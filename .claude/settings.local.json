@@ -17,7 +17,15 @@
       "Bash(sed:*)",
       "Bash(grep:*)",
       "Bash(python3 -c \"import sys,json; d=json.loads\\(sys.stdin.read\\(\\)\\); print\\(d.get\\(''message'',{}\\).get\\(''content'',[{}]\\)[0].get\\(''text'',''''\\)[:200] if d.get\\(''message'',{}\\).get\\(''content''\\) else ''working...''\\)\")",
-      "Bash(export:*)"
+      "Bash(export:*)",
+      "Bash(python3:*)",
+      "Bash(LC_ALL=C sed:*)",
+      "Bash(for f in src/*.c src/*.h)",
+      "Bash(do echo \"=== $f ===\")",
+      "Read(//c/Src/div/**)",
+      "Bash(done)",
+      "Bash(python:*)",
+      "Bash(echo ================================================================================\nFINAL REPORT: WHY UTF-8 CONVERSION BREAKS DIV GAMES STUDIO COMPILATION\n================================================================================:*)"
     ]
   }
 }

@@ -13,20 +13,24 @@ Clean up first, ship second, then modernize based on what real users actually wa
 
 ---
 
-## Phase 0 — Archaeology & Dead Code Removal
+## Phase 0 — Archaeology & Dead Code Removal ✓
 
-Strip ~35,000 lines of dead weight. Make the codebase honest about what it is today.
+**Completed 2026-03-06.** 118 files changed, 145 insertions, ~41,000 deletions.
 
-### Strip dead subsystems
-- [ ] Delete CD-ROM/CDDA code: `cdrom.c`, `divcdrom.c`, `runtime/cdrom.c` (~2,200 lines)
-- [ ] Delete MODE8/VPE 3D engine: `runtime/vpe/` (18 files, ~6,500 lines) — it was a regret in 1998
-- [ ] Delete Visor 3D sprite generator: `visor/` (9 files, ~5,000 lines) — dead ifdef, never active
-- [ ] Delete DLL plugin system: grep for `DIVDLL`, remove infrastructure (~1,000 lines)
-- [ ] Delete `div1run/unused/` directory (explicitly marked dead)
-- [ ] Audit and likely delete `other/` directory (~17,000 lines of vestigial duplicates)
-- [ ] Remove dead `#ifdef` branches: GCW, PSP, Pandora, GP2X, Amiga, Atari ST, PS2 (~200 lines)
-- [ ] Delete dead cmake toolchain files (keep only: windows-native, linux, osx, pi)
-- [ ] Remove `shared/lib/portrend/` (dead 3D code behind commented ifdef)
+### What was removed
+- [x] CD-ROM/CDDA code: `cdrom.c`, `divcdrom.c`, `runtime/cdrom.c` (clock widget preserved → `divclock.c`)
+- [x] MODE8/VPE 3D engine: `runtime/vpe/` (38 files deleted)
+- [x] Visor 3D sprite generator: `visor/` (21 files deleted, `divspr.c` → stub)
+- [x] DLL plugin system: all `DIVDLL` infrastructure removed from divc.c, runtime, div1run
+- [x] `div1run/unused/` directory (3 files)
+- [x] `other/` directory (7 files)
+- [x] Dead `#ifdef` branches: GCW, PSP, Pandora, GP2X, Amiga, Atari ST, PS2
+- [x] Dead cmake toolchain files (7 deleted, kept: windows-native, linux, osx, defaults)
+- [x] `shared/lib/portrend/` (3 files), `shared/mikedll.c`, `shared/divdll.h`
+- [x] Network code: NETLIB/NETPLAY blocks, `net.c`, `net.h`, `netlib.h`
+- [x] Fixed CMakeLists.txt `exec_program("git")` → `execute_process()` with fallback
+
+### Still pending from Phase 0
 - [ ] Clean up bundled sdlgfx — only `SDL_framerate.c` is actually used
 - [ ] Remove hundreds of commented-out code blocks throughout
 
@@ -46,6 +50,52 @@ Strip ~35,000 lines of dead weight. Make the codebase honest about what it is to
 - [ ] Add a DLL auto-copy step so first-time build "just works"
 - [ ] Add a one-command build script wrapper
 - [ ] Add proper `.gitignore` for build/ and div/ runtime artifacts
+
+---
+
+## Phase 0.5 — Fix File Encoding (Latin-1 → UTF-8)
+
+The entire codebase is Latin-1 encoded (from the MS-DOS era). Modern editors, tools,
+and AI assistants silently corrupt these files by converting them to UTF-8. This makes
+the codebase dangerous to edit — we can't maintain code we can barely touch.
+
+### The problem
+
+47+ source files contain non-ASCII bytes (Spanish accented characters). Most are in
+comments (harmless), but 4 critical character lookup tables contain **load-bearing
+high bytes** that break if their values change:
+
+- `div.c:110-114` — `lower[256]`: maps every byte value to its normalized lowercase.
+  Indices 128-159 map accented vowels (á→a, é→e, ñ→n, etc.) for identifier parsing.
+- `divc.c:1205` — case-insensitive character table (8 high bytes)
+- `divc.c:1285` — another character mapping table (8 high bytes)
+- `divc.c:3232` — case-sensitive character table (35 high bytes)
+
+These tables are used by the lexical analyzer to support accented Spanish identifiers
+in DIV programs (e.g., `posición` normalizes to `posicion`). The compiler reads source
+byte-by-byte and does `lower[byte]` lookups — if the table has wrong values at indices
+0x80-0xFF, compilation fails or produces garbage.
+
+### The fix (small, surgical)
+
+1. Replace the 4 string-literal table initializations with explicit hex escapes:
+   `"...ÿueaaaa‡..."` → `"...\xff\x75\x65\x61\x61\x61\x61\x87..."`
+   This makes the byte values explicit and encoding-independent.
+
+2. Replace the ~5 Spanish display strings (fprintf in divc.c, box-drawing in
+   divhelp.c) with ASCII equivalents or hex escapes.
+
+3. Convert all source files to UTF-8 (comments become proper UTF-8, code is
+   now encoding-safe thanks to hex escapes).
+
+4. Verify: `file --mime-encoding` shows UTF-8 for all files, build succeeds,
+   compile (F11) works, existing .PRG files still compile correctly.
+
+### Why this matters
+
+Without this fix, every future edit requires `sed -i` through bash to avoid
+corruption. No modern editor or tool can safely save these files. This is a
+prerequisite for comfortable development in Phases 1-3.
 
 ---
 
@@ -265,6 +315,7 @@ The patterns:
 ## Notes
 
 - The codebase MUST be compiled as 32-bit (`sizeof(int) == sizeof(void*)` everywhere)
+- Source files are Latin-1 encoded — see Phase 0.5 for the plan to fix this
 - The `texto[]` / `lenguaje.div` system makes localization straightforward
 - The OSDEP layer is the right abstraction boundary for all platform work
 - The process model is DIV's core innovation — protect it, document it, celebrate it
