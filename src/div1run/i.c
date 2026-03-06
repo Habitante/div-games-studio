@@ -9,8 +9,6 @@
 
 #include "inter.h"
 #include "divsound.h"
-#include "cdrom.h"
-#include "net.h"
 #ifndef __APPLE__
 #include <malloc.h>
 #endif
@@ -18,9 +16,6 @@
 #include <emscripten.h>
 #endif
 
-#ifdef DIVDLL
-#include "divdll.h"
-#endif
 
 // FILE PROTOTYPES
 void interprete (void);
@@ -68,12 +63,6 @@ int __far critical_error(unsigned deverr,unsigned errcode,unsigned far*devhdr)
 //อออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
 void CMP_export(char *name,void *dir,int nparms)
 {
-#ifdef DIVDLL
-static int nExt=0;
-  nparms=nparms;
-  name=name;
-  ExternDirs[nExt++]=dir;
-#endif
 }
 
 void CNT_export(char *name,void *dir,int nparms)
@@ -277,9 +266,6 @@ printf("exesize: %d datasize: %d exestart: %d datstart: %d filepos:%d\n ",exesiz
       InitHandler(0);
 #endif
     }
-#ifdef DOS
-    Init_CD();
-#endif
     interprete();
 
   } else exer(1);
@@ -291,8 +277,6 @@ printf("exesize: %d datasize: %d exestart: %d datstart: %d filepos:%d\n ",exesiz
 
 int _mouse_x,_mouse_y;
 
-void MAINSRV_Packet(WORD Usuario,WORD Comando,BYTE *Buffer,WORD Len);
-void MAINNOD_Packet(WORD Usuario,WORD Comando,BYTE *Buffer,WORD Len);
 
 extern int find_status;
 
@@ -435,60 +419,7 @@ max_saltos=2;
 
   init_volcado();
 
-#ifdef DIVDLL
-  // DLL_3 Exportaciขn de funciones y variables (para utilizarlas en las DLL)
 
-// Exportadas desde 'C'
-// files
-  DIV_export("div_fopen"  ,(void *)fopen  );
-  DIV_export("div_fclose" ,(void *)fclose );
-  DIV_export("div_malloc" ,(void *)malloc);
-  DIV_export("div_free"   ,(void *)free);
-  DIV_export("div_rand"   ,(void *)_random);
-  DIV_export("div_text_out",(void *)text_out);
-// variables publicas
-
-  DIV_export("stack",(void *)&pila);
-  DIV_export("sp",(void *)&sp);
-  DIV_export("wide",(void *)&vga_an);
-  DIV_export("height",(void *)&vga_al);
-  DIV_export("buffer",(void *)&copia);
-  
-  DIV_export("background",(void *)&copia2);
-  DIV_export("ss_time",(void *)&ss_time);
-  DIV_export("ss_status",(void *)&ss_status);
-  DIV_export("ss_exit",(void *)&ss_exit);
-
-  DIV_export("process_size",(void *)&iloc_len);
-  DIV_export("id_offset",(void *)&id);
-  DIV_export("id_init_offset",(void *)&id_init);
-  DIV_export("id_start_offset",(void *)&id_start);
-  DIV_export("id_end_offset",(void *)&id_end);
-  DIV_export("set_palette",(void *)&activar_paleta);
-  DIV_export("ghost",(void *)&ghost);
-
-  DIV_export("mem",(void *)mem);
-  DIV_export("palette",(void *)paleta);
-  DIV_export("active_palette",(void *)dac);
-  DIV_export("key",(void *)kbdFLAGS);
-
-  ss_time=3000; ss_time_counter=0;
-  ss_status=1; activar_paleta=0;
-
-/////////////////////////////////////////////////////////////
-
-  COM_export=CNT_export;
-  LookForAutoLoadDlls();
-  COM_export=CMP_export;
-
-#endif
-
-#ifdef NETLIB
-  inicializacion_red=0;
-
-  SRV_Packet=MAINSRV_Packet;
-  NOD_Packet=MAINNOD_Packet;
-#endif
 
 /////////////////////////////////////////////////////////////
 
@@ -592,9 +523,6 @@ void exec_process(void) {
     mem[ide+_Frame]-=100;
     mem[ide+_Executed]=1;
   } else {
-#ifdef NETLIB
-    net_receive(); // Recibe los paquetes justo antes de ejecutar el proceso
-#endif
     id=ide; ip=mem[id+_IP]; sp=64; pila[64]=0;
 
     #ifdef DEBUG
@@ -796,23 +724,12 @@ void exec_process(void) {
           id=bp;
         } break;
       case limp:
-#ifdef DIVDLL
-        if ((pe[nDLL]=DIV_LoadDll((char*)&mem[itxt+mem[ip++]]))==NULL)
-          exer(4);
-        else
-          nDLL++;
-#else
 ip++;
 printf("limp\n");
-#endif
         break;
       case lext:
-#ifdef DIVDLL
-        call((voidReturnType)ExternDirs[mem[ip++]]);
-#else
 ip++;
 printf("lext\n");
-#endif
         break;
       case lchk:
         if (pila[sp]<id_init || pila[sp]>id_end || pila[sp]!=mem[pila[sp]]) {
@@ -870,9 +787,6 @@ void trace_process(void) {
     mem[ide+_Frame]-=100;
     mem[ide+_Executed]=1;
   } else {
-#ifdef NETLIB
-    net_receive(); // Recibe los paquetes justo antes de ejecutar el proceso
-#endif
     id=ide; ip=mem[id+_IP]; sp=64; pila[64]=0;
     continue_process:
     max_reloj=get_reloj()+max_process_time;
@@ -997,23 +911,12 @@ void trace_process(void) {
           id=bp;
         } break;
       case limp:
-#ifdef DIVDLL
-        if ((pe[nDLL]=DIV_LoadDll((byte*)&mem[itxt+mem[ip++]]))==NULL)
-          exer(4);
-        else
-          nDLL++;
-#else
 ip++;
 printf("limp\n");
-#endif
         break;
       case lext:
-#ifdef DIVDLL
-        call((unsigned int)ExternDirs[mem[ip++]]);
-#else
 ip++;
 printf("lext\n");
-#endif
         break;
       #ifdef DEBUG
       case lchk:
@@ -1215,33 +1118,6 @@ emscripten_run_script (buf);
   if (!dll_loaded) {
     dll_loaded=1;
 
-#ifdef DIVDLL
-    // Los importa
-
-    set_video_mode        =(void (*)())DIV_import("set_video_mode"); //ok
-    process_palette       =(void (*)())DIV_import("process_palette"); //ok
-    process_active_palette=(void (*)())DIV_import("process_active_palette"); //ok
-
-    process_sound         =(void (*)(char *, int))DIV_import("process_sound"); //ok
-
-    process_fpg           =(void (*)(char *, int))DIV_import("process_fpg"); //ok
-    process_map           =(void (*)(char *, int))DIV_import("process_map"); //ok
-    process_fnt           =(void (*)(char *, int))DIV_import("process_fnt"); //ok
-
-    background_to_buffer  =(void (*)())DIV_import("background_to_buffer"); //ok
-    buffer_to_video       =(void (*)())DIV_import("buffer_to_video"); //ok
-
-    post_process_scroll   =(void (*)())DIV_import("post_process_scroll"); //ok
-    post_process_m7       =(void (*)())DIV_import("post_process_m7"); //ok
-    post_process_buffer   =(void (*)())DIV_import("post_process_buffer"); //ok
-    post_process          =(void (*)())DIV_import("post_process"); //ok
-
-    putsprite             =(void (*)(unsigned char *, int, int, int, int, int, int, int, int, int ))DIV_import("put_sprite"); //ok
-
-    ss_init               =(void (*)())DIV_import("ss_init"); //ok
-    ss_frame              =(void (*)())DIV_import("ss_frame"); //ok
-    ss_end                =(void (*)())DIV_import("ss_end"); //ok
-#endif
     ss_time_counter=get_reloj()+ss_time;
 
     // DLL_1 Aquก se llama a uno.
@@ -1419,13 +1295,7 @@ void finalizacion (void) {
     set_paleta(); set_dac();
   }
 
-#ifdef DIVDLL
-  while (nDLL--) DIV_UnLoadDll(pe[nDLL]);
-#endif
 
-#ifdef NETLIB
-  if (inicializacion_red) net_end();
-#endif
   rvmode();
   EndSound();
   mouse_off();
@@ -1473,9 +1343,6 @@ void exer(int e) {
   //printf("*** Error de ejecuciขn:\n\n\tnง actual de procesos = %u\n\tnง m ximo de procesos = %u",
   //procesos,(id_end-id_start)/iloc_len+1);
 
-#ifdef NETLIB
-  if (inicializacion_red) net_end();
-#endif
 
   rvmode();
   EndSound();
@@ -1523,9 +1390,6 @@ void e(char * texto) {
        printf("DIV Execution error: %s (%s)",texto,fname[v_function]);
   else printf("DIV Execution error: %s",texto);
 
-#ifdef NETLIB
-  if (inicializacion_red) net_end();
-#endif
 
   rvmode();
   EndSound();

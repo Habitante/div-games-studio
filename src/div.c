@@ -372,7 +372,6 @@ int DPMIalloc4k(void);
 
 #endif
 
-#if !defined ( GP2X ) && !defined (PS2)
 #ifdef MIXER
 void print_init_flags(int flags)
 {
@@ -385,7 +384,6 @@ void print_init_flags(int flags)
 			debugprintf("None");
         debugprintf("\n");
 }
-#endif
 #endif
 
 void get_error(int n);
@@ -547,7 +545,6 @@ int main(int argc, char * argv[]) {
 	if(SDL_NumJoysticks() > 0)
 		SDL_JoystickOpen(0);
 
-#if !defined( GP2X ) && !defined (PS2) && !defined ( PSP )
 #ifdef MIXER
 	int flags = MIX_INIT_MOD|MIX_INIT_OGG|MIX_INIT_FLAC;
 
@@ -557,7 +554,6 @@ int main(int argc, char * argv[]) {
 		printf("Mix_Init: %s\n", Mix_GetError());
 		print_init_flags(initted);
 	}
-#endif
 #endif
 
 #ifndef __EMSCRIPTEN__
@@ -1776,9 +1772,7 @@ void shell(void) {
 		
 		EndSound();
 #ifndef SDL2
-#if !defined ( GP2X ) && !defined (PS2) && !defined (PSP)
 		SDL_putenv("PROMPT=[DIV] $P$G");
-#endif
 #endif
 
 		chdir(tipo[0].path);

@@ -7,15 +7,6 @@
 #ifndef NULL
 #define NULL                    0
 #endif
-//#include "divdll.h"
-#define COMMON_PARAMS   void *(*DIV_import)(char *name),\
-                        void (*DIV_export)(char *name,void *obj)
-#define LIBRARY_PARAMS  void (*COM_export)(char *name,void *obj,int nparms)
-void divmain(COMMON_PARAMS);
-
-void  DIV_export(char *name,void *obj());
-void *DIV_import(char *name);
-#define AutoLoad()      DIV_export("Autoload",divmain)
 
 #define     __export       /* __EXPORT */
 // __declspec(dllexport)

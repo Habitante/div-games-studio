@@ -27,10 +27,6 @@
 #define GLOBAL_DATA extern
 #endif
 
-#ifdef GCW
-#define GCW_W 320
-#define GCW_H 240
-#endif
 
 #ifdef DIVGIT
 #include "divgit.h"
@@ -48,11 +44,7 @@ void call(const voidReturnType func); // void funcion(void); int n=(int)funcion;
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#ifndef PS2
 #include <stdint.h>
-#else
-typedef unsigned short uint16_t;
-#endif
 
 #ifndef __APPLE__
 #include <malloc.h>

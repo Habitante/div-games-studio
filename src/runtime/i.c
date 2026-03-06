@@ -17,24 +17,12 @@
 
 #include "inter.h"
 
-#include "cdrom.h"
 #include "divsound.h"
 #include "divmixer.hpp"
-#include "netlib.h"
 #include <time.h>
 #include <sched.h>
 
-#ifdef NETPLAY
-extern int inicializacion_red;
-#endif
-
 void busca_packfile(void);
-
-
-void _object_data_input(int ide);
-void _object_destroy(int num_object);
-int create_object(int ide);
-void _object_data_output(int ide);
 
 void InitHandler(int);
 int DetectBlaster(int*,int*,int*,int*,int*);
@@ -56,8 +44,6 @@ extern int no_volcar_nada;
 
 void readmouse(void);
 
-int dll_loaded=0;
-
 int trace_program=0;
 #ifdef __EMSCRIPTEN__
 int ignore_errors=1;
@@ -70,7 +56,6 @@ int old_restore_type;
 
 int last_key_check,key_check,last_joy_check,joy_check; // Call screensaver
 int last_mou_check,mou_check;
-int error_vpe;
 
 void function_exec(int id,int n); // Id, ciclos
 void process_exec(int id,int n); // Id, ciclos
@@ -339,27 +324,6 @@ int __far critical_error(unsigned deverr,unsigned errcode,unsigned far*devhdr)
   { c_e_0=deverr; c_e_1=errcode; c_e_2=devhdr; return(_HARDERR_IGNORE); }
 
 ///////////////////////////////////////////////////////////////////////////////
-void CMP_export(char *name,void *dir,int nparms)
-{
-#ifdef DIVDLL
-static int nExt=0;
-  nparms=nparms;
-  name=name;
-
-  printf("%s[%d] %x %d \n",name,nExt,dir,nparms);
-
-  ExternDirs[nExt++]=dir;
-
-#endif
-}
-
-void CNT_export(char *name,void *dir,int nparms)
-{
-  nparms=nparms;
-  dir=dir;
-  name=name;
-}
-///////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////
 // Main program
@@ -401,9 +365,6 @@ int DPMIalloc4k(void);
 
 void check_mouse(void);
 int _mouse_x,_mouse_y;
-
-void MAINSRV_Packet(WORD Usuario,WORD Comando,BYTE *Buffer,WORD Len);
-void MAINNOD_Packet(WORD Usuario,WORD Comando,BYTE *Buffer,WORD Len);
 
 extern int find_status;
 
@@ -608,59 +569,10 @@ init_rnd(dtime);
 
   init_volcado();
 
-  // DLL_3 Exportaci�n de funciones y variables (para utilizarlas en las DLL)
-#ifdef DIVDLL
-// Exportadas desde 'C'
-// files
-  DIV_export("div_fopen"  ,(void *)fopen  );
-  DIV_export("div_fclose" ,(void *)fclose );
-  DIV_export("div_malloc" ,(void *)malloc);
-  DIV_export("div_free"   ,(void *)free);
-  DIV_export("div_rand"   ,(void *)_random);
-  DIV_export("div_text_out",(void *)text_out);
-// variables publicas
-
-  DIV_export("stack",(void *)&pila);
-  DIV_export("sp",(void *)&sp);
-  DIV_export("wide",(void *)&vga_an);
-  DIV_export("height",(void *)&vga_al);
-  DIV_export("buffer",(void *)&copia);
-  DIV_export("background",(void *)&copia2);
-  DIV_export("ss_time",(void *)&ss_time);
-  DIV_export("ss_status",(void *)&ss_status);
-  DIV_export("ss_exit",(void *)&ss_exit);
-
-  DIV_export("process_size",(void *)&iloc_len);
-  DIV_export("id_offset",(void *)&id);
-  DIV_export("id_init_offset",(void *)&id_init);
-  DIV_export("id_start_offset",(void *)&id_start);
-  DIV_export("id_end_offset",(void *)&id_end);
-  DIV_export("set_palette",(void *)&activar_paleta);
-  DIV_export("ghost",(void *)&ghost);
-  DIV_export("region",(void *)region);
-
-  DIV_export("mem",(void *)mem);
-  DIV_export("palette",(void *)paleta);
-  DIV_export("active_palette",(void *)dac);
-  DIV_export("key",(void *)kbdFLAGS);
-  DIV_export("graphs",(void *)g);
-#endif
-
   ss_time=3000; ss_time_counter=0;
   ss_status=1; activar_paleta=0;
 
   memset(tabfiles, 0, 32*4);
-
-/////////////////////////////////////////////////////////////
-#ifdef DIVDLL
-  COM_export=CNT_export;
-  LookForAutoLoadDlls();
-  COM_export=CMP_export;
-#endif
-#ifdef NETPLAY
-	inicializacion_red=0;
-#endif
-/////////////////////////////////////////////////////////////
 
   for(n=0; n<128; n++) {
     sonido[n].smp  = NULL;
@@ -671,7 +583,6 @@ init_rnd(dtime);
 #ifdef JUDAS
   if(judascfg_device!=DEV_NOSOUND) set_init_mixer();
 #endif
-  Init_CD();
 
   find_status=0;
 }
@@ -817,7 +728,6 @@ void mainloop(void) {
   }
 #endif
 
-	error_vpe=0;
   frame_start();
 
 #ifdef DEBUG
@@ -836,9 +746,6 @@ void mainloop(void) {
       exec_process();
     } while (ide);
     frame_end();
-    if (error_vpe!=0) {
-      v_function=-2; e(error_vpe);
-    }
 #ifdef EMSCRIPTEN
 //    running = 0;
 #endif
@@ -917,11 +824,8 @@ void exec_process(void) {
 		if (mem[ide+_Frame]>=100) {
 			mem[ide+_Frame]-=100;
 			mem[ide+_Executed]=1;
-		} else {	  
-#ifdef NETPLAY
-			_net_loop(); // Process netplay routine before calling process
-#endif
-			id=ide; 
+		} else {
+			id=ide;
 			ip=mem[id+_IP];
 			carga_pila(id);
 
@@ -1000,11 +904,6 @@ void trace_process(void) {
 		mem[ide+_Frame]-=100;
 		mem[ide+_Executed]=1;
 	} else {
-
-#ifdef NETPLAY
-		_net_loop(); // Receive packets before executing process
-#endif
-
 		id=ide;
 		ip=mem[id+_IP];
 		carga_pila(id);
@@ -1280,51 +1179,6 @@ void frame_end(void) {
 	emscripten_run_script (buf);
 #endif
 
-#ifdef DIVDLL
-	// DLL_0 Lee los puntos de ruptura (bien sea de autoload o de import)
-	if (!dll_loaded) {
-		dll_loaded=1;
-
-		// Imports
-
-		set_video_mode        =(void (*)())DIV_import("set_video_mode"); //ok
-		process_palette       =(void (*)())DIV_import("process_palette"); //ok
-		process_active_palette=(void (*)())DIV_import("process_active_palette"); //ok
-
-		process_sound         =(void (*)(char *,int))DIV_import("process_sound"); //ok
-
-		process_fpg           =(void (*)(char *,int))DIV_import("process_fpg"); //ok
-		process_map           =(void (*)(char *,int))DIV_import("process_map"); //ok
-		process_fnt           =(void (*)(char *,int))DIV_import("process_fnt"); //ok
-
-		background_to_buffer  =(void (*)())DIV_import("background_to_buffer"); //ok
-		buffer_to_video       =(void (*)())DIV_import("buffer_to_video"); //ok
-
-		post_process_scroll   =(void (*)())DIV_import("post_process_scroll"); //ok
-		post_process_m7       =(void (*)())DIV_import("post_process_m7"); //ok
-		post_process_buffer   =(void (*)())DIV_import("post_process_buffer"); //ok
-		pre_process_buffer    =(void (*)())DIV_import("pre_process_buffer"); //ok
-		post_process          =(void (*)())DIV_import("post_process"); //ok
-
-		putsprite             =(void (*)(byte *,int,int,int,int,int,int,int,int,int))DIV_import("put_sprite"); //ok
-
-		ss_init               =(void (*)())DIV_import("ss_init"); //ok
-		ss_frame              =(void (*)())DIV_import("ss_frame"); //ok
-		ss_end                =(void (*)())DIV_import("ss_end"); //ok
-
-		ss_time_counter=get_reloj()+ss_time;
-
-		// DLL_1 Aqu� se llama a uno.
-
-#ifdef DEBUG
-		if (process_palette!=NULL) 
-			process_palette();
-	
-#endif // DEBUG
-	}
-
-#endif // DLL
-
 	// Si el usuario modific� mouse.x o mouse.y, posiciona el rat�n debidamente
 #ifndef SDL2
 	if (_mouse_x!=mouse->x || _mouse_y!=mouse->y) 
@@ -1372,36 +1226,6 @@ void frame_end(void) {
 	}
 	oreloj=get_ticks();
 #endif
-
-#if (defined MODE8) || (defined NEWMODE8)
-	for (n=0,ide=id_start; ide<=id_end; ide+=iloc_len) {
-		if (mem[ide+_Ctype]==3 && mem[ide+_Old_Ctype]!=3) {
-			n=1; 
-			mem[ide+_M8_Object]=create_object(ide);
-
-			// ******* OJO *************** PROBAR !!!!!
-
-			if (mem[ide+_M8_Object]==-1) elimina_proceso(ide);
-
-		} else if (mem[ide+_Ctype]!=3 && mem[ide+_Old_Ctype]==3) {
-			n=1; _object_destroy(mem[ide+_M8_Object]);
-			mem[ide+_M8_Object]=-1;
-		}
-
-		mem[ide+_Old_Ctype]=mem[ide+_Ctype];
-		if (mem[ide+_Ctype]==3) {
-			_object_data_input(ide);
-			n=1;
-		}
-	}
-
-    loop_mode8();
-
-	for (ide=id_start; ide<=id_end; ide+=iloc_len) {
-		if (mem[ide+_Ctype]==3)
-			_object_data_output(ide);
-	}
-#endif // MODE8
 
 #ifdef DEBUG
 	if (n) {
@@ -1727,9 +1551,6 @@ void elimina_proceso(int id) {
 						
 				mem[id_init+_Son]=mem[id+_Son];
 			}
-#ifdef MODE8
-	_object_destroy(mem[id+_M8_Object]);
-#endif
 
 	while(mem[id_end+_Status]==0 && id_end>id_start) {
 		id_end-=iloc_len;
@@ -1740,18 +1561,13 @@ void elimina_proceso(int id) {
 // Finalise
 ///////////////////////////////////////////////////////////////////////////////
 
-#if defined ( WIN32 ) || defined ( PSP )
+#ifdef WIN32
 void closefiles(void); // close fake fmemopen'd files
 #endif
 
 void finalizacion (void) {
   int newmapcount = 0;
   int snum = 0;
-#ifdef DIVDLL
-// unload dlls
-	while (nDLL--)
-		DIV_UnLoadDll(pe[nDLL]);
-#endif
 
 	dacout_r=64;
 	dacout_g=64;
@@ -1763,10 +1579,6 @@ void finalizacion (void) {
 		set_dac();
 	}
 
-#ifdef NETPLAY
-	if (inicializacion_red)
-		net_end();
-#endif
 	rvmode();
 
 	kbdReset();
@@ -1834,7 +1646,7 @@ void finalizacion (void) {
   free(copia_debug);
 #endif
 
-#if defined (WIN32) || defined (PSP)
+#ifdef WIN32
 
 	closefiles();
 
@@ -1880,10 +1692,6 @@ void exer(int e) {
 
   //printf("*** Error de ejecuci�n:\n\n\tn� actual de procesos = %u\n\tn� m�ximo de procesos = %u",
   //procesos,(id_end-id_start)/iloc_len+1);
-#ifdef NETPLAY
-	if (inicializacion_red)
-		net_end();
-#endif
 
 	rvmode();
 
@@ -1932,10 +1740,6 @@ void e(int texto) {
 	} else {
 		printf("Error %d %s\n\n",texto,text[texto]);
 	}
-#ifdef NETPLAY
-	if (inicializacion_red)
-		net_end();
-#endif
 	rvmode();
 
 //  if (end_extern!=NULL) end_extern();

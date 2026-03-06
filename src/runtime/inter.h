@@ -39,12 +39,6 @@
 typedef void(*voidReturnType)(void);
 void call(const voidReturnType func); // void funcion(void); int n=(int)funcion; call(n);
 
-#ifdef PSP
-#include <pspkernel.h>
-#include <pspdebug.h>
-#include <pspaudiolib.h>
-#define printf	pspDebugScreenPrintf
-#endif
 
 
 //#include <bios.h>
@@ -52,7 +46,6 @@ void call(const voidReturnType func); // void funcion(void); int n=(int)funcion;
 //#include <i86.h>
 //#include <graph.h>
 #include <math.h>
-#include "divdll.h"
 
 #include "divkeybo.h"
 #include "divfli.h"
@@ -162,9 +155,6 @@ extern int debug_active;
 void memcpyb(byte * di, byte * si, int n);
 //void call(int *(*func)() );
 
-// Mode8 (vpe/vpedll.cpp)
-
-void loop_mode8(void);
 
 ///////////////////////////////////////////////////////////////////////////////
 //      Functions exported by DIVLENGU (divlengu.cpp)

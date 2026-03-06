@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls:*)",
+      "Bash(cmake:*)",
+      "Bash(/c/msys64/mingw32/bin/cmake:*)",
+      "Bash(/c/msys64/mingw32/bin/mingw32-make:*)",
+      "Bash(/c/msys64/mingw32/bin/gcc:*)",
+      "Bash(rm:*)",
+      "Bash(PATH=\"/c/msys64/mingw32/bin:$PATH\" mingw32-make:*)",
+      "Bash(PATH=\"/c/msys64/mingw32/bin:$PATH\" mingw32-make VERBOSE=1:*)",
+      "Bash(PATH=\"/c/msys64/mingw32/bin:$PATH\" which git:*)",
+      "Bash(PATH=\"/c/msys64/mingw32/bin:/mingw64/bin:$PATH\" mingw32-make:*)",
+      "Bash(./system/div-WINDOWS.exe COMP:*)",
+      "Bash(./system/divrun-WINDOWS.exe:*)",
+      "Bash(taskkill:*)",
+      "Bash(sed:*)",
+      "Bash(grep:*)",
+      "Bash(python3 -c \"import sys,json; d=json.loads\\(sys.stdin.read\\(\\)\\); print\\(d.get\\(''message'',{}\\).get\\(''content'',[{}]\\)[0].get\\(''text'',''''\\)[:200] if d.get\\(''message'',{}\\).get\\(''content''\\) else ''working...''\\)\")",
+      "Bash(export:*)"
+    ]
+  }
+}

@@ -6,17 +6,6 @@
 #include "inter.h"
 #include "madewith.h"
 
-#ifdef GCW
-//#define GCW_W 640
-//#define GCW_H 480
-
-#define GCW_W 320
-#define GCW_H 240
-
-float w_ratio=1.0;
-float h_ratio=1.0;
-#endif
-
 ///////////////////////////////////////////////////////////////////////////////
 //	Declarations and module-level data
 ///////////////////////////////////////////////////////////////////////////////
@@ -255,53 +244,14 @@ SDL_ShowCursor(SDL_DISABLE);
 		vga=OSDEP_SetVideoMode(vga_an, vga_al, 8, 0);
 #else
 
-#ifdef PANDORA
-		vga=OSDEP_SetVideoMode(vga_an, vga_al, 8, 1);
-#else
-
-#ifdef PSP
-	fsmode=1;
-//		if(!vga)
-			vga=OSDEP_SetVideoMode(480, 272, 8, 0);
-			//SDL_SWSURFACE | SDL_FULLSCREEN);
-#else
-
 		if(fsmode==1)
 			vga=OSDEP_SetVideoMode(vga_an, vga_al, 8, 1);
-#endif
 
 		if(!vga || fsmode==0)
 			vga=OSDEP_SetVideoMode(vga_an, vga_al, 8, 0);//, SDL_FULLSCREEN | SDL_HWSURFACE | SDL_DOUBLEBUF);
 
-#ifdef GCW
-    
-  if(vga_an>640 || vga_al>480) {
-    
-    vga=OSDEP_SetVideoMode(640,480, 8, 0);
-    if(!vga) 
-      vga=OSDEP_SetVideoMode(320,240, 8, 0);
-
-    if(vga) {
-//    vga=SDL_SetVideoMode(GCW_W,GCW_H, 8, 0);
-//    if(!vga) {
-//      vga=SDL_SetVideoMode(320,240, 8, 0);
-//    }
-
-//    w_ratio = vga_an / (float)(vga->w*1.0);
-//    h_ratio = vga_al / (float)(vga->h*1.0);   
-
-      printf("Setting soft mode %d %d\n",vga->w,vga->h);
-    
-    } 
-  }
-  // hardware scale
-#endif
-
 #endif
 		printf("Set mode: %d,%d\n",vga->w,vga->h);
-		
-
-#endif
 
 
 #ifdef STDOUTLOG
@@ -432,61 +382,6 @@ void rvmode(void) {
 //�����������������������������������������������������������������������������
 //      Dump buffer to VGA
 //�����������������������������������������������������������������������������
-#ifdef GCW
-void volcadogcw(byte *p) {
-	// blit screen to smaller 320x240 screen
-	byte *qt = (byte *)vga->pixels;
-	byte *q = qt;
-	int row=0;
-	float vy=0;
-	float vx=0;
-	float wratio = vga_an / (float)(vga->w*1.0);
-	float hratio = vga_al / (float)(vga->h*1.0);
-	byte *c;
-	//printf("ratio is %fx%f\n",wratio,hratio);
-	
-	if(SDL_MUSTLOCK(vga))
-		SDL_LockSurface(vga);
-
-	for (vy=0; vy<vga_al;vy+=hratio) {
-		// calculate the pixel
-		c=&p[vga_an*(int)vy];
-		
-		for(vx=0;vx<vga_an;vx+=wratio) {
-			
-			*q=c[(int)vx];
-//			c+=(int)wratio;
-			q++;
-		}
-//		memcpy(q,p,vga_an);
-//			p=p[(int)(vga_an*hratio)];
-		//q+=vga->pitch;//vga_an;//*vga->pitch*vga->format->BytesPerPixel;
-	}
-	if(SDL_MUSTLOCK(vga))
-		SDL_UnlockSurface(vga);
-
-	return;
-	for (vy=0; vy<vga_al;vy+=hratio) {
-//printf("%d %d %d vy is %f %d\n",row,GCW_W, GCW_H, vy,(int)vy);
-		// calculate the pixel
-		c=&p[vga->w*(int)(row/hratio)];
-		q=&qt[vga->pitch*(int)row];
-//		qt = &q[(int)vy *GCW_W];
-		for(vx=0;vx<vga_an;vx+=wratio) {
-//printf("plotting %f %f %x %x\n",vy,vx,q,vga->pixels);		
-			*q=c[(int)vx];
-//			c+=(int)wratio;
-			q++;
-		}
-		row++;
-//		memcpy(q,p,vga_an);
-//			p=p[(int)(vga_an*hratio)];
-		//q+=vga->pitch;//vga_an;//*vga->pitch*vga->format->BytesPerPixel;
-	}
-	
-}
-#endif
-
 void volcadosdl(byte *p) {
 	
 #ifndef SDL2
@@ -500,14 +395,6 @@ void volcadosdl(byte *p) {
 SDL_RenderClear(divRender);
 SDL_RenderCopy(divRender, divTexture, NULL, NULL);
 SDL_RenderPresent(divRender);
-#endif
-
-#ifdef GCW 
-	if(vga_an>640 || vga_al>480) {
-		volcadogcw(p);
-		OSDEP_Flip(vga);
-		return;
-	}
 #endif
 
 	if(SDL_MUSTLOCK(vga))

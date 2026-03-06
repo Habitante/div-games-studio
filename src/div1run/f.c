@@ -5,11 +5,6 @@
 
 #include "inter.h"
 #include "divsound.h"
-#include "cdrom.h"
-#include "net.h"
-#ifdef DIVDLL
-#include "divdll.h"
-#endif
 
 // file prototypes
 
@@ -198,13 +193,6 @@ void function(void) {
     case 77: set_volume(); break;
 #ifdef NOTYET
     case 78: set_color(); break;
-#ifdef NETLIB
-    case 79: _net_init_ipx(); break;
-    case 80: _net_init_modem(); break;
-    case 81: _net_init_serial(); break;
-    case 82: _net_send(); break;
-    case 83: _net_asign(); break;
-#endif
     case 84: path_find(); break;
     case 85: path_line(); break;
     case 86: path_free(); break;
@@ -1708,13 +1696,7 @@ void fget_angle(void) {
 //ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
 
 void _play_cd(void) {
-#ifdef DOS
-  int p,m;
-  m=pila[sp--]; p=pila[sp];
-  Stop_CD();
-  if (p<1) return;
-  Play_CD(p,m);
-#endif
+  sp--;
 }
 
 //ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
@@ -1722,26 +1704,15 @@ void _play_cd(void) {
 //ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
 
 void _stop_cd(void) {
-#ifdef DOS
-  Stop_CD(); 
-#endif  
-sp++;
+  sp++;
 }
 
 //ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
 //      Is_playing_cd();
 //ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
 
-unsigned int get_cd_error(void);
-
 void _is_playing_cd(void) {
-#ifdef DOS
-  if (get_cd_error()&0x200) 
-	pila[++sp]=1; 
-  else 
-#endif
     pila[++sp]=0;
-
 }
 
 //ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
@@ -1911,13 +1882,7 @@ void _exit_dos(void) {
   FILE * f;
   #endif
 
-#ifdef DIVDLL
-  while (nDLL--) DIV_UnLoadDll(pe[nDLL]);
-#endif
 
-#ifdef NETLIB
-  if (inicializacion_red) net_end();
-#endif
 
   rvmode();
   EndSound();
@@ -2213,104 +2178,3 @@ void set_color(void) {
 
   if (!activar_paleta) activar_paleta=1;
 }
-
-#ifdef NETLIB
-//ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
-//      Net_init_ipx(socket, jugadores, timeout)
-//ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
-
-void _net_init_ipx(void) { // Ojo, emitir los errores, e(...)
-  int s,j,t;
-  int old_reloj=get_reloj();
-
-  t=pila[sp--];
-  j=pila[sp--];
-  s=pila[sp];
-
-  if (t<1 || t>60) { e(e148); return; } // Lกmites timeout
-  if (j<2 || j>8) { e(e149); return; }  // Lกmites jugadores
-  s^=113838; // Para evitar conflictos en lo posible
-
-  pila[sp]=net_init_ipx(s,j,t);
-
-  reloj=old_reloj;
-}
-
-//ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
-//      Net_init_modem(puerto,velocidad,dial,cad_inicio,cad_llamada,cad_telefono,timeout)
-//ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
-
-void _net_init_modem(void) {
-  int old_reloj=get_reloj();
-
-  sp-=6;
-  pila[sp]=-1; // ญญญOJO!!! **************************************************
-
-  reloj=old_reloj;
-}
-
-//ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
-//      Net_init_serial(puerto, velocidad_baudios, segundos_timeout)
-//ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
-
-void _net_init_serial(void) {
-  int old_reloj=get_reloj();
-
-  sp-=2;
-  pila[sp]=-1; // ญญญOJO!!! **************************************************
-
-  reloj=old_reloj;
-}
-
-//ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
-//      Net_send(offset datos, longitud)
-//ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
-
-void _net_send(void) {
-  int d,l;
-
-  l=pila[sp--];
-  d=pila[sp];
-
-  if (d<long_header || d+l>id_init) { e(e150); return; } // Sขlo GLOBAL
-
-  net_send(d,(char*)&mem[d],l*4);
-}
-
-//ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
-//    Net_asign(offset dato, valor);
-//ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
-
-void _net_asign(void) {
-  int off,val;
-
-  val=pila[sp--];
-  off=pila[sp];
-
-  if (off<long_header || off>=id_init) { e(e150); return; } // Sขlo GLOBAL
-
-  net_send(off,(char*)&val,4);
-  net_send(off,(char*)&val,4);
-}
-
-//=============================================================================
-// Funciขn que se ejecuta al recibir un paquete el servidor
-//=============================================================================
-
-void MAINSRV_Packet(WORD Usuario,WORD Comando,BYTE *Buffer,WORD Len) {
-  Usuario=Usuario;
-  net_send(Comando,Buffer,Len);
-  memcpy(&mem[Comando],Buffer,Len);
-}
-
-//=============================================================================
-// Funciขn que se ejecuta al recibir un paquete el nodo
-//=============================================================================
-
-void MAINNOD_Packet(WORD Usuario,WORD Comando,BYTE *Buffer,WORD Len) {
-  Usuario=Usuario;
-  memcpy(&mem[Comando],Buffer,Len);
-}
-
-//ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
-#endif

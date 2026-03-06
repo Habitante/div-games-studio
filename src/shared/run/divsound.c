@@ -18,9 +18,6 @@ int Freq_original[CHANNELS];
 int SoundActive=1;
 void print_init_flags(int flags)
 {
-#ifndef GP2X
-#ifndef PS2
-#ifndef PSP
 #ifdef MIXER
 
 #define PFLAG(a) if(flags&MIX_INIT_##a) printf(#a " ")
@@ -28,14 +25,11 @@ void print_init_flags(int flags)
         PFLAG(MOD);
         PFLAG(MP3);
         PFLAG(OGG);
-        
+
         if(!flags)
                 printf("None");
-        
+
         printf("\n");
-#endif
-#endif
-#endif
 #endif
 }
 
@@ -50,21 +44,15 @@ void InitSound(void)
   Uint16 audio_format = AUDIO_S16SYS;
   int audio_channels = 2;
   int audio_buffers = 512;
-#ifndef GP2X
-#ifndef PS2
-#ifndef PSP
   int flags = MIX_INIT_FLAC | MIX_INIT_MOD | MIX_INIT_MP3 | MIX_INIT_OGG ;
-  
+
   initted=Mix_Init(flags);
 
 
-	
+
   if((initted&flags) != flags) {
 	  printf("Mix_Init error: %s\n",Mix_GetError());
    }
-#endif
-#endif
-#endif
 
   SDL_Init( SDL_INIT_AUDIO );
 

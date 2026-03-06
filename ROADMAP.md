@@ -2,10 +2,14 @@
 
 No deadlines, no pressure. Just a living document for when the mood strikes.
 
-The goal: ship DIV on Steam as a polished retro game-creation toolkit. Lean into the
-constraints (256 colors, integer math, cooperative processes) as features, not bugs.
-Think PICO-8, not Godot. The integrated IDE is the killer differentiator — no fork
-ever replicated it.
+The goal: ship DIV on Steam as a polished retro game-creation toolkit. Start by
+leaning into the classic constraints (256 colors, integer math, cooperative processes)
+as features, not bugs — think PICO-8, not Godot. The integrated IDE is the killer
+differentiator no fork ever replicated.
+
+But keep the door open. True color rendering, float types, and language modernization
+are real aspirations — they just come after shipping something people can use today.
+Clean up first, ship second, then modernize based on what real users actually want.
 
 ---
 
@@ -134,14 +138,68 @@ The features needed so a modern developer won't rage-quit in the first 10 minute
 
 ## Phase 4 — Community & Polish (post-launch)
 
-Ship, get feedback, iterate.
+Ship, get feedback, iterate. Gather real user data on what matters most.
 
 - [ ] Steam Workshop for sharing DIV games and assets
 - [ ] Interactive tutorial / guided first-game experience
 - [ ] Sample games that showcase DIV's strengths
 - [ ] Community-driven documentation and examples
-- [ ] Evaluate demand for: true color mode, float type, higher resolutions
-      (don't build these until real users ask for them)
+- [ ] Collect feedback on what users actually want next
+
+---
+
+## Phase 5 — DIV Reborn (aspirational, driven by demand)
+
+The door stays open. These are the deeper modernizations that would make DIV
+genuinely competitive as a creative tool, not just a nostalgia piece. Pursue them
+based on community demand and what feels right.
+
+### Rendering modernization
+- [ ] **True color (32-bit RGBA) rendering mode** — alongside classic 8-bit palette
+  - Daniel has wanted this for years; always wished DIV allowed more than 256 colors
+  - Approach: add a 32-bit render path in the OSDEP/blitter layer, switchable per project
+  - Keep 8-bit mode as default for backward compat and retro charm
+  - PNG/modern image format import in editors
+  - Alpha blending / per-pixel transparency
+- [ ] **Native high-resolution support** — not just integer scaling of 320x200
+  - Requires UI layout to be resolution-aware (the biggest piece of work)
+
+### Language & VM evolution
+- [ ] **Float/fixed-point type** — the most-requested language feature across all forks
+  - Difficulty: 8/10 — touches compiler (divc.c), VM (runtime/i.c), and memory layout
+  - Approach options:
+    a) Native float type with new opcodes (lfadd, lfsub, etc.) — clean but invasive
+    b) Fixed-point via library functions (less invasive, keeps int VM, but awkward syntax)
+    c) Implicit fixed-point (integers represent thousandths, compiler handles scaling)
+  - Must not break existing programs — new keyword/type, not changed semantics for int
+  - The earlier phases (splitting divc.c, documenting the VM) make this tractable
+- [ ] **Relaxed syntax** — quality-of-life improvements without breaking compatibility
+  - Modern comparison operators alongside classic ones?
+  - Optional semicolons or other ergonomic tweaks?
+  - Better string handling (first-class strings, not char arrays with special opcodes)?
+  - Better error messages from the compiler
+- [ ] **Larger address space** — currently limited by int-sized pointers
+
+### Editor improvements
+- [ ] Syntax-aware autocomplete (function/variable list from compiler symbol table)
+- [ ] Code folding
+- [ ] Go-to-definition / go-to-line
+- [ ] Brace/bracket matching
+- [ ] Dark mode / theme support
+
+### Export & distribution
+- [ ] Web export (Emscripten — runtime partially exists already)
+- [ ] "Made with DIV" branding for exported games
+- [ ] Standalone installer generation for exported games
+
+### Notes on Phase 5
+- These are expensive changes. Don't start them until Phases 0-3 are solid.
+- The cleanup work (splitting divc.c, documenting the VM, normalizing types) in
+  Phases 1-2 is what makes Phase 5 *possible*. Don't skip the foundations.
+- BennuGD proved that true color and floats attract users. The trick is shipping
+  the working 8-bit version first so you have a community to build for.
+- Daniel is the only person who fully understands the compiler and VM internals.
+  Phase 2 documentation is critical before attempting Phase 5.
 
 ---
 
@@ -170,16 +228,18 @@ Ship, get feedback, iterate.
 
 ## Non-goals
 
-Things we're deliberately not doing:
+Things we're deliberately not doing (or not doing *yet*):
 
 - **MODE8 3D anything** — it was a regret in 1998, no need to double down. Deleted.
+- **Network/multiplayer code** — never really worked properly. Strip it.
 - **Mobile ports** — touch UX for an IDE is painful. Maybe runtime-only someday.
 - **Rewrite in another language** — the C codebase IS DIV; we clean it, not replace it.
-- **Backwards-incompatible language changes** — old .PRG files should still compile.
-- **Competing with Godot/Unity** — we are a constrained retro-creative-tool, not a
-  general-purpose engine. The constraints are features.
-- **64-bit port** — the codebase assumes `sizeof(int)==sizeof(void*)` in hundreds of
-  places. Fixing this is a multi-month project with no user-visible benefit. Ship 32-bit.
+- **Breaking old programs** — existing .PRG files should still compile (except MODE8
+  and network-specific code, which we're removing). New features are additive.
+- **Competing with Godot/Unity on features** — we are a focused creative tool with
+  a unique personality. The constraints are features until we choose to relax them.
+- **64-bit port** — `sizeof(int)==sizeof(void*)` assumed in hundreds of places.
+  Multi-month project with no user-visible benefit. Ship 32-bit.
 
 ---
 
@@ -192,8 +252,9 @@ The patterns:
    the all-in-one experience. The IDE IS the product.
 2. **Single-developer dependency.** Every fork was one person. Ship something small and
    let the community contribute.
-3. **Over-modernization.** Forks died chasing true-color and floats. Ship the working
-   8-bit/integer version first. Modernize based on demand.
+3. **Over-modernization before shipping.** Forks died chasing true-color and floats
+   before they had a working product. True color and floats are good goals — but ship
+   the working 8-bit/integer version first, then modernize with a community behind you.
 4. **No games shipped.** No fork made it easy to distribute finished games. The export
    story is critical.
 5. **Commercial models failed.** Gemix charged money in a free-tools world. Keep the

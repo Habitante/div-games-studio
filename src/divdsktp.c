@@ -116,7 +116,7 @@ void New_DownLoad_Desktop() {
       case    3: //palet
               break;
       case    4: //timer
-              if(ventana[x].paint_handler==CDiv1) iWork=0;
+              // removed: CD player (CDiv1)
               if(ventana[x].paint_handler==Clock1) iWork=1;
               n+=fwrite(&iWork,1,4,desktop);
               break;
@@ -277,8 +277,6 @@ fflush(lst);
 #endif
                                         break;
                                 case    4: //timer
-                                        if(ventana[x].paint_handler==CDiv1)
-                                                iWork=0;
                                         if(ventana[x].paint_handler==Clock1)
                                                 iWork=1;
                                         n=fwrite(&iWork,1,4,desktop);
@@ -528,10 +526,7 @@ int UpLoad_Desktop()
                                 fread(&iWork,1,4,desktop);
                                 switch(iWork)
                                 {
-                                        case 0: //CD
-                                                if (!CDinit()) if (!CDinit()) CDinit();
-                                                if (get_cd_error()&0x200) CDPlaying=1; else CDPlaying=0;
-                                                nueva_ventana_carga(CDiv0,ventana_aux.x,ventana_aux.y);
+                                        case 0: break; // removed: CD player
                                                 break;
                                         case 1: //Reloj
                                                 nueva_ventana_carga(Clock0,ventana_aux.x,ventana_aux.y);

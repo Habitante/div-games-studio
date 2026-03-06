@@ -57,11 +57,6 @@ void read_mouse(void) {
 #endif
 	read_mouse2();
 
-#ifdef GCW
-	m_x+=joymx;
-	m_y+=joymy;
-#endif
-
 	if (modo<100 && hotkey && !help_paint_active) 
 		tecla();
 
@@ -271,10 +266,6 @@ void libera_drag(void) {
 //�����������������������������������������������������������������������������
 
 #define JOY_DEADZONE 500
-#ifdef GCW
-extern float w_ratio;
-extern float h_ratio;
-#endif
 
 void checkmod(OSDEPMod mod) {
 	if( mod != KMOD_NONE ){
@@ -386,123 +377,6 @@ void read_mouse2(void) {
 	SDL_Event event;
 	int n=0;
 	
-#ifdef GCW_
-while(SDL_PollEvent(&event))
-{
-	switch(event.type)
-	{
-		case SDL_QUIT:
-			salir_del_entorno=1;
-		break;
-		case SDL_KEYDOWN:			// Button press
-			switch(event.key.keysym.sym)
-			{
-				case SDLK_LEFT:		// D-PAD LEFT
-				break;
-				case SDLK_RIGHT:	// D-PAD RIGHT
-				break;
-				case SDLK_UP:		// D-PAD UP
-				break;
-				case SDLK_DOWN:		// D-PAD DOWN
-				break;
-				case SDLK_LCTRL:	// A
-				break;
-				case SDLK_LALT:		// B
-					m_b |=1;
-				break;
-				case SDLK_LSHIFT:	// X
-				break;
-				case SDLK_SPACE:	// Y
-				break;
-				case SDLK_TAB:		// Left shoulder
-				break;
-				case SDLK_BACKSPACE:	// Right shoulder
-				break;
-				case SDLK_RETURN:	// Start
-				break;
-				case SDLK_ESCAPE:	// Select
-				break;
-				case SDLK_PAUSE:	// Lock
-				break;
-
-				default:
-				break;
-			}
-		break;
-		case SDL_KEYUP:				// Button release
-			switch(event.key.keysym.sym)
-			{
-				case SDLK_LEFT:		// D-PAD LEFT
-				break;
-				case SDLK_RIGHT:	// D-PAD RIGHT
-				break;
-				case SDLK_UP:		// D-PAD UP
-				break;
-				case SDLK_DOWN:		// D-PAD DOWN
-				break;
-				case SDLK_LCTRL:	// A
-				break;
-				case SDLK_LALT:		// B
-					m_b &= ~1;
-				break;
-				case SDLK_LSHIFT:	// X
-				break;
-				case SDLK_SPACE:	// Y
-				break;
-				case SDLK_TAB:		// Left shoulder
-				break;
-				case SDLK_BACKSPACE:	// Right shoulder
-				break;
-				case SDLK_RETURN:	// Start
-				break;
-				case SDLK_ESCAPE:	// Select
-				break;
-				case SDLK_PAUSE:	// Lock
-				break;
-
-				default:
-				break;
-			}
-		break;
-		case SDL_JOYAXISMOTION:			// Analog joystick movement
-			switch(event.jaxis.axis)
-			{
-				case 0:		// axis 0 (left-right)
-					if(event.jaxis.value < -JOY_DEADZONE)
-					{
-						m_x-=2;//=event.jaxis.value;
-						// left movement
-					}
-					else if(event.jaxis.value > JOY_DEADZONE)
-					{
-						m_x+=2;//=event.jaxis.value;
-						// right movement
-					}
-				break;
-				case 1:		// axis 1 (up-down)
-					if(event.jaxis.value < -JOY_DEADZONE)
-					{
-						m_y-=2;//=event.jaxis.value;
-						// up movement
-					}
-					else if(event.jaxis.value > JOY_DEADZONE)
-					{
-						m_y+=2;//=event.jaxis.value;
-						// down movement
-					}
-				break;
-
-				default:
-				break;
-			}
-		break;
-
-		default:
-		break;
-	}
-}
-#else
-
 while(SDL_PollEvent(&event) )
         {
 #ifdef SDL2
@@ -593,10 +467,6 @@ while(SDL_PollEvent(&event) )
 					m_x = event.motion.x;
 					m_y = event.motion.y;
 				}
-#ifdef GCW
-				m_x = event.motion.x*w_ratio;
-            	m_y = event.motion.y*w_ratio;
-#endif
 
 //				m_x+=event.motion.xrel;
 //				m_y+=event.motion.yrel;
@@ -670,10 +540,6 @@ while(SDL_PollEvent(&event) )
 #endif
 //				fprintf(stdout, "ascii: %d scancode: %d 0x%x\n", ascii, scan_code,scan_code);
 				key(scan_code)=1;
-#ifdef GCW
-					if(event.key.keysym.sym ==SDLK_LALT)		// B
-						m_b |=1;
-#endif
 			}
 			if(event.type == SDL_KEYUP) 
 			{
@@ -685,10 +551,6 @@ while(SDL_PollEvent(&event) )
 				//scan_code = event.key.keysym.scancode;
 				key(scan_code)=0;
 				scan_code=0;
-#ifdef GCW
-				if(event.key.keysym.sym ==SDLK_LALT)		// B
-					m_b &= ~1;
-#endif
 			}
 
 			if (event.type == SDL_MOUSEBUTTONUP)
@@ -719,7 +581,6 @@ while(SDL_PollEvent(&event) )
   //                  quit = 1;
             
         }
-#endif
 	if(soundstopped==1) {
 
 #ifndef SDL2

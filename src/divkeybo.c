@@ -141,9 +141,6 @@ reloj = SDL_GetTicks()/100;//(int)clock();
     ascii=0; scan_code=0;
 
 SDL_Event event;
-#ifdef GCW
-
-#else
 while(SDL_PollEvent(&event))
         {
 			
@@ -189,7 +186,6 @@ while(SDL_PollEvent(&event))
 			
         }
 
-#endif
 
   union REGS r;
   struct SREGS s;

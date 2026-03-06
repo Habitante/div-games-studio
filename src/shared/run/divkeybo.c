@@ -7,44 +7,6 @@
 #include "osdep.h"
 
 
-#ifdef GCW
-
-
-// GCW DEFAULT BUTTON MAPPING
-
-
-/*
-#define GCW_L SDLK_TAB
-#define GCW_R SDLK_BACKSPACE
-#define GCW_UP SDLK_UP
-#define GCW_DOWN SDLK_DOWN
-#define GCW_LEFT SDLK_LEFT
-#define GCW_RIGHT SDLK_RIGHT
-#define GCW_A SDLK_LCTRL
-#define GCW_B SDLK_LALT
-#define GCW_X SDLK_LSHIFT
-#define GCW_Y SDLK_SPACE
-#define GCW_START SDLK_RETURN
-#define GCW_SELECT SDLK_ESCAPE
-#define GCW_LOCK SDLK_PAUSE
-*/
-
-#define GCW_L SDLK_TAB
-#define GCW_R SDLK_BACKSPACE
-#define GCW_UP SDLK_UP
-#define GCW_DOWN SDLK_DOWN
-#define GCW_LEFT SDLK_LEFT
-#define GCW_RIGHT SDLK_RIGHT
-#define GCW_A SDLK_LCTRL
-#define GCW_B SDLK_RSHIFT
-#define GCW_X SDLK_LSHIFT
-#define GCW_Y SDLK_SPACE
-#define GCW_START SDLK_RETURN
-#define GCW_SELECT SDLK_ESCAPE
-#define GCW_LOCK SDLK_PAUSE
-
-#endif
-
 #define JOY_DEADZONE 500
 int joymx = 0, joymy=0;
 
@@ -340,39 +302,6 @@ if(vwidth == 0 && vheight == 0) {
 	vwidth = vga_an;
 	vheight = vga_al;
 }
-#ifdef GCW
-if(divjoy) {
-	byte hatval;
-
-// reset hat positions (D-PAD)
-
-// get new positions (D-PAD)
-	hatval = SDL_JoystickGetHat(divjoy,0);
-if(hatval!=oldhatval) {
-		key(OSDEP_key[GCW_LEFT])=0;
-		key(OSDEP_key[GCW_RIGHT])=0;
-		key(OSDEP_key[GCW_DOWN])=0;
-		key(OSDEP_key[GCW_UP])=0;
-
-	if(hatval & SDL_HAT_RIGHT) 
-		key(OSDEP_key[GCW_RIGHT])=1;
-
-	if(hatval & SDL_HAT_LEFT)
-		key(OSDEP_key[GCW_LEFT])=1;
-	
-	if(hatval & SDL_HAT_UP)
-		key(OSDEP_key[GCW_UP])=1;
-
-	if(hatval & SDL_HAT_DOWN)
-		key(OSDEP_key[GCW_DOWN])=1;
-
-}
-oldhatval = hatval;
-
-}
-#endif
-	
-
 	while(SDL_PollEvent(&event)) {	
 //		printf("event: %d\n",event.type);
 		// check keys
@@ -398,95 +327,6 @@ oldhatval = hatval;
 
 #endif
 
-#ifdef GCW
-		if(event.type == SDL_JOYBUTTONDOWN || event.type == SDL_JOYBUTTONUP)  {
-			
-			if(event.type == SDL_JOYBUTTONDOWN)
-				event.type = SDL_KEYDOWN;
-				
-			if(event.type == SDL_JOYBUTTONUP)
-				event.type = SDL_KEYUP;
-/*
-	ELEMENT_B,
-	ELEMENT_A,
-	ELEMENT_Y,
-	ELEMENT_X,
-	ELEMENT_SELECT,
-	ELEMENT_START,
-	ELEMENT_L,
-	ELEMENT_R,
-	*/			
-
-			switch(event.jbutton.button) {
-
-		// these buttons probably arent correcct.
-
-				case 0: // B
-					event.key.keysym.sym=SDLK_LALT;
-					break;
-				case 3: // A
-					event.key.keysym.sym=SDLK_LCTRL;
-					break;
-				case 2: // Y
-					event.key.keysym.sym=SDLK_SPACE;
-					break;
-				case 1: // X
-					event.key.keysym.sym=SDLK_LSHIFT;
-					break;
-				case 4: // SELECT
-					event.key.keysym.sym=SDLK_ESCAPE;
-					break;
-				case 5: // START
-					event.key.keysym.sym=SDLK_RETURN;
-					break;	
-				case 6: // LEFT
-					event.key.keysym.sym=SDLK_TAB;
-					break;	
-				case 7: // RIGHT
-					event.key.keysym.sym=SDLK_BACKSPACE;
-					break;	
-
-			}
-		}
-			
-		// Analog joystick mapped to mouse movement
-		if(event.type == SDL_JOYAXISMOTION) {			
-				
-			switch(event.jaxis.axis)
-			{
-				case 0:		// axis 0 (left-right)
-					joymx=0;
-					if(event.jaxis.value < -JOY_DEADZONE)
-					{
-						joymx=-2;
-						// left movement
-					}
-					else if(event.jaxis.value > JOY_DEADZONE)
-					{
-						joymx=2;
-						// right movement
-					}
-				break;
-				case 1:		// axis 1 (up-down)
-					joymy=0;
-					if(event.jaxis.value < -JOY_DEADZONE)
-					{
-						joymy=-2;
-						// up movement
-					}
-					else if(event.jaxis.value > JOY_DEADZONE)
-					{
-						joymy=2;
-						// down movement
-					}
-				break;
-
-				default:
-				break;
-			}
-		}
-#endif
-
             /* If a quit event has been sent */
 		if (event.type == SDL_QUIT)
 			alt_x=1;
@@ -494,80 +334,6 @@ oldhatval = hatval;
 		if (event.type == SDL_KEYDOWN) {
 //			printf("KEYDOWN %d\n",event.key.keysym.sym);
 			switch(event.key.keysym.sym) {
-#ifdef GCW
-			case SDLK_LEFT:		// D-PAD LEFT
-			event.key.keysym.sym=GCW_LEFT;
-//				key(OSDEP_key[GCW_LEFT])=1;
-			break;
-			
-			case SDLK_RIGHT:	// D-PAD RIGHT
-				event.key.keysym.sym=GCW_RIGHT;
-//				key(OSDEP_key[GCW_RIGHT])=1;
-
-			break;
-			case SDLK_UP:		// D-PAD UP
-			event.key.keysym.sym=GCW_UP;
-//				key(OSDEP_key[GCW_UP])=1;
-			break;
-			
-			case SDLK_DOWN:		// D-PAD DOWN
-			event.key.keysym.sym=GCW_DOWN;
-//					key(OSDEP_key[GCW_DOWN])=1;
-			break;
-			
-			case SDLK_LCTRL:	// A
-			event.key.keysym.sym=GCW_A;
-//				key(OSDEP_key[GCW_A])=1;
-				mouse->left=1;
-			break;
-			
-			case SDLK_LALT:		// B
-			event.key.keysym.sym=GCW_B;
-//				key(OSDEP_key[GCW_B])=1;
-				mouse->right=1;
-			break;
-			
-			case SDLK_LSHIFT:	// X
-			event.key.keysym.sym=GCW_X;
-//				key(OSDEP_key[GCW_X])=1;
-			break;
-			
-			case SDLK_SPACE:	// Y
-			event.key.keysym.sym=GCW_Y;
-//				key(OSDEP_key[GCW_Y])=1;
-			break;
-
-			case SDLK_TAB:		// Left shoulder
-			event.key.keysym.sym=GCW_L;
-//				key(OSDEP_key[GCW_L])=1;
-			break;
-
-			case SDLK_BACKSPACE:	// Right shoulder
-			event.key.keysym.sym=GCW_R;
-//				key(OSDEP_key[GCW_R])=1;
-			break;
-			
-			case SDLK_RETURN:	// Start
-//				scan_code = OSDEP_key[GCW_START];
-				event.key.keysym.sym=GCW_START;
-//				key(OSDEP_key[GCW_START])=1;
-			break;
-			
-			case SDLK_ESCAPE:	// Select
-				event.key.keysym.sym=GCW_SELECT;
-//				key(OSDEP_key[GCW_SELECT])=1;			
-				if(key(OSDEP_key[GCW_X])==1)
-					alt_x=1;
-			break;
-			
-			case SDLK_PAUSE:	// Lock
-			event.key.keysym.sym=GCW_LOCK;
-//				key(OSDEP_key[GCW_LOCK])=1;
-			break;
-
-			default:
-			break;
-#else
 // handle special keys
 			case SDLK_LSHIFT:
 				shift_status|=2;
@@ -589,7 +355,6 @@ oldhatval = hatval;
 				break;
 			case SDLK_INSERT:
 				shift_status|=128;
-#endif
 		}
 
 //		if(scan_code==0)
@@ -616,80 +381,6 @@ oldhatval = hatval;
 	
 	if(event.type == SDL_KEYUP) {
 //		printf("KEYUP %d\n",event.key.keysym.sym);
-#ifdef GCW
-		switch(event.key.keysym.sym) {
-			case SDLK_LEFT:		// D-PAD LEFT
-				event.key.keysym.sym=GCW_LEFT;
-//				key(OSDEP_key[GCW_LEFT])=0;
-				break;
-			
-			case SDLK_RIGHT:	// D-PAD RIGHT
-				event.key.keysym.sym=GCW_RIGHT;
-//				key(OSDEP_key[GCW_RIGHT])=0;
-				break;
-			
-			case SDLK_UP:		// D-PAD UP
-				event.key.keysym.sym=GCW_UP;
-//				key(OSDEP_key[GCW_UP])=0;
-				break;
-			
-			case SDLK_DOWN:		// D-PAD DOWN
-				event.key.keysym.sym=GCW_DOWN;
-	//			key(OSDEP_key[GCW_DOWN])=0;
-				break;
-			
-			case SDLK_LCTRL:	// A
-				event.key.keysym.sym=GCW_A;
-				//key(OSDEP_key[GCW_A])=0;
-				mouse->left=0;
-				break;
-			
-			case SDLK_LALT:		// B
-				event.key.keysym.sym=GCW_B;
-				//key(OSDEP_key[GCW_B])=0;
-				mouse->right=0;
-				break;
-			
-			case SDLK_LSHIFT:	// X
-				event.key.keysym.sym=GCW_X;
-				//key(OSDEP_key[GCW_X])=0;
-				break;
-			
-			case SDLK_SPACE:	// Y
-				event.key.keysym.sym=GCW_Y;
-//				key(OSDEP_key[GCW_Y])=0;
-				break;
-	
-			case SDLK_TAB:		// Left shoulder
-				event.key.keysym.sym=GCW_L;
-//				key(OSDEP_key[GCW_L])=0;
-				break;
-
-			case SDLK_BACKSPACE:	// Right shoulder
-				event.key.keysym.sym=GCW_R;
-				//key(OSDEP_key[GCW_R])=0;
-				break;
-			
-			case SDLK_RETURN:	// Start
-				event.key.keysym.sym=GCW_START;
-//				key(OSDEP_key[GCW_START])=0;
-				break;
-			
-			case SDLK_ESCAPE:	// Select
-				event.key.keysym.sym=GCW_SELECT;
-//				key(OSDEP_key[GCW_SELECT])=0;			
-				break;
-			
-			case SDLK_PAUSE:	// Lock
-				event.key.keysym.sym=GCW_LOCK;
-//				key(OSDEP_key[GCW_LOCK])=0;
-				break;
-			
-			default:
-				break;
-		}
-//#else
-#endif
 
 		shift_status=0;
 		checkmod((OSDEPMod) event.key.keysym.mod);
@@ -781,11 +472,6 @@ oldhatval = hatval;
     s.ds=s.es=s.fs=s.gs=FP_SEG(&s);
     r.h.ah=2; int386x(0x16,&r,&r,&s); shift_status=r.h.al;
   }
-#endif
-
-#ifdef GCW
-	mouse->x+=joymx;
-	mouse->y+=joymy;
 #endif
 
 //printf("ascii: %d scan_code: %d\n",ascii,scan_code);

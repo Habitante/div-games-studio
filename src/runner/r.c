@@ -30,7 +30,6 @@
 #include <unistd.h> // for usleep
 #endif
 
-#ifndef PSP
 void sleep_ms(int milliseconds) // cross-platform sleep function
 {
 #ifdef WIN32
@@ -44,8 +43,6 @@ void sleep_ms(int milliseconds) // cross-platform sleep function
     usleep(milliseconds * 1000);
 #endif
 }
-
-#endif
 
 #ifdef __APPLE__
 #include <unistd.h>
@@ -100,9 +97,7 @@ int ret = system(init);
 
 while(ret == 1 || ret ==2 || ret==256 || ret == 512) {
 #ifndef WIN32
-#ifndef PSP
 sleep_ms(1000);
-#endif
 #endif
 
 	if(ret == 1 || ret==256) {
@@ -114,9 +109,7 @@ printf("%d\n",ret);
 #endif
   
 #ifndef WIN32
-#ifndef PSP
 sleep_ms(1000);
-#endif
 #endif
 	if(ret == 2 || ret==512) {
 		ret=system(ide " TEST");

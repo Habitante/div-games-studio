@@ -152,10 +152,6 @@ void set_dac(byte *_dac) {
 int LinealMode;
 int modovesa;
 
-#ifdef GCW
-float w_ratio=1.0;
-float h_ratio=1.0;
-#endif
 
 SDL_Surface* copy_surface(SDL_Surface* source)
 {
@@ -189,20 +185,12 @@ SDL_setFramerate(&fpsman, 60);
  
   fprintf(stdout,"full screen: %d\n",fsmode);
 
-#ifdef GCW_SOFTSTRETCH
-	vga=OSDEP_SetVideoMode(GCW_W,GCW_H, 8,  SDL_HWSURFACE | SDL_DOUBLEBUF);//SDL_HWPALETTE|SDL_SRCCOLORKEY|SDL_HWSURFACE|SDL_DOUBLEBUF);
-	w_ratio = vga_an / (float)(GCW_W*1.0);
-	h_ratio = vga_al / (float)(GCW_H*1.0);
-#else
-
 	if(fsmode==0)
 		vga=OSDEP_SetVideoMode(vga_an, vga_al, CDEPTH, 0);
 
 	else
 		vga=OSDEP_SetVideoMode(vga_an, vga_al, CDEPTH,  1);
 	
-	//SDL_FULLSCREEN | SDL_HWSURFACE | SDL_DOUBLEBUF);//SDL_HWPALETTE|SDL_SRCCOLORKEY|SDL_HWSURFACE|SDL_DOUBLEBUF);
-#endif
 
 //	if(copia_surface)
 //		SDL_FreeSurface(copia_surface);
@@ -356,35 +344,6 @@ void rvmode(void) {
 //อออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
 //      Dump buffer to vga (screen)
 //อออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
-#ifdef GCW_SOFTSTRETCH
-
-void volcadogcw(byte *p) {
-	// blit screen to smaller 320x240 screen
-	byte *q = (byte *)vga->pixels;
-	float vy=0;
-	float vx=0;
-	
-	byte *c;
-
-	if(SDL_MUSTLOCK(vga))
-		SDL_LockSurface(vga);
-
-	for (vy=0; vy<vga_al;vy+=h_ratio) {
-		// calculate the pixel
-		c=&p[vga_an*(int)vy];
-	
-		for(vx=0;vx<vga_an;vx+=w_ratio) {			
-			*q=c[(int)vx];
-			q++;
-		}
-	}
-	
-	if(SDL_MUSTLOCK(vga))
-		SDL_UnlockSurface(vga);
-
-}
-#endif
-
 void vgacpy(byte * q, byte * p, int n) ;
 
 
@@ -458,14 +417,6 @@ void volcadosdl(byte *p) {
 	SDL_Rect trc;
 	int vn=0;
 		
-#ifdef GCW_SOFTSTRETCH
-	if(vga_an>=GCW_W && vga_al>=GCW_H) {
-		volcadogcw(p);
-		SDL_Flip(vga);
-		return;
-	}
-#endif
-
 	int64_t n,m=(vga_an*vga_al)/4,plano=0x100,y;
 	byte * v2, * p2;
 

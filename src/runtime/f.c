@@ -7,16 +7,8 @@
 #include <errno.h>
 
 void readmouse(void);
-#include "netlib.h"
-
-#include "cdrom.h"
 #include "divmixer.hpp"
 #include "divsound.h"
-
-#ifdef NETPLAY
-#include "net.h"
-#include "netlib.h"
-#endif
 
 #ifdef __EMSCRIPTEN__
 extern void es_fps(byte);
@@ -40,34 +32,29 @@ void _comprimir(int encode, char *fichero);
 
 extern int max_reloj;
 
-void set_sector_height(void);
-void get_sector_height(void);
-void go_to_flag(void);
-void set_point_m8(void);
-void get_point_m8(void);
-void start_mode8(void);
-void stop_mode8(void);
-void load_wld(void);
-void set_fog(void);
-void set_sector_texture(void);
-void get_sector_texture(void);
-void set_wall_texture(void);
-void get_wall_texture(void);
 void _object_avance(int ide,int angulo,int velocidad);
 int joy_position(int eje);
 
-// dummy function for missing mode8
-#if (!defined NEWMODE8 && !defined MODE8) 
 void _object_avance	(int ide,int angulo,int velocidad) {
 	mem[id+_X]+=get_distx(mem[id+_Angle],pila[sp]);
     mem[id+_Y]+=get_disty(mem[id+_Angle],pila[sp]);
-
-//	printf("DUMMY - object advance\n");
-	
 }
-#endif
 
-void set_env_color(void);
+// No-op stubs for removed MODE8 functions
+static void stop_mode8(void)        { pila[sp]=0; }
+static void load_wld(void)          { sp--; pila[sp]=0; }
+static void start_mode8(void)       { sp-=2; pila[sp]=0; }
+static void go_to_flag(void)        { pila[sp]=0; }
+static void set_sector_height(void) { sp-=2; pila[sp]=0; }
+static void get_sector_height(void) { sp-=2; pila[sp]=0; }
+static void set_point_m8(void)      { sp-=2; pila[sp]=0; }
+static void get_point_m8(void)      { sp-=2; pila[sp]=0; }
+static void set_fog(void)           { sp--; pila[sp]=0; }
+static void set_sector_texture(void){ sp-=3; pila[sp]=0; }
+static void get_sector_texture(void){ sp-=3; pila[sp]=0; }
+static void set_wall_texture(void)  { sp-=2; pila[sp]=0; }
+static void get_wall_texture(void)  { sp-=2; pila[sp]=0; }
+static void set_env_color(void)     { sp-=2; pila[sp]=0; }
 
 void path_find(void);
 void path_line(void);
@@ -2467,11 +2454,7 @@ void fget_angle(void) {
 //����������������������������������������������������������������������������
 
 void _play_cd(void) {
-  int p,m;
-  m=pila[sp--]; p=pila[sp];
-  Stop_CD();
-  if (p<1) return;
-  Play_CD(p,m);
+  sp--; /* removed: cdrom */
 }
 
 //����������������������������������������������������������������������������
@@ -2479,23 +2462,15 @@ void _play_cd(void) {
 //����������������������������������������������������������������������������
 
 void _stop_cd(void) {
-  Stop_CD();
-  pila[++sp]=0;
+  /* removed: cdrom */ pila[++sp]=0;
 }
 
 //����������������������������������������������������������������������������
 //      Is_playing_cd();
 //����������������������������������������������������������������������������
-unsigned int get_cd_error(void);
 
 void _is_playing_cd(void) {
-//CACA
-#ifdef DOS
-  if (get_cd_error()&0x200)
-        pila[++sp]=1;
-    else
-#endif
-        pila[++sp]=0;
+  /* removed: cdrom */ pila[++sp]=0;
 }
 
 //����������������������������������������������������������������������������
@@ -2693,13 +2668,6 @@ void _exit_dos(void) {
   #ifdef DEBUG
   FILE * f;
   #endif
-#ifdef DIVDLL
-  while (nDLL--) DIV_UnLoadDll(pe[nDLL]);
-#endif
-
-#ifdef NET
-  if (inicializacion_red) net_end();
-#endif
   rvmode();
 //EndSound();
   kbdReset();
@@ -4773,15 +4741,9 @@ void function(void) {
     case 76: unload_fnt(); break;
     case 77: set_volume(); break;
     case 78: set_color(); break;
-    
-#ifdef NETPLAY
-    case 79: net_join_game(); break;
-    case 80: net_get_games(); break;
-#endif
-
-#ifdef MODE8
+    case 79: sp-=2; pila[sp]=0; break;
+    case 80: pila[++sp]=0; break;
     case 81: stop_mode8(); break;
-#endif
 
     case 82: x_advance(); break;
     case 83: _strchar(); break;
@@ -4789,8 +4751,6 @@ void function(void) {
     case 85: path_line(); break;
     case 86: path_free(); break;
     case 87: new_map(); break;
-    
-#if (defined  MODE8) || (defined NEWMODE8)
     case 88: load_wld(); break;
     case 89: start_mode8(); break;
     case 90: go_to_flag(); break;
@@ -4804,7 +4764,6 @@ void function(void) {
     case 98: set_wall_texture(); break;
     case 99: get_wall_texture(); break;
     case 100: set_env_color(); break;
-#endif
 
     case 101: _strcpy(); break;
     case 102: _strcat(); break;

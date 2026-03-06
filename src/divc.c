@@ -212,7 +212,6 @@
 //#define listados // Para generar los listados de objetos y EML (LST/TAB/EML)
 
 #include "global.h"
-#include "divdll.h"
 
 #ifdef ZLIB
 #include <zlib.h>
@@ -3175,72 +3174,6 @@ int analiza_struct_private(int offstruct) { // tras " struct id [ <const> ] " //
 }
 
 //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-#ifdef DIVDLL
-typedef struct _DLL{
-        char    *Name;
-        int     nParms;
-        int     Order;
-}DLL;
-
-DLL *ImpDLL;
-int PrevOrder;
-int nFuns;
-
-PE    *divcpe;
-
-void CNT_export(char *name,void *dir,int nparms)
-{
-  name=name;
-  dir=dir;
-  nparms=nparms;
-  nFuns++;
-}
-void CMP_export(char *name,void *dir,int nparms)
-{
-  dir=dir;
-  ImpDLL[nFuns].Name  =name;
-  ImpDLL[nFuns].nParms=nparms;
-  ImpDLL[nFuns].Order =PrevOrder++;
-  nFuns++;
-}
-
-int ImportDll(char *name)
-{
-debugprintf("Looking for funcs in %s\n",name);
-  nFuns=0;
-#ifdef DIVDLL
-  COM_export=CNT_export;
-  divcpe=DIV_ImportDll(name);
-  if (divcpe==NULL) return 0;
-  DIV_UnImportDll(divcpe);
-  //
-  if (nFuns==0) return -1;
-  ImpDLL=(DLL*)malloc(sizeof(DLL)*nFuns);
-  if (ImpDLL==NULL) return 0;
-  nFuns=0;
-  COM_export=CMP_export;
-  divcpe=DIV_ImportDll(name);
-  if (divcpe==NULL) { free(ImpDLL); return 0; }
-return nFuns;
-#endif
-}
-
-void UnimportDll()
-{
-#ifdef DIVDLL
-  DIV_UnImportDll(divcpe);
-#endif
-}
-
-struct _dlls {
-  int filename;         // Puntero al nombre asciiz
-  int linea1,columna1;  // Posicion en la que comienza la sentencia en el fuente
-  int linea2,columna2;  // Posicion en la que acaba la sentencia en el fuente
-} dlls[64];
-
-int idlls;              // Indice de la estructura anterior
-#endif
-
 //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
 
 void sintactico (void) {
@@ -3371,70 +3304,6 @@ void sintactico (void) {
   if (!free_sintax) if (pieza!=p_ptocoma) c_error(3,66);
   while (pieza==p_ptocoma || pieza==p_coma) lexico();
   final_sentencia();
-
-#ifdef DIVDLL
-  dlls[0].linea1=linea1;
-  dlls[0].columna1=columna1;
-  dlls[0].linea2=linea2;
-  dlls[0].columna2=columna2;
-  idlls=1;
-
-  //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-  // Import de librerias din micas
-  //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-  // {p_import p_lit {;}}
-  //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-
-  PrevOrder=0;
-
-  while (pieza==p_import) {
-    inicio_sentencia();
-    lexico();
-    if (pieza!=p_lit && !(pieza==p_id && (*o).tipo==tcons && (*o).cons.literal))
-		c_error(1,62);
-	lexico();
-    if (!free_sintax) 
-		if (pieza!=p_ptocoma) 
-			c_error(3,66);
-
-    old_source=source;
-    nombre_dll=(byte*)&mem[pieza_num];
-
-    if (idlls<64) 
-		dlls[idlls].filename=pieza_num;
-
-//printf("DLL: %lx %d %s\n",&mem[pieza_num],pieza_num,nombre_dll);
-
-    if (nombre_dll==NULL) c_error(0,63);
-    if ((num_extern=ImportDll((char *)nombre_dll))==0) c_error(0,63);
-    if (num_extern>0) {
-		printf("num funcs: %d\n",num_extern);
-      save_error(0);
-      for (n=0;n<num_extern;n++) {
-        source=(byte *)ImpDLL[n].Name;
-        lexico();
-        if (pieza!=p_id) c_error(4,63);
-        if ((*o).tipo!=tnone) c_error(4,63);
-        (*o).tipo=tfext;
-        (*o).fext.codigo=ImpDLL[n].Order;
-        (*o).fext.num_par=ImpDLL[n].nParms;
-      }
-      free(ImpDLL);
-      UnimportDll();
-    }
-    while (pieza==p_ptocoma || pieza==p_coma) lexico();
-    final_sentencia();
-
-    if (idlls<64) {
-      dlls[idlls].linea1=linea1;
-      dlls[idlls].columna1=columna1;
-      dlls[idlls].linea2=linea2;
-      dlls[idlls].columna2=columna2;
-      idlls++;
-    }
-  }
-
-#endif
 
 	while(pieza==p_include) {
 		inicio_sentencia();
@@ -4201,30 +4070,7 @@ void sintactico (void) {
 
   g2(ltyp,(memptrsize)bloque_actual);
   g2(lcbp,0);
-#ifdef DIVDLL
-  linea1=dlls[0].linea1;
-  columna1=dlls[0].columna1;
-  linea2=dlls[0].linea2;
-  columna2=dlls[0].columna2;
-  inicio=0; final=imem-1;
-  grabar_sentencia();
-
   if (pieza==p_import) c_error(0,147); // Advertir a usuarios de DIV 1
-
-  // Genera el c¢digo para cargar las librer¡as
-
-  for (n=1;n<idlls;n++) {
-    inicio=imem; final=imem+1;
-    g2(limp,dlls[n].filename);
-    linea1=dlls[n].linea1;
-    columna1=dlls[n].columna1;
-    linea2=dlls[n].linea2;
-    columna2=dlls[n].columna2;
-    grabar_sentencia();
-  }
-
-#endif
-
   // El primer FRAME, y la carga de variables PRIVATE, se ejecutan
   // conjuntamente en el BEGIN del programa principal.
 

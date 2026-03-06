@@ -260,21 +260,10 @@ case lfrf:
     #endif
   } break;
 case limp:
-#ifdef DIVDLL
-    if ((pe[nDLL]=DIV_LoadDll((char*)&mem[mem[ip++]]))==NULL)
-    break;
-//      exer(4);
-    else
-      nDLL++;
-#else
 printf("skipping dll %s\n",(char*)&mem[mem[ip++]]);
-#endif
   break;
 case lext:
-#ifdef DIVDLL
-if(ExternDirs[mem[ip]])
-    call((voidReturnType)ExternDirs[mem[ip++]]);
-#endif
+  ip++;
   break;
 case lchk:
   #ifdef DEBUG

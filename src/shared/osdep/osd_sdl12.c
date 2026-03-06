@@ -22,9 +22,7 @@ static uint32_t flags;
 
 void OSDEP_Init(void) {
 
-#if !defined (GP2X) && !defined (PS2) && !defined (PSP) 
-  SDL_putenv("SDL_VIDEO_WINDOW_POS=center"); 
-#endif
+  SDL_putenv("SDL_VIDEO_WINDOW_POS=center");
 
 	SDL_Init( SDL_INIT_EVERYTHING);
 
