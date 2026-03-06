@@ -10,9 +10,8 @@ the architecture and the, shall we say, creative coding conventions throughout.
 
 This repository is the open-source continuation of that codebase, ported from its
 original DJGPP/DOS toolchain to modern platforms using SDL. The port and ongoing
-maintenance were led by Mike Green (MikeDX / DX Games). Daniel (the User here, on 
-this machine) remains involved and is the best (possibly only) person who can explain 
-why things are the way they are (if memory serves ... its been a while).
+maintenance were led by Mike Green (MikeDX / DX Games). Daniel remains involved and 
+is the best (possibly only) person who can explain why things are the way they are (if memory serves ... its been a while).
 
 > 100% compatible with existing DIV1 and DIV2 code including plugin DLLs — even MODE8 3D.
 
