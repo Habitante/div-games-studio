@@ -1,0 +1,48 @@
+# Build output
+build/
+a.out
+CMakeCache.txt
+CMakeFiles/
+Makefile
+cmake_install.cmake
+*.o
+*.a
+*.so
+*.tar.gz
+*.zip
+
+# Runtime directory (executables, DLLs, user data)
+div/*.exe
+div/*.dll
+div/system/*.exe
+div/system/*.dll
+div/system/session.dtf
+div/system/setup.bin
+div/system/user.nfo
+div/system/exec.*
+div/system/EXEC.EXE
+
+# DIV2 user data directories (uppercase, from DOS backup)
+div/DAT/
+div/DLL/
+div/FLI/
+div/FNT/
+div/FPG/
+div/GENSPR/
+div/IFS/
+div/INSTALL/
+div/MAP/
+div/MOD/
+div/PAL/
+div/PCM/
+div/PRG/
+div/SETUP/
+div/WLD/
+div/HELP/
+div/*.PRG
+
+# Legacy
+old/
+html/
+zipdiv
+WSTUB/

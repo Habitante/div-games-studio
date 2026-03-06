@@ -1,0 +1,842 @@
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+        DIV DX 3.01 ENGLISH VERSION
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+# ASCII File with the text strings of the DIV environment that
+# they can be modified, respecting the format for translation
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+        INFORMATIVE TEXT FOR LOADING
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+# Copyright
+
+001     " DIV DX Operating System - version 3.01 - (c) 2016 DX GAMES.\n"
+
+# Information
+
+006     "Resources_reserved() ...\n"
+010     "Data_loading_session() ...\n"
+011     "Filters_initialisation() "
+012     "Global_data_determination() ...\n"
+013     "Video_initialisation() ...\n"
+
+# Global Errors
+
+014     "Internal error number #%u"
+016     "Error: file not found( SETUP.CFG )"
+017     "Error: insufficient memory( SETUP.CFG )"
+
+# Info for compiling setup.cfg
+
+018     "Compile the configuration file ..."
+019     "video mode"
+020     "complete number"
+021     "SLOW, MEDIUM o FAST"
+022     "YES o NO"
+023     "one \"literal\""
+024     "RED, GREEN, BLUE"
+025     "one variable"
+026     "\nsetup.cfg %u lines, %u errors\n"
+027     "\n  Error, expecting %s (line %u)"
+
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+        MISCELLANEOUS
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+# Temporal
+
+015     "Menu"
+028     "Palettes"
+029     "Maps"
+030     "FPG Files"
+031     "Fonts"
+032     "System"
+
+# Copyright to be printed in the bottom corner
+
+033     "DIVDX 3.01 (SAFE MODE)"
+034     "DIVDX 3.01"
+
+# 034     "DIVDX 2.02"
+
+# Copyright intro window
+
+035     "Information"
+
+# 035     "DIV 2.02"
+
+036     "Registered version"
+037     "This Version."
+
+# Exit to DOS
+
+040     "Exit from DIV?"
+
+# Error windows
+
+041     "Error"
+042     "Drive not ready."
+043     "File is not found."
+044     "The file couldn't be read."
+045     "Insufficient memory, try closing some windows."
+046     "File type not recognised."
+047     "The indicated file could not be saved."
+048     "Insufficient free space on the hard disk."
+049     "Value out of range."
+
+050     "Close the map?"
+051     "Palette"
+052     "Overwrite the map?"
+053     "The palette is different"
+054     "Activate the new palette?"
+055     "Adapt the map to the actual palette?"
+056     "Adapt the palette?"
+057     "Create a map copy?"
+059     "Close the trash-can?"
+
+060     "Eliminate this element?"
+061     "This is not a palette file"
+062     "Create a hardness map?"
+063     "Restore the map"
+064     "Close the window?"
+065     "Wish to adapt the file?"
+066     "Wish to adapt the system?"
+067     "The palette has changed"
+068     "Description"
+069     "New FPG File"
+070     "Open FPG File"
+071     "CODE:"
+072     "DESCRIPTION: "
+
+# Text to preview fonts
+073     "123ABCabc!?&¥¤‡"
+
+#
+
+074     "Open FNT"
+075     "The font already exists"
+076     "Do you wish to overwrite it?"
+077     "Open IFS"
+078     "Select the colour"
+079     "Value"
+080     "Test"
+081     "Close the file FPG?"
+082     "Overwrite the FPG file?"
+083     "Font Generator"
+084     "New font:"
+085     "Aspect:"
+086     "Outline"
+087     "Shadow"
+088     "Yes"
+089     "No"
+090     "NEWFNT.FNT"
+
+# Default text for creating text windows
+
+091     "Font"
+092     "Restoring..."
+093     "Calculating..."
+094     "Applying the effect..."
+095     "Percentages"
+096     "Grey Scale"
+097     "Introduce text"
+098     "View Font"
+099     "The file does not exist."
+
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+        BUTTONS
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+100     "\# Accept "
+101     "\# Cancel "
+102     "\# Yes "
+103     "\# No "
+104     "\# Revert "
+105     "Gamma"
+106     "Copy"
+107     "Change"
+108     "Info"
+109     "Select/Haul"
+
+110     "\#+"
+111     "\#-"
+112     "Mosaic"
+
+113     "\# Test "
+114     "Numbers"
+115     "Capitals"
+116     "Lowercase"
+117     "Symbols"
+118     "Extended"
+119     "\# Close "
+120     "\# Generate "
+121     "\#..."
+122     "\# Text "
+123     "\# Convert "
+124     "\# All "
+125     "\# Help "
+
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+    DIVERSE WINDOWS
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+# Open
+
+126 "filename:"
+127 "files:"
+128 "Directory:"
+129 "Drive:"
+130 "Type:"
+
+# New MAP
+
+132 "New map..."
+133 "Wide"
+134 "Height"
+135 "Size:"
+136 "Map "
+137 "Sound "
+
+152 "Centre X"
+153 "Centre Y"
+
+# Palettes
+
+138 "Edit palette..."
+139 "Overwrite the palette?"
+140 "Sort palette..."
+141 "Dec"
+142 "Hex"
+143 "Red "
+144 "Grn."
+145 "Blue"
+
+# CD Player
+
+150 "CDiv Player"
+151 "Clock"
+
+# Editor&Co.
+
+160 "Find text..."
+161 "Text:"
+162 "Substitute for:"
+163 "Complete word"
+164 "Capital/small letters"
+165 "Substitute text..."
+# Mas textos
+166 "Num "
+167 "Cap "
+168 "Small "
+169 "Sym "
+170 "Ext "
+# Text for dialogues to control FPG Files
+171 "The file to be converted."
+172 "This operation will affect everything"
+173 "Graphic included in the file %s."
+174 "Are you sure you want to convert it ?"
+175 "Small font"
+176 "Big font"
+177 "Mode:"
+
+178 "Appearance:"
+179 "Tiled"
+181 "Gradient"
+182 "Select background"
+183 "Edit gradient"
+
+186 "New program..."
+187 "Substitute the program?"
+188 "Close the program?"
+189 "No (more) occurrences were found."
+190 "Substitute the text?"
+191 "Substitution is ended"
+192 " change(s)was(ere) made"
+
+193 "Error in the Heap."
+194 "Free memory : %d,%03d %s."
+195 "Free memory : %.3f %s"
+196 "Maps : %d,%03d %s"
+197 "Maps : %d %s."
+198 "Resources in use : %d%c."
+199 "System information"
+
+200 "Compiling..."
+201 "Preparing compilation..."
+202 "Compilation is ended..."
+203 "Preloading objects..."
+204 "Generating lists..."
+205 "Saving..."
+206 "Program:"
+207 "Error "
+208 " in the line "
+
+# Projects
+
+209 "Open project file"
+210 "Save project"
+211 "Overwrite project?"
+212 "Add file to the project"
+213 "This is not a project file"
+214 "New project"
+215 "Overwrite file?"
+216 "Overwrite project?"
+217 "Creating font"
+218 "Overwriting font"
+219 "Compressing files"
+
+220 "EXAMPLE.PRG"
+
+221 "Close the project?"
+222 "It is not possible to add this file."
+223 "First it is necessary to compile the project."
+
+224 "Program name."
+225 "Help message."
+226 "Copyright."
+227 "Destination disk."
+228 "Directory by default."
+229 "Installation with success."
+230 "File is not found (%s)."
+231 "Error while creating the installation."
+232 "Please insert a new disk."
+233 "Disk is full."
+234 "Copying files..."
+
+235 "Executing..."
+236 "Creating installation..."
+237 "Copying INSTALL.EXE ..."
+
+238 "It is not possible to install a sound setup."
+239 "Include sound setup"
+240 "Create subdirectories"
+
+241 "Debugging program..."
+
+242 "It is not possible to write the font."
+243 "It is not a valid font map."
+
+244 "Font test:"
+246 "123ABCabc!?¥¤"
+
+250 "Push a button to exit"
+251 "Introduce destination drive-disk :  "
+252 "Insert disk n§ %d."
+253 "Full installation."
+254 "Introduce directory : %s"
+255 "Free space on drive : %d Kbytes."
+256 "Disposed drive-disks : "
+257 "Error in installation."
+258 "File is spoilt."
+259 "File is not found."
+260 "There is insufficient free space on the hard drive."
+261 "Incorrect drive-disk or directory."
+
+263 "Please select template file (IFS)."
+264 "Choose new file name"
+
+# Explosion Generator
+
+300 "Explosions generator";
+301 "Type A."
+302 "Type B."
+303 "Type C."
+304 "Images"
+305 "Granulated"
+
+306 "Invert"
+307 "Delete"
+308 "Colour"
+
+310 "8 Colours"
+311 "16 Colours"
+312 "32 Colours"
+
+313 "Editorial"
+314 "Fix"
+
+315 "Direct from palette"
+316 "Edit each colour"
+317 "Edit each 2 col."
+318 "Edit each 4 col."
+319 "Edit each 8 col."
+
+320 "There is insufficient memory to complete the operation."
+321 "Wish to convert loaded maps?"
+
+322 "Windows colours:"
+323 "Background"
+324 "Paint"
+325 "Box"
+326 "Program editor:"
+327 "Cursor"
+328 "Font:"
+329 "Paint program:"
+330 "Memory for undo buffer"
+331 "Explode windows"
+332 "Save and restore the session"
+333 "Global options:"
+
+334 "Close all maps?"
+335 " All map windows will be closed, are you sure? "
+336 "Move full windows"
+337 "Sort list"
+338 "Close the sound?"
+339 "Save sound as..."
+340 "Overwrite the sound?"
+341 "Open sound..."
+342 "Warning: The file will be shown using a different palette"
+343 "If you want to see the file correctly, close and re-open the file."
+344 "Warning: The file is adaptable to a new palette"
+345 "The file may be damaged, are you sure?"
+346 "Open program..."
+347 "Find..."
+
+348 "The palette has changed"
+349 "Edit sound"
+
+# Miscelanea (ultimos textos metidos en lenguaje.div)
+
+350 "Trash-can"
+
+351 "Select the hard disk where to install the program and press"
+355 "the INSTALL button, insert the correct path and press ENTER."
+352 "Copyright (c) "
+353 "GAMES/"
+354 "Installation is complete, press any key to finish."
+
+# 355 Este texto esta definido tras el numero 351
+
+356 "hard drive destination is invalid."
+357 "Error creating the installation. Insufficient memory."
+358 "Error creating the installation."
+359 "Installation disk(s) is prepared(s)."
+360 "Executable created in "
+361 " "
+362 "Full disk or there is no disk."
+363 "Disk write-protected."
+364 "Unprotect the disk and retry."
+365 "Error: the sound did not initialize \n"
+366 "Message: \""
+367 "DIV - Execution error"
+368 "Insufficient memory."
+369 "Too many processes at the same time."
+370 "Stack exceeded."
+371 "The DLL file could not be found."
+372 "The file with the system font is not found."
+373 "The file with the system graphics is not found."
+374 "Return code: %d"
+375 "Return with exit()"
+376 "Error: Mouse driver is not found, load your mouse driver or mouse.com."
+377 "There is insufficient free space on the hard disk %c:"
+378 "Some options could not work, it is necessary to free up %u Kb more."
+379 "Process list:"
+380 "Go to ..."
+381 "Error: "
+383 "Press Accept if you see the screen correctly."
+384 "Video-mode test..."
+385 "Proceed with change of video-mode..."
+386 "If the screen is not seen correctly, wait a few seconds."
+
+387 "Option not available in the DEMO version."
+388 "This DEMO cannot import PCX, JPG or BMP files."
+389 "This DEMO cannot import WAV files."
+
+390 "Shell not available in this version"
+
+391 "This option requires a Pentium(tm) or higher PC."
+
+392 "Demonstration version"
+393 "This is not an evaluation copy"
+394 "from DIV Games Studio 2 limited"
+395 "for 31 program executions"
+
+396 "Execution number"
+
+398 "4ureyesonly"
+399 "Version 3.01 for evaluation of ..."
+
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+        PROFESSIONAL DIV - NEW TEXTS
+        (There are also modified texts of the above)
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+400 "Search map"
+401 "Size of cells"
+402 "Hardness colour"
+403 "Eliminate minimum"
+404 "Creating map..."
+
+405 "Comments"
+406 "Symbols"
+407 "Reserved"
+408 "Pre-defined"
+409 "Numbers"
+410 "Literals"
+411 "Tabstops"
+412 "Syntax highlight (*.PRG)"
+
+413 "Calculator"
+414 ""
+415 "Int"
+416 "Hex"
+417 "Error [? F1]"
+
+418 "The file is already present on the drive."
+
+419 "Images"
+
+420 "Gamma editor"
+
+421 "Volume"
+
+422 "Sprites generator"
+423 "Man"
+424 "Woman"
+425 "Child"
+426 "Size (%)"
+427 "\#>>"
+428 "Animation: "
+429 "Frames"
+430 "Rotat. (0..360)"
+431 "Persp. (0..90)"
+432 "Illumination: "
+433 "Choose texture..."
+434 "Calculating..."
+435 "\#<<"
+
+436 "Creating..."
+437 "Printing..."
+438 "Print list"
+439 "FILES:"
+
+440 "New 3D map ..."
+441 "Saving..."
+442 "Edit 3D map"
+443 "Editor"
+444 "Top"
+445 "Line"
+446 "Sector"
+447 "Flag"
+
+448 "In printer"
+449 "In files:"
+
+450 "Wish to replace the files?"
+451 "FPGLIST.TXT"
+
+452 "There is no selected block."
+453 "Print list"
+454 "Full list"
+455 "Selected block"
+
+456 "\# Continue "
+457 "\# New session "
+
+458 "Grid"
+459 "Snap"
+
+460 "Name:"
+461 "Company:"
+462 "User information ..."
+
+463 "Program registered for"
+
+464 "Original idea and program by: Daniel Navarro"
+465 "DX Rebirth & modern ports: Mike Green"
+466 "Auxiliary programming: Juanjo Garrido"
+467 "Program support: Fernando Pirez"
+468 "Examples and tests: Antonio Marchal, Luis Sureda,"
+469 "Manuel Cabanas, Daniel Munoz"
+470 "Graphics: Santiago Garcia, Miguel Angel Carrillo,"
+471 "Carlos Cabanas, Rafael Barraso, Julio Cesar Lopez,"
+472 "Jose Fernandez, Eva Astorga, J.Ricardo Abell ,
+473 "Pablo de la Sierra"
+474 "Sound effects: Carlos Illana"
+475 "Moral support: Cesar Valencia"
+476 "Production: Mario de Luis & Carlos Doral"
+477 "Thanks to: Belen Perez, Wonder, Pete, Rubo, DDI,"
+478 "Tizo, Sobakus, Juangake, Christian, Tomas Cuadra,"
+479 "Javier Carrion, David Picon, Pedro P. Aull¢, JB,"
+480 "Zeen, Jens Grobecker, J.C. Ar‚valo, Carlos Doral,"
+481 "Rafa S. Gago, Antonio Ruiz y Gonzalo Martin"
+482 "DIV Games Studio (c) 1998-2001 Hammer Technologies."
+483 "DX Games studio (c) 2015 MikeDX"
+
+484 "(c) 2016 DX GAMES."
+485 "DX Games Studio - v3.01"
+486 "Daniel Navarro & MikeDX"
+
+487 "system/Div.map"
+
+488 "\# << "
+489 "\# >> "
+490 "\#Index"
+491 "\#Glossary"
+492 "\#Functions"
+493 "\# ? "
+494 "\#Print"
+
+495 "HELP.TXT"
+496 "Print help"
+
+497 "Converting..."
+
+498 "Creating "
+
+499 "Graphic "
+500 " from "
+
+501 "\#Vol -"
+502 "\#Vol +"
+503 "\#Fade <"
+504 "\#Fade >"
+505 "\#Silence"
+506 "\#Copy"
+507 "\#Cut off"
+508 "\#Paste"
+509 "\# Test "
+
+510 "\# Replace "
+511 "\# Add "
+
+512 "\# Copy in window "
+513 "Close the song?"
+
+514 "Generating sprites"
+
+515 "Insert the disk number"
+516 "and press a button to continue."
+517 "Pack files"
+518 "Code for Pentium"
+519 "\# Errors "
+520 "disk change."
+521 "File (FPG)."
+522 "Small font."
+523 "Big font."
+
+524 "Select a file"
+525 "Select a font"
+
+526 "Information messages from installer"
+527 "\# Messages "
+
+528 "The specified drive or path is invalid."
+529 "The installation was interruped by user."
+530 "The error was produced while reading the archives."
+531 "The error was produced while writting the files."
+532 "There is insufficient space on the selected drive."
+533 "Insufficient memory to create the installation."
+534 "The internal FPG is invalid (shortage of graphics or control points)."
+535 "A VESA was not found (screen controller)."
+536 "Was not found any hard-disk where to install."
+
+537 "Error messages from installer"
+
+538 "\# Default messags "
+
+539 "Second font"
+540 "Invalid file, shortage of graphic %d."
+541 "Invalid file, the graphic %d must be 640x480."
+542 "Invalid file, shortage of control point %d of graphic %d."
+
+543 "Adapting installation..."
+
+544 "Mouse"
+
+545 "Error while reading the animation file"
+
+# Reserved for map search
+546 ""
+
+548 "The sound system is deactivated."
+
+549 "Could not initialize the sound system."
+
+550 "Armed"
+551 "Map file is invalid"
+552 "Convert"
+553 "\# 08 bit "
+554 "\# 16 bit "
+555 "\# 11025 "
+556 "\# 22050 "
+557 "\# 44100 "
+
+558 "Open song"
+559 "Opening sound"
+
+560 "Record sound"
+561 "MIC"
+562 "CD"
+563 "Press ACCEPT to begin recording."
+564 "Press ESC to finish recording."
+565 "Font:"
+566 "File:"
+567 "Test"
+
+568 "It has read a new palette ..."
+569 "Convert to the actual palette"
+570 "Merge with the actual palette"
+571 "Load the new palette"
+
+572 "Paintbrush\hl ... (system/brush.fpg)"
+573 "Textures on the desk ..."
+
+574 "Too many sounds copied onto desktop"
+
+575 "SB Pro or better required to record sounds"
+
+576 "Actual"
+577 "New"
+
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+        TEXT FOR DIFFERENT MENU OPTIONS
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+# The menus can have up to 25 options, the first start in the text
+# 750 and the others consecutively every 25 s, the texts that are defined for
+# Each menu are: nombre_icono.mnu, title bar, option 1, option 2, ...
+
+750     # Main MENU
+
+        "menu"
+        "MAIN MENU"
+        "Programs "
+        "Palettes"
+        "Maps"
+        "3D Maps"
+        "FPG Files"
+        "Fonts"
+        "Sounds"
+        "System"                                
+        "Help [F1]"
+
+775     # Palettes menu
+
+        "palettes"
+        "PALETTES Menu"
+        "Open palette..."
+        "Save palette..."
+        "-Edit palette..."
+        "Sort palette..."
+        "Merge palettes..."
+        "Display palette"
+
+800     # Maps Menu
+
+        "maps"
+        "MAPS Menu"
+        "New..."
+        "Open map..."
+        "Close"
+        "Close all..."
+        "Save"
+        "Save as..."
+        "Resize..."
+        "Search map..."
+        "Edit map"
+        "Explosions Generator"
+        "Sprites Generator"
+
+825     # FPG FILE MENU
+
+        "files"
+        "FPG MENU"
+        "New..."
+        "Open file..."
+        "Close"
+        "Save as..."
+        "-Load marked"
+        "Delete marked"
+        "-Print list..."
+        "-Export map"
+        "Import map"
+
+850     # fonts menu
+
+        "fonts"
+        "FONT Menu"
+        "Generate font..."
+        "Open font..."
+        "Close"
+        "-Write text..."
+        "Export map"
+        "Import map"
+
+875     # Systems menu
+
+        "system"
+        "SYSTEM Menu"
+        "CDiv Player"
+        "Clock"
+        "Trashcan"
+        "Calculator"
+        "-Video-mode..."
+        "Background..."
+        "Configuration..."
+        "-System information"
+        "About..."
+        "Shell to MS-DOS [ALT-S]"
+        "Exit from DIV [ALT-X]"
+
+900     # Programs Menu
+
+        "programs"
+        "PROGRAM Menu"
+        "New..."
+        "Open program... [F4]"
+        "Close"
+        "Save [F2]"
+        "Save as..."
+        "Editor menu"
+        "-Execute [F10]"
+        "Compile [F11]"
+        "Debug program [F12]"
+        "-Create Installation..."
+        "Print list..."
+
+925     # sounds menu
+
+        "sounds"
+        "SOUNDS Menu"
+        "New..."
+        "Open sound..."
+        "Close"
+        "Save"
+        "Save as..."
+        "-Edit sound"
+        "-Volume levels"
+        "-Open song..."
+        "Close song"
+
+950     # Editor Menu
+
+        "editor"
+        "EDITOR Menu"
+        "Delete line [CTRL-Y]"
+        "-Mark block [ALT-A]"
+        "Unmark [ALT-U]"
+        "Cut [CTRL+X]"
+        "Copy [CTRL+C]"
+        "Paste [CTRL+V]"
+        "-Go to... [F5]"
+        "Search... [CTRL+F]"
+        "Repeat [CTRL+G]"
+        "Replace... [CTRL+R]"
+
+1000    # Menu de mapas 3D
+
+        "maps 3D"
+        "3D MAP Menu"
+        "New..."
+        "Open 3D map..."
+        "Close"
+        "Close all..."
+        "Save"
+        "Save as..."
+        "Edit map"
+
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+
+            
