@@ -219,15 +219,33 @@ int32_t OSDEP_NumJoysticks(void) {
 }
 
 int OSDEP_JoystickNumButtons(int n) {
-	return SDL_JoystickNumButtons(n);
+	OSDEP_Joystick *joy = SDL_JoystickOpen(n);
+	int count = 0;
+	if (joy) {
+		count = SDL_JoystickNumButtons(joy);
+		SDL_JoystickClose(joy);
+	}
+	return count;
 }
 
 int OSDEP_JoystickNumHats(int n) {
-	return SDL_JoystickNumHats(n);
+	OSDEP_Joystick *joy = SDL_JoystickOpen(n);
+	int count = 0;
+	if (joy) {
+		count = SDL_JoystickNumHats(joy);
+		SDL_JoystickClose(joy);
+	}
+	return count;
 }
 
 int OSDEP_JoystickNumAxes(int n) {
-	return SDL_JoystickNumAxes(n);
+	OSDEP_Joystick *joy = SDL_JoystickOpen(n);
+	int count = 0;
+	if (joy) {
+		count = SDL_JoystickNumAxes(joy);
+		SDL_JoystickClose(joy);
+	}
+	return count;
 }
 
 uint8_t OSDEP_JoystickGetButton(OSDEP_Joystick *joystick, int button) {
@@ -248,7 +266,7 @@ void OSDEP_JoystickClose(OSDEP_Joystick *joy) {
 }
 
 char * OSDEP_JoystickName(int n) {
-	return SDL_JoystickName(n);
+	return (char *)SDL_JoystickNameForIndex(n);
 }
 
 void OSDEP_keyInit(void) {

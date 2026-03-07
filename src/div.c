@@ -2940,9 +2940,9 @@ void window_surface(int an, int al, byte type) {
 
 #ifdef IMAGE
 	if(type==1) 
-		v.surfaceptr = IMG_Load("/home/mike/div2015/system/red_panel.png");
+		v.surfaceptr = IMG_Load("system/red_panel.png");
 	else
-		v.surfaceptr = IMG_Load("/home/mike/div2015/system/blue_panel.png");
+		v.surfaceptr = IMG_Load("system/blue_panel.png");
 #endif
 
 //		SDL_SetAlpha(v.surfaceptr,SDL_SRCALPHA | SDL_RLEACCEL ,128);

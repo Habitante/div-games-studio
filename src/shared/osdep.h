@@ -99,6 +99,7 @@ char * itoa(long n, char *buf, int len);
 #define stricmp strcasecmp
 
 
+#if !defined(__MINGW32__)
 extern void _splitpath (
    const char *path,  // Path Input
    char *drive,       // Drive     : Output
@@ -108,6 +109,7 @@ extern void _splitpath (
 );
 
 extern char *_fullpath(char *_FullPath,const char *_Path,size_t _SizeInBytes);
+#endif
 
 
 // dos directory stuff
@@ -164,6 +166,7 @@ unsigned int _dos_setfileattr(const char *filename, unsigned int attr);
 void __mkdir(char *dir);
 
 void _dos_getdrive( unsigned int *drive);
+#if !defined(__MINGW32__)
 void _makepath(
    char *path,
    const char *drive,
@@ -171,6 +174,7 @@ void _makepath(
    const char *fname,
    const char *ext 
 );
+#endif
 
 extern void compilar(void);
 extern int _chdir(const char* Directory);

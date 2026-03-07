@@ -285,7 +285,13 @@ SET(DEMOTARGET ${TARGET}-DEMO ) #-${GIT_BRANCH}-${GIT_COMMIT_HASH})
 SET_SOURCE_FILES_PROPERTIES(${SDLGFX_SOURCES} ${SHARED_RUN} ${RUNNER_SOURCES} PROPERTIES LANGUAGE ${CLANG} )
 SET_SOURCE_FILES_PROPERTIES(${RUNTIME_SOURCES} ${DIV1RUN_SOURCES} ${DEBUG_SOURCES} ${DIV_SOURCES} ${JUDAS_SOURCES} ${OSDEP} PROPERTIES LANGUAGE ${CLANG})
 
-ADD_DEFINITIONS( ${BUILD_LEVEL} -fpermissive -fno-omit-frame-pointer -funsigned-char -w -Wno-unused-result -Wno-unused -D${PLATFORM}=1 -DTARGET="${TARGET}" -DRDEBUG="${DEBUG}" -DRUNTIME="${RUNTIME}")
+option(DIV_WARNING_BASELINE "Enable compiler warnings for baseline cleanup work" OFF)
+set(DIV_WARNING_FLAGS "-w -Wno-unused-result -Wno-unused")
+if(DIV_WARNING_BASELINE)
+	set(DIV_WARNING_FLAGS "-Wall -Wextra -Wformat=2 -Wshadow -Wpointer-arith -Wcast-align")
+endif()
+
+ADD_DEFINITIONS( ${BUILD_LEVEL} -fpermissive -fno-omit-frame-pointer -funsigned-char ${DIV_WARNING_FLAGS} -D${PLATFORM}=1 -DTARGET="${TARGET}" -DRDEBUG="${DEBUG}" -DRUNTIME="${RUNTIME}")
 # -DJPGLIB)
 
 #ADD_DEFINITIONS( -D_GNU_SOURCE=1 -DZLIB -DSDLGFX ${OS_DEFINITIONS})

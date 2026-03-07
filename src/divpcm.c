@@ -368,15 +368,15 @@ void mostrar_mod_meters(void)
 //      wbox(v.ptr, an, al, c1, 22, 39, 6, 9);
 //      wbox(v.ptr, an, al, c1, 44, 39, 6, 9);
 
-      wwrite(v.ptr, an, al, 29, 40, 2, "L ", c1);
-      wwrite(v.ptr, an, al, 28, 40, 2, "L ", c4);
+      wwrite(v.ptr, an, al, 29, 40, 2, (byte *)"L ", c1);
+      wwrite(v.ptr, an, al, 28, 40, 2, (byte *)"L ", c4);
       sprintf(cwork,"%03d",GetSongLine());
-      wwrite(v.ptr, an, al, 42, 40, 2, cwork, c3);
+      wwrite(v.ptr, an, al, 42, 40, 2, (byte *)cwork, c3);
 
-      wwrite(v.ptr, an, al, 52, 40, 2, "P ", c1);
-      wwrite(v.ptr, an, al, 51, 40, 2, "P ", c4);
+      wwrite(v.ptr, an, al, 52, 40, 2, (byte *)"P ", c1);
+      wwrite(v.ptr, an, al, 51, 40, 2, (byte *)"P ", c4);
       sprintf(cwork,"%03d",GetSongPos());
-      wwrite(v.ptr, an, al, 64, 40, 2, cwork, c3);
+      wwrite(v.ptr, an, al, 64, 40, 2, (byte *)cwork, c3);
 
       ancho_barra = (v.an-4*big2)/SongChannels;
 
@@ -438,8 +438,8 @@ Mix_Chunk *DIVMIX_LoadPCM(char *path) {
   char *riff="RIFF";
   char *wavefmt = "WAVEfmt ";
   char *data = "data";
-  byte *dst; 
-  byte *ptr; 
+  byte *dst;
+  byte *ptr;
   int32_t iLen, Len;
   SDL_RWops *rw;
   Mix_Chunk *smp = NULL;
@@ -448,7 +448,7 @@ Mix_Chunk *DIVMIX_LoadPCM(char *path) {
   char fname[_MAX_FNAME+1];
   char ext[_MAX_EXT+1];
 
-  _splitpath(full,(char *)drive,(char *)dir,(char *)fname,(char *)ext);
+  _splitpath(path,(char *)drive,(char *)dir,(char *)fname,(char *)ext);
   strupr((char *)ext);
 
   // if file isnt a pcm, reject
@@ -456,7 +456,7 @@ Mix_Chunk *DIVMIX_LoadPCM(char *path) {
     return NULL;
   }
 
-  f=fopen(full,"r");
+  f=fopen(path,"rb");
   if(f) {
     fseek(f,0,SEEK_END);
     Len = ftell(f);
@@ -467,8 +467,12 @@ Mix_Chunk *DIVMIX_LoadPCM(char *path) {
 
     iLen = Len + 50;
 
-    if(dst==NULL)
-      return(-1);
+    if(dst==NULL || ptr==NULL) {
+      if (dst) free(dst);
+      if (ptr) free(ptr);
+      fclose(f);
+      return NULL;
+    }
 
     memset(dst,0,(int)Len+40);
     fread(ptr,1,Len,f);
@@ -1055,7 +1059,7 @@ void PlaySong(char *pathname)
 		v_texto=strdup((char *)Mix_GetError());//texto[46];
     if(strlen(v_texto)==0) {
       free(v_texto);
-      v_texto=strdup(texto[46]);
+      v_texto=strdup((const char *)texto[46]);
     }
 		dialogo(err0);
     free(v_texto);
@@ -1217,7 +1221,7 @@ void EditSound1(void)
   int     x, y, y0, y1, p0, p1;
   int     Ancho, Alto, First=1, lx, ly;
   short   muestra;
-  char    cwork[6];
+  char    cwork[16];
 
   _show_items();
 
@@ -1228,7 +1232,7 @@ void EditSound1(void)
   wwrite(v.ptr, an, al, 39, 13, 1, (byte *)mypcminfo->name, c3);
   itoa(mypcminfo->SoundFreq, cwork, 10);
   wwrite(v.ptr, an, al, 39, 23, 1, (byte *)cwork, c3);
-  sprintf(cwork,"%02d bit",mypcminfo->SoundBits);
+  snprintf(cwork, sizeof(cwork), "%02d bit", mypcminfo->SoundBits);
   wwrite(v.ptr, an, al, 39, 33, 1, (byte *)cwork, c3);
 
   // Opciones de conversion

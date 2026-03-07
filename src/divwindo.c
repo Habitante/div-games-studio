@@ -749,7 +749,7 @@ void wwrite_in_box(byte*copia,int an_real_copia,int an_copia,int al_copia,
 
 	if (boton) { 
 #ifdef TTF
-		tempsurface = IMG_Load("/home/mike/div2015/system/red_button00.png");
+		tempsurface = IMG_Load("system/red_button00.png");
 		tsurface = zoomSurface(tempsurface, (float)(an*2+6)/tempsurface->w, (float) (al*2+6)/tempsurface->h, 1 );
 		rc.x=2*x-3;
 		rc.y=2*y-3;

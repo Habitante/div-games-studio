@@ -643,7 +643,7 @@ void edit_mode_6(void) {
     ayuda_dibujo(1295);
     regla_edicion(); select_fx(12,&efecto6); select_color(2);
 
-    an=map_an*2; back=0; switch(s) {
+    an=map_an*2; al=0; back=0; switch(s) {
       case 0:
         if ((mouse_b&1) && mouse_graf>=10) {
           s=1; x0=coord_x; y0=coord_y;
@@ -719,7 +719,7 @@ void edit_mode_7(void) {
     ayuda_dibujo(1295);
     regla_edicion(); select_fx(12,&efecto7); select_color(2);
 
-    an=map_an*2; back=0; switch(s) {
+    an=map_an*2; al=0; back=0; switch(s) {
       case 0:
         if ((mouse_b&1) && mouse_graf>=10) {
           s=1; x0=coord_x; y0=coord_y;
@@ -2786,7 +2786,7 @@ void mover(byte * sp, int an, int al) {
   int _an,_al;
   int xg,yg;
   byte * p;
-  int _coord_x,_coord_y;
+  int _coord_x=0,_coord_y=0;
   int _mouse_graf;
 
   int ghost=0,block=0;
@@ -3106,7 +3106,7 @@ void cuentagotas(void) {
 //ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
 
 int editable(int *n) {
-  int r;
+  int r=4;
 
   switch(reglas[regla].numcol) {
     case 8: r=16; break; case 16: r=8; break; case 32: r=4; break; }
@@ -3133,7 +3133,7 @@ int editable(int *n) {
 //ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
 
 int editable_seleccion(int *n,int x,int y) {
-  int r;
+  int r=4;
 
   switch(reglas[regla].numcol) {
     case 8: r=16; break; case 16: r=8; break; case 32: r=4; break; }
@@ -3161,7 +3161,7 @@ void dibuja_regla(void) {
   int x,y;
   int n,med;
   byte * p,*ptr;
-  int s0,s1;
+  int s0=4,s1=0;
 
 
   if (fondo_resaltado) { dac[0]=(dac[0]+32)%64; dac[1]=(dac[1]+32)%64; dac[2]=(dac[2]+32)%64; }
@@ -3247,7 +3247,7 @@ void dibuja_regla(void) {
 //ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
 
 void dibuja_regla_seleccion(byte * p, int c, int d, int x, int y) {
-  int n,s0,s1;
+  int n,s0=4,s1=0;
 
   switch (reglas[regla].numcol) {
     case 8: s0=16; s1=5; break;

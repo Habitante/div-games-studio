@@ -107,6 +107,7 @@ void call(const voidReturnType func) {
 #include <string.h>
 #include <errno.h>
 
+#if !defined(__MINGW32__)
 // Abstract:   split a path into its parts
 // Parameters: Path: Object to split
 //             Drive: Logical drive , only for compatibility , not considered
@@ -250,6 +251,7 @@ char *_fullpath(char *_FullPath,const char *_Path,size_t _SizeInBytes) {
 strcpy(_FullPath, _Path);
 	return _FullPath;
 }
+#endif
 
 
 int nummatch=0;
@@ -273,15 +275,16 @@ type = attr;
 strcpy(findmask,name);
 strlwr(findmask);
 
-#ifdef __cplusplus
-#if defined(__MINGW64__) 
-	hFile =  _findfirst("*.*",( _finddata64i32_t*)result);
+#if defined(__MINGW64__)
+	{
+		struct _finddata64i32_t first_result;
+		hFile = _findfirst("*.*", &first_result);
+	}
 #else
-	hFile =  _findfirst("*.*",( _finddata32_t*)result);
-#endif
-
-#else
-hFile =  _findfirst("*",result);
+	{
+		struct _finddata32_t first_result;
+		hFile = _findfirst("*.*", &first_result);
+	}
 #endif
 //nummatch = scandir(".", &namelist, 0, NULL); 
 
@@ -496,9 +499,9 @@ void __mkdir(char *dir) {
 
 
 void textcolor(int attr, int fg, int bg)
-{	char command[13];
+{	char command[40];
 
 	/* Command is the control command to the terminal */
-	sprintf(command, "%c[%d;%d;%dm", 0x1B, attr, fg + 30, bg + 40);
+	snprintf(command, sizeof(command), "%c[%d;%d;%dm", 0x1B, attr, fg + 30, bg + 40);
 	printf("%s", command);
 }

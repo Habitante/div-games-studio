@@ -266,6 +266,7 @@ void crear_ghost_slow (void) {
   int dmin,dif;
   byte *pal,*endpal,*color;
 
+  color=dac4;
   pal=dac4; endpal=dac4+768; dmin=65536;
   do {
     dif=*(int*)(cuad+r+*pal); pal++;
@@ -295,6 +296,7 @@ byte find_color(byte r,byte g,byte b) {
   int dmin,dif,_r,_g,_b;
   byte *pal,*endpal,*color;
 
+  color=dac4;
   pal=dac4; endpal=dac4+768; dmin=65536;
   _r=(int)r*256; _g=(int)g*256; _b=(int)b*256;
   do {
@@ -312,6 +314,7 @@ byte find_color_not0(byte r,byte g,byte b) {
   int dmin,dif,_r,_g,_b;
   byte *pal,*endpal,*color;
 
+  color=dac4;
   pal=dac4+3; endpal=dac4+768; dmin=65536;
   _r=(int)r*256; _g=(int)g*256; _b=(int)b*256;
   do {
@@ -408,6 +411,7 @@ byte find_ord(byte * dac) {
   int dmin,dif,r2,g2,b2;
   byte *pal,*endpal,*color;
 
+  color=dac;
   pal=dac; endpal=dac+1024; dmin=65536;
   if (r<0) r=0; else if (r>63) r=63;
   if (g<0) g=0; else if (g>63) g=63;
@@ -1016,6 +1020,7 @@ word find_ord2(byte * dac) {
   int dmin,dif,r2,g2,b2;
   byte *pal,*endpal,*color;
 
+  color=dac;
   pal=dac; endpal=dac+2048; dmin=65536;
   if (r<0) r=0; else if (r>63) r=63;
   if (g<0) g=0; else if (g>63) g=63;
@@ -1073,7 +1078,7 @@ void fusionar_paletas(void){
   byte pal[2048]; // Dos paletas en formato R,G,B,sum(RGB),R,G,B,sum(RGB)...
   word paleta[512];
   int dist[512];
-  int n,c,min,cmin;
+  int n,c,min,cmin=0;
 
   // paleta vieja en dac, nueva en dac4
 
@@ -1182,6 +1187,7 @@ word new_find_ord(byte * dac) {
   int dmin,dif,r2,g2,b2;
   byte *pal,*endpal,*color;
 
+  color=dac;
   pal=dac; endpal=dac+num_colores*4; dmin=65536;
   if (r<0) r=0; else if (r>63) r=63;
   if (g<0) g=0; else if (g>63) g=63;
@@ -1204,7 +1210,7 @@ void crear_paleta(void){
   word * paleta;
   int * dist;
   int rr,gg,bb,n;
-  int c,min,cmin;
+  int c,min,cmin=0;
   byte col;
 
   // Cuenta el n£mero de colores y genera pal[]

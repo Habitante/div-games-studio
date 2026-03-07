@@ -549,8 +549,6 @@ void volcadosdl(byte *p) {
 //	SDL_FillRect(copia_surface, NULL, colorkey);
 
 
-	memset(oldp,vga_an*vga_al,0);
-
 }
 
 void volcado(byte *p) {
