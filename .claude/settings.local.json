@@ -25,7 +25,13 @@
       "Read(//c/Src/div/**)",
       "Bash(done)",
       "Bash(python:*)",
-      "Bash(echo ================================================================================\nFINAL REPORT: WHY UTF-8 CONVERSION BREAKS DIV GAMES STUDIO COMPILATION\n================================================================================:*)"
+      "Bash(echo ================================================================================\nFINAL REPORT: WHY UTF-8 CONVERSION BREAKS DIV GAMES STUDIO COMPILATION\n================================================================================:*)",
+      "Bash(git add CMakeLists.txt src/div.c src/divpaint.c src/divpalet.c src/divpcm.c src/divvideo.c src/divwindo.c src/shared/osdep.h src/shared/osdep/osd_sdl2.c src/win/osdepwin.c reports/)",
+      "Bash(git commit:*)",
+      "Bash(echo \"$PATH\")",
+      "Bash(echo $PATH)",
+      "Bash(PATH=\"/c/msys64/mingw32/bin:/c/msys64/usr/bin:$PATH\")",
+      "Bash(mingw32-make -j4)"
     ]
   }
 }

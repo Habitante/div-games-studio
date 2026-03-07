@@ -68,8 +68,6 @@ src/
     divlengu.c       Runtime language/text strings
     vpe/             MODE8 3D engine (raycaster / voxel)
 
-  div1run/           DIV1-compatible runtime (older bytecode format)
-
   runner/
     r.c              Launcher — starts the IDE, chains to debugger
 
@@ -78,7 +76,7 @@ src/
       osd_sdl2.c/.h  SDL2 OS-dependency layer (display, input, audio)
       osd_sdl12.c/.h SDL 1.2 OS-dependency layer (legacy)
     run/              Shared runtime support (keyboard, mouse, sound, FLI)
-    lib/sdlgfx/       Bundled SDL_gfx (framerate limiter)
+    lib/sdlgfx/       Bundled SDL_gfx framerate limiter
     lib/zip/           Zip archive support
 
   win/
@@ -135,13 +133,32 @@ pacman -S --needed \
   mingw-w64-i686-pkgconf
 ```
 
-Add `C:\msys64\mingw32\bin` to your system PATH (use PowerShell, **not** `setx`):
+Add `C:\msys64\mingw32\bin` and `C:\msys64\usr\bin` to your **User** PATH.
+Put `mingw32\bin` **first** — before any `mingw64` entry:
 
 ```powershell
 [Environment]::SetEnvironmentVariable('Path',
-  [Environment]::GetEnvironmentVariable('Path','User') + ';C:\msys64\mingw32\bin',
+  'C:\msys64\mingw32\bin;C:\msys64\usr\bin;' +
+  [Environment]::GetEnvironmentVariable('Path','User'),
   'User')
 ```
+
+> **Important — MINGW64 shell PATH injection:** If you use Git Bash, MSYS2's
+> MINGW64 shell, or a VS Code terminal that runs under MINGW64, the shell
+> automatically prepends `/mingw64/bin` to `$PATH` on startup — regardless of
+> your Windows environment settings. This causes the 32-bit compiler (`cc1.exe`)
+> to silently crash because it loads 64-bit DLLs from the wrong directory.
+>
+> **Do not add `C:\msys64\mingw64\bin` to your PATH.** If your shell still shows
+> `/mingw64/bin` first (check with `echo $PATH`), prepend the correct path
+> before building:
+>
+> ```bash
+> export PATH="/c/msys64/mingw32/bin:/c/msys64/usr/bin:$PATH"
+> ```
+>
+> Alternatively, build from a regular Command Prompt or the MSYS2 **MinGW32**
+> shell (not MinGW64), which prepends the correct 32-bit paths.
 
 ### Build
 
@@ -192,7 +209,6 @@ system\div-WINDOWS.exe INIT
 | `d-WINDOWS.exe` | `div/` | Launcher — starts IDE, chains to debugger |
 | `div-WINDOWS.exe` | `div/system/` | The IDE, compiler, and all editors |
 | `divrun-WINDOWS.exe` | `div/system/` | DIV2 bytecode runtime |
-| `div1run-WINDOWS.exe` | `div/system/` | DIV1 bytecode runtime |
 | `divdbg-WINDOWS.exe` | `div/system/` | Runtime with integrated debugger |
 
 ## Building on Linux

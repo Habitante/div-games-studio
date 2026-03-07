@@ -30,15 +30,13 @@ Clean up first, ship second, then modernize based on what real users actually wa
 - [x] Network code: NETLIB/NETPLAY blocks, `net.c`, `net.h`, `netlib.h`
 - [x] Fixed CMakeLists.txt `exec_program("git")` → `execute_process()` with fallback
 
-### Still pending from Phase 0
-- [ ] Clean up bundled sdlgfx — only `SDL_framerate.c` is actually used
-- [ ] Remove hundreds of commented-out code blocks throughout
+### Additional cleanup (done 2026-03-07)
+- [x] Cleaned up bundled sdlgfx — removed unused files, kept only `SDL_framerate.c/.h`
+- [x] Dropped DIV1 runtime (`div1run/`, ~3,000 lines) — orphaned, never called from IDE or launcher
+- [x] `.gitignore` already in place since initial commit
 
-### Decision: Drop DIV1 runtime?
-- [ ] Decide whether to keep `div1run/` (~3,000 lines, separate interpreter)
-- Recommendation: drop it. Nobody is running DIV1 bytecode in 2026, and maintaining
-  two parallel interpreters doubles the cost of every VM bugfix.
-- If kept: clearly mark as legacy, don't ship on Steam.
+### Still pending from Phase 0
+- [ ] Remove hundreds of commented-out code blocks throughout
 
 ### Hide deprecated IDE features
 - [ ] Remove or hide from menus: CD Player, Clock, Trash icon, DOS Shell, Calculator
@@ -49,7 +47,6 @@ Clean up first, ship second, then modernize based on what real users actually wa
 - [ ] Remove dead cmake options and platform branches
 - [ ] Add a DLL auto-copy step so first-time build "just works"
 - [ ] Add a one-command build script wrapper
-- [ ] Add proper `.gitignore` for build/ and div/ runtime artifacts
 
 ---
 
@@ -65,8 +62,8 @@ tables used by the compiler's lexical analyzer.
 - [x] Replaced all high bytes in string/char literals with `\xNN` hex escapes
   - 4 character lookup tables in `divc.c` (used by lexer for accented identifiers)
   - 1 corrupted `lower[256]` table in `div.c` (was already broken in git HEAD)
-  - 39 Spanish error message strings in `div1run/inter.h`
-  - 127 font bitmap data lines in `SDL_gfxPrimitives_font.h`
+  - 39 Spanish error message strings in `div1run/inter.h` (div1run since removed)
+  - 127 font bitmap data lines in `SDL_gfxPrimitives_font.h` (sdlgfx since cleaned up)
   - Display strings in `divfont.c`, `divhandl.c`, `divhelp.c`, `divpaint.c`, `runtime/debug/d.c`
 - [x] Converted all 53 Latin-1 source files to UTF-8
 - [x] Verified: build succeeds, F11 compile works, runtime works, debug works
