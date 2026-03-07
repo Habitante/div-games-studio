@@ -62,7 +62,7 @@ Clean up first, ship second, then modernize based on what real users actually wa
 
 ### Still pending from Phase 0
 - [ ] Remove hundreds of commented-out code blocks throughout
-- [ ] Remove remaining `#ifdef TTF` dead code (~25 blocks across div.c, divwindo.c,
+- [x] Remove remaining `#ifdef TTF` dead code (~25 blocks across div.c, divwindo.c,
   divpalet.c, divsetup.c, divhelp.c, divvideo.c, global.h, osdep.h)
 
 ### Build system cleanup

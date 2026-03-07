@@ -77,14 +77,6 @@ SET(RUNTIME "divrun-${PLATFORM}")
 SET(DEBUG "divdbg-${PLATFORM}")
 SET(RUNNER "d-${PLATFORM}")
 
-# fix this
-MESSAGE(WARNING "TODO - FIX RUNNER DEFINITION")
-
-IF(TARGETOS STREQUAL "WINDOWS" )
-SET(RUNNER "d.exe")
-ENDIF()
-
-
 set(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
 set(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "")
 
@@ -126,15 +118,6 @@ IF(HAS_SDL EQUAL 1)
 
 	ENDIF()
 
-	IF(HAS_SDLTTF)
-		MESSAGE(STATUS "Adding SDL TTF")
-		Include(FindSDL_mixer)
-		include_directories(${SDL_TTF_INCLUDE_DIRS})
-		set(EXTRA_LIBS ${EXTRA_LIBS} ${SDL_TTF_LIBRARIES})
-		ADD_DEFINITIONS( -DTTF )
-
-	ENDIF()
-
 	SET(OSDEP ${OSDEP} "src/shared/osdep/osd_sdl12.c")
 
 ENDIF()
@@ -161,15 +144,6 @@ IF(HAS_SDL EQUAL 2)
 		include_directories(${SDLIMAGE_INCLUDE_DIRS})
 		set(EXTRA_LIBS ${EXTRA_LIBS} ${SDLIMAGE_LIBRARIES})
 		ADD_DEFINITIONS( -DIMAGE )
-
-	ENDIF()
-
-	IF(HAS_SDLTTF)
-		MESSAGE(STATUS "Adding SDL2 TTF")
-		PKG_SEARCH_MODULE(SDLTTF REQUIRED SDL2_ttf>=2.0.0)
-		include_directories(${SDLTTF_INCLUDE_DIRS})
-		set(EXTRA_LIBS ${EXTRA_LIBS} ${SDLTTF_LIBRARIES})
-		ADD_DEFINITIONS( -DTTF )
 
 	ENDIF()
 
@@ -234,13 +208,6 @@ SET(PLATFORM_LIBS m ${OS_LIBS})
 
 #SET(PLATFORM_LIBS "jpeg" "m" "z" "mingw32" "SDL" "SDLMain" "mingw32")
 
-# include our SDL stuff
-# this includes TTF
-#IF(SDL GREATER 0)
-#	MESSAGE("-- Including SDL(${SDL})")
-#	SET(TARGET ${TARGET}-SDL${SDL})
-#	INCLUDE (tools/sdl.cmake)
-#ENDIF()
 
 # default definitions
 ADD_DEFINITIONS( -D_GNU_SOURCE)
@@ -253,10 +220,6 @@ FILE(GLOB DIV_SOURCES "src/*.c")
 FILE(GLOB SDLGFX_SOURCES "src/shared/lib/sdlgfx/SDL_framerate.c")
 
 SET(DIV_SOURCES ${DIV_SOURCES} ${SDLGFX_SOURCES} )
-
-IF(HAS_TTF)
-SET(DIV_SOURCES ${DIV_SOURCES} "src/shared/ttf.c")
-ENDIF()
 
 # DLL and visor sources removed (Phase 0 cleanup)
 FILE(GLOB RUNTIME_SOURCES "src/runtime/*.c")

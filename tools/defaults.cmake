@@ -3,7 +3,6 @@
 
 SET(HAS_SDL 1) # to display anything
 SET(HAS_NET 0) # network play
-SET(HAS_SDLTTF 0) # future
 SET(HAS_SDLIMAGE 0) # future
 SET(HAS_ZLIB 1) # to run code
 SET(HAS_SDLMIXER 0) # optional media lib

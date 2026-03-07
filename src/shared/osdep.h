@@ -16,11 +16,6 @@
 #include "unzip.h"
 #endif
 
-#ifdef TTF
-#include "ttf.h"
-#endif
-
-
 #include <stdint.h>
 
 #include <limits.h>

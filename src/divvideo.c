@@ -9,11 +9,7 @@
 #include "lib/sdlgfx/SDL_framerate.h"
 
 
-#ifdef TTF
-#define CDEPTH 32
-#else
 #define CDEPTH 8
-#endif
 
 void snapshot(byte *p);
 void volcadocsvga(byte *p);
@@ -206,40 +202,6 @@ SDL_setFramerate(&fpsman, 60);
 //		fprintf(stderr, "Warning: colorkey will not be used, reason: %s\n", SDL_GetError());;
 	
 
-#ifdef TTF
-	if(vga!=NULL) {
-		
-		if(tapiz_surface!=NULL) {
-			tempsurface = SDL_DisplayFormat(tapiz_surface);
-			if(tempsurface!=NULL) {
-				SDL_FreeSurface(tapiz_surface);
-				tapiz_surface=tempsurface;
-				tempsurface=NULL;
-			}
-		}
-		
-		if(mouse_surface!=NULL) {
-			tempsurface = SDL_DisplayFormatAlpha(mouse_surface);
-			if(tempsurface!=NULL) {
-				SDL_FreeSurface(mouse_surface);
-				mouse_surface=tempsurface;
-				tempsurface=NULL;
-			}
-		}
-		
-		for(vn=max_windows-1;vn>=0; vn--) {
-			if(ventana[vn].surfaceptr!=NULL) {
-				tempsurface=SDL_DisplayFormat(ventana[vn].surfaceptr);
-				if(tempsurface!=NULL) {
-					SDL_FreeSurface(ventana[vn].surfaceptr);
-					ventana[vn].surfaceptr=tempsurface;
-					tempsurface=NULL;
-				}
-			}
-		}	
-	}
-#endif
-
 	modovesa=1;
 	
 	set_dac(dac);
@@ -429,38 +391,37 @@ void volcadosdl(byte *p) {
 //	SDL_FillRect(vga, NULL, 0);
 
 
-#ifndef TTF	
 	if(0) {
-		do { 
-			v2=q+m; 
-			y=0; 
-			p2=p++; 
+		do {
+			v2=q+m;
+			y=0;
+			p2=p++;
 			plano<<=1;
 			while (y<vga_al) {
 				n=y*4;
-				
-				if (scan[n+1]) 
+
+				if (scan[n+1])
 					vgacpy(v2+scan[n],p2+scan[n]*4,scan[n+1]);
-				
-				if (scan[n+3]) 
+
+				if (scan[n+3])
 					vgacpy(v2+scan[n+2],p2+scan[n+2]*4,scan[n+3]);
-				
-				v2+=vga_an/4; 
-					p2+=vga_an; y++; 
+
+				v2+=vga_an/4;
+					p2+=vga_an; y++;
 			}
 		} while (plano<=0x800);
 
-		y=0; 
-		v2=(byte *)vga->pixels; 
+		y=0;
+		v2=(byte *)vga->pixels;
 
 		while (y<vga_al) {
 			n=y*4;
-			if (scan[n+1]) 
+			if (scan[n+1])
 				memcpyb(v2+scan[n],v2+scan[n]+m,scan[n+1]);
-			if (scan[n+3]) 
+			if (scan[n+3])
 				memcpyb(v2+scan[n+2],v2+scan[n+2]+m,scan[n+3]);
 			v2+=vga_an/4; y++;
-		} 
+		}
 
 	} else {
 		for (vy=0; vy<vga_al;vy++) {
@@ -470,7 +431,7 @@ void volcadosdl(byte *p) {
 					for(vx=0;vx<vga_an;vx++) {
 						q32[vx]=(uint32_t)((colors[*p].b)+(colors[*p].g<<8)+(colors[*p].r<<16));
 						*p++;
-					} 
+					}
 					break;
 
 				case 24:
@@ -482,7 +443,6 @@ void volcadosdl(byte *p) {
 					}
 					break;
 
-					
 				case 16:
 					for(vx=0;vx<vga_an;vx++) {
 						q[vx*2]=colors[*p].b+colors[*p].g<<8;
@@ -490,53 +450,16 @@ void volcadosdl(byte *p) {
 						*p++;
 					}
 					break;
-				
-				case 8: 
+
+				case 8:
 					memcpy(q,p,vga_an);
 					p+=vga_an;
 			}
-		
+
 			q+=vga->pitch;
 
 		}
 	}
-	
-#else
-	
-	
-	if(tapiz_surface!=NULL);
-		SDL_BlitSurface(tapiz_surface, NULL, vga, NULL);
-
-	for(vn=max_windows-1;vn>=0; vn--) {
-		if(ventana[vn].surfaceptr!=NULL) {
-			trc.x=ventana[vn].x;
-			trc.y=ventana[vn].y;
-			trc.w=ventana[vn].an;
-			trc.h=ventana[vn].al;
-
-			
-			//SDL_SetAlpha(ventana[vn].surfaceptr,SDL_SRCALPHA | SDL_RLEACCEL, 230);
-			
-			if(ventana[vn].exploding==1) {
-				SDL_SetAlpha(ventana[vn].surfaceptr,SDL_SRCALPHA | SDL_RLEACCEL,explode_num*25);
-			}
-			SDL_BlitSurface(ventana[vn].surfaceptr,NULL,vga,&trc);
-			
-		}
-		
-	}
-
-	trc.x=mouse_x;
-	trc.y=mouse_y;
-	trc.w=mouse_surface->w;
-	trc.h=mouse_surface->h;
-
-	SDL_SetAlpha(mouse_surface,SDL_SRCALPHA | SDL_RLEACCEL,32);
-	
-	SDL_BlitSurface(mouse_surface,NULL,vga,&trc);
-
-//printf("window zero is %d\n",v.tipo);
-#endif
 		
 	OSDEP_UpdateRect(vga,0,0,vga_an,vga_al);
 

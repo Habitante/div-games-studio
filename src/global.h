@@ -615,12 +615,6 @@ GLOBAL_DATA char help_xlat[256];               // Para convertir los gr ficos d
 
 GLOBAL_DATA byte * text_font; // Font est ndar, 7 puntos de alto, ancho proporcional
 
-#ifdef TTF
-GLOBAL_DATA TTF_Font* sysfont;
-GLOBAL_DATA TTF_Font* editorfont;
-
-#endif
-
 GLOBAL_DATA SDL_Color colors[256];
 
 GLOBAL_DATA byte * font; // Font para el editor de programas / hipertexto
@@ -706,9 +700,6 @@ struct tventana {
   int x,y,an,al;                        // Posici¢n y dimensiones de la ventana
   int _x,_y,_an,_al;                    // Posici¢n salvada al minimizarse
   byte * ptr;                           // Buffer de la ventana
-#ifdef TTF
-  SDL_Surface *surfaceptr;  
-#endif
   struct tmapa * mapa;                  // Puntero a otro struct tipo mapa
   struct tprg * prg;                    // Puntero a otro struct tipo prg
   int volcar;                           // Indica si se debe volcar la ventana

@@ -2175,10 +2175,6 @@ void cierra_ventana(void) {
 
   if (v.click_handler!=err2) { 
 	  free(v.ptr);
-#ifdef TTF
-	  SDL_FreeSurface(v.surfaceptr);
-	  v.surfaceptr=NULL;
-#endif
 	  v.ptr=NULL;
   }
   
@@ -2733,14 +2729,6 @@ if(_ptr==NULL)
 	trc.w=ventana[n].an;
 	trc.h=ventana[n].al;
 
-#ifdef TTF
-if(0) {
-	if(ventana[n].surfaceptr!=NULL)
-		SDL_BlitSurface(ventana[n].surfaceptr,NULL,copia_surface,&trc);
-
-}
-#endif
-
 	volcado_parcial(x,y,an,al);
 
 
@@ -2917,43 +2905,6 @@ void volcado_copia(void) {
 }
 
 void window_surface(int an, int al, byte type) {
-#ifdef TTF
-
-//	if(v.surfaceptr!=NULL)
-//		SDL_FreeSurface(v.surfaceptr
-	tempsurface=NULL;
-
-#ifdef IMAGE
-	if(type==1) 
-		v.surfaceptr = IMG_Load("system/red_panel.png");
-	else
-		v.surfaceptr = IMG_Load("system/blue_panel.png");
-#endif
-
-//		SDL_SetAlpha(v.surfaceptr,SDL_SRCALPHA | SDL_RLEACCEL ,128);
-
-	if(v.surfaceptr!=NULL) {
-		tempsurface=zoomSurface(v.surfaceptr, (float)((an*1.0f)/(v.surfaceptr->w*1.0f)), (float)((al*1.0f)/(v.surfaceptr->h*1.0f)),0);
-		SDL_FreeSurface(v.surfaceptr);
-	}
-
-	// if couldnt be found
-//	if(tempsurface==NULL) 
-//		tempsurface = SDL_CreateRGBSurface(SDL_SWSURFACE, an, al, 32,
-//											rmask, gmask, bmask, amask);
-
-
-//	SDL_SetAlpha(tempsurface,SDL_SRCALPHA | SDL_RLEACCEL ,128);
-
-	if(tempsurface!=NULL) {
-		v.surfaceptr=SDL_DisplayFormat(tempsurface);
-		SDL_SetAlpha(v.surfaceptr,SDL_SRCALPHA | SDL_RLEACCEL ,255);
-	}
-	if(tempsurface!=NULL)
-		SDL_FreeSurface(tempsurface);
-
-#endif
-                                   	
 }
 
 
@@ -3020,9 +2971,6 @@ void nueva_ventana(voidReturnType init_handler) {
     v.prg=NULL;
     v.aux=NULL;
 	v.ptr=NULL;
-#ifdef TTF
-	v.surfaceptr=NULL;
-#endif	
     call(init_handler);
 
     if (big) if (v.an>0) { v.an=v.an*2; v.al=v.al*2; } else v.an=-v.an;
@@ -3461,9 +3409,6 @@ void refrescadialogo(void)
 	byte * ptr=v.ptr;
 	int an=v.an,al=v.al;
 	memset(ptr,c0,an*al); if (big) { an/=2; al/=2; }
-#ifdef TTF
-	SDL_FillRect(v.surfaceptr,NULL,SDL_MapRGB( v.surfaceptr->format, 0, 0, 0 ));
-#endif      
       wrectangulo(ptr,an,al,c2,0,0,an,al);
       wput(ptr,an,al,an-9,2,35);
       if (!strcmp((char *)v.titulo,(char *)texto[41])) wgra(ptr,an,al,c_r_low,2,2,an-12,7);
@@ -3621,44 +3566,8 @@ void inicializacion(void) {
 	}
 
 
-#ifdef TTF
-
-	TTF_Init();
-
-	IMG_Init(IMG_INIT_JPG|IMG_INIT_PNG|IMG_INIT_TIF);
-
-	sysfont = loadfont("/home/mike/cool-retro-term/app/qml/fonts/modern-fixedsys-excelsior/FSEX301-L2.ttf",(big==1)?18:9);
-	editorfont = loadfont("/home/mike/cool-retro-term/app/qml/fonts/modern-fixedsys-excelsior/FSEX301-L2.ttf", (big==1)?18:9);
-
-	//sysfont = loadfont("system/KenPixel.ttf",(big==1)?12:6);
-	//sysfont = loadfont("/usr/share/fuze/assets/fuzebasic/zx.ttf",(big==1)?30:15);
-	//sysfont = loadfont("/usr/share/wine/fonts/tahoma.ttf",(big==1)?14:7);
-	//sysfont = loadfont("/home/mike/cool-retro-term/app/qml/fonts/modern-fixedsys-excelsior/FSEX301-L2.ttf",20);
-	//usr/share/wine/fonts/tahoma.ttf",(big==1)?14:7);
-
-	//printf("Loaded TTF: %x\n",sysfont);
-
-//	font_an=(big==1)?16:8;
-	tempsurface = drawtext(sysfont, colors[c].r,colors[c].g,colors[c].b,0, 255, 255,255, 0, "W", solid);
-	font_an=tempsurface->w;
-	SDL_FreeSurface(tempsurface);	
-	font_al=TTF_FontHeight(sysfont)+2;
-
-	tempsurface = drawtext(sysfont, colors[c].r,colors[c].g,colors[c].b,0, 255, 255,255, 0, "W", solid);
-	editor_font_an=tempsurface->w;
-	SDL_FreeSurface(tempsurface);
-	editor_font_al=TTF_FontHeight(editorfont)+2;
-	
-	tapiz_surface=NULL;
-	mouse_surface=NULL;
-	tempsurface=NULL;
-#else
-
 editor_font_al = font_al;
 editor_font_an = font_an;
-
-
-#endif
 
 #ifdef IMAGE
 mouse_surface = IMG_Load("system/cursor.png");

@@ -483,9 +483,6 @@ void resize_help(void) {
     }
 
     if ((new_block=(byte *)realloc(v.ptr,v.an*v.al))!=NULL) {
-#ifdef TTF
-		SDL_FreeSurface(v.surfaceptr);
-#endif
 		window_surface(v.an,v.al,0);
 		
       if (modo<100) {
@@ -1228,41 +1225,6 @@ void put_image_line(int n,int linea,byte * di,int v_an) {
 
 void put_chr(byte * ptr, int an, byte c,byte color) {
   int n,m;
-
-#ifdef TTF
-	int x,y;
-	SDL_Rect rc;
-
-	SDL_Surface *tsurface=v.surfaceptr;
-
-	char s[3];
-	s[1]=0;
-	s[0]=c;
-
-	ptr-=((v.an*(10+16)+2)*big2);
-	x=(ptr-v.ptr)%v.an;
-	y=((ptr-v.ptr)-x)/v.an;
-	
-	y+=((10+16)+2)*big2;
-	
-	rc.x=x+8;
-	rc.y=y;		
-	
-//	printf("%x %x %d %d %s\n",ptr,v.ptr, x,y,s);
-	
-	if(tsurface!=NULL) {
-		tempsurface = drawtext(sysfont, colors[color].r,colors[color].g,colors[color].b,0, 0,0,0, 0, (char *)s, solid);
-		rc.w=tempsurface->w;
-		rc.h=tempsurface->h;
-
-		SDL_BlitSurface(tempsurface, NULL, tsurface,&rc);
-	}
-	SDL_FreeSurface(tempsurface);
-	
-	return;
-	
-#endif
-
   byte *si;
 
   si=font+c*font_an*font_al;

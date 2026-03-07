@@ -87,22 +87,6 @@ void wbox(byte*copia,int an_copia,int al_copia,byte c,int x,int y,int an,int al)
 void wbox_in_box(byte*copia,int an_real_copia,int an_copia,int al_copia,byte c,int x,int y,int an,int al) {
 
 	byte *p;
-#ifdef TTF
-	SDL_Surface *tsurface = v.surfaceptr;
-#endif
-	SDL_Rect rc;
-	int vn=0;
-	
-	
-/*	for (vn=0;vn<max_windows;vn++) {
-		if(ventana[vn].ptr==copia) {
-			tsurface = ventana[vn].surfaceptr;
-			break;
-		}
-	}
-*/
-	// render ttf to copia_suface;	
-	// ofset by the window x/y
 
 	if (big) {
 		an_real_copia*=2; an_copia*=2; al_copia*=2;
@@ -118,25 +102,11 @@ void wbox_in_box(byte*copia,int an_real_copia,int an_copia,int al_copia,byte c,i
   if (x+an>an_copia) an=an_copia-x;
 
   if (an>0 && al>0) {
-
-    rc.x=x;
-	rc.y=y;		
-	rc.w=an;
-	rc.h=al;
-
-#ifdef TTF
-if(tsurface!=NULL)
-	SDL_FillRect(tsurface,&rc,SDL_MapRGB(tsurface->format,colors[c].r,colors[c].g,colors[c].b));
-#else
-
     p=copia+y*an_real_copia+x;
     do {
       memset(p,c,an);
       p+=an_real_copia;
     } while (--al);
-    
-
-#endif
 
 
     
@@ -239,12 +209,10 @@ void wresalta_box(byte*copia,int an_copia,int al_copia,int x,int y,int an,int al
 //ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
 
 void wrectangulo(byte*copia,int an_copia,int al_copia,byte c,int x,int y,int an,int al) {
-#ifndef TTF
   wbox(copia,an_copia,al_copia,c,x,y,an,1);
   wbox(copia,an_copia,al_copia,c,x,y+al-1,an,1);
   wbox(copia,an_copia,al_copia,c,x,y+1,1,al-2);
   wbox(copia,an_copia,al_copia,c,x+an-1,y+1,1,al-2);
-#endif
 }
 
 //ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
@@ -262,63 +230,6 @@ void wput_in_box(byte*copia,int an_real_copia,int an_copia,int al_copia,int x,in
   byte *p,*q;
   int salta_x, long_x, resto_x;
   int salta_y, long_y, resto_y;
-
-#ifdef TTF
-	SDL_Surface *img=NULL;
-	SDL_Rect rc;
-	rc.x=x;
-	rc.y=y;
-if(big)
-rc.x*=2;
-rc.y*=2;
-
-
-
-	switch(abs(n)) {
-		
-		case 50:
-		
-			//printf("loading dxlogo\n");
-
-			img = IMG_Load("system/dxlogo.png");
-			rc.x+=10;
-			rc.y+=50;
-		break;
-		
-		case 59:
-			tempsurface = IMG_Load("system/blue_boxCross.png");
-			img = zoomSurface(tempsurface, 0.4f,0.4f,0);
-			SDL_FreeSurface(tempsurface);
-			 
-		break;
-		
-		case 58:
-			tempsurface = IMG_Load("system/grey_box.png");
-			img = zoomSurface(tempsurface, 0.4f,0.4f,0);
-			SDL_FreeSurface(tempsurface);
-			
-		break;
-		
-	}
-
-	if(img!=NULL) {
-		rc.w=img->w;
-		rc.h=img->h;
-
-		if(big==0) {
-			rc.w/=2;
-			rc.h/=2;
-		}
-
-		SDL_BlitSurface(img,NULL,v.surfaceptr,&rc);
-		SDL_FreeSurface(img);
-		return;
-	}
-	
-//	if(abs(n)>=32)
-		//printf("put graph %d at %d,%d\n",n,x,y);
-
-#endif
 
   if (big) { 
 	if ((n>=32 || n<0) && n!=233) { 
@@ -487,10 +398,6 @@ void wvolcado(byte*copia,int an_copia,int al_copia,
 	trc.y=y;
 	trc.w=an_copia;
 	trc.h=al_copia;
-#ifdef TTF
-//	if(ventana[vn].surfaceptr!=NULL && copia_surface!=NULL)
-//		SDL_BlitSurface(ventana[vn].surfaceptr,NULL,copia_surface,&trc);
-#endif
 }
 
 //ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
@@ -586,26 +493,18 @@ int text_len(byte * ptr) {
 	word dir;
 	} * car;
 	*/
-	int h=0;
-
-#ifdef TTF
-	TTF_SizeText(sysfont, (char *)ptr, &an, &h);
-#else
 	sscar *car;
 
 	car=(sscar*)(text_font+1); an=0;
 	while (*ptr) {
-		an+=car[*ptr].an; 
-		ptr++; 
+		an+=car[*ptr].an;
+		ptr++;
 	}
-
-
-#endif
-	if (big) 
+	if (big)
 		an/=2;
 
-	if (an) 
-		an--; 
+	if (an)
+		an--;
 
 
 //	printf("%d\n",an);
@@ -659,12 +558,7 @@ void wwrite_in_box(byte*copia,int an_real_copia,int an_copia,int al_copia,
 
 //	printf("Writing in box: %s\n",ptr);
 	
-	int vn=0;
-	SDL_Surface *tsurface;
-	
 	int an,al,boton,multi;
-
-	SDL_Rect rc;
 
 	/*
 	struct {
@@ -747,23 +641,7 @@ void wwrite_in_box(byte*copia,int an_real_copia,int an_copia,int al_copia,
 		break;
 	}
 
-	if (boton) { 
-#ifdef TTF
-		tempsurface = IMG_Load("system/red_button00.png");
-		tsurface = zoomSurface(tempsurface, (float)(an*2+6)/tempsurface->w, (float) (al*2+6)/tempsurface->h, 1 );
-		rc.x=2*x-3;
-		rc.y=2*y-3;
-
-		rc.w=tsurface->w;
-		rc.h=tsurface->h;
-		
-		SDL_BlitSurface(tsurface, NULL, v.surfaceptr, &rc);
-		
-		SDL_FreeSurface(tempsurface);		
-		SDL_FreeSurface(tsurface);
-		
-#else
-
+	if (boton) {
 		if (c!=c0) {
 			wbox(copia,an_real_copia,al_copia,c2,x-2,y-2,an+4,al+4);
 			wrectangulo(copia,an_real_copia,al_copia,c0,x-3,y-3,an+6,al+6);
@@ -798,74 +676,12 @@ void wwrite_in_box(byte*copia,int an_real_copia,int an_copia,int al_copia,
 				*(copia+(2*(y+al)+3)*an_real_copia*2+2*x-3)=c2;
 			}
 		}
-#endif
 	}
 
 	if (big&&!multi) {
 		an_real_copia*=2; an_copia*=2; al_copia*=2;
 		x*=2; y*=2; an*=2; al*=2;
 	}
-
-
-#ifdef TTF
-// get window
-	
-	tsurface = v.surfaceptr;
-	//copia_surface;
-/*	
-	for (vn=0;vn<max_windows;vn++) {
-		if(ventana[vn].ptr==copia) {
-			tsurface = ventana[vn].surfaceptr;
-			break;
-		}
-	}
-	
-	if(tsurface == v.surfaceptr) {	
-
-	// calculate if we are rendering the archive listbox
-//		larchivosbr
-		if(false)
-			x+=10;
-
-	}
-	* */
-	// render ttf to copia_suface;	
-	// ofset by the window x/y
-
-	
-	rc.x=x;
-	rc.y=y;		
-	
-
-	if(tsurface!=NULL) {
-		SDL_Surface* surface = drawtext(sysfont, colors[c].r,colors[c].g,colors[c].b,0, 255, 255,255, 0, (char *)ptr, solid);
-//		printf("string: %s x: %d y: %d surface w: %d surface h: %d real an %d an %d al %d %d\n",(char *)ptr, x,y,tsurface->w, tsurface->h, an_real_copia, an_copia, al_copia,__LINE__);
-		
-		rc.w=an_copia;
-		rc.h=al_copia;
-		SDL_SetClipRect(tsurface, &rc);
-
-	if(surface!=NULL) {
-		tempsurface = SDL_DisplayFormat(surface);
-		SDL_FreeSurface(surface);
-		surface=tempsurface;
-		tempsurface=NULL;
-		
-		rc.w=surface->w;
-		rc.h=surface->h;
-
-		SDL_BlitSurface(surface, NULL, tsurface,&rc);
-
-
-		SDL_FreeSurface(surface);
-	}
-	
-	SDL_SetClipRect(tsurface, NULL);
-
-	}
-
-#else
-
 
 
 	if (y<al_copia && y+al>0) {
@@ -900,9 +716,6 @@ void wwrite_in_box(byte*copia,int an_real_copia,int an_copia,int al_copia,
 			}
 		}
 	}
-#endif
-
-
 
 }
 

@@ -193,12 +193,6 @@ void Get_Tapiz() {
 		if(v_existe) {
 
 			if ((f=fopen(full,"rb"))!=NULL) { // Se ha elegido uno
-#ifdef TTF
-			strcpy(Tap_name,input);
-			strcpy(Tap_pathname,full);
-			fclose(f);
-			return;
-#endif
 
 			fseek(f,0,SEEK_END);
 			len=ftell(f);
@@ -1093,30 +1087,6 @@ void tapiz_thumb(void)
 
 
 
-#ifdef TTF
-
-
-	tempsurface = zoomSurface(tapiz_temp_surface, (float)an/vga_an, (float)al/vga_al,0);
-
-	printf("creat wallpaper thumb %f %f \n",an/vga_an, al/vga_al);
-
-	thumb_pos=5*big2+(42*big2)*v.an;
-
-	rc.x=5*big2;
-	rc.y=(42*big2);
-	rc.w=an;
-	rc.h=al;
-
-	SDL_BlitSurface(tempsurface,NULL, v.surfaceptr, &rc);
-	SDL_FreeSurface(tempsurface);
-	tempsurface=NULL;
-
-
-
-
-#else
-
-
   if(x_tapiz==NULL) return;
 
   // Crea la reducci¢n del tapiz
@@ -1124,13 +1094,10 @@ void tapiz_thumb(void)
   coefredx=x_tapiz_an/((float)128*(float)big2);
   coefredy=x_tapiz_al/((float) 88*(float)big2);
 
-
-	
-
   if ((ptr=(byte *)malloc(an*al))==NULL) return;
 
   memset(ptr,0,an*al);
-  
+
   a=(float)0.0;
   for(y=0;y<al;y++)
   {
@@ -1147,7 +1114,6 @@ void tapiz_thumb(void)
 
   // Lo pinta en pantalla
 
-
   thumb_pos=5*big2+(42*big2)*v.an;
 
   for (y=0; y<al; y++)
@@ -1158,8 +1124,6 @@ void tapiz_thumb(void)
     }
   }
   free(ptr);
-  
-#endif
   
 }
 
@@ -1177,54 +1141,6 @@ void preparar_tapiz_temp(void) {
   byte old_dac[768];
   byte old_dac4[768];
 
-#ifdef TTF
-	SDL_Rect rc;
-	
-	if(tapiz_temp_surface!=NULL)
-		SDL_FreeSurface(tapiz_temp_surface);
-		
-	tapiz_temp_surface = DIV_IMG_Load(Tap_pathname);
-
-	if(tapiz_temp_surface!=NULL) {
-
-		if(Tap_mosaico) {
-			tempsurface = SDL_DisplayFormat(vga);
-			SDL_FillRect(tempsurface,NULL,0);
-			x=0;
-			y=0;
-			while(x<vga_an) {
-				y=0;
-				
-				while(y<vga_al) {
-					rc.x=x;
-					rc.y=y;
-					rc.w=tapiz_temp_surface->w;
-					rc.h=tapiz_temp_surface->w;
-					SDL_BlitSurface(tapiz_temp_surface,NULL,tempsurface,&rc);
-					y+=rc.h;
-				}
-				x+=rc.w;
-			}
-
-		
-
-		} else {
-			
-			tempsurface = zoomSurface(tapiz_temp_surface,(float)vga_an/tapiz_temp_surface->w,(float)vga_al/tapiz_temp_surface->h,1);
-			
-		}
-		SDL_FreeSurface(tapiz_temp_surface);
-		
-		tapiz_temp_surface = SDL_DisplayFormat(tempsurface);
-		
-		SDL_FreeSurface(tempsurface);
-		
-	} else {
-		v_texto=(char *)texto[46]; dialogo((voidReturnType)err0);
-		return;
-	}
-
-#else
 
 
 
@@ -1325,8 +1241,6 @@ void preparar_tapiz_temp(void) {
 
   memcpy(dac,old_dac,768);
   memcpy(dac4,old_dac4,768);
-
-#endif
 
 }
 
