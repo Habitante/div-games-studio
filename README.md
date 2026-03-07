@@ -9,11 +9,13 @@ background in Z80 and 8086 assembly programming — which explains both the ambi
 the architecture and the, shall we say, creative coding conventions throughout.
 
 This repository is the open-source continuation of that codebase, ported from its
-original DJGPP/DOS toolchain to modern platforms using SDL. The port and ongoing
-maintenance were led by Mike Green (MikeDX / DX Games). Daniel remains involved and 
-is the best (possibly only) person who can explain why things are the way they are (if memory serves ... its been a while).
+original DJGPP/DOS toolchain to modern platforms using SDL2. The SDL port was led by
+Mike Green (MikeDX / DX Games). Daniel Navarro has resumed active development,
+cleaning up the codebase and working toward a Steam release as a retro game-creation
+toolkit.
 
-> 100% compatible with existing DIV1 and DIV2 code including plugin DLLs — even MODE8 3D.
+> The original DIV IDE — code editor, sprite tools, compiler, debugger — running
+> natively on modern platforms. Think PICO-8 with a full integrated desktop.
 
 ## What is DIV?
 
@@ -35,12 +37,14 @@ The IDE provides a full desktop environment (yes, inside the program) with:
 
 ## Codebase overview
 
-~150,000 lines of C across 136 source files and 81 headers. The code dates back to
+~109,000 lines of C across 82 source files and 44 headers. The code dates back to
 the mid-90s and carries all the hallmarks of that era: single-letter variable names,
 Spanish comments and identifiers, 8-bit palette rendering, `int`-sized pointer
 arithmetic, and lots of global state. It was originally built for 16/32-bit DOS with
 DJGPP and has been progressively adapted for modern platforms through an OS-dependency
-abstraction layer.
+abstraction layer. A significant cleanup (Phase 0) removed ~35K lines of dead code
+including MODE8/VPE 3D, the DLL plugin system, CD-ROM support, and other legacy
+subsystems.
 
 ```
 src/
@@ -112,13 +116,10 @@ build/               CMake build output
 
 | Platform | Status |
 |----------|--------|
-| Windows (32-bit) | Working |
-| Linux (x86/x64) | Working |
-| macOS | Working |
-| Raspberry Pi | Working |
-| Android | Working |
-| HTML/JS (Emscripten) | Runtime export only |
-| PSP, GCW-Zero, Pandora, GP2X | Experimental |
+| Windows (32-bit, MSYS2/MinGW) | Working |
+| Linux (x86/x64) | Builds, needs testing |
+| macOS | Builds, needs testing |
+| Raspberry Pi | Builds, needs testing |
 
 ## Building on Windows
 
@@ -229,8 +230,8 @@ make -j$(nproc)
 - **1997** — DIV Games Studio 1 released (Hammer Technologies, Spain)
 - **1998** — DIV Games Studio 2 released, with MODE8 3D engine
 - **~2014** — Source code released under GNU GPL; Mike Green begins SDL port
-- **2015+** — Cross-platform support added (Linux, macOS, Android, RPi, handhelds)
-- **2024+** — Ongoing maintenance and modernization
+- **2015+** — Cross-platform support added (Linux, macOS, RPi)
+- **2026** — Daniel Navarro resumes active development; major codebase cleanup
 
 ## License
 
