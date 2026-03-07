@@ -373,6 +373,8 @@ void read_mouse2(void) {
 
 	scan_code  =0;
 	ascii=0;
+	m_b &=~4; // clear wheel-down (one-shot per frame)
+	m_b &=~8; // clear wheel-up (one-shot per frame)
 
 	SDL_Event event;
 	int n=0;
@@ -399,9 +401,6 @@ while(SDL_PollEvent(&event) )
 #endif
 
 #ifdef SDL2
-    		m_b &=~4;
-    		m_b &=~8;
-
             // Text input for SDL2 — only set ascii, not scan_code.
             // scan_code is set by SDL_KEYDOWN via OSDEP_key[] (DOS scan codes).
             // Setting scan_code to ASCII here caused collisions: e.g. 'M'=77

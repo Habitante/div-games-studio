@@ -43,8 +43,27 @@ Clean up first, ship second, then modernize based on what real users actually wa
 - [x] Extracted brush/texture browser from divmap3d.c → new `divbrush.c` (paint editor dependency)
 - [x] Removed Sprite Generator: `divspr.c` stub, menu entry, `div/GENSPR/` data directory, `generador_sprites()` declaration
 
+### Line ending normalization (done 2026-03-07)
+- [x] Fixed `divlengu.c` (IDE + runtime) to accept both CRLF and LF-only files
+- [x] Fixed `divhelp.c` `tabula_help()`/`tabula_help2()` for CRLF and LF-only
+- [x] Replaced broken `ú`/char-250 forced line break in help with `{br}` tag
+- [x] Added `.gitattributes` with `* text=auto eol=lf`
+- [x] Converted `lenguaje.div`, `lenguaje.int`, `help.div`, `help.idx` to LF
+- [x] Converted `lenguaje.int` from Latin-1 to UTF-8
+
+### SDL2 port bug fixes (done 2026-03-07)
+- [x] Fixed Shift+letter in editor: `SDL_TEXTINPUT` was setting `scan_code` to ASCII
+  value, colliding with DOS scan codes ('M'=77=Right, 'P'=80=Down, 'Q'=81=PgDn)
+- [x] Fixed mouse wheel runaway scroll: wheel bits persisted across frames when no
+  SDL events were queued, causing continuous scrolling until another event arrived
+- [x] Restored `.PRG` extension check for syntax colorizer (was commented out)
+- [x] Fixed `f_cortar_bloque(memptrsize)` back to `f_cortar_bloque(int)`
+- [x] Removed 3 dead `#ifdef TTF` blocks from `divedit.c`
+
 ### Still pending from Phase 0
 - [ ] Remove hundreds of commented-out code blocks throughout
+- [ ] Remove remaining `#ifdef TTF` dead code (~25 blocks across div.c, divwindo.c,
+  divpalet.c, divsetup.c, divhelp.c, divvideo.c, global.h, osdep.h)
 
 ### Build system cleanup
 - [ ] Remove dead cmake options and platform branches
