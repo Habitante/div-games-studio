@@ -30,7 +30,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-//#include <mem.h>
 #include "judas.h"
 #include "judastbl.h"
 #include "osdep.h"

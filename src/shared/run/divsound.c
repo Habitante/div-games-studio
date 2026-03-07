@@ -48,8 +48,6 @@ void InitSound(void)
 
   initted=Mix_Init(flags);
 
-
-
   if((initted&flags) != flags) {
 	  printf("Mix_Init error: %s\n",Mix_GetError());
    }
@@ -59,7 +57,6 @@ void InitSound(void)
 fprintf(stdout, "Opening Audio Device \n");
   if(Mix_OpenAudio(audio_rate, audio_format, audio_channels, audio_buffers) != 0) {
   	fprintf(stderr, "Unable to initialize audio: %s\n", Mix_GetError());
-//	exit(1);
 }
 
 
@@ -91,11 +88,9 @@ fprintf(stdout,"running with SDL_mixer version: %d.%d.%d\n",
   unsigned short DMAS[10]  ={0,1,2,3,4,5,6,7,8,9};
   unsigned short DMAS2[10] ={0,1,2,3,4,5,6,7,8,9};
 
-//int mixer         = QUALITYMIXER;
   int mixer         = FASTMIXER;
   int mixrate       = 44100;
   int mixmode       = SIXTEENBIT | STEREO;
-//int mixmode       = EIGHTBIT | MONO;
   int interpolation = 1;
   int cfg_dev, cfg_port, cfg_irq, cfg_dma1, cfg_dma2;
 
@@ -223,9 +218,6 @@ fprintf(stdout,"running with SDL_mixer version: %d.%d.%d\n",
 #endif
 
   MusicChannels=0;
-
-
-
 }
 
 void ResetSound(void)
@@ -238,11 +230,9 @@ void ResetSound(void)
   unsigned short DMAS[10]  ={0,1,2,3,4,5,6,7,8,9};
   unsigned short DMAS2[10] ={0,1,2,3,4,5,6,7,8,9};
 
-//int mixer         = QUALITYMIXER;
   int mixer         = FASTMIXER;
   int mixrate       = 44100;
   int mixmode       = SIXTEENBIT | STEREO;
-//int mixmode       = EIGHTBIT | MONO;
   int interpolation = 1;
 
   StopSong();
@@ -405,8 +395,6 @@ int UnloadSound(int NumSonido)
 #ifdef MIXER
 
 void doneEffect(int chan, void *data) {
-//  if(Mix_Playing(chan))
-//    StopSound(chan);
 	return;
 }
  	
@@ -484,7 +472,6 @@ int DivPlaySound(int NumSonido, int Volumen, int Frec) // Vol y Frec (0..256)
 {
   int con=0;
   int loop=-1;
-//Mix_HaltChannel(-1);
 #ifdef MIXER
 
 #if defined( __EMSCRIPTEN__ ) && !defined (SDL2)
@@ -533,9 +520,6 @@ int StopSound(int NumChannel)
 #ifdef MIXER
 int x=99;
 #if ! defined( __EMSCRIPTEN__ ) || defined (SDL2)
-  //   if(!Mix_UnregisterAllEffects(NumChannel)) {
-  //     printf("Mix_UnregisterAllEffects: %s\n", Mix_GetError());
-  //   }
 #endif
  if(Mix_Playing(NumChannel)) {
     Mix_HaltChannel(NumChannel);

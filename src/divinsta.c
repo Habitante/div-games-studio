@@ -437,21 +437,12 @@ void create_install_image(char * file, int errores) {
 	  
 	  memset(lst,0,1000*sizeof(int));
 	  
-/*      while(fl++<1000) {
-		  lst[fl]=0;
-	  }
-*/
-
-//      memset(lst,0,1000*sizeof(memptrsize));
-
       while (p<fpg+file_len && *(int32_t*)p<1000 && *(int32_t*)p>0 ) {
         lst[*(int32_t*)p]=(memptrsize)p;
         p+=*(memptrsize*)(p+4);//sizeof(int*));
       }
 
       strcpy(cwork,"");
-
-//printf("lst[3] %x\n",lst[3]);
 
       if (!lst[1]) sprintf(cwork,(char *)texto[540],1);
       if ((ptr=(int32_t*)lst[2])) {
@@ -760,21 +751,12 @@ void crear_instalacion(void) {
   if (_drive<=2) { strcpy(dir,"/"); is_disk=_drive; } // En un disquete no crear  directorios
 
   for(x=1;x<strlen(dir);x++) if(dir[x]=='/') { // Crea directorios ...
-//    strcpy(cWork,drive);
-//    strcat(cWork,dir);
-//    cWork[x+2]=0;
 strcpy(cWork,full);
-
-//printf("cwork %s\n",cWork);
 
 #ifdef NOTYET
     mkdir(cWork);
 #endif
   }
-
-//  strcpy(full,drive); strcat(full,dir); // Destino: "full"*.*
-
- // _dos_setdrive(my_drive,&_drive);
 
   // *** Directorio por defecto
 
@@ -832,7 +814,6 @@ strcpy(cWork,full);
       _splitpath(ins,drive,dir,fname,ext);
       strcpy(MiHeaderSetup[x].name,fname);
       strcat(MiHeaderSetup[x].name,ext);
-//      strupr(MiHeaderSetup[x].name);
       for (n=0;n<x;n++) {
         if (!strcmp(MiHeaderSetup[n].name,MiHeaderSetup[x].name)) break;
       }
@@ -862,7 +843,6 @@ strcpy(cWork,full);
       } else {
         ins+=strlen(ins)+1;
         strcpy((char *)__ins,(char *)chr);
-        //strupr(__ins);
         __ins+=strlen(__ins)+1;
         if (topack) dirhead.nfiles++;
       }
@@ -1094,9 +1074,6 @@ strcpy(cWork,full);
     } else if (x==1) {
 
       fin=fopen("install/div32run.ins","rb");
-
-//    if (pentium) fin=fopen("install/div32run.ins","rb");
-//    else         fin=fopen("install/div32run.386","rb");
 
       strcpy(MiHeaderSetup[x].name,"DIV32RUN.DLL");
       topack=0;

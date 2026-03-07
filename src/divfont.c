@@ -146,9 +146,6 @@ float px,py;
 char cWork[10];
         if (big) {tan*=2;tal*=2; }
         _process_items();
-//        if((wmouse_y==-1)&&(wmouse_x==-1))
-//                return;
-                //ShowText();
         switch(v.active_item)
         {
                 case 0:
@@ -244,7 +241,6 @@ char cWork[10];
                         break;
                 case 15:
                         cierra_ventana();
-                        // fin_dialogo=1;
                         return;
                         break;
         }
@@ -406,8 +402,6 @@ char cWork[10];
                 FntAncho=FntAlto=fontTamanos[(lfontsizes.zona-10)+lfontsizes.inicial];
                 sprintf(cFntAlto,"%d",FntAlto);
                 sprintf(cFntAncho,"%d",FntAncho);
-//                v.item[2].estado&=-3; // Evitar "out of range"
-//                v.item[3].estado&=-3;
                 call((voidReturnType )v.paint_handler);
                 v.volcar=1;
         }
@@ -922,17 +916,6 @@ void Preview0()
     if(TamaY<fal) TamaY=fal;
   } if (TamaY==0) TamaY=_fal;
 
-/*
-        TamaX=0;
-        TamaY=0;
-        for(x=0;x<strlen(TestString);x++)
-        {
-                GetCharSize(TestString[x],&fan,&fal);
-                TamaX+=fan;
-                if(TamaY<fal)
-                        TamaY=fal;
-        }
-*/
         v.tipo=1; // Di logo
         if(big) { TX=TamaX/2; TY=TamaY/2; } else { TX=TamaX; TY=TamaY; }
         v.an=TX+6;
@@ -1068,8 +1051,6 @@ int GenCode=0;
                 if(GenFontbotones[4])
                         GenCode+=EXT;
                 font_generated=CreateFont(GenCode);
-//                if(!CreateFont(GenCode)) font_generated=1;
-//                else font_generated=0;
         }
 }
 void GenFont0(void)
@@ -1174,20 +1155,6 @@ void Preview20()
     TamaX+=fan;
     if(TamaY<fal) TamaY=fal;
   } if (TamaY==0) TamaY=_fal; if (TamaX==0) TamaX=1;
-/*
-        int x,fan,fal;
-        TamaX=0;
-        TamaY=0;
-        memset(TestString,0,21);
-        memcpy(TestString,texto[73],20);
-        for(x=0;x<strlen(TestString);x++)
-        {
-                GetCharSizeBuffer(TestString[x],&fan,&fal,FntAux);
-                TamaX+=fan;
-                if(TamaY<fal)
-                        TamaY=fal;
-        }
-*/
         v.tipo=1; // Di logo
 
         if(big) { TX=TamaX/2; TY=TamaY/2; } else { TX=TamaX; TY=TamaY; }
@@ -1425,8 +1392,6 @@ int Length;
         fclose(file);
         v.titulo=v.aux;
         v.nombre=v.aux;
-//        _button(113 ,7,v.al-14,0);
-//        _button(122 ,v.an-8,v.al-14,2);
 }
 
 void ReloadFont(int vn, struct tventana *vntn)

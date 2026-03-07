@@ -31,22 +31,16 @@ char * _strupr(char *string)
 	if(string>0 && strlen(string)>0) {
 	st = (char *)malloc(strlen(string));
 	
-//printf("string: [%s]\n",string);
-
-  for(x=0;x<strlen(string);x++) 
+  for(x=0;x<strlen(string);x++)
     st[x] = toupper((unsigned char) string[x]);
 
 st[x]=0;
-//printf("upper'd string: [%s]\n",st);
     return st;
 
 }
 else return " ";
 }
 
-
-
- 
 char * strlwr(char *s)
 {
 char *ucs = (char *) s;
@@ -69,7 +63,6 @@ st = (char *)malloc(strlen(string));
     st[x] = tolower((unsigned char) string[x]);
 
 st[x]=0;
-//printf("lower'd string: [%s]\n",st);
 }
    return st;
 }
@@ -79,27 +72,15 @@ st[x]=0;
 
 void _dos_setdrive( unsigned __drivenum, unsigned *__drives )
 {
-
-//	printf("Set drive %i\n",__drivenum);
-		
 	char c[3];
 	c[0]=__drivenum+'A'-1;
 	c[1]=':';
 	c[2]=0;
-//	chdir(c);
-	
-//	printf( "set drive: %c\n %s",__drivenum+'A'-1,c);
-
 }
-
-
 
 char * itoa(long n, char *buf, int len)
 {
-//    int len = n==0 ? 1 : floor(log10l(abs(n)))+1;
     if (n<0) len++; // room for negative sign '-'
-
-//    char    *buf = calloc(sizeof(char), len+1); // +1 for null
     snprintf(buf, len+1, "%ld", n);
     return   buf;
 }
@@ -136,8 +117,6 @@ Filename,char* Extension)
   // extensions are not common in linux
   // but considered anyway
   Drive = NULL;
-
-//printf("Input %s\n",Path);
 
   while(*CopyOfPath != '\0')
     {
@@ -187,9 +166,7 @@ Filename,char* Extension)
         {Filename++;}
   }
   *Extension = '\0';
-//  Filename[
   Extension = ext;
-//  printf("Extension is %s\n",ext);//Extension);
   
   return;
 }
@@ -244,8 +221,6 @@ void _makepath(char* Path,const char* Drive,const char* Directory,
 
 int _chdir(const char* Directory)
 {
-//	printf("Chdir %s\n",Directory);
-
 	if(Directory!=NULL && strlen(Directory)>0)
 		chdir(Directory);
 
@@ -269,20 +244,10 @@ char findname[2048];
 struct dirent **namelist=NULL;
 
 unsigned int _dos_findfirst(char *name, unsigned int attr, struct find_t *result) {
-//printf("TODO - findfirst\n");
-
-
  unsigned int ret =0;
-
-//printf("name is %s\n",name);
 
 strcpy(findmask,name);
 strlwr(findmask);
-
-
-
-
-  //  int n;
 
 if(namelist!=NULL) {
 	while(++np<nummatch) {
@@ -296,27 +261,13 @@ if(namelist!=NULL) {
 np=-1;
 type = attr;
 
-//n--;
 ret =_dos_findnext(result);
-
-//printf("matches: %d\n",nummatch);
 
 return (ret);
 
 
-/*result->attrib=0;
-	strcpy(result->name,namelist[0]->d_name);
-	if(namelist[0]->d_type == DT_DIR) {
-		result->attrib=16;
-	}
-	
-///	result->
-								return 0;
-								* */
 							}
 unsigned int _dos_findnext(struct find_t *result) {
-//	printf("TODO - findnext\n");
-	
 while(++np<nummatch) {
 	strcpy(result->name,namelist[np]->d_name);
 	result->attrib=0;
@@ -331,32 +282,23 @@ while(++np<nummatch) {
 			}
 		} 
 		strcpy(findname, result->name);
-//		strlwr(findname);
-
-//printf("Matching %s to %s\n",findmask,findname);
 
 	if (fnmatch(findmask, findname, FNM_PATHNAME | FNM_CASEFOLD)==0){
 		
 		if(namelist[np]->d_type != DT_DIR && type == _A_NORMAL) {
-			//printf("free'ing np [%d] [FILE]\n",np,result->name);
 			free(namelist[np]);
 			result->attrib=0;
 			return 0;
 		} 
 	}
 }
-//printf("free'ing np [%d] *not matched* %s\n",np, namelist[np]->d_name);
 if(np<nummatch)
 	free(namelist[np]);
 }
-//free(namelist);
-//namelist=NULL;
 	return 1;
 }
 
 unsigned int _dos_setfileattr(const char *filename, unsigned int attr) {
-						//		printf("TODO - setfileattr\n");
-
 	return 1;
 }
 

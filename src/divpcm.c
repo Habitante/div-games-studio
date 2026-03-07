@@ -180,7 +180,6 @@ void PCM3(void) {
 	  Mix_FreeChunk(mypcminfo->SI);
 	  mypcminfo->SI=NULL;
 #endif
-    //judas_freesample(mypcminfo->sample);
     mypcminfo->SoundData=NULL;
     mypcminfo->SoundSize=0;
   }
@@ -304,48 +303,17 @@ void FreeMOD(void)
 {
   Mix_HaltMusic();
   Mix_SetPostMix(NULL, NULL);
-/*  switch(SongType)
-  {
-    case XM:   judas_freexm();  break;
-    case S3M: judas_frees3m(); break;
-    case MOD: judas_freemod(); break;
-  }
-*/
   SongType=0;
 }
 int songpos;
 int songline;
 int GetSongPos(void)
 {
-  int pos;
-// TODO - JUDAS GET SONG POS
-/*
-  switch(SongType)
-  {
-    case XM:  pos=judas_getxmpos();  break;
-    case S3M: pos=judas_gets3mpos(); break;
-    case MOD: pos=judas_getmodpos(); break;
-  }
-
-  return(pos);
-  * */
   return songpos;
-  
 }
 
 int GetSongLine(void)
 {
-  int pos;
-/*
-  switch(SongType)
-  {
-    case XM:  pos=judas_getxmline();  break;
-    case S3M: pos=judas_gets3mline(); break;
-    case MOD: pos=judas_getmodline(); break;
-  }
-
-  return(pos);
-  */
   return songline;
 }
 
@@ -364,9 +332,6 @@ void mostrar_mod_meters(void)
     {
       wbox(v.ptr, an, al, c1,  2, 10,    an-4, al-12-10);
       wbox(v.ptr, an, al, c2, 22, 39, an-4-20,        9);
-
-//      wbox(v.ptr, an, al, c1, 22, 39, 6, 9);
-//      wbox(v.ptr, an, al, c1, 44, 39, 6, 9);
 
       wwrite(v.ptr, an, al, 29, 40, 2, (byte *)"L ", c1);
       wwrite(v.ptr, an, al, 28, 40, 2, (byte *)"L ", c4);
@@ -403,7 +368,6 @@ void mostrar_mod_meters(void)
   {
     if(!last_mod_clean)
     {
-//    wbox(v.ptr,an,al,c1,2,10,an-4,al-12-10);
       call(v.paint_handler);
       v.volcar=1;
       last_mod_clean = 1;
@@ -515,8 +479,6 @@ Mix_Chunk *SI;
 
 #endif
 
-//  SoundInfo *SI;
-
   int       num;
 
   v_modo=0;
@@ -584,33 +546,7 @@ Mix_Chunk *SI;
    }
 		
 #endif
-	
-#ifdef NOTYET
-      SI = judas_loadwav(SoundPathName);
-      if(judas_error != JUDAS_OK && judas_error == JUDAS_WRONG_FORMAT)
-      {
-        if(SI) free(SI);
-        SI = judas_loadrawsample(SoundPathName, 0, 0, 0);
-      }
-      if(SI==NULL || judas_error != JUDAS_OK)
-      {
-        free(pcminfo_aux);
-        if(SI) free(SI);
-        v_texto=(char *)texto[46];
-        dialogo(err0);
-        continue;
-      }
 
-      memcpy(mypcminfo->name,SoundName,14);
-      memcpy(mypcminfo->pathname,SoundPathName,256);
-      mypcminfo->SoundFreq = SI->SoundFreq;
-      mypcminfo->SoundBits = SI->SoundBits;
-      mypcminfo->SoundSize = SI->SoundSize;
-      mypcminfo->SoundData = SI->SoundData;
-      mypcminfo->sample    = SI->sample;
-
-      free(SI);
-#endif
       memcpy(mypcminfo->name,SoundName,14);
       memcpy(mypcminfo->pathname,SoundPathName,256);
 	  mypcminfo->SoundFreq = 44100;
@@ -621,17 +557,13 @@ Mix_Chunk *SI;
       if(mypcminfo->SoundData!=NULL) 
 		memcpy(mypcminfo->SoundData,SI->abuf, SI->alen);
       
-//      mypcminfo->SoundData = (short *)SI->abuf;
       mypcminfo->SI = SI;
-//      mypcminfo->sample    = (char *)wav_buffer;    
 #endif
       nueva_ventana(PCM0);
     }
   }
   
 }
-
-//#define SoundInfo char
 
 void OpenSoundFile(void) // Open the file SoundPathName
 {
@@ -647,8 +579,6 @@ debugprintf("SOundPath %s\n",full);
 
   strcpy(SoundName,input);
   strcpy(SoundPathName,full);
-
-//CloseSound(SoundPathName);
 
   if((pcminfo_aux=(byte *)malloc(sizeof(pcminfo)))==NULL)
   {
@@ -676,22 +606,6 @@ debugprintf("SOundPath %s\n",full);
    }
     
 #endif
-/*  SI = judas_loadwav(SoundPathName);
-  if(judas_error == JUDAS_WRONG_FORMAT)
-  {
-    if (SI) free(SI);
-    SI = judas_loadrawsample(SoundPathName, 0, 0, 0);
-  }
-
-  if(SI==NULL || judas_error!=JUDAS_OK)
-  {
-    free(pcminfo_aux);
-    if(SI) free(SI);
-    v_texto=(char *)texto[46];
-    dialogo(err0);
-    return;
-  }
-*/
   memcpy(mypcminfo->name,SoundName,14);
   memcpy(mypcminfo->pathname,SoundPathName,256);
   mypcminfo->SoundFreq = 44100;
@@ -702,10 +616,8 @@ debugprintf("SOundPath %s\n",full);
   if(mypcminfo->SoundData!=NULL) 
     memcpy(mypcminfo->SoundData,SI->abuf, SI->alen);
 
-//  mypcminfo->SoundData = (short *)SI->abuf;
   mypcminfo->SI = SI;
 
-//  free(SI);
 #endif
   nueva_ventana(PCM0);
 
@@ -736,17 +648,6 @@ void OpenDesktopSound(FILE *f)
   }
 
   fread(mypcminfo->SoundData, 2, mypcminfo->SoundSize, f);
-
-/*
-  smp = judas_allocsample(mypcminfo->SoundSize*2);
-  mypcminfo->SoundData = (short *)smp->start;
-  mypcminfo->sample    = smp;
-  fread(mypcminfo->SoundData, 2, mypcminfo->SoundSize, f);
-  smp->repeat    = smp->start;
-  smp->end       = smp->start + mypcminfo->SoundSize*2;
-  smp->voicemode = VM_ON | VM_16BIT;
-  judas_ipcorrect(smp);
-*/
 
   nueva_ventana_carga(PCM0,ventana_aux.x,ventana_aux.y);
 
@@ -1033,10 +934,6 @@ void noEffect(void *udata, Uint8 *stream, int len)
         songline=0;
     }
   }
-    // you could work with stream here...
-//  if(udata!=NULL)
-//    fprintf(stdout,"%c %x %x %d\n",((char *)udata)[0],udata,stream,len);
-//  memset(stream,255,len);
 }
 
 void PlaySong(char *pathname)
@@ -1075,43 +972,6 @@ void PlaySong(char *pathname)
   }
   
   SongChannels = 8;
-
-#ifdef NOTYET
-  if(judas_channel[0].smp) judas_stopsample(0);
-
-  FreeMOD();
-  SongCode++;
-  mymodinfo->SongCode=SongCode;
-  last_mod_clean=0;
-
-  judas_loadxm(pathname);
-  if(judas_error == JUDAS_OK) { judas_playxm(1000000); SongType=XM; }
-  else if(judas_error == JUDAS_WRONG_FORMAT)
-  {
-    judas_loads3m(pathname);
-    if(judas_error == JUDAS_OK) { judas_plays3m(1000000); SongType=S3M; }
-    else if(judas_error == JUDAS_WRONG_FORMAT)
-    {
-      judas_loadmod(pathname);
-      if(judas_error == JUDAS_OK) { judas_playmod(1000000); SongType=MOD; }
-    }
-  }
-
-  if(judas_error != JUDAS_OK)
-  {
-    v_texto=(char *)texto[46];
-    dialogo(err0);
-    return;
-  }
-
-  switch(SongType)
-  {
-    case XM:  SongChannels = judas_getxmchannels();  break;
-    case S3M: SongChannels = judas_gets3mchannels(); break;
-    case MOD: SongChannels = judas_getmodchannels(); break;
-  }
-
-#endif
 
 #endif
 
@@ -1164,7 +1024,6 @@ void EditSound0(void)
   alto_ventana  = 64*big2;
   sel_1         = 0;
   sel_2         = 0;
-  //sel_2         = ancho_ventana-1;
 
   for(NumSND=0; NumSND<100; NumSND++)
   {
@@ -1236,12 +1095,6 @@ void EditSound1(void)
   wwrite(v.ptr, an, al, 39, 33, 1, (byte *)cwork, c3);
 
   // Opciones de conversion
-
-/*
-  wbox       (v.ptr, an, al, c12, 191, 13, text_len(texto[552])+2, 11);
-  wrectangulo(v.ptr, an, al,  c0, 190, 12, text_len(texto[552])+4, 13);
-  wwrite(v.ptr, an, al, 192, 15, 0, texto[552], c3);
-*/
 
   // Zona de edicion
   wrectangulo(v.ptr, an, al, c0, 3, 11+PosY, an_v+2, al_v+2);
@@ -1363,7 +1216,6 @@ void EditSound2(void)
 
 void EditSound3(void)
 {
-//	printf("TODO - divpcm.cpp EditSound3\n");
 Mix_HaltChannel(-1);
 #ifdef NOTYET
   if(judas_channel[0].smp) judas_stopsample(0);
@@ -1438,7 +1290,6 @@ void RecSound1(void)
 
 void RecSound2(void)
 {
-//int  an=v.an/big2;
   int  need_refresh=0;
 
   _process_items();
@@ -1525,8 +1376,6 @@ void ModifySound(int option)
   if(final==ancho_ventana) fin=mypcminfo->SoundSize;
 
 	Mix_HaltChannel(-1);
-	
-//  if(judas_channel[0].smp) judas_stopsample(0);
 
   switch(option)
   {
@@ -1570,8 +1419,6 @@ void ModifySound(int option)
       if(mypcminfo->SoundSize-Clipboard.SoundSize<=0)
       {
         if(mypcminfo->SoundData) {
-		//	Mix_FreeChunk(mypcminfo->SI);
-//          judas_freesample(mypcminfo->sample);
           mypcminfo->SoundData=NULL;
           mypcminfo->SoundSize=0;
         }
@@ -1602,17 +1449,11 @@ void ModifySound(int option)
           dialogo(err0);
           return;
         }
-//		rw = SDL_RWFromMem(pcminfo_bak.SoundBits,pcminfo_bak.SoundSize);
-//		rw = SDL_RWFromMem(FileBuffer,FilePos);
-//		SI = Mix_LoadWAV_RW(rw,1);
 		SI = Mix_QuickLoad_RAW(FileBuffer,FilePos);
-//		Mix_PlayChannel(-1,SI,0);
 		pcminfo_bak.SI=SI;
-//        SI = judas_loadwav_mem(FileBuffer);
 
-        if(SI==NULL)// || judas_error!=JUDAS_OK)
+        if(SI==NULL)
         {
-//          if(SI)         free(SI);
           if(FileBuffer) free(FileBuffer);
           free(pcminfo_bak.SoundData);
           free(Clipboard.SoundData);
@@ -1623,25 +1464,20 @@ void ModifySound(int option)
         }
 
         if(mypcminfo->SoundData) {
-		//	Mix_FreeChunk(SI);
-//          judas_freesample(mypcminfo->sample);
           mypcminfo->SoundData=NULL;
           mypcminfo->SoundSize=0;
         }
 
         mypcminfo->SoundSize = SI->alen/2;
-        
+
         mypcminfo->SoundData = (short *)malloc(SI->alen);
 
-		if(mypcminfo->SoundData!=NULL) 
+		if(mypcminfo->SoundData!=NULL)
 			memcpy(mypcminfo->SoundData,SI->abuf, SI->alen);
 
-//        mypcminfo->SoundData = SI->abuf;
-        mypcminfo->sample    = NULL;////SI->sample;
+        mypcminfo->sample    = NULL;
         mypcminfo->SI		 = SI;
-        
 
-//        free(SI);
         free(FileBuffer);
         free(pcminfo_bak.SoundData);
       }
@@ -1695,9 +1531,8 @@ void ModifySound(int option)
 		SI = Mix_QuickLoad_RAW(FileBuffer, FilePos);
 		pcminfo_bak.SI=SI;
 		
-      if(SI==NULL) // || judas_error!=JUDAS_OK)
+      if(SI==NULL)
       {
-//        if(SI)         free(SI);
         if(FileBuffer) free(FileBuffer);
         v_texto=(char *)texto[45];
         dialogo(err0);
@@ -1705,8 +1540,6 @@ void ModifySound(int option)
       }
 
       if(mypcminfo->SoundData) {
-		//  Mix_FreeChunk(SI);
-//        judas_freesample(mypcminfo->sample);
         mypcminfo->SoundData=NULL;
         mypcminfo->SoundSize=0;
       }
@@ -1714,43 +1547,16 @@ void ModifySound(int option)
       mypcminfo->SoundSize = SI->alen/2;
 
       mypcminfo->SoundData = (short *)malloc(SI->alen);
-	  if(mypcminfo->SoundData!=NULL) 
+	  if(mypcminfo->SoundData!=NULL)
 		memcpy(mypcminfo->SoundData,SI->abuf, SI->alen);
 
-//      mypcminfo->SoundData = SI->SoundData;
-      mypcminfo->sample    = NULL;////SI->sample;
+      mypcminfo->sample    = NULL;
 		mypcminfo->SI=SI;
 		
-//      free(SI);
       free(FileBuffer);
       return;
     case 8: // Play
-#ifdef NOTYET
-      if ( judascfg_device == DEV_NOSOUND) {
-        if ( SoundError ) {
-          v_texto=(char *)texto[549]; dialogo(err0);
-        } else {
-          v_texto=(char *)texto[548]; dialogo(err0);
-        } return;
-      }
-#endif
       if(mypcminfo->SoundData==NULL) return;
-#ifdef NOTYET
-
-      if(sel_1==sel_2) {
-        sample.start  = (mypcminfo->sample)->start;
-        sample.repeat = (mypcminfo->sample)->repeat;
-        sample.end    = (mypcminfo->sample)->end;
-      } else {
-        sample.start  = (mypcminfo->sample)->start+ini*2;
-        sample.repeat = (mypcminfo->sample)->start+ini*2;
-        sample.end    = (mypcminfo->sample)->start+fin*2;
-      }
-      sample.vuprofile = (mypcminfo->sample)->vuprofile;
-      sample.voicemode = (mypcminfo->sample)->voicemode;
-
-      judas_playsample(&sample, 0, mypcminfo->SoundFreq, 64*256, MIDDLE);
-#endif
 	
 	Mix_PlayChannel(-1,mypcminfo->SI,0);
 	
@@ -2000,15 +1806,9 @@ debugprintf("SoundFile to record: %s\n",SoundFile);
   {
     MIX_SetInput(MIX_IN_CD|MIX_NO_FILT);
   }
-//MIX_SetVolume(MIX_INPUT, 15, 15);
-
 
 #ifdef NOTYET
   if(judascfg_device == DEV_SB16 ) {
-//  ra=44100;
-//  dspwrite(0x42);
-//  dspwrite((unsigned char)((ra>>8)&0xFF));
-//  dspwrite((unsigned char)(ra&0xFF));
     ra=44100;
     ca=256UL-(1000000UL/ra);
     sbsettc(ca);
@@ -2077,8 +1877,6 @@ void PollRecord(void)
 #endif
     return;
   }
-//  printf("1836 length %d fseek %x\n",length,f);
-  
   fseek(f, 40, SEEK_SET);
   fwrite(&length,1,4,f);
   fclose(f);

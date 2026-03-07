@@ -112,12 +112,6 @@ void Vid_Setup3(void) {
     VS_BIG  =stbig;
     VS_ANCHO=stvga_an;
     VS_ALTO =stvga_al;
-//    vvga_an = VS_ANCHO;
-//	vvga_al = VS_ALTO;
-//	EndSound();
-//	soundstopped=1;
-
-//	SDL_putenv("SDL_VIDEO_WINDOW_POS=center"); 
 	v_titulo=(char *)texto[385];
     v_texto =(char *)texto[386];
 //    dialogo((voidReturnType)info0);
@@ -374,80 +368,9 @@ typedef struct _meminfo{
 }meminfo;
 
 
-
 int Mem_GetHeapFree()
 {
 	return 0;
-#ifdef NOTYET
-
-    long pages = sysconf(_SC_PHYS_PAGES);
-    long page_size = sysconf(_SC_PAGE_SIZE);
-    return pages * page_size * 1000;
-#endif
-
-#ifndef WIN32
-    FILE *meminfo = fopen("/proc/meminfo", "r");
-
-    if(meminfo == NULL)
-		return 0;
-//        ... // handle error
-
-    char line[256];
-    while(fgets(line, sizeof(line), meminfo))
-    {
-        int ram;
-        if(sscanf(line, "MemFree: %d kB", &ram) == 1)
-        {
-            fclose(meminfo);
-            return ram;
-        }
-    }
-
-    // If we got here, then we couldn't find the proper line in the meminfo file:
-    // do something appropriate like return an error code, throw an exception, etc.
-    fclose(meminfo);
-    return -1;
-#endif
-
-#ifdef NOTYET
-    FILE *meminfo = fopen("/proc/meminfo", "r");
-
-    if(meminfo == NULL)
-		return 0;
-//        ... // handle error
-
-    char line[256];
-    while(fgets(line, sizeof(line), meminfo))
-    {
-        int ram;
-        if(sscanf(line, "MemTotal: %d kB", &ram) == 1)
-        {
-            fclose(meminfo);
-            return ram;
-        }
-    }
-
-    // If we got here, then we couldn't find the proper line in the meminfo file:
-    // do something appropriate like return an error code, throw an exception, etc.
-    fclose(meminfo);
-    return -1;
-#endif
-
-#ifdef NOTYET
-  struct _heapinfo miheap;
-  int status=0,total=0;
-  miheap._pentry=NULL;
-  _heapmin();
-  for(;;)
-  {
-    status=_heapwalk(&miheap);
-    if(status!=_HEAPOK) break;
-    if(miheap._useflag==_FREEENTRY) total+=miheap._size;
-  }
-  if(status!=_HEAPEND) return -1;
-  return total;
-#endif
-return 0;
 }
 #ifdef WIN32
 #include <windows.h>
@@ -468,8 +391,6 @@ void GetFreeMem(meminfo *Meminfo)
 		Meminfo->Bloque_mas_grande_disponible = -1;
 		return;
 	}
-//        ... // handle error
-
     char line[256];
     while(fgets(line, sizeof(line), mem))
     {
@@ -489,15 +410,6 @@ void GetFreeMem(meminfo *Meminfo)
     return;
 #endif
 
-#ifdef NOTYET
-  union REGS regs;
-  struct SREGS sregs;
-  regs.x.eax=0x0500;
-  memset( &sregs, 0 , sizeof(sregs) );
-  sregs.es  =FP_SEG(Meminfo);
-  regs.x.edi=FP_OFF(Meminfo);
-  int386x(0x031,&regs,&regs,&sregs);
-#endif
 }
 
 void MemInfo1(void) {
@@ -542,9 +454,6 @@ void MemInfo1(void) {
 	}
 	fprintf(stdout,"Memory free: %d (%f)\n",mem, fmem);
 
-//	fmem=fmem*1000;
-//    if(fmem/1000) sprintf(cWork,(char *)texto[194],fmem,sizes[csize]);
-   // else         
    sprintf(cWork,(char *)texto[195],fmem,sizes[csize]);
   }
   wwrite(v.ptr,an,al,an/2+1,44,1,(byte *)cWork,c1);
@@ -574,8 +483,6 @@ void MemInfo0(void) {
   v.paint_handler=(voidReturnType)MemInfo1;
   v.click_handler=(voidReturnType)MemInfo2;
 
-//  _heapshrink();
-
   _button(100,v.an/2,v.al-14,1);
 }
 
@@ -601,9 +508,6 @@ void Cfg_colors(void) {
   wbox(v.ptr,an,al,color_cfg[6],13,45+10,7,7);
   wbox(v.ptr,an,al,color_cfg[7],53+25,45+10,7,7);
   wbox(v.ptr,an,al,color_cfg[8],93+34,45+10,7,7);
-//  wbox(v.ptr,an,al,color_cfg[9],13,45+20,7,7);
-//  wbox(v.ptr,an,al,color_cfg[10],53+25,45+20,7,7);
-//  wbox(v.ptr,an,al,color_cfg[11],93+34,45+20,7,7);
   wbox(v.ptr,an,al,color_cfg[10],13,45+20,7,7);
   wbox(v.ptr,an,al,color_cfg[11],53+25,45+20,7,7);
 }
@@ -639,13 +543,6 @@ void Cfg_Setup1(void) {
   wwrite(v.ptr,an,al,63+25,45+10,0,texto[406],c3);
   wrectangulo(v.ptr,an,al,c0,92+34,44+10,9,9);
   wwrite(v.ptr,an,al,103+34,45+10,0,texto[407],c3);
-
-//  wrectangulo(v.ptr,an,al,c0,12,44+20,9,9);
-//  wwrite(v.ptr,an,al,23,45+20,0,texto[408],c3);
-//  wrectangulo(v.ptr,an,al,c0,52+25,44+20,9,9);
-//  wwrite(v.ptr,an,al,63+25,45+20,0,texto[409],c3);
-//  wrectangulo(v.ptr,an,al,c0,92+34,44+20,9,9);
-//  wwrite(v.ptr,an,al,103+34,45+20,0,texto[410],c3);
 
   wrectangulo(v.ptr,an,al,c0,12,44+20,9,9);
   wwrite(v.ptr,an,al,23,45+20,0,texto[409],c3);
@@ -753,9 +650,6 @@ void Cfg_Setup2(void) {
   if (wmouse_in(12,44+10,9,9)) zona=7;
   if (wmouse_in(52+25,44+10,9,9)) zona=8;
   if (wmouse_in(92+34,44+10,9,9)) zona=9;
-//  if (wmouse_in(12,44+20,9,9)) zona=10;
-//  if (wmouse_in(52+25,44+20,9,9)) zona=11;
-//  if (wmouse_in(92+34,44+20,9,9)) zona=12;
   if (wmouse_in(12,44+20,9,9)) zona=11;
   if (wmouse_in(52+25,44+20,9,9)) zona=12;
 
@@ -1086,7 +980,6 @@ void tapiz_thumb(void)
 	preparar_tapiz_temp();
 
 
-
   if(x_tapiz==NULL) return;
 
   // Crea la reducci¢n del tapiz
@@ -1140,8 +1033,6 @@ void preparar_tapiz_temp(void) {
   byte pal[768];
   byte old_dac[768];
   byte old_dac4[768];
-
-
 
 
   // *** OJO ***

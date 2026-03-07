@@ -29,16 +29,6 @@ void SetMasterVolume (UWORD volumen)
                     outp(BaseAddress+GUSMIXDATA,volumen);
                     outp(BaseAddress+GUSMIXADDRESS,GUSMASTERR);
                     outp(BaseAddress+GUSMIXDATA,volumen);
-/* OJO !!!
-        case GUSMAX:
-                    volumen = 15-volumen;
-                    volumen <<= 2;
-                    outp(BaseAddress+MAXMIXADDRESS,GUSMAXMASTERL);
-                    outp(BaseAddress+MAXMIXDATA,volumen);
-                    outp(BaseAddress+MAXMIXADDRESS,GUSMAXMASTERR);
-                    outp(BaseAddress+MAXMIXDATA,volumen);
-                    break;
-*/
     }
 #endif
 }
@@ -69,17 +59,6 @@ void SetVocVolume (UWORD volumen)
                     outp(BaseAddress+GUSMIXDATA,volumen);
                     outp(BaseAddress+GUSMIXADDRESS,GUSVOCR);
                     outp(BaseAddress+GUSMIXDATA,volumen);
-/* OJO !!!
-        case GUSMAX:
-                    volumen=15-volumen;
-                    volumen <<= 1;
-                    volumen++;
-                    outp(BaseAddress+MAXMIXADDRESS,GUSMAXVOCL);
-                    outp(BaseAddress+MAXMIXDATA,volumen);
-                    outp(BaseAddress+MAXMIXADDRESS,GUSMAXVOCR);
-                    outp(BaseAddress+MAXMIXDATA,volumen);
-                    break;
-*/
     }
 #endif
 }
@@ -109,17 +88,6 @@ void SetCDVolume (UWORD volumen)
                     outp(BaseAddress+GUSMIXDATA,volumen);
                     outp(BaseAddress+GUSMIXADDRESS,GUSCDR);
                     outp(BaseAddress+GUSMIXDATA,volumen);
-/* OJO !!!
-        case GUSMAX:
-                    volumen=15-volumen;
-                    volumen <<= 1;
-                    volumen++;
-                    outp(BaseAddress+MAXMIXADDRESS,GUSMAXCDL);
-                    outp(BaseAddress+MAXMIXDATA,volumen);
-                    outp(BaseAddress+MAXMIXADDRESS,GUSMAXCDR);
-                    outp(BaseAddress+MAXMIXDATA,volumen);
-                    break;
-*/
     }
 #endif
 }
@@ -152,15 +120,6 @@ void MIX_SetInput(byte opt)
 #ifdef DOS
   outp(judascfg_port+MIX_ADR_OFF,   MIX_INPUT);
   outp(judascfg_port+MIX_ADR_OFF+1, opt);
-/*
-	asm mov dx,judascfg_port;
-	asm add dx,MIX_ADR_OFF;
-	asm mov al,MIX_INPUT;
-	asm out dx,al;
-	asm inc dx;
-	asm mov al,opt;
-	asm out dx,al;
-*/
 #endif
 }
 
@@ -173,23 +132,6 @@ void MIX_GetVolume(byte reg, byte *left, byte *right)
   al = inp(judascfg_port+MIX_ADR_OFF+1);
   *right = al  & 0x0f;
   *left  = al >> 4;
-/*
-	asm mov dx,judascfg_port
-	asm add dx,MIX_ADR_OFF
-	asm mov al,reg
-	asm out dx,al
-	asm inc dx
-	asm in al,dx
-	asm mov ah,al
-	asm les bx,right
-	asm and al,0xf
-	asm mov es:[bx],al
-	asm mov al,ah
-	asm les bx,left
-	asm mov cl,4
-	asm shr al,cl
-	asm mov es:[bx],al
-*/
 
 #endif
 }
@@ -203,18 +145,6 @@ void MIX_SetVolume(byte reg, byte left, byte right)
   al  = left << 4;
   al |= right;
   outp(judascfg_port+MIX_ADR_OFF+1, al);
-/*
-	asm mov dx,io_addr
-	asm add dx,MIX_ADR_OFF
-	asm mov al,reg
-	asm out dx,al
-	asm inc dx
-	asm mov al,left
-	asm mov cl,4
-	asm shl al,cl
-	asm or al,right
-	asm out dx,al
-*/
 #endif
 }
 

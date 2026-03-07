@@ -877,11 +877,6 @@ void RefPalAndDlg(int no_tocar_mapas,int guardar_original)
     }
   }
 
-//  do {
-//    for (n=1;n<max_windows;n++) if (ventana[n].tipo==101) break;
-//    if (n<max_windows) RemapAllFiles(n);
-//  } while (n<max_windows);
-
   exp_Color0=-1; exp_Color1=-1; exp_Color2=-1;
 
   if (t64!=NULL) { free(t64); t64=NULL; }
@@ -900,13 +895,10 @@ void ordena1(void){
 
   _show_items();
 
-//  wrectangulo(v.ptr,an,al,c2,2,10,65*2+3,65*2+3);
   wbox(v.ptr,an,al,c0,3,11,65*2+1,65*2+1);
 
   wbox(v.ptr,an,al,c2,2+66,10,1,65*2+3);
   wbox(v.ptr,an,al,c2,2,10+66,65*2+3,1);
-
-//  wbox(v.ptr,an,al,c2,2,10+132,65*2+3,15);
 
   ord_paleta0();
   for (y=0;y<16;y++) for (x=0;x<16;x++)
@@ -1172,9 +1164,6 @@ void fusionar_paletas(void){
 //ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
 
 byte * muestra;   // 32768
-//byte * pal;       // 32768*4
-//byte * paleta;    // 32768*2 (o max_colores*2)
-//byte * dist;      // 32768*4 (o max_colores*4)
 byte nueva_paleta[768];
 int num_colores;
 extern int cargar_paleta;
@@ -1321,7 +1310,6 @@ void crear_paleta(void){
 extern byte tapiz_gama[128];
 
 byte ctapiz[256];
-//byte col_tapiz[65];
 extern SDL_Surface *vga;
 
 void preparar_tapiz(void) {

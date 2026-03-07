@@ -100,13 +100,6 @@ void pinta_segmento_procesos(void);
 void pinta_segmento_profile(void);
 
 
-
-
-
-
-
-
-
 #define max_procesos 2048
 
 char combo_error[128]; // para componer mensajes de error compuestos.
@@ -142,10 +135,6 @@ int smouse_x,smouse_y,mouse_x=0,mouse_y=0,mouse_b;
 
 int reloj_debug;
 int ticks_debug;
-
-//#define mouse_x (cbd.mouse_cx>>1)
-//#define mouse_y (cbd.mouse_dx)
-//#define mouse_b (cbd.mouse_bx)
 
 //ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
 
@@ -1396,19 +1385,6 @@ void restaura_tapiz(int x,int y,int an,int al) {
   }
 }
 
-/*
-void restaura_tapiz(int x,int y,int an,int al) {
-  int n;
-
-  if (an>0 && al>0) {
-    n=y*vga_an+x;
-    while (al--) {
-      memcpy(copia+n,copia_debug+n,an);
-      n+=vga_an;
-    }
-  }
-}*/
-
 //ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
 //      Definici¢n de items
 //ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
@@ -1577,16 +1553,11 @@ void _process_items(void) {
 
   v.active_item=-1;
 
-//  if (ascii==0x1b) {
-//    asc=ascii;
-//  }
-
   if (v.selected_item!=-1) {
     if (!v.estado && v.tipo==102) {
       asc=ascii; kesc=kbdFLAGS[28];
       ascii=0; kbdFLAGS[28]=0;
     } else {
-      // tecla();
       if (ascii==9) {
         ascii=0;
         _select_new_item(v.selected_item+1);
@@ -1780,7 +1751,6 @@ void get_input(int n) {
     case 8:
       if (get_pos) {
         strcpy(&get[get_pos-1],&get[get_pos]); get_pos--;
-//        get[strlen(get)-1]=0;
       }
       if (!*get && superget) strcpy((char *)v.item[v.selected_item].get.buffer,"");
       v.volcar=1; break;
@@ -1829,14 +1799,11 @@ void get_input(int n) {
     } else scroll=0;
 
     wbox(v.ptr,v.an/big2,v.al/big2,c0,v.item[n].get.x,v.item[n].get.y+8,v.item[n].get.an,9);
-//    wwrite_in_box(v.ptr,v.an/big2,v.item[n].get.an-1+v.item[n].get.x,v.al/big2,v.item[n].get.x+1,v.item[n].get.y+9,0,cwork,c4);
     wwrite_in_box(v.ptr+(v.item[n].get.x+1)*big2, v.an/big2, v.item[n].get.an-2, v.al/big2, 0-scroll, v.item[n].get.y+9,0, (byte *)cwork, c4);
 
     if (system_clock&4) {
-//      if (strlen(get)) x=v.item[n].get.x+text_len(get)+2; else x=v.item[n].get.x+1;
       x=l+1;
       wbox_in_box(v.ptr+(v.item[n].get.x+1)*big2,v.an/big2,v.item[n].get.an-2,v.al/big2,c3,x-scroll,v.item[n].get.y+9,2,7);
-//      wbox_in_box(v.ptr,v.an/big2,v.item[n].get.an-1+v.item[n].get.x,v.al/big2,c3,x,v.item[n].get.y+9,2,7);
     }
   } get_cursor=(system_clock&4);
 
@@ -2091,7 +2058,6 @@ extern int ignore_errors;
 
 void e(int texto) {
 #ifdef __EMSCRIPTEN__
-//	printf("ERROR: %s\n",(char *)text[texto]);
 	return;
 #endif
   int smouse_x,smouse_y;
@@ -2112,10 +2078,6 @@ void e(int texto) {
   set_mouse(mouse_x,mouse_y);
   if (!v.tipo) memcpy(copia_debug,copia,vga_an*vga_al);
   dacout_r=0; dacout_g=0; dacout_b=0; dacout_speed=16;
-
-//  while (now_dacout_r!=dacout_r || now_dacout_g!=dacout_g || now_dacout_b!=dacout_b) {
-//    set_paleta(); set_dac();
-//  }
 
   mouse_graf=1; v_texto=(char *)text[texto]; dialogo(_err0);
   dacout_r=dr; dacout_g=dg; dacout_b=db;
@@ -2493,11 +2455,6 @@ void debug(void) {
   dr=dacout_r; dg=dacout_g; db=dacout_b;
 
   memcpy(copia_debug,copia,vga_an*vga_al);
-
-//  dacout_r=0; dacout_g=0; dacout_b=0; dacout_speed=16;
-//  while (now_dacout_r!=dacout_r || now_dacout_g!=dacout_g || now_dacout_b!=dacout_b) {
-//    set_paleta(); set_dac();
-//  }
 
   new_palette=0; mouse_graf=1; dialogo(debug0);
 
@@ -3911,11 +3868,6 @@ void debug2(void) {
       dialogo(inspect0); pinta_lista_proc();
       v.volcar=1; break;
 
-//  case 5: id=mem[ids[ids_select]+_Father]; break; // Father
-//  case 6: id=mem[ids[ids_select]+_SmallBro]; break; // SmallBro
-//  case 7: id=mem[ids[ids_select]+_BigBro]; break; // BigBro
-//  case 8: id=mem[ids[ids_select]+_Son]; break; // Son
-
     case 7: // Profile
       profile_window:
       dialogo(profile0);
@@ -3950,19 +3902,6 @@ void debug2(void) {
       break;
   }
 
-  /*
-  if (v.active_item>=5 && v.active_item<=8) { // Go to Father, Brother or Son
-    if ((id&1) && id>=id_start && id<=id_end && id==mem[id]) {
-      for (n=0;n<iids;n++) if (ids[n]==id) break;
-      if (n<iids) {
-        ids_select=n;
-        if (ids_select<ids_ini) ids_ini=ids_select;
-        if (ids_select>=ids_ini+13) ids_ini=ids_select-12;
-        pinta_lista_proc();
-        v.volcar=1;
-      }
-    }
-  }*/
 }
 
 void debug3(void) {
@@ -4031,8 +3970,6 @@ void determina_codigo(void) { // Determina lo que se debe ver para "ids_next"
 
   l=linea0=linea1-3;
   if (l<0) l=linea0=0;
-
-  //if (linea1) l=linea0=linea1-1; else l=linea0=0;
 
   plinea0=source+1; while(l--) plinea0+=strlen((char *)plinea0)+1;
 
@@ -4365,8 +4302,6 @@ int lp2_select; //???
 
 //ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
 
-//extern int cpu_type;
-
 unsigned int get_tick(void);
 
 #pragma aux get_tick= \
@@ -4392,14 +4327,10 @@ void reset_tick(void);
 #define IntIncr (unsigned int)(11932/256)
 
 unsigned int get_ticks(void) {
-//	printf("ticks\n");
-
 	return OSDEP_GetTicks();///10;
 #ifdef DOS
   unsigned int x,xnull;
 
-  //OJO, es importante haber reprogramado el timer con el siguiente out
-  //outp(0x43, 0x34); // 0x36 00110100, lsb/msb, counter 0, mode ­2!, binary
   xnull=(unsigned char)inp(0x40);           // LSB
   x=ticks+IntIncr-(unsigned char)inp(0x40); // MSB
   return(x);

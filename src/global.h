@@ -9,8 +9,6 @@
 #ifndef __GLOBAL_H
 #define __GLOBAL_H
  
-//#define SHARE // To compile the demo (limited) version
-
 #ifndef false
 #define false 0
 #define true 1
@@ -37,10 +35,6 @@ typedef void(*voidReturnType)(void);
 void call(const voidReturnType func); // void funcion(void); int n=(int)funcion; call(n);
 
 
-//#include <i86.h>
-//#include <bios.h>
-//#include <dos.h>
-//#include <conio.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -55,8 +49,6 @@ void call(const voidReturnType func); // void funcion(void); int n=(int)funcion;
 #include "osdep.h"
 
 
-//#include <graph.h>
-//#include <direct.h>
 #include <math.h>
 #include <signal.h>
 
@@ -521,9 +513,6 @@ GLOBAL_DATA int mask_on;
 
 extern int hotkey;
 
-//GLOBAL_DATA byte desk_r,desk_g,desk_b,desk_tile;
-//GLOBAL_DATA char desk_file[_MAX_PATH+1];
-
 GLOBAL_DATA int tapiz_an,tapiz_al;
 
 GLOBAL_DATA int mouse_x,mouse_y,mouse_b,mouse_graf; // Rat¢n
@@ -631,7 +620,6 @@ struct tipo_undo {               // Tabla c¡clica con los undo
 };                                      // modo=-1 si entrada no usada
 
 GLOBAL_DATA struct tipo_undo *tundo;
-//GLOBAL_DATA struct tipo_undo tundo[max_undos];
 
 GLOBAL_DATA int iundo; // Indice de tundo[], primer elemento libre
 
@@ -831,7 +819,7 @@ GLOBAL_DATA char shift_status,ascii,scan_code;
 GLOBAL_DATA char full[_MAX_PATH+1];
 GLOBAL_DATA char mascara[512]; // Mascara con la que se realiza el dir
 GLOBAL_DATA char input[512];   // Cuadro de di logo para introducir el nombre
-//GLOBAL_DATA int input_len;
+
 
 GLOBAL_DATA int hiden[max_windows]; // Ventanas ocultadas al abrir un di logo
 
@@ -886,12 +874,6 @@ void muestra_papelera(); // trash shows (?)
 //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
 //      Functions and structures exported by the (sound) recorder
 //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-
-//#define GRABADORA // TAPE RECORDER
-
-#ifdef GRABADORA
-#include "grabador.h"
-#endif
 
 //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
 //      Funciones y estructuras exportadas el generador de fonts

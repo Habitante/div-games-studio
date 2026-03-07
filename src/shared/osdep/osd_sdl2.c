@@ -24,7 +24,6 @@ void OSDEP_Init(void) {
 	freopen( "CON", "w", stderr );
 #endif
 
-	//atexit(SDL_Quit);
 }
 
 void OSDEP_Quit(void) {
@@ -40,12 +39,10 @@ uint32_t OSDEP_GetTicks(void) {
 void OSDEP_SetCaption(char *title, char *icon) {
 	fprintf(stdout, "%s\n", __FUNCTION__);
 	strcpy(windowtitle,title);
-	//SDL_WM_SetCaption((const char *)title, (const char *)icon);
 }
 
 OSDEP_VMode ** OSDEP_ListModes(void) {
 fprintf(stdout, "%s\n", __FUNCTION__);
-//	SDL_ListModes(NULL, SDL_FULLSCREEN|SDL_HWSURFACE);
 	return NULL;
 }
 
@@ -54,8 +51,6 @@ void OSDEP_WarpMouse(int x, int y) {
 }
 
 int OSDEP_IsFullScreen(void) {
-//	if (OSDEP_surface->flags & SDL_FULLSCREEN) return 1; // return true if surface is fullscreen
-//    return 0;//OSDEP_window->fullscreen; // Return false if surface is windowed
     if(OSDEP_window != NULL) {
 	    SDL_DestroyWindow(OSDEP_window);
     	OSDEP_window = NULL;
@@ -146,10 +141,6 @@ OSDEP_Surface * OSDEP_SetVideoMode(int width, int height, int bpp, char fs) {
 	
 	OSDEP_buffer32 = SDL_CreateRGBSurface(0, width, height, 32,
 		0,0,0,0);
-		// rmask,
-		// gmask,
-		// bmask,
-		// amask);
 
 
 	OSDEP_texture = SDL_CreateTextureFromSurface(OSDEP_renderer, OSDEP_buffer32);
@@ -159,39 +150,19 @@ OSDEP_Surface * OSDEP_SetVideoMode(int width, int height, int bpp, char fs) {
 
 
 void OSDEP_Flip(OSDEP_Surface *s) {
-//	fprintf(stdout, "%s\n", __FUNCTION__);
+	void *pixels;
+  int pitch;
 
-	void *pixels; 
-  int pitch; 
+  /* blit the 320x200x8 Surface to a 32bit helper                */
+  /* Surface for pixel format conversion (8bit palettized to     */
+  /* 32bit). SDL2 Textures don't work with 8bit pixels formats.  */
 
-  /* blit the 320x200x8 Surface to a 32bit helper                */ 
-  /* Surface for pixel format conversion (8bit palettized to     */ 
-  /* 32bit). SDL2 Textures don't work with 8bit pixels formats.  */ 
-
- /* move it to the texture */ 
+ /* move it to the texture */
   SDL_BlitSurface(OSDEP_buffer8, NULL, OSDEP_buffer32, NULL);
-
-  // SDL_LockTexture(OSDEP_texture, NULL, &pixels, &pitch); 
-  // SDL_ConvertPixels(OSDEP_buffer32->w, OSDEP_buffer32->h, 
-  //              OSDEP_buffer32->format->format, 
-  //              OSDEP_buffer32->pixels, OSDEP_buffer32->pitch, 
-  //              SDL_PIXELFORMAT_ARGB8888, 
-  //              pixels, pitch); 
-  // SDL_UnlockTexture(OSDEP_texture); 
-
-	// int w=0;
-	// int h=0;
-
-	// for(w=0;w<OSDEP_buffer8->width;w++) {
-	// 	for(w=0;w<OSDEP_buffer8->width;w++) {
-			
-	// 	}
-
-	// }
 
     /* Modify the texture's pixels */
 	SDL_UpdateTexture(OSDEP_texture, NULL, OSDEP_buffer32->pixels, OSDEP_buffer32->pitch);
-    
+
     /* Make the modified texture visible by rendering it */
     SDL_RenderCopy(OSDEP_renderer, OSDEP_texture, NULL, NULL);
 
@@ -199,15 +170,10 @@ void OSDEP_Flip(OSDEP_Surface *s) {
 }
 
 void OSDEP_UpdateRect(SDL_Surface *screen, Sint32 x, Sint32 y, Sint32 w, Sint32 h) {
-//	fprintf(stdout, "%s\n", __FUNCTION__);
 	OSDEP_Flip(screen);
-//	SDL_RenderPresent(OSDEP_renderer);	
 }
 
 int OSDEP_SetPalette(OSDEP_Surface *surface, OSDEP_Color *colors, int firstcolor, int ncolors) {
-//	fprintf(stdout, "%s\n", __FUNCTION__);
-//	return 0;
-
 	SDL_SetPaletteColors(surface->format->palette, colors, 0, 256);
 	return 1;
 }

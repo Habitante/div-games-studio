@@ -130,14 +130,7 @@ return ;
 struct llist * find_proc(int id) {
 	struct llist *ls = plist;
 
-//	printf("first id: %x %d\n",ls, ls->pid);
-
-//	if(ls->lnext==NULL)
-//		return NULL;
-	
 	do {
-//		printf("%d %d\n",ls->pid,id);
-		
 		if(ls->pid==id) {
 			printf("found id: %d %x\n",id,ls);
 			return ls;
@@ -182,19 +175,15 @@ printf("After id %d removed:\n",did);
 // look for slot
 
 	do {
-//		printf("Looking for next %x %x\n",ff,ff->lnext);
 		if(checklist==_Z) {
 			if(ff->z > mem[did+checklist]) {
-	//			printf("Z %d is MORE than %d\n",ff->z,mem[did+checklist]);
 				pf = ff;
-//				break;
 			}
 		}
 		if(checklist==_P) {
 			if(ff->p > mem[did+checklist]) {
 				printf("MATCHED P\n");
 				pf = ff;
-	//			break;
 			}
 		}
 		ff=ff->lnext;
@@ -211,12 +200,8 @@ printf("After id %d removed:\n",did);
 	
 	if(pf!=NULL) {
 	
-//		printf("Re-indexing for (oldid) %d id %d %d %d\n",oldid, did,checklist,did+checklist);
-
 		ff=pf;
-		//->lprev;
 
-	
 		fs->lnext = ff->lnext;
 		fs->next = ff->next;
 		
@@ -229,9 +214,6 @@ printf("After id %d removed:\n",did);
 		ff->lnext=fs;
 		ff->next=fs->pid;
 
-//		fs->next = pf->pid;
-//		fs->lnext = pf;
-	
 	}
 	checklist=0;
 	dtemp=0;
@@ -240,7 +222,6 @@ printf("After id %d removed:\n",did);
 	proc_list();
 	
 }
-
 
 
 void remove_process(int remove_id) {
@@ -307,8 +288,6 @@ void insert_process(int insert_id) {
 
 	printf("New process id: %d %x %x\n",insert_id,pnew,pnew->lprev);
 	
-//	free(n);
-	  
 	proc_list();  
 }
 #endif
@@ -373,7 +352,6 @@ time_t dtime;
 memptrsize stack[65535];
 
 void inicializacion (void) {
-//  FILE * f=NULL;
   int n;
   
   for (n=0;n<65535;n++)
@@ -389,18 +367,6 @@ void inicializacion (void) {
   dirinfo=(struct _dirinfo*)&mem[long_header+14+10*10+10*7+8+11+9+10*4];
   fileinfo=(struct _fileinfo*)&mem[long_header+14+10*10+10*7+8+11+9+10*4+1026];
   video_modes=(struct _video_modes*)&mem[long_header+14+10*10+10*7+8+11+9+10*4+1026+146];
-/*
-  if (mem[0]!=1) f=fopen("sound.cfg","rb");
-
-  if (f!=NULL) {
-    fread(setup,4,8,f); fclose(f);
-  } else {
-// Juanjo
-//  DetectBlaster(&setup->card,&setup->port,&setup->irq,&setup->dma,&setup->dma2);
-//  DetectGUS(&setup->card,&setup->port,&setup->irq,&setup->dma,&setup->dma2);
-//  setup->master=15; setup->sound_fx=15; setup->cd_audio=15;
-  }
-*/
   iloc=mem[2];            // Start of local variables | Inicio de la imagen de las variables locales
   iloc_len=mem[6]+mem[5]; // Length of local ( public and private ) | Longitud de las locales (p�blicas y privadas)
   iloc_pub_len=mem[6];  	// Length of local public variables | Longitud de las variables locales p�blicas
@@ -426,8 +392,6 @@ void inicializacion (void) {
   ghost=(byte *)((memptrsize)(ghost_inicial+512));//&0xFFFFFF00);
 
   crea_cuad();
-
-//  if((texto=(struct t_texto *)malloc(sizeof(struct t_texto)*max_textos))==NULL) exer(1);
 
   // Crea los dos primeros procesos, init y main
 
@@ -475,10 +439,7 @@ insert_process(id_start);
 
 time(&dtime);
 
-//  _bios_timeofday(_TIME_GETCLOCK,(long*)&ip); 
 init_rnd(dtime);
-
-  //_setvideomode(_MRES256COLOR);
 
   detectar_vesa();
 
@@ -500,9 +461,6 @@ init_rnd(dtime);
   now_dacout_r=64; now_dacout_g=64; now_dacout_b=64; paleta_cargada=0;
 
   set_dac();
-//#ifdef __EMSCRIPTEN__
-//  tabla_ghost(); 
-//#endif
   dirinfo->files=0;
   memset(dirinfo->name,0,1025*4);
 
@@ -665,13 +623,10 @@ void guarda_pila(int id, int sp1, int sp2) {
   		break;
   }
   printf("using stack: %d\n",stacks);
-  //if(stacks>=65535)
-  	//exit("out of memory");
   stack[stacks]=p;
   
   if (p!=NULL) {
     mem[id+_SP]=stacks;
-    //(memptrsize)p; 
     p[0]=sp1; p[1]=sp2;
     for (n=0;n<=sp2-sp1;n++) p[n+2]=pila[sp1+n];
   } else mem[id+_SP]=0;
@@ -747,7 +702,6 @@ void mainloop(void) {
     } while (ide);
     frame_end();
 #ifdef EMSCRIPTEN
-//    running = 0;
 #endif
 }
 
@@ -755,9 +709,6 @@ void interprete (void)
 {
   inicializacion();
 #ifndef DEBUG
-//#ifndef __EMSCRIPTEN__
-//  madewith();
-//#endif
 #endif
 
 #ifdef __EMSCRIPTEN__
@@ -772,8 +723,6 @@ void interprete (void)
 
 #ifdef __EMSCRIPTEN__
 void es_fps(byte f) {
-//  emscripten_cancel_main_loop();
-//  emscripten_set_main_loop(mainloop, f, 0);
 }	
 #endif
 //�����������������������������������������������������������������������������
@@ -1090,8 +1039,7 @@ void frame_start(void) {
 #ifdef WIN32
 			SDL_Delay(((int)freloj-old_reloj)-1);
 #else
-			sched_yield();			
-//			usleep(((int)freloj-old_reloj)-1); 
+			sched_yield();
 #endif			
 		} while (get_reloj()<(int)freloj); // TO keep FPS
 		}
@@ -1357,13 +1305,6 @@ void frame_end(void) {
 					}	mem[ide+_Executed]=1;
 
 				}
-      /*
-		if(ide || m7ide || scrollide || otheride) 
-			printf("ide: %d, m7ide: %d, scrollide: %d, otheride: %s\n",
-			ide,m7ide,scrollide,	
-			(otheride==3?"Draw":(otheride==2?"Mouse":(otheride==1?"Text":"Graph")))
-			);
-*/
 		} while (ide || m7ide || scrollide || otheride);
 
 #else // IFDEFNOTYET
@@ -1371,7 +1312,6 @@ void frame_end(void) {
 		for (id=id_start; id<=id_end; id+=iloc_len)
 			if ((mem[id+_Status]==2 || mem[id+_Status]==4) && mem[id+_Ctype]==0 &&
 				!mem[id+_Executed]) {
-				// && mem[id+_Z]>max) { ide=id; max=mem[id+_Z]; }
 				ide=id; 
 
 				if (mem[ide+_Graph]>0 || mem[ide+_XGraph]>0) {
@@ -1585,11 +1525,9 @@ void finalizacion (void) {
 
 #ifdef DEBUG
 	if(text_font!=NULL) {
-//		printf("text_font = %x\n",text_font);
 		free(text_font);
 	}
 	if(graf_ptr!=NULL) {
-//		printf("graf_ptr = %x\n",text_font);
 		free(graf_ptr);
 	}
 #endif
@@ -1690,8 +1628,6 @@ void exer(int e) {
 
 #endif
 
-  //printf("*** Error de ejecuci�n:\n\n\tn� actual de procesos = %u\n\tn� m�ximo de procesos = %u",
-  //procesos,(id_end-id_start)/iloc_len+1);
 
 	rvmode();
 
@@ -1742,7 +1678,6 @@ void e(int texto) {
 	}
 	rvmode();
 
-//  if (end_extern!=NULL) end_extern();
 	kbdReset();
 
 #if defined (DOS) || defined (WIN32)
@@ -1765,8 +1700,6 @@ extern char exebin[255];
 #endif
 
 
-
-
 int main(int argc,char * argv[]) {
   FILE * f, *fsf;
   int a=0;
@@ -1786,12 +1719,6 @@ int main(int argc,char * argv[]) {
   uint32_t datsize = 0;
   uint32_t exestart = 0;
   uint32_t datstart = 0;
-
-// fix stderr / stdout
-#ifdef WIN32
-//	freopen( "CON", "w", stdout );
-//	freopen( "CON", "w", stderr );
-#endif
 
 	copia=NULL;
 	copia2=NULL;
@@ -1815,9 +1742,6 @@ int main(int argc,char * argv[]) {
 #endif
 
 if(true) {
-//	printf("searching for magic\n");
-// search for magic..
-
 	f=fopen(argv[0],"rb");
 
 	memset(buf,0,55);
@@ -1833,14 +1757,11 @@ if(true) {
 			fread(&exesize,4,1,f);
 			fread(&datsize,4,1,f);
 
-		} else {
-		//	printf("failed: %s\n",buf);
 		}
 		if(exesize==0)
 			fclose(f);
 	}
 }
-
 
 
 #ifndef DEBUG
@@ -1871,9 +1792,6 @@ if(true) {
 
 #ifdef __EMSCRIPTEN__
 
-//jschar=emscripten_run_script_string("$('#exename').text()");
-
-//emscripten_wget (jschar, "exe");//, loadmarvin, errormarvin);
 	max_saltos = 0;
 
 
@@ -1912,8 +1830,6 @@ if(argc>1 && exesize==0) {
 		f=fopen(argv[0],"rb");
 	}
 	
-	//printf("%x %s\n",f,argv[1]);
-	
 	if(!f) {
 
 #ifndef DEBUG
@@ -1946,8 +1862,6 @@ if(argc>1 && exesize==0) {
 // check if div1 or div2 exe
   fseek(f,0,SEEK_END);
   len=ftell(f);
-//  printf("pack len: %d\n",len);
-  
   if(exesize>0)
 	exestart=len-exesize-datsize-10;
 
@@ -1960,25 +1874,14 @@ if(datsize>0) {
   
 fseek(f,0x2+exestart,SEEK_SET);
 fread(&DIV_VER,1,1,f);
-//printf("%s\n",DIV_VER=='D'?"DIV 1":"DIV 2");
-//  if(exesize==0) {
-//} else {
-//	len=exesize;
-//}
-
-//printf("div ver: [%d] [%c]\n",DIV_VER,DIV_VER);
-
 switch(DIV_VER) {
 	case 'j':
 	break;
 	case 's':
-//		printf("Cannot load DIV1 exe (yet!)\n");
 		fclose(f);
 		exit(26);
 	break;
 	case 144:
-//	case -112:
-		//printf("Found Div Windows exe\n");
 		stubsize = winstubsize;
 		
 	break;
@@ -2002,11 +1905,8 @@ fseek(f,div1stubsize,SEEK_SET);
 fread(mimem,4,10,f);
 
 #ifdef PRGDUMP
-for(a=0;a<10;a++){ 
-//printf("offset %d is %x (%d)\n",a,mimem[a],mimem[a]);
-//printf("Text offset is %x\n",(uint16_t*)mimem[6]);
+for(a=0;a<10;a++){
 }
-
 #endif
   iloc_len=(mimem[5]+mimem[6]);
 
@@ -2027,38 +1927,20 @@ memset(mem,0,((((memptrsize)mem+3)/4)*4));
         memb=(byte*)mem;
         memw=(word*)mem;
 fseek(f,div1stubsize,SEEK_SET);
-//rewind(f);
-//printf("FILE AT: %d\n",ftell(f));
 fread(mem,1,len-div1stubsize,f);
-//printf("FILE AT: %d %d\n",ftell(f),len);
 
 #ifdef DUMP_PRG
 dump(len-div1stubsize);
 #endif
 
-//for(a=0;a<40;a++){ 
-//printf("ptr offset %d is %x (%d)\n",a,dp[a],dp[a]);
-//printf("Text offset is %x\n",(uint16_t*)mimem[6]);
-//}
-//memcpy(mem,mimem,40);
-//memcpy(mem,ptr,len-div1stubsize);//4*imem_max+1032*5+16*1025+3);
-
-//printf("ptrsize %d\nmem: %x iloc: %d iloc_len: %d iloc_max %d\nvars: %d\n",sizeof(ptr),mem,mem[6],iloc_len,imem_max,mem[2]);
   kbdInit();
 
 
-//printf("first op: %d\n",mem[mem[1]]);
         interprete();        
 } else {
 
   fseek(f,stubsize+exestart,SEEK_SET);
   fread(mimem,4,10,f);
-
-for(a=0;a<10;a++){ 
-//printf("offset %d is %x (%d)\n",a,mimem[a],mimem[a]);
-//printf("Text offset is %x\n",(uint16_t*)mimem[6]);
-}
-//exit(0);
 
   iloc_len=(mimem[5]+mimem[6]);
 
@@ -2108,7 +1990,6 @@ for(a=0;a<10;a++){
 #ifdef DUMP_BYTECODE
 FILE *m = fopen("exec.m","wb");
 if(m) {
-//	fwrite((uint32_t *)&mem[9],1,len_descomp,m);
 	fwrite((uint32_t *)mem,1,len_descomp+80,m);
 	fclose(m);
 }
@@ -2206,7 +2087,6 @@ int is_pak(FILE *f, char *name) {
   if (!strcmp(head,"dat\x1a\x0d\x0a") && nfiles>0) {
     if (prg_id==id[0] || prg_id==id[1] || prg_id==id[2]) {
       packdir=(struct _packdir* )malloc(nfiles*sizeof(struct _packdir));
-      //printf("packdir: %x %d\n",packdir,nfiles);
       if (packdir!=NULL) {
         if (fread(packdir,sizeof(struct _packdir),nfiles,f)==nfiles) {
           for (n=0;n<nfiles;n++) {
@@ -2311,8 +2191,6 @@ void DebugData(int Val)
     fclose(f);
   }
 }
-
-//int xxx_xxx_xxx;
 
 void GetFree4kBlocks(void)
 {

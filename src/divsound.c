@@ -8,12 +8,9 @@ int reloj=0;
 extern int safe;
 
 int SoundActive=0;
-//int SoundActive=1;
 
 void InitSound(void)
 {
-//	SDL_Init(SDL_INIT_AUDIO);
-//	printf("Sound system initialised\n");
 SDL_InitSubSystem( SDL_INIT_AUDIO );
 #ifdef MIXER
 
@@ -26,7 +23,6 @@ int audio_buffers = 4096;
  
 if(Mix_OpenAudio(audio_rate, audio_format, audio_channels, audio_buffers) != 0) {
 	fprintf(stderr, "Unable to initialize audio: %s\n", Mix_GetError());
-//	exit(1);
 }
 
 #endif
@@ -41,11 +37,8 @@ if(Mix_OpenAudio(audio_rate, audio_format, audio_channels, audio_buffers) != 0) 
   unsigned short DMAS2[10] ={0,1,2,3,4,5,6,7,8,9};
 
   int mixer         = QUALITYMIXER;
-//int mixer         = FASTMIXER;
   int mixrate       = 44100;
   int mixmode       = SIXTEENBIT | MONO;
-//int mixmode       = SIXTEENBIT | STEREO;
-//int mixmode       = EIGHTBIT | MONO;
   int interpolation = 1;
   int cfg_dev, cfg_port, cfg_irq, cfg_dma1, cfg_dma2;
 

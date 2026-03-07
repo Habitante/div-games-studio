@@ -96,9 +96,6 @@ extern int superget;
 //      Global variables
 ///////////////////////////////////////////////////////////////////////////////
 
-//int * system_clock = (void*) 0x46c; // Reloj del sistema
-//int system_clock;
-
 char get_buffer[long_line]; // Shared buffer (except for calculator)
 char * get;
 int get_cursor,get_pos;     // Clock y posici�n del cursor en los get
@@ -227,7 +224,6 @@ void chk_demo(void) {
 		if(exe_cola[0]==0xDABACA2A) {
 			if (exe_cola[1]-0xF31725AB>1024) beta_status=1; else exe_cola[1]++;
 			fseek(f, -4, SEEK_END);
-			//    fwrite(&exe_cola[1], 1, 4, f);
 		} else {
 			fclose(f);
 			f=fopen(exe_name, "ab");
@@ -399,7 +395,6 @@ int main(int argc, char * argv[]) {
 	
 #ifdef SDL
 	OSDEP_Init();
-	// SDL_INIT_EVERYTHING);
 #endif
 
 	atexit(free_resources);
@@ -631,7 +626,6 @@ int main(int argc, char * argv[]) {
 	if (auto_save_session || modo_de_retorno!=0)
 		if (modo_de_retorno!=3) 
 			DownLoad_Desktop(); // Si no fallo el test
-	//New_DownLoad_Desktop();
 
 	Save_Cfgbin();
 
@@ -727,8 +721,6 @@ void inicializa_entorno() {
 
   // Si no existe el fichero DIV.DTF o se pide el modo a prueba de fallos
 
-//  if(!CopiaDesktop) nueva_ventana(menu_principal0); else UpLoad_Desktop();
-
   if(CopiaDesktop && !nueva_sesion && !primera_vez) UpLoad_Desktop();
  
   if (!primera_vez) {
@@ -759,10 +751,6 @@ void inicializa_entorno() {
   _chdir("system"); DaniDel("exec.*"); _chdir("..");
 
   if (primera_vez) {
-    //v_tipo=13; strcpy(input,"system/div.txt");
-    //mouse_graf=3; volcado_copia(); mouse_graf=1;
-    //v_terminado=-1; // No emite error si el fichero no existe
-    //abrir_programa(); if (v_terminado) maximizar();
     nueva_ventana(menu_principal0);
     minimiza_ventana();
     
@@ -770,16 +758,6 @@ void inicializa_entorno() {
     help(2000);
     primera_vez=0;
   }
-
-// OJO! no se informa si no se pudo inicializar el sonido (s�lo en Sonidos/Nuevo)
-
-/*
-  if (!primera_vez && !Interpretando && SoundError){
-    v_texto=texto[549];
-    dialogo(errhlp0);
-    if (v_aceptar) help(2008);
-  }
-*/
 
   vacia_buffer();
 }
@@ -2008,9 +1986,7 @@ void entorno_dialogo(void) {
 
 	wmouse_x=-1; wmouse_y=-1;
 
-	//  if (flushall()>10) fcloseall();
-
-	do { 
+	do {
 		read_mouse();
 	} while((mouse_b) || key(_ESC));
 
@@ -2095,11 +2071,8 @@ void maximiza_ventana(void) {
   v._x=x; v._y=y;
   v._an=an; v._al=al;
   v.primer_plano=1;
-//  if (v.tipo>=100) activar();
 
   do { read_mouse(); } while(mouse_b&1);
-
-//  if (exploding_windows) extrude(x,y,an,al,v.x,v.y,v.an,v.al);
 
   se_ha_movido_desde(x,y,an,al);
 
@@ -2142,9 +2115,7 @@ void minimiza_ventana(void) {
   v.primer_plano=2;
 
   do { read_mouse(); } while(mouse_b&1);
-  
-  //if (exploding_windows) extrude(x,y,an,al,v.x,v.y,v.an,v.al);
-  
+
   se_ha_movido_desde(x,y,an,al);
 
 }
@@ -2291,18 +2262,11 @@ void mueve_ventana(void) {
 
   big=b;
   if (x!=oldx || y!=oldy) {
-//    volcado_copia();
     v.x=x; v.y=y;
-//    if (modo<100) { fondo_edicion(x,y,an,al);
-//      volcar_barras(0);
-//      actualiza_dialogos(x,y,an,al);
-//    } else actualiza_caja(oldx,oldy,an,al);
     se_ha_movido_desde(oldx,oldy,an,al);
     volcado_completo=1;
     volcado_copia();
   }
-
-//  if (v.primer_plano==1) wrectangulo(v.ptr,an/big2,al/big2,c2,0,0,an/big2,al/big2);
 
   //���������������������������������������������������������������������������
   // Comprueba si se ha pulsado doble click para autoemplazar la ventana
@@ -2404,8 +2368,6 @@ void actualiza_caja(int x, int y, int an, int al) {
 
 
   char *div_version;
-
-//#define NIGHTLY_VERSION "DIVDX BUILD 01234abcdef"
 
 #ifdef GIT_SHA1
 
@@ -3069,9 +3031,7 @@ void nueva_ventana(voidReturnType init_handler) {
       v.ptr=ptr;
 
       memset(ptr,c0,an*al); if (big) { an/=2; al/=2; }
- //     SDL_FillRect(v.surfaceptr,NULL,SDL_MapRGB( v.surfaceptr->format, 0,0,0));
-      //colors[c0].b,colors[c0].g,colors[c0].r));
-      
+
       wrectangulo(ptr,an,al,c2,0,0,an,al);
       wput(ptr,an,al,an-9,2,35);
       
@@ -3360,8 +3320,7 @@ uint32_t colorkey=0;
       v.ptr=ptr;
 
       memset(ptr,c0,an*al); if (big) { an/=2; al/=2; }
-//      SDL_FillRect(v.surfaceptr,NULL,SDL_MapRGB( v.surfaceptr->format, 0, 0, 0 ));
-      
+
       wrectangulo(ptr,an,al,c2,0,0,an,al);
 
       wput(ptr,an,al,an-9,2,35);
@@ -3430,10 +3389,6 @@ void refrescadialogo(void)
 
 void init_lexcolor(void);
 void end_lexcolor(void);
-
-//typedef enum    {SV_cpu86,SV_cpu186,SV_cpu286,SV_cpu286p,
-//                 SV_cpu386,SV_cpu386p,SV_cpu486,SV_cpu486p,
-//                 SV_cpu586,SV_cpu586p} SV_cpuType;
 
 void inicializacion(void) {
 
@@ -3628,7 +3583,6 @@ mouse_surface = IMG_Load("system/cursor.png");
 		fseek(f,0,SEEK_END); 
 		n=ftell(f);
 #ifndef __EMSCRIPTEN__
-//n=1352;
 #endif
 		if ((ptr2=(byte *)malloc(n))!=NULL) {
 			memset(graf_help,0,sizeof(graf_help));
@@ -3662,22 +3616,11 @@ while(ftell(f)<file_len && len_>0 && num_>0) {
 	fseek(f,pts*4,SEEK_CUR);
 	
 	pos = ftell(f);
-	
-	//mptr=(byte *)malloc(an*al);
 
 	graf_help[num_].an=an;
 	graf_help[num_].al=al;
 	graf_help[num_].offset=pos;
  	fseek(es,len,SEEK_CUR);
- 	
-/* 	mptr = (byte *)malloc(len_);
- 	fread(mptr,1,an*al,es);
- 	lst[num_]=iptr=(int *)mptr;
-// 	 printf("mem ptr is %x\n",iptr);
- 	  	 if (m!=palcrc) {
-		 adaptar(ptr+64+iptr[15]*4, iptr[13]*iptr[14], (byte*)(g[num].fpg)+8,&xlat[0]);
- 	 } 	
- 	 */
 }
 #endif
 
@@ -3792,7 +3735,6 @@ void finalizacion(void) {
   if(modo_de_retorno==0 || modo_de_retorno==3)
         rvmode();
 
-//  EndSound();
 	end_lexcolor();
 
   kbdReset();
@@ -3846,7 +3788,6 @@ DWORD cchBuffer;
     {
         // Dump drive information
         driveType = GetDriveType(driveStrings);
-//        GetDiskFreeSpaceEx(driveStrings, &freeSpace, NULL, NULL);
 
         switch (driveType)
         {
@@ -3870,9 +3811,6 @@ DWORD cchBuffer;
             strcpy(driveTypeString,"Unknown");
             break;
         }
-
-//        printf("%s - %s - %I64u GB free\n", driveStrings, driveTypeString,
-//                  freeSpace / 1024 / 1024 / 1024);
 
         // Move to next drive string
         // +1 is to move past the null at the end of the string.
@@ -4136,16 +4074,11 @@ void _process_items(void) {
 
   v.active_item=-1;
 
-//  if (ascii==0x1b) {
-//    asc=ascii;
-//  }
-
   if (v.selected_item!=-1) {
     if (!v.estado && v.tipo==102) {
       asc=ascii; kesc=kbdFLAGS[28];
       ascii=0; kbdFLAGS[28]=0;
     } else {
-      // tecla();
       if (ascii==9) {
         ascii=0;
         _select_new_item(v.selected_item+1);
@@ -4366,7 +4299,6 @@ void get_input(int n) {
     case 8:
       if (get_pos) {
         strcpy(&get[get_pos-1],&get[get_pos]); get_pos--;
-//        get[strlen(get)-1]=0;
       }
       if (!*get && superget) 
 		strcpy((char *)v.item[v.selected_item].get.buffer,"");
@@ -4421,14 +4353,11 @@ void get_input(int n) {
     } else scroll=0;
 
     wbox(v.ptr,v.an/big2,v.al/big2,c0,v.item[n].get.x,v.item[n].get.y+8,v.item[n].get.an,9);
-//    wwrite_in_box(v.ptr,v.an/big2,v.item[n].get.an-1+v.item[n].get.x,v.al/big2,v.item[n].get.x+1,v.item[n].get.y+9,0,cwork,c4);
     wwrite_in_box(v.ptr+(v.item[n].get.x+1)*big2,v.an/big2,v.item[n].get.an-2,v.al/big2,0-scroll,v.item[n].get.y+9,0,(byte *)cwork,c4);
 
     if (*system_clock&4) {
-//      if (strlen(get)) x=v.item[n].get.x+text_len(get)+2; else x=v.item[n].get.x+1;
       x=l+1;
       wbox_in_box(v.ptr+(v.item[n].get.x+1)*big2,v.an/big2,v.item[n].get.an-2,v.al/big2,c3,x-scroll,v.item[n].get.y+9,2,7);
-//      wbox_in_box(v.ptr,v.an/big2,v.item[n].get.an-1+v.item[n].get.x,v.al/big2,c3,x,v.item[n].get.y+9,2,7);
     }
   } get_cursor=(*system_clock&4);
 
@@ -4656,12 +4585,8 @@ void Load_Cfgbin() {
       Setupfile.Max_undo=1024; // Undo System
       Setupfile.Undo_memory=1024*1024+65536;
       Setupfile.tab_size=4;
-      // memcpy(&Setupfile.colors_rgb[0],"\x1d\x1d\x1d\x3f\x3f\x3f\x0\x0\x20\x0\x5\x5\x36\x0\x0\x3f\x3f\x3f\x15\x15"
-      // 	                              "\x15\x3f\x3f\x3f\x0\x33\x0\x35\x31\x31\x2a\x0\x3e\x32\x32\x0",12*3);
       memcpy(&Setupfile.colors_rgb[0],"\x1c\x1c\x1c\x3d\x3d\x3c\x0\x0\x20\x2\x6\x7\x0\x27\x0\x3d\x3d\x3c\x14\x14"
      	                              "\x14\x3d\x3d\x3c\x0\x0\x2e\x34\x31\x31\x22\x13\x13\x26\x26\x0",12*3);
-      // memcpy(&Setupfile.colors_rgb[0],"\x19\x19\x20\x3f\x3f\x3f\x00\x00\x30\x00\x00\x20\x25\x25\x2b\x3f\x3f\x3f"
-      //                                 "\x15\x15\x28\x3f\x3f\x3f\x3f\x3f\x3f\x30\x30\x34\x25\x25\x2b\x25\x25\x2b",12*3);
       Setupfile.editor_font=2;
       Setupfile.paint_cursor=0;
       Setupfile.exploding_windows=1;
@@ -4692,12 +4617,8 @@ void Load_Cfgbin() {
       Setupfile.Max_undo=1024; // Undo System
       Setupfile.Undo_memory=1024*1024+65536;
       Setupfile.tab_size=4;
-      // memcpy(&Setupfile.colors_rgb[0],"\x1d\x1d\x1d\x3f\x3f\x3f\x0\x0\x20\x0\x5\x5\x36\x0\x0\x3f\x3f\x3f\x15\x15"
-      // 	                              "\x15\x3f\x3f\x3f\x0\x33\x0\x35\x31\x31\x2a\x0\x3e\x32\x32\x0",12*3);
       memcpy(&Setupfile.colors_rgb[0],"\x1c\x1c\x1c\x3d\x3d\x3c\x0\x0\x20\x2\x6\x7\x0\x27\x0\x3d\x3d\x3c\x14\x14"
      	                              "\x14\x3d\x3d\x3c\x0\x0\x2e\x34\x31\x31\x22\x13\x13\x26\x26\x0",12*3);
-      // memcpy(&Setupfile.colors_rgb[0],"\x19\x19\x20\x3f\x3f\x3f\x00\x00\x30\x00\x00\x20\x25\x25\x2b\x3f\x3f\x3f"
-      //                                 "\x15\x15\x28\x3f\x3f\x3f\x3f\x3f\x3f\x30\x30\x34\x25\x25\x2b\x25\x25\x2b",12*3);
       Setupfile.editor_font=0;
       Setupfile.paint_cursor=0;
       Setupfile.exploding_windows=1;
@@ -4716,11 +4637,6 @@ void Load_Cfgbin() {
     }
   } else {
     fread(&Setupfile,1,sizeof(Setupfile),file);
-    // for(n=0;n<36;n++) {//sizeof(Setupfile.colors_rgb);n++) {
-    // 	fprintf(stdout,"\\x%x",Setupfile.colors_rgb[n]);
-    // }
-    // fprintf(stdout,"\n");
-    // n=0;
     fclose(file);
   }
 
@@ -4840,7 +4756,6 @@ void check_free(void) {
     dialogo(info0);
   }
 
-//  salir_del_entorno=1; // Para salir al MS-DOS
 }
 
 //�����������������������������������������������������������������������������
@@ -4947,7 +4862,6 @@ void DaniDel(char *name) {
     strcat(cwork3,ft.name);
     if (_fullpath(cwork1, cwork3, _MAX_PATH)==NULL) strcpy(cwork1,ft.name);
     _dos_setfileattr(cwork1,_A_NORMAL);
-//    printf("deleting %s\n",cwork1);
     remove(cwork1);
     rc=_dos_findnext(&ft);
   }
@@ -5008,8 +4922,6 @@ void GetFree4kBlocks(void)
 //�����������������������������������������������������������������������������
 
 void check_oldpif(void) {
-//	printf("Check oldpif\n");
-	
   unsigned n;
   byte pif[1024];
   FILE * f;

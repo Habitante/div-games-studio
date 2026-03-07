@@ -209,15 +209,12 @@
 //      DIV - Compilador Interno
 //ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
 
-//#define listados // Para generar los listados de objetos y EML (LST/TAB/EML)
-
 #include "global.h"
 
 #ifdef ZLIB
 #include <zlib.h>
 #endif
 
-//extern char ExeGen[_MAX_PATH];
 void l_objetos (void);
 void l_ensamblador (void);
 
@@ -1033,10 +1030,6 @@ free_resources();
   lex_case[' ']=(struct lex_ele*)l_spc;
   lex_case[tab]=(struct lex_ele*)l_spc;
   lex_case[cr]=(struct lex_ele*)l_cr;
-/*
-  for (n=0;n<256;n++)
-	printf("vhash[%d] = %x\n",n,vhash[n]);
-*/
 
   inicio_objetos=ivnom.b;
 
@@ -1127,8 +1120,6 @@ free_resources();
 
   if (program_type==1) if ((f=fopen("install/setup.ovl","wb"))!=NULL) {
     fwrite(div_stub,1,602,f);
-//    fwrite(mem,4,imem,f); fwrite(loc,4,iloc,f);
-//    fclose(f);
     p=(byte*)malloc((imem+iloc)*4);
     m=(imem+iloc)*4+1024;
     q=(byte*)malloc(m);
@@ -1160,15 +1151,11 @@ free_resources();
     }
   }
 
-//if ((f=fopen(ExeGen,"wb"))!=NULL) {
-
   if (ejecutar_programa==3) mem[0]+=128;
   if (ignore_errors) mem[0]+=512;
 
   if ((f=fopen("system/EXEC.EXE","wb"))!=NULL) {
     fwrite(div_stub,1,602,f);
-//    fwrite(mem,4,imem,f); fwrite(loc,4,iloc,f);
-//    fclose(f);
     p=(byte*)malloc((imem+iloc)*4);
     m=(imem+iloc)*4+1024;
     q=(byte*)malloc(m);
@@ -1197,7 +1184,6 @@ free_resources();
       if (q!=NULL) free(q);
       fclose(f);
       c_error(0,0);
-      //fwrite(mem,4,imem,f); fwrite(loc,4,iloc,f);
     }
   }
 
@@ -1865,9 +1851,6 @@ void lexico(void) {
       n=(strlen((char *)ivnom.b)+ptr4)/4;
       memcpy(&mem_ory[itxt],ivnom.b,strlen((char *)ivnom.b)+1);
 
-//      fprintf(stdout,"FILE: %s\n",(char *)ivnom.b);
-//	      fprintf(stdout,"LOOKING FOR FILE: %s [%s] [%s]\n",(char *)ivnom.b,full,(char *)&tipo[8]);
-
       if ((!ivnom.b[0]!='.' && ivnom.b[1]!=0) && (ivnom.b[0]!='/' && ivnom.b[1]!=0) && strcmp("/",(char *)ivnom.b) && (f=div_open_file((char *)ivnom.b))!=NULL) {
 	      fprintf(stdout,"FOUND FILE: [%s] [%s] [%s]\n",(char *)ivnom.b,full,(char *)&tipo[8]);
 
@@ -2076,8 +2059,6 @@ int analiza_pointer_struct(int tipo, int offset, struct objeto * estructura) {
   (*ob).tipo=tipo;                // tpsgl o tpslo
   (*ob).psgl.offset=offset;       // del pointer
   (*ob).psgl.ostruct=estructura;  // struct original
-
-  // (*ob).psgl.len_item ð (*((*ob).psgl.ostruct)).len_item;
 
   return(1);
 }
@@ -4679,7 +4660,6 @@ void tglo_init2(int tipo) {
         imemptr+=4;
         imem=((memptrsize)imemptr-(memptrsize)mem+3)/4;
       }
-//      test_buffer(&mem,&imem_max,imem);
       return;
     }
 
@@ -4699,7 +4679,6 @@ void tglo_init2(int tipo) {
         imemptr+=4;
         imem=((memptrsize)imemptr-(memptrsize)mem+3)/4;
       }
-//      test_buffer(&mem,&imem_max,imem);
       lexico(); continue;
     }
 
@@ -4725,7 +4704,6 @@ void tglo_init2(int tipo) {
           if (strlen((char*)&mem_ory[valor])>(mem[imem]&0xFFFFF)+1) c_error(2,129);
           _imem=imem;
           imem+=1+((mem[imem]&0xFFFFF)+5)/4;
-//          test_buffer(&mem,&imem_max,imem);
           imemptr=(byte*)&mem[imem];
           strcpy((char*)&mem[_imem+1],(char*)&mem_ory[valor]);
           if (pieza!=p_coma) return;
@@ -4761,7 +4739,6 @@ void tglo_init2(int tipo) {
 
         imem=((memptrsize)imemptr-(memptrsize)mem+3)/4;
         mem[imem++]=valor;
-//        test_buffer(&mem,&imem_max,imem);
         imemptr=(byte*)&mem[imem];
         if (pieza!=p_coma) return;
         lexico(); continue;
@@ -4804,7 +4781,6 @@ void tglo_init2(int tipo) {
 
             imem=((memptrsize)imemptr-(memptrsize)mem+3)/4;
             mem[imem++]=valor;
-//            test_buffer(&mem,&imem_max,imem);
             imemptr=(byte*)&mem[imem];
             if (pieza!=p_coma) return;
             lexico(); continue;
@@ -4833,7 +4809,6 @@ void tglo_init2(int tipo) {
 
     if (dup>1) {
       len=imemptr-oimemptr;
-//      test_buffer(&mem,&imem_max,(((memptrsize)oimemptr-(memptrsize)mem)+len*dup+3)/4);
       while (--dup) {
         for (n=0;n<len;n++) {
 
@@ -5467,9 +5442,6 @@ int constante (void) {
     case estring:
       pila[++i]=(*e).valor; break;
 
-//    case erango:
-//      if (pila[i]<0||pila[i]>(*e).valor) c_error(4,31); break;
-
     case eoper: switch((*e).token) {
       case p_or: pila[i-1]|=pila[i]; i--; break;
       case p_xor: pila[i-1]^=pila[i]; i--; break;
@@ -5489,8 +5461,6 @@ int constante (void) {
 
 // Creo que se quit¢ los pointer (y los rangos, por consiguiente) por los FROM,
 // ya que provocaba confusion el tomar como constante una variable ...
-
-//      case p_pointer: pila[i]=mem[pila[i]]; break;
 
       case p_not: pila[i]^=-1; break;
       case p_shr: pila[i-1]>>=pila[i]; i--; break;
@@ -7310,7 +7280,6 @@ FILE * open_multi(char *file, char *mode) {
   }
 
   strcpy(full,(char*)file); // full filename
-//fprintf(stdout,"Trying to open %s\n",file);
   if ( f = fpopen(full))
     return f;
 
@@ -7442,15 +7411,7 @@ void compilar2(void) {
     compilado=1; mouse_graf=3; numero_error=-1;
     comp();
     if (numero_error>=0) {
-      //      strcpy(e_msg,texto[207]);
-      //      itoa(numero_error,e_msg+strlen(e_msg),10);
-//      if (numero_error>=10) {
         get_error(500+numero_error);
-      //        strcat(e_msg,texto[208]);
-      //        itoa(linea_error,e_msg+strlen(e_msg),10);
-//      }
-      //      strcat(e_msg,".");
-      //      mensaje_compilacion(e_msg);
       mensaje_compilacion(cerror);
     } else {
       mensaje_compilacion(texto[202]);
@@ -7513,8 +7474,6 @@ void g2(int op, int pa) {
 int optimizado;
 
 void gen(int param, int op, int pa) {
-//  int n;
-
   optimizado=0;
 
   switch(op) {

@@ -4,8 +4,6 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-//#include <mem.h>
-//#include <io.h>
 #include <fcntl.h>
 #include "judas.h"
 #include "osdep.h"
@@ -16,12 +14,6 @@ extern unsigned char judas_initialized;
 extern void safemixer(void *address, int length);
 
 int JudasProgressRead(int handle, void *buffer, int size);
-
-/*
-#define max_textos 2048
-int Progress(char *titulo,int current,int total);
-extern char *texto[max_textos];
-*/
 
 #pragma pack (push, 1);
 typedef struct
@@ -165,7 +157,6 @@ SoundInfo *judas_loadwav(char *name)
         WAV_HEADER header;
         unsigned char *SI_aux;
         SoundInfo *SI=NULL;
-//      int con, pasos, resto;
 
         if((SI_aux=(char *)malloc(sizeof(SoundInfo)))==NULL) return(SI);
         SI=(SoundInfo *)SI_aux;
@@ -178,12 +169,7 @@ SoundInfo *judas_loadwav(char *name)
 
         /* Don't waste memory if Nosound */
         judas_error = JUDAS_OK;
-/*
-        if (judas_device == DEV_NOSOUND)
-        {
-                return(SI);
-        }
-*/
+
         /*
          * Try to open
          */
@@ -484,7 +470,6 @@ SoundInfo *judas_loadwav_mem(unsigned char *FileBuffer)
         WAV_HEADER header;
         unsigned char *SI_aux;
         SoundInfo *SI=NULL;
-//      int con, pasos, resto;
         int FilePos=0;
 
         if((SI_aux=(char *)malloc(sizeof(SoundInfo)))==NULL) return(SI);
@@ -498,12 +483,7 @@ SoundInfo *judas_loadwav_mem(unsigned char *FileBuffer)
 
         /* Don't waste memory if Nosound */
         judas_error = JUDAS_OK;
-/*
-        if (judas_device == DEV_NOSOUND)
-        {
-                return(SI);
-        }
-*/
+
         /*
          * Read identification
          */

@@ -22,15 +22,10 @@ extern short CDPlaying;
 
 // M3D_info removed (MODE8/3D map editor deleted)
 
-// extern char FontPathName[256];
-// extern char FontName[14];
-
 extern char Load_FontPathName[256];
 extern char Load_FontName[14];
 
-// extern char Nombres[256][15];
-
-//extern 
+//extern
 struct _calc {
   char ctext[128];
   char cget[128];
@@ -69,119 +64,6 @@ int getFileCreationTime(char *path) {
 }
 
 
-/*
-
-void New_DownLoad_Desktop() {
-  char cwork[256];
-  int iWork,x,numvent=0,n;
-  int man,mal;
-  pcminfo *mypcminfo;
-
-  DaniDel("desk\\window.000"); // Borra la sesi¢n anterior
-
-  // Graba window.000 con la informaci¢n general de la sesi¢n
-
-  if ((desktop=fopen("desk\\window.000","wb"))==NULL) return;
-  n=fwrite(&n,1,4,desktop);
-  iWork=Setupfile.Vid_modeAlto+Setupfile.Vid_modeAncho*10000+(Setupfile.Vid_modeBig<<31);
-  n+=fwrite(&iWork,1,4,desktop);
-  n+=fwrite(&numvent,1,4,desktop);
-  n+=fwrite(dac,1,768,desktop);
-  n+=fwrite(ghost,1,65536,desktop);
-  fseek(desktop,0,SEEK_SET); fwrite(&n,1,4,desktop); fclose(desktop);
-
-  for(x=max_windows;x>=0;x--) if(ventana[x].tipo!=0) {
-
-    sprintf(cwork,"desk\\window.%03d",++numvent);
-    if ((desktop=fopen(cwork,"wb"))==NULL) continue;
-    n=fwrite(&n,1,4,desktop);
-    n+=fwrite(&ventana[x],1,sizeof(struct tventana),desktop);
-
-    switch(ventana[x].tipo) { // Estructura de ventana
-      case    2: //menu
-              iWork=-1;
-              if(ventana[x].paint_handler==menu_principal1) iWork=0;
-              if(ventana[x].paint_handler==menu_programas1) iWork=1;
-              if(ventana[x].paint_handler==menu_paletas1) iWork=2;
-              if(ventana[x].paint_handler==menu_mapas1) iWork=3;
-              if(ventana[x].paint_handler==menu_graficos1) iWork=4;
-              if(ventana[x].paint_handler==menu_fuentes1) iWork=5;
-              if(ventana[x].paint_handler==menu_sonidos1) iWork=6;
-              if(ventana[x].paint_handler==menu_sistema1) iWork=7;
-              if(ventana[x].paint_handler==menu_edicion1) iWork=8;
-              n+=fwrite(&iWork,1,4,desktop);
-              break;
-      case    3: //palet
-              break;
-      case    4: //timer
-              // removed: CD player (CDiv1)
-              if(ventana[x].paint_handler==Clock1) iWork=1;
-              n+=fwrite(&iWork,1,4,desktop);
-              break;
-      case    5: //papelera
-              break;
-      case    100: //map
-              // estructura tmapa
-              man=ventana[x].mapa->map_an;
-              mal=ventana[x].mapa->map_al;
-              n+=fwrite(ventana[x].mapa,1,sizeof(struct tmapa),desktop);
-              // Grafico
-              n+=fwrite((char *)ventana[x].mapa->map,1,man*mal,desktop);
-              break;
-      case    101: //fpg
-              // estructura fpg
-              n+=fwrite(ventana[x].aux,1,sizeof(FPG),desktop);
-              break;
-      case    102: //prg
-              if(ventana[x].prg!=NULL) {
-                iWork=0;
-                n+=fwrite(&iWork,1,4,desktop);
-                n+=fwrite(ventana[x].prg,1,sizeof(struct tprg),desktop);
-                n+=fwrite(ventana[x].prg->buffer,1,ventana[x].prg->buffer_lon,desktop);
-                iWork=(memptrsize)ventana[x].prg->lptr-(memptrsize)ventana[x].prg->buffer;
-                n+=fwrite(&iWork,1,4,desktop);
-                iWork=(memptrsize)ventana[x].prg->vptr-(memptrsize)ventana[x].prg->buffer;
-                n+=fwrite(&iWork,1,4,desktop);
-              } else {
-                if (!strcmp(ventana[x].nombre,texto[83])) {
-                  iWork=1;
-                  n+=fwrite(&iWork,1,4,desktop);
-                  n=Save_Font_session(desktop,n);
-                } else {
-                  iWork=2;
-                  n+=fwrite(&iWork,1,4,desktop);
-                  n+=fwrite(&help_item,1,4,desktop);
-                  n+=fwrite(&help_al,1,4,desktop);
-                  n+=fwrite(&help_l,1,4,desktop);
-                }
-              }
-              break;
-      case    104: //fnt
-              n+=fwrite(ventana[x].aux,1,14,desktop);
-              n+=fwrite(ventana[x].aux+14,1,_MAX_PATH-14,desktop);
-              break;
-
-       case   105: //pcm
-              mypcminfo=(pcminfo *)ventana[x].aux;
-              n+=fwrite(mypcminfo->name,1,14,desktop);
-              n+=fwrite(mypcminfo->pathname,1,256,desktop);
-              break;
-    }
-
-    fseek(desktop,0,SEEK_SET); fwrite(&n,1,4,desktop); fclose(desktop);
-
-  }
-
-  if ((desktop=fopen("desk\\window.000","rb+"))==NULL) { DaniDel("desk\\window.000"); return; }
-  fseek(desktop,4+4,SEEK_SET);
-  fwrite(&numvent,1,4,desktop);
-  fclose(desktop);
-}
-
-*/
-
-//#define SLST
-
 void DownLoad_Desktop()
 {
 int iWork,x,numvent=0,n;
@@ -189,40 +71,18 @@ int man,mal;
 pcminfo *mypcminfo;
 modinfo *mymodinfo;
 
-#ifdef SLST
-  FILE * lst;
-  lst=fopen("session.lst","wt");
-  fprintf(lst,"sizeof(struct tventana)=%d\n",sizeof(struct tventana));
-  fprintf(lst,"vid_mode=%d,vid_modebig=%d\n",Setupfile.Vid_mode,Setupfile.Vid_modeBig);
-fflush(lst);
-#endif
         // Pone una cabecera de identificaci¢n
         desktop=fopen("system/session.dtf","wb");
         n=fwrite("dtf\x1a\x0d\x0a\x0",8,1,desktop);
-#ifdef SLST
-        fprintf(lst,"header %d elementos escritos <<<\n",n);
-#endif
         // guarda la antigua resoluci¢n
         iWork=Setupfile.Vid_modeAlto+Setupfile.Vid_modeAncho*10000+(Setupfile.Vid_modeBig<<31);
         n=fwrite(&iWork,1,4,desktop);
-#ifdef SLST        
-        fprintf(lst,"resol %d elementos escritos <<<\n",n);
-#endif
         // reserva espacio para el numero de ventanas
         n=fwrite(&numvent,1,4,desktop);
-#ifdef SLST
-        fprintf(lst,"numvent %d elementos escritos <<<\n",n);
-#endif
         // guarda paleta /4
         n=fwrite(dac,768,1,desktop);
-#ifdef SLST
-        fprintf(lst,"dac %d elementos escritos <<<\n",n);
-#endif
         // guarda tabla ghost
         n=fwrite(ghost,65536,1,desktop);
-#ifdef SLST
-        fprintf(lst,"ghost %d elementos escritos <<<\n",n);
-#endif
         // Mira y guarda una por una las ventanas utilizadas
         for(x=max_windows-1;x>=0;x--)
         {
@@ -230,13 +90,6 @@ fflush(lst);
                 {
                         numvent++;
                         n=fwrite(&ventana[x],1,sizeof(struct tventana),desktop);
-#ifdef SLST
-                        fprintf(lst,"v %d elementos escritos <<<\n",n);
-						if(ventana[x].tipo < 107)
-							fprintf(lst,"Ventana %d \"%s\" (tipo %d)\n",x,ventana[x].titulo,ventana[x].tipo);
-
-                        fprintf(lst,"  primer_plano=%d, (%d,%d,%d,%d)\n",ventana[x].primer_plano,ventana[x].x,ventana[x].y,ventana[x].an,ventana[x].al);
-#endif
                         switch(ventana[x].tipo)
                         {
                                 //Estructura de ventana
@@ -261,76 +114,43 @@ fflush(lst);
                                         if(ventana[x].paint_handler==menu_edicion1)
                                                         iWork=8;
                                         // menu_mapas3D1 check removed (MODE8/3D map editor deleted)
-#ifdef SLST
-                                        fprintf(lst,"  menu tipo %d\n",iWork);
-                                        fprintf(lst,"tipomenu %d elementos escritos <<<\n",n);
-#endif
                                         n=fwrite(&iWork,1,4,desktop);
                                         
                                         break;
                                 case    3: //palet
-#ifdef SLST                                
-                                        fprintf(lst,"  paleta\n");
-#endif
                                         break;
                                 case    4: //timer
                                         if(ventana[x].paint_handler==Clock1)
                                                 iWork=1;
                                         n=fwrite(&iWork,1,4,desktop);
-#ifdef SLST
-                                        fprintf(lst,"cdivorclock %d elementos escritos <<<\n",n);
-
-                                        if (iWork) 
-                                            fprintf(lst,"  reloj\n"); 
-                                        else 
-                                            fprintf(lst,"  cdiv\n");
-#endif
                                         break;
                                 case    5: //papelera
-#ifdef SLST
-                                        fprintf(lst,"  papelera\n");
-#endif
                                         break;
                                 case    8: //mixer
-#ifdef SLST
-                                        fprintf(lst,"  mixer\n");
-#endif
                                         break;
                                 case    100: //map
                                         // estructura tmapa
                                         man=ventana[x].mapa->map_an;
                                         mal=ventana[x].mapa->map_al;
                                         n=fwrite(ventana[x].mapa,1,sizeof(struct tmapa),desktop);
-
-                                        // fprintf(lst,"tmapa %d elementos escritos <<<\n",n);
                                         // Grafico
                                         n=fwrite((char *)ventana[x].mapa->map,man*mal,1,desktop);
-                                        // fprintf(lst,"mapa %d elementos escritos <<<\n",n);
-                                        // fprintf(lst,"  mapa %dx%d\n",man,mal);
                                         break;
                                 case    101: //fpg
                                         // estructura fpg
                                         n=fwrite(ventana[x].aux,1,sizeof(FPG),desktop);
-                                        // fprintf(lst,"fpg %d elementos escritos <<<\n",n);
-                                        // fprintf(lst,"  fpg\n");
                                         break;
                                 case    102: //prg
                                         if(ventana[x].prg!=NULL)
                                         {
                                                 iWork=0;
                                                 n=fwrite(&iWork,1,4,desktop);
-                                                // fprintf(lst,"tipoprg %d elementos escritos <<<\n",n);
                                                 n=fwrite(ventana[x].prg,1,sizeof(struct tprg),desktop);
-                                                // fprintf(lst,"tprg %d elementos escritos <<<\n",n);
                                                 n=fwrite(ventana[x].prg->buffer,1,ventana[x].prg->buffer_lon,desktop);
-                                                // fprintf(lst,"buffer %d elementos escritos <<<\n",n);
                                                 iWork=(memptrsize)ventana[x].prg->lptr-(memptrsize)ventana[x].prg->buffer;
                                                 n=fwrite(&iWork,1,4,desktop);
-                                                // fprintf(lst,"offset lptr %d elementos escritos <<<\n",n);
                                                 iWork=(memptrsize)ventana[x].prg->vptr-(memptrsize)ventana[x].prg->buffer;
                                                 n=fwrite(&iWork,1,4,desktop);
-                                                // fprintf(lst,"offset vptr %d elementos escritos <<<\n",n);
-                                                // fprintf(lst,"  programa\n");
                                         }
                                         else
                                         {
@@ -338,9 +158,7 @@ fflush(lst);
                                                 if (!strcmp((char *)ventana[x].nombre,(char *)texto[83])) {
                                                         iWork=1;
                                                         n=fwrite(&iWork,1,4,desktop);
-                                                        // fprintf(lst,"tipo fontgen %d elementos escritos <<<\n",n);
                                                         iWork=Save_Font_session(desktop,iWork);
-                                                        // fprintf(lst,"  font generator\n");
                                                 } else if (!strcmp((char *)ventana[x].nombre,(char *)texto[413])) {
                                                   iWork=3;
                                                   n=fwrite(&iWork,1,4,desktop);
@@ -349,24 +167,16 @@ fflush(lst);
                                                 } else {
                                                         iWork=2;
                                                         n=fwrite(&iWork,1,4,desktop);
-                                                        // fprintf(lst,"tipo help %d elementos escritos <<<\n",n);
                                                         n=fwrite(&help_item,1,4,desktop);
-                                                        // fprintf(lst,"help_item %d elementos escritos <<<\n",n);
                                                         n=fwrite(&help_al,1,4,desktop);
-                                                        // fprintf(lst,"help_al %d elementos escritos <<<\n",n);
                                                         n=fwrite(&help_l,1,4,desktop);
-                                                        // fprintf(lst,"help_l %d elementos escritos <<<\n",n);
-                                                        // fprintf(lst,"  help\n");
                                                 }
                                         }
                                         break;
                                 case    104: //fnt
                                         // Descargarse
                                         n=fwrite(ventana[x].aux,1,14,desktop);
-                                        // fprintf(lst,"filename %d elementos escritos <<<\n",n);
                                         n=fwrite(ventana[x].aux+14,1,_MAX_PATH-14,desktop);
-                                        // fprintf(lst,"path %d elementos escritos <<<\n",n);
-                                        // fprintf(lst,"  font\n");
                                         break;
 #ifdef NOTYET
                                  case    105: //pcm
@@ -404,10 +214,6 @@ fflush(lst);
         fseek(desktop,0,SEEK_SET);
         fseek(desktop,8+4,SEEK_SET);
         n=fwrite(&numvent,1,4,desktop);
-#ifdef SLST
-        fprintf(lst,"numvent %d elementos escritos <<<\n",n);
-		fclose(lst);
-#endif
         fclose(desktop);
 }
 
@@ -459,7 +265,6 @@ int UpLoad_Desktop()
                 return(0);
 		
 		
-	//	printf("loading saved session\n");
         fseek(desktop,8+4,SEEK_SET);
         fread(&numvent,1,4,desktop);
         fseek(desktop,8+4+4+768+65536,SEEK_SET);
@@ -567,7 +372,6 @@ int UpLoad_Desktop()
                                 memcpy((char *)v.mapa->descripcion,(char *)maux.descripcion,32);
                                 memcpy((char *)v.mapa->puntos,(char *)maux.puntos,512*2);
                                 // Grafico
-                                // fread(v.mapa->map,maux.map_an,maux.map_al,desktop);
                                 call((voidReturnType )v.paint_handler);
                                 wvolcado(copia,vga_an,vga_al,v.ptr,v.x,v.y,v.an,v.al,0);
                                 if(!Interpretando)
@@ -617,9 +421,7 @@ int UpLoad_Desktop()
 
 										if(dtime < getFileCreationTime(&pathtmp[0])) {
 											v_titulo=v_prg->filename;
-											//(char *)texto[75];
 											v_texto="File on disk is newer, reload?";
-											//(char *)texto[76];
 											dialogo(aceptar0);
 
 											if(v_aceptar) {
@@ -737,14 +539,6 @@ int nueva_ventana_carga(voidReturnType init_handler,int nx,int ny)
 	uint32_t colorkey=0;
 
   if (!ventana[max_windows-1].tipo) {
-/*
-    if (v.tipo)
-    {
-      wmouse_x=-1; wmouse_y=-1; m=mouse_b; mouse_b=0;
-      call(v.click_handler); mouse_b=m;
-      if (v.volcar) { vuelca_ventana(0); v.volcar=0; }
-    }
-*/
     addwindow();
 
     //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
@@ -781,14 +575,6 @@ int nueva_ventana_carga(voidReturnType init_handler,int nx,int ny)
     //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
     // Algoritmo de emplazamiento de ventanas ...
     //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-/*
-    if (v.tipo==1)
-    { // Los di logos se colocan en el centro
-        x=vga_an/2-an/2;
-        y=vga_al/2-al/2;
-    }
-    else
-*/
 
     if(!VidModeChanged) { x=nx; y=ny; } else emplazar(v.lado*2+1,&x,&y,an,al);
 
@@ -820,30 +606,11 @@ int nueva_ventana_carga(voidReturnType init_handler,int nx,int ny)
     //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
     // Comprueba que si se trata de un men£ no este ya generado
     //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-/*
-    n=0; if (v.tipo==2 || v.tipo==3 || v.tipo==4) {
-      for (m=1;m<max_windows;m++)
-        if (ventana[m].tipo==2 || ventana[m].tipo==3 || ventana[m].tipo==4)
-          if (ventana[m].click_handler==v.click_handler) n=m;
-    }
-
-    if (!n)
-*/
     if ((ptr=(byte *)malloc(an*al))!=NULL) { // Ventana, free en cierra_ventana
 
       //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
       // Pasa a segundo plano las ventanas que corresponda
       //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-/*
-      if (v.tipo==1) { // Los di logos cierran todas las ventanas
-        if (ventana[1].tipo==1) { // Di logo sobre di logo
-          ventana[1].primer_plano=0; vuelca_ventana(1);
-        } else for (n=1;n<max_windows;n++)
-          if (ventana[n].tipo && ventana[n].primer_plano==1) {
-            hiden[n-1]=1; ventana[n].primer_plano=0; vuelca_ventana(n);
-          } else hiden[n-1]=0;
-      } else {
-*/
         vtipo=v.tipo; v.tipo=0;
 
         if(!VidModeChanged) {
@@ -868,9 +635,6 @@ int nueva_ventana_carga(voidReturnType init_handler,int nx,int ny)
           }
         }
         v.tipo=vtipo;
-/*
-      }
-*/
 
       //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
       // Inicializa la ventana
@@ -881,9 +645,7 @@ int nueva_ventana_carga(voidReturnType init_handler,int nx,int ny)
 		window_surface(an,al,0);
 		
       memset(ptr,c0,an*al); if (big) { an/=2; al/=2; }
-//		SDL_FillRect(v.surfaceptr,NULL,SDL_MapRGB( v.surfaceptr->format, 0, 0, 0 ));
 
-		      
       wrectangulo(ptr,an,al,c2,0,0,an,al);
 
       wput(ptr,an,al,an-9,2,35);
@@ -900,9 +662,6 @@ int nueva_ventana_carga(voidReturnType init_handler,int nx,int ny)
 
       call((voidReturnType )v.paint_handler);
 
-/*
-      do { read_mouse(); } while((mouse_b&1) || key(_ESC));
-*/
       if(!VidModeChanged) {
         v.primer_plano=ventana_aux.primer_plano;
         v.estado=ventana_aux.estado;

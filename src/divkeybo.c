@@ -9,13 +9,6 @@
 //ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
 // IRQ Data
 //ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
-/*
-typedef void (__interrupt __far *TIRQHandler)(void);
-
-TIRQHandler OldIrqHandler;
-TIRQHandler OldIrq23;
-TIRQHandler OldIrq1b;
-*/
 byte * shift = (byte *) 0x417; // Shift status
 
 byte buf[64*3]; // {ascii,scan_code,shift_status}
@@ -53,8 +46,6 @@ void __far __interrupt __loadds IrqHandler(void)
     } else {
       n=128; do { kbdFLAGS[--n]=0; } while (n);
     }
-
-//    if (kbhit()) getch();
 
     OldIrqHandler();
 
@@ -132,77 +123,6 @@ extern int reloj;
 void tecla(void) {
 mclock = SDL_GetTicks()/100;//(int)clock()/20000;
 reloj = SDL_GetTicks()/100;//(int)clock();
-
-//printf("%d %d\n",mclock,reloj);
-
-//mclock++;
-#ifdef NOTYET
-//printf("Reading keyboard\n");
-    ascii=0; scan_code=0;
-
-SDL_Event event;
-while(SDL_PollEvent(&event))
-        {
-			
-
-			
-            /* If a quit event has been sent */
-            if (event.type == SDL_QUIT)
-            {
-                /* Quit the application */
-                salir_del_entorno=1;
-            }
-            
-            if (event.type == SDL_KEYDOWN)
-            {
-				printf("key pressed\n");
-#ifndef DROID
-				scan_code = osdep_key[event.key.keysym.unicode];
-#endif
-				kbgFlags[scan_code]=1;
-			}
-			if(event.type == SDL_KEYUP) 
-			{
-				scan_code = osdep_key[event.key.keysym.sym];
-				//scan_code = event.key.keysym.scancode;
-				kbdFLAGS[scan_code]=0;
-				scan_code=0;
-			}
-			  if (event.type == SDL_MOUSEMOTION)
-            {
-				m_x+=event.motion.xrel;
-				m_y+=event.motion.yrel;
-			}
-            /* If a button on the mouse is pressed. */
-            if (event.type == SDL_MOUSEBUTTONDOWN)
-            {
-	//			m_b = 1;
-			}
-			
-			if (event.type == SDL_MOUSEBUTTONUP)
-            {
-//				m_b = 0;
-			}
-			
-        }
-
-
-  union REGS r;
-  struct SREGS s;
-
-  tecla_bios();
-
-  if (ibuf!=fbuf) {
-    ascii=buf[ibuf]; scan_code=buf[ibuf+1]; shift_status=buf[ibuf+2];
-    if ((ibuf+=3)==64*3) ibuf=0;
-  } else {
-    ascii=0; scan_code=0;
-    s.ds=s.es=s.fs=s.gs=FP_SEG(&s);
-    r.h.ah=2; int386x(0x16,&r,&r,&s); shift_status=r.h.al;
-  }
-
-#endif
-
 }
 
 //ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ

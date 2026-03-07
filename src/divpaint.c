@@ -57,8 +57,6 @@ void vuelca_barra(byte * p, int real_an, int x, int y, int an, int al) ;
 void vuelca_barra_oscurecida(byte * p, int real_an, int x, int y, int an, int al);
 
 
-
-
 //ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
 //      Barras de herramientas del programa de dibujo
 //ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
@@ -235,8 +233,6 @@ void edit_mode_0(void) {
         *(map+coord_x+coord_y*map_an)=0;
       }
     }
-
-// if ((mouse_b&1) && selected_icon==1) {nueva_barra(64,96);}
 
     if (((mouse_b&1) && selected_icon==1) || (scan_code==14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
       undo_back(); do {read_mouse();} while(mouse_b&1);
@@ -566,12 +562,6 @@ void edit_mode_5(void) {
       case 2:
         if (mouse_graf>=10) {
           y0=sqrt(abs(coord_x-x1)*abs(coord_x-x1)+abs(coord_y-y1)*abs(coord_y-y1));
-
-          // OJO, esto se puede poner a gusto del consumidor
-
-          // y0=y0/2; if (y0>32) y0=32;
-          // y0=y0/2;
-          // y0=16; if (y0>32) y0=16+(y0-32)/2;
 
           if (key(0xd) || key (0x4e)) tension++;
           if (key(0xc) || key (0x4a) && tension) tension--;
@@ -994,10 +984,6 @@ void edit_mode_10(void) {
 
       case 2: case 3:
 
-//        if ((mouse_b&1) && selected_icon==12) { // *** Delete, borra selecci¢n
-//          box2mab(); mab_delete(); do {read_mouse();} while(mouse_b&1);
-//        }
-
         if ((mouse_b&1) && selected_icon==12) { // *** Mover, Copiar, ...
           do {read_mouse();} while(mouse_b&1);
           sel_status=0; box2mab(); mover(NULL,0,0);
@@ -1136,7 +1122,6 @@ void test_siguiente(void) {
   // Zona a refrescar calculada
 
   cclock=(*system_clock)>>1;
-//	  printf("%d %d\n",cclock, system_clock);
 }
 
 void test_sel(void) {
@@ -1501,8 +1486,6 @@ void mab_line(int x0, int y0, int x1, int y1) {
   if (y0>y1) {y=y1; dy=y0-y1;} else {y=y0; dy=y1-y0;}
 
   if (!dx && !dy) set_mab(x0,y0); else {
-
-//    set_mab(x0,y0);
 
     if (dy<=dx) {
       if (x0>x1) { set_mab(x1,y1); x0--; swap(x0,x1); swap(y0,y1); }
@@ -3303,7 +3286,6 @@ void dibuja_regla_seleccion(byte * p, int c, int d, int x, int y) {
     case 8: wwrite(p,c,d,x+128+48,y+8,1,texto[319],c3); break;
   }
 
-  //write(barra_an-21,6,0,num)***
 }
 
 //ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
@@ -3968,7 +3950,6 @@ void pinta_ventana_mascara(byte * p,int c,int d) {
 //ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
 //      Selecci¢n de un color de la paleta, desde una barra de edici¢n
 //ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
-//Find: SCO
 
 #define max_texturas 1000
 #define an_textura   (3+1) // 000 - 999
@@ -4768,11 +4749,7 @@ void dibuja_barra(int _an) {
   barra_an=2+8+38+n*16+1+_an;
   memset(barra,c0,vga_an*19*big2);
   wrectangulo(barra,vga_an/big2,19,c2,0,0,barra_an,19);
-//  for (a=0;a<barra_an;a++) { barra[a]=c2; barra[a+vga_an*18]=c2; }
-//  for (a=1;a<18;a++) { barra[a*vga_an]=c2; barra[a*vga_an+barra_an-1]=c2; }
   wgra(barra,vga_an/big2,19,c_b_low,2,2,7,7);
-
-//**** OJO ****
 
   put_barra(2,10,35);
   n=0; while (bar[n]) {
@@ -4831,7 +4808,6 @@ void anal_barra(int an, int al) {
   byte * p;
   byte num[5];
 
-//  for (p=barra+617+barra_an;p<barra+320*17;p+=320) memset(p,c2,21);
   wbox(barra,vga_an/big2,vga_al,c2,barra_an-23,2,21,15);
 
   p=copia; copia=barra; text_color=c4; num[4]=0;
@@ -4871,100 +4847,6 @@ int nueva_barra(int an, int al) {
 
   return(0);
 }
-
-/*
-int select_icon(int icono_x,int * iconos) {
-
-  int a,b,c,d;
-  int num,col,fil;
-  int r=-1,ix,iy;
-  byte * p;
-
-  if (mouse_in(icono_x,barra_y+2,icono_x+15,barra_y+17) && (mouse_b&1)) {
-
-    num=*iconos++; col=*iconos++; fil=(num+col-1)/col;
-    c=(col*16+3)*big2; d=(fil*16+11)*big2;
-    if ((p=(byte*)malloc(c*d))==NULL) {
-      v_texto=(char *)texto[45]; dialogo(err0); return(-1); }
-
-    volcar_barras(0);
-
-    a=barra_x+(icono_x-barra_x)*big2-(col-1)*8*big2-2*big2;
-    if (barra_y>vga_al/2-9*big2) b=barra_y-d-1; else b=barra_y+19*big2+1;
-    if (a<barra_x) a=barra_x;
-    if (a+c>barra_x+barra_an*big2) a=barra_x+barra_an*big2-c;
-    ajusta_caja(&a,&b,&c,&d); c/=big2; d/=big2;
-    do {read_mouse();} while (mouse_b&1);
-
-    do {
-      read_mouse(); test_mouse_box(a,b,c,d);
-
-      wrectangulo(p,c,d,c2,0,0,c,d);
-      wbox(p,c,d,c0,1,1,c-2,d-2);
-      wgra(p,c,d,c_b_low,2,2,c-12,7);
-      wput(p,c,d,c-9,2,35);
-
-      r=0; while (r<num) {
-        wput(p,c,d,2+(r%col)*16,10+(r/col)*16,*iconos++); r++;
-      } iconos-=num;
-
-      if (mouse_in(a+2,b+10,a+c-2,b+d-2)) {
-        r=((mouse_y-b-10)/16)*col+(mouse_x-a-2)/16;
-        ix=2+(r%col)*16; iy=10+(r/col)*16;
-        wresalta_box(p,c,d,ix,iy,15,15);
-      } else if (mouse_in(a+2,b+2,a+c-10,b+9)) {
-        ix=mouse_shift_x-a; iy=mouse_shift_y-b;
-        wrectangulo(p,c,d,c4,0,0,c,d);
-        while (mouse_b&1) {
-          salvaguarda(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,0);
-          put(mouse_shift_x,mouse_shift_y,mouse_graf);
-          volcado(copia);
-          salvaguarda(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,1);
-      	  fondo_edicion(a,b,c*big2,d*big2);
-          volcar_barras(0);
-          read_mouse();
-          a=mouse_shift_x-ix; b=mouse_shift_y-iy;
-          wvolcado(copia,vga_an,vga_al,p,a,b,c*big2,d*big2,0);
-          volcado_parcial(a,b,c*big2,d*big2);
-        } wrectangulo(p,c,d,c2,0,0,c,d);
-      }
-
-      wvolcado(copia,vga_an,vga_al,p,a,b,c*big2,d*big2,0);
-      volcado_parcial(a,b,c*big2,d*big2);
-
-      salvaguarda(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,0);
-      put(mouse_shift_x,mouse_shift_y,mouse_graf);
-      volcado(copia);
-      salvaguarda(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,1);
-
-    } while (!mouse_b && !key(_ESC));
-
-    if ((mouse_b&1) && mouse_in(a+2,b+10,a+c-2,b+d-2)) {
-      r=((mouse_y-b-10)/16)*col+(mouse_x-a-2)/16;
-    } else r=-1;
-
-    if (!mouse_in(barra_x,barra_y,barra_x+barra_an-1,barra_y+18) || !(mouse_b&1)
-        || mouse_in(icono_x,barra_y+2,icono_x+15,barra_y+17)) {
-      wput(p,c,d,c-9,2,-45);
-      wvolcado(copia,vga_an,vga_al,p,a,b,c*big2,d*big2,0);
-      volcado_parcial(a,b,c*big2,d*big2);
-      salvaguarda(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,0);
-      put(mouse_shift_x,mouse_shift_y,mouse_graf); volcado(copia);
-      salvaguarda(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,1);
-      do { read_mouse(); } while (mouse_b || key(_ESC));
-    }
-
-    fondo_edicion(a,b,c*big2,d*big2);
-    volcar_barras(0);
-    salvaguarda(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,0);
-    put(mouse_shift_x,mouse_shift_y,mouse_graf); volcado(copia);
-    salvaguarda(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,1);
-
-    free(p);
-  } return(r);
-
-}
-*/
 
 void volcar_barras(int oscurecidas) {
   int n;
@@ -5048,36 +4930,6 @@ void vuelca_barra_oscurecida(byte * p, int real_an, int x, int y, int an, int al
   } while (--long_y);
 }
 
-// OJO !!!
-
-/*void vuelca_barra2(byte * p, int x, int y, int an, int al) {
-
-  byte * q;
-  int salta_x, long_x, resto_x;
-  int salta_y, long_y, resto_y;
-
-  q=copia+y*320+x;
-
-  if (x<0) salta_x=-x; else salta_x=0;
-  if (x+an>320) resto_x=x+an-320; else resto_x=0;
-  long_x=an-salta_x-resto_x;
-
-  resto_x+=320-barra_an;
-
-  if (y<0) salta_y=-y; else salta_y=0;
-  if (y+al>200) resto_y=y+al-200; else resto_y=0;
-  long_y=al-salta_y-resto_y;
-
-  p+=320*salta_y+salta_x; q+=320*salta_y+salta_x;
-  resto_x+=salta_x; an=long_x;
-  do {
-    do {
-      *q=ghost[*q+*p*256]; q++; p++;
-    } while (--an);
-    q+=320-(an=long_x); p+=resto_x;
-  } while (--long_y);
-}*/
-
 //ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
 //      Pone un gr fico en la barra de edici¢n
 //ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
@@ -5086,31 +4938,6 @@ void put_barra(int x,int y,int n) {
 
   wput_in_box(barra,vga_an/big2,vga_an/big2,19,x,y,-n);
 
-/*  int al,an,ancho;
-  byte *p,*q;
-
-  p=graf[n]+8;
-
-  al=*((word*)(graf[n]+2));
-  an=*((word*)graf[n]); ancho=an;
-
-  x-=*((word*)(graf[n]+4));
-  y-=*((word*)(graf[n]+6));
-
-  q=barra+y*vga_an+x;
-
-  do {
-    do {
-      switch(*p) {
-        case 0: *q=c0; break;
-        case 1: *q=c1; break;
-        case 2: *q=c2; break;
-        case 3: *q=c3; break;
-        case 4: *q=c4; break;
-      } p++; q++;
-    } while (--an);
-    q+=vga_an-(an=ancho);
-  } while (--al); */
 }
 
 void put_barra_inv(int x,int y,int n) {
@@ -5118,32 +4945,5 @@ void put_barra_inv(int x,int y,int n) {
   wput_in_box(barra,vga_an/big2,vga_an/big2,19,x,y,-n); //*** OJO *** esto no vale
   wresalta_box(barra,vga_an/big2,19,x,y,*((word*)graf[n])/big2,*((word*)(graf[n]+2))/big2);
 
-/*  int al,an,ancho;
-  byte *p,*q,c15;
-
-  c15=media(c1,c2);
-
-  p=graf[n]+8;
-
-  al=*((word*)(graf[n]+2));
-  an=*((word*)graf[n]); ancho=an;
-
-  x-=*((word*)(graf[n]+4));
-  y-=*((word*)(graf[n]+6));
-
-  q=barra+y*vga_an+x;
-
-  do {
-    do {
-      switch(*p) {
-        case 0: *q=c4; break;
-        case 1: *q=c3; break;
-        case 2: *q=c2; break;
-        case 3: *q=c15; break;
-        case 4: *q=c0; break;
-      } p++; q++;
-    } while (--an);
-    q+=vga_an-(an=ancho);
-  } while (--al); */
 }
 

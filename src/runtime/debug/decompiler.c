@@ -17,7 +17,6 @@ byte locvar[STACK_SIZE];
 byte localvar;
 
 void getvarname(int i, char *name) {
-//fprintf(prg,"// getvarname %d iloc_len %d\n",i,iloc_len);
 
 	char mousestruct[12][10]={
 		"x","y","z","file",
@@ -75,8 +74,6 @@ void getvarname(int i, char *name) {
 		if(i>=mem[6] && i<255) {
 if(localvar==0)
 	i+=mem[5];
-// default name
-//fprintf(prg,"// getvarname %d iloc_len %d iloc %d\n",i,iloc_len,iloc);
 			sprintf(name,"var%d",i,mem[1]-1);
 
 			if(i>=iloc_len && i<=iloc_len+12) {
@@ -108,7 +105,6 @@ void printlocal(void) {
 
 	int i=mem[2]+35;
 
-//	if(i<mem[7]-36)
 		fprintf(prg,"LOCAL\n");
 
 	while(i<mem[7]) {
@@ -116,10 +112,7 @@ void printlocal(void) {
 		i++;
 	}
 
-//	fprintf(prg,"BEGIN\n");
 }
-
-
 
 
 void dump(int size) {
@@ -211,11 +204,7 @@ while(i++<mem[7]-36) {
     case lrng: fprintf(sta,"%5u\trng %u",i,mem[i+1]); i++; break;
     case ljmp: 
 		fprintf(sta,"%5u\tjmp %u",i,mem[i+1]); 
-//		if(mem[i+1]<i) {
-//			printf("jump %d %d\n",i,mem[i+1]);
 			jmp[mem[i+1]]++;
-//			j++;
-//		}
 		i++; 
 		break;
     case ljpf: 
@@ -223,7 +212,6 @@ while(i++<mem[7]-36) {
 		if(mem[i+1]<i) {
 				printf("jump backward %d %d\n",i,mem[i+1]);
 			jpb[mem[i+1]]++;
-//			f++;
 		} else {
 			printf("jump forward %d %d\n",i,mem[i+1]);
 			jpf[mem[i+1]]++;
@@ -239,7 +227,6 @@ while(i++<mem[7]-36) {
 		break;
     case lfun: 
 		fprintf(sta,"%5u\tfun %u stack: %d",i,mem[i+1],sp); 
-//			printf("func %d\n",mem[i+1]);
 		switch(mem[i+1]) {
 			case 2: // load_pal
 			case 3: // load_fpg
@@ -263,8 +250,6 @@ while(i++<mem[7]-36) {
 			}
 
 			break;
-//			default:
-//				printf("called func %d\n",mem[i]);
 		}
 		i++; 		
 		break;
@@ -272,7 +257,6 @@ while(i++<mem[7]-36) {
     case lret: fprintf(sta,"%5u\tret",i); break;
     case lasp: 
 		fprintf(sta,"%5u\tasp",i); 
-//		printf("LASP: %d\n",i);
 		break;
     case lfrm: fprintf(sta,"%5u\tfrm",i); break;
     case lcbp: fprintf(sta,"%5u\tcbp %u",i,mem[i+1]); i++; break;
@@ -319,7 +303,6 @@ f=0;
 
 i=mem[1]-1;
 	while (i++<mem[2]-1) { 
-//		printf("%d:%5u\n",i,mem[i]); 
 		fprintf(sta,"\n");
 
 		if(end[i]>0) {
@@ -336,7 +319,6 @@ i=mem[1]-1;
 		}
 
 		if(jmp[i] || jpb[i] || jpf[i]) {
-//			fprintf(prg,"// i: %d jmp %d jpb %d jpf: %d\n",i,jmp[i],jpb[i],jpf[i]);
 		
 			if(jmp[i]>0) {
 				fprintf(prg,"\nLOOP // %d %d\n\n",i,jmp[i]);
@@ -346,15 +328,6 @@ i=mem[1]-1;
 				fprintf(prg,"\nREPEAT // %d %d\n",i,jpb[i]);
 			} else {
 		}
-/*			if(jpf[i]>0) {
-				while(jpf[i]>0) {
-					fprintf(prg,"END // %d %d\n\n",i,jpf[i]);
-					jpf[i]--;
-				}
-			}
-			* */
-				
-		
 	}
 	
 		switch ((byte)mem[i]) {
@@ -367,12 +340,9 @@ i=mem[1]-1;
 			// load val to stack
     case lcar: 
 		fprintf(sta,"%5u\tcar %d",i,mem[i+1]); 
-//		fprintf(prg,"// sp: %d %d\n",sp,mem[i+1]);
 		stack[sp]=mem[i+1];
 		sprintf(cstack[sp],"%d%c",mem[i+1],0);
-//		memset(cmd,0,255);
 		strcpy(cmd,cstack[sp]);
-//		fprintf(prg,"// GLOBAL VAR %s\n",cmd);
 		stp[sp]=0; // not a pointer
 		locvar[sp]=0; // not a local
 		sp++;
@@ -380,63 +350,8 @@ i=mem[1]-1;
 		break;
     case lasi: 
 		fprintf(sta,"%5u\tasi",i); 
-//		fprintf(prg,"// lasi: %d %d [%s] [%s]\n",sp,i,cmd,cstack[sp-2]);
-//		fflush(prg);
 		if(strlen(cmd)>0 && sp>1) {
-//			fprintf(prg,"// cmd blank, filling with %s\n",cstack[sp-1]);
-//			sprintf(cmd,"%s",cstack[sp-1]);
-//		}
-/*		
-local struct reserved[0]
-        process_id     // Identificador del proceso
-        id_scan        // Para scanear procesos (colisiones)
-        process_type   // Tipo de proceso
-        type_scan      // Para scanear procesos por tipo
-        status         // Estado actual de este proceso
-        param_offset   // Puntero a los par metros pasados
-        program_index  // Contador de programa para este proceso
-        is_executed    // Indica si el proceso ya ha sido ejecutado
-        is_painted     // Indica si el proceso ya ha sido pintado
-        distance_1     // Distancia 1 del proceso (reservado modo 7)
-        distance_2     // Distancia 2 del proceso (idem)
-        frame_percent  // Porcentaje de frame recorrido
-        box_x0         // Caja ocupada por el sprite cada
-        box_y0         // vez que se pinta para realizar
-        box_x1         // volcado y restauraci¢n de fondo
-        box_y1         // parcial (dump_type==partial_dump)
-end
-
-local father=0          // Identificador del padre
-local son=0             // Identificador del £ltimo hijo
-local smallbro=0        // Identificador del hermano menor
-local bigbro=0          // Identificador del hermano mayor
-local priority=0        // Prioridad de proceso (a mayor se procesa antes)
-local ctype=0           // Tipo de coordenada
-local x=0               // Coordenada X
-local y=0               // Coordenada Y
-local z=0               // Prioridad de impresi¢n del gr fico
-local graph=0           // C¢digo del gr fico para este proceso
-local flags=0           // +1 iversi¢n horiz., +2 inversion vert., +4 Ghost
-local size=100          // Tama¤o del proceso (en tanto por ciento)
-local angle=0           // Angulo del proceso
-local region=0          // Regi¢n de clipping para este proceso
-local file=0            // Fichero del que tomar los gr ficos
-local xgraph=0          // Puntero a tabla: n§graficos, graf_angulo_0, ...
-local height=1          // Altura de los procesos en el modo-7 (pix/4)
-local cnumber=0         // N§ de scroll o m7 en el que est  (0 en todos, o bien: +1 en el 0, +2 en el 1, +4 en el 2, ...)
-local resolution=0 
-
-*/
-//		if(strlen(cstack[sp-2])==0) {
-//			memset(name,0,255);
-//		fprintf(prg,"// %d\n",stack[0]);
-//fflush(prg);
-//			getvarname(stack[sp-2],cstack[sp-2]);
-//		}
 		fprintf(prg,"// asi stack %s %s %d %d\n",cstack[sp-2],cstack[sp-1],sp,i);
-//		localvar=locvar[sp-2];
-//		getvarname(stack[sp-2],cstack[sp-2]);
-//		
 			fprintf(prg,"%s=%s",cstack[sp-2],cmd);
 		}
 		memset(cmd,0,255);
@@ -445,13 +360,10 @@ local resolution=0
 		break;
     case lori: 
 		fprintf(sta,"%5u\tori",i);
-//		fprintf(prg,"// UNIMP! || (ORI)\n");
 		fprintf(prg,"// stack: || %d %d\n",sp,i);
 		sprintf(condstack[con],"%s OR %s",condstack[con-2],condstack[con-1]);
 		strcpy(condstack[con-2],condstack[con]);
 		strcpy(cstack[sp-2],condstack[con]);
-//		sp--;
-//		fprintf(prg,"// cmd: %s\n",condstack[con]);
 
 		con--;
 		strcpy(cmd,condstack[con-1]);
@@ -464,26 +376,20 @@ local resolution=0
 		break;
     case land: 
 		fprintf(sta,"%5u\tand",i); 
-//		fprintf(prg,"// UNIMP! && (AND)\n");
 		fprintf(prg,"// stack: && %d\n",sp);
 		sprintf(condstack[con],"(%s && %s)",condstack[con-2],condstack[con-1]);
 		strcpy(condstack[con-2],condstack[con]);
 		con--;
-//		fprintf(prg,"// condstack %s\n",condstack[con]);
 		strcpy(cmd,condstack[con-1]);
 		break;
     case ligu: 
 		fprintf(sta,"%5u\tigu",i); 
-//		fprintf(prg,"// %s UNIMP! == (IGU)\n",cmd);		
-//		fprintf(prg,"// stack: %d\n",sp);
 		sprintf(condstack[con],"%s == %s",cstack[sp-2],cstack[sp-1]);
 		strcpy(cmd,condstack[con]);
 		con++;
 		break;
     case ldis: 
 		fprintf(sta,"%5u\tdis",i); 
-//		fprintf(prg,"// UNIMP! != (DIS)\n");		
-//		fprintf(prg,"// stack: %d\n",sp);
 		sprintf(condstack[con],"%s != %s",cstack[sp-2],cstack[sp-1]);
 		strcpy(cmd,condstack[con]);
 		con++;
@@ -491,16 +397,12 @@ local resolution=0
 		break;
     case lmay: 
 		fprintf(sta,"%5u\tmay",i); 
-//		fprintf(prg,"// UNIMP! > (MAY)\n");		
 		sprintf(condstack[con],"%s > %s",cstack[sp-2],cstack[sp-1]);
 		strcpy(cmd,condstack[con]);
 		con++;
-//		fprintf(prg,"// stack: %d %s\n",sp,cmd);
 		break;
     case lmen: 
 		fprintf(sta,"%5u\tmen",i); 
-//		fprintf(prg,"// UNIMP! < (MEN)\n");				
-//		fprintf(prg,"// stack: %d\n",sp);
 		sprintf(condstack[con],"%s < %s",cstack[sp-2],cstack[sp-1]);
 		strcpy(cmd,condstack[con]);
 		con++;
@@ -508,8 +410,6 @@ local resolution=0
 		break;
     case lmei: 
 		fprintf(sta,"%5u\tmei",i); 
-//		fprintf(prg,"// UNIMP! <= (MEI)\n");	
-//		fprintf(prg,"// stack: %d\n",sp);
 		sprintf(condstack[con],"(%s <= %s)",cstack[sp-2],cstack[sp-1]);
 		strcpy(cmd,condstack[con]);
 		con++;
@@ -517,8 +417,6 @@ local resolution=0
 		break;
     case lmai: 
 		fprintf(sta,"%5u\tmai",i); 
-//		fprintf(prg,"// UNIMP! >= (MAI)\n");			
-//		fprintf(prg,"// stack: %d\n",sp);
 		sprintf(condstack[con],"(%s >= %s)",cstack[sp-2],cstack[sp-1]);
 		strcpy(cmd,condstack[con]);
 		con++;
@@ -526,39 +424,14 @@ local resolution=0
     case ladd: 
 		fprintf(sta,"%5u\tadd",i);
 		fprintf(prg,"// ladd %d[%d]+%d[%d] %d %d\n",stack[sp-2],stp[sp-2],stack[sp-1],stp[sp-1],sp,i);
-//		fprintf(prg,"// %s add %s\n",cstack[sp-2],cstack[sp-1]);
-/*		if(stp[sp-2])
-			getvarname(stack[sp-2],cstack[sp]);
-		else
-			sprintf(cstack[sp],"%d",stack[sp-2]);
-		if(stp[sp-1])
-			getvarname(stack[sp-1],cstack[sp+1]);
-		else
-			sprintf(cstack[sp+1],"%d",stack[sp-1]);
-*/			
 		sprintf(cstack[sp],"(%s+%s)",cstack[sp-2],cstack[sp-1]);
 		stack[sp-2]+=stack[sp-1]; 
 		strcpy(cmd,cstack[sp]);
 		strcpy(cstack[sp-2],cstack[sp]);
-//		sp--;
-//		sprintf(cstack[sp-1],"%s",stack[sp-1]);
-//		strcpy(cstack[sp-2],cstack[sp]);
 		sp--;
 		break;
     case lsub: 
 		fprintf(sta,"%5u\tsub",i); 
-//		fprintf(prg,"// %d[%d]-%d[%d]\n",stack[sp-2],stp[sp-2],stack[sp-1],stp[sp-1]);
-/*
-		if(stp[sp-2])
-			getvarname(stack[sp-2],cstack[sp]);
-		else
-			sprintf(cstack[sp],"%d",stack[sp-2]);
-
-		if(stp[sp-1])
-			getvarname(stack[sp-1],cstack[sp+1]);
-		else
-			sprintf(cstack[sp+1],"%d",stack[sp-1]);
-*/
 		//stack[sp-2]-=stack[sp-1];
 		sprintf(cstack[sp],"(%s-%s)",cstack[sp-2],cstack[sp-1]);
 		stack[sp-2]-=stack[sp-1];
@@ -569,7 +442,6 @@ local resolution=0
 		break;
     case lmul:
 		fprintf(sta,"%5u\tmul",i); 
-//		fprintf(prg,"// %s*%s\n",cstack[sp-2],cstack[sp-1]);
 		sprintf(cstack[sp],"(%s*%s)",cstack[sp-2],cstack[sp-1]);
 		strcpy(cstack[sp-2],cstack[sp]);
 		sp-=1;
@@ -612,8 +484,6 @@ local resolution=0
     case lnot: fprintf(sta,"%5u\tnot",i); break;
     case laid: 
 		fprintf(sta,"%5u\taid",i); 
-//		fprintf(prg,"// UNIMP LAID %d %s\n",i,cstack[sp-1]);
-//		fprintf(prg,"// LOCAL VAR %s\n",cstack[sp-1]);
 		localvar=locvar[sp-1];
 		getvarname(stack[sp-1],cstack[sp-1]);
 		fprintf(prg,"// %s %d %d %d\n",cstack[sp-1],stack[sp-1],i,localvar);		
@@ -649,7 +519,6 @@ local resolution=0
 				strcpy(cmd,cstack[sp-1]);
 			// check if the jpf goes past a jmp
 
-//			fprintf(prg,"// jpf %d %d %d\n",mem[mem[i]-2],i,mem[i+1]-2);
 			if(mem[mem[i+1]-2]==ljmp) { 
 				if(mem[mem[i+1]-1]<mem[i+1]-2)
 					fprintf(prg,"WHILE");
@@ -664,7 +533,6 @@ local resolution=0
 			else {
 				fprintf(prg,"IF");
 				// ifs need an end, set an endstop 
-//			fprintf(prg,"// endstop added at %d\n",mem[i+1]);
 			end[mem[i+1]]++;
 
 			}
@@ -679,10 +547,8 @@ local resolution=0
 		break;
     case lfun: 
 		fprintf(sta,"%5u\tfun %u",i,mem[i+1]); 
-//		fprintf(prg,"// LFUN stack: %d i: %u con: %u\n",sp,i,con);
 		// calling function
 
-//		fprintf(prg,"// fun stack %d %d\n",sp,i);
 
 		switch(mem[i+1]) {
 			
@@ -727,14 +593,12 @@ local resolution=0
 			case 1:
 				sprintf(cmd, "key(%s)",keys[stack[sp-1]]);
 				strcpy(cstack[sp-1],cmd);
-//				sp=0;
 				break;
 
 			case 2: // load_pal
 				sprintf(cmd,"load_pal(\"%s\")",(byte*)&mem[mem[7]+stack[sp-1]]);
 				strcpy(cstack[sp-1],cmd);
 
-//				sp=0;
 				break;
 				
 			case 3:
@@ -746,7 +610,6 @@ local resolution=0
 					sprintf(cmd,"load_fpg(\"%s\")",(byte*)&mem[mem[7]+stack[sp-1]]);
 					strcpy(cstack[sp-1],cmd);
 				}
-//				sp=0;
 				break;
 			
 			case 4: // start_scroll (6)
@@ -758,7 +621,6 @@ local resolution=0
 			case 5: // stop_scroll
 				sprintf(cmd,"stop_scroll(%s)",cstack[sp-1]);
 				strcpy(cstack[sp-1],cmd);
-//				sp=0;
 				break;
 			
 			case 6: // out_region (2)	
@@ -769,29 +631,22 @@ local resolution=0
 			case 8:
 				sprintf(cmd,"collision(type proc%s)",cstack[sp-1]);
 				strcpy(cstack[sp-1],cmd);
-//				sp=0;
 				break;
 				
 			case 9: // get_id (1)
 				fprintf(prg,"// GET_ID\n");
 				sprintf(cmd,"get_id(type proc%s)",cstack[sp-1]);
 				strcpy(cstack[sp-1],cmd);
-//				con++;
 				break;
-//				sp=1;
 			
 			case 12:
 				sprintf(cmd,"get_angle(%s)",cstack[sp-1]);
-//				strcpy(condstack[con],cmd);
 				strcpy(cstack[sp-1],cmd);
-//				con++;
-//				sp=1;
 				break;
 
 			case 15:
 				sprintf(cmd,"load_fnt(\"%s\")",(byte*)&mem[mem[7]+stack[sp-1]]);
 				strcpy(cstack[sp-1],cmd);
-//				sp=0;
 				break;	
 			
 			case 16: // write (5)
@@ -814,11 +669,9 @@ local resolution=0
 
 				strcpy(cstack[sp-1],cmd);
 
-//				sp=0;
 				break;
 			case 20: // unload_fpg (1)
 				sprintf(cmd,"unload_fpg(%s)",cstack[sp-1]);
-//				sp--;
 				strcpy(cstack[sp-1],cmd);
 				break;
 
@@ -874,7 +727,6 @@ local resolution=0
 			case 36:
 				sprintf(cmd,"set_mode(%d)",stack[sp-1]);
 				strcpy(cstack[sp-1],cmd);
-//				sp--;
 				break;
 			
 			case 37: // load_pcm (2)
@@ -893,7 +745,6 @@ local resolution=0
 			case 40: // stop_sound (1)
 				sprintf(cmd,"stop_sound(%d)",stack[sp-1]);
 				strcpy(cstack[sp-1],cmd);
-//				sp=0;
 				break;
 				
 			case 42: // set_fps (2)
@@ -941,7 +792,6 @@ local resolution=0
 			default: 
 				sprintf(cmd,"func(%d)",mem[i+1]);
 				strcpy(cstack[sp-1],cmd);
-//				sp=0;
 				break;
 		}
 		strcpy(condstack[con],cmd);
@@ -949,7 +799,6 @@ local resolution=0
 		i++; break;
     case lcal: 
 		fprintf(sta,"%5u\tcal %u",i,mem[i+1]); 
-//		fprintf(prg,"\n// lcal %d %d \n",i,sp);
 		sprintf(cmd,"proc%u(",mem[mem[i+1]+1]);
 		
 		fprintf(prg,"// assigned: %s\n",mem[i+2]==lasi?"yes":"no");
@@ -962,7 +811,6 @@ local resolution=0
 			strcat(cmd,",");
 		}
 		strcat(cmd,")");
-//		sp=0;
 		strcpy(cstack[sp],cmd);
 		sp++;
 		i++; 
@@ -977,7 +825,6 @@ local resolution=0
     case lasp: 
 		fprintf(sta,"%5u\tasp",i); 
 		fprintf(prg,"%s;\n",cmd);
-//		fprintf(prg,"// discard stack %d\n",sp);
 		memset(cmd,0,255);
 		con=0;
 		sp--;
@@ -999,7 +846,6 @@ local resolution=0
 		i++; break;
     case lcpa: 
 		fprintf(sta,"%5u\tcpa",i); 
-//		fprintf(prg,"// args[]\n");
 		if(args>0) {
 			args--;
 			localvar=locvar[0];
@@ -1020,8 +866,6 @@ local resolution=0
 			i+=2;
 			printglobals();
 			printlocal();
-//			if(mem[i+3]==lnop) 
-//				fprintf(prg,"BEGIN\n");
 		} else {
 			fprintf(prg,"\n\nPROCESS proc%u(",mem[i+1]);
 		}
@@ -1037,7 +881,6 @@ local resolution=0
 			i++;
 		}
 		fprintf(prg,"\nBEGIN // lpri\n");	
-//		i=mem[i+1]-1;
 		sp=0;
 		break;
     case lcse: fprintf(sta,"%5u\tcse %u",i,mem[i+1]); i++; break;
@@ -1098,18 +941,6 @@ local resolution=0
 		getvarname(mem[i+2],name);
 		strcat(cstack[sp-1],".");
 		strcat(cstack[sp-1],name);
-/*		switch(mem[i+2]) {
-			
-			case 28:
-//				strcat(cstack[sp-1],".angle");
-				strcpy(cmd,cstack[sp-1]);
-				strcat(cmd,".angle");
-//				sp++;
-				break;
-		}
-*/
-//		i++;
-//		fprintf(prg,"// offset %d %s %d %s %s\n",mem[i+2],cstack[sp-1],stack[sp-1],condstack[con-1],cmd);
 		i+=2;
 		fprintf(prg,"// lchk next %d %d\n",i,mem[i+1]);
 		if(mem[i+1]==lptr || mem[i+1]==lchk)
@@ -1128,77 +959,6 @@ local resolution=0
 		break;
 		
     case ldbg: fprintf(sta,"%5u\tdbg",i); break;
-/*
-    case lcar2: fprintf(sta,"%5u\tcar2 %u %u",i,mem[i+1],mem[i+2]); i+=2; break;
-    case lcar3: fprintf(sta,"%5u\tcar3 %u %u %u",i,mem[i+1],mem[i+2],mem[i+3]); i+=3; break;
-    case lcar4: fprintf(sta,"%5u\tcar4 %u %u %u %u",i,mem[i+1],mem[i+2],mem[i+3],mem[i+4]); i+=4; break;
-    case lasiasp: fprintf(sta,"%5u\tasiasp",i); break;
-    case lcaraid: fprintf(sta,"%5u\tcaraid %u",i,mem[i+1]); i++; break;
-    case lcarptr: fprintf(sta,"%5u\tcarptr %u",i,mem[i+1]); i++; break;
-    case laidptr: fprintf(sta,"%5u\taidptr",i); break;
-    case lcaraidptr: fprintf(sta,"%5u\tcaraidptr %u",i,mem[i+1]); i++; break;
-    case lcaraidcpa: fprintf(sta,"%5u\tcaraidcpa %u",i,mem[i+1]); i++; break;
-    case laddptr: fprintf(sta,"%5u\taddptr",i); break;
-    case lfunasp: fprintf(sta,"%5u\tfunasp %u",i,mem[i+1]); i++; break;
-    case lcaradd: fprintf(sta,"%5u\tcaradd %u",i,mem[i+1]); i++; break;
-    case lcaraddptr: fprintf(sta,"%5u\tcaraddptr %u",i,mem[i+1]); i++; break;
-    case lcarmul: fprintf(sta,"%5u\tcarmul %u",i,mem[i+1]); i++; break;
-    case lcarmuladd: fprintf(sta,"%5u\tcarmuladd %u",i,mem[i+1]); i++; break;
-    case lcarasiasp: fprintf(sta,"%5u\tcarasiasp %u",i,mem[i+1]); i++; break;
-    case lcarsub: fprintf(sta,"%5u\tcarsub %u",i,mem[i+1]); i++; break;
-    case lcardiv: fprintf(sta,"%5u\tcardiv %u",i,mem[i+1]); i++; break;
-
-    case lptrwor: fprintf(sta,"%5u\tptrwor",i); break;
-    case lasiwor: fprintf(sta,"%5u\tasiwor",i); break;
-    case liptwor: fprintf(sta,"%5u\tiptwor",i); break;
-    case lptiwor: fprintf(sta,"%5u\tptiwor",i); break;
-    case ldptwor: fprintf(sta,"%5u\tdptwor",i); break;
-    case lptdwor: fprintf(sta,"%5u\tptdwor",i); break;
-    case ladawor: fprintf(sta,"%5u\tadawor",i); break;
-    case lsuawor: fprintf(sta,"%5u\tsuawor",i); break;
-    case lmuawor: fprintf(sta,"%5u\tmuawor",i); break;
-    case ldiawor: fprintf(sta,"%5u\tdiawor",i); break;
-    case lmoawor: fprintf(sta,"%5u\tmoawor",i); break;
-    case lanawor: fprintf(sta,"%5u\tanawor",i); break;
-    case lorawor: fprintf(sta,"%5u\torawor",i); break;
-    case lxoawor: fprintf(sta,"%5u\txoawor",i); break;
-    case lsrawor: fprintf(sta,"%5u\tsrawor",i); break;
-    case lslawor: fprintf(sta,"%5u\tslawor",i); break;
-    case lcpawor: fprintf(sta,"%5u\tcpawor",i); break;
-
-    case lptrchr: fprintf(sta,"%5u\tptrchr",i); break;
-    case lasichr: fprintf(sta,"%5u\tasichr",i); break;
-    case liptchr: fprintf(sta,"%5u\tiptchr",i); break;
-    case lptichr: fprintf(sta,"%5u\tptichr",i); break;
-    case ldptchr: fprintf(sta,"%5u\tdptchr",i); break;
-    case lptdchr: fprintf(sta,"%5u\tptdchr",i); break;
-    case ladachr: fprintf(sta,"%5u\tadachr",i); break;
-    case lsuachr: fprintf(sta,"%5u\tsuachr",i); break;
-    case lmuachr: fprintf(sta,"%5u\tmuachr",i); break;
-    case ldiachr: fprintf(sta,"%5u\tdiachr",i); break;
-    case lmoachr: fprintf(sta,"%5u\tmoachr",i); break;
-    case lanachr: fprintf(sta,"%5u\tanachr",i); break;
-    case lorachr: fprintf(sta,"%5u\torachr",i); break;
-    case lxoachr: fprintf(sta,"%5u\txoachr",i); break;
-    case lsrachr: fprintf(sta,"%5u\tsrachr",i); break;
-    case lslachr: fprintf(sta,"%5u\tslachr",i); break;
-    case lcpachr: fprintf(sta,"%5u\tcpachr",i); break;
-
-    case lstrcpy: fprintf(sta,"%5u\tstrcpy",i); break;
-    case lstrfix: fprintf(sta,"%5u\tstrfix",i); break;
-    case lstrcat: fprintf(sta,"%5u\tstrcat",i); break;
-    case lstradd: fprintf(sta,"%5u\tstradd",i); break;
-    case lstrdec: fprintf(sta,"%5u\tstrdec",i); break;
-    case lstrsub: fprintf(sta,"%5u\tstrsub",i); break;
-    case lstrlen: fprintf(sta,"%5u\tstrlen",i); break;
-    case lstrigu: fprintf(sta,"%5u\tstrigu",i); break;
-    case lstrdis: fprintf(sta,"%5u\tstrdis",i); break;
-    case lstrmay: fprintf(sta,"%5u\tstrmay",i); break;
-    case lstrmen: fprintf(sta,"%5u\tstrmen",i); break;
-    case lstrmei: fprintf(sta,"%5u\tstrmei",i); break;
-    case lstrmai: fprintf(sta,"%5u\tstrmai",i); break;
-    case lcpastr: fprintf(sta,"%5u\tcpastr",i); break;
-*/
     default: fprintf(sta,"***"); break;
   } 
 }

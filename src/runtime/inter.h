@@ -11,7 +11,6 @@
 #endif
 
 
-
 //#include "include.div"
 
 #define INTERPRETE
@@ -40,11 +39,6 @@ typedef void(*voidReturnType)(void);
 void call(const voidReturnType func); // void funcion(void); int n=(int)funcion; call(n);
 
 
-
-//#include <bios.h>
-//#include <dos.h>
-//#include <i86.h>
-//#include <graph.h>
 #include <math.h>
 
 #include "divkeybo.h"
@@ -54,8 +48,6 @@ void call(const voidReturnType func); // void funcion(void); int n=(int)funcion;
 #include  <zlib.h>
 #endif
 
-//#include "..\judas\judas.h"
-//#include "..\judas\timer.h"
 #include "divsound.h"
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -153,8 +145,6 @@ extern int debug_active;
 // Assembler (a.asm - replaced with a.cpp)
 
 void memcpyb(byte * di, byte * si, int n);
-//void call(int *(*func)() );
-
 
 ///////////////////////////////////////////////////////////////////////////////
 //      Functions exported by DIVLENGU (divlengu.cpp)
@@ -761,17 +751,6 @@ GLOBAL struct _iscroll iscroll[10];
 
 GLOBAL int snum; // Variable para indicar sobre que scroll se trata
 
-//GLOBAL int scroll_on;     // 0-Sin scroll, 1-Un plano, 2-Dos planos
-//GLOBAL int scr_x,scr_y;   // Posici¢n en copia de la ventana de scroll (regi¢n)
-//GLOBAL int scr_an,scr_al; // Dimensiones de la ventana de scroll
-//GLOBAL byte *_sscr1,*sscr1; // Primer plano de scroll, buffer circular
-//GLOBAL byte *_sscr2,*sscr2; // Segundo plano de scroll, buffer circular
-//GLOBAL byte *map1,*map2;  // Mapas, primer y segundo plano
-//GLOBAL int map1_an,map1_al,map2_an,map2_al; // Dimensiones de los mapas
-//GLOBAL int map_flags;     // Indica si los planos son c¡clicos, y en que ejes
-//GLOBAL int map1_x,map1_y,map2_x,map2_y; // Posici¢n del scroll (esq. sup. izda.)
-//GLOBAL int block1,block2; // N§ de scanes de la primera porci¢n de los buffers
-
 ///////////////////////////////////////////////////////////////////////////////
 // Dynamic system memory - Internal Struct
 ///////////////////////////////////////////////////////////////////////////////
@@ -964,7 +943,6 @@ void frame_end(void);
 
 //ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
 
-//void find_color(int r,int g,int b);
 byte media(byte a,byte b);
 
 GLOBAL int dr,dg,db;

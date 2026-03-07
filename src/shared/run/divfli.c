@@ -1,8 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-//#include <conio.h>
-//#include <mem.h>
 #include "topflc.h"
 #include "inter.h"
 
@@ -102,17 +100,6 @@ int FlcCheckHeader(char *filename) {
   ReadU16(&flc.HeaderDepth, flc.pMembuf+12);
   ReadU16(&flc.HeaderSpeed, flc.pMembuf+16);
 
-#ifdef DEBUG
-/*
-  printf("flc.HeaderSize: %d\n", flc.HeaderSize);
-  printf("flc.HeaderCheck: %d\n", flc.HeaderCheck);
-  printf("flc.HeaderFrames: %d\n", flc.HeaderFrames);
-  printf("flc.HeaderWidth: %d\n", flc.HeaderWidth);
-  printf("flc.HeaderHeight: %d\n", flc.HeaderHeight);
-  printf("flc.HeaderDepth: %d\n", flc.HeaderDepth);
-  printf("flc.HeaderSpeed: %d\n", flc.HeaderSpeed);
-*/
-#endif
 
   if((flc.HeaderCheck==0x0AF12) || (flc.HeaderCheck==0x0AF11)) { 
     flc.screen_w=flc.HeaderWidth;
@@ -152,62 +139,11 @@ int StartFLI(char *flinombre, char *Buffer, int Buff_anc,int Buff_alt,int cx,int
 		printf("Wrong header\n");
 		return 0;
 	}
-//  SDLInit(nombre);
-
 printf("Loaded %s\n",nombre);
 FlcInitFirstFrame();
 printf("Frames: %d\n",flc.HeaderFrames);
 return flc.HeaderFrames;
-
-#ifdef NOTYET
-  if(animation!=NULL) EndFli();
-
-  strcpy(TFNombre,nombre);
-  TFErrorHandler_Set(Error_Reporter);
-  animation=TFAnimation_NewFile(nombre);
-  if(animation==NULL) return(0);
-  CBuffer  =Buffer;
-  CBuff_alt=Buff_alt;
-  CBuff_anc=Buff_anc;
-  TFOffset =cy*Buff_anc+cx;
-
-  TFAnimation_SetLooping(animation, TF_TRUE);
-  TFAnimation_SetPaletteFunction(animation, Palette_Update);
-  TFAnimation_GetInfo(animation, &info);
-
-  if((cx<0)||(cy<0)) return(0);
-  if((info.Width+cx>Buff_anc)||(info.Height+cy>Buff_alt)) return(0);
-  if((TFframe=(TFUByte *)malloc(info.Height*info.Width+256))==NULL) return(0);
-  if( (TFpalette=malloc(768) )==NULL) return(0);
-
-  TFBuffers_Set(animation, TFframe, TFpalette);
-  Nextframe();
-  Nextframe();
-  return(info.NumFrames);
-#endif
 }
-
-
-#ifdef NOTYET
-static void Palette_Update() {
-  char *d=&flc.colors;
-  int n,m=0;
-
-  for (n=0;n<192;n++) m+=*((int*)d+n);
-  if (m) {
-
-  fli_palette_update=1;
-  memcpy(paleta,d,768);
-  dr=now_dacout_r=dacout_r=0;
-  dg=now_dacout_g=dacout_g=0;
-  db=now_dacout_b=dacout_b=0;
-  nueva_paleta();
-  paleta_cargada=1;
-
-  }
-}
-
-#endif
 
 void COLORS256()
 { Uint8 *pSrc;
@@ -231,7 +167,6 @@ void COLORS256()
       flc.colors[i].b=*(pSrc++);
       i++;
     }
-//    Palette_Update();
     OSDEP_SetPalette(flc.mainscreen, flc.colors, NumColorsSkip, i);
   }
 } /* COLORS256 */
@@ -317,7 +252,6 @@ void DECODE_COLOR()
       flc.colors[i].b=*(pSrc++)<<2;
       i++;
     }
-//    Palette_Update();
     OSDEP_SetPalette(flc.mainscreen, flc.colors, NumColorsSkip, i);
   }
 } /* DECODE_COLOR  */
@@ -425,15 +359,6 @@ int FlcCheckFrame()
   ReadU16(&flc.FrameCheck, flc.pFrame+4);
   ReadU16(&flc.FrameChunks, flc.pFrame+6);
 
-#ifdef DEBUG
-
-/*
-  printf("flc.FrameSize: %d\n", flc.FrameSize);
-  printf("flc.FrameCheck: %d\n", flc.FrameCheck);
-  printf("flc.FrameChunks: %d\n", flc.FrameChunks);
-*/
-
-#endif
 
   flc.pFrame+=16;
   if(flc.FrameCheck==0x0f1fa) { 
@@ -457,18 +382,10 @@ void FlcDoOneFrame()
 { int ChunkCount; 
   ChunkCount=flc.FrameChunks;
   flc.pChunk=flc.pMembuf;
-//  if ( SDL_LockSurface(flc.mainscreen) < 0 )
-//    return;
   while(ChunkCount--) {
     ReadU32(&flc.ChunkSize, flc.pChunk+0);
     ReadU16(&flc.ChunkType, flc.pChunk+4);
 
-#ifdef DEBUG
-/*   
-	printf("flc.ChunkSize: %d\n", flc.ChunkSize);
-    printf("flc.ChunkType: %d\n", flc.ChunkType);
-*/
-#endif
 
     switch(flc.ChunkType) {
       case 4:
@@ -503,7 +420,6 @@ void FlcDoOneFrame()
     
     flc.pChunk+=flc.ChunkSize;
   }
-//  SDL_UnlockSurface(flc.mainscreen);
 } /* FlcDoOneFrame */
 int Nextframe()
 {
@@ -524,19 +440,10 @@ int Nextframe()
 
     if(flc.FrameCheck!=0x0f100) {
       FlcDoOneFrame();
-//      SDLWaitFrame();
       /* TODO: Track which rectangles have really changed */
       OSDEP_UpdateRect(flc.mainscreen, 0, 0, 0, 0);
     }
 
-#ifdef NOTYET
-int i;
-  if(animation==NULL) return 0;
-  TFFrame_Decode(animation);
-  for(i=0; i<info.Height; i++) memcpy(CBuffer+TFOffset+i*CBuff_anc, TFframe+i*info.Width, info.Width);
-  TFAnimation_GetInfo(animation, &info);
-  if(info.CurFrame<info.NumFrames) return(1);
-#endif
 return(flc.FrameCount);
 }
 
@@ -552,52 +459,17 @@ void EndFli()
 	flc.pMembuf=NULL;
 	flc.file=NULL;
 
-#ifdef NOTYET
-  if(animation==NULL) return;
-  TFAnimation_Delete(animation);
-  animation=NULL;
-  free(TFframe);
-  free(TFpalette);
-#endif
 }
 
 void ResetFli()
 {
-#ifdef NOTYET
-  if(animation==NULL) return;
-  TFAnimation_Delete(animation);
-  animation=TFAnimation_NewFile(TFNombre);
-  if(animation==NULL) return;
-  TFBuffers_Set(animation, TFframe, TFpalette);
-  Nextframe();
-#endif
 }
 
 int quit_warning;
 
 static void Error_Reporter(char *msg)
 {
-#ifdef NOTYET
-  quit_warning=(int)msg;
-#endif
 }
 
 static void Palette_Update(TFUByte (*TFpalette)[256][3]) {
-#ifdef NOTYET
-  char *d=(char*)TFpalette;
-  int n,m=0;
-
-  for (n=0;n<192;n++) m+=*((int*)d+n);
-  if (m) {
-
-  fli_palette_update=1;
-  memcpy(paleta,d,768);
-  dr=now_dacout_r=dacout_r=0;
-  dg=now_dacout_g=dacout_g=0;
-  db=now_dacout_b=dacout_b=0;
-  nueva_paleta();
-  paleta_cargada=1;
-
-  }
-#endif
 }

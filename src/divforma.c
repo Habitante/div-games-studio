@@ -233,7 +233,6 @@ int cargar_paleta=0;
 void descomprime_PCX(byte *buffer, byte *mapa, int vent)
 {
   unsigned int con;
-//unsigned int fExit=0;
   unsigned int pixel=0, pixel_line=0;
   unsigned int last_byte,bytes_line;
   char ch, rep;
@@ -622,7 +621,6 @@ int es_BMP(byte *buffer)
   if(FileHeader.bfType!=0x4D42) return(0);
   CopiaBuffer=buffer+14;
   memcpy(&InfoHeader,CopiaBuffer,40);
-//if(InfoHeader.biCompression) if(InfoHeader.biCompression!=BI_RLE8) return(0);
   if(InfoHeader.biBitCount!=4 &&
      InfoHeader.biBitCount!=8 &&
      InfoHeader.biBitCount!=24) return(0);
@@ -1156,7 +1154,6 @@ int cargadac_FNT(char *name)
     fclose(file);
     return(0);
   }
-//  fseek(file,48,SEEK_SET);
   fread(dac4,768,1,file);
   fclose(file);
 
@@ -1181,7 +1178,6 @@ int cargadac_FPG(char *name)
     fclose(file);
     return(0);
   }
-//  fseek(file,48,SEEK_SET);
   fread(dac4,768,1,file);
   fclose(file);
 

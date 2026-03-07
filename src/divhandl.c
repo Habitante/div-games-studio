@@ -125,8 +125,7 @@ void menu_principal2(void) {
 			case 8:
 				help(3);
 			break;
-		} 
-		// do { read_mouse(); } while (mouse_b&1);
+		}
 	}
 }
 
@@ -842,8 +841,6 @@ void menu_fuentes1(void) {
   pinta_menu(850);
 }
 
-//void Preview_2(void);
-
 extern char *FntAux;
 void GetText0(void);
 void CreateText(void);
@@ -873,7 +870,6 @@ void menu_fuentes2(void) {
 
       case 3:
         if (n=determina_fnt()) {
-          //v_titulo=texto[91];
           move(0,n); cierra_ventana();
         } break;
 
@@ -1091,13 +1087,7 @@ void RecSound0(void);
 void editar_sonido(void);
 
 void menu_sonidos2(void) {
-//static int ns,chn;
-//static bload=0;
   pcminfo *mypcminfo;
-//byte * p;
-//FILE * f;
-//char cwork[256];
-//int x;
   int n;
 
   if (determina_pcm()) actualiza_menu(925,1,0);
@@ -1177,7 +1167,6 @@ void menu_sonidos2(void) {
                 strcpy(mypcminfo->name,     input);
                 move(0,n); cierra_ventana();
                 OpenSoundFile();
-//              wup(n); repinta_ventana(); wdown(n); vuelca_ventana(n);
               } else { v_texto=(char *)texto[47]; dialogo(err0); }
             }
           }
@@ -1343,19 +1332,14 @@ void actualiza_menu(int menu,int min,int max) { // (Min,Max) Opciones prohibidas
 	if (mouse_b&1) 
 		n=-n;
 
-//	printf("state: %d\n",v.estado);
 
 	if (n!=v.estado) {
 
 		if (v.estado) {
 			wbox(ptr,an,al,c2,2,1+abs(v.estado)*9,an-4,8);
-			p=texto[menu+abs(v.estado)]; 
-	//		printf("menu text: %s\n",p);
-			
-			if (*p=='-') 
+			p=texto[menu+abs(v.estado)];
+			if (*p=='-')
 				p++;
-
-			//      wwrite(ptr,an,al,3,2+abs(v.estado)*9,0,p,c3);
 
 			if ((q=(byte *)strchr((const char *)p,'['))!=NULL) {
 				*q=0; wwrite(ptr,an,al,3,2+abs(v.estado)*9,0,p,c3);
@@ -1403,8 +1387,6 @@ void actualiza_menu(int menu,int min,int max) { // (Min,Max) Opciones prohibidas
 			} else {
 				wbox(ptr,an,al,c2,2,1+n*9,an-4,8);
 				p=texto[menu+n]; if (*p=='-') p++;
-				
-		//		printf("menu text: %s\n",p);
 
 				if ((q=(byte *)strchr((const char *)p,'['))!=NULL) { 
 					*q=0;
@@ -1541,15 +1523,6 @@ void calcula_primer_plano(void) {
 // READ MOUSE BUTTONS
 
 void read_mouse3(void) {
-	/*
-  union REGS regs;
-  memset(&regs,0,sizeof(regs));
-  regs.w.ax=3;
-  int386(0x33,&regs,&regs);
-  mouse_b=regs.w.bx;
-  */
-  
-  // TODO - ADD SDL MOUSE INPUTS
 }
 
 extern int back;
@@ -2160,13 +2133,9 @@ void TratarPaleta3(void) {
 //      Listas para la ventana de abrir fichero
 //ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
 
-//#define max_archivos 512 // ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ File listbox
-//#define an_archivo (255)
 char archivo[max_archivos*an_archivo];
 struct t_listbox larchivos={3,49,archivo,an_archivo,12,64};
 
-//#define max_directorios 2048
-//#define an_directorio (255)
 char directorio[max_directorios*an_directorio];
 struct t_listbox ldirectorios={80,49,directorio,an_directorio,10,64};
 
@@ -2294,7 +2263,6 @@ void actualiza_listbox(struct t_listbox * l) {
     wwrite_in_box(ptr+(l->x+2)*big2,an,l->an-4,al,0,l->y+2+(old_zona-10)*8,0,
       (byte *)l->lista+l->lista_an*(l->inicial+old_zona-10),c3); v.volcar=1;
   }
-//printf("zona: %d\n",l->zona);
 
   if ((mouse_b&8 && l->zona>0) || (l->zona==2 && ((mouse_b&1)||(v_pausa&&!(mouse_b&1)&&(old_mouse_b&1))))) {
     if (!v_pausa||(v_pausa&&!(mouse_b&1)&&(old_mouse_b&1))) {
@@ -2347,45 +2315,7 @@ void actualiza_listbox(struct t_listbox * l) {
     case 4: mouse_graf=13; break;
   }
 }
-/*
-//ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
-//      Open dialog box
-//ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
 
-#define ancho_abrir 184+12
-#define alto_abrir 149+4
-
-void imprime_ruta(void) {
-  int an=v.an/big2,al=v.al/big2;
-
-  wbox(v.ptr,an,al,c2,3,31,an-6,7);
-  strcpy(full,tipo[v_tipo].path);
-  if (tipo[v_tipo].path[strlen(tipo[v_tipo].path)-1]!='\\')
-    strcat(full,"\\"); strcat(full,mascara);
-  wwrite_in_box(v.ptr,an,an-3,al,4,31,0,full,c1);
-  wwrite_in_box(v.ptr,an,an-3,al,3,31,0,full,c3);
-}
-
-void dir_abrir(void) {
-  unsigned n,m;
-  struct find_t fileinfo;
-
-  n=0; m=_dos_findfirst(mascara,_A_NORMAL,&fileinfo);
-  while (m==0 && n<max_archivos) {
-    strcpy(archivo+n++*an_archivo,fileinfo.name);
-    m=_dos_findnext(&fileinfo);
-  } larchivos.maximo=n;
-  qsort(archivo,larchivos.maximo,an_archivo,strcmp);
-
-  n=0; m=_dos_findfirst("*.*",_A_SUBDIR,&fileinfo);
-  while (m==0 && n<max_directorios) {
-    if (strcmp(fileinfo.name,".") && (fileinfo.attrib&16))
-      strcpy(directorio+n++*an_directorio,fileinfo.name);
-    m=_dos_findnext(&fileinfo);
-  } ldirectorios.maximo=n;
-  qsort(directorio,ldirectorios.maximo,an_directorio,strcmp);
-}
-*/
 //ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
 //     Analyzes a file name (for input + enter, accept or double-click)
 //ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
@@ -2563,7 +2493,6 @@ void nuevo_mapa2(void) {
       map_al=atoi(&mapsizes[n*9+strlen(&mapsizes[n*9])+1]);
       mapsizes[n*9+strlen(&mapsizes[n*9])]='x';
       itoa(map_an,mancho,10); itoa(map_al,malto,10);
-//      v.item[0].estado&=-3; v.item[1].estado&=-3; // Evitar "out of range"
       call((voidReturnType )v.paint_handler); actualiza_listbox(&lmapsizes);
       _select_new_item(2); v.volcar=1;
     }
@@ -2638,7 +2567,6 @@ void abrir_mapa(void) {
   byte palorg[768];
   byte xlat[256];
   int  num,div_try;
-//int filesize;
 
   if(!v_terminado) return;
 
@@ -2769,8 +2697,6 @@ void abrir_mapa(void) {
 				  memset(v_mapa,0,sizeof(struct tmapa));
 				  
 				if ((v_mapa->map=(byte *)malloc(map_an*map_al+map_an))!=NULL) {
-					//memset(v_mapa->map,0,map_an*map_al+map_an);
-				  
                   v_mapa->TengoNombre=0; //No tiene descripcion por defecto
 
                   for (x=0;x<512;x++) v_mapa->puntos[x]=-1;
@@ -3040,7 +2966,6 @@ int Colors[9],min_dist,i,dist;
           dialogo(err0);
           return;
         }
-//CACA
         y=(float)0;
         for(fy=0;fy<map_al;fy++)
         {
@@ -3579,7 +3504,6 @@ void about1(void) {
   wwrite(v.ptr,an,al,x,11+8*17,1,texto[481],c0);
   wwrite(v.ptr,an,al,x,11+8*18,1,texto[482],c3);
   wwrite(v.ptr,an,al,x,11+8*19,1,texto[483],c4);
-//  wwrite(v.ptr,an,al,x,11+8*20,1,texto[484],c4);
 }
 
 void about2(void) {

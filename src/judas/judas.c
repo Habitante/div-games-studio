@@ -32,14 +32,10 @@
  *        (Read JUDAS.DOC for complete history)
  */
 
-//#include <io.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <stdio.h>
-//#include <conio.h>
 #include <stdlib.h>
-//#include <dos.h>
-//#include <mem.h>
 #include "judasdma.h"
 #include "judasmem.h"
 #include "judascfg.h"
@@ -149,7 +145,6 @@ static void gus_stopchannel(unsigned char channel);
  * Assembler functions in JUDASASM.ASM
  */
 
-//#define interrupt 
 
 void judas_update(void);
 void sb_handler(void);

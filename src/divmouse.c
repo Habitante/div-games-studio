@@ -84,8 +84,6 @@ void read_mouse(void) {
 		}
 #ifdef SDL2
 	if(vga_an != vwidth || vga_al != vheight) {
-		// mouse_x *= (vga_an / vwidth);
-		// mouse_y *= (vga_al / vheight);
 		mouse_x = (int)(m_x*(float)((float)vga_an / (float)vwidth));// / (float)vga_an);
 		mouse_y = (int)(m_y*(float)((float)vga_al / (float)vheight));// / (float)vga_al);
 
@@ -136,13 +134,6 @@ void read_mouse(void) {
 				mouse_y-=(1<<zoom)*s; 
 				shift=1;
 			}
-/*	
-			if ( key(_SPC)) {
-				m_b |= 16;
-			} else if ( m_b&1 ){
-				m_b &= ~16;;
-			}
-			* */
 /*			if (key(_SPC)) {
 				if (mouse_b!=0xfffd) {
 					mouse_b=0xfffd;
@@ -325,8 +316,6 @@ void PrintEvent(const SDL_Event * event)
 			vheight = vga_al;
 			EndSound();
 			soundstopped = 1;
-		    //vwidth = event->window.data1;
-            //vheight = event->window.data2;
             break;
         case SDL_WINDOWEVENT_SIZE_CHANGED:
             SDL_Log("Window %d size changed to %dx%d",
@@ -469,8 +458,6 @@ while(SDL_PollEvent(&event) )
 					m_y = event.motion.y;
 				}
 
-//				m_x+=event.motion.xrel;
-//				m_y+=event.motion.yrel;
 			}
             /* If a button on the mouse is pressed. */
             if (event.type == SDL_MOUSEBUTTONDOWN)
@@ -497,15 +484,6 @@ while(SDL_PollEvent(&event) )
 					break;
 				}
 #endif
-/*				if(event.button.button == SDL_BUTTON_RIGHT)
-				{
-					mouse->right = 1;
-				}
-				if(event.button.button == SDL_BUTTON_MIDDLE)
-				{
-					mouse->middle = 1;
-				}
-				* */
 			//	printf("click\n");
 //				m_b = 1;
 			}
@@ -576,11 +554,6 @@ while(SDL_PollEvent(&event) )
 #endif
 			}
 			
-                /* If the left button was pressed. */
-//                if (event.button.button == SDL_BUTTON_LEFT)
-                    /* Quit the application */
-  //                  quit = 1;
-            
         }
 	if(soundstopped==1) {
 

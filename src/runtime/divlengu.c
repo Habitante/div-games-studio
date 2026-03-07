@@ -28,10 +28,8 @@ void an_comentario(void);
 
 void inicializa_textos(byte * fichero) {
 
-//#ifdef DEBUG
   FILE * f;
   int n;
-//#endif
 
   memset(text,0,max_textos_sistema*4);
 
@@ -53,7 +51,6 @@ void inicializa_textos(byte * fichero) {
   if ((f=fopen((char *)fichero,"rb"))!=NULL) {
     fseek(f,-4,SEEK_END);
     fread(&n,4,1,f);
-    //DebugData(n);
     fseek(f,-4-n,SEEK_END);
     if ((textos=(byte *)malloc(n+1))!=NULL) {
       n=fread(textos,1,n,f);
@@ -63,11 +60,6 @@ void inicializa_textos(byte * fichero) {
     } else fclose(f);
   } 
 
-/*
-  textos=textosing;
-  fin_textos=textos+sizeof(textosing);
-  analiza_textos();
-*/
 #endif
 
 }

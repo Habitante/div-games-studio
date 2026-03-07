@@ -56,7 +56,6 @@ void load_index(void) {
   FILE *f;
 
   if (div_index!=NULL) {
-    //free(div_index);
     div_index=NULL;
   }
 
@@ -165,7 +164,6 @@ void help1(void) {
   wput(ptr,an,al,an-9,al-9,34);         // Resize
   barra_vertical();
 
-//  wbox(ptr,an,al,c1,2,10,an-12,15);
   wbox(ptr,an,al,c0,2,10+15,an-12,1);
 
   vuelca_help();
@@ -180,8 +178,6 @@ void help2(void) {
   if (v.estado) {
 
     _process_items();
-
-    // tecla();
 
     if (v.active_item==2 && help_item!=3) help_xref(3,0);
     if (v.active_item==3 && help_item!=4) help_xref(4,0);
@@ -246,25 +242,6 @@ void help2(void) {
         if (help_l+help_al<help_lines) { while (*(help_line++)); help_l++; }
       } vuelca_help(); v.volcar++;
     }
-
-/*
-    if (mouse_graf==13 && (mouse_b&1) && !(old_mouse_b&1) && wmouse_x!=1) {
-      n=0;
-      if (help_lines>help_al)
-        if (wmouse_y>18+(help_l*(v.al/big2-21-18))/(help_lines-help_al)) n=1;
-      if (n) {
-        for (n=0;n<help_al;n++) {
-          if (help_l+help_al<help_lines) { while (*(help_line++)); help_l++; }
-        }
-      } else {
-        for (n=0;n<help_al;n++) {
-          if (help_line!=help_buffer+1) {
-            help_line--; while (*(--help_line)); help_line++; help_l--;
-          }
-        }
-      } vuelca_help(); v.volcar++;
-    }
-*/
 
     if (mouse_graf==13 && (mouse_b&1) && wmouse_x!=-1) {
       min=18; max=al-21;
@@ -376,8 +353,6 @@ void help2(void) {
           a_back=(a_back+2)%64;
         }
       } else {
-        // *** OJO *** Esto no se para que !@#¥!! serv¡a ...
-        // help_xref(backto[a_back],backto[a_back+1]);
       }
     }
 
@@ -404,10 +379,8 @@ void help3(void) {
   if (help_buffer!=NULL) {
     while (n_loaded) {
       n_loaded--;
-      //free(graf_help[loaded[n_loaded]].ptr);
       graf_help[loaded[n_loaded]].ptr=NULL;
     }
-    //free(help_buffer);
     help_buffer=NULL;
   }
 }
@@ -622,7 +595,6 @@ void help(int n){
           tabula_help(p+1,help_buffer,helpidx[n*2+1]-(p+1-h_buffer));
           nueva_ventana(help0);
         }
-        //free(h_buffer);
       } fclose(f);
     }
   }
@@ -703,7 +675,6 @@ void help_paint(memptrsize n){
           dialogo(help_paint0);
           help_paint_active=0;
         }
-        //free(h_buffer);
       } fclose(f);
     }
   }
@@ -746,11 +717,9 @@ void help_xref(int n,int linea) {
 
   while (n_loaded) {
     n_loaded--;
-    //free(graf_help[loaded[n_loaded]].ptr);
     graf_help[loaded[n_loaded]].ptr=NULL;
   }
 
-  //free(help_buffer);
   help_buffer=NULL;
   if (helpidx[n*2] && helpidx[n*2+1]) {
     if((f=fopen("help/help.div","rb"))!=NULL) {
@@ -773,14 +742,11 @@ void help_xref(int n,int linea) {
           fread(h_buffer,1,helpidx[n*2+1],f);
           p=h_buffer; while (*p!='}') p++; *p=0;
           strcpy((char *)help_title,(char *)h_buffer);
-//          help_an=(vga_an-12*big2-1)/font_an; if (help_an>80) help_an=80;
-//          help_al=(vga_al/2-12*big2-1)/font_al;
           help_l=0;
           tabula_help(p+1,help_buffer,helpidx[n*2+1]-(p+1-h_buffer));
           if (linea!=-1) while (linea--) { while (*help_line++); help_l++; }
           repinta_ventana(); vuelca_ventana(0);
         }
-        //free(h_buffer);
       } fclose(f);
     }
   } if (help_buffer==NULL) cierra_ventana();
@@ -976,7 +942,6 @@ void tabula_help(byte *si,byte *di,int lon) {
               si+=2;
               if (ejemplo) {
                 ejemplo=0; ultimo_cr=1; if (*(di-1)==6) di--;
-                //*di++=0; help_lines++; chars=0;
               } else if (imagen) {
                 if (!ultimo_cr) { *di++=0; help_lines++; ultimo_cr=1; chars=0; }
                 do {
@@ -1133,13 +1098,6 @@ void arregla_linea(byte * end,int chars,int help_an) {
 //ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
 //      Vuelca la ventana del hipertexto
 //ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
-
-/*
-int help_an,help_al;            // Ancho y alto de la ventana de ayuda
-byte *help_buffer;              // Buffer para contener la ayuda
-byte *help_line;                // Puntero a la l¡nea actual
-byte *help_end;                 // Final de help_buffer;
-*/
 
 void vuelca_help(void) {
   byte *si,*di,*old_di;
@@ -1459,8 +1417,7 @@ void Print_Help(void) {
           Progress((char *)texto[437],help_end-print_buffer,help_end-print_buffer);
 
           help_end=_help_end;
-          //free(print_buffer);
-        } //free(h_buffer);
+        }
       } fclose(f);
     }
 

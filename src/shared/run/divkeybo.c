@@ -36,8 +36,6 @@ int fbuf=0; // Puntero al buffer, fin de la cola
 //ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
 
 int ctrl_c=0,alt_x=0;
-//word * kb_start = (void*) 0x41a;
-//word * kb_end = (void*) 0x41c;
 
 void __far __interrupt __loadds IrqHandler(void)
 {
@@ -59,8 +57,6 @@ void __far __interrupt __loadds IrqHandler(void)
     } else {
       n=128; do { kbdFLAGS[--n]=0; } while (n);
     }
-
-//    if (kbhit()) getch();
 
     OldIrqHandler();
 
@@ -180,13 +176,9 @@ void tecla_bios(void) {
 
 void checkmod(OSDEPMod mod) {
 	
-//	shift_status = 0;
 	if( mod == KMOD_NONE ){
-//            printf( "None\n" );
             return;
         }
-	// if( mod & KMOD_NUM ) printf( "NUMLOCK " );
-    //    if( mod & KMOD_CAPS ) printf( "CAPSLOCK " );
         if( mod & KMOD_LCTRL ) shift_status |=4; 
        if( mod & KMOD_RCTRL ) shift_status |=4;
         if( mod & KMOD_RSHIFT ) shift_status |=1;
@@ -198,21 +190,6 @@ void checkmod(OSDEPMod mod) {
         
         if (mod & KMOD_CAPS) shift_status |=64;
         if (mod & KMOD_NUM) shift_status |=32;
-        /*
-         if( mod & KMOD_NUM ) printf( "NUMLOCK " );
-        if( mod & KMOD_CAPS ) printf( "CAPSLOCK " );
-        if( mod & KMOD_LCTRL ) printf( "LCTRL " );
-        if( mod & KMOD_RCTRL ) printf( "RCTRL " );
-        if( mod & KMOD_RSHIFT ) printf( "RSHIFT " );
-        if( mod & KMOD_LSHIFT ) printf( "LSHIFT " );
-        if( mod & KMOD_RALT ) printf( "RALT " );
-        if( mod & KMOD_LALT ) printf( "LALT " );
-        if( mod & KMOD_CTRL ) printf( "CTRL " );
-//        if( mod & KMOD_SHIFT ) printf( "SHIFT " );
-        if( mod & KMOD_ALT ) printf( "ALT " );
-        
-        printf("\n");
-        * */
 }
 
 #ifdef SDL2
@@ -240,14 +217,8 @@ void PrintEvent(const SDL_Event * event)
             SDL_Log("Window %d resized to %dx%d",
                     event->window.windowID, event->window.data1,
                     event->window.data2);
-//            vga_an = event->window.data1;
-//			vga_al = event->window.data2;
 			vwidth = event->window.data1;
 			vheight = event->window.data2;
-			// EndSound();
-			// soundstopped = 1;
-		    //vwidth = event->window.data1;
-            //vheight = event->window.data2;
             break;
         case SDL_WINDOWEVENT_SIZE_CHANGED:
             SDL_Log("Window %d size changed to %dx%d",
@@ -295,15 +266,12 @@ int8_t hx=0,hy=0; // hat xy positions
 
 byte oldhatval;
 void tecla(void) {
-//printf("tecla\n");
-//ascii=0; scan_code=0;
 SDL_Event event;
 if(vwidth == 0 && vheight == 0) {
 	vwidth = vga_an;
 	vheight = vga_al;
 }
 	while(SDL_PollEvent(&event)) {	
-//		printf("event: %d\n",event.type);
 		// check keys
 #ifdef SDL2
 	PrintEvent(&event);
@@ -311,17 +279,12 @@ if(vwidth == 0 && vheight == 0) {
 
 #ifdef SDL
 		if (event.type == SDL_VIDEORESIZE) {
-//				printf("RESIZING\n");
 			if(event.resize.w!=320 && event.resize.h!=200) {
 				vwidth = event.resize.w;
 				vheight = event.resize.h;
 			} else {
 				svmode();
 			}
-//			EndSound();
-//			soundstopped=1;
-//				volcado_parcial(0,0,vga_an-1,vga_al-1);
-//				SDL_PauseAudio(0);
 			
         }
 
@@ -332,7 +295,6 @@ if(vwidth == 0 && vheight == 0) {
 			alt_x=1;
             
 		if (event.type == SDL_KEYDOWN) {
-//			printf("KEYDOWN %d\n",event.key.keysym.sym);
 			switch(event.key.keysym.sym) {
 // handle special keys
 			case SDLK_LSHIFT:
@@ -357,7 +319,6 @@ if(vwidth == 0 && vheight == 0) {
 				shift_status|=128;
 		}
 
-//		if(scan_code==0)
 			scan_code = OSDEP_key[event.key.keysym.sym<2048?event.key.keysym.sym:event.key.keysym.sym-0x3FFFFD1A];
 		
 		ascii = event.key.keysym.scancode;
@@ -368,25 +329,17 @@ if(vwidth == 0 && vheight == 0) {
 #ifndef SDL2
 		if(event.key.keysym.unicode<0x80) {
 			ascii = event.key.keysym.unicode;
-			//printf("ascii val: %d\n",ascii);
 		}					
 #endif
 #endif
-//#ifndef GCW				
-		kbdFLAGS[scan_code]=1;	
-		//printf("kbdflags: %d %d\n",kbdFLAGS[scan_code],key(scan_code));		
-//#endif
+		kbdFLAGS[scan_code]=1;
 	}
 	
 	
 	if(event.type == SDL_KEYUP) {
-//		printf("KEYUP %d\n",event.key.keysym.sym);
-
 		shift_status=0;
 		checkmod((OSDEPMod) event.key.keysym.mod);
 		
-//		scan_code = OSDEP_key[event.key.keysym.sym];
-		//scan_code = event.key.keysym.scancode;
 		kbdFLAGS[OSDEP_key[event.key.keysym.sym<2048?event.key.keysym.sym:event.key.keysym.sym-0x3FFFFD1A]]=0;
 	}
 	
@@ -395,15 +348,13 @@ if(vwidth == 0 && vheight == 0) {
 		mouse->y = event.motion.y;
 
 		if(vga_an != vwidth || vga_al != vheight) {
-			mouse->x = (int)(event.motion.x*(float)((float)vga_an / (float)vwidth));// / (float)vga_an);
-			mouse->y = (int)(event.motion.y*(float)((float)vga_al / (float)vheight));// / (float)vga_al);
+			mouse->x = (int)(event.motion.x*(float)((float)vga_an / (float)vwidth));
+			mouse->y = (int)(event.motion.y*(float)((float)vga_al / (float)vheight));
 #ifdef SDL2
 			SDL_Log("Mouse: VX: %d VY: %d x: %d y: %d\n",mouse->x, mouse->y, event.motion.x,event.motion.y);
 #endif
 		}
 
-//				m_x+=event.motion.xrel;
-//				m_y+=event.motion.yrel;
 	}
 		/* If a button on the mouse is pressed. */
 	if (event.type == SDL_MOUSEBUTTONDOWN) {
@@ -473,8 +424,6 @@ if(vwidth == 0 && vheight == 0) {
     r.h.ah=2; int386x(0x16,&r,&r,&s); shift_status=r.h.al;
   }
 #endif
-
-//printf("ascii: %d scan_code: %d\n",ascii,scan_code);
 
 }
 

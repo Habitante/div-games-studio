@@ -4,8 +4,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "global.h"
-//#include "inc\svga.h"
-//#include "inc\vesa.h"
 #include "lib/sdlgfx/SDL_framerate.h"
 
 
@@ -28,8 +26,6 @@ void volcadosdl(byte *p);
 #define CRTC_OFFSET     0x13    //CRTC offset register index
 #define SC_INDEX        0x3c4   //Sequence Controller Index
 #define MISC_OUTPUT     0x3c2   //Miscellaneous Output register
-
-//byte * vga = (byte *) 0xA0000; // Pantalla fisica
 
 SDL_Surface *vga;
 #ifdef SDL2
@@ -109,8 +105,6 @@ struct {
 FPSmanager fpsman;
 
 void retrazo(void) {
-
-//printf("retrazo (vsync)\n");
 SDL_framerateDelay(&fpsman);
 
 #ifdef NOTYET
@@ -134,10 +128,8 @@ void set_dac(byte *_dac) {
           colors[i].b=_dac[b+2]*4;
           b+=3;
     }
-//	if(vga->format->BitsPerPixel==8) {
-		if(!OSDEP_SetPalette(vga, colors, 0, 256)) 
-			printf("Failed to set palette :(\n"); 
-//	}	
+		if(!OSDEP_SetPalette(vga, colors, 0, 256))
+			printf("Failed to set palette :(\n");
 	retrazo();
 }
 
@@ -171,7 +163,6 @@ SDL_Surface* copy_surface(SDL_Surface* source)
 
 
 void svmode(void) {
-//	printf("TODO - Set video mode (%dx%d)\n",vga_an,vga_al);
  Uint32 colorkey=0;
  int vn=0;
 
@@ -186,110 +177,14 @@ SDL_setFramerate(&fpsman, 60);
 
 	else
 		vga=OSDEP_SetVideoMode(vga_an, vga_al, CDEPTH,  1);
-	
-
-//	if(copia_surface)
-//		SDL_FreeSurface(copia_surface);
-//			SDL_SetAlpha(copia_surface,SDL_SRCALPHA | SDL_RLEACCEL,128);
-
-//	copia_surface = SDL_DisplayFormat( vga );
-
-//	colorkey = SDL_MapRGB( copia_surface->format, 0xFF, 0, 0xFF );
-
-//	SDL_FillRect(copia_surface, NULL, 0);
-
-//	if(SDL_SetColorKey(copia_surface , SDL_SRCCOLORKEY , colorkey)==-1)
-//		fprintf(stderr, "Warning: colorkey will not be used, reason: %s\n", SDL_GetError());;
-	
 
 	modovesa=1;
 	
 	set_dac(dac);
-
-#ifdef NOTYET
-
-  VBESCREEN Screen;
-
-  int mode=0;
-  int error=0,n;
-
-  LinealMode=0;
-  modovesa=0;
-
-  // Check first if a VESA mode
-
-  for (n=0;n<num_modos;n++) {
-    if (vga_an==modos[n].ancho && vga_al==modos[n].alto) {
-      if (modos[n].modo) { mode=modos[n].modo; break; }
-    }
-  }
-  
-  if (n<num_modos) {
-    modovesa=1;
-    if(VersionVesa<0x102) {
-      if (!VBE_setVideoMode(mode)) error=1;
-      else vga=(char *)0x0A0000;
-    } else {
-      if(VersionVesa<0x200) {
-        if(!SV_setMode(mode)) error=1;
-        else vga=(char *)0x0A0000;
-      } else {
-       	if (vbeSetMode (vga_an, vga_al, 8, &Screen) == 4) {
-          LinealMode=1;
-          mode|=vbeLinearBuffer;
-          if(!SV_setMode(mode)) {
-            LinealMode=0;
-            mode^=vbeLinearBuffer;
-            if(!SV_setMode(mode)) error=1;
-            else vga=(char *)videoMem;
-          } else vga=(char *)videoMem;
-        } else {
-          LinealMode=1;
-          vga=Screen.adr;
-        }
-      }
-    }
-  } else switch(vga_an*1000+vga_al) {
-    case 320200: _setvideomode(_MRES256COLOR); break;
-    case 320240: svmodex(0); break;
-    case 320400: svmodex(1); break;
-    case 360240: svmodex(2); break;
-    case 360360: svmodex(3); break;
-    case 376282: svmodex(4); break;
-    default: error=1; break;
-  }
-
-  // OJO!, esto provoca que, en equipos sin VESA, se vea en "320x200 BIG"
-
-  if (error) {
-    modovesa=0;
-    vga_an=320; vga_al=200; _setvideomode(_MRES256COLOR);
-  }
-#endif
 }
 
 void svmodex(int m) {
 	printf("TODO - divvideo.cpp svmodex.cpp\n");
-#ifdef NOTYET
-  int n=0;
-
-  _setvideomode(_MRES256COLOR);
-
-  outpw(SC_INDEX,0x604); //disable chain4 mode
-  outpw(SC_INDEX,0x100);
-  outp(MISC_OUTPUT,modox[m].dot);
-  outpw(SC_INDEX,0x300);
-  outp(CRTC_INDEX,0x11);
-  outpw(CRTC_INDEX+1,inp(CRTC_INDEX+1)&0x7f);
-
-  while (modox[m].crt[n]) outpw(CRTC_INDEX,modox[m].crt[n++]);
-
-  outpw(SC_INDEX,0x0f02);
-  memset(vga,0,65536);
-
-  outp(CRTC_INDEX,CRTC_OFFSET);
-  outp(CRTC_INDEX+1,vga_an/8);
-#endif
 }
 
 //ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
@@ -299,8 +194,6 @@ void svmodex(int m) {
 void rvmode(void) {
 	if(IsFullScreen(vga))
 		SDL_ToggleFS(vga);
-//	SDL_FreeSurface(copia_surface);
-	
 }
 
 //ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
@@ -324,7 +217,6 @@ return;
   while (y<vga_al) {
     n=y*4;
     if (scan[n+1]) {
-//		printf("y:%d n: %d\n",y,n+1); 
 		memcpy(q+scan[n],p+scan[n],scan[n+1]);
 		if(scan[n]<x1)
 			x1=scan[n];
@@ -338,7 +230,6 @@ return;
 			
 	}
     if (scan[n+3]) {
-//		printf("y:%d n: %d\n",y,n+3); 
 		memcpy(q+scan[n+2],p+scan[n+2],scan[n+3]);
 		if(scan[n+2]<x1)
 			x1=scan[n+2];
@@ -350,11 +241,8 @@ return;
 		if(y+1-y1>h1)
 			h1=(y+1-y1);
 			
-//		SDL_UpdateRect(vga,scan[n+2],y,scan[n+3],1);
-
 	}
 
-//    q+=vga_an; 
     q+=vga->pitch; 
     p+=vga_an; 
     y++;
@@ -363,9 +251,7 @@ return;
   printf("changed rect: %d %d %d %d     \r",x1,y1,w1,h1);
   
  OSDEP_UpdateRect(vga,x1,y1,w1,h1);
-	 
-//	SDL_Flip(vga);
-//	volcadosdl(p);
+
 	return;
 }
 
@@ -387,9 +273,6 @@ void volcadosdl(byte *p) {
 
 	byte *q = (byte *)vga->pixels;
 	uint32_t *q32 = (uint32_t *)vga->pixels;
-
-//	SDL_FillRect(vga, NULL, 0);
-
 
 	if(0) {
 		do {
@@ -468,10 +351,6 @@ void volcadosdl(byte *p) {
 
 	OSDEP_Flip(vga);
 
-//	colorkey = SDL_MapRGB( copia_surface->format, 0xFF, 0, 0xFF );
-//	SDL_FillRect(copia_surface, NULL, colorkey);
-
-
 }
 
 void volcado(byte *p) {
@@ -533,7 +412,6 @@ void snapshot(byte *p) {
 //ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
 
 void volcadop320200(byte *p) { // PARTIAL
-//printf("partial dump\n");
 #ifdef NOTYET
   int y=0,n;
   byte * q=(byte *)vga->pixels;
@@ -549,11 +427,9 @@ void volcadop320200(byte *p) { // PARTIAL
     q+=vga_an; p+=vga_an; y++;
   }
 #endif
-//SDL_Flip(vga);
 }
 
 void volcadoc320200(byte *p) { // COMPLETE
-//printf("complete dump\n");
 #ifdef NOTYET
   #ifdef GRABADORA
   RegScreen(p);
@@ -567,8 +443,6 @@ void volcadoc320200(byte *p) { // COMPLETE
 //ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
 
 void volcadopsvga(byte *p) {
-//	printf("divvideo.cpp - volcadopsvga\n");
-//#ifdef NOTYET
   int y=0,page,old_page=-1751,point,t1,t2,n;
   char *q=(char *)vga->pixels;
 
@@ -587,12 +461,9 @@ void volcadopsvga(byte *p) {
       if (point+scan[n+1]>65536) {
         t1=65536-point;
         t2=scan[n+1]-t1;
- //       if (page!=old_page) SV_setBank((signed long)page);
         memcpy(vga+point,p+scan[n],t1);
- //       SV_setBank((signed long)page+1); old_page=page+1;
         memcpy(vga,p+scan[n]+t1,t2);
       } else {
-       // if (page!=old_page) SV_setBank((signed long)(old_page=page));
         memcpy(vga+point,p+scan[n],scan[n+1]);
       }
     }
@@ -602,34 +473,26 @@ void volcadopsvga(byte *p) {
       if (point+scan[n+3]>65536) {
         t1=65536-point;
         t2=scan[n+3]-t1;
-   //     if (page!=old_page) SV_setBank((signed long)page);
         memcpy(vga+point,p+scan[n+2],t1);
-    //    SV_setBank((signed long)page+1); old_page=page+1;
         memcpy(vga,p+scan[n+2]+t1,t2);
       } else {
-     //   if (page!=old_page) SV_setBank((signed long)(old_page=page));
         memcpy(vga+point,p+scan[n+2],scan[n+3]);
       }
     } p+=vga_an; y++;
   }
-//#endif
 }
 
 void volcadocsvga(byte *p) {
-//	printf("divvideo.cpp - volcadocsvga\n");
-//#ifdef NOTYET
   int cnt=vga_an*vga_al;
   int tpv=0,ActPge=0;
 
   if(LinealMode) memcpy(vga,p,cnt);
   else while(cnt>0) {
-    //SV_setBank((signed long)ActPge++);
     tpv=cnt>65536?65536:cnt;
     memcpy(vga,p,tpv);
     p+=tpv;
     cnt-=tpv;
   }
-//#endif
 }
 
 //ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ

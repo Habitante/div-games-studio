@@ -101,35 +101,6 @@ void FPG2(void)
 		break;
 	}
 
-/*
-	x=0; y=0; do { y+=abs((memptrsize)dac[x]-(memptrsize)newdac[x]); } while (++x<768);
-	if(y) {
-		v_titulo=texto[53];
-		v_texto=texto[66];
-		dialogo(aceptar0);
-
-		if(!v_aceptar) {
-			//CACA
-			RemapAllFiles(0);
-			return;
-		} else {
-			if (hay_mapas()) {
-				v_titulo=texto[348];
-				v_texto=texto[321];
-				dialogo(aceptar0);
-			} 
-			else v_aceptar=1;
-			if(v_aceptar) 
-				RefPalAndDlg(0,1);
-			else 
-				RefPalAndDlg(1,1);
-			//                       RefPalAndDlg(0,1);
-			return;
-			}
-		}
-	}
-	NewDacLoaded=0;
-*/
 	if((arrastrar==4)) { //Suelto
 		arrastrar=5; free_drag=0;
 		
@@ -310,7 +281,6 @@ void FPG3(void) {
 		if(MiFPG->thumb[n].ptr!=NULL)
 			free(MiFPG->thumb[n].ptr);
 	}
-	//printf("v.aux %x\n",v.aux);
 	free(v.aux);
 }
 
@@ -1398,11 +1368,6 @@ void FPG_actualiza_listboxbr(struct t_listboxbr * l) {
 		v.volcar=1;
 	}
 
-	//if (l->zona==2 && (mouse_b&1)) {
-	//  if (old_mouse_b&1) { retrazo(); retrazo(); retrazo(); retrazo(); }
-	//---
-	//printf("zona: %d\n",l->zona);
-
 	if ((mouse_b&8 && wmouse_x!=-1) || (l->zona==2 && ((mouse_b&1)||(v_pausa&&!(mouse_b&1)&&(old_mouse_b&1))))) {
 		if (mouse_b&8 || !v_pausa||(v_pausa&&!(mouse_b&1)&&(old_mouse_b&1))) {
 			
@@ -1425,9 +1390,6 @@ void FPG_actualiza_listboxbr(struct t_listboxbr * l) {
 		v.volcar=1;
 	}
 
-	//if (l->zona==3 && (mouse_b&1)) {
-	//  if (old_mouse_b&1) { retrazo(); retrazo(); retrazo(); retrazo(); }
-	//---
 	if ((mouse_b&4 && wmouse_x!=-1)|| (l->zona==3 && ((mouse_b&1)||(v_pausa&&!(mouse_b&1)&&(old_mouse_b&1))))) {
 
 		if (mouse_b&4 || !v_pausa||(v_pausa&&!(mouse_b&1)&&(old_mouse_b&1))) {
@@ -1966,9 +1928,6 @@ void emplazar_map(void) { // Emplaza grafico lnum
 
 	// Primero crea en scan[] una lista de posibles alturas (0+fines de ventana)
 	for(n=0; n<lnum; n++) {
-	//    if((y=lgraf[n].y+lgraf[n].al+1)<lmapal)
-	//    {
-
 		y=lgraf[n].y+lgraf[n].al+1;
 
 		x=0;
@@ -1984,7 +1943,6 @@ void emplazar_map(void) { // Emplaza grafico lnum
 			scan[x]=y; scans++;
 		}
 
-	//    }
 	}
 
 	// Segundo ... algoritmo de colocaci¢n ...
@@ -2007,7 +1965,6 @@ void emplazar_map(void) { // Emplaza grafico lnum
 			break;
 		}
 	}
-	//if(lgraf[lnum].y+lgraf[lnum].al>lmapal) printf("Falla el grafico %d\n", lnum);
 }
 
 int colisiona_con_map(int n, int x, int y, int an, int al) {

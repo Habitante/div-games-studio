@@ -231,31 +231,13 @@ void Explode1(void) {
 
   crea_gama(exp_gama, exp_colores);
 
-//v.an=128;
-//v.al=90+5;
-
   wbox(v.ptr,an,al,c0,2,31,an-4,1);
 
-//wbox(v.ptr,an,al,c0,90,12,1,44);
-
-//wbox(v.ptr,an,al,c0,90,10,1,al-30);
   wbox(v.ptr,an,al,c0,2,74,an-4,1);
-
-//wwrite(v.ptr,an,al,115-21,11,0,texto[308],c3);
 
   wwrite(v.ptr,an,al,an-70,11,0,texto[181],c3);
   wrectangulo(v.ptr,an,al,c0,an-70,18,66,11);
   for (x=0;x<64;x++) wbox(v.ptr,an,al,exp_colores[x*2],an-69+x,18+1,1,9);
-
-/*
-  wwrite(v.ptr,an,al,115-21,11,0,texto[308],c3);
-  wbox(v.ptr,an,al,c0,94,19,30,16);
-   wbox(v.ptr,an,al,exp_Color2,95,20,28,14);
-  wbox(v.ptr,an,al,c0,94,37,30,16);
-   wbox(v.ptr,an,al,exp_Color1,95,38,28,14);
-  wbox(v.ptr,an,al,c0,94,55,30,16);
-   wbox(v.ptr,an,al,exp_Color0,95,56,28,14);
-*/
 }
 
 void Selcolor0();
@@ -303,48 +285,6 @@ void Explode2(void) {
   OldTipoA=TipoA;
   OldTipoB=TipoB;
   OldTipoC=TipoC;
-/*
-  if((wmouse_x>=95)&&(wmouse_x<=95+28))
-  {
-          if((wmouse_y>=20)&&(wmouse_y<=20+14)&&(mouse_b))
-          {
-                _reselect_item();
-                SelColorFont=exp_Color2;
-                dialogo((int)Selcolor0);
-                if(SelColorOk)
-                {
-                        exp_Color2=SelColorFont;
-                        wbox(v.ptr,v.an/big2,v.al/big2,exp_Color2,95,20,28,14);
-                        need_refresh=1;
-                }
-          }
-          if((wmouse_y>=38)&&(wmouse_y<=38+14)&&(mouse_b))
-          {
-                _reselect_item();
-                SelColorFont=exp_Color1;
-                dialogo((int)Selcolor0);
-                if(SelColorOk)
-                {
-                        exp_Color1=SelColorFont;
-                        wbox(v.ptr,v.an/big2,v.al/big2,exp_Color1,95,38,28,14);
-                        need_refresh=1;
-                }
-          }
-          if((wmouse_y>=56)&&(wmouse_y<=56+14)&&(mouse_b))
-          {
-                _reselect_item();
-                SelColorFont=exp_Color0;
-                dialogo((int)Selcolor0);
-                if(SelColorOk)
-                {
-                        exp_Color0=SelColorFont;
-                        wbox(v.ptr,v.an/big2,v.al/big2,exp_Color0,95,56,28,14);
-                        need_refresh=1;
-                }
-          }
-
-  }
-*/
   if (wmouse_in(an-70,18,66,11) && (mouse_b&1))
   {
     gama=exp_colores;
@@ -427,7 +367,6 @@ void Explode0(void) {
 void GenExplodes()
 {
 int ExpDac[256];
-//float r,g,b,incr,incg,incb;
 int n=0,nf,y;
 int x;
         n_frames=_n_frames;
@@ -437,40 +376,6 @@ int x;
         if(!v_aceptar)
                 return;
         for(x=0;x<256;x++) ExpDac[x] = exp_colores[x/2];
-/*
-        //Gamma del exp_Color2 al exp_Color1
-        r=(float)dac[exp_Color2*3  ];
-        g=(float)dac[exp_Color2*3+1];
-        b=(float)dac[exp_Color2*3+2];
-        incr=((float)dac[exp_Color1*3  ]-r)/111.0;
-        incg=((float)dac[exp_Color1*3+1]-g)/111.0;
-        incb=((float)dac[exp_Color1*3+2]-b)/111.0;
-        create_dac4();
-        for(x=0;x<16;x++)
-                ExpDac[x]=find_color(0,0,0);
-        for(x=16;x<128;x++)
-        {
-                ExpDac[x]=find_color((int)r,(int)g,(int)b);
-                r+=incr;
-                g+=incg;
-                b+=incb;
-        }
-
-        //Gamma del exp_Color1 al exp_Color0
-        r=(float)dac[exp_Color1*3  ];
-        g=(float)dac[exp_Color1*3+1];
-        b=(float)dac[exp_Color1*3+2];
-        incr=((float)dac[exp_Color0*3  ]-r)/127.0;
-        incg=((float)dac[exp_Color0*3+1]-g)/127.0;
-        incb=((float)dac[exp_Color0*3+2]-b)/127.0;
-        for(x=128;x<256;x++)
-        {
-                ExpDac[x]=find_color((int)r,(int)g,(int)b);
-                r+=incr;
-                g+=incg;
-                b+=incb;
-        }
-*/
   init_rnd(*system_clock,NULL);
   Buff_exp=(char *)malloc(exp_ancho*exp_alto);
   n_pun=32;

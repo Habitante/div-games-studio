@@ -446,13 +446,7 @@ void puede_ir(int x0,int y0,int x1,int y1) {
   int dx,dy,a,b,d,x,y;
 
   choque_linea=0;
-/*
-  if (tile>3) { // Tama¤o del tile ... si es muy grande lo divide entre 2
-    x0=x0/2; y0=y0/2;
-    x1=x1/2; y1=y1/2;
-    tilesize=tile/2;
-  } else tilesize=tile;
-*/  tilesize=tile;
+  tilesize=tile;
 
   if (x0>x1) { x=x1; dx=x0-x1; } else { x=x0; dx=x1-x0; }
   if (y0>y1) { y=y1; dy=y0-y1; } else { y=y0; dy=y1-y0; }
@@ -560,11 +554,9 @@ void path_free(void) {
 
   an=ptr[13]; al=ptr[14]; map=(byte*)ptr+64+ptr[15]*4;
   if (an<1 || al<1 || an>max_map_size || al>max_map_size) { e(152); return; }
-//printf("got to 559\n");
-
   // Comprueba l¡mites de coordenadas (si est n fuera del mapa retorna 0)
   if (x<0 || y<0 || x>=an*tile || y>=al*tile) return;
-//printf("m is %d %d %d\n",m(x/tile,y/tile),x,y);
+
   // Determina si la casilla destino est  libre
 
   if (!m(x/tile,y/tile)) pila[sp]=1;

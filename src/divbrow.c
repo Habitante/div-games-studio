@@ -594,7 +594,6 @@ void crear_un_thumb_FNT(struct t_listboxbr * l)
 		strupr(filename);
 		printf("%s %s\n",filename,l->lista+(l->lista_an*num));
 		fflush(stdout);
-//return;		
       if(!strcmp(strchr(filename,'.'),".FNT"));
       else
       {
@@ -869,7 +868,6 @@ void crear_un_thumb_IFS(struct t_listboxbr * l)
       thumb[num].status=-1;
       return;
     }
-//  fseek(fifs,16,SEEK_SET);
     fseek(fifs,4,SEEK_SET);
     fread(&n,1,4,fifs);
     fseek(fifs,n,SEEK_SET);
@@ -1021,7 +1019,6 @@ void crear_un_thumb_PCM(struct t_listboxbr * l)
       thumb[num].filesize=ftell(f);
       mem=thumb[num].filesize*2;
       fseek(f,0,SEEK_SET);
-//    printf("thumb[num].filesize:%d, mem:%d\n", thumb[num].filesize, mem);
       if(thumb[num].filesize>mem)
       {
         fclose(f);
@@ -1420,8 +1417,6 @@ void browser0(void) {
     last_mod_clean=0;
   }
 
-//if (v_thumb==7) v_thumb=0; // OJO !!! Prueba para s3m
-
   if (v_thumb==0) {
     v.an= ancho_br-1;
     v.al=alto_br-1;
@@ -1563,7 +1558,6 @@ void browser2(void) {
 
   int need_refresh=0;
   int estado;
-//FILE *f;
 
   crear_thumbs();
 
@@ -1625,13 +1619,6 @@ void browser2(void) {
 
   switch(v.active_item) {
     case 1:
-/*
-      if(v_thumb==7) // OJO !!! Prueba para s3m
-      {
-        fin_dialogo=1;
-        break;
-      }
-*/
       if(num_taggeds)
       {
         v_terminado=1; v_existe=1;
@@ -1743,14 +1730,10 @@ void browser2(void) {
 			     }
             else
             {
-//              smp=SI->sample;
 			Mix_PlayChannel(0,smp,0);
-//              judas_playsample(smp, 0, SI->SoundFreq, 64*256, MIDDLE);
-//              free(SI);
               while (mouse_b&1) read_mouse();
             }
           }
-//        strcpy(full,archivo+(larchivosbr.zona-10+larchivosbr.inicial)*an_archivo);
         } else if(v_tipo==16 && opc_pru) {
 #ifdef NOTYET
           strcpy(full,tipo[v_tipo].path);
@@ -1842,10 +1825,6 @@ void browser3(void) {
 
   if(bload==1) {
     bload=0;
-/*
-    StopSound(chn);
-    UnloadSound(ns);
-*/
   }
 
   _dos_setdrive(toupper(*tipo[1].path)-'A'+1,&n); chdir(tipo[1].path);
@@ -1858,10 +1837,6 @@ void browser3(void) {
   if(song_playing)
   {
     song_playing=0;
-/*
-    StopSong();
-    UnloadSong();
-*/
   }
 
   if(v_tipo==16) FreeMOD();
@@ -1906,12 +1881,6 @@ void dir_abrirbr(void) {
   }
   num_taggeds = 0;
   ini_tagged  = 0;
-/*
-  if (tipo[v_tipo].defecto>=0 && tipo[v_tipo].defecto<lextbr.maximo)
-    strcpy(input,&ext[an_ext*tipo[v_tipo].defecto]);
-  else strcpy(input,&ext[0]);
-  strcpy(mascara,input);
-*/
 }
 
 //ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ

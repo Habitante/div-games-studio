@@ -4,7 +4,6 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-//#include <mem.h>
 #include "judas.h"
 #include "osdep.h"
 
@@ -31,13 +30,6 @@ SoundInfo *judas_loadrawsample(char *name, int repeat, int end, unsigned char vo
 
         /* Don't waste memory if Nosound */
         judas_error = JUDAS_OK;
-
-/*
-        if (judas_device == DEV_NOSOUND)
-        {
-                return(SI);
-        }
-*/
 
         judas_error = JUDAS_OPEN_ERROR;
         handle = judas_open(name);
@@ -122,13 +114,6 @@ SoundInfo *judas_loadrawsample_mem(char *FileBuffer, int length, int repeat, int
 
         /* Don't waste memory if Nosound */
         judas_error = JUDAS_OK;
-
-/*
-        if (judas_device == DEV_NOSOUND)
-        {
-                return(SI);
-        }
-*/
 
         if((temp=(char *)malloc(length))==NULL)
         {

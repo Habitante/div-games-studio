@@ -292,14 +292,6 @@ void programa2(void) {
 
   if (mouse_graf==12 && (mouse_b&1) && wmouse_x!=-1) resize();
 
-/*
-  if (mouse_graf==13 && !(old_mouse_b&1) &&(mouse_b&1) && wmouse_x!=-1) {
-    if (!(v.botones&32)) {
-      if (wmouse_y>get_slide_y()) f_avpag(); else f_repag(); v.botones^=32;
-    }
-  } else if (v.botones&32) v.botones^=32;
-*/
-
   if (mouse_graf==13 && (mouse_b&1) && wmouse_x!=-1) {
     f_bop(); f_inicio();
     min=18; max=al-21;
@@ -1831,8 +1823,6 @@ void barra_info(void) {
   wwrite_in_box(v.ptr,an,an-19,al,3,10,0,(byte *)num,c3); ancho=text_len((byte *)num)+1;
   itoa(v.prg->columna,num+1,10); num[0]=',';
   wwrite_in_box(v.ptr,an,an-19,al,3+ancho,10,0,(byte *)num,c3); ancho+=text_len((byte *)num)+1;
-//  itoa(v.prg->num_lineas,num+1,10); num[0]='('; num[strlen(num)+1]=0; num[strlen(num)]=')';
-//  wwrite_in_box(v.ptr,an,an-19,al,3+ancho,10,0,num,c3); ancho+=text_len(num)+1;
 }
 
 //ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
@@ -1973,8 +1963,6 @@ void maximizar(void) {
       if (exploding_windows) extrude(v.prg->old_x,v.prg->old_y,_an,_al,v.x,v.y,v.an,v.al);
       v.volcar=2;
       se_ha_movido_desde(v.prg->old_x,v.prg->old_y,_an,_al);
-//      actualiza_caja(0,0,vga_an,vga_al);
-//      v.volcar=2; vuelca_ventana(0);
     } else {
       v.prg->an=v.prg->old_an;
       v.prg->al=v.prg->old_al;
@@ -2011,8 +1999,6 @@ void maximizar(void) {
       if (exploding_windows) extrude(_x,_y,_an2,_al2,v.x,v.y,v.an,v.al);
       v.volcar=2;
       se_ha_movido_desde(_x,_y,_an2,_al2);
-//      actualiza_caja(0,0,vga_an,vga_al);
-//      v.volcar=2; vuelca_ventana(0);
     } else {
       v.prg->an=_an; v.prg->al=_al;
       v.an=_an2; v.al=_al2;
@@ -2264,15 +2250,6 @@ void put_char(byte * ptr, int an, byte c,int block) {
         } while (--n);
         break;
     }
-/*
-    do {
-      m=editor_font_an; do {
-        if (*si) *ptr=color;
-        si++; ptr++;
-      } while (--m);
-      ptr+=an-editor_font_an;
-    } while (--n);
-*/
   }
 }
 

@@ -106,7 +106,6 @@ byte color_oscuro;
 
 void set_paleta (void) {
   word n;
-//printf("set paleta\n");
   n=abs(dacout_speed); // if (n>64) n=64;
 
   if (now_dacout_r<dacout_r) {
@@ -235,8 +234,6 @@ printf("setting new video mode %d %d %x\n",vga_an,vga_al,vga);
 
 //hide the mouse
 SDL_ShowCursor(SDL_DISABLE);
-//	if(vga)
-//		SDL_FreeSurface(vga);	
 	vga=NULL;
 #ifdef __EMSCRIPTEN__
 	
@@ -248,7 +245,7 @@ SDL_ShowCursor(SDL_DISABLE);
 			vga=OSDEP_SetVideoMode(vga_an, vga_al, 8, 1);
 
 		if(!vga || fsmode==0)
-			vga=OSDEP_SetVideoMode(vga_an, vga_al, 8, 0);//, SDL_FULLSCREEN | SDL_HWSURFACE | SDL_DOUBLEBUF);
+			vga=OSDEP_SetVideoMode(vga_an, vga_al, 8, 0);
 
 #endif
 		printf("Set mode: %d,%d\n",vga->w,vga->h);
@@ -408,11 +405,9 @@ SDL_RenderPresent(divRender);
 		q+=vga->pitch;//vga_an;//*vga->pitch*vga->format->BytesPerPixel;
 	}
 
-//	printf("draw screen\n");
 	if(SDL_MUSTLOCK(vga))
 		SDL_UnlockSurface(vga);
 
-//	SDL_UpdateRect(vga,0,0,vga_an,vga_al);
 	OSDEP_Flip(vga);
 }
 
@@ -428,7 +423,6 @@ extern int alt_x;
 #define maxframes 30000
 
 void volcado(byte *p) {
-//printf("%d %d %d\n",game_fps,freloj,ireloj);//,reloj);
 #ifndef __EMSCRIPTEN__
 if ((shift_status&4) && (shift_status&8) && key(_0)) {
 	recording = 1;
@@ -439,10 +433,7 @@ if ((shift_status&4) && (shift_status&8) && key(_9)) {
 
 	if(recording) {
 
-//		if(programRunning )  {
-			
 			framecount++;
-//		}
 			if(!(framecount%(fps/12)) && framecount>5 && framecount<maxframes) { // && framecount%3==1) {
 				char filename[255];
 				memset(filename,0,255);
@@ -456,8 +447,6 @@ if ((shift_status&4) && (shift_status&8) && key(_9)) {
 	}
 	// CTRL + ALT + P
 
-	
-	
   if ((shift_status&4) && (shift_status&8) && key(_P)) {
     snapshot(p);
     do {tecla();} while(key(_P));
@@ -466,10 +455,8 @@ if ((shift_status&4) && (shift_status&8) && key(_9)) {
   if (shift_status&8 && key(_ENTER)) {
 	SDL_ToggleFS(vga);
 	do{tecla();} while (key(_ENTER));
- } 
-  
-  
-  
+ }
+
 #endif
   if (fli_palette_update) retrazo();
 
@@ -648,11 +635,6 @@ int graba_MAP (byte * mapa, int an, int al, FILE * f) {
 //�����������������������������������������������������������������������������
 //      Restauraci�n parcial del fondo a la copia
 //�����������������������������������������������������������������������������
-
-//int scan0[MAX_YRES]; // indica para cada scan, pixel inicial (vga_an si n/a)
-//int scan1[MAX_YRES]; // indica para cada scan, pixel final (0 si n/a)
-
-//short scan[MAX_YRES*4]; // Por scan [x,an,x,an] se definen hasta 2 segmentos a volcar
 
 void restore(byte *q, byte *p) {
   int y=0,n=0;
@@ -1006,14 +988,12 @@ void crear_ghost(void) {
       fast_ghost: *(ghost+n*256+m)=find_col;
                   *(ghost+m*256+n)=find_col;
 
-      // if ((punto++&2047)==0) cprintf(".");
 
     } while (++m<n);
   } while (--n);
 
   do { *(ghost+n*256+n)=n; } while(++n<256);
 
-  // if (puntos) cprintf(".\r\n");
 #ifdef DIV2
   memcpy(ghost_inicial,ghost,256);
 

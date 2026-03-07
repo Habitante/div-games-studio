@@ -1,5 +1,4 @@
 #include <stdlib.h>
-//#include <conio.h>
 #include <string.h>
 
 #include "global.h"
@@ -19,42 +18,6 @@ char OEM2ANSI[256]={
   43,45,45,43,45,43,227,195,43,43,45,45,166,45,43,164,240,208,202,203,200,105,205,206,207,43,43,95,95,166,204,95,
   211,223,212,210,245,213,181,254,222,218,219,217,253,221,175,180,173,177,95,190,182,167,247,184,176,168,183,185,179,178,95,32};
 
-/*
-char OEM2ANSI[256]={     // Tabla antigua
-//Diferencias
-                 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-                 0,  0,  0,  0,  0,164,  0,  0,  0,  0,
-               182,167,  0,  0,  0,  0,  0,  0,  0,  0,
-                 0,  0,
-//Diferencias
-                32, 33, 34, 35, 36, 37, 38, 39,
-                40, 41, 42, 43, 44, 45, 46, 47, 48, 49,
-                50, 51, 52, 53, 54, 55, 56, 57, 58, 59,
-                60, 61, 62, 63, 64, 65, 66, 67, 68, 69,
-                70, 71, 72, 73, 74, 75, 76, 77, 78, 79,
-                80, 81, 82, 83, 84, 85, 86, 87, 88, 89,
-                90, 91, 92, 93, 94, 95, 96, 97, 98, 99,
-               100,101,102,103,104,105,106,107,108,109,
-               110,111,112,113,114,115,116,117,118,119,
-               120,121,122,123,124,125,126,127,
-//Diferencias
-               199,252,
-               233,226,228,224,229,231,234,235,232,239,
-               238,236,196,197,201,230,198,244,246,242,
-               251,239,255,214,220,162,163,165,  0,131,
-               225,237,243,250,241,209,170,186,191,  0,
-                 0,189,188,161,181,187,  0,  0,  0,  0,
-                 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-                 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-                 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-                 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-                 0,  0,  0,  0,  0,223,  0,  0,  0,  0,
-               181,  0,  0,  0,  0,167,  0,248,  0,  0,
-                 0,177,  0,  0,  0,  0,247,  0,176,149,
-                 0,  0,  0,178,  0,  0};
-//Diferencias
-*/
-
 FNTHEADER FNTheader = { "DIVFNT", 0x1A };
 IFSHEADER IFSheader;
 TABLAFNT tablaFNT[256];
@@ -73,7 +36,6 @@ unsigned short anchoreal,altoreal, anchoBody, altoBody, anchoOutline, altoOutlin
 
 void CloseAndFreeAll()
 {
-//    fcloseall();
     if (fichIFS!=NULL) { fclose(fichIFS); fichIFS=NULL; }
     if (fichFNT!=NULL) { fclose(fichFNT); fichFNT=NULL; }
     if (Buffer) free(Buffer);
@@ -463,17 +425,6 @@ short PintaSombra()
     } else ptr2=shadowBuffer;
     if (ifs.sombraX>0) ptr2+=absSombraX;
 
-/*
-    if (ifs.sombraX < 0 && ifs.sombraY < 0)
-        ptr2=shadowBuffer;
-    else if (ifs.sombraX > 0 && ifs.sombraY > 0)
-            ptr2=shadowBuffer + absSombraX + absSombraY * (anchoreal+absSombraX);
-    else if (ifs.sombraX > 0)
-            ptr2=shadowBuffer + absSombraX;
-    else
-        ptr2=shadowBuffer + absSombraY*(anchoreal+absSombraX);
-*/
-
     ptrShadow=ptr2;
 
     ptr=ptrOutline;
@@ -696,17 +647,6 @@ void unirSombraConResto()
     } else ptr2=shadowBuffer;
     if (ifs.sombraX<0) ptr2+=absSombraX;
 
-/*
-    if (ifs.sombraX < 0 && ifs.sombraY < 0)
-        ptr2=shadowBuffer + absSombraX + absSombraY*anchoreal;
-    else if (ifs.sombraX > 0 && ifs.sombraY > 0)
-        ptr2=shadowBuffer;
-    else if (ifs.sombraX > 0)
-        ptr2=shadowBuffer + absSombraY*anchoreal;
-    else
-        ptr2=shadowBuffer + absSombraX;
-*/
-
     for (y=0; y<altoOutline; y++)
     {
         for (x=0; x<anchoOutline; x++, ptr++, ptr2++)
@@ -756,10 +696,8 @@ int Jorge_Crea_el_font(int GenCode)
             anchoreal=0;
             altoreal=0;
             incY=0;
-//            if (OEM2ANSI[x]!=0)
             if (x!=0)
             {
-//             if ((ret=CargaLetra(OEM2ANSI[x])))
              if ((ret=CargaLetra(x)))
              {
                 CloseAndFreeAll();
@@ -782,8 +720,6 @@ int Jorge_Crea_el_font(int GenCode)
                     for (j=0; !stop && j<anchoreal; j++)
                         if (ptrLetra[incY*anchoreal+j]) stop=1;
                 incY--;
-//                incY=altoBody*despY/Alto;
-
                 if (ifs.outline)
                 {
                     if ((ret=PintaOutline()))
@@ -838,8 +774,6 @@ int Jorge_Crea_el_font(int GenCode)
         CloseAndFreeAll();
         return (IFS_WRITE_ERROR);
     }
-
-//    tablaFNT[' '].ancho=ifs.tamX;
 
     fseek(fichFNT,8+768+sizeof(reglas)+4,SEEK_SET);
     fwrite(&tablaFNT,sizeof(tablaFNT),1,fichFNT);
@@ -965,7 +899,6 @@ char *rawBuffer;
                     ptr[(cy+iy)*an+cx+x+y*an]=c;
                   }
                 }
-//                memcpy(ptr+((cy+iy)*an+cx)+y*an,rawBuffer+y*tablaFNT[WhatChar].ancho,tablaFNT[WhatChar].ancho);
             }
             free(rawBuffer);
             if(WhatChar==32)

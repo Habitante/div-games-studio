@@ -67,15 +67,10 @@ extern int nomitidos;
 static int n_reloj=0, o_reloj=0;
 
 int get_reloj(void) {
-	
-//	reloj = SDL_GetTicks()/10;
-//		return reloj;
-		
 	n_reloj=OSDEP_GetTicks();
 	reloj+=(n_reloj-o_reloj);
 	o_reloj=n_reloj;
 
-//reloj=SDL_GetTicks()/10;
 	return reloj;
 }
 
@@ -144,10 +139,7 @@ FILE *__fpopen (byte *file, char *mode) {
 	strcat(fprgpath,"/");
 	strcat(fprgpath,full);
 
-//fprintf(stdout,"Trying to open %s\n",fprgpath);
-	
 	if ((f=fopen(fprgpath,mode))) { // prgpath/file
-	//	printf("Found %s in prg dir [%s]\n",file, prgpath);
     strcpy(full, fprgpath);
 		return f;
 	}
@@ -182,13 +174,10 @@ FILE * open_multi(char *file, char *mode) {
   }
 
   strcpy(full,(char*)file); // full filename
-//fprintf(stdout,"Trying to open %s\n",file);
 #ifdef DEBUG
   if ( f = fpopen(full, mode))
     return f;
 #endif
-
-//fprintf(stdout,"Trying to open %s\n",full);
 
   if ((f=fopen(full,mode))) // "paz\fixero.est"
     return f;
@@ -209,8 +198,6 @@ FILE * open_multi(char *file, char *mode) {
 
     strcat(full,(char*)file);
 
-//fprintf(stdout,"Trying to open %s\n",full);
-
   if ((f=fopen(full,mode))) // "est\paz\fixero.est"
     return f;
 
@@ -220,8 +207,6 @@ FILE * open_multi(char *file, char *mode) {
 #endif
 
   strupr(full);
-
-//fprintf(stdout,"Trying to open %s\n",full);
 
   if ((f=fopen(full,mode))) // "est\paz\fixero.est"
   return f;
@@ -234,8 +219,6 @@ FILE * open_multi(char *file, char *mode) {
   strcpy(full,fname);
   strcat(full,ext);
 
-//fprintf(stdout,"Trying to open %s\n",full);
-
   if ((f=fopen(full,mode))) // "fixero.est"
     return f;
 
@@ -245,8 +228,6 @@ FILE * open_multi(char *file, char *mode) {
 #endif
 
   strupr(full);
-
-//fprintf(stdout,"Trying to open %s\n",full);
 
   if ((f=fopen(full,mode))) // "fixero.est"
     return f;
@@ -258,15 +239,13 @@ FILE * open_multi(char *file, char *mode) {
 
   strlwr(full);
 
-//fprintf(stdout,"Trying to open %s\n",full);
-
   if ((f=fopen(full,mode))) // "fixero.est"
     return f;
 
 #ifdef DEBUG
   if ( f = fpopen(full, mode))
     return f;
-#endif    
+#endif
 
   if (strchr(ext,'.')==NULL)
     strcpy(full,ext); 
@@ -298,7 +277,6 @@ FILE * open_multi(char *file, char *mode) {
 #endif
 
 #ifdef ZLIB
-//  fprintf(stdout,"Trying to open from zip %s\n",file);
     if(mode[0]!='w')
       if(f=memz_open_file(file))
         return f;
@@ -381,8 +359,6 @@ int read_packfile(byte * file) {
   char * ptr;
   int n;
   unsigned long len_desc;
-  //fprintf(stdout,"trying to read %s from %d files\n",file,npackfiles);
-
   if (_fullpath(full,(char*)file,_MAX_PATH)==NULL) return(-1);
 char *ff = (char *)file;
 
@@ -401,7 +377,6 @@ while (*ff!=0) {
   strupr(full);
 
   for (n=0;n<npackfiles;n++) {
-	//  printf("looking for %s against %s\n",full,packdir[n].filename);
     if (!strcmp(full,packdir[n].filename)) break;
 }
   if (n<npackfiles) {
@@ -569,7 +544,6 @@ void nueva_paleta(void) {
 void unload_map(void) {
   if (pila[sp]<1000 || pila[sp]>1999) return;
   if (g[0].grf[pila[sp]]!=0) { 
-//	  printf("Freeing %lx\n ",(g[0].grf[pila[sp]]));//-1330);	  
 	  free((byte*)(g[0].grf[pila[sp]])-1330); g[0].grf[pila[sp]]=0; 
   }
 }
@@ -816,7 +790,6 @@ void load_fpg(void) {
     }
     num++;
   } if (num==max_fpgs) { pila[sp]=0; e(104); return; }
-//printf("num is %d\n",num);
   if (num) {
     if ((lst=(int**)malloc(sizeof(int*)*1000))==NULL) { 
 	pila[sp]=0; 
@@ -843,8 +816,7 @@ void load_fpg(void) {
       pila[sp]=0; e(105); return;
     } else {
       fseek(es,0,SEEK_END); file_len=ftell(es);
-      //printf("file_len is %d\n",file_len);
-      
+
 #ifdef __EMSCRIPTEN__ 
 file_len=1352;
 #endif
@@ -871,9 +843,6 @@ fclose(es);
   if (strcmp((char *)ptr,"fpg\x1a\x0d\x0a")) { e(106); free(ptr); return; }
 
   if (process_fpg!=NULL) process_fpg((char *)ptr,file_len);
-//#ifdef STDOUTLOG
-//printf("fpg found\n");
-//#endif
   if (!paleta_cargada) {
     for (m=0;m<768;m++) if (ptr[m+8]!=paleta[m]) break;
     if (m<768) {
@@ -915,12 +884,10 @@ while(ftell(es)<file_len && len_>0 && num_>0) {
 	byte *mptr=&ptr[pos];
 	fread(&num_,4,1,es);
 	fread(&len_,4,1,es);
-//	printf("len: %d num: %d len: %d\n",len_,num_,ftell(es));
  	fseek(es,-8,SEEK_CUR);
  	mptr = (byte *)malloc(len_);
  	fread(mptr,1,len_,es);
  	lst[num_]=iptr=(int *)mptr;
-// 	 printf("mem ptr is %x\n",iptr);
  	  	 if (m!=palcrc) {
 		 adaptar(ptr+64+iptr[15]*4, iptr[13]*iptr[14], (byte*)(g[num].fpg)+8,&xlat[0]);
  	 } 	
@@ -941,7 +908,6 @@ int *ptr_8=(int*)ptr3;
     lst[num]=iptr=ptr_4;
     if (m!=palcrc) adaptar(ptr+64+iptr[15]*4, iptr[13]*iptr[14], (byte*)(g[num].fpg)+8,&xlat[0]);
     ptr=(byte *)&ptr2[len];//(int*)(ptr[4]);
-    //if(num<=0 || num>1000) break;
     ptr3=ptr;
     ptr2=ptr;
   }
@@ -1887,8 +1853,6 @@ void save(void) {
   es=open_save_file((byte*)&mem[pila[sp]]);
   if (es==NULL) { pila[sp]=0; e(123); return; }
 
-  //fprintf(stdout, "File saved: %s\n", full);
-
   llon = (int)fwrite(&mem[offset],1,lon,es);
 
   fclose(es);
@@ -2141,15 +2105,6 @@ extern int MusicChannels;
 void stop_sound(void) {
 #ifdef MIXER
   int x;
-/*
-  int InitChannel=16;
-
-  if(MusicChannels>InitChannel) InitChannel=MusicChannels;
-  if(InitChannel>=32) {
-    pila[sp]=0;
-    return;
-  }
-  */
 //  if(pila[sp]==-1) {
 //    for(x=0; x<CHANNELS; x++) StopSound(x);
 //  } else {
@@ -2193,8 +2148,6 @@ void load_song(void) {
   char * ptr;
 
   loop=pila[sp--];
-//printf("Requesting song: %s\n",(char *)&mem[pila[sp]]);
-
   if (npackfiles) {
     m=read_packfile((byte*)&mem[pila[sp]]);
     if (m==-1) goto songfuera;
@@ -2214,7 +2167,6 @@ void load_song(void) {
       } else { fclose(es); pila[sp]=0; e(100); return; }
     }
   }
-//printf("Loading Song\n");
   pila[sp]=LoadSong(ptr,file_len,loop);
 
   free(ptr);
@@ -2299,12 +2251,6 @@ void set_fps(void) {
   if (pila[sp]<4) pila[sp]=4;
   if (pila[sp]>999) pila[sp]=999;
   dfps = pila[sp];
-#ifdef __EMSCRIPTEN__
-//if(max_saltos<2)
-//	max_saltos=2;
-//  emscripten_cancel_main_loop();
-//  emscripten_set_main_loop(mainloop,dfps,0);
-#endif
   ireloj=1000.0/(double)pila[sp];
 }
 
@@ -2324,8 +2270,6 @@ void start_fli(void) {
     pila[sp]=StartFLI(full,(char *)copia2,vga_an,vga_al,x,y);
     if (pila[sp]==0) e(130);
   }
-//  pila[sp]=StartFLI((byte*)&mem[pila[sp]],copia2,vga_an,vga_al,x,y);
-//  if (pila[sp]==0) e(130);
 #endif
 
 pila[sp]=0;
@@ -2569,7 +2513,6 @@ void fade_off(void) {
   //} 
   fading=1;
   pila[++sp]=0;
-  //max_reloj+=get_reloj()-old_reloj;
 }
 
 //����������������������������������������������������������������������������
@@ -2633,7 +2576,6 @@ void _exit_dos(void) {
   FILE * f;
   #endif
   rvmode();
-//EndSound();
   kbdReset();
 
   #ifdef DEBUG
@@ -2809,9 +2751,6 @@ int joy_cx=0,joy_cy=0,joy_x0,joy_x1,joy_y0,joy_y1,init_joy=0;
 void read_joy(void) {
 #ifndef DOS
 // do SDL joystick stuff
-
-//if(joy_status)
-//joy->button1=1;
 
 #else
   int n,x,y;
@@ -3641,7 +3580,6 @@ int Mem_GetHeapFree()
     if(status!=_HEAPOK) break;
     if(miheap._useflag==_FREEENTRY) total+=miheap._size;
   }
-//if(status!=_HEAPEND) return -1;
   return total;
 #endif
 return 65535;
@@ -4622,8 +4560,6 @@ void function(void) {
   #endif
 
   old_reloj=get_reloj();
-
-//printf("func: %s\n",fname[mem[ip+1]]);
 
   switch(v_function=(byte)mem[ip++]) {
     case 0: _signal(); break;

@@ -362,21 +362,6 @@ void wvolcado(byte*copia,int an_copia,int al_copia,
 	int salta_y, long_y, resto_y;
 	int vn=0;
 
-	SDL_Rect trc;
-	
-//	printf("copia: %x %x\n",copia,p);
-
-	for (vn=0;vn<max_windows;vn++) {
-		if(ventana[vn].ptr!=NULL)
-	//		printf("copia: %x\n",ventana[vn].ptr);
-
-		if(ventana[vn].ptr==p) {
-//			printf("vn is: %d\n",vn);
-			
-			break;
-		}
-	}
-
 	q=copia+y*an_copia+x;
 
   if (x<0) salta_x=-x; else salta_x=0;
@@ -392,12 +377,6 @@ void wvolcado(byte*copia,int an_copia,int al_copia,
   do {
     memcpy(q,p,an); q+=an_copia; p+=resto_x;
   } while (--long_y >0 && q<(copia+(an_copia*al_copia)));
-
-
-	trc.x=x;
-	trc.y=y;
-	trc.w=an_copia;
-	trc.h=al_copia;
 }
 
 //ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
@@ -414,15 +393,9 @@ void wvolcado_oscuro(byte*copia,int an_copia,int al_copia,
 
 	SDL_Rect trc;
 	
-//	printf("copia: %x %x\n",copia,p);
-
 	for (vn=0;vn<max_windows;vn++) {
 		if(ventana[vn].ptr>0)
-	//		printf("copia: %x\n",ventana[vn].ptr);
-
 		if(ventana[vn].ptr==p) {
-//			printf("vn is: %d\n",vn);
-			
 			break;
 		}
 	}
@@ -440,16 +413,6 @@ void wvolcado_oscuro(byte*copia,int an_copia,int al_copia,
   p+=an*salta_y+salta_x; q+=an_copia*salta_y+salta_x;
   resto_x+=salta_x; an=long_x;
 
-/*do {
-	  memcpy(q,p,an);
-	  q+=an;
-	  p+=an;
-  q+=an_copia-(an=long_x);
-  p+=resto_x;
-} while (--long_y);
-
-  */
-
   do {
     do {
       *q=*(_ghost+*p);
@@ -465,11 +428,6 @@ void wvolcado_oscuro(byte*copia,int an_copia,int al_copia,
 	trc.w=an_copia;
 	trc.h=al_copia;
 
-//if(ventana[vn].surfaceptr!=NULL && vn<max_windows)
-//	SDL_BlitSurface(ventana[vn].surfaceptr,NULL,copia_surface,&trc);
-
-
-
 }
 
 //ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
@@ -480,7 +438,6 @@ typedef  struct { byte an; word dir; } sscar;
 
 int char_len(char c) {
 	sscar *car;
-//  struct { byte an; word dir; } * car;
   car=(sscar *)(text_font+1); return(car[c].an);
 }
 
@@ -488,11 +445,6 @@ int text_len(byte * ptr) {
 
 	int an;
 
-	/*  struct {
-	byte an;
-	word dir;
-	} * car;
-	*/
 	sscar *car;
 
 	car=(sscar*)(text_font+1); an=0;
@@ -507,25 +459,15 @@ int text_len(byte * ptr) {
 		an--;
 
 
-//	printf("%d\n",an);
-	
 	return(an);
 
 }
 
 
-
 int text_len2(byte * ptr) {
   int an;
-/*  struct {
-    byte an;
-    word dir;
-  } * car;
-
-*/
-
 	sscar *car;
-	car=(sscar*)(text_font+1); 
+	car=(sscar*)(text_font+1);
 	an=0;
 
 	while (*ptr) { 
@@ -544,8 +486,6 @@ int text_len2(byte * ptr) {
 void wwrite(byte*copia,int an_copia,int al_copia,
             int x,int y,int centro,byte * ptr,byte c) {
 				
-//	printf("wwrite: %x %d %d %d %d %d %s %d\n",copia,an_copia, al_copia, x,y,centro, ptr, x);
-	
 	wwrite_in_box(copia,an_copia,an_copia,al_copia,x,y,centro,ptr,c);
 }
 
@@ -556,16 +496,7 @@ extern struct t_listboxbr larchivosbr;
 void wwrite_in_box(byte*copia,int an_real_copia,int an_copia,int al_copia,
             int x,int y,int centro,byte * ptr,byte c) {
 
-//	printf("Writing in box: %s\n",ptr);
-	
 	int an,al,boton,multi;
-
-	/*
-	struct {
-	byte an;
-	word dir;
-	} * car;
-	*/
 
 	byte * font;
 
