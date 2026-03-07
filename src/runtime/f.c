@@ -40,21 +40,7 @@ void _object_avance	(int ide,int angulo,int velocidad) {
     mem[id+_Y]+=get_disty(mem[id+_Angle],pila[sp]);
 }
 
-// No-op stubs for removed MODE8 functions
-static void stop_mode8(void)        { pila[sp]=0; }
-static void load_wld(void)          { sp--; pila[sp]=0; }
-static void start_mode8(void)       { sp-=2; pila[sp]=0; }
-static void go_to_flag(void)        { pila[sp]=0; }
-static void set_sector_height(void) { sp-=2; pila[sp]=0; }
-static void get_sector_height(void) { sp-=2; pila[sp]=0; }
-static void set_point_m8(void)      { sp-=2; pila[sp]=0; }
-static void get_point_m8(void)      { sp-=2; pila[sp]=0; }
-static void set_fog(void)           { sp--; pila[sp]=0; }
-static void set_sector_texture(void){ sp-=3; pila[sp]=0; }
-static void get_sector_texture(void){ sp-=3; pila[sp]=0; }
-static void set_wall_texture(void)  { sp-=2; pila[sp]=0; }
-static void get_wall_texture(void)  { sp-=2; pila[sp]=0; }
-static void set_env_color(void)     { sp-=2; pila[sp]=0; }
+// MODE8 function stubs removed (MODE8 deleted)
 
 void path_find(void);
 void path_line(void);
@@ -2449,29 +2435,7 @@ void fget_angle(void) {
   else pila[sp]=(float)atan2(y0,x0)*radian;
 }
 
-//����������������������������������������������������������������������������
-//      Play_cd(pista,modo);
-//����������������������������������������������������������������������������
-
-void _play_cd(void) {
-  sp--; /* removed: cdrom */
-}
-
-//����������������������������������������������������������������������������
-//      Stop_cd();
-//����������������������������������������������������������������������������
-
-void _stop_cd(void) {
-  /* removed: cdrom */ pila[++sp]=0;
-}
-
-//����������������������������������������������������������������������������
-//      Is_playing_cd();
-//����������������������������������������������������������������������������
-
-void _is_playing_cd(void) {
-  /* removed: cdrom */ pila[++sp]=0;
-}
+// CD function stubs removed (CDDA deleted)
 
 //����������������������������������������������������������������������������
 //      Start_mode7(n,fichero,graf1,graf2,region,horizonte)
@@ -4713,9 +4677,9 @@ void function(void) {
     case 48: refresh_scroll(); break;
     case 49: fget_dist(); break;
     case 50: fget_angle(); break;
-    case 51: _play_cd(); break;
-    case 52: _stop_cd(); break;
-    case 53: _is_playing_cd(); break;
+    case 51: sp--; break; // play_cd removed (CDDA deleted)
+    case 52: pila[++sp]=0; break; // stop_cd removed (CDDA deleted)
+    case 53: pila[++sp]=0; break; // is_playing_cd removed (CDDA deleted)
     case 54: start_mode7(); break;
     case 55: stop_mode7(); break;
     case 56: advance(); break;
@@ -4743,7 +4707,7 @@ void function(void) {
     case 78: set_color(); break;
     case 79: sp-=2; pila[sp]=0; break;
     case 80: pila[++sp]=0; break;
-    case 81: stop_mode8(); break;
+    case 81: pila[sp]=0; break; // stop_mode8 removed (MODE8 deleted)
 
     case 82: x_advance(); break;
     case 83: _strchar(); break;
@@ -4751,19 +4715,19 @@ void function(void) {
     case 85: path_line(); break;
     case 86: path_free(); break;
     case 87: new_map(); break;
-    case 88: load_wld(); break;
-    case 89: start_mode8(); break;
-    case 90: go_to_flag(); break;
-    case 91: set_sector_height(); break;
-    case 92: get_sector_height(); break;
-    case 93: set_point_m8(); break;
-    case 94: get_point_m8(); break;
-    case 95: set_fog(); break;
-    case 96: set_sector_texture(); break;
-    case 97: get_sector_texture(); break;
-    case 98: set_wall_texture(); break;
-    case 99: get_wall_texture(); break;
-    case 100: set_env_color(); break;
+    case 88: sp--; pila[sp]=0; break; // load_wld removed (MODE8 deleted)
+    case 89: sp-=2; pila[sp]=0; break; // start_mode8 removed (MODE8 deleted)
+    case 90: pila[sp]=0; break; // go_to_flag removed (MODE8 deleted)
+    case 91: sp-=2; pila[sp]=0; break; // set_sector_height removed (MODE8 deleted)
+    case 92: sp-=2; pila[sp]=0; break; // get_sector_height removed (MODE8 deleted)
+    case 93: sp-=2; pila[sp]=0; break; // set_point_m8 removed (MODE8 deleted)
+    case 94: sp-=2; pila[sp]=0; break; // get_point_m8 removed (MODE8 deleted)
+    case 95: sp--; pila[sp]=0; break; // set_fog removed (MODE8 deleted)
+    case 96: sp-=3; pila[sp]=0; break; // set_sector_texture removed (MODE8 deleted)
+    case 97: sp-=3; pila[sp]=0; break; // get_sector_texture removed (MODE8 deleted)
+    case 98: sp-=2; pila[sp]=0; break; // set_wall_texture removed (MODE8 deleted)
+    case 99: sp-=2; pila[sp]=0; break; // get_wall_texture removed (MODE8 deleted)
+    case 100: sp-=2; pila[sp]=0; break; // set_env_color removed (MODE8 deleted)
 
     case 101: _strcpy(); break;
     case 102: _strcat(); break;
@@ -4848,8 +4812,8 @@ char * fname[]={
 "map_put","put_pixel","get_pixel","map_put_pixel","map_get_pixel","get_point",
 "clear_screen","save","load","set_mode","load_pcm/wav","unload_pcm/wav","sound",
 "stop_sound","change_sound","set_fps","start_fli","frame_fli","end_fli",
-"reset_fli","system","refresh_scroll","fget_dist","fget_angle","play_cd",
-"stop_cd","is_playing_cd","start_mode7","stop_mode7","advance","abs","fade_on",
+"reset_fli","system","refresh_scroll","fget_dist","fget_angle","",
+"","","start_mode7","stop_mode7","advance","abs","fade_on",
 "fade_off","rand_seed","sqrt","pow","map_block_copy","move_scroll",
 "near_angle","let_me_alone","exit","roll_palette","get_real_point",
 "get_joy_button","get_joy_position","convert_palette","load_map/pcx","reset_sound",
@@ -4857,11 +4821,11 @@ char * fname[]={
 
 // Nuevas funciones a�adidas para DIV 2.0
 
-"set_color","net_join_game","net_get_games","stop_mode8","x_advance","char",
-"path_find","path_line","path_free","new_map","load_wld","start_mode8",
-"go_to_flag","set_sector_height","get_sector_height","set_point_m8",
-"get_point_m8","set_fog","set_sector_texture","get_sector_texture",
-"set_wall_texture","get_wall_texture","set_env_color","strcpy","strcat",
+"set_color","net_join_game","net_get_games","","x_advance","char",
+"path_find","path_line","path_free","new_map","","",
+"","","","",
+"","","","",
+"","","","strcpy","strcat",
 "strlen","strcmp","strchr","strstr","strset","strupr","strlwr","strdel",
 "screen_copy","sort","load_song","unload_song","song","stop_song",
 "set_song_pos","get_song_pos","get_song_line",

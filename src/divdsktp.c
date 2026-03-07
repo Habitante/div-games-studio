@@ -7,8 +7,6 @@
 
 int nueva_ventana_carga(voidReturnType init_handler,int nx,int ny);
 int nuevo_mapa_carga(int nx,int ny,char *nombre,byte *mapilla);
-void nuevo_mapa3d_carga(void);
-
 void carga_programa0(void);
 void carga_Fonts0(void);
 void carga_help(int n,int helpal,int helpline,int x1,int x2);
@@ -22,7 +20,7 @@ int CDinit(void);
 int get_cd_error(void);
 extern short CDPlaying;
 
-extern M3D_info *m3d;
+// M3D_info removed (MODE8/3D map editor deleted)
 
 // extern char FontPathName[256];
 // extern char FontName[14];
@@ -262,8 +260,7 @@ fflush(lst);
                                                         iWork=7;
                                         if(ventana[x].paint_handler==menu_edicion1)
                                                         iWork=8;
-                                        if(ventana[x].paint_handler==menu_mapas3D1)
-                                                        iWork=9;
+                                        // menu_mapas3D1 check removed (MODE8/3D map editor deleted)
 #ifdef SLST
                                         fprintf(lst,"  menu tipo %d\n",iWork);
                                         fprintf(lst,"tipomenu %d elementos escritos <<<\n",n);
@@ -393,11 +390,7 @@ fflush(lst);
 										Mix_FreeChunk(mypcminfo->SI);
                                         break;
 #endif
-                                 case    106: //map3d
-                                        n=fwrite(ventana[x].aux,1,sizeof(M3D_info)-sizeof(tmap),desktop);
-                                        m3d=(M3D_info *) ventana[x].aux;
-                                        map_saveedit(desktop,&m3d->map);
-                                        break;
+                                 // case 106 (map3d) removed (MODE8/3D map editor deleted)
                                  case    107: //mod
                                         mymodinfo=(modinfo *)ventana[x].aux;
                                         n=fwrite(mymodinfo->name,1,14,desktop);
@@ -508,9 +501,7 @@ int UpLoad_Desktop()
                                         case    8:
                                                 nueva_ventana_carga(menu_edicion0,ventana_aux.x,ventana_aux.y);
                                                 break;
-                                        case    9:
-                                                nueva_ventana_carga(menu_mapas3D0,ventana_aux.x,ventana_aux.y);
-                                                break;
+                                        // case 9 (menu_mapas3D0) removed (MODE8/3D map editor deleted)
                                         default:
                                                 break;
                                 }
@@ -712,9 +703,7 @@ int UpLoad_Desktop()
                                 OpenDesktopSound(desktop);
                                 break;
 #endif
-                        case    106: //map3d
-                                nuevo_mapa3d_carga();
-                                break;
+                        // case 106 (map3d) removed (MODE8/3D map editor deleted)
                         case    107: //mod
                                 fread(SongName,1,14,desktop);
                                 fread(SongPathName,1,256,desktop);
@@ -1006,44 +995,7 @@ int nuevo_mapa_carga(int nx,int ny,char *nombre,byte *mapilla)
   return(1);
 }
 
-extern int scroll_x, scroll_y;
-extern float zoom_level;
-
-void nuevo_mapa3d_carga(void)
-{
-  int con;
-
-  if((m3d=(M3D_info *)malloc(sizeof(M3D_info)))==NULL)
-  {
-    v_texto=(char *)texto[45];
-    dialogo(err0);
-    return;
-  }
-
-  memset(m3d, 0, sizeof(M3D_info));
-  m3d->numero = 1;
-
-  for(con=0; con<max_windows-1; con++)
-  {
-    if (ventana[con].tipo==106)
-    {
-      if (((M3D_info*)ventana[con].aux)->numero==m3d->numero)
-      {
-        m3d->numero++;
-        con=-1;
-      }
-    }
-  }
-
-  fread(m3d,1,sizeof(M3D_info)-sizeof(tmap),desktop);
-  map_readedit(desktop, &m3d->map);
-
-  nueva_ventana_carga(MapperVisor0,ventana_aux.x,ventana_aux.y);
-
-  scroll_x=INICIO_X;
-  scroll_y=INICIO_Y;
-  zoom_level=0.125;
-}
+// nuevo_mapa3d_carga removed (MODE8/3D map editor deleted)
 
 void test_cursor(void);
 

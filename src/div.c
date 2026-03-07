@@ -40,7 +40,7 @@ void test0(void);
 void calc2(void);
 void cargar_thumbs(void);
 void mostrar_mod_meters(void);
-void MapperCreator2(void);
+// MapperCreator2 removed (MODE8/3D map editor deleted)
 
 ///////////////////////////////////////////////////////////////////////////////
 //   Prototypes for this file
@@ -1130,18 +1130,7 @@ void mainloop(void) {
 				}
 			}
 
-			if (v.tipo==106) {
-				llamar=0;
-
-				if ((mouse_b&1) && !(old_mouse_b&1)) {
-					if (*system_clock<doble_click+10 && *system_clock>doble_click && abs(doble_click_x-mouse_x)<8 && abs(doble_click_y-mouse_y)<8) {
-						llamar=1;
-					} else {
-						doble_click=*system_clock;
-						doble_click_x=mouse_x; doble_click_y=mouse_y;
-					}
-				}
-			}
+			// tipo==106 (3D map window) check removed (MODE8/3D map editor deleted)
 
 			if (v.tipo>=100 && arrastrar==4) {
 				if (v.tipo==100) mouse_b|=1; 
@@ -2690,11 +2679,7 @@ SDL_Rect trc;
         actualiza_caja2(m,ventana[m].x+2*big2,ventana[m].y+18*big2+ventana[m].prg->linea_vieja*font_al,ventana[m].an-12,font_al);
       return;
     }
-    if (ventana[m].click_handler==MapperCreator2 && ventana[m].volcar==2) {
-      ventana[m].volcar=0;
-      actualiza_caja2(m,ventana[m].x+3*big2,ventana[m].y+182*big2,39*big2,15*big2);
-      return;
-    }
+    // MapperCreator2 check removed (MODE8/3D map editor deleted)
   } ventana[m].volcar=0;
 
   x=ventana[m].x; y=ventana[m].y;
@@ -4384,7 +4369,8 @@ int get_status(int n) {
     x|=2;
   }
   if ((ascii&&(ascii!=0x1b)&&v.selected_item==n)) { //||superget) {
-    if (v.click_handler!=MapperCreator2 || (ascii>='0' && ascii<='9')) {
+    // MapperCreator2 digit filter removed (MODE8/3D map editor deleted)
+    {
       if (!(x&2)) {
         if (ascii==13) ascii=0;
         else x|=4;
@@ -4498,14 +4484,14 @@ void get_input(int n) {
           default: v.volcar=l; break;
         }
       } else if (ascii && char_len(ascii)>1 && (x=strlen(get))<v.item[n].get.lon_buffer-1) {
-        if (v.click_handler!=MapperCreator2 || (ascii>='0' && ascii<='9')) {
+        // MapperCreator2 digit filter removed (MODE8/3D map editor deleted)
+        {
           strcpy(cwork,get);
           cwork[get_pos]=ascii;
           cwork[get_pos+1]=0;
           strcat(cwork,get+get_pos);
           strcpy(get,cwork);
           get_pos++; v.volcar=1;
-//        get[x++]=ascii; get[x]=0; v.volcar=1;
         }
       } break;
   }

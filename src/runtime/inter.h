@@ -365,11 +365,7 @@ struct _net { // x1
 
 GLOBAL struct _net * net;
 
-struct _m8 { // x10
-  int z,camera,height,angle;
-};
-
-GLOBAL struct _m8 * m8;
+// struct _m8 removed (MODE8 deleted)
 
 struct _dirinfo { // x1
   int files;
@@ -467,7 +463,7 @@ void read_joy(void);
 #define _Dist1      11 //Distancia 1, para el modo 7
 #define _Dist2      12 //Distancia 2, para el modo 7
 
-#define _M8_Object  11 //Objeto dentro del mundo m8
+// _M8_Object removed (MODE8 deleted)
 #define _Old_Ctype  12 //Antiguo _Ctype
 
 #define _Frame      13 //Cuanto frame lleva el proceso (frame(n))
@@ -497,11 +493,7 @@ void read_joy(void);
 #define _Height     36 //Altura de los procesos en el modo 7 (pix/4)
 #define _Cnumber    37 //Indica en que scroll o m7 se ver  el gr fico
 #define _Resolution 38 //Resoluci¢n de las coordenadas x,y para este proceso
-#define _Radius     39 //Radio del objeto en m8
-#define _M8_Wall    40 //Pared con la que colisiona
-#define _M8_Sector  41 //Sector en el que esta
-#define _M8_NextSector 42 //Sector que esta detras de la pared con la que colisiona
-#define _M8_Step    43 //Lo que puede subir el sprite en m8 (altura escalon)
+// _Radius, _M8_Wall, _M8_Sector, _M8_NextSector, _M8_Step removed (MODE8 deleted)
 
 //ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
 //  Memoria de la m quina destino

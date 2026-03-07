@@ -22,8 +22,6 @@ void abrir_mapa(void);
 int determina_mapa(void);
 void guardar_mapa(void);
 void mapa_busqueda(void);
-int determina_mapa3d(void);
-void abrir_mapa3d(void);
 void imp_fontmap(void);
 void gen_char(byte * di,int an,int al,int inc,char * si);
 void AplieX(struct tmapa *MiMap,int man,int mal);
@@ -37,7 +35,6 @@ void AplieX(struct tmapa *MiMap,int man,int mal);
 
 byte AuxPal[768];
 int status_nuevo;
-extern M3D_info *m3d;
 
 void _completo(void);
 void text_cursor(void);
@@ -55,7 +52,6 @@ void errhlp0(void);
 void DaniDel(char *name);
 void about0(void);
 void map_save(void);
-void map_read(M3D_info *m3d);
 
 void SaveSound(pcminfo *mypcminfo, char *dst);
 void PasteNewSounds(void);
@@ -106,32 +102,28 @@ void menu_principal2(void) {
 				nueva_ventana(menu_paletas0); 
 			break;
 		
-			case 3: 
-				nueva_ventana(menu_mapas0); 
+			case 3:
+				nueva_ventana(menu_mapas0);
 			break;
-		
-			case 4: 
-				nueva_ventana(menu_mapas3D0); 
+
+			case 4:
+				nueva_ventana(menu_graficos0);
 			break;
-		
-			case 5: 
-				nueva_ventana(menu_graficos0); 
+
+			case 5:
+				nueva_ventana(menu_fuentes0);
 			break;
-		
-			case 6: 
-				nueva_ventana(menu_fuentes0); 
+
+			case 6:
+				nueva_ventana(menu_sonidos0);
 			break;
-		
-			case 7: 
-				nueva_ventana(menu_sonidos0); 
+
+			case 7:
+				nueva_ventana(menu_sistema0);
 			break;
-			
-			case 8: 
-				nueva_ventana(menu_sistema0); 
-			break;
-			
-			case 9: 
-				help(3); 
+
+			case 8:
+				help(3);
 			break;
 		} 
 		// do { read_mouse(); } while (mouse_b&1);
@@ -637,107 +629,7 @@ void actualiza_titulo(void)
   }
 }
 
-void menu_mapas3D0(void) { crear_menu(1000);
-  v.paint_handler=menu_mapas3D1;
-  v.click_handler=menu_mapas3D2; }
-
-void menu_mapas3D1(void) { pinta_menu(1000); }
-
-void nuevo_mapa3d(void);
-
-void menu_mapas3D2(void) {
-  int n,m;
-
-  if (determina_mapa3d()) actualiza_menu(1000,1,0);
-  else actualiza_menu(1000,3,7);
-
-  if ((old_mouse_b&1) && !(mouse_b&1)) {
-
-    v_tipo=15;
-
-    switch (v.estado) {
-
-      case 1: // Nuevo mapa ...
-        nuevo_mapa3d();
-        break;
-
-      case 2: // Abrir mapa ...
-        v_modo=0; v_texto=(char *)texto[803];
-      	dialogo(browser0);
-        if (v_terminado) {
-          if (!v_existe) {
-            v_texto=(char *)texto[43];dialogo(err0);
-          } else {
-            mouse_graf=3; volcado_copia(); mouse_graf=1;
-            abrir_mapa3d();
-          }
-        } break;
-
-      case 3: // Cerrar mapa
-        if (n=determina_mapa3d()) {
-          v_titulo=(char *)texto[50]; v_texto=(char *)ventana[n].titulo;
-          dialogo(aceptar0);
-          if (v_aceptar) {
-            move(0,n); cierra_ventana();
-          }
-        } break;
-
-      case 4: // Cerrar todos los mapas 3d (maximizados)
-        v_titulo=(char *)texto[334]; v_texto=(char *)texto[335];
-        dialogo(aceptar0);
-        if (v_aceptar) {
-          for (n=0;n<max_windows;n++) if (ventana[n].tipo==106 && ventana[n].primer_plano!=2) {
-            move(0,n); cierra_ventana(); n=-1;
-          }
-        } break;
-
-      case 5: // Guardar mapa
-        if (n=determina_mapa3d()) {
-          if (strchr((const char *)ventana[n].titulo,' ')!=NULL) goto no_tiene_nombre;
-          mouse_graf=3; volcado_copia(); mouse_graf=1;
-          m3d=(M3D_info *)ventana[v_ventana].aux;
-          strcpy(input, (char *)m3d->m3d_name);
-          strcpy(full,  (char *)m3d->m3d_path);
-          map_save();
-        } break;
-
-      case 6: // Guardar mapa como ...
-      no_tiene_nombre:
-        if (determina_mapa3d()) {
-          v_modo=1; v_texto=(char *)texto[807];
-          dialogo(browser0);
-          if (v_terminado) {
-            if (v_existe) {
-              v_titulo=(char *)texto[52]; v_texto=input;
-              dialogo(aceptar0);
-            } else v_aceptar=1;
-            if (v_aceptar) {
-              mouse_graf=3; volcado_copia(); mouse_graf=1;
-              strcpy(full, tipo[v_tipo].path);
-              if (full[strlen(full)-1]!='/') strcat(full,"/");
-              strcat(full,input);
-              m3d=(M3D_info *)ventana[v_ventana].aux;
-              map_save();
-              wup(v_ventana);
-              actualiza_titulo();
-              wdown(v_ventana);
-              vuelca_ventana(v_ventana);
-            }
-          }
-        } break;
-      case 7: // Editar el mapa
-        if (n=determina_mapa3d()) {
-          pinta_menu(1000); v.estado=0;
-          move(0,n);
-          if (v.primer_plano==0) {
-            for (m=1;m<max_windows;m++) if (ventana[m].tipo && ventana[m].primer_plano==1)
-              if (colisionan(0,m)) {ventana[m].primer_plano=0; vuelca_ventana(m);}
-            v.primer_plano=1;
-          } mouse_b=1; call((voidReturnType )v.click_handler);
-        } break;
-    }
-  }
-}
+// menu_mapas3D functions removed (MODE8/3D map editor deleted)
 
 int comprobar_fichero(void) {
   char cwork[8];
@@ -800,13 +692,7 @@ int determina_fpg(void) {
   } return(n);
 }
 
-int determina_prj(void) {
-  int m,n=0;
-
-  for (m=1;m<max_windows;m++) if (ventana[m].tipo==106) {
-    n=m; break;
-  } return(n);
-}
+// determina_prj removed (MODE8/3D map editor deleted)
 
 int determina_map(void) {
   int m,n=0;
@@ -827,15 +713,7 @@ int determina_mapa(void) {
   } return(n);
 }
 
-int determina_mapa3d(void) {
-  int m,n=0;
-
-  for (m=1;m<max_windows;m++) if (ventana[m].tipo==106 && ventana[m].estado) {
-    n=m; break;
-  } if (n) {
-    v_ventana=n;
-  } return(n);
-}
+// determina_mapa3d removed (MODE8/3D map editor deleted)
 
 int determina_prg(void) {
   int m,n=0;
@@ -1691,7 +1569,7 @@ extern int back;
 
 extern int TipoTex;
 extern int TipoBrowser;
-extern M3D_info  m3d_edit;
+extern byte brush_fpg_path[256];
 extern struct t_listboxbr ltexturasbr;
 extern struct t_listboxbr lthumbmapbr;
 
@@ -1815,7 +1693,7 @@ void mapa2(void) {
     TipoTex=0;
     if((FilePaintFPG=fopen(full,"rb"))!=NULL) // NOTE !!! Could provide message here
     {
-      strcpy((char *)m3d_edit.fpg_path, full);
+      strcpy((char *)brush_fpg_path, full);
       modo-=100;
       M3D_crear_thumbs(&ltexturasbr,0);
       modo+=100;
@@ -2961,46 +2839,7 @@ void abrir_mapa(void) {
   } create_dac4();
 }
 
-void abrir_mapa3d(void) {
-  FILE *f;
-  int  num;
-
-  if(!v_terminado) return;
-
-  if(!num_taggeds) {
-    strcpy(full,tipo[v_tipo].path);
-    if (full[strlen(full)-1]!='/') strcat(full,"/");
-    strcat(full, input);
-    if ((f=fopen(full,"rb"))!=NULL) {
-      fclose(f);
-      v_existe=1;
-    } else v_existe=0;
-    strcpy(larchivosbr.lista,input);
-    larchivosbr.maximo=1;
-    thumb[0].tagged=1;
-    num_taggeds=1;
-  }
-
-  for(num=0; num<larchivosbr.maximo; num++)
-  {
-    if(thumb[num].tagged)
-    {
-      strcpy(input,larchivosbr.lista+larchivosbr.lista_an*num);
-      strcpy(full,tipo[v_tipo].path);
-      if (full[strlen(full)-1]!='/') strcat(full,"/");
-      strcat(full, input);
-
-      if ((f=fopen(full,"rb"))!=NULL) { // Se ha elegido uno
-        fclose(f);
-        nuevo_mapa3d();
-        map_read((M3D_info*)v.aux);
-        actualiza_titulo();
-        call((voidReturnType )v.paint_handler);
-        v.volcar=1;
-      } else { v_texto=(char *)texto[44]; dialogo(err0); }
-    }
-  }
-}
+// abrir_mapa3d removed (MODE8/3D map editor deleted)
 
 //ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
 //      Save a map

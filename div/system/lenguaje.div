@@ -510,9 +510,9 @@
 438 "Print list"
 439 "FILES:"
 
-440 "New 3D map ..."
+440 ""
 441 "Saving..."
-442 "Edit 3D map"
+442 ""
 443 "Editor"
 444 "Top"
 445 "Line"
@@ -704,7 +704,6 @@
         "Programs "
         "Palettes"
         "Maps"
-        "3D Maps"
         "FPG Files"
         "Fonts"
         "Sounds"
@@ -822,17 +821,7 @@
         "Repeat [CTRL+G]"
         "Replace... [CTRL+R]"
 
-1000    # Menu de mapas 3D
-
-        "maps 3D"
-        "3D MAP Menu"
-        "New..."
-        "Open 3D map..."
-        "Close"
-        "Close all..."
-        "Save"
-        "Save as..."
-        "Edit map"
+// 1000 section (3D MAP menu) removed (MODE8/3D map editor deleted)
 
 �������������������������������������������������������������������������������
 

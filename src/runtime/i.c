@@ -385,7 +385,7 @@ void inicializacion (void) {
   joy=(struct _joy*)&mem[long_header+14+10*10+10*7];
   setup=(struct _setup*)&mem[long_header+14+10*10+10*7+8];
   net=(struct _net*)&mem[long_header+14+10*10+10*7+8+11];
-  m8=(struct _m8*)&mem[long_header+14+10*10+10*7+8+11+9];
+  // m8 pointer removed (MODE8 deleted) - memory layout preserved for compatibility
   dirinfo=(struct _dirinfo*)&mem[long_header+14+10*10+10*7+8+11+9+10*4];
   fileinfo=(struct _fileinfo*)&mem[long_header+14+10*10+10*7+8+11+9+10*4+1026];
   video_modes=(struct _video_modes*)&mem[long_header+14+10*10+10*7+8+11+9+10*4+1026+146];
@@ -525,7 +525,7 @@ init_rnd(dtime);
     (m7+n)->distance=64;
     (m7+n)->focus=256;
 
-    (m8+n)->z=256;
+    // m8 initialization removed (MODE8 deleted)
     (m7+n)->height=32;
   }
 

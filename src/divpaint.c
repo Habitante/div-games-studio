@@ -3980,7 +3980,7 @@ extern int TipoTex;
 extern int t_maximo;
 extern int f_maximo;
 extern int FPG_thumbpos;
-extern M3D_info  m3d_edit;
+extern byte brush_fpg_path[256];
 extern char m3d_fpgcodesbr[max_texturas*an_textura];
 extern struct t_listboxbr ltexturasbr;
 extern struct _thumb_tex {

@@ -3,7 +3,7 @@
 
 #include "global.h"
 
-// Used by divmap3d.c for scroll dragging
+// Used by divbrush.c for scroll dragging
 int last_x, last_y;
 
 // Used by divpalet.c for 64-color thumbnail

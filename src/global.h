@@ -61,7 +61,7 @@ void call(const voidReturnType func); // void funcion(void); int n=(int)funcion;
 #include <signal.h>
 
 #include "divkeybo.h"
-#include "divmap3d.hpp"
+// divmap3d.hpp removed (MODE8/3D map editor deleted)
 
   // OJO !!! JUDAS !!!
 #include "judas/judas.h"
@@ -420,7 +420,7 @@ void menu_fuentes0(void);void menu_fuentes1(void);void menu_fuentes2(void);
 void menu_sonidos0(void);void menu_sonidos1(void);void menu_sonidos2(void);
 void menu_sistema0(void);void menu_sistema1(void);void menu_sistema2(void);
 void menu_edicion0(void);void menu_edicion1(void);void menu_edicion2(void);
-void menu_mapas3D0(void);void menu_mapas3D1(void);void menu_mapas3D2(void);void menu_mapas3D3(void);
+// menu_mapas3D declarations removed (MODE8/3D map editor deleted)
 
 void nuevo_mapa0(void);void nuevo_mapa1(void);void nuevo_mapa2(void);void nuevo_mapa3(void);
 void mapa0(void);void mapa1(void);void mapa2(void);void mapa3(void);
@@ -431,7 +431,7 @@ void error0(void);void error1(void);void error2(void);void error3(void);
 void err0(void);void err1(void);void err2(void);void err3(void);void info0(void);
 void browser0(void); void browser2(void);
 void MapperWarning0(void); void MapperWarning1(void); void MapperWarning2(void);
-void MapperVisor0(void); void MapperVisor1(void); void MapperVisor2(void); void MapperVisor3(void);
+// MapperVisor declarations removed (MODE8/3D map editor deleted)
 void generador_sprites(void);
 
 
@@ -1051,21 +1051,7 @@ GLOBAL_DATA struct _gcolor * t_gama;
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
-///////////////////////////////////////////////////////////////////////////////
-//  Estructura para guardar info de mapas 3D
-///////////////////////////////////////////////////////////////////////////////
-
-#define INICIO_X       4992
-#define INICIO_Y       4992
-
-typedef struct {
-  byte  m3d_path[256];
-  byte  m3d_name[16];
-  int   numero;
-  byte  fpg_path[256];
-  byte  fpg_name[16];
-  tmap  map;
-} M3D_info;
+// M3D_info struct removed (MODE8/3D map editor deleted)
 
 //ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
 //  Estructura para guardar reducciones
