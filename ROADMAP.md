@@ -39,9 +39,10 @@ Clean up first, ship second, then modernize based on what real users actually wa
 - [ ] Remove hundreds of commented-out code blocks throughout
 
 ### Hide deprecated IDE features
-- [ ] Remove or hide from menus: CD Player, Clock, Trash icon, DOS Shell, Calculator
+- [x] Hide from menus: CD Player (CDDA code removed), DOS Shell (no DOS)
 - [ ] Remove or hide: 3D Map Editor (MODE8-dependent, useless without VPE)
 - [ ] Keep but flag: Sprite Generator (visor-based, evaluate if anyone uses it)
+- Clock, Trash icon, Calculator: keep — still functional
 
 ### Build system cleanup
 - [ ] Remove dead cmake options and platform branches

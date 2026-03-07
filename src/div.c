@@ -1679,8 +1679,8 @@ void mainloop(void) {
 			salir_del_entorno=1;
 	}
 
-	if ((shift_status&8) && scan_code==31) 
-		shell();
+	// Alt+S DOS shell disabled (no DOS)
+
 
 	//�������������������������������������������������������������������������
 	// Finaliza el bucle central
@@ -1982,8 +1982,8 @@ void dialog_loop(void) {
 	// End central loop
 	//�������������������������������������������������������������������������
 
-	if ((shift_status&8) && scan_code==31) 
-		shell();
+	// Alt+S DOS shell disabled (no DOS)
+
 
 	volcado_copia();
 

@@ -1376,20 +1376,18 @@ void calculadora(void);
 void menu_sistema2(void) {
   actualiza_menu(875,1,0); if ((old_mouse_b&1) && !(mouse_b&1)) {
     switch (v.estado) {
-      case 1: break; // removed: CD player
-      case 2: muestra_reloj(); break;
-      case 3: muestra_papelera(); break;
-      case 4: calculadora(); break;
-      case 5: dialogo(Vid_Setup0); break;
-      case 6: dialogo(Tap_Setup0); break;
-      case 7:
+      case 1: muestra_reloj(); break;
+      case 2: muestra_papelera(); break;
+      case 3: calculadora(); break;
+      case 4: dialogo(Vid_Setup0); break;
+      case 5: dialogo(Tap_Setup0); break;
+      case 6:
         dialogo(Cfg_Setup0);
         Cfg_Setup_end();
         break;
-      case 8: dialogo(MemInfo0); break;
-      case 9: dialogo(about0); break;
-      case 10: shell(); break;
-      case 11:
+      case 7: dialogo(MemInfo0); break;
+      case 8: dialogo(about0); break;
+      case 9:
         v_titulo=(char *)texto[40]; v_texto=NULL; dialogo(aceptar0);
         if (v_aceptar) salir_del_entorno=1; break;
     }
