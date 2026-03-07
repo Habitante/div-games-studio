@@ -21,7 +21,7 @@ void editor(void);
 void _parcial(void);
 void error_cursor2(void);
 void delete_text_cursor(void);
-void f_cortar_bloque(memptrsize borrar);
+void f_cortar_bloque(int borrar);
 void f_pegar_bloque(void);
 int linelen(byte * p);
 void f_fin(void);
@@ -967,7 +967,7 @@ void f_desmarcar(void) {
 
 int t_p;
 
-void f_cortar_bloque(memptrsize borrar) {
+void f_cortar_bloque(int borrar) {
   int n;
   t_p=0; // Tipo de papelera -> chars por defecto
   if (kbloque && kprg!=v.prg) {
@@ -1517,7 +1517,7 @@ void rellena_colin(void) {  // Funci¢n para obtener los colores de la siguiente
   unsigned char *p=csource;
   int i=0;
 
-  if (!coloreador ) {//|| strstr((const char *)v.titulo,".PRG")) {
+  if (!coloreador || !strstr((const char *)v.titulo,".PRG")) {
     memset(colin,ce4,1024);
   } else do {
     clexico();
@@ -1581,9 +1581,6 @@ void _completo(void) {
 
   if (v.al<v._al) { _an=v.an; _al=v.al; v.an=v._an; v.al=v._al; }
   an=v.an/big2; al=v.al/big2;
-#ifdef TTF
-	SDL_FillRect(v.surfaceptr,&rc,SDL_MapRGB( v.surfaceptr->format, colors[ce01].r, colors[ce01].g, colors[ce01].b));
-#endif
   if (kbloque && kprg==v.prg) {
     if (kcol1>linelen(kini)) kcol1=linelen(kini)+1;
     if (kbloque&1) {
@@ -1843,13 +1840,7 @@ void barra_info(void) {
 //ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
 
 void resize_surface(void) {
-
-#ifdef TTF
-	SDL_FreeSurface(v.surfaceptr);
-	v.surfaceptr=NULL;
-#endif	
 	window_surface(v.an,v.al,0);
-	
 }
 
 void resize(void) {
@@ -2310,62 +2301,8 @@ void put_char2(byte * ptr, int an, byte c,byte color) {
 void put_char3(byte * ptr, int an, byte c,int block, byte color) {
   int n,m;
   byte *si;
-	int oi;
-	char s[2];
-//	printf("%c",c);
-	
+
   si=font+c*char_size;
-int x=0,y=0;
-
-
-#ifdef TTF
-	s[0]=(char *)c;
-	s[1]=0;
-
-oi = ptr-v.ptr;
-
-
-//printf("char=%c ptr = %x vptr = %x oi=%x length = %x\n", c, si, v.ptr, oi, (v.an*18+2)*big2);
-
-
-//oi-=(v.an*18+2)*big2;
-
-//x=oi/v.an;//((v.an*18+2)*big2);
-x=(oi%an);//*18+2)*big2);
-//printf("x= %d y=%d\n",x,y);
-y=oi/an;//=50;//oi-(y*v.an);
-
-
-// get window
-	
-/*	tsurface = copia_surface;
-	for (vn=0;vn<max_windows;vn++) {
-		if(ventana[vn].ptr==copia) {
-			tsurface = ventana[vn].surfaceptr;
-			break;
-		}
-	}
-*/
-	// render ttf to copia_suface;	
-	// ofset by the window x/y
-	SDL_Rect rc;
-
-	rc.x=x;
-	rc.y=y;		
-	
-	SDL_Surface *tsurface=v.surfaceptr;
-	
-	if(tsurface!=NULL) {
-		SDL_Surface* surface = drawtext(editorfont, colors[color].r,colors[color].g,colors[color].b,0, 0,0,0, 0, (char *)s, solid);
-		rc.h=editor_font_al;
-		rc.w=editor_font_an;
-
-		SDL_BlitSurface(surface, NULL, tsurface,&rc);
-		SDL_FreeSurface(surface);
-	}
-
-#else
-
 
   if (block) {
 
@@ -2420,9 +2357,6 @@ y=oi/an;//=50;//oi-(y*v.an);
         break;
     }
   }
-
-#endif
-
 }
 
 

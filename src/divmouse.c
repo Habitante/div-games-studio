@@ -402,10 +402,12 @@ while(SDL_PollEvent(&event) )
     		m_b &=~4;
     		m_b &=~8;
 
-            // Fix editor input for SDL2
+            // Text input for SDL2 — only set ascii, not scan_code.
+            // scan_code is set by SDL_KEYDOWN via OSDEP_key[] (DOS scan codes).
+            // Setting scan_code to ASCII here caused collisions: e.g. 'M'=77
+            // matches Right Arrow, so Shift+M triggered Shift+Right in editor.
             if(event.type == SDL_TEXTINPUT) {
-            	scan_code = event.text.text[0];
-            	ascii = scan_code;
+            	ascii = event.text.text[0];
             }
             if(event.type == SDL_MOUSEWHEEL) {
             		
