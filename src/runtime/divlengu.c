@@ -102,13 +102,13 @@ void an_numero(void) {
 
 void an_comentario(void) {
 
-  while (*p_lengu!=13 && p_lengu<fin_textos) p_lengu++;
+  while (*p_lengu!='\n' && *p_lengu!='\r' && p_lengu<fin_textos) p_lengu++;
 }
 
 void an_texto(void) {
 
   text[numero]=q_lengu; p_lengu++; numero++;
-  while (*p_lengu!='"' && p_lengu<fin_textos && *p_lengu!=13) {
+  while (*p_lengu!='"' && p_lengu<fin_textos && *p_lengu!='\r' && *p_lengu!='\n') {
     if (*p_lengu=='\\') { p_lengu++;
       if (*p_lengu=='n') {
         *q_lengu++=13; *q_lengu++=10; p_lengu++;

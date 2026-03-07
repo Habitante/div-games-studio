@@ -839,44 +839,25 @@ void tabula_help(byte *si,byte *di,int lon) {
 
     if (c<32 && c!=13 && c!=10) *(si-1)=c='?';
 
-    // Salto de l¡nea simple forzado (ú)
-
-    if (c==250) {
-      *di++=0; help_lines++; ultimo_cr=1; chars=0;
-      if (*si==13) si+=2;
-      goto ini_tabulador;
-    }
-
-    if (c==0xC3 && *si==0xBA) {
-      *di++=0; 
-//      *di++=0;
-      help_lines++; 
-      ultimo_cr=1; 
-      chars=0;
-      *si++;
-      if (*si==13) si+=2;
-      goto ini_tabulador;
-    }
-
     // Comentarios
 
     if (c=='#' && ultimo_cr_real && si<end) {
-      while (*si++!=13); si++;
+      while (si < end && *si != '\n') si++;
+      if (si < end) si++; // skip LF
       goto ini_tabulador;
-//      c=*si++;
     } if (si>=end) break;
 
     // Saltos de l¡nea
 
-    if (c==13) {
+    if (c==13 || c==10) {
+      if (c==13 && si < end && *si==10) si++; // skip LF after CR
       if (ejemplo) {
         ultimo_cr_real=1; ultimo_cr=2;
-        si++; *di++=0; help_lines++;
+        *di++=0; help_lines++;
         di=continua_imagen(di); c=0; chars=0;
       } else {
         if (ultimo_cr==1) { *di++=0; help_lines++; di=continua_imagen(di); ultimo_cr=2; }
-        si++;
-        if (si>=end || *si==13) c=0; else if (!ultimo_cr) c=' '; else c=0;
+        if (si>=end || *si==13 || *si==10) c=0; else if (!ultimo_cr) c=' '; else c=0;
         ultimo_cr_real=1;
       }
     } else ultimo_cr_real=0;
@@ -907,6 +888,18 @@ void tabula_help(byte *si,byte *di,int lon) {
 
             case '}': // '}'
               c='}'; si+=2;
+              break;
+
+            case 'b': // {br} — forced line break
+              if (si[1]=='r' && si[2]=='}') {
+                si+=3;
+                *di++=0; help_lines++; ultimo_cr=1; chars=0;
+                if (*si=='\r') si++; // skip CR if present
+                if (*si=='\n') si++; // skip LF
+                continue;
+              }
+              // else fall through to default (bold text)
+              c=1; estado=1; chars--;
               break;
 
             case '/': // L¡nea
@@ -1304,18 +1297,11 @@ void tabula_help2(byte *si,byte *di,int lon) {
 
     if (c<32 && c!=13 && c!=10) *(si-1)=c='?';
 
-    // Salto de l¡nea simple forzado (ú)
-
-    if (c==250) {
-      *di++=0; ultimo_cr=1; chars=0;
-      if (*si==13) si+=2;
-      goto ini_tabulador;
-    }
-
     // Comentarios
 
     if (c=='#' && ultimo_cr_real && si<end) {
-      while (*si++!=13); si++;
+      while (si < end && *si != '\n') si++;
+      if (si < end) si++; // skip LF
       goto ini_tabulador;
     }
 
@@ -1323,15 +1309,15 @@ void tabula_help2(byte *si,byte *di,int lon) {
 
     // Saltos de l¡nea
 
-    if (c==13) {
+    if (c==13 || c==10) {
+      if (c==13 && si < end && *si==10) si++; // skip LF after CR
       if (ejemplo) {
         ultimo_cr_real=1; ultimo_cr=2;
-        si++; *di++=0;
+        *di++=0;
         c=0; chars=0;
       } else {
         if (ultimo_cr==1) { *di++=0; ultimo_cr=2; }
-        si++;
-        if (si>=end || *si==13) c=0; else if (!ultimo_cr) c=' '; else c=0;
+        if (si>=end || *si==13 || *si==10) c=0; else if (!ultimo_cr) c=' '; else c=0;
         ultimo_cr_real=1;
       }
     } else ultimo_cr_real=0;
@@ -1362,6 +1348,17 @@ void tabula_help2(byte *si,byte *di,int lon) {
             case '}': // '}'
               c='}'; si+=2;
               break;
+
+            case 'b': // {br} — forced line break
+              if (si[1]=='r' && si[2]=='}') {
+                si+=3;
+                *di++=0; ultimo_cr=1; chars=0;
+                if (*si=='\r') si++; // skip CR if present
+                if (*si=='\n') si++; // skip LF
+                continue;
+              }
+              // else fall through to default (bold/ignored in print)
+              continue;
 
             case '/': // L¡nea
               si+=2;

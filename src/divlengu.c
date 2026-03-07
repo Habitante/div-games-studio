@@ -75,13 +75,13 @@ void an_numero(void) {
 
 void an_comentario(void) {
 
-  while (*p!=13 && p<fin_textos) p++;
+  while (*p!='\n' && *p!='\r' && p<fin_textos) p++;
 }
 
 void an_texto(void) {
 
   texto[numero]=q; p++; numero++;
-  while (*p!='"' && p<fin_textos && *p!=13) {
+  while (*p!='"' && p<fin_textos && *p!='\r' && *p!='\n') {
     if (*p=='\\') { p++;
       if (*p=='n') {
         *q++=13; *q++=10; p++;

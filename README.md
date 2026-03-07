@@ -58,6 +58,7 @@ src/
   divvideo.c         Video mode setup
   diveffec.c         Screen transition effects
   divhandl.c         Window/dialog handler
+  divbrush.c         Brush/texture thumbnail browser (paint editor)
   global.h           Master header — types, externs, the lot
 
   runtime/
@@ -66,7 +67,6 @@ src/
     f.c              Runtime built-in functions
     divmixer.c       Runtime sound
     divlengu.c       Runtime language/text strings
-    vpe/             MODE8 3D engine (raycaster / voxel)
 
   runner/
     r.c              Launcher — starts the IDE, chains to debugger
@@ -81,8 +81,6 @@ src/
 
   win/
     osdepwin.c       Windows-specific helpers (fmemopen shim, etc.)
-
-  visor/             "Visor" — the low-level rendering / UI composition layer
 
 tools/               CMake toolchain files per platform
 div/                 Runtime directory (executables, DLLs, data files)
@@ -102,6 +100,13 @@ build/               CMake build output
   platform means implementing this interface.
 - **32-bit code**: The codebase assumes `sizeof(int) == sizeof(void*)` in many
   places. It must be compiled as 32-bit.
+- **UI strings and menus**: All IDE text comes from `system/lenguaje.div`, loaded
+  into the `texto[]` array at startup. Entries are numbered (`391 "Some text"`).
+  Menus are defined as consecutive blocks anchored at a base index — e.g. the Maps
+  menu starts at `800`, so `texto[800]` is the tab label, `texto[801]` the title,
+  and `texto[802..]` are the menu items in order. `crear_menu(800)` reads entries
+  sequentially until the next block. To add/remove a menu item, edit `lenguaje.div`
+  and the corresponding `case` in the menu's click handler.
 
 ## Supported platforms
 

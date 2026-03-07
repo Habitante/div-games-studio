@@ -703,7 +703,7 @@ extern char *Text03;
 void ShowText(void);
 void crea_barratitulo(void);
 
-extern byte * t64;
+byte *t64 = NULL;
 
 void RefPalAndDlg(int no_tocar_mapas,int guardar_original)
 {

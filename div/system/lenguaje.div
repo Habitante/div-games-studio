@@ -444,8 +444,6 @@
 
 390 "Shell not available in this version"
 
-391 "This option requires a Pentium(tm) or higher PC."
-
 392 "Demonstration version"
 393 "This is not an evaluation copy"
 394 "from DIV Games Studio 2 limited"
@@ -490,7 +488,6 @@
 
 421 "Volume"
 
-422 "Sprites generator"
 423 "Man"
 424 "Woman"
 425 "Child"
@@ -602,8 +599,6 @@
 
 512 "\# Copy in window "
 513 "Close the song?"
-
-514 "Generating sprites"
 
 515 "Insert the disk number"
 516 "and press a button to continue."
@@ -735,7 +730,6 @@
         "Search map..."
         "Edit map"
         "Explosions Generator"
-        "Sprites Generator"
 
 825     # FPG FILE MENU
 
@@ -821,7 +815,7 @@
         "Repeat [CTRL+G]"
         "Replace... [CTRL+R]"
 
-// 1000 section (3D MAP menu) removed (MODE8/3D map editor deleted)
+# 1000 section (3D MAP menu) removed (MODE8/3D map editor deleted)
 
 �������������������������������������������������������������������������������
 

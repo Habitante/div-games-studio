@@ -432,8 +432,6 @@ void err0(void);void err1(void);void err2(void);void err3(void);void info0(void)
 void browser0(void); void browser2(void);
 void MapperWarning0(void); void MapperWarning1(void); void MapperWarning2(void);
 // MapperVisor declarations removed (MODE8/3D map editor deleted)
-void generador_sprites(void);
-
 
 int nuevo_mapa(byte *mapilla);
 void nuevo_mapa3D(void);

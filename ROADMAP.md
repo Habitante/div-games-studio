@@ -34,15 +34,17 @@ Clean up first, ship second, then modernize based on what real users actually wa
 - [x] Cleaned up bundled sdlgfx — removed unused files, kept only `SDL_framerate.c/.h`
 - [x] Dropped DIV1 runtime (`div1run/`, ~3,000 lines) — orphaned, never called from IDE or launcher
 - [x] `.gitignore` already in place since initial commit
+- [x] Hidden from menus: CD Player (CDDA code removed), DOS Shell (no DOS), disabled Alt+S
+- Clock, Trash icon, Calculator: keep — still functional
+- [x] Removed 3D Map Editor: `divmap3d.c` (4,198 lines), `divmap3d.hpp`, `div/WLD/` data,
+  all menu entries, help docs, help.idx entries, and cross-references
+- [x] Removed MODE8 language remnants: 14 function stubs + struct _m8 + M8_* locals from runtime
+- [x] Removed CD music language remnants: play_cd/stop_cd/is_playing_cd stubs from runtime
+- [x] Extracted brush/texture browser from divmap3d.c → new `divbrush.c` (paint editor dependency)
+- [x] Removed Sprite Generator: `divspr.c` stub, menu entry, `div/GENSPR/` data directory, `generador_sprites()` declaration
 
 ### Still pending from Phase 0
 - [ ] Remove hundreds of commented-out code blocks throughout
-
-### Hide deprecated IDE features
-- [x] Hide from menus: CD Player (CDDA code removed), DOS Shell (no DOS)
-- [ ] Remove or hide: 3D Map Editor (MODE8-dependent, useless without VPE)
-- [ ] Keep but flag: Sprite Generator (visor-based, evaluate if anyone uses it)
-- Clock, Trash icon, Calculator: keep — still functional
 
 ### Build system cleanup
 - [ ] Remove dead cmake options and platform branches

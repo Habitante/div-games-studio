@@ -599,13 +599,6 @@ void menu_mapas2(void) {
         GenExplodes();
         break;
 
-      case 11:
-        if (cpu_type==5) generador_sprites();
-        else {
-          v_texto=(char *)texto[391]; dialogo(err0);
-        }
-        break;
-
     }
   }
 }
