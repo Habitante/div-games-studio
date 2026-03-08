@@ -1,13 +1,7 @@
-# include defaults
-# minimum set of defines for build
+# Default build options for DIV Games Studio
+# Platform toolchain files override these as needed.
 
-SET(HAS_SDL 1) # to display anything
-SET(HAS_NET 0) # network play
-SET(HAS_SDLIMAGE 0) # future
-SET(HAS_ZLIB 1) # to run code
-SET(HAS_SDLMIXER 0) # optional media lib
-SET(HAS_DLL 0) # optional dll support
-SET(HAS_JPEG 0) # legacy jpeg support
-SET(HAS_FLI 1) # legacy fli support
-SET(HAS_MODE8 0) # legacy mode8 support
-SET(HAS_GIT 0) # libgit support
+SET(HAS_SDLMIXER 1)  # SDL2_mixer for sound
+SET(HAS_ZLIB 1)      # zlib for compressed data
+SET(HAS_JPEG 0)      # libjpeg for JPEG support
+SET(HAS_FLI 1)       # FLI animation support
