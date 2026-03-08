@@ -54,7 +54,6 @@ void minimiza_ventana(void);
 void mueve_ventana(void);
 int determina_prg2(void);
 int determina_calc(void);
-void shell(void);
 void actualiza_dialogos(int x, int y, int an, int al);
 int colisiona_con(int a, int x, int y, int an, int al);
 void extrude(int x,int y,int an,int al,int x2,int y2,int an2,int al2);
@@ -1690,7 +1689,6 @@ void entorno(void) {
 	int llamar;
 
 	char cwork[256],*p;
-	//  check_free();
 
 	do {
 		mainloop();
@@ -1708,60 +1706,6 @@ void entorno(void) {
 //  Shell al sistema operativo
 //�����������������������������������������������������������������������������
 
-char *paths_to_check[] = {"COMSPEC","PATH"};
-
-char *command_path() {
-/*    static char fullpath[128];
-    char *commandpath;
-    int i;
-
-    if (commandpath=getenv("COMSPEC")) {
-         strlwr(strcpy(fullpath,commandpath));
-        if (strstr(fullpath,".com")) return(&fullpath);
-    }
-
-    for(i=0;i<sizeof(paths_to_check)/sizeof(paths_to_check[0]);i++) {
-    _searchenv("command.com",paths_to_check[i],fullpath);
-    if(fullpath[0]) return(&fullpath);
-    }    return(NULL);
-    */
-    return NULL;
-}
-
-void shell(void) {
-	
-	char *s=command_path();
-	unsigned n;
-
-	if (s==NULL) {
-		v_texto=(char *)texto[390]; dialogo(err0);
-	} else {
-		
-		EndSound();
-#ifndef SDL2
-		SDL_putenv("PROMPT=[DIV] $P$G");
-#endif
-
-		chdir(tipo[0].path);
-
-		system(s);
-
-		_dos_setdrive((memptrsize)toupper(*tipo[1].path)-'A'+1,&n);
-		
-		chdir(tipo[1].path);
-
-		svmode(); 
-		set_dac(dac);
-		
-		set_mouse(mouse_x,mouse_y);
-		
-		read_mouse();
-
-		volcado_completo=1; volcado_copia();
-
-		InitSound();
-	}
-}
 
 //�����������������������������������������������������������������������������
 //    Secondary loop DIV / OS ( management of a dialog box )
@@ -4735,26 +4679,6 @@ void check_mouse(void) {
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-//  Check if there is enough space on the HD
-///////////////////////////////////////////////////////////////////////////////
-
-unsigned int GetFreeUnid(char unidad);
-
-void check_free(void) {
-  char t1[128],t2[128];
-  unsigned int totfree;
-
-  totfree=GetFreeUnid((toupper(tipo[1].path[0])-'A')+1)/1024;
-
-  if (totfree<4096) {
-    v_titulo=t1; v_texto=t2;
-    sprintf(t1,(char *)texto[377],toupper((memptrsize)tipo[1].path[0]));
-    sprintf(t2,(char *)texto[378],(char *)4096-totfree);
-    dialogo(info0);
-  }
-
-}
 
 //�����������������������������������������������������������������������������
 //  Determines a prg for help with F1

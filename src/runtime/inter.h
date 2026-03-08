@@ -92,6 +92,7 @@ void mouse_window(void);
 void set_paleta (void);
 void set_dac(void);
 void retrazo(void);
+void fade_wait(void);
 void svmode(void);
 void rvmode(void);
 void init_volcado(void);

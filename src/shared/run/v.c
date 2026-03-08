@@ -200,6 +200,23 @@ void retrazo (void) {
 #endif
 }
 
+// Blocking fade: advance palette toward target, presenting each step.
+// Replaces DOS spin-wait loops that wrote VGA DAC registers directly.
+void fade_wait(void) {
+#ifdef DOS
+  while (now_dacout_r!=dacout_r || now_dacout_g!=dacout_g || now_dacout_b!=dacout_b) {
+    set_paleta(); set_dac();
+  }
+#else
+  while (now_dacout_r!=dacout_r || now_dacout_g!=dacout_g || now_dacout_b!=dacout_b) {
+    set_paleta(); set_dac();
+    OSDEP_Flip(vga);
+    SDL_Delay(16);
+  }
+#endif
+  fading=0;
+}
+
 //�����������������������������������������������������������������������������
 //      Set Video Mode (vga_an y vga_al se definen en shared.h)
 //�����������������������������������������������������������������������������

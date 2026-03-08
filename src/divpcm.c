@@ -4,7 +4,11 @@
 #include "divmixer.hpp"
 #include "divsb.h"
 
-//#include <io.h>
+#ifdef _WIN32
+#include <io.h>
+#else
+#include <unistd.h>
+#endif
 
 // HACK
 byte DmaBuf=0;
@@ -538,8 +542,7 @@ Mix_Chunk *SI;
 
   if(SI==NULL) {
 
-//		 free(pcminfo_aux);
-        //if(SI) free(SI);
+		 free(pcminfo_aux);
         v_texto=(char *)texto[46];
         dialogo(err0);
         continue;
@@ -631,7 +634,7 @@ void OpenDesktopSound(FILE *f)
   pcminfo *mypcminfo;
 
   pcminfo_aux=(byte *)malloc(sizeof(pcminfo));
-  if(pcminfo_aux==NULL) return; // OJO !!!
+  if(pcminfo_aux==NULL) return;
   mypcminfo=(pcminfo *)pcminfo_aux;
 
   fread(mypcminfo->name,       1,  14, f);
@@ -649,8 +652,24 @@ void OpenDesktopSound(FILE *f)
 
   fread(mypcminfo->SoundData, 2, mypcminfo->SoundSize, f);
 
-  nueva_ventana_carga(PCM0,ventana_aux.x,ventana_aux.y);
+#ifdef MIXER
+  {
+    byte *FileBuffer = SaveSoundMem(mypcminfo);
+    if(FileBuffer!=NULL) {
+      int wavSize = mypcminfo->SoundSize*2 + 44;
+      SDL_RWops *rw = SDL_RWFromMem(FileBuffer, wavSize);
+      mypcminfo->SI = Mix_LoadWAV_RW(rw, 1);
+      free(FileBuffer);
+    }
+    if(mypcminfo->SI==NULL) {
+      free(mypcminfo->SoundData);
+      free(pcminfo_aux);
+      return;
+    }
+  }
+#endif
 
+  nueva_ventana_carga(PCM0,ventana_aux.x,ventana_aux.y);
 }
 
 void SaveSound(pcminfo *mypcminfo, char *dst)
@@ -878,12 +897,9 @@ void OpenSong(void) {
 }
 
 void OpenDesktopSong(void) {
-debugprintf("TODO - divpcm.cpp OpenDesktopSong\n");
-
-#ifdef NOTYET
   modinfo *mymodinfo;
 
-  if((modinfo_aux=(char *)malloc(sizeof(modinfo)))==NULL)
+  if((modinfo_aux=(byte *)malloc(sizeof(modinfo)))==NULL)
   {
     v_texto=(char *)texto[45];
     dialogo(err0);
@@ -891,31 +907,10 @@ debugprintf("TODO - divpcm.cpp OpenDesktopSong\n");
   }
   mymodinfo=(modinfo *)modinfo_aux;
 
-  if(judas_channel[0].smp) judas_stopsample(0);
-
-  judas_loadxm(SongPathName);
-  if(judas_error != JUDAS_OK && judas_error == JUDAS_WRONG_FORMAT)
-  {
-    judas_loads3m(SongPathName);
-    if(judas_error != JUDAS_OK && judas_error == JUDAS_WRONG_FORMAT)
-    {
-      judas_loadmod(SongPathName);
-    }
-  }
-  if(judas_error != JUDAS_OK)
-  {
-    free(modinfo_aux);
-    v_texto=(char *)texto[46];
-    dialogo(err0);
-    return;
-  }
-
   memcpy(mymodinfo->name,SongName,14);
   memcpy(mymodinfo->pathname,SongPathName,256);
 
-  nueva_ventana_carga((int)MOD0,ventana_aux.x,ventana_aux.y);
-#endif
-
+  nueva_ventana_carga(MOD0,ventana_aux.x,ventana_aux.y);
 }
 
 int songposcount=0;
@@ -1631,12 +1626,9 @@ void ModifySound(int option)
 
 void ChangeSoundFreq(int freq)
 {
-	printf("TODO - divpcm.cpp ChangeSoundFreq\n");
-#ifdef NOTYET
   pcminfo   *mypcminfo=(pcminfo *)pcminfo_aux;
   pcminfo   pcminfo_bak;
   byte      *FileBuffer;
-  SoundInfo *SI=NULL;
   short     *short_ptr;
   float     paso, pos_f;
   int       length = mypcminfo->SoundSize;
@@ -1644,6 +1636,7 @@ void ChangeSoundFreq(int freq)
 
   if(mypcminfo->SoundData == NULL || mypcminfo->SoundFreq == freq) return;
 
+  // Resample from current frequency to target frequency (nearest-neighbor)
   paso   = (float)mypcminfo->SoundFreq/(float)freq;
   pos_f  = (float)length/paso;
   length = (int)(pos_f+0.5);
@@ -1660,6 +1653,7 @@ void ChangeSoundFreq(int freq)
     pos_f+=paso;
   }
 
+  // Build a WAV file in memory from the resampled data
   pcminfo_bak.SoundFreq = freq;
   pcminfo_bak.SoundSize = length;
   pcminfo_bak.SoundData = short_ptr;
@@ -1672,34 +1666,41 @@ void ChangeSoundFreq(int freq)
     return;
   }
 
-  SI = judas_loadwav_mem(FileBuffer);
-
-  if(SI==NULL || judas_error != JUDAS_OK)
+#ifdef MIXER
   {
-    if(SI)         free(SI);
-    if(FileBuffer) free(FileBuffer);
-    free(short_ptr);
-    v_texto=(char *)texto[45];
-    dialogo(err0);
-    return;
+    int wavSize = length*2 + 44;
+    SDL_RWops *rw = SDL_RWFromMem(FileBuffer, wavSize);
+    Mix_Chunk *newSI = Mix_LoadWAV_RW(rw, 1);
+
+    if(newSI==NULL)
+    {
+      free(FileBuffer);
+      free(short_ptr);
+      v_texto=(char *)texto[45];
+      dialogo(err0);
+      return;
+    }
+
+    // Free old sound data
+    if(mypcminfo->SoundData) {
+      Mix_FreeChunk(mypcminfo->SI);
+      mypcminfo->SI=NULL;
+      mypcminfo->SoundData=NULL;
+      mypcminfo->SoundSize=0;
+    }
+
+    // Store new resampled sound
+    mypcminfo->SoundFreq = freq;
+    mypcminfo->SoundSize = newSI->alen/2;
+    mypcminfo->SoundData = (short *)malloc(newSI->alen);
+    if(mypcminfo->SoundData!=NULL)
+      memcpy(mypcminfo->SoundData, newSI->abuf, newSI->alen);
+    mypcminfo->SI = newSI;
   }
-
-  if(mypcminfo->SoundData) {
-    judas_freesample(mypcminfo->sample);
-    mypcminfo->SoundData=NULL;
-    mypcminfo->SoundSize=0;
-  }
-
-  mypcminfo->SoundFreq = freq;
-  mypcminfo->SoundSize = SI->SoundSize;
-  mypcminfo->SoundData = SI->SoundData;
-  mypcminfo->sample    = SI->sample;
-
-  free(SI);
-  free(FileBuffer);
-  free(short_ptr);
 #endif
 
+  free(FileBuffer);
+  free(short_ptr);
 }
 
 
@@ -1959,22 +1960,19 @@ void CopyNewSound(pcminfo *mypcminfo, int ini, int fin)
 
 void PasteNewSounds(void)
 {
-	printf("TODO - divpcm.cpp PasteNewSounds\n");
-
-#ifdef NOTYET
   pcminfo   *mypcminfo;
   byte      *FileBuffer;
-  SoundInfo *SI=NULL;
   int       con;
 
   for(con=0; con<NumSND; con++)
   {
-    if((pcminfo_aux=(char *)malloc(sizeof(pcminfo)))==NULL)
+    if((pcminfo_aux=(byte *)malloc(sizeof(pcminfo)))==NULL)
     {
       v_texto=(char *)texto[45];
       dialogo(err0);
       continue;
     }
+    memset(pcminfo_aux,0,sizeof(pcminfo));
     mypcminfo=(pcminfo *)pcminfo_aux;
 
     mypcminfo->SoundFreq = DesktopSND[con].SoundFreq;
@@ -1990,35 +1988,38 @@ void PasteNewSounds(void)
       continue;
     }
 
-    SI = judas_loadwav_mem(FileBuffer);
-
-    if(SI==NULL || judas_error != JUDAS_OK)
+#ifdef MIXER
     {
-      if(SI)         free(SI);
-      if(FileBuffer) free(FileBuffer);
-      free(DesktopSND[con].SoundData);
-      free(pcminfo_aux);
-      v_texto=(char *)texto[46];
-      dialogo(err0);
-      continue;
+      int wavSize = mypcminfo->SoundSize*2 + 44;
+      SDL_RWops *rw = SDL_RWFromMem(FileBuffer, wavSize);
+      Mix_Chunk *newSI = Mix_LoadWAV_RW(rw, 1);
+
+      if(newSI==NULL)
+      {
+        free(FileBuffer);
+        free(DesktopSND[con].SoundData);
+        free(pcminfo_aux);
+        v_texto=(char *)texto[46];
+        dialogo(err0);
+        continue;
+      }
+
+      memcpy(mypcminfo->name,DesktopSND[con].name,14);
+      mypcminfo->pathname[0] = 0;
+      mypcminfo->SoundBits = DesktopSND[con].SoundBits;
+      mypcminfo->SoundSize = newSI->alen/2;
+      mypcminfo->SoundData = (short *)malloc(newSI->alen);
+      if(mypcminfo->SoundData!=NULL)
+        memcpy(mypcminfo->SoundData, newSI->abuf, newSI->alen);
+      mypcminfo->SI = newSI;
     }
+#endif
 
-    memcpy(mypcminfo->name,DesktopSND[con].name,14);
-    mypcminfo->pathname[0] = 0;
-    mypcminfo->SoundFreq = SI->SoundFreq;
-    mypcminfo->SoundBits = DesktopSND[con].SoundBits;
-    mypcminfo->SoundSize = SI->SoundSize;
-    mypcminfo->SoundData = SI->SoundData;
-    mypcminfo->sample    = SI->sample;
-
-    free(SI);
     free(FileBuffer);
     free(DesktopSND[con].SoundData);
 
-    nueva_ventana((int)PCM0);
+    nueva_ventana(PCM0);
   }
-#endif
-  
 }
 
 byte *SaveSoundMem(pcminfo *mypcminfo)
@@ -2101,18 +2102,11 @@ int IsWAV(char *FileName)
 
 int NewSample(pcminfo *mypcminfo)
 {
-	printf("TODO - divpcm.cpp NewSample\n");
-#ifdef NOTYET
-  mypcminfo->sample = judas_allocsample(mypcminfo->SoundSize*2);
-  if(judas_error != JUDAS_OK) return(0);
-  mypcminfo->sample->repeat    = mypcminfo->sample->start;
-  mypcminfo->sample->end       = mypcminfo->sample->start + mypcminfo->SoundSize*2;
-  mypcminfo->sample->voicemode = VM_ON | VM_16BIT;
-  judas_ipcorrect(mypcminfo->sample);
-  mypcminfo->SoundData = (short *)(mypcminfo->sample->start);
-#endif
+  mypcminfo->SoundData = (short *)malloc(mypcminfo->SoundSize*2);
+  if(mypcminfo->SoundData == NULL) return(0);
+  mypcminfo->sample = NULL;
+  mypcminfo->SI = NULL;
   return(1);
- 
 }
 
 void wline(char *ptr,int realan,int an,int al,int x0, int y0, int x1, int y1, char color) {

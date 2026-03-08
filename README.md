@@ -136,6 +136,7 @@ pacman -S --needed \
   mingw-w64-i686-SDL2_mixer \
   mingw-w64-i686-SDL2_net \
   mingw-w64-i686-zlib \
+  mingw-w64-i686-libjpeg-turbo \
   mingw-w64-i686-pkgconf
 ```
 
@@ -187,7 +188,7 @@ updating MSYS2):
 cp /c/msys64/mingw32/bin/{SDL2.dll,libgcc_s_dw2-1.dll,libwinpthread-1.dll} div/
 
 # To div/system/ (for the IDE and runtimes)
-cp /c/msys64/mingw32/bin/{SDL2.dll,SDL2_mixer.dll,SDL2_net.dll,zlib1.dll} div/system/
+cp /c/msys64/mingw32/bin/{SDL2.dll,SDL2_mixer.dll,SDL2_net.dll,zlib1.dll,libjpeg-8.dll} div/system/
 cp /c/msys64/mingw32/bin/{libgcc_s_dw2-1.dll,libwinpthread-1.dll} div/system/
 cp /c/msys64/mingw32/bin/{libFLAC.dll,libmpg123-0.dll,libogg-0.dll} div/system/
 cp /c/msys64/mingw32/bin/{libopus-0.dll,libopusfile-0.dll,libvorbis-0.dll} div/system/

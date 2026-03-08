@@ -1352,7 +1352,7 @@ void preparar_tapiz(void) {
     case 1: descomprime_MAP(temp2,temp,0); break;
     case 2: descomprime_PCX(temp2,temp,0); break;
     case 3: descomprime_BMP(temp2,temp,0); break;
-//    case 4: descomprime_JPG(temp2,temp,0,lon); break;
+    case 4: descomprime_JPG(temp2,temp,0,lon); break;
   } swap(map_an,tap_an); swap(map_al,tap_al);
   cargar_paleta=n;
 

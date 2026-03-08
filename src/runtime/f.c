@@ -1966,9 +1966,7 @@ vvga_al = vga_al;
 
 
   dacout_r=64; dacout_g=64; dacout_b=64; dacout_speed=8;
-  while (now_dacout_r!=dacout_r || now_dacout_g!=dacout_g || now_dacout_b!=dacout_b) {
-    set_paleta(); set_dac(); //LoopSound();
-  }
+  fade_wait();
 
   if(copia!=NULL) {
 	free(copia); 
@@ -2506,11 +2504,7 @@ void fade_on(void) {
 
 void fade_off(void) {
   dacout_r=64; dacout_g=64; dacout_b=64; dacout_speed=8;
-  if (now_dacout_r!=dacout_r || now_dacout_g!=dacout_g || now_dacout_b!=dacout_b) 
-  //{
-  //  set_paleta(); set_dac(); //LoopSound();
-  //} 
-  fading=1;
+  fade_wait();
   pila[++sp]=0;
 }
 

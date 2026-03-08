@@ -1902,8 +1902,7 @@ void volcado_copia(void) {
   // **************************************************
 
   dacout_r=0; dacout_g=0; dacout_b=0; dacout_speed=16;
-  while (now_dacout_r!=dacout_r || now_dacout_g!=dacout_g || now_dacout_b!=dacout_b) {
-    set_paleta(); set_dac(); }
+  fade_wait();
 
   // **************************************************
 

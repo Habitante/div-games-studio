@@ -178,28 +178,10 @@ modinfo *mymodinfo;
                                         n=fwrite(ventana[x].aux,1,14,desktop);
                                         n=fwrite(ventana[x].aux+14,1,_MAX_PATH-14,desktop);
                                         break;
-#ifdef NOTYET
                                  case    105: //pcm
                                         mypcminfo=(pcminfo *)ventana[x].aux;
                                         SaveDesktopSound(mypcminfo, desktop);
-/*
-                                        if(mypcminfo->pathname[0]!=0) // OJO !!!
-                                        {
-                                          n=fwrite(mypcminfo->name,1,14,desktop);
-                                          // fprintf(lst,"pcm name %d elementos escritos <<<\n",n);
-                                          n=fwrite(mypcminfo->pathname,1,256,desktop);
-                                          // fprintf(lst,"pcm path %d elementos escritos <<<\n",n);
-                                          // fprintf(lst,"  pcm\n");
-                                        }
-*/
-/*
-                                        n=fwrite(mypcminfo, 1, sizeof(pcminfo), desktop);
-                                        n=fwrite(mypcminfo->SoundData, 2, mypcminfo->SoundSize, desktop);
-*/
-										free(mypcminfo->SoundData);
-										Mix_FreeChunk(mypcminfo->SI);
                                         break;
-#endif
                                  // case 106 (map3d) removed (MODE8/3D map editor deleted)
                                  case    107: //mod
                                         mymodinfo=(modinfo *)ventana[x].aux;
@@ -485,26 +467,9 @@ int UpLoad_Desktop()
                                   if(!Interpretando) actualiza_caja(0,0,vga_an,vga_al);
                                 }
                                 break;
-#ifdef NOTYET                                
                         case    105: //pcm
-/*
-                                fread(SoundName,1,14,desktop);
-                                fread(SoundPathName,1,256,desktop);
-                                if ((f=fopen(SoundPathName,"rb"))!=NULL) {
-                                  fclose(f);
-                                  OpenDesktopSound();
-                                }
-*/
-/*
-                                pcminfo_aux=(char *)malloc(sizeof(pcminfo));
-                                mypcminfo=(pcminfo *)pcminfo_aux;
-                                mypcminfo->SoundData=(short *)malloc(mypcminfo->SoundSize*2);
-                                fread(mypcminfo, 1, sizeof(pcminfo), desktop);
-                                fread(mypcminfo->SoundData, 2, mypcminfo->SoundSize, desktop);
-*/
                                 OpenDesktopSound(desktop);
                                 break;
-#endif
                         // case 106 (map3d) removed (MODE8/3D map editor deleted)
                         case    107: //mod
                                 fread(SongName,1,14,desktop);

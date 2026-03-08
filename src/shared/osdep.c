@@ -228,8 +228,8 @@ int _chdir(const char* Directory)
 }
 
 char *_fullpath(char *_FullPath,const char *_Path,size_t _SizeInBytes) {
-//	realpath(_Path, _FullPath);
-strcpy(_FullPath, _Path);
+	if (realpath(_Path, _FullPath) == NULL)
+		strcpy(_FullPath, _Path);
 	return _FullPath;
 }
 

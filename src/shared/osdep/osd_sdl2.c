@@ -110,12 +110,7 @@ OSDEP_Surface * OSDEP_SetVideoMode(int width, int height, int bpp, char fs) {
 #endif
 
     if(OSDEP_window != NULL) {
-//	    SDL_DestroyRenderer(OSDEP_renderer);
-//    	SDL_DestroyWindow(OSDEP_window);
-    	// if window smaller that vibile allowed, resize
-    	// SDL_SetWindowSize(OSDEP_window,
-     //                   width, height);
-
+    	SDL_SetWindowSize(OSDEP_window, width, height);
     } else {
     	SDL_CreateWindowAndRenderer(width, height, SDL_WINDOW_RESIZABLE, &OSDEP_window, &OSDEP_renderer);
     	// hide mouse cursor

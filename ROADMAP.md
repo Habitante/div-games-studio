@@ -61,7 +61,8 @@ Clean up first, ship second, then modernize based on what real users actually wa
 - [x] Removed 3 dead `#ifdef TTF` blocks from `divedit.c`
 
 ### Still pending from Phase 0
-- [ ] Remove hundreds of commented-out code blocks throughout
+- [x] Remove hundreds of commented-out code blocks throughout
+  (52 files audited, ~1,500 lines removed, 28 review items resolved — see `reports/REVIEW-ITEMS.md`)
 - [x] Remove remaining `#ifdef TTF` dead code (~25 blocks across div.c, divwindo.c,
   divpalet.c, divsetup.c, divhelp.c, divvideo.c, global.h, osdep.h)
 
@@ -112,6 +113,29 @@ Make the compiler tell us what's actually broken. Fix the scariest stuff.
 - [ ] Fix window close button (currently logged but ignored — no `salir_del_entorno`)
 - [ ] Fix focus loss handling (no pause on minimize/alt-tab)
 - [ ] Fix or remove the commented-out `free()` in runtime stack management (`i.c:778`)
+
+### Fix video mode / display system
+The entire video mode and fullscreen system is broken in the SDL2 port.
+In the original DOS version, everything was fullscreen (no choice), and the
+IDE listed available VGA/VESA modes. The SDL2 port made everything windowed
+but left the underlying infrastructure broken:
+
+- [ ] `OSDEP_IsFullScreen()` — **destroys the window and calls SDL_Quit()**
+      instead of checking fullscreen state. Must be a simple flag check.
+- [ ] `OSDEP_ListModes()` — returns NULL (hardcoded). `detectar_vesa()` falls
+      back to 8 hardcoded modes but `num_modos` stays 0, so the System →
+      Video Mode dialog shows an empty list.
+- [ ] `OSDEP_SetVideoMode()` ignores the `fs` (fullscreen) parameter — window
+      is always created with `SDL_WINDOW_RESIZABLE`, never fullscreen.
+- [ ] `test_video` startup dialog disabled (item 9) — depends on the above.
+- [ ] IDE: should support maximize, Alt+Enter fullscreen toggle, respond to
+      modern window management conventions.
+- [ ] Runtime: games designed for 320x200 or 640x480 open in tiny windows
+      with no way to scale or go fullscreen. Need integer-scaled upscaling
+      (2x, 3x, 4x) and a fullscreen option.
+- [ ] Replace the old VGA/VESA mode list with something meaningful for modern
+      displays (e.g. desktop resolution for fullscreen, user-chosen scale
+      factor for windowed).
 
 ### Normalize basics
 - [ ] Unify byte types: pick `uint8_t` everywhere, stop mixing `byte`/`char`/`uchar`
