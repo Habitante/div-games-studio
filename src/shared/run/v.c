@@ -17,13 +17,8 @@
 
 #ifdef DOS
 byte * vga = (byte *) 0xA0000; // Physical screen
-                               // TODO - (change this to SDL surface pixels)
 #else
 SDL_Surface *vga=NULL;
-SDL_Window *divWindow=NULL;
-SDL_Renderer *divRender=NULL;
-SDL_Texture *divTexture=NULL;
-
 #endif
 
 void snapshot(byte *p);
@@ -395,21 +390,16 @@ void rvmode(void) {
 //      Dump buffer to VGA
 //-----------------------------------------------------------------------------
 void volcadosdl(byte *p) {
-	
-	SDL_UpdateTexture(divTexture, NULL, copia, vga_an * sizeof (Uint8));
-SDL_RenderClear(divRender);
-SDL_RenderCopy(divRender, divTexture, NULL, NULL);
-SDL_RenderPresent(divRender);
 
 	if(SDL_MUSTLOCK(vga))
 		SDL_LockSurface(vga);
 
 	byte *q = (byte *)vga->pixels;
-	int vy=0;
-	for (vy=0; vy<vga_al;vy++) {
-		memcpy(q,p,vga_an);
+	int vy;
+	for (vy=0; vy<vga_al; vy++) {
+		memcpy(q, p, vga_an);
 		p+=vga_an;
-		q+=vga->pitch;//vga_an;//*vga->pitch*vga->format->BytesPerPixel;
+		q+=vga->pitch;
 	}
 
 	if(SDL_MUSTLOCK(vga))
@@ -444,7 +434,7 @@ if ((shift_status&4) && (shift_status&8) && key(_9)) {
 			if(!(framecount%(fps/12)) && framecount>5 && framecount<maxframes) { // && framecount%3==1) {
 				char filename[255];
 				memset(filename,0,255);
-				sprintf(filename,"/home/mike/Desktop/out/out%05d.bmp",framecount);
+				sprintf(filename,"out%05d.bmp",framecount);
 				SDL_SaveBMP(vga, filename);
 			} else {
 				if(framecount>maxframes)
@@ -459,10 +449,11 @@ if ((shift_status&4) && (shift_status&8) && key(_9)) {
     do {tecla();} while(key(_P));
   }
   
-  if (shift_status&8 && key(_ENTER)) {
+  { static uint32_t fs_cooldown = 0;
+    if (shift_status&8 && key(_ENTER) && SDL_GetTicks() - fs_cooldown > 500) {
 	SDL_ToggleFS(vga);
-	do{tecla();} while (key(_ENTER));
- }
+	fs_cooldown = SDL_GetTicks();
+  } }
 
 #endif
   if (fli_palette_update) retrazo();

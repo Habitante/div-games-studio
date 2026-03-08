@@ -106,14 +106,26 @@ Make the compiler tell us what's actually broken. Fix the scariest stuff.
 
 ### Enable warnings
 - [ ] Replace `-w` (suppress all warnings) with `-Wall -Wextra` in CMakeLists.txt
+  - Baseline: 1,745 warnings (see `reports/warnings-baseline-full.md`)
+  - ~653 are shadow warnings from globals `r,g,b,c,d,a,f,x,y` — suppress with `-Wno-shadow` initially
 - [ ] Fix all implicit function declarations
 - [ ] Fix pointer/int cast warnings (the 32-bit-assumption cases)
 - [ ] Fix unused variable warnings
 - [ ] Remove `-fpermissive` once code is clean enough
 
+### Critical bugs fixed (found via `-Wall -Wextra` audit, 2026-03-08)
+- [x] `divc.c:1854`: `!ivnom.b[0]!='.'` operator precedence bug — `#include` path
+      "skip dot-files" check was always true. Present since original code.
+- [x] `divforma.c:1403`: use-after-free — BMP palette loader read from freed
+      `CopiaBuffer`. Moved `free()` to after palette memcpy in each branch.
+- [x] Missing return statements: `divc.c` div_open_file_mode(), `div.c` GetHeapFree()/
+      GetMemoryFree(), `divpack.c` pack(), `divsound.c` GetSongPos()/GetSongLine(),
+      `divkeybo.c` GetIRQVector(). Added appropriate fallback returns.
+- [x] `div.c` determina_unidades(): void function had `return -1`/`return 0` — fixed.
+
 ### Fix known landmines
-- [ ] `divkeybo.c:32-33`: DOS BIOS addresses hardcoded (`0x41a`, `0x41c`) — will crash
-- [ ] `div.c:2949`: hardcoded `/home/mike/div2015/system/red_panel.png` dev path
+- [x] `divkeybo.c`: DOS BIOS pointers (`0x417`, `0x41a`, `0x41c`) guarded with `#ifdef DOS`
+- [x] `div.c:2949`: `red_panel.png` already fixed to relative path; `v.c` recording path fixed too
 - [ ] Audit all 1,493 `sprintf`/`strcpy` calls — migrate critical paths to safe variants
 - [ ] Audit the `PrintEvent` pattern for similar `#ifdef`-body bugs (divmouse.c:506 was one)
 - [x] Fix window close button — was already working via `SDL_QUIT` → `salir_del_entorno`.
@@ -137,22 +149,26 @@ In the original DOS version, everything was fullscreen (no choice), and the
 IDE listed available VGA/VESA modes. The SDL2 port made everything windowed
 but left the underlying infrastructure broken:
 
-- [ ] `OSDEP_IsFullScreen()` — **destroys the window and calls SDL_Quit()**
-      instead of checking fullscreen state. Must be a simple flag check.
-- [ ] `OSDEP_ListModes()` — returns NULL (hardcoded). `detectar_vesa()` falls
-      back to 8 hardcoded modes but `num_modos` stays 0, so the System →
-      Video Mode dialog shows an empty list.
-- [ ] `OSDEP_SetVideoMode()` ignores the `fs` (fullscreen) parameter — window
-      is always created with `SDL_WINDOW_RESIZABLE`, never fullscreen.
-- [ ] `test_video` startup dialog disabled (item 9) — depends on the above.
-- [ ] IDE: should support maximize, Alt+Enter fullscreen toggle, respond to
-      modern window management conventions.
-- [ ] Runtime: games designed for 320x200 or 640x480 open in tiny windows
-      with no way to scale or go fullscreen. Need integer-scaled upscaling
-      (2x, 3x, 4x) and a fullscreen option.
-- [ ] Replace the old VGA/VESA mode list with something meaningful for modern
-      displays (e.g. desktop resolution for fullscreen, user-chosen scale
-      factor for windowed).
+- [x] `OSDEP_IsFullScreen()` — was destroying the window + calling SDL_Quit().
+      Replaced with `SDL_GetWindowFlags()` query. Alt+Enter and shutdown no longer crash.
+- [x] `OSDEP_ListModes()` / `detectar_vesa()` — fallback had 8 modes but `num_modos`
+      stayed 0. Fixed: `num_modos=8`, video mode dialog now shows entries.
+- [x] `OSDEP_SetVideoMode()` — now honors the `fs` parameter. Uses
+      `SDL_WINDOW_FULLSCREEN_DESKTOP` for fullscreen, `SDL_WINDOW_RESIZABLE` for windowed.
+      Added `SDL_RenderSetLogicalSize()` + `SDL_RenderSetIntegerScale()` for proper
+      pixel-art scaling with letterboxing at any window size.
+- [x] `OSDEP_SetCaption()` — now calls `SDL_SetWindowTitle()` (was storing but never applying).
+- [x] `OSDEP_SetPalette()` — now uses actual `firstcolor`/`ncolors` params (was hardcoded 0,256).
+- [x] Texture changed from STATIC to STREAMING (`SDL_TEXTUREACCESS_STREAMING`) for
+      efficient per-frame updates.
+- [x] Removed dead `divWindow`/`divRender`/`divTexture` globals (v.c, divvideo.c).
+- [x] Removed dead code in runtime `volcadosdl()` (NULL pointer SDL calls).
+- [x] Removed dead Mode X planar copy and manual 32/24/16-bit pixel conversion in
+      IDE `volcadosdl()` — surface is always 8-bit, OSDEP_Flip handles conversion.
+- [x] Removed dead `nothing()` function from divvideo.c.
+- [x] Alt+Enter fullscreen toggle now works in both IDE and runtime.
+- [ ] `test_video` startup dialog disabled (item 9) — could be re-enabled now.
+- [ ] DPI-aware rendering (`SDL_WINDOW_ALLOW_HIGHDPI`) — future improvement.
 
 ### Normalize basics
 - [x] Remove SDL1 / Emscripten preprocessor branches (30 `#ifdef SDL2` / `#ifndef SDL2` /

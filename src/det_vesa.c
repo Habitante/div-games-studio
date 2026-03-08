@@ -25,8 +25,8 @@ void detectar_vesa(void) { // Detects available video modes
 	modes=OSDEP_ListModes();
 
 	/* Check is there are any modes available */
-	if(modes == 0 || modes == -1) {
-		// none, just list some standard ones for use in windowed mode.
+	if(modes == 0 || modes == (OSDEP_VMode **)-1) {
+		// No mode enumeration — list standard resolutions for windowed mode
 		modos[0].ancho=320; modos[0].alto=240; modos[0].modo=1;
 		modos[1].ancho=640; modos[1].alto=480; modos[1].modo=1;
 		modos[2].ancho=800; modos[2].alto=600; modos[2].modo=1;
@@ -35,12 +35,12 @@ void detectar_vesa(void) { // Detects available video modes
 		modos[5].ancho=1920; modos[5].alto=1080; modos[5].modo=1;
 		modos[6].ancho=1280; modos[6].alto=720; modos[6].modo=1;
 		modos[7].ancho=376; modos[7].alto=282; modos[7].modo=1;
+		num_modos=8;
 	} else {
 		for(i=0;modes[i];++i) {
 			modos[i].ancho=modes[i]->w; modos[i].alto=modes[i]->h; modos[i].modo=1;
 		}
-		num_modos=i-1;
-
+		num_modos=i;
 	}
 	
 	sprintf(marcavga,"SDL Video Driver");

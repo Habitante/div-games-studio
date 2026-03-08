@@ -1,5 +1,4 @@
-// OSDEP INCLUDE FILE
-// CONFIGURED FOR SDL1.2
+// OSDEP — SDL2 platform abstraction layer
 
 #include "osd_sdl2.h"
 
@@ -37,13 +36,13 @@ uint32_t OSDEP_GetTicks(void) {
 
 // Display
 void OSDEP_SetCaption(char *title, char *icon) {
-	fprintf(stdout, "%s\n", __FUNCTION__);
 	strcpy(windowtitle,title);
+	if (OSDEP_window)
+		SDL_SetWindowTitle(OSDEP_window, title);
 }
 
 OSDEP_VMode ** OSDEP_ListModes(void) {
-fprintf(stdout, "%s\n", __FUNCTION__);
-	return NULL;
+	return NULL; // Mode enumeration handled by detectar_vesa() fallback
 }
 
 void OSDEP_WarpMouse(int x, int y) {
@@ -51,31 +50,9 @@ void OSDEP_WarpMouse(int x, int y) {
 }
 
 int OSDEP_IsFullScreen(void) {
-    if(OSDEP_window != NULL) {
-	    SDL_DestroyWindow(OSDEP_window);
-    	OSDEP_window = NULL;
-    }
-    if(OSDEP_renderer !=NULL) {
-    	SDL_DestroyRenderer(OSDEP_renderer);
-    	OSDEP_renderer = NULL;
-    }
-
-    if(OSDEP_texture !=NULL) {
-	    SDL_DestroyTexture(OSDEP_texture);
-	    OSDEP_texture = NULL;
-    }
-    if(OSDEP_buffer32 !=NULL) {
-    	SDL_FreeSurface(OSDEP_buffer32);
-    	OSDEP_buffer32 = NULL;
-    }
-    if(OSDEP_buffer8 !=NULL) {
-    	SDL_FreeSurface(OSDEP_buffer8);
-    	OSDEP_buffer8 = NULL;
-    }
-
-    SDL_Quit();
-    return 0;
-
+    if (OSDEP_window == NULL) return 0;
+    Uint32 flags = SDL_GetWindowFlags(OSDEP_window);
+    return (flags & (SDL_WINDOW_FULLSCREEN | SDL_WINDOW_FULLSCREEN_DESKTOP)) != 0;
 }
 
 void OSDEP_SetWindowSize(int w, int h) {
@@ -90,33 +67,34 @@ SDL_Log("VW: %d VH: %d W: %d H: %d\n",vwidth, vheight, w,h);
 }
 
 OSDEP_Surface * OSDEP_SetVideoMode(int width, int height, int bpp, char fs) {
-	fprintf(stdout, "%s\n", __FUNCTION__);
-	Uint32 rmask, gmask, bmask, amask;
 
-
-	SDL_Log("Setting Videomode to %d x %d\n", width, height);
-    /* SDL interprets each pixel as a 32-bit number, so our masks must depend
-       on the endianness (byte order) of the machine */
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-    rmask = 0xff000000;
-    gmask = 0x00ff0000;
-    bmask = 0x0000ff00;
-    amask = 0x000000ff;
-#else
-    rmask = 0x000000ff;
-    gmask = 0x0000ff00;
-    bmask = 0x00ff0000;
-    amask = 0xff000000;
-#endif
+	SDL_Log("Setting Videomode to %d x %d (fs=%d)\n", width, height, fs);
 
     if(OSDEP_window != NULL) {
-    	SDL_SetWindowSize(OSDEP_window, width, height);
+    	// Window exists — update fullscreen state and size
+    	if (fs) {
+    		SDL_SetWindowFullscreen(OSDEP_window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+    	} else {
+    		SDL_SetWindowFullscreen(OSDEP_window, 0);
+    		SDL_SetWindowSize(OSDEP_window, width, height);
+    	}
     } else {
-    	SDL_CreateWindowAndRenderer(width, height, SDL_WINDOW_RESIZABLE, &OSDEP_window, &OSDEP_renderer);
-    	// hide mouse cursor
-		SDL_ShowCursor(SDL_DISABLE);
+    	// Create new window
+    	Uint32 flags = SDL_WINDOW_RESIZABLE;
+    	if (fs) flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
 
+    	SDL_CreateWindowAndRenderer(width, height, flags, &OSDEP_window, &OSDEP_renderer);
+    	SDL_ShowCursor(SDL_DISABLE);
+
+    	if (windowtitle[0])
+    		SDL_SetWindowTitle(OSDEP_window, windowtitle);
 	}
+
+	// Set logical size so SDL handles scaling and mouse coordinate mapping.
+	// Content is centered with letterboxing to maintain aspect ratio.
+	SDL_RenderSetLogicalSize(OSDEP_renderer, width, height);
+
+	// Recreate surfaces and texture at the new logical size
     if(OSDEP_texture !=NULL) {
 	    SDL_DestroyTexture(OSDEP_texture);
 	    OSDEP_texture = NULL;
@@ -130,15 +108,15 @@ OSDEP_Surface * OSDEP_SetVideoMode(int width, int height, int bpp, char fs) {
     	OSDEP_buffer8 = NULL;
     }
 
-
 	OSDEP_buffer8 = SDL_CreateRGBSurface(0, width, height, 8,
 		0,0,0,0);
-	
+
 	OSDEP_buffer32 = SDL_CreateRGBSurface(0, width, height, 32,
 		0,0,0,0);
 
-
-	OSDEP_texture = SDL_CreateTextureFromSurface(OSDEP_renderer, OSDEP_buffer32);
+	OSDEP_texture = SDL_CreateTexture(OSDEP_renderer,
+		SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING,
+		width, height);
 
 	return OSDEP_buffer8;
 }
@@ -169,7 +147,7 @@ void OSDEP_UpdateRect(SDL_Surface *screen, Sint32 x, Sint32 y, Sint32 w, Sint32 
 }
 
 int OSDEP_SetPalette(OSDEP_Surface *surface, OSDEP_Color *colors, int firstcolor, int ncolors) {
-	SDL_SetPaletteColors(surface->format->palette, colors, 0, 256);
+	SDL_SetPaletteColors(surface->format->palette, colors + firstcolor, firstcolor, ncolors);
 	return 1;
 }
 

@@ -28,47 +28,36 @@ void volcadosdl(byte *p);
 #define MISC_OUTPUT     0x3c2   //Miscellaneous Output register
 
 SDL_Surface *vga;
-SDL_Window *divWindow;
-SDL_Renderer *divRender;
 
 int IsFullScreen(SDL_Surface *surface)
 {
 	return OSDEP_IsFullScreen();
 }
 
+static int windowed_an = 0, windowed_al = 0;
+
 void SDL_ToggleFS(SDL_Surface *surface)
 {
-    if (IsFullScreen(surface))
-		fsmode=0;
-	else 
-		fsmode=1;
-	
-	svmode();
-	set_dac(dac);
-}
-
-int nothing(SDL_Surface *surface) {
-        // Switch to WINDOWED mode
-     Uint32 flags = surface->flags; // Get the video surface flags
-
-   if (IsFullScreen(surface)) {
-        if ((vga = OSDEP_SetVideoMode(vga_an, vga_al, CDEPTH, 0)) == NULL) 
-			return 0;
-		
-		vga = OSDEP_SetVideoMode(vga_an, vga_al, CDEPTH, 0);
-		fsmode=0;
-    } else {
-		
-		vga = OSDEP_SetVideoMode(vga_an,vga_al, CDEPTH,1);// | SDL_HWSURFACE | SDL_DOUBLEBUF);
-	
-		if (vga == NULL) {
-			vga = OSDEP_SetVideoMode(vga_an,vga_al, CDEPTH, 0);
+    if (IsFullScreen(surface)) {
+		// Going windowed — restore saved windowed size
+		if (windowed_an >= 640 && windowed_al >= 480) {
+			vga_an = windowed_an;
+			vga_al = windowed_al;
+		} else {
+			// Fallback: use setup values or sensible default
+			vga_an = (VS_ANCHO >= 640) ? VS_ANCHO : 640;
+			vga_al = (VS_ALTO >= 480) ? VS_ALTO : 480;
 		}
+		fsmode=0;
+	} else {
+		// Going fullscreen — save current windowed size
+		windowed_an = vga_an;
+		windowed_al = vga_al;
 		fsmode=1;
 	}
+
+	svmode();
 	set_dac(dac);
-    
-    return 1;
 }
 
 
@@ -255,100 +244,21 @@ return;
 
 void volcadosdl(byte *p) {
 	int vy;
-	int vx;
-
-	byte *oldp=(byte *)p;
-	
-	uint32_t colorkey = 0;
-	SDL_Rect trc;
-	int vn=0;
-		
-	int64_t n,m=(vga_an*vga_al)/4,plano=0x100,y;
-	byte * v2, * p2;
 
 	if(SDL_MUSTLOCK(vga))
 		SDL_LockSurface(vga);
 
 	byte *q = (byte *)vga->pixels;
-	uint32_t *q32 = (uint32_t *)vga->pixels;
-
-	if(0) {
-		do {
-			v2=q+m;
-			y=0;
-			p2=p++;
-			plano<<=1;
-			while (y<vga_al) {
-				n=y*4;
-
-				if (scan[n+1])
-					vgacpy(v2+scan[n],p2+scan[n]*4,scan[n+1]);
-
-				if (scan[n+3])
-					vgacpy(v2+scan[n+2],p2+scan[n+2]*4,scan[n+3]);
-
-				v2+=vga_an/4;
-					p2+=vga_an; y++;
-			}
-		} while (plano<=0x800);
-
-		y=0;
-		v2=(byte *)vga->pixels;
-
-		while (y<vga_al) {
-			n=y*4;
-			if (scan[n+1])
-				memcpyb(v2+scan[n],v2+scan[n]+m,scan[n+1]);
-			if (scan[n+3])
-				memcpyb(v2+scan[n+2],v2+scan[n+2]+m,scan[n+3]);
-			v2+=vga_an/4; y++;
-		}
-
-	} else {
-		for (vy=0; vy<vga_al;vy++) {
-			switch(vga->format->BitsPerPixel) {
-				case 32:
-					q32= (uint32_t*)q;
-					for(vx=0;vx<vga_an;vx++) {
-						q32[vx]=(uint32_t)((colors[*p].b)+(colors[*p].g<<8)+(colors[*p].r<<16));
-						*p++;
-					}
-					break;
-
-				case 24:
-					for(vx=0;vx<vga_an;vx++) {
-						q[vx*3]=colors[*p].b;
-						q[vx*3+1]=colors[*p].g;
-						q[vx*3+2]=colors[*p].r;
-						*p++;
-					}
-					break;
-
-				case 16:
-					for(vx=0;vx<vga_an;vx++) {
-						q[vx*2]=colors[*p].b+colors[*p].g<<8;
-						q[vx*2+1]=colors[*p].g;
-						*p++;
-					}
-					break;
-
-				case 8:
-					memcpy(q,p,vga_an);
-					p+=vga_an;
-			}
-
-			q+=vga->pitch;
-
-		}
+	for (vy=0; vy<vga_al; vy++) {
+		memcpy(q, p, vga_an);
+		p+=vga_an;
+		q+=vga->pitch;
 	}
-		
-	OSDEP_UpdateRect(vga,0,0,vga_an,vga_al);
 
 	if(SDL_MUSTLOCK(vga))
 		SDL_UnlockSurface(vga);
 
 	OSDEP_Flip(vga);
-
 }
 
 void volcado(byte *p) {
@@ -378,9 +288,11 @@ void volcado(byte *p) {
     }
   } 
 
-  if (shift_status&8 && key(_ENTER)) {
+  { static uint32_t fs_cooldown = 0;
+    if (shift_status&8 && key(_ENTER) && SDL_GetTicks() - fs_cooldown > 500) {
 	SDL_ToggleFS(vga);
- } 
+	fs_cooldown = SDL_GetTicks();
+  } }
 
 
   init_volcado();

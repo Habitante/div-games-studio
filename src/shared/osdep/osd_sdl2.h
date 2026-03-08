@@ -5,10 +5,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#ifdef __EMSCRIPTEN__
-#include <emscripten.h>
-#endif
-
 #ifdef MIXER
 #include <SDL2/SDL_mixer.h>
 #endif

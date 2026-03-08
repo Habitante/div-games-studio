@@ -316,15 +316,19 @@ void PrintEvent(const SDL_Event * event)
                     event->window.data2);
             break;
         case SDL_WINDOWEVENT_RESIZED:
-            SDL_Log("Window %d resized to %dx%d",
+            SDL_Log("Window %d resized to %dx%d (fs=%d)",
                     event->window.windowID, event->window.data1,
-                    event->window.data2);
-            vga_an = event->window.data1;
-			vga_al = event->window.data2;
-			vwidth = vga_an;
-			vheight = vga_al;
-			EndSound();
-			soundstopped = 1;
+                    event->window.data2, OSDEP_IsFullScreen());
+            // Ignore resize events in fullscreen — the logical resolution
+            // stays the same, SDL_RenderSetLogicalSize handles scaling
+            if (!OSDEP_IsFullScreen()) {
+                vga_an = event->window.data1;
+                vga_al = event->window.data2;
+                vwidth = vga_an;
+                vheight = vga_al;
+                EndSound();
+                soundstopped = 1;
+            }
             break;
         case SDL_WINDOWEVENT_SIZE_CHANGED:
             SDL_Log("Window %d size changed to %dx%d",
