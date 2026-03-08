@@ -153,10 +153,10 @@
 #define DMA_TWOS_COMP		0x80		/* 1=do twos comp */
 
 /* These are the xfer rate bits ... */
-#define DMA_R0		0x00		/* Fastest DMA xfer (~650khz) */
-#define DMA_R1		0x08		/* fastest / 2 */
-#define DMA_R2		0x10		/* fastest / 4 */
-#define DMA_R3		0x18		/* Slowest DMA xfer (fastest / 8) */
+#define DMA_R0		0x00		/* FastestáDMA xfer (~650khz) */
+#define DMA_R1		0x08		/* fastestá/ 2 */
+#define DMA_R2		0x10		/* fastestá/ 4 */
+#define DMA_R3		0x18		/* SlowestáDMA xfer (fastestá/ 8) */
 
 /* SAMPLE control register */
 #define ENABLE_ADC		0x01

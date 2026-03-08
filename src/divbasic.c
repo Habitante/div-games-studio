@@ -163,7 +163,7 @@ void memxchg(byte *d, byte *s, int n) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-//      MEGARUTINA para reponer el fondo de una caja en edici¢n
+//      MEGARUTINA para reponer el fondo de una caja en edición
 ///////////////////////////////////////////////////////////////////////////////
 
 static int zoom_porcion=0;
@@ -213,7 +213,7 @@ void fondo_edicion(int x,int y,int an,int al) {
 
   // Llama a zoom_map para que actualice la caja correspondiente
 
-  // 1 - Intersecci¢n entre zoom y ventana en la copia
+  // 1 - Intersección entre zoom y ventana en la copia
 
   _x0=(x>zx)?x:zx;
   _y0=(y>zy)?y:zy;
@@ -438,7 +438,7 @@ void modo_inter(void) {
 }
 
 //-----------------------------------------------------------------------------
-//      Interpolaci¢n
+//      Interpolación
 //-----------------------------------------------------------------------------
 
 void fill_inter(int an,int al) { // Rellena con medias una zona
@@ -638,7 +638,7 @@ void fill_scan(word x,word y) {
   x=x0; sigue_scan_0:
 
   if (y>0) while (x<=x1) {
-    if (!is_mab(x,y-1)) // Si no est  pintado
+    if (!is_mab(x,y-1)) // Si no está pintado
       if (fill_dac[*(map+(y-1)*map_an+x)]) // Si se tiene que pintar
         if (fsp<fsp_max) { // Si se puede pintar
           *fsp=x0; fsp++; *fsp=x1; fsp++;
@@ -652,7 +652,7 @@ void fill_scan(word x,word y) {
   x=x0; sigue_scan_1:
 
   if (y<map_al-1) while (x<=x1) {
-    if (!is_mab(x,y+1)) // Si no est  pintado
+    if (!is_mab(x,y+1)) // Si no está pintado
       if (fill_dac[*(map+(y+1)*map_an+x)]) // Si se tiene que pintar
         if (fsp<fsp_max) { // Si se puede pintar
           *fsp=x0; fsp++; *fsp=x1; fsp++;
@@ -708,12 +708,12 @@ void volcado_inter(int an) { // Vuelca a pantalla la zona interpolada
 }
 
 //-----------------------------------------------------------------------------
-//      Dibuja una selecci¢n de mapa de bits (seg£n zoom,zoom_x/y,mab_*)
+//      Dibuja una selección de mapa de bits (según zoom,zoom_x/y,mab_*)
 //-----------------------------------------------------------------------------
 
 void draw_selection_mab(void) {
 
-  int x0,y0,x1,y1; // Intersecci¢n de la zona seleccionada y lo visto en zoom
+  int x0,y0,x1,y1; // Intersección de la zona seleccionada y lo visto en zoom
   int x,y,c;
   byte *p,g0=c0,g4=c4;
   word g04,g40;
@@ -857,7 +857,7 @@ void draw_selection_mab(void) {
 }
 
 //-----------------------------------------------------------------------------
-//      Dibuja una caja de selecci¢n (seg£n zoom,zoom_x/y)
+//      Dibuja una caja de selección (según zoom,zoom_x/y)
 //-----------------------------------------------------------------------------
 
 void draw_selection_box(int _x0,int _y0,int _x1,int _y1) {
@@ -934,9 +934,9 @@ void draw_selection_box(int _x0,int _y0,int _x1,int _y1) {
 
 void set_mab(int x,int y) { // Pone un pixel en el mapa de bits
 
-  x+=y*map_an; // N§ de bit en el buffer
-  y=x>>5; // N§ de int en el buffer
-  x&=31; // N§ de bit en el int
+  x+=y*map_an; // Nº de bit en el buffer
+  y=x>>5; // Nº de int en el buffer
+  x&=31; // Nº de bit en el int
   *(mab+y)|=1<<x;
 }
 
@@ -946,9 +946,9 @@ void set_mab(int x,int y) { // Pone un pixel en el mapa de bits
 
 int is_mab(int x,int y) { // Consulta un pixel en el mapa de bits
 
-  x+=y*map_an; // N§ de bit en el buffer
-  y=x>>5; // N§ de int en el buffer
-  x&=31; // N§ de bit en el int
+  x+=y*map_an; // Nº de bit en el buffer
+  y=x>>5; // Nº de int en el buffer
+  x&=31; // Nº de bit en el int
   return(*(mab+y)&(1<<x));
 }
 
@@ -965,7 +965,7 @@ int is_near_mab(int x,int y) {
 }
 
 //-----------------------------------------------------------------------------
-//      UNDO - Guarda la zona ocupada por una acci¢n, antes de realizarla claro
+//      UNDO - Guarda la zona ocupada por una acción, antes de realizarla claro
 //-----------------------------------------------------------------------------
 
 byte * save_undo(int x, int y, int an, int al) {
@@ -1002,7 +1002,7 @@ byte * save_undo(int x, int y, int an, int al) {
 
   if (start+an*al>undo_memory) start=0;
 
-  // Si una acci¢n ocupa m s de undo_memory, entonces no la guardamos.
+  // Si una acción ocupa más de undo_memory, entonces no la guardamos.
 
   if ((end=start+an*al)<=undo_memory) {
 
@@ -1021,7 +1021,7 @@ byte * save_undo(int x, int y, int an, int al) {
            (tundo[a].start>=start && tundo[a].start<end))
            tundo[a].modo=-1;
 
-    // Guardamos la zona que ocupar  la acci¢n realizada.
+    // Guardamos la zona que ocupará la acción realizada.
 
     copy_block(undo+start,map+x+y*map_an,an,al);
 
@@ -1042,7 +1042,7 @@ byte * save_undo(int x, int y, int an, int al) {
 }
 
 //-----------------------------------------------------------------------------
-//      UNDO - Restaura la zona ocupada por la £ltima acci¢n.
+//      UNDO - Restaura la zona ocupada por la última acción.
 //-----------------------------------------------------------------------------
 
 int undo_back(void) {
@@ -1081,7 +1081,7 @@ int undo_back(void) {
 }
 
 //-----------------------------------------------------------------------------
-//      UNDO - Rehace la untima acci¢n desecha con undo_back()
+//      UNDO - Rehace la untima acción desecha con undo_back()
 //-----------------------------------------------------------------------------
 
 void undo_next(void) {

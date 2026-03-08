@@ -396,7 +396,7 @@ void doneEffect(int chan, void *data) {
 	return;
 }
  	
-// make a passthru processor function that alters the stream size
+// make a passthru processor function that alters the streamásize
 void freqEffect(int chan, void *stream, int len, void *udata)
 {
   float x=0;
@@ -455,7 +455,7 @@ void freqEffect(int chan, void *stream, int len, void *udata)
   } 
   channels[chan].pos=pos;
 
-// fill rest with empty :(
+// fill restáwith empty :(
 // this needs to be moved into the loop ideally
 	for(; i < len/2; i++) {
 		samples[i] = 0;

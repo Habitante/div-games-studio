@@ -50,7 +50,7 @@ void pinta_sprite_m7(int n,int ide,int x,int y,int size,int ang);
 #define grados_giro 16
 
 //----------------------------------------------------------------------------
-// Variables del m¢dulo
+// Variables del módulo
 //----------------------------------------------------------------------------
 
 int seno[grados_360+1], coseno[grados_360+1]; //m7
@@ -100,7 +100,7 @@ static unsigned int mul_16(long a, long b)
 
 
 //----------------------------------------------------------------------------
-// Funci¢n para pintar los sprites de un scroll ordenados por Z
+// Función para pintar los sprites de un scroll ordenados por Z
 //----------------------------------------------------------------------------
 
 void pinta_sprites_scroll(void) {
@@ -131,13 +131,13 @@ void pinta_sprites_scroll(void) {
 }
 
 //----------------------------------------------------------------------------
-// Determina el movimiento de la ventana de scroll (autom tico o manual)
+// Determina el movimiento de la ventana de scroll (automático o manual)
 //----------------------------------------------------------------------------
 
 void mover_scroll(int back) {
   int i,x,y,ix,iy,r;
 
-  if (i=(scroll+snum)->camera) { // Comprueba si el scroll es aut¢m tico
+  if (i=(scroll+snum)->camera) { // Comprueba si el scroll es autómático
     if (i>=id_start && i<=id_end && mem[i]==i) {
       ix=mem[i+_X]; iy=mem[i+_Y];
       if (mem[i+_Resolution]) { ix/=mem[i+_Resolution]; iy/=mem[i+_Resolution]; }
@@ -318,7 +318,7 @@ void set_scroll(int plano,int x,int y) {
 
   // Dispone de (di,iscroll[snum].an/al) < (si,x,y,an,al)
 
-/* Se ha quitado esta optimizaci¢n
+/* Se ha quitado esta optimización
   if (x+iscroll[snum].an<=an && y+iscroll[snum].al<=al) {
     y=iscroll[snum].al; do {
       memcpy(di,si,iscroll[snum].an);
@@ -336,7 +336,7 @@ void set_scroll(int plano,int x,int y) {
       _si=si;
       nx=_nx;
       x=iscroll[snum].an;
-      nt=0; // n£mero de tramos
+      nt=0; // número de tramos
       fast[iscan].inc[0]=0;
       esdato=0;
       do {
@@ -431,7 +431,7 @@ void process_scan(int n) { // Reprocesa un scan por completo
 }
 
 //----------------------------------------------------------------------------
-// Entra un pixel en todas las l¡neas por la derecha (sale por la izda)
+// Entra un pixel en todas las líneas por la derecha (sale por la izda)
 //----------------------------------------------------------------------------
 
 void process_scan_right(void) {
@@ -439,14 +439,14 @@ void process_scan_right(void) {
   byte * si;
 
   block=iscroll[snum].block1;
-  si=iscroll[snum].sscr1+iscroll[snum].an-1; // Final de la primera l¡nea
+  si=iscroll[snum].sscr1+iscroll[snum].an-1; // Final de la primera línea
   in=iscroll[snum].iscan;
   n=iscroll[snum].al;
   fast=iscroll[snum].fast;
 
   do {
 
-    // 1§ quita el pixel por la izquierda ...
+    // 1º quita el pixel por la izquierda ...
 
     if (fast[in].inc[0]) { // Si empieza con fondo
       fast[in].inc[0]--;
@@ -464,7 +464,7 @@ void process_scan_right(void) {
       }
     }
 
-    // 2§ a¤ade el pixel por la derecha ...
+    // 2º añade el pixel por la derecha ...
 
     if (*si) { // Si viene primer plano
       if (fast[in].nt&1) { // Si el tramo acaba en primer plano
@@ -491,7 +491,7 @@ void process_scan_right(void) {
 }
 
 //----------------------------------------------------------------------------
-// Entra un pixel en todas las l¡neas por la izquierda (sale por la dcha)
+// Entra un pixel en todas las líneas por la izquierda (sale por la dcha)
 //----------------------------------------------------------------------------
 
 void process_scan_left(void) {
@@ -499,25 +499,25 @@ void process_scan_left(void) {
   byte * si;
 
   block=iscroll[snum].block1;
-  si=iscroll[snum].sscr1+iscroll[snum].an-1; // Final de la primera l¡nea
+  si=iscroll[snum].sscr1+iscroll[snum].an-1; // Final de la primera línea
   in=iscroll[snum].iscan;
   n=iscroll[snum].al;
   fast=iscroll[snum].fast;
 
   do {
 
-    // 1§ quita el pixel por la derecha ...
+    // 1º quita el pixel por la derecha ...
 
     if (fast[in].nt<max_inc) {
       if (!--fast[in].inc[fast[in].nt]) fast[in].nt--;
     } else { // Caso complicado
-      if (fast[in].nt&1) { // Si la l¡nea acababa en primer plano ...
+      if (fast[in].nt&1) { // Si la línea acababa en primer plano ...
         if (!*si) {        // ... y ahora acaba en fondo
           if (--fast[in].nt==max_inc-1) {
             process_scan(iscroll[snum].al-n); goto cont_loop;
           }
         }
-      } else {       // Si la l¡nea acababa en fondo ...
+      } else {       // Si la línea acababa en fondo ...
         if (*si) {   // ... y ahora acaba en primer plano
           if (--fast[in].nt==max_inc-1) {
             process_scan(iscroll[snum].al-n); goto cont_loop;
@@ -526,7 +526,7 @@ void process_scan_left(void) {
       }
     }
 
-    // 2§ a¤ade el pixel por la izquierda ...
+    // 2º añade el pixel por la izquierda ...
 
     if (*(si-iscroll[snum].an+1)) { // Si viene primer plano
       if (!fast[in].inc[0]) { // Si el tramo comienza en primer plano
@@ -679,7 +679,7 @@ byte * scroll_right(byte * _buf, byte * buf, int * block,
                     byte * map, int an, int al, int x, int y) {
 
   // Ventana de scroll (_buf,iscroll[snum].an,iscroll[snum].al(+1))
-  // N£mero de scanes del primer bloque (*block)
+  // Número de scanes del primer bloque (*block)
   // Puntero al inicio actual del scroll (buf)
   // Mapa en (map,an,al) coordenadas inicio scroll (x,y)
 
@@ -799,14 +799,14 @@ byte * scroll_up(byte * _buf, byte * buf, int * block,
 }
 
 //----------------------------------------------------------------------------
-//      Funcion externa para pintar gr ficos (para el put del lenguaje)
+//      Funcion externa para pintar gráficos (para el put del lenguaje)
 //----------------------------------------------------------------------------
 
 void put_sprite(int file,int graph,int x,int y,int angle,int size,int flags,int reg,byte * cop,int copan,int copal) {
 
   int * ptr;
   byte * si;
-  int an,al; // Informaci¢n respecto a pantalla del grafico
+  int an,al; // Información respecto a pantalla del grafico
   int xg,yg;
   byte * _copia=copia;
   int _vga_an=vga_an,_vga_al=vga_al;
@@ -858,14 +858,14 @@ void put_sprite(int file,int graph,int x,int y,int angle,int size,int flags,int 
 }
 
 //----------------------------------------------------------------------------
-//      La funci¢n que pinta los sprites de los procesos
+//      La función que pinta los sprites de los procesos
 //----------------------------------------------------------------------------
 
-void pinta_sprite(void) { // Pinta un sprite (si se ve), seg£n mem[ide+ ... ]
+void pinta_sprite(void) { // Pinta un sprite (si se ve), según mem[ide+ ... ]
 
   int * ptr;
   byte * si;
-  int x,y,an,al; // Informaci¢n respecto a pantalla del grafico
+  int x,y,an,al; // Información respecto a pantalla del grafico
   int xg,yg;
   int n,m;
 
@@ -1329,7 +1329,7 @@ void sp_rotado(byte * si, int x, int y, int an, int al, int xg, int yg,
 }
 
 //----------------------------------------------------------------------------
-// Impresi¢n de un sprite rotado y escalado, sin cortar
+// Impresión de un sprite rotado y escalado, sin cortar
 //----------------------------------------------------------------------------
 
 void sp_scanc(byte * p,short n,short m,short o,byte * si,int an,int x0,int y0,int x1,int y1) {
@@ -1364,7 +1364,7 @@ void sp_scancg(byte * p,short n,short m,short o,byte * si,int an,int x0,int y0,i
 }
 
 //----------------------------------------------------------------------------
-// Impresi¢n de un sprite rotado y escalado, cortando
+// Impresión de un sprite rotado y escalado, cortando
 //----------------------------------------------------------------------------
 
 void sp_scan(byte * p,short n,byte * si,int an,int x0,int y0,int x1,int y1) {
@@ -1445,7 +1445,7 @@ void pinta_drawings(void) {
 }
 
 //-----------------------------------------------------------------------------
-//      Dibuja una caja, seg£n modo_caja, line_fx y color
+//      Dibuja una caja, según modo_caja, line_fx y color
 //-----------------------------------------------------------------------------
 
 void caja(int x,int y,int an,int al) {
@@ -1461,7 +1461,7 @@ void caja_rellena(int x,int y,int an,int al) {
 }
 
 //-----------------------------------------------------------------------------
-//      Dibuja un c¡rculo (line_fx y color)
+//      Dibuja un círculo (line_fx y color)
 //-----------------------------------------------------------------------------
 
 void circulo(int relleno,int x0,int y0,int x1,int y1) {
@@ -1760,7 +1760,7 @@ void pinta_textos(int n) { // E: texto[]
 
     texto[n].an=0; // Inicializa la region a volcar para este texto
 
-    x=texto[n].x;                     // X primer car cter
+    x=texto[n].x;                     // X primer carácter
     y=texto[n].y;                     // Y
 
     fuente=0; while (fuente<max_fonts) {
@@ -1927,7 +1927,7 @@ void pinta_m7(int n) {
 // Pinta los sprites del modo 7 (scroll snum)
 //----------------------------------------------------------------------------
 
-void pinta_sprites_m7(int n,int cx,int cy,float ang) { // Le pasamos la posici¢n de la c mara
+void pinta_sprites_m7(int n,int cx,int cy,float ang) { // Le pasamos la posición de la cámara
   int factor;
   #ifdef DEBUG
   int oreloj;
@@ -1981,7 +1981,7 @@ void pinta_sprites_m7(int n,int cx,int cy,float ang) { // Le pasamos la posici¢
     }
 
     if (ide) {
-      if (max>=32) { // No pinta el objeto si est  en las coordenadas de la c mara (ñ2)
+      if (max>=32) { // No pinta el objeto si está en las coordenadas de la cámara (ñ2)
 
         h=(m7+n)->height-mem[ide+_Height];
         altura=(h*(max-factor))/(max); // en pix/4
@@ -2019,21 +2019,21 @@ void pinta_sprites_m7(int n,int cx,int cy,float ang) { // Le pasamos la posici¢
 }
 
 //----------------------------------------------------------------------------
-// Pinta un sprite (mem[ide]) en el modo 7 (si est  delante de la c mara)
+// Pinta un sprite (mem[ide]) en el modo 7 (si está delante de la cámara)
 //----------------------------------------------------------------------------
 
 void pinta_sprite_m7(int n,int ide,int x,int y,int size,int ang) {
 
   int * ptr;
   byte * si;
-  int an,al; // Informaci¢n respecto a pantalla del grafico
+  int an,al; // Información respecto a pantalla del grafico
   int xg,yg;
   int m,p;
 
   if (mem[ide+_File]>max_fpgs || mem[ide+_File]<0) return;
   if ((p=mem[ide+_XGraph])>0) {
     m=mem[p]; if (m<1 || m>256) return;
-    // ang es el  ngulo de visi¢n del gr fico (0..4096), m el n£mero de particiones
+    // ang es el ángulo de visión del gráfico (0..4096), m el número de particiones
     mem[ide+_Flags]&=254;
     mem[ide+_Graph]=((ang+4096/(m*2))*m)/4096;
     if (mem[ide+_Graph]>=m) mem[ide+_Graph]=0;
@@ -2050,8 +2050,8 @@ void pinta_sprite_m7(int n,int ide,int x,int y,int size,int ang) {
 
   if ((ptr=g[mem[ide+_File]].grf[mem[ide+_Graph]])!=NULL) {
 
-    an=ptr[13]; al=ptr[14];     // Ancho y Alto del gr fico
-    si=(byte*)ptr+64+ptr[15]*4; // Inicio del gr fico
+    an=ptr[13]; al=ptr[14];     // Ancho y Alto del gráfico
+    si=(byte*)ptr+64+ptr[15]*4; // Inicio del gráfico
 
     if (ptr[15]==0 || *((word*)ptr+32)==65535) {
       xg=ptr[13]/2; yg=ptr[14]-1;

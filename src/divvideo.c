@@ -540,7 +540,7 @@ void volcadocx(byte * p) {
 
 
 //-----------------------------------------------------------------------------
-//      Subrutinas de volcado genricas
+//      Subrutinas de volcado genéricas
 //-----------------------------------------------------------------------------
 
 void vgacpy(byte * q, byte * p, int n) {
@@ -584,7 +584,7 @@ void volcado_parcial(int x,int y,int an,int al) {
     }
 
     while (y<=ymax) { n=y*4;
-      if (scan[n+1]==0) {         // Caso 1, el scan estaba vac¡o ...
+      if (scan[n+1]==0) {         // Caso 1, el scan estaba vacío ...
         scan[n]=x; scan[n+1]=an;
       } else if (scan[n+3]==0) {  // Caso 2, ya hay un scan definido ...
         if (x>scan[n]+scan[n+1] || x+an<scan[n]) { // ... hueco entre medias
@@ -606,10 +606,10 @@ void volcado_parcial(int x,int y,int an,int al) {
           if (x+an>scan[n+2]+scan[n+3]) scan[n+1]=x+an-scan[n]; else scan[n+1]=scan[n+2]+scan[n+3]-scan[n];
           scan[n+2]=0; scan[n+3]=0;
         } else {
-          if (x>scan[n]+scan[n+1] || x+an<scan[n]) { // No choca con 1§
-            if (x>scan[n+2]+scan[n+3] || x+an<scan[n+2]) { // No choca con 2§
+          if (x>scan[n]+scan[n+1] || x+an<scan[n]) { // No choca con 1º
+            if (x>scan[n+2]+scan[n+3] || x+an<scan[n+2]) { // No choca con 2º
               // Caso 3.4, el nuevo no colisiona con ninguno, se calcula el espacio
-              // hasta ambos, y se fusiona con el m s cercano
+              // hasta ambos, y se fusiona con el más cercano
               if (x+an<scan[n]) d1=scan[n]-(x+an); else d1=x-(scan[n]+scan[n+1]);
               if (x+an<scan[n+2]) d2=scan[n+2]-(x+an); else d2=x-(scan[n+2]+scan[n+3]);
               if (d1<=d2) {
@@ -624,13 +624,13 @@ void volcado_parcial(int x,int y,int an,int al) {
                 else scan[n+3]=x2+scan[n+3]-scan[n+2];
               }
             } else {
-              // Caso 3.3, el nuevo colisiona con el 2§, se fusionan
+              // Caso 3.3, el nuevo colisiona con el 2º, se fusionan
               if (x<(x2=scan[n+2])) scan[n+2]=x;
               if (x+an>x2+scan[n+3]) scan[n+3]=x+an-scan[n+2];
               else scan[n+3]=x2+scan[n+3]-scan[n+2];
             }
           } else {
-            // Caso 3.2, el nuevo colisiona con el 1§, se fusionan
+            // Caso 3.2, el nuevo colisiona con el 1º, se fusionan
             if (x<(x2=scan[n])) scan[n]=x;
             if (x+an>x2+scan[n+1]) scan[n+1]=x+an-scan[n];
             else scan[n+1]=x2+scan[n+1]-scan[n];

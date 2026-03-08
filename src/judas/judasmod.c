@@ -200,7 +200,7 @@ static int panningtable[] =
         64, 191, 191, 64
 };
 
-/* Period table for MODs, lowest octave (0) with all finetunes */
+/* Period table for MODs, lowestáoctave (0) with all finetunes */
 unsigned short periodtable[16][12] =
 {
         {6848, 6464, 6096, 5760, 5424, 5120, 4832, 4560, 4304, 4064, 3840, 3624},

@@ -116,8 +116,19 @@ Make the compiler tell us what's actually broken. Fix the scariest stuff.
 - [ ] `div.c:2949`: hardcoded `/home/mike/div2015/system/red_panel.png` dev path
 - [ ] Audit all 1,493 `sprintf`/`strcpy` calls — migrate critical paths to safe variants
 - [ ] Audit the `PrintEvent` pattern for similar `#ifdef`-body bugs (divmouse.c:506 was one)
-- [ ] Fix window close button (currently logged but ignored — no `salir_del_entorno`)
-- [ ] Fix focus loss handling (no pause on minimize/alt-tab)
+- [x] Fix window close button — was already working via `SDL_QUIT` → `salir_del_entorno`.
+      Fixed inner loops (dialog, paint color/mask pickers) that blocked exit until dismissed.
+- [x] Fix focus loss handling: runtime pauses game + audio on alt-tab/minimize,
+      resumes on focus regain. IDE unaffected (editor doesn't need to pause).
+- [x] Fix mouse-outside-window: IDE and runtime now report `mouse_x=mouse_y=-1` when
+      mouse leaves the window, so UI hover/hit tests fail naturally instead of freezing
+      at the last edge position.
+- [x] Fix spacebar-as-click in paint editor: magic value `0xfffd` had mouse wheel bits
+      set (bits 2-3), causing SDL port's `select_zoom()` to misinterpret spacebar as
+      wheel-up → zoom-out. Changed to `0x8001` (bit 0 = left click, bit 15 = spacebar marker).
+- [x] Fix `select_zoom()` crash: SDL port added mouse wheel zoom with `(zoom-1)%4` which
+      produces -1 when zoom=0 (C modulo preserves sign), then `1 << -1` = undefined behavior.
+      Fixed with explicit bounds checking and separated wheel/Z-key/icon into distinct branches.
 - [ ] Fix or remove the commented-out `free()` in runtime stack management (`i.c:778`)
 
 ### Fix video mode / display system

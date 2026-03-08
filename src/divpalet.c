@@ -1,6 +1,6 @@
 
 //-----------------------------------------------------------------------------
-//      M¢dulo de operaciones sobre el dac o paleta
+//      Módulo de operaciones sobre el dac o paleta
 //-----------------------------------------------------------------------------
 
 #include "global.h"
@@ -27,19 +27,19 @@ int cargadac_FPG(char *name);
 int cargadac_PAL(char *name);
 
 //-----------------------------------------------------------------------------
-//      Variables globales del m¢dulo
+//      Variables globales del módulo
 //-----------------------------------------------------------------------------
 
-struct t_tpuntos { // Para la creaci¢n de la tabla ghost
+struct t_tpuntos { // Para la creación de la tabla ghost
   int r,g,b;
   struct t_tpuntos * next;
 } tpuntos[256];
 
-struct t_tpuntos * vcubos[512]; // Para la creaci¢n de la tabla ghost
+struct t_tpuntos * vcubos[512]; // Para la creación de la tabla ghost
 
-byte _r,_g,_b,find_col; // C lculos sobre la paleta
+byte _r,_g,_b,find_col; // Cálculos sobre la paleta
 
-int find_min; // C lculo del color m s pr¢ximo
+int find_min; // Cálculo del color más próximo
 
 byte paleta[768];
 
@@ -94,7 +94,7 @@ void find_colors(void) {
 }
 
 //-----------------------------------------------------------------------------
-//      Funciones para la creaci¢n de la tabla ghost
+//      Funciones para la creación de la tabla ghost
 //-----------------------------------------------------------------------------
 
 void init_ghost(void) {
@@ -121,7 +121,7 @@ void init_ghost(void) {
 }
 
 //-----------------------------------------------------------------------------
-//      Funci¢n de b£squeda r pida de un color
+//      Función de búsqueda rápida de un color
 //      OJO!!! Antes hay que llamar a create_dac4();
 //-----------------------------------------------------------------------------
 
@@ -175,7 +175,7 @@ byte fast_find_color(byte fr,byte fg,byte fb) {
 }
 
 //-----------------------------------------------------------------------------
-//      Funci¢n para la creaci¢n de la tabla ghost
+//      Función para la creación de la tabla ghost
 //-----------------------------------------------------------------------------
 
 void crear_ghost(int puntos) {
@@ -287,7 +287,7 @@ void create_dac4(void) {
 }
 
 //-----------------------------------------------------------------------------
-//      Busca un color (r,g,b) en la paleta (b£squeda completa)
+//      Busca un color (r,g,b) en la paleta (búsqueda completa)
 //      OJO!!! Antes hay que llamar a create_dac4();
 //-----------------------------------------------------------------------------
 
@@ -328,7 +328,7 @@ byte find_color_not0(byte r,byte g,byte b) {
 }
 
 //-----------------------------------------------------------------------------
-//      Funci¢n de ordenaci¢n de la paleta
+//      Función de ordenación de la paleta
 //-----------------------------------------------------------------------------
 
 void ord_paleta0(void) {
@@ -430,7 +430,7 @@ byte find_ord(byte * dac) {
 }
 
 //-----------------------------------------------------------------------------
-//      Media de dos colores (c lculo exacto)
+//      Media de dos colores (cálculo exacto)
 //-----------------------------------------------------------------------------
 
 byte media(byte a,byte b) {
@@ -445,7 +445,7 @@ byte media(byte a,byte b) {
 }
 
 //-----------------------------------------------------------------------------
-//      Calcula que colores de la regla son los m s cercanos a cada RGB
+//      Calcula que colores de la regla son los más cercanos a cada RGB
 //-----------------------------------------------------------------------------
 
 void make_near_regla(void) {
@@ -473,7 +473,7 @@ void calcula_regla(int n) {
 
   if (!reglas[n].fijo) { // Las reglas fijas no se pueden calcular
     switch(reglas[n].tipo) {
-      case 0: // Lineal, el c lculo es obvio, se toman los colores en secuencia
+      case 0: // Lineal, el cálculo es obvio, se toman los colores en secuencia
         for (a=1;a<32;a++) reglas[n].col[a+1]=reglas[n].col[a]+1;
         break;
       case 1: // Adaptable cada 1 color, no hay nada que calcular
@@ -971,7 +971,7 @@ void ordena2(void){
 }
 
 void ordena0(void){
-  v.tipo=1; // Di logo
+  v.tipo=1; // Diálogo
   v.estado=0;
   v.an=65*2+7;
   v.al=65*2+31;
@@ -999,7 +999,7 @@ void ordena_paleta(void) {
 }
 
 //-----------------------------------------------------------------------------
-//      Fusi¢n de dos paletas diferentes
+//      Fusión de dos paletas diferentes
 //-----------------------------------------------------------------------------
 
 // byte paleta[768]
@@ -1107,7 +1107,7 @@ void fusionar_paletas(void){
   c=511; while (c>255) {
 
     min=64*64*64;
-    for (n=1;n<c;n++) { // Busca la distancia m¡nima de todas
+    for (n=1;n<c;n++) { // Busca la distancia mínima de todas
       if (dist[n]<min) {
         cmin=n; min=dist[n];
       }
@@ -1152,11 +1152,11 @@ void fusionar_paletas(void){
 }
 
 //-----------------------------------------------------------------------------
-//  Creaci¢n de una paleta a partir de una muestra de colores
+//  Creación de una paleta a partir de una muestra de colores
 //
 //  Entradas: muestra[]
 //      Se requiere un puntero a una tabla RGB (32x32x32 bytes) con valores
-//      0 o 1 (seg£n ese color est presente o no en la muestra)
+//      0 o 1 (según ese color esté presente o no en la muestra)
 //
 //  Salidas: nueva_paleta[] muestra[]
 //      La paleta resultante y en la tabla original se han sustituido los
@@ -1199,7 +1199,7 @@ void crear_paleta(void){
   int c,min,cmin=0;
   byte col;
 
-  // Cuenta el n£mero de colores y genera pal[]
+  // Cuenta el número de colores y genera pal[]
 
   if ((pal=(byte*)malloc(32768*4))==NULL) return;
 
@@ -1249,7 +1249,7 @@ void crear_paleta(void){
     if (!cargar_paleta) if ((c&127)==0) Progress((char *)texto[497],num_colores*2+num_colores-c,num_colores*4-256);
 
     min=64*64*64;
-    for (n=0;n<c;n++) { // Busca la distancia m¡nima de todas
+    for (n=0;n<c;n++) { // Busca la distancia mínima de todas
       if (dist[n]<min) {
         cmin=n; min=dist[n];
       }
@@ -1405,7 +1405,7 @@ void rescalar(byte *si,int sian,int sial,byte *di,int dian,int dial) {
 }
 
 //-----------------------------------------------------------------------------
-//      Funciones de edici¢n de la paleta
+//      Funciones de edición de la paleta
 //-----------------------------------------------------------------------------
 
 char Valores[72*1];
@@ -1809,7 +1809,7 @@ int an=v.an/big2,al=v.al/big2;
 
 void InterPal0(void)
 {
-        v.tipo=1; // Di logo
+        v.tipo=1; // Diálogo
         v.an=220-46-7;
         v.al=163+24-16;
         v.titulo=texto[138];
@@ -1826,7 +1826,7 @@ void InterPal0(void)
 }
 
 //-----------------------------------------------------------------------------
-//	Funciones propias del men£ de paleta
+//	Funciones propias del menú de paleta
 //-----------------------------------------------------------------------------
 
 void EditPal()

@@ -2,6 +2,7 @@
 #include "inter.h"
 
 float m_x=0.0,m_y=0.0;
+extern int mouse_in_window;
 
 //----------------------------------------------------------------------------
 //      Set_mouse(x,y)
@@ -41,7 +42,7 @@ void mouse_off (void) {
 }
 
 //-----------------------------------------------------------------------------
-//      Define la regi¢n de movimiento del rat¢n (pantalla completa)
+//      Define la región de movimiento del ratón (pantalla completa)
 //-----------------------------------------------------------------------------
 
 void mouse_window(void) {
@@ -115,7 +116,7 @@ void readmouse(void) {
   m_x+=(float)ix/(1.0+((float)mouse->speed/3.0));
   m_y+=(float)iy/(1.0+((float)mouse->speed/3.0));
 
-  // Control del rat¢n con el teclado
+  // Control del ratón con el teclado
 
   if (mouse->cursor&1) {
 
@@ -150,18 +151,26 @@ void readmouse(void) {
   }
 #endif
 //if(mouse->left) mouse_b=1; else mouse_b=0;
-  _mouse_x=(int)mouse->x;
-  _mouse_y=(int)mouse->y;
+  // When mouse is outside the window, report out-of-bounds
+  if (!mouse_in_window) {
+    _mouse_x=-1;
+    _mouse_y=-1;
+    mouse->x=-1;
+    mouse->y=-1;
+  } else {
+    _mouse_x=(int)mouse->x;
+    _mouse_y=(int)mouse->y;
 
-  if (_mouse_x<0) { _mouse_x=0; n++; }
-  else if (_mouse_x>=vga_an) { _mouse_x=vga_an-1; n++; }
-  if (_mouse_y<0) { _mouse_y=0; n++; }
-  else if (_mouse_y>=vga_al) { _mouse_y=vga_al-1; n++; }
+    if (_mouse_x<0) { _mouse_x=0; n++; }
+    else if (_mouse_x>=vga_an) { _mouse_x=vga_an-1; n++; }
+    if (_mouse_y<0) { _mouse_y=0; n++; }
+    else if (_mouse_y>=vga_al) { _mouse_y=vga_al-1; n++; }
 
-  if (n) set_mouse(_mouse_x,_mouse_y);
+    if (n) set_mouse(_mouse_x,_mouse_y);
 
-  mouse->x=_mouse_x;
-  mouse->y=_mouse_y;
+    mouse->x=_mouse_x;
+    mouse->y=_mouse_y;
+  }
 #ifdef DEBUG
 			mouse_x = _mouse_x;
 			mouse_y = _mouse_y;

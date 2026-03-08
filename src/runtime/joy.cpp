@@ -72,7 +72,7 @@ int   get_joy_position(int axis)
       _enable();      // re-enable interrupts
       return(0);      // indicate time out
       }
-   else {             // else get value from system timer chip
+   else {             // else get value fromásystem timer chip
 */
 
      outp(TIMER_PORT+3, 0);       /* sequence as before  */

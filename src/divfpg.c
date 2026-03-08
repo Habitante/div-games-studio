@@ -452,7 +452,7 @@ void abrir_fichero(void) {
 	////////////////////
 	// *** Juanjo *** //
 
-	n=0; // N£mero de paletas distintas
+	n=0; // Número de paletas distintas
 	muestra=NULL;
 	memcpy(pal,dac,768);
 
@@ -533,7 +533,7 @@ void abrir_fichero(void) {
 
 	if (sum) {
 		memcpy(paltratar,pal,768);
-		dialogo(TratarPaleta0); // ¨Cargar paleta?
+		dialogo(TratarPaleta0); // ¿Cargar paleta?
 
 		switch(v_aceptar) {
 			case 0: // Cancelar (no cargar)
@@ -648,7 +648,7 @@ void Warning2(void) {
 	}
 }
 void Warning0(void) {
-	v.tipo=1; // Di logo
+	v.tipo=1; // Diálogo
 	v.an=200;
 	v.al=60;
 	v.titulo=texto[171];
@@ -788,7 +788,7 @@ void GetCode3(void) {
 }
 
 void GetCode0(void) {
-	v.tipo=1; // Di logo
+	v.tipo=1; // Diálogo
 	v.an=180+25;
 	v.al=100-12;
 	v.titulo=texto[68];
@@ -990,7 +990,7 @@ void Delete_Taggeds() {
 	if ((array_del=(int *)malloc(taggeds*4))==NULL) 
 		return;
 
-	if((fpg=fopen((char *)MiFPG->ActualFile,"rb"))==NULL) { // No deber¡a fallar esto
+	if((fpg=fopen((char *)MiFPG->ActualFile,"rb"))==NULL) { // No debería fallar esto
 		free(array_del); return;
 	}
 
@@ -1022,7 +1022,7 @@ void Delete_Taggeds() {
 }
 
 //-----------------------------------------------------------------------------
-//  Opci¢n de impresi¢n de la lista de gr ficos de un fichero
+//  Opción de impresión de la lista de gráficos de un fichero
 //-----------------------------------------------------------------------------
 
 int f_im=1,f_ar=0;
@@ -1112,7 +1112,7 @@ void Print_List(void) {
 			}
 
 			g=fopen((char *)MiFPG->ActualFile,"rb");
-			if (g==NULL) { // No deber¡a pasar nunca
+			if (g==NULL) { // No debería pasar nunca
 			
 				if(f_ar) 
 					fclose(f);
@@ -1563,7 +1563,7 @@ void crear_un_thumb_FPG(struct t_listboxbr * l){
 				estado=0; MiFPG->thumb[num].status=-1;
 			}
 			return;
-		} else if (estado==2 && MiFPG->thumb[num].status!=MiFPG->thumb[num].filesize) { // Se contin£a leyendo un thumbnail
+		} else if (estado==2 && MiFPG->thumb[num].status!=MiFPG->thumb[num].filesize) { // Se continúa leyendo un thumbnail
 
 			if ((f=fopen((char *)MiFPG->ActualFile,"rb"))!=NULL) {
 				fseek(f,MiFPG->OffsGrf[MiFPG->DesIndex[num]],SEEK_SET);
@@ -1594,7 +1594,7 @@ void crear_un_thumb_FPG(struct t_listboxbr * l){
 			return;
 		}
 
-		// Y ahora crea el thumbnail si el fichero se carg¢ ya completo
+		// Y ahora crea el thumbnail si el fichero se cargó ya completo
 		if (estado==2 && MiFPG->thumb[num].status==MiFPG->thumb[num].filesize && abs(_omx-mouse_x)+abs(_omy-mouse_y)+mouse_b+ascii==0) {
 
 			MiFPG->thumb[num].status=0;
@@ -1945,7 +1945,7 @@ void emplazar_map(void) { // Emplaza grafico lnum
 
 	}
 
-	// Segundo ... algoritmo de colocaci¢n ...
+	// Segundo ... algoritmo de colocación ...
 	for(n=0; n<scans; n++) {
 		y = scan[n];
 		new_x = 0;
@@ -1999,7 +1999,7 @@ void cierra_fpg(char *fpg_path) {
 
 //-----------------------------------------------------------------------------
 //      Selecciona un fichero para abrir o sobreescribir
-//---------------------------------------Ý-------------------------------------
+//-----------------------------------------------------------------------------
 
 int selecciona_fichero(void) {
 	FPG *MiFPG;
@@ -2060,7 +2060,7 @@ int selecciona_fichero(void) {
 }
 
 //-----------------------------------------------------------------------------
-//      Sustituir o a¤adir FPG
+//      Sustituir o añadir FPG
 //-----------------------------------------------------------------------------
 
 void sustituir_FPG_1(void) {
@@ -2105,7 +2105,7 @@ void sustituir_FPG_0(void) {
 	v.click_handler=sustituir_FPG_2;
 
 	_button(510, 7,v.al-14,0); // Reemplazar
-	_button(511,x2,v.al-14,0); // A¤adir
+	_button(511,x2,v.al-14,0); // Añadir
 	_button(101,x3,v.al-14,0); // Cancelar
 
 	v_aceptar=3;

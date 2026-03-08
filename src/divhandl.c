@@ -308,7 +308,7 @@ void menu_programas2(void) {
 }
 
 //-----------------------------------------------------------------------------
-//      Men£ edicion
+//      Menú edicion
 //-----------------------------------------------------------------------------
 
 void _completo(void);
@@ -451,7 +451,7 @@ void menu_edicion2(void) {
 void write_line(void);
 void read_line(void);
 
-void save_prg_buffer(memptrsize n) { // Actualiza el programa, guarda la l¡nea actual
+void save_prg_buffer(memptrsize n) { // Actualiza el programa, guarda la línea actual
   wup(n);
   write_line(); read_line();
   wdown(n);
@@ -580,7 +580,7 @@ void menu_mapas2(void) {
       case 7: // Reescalar el mapa
         Reducex2(); break;
 
-      case 8: // Crear el mapa de b£squeda
+      case 8: // Crear el mapa de búsqueda
         mapa_busqueda(); break;
 
       case 9: // Editar el mapa
@@ -1027,7 +1027,7 @@ void gen_fontmap(void) {
 
   if (v_mapa!=NULL && v_mapa->map!=NULL) {
 
-    // Ojo! calcular "c4" como un color !=0 !=c4 que no est
+    // Ojo! calcular "c4" como un color !=0 !=c4 que no esté
     // en el font y lo mas parecido a c4 posible
 
     memset(col,0,256);
@@ -1255,7 +1255,7 @@ void crear_menu(int menu) {
 
   int an;
 
-  v.tipo=2; // Men£
+  v.tipo=2; // Menú
   v.nombre=texto[menu++];
   v.titulo=texto[menu];
   v.estado=0;
@@ -1403,11 +1403,11 @@ void actualiza_menu(int menu,int min,int max) { // (Min,Max) Opciones prohibidas
 //      Ventana tipo mapa
 //-----------------------------------------------------------------------------
 
-// Una ventana de tipo "mapa" requiere la siguiente informaci¢n (tanto si se
+// Una ventana de tipo "mapa" requiere la siguiente información (tanto si se
 // carga un mapa como si se crea nuevo en el programa)
 
-// v_mapa->filename   -¿ Estos dos primeros campos ser n "Mapa x",NULL si
-// v_mapa->path       -Ù el mapa no tiene una correspondencia a£n en disco
+// v_mapa->filename   -¿ Estos dos primeros campos serán "Mapa x",NULL si
+// v_mapa->path       -Ù el mapa no tiene una correspondencia aún en disco
 // v_mapa->map
 // v_mapa->mab
 // v_mapa->map_an/al
@@ -1533,7 +1533,7 @@ extern struct t_listboxbr ltexturasbr;
 extern struct t_listboxbr lthumbmapbr;
 
 extern struct _thumb_tex {
-  int an,al;            // Ancho y Alto de la reducci¢n
+  int an,al;            // Ancho y Alto de la reducción
   int RealAn, RealAl;   // Ancho y Alto de la textura
   char * ptr;           // ==NULL si el thumbnail no se ha comenzado a cargar
   int status;           // 0-No es una textura valida, 1-Cargada
@@ -1543,7 +1543,7 @@ extern struct _thumb_tex {
 } thumb_tex[max_texturas];
 
 extern struct _thumb_map {
-  int an,al;            // Ancho y Alto de la reducci¢n
+  int an,al;            // Ancho y Alto de la reducción
   int RealAn, RealAl;   // Ancho y Alto de la textura
   char * ptr;           // ==NULL si el thumbnail no se ha comenzado a cargar
   int status;           // 0-No es una textura valida, 1-Cargada
@@ -1671,8 +1671,8 @@ void mapa2(void) {
      modo-=100; switch(modo) {
         case 0: edit_mode_0(); break;   // Pixels
         case 1: edit_mode_1(); break;   // Strokes
-        case 2: edit_mode_2(); break;   // L¡nes
-        case 3: edit_mode_3(); break;   // L¡nes cont.
+        case 2: edit_mode_2(); break;   // Línes
+        case 3: edit_mode_3(); break;   // Línes cont.
         case 4: edit_mode_4(); break;   // Bezier
         case 5: edit_mode_5(); break;   // Bezier cont.
         case 6: edit_mode_6(); break;   // Boxes
@@ -1949,7 +1949,7 @@ void info0(void) {
 }
 
 //-----------------------------------------------------------------------------
-//      Test new video mode
+//      Testánew video mode
 //-----------------------------------------------------------------------------
 
 extern int * system_clock;
@@ -2014,7 +2014,7 @@ void aceptar2(void) {
 }
 
 //-----------------------------------------------------------------------------
-//      Cuadro de di logo para tratar paleta al abrir con v_titulo y/o v_texto
+//      Cuadro de diálogo para tratar paleta al abrir con v_titulo y/o v_texto
 //-----------------------------------------------------------------------------
 
 void TratarPaleta1(void);
@@ -2359,16 +2359,16 @@ void analizar_input(void) {
         // LàGICA DE TRATAMIENTO DEL NOMBRE DE FICHERO
 
         // si tiene comodines
-        //   si no se convierte en ning£n fichero, lo toma como nueva m scara
+        //   si no se convierte en ningún fichero, lo toma como nueva máscara
         //   si se convierte en un fichero, expande su nombre a input (editando)
-        //   si se convierte en m s de uno, lo toma como nueva m scara
+        //   si se convierte en más de uno, lo toma como nueva máscara
         // si no tiene comodines
         //   si el fichero no existe ... (segun modo abrir/guardar)
         //   si existe como un fichero ... (segun modo abrir/guardar)
         //   si existe como directorio, se mueve hacia ese directorio
 
         // (la otra diferencia entre abrir/guardar es que al entrar en guardar
-        // se est  en status_abrir=1 e input="")
+        // se está en status_abrir=1 e input="")
 
 
           if (strchr(input,'*')!=NULL || strchr(input,'?')!=NULL) { // Wildcards
@@ -2382,12 +2382,12 @@ void analizar_input(void) {
 		strcpy(mascara,input); // si hay MAS de uno ...
 		printf("input: %s\n",input);
 		}
-            } else { // si no encontr¢ ninguno ...
+            } else { // si no encontró ninguno ...
 
-              // si no tenia extensi¢n y la m scara si la tiene ...
+              // si no tenia extensión y la máscara si la tiene ...
               if (strchr(input,'.')==NULL && strchr(mascara,'.')!=NULL) {
 
-                strcat(input,strchr(mascara,'.')); // le a¤ade la m scara
+                strcat(input,strchr(mascara,'.')); // le añade la máscara
 
         	      if (!_dos_findfirst(input,_A_NORMAL,&fileinfo)) { // si hay alguno ...
               		if (_dos_findnext(&fileinfo)) { // si SOLO hay uno
@@ -2419,11 +2419,11 @@ void analizar_input(void) {
 		}
             else if (strchr(input,'*')!=NULL || strchr(input,'?')!=NULL) {
               strcpy(mascara,input);
-            } else {v_terminado=1; v_existe=0; } // Fichero no encontrado (con extensi¢n a¤adida)
-          } else {v_terminado=1; v_existe=0; } // Fichero no encontrado (sin extensi¢n a¤adida)
+            } else {v_terminado=1; v_existe=0; } // Fichero no encontrado (con extensión añadida)
+          } else {v_terminado=1; v_existe=0; } // Fichero no encontrado (sin extensión añadida)
         } 
         else {
-		strcpy(input,mascara); // Mantiene la m scara vieja
+		strcpy(input,mascara); // Mantiene la máscara vieja
 	}
         getcwd(tipo[v_tipo].path,PATH_MAX+1); 
         imprime_rutabr();
@@ -2507,21 +2507,21 @@ void nuevo_mapa2(void) {
 int nuevo_mapa(byte * mapilla) {
   int n;
 
-  // 1§ Pide memoria para un struct tmapa
+  // 1º Pide memoria para un struct tmapa
   if ((v_mapa=(struct tmapa *)malloc(sizeof(struct tmapa)))!=NULL) {
 
-    // 2§ Pide memoria para el mapa
+    // 2º Pide memoria para el mapa
 
     if (mapilla!=NULL) v_mapa->map=mapilla; else v_mapa->map=(byte *)malloc(map_an*map_al);
 
     if (v_mapa->map!=NULL) {
 
       if (mapilla==NULL) {
-        // 2§B Pone el mapa a cero
+        // 2ºB Pone el mapa a cero
         memset(v_mapa->map,0,map_an*map_al);
       }
 
-      // 4§ Fija el resto de variables
+      // 4º Fija el resto de variables
       strcpy(v_mapa->filename,(char *)texto[136]);
       ltoa(siguiente_codigo++,v_mapa->filename+strlen(v_mapa->filename),10);
       *v_mapa->path='\0';
@@ -2577,7 +2577,7 @@ void abrir_mapa(void) {
     num_taggeds=1;
   }
 
-  n=0; // N£mero de paletas distintas
+  n=0; // Número de paletas distintas
   muestra=NULL;
   memcpy(pal,dac,768);
   memcpy(palorg,paleta_original,768);
@@ -2641,7 +2641,7 @@ void abrir_mapa(void) {
 
   if (sum)
   {
-    dialogo(TratarPaleta0); // ¨Cargar paleta?
+    dialogo(TratarPaleta0); // ¿Cargar paleta?
 
     switch(v_aceptar)
     {
@@ -2954,7 +2954,7 @@ int Colors[9],min_dist,i,dist;
         incx=(float)man/(float)map_an;
         bufferaux=(char *)malloc(map_an*map_al);
 
-        if (bufferaux==NULL) { // Esto lo a¤adi¢ dani ...
+        if (bufferaux==NULL) { // Esto lo añadió dani ...
           v_texto=(char *)texto[45];
           dialogo(err0);
           return;
@@ -3043,7 +3043,7 @@ int Colors[9],min_dist,i,dist;
 }
 
 //-----------------------------------------------------------------------------
-//      Crea un mapa de b£squeda de hasta 128x128 tiles
+//      Crea un mapa de búsqueda de hasta 128x128 tiles
 //      usado para crear un mapa de durezas
 //-----------------------------------------------------------------------------
 
@@ -3107,7 +3107,7 @@ void mapa_busqueda() {
 
   man=map_an; mal=map_al; ma=map; // Mapa original ma(man,mal)
 
-  if (man>mal) { // Obtiene los l¡mites del "tile"
+  if (man>mal) { // Obtiene los límites del "tile"
     mintile=(man+max_map_size-1)/max_map_size;
     if (mal<256) maxtile=mal; else maxtile=256;
   } else {
@@ -3121,7 +3121,7 @@ void mapa_busqueda() {
 
   if(!v_aceptar) return;
 
-  map_an=(map_an+itile-1)/itile; // Tama¤o del nuevo mapa
+  map_an=(map_an+itile-1)/itile; // Tamaño del nuevo mapa
   map_al=(map_al+itile-1)/itile;
   if (map_an>max_map_size) map_an=max_map_size;
   if (map_al>max_map_size) map_al=max_map_size;

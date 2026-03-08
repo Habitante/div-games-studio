@@ -1,7 +1,7 @@
 
-// **** OJO **** La funci¢n que genera el texto es void CreateText()
-// **** ShowFont? es la ventana de font (el font se carga en memoria), GetText es el d¡alogo con el "input text"
-// El v.aux de ShowFont apunta a la siguiente informaci¢n al llamar a CreateText()
+// **** OJO **** La función que genera el texto es void CreateText()
+// **** ShowFont? es la ventana de font (el font se carga en memoria), GetText es el díalogo con el "input text"
+// El v.aux de ShowFont apunta a la siguiente información al llamar a CreateText()
 // v.aux -> filename, v.aux+14 -> path, v.aux+RES_FOR_NAME -> fichero FNT
 // No se hace FntAux=v.aux+RES_FOR_NAME; antes de llamar a CreateText, es decir, FntAux apunta al fichero
 // El string se pasa a CreateText en cCharsToPrint[128]
@@ -820,7 +820,7 @@ void Selcolor3(void)
 
 void Selcolor0(void)
 {
-        v.tipo=1; // Di logo
+        v.tipo=1; // Diálogo
         v.an=131;
         v.al=157;
         v.titulo=texto[78];
@@ -916,7 +916,7 @@ void Preview0()
     if(TamaY<fal) TamaY=fal;
   } if (TamaY==0) TamaY=_fal;
 
-        v.tipo=1; // Di logo
+        v.tipo=1; // Diálogo
         if(big) { TX=TamaX/2; TY=TamaY/2; } else { TX=TamaX; TY=TamaY; }
         v.an=TX+6;
         if(v.an<60)
@@ -1055,7 +1055,7 @@ int GenCode=0;
 }
 void GenFont0(void)
 {
-        v.tipo=1; // Di logo
+        v.tipo=1; // Diálogo
         v.an=169-26;
         v.al=103;
         v.titulo=texto[852];
@@ -1155,7 +1155,7 @@ void Preview20()
     TamaX+=fan;
     if(TamaY<fal) TamaY=fal;
   } if (TamaY==0) TamaY=_fal; if (TamaX==0) TamaX=1;
-        v.tipo=1; // Di logo
+        v.tipo=1; // Diálogo
 
         if(big) { TX=TamaX/2; TY=TamaY/2; } else { TX=TamaX; TY=TamaY; }
         v.an=TX+6;
@@ -1277,7 +1277,7 @@ void ShowFont1(void)
 
   if (TamaX>ancho_w*big2 || TamaY>alto_w*big2)
   {
-    // Crea la reducci¢n del thumbnail
+    // Crea la reducción del thumbnail
     coefredx = TamaX/((float)ancho_w*(float)big2);
     coefredy = TamaY/((float)alto_w*(float)big2);
     if(coefredx>coefredy) coefredy=coefredx;
@@ -1563,7 +1563,7 @@ int n,y,x,TamaX=0,TamaY=0,fan,_fal=0,fal,init,cnt;
                         TamaY=fal;
         } if (TamaY==0) TamaY=_fal;
 
-        // 3 - Crea un mapa de ese tama¤o
+        // 3 - Crea un mapa de ese tamaño
 
         map_an=TamaX;
         map_al=TamaY;
@@ -1600,7 +1600,7 @@ int n,y,x,TamaX=0,TamaY=0,fan,_fal=0,fal,init,cnt;
         v.mapa->zoom_x=x;
         v.mapa->zoom_y=y;
 
-        // 6 - Inicializa los puntos de control y el c¢digo
+        // 6 - Inicializa los puntos de control y el código
 
         for (n=0;n<512;n++)
                 v.mapa->puntos[n]=-1;

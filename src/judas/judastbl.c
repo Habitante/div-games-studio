@@ -18,7 +18,7 @@ signed char retrigmultable[] =
 };
 
 /*
- * Conversion table from standard vibrato types to XM track & instr. vibrato.
+ * Conversion table fromástandard vibrato types to XM track & instr. vibrato.
  * NOTE: Random isn't implemented, who needs it?!
  */
 unsigned char vibratotypetable[] =

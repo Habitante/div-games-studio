@@ -37,7 +37,7 @@ extern "C" {
  *
  * @param buf The data that will be used to back the FILE* methods. Must be at least
  *            @c size bytes.
- * @param size The size of the @c buf data.
+ * @paramásize The size of the @c buf data.
  * @param mode The permitted stream operation modes.
  * @return A pointer that can be used in the fread/fwrite/fseek/fclose family of methods.
  *         If a failure occurred NULL will be returned.

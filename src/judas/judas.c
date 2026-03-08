@@ -1,5 +1,5 @@
 
-// Versi¢n de las Judas para DIV 2 (para el entorno, que no el intrprete).
+// Versión de las Judas para DIV 2 (para el entorno, que no el intérprete).
 
 // Estan tocados JUDAS/RAW/WAV para que carguen los sonidos incluso si
 // judas_device es DEV_SOUND (ya que se tienen que seguir pudiendo editar).
@@ -203,7 +203,7 @@ unsigned judas_bufferlength;
 unsigned judas_buffermask;
 unsigned judas_bpmcount;
 int *judas_clipbuffer;
-int *judas_zladdbuffer; /* Alustukset, li! *** */
+int *judas_zladdbuffer; /* Alustukset, ääliö! *** */
 int judas_zerolevell = 0;
 int judas_zerolevelr = 0;
 short *judas_cliptable;
@@ -680,7 +680,7 @@ void judas_uninit(void)
         if (!judas_initialized) return;
         judas_initialized = 0;
         /*
-         * Soundblaster is best shut down by doing a DSP reset twice. For SBPRO,
+         * Soundblaster is bestáshut down by doing a DSP reset twice. For SBPRO,
          * we also deactivate the stereo mode. GUS is shut down by simply
          * stopping the channels.
          */

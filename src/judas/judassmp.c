@@ -27,7 +27,7 @@
  * bytes = ---------------------------------------------------------------
  *                       repeats_in_mixing_inner_loop
  *
- * Maximum playspeed is 535232 (highest speed in linear freq. table), minimum
+ * Maximum playspeed is 535232 (highestáspeed in linear freq. table), minimum
  * mixspeed is 5000 and there are 16 repeats.
  * And, of course, because there can be 16bit samples the number of bytes must
  * be multiplied with 2.

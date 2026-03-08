@@ -36,17 +36,17 @@ extern struct _calc * pcalc;
 extern struct _calc * readcalc;
 void calc0(void);
 
-extern int helpidx[4096];              // Por cada trmino {inicio,longitud}
-extern int help_item;                  // Indica sobre que trmino se pide ayuda
+extern int helpidx[4096];              // Por cada término {inicio,longitud}
+extern int help_item;                  // Indica sobre que término se pide ayuda
 extern int help_len;                   // Longitud del help_buffer
 extern int help_an,help_al;            // Ancho y alto de la ventana de ayuda
-extern int help_l,help_lines;          // L¡nea actual, y lineas totales
-extern byte help_title[128];           // T¡tulo del trmino
+extern int help_l,help_lines;          // Línea actual, y lineas totales
+extern byte help_title[128];           // Título del término
 extern byte *help_buffer,*h_buffer;    // Buffer para contener la ayuda, auxiliar
-extern byte *help_line;                // Puntero a la l¡nea actual
+extern byte *help_line;                // Puntero a la línea actual
 extern byte *help_end;                 // Final de help_buffer;
-extern int loaded[64],n_loaded;        // Im genes cargadas, hasta un m ximo de 32
-extern int backto[64];      // Cola circular para almacenar los topicos consultados {n,l¡nea}
+extern int loaded[64],n_loaded;        // Imágenes cargadas, hasta un máximo de 32
+extern int backto[64];      // Cola circular para almacenar los topicos consultados {n,línea}
 extern int i_back,a_back,f_back; // Inicio y final de la cola circular (ambos 0,2,..62)
 
 void Fonts1(void); void Fonts2(void); void Fonts3(void);
@@ -71,10 +71,10 @@ int man,mal;
 pcminfo *mypcminfo;
 modinfo *mymodinfo;
 
-        // Pone una cabecera de identificaci¢n
+        // Pone una cabecera de identificación
         desktop=fopen("system/session.dtf","wb");
         n=fwrite("dtf\x1a\x0d\x0a\x0",8,1,desktop);
-        // guarda la antigua resoluci¢n
+        // guarda la antigua resolución
         iWork=Setupfile.Vid_modeAlto+Setupfile.Vid_modeAncho*10000+(Setupfile.Vid_modeBig<<31);
         n=fwrite(&iWork,1,4,desktop);
         // reserva espacio para el numero de ventanas
@@ -567,7 +567,7 @@ int nueva_ventana_carga(voidReturnType init_handler,int nx,int ny)
     }
 
     //---------------------------------------------------------------------------
-    // Comprueba que si se trata de un men£ no este ya generado
+    // Comprueba que si se trata de un menú no este ya generado
     //---------------------------------------------------------------------------
     if ((ptr=(byte *)malloc(an*al))!=NULL) { // Ventana, free en cierra_ventana
 
@@ -672,7 +672,7 @@ int nueva_ventana_carga(voidReturnType init_handler,int nx,int ny)
       }
 
     //---------------------------------------------------------------------------
-    // No se pudo abrir la ventana, (no hay memoria o men£ duplicado)
+    // No se pudo abrir la ventana, (no hay memoria o menú duplicado)
     //---------------------------------------------------------------------------
 
     } else { divdelete(0); return(1); }
@@ -692,14 +692,14 @@ int nuevo_mapa_carga(int nx,int ny,char *nombre,byte *mapilla)
 {
   int n;
 
-  //1§ Pide memoria para un struct tmapa
+  //1º Pide memoria para un struct tmapa
   if ((v_mapa=(struct tmapa *)malloc(sizeof(struct tmapa)))!=NULL) {
 	memset(v_mapa,0,sizeof(struct tmapa));
 	
-    // 2§ Pide memoria para el mapa
+    // 2º Pide memoria para el mapa
     v_mapa->map=mapilla;
 
-    //4§ Fija el resto de variables
+    //4º Fija el resto de variables
     memcpy((char *)v_mapa->filename,(char *)nombre,255);
     *v_mapa->path='\0';
     v_mapa->map_an=map_an;
@@ -735,7 +735,7 @@ void carga_programa0(void)
   v.al=(12+16)*big2+editor_font_al*v_prg->al;
 
   if (v.an>vga_an) {
-    v.prg->an=(vga_an-12*big2)/editor_font_an; // Calcula tama¤o (en chr) maximizada
+    v.prg->an=(vga_an-12*big2)/editor_font_an; // Calcula tamaño (en chr) maximizada
     v.an=(4+8)*big2+editor_font_an*v.prg->an;
     ventana_aux.an=v.an;
   }

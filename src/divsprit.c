@@ -165,7 +165,7 @@ void sp_normal_mask( byte * p, int x, int y, int an, int al,
 }
 
 //-----------------------------------------------------------------------------
-//      Pone un gr fico rotado y escalado
+//      Pone un gráfico rotado y escalado
 //-----------------------------------------------------------------------------
 
 byte * ptrmap;
@@ -444,7 +444,7 @@ void sp_scan_mask(byte * p,short n,byte * si,int an,int x0,int y0,int x1,int y1,
 }
 
 //-----------------------------------------------------------------------------
-//      Invierte horizontalmente un gr fico
+//      Invierte horizontalmente un gráfico
 //-----------------------------------------------------------------------------
 
 void invierte_hor(byte * p, int an, int al) {
@@ -461,7 +461,7 @@ void invierte_hor(byte * p, int an, int al) {
 }
 
 //-----------------------------------------------------------------------------
-//      Invierte verticalmente un gr fico
+//      Invierte verticalmente un gráfico
 //-----------------------------------------------------------------------------
 
 void invierte_ver(byte * sp, int an, int al) {
@@ -478,7 +478,7 @@ void invierte_ver(byte * sp, int an, int al) {
 }
 
 //-----------------------------------------------------------------------------
-//      Devuelve el ancho y alto de un gr fico rotado y/o escalado
+//      Devuelve el ancho y alto de un gráfico rotado y/o escalado
 //-----------------------------------------------------------------------------
 
 void sp_size( int *x, int *y, int *an, int *al, int xg, int yg,

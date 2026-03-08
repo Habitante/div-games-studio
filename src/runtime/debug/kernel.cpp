@@ -1,6 +1,6 @@
 
 //-----------------------------------------------------------------------------
-// Nucleo de la ejecuci¢n de los programas en DIV
+// Nucleo de la ejecución de los programas en DIV
 //-----------------------------------------------------------------------------
 
 case lnop: break;
@@ -104,7 +104,7 @@ if((id_start+((procesos-2)*iloc_len)) == id_end)
   mem[id+_Id]=id;
   if (mem[id+_BigBro]=mem[id2+_Son]) mem[mem[id+_BigBro]+_SmallBro]=id;
   mem[id2+_Son]=id; mem[id+_Father]=mem[id+_Caller]=id2;
-  if (mem[ip+2]==lnop) mem[id+_FCount]=mem[id2+_FCount]+1; // Funci¢n
+  if (mem[ip+2]==lnop) mem[id+_FCount]=mem[id2+_FCount]+1; // Función
   #ifdef DEBUG
   else process_level++;
   #endif
@@ -218,7 +218,7 @@ case lrtf:
   bp=id; id=mem[id+_Caller];
   elimina_proceso(bp);
   if (!(id&1)) {
-    if (id) actualiza_pila(id-1,pila[sp]); // Un return de funci¢n (tras frame)
+    if (id) actualiza_pila(id-1,pila[sp]); // Un return de función (tras frame)
     goto next_process1;
   }
   ip=mem[id+_IP];
@@ -278,7 +278,7 @@ case ldbg:
     if (debug_active) {
       for (ibreakpoint=0;ibreakpoint<max_breakpoint;ibreakpoint++)
         if (breakpoint[ibreakpoint].line>-1 && abs(breakpoint[ibreakpoint].offset)==ip-1) break;
-      if (ibreakpoint<max_breakpoint) { // Se lleg¢ a un breakpoint
+      if (ibreakpoint<max_breakpoint) { // Se llegó a un breakpoint
         mem[--ip]=breakpoint[ibreakpoint].code;
         breakpoint[ibreakpoint].line=-1;
         call_to_debug=1; process_stoped=id;
@@ -473,14 +473,14 @@ case lstradd: // Strcat "en el aire" (ojo, el aire tiene tambien 0xDAD00402)
   nstring=((nstring+1)&3);
   break;
 
-case lstrdec: // cambio de tama¤o "en el aire" (no da error, hace lo que puede)
+case lstrdec: // cambio de tamaño "en el aire" (no da error, hace lo que puede)
   oo=strlen((char*)&mem[pila[sp-1]]);
   if (oo<1028) {
     strcpy((char*)&mem[nullstring[nstring]],(char*)&mem[pila[sp-1]]);
     if (pila[sp]>0) { // Quitar caracteres
       if (pila[sp]>=oo) memb[nullstring[nstring]*4]=0;
       else memb[nullstring[nstring]*4+oo-pila[sp]]=0;
-    } else if (pila[sp]<0) { // A¤adir (?) caracteres (por homogeneidad)
+    } else if (pila[sp]<0) { // Añadir (?) caracteres (por homogeneidad)
       pila[sp]=oo-pila[sp]; // Nueva longitud
       if (pila[sp]>1025) pila[sp]=1025;
       for (;oo<pila[sp];oo++) {
@@ -492,7 +492,7 @@ case lstrdec: // cambio de tama¤o "en el aire" (no da error, hace lo que puede)
   nstring=((nstring+1)&3);
   break;
 
-case lstrsub: // cambio de tama¤o a un string
+case lstrsub: // cambio de tamaño a un string
   oo=strlen((char*)&mem[pila[sp-1]]);
   #ifdef DEBUG
     if ((mem[pila[sp-1]-1]&0xFFF00000)!=0xDAD00000) {
@@ -509,7 +509,7 @@ case lstrsub: // cambio de tama¤o a un string
   if (pila[sp]>0) { // Quitar caracteres
     if (pila[sp]>=oo) memb[pila[sp-1]*4]=0;
     else memb[pila[sp-1]*4+oo-pila[sp]]=0;
-  } else if (pila[sp]<0) { // A¤adir (?) caracteres (por homogeneidad)
+  } else if (pila[sp]<0) { // Añadir (?) caracteres (por homogeneidad)
     pila[sp]=oo-pila[sp]; // Nueva longitud
     for (;oo<pila[sp];oo++) {
       memb[pila[sp-1]*4+oo]=' ';

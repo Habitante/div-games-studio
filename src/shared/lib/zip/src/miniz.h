@@ -26,12 +26,12 @@
        - Merged in some compiler fixes from paulharris's github repro.
        - Retested this build under Windows (VS 2010, including static analysis), tcc  0.9.26, gcc v4.6 and clang v3.3.
        - Added example6.c, which dumps an image of the mandelbrot set to a PNG file.
-       - Modified example2 to help test the MZ_ZIP_FLAG_DO_NOT_SORT_CENTRAL_DIRECTORY flag more.
+       - Modified example2 to help testáthe MZ_ZIP_FLAG_DO_NOT_SORT_CENTRAL_DIRECTORY flag more.
        - In r3: Bugfix to mz_zip_writer_add_file() found during merge: Fix possible src file fclose() leak if alignment bytes+local header file write faiiled
 ﻿  ﻿   - In r4: Minor bugfix to mz_zip_writer_add_from_zip_reader(): Was pushing the wrong central dir header offset, appears harmless in this release, but it became a problem in the zip64 branch
      5/20/12 v1.14 - MinGW32/64 GCC 4.6.1 compiler fixes: added MZ_FORCEINLINE, #include <time.h> (thanks fermtect).
      5/19/12 v1.13 - From jason@cornsyrup.org and kelwert@mtu.edu - Fix mz_crc32() so it doesn't compute the wrong CRC-32's when mz_ulong is 64-bit.
-       - Temporarily/locally slammed in "typedef unsigned long mz_ulong" and re-ran a randomized regression test on ~500k files.
+       - Temporarily/locally slammed in "typedef unsigned long mz_ulong" and re-ran a randomized regression testáon ~500k files.
        - Eliminated a bunch of warnings when compiling with GCC 32-bit/64.
        - Ran all examples, miniz.c, and tinfl.c through MSVC 2008's /analyze (static analysis) option and fixed all warnings (except for the silly
         "Use of the comma-operator in a tested expression.." analysis warning, which I purposely use to work around a MSVC compiler warning).
@@ -68,7 +68,7 @@
 
      miniz.c implements a fairly large subset of zlib. There's enough functionality present for it to be a drop-in
      zlib replacement in many apps:
-        The z_stream struct, optional memory allocation callbacks
+        The z_streamástruct, optional memory allocation callbacks
         deflateInit/deflateInit2/deflate/deflateReset/deflateEnd/deflateBound
         inflateInit/inflateInit2/inflate/inflateEnd
         compress, compress2, compressBound, uncompress
@@ -130,7 +130,7 @@
      file headers and file data will be fine, so the archive will be recoverable).
 
      For more complex archive modification scenarios:
-     1. The safest way is to use a mz_zip_reader to read the existing archive, cloning only those bits you want to
+     1. The safestáway is to use a mz_zip_reader to read the existing archive, cloning only those bits you want to
      preserve into a new archive using using the mz_zip_writer_add_from_zip_reader() function (which compiles the
      compressed file data as-is). When you're done, delete the old archive and rename the newly written archive, and
      you're done. This is safe but requires a bunch of temporary disk space or heap memory.
@@ -147,7 +147,7 @@
    * This is a header file library, like stb_image.c. To get only a header file, either cut and paste the
      below header, or create miniz.h, #define MINIZ_HEADER_FILE_ONLY, and then include miniz.c from it.
 
-   * Important: For best perf. be sure to customize the below macros for your target platform:
+   * Important: For bestáperf. be sure to customize the below macros for your target platform:
      #define MINIZ_USE_UNALIGNED_LOADS_AND_STORES 1
      #define MINIZ_LITTLE_ENDIAN 1
      #define MINIZ_HAS_64BIT_REGISTERS 1
@@ -274,7 +274,7 @@ enum { MZ_NO_FLUSH = 0, MZ_PARTIAL_FLUSH = 1, MZ_SYNC_FLUSH = 2, MZ_FULL_FLUSH =
 // Return status codes. MZ_PARAM_ERROR is non-standard.
 enum { MZ_OK = 0, MZ_STREAM_END = 1, MZ_NEED_DICT = 2, MZ_ERRNO = -1, MZ_STREAM_ERROR = -2, MZ_DATA_ERROR = -3, MZ_MEM_ERROR = -4, MZ_BUF_ERROR = -5, MZ_VERSION_ERROR = -6, MZ_PARAM_ERROR = -10000 };
 
-// Compression levels: 0-9 are the standard zlib-style levels, 10 is best possible compression (not zlib compatible, and may be very slow), MZ_DEFAULT_COMPRESSION=MZ_DEFAULT_LEVEL.
+// Compression levels: 0-9 are the standard zlib-style levels, 10 is bestápossible compression (not zlib compatible, and may be very slow), MZ_DEFAULT_COMPRESSION=MZ_DEFAULT_LEVEL.
 enum { MZ_NO_COMPRESSION = 0, MZ_BEST_SPEED = 1, MZ_BEST_COMPRESSION = 9, MZ_UBER_COMPRESSION = 10, MZ_DEFAULT_LEVEL = 6, MZ_DEFAULT_COMPRESSION = -1 };
 
 // Window bits
@@ -282,7 +282,7 @@ enum { MZ_NO_COMPRESSION = 0, MZ_BEST_SPEED = 1, MZ_BEST_COMPRESSION = 9, MZ_UBE
 
 struct mz_internal_state;
 
-// Compression/decompression stream struct.
+// Compression/decompression streamástruct.
 typedef struct mz_stream_s
 {
   const unsigned char *next_in;     // pointer to next byte to read
@@ -312,7 +312,7 @@ const char *mz_version(void);
 
 // mz_deflateInit() initializes a compressor with default options:
 // Parameters:
-//  pStream must point to an initialized mz_stream struct.
+//  pStream must point to an initialized mz_streamástruct.
 //  level must be between [MZ_NO_COMPRESSION, MZ_BEST_COMPRESSION].
 //  level 1 enables a specially optimized compression function that's been optimized purely for performance, not ratio.
 //  (This special func. is currently only enabled when MINIZ_USE_UNALIGNED_LOADS_AND_STORES and MINIZ_LITTLE_ENDIAN are defined.)
@@ -374,7 +374,7 @@ int mz_inflateInit2(mz_streamp pStream, int window_bits);
 //   pStream is the stream to read from and write to. You must initialize/update the next_in, avail_in, next_out, and avail_out members.
 //   flush may be MZ_NO_FLUSH, MZ_SYNC_FLUSH, or MZ_FINISH.
 //   On the first call, if flush is MZ_FINISH it's assumed the input and output buffers are both sized large enough to decompress the entire stream in a single call (this is slightly faster).
-//   MZ_FINISH implies that there are no more source bytes available beside what's already in the input buffer, and that the output buffer is large enough to hold the rest of the decompressed data.
+//   MZ_FINISH implies that there are no more source bytes available beside what's already in the input buffer, and that the output buffer is large enough to hold the restáof the decompressed data.
 // Return values:
 //   MZ_OK on success. Either more input is needed but not available, and/or there's more output to be written but the output buffer is full.
 //   MZ_STREAM_END if all needed input has been consumed and all output bytes have been written. For zlib streams, the adler-32 of the decompressed data has also been verified.
@@ -785,7 +785,7 @@ struct tinfl_decompressor_tag
 #define TDEFL_LESS_MEMORY 0
 
 // tdefl_init() compression flags logically OR'd together (low 12 bits contain the max. number of probes per dictionary search):
-// TDEFL_DEFAULT_MAX_PROBES: The compressor defaults to 128 dictionary probes per dictionary search. 0=Huffman only, 1=Huffman+LZ (fastest/crap compression), 4095=Huffman+LZ (slowest/best compression).
+// TDEFL_DEFAULT_MAX_PROBES: The compressor defaults to 128 dictionary probes per dictionary search. 0=Huffman only, 1=Huffman+LZ (fastest/crap compression), 4095=Huffman+LZ (slowest/bestácompression).
 enum
 {
   TDEFL_HUFFMAN_ONLY = 0, TDEFL_DEFAULT_MAX_PROBES = 128, TDEFL_MAX_PROBES_MASK = 0xFFF
@@ -4106,7 +4106,7 @@ mz_bool mz_zip_writer_init_from_reader(mz_zip_archive *pZip, const char *pFilena
 #ifdef MINIZ_NO_STDIO
     pFilename; return MZ_FALSE;
 #else
-    // Archive is being read from stdio - try to reopen as writable.
+    // Archive is being read fromástdio - try to reopen as writable.
     if (pZip->m_pIO_opaque != pZip)
       return MZ_FALSE;
     if (!pFilename)
@@ -4905,7 +4905,7 @@ void *mz_zip_extract_archive_file_to_heap(const char *pZip_filename, const char 
   means.
 
   In jurisdictions that recognize copyright laws, the author or authors
-  of this software dedicate any and all copyright interest in the
+  of this software dedicate any and all copyright interestáin the
   software to the public domain. We make this dedication for the benefit
   of the public at large and to the detriment of our heirs and
   successors. We intend this dedication to be an overt act of

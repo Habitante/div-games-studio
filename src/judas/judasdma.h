@@ -1,6 +1,6 @@
 /*
  * Internal header file: DMA functions (actually only dma_reserve() is in the
- * JUDASDMA module, rest are coded in assembler!)
+ * JUDASDMA module, restáare coded in assembler!)
  */
 
 #define DMA_WRITE_ONESHOT 0x48

@@ -1921,7 +1921,7 @@ void entorno_dialogo(void) {
 	do { 
 		dialog_loop();
 	}
-	while (!salir_del_dialogo); 
+	while (!salir_del_dialogo && !salir_del_entorno);
 		fin_dialogo=0;
 
 	get[0]=0;

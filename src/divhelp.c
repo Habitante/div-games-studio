@@ -1,6 +1,6 @@
 
 //-----------------------------------------------------------------------------
-//      M¢dulo que contiene el c¢digo del hipertexto
+//      Módulo que contiene el código del hipertexto
 //-----------------------------------------------------------------------------
 
 #include "global.h"
@@ -8,20 +8,20 @@
 extern int fin_ventana;
 extern int primera_vez;
 
-int helpidx[4096];              // Por cada trmino {inicio,longitud}
-int help_item;                  // Indica sobre que trmino se pide ayuda
+int helpidx[4096];              // Por cada término {inicio,longitud}
+int help_item;                  // Indica sobre que término se pide ayuda
 int help_len;                   // Longitud del help_buffer
 int help_an,help_al;            // Ancho y alto de la ventana de ayuda
-int help_l,help_lines;          // L¡nea actual, y lineas totales
-byte help_title[128];           // T¡tulo del trmino
+int help_l,help_lines;          // Línea actual, y lineas totales
+byte help_title[128];           // Título del término
 byte *help_buffer=NULL;         // Buffer para contener la ayuda
 byte *h_buffer;                 // Buffer auxiliar
-byte *help_line;                // Puntero a la l¡nea actual
+byte *help_line;                // Puntero a la línea actual
 byte *help_end;                 // Final de help_buffer;
 byte *div_index=NULL;           // Inicio del glosario
 byte *index_end;                // Final del glosario
 
-int loaded[64],n_loaded=0;      // Im genes cargadas, hasta un m ximo de 32
+int loaded[64],n_loaded=0;      // Imágenes cargadas, hasta un máximo de 32
 
 int determina_prg2(void);
 struct tprg * old_prg;
@@ -42,12 +42,12 @@ void put_image_line(int n,int linea,byte * di,int v_an);
 
 // Sistema de "Back to previous topic"
 
-int backto[64]; // Cola circular para almacenar los topicos consultados {n,l¡nea}
+int backto[64]; // Cola circular para almacenar los topicos consultados {n,línea}
 int i_back,f_back; // Inicio y final de la cola circular (0,2,...,62)
-int a_back;        // Trmino actual (i_back <= a_back <= f_back)
+int a_back;        // Término actual (i_back <= a_back <= f_back)
 
 //-----------------------------------------------------------------------------
-//      Carga el glosario de trminos (div_index.prg)
+//      Carga el glosario de términos (div_index.prg)
 //-----------------------------------------------------------------------------
 
 void load_index(void) {
@@ -79,7 +79,7 @@ void load_index(void) {
 }
 
 //-----------------------------------------------------------------------------
-//      Crea el ¡ndice para el hipertexto
+//      Crea el índice para el hipertexto
 //-----------------------------------------------------------------------------
 
 void make_helpidx(void) {
@@ -87,7 +87,7 @@ void make_helpidx(void) {
   byte * help=NULL,* i=NULL,* help_end;
   FILE * f;
 
-  i_back=a_back=f_back=0; // La cola se vac¡a
+  i_back=a_back=f_back=0; // La cola se vacía
 
   memset(helpidx,0,sizeof(helpidx));
   if((f=fopen("help/help.div","rb"))!=NULL) {
@@ -104,7 +104,7 @@ void make_helpidx(void) {
           while (*i>='0' && *i<='9') 
 			n=n*10+*i++-0x30;
           
-          helpidx[n*2]=(long)(i+1-help); // Fija el inicio del trmino n
+          helpidx[n*2]=(long)(i+1-help); // Fija el inicio del término n
           
           if (m>=0) 
 			helpidx[m*2+1]=len-helpidx[m*2]; // Fija la longitud del anterior
@@ -385,7 +385,7 @@ void help3(void) {
   }
 }
 
-void help0(void) { // En help_item se indica sobre que trmino se pide ayuda
+void help0(void) { // En help_itemáse indica sobre que término se pide ayuda
   int x;
 
   v.tipo=102;
@@ -421,14 +421,14 @@ void help0(void) { // En help_item se indica sobre que trmino se pide ayuda
 }
 
 //-----------------------------------------------------------------------------
-//      Cambia el tama¤o de la ventana de ayuda
+//      Cambia el tamaño de la ventana de ayuda
 //-----------------------------------------------------------------------------
 
 void resize_help(void) {
-  int _mx=mouse_x,_my=mouse_y;  // Coordenadas del rat¢n iniciales
-  int my;                       // Coordenadas tabuladas del rat¢n en cada momento
+  int _mx=mouse_x,_my=mouse_y;  // Coordenadas del ratón iniciales
+  int my;                       // Coordenadas tabuladas del ratón en cada momento
   int _al;                      // al original, en chr
-  int old_al;                   // £ltimo al
+  int old_al;                   // último al
   byte *new_block;
   int an=v.an/big2,al=v.al/big2;
 
@@ -546,7 +546,7 @@ void help(int n){
     if (m) move(0,m);
     if (v.primer_plano==2) maximiza_ventana();
 
-    if (m && v.primer_plano==0) { // Si estaba en 2§ plano
+    if (m && v.primer_plano==0) { // Si estaba en 2º plano
       for (m=1;m<max_windows;m++) if (ventana[m].tipo && ventana[m].primer_plano==1)
         if (colisionan(0,m)) {ventana[m].primer_plano=0; vuelca_ventana(m);}
       v.primer_plano=1;
@@ -604,7 +604,7 @@ void help(int n){
 //      Ayuda en el programa de dibujo
 //-----------------------------------------------------------------------------
 
-void help_paint0(void) { // En help_item se indica sobre que trmino se pide ayuda
+void help_paint0(void) { // En help_itemáse indica sobre que término se pide ayuda
   int x;
 
   v.tipo=1;
@@ -707,7 +707,7 @@ void get_error(int n) {
 }
 
 //-----------------------------------------------------------------------------
-//      Accede a otro trmino a travs de una referencia cruzada
+//      Accede a otro término a través de una referencia cruzada
 //-----------------------------------------------------------------------------
 
 void help_xref(int n,int linea) {
@@ -756,10 +756,10 @@ void help_xref(int n,int linea) {
 //      Tabula la ayuda para un ancho dado (help_an)
 //-----------------------------------------------------------------------------
 
-// graf[n] puntero a an,al,x0,x1,gr fico... (an..x1 son word)
+// graf[n] puntero a an,al,x0,x1,gráfico... (an..x1 son word)
 
 int ejemplo=0;  // Viene un ejemplo
-int imagen=0;   // C¢digo de la imagen
+int imagen=0;   // Código de la imagen
 int imagen_y;   // Linea actual de la imagen
 int imagen_al;  // alto en chars de la imagen
 int imagen_an;  // ancho en chars de la imagen
@@ -798,7 +798,7 @@ void tabula_help(byte *si,byte *di,int lon) {
 
     c=*si++;
 
-    // Car cteres 0..31 se sustituyen por '?'
+    // Carácteres 0..31 se sustituyen por '?'
 
     if (c<32 && c!=13 && c!=10) *(si-1)=c='?';
 
@@ -810,7 +810,7 @@ void tabula_help(byte *si,byte *di,int lon) {
       goto ini_tabulador;
     } if (si>=end) break;
 
-    // Saltos de l¡nea
+    // Saltos de línea
 
     if (c==13 || c==10) {
       if (c==13 && si < end && *si==10) si++; // skip LF after CR
@@ -825,11 +825,11 @@ void tabula_help(byte *si,byte *di,int lon) {
       }
     } else ultimo_cr_real=0;
 
-    // Mientras vengan chars o saltos de l¡nea
+    // Mientras vengan chars o saltos de línea
 
     if (c!=0 || !ultimo_cr) {
 
-      if (c) { // Si viene un car cter
+      if (c) { // Si viene un carácter
 
         // Tratamiento de comandos
 
@@ -865,7 +865,7 @@ void tabula_help(byte *si,byte *di,int lon) {
               c=1; estado=1; chars--;
               break;
 
-            case '/': // L¡nea
+            case '/': // Línea
               si+=2; if (imagen) {
                 if (!ultimo_cr) { *di++=0; help_lines++; ultimo_cr=1; chars=0; }
                 do {
@@ -973,7 +973,7 @@ void tabula_help(byte *si,byte *di,int lon) {
 
         if (!ejemplo && chars==help_an+1) {
 
-          chars2=chars; help_an2=help_an; // Arreglar la l¡nea que se trunc¢
+          chars2=chars; help_an2=help_an; // Arreglar la línea que se truncó
 
           nchars=chars=0; *di=c; old_di2=di+1;
 
@@ -986,7 +986,7 @@ void tabula_help(byte *si,byte *di,int lon) {
             di--; chars++; nchars++; chars2--;
           }
 
-          di2=di; // Donde termina la l¡nea anterior
+          di2=di; // Donde termina la línea anterior
 
           if (estado==0) { // Se corta el texto normal
             if (imagen) {
@@ -1154,7 +1154,7 @@ void vuelca_help(void) {
 }
 
 //-----------------------------------------------------------------------------
-//      Impresi¢n parcial de una imagen
+//      Impresión parcial de una imagen
 //-----------------------------------------------------------------------------
 
 void put_image_line(int n,int linea,byte * di,int v_an) {
@@ -1178,7 +1178,7 @@ void put_image_line(int n,int linea,byte * di,int v_an) {
 }
 
 //-----------------------------------------------------------------------------
-//      Impresi¢n de un car cter
+//      Impresión de un carácter
 //-----------------------------------------------------------------------------
 
 void put_chr(byte * ptr, int an, byte c,byte color) {
@@ -1196,7 +1196,7 @@ void put_chr(byte * ptr, int an, byte c,byte color) {
 }
 
 //-----------------------------------------------------------------------------
-//  Tabula un trmino de la ayuda para enviarlo a impresora
+//  Tabula un término de la ayuda para enviarlo a impresora
 //-----------------------------------------------------------------------------
 
 #define ancho_ayuda 70
@@ -1213,7 +1213,7 @@ void tabula_help2(byte *si,byte *di,int lon) {
 
     c=*si++;
 
-    // Car cteres 0..31 se sustituyen por '?'
+    // Carácteres 0..31 se sustituyen por '?'
 
     if (c<32 && c!=13 && c!=10) *(si-1)=c='?';
 
@@ -1227,7 +1227,7 @@ void tabula_help2(byte *si,byte *di,int lon) {
 
     if (si>=end) break;
 
-    // Saltos de l¡nea
+    // Saltos de línea
 
     if (c==13 || c==10) {
       if (c==13 && si < end && *si==10) si++; // skip LF after CR
@@ -1242,11 +1242,11 @@ void tabula_help2(byte *si,byte *di,int lon) {
       }
     } else ultimo_cr_real=0;
 
-    // Mientras vengan chars o saltos de l¡nea
+    // Mientras vengan chars o saltos de línea
 
     if (c!=0 || !ultimo_cr) {
 
-      if (c) { // Si viene un car cter
+      if (c) { // Si viene un carácter
 
         // Tratamiento de comandos
 
@@ -1280,7 +1280,7 @@ void tabula_help2(byte *si,byte *di,int lon) {
               // else fall through to default (bold/ignored in print)
               continue;
 
-            case '/': // L¡nea
+            case '/': // Línea
               si+=2;
               if (!ultimo_cr) { *di++=0; ultimo_cr=1; chars=0; }
               strcpy((char *)di,"\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4");
@@ -1347,7 +1347,7 @@ void tabula_help2(byte *si,byte *di,int lon) {
 }
 
 //-----------------------------------------------------------------------------
-//  Opci¢n de impresi¢n de una p gina de ayuda
+//  Opción de impresión de una página de ayuda
 //-----------------------------------------------------------------------------
 
 char h_ar[16]="";
@@ -1397,7 +1397,7 @@ void Print_Help(void) {
           _help_end=help_end;
           tabula_help2(p+1,print_buffer,helpidx[help_item*2+1]-(p+1-h_buffer));
 
-          // Imprime el t¡tulo de la p gina de ayuda
+          // Imprime el título de la página de ayuda
 
           fwrite("\xd\xa",1,2,g);
           for (n=0;n<(ancho_ayuda-strlen((char *)help_title)-4)/2;n++) fwrite(" ",1,1,g);

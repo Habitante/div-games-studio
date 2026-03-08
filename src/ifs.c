@@ -5,7 +5,7 @@
 #include "ifs.h"
 
 //-----------------------------------------------------------------------------
-//  Tabla de conversi¢n de chars Windows a chars MSDOS
+//  Tabla de conversión de chars Windows a chars MSDOS
 //-----------------------------------------------------------------------------
 
 char OEM2ANSI[256]={
@@ -125,8 +125,8 @@ short escalar()
     short cx=0,cy=0,flag=0;
     char *ptr=Buffer, *p;
 
-    ancho2= (float) ancho * ifs.tamX / sizeIFS;    // ancho real en relaci¢n
-                                                     // al tama¤o original
+    ancho2= (float) ancho * ifs.tamX / sizeIFS;    // ancho real en relación
+                                                     // al tamaño original
     alto2= (float) alto * ifs.tamY / sizeIFS;
 
     if (ifs.tamX==sizeIFS && ifs.tamY==sizeIFS)         // no hace falta escalar
@@ -575,7 +575,7 @@ void texturarSombra()
 }
 
 
-void unirOutlineConBody(void) { // Le a¤ade el body al outline
+void unirOutlineConBody(void) { // Le añade el body al outline
   char *ptr, *ptr2, c, color, realcolor;
   short x,y,n;
 

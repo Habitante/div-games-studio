@@ -1,6 +1,6 @@
 
 //-----------------------------------------------------------------------------
-//      M¢dulo de an lisis de setup.cfg
+//      Módulo de análisis de setup.cfg
 //-----------------------------------------------------------------------------
 
 #include "global.h"
@@ -12,7 +12,7 @@ void cfg_show_mouse(void);
 void cfg_show_cursor(void);
 
 //-----------------------------------------------------------------------------
-//      Variables a nivel de m¢dulo
+//      Variables a nivel de módulo
 //-----------------------------------------------------------------------------
 
 int stnot_big;
@@ -355,7 +355,7 @@ void Tap_Setup0(void)
 }
 
 typedef struct _meminfo{
-        unsigned long Bloque_mas_grande_disponible; // largest block available
+        unsigned long Bloque_mas_grande_disponible; // largestáblock available
         unsigned Maximo_de_paginas_desbloqueadas; // Maximum pages unblocked
         unsigned Pagina_bloqueable_mas_grande; // Lockable larger page
         unsigned Espacio_de_direccionamiento_lineal; // Linear address space
@@ -487,7 +487,7 @@ void MemInfo0(void) {
 }
 
 //-----------------------------------------------------------------------------
-//  Ventana de configuraci¢n
+//  Ventana de configuración
 //-----------------------------------------------------------------------------
 
 char color_cfg[12];
@@ -941,7 +941,7 @@ void resize_program(void) {
   v.al=(12+16)*big2+font_al*v_prg->al;
 
   if (v.an>vga_an) {
-    v.prg->an=(vga_an-12*big2)/font_an; // Calcula tama¤o (en chr) maximizada
+    v.prg->an=(vga_an-12*big2)/font_an; // Calcula tamaño (en chr) maximizada
     v.an=(4+8)*big2+font_an*v.prg->an;
     ventana_aux.an=v.an;
   }
@@ -982,7 +982,7 @@ void tapiz_thumb(void)
 
   if(x_tapiz==NULL) return;
 
-  // Crea la reducci¢n del tapiz
+  // Crea la reducción del tapiz
 
   coefredx=x_tapiz_an/((float)128*(float)big2);
   coefredy=x_tapiz_al/((float) 88*(float)big2);

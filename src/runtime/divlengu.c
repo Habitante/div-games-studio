@@ -1,6 +1,6 @@
 
 //-----------------------------------------------------------------------------
-//      M¢dulo para la gesti¢n de textos (lenguaje.div) y de encriptaci¢n
+//      Módulo para la gestión de textos (lenguaje.div) y de encriptación
 //-----------------------------------------------------------------------------
 
 #include "inter.h"
@@ -8,7 +8,7 @@
 byte * textos;
 byte * fin_textos;
 
-int numero=0; // N£mero de texto
+int numero=0; // Número de texto
 byte *p_lengu,*q_lengu; // Punteros de lectura y escritura respectivamente.
 
 
@@ -65,7 +65,7 @@ void inicializa_textos(byte * fichero) {
 }
 
 //-----------------------------------------------------------------------------
-//      Funci¢n de an lisis de los textos
+//      Función de análisis de los textos
 //-----------------------------------------------------------------------------
 
 void analiza_textos(void) {
@@ -121,7 +121,7 @@ void finaliza_textos(void) {
 }
 
 //----------------------------------------------------------------------------
-//      Generador de n£meros aleatorios
+//      Generador de números aleatorios
 //----------------------------------------------------------------------------
 
 union {byte b[128]; int d[32];} seed_coder; // Seed aleatorio (127 bytes + PTR)
@@ -156,7 +156,7 @@ void init_rnd_coder(int n, char * clave){
 }
 
 //-----------------------------------------------------------------------------
-//  Funci¢n de encriptaci¢n/desencriptaci¢n
+//  Función de encriptación/desencriptación
 //-----------------------------------------------------------------------------
 
 void coder(byte * ptr, int len, char * clave) {

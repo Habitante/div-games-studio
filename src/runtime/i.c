@@ -73,6 +73,7 @@ int nstring=0;
 
 int max,max_reloj;        // Process in order or _Priority and _Z 
 extern int alt_x;
+extern int app_paused;
 int splashtime = 5000; // 5 seconds
 #ifdef EMSCRIPTEN
 byte running = 0;
@@ -917,6 +918,12 @@ void frame_start(void) {
 	ascii=0;
 	scan_code=0;
 	tecla();
+
+	// Pause while app has lost focus (alt-tab, minimize)
+	while (app_paused && !alt_x) {
+		SDL_Delay(50);
+		tecla();
+	}
 
   // Control screensaver
 

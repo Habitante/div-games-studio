@@ -9,6 +9,7 @@ extern int help_paint_active;
 byte m_b;
 
 float m_x=0.0,m_y=0.0;
+int mouse_in_window=1;
 int joymx = 0, joymy=0;
 void read_mouse2(void);
 void libera_drag(void);
@@ -55,10 +56,25 @@ void read_mouse(void) {
 	}
 	read_mouse2();
 
-	if (modo<100 && hotkey && !help_paint_active) 
+	if (modo<100 && hotkey && !help_paint_active)
 		tecla();
 
-	real_mouse_x=(int)m_x; 
+	// When mouse is outside the window, force out-of-bounds so no UI
+	// element thinks it's being hovered (en_caja checks will all fail).
+	// Also update mouse_shift and coord so the paint cursor goes offscreen.
+	if (!mouse_in_window) {
+		mouse_x=-1;
+		mouse_y=-1;
+		real_mouse_x=-1;
+		real_mouse_y=-1;
+		mouse_shift_x=-1;
+		mouse_shift_y=-1;
+		coord_x=-1;
+		coord_y=-1;
+		return;
+	}
+
+	real_mouse_x=(int)m_x;
 	real_mouse_y=(int)m_y;
 	
 
@@ -71,14 +87,13 @@ void read_mouse(void) {
 		shift=1;
 
 		if (modo<100 && hotkey && !help_paint_active) {
-/*			if (key(_SPC)) {
-				if (mouse_b!=0xfffd) {
-					mouse_b=0xfffd;
+			if (key(_SPC)) {
+				if (mouse_b!=0x8001) {
+					mouse_b=0x8001;
 				}
-			} else if (mouse_b==0xfffd) {
+			} else if (mouse_b==0x8001) {
 				mouse_b=0;
 			}
-			* */
 		}
 	if(vga_an != vwidth || vga_al != vheight) {
 		mouse_x = (int)(m_x*(float)((float)vga_an / (float)vwidth));// / (float)vga_an);
@@ -130,14 +145,13 @@ void read_mouse(void) {
 				mouse_y-=(1<<zoom)*s; 
 				shift=1;
 			}
-/*			if (key(_SPC)) {
-				if (mouse_b!=0xfffd) {
-					mouse_b=0xfffd;
+			if (key(_SPC)) {
+				if (mouse_b!=0x8001) {
+					mouse_b=0x8001;
 				}
-			} else if (mouse_b==0xfffd) {
+			} else if (mouse_b==0x8001) {
 				mouse_b=0;
 			}
-*/
 			if (shift) {
 				real_mouse_x=mouse_x;
 				real_mouse_y=mouse_y;
@@ -327,11 +341,10 @@ void PrintEvent(const SDL_Event * event)
             SDL_Log("Window %d restored", event->window.windowID);
             break;
         case SDL_WINDOWEVENT_ENTER:
-            SDL_Log("Mouse entered window %d",
-                    event->window.windowID);
+            mouse_in_window=1;
             break;
         case SDL_WINDOWEVENT_LEAVE:
-            SDL_Log("Mouse left window %d", event->window.windowID);
+            mouse_in_window=0;
             break;
         case SDL_WINDOWEVENT_FOCUS_GAINED:
             SDL_Log("Window %d gained keyboard focus",

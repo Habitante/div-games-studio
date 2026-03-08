@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-//      M¢dulo para la creacion de explosiones
+//      Módulo para la creacion de explosiones
 //-----------------------------------------------------------------------------
 
 #include "global.h"
@@ -8,8 +8,8 @@
 //      Definiciones
 //-----------------------------------------------------------------------------
 
-#define max_pun 64      // N£mero m ximo de puntos de control
-#define max_exp 8       // N£mero m ximo de explosiones base
+#define max_pun 64      // Número máximo de puntos de control
+#define max_exp 8       // Número máximo de explosiones base
 #define DEEP    4
 #pragma on (check_stack);
 
@@ -48,7 +48,7 @@ struct _gcolor exp_gama[9];
 int cx,cy;
 int ExpGama;
 
-struct tp {			// Estructura para los puntos de la explosi¢n
+struct tp {			// Estructura para los puntos de la explosión
   int x,y;                      // Coordenadas del punto
   int radio;                    // Radio efectivo del punto
   int fuerza;                   // Fuerza central del punto
@@ -56,13 +56,13 @@ struct tp {			// Estructura para los puntos de la explosi¢n
   int ix,iy;                    // Incrementos
 };
 
-struct te {                     // Estructura para una explosi¢n base
+struct te {                     // Estructura para una explosión base
   struct tp p[max_pun];
   byte * ptr;
 } e[max_exp];
 
 //-----------------------------------------------------------------------------
-//      Par metros para crear la explosi¢n
+//      Parámetros para crear la explosión
 //-----------------------------------------------------------------------------
 
 int exp_ancho=32;      // 8..256
@@ -110,7 +110,7 @@ void crear_puntos(void) {
 }
 
 //-----------------------------------------------------------------------------
-//      Avanza un frame en la explosi¢n
+//      Avanza un frame en la explosión
 //-----------------------------------------------------------------------------
 
 void avanzar_puntos(void) {
@@ -130,7 +130,7 @@ void avanzar_puntos(void) {
 }
 
 //-----------------------------------------------------------------------------
-//	Pinta la explosi¢n
+//	Pinta la explosión
 //-----------------------------------------------------------------------------
 
 int pintar_explosion(void) {

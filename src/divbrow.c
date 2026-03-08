@@ -1,6 +1,6 @@
 
 //-----------------------------------------------------------------------------
-//      M¢dulo que contiene el c¢digo de los handler de ventanas thumbnail
+//      Módulo que contiene el código de los handler de ventanas thumbnail
 //-----------------------------------------------------------------------------
 
 #include "global.h"
@@ -43,23 +43,23 @@ Mix_Chunk * smp=NULL;
 #endif
 
 //-----------------------------------------------------------------------------
-//      Variables del m¢dulo
+//      Variables del módulo
 //-----------------------------------------------------------------------------
 
 /*struct t_listboxbr{
-  int x,y;              // Posici¢n del listbox en la ventana
+  int x,y;              // Posición del listbox en la ventana
   char * lista;         // El puntero a la lista
-  int lista_an;         // N§ de car cteres de cada registro
-  int columnas;         // N§ de columnas del listbox browser
-  int lineas;           // N§ de lineas
-  int an,al;            // Tama¤o en pixels de cada casilla
+  int lista_an;         // Nº de carácteres de cada registro
+  int columnas;         // Nº de columnas del listbox browser
+  int lineas;           // Nº de lineas
+  int an,al;            // Tamaño en pixels de cada casilla
 
   int inicial;          // Registro inicial visualizado (desde 0)
-  int maximo;           // N§ total de registros existentes (0 n/a)
-  int s0,s1,slide;      // Posici¢n inicial, final y actual de la "slide bar"
+  int maximo;           // Nº total de registros existentes (0 n/a)
+  int s0,s1,slide;      // Posición inicial, final y actual de la "slide bar"
   int zona;             // Zona seleccionada
-  int botones;          // Indica si esta pulsado el bot¢n up(1) o down(2)
-  int creada;           // Indica si ya est  creada la lista en pantalla
+  int botones;          // Indica si esta pulsado el botón up(1) o down(2)
+  int creada;           // Indica si ya está creada la lista en pantalla
 };*/
 
 
@@ -269,7 +269,7 @@ void crear_un_thumb_MAP(struct t_listboxbr * l){
         fclose(f);
       } else { estado=0; thumb[num].status=-1; }
       return;
-    } else if (estado==2 && thumb[num].status!=thumb[num].filesize) { // Se contin£a leyendo un thumbnail
+    } else if (estado==2 && thumb[num].status!=thumb[num].filesize) { // Se continúa leyendo un thumbnail
 
       if ((f=fopen(l->lista+(l->lista_an*num),"rb"))!=NULL) {
         fseek(f,thumb[num].status,SEEK_SET);
@@ -292,7 +292,7 @@ void crear_un_thumb_MAP(struct t_listboxbr * l){
 
     }
 
-    // Y ahora crea el thumbnail si el fichero se carg¢ ya completo
+    // Y ahora crea el thumbnail si el fichero se cargó ya completo
 
     if (estado==2 && thumb[num].status==thumb[num].filesize &&
         abs(_omx-mouse_x)+abs(_omy-mouse_y)+mouse_b+ascii==0) {
@@ -649,7 +649,7 @@ void crear_un_thumb_FNT(struct t_listboxbr * l)
       fclose(f);
     }
 
-    // Se contin£a leyendo un thumbnail
+    // Se continúa leyendo un thumbnail
     else if (estado==2 && thumb[num].status!=thumb[num].filesize)
     {
       if ((f=fopen(l->lista+(l->lista_an*num),"rb"))==NULL)
@@ -688,7 +688,7 @@ void crear_un_thumb_FNT(struct t_listboxbr * l)
       return;
     }
 
-    // Now create the thumbnail if the file is complete ¢ Loaded
+    // Now create the thumbnail if the file is complete ó Loaded
     if (estado==2 && thumb[num].status==thumb[num].filesize &&
         abs(_omx-mouse_x)+abs(_omy-mouse_y)+mouse_b+ascii==0)
     {
@@ -1077,7 +1077,7 @@ void crear_un_thumb_PCM(struct t_listboxbr * l)
       fclose(f);
     }
 
-    // Se contin£a leyendo un thumbnail
+    // Se continúa leyendo un thumbnail
     else if (estado==2 && thumb[num].status!=thumb[num].filesize)
     {
       if ((f=fopen(l->lista+(l->lista_an*num),"rb"))==NULL)
@@ -1116,7 +1116,7 @@ void crear_un_thumb_PCM(struct t_listboxbr * l)
       return;
     }
 
-    // Y ahora crea el thumbnail si el fichero se carg¢ ya completo
+    // Y ahora crea el thumbnail si el fichero se cargó ya completo
     if (estado==2 && thumb[num].status==thumb[num].filesize &&
         abs(_omx-mouse_x)+abs(_omy-mouse_y)+mouse_b+ascii==0)
     {
@@ -1393,7 +1393,7 @@ void muestra_thumb(struct t_listboxbr * l, int num) {
 void browser0(void) {
   unsigned n,m,x;
 
-  v.tipo=1; // Di logo
+  v.tipo=1; // Diálogo
   v.titulo=(byte *)v_texto;
   v_thumb=v_tipo;
 

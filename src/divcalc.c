@@ -1,6 +1,6 @@
 
 //-----------------------------------------------------------------------------
-//      M¢dulo que contiene el c¢digo de la calculadora
+//      Módulo que contiene el código de la calculadora
 //-----------------------------------------------------------------------------
 
 #include "global.h"
@@ -19,7 +19,7 @@ void expres5(void);
 void calculadora(void);
 
 //-----------------------------------------------------------------------------
-//      Variables del m¢dulo
+//      Variables del módulo
 //-----------------------------------------------------------------------------
 
 extern char get_buffer[long_line];
@@ -46,14 +46,14 @@ enum tokens { p_inicio, p_ultimo, p_error, p_num, p_abrir, p_cerrar, p_add,
 
 int token;      // Del tipo enumerado anterior
 double tnumero;  // Cuando token==p_num
-static char * expresion;     // Puntero a la expresi¢n asciiz
+static char * expresion;     // Puntero a la expresión asciiz
 
 struct {        // Para contener la expresion analizada
   int token;
   double numero;
 } expres[64];
 
-int iexpres;    // N£mero de elementos introducidos en expres[]
+int iexpres;    // Número de elementos introducidos en expres[]
 
 double evaluar(void);
 
@@ -63,9 +63,9 @@ void calcular(void) {
   iexpres=0;              // Inicializa el contador de expresiones
   get_token();            // Obtiene el primer token
   expres0();              // Se analiza la expresion
-  if (token==p_ultimo) {  // Se analiz¢ con xito la expresion
+  if (token==p_ultimo) {  // Se analizó con éxito la expresion
     evaluacion=evaluar();
-    if (token!=p_error) { // Se evalu¢ con xito
+    if (token!=p_error) { // Se evaluó con éxito
       token=p_num;
       tnumero=evaluacion;
     }
@@ -236,7 +236,7 @@ void get_token(void) {
   }
 }
 
-double get_num(void) { // Lee el n£mero que hay en *expresion (double en hex o dec)
+double get_num(void) { // Lee el número que hay en *expresion (double en hex o dec)
   double x=0;
   double dec=10;
 
@@ -272,7 +272,7 @@ double get_num(void) { // Lee el n£mero que hay en *expresion (double en hex o 
 }
 
 //-----------------------------------------------------------------------------
-//      Cuadro de di logo para la calculadora
+//      Cuadro de diálogo para la calculadora
 //-----------------------------------------------------------------------------
 
 void calc1(void) {
@@ -325,7 +325,7 @@ void calc2(void) {
   get=get_buffer;
   superget=0;
 
-  if (v.active_item>=0 && strlen(pcalc->ctext)) { // Se eval£a la expresi¢n
+  if (v.active_item>=0 && strlen(pcalc->ctext)) { // Se evalúa la expresión
     expresion=pcalc->ctext;
     calcular();
 

@@ -590,7 +590,7 @@ int judas_loadxm(char *name)
                         int s;
 
                         /*
-                         * There are samples; read the rest in
+                         * There are samples; read the restáin
                          */
                         if (judas_read(handle, ((char *)instr_ptr) + 29, sizeof(XM_INSTRUMENT) - 29 - 650) != sizeof(XM_INSTRUMENT) - 29 - 650)
                         {

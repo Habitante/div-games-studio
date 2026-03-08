@@ -1,25 +1,25 @@
 
 //----------------------------------------------------------------------------
-//  C¢digo de las funciones de IA (o relacionadas con ella)
+//  Código de las funciones de IA (o relacionadas con ella)
 //----------------------------------------------------------------------------
 
-//  en un principio ser n las siguientes funciones:
-//    path_find() (principal de b£squeda)
-//    path_line() (determina si se puede ir en l¡nea recta)
-//    path_free() (r pida, determina si un punto est  libre)
+//  en un principio serán las siguientes funciones:
+//    path_find() (principal de búsqueda)
+//    path_line() (determina si se puede ir en línea recta)
+//    path_free() (rápida, determina si un punto está libre)
 //    new_map()  (para crear los mapas en el propio prg, similar a load_map)
 
 #include "inter.h"
 
 //----------------------------------------------------------------------------
-//  Datos del m¢dulo
+//  Datos del módulo
 //----------------------------------------------------------------------------
 
 #define max_map_size 254 // 128
 
 int find_status;    // Indica si han sido inicializadas las estructuras
 
-int modo;           // 0 R pido, 1 Exacto
+int modo;           // 0 Rápido, 1 Exacto
 
 word * distancias;  // Tabla con las distancias del origen a cada casilla
 word * distancias2; // Tabla con las distancias del destino a cada casilla
@@ -34,14 +34,14 @@ int an,al;          // Ancho y alto del mapa
 
 #define m(x,y) (*(map+(x)+((y)*an)))
 
-word cx,cy,c;       // Casilla actualmente en exploraci¢n (x,y y n£mero)
+word cx,cy,c;       // Casilla actualmente en exploración (x,y y número)
 int ax,ay,bx,by;    // Casillas inicial y final
-word b;             // Casilla final (n£mero)
-int fin;            // Indica si se alcanz¢ ya el destino
+word b;             // Casilla final (número)
+int fin;            // Indica si se alcanzó ya el destino
 int tile;           // Tilesize del mapa (entero, de 1 en adelante)
 int choque_linea;   // Para determinar si se puede ir de un punto a otro
 
-int cas_inicial;    // Si la primera casilla est  ocupada .. la desocupa
+int cas_inicial;    // Si la primera casilla está ocupada .. la desocupa
 
 //----------------------------------------------------------------------------
 //  path_find(modo,file,code,tilesize,x,y,offset tabla,sizeof tabla)
@@ -58,7 +58,7 @@ void add(int x, int y, word bnew, word step);
 void add2(word bnew, word step);
 
 void path_find(void) {
-  int file,code,x,y,offset,size;  // Par metros de entrada
+  int file,code,x,y,offset,size;  // Parámetros de entrada
   int *ptr;                       // Puntero al registro del mapa
 
 //----------------------------------------------------------------------------
@@ -74,7 +74,7 @@ void path_find(void) {
 
   pila[sp]=0; // Por defecto, y hasta que se demuestre lo contrario
 
-  // Comprueba l¡mites de offset y size ...
+  // Comprueba límites de offset y size ...
 #ifdef DIV2
   if (!capar(offset) || !capar(offset+size)) { e(122); return; }
 #else
@@ -82,7 +82,7 @@ void path_find(void) {
   if (offset<long_header || offset+size>imem_max) { e(e122); return; }
 #endif
 
-  // L¡mites tilesize
+  // Límites tilesize
 
   if (tile<1 || tile>256) { e(151); return; }
 
@@ -100,7 +100,7 @@ void path_find(void) {
 
   if (an<1 || al<1 || an>max_map_size || al>max_map_size) { e(152); return; }
 
-  // Comprueba l¡mites de coordenadas (si est n fuera del mapa retorna 0)
+  // Comprueba límites de coordenadas (si están fuera del mapa retorna 0)
 
   if (x<0 || y<0 || x>=an*tile || y>=al*tile) return;
   ax=mem[id+_X]; ay=mem[id+_Y];
@@ -110,9 +110,9 @@ void path_find(void) {
 
   ax/=tile; ay/=tile; bx=x/tile; by=y/tile;
 
-  if (m(bx,by)) { // Caso en el que la casilla final est ocupada
+  if (m(bx,by)) { // Caso en el que la casilla final esté ocupada
 
-    x=0; // Si la casilla final no est  libre, prueba con una adyacente
+    x=0; // Si la casilla final no está libre, prueba con una adyacente
 
     if (ax<bx) {
       if (ay<by) {
@@ -150,7 +150,7 @@ void path_find(void) {
     }
   }
 
-  // Si las casillas inicial y final son idnticas ...
+  // Si las casillas inicial y final son idénticas ...
 
   if (ax==bx && ay==by) {
     if (size<2) return;
@@ -160,7 +160,7 @@ void path_find(void) {
 
 //----------------------------------------------------------------------------
 
-  // Inicializa el sistema de b£squeda, si esta es la primera b£squeda
+  // Inicializa el sistema de búsqueda, si esta es la primera búsqueda
 
   if (!find_status) if (init_find()) { e(100); return; }
 
@@ -169,36 +169,36 @@ void path_find(void) {
   // Prepara (limpia) los buffer ...
 
   memset(distancias,0,max_map_size*max_map_size*2); // Distancias si hace falta limpiarlo, para ver
-                              // que casillas est n ya visitadas en el "fill"
+                              // que casillas están ya visitadas en el "fill"
 
   cx=ax; cy=ay; c=cx+cy*max_map_size; b=bx+by*max_map_size;
 
   sig(c)=65535; // No hay una siguiente
   dis(c)=1;     // No hay una distancia (1 para marcarla como visitada)
-  fin=0;        // No se encontr¢ un camino
+  fin=0;        // No se encontró un camino
 
   if (!modo) do {
     expand();
     c=sig(c);
     if (c==65535) break;
-    cy=c/max_map_size; cx=c%max_map_size; // Hace falta por comprobar los l¡mites (y el mapa)
+    cy=c/max_map_size; cx=c%max_map_size; // Hace falta por comprobar los límites (y el mapa)
   } while (!fin);
   else do {
     expand2();
     c=sig(c);
     if (c==65535) break;
-    cy=c/max_map_size; cx=c%max_map_size; // Hace falta por comprobar los l¡mites (y el mapa)
+    cy=c/max_map_size; cx=c%max_map_size; // Hace falta por comprobar los límites (y el mapa)
   } while (!fin);
 
-  // Si (fin==1) se alcanz¢ la casilla (bx,by), y el camino se saca de dis()
+  // Si (fin==1) se alcanzó la casilla (bx,by), y el camino se saca de dis()
 
-  if (!fin) { // ­­­ No se encontr¢ (no hay) un camino hasta bx,by !!!
+  if (!fin) { // ¡¡¡ No se encontró (no hay) un camino hasta bx,by !!!
     m(ax,ay)=cas_inicial; return;
   }
 
 //----------------------------------------------------------------------------
 
-  // Hay un camino, ahora obtiene los vrtices en la tabla pasada como par metro
+  // Hay un camino, ahora obtiene los vértices en la tabla pasada como parámetro
 
   pila[sp]=calcula_vertices(&mem[offset],size/2,mem[id+_X],mem[id+_Y],x,y);
 
@@ -210,17 +210,17 @@ void path_find(void) {
 //  Expande una casilla
 //----------------------------------------------------------------------------
 
-void expand(void) { // Versi¢n r pida
+void expand(void) { // Versión rápida
   int n=0;
 
-  // Examina los limites del mapa y a¤ade los cuatro laterales
+  // Examina los limites del mapa y añade los cuatro laterales
 
   if (cx)      if (!m(cx-1,cy)) { n|=1; if (!dis(c-1))   add(cx-1,cy,c-1,10); }
   if (cx<an-1) if (!m(cx+1,cy)) { n|=2; if (!dis(c+1))   add(cx+1,cy,c+1,10); }
   if (cy)      if (!m(cx,cy-1)) { n|=4; if (!dis(c-max_map_size)) add(cx,cy-1,c-max_map_size,10); }
   if (cy<al-1) if (!m(cx,cy+1)) { n|=8; if (!dis(c+max_map_size)) add(cx,cy+1,c+max_map_size,10); }
 
-  // Ahora a¤ade las cuatro diagonales (no se si ser  necesario ...)
+  // Ahora añade las cuatro diagonales (no se si será necesario ...)
 
   if ((n&5)==5)   if (!dis(c-1-max_map_size)) if (!m(cx-1,cy-1)) add(cx-1,cy-1,c-1-max_map_size,14);
   if ((n&9)==9)   if (!dis(c-1+max_map_size)) if (!m(cx-1,cy+1)) add(cx-1,cy+1,c-1+max_map_size,14);
@@ -229,17 +229,17 @@ void expand(void) { // Versi¢n r pida
 
 }
 
-void expand2(void) { // Versi¢n exacta
+void expand2(void) { // Versión exacta
   int n=0;
 
-  // Examina los limites del mapa y a¤ade los cuatro laterales
+  // Examina los limites del mapa y añade los cuatro laterales
 
   if (cx)      if (!m(cx-1,cy)) { n|=1; if (!dis(c-1))   add2(c-1,10); }
   if (cx<an-1) if (!m(cx+1,cy)) { n|=2; if (!dis(c+1))   add2(c+1,10); }
   if (cy)      if (!m(cx,cy-1)) { n|=4; if (!dis(c-max_map_size)) add2(c-max_map_size,10); }
   if (cy<al-1) if (!m(cx,cy+1)) { n|=8; if (!dis(c+max_map_size)) add2(c+max_map_size,10); }
 
-  // Ahora a¤ade las cuatro diagonales (no se si ser  necesario ...)
+  // Ahora añade las cuatro diagonales (no se si será necesario ...)
 
   if ((n&5)==5)   if (!dis(c-1-max_map_size)) if (!m(cx-1,cy-1)) add2(c-1-max_map_size,14);
   if ((n&9)==9)   if (!dis(c-1+max_map_size)) if (!m(cx-1,cy+1)) add2(c-1+max_map_size,14);
@@ -249,10 +249,10 @@ void expand2(void) { // Versi¢n exacta
 }
 
 //----------------------------------------------------------------------------
-//  A¤ade una nueva casilla
+//  Añade una nueva casilla
 //----------------------------------------------------------------------------
 
-void add(int x, int y, word bnew, word step) { // Versi¢n r pida
+void add(int x, int y, word bnew, word step) { // Versión rápida
   word cdis;    // Distancia
   word i,a;     // Siguiente y anterior
 
@@ -271,7 +271,7 @@ void add(int x, int y, word bnew, word step) { // Versi¢n r pida
   if (bnew==b) fin=1;
 }
 
-void add2(word bnew, word step) { // Versi¢n exacta
+void add2(word bnew, word step) { // Versión exacta
   word i,a;     // Siguiente y anterior
 
   dis(bnew)=dis(c)+step; // Guarda su distancia
@@ -288,7 +288,7 @@ void add2(word bnew, word step) { // Versi¢n exacta
 }
 
 //----------------------------------------------------------------------------
-//  Inicializa las estructuras de b£squeda - Retorna 1 si fall¢ alg£n alloc
+//  Inicializa las estructuras de búsqueda - Retorna 1 si falló algún alloc
 //----------------------------------------------------------------------------
 
 int init_find(void) {
@@ -306,13 +306,13 @@ int init_find(void) {
 }
 
 //----------------------------------------------------------------------------
-//  Calcula todos los vrtices por los que debe pasar, de (x1,y1) a (x0,y0)
-//  Devuelve el n£mero de vrtices o 0 si salen demasiados vrtices ...
+//  Calcula todos los vértices por los que debe pasar, de (x1,y1) a (x0,y0)
+//  Devuelve el número de vértices o 0 si salen demasiados vértices ...
 //----------------------------------------------------------------------------
 
 int calcula_vertices(int * ptr, int max_ver, int x0, int y0, int x1, int y1) {
-  int * p=ptr+max_ver*2;  // Del £ltimo al primero, y luego memmove
-  int num=max_ver;        // Para contar los vrtices que lleva metidos en *ptr
+  int * p=ptr+max_ver*2;  // Del último al primero, y luego memmove
+  int num=max_ver;        // Para contar los vértices que lleva metidos en *ptr
   int d;                  // Distancia de la casilla actual al inicio
   int x,y;                // Siguiente punto
   int xx,yy;              // Punto actual (hasta el que SI puede ir seguro)
@@ -320,10 +320,10 @@ int calcula_vertices(int * ptr, int max_ver, int x0, int y0, int x1, int y1) {
   int dir;                // Direcciones en las que puede ir ...
   int cas;                // Casilla actual (bx+by*max_map_size)
   int n;                  // Un simple contador
-  int nextx[8],nexty[8];  // Las pr¢ximas ocho casillas (ix,iy desde bx,by)
+  int nextx[8],nexty[8];  // Las próximas ocho casillas (ix,iy desde bx,by)
 
   if (num<1) return(0);
-  *(--p)=y1; *(--p)=x1; num--; // Mete el £ltimo vrtice
+  *(--p)=y1; *(--p)=x1; num--; // Mete el último vértice
 
   x=bx*tile+tile/2; y=by*tile+tile/2; cas=bx+by*max_map_size; fin=0;
 
@@ -416,7 +416,7 @@ int calcula_vertices(int * ptr, int max_ver, int x0, int y0, int x1, int y1) {
 
     } while (!choque_linea);
 
-    if (choque_linea) { // A¤ade un nuevo vrtice a la ruta
+    if (choque_linea) { // Añade un nuevo vértice a la ruta
       if (!num) return(0);
       *(--p)=yy; *(--p)=xx; num--;
       x1=xx; y1=yy;
@@ -424,7 +424,7 @@ int calcula_vertices(int * ptr, int max_ver, int x0, int y0, int x1, int y1) {
 
   } while (!fin);
 
-  if (x!=x0 || y!=y0) { // ¨es necesario ir al centro de la primera casilla?
+  if (x!=x0 || y!=y0) { // ¿es necesario ir al centro de la primera casilla?
     puede_ir(x1,y1,x0,y0);
     if (choque_linea) {
       if (!num) return(0);
@@ -438,7 +438,7 @@ int calcula_vertices(int * ptr, int max_ver, int x0, int y0, int x1, int y1) {
 }
 
 //----------------------------------------------------------------------------
-//  Determina si puede ir a un punto en l¡nea recta (pathline/calcula_vertices)
+//  Determina si puede ir a un punto en línea recta (pathline/calcula_vertices)
 //----------------------------------------------------------------------------
 
 void puede_ir(int x0,int y0,int x1,int y1) {
@@ -498,7 +498,7 @@ void path_line(void) {
 
   pila[sp]=0; // Por defecto, y hasta que se demuestre lo contrario
 
-  if (tile<1 || tile>256) { e(151); return; } // L¡mites tilesize
+  if (tile<1 || tile>256) { e(151); return; } // Límites tilesize
 
   // Comprueba limites de file y code
 
@@ -513,7 +513,7 @@ void path_line(void) {
   an=ptr[13]; al=ptr[14]; map=(byte*)ptr+64+ptr[15]*4;
   if (an<1 || al<1 || an>max_map_size || al>max_map_size) { e(152); return; }
 
-  // Comprueba l¡mites de coordenadas (si est n fuera del mapa retorna 0)
+  // Comprueba límites de coordenadas (si están fuera del mapa retorna 0)
 
   if (x<0 || y<0 || x>=an*tile || y>=al*tile) return;
   ax=mem[id+_X]; ay=mem[id+_Y];
@@ -540,7 +540,7 @@ void path_free(void) {
 
   pila[sp]=0; // Por defecto, y hasta que se demuestre lo contrario
 
-  if (tile<1 || tile>256) { e(151); return; } // L¡mites tilesize
+  if (tile<1 || tile>256) { e(151); return; } // Límites tilesize
 
   // Comprueba limites de file y code
 
@@ -554,10 +554,10 @@ void path_free(void) {
 
   an=ptr[13]; al=ptr[14]; map=(byte*)ptr+64+ptr[15]*4;
   if (an<1 || al<1 || an>max_map_size || al>max_map_size) { e(152); return; }
-  // Comprueba l¡mites de coordenadas (si est n fuera del mapa retorna 0)
+  // Comprueba límites de coordenadas (si están fuera del mapa retorna 0)
   if (x<0 || y<0 || x>=an*tile || y>=al*tile) return;
 
-  // Determina si la casilla destino est  libre
+  // Determina si la casilla destino está libre
 
   if (!m(x/tile,y/tile)) pila[sp]=1;
 }

@@ -30,7 +30,7 @@
 #include <unistd.h> // for usleep
 #endif
 
-void sleep_ms(int milliseconds) // cross-platform sleep function
+void sleep_ms(int milliseconds) // cross-platformásleep function
 {
 #ifdef WIN32
     Sleep(milliseconds);

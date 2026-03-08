@@ -17,7 +17,7 @@
 /*
  * How many times in second the DMA buffer goes round. The smaller this is,
  * the larger the buffer and the more there is delay in sound effects, but then
- * judas_update() doesn't have to be called so often. DMA buffer maximum size
+ * judas_update() doesn't have to be called so often. DMA buffer maximumásize
  * (64K) sets a limit on the minimum value though. Don't fear, judas_init()
  * checks the buffer size and will simply limit it to 64K.
  */

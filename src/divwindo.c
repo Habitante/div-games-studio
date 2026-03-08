@@ -1,6 +1,6 @@
 
 //-----------------------------------------------------------------------------
-//      M¢dulo que contiene las primitivas b sicas para ventanas
+//      Módulo que contiene las primitivas básicas para ventanas
 //-----------------------------------------------------------------------------
 
 #include "global.h"
@@ -114,7 +114,7 @@ void wbox_in_box(byte*copia,int an_real_copia,int an_copia,int al_copia,byte c,i
 }
 
 //-----------------------------------------------------------------------------
-//  Barra de t¡tulo
+//  Barra de título
 //-----------------------------------------------------------------------------
 
 char gradient[]={
@@ -205,7 +205,7 @@ void wresalta_box(byte*copia,int an_copia,int al_copia,int x,int y,int an,int al
 }
 
 //-----------------------------------------------------------------------------
-//      Dibuja un rect ngulo
+//      Dibuja un rectángulo
 //-----------------------------------------------------------------------------
 
 void wrectangulo(byte*copia,int an_copia,int al_copia,byte c,int x,int y,int an,int al) {
@@ -431,7 +431,7 @@ void wvolcado_oscuro(byte*copia,int an_copia,int al_copia,
 }
 
 //-----------------------------------------------------------------------------
-//      Funciones de impresi¢n de un texto
+//      Funciones de impresión de un texto
 //-----------------------------------------------------------------------------
 typedef  struct { byte an; word dir; } sscar;
 // * car;

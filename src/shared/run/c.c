@@ -1,6 +1,6 @@
 
 //----------------------------------------------------------------------------
-// C¢digo de las funciones de detecci¢n de colisi¢n
+// Código de las funciones de detección de colisión
 //----------------------------------------------------------------------------
 #include "inter.h"
 //----------------------------------------------------------------------------
@@ -17,14 +17,14 @@ void test_scanc(byte * p,short n,short m,short o,byte * si,int an,int x0,int y0,
 void test_scan(byte * p,short n,byte * si,int an,int x0,int y0,int x1,int y1);
 
 //----------------------------------------------------------------------------
-// Variables definidas a nivel de m¢dulo
+// Variables definidas a nivel de módulo
 //----------------------------------------------------------------------------
 
 int colisiona;
 int p[24];
 
 //----------------------------------------------------------------------------
-//      Out_region(id,region) - solo para gr ficos de pantalla o scroll
+//      Out_region(id,region) - solo para gráficos de pantalla o scroll
 //----------------------------------------------------------------------------
 
 void out_region(void) {
@@ -33,7 +33,7 @@ void out_region(void) {
   int xg,yg,xg1,yg1,x,y,an,al;
   int * ptr,n,m;
 
-  reg=pila[sp--]; id=pila[sp]; pila[sp]=1; // Por defecto no est  en la region
+  reg=pila[sp--]; id=pila[sp]; pila[sp]=1; // Por defecto no está en la region
 
   if (mem[id+_Ctype]==2) { e(137); return; }
 
@@ -83,27 +83,27 @@ void out_region(void) {
 
     for (n=0;n<10;n++)if(iscroll[n].on&&(mem[id+_Cnumber]==0||(mem[id+_Cnumber]&(1<<n)))) {
 
-      xg=x+iscroll[n].x-iscroll[n].map1_x; // Posici¢n del sprite en el scroll
+      xg=x+iscroll[n].x-iscroll[n].map1_x; // Posición del sprite en el scroll
       yg=y+iscroll[n].y-iscroll[n].map1_y;
 
-      xg1=xg+an; yg1=yg+al; // 1§ Intersecci¢n de xg,yg,an,al e iscroll[n]
+      xg1=xg+an; yg1=yg+al; // 1º Intersección de xg,yg,an,al e iscroll[n]
 
       if (iscroll[n].x>xg) xg=iscroll[n].x;
       if (iscroll[n].y>yg) yg=iscroll[n].y;
       if (iscroll[n].x+iscroll[n].an<xg1) xg1=iscroll[n].x+iscroll[n].an;
       if (iscroll[n].y+iscroll[n].al<yg1) yg1=iscroll[n].y+iscroll[n].al;
 
-      if (xg>=xg1 || yg>=yg1) continue; // Si no hay intersecci¢n, continua
+      if (xg>=xg1 || yg>=yg1) continue; // Si no hay intersección, continua
 
       if (xg<region[reg].x1 && yg<region[reg].y1 && xg1>region[reg].x0 &&
-        yg1>region[reg].y0) { pila[sp]=0; return; } // Si est  en la regi¢n
+        yg1>region[reg].y0) { pila[sp]=0; return; } // Si está en la región
 
     }
 
   } else if (mem[id+_Ctype]==0) {
 
     if (x<region[reg].x1 && y<region[reg].y1 && x+an>region[reg].x0 &&
-        y+al>region[reg].y0) pila[sp]=0; // Si est  en la regi¢n
+        y+al>region[reg].y0) pila[sp]=0; // Si está en la región
 
   }
 }
@@ -143,15 +143,15 @@ void graphic_info(void) {
 //----------------------------------------------------------------------------
 
 // *** OJO, Detecta choques pantalla-pantalla, scroll-scroll y pantalla-scroll
-// Pero los gr ficos que est n en scroll detectan colisiones s¢lo en el primer
-// scroll en el que est n (aunque estn en varios)
+// Pero los gráficos que están en scroll detectan colisiones sólo en el primer
+// scroll en el que están (aunque estén en varios)
 
 void collision(void) {
 
   int i,bloque; // Recorre procesos de _IdScan en adelante, si _IdScan=0 desde start
   int file,graph,angle;
   int x,y,n,m;  // Coordenadas del proceso actual
-  int64_t xg,yg;  // Centro gravitatorio del gr fico del proceso actual
+  int64_t xg,yg;  // Centro gravitatorio del gráfico del proceso actual
   int * ptr;
 
   bloque=pila[sp]; pila[sp]=0; // Por defecto no colisiona
@@ -249,7 +249,7 @@ int comprobar_colisiones(int i,int bloque,int scroll) {
       	  for(n=0;n<10;n++)
       	    if(iscroll[n].on&&(mem[i+_Cnumber]==0||(mem[i+_Cnumber]&(1<<n)))) break;
       	  if (n==10) continue;
-        } else { // Choque de scroll con scroll - simpre que coincidan en el 1§
+        } else { // Choque de scroll con scroll - simpre que coincidan en el 1º
       	  if (mem[i+_Cnumber] && !(mem[i+_Cnumber]&(1<<scroll))) continue;
       	  else n=scroll;
       	}
@@ -340,7 +340,7 @@ int comprobar_colisiones(int i,int bloque,int scroll) {
 }
 
 //-----------------------------------------------------------------------------
-//      Devuelve la caja en la que se encuentra un gr fico rotado y escalado
+//      Devuelve la caja en la que se encuentra un gráfico rotado y escalado
 //-----------------------------------------------------------------------------
 
 void sp_size( int *x, int *y, int *xx, int *yy, int xg, int yg,
@@ -389,7 +389,7 @@ void sp_size( int *x, int *y, int *xx, int *yy, int xg, int yg,
 }
 
 //-----------------------------------------------------------------------------
-//      Devuelve la caja en la que se encuentra un gr fico rotado y/o escalado
+//      Devuelve la caja en la que se encuentra un gráfico rotado y/o escalado
 //-----------------------------------------------------------------------------
 
 void sp_size_scaled( int *x, int *y, int *xx, int *yy, int xg, int yg,
@@ -411,13 +411,13 @@ void sp_size_scaled( int *x, int *y, int *xx, int *yy, int xg, int yg,
 }
 
 //----------------------------------------------------------------------------
-//      Funcion externa para pintar gr ficos (para las colisiones)
+//      Funcion externa para pintar gráficos (para las colisiones)
 //----------------------------------------------------------------------------
 
 void put_collision(byte * buffer, int * ptr, int x, int y, int xg, int yg, int angle, int size, int flags) {
 
   byte * si;
-  int an,al; // Informaci¢n respecto a pantalla del grafico
+  int an,al; // Información respecto a pantalla del grafico
   byte * _copia;
   int _vga_an,_vga_al;
   int ix,iy;
@@ -560,13 +560,13 @@ void sp_rotado_p(byte * si, int an, int al, int flags) {
 }
 
 //----------------------------------------------------------------------------
-//      Funcion externa para comprobar gr ficos (para las colisiones)
+//      Funcion externa para comprobar gráficos (para las colisiones)
 //----------------------------------------------------------------------------
 
 void test_collision(byte * buffer, int * ptr, int x, int y, int xg, int yg, int angle, int size, int flags) {
 
   byte * si;
-  int an,al; // Informaci¢n respecto a pantalla del grafico
+  int an,al; // Información respecto a pantalla del grafico
   byte * _copia;
   int _vga_an,_vga_al;
   int ix,iy;
@@ -604,7 +604,7 @@ void test_collision(byte * buffer, int * ptr, int x, int y, int xg, int yg, int 
 }
 
 //----------------------------------------------------------------------------
-// Test sprite - [espejado] [ghost]
+// Testásprite - [espejado] [ghost]
 //----------------------------------------------------------------------------
 
 void test_normal(byte * p, int x, int y, int an, int al, int flags) {
@@ -652,7 +652,7 @@ void test_normal(byte * p, int x, int y, int an, int al, int flags) {
 }
 
 //----------------------------------------------------------------------------
-// Test sprite - cortado [espejado] [ghost]
+// Testásprite - cortado [espejado] [ghost]
 //----------------------------------------------------------------------------
 
 void test_cortado(byte * p, int x, int y, int an, int al, int flags) {
@@ -714,7 +714,7 @@ void test_cortado(byte * p, int x, int y, int an, int al, int flags) {
 }
 
 //----------------------------------------------------------------------------
-// Test sprite - escalado [cortado] [espejado] [ghost]
+// Testásprite - escalado [cortado] [espejado] [ghost]
 //----------------------------------------------------------------------------
 
 void test_escalado(byte * old_si, int x, int y, int an, int al, int xg, int yg,
@@ -766,7 +766,7 @@ void test_escalado(byte * old_si, int x, int y, int an, int al, int xg, int yg,
 }
 
 //----------------------------------------------------------------------------
-// Test sprite - rotado [escalado] [cortado] [espejado] [ghost]
+// Testásprite - rotado [escalado] [cortado] [espejado] [ghost]
 //----------------------------------------------------------------------------
 
 void test_rotado(byte * si, int an, int al, int flags) {

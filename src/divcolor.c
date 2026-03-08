@@ -9,21 +9,21 @@ void col_analiza_ltlex(void);
 
 //-----------------------------------------------------------------------------
 
-#define max_obj 768     // L¡mite m ximo de objetos del compilador
+#define max_obj 768     // Límite máximo de objetos del compilador
 #define long_med_id 16  // Longitud media de los identificadores (+4+4+1)
 
-#define max_nodos 128   // M ximo n£mero de nodos del lxico para s¡mbolos
+#define max_nodos 128   // Máximo número de nodos del léxico para símbolos
 
 #define cr 13           // Retorno de carro
 #define lf 10           // Salto de linea
-#define tab 9           // Tabulaci¢n
+#define tab 9           // Tabulación
 
 #define l_err 0         // Valores de lex_case, si no son punteros a lex_simb
-#define l_cr  1         // Fin de linea (l_err Car cter no esperado)
+#define l_cr  1         // Fin de linea (l_err Carácter no esperado)
 #define l_id  2         // Identificador o palabra reservada
 #define l_spc 3         // Espacios y tabulaciones
 #define l_lit 4         // Literal
-#define l_num 5         // Constante numrica
+#define l_num 5         // Constante numérica
 
 #define p_ultima        0x00 // Fin de fichero <EOF>
 
@@ -34,10 +34,10 @@ void col_analiza_ltlex(void);
 #define p_rem           0x7f // Comentario de una linea
 
 #define p_id            0xfd // Identificador
-#define p_num           0xfe // N£mero
+#define p_num           0xfe // Número
 
 #define p_spc           0x100 // Espacios
-#define p_sym           0x101 // S¡mbolo
+#define p_sym           0x101 // Símbolo
 #define p_lit           0x102 // Literal entre comillas
 #define p_res           0x103 // Id reservado
 #define p_pre           0x104 // Id predefinido
@@ -51,10 +51,10 @@ struct clex_ele {
   struct clex_ele * siguiente;
 } clex_simb[max_nodos], * iclex_simb, * clex_case[256];
 
-int cnum_nodos; // N£mero de nodos ocupados en clex_simb
+int cnum_nodos; // Número de nodos ocupados en clex_simb
 
-int iscoment; // Indica si est  dentro de un comentario.
-int numrem;   // Relaci¢n entre /* y */
+int iscoment; // Indica si está dentro de un comentario.
+int numrem;   // Relación entre /* y */
 
 byte * cvnom=NULL; // Vector de nombres (cad_hash:int, pieza (o iobj):int, asciiz)
 union { byte*b; byte**p; } icvnom;
@@ -68,7 +68,7 @@ byte * csource;
 int incluye_nombres;
 
 //-----------------------------------------------------------------------------
-//      Funci¢n de error (!!!) (solo para cuando analiza ltlex)
+//      Función de error (!!!) (solo para cuando analiza ltlex)
 //-----------------------------------------------------------------------------
 
 void col_error(int n, int m) {
@@ -76,7 +76,7 @@ void col_error(int n, int m) {
 }
 
 //-----------------------------------------------------------------------------
-//      Funci¢n de inicializaci¢n del coloreador
+//      Función de inicialización del coloreador
 //-----------------------------------------------------------------------------
 
 void init_lexcolor() {
@@ -149,7 +149,7 @@ void clexico(void) {
         }
       } else { // id nuevo
         if (incluye_nombres) {
-          *ptr=_ivnom; // a¤ade un nuevo id
+          *ptr=_ivnom; // añade un nuevo id
         } else {
           icvnom.b=_ivnom; // lo saca de cvnom
         }
@@ -212,7 +212,7 @@ FILE * cdef; // Para el analizador de "ltlex.def"
 byte *_cbuf;
 
 //-----------------------------------------------------------------------------
-//      Precarga de las estructuras lxicas, analiza el fichero ltlex.def
+//      Precarga de las estructuras léxicas, analiza el fichero ltlex.def
 //-----------------------------------------------------------------------------
 
 void col_analiza_ltlex(void){
@@ -253,7 +253,7 @@ void col_analiza_ltlex(void){
         buf--; icvnom.b++;
       } else if (t>=0x78 && t<=0x7b) {  //Analiza un delimitador de literal
         clex_case[*buf]=(struct clex_ele*)l_lit;
-      } else {                          //Analiza un nuevo s¡mbolo
+      } else {                          //Analiza un nuevo símbolo
         if ((e=clex_case[*buf])==0) {
           if (cnum_nodos++==max_nodos) col_error(0,3);
           e=clex_case[*buf]=iclex_simb++; (*e).caracter=*buf++;
@@ -281,7 +281,7 @@ void col_analiza_ltlex(void){
 }
 
 //-----------------------------------------------------------------------------
-//  A¤ade al vector hash las palabras predefinidas
+//  Añade al vector hash las palabras predefinidas
 //-----------------------------------------------------------------------------
 
 void col_analiza_ltobj(void){

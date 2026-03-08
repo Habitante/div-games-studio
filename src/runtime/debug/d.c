@@ -1,14 +1,14 @@
 
 //----------------------------------------------------------------------------
-//      Funciones del debugger y di logos de error
-//      *** OJO *** La funcion trace_process() est  en i.cpp
+//      Funciones del debugger y diálogos de error
+//      *** OJO *** La funcion trace_process() está en i.cpp
 //----------------------------------------------------------------------------
 
 #include "../inter.h"
 
 //--------------------------------------------------------------------------
 
-int debug_active=1;             // Si esta variable se pone a 0, no se podr 
+int debug_active=1;             // Si esta variable se pone a 0, no se podrá
                                 // invocar nunca al debugger, ni a sus ventanas
 
 //--------------------------------------------------------------------------
@@ -114,20 +114,20 @@ int no_volcar_nada=0;
 int profiler_x,profiler_y;
 
 int show_items_called=0;
-int get_pos=0,get_cursor=0;     // Clock y posici¢n del cursor en los get
+int get_pos=0,get_cursor=0;     // Clock y posición del cursor en los get
 int superget=0;
 
 //--------------------------------------------------------------------------
 
-int linea0;     // N£mero de l¡nea inicial de la ventana del debugger
-byte * plinea0; // Puntero a la primera l¡nea de la ventana del debugger
+int linea0;     // Número de línea inicial de la ventana del debugger
+byte * plinea0; // Puntero a la primera línea de la ventana del debugger
 
-int mem1,mem2; // L¡mites de la sentencia actual en el vector mem[]
-int linea1,columna1,linea2,columna2; // L¡mites de la sentencia actual
+int mem1,mem2; // Límites de la sentencia actual en el vector mem[]
+int linea1,columna1,linea2,columna2; // Límites de la sentencia actual
 
-int linea_sel; // N§ de l¡nea seleccionada
+int linea_sel; // Nº de línea seleccionada
 
-int x_inicio=54; // x inicial en la ventana de c¢digo fuente
+int x_inicio=54; // x inicial en la ventana de código fuente
 
 //--------------------------------------------------------------------------
 
@@ -173,7 +173,7 @@ char * vnom=NULL; // Vector de nombres
 #define tfunc   9
 #define tsglo   10
 #define tsloc   11
-#define tfext   12      // Funci¢n de una librer¡a externa
+#define tfext   12      // Función de una librería externa
 
 #define tbglo   13      // Byte global
 #define twglo   14
@@ -201,7 +201,7 @@ struct objeto {
   int v0,v1,v2,v3,v4,v5;
 } * o=NULL;
 
-int num_obj=0;  // N£mero de objetos de la tabla de objetos
+int num_obj=0;  // Número de objetos de la tabla de objetos
 
 int num_obj_predefinidos;
 
@@ -211,11 +211,11 @@ int * visor;    // Para indicar que tipo de visor utilizan los objetos
 struct variables {
   int objeto;   // Objeto de o[]
   int tab;      // Tabulacion (0-no member,1,2,...)
-  int miembro;  // Miembro de ..., como ¡ndice de var[]
+  int miembro;  // Miembro de ..., como índice de var[]
   int indice;   // Para las tablas o struct, elemento visualizado
 } * var=NULL;
 
-int num_var=0;  // N£mero de variables incluidas en var[]
+int num_var=0;  // Número de variables incluidas en var[]
 
 int var_ini;    // La primera variable que se visualiza en la ventana
 int var_select; // La variable seleccionada
@@ -228,16 +228,16 @@ int bloque_actual; // Proceso sobre el que se hace el inspect
 
 //----------------------------------------------------------------------------
 
-int iids,*ids;  // Identificadores de los procesos, por orden de ejecuci¢n
+int iids,*ids;  // Identificadores de los procesos, por orden de ejecución
 int ids_ini;    // El primer proceso que se visualiza en la ventana
 int ids_select; // El proceso sobre el que se visualiza informacion 'Hi-lite'
-int ids_next;   // El siguiente proceso dentro del orden de ejecuci¢n '>'
+int ids_next;   // El siguiente proceso dentro del orden de ejecución '>'
 
 //----------------------------------------------------------------------------
 
-int lp1[512];     // Numero de l¡nea en el que est n los procesos
-char * lp2[512];  // Punteros a las l¡neas de los procesos
-int lp_num;       // N£mero de procesos en la lista
+int lp1[512];     // Numero de línea en el que están los procesos
+char * lp2[512];  // Punteros a las líneas de los procesos
+int lp_num;       // Número de procesos en la lista
 int lp_ini;       // La primera variable que se visualiza en la ventana
 int lp_select;    // La variable seleccionada
 int lp_sort=0;    // Flag que indica si se ordena la lista
@@ -256,7 +256,7 @@ int obj_size;  // Longitud de cada objeto (struct objeto)
 unsigned f_time[256]; // Tiempo consumido por las diferentes funciones
 unsigned frame_time[256]; // Tiempo consumido por las diferentes funciones
 
-//---------------------------------------------------------------------------- //      Inicializaci¢n del debug //----------------------------------------------------------------------------
+//---------------------------------------------------------------------------- //      Inicialización del debug //----------------------------------------------------------------------------
 
 void init_debug(void) {
   FILE *f;
@@ -438,7 +438,7 @@ void init_colors(void) {
 }
 
 //-----------------------------------------------------------------------------
-//      Crea un cuadro de di logo (debe retornar al llamante tal cual)
+//      Crea un cuadro de diálogo (debe retornar al llamante tal cual)
 //-----------------------------------------------------------------------------
 
 void dummy_handler(void) {}
@@ -494,7 +494,7 @@ void dialogo(voidReturnType init_handler) {
 
       vtipo=v.tipo; v.tipo=0;
 
-      if (ventana[1].tipo==1) { // Di logo sobre di logo
+      if (ventana[1].tipo==1) { // Diálogo sobre diálogo
         ventana[1].primer_plano=0; vuelca_ventana(1);
       }
 
@@ -534,7 +534,7 @@ void dialogo(voidReturnType init_handler) {
       entorno_dialogo();
 
     //---------------------------------------------------------------------------
-    // No se pudo abrir el di logo, (no hay memoria)
+    // No se pudo abrir el diálogo, (no hay memoria)
     //---------------------------------------------------------------------------
 
     } else {
@@ -567,7 +567,7 @@ void repinta_ventana(void) {
 }
 
 //-----------------------------------------------------------------------------
-//      Gesti¢n de un cuadro de di logo - Debugger
+//      Gestión de un cuadro de diálogo - Debugger
 //-----------------------------------------------------------------------------
 
 void entorno_dialogo(void) {
@@ -589,11 +589,11 @@ void entorno_dialogo(void) {
     if (mouse_in(v.x,v.y,v.x+v.an-1,v.y+v.al-1)) n=0; else n=max_windows;
 
     //-------------------------------------------------------------------------
-    // Si antes est bamos en una ventana en la que hemos dejado de estar
-    // debemos repintar esta £ltima (para borrar posibles "hi-lite")
+    // Si antes estábamos en una ventana en la que hemos dejado de estar
+    // debemos repintar esta última (para borrar posibles "hi-lite")
     //-------------------------------------------------------------------------
 
-    if (n==0) // Si ahora estamos en la barra, tambin se repinta la ventana
+    if (n==0) // Si ahora estamos en la barra, también se repinta la ventana
       if (!mouse_in(v.x+2*big2,v.y+10*big2,v.x+v.an-2*big2,v.y+v.al-2*big2)) n--;
 
     if (n!=oldn && oldn==0) if (v.primer_plano==1) {
@@ -638,7 +638,7 @@ void entorno_dialogo(void) {
     }
 
     //-------------------------------------------------------------------------
-    //  Los di logos se deben invocar siempre
+    //  Los diálogos se deben invocar siempre
     //-------------------------------------------------------------------------
 
     if (!dialogo_invocado && !salir_del_dialogo) {
@@ -704,7 +704,7 @@ void refrescadialogo(void) {
 }
 
 //-----------------------------------------------------------------------------
-//      Cierra la ventana activa (la n£mero 0)
+//      Cierra la ventana activa (la número 0)
 //-----------------------------------------------------------------------------
 
 void cierra_ventana(void) {
@@ -723,7 +723,7 @@ void cierra_ventana(void) {
   memmove(&v.tipo,&ventana[1].tipo,sizeof(tventana)*(max_windows-1));
   actualiza_caja(x,y,an,al);
 
-  if (v.tipo==1) { // Di logo sobre di logo solo abre el £ltimo
+  if (v.tipo==1) { // Diálogo sobre diálogo solo abre el último
     v.primer_plano=1; vuelca_ventana(0);
   }
 
@@ -760,7 +760,7 @@ void mueve_ventana(void) {
 }
 
 //-----------------------------------------------------------------------------
-//	Vuelca una ventana, normal u oscurecida seg£n este o no en primer plano
+//	Vuelca una ventana, normal u oscurecida según este o no en primer plano
 //-----------------------------------------------------------------------------
 
 void vuelca_ventana(int m) {
@@ -898,7 +898,7 @@ void wbox_in_box(byte*copia,int an_real_copia,int an_copia,int al_copia,byte c,i
 
 
 //-----------------------------------------------------------------------------
-//      Dibuja un rect ngulo
+//      Dibuja un rectángulo
 //-----------------------------------------------------------------------------
 
 void wrectangulo(byte*copia,int an_copia,int al_copia,byte c,int x,int y,int an,int al) {
@@ -909,7 +909,7 @@ void wrectangulo(byte*copia,int an_copia,int al_copia,byte c,int x,int y,int an,
 }
 
 //-----------------------------------------------------------------------------
-//      Pone un gr fico
+//      Pone un gráfico
 //-----------------------------------------------------------------------------
 
 void put(int x,int y,int n) {
@@ -1043,7 +1043,7 @@ void bwput_in_box(byte*copia,int an_real_copia,int an_copia,int al_copia,int x,i
 }
 
 //-----------------------------------------------------------------------------
-//      Funciones de impresi¢n de un texto
+//      Funciones de impresión de un texto
 //-----------------------------------------------------------------------------
 
 int char_len(char c) {
@@ -1357,7 +1357,7 @@ int colisiona_con(int a, int x, int y, int an, int al) {
 }
 
 //----------------------------------------------------------------------------
-//      Void restaura tapiz *** OJO *** aqu¡ se debe actualizar el fondo
+//      Void restaura tapiz *** OJO *** aquí se debe actualizar el fondo
 //----------------------------------------------------------------------------
 
 void restaura_tapiz(int x,int y,int an,int al) {
@@ -1386,7 +1386,7 @@ void restaura_tapiz(int x,int y,int an,int al) {
 }
 
 //-----------------------------------------------------------------------------
-//      Definici¢n de items
+//      Definición de items
 //-----------------------------------------------------------------------------
 
 void _button(byte *t,int x,int y,int c) {
@@ -1426,7 +1426,7 @@ void _flag(byte *t,int x,int y,int *valor) {
 }
 
 //-----------------------------------------------------------------------------
-//      Impresi¢n de items
+//      Impresión de items
 //-----------------------------------------------------------------------------
 
 void _show_items(void) {
@@ -1836,7 +1836,7 @@ int button_status(int n) {
 }
 
 //----------------------------------------------------------------------------
-//      Read mouse adaptado al intrprete
+//      Read mouse adaptado al intérprete
 //----------------------------------------------------------------------------
 void readmouse(void);
 
@@ -1949,7 +1949,7 @@ void salvaguarda(byte * p, int x, int y, int n, int flag) {
 }
 
 //-----------------------------------------------------------------------------
-//      Comprueba si el rat¢n est  en una caja
+//      Comprueba si el ratón está en una caja
 //-----------------------------------------------------------------------------
 
 int mouse_in(int x, int y, int x2, int y2) {
@@ -1962,7 +1962,7 @@ int wmouse_in(int x, int y, int an, int al) {
 }
 
 //-----------------------------------------------------------------------------
-//      Cuadro de di logo ERROR
+//      Cuadro de diálogo ERROR
 //-----------------------------------------------------------------------------
 
 void err1(void) {
@@ -1985,7 +1985,7 @@ void err0(void) {
 }
 
 //-----------------------------------------------------------------------------
-//      Cuadro de di logo ERROR dentro de una funci¢n del lenguaje
+//      Cuadro de diálogo ERROR dentro de una función del lenguaje
 //-----------------------------------------------------------------------------
 
 char * te;
@@ -2042,7 +2042,7 @@ void _err0(void) {
   v.paint_handler=_err1;
   v.click_handler=_err2;
 
-//  ojo, a¤adir la que falta y comprobar que 218 es suficiente
+//  ojo, añadir la que falta y comprobar que 218 es suficiente
   _button(text[11],7,v.al-14,0);
   _button(text[12],7+text_len(text[11])+14,v.al-14,0);
   _button(text[13],v.an-8-text_len(text[14])-14,v.al-14,2);
@@ -2050,7 +2050,7 @@ void _err0(void) {
 }
 
 //----------------------------------------------------------------------------
-//      Mensajes de error - Versi¢n con debugger
+//      Mensajes de error - Versión con debugger
 //----------------------------------------------------------------------------
 
 extern int ignore_errors;
@@ -2064,7 +2064,7 @@ void e(int texto) {
   int ticks_e=ticks;
   int dr=dacout_r,dg=dacout_g,db=dacout_b;
 
-  if (v_function==-1) return; // Alg£n error que es mejor que sea ignorado...
+  if (v_function==-1) return; // Algún error que es mejor que sea ignorado...
 
   num_error=texto;
   te=(char *)text[texto]; n=0;
@@ -2086,7 +2086,7 @@ void e(int texto) {
 }
 
 //-----------------------------------------------------------------------------
-//      Cuadro de di logo cuando llega una sentencia DEBUG
+//      Cuadro de diálogo cuando llega una sentencia DEBUG
 //-----------------------------------------------------------------------------
 
 void deb1(void) {
@@ -2163,20 +2163,20 @@ int procesos_ejecutados(void) {
 }
 
 //----------------------------------------------------------------------------
-//      Determina ids[] (lista de procesos, por orden de ejecuci¢n)
+//      Determina ids[] (lista de procesos, por orden de ejecución)
 //----------------------------------------------------------------------------
 
 void determina_ids(void) {
   int max,ide,id;
 
-  iids=0; // N§ de procesos
+  iids=0; // Nº de procesos
   ids_next=-1;
 
-  // Marca todos los procesos para que no estn en la lista
+  // Marca todos los procesos para que no estén en la lista
 
   for (ide=id_start; ide<=id_end; ide+=iloc_len) mem[ide+_Painted]=0;
 
-  // Primero a¤ade a la lista los procesos ya ejecutados
+  // Primero añade a la lista los procesos ya ejecutados
 
   id_old=id_start;
 
@@ -2193,7 +2193,7 @@ void determina_ids(void) {
     }
   } while (ide);
 
-  // Despus el proceso detenido, en caso de que haya alguno
+  // Después el proceso detenido, en caso de que haya alguno
 
   if (process_stoped) {
     mem[process_stoped+_Painted]=1;
@@ -2201,7 +2201,7 @@ void determina_ids(void) {
     if (iids<max_procesos) ids[iids++]=process_stoped;
   }
 
-  // Despus a¤ade los procesos por ejecutar
+  // Después añade los procesos por ejecutar
 
   do {
     ide=0; max=0x80000000;
@@ -2217,7 +2217,7 @@ void determina_ids(void) {
     }
   } while (ide);
 
-  // Despus a¤ade el resto de procesos (cualquier estado)
+  // Después añade el resto de procesos (cualquier estado)
 
   do {
     ide=0; max=0x80000000;
@@ -2234,7 +2234,7 @@ void determina_ids(void) {
 
 
 //----------------------------------------------------------------------------
-//      Pinta la lista de procesos y la informaci¢n relativa al seleccionado
+//      Pinta la lista de procesos y la información relativa al seleccionado
 //----------------------------------------------------------------------------
 
 void pinta_lista_proc(void) {
@@ -2335,14 +2335,14 @@ void pinta_lista_proc(void) {
   wwrite_in_box(ptr,an,an-2,al,an-39,48+24,1,(byte *)msg,c1);
   wwrite_in_box(ptr,an,an-2,al,an-40,48+24,1,(byte *)msg,c3);
 
-  wbox(ptr,an,al,c1,134,32,46,46); // Gr fico del proceso
+  wbox(ptr,an,al,c1,134,32,46,46); // Gráfico del proceso
   process_graph(ids[ids_select],ptr+32*big2*v.an+134*big2,v.an,46*big2,46*big2);
 
   pinta_segmento();
 }
 
 //----------------------------------------------------------------------------
-//      Pinta el gr fico de un proceso para el debugger
+//      Pinta el gráfico de un proceso para el debugger
 //----------------------------------------------------------------------------
 
 void process_graph(int id,byte *q,int van,int an,int al) {
@@ -2440,7 +2440,7 @@ void process_graph(int id,byte *q,int van,int an,int al) {
 }
 
 //----------------------------------------------------------------------------
-//      Funci¢n invocada como debug (al pulsar F12 durante la ejecuci¢n)
+//      Función invocada como debug (al pulsar F12 durante la ejecución)
 //----------------------------------------------------------------------------
 
 void debug(void) {
@@ -2479,11 +2479,11 @@ void crear_lista_variables(void) {
 
   num_var=0;
 
-  // A¤ade las variables por orden alfabtico a la lista var[num_var]
+  // Añade las variables por orden alfabético a la lista var[num_var]
 
   do {
     nuevo=0;
-    for (n=0;n<num_obj;n++) { // Busca la menor alfabticamente
+    for (n=0;n<num_obj;n++) { // Busca la menor alfabéticamente
 
       if (!pre_defined && n<num_obj_predefinidos) continue;
       if (!user_defined && n>=num_obj_predefinidos) continue;
@@ -2602,7 +2602,7 @@ void inspect1(void) {
   _show_items();
   wwrite(ptr,an,al,4,al-14,0,text[38],c3);
 
-  wrectangulo(ptr,an,al,c0,3,19,128+32+64,83); // L¡mites listbox procesos
+  wrectangulo(ptr,an,al,c0,3,19,128+32+64,83); // Límites listbox procesos
   wrectangulo(ptr,an,al,c0,122+32+64,19,9,83);
   wrectangulo(ptr,an,al,c0,122+32+64,27,9,83-16);
 
@@ -3115,7 +3115,7 @@ void pinta_lista_var(void) {
         else goto show_tabla;
       show_tabla:
         strcat(msg,"[");
-        if (o[var[m].objeto].v3==-1) { // Tabla de 1 dimensi¢n
+        if (o[var[m].objeto].v3==-1) { // Tabla de 1 dimensión
           itoa(var[m].indice,msg+strlen(msg),10);
         } else if (o[var[m].objeto].v4==-1) { // Tabla de 2 dimensiones
           itoa(var[m].indice%(o[var[m].objeto].v2+1),msg+strlen(msg),10);
@@ -3156,7 +3156,7 @@ void pinta_lista_var(void) {
         if (o[var[m].objeto].v4==-1 && o[var[m].objeto].v3==0) break;
       show_indice:
         strcat(msg,"[");
-        if (o[var[m].objeto].v4==-1) { // Struct de 1 dimensi¢n
+        if (o[var[m].objeto].v4==-1) { // Struct de 1 dimensión
           itoa(var[m].indice,msg+strlen(msg),10);
         } else if (o[var[m].objeto].v5==-1) { // Struct de 2 dimensiones
           itoa(var[m].indice%(o[var[m].objeto].v3+1),msg+strlen(msg),10);
@@ -3179,7 +3179,7 @@ void pinta_lista_var(void) {
 }
 
 //----------------------------------------------------------------------------
-//  Visualiza un objeto seg£n su visor[]
+//  Visualiza un objeto según su visor[]
 //----------------------------------------------------------------------------
 
 void visualiza(int valor, int objeto, char * str) {
@@ -3487,13 +3487,13 @@ void debug1(void) {
   wwrite(ptr,an,al,4,11,0,(byte *)msg,c1);
   wwrite(ptr,an,al,3,11,0,(byte *)msg,c3);
 
-  wrectangulo(ptr,an,al,c0,3,19,128,128-5-16-32); // L¡mites listbox procesos
+  wrectangulo(ptr,an,al,c0,3,19,128,128-5-16-32); // Límites listbox procesos
   wrectangulo(ptr,an,al,c0,122,19,9,128-5-16-32);
   wrectangulo(ptr,an,al,c0,122,27,9,112-5-16-32);
 
   wrectangulo(ptr,an,al,c0,133,19,120+304-256,11); // Caja nombre proceso
 
-  wrectangulo(ptr,an,al,c0,133,31,48,48); // Caja gr fico
+  wrectangulo(ptr,an,al,c0,133,31,48,48); // Caja gráfico
 
   wput(ptr,an,al,123,20,-39); // Boton arriba / abajo (pulsados 41,42)
   wput(ptr,an,al,123,139-5-16-32,-40);
@@ -3721,9 +3721,9 @@ void debug2(void) {
     case 1: // Goto
       goto_proc:
       dialogo(lista_procesos0);
-      //int linea0;     // N£mero de l¡nea inicial de la ventana del debugger
-      //byte * plinea0; // Puntero a la primera l¡nea de la ventana del debugger
-      //int linea_sel; // N§ de l¡nea seleccionada
+      //int linea0;     // Número de línea inicial de la ventana del debugger
+      //byte * plinea0; // Puntero a la primera línea de la ventana del debugger
+      //int linea_sel; // Nº de línea seleccionada
       if (v_aceptar) {
         x_inicio=54;
         while (linea0>lp1[lp_select]) {
@@ -3814,7 +3814,7 @@ void debug2(void) {
 
       for (iip=mem1;iip<mem2;iip++) {
 
-        // ­OJO!, para saber si la sentencia siguiente llama a una funci¢n,
+        // ¡OJO!, para saber si la sentencia siguiente llama a una función,
         // se busca un call. Esto es algo impreciso, ya que un cal es un
         // "26", y puede haber un dato constante con ese valor.
 
@@ -3830,7 +3830,7 @@ void debug2(void) {
             fin_dialogo=1; break;
           }
         }
-      } // Si no quedan breakpoints, se har  un Trace.
+      } // Si no quedan breakpoints, se hará un Trace.
 
       process_level=0;
       do { trace_process();
@@ -3909,7 +3909,7 @@ void debug3(void) {
 
 void debug0(void) {
   v.tipo=1; v.titulo=text[64];
-  v.an=304; v.al=146+46; // OJO Ponerlo tambin en change mode
+  v.an=304; v.al=146+46; // OJO Ponerlo también en change mode
   v.paint_handler=debug1;
   v.click_handler=debug2;
   v.close_handler=debug3;
@@ -3926,10 +3926,10 @@ void debug0(void) {
 }
 
 //----------------------------------------------------------------------------
-//  Funciones que pintan el c¢digo fuente en la ventana del debugger
+//  Funciones que pintan el código fuente en la ventana del debugger
 //----------------------------------------------------------------------------
 
-void get_line(int n) { // A partir de una direcci¢n IP, obtiene la pos. de la sentencia
+void get_line(int n) { // A partir de una dirección IP, obtiene la pos. de la sentencia
   int x=0;
   if (line==NULL) return;
   for (x=0;x<num_sentencias;x++) if (n>=line[x*6] && n<=line[x*6+1]) break;
@@ -3944,7 +3944,7 @@ void get_line(int n) { // A partir de una direcci¢n IP, obtiene la pos. de la s
   }
 }
 
-int get_ip(int n) { // A partir de una l¡nea, obtiene la direcci¢n IP de la sentencia
+int get_ip(int n) { // A partir de una línea, obtiene la dirección IP de la sentencia
   int x=0;
   if (line==NULL) return(0);
   for (x=0;x<num_sentencias;x++) if (n==line[x*6+2]-1) break;
@@ -3978,7 +3978,7 @@ void determina_codigo(void) { // Determina lo que se debe ver para "ids_next"
 
 }
 
-void pinta_codigo(void) { // Pinta el c¢digo
+void pinta_codigo(void) { // Pinta el código
   byte * p=plinea0,c;
   int n,x,l=linea0;
   byte * ptr=v.ptr;
@@ -4126,7 +4126,7 @@ void pintar_lista_procesos(void) {
   int an=v.an/big2,al=v.al/big2;
   int n,m,x;
 
-  wbox(ptr,an,al,c1,4,20,128+32-10,121); // L¡mites listbox procesos
+  wbox(ptr,an,al,c1,4,20,128+32-10,121); // Límites listbox procesos
 
   for (m=lp_ini;m<lp_ini+15 && m<lp_num;m++) {
     if (m==lp_select) {
@@ -4164,7 +4164,7 @@ void lista_procesos1(void) {
   wwrite(ptr,an,al,5,11,0,text[74],c1);
   wwrite(ptr,an,al,4,11,0,text[74],c3);
 
-  wrectangulo(ptr,an,al,c0,3,19,128+32,123); // L¡mites listbox procesos
+  wrectangulo(ptr,an,al,c0,3,19,128+32,123); // Límites listbox procesos
   wrectangulo(ptr,an,al,c0,122+32,19,9,123);
   wrectangulo(ptr,an,al,c0,122+32,27,9,123-16);
 
@@ -4277,11 +4277,11 @@ void lista_procesos0(void) {
 }
 
 //-----------------------------------------------------------------------------
-// Profile - Perfiles de tiempo de ejecuci¢n
+// Profile - Perfiles de tiempo de ejecución
 //-----------------------------------------------------------------------------
 
 //int lp1[512];     // Numero de objeto correspondiente a los procesos
-//int lp_num;       // N£mero de bloques de procesos en la lista
+//int lp_num;       // Número de bloques de procesos en la lista
 //int lp_ini;       // El primer bloque que se visualiza en la ventana
 //int lp_select;    // El bloque de proceso seleccionado
 
@@ -4338,7 +4338,7 @@ return (unsigned int)clock();
 #endif
 }
 
-void function_exec(int id,int n) { // N§, ciclos
+void function_exec(int id,int n) { // Nº, ciclos
   if (n>0) f_time[id]+=n;
 }
 
@@ -4426,13 +4426,13 @@ void pintar_lista_profile(void) {
   int m,x,porcen,porcen2;
   char cwork[256];
 
-  wbox(ptr,an,al,c1,4,lpy,an-16,lpnum*lpal-1); // L¡mites listbox procesos
+  wbox(ptr,an,al,c1,4,lpy,an-16,lpnum*lpal-1); // Límites listbox procesos
   for (m=lp_ini;m<lp_ini+lpnum && m<lp_num;m++) {
     if (m==lp_select) {
       wbox(ptr,an,al,c01,4,lpy+(m-lp_ini)*lpal,an-16-130,lpal-1); // Relleno listbox procesos
       x=c4;
     } else x=c3;
-    wrectangulo(ptr,an,al,c0,an-12-130,lpy-1+(m-lp_ini)*lpal,66,lpal+1); // L¡mites barras
+    wrectangulo(ptr,an,al,c0,an-12-130,lpy-1+(m-lp_ini)*lpal,66,lpal+1); // Límites barras
 
     wbox(ptr,an,al,c_g_low0,an-11-130,lpy+(m-lp_ini)*lpal,64,lpal-1); // Ejecucion
 
@@ -4464,13 +4464,13 @@ void pintar_lista_profile(void) {
     wbox(ptr,an,al,c0,4,lpy+(m-lp_ini)*lpal+lpal-1,an-16,1);
   }
 
-  wbox(ptr,an,al,c1,4,lp2y,an-lp2esp-16,lp2num*lp2al-1); // L¡mites listbox procesos
+  wbox(ptr,an,al,c1,4,lp2y,an-lp2esp-16,lp2num*lp2al-1); // Límites listbox procesos
   for (m=lp2_ini;m<lp2_ini+lp2num && m<lp2_num;m++) {
     if (m==lp2_select) {
       wbox(ptr,an,al,c01,4,lp2y+(m-lp2_ini)*lp2al,an-lp2esp-16-65,lp2al-1); // Relleno listbox procesos
       x=c4;
     } else x=c3;
-    wrectangulo(ptr,an,al,c0,an-lp2esp-12-65,lp2y-1+(m-lp2_ini)*lp2al,1,lp2al+1); // L¡mites barras
+    wrectangulo(ptr,an,al,c0,an-lp2esp-12-65,lp2y-1+(m-lp2_ini)*lp2al,1,lp2al+1); // Límites barras
 
     wbox(ptr,an,al,c_g_low0,an-lp2esp-11-65,lp2y+(m-lp2_ini)*lp2al,64,lp2al-1); // Ejecucion
 
@@ -4638,14 +4638,14 @@ void profile1(void) {
   wwrite(ptr,an,al,an/2+3+(an/2-4)/2,13+14,1,(byte *)cwork,c_r_low0);
   wwrite(ptr,an,al,an/2+2+(an/2-4)/2,13+14,1,(byte *)cwork,c34);
 
-  wrectangulo(ptr,an,al,c0,3,lpy-1,an-6,lpal+1); // L¡mites listbox procesos
+  wrectangulo(ptr,an,al,c0,3,lpy-1,an-6,lpal+1); // Límites listbox procesos
   wrectangulo(ptr,an,al,c0,3,lpy-1,an-6,lpnum*lpal+1);
   wrectangulo(ptr,an,al,c0,an-12,lpy-1,9,lpnum*lpal+1);
   wrectangulo(ptr,an,al,c0,an-12,lpy+7,9,lpnum*lpal+1-16);
   wput(ptr,an,al,an-11,lpy,-39); // Boton arriba / abajo (pulsados 41,42)
   wput(ptr,an,al,an-11,lpy+lpnum*lpal-8,-40);
 
-  wrectangulo(ptr,an,al,c0,3,lp2y-1,an-lp2esp-6,lp2al+1); // L¡mites listbox procesos
+  wrectangulo(ptr,an,al,c0,3,lp2y-1,an-lp2esp-6,lp2al+1); // Límites listbox procesos
   wrectangulo(ptr,an,al,c0,3,lp2y-1,an-lp2esp-6,lp2num*lp2al+1);
   wrectangulo(ptr,an,al,c0,an-lp2esp-12,lp2y-1,9,lp2num*lp2al+1);
   wrectangulo(ptr,an,al,c0,an-lp2esp-12,lp2y+7,9,lp2num*lp2al+1-16);

@@ -1,6 +1,6 @@
 
 //-----------------------------------------------------------------------------
-//      M¢dulo que contiene el c¢digo de lectura/escritura de formatos gr ficos
+//      Módulo que contiene el código de lectura/escritura de formatos gráficos
 //-----------------------------------------------------------------------------
 
 #include "global.h"
@@ -55,11 +55,11 @@ typedef struct tagRGBQUAD
 // - Create the following functions in divforma.cpp (if the type is XYZ)
 
 // PROT: int is_XYZ (byte * buffer);
-// DESC: Returns TRUE if the file is loaded into the buffer type XYZ, and Adem s 
+// DESC: Returns TRUE if the file is loaded into the buffer type XYZ, and Además 
 // returns the width / height of the bitmap in the variables map_an / p
 
 // PROT: void decompresses_XYZ (byte * buffer, byte * map vent int);
-// DESC: The function ¢ n receives the loaded file in buffer and another buffer
+// DESC: The function ó n receives the loaded file in buffer and another buffer
 // Map_an * map_al + map_an bytes (map), you have to unpack this
 // latest.
 // "Vent" indicates whether to charge the additional information window
@@ -135,7 +135,7 @@ int graba_MAP (byte * mapa, FILE * f) {
 	fwrite("map\x1a\x0d\x0a\x00\x00",8,1,f);      // +000 Cabecera y version
 	x=map_an; fwrite(&x,2,1,f);                   // +008 Ancho
 	x=map_al; fwrite(&x,2,1,f);                   // +010 Alto
-	y=ventana[v_ventana].mapa->Codigo; fwrite(&y,4,1,f);// +012 C¢digo
+	y=ventana[v_ventana].mapa->Codigo; fwrite(&y,4,1,f);// +012 Código
 
 	fwrite(ventana[v_ventana].mapa->descripcion,32,1,f);// +016 Descripcion
 	fwrite(dac,768,1,f);                          // +048 Paleta
@@ -289,7 +289,7 @@ void descomprime_PCX(byte *buffer, byte *mapa, int vent)
     do {
       ch=*buffer++;                               // Copia uno por defecto.
       if((ch&192)==192) {                         // Si RLE entonces
-        rep=(ch&63);                              // rep = n§ de veces a copiar.
+        rep=(ch&63);                              // rep = nº de veces a copiar.
         ch=*buffer++;
       } else rep=1;
       pixel+=rep;                                 // Controla que no nos salgamos.
@@ -307,7 +307,7 @@ void descomprime_PCX(byte *buffer, byte *mapa, int vent)
     do {
       ch=*buffer++;                               // Copia uno por defecto.
       if((ch&192)==192) {                         // Si RLE entonces
-        rep=(ch&63);                              // rep = n§ de veces a copiar.
+        rep=(ch&63);                              // rep = nº de veces a copiar.
         ch=*buffer++;
       } else rep=1;
       pixel+=rep;                                 // Controla que no nos salgamos.
@@ -543,7 +543,7 @@ int graba_PCX(byte *mapa,FILE *f) {
 }
 
 //-----------------------------------------------------------------------------
-//  Rutina de descompresi¢n de RLE optimizada
+//  Rutina de descompresión de RLE optimizada
 //-----------------------------------------------------------------------------
 
 byte * descomprime_rle(byte * buffer,unsigned int bytes_line,unsigned int last_byte,byte * pDest) {
@@ -555,7 +555,7 @@ byte * descomprime_rle(byte * buffer,unsigned int bytes_line,unsigned int last_b
   do {
     ch=*buffer++;                               // Copia uno por defecto.
     if((ch&192)==192) {                         // Si RLE entonces
-      rep=(ch&63);                              // rep = n§ de veces a copiar.
+      rep=(ch&63);                              // rep = nº de veces a copiar.
       ch=*buffer++;
     } else rep=1;
     pixel+=rep;                                 // Controla que no nos salgamos.

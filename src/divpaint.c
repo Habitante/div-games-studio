@@ -1,6 +1,6 @@
 
 //-----------------------------------------------------------------------------
-//      M¢dulo de dibujo
+//      Módulo de dibujo
 //-----------------------------------------------------------------------------
 
 #include "global.h"
@@ -81,11 +81,11 @@ extern int help_paint_active;
 int back; // Indica si se debe hacer un undo tras el volcado
 
 //-----------------------------------------------------------------------------
-//      Variables globales de este m¢dulo
+//      Variables globales de este módulo
 //-----------------------------------------------------------------------------
 
 int zoom_dx,zoom_dy,zoom_sx,zoom_sy;
-int zoom_speed=4; // m s -> lento, menos -> r pido
+int zoom_speed=4; // más -> lento, menos -> rápido
 int _tab=0;
 
 int hotkey=1; // Indica si es se pueden utilizar hotkey (para barra de texto)
@@ -94,7 +94,7 @@ int num_punto=0;
 
 //-----------------------------------------------------------------------------
 
-int line_fx=16; // Modo en el que se va a pintar la l¡nea
+int line_fx=16; // Modo en el que se va a pintar la línea
 
 int efecto1=16,efecto2=16,efecto3=16,efecto4=16,efecto5=16;
 int efecto6=16,efecto7=16,efecto8=4,efecto12=16;
@@ -143,7 +143,7 @@ byte get_color(int x,int y) {
 }
 
 //-----------------------------------------------------------------------------
-//      Edit screen (edici¢n genrica, sin modo definido)
+//      Edit screen (edición genérica, sin modo definido)
 //-----------------------------------------------------------------------------
 
 void test_mouse_box(int a,int b,int c, int d) {
@@ -205,7 +205,7 @@ void edit_scr(void) {
     // ...
 
     volcado_edicion();
-  } while (!(mouse_b&2) && !key(_ESC) && modo<100 &&
+  } while (!salir_del_entorno && !(mouse_b&2) && !key(_ESC) && modo<100 &&
     !(mouse_b && mouse_in(barra_x,barra_y+10,barra_x+9,barra_y+18)));
 }
 
@@ -239,12 +239,12 @@ void edit_mode_0(void) {
     } else if (scan_code==14 && (key(_L_SHIFT)||key(_R_SHIFT))) { undo_next(); hacer_zoom=1; }
 
     volcado_edicion();
-  } while (!(mouse_b&2) && !key(_ESC) && modo<100 &&
+  } while (!salir_del_entorno && !(mouse_b&2) && !key(_ESC) && modo<100 &&
     !(mouse_b && mouse_in(barra_x,barra_y+10,barra_x+9,barra_y+18)));
 }
 
 //-----------------------------------------------------------------------------
-//      Edit screen (l piz)
+//      Edit screen (lápiz)
 //-----------------------------------------------------------------------------
 
 void edit_mode_1(void) {
@@ -263,7 +263,7 @@ void edit_mode_1(void) {
     select_fx(12,&efecto1);
     select_color(2);
 
-    a=-1; // Ultima acci¢n realizada (en esta iteraci¢n) - sin definir
+    a=-1; // Ultima acción realizada (en esta iteración) - sin definir
 
     if ((mouse_b&1) && mouse_graf>=10) {
 
@@ -279,7 +279,7 @@ void edit_mode_1(void) {
 
     } else a=0;
 
-    if (a>=0) _a=a; // Fijamos la £ltima acci¢n
+    if (a>=0) _a=a; // Fijamos la última acción
 
     if (((mouse_b&1) && selected_icon==1) || (scan_code==14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
       undo_back(); do {read_mouse();} while(mouse_b&1);
@@ -287,12 +287,12 @@ void edit_mode_1(void) {
 
     _x=coord_x; _y=coord_y; _b=mouse_b;
     volcado_edicion();
-  } while (!(mouse_b&2) && !key(_ESC) && modo<100 &&
+  } while (!salir_del_entorno && !(mouse_b&2) && !key(_ESC) && modo<100 &&
     !(mouse_b && mouse_in(barra_x,barra_y+10,barra_x+9,barra_y+18)));
 }
 
 //-----------------------------------------------------------------------------
-//      Edit screen (l¡neas)
+//      Edit screen (líneas)
 //-----------------------------------------------------------------------------
 
 void edit_mode_2(void) {
@@ -350,12 +350,12 @@ void edit_mode_2(void) {
       hacer_zoom_an=0; hacer_zoom_al=0; hacer_zoom=0;
     }
 
-  } while (!(mouse_b&2) && !(key(_ESC)&&s!=1) && modo<100 &&
+  } while (!salir_del_entorno && !(mouse_b&2) && !(key(_ESC)&&s!=1) && modo<100 &&
     !(mouse_b && mouse_in(barra_x,barra_y+10,barra_x+9,barra_y+18)));
 }
 
 //-----------------------------------------------------------------------------
-//      Edit screen (l¡neas continuas)
+//      Edit screen (líneas continuas)
 //-----------------------------------------------------------------------------
 
 void edit_mode_3(void) {
@@ -416,12 +416,12 @@ void edit_mode_3(void) {
       hacer_zoom_an=0; hacer_zoom_al=0; hacer_zoom=0;
     }
 
-  } while (!(mouse_b&2) && !(key(_ESC)&&s!=1) && modo<100 &&
+  } while (!salir_del_entorno && !(mouse_b&2) && !(key(_ESC)&&s!=1) && modo<100 &&
     !(mouse_b && mouse_in(barra_x,barra_y+10,barra_x+9,barra_y+18)));
 }
 
 //-----------------------------------------------------------------------------
-//      Edit screen (curvas bzier)
+//      Edit screen (curvas bézier)
 //-----------------------------------------------------------------------------
 
 void edit_mode_4(void) {
@@ -504,12 +504,12 @@ void edit_mode_4(void) {
       hacer_zoom_an=0; hacer_zoom_al=0; hacer_zoom=0;
     }
 
-  } while (!(mouse_b&2) && !(key(_ESC)&&s!=1) && modo<100 &&
+  } while (!salir_del_entorno && !(mouse_b&2) && !(key(_ESC)&&s!=1) && modo<100 &&
     !(mouse_b && mouse_in(barra_x,barra_y+10,barra_x+9,barra_y+18)));
 }
 
 //-----------------------------------------------------------------------------
-//      Edit screen (curvas bzier continuas)
+//      Edit screen (curvas bézier continuas)
 //-----------------------------------------------------------------------------
 
 int bezier_x,bezier_y;
@@ -599,12 +599,12 @@ void edit_mode_5(void) {
       hacer_zoom_an=0; hacer_zoom_al=0; hacer_zoom=0;
     }
 
-  } while (!(mouse_b&2) && !(key(_ESC)&&s!=1) && modo<100 &&
+  } while (!salir_del_entorno && !(mouse_b&2) && !(key(_ESC)&&s!=1) && modo<100 &&
     !(mouse_b && mouse_in(barra_x,barra_y+10,barra_x+9,barra_y+18)));
 }
 
 //-----------------------------------------------------------------------------
-//      Edit screen (rect ngulos)
+//      Edit screen (rectángulos)
 //-----------------------------------------------------------------------------
 
 int iconos_caja[]={2,1,110,111};
@@ -675,12 +675,12 @@ void edit_mode_6(void) {
       hacer_zoom_an=0; hacer_zoom_al=0; hacer_zoom=0;
     }
 
-  } while (!(mouse_b&2) && !(key(_ESC)&&s!=1) && modo<100 &&
+  } while (!salir_del_entorno && !(mouse_b&2) && !(key(_ESC)&&s!=1) && modo<100 &&
     !(mouse_b && mouse_in(barra_x,barra_y+10,barra_x+9,barra_y+18)));
 }
 
 //-----------------------------------------------------------------------------
-//      Edit screen (c¡rculos)
+//      Edit screen (círculos)
 //-----------------------------------------------------------------------------
 
 int iconos_circulo[]={4,1,175,176,112,113};
@@ -766,7 +766,7 @@ void edit_mode_7(void) {
       hacer_zoom_an=0; hacer_zoom_al=0; hacer_zoom=0;
     }
 
-  } while (!(mouse_b&2) && !(key(_ESC)&&s!=1) && modo<100 &&
+  } while (!salir_del_entorno && !(mouse_b&2) && !(key(_ESC)&&s!=1) && modo<100 &&
     !(mouse_b && mouse_in(barra_x,barra_y+10,barra_x+9,barra_y+18)));
 }
 
@@ -828,7 +828,7 @@ int rnd();
 void edit_mode_8(void) {
   byte col;
   int n,m,x,y;
-  int u=undo_spray,ux,uy; // N§ de acciones guardadas y en que caja
+  int u=undo_spray,ux,uy; // Nº de acciones guardadas y en que caja
 
   clock_spray=-1;
 
@@ -898,7 +898,7 @@ void edit_mode_8(void) {
     n=modo_spray; select_spray(13); if (n!=modo_spray) u=undo_spray;
 
     volcado_edicion();
-  } while (!(mouse_b&2) && !key(_ESC) && modo<100 &&
+  } while (!salir_del_entorno && !(mouse_b&2) && !key(_ESC) && modo<100 &&
     !(mouse_b && mouse_in(barra_x,barra_y+10,barra_x+9,barra_y+18)));
 }
 
@@ -932,7 +932,7 @@ void edit_mode_9(void) {
 
     volcado_edicion();
 
-  } while (!(mouse_b&2) && !key(_ESC) && modo<100 &&
+  } while (!salir_del_entorno && !(mouse_b&2) && !key(_ESC) && modo<100 &&
     !(mouse_b && mouse_in(barra_x,barra_y+10,barra_x+9,barra_y+18)));
 }
 
@@ -1059,7 +1059,7 @@ void edit_mode_10(void) {
     } anal_barra(an,al);
 
     volcado_edicion();
-  } while (!(mouse_b&2) && !(key(_ESC)&&s!=1&&s!=2) && modo<100 &&
+  } while (!salir_del_entorno && !(mouse_b&2) && !(key(_ESC)&&s!=1&&s!=2) && modo<100 &&
     !(mouse_b && mouse_in(barra_x,barra_y+10,barra_x+9,barra_y+18)));
 
   sel_status=0;
@@ -1067,7 +1067,7 @@ void edit_mode_10(void) {
 
 void test_anterior(void) {
 
-  // Todo esto se a¤ade para calcular la zona a refrescar, en lugar de
+  // Todo esto se añade para calcular la zona a refrescar, en lugar de
   // hacer un sencillo "hacer_zoom=1"
 
   hacer_zoom_x=map_an; hacer_zoom_y=map_al;
@@ -1147,20 +1147,20 @@ void corta_mapa(void) {
   int x,y,an,al;
   byte *p;
 
-  //1§ Pide memoria para un struct tmapa
+  //1º Pide memoria para un struct tmapa
   if ((v_mapa=(struct tmapa *)malloc(sizeof(struct tmapa)))!=NULL) {
 
     box2mab(); an=mab_x1-mab_x0+1; al=mab_y1-mab_y0+1;
 
-    // 2§ Pide memoria para el mapa
+    // 2º Pide memoria para el mapa
     if ((v_mapa->map=(byte *)malloc(an*al))!=NULL) {
 
-      //2§B Copia el contenido del mapa
+      //2ºB Copia el contenido del mapa
       p=v_mapa->map;
       for (y=mab_y0;y<=mab_y1;y++) for (x=mab_x0;x<=mab_x1;x++)
         if (is_mab(x,y)) *p++=*(map+y*map_an+x); else *p++=0;
 
-      //4§ Fija el resto de variables
+      //4º Fija el resto de variables
       strcpy(v_mapa->filename,(char *)texto[136]);
       ltoa(siguiente_codigo++,v_mapa->filename+strlen(v_mapa->filename),10);
       *v_mapa->path='\0';
@@ -1247,7 +1247,7 @@ void mab_regla(void) {
 }
 
 //-----------------------------------------------------------------------------
-//	Invierte una selecci¢n
+//	Invierte una selección
 //-----------------------------------------------------------------------------
 
 void mab_invertir(void) {
@@ -1266,7 +1266,7 @@ void mab_invertir(void) {
 }
 
 //-----------------------------------------------------------------------------
-//      Crea la m scara a una selecci¢n
+//      Crea la máscara a una selección
 //-----------------------------------------------------------------------------
 
 void mab_mascara(void) {
@@ -1293,7 +1293,7 @@ void mab_mascara(void) {
 }
 
 //-----------------------------------------------------------------------------
-//      Aclara una selecci¢n
+//      Aclara una selección
 //-----------------------------------------------------------------------------
 
 void mab_aclarar(byte color_aclarar) {
@@ -1350,7 +1350,7 @@ void mab_antialias(void) {
 }
 
 //-----------------------------------------------------------------------------
-//      Modo de selecci¢n de bloques por una caja (seg£n s=estado)
+//      Modo de selección de bloques por una caja (según s=estado)
 //-----------------------------------------------------------------------------
 
 int edit_mode_6_box(int s) {
@@ -1390,7 +1390,7 @@ int edit_mode_6_box(int s) {
 }
 
 //-----------------------------------------------------------------------------
-//      Modo de selecci¢n de bloques por una caja (seg£n s=estado)
+//      Modo de selección de bloques por una caja (según s=estado)
 //-----------------------------------------------------------------------------
 
 int edit_mode_6_box_auto(int s) {
@@ -1475,7 +1475,7 @@ int edit_mode_6_box_auto(int s) {
 }
 
 //-----------------------------------------------------------------------------
-//      Dibuja una l¡nea en el mapa de bits desde x0,y0 .. hasta x1,y1
+//      Dibuja una línea en el mapa de bits desde x0,y0 .. hasta x1,y1
 //-----------------------------------------------------------------------------
 
 void mab_line(int x0, int y0, int x1, int y1) {
@@ -1578,7 +1578,7 @@ void rellenar_poligono(void) {
 }
 
 //-----------------------------------------------------------------------------
-//      Modo de selecci¢n poligonal (seg£n s=estado)
+//      Modo de selección poligonal (según s=estado)
 //-----------------------------------------------------------------------------
 
 int edit_mode_6_lines(int s) {
@@ -1639,7 +1639,7 @@ int edit_mode_6_lines(int s) {
 }
 
 //-----------------------------------------------------------------------------
-//      Modo de selecci¢n de bloques por relleno (seg£n s=estado)
+//      Modo de selección de bloques por relleno (según s=estado)
 //-----------------------------------------------------------------------------
 
 int edit_mode_6_fill(int s) {
@@ -1686,7 +1686,7 @@ int edit_mode_6_fill(int s) {
 }
 
 //-----------------------------------------------------------------------------
-//      Modo de selecci¢n de bloques por varias cajas (seg£n s=estado)
+//      Modo de selección de bloques por varias cajas (según s=estado)
 //-----------------------------------------------------------------------------
 
 int edit_mode_6_boxes(int s) {
@@ -1782,7 +1782,7 @@ void edit_mode_11(void) {
     else if (scan_code==14 && (key(_L_SHIFT)||key(_R_SHIFT))) { undo_next(); hacer_zoom=1; }
 
     volcado_edicion();
-  } while (!(mouse_b&2) && !key(_ESC) && modo<100 &&
+  } while (!salir_del_entorno && !(mouse_b&2) && !key(_ESC) && modo<100 &&
     !(mouse_b && mouse_in(barra_x,barra_y+10,barra_x+9,barra_y+18)));
 }
 
@@ -1843,7 +1843,7 @@ void edit_mode_12(void) {
       font=NULL;
     }
 
-  } else font=NULL; // Pintar  con el font del editor
+  } else font=NULL; // Pintará con el font del editor
 
   barra_texto=1;
 
@@ -1944,7 +1944,7 @@ void edit_mode_12(void) {
     } else if ((scan_code==14&&hotkey) && (key(_L_SHIFT)||key(_R_SHIFT))) { undo_next(); hacer_zoom=1; }
 
     volcado_edicion();
-  } while (!(mouse_b&2) && !(key(_ESC) && hotkey) && modo<100 &&
+  } while (!salir_del_entorno && !(mouse_b&2) && !(key(_ESC) && hotkey) && modo<100 &&
     !(mouse_b && mouse_in(barra_x,barra_y+10,barra_x+9,barra_y+18)));
 
   barra_texto=0;
@@ -1953,7 +1953,7 @@ void edit_mode_12(void) {
 }
 
 //-----------------------------------------------------------------------------
-//      Funci¢n que escribe un car cter del sistema en un mapa (en 'color')
+//      Función que escribe un carácter del sistema en un mapa (en 'color')
 //-----------------------------------------------------------------------------
 
 void write_char(int x, int y, byte c) {
@@ -2111,14 +2111,14 @@ void edit_mode_13(void) {
 
     volcado_edicion();
 
-  } while (!(mouse_b&2) && !key(_ESC) && modo<100 &&
+  } while (!salir_del_entorno && !(mouse_b&2) && !key(_ESC) && modo<100 &&
     !(mouse_b && mouse_in(barra_x,barra_y+10,barra_x+9,barra_y+18)));
 
   sel_status=0; modo_seleccion=m_s;
 }
 
 //-----------------------------------------------------------------------------
-//      Pinta una curva bzier
+//      Pinta una curva bézier
 //-----------------------------------------------------------------------------
 
 void bezier(int x0,int y0,int x1,int y1,int _x0,int _y0,int _x1,int _y1,int inc0) {
@@ -2153,8 +2153,8 @@ void bezier(int x0,int y0,int x1,int y1,int _x0,int _y0,int _x1,int _y1,int inc0
 }
 
 //-----------------------------------------------------------------------------
-//      Dibuja una l¡nea de puntos desde x0,y0 .. hasta x1,y1
-//      'inc0' indica si debemos pinr el primer pixel de la l¡nea
+//      Dibuja una línea de puntos desde x0,y0 .. hasta x1,y1
+//      'inc0' indica si debemos pinr el primer pixel de la línea
 //-----------------------------------------------------------------------------
 
 void line0(int x0, int y0, int x1, int y1, int inc0) {
@@ -2195,7 +2195,7 @@ void line0(int x0, int y0, int x1, int y1, int inc0) {
   }
 }
 
-// Intentando a¤adir que pinten de abajo hacia arriba y de derecha a izquierda
+// Intentando añadir que pinten de abajo hacia arriba y de derecha a izquierda
 
 void line(int x0, int y0, int x1, int y1, int inc0) {
   int dx=0,dy=0,a=0,b=0,d=0,x=0,y=0;
@@ -2255,7 +2255,7 @@ void line(int x0, int y0, int x1, int y1, int inc0) {
 }
 
 //-----------------------------------------------------------------------------
-//      Pinta un pixel, seg£n line_fx y color
+//      Pinta un pixel, según line_fx y color
 //-----------------------------------------------------------------------------
 
 int color256;
@@ -2624,7 +2624,7 @@ void _line_pixel(int x,int y) { // Un simple pixel (para line_pixel,spray y writ
 }
 
 //-----------------------------------------------------------------------------
-//      Dibuja una caja, seg£n modo_caja, line_fx y color
+//      Dibuja una caja, según modo_caja, line_fx y color
 //-----------------------------------------------------------------------------
 
 void caja(int x0,int y0,int x1,int y1) {
@@ -2647,7 +2647,7 @@ void caja(int x0,int y0,int x1,int y1) {
 }
 
 //-----------------------------------------------------------------------------
-//      Dibuja un c¡rculo, seg£n modo_c¡rculo, line_fx y color
+//      Dibuja un círculo, según modo_círculo, line_fx y color
 //-----------------------------------------------------------------------------
 
 void circulo(int x0,int y0,int x1,int y1,int relleno) {
@@ -2731,7 +2731,7 @@ void circulo_scan2(int x,int y,int an) {
 }
 
 //-----------------------------------------------------------------------------
-//      Detecta la regla de color dentro de una barra de edici¢n
+//      Detecta la regla de color dentro de una barra de edición
 //-----------------------------------------------------------------------------
 
 void regla_edicion(void) {
@@ -2948,7 +2948,7 @@ void mover(byte * sp, int an, int al) {
       }
     } else _tab=0;
 
-  } while (!(mouse_b&2) && !(key(_ESC)&&!s) && modo<100 &&
+  } while (!salir_del_entorno && !(mouse_b&2) && !(key(_ESC)&&!s) && modo<100 &&
     !(mouse_b && mouse_in(barra_x,barra_y+10,barra_x+9,barra_y+18)));
 
   if (key(_ESC)||(mouse_b && mouse_in(barra_x,barra_y+10,barra_x+9,barra_y+18)))
@@ -2987,7 +2987,7 @@ void efectos(void) {
       do {read_mouse();} while(mouse_b&1);
     }
 
-    if ((mouse_b&1) && selected_icon==4) { // M scara
+    if ((mouse_b&1) && selected_icon==4) { // Máscara
       mab_mascara(); hacer_zoom=1;
       do {read_mouse();} while(mouse_b&1);
     }
@@ -3012,7 +3012,7 @@ void efectos(void) {
     test_siguiente();
 
     volcado_edicion();
-  } while (!(mouse_b&2) && !key(_ESC) && modo<100 &&
+  } while (!salir_del_entorno && !(mouse_b&2) && !key(_ESC) && modo<100 &&
     !(mouse_b && mouse_in(barra_x,barra_y+10,barra_x+9,barra_y+18)));
 
   if (key(_ESC)||(mouse_b && mouse_in(barra_x,barra_y+10,barra_x+9,barra_y+18)))
@@ -3067,7 +3067,7 @@ void cuentagotas(void) {
       }
 
       volcado_edicion();
-    } while (!(mouse_b&2) && !key(_ESC) && modo<100 &&
+    } while (!salir_del_entorno && !(mouse_b&2) && !key(_ESC) && modo<100 &&
       !(mouse_b && mouse_in(barra_x,barra_y+10,barra_x+9,barra_y+18)));
 
     if (key(_ESC)||(mouse_b && mouse_in(barra_x,barra_y+10,barra_x+9,barra_y+18)))
@@ -3084,8 +3084,8 @@ void cuentagotas(void) {
 }
 
 //-----------------------------------------------------------------------------
-//      Funci¢n que dice si el cursor esta sobre un color editable de la regla
-//      Devuelve en el par metro el color editado (de la regla actual de color)
+//      Función que dice si el cursor esta sobre un color editable de la regla
+//      Devuelve en el parámetro el color editado (de la regla actual de color)
 //-----------------------------------------------------------------------------
 
 int editable(int *n) {
@@ -3110,9 +3110,9 @@ int editable(int *n) {
 }
 
 //-----------------------------------------------------------------------------
-//      Funci¢n que dice si el cursor esta sobre un color editable de la regla
-//      Devuelve en el par metro el color editado (de la regla actual de color)
-//      - Versi¢n para la regla de la ventana de select_color -
+//      Función que dice si el cursor esta sobre un color editable de la regla
+//      Devuelve en el parámetro el color editado (de la regla actual de color)
+//      - Versión para la regla de la ventana de select_color -
 //-----------------------------------------------------------------------------
 
 int editable_seleccion(int *n,int x,int y) {
@@ -3201,7 +3201,7 @@ void dibuja_regla(void) {
     }
   }
 
-  // Selecci¢n de textura_color
+  // Selección de textura_color
 
   wbox(barra,vga_an/big2,19,c2,80,2+9,7,6);
 
@@ -3209,12 +3209,12 @@ void dibuja_regla(void) {
   wbox(barra,vga_an/big2,19,c3,80+5,2+10,1,4);
   wbox(barra,vga_an/big2,19,c3,80+1,2+13,5,1);
 
-  // Rect ngulo del color 0
+  // Rectángulo del color 0
 
   wrectangulo(barra,vga_an/big2,19,c1,88,2,7,8);
   wbox(barra,vga_an/big2,19,0,88+1,2+1,5,6);
 
-  // Selecci¢n de brush
+  // Selección de brush
 
   wbox(barra,vga_an/big2,19,c2,88,2+9,7,6);
 
@@ -3226,7 +3226,7 @@ void dibuja_regla(void) {
 }
 
 //-----------------------------------------------------------------------------
-//      Dibuja la regla de colores dentro de la ventana de selecci¢n de color
+//      Dibuja la regla de colores dentro de la ventana de selección de color
 //-----------------------------------------------------------------------------
 
 void dibuja_regla_seleccion(byte * p, int c, int d, int x, int y) {
@@ -3326,7 +3326,7 @@ void ayuda_dibujo(int n) {
       fondo_resaltado=0; zoom_map(); hacer_zoom=0;
     }
 
-    // Crea un di logo de ayuda...
+    // Crea un diálogo de ayuda...
 
     help_paint(n);
 
@@ -3436,7 +3436,7 @@ void zoom_map2(void) {
 
 
 //-----------------------------------------------------------------------------
-//      Volcado de la copia virtual de pantalla a la real (en edici¢n)
+//      Volcado de la copia virtual de pantalla a la real (en edición)
 //-----------------------------------------------------------------------------
 
 int b_pulsada;
@@ -3508,7 +3508,7 @@ void volcado_edicion(void) {
 }
 
 //-----------------------------------------------------------------------------
-//      Selecci¢n de otra barra, desde la pantalla de edici¢n
+//      Selección de otra barra, desde la pantalla de edición
 //-----------------------------------------------------------------------------
 
 int iconos_mode[]={14,2,177,160,161,178,162,179,163,164,180,165,131,100,191,190};
@@ -3542,7 +3542,7 @@ void select_mode(void) {
 }
 
 //-----------------------------------------------------------------------------
-//      Selecci¢n de FX, desde una barra de edici¢n
+//      Selección de FX, desde una barra de edición
 //-----------------------------------------------------------------------------
 
 void select_fx(int n,int * efecto) {
@@ -3657,7 +3657,7 @@ void select_fx(int n,int * efecto) {
 }
 
 //-----------------------------------------------------------------------------
-//      Selecci¢n de algoritmo de relleno, desde una barra de edici¢n
+//      Selección de algoritmo de relleno, desde una barra de edición
 //-----------------------------------------------------------------------------
 
 void select_fill(int n) {
@@ -3668,7 +3668,7 @@ void select_fill(int n) {
 }
 
 //-----------------------------------------------------------------------------
-//      Selecci¢n de algoritmo de relleno, desde una barra de edici¢n
+//      Selección de algoritmo de relleno, desde una barra de edición
 //-----------------------------------------------------------------------------
 
 int iconos_box[]={6,1,135,136,137,138,169,170};
@@ -3680,7 +3680,7 @@ void select_box(int n) {
 }
 
 //-----------------------------------------------------------------------------
-//      Selecci¢n de entre cualquier lista de iconos, en una barra de edici¢n
+//      Selección de entre cualquier lista de iconos, en una barra de edición
 //-----------------------------------------------------------------------------
 
 int select_icon(int icono_x,int * iconos) {
@@ -3807,7 +3807,7 @@ void volcado_raton_b(void) {
 }
 
 //-----------------------------------------------------------------------------
-//      Ventana de selecci¢n de m scara
+//      Ventana de selección de máscara
 //-----------------------------------------------------------------------------
 
 void select_mascara(int n) {
@@ -3896,6 +3896,7 @@ void select_mascara(int n) {
       volcado_parcial(a+x*big2,b+y*big2,9*big2,9*big2);
 
     } while (!(mouse_b&2) && !key(_ESC) && !salir && !key(_M) &&
+             !salir_del_entorno &&
              !((mouse_b&1) && mouse_in(a+c-9,b+2,a+c-2,b+9)));
 
     if (!mouse_in(barra_x,barra_y,barra_x+barra_an-1,barra_y+18) || !(mouse_b&1)
@@ -3916,7 +3917,7 @@ void select_mascara(int n) {
 }
 
 //-----------------------------------------------------------------------------
-//      Pinta la ventana de selecci¢n de m scara
+//      Pinta la ventana de selección de máscara
 //-----------------------------------------------------------------------------
 
 void pinta_ventana_mascara(byte * p,int c,int d) {
@@ -3948,7 +3949,7 @@ void pinta_ventana_mascara(byte * p,int c,int d) {
 }
 
 //-----------------------------------------------------------------------------
-//      Selecci¢n de un color de la paleta, desde una barra de edici¢n
+//      Selección de un color de la paleta, desde una barra de edición
 //-----------------------------------------------------------------------------
 
 #define max_texturas 1000
@@ -3965,7 +3966,7 @@ extern byte brush_fpg_path[256];
 extern char m3d_fpgcodesbr[max_texturas*an_textura];
 extern struct t_listboxbr ltexturasbr;
 extern struct _thumb_tex {
-  int an,al;            // Ancho y Alto de la reducci¢n
+  int an,al;            // Ancho y Alto de la reducción
   int RealAn, RealAl;   // Ancho y Alto de la textura
   char * ptr;           // ==NULL si el thumbnail no se ha comenzado a cargar
   int status;           // 0-No es una textura valida, 1-Cargada
@@ -3983,7 +3984,7 @@ struct t_listboxbr lthumbmapbr={3-2,11-2,NULL,0,4,4,32,32};
 int TipoBrowser=0;
 
 struct _thumb_map { // Reducciones de brushmaps
-  int an,al;            // Ancho y Alto de la reducci¢n
+  int an,al;            // Ancho y Alto de la reducción
   int RealAn, RealAl;   // Ancho y Alto de la textura
   char * ptr;           // ==NULL si el thumbnail no se ha comenzado a cargar
   int status;           // 0-No es una textura valida, 1-Cargada
@@ -4117,7 +4118,7 @@ int crear_mapbr_thumbs(struct t_listboxbr * l)
   return(1);
 }
 
-void select_color(int n) { // N£mero de "icono" como par metro
+void select_color(int n) { // Número de "icono" como parámetro
   int x,y,col,oldcol,ix,iy;
   int a,b,c,d;
   int salir,volcar;
@@ -4309,7 +4310,7 @@ void select_color(int n) { // N£mero de "icono" como par metro
           mouse_graf=2;
       }
 
-      // Volcar: 0-Nada (rat¢n), 1-Informaci¢n color, 2-Ventana entera.
+      // Volcar: 0-Nada (ratón), 1-Información color, 2-Ventana entera.
 
       if (volcar==1) { volcar=0;
         volcar_barras(0);
@@ -4366,6 +4367,7 @@ void select_color(int n) { // N£mero de "icono" como par metro
         } else salir=1;
 
     } while (!(mouse_b&2) && !key(_ESC) && !salir && !key(_C) &&
+             !salir_del_entorno &&
              !((mouse_b&1) && mouse_in(a+c-9,b+2,a+c-2,b+9)));
 
     if (!mouse_in(barra_x,barra_y,barra_x+barra_an-1,barra_y+18) || !(mouse_b&1)
@@ -4409,7 +4411,7 @@ void select_color(int n) { // N£mero de "icono" como par metro
 }
 
 //-----------------------------------------------------------------------------
-//  Animaci¢n (pasa mapas con TAB y shift-TAB)
+//  Animación (pasa mapas con TAB y shift-TAB)
 //-----------------------------------------------------------------------------
 
 void cambia_mapa(int adelante) {
@@ -4630,13 +4632,11 @@ void select_zoom(void) {
     } else if (!big) mouse_shift=1;
   }
 
-  if (z=(key(_Z)&&hotkey) || (mouse_b&4 && zoom<3) || (mouse_b&8 && zoom>0)) { 
-	  if(mouse_b&8) {
-		zoom=(zoom-1)%4;
-	  } else {
-		zoom=(zoom+1)%4; 
-      }
-      r=0;
+  if (mouse_b&8 && zoom>0) { zoom--; r=0;
+    if (!mouse_shift) { zoom_cx=coord_x; zoom_cy=coord_y; }
+  } else if (mouse_b&4 && zoom<3) { zoom++; r=0;
+    if (!mouse_shift) { zoom_cx=coord_x; zoom_cy=coord_y; }
+  } else if (z=(key(_Z)&&hotkey)) { zoom=(zoom+1)%4; r=0;
     if (!mouse_shift) { zoom_cx=coord_x; zoom_cy=coord_y; }
   } else { r=select_icon(barra_x+48,iconos_zoom); if (r>=0) zoom=r; }
 
@@ -4741,7 +4741,7 @@ void mover_zoom(void) {
 
 void dibuja_barra(int _an) {
 
-  int n; // N£mero de iconos
+  int n; // Número de iconos
 
   fondo_edicion(barra_x-4,barra_y,barra_an*big2+4,19*big2);
 
@@ -4851,7 +4851,7 @@ int nueva_barra(int an, int al) {
 void volcar_barras(int oscurecidas) {
   int n;
 
-  // La barra principal se trata de forma especial, siempre est  activa
+  // La barra principal se trata de forma especial, siempre está activa
 
   if (!oscurecidas) vuelca_barra(barra,vga_an,barra_x,barra_y,barra_an,19);
   else vuelca_barra_oscurecida(barra,vga_an,barra_x,barra_y,barra_an,19);
@@ -4931,7 +4931,7 @@ void vuelca_barra_oscurecida(byte * p, int real_an, int x, int y, int an, int al
 }
 
 //-----------------------------------------------------------------------------
-//      Pone un gr fico en la barra de edici¢n
+//      Pone un gráfico en la barra de edición
 //-----------------------------------------------------------------------------
 
 void put_barra(int x,int y,int n) {

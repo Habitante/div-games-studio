@@ -1,6 +1,6 @@
 
 //-----------------------------------------------------------------------------
-//      Pruebas con la interrupci¢n de teclado
+//      Pruebas con la interrupción de teclado
 //-----------------------------------------------------------------------------
 
 #include "inter.h"
@@ -36,6 +36,8 @@ int fbuf=0; // Puntero al buffer, fin de la cola
 //-----------------------------------------------------------------------------
 
 int ctrl_c=0,alt_x=0;
+int app_paused=0;
+int mouse_in_window=1;
 
 void __far __interrupt __loadds IrqHandler(void)
 {
@@ -224,29 +226,26 @@ void PrintEvent(const SDL_Event * event)
                     event->window.windowID, event->window.data1,
                     event->window.data2);
             break;
-        case SDL_WINDOWEVENT_MINIMIZED:
-            SDL_Log("Window %d minimized", event->window.windowID);
-            break;
         case SDL_WINDOWEVENT_MAXIMIZED:
             SDL_Log("Window %d maximized", event->window.windowID);
             break;
-        case SDL_WINDOWEVENT_RESTORED:
-            SDL_Log("Window %d restored", event->window.windowID);
-            break;
         case SDL_WINDOWEVENT_ENTER:
-            SDL_Log("Mouse entered window %d",
-                    event->window.windowID);
+            mouse_in_window=1;
             break;
         case SDL_WINDOWEVENT_LEAVE:
-            SDL_Log("Mouse left window %d", event->window.windowID);
+            mouse_in_window=0;
             break;
         case SDL_WINDOWEVENT_FOCUS_GAINED:
-            SDL_Log("Window %d gained keyboard focus",
-                    event->window.windowID);
+        case SDL_WINDOWEVENT_RESTORED:
+            app_paused=0;
+            Mix_Resume(-1);
+            Mix_ResumeMusic();
             break;
         case SDL_WINDOWEVENT_FOCUS_LOST:
-            SDL_Log("Window %d lost keyboard focus",
-                    event->window.windowID);
+        case SDL_WINDOWEVENT_MINIMIZED:
+            app_paused=1;
+            Mix_Pause(-1);
+            Mix_PauseMusic();
             break;
         case SDL_WINDOWEVENT_CLOSE:
             SDL_Log("Window %d closed", event->window.windowID);

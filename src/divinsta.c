@@ -1,6 +1,6 @@
 
 //-----------------------------------------------------------------------------
-//  M¢dulo que contiene el c¢digo del creador de instalaciones
+//  Módulo que contiene el código del creador de instalaciones
 //-----------------------------------------------------------------------------
 
 #include "global.h"
@@ -12,7 +12,7 @@
 
 
 //-----------------------------------------------------------------------------
-//  Prototipos y variables del m¢dulo
+//  Prototipos y variables del módulo
 //-----------------------------------------------------------------------------
 
 void Setup0();
@@ -89,7 +89,7 @@ struct _dirhead {
   char pack[16];        // Nombre del propio packfile (no va en el archivo)
   char head[8];         // Cabecera inicial del packfile (dat<-\n00)
   int crc1,crc2,crc3;   // CRC's de hasta tres programas que lo utilicen
-  int nfiles;           // N£mero de archivos contenidos
+  int nfiles;           // Número de archivos contenidos
 } dirhead;
 
 struct tdir {
@@ -106,7 +106,7 @@ int memcrc[9];          // Para obtener el CRC de los programas
 byte * imagen_install=NULL;
 
 //-----------------------------------------------------------------------------
-//  Ventana de Custom setup
+//  Ventana de Customásetup
 //-----------------------------------------------------------------------------
 
 void Setup1() {
@@ -530,7 +530,7 @@ int is_point(int * ptr, int n) {
 }
 
 //-----------------------------------------------------------------------------
-//  Mensajes de informaci¢n del instalador
+//  Mensajes de información del instalador
 //-----------------------------------------------------------------------------
 
 void Setupm1() {
@@ -630,7 +630,7 @@ void Setupe0() {
 
 
 //-----------------------------------------------------------------------------
-//  Funcion invocada para crear una instalacion desde el men£ programas
+//  Funcion invocada para crear una instalacion desde el menú programas
 //-----------------------------------------------------------------------------
 
 int GetFileLen(FILE *file) {
@@ -747,7 +747,7 @@ void crear_instalacion(void) {
   }
 #endif
 
-  if (_drive<=2) { strcpy(dir,"/"); is_disk=_drive; } // En un disquete no crear  directorios
+  if (_drive<=2) { strcpy(dir,"/"); is_disk=_drive; } // En un disquete no creará directorios
 
   for(x=1;x<strlen(dir);x++) if(dir[x]=='/') { // Crea directorios ...
 strcpy(cWork,full);
@@ -766,7 +766,7 @@ strcpy(cWork,full);
 
   strupr(DefDir);
 
-  // *** Ficheros de la instalaci¢n (los de exec y los de setup)
+  // *** Ficheros de la instalación (los de exec y los de setup)
 
   fin=fopen("system/exec.ins","rb"); fseek(fin,0,SEEK_END); n=ftell(fin); fclose(fin);
 
@@ -818,7 +818,7 @@ strcpy(cWork,full);
       }
       if (n<x || !strcmp(MiHeaderSetup[n].name,"SOUND.CFG")) {
 
-        // Si el fichero llevaba '+', pone un '+' a su aparici¢n anterior
+        // Si el fichero llevaba '+', pone un '+' a su aparición anterior
 
         ins+=strlen(ins)+1;
 
@@ -859,24 +859,24 @@ strcpy(cWork,full);
 
 //-----------------------------------------------------------------------------
 
-  // Aqu¡ se crear  el "PACKFILE.DAT" con los archivos pertinentes
-  // *** OJO *** Cuando el usuario seleccione la opci¢n "Instalaci¢n protegida"
-  // nfiles es el n£mero de ficheros totales (EXE + OVL [+ SETUP] + char * ins)
+  // Aquí se creará el "PACKFILE.DAT" con los archivos pertinentes
+  // *** OJO *** Cuando el usuario seleccione la opción "Instalación protegida"
+  // nfiles es el número de ficheros totales (EXE + OVL [+ SETUP] + char * ins)
   // Crea el directorio en hdir[].name/offset/len1/len2
   // y su cabecera en dirhead.packname/head/crc1/crc2/crc3/nfiles
 
   if (dirhead.nfiles) {
 
-    // 0§ Define los valores b sicos de la cabecera del packfile
+    // 0º Define los valores básicos de la cabecera del packfile
 
     strcpy(cWork,(char *)texto[498]);
     strcat(cWork,dirhead.pack);
 
     memcpy(dirhead.head,"dat\x1a\x0d\x0a\x00\x00",8);
 
-    // dirhead.nfiles ya est  precalculado antes
+    // dirhead.nfiles ya está precalculado antes
 
-    // 1§ Obtiene los CRC del system\exec.exe y install\setup.ovl (si include_setup)
+    // 1º Obtiene los CRC del system\exec.exe y install\setup.ovl (si include_setup)
 
     dirhead.crc1=0;
     dirhead.crc2=0;
@@ -898,29 +898,29 @@ strcpy(cWork,full);
       fclose(fin);
     }
 
-    // 2§ Abre el fichero ("INSTALL/PACKFILE.DAT","wb")
+    // 2º Abre el fichero ("INSTALL/PACKFILE.DAT","wb")
 
     if ((fout=fopen("install/PACKFILE.DAT","wb"))==NULL) {
       v_texto=(char *)texto[358]; dialogo(err0);
       free(_ins); return;
     }
 
-    // 3§ Graba la cabecera (&dirhead.head)
+    // 3º Graba la cabecera (&dirhead.head)
 
     fwrite(&dirhead.head,1,8+3*4+4,fout);
 
-    // 4§ Pide memoria para el directorio (hdir[])
+    // 4º Pide memoria para el directorio (hdir[])
 
     if ((hdir=(struct tdir *)malloc(dirhead.nfiles*sizeof(struct tdir)))==NULL) {
       v_texto=(char *)texto[357]; dialogo(err0);
       fclose(fout); free(_ins); return;
     }
 
-    // 5§ Graba el directorio (con basura, inicialmente)
+    // 5º Graba el directorio (con basura, inicialmente)
 
     fwrite(hdir,sizeof(struct tdir),dirhead.nfiles,fout);
 
-    // 6§ Graba todos los archivos a continuacion (rellenando hdir[])
+    // 6º Graba todos los archivos a continuacion (rellenando hdir[])
 
     ins=__ins=_ins;
 
@@ -963,7 +963,7 @@ strcpy(cWork,full);
       ins+=strlen(ins)+1;
     }
 
-    // 7§ Actualiza la lista de ficheros a incluir (_ins), con el PACKFILE
+    // 7º Actualiza la lista de ficheros a incluir (_ins), con el PACKFILE
 
     nfiles=nfiles-dirhead.nfiles+1;
 
@@ -972,9 +972,9 @@ strcpy(cWork,full);
       strcpy(__ins,(char *)chr); __ins+=strlen(__ins)+1;
     }
 
-    strcpy(__ins,"install/PACKFILE.DAT"); // a¤ade el PACKFILE como el £ltimo fichero
+    strcpy(__ins,"install/PACKFILE.DAT"); // añade el PACKFILE como el último fichero
 
-    // 8§ Reescribe el hdir[] y cierra el fichero
+    // 8º Reescribe el hdir[] y cierra el fichero
 
     fseek(fout,8+3*4+4,SEEK_SET);
     fwrite(hdir,sizeof(struct tdir),dirhead.nfiles,fout);
@@ -990,7 +990,7 @@ strcpy(cWork,full);
   create_zip(full);
 
 
-// the rest is old BS
+// the restáis old BS
 
 #if 0
 //-----------------------------------------------------------------------------
@@ -1060,7 +1060,7 @@ strcpy(cWork,full);
     fclose(fout); free(_ins); return;
   } fwrite(MiHeaderSetup,sizeof(HeaderSetup),nfiles,fout);
 
-  // Copia al INSTALL.DIV todos los ficheros de la instalaci¢n
+  // Copia al INSTALL.DIV todos los ficheros de la instalación
 
   ins=_ins;
 
@@ -1266,7 +1266,7 @@ strcpy(cWork,full);
 
 #endif
 
-  v_titulo=(char *)texto[359];        // Di logo indicando el final de la instalaci¢n
+  v_titulo=(char *)texto[359];        // Diálogo indicando el final de la instalación
   strcpy(cWork,(char *)texto[360]);
   strupr(full);
   strcat(cWork,full);
@@ -1419,7 +1419,7 @@ int FileCopyICE(char *org,char *dest,int vols,int _texto) { // Returns 0 -Error 
         len=0;
       }
 
-    } else { // Digo yo que ser  esto ...
+    } else { // Digo yo que será esto ...
       if (len<=totfree) { // Da igual, coge de todas formas
         fread(buffer,1,len,fin);
         if (fwrite(buffer,1,len,fout)!=len) { retval=0; break; }
