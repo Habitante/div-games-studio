@@ -66,10 +66,16 @@ Clean up first, ship second, then modernize based on what real users actually wa
 - [x] Remove remaining `#ifdef TTF` dead code (~25 blocks across div.c, divwindo.c,
   divpalet.c, divsetup.c, divhelp.c, divvideo.c, global.h, osdep.h)
 
-### Build system cleanup
-- [ ] Remove dead cmake options and platform branches
-- [ ] Add a DLL auto-copy step so first-time build "just works"
-- [ ] Add a one-command build script wrapper
+### Build system cleanup ✓
+- [x] Remove dead cmake options and platform branches
+  (removed SDL1 branch, libgit2, SDL_image, DEMOTARGET, APPLE block, dead JUDAS refs;
+   deleted 4 dead toolchains: windows.cmake, linux.cmake, osx.cmake, pi.cmake;
+   deleted 6 dead scripts: app.sh, makedll.sh, makedroid.bat, makegcw.bat, makehtml.bat, makepnd.bat;
+   CMakeLists.txt reduced from 376 to 161 lines)
+- [x] Add a DLL auto-copy step so first-time build "just works"
+  (`tools/copy_dlls.sh` — uses objdump to recursively find and copy mingw DLLs; runs as post-build step)
+- [x] Add a one-command build script wrapper
+  (`build.sh` at project root — sets PATH, runs cmake + make; supports `--clean`)
 
 ---
 
@@ -138,6 +144,10 @@ but left the underlying infrastructure broken:
       factor for windowed).
 
 ### Normalize basics
+- [ ] Remove SDL1 / Emscripten preprocessor branches (~25 `#ifdef SDL2` / `#ifndef SDL2`
+      blocks across divmouse.c, divkeybo.c, divsound.c, v.c, mouse.c, divvideo.c, f.c, i.c,
+      osdep.h; plus `#ifdef SDL` in div.c, divkeybo.c; plus `__EMSCRIPTEN__` in divsound.c;
+      delete `osd_sdl12.h` and `osd_sdl.h`)
 - [ ] Unify byte types: pick `uint8_t` everywhere, stop mixing `byte`/`char`/`uchar`
 - [ ] Normalize path separators (some code only checks `/`, not `\`)
 
