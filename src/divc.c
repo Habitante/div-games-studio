@@ -96,7 +96,7 @@
 // E - Finalizar el autoformateador de listados
 // F - Generar un NFO informativo del programa compilado (TAB+LST+EML)
 
-// ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+// -----------------------------------------------------------------------------
 
 // SOLUCION 1: POINTERS BYTE/WORD LIMITADOS A TABLAS BYTE/WORD
 
@@ -189,7 +189,7 @@
 //      RELATIVA A MULTIPLICAR LOS OFFSET POR 4 !!!!!!!!!!!
 //      (en una ocasi¢n lo intent .. y lo acab deshaciendo todo)
 
-// ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+// -----------------------------------------------------------------------------
 
 // Optimizaci¢n de codigo intermedio
 
@@ -199,7 +199,7 @@
 // no se puede generar codigo a byte, pero si utilizar el sistema de "byte"
 // como compresion de los EXE, descomprimiendo en el intrprete al cargar
 
-// ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+// -----------------------------------------------------------------------------
 
 // Tablas y estructuras multidimensionales
 // revisar errores: 35, ...
@@ -524,7 +524,7 @@ void add_code(int dir, int param, int op);
 
 //-----------------------------------------------------------------------------
 
-//ÄMnem¢nicoÄC¢dg.ÄOperandos (Generaci¢n de c¢digo EML, "*" ð "a£n no usado")
+//-Mnem¢nico-C¢dg.-Operandos (Generaci¢n de c¢digo EML, "*" ð "a£n no usado")
 
 #define lnop  0 // *            No operaci¢n
 #define lcar  1 // valor        Carga una constante en pila
@@ -751,7 +751,7 @@ void grabar_sentencia(void);  // Guarda las seis variables en el fichero
 
 //-----------------------------------------------------------------------------
 
-// Tabla de objetos ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ *iobj primer objeto libre
+// Tabla de objetos --------------------------------- *iobj primer objeto libre
 
 struct objeto {
   byte tipo;    // Tipo de objeto
@@ -840,7 +840,7 @@ struct objeto {
       int num_par;
     } fext;
   };
-} obj[max_obj], * iobj; // ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+} obj[max_obj], * iobj; // ----------------------------------------------------
 
 //-----------------------------------------------------------------------------
 
@@ -915,7 +915,7 @@ int iloc_len; // final de las variables locales incluyendo las privadas
 // iloc         inicio en mem[] de las variables locales (inicializadas)
 // iloc_len     longitud de las variables locales
 
-//ÄÄÄÄÄÄÄÄÄÄÄÄÄ Inserci¢n en la tabla de expresiones, acceso a variables
+//------------- Inserci¢n en la tabla de expresiones, acceso a variables
 
 //vglo           &vglo ptr
 //tglo[_exp]     &tglo <_exp> add rng ptr
@@ -2077,7 +2077,7 @@ int analiza_struct(int offstruct) { // tras " struct id [ <const> ] " // idðmem
 
   while (pieza!=p_end) {
 
-    if (pieza==p_struct) {                              // Miembro struct ÄÄÄ
+    if (pieza==p_struct) {                              // Miembro struct ---
 
       lexico();
 
@@ -2215,7 +2215,7 @@ int analiza_struct(int offstruct) { // tras " struct id [ <const> ] " // idðmem
         while (pieza==p_ptocoma || pieza==p_coma) lexico();
       }
 
-    } else if (pieza==p_byte) {                         // Miembro byte ÄÄÄ
+    } else if (pieza==p_byte) {                         // Miembro byte ---
 
       lexico();
 
@@ -2290,7 +2290,7 @@ int analiza_struct(int offstruct) { // tras " struct id [ <const> ] " // idðmem
         while (pieza==p_ptocoma || pieza==p_coma) lexico();
       }
 
-    } else if (pieza==p_word) {                         // Miembro word ÄÄÄ
+    } else if (pieza==p_word) {                         // Miembro word ---
 
       lexico();
 
@@ -2387,7 +2387,7 @@ int analiza_struct(int offstruct) { // tras " struct id [ <const> ] " // idðmem
       } else {
 
         ob=o; if ((*ob).tipo!=tnone) c_error(0,114); lexico();
-        if (pieza==p_corab) { lexico();                   // Miembro tabla ÄÄÄ
+        if (pieza==p_corab) { lexico();                   // Miembro tabla ---
           (*ob).tipo=ttglo; (*ob).tglo.offset=len;
           if (((*ob).tglo.len1=constante())<0) c_error(4,35);
           if (pieza==p_coma) {
@@ -2411,7 +2411,7 @@ int analiza_struct(int offstruct) { // tras " struct id [ <const> ] " // idðmem
             imem=_imem;
           } len+=(*ob).tglo.totalen;
 
-        } else {                                          // Miembro variable ÄÄÄ
+        } else {                                          // Miembro variable ---
 
           (*ob).tipo=tvglo; (*ob).vglo.offset=len;
           test_buffer(&mem,&imem_max,offstruct+len);
@@ -2427,7 +2427,7 @@ int analiza_struct(int offstruct) { // tras " struct id [ <const> ] " // idðmem
   } return(len);
 }
 
-//ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+//---------------------------------------------------------------------------
 
 int analiza_struct_local(int offstruct) { // tras " struct id [ <const> ] " // idðmember
   int len=0,dup,i,_itxt,_iloc;
@@ -2439,7 +2439,7 @@ int analiza_struct_local(int offstruct) { // tras " struct id [ <const> ] " // i
 
   while (pieza!=p_end) {
 
-    if (pieza==p_struct) {                              // Miembro struct ÄÄÄ
+    if (pieza==p_struct) {                              // Miembro struct ---
 
       lexico();
 
@@ -2576,7 +2576,7 @@ int analiza_struct_local(int offstruct) { // tras " struct id [ <const> ] " // i
         while (pieza==p_ptocoma || pieza==p_coma) lexico();
       }
 
-    } else if (pieza==p_byte) {                         // Miembro byte ÄÄÄ
+    } else if (pieza==p_byte) {                         // Miembro byte ---
 
       lexico();
 
@@ -2651,7 +2651,7 @@ int analiza_struct_local(int offstruct) { // tras " struct id [ <const> ] " // i
         while (pieza==p_ptocoma || pieza==p_coma) lexico();
       }
 
-    } else if (pieza==p_word) {                         // Miembro word ÄÄÄ
+    } else if (pieza==p_word) {                         // Miembro word ---
 
       lexico();
 
@@ -2749,7 +2749,7 @@ int analiza_struct_local(int offstruct) { // tras " struct id [ <const> ] " // i
       } else {
 
         ob=o; if ((*ob).tipo!=tnone) c_error(0,114); lexico();
-        if (pieza==p_corab) { lexico();    // Miembro tabla ÄÄÄ
+        if (pieza==p_corab) { lexico();    // Miembro tabla ---
           (*ob).tipo=ttloc; (*ob).tloc.offset=len;
           if (((*ob).tloc.len1=constante())<0) c_error(4,35);
           if (pieza==p_coma) {
@@ -2773,7 +2773,7 @@ int analiza_struct_local(int offstruct) { // tras " struct id [ <const> ] " // i
             iloc=_iloc;
           } len+=(*ob).tloc.totalen;
 
-        } else {                                          // Miembro variable ÄÄÄ
+        } else {                                          // Miembro variable ---
 
           (*ob).tipo=tvloc; (*ob).vloc.offset=len;
           test_buffer(&loc,&iloc_max,offstruct+len);
@@ -2790,7 +2790,7 @@ int analiza_struct_local(int offstruct) { // tras " struct id [ <const> ] " // i
   } return(len);
 }
 
-//ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+//---------------------------------------------------------------------------
 
 int analiza_struct_private(int offstruct) { // tras " struct id [ <const> ] " // idðmember
   int len=0,dup,i,_itxt,_imem;
@@ -2802,7 +2802,7 @@ int analiza_struct_private(int offstruct) { // tras " struct id [ <const> ] " //
 
   while (pieza!=p_end) {
 
-    if (pieza==p_struct) {                              // Miembro struct ÄÄÄ
+    if (pieza==p_struct) {                              // Miembro struct ---
 
       lexico();
 
@@ -2939,7 +2939,7 @@ int analiza_struct_private(int offstruct) { // tras " struct id [ <const> ] " //
         while (pieza==p_ptocoma || pieza==p_coma) lexico();
       }
 
-    } else if (pieza==p_byte) {                         // Miembro byte ÄÄÄ
+    } else if (pieza==p_byte) {                         // Miembro byte ---
 
       lexico();
 
@@ -3013,7 +3013,7 @@ int analiza_struct_private(int offstruct) { // tras " struct id [ <const> ] " //
         while (pieza==p_ptocoma || pieza==p_coma) lexico();
       }
 
-    } else if (pieza==p_word) {                         // Miembro word ÄÄÄ
+    } else if (pieza==p_word) {                         // Miembro word ---
 
       lexico();
 
@@ -3110,7 +3110,7 @@ int analiza_struct_private(int offstruct) { // tras " struct id [ <const> ] " //
       } else {
 
         ob=o; if ((*ob).tipo!=tnone) c_error(0,114); lexico();
-        if (pieza==p_corab) { lexico();    // Miembro tabla ÄÄÄ
+        if (pieza==p_corab) { lexico();    // Miembro tabla ---
           (*ob).tipo=ttloc; (*ob).tloc.offset=len;
           if (((*ob).tloc.len1=constante())<0) c_error(4,35);
           if (pieza==p_coma) {
@@ -3134,7 +3134,7 @@ int analiza_struct_private(int offstruct) { // tras " struct id [ <const> ] " //
             imem=_imem;
           } len+=(*ob).tloc.totalen;
 
-        } else {                                          // Miembro variable ÄÄÄ
+        } else {                                          // Miembro variable ---
 
           (*ob).tipo=tvloc; (*ob).vloc.offset=len;
 
@@ -3154,8 +3154,8 @@ int analiza_struct_private(int offstruct) { // tras " struct id [ <const> ] " //
   } return(len);
 }
 
-//ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-//ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
 
 void sintactico (void) {
 
@@ -3169,11 +3169,11 @@ void sintactico (void) {
 
   lexico();
 
-  //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+  //---------------------------------------------------------------------------
   // Opciones de compilacion
-  //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+  //---------------------------------------------------------------------------
   // p_compiler_options {opcion} {;}
-  //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+  //---------------------------------------------------------------------------
 
   max_process=0; // Valores de las opciones por defecto
   ignore_errors=0;
@@ -3261,11 +3261,11 @@ void sintactico (void) {
     } while (1);
   }
 
-  //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+  //---------------------------------------------------------------------------
   // Cabecera
-  //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+  //---------------------------------------------------------------------------
   // p_program p_id {;}
-  //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+  //---------------------------------------------------------------------------
 
   save_error(0);
   if (pieza!=p_program && pieza!=p_setup_program) c_error(4,20);
@@ -3301,11 +3301,11 @@ void sintactico (void) {
 		while (pieza==p_ptocoma || pieza==p_coma) lexico();
 		final_sentencia();
 	}
-  //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+  //---------------------------------------------------------------------------
   // Zona de constantes
-  //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+  //---------------------------------------------------------------------------
   // [ p_const {;} { p_id p_asig <exp> {; | ,} } ]
-  //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+  //---------------------------------------------------------------------------
 
   if (pieza==p_const) {
     pasa_ptocoma();
@@ -3322,9 +3322,9 @@ void sintactico (void) {
     }
   }
 
-  //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+  //---------------------------------------------------------------------------
   // Variables globales, pueden usarse en expresiones constantes
-  //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+  //---------------------------------------------------------------------------
   // <variable> := p_id [ p_asig <exp> ] {;}
   //
   // <tabla> := p_id p_corab ( p_corce p_asig <init>
@@ -3332,7 +3332,7 @@ void sintactico (void) {
   //
   // <init>  := ( <string> | <exp> [ [p_dup] p_abrir <init> p_cerrar ] )
   //            [ p_coma <init>]
-  //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+  //---------------------------------------------------------------------------
 
   if (pieza==p_global) {
     pasa_ptocoma();
@@ -3685,14 +3685,14 @@ void sintactico (void) {
     }
   }
 
-  //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+  //---------------------------------------------------------------------------
   // Variables locales, no se pueden usar en expresiones constantes
-  //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+  //---------------------------------------------------------------------------
   // <variable> := p_id [ p_asig <exp> ] {;}
   //
   // <tabla> := p_id p_corab ( p_corce p_asig <init>
   //                       | <exp> p_corce [ p_asig <init> ] ) {;}
-  //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+  //---------------------------------------------------------------------------
 
   if (pieza==p_local) {
     pasa_ptocoma();
@@ -4041,9 +4041,9 @@ void sintactico (void) {
     }
   }
 
-  //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+  //---------------------------------------------------------------------------
   // C¢digo principal
-  //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+  //---------------------------------------------------------------------------
 
   // Genera el salto al inicio del c¢digo (long_header)
 
@@ -4075,11 +4075,11 @@ void sintactico (void) {
   g1(lret);
   pasa_ptocoma(); final_sentencia(); grabar_sentencia();
 
-  //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+  //---------------------------------------------------------------------------
   // Procesos
-  //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+  //---------------------------------------------------------------------------
   // p_process p_id p_abrir [ id { , id } ] p_cerrar { ; } p_begin ... p_end
-  //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+  //---------------------------------------------------------------------------
 
   save_error(0);
   while (pieza==p_process || pieza==p_function) {
@@ -4137,9 +4137,9 @@ void sintactico (void) {
 
 }
 
-  //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+  //---------------------------------------------------------------------------
   // Analiza las variables privadas de un bloque, como las locales
-  //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+  //---------------------------------------------------------------------------
 
     // *** OJO *** No se debe permitir #id.tvpri
     //             pues fallar¡a a no ser que #id fuera del mismo tipo que el
@@ -4598,12 +4598,12 @@ void analiza_private(void) {
 
 }
 
-  //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+  //---------------------------------------------------------------------------
   // Inicializaci¢n de tablas (a mem[imem++])
-  //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+  //---------------------------------------------------------------------------
   // <init>  := ( <string> | <exp> [ [p_dup] p_abrir <init> p_cerrar ] )
   //            [ p_coma <init>]
-  //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+  //---------------------------------------------------------------------------
 
 
 void tglo_init(memptrsize tipo) { // Tipo: 0-Int o variado (struct), 1-Word, 2-Byte

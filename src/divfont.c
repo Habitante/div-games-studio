@@ -683,7 +683,7 @@ int an=v.an/big2,al=v.al/big2;
 
 //-----------------------------------------------------------------------------
 
-#define max_archivos 512 // ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ Listbox de archivos
+#define max_archivos 512 // ------------------------------- Listbox de archivos
 extern struct t_listboxbr larchivosbr;
 extern t_thumb thumb[max_archivos];
 extern int num_taggeds;
@@ -1426,7 +1426,7 @@ int Length;
         fclose(file);
 }
 
-#define max_archivos 512 // ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ Listbox de archivos
+#define max_archivos 512 // ------------------------------- Listbox de archivos
 extern struct t_listboxbr larchivosbr;
 extern t_thumb thumb[max_archivos];
 extern int num_taggeds;

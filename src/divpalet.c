@@ -134,13 +134,13 @@ byte fast_find_color(byte fr,byte fg,byte fb) {
   find_min=65536;
   num_puntos=0;
 
-  // Cubos de distancia sqr(0) ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+  // Cubos de distancia sqr(0) --------------------------------------------
 
   crear_ghost_vc(vcubo);
 
   if (num_puntos>1) goto fast_find;
 
-  // Cubos de distancia sqr(1) ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+  // Cubos de distancia sqr(1) --------------------------------------------
 
   if (r3>0) crear_ghost_vc(vcubo-64);
   if (r3<7*64) crear_ghost_vc(vcubo+64);
@@ -151,7 +151,7 @@ byte fast_find_color(byte fr,byte fg,byte fb) {
 
   if (num_puntos>2) goto fast_find;
 
-  // Cubos de distancia sqr(2) ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+  // Cubos de distancia sqr(2) --------------------------------------------
 
   if (r3>0) {
     if (g3>0) crear_ghost_vc(vcubo-64-8);
@@ -198,13 +198,13 @@ void crear_ghost(int puntos) {
       find_min=65536;
       num_puntos=0;
 
-      // Cubos de distancia sqr(0) ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+      // Cubos de distancia sqr(0) --------------------------------------------
 
       crear_ghost_vc(vcubo);
 
       if (num_puntos>1) goto fast_ghost;
 
-      // Cubos de distancia sqr(1) ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+      // Cubos de distancia sqr(1) --------------------------------------------
 
       if (r3>0) crear_ghost_vc(vcubo-64);
       if (r3<7*64) crear_ghost_vc(vcubo+64);
@@ -215,7 +215,7 @@ void crear_ghost(int puntos) {
 
       if (num_puntos>2) goto fast_ghost;
 
-      // Cubos de distancia sqr(2) ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+      // Cubos de distancia sqr(2) --------------------------------------------
 
       if (r3>0) {
         if (g3>0) crear_ghost_vc(vcubo-64-8);
@@ -511,7 +511,7 @@ int hay_mapas(void) {
 
 char PalName[_MAX_PATH+1]="";
 
-#define max_archivos 512 // ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ Listbox de archivos
+#define max_archivos 512 // ------------------------------- Listbox de archivos
 extern struct t_listboxbr larchivosbr;
 extern t_thumb thumb[max_archivos];
 extern int num_taggeds;

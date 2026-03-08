@@ -1406,8 +1406,8 @@ void actualiza_menu(int menu,int min,int max) { // (Min,Max) Opciones prohibidas
 // Una ventana de tipo "mapa" requiere la siguiente informaci¢n (tanto si se
 // carga un mapa como si se crea nuevo en el programa)
 
-// v_mapa->filename   Ä¿ Estos dos primeros campos ser n "Mapa x",NULL si
-// v_mapa->path       ÄÙ el mapa no tiene una correspondencia a£n en disco
+// v_mapa->filename   -¿ Estos dos primeros campos ser n "Mapa x",NULL si
+// v_mapa->path       -Ù el mapa no tiene una correspondencia a£n en disco
 // v_mapa->map
 // v_mapa->mab
 // v_mapa->map_an/al
