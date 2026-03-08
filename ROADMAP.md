@@ -144,10 +144,10 @@ but left the underlying infrastructure broken:
       factor for windowed).
 
 ### Normalize basics
-- [ ] Remove SDL1 / Emscripten preprocessor branches (~25 `#ifdef SDL2` / `#ifndef SDL2`
-      blocks across divmouse.c, divkeybo.c, divsound.c, v.c, mouse.c, divvideo.c, f.c, i.c,
-      osdep.h; plus `#ifdef SDL` in div.c, divkeybo.c; plus `__EMSCRIPTEN__` in divsound.c;
-      delete `osd_sdl12.h` and `osd_sdl.h`)
+- [x] Remove SDL1 / Emscripten preprocessor branches (30 `#ifdef SDL2` / `#ifndef SDL2` /
+      `#ifdef SDL` / `__EMSCRIPTEN__` blocks removed across 11 files; deleted `osd_sdl12.c`,
+      `osd_sdl12.h`, `osd_sdl.h`; merged declarations into `osd_sdl2.h`; removed `-DSDL2=2`
+      from CMakeLists.txt)
 - [ ] Unify byte types: pick `uint8_t` everywhere, stop mixing `byte`/`char`/`uchar`
 - [ ] Normalize path separators (some code only checks `/`, not `\`)
 

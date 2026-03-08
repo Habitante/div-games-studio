@@ -1,2 +1,10 @@
 # Normalize all text files to LF line endings
 * text=auto eol=lf
+
+# DIV data files: mostly text but may contain raw CP437 bytes (0x80-0xFF)
+# in quoted strings for the 8-bit bitmap font. Treat as binary to prevent
+# git from mangling high bytes during checkout/commit.
+div/system/lenguaje.div -text
+div/system/lenguaje.int -text
+div/help/help.div -text
+div/help/help.idx -text

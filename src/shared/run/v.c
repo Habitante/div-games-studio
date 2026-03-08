@@ -83,22 +83,22 @@ struct {
    0x6109,0x310f,0x3710,0x8911,0x3312,0x2f13,0x0014,0x3c15,0x5c16,0xe317,0}
 };
 
-//�����������������������������������������������������������������������������
+//-----------------------------------------------------------------------------
 //      Tabla ghost
-//�����������������������������������������������������������������������������
+//-----------------------------------------------------------------------------
 
-struct t_tpuntos { // Para la creaci�n de la tabla ghost
+struct t_tpuntos { // Para la creación de la tabla ghost
   int r,g,b;
   struct t_tpuntos * next;
 } tpuntos[256];
 
-struct t_tpuntos * vcubos[512]; // Para la creaci�n de la tabla ghost
+struct t_tpuntos * vcubos[512]; // Para la creación de la tabla ghost
 
 extern int fli_palette_update;
 
-//����������������������������������������������������������������������������
-// Funci�n para poner la paleta
-//����������������������������������������������������������������������������
+//----------------------------------------------------------------------------
+// Función para poner la paleta
+//----------------------------------------------------------------------------
 
 byte color_oscuro;
 
@@ -215,9 +215,9 @@ void fade_wait(void) {
   fading=0;
 }
 
-//�����������������������������������������������������������������������������
+//-----------------------------------------------------------------------------
 //      Set Video Mode (vga_an y vga_al se definen en shared.h)
-//�����������������������������������������������������������������������������
+//-----------------------------------------------------------------------------
 
 int LinealMode;
 int modovesa;
@@ -373,9 +373,9 @@ void svmodex(int m) {
 #endif
 }
 
-//�����������������������������������������������������������������������������
+//-----------------------------------------------------------------------------
 //      Reset Video Mode
-//�����������������������������������������������������������������������������
+//-----------------------------------------------------------------------------
 
 void rvmode(void) {
 
@@ -391,9 +391,9 @@ void rvmode(void) {
 #endif
 }
 
-//�����������������������������������������������������������������������������
+//-----------------------------------------------------------------------------
 //      Dump buffer to VGA
-//�����������������������������������������������������������������������������
+//-----------------------------------------------------------------------------
 void volcadosdl(byte *p) {
 	
 	SDL_UpdateTexture(divTexture, NULL, copia, vga_an * sizeof (Uint8));
@@ -497,9 +497,9 @@ volcadosdl(p);
   init_volcado();
 }
 
-//�����������������������������������������������������������������������������
+//-----------------------------------------------------------------------------
 //      Snapshot
-//�����������������������������������������������������������������������������
+//-----------------------------------------------------------------------------
 
 void snapshot(byte *p) {
   FILE * f;
@@ -621,7 +621,7 @@ int graba_MAP (byte * mapa, int an, int al, FILE * f) {
   fwrite("map\x1a\x0d\x0a\x00\x00",8,1,f);      // +000 Cabecera y version
   fwrite(&an,2,1,f);                   // +008 Ancho
   fwrite(&al,2,1,f);                   // +010 Alto
-  y=1; fwrite(&y,4,1,f);// +012 C�digo
+  y=1; fwrite(&y,4,1,f);// +012 Código
 
   fwrite(cwork,32,1,f);// +016 Descripcion
   fwrite(paleta,768,1,f);                          // +048 Paleta
@@ -639,9 +639,9 @@ int graba_MAP (byte * mapa, int an, int al, FILE * f) {
   return(0);
 }
 
-//�����������������������������������������������������������������������������
-//      Restauraci�n parcial del fondo a la copia
-//�����������������������������������������������������������������������������
+//-----------------------------------------------------------------------------
+//      Restauración parcial del fondo a la copia
+//-----------------------------------------------------------------------------
 
 void restore(byte *q, byte *p) {
   int y=0,n=0;
@@ -662,9 +662,9 @@ void restore(byte *q, byte *p) {
   }
 }
 
-//�����������������������������������������������������������������������������
+//-----------------------------------------------------------------------------
 //      Volcado en el modo 320x200
-//�����������������������������������������������������������������������������
+//-----------------------------------------------------------------------------
 
 void volcadop320200(byte *p) {
   int y=0,n;
@@ -689,9 +689,9 @@ void volcadoc320200(byte *p) {
   memcpy(vga,p,vga_an*vga_al);
 }
 
-//�����������������������������������������������������������������������������
+//-----------------------------------------------------------------------------
 //      Volcado en SVGA
-//�����������������������������������������������������������������������������
+//-----------------------------------------------------------------------------
 
 void volcadopsvga(byte *p) {
 #ifdef DOS
@@ -758,9 +758,9 @@ void volcadocsvga(byte *p) {
 #endif
 }
 
-//�����������������������������������������������������������������������������
+//-----------------------------------------------------------------------------
 //      Volcado en un modo-x
-//�����������������������������������������������������������������������������
+//-----------------------------------------------------------------------------
 
 void volcadopx(byte * p) {
 #ifdef DOS
@@ -800,9 +800,9 @@ void volcadocx(byte * p) {
 #endif
 }
 
-//�����������������������������������������������������������������������������
-//      Subrutinas de volcado gen�ricas
-//�����������������������������������������������������������������������������
+//-----------------------------------------------------------------------------
+//      Subrutinas de volcado genéricas
+//-----------------------------------------------------------------------------
 
 void vgacpy(byte * q, byte * p, int n) {
   int m;
@@ -816,9 +816,9 @@ void vgacpy(byte * q, byte * p, int n) {
   }
 }
 
-//�����������������������������������������������������������������������������
+//-----------------------------------------------------------------------------
 //      Selecciona una ventana para su posterior volcado
-//�����������������������������������������������������������������������������
+//-----------------------------------------------------------------------------
 
 void init_volcado(void) {
 #ifndef DROID
@@ -846,7 +846,7 @@ void volcado_parcial(int x,int y,int an,int al) {
     }
 
     while (y<=ymax) { n=y*4;
-      if (scan[n+1]==0) {         // Caso 1, el scan estaba vac�o ...
+      if (scan[n+1]==0) {         // Caso 1, el scan estaba vacío ...
         scan[n]=x; scan[n+1]=an;
       } else if (scan[n+3]==0) {  // Caso 2, ya hay un scan definido ...
         if (x>scan[n]+scan[n+1] || x+an<scan[n]) { // ... hueco entre medias
@@ -868,10 +868,10 @@ void volcado_parcial(int x,int y,int an,int al) {
           if (x+an>scan[n+2]+scan[n+3]) scan[n+1]=x+an-scan[n]; else scan[n+1]=scan[n+2]+scan[n+3]-scan[n];
           scan[n+2]=0; scan[n+3]=0;
         } else {
-          if (x>scan[n]+scan[n+1] || x+an<scan[n]) { // No choca con 1�
-            if (x>scan[n+2]+scan[n+3] || x+an<scan[n+2]) { // No choca con 2�
+          if (x>scan[n]+scan[n+1] || x+an<scan[n]) { // No choca con 1-
+            if (x>scan[n+2]+scan[n+3] || x+an<scan[n+2]) { // No choca con 2-
               // Caso 3.4, el nuevo no colisiona con ninguno, se calcula el espacio
-              // hasta ambos, y se fusiona con el m�s cercano
+              // hasta ambos, y se fusiona con el más cercano
               if (x+an<scan[n]) d1=scan[n]-(x+an); else d1=x-(scan[n]+scan[n+1]);
               if (x+an<scan[n+2]) d2=scan[n+2]-(x+an); else d2=x-(scan[n+2]+scan[n+3]);
               if (d1<=d2) {
@@ -886,13 +886,13 @@ void volcado_parcial(int x,int y,int an,int al) {
                 else scan[n+3]=x2+scan[n+3]-scan[n+2];
               }
             } else {
-              // Caso 3.3, el nuevo colisiona con el 2�, se fusionan
+              // Caso 3.3, el nuevo colisiona con el 2-, se fusionan
               if (x<(x2=scan[n+2])) scan[n+2]=x;
               if (x+an>x2+scan[n+3]) scan[n+3]=x+an-scan[n+2];
               else scan[n+3]=x2+scan[n+3]-scan[n+2];
             }
           } else {
-            // Caso 3.2, el nuevo colisiona con el 1�, se fusionan
+            // Caso 3.2, el nuevo colisiona con el 1-, se fusionan
             if (x<(x2=scan[n])) scan[n]=x;
             if (x+an>x2+scan[n+1]) scan[n+1]=x+an-scan[n];
             else scan[n+1]=x2+scan[n+1]-scan[n];
@@ -903,9 +903,9 @@ void volcado_parcial(int x,int y,int an,int al) {
   }
 }
 
-//�����������������������������������������������������������������������������
-//      Funciones para la creaci�n de la tabla ghost
-//�����������������������������������������������������������������������������
+//-----------------------------------------------------------------------------
+//      Funciones para la creación de la tabla ghost
+//-----------------------------------------------------------------------------
 
 void init_ghost(void) {
 
@@ -928,9 +928,9 @@ void init_ghost(void) {
   }
 }
 
-//�����������������������������������������������������������������������������
-//      Funci�n para la creaci�n de la tabla ghost
-//�����������������������������������������������������������������������������
+//-----------------------------------------------------------------------------
+//      Función para la creación de la tabla ghost
+//-----------------------------------------------------------------------------
 
 int rr,gg,bb;
 int num_puntos;
@@ -955,13 +955,13 @@ void crear_ghost(void) {
       find_min=65536;
       num_puntos=0;
 
-      // Cubos de distancia sqr(0) ��������������������������������������������
+      // Cubos de distancia sqr(0) --------------------------------------------
 
       crear_ghost_vc(vcubo);
 
       if (num_puntos>1) goto fast_ghost;
 
-      // Cubos de distancia sqr(1) ��������������������������������������������
+      // Cubos de distancia sqr(1) --------------------------------------------
 
       if (r3>0) crear_ghost_vc(vcubo-64);
       if (r3<7*64) crear_ghost_vc(vcubo+64);
@@ -972,7 +972,7 @@ void crear_ghost(void) {
 
       if (num_puntos>2) goto fast_ghost;
 
-      // Cubos de distancia sqr(2) ��������������������������������������������
+      // Cubos de distancia sqr(2) --------------------------------------------
 
       if (r3>0) {
         if (g3>0) crear_ghost_vc(vcubo-64-8);
@@ -1065,4 +1065,4 @@ byte media(byte a,byte b) {
   return(find_col);
 }
 
-//����������������������������������������������������������������������������
+//----------------------------------------------------------------------------

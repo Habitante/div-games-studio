@@ -1,12 +1,12 @@
 
 // *** OJO *** Poner un M8 donde haya un M7 ...
 
-// *** OJO *** Quitar los OJOID de aqu� y de kernel
+// *** OJO *** Quitar los OJOID de aqu- y de kernel
 
 // quitar los //net de aqui y de f.cpp
 
 // *** OJO *** Que el usuario pueda determinar de alguna forma imem_max
-//             (o bien el n�mero de procesos m�ximo)
+//             (o bien el número de procesos máximo)
 // OJO !!! Convertir imem_max en variable
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -338,9 +338,9 @@ int DPMIalloc4k(void);
         "done:",\
         modify [ax bx cx si di] value [edx];
 
-//�����������������������������������������������������������������������������
+//-----------------------------------------------------------------------------
 // Initialise (setup)
-//�����������������������������������������������������������������������������
+//-----------------------------------------------------------------------------
 
 void check_mouse(void);
 int _mouse_x,_mouse_y;
@@ -368,10 +368,10 @@ void inicializacion (void) {
   fileinfo=(struct _fileinfo*)&mem[long_header+14+10*10+10*7+8+11+9+10*4+1026];
   video_modes=(struct _video_modes*)&mem[long_header+14+10*10+10*7+8+11+9+10*4+1026+146];
   iloc=mem[2];            // Start of local variables | Inicio de la imagen de las variables locales
-  iloc_len=mem[6]+mem[5]; // Length of local ( public and private ) | Longitud de las locales (p�blicas y privadas)
-  iloc_pub_len=mem[6];  	// Length of local public variables | Longitud de las variables locales p�blicas
+  iloc_len=mem[6]+mem[5]; // Length of local ( public and private ) | Longitud de las locales (públicas y privadas)
+  iloc_pub_len=mem[6];  	// Length of local public variables | Longitud de las variables locales públicas
   inicio_privadas=iloc_pub_len;
-  imem=mem[8];            // Final code , local and texts ( length cmp ) | Final de c�digo, locales y textos (longitud del cmp)
+  imem=mem[8];            // Final code , local and texts ( length cmp ) | Final de código, locales y textos (longitud del cmp)
 
   if (iloc_len&1) iloc_len++; if (!(imem&1)) imem++;
 
@@ -470,7 +470,7 @@ init_rnd(dtime);
   mouse->size=100;
   mouse->speed=2;
 
-  check_mouse(); // mouse->cursor = 1-No hay rat�n, 0-Si hay
+  check_mouse(); // mouse->cursor = 1-No hay ratón, 0-Si hay
 
   for (n=0;n<10;n++) { // En un principio no hay sistema de scroll, ni de m7
     (scroll+n)->z=512;
@@ -545,9 +545,9 @@ init_rnd(dtime);
   find_status=0;
 }
 
-//�����������������������������������������������������������������������������
+//-----------------------------------------------------------------------------
 //  Crea la tabla de cuadrados
-//�����������������������������������������������������������������������������
+//-----------------------------------------------------------------------------
 
 void crea_cuad(void) {
   int a,b;
@@ -561,9 +561,9 @@ void crea_cuad(void) {
   } while (++a<64);
 }
 
-//�����������������������������������������������������������������������������
+//-----------------------------------------------------------------------------
 //      Carga el font del sistema
-//�����������������������������������������������������������������������������
+//-----------------------------------------------------------------------------
 
 #include "06x08.h"
 
@@ -599,9 +599,9 @@ void system_font(void) {
   f_i[0].alto=8;
 }
 
-//�����������������������������������������������������������������������������
+//-----------------------------------------------------------------------------
 // Sistema multi-pila para funciones (DIV 2)
-//�����������������������������������������������������������������������������
+//-----------------------------------------------------------------------------
 
 // Funciones:
 //      guarda_pila(id,sp,mem[id+_SP]); // En lfrm y lfrf de funciones
@@ -725,9 +725,9 @@ void interprete (void)
 void es_fps(byte f) {
 }	
 #endif
-//�����������������������������������������������������������������������������
+//-----------------------------------------------------------------------------
 // Procesa el siguiente proceso
-//�����������������������������������������������������������������������������
+//-----------------------------------------------------------------------------
 #ifdef DEBUG
 int oreloj;
 #endif
@@ -796,9 +796,9 @@ void exec_process(void) {
 	}
 }
 
-//�����������������������������������������������������������������������������
-//  N�cleo interno del int�rprete
-//�����������������������������������������������������������������������������
+//-----------------------------------------------------------------------------
+//  Núcleo interno del intérprete
+//-----------------------------------------------------------------------------
 
 int oo; // Para usos internos en el kernel
 
@@ -815,9 +815,9 @@ void nucleo_exec() {
 	next_process2: ;
 }
 
-//�����������������������������������������������������������������������������
+//-----------------------------------------------------------------------------
 // Procesa la siguiente instruccion del siguiente proceso
-//�����������������������������������������������������������������������������
+//-----------------------------------------------------------------------------
 
 #ifdef DEBUG
 
@@ -867,9 +867,9 @@ void trace_process(void) {
 	id=ide;
 }
 
-//�����������������������������������������������������������������������������
-//  N�cleo interno del int�rprete, cuando se est� trazando
-//�����������������������������������������������������������������������������
+//-----------------------------------------------------------------------------
+//  Núcleo interno del intérprete, cuando se está trazando
+//-----------------------------------------------------------------------------
 
 void nucleo_trace(void) {
 
@@ -1062,11 +1062,11 @@ void frame_start(void) {
 	for (ide=id_start; ide<=id_end; ide+=iloc_len)
 		mem[ide+_Executed]=0;
 
-// Fija la prioridad m�xima, para ejecutar procesos seg�n _Priority
+// Fija la prioridad máxima, para ejecutar procesos según _Priority
 
 	id_old=id_start; // El siguiente a procesar
 
-// Posiciona las variables del rat�n
+// Posiciona las variables del ratón
 
 	readmouse();
 
@@ -1108,9 +1108,9 @@ void frame_start(void) {
 
 }
 
-//�����������������������������������������������������������������������������
+//-----------------------------------------------------------------------------
 // Ends a frame and print graphics
-//�����������������������������������������������������������������������������
+//-----------------------------------------------------------------------------
 
 void frame_end(void) {
 	int mouse_pintado=0,textos_pintados=0,drawings_pintados=0;
@@ -1127,7 +1127,7 @@ void frame_end(void) {
 	emscripten_run_script (buf);
 #endif
 
-	// Si el usuario modific� mouse.x o mouse.y, posiciona el rat�n debidamente
+	// Si el usuario modificó mouse.x o mouse.y, posiciona el ratón debidamente
 
 	if (!saltar_volcado) {
 
@@ -1182,7 +1182,7 @@ void frame_end(void) {
 
 	for (ide=id_start; ide<=id_end; ide+=iloc_len) {
 		mem[ide+_Executed]=0; // Sin ejecutar
-		mem[ide+_x1]=-1; // Sin regi�n de volcado
+		mem[ide+_x1]=-1; // Sin región de volcado
 	}
 
 	for (n=0;n<10;n++) {
@@ -1351,7 +1351,7 @@ void frame_end(void) {
 				if (post_process_buffer!=NULL)
 					post_process_buffer();
 
-    // Si se est� haciendo un fade lo contin�a
+    // Si se está haciendo un fade lo continúa
 
 				if (now_dacout_r!=dacout_r || now_dacout_g!=dacout_g || now_dacout_b!=dacout_b) {
 					set_paleta();
@@ -1390,7 +1390,7 @@ void frame_end(void) {
 
 							volcado_completo=0;
 
-							// A�ade los volcados de este frame a los restore del anterior
+							// Añade los volcados de este frame a los restore del anterior
 
 							for (n=id_start; n<=id_end; n+=iloc_len)
 								if (mem[n+_x1]!=-1) volcado_parcial(mem[n+_x0],mem[n+_y0],mem[n+_x1]-mem[n+_x0]+1,mem[n+_y1]-mem[n+_y0]+1);
