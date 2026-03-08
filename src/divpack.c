@@ -85,6 +85,7 @@ int pack(char *runtime, char *exefile, char *datafile, char *outfile) {
 	chmod(outfile,strtol("0777",NULL,8));
 #endif
 
+	return 1;
 }
 
 #ifdef STANDALONE

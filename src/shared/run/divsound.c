@@ -760,6 +760,7 @@ int GetSongPos(void)
 
   return(pos);
 #endif
+  return -1;
 }
 
 int GetSongLine(void)
@@ -778,6 +779,7 @@ int GetSongLine(void)
 
   return(pos);
 #endif
+  return -1;
 }
 
 int IsPlayingSong(void)

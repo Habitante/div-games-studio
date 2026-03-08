@@ -3716,7 +3716,7 @@ DWORD cchBuffer;
     driveStrings = (char*)malloc((cchBuffer + 1) * sizeof(char));
     if (driveStrings == NULL)
     {
-        return -1;
+        return;
     }
 
     // Fetch all drive strings    
@@ -3760,8 +3760,6 @@ DWORD cchBuffer;
     }
 
     free(driveStrings);
-
-    return 0;
 #endif
 #ifdef NOTYET
   int n,m,uni=0;
@@ -3838,6 +3836,7 @@ int GetHeapFree(int RetUsed) {
   }
   if(RetUsed) return(Use); else return(Free);
 #endif
+  return 0;
 }
 
 char *GetMemoryFree() {
@@ -3855,6 +3854,7 @@ char *GetMemoryFree() {
           MemInfo.data1+GetHeapFree(0),GetHeapFree(1),MaxMemUsed);
   return(MemoriaLibre);
 #endif
+  return MemoriaLibre;
 }
 
 void DebugFile(char *Cadena,char *Nombre) {

@@ -1851,7 +1851,7 @@ void lexico(void) {
       n=(strlen((char *)ivnom.b)+ptr4)/4;
       memcpy(&mem_ory[itxt],ivnom.b,strlen((char *)ivnom.b)+1);
 
-      if ((!ivnom.b[0]!='.' && ivnom.b[1]!=0) && (ivnom.b[0]!='/' && ivnom.b[1]!=0) && strcmp("/",(char *)ivnom.b) && (f=div_open_file((char *)ivnom.b))!=NULL) {
+      if ((ivnom.b[0]!='.' && ivnom.b[1]!=0) && (ivnom.b[0]!='/' && ivnom.b[1]!=0) && strcmp("/",(char *)ivnom.b) && (f=div_open_file((char *)ivnom.b))!=NULL) {
 	      fprintf(stdout,"FOUND FILE: [%s] [%s] [%s]\n",(char *)ivnom.b,full,(char *)&tipo[8]);
 
         empaquetable=0;
@@ -7366,7 +7366,7 @@ FILE * open_multi(char *file, char *mode) {
   if ( f = fpopen(full))
     return f;
 
-
+  return NULL;
 }
 
 FILE * div_open_file(char * file) {

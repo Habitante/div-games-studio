@@ -9,7 +9,11 @@
 //-----------------------------------------------------------------------------
 // IRQ Data
 //-----------------------------------------------------------------------------
+// DOS BIOS shift-status byte at 0x417 -- only meaningful under real-mode DOS.
+// On SDL2 builds shift_status is maintained by the SDL event loop instead.
+#ifdef DOS
 byte * shift = (byte *) 0x417; // Shift status
+#endif
 
 byte buf[64*3]; // {ascii,scan_code,shift_status}
 int ibuf=0; // Puntero al buffer, inicio de la cola
@@ -21,7 +25,7 @@ int fbuf=0; // Puntero al buffer, fin de la cola
 
 int ctrl_c=0;
 
-#ifdef NOTYET
+#ifdef DOS
 word * kb_start = (void*) 0x41a;
 word * kb_end = (void*) 0x41c;
 #endif

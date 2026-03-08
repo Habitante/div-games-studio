@@ -25,7 +25,11 @@ TIRQHandler OldIrqHandler;
 TIRQHandler OldIrq23;
 TIRQHandler OldIrq1b;
 
+// DOS BIOS shift-status byte at 0x417 -- only meaningful under real-mode DOS.
+// On SDL2 builds shift_status is maintained by the SDL event loop instead.
+#ifdef DOS
 byte * shift = (byte *) 0x417; // Shift status
+#endif
 
 byte buf[64*3]; // {ascii,scan_code,shift_status}
 int ibuf=0; // Puntero al buffer, inicio de la cola
@@ -86,6 +90,7 @@ TIRQHandler GetIRQVector(int n)
     int386x (0x21, &inregs, &outregs, &sregs);
     return (TIRQHandler)(MK_FP((word)sregs.es, outregs.x.ebx));
 #endif
+  return NULL;
 }
 
 //-----------------------------------------------------------------------------

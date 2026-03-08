@@ -71,8 +71,10 @@ void pinta_segmento_procesos(void);
 #define lf 10           // newline / linefeed 
 #define tab 9           // tabulation
 
+#ifdef DOS
 extern word * kb_start;
 extern word * kb_end;
+#endif
 extern int ibuf; // A pointer to the queue buffer
 extern int fbuf; // Puntero al buffer, fin de la cola
 
@@ -838,7 +840,7 @@ void editor() {
 
 //-----------------------------------------------------------------------------
 
-  if (!(shift_status&4) && ascii) {
+  if (!(shift_status&(4|8)) && ascii) {
     if (ascii==cr) f_enter(); else if (ascii!=0x1b) {
       if (modo_cursor) f_sobreescribir(); else f_insertar();
     }

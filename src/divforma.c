@@ -1400,8 +1400,8 @@ int cargadac_BMP(char *name)
   buffer=CopiaBuffer+14;
   memcpy(&InfoHeader,buffer,40);
   buffer=CopiaBuffer+54;
-  free(CopiaBuffer);
   if(FileHeader.bfType!=0x4D42) {
+    free(CopiaBuffer);
     fclose(file);
     return(0);
   }
@@ -1409,15 +1409,18 @@ int cargadac_BMP(char *name)
   {
     if(InfoHeader.biClrUsed) memcpy(Bmpdac, buffer, 4*InfoHeader.biClrUsed);
     else                     memcpy(Bmpdac, buffer, 4*256);
+    free(CopiaBuffer);
   }
   else if(InfoHeader.biBitCount==4)
   {
     memset (Bmpdac, 0, 1024);
     if(InfoHeader.biClrUsed) memcpy(Bmpdac, buffer, 4*InfoHeader.biClrUsed);
     else                     memcpy(Bmpdac, buffer, 4*16);
+    free(CopiaBuffer);
   }
   else
   {
+    free(CopiaBuffer);
     man = InfoHeader.biWidth;
     mal = InfoHeader.biHeight;
     fseek(file,0,SEEK_END); n=ftell(file);
