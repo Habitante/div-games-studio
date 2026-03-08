@@ -183,6 +183,52 @@ No behavioral changes — pure cleanup.
 
 ---
 
+## Phase 2.5 — SDL2 → SDL3 Migration
+
+Migrate from SDL2/SDL2_mixer to SDL3/SDL3_mixer. Not urgent — SDL2 will be
+maintained for years — but SDL3_mixer in particular offers real improvements
+for our audio code (native frequency ratio, raw PCM loading, unified audio type).
+
+**Pre-requisite:** Verify 32-bit package availability across platforms before starting.
+Check `mingw-w64-i686-SDL3`, `mingw-w64-i686-SDL3_mixer` in MSYS2, plus Linux/macOS
+equivalents if cross-platform is a goal.
+
+See [`reports/SDL3-MIGRATION-REPORT.md`](reports/SDL3-MIGRATION-REPORT.md) for the
+full analysis (~450 call sites, ~5-8 days estimated effort).
+
+### SDL_mixer → SDL3_mixer (largest task, ~3-5 days)
+- [ ] Replace channel-based model with explicit MIX_Track pool
+- [ ] Delete `freqEffect` callback — replaced by `MIX_SetTrackFrequencyRatio()`
+- [ ] Delete WAV-header-wrapping hacks (`DIVMIX_LoadPCM`, `SaveSoundMem`) — replaced by `MIX_LoadRawAudio()`
+- [ ] Make `SoundData` the authoritative buffer in PCM editor (MIX_Audio is opaque)
+- [ ] Port IDE audio: divpcm.c (~40 sites), divbrow.c, divmixer.c, divsound.c
+- [ ] Port runtime audio: shared/run/divsound.c (~35 sites), i.c
+- [ ] Update structs: `Mix_Chunk*` / `Mix_Music*` → `MIX_Audio*` in global.h, divsound.h
+
+### Event system (~1-2 days)
+- [ ] Flatten window events (SDL_WINDOWEVENT sub-dispatch → top-level event types)
+- [ ] Rename all event constants (SDL_KEYDOWN → SDL_EVENT_KEY_DOWN, etc.)
+- [ ] Flatten keyboard struct (event.key.keysym.sym → event.key.key)
+- [ ] Rebuild OSDEP_key[] table from scratch (SDL3 keycode values differ completely)
+- [ ] Add resize re-entrancy guard (SDL_SetWindowSize now fires RESIZED event)
+
+### Surface creation & palette (~0.5-1 day)
+- [ ] SDL_CreateRGBSurface → SDL_CreateSurface with pixel format enums
+- [ ] Add SDL_CreateSurfacePalette() after 8-bit surface creation (SDL3 doesn't auto-create)
+- [ ] Update surface->format access (now an enum, not a struct pointer)
+- [ ] SDL_FreeSurface → SDL_DestroySurface (~6 sites)
+
+### Trivial renames & build system (~0.5 day)
+- [ ] SDL_RWops → SDL_IOStream, SDL_RWFromMem → SDL_IOFromMem (~12 sites)
+- [ ] SDL_RenderCopy → SDL_RenderTexture, SDL_ShowCursor → SDL_HideCursor
+- [ ] SDL_INIT_EVERYTHING → explicit subsystem flags
+- [ ] Joystick index→ID overhaul (osd_sdl2.c)
+- [ ] Update CMakeLists.txt: SDL3 packages, include paths, link targets
+- [ ] Delete osd_sdl12.c / osd_sdl12.h (SDL 1.2 dead code)
+- [ ] Consider using SDL's Coccinelle patches for automated renames
+
+---
+
 ## Phase 3 — Minimum Viable Steam Product
 
 The features needed so a modern developer won't rage-quit in the first 10 minutes.
