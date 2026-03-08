@@ -392,9 +392,7 @@ int main(int argc, char * argv[]) {
 	unsigned n;
 	debugprintf("Welcome to DIV\n");
 	
-#ifdef SDL
 	OSDEP_Init();
-#endif
 
 	atexit(free_resources);
   

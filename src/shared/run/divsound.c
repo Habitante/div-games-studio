@@ -61,19 +61,17 @@ fprintf(stdout, "Opening Audio Device \n");
 
 
   print_init_flags(initted);
-#ifndef __EMSCRIPTEN__
 SDL_version compile_version;
 const SDL_version *link_version=Mix_Linked_Version();
 SDL_MIXER_VERSION(&compile_version);
-fprintf(stdout,"compiled with SDL_mixer version: %d.%d.%d\n", 
+fprintf(stdout,"compiled with SDL_mixer version: %d.%d.%d\n",
         compile_version.major,
         compile_version.minor,
         compile_version.patch);
-fprintf(stdout,"running with SDL_mixer version: %d.%d.%d\n", 
+fprintf(stdout,"running with SDL_mixer version: %d.%d.%d\n",
         link_version->major,
         link_version->minor,
         link_version->patch);
-#endif
 
   initted = 1;
 #endif
@@ -474,9 +472,6 @@ int DivPlaySound(int NumSonido, int Volumen, int Frec) // Vol y Frec (0..256)
   int loop=-1;
 #ifdef MIXER
 
-#if defined( __EMSCRIPTEN__ ) && !defined (SDL2)
-  loop = sonido[NumSonido].loop?-1:0;
-#endif
   // always play as loop, let the freqEffect manage stop_sound when loop is zero
   // this permits slow playing sound to run for the correct length.
 	con = Mix_PlayChannel(-1, sonido[NumSonido].sound, loop);
@@ -487,20 +482,15 @@ int DivPlaySound(int NumSonido, int Volumen, int Frec) // Vol y Frec (0..256)
     return(0);
   
   // Make sure all old callbacks are cleared
-#if ! defined( __EMSCRIPTEN__ ) || defined (SDL2)
   Mix_UnregisterAllEffects(con);
-#endif
 
   channels[con].freq = Frec;
   channels[con].vol = Volumen;
   channels[con].pos = 0;
 
-#if ! defined( __EMSCRIPTEN__ ) || defined (SDL2)
   // Setup our callback to change frequency
 		Mix_RegisterEffect(con, freqEffect, doneEffect,NULL);
     Mix_ChannelFinished(channelDone);
-//  Mix_SetPostMix(freq)
-#endif
 	
 	Mix_Volume(con,Volumen/2);
 	channels[con].num=NumSonido;
@@ -519,8 +509,6 @@ int StopSound(int NumChannel)
   
 #ifdef MIXER
 int x=99;
-#if ! defined( __EMSCRIPTEN__ ) || defined (SDL2)
-#endif
  if(Mix_Playing(NumChannel)) {
     Mix_HaltChannel(NumChannel);
   }
@@ -602,18 +590,13 @@ int IsPlayingSound(int NumChannel)
 #ifdef DIV2
 int LoadSong(char *ptr, int Len, int Loop)
 {
-#if ! defined( __EMSCRIPTEN__ ) || defined (SDL2)
 #ifdef MIXER
   int con=0;
 
   // Check we can load the file
-  SDL_RWops *rw = SDL_RWFromMem(ptr, Len); 
+  SDL_RWops *rw = SDL_RWFromMem(ptr, Len);
 
-  Mix_Music* music = Mix_LoadMUS_RW(rw
-#ifdef SDL2
-    ,0
-#endif
-    ); 
+  Mix_Music* music = Mix_LoadMUS_RW(rw, 0);
   if(!music)
   	return(-1);
 
@@ -653,24 +636,19 @@ int LoadSong(char *ptr, int Len, int Loop)
   if(judas_error != JUDAS_OK) return(-1);
 #endif
 
-  if((cancion[con].ptr=(char *)malloc(Len))==NULL) 
+  if((cancion[con].ptr=(char *)malloc(Len))==NULL)
     return(-1);
 
   memcpy(cancion[con].ptr, ptr, Len);
   cancion[con].loop=Loop;
 
-  rw = SDL_RWFromMem(cancion[con].ptr, Len); 
-  music = Mix_LoadMUS_RW(rw
-#ifdef SDL2
-    ,0
-#endif
-    ); 
+  rw = SDL_RWFromMem(cancion[con].ptr, Len);
+  music = Mix_LoadMUS_RW(rw, 0);
 
   cancion[con].music = music;
   cancion[con].rw = rw;
 
   return(con);
-#endif
 #endif
 return -1;
 }

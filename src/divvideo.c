@@ -28,10 +28,8 @@ void volcadosdl(byte *p);
 #define MISC_OUTPUT     0x3c2   //Miscellaneous Output register
 
 SDL_Surface *vga;
-#ifdef SDL2
 SDL_Window *divWindow;
 SDL_Renderer *divRender;
-#endif
 
 int IsFullScreen(SDL_Surface *surface)
 {

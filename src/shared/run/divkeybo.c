@@ -192,7 +192,6 @@ void checkmod(OSDEPMod mod) {
         if (mod & KMOD_NUM) shift_status |=32;
 }
 
-#ifdef SDL2
 #include <SDL2/SDL_events.h>
 
 void PrintEvent(const SDL_Event * event)
@@ -259,7 +258,6 @@ void PrintEvent(const SDL_Event * event)
         }
     }
 }
-#endif
 
 
 int8_t hx=0,hy=0; // hat xy positions
@@ -273,22 +271,7 @@ if(vwidth == 0 && vheight == 0) {
 }
 	while(SDL_PollEvent(&event)) {	
 		// check keys
-#ifdef SDL2
 	PrintEvent(&event);
-#endif
-
-#ifdef SDL
-		if (event.type == SDL_VIDEORESIZE) {
-			if(event.resize.w!=320 && event.resize.h!=200) {
-				vwidth = event.resize.w;
-				vheight = event.resize.h;
-			} else {
-				svmode();
-			}
-			
-        }
-
-#endif
 
             /* If a quit event has been sent */
 		if (event.type == SDL_QUIT)
@@ -324,14 +307,6 @@ if(vwidth == 0 && vheight == 0) {
 		ascii = event.key.keysym.scancode;
 		checkmod((OSDEPMod) event.key.keysym.mod);
 
-// unicode not working on android
-#ifndef DROID
-#ifndef SDL2
-		if(event.key.keysym.unicode<0x80) {
-			ascii = event.key.keysym.unicode;
-		}					
-#endif
-#endif
 		kbdFLAGS[scan_code]=1;
 	}
 	
@@ -350,9 +325,7 @@ if(vwidth == 0 && vheight == 0) {
 		if(vga_an != vwidth || vga_al != vheight) {
 			mouse->x = (int)(event.motion.x*(float)((float)vga_an / (float)vwidth));
 			mouse->y = (int)(event.motion.y*(float)((float)vga_al / (float)vheight));
-#ifdef SDL2
 			SDL_Log("Mouse: VX: %d VY: %d x: %d y: %d\n",mouse->x, mouse->y, event.motion.x,event.motion.y);
-#endif
 		}
 
 	}

@@ -49,12 +49,10 @@ void read_mouse(void) {
 	int s,shift=0;
 
 	old_mouse_b=mouse_b;
-#ifdef SDL2
 	if(vwidth == 0 && vheight == 0 ) {
 		vwidth = vga_an;
 		vheight = vga_al;
 	}
-#endif
 	read_mouse2();
 
 	if (modo<100 && hotkey && !help_paint_active) 
@@ -82,13 +80,11 @@ void read_mouse(void) {
 			}
 			* */
 		}
-#ifdef SDL2
 	if(vga_an != vwidth || vga_al != vheight) {
 		mouse_x = (int)(m_x*(float)((float)vga_an / (float)vwidth));// / (float)vga_an);
 		mouse_y = (int)(m_y*(float)((float)vga_al / (float)vheight));// / (float)vga_al);
 
 	}
-#endif
 
 
 	} else if (modo<100 && hotkey && !help_paint_active) { // Las teclas est�n solo activas en edici�n
@@ -285,7 +281,6 @@ void checkmod(OSDEPMod mod) {
 int soundstopped=0;
 
 
-#ifdef SDL2
 #include <SDL2/SDL_events.h>
 
 void PrintEvent(const SDL_Event * event)
@@ -356,7 +351,6 @@ void PrintEvent(const SDL_Event * event)
         }
     }
 }
-#endif
 
 void read_mouse2(void) {
 
@@ -370,27 +364,9 @@ void read_mouse2(void) {
 	
 while(SDL_PollEvent(&event) )
         {
-#ifdef SDL2
 	PrintEvent(&event);
-#endif
 
-#ifndef SDL2
-			if (event.type == SDL_VIDEORESIZE) {
-//				printf("RESIZING\n");
-				vga_an = event.resize.w;
-				vga_al = event.resize.h;
-				if(div_started) {
-					EndSound();
-					soundstopped=1;
-				}
-//				volcado_parcial(0,0,vga_an-1,vga_al-1);
-//				SDL_PauseAudio(0);
-				
-            }
-#endif
-
-#ifdef SDL2
-            // Text input for SDL2 — only set ascii, not scan_code.
+            // Text input — only set ascii, not scan_code.
             // scan_code is set by SDL_KEYDOWN via OSDEP_key[] (DOS scan codes).
             // Setting scan_code to ASCII here caused collisions: e.g. 'M'=77
             // matches Right Arrow, so Shift+M triggered Shift+Right in editor.
@@ -398,14 +374,13 @@ while(SDL_PollEvent(&event) )
             	ascii = event.text.text[0];
             }
             if(event.type == SDL_MOUSEWHEEL) {
-            		
+
             	if(event.wheel.y>0) {
 					m_b |= 8;
 	        	} else {
 					m_b |= 4;
         		}
             }
-#endif
 
 			if(event.type == SDL_JOYAXISMOTION) {			// Analog joystick movement
 				
@@ -472,18 +447,6 @@ while(SDL_PollEvent(&event) )
 				{
 					m_b |= 2;
 				}
-#ifndef SDL2
-				if(event.button.button == SDL_BUTTON_WHEELUP)
-				{
-					m_b |= 8;
-					break;
-				}
-				if(event.button.button == SDL_BUTTON_WHEELDOWN)
-				{
-					m_b |= 4;
-					break;
-				}
-#endif
 			//	printf("click\n");
 //				m_b = 1;
 			}
@@ -498,15 +461,7 @@ while(SDL_PollEvent(&event) )
 				scan_code = OSDEP_key[event.key.keysym.sym<2048?event.key.keysym.sym:event.key.keysym.sym-0x3FFFFD1A];
 			}
 		//		ascii = scan_code;
-#ifndef DROID
-#ifndef SDL2
-				if(event.key.keysym.unicode<0x80 && scan_code !=83 && event.key.keysym.unicode>=0)
-					ascii = event.key.keysym.unicode&0xFF;
-#endif
-#endif
 
-
-#ifdef SDL2
 				// fix backspace in editor
 				if(scan_code==14)
 					ascii = 8;
@@ -516,7 +471,6 @@ while(SDL_PollEvent(&event) )
 
 				if(scan_code==15)
 					ascii=9;
-#endif
 //				fprintf(stdout, "ascii: %d scancode: %d 0x%x\n", ascii, scan_code,scan_code);
 				key(scan_code)=1;
 			}
@@ -540,26 +494,11 @@ while(SDL_PollEvent(&event) )
 
 				if(event.button.button ==SDL_BUTTON_RIGHT)
 					m_b &= ~2;
-#ifndef SDL2
-				if(event.button.button == SDL_BUTTON_WHEELUP)
-				{
-					m_b &= ~8;
-				}
-
-				if(event.button.button == SDL_BUTTON_WHEELDOWN)
-				{
-					m_b &= ~4;
-
-				}
-#endif
 			}
 			
         }
 	if(soundstopped==1) {
 
-#ifndef SDL2
-		SDL_putenv("SDL_VIDEO_WINDOW_POS=default"); 
-#endif
 		//SDL_SetVideoMode(event.resize.w, event.resize.h, 8,  SDL_HWSURFACE | SDL_RESIZABLE);
 		//				bW = buffer->w; bH = buffer->h;
 		

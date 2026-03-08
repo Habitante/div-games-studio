@@ -1128,10 +1128,6 @@ void frame_end(void) {
 #endif
 
 	// Si el usuario modific� mouse.x o mouse.y, posiciona el rat�n debidamente
-#ifndef SDL2
-	if (_mouse_x!=mouse->x || _mouse_y!=mouse->y) 
-		set_mouse(mouse->x,mouse->y);
-#endif
 
 	if (!saltar_volcado) {
 

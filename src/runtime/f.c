@@ -2001,9 +2001,7 @@ vvga_al = vga_al;
   } else {
     svmode();
   }
-#ifdef SDL2
   OSDEP_SetWindowSize(vga_an, vga_al);
-#endif
 
   dacout_speed=0; set_dac();
 

@@ -16,15 +16,13 @@
 #define MISC_OUTPUT     0x3c2   //Miscellaneous Output register
 
 #ifdef DOS
-byte * vga = (byte *) 0xA0000; // Physical screen 
+byte * vga = (byte *) 0xA0000; // Physical screen
                                // TODO - (change this to SDL surface pixels)
 #else
 SDL_Surface *vga=NULL;
-#ifdef SDL2
 SDL_Window *divWindow=NULL;
 SDL_Renderer *divRender=NULL;
 SDL_Texture *divTexture=NULL;
-#endif
 
 #endif
 
@@ -398,18 +396,10 @@ void rvmode(void) {
 //�����������������������������������������������������������������������������
 void volcadosdl(byte *p) {
 	
-#ifndef SDL2
-	if(!vga) {
-		printf("setting up screen for first time %d %d\n",vga_an,vga_al);
-		svmode();
-		set_dac(); // tabla_ghost();
-	}
-#else
 	SDL_UpdateTexture(divTexture, NULL, copia, vga_an * sizeof (Uint8));
 SDL_RenderClear(divRender);
 SDL_RenderCopy(divRender, divTexture, NULL, NULL);
 SDL_RenderPresent(divRender);
-#endif
 
 	if(SDL_MUSTLOCK(vga))
 		SDL_LockSurface(vga);
