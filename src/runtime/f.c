@@ -2105,12 +2105,11 @@ extern int MusicChannels;
 void stop_sound(void) {
 #ifdef MIXER
   int x;
-//  if(pila[sp]==-1) {
-//    for(x=0; x<CHANNELS; x++) StopSound(x);
-//  } else {
-
+  if(pila[sp]==-1) {
+    for(x=0; x<CHANNELS; x++) StopSound(x);
+  } else {
     StopSound(pila[sp]-1);
-//  }
+  }
 #endif
   pila[sp]=0;
 }

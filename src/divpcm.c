@@ -152,7 +152,7 @@ void PCM2(void) {
   pcminfo *mypcminfo=(pcminfo *)v.aux;
 
   if(mouse_b&1) {
-    if ( false /*judascfg_device == DEV_NOSOUND */) {
+    if (!SoundActive) {
       if ( SoundError ) {
         v_texto=(char *)texto[549]; dialogo(errhlp0);
         if (v_aceptar) help(2008);

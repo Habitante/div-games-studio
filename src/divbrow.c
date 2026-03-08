@@ -1513,7 +1513,7 @@ void browser0(void) {
     larchivosbr.al=8;
   }
 
-  if(v_thumb==7 && false /*judascfg_device == DEV_NOSOUND*/) opc_pru=0;
+  if(v_thumb==7 && !SoundActive) opc_pru=0;
 
 }
 

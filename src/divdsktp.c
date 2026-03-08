@@ -511,9 +511,7 @@ int UpLoad_Desktop()
                                 fread(SongPathName,1,256,desktop);
                                 if ((f=fopen(SongPathName,"rb"))!=NULL) {
                                   fclose(f);
-                                 //if ( judascfg_device != DEV_NOSOUND ) {
                                     OpenDesktopSong();
-                                 // }
                                 }
                                 break;
                 }

@@ -3693,9 +3693,7 @@ fclose(f);
   volcado(copia);
 
   InitSound();
-/*
-  if(judascfg_device!=DEV_NOSOUND) set_init_mixer();
-*/
+  if(SoundActive) set_init_mixer();
 }
 
 //�����������������������������������������������������������������������������

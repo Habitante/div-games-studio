@@ -1098,7 +1098,7 @@ void menu_sonidos2(void) {
 
       case 1:
 
-        if ( false /*judascfg_device == DEV_NOSOUND*/) {
+        if (!SoundActive) {
           if ( SoundError ) {
             v_texto=(char *)texto[549]; dialogo(errhlp0);
             if (v_aceptar) help(2008);
@@ -1107,19 +1107,12 @@ void menu_sonidos2(void) {
             if (v_aceptar) help(2009);
           }
           return;
-        } else if( false /*judascfg_device != DEV_SBPRO &&
-                   judascfg_device != DEV_SB16 */ ) {
+        } else if (!SoundActive) {
           v_texto=(char *)texto[575]; dialogo(err0);
           return;
         }
 
-//        judas_stopsample(0);
-//        sbmalloc();
-
-        if(true /*aligned[0]!=NULL && aligned[1]!=NULL */) 
-			dialogo(RecSound0);
-        else { v_texto=(char *)texto[45];dialogo(err0); }
-//        sbfree();
+        dialogo(RecSound0);
         break;
 
       case 2:
@@ -1190,7 +1183,7 @@ void menu_sonidos2(void) {
         break;
 
       case 8:
-        if ( false /*judascfg_device == DEV_NOSOUND*/ ) {
+        if (!SoundActive) {
           if ( SoundError ) {
             v_texto=(char *)texto[549]; dialogo(errhlp0);
             if (v_aceptar) help(2008);

@@ -23,6 +23,8 @@ int audio_buffers = 4096;
  
 if(Mix_OpenAudio(audio_rate, audio_format, audio_channels, audio_buffers) != 0) {
 	fprintf(stderr, "Unable to initialize audio: %s\n", Mix_GetError());
+} else {
+	SoundActive = 1;
 }
 
 #endif
