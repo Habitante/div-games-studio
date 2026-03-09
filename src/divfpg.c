@@ -487,7 +487,7 @@ void abrir_fichero(void) {
 				sum=0; 
 
 				do { 
-					sum+=abs((memptrsize)pal[x]-(memptrsize)dac4[x]); 
+					sum+=abs((int)pal[x]-(int)dac4[x]);
 				} while (++x<768);
 
 				if (sum) {
@@ -523,7 +523,7 @@ void abrir_fichero(void) {
 	x=0; 
 	sum=0; 
 	do { 
-		sum+=abs((memptrsize)pal[x]-(memptrsize)dac[x]); 	
+		sum+=abs((int)pal[x]-(int)dac[x]);
 	} while (++x<768);
 
 	if (sum) {
@@ -673,7 +673,7 @@ int RemapAllFiles(int vent) {
 		x=0; sum=0;
 
 		do {
-			sum+=abs((memptrsize)dac[x]-(memptrsize)p[x]); 
+			sum+=abs((int)dac[x]-(int)p[x]);
 		} while (++x<768);
 
 		if (!sum)
@@ -1055,7 +1055,7 @@ void printlist0(void) {
 void Print_List(void) {
 	FPG *MiFPG;
 	HeadFPG cab;
-	FILE * f, * g;
+	FILE * f=NULL, * g;
 	int n,vent;
 	int _num=0,num=0;
 	char cwork[128],cwork2[13];

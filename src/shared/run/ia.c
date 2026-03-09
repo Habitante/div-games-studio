@@ -316,7 +316,7 @@ int calcula_vertices(int * ptr, int max_ver, int x0, int y0, int x1, int y1) {
   int d;                  // Distancia de la casilla actual al inicio
   int x,y;                // Siguiente punto
   int xx,yy;              // Punto actual (hasta el que SI puede ir seguro)
-  int newdir;             // Temporal (para calcular la siguiente casilla)
+  int newdir=0;           // Temporal (para calcular la siguiente casilla)
   int dir;                // Direcciones en las que puede ir ...
   int cas;                // Casilla actual (bx+by*max_map_size)
   int n;                  // Un simple contador

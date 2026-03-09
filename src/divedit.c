@@ -1550,8 +1550,8 @@ void rellena_colin(void) {  // Función para obtener los colores de la siguiente
 void _completo(void) {
   int ancho,alto;
   byte *di,*si,*old_di;
-  byte *s,*_kini;
-  int n,_kcol1;
+  byte *s,*_kini=NULL;
+  int n,_kcol1=0;
   int x,col0,col1;
   int an,al,_an=0,_al=0;
   int i;
@@ -1679,8 +1679,8 @@ void _completo(void) {
 void _parcial(void) {
   int linea,ancho;
   byte *di,*si,*old_di;
-  byte *s,*_kini;
-  int n,_kcol1;
+  byte *s,*_kini=NULL;
+  int n,_kcol1=0;
   int x,col0,col1;
   int an,al,_an=0,_al=0;
   int i;
@@ -2369,7 +2369,7 @@ void write_line(void) {
   fin=v.prg->lptr+strlen(v.prg->l); // Donde debe ir
 
   if (ini<v.prg->buffer+old_lon) {
-    lon=(memptrsize)v.prg->buffer+old_lon-(memptrsize)ini;
+    lon=(uintptr_t)v.prg->buffer+old_lon-(uintptr_t)ini;
     memmove(fin,ini,lon);
     if (kini>ini && kini<ini+lon) kini+=fin-ini;
     if (kfin>ini && kfin<ini+lon) kfin+=fin-ini;
@@ -2392,7 +2392,7 @@ void delete_line(void) {
   fin=v.prg->lptr+strlen(v.prg->l); // Donde debe ir
 
   if (ini<v.prg->buffer+old_lon) {
-    lon=(memptrsize)v.prg->buffer+old_lon-(memptrsize)ini;
+    lon=(uintptr_t)v.prg->buffer+old_lon-(uintptr_t)ini;
     memmove(fin,ini,lon);
     if (kini>=ini && kini<ini+lon) kini+=fin-ini;
     if (kfin>=ini && kfin<ini+lon) kfin+=fin-ini;

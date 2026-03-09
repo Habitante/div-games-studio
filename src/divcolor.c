@@ -120,7 +120,7 @@ void clexico(void) {
   struct clex_ele * e;
   int n;
 
-  switch ((memptrsize)clex_case[*_source]) { // Puntero a un clex_ele o l_???
+  switch ((uintptr_t)clex_case[*_source]) { // Puntero a un clex_ele o l_???
 
     case l_err:
       cpieza=p_rem; _source++; break;
@@ -139,7 +139,7 @@ void clexico(void) {
       while (*ptr && strcmp((char *)(ptr+2),(char *)_ivnom+ptr8)) ptr=(byte **)*ptr;
       if (!strcmp((char *)(ptr+2),(char *)_ivnom+ptr8)) { // id encontrado
         icvnom.b=_ivnom; // lo saca de cvnom
-        cpieza=(memptrsize)*(ptr+1);
+        cpieza=(intptr_t)*(ptr+1);
         if (cpieza<256 && cpieza>=0) { // palabra reservada (token)
           if (cpieza==p_rem) {
             while (*_source!=cr && *_source) _source++;
@@ -176,11 +176,11 @@ void clexico(void) {
       cpieza=p_num;
       if (*_source=='0' && lower[*(_source+1)]=='x') {
         _source+=2;
-        while ((memptrsize)clex_case[*_source]==l_num ||
+        while ((uintptr_t)clex_case[*_source]==l_num ||
                (lower[*_source]>='a' && lower[*_source]<='f')) {
           _source++;
         }
-      } else do { _source++; } while ((memptrsize)clex_case[*_source]==l_num);
+      } else do { _source++; } while ((uintptr_t)clex_case[*_source]==l_num);
       break;
 
     default: // puntero a un clex_ele
@@ -221,7 +221,7 @@ void col_analiza_ltlex(void){
   int len;
   struct clex_ele * e;
 
-  int t; //token (cpieza)
+  int t=0; //token (cpieza)
   byte h; //hash (para id)
   byte * _ivnom;
   byte * * ptr;

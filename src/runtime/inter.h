@@ -63,7 +63,9 @@ void call(const voidReturnType func); // void funcion(void); int n=(int)funcion;
 #define debugprintf(...) 
 #endif
 
+#ifdef _MSC_VER
 #pragma check_stack(off)
+#endif
 
 #define DPMI_INT 0x31
 

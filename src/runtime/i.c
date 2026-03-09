@@ -391,7 +391,7 @@ void inicializacion (void) {
 
   if((ghost_inicial=(byte*)malloc(65536+512))==NULL) exer(1);
 
-  ghost=(byte *)((memptrsize)(ghost_inicial+512));//&0xFFFFFF00);
+  ghost=(byte *)((uintptr_t)(ghost_inicial+512));//&0xFFFFFF00);
 
   crea_cuad();
 
@@ -535,7 +535,7 @@ init_rnd(dtime);
   memset(tabfiles, 0, 32*4);
 
   for(n=0; n<128; n++) {
-    sonido[n].smp  = NULL;
+    sonido[n].smp  = 0;
     cancion[n].ptr = NULL;
   }
 
@@ -625,7 +625,7 @@ void guarda_pila(int id, int sp1, int sp2) {
   		break;
   }
   printf("using stack: %d\n",stacks);
-  stack[stacks]=p;
+  stack[stacks]=(memptrsize)(uintptr_t)p;
   
   if (p!=NULL) {
     mem[id+_SP]=stacks;
@@ -638,9 +638,9 @@ void carga_pila(int id) {
   int n;
   int32_t * p;
   if (mem[id+_SP]) {
-    p=stack[mem[id+_SP]];
-    
-    for (n=0;n<=p[1]-p[0];n++) 
+    p=(int32_t*)(uintptr_t)stack[mem[id+_SP]];
+
+    for (n=0;n<=p[1]-p[0];n++)
     	pila[p[0]+n]=p[n+2];
 
 //    free(stack[mem[id+_SP]]);
@@ -654,7 +654,7 @@ void carga_pila(int id) {
 void actualiza_pila(int id, int valor) {
   int32_t * p;
   if (mem[id+_SP]) {
-    p=stack[mem[id+_SP]];
+    p=(int32_t*)(uintptr_t)stack[mem[id+_SP]];
     p[p[1]-p[0]+2]=valor;
   }
 }
@@ -1122,8 +1122,8 @@ void frame_start(void) {
 
 void frame_end(void) {
 	int mouse_pintado=0,textos_pintados=0,drawings_pintados=0;
-	int mouse_x0,mouse_x1,mouse_y0,mouse_y1;
-	int n,m7ide,scrollide,otheride,retra=0;
+	int mouse_x0=0,mouse_x1=0,mouse_y0=0,mouse_y1=0;
+	int n=0,m7ide,scrollide,otheride,retra=0;
 	char buf[255];
 
 #ifdef DEBUG
@@ -1922,8 +1922,8 @@ for(a=0;a<10;a++){
 
 dp=(byte*)malloc(len);
 mem=(int*)malloc(4*len);//imem_max+1032*5+16*1025+3);
-mem=(int*)((((memptrsize)mem+3)/4)*4);
-memset(mem,0,((((memptrsize)mem+3)/4)*4));
+mem=(int*)((((uintptr_t)mem+3)/4)*4);
+memset(mem,0,((((uintptr_t)mem+3)/4)*4));
         memb=(byte*)mem;
         memw=(word*)mem;
 fseek(f,div1stubsize,SEEK_SET);
@@ -1963,7 +1963,7 @@ dump(len-div1stubsize);
 
   if ((mem=(int*)malloc(4*imem_max+1032*5+16*1025+3))!=NULL){
 
-    mem=(int*)((((memptrsize)mem+3)/4)*4);
+    mem=(int*)((((uintptr_t)mem+3)/4)*4);
 
     filenames=(char*)&mem[imem_max+258*5]; // Buffer de 16*1025 para dirinfo[].name
 
@@ -2037,9 +2037,9 @@ if(m) {
 
 #ifdef DEBUG
 		printf("Joyname:    %s\n", OSDEP_JoystickName(0));
-		printf("NumAxes: %d: Numhats: %d : NumButtons: %d\n",OSDEP_JoystickNumAxes(divjoy), OSDEP_JoystickNumHats(divjoy),OSDEP_JoystickNumButtons(divjoy));
-#endif		
-	if (OSDEP_JoystickNumHats(divjoy)==0)  {
+		printf("NumAxes: %d: Numhats: %d : NumButtons: %d\n",OSDEP_JoystickNumAxes(0), OSDEP_JoystickNumHats(0),OSDEP_JoystickNumButtons(0));
+#endif
+	if (OSDEP_JoystickNumHats(0)==0)  {
 		OSDEP_JoystickClose(divjoy);
 		divjoy=NULL;
 	}

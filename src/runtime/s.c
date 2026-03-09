@@ -1183,11 +1183,11 @@ void sp_rotado(byte * si, int x, int y, int an, int al, int xg, int yg,
   float a,s;
   int p[24];
   int h,hmin,hmax; // Altura minima y maxima
-  int n,l0,l1;   // Lado 0 y lado 1 (indices p[])
+  int n,l0=0,l1;   // Lado 0 y lado 1 (indices p[])
 
   int hmax0,hmax1;
-  union { int32_t l; int16_t w[2]; } x0,x1,g0x,g1x,g0y,g1y;
-  int ix0,ix1,ig0x,ig1x,ig0y,ig1y,kk;
+  union { int32_t l; int16_t w[2]; } x0,x1,g0x={0},g1x={0},g0y={0},g1y={0};
+  int ix0=0,ix1=0,ig0x=0,ig1x=0,ig0y=0,ig1y=0,kk;
   byte * ptrcopia;
 
   a=(float)ang/radian; s=(float)size/100; xg=-xg; yg=-yg;
@@ -1741,7 +1741,7 @@ void pinta_textos(int n) { // E: texto[]
   int x,y,an,al;
   int fuente;
 
-  byte * ptr,* ptr2;
+  byte * ptr=NULL,* ptr2;
   byte numero[32];
 
   do if (texto[n].font) {
@@ -1933,7 +1933,7 @@ void pinta_sprites_m7(int n,int cx,int cy,float ang) { // Le pasamos la posició
   int oreloj;
   #endif
   int cx2=cx/4096,cy2=cy/4096,dx,dy;
-  int ide,id,max,distmax,old_z;
+  int ide,id,max,distmax,old_z=0;
   int altura,h,anchura,porcen;
   float a;
 

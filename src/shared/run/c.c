@@ -228,7 +228,7 @@ void collision(void) {
 
 int comprobar_colisiones(int i,int bloque,int scroll) {
   int file,graph,angle;
-  int *ptr,n,m,j;
+  int *ptr,n=0,m,j;
   int x,y,dist=0;
   int xx,yy,an,al;
   short xg,yg,xxg,yyg;
@@ -461,11 +461,11 @@ void put_collision(byte * buffer, int * ptr, int x, int y, int xg, int yg, int a
 void sp_rotado_p(byte * si, int an, int al, int flags) {
 
   int h,hmin,hmax; // Altura minima y maxima
-  int n,l0,l1;   // Lado 0 y lado 1 (indices p[])
+  int n,l0=0,l1;   // Lado 0 y lado 1 (indices p[])
 
   int hmax0,hmax1;
-  union { int l; short w[2]; } x0,x1,g0x,g1x,g0y,g1y;
-  int ix0,ix1,ig0x,ig1x,ig0y,ig1y,kk;
+  union { int l; short w[2]; } x0,x1,g0x={0},g1x={0},g0y={0},g1y={0};
+  int ix0=0,ix1=0,ig0x=0,ig1x=0,ig0y=0,ig1y=0,kk;
   byte * ptrcopia;
 
   memcpy(&p[8],&p[0],sizeof(p[0])*8); memcpy(&p[16],&p[0],sizeof(p[0])*8);
@@ -772,11 +772,11 @@ void test_escalado(byte * old_si, int x, int y, int an, int al, int xg, int yg,
 void test_rotado(byte * si, int an, int al, int flags) {
 
   int h,hmin,hmax; // Altura minima y maxima
-  int n,l0,l1;     // Lado 0 y lado 1 (indices p[])
+  int n,l0=0,l1;     // Lado 0 y lado 1 (indices p[])
 
   int hmax0,hmax1;
-  union { int l; short w[2]; } x0,x1,g0x,g1x,g0y,g1y;
-  int ix0,ix1,ig0x,ig1x,ig0y,ig1y,kk;
+  union { int l; short w[2]; } x0,x1,g0x={0},g1x={0},g0y={0},g1y={0};
+  int ix0=0,ix1=0,ig0x=0,ig1x=0,ig0y=0,ig1y=0,kk;
   byte * ptrcopia;
 
   memcpy(&p[8],&p[0],sizeof(p[0])*8); memcpy(&p[16],&p[0],sizeof(p[0])*8);

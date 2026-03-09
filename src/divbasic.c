@@ -879,10 +879,10 @@ void draw_selection_box(int _x0,int _y0,int _x1,int _y1) {
       n=x1-x0+1;
       p=copia+vga_an*y0+x0;
       if ((y0^cclock)&1) do {
-        if ((memptrsize)p&1) *p=c0; else *p=c4; p++;
+        if ((uintptr_t)p&1) *p=c0; else *p=c4; p++;
       } while (--n);
       else do {
-        if ((memptrsize)p&1) *p=c4; else *p=c0; p++;
+        if ((uintptr_t)p&1) *p=c4; else *p=c0; p++;
       } while (--n);
     }
 
@@ -891,10 +891,10 @@ void draw_selection_box(int _x0,int _y0,int _x1,int _y1) {
       n=x1-x0+1;
       p=copia+vga_an*y1+x0;
       if ((y1^cclock)&1) do {
-        if ((memptrsize)p&1) *p=c0; else *p=c4; p++;
+        if ((uintptr_t)p&1) *p=c0; else *p=c4; p++;
       } while (--n);
       else do {
-        if ((memptrsize)p&1) *p=c4; else *p=c0; p++;
+        if ((uintptr_t)p&1) *p=c4; else *p=c0; p++;
       } while (--n);
     }
 

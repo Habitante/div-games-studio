@@ -239,11 +239,11 @@ void crear_ghost(int puntos) {
       fast_ghost: *(ghost+n*256+m)=find_col;
                   *(ghost+m*256+n)=find_col;
 
-      if (puntos) if ((punto++&2047)==0) cprintf(".");
+      if (puntos) { if ((punto++&2047)==0) { cprintf("."); } }
     } while (++m<n);
   } while (--n);
 
-  do { *(ghost+n*256+n)=n; } while(++n<256); if (puntos) cprintf(".\r\n");
+  do { *(ghost+n*256+n)=n; } while(++n<256); if (puntos) { cprintf(".\r\n"); }
 
 }
 

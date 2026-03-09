@@ -237,7 +237,7 @@ void descomprime_PCX(byte *buffer, byte *mapa, int vent)
   unsigned int last_byte,bytes_line;
   char ch, rep;
   pcx_header header;
-  byte *pSrc, *pDest, *pSrcLine, *AuxPtr;
+  byte *pSrc=NULL, *pDest, *pSrcLine, *AuxPtr;
   int  rgb_color, x, y;
   byte rgb_blue, rgb_green, rgb_red;
   byte color16;
@@ -1418,7 +1418,10 @@ int cargadac_BMP(char *name)
     else                     memcpy(Bmpdac, buffer, 4*16);
     free(CopiaBuffer);
   }
-  else
+  free(CopiaBuffer);
+  CopiaBuffer = NULL;
+  buffer = NULL;
+  if(!((InfoHeader.biBitCount==8 && !cargar_paleta) || InfoHeader.biBitCount==4))
   {
     free(CopiaBuffer);
     man = InfoHeader.biWidth;

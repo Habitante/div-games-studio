@@ -1052,7 +1052,7 @@ void stop_scroll(void) {
 void elimina_proceso(int);
 
 void kill_invisible(void) {
-  int i,n;
+  int i,n=0;
   for (i=id_start; i<=id_end; i+=iloc_len) {
 	  if (mem[i+_Status]) { 
 		n=0;
@@ -2902,7 +2902,7 @@ void _strcpy(void) {
   if ((unsigned)pila[sp]>255) if ((mem[pila[sp-1]-1]&0xFFFFF)+1<strlen((char*)&mem[pila[sp]])) {
     sp--; e(140); return;
   }
-  if ((unsigned)pila[sp]>255) strcpy((char*)&mem[pila[sp-1]],(char*)&mem[pila[sp]]);
+  if ((unsigned)pila[sp]>255) memmove((char*)&mem[pila[sp-1]],(char*)&mem[pila[sp]],strlen((char*)&mem[pila[sp]])+1);
   else mem[pila[sp-1]]=pila[sp];
   sp--;
 }
@@ -2916,8 +2916,15 @@ void _strcat(void) {
   if ((mem[pila[sp-1]-1]&0xFFFFF)+1<strlen((char*)&mem[pila[sp-1]])+n) {
     sp--; e(140); return;
   }
-  if ((unsigned)pila[sp]>255) strcat((char*)&mem[pila[sp-1]],(char*)&mem[pila[sp]]);
-  else sprintf((char*)&mem[pila[sp-1]],"%s%c%c",(char*)&mem[pila[sp-1]],pila[sp],'\0');
+  if ((unsigned)pila[sp]>255) {
+    char *dst=(char*)&mem[pila[sp-1]];
+    int dlen=strlen(dst);
+    memmove(dst+dlen,(char*)&mem[pila[sp]],strlen((char*)&mem[pila[sp]])+1);
+  } else {
+    char *dst=(char*)&mem[pila[sp-1]];
+    int dlen=strlen(dst);
+    dst[dlen]=(char)pila[sp]; dst[dlen+1]=0;
+  }
   sp--;
 }
 
@@ -4222,9 +4229,9 @@ void _malloc(void) {
 
   memset(divmalloc[con].ptr,0,pila[sp]*4+4+3);
 
-  p=(byte*) ( ( ( (memptrsize) divmalloc[con].ptr+3) /4)*4 );
+  p=(byte*) ( ( ( (uintptr_t) divmalloc[con].ptr+3) /4)*4 );
 
-  divmalloc[con].imem1=((memptrsize)p-(memptrsize)mem)/4;
+  divmalloc[con].imem1=((uintptr_t)p-(uintptr_t)mem)/4;
 
   if (!(divmalloc[con].imem1&1)) divmalloc[con].imem1++;
 

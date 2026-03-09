@@ -153,8 +153,9 @@ void set_dac (void) {
           colors[i].b=dac[b+2]*4;
           b+=3;
     }
-	if(!OSDEP_SetPalette(vga, colors, 0, 256)) 
-		printf("Failed to set palette :(\n"); 
+	if(!OSDEP_SetPalette(vga, colors, 0, 256)) {
+		printf("Failed to set palette :(\n");
+	}
 	
 	retrazo();
 #else
@@ -1019,7 +1020,7 @@ void crear_ghost_vc(int m) {
 void crear_ghost_slow (void) {
 
   int dmin,dif;
-  byte *pal,*endpal,*color;
+  byte *pal,*endpal,*color=NULL;
 
   pal=dac4; endpal=dac4+768; dmin=65536;
   do {
@@ -1034,7 +1035,7 @@ void crear_ghost_slow (void) {
 void find_color(byte r, byte g,byte b) { // Encuentra un color (que no sea el 0)
 
   int dmin,dif;
-  byte *pal,*endpal,*color;
+  byte *pal,*endpal,*color=NULL;
 
   pal=paleta+3; endpal=paleta+768; dmin=65536;
   do {

@@ -1242,7 +1242,7 @@ void save_error(word tipo) { // Guarda una posicion de error (de 0 .. 3)
 
 void c_error(word tipo, word e) {
   int columna=0;
-  byte *_p,*p;
+  byte *_p=NULL,*p=NULL;
 
   numero_error=e;
 
@@ -1646,7 +1646,7 @@ byte * next_lexico(byte * _source, int coment, int linea) { // No genera nunca e
   if (linea) ierror=_source;
   next_source=_source;
 
-  switch ((memptrsize)lex_case[*_source]) {
+  switch ((uintptr_t)lex_case[*_source]) {
 
     case l_err:
       if (coment) { _source++; goto lex_scan; }
@@ -1679,7 +1679,7 @@ byte * next_lexico(byte * _source, int coment, int linea) { // No genera nunca e
       while (*ptr!=NULL && strcmp((char *)(ptr+2),(char *)_ivnom+ptr8)) ptr=(byte **)*ptr;
       if (!strcmp((char *)(ptr+2),(char *)_ivnom+ptr8)) { // id encontrado
         ivnom.b=_ivnom; // lo saca de vnom
-        next_pieza=(memptrsize)*(ptr+1);
+        next_pieza=(intptr_t)*(ptr+1);
         if (next_pieza<256 && next_pieza>=0) { // palabra reservada (token)
           if (next_pieza==p_rem) { while (*_source!=cr) _source++; goto lex_scan; }
         } else { // objeto (id anterior)
@@ -1758,7 +1758,7 @@ void lexico(void) {
   if (!coment) {old_linea=linea; old_ierror=ierror; old_ierror_end=ierror_end;}
 
   lex_scan: ierror=_source;
-  switch ((memptrsize)lex_case[*_source]) { // Puntero a un lex_ele o l_???
+  switch ((uintptr_t)lex_case[*_source]) { // Puntero a un lex_ele o l_???
 
     case l_err:
       if (coment) { pieza=p_rem; _source++; } else c_error(0,10); break;
@@ -1788,7 +1788,7 @@ void lexico(void) {
 	  
       if (!strcmp((char *)(ptr+2),(char *)_ivnom+ptr8)) { // id found
         ivnom.b=_ivnom; // lo saca de vnom
-        pieza=(memptrsize)*(ptr+1);
+        pieza=(intptr_t)*(ptr+1);
         if (pieza<256 && pieza>=0) { // reserved word (t	oken)
 			
           if (pieza==p_rem) { while (*_source!=cr) _source++; goto lex_scan; }
@@ -1851,7 +1851,7 @@ void lexico(void) {
       n=(strlen((char *)ivnom.b)+ptr4)/4;
       memcpy(&mem_ory[itxt],ivnom.b,strlen((char *)ivnom.b)+1);
 
-      if ((ivnom.b[0]!='.' && ivnom.b[1]!=0) && (ivnom.b[0]!='/' && ivnom.b[1]!=0) && strcmp("/",(char *)ivnom.b) && (f=div_open_file((char *)ivnom.b))!=NULL) {
+      if (ivnom.b[0]!='.' && (ivnom.b[0]!='/' && ivnom.b[1]!=0) && strcmp("/",(char *)ivnom.b) && (f=div_open_file((char *)ivnom.b))!=NULL) {
 	      fprintf(stdout,"FOUND FILE: [%s] [%s] [%s]\n",(char *)ivnom.b,full,(char *)&tipo[8]);
 
         empaquetable=0;
@@ -1898,15 +1898,15 @@ void lexico(void) {
       pieza=p_num; pieza_num=0;
       if (*_source=='0' && lower[*(_source+1)]=='x') {
         _source+=2;
-        while ((memptrsize)lex_case[*_source]==l_num ||
+        while ((uintptr_t)lex_case[*_source]==l_num ||
                (lower[*_source]>='a' && lower[*_source]<='f')) {
-          if ((memptrsize)lex_case[*_source]==l_num)
+          if ((uintptr_t)lex_case[*_source]==l_num)
             pieza_num=pieza_num*16+*_source++-0x30;
           else pieza_num=pieza_num*16+lower[*_source++]-'a'+10;
         }
       } else do {
         pieza_num=pieza_num*10+*_source++-0x30;
-      } while ((memptrsize)lex_case[*_source]==l_num);
+      } while ((uintptr_t)lex_case[*_source]==l_num);
       break;
 
     default: // puntero a un lex_ele
@@ -2199,7 +2199,7 @@ int analiza_struct(int offstruct) { // tras " struct id [ <const> ] " // id≡me
             c_error(4,129);
           test_buffer(&mem,&imem_max,offstruct+len);
           mem[offstruct+len]=0xDAD00000|(*ob).cglo.totalen;
-          strcpy((char*)&mem[offstruct+len+1],(char*)&mem[pieza_num]);
+          memmove((char*)&mem[offstruct+len+1],(char*)&mem[pieza_num],strlen((char*)&mem[pieza_num])+1);
           len+=1+((*ob).cglo.totalen+5)/4;
           itxt=_itxt; // Saca la cadena del segmento de textos
           lexico();
@@ -2923,7 +2923,7 @@ int analiza_struct_private(int offstruct) { // tras " struct id [ <const> ] " //
             c_error(4,129);
           test_buffer(&mem,&imem_max,offstruct+len);
           mem[offstruct+len]=0xDAD00000|(*ob).cloc.totalen;
-          strcpy((char*)&mem[offstruct+len+1],(char*)&mem[pieza_num]);
+          memmove((char*)&mem[offstruct+len+1],(char*)&mem[pieza_num],strlen((char*)&mem[pieza_num])+1);
           len+=1+((*ob).cloc.totalen+5)/4;
           itxt=_itxt; // Saca la cadena del segmento de textos
           lexico();
@@ -3160,7 +3160,7 @@ int analiza_struct_private(int offstruct) { // tras " struct id [ <const> ] " //
 void sintactico (void) {
 
   struct objeto * ob, * member2;
-  int _imem,_imem_old,num_par,n;
+  int _imem,_imem_old,num_par=0,n;
   byte * old_source,*nombre_dll,*oimemptr, *nombre_include;
   int _itxt,dup;
   char cWork[256];
@@ -3458,7 +3458,7 @@ void sintactico (void) {
               c_error(4,129);
             imem=_imem+1+((*ob).cglo.totalen+5)/4; // ej. c[32] -> c[0]..c[32],NUL
             test_buffer(&mem,&imem_max,imem);
-            strcpy((char*)&mem[_imem+1],(char*)&mem[pieza_num]);
+            memmove((char*)&mem[_imem+1],(char*)&mem[pieza_num],strlen((char*)&mem[pieza_num])+1);
             itxt=_itxt; // Saca la cadena del segmento de textos
             lexico();
           } else {
@@ -4049,7 +4049,7 @@ void sintactico (void) {
 
   mem[0]=program_type; mem[1]=imem; iloc_len=iloc;
 
-  g2(ltyp,(memptrsize)bloque_actual);
+  g2(ltyp,(intptr_t)bloque_actual);
   g2(lcbp,0);
   if (pieza==p_import) c_error(0,147); // Advertir a usuarios de DIV 1
   // El primer FRAME, y la carga de variables PRIVATE, se ejecutan
@@ -4095,7 +4095,7 @@ void sintactico (void) {
     } else c_error(2,118);
     (*ob).proc.offset=imem; (*ob).proc.num_par=0;
 
-    g2(ltyp,(memptrsize)bloque_actual);
+    g2(ltyp,(intptr_t)bloque_actual);
     if (n==p_function) g1(lnop);
     g2(lcbp,0); _imem=imem-1;
     if (pieza!=p_abrir) c_error(3,36);
@@ -4146,7 +4146,7 @@ void sintactico (void) {
     //             proceso actual (hermano)
 
 void analiza_private(void) {
-  struct objeto * ob, * member2;
+  struct objeto * ob=NULL, * member2;
   int _imem,_imem_old,_itxt,dup;
   byte *oimemptr;
 
@@ -4308,7 +4308,7 @@ void analiza_private(void) {
               c_error(4,129);
             imem=_imem+1+((*ob).cloc.totalen+5)/4; // ej. c[32] -> c[0]..c[32],NUL
             test_buffer(&mem,&imem_max,imem);
-            strcpy((char*)&mem[_imem+1],(char*)&mem[pieza_num]);
+            memmove((char*)&mem[_imem+1],(char*)&mem[pieza_num],strlen((char*)&mem[pieza_num])+1);
             itxt=_itxt; // Saca la cadena del segmento de textos
             lexico();
           } else {
@@ -7689,7 +7689,7 @@ void plexico(void) {
   if (!coment) {old_linea=linea; old_ierror=ierror; old_ierror_end=ierror_end;}
 
   lex_scan: ierror=_source;
-  switch ((memptrsize)lex_case[*_source]) { // Puntero a un lex_ele o l_???
+  switch ((uintptr_t)lex_case[*_source]) { // Puntero a un lex_ele o l_???
 
     case l_err:
       if (coment) { pieza=p_rem; _source++; } else c_error(0,10); break;
@@ -7707,7 +7707,7 @@ void plexico(void) {
       while (*ptr && strcmp((char *)(ptr+2),(char *)(_ivnom+ptr8))) ptr=(byte **)*ptr;
       if (!strcmp((char *)(ptr+2),(char *)_ivnom+ptr8)) { // id found
         ivnom.b=_ivnom; // lo saca de vnom
-        pieza=(memptrsize)*(ptr+1);
+        pieza=(intptr_t)*(ptr+1);
         if (pieza<256 && pieza>=0) { // palabra reservada (token)
           if (pieza==p_rem) { while (*_source!=cr) _source++; goto lex_scan; }
         } else { // objeto (id anterior)
@@ -7738,15 +7738,15 @@ void plexico(void) {
       pieza=p_num; pieza_num=0;
       if (*_source=='0' && lower[*(_source+1)]=='x') {
         _source+=2;
-        while ((memptrsize)lex_case[*_source]==l_num ||
+        while ((uintptr_t)lex_case[*_source]==l_num ||
                (lower[*_source]>='a' && lower[*_source]<='f')) {
-          if ((memptrsize)lex_case[*_source]==l_num)
+          if ((uintptr_t)lex_case[*_source]==l_num)
             pieza_num=pieza_num*16+*_source++-0x30;
           else pieza_num=pieza_num*16+lower[*_source++]-'a'+10;
         }
       } else do {
         pieza_num=pieza_num*10+*_source++-0x30;
-      } while ((memptrsize)lex_case[*_source]==l_num);
+      } while ((uintptr_t)lex_case[*_source]==l_num);
       break;
 
     default: // puntero a un lex_ele

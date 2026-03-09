@@ -2165,7 +2165,7 @@ void line0(int x0, int y0, int x1, int y1, int inc0) {
   if (x0>x1) {x=x1; dx=x0-x1;} else {x=x0; dx=x1-x0;}
   if (y0>y1) {y=y1; dy=y0-y1;} else {y=y0; dy=y1-y0;}
 
-  if (inc0==-1) inc0=0; else unded=(int64_t)save_undo(x-pincel_an/2,y-pincel_al/2,dx+1+pincel_an,dy+1+pincel_al);
+  if (inc0==-1) inc0=0; else unded=(intptr_t)save_undo(x-pincel_an/2,y-pincel_al/2,dx+1+pincel_an,dy+1+pincel_al);
 
   if (unded) {
     if (!dx && !dy) line_pixel(x0,y0); else {
@@ -2204,7 +2204,7 @@ void line(int x0, int y0, int x1, int y1, int inc0) {
   if (x0>x1) {x=x1; dx=x0-x1;} else {x=x0; dx=x1-x0;}
   if (y0>y1) {y=y1; dy=y0-y1;} else {y=y0; dy=y1-y0;}
 
-  if (inc0==-1) inc0=0; else unded=(int64_t)save_undo(x-pincel_an/2,y-pincel_al/2,dx+1+pincel_an,dy+1+pincel_al);
+  if (inc0==-1) inc0=0; else unded=(intptr_t)save_undo(x-pincel_an/2,y-pincel_al/2,dx+1+pincel_an,dy+1+pincel_al);
 
   if (unded) {
     if (!dx && !dy) line_pixel(x0,y0); else {
@@ -4623,7 +4623,7 @@ void mover_barra(void) {
 int iconos_zoom[]={4,1,101,102,103,104};
 
 void select_zoom(void) {
-  int r,z;
+  int r=0,z=0;
 
   if (mouse_in(barra_x,barra_y,barra_x+barra_an*big2-1,barra_y+19*big2-1)) {
     if (big && !mouse_shift) { mouse_shift=1;

@@ -1180,7 +1180,7 @@ char pletras[5*8+1]="01234567ABCDEFGHabcdefgh!?$*/+()\xa5\xa4\x87\xa0\x82\xa1\xa
 
 void crear_texto_prueba(char * s, char flags) {
   int numbits=0;
-  int numchar,x;
+  int numchar=0,x;
 
   *s=0;
 

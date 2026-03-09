@@ -134,15 +134,15 @@ SET(TARGET ${TARGET}-${PLATFORM})
 SET_SOURCE_FILES_PROPERTIES(${SDLGFX_SOURCES} ${SHARED_RUN} ${RUNNER_SOURCES} PROPERTIES LANGUAGE ${CLANG})
 SET_SOURCE_FILES_PROPERTIES(${RUNTIME_SOURCES} ${DEBUG_SOURCES} ${DIV_SOURCES} ${OSDEP} PROPERTIES LANGUAGE ${CLANG})
 
-option(DIV_WARNING_BASELINE "Enable compiler warnings for baseline cleanup work" OFF)
-set(DIV_WARNING_FLAGS "-w -Wno-unused-result -Wno-unused")
-if(DIV_WARNING_BASELINE)
-    set(DIV_WARNING_FLAGS "-Wall -Wextra -Wformat=2 -Wshadow -Wpointer-arith -Wcast-align")
-endif()
+set(DIV_WARNING_FLAGS "-Wall -Wextra -Wno-shadow -Wno-unused-parameter -Wno-sign-compare -Wno-missing-field-initializers -Wno-char-subscripts -Wno-unused-result -Wno-unused")
 
-ADD_DEFINITIONS(${BUILD_LEVEL} -fpermissive -fno-omit-frame-pointer -funsigned-char ${DIV_WARNING_FLAGS} -D${PLATFORM}=1 -DTARGET="${TARGET}" -DRDEBUG="${DEBUG}" -DRUNTIME="${RUNTIME}")
+ADD_DEFINITIONS(${BUILD_LEVEL} -fno-omit-frame-pointer -funsigned-char ${DIV_WARNING_FLAGS} -D${PLATFORM}=1 -DTARGET="${TARGET}" -DRDEBUG="${DEBUG}" -DRUNTIME="${RUNTIME}")
 
-ADD_DEFINITIONS(-Wfatal-errors)
+# Suppress warnings in third-party code
+set_source_files_properties(${ZIP_SOURCES} PROPERTIES COMPILE_FLAGS "-w")
+set_source_files_properties(${SDLGFX_SOURCES} PROPERTIES COMPILE_FLAGS "-w")
+
+# -Wfatal-errors removed: we want to see all warnings, not stop at the first one
 
 # Executables
 ADD_EXECUTABLE(${TARGET} src/global.h ${DIV_SOURCES} ${ZIP_SOURCES} ${OSDEP})

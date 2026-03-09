@@ -147,9 +147,9 @@ modinfo *mymodinfo;
                                                 n=fwrite(&iWork,1,4,desktop);
                                                 n=fwrite(ventana[x].prg,1,sizeof(struct tprg),desktop);
                                                 n=fwrite(ventana[x].prg->buffer,1,ventana[x].prg->buffer_lon,desktop);
-                                                iWork=(memptrsize)ventana[x].prg->lptr-(memptrsize)ventana[x].prg->buffer;
+                                                iWork=(uintptr_t)ventana[x].prg->lptr-(uintptr_t)ventana[x].prg->buffer;
                                                 n=fwrite(&iWork,1,4,desktop);
-                                                iWork=(memptrsize)ventana[x].prg->vptr-(memptrsize)ventana[x].prg->buffer;
+                                                iWork=(uintptr_t)ventana[x].prg->vptr-(uintptr_t)ventana[x].prg->buffer;
                                                 n=fwrite(&iWork,1,4,desktop);
                                         }
                                         else

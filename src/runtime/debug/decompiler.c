@@ -3,6 +3,11 @@
 
 #ifndef __EMSCRIPTEN__
 
+// Helper to safely sprintf into a buffer using a temp to avoid overlap warnings
+#define SAFE_SPRINTF(dst, fmt, ...) do { char _tmp_buf[512]; snprintf(_tmp_buf,sizeof(_tmp_buf),fmt,__VA_ARGS__); strcpy(dst,_tmp_buf); } while(0)
+// Copy between different elements of the same array (compiler can't prove non-overlap)
+static inline void array_strcpy(char *dst, const char *src) { char tmp[512]; strncpy(tmp,src,511); tmp[511]=0; strcpy(dst,tmp); }
+
 #define STACK_SIZE 128
 
 extern int stack[STACK_SIZE];
@@ -361,8 +366,8 @@ i=mem[1]-1;
     case lori: 
 		fprintf(sta,"%5u\tori",i);
 		fprintf(prg,"// stack: || %d %d\n",sp,i);
-		sprintf(condstack[con],"%s OR %s",condstack[con-2],condstack[con-1]);
-		strcpy(condstack[con-2],condstack[con]);
+		SAFE_SPRINTF(condstack[con],"%s OR %s",condstack[con-2],condstack[con-1]);
+		array_strcpy(condstack[con-2],condstack[con]);
 		strcpy(cstack[sp-2],condstack[con]);
 
 		con--;
@@ -377,8 +382,8 @@ i=mem[1]-1;
     case land: 
 		fprintf(sta,"%5u\tand",i); 
 		fprintf(prg,"// stack: && %d\n",sp);
-		sprintf(condstack[con],"(%s && %s)",condstack[con-2],condstack[con-1]);
-		strcpy(condstack[con-2],condstack[con]);
+		SAFE_SPRINTF(condstack[con],"(%s && %s)",condstack[con-2],condstack[con-1]);
+		array_strcpy(condstack[con-2],condstack[con]);
 		con--;
 		strcpy(cmd,condstack[con-1]);
 		break;
@@ -424,49 +429,49 @@ i=mem[1]-1;
     case ladd: 
 		fprintf(sta,"%5u\tadd",i);
 		fprintf(prg,"// ladd %d[%d]+%d[%d] %d %d\n",stack[sp-2],stp[sp-2],stack[sp-1],stp[sp-1],sp,i);
-		sprintf(cstack[sp],"(%s+%s)",cstack[sp-2],cstack[sp-1]);
-		stack[sp-2]+=stack[sp-1]; 
+		SAFE_SPRINTF(cstack[sp],"(%s+%s)",cstack[sp-2],cstack[sp-1]);
+		stack[sp-2]+=stack[sp-1];
 		strcpy(cmd,cstack[sp]);
-		strcpy(cstack[sp-2],cstack[sp]);
+		array_strcpy(cstack[sp-2],cstack[sp]);
 		sp--;
 		break;
-    case lsub: 
-		fprintf(sta,"%5u\tsub",i); 
+    case lsub:
+		fprintf(sta,"%5u\tsub",i);
 		//stack[sp-2]-=stack[sp-1];
-		sprintf(cstack[sp],"(%s-%s)",cstack[sp-2],cstack[sp-1]);
+		SAFE_SPRINTF(cstack[sp],"(%s-%s)",cstack[sp-2],cstack[sp-1]);
 		stack[sp-2]-=stack[sp-1];
-		strcpy(cstack[sp-2],cstack[sp]);		
+		array_strcpy(cstack[sp-2],cstack[sp]);
 		strcpy(cmd,cstack[sp-2]);
 				
 		sp--;
 		break;
     case lmul:
 		fprintf(sta,"%5u\tmul",i); 
-		sprintf(cstack[sp],"(%s*%s)",cstack[sp-2],cstack[sp-1]);
-		strcpy(cstack[sp-2],cstack[sp]);
+		SAFE_SPRINTF(cstack[sp],"(%s*%s)",cstack[sp-2],cstack[sp-1]);
+		array_strcpy(cstack[sp-2],cstack[sp]);
 		sp-=1;
-		
+
 		break;
-    case ldiv: 
-		fprintf(sta,"%5u\tdiv",i); 
-		sprintf(cstack[sp],"(%s/%s)",cstack[sp-2],cstack[sp-1]);
-		strcpy(cstack[sp-2],cstack[sp]);
+    case ldiv:
+		fprintf(sta,"%5u\tdiv",i);
+		SAFE_SPRINTF(cstack[sp],"(%s/%s)",cstack[sp-2],cstack[sp-1]);
+		array_strcpy(cstack[sp-2],cstack[sp]);
 		sp-=1;
-	
+
 		break;
-    case lmod: 
-		fprintf(sta,"%5u\tmod",i); 
-		sprintf(cstack[sp],"(%s MOD %s)",cstack[sp-2],cstack[sp-1]);
-		strcpy(cstack[sp-2],cstack[sp]);
+    case lmod:
+		fprintf(sta,"%5u\tmod",i);
+		SAFE_SPRINTF(cstack[sp],"(%s MOD %s)",cstack[sp-2],cstack[sp-1]);
+		array_strcpy(cstack[sp-2],cstack[sp]);
 		sp-=1;			
 		break;
 		
     case lneg: 
 		fprintf(sta,"%5u\tneg",i); 
-		sprintf(cstack[sp],"-%s",cstack[sp-1]);
+		SAFE_SPRINTF(cstack[sp],"-%s",cstack[sp-1]);
 		stack[sp-1]=-stack[sp-1];
 		strcpy(cmd,cstack[sp]);
-		strcpy(cstack[sp-1],cstack[sp]);
+		array_strcpy(cstack[sp-1],cstack[sp]);
 		
 		break;
     

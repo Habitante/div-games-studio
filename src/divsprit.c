@@ -177,11 +177,11 @@ void sp_rotado( byte * si, int x, int y, int an, int al, int xg, int yg,
   float a0,a1,a2,a3;
   int p[24];
   int h,hmin,hmax; // Altura minima y maxima
-  int n,l0,l1;   // Lado 0 y lado 1 (indices p[])
+  int n,l0=0,l1;   // Lado 0 y lado 1 (indices p[])
 
   int hmax0,hmax1;
-  union { int l; short w[2]; } x0,x1,g0x,g1x,g0y,g1y;
-  int ix0,ix1,ig0x,ig1x,ig0y,ig1y;
+  union { int l; short w[2]; } x0,x1,g0x={0},g1x={0},g0y={0},g1y={0};
+  int ix0=0,ix1=0,ig0x=0,ig1x=0,ig0y=0,ig1y=0;
 
   xg=-xg; yg=-yg;
 

@@ -415,8 +415,8 @@ case lstrcpy:
       break;
     }
   #endif
-  if ((unsigned)pila[sp]>255) strcpy((char*)&mem[pila[sp-1]],(char*)&mem[pila[sp]]);
-  else sprintf((char*)&mem[pila[sp-1]],"%c\0",pila[sp]);
+  if ((unsigned)pila[sp]>255) memmove((char*)&mem[pila[sp-1]],(char*)&mem[pila[sp]],strlen((char*)&mem[pila[sp]])+1);
+  else { ((char*)&mem[pila[sp-1]])[0]=(char)pila[sp]; ((char*)&mem[pila[sp-1]])[1]=0; }
   sp--;
   break;
 
@@ -441,8 +441,15 @@ case lstrcat:
       break;
     }
   #endif
-  if ((unsigned)pila[sp]>255) strcat((char*)&mem[pila[sp-1]],(char*)&mem[pila[sp]]);
-  else sprintf((char*)&mem[pila[sp-1]],"%s%c\0",(char*)&mem[pila[sp-1]],pila[sp]);
+  if ((unsigned)pila[sp]>255) {
+    char *dst=(char*)&mem[pila[sp-1]];
+    int dlen=strlen(dst);
+    memmove(dst+dlen,(char*)&mem[pila[sp]],strlen((char*)&mem[pila[sp]])+1);
+  } else {
+    char *dst=(char*)&mem[pila[sp-1]];
+    int dlen=strlen(dst);
+    dst[dlen]=(char)pila[sp]; dst[dlen+1]=0;
+  }
   sp--;
   break;
 
@@ -456,18 +463,20 @@ case lstradd: // Strcat "en el aire" (ojo, el aire tiene tambien 0xDAD00402)
       break;
     }
   #endif
+  { char _tmp[1030]; int _tlen=0;
   if ((unsigned)pila[sp-1]>255) {
-    if ((unsigned)pila[sp]>255) {
-      sprintf((char*)&mem[nullstring[nstring]],"%s%s\0",(char*)&mem[pila[sp-1]],(char*)&mem[pila[sp]]);
-    } else {
-      sprintf((char*)&mem[nullstring[nstring]],"%s%c\0",(char*)&mem[pila[sp-1]],pila[sp]);
-    }
+    _tlen=strlen((char*)&mem[pila[sp-1]]);
+    memcpy(_tmp,(char*)&mem[pila[sp-1]],_tlen);
   } else {
-    if ((unsigned)pila[sp]>255) {
-      sprintf((char*)&mem[nullstring[nstring]],"%c%s\0",pila[sp-1],(char*)&mem[pila[sp]]);
-    } else {
-      sprintf((char*)&mem[nullstring[nstring]],"%c%c\0",pila[sp-1],pila[sp]);
-    }
+    _tmp[0]=(char)pila[sp-1]; _tlen=1;
+  }
+  if ((unsigned)pila[sp]>255) {
+    int slen=strlen((char*)&mem[pila[sp]]);
+    memcpy(_tmp+_tlen,(char*)&mem[pila[sp]],slen+1); _tlen+=slen;
+  } else {
+    _tmp[_tlen++]=(char)pila[sp]; _tmp[_tlen]=0;
+  }
+  memcpy((char*)&mem[nullstring[nstring]],_tmp,_tlen+1);
   }
   pila[--sp]=nullstring[nstring];
   nstring=((nstring+1)&3);
@@ -476,7 +485,7 @@ case lstradd: // Strcat "en el aire" (ojo, el aire tiene tambien 0xDAD00402)
 case lstrdec: // cambio de tamaño "en el aire" (no da error, hace lo que puede)
   oo=strlen((char*)&mem[pila[sp-1]]);
   if (oo<1028) {
-    strcpy((char*)&mem[nullstring[nstring]],(char*)&mem[pila[sp-1]]);
+    memmove((char*)&mem[nullstring[nstring]],(char*)&mem[pila[sp-1]],strlen((char*)&mem[pila[sp-1]])+1);
     if (pila[sp]>0) { // Quitar caracteres
       if (pila[sp]>=oo) memb[nullstring[nstring]*4]=0;
       else memb[nullstring[nstring]*4+oo-pila[sp]]=0;
@@ -632,8 +641,8 @@ case lcpastr:
     }
   #endif
   if ((unsigned)pila[mem[id+_Param]]>255)
-    strcpy((char*)&mem[pila[sp]],(char*)&mem[pila[mem[id+_Param]]]);
-  else sprintf((char*)&mem[pila[sp]],"%c\0",pila[mem[id+_Param]]);
+    memmove((char*)&mem[pila[sp]],(char*)&mem[pila[mem[id+_Param]]],strlen((char*)&mem[pila[mem[id+_Param]]])+1);
+  else { ((char*)&mem[pila[sp]])[0]=(char)pila[mem[id+_Param]]; ((char*)&mem[pila[sp]])[1]=0; }
   sp--; mem[id+_Param]++;
   break;
 

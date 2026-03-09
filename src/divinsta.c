@@ -438,7 +438,7 @@ void create_install_image(char * file, int errores) {
 	  memset(lst,0,1000*sizeof(int));
 	  
       while (p<fpg+file_len && *(int32_t*)p<1000 && *(int32_t*)p>0 ) {
-        lst[*(int32_t*)p]=(memptrsize)p;
+        lst[*(int32_t*)p]=(intptr_t)p;
         p+=*(memptrsize*)(p+4);//sizeof(int*));
       }
 
@@ -710,7 +710,7 @@ void crear_instalacion(void) {
   int x,n,m,topack;
   char cWork[256];
   char dWork[256];
-  unsigned _drive,my_drive;
+  unsigned _drive=0,my_drive;
   byte * chr;
   int TotLen=0,PackSize;
   int size[6];

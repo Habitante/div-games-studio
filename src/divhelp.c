@@ -771,7 +771,7 @@ int tipo_imagen; // 0-izquierda, 1-centro, 2-derecha
 int restaurar_help_an=0;
 
 byte * continua_imagen(byte * di) {
-  int n;
+  int n=0;
 
   if (restaurar_help_an) { restaurar_help_an=0; help_an+=imagen_an; }
   if (ejemplo) *di++=6; else if (imagen) {

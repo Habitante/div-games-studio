@@ -264,7 +264,7 @@ short PintaOutline()
   short altoTotal=altoBody+4+ifs.outline*2;
   short anchoOut=anchoBody+ifs.outline*2;
   short altoOut=altoBody+1+ifs.outline*2;
-  char *tmpBuffer, *ptr, *ptr2, *pun, blanco, negro, gris;
+  char *tmpBuffer, *ptr, *ptr2, *pun, blanco=0, negro=0, gris;
 
     tmpBuffer=(char *)malloc (anchoTotal*(altoTotal+1));
     outBuffer=(char *)realloc (outBuffer, anchoOut*altoOut);
@@ -828,7 +828,7 @@ char *rawBuffer;
                 fclose(fichFnt);
                 return 4;
         }
-        if (tablaFNT[WhatChar].ancho*tablaFNT[WhatChar].alto)
+        if (tablaFNT[WhatChar].ancho && tablaFNT[WhatChar].alto)
         {
             rawBuffer=(char *) malloc(tablaFNT[WhatChar].ancho*tablaFNT[WhatChar].alto);
             if (rawBuffer==NULL)
@@ -881,7 +881,7 @@ int ShowCharBuffer(int WhatChar,int cx,int cy,char *ptr,int an,char *buffer)
 int y,iy,x,c;
 char *rawBuffer;
         memcpy(tablaFNT,buffer+8+768+sizeof(reglas)+4,sizeof(tablaFNT));
-        if (tablaFNT[WhatChar].ancho*tablaFNT[WhatChar].alto)
+        if (tablaFNT[WhatChar].ancho && tablaFNT[WhatChar].alto)
         {
             rawBuffer=(char *) malloc(tablaFNT[WhatChar].ancho*tablaFNT[WhatChar].alto);
             if (rawBuffer==NULL)
@@ -891,7 +891,7 @@ char *rawBuffer;
                 else
                         return (tablaFNT[WhatChar].ancho+1);
             }
-            memcpy(rawBuffer,buffer+tablaFNT[WhatChar].offset,tablaFNT[WhatChar].ancho*tablaFNT[WhatChar].alto);
+            memcpy(rawBuffer,buffer+tablaFNT[WhatChar].offset,tablaFNT[WhatChar].ancho && tablaFNT[WhatChar].alto);
             iy=tablaFNT[WhatChar].incY;
             for (y=0; y<tablaFNT[WhatChar].alto; y++) {
                 for (x=0; x<tablaFNT[WhatChar].ancho; x++) {
@@ -929,7 +929,7 @@ byte xlat[256];
 
         for(x=0;x<256;x++)
         {
-                if (tablaFNT[x].ancho*tablaFNT[x].alto)
+                if (tablaFNT[x].ancho && tablaFNT[x].alto)
                         for(a=0;a<tablaFNT[x].alto;a++)
                                 for(b=0;b<tablaFNT[x].ancho;b++)
                                 {

@@ -905,7 +905,7 @@ extern char Load_FontPathName[256];
 extern char Load_FontName[14];
 
 void imp_fontmap(void) {
-  char FontPathName[256],FontName[14];
+  char FontPathName[256],FontName[14]="";
   char *buffer,*di,color;
   int buffer_len,x,y,_x0,x0=1,y0=1,chars,*p;
   int gencode;
@@ -1004,7 +1004,7 @@ void imp_fontmap(void) {
 
 void gen_fontmap(void) {
   int * p=(int*)(FntAux+1356),n,x;
-  char col[256],*ptr,*FntEnd;
+  char col[256],*ptr,*FntEnd=NULL;
   int dist,mincolor,mindist,r,g,b;
 
   map_an=1; map_al=0;
@@ -1562,7 +1562,7 @@ extern byte * textura_color;
 FILE *FilePaintFPG;
 
 void mapa2(void) {
-  int old_modo,n,_iundo;
+  int old_modo=0,n,_iundo;
   int an=v.an,al=v.al;
   int sp_an,sp_al,ew;
   byte * sp;
@@ -2605,7 +2605,7 @@ void abrir_mapa(void) {
         if (n++==0) {
           memcpy(pal,dac4,768);
         } else {
-          x=0; sum=0; do { sum+=abs((memptrsize)pal[x]-(memptrsize)dac4[x]); } while (++x<768);
+          x=0; sum=0; do { sum+=abs((int)pal[x]-(int)dac4[x]); } while (++x<768);
           if (sum) {
             if (muestra==NULL) {
               muestra=(byte*)malloc(32768);
@@ -2632,11 +2632,11 @@ void abrir_mapa(void) {
 
   // Tenemos en pal[] la paleta de los mapas a cargar
 
-  x=0; sum=0; do { sum+=abs((memptrsize)pal[x]-(memptrsize)dac[x]); } while (++x<768);
+  x=0; sum=0; do { sum+=abs((int)pal[x]-(int)dac[x]); } while (++x<768);
   memcpy(paltratar,pal,768);
 
   if (sum && n==1) {
-    x=0; sum=0; do { sum+=abs((memptrsize)paleta_original[x]-(memptrsize)dac[x]); } while (++x<768);
+    x=0; sum=0; do { sum+=abs((int)paleta_original[x]-(int)dac[x]); } while (++x<768);
     memcpy(paltratar,paleta_original,768);
   }
 
@@ -2717,7 +2717,7 @@ void abrir_mapa(void) {
 
                   ExternUseBufferMap=(char	 *)v_mapa->map;
 
-                  x=0; sum=0; do { sum+=abs((memptrsize)dac4[x]-(memptrsize)dac[x]); } while (++x<768);
+                  x=0; sum=0; do { sum+=abs((int)dac4[x]-(int)dac[x]); } while (++x<768);
 
                   if (sum) {
                     memcpy(pal,dac4,768); create_dac4();
@@ -3259,7 +3259,7 @@ float fx,fy,cx,cy,rx,ry;
 float pp1,pp2,pp3,pp4;
 int r,b,g,regen=0;
 FILE *rgb_tab=NULL;
-char *rgb_table;
+char *rgb_table=NULL;
 char Tabla[190];
 int Colors[9],min_dist,i,dist;
 

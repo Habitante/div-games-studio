@@ -115,8 +115,9 @@ void set_dac(byte *_dac) {
           colors[i].b=_dac[b+2]*4;
           b+=3;
     }
-		if(!OSDEP_SetPalette(vga, colors, 0, 256))
+		if(!OSDEP_SetPalette(vga, colors, 0, 256)) {
 			printf("Failed to set palette :(\n");
+		}
 	retrazo();
 }
 

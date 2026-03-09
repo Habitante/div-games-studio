@@ -371,14 +371,13 @@ int DPMIalloc4k(void);
 #ifdef MIXER
 void print_init_flags(int flags)
 {
-#define PFLAG(a) if(flags&MIX_INIT_##a) printf(#a " ")
+#define PFLAG(a) if(flags&MIX_INIT_##a) { printf(#a " "); }
         PFLAG(FLAC);
         PFLAG(MOD);
         PFLAG(MP3);
         PFLAG(OGG);
-        if(!flags)
-			debugprintf("None");
-        debugprintf("\n");
+        if(!flags) { printf("None"); }
+        printf("\n");
 }
 #endif
 
@@ -3373,8 +3372,9 @@ void inicializacion(void) {
 	make_helpidx(); // *** Crea el índice del hipertexto ***
 	load_index();   // *** Carga el glosario del hipertexto ***
 
-	if(!Interpretando)
+	if(!Interpretando) {
 		printf("%s",(char *)texto[6]); // *** Init buffers gráficos ***
+	}
 
 	undo=(byte*)malloc(undo_memory);
 	tundo=(struct tipo_undo *)malloc(sizeof(struct tipo_undo)*max_undos);
@@ -3582,18 +3582,18 @@ fclose(f);
 
   }
 
-  if (!Interpretando) printf("%s",(char *)texto[10]); // *** Carga los objetos editados ***
+  if (!Interpretando) { printf("%s",(char *)texto[10]); } // *** Carga los objetos editados ***
 
   if (auto_save_session || Interpretando) CopiaDesktop=Can_UpLoad_Desktop();
 
   if(!CopiaDesktop) { //Carga paleta comun
-    if (!Interpretando) cprintf("%s",(char *)texto[11]); // *** Cálculos sobre la paleta ***
+    if (!Interpretando) { cprintf("%s",(char *)texto[11]); } // *** Cálculos sobre la paleta ***
     memcpy(dac,system_dac,768);
     init_ghost();
     crear_ghost(1);
   }
 
-  if (!Interpretando) printf("%s",(char *)texto[12]); // *** Miscelánea ***
+  if (!Interpretando) { printf("%s",(char *)texto[12]); } // *** Miscelánea ***
   find_colors(); memset(copia,c0,vga_an*vga_al);
   zoom=0; zoom_x=0; zoom_y=0; zoom_cx=vga_an/2; zoom_cy=vga_al/2; zoom_move=c3;
   barra_x=8*big2; barra_y=vga_al-27*big2; regla=0; actual_mouse=21; sel_status=0;
@@ -3612,7 +3612,7 @@ fclose(f);
   inicializa_compilador(); // *** Compilador *** espacios de lower a 00
   init_lexcolor();
 
-  if (!Interpretando) printf("%s",(char *)texto[13]);
+  if (!Interpretando) { printf("%s",(char *)texto[13]); }
 
   crea_gama(Setupfile.t_gama,tapiz_gama);
 
@@ -3761,6 +3761,8 @@ DWORD cchBuffer;
     }
 
     free(driveStrings);
+
+    return;
 #endif
 #ifdef NOTYET
   int n,m,uni=0;
@@ -3855,7 +3857,7 @@ char *GetMemoryFree() {
           MemInfo.data1+GetHeapFree(0),GetHeapFree(1),MaxMemUsed);
   return(MemoriaLibre);
 #endif
-  return MemoriaLibre;
+  return "";
 }
 
 void DebugFile(char *Cadena,char *Nombre) {
@@ -4011,7 +4013,7 @@ void show_flag(struct t_item * i) {
 
 void _process_items(void) {
   int n=0,estado;
-  int asc,kesc,est;
+  int asc=0,kesc=0,est;
 
   v.active_item=-1;
 

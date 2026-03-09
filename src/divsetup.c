@@ -780,7 +780,7 @@ void Cfg_Setup_end(void) {
   int n,ew,found;
   byte * ptr;
   int an,al;
-  FILE * f;
+  FILE * f=NULL;
   struct tventana vp[24];
   int i;
 

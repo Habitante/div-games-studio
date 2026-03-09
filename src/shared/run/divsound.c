@@ -20,14 +20,13 @@ void print_init_flags(int flags)
 {
 #ifdef MIXER
 
-#define PFLAG(a) if(flags&MIX_INIT_##a) printf(#a " ")
+#define PFLAG(a) if(flags&MIX_INIT_##a) { printf(#a " "); }
         PFLAG(FLAC);
         PFLAG(MOD);
         PFLAG(MP3);
         PFLAG(OGG);
 
-        if(!flags)
-                printf("None");
+        if(!flags) { printf("None"); }
 
         printf("\n");
 #endif
@@ -209,7 +208,7 @@ fprintf(stdout,"running with SDL_mixer version: %d.%d.%d\n",
     UnloadSound(con);
     UnloadSong(con);
   }
-  for(con=16; con<32; con++) judas_channel[con].smp=NULL;
+  for(con=16; con<32; con++) judas_channel[con].smp=0;
   for(con= 0; con<32; con++) channel(con)=0;
 
 
@@ -262,7 +261,7 @@ void ResetSound(void)
     set_mixer();
   }
 
-  for(con=16; con<32; con++) judas_channel[con].smp=NULL;
+  for(con=16; con<32; con++) judas_channel[con].smp=0;
   for(con= 0; con<32; con++) channel(con)=0;
 
   MusicChannels=0;
@@ -288,7 +287,7 @@ int LoadSound(char *ptr, long Len, int Loop)
 	byte res=0;
 	int32_t iLen = (int32_t)Len+36;
 
-	while(con<128 && sonido[con].smp!=NULL) 
+	while(con<128 && sonido[con].smp!=0) 
 		con++;
 	
 	if(con==128) return(-1);
@@ -345,7 +344,7 @@ int LoadSound(char *ptr, long Len, int Loop)
   SoundInfo *SI=NULL;
   int con=0;
 
-  while(con<128 && sonido[con].smp!=NULL) con++;
+  while(con<128 && sonido[con].smp!=0) con++;
   if(con==128) return(-1);
 
   SI = judas_loadwav_mem(ptr);
@@ -376,7 +375,7 @@ int UnloadSound(int NumSonido)
 #ifdef MIXER
 	if(sonido[NumSonido].sound) {
 		Mix_FreeChunk(sonido[NumSonido].sound);
-		sonido[NumSonido].smp=NULL;
+		sonido[NumSonido].smp=0;
 		sonido[NumSonido].sound=NULL;
 	}
 #endif
@@ -384,7 +383,7 @@ int UnloadSound(int NumSonido)
   if(sonido[NumSonido].smp)
   {
     judas_freesample(sonido[NumSonido].smp);
-    sonido[NumSonido].smp=NULL;
+    sonido[NumSonido].smp=0;
   }
 #endif
   return(1);

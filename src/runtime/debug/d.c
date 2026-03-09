@@ -1549,7 +1549,7 @@ void select_button(t_item * i,int activo) {
 
 void _process_items(void) {
   int n=0,estado;
-  int asc,kesc,est;
+  int asc=0,kesc=0,est;
 
   v.active_item=-1;
 
@@ -1767,7 +1767,7 @@ void get_input(int n) {
           case 79: get_pos=strlen(get); break;        // fin
           case 83:
             get[strlen(get)+1]=0;
-            strcpy(&get[get_pos],&get[get_pos+1]);
+            memmove(&get[get_pos],&get[get_pos+1],strlen(&get[get_pos+1])+1);
             if (!*get && superget) strcpy((char *)v.item[v.selected_item].get.buffer,"");
             break;
           default: v.volcar=l; break;
@@ -3007,14 +3007,14 @@ void inspect0(void) {
 // Funciones para evitar los page fault
 
 byte * capar_byte(byte * dir) {
-  memptrsize offset;
-  offset=((memptrsize)dir-(memptrsize)mem)/4;
+  uintptr_t offset;
+  offset=((uintptr_t)dir-(uintptr_t)mem)/4;
   if (capar(offset)) return(dir); else return((byte*)mem);
 }
 
 word * capar_word(word * dir) {
-  memptrsize offset;
-  offset=((memptrsize)dir-(memptrsize)mem)/4;
+  uintptr_t offset;
+  offset=((uintptr_t)dir-(uintptr_t)mem)/4;
   if (capar(offset)) return(dir); else return((word*)mem);
 }
 
@@ -4474,18 +4474,18 @@ void pintar_lista_profile(void) {
 
     wbox(ptr,an,al,c_g_low0,an-lp2esp-11-65,lp2y+(m-lp2_ini)*lp2al,64,lp2al-1); // Ejecucion
 
-    porcen=(unsigned)(((double)f_time[(memptrsize)lp2[m]]*(double)10000.0)/(double)f_time_total);
-    porcen2=(unsigned)(((double)f_time[(memptrsize)lp2[m]]*(double)10000.0)/(double)f_max);
+    porcen=(unsigned)(((double)f_time[(uintptr_t)lp2[m]]*(double)10000.0)/(double)f_time_total);
+    porcen2=(unsigned)(((double)f_time[(uintptr_t)lp2[m]]*(double)10000.0)/(double)f_max);
     wbox(ptr,an,al,c_g_low, an-lp2esp-11-65,lp2y+(m-lp2_ini)*lp2al,(64*porcen2)/10000,lpal-1);
     sprintf(cwork,"%d.%02d%c",porcen/100,porcen%100,'%');
     if (absolut)
-      if (game_frames>0) sprintf(cwork,"%d",(int)((f_time[(memptrsize)lp2[m]]*100)/game_frames));
+      if (game_frames>0) sprintf(cwork,"%d",(int)((f_time[(uintptr_t)lp2[m]]*100)/game_frames));
       else sprintf(cwork,"0");
 
     wwrite(ptr,an,al,an-lp2esp-10-33,lp2y+1+(m-lp2_ini)*lp2al,1,(byte *)cwork,c_g_low0);
     wwrite(ptr,an,al,an-lp2esp-11-33,lp2y+1+(m-lp2_ini)*lp2al,1,(byte *)cwork,c34);
 
-    wwrite_in_box(ptr,an,an-lp2esp-13-66,al,5,lp2y+1+(m-lp2_ini)*lp2al,0,(byte *)fname[(memptrsize)lp2[m]],x);
+    wwrite_in_box(ptr,an,an-lp2esp-13-66,al,5,lp2y+1+(m-lp2_ini)*lp2al,0,(byte *)fname[(uintptr_t)lp2[m]],x);
     wbox(ptr,an,al,c0,4,lp2y+(m-lp2_ini)*lp2al+lp2al-1,an-lp2esp-16,1);
   }
 
