@@ -4,6 +4,7 @@
 //----------------------------------------------------------------------------
 
 #include "inter.h"
+#include "div_string.h"
 #include <errno.h>
 
 void readmouse(void);
@@ -3479,12 +3480,12 @@ void _mkdir(void) {
   buffer=(char*)&mem[pila[sp]];
 
   if (strlen(buffer))
-    if (buffer[strlen(buffer)-1]=='/')
+    if (IS_PATH_SEP(buffer[strlen(buffer)-1]))
       buffer[strlen(buffer)-1]=0;
 
   for(x=0;x<strlen(buffer);x++) {
     if (x>0 && buffer[x-1]==':') continue;
-    if(buffer[x]=='/') {
+    if(IS_PATH_SEP(buffer[x])) {
       strcpy(cwork,buffer);
       cwork[x]=0;
       __mkdir(cwork);
@@ -3511,7 +3512,7 @@ void remove_file(void) {
 
   for(x=strlen(cwork2)-1;; x--) {
     if(x==-1) { cwork2[0]=0; break; }
-    if(cwork2[x]=='/') { cwork2[x+1]=0; break; }
+    if(IS_PATH_SEP(cwork2[x])) { cwork2[x+1]=0; break; }
   }
 
   rc=_dos_findfirst((char *)&mem[pila[sp]],_A_NORMAL|_A_SYSTEM|_A_HIDDEN,&ft);
@@ -4303,7 +4304,7 @@ void encode_file(int encode) {
   strcpy(cwork2, (char *)name);
   for(x=strlen(cwork2)-1;; x--) {
     if(x==-1) { cwork2[0]=0; break; }
-    if(cwork2[x]=='/') { cwork2[x+1]=0; break; }
+    if(IS_PATH_SEP(cwork2[x])) { cwork2[x+1]=0; break; }
   }
 
   rc=_dos_findfirst((char *)name,_A_NORMAL,&ft);
@@ -4405,7 +4406,7 @@ void _compress(int encode) {
   strcpy(cwork2,(char *) name);
   for(x=strlen(cwork2)-1;; x--) {
     if(x==-1) { cwork2[0]=0; break; }
-    if(cwork2[x]=='/') { cwork2[x+1]=0; break; }
+    if(IS_PATH_SEP(cwork2[x])) { cwork2[x+1]=0; break; }
   }
 
   rc=_dos_findfirst((char *)name,_A_NORMAL,&ft);

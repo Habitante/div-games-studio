@@ -4,6 +4,7 @@
 //-----------------------------------------------------------------------------
 
 #include "global.h"
+#include "div_string.h"
 
 extern int fin_ventana;
 extern int primera_vez;
@@ -691,7 +692,7 @@ extern int linea_error;
 void get_error(int n) {
   FILE * f;
   byte * p;
-  sprintf(cerror,"%s",(char *)texto[381]); p=(byte *)cerror+strlen((char *)cerror);
+  DIV_SPRINTF(cerror,"%s",(char *)texto[381]); p=(byte *)cerror+strlen((char *)cerror);
 
   if (helpidx[n*2] && helpidx[n*2+1]) {
     if((f=fopen("help/help.div","rb"))!=NULL) {
@@ -702,7 +703,10 @@ void get_error(int n) {
   }
 
   if (n==502 || n==503 || n==504 || n==507) {
-    sprintf(cerror,"%s (%d).",cerror,linea_error);
+    /* Fix overlapping sprintf: cerror is both dest and arg */
+    char tmp[sizeof(cerror)];
+    DIV_SPRINTF(tmp, "%s (%d).", cerror, linea_error);
+    DIV_STRCPY(cerror, tmp);
   }
 }
 

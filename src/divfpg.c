@@ -1,5 +1,6 @@
 #include "global.h"
 #include "fpgfile.hpp"
+#include "div_string.h"
 
 int selecciona_fichero(void);
 
@@ -288,8 +289,6 @@ extern byte color_tag;
 
 void FPG0N(void) {
 	FPG *MiFPG;
-	char oc=0;
-
 	int n;
 
 	v.tipo=101; // SOLIZABLE
@@ -311,10 +310,8 @@ void FPG0N(void) {
 	MiFPG->lInfoFPG.creada=0;
 	MiFPG->thumb_on=0;
 	Crear_FPG(MiFPG,full);
-	// false terminate fpg name to fit in fpg header
-	input[12]=0;
-	strcpy((char *)MiFPG->NombreFpg,input);
-	input[12]=oc;
+	// Safe copy: NombreFpg is 13 bytes, truncate to fit FPG header
+	div_strcpy((char *)MiFPG->NombreFpg, sizeof(MiFPG->NombreFpg), input);
 	v.titulo=MiFPG->NombreFpg;
 	v.nombre=MiFPG->NombreFpg;
 	MiFPG->FPGInfo=0;
@@ -326,7 +323,6 @@ void FPG0N(void) {
 void FPG0A(void) {
 	FPG *MiFPG;
 	int n;
-	char oc=0;
 	v.tipo=101; // SOLIZABLE
 	v.an=159;
 	v.al=72+5;
@@ -345,9 +341,8 @@ void FPG0A(void) {
 
 	MiFPG->LastUsed=1;
 	Abrir_FPG(MiFPG,full);
-	input[12]=0;
-	strcpy((char *)MiFPG->NombreFpg,input);
-	input[12]=oc;
+	// Safe copy: NombreFpg is 13 bytes, truncate to fit FPG header
+	div_strcpy((char *)MiFPG->NombreFpg, sizeof(MiFPG->NombreFpg), input);
 	v.titulo=MiFPG->NombreFpg;
 	v.nombre=MiFPG->NombreFpg;
 
@@ -443,7 +438,7 @@ void abrir_fichero(void) {
 		} else
 			v_existe=0;
 
-		strcpy(larchivosbr.lista,input);
+		div_strcpy(larchivosbr.lista, larchivosbr.lista_an, input);
 		larchivosbr.maximo=1;
 		thumb[0].tagged=1;
 		num_taggeds=1;
@@ -1769,16 +1764,20 @@ void GetGrafMAP(struct tmapa *mapa, byte *imagen, int x, int y, int ancho, int a
 	while(MiFPG->OffsGrf[cod])
 		cod++;
 
-	strcpy(str_file, (char *)MiFPG->NombreFpg);
+	DIV_STRCPY(str_file, (char *)MiFPG->NombreFpg);
 
 	if(strchr(str_file,'.'))
-		strcpy(strchr(str_file,'.'), "");
+		*strchr(str_file,'.') = '\0';
 
 	if(strlen(str_file)>5)
 		str_file[5]=(char)0;
 
-	sprintf(str_file,"%s%d.MAP",strupr(str_file),cod);
-	sprintf(str_desc, "%s%d%s%s", texto[499], cod, texto[500], mapa->filename);
+	{ /* Overlapping sprintf fix: str_file is both dest and arg */
+		char tmp[sizeof(str_file)];
+		DIV_SPRINTF(tmp, "%s%d.MAP", strupr(str_file), cod);
+		DIV_STRCPY(str_file, tmp);
+	}
+	DIV_SPRINTF(str_desc, "%s%d%s%s", texto[499], cod, texto[500], mapa->filename);
 
 	Anadir_FPG(MiFPG, cod, str_desc, str_file, ancho, alto, 0, NULL, (char *)buffer, 0, 0);
 

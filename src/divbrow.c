@@ -4,6 +4,7 @@
 //-----------------------------------------------------------------------------
 
 #include "global.h"
+#include "div_string.h"
 #include "divsound.h"
 #include "ifs.h"
 
@@ -1456,7 +1457,7 @@ void browser0(void) {
     strcpy(input,&ext[an_ext*tipo[v_tipo].defecto]);
   else strcpy(input,&ext[0]);
 
-  strcpy(mascara,input);
+  DIV_STRCPY(mascara,input);
   v_terminado=0;
 
   _get(126,4,v.al-21,v.an-(24+text_len(texto[100])+text_len(texto[101])),(byte *)input,512,0,0);
@@ -1800,7 +1801,7 @@ void browser2(void) {
     } else if (lextbr.zona>=10) { v.volcar=1;
       tipo[v_tipo].defecto=lextbr.zona-10+lextbr.inicial;
       strcpy(input,ext+(lextbr.zona-10+lextbr.inicial)*an_ext);
-      strcpy(mascara,input);
+      DIV_STRCPY(mascara,input);
       tipo[v_tipo].inicial=0;
       imprime_rutabr();
       larchivosbr.creada=0;

@@ -16,6 +16,7 @@
 #define DEFINIR_AQUI
 
 #include "inter.h"
+#include "div_string.h"
 
 #include "divsound.h"
 #include "divmixer.hpp"
@@ -1867,7 +1868,7 @@ if(argc>1 && exesize==0) {
 #ifdef ZLIB
 if(datsize>0) {	
 	datastartpos=exestart+exesize;
-	strcpy(exebin,argv[0]);
+	div_strcpy(exebin, sizeof(exebin), argv[0]);
 }
 #endif
   

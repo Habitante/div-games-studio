@@ -1,5 +1,6 @@
 
 #include "global.h"
+#include "div_string.h"
 #include "divsound.h"
 #include "divmixer.hpp"
 #include "divsb.h"
@@ -499,7 +500,7 @@ Mix_Chunk *SI;
       fclose(f);
       v_existe=1;
     } else v_existe=0;
-    strcpy(larchivosbr.lista,input);
+    div_strcpy(larchivosbr.lista, larchivosbr.lista_an, input);
     larchivosbr.maximo=1;
     thumb[0].tagged=1;
     num_taggeds=1;
@@ -513,8 +514,8 @@ Mix_Chunk *SI;
       strcpy(full,tipo[v_tipo].path);
       if (full[strlen(full)-1]!='/') strcat(full,"/");
       strcat(full, input);
-      strcpy(SoundName,input);
-      strcpy(SoundPathName,full);
+      DIV_STRCPY(SoundName,input);
+      DIV_STRCPY(SoundPathName,full);
 
       if (!v_existe) {
         v_texto=(char *)texto[43];
@@ -580,8 +581,8 @@ debugprintf("SoundName %s\n",input);
 debugprintf("SOundPath %s\n",full);
 
 
-  strcpy(SoundName,input);
-  strcpy(SoundPathName,full);
+  DIV_STRCPY(SoundName,input);
+  DIV_STRCPY(SoundPathName,full);
 
   if((pcminfo_aux=(byte *)malloc(sizeof(pcminfo)))==NULL)
   {
@@ -857,7 +858,7 @@ void OpenSong(void) {
       fclose(f);
       v_existe=1;
     } else v_existe=0;
-    strcpy(larchivosbr.lista,input);
+    div_strcpy(larchivosbr.lista, larchivosbr.lista_an, input);
     larchivosbr.maximo=1;
     thumb[0].tagged=1;
     num_taggeds=1;
@@ -871,8 +872,8 @@ void OpenSong(void) {
       strcpy(full,tipo[v_tipo].path);
       if (full[strlen(full)-1]!='/') strcat(full,"/");
       strcat(full, input);
-      strcpy(SongName,input);
-      strcpy(SongPathName,full);
+      DIV_STRCPY(SongName,input);
+      DIV_STRCPY(SongPathName,full);
 
       if (!v_existe) {
         v_texto=(char *)texto[43];

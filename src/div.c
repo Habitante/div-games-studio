@@ -21,6 +21,7 @@
 #endif
 
 #include "global.h"
+#include "div_string.h"
 #include "divsound.h"
 #include "divmixer.hpp"
 #include "divsb.h"
@@ -4773,7 +4774,7 @@ void DaniDel(char *name) {
   strcpy(cwork2, name);
   for(x=strlen(cwork2)-1;; x--) {
     if(x==-1) { cwork2[0]=0; break; }
-    if(cwork2[x]=='/') { cwork2[x+1]=0; break; }
+    if(IS_PATH_SEP(cwork2[x])) { cwork2[x+1]=0; break; }
   }
 
   rc=_dos_findfirst(name,_A_NORMAL,&ft);

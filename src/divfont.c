@@ -7,6 +7,7 @@
 // El string se pasa a CreateText en cCharsToPrint[128]
 
 #include "global.h"
+#include "div_string.h"
 #include "ifs.h"
 
 void Selcolor0(void);
@@ -228,10 +229,10 @@ char cWork[10];
                         dialogo(GenFont0);
                         if (font_generated) {
                           close_old_fnt();
-                          strcpy(Load_FontName,FontName);
-                          strcpy(Load_FontPathName,FontPathName);
+                          div_strcpy(Load_FontName, sizeof(Load_FontName), FontName);
+                          DIV_STRCPY(Load_FontPathName,FontPathName);
                           for(x=strlen(Load_FontPathName)+1;x>=0;x++) {
-                            if(Load_FontPathName[x]=='/') {
+                            if(IS_PATH_SEP(Load_FontPathName[x])) {
                               Load_FontPathName[x+1]=0; break;
                             }
                           }
@@ -671,10 +672,10 @@ int an=v.an/big2,al=v.al/big2;
                         if(!v_aceptar)
                                 return;
                 }
-                strcpy(FontName,input);
-                strcpy(FontPathName,tipo[v_tipo].path);
-                if (FontPathName[strlen(FontPathName)-1]!='/') strcat(FontPathName,"/");
-                strcat(FontPathName,input);
+                DIV_STRCPY(FontName,input);
+                DIV_STRCPY(FontPathName,tipo[v_tipo].path);
+                if (!IS_PATH_SEP(FontPathName[strlen(FontPathName)-1])) strcat(FontPathName,"/");
+                DIV_STRCAT(FontPathName,input);
                 wbox(v.ptr,an,al,c2,4,19,66,8); // Borde oscuro del Font
                 wwrite(v.ptr,an,al,4,19,0,(byte *)FontName,c4);
                 v.volcar=1;
@@ -713,7 +714,7 @@ int  num;
                             fclose(f);
                             v_existe=1;
                           } else v_existe=0;
-                          strcpy(larchivosbr.lista,input);
+                          div_strcpy(larchivosbr.lista, larchivosbr.lista_an, input);
                           larchivosbr.maximo=1;
                           thumb[0].tagged=1;
                           num_taggeds=1;
@@ -724,10 +725,10 @@ int  num;
                           if(thumb[num].tagged)
                           {
                             strcpy(input,larchivosbr.lista+larchivosbr.lista_an*num);
-                            strcpy(FaceName,input);
-                            strcpy(FacePathName,tipo[v_tipo].path);
-                            if (FacePathName[strlen(FacePathName)-1]!='/') strcat(FacePathName,"/");
-                            strcat(FacePathName,input);
+                            DIV_STRCPY(FaceName,input);
+                            DIV_STRCPY(FacePathName,tipo[v_tipo].path);
+                            if (!IS_PATH_SEP(FacePathName[strlen(FacePathName)-1])) strcat(FacePathName,"/");
+                            DIV_STRCAT(FacePathName,input);
                           }
                         }
                         wbox(v.ptr,an,al,c2,4,38,66,8); // Borde oscuro de Face
@@ -1454,7 +1455,7 @@ void OpenFont(void) {
       fclose(f);
       v_existe=1;
     } else v_existe=0;
-    strcpy(larchivosbr.lista,input);
+    div_strcpy(larchivosbr.lista, larchivosbr.lista_an, input);
     larchivosbr.maximo=1;
     thumb[0].tagged=1;
     num_taggeds=1;
@@ -1477,8 +1478,8 @@ void OpenFont(void) {
               v_texto=(char *)texto[43];
               dialogo(err0);
             } else {
-              strcpy(Load_FontName,input);
-              strcpy(Load_FontPathName,full);
+              div_strcpy(Load_FontName, sizeof(Load_FontName), input);
+              DIV_STRCPY(Load_FontPathName,full);
               nueva_ventana(ShowFont0);
             }
           } else { v_texto=(char *)texto[46]; dialogo(err0); }

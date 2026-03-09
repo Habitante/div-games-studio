@@ -4,6 +4,7 @@
 //-----------------------------------------------------------------------------
 
 #include "global.h"
+#include "div_string.h"
 #include "newfuncs.h"
 
 
@@ -143,7 +144,7 @@ void Vid_Setup0(void) {
 
   for (n=0;n<num_modos;n++) {
     memset(&vgasizes[n*16],0,16);
-    sprintf(&vgasizes[n*16],"%s%d x %d",(modos[n].modo)?"SDL ":"VGA ",modos[n].ancho,modos[n].alto);
+    div_snprintf(&vgasizes[n*16], 16, "%s%d x %d",(modos[n].modo)?"SDL ":"VGA ",modos[n].ancho,modos[n].alto);
   }
 
   lvgasizes.creada=0;
@@ -201,8 +202,8 @@ void Get_Tapiz() {
 
 				if ( es_MAP((byte *)cwork) || es_PCX((byte *)cwork) || es_BMP((byte *)cwork) ) {
 
-					strcpy(Tap_name,input);
-					strcpy(Tap_pathname,full);
+					DIV_STRCPY(Tap_name,input);
+					DIV_STRCPY(Tap_pathname,full);
 
 				} else {
 
@@ -214,8 +215,8 @@ void Get_Tapiz() {
 
 							if (es_JPG(ptr,len)) {
 
-								strcpy(Tap_name,input);
-								strcpy(Tap_pathname,full);
+								DIV_STRCPY(Tap_name,input);
+								DIV_STRCPY(Tap_pathname,full);
 
 							} else { 
 								v_texto=(char *)texto[46]; 
@@ -260,8 +261,8 @@ void Tap_Setup1(void) {
   int x;
 
   _show_items();
-  for(x=strlen(Tap_pathname)-1;x>=0;x--) if(Tap_pathname[x]=='/' || x==0) {
-    strcpy(Tap_name,&Tap_pathname[x+1]);
+  for(x=strlen(Tap_pathname)-1;x>=0;x--) if(IS_PATH_SEP(Tap_pathname[x]) || x==0) {
+    DIV_STRCPY(Tap_name,&Tap_pathname[x+1]);
     x=-1;
   }
 

@@ -4,6 +4,7 @@
 //-----------------------------------------------------------------------------
 
 #include "global.h"
+#include "div_string.h"
 #include "fpgfile.hpp"
 
 void crear_ghost_vc(int m);
@@ -540,7 +541,7 @@ void LoadPal() {
       fclose(f);
       v_existe=1;
     } else v_existe=0;
-    strcpy(larchivosbr.lista,input);
+    div_strcpy(larchivosbr.lista, larchivosbr.lista_an, input);
     larchivosbr.maximo=1;
     thumb[0].tagged=1;
     num_taggeds=1;

@@ -4,6 +4,7 @@
 //-----------------------------------------------------------------------------
 
 #include "global.h"
+#include "div_string.h"
 #include "divsound.h"
 #include "fpgfile.hpp"
 #include "divsb.h"
@@ -925,10 +926,10 @@ void imp_fontmap(void) {
     dialogo(aceptar0); if(!v_aceptar) return;
   }
 
-  strcpy(FontName,input);
-  strcpy(FontPathName,tipo[v_tipo].path);
-  if (FontPathName[strlen(FontPathName)-1]!='/') strcat(FontPathName,"/");
-  strcat(FontPathName,input); // * FontPathName ruta completa del fichero
+  div_strcpy(FontName, sizeof(FontName), input);
+  DIV_STRCPY(FontPathName, tipo[v_tipo].path);
+  if (!IS_PATH_SEP(FontPathName[strlen(FontPathName)-1])) strcat(FontPathName,"/");
+  div_strcat(FontPathName, sizeof(FontPathName), input); // * FontPathName ruta completa del fichero
 
   buffer_len=1356+256*16+map_an*map_al; // Pide memoria suficiente para el FNT
 
@@ -1156,8 +1157,8 @@ void menu_sonidos2(void) {
 
               if (strchr(input,' ')==NULL) {
                 SaveSound(mypcminfo,full);
-                strcpy(mypcminfo->pathname, full);
-                strcpy(mypcminfo->name,     input);
+                div_strcpy(mypcminfo->pathname, sizeof(mypcminfo->pathname), full);
+                div_strcpy(mypcminfo->name, sizeof(mypcminfo->name), input);
                 move(0,n); cierra_ventana();
                 OpenSoundFile();
               } else { v_texto=(char *)texto[47]; dialogo(err0); }
@@ -2350,7 +2351,7 @@ void analizar_input(void) {
     _dos_setdrive(drive[0]-'A'+1,&n);
 //    getcwd(full,PATH_MAX);
     if ( true || (full[0]==drive[0])) {
-      if (strlen(dir)>1) if (dir[strlen(dir)-1]=='/') dir[strlen(dir)-1]=0;
+      if (strlen(dir)>1) if (IS_PATH_SEP(dir[strlen(dir)-1])) dir[strlen(dir)-1]=0;
       if (!strlen(dir) || !chdir(dir)) {
 #ifdef DOS		
         strcpy(input,fname); strcat(input,ext);
@@ -2379,7 +2380,7 @@ void analizar_input(void) {
                 strcpy(input,fileinfo.name);
 
               } else {
-		strcpy(mascara,input); // si hay MAS de uno ...
+		DIV_STRCPY(mascara,input); // si hay MAS de uno ...
 		printf("input: %s\n",input);
 		}
             } else { // si no encontró ninguno ...
@@ -2392,10 +2393,10 @@ void analizar_input(void) {
         	      if (!_dos_findfirst(input,_A_NORMAL,&fileinfo)) { // si hay alguno ...
               		if (_dos_findnext(&fileinfo)) { // si SOLO hay uno
                     strcpy(input,fileinfo.name);
-              		} else strcpy(mascara,input); // si hay MAS de uno
+              		} else DIV_STRCPY(mascara,input); // si hay MAS de uno
                 }
-        	      else strcpy(mascara,input);
-        	    } else strcpy(mascara,input);
+        	      else DIV_STRCPY(mascara,input);
+        	    } else DIV_STRCPY(mascara,input);
             }
 
           } else // No wildcards ...
@@ -2414,11 +2415,11 @@ void analizar_input(void) {
           		if (_dos_findnext(&fileinfo)) {
                 strcpy(input,fileinfo.name);
               } else {
-			strcpy(mascara,input);
+			DIV_STRCPY(mascara,input);
 			printf("2584 input %s\n",input);
 		}
             else if (strchr(input,'*')!=NULL || strchr(input,'?')!=NULL) {
-              strcpy(mascara,input);
+              DIV_STRCPY(mascara,input);
             } else {v_terminado=1; v_existe=0; } // Fichero no encontrado (con extensión añadida)
           } else {v_terminado=1; v_existe=0; } // Fichero no encontrado (sin extensión añadida)
         } 
@@ -2571,7 +2572,7 @@ void abrir_mapa(void) {
       fclose(f);
       v_existe=1;
     } else v_existe=0;
-    strcpy(larchivosbr.lista,input);
+    div_strcpy(larchivosbr.lista, larchivosbr.lista_an, input);
     larchivosbr.maximo=1;
     thumb[0].tagged=1;
     num_taggeds=1;
@@ -2728,8 +2729,8 @@ void abrir_mapa(void) {
 
                   // Define path\filename, map_an/al y crea la nueva ventana
 
-                  strcpy(v_mapa->filename,input);
-                  strcpy(v_mapa->path,tipo[v_tipo].path);
+                  div_strcpy(v_mapa->filename, sizeof(v_mapa->filename), input);
+                  div_strcpy(v_mapa->path, sizeof(v_mapa->path), tipo[v_tipo].path);
                   memcpy(v_mapa->descripcion,Descripcion,32);
                   v_mapa->TengoNombre=0;
                   v_mapa->Codigo=Codigo;
@@ -2775,7 +2776,7 @@ void guardar_mapa(void) {
 
   if (strchr(input,' ')==NULL) {
     if ((f=fopen(full,"wb"))!=NULL) { // Se ha elegido uno
-		strcpy(filename,input);
+		div_strcpy(filename, sizeof(filename), input);
 		strupr(filename);
 
       if (!strcmp(strchr(filename,'.'),".PCX")) tipomapa=1;
@@ -2798,8 +2799,8 @@ void guardar_mapa(void) {
   } else { v_texto=(char *)texto[47]; dialogo(err0); e=1; }
 
   if (!e) { // Debe cambiar la ruta y nombre del mapa/ventana guardado
-    strcpy(ventana[v_ventana].mapa->path,tipo[v_tipo].path);
-    strcpy(ventana[v_ventana].mapa->filename,input);
+    div_strcpy(ventana[v_ventana].mapa->path, sizeof(ventana[v_ventana].mapa->path), tipo[v_tipo].path);
+    div_strcpy(ventana[v_ventana].mapa->filename, sizeof(ventana[v_ventana].mapa->filename), input);
     wgra(ventana[v_ventana].ptr,an,al,c_b_low,2,2,an-20,7);
     if (text_len(ventana[v_ventana].titulo)+3>an-20) {
       wwrite_in_box(ventana[v_ventana].ptr,an,an-19,al,4,2,0,ventana[v_ventana].titulo,c1);
@@ -3084,7 +3085,7 @@ void mapbus0() {
   sprintf(ctile,"%d",mintile);
   sprintf(ccolor,"%d",color);
 
-  sprintf(ctiletext,"%s [%d..%d]",texto[401],mintile,maxtile);
+  DIV_SPRINTF(ctiletext,"%s [%d..%d]",texto[401],mintile,maxtile);
   texto[546]=(byte *)&ctiletext[0];
 
   _get(546,4,11,64+40,(byte *)ctile,5,mintile,maxtile);

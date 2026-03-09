@@ -4,6 +4,7 @@
 //-----------------------------------------------------------------------------
 
 #include "global.h"
+#include "div_string.h"
 #include <time.h>
 
 void _completo(void);
@@ -2437,7 +2438,7 @@ void abrir_programa(void) {
       fclose(f);
       v_existe=1;
     } else v_existe=0;
-    strcpy(larchivosbr.lista,input);
+    div_strcpy(larchivosbr.lista, larchivosbr.lista_an, input);
     larchivosbr.maximo=1;
     thumb[0].tagged=1;
     num_taggeds=1;
@@ -2456,11 +2457,11 @@ void abrir_programa(void) {
         fseek(f,0,SEEK_END); n=ftell(f)+buffer_grow;
         if ((buffer=(byte *)malloc(n))!=NULL) {
 			memset(buffer,0,n);
-			
+
           if ((v_prg=(struct tprg*)malloc(sizeof(struct tprg)))!=NULL) {
               v_prg->buffer_lon=n;
-              strcpy(v_prg->filename,input);
-              strcpy(v_prg->path,tipo[v_tipo].path);
+              div_strcpy(v_prg->filename, sizeof(v_prg->filename), input);
+              div_strcpy(v_prg->path, sizeof(v_prg->path), tipo[v_tipo].path);
               fseek(f,0,SEEK_SET);
 
             if (fread(buffer,1,n,f)==n-buffer_grow) {
@@ -2566,8 +2567,8 @@ void programa0_nuevo(void) {
       if ((v_prg=(struct tprg*)malloc(sizeof(struct tprg)))!=NULL) {
 		  memset(v_prg,0,sizeof(struct tprg));
           v_prg->buffer_lon=n;
-          strcpy(v_prg->filename,input);
-          strcpy(v_prg->path,tipo[v_tipo].path);
+          div_strcpy(v_prg->filename, sizeof(v_prg->filename), input);
+          div_strcpy(v_prg->path, sizeof(v_prg->path), tipo[v_tipo].path);
 //        n-=buffer_grow;
         n=strlen(buffer);
         v_prg->file_lon=n;
@@ -2606,8 +2607,8 @@ void guardar_prg(void) {
     fwrite(v.prg->buffer,1,v.prg->file_lon,f);
     fclose(f); // *** OJO, se debe borrar el fichero si no se pudo grabar entero
 
-    strcpy(v.prg->path,tipo[v_tipo].path);
-    strcpy(v.prg->filename,input);
+    div_strcpy(v.prg->path, sizeof(v.prg->path), tipo[v_tipo].path);
+    div_strcpy(v.prg->filename, sizeof(v.prg->filename), input);
 
     wgra(v.ptr,an,al,c_b_low,2,2,an-20,7);
     if (text_len(v.titulo)+3>an-20) {
@@ -2892,8 +2893,8 @@ void abrir_programa_para_fernando(char *nombre,char *path) {
     if ((buffer=(byte *)malloc(n))!=NULL) {
       if ((v_prg=(struct tprg*)malloc(sizeof(struct tprg)))!=NULL) {
     v_prg->buffer_lon=n;
-    strcpy(v_prg->filename,input);
-        strcpy(v_prg->path,wpath); //<<<-----------
+    div_strcpy(v_prg->filename, sizeof(v_prg->filename), input);
+        div_strcpy(v_prg->path, sizeof(v_prg->path), wpath); //<<<-----------
     fseek(f,0,SEEK_SET);
         if (fread(buffer,1,n,f)==n-buffer_grow) {
 

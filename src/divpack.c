@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <zlib.h>
 #include <stdlib.h>
+#include "div_string.h"
 
 #define INTOOUT  \
 \
@@ -101,31 +102,31 @@ int main(int argc, char *argv[]) {
 
 	// output file
 	if(argc>4) {
-		strcpy(outfile, argv[4]);
+		DIV_STRCPY(outfile, argv[4]);
 	} else {
-		strcpy(outfile,"out");
+		DIV_STRCPY(outfile,"out");
 	}
 
 	// runtime
 	if(argc>1) {
-		strcpy(runtime, argv[1]);
+		DIV_STRCPY(runtime, argv[1]);
 	} else {
-		strcpy(runtime,"system/divrun-LINUX");
+		DIV_STRCPY(runtime,"system/divrun-LINUX");
 	}
 
 	// bytecode
 	if(argc>2) {
-		strcpy(exefile, argv[2]);
+		DIV_STRCPY(exefile, argv[2]);
 	} else {
-		strcpy(exefile, "system/EXEC.EXE");
+		DIV_STRCPY(exefile, "system/EXEC.EXE");
 	}
 
 	// data file (pak in zip or zip)
 
 	if(argc>2) {
-		strcpy(datafile, argv[3]);
+		DIV_STRCPY(datafile, argv[3]);
 	} else {
-		strcpy(datafile, "data.div");
+		DIV_STRCPY(datafile, "data.div");
 	}
 
 	return pack(runtime, exefile, datafile, outfile);

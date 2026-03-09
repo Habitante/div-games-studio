@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <time.h>
 #include "global.h"
+#include "div_string.h"
 
 static int ORDig1=-1, ORDig2=-1, ORDig3=-1, ORDig4=-1;
 static char cTimeForIcon[18];
@@ -25,7 +26,7 @@ static void Show_Time(void) {
 
   time(&dtime);
   timeinfo = localtime(&dtime);
-  sprintf(cTimeForIcon, "%s [%02d%c%02d]", texto[151],
+  DIV_SPRINTF(cTimeForIcon, "%s [%02d%c%02d]", texto[151],
           timeinfo->tm_hour, timeinfo->tm_sec % 2 ? ':' : '.', timeinfo->tm_min);
 
   sprintf(cBuff, "%02d", timeinfo->tm_hour);
@@ -74,7 +75,7 @@ void Clock0(void) {
   v.titulo = texto[151];
   time(&dtime);
   timeinfo = localtime(&dtime);
-  sprintf(cTimeForIcon, "%s [%02d%c%02d]", texto[151],
+  DIV_SPRINTF(cTimeForIcon, "%s [%02d%c%02d]", texto[151],
           timeinfo->tm_hour, timeinfo->tm_sec % 2 ? ';' : ' ', timeinfo->tm_min);
   v.nombre = (byte *)cTimeForIcon;
   v.paint_handler = Clock1;

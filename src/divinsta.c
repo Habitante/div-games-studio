@@ -4,6 +4,7 @@
 //-----------------------------------------------------------------------------
 
 #include "global.h"
+#include "div_string.h"
 #ifdef ZLIB
 #include <zlib.h>
 #endif
@@ -195,8 +196,8 @@ void Setup2() {
             create_install_image(full,1);
             if (imagen_install!=NULL) {
               free(ptrimg);
-              strcpy(ifile1,full);
-              strcpy(ifile1name,input);
+              DIV_STRCPY(ifile1,full);
+              div_strcpy(ifile1name, sizeof(ifile1name), input);
             } else imagen_install=ptrimg;
             call(v.paint_handler); v.volcar=1;
           }
@@ -224,8 +225,8 @@ void Setup2() {
           if (strcmp(cwork,"fnt\x1a\x0d\x0a")) {
             v_texto=(char *)texto[46]; dialogo(err0);
           } else {
-            strcpy(ifile2,full);
-            strcpy(ifile2name,input);
+            DIV_STRCPY(ifile2,full);
+            div_strcpy(ifile2name, sizeof(ifile2name), input);
             call(v.paint_handler); v.volcar=1;
           }
         }
@@ -252,8 +253,8 @@ void Setup2() {
           if (strcmp(cwork,"fnt\x1a\x0d\x0a")) {
             v_texto=(char *)texto[46]; dialogo(err0);
           } else {
-            strcpy(ifile3,full);
-            strcpy(ifile3name,input);
+            DIV_STRCPY(ifile3,full);
+            div_strcpy(ifile3name, sizeof(ifile3name), input);
             call(v.paint_handler); v.volcar=1;
           }
         }
@@ -749,7 +750,7 @@ void crear_instalacion(void) {
 
   if (_drive<=2) { strcpy(dir,"/"); is_disk=_drive; } // En un disquete no creará directorios
 
-  for(x=1;x<strlen(dir);x++) if(dir[x]=='/') { // Crea directorios ...
+  for(x=1;x<strlen(dir);x++) if(IS_PATH_SEP(dir[x])) { // Crea directorios ...
 strcpy(cWork,full);
 
 #ifdef NOTYET

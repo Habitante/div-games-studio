@@ -2,6 +2,7 @@
 
 #include "global.h"
 #include "fpgfile.hpp"
+#include "div_string.h"
 
 void InitGetCode(void);
 extern int RetValue;
@@ -337,7 +338,7 @@ byte MiTabla[256];
         //Nombre del fichero temporal
         strcpy(ActualPath,(char *)Fpg->ActualFile);
         for(x=strlen(ActualPath);x>=0;x--)
-                if(ActualPath[x]=='/')
+                if(IS_PATH_SEP(ActualPath[x]))
                         x=-1;
                 else
                         ActualPath[x]=0;
@@ -460,7 +461,7 @@ char *Buffer;
         cierra_fpg(full);
 
         strcpy((char *)Fpg->ActualFile,full);
-        strcpy((char *)Fpg->NombreFpg,input);
+        div_strcpy((char *)Fpg->NombreFpg, sizeof(Fpg->NombreFpg), input);
 
         wgra(ventana[n].ptr,an,al,c_b_low,2,2,an-20,7);
         if (text_len(ventana[n].titulo)+3>an-20) {
@@ -493,7 +494,7 @@ debugprintf("Deleting map %d\n",COD);
         //Nombre del fichero temporal
         strcpy(ActualPath,(char *)Fpg->ActualFile);
         for(x=strlen(ActualPath);x>=0;x--)
-                if(ActualPath[x]=='/')
+                if(IS_PATH_SEP(ActualPath[x]))
                         x=-1;
                 else
                         ActualPath[x]=0;
@@ -607,7 +608,7 @@ int Borrar_muchos_FPG(FPG *Fpg,int taggeds,int *array_del) {
 
   strcpy(ActualPath,(char *)Fpg->ActualFile); //Nombre del fichero temporal
   for(x=strlen(ActualPath);x>=0;x--)
-    if(ActualPath[x]=='/') x=-1; else ActualPath[x]=0;
+    if(IS_PATH_SEP(ActualPath[x])) x=-1; else ActualPath[x]=0;
   strcat(ActualPath,"_DIV_.FPG");
   DaniDel(ActualPath);
 
