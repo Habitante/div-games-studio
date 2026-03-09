@@ -104,14 +104,19 @@ tables used by the compiler's lexical analyzer.
 
 Make the compiler tell us what's actually broken. Fix the scariest stuff.
 
-### Enable warnings
-- [ ] Replace `-w` (suppress all warnings) with `-Wall -Wextra` in CMakeLists.txt
-  - Baseline: 1,745 warnings (see `reports/warnings-baseline-full.md`)
-  - ~653 are shadow warnings from globals `r,g,b,c,d,a,f,x,y` — suppress with `-Wno-shadow` initially
-- [ ] Fix all implicit function declarations
-- [ ] Fix pointer/int cast warnings (the 32-bit-assumption cases)
-- [ ] Fix unused variable warnings
-- [ ] Remove `-fpermissive` once code is clean enough
+### Enable warnings ✓ (done 2026-03-09)
+- [x] Replace `-w` (suppress all warnings) with `-Wall -Wextra` in CMakeLists.txt
+  - Original baseline: 1,745 warnings → after Phase 0 dead code removal: 342
+  - Suppressed low-value: `-Wno-shadow -Wno-unused-parameter -Wno-sign-compare
+    -Wno-missing-field-initializers -Wno-char-subscripts`
+  - Third-party files (zip.c, SDL_framerate.c) suppressed with per-file `-w`
+- [x] Fix all CRITICAL/HIGH warnings: use-after-free, -Wrestrict (52 sites),
+      missing returns, abs-on-unsigned (14), pointer casts (50+), maybe-uninitialized (128),
+      empty-body (19), int-in-bool-context (3)
+- [x] Fix pointer/int cast warnings — replaced `(memptrsize)` with `(uintptr_t)`/`(intptr_t)`
+- [x] Remove `-fpermissive` (was a no-op in C mode anyway)
+- Remaining: 626 LOW-severity warnings (misleading-indentation 260, parentheses 144,
+  dangling-else 80, pointer-sign 51, missing-braces 18, misc 10)
 
 ### Critical bugs fixed (found via `-Wall -Wextra` audit, 2026-03-08)
 - [x] `divc.c:1854`: `!ivnom.b[0]!='.'` operator precedence bug — `#include` path
@@ -126,7 +131,11 @@ Make the compiler tell us what's actually broken. Fix the scariest stuff.
 ### Fix known landmines
 - [x] `divkeybo.c`: DOS BIOS pointers (`0x417`, `0x41a`, `0x41c`) guarded with `#ifdef DOS`
 - [x] `div.c:2949`: `red_panel.png` already fixed to relative path; `v.c` recording path fixed too
-- [ ] Audit all 1,493 `sprintf`/`strcpy` calls — migrate critical paths to safe variants
+- [x] Audit unsafe `sprintf`/`strcpy` calls — see `reports/unsafe-string-audit.md`.
+      Created `src/div_string.h` with safe helpers (div_strcpy, div_strcat, div_snprintf,
+      IS_PATH_SEP). Fixed 38 high-risk `strcpy(dest, input)` buffer overflow sites across
+      12 files, 2 overlapping sprintf (UB), and 15 path separator sites (only checked `/`).
+      ~690 remaining strcpy are low-risk internal string copies.
 - [ ] Audit the `PrintEvent` pattern for similar `#ifdef`-body bugs (divmouse.c:506 was one)
 - [x] Fix window close button — was already working via `SDL_QUIT` → `salir_del_entorno`.
       Fixed inner loops (dialog, paint color/mask pickers) that blocked exit until dismissed.
@@ -176,7 +185,7 @@ but left the underlying infrastructure broken:
       `osd_sdl12.h`, `osd_sdl.h`; merged declarations into `osd_sdl2.h`; removed `-DSDL2=2`
       from CMakeLists.txt)
 - [ ] Unify byte types: pick `uint8_t` everywhere, stop mixing `byte`/`char`/`uchar`
-- [ ] Normalize path separators (some code only checks `/`, not `\`)
+- [x] Normalize path separators — 15 sites fixed via `IS_PATH_SEP()` macro (done 2026-03-09)
 
 ---
 
@@ -193,14 +202,22 @@ No behavioral changes — pure cleanup.
 - [ ] Document the meaning of `v.an`/`v.al` (width/height), `tapiz` (wallpaper),
       `papelera` (clipboard), etc. in a glossary or inline
 
-### Architecture
-- [ ] Document the call graph from IDE startup → main loop → event processing
-- [ ] Document the compiler pipeline: lexer → parser → codegen → bytecode format
-- [ ] Document the VM interpreter loop and process scheduling algorithm
-- [ ] Document the rendering pipeline: 8-bit surface → palette blit → SDL2 texture
-- [ ] Document the FPG/MAP/FNT/PAL binary file formats
-- [ ] Document the OSDEP abstraction layer contract
-- [ ] Catalogue all 100+ globals in global.h with their roles
+### Architecture ✓ (initial docs done 2026-03-09)
+- [x] Document the call graph from IDE startup → main loop → event processing
+      → `reports/architecture-overview.md`
+- [x] Document the compiler pipeline: lexer → parser → codegen → bytecode format
+      → `reports/compiler-pipeline.md` (127-opcode EML instruction set documented)
+- [x] Document the VM interpreter loop and process scheduling algorithm
+      → `reports/vm-and-runtime.md` (stack VM, FRAME-based cooperative multitasking)
+- [x] Document the rendering pipeline: 8-bit surface → palette blit → SDL2 texture
+      → `reports/vm-and-runtime.md` (rendering section)
+- [x] Document the FPG/MAP/FNT/PAL binary file formats
+      → `reports/architecture-overview.md` (file formats section)
+- [x] Document the OSDEP abstraction layer contract
+      → `reports/architecture-overview.md` (OSDEP section)
+- [x] Catalogue all 100+ globals in global.h with their roles
+      → `reports/glossary-spanish-english.md` (~150 identifiers translated)
+- [ ] Review docs for accuracy (Daniel is the authority on compiler/VM internals)
 
 ### Structural improvements
 - [ ] Consider splitting `divc.c` (9,346 lines) into lexer/parser/codegen modules
