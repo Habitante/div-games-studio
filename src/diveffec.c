@@ -289,7 +289,7 @@ void Explode2(void) {
   {
     gama=exp_colores;
     t_gama=exp_gama;
-    dialogo((voidReturnType)gama0);
+    show_dialog((voidReturnType)gama0);
     if (v_aceptar) need_refresh=1;
   }
   if(need_refresh){
@@ -372,7 +372,7 @@ int x;
         n_frames=_n_frames;
         create_dac4();
 
-        dialogo((voidReturnType)Explode0);
+        show_dialog((voidReturnType)Explode0);
         if(!v_aceptar)
                 return;
         for(x=0;x<256;x++) ExpDac[x] = exp_colores[x/2];

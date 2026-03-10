@@ -150,7 +150,7 @@ void crea_gama(struct _gcolor * t_gama, byte * gama) {
 }
 
 //-----------------------------------------------------------------------------
-//  Codigo principal del dialogo de gamas
+//  Codigo principal del show_dialog de gamas
 //-----------------------------------------------------------------------------
 
 void gama0(void)
@@ -255,7 +255,7 @@ void gama2(void)
       else
       if ( wmouse_in(button_coords[con].x-3, button_coords[con].y-15, 14, 14) )
       {
-        dialogo((voidReturnType)Selcolor0);
+        show_dialog((voidReturnType)Selcolor0);
         if(SelColorOk)
         {
           t_gama[con].selec = 1;

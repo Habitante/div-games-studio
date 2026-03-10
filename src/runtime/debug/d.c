@@ -18,7 +18,7 @@ void process_list0(void);
 void profile0(void);
 byte * get_offset_byte(int m);
 word * get_offset_word(int m);
-void vuelca_ventana(int m);
+void flush_window(int m);
 void wrectangle(byte*copia,int an_copia,int al_copia,byte c,int x,int y,int an,int al);
 void wput(byte*copia,int an_copia,int al_copia,int x,int y,int n);
 void wbox(byte*copia,int an_copia,int al_copia,byte c,int x,int y,int an,int al);
@@ -34,14 +34,14 @@ void explode(int x,int y,int an,int al);
 void wvolcado(byte*copia,int an_copia,int al_copia,
               byte *p,int x,int y,int an,int al,int salta);
               
-void entorno_dialogo(void);
+void modal_loop(void);
 int mouse_in(int x, int y, int x2, int y2);   
-void mueve_ventana(void);
-void cierra_ventana(void);
-void volcado_copia(void);
-void actualiza_caja(int x, int y, int an, int al);
+void move_window(void);
+void close_window(void);
+void flush_copy(void);
+void update_box(int x, int y, int an, int al);
 void implode(int x,int y,int an,int al);
-int colisiona_con(int a, int x, int y, int an, int al);
+int collides_with(int a, int x, int y, int an, int al);
 
 void wvolcado_oscuro(byte*copia,int an_copia,int al_copia,
               byte *p,int x,int y,int an,int al,int salta) ;
@@ -54,7 +54,7 @@ void wtexc(byte*copia,int an_real_copia,int an_copia,int al_copia,
            byte*p,int x,int y,byte an,int al,byte c);
            
 void wtexn(byte*copia,int an_real_copia,byte*p,int x,int y,byte an,int al,byte c);
-void restaura_tapiz(int x,int y,int an,int al) ;
+void restore_wallpaper(int x,int y,int an,int al) ;
 
 void show_button(t_item * i);
 void show_get(t_item * i);
@@ -122,8 +122,8 @@ int superget=0;
 int linea0;     // Número de línea inicial de la ventana del debugger
 byte * plinea0; // Puntero a la primera línea de la ventana del debugger
 
-int mem1,mem2; // Límites de la sentencia actual en el vector mem[]
-int linea1,columna1,linea2,columna2; // Límites de la sentencia actual
+int mem1,mem2; // Límites de la statement actual en el vector mem[]
+int linea1,columna1,linea2,columna2; // Límites de la statement actual
 
 int linea_sel; // Nº de línea seleccionada
 
@@ -444,7 +444,7 @@ void init_colors(void) {
 
 void dummy_handler(void) {}
 
-void dialogo(voidReturnType init_handler) {
+void show_dialog(voidReturnType init_handler) {
 
   byte * ptr;
   int x,y,an,al;
@@ -487,7 +487,7 @@ void dialogo(voidReturnType init_handler) {
 
     v.x=x; v.y=y;
 
-    if ((ptr=(byte *)malloc(an*al))!=NULL) { // Ventana, free en cierra_ventana
+    if ((ptr=(byte *)malloc(an*al))!=NULL) { // Ventana, free en close_window
 
       //---------------------------------------------------------------------------
       // Pasa a segundo plano las ventanas que corresponda
@@ -496,7 +496,7 @@ void dialogo(voidReturnType init_handler) {
       vtipo=v.tipo; v.tipo=0;
 
       if (ventana[1].tipo==1) { // Diálogo sobre diálogo
-        ventana[1].primer_plano=0; vuelca_ventana(1);
+        ventana[1].primer_plano=0; flush_window(1);
       }
 
       v.tipo=vtipo;
@@ -532,7 +532,7 @@ void dialogo(voidReturnType init_handler) {
       wvolcado(copia,vga_an,vga_al,ptr,x,y,an,al,0);
       volcado_parcial(x,y,an,al);
       do { dread_mouse(); } while(mouse_b&1);
-      entorno_dialogo();
+      modal_loop();
 
     //---------------------------------------------------------------------------
     // No se pudo abrir el diálogo, (no hay memoria)
@@ -571,7 +571,7 @@ void repaint_window(void) {
 //      Gestión de un cuadro de diálogo - Debugger
 //-----------------------------------------------------------------------------
 
-void entorno_dialogo(void) {
+void modal_loop(void) {
 
   int n,m,oldn=max_windows;
   int dialogo_invocado;
@@ -601,7 +601,7 @@ void entorno_dialogo(void) {
       dialogo_invocado=1;
       wmouse_x=-1; wmouse_y=-1; m=mouse_b; mouse_b=0;
       call(v.click_handler); mouse_b=m;
-      if (v.volcar) { vuelca_ventana(0); v.volcar=0; }
+      if (v.volcar) { flush_window(0); v.volcar=0; }
       salir_del_dialogo=0;
     } oldn=max_windows; if (n<0) n++;
 
@@ -626,16 +626,16 @@ void entorno_dialogo(void) {
       wmouse_x=mouse_x-v.x; wmouse_y=mouse_y-v.y;
       if (big) { wmouse_x/=2; wmouse_y/=2; }
       call(v.click_handler);
-      if (v.volcar) { vuelca_ventana(0); v.volcar=0; }
+      if (v.volcar) { flush_window(0); v.volcar=0; }
       oldn=0;
       salir_del_dialogo=0;
 
     } else { // Si estamos en la barra de control de la ventana ...
 
-      if (mouse_graf==2 && (mouse_b&1)) mueve_ventana();
+      if (mouse_graf==2 && (mouse_b&1)) move_window();
 
       if (mouse_graf==5 && (mouse_b&1)) {
-        cierra_ventana(); salir_del_dialogo=1;
+        close_window(); salir_del_dialogo=1;
       } oldn=-1;
     }
     }
@@ -648,12 +648,12 @@ void entorno_dialogo(void) {
       dialogo_invocado=1;
       wmouse_x=-1; wmouse_y=-1; m=mouse_b; mouse_b=0;
       call(v.click_handler); mouse_b=m;
-      if (v.volcar) { vuelca_ventana(0); v.volcar=0; }
+      if (v.volcar) { flush_window(0); v.volcar=0; }
       salir_del_dialogo=0;
     }
 
     if (fin_dialogo && !salir_del_dialogo) {
-      cierra_ventana(); salir_del_dialogo=1;
+      close_window(); salir_del_dialogo=1;
     }
 
     //-------------------------------------------------------------------------
@@ -663,7 +663,7 @@ void entorno_dialogo(void) {
     if (key(_ESC) && !key(_L_CTRL)) {
       for (n=0;n<v.items;n++)
         if (v.item[n].tipo==2 && (v.item[n].estado&2)) break;
-      if (n==v.items) { cierra_ventana(); salir_del_dialogo=1; }
+      if (n==v.items) { close_window(); salir_del_dialogo=1; }
     }
 
     //-------------------------------------------------------------------------
@@ -671,7 +671,7 @@ void entorno_dialogo(void) {
     //-------------------------------------------------------------------------
 
     if (!no_volcar_nada) {
-      volcado_copia();
+      flush_copy();
     }
 
   } while (!salir_del_dialogo); fin_dialogo=0;
@@ -682,10 +682,10 @@ void entorno_dialogo(void) {
 }
 
 //----------------------------------------------------------------------------
-//      Pinta un cuadro de dialogo
+//      Pinta un cuadro de show_dialog
 //----------------------------------------------------------------------------
 
-void refrescadialogo(void) {
+void refresh_dialog(void) {
 
   byte * ptr=v.ptr;
   int an=v.an,al=v.al;
@@ -710,24 +710,24 @@ void refrescadialogo(void) {
 //      Cierra la ventana activa (la número 0)
 //-----------------------------------------------------------------------------
 
-void cierra_ventana(void) {
+void close_window(void) {
   int x,y,an,al;
 
   call(v.close_handler);
   if (big) wput(v.ptr,v.an/2,v.al/2,v.an/2-9,2,-45);
   else wput(v.ptr,v.an,v.al,v.an-9,2,-45);
-  vuelca_ventana(0);
+  flush_window(0);
   volcado_parcial(v.x,v.y,v.an,v.al);
   if (!no_volcar_nada) {
-    volcado_copia();
+    flush_copy();
   } free(v.ptr);
 
   x=v.x; y=v.y; an=v.an; al=v.al;
   memmove(&v.tipo,&ventana[1].tipo,sizeof(tventana)*(max_windows-1));
-  actualiza_caja(x,y,an,al);
+  update_box(x,y,an,al);
 
   if (v.tipo==1) { // Diálogo sobre diálogo solo abre el último
-    v.primer_plano=1; vuelca_ventana(0);
+    v.primer_plano=1; flush_window(0);
   }
 
   do { dread_mouse(); } while((mouse_b&1) || key(_ESC));
@@ -739,7 +739,7 @@ void cierra_ventana(void) {
 //      Mueve una ventana
 //-----------------------------------------------------------------------------
 
-void mueve_ventana(void) {
+void move_window(void) {
   int ix,iy;
   int x,y,an,al;
 
@@ -752,10 +752,10 @@ void mueve_ventana(void) {
   do {
     x=v.x; y=v.y;
     v.x=mouse_x-ix; v.y=mouse_y-iy;
-    v.tipo=0; actualiza_caja(x,y,an,al); v.tipo=1;
-    vuelca_ventana(0);
+    v.tipo=0; update_box(x,y,an,al); v.tipo=1;
+    flush_window(0);
     if (!no_volcar_nada) {
-      volcado_copia();
+      flush_copy();
     }
   } while(mouse_b&1);
 
@@ -766,7 +766,7 @@ void mueve_ventana(void) {
 //	Vuelca una ventana, normal u oscurecida según este o no en primer plano
 //-----------------------------------------------------------------------------
 
-void vuelca_ventana(int m) {
+void flush_window(int m) {
 
   int x,y,an,al,n;
   byte * _ptr;
@@ -781,7 +781,7 @@ void vuelca_ventana(int m) {
   if (x+an>vga_an) an=vga_an-x;
   if (y+al>vga_al) al=vga_al-y;
 
-  for (n=m;n>=0;n--) if (ventana[n].tipo) if (colisiona_con(n,x,y,an,al)) {
+  for (n=m;n>=0;n--) if (ventana[n].tipo) if (collides_with(n,x,y,an,al)) {
 
     _ptr=ventana[n].ptr;
     salta_x=0; salta_y=0;
@@ -1253,16 +1253,16 @@ void explode(int x,int y,int an,int al) {
   int xx,yy,aan,aal;
   if (no_volcar_nada) return;
   v.tipo=0; big=0;
-  actualiza_caja(x,y,an,al);
+  update_box(x,y,an,al);
   while (++n<10) {
     aan=(an*n)/10; aal=(al*n)/10;
     xx=x+an/2-aan/2; yy=y+al/2-aal/2;
     wrectangle(copia,vga_an,vga_al,c4,xx,yy,aan,aal);
     volcado_parcial(xx,yy,aan,aal);
     retrazo();
-    volcado_copia();
-    actualiza_caja(xx,yy,aan,1); actualiza_caja(xx,yy,1,aal);
-    actualiza_caja(xx+aan-1,yy,1,aal); actualiza_caja(xx,yy+aal-1,aan,1);
+    flush_copy();
+    update_box(xx,yy,aan,1); update_box(xx,yy,1,aal);
+    update_box(xx+aan-1,yy,1,aal); update_box(xx,yy+aal-1,aan,1);
   } v.tipo=tipo; big=b;
 }
 
@@ -1276,8 +1276,8 @@ void implode(int x,int y,int an,int al) {
     xx=x+an/2-aan/2; yy=y+al/2-aal/2;
     wrectangle(copia,vga_an,vga_al,c4,xx,yy,aan,aal);
     volcado_parcial(xx,yy,aan,aal);
-    volcado_copia();
-    actualiza_caja(xx,yy,aan,aal);
+    flush_copy();
+    update_box(xx,yy,aan,aal);
     retrazo();
   } while (--n); big=b;
 }
@@ -1287,7 +1287,7 @@ void extrude(int x,int y,int an,int al,int x2,int y2,int an2,int al2) {
   int xx,yy,aan,aal;
   if (no_volcar_nada) return;
   v.tipo=0; big=0;
-  actualiza_caja(x,y,an,al);
+  update_box(x,y,an,al);
   do {
     aan=(an*n+an2*(10-n))/10;
     aal=(al*n+al2*(10-n))/10;
@@ -1295,8 +1295,8 @@ void extrude(int x,int y,int an,int al,int x2,int y2,int an2,int al2) {
     yy=(y*n+y2*(10-n))/10;
     wrectangle(copia,vga_an,vga_al,c4,xx,yy,aan,aal);
     volcado_parcial(xx,yy,aan,aal);
-    volcado_copia();
-    actualiza_caja(xx,yy,aan,aal);
+    flush_copy();
+    update_box(xx,yy,aan,aal);
     retrazo();
   } while (--n); big=b; v.tipo=tipo;
 }
@@ -1305,7 +1305,7 @@ void extrude(int x,int y,int an,int al,int x2,int y2,int an2,int al2) {
 //      Actualiza una caja de la pantalla
 //-----------------------------------------------------------------------------
 
-void actualiza_caja(int x, int y, int an, int al) {
+void update_box(int x, int y, int an, int al) {
 
   int n;
   byte * _ptr;
@@ -1318,9 +1318,9 @@ void actualiza_caja(int x, int y, int an, int al) {
   if (y+al>vga_al) al=vga_al-y;
   if (an<=0 || al<=0) return;
 
-  restaura_tapiz(x,y,an,al);
+  restore_wallpaper(x,y,an,al);
 
-  for (n=max_windows-1;n>=0;n--) if (ventana[n].tipo) if (colisiona_con(n,x,y,an,al)) {
+  for (n=max_windows-1;n>=0;n--) if (ventana[n].tipo) if (collides_with(n,x,y,an,al)) {
 
     _ptr=ventana[n].ptr;
     salta_x=0; salta_y=0;
@@ -1344,10 +1344,10 @@ void actualiza_caja(int x, int y, int an, int al) {
 }
 
 //-----------------------------------------------------------------------------
-//	Comprueba si dos ventanas colisionan
+//	Comprueba si dos ventanas windows_collide
 //-----------------------------------------------------------------------------
 
-int colisionan(int a,int b) {
+int windows_collide(int a,int b) {
 
   if (ventana[b].y<ventana[a].y+ventana[a].al &&
       ventana[b].y+ventana[b].al>ventana[a].y &&
@@ -1356,7 +1356,7 @@ int colisionan(int a,int b) {
     return(1); else return(0);
 }
 
-int colisiona_con(int a, int x, int y, int an, int al) {
+int collides_with(int a, int x, int y, int an, int al) {
 
   if (y<ventana[a].y+ventana[a].al &&
       y+al>ventana[a].y &&
@@ -1370,7 +1370,7 @@ int colisiona_con(int a, int x, int y, int an, int al) {
 // TODO: Should also update the background when the game state changes.
 //----------------------------------------------------------------------------
 
-void restaura_tapiz(int x,int y,int an,int al) {
+void restore_wallpaper(int x,int y,int an,int al) {
 
   byte *p;
   byte *t;
@@ -1496,7 +1496,7 @@ void select_get(t_item * i,int activo,int ocultar_error) {
           else if (!ocultar_error && !show_items_called) {
             sprintf(combo_error,"%s [%d..%d].",(char *)text[4],i->get.r0,i->get.r1);
             text[3]=(byte *)combo_error;
-            v_texto=(char *)text[3]; dialogo(err0);
+            v_texto=(char *)text[3]; show_dialog(err0);
           }
         }
       }
@@ -1905,7 +1905,7 @@ void dread_mouse(void) {
 //      Volcado de la copia virtual de pantalla a la real (pantalla principal)
 //-----------------------------------------------------------------------------
 
-void volcado_copia(void) {
+void flush_copy(void) {
 
   dread_mouse();
   save_mouse_bg(fondo_raton,mouse_x,mouse_y,mouse_graf,0);
@@ -2092,7 +2092,7 @@ void e(int texto) {
   if (!v.tipo) memcpy(copia_debug,copia,vga_an*vga_al);
   dacout_r=0; dacout_g=0; dacout_b=0; dacout_speed=16;
 
-  mouse_graf=1; v_texto=(char *)text[texto]; dialogo(_err0);
+  mouse_graf=1; v_texto=(char *)text[texto]; show_dialog(_err0);
   dacout_r=dr; dacout_g=dg; dacout_b=db;
   reloj=reloj_e;
   ticks=ticks_e;
@@ -2100,7 +2100,7 @@ void e(int texto) {
 }
 
 //-----------------------------------------------------------------------------
-//      Cuadro de diálogo cuando llega una sentencia DEBUG
+//      Cuadro de diálogo cuando llega una statement DEBUG
 //-----------------------------------------------------------------------------
 
 void deb1(void) {
@@ -2153,7 +2153,7 @@ void deb(void) {
   if (!v.tipo) memcpy(copia_debug,copia,vga_an*vga_al);
   dacout_r=0; dacout_g=0; dacout_b=0; dacout_speed=16;
 
-  mouse_graf=1; dialogo(deb0);
+  mouse_graf=1; show_dialog(deb0);
 
   dacout_r=dr; dacout_g=dg; dacout_b=db;
   reloj=reloj_e;
@@ -2469,7 +2469,7 @@ void debug(void) {
 
   memcpy(copia_debug,copia,vga_an*vga_al);
 
-  new_palette=0; mouse_graf=1; dialogo(debug0);
+  new_palette=0; mouse_graf=1; show_dialog(debug0);
 
   dacout_r=dr; dacout_g=dg; dacout_b=db;
 
@@ -2842,13 +2842,13 @@ void inspect2(void) {
       if (o[var[var_select].objeto].tipo!=tcons) {
         if (o[var[var_select].objeto].tipo==tsglo || o[var[var_select].objeto].tipo==tsloc ||
            ((o[var[var_select].objeto].tipo==tpsgl || o[var[var_select].objeto].tipo==tpslo) && var[var_select].indice>=0)) {
-          v_texto=(char *)text[39]; dialogo(err0);
+          v_texto=(char *)text[39]; show_dialog(err0);
         } else if (o[var[var_select].objeto].tipo==tcglo || o[var[var_select].objeto].tipo==tcloc) {
-          dialogo(changestring0); pinta_lista_var(); v.volcar=1;
+          show_dialog(changestring0); pinta_lista_var(); v.volcar=1;
         } else {
-          dialogo(change0); pinta_lista_var(); v.volcar=1;
+          show_dialog(change0); pinta_lista_var(); v.volcar=1;
         }
-      } else { v_texto=(char *)text[40]; dialogo(err0); }
+      } else { v_texto=(char *)text[40]; show_dialog(err0); }
       break;
     case 1: // Index--
       dec_index:
@@ -3406,14 +3406,14 @@ void change2(void) {
     case 1:
       if (get_offset(var_select)==1) {
         if (atoi(buscar)<0 || atoi(buscar)>255) {
-          v_texto=(char *)text[54]; dialogo(err0);
+          v_texto=(char *)text[54]; show_dialog(err0);
         } else {
           *get_offset_byte(var_select)=(byte)atoi(buscar);
           fin_dialogo=1;
         }
       } else if (get_offset(var_select)==2) {
         if (atoi(buscar)<0 || atoi(buscar)>65535) {
-          v_texto=(char *)text[55]; dialogo(err0);
+          v_texto=(char *)text[55]; show_dialog(err0);
         } else {
           *get_offset_word(var_select)=(word)atoi(buscar);
           fin_dialogo=1;
@@ -3463,7 +3463,7 @@ void changestring2(void) {
         strcpy((char*)&mem[get_offset(var_select)],enterstring);
       else {
         v_texto=(char *)text[59];
-        dialogo(err0);
+        show_dialog(err0);
       }
       fin_dialogo=1; break;
     case 2: fin_dialogo=1; break;
@@ -3732,12 +3732,12 @@ void debug2(void) {
         } if (new_palette) { new_palette=0; repaint_window(); }
         dread_mouse(); _process_items();
         v.volcar=1; volcado_completo=1;
-        if (no_volcar_nada) dialogo(profile0);
+        if (no_volcar_nada) show_dialog(profile0);
       } else fin_dialogo=1;
       break;
     case 1: // Goto
       goto_proc:
-      dialogo(process_list0);
+      show_dialog(process_list0);
       //int linea0;     // Número de línea inicial de la ventana del debugger
       //byte * plinea0; // Puntero a la primera línea de la ventana del debugger
       //int linea_sel; // Nº de línea seleccionada
@@ -3768,7 +3768,7 @@ void debug2(void) {
             mem[m]=ldbg;
             pinta_codigo(); v.volcar=1;
           }
-        } else { v_texto=(char *)text[63]; dialogo(err0); }
+        } else { v_texto=(char *)text[63]; show_dialog(err0); }
       }
       break;
     case 3: // Go here!
@@ -3792,7 +3792,7 @@ void debug2(void) {
           mem[m]=ldbg;
           fin_dialogo=1;
         }
-      } else { v_texto=(char *)text[63]; dialogo(err0); }
+      } else { v_texto=(char *)text[63]; show_dialog(err0); }
       break;
     case 4: // Trace
       trace_proc:
@@ -3881,12 +3881,12 @@ void debug2(void) {
     case 6: // Inspect
       inspect_proc:
       bloque_actual=mem[ids[ids_select]+_Bloque];
-      dialogo(inspect0); pinta_lista_proc();
+      show_dialog(inspect0); pinta_lista_proc();
       v.volcar=1; break;
 
     case 7: // Profile
       profile_window:
-      dialogo(profile0);
+      show_dialog(profile0);
       break;
     case 8: // Ex. Process
       exec_proc:
@@ -3946,7 +3946,7 @@ void debug0(void) {
 //  Funciones que pintan el código fuente en la ventana del debugger
 //----------------------------------------------------------------------------
 
-void get_line(int n) { // A partir de una dirección IP, obtiene la pos. de la sentencia
+void get_line(int n) { // A partir de una dirección IP, obtiene la pos. de la statement
   int x=0;
   if (line==NULL) return;
   for (x=0;x<num_sentencias;x++) if (n>=line[x*6] && n<=line[x*6+1]) break;
@@ -3961,7 +3961,7 @@ void get_line(int n) { // A partir de una dirección IP, obtiene la pos. de la s
   }
 }
 
-int get_ip(int n) { // A partir de una línea, obtiene la dirección IP de la sentencia
+int get_ip(int n) { // A partir de una línea, obtiene la dirección IP de la statement
   int x=0;
   if (line==NULL) return(0);
   for (x=0;x<num_sentencias;x++) if (n==line[x*6+2]-1) break;

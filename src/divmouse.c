@@ -13,7 +13,7 @@ int mouse_in_window=1;
 int joymx = 0, joymy=0;
 void read_mouse2(void);
 void libera_drag(void);
-int colisiona_con(int a, int x, int y, int an, int al);
+int collides_with(int a, int x, int y, int an, int al);
 void InitSound(void);
 void EndSound(void);
 int div_started = 0;
@@ -258,7 +258,7 @@ void libera_drag(void) {
 			wdown(n);
 		}
 
-		if(modo>=100) { vuelca_ventana(n); } ventana[n].volcar=0;
+		if(modo>=100) { flush_window(n); } ventana[n].volcar=0;
 	}
 }
 
@@ -579,14 +579,14 @@ while(SDL_PollEvent(&event) )
 	
 		//	printf("n=%d\n",n);
 
-			if (colisiona_con(n,ventana[n].x,ventana[n].y,ventana[n].an,ventana[n].al))	
-				emplazar(1,&ventana[n].x,&ventana[n].y,ventana[n].an,ventana[n].al);		
+			if (collides_with(n,ventana[n].x,ventana[n].y,ventana[n].an,ventana[n].al))	
+				place_window(1,&ventana[n].x,&ventana[n].y,ventana[n].an,ventana[n].al);		
 
 			}
 		}	
 			
 		}
-		actualiza_caja(0,0,vga_an,vga_al);
+		update_box(0,0,vga_an,vga_al);
 //		volcado_completo=1;
 		volcado(copia);
 		InitSound();

@@ -35,7 +35,7 @@ struct _calc {
 int superget=0;
 
 //-----------------------------------------------------------------------------
-//    Evaluador de expresiones (se le pasa el puntero en `expresion')
+//    Evaluador de expresiones (se le pasa el puntero en `expression')
 //    Si todo fue bien, devuelve token=p_num y tnumero=n
 //-----------------------------------------------------------------------------
 
@@ -46,9 +46,9 @@ enum tokens { p_inicio, p_ultimo, p_error, p_num, p_abrir, p_cerrar, p_add,
 
 int token;      // Del tipo enumerado anterior
 double tnumero;  // Cuando token==p_num
-static char * expresion;     // Puntero a la expresión asciiz
+static char * expression;     // Puntero a la expresión asciiz
 
-struct {        // Para contener la expresion analizada
+struct {        // Para contener la expression analizada
   int token;
   double numero;
 } expres[64];
@@ -62,8 +62,8 @@ void calcular(void) {
   token=p_inicio;         // No hay ningun token inicialmente
   iexpres=0;              // Inicializa el contador de expresiones
   get_token();            // Obtiene el primer token
-  expres0();              // Se analiza la expresion
-  if (token==p_ultimo) {  // Se analizó con éxito la expresion
+  expres0();              // Se analiza la expression
+  if (token==p_ultimo) {  // Se analizó con éxito la expression
     evaluacion=evaluar();
     if (token!=p_error) { // Se evaluó con éxito
       token=p_num;
@@ -194,12 +194,12 @@ void get_token(void) {
 
   if (token!=p_error) {
     reget_token:
-    switch(*expresion++) {
+    switch(*expression++) {
       case ' ': goto reget_token;
       case 0: token=p_ultimo; break;
       case '0': case '1': case '2': case '3': case '4': case '5': case '6':
       case '7': case '8': case '9': case '.':
-        token=p_num; expresion--; tnumero=get_num();
+        token=p_num; expression--; tnumero=get_num();
         break;
       case '(': token=p_abrir; break;
       case ')': token=p_cerrar; break;
@@ -208,17 +208,17 @@ void get_token(void) {
       case '*': token=p_mul; break;
       case '/': token=p_div; break;
       case '%': token=p_mod; break;
-      case '<': if (*expresion++=='<') token=p_shl; else token=p_error; break;
-      case '>': if (*expresion++=='>') token=p_shr; else token=p_error; break;
-      case '^': if (*expresion=='^') expresion++; token=p_xor; break;
-      case '|': if (*expresion=='|') expresion++; token=p_or; break;
-      case '&': if (*expresion=='&') expresion++; token=p_and; break;
+      case '<': if (*expression++=='<') token=p_shl; else token=p_error; break;
+      case '>': if (*expression++=='>') token=p_shr; else token=p_error; break;
+      case '^': if (*expression=='^') expression++; token=p_xor; break;
+      case '|': if (*expression=='|') expression++; token=p_or; break;
+      case '&': if (*expression=='&') expression++; token=p_and; break;
       case '!': token=p_not; break;
       default:
-        if (lower[*(expresion-1)]>='a' && lower[*(expresion-1)]<='z') {
-          n=1; cwork[0]=lower[*(expresion-1)];
-          while (n<31 && lower[*expresion]>='a' && lower[*expresion]<='z') {
-            cwork[n++]=lower[*expresion++];
+        if (lower[*(expression-1)]>='a' && lower[*(expression-1)]<='z') {
+          n=1; cwork[0]=lower[*(expression-1)];
+          while (n<31 && lower[*expression]>='a' && lower[*expression]<='z') {
+            cwork[n++]=lower[*expression++];
           } cwork[n]=0;
           if (!strcmp(cwork,"mod")) token=p_mod;
           else if (!strcmp(cwork,"not")) token=p_not;
@@ -236,34 +236,34 @@ void get_token(void) {
   }
 }
 
-double get_num(void) { // Lee el número que hay en *expresion (double en hex o dec)
+double get_num(void) { // Lee el número que hay en *expression (double en hex o dec)
   double x=0;
   double dec=10;
 
-  if (*expresion=='0' && lower[*(expresion+1)]=='x') { // Numeros en hex
+  if (*expression=='0' && lower[*(expression+1)]=='x') { // Numeros en hex
 
-    expresion+=2;
-    if ((*expresion>='0' && *expresion<='9') || (lower[*expresion]>='a' && lower[*expresion]<='f')) {
+    expression+=2;
+    if ((*expression>='0' && *expression<='9') || (lower[*expression]>='a' && lower[*expression]<='f')) {
       do {
-        if (*expresion>='0' && *expresion<='9')
-          x=x*16+*expresion++-0x30;
-        else x=x*16+lower[*expresion++]-'a'+10;
-      } while ((*expresion>='0' && *expresion<='9') || (lower[*expresion]>='a' && lower[*expresion]<='f'));
+        if (*expression>='0' && *expression<='9')
+          x=x*16+*expression++-0x30;
+        else x=x*16+lower[*expression++]-'a'+10;
+      } while ((*expression>='0' && *expression<='9') || (lower[*expression]>='a' && lower[*expression]<='f'));
     } else token=p_error;
 
   } else {
 
-    while (*expresion>='0' && *expresion<='9') {
-      x*=10; x+=(*expresion-'0'); expresion++;
+    while (*expression>='0' && *expression<='9') {
+      x*=10; x+=(*expression-'0'); expression++;
     }
-    if (*expresion=='.') {
-      expresion++;
-      if (*expresion<'0' || *expresion>'9') token=p_error;
+    if (*expression=='.') {
+      expression++;
+      if (*expression<'0' || *expression>'9') token=p_error;
       else do {
-        x+=(double)(*expresion-'0')/dec;
+        x+=(double)(*expression-'0')/dec;
         dec*=10;
-        expresion++;
-      } while (*expresion>='0' && *expresion<='9');
+        expression++;
+      } while (*expression>='0' && *expression<='9');
     }
 
   }
@@ -326,7 +326,7 @@ void calc2(void) {
   superget=0;
 
   if (v.active_item>=0 && strlen(pcalc->ctext)) { // Se evalúa la expresión
-    expresion=pcalc->ctext;
+    expression=pcalc->ctext;
     calcular();
 
     if (token==p_num) {
@@ -371,7 +371,7 @@ void calc0(void) {
 void calculadora(void) {
   pcalc=(struct _calc *)malloc(sizeof(struct _calc));
   if (pcalc!=NULL) {
-    nueva_ventana(calc0);
+    new_window(calc0);
   }
 }
 

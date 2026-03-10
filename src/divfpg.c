@@ -153,7 +153,7 @@ void FPG2(void)
 		if((fpg=fopen((char *)MiFPG->ActualFile,"rb"))==NULL) {
 			//Error: no es un encontro el fichero.(grfxch ?????)
 			v_texto=(char *)texto[43];
-			dialogo(err0);
+			show_dialog(err0);
 			return;
 		}
 		fseek(fpg,MiFPG->OffsGrf[Elemento],SEEK_SET);
@@ -214,7 +214,7 @@ void FPG2(void)
 
 		if(v.mapa==NULL) {
 			fclose(fpg);
-			v_texto=(char *)texto[45]; dialogo(err0);
+			v_texto=(char *)texto[45]; show_dialog(err0);
 			return;
 		}
 		v.mapa->map=(byte *)malloc(map_an*map_al);
@@ -222,7 +222,7 @@ void FPG2(void)
 		if(v.mapa->map==NULL) {
 			fclose(fpg);
 			free(v.mapa);
-			v_texto=(char *)texto[45]; dialogo(err0);
+			v_texto=(char *)texto[45]; show_dialog(err0);
 			return;
 		}
 
@@ -355,7 +355,7 @@ int new_file(void) {
 	v_modo=1;
 	v_tipo=4;
 	v_texto=(char *)texto[69];
-	dialogo(browser0);
+	show_dialog(browser0);
 
 	strcpy(full,tipo[v_tipo].path);
 
@@ -373,7 +373,7 @@ int new_file(void) {
 		{
 			v_titulo=(char *)texto[82];
 			v_texto=input;
-			dialogo(aceptar0);
+			show_dialog(aceptar0);
 		}
 		if(v_aceptar)
 		{
@@ -381,13 +381,13 @@ int new_file(void) {
 
 			if(v_aux==NULL)
 			{
-				v_texto=(char *)texto[45]; dialogo(err0);
+				v_texto=(char *)texto[45]; show_dialog(err0);
 				return 0;
 			}
 
 			close_fpg(full);
 			memset(v_aux, 0, sizeof(FPG));
-			nueva_ventana(FPG0N);
+			new_window(FPG0N);
 		}
 		else return 0;
 
@@ -421,7 +421,7 @@ void open_file(void) {
 
 	v_modo=0; v_tipo=4;
 	v_texto=(char *)texto[70];
-	dialogo(browser0);
+	show_dialog(browser0);
 	if (!v_terminado) return;
 
 	if(!num_taggeds) {
@@ -464,7 +464,7 @@ void open_file(void) {
 
 			if((f=fopen(full,"rb"))==NULL) {
 				v_texto=(char *)texto[44];
-				dialogo(err0);
+				show_dialog(err0);
 				continue;
 			}
 			
@@ -473,7 +473,7 @@ void open_file(void) {
 			if (strcmp(cwork,"fpg\x1a\x0d\x0a")) {
 				fclose(f);
 				v_texto=(char *)texto[46];
-				dialogo(err0);
+				show_dialog(err0);
 				continue;
 			}
 
@@ -528,7 +528,7 @@ void open_file(void) {
 
 	if (sum) {
 		memcpy(paltratar,pal,768);
-		dialogo(TratarPaleta0); // ¿Cargar paleta?
+		show_dialog(TratarPaleta0); // ¿Cargar paleta?
 
 		switch(v_aceptar) {
 			case 0: // Cancelar (no cargar)
@@ -573,7 +573,7 @@ void open_file(void) {
 						v_aux=(byte *)malloc(sizeof(FPG));
 						if(v_aux==NULL) {
 							v_texto=(char *)texto[45];
-							dialogo(err0);
+							show_dialog(err0);
 							continue;
 						}
 
@@ -583,19 +583,19 @@ void open_file(void) {
 						MiFPG->lInfoFPG.creada=0;
 						close_fpg(full);
 						memset(v_aux, 0, sizeof(FPG));
-						nueva_ventana(FPG0A);
+						new_window(FPG0A);
 					} else { 
 						v_texto=(char *)texto[46];
-						dialogo(err0); 
+						show_dialog(err0); 
 					}
 				} else { 
 					fclose(f); 
 					v_texto=(char *)texto[44]; 
-					dialogo(err0); 
+					show_dialog(err0); 
 				}
 			} else { 
 				v_texto=(char *)texto[44]; 
-				dialogo(err0); 
+				show_dialog(err0); 
 			}
 		}
 	} 
@@ -681,24 +681,24 @@ int RemapAllFiles(int vent) {
 	}
 
 	strcpy(cNamev2convert,(char *)ventana[vent].titulo);
-	dialogo(Warning0);
+	show_dialog(Warning0);
 
 	switch(v_aceptar) {
 		case 0:
 			move(0,vent);
-			cierra_ventana(); 
+			close_window(); 
 		break;
 		
 		case 1:
 			v_titulo=(char *)texto[344];
 			v_texto=(char *)texto[345];
 			
-			dialogo(aceptar0);
+			show_dialog(aceptar0);
 			
 			if (v_aceptar) {
 				RemapAllFileToPal(MiFPG);
 			} else {
-				move(0,vent); cierra_ventana();
+				move(0,vent); close_window();
 			}
 		break;
 	}
@@ -882,7 +882,7 @@ void InitGetCode(void) {
 		}
 	}
 
-	dialogo(GetCode0);
+	show_dialog(GetCode0);
 }
 
 int find_fpg_window();
@@ -959,7 +959,7 @@ void Show_Taggeds()
 		v.mapa->zoom_x=x;
 		v.mapa->zoom_y=y;
 
-		activar();
+		activate();
 		call((voidReturnType )v.paint_handler);
 		wvolcado(copia,vga_an,vga_al,v.ptr,v.x,v.y,v.an,v.al,0);
 	}
@@ -1013,7 +1013,7 @@ void Delete_Taggeds() {
 	FPG_update_listbox_br(&MiFPG->lInfoFPG);
 	call((voidReturnType )v.paint_handler);
 	wdown(vent);
-	vuelca_ventana(vent);
+	flush_window(vent);
 }
 
 //-----------------------------------------------------------------------------
@@ -1070,7 +1070,7 @@ void Print_List(void) {
 	v_texto=n_ar;
 	v_titulo=(char *)texto[438];
 
-	dialogo(printlist0);
+	show_dialog(printlist0);
 
 	if (v_aceptar) {
 
@@ -1091,7 +1091,7 @@ void Print_List(void) {
 					strupr(cwork);
 					v_titulo=(char *)texto[450];
 					v_texto=cwork;
-					dialogo(aceptar0);
+					show_dialog(aceptar0);
 					
 					if (!v_aceptar)
 						return;
@@ -1101,7 +1101,7 @@ void Print_List(void) {
 
 				if (f==NULL) { 
 						v_texto=(char *)texto[47];
-						dialogo(err0); 
+						show_dialog(err0); 
 						return; 
 				}
 			}
@@ -1686,7 +1686,7 @@ void MAPtoFPG(struct tmapa * mapa) {
 
 	if((imagen=(byte *)malloc(mapa->map_an*mapa->map_al))==NULL) {
 		v_texto=(char *)texto[45];
-		dialogo(err0);
+		show_dialog(err0);
 		return;
 	}
 
@@ -1720,7 +1720,7 @@ void MAPtoFPG(struct tmapa * mapa) {
 				if((ancho-2)*(alto-2) <= 0) {
 					free(imagen);
 					v_texto=(char *)texto[551];
-					dialogo(err0);
+					show_dialog(err0);
 					return;
 				}
 
@@ -1742,7 +1742,7 @@ void GetGrafMAP(struct tmapa *mapa, byte *imagen, int x, int y, int ancho, int a
 
 	if((buffer=(byte *)malloc(ancho*alto))==NULL) {
 		v_texto=(char *)texto[45];
-		dialogo(err0);
+		show_dialog(err0);
 		return;
 	}
 
@@ -1807,7 +1807,7 @@ void FPGtoMAP(FPG *MiFPG) {
 
 	if((fpg=fopen((char *)MiFPG->ActualFile,"rb"))==NULL) {
 		v_texto=(char *)texto[43];
-		dialogo(err0);
+		show_dialog(err0);
 		return;
 	}
 
@@ -1838,7 +1838,7 @@ void FPGtoMAP(FPG *MiFPG) {
 	if((FPGmap=(byte *)malloc(lmapan*lmapal))==NULL) {
 		fclose(fpg);
 		v_texto=(char *)texto[45];
-		dialogo(err0);
+		show_dialog(err0);
 		return;
 	}
 
@@ -1859,7 +1859,7 @@ void FPGtoMAP(FPG *MiFPG) {
 			fclose(fpg);
 			free(FPGmap);
 			v_texto=(char *)texto[45];
-			dialogo(err0);
+			show_dialog(err0);
 			return;
 		}
 
@@ -1868,7 +1868,7 @@ void FPGtoMAP(FPG *MiFPG) {
 			free(FPGmap);
 			free(FPGimagen);
 			v_texto=(char *)texto[44];
-			dialogo(err0);
+			show_dialog(err0);
 			return;
 		}
 
@@ -1989,7 +1989,7 @@ void close_fpg(char *fpg_path) {
       if(!strcmp(fpg_path, (char *)MiFPG->ActualFile))
       {
         move(0,m);
-        cierra_ventana();
+        close_window();
         break;
       }
     }
@@ -2007,7 +2007,7 @@ int select_file(void) {
 	v_modo=0;
 	v_tipo=4;
 	v_texto=(char *)texto[69];
-	dialogo(browser0);
+	show_dialog(browser0);
 
 	strcpy(full,tipo[v_tipo].path);
 
@@ -2022,24 +2022,24 @@ int select_file(void) {
 		} else {
 			v_titulo=(char *)texto[82];
 			v_texto=input;
-			dialogo(replace_FPG_0);
+			show_dialog(replace_FPG_0);
 		}
 		
 		if(v_aceptar==1) {
 			v_aux=(byte *)malloc(sizeof(FPG));
 
 			if(v_aux==NULL) {
-				v_texto=(char *)texto[45]; dialogo(err0);
+				v_texto=(char *)texto[45]; show_dialog(err0);
 				return 0;
 			}
 			close_fpg(full);
 			memset(v_aux, 0, sizeof(FPG));
-			nueva_ventana(FPG0N);
+			new_window(FPG0N);
 		} else if(v_aceptar==2) {
 			v_aux=(byte *)malloc(sizeof(FPG));
 
 			if(v_aux==NULL) {
-				v_texto=(char *)texto[45]; dialogo(err0);
+				v_texto=(char *)texto[45]; show_dialog(err0);
 				return 0;
 			}
 
@@ -2049,7 +2049,7 @@ int select_file(void) {
 			MiFPG->lInfoFPG.creada=0;
 			close_fpg(full);
 			memset(v_aux, 0, sizeof(FPG));
-			nueva_ventana(FPG0A);
+			new_window(FPG0A);
 		} else 
 			return 0;
 

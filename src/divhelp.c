@@ -24,7 +24,7 @@ byte *index_end;                // Final del glosario
 
 int loaded[64],n_loaded=0;      // Imágenes cargadas, hasta un máximo de 32
 
-int determina_prg2(void);
+int determine_prg2(void);
 struct tprg * old_prg;
 extern int help_paint_active;
 
@@ -325,7 +325,7 @@ void help2(void) {
                   v_prg->num_lineas=1;
                   n=v_prg->file_lon;
                   while (n--) if (*p++==13) v_prg->num_lineas++;
-                  nueva_ventana(program0);
+                  new_window(program0);
                 }
 
               }
@@ -366,7 +366,7 @@ void help2(void) {
     if (!help_paint_active) {
       if (key(_ESC) && !key(_L_CTRL)) {
         if (mouse_in(v.x+2*big2,v.y+10*big2,v.x+v.an-2*big2,v.y+v.al-2*big2)) {
-          cierra_ventana();
+          close_window();
         } else fin_ventana=2;
       }
     }
@@ -436,7 +436,7 @@ void resize_help(void) {
   _al=help_al;
 
   wput(v.ptr,an,al,an-9,al-9,-44);
-  vuelca_ventana(0);
+  flush_window(0);
 
   do {
 
@@ -461,16 +461,16 @@ void resize_help(void) {
 		
       if (modo<100) {
         draw_edit_background(v.x,v.y,v.an>an?v.an:an,v.al>al?v.al:al);
-        volcar_barras(1);
+        flush_bars(1);
       }
 
       v.ptr=new_block;
       repaint_window();
       wput(v.ptr,v.an/big2,v.al/big2,v.an/big2-9,v.al/big2-9,-44);
-      se_ha_movido_desde(v.x,v.y,an,al);
+      on_window_moved(v.x,v.y,an,al);
 
       if (modo>=100) {
-        actualiza_caja(v.x,v.y,v.an>an?v.an:an,v.al>al?v.al:al);
+        update_box(v.x,v.y,v.an>an?v.an:an,v.al>al?v.al:al);
       }
 
     } else {
@@ -514,7 +514,7 @@ int dtoi(int m) {
 //      Ayuda
 //-----------------------------------------------------------------------------
 
-int determina_help(void) {
+int determine_help(void) {
   int m,n=-1;
 
   for (m=0;m<max_windows;m++) {
@@ -524,32 +524,32 @@ int determina_help(void) {
   } return(n);
 }
 
-int determina_calc(void);
+int determine_calc(void);
 
 void help(int n){
   FILE * f;
   byte * p;
   int m,m_back;
 
-  determina_prg2();
+  determine_prg2();
 
   if (v_ventana!=-1) {
     old_prg=ventana[v_ventana].prg;
   } else {
-    determina_calc();
+    determine_calc();
     if (v_ventana!=-1) {
       old_prg=(struct tprg*)ventana[v_ventana].aux;
     }
   }
 
-  if ((m=determina_help())!=-1) {
+  if ((m=determine_help())!=-1) {
 
     if (m) move(0,m);
-    if (v.primer_plano==2) maximiza_ventana();
+    if (v.primer_plano==2) maximize_window();
 
     if (m && v.primer_plano==0) { // Si estaba en 2º plano
       for (m=1;m<max_windows;m++) if (ventana[m].tipo && ventana[m].primer_plano==1)
-        if (colisionan(0,m)) {ventana[m].primer_plano=0; vuelca_ventana(m);}
+        if (windows_collide(0,m)) {ventana[m].primer_plano=0; flush_window(m);}
       v.primer_plano=1;
     }
 
@@ -561,8 +561,8 @@ void help(int n){
       help_xref(n,0);
     }
 
-    if (!v.estado) activar();
-    vuelca_ventana(0);
+    if (!v.estado) activate();
+    flush_window(0);
 
     return;
 
@@ -594,7 +594,7 @@ void help(int n){
           help_al=(vga_al/2-(12+16)*big2-1)/font_al; help_l=0;
           if (primera_vez) help_al+=5;
           tabula_help(p+1,help_buffer,helpidx[n*2+1]-(p+1-h_buffer));
-          nueva_ventana(help0);
+          new_window(help0);
         }
       } fclose(f);
     }
@@ -673,7 +673,7 @@ void help_paint(memptrsize n){
           help_al=(vga_al/2-(12+16)*big2-1)/font_al; help_l=0;
           tabula_help(p+1,help_buffer,helpidx[n*2+1]-(p+1-h_buffer));
           help_paint_active=1;
-          dialogo(help_paint0);
+          show_dialog(help_paint0);
           help_paint_active=0;
         }
       } fclose(f);
@@ -749,11 +749,11 @@ void help_xref(int n,int linea) {
           help_l=0;
           tabula_help(p+1,help_buffer,helpidx[n*2+1]-(p+1-h_buffer));
           if (linea!=-1) while (linea--) { while (*help_line++); help_l++; }
-          repaint_window(); vuelca_ventana(0);
+          repaint_window(); flush_window(0);
         }
       } fclose(f);
     }
-  } if (help_buffer==NULL) cierra_ventana();
+  } if (help_buffer==NULL) close_window();
 }
 
 //-----------------------------------------------------------------------------
@@ -1371,7 +1371,7 @@ void Print_Help(void) {
 
   v_texto=h_ar;
   v_titulo=(char *)texto[496];
-  dialogo(printlist0);
+  show_dialog(printlist0);
 
   if (v_aceptar) {
 
@@ -1385,11 +1385,11 @@ void Print_Help(void) {
         strupr(cwork);
         v_titulo=(char *)texto[450];
         v_texto=cwork;
-        dialogo(aceptar0);
+        show_dialog(aceptar0);
         if (!v_aceptar) return;
       }
       g=fopen(h_ar,"wb");
-      if (g==NULL) { v_texto=(char *)texto[47]; dialogo(err0); return; }
+      if (g==NULL) { v_texto=(char *)texto[47]; show_dialog(err0); return; }
     } else g=stdprn;
 
     if((f=fopen("help/help.div","rb"))!=NULL) {

@@ -1,5 +1,5 @@
 
-// Versión de las Judas para DIV 2 (para el entorno, que no el intérprete).
+// Versión de las Judas para DIV 2 (para el main_loop, que no el intérprete).
 
 // Estan tocados JUDAS/RAW/WAV para que carguen los sonidos incluso si
 // judas_device es DEV_SOUND (ya que se tienen que seguir pudiendo editar).

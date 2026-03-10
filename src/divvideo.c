@@ -296,7 +296,7 @@ void volcado(byte *p) {
   } }
 
 
-  init_volcado();
+  init_flush();
 
 
 }
@@ -474,7 +474,7 @@ return;
 //      Select a window for subsequent dump
 //-----------------------------------------------------------------------------
 
-void init_volcado(void) { 
+void init_flush(void) { 
 	memset(&scan[0],0,MAX_YRES*8); volcado_completo=0; 
 }
 

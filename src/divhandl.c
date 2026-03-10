@@ -100,31 +100,31 @@ void menu_principal2(void) {
 	if ((old_mouse_b&1) && !(mouse_b&1)) {
 		switch (v.estado) {
 			case 1: 
-				nueva_ventana(menu_programas0); 
+				new_window(menu_programas0); 
 			break;
 			
 			case 2: 
-				nueva_ventana(menu_paletas0); 
+				new_window(menu_paletas0); 
 			break;
 		
 			case 3:
-				nueva_ventana(menu_mapas0);
+				new_window(menu_mapas0);
 			break;
 
 			case 4:
-				nueva_ventana(menu_graficos0);
+				new_window(menu_graficos0);
 			break;
 
 			case 5:
-				nueva_ventana(menu_fuentes0);
+				new_window(menu_fuentes0);
 			break;
 
 			case 6:
-				nueva_ventana(menu_sonidos0);
+				new_window(menu_sonidos0);
 			break;
 
 			case 7:
-				nueva_ventana(menu_sistema0);
+				new_window(menu_sistema0);
 			break;
 
 			case 8:
@@ -167,12 +167,12 @@ void menu_programas2(void) {
 
       case 1: // Nuevo ...
         v_modo=1; v_texto=(char *)texto[186];
-      	dialogo(browser0);
+      	show_dialog(browser0);
         if (v_terminado) {
           if (!v_existe) v_aceptar=1;
           else {
             v_titulo=(char *)texto[187]; v_texto=input;
-            dialogo(aceptar0);
+            show_dialog(aceptar0);
           }
           if(v_aceptar) {
             program0_new();
@@ -182,12 +182,12 @@ void menu_programas2(void) {
 
       case 2: // Abrir programa ...
         v_modo=0; v_texto=(char *)texto[346];
-      	dialogo(browser0);
+      	show_dialog(browser0);
         if (v_terminado) {
           if (!v_existe) {
-            v_texto=(char *)texto[43];dialogo(err0);
+            v_texto=(char *)texto[43];show_dialog(err0);
           } else {
-            mouse_graf=3; volcado_copia(); mouse_graf=1;
+            mouse_graf=3; flush_copy(); mouse_graf=1;
             open_program();
           }
         } break;
@@ -195,19 +195,19 @@ void menu_programas2(void) {
       case 3:
         if ((n=find_program_window())) {
           v_titulo=(char *)texto[188]; v_texto=(char *)ventana[n].titulo;
-          dialogo(aceptar0);
+          show_dialog(aceptar0);
           if (v_aceptar) {
             move(0,n);
-            cierra_ventana();
+            close_window();
           }
         } break;
         break;
 
       case 4:
         if ((n=find_program_window())) {
-          vuelca_ventana(0);
+          flush_window(0);
           save_prg_buffer(n);
-          mouse_graf=3; volcado_copia(); mouse_graf=1;
+          mouse_graf=3; flush_copy(); mouse_graf=1;
           wup(n);
           strcpy(tipo[v_tipo].path,v.prg->path);
           strcpy(input,v.prg->filename);
@@ -220,14 +220,14 @@ void menu_programas2(void) {
         if ((n=find_program_window())) {
           save_prg_buffer(n);
           v_modo=1; v_texto=(char *)texto[906];
-          dialogo(browser0);
+          show_dialog(browser0);
           if (v_terminado) {
             if (v_existe) {
               v_titulo=(char *)texto[187]; v_texto=input;
-              dialogo(aceptar0);
+              show_dialog(aceptar0);
             } else v_aceptar=1;
             if (v_aceptar) {
-              mouse_graf=3; volcado_copia(); mouse_graf=1;
+              mouse_graf=3; flush_copy(); mouse_graf=1;
               wup(n);
               save_program();
               wdown(n);
@@ -236,7 +236,7 @@ void menu_programas2(void) {
           }
         } break;
 
-      case 6: nueva_ventana(menu_edicion0); break;
+      case 6: new_window(menu_edicion0); break;
 
       case 8:
         if ((n=find_program_window())) {
@@ -246,7 +246,7 @@ void menu_programas2(void) {
           v_ventana=n;
           ejecutar_programa=0;
           strcpy(tipo[8].path,ventana[n].prg->path);
-          compilar_programa();
+          compile_program();
           if(numero_error!=-1) {
             goto_error();
             if (v_ayuda) help(500+numero_error);
@@ -257,7 +257,7 @@ void menu_programas2(void) {
       case 9:
         if ((n=find_program_window())) {
           save_prg_buffer(n);
-          mouse_graf=3; volcado_copia(); mouse_graf=1;
+          mouse_graf=3; flush_copy(); mouse_graf=1;
           wup(n);
           strcpy(tipo[v_tipo].path,v.prg->path);
           strcpy(input,v.prg->filename);
@@ -268,7 +268,7 @@ void menu_programas2(void) {
           v_ventana=n;
           if (v.estado==7) ejecutar_programa=1; else ejecutar_programa=3;
           strcpy(tipo[8].path,ventana[n].prg->path);
-          compilar_programa();
+          compile_program();
           if(numero_error!=-1) {
             goto_error();
             if (v_ayuda) help(500+numero_error);
@@ -287,7 +287,7 @@ void menu_programas2(void) {
           ejecutar_programa=2;
           DaniDel("system/exec.ins");
           strcpy(tipo[8].path,ventana[n].prg->path);
-          compilar_programa();
+          compile_program();
           if(numero_error!=-1) {
             goto_error();
             if (v_ayuda) help(500+numero_error);
@@ -297,7 +297,7 @@ void menu_programas2(void) {
               fclose(f); crear_instalacion();
               DaniDel("install.div");
             } else {
-              v_texto=(char *)texto[238]; dialogo(err0);
+              v_texto=(char *)texto[238]; show_dialog(err0);
             }
           }
         } break;
@@ -346,52 +346,52 @@ void menu_edicion2(void) {
       case 1: // Delete line
         if ((n=find_program_window())) { wup(n);
           f_delete();
-          _completo(); v.volcar=2; wdown(n); vuelca_ventana(n);
+          _completo(); v.volcar=2; wdown(n); flush_window(n);
         } break;
 
       case 2: // Mark
         if ((n=find_program_window())) { wup(n);
           f_mark();
-          _completo(); v.volcar=2; wdown(n); vuelca_ventana(n);
+          _completo(); v.volcar=2; wdown(n); flush_window(n);
         } break;
 
       case 3: // Unmark
         if ((n=find_program_window())) { wup(n);
           f_unmark();
-          _completo(); v.volcar=2; wdown(n); vuelca_ventana(n);
+          _completo(); v.volcar=2; wdown(n); flush_window(n);
         } break;
 
       case 4: // Cut
         if ((n=find_program_window())) { wup(n);
           f_cut_block(1);
-          _completo(); v.volcar=2; wdown(n); vuelca_ventana(n);
+          _completo(); v.volcar=2; wdown(n); flush_window(n);
         } break;
 
       case 5: // Copy
         if ((n=find_program_window())) { wup(n);
           f_cut_block(0);
-          _completo(); v.volcar=2; wdown(n); vuelca_ventana(n);
+          _completo(); v.volcar=2; wdown(n); flush_window(n);
         } break;
 
       case 6: // Paste
         if ((n=find_program_window())) { wup(n);
           f_paste_block();
           f_unmark();
-          _completo(); v.volcar=2; wdown(n); vuelca_ventana(n);
+          _completo(); v.volcar=2; wdown(n); flush_window(n);
         } break;
 
       case 7:
         if ((n=find_program_window())) {
           wmouse_x=-1; wmouse_y=-1; mouse_b=0; call(v.click_handler);
-          if (v.volcar) { vuelca_ventana(0); v.volcar=0; }
+          if (v.volcar) { flush_window(0); v.volcar=0; }
           move(0,n);
           if (v.primer_plano==0) {
             for (m=1;m<max_windows;m++) if (ventana[m].tipo && ventana[m].primer_plano==1)
-              if (colisionan(0,m)) { ventana[m].primer_plano=0; vuelca_ventana(m); }
+              if (windows_collide(0,m)) { ventana[m].primer_plano=0; flush_window(m); }
             v.primer_plano=1;
-          } vuelca_ventana(0);
+          } flush_window(0);
           write_line(); read_line();
-          dialogo(process_list0);
+          show_dialog(process_list0);
           scan_code=0; ascii=0;
           if (v_aceptar) {
             f_bop(); f_home();
@@ -409,12 +409,12 @@ void menu_edicion2(void) {
 
       case 8:
         if ((n=find_program_window())) {
-          dialogo(find_text0);
+          show_dialog(find_text0);
           if (v_aceptar) {
             move(0,n);
             if (v.primer_plano==0) {
               for (m=1;m<max_windows;m++) if (ventana[m].tipo && ventana[m].primer_plano==1)
-                if (colisionan(0,m)) {ventana[m].primer_plano=0; vuelca_ventana(m);}
+                if (windows_collide(0,m)) {ventana[m].primer_plano=0; flush_window(m);}
               v.primer_plano=1;
             } find_text();
           }
@@ -423,23 +423,23 @@ void menu_edicion2(void) {
       case 9:
         if ((n=find_program_window())) {
           wmouse_x=-1; wmouse_y=-1; mouse_b=0; call((voidReturnType )v.click_handler);
-          if (v.volcar) { vuelca_ventana(0); v.volcar=0; }
+          if (v.volcar) { flush_window(0); v.volcar=0; }
           move(0,n);
           if (v.primer_plano==0) {
             for (m=1;m<max_windows;m++) if (ventana[m].tipo && ventana[m].primer_plano==1)
-              if (colisionan(0,m)) {ventana[m].primer_plano=0; vuelca_ventana(m);}
-            v.primer_plano=1; vuelca_ventana(0);
+              if (windows_collide(0,m)) {ventana[m].primer_plano=0; flush_window(m);}
+            v.primer_plano=1; flush_window(0);
           } find_text();
         } break;
 
       case 10:
         if ((n=find_program_window())) {
-          dialogo(replace_text0);
+          show_dialog(replace_text0);
           if (v_aceptar) {
             move(0,n);
             if (v.primer_plano==0) {
               for (m=1;m<max_windows;m++) if (ventana[m].tipo && ventana[m].primer_plano==1)
-                if (colisionan(0,m)) {ventana[m].primer_plano=0; vuelca_ventana(m);}
+                if (windows_collide(0,m)) {ventana[m].primer_plano=0; flush_window(m);}
               v.primer_plano=1;
             } replace_text();
           }
@@ -482,7 +482,7 @@ void menu_paletas2(void) {
       case 3: EditPal(); break;
       case 4: ordena_paleta(); break;
       case 5: fusiona_paleta(); break;
-      case 6: nueva_ventana(paleta0); break;
+      case 6: new_window(paleta0); break;
     }
   }
 }
@@ -514,20 +514,20 @@ void menu_mapas2(void) {
     switch (v.estado) {
 
       case 1: // Nuevo mapa ...
-        dialogo(nuevo_mapa0);
+        show_dialog(nuevo_mapa0);
         if (v_terminado) {
-          mouse_graf=3; volcado_copia(); mouse_graf=1;
+          mouse_graf=3; flush_copy(); mouse_graf=1;
           new_map(NULL);
         } break;
 
       case 2: // Abrir mapa ...
         v_modo=0; v_texto=(char *)texto[803];
-      	dialogo(browser0);
+      	show_dialog(browser0);
         if (v_terminado) {
           if (!v_existe) {
-            v_texto=(char *)texto[43];dialogo(err0);
+            v_texto=(char *)texto[43];show_dialog(err0);
           } else {
-            mouse_graf=3; volcado_copia(); mouse_graf=1;
+            mouse_graf=3; flush_copy(); mouse_graf=1;
             open_map();
           }
         } break;
@@ -535,18 +535,18 @@ void menu_mapas2(void) {
       case 3: // Cerrar mapa
         if ((n=find_and_load_map())) {
           v_titulo=(char *)texto[50]; v_texto=(char *)ventana[n].titulo;
-          dialogo(aceptar0);
+          show_dialog(aceptar0);
           if (v_aceptar) {
-            move(0,n); cierra_ventana();
+            move(0,n); close_window();
           }
         } break;
 
       case 4: // Cerrar todos los mapas (maximizados)
         v_titulo=(char *)texto[334]; v_texto=(char *)texto[335];
-        dialogo(aceptar0);
+        show_dialog(aceptar0);
         if (v_aceptar) {
           for (n=0;n<max_windows;n++) if (ventana[n].tipo==100 && ventana[n].primer_plano!=2) {
-            move(0,n); cierra_ventana(); n=-1;
+            move(0,n); close_window(); n=-1;
           }
         } break;
 
@@ -558,7 +558,7 @@ void menu_mapas2(void) {
             strcpy(input2,(char *)ventana[n].titulo);
             goto casi_no_tiene_nombre;
           }
-          mouse_graf=3; volcado_copia(); mouse_graf=1;
+          mouse_graf=3; flush_copy(); mouse_graf=1;
           strcpy(tipo[v_tipo].path,ventana[n].mapa->path);
           strcpy(input,ventana[n].mapa->filename); save_map();
         } break;
@@ -569,14 +569,14 @@ void menu_mapas2(void) {
           v_modo=1;
       casi_no_tiene_nombre:
           v_texto=(char *)texto[807];
-          dialogo(browser0);
+          show_dialog(browser0);
           if (v_terminado) {
             if (v_existe) {
               v_titulo=(char *)texto[52]; v_texto=input;
-              dialogo(aceptar0);
+              show_dialog(aceptar0);
             } else v_aceptar=1;
             if (v_aceptar) {
-              mouse_graf=3; volcado_copia(); mouse_graf=1;
+              mouse_graf=3; flush_copy(); mouse_graf=1;
               save_map();
             }
           }
@@ -594,7 +594,7 @@ void menu_mapas2(void) {
           move(0,n);
           if (v.primer_plano==0) {
             for (m=1;m<max_windows;m++) if (ventana[m].tipo && ventana[m].primer_plano==1)
-              if (colisionan(0,m)) {ventana[m].primer_plano=0; vuelca_ventana(m);}
+              if (windows_collide(0,m)) {ventana[m].primer_plano=0; flush_window(m);}
             v.primer_plano=1;
           } mouse_b=1; call((voidReturnType )v.click_handler);
         } break;
@@ -634,7 +634,7 @@ int check_file(void) {
 
   v_modo=0; v_tipo=4;
   v_texto=(char *)texto[70];
-  dialogo(browser0);
+  show_dialog(browser0);
 
   strcpy(full,tipo[v_tipo].path);
   if (full[strlen(full)-1]!='/') strcat(full,"/");
@@ -647,13 +647,13 @@ int check_file(void) {
         if (!strcmp(cwork,"fpg\x1a\x0d\x0a")) {
           if (!v_existe) {
             v_texto=(char *)texto[43];
-            dialogo(err0);
+            show_dialog(err0);
           } else {
             return(1);
           }
-        } else { v_texto=(char *)texto[46]; dialogo(err0); }
-      } else { fclose(f); v_texto=(char *)texto[44]; dialogo(err0); }
-    } else { v_texto=(char *)texto[44]; dialogo(err0); }
+        } else { v_texto=(char *)texto[46]; show_dialog(err0); }
+      } else { fclose(f); v_texto=(char *)texto[44]; show_dialog(err0); }
+    } else { v_texto=(char *)texto[44]; show_dialog(err0); }
   }
 
   return(0);
@@ -768,17 +768,17 @@ void menu_graficos2(void) {
       case 3: // Cerrar fichero
         if ((n=find_fpg_window())) {
           v_titulo=(char *)texto[81]; v_texto=(char *)ventana[n].titulo;
-          dialogo(aceptar0);
+          show_dialog(aceptar0);
           if (v_aceptar) {
             free(ventana[n].aux);
-            move(0,n); cierra_ventana();
+            move(0,n); close_window();
           }
         } break;
 
       case 4: // fichero guardar como...
         if ((n=find_fpg_window())) {
           v_modo=1; v_texto=(char *)texto[830];
-          dialogo(browser0);
+          show_dialog(browser0);
           if (v_terminado) {
             if (v_existe) {
 
@@ -790,18 +790,18 @@ void menu_graficos2(void) {
 
               if (!strcmp(full,(char *)Fpg->ActualFile)) {
                 v_texto=(char *)texto[418];
-                dialogo(err0);
+                show_dialog(err0);
                 v_aceptar=0;
               } else {
                 v_titulo=(char *)texto[82]; v_texto=input;
-                dialogo(aceptar0);
+                show_dialog(aceptar0);
               }
 
             } else {
               v_aceptar=1;
             }
             if (v_aceptar) {
-              mouse_graf=3; volcado_copia(); mouse_graf=1;
+              mouse_graf=3; flush_copy(); mouse_graf=1;
               SaveFPG(n);
             }
           }
@@ -877,13 +877,13 @@ void menu_fuentes2(void) {
 
       case 3:
         if ((n=find_font_window())) {
-          move(0,n); cierra_ventana();
+          move(0,n); close_window();
         } break;
 
       case 4:
         if ((n=find_font_window())) {
           FntAux=(char *)(ventana[n].aux+RES_FOR_NAME);
-          dialogo(GetText0);
+          show_dialog(GetText0);
           if(v_aceptar) CreateText();
         } break;
 
@@ -923,13 +923,13 @@ void print_fontmap(void) {
   strcat(FontPathName,"/");
   strcat(FontPathName,FontName);
 
-  v_texto=(char *)texto[264]; dialogo(browser0);
+  v_texto=(char *)texto[264]; show_dialog(browser0);
 
   if (!v_terminado) return;
 
   if (v_existe) {
     v_titulo=(char *)texto[75]; v_texto=(char *)texto[76];
-    dialogo(aceptar0); if(!v_aceptar) return;
+    show_dialog(aceptar0); if(!v_aceptar) return;
   }
 
   div_strcpy(FontName, sizeof(FontName), input);
@@ -940,7 +940,7 @@ void print_fontmap(void) {
   buffer_len=1356+256*16+map_an*map_al; // Pide memoria suficiente para el FNT
 
   if ((buffer=(char*)malloc(buffer_len))==NULL) {
-    v_texto=(char *)texto[45]; dialogo(err0); return; // Not enought memory, close ...
+    v_texto=(char *)texto[45]; show_dialog(err0); return; // Not enought memory, close ...
   }
 
   memcpy(buffer,"fnt\x1a\x0d\x0a\x00",8);
@@ -968,7 +968,7 @@ void print_fontmap(void) {
 
   end_bucle:
 
-  if (chars!=256) { v_texto=(char *)texto[243]; dialogo(err0); free(buffer); return; }
+  if (chars!=256) { v_texto=(char *)texto[243]; show_dialog(err0); free(buffer); return; }
 
   gencode=0;
   if (*(int*)(buffer+1356+'0'*16)) gencode|=1;
@@ -980,12 +980,12 @@ void print_fontmap(void) {
   memcpy(buffer+1352,&gencode,4);
 
   if ((f=fopen(FontPathName,"wb"))==NULL) {
-    v_texto=(char *)texto[242]; dialogo(err0);
+    v_texto=(char *)texto[242]; show_dialog(err0);
     free(buffer); return;
   }
 
   if (fwrite(buffer,1,di-buffer,f)!=di-buffer) {
-    v_texto=(char *)texto[242]; dialogo(err0);
+    v_texto=(char *)texto[242]; show_dialog(err0);
     fclose(f); free(buffer); return;
   }
 
@@ -998,12 +998,12 @@ void print_fontmap(void) {
   for (x=-1,y=1;y<max_windows;y++) if (ventana[y].tipo==104 && !strcmp((char *)ventana[y].titulo,FontName)) x=y;
 
   if (x>=0) {
-    move(0,x); cierra_ventana();
+    move(0,x); close_window();
   }
 
   strcpy(Load_FontName,FontName);
   strcpy(Load_FontPathName,FontPathName);
-  nueva_ventana(ShowFont0);
+  new_window(ShowFont0);
 
 }
 
@@ -1055,7 +1055,7 @@ void generate_fontmap(void) {
     for (x=1,n=0;n<256;n++) {
       generate_character(v_mapa->map+map_an+x,*(p+n*4),*(p+n*4+1),*(p+n*4+2),FntAux+*(p+n*4+3));
       if (*(p+n*4)==0 || *(p+n*4+1)==0) x+=2; else x+=*(p+n*4)+1;
-    } nueva_ventana(mapa0);
+    } new_window(mapa0);
   }
 }
 
@@ -1108,19 +1108,19 @@ void menu_sonidos2(void) {
 
         if (!SoundActive) {
           if ( SoundError ) {
-            v_texto=(char *)texto[549]; dialogo(errhlp0);
+            v_texto=(char *)texto[549]; show_dialog(errhlp0);
             if (v_aceptar) help(2008);
           } else {
-            v_texto=(char *)texto[548]; dialogo(errhlp0);
+            v_texto=(char *)texto[548]; show_dialog(errhlp0);
             if (v_aceptar) help(2009);
           }
           return;
         } else if (!SoundActive) {
-          v_texto=(char *)texto[575]; dialogo(err0);
+          v_texto=(char *)texto[575]; show_dialog(err0);
           return;
         }
 
-        dialogo(RecSound0);
+        show_dialog(RecSound0);
         break;
 
       case 2:
@@ -1130,33 +1130,33 @@ void menu_sonidos2(void) {
       case 3:
         if ((n=find_pcm_window())) {
           v_titulo=(char *)texto[338]; v_texto=(char *)ventana[n].titulo;
-          dialogo(aceptar0);
-          if (v_aceptar) { move(0,n); cierra_ventana(); }
+          show_dialog(aceptar0);
+          if (v_aceptar) { move(0,n); close_window(); }
         } break;
 
       case 4:
         if ((n=find_pcm_window())) {
           if (strchr((const char *)ventana[n].titulo,' ')!=NULL) goto no_tiene_nombre_sonido;
-          mouse_graf=3; volcado_copia(); mouse_graf=1;
+          mouse_graf=3; flush_copy(); mouse_graf=1;
           mypcminfo=(pcminfo *)ventana[n].aux;
           strcpy(full,  mypcminfo->pathname);
           strcpy(input, mypcminfo->name);
           SaveSound(mypcminfo,full);
-          wup(n); repaint_window(); wdown(n); vuelca_ventana(n);
+          wup(n); repaint_window(); wdown(n); flush_window(n);
         } break;
 
       case 5:
       no_tiene_nombre_sonido:
         if ((n=find_pcm_window())) {
           v_tipo=7; v_modo=1; v_texto=(char *)texto[339];
-          dialogo(browser0);
+          show_dialog(browser0);
           if (v_terminado) {
             if (v_existe) {
               v_titulo=(char *)texto[340]; v_texto=input;
-              dialogo(aceptar0);
+              show_dialog(aceptar0);
             } else v_aceptar=1;
             if (v_aceptar) {
-              mouse_graf=3; volcado_copia(); mouse_graf=1;
+              mouse_graf=3; flush_copy(); mouse_graf=1;
               mypcminfo=(pcminfo *)ventana[n].aux;
               strcpy(full,tipo[v_tipo].path);
               if (full[strlen(full)-1]!='/') strcat(full,"/");
@@ -1166,9 +1166,9 @@ void menu_sonidos2(void) {
                 SaveSound(mypcminfo,full);
                 div_strcpy(mypcminfo->pathname, sizeof(mypcminfo->pathname), full);
                 div_strcpy(mypcminfo->name, sizeof(mypcminfo->name), input);
-                move(0,n); cierra_ventana();
+                move(0,n); close_window();
                 OpenSoundFile();
-              } else { v_texto=(char *)texto[47]; dialogo(err0); }
+              } else { v_texto=(char *)texto[47]; show_dialog(err0); }
             }
           }
         } break;
@@ -1180,23 +1180,23 @@ void menu_sonidos2(void) {
 
 //          judas_stopsample(0);
 
-          dialogo(EditSound0);
+          show_dialog(EditSound0);
           move(0,n); call((voidReturnType )v.paint_handler); v.volcar=1;
           PasteNewSounds();
         }
         break;
 
       case 7:
-        nueva_ventana(mixer0);
+        new_window(mixer0);
         break;
 
       case 8:
         if (!SoundActive) {
           if ( SoundError ) {
-            v_texto=(char *)texto[549]; dialogo(errhlp0);
+            v_texto=(char *)texto[549]; show_dialog(errhlp0);
             if (v_aceptar) help(2008);
           } else {
-            v_texto=(char *)texto[548]; dialogo(errhlp0);
+            v_texto=(char *)texto[548]; show_dialog(errhlp0);
             if (v_aceptar) help(2009);
           }
           return;
@@ -1208,8 +1208,8 @@ void menu_sonidos2(void) {
       case 9:
         if ((n=find_mod_window())) {
           v_titulo=(char *)texto[513]; v_texto=(char *)ventana[n].titulo;
-          dialogo(aceptar0);
-          if (v_aceptar) { move(0,n); cierra_ventana(); }
+          show_dialog(aceptar0);
+          if (v_aceptar) { move(0,n); close_window(); }
         } break;
         break;
     }
@@ -1240,16 +1240,16 @@ void menu_sistema2(void) {
       case 1: show_clock(); break;
       case 2: muestra_papelera(); break;
       case 3: calculadora(); break;
-      case 4: dialogo(Vid_Setup0); break;
-      case 5: dialogo(Tap_Setup0); break;
+      case 4: show_dialog(Vid_Setup0); break;
+      case 5: show_dialog(Tap_Setup0); break;
       case 6:
-        dialogo(Cfg_Setup0);
+        show_dialog(Cfg_Setup0);
         Cfg_Setup_end();
         break;
-      case 7: dialogo(MemInfo0); break;
-      case 8: dialogo(about0); break;
+      case 7: show_dialog(MemInfo0); break;
+      case 8: show_dialog(about0); break;
       case 9:
-        v_titulo=(char *)texto[40]; v_texto=NULL; dialogo(aceptar0);
+        v_titulo=(char *)texto[40]; v_texto=NULL; show_dialog(aceptar0);
         if (v_aceptar) { salir_del_entorno=1; } break;
     }
   }
@@ -1428,7 +1428,7 @@ void update_menu(int menu,int min,int max) {
 // v_mapa->mab
 // v_mapa->map_an/al
 
-void volcado_raton(void);
+void blit_mouse(void);
 
 void mapa0(void) {
   int x,y;
@@ -1516,7 +1516,7 @@ void mapa1(void) {
   }
 }
 
-int colisionan(int,int);
+int windows_collide(int,int);
 
 void calculate_foreground(void) {
   int n,m;
@@ -1524,7 +1524,7 @@ void calculate_foreground(void) {
   for (n=0;n<max_windows;n++) if (ventana[n].tipo && ventana[n].primer_plano!=2) {
     ventana[n].primer_plano=1;
     for (m=0;m<n;m++) if (ventana[m].tipo) {
-      if (colisionan(n,m)) ventana[n].primer_plano=0;
+      if (windows_collide(n,m)) ventana[n].primer_plano=0;
     }
   }
 }
@@ -1569,7 +1569,7 @@ extern struct _thumb_map {
 } thumb_map[max_windows];
 
 void M3D_create_thumbs(struct t_listboxbr * l, int prog);
-int  crear_mapbr_thumbs(struct t_listboxbr * l);
+int  create_mapbr_thumbs(struct t_listboxbr * l);
 void FreePaintThumbs(void);
 
 extern byte * textura_color;
@@ -1597,7 +1597,7 @@ void mapa2(void) {
     mab=(int *)malloc(((map_an*map_al+31)/32)*4);
 
     if (mab==NULL) {
-      v_texto=(char *)texto[45]; dialogo(err0); return;
+      v_texto=(char *)texto[45]; show_dialog(err0); return;
     }
 
     for (n=1;n<max_windows;n++)
@@ -1676,7 +1676,7 @@ void mapa2(void) {
     }
 
     v.tipo=100;
-    if(crear_mapbr_thumbs(&lthumbmapbr))
+    if(create_mapbr_thumbs(&lthumbmapbr))
     {
       TipoTex |= MAPBR; // Thumbnail type MAPBR
     }
@@ -1704,12 +1704,12 @@ void mapa2(void) {
           sp_al=ventana[1].mapa->map_al;
           if ((sp=(byte*)malloc(sp_an*sp_al))!=NULL) {
             memcpy(sp,ventana[1].mapa->map,sp_an*sp_al);
-            mover(sp,sp_an,sp_al);
+            move_selection(sp,sp_an,sp_al);
           }; arrastrar=5;
           break;
         default: edit_scr(); break;
       }
-      if (modo<100) { put_barra(2,10,45); } volcado_raton();
+      if (modo<100) { put_bar(2,10,45); } blit_mouse();
       do { read_mouse(); } while (mouse_b || key(_ESC));
     } while (modo>=100); mouse_graf=1;
 
@@ -1746,12 +1746,12 @@ void mapa2(void) {
       wwrite(v.ptr,an,al,2+(an-20)/2,2,1,v.titulo,c4);
     }
 
-    mapa1(); actualiza_caja(0,0,vga_an,vga_al);
+    mapa1(); update_box(0,0,vga_an,vga_al);
     if (iundo!=_iundo) v.mapa->grabado=0;
 
     n=0; while (n<num_ventanas_a_crear) {
       v_mapa=ventanas_a_crear[n++];
-      nueva_ventana(mapa0);
+      new_window(mapa0);
     }
   }
 }
@@ -2548,13 +2548,13 @@ int new_map(byte * mapilla) {
       v_mapa->descripcion[0]=0;
       for (n=0;n<512;n++) v_mapa->puntos[n]=-1;
       if(MustCreate)
-              nueva_ventana(mapa0);
+              new_window(mapa0);
 
       return(0);
 
-    } else { v_texto=(char *)texto[45]; dialogo(err0); free(v_mapa); }
+    } else { v_texto=(char *)texto[45]; show_dialog(err0); free(v_mapa); }
 
-  } else { v_texto=(char *)texto[45]; dialogo(err0); }
+  } else { v_texto=(char *)texto[45]; show_dialog(err0); }
 
   return(1);
 }
@@ -2657,7 +2657,7 @@ void open_map(void) {
 
   if (sum)
   {
-    dialogo(TratarPaleta0); // ¿Cargar paleta?
+    show_dialog(TratarPaleta0); // ¿Cargar paleta?
 
     switch(v_aceptar)
     {
@@ -2723,7 +2723,7 @@ void open_map(void) {
                     free(v_mapa);
                     free(buffer);
                     fclose(f);
-                    v_texto=(char *)texto[44]; dialogo(err0);
+                    v_texto=(char *)texto[44]; show_dialog(err0);
                     continue;
                   }
 
@@ -2753,16 +2753,16 @@ void open_map(void) {
                   v_mapa->map_an=map_an;
                   v_mapa->map_al=map_al;
 
-                  nueva_ventana(mapa0);
+                  new_window(mapa0);
 
-                } else { v_texto=(char *)texto[45]; dialogo(err0); free(v_mapa); }
-              } else { v_texto=(char *)texto[45]; dialogo(err0); }
-            } else { v_texto=(char *)texto[46]; dialogo(err0); }
-          } else { v_texto=(char *)texto[44]; dialogo(err0); }
+                } else { v_texto=(char *)texto[45]; show_dialog(err0); free(v_mapa); }
+              } else { v_texto=(char *)texto[45]; show_dialog(err0); }
+            } else { v_texto=(char *)texto[46]; show_dialog(err0); }
+          } else { v_texto=(char *)texto[44]; show_dialog(err0); }
           free(buffer);
-        } else { v_texto=(char *)texto[45]; dialogo(err0); }
+        } else { v_texto=(char *)texto[45]; show_dialog(err0); }
         fclose(f);
-      } else { v_texto=(char *)texto[44]; dialogo(err0); }
+      } else { v_texto=(char *)texto[44]; show_dialog(err0); }
     }
   } create_dac4();
 }
@@ -2805,7 +2805,7 @@ void save_map(void) {
         case 0: e=graba_MAP(map,f); break;
         case 1: e=graba_PCX(map,f); break;
         case 2: e=graba_BMP(map,f); break;
-      } if (e==2) { v_texto=(char *)texto[48]; dialogo(err0); }
+      } if (e==2) { v_texto=(char *)texto[48]; show_dialog(err0); }
 
       if (e || ferror(f)) {
         fclose(f);
@@ -2814,8 +2814,8 @@ void save_map(void) {
         fclose(f);
       }
 
-    } else { v_texto=(char *)texto[47]; dialogo(err0); e=1; }
-  } else { v_texto=(char *)texto[47]; dialogo(err0); e=1; }
+    } else { v_texto=(char *)texto[47]; show_dialog(err0); e=1; }
+  } else { v_texto=(char *)texto[47]; show_dialog(err0); e=1; }
 
   if (!e) { // Debe cambiar la ruta y nombre del mapa/ventana guardado
     div_strcpy(ventana[v_ventana].mapa->path, sizeof(ventana[v_ventana].mapa->path), tipo[v_tipo].path);
@@ -2827,7 +2827,7 @@ void save_map(void) {
     } else {
       wwrite(ventana[v_ventana].ptr,an,al,3+(an-20)/2,2,1,ventana[v_ventana].titulo,c1);
       wwrite(ventana[v_ventana].ptr,an,al,2+(an-20)/2,2,1,ventana[v_ventana].titulo,c4);
-    } vuelca_ventana(v_ventana);
+    } flush_window(v_ventana);
   }
 }
 
@@ -2924,7 +2924,7 @@ int Colors[9],min_dist,i,dist;
         man=MiMap->map_an;
         mal=MiMap->map_al;
 
-        dialogo(Tamnio0);
+        show_dialog(Tamnio0);
         if(!v_aceptar)
                 return;
 
@@ -2976,7 +2976,7 @@ int Colors[9],min_dist,i,dist;
 
         if (bufferaux==NULL) { // Esto lo añadió dani ...
           v_texto=(char *)texto[45];
-          dialogo(err0);
+          show_dialog(err0);
           return;
         }
         y=(float)0;
@@ -3030,7 +3030,7 @@ int Colors[9],min_dist,i,dist;
 
         if (new_map((byte *)bufferaux)) {
                 v_texto=(char *)texto[45];
-                dialogo(err0);
+                show_dialog(err0);
                 free(bufferaux);
                 return;
         }
@@ -3137,7 +3137,7 @@ void map_search() {
   if (mintile>256) mintile=256;
   if (maxtile<mintile) maxtile=256;
 
-  v_aceptar=0; dialogo(map_search0);
+  v_aceptar=0; show_dialog(map_search0);
 
   if(!v_aceptar) return;
 
@@ -3148,7 +3148,7 @@ void map_search() {
 
   if((map=(byte*)malloc(map_an*map_al))==NULL) {
     v_texto=(char *)texto[45];
-    dialogo(err0);
+    show_dialog(err0);
     return;
   }
 
@@ -3234,14 +3234,14 @@ int Progress(char *titulo,int current,int total)
 {
         if(!ProgressInit)
         {//Inicializa la ventan de progreso
-                mouse_graf=3; volcado_copia();
+                mouse_graf=3; flush_copy();
                 ProgressInit=1;
                 ProgressCurrent=current;
                 ProgressTitle=titulo;
                 ProgressTotal=total;
-                nueva_ventana(Progress0);
-                vuelca_ventana(0);
-                volcado_copia();
+                new_window(Progress0);
+                flush_window(0);
+                flush_copy();
         }
         else
         {
@@ -3250,16 +3250,16 @@ int Progress(char *titulo,int current,int total)
                 {//Finaliza la ventan de progreso
                         mouse_graf=1;
                         ProgressInit=0;
-                        cierra_ventana();
-                        volcado_copia();
+                        close_window();
+                        flush_copy();
                         return 0;
                 }
                 else
                 {//Bucle de la ventan de progreso
                         v=ventana[0];
                         Progress2();
-                        vuelca_ventana(0);
-                        volcado_copia();
+                        flush_window(0);
+                        flush_copy();
                 }
         }
 return(1);
@@ -3318,7 +3318,7 @@ int Colors[9],min_dist,i,dist;
          rgb_table=(char *)malloc(32768);
          if(rgb_table==NULL)
          {
-                v_texto=(char *)texto[45]; dialogo(err0);
+                v_texto=(char *)texto[45]; show_dialog(err0);
                 return;
          }
          if((rgb_tab=fopen("RGB_TAB.TMP","rb"))==NULL)
@@ -3374,7 +3374,7 @@ int Colors[9],min_dist,i,dist;
         bufferaux=(char *)malloc(map_an*map_al);
         if(bufferaux==NULL)
         {
-                v_texto=(char *)texto[45]; dialogo(err0);
+                v_texto=(char *)texto[45]; show_dialog(err0);
                 if(!Gris)
                         free(rgb_table);
                 return;
@@ -3449,7 +3449,7 @@ int Colors[9],min_dist,i,dist;
 
         if (new_map((byte *)bufferaux)) {
                 v_texto=(char *)texto[45];
-                dialogo(err0);
+                show_dialog(err0);
                 free(bufferaux);
                 if(!Gris)
                         free(rgb_table);

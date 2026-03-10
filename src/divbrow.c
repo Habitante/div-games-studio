@@ -1698,9 +1698,9 @@ void browser2(void) {
 #ifdef NOTYET
           if ( judascfg_device == DEV_NOSOUND) {
             if ( SoundError ) {
-              v_texto=texto[549]; dialogo(err0);
+              v_texto=texto[549]; show_dialog(err0);
             } else {
-              v_texto=texto[548]; dialogo(err0);
+              v_texto=texto[548]; show_dialog(err0);
             } return;
           } else 
 #else
@@ -1796,7 +1796,7 @@ void browser2(void) {
         create_listbox(&ldirectoriosbr);
       } else {
         _dos_setdrive(tipo[v_tipo].path[0]-'A'+1,&n);
-        v_texto=(char *)texto[42]; dialogo(err0); return;
+        v_texto=(char *)texto[42]; show_dialog(err0); return;
       }
     } else if (lextbr.zona>=10) { v.volcar=1;
       tipo[v_tipo].defecto=lextbr.zona-10+lextbr.inicial;

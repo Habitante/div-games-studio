@@ -50,7 +50,7 @@ byte paleta[768];
 int num_puntos;
 
 //-----------------------------------------------------------------------------
-//      Busca los colores c0..c4 del entorno
+//      Busca los colores c0..c4 del main_loop
 //-----------------------------------------------------------------------------
 
 void find_colors(void) {
@@ -533,7 +533,7 @@ void LoadPal() {
   v_modo=0;
   v_tipo=3;
   v_texto=(char *)texto[777];
-  dialogo(browser0);
+  show_dialog(browser0);
   if (!v_terminado) return;
 
   if(!num_taggeds) {
@@ -561,7 +561,7 @@ void LoadPal() {
 
       if (!v_existe) {
         v_texto=(char *)texto[43];
-        dialogo(err0);
+        show_dialog(err0);
       } else {
         strcpy(PalName,full);
 
@@ -577,12 +577,12 @@ void LoadPal() {
           if (hay_mapas()) {
             v_titulo=(char *)texto[53];
             v_texto=(char *)texto[321];
-            dialogo(aceptar0);
+            show_dialog(aceptar0);
           } else v_aceptar=1;
           if(v_aceptar) RefPalAndDlg(0,1); else RefPalAndDlg(1,1);
         } else {
           v_texto=(char*)texto[46];
-          dialogo(err0);
+          show_dialog(err0);
           return;
         }
       }
@@ -593,7 +593,7 @@ void LoadPal() {
     muestra=(byte*)malloc(32768);
     if (muestra==NULL) {
       v_texto=(char *)texto[45];
-      dialogo(err0);
+      show_dialog(err0);
       return;
     }
     memset(muestra,0,32768);
@@ -630,7 +630,7 @@ void LoadPal() {
     if (hay_mapas()) {
       v_titulo=(char *)texto[53];
       v_texto=(char *)texto[321];
-      dialogo(aceptar0);
+      show_dialog(aceptar0);
     } else v_aceptar=1;
     if(v_aceptar) RefPalAndDlg(0,1); else RefPalAndDlg(1,1);
   }
@@ -656,7 +656,7 @@ FILE *f;
         else
         {
                 v_texto=(char *)texto[47];
-                dialogo(err0);
+                show_dialog(err0);
         }
 }
 
@@ -666,14 +666,14 @@ void SaveAsPal()
         v_modo=1;
         v_tipo=10;
         v_texto=(char *)texto[778];
-	dialogo(browser0);
+	show_dialog(browser0);
         if (v_terminado)
         {
                 if (v_existe)
                 {
                         v_titulo=(char *)texto[139];
                         v_texto=input;
-                        dialogo(aceptar0);
+                        show_dialog(aceptar0);
                         if (v_aceptar)
                                 Guarda_Pal();
                 }
@@ -685,7 +685,7 @@ void SaveAsPal()
 }
 
 //-----------------------------------------------------------------------------
-//      Refresca todo el entorno tras cambiar una paleta
+//      Refresca todo el main_loop tras cambiar una paleta
 //-----------------------------------------------------------------------------
 void ReloadFont(int ventana, struct tventana *vntn);
 
@@ -706,7 +706,7 @@ extern char *Text02;
 extern char *Text03;
 
 void ShowText(void);
-void crea_barratitulo(void);
+void create_title_bar(void);
 
 byte *t64 = NULL;
 
@@ -793,12 +793,12 @@ void RefPalAndDlg(int no_tocar_mapas,int guardar_original)
     }
   }
 
-  x=0; mouse_graf=3; volcado_copia(); mouse_graf=1;
+  x=0; mouse_graf=3; flush_copy(); mouse_graf=1;
 
   init_ghost(); crear_ghost(0); find_colors();
   zoom_move=c3; color=0;
 
-  crea_barratitulo();
+  create_title_bar();
 
   for (n=1;n<max_windows;n++)
   {
@@ -858,7 +858,7 @@ void RefPalAndDlg(int no_tocar_mapas,int guardar_original)
   // Restaura el tapiz de fondo
   preparar_tapiz();
 
-  actualiza_caja(0,0,vga_an,vga_al);
+  update_box(0,0,vga_an,vga_al);
 
   volcado(copia);
 
@@ -993,7 +993,7 @@ void ordena0(void){
 void ordena_paleta(void) {
   int n;
 
-  dialogo(ordena0);
+  show_dialog(ordena0);
   if (v_aceptar) {
     for (n=0;n<256;n++) {
       dac4[n*3]=dac[paleta[n]*3];
@@ -1035,11 +1035,11 @@ word find_ord2(byte * dac) {
 void fusiona_paleta(void){
   int div_try=0;
 
-  v_modo=0; v_tipo=3; v_texto=(char *)texto[781]; dialogo(browser0);
+  v_modo=0; v_tipo=3; v_texto=(char *)texto[781]; show_dialog(browser0);
 
   if (v_terminado) {
     if (!v_existe) {
-      v_texto=(char *)texto[43]; dialogo(err0);
+      v_texto=(char *)texto[43]; show_dialog(err0);
     } else {
       strcpy(full,tipo[v_tipo].path);
       if (full[strlen(full)-1]!='/') strcat(full,"/");
@@ -1054,7 +1054,7 @@ void fusiona_paleta(void){
       div_try|=cargadac_PAL(PalName);
       div_try|=cargadac_JPG(PalName);
 
-      if(!div_try) { v_texto=(char *)texto[46]; dialogo(err0); return; }
+      if(!div_try) { v_texto=(char *)texto[46]; show_dialog(err0); return; }
 
       mouse_graf=3; volcado(copia);
 
@@ -1577,7 +1577,7 @@ int an=v.an/big2,al=v.al/big2;
                                         {dac[n*3+2]=fB;fB+=fIB;}
                                         
                                         find_colors();
-                                        refrescadialogo();
+                                        refresh_dialog();
                                         wrectangle(v.ptr,an,al,c0,(SelColor%16)*8+1,(SelColor/16)*8+9,9,9);
                                         wrectangle(v.ptr,an,al,c4,(cColor%16)*8+1,(cColor/16)*8+9,9,9);
                                         set_dac(dac);
@@ -1588,7 +1588,7 @@ int an=v.an/big2,al=v.al/big2;
                                         dac[cColor*3+1]=dac[SelColor*3+1];
                                         dac[cColor*3+2]=dac[SelColor*3+2];                                        
                                         find_colors();
-                                        refrescadialogo();
+                                        refresh_dialog();
                                         wrectangle(v.ptr,an,al,c0,(SelColor%16)*8+1,(SelColor/16)*8+9,9,9);
                                         wrectangle(v.ptr,an,al,c4,(cColor%16)*8+1,(cColor/16)*8+9,9,9);
                                         set_dac(dac);
@@ -1605,7 +1605,7 @@ int an=v.an/big2,al=v.al/big2;
                                         dac[SelColor*3+2]=dac[cColor*3+2];
                                         dac[cColor*3+2]=bWork;                                        
                                         find_colors();
-                                        refrescadialogo();
+                                        refresh_dialog();
                                         wrectangle(v.ptr,an,al,c0,(SelColor%16)*8+1,(SelColor/16)*8+9,9,9);
                                         wrectangle(v.ptr,an,al,c4,(cColor%16)*8+1,(cColor/16)*8+9,9,9);
                                         set_dac(dac);
@@ -1729,7 +1729,7 @@ int an=v.an/big2,al=v.al/big2;
                         lGre.inicial=63-dac[SelColor*3+1];
                         lBlu.inicial=63-dac[SelColor*3+2];
                         find_colors();
-                        refrescadialogo();
+                        refresh_dialog();
                         set_dac(dac);
                         v.volcar=1;
                 }        
@@ -1787,7 +1787,7 @@ int an=v.an/big2,al=v.al/big2;
                                 memcpy(dac,paleta,768);
 
                                 find_colors();
-                                refrescadialogo();
+                                refresh_dialog();
                                 set_dac(dac);
                                 Degradar=0;Copiar=0;Intercambiar=0;
                                 Accion=0;
@@ -1847,7 +1847,7 @@ byte DacAux[768];
         Retorno=0;
         memcpy(DacAux,dac,768);
         memcpy(paleta,dac,768);
-        dialogo(InterPal0);
+        show_dialog(InterPal0);
         if(!Retorno)
         {
                 memcpy(dac,DacAux,768);
@@ -1861,7 +1861,7 @@ byte DacAux[768];
                   if (hay_mapas()) {
                     v_titulo=(char *)texto[53];
                     v_texto=(char *)texto[321];
-                    dialogo(aceptar0);
+                    show_dialog(aceptar0);
                   } else v_aceptar=1;
                   memcpy(dac4,dac,768);
                   memcpy(dac,DacAux,768);

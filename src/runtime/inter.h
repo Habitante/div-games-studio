@@ -97,7 +97,7 @@ void retrazo(void);
 void fade_wait(void);
 void svmode(void);
 void rvmode(void);
-void init_volcado(void);
+void init_flush(void);
 void volcado_parcial(int,int,int,int);
 void volcado(byte *);
 void restore(byte *,byte *);
@@ -170,7 +170,7 @@ void finaliza_textos(void);
 //-----------------------------------------------------------------------------
 
 #define lnop  0 // *            No operación
-#define lcar  1 // valor        Carga una constante en pila
+#define lcar  1 // valor        Carga una constant en pila
 #define lasi  2 //              Saca valor, offset y mete el valor en [offset]
 #define lori  3 //              Or lógico
 #define lxor  4 //              Xor, or exclusivo
@@ -186,10 +186,10 @@ void finaliza_textos(void);
 #define lmul 14 //              Multiplicación
 #define ldiv 15 //              División de enteros
 #define lmod 16 //              Módulo, resto de la división
-#define lneg 17 //              Negación, cambia de signo una constante
+#define lneg 17 //              Negación, cambia de signo una constant
 #define lptr 18 //              Pointer, saca offset y mete [offset]
 #define lnot 19 //              Negación binaria, bit a bit
-#define laid 20 //              Suma id a la constante de la pila
+#define laid 20 //              Suma id a la constant de la pila
 #define lcid 21 //              Carga id en la pila
 #define lrng 22 // offset, len  Realiza una comparación de rango
 #define ljmp 23 // offset       Salta a una dirección de mem[]
@@ -834,13 +834,13 @@ GLOBAL int buffer_an,buffer_al;         // Width & Height of buffer
 GLOBAL int big,big2; // big(0,1), big2(1,2)
 GLOBAL int mouse_graf;
 
-GLOBAL byte c0,c1,c2,c3,c4,text_color; // Colores del entorno
+GLOBAL byte c0,c1,c2,c3,c4,text_color; // Colores del main_loop
 GLOBAL byte c01,c12,c23,c34; // Colores intermedios
 GLOBAL byte c_r,c_g,c_b,c_r_low,c_g_low,c_b_low;
 
 GLOBAL byte * fondo_raton; // Buffer para guardar el fondo del ratón
 
-GLOBAL byte * graf_ptr, * graf[256];    // Gráficos del entorno
+GLOBAL byte * graf_ptr, * graf[256];    // Gráficos del main_loop
 GLOBAL byte * text_font; // Font estándar, 7 puntos de alto, ancho proporcional
 
 GLOBAL int wmouse_x,wmouse_y; // Ratón dentro de una ventana

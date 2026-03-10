@@ -43,13 +43,13 @@ void Bin2(void)
 				MiVentana=v;
 				v=ventana[1];
 				ventana[1]=MiVentana;
-				cierra_ventana();
+				close_window();
 			break;
 
 			case 101: // Item dragged from FPG to bin. Remove from FPG
 				v_titulo=(char *)texto[60];
 				v_texto=ventana[1].mapa->descripcion;
-				dialogo(aceptar0);
+				show_dialog(aceptar0);
 
 				if(v_aceptar) {
 					MiVentana=v;
@@ -94,5 +94,5 @@ void Bin0(void)
 
 void muestra_papelera()
 {
-  nueva_ventana(Bin0);
+  new_window(Bin0);
 }

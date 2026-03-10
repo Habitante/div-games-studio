@@ -85,5 +85,5 @@ void Clock0(void) {
 }
 
 void show_clock(void) {
-  nueva_ventana(Clock0);
+  new_window(Clock0);
 }

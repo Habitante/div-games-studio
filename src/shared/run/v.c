@@ -490,7 +490,7 @@ volcadosdl(p);
   }
 #endif
   if (fli_palette_update) { fli_palette_update=0; set_dac2(); }
-  init_volcado();
+  init_flush();
 }
 
 //-----------------------------------------------------------------------------
@@ -816,7 +816,7 @@ void vgacpy(byte * q, byte * p, int n) {
 //      Selecciona una ventana para su posterior volcado
 //-----------------------------------------------------------------------------
 
-void init_volcado(void) {
+void init_flush(void) {
 #ifndef DROID
 	 memset(&scan[0],0,MAX_YRES*sizeof(short)); 
 #endif

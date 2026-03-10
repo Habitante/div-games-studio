@@ -5,7 +5,7 @@
 
 #include "global.h"
 
-void ayuda_dibujo(int); // Drawing support
+void draw_help(int); // Drawing support
 
 
 void draw_selection_box(int _x0,int _y0,int _x1,int _y1);
@@ -166,7 +166,7 @@ void memxchg(byte *d, byte *s, int n) {
 //      MEGARUTINA para reponer el fondo de una caja en edición
 ///////////////////////////////////////////////////////////////////////////////
 
-static int zoom_porcion=0;
+static int zoom_region=0;
 int zoom_an,zoom_al;
 byte *zoom_p,*zoom_q;
 
@@ -185,9 +185,9 @@ void draw_edit_background(int x,int y,int an,int al) {
 
   volcado_parcial(x,y,an,al);
 
-  // TODO: Improve actualiza_caja() for better window background repaint
+  // TODO: Improve update_box() for better window background repaint
 
-  if (zx || zy) if (x<zx || y<zy || x+an>zx+zan || y+al>zy+zal) actualiza_caja(x,y,an,al);
+  if (zx || zy) if (x<zx || y<zy || x+an>zx+zan || y+al>zy+zal) update_box(x,y,an,al);
 
   if (_big) { big=0; big2=1; }
 
@@ -239,7 +239,7 @@ void draw_edit_background(int x,int y,int an,int al) {
   zoom_x=_x0; zoom_y=_y0;
   zan=(_x1-_x0+1)<<zoom; zal=(_y1-_y0+1)<<zoom;
   volcado_parcial(zx,zy,zan,zal);
-  zoom_porcion=1; zoom_map(); zoom_porcion=0;
+  zoom_region=1; zoom_map(); zoom_region=0;
   zoom_x=_zoom_x; zoom_y=_zoom_y; zx=_zx; zy=_zy; zan=_zan; zal=_zal;
 
 }
@@ -256,7 +256,7 @@ void zoom_map(void) {
   byte *p,*q;
   int _big=big;
 
-  if (!zoom_porcion) {
+  if (!zoom_region) {
 
     p=map+zoom_y*map_an+zoom_x;
     q=copia;
@@ -275,7 +275,7 @@ void zoom_map(void) {
 
     if (!zoom_background) {
       if (zx || zy) {
-        actualiza_background();
+        update_background();
         volcado_completo=1;
       } else {
         if (_big) { big=0; big2=1; }
@@ -363,7 +363,7 @@ void zoom_map(void) {
     break;
   }
 
-  if (!zoom_porcion) cclock=(*system_clock)>>1;
+  if (!zoom_region) cclock=(*system_clock)>>1;
 
   if (sel_status) switch(modo_seleccion) {
     case -1: for (n=0;n<512;n+=2) if (v.mapa->puntos[n]!=-1) {
@@ -399,13 +399,13 @@ void interpolation_mode(void) {
     make_near_regla();
 
     bar[0]=101+zoom; bar[1]=120; bar[2]=154; bar[3]=0;
-    dibuja_barra(0); put_barra(10,2,118); hacer_zoom=1;
+    draw_bar(0); put_bar(10,2,118); hacer_zoom=1;
 
     memset(m0,0,an*al*2);
     memset(m1,0,an*al*2);
 
     do {
-      ayuda_dibujo(1295);
+      draw_help(1295);
       read_mouse(); select_zoom(); test_mouse();
 
       if (((mouse_b&1) && selected_icon==2)) {
@@ -417,14 +417,14 @@ void interpolation_mode(void) {
 
       blit_interpolated(an);
 
-      volcado_edicion();
+      blit_edit();
     } while (!(mouse_b&2) && !key(_ESC) && modo<100 &&
       !(mouse_b && mouse_in(barra_x,barra_y+10,barra_x+9,barra_y+18)));
 
     blit_interpolated(an);
 
     if (key(_ESC)||(mouse_b && mouse_in(barra_x,barra_y+10,barra_x+9,barra_y+18)))
-      { put_barra(2,10,45); volcar_barras(0);
+      { put_bar(2,10,45); flush_bars(0);
         put(mouse_x,mouse_y,mouse_graf); volcado(copia); }
 
     free(m1); free(m0);
@@ -432,7 +432,7 @@ void interpolation_mode(void) {
   }
 
   if (m0==NULL || m1==NULL) {
-    v_texto=(char *)texto[45]; dialogo(err0);
+    v_texto=(char *)texto[45]; show_dialog(err0);
   }
 
   modo+=100;
@@ -565,7 +565,7 @@ void fill_select(word x,word y) {
   if ((fss=(word*)malloc(60000))!=NULL) {
     fsp=fss; fsp_max=fss+30000; fill_scan(x,y); free(fss);
   } else {
-    v_texto=(char *)texto[45]; dialogo(err0);
+    v_texto=(char *)texto[45]; show_dialog(err0);
   }
   modo_fill=_modo_fill;
 }
@@ -614,7 +614,7 @@ void fill(word x,word y) {
 
     free(fss);
   } else {
-    v_texto=(char *)texto[45]; dialogo(err0);
+    v_texto=(char *)texto[45]; show_dialog(err0);
   }
 }
 
@@ -1038,9 +1038,9 @@ byte * save_undo(int x, int y, int an, int al) {
 
   } else {
     draw_edit_background(0,0,vga_an,vga_al);
-    volcar_barras(1);
+    flush_bars(1);
     volcado_completo=1; volcado(copia);
-    v_texto=(char *)texto[320]; dialogo(err0); undo_error=1;
+    v_texto=(char *)texto[320]; show_dialog(err0); undo_error=1;
   }
 
   return(ret);

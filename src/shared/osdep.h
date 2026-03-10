@@ -165,7 +165,7 @@ void _makepath(
 );
 #endif
 
-extern void compilar(void);
+extern void compile(void);
 extern int _chdir(const char* Directory);
 
 //#define SoundInfo SDL_AudioSpec

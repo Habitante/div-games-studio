@@ -113,16 +113,16 @@ void call(const voidReturnType func); // void funcion(void); int n=(int)funcion;
 void _fwrite(char*,byte*,int);
 void _ffwrite(byte *Buffer,unsigned int Len,FILE *file);
 void error(int);
-void nueva_ventana(voidReturnType);
-void dialogo(voidReturnType);
-void refrescadialogo(void);
-void cierra_ventana(void);
-void actualiza_caja(int,int,int,int);
-void actualiza_background(void);
-void vuelca_ventana(int);
-void volcado_copia(void);
-void emplazar(int flag,int*_x,int*_y,int an,int al);
-void se_ha_movido_desde(int x,int y,int an,int al);
+void new_window(voidReturnType);
+void show_dialog(voidReturnType);
+void refresh_dialog(void);
+void close_window(void);
+void update_box(int,int,int,int);
+void update_background(void);
+void flush_window(int);
+void flush_copy(void);
+void place_window(int flag,int*_x,int*_y,int an,int al);
+void on_window_moved(int x,int y,int an,int al);
 void _get(int texto,int x,int y,int an,byte * buf,int lon_buf,int r0,int r1);
 void _button(int texto,int x,int y,int centro);
 void _flag(int texto,int x,int y,int * variable);
@@ -130,10 +130,10 @@ void _show_items();
 void _process_items();
 void _select_new_item(int n);
 void _reselect_item(void);
-int colisionan(int a,int b);
-void maximiza_ventana(void);
+int windows_collide(int a,int b);
+void maximize_window(void);
 void explode(int x,int y,int an,int al);
-void activar(void);
+void activate(void);
 void DaniDel(char *name);
 
 void window_surface(int an, int al, byte type);
@@ -182,12 +182,12 @@ void edit_mode_12(void);
 void edit_mode_13(void);
 
 void test_mouse(void);
-void volcado_edicion(void);
-void dibuja_barra(int);
-void put_barra(int,int,int);
-void put_barra_inv(int,int,int);
-void volcar_barras(int);
-void mover(byte *,int,int);
+void blit_edit(void);
+void draw_bar(int);
+void put_bar(int,int,int);
+void put_bar_inv(int,int,int);
+void flush_bars(int);
+void move_selection(byte *,int,int);
 void select_zoom(void);
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -208,7 +208,7 @@ void retrazo(void);
 void svmode(void);
 void rvmode(void);
 void set_dac(byte*);
-void init_volcado(void);
+void init_flush(void);
 void volcado_parcial(int,int,int,int);
 void volcado(byte *);
 
@@ -487,10 +487,10 @@ GLOBAL_DATA int vwidth,vheight; // Window Screen Size
 GLOBAL_DATA int Codigo;              //Codigo del mapa
 GLOBAL_DATA char Descripcion[32];    //Descripcion del mapa
 
-GLOBAL_DATA byte * tapiz; // Gráfico de fondo para el entorno de ventanas
+GLOBAL_DATA byte * tapiz; // Gráfico de fondo para el main_loop de ventanas
 GLOBAL_DATA byte * mapa_tapiz; // Inicio del bitmap (tapiz_an,tapiz_al)
 GLOBAL_DATA byte * fill_dac; // Valores a 1 para los colores que puedan estar en la zona
-GLOBAL_DATA byte * map; // Mapa editado (el dibujo, no el entorno)
+GLOBAL_DATA byte * map; // Mapa editado (el dibujo, no el main_loop)
 GLOBAL_DATA int * mab; // Mapa editado (en mapa de bits para la selección de zonas)
 GLOBAL_DATA byte * ghost; // Tabla ghost-layering para la paleta del objeto editado
 GLOBAL_DATA byte * dac; // Paleta del objeto editado
@@ -501,7 +501,7 @@ GLOBAL_DATA word mab_x0,mab_x1,mab_y0,mab_y1; // Límites de la zona seleccionad
 // int r,g,b,c,d,a removed (Sprint D) — replaced with local variables or file-static in divpalet.c
 // FILE *f removed (Sprint D) — all usages now use local declarations
 
-GLOBAL_DATA byte c0,c1,c2,c3,c4,text_color; // Colores del entorno
+GLOBAL_DATA byte c0,c1,c2,c3,c4,text_color; // Colores del main_loop
 GLOBAL_DATA byte c01,c12,c23,c34; // Colores intermedios
 GLOBAL_DATA byte c_r,c_g,c_b,c_r_low,c_g_low,c_b_low,c_y;
 GLOBAL_DATA byte c_com,c_sim,c_res,c_pre,c_num,c_lit;
@@ -524,7 +524,7 @@ GLOBAL_DATA byte * cuad; // Diferencias elevadas al cuadrado para la paleta
 
 GLOBAL_DATA int * system_clock, cclock, mclock;
 
-GLOBAL_DATA byte * copia; // Copia virtual de pantalla (del entorno)
+GLOBAL_DATA byte * copia; // Copia virtual de pantalla (del main_loop)
 
 GLOBAL_DATA SDL_Surface *copia_surface;
 GLOBAL_DATA	SDL_Surface *tempsurface;
@@ -589,7 +589,7 @@ GLOBAL_DATA int modo; // Modo de dibujo (0-lapiz,1-líneas,2-bezier, ...) (+100 
 
 GLOBAL_DATA byte * fondo_raton; // Buffer para guardar el fondo del ratón
 
-GLOBAL_DATA byte * graf_ptr, * graf[256];    // Gráficos del entorno
+GLOBAL_DATA byte * graf_ptr, * graf[256];    // Gráficos del main_loop
 
 //GLOBAL_DATA 
 struct tgraf_help {
@@ -674,7 +674,7 @@ struct t_item {
 
 //GLOBAL_DATA 
 struct tventana {
-  int tipo;                             // 0-none, 1-dialogo, 2-menu, 3-paleta
+  int tipo;                             // 0-none, 1-show_dialog, 2-menu, 3-paleta
                                         // 4-timer, 5-papelera, 7-barra_progreso
                                         // 8-mixer
                                         // 100-map (>=100 objetos excluibles)
@@ -951,10 +951,10 @@ GLOBAL_DATA int source_len;
 GLOBAL_DATA int saved_esp;
 
 void inicializa_compilador(void);
-void compilar_programa(void);
+void compile_program(void);
 void finaliza_compilador(void);
 
-void compilar(void); // Internal compiler functions
+void compile(void); // Internal compiler functions
 void comp(void);
 void free_resources(void);
 void comp_exit(void);

@@ -188,7 +188,7 @@ void M3D_create_thumbs(struct t_listboxbr * l, int prog)
   if((FPG_F=fopen((char *)brush_fpg_path,"rb"))==NULL)
   {
     v_texto=(char *)texto[43];
-    dialogo(err0);
+    show_dialog(err0);
     return;
   }
   fseek(FPG_F, 0, SEEK_END);
@@ -200,7 +200,7 @@ void M3D_create_thumbs(struct t_listboxbr * l, int prog)
   {
     fclose(FPG_F);
     v_texto=(char *)texto[44];
-    dialogo(err0);
+    show_dialog(err0);
     return;
   }
 
@@ -242,7 +242,7 @@ void M3D_create_thumbs(struct t_listboxbr * l, int prog)
         fclose(FPG_F);
         if (prog) Progress((char *)texto[93], FPG_progress.total, FPG_progress.total);
         v_texto=(char *)texto[44];
-        dialogo(err0);
+        show_dialog(err0);
         return;
       }
     }
@@ -286,7 +286,7 @@ void M3D_create_thumbs(struct t_listboxbr * l, int prog)
       fclose(FPG_F);
       if (prog) Progress((char *)texto[93], FPG_progress.total, FPG_progress.total);
       v_texto=(char *)texto[45];
-      dialogo(err0);
+      show_dialog(err0);
       return;
     }
 
@@ -305,7 +305,7 @@ void M3D_create_thumbs(struct t_listboxbr * l, int prog)
       free(FPG_D.imagen);
       if (prog) Progress((char *)texto[93], FPG_progress.total, FPG_progress.total);
       v_texto=(char *)texto[44];
-      dialogo(err0);
+      show_dialog(err0);
       return;
     }
 

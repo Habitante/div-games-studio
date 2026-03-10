@@ -47,27 +47,27 @@ void mostrar_mod_meters(void);
 //   Prototypes for this file
 ///////////////////////////////////////////////////////////////////////////////
 
-void inicializacion(void);
-void inicializa_entorno(void);
-void entorno(void);
-void finalizacion(void);
-void minimiza_ventana(void);
-void mueve_ventana(void);
-int determina_prg2(void);
-int determina_calc(void);
-void actualiza_dialogos(int x, int y, int an, int al);
-int colisiona_con(int a, int x, int y, int an, int al);
+void initialization(void);
+void init_environment(void);
+void main_loop(void);
+void finalization(void);
+void minimize_window(void);
+void move_window(void);
+int determine_prg2(void);
+int determine_calc(void);
+void update_dialogs(int x, int y, int an, int al);
+int collides_with(int a, int x, int y, int an, int al);
 void extrude(int x,int y,int an,int al,int x2,int y2,int an2,int al2);
-void desactivar(void);
+void deactivate(void);
 void implode(int x,int y,int an,int al);
-void mueve_ventana_completa(void);
-void restaura_tapiz(int x,int y,int an,int al);
-void posicion_menos_mala(int*_x,int*_y,int an,int al);
-int calcular_colision(int x,int y,int an,int al);
-int cuanto_colisiona_con(int a, int x, int y, int an, int al);
+void move_window_complete(void);
+void restore_wallpaper(int x,int y,int an,int al);
+void find_best_position(int*_x,int*_y,int an,int al);
+int calculate_collision(int x,int y,int an,int al);
+int calculate_overlap(int a, int x, int y, int an, int al);
 void check_oldpif(void);
 void default_reglas(void);
-void determina_unidades(void);
+void determine_units(void);
 void show_button(struct t_item * i);
 void show_get(struct t_item * i);
 void show_flag(struct t_item * i);
@@ -590,14 +590,14 @@ int main(int argc, char * argv[]) {
 		printf("\n");
 	}
 
-	inicializacion();
+	initialization();
 
-	inicializa_entorno();
+	init_environment();
   
   /////////////////////////////////////////////////////////////////////////////
   
 	if(beta_status==0) 
-		dialogo(betatest0);
+		show_dialog(betatest0);
 		
 #ifdef SHARE
 	else {
@@ -605,7 +605,7 @@ int main(int argc, char * argv[]) {
 			chk_demo();
 
 			if (mostrar_demo) {
-				dialogo(demo0);
+				show_dialog(demo0);
 
 				if (v_aceptar) 
 					help(2007);
@@ -621,13 +621,13 @@ int main(int argc, char * argv[]) {
 	return 0;
 #endif
 
-	entorno(); // Environment
+	main_loop(); // Environment
 
 
  
   /////////////////////////////////////////////////////////////////////////////
 
-	mouse_graf=3; volcado_copia();
+	mouse_graf=3; flush_copy();
 
 	if (auto_save_session || modo_de_retorno!=0)
 		if (modo_de_retorno!=3) 
@@ -635,7 +635,7 @@ int main(int argc, char * argv[]) {
 
 	Save_Cfgbin();
 
-	finalizacion();
+	finalization();
 
 	finaliza_textos();
 
@@ -661,7 +661,7 @@ int main(int argc, char * argv[]) {
 
 char cbs[65],cbn,cgs[65],cgn,crs[65],crn;
 
-void crea_barratitulo(void) {
+void create_title_bar(void) {
   int n,m;
 
   cbs[0]=c_b_low; cbs[64]=media(c_b_low,c0); n=64;
@@ -703,7 +703,7 @@ void usuario0(void);
 extern char user1[];
 extern char user2[];
 
-void inicializa_entorno() {
+void init_environment() {
   FILE * f;
   int n;
   char cWork[256];
@@ -714,14 +714,14 @@ void inicializa_entorno() {
     fclose(f);
   }
 
-	actualiza_caja(0,0,vga_an,vga_al);
+	update_box(0,0,vga_an,vga_al);
     volcado_completo=1; volcado(copia);
     
   if(!Interpretando) {
     if (!strlen(user1) || !strlen(user2)) {
-      dialogo(usuario0);
+      show_dialog(usuario0);
     } else {
-      dialogo(copyright0);
+      show_dialog(copyright0);
     }
   }
 
@@ -732,22 +732,22 @@ void inicializa_entorno() {
   if (!primera_vez) {
     for (n=0;n<max_windows;n++)
       if (ventana[n].click_handler==menu_principal2) break;
-    if (n==max_windows) nueva_ventana(menu_principal0);
+    if (n==max_windows) new_window(menu_principal0);
   }
 
-//  if (test_video) dialogo(test0);
+//  if (test_video) show_dialog(test0);
 // Have we come back from running a prog?
   if (Interpretando) {
     vacia_buffer();
     if ((f=fopen("system/exec.err","rb"))!=NULL) {
       fread(&error_code,4,1,f);
-      if (error_code) dialogo(interr0);
+      if (error_code) show_dialog(interr0);
       else {
         fread(&v_modo,1,4,f);
         strcpy(cWork,(char *)texto[366]);
         fread(cWork+strlen(cWork),1,256-strlen(cWork),f);
         cWork[255]=0; if (strlen(cWork)<255) strcat(cWork,"\"");
-        v_texto=cWork; dialogo(intmsg0);
+        v_texto=cWork; show_dialog(intmsg0);
       }
       fclose(f);
     }
@@ -757,8 +757,8 @@ void inicializa_entorno() {
   _chdir("system"); DaniDel("exec.*"); _chdir("..");
 
   if (primera_vez) {
-    nueva_ventana(menu_principal0);
-    minimiza_ventana();
+    new_window(menu_principal0);
+    minimize_window();
     
     primera_vez=2;
     help(2000);
@@ -888,7 +888,7 @@ void mainloop(void) {
 		free_drag=0;
 		v_titulo=(char *)texto[57]; 
 		v_texto=NULL;
-		dialogo(aceptar0);
+		show_dialog(aceptar0);
 
 		if (v_aceptar) {
 
@@ -899,7 +899,7 @@ void mainloop(void) {
 
 				if(MustCreate==0) {
 					  memcpy(v_mapa->filename,v.mapa->filename,13);
-					  nueva_ventana(mapa0);
+					  new_window(mapa0);
 					  MustCreate=1;
 				}
 
@@ -959,7 +959,7 @@ void mainloop(void) {
 				mouse_b=m;
 				
 				if (v.volcar) { 
-					vuelca_ventana(0); 
+					flush_window(0); 
 					v.volcar=0;
 				}
 			} 
@@ -1017,18 +1017,18 @@ void mainloop(void) {
 		if (n==0 && v.primer_plano!=1) { // Se pulsó icono o 2º plano
 			for (m=1;m<max_windows;m++) {
 				if (ventana[m].tipo && ventana[m].primer_plano==1) {
-					if (colisionan(0,m)) {
+					if (windows_collide(0,m)) {
 						ventana[m].primer_plano=0; 
-						vuelca_ventana(m);
+						flush_window(m);
 					}
 				}
 			}
 			if (v.primer_plano==0) { // Si estaba en segundo plano
 				if (v.tipo>=100 && !v.estado) 
-					activar(); // Activa un mapa
+					activate(); // Activa un mapa
 				
 				v.primer_plano=1; 
-				vuelca_ventana(0);
+				flush_window(0);
 				do { 
 					read_mouse(); 
 				} while(mouse_b&1); 
@@ -1042,8 +1042,8 @@ void mainloop(void) {
 	//-------------------------------------------------------------------------
 
 	} else if (n==0 && (mouse_b&1) && v.tipo>=100 && v.primer_plano<2 && !v.estado && mouse_graf!=4 && mouse_graf!=5) { 
-		activar(); 
-		vuelca_ventana(0); 
+		activate(); 
+		flush_window(0); 
 	}
 
 	//-------------------------------------------------------------------------
@@ -1056,7 +1056,7 @@ void mainloop(void) {
 		if (v.tipo==100) 
 			mouse_b|=1; 
 		
-		activar();
+		activate();
 		wmouse_x=mouse_x-v.x; 
 		wmouse_y=mouse_y-v.y;
 
@@ -1069,13 +1069,13 @@ void mainloop(void) {
 
 		for (m=1;m<max_windows;m++) 
 			if (ventana[m].tipo && ventana[m].primer_plano==1)
-				if (colisionan(0,m)) {
+				if (windows_collide(0,m)) {
 					ventana[m].primer_plano=0; 
-					vuelca_ventana(m);
+					flush_window(m);
 				}
 
 		v.primer_plano=1; 
-		vuelca_ventana(0); 
+		flush_window(0); 
 		v.volcar=0;
 		do { 
 			read_mouse(); 
@@ -1118,7 +1118,7 @@ void mainloop(void) {
 
 			if (v.tipo>=100 && arrastrar==4) {
 				if (v.tipo==100) mouse_b|=1; 
-					activar();
+					activate();
 			}
 
 			if (llamar) {
@@ -1133,7 +1133,7 @@ void mainloop(void) {
 				call((voidReturnType )v.click_handler);
 				volcados_parciales=1;
 				if (v.volcar) { 
-					vuelca_ventana(0); 
+					flush_window(0); 
 					v.volcar=0; 
 				}
 				volcados_parciales=0;
@@ -1149,7 +1149,7 @@ void mainloop(void) {
       //-----------------------------------------------------------------------
 
 			if (mouse_graf==2 && (mouse_b&1) && !(old_mouse_b&1)) {
-				mueve_ventana();
+				move_window();
 			}
 
       //-----------------------------------------------------------------------
@@ -1163,7 +1163,7 @@ void mainloop(void) {
 					else 
 						wput(v.ptr,v.an,v.al,v.an-9,2,-45);
 
-					vuelca_ventana(0);
+					flush_window(0);
 				}
 				
 				if (!(mouse_b&1) && (old_mouse_b&1)) {
@@ -1173,7 +1173,7 @@ void mainloop(void) {
 						else 
 							wput(v.ptr,v.an,v.al,v.an-9,2,-45);
 
-						vuelca_ventana(0); volcado_copia();
+						flush_window(0); flush_copy();
 
 						if (big) 
 							wput(v.ptr,v.an/2,v.al/2,v.an/2-9,2,-35);
@@ -1186,7 +1186,7 @@ void mainloop(void) {
 
 						v_titulo=(char *)texto[40]; 
 						v_texto=NULL; 
-						dialogo(aceptar0);
+						show_dialog(aceptar0);
 
 						if (v_aceptar) 
 							salir_del_entorno=1;
@@ -1197,8 +1197,8 @@ void mainloop(void) {
 						else 
 							wput(v.ptr,v.an,v.al,v.an-9,2,-45);
 
-						vuelca_ventana(0); 
-						volcado_copia();
+						flush_window(0); 
+						flush_copy();
 						
 						if (big) 
 							wput(v.ptr,v.an/2,v.al/2,v.an/2-9,2,-35);
@@ -1222,14 +1222,14 @@ void mainloop(void) {
 						}
 
 						if (v.tipo==100 || (v.tipo==102 && v.prg!=NULL))
-							dialogo(aceptar0); 
+							show_dialog(aceptar0); 
 						else 
 							v_aceptar=1;
 
 						if (v_aceptar) 
-							cierra_ventana();
+							close_window();
 					} else 
-						cierra_ventana();
+						close_window();
 				} else if (mouse_b&1) restore_button=3;
 			}
 
@@ -1240,11 +1240,11 @@ void mainloop(void) {
 			if (mouse_graf==4) {
 				if (mouse_b&1) {
 					wput(v.ptr,v.an/big2,v.al/big2,v.an/big2-17,2,-47);
-					vuelca_ventana(0);
+					flush_window(0);
 				}
 
 				if (!(mouse_b&1) && (old_mouse_b&1)) {
-					minimiza_ventana();
+					minimize_window();
 				} else if (mouse_b&1) 
 					restore_button=1;
 			}
@@ -1261,7 +1261,7 @@ void mainloop(void) {
 	if (n==0 && v.primer_plano==2) {
 		if (mouse_graf==2) {
 			if ((mouse_b&1) && !(old_mouse_b&1)) 
-				mueve_ventana();
+				move_window();
 		} else {
 			if (mouse_b&1) {
 				if (big) {
@@ -1274,7 +1274,7 @@ void mainloop(void) {
 			}
 			
 			if (!(mouse_b&1) && (old_mouse_b&1)) {
-				maximiza_ventana();
+				maximize_window();
 			} else if (mouse_b&1) 
 				restore_button=2;
 		}
@@ -1326,10 +1326,10 @@ void mainloop(void) {
 
 			if (fin_ventana==2) { // Close the window(m)
 				move(0,m);
-				cierra_ventana();
+				close_window();
 			} else if (ventana[m].volcar) {
 				volcados_parciales=1;
-				vuelca_ventana(m); 
+				flush_window(m); 
 				ventana[m].volcar=0;
 				volcados_parciales=0;
 			} 
@@ -1414,7 +1414,7 @@ void mainloop(void) {
 				call((voidReturnType )v.click_handler);
 
 				if (v.volcar) { 
-					vuelca_ventana(0); 
+					flush_window(0); 
 					v.volcar=0; 
 				}
 
@@ -1423,21 +1423,21 @@ void mainloop(void) {
 				if (v.primer_plano==0) {
 					for (m=1;m<max_windows;m++) 
 						if (ventana[m].tipo && ventana[m].primer_plano==1)
-							if (colisionan(0,m)) { 
+							if (windows_collide(0,m)) { 
 								ventana[m].primer_plano=0; 
-								vuelca_ventana(m); 
+								flush_window(m); 
 							}
 
 					v.primer_plano=1;
 				} 
 				
-				vuelca_ventana(0);
+				flush_window(0);
 			}
 			
 			switch(n) {
 
 				case 1:
-					dialogo(find_text0);
+					show_dialog(find_text0);
 					if (v_aceptar) 
 						find_text();
 				break;
@@ -1447,14 +1447,14 @@ void mainloop(void) {
 				break;
 
 				case 3:
-					dialogo(replace_text0);
+					show_dialog(replace_text0);
 					if (v_aceptar) 
 						replace_text();
 				break;
 
 				case 4:
 					mouse_graf=3; 
-					volcado_copia();
+					flush_copy();
 					v_tipo=8; 
 					save_prg_buffer(0);
 					strcpy(tipo[8].path,v.prg->path);
@@ -1468,7 +1468,7 @@ void mainloop(void) {
 					source_len=v.prg->file_lon;
 					v_ventana=0;
 					ejecutar_programa=0;
-					compilar_programa();
+					compile_program();
 					
 					if(numero_error!=-1) {
 						goto_error();
@@ -1493,7 +1493,7 @@ void mainloop(void) {
 						ejecutar_programa=1; 
 					else ejecutar_programa=3;
 					
-					compilar_programa();
+					compile_program();
 					
 					if(numero_error!=-1) {
 						goto_error();
@@ -1511,7 +1511,7 @@ void mainloop(void) {
 					v_tipo=8; 
 					save_prg_buffer(0);
 				
-					dialogo(process_list0);
+					show_dialog(process_list0);
 					scan_code=0; 
 					ascii=0;
 					
@@ -1572,21 +1572,21 @@ void mainloop(void) {
 		v_tipo=8; 
 		v_modo=0; 
 		v_texto=(char *)texto[346];
-		dialogo(browser0);
+		show_dialog(browser0);
 
 		if (v_terminado) {
 			if (!v_existe) {
 				v_texto=(char *)texto[43]; 
-				dialogo(err0);
+				show_dialog(err0);
 			} else {
-				mouse_graf=3; volcado_copia(); mouse_graf=1;
+				mouse_graf=3; flush_copy(); mouse_graf=1;
 				open_program();
 			}
 		}
 	}
 
 	if (scan_code==59) { // F1 Help
-		determina_prg2();
+		determine_prg2();
 
 		if (v_ventana!=-1) {
 			if(numero_error!=-1 && ventana[v_ventana].prg==eprg) {
@@ -1635,7 +1635,7 @@ void mainloop(void) {
 			}
 		
 		} else {
-			determina_calc();
+			determine_calc();
 		
 			if (v_ventana!=-1) {
 				help(1301);
@@ -1647,7 +1647,7 @@ void mainloop(void) {
 	if ((shift_status&8) && scan_code==45) { // Alt-X Exit
 		v_titulo=(char *)texto[40]; 
 		v_texto=NULL; 
-		dialogo(aceptar0);
+		show_dialog(aceptar0);
 		
 		if (v_aceptar) 
 			salir_del_entorno=1;
@@ -1660,11 +1660,11 @@ void mainloop(void) {
 	// Finaliza el bucle central
 	//-------------------------------------------------------------------------
 
-	volcado_copia();
+	flush_copy();
 
 	if (restore_button==1) {
 		wput(v.ptr,v.an/big2,v.al/big2,v.an/big2-17,2,-37);
-		vuelca_ventana(0);
+		flush_window(0);
 	} else if (restore_button==2) {
 		if (big) {
 			wput(copia,-vga_an,vga_al,v.x,v.y,-38);
@@ -1679,7 +1679,7 @@ void mainloop(void) {
 		else 
 			wput(v.ptr,v.an,v.al,v.an-9,2,-35);
 		
-		vuelca_ventana(0);
+		flush_window(0);
 	} 
 	
 	restore_button=0;
@@ -1694,7 +1694,7 @@ void mainloop(void) {
  * Repeatedly calls mainloop() to pump events, manage windows, and render
  * the desktop until salir_del_entorno is set (quit requested).
  */
-void entorno(void) {
+void main_loop(void) {
 	div_started = 1;
 	int n,m,oldn=max_windows;
 
@@ -1765,7 +1765,7 @@ void dialog_loop(void) {
 		volcados_parciales=1;
 		
 		if (v.volcar) { 
-			vuelca_ventana(0); 
+			flush_window(0); 
 			v.volcar=0; 
 		}
 		
@@ -1812,7 +1812,7 @@ void dialog_loop(void) {
 			volcados_parciales=1;
 			
 			if (v.volcar) {
-				vuelca_ventana(0); 
+				flush_window(0); 
 				v.volcar=0; 
 			}
 			
@@ -1823,7 +1823,7 @@ void dialog_loop(void) {
 		} else { // Si estamos en la barra de control de la ventana ...
 
 			if (mouse_graf==2 && (mouse_b&1) && !(old_mouse_b&1)) 
-				mueve_ventana();
+				move_window();
 
 			if (mouse_graf==5) {
 				if (mouse_b&1) {
@@ -1833,11 +1833,11 @@ void dialog_loop(void) {
 						wput(v.ptr,v.an,v.al,v.an-9,2,-45);
 
 					volcados_parciales=1;
-					vuelca_ventana(0);
+					flush_window(0);
 					volcados_parciales=0;
 				}
 				if (!(mouse_b&1) && (old_mouse_b&1)) {
-					cierra_ventana(); 
+					close_window(); 
 					salir_del_dialogo=1;
 				} else if (mouse_b&1) 
 					restore_button=3;
@@ -1845,7 +1845,7 @@ void dialog_loop(void) {
 			
 			oldn=-1;
 		} else if (modo<100 && (mouse_b&1)) {
-			cierra_ventana(); salir_del_dialogo=1;
+			close_window(); salir_del_dialogo=1;
 	}
 
 	//-------------------------------------------------------------------------
@@ -1861,7 +1861,7 @@ void dialog_loop(void) {
 		call((voidReturnType )v.click_handler); mouse_b=m;
 		volcados_parciales=1;
 		if (v.volcar) { 
-			vuelca_ventana(0); 
+			flush_window(0); 
 			v.volcar=0; 
 		}
 		
@@ -1870,7 +1870,7 @@ void dialog_loop(void) {
 	}
 
 	if (fin_dialogo && !salir_del_dialogo) {
-		cierra_ventana(); salir_del_dialogo=1;
+		close_window(); salir_del_dialogo=1;
 
 #ifdef __EMSCRIPTEN__
 		printf("resuming main loop\n");
@@ -1896,7 +1896,7 @@ void dialog_loop(void) {
 			if (v.item[n].tipo==2 && (v.item[n].estado&2))
 				break;
 		if (n==v.items) {
-			cierra_ventana();
+			close_window();
 			salir_del_dialogo=1;
 		}
 	}
@@ -1908,20 +1908,20 @@ void dialog_loop(void) {
 	// Alt+S DOS shell disabled (no DOS)
 
 
-	volcado_copia();
+	flush_copy();
 
 	if (restore_button==3) {
 		if (big) 
 			wput(v.ptr,v.an/2,v.al/2,v.an/2-9,2,-35);
 		else 
 			wput(v.ptr,v.an,v.al,v.an-9,2,-35);
-		vuelca_ventana(0);
+		flush_window(0);
 	} 
 	
 	restore_button=0;
 }
 
-void entorno_dialogo(void) {
+void modal_loop(void) {
 	
 	salir_del_dialogo=0;
 
@@ -1954,16 +1954,16 @@ void entorno_dialogo(void) {
 //      (... hasta la posicion v.x/y/an/al)
 //-----------------------------------------------------------------------------
 
-void se_ha_movido_desde(int x,int y,int an,int al) {
+void on_window_moved(int x,int y,int an,int al) {
 
   int n,m;
 
   n=v.tipo; v.tipo=0;
   if (modo<100) {
     draw_edit_background(x,y,an,al);
-    volcar_barras(0);
-    actualiza_dialogos(x,y,an,al);
-  } else actualiza_caja(x,y,an,al);
+    flush_bars(0);
+    update_dialogs(x,y,an,al);
+  } else update_box(x,y,an,al);
   v.tipo=n;
 
   if (v.tipo!=1) {
@@ -1973,35 +1973,35 @@ void se_ha_movido_desde(int x,int y,int an,int al) {
 
         // Si una ventana oscurecida estaba tapada antes ...
 
-        if (colisiona_con(n,x,y,an,al)) {
+        if (collides_with(n,x,y,an,al)) {
           ventana[n].primer_plano=1;
 
           // Si esta tapada por otras ventanas (en primer o segundo plano) ...
 
           for (m=1;m<max_windows;m++)
             if (m!=n && ventana[m].tipo && (ventana[m].primer_plano==1 || (ventana[m].primer_plano!=1 && m<n)))
-              if (colisionan(n,m)) ventana[n].primer_plano=0;
+              if (windows_collide(n,m)) ventana[n].primer_plano=0;
 
           // Si destapamos la susodicha ventana .. la pasa a primer plano ..
 
           if (ventana[n].primer_plano==1) {
             if (n!=1) {
               move(1,n);
-            } vuelca_ventana(1);
+            } flush_window(1);
           }
         }
 
     for (n=1;n<max_windows;n++) if (ventana[n].tipo && ventana[n].primer_plano==1)
-      if (colisionan(0,n)) {ventana[n].primer_plano=0; vuelca_ventana(n);}
+      if (windows_collide(0,n)) {ventana[n].primer_plano=0; flush_window(n);}
 
-  } vuelca_ventana(0);
+  } flush_window(0);
 }
 
 //-----------------------------------------------------------------------------
 //      Maximiza la ventana activa (la número 0)
 //-----------------------------------------------------------------------------
 
-void maximiza_ventana(void) {
+void maximize_window(void) {
 
   int x,y,an,al,n,m;
 
@@ -2012,7 +2012,7 @@ void maximiza_ventana(void) {
     wput(copia,vga_an,vga_al,v.x,v.y,-48);
     volcado_parcial(v.x,v.y,7,7);
   }
-  volcado_copia();
+  flush_copy();
 
   x=v.x; y=v.y;
   an=v.an; al=v.al;
@@ -2021,8 +2021,8 @@ void maximiza_ventana(void) {
   v.an=v._an; v.al=v._al;
 
   m=0; for (n=1;n<max_windows;n++)
-    if (ventana[n].tipo && ventana[n].primer_plano==1) if (colisionan(0,n)) m++;
-  if (m) emplazar(v.lado*2+1,&v.x,&v.y,v.an,v.al);
+    if (ventana[n].tipo && ventana[n].primer_plano==1) if (windows_collide(0,n)) m++;
+  if (m) place_window(v.lado*2+1,&v.x,&v.y,v.an,v.al);
 
   v._x=x; v._y=y;
   v._an=an; v._al=al;
@@ -2030,9 +2030,9 @@ void maximiza_ventana(void) {
 
   do { read_mouse(); } while(mouse_b&1);
 
-  se_ha_movido_desde(x,y,an,al);
+  on_window_moved(x,y,an,al);
 
-  if (v.tipo>=100) { activar(); vuelca_ventana(0); }
+  if (v.tipo>=100) { activate(); flush_window(0); }
 
 }
 
@@ -2040,15 +2040,15 @@ void maximiza_ventana(void) {
 //      Minimiza la ventana activa (la número 0)
 //-----------------------------------------------------------------------------
 
-void minimiza_ventana(void) {
+void minimize_window(void) {
 
   int x,y,an,al,n,m;
 
   wput(v.ptr,v.an/big2,v.al/big2,v.an/big2-17,2,-47);
-  vuelca_ventana(0);
-  if (primera_vez!=1) volcado_copia();
+  flush_window(0);
+  if (primera_vez!=1) flush_copy();
   wput(v.ptr,v.an/big2,v.al/big2,v.an/big2-17,2,-37);
-  if (v.tipo>=100) desactivar();
+  if (v.tipo>=100) deactivate();
 
   x=v.x; y=v.y;
   an=v.an; al=v.al;
@@ -2057,13 +2057,13 @@ void minimiza_ventana(void) {
 
   if (v.an!=v._an || v.al!=v._al) { // Si es la primera vez que se minimiza
                                     // (o cambió de nombre ...)
-    emplazar(v.lado*2+0,&v.x,&v.y,v.an,v.al);
+    place_window(v.lado*2+0,&v.x,&v.y,v.an,v.al);
   } else {
     v.x=v._x; v.y=v._y;
     m=0; for (n=1;n<max_windows;n++)
       if (ventana[n].tipo && ventana[n].primer_plano==2)
-        if (colisionan(0,n)) m++;
-    if (m) emplazar(v.lado*2+0,&v.x,&v.y,v.an,v.al);
+        if (windows_collide(0,n)) m++;
+    if (m) place_window(v.lado*2+0,&v.x,&v.y,v.an,v.al);
   }
 
   v._x=x; v._y=y;
@@ -2072,7 +2072,7 @@ void minimiza_ventana(void) {
 
   do { read_mouse(); } while(mouse_b&1);
 
-  se_ha_movido_desde(x,y,an,al);
+  on_window_moved(x,y,an,al);
 
 }
 
@@ -2080,7 +2080,7 @@ void minimiza_ventana(void) {
 //      Cierra la ventana activa (la número 0)
 //-----------------------------------------------------------------------------
 
-void cierra_ventana(void) {
+void close_window(void) {
   int x=0,y=0,an=0,al=0,n=0,m=0;
 
   if (v.tipo==102 && fin_ventana==1) { fin_ventana=2; return; }
@@ -2095,9 +2095,9 @@ void cierra_ventana(void) {
   if (!cierra_rapido) {
     if (big) wput(v.ptr,v.an/2,v.al/2,v.an/2-9,2,-45);
     else wput(v.ptr,v.an,v.al,v.an-9,2,-45);
-    vuelca_ventana(0);
+    flush_window(0);
     volcado_parcial(v.x,v.y,v.an,v.al);
-    volcado_copia();
+    flush_copy();
   }
 
   if (v.click_handler!=err2) { 
@@ -2118,7 +2118,7 @@ void cierra_ventana(void) {
             wwrite(ventana[m].ptr,ventana[m].an/big2,ventana[m].al/big2,3+(ventana[m].an/big2-20)/2,2,1,ventana[m].titulo,c1);
             wwrite(ventana[m].ptr,ventana[m].an/big2,ventana[m].al/big2,2+(ventana[m].an/big2-20)/2,2,1,ventana[m].titulo,c4);
           }
-          vuelca_ventana(m); v.estado=0; break;
+          flush_window(m); v.estado=0; break;
         }
       }
     } old_prg=NULL;
@@ -2135,7 +2135,7 @@ void cierra_ventana(void) {
         wwrite(ventana[m].ptr,ventana[m].an/big2,ventana[m].al/big2,3+(ventana[m].an/big2-20)/2,2,1,ventana[m].titulo,c1);
         wwrite(ventana[m].ptr,ventana[m].an/big2,ventana[m].al/big2,2+(ventana[m].an/big2-20)/2,2,1,ventana[m].titulo,c4);
       }
-      vuelca_ventana(m); break;
+      flush_window(m); break;
     }
   }
 
@@ -2145,28 +2145,28 @@ void cierra_ventana(void) {
   divdelete(0);
   if (modo<100) {
     draw_edit_background(x,y,an,al);
-    volcar_barras(0);
-    actualiza_dialogos(x,y,an,al);
-  } else actualiza_caja(x,y,an,al);
+    flush_bars(0);
+    update_dialogs(x,y,an,al);
+  } else update_box(x,y,an,al);
 
   if (n==1 || n==7) { // Los diálogos pasan a primer plano las hiden[] al cerrarse
     if (v.tipo==1 || v.tipo==7) { // Diálogo sobre Diálogo solo abre el último
-      v.primer_plano=1; vuelca_ventana(0);
+      v.primer_plano=1; flush_window(0);
     } else if (modo>=100) for (n=0;n<max_windows;n++) if (hiden[n]) {
       ventana[n].primer_plano=1;
-      vuelca_ventana(n);
+      flush_window(n);
     }
   } else for (n=0;n<max_windows;n++)
     if (ventana[n].tipo && ventana[n].primer_plano==0)
-      if (colisiona_con(n,x,y,an,al)) {
+      if (collides_with(n,x,y,an,al)) {
         ventana[n].primer_plano=1;
         for (m=0;m<max_windows;m++)
           if (m!=n && ventana[m].tipo && (ventana[m].primer_plano==1 || (ventana[m].primer_plano==2 && m<n)))
-            if (colisionan(n,m)) ventana[n].primer_plano=0;
+            if (windows_collide(n,m)) ventana[n].primer_plano=0;
         if (ventana[n].primer_plano==1) {
           if (n!=0) {
             move(0,n);
-          } vuelca_ventana(0);
+          } flush_window(0);
         }
       }
   do { read_mouse(); tecla(); } while((mouse_b) || key(_ESC) || key(_T) || key(_U));
@@ -2180,10 +2180,10 @@ void cierra_ventana(void) {
 //      Mueve una ventana
 //-----------------------------------------------------------------------------
 
-void mueve_ventana(void) {
+void move_window(void) {
   int ix,iy,oldx,oldy,an,al,b,x,y;
 
-  if (move_full_window) { mueve_ventana_completa(); return; }
+  if (move_full_window) { move_window_complete(); return; }
 
   mouse_graf=2;
   an=v.an; al=v.al;
@@ -2199,19 +2199,19 @@ void mueve_ventana(void) {
     volcado_parcial(x,y,1,al);
     volcado_parcial(x,y+al-1,an,1);
     volcado_parcial(x+an-1,y,1,al);
-    volcado_copia();
+    flush_copy();
 
     if (modo<100) {
       if (b) big=1;
       draw_edit_background(x,y,an,al);
-      volcar_barras(0);
-      actualiza_dialogos(x,y,an,al);
+      flush_bars(0);
+      update_dialogs(x,y,an,al);
       big=0;
     } else {
-      actualiza_caja(x,y,an,1);
-      actualiza_caja(x,y,1,al);
-      actualiza_caja(x,y+al-1,an,1);
-      actualiza_caja(x+an-1,y,1,al);
+      update_box(x,y,an,1);
+      update_box(x,y,1,al);
+      update_box(x,y+al-1,an,1);
+      update_box(x+an-1,y,1,al);
     }
 
   } while(mouse_b&1);
@@ -2219,9 +2219,9 @@ void mueve_ventana(void) {
   big=b;
   if (x!=oldx || y!=oldy) {
     v.x=x; v.y=y;
-    se_ha_movido_desde(oldx,oldy,an,al);
+    on_window_moved(oldx,oldy,an,al);
     volcado_completo=1;
-    volcado_copia();
+    flush_copy();
   }
 
   //---------------------------------------------------------------------------
@@ -2233,27 +2233,27 @@ void mueve_ventana(void) {
   if (oldx==v.x && oldy==v.y) {
     if (*system_clock<doble_click+10 && *system_clock>doble_click
         && abs(doble_click_x-mouse_x)<8 && abs(doble_click_y-mouse_y)<8) {
-      if (v.primer_plano==2) emplazar(v.lado*2+0,&v.x,&v.y,v.an,v.al);
-      else emplazar(v.lado*2+1,&v.x,&v.y,v.an,v.al);
+      if (v.primer_plano==2) place_window(v.lado*2+0,&v.x,&v.y,v.an,v.al);
+      else place_window(v.lado*2+1,&v.x,&v.y,v.an,v.al);
       if (v.x==oldx && v.y==oldy) {
         v.lado^=1;
-        if (v.primer_plano==2) emplazar(v.lado*2+0,&v.x,&v.y,v.an,v.al);
-        else emplazar(v.lado*2+1,&v.x,&v.y,v.an,v.al);
+        if (v.primer_plano==2) place_window(v.lado*2+0,&v.x,&v.y,v.an,v.al);
+        else place_window(v.lado*2+1,&v.x,&v.y,v.an,v.al);
         if (v.x==oldx && v.y==oldy) v.lado^=1;
       }
       if (v.x!=oldx || v.y!=oldy) {
         if (exploding_windows) extrude(oldx,oldy,v.an,v.al,v.x,v.y,v.an,v.al);
-        se_ha_movido_desde(oldx,oldy,v.an,v.al); x++;
+        on_window_moved(oldx,oldy,v.an,v.al); x++;
       }
     } else {
       doble_click=*system_clock; doble_click_x=mouse_x; doble_click_y=mouse_y;
     }
   }
 
-  if (!x && v.primer_plano==1) vuelca_ventana(0);
+  if (!x && v.primer_plano==1) flush_window(0);
 }
 
-void mueve_ventana_completa(void) {
+void move_window_complete(void) {
 
   int ix,iy,oldx,oldy;
   int x,y,an,al;
@@ -2271,13 +2271,13 @@ void mueve_ventana_completa(void) {
   do {
     x=v.x; y=v.y;
     v.x=mouse_x-ix; v.y=mouse_y-iy;
-    se_ha_movido_desde(x,y,an,al); volcado_copia();
+    on_window_moved(x,y,an,al); flush_copy();
   } while(mouse_b&1);
 #endif
 
   if (mover_ventana) {
     mover_ventana=0;
-    vuelca_ventana(0);
+    flush_window(0);
   }
 
   if (v.primer_plano==1) wrectangle(v.ptr,an/big2,al/big2,c2,0,0,an/big2,al/big2);
@@ -2292,30 +2292,30 @@ void mueve_ventana_completa(void) {
     if (*system_clock<doble_click+10 && *system_clock>doble_click
       && abs(doble_click_x-mouse_x)<8 && abs(doble_click_y-mouse_y)<8) {
       if (v.primer_plano==2)
-        emplazar(v.lado*2+0,&v.x,&v.y,v.an,v.al);
-      else emplazar(v.lado*2+1,&v.x,&v.y,v.an,v.al);
+        place_window(v.lado*2+0,&v.x,&v.y,v.an,v.al);
+      else place_window(v.lado*2+1,&v.x,&v.y,v.an,v.al);
       if (v.x==oldx && v.y==oldy) {
         v.lado^=1;
-        if (v.primer_plano==2) emplazar(v.lado*2+0,&v.x,&v.y,v.an,v.al);
-        else emplazar(v.lado*2+1,&v.x,&v.y,v.an,v.al);
+        if (v.primer_plano==2) place_window(v.lado*2+0,&v.x,&v.y,v.an,v.al);
+        else place_window(v.lado*2+1,&v.x,&v.y,v.an,v.al);
         if (v.x==oldx && v.y==oldy) v.lado^=1;
       }
       if (v.x!=oldx || v.y!=oldy) {
         if (exploding_windows) extrude(oldx,oldy,v.an,v.al,v.x,v.y,v.an,v.al);
-        se_ha_movido_desde(oldx,oldy,v.an,v.al); x++; }
+        on_window_moved(oldx,oldy,v.an,v.al); x++; }
     } else {
       doble_click=*system_clock; doble_click_x=mouse_x; doble_click_y=mouse_y;
     }
   }
 
-  if (!x && v.primer_plano==1) vuelca_ventana(0);
+  if (!x && v.primer_plano==1) flush_window(0);
 }
 
 //-----------------------------------------------------------------------------
 //      updates a screen box (region)
 //-----------------------------------------------------------------------------
 
-void actualiza_caja(int x, int y, int an, int al) {
+void update_box(int x, int y, int an, int al) {
 
   int n=0;
   byte * _ptr=NULL;
@@ -2343,14 +2343,14 @@ div_version=texto[safe];
   if (y+al>vga_al) al=vga_al-y;
   if (an<=0 || al<=0) return;
 
-  restaura_tapiz(x,y,an,al);
+  restore_wallpaper(x,y,an,al);
 
   if (y<vga_al && y+al>vga_al-8*big2 && x<vga_an && x+an>=vga_an-(text_len(div_version)+2)*big2) {
     wwrite_in_box(copia+y*vga_an+x,vga_an,an,al,vga_an-1-x,vga_al-1-y,18,div_version,c0);
     wwrite_in_box(copia+y*vga_an+x,vga_an,an,al,vga_an-2-x,vga_al-1-y,18,div_version,c2);
   }
 
-  for (n=max_windows-1;n>=0;n--) if (ventana[n].tipo) if (colisiona_con(n,x,y,an,al)) {
+  for (n=max_windows-1;n>=0;n--) if (ventana[n].tipo) if (collides_with(n,x,y,an,al)) {
 	  
 
 	  
@@ -2395,7 +2395,7 @@ div_version=texto[safe];
 
 }
 
-void actualiza_dialogos(int x, int y, int an, int al) {
+void update_dialogs(int x, int y, int an, int al) {
   int n;
   byte * _ptr;
   int _x,_y,_an,_al;
@@ -2407,7 +2407,7 @@ void actualiza_dialogos(int x, int y, int an, int al) {
   if (y+al>vga_al) al=vga_al-y;
   if (an<=0 || al<=0) return;
 
-  for (n=max_windows-1;n>=0;n--) if (ventana[n].tipo==1) if (colisiona_con(n,x,y,an,al))
+  for (n=max_windows-1;n>=0;n--) if (ventana[n].tipo==1) if (collides_with(n,x,y,an,al))
   if (ventana[n].primer_plano<2) {
 
     _ptr=ventana[n].ptr;
@@ -2433,14 +2433,14 @@ void actualiza_dialogos(int x, int y, int an, int al) {
 //      Actualiza una caja de la pantalla, de una ventana para arriba
 //-----------------------------------------------------------------------------
 
-void actualiza_caja2(int vent, int x, int y, int an, int al) {
+void update_box2(int vent, int x, int y, int an, int al) {
 
   int n;
   byte * _ptr;
   int _x,_y,_an,_al;
   int salta_x,salta_y;
 
-  if (ventana[vent].primer_plano==2) { actualiza_caja(x,y,an,al); return; }
+  if (ventana[vent].primer_plano==2) { update_box(x,y,an,al); return; }
 
   if (x<0) { an+=x; x=0; }
   if (y<0) { al+=y; y=0; }
@@ -2448,7 +2448,7 @@ void actualiza_caja2(int vent, int x, int y, int an, int al) {
   if (y+al>vga_al) al=vga_al-y;
   if (an<=0 || al<=0) return;
 
-  for (n=vent;n>=0;n--) if (ventana[n].tipo) if (colisiona_con(n,x,y,an,al)) {
+  for (n=vent;n>=0;n--) if (ventana[n].tipo) if (collides_with(n,x,y,an,al)) {
   if (ventana[n].primer_plano<2) {
 
     _ptr=ventana[n].ptr;
@@ -2494,22 +2494,22 @@ void actualiza_caja2(int vent, int x, int y, int an, int al) {
 //      Actualiza el fondo de una ventana de zoom (zx,zy,zan,zal)
 //-----------------------------------------------------------------------------
 
-void actualiza_background(void) {
+void update_background(void) {
 
   int y0=0,y1=vga_al-1;
   int _big=big;
 
   if (zy>2) {
-    y0=zy-2; actualiza_caja(0,0,vga_an,zy-2);
+    y0=zy-2; update_box(0,0,vga_an,zy-2);
   }
   if (zy+zal<vga_al-2) {
-    y1=zy+zal+1; actualiza_caja(0,zy+zal+2,vga_an,vga_al-2-zy-zal);
+    y1=zy+zal+1; update_box(0,zy+zal+2,vga_an,vga_al-2-zy-zal);
   }
   if (zx>2) {
-    actualiza_caja(0,y0,zx-2,y1-y0+1);
+    update_box(0,y0,zx-2,y1-y0+1);
   }
   if (zx+zan<vga_an-2) {
-    actualiza_caja(zx+zan+2,y0,vga_an-2-zx-zan,y1-y0+1);
+    update_box(zx+zan+2,y0,vga_an-2-zx-zan,y1-y0+1);
   }
 
   if (_big) { big=0; big2=1; }
@@ -2532,7 +2532,7 @@ void actualiza_background(void) {
 //      Resets the bacground (wallpaper) in a given area
 //-----------------------------------------------------------------------------
 
-void restaura_tapiz(int x,int y,int an,int al) {
+void restore_wallpaper(int x,int y,int an,int al) {
   byte *p;
   byte *t;
   int n,_an;
@@ -2583,7 +2583,7 @@ void restaura_tapiz(int x,int y,int an,int al) {
 //    Dumps a window, according this standard or obscured or not in the foreground
 //-----------------------------------------------------------------------------
 
-void vuelca_ventana(int m) {
+void flush_window(int m) {
 
   int x,y,an,al,n;
   byte * _ptr;
@@ -2597,10 +2597,10 @@ SDL_Rect trc;
   if (volcados_parciales) {
     if (ventana[m].tipo==102 && ventana[m].volcar==1 && ventana[m].prg!=NULL) {
       ventana[m].volcar=0;
-      actualiza_caja2(m,ventana[m].x+2*big2,ventana[m].y+10*big2,ventana[m].an-20,7*big2);
-      actualiza_caja2(m,ventana[m].x+2*big2,ventana[m].y+18*big2+(ventana[m].prg->linea-ventana[m].prg->primera_linea)*font_al,ventana[m].an-12,font_al);
+      update_box2(m,ventana[m].x+2*big2,ventana[m].y+10*big2,ventana[m].an-20,7*big2);
+      update_box2(m,ventana[m].x+2*big2,ventana[m].y+18*big2+(ventana[m].prg->linea-ventana[m].prg->primera_linea)*font_al,ventana[m].an-12,font_al);
       if (ventana[m].prg->linea_vieja!=ventana[m].prg->linea-ventana[m].prg->primera_linea)
-        actualiza_caja2(m,ventana[m].x+2*big2,ventana[m].y+18*big2+ventana[m].prg->linea_vieja*font_al,ventana[m].an-12,font_al);
+        update_box2(m,ventana[m].x+2*big2,ventana[m].y+18*big2+ventana[m].prg->linea_vieja*font_al,ventana[m].an-12,font_al);
       return;
     }
     // MapperCreator2 check removed (MODE8/3D map editor deleted)
@@ -2609,14 +2609,14 @@ SDL_Rect trc;
   x=ventana[m].x; y=ventana[m].y;
   an=ventana[m].an; al=ventana[m].al;
 
-  if (ventana[m].primer_plano==2) { actualiza_caja(x,y,an,al); return; }
+  if (ventana[m].primer_plano==2) { update_box(x,y,an,al); return; }
 
   if (x<0) { an+=x; x=0; }
   if (y<0) { al+=y; y=0; }
   if (x+an>vga_an) an=vga_an-x;
   if (y+al>vga_al) al=vga_al-y;
 
-  for (n=m;n>=0;n--) if (ventana[n].tipo) if (colisiona_con(n,x,y,an,al)) {
+  for (n=m;n>=0;n--) if (ventana[n].tipo) if (collides_with(n,x,y,an,al)) {
   if (ventana[n].primer_plano<2) {
 
     _ptr=ventana[n].ptr;
@@ -2669,7 +2669,7 @@ if(_ptr==NULL)
 //      (flag=0:icono, flag=1:ventana)
 //-----------------------------------------------------------------------------
 
-void emplazar(int flag,int*_x,int*_y,int an,int al) {
+void place_window(int flag,int*_x,int*_y,int an,int al) {
   int n,m,x,y,new_x,old_y=*_y;
   int scanes,scan[max_windows];
 
@@ -2708,7 +2708,7 @@ void emplazar(int flag,int*_x,int*_y,int an,int al) {
       y=scan[n]; new_x=vga_an-an;
       do { x=new_x;
         for (m=1;m<max_windows;m++)
-          if (ventana[m].tipo && colisiona_con(m,x-1,y-1,an+2,al+2))
+          if (ventana[m].tipo && collides_with(m,x-1,y-1,an+2,al+2))
             if (new_x>=ventana[m].x-an) new_x=ventana[m].x-an-1;
       } while (new_x!=x && new_x>=0);
       if (new_x>=0) { *_x=new_x; *_y=y; break; }
@@ -2718,7 +2718,7 @@ void emplazar(int flag,int*_x,int*_y,int an,int al) {
       y=scan[n]; new_x=0;
       do { x=new_x;
         for (m=1;m<max_windows;m++)
-          if (ventana[m].tipo && colisiona_con(m,x-1,y-1,an+2,al+2))
+          if (ventana[m].tipo && collides_with(m,x-1,y-1,an+2,al+2))
             if (ventana[m].x+ventana[m].an>=new_x) new_x=ventana[m].x+ventana[m].an+1;
       } while (new_x!=x && new_x+an<=vga_an);
       if (new_x+an<=vga_an) { *_x=new_x; *_y=y; break; }
@@ -2728,7 +2728,7 @@ void emplazar(int flag,int*_x,int*_y,int an,int al) {
   // Tercero, si el algoritmo falló, entonces coloca la ventana en ...
 
   if (flag&1) {
-    if (*_y+al>vga_al) posicion_menos_mala(_x,_y,an,al);
+    if (*_y+al>vga_al) find_best_position(_x,_y,an,al);
   } else {
     if (*_y<0) *_y=old_y;
   }
@@ -2741,7 +2741,7 @@ void emplazar(int flag,int*_x,int*_y,int an,int al) {
 #define pasos_x 16
 #define pasos_y 10
 
-void posicion_menos_mala(int*_x,int*_y,int an,int al) {
+void find_best_position(int*_x,int*_y,int an,int al) {
   unsigned int c,colision=-1;
   int a,b,x,y;
 
@@ -2749,18 +2749,18 @@ void posicion_menos_mala(int*_x,int*_y,int an,int al) {
     x=(float)((vga_an-an)*a)/(float)pasos_x;
     for (b=0;b<=pasos_y;b++) {
       y=(float)((vga_al-al)*b)/(float)pasos_y;
-      c=calcular_colision(x,y,an,al);
+      c=calculate_collision(x,y,an,al);
       if (c<colision) { colision=c; *_x=x; *_y=y; }
     }
   }
 }
 
-int calcular_colision(int x,int y,int an,int al) {
+int calculate_collision(int x,int y,int an,int al) {
   int n,c,colision=0;
 
   for (n=1;n<max_windows;n++) {
     if (ventana[n].tipo) {
-      if ((c=cuanto_colisiona_con(n,x,y,an,al))) {
+      if ((c=calculate_overlap(n,x,y,an,al))) {
         if (ventana[n].primer_plano) colision+=vga_an*vga_al+c;
         else colision+=vga_an*vga_al/4+c;
       }
@@ -2768,7 +2768,7 @@ int calcular_colision(int x,int y,int an,int al) {
   } return(colision);
 }
 
-int cuanto_colisiona_con(int a, int x, int y, int an, int al) {
+int calculate_overlap(int a, int x, int y, int an, int al) {
 
   int n,m,_an=0,_al=0;
 
@@ -2791,10 +2791,10 @@ int cuanto_colisiona_con(int a, int x, int y, int an, int al) {
 }
 
 //-----------------------------------------------------------------------------
-//    Comprueba si dos ventanas colisionan
+//    Comprueba si dos ventanas windows_collide
 //-----------------------------------------------------------------------------
 
-int colisionan(int a,int b) {
+int windows_collide(int a,int b) {
 
   if (ventana[b].y<ventana[a].y+ventana[a].al &&
       ventana[b].y+ventana[b].al>ventana[a].y &&
@@ -2804,7 +2804,7 @@ int colisionan(int a,int b) {
     return(1); else return(0);
 }
 
-int colisiona_con(int a, int x, int y, int an, int al) {
+int collides_with(int a, int x, int y, int an, int al) {
 
   if (y<ventana[a].y+ventana[a].al &&
       y+al>ventana[a].y &&
@@ -2820,7 +2820,7 @@ int colisiona_con(int a, int x, int y, int an, int al) {
 
 int leer_mouse=1;
 
-void volcado_copia(void) {
+void flush_copy(void) {
 
   if (leer_mouse) read_mouse();
   if (modo<100) {
@@ -2844,7 +2844,7 @@ void window_surface(int an, int al, byte type) {
 //      Create a new window
 //-----------------------------------------------------------------------------
 
-void nueva_ventana(voidReturnType init_handler) {
+void new_window(voidReturnType init_handler) {
 	byte * ptr;
 	int n,m,om,x,y,an,al;
 	int vtipo;
@@ -2872,7 +2872,7 @@ void nueva_ventana(voidReturnType init_handler) {
       m=mouse_b; om=old_mouse_b; mouse_b=0; old_mouse_b=0;
       call((voidReturnType )v.click_handler);
       mouse_b=m; old_mouse_b=om;
-      if (v.volcar) { vuelca_ventana(0); v.volcar=0; }
+      if (v.volcar) { flush_window(0); v.volcar=0; }
     }
 
     addwindow();
@@ -2917,7 +2917,7 @@ void nueva_ventana(voidReturnType init_handler) {
       y=x=vga_an/2-an/2;
     } else if (v.tipo==1 || v.tipo==7) { // Los diálogos se colocan en el centro
       x=vga_an/2-an/2; y=vga_al/2-al/2;
-    } else emplazar(v.lado*2+1,&x,&y,an,al);
+    } else place_window(v.lado*2+1,&x,&y,an,al);
 
     v.x=x; v.y=y;
 
@@ -2943,7 +2943,7 @@ void nueva_ventana(voidReturnType init_handler) {
           call((voidReturnType )v.paint_handler);
           wdown(m);
         }
-        vtipo=v.tipo; v.tipo=0; vuelca_ventana(m); v.tipo=vtipo;
+        vtipo=v.tipo; v.tipo=0; flush_window(m); v.tipo=vtipo;
         break;
       }
     }
@@ -2960,7 +2960,7 @@ void nueva_ventana(voidReturnType init_handler) {
 
     if (!n) ptr=(byte *)malloc(an*al); else ptr=NULL;
 
-    if (ptr!=NULL) { // Ventana, free en cierra_ventana
+    if (ptr!=NULL) { // Ventana, free en close_window
 		window_surface(an,al,0);
 		
       //---------------------------------------------------------------------------
@@ -2970,25 +2970,25 @@ void nueva_ventana(voidReturnType init_handler) {
       if (v.tipo==1 || v.tipo==7) { // Los diálogos/progreso cierran todas las ventanas
         vtipo=v.tipo; v.tipo=0;
         if (ventana[1].tipo==1 || ventana[1].tipo==7) { // Diálogo sobre diálogo
-          ventana[1].primer_plano=0; vuelca_ventana(1);
+          ventana[1].primer_plano=0; flush_window(1);
         } else for (n=1;n<max_windows;n++)
           if (ventana[n].tipo && ventana[n].primer_plano==1) {
-            hiden[n-1]=1; ventana[n].primer_plano=0; vuelca_ventana(n);
+            hiden[n-1]=1; ventana[n].primer_plano=0; flush_window(n);
           } else hiden[n-1]=0;
       } else {
         vtipo=v.tipo; v.tipo=0;
         for (n=1;n<max_windows;n++) {
           if (ventana[n].tipo && ventana[n].primer_plano==1) {
-            if (colisionan(0,n)) {
+            if (windows_collide(0,n)) {
               if (n==1) {
                 wup(1);
                 wmouse_x=-1; wmouse_y=-1;
                 m=mouse_b; om=old_mouse_b; mouse_b=0; old_mouse_b=0;
                 call((voidReturnType )v.click_handler);
                 mouse_b=m; old_mouse_b=om;
-                v.primer_plano=0; vuelca_ventana(0); v.volcar=0;
+                v.primer_plano=0; flush_window(0); v.volcar=0;
                 wdown(1);
-              } else { ventana[n].primer_plano=0; vuelca_ventana(n); }
+              } else { ventana[n].primer_plano=0; flush_window(n); }
             }
           }
         }
@@ -3058,20 +3058,20 @@ void nueva_ventana(voidReturnType init_handler) {
       if (n && ventana[n].primer_plano==2) {
         divdelete(0);
         move(0,n-1);
-        maximiza_ventana();
+        maximize_window();
       } else if (n) {
         if (ventana[n].primer_plano==0) {
           divdelete(0);
           move(0,n-1);
           for (m=1;m<max_windows;m++) if (ventana[m].tipo && ventana[m].primer_plano==1)
-            if (colisionan(0,m)) { ventana[m].primer_plano=0; vuelca_ventana(m); }
-          v.primer_plano=1; vuelca_ventana(0);
+            if (windows_collide(0,m)) { ventana[m].primer_plano=0; flush_window(m); }
+          v.primer_plano=1; flush_window(0);
         } else { // Cuando el menu pedido ya está en primer plano lo resalta
           divdelete(0);
           move(0,n-1);
           wrectangle(v.ptr,v.an/big2,v.al/big2,c4,0,0,v.an/big2,v.al/big2);
-          init_volcado(); vuelca_ventana(0);
-          retrazo(); volcado_copia();
+          init_flush(); flush_window(0);
+          retrazo(); flush_copy();
           wrectangle(v.ptr,v.an/big2,v.al/big2,c2,0,0,v.an/big2,v.al/big2);
           v.volcar=1; retrazo(); retrazo(); retrazo(); retrazo();
         }
@@ -3088,7 +3088,7 @@ void nueva_ventana(voidReturnType init_handler) {
 //      Explode de una nueva ventana
 //-----------------------------------------------------------------------------
 
-void init_volcado(void);
+void init_flush(void);
 
 void explode(int x,int y,int an,int al) {
   int n=0,tipo=v.tipo,b=big;
@@ -3097,10 +3097,10 @@ void explode(int x,int y,int an,int al) {
   if (modo<100) {
     if (b) big=1;
     draw_edit_background(x,y,an,al);
-    volcar_barras(0);
-    actualiza_dialogos(x,y,an,al);
+    flush_bars(0);
+    update_dialogs(x,y,an,al);
     big=0;
-  } else actualiza_caja(x,y,an,al);
+  } else update_box(x,y,an,al);
   while (++n<10) {
     aan=(an*n)/10; aal=(al*n)/10;
     xx=x+an/2-aan/2; yy=y+al/2-aal/2;
@@ -3111,18 +3111,18 @@ void explode(int x,int y,int an,int al) {
     volcado_parcial(xx+aan-1,yy,1,aal);
     explode_num=n;
     retrazo();
-    volcado_copia();
+    flush_copy();
     if (modo<100) {
       if (b) big=1;
       draw_edit_background(xx,yy,aan,aal);
-      volcar_barras(0);
-      actualiza_dialogos(xx,yy,aan,aal);
+      flush_bars(0);
+      update_dialogs(xx,yy,aan,aal);
       big=0;
     } else {
-      actualiza_caja(xx,yy,aan,1);
-      actualiza_caja(xx,yy,1,aal);
-      actualiza_caja(xx,yy+aal-1,aan,1);
-      actualiza_caja(xx+aan-1,yy,1,aal);
+      update_box(xx,yy,aan,1);
+      update_box(xx,yy,1,aal);
+      update_box(xx,yy+aal-1,aan,1);
+      update_box(xx+aan-1,yy,1,aal);
     }
   } v.tipo=tipo; big=b;
 }
@@ -3141,18 +3141,18 @@ void implode(int x,int y,int an,int al) {
     volcado_parcial(xx,yy+aal-1,aan,1);
     volcado_parcial(xx+aan-1,yy,1,aal);
     explode_num=n;
-    volcado_copia();
+    flush_copy();
     if (modo<100) {
       if (b) big=1;
       draw_edit_background(xx,yy,aan,aal);
-      volcar_barras(0);
-      actualiza_dialogos(xx,yy,aan,aal);
+      flush_bars(0);
+      update_dialogs(xx,yy,aan,aal);
       big=0;
     } else {
-      actualiza_caja(xx,yy,aan,1);
-      actualiza_caja(xx,yy,1,aal);
-      actualiza_caja(xx,yy+aal-1,aan,1);
-      actualiza_caja(xx+aan-1,yy,1,aal);
+      update_box(xx,yy,aan,1);
+      update_box(xx,yy,1,aal);
+      update_box(xx,yy+aal-1,aan,1);
+      update_box(xx+aan-1,yy,1,aal);
     }
     retrazo();
   } while (--n); big=b;
@@ -3165,10 +3165,10 @@ void extrude(int x,int y,int an,int al,int x2,int y2,int an2,int al2) {
   if (modo<100) {
     if (b) big=1;
     draw_edit_background(x,y,an,al);
-    volcar_barras(0);
-    actualiza_dialogos(x,y,an,al);
+    flush_bars(0);
+    update_dialogs(x,y,an,al);
     big=0;
-  } else actualiza_caja(x,y,an,al);
+  } else update_box(x,y,an,al);
   do {
     aan=(an*n+an2*(10-n))/10;
     aal=(al*n+al2*(10-n))/10;
@@ -3179,19 +3179,19 @@ void extrude(int x,int y,int an,int al,int x2,int y2,int an2,int al2) {
     volcado_parcial(xx,yy,1,aal);
     volcado_parcial(xx,yy+aal-1,aan,1);
     volcado_parcial(xx+aan-1,yy,1,aal);
-    if (primera_vez!=1) volcado_copia();
+    if (primera_vez!=1) flush_copy();
 
     if (modo<100) {
       if (b) big=1;
       draw_edit_background(xx,yy,aan,aal);
-      volcar_barras(0);
-      actualiza_dialogos(xx,yy,aan,aal);
+      flush_bars(0);
+      update_dialogs(xx,yy,aan,aal);
       big=0;
     } else {
-      actualiza_caja(xx,yy,aan,1);
-      actualiza_caja(xx,yy,1,aal);
-      actualiza_caja(xx,yy+aal-1,aan,1);
-      actualiza_caja(xx+aan-1,yy,1,aal);
+      update_box(xx,yy,aan,1);
+      update_box(xx,yy,1,aal);
+      update_box(xx,yy+aal-1,aan,1);
+      update_box(xx+aan-1,yy,1,aal);
     }
 
     if (primera_vez!=1) retrazo();
@@ -3204,7 +3204,7 @@ void extrude(int x,int y,int an,int al,int x2,int y2,int an2,int al2) {
 //-----------------------------------------------------------------------------
 
 
-void dialogo(voidReturnType init_handler) {
+void show_dialog(voidReturnType init_handler) {
 
   int vtipo,_get_pos;
   byte * ptr;
@@ -3218,7 +3218,7 @@ uint32_t colorkey=0;
     if (v.tipo) {
       wmouse_x=-1; wmouse_y=-1; m=mouse_b; mouse_b=0;
       call((voidReturnType )v.click_handler); mouse_b=m;
-      if (v.volcar) { vuelca_ventana(0); v.volcar=0; }
+      if (v.volcar) { flush_window(0); v.volcar=0; }
     }
 
     addwindow();
@@ -3259,7 +3259,7 @@ uint32_t colorkey=0;
 
     if (v.click_handler==err2) ptr=error_window; else ptr=(byte *)malloc(an*al);
 
-    if (ptr!=NULL) { // Ventana, free en cierra_ventana
+    if (ptr!=NULL) { // Ventana, free en close_window
 		memset(ptr,0,an*al);
 
 		window_surface(an,al,1);
@@ -3272,11 +3272,11 @@ uint32_t colorkey=0;
 
       if (modo>=100) {
         if (ventana[1].tipo==1 || ventana[1].tipo==7) { // Diálogo sobre diálogo
-          ventana[1].primer_plano=0; vuelca_ventana(1);
+          ventana[1].primer_plano=0; flush_window(1);
         } else {
           for (n=1;n<max_windows;n++) {
             if (ventana[n].tipo && ventana[n].primer_plano==1) {
-              hiden[n-1]=1; ventana[n].primer_plano=0; vuelca_ventana(n);
+              hiden[n-1]=1; ventana[n].primer_plano=0; flush_window(n);
             } else hiden[n-1]=0;
           }
         }
@@ -3320,7 +3320,7 @@ uint32_t colorkey=0;
       wvolcado(copia,vga_an,vga_al,ptr,x,y,an,al,0);
       volcado_parcial(x,y,an,al);
       do { read_mouse(); } while(mouse_b&1);
-      entorno_dialogo();
+      modal_loop();
 
       get_pos=_get_pos;
 
@@ -3334,7 +3334,7 @@ uint32_t colorkey=0;
   }
 }
 
-void refrescadialogo(void)
+void refresh_dialog(void)
 {
 	byte * ptr=v.ptr;
 	int an=v.an,al=v.al;
@@ -3365,7 +3365,7 @@ void end_lexcolor(void);
  * Sets up video mode, keyboard, help index, palette tables, UI fonts,
  * icon graphics, sound system, and the paint toolbar.
  */
-void inicializacion(void) {
+void initialization(void) {
 
 	FILE *f;
 	int n, a;
@@ -3633,14 +3633,14 @@ fclose(f);
   iundo=0; for (a=0;a<max_undos;a++) tundo[a].modo=-1;
   color=0; default_reglas(); modo=101;
   modo_fill=0; modo_circulo=0; modo_caja=1; modo_seleccion=0;
-  v.tipo=0; init_volcado();
+  v.tipo=0; init_flush();
   siguiente_codigo=1; mouse_shift=0;
   memcpy(paleta_original,dac,768);
   quien_arrastra=0; free_drag=1;
   memset(mask,0,256); mask_on=0; v_pausa=0;
   get=get_buffer;
 
-  determina_unidades();
+  determine_units();
 
   inicializa_compilador(); // *** Compilador *** espacios de lower a 00
   init_lexcolor();
@@ -3657,9 +3657,9 @@ fclose(f);
 
   arrastrar=0;
 
-  actualiza_caja(0,0,vga_an,vga_al);
+  update_box(0,0,vga_an,vga_al);
 
-  crea_barratitulo();
+  create_title_bar();
   
   svmode(); 
   set_dac(dac); 
@@ -3676,10 +3676,10 @@ fclose(f);
 //      Return from program
 //-----------------------------------------------------------------------------
 
-/* IDE shutdown: free all buffers allocated by inicializacion().
+/* IDE shutdown: free all buffers allocated by initialization().
  * Restores video mode, shuts down the syntax colorizer and keyboard.
  */
-void finalizacion(void) {
+void finalization(void) {
 
   if(undo!=NULL) {
 	free(undo);
@@ -3738,7 +3738,7 @@ void default_reglas(void) {
 //      Function to determine the present drives (in string unidades[])
 //-----------------------------------------------------------------------------
 
-void determina_unidades(void) {
+void determine_units(void) {
 #ifdef WIN32
   int n,m,uni=0;
 DWORD cchBuffer;
@@ -3833,7 +3833,7 @@ void _fwrite(char * s, byte * buf, int n) {
 
 void error(int n) {
 	debugprintf("WHOOPS!\n");
-    finalizacion();
+    finalization();
     printf((char *)texto[14],n);
     printf("\n");
     exit(0);
@@ -4019,7 +4019,7 @@ void select_get(struct t_item * i,int activo,int ocultar_error) {
       if (atoi(get)>=i->get.r0 && atoi(get)<=i->get.r1) itoa(atoi(get),(char *)i->get.buffer,10);
       else if (!ocultar_error && !show_items_called) {
         sprintf(cWork,"%s [%d..%d].",texto[49],i->get.r0,i->get.r1);
-        v_texto=cWork; dialogo(err0);
+        v_texto=cWork; show_dialog(err0);
       }
     } } }
 
@@ -4344,10 +4344,10 @@ void get_input(int n) {
 }
 
 //-----------------------------------------------------------------------------
-//      Funciones de desactivar y activar
+//      Funciones de deactivate y activate
 //-----------------------------------------------------------------------------
 
-void desactivar(void) { // Minimiza: se desactiva
+void deactivate(void) { // Minimiza: se desactiva
   int m;
   int an=v.an,al=v.al;
   if (big) { an/=2; al/=2; }
@@ -4371,7 +4371,7 @@ void desactivar(void) { // Minimiza: se desactiva
         wwrite(ventana[m].ptr,ventana[m].an/big2,ventana[m].al/big2,3+(ventana[m].an/big2-20)/2,2,1,ventana[m].titulo,c1);
         wwrite(ventana[m].ptr,ventana[m].an/big2,ventana[m].al/big2,2+(ventana[m].an/big2-20)/2,2,1,ventana[m].titulo,c4);
       }
-      vuelca_ventana(m); break;
+      flush_window(m); break;
     }
     if (v.tipo==102) call((voidReturnType )v.paint_handler); // Borra cursor
   }
@@ -4380,7 +4380,7 @@ void desactivar(void) { // Minimiza: se desactiva
 /* Activate the front window: highlight its title bar as focused.
  * NOTE: Called from multiple places, not just maximize — see original div.cpp.
  */
-void activar(void) {
+void activate(void) {
   int m;
   int an=v.an,al=v.al;
   if (big) { an/=2; al/=2; }
@@ -4407,7 +4407,7 @@ void activar(void) {
       wup(m);
       call((voidReturnType )v.paint_handler);
       wdown(m);
-    } vuelca_ventana(m); break;
+    } flush_window(m); break;
   }
 }
 
@@ -4725,7 +4725,7 @@ void check_mouse(void) {
 //  Determines a prg for help with F1
 //-----------------------------------------------------------------------------
 
-int determina_prg2(void) {
+int determine_prg2(void) {
   int m,n=-1;
 
   for (m=0;m<max_windows;m++) {
@@ -4735,7 +4735,7 @@ int determina_prg2(void) {
   } return(v_ventana=n);
 }
 
-int determina_calc(void) {
+int determine_calc(void) {
   int m,n=-1;
 
   for (m=0;m<max_windows;m++) {

@@ -24,7 +24,7 @@ void system_font(void);
 void interprete (void);
 void crea_cuad(void);
 void exec_process(void);
-void finalizacion (void);
+void finalization (void);
 void elimina_proceso(int id);
 void nucleo_exec(void);
 void nucleo_trace(void);
@@ -347,7 +347,7 @@ extern int find_status;
 time_t dtime;
 memptrsize stack[65535];
 
-void inicializacion (void) {
+void initialization (void) {
   int n;
   
   for (n=0;n<65535;n++)
@@ -521,7 +521,7 @@ init_rnd(dtime);
   busca_packfile();
   #endif
 
-  init_volcado();
+  init_flush();
 
   ss_time=3000; ss_time_counter=0;
   ss_status=1; activar_paleta=0;
@@ -667,7 +667,7 @@ void mainloop(void) {
   if(!(procesos && !(kbdFLAGS[_ESC] && kbdFLAGS[_L_CTRL]) && !alt_x)) {
     fprintf(stdout, "Program finished. Ending.\n");
     emscripten_cancel_main_loop();
-    finalizacion();
+    finalization();
     return;
   }
 #endif
@@ -708,11 +708,11 @@ void mainloop(void) {
 
 /* VM entry point: initializes the runtime, then runs the main game loop
  * until all processes are dead or the user presses Ctrl+Esc / Alt+X.
- * Calls finalizacion() on exit to free all runtime resources.
+ * Calls finalization() on exit to free all runtime resources.
  */
 void interprete (void)
 {
-  inicializacion();
+  initialization();
 #ifndef DEBUG
 #endif
 
@@ -722,7 +722,7 @@ void interprete (void)
   while (procesos && !(kbdFLAGS[_ESC] && kbdFLAGS[_L_CTRL]) && !alt_x) {
 	mainloop();
   }
-  finalizacion();
+  finalization();
 #endif
 }
 
@@ -1522,7 +1522,7 @@ void elimina_proceso(int id) {
 void closefiles(void); // close fake fmemopen'd files
 #endif
 
-void finalizacion (void) {
+void finalization (void) {
   int newmapcount = 0;
   int snum = 0;
 
