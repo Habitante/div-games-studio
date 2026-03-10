@@ -427,8 +427,8 @@ void put_collision(byte * buffer, int * ptr, int x, int y, int xg, int yg, int a
   ix=clipx0; iy=clipy0;
 
   _copia=copia; copia=buffer;
-  _vga_an=vga_an; vga_an=buffer_an;
-  _vga_al=vga_al; vga_al=buffer_al;
+  _vga_an=vga_width; vga_width=buffer_an;
+  _vga_al=vga_height; vga_height=buffer_al;
   clipx0=0; clipx1-=ix-1;
   clipy0=0; clipy1-=iy-1;
 
@@ -448,8 +448,8 @@ void put_collision(byte * buffer, int * ptr, int x, int y, int xg, int yg, int a
   }
 
   copia=_copia;
-  vga_an=_vga_an;
-  vga_al=_vga_al;
+  vga_width=_vga_an;
+  vga_height=_vga_al;
   clipx0=ix; clipx1+=ix-1;
   clipy0=iy; clipy1+=iy-1;
 }
@@ -476,7 +476,7 @@ void sp_rotated_p(byte * si, int an, int al, int flags) {
     n+=2;
   } while (n<16);
 
-  l1=l0; hmax0=hmin; hmax1=hmin; ptrcopia=copia+hmin*vga_an;
+  l1=l0; hmax0=hmin; hmax1=hmin; ptrcopia=copia+hmin*vga_width;
 
   h=hmin; do {
 
@@ -553,7 +553,7 @@ void sp_rotated_p(byte * si, int an, int al, int flags) {
 
     x0.l+=ix0; x1.l+=ix1; g0x.l+=ig0x; g1x.l+=ig1x; g0y.l+=ig0y; g1y.l+=ig1y;
 
-    ptrcopia+=vga_an;
+    ptrcopia+=vga_width;
 
   } while (h++<hmax);
 
@@ -576,8 +576,8 @@ void test_collision(byte * buffer, int * ptr, int x, int y, int xg, int yg, int 
   ix=clipx0; iy=clipy0;
 
   _copia=copia; copia=buffer;
-  _vga_an=vga_an; vga_an=buffer_an;
-  _vga_al=vga_al; vga_al=buffer_al;
+  _vga_an=vga_width; vga_width=buffer_an;
+  _vga_al=vga_height; vga_height=buffer_al;
   clipx0=0; clipx1-=ix-1;
   clipy0=0; clipy1-=iy-1;
 
@@ -597,8 +597,8 @@ void test_collision(byte * buffer, int * ptr, int x, int y, int xg, int yg, int 
   }
 
   copia=_copia;
-  vga_an=_vga_an;
-  vga_al=_vga_al;
+  vga_width=_vga_an;
+  vga_height=_vga_al;
   clipx0=ix; clipx1+=ix-1;
   clipy0=iy; clipy1+=iy-1;
 }
@@ -609,7 +609,7 @@ void test_collision(byte * buffer, int * ptr, int x, int y, int xg, int yg, int 
 
 void test_normal(byte * p, int x, int y, int an, int al, int flags) {
 
-  byte *q=copia+y*vga_an+x;
+  byte *q=copia+y*vga_width+x;
   int ancho=an;
 
   switch (flags&3) {
@@ -619,7 +619,7 @@ void test_normal(byte * p, int x, int y, int an, int al, int flags) {
           if (*p && *q) { colisiona=1; return;}
           p++; q++;
         } while (--an);
-        q+=vga_an-(an=ancho);
+        q+=vga_width-(an=ancho);
       } while (--al); break;
     case 1: //h-
       p+=an-1;
@@ -628,7 +628,7 @@ void test_normal(byte * p, int x, int y, int an, int al, int flags) {
           if (*p && *q) { colisiona=1; return;}
           p--; q++;
         } while (--an);
-        q+=vga_an-(an=ancho); p+=an*2;
+        q+=vga_width-(an=ancho); p+=an*2;
       } while (--al); break;
     case 2: //-v
       p+=(al-1)*an;
@@ -637,7 +637,7 @@ void test_normal(byte * p, int x, int y, int an, int al, int flags) {
           if (*p && *q) { colisiona=1; return;}
           p++; q++;
         } while (--an);
-        q+=vga_an-(an=ancho); p-=an*2;
+        q+=vga_width-(an=ancho); p-=an*2;
       } while (--al); break;
     case 3: //hv
       p+=al*an-1;
@@ -646,7 +646,7 @@ void test_normal(byte * p, int x, int y, int an, int al, int flags) {
           if (*p && *q) { colisiona=1; return;}
           p--; q++;
         } while (--an);
-        q+=vga_an-(an=ancho);
+        q+=vga_width-(an=ancho);
       } while (--al); break;
   }
 }
@@ -657,7 +657,7 @@ void test_normal(byte * p, int x, int y, int an, int al, int flags) {
 
 void test_clipped(byte * p, int x, int y, int an, int al, int flags) {
 
-  byte *q=copia+y*vga_an+x;
+  byte *q=copia+y*vga_width+x;
   int salta_x, long_x, resto_x;
   int salta_y, long_y, resto_y;
 
@@ -671,44 +671,44 @@ void test_clipped(byte * p, int x, int y, int an, int al, int flags) {
 
   switch (flags&3) {
     case 0: //--
-      p+=an*salta_y+salta_x; q+=vga_an*salta_y+salta_x;
+      p+=an*salta_y+salta_x; q+=vga_width*salta_y+salta_x;
       resto_x+=salta_x; an=long_x;
       do {
         do {
           if (*p && *q) { colisiona=1; return;}
           p++; q++;
         } while (--an);
-        q+=vga_an-(an=long_x); p+=resto_x;
+        q+=vga_width-(an=long_x); p+=resto_x;
       } while (--long_y); break;
     case 1: //h-
-      p+=an*salta_y+an-1-salta_x; q+=vga_an*salta_y+salta_x;
+      p+=an*salta_y+an-1-salta_x; q+=vga_width*salta_y+salta_x;
       resto_x+=salta_x; salta_x=long_x;
       do {
         do {
           if (*p && *q) { colisiona=1; return;}
           p--; q++;
         } while (--salta_x);
-        q+=vga_an-(salta_x=long_x); p+=an+long_x;
+        q+=vga_width-(salta_x=long_x); p+=an+long_x;
       } while (--long_y); break;
     case 2: //-v
-      p+=(al-1)*an-an*salta_y+salta_x; q+=vga_an*salta_y+salta_x;
+      p+=(al-1)*an-an*salta_y+salta_x; q+=vga_width*salta_y+salta_x;
       resto_x+=salta_x; salta_x=long_x;
       do {
         do {
           if (*p && *q) { colisiona=1; return;}
           p++; q++;
         } while (--salta_x);
-        q+=vga_an-(salta_x=long_x); p+=resto_x-an*2;
+        q+=vga_width-(salta_x=long_x); p+=resto_x-an*2;
       } while (--long_y); break;
     case 3: //hv
-      p+=al*an-1-an*salta_y-salta_x; q+=vga_an*salta_y+salta_x;
+      p+=al*an-1-an*salta_y-salta_x; q+=vga_width*salta_y+salta_x;
       resto_x+=salta_x; salta_x=long_x;
       do {
         do {
           if (*p && *q) { colisiona=1; return;}
           p--; q++;
         } while (--salta_x);
-        q+=vga_an-(salta_x=long_x); p-=resto_x;
+        q+=vga_width-(salta_x=long_x); p-=resto_x;
       } while (--long_y); break;
   }
 }
@@ -738,7 +738,7 @@ void test_scaled(byte * old_si, int x, int y, int an, int al, int xg, int yg,
 
   if (x1<clipx0 || y1<clipy0 || x0>=clipx1 || y0>=clipy1) return;
 
-  di=copia+y0*vga_an+x0;
+  di=copia+y0*vga_width+x0;
 
   if (x0<clipx0) salta_x=clipx0-x0; else salta_x=0;
   if (x1>=clipx1) resto_x=x1-clipx1+1; else resto_x=0;
@@ -751,7 +751,7 @@ void test_scaled(byte * old_si, int x, int y, int an, int al, int xg, int yg,
   if (flags&1) { xr=an*256-salta_x*ixr-1; ixr=-ixr; } else xr=salta_x*ixr;
   if (flags&2) { yr=al*256-salta_y*iyr-1; iyr=-iyr; } else yr=salta_y*iyr;
 
-  old_xr=xr; old_an=an; di+=vga_an*salta_y+salta_x; an=long_x;
+  old_xr=xr; old_an=an; di+=vga_width*salta_y+salta_x; an=long_x;
 
   do {
     si=old_si+(yr>>8)*old_an;
@@ -760,7 +760,7 @@ void test_scaled(byte * old_si, int x, int y, int an, int al, int xg, int yg,
       di++; xr+=ixr;
     } while (--an);
     yr+=iyr; xr=old_xr;
-    di+=vga_an-(an=long_x);
+    di+=vga_width-(an=long_x);
   } while (--long_y);
 
 }
@@ -787,7 +787,7 @@ void test_rotated(byte * si, int an, int al, int flags) {
     n+=2;
   } while (n<16);
 
-  l1=l0; hmax0=hmin; hmax1=hmin; ptrcopia=copia+hmin*vga_an;
+  l1=l0; hmax0=hmin; hmax1=hmin; ptrcopia=copia+hmin*vga_width;
 
   h=hmin; do {
 
@@ -871,7 +871,7 @@ void test_rotated(byte * si, int an, int al, int flags) {
 
     x0.l+=ix0; x1.l+=ix1; g0x.l+=ig0x; g1x.l+=ig1x; g0y.l+=ig0y; g1y.l+=ig1y;
 
-    ptrcopia+=vga_an;
+    ptrcopia+=vga_width;
 
   } while (h++<hmax);
 

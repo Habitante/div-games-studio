@@ -371,16 +371,16 @@ void initialization (void) {
 
   if (iloc_len&1) { iloc_len++; } if (!(imem&1)) { imem++; }
 
-  if((copia=(byte*)malloc(vga_an*vga_al))==NULL) exer(1);
-  memset(copia,0,vga_an*vga_al);
+  if((copia=(byte*)malloc(vga_width*vga_height))==NULL) exer(1);
+  memset(copia,0,vga_width*vga_height);
 
-  if((copia2=(byte*)malloc(vga_an*(vga_al+1)))==NULL) exer(1);
-  memset(copia2,0,vga_an*vga_al);
+  if((copia2=(byte*)malloc(vga_width*(vga_height+1)))==NULL) exer(1);
+  memset(copia2,0,vga_width*vga_height);
 
   memset(divmalloc, 0, sizeof(divmalloc));
 
   #ifdef DEBUG
-  if((copia_debug=(byte*)malloc(vga_an*vga_al))==NULL) exer(1);
+  if((copia_debug=(byte*)malloc(vga_width*vga_height))==NULL) exer(1);
   #endif
 
   if((ghost_inicial=(byte*)malloc(65536+512))==NULL) exer(1);
@@ -418,7 +418,7 @@ insert_process(id_start);
 
   for (n=0;n<max_region;n++) {
     region[n].x0=0; region[n].y0=0;
-    region[n].x1=vga_an; region[n].y1=vga_al;
+    region[n].x1=vga_width; region[n].y1=vga_height;
   }
 
   memset(g,0,sizeof(g));
@@ -440,13 +440,13 @@ init_rnd(dtime);
   detect_vesa();
 
   for (n=0;n<num_video_modes;n++) {
-    if (video_modes[n].ancho==vga_an && video_modes[n].alto==vga_al) {
+    if (video_modes[n].width==vga_width && video_modes[n].height==vga_height) {
       break;
     }
   }
 
-	vvga_an = vga_an;
-	vvga_al = vga_al;
+	vvga_an = vga_width;
+	vvga_al = vga_height;
 
 
   setup_video_mode();
@@ -461,8 +461,8 @@ init_rnd(dtime);
   memset(dirinfo->name,0,1025*4);
 
   mouse->z=-512;
-  mouse->x=vga_an/2;
-  mouse->y=vga_al/2;
+  mouse->x=vga_width/2;
+  mouse->y=vga_height/2;
   mouse->size=100;
   mouse->speed=2;
 
@@ -542,17 +542,17 @@ init_rnd(dtime);
 }
 
 //-----------------------------------------------------------------------------
-//  Crea la tabla de cuadrados
+//  Crea la tabla de color_lookuprados
 //-----------------------------------------------------------------------------
 
 void create_color_lookup(void) {
   int a,b;
 
-  if((cuad=(byte*)malloc(16384))==NULL) exer(1);
+  if((color_lookup=(byte*)malloc(16384))==NULL) exer(1);
 
   a=0; do {
     b=0; do {
-      * (int *) (cuad + a*4*64 + b*4) = (a>b) ? (a-b)*(a-b) : (b-a)*(b-a);
+      * (int *) (color_lookup + a*4*64 + b*4) = (a>b) ? (a-b)*(a-b) : (b-a)*(b-a);
     } while (++b<64);
   } while (++a<64);
 }
@@ -973,7 +973,7 @@ void frame_start(void) {
 				}
 				
 				ss_frame();
-				volcado_completo=1; 
+				full_redraw=1; 
 				if (buffer_to_video!=NULL) 
 					buffer_to_video(); 
 				else
@@ -983,8 +983,8 @@ void frame_start(void) {
 			if (ss_end!=NULL) 
 				ss_end();
 
-			memcpy(copia,copia2,vga_an*vga_al);
-			blit_partial(0,0,vga_an,vga_al);
+			memcpy(copia,copia2,vga_width*vga_height);
+			blit_partial(0,0,vga_width,vga_height);
 			ss_time_counter=get_reloj()+ss_time;
 		}
 	}
@@ -1156,7 +1156,7 @@ void frame_end(void) {
 #endif
 
 	if (restore_type==0 || restore_type==1) {
-		if (!iscroll[0].on || iscroll[0].x || iscroll[0].y || iscroll[0].an!=vga_an || iscroll[0].al!=vga_al) {
+		if (!iscroll[0].on || iscroll[0].x || iscroll[0].y || iscroll[0].an!=vga_width || iscroll[0].al!=vga_height) {
 			
 			if (background_to_buffer!=NULL) 
 				background_to_buffer();
@@ -1164,7 +1164,7 @@ void frame_end(void) {
 				if (old_restore_type==0)
 					restore((byte*)copia,(byte*)copia2);
 				else
-					memcpy(copia,copia2,vga_an*vga_al);
+					memcpy(copia,copia2,vga_width*vga_height);
 			}
 		}
 	}
@@ -1281,7 +1281,7 @@ void frame_end(void) {
 						readmouse();
 						x1s=-1;
 						v_function=-1; // No errors (don't show?)
-						put_sprite(mouse->file,mouse->graph,mouse->x,mouse->y,mouse->angle,mouse->size,mouse->flags,mouse->region,copia,vga_an,vga_al);
+						put_sprite(mouse->file,mouse->graph,mouse->x,mouse->y,mouse->angle,mouse->size,mouse->flags,mouse->region,copia,vga_width,vga_height);
 						mouse_x0=x0s;
 						mouse_x1=x1s;
 						mouse_y0=y0s;
@@ -1292,7 +1292,7 @@ void frame_end(void) {
 #endif
 					} else if (otheride==3) {
 						for (n=0;n<max_drawings;n++)
-							if (drawing[n].tipo)
+							if (drawing[n].type)
 								break;
 
 						if (n<max_drawings) {
@@ -1406,10 +1406,10 @@ void frame_end(void) {
 					} else {
 
 					  if (old_dump_type) {
-						volcado_completo=1; blit_screen((byte*)copia);
+						full_redraw=1; blit_screen((byte*)copia);
 					  } else {
 
-							volcado_completo=0;
+							full_redraw=0;
 
 							// Añade los volcados de este frame a los restore del anterior
 
@@ -1581,7 +1581,7 @@ void finalization (void) {
   free(ghost_inicial);
 
 // Free quads
-  free(cuad);
+  free(color_lookup);
 
 // Free system font
   free(fonts[0]);
@@ -1792,14 +1792,14 @@ if(true) {
 #endif
 #endif
 #endif
-  vga_an=argc; // To remove a warning (argc unused?)
+  vga_width=argc; // To remove a warning (argc unused?)
 
 #ifdef DOS
   _harderr(critical_error);
 #endif
 
 
-	vga_an=320; vga_al=200; 
+	vga_width=320; vga_height=200; 
 	ireloj=1000.0/24.0; // 24 fps
 	max_saltos = 0; // 0 skips
 

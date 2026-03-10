@@ -187,7 +187,7 @@ void M3D_create_thumbs(struct t_listboxbr * l, int prog)
 
   if((FPG_F=fopen((char *)brush_fpg_path,"rb"))==NULL)
   {
-    v_texto=(char *)texto[43];
+    v_text=(char *)texto[43];
     show_dialog(err0);
     return;
   }
@@ -199,7 +199,7 @@ void M3D_create_thumbs(struct t_listboxbr * l, int prog)
   if(fread(&FPG_H, 1, sizeof(FPG_header), FPG_F)!=sizeof(FPG_header))
   {
     fclose(FPG_F);
-    v_texto=(char *)texto[44];
+    v_text=(char *)texto[44];
     show_dialog(err0);
     return;
   }
@@ -207,7 +207,7 @@ void M3D_create_thumbs(struct t_listboxbr * l, int prog)
   memcpy(FPG_pal, FPG_H.pal, 768);
   create_dac4();
 
-  if (modo<100) {
+  if (draw_mode<100) {
     for(n=0; n<256; n++) {
       switch ((FPG_pal[n*3]+FPG_pal[n*3+1]+FPG_pal[n*3+2])/22) {
         case 1: FPG_xlat[n]=c0; break;
@@ -234,14 +234,14 @@ void M3D_create_thumbs(struct t_listboxbr * l, int prog)
     {
       if(feof(FPG_F))
       {
-        l->maximo=f_maximo=n;
+        l->total_items=f_maximo=n;
         break;
       }
       else
       {
         fclose(FPG_F);
         if (prog) Progress((char *)texto[93], FPG_progress.total, FPG_progress.total);
-        v_texto=(char *)texto[44];
+        v_text=(char *)texto[44];
         show_dialog(err0);
         return;
       }
@@ -285,7 +285,7 @@ void M3D_create_thumbs(struct t_listboxbr * l, int prog)
       }
       fclose(FPG_F);
       if (prog) Progress((char *)texto[93], FPG_progress.total, FPG_progress.total);
-      v_texto=(char *)texto[45];
+      v_text=(char *)texto[45];
       show_dialog(err0);
       return;
     }
@@ -304,7 +304,7 @@ void M3D_create_thumbs(struct t_listboxbr * l, int prog)
       fclose(FPG_F);
       free(FPG_D.imagen);
       if (prog) Progress((char *)texto[93], FPG_progress.total, FPG_progress.total);
-      v_texto=(char *)texto[44];
+      v_text=(char *)texto[44];
       show_dialog(err0);
       return;
     }
@@ -317,7 +317,7 @@ void M3D_create_thumbs(struct t_listboxbr * l, int prog)
   fclose(FPG_F);
 
   // In paint mode, start from index 0 (no empty texture slot)
-  for(con=0; con<l->maximo; con++)
+  for(con=0; con<l->total_items; con++)
   {
     for(;;)
     {
@@ -387,7 +387,7 @@ void M3D_create_thumbs(struct t_listboxbr * l, int prog)
         free(temp2);
       }
       thumb_tex[con].status = 1;
-      FPG_progress.pos+=(FPG_progress.total-FPG_progress.pos)/(l->maximo-con);
+      FPG_progress.pos+=(FPG_progress.total-FPG_progress.pos)/(l->total_items-con);
       if (prog) Progress((char *)texto[93], FPG_progress.pos, FPG_progress.total);
       break;
     }
@@ -398,9 +398,9 @@ void M3D_create_thumbs(struct t_listboxbr * l, int prog)
     if (prog) Progress((char *)texto[93], FPG_progress.total, FPG_progress.total);
   }
 
-  qsort(thumb_tex,l->maximo,sizeof(struct _thumb_tex),cmpcode);
+  qsort(thumb_tex,l->total_items,sizeof(struct _thumb_tex),cmpcode);
   qsort(textura,t_maximo,an_textura,strcmpsort);
-  qsort(fondo,l->maximo,an_textura,strcmpsort);
+  qsort(fondo,l->total_items,an_textura,strcmpsort);
 }
 
 //-----------------------------------------------------------------------------
@@ -421,7 +421,7 @@ void M3D_show_thumb(struct t_listboxbr * l, int num)
   if(TipoBrowser==MAPBR) memcpy(&thumb_tmp, &thumb_map, sizeof(struct _thumb_map)*max_windows);
   else                   memcpy(&thumb_tmp, &thumb_tex, sizeof(struct _thumb_tex)*max_texturas);
 
-  if (num>=l->inicial && num<l->inicial+l->lineas*l->columnas) {
+  if (num>=l->first_visible && num<l->first_visible+l->lines*l->columns) {
     if(TipoBrowser==MAPBR) {
       num_tex=num;
     } else {
@@ -439,11 +439,11 @@ void M3D_show_thumb(struct t_listboxbr * l, int num)
       }
     }
 
-    px=(l->x+1+(l->an+1)*((num-l->inicial)%l->columnas))*big2+(l->an*big2-thumb_tmp[num_tex].an)/2;
+    px=(l->x+1+(l->an+1)*((num-l->first_visible)%l->columns))*big2+(l->an*big2-thumb_tmp[num_tex].an)/2;
     if ((incy=((l->al-8)*big2-thumb_tmp[num_tex].al)/2)<0) incy=0;
-    py=(l->y+1+(l->al+1)*((num-l->inicial)/l->columnas))*big2+incy;
+    py=(l->y+1+(l->al+1)*((num-l->first_visible)/l->columns))*big2+incy;
 
-    ly=(l->y+(l->al+1)*((num-l->inicial)/l->columnas)+l->al-8)*big2;
+    ly=(l->y+(l->al+1)*((num-l->first_visible)/l->columns)+l->al-8)*big2;
 
     wbox(ptr,an,al,c01,(px-(l->an*big2-thumb_tmp[num_tex].an)/2)/big2,(py-incy)/big2+l->al-8,l->an,8);
 
@@ -473,19 +473,19 @@ void M3D_show_thumb(struct t_listboxbr * l, int num)
     }
 
     if (TipoBrowser!=MAPBR) {
-      if (modo<100 && num_tex==num_pincel) {
+      if (draw_mode<100 && num_tex==num_pincel) {
         wbox(ptr,an,al,c_b_low,px,py+l->al-8,l->an,8);
       }
 
       py+=l->al-1;
-      p=l->lista+l->lista_an*num;
+      p=l->list+l->item_width*num;
 
-      if (l->zona-10==num-l->inicial) x=c4; else x=c3;
+      if (l->zone-10==num-l->first_visible) x=c4; else x=c3;
       wwrite(ptr,an,al,px+l->an/2+1,py,7,(byte *)p,c0);
       wwrite(ptr,an,al,px+l->an/2,py,7,(byte *)p,x);
     }
 
-    v.volcar=1;
+    v.redraw=1;
   }
 }
 
@@ -499,28 +499,28 @@ void M3D_create_listboxbr(struct t_listboxbr * l)
   int an=v.an/big2,al=v.al/big2;
   int x,y;
 
-  if (!l->creada) {
+  if (!l->created) {
     l->slide=l->s0=l->y+9;
-    l->s1=l->y+(l->al*l->lineas+l->lineas+1)-12;
-    l->botones=0;
-    l->creada=1;
-    l->zona=0;
-    l->inicial=FPG_thumbpos;
-    if ((l->inicial+(l->lineas-1)*l->columnas)>=l->maximo) {
-      l->inicial=0;
+    l->s1=l->y+(l->al*l->lines+l->lines+1)-12;
+    l->buttons=0;
+    l->created=1;
+    l->zone=0;
+    l->first_visible=FPG_thumbpos;
+    if ((l->first_visible+(l->lines-1)*l->columns)>=l->total_items) {
+      l->first_visible=0;
     }
   }
 
-  wbox(ptr,an,al,c1,l->x,l->y,(l->an+1)*l->columnas,(l->al+1)*l->lineas);
+  wbox(ptr,an,al,c1,l->x,l->y,(l->an+1)*l->columns,(l->al+1)*l->lines);
 
-  for (y=0;y<l->lineas;y++)
-    for (x=0;x<l->columnas;x++)
+  for (y=0;y<l->lines;y++)
+    for (x=0;x<l->columns;x++)
       wrectangle(ptr,an,al,c0,l->x+(x*(l->an+1)),l->y+(y*(l->al+1)),l->an+2,l->al+2);
 
-  wrectangle(ptr,an,al,c0,l->x+(l->an+1)*l->columnas,l->y,9,(l->al+1)*l->lineas+1);
-  wrectangle(ptr,an,al,c0,l->x+(l->an+1)*l->columnas,l->y+8,9,(l->al+1)*l->lineas-15);
-  wput(ptr,an,al,l->x+(l->an+1)*l->columnas+1,l->y+1,-39);
-  wput(ptr,an,al,l->x+(l->an+1)*l->columnas+1,l->y+(l->al+1)*l->lineas-7,-40);
+  wrectangle(ptr,an,al,c0,l->x+(l->an+1)*l->columns,l->y,9,(l->al+1)*l->lines+1);
+  wrectangle(ptr,an,al,c0,l->x+(l->an+1)*l->columns,l->y+8,9,(l->al+1)*l->lines-15);
+  wput(ptr,an,al,l->x+(l->an+1)*l->columns+1,l->y+1,-39);
+  wput(ptr,an,al,l->x+(l->an+1)*l->columns+1,l->y+(l->al+1)*l->lines-7,-40);
 
   M3D_paint_listboxbr(l);
   paint_slider_br(l);
@@ -534,85 +534,85 @@ void M3D_update_listboxbr(struct t_listboxbr * l)
 {
   byte * ptr=v.ptr, *p;
   int an=v.an/big2,al=v.al/big2;
-  int n,old_zona=l->zona,x,y;
+  int n,old_zona=l->zone,x,y;
 
-  if (wmouse_in(l->x,l->y,(l->an+1)*l->columnas,(l->al+1)*l->lineas)) {
-    l->zona=(wmouse_x-l->x)/(l->an+1)+((wmouse_y-l->y)/(l->al+1))*l->columnas;
-    if (l->zona>=l->maximo-l->inicial || l->zona>=l->lineas*l->columnas) l->zona=1;
-    else l->zona+=10;
-  } else if (wmouse_in(l->x+(l->an+1)*l->columnas,l->y,9,9)) l->zona=2;
-  else if (wmouse_in(l->x+(l->an+1)*l->columnas,l->y+(l->al+1)*l->lineas-8,9,9)) l->zona=3;
-  else if (wmouse_in(l->x+(l->an+1)*l->columnas,l->y+9,9,(l->al+1)*l->lineas-17)) l->zona=4;
-  else l->zona=0;
+  if (wmouse_in(l->x,l->y,(l->an+1)*l->columns,(l->al+1)*l->lines)) {
+    l->zone=(wmouse_x-l->x)/(l->an+1)+((wmouse_y-l->y)/(l->al+1))*l->columns;
+    if (l->zone>=l->total_items-l->first_visible || l->zone>=l->lines*l->columns) l->zone=1;
+    else l->zone+=10;
+  } else if (wmouse_in(l->x+(l->an+1)*l->columns,l->y,9,9)) l->zone=2;
+  else if (wmouse_in(l->x+(l->an+1)*l->columns,l->y+(l->al+1)*l->lines-8,9,9)) l->zone=3;
+  else if (wmouse_in(l->x+(l->an+1)*l->columns,l->y+9,9,(l->al+1)*l->lines-17)) l->zone=4;
+  else l->zone=0;
 
   if (TipoBrowser!=MAPBR) {
-    if (old_zona!=l->zona) if (old_zona>=10) {
-      x=l->x+1+((old_zona-10)%l->columnas)*(l->an+1);
-      y=l->y+l->al+((old_zona-10)/l->columnas)*(l->al+1);
-      p=(byte *)l->lista+l->lista_an*(l->inicial+old_zona-10);
+    if (old_zona!=l->zone) if (old_zona>=10) {
+      x=l->x+1+((old_zona-10)%l->columns)*(l->an+1);
+      y=l->y+l->al+((old_zona-10)/l->columns)*(l->al+1);
+      p=(byte *)l->list+l->item_width*(l->first_visible+old_zona-10);
       wwrite(ptr,an,al,x+l->an/2,y,7,p,c3);
-      v.volcar=1;
+      v.redraw=1;
     }
   }
 
-  if (l->zona==2 && (mouse_b&1)) {
-    if (old_mouse_b&1) { retrace_wait(); retrace_wait(); retrace_wait(); retrace_wait(); }
-      if (l->inicial) {
-        l->inicial-=l->columnas; M3D_paint_listboxbr(l); v.volcar=1; }
-      wput(ptr,an,al,l->x+(l->an+1)*l->columnas+1,l->y+1,-41);
-      l->botones|=1; v.volcar=1;
-  } else if (l->botones&1) {
-    wput(ptr,an,al,l->x+(l->an+1)*l->columnas+1,l->y+1,-39);
-    l->botones^=1; v.volcar=1;
+  if (l->zone==2 && (mouse_b&1)) {
+    if (prev_mouse_buttons&1) { retrace_wait(); retrace_wait(); retrace_wait(); retrace_wait(); }
+      if (l->first_visible) {
+        l->first_visible-=l->columns; M3D_paint_listboxbr(l); v.redraw=1; }
+      wput(ptr,an,al,l->x+(l->an+1)*l->columns+1,l->y+1,-41);
+      l->buttons|=1; v.redraw=1;
+  } else if (l->buttons&1) {
+    wput(ptr,an,al,l->x+(l->an+1)*l->columns+1,l->y+1,-39);
+    l->buttons^=1; v.redraw=1;
   }
 
-  if (l->zona==3 && (mouse_b&1)) {
-    if (old_mouse_b&1) { retrace_wait(); retrace_wait(); retrace_wait(); retrace_wait(); }
-    n=l->maximo-l->inicial;
-    if (n>l->lineas*l->columnas) {
-      l->inicial+=l->columnas; M3D_paint_listboxbr(l); v.volcar=1; }
-    wput(ptr,an,al,l->x+(l->an+1)*l->columnas+1,l->y+(l->al+1)*l->lineas-7,-42);
-    l->botones|=2; v.volcar=1;
-  } else if (l->botones&2) {
-    wput(ptr,an,al,l->x+(l->an+1)*l->columnas+1,l->y+(l->al+1)*l->lineas-7,-40);
-    l->botones^=2; v.volcar=1;
+  if (l->zone==3 && (mouse_b&1)) {
+    if (prev_mouse_buttons&1) { retrace_wait(); retrace_wait(); retrace_wait(); retrace_wait(); }
+    n=l->total_items-l->first_visible;
+    if (n>l->lines*l->columns) {
+      l->first_visible+=l->columns; M3D_paint_listboxbr(l); v.redraw=1; }
+    wput(ptr,an,al,l->x+(l->an+1)*l->columns+1,l->y+(l->al+1)*l->lines-7,-42);
+    l->buttons|=2; v.redraw=1;
+  } else if (l->buttons&2) {
+    wput(ptr,an,al,l->x+(l->an+1)*l->columns+1,l->y+(l->al+1)*l->lines-7,-40);
+    l->buttons^=2; v.redraw=1;
   }
 
-  if (l->zona==4 && (mouse_b&1)) {
+  if (l->zone==4 && (mouse_b&1)) {
     l->slide=wmouse_y-1;
     if (l->slide<l->s0) l->slide=l->s0;
     else if (l->slide>l->s1) l->slide=l->s1;
 
-    if (l->maximo>l->lineas*l->columnas) {
-      n=(l->maximo-l->lineas*l->columnas+l->columnas-1)/l->columnas;
+    if (l->total_items>l->lines*l->columns) {
+      n=(l->total_items-l->lines*l->columns+l->columns-1)/l->columns;
 
       n=0.5+(float)(n*(l->slide-l->s0))/(l->s1-l->s0);
 
-      if (n!=l->inicial/l->columnas) { l->inicial=n*l->columnas; M3D_paint_listboxbr(l); }
-    } paint_slider_br(l); v.volcar=1;
+      if (n!=l->first_visible/l->columns) { l->first_visible=n*l->columns; M3D_paint_listboxbr(l); }
+    } paint_slider_br(l); v.redraw=1;
 
   } else {
 
-    if (l->maximo<=l->lineas*l->columnas) n=l->s0;
+    if (l->total_items<=l->lines*l->columns) n=l->s0;
     else {
-      n=(l->maximo-l->lineas*l->columnas+l->columnas-1)/l->columnas;
+      n=(l->total_items-l->lines*l->columns+l->columns-1)/l->columns;
 
-      n=(l->s0*(n-l->inicial/l->columnas)+l->s1*(l->inicial/l->columnas))/n;
+      n=(l->s0*(n-l->first_visible/l->columns)+l->s1*(l->first_visible/l->columns))/n;
     }
-    if (n!=l->slide) { l->slide=n; paint_slider_br(l); v.volcar=1; }
+    if (n!=l->slide) { l->slide=n; paint_slider_br(l); v.redraw=1; }
   }
 
   if (TipoBrowser!=MAPBR) {
-    if (old_zona!=l->zona) if (l->zona>=10) {
-      x=l->x+1+((l->zona-10)%l->columnas)*(l->an+1);
-      y=l->y+l->al+((l->zona-10)/l->columnas)*(l->al+1);
-      p=(byte *)l->lista+l->lista_an*(l->inicial+l->zona-10);
+    if (old_zona!=l->zone) if (l->zone>=10) {
+      x=l->x+1+((l->zone-10)%l->columns)*(l->an+1);
+      y=l->y+l->al+((l->zone-10)/l->columns)*(l->al+1);
+      p=(byte *)l->list+l->item_width*(l->first_visible+l->zone-10);
       wwrite(ptr,an,al,x+l->an/2,y,7,p,c4);
-      v.volcar=1;
+      v.redraw=1;
     }
   }
 
-  switch (l->zona) {
+  switch (l->zone) {
     case 2: mouse_graf=7; break;
     case 3: mouse_graf=9; break;
     case 4: mouse_graf=13; break;
@@ -629,24 +629,24 @@ void M3D_paint_listboxbr(struct t_listboxbr * l)
   int an=v.an/big2,al=v.al/big2;
   int n,y,x;
 
-  for(y=0;y<l->lineas;y++)
-    for(x=0; x<l->columnas; x++) {
+  for(y=0;y<l->lines;y++)
+    for(x=0; x<l->columns; x++) {
       wbox(ptr,an,al,c1,l->x+(x*(l->an+1))+1,l->y+(y*(l->al+1))+1,l->an,l->al-8);
       wbox(ptr,an,al,c01,l->x+(x*(l->an+1))+1,l->y+(y*(l->al+1))+1+l->al-8,l->an,8);
     }
 
-  if (wmouse_in(l->x,l->y,(l->an+1)*l->columnas,(l->al+1)*l->lineas)) {
-    l->zona=((mouse_x-v.x)/big2-l->x)/(l->an+1)+(((mouse_y-v.y)/big2-l->y)/(l->al+1))*l->columnas;
-    if (l->zona>=l->maximo-l->inicial || l->zona>=l->lineas*l->columnas) l->zona=1;
-    else l->zona+=10;
-  } else if (wmouse_in(l->x+(l->an+1)*l->columnas,l->y,9,9)) l->zona=2;
-  else if (wmouse_in(l->x+(l->an+1)*l->columnas,l->y+(l->al+1)*l->lineas-8,9,9)) l->zona=3;
-  else if (wmouse_in(l->x+(l->an+1)*l->columnas,l->y+9,9,(l->al+1)*l->lineas-17)) l->zona=4;
-  else l->zona=0;
+  if (wmouse_in(l->x,l->y,(l->an+1)*l->columns,(l->al+1)*l->lines)) {
+    l->zone=((mouse_x-v.x)/big2-l->x)/(l->an+1)+(((mouse_y-v.y)/big2-l->y)/(l->al+1))*l->columns;
+    if (l->zone>=l->total_items-l->first_visible || l->zone>=l->lines*l->columns) l->zone=1;
+    else l->zone+=10;
+  } else if (wmouse_in(l->x+(l->an+1)*l->columns,l->y,9,9)) l->zone=2;
+  else if (wmouse_in(l->x+(l->an+1)*l->columns,l->y+(l->al+1)*l->lines-8,9,9)) l->zone=3;
+  else if (wmouse_in(l->x+(l->an+1)*l->columns,l->y+9,9,(l->al+1)*l->lines-17)) l->zone=4;
+  else l->zone=0;
 
-  n=l->maximo-l->inicial;
-  if (n>l->lineas*l->columnas) n=l->lineas*l->columnas;
-  while (n>0) M3D_show_thumb(l,l->inicial+--n);
+  n=l->total_items-l->first_visible;
+  if (n>l->lines*l->columns) n=l->lines*l->columns;
+  while (n>0) M3D_show_thumb(l,l->first_visible+--n);
 }
 
 //-----------------------------------------------------------------------------
@@ -660,53 +660,53 @@ extern struct t_listboxbr lthumbmapbr;
 
 void MapperBrowseFPG0(void)
 {
-  v.tipo = 1;
+  v.type = 1;
   v.an   = 147-4;
   v.al   = 147-4;
   if (TipoTex>3) {
     if(TipoBrowser==BRUSH) {
-      v.titulo = texto[572];
-      v.nombre = texto[572];
+      v.title = texto[572];
+      v.name = texto[572];
     } else {
-      v.titulo = texto[573];
-      v.nombre = texto[573];
+      v.title = texto[573];
+      v.name = texto[573];
     }
   } else {
-    v.titulo = texto[433];
-    v.nombre = texto[433];
+    v.title = texto[433];
+    v.name = texto[433];
   }
 
   v.paint_handler=MapperBrowseFPG1;
   v.click_handler=MapperBrowseFPG2;
 
-  if(modo<100) {
+  if(draw_mode<100) {
     if(TipoBrowser==MAPBR) {
       memcpy(&copia_br, &ltexturasbr, sizeof(ltexturasbr));
       memcpy(&ltexturasbr, &lthumbmapbr, sizeof(ltexturasbr));
-      ltexturasbr.maximo=m_maximo;
+      ltexturasbr.total_items=m_maximo;
     } else {
       memcpy(m3d_fpgcodesbr, fondo, max_texturas*an_textura);
-      ltexturasbr.maximo=f_maximo;
+      ltexturasbr.total_items=f_maximo;
     }
   } else {
     if(TipoTex==FONDO) {
       memcpy(m3d_fpgcodesbr, fondo, max_texturas*an_textura);
-      ltexturasbr.maximo=f_maximo;
+      ltexturasbr.total_items=f_maximo;
     } else {
       memcpy(m3d_fpgcodesbr, textura, max_texturas*an_textura);
-      ltexturasbr.maximo=t_maximo;
+      ltexturasbr.total_items=t_maximo;
     }
   }
 
   num=0;
 
-  ltexturasbr.creada   = 0;
-  ltexturasbr.columnas = 4;
+  ltexturasbr.created   = 0;
+  ltexturasbr.columns = 4;
   ltexturasbr.an       = 32;
   ltexturasbr.al       = 32;
-  ltexturasbr.lineas   = 4;
+  ltexturasbr.lines   = 4;
 
-  v_terminado=0; t_pulsada=1;
+  v_finished=0; t_pulsada=1;
 }
 
 void MapperBrowseFPG1(void)
@@ -725,29 +725,29 @@ void MapperBrowseFPG2(void) {
 
   M3D_update_listboxbr(&ltexturasbr);
 
-  if((mouse_b&1) && !(old_mouse_b&1))
+  if((mouse_b&1) && !(prev_mouse_buttons&1))
   {
-    if(ltexturasbr.zona>=10)
+    if(ltexturasbr.zone>=10)
     {
-      // Paint mode only (modo<100) - 3D map mode removed
+      // Paint mode only (draw_mode<100) - 3D map mode removed
       if(TipoBrowser==BRUSH) {
         old_pincel=num_pincel;
-        num_pincel=ltexturasbr.inicial+ltexturasbr.zona-10;
+        num_pincel=ltexturasbr.first_visible+ltexturasbr.zone-10;
         M3D_show_thumb(&ltexturasbr,old_pincel);
         M3D_show_thumb(&ltexturasbr,num_pincel);
         num_pincel=old_pincel;
       }
       FPG_thumbpos = 0;
-      v_terminado  = 1;
-      fin_dialogo  = 1;
+      v_finished  = 1;
+      end_dialog  = 1;
     }
   }
 
   if(!t_pulsada) {
     if(TipoBrowser==BRUSH) {
-      if(key(_T)) fin_dialogo=1;
+      if(key(_T)) end_dialog=1;
     } else if(TipoBrowser==MAPBR) {
-      if(key(_U)) fin_dialogo=1;
+      if(key(_U)) end_dialog=1;
     }
   }
 }

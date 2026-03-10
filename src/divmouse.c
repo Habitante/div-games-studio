@@ -49,14 +49,14 @@ void read_mouse(void) {
 	int n=0;
 	int s,shift=0;
 
-	old_mouse_b=mouse_b;
+	prev_mouse_buttons=mouse_b;
 	if(vwidth == 0 && vheight == 0 ) {
-		vwidth = vga_an;
-		vheight = vga_al;
+		vwidth = vga_width;
+		vheight = vga_height;
 	}
 	read_mouse2();
 
-	if (modo<100 && hotkey && !help_paint_active)
+	if (draw_mode<100 && hotkey && !help_paint_active)
 		poll_keyboard();
 
 	// When mouse is outside the window, force out-of-bounds so no UI
@@ -86,7 +86,7 @@ void read_mouse(void) {
 
 		shift=1;
 
-		if (modo<100 && hotkey && !help_paint_active) {
+		if (draw_mode<100 && hotkey && !help_paint_active) {
 			if (key(_SPC)) {
 				if (mouse_b!=0x8001) {
 					mouse_b=0x8001;
@@ -95,14 +95,14 @@ void read_mouse(void) {
 				mouse_b=0;
 			}
 		}
-	if(vga_an != vwidth || vga_al != vheight) {
-		mouse_x = (int)(m_x*(float)((float)vga_an / (float)vwidth));// / (float)vga_an);
-		mouse_y = (int)(m_y*(float)((float)vga_al / (float)vheight));// / (float)vga_al);
+	if(vga_width != vwidth || vga_height != vheight) {
+		mouse_x = (int)(m_x*(float)((float)vga_width / (float)vwidth));// / (float)vga_width);
+		mouse_y = (int)(m_y*(float)((float)vga_height / (float)vheight));// / (float)vga_height);
 
 	}
 
 
-	} else if (modo<100 && hotkey && !help_paint_active) { // Las teclas están solo activas en edición
+	} else if (draw_mode<100 && hotkey && !help_paint_active) { // Las teclas están solo activas en edición
 
 		if (!(shift_status&4)) {
 
@@ -166,16 +166,16 @@ void read_mouse(void) {
 		if (mouse_x<0) { 
 			mouse_x=0; 
 			n++; 
-		} else if (mouse_x>=vga_an) { 
-			mouse_x=vga_an-1; 
+		} else if (mouse_x>=vga_width) { 
+			mouse_x=vga_width-1; 
 			n++; 
 		}
 		
 		if (mouse_y<0) {
 			mouse_y=0;
 			n++; 
-		} else if (mouse_y>=vga_al) {
-			mouse_y=vga_al-1; 
+		} else if (mouse_y>=vga_height) {
+			mouse_y=vga_height-1; 
 			n++; 
 		}
 
@@ -189,41 +189,41 @@ void read_mouse(void) {
 		mouse_shift_y=mouse_y;
 	}
 
-	coord_x=zoom_x+(mouse_shift_x-zx)/(1<<zoom);
-	coord_y=zoom_y+(mouse_shift_y-zy)/(1<<zoom);
+	coord_x=zoom_x+(mouse_shift_x-zoom_win_x)/(1<<zoom);
+	coord_y=zoom_y+(mouse_shift_y-zoom_win_y)/(1<<zoom);
 
 	if(free_drag) {
-		switch(arrastrar) {
+		switch(dragging) {
 			case 0:
-			if ((mouse_b&1) && !(old_mouse_b&1)) {
-				arrastrar=1; arrastrar_x=mouse_x; arrastrar_y=mouse_y;
+			if ((mouse_b&1) && !(prev_mouse_buttons&1)) {
+				dragging=1; drag_x=mouse_x; drag_y=mouse_y;
 			} 
 			break;
 		
 			case 1:
-				arrastrar=0;
+				dragging=0;
 				break;
 			
 			case 2:
 				if (mouse_b&1) {
-					if (abs(mouse_x-arrastrar_x)>1 || abs(mouse_y-arrastrar_y)>1) {
-						arrastrar=3;
+					if (abs(mouse_x-drag_x)>1 || abs(mouse_y-drag_y)>1) {
+						dragging=3;
 						wmouse_x=-1;
 						wmouse_y=-1;
 						mouse_b &=~1;
 						call((voidReturnType )v.click_handler);
-						quien_arrastra=v.orden;
+						drag_source=v.order;
 						mouse_b |=1;
-						mouse_graf=arrastrar_graf;
+						mouse_graf=drag_graphic;
 					}
 				} else {
-					arrastrar=0;
+					dragging=0;
 				} 
 			break;
 			
 			case 3:
 				if (!(mouse_b&1)) {
-				arrastrar=4;
+				dragging=4;
 				} 
 			break;
 			
@@ -237,13 +237,13 @@ void read_mouse(void) {
 
 void libera_drag(void) {
 	int n;
-	arrastrar=0;
+	dragging=0;
 	for (n=0;n<max_windows;n++) {
-		if (ventana[n].tipo && ventana[n].orden==quien_arrastra) 
+		if (ventana[n].type && ventana[n].order==drag_source) 
 			break;
 	}
 	
-	if (n<max_windows && ventana[n].tipo==101 && ventana[n].mapa!=NULL) {
+	if (n<max_windows && ventana[n].type==101 && ventana[n].mapa!=NULL) {
 		free(ventana[n].mapa->map);
 		free(ventana[n].mapa);
 		ventana[n].mapa=NULL;
@@ -258,7 +258,7 @@ void libera_drag(void) {
 			wdown(n);
 		}
 
-		if(modo>=100) { flush_window(n); } ventana[n].volcar=0;
+		if(draw_mode>=100) { flush_window(n); } ventana[n].redraw=0;
 	}
 }
 
@@ -322,10 +322,10 @@ void PrintEvent(const SDL_Event * event)
             // Ignore resize events in fullscreen — the logical resolution
             // stays the same, SDL_RenderSetLogicalSize handles scaling
             if (!OSDEP_IsFullScreen()) {
-                vga_an = event->window.data1;
-                vga_al = event->window.data2;
-                vwidth = vga_an;
-                vheight = vga_al;
+                vga_width = event->window.data1;
+                vga_height = event->window.data2;
+                vwidth = vga_width;
+                vheight = vga_height;
                 EndSound();
                 soundstopped = 1;
             }
@@ -442,7 +442,7 @@ while(SDL_PollEvent(&event) )
             if (event.type == SDL_QUIT)
             {
                 /* Quit the application */
-                salir_del_entorno=1;
+                exit_requested=1;
             }
               if (event.type == SDL_MOUSEMOTION)
             {
@@ -523,52 +523,52 @@ while(SDL_PollEvent(&event) )
 		//SDL_SetVideoMode(event.resize.w, event.resize.h, 8,  SDL_HWSURFACE | SDL_RESIZABLE);
 		//				bW = buffer->w; bH = buffer->h;
 		
-		if(vga_an<640)
-			vga_an=640;
+		if(vga_width<640)
+			vga_width=640;
 
 		
-		if(vga_al<480)
-			vga_al=480;
+		if(vga_height<480)
+			vga_height=480;
 		
 		
-		if(vga_an&1)
-			vga_an++;
+		if(vga_width&1)
+			vga_width++;
 
-		if(vga_al&1)
-			vga_al++;
+		if(vga_height&1)
+			vga_height++;
 
-		VS_ANCHO=vga_an;
-		VS_ALTO=vga_al;
+		VS_WIDTH=vga_width;
+		VS_HEIGHT=vga_height;
 
 
 		if(copia) {
 			free(copia-6);
 			copia=NULL;
 		}
-		if(barra) {
-			free(barra);
-			barra=NULL;
+		if(toolbar) {
+			free(toolbar);
+			toolbar=NULL;
 		}
 			
-		barra=(byte*)malloc(vga_an*19*big2);
-		if (!barra) return;
-		barra_x=8*big2; barra_y=vga_al-27*big2; regla=0; actual_mouse=21; sel_status=0;
+		toolbar=(byte*)malloc(vga_width*19*big2);
+		if (!toolbar) return;
+		toolbar_x=8*big2; toolbar_y=vga_height-27*big2; gradient=0; current_mouse=21; sel_status=0;
 
-		copia=(byte*)malloc(vga_an*vga_al+6)+6;
+		copia=(byte*)malloc(vga_width*vga_height+6)+6;
 		setup_video_mode();
-		preparar_tapiz();
+		prepare_wallpaper();
 	
-		if(strcmp((char *)v.titulo, (char *)texto[35])) {
+		if(strcmp((char *)v.title, (char *)texto[35])) {
 
 		for(n=max_windows;n>=0;n--) {
-			if(ventana[n].tipo) {
+			if(ventana[n].type) {
 
-				if (ventana[n].x+ventana[n].an>vga_an) 
-					ventana[n].x=vga_an-ventana[n].an;
+				if (ventana[n].x+ventana[n].an>vga_width) 
+					ventana[n].x=vga_width-ventana[n].an;
 		
 		
-				if (ventana[n].y+ventana[n].al>vga_al) 
-					ventana[n].y=vga_al-ventana[n].al;
+				if (ventana[n].y+ventana[n].al>vga_height) 
+					ventana[n].y=vga_height-ventana[n].al;
 
 	
 				if(ventana[n].x<=0)
@@ -586,8 +586,8 @@ while(SDL_PollEvent(&event) )
 		}	
 			
 		}
-		update_box(0,0,vga_an,vga_al);
-//		volcado_completo=1;
+		update_box(0,0,vga_width,vga_height);
+//		full_redraw=1;
 		blit_screen(copia);
 		InitSound();
 		soundstopped=0;

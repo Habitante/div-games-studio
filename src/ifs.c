@@ -677,7 +677,7 @@ int Jorge_Crea_el_font(int GenCode)
     }
     fwrite("fnt\x1a\x0d\x0a\x00\x00",8,1,fichFNT);
     fwrite(dac,768,1,fichFNT);
-    fwrite(reglas,sizeof(reglas),1,fichFNT);
+    fwrite(gradients,sizeof(gradients),1,fichFNT);
     fwrite(&GenCode,1,4,fichFNT);
 
     if (fwrite(tablaFNT,sizeof(tablaFNT),1,fichFNT)<1) {
@@ -774,7 +774,7 @@ int Jorge_Crea_el_font(int GenCode)
         return (IFS_WRITE_ERROR);
     }
 
-    fseek(fichFNT,8+768+sizeof(reglas)+4,SEEK_SET);
+    fseek(fichFNT,8+768+sizeof(gradients)+4,SEEK_SET);
     fwrite(&tablaFNT,sizeof(tablaFNT),1,fichFNT);
 
     Progress((char *)texto[217],256,256);
@@ -790,7 +790,7 @@ FILE *fichFnt;
 
         if ((fichFnt=fopen("PREVIEW.FNT","rb"))==NULL)
                 return;
-        fseek(fichFnt,8+768+sizeof(reglas)+4,SEEK_SET);
+        fseek(fichFnt,8+768+sizeof(gradients)+4,SEEK_SET);
         if (fread(tablaFNT,sizeof(tablaFNT),1,fichFnt)<1)
         {
                 fclose(fichFnt);
@@ -809,7 +809,7 @@ void GetCharSizeBuffer(int WhatChar,int *ancho,int *alto,char *buffer)
         *ancho=4;
         *alto=1;
 
-        memcpy(tablaFNT,buffer+8+768+sizeof(reglas)+4,sizeof(tablaFNT));
+        memcpy(tablaFNT,buffer+8+768+sizeof(gradients)+4,sizeof(tablaFNT));
         *alto=tablaFNT[WhatChar].incY+tablaFNT[WhatChar].alto;
         *ancho=tablaFNT[WhatChar].ancho+1;
 return;
@@ -821,7 +821,7 @@ FILE *fichFnt;
 char *rawBuffer;
         if ((fichFnt=fopen("PREVIEW.FNT","rb"))==NULL)
                 return 4;
-        fseek(fichFnt,8+768+sizeof(reglas)+4,SEEK_SET);
+        fseek(fichFnt,8+768+sizeof(gradients)+4,SEEK_SET);
         if (fread(tablaFNT,sizeof(tablaFNT),1,fichFnt)<1)
         {
                 fclose(fichFnt);
@@ -879,7 +879,7 @@ int ShowCharBuffer(int WhatChar,int cx,int cy,char *ptr,int an,char *buffer)
 {
 int y,iy,x,c;
 char *rawBuffer;
-        memcpy(tablaFNT,buffer+8+768+sizeof(reglas)+4,sizeof(tablaFNT));
+        memcpy(tablaFNT,buffer+8+768+sizeof(gradients)+4,sizeof(tablaFNT));
         if (tablaFNT[WhatChar].ancho && tablaFNT[WhatChar].alto)
         {
             rawBuffer=(char *) malloc(tablaFNT[WhatChar].ancho*tablaFNT[WhatChar].alto);
@@ -924,7 +924,7 @@ byte xlat[256];
         for (x=1;x<256;x++)
                 xlat[x]=find_color_not0(DacFnt[x*3],DacFnt[x*3+1],DacFnt[x*3+2]);
 
-        memcpy(tablaFNT,buffer+8+768+sizeof(reglas)+4,sizeof(tablaFNT));
+        memcpy(tablaFNT,buffer+8+768+sizeof(gradients)+4,sizeof(tablaFNT));
 
         for(x=0;x<256;x++)
         {

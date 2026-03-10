@@ -189,7 +189,7 @@ void SS2()
 /* Upper bits 11 - Lines skip 
 */
       if((Count & 0xc000)==0xc000) {  // 0xc000h = 1100000000000000
-        pDst+=(0x10000-Count)*vga_an;//flc.mainscreen->pitch;
+        pDst+=(0x10000-Count)*vga_width;//flc.mainscreen->pitch;
       }
 
       if((Count & 0xc000)==0x4000) {  // 0x4000h = 0100000000000000
@@ -226,7 +226,7 @@ void SS2()
           }
         }
       }
-      pDst+=vga_an;//=flc.mainscreen->pitch;
+      pDst+=vga_width;//=flc.mainscreen->pitch;
     } 
   }
 } /* SS2 */
@@ -265,7 +265,7 @@ void DECODE_COPY()
   while(Lines-- > 0) {
     memcpy(pDst, pSrc, flc.screen_w);
     pSrc+=flc.screen_w;
-    pDst+=vga_an;//flc.mainscreen->pitch;
+    pDst+=vga_width;//flc.mainscreen->pitch;
   }
 } /* DECODE_COPY */
 
@@ -275,7 +275,7 @@ void _BLACK()
   pDst=flc.buffer;//mainscreen->pixels;
   while(Lines-- > 0) {
     memset(pDst, 0, flc.screen_w);
-    pDst+=vga_an;//flc.mainscreen->pitch;
+    pDst+=vga_width;//flc.mainscreen->pitch;
   }
 } /* BLACK */
 
@@ -306,7 +306,7 @@ void DECODE_BRUN()
         }
       }
     }
-    pDst+=vga_an;//flc.mainscreen->pitch;
+    pDst+=vga_width;//flc.mainscreen->pitch;
   }
 } /* DECODE_BRUN */
 
@@ -324,7 +324,7 @@ void DECODE_LC()
 
   ReadU16(&tmp, pSrc);
   pSrc+=2;
-  pDst+=vga_an;//tmp*flc.mainscreen->pitch;
+  pDst+=vga_width;//tmp*flc.mainscreen->pitch;
   ReadU16(&Lines, pSrc);
   pSrc+=2;
   while(Lines--) {
@@ -348,7 +348,7 @@ void DECODE_LC()
         }
       }
     }
-    pDst+=vga_an;//flc.mainscreen->pitch;
+    pDst+=vga_width;//flc.mainscreen->pitch;
   }
 } /* DECODE_LC */
 

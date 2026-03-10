@@ -20,7 +20,7 @@ void draw_circle(int x0,int y0,int x1,int y1,int relleno);
 void _line_pixel(int x,int y);
 void select_fill(int n);
 void select_box(int n);
-void box2mab(void);
+void box_to_sel_mask(void);
 void effects(void);
 void cut_map(void);
 void test_previous(void);
@@ -31,9 +31,9 @@ int edit_mode_6_boxes(int s);
 int edit_mode_6_box_auto(int s);
 void test_next(void);
 void test_sel(void);
-void test_mab(void);
+void test_sel_mask(void);
 void write_char(int x, int y, byte c);
-void write_char2(int x, int y, byte * si, int font_an, int font_al);
+void write_char2(int x, int y, byte * si, int font_width, int font_height);
 void line_pixel(int x,int y);
 void circulo_scan2(int x,int y,int an);
 void circulo_scan(int x,int y,int an);
@@ -71,7 +71,7 @@ struct {
 //      Constantes
 //-----------------------------------------------------------------------------
 
-#define _ir 96 // Inicio regla de colores en la pantalla de edicion
+#define _ir 96 // Inicio gradient de colores en la pantalla de edicion
 #define max_int 65536
 
 extern int cierra_rapido;
@@ -88,7 +88,7 @@ int zoom_dx,zoom_dy,zoom_sx,zoom_sy;
 int zoom_speed=4; // más -> lento, menos -> rápido
 int _tab=0;
 
-int hotkey=1; // Indica si es se pueden utilizar hotkey (para barra de texto)
+int hotkey=1; // Indica si es se pueden utilizar hotkey (para toolbar de texto)
 
 int num_punto=0;
 
@@ -143,7 +143,7 @@ byte get_color(int x,int y) {
 }
 
 //-----------------------------------------------------------------------------
-//      Edit screen (edición genérica, sin modo definido)
+//      Edit screen (edición genérica, sin draw_mode definido)
 //-----------------------------------------------------------------------------
 
 void test_mouse_box(int a,int b,int c, int d) {
@@ -154,12 +154,12 @@ void test_mouse_box(int a,int b,int c, int d) {
     if (mouse_in(a+2,b+2,a+c-10,b+9)) mouse_graf=2;
     else if (mouse_in(a+c-9,b+2,a+c-2,b+9)) mouse_graf=5;
     else mouse_graf=1;
-  } else if (mouse_in(barra_x,barra_y,barra_x+barra_an*big2-1,barra_y+19*big2-1)) {
+  } else if (mouse_in(toolbar_x,toolbar_y,toolbar_x+toolbar_width*big2-1,toolbar_y+19*big2-1)) {
     if (big && !mouse_shift) { mouse_shift=1;
-      mouse_x=barra_x+(mouse_shift_x-barra_x)/2;
-      mouse_y=barra_y+(mouse_shift_y-barra_y)/2; }
-    if (mouse_in(barra_x,barra_y,barra_x+9,barra_y+9)) mouse_graf=2;
-    else if (mouse_in(barra_x,barra_y+10,barra_x+9,barra_y+18)) mouse_graf=5;
+      mouse_x=toolbar_x+(mouse_shift_x-toolbar_x)/2;
+      mouse_y=toolbar_y+(mouse_shift_y-toolbar_y)/2; }
+    if (mouse_in(toolbar_x,toolbar_y,toolbar_x+9,toolbar_y+9)) mouse_graf=2;
+    else if (mouse_in(toolbar_x,toolbar_y+10,toolbar_x+9,toolbar_y+18)) mouse_graf=5;
     else mouse_graf=1;
   } else mouse_graf=1;
 }
@@ -172,26 +172,26 @@ void test_mouse_box2(int a,int b,int c, int d) {
     if (mouse_in(a,b+2,a+c-10,b+9)) mouse_graf=2;
     else if (mouse_in(a+c-9,b+2,a+c-2,b+9)) mouse_graf=5;
     else mouse_graf=1;
-  } else if (mouse_in(barra_x,barra_y,barra_x+barra_an*big2-1,barra_y+19*big2-1)) {
+  } else if (mouse_in(toolbar_x,toolbar_y,toolbar_x+toolbar_width*big2-1,toolbar_y+19*big2-1)) {
     if (big && !mouse_shift) { mouse_shift=1;
-      mouse_x=barra_x+(mouse_shift_x-barra_x)/2;
-      mouse_y=barra_y+(mouse_shift_y-barra_y)/2; }
-    if (mouse_in(barra_x,barra_y,barra_x+9,barra_y+9)) mouse_graf=2;
-    else if (mouse_in(barra_x,barra_y+10,barra_x+9,barra_y+18)) mouse_graf=5;
+      mouse_x=toolbar_x+(mouse_shift_x-toolbar_x)/2;
+      mouse_y=toolbar_y+(mouse_shift_y-toolbar_y)/2; }
+    if (mouse_in(toolbar_x,toolbar_y,toolbar_x+9,toolbar_y+9)) mouse_graf=2;
+    else if (mouse_in(toolbar_x,toolbar_y+10,toolbar_x+9,toolbar_y+18)) mouse_graf=5;
     else mouse_graf=1;
-  } else if (mouse_in(zx,zy,zx+zan-1,zy+zal-1)) mouse_graf=actual_mouse-zoom;
+  } else if (mouse_in(zoom_win_x,zoom_win_y,zoom_win_x+zoom_win_width-1,zoom_win_y+zoom_win_height-1)) mouse_graf=current_mouse-zoom;
          else mouse_graf=1;
 }
 
 void test_mouse(void) {
-  if (mouse_in(barra_x,barra_y,barra_x+barra_an*big2-1,barra_y+19*big2-1)) {
+  if (mouse_in(toolbar_x,toolbar_y,toolbar_x+toolbar_width*big2-1,toolbar_y+19*big2-1)) {
     if (big && !mouse_shift) { mouse_shift=1;
-      mouse_x=barra_x+(mouse_shift_x-barra_x)/2;
-      mouse_y=barra_y+(mouse_shift_y-barra_y)/2; }
-    if (mouse_in(barra_x,barra_y,barra_x+9,barra_y+9)) mouse_graf=2;
-    else if (mouse_in(barra_x,barra_y+10,barra_x+9,barra_y+18)) mouse_graf=5;
+      mouse_x=toolbar_x+(mouse_shift_x-toolbar_x)/2;
+      mouse_y=toolbar_y+(mouse_shift_y-toolbar_y)/2; }
+    if (mouse_in(toolbar_x,toolbar_y,toolbar_x+9,toolbar_y+9)) mouse_graf=2;
+    else if (mouse_in(toolbar_x,toolbar_y+10,toolbar_x+9,toolbar_y+18)) mouse_graf=5;
     else mouse_graf=1;
-  } else if (mouse_in(zx,zy,zx+zan-1,zy+zal-1)) mouse_graf=actual_mouse-zoom;
+  } else if (mouse_in(zoom_win_x,zoom_win_y,zoom_win_x+zoom_win_width-1,zoom_win_y+zoom_win_height-1)) mouse_graf=current_mouse-zoom;
          else mouse_graf=1;
 }
 
@@ -205,8 +205,8 @@ void edit_scr(void) {
     // ...
 
     blit_edit();
-  } while (!salir_del_entorno && !(mouse_b&2) && !key(_ESC) && modo<100 &&
-    !(mouse_b && mouse_in(barra_x,barra_y+10,barra_x+9,barra_y+18)));
+  } while (!exit_requested && !(mouse_b&2) && !key(_ESC) && draw_mode<100 &&
+    !(mouse_b && mouse_in(toolbar_x,toolbar_y+10,toolbar_x+9,toolbar_y+18)));
 }
 
 //-----------------------------------------------------------------------------
@@ -223,25 +223,25 @@ void edit_mode_0(void) {
   do {
     draw_help(1295);
     edit_ruler(); select_color(2);
-    if (((mouse_b&1) && !(old_mouse_b&1)) && mouse_graf>=10) {
-      if (!mask[*(map+coord_x+coord_y*map_an)]) {
-        if (*(map+coord_x+coord_y*map_an)!=color) {
+    if (((mouse_b&1) && !(prev_mouse_buttons&1)) && mouse_graf>=10) {
+      if (!mask[*(map+coord_x+coord_y*map_width)]) {
+        if (*(map+coord_x+coord_y*map_width)!=color) {
           save_undo(coord_x,coord_y,1,1);
-          *(map+coord_x+coord_y*map_an)=color;
+          *(map+coord_x+coord_y*map_width)=color;
         } else {
           save_undo(coord_x,coord_y,1,1);
-          *(map+coord_x+coord_y*map_an)=0;
+          *(map+coord_x+coord_y*map_width)=0;
         }
       }
     }
 
     if (((mouse_b&1) && selected_icon==1) || (scan_code==14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
       undo_back(); do {read_mouse();} while(mouse_b&1);
-    } else if (scan_code==14 && (key(_L_SHIFT)||key(_R_SHIFT))) { undo_next(); hacer_zoom=1; }
+    } else if (scan_code==14 && (key(_L_SHIFT)||key(_R_SHIFT))) { undo_next(); need_zoom=1; }
 
     blit_edit();
-  } while (!salir_del_entorno && !(mouse_b&2) && !key(_ESC) && modo<100 &&
-    !(mouse_b && mouse_in(barra_x,barra_y+10,barra_x+9,barra_y+18)));
+  } while (!exit_requested && !(mouse_b&2) && !key(_ESC) && draw_mode<100 &&
+    !(mouse_b && mouse_in(toolbar_x,toolbar_y+10,toolbar_x+9,toolbar_y+18)));
 }
 
 //-----------------------------------------------------------------------------
@@ -284,12 +284,12 @@ void edit_mode_1(void) {
 
     if (((mouse_b&1) && selected_icon==1) || (scan_code==14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
       undo_back(); do {read_mouse();} while(mouse_b&1);
-    } else if (scan_code==14 && (key(_L_SHIFT)||key(_R_SHIFT))) { undo_next(); hacer_zoom=1; }
+    } else if (scan_code==14 && (key(_L_SHIFT)||key(_R_SHIFT))) { undo_next(); need_zoom=1; }
 
     _x=coord_x; _y=coord_y; _b=mouse_b;
     blit_edit();
-  } while (!salir_del_entorno && !(mouse_b&2) && !key(_ESC) && modo<100 &&
-    !(mouse_b && mouse_in(barra_x,barra_y+10,barra_x+9,barra_y+18)));
+  } while (!exit_requested && !(mouse_b&2) && !key(_ESC) && draw_mode<100 &&
+    !(mouse_b && mouse_in(toolbar_x,toolbar_y+10,toolbar_x+9,toolbar_y+18)));
 }
 
 //-----------------------------------------------------------------------------
@@ -340,20 +340,20 @@ void edit_mode_2(void) {
 
     if (((mouse_b&1) && selected_icon==1) || (scan_code==14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
       undo_back(); do {read_mouse();} while(mouse_b&1);
-    } else if (scan_code==14 && (key(_L_SHIFT)||key(_R_SHIFT))) { undo_next(); hacer_zoom=1; }
+    } else if (scan_code==14 && (key(_L_SHIFT)||key(_R_SHIFT))) { undo_next(); need_zoom=1; }
 
     analyze_bar(an+1,al+1);
     blit_edit();
 
     if (back) {
-      undo_back(); if (hacer_zoom==1) zoom_map();
-      else if (hacer_zoom==-1 && hacer_zoom_an>0 && hacer_zoom_al>0)
-        draw_edit_background(hacer_zoom_x,hacer_zoom_y,hacer_zoom_an,hacer_zoom_al);
-      hacer_zoom_an=0; hacer_zoom_al=0; hacer_zoom=0;
+      undo_back(); if (need_zoom==1) zoom_map();
+      else if (need_zoom==-1 && need_zoom_width>0 && need_zoom_height>0)
+        draw_edit_background(need_zoom_x,need_zoom_y,need_zoom_width,need_zoom_height);
+      need_zoom_width=0; need_zoom_height=0; need_zoom=0;
     }
 
-  } while (!salir_del_entorno && !(mouse_b&2) && !(key(_ESC)&&s!=1) && modo<100 &&
-    !(mouse_b && mouse_in(barra_x,barra_y+10,barra_x+9,barra_y+18)));
+  } while (!exit_requested && !(mouse_b&2) && !(key(_ESC)&&s!=1) && draw_mode<100 &&
+    !(mouse_b && mouse_in(toolbar_x,toolbar_y+10,toolbar_x+9,toolbar_y+18)));
 }
 
 //-----------------------------------------------------------------------------
@@ -407,20 +407,20 @@ void edit_mode_3(void) {
 
     if (((mouse_b&1) && selected_icon==1) || (scan_code==14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
       undo_back(); do {read_mouse();} while(mouse_b&1);
-    } else if (scan_code==14 && (key(_L_SHIFT)||key(_R_SHIFT))) { undo_next(); hacer_zoom=1; }
+    } else if (scan_code==14 && (key(_L_SHIFT)||key(_R_SHIFT))) { undo_next(); need_zoom=1; }
 
     analyze_bar(an+1,al+1);
     blit_edit();
 
     if (back) {
-      undo_back(); if (hacer_zoom==1) zoom_map();
-      else if (hacer_zoom==-1 && hacer_zoom_an>0 && hacer_zoom_al>0)
-        draw_edit_background(hacer_zoom_x,hacer_zoom_y,hacer_zoom_an,hacer_zoom_al);
-      hacer_zoom_an=0; hacer_zoom_al=0; hacer_zoom=0;
+      undo_back(); if (need_zoom==1) zoom_map();
+      else if (need_zoom==-1 && need_zoom_width>0 && need_zoom_height>0)
+        draw_edit_background(need_zoom_x,need_zoom_y,need_zoom_width,need_zoom_height);
+      need_zoom_width=0; need_zoom_height=0; need_zoom=0;
     }
 
-  } while (!salir_del_entorno && !(mouse_b&2) && !(key(_ESC)&&s!=1) && modo<100 &&
-    !(mouse_b && mouse_in(barra_x,barra_y+10,barra_x+9,barra_y+18)));
+  } while (!exit_requested && !(mouse_b&2) && !(key(_ESC)&&s!=1) && draw_mode<100 &&
+    !(mouse_b && mouse_in(toolbar_x,toolbar_y+10,toolbar_x+9,toolbar_y+18)));
 }
 
 //-----------------------------------------------------------------------------
@@ -497,19 +497,19 @@ void edit_mode_4(void) {
 
     if (((mouse_b&1) && selected_icon==1) || (scan_code==14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
       undo_back(); do {read_mouse();} while(mouse_b&1);
-    } else if (scan_code==14 && (key(_L_SHIFT)||key(_R_SHIFT))) { undo_next(); hacer_zoom=1; }
+    } else if (scan_code==14 && (key(_L_SHIFT)||key(_R_SHIFT))) { undo_next(); need_zoom=1; }
 
     blit_edit();
 
     if (back) {
-      undo_back(); if (hacer_zoom==1) zoom_map();
-      else if (hacer_zoom==-1 && hacer_zoom_an>0 && hacer_zoom_al>0)
-        draw_edit_background(hacer_zoom_x,hacer_zoom_y,hacer_zoom_an,hacer_zoom_al);
-      hacer_zoom_an=0; hacer_zoom_al=0; hacer_zoom=0;
+      undo_back(); if (need_zoom==1) zoom_map();
+      else if (need_zoom==-1 && need_zoom_width>0 && need_zoom_height>0)
+        draw_edit_background(need_zoom_x,need_zoom_y,need_zoom_width,need_zoom_height);
+      need_zoom_width=0; need_zoom_height=0; need_zoom=0;
     }
 
-  } while (!salir_del_entorno && !(mouse_b&2) && !(key(_ESC)&&s!=1) && modo<100 &&
-    !(mouse_b && mouse_in(barra_x,barra_y+10,barra_x+9,barra_y+18)));
+  } while (!exit_requested && !(mouse_b&2) && !(key(_ESC)&&s!=1) && draw_mode<100 &&
+    !(mouse_b && mouse_in(toolbar_x,toolbar_y+10,toolbar_x+9,toolbar_y+18)));
 }
 
 //-----------------------------------------------------------------------------
@@ -593,19 +593,19 @@ void edit_mode_5(void) {
 
     if (((mouse_b&1) && selected_icon==1) || (scan_code==14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
       undo_back(); do {read_mouse();} while(mouse_b&1);
-    } else if (scan_code==14 && (key(_L_SHIFT)||key(_R_SHIFT))) { undo_next(); hacer_zoom=1; }
+    } else if (scan_code==14 && (key(_L_SHIFT)||key(_R_SHIFT))) { undo_next(); need_zoom=1; }
 
     blit_edit();
 
     if (back) {
-      undo_back(); if (hacer_zoom==1) zoom_map();
-      else if (hacer_zoom==-1 && hacer_zoom_an>0 && hacer_zoom_al>0)
-        draw_edit_background(hacer_zoom_x,hacer_zoom_y,hacer_zoom_an,hacer_zoom_al);
-      hacer_zoom_an=0; hacer_zoom_al=0; hacer_zoom=0;
+      undo_back(); if (need_zoom==1) zoom_map();
+      else if (need_zoom==-1 && need_zoom_width>0 && need_zoom_height>0)
+        draw_edit_background(need_zoom_x,need_zoom_y,need_zoom_width,need_zoom_height);
+      need_zoom_width=0; need_zoom_height=0; need_zoom=0;
     }
 
-  } while (!salir_del_entorno && !(mouse_b&2) && !(key(_ESC)&&s!=1) && modo<100 &&
-    !(mouse_b && mouse_in(barra_x,barra_y+10,barra_x+9,barra_y+18)));
+  } while (!exit_requested && !(mouse_b&2) && !(key(_ESC)&&s!=1) && draw_mode<100 &&
+    !(mouse_b && mouse_in(toolbar_x,toolbar_y+10,toolbar_x+9,toolbar_y+18)));
 }
 
 //-----------------------------------------------------------------------------
@@ -616,9 +616,9 @@ int iconos_caja[]={2,1,110,111};
 
 void select_rect(int n) {
   int r;
-  r=select_icon(barra_x+48+n*16,iconos_caja);
+  r=select_icon(toolbar_x+48+n*16,iconos_caja);
   if (r>=0) {
-    modo_caja=r; bar[13]=iconos_caja[2+modo_caja];
+    mode_rect=r; bar[13]=iconos_caja[2+mode_rect];
     draw_bar(22); draw_ruler();
   }
 }
@@ -632,14 +632,14 @@ void edit_mode_6(void) {
 
   bar[0]=101+zoom; bar[1]=121;
   for (a=2;a<11;a++) { bar[a]=1; } bar[11]=166;
-  bar[12]=119; bar[13]=iconos_caja[2+modo_caja]; bar[14]=0; bar[15]=0;
+  bar[12]=119; bar[13]=iconos_caja[2+mode_rect]; bar[14]=0; bar[15]=0;
   draw_bar(22); draw_ruler();
 
   s=0; do {
     draw_help(1295);
     edit_ruler(); select_fx(12,&efecto6); select_color(2);
 
-    an=map_an*2; al=0; back=0; switch(s) {
+    an=map_width*2; al=0; back=0; switch(s) {
       case 0:
         if ((mouse_b&1) && mouse_graf>=10) {
           s=1; x0=coord_x; y0=coord_y;
@@ -666,23 +666,23 @@ void edit_mode_6(void) {
 
     if (((mouse_b&1) && selected_icon==1) || (scan_code==14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
       undo_back(); do {read_mouse();} while(mouse_b&1);
-    } else if (scan_code==14 && (key(_L_SHIFT)||key(_R_SHIFT))) { undo_next(); hacer_zoom=1; }
+    } else if (scan_code==14 && (key(_L_SHIFT)||key(_R_SHIFT))) { undo_next(); need_zoom=1; }
 
     select_rect(13);
 
-    if (an==map_an*2) analyze_bar(0,0);
+    if (an==map_width*2) analyze_bar(0,0);
     else analyze_bar(abs(an)+1,abs(al)+1);
     blit_edit();
 
     if (back) {
-      undo_back(); if (hacer_zoom==1) zoom_map();
-      else if (hacer_zoom==-1 && hacer_zoom_an>0 && hacer_zoom_al>0)
-        draw_edit_background(hacer_zoom_x,hacer_zoom_y,hacer_zoom_an,hacer_zoom_al);
-      hacer_zoom_an=0; hacer_zoom_al=0; hacer_zoom=0;
+      undo_back(); if (need_zoom==1) zoom_map();
+      else if (need_zoom==-1 && need_zoom_width>0 && need_zoom_height>0)
+        draw_edit_background(need_zoom_x,need_zoom_y,need_zoom_width,need_zoom_height);
+      need_zoom_width=0; need_zoom_height=0; need_zoom=0;
     }
 
-  } while (!salir_del_entorno && !(mouse_b&2) && !(key(_ESC)&&s!=1) && modo<100 &&
-    !(mouse_b && mouse_in(barra_x,barra_y+10,barra_x+9,barra_y+18)));
+  } while (!exit_requested && !(mouse_b&2) && !(key(_ESC)&&s!=1) && draw_mode<100 &&
+    !(mouse_b && mouse_in(toolbar_x,toolbar_y+10,toolbar_x+9,toolbar_y+18)));
 }
 
 //-----------------------------------------------------------------------------
@@ -693,9 +693,9 @@ int iconos_circulo[]={4,1,175,176,112,113};
 
 void select_circle(int n) {
   int r;
-  r=select_icon(barra_x+48+n*16,iconos_circulo);
+  r=select_icon(toolbar_x+48+n*16,iconos_circulo);
   if (r>=0) {
-    modo_circulo=r; bar[13]=iconos_circulo[2+modo_circulo];
+    mode_circle=r; bar[13]=iconos_circulo[2+mode_circle];
     draw_bar(22); draw_ruler();
   }
 }
@@ -709,14 +709,14 @@ void edit_mode_7(void) {
 
   bar[0]=101+zoom; bar[1]=121;
   for (a=2;a<11;a++) { bar[a]=1; } bar[11]=166;
-  bar[12]=119; bar[13]=iconos_circulo[2+modo_circulo]; bar[14]=0; bar[15]=0;
+  bar[12]=119; bar[13]=iconos_circulo[2+mode_circle]; bar[14]=0; bar[15]=0;
   draw_bar(22); draw_ruler();
 
   s=0; do {
     draw_help(1295);
     edit_ruler(); select_fx(12,&efecto7); select_color(2);
 
-    an=map_an*2; al=0; back=0; switch(s) {
+    an=map_width*2; al=0; back=0; switch(s) {
       case 0:
         if ((mouse_b&1) && mouse_graf>=10) {
           s=1; x0=coord_x; y0=coord_y;
@@ -725,15 +725,15 @@ void edit_mode_7(void) {
       case 1:
         if (mouse_graf>=10) {
           line_fx=efecto7;
-          if (modo_circulo<2) {
+          if (mode_circle<2) {
             an=coord_x-x0; al=coord_y-y0;
             if (key(_L_CTRL) || key(_R_CTRL)) {
               if (abs(an)>abs(al)) { if (al<0) al=-abs(an); else al=abs(an); }
               else { if (an<0) an=-abs(al); else an=abs(al); }
-              undo_error=0; draw_circle(x0,y0,x0+an,y0+al,modo_circulo&1);
+              undo_error=0; draw_circle(x0,y0,x0+an,y0+al,mode_circle&1);
               if (undo_error) s=0;
             } else {
-              undo_error=0; draw_circle(x0,y0,coord_x,coord_y,modo_circulo&1);
+              undo_error=0; draw_circle(x0,y0,coord_x,coord_y,mode_circle&1);
               if (undo_error) s=0;
             }
           } else {
@@ -741,10 +741,10 @@ void edit_mode_7(void) {
             if (key(_L_CTRL) || key(_R_CTRL)) {
               if (abs(an)>abs(al)) { if (al<0) al=-abs(an); else al=abs(an); }
               else { if (an<0) an=-abs(al); else an=abs(al); }
-              undo_error=0; draw_circle(x0-an,y0-an,x0+an,y0+an,modo_circulo&1);
+              undo_error=0; draw_circle(x0-an,y0-an,x0+an,y0+an,mode_circle&1);
               if (undo_error) s=0;
             } else {
-              undo_error=0; draw_circle(x0-an,y0-al,x0+an,y0+al,modo_circulo&1);
+              undo_error=0; draw_circle(x0-an,y0-al,x0+an,y0+al,mode_circle&1);
               if (undo_error) s=0;
             }
           }
@@ -758,23 +758,23 @@ void edit_mode_7(void) {
 
     if (((mouse_b&1) && selected_icon==1) || (scan_code==14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
       undo_back(); do {read_mouse();} while(mouse_b&1);
-    } else if (scan_code==14 && (key(_L_SHIFT)||key(_R_SHIFT))) { undo_next(); hacer_zoom=1; }
+    } else if (scan_code==14 && (key(_L_SHIFT)||key(_R_SHIFT))) { undo_next(); need_zoom=1; }
 
     select_circle(13);
 
-    if (an==map_an*2) analyze_bar(0,0);
+    if (an==map_width*2) analyze_bar(0,0);
     else analyze_bar(abs(an)+1,abs(al)+1);
     blit_edit();
 
     if (back) {
-      undo_back(); if (hacer_zoom==1) zoom_map();
-      else if (hacer_zoom==-1 && hacer_zoom_an>0 && hacer_zoom_al>0)
-        draw_edit_background(hacer_zoom_x,hacer_zoom_y,hacer_zoom_an,hacer_zoom_al);
-      hacer_zoom_an=0; hacer_zoom_al=0; hacer_zoom=0;
+      undo_back(); if (need_zoom==1) zoom_map();
+      else if (need_zoom==-1 && need_zoom_width>0 && need_zoom_height>0)
+        draw_edit_background(need_zoom_x,need_zoom_y,need_zoom_width,need_zoom_height);
+      need_zoom_width=0; need_zoom_height=0; need_zoom=0;
     }
 
-  } while (!salir_del_entorno && !(mouse_b&2) && !(key(_ESC)&&s!=1) && modo<100 &&
-    !(mouse_b && mouse_in(barra_x,barra_y+10,barra_x+9,barra_y+18)));
+  } while (!exit_requested && !(mouse_b&2) && !(key(_ESC)&&s!=1) && draw_mode<100 &&
+    !(mouse_b && mouse_in(toolbar_x,toolbar_y+10,toolbar_x+9,toolbar_y+18)));
 }
 
 //-----------------------------------------------------------------------------
@@ -785,27 +785,27 @@ void zoom_region(int x, int y, int an, int al) {
 
   if (x<0) { an+=x; x=0; }
   if (y<0) { al+=y; y=0; }
-  if (x+an>map_an) { an=map_an-x; }
-  if (y+al>map_al) { al=map_al-y; }
+  if (x+an>map_width) { an=map_width-x; }
+  if (y+al>map_height) { al=map_height-y; }
   if (an<=0 || al<=0) return;
 
   // Determina la zona de zoom a refrescar
 
-  if (x<zoom_x) hacer_zoom_x=zx-((zoom_x-x)<<zoom);
-  else hacer_zoom_x=zx+((x-zoom_x)<<zoom);
-  if (y<zoom_y) hacer_zoom_y=zy+((y-zoom_y)<<zoom);
-  else hacer_zoom_y=zy+((y-zoom_y)<<zoom);
-  hacer_zoom_an=an<<zoom; hacer_zoom_al=al<<zoom;
+  if (x<zoom_x) need_zoom_x=zoom_win_x-((zoom_x-x)<<zoom);
+  else need_zoom_x=zoom_win_x+((x-zoom_x)<<zoom);
+  if (y<zoom_y) need_zoom_y=zoom_win_y+((y-zoom_y)<<zoom);
+  else need_zoom_y=zoom_win_y+((y-zoom_y)<<zoom);
+  need_zoom_width=an<<zoom; need_zoom_height=al<<zoom;
 
-  if (hacer_zoom_x+hacer_zoom_an<=zx || hacer_zoom_y+hacer_zoom_al<=zy ||
-      hacer_zoom_x>=zx+zan || hacer_zoom_y>=zy+zal) {
-    hacer_zoom_an=0; hacer_zoom_al=0;
+  if (need_zoom_x+need_zoom_width<=zoom_win_x || need_zoom_y+need_zoom_height<=zoom_win_y ||
+      need_zoom_x>=zoom_win_x+zoom_win_width || need_zoom_y>=zoom_win_y+zoom_win_height) {
+    need_zoom_width=0; need_zoom_height=0;
   } else {
-    if (hacer_zoom_x<zx) { hacer_zoom_an-=zx-hacer_zoom_x; hacer_zoom_x=zx; }
-    if (hacer_zoom_y<zy) { hacer_zoom_al-=zy-hacer_zoom_y; hacer_zoom_y=zy; }
-    if (hacer_zoom_x+hacer_zoom_an>zx+zan) hacer_zoom_an=zx+zan-hacer_zoom_x;
-    if (hacer_zoom_y+hacer_zoom_al>zy+zal) hacer_zoom_al=zy+zal-hacer_zoom_y;
-    if (!hacer_zoom) hacer_zoom=-1;
+    if (need_zoom_x<zoom_win_x) { need_zoom_width-=zoom_win_x-need_zoom_x; need_zoom_x=zoom_win_x; }
+    if (need_zoom_y<zoom_win_y) { need_zoom_height-=zoom_win_y-need_zoom_y; need_zoom_y=zoom_win_y; }
+    if (need_zoom_x+need_zoom_width>zoom_win_x+zoom_win_width) need_zoom_width=zoom_win_x+zoom_win_width-need_zoom_x;
+    if (need_zoom_y+need_zoom_height>zoom_win_y+zoom_win_height) need_zoom_height=zoom_win_y+zoom_win_height-need_zoom_y;
+    if (!need_zoom) need_zoom=-1;
   }
 }
 
@@ -821,7 +821,7 @@ int iconos_spray[]={6,1,181,182,183,184,185,186};
 
 void select_spray(int n) {
   int r;
-  r=select_icon(barra_x+48+n*16,iconos_spray);
+  r=select_icon(toolbar_x+48+n*16,iconos_spray);
   if (r>=0) {
     modo_spray=r; bar[13]=iconos_spray[2+modo_spray];
     draw_bar(0); draw_ruler();
@@ -902,13 +902,13 @@ void edit_mode_8(void) {
 
     if (((mouse_b&1) && selected_icon==1) || (scan_code==14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
       undo_back(); do {read_mouse();} while(mouse_b&1);
-    } else if (scan_code==14 && (key(_L_SHIFT)||key(_R_SHIFT))) { undo_next(); hacer_zoom=1; }
+    } else if (scan_code==14 && (key(_L_SHIFT)||key(_R_SHIFT))) { undo_next(); need_zoom=1; }
 
     n=modo_spray; select_spray(13); if (n!=modo_spray) u=undo_spray;
 
     blit_edit();
-  } while (!salir_del_entorno && !(mouse_b&2) && !key(_ESC) && modo<100 &&
-    !(mouse_b && mouse_in(barra_x,barra_y+10,barra_x+9,barra_y+18)));
+  } while (!exit_requested && !(mouse_b&2) && !key(_ESC) && draw_mode<100 &&
+    !(mouse_b && mouse_in(toolbar_x,toolbar_y+10,toolbar_x+9,toolbar_y+18)));
 }
 
 
@@ -923,27 +923,27 @@ void edit_mode_9(void) {
 
   bar[0]=101+zoom; bar[1]=121;
   for (a=2;a<11;a++) { bar[a]=1; } bar[11]=166;
-  bar[12]=iconos_fill[2+modo_fill]; bar[13]=0;
+  bar[12]=iconos_fill[2+mode_fill]; bar[13]=0;
   draw_bar(0); draw_ruler();
 
   do {
     draw_help(1295);
     edit_ruler(); select_fill(12); select_color(2);
 
-    if ((mouse_b&1) && !(old_mouse_b&1) && mouse_graf>=10) {
-      if (!mask[*(map+coord_y*map_an+coord_x)] && (*(map+coord_y*map_an+coord_x)!=color || modo_fill==3 || textura_color!=NULL)) {
+    if ((mouse_b&1) && !(prev_mouse_buttons&1) && mouse_graf>=10) {
+      if (!mask[*(map+coord_y*map_width+coord_x)] && (*(map+coord_y*map_width+coord_x)!=color || mode_fill==3 || textura_color!=NULL)) {
         fill(coord_x,coord_y);
       }
     }
 
     if (((mouse_b&1) && selected_icon==1) || (scan_code==14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
       undo_back(); do {read_mouse();} while(mouse_b&1);
-    } else if (scan_code==14 && (key(_L_SHIFT)||key(_R_SHIFT))) { undo_next(); hacer_zoom=1; }
+    } else if (scan_code==14 && (key(_L_SHIFT)||key(_R_SHIFT))) { undo_next(); need_zoom=1; }
 
     blit_edit();
 
-  } while (!salir_del_entorno && !(mouse_b&2) && !key(_ESC) && modo<100 &&
-    !(mouse_b && mouse_in(barra_x,barra_y+10,barra_x+9,barra_y+18)));
+  } while (!exit_requested && !(mouse_b&2) && !key(_ESC) && draw_mode<100 &&
+    !(mouse_b && mouse_in(toolbar_x,toolbar_y+10,toolbar_x+9,toolbar_y+18)));
 }
 
 //-----------------------------------------------------------------------------
@@ -957,8 +957,8 @@ void block_bar(int n) {
     case 0:
       bar[0]=101+zoom; bar[1]=121; for (a=2;a<11;a++) bar[a]=1;
       bar[11]=166; bar[13]=0; bar[14]=0;
-      if (modo_seleccion<4) bar[12]=135+modo_seleccion;
-      else bar[12]=modo_seleccion+169-4;
+      if (mode_selection<4) bar[12]=135+mode_selection;
+      else bar[12]=mode_selection+169-4;
       draw_bar(22); draw_ruler();
       break;
     case 1:
@@ -985,8 +985,8 @@ void edit_mode_10(void) {
     edit_ruler(); select_color(2);
 
     if (((mouse_b&1) && selected_icon==1) || (scan_code==14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
-      undo_back(); hacer_zoom=1; do {read_mouse();} while(mouse_b&1);
-    } else if (scan_code==14 && (key(_L_SHIFT)||key(_R_SHIFT))) { undo_next(); hacer_zoom=1; }
+      undo_back(); need_zoom=1; do {read_mouse();} while(mouse_b&1);
+    } else if (scan_code==14 && (key(_L_SHIFT)||key(_R_SHIFT))) { undo_next(); need_zoom=1; }
 
     switch(s) {
       case 0: case 1:
@@ -996,20 +996,20 @@ void edit_mode_10(void) {
 
         if ((mouse_b&1) && selected_icon==12) { // *** Mover, Copiar, ...
           do {read_mouse();} while(mouse_b&1);
-          sel_status=0; box2mab(); move_selection(NULL,0,0);
-          if (modo<100) { block_bar(1); sel_status=1; }
-          zoom_background=0; hacer_zoom=1;
+          sel_status=0; box_to_sel_mask(); move_selection(NULL,0,0);
+          if (draw_mode<100) { block_bar(1); sel_status=1; }
+          zoom_background=0; need_zoom=1;
           do {read_mouse();} while(mouse_b || key(_ESC));
         }
         if ((mouse_b&1) && selected_icon==13) { // *** Efectos
           do {read_mouse();} while(mouse_b&1);
-          box2mab(); effects();
-          if (modo<100) { block_bar(1); sel_status=1; }
-          zoom_background=0; hacer_zoom=1;
+          box_to_sel_mask(); effects();
+          if (draw_mode<100) { block_bar(1); sel_status=1; }
+          zoom_background=0; need_zoom=1;
           do {read_mouse();} while(mouse_b || key(_ESC));
         }
         if (((mouse_b&1) && selected_icon==14) || key(_K)) { // *** Cortar ventana
-          s=0; sel_status=0; block_bar(0); hacer_zoom=1;
+          s=0; sel_status=0; block_bar(0); need_zoom=1;
 	  cut_map();
           do {read_mouse();} while(mouse_b || key(_ESC));
         } break;
@@ -1018,36 +1018,36 @@ void edit_mode_10(void) {
     test_previous();
 
     if ((key(_L_CTRL)||key(_R_CTRL)) && (mouse_b&1) && mouse_graf>=10 && sel_status && s>=2) {
-      if (modo_seleccion==0 || modo_seleccion==4 || (modo_seleccion==3 && s<2)) {
+      if (mode_selection==0 || mode_selection==4 || (mode_selection==3 && s<2)) {
         x=coord_x-(sel_x1-sel_x0)/2;
         y=coord_y-(sel_y1-sel_y0)/2;
         if (x<0) { x=0; } if (y<0) { y=0; }
-        if (x+sel_x1-sel_x0>=map_an) { x=map_an-(sel_x1-sel_x0)-1; }
-        if (y+sel_y1-sel_y0>=map_al) { y=map_al-(sel_y1-sel_y0)-1; }
+        if (x+sel_x1-sel_x0>=map_width) { x=map_width-(sel_x1-sel_x0)-1; }
+        if (y+sel_y1-sel_y0>=map_height) { y=map_height-(sel_y1-sel_y0)-1; }
         sel_x1-=sel_x0; sel_x0=x; sel_x1+=x;
         sel_y1-=sel_y0; sel_y0=y; sel_y1+=y;
       } else {
-        x=coord_x-(mab_x1-mab_x0)/2;
-        y=coord_y-(mab_y1-mab_y0)/2;
+        x=coord_x-(sel_mask_x1-sel_mask_x0)/2;
+        y=coord_y-(sel_mask_y1-sel_mask_y0)/2;
         if (x<0) { x=0; } if (y<0) { y=0; }
-      	if (x+mab_x1-mab_x0>=map_an) x=map_an-(mab_x1-mab_x0)-1;
-      	if (y+mab_y1-mab_y0>=map_al) y=map_al-(mab_y1-mab_y0)-1;
-        if ((m=(int*)malloc(((map_an*map_al+31)/32)*4))!=NULL) {
-      	  memcpy(m,mab,((map_an*map_al+31)/32)*4);
-      	  memset(mab,0,((map_an*map_al+31)/32)*4);
-          for (a=mab_y0;a<=mab_y1;a++)
-            for (b=mab_x0;b<=mab_x1;b++) {
-              aa=a; bb=b; bb+=aa*map_an; aa=bb>>5; bb&=31;
-              if (*(m+aa)&(1<<bb)) set_mab(b+x-mab_x0,a+y-mab_y0);
+      	if (x+sel_mask_x1-sel_mask_x0>=map_width) x=map_width-(sel_mask_x1-sel_mask_x0)-1;
+      	if (y+sel_mask_y1-sel_mask_y0>=map_height) y=map_height-(sel_mask_y1-sel_mask_y0)-1;
+        if ((m=(int*)malloc(((map_width*map_height+31)/32)*4))!=NULL) {
+      	  memcpy(m,selection_mask,((map_width*map_height+31)/32)*4);
+      	  memset(selection_mask,0,((map_width*map_height+31)/32)*4);
+          for (a=sel_mask_y0;a<=sel_mask_y1;a++)
+            for (b=sel_mask_x0;b<=sel_mask_x1;b++) {
+              aa=a; bb=b; bb+=aa*map_width; aa=bb>>5; bb&=31;
+              if (*(m+aa)&(1<<bb)) set_selection_mask(b+x-sel_mask_x0,a+y-sel_mask_y0);
             }
-      	  mab_x1-=mab_x0; mab_x0=x; mab_x1+=x;
-      	  mab_y1-=mab_y0; mab_y0=y; mab_y1+=y;
+      	  sel_mask_x1-=sel_mask_x0; sel_mask_x0=x; sel_mask_x1+=x;
+      	  sel_mask_y1-=sel_mask_y0; sel_mask_y0=y; sel_mask_y1+=y;
           free(m);
         } else {
-          v_texto=(char *)texto[45]; show_dialog(err0);
+          v_text=(char *)texto[45]; show_dialog(err0);
         }
       }
-    } else switch(modo_seleccion) {
+    } else switch(mode_selection) {
       case 0: s=edit_mode_6_box(s); break;
       case 1: s=edit_mode_6_fill(s); break;
       case 2: s=edit_mode_6_lines(s); break;
@@ -1058,19 +1058,19 @@ void edit_mode_10(void) {
 
     test_next();
 
-    if (modo_seleccion==0 || modo_seleccion==4 || (modo_seleccion==3 && s<2)) {
+    if (mode_selection==0 || mode_selection==4 || (mode_selection==3 && s<2)) {
       if (sel_x1>=sel_x0) an=sel_x1-sel_x0+1; else an=sel_x0-sel_x1+1;
       if (sel_y1>=sel_y0) al=sel_y1-sel_y0+1; else al=sel_y0-sel_y1+1;
       if (sel_status==0) { an=0; al=0; }
     } else {
-      if (mab_x1>=mab_x0) an=mab_x1-mab_x0+1; else an=mab_x0-mab_x1+1;
-      if (mab_y1>=mab_y0) al=mab_y1-mab_y0+1; else al=mab_y0-mab_y1+1;
+      if (sel_mask_x1>=sel_mask_x0) an=sel_mask_x1-sel_mask_x0+1; else an=sel_mask_x0-sel_mask_x1+1;
+      if (sel_mask_y1>=sel_mask_y0) al=sel_mask_y1-sel_mask_y0+1; else al=sel_mask_y0-sel_mask_y1+1;
       if (sel_status==0) { an=0; al=0; }
     } analyze_bar(an,al);
 
     blit_edit();
-  } while (!salir_del_entorno && !(mouse_b&2) && !(key(_ESC)&&s!=1&&s!=2) && modo<100 &&
-    !(mouse_b && mouse_in(barra_x,barra_y+10,barra_x+9,barra_y+18)));
+  } while (!exit_requested && !(mouse_b&2) && !(key(_ESC)&&s!=1&&s!=2) && draw_mode<100 &&
+    !(mouse_b && mouse_in(toolbar_x,toolbar_y+10,toolbar_x+9,toolbar_y+18)));
 
   sel_status=0;
 }
@@ -1078,55 +1078,55 @@ void edit_mode_10(void) {
 void test_previous(void) {
 
   // Todo esto se añade para do_calculate la zona a refrescar, en lugar de
-  // hacer un sencillo "hacer_zoom=1"
+  // hacer un sencillo "need_zoom=1"
 
-  hacer_zoom_x=map_an; hacer_zoom_y=map_al;
-  hacer_zoom_an=0; hacer_zoom_al=0;
+  need_zoom_x=map_width; need_zoom_y=map_height;
+  need_zoom_width=0; need_zoom_height=0;
 
-  if (sel_status) switch(modo_seleccion) {
+  if (sel_status) switch(mode_selection) {
     case 0: test_sel(); break;
-    case 1: test_mab(); break;
-    case 2: test_mab(); break;
-    case 3: test_sel(); test_mab(); break;
+    case 1: test_sel_mask(); break;
+    case 2: test_sel_mask(); break;
+    case 3: test_sel(); test_sel_mask(); break;
     case 4: test_sel(); break;
-    case 5: test_mab(); break;
+    case 5: test_sel_mask(); break;
   }
 
 }
 void test_next(void) {
   int x,y,an,al;
 
-  if (sel_status) switch(modo_seleccion) {
+  if (sel_status) switch(mode_selection) {
     case -1: test_sel(); break;
     case 0: test_sel(); break;
-    case 1: test_mab(); break;
-    case 2: test_mab(); break;
-    case 3: test_sel(); test_mab(); break;
+    case 1: test_sel_mask(); break;
+    case 2: test_sel_mask(); break;
+    case 3: test_sel(); test_sel_mask(); break;
     case 4: test_sel(); break;
-    case 5: test_mab(); break;
+    case 5: test_sel_mask(); break;
   }
 
   // Determina la zona de zoom a refrescar en pantalla
 
-  x=hacer_zoom_x; y=hacer_zoom_y;
-  an=hacer_zoom_an-hacer_zoom_x+1;
-  al=hacer_zoom_al-hacer_zoom_y+1;
+  x=need_zoom_x; y=need_zoom_y;
+  an=need_zoom_width-need_zoom_x+1;
+  al=need_zoom_height-need_zoom_y+1;
 
-  if (x<zoom_x) hacer_zoom_x=zx-((zoom_x-x)<<zoom);
-  else hacer_zoom_x=zx+((x-zoom_x)<<zoom);
-  if (y<zoom_y) hacer_zoom_y=zy+((y-zoom_y)<<zoom);
-  else hacer_zoom_y=zy+((y-zoom_y)<<zoom);
-  hacer_zoom_an=an<<zoom; hacer_zoom_al=al<<zoom;
+  if (x<zoom_x) need_zoom_x=zoom_win_x-((zoom_x-x)<<zoom);
+  else need_zoom_x=zoom_win_x+((x-zoom_x)<<zoom);
+  if (y<zoom_y) need_zoom_y=zoom_win_y+((y-zoom_y)<<zoom);
+  else need_zoom_y=zoom_win_y+((y-zoom_y)<<zoom);
+  need_zoom_width=an<<zoom; need_zoom_height=al<<zoom;
 
-  if (hacer_zoom_x+hacer_zoom_an<=zx || hacer_zoom_y+hacer_zoom_al<=zy ||
-      hacer_zoom_x>=zx+zan || hacer_zoom_y>=zy+zal) {
-    hacer_zoom_an=0; hacer_zoom_al=0;
+  if (need_zoom_x+need_zoom_width<=zoom_win_x || need_zoom_y+need_zoom_height<=zoom_win_y ||
+      need_zoom_x>=zoom_win_x+zoom_win_width || need_zoom_y>=zoom_win_y+zoom_win_height) {
+    need_zoom_width=0; need_zoom_height=0;
   } else {
-    if (hacer_zoom_x<zx) { hacer_zoom_an-=zx-hacer_zoom_x; hacer_zoom_x=zx; }
-    if (hacer_zoom_y<zy) { hacer_zoom_al-=zy-hacer_zoom_y; hacer_zoom_y=zy; }
-    if (hacer_zoom_x+hacer_zoom_an>zx+zan) hacer_zoom_an=zx+zan-hacer_zoom_x;
-    if (hacer_zoom_y+hacer_zoom_al>zy+zal) hacer_zoom_al=zy+zal-hacer_zoom_y;
-    if (!hacer_zoom) hacer_zoom=-1;
+    if (need_zoom_x<zoom_win_x) { need_zoom_width-=zoom_win_x-need_zoom_x; need_zoom_x=zoom_win_x; }
+    if (need_zoom_y<zoom_win_y) { need_zoom_height-=zoom_win_y-need_zoom_y; need_zoom_y=zoom_win_y; }
+    if (need_zoom_x+need_zoom_width>zoom_win_x+zoom_win_width) need_zoom_width=zoom_win_x+zoom_win_width-need_zoom_x;
+    if (need_zoom_y+need_zoom_height>zoom_win_y+zoom_win_height) need_zoom_height=zoom_win_y+zoom_win_height-need_zoom_y;
+    if (!need_zoom) need_zoom=-1;
   }
 
   // Zona a refrescar calculada
@@ -1135,17 +1135,17 @@ void test_next(void) {
 }
 
 void test_sel(void) {
-  if (hacer_zoom_x>sel_x0) { hacer_zoom_x=sel_x0; } if (hacer_zoom_x>sel_x1) { hacer_zoom_x=sel_x1; }
-  if (hacer_zoom_y>sel_y0) { hacer_zoom_y=sel_y0; } if (hacer_zoom_y>sel_y1) { hacer_zoom_y=sel_y1; }
-  if (hacer_zoom_an<sel_x0) { hacer_zoom_an=sel_x0; } if (hacer_zoom_an<sel_x1) { hacer_zoom_an=sel_x1; }
-  if (hacer_zoom_al<sel_y0) { hacer_zoom_al=sel_y0; } if (hacer_zoom_al<sel_y1) { hacer_zoom_al=sel_y1; }
+  if (need_zoom_x>sel_x0) { need_zoom_x=sel_x0; } if (need_zoom_x>sel_x1) { need_zoom_x=sel_x1; }
+  if (need_zoom_y>sel_y0) { need_zoom_y=sel_y0; } if (need_zoom_y>sel_y1) { need_zoom_y=sel_y1; }
+  if (need_zoom_width<sel_x0) { need_zoom_width=sel_x0; } if (need_zoom_width<sel_x1) { need_zoom_width=sel_x1; }
+  if (need_zoom_height<sel_y0) { need_zoom_height=sel_y0; } if (need_zoom_height<sel_y1) { need_zoom_height=sel_y1; }
 }
 
-void test_mab(void) {
-  if (hacer_zoom_x>mab_x0) { hacer_zoom_x=mab_x0; } if (hacer_zoom_x>mab_x1) { hacer_zoom_x=mab_x1; }
-  if (hacer_zoom_y>mab_y0) { hacer_zoom_y=mab_y0; } if (hacer_zoom_y>mab_y1) { hacer_zoom_y=mab_y1; }
-  if (hacer_zoom_an<mab_x0) { hacer_zoom_an=mab_x0; } if (hacer_zoom_an<mab_x1) { hacer_zoom_an=mab_x1; }
-  if (hacer_zoom_al<mab_y0) { hacer_zoom_al=mab_y0; } if (hacer_zoom_al<mab_y1) { hacer_zoom_al=mab_y1; }
+void test_sel_mask(void) {
+  if (need_zoom_x>sel_mask_x0) { need_zoom_x=sel_mask_x0; } if (need_zoom_x>sel_mask_x1) { need_zoom_x=sel_mask_x1; }
+  if (need_zoom_y>sel_mask_y0) { need_zoom_y=sel_mask_y0; } if (need_zoom_y>sel_mask_y1) { need_zoom_y=sel_mask_y1; }
+  if (need_zoom_width<sel_mask_x0) { need_zoom_width=sel_mask_x0; } if (need_zoom_width<sel_mask_x1) { need_zoom_width=sel_mask_x1; }
+  if (need_zoom_height<sel_mask_y0) { need_zoom_height=sel_mask_y0; } if (need_zoom_height<sel_mask_y1) { need_zoom_height=sel_mask_y1; }
 }
 
 //-----------------------------------------------------------------------------
@@ -1158,44 +1158,44 @@ void cut_map(void) {
   byte *p;
 
   //1º Pide memoria para un struct tmapa
-  if ((v_mapa=(struct tmapa *)malloc(sizeof(struct tmapa)))!=NULL) {
+  if ((v_map=(struct tmapa *)malloc(sizeof(struct tmapa)))!=NULL) {
 
-    box2mab(); an=mab_x1-mab_x0+1; al=mab_y1-mab_y0+1;
+    box_to_sel_mask(); an=sel_mask_x1-sel_mask_x0+1; al=sel_mask_y1-sel_mask_y0+1;
 
     // 2º Pide memoria para el mapa
-    if ((v_mapa->map=(byte *)malloc(an*al))!=NULL) {
+    if ((v_map->map=(byte *)malloc(an*al))!=NULL) {
 
       //2ºB Copia el contenido del mapa
-      p=v_mapa->map;
-      for (y=mab_y0;y<=mab_y1;y++) for (x=mab_x0;x<=mab_x1;x++)
-        if (is_mab(x,y)) *p++=*(map+y*map_an+x); else *p++=0;
+      p=v_map->map;
+      for (y=sel_mask_y0;y<=sel_mask_y1;y++) for (x=sel_mask_x0;x<=sel_mask_x1;x++)
+        if (is_selection_mask(x,y)) *p++=*(map+y*map_width+x); else *p++=0;
 
       //4º Fija el resto de variables
-      strcpy(v_mapa->filename,(char *)texto[136]);
-      ltoa(siguiente_codigo++,v_mapa->filename+strlen(v_mapa->filename),10);
-      *v_mapa->path='\0';
-      v_mapa->map_an=an;
-      v_mapa->map_al=al;
+      strcpy(v_map->filename,(char *)texto[136]);
+      ltoa(next_code++,v_map->filename+strlen(v_map->filename),10);
+      *v_map->path='\0';
+      v_map->map_width=an;
+      v_map->map_height=al;
       for (x=0;x<512;x+=2) {
-        if (v.mapa->puntos[x]>=mab_x0 && v.mapa->puntos[x]<=mab_x1 &&
-            v.mapa->puntos[x+1]>=mab_y0 && v.mapa->puntos[x+1]<=mab_y1) {
-          v_mapa->puntos[x]=v.mapa->puntos[x]-mab_x0;
-          v_mapa->puntos[x+1]=v.mapa->puntos[x+1]-mab_y0;
+        if (v.mapa->puntos[x]>=sel_mask_x0 && v.mapa->puntos[x]<=sel_mask_x1 &&
+            v.mapa->puntos[x+1]>=sel_mask_y0 && v.mapa->puntos[x+1]<=sel_mask_y1) {
+          v_map->puntos[x]=v.mapa->puntos[x]-sel_mask_x0;
+          v_map->puntos[x+1]=v.mapa->puntos[x+1]-sel_mask_y0;
         } else {
-          v_mapa->puntos[x]=-1;
-          v_mapa->puntos[x+1]=-1;
+          v_map->puntos[x]=-1;
+          v_map->puntos[x+1]=-1;
         }
       }
-      v_mapa->TengoNombre=0;//No tiene descripcion por defecto
-      v_mapa->Codigo=0;
-      ventanas_a_crear[num_ventanas_a_crear++]=v_mapa;
+      v_map->TengoNombre=0;//No tiene descripcion por defecto
+      v_map->fpg_code=0;
+      windows_to_create[num_windows_to_create++]=v_map;
 
     } else {
-      v_texto=(char *)texto[45]; show_dialog(err0); free(v_mapa);
+      v_text=(char *)texto[45]; show_dialog(err0); free(v_map);
     }
 
   } else {
-    v_texto=(char *)texto[45]; show_dialog(err0);
+    v_text=(char *)texto[45]; show_dialog(err0);
   }
 }
 
@@ -1203,16 +1203,16 @@ void cut_map(void) {
 //      Convierte los bloques sencillos (cajas) en mapas de bits
 //-----------------------------------------------------------------------------
 
-void box2mab(void) {
+void box_to_sel_mask(void) {
 
   int x,y;
 
-  if (modo_seleccion==0 || modo_seleccion==4) {
-    mab_x0=sel_x0; mab_y0=sel_y0;
-    mab_x1=sel_x1; mab_y1=sel_y1;
-    for (y=mab_y0;y<=mab_y1;y++)
-      for (x=mab_x0;x<=mab_x1;x++)
-        set_mab(x,y);
+  if (mode_selection==0 || mode_selection==4) {
+    sel_mask_x0=sel_x0; sel_mask_y0=sel_y0;
+    sel_mask_x1=sel_x1; sel_mask_y1=sel_y1;
+    for (y=sel_mask_y0;y<=sel_mask_y1;y++)
+      for (x=sel_mask_x0;x<=sel_mask_x1;x++)
+        set_selection_mask(x,y);
   }
 }
 
@@ -1220,38 +1220,38 @@ void box2mab(void) {
 //      Borra (con color) una zona seleccionada
 //-----------------------------------------------------------------------------
 
-void mab_delete(void) {
+void sel_mask_delete(void) {
   int x,y;
 
-  if (save_undo(mab_x0,mab_y0,mab_x1-mab_x0+1,mab_y1-mab_y0+1)) {
+  if (save_undo(sel_mask_x0,sel_mask_y0,sel_mask_x1-sel_mask_x0+1,sel_mask_y1-sel_mask_y0+1)) {
     if (textura_color==NULL) {
-      for (y=mab_y0;y<=mab_y1;y++)
-        for (x=mab_x0;x<=mab_x1;x++)
-          if (is_mab(x,y)) *(map+x+y*map_an)=color;
+      for (y=sel_mask_y0;y<=sel_mask_y1;y++)
+        for (x=sel_mask_x0;x<=sel_mask_x1;x++)
+          if (is_selection_mask(x,y)) *(map+x+y*map_width)=color;
     } else {
-      for (y=mab_y0;y<=mab_y1;y++)
-        for (x=mab_x0;x<=mab_x1;x++)
-          if (is_mab(x,y)) *(map+x+y*map_an)=get_color(x,y);
+      for (y=sel_mask_y0;y<=sel_mask_y1;y++)
+        for (x=sel_mask_x0;x<=sel_mask_x1;x++)
+          if (is_selection_mask(x,y)) *(map+x+y*map_width)=get_color(x,y);
     }
   }
 }
 
 //-----------------------------------------------------------------------------
-//      Cambia de banco (con la regla) una zona seleccionada
+//      Cambia de banco (con la gradient) una zona seleccionada
 //-----------------------------------------------------------------------------
 
-void mab_ruler(void) {
+void sel_mask_ruler(void) {
   int x,y;
   int c;
 
-  if (save_undo(mab_x0,mab_y0,mab_x1-mab_x0+1,mab_y1-mab_y0+1)) {
-    make_near_regla();
-    for (y=mab_y0;y<=mab_y1;y++)
-      for (x=mab_x0;x<=mab_x1;x++)
-        if (is_mab(x,y)) {
-          c=(memptrsize)*(map+x+y*map_an)*3;
+  if (save_undo(sel_mask_x0,sel_mask_y0,sel_mask_x1-sel_mask_x0+1,sel_mask_y1-sel_mask_y0+1)) {
+    make_nearest_gradient();
+    for (y=sel_mask_y0;y<=sel_mask_y1;y++)
+      for (x=sel_mask_x0;x<=sel_mask_x1;x++)
+        if (is_selection_mask(x,y)) {
+          c=(memptrsize)*(map+x+y*map_width)*3;
           c=dac[c]+dac[c+1]+dac[c+2];
-          *(map+x+y*map_an)=near_regla[c];
+          *(map+x+y*map_width)=nearest_gradient[c];
         }
   }
 }
@@ -1260,18 +1260,18 @@ void mab_ruler(void) {
 //	Invierte una selección
 //-----------------------------------------------------------------------------
 
-void mab_invert(void) {
+void sel_mask_invert(void) {
   int x,y;
   byte p[256];
 
-  if (save_undo(mab_x0,mab_y0,mab_x1-mab_x0+1,mab_y1-mab_y0+1)) {
+  if (save_undo(sel_mask_x0,sel_mask_y0,sel_mask_x1-sel_mask_x0+1,sel_mask_y1-sel_mask_y0+1)) {
     create_dac4();
     for (x=0;x<256;x++) {
       p[x]=find_color(63-dac[x*3],63-dac[x*3+1],63-dac[x*3+2]);
     }
-    for (y=mab_y0;y<=mab_y1;y++)
-      for (x=mab_x0;x<=mab_x1;x++)
-        if (is_mab(x,y)) *(map+x+y*map_an)=p[*(map+x+y*map_an)];
+    for (y=sel_mask_y0;y<=sel_mask_y1;y++)
+      for (x=sel_mask_x0;x<=sel_mask_x1;x++)
+        if (is_selection_mask(x,y)) *(map+x+y*map_width)=p[*(map+x+y*map_width)];
   }
 }
 
@@ -1279,25 +1279,25 @@ void mab_invert(void) {
 //      Crea la máscara a una selección
 //-----------------------------------------------------------------------------
 
-void mab_mask(void) {
+void sel_mask_mask(void) {
   int x,y,c;
   c=0;
 
-  if (save_undo(mab_x0,mab_y0,mab_x1-mab_x0+1,mab_y1-mab_y0+1)) {
-    for (y=mab_y0;y<=mab_y1;y++)
-      for (x=mab_x0;x<=mab_x1;x++)
-        if (is_mab(x,y))
-          if (!*(map+x+y*map_an)) {
+  if (save_undo(sel_mask_x0,sel_mask_y0,sel_mask_x1-sel_mask_x0+1,sel_mask_y1-sel_mask_y0+1)) {
+    for (y=sel_mask_y0;y<=sel_mask_y1;y++)
+      for (x=sel_mask_x0;x<=sel_mask_x1;x++)
+        if (is_selection_mask(x,y))
+          if (!*(map+x+y*map_width)) {
             c=0;
-            if (x>0) c|=*(map+x-1+y*map_an);
+            if (x>0) c|=*(map+x-1+y*map_width);
             if (c==color) c=0;
-            if (y>0) c|=*(map+x+(y-1)*map_an);
+            if (y>0) c|=*(map+x+(y-1)*map_width);
             if (c==color) c=0;
-            if (x<map_an-1) c|=*(map+x+1+y*map_an);
+            if (x<map_width-1) c|=*(map+x+1+y*map_width);
             if (c==color) c=0;
-            if (y<map_al-1) c|=*(map+x+(y+1)*map_an);
+            if (y<map_height-1) c|=*(map+x+(y+1)*map_width);
             if (c==color) c=0;
-            if (c) *(map+x+y*map_an)=color;
+            if (c) *(map+x+y*map_width)=color;
           }
   }
 }
@@ -1306,19 +1306,19 @@ void mab_mask(void) {
 //      Aclara una selección
 //-----------------------------------------------------------------------------
 
-void mab_lighten(byte color_aclarar) {
+void sel_mask_lighten(byte color_aclarar) {
   int x,y,n,a,b,c,d;
   byte p[256];
 
-  if (save_undo(mab_x0,mab_y0,mab_x1-mab_x0+1,mab_y1-mab_y0+1)) {
+  if (save_undo(sel_mask_x0,sel_mask_y0,sel_mask_x1-sel_mask_x0+1,sel_mask_y1-sel_mask_y0+1)) {
     for (x=0;x<256;x++) {
       n=x*256; p[x]=x;
       a=*(ghost+n+color_aclarar); b=*(ghost+n+a); c=*(ghost+n+b); d=*(ghost+n+c);
       if (d!=p[x]) p[x]=d; else if (c!=p[x]) p[x]=c; else if (b!=p[x]) p[x]=b; else if (a!=p[x]) p[x]=a; else p[x]=color_aclarar;
     }
-    for (y=mab_y0;y<=mab_y1;y++)
-      for (x=mab_x0;x<=mab_x1;x++)
-        if (is_mab(x,y)) *(map+x+y*map_an)=p[*(map+x+y*map_an)];
+    for (y=sel_mask_y0;y<=sel_mask_y1;y++)
+      for (x=sel_mask_x0;x<=sel_mask_x1;x++)
+        if (is_selection_mask(x,y)) *(map+x+y*map_width)=p[*(map+x+y*map_width)];
   }
 }
 
@@ -1326,36 +1326,36 @@ void mab_lighten(byte color_aclarar) {
 //      Anti aliasing
 //-----------------------------------------------------------------------------
 
-void mab_antialias(void) {
+void sel_mask_antialias(void) {
   int x,y;
   int an,al;
   byte * p;
   int cx,cy,_c;
 
-  an=mab_x1-mab_x0+1; al=mab_y1-mab_y0+1;
-  if ((p=(byte*)malloc(map_an*map_al))!=NULL) {
-    if (save_undo(mab_x0,mab_y0,an,al)) {
-      for (y=mab_y0;y<=mab_y1;y++)
-        for (x=mab_x0;x<=mab_x1;x++)
-          if (is_mab(x,y)) {
-            _c=*(map+x+y*map_an);
-            if (x>0) cx=*(map+x-1+y*map_an)*256; else cx=_c*256;
-            if (x<map_an-1) cx=*(ghost+cx+*(map+x+1+y*map_an)); else cx=*(ghost+cx+_c);
-            if (y>0) cy=*(map+x+(y-1)*map_an)*256; else cy=_c*256;
-            if (y<map_al-1) cy=*(ghost+cy+*(map+x+(y+1)*map_an)); else cy=*(ghost+cy+_c);
+  an=sel_mask_x1-sel_mask_x0+1; al=sel_mask_y1-sel_mask_y0+1;
+  if ((p=(byte*)malloc(map_width*map_height))!=NULL) {
+    if (save_undo(sel_mask_x0,sel_mask_y0,an,al)) {
+      for (y=sel_mask_y0;y<=sel_mask_y1;y++)
+        for (x=sel_mask_x0;x<=sel_mask_x1;x++)
+          if (is_selection_mask(x,y)) {
+            _c=*(map+x+y*map_width);
+            if (x>0) cx=*(map+x-1+y*map_width)*256; else cx=_c*256;
+            if (x<map_width-1) cx=*(ghost+cx+*(map+x+1+y*map_width)); else cx=*(ghost+cx+_c);
+            if (y>0) cy=*(map+x+(y-1)*map_width)*256; else cy=_c*256;
+            if (y<map_height-1) cy=*(ghost+cy+*(map+x+(y+1)*map_width)); else cy=*(ghost+cy+_c);
             cx=*(ghost+cx*256+cy);
             _c=*(ghost+_c*256+cx);
-            *(p+(x-mab_x0)+(y-mab_y0)*an)=(byte)_c;
+            *(p+(x-sel_mask_x0)+(y-sel_mask_y0)*an)=(byte)_c;
           }
-      for (y=mab_y0;y<=mab_y1;y++)
-        for (x=mab_x0;x<=mab_x1;x++)
-          if (is_mab(x,y)) {
-            *(map+x+y*map_an)=*(p+(x-mab_x0)+(y-mab_y0)*an);
+      for (y=sel_mask_y0;y<=sel_mask_y1;y++)
+        for (x=sel_mask_x0;x<=sel_mask_x1;x++)
+          if (is_selection_mask(x,y)) {
+            *(map+x+y*map_width)=*(p+(x-sel_mask_x0)+(y-sel_mask_y0)*an);
           }
       free(p);
     }
   } else {
-    v_texto=(char *)texto[45]; show_dialog(err0);
+    v_text=(char *)texto[45]; show_dialog(err0);
   }
 }
 
@@ -1413,11 +1413,11 @@ int edit_mode_6_box_auto(int s) {
     case 2:
       if ((mouse_b&1) && mouse_graf>=10) {
 
-        if (*(map+coord_y*map_an+coord_x)) {
+        if (*(map+coord_y*map_width+coord_x)) {
 
           if (s==0 || (coord_x<sel_x0 || coord_x>sel_x1 || coord_y<sel_y0 || coord_y>sel_y1)) {
             x0=coord_x; x1=coord_x; y0=coord_y; y1=coord_y;
-	    sel_x0=map_an; sel_y0=map_al; sel_x1=0; sel_y1=0;
+	    sel_x0=map_width; sel_y0=map_height; sel_x1=0; sel_y1=0;
           } else {
 	    x0=sel_x0; x1=sel_x1; y0=sel_y0; y1=sel_y1;
 	  }
@@ -1426,37 +1426,37 @@ int edit_mode_6_box_auto(int s) {
 
             // Amplia la caja ...
             n=0; if (y0>0) {
-              for (x=x0;x<=x1;x++) if (*(map+(y0-1)*map_an+x)) n++;
+              for (x=x0;x<=x1;x++) if (*(map+(y0-1)*map_width+x)) n++;
               if (n) { y0--; } m+=n; }
-            n=0; if (y1<map_al-1) {
-              for (x=x0;x<=x1;x++) if (*(map+(y1+1)*map_an+x)) n++;
+            n=0; if (y1<map_height-1) {
+              for (x=x0;x<=x1;x++) if (*(map+(y1+1)*map_width+x)) n++;
               if (n) { y1++; } m+=n; }
             n=0; if (x0>0) {
-              for (y=y0;y<=y1;y++) if (*(map+y*map_an+x0-1)) n++;
+              for (y=y0;y<=y1;y++) if (*(map+y*map_width+x0-1)) n++;
               if (n) { x0--; } m+=n; }
-            n=0; if (x1<map_an-1) {
-              for (y=y0;y<=y1;y++) if (*(map+y*map_an+x1+1)) n++;
+            n=0; if (x1<map_width-1) {
+              for (y=y0;y<=y1;y++) if (*(map+y*map_width+x1+1)) n++;
               if (n) { x1++; } m+=n; }
 
 	    // Reduce la caja ...
 	    n=0; if (y0<y1) {
-	      for (x=x0;x<=x1;x++) if (*(map+y0*map_an+x)) n++;
+	      for (x=x0;x<=x1;x++) if (*(map+y0*map_width+x)) n++;
 	      if (!n) {y0++;m++;} }
 	    n=0; if (y0<y1) {
-	      for (x=x0;x<=x1;x++) if (*(map+y1*map_an+x)) n++;
+	      for (x=x0;x<=x1;x++) if (*(map+y1*map_width+x)) n++;
 	      if (!n) {y1--;m++;} }
 	    n=0; if (x0<x1) {
-	      for (y=y0;y<=y1;y++) if (*(map+y*map_an+x0)) n++;
+	      for (y=y0;y<=y1;y++) if (*(map+y*map_width+x0)) n++;
 	      if (!n) {x0++;m++;} }
 	    n=0; if (x0<x1) {
-	      for (y=y0;y<=y1;y++) if (*(map+y*map_an+x1)) n++;
+	      for (y=y0;y<=y1;y++) if (*(map+y*map_width+x1)) n++;
 	      if (!n) {x1--;m++;} }
 
           } while (m);
 
           if (sel_x0==x0 && sel_x1==x1 && sel_y0==y0 && sel_y1==y1) {
 	    if (x0>0) { sel_x0--; } if (y0>0) { sel_y0--; }
-	    if (x1<map_an-1) { sel_x1++; } if (y1<map_al-1) { sel_y1++; }
+	    if (x1<map_width-1) { sel_x1++; } if (y1<map_height-1) { sel_y1++; }
 	  } else {
 	    sel_x0=x0; sel_y0=y0; sel_x1=x1; sel_y1=y1;
 	  }
@@ -1488,41 +1488,41 @@ int edit_mode_6_box_auto(int s) {
 //      Dibuja una línea en el mapa de bits desde x0,y0 .. hasta x1,y1
 //-----------------------------------------------------------------------------
 
-void mab_line(int x0, int y0, int x1, int y1) {
+void sel_mask_line(int x0, int y0, int x1, int y1) {
 
   int dx,dy,a,b,d,x,y;
 
   if (x0>x1) {x=x1; dx=x0-x1;} else {x=x0; dx=x1-x0;}
   if (y0>y1) {y=y1; dy=y0-y1;} else {y=y0; dy=y1-y0;}
 
-  if (!dx && !dy) set_mab(x0,y0); else {
+  if (!dx && !dy) set_selection_mask(x0,y0); else {
 
     if (dy<=dx) {
-      if (x0>x1) { set_mab(x1,y1); x0--; swap(x0,x1); swap(y0,y1); }
+      if (x0>x1) { set_selection_mask(x1,y1); x0--; swap(x0,x1); swap(y0,y1); }
       d=2*dy-dx; a=2*dy; b=2*(dy-dx); x=x0; y=y0;
       if (y0<=y1) while (x<x1) {
         if (d<=0) { d+=a; x++; } else { d+=b; x++; y++; }
-        set_mab(x,y);
+        set_selection_mask(x,y);
       } else while (x<x1) {
         if (d<=0) { d+=a; x++; } else { d+=b; x++; y--; }
-        set_mab(x,y);
+        set_selection_mask(x,y);
       }
     } else  {
-      if (y0>y1) { set_mab(x1,y1); y0--; swap(x0,x1); swap(y0,y1); }
+      if (y0>y1) { set_selection_mask(x1,y1); y0--; swap(x0,x1); swap(y0,y1); }
       d=2*dx-dy; a=2*dx; b=2*(dx-dy); x=x0; y=y0;
       if (x0<=x1) while (y<y1) {
         if (d<=0) { d+=a; y++; } else { d+=b; y++; x++; }
-        set_mab(x,y);
+        set_selection_mask(x,y);
       } else while (y<y1) {
         if (d<=0) { d+=a; y++; } else { d+=b; y++; x--; }
-        set_mab(x,y);
+        set_selection_mask(x,y);
       }
     }
   }
 }
 
 //-----------------------------------------------------------------------------
-//      Algoritmo de relleno de un poligono en mab
+//      Algoritmo de relleno de un poligono en selection_mask
 //-----------------------------------------------------------------------------
 
 word poligono[2048]; // Hasta 1024 puntos para seleccionar un poligono
@@ -1567,7 +1567,7 @@ void fill_polygon(void) {
   int x0,dentro;
   int m,n;
 
-  y0=map_al; y1=0;
+  y0=map_height; y1=0;
 
   for (n=1;n<n_puntos*2;n+=2) {
     if (poligono[n]<y0) y0=poligono[n];
@@ -1580,7 +1580,7 @@ void fill_polygon(void) {
       find_first_x_from(x0,n);
       if (xmin!=max_int) {
         if (dentro) {
-          for (m=x0+1;m<=xmin;m++) set_mab(m,n);
+          for (m=x0+1;m<=xmin;m++) set_selection_mask(m,n);
         } dentro^=trans; x0=xmin;
       }
     } while (xmin!=max_int);
@@ -1600,9 +1600,9 @@ int edit_mode_6_lines(int s) {
       if ((mouse_b&1) && mouse_graf>=10) {
         s=1; n_puntos=1;
         poligono[0]=coord_x; poligono[1]=coord_y;
-        memset(mab,0,((map_an*map_al+31)/32)*4);
-        mab_x0=mab_x1=coord_x; mab_y0=mab_y1=coord_y;
-        set_mab(coord_x,coord_y);
+        memset(selection_mask,0,((map_width*map_height+31)/32)*4);
+        sel_mask_x0=sel_mask_x1=coord_x; sel_mask_y0=sel_mask_y1=coord_y;
+        set_selection_mask(coord_x,coord_y);
         oldx=coord_x; oldy=coord_y;
       } break;
 
@@ -1612,9 +1612,9 @@ int edit_mode_6_lines(int s) {
          (poligono[n_puntos*2-2]!=coord_x||poligono[n_puntos*2-1]!=coord_y)) {
         poligono[n_puntos*2]=coord_x;
         poligono[n_puntos*2+1]=coord_y; n_puntos++;
-        if (coord_x<mab_x0) mab_x0=coord_x; else if (coord_x>mab_x1) mab_x1=coord_x;
-        if (coord_y<mab_y0) mab_y0=coord_y; else if (coord_y>mab_y1) mab_y1=coord_y;
-        mab_line(oldx,oldy,coord_x,coord_y);
+        if (coord_x<sel_mask_x0) sel_mask_x0=coord_x; else if (coord_x>sel_mask_x1) sel_mask_x1=coord_x;
+        if (coord_y<sel_mask_y0) sel_mask_y0=coord_y; else if (coord_y>sel_mask_y1) sel_mask_y1=coord_y;
+        sel_mask_line(oldx,oldy,coord_x,coord_y);
         oldx=coord_x; oldy=coord_y;
         if (n_puntos>3 && oldx>=poligono[0]-1 && oldx<=poligono[0]+1 &&
             oldy>=poligono[1]-1 && oldy<=poligono[1]+1) {
@@ -1629,7 +1629,7 @@ int edit_mode_6_lines(int s) {
         if (n_puntos>2) {
           poligono[n_puntos*2]=poligono[0];
           poligono[n_puntos*2+1]=poligono[1]; n_puntos++;
-          mab_line(oldx,oldy,poligono[0],poligono[1]);
+          sel_mask_line(oldx,oldy,poligono[0],poligono[1]);
           fill_polygon();
           s=2; block_bar(1);
           do {read_mouse();} while (mouse_b || key(_ESC));
@@ -1659,31 +1659,31 @@ int edit_mode_6_fill(int s) {
   switch(s) {
     case 0:
       if ((mouse_b&1) && mouse_graf>=10) {
-        if (modo_seleccion==1) {
+        if (mode_selection==1) {
           memset(fill_dac,0,256);
-          fill_dac[*(map+coord_y*map_an+coord_x)]=1;
+          fill_dac[*(map+coord_y*map_width+coord_x)]=1;
         } else { memset(fill_dac,1,256); fill_dac[0]=0; }
         s=2; memset(focos,-1,512);
         focos[0]=coord_x; focos[1]=coord_y;
-        memset(mab,0,((map_an*map_al+31)/32)*4);
-        mab_x0=map_an; mab_y0=map_al; mab_x1=0; mab_y1=0;
+        memset(selection_mask,0,((map_width*map_height+31)/32)*4);
+        sel_mask_x0=map_width; sel_mask_y0=map_height; sel_mask_x1=0; sel_mask_y1=0;
         fill_select(coord_x,coord_y);
-        if (is_mab(coord_x,coord_y)) block_bar(1); else s=0;
+        if (is_selection_mask(coord_x,coord_y)) block_bar(1); else s=0;
         do {read_mouse();} while(mouse_b&1);
       } break;
 
     case 2:
       sel_status=1;
       if ((mouse_b&1) && mouse_graf>=10) {
-        if (modo_seleccion==1) fill_dac[*(map+coord_y*map_an+coord_x)]=1;
+        if (mode_selection==1) fill_dac[*(map+coord_y*map_width+coord_x)]=1;
         n=0; while(n<126 && focos[n]>=0) n+=2;
         focos[n]=coord_x; focos[n+1]=coord_y;
-        memset(mab,0,((map_an*map_al+31)/32)*4);
+        memset(selection_mask,0,((map_width*map_height+31)/32)*4);
         for (n=0;n<128;n+=2)
           if (focos[n]>=0) {
-            if (!is_mab(focos[n],focos[n+1])) {
+            if (!is_selection_mask(focos[n],focos[n+1])) {
               fill_select(focos[n],focos[n+1]);
-              if (!is_mab(focos[n],focos[n+1])) {
+              if (!is_selection_mask(focos[n],focos[n+1])) {
                 s=0; sel_status=0; block_bar(0);
                 do {read_mouse();} while (mouse_b || key(_ESC));
               }
@@ -1708,8 +1708,8 @@ int edit_mode_6_boxes(int s) {
     case 0:
       if ((mouse_b&1) && mouse_graf>=10) {
         s=1; sel_x0=coord_x; sel_y0=coord_y;
-        memset(mab,0,((map_an*map_al+31)/32)*4);
-        mab_x0=map_an; mab_y0=map_al; mab_x1=0; mab_y1=0;
+        memset(selection_mask,0,((map_width*map_height+31)/32)*4);
+        sel_mask_x0=map_width; sel_mask_y0=map_height; sel_mask_x1=0; sel_mask_y1=0;
         do {read_mouse();} while(mouse_b&1);
       } break;
 
@@ -1719,11 +1719,11 @@ int edit_mode_6_boxes(int s) {
         if (mouse_b&1) {
           if (sel_x0>sel_x1) swap(sel_x0,sel_x1);
           if (sel_y0>sel_y1) swap(sel_y0,sel_y1);
-	  mab_x0=sel_x0; mab_x1=sel_x1;
-	  mab_y0=sel_y0; mab_y1=sel_y1;
+	  sel_mask_x0=sel_x0; sel_mask_x1=sel_x1;
+	  sel_mask_y0=sel_y0; sel_mask_y1=sel_y1;
 	  for (y=sel_y0;y<=sel_y1;y++)
 	    for (x=sel_x0;x<=sel_x1;x++)
-	      set_mab(x,y);
+	      set_selection_mask(x,y);
           sel_x1=-1; s=2; block_bar(1);
           do {read_mouse();} while(mouse_b&1);
         } else if (mouse_b || key(_ESC)) {
@@ -1750,13 +1750,13 @@ int edit_mode_6_boxes(int s) {
       if ((mouse_b&1) && mouse_graf>=10) {
         if (sel_x0>sel_x1) swap(sel_x0,sel_x1);
         if (sel_y0>sel_y1) swap(sel_y0,sel_y1);
-        if (sel_x0<mab_x0) mab_x0=sel_x0;
-        if (sel_x1>mab_x1) mab_x1=sel_x1;
-	if (sel_y0<mab_y0) mab_y0=sel_y0;
-        if (sel_y1>mab_y1) mab_y1=sel_y1;
+        if (sel_x0<sel_mask_x0) sel_mask_x0=sel_x0;
+        if (sel_x1>sel_mask_x1) sel_mask_x1=sel_x1;
+	if (sel_y0<sel_mask_y0) sel_mask_y0=sel_y0;
+        if (sel_y1>sel_mask_y1) sel_mask_y1=sel_y1;
         for (y=sel_y0;y<=sel_y1;y++)
           for (x=sel_x0;x<=sel_x1;x++)
-            set_mab(x,y);
+            set_selection_mask(x,y);
 	s=2; sel_x1=-1;
         do {read_mouse();} while(mouse_b&1);
       } else if ((mouse_b&2) || key(_ESC)) {
@@ -1790,11 +1790,11 @@ void edit_mode_11(void) {
       undo_next(); break;
     }
     if (scan_code==14 && !key(_L_SHIFT) && !key(_R_SHIFT)) undo_back();
-    else if (scan_code==14 && (key(_L_SHIFT)||key(_R_SHIFT))) { undo_next(); hacer_zoom=1; }
+    else if (scan_code==14 && (key(_L_SHIFT)||key(_R_SHIFT))) { undo_next(); need_zoom=1; }
 
     blit_edit();
-  } while (!salir_del_entorno && !(mouse_b&2) && !key(_ESC) && modo<100 &&
-    !(mouse_b && mouse_in(barra_x,barra_y+10,barra_x+9,barra_y+18)));
+  } while (!exit_requested && !(mouse_b&2) && !key(_ESC) && draw_mode<100 &&
+    !(mouse_b && mouse_in(toolbar_x,toolbar_y+10,toolbar_x+9,toolbar_y+18)));
 }
 
 //-----------------------------------------------------------------------------
@@ -1811,14 +1811,14 @@ int barra_texto=0; // Para no resaltar el background con la 'b'
 
 void edit_mode_12(void) {
   int spacelen,cnt,x,fan,fal,anmax,almax;
-  int ms=modo_seleccion;
+  int ms=mode_selection;
   int a;
   int tx=-256,ty=-256; // Inicio del texto (para el enter)
   byte * font, * buffer;
   int ilon=0;
   byte lon[256];
 
-  modo_seleccion=0; bar[0]=101+zoom; bar[1]=121;
+  mode_selection=0; bar[0]=101+zoom; bar[1]=121;
   for (a=2;a<11;a++) { bar[a]=1; } bar[11]=166;
   bar[12]=119; bar[13]=0;
   draw_bar(0); draw_ruler();
@@ -1851,7 +1851,7 @@ void edit_mode_12(void) {
     if ((buffer=(byte*)malloc(anmax*almax))!=NULL) {
       memset(buffer,0,anmax*almax);
     } else {
-      v_texto=(char *)texto[45]; show_dialog(err0);
+      v_text=(char *)texto[45]; show_dialog(err0);
       font=NULL;
     }
 
@@ -1870,8 +1870,8 @@ void edit_mode_12(void) {
       // Escribe con el font del sistema
 
       if (mouse_graf>=10 && (mouse_b&1) && !key(_SPC)) {
-        sel_x0=coord_x-font_an/2; sel_y0=coord_y-font_al/2;
-        sel_x1=sel_x0+font_an-1; sel_y1=sel_y0+font_al-1;
+        sel_x0=coord_x-font_width/2; sel_y0=coord_y-font_height/2;
+        sel_x1=sel_x0+font_width-1; sel_y1=sel_y0+font_height-1;
         sel_status=1; hotkey=0; tx=sel_x0; ty=sel_y0;
       } else if (((mouse_b&2) || key(_ESC)) && sel_status) {
         sel_status=0; hotkey=1;
@@ -1879,20 +1879,20 @@ void edit_mode_12(void) {
       }
       if (sel_status==1) {
         if (ascii==13) {
-          ty+=font_al; sel_x0=tx; sel_y0=ty;
-          sel_x1=sel_x0+font_an-1; sel_y1=sel_y0+font_al-1;
+          ty+=font_height; sel_x0=tx; sel_y0=ty;
+          sel_x1=sel_x0+font_width-1; sel_y1=sel_y0+font_height-1;
         } else if (scan_code==14) {
           if (sel_x0!=tx) {
             if (undo_back()) {
               test_previous();
-              sel_x0-=font_an; sel_x1-=font_an;
+              sel_x0-=font_width; sel_x1-=font_width;
             }
           }
         } else if (ascii && scan_code!=15 && scan_code!=1 && ilon<256) {
-          if (save_undo(sel_x0,sel_y0,font_an,font_al)) {
+          if (save_undo(sel_x0,sel_y0,font_width,font_height)) {
             test_previous(); // Para contrarrestar el efecto del save_undo()
             line_fx=efecto12; write_char(sel_x0,sel_y0,ascii);
-            sel_x0+=font_an; sel_x1+=font_an;
+            sel_x0+=font_width; sel_x1+=font_width;
           }
         }
       }
@@ -1945,23 +1945,23 @@ void edit_mode_12(void) {
       if (sel_x0!=tx) {
         if (undo_back()) {
           if (font==NULL) {
-            sel_x0-=font_an; sel_x1-=font_an;
+            sel_x0-=font_width; sel_x1-=font_width;
           } else {
             sel_x0-=lon[--ilon]; sel_x1-=lon[ilon];
           }
         }
       } else undo_back();
-      hacer_zoom=1;
+      need_zoom=1;
       do {read_mouse();} while(mouse_b&1);
-    } else if ((scan_code==14&&hotkey) && (key(_L_SHIFT)||key(_R_SHIFT))) { undo_next(); hacer_zoom=1; }
+    } else if ((scan_code==14&&hotkey) && (key(_L_SHIFT)||key(_R_SHIFT))) { undo_next(); need_zoom=1; }
 
     blit_edit();
-  } while (!salir_del_entorno && !(mouse_b&2) && !(key(_ESC) && hotkey) && modo<100 &&
-    !(mouse_b && mouse_in(barra_x,barra_y+10,barra_x+9,barra_y+18)));
+  } while (!exit_requested && !(mouse_b&2) && !(key(_ESC) && hotkey) && draw_mode<100 &&
+    !(mouse_b && mouse_in(toolbar_x,toolbar_y+10,toolbar_x+9,toolbar_y+18)));
 
   barra_texto=0;
 
-  hotkey=1; sel_status=0; modo_seleccion=ms; if (font!=NULL) free(buffer);
+  hotkey=1; sel_status=0; mode_selection=ms; if (font!=NULL) free(buffer);
 }
 
 //-----------------------------------------------------------------------------
@@ -1974,60 +1974,60 @@ void write_char(int x, int y, byte c) {
   byte col;
 
   if (textura_color==NULL) {
-    si=font+c*font_an*font_al;
-    n=font_al; do {
-      m=font_an; do {
+    si=font+c*font_width*font_height;
+    n=font_height; do {
+      m=font_width; do {
         if (*si) _line_pixel(x,y);
         si++; x++;
       } while (--m);
-      x-=font_an; y++;
+      x-=font_width; y++;
     } while (--n);
   } else {
     col=color;
-    si=font+c*font_an*font_al;
-    n=font_al; do {
-      m=font_an; do {
+    si=font+c*font_width*font_height;
+    n=font_height; do {
+      m=font_width; do {
         color=get_color(x,y);
         if (*si) _line_pixel(x,y);
         si++; x++;
       } while (--m);
-      x-=font_an; y++;
+      x-=font_width; y++;
     } while (--n);
     color=col;
   }
 }
 
-void write_char2(int x, int y, byte * si, int font_an, int font_al) {
+void write_char2(int x, int y, byte * si, int font_width, int font_height) {
   int n,m;
   byte c=color,*g;
 
   if (textura_color!=NULL) {
-    n=font_al; do {
-      m=font_an; do {
+    n=font_height; do {
+      m=font_width; do {
         if (*si) {
           color=*(ghost+(memptrsize)get_color(x,y)*256+*si);
           _line_pixel(x,y);
         }
         si++; x++;
       } while (--m);
-      x-=font_an; y++;
+      x-=font_width; y++;
     } while (--n);
   } else if (!c) {
-    n=font_al; do {
-      m=font_an; do {
+    n=font_height; do {
+      m=font_width; do {
         if (*si) { color=*si; _line_pixel(x,y); }
         si++; x++;
       } while (--m);
-      x-=font_an; y++;
+      x-=font_width; y++;
     } while (--n);
   } else {
     g=ghost+(memptrsize)c*256;
-    n=font_al; do {
-      m=font_an; do {
+    n=font_height; do {
+      m=font_width; do {
         if (*si) { color=*(g+*si); _line_pixel(x,y); }
         si++; x++;
       } while (--m);
-      x-=font_an; y++;
+      x-=font_width; y++;
     } while (--n);
   }
   color=c;
@@ -2042,10 +2042,10 @@ void edit_mode_13(void) {
   byte * p;
   int m;
   char num[4];
-  int m_s=modo_seleccion;
+  int m_s=mode_selection;
 
   bar[0]=101+zoom; bar[1]=192; bar[2]=1; bar[3]=193;
-  bar[4]=0; bar[5]=0; draw_bar(22); modo_seleccion=-1;
+  bar[4]=0; bar[5]=0; draw_bar(22); mode_selection=-1;
 
   do {
     draw_help(1295);
@@ -2070,8 +2070,8 @@ void edit_mode_13(void) {
     if (num_punto<  0) num_punto=  0;
     if (num_punto>255) num_punto=255;
 
-    hacer_zoom_x=map_an; hacer_zoom_y=map_al;
-    hacer_zoom_an=0; hacer_zoom_al=0;
+    need_zoom_x=map_width; need_zoom_y=map_height;
+    need_zoom_width=0; need_zoom_height=0;
 
     for (m=0;m<512;m+=2) if (v.mapa->puntos[m]!=-1) {
       sel_x0=v.mapa->puntos[m]-1;
@@ -2104,29 +2104,29 @@ void edit_mode_13(void) {
     if (v.mapa->puntos[num_punto*2]!=-1)
       analyze_bar(v.mapa->puntos[num_punto*2],v.mapa->puntos[num_punto*2+1]);
     else {
-      wbox(barra,vga_an/big2,vga_al,c2,barra_an-23,2,21,15);
-      p=copia; copia=barra; text_color=c4;
-      writetxt(barra_an-22,3,0,(byte *)"????");
-      writetxt(barra_an-22,10,0,(byte *)"????");
+      wbox(toolbar,vga_width/big2,vga_height,c2,toolbar_width-23,2,21,15);
+      p=copia; copia=toolbar; text_color=c4;
+      writetxt(toolbar_width-22,3,0,(byte *)"????");
+      writetxt(toolbar_width-22,10,0,(byte *)"????");
       copia=p;
     }
 
-    wbox(barra,vga_an/big2,19,c2,48+2*16,2,15,15);
+    wbox(toolbar,vga_width/big2,19,c2,48+2*16,2,15,15);
 
     num[3]=0;
     num[2]=48+num_punto%10;
     num[1]=48+(num_punto/10)%10;
     num[0]=48+(num_punto/100)%10;
 
-    wwrite(barra,vga_an/big2,19,56+2*16,6,1,(byte *)num,c1);
-    wwrite(barra,vga_an/big2,19,55+2*16,6,1,(byte *)num,c4);
+    wwrite(toolbar,vga_width/big2,19,56+2*16,6,1,(byte *)num,c1);
+    wwrite(toolbar,vga_width/big2,19,55+2*16,6,1,(byte *)num,c4);
 
     blit_edit();
 
-  } while (!salir_del_entorno && !(mouse_b&2) && !key(_ESC) && modo<100 &&
-    !(mouse_b && mouse_in(barra_x,barra_y+10,barra_x+9,barra_y+18)));
+  } while (!exit_requested && !(mouse_b&2) && !key(_ESC) && draw_mode<100 &&
+    !(mouse_b && mouse_in(toolbar_x,toolbar_y+10,toolbar_x+9,toolbar_y+18)));
 
-  sel_status=0; modo_seleccion=m_s;
+  sel_status=0; mode_selection=m_s;
 }
 
 //-----------------------------------------------------------------------------
@@ -2496,21 +2496,21 @@ void line_pixel(int x,int y) { // Brush
 
   if (textura_color==NULL) {
     if (tipo_pincel) {
-      if (x>=0 && y>=0 && x+pincel_an<=map_an && y+pincel_al<=map_al && !difuminar) {
-        q=map+x+y*map_an; p=pincel;
+      if (x>=0 && y>=0 && x+pincel_an<=map_width && y+pincel_al<=map_height && !difuminar) {
+        q=map+x+y*map_width; p=pincel;
         if (mask_on) {
           do {
             do {
               if ((line_fx=*p) && *q!=color) { pixel(q); } q++; p++;
             } while (++xx<pincel_an);
-            xx=0; q-=pincel_an-map_an;
+            xx=0; q-=pincel_an-map_width;
           } while (++yy<pincel_al);
         } else {
           do {
             do {
               if ((line_fx=*p) && *q!=color) { pixel_sin_mask(q); } q++; p++;
             } while (++xx<pincel_an);
-            xx=0; q-=pincel_an-map_an;
+            xx=0; q-=pincel_an-map_width;
           } while (++yy<pincel_al);
         }
       } else {
@@ -2524,21 +2524,21 @@ void line_pixel(int x,int y) { // Brush
         } while (++yy<pincel_al);
       }
     } else {
-      if (x>=0 && y>=0 && x+pincel_an<=map_an && y+pincel_al<=map_al && !difuminar) {
-        q=map+x+y*map_an; p=pincel;
+      if (x>=0 && y>=0 && x+pincel_an<=map_width && y+pincel_al<=map_height && !difuminar) {
+        q=map+x+y*map_width; p=pincel;
         if (mask_on) {
           do {
             do {
               if (*p && *q!=color) { pixel(q); } q++; p++;
             } while (++xx<pincel_an);
-            xx=0; q-=pincel_an-map_an;
+            xx=0; q-=pincel_an-map_width;
           } while (++yy<pincel_al);
         } else {
           do {
             do {
               if (*p && *q!=color) { pixel_sin_mask(q); } q++; p++;
             } while (++xx<pincel_an);
-            xx=0; q-=pincel_an-map_an;
+            xx=0; q-=pincel_an-map_width;
           } while (++yy<pincel_al);
         }
       } else {
@@ -2555,15 +2555,15 @@ void line_pixel(int x,int y) { // Brush
   } else {
     col=color;
     if (tipo_pincel) {
-      if (x>=0 && y>=0 && x+pincel_an<=map_an && y+pincel_al<=map_al && !difuminar) {
-        q=map+x+y*map_an; p=pincel;
+      if (x>=0 && y>=0 && x+pincel_an<=map_width && y+pincel_al<=map_height && !difuminar) {
+        q=map+x+y*map_width; p=pincel;
         if (mask_on) {
           do {
             do {
               color=get_color(x+xx,y+yy);
               if ((line_fx=*p) && *q!=color) { pixel(q); } q++; p++;
             } while (++xx<pincel_an);
-            xx=0; q-=pincel_an-map_an;
+            xx=0; q-=pincel_an-map_width;
           } while (++yy<pincel_al);
         } else {
           do {
@@ -2571,7 +2571,7 @@ void line_pixel(int x,int y) { // Brush
               color=get_color(x+xx,y+yy);
               if ((line_fx=*p) && *q!=color) { pixel_sin_mask(q); } q++; p++;
             } while (++xx<pincel_an);
-            xx=0; q-=pincel_an-map_an;
+            xx=0; q-=pincel_an-map_width;
           } while (++yy<pincel_al);
         }
       } else {
@@ -2586,15 +2586,15 @@ void line_pixel(int x,int y) { // Brush
         } while (++yy<pincel_al);
       }
     } else {
-      if (x>=0 && y>=0 && x+pincel_an<=map_an && y+pincel_al<=map_al && !difuminar) {
-        q=map+x+y*map_an; p=pincel;
+      if (x>=0 && y>=0 && x+pincel_an<=map_width && y+pincel_al<=map_height && !difuminar) {
+        q=map+x+y*map_width; p=pincel;
         if (mask_on) {
           do {
             do {
               color=get_color(x+xx,y+yy);
               if (*p && *q!=color) { pixel(q); } q++; p++;
             } while (++xx<pincel_an);
-            xx=0; q-=pincel_an-map_an;
+            xx=0; q-=pincel_an-map_width;
           } while (++yy<pincel_al);
         } else {
           do {
@@ -2602,7 +2602,7 @@ void line_pixel(int x,int y) { // Brush
               color=get_color(x+xx,y+yy);
               if (*p && *q!=color) { pixel_sin_mask(q); } q++; p++;
             } while (++xx<pincel_an);
-            xx=0; q-=pincel_an-map_an;
+            xx=0; q-=pincel_an-map_width;
           } while (++yy<pincel_al);
         }
       } else {
@@ -2624,19 +2624,19 @@ void line_pixel(int x,int y) { // Brush
 void _line_pixel(int x,int y) { // Un simple pixel (para line_pixel,spray y writes)
   byte c1,c2,_color=color;
 
-  if (x>=0 && y>=0 && x<map_an && y<map_al) {
+  if (x>=0 && y>=0 && x<map_width && y<map_height) {
     if (difuminar) {
-      if (x<map_an-1 && x>0) c1=*(ghost+*(map+x+y*map_an-1)*256+*(map+x+y*map_an+1));
-        else c1=*(map+x+y*map_an);
-      if (y<map_al-1 && y>0) c2=*(ghost+*(map+x+(y-1)*map_an)*256+*(map+x+(y+1)*map_an));
-        else c2=*(map+x+y*map_an);
-      _color=color; color=*(ghost+(memptrsize)c1*256+c2); pixel(map+x+y*map_an); color=_color;
-    } else pixel(map+x+y*map_an);
+      if (x<map_width-1 && x>0) c1=*(ghost+*(map+x+y*map_width-1)*256+*(map+x+y*map_width+1));
+        else c1=*(map+x+y*map_width);
+      if (y<map_height-1 && y>0) c2=*(ghost+*(map+x+(y-1)*map_width)*256+*(map+x+(y+1)*map_width));
+        else c2=*(map+x+y*map_width);
+      _color=color; color=*(ghost+(memptrsize)c1*256+c2); pixel(map+x+y*map_width); color=_color;
+    } else pixel(map+x+y*map_width);
   }
 }
 
 //-----------------------------------------------------------------------------
-//      Dibuja una caja, según modo_caja, line_fx y color
+//      Dibuja una caja, según mode_rect, line_fx y color
 //-----------------------------------------------------------------------------
 
 void draw_box(int x0,int y0,int x1,int y1) {
@@ -2647,7 +2647,7 @@ void draw_box(int x0,int y0,int x1,int y1) {
   if (y0>y1) swap(y0,y1); al=y1-y0+1;
 
   if (save_undo(x0-pincel_an/2,y0-pincel_al/2,an+pincel_an,al+pincel_al)) {
-    if (modo_caja) {
+    if (mode_rect) {
       do { circulo_scan2(x0,y0++,an); } while (--al);
     } else  {
       circulo_scan(x0,y0,an); circulo_scan(x0,y0+al-1,an);
@@ -2723,17 +2723,17 @@ void circulo_scan(int x,int y,int an) {
 void circulo_scan2(int x,int y,int an) {
   byte *p,col;
   if (textura_color==NULL) {
-    if (y>=0 && y<map_al && x<map_an && x+an>0) {
+    if (y>=0 && y<map_height && x<map_width && x+an>0) {
       if (x<0) { an+=x; x=0; }
-      if (x+an>map_an) { an=map_an-x; }
-      p=map+y*map_an+x; do pixel(p++); while (--an);
+      if (x+an>map_width) { an=map_width-x; }
+      p=map+y*map_width+x; do pixel(p++); while (--an);
     }
   } else {
     col=color;
-    if (y>=0 && y<map_al && x<map_an && x+an>0) {
+    if (y>=0 && y<map_height && x<map_width && x+an>0) {
       if (x<0) { an+=x; x=0; }
-      if (x+an>map_an) { an=map_an-x; }
-      p=map+y*map_an+x;
+      if (x+an>map_width) { an=map_width-x; }
+      p=map+y*map_width+x;
       do {
         color=get_color(x++,y);
         pixel(p++);
@@ -2743,7 +2743,7 @@ void circulo_scan2(int x,int y,int an) {
 }
 
 //-----------------------------------------------------------------------------
-//      Detecta la regla de color dentro de una barra de edición
+//      Detecta la gradient de color dentro de una toolbar de edición
 //-----------------------------------------------------------------------------
 
 void edit_ruler(void) {
@@ -2751,14 +2751,14 @@ void edit_ruler(void) {
 
     read_mouse(); select_zoom(); test_mouse();
     if ((key(_L_SHIFT) || key(_R_SHIFT)) && (mouse_b&1) && mouse_graf>=10) {
-      color=*(map+coord_y*map_an+coord_x);
+      color=*(map+coord_y*map_width+coord_x);
       remove_texture();
       draw_ruler(); mouse_b=0;
     }
 
-    if ((mouse_b&1) && mouse_in(barra_x+_ir,barra_y,barra_x+_ir+127,barra_y+18)) {
-      if (editable(&n)) reglas[regla].col[n]=color;
-      else color=reglas[regla].col[n];
+    if ((mouse_b&1) && mouse_in(toolbar_x+_ir,toolbar_y,toolbar_x+_ir+127,toolbar_y+18)) {
+      if (editable(&n)) gradients[gradient].colors[n]=color;
+      else color=gradients[gradient].colors[n];
       remove_texture();
       draw_ruler();
     }
@@ -2791,13 +2791,13 @@ void move_selection(byte * sp, int an, int al) {
   byte num[5];
 
   if (sp==NULL) {
-    an=mab_x1-mab_x0+1; al=mab_y1-mab_y0+1;
+    an=sel_mask_x1-sel_mask_x0+1; al=sel_mask_y1-sel_mask_y0+1;
     if ((sp=(byte*)malloc(an*al))==NULL) {
-      v_texto=(char *)texto[45]; show_dialog(err0); return; }
+      v_text=(char *)texto[45]; show_dialog(err0); return; }
     memset(sp,0,an*al); // Crea el sprite en sp
-    for (y=mab_y0;y<=mab_y1;y++)
-      for (x=mab_x0;x<=mab_x1;x++)
-        if (is_mab(x,y)) *(sp+x-mab_x0+(y-mab_y0)*an)=*(map+x+y*map_an);
+    for (y=sel_mask_y0;y<=sel_mask_y1;y++)
+      for (x=sel_mask_x0;x<=sel_mask_x1;x++)
+        if (is_selection_mask(x,y)) *(sp+x-sel_mask_x0+(y-sel_mask_y0)*an)=*(map+x+y*map_width);
   }
 
   bar[0]=101+zoom; bar[1]=121; bar[2]=105+ghost; bar[3]=122+block;
@@ -2812,7 +2812,7 @@ void move_selection(byte * sp, int an, int al) {
 
       if (((mouse_b&1) && selected_icon==1) || (scan_code==14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
         undo_back(); do {read_mouse();} while(mouse_b&1);
-      } else if (scan_code==14 && (key(_L_SHIFT)||key(_R_SHIFT))) { undo_next(); hacer_zoom=1; }
+      } else if (scan_code==14 && (key(_L_SHIFT)||key(_R_SHIFT))) { undo_next(); need_zoom=1; }
 
       if ((mouse_b&1) && selected_icon==2) {
         ghost^=1; bar[2]=105+ghost;
@@ -2847,7 +2847,7 @@ void move_selection(byte * sp, int an, int al) {
       }
 
       if ((mouse_b&1) && selected_icon==8) {
-        box2mab(); mab_delete();
+        box_to_sel_mask(); sel_mask_delete();
         do {read_mouse();} while(mouse_b&1);
       }
 
@@ -2866,42 +2866,42 @@ void move_selection(byte * sp, int an, int al) {
       _x=coord_x-_coord_x; _y=_coord_y-coord_y;
       if (!_x && !_y) ang=0; else ang=atan2(_y,_x);
       xg=ang*57.295779761; if (xg<0) xg+=360;
-      wbox(barra,vga_an/big2,19,c2,barra_an-23,2,21,15);
-      p=copia; copia=barra; text_color=c3;
+      wbox(toolbar,vga_width/big2,19,c2,toolbar_width-23,2,21,15);
+      p=copia; copia=toolbar; text_color=c3;
       num[4]=0; num[3]='\xa7'; num[2]=xg%10+48; num[1]=(xg/10)%10+48;
-      num[0]=(xg/100)%10+48; writetxt(barra_an-21,6,0,num); copia=p;
+      num[0]=(xg/100)%10+48; writetxt(toolbar_width-21,6,0,num); copia=p;
     }
 
     if (s==3 || s==4) {
       _x=coord_x+coord_y-_coord_x-_coord_y;
       if ((size=1+(float)_x/100)<0) size=0;
       xg=size*100;
-      wbox(barra,vga_an/big2,19,c2,barra_an-23,2,21,15);
-      p=copia; copia=barra; text_color=c3;
+      wbox(toolbar,vga_width/big2,19,c2,toolbar_width-23,2,21,15);
+      p=copia; copia=toolbar; text_color=c3;
       num[4]=0; num[3]='%'; num[2]=xg%10+48; num[1]=(xg/10)%10+48;
-      num[0]=(xg/100)%10+48; writetxt(barra_an-22,6,0,num); copia=p;
+      num[0]=(xg/100)%10+48; writetxt(toolbar_width-22,6,0,num); copia=p;
     }
 
-    if (mouse_in(barra_x+48,barra_y+2,barra_x+barra_an-2,barra_y+17)) {
-      selected_icon=(mouse_x-barra_x-48)/16;
+    if (mouse_in(toolbar_x+48,toolbar_y+2,toolbar_x+toolbar_width-2,toolbar_y+17)) {
+      selected_icon=(mouse_x-toolbar_x-48)/16;
       if (bar[selected_icon]>1) {
-        wresalta_box(barra,vga_an/big2,19,48+selected_icon*16,2,15,15);
+        wresalta_box(toolbar,vga_width/big2,19,48+selected_icon*16,2,15,15);
       } else selected_icon=-1;
     } else selected_icon=-1;
 
     if ((_mouse_graf=mouse_graf)>=10) {
-      if (_coord_x>=0 && _coord_y>=0 && _coord_x<map_an && _coord_y<map_al) {
+      if (_coord_x>=0 && _coord_y>=0 && _coord_x<map_width && _coord_y<map_height) {
         xg=an/2; yg=al/2;
         if (size==1 && ang==0) {
           if (save_undo(_coord_x-xg,_coord_y-yg,an,al))
             sp_normal(sp,_coord_x,_coord_y,an,al,xg,yg,block*2+ghost);
-          else modo=110;
+          else draw_mode=110;
         } else {
           _an=an; _al=al; _x=_coord_x; _y=_coord_y;
           sp_size(&_x,&_y,&_an,&_al,xg,yg,ang,size);
           if (save_undo(_x,_y,_an,_al))
             sp_rotated(sp,_coord_x,_coord_y,an,al,xg,yg,block*2+ghost,ang,size);
-          else modo=110;
+          else draw_mode=110;
         }
       }
       if (s==2 || s==4) _mouse_graf=1; else _mouse_graf=2;
@@ -2909,10 +2909,10 @@ void move_selection(byte * sp, int an, int al) {
 
     zoom_map();
     flush_bars(0);
-    save_mouse_bg(fondo_raton,mouse_shift_x,mouse_shift_y,_mouse_graf,0);
+    save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,_mouse_graf,0);
     put(mouse_shift_x,mouse_shift_y,_mouse_graf);
     blit_screen(copia);
-    save_mouse_bg(fondo_raton,mouse_shift_x,mouse_shift_y,_mouse_graf,1);
+    save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,_mouse_graf,1);
 
     if (mouse_graf>=10) switch(s) {
       case 0:
@@ -2960,10 +2960,10 @@ void move_selection(byte * sp, int an, int al) {
       }
     } else _tab=0;
 
-  } while (!salir_del_entorno && !(mouse_b&2) && !(key(_ESC)&&!s) && modo<100 &&
-    !(mouse_b && mouse_in(barra_x,barra_y+10,barra_x+9,barra_y+18)));
+  } while (!exit_requested && !(mouse_b&2) && !(key(_ESC)&&!s) && draw_mode<100 &&
+    !(mouse_b && mouse_in(toolbar_x,toolbar_y+10,toolbar_x+9,toolbar_y+18)));
 
-  if (key(_ESC)||(mouse_b && mouse_in(barra_x,barra_y+10,barra_x+9,barra_y+18)))
+  if (key(_ESC)||(mouse_b && mouse_in(toolbar_x,toolbar_y+10,toolbar_x+9,toolbar_y+18)))
     { put_bar(2,10,45); flush_bars(0);
       put(mouse_x,mouse_y,mouse_graf); blit_screen(copia); }
 
@@ -2979,7 +2979,7 @@ void effects(void) {
 
   bar[0]=101+zoom; bar[1]=121; bar[2]=140; bar[3]=194;
   bar[4]=128; bar[5]=142; bar[6]=143; bar[7]=150; bar[8]=0;
-  draw_bar(0); put_bar_inv(10,2,171); hacer_zoom=1;
+  draw_bar(0); put_bar_inv(10,2,171); need_zoom=1;
 
   do {
     draw_help(1295);
@@ -2987,84 +2987,84 @@ void effects(void) {
 
     if (((mouse_b&1) && selected_icon==1) || (scan_code==14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
       undo_back(); do {read_mouse();} while(mouse_b&1);
-    } else if (scan_code==14 && (key(_L_SHIFT)||key(_R_SHIFT))) { undo_next(); hacer_zoom=1; }
+    } else if (scan_code==14 && (key(_L_SHIFT)||key(_R_SHIFT))) { undo_next(); need_zoom=1; }
 
-    if ((mouse_b&1) && selected_icon==2) { // Pasar a regla
-      mab_ruler(); hacer_zoom=1;
+    if ((mouse_b&1) && selected_icon==2) { // Pasar a gradient
+      sel_mask_ruler(); need_zoom=1;
       do {read_mouse();} while(mouse_b&1);
     }
 
     if ((mouse_b&1) && selected_icon==3) { // Invertir
-      mab_invert(); hacer_zoom=1;
+      sel_mask_invert(); need_zoom=1;
       do {read_mouse();} while(mouse_b&1);
     }
 
     if ((mouse_b&1) && selected_icon==4) { // Máscara
-      mab_mask(); hacer_zoom=1;
+      sel_mask_mask(); need_zoom=1;
       do {read_mouse();} while(mouse_b&1);
     }
 
     if ((mouse_b&1) && selected_icon==5) { // Aclarar
-      mab_lighten(c4); hacer_zoom=1;
+      sel_mask_lighten(c4); need_zoom=1;
       do {read_mouse();} while(mouse_b&1);
     }
 
     if ((mouse_b&1) && selected_icon==6) { // Oscurecer
-      mab_lighten(c0); hacer_zoom=1;
+      sel_mask_lighten(c0); need_zoom=1;
       do {read_mouse();} while(mouse_b&1);
     }
 
     if ((mouse_b&1) && selected_icon==7) { // Anti-alias
-      mab_antialias(); hacer_zoom=1;
+      sel_mask_antialias(); need_zoom=1;
       do {read_mouse();} while(mouse_b&1);
     }
 
-    hacer_zoom_x=map_an; hacer_zoom_y=map_al;
-    hacer_zoom_an=0; hacer_zoom_al=0;
+    need_zoom_x=map_width; need_zoom_y=map_height;
+    need_zoom_width=0; need_zoom_height=0;
     test_next();
 
     blit_edit();
-  } while (!salir_del_entorno && !(mouse_b&2) && !key(_ESC) && modo<100 &&
-    !(mouse_b && mouse_in(barra_x,barra_y+10,barra_x+9,barra_y+18)));
+  } while (!exit_requested && !(mouse_b&2) && !key(_ESC) && draw_mode<100 &&
+    !(mouse_b && mouse_in(toolbar_x,toolbar_y+10,toolbar_x+9,toolbar_y+18)));
 
-  if (key(_ESC)||(mouse_b && mouse_in(barra_x,barra_y+10,barra_x+9,barra_y+18)))
+  if (key(_ESC)||(mouse_b && mouse_in(toolbar_x,toolbar_y+10,toolbar_x+9,toolbar_y+18)))
     { put_bar(2,10,45); flush_bars(0);
       put(mouse_x,mouse_y,mouse_graf); blit_screen(copia); }
 }
 
 //-----------------------------------------------------------------------------
-//      Cuentagotas (toma un color de pantalla) para una barra cualquiera
+//      Cuentagotas (toma un color de pantalla) para una toolbar cualquiera
 //-----------------------------------------------------------------------------
 
 void eyedropper(void) {
 
-  byte * _barra, * _copia;
+  byte * _toolbar, * _copia;
   int _bar[16];
-  int _barra_an;
+  int _toolbar_width;
   int col=color;
   byte num[8];
 
-  if ((_barra=(byte*)malloc(vga_an*19*big2))!=NULL) {
-    memcpy(_barra,barra,vga_an*19*big2); memcpy(_bar,bar,16*4); _barra_an=barra_an;
+  if ((_toolbar=(byte*)malloc(vga_width*19*big2))!=NULL) {
+    memcpy(_toolbar,toolbar,vga_width*19*big2); memcpy(_bar,bar,16*4); _toolbar_width=toolbar_width;
 
     bar[0]=101+zoom; bar[1]=1; bar[2]=1; bar[3]=1; bar[4]=0;
-    draw_bar(0); put_bar_inv(10,2,166); hacer_zoom=1;
+    draw_bar(0); put_bar_inv(10,2,166); need_zoom=1;
 
     do {
       draw_help(1295);
       read_mouse(); select_zoom(); test_mouse();
 
       if ((mouse_b&1) && mouse_graf>=10) {
-        col=*(map+coord_x+coord_y*map_an);
+        col=*(map+coord_x+coord_y*map_width);
         color=col; mouse_b=2;
         remove_texture();
       }
 
       if (mouse_graf>=10) {
-        col=*(map+coord_x+coord_y*map_an);
-        _copia=copia; copia=barra;
-        wbox(barra,vga_an/big2,19,col,64,2,15,15);
-        wbox(barra,vga_an/big2,19,c2,80,2,31,15);
+        col=*(map+coord_x+coord_y*map_width);
+        _copia=copia; copia=toolbar;
+        wbox(toolbar,vga_width/big2,19,col,64,2,15,15);
+        wbox(toolbar,vga_width/big2,19,c2,80,2,31,15);
         text_color=c4;
         num[2]=col%10+48; num[1]=(col/10)%10+48; num[0]=(col/100)%10+48;
         strcpy((char *)&num[3],"Dec"); writetxt(109,3,2,num);
@@ -3072,45 +3072,45 @@ void eyedropper(void) {
         strcpy((char *)&num[2],"Hex"); writetxt(109,10,2,num);
         copia=_copia;
       } else {
-        _copia=copia; copia=barra;
-        wbox(barra,vga_an/big2,19,c1,64,2,15,15);
-        wbox(barra,vga_an/big2,19,c2,80,2,31,15);
+        _copia=copia; copia=toolbar;
+        wbox(toolbar,vga_width/big2,19,c1,64,2,15,15);
+        wbox(toolbar,vga_width/big2,19,c2,80,2,31,15);
         copia=_copia;
       }
 
       blit_edit();
-    } while (!salir_del_entorno && !(mouse_b&2) && !key(_ESC) && modo<100 &&
-      !(mouse_b && mouse_in(barra_x,barra_y+10,barra_x+9,barra_y+18)));
+    } while (!exit_requested && !(mouse_b&2) && !key(_ESC) && draw_mode<100 &&
+      !(mouse_b && mouse_in(toolbar_x,toolbar_y+10,toolbar_x+9,toolbar_y+18)));
 
-    if (key(_ESC)||(mouse_b && mouse_in(barra_x,barra_y+10,barra_x+9,barra_y+18)))
+    if (key(_ESC)||(mouse_b && mouse_in(toolbar_x,toolbar_y+10,toolbar_x+9,toolbar_y+18)))
       { put_bar(2,10,45); flush_bars(0);
         put(mouse_x,mouse_y,mouse_graf); blit_screen(copia); }
 
-    memcpy(barra,_barra,vga_an*19*big2); memcpy(bar,_bar,16*4); barra_an=_barra_an;
-    free(_barra);
+    memcpy(toolbar,_toolbar,vga_width*19*big2); memcpy(bar,_bar,16*4); toolbar_width=_toolbar_width;
+    free(_toolbar);
   } else {
-    v_texto=(char *)texto[45]; show_dialog(err0);
+    v_text=(char *)texto[45]; show_dialog(err0);
   }
 
-  zoom_background=0; hacer_zoom=1;
+  zoom_background=0; need_zoom=1;
 }
 
 //-----------------------------------------------------------------------------
-//      Función que dice si el cursor esta sobre un color editable de la regla
-//      Devuelve en el parámetro el color editado (de la regla actual de color)
+//      Función que dice si el cursor esta sobre un color editable de la gradient
+//      Devuelve en el parámetro el color editado (de la gradient actual de color)
 //-----------------------------------------------------------------------------
 
 int editable(int *n) {
   int r=4;
 
-  switch(reglas[regla].numcol) {
+  switch(gradients[gradient].num_colors) {
     case 8: r=16; break; case 16: r=8; break; case 32: r=4; break; }
-  *n=(mouse_x-barra_x-_ir)/r+1;
+  *n=(mouse_x-toolbar_x-_ir)/r+1;
 
-  if (!reglas[regla].fijo) {
-    if (mouse_y>=barra_y+11 && mouse_y<=barra_y+18
-        && mouse_x>=barra_x+_ir && mouse_x<barra_x+_ir+128) {
-      switch(reglas[regla].tipo) {
+  if (!gradients[gradient].fixed) {
+    if (mouse_y>=toolbar_y+11 && mouse_y<=toolbar_y+18
+        && mouse_x>=toolbar_x+_ir && mouse_x<toolbar_x+_ir+128) {
+      switch(gradients[gradient].type) {
         case 0: if (*n==1) r=1; else r=0; break;
         case 1: r=1; break;
         case 2: if (*n%2==0) r=1; else r=0; break;
@@ -3122,22 +3122,22 @@ int editable(int *n) {
 }
 
 //-----------------------------------------------------------------------------
-//      Función que dice si el cursor esta sobre un color editable de la regla
-//      Devuelve en el parámetro el color editado (de la regla actual de color)
-//      - Versión para la regla de la ventana de select_color -
+//      Función que dice si el cursor esta sobre un color editable de la gradient
+//      Devuelve en el parámetro el color editado (de la gradient actual de color)
+//      - Versión para la gradient de la ventana de select_color -
 //-----------------------------------------------------------------------------
 
 int editable_selection(int *n,int x,int y) {
   int r=4;
 
-  switch(reglas[regla].numcol) {
+  switch(gradients[gradient].num_colors) {
     case 8: r=16; break; case 16: r=8; break; case 32: r=4; break; }
   *n=(mouse_x-x)/r+1;
 
-  if (!reglas[regla].fijo) {
+  if (!gradients[gradient].fixed) {
     if (mouse_y>=y+9 && mouse_y<y+16
         && mouse_x>=x && mouse_x<x+128) {
-      switch(reglas[regla].tipo) {
+      switch(gradients[gradient].type) {
         case 0: if (*n==1) r=1; else r=0; break;
         case 1: r=1; break;
         case 2: if (*n%2==0) r=1; else r=0; break;
@@ -3149,7 +3149,7 @@ int editable_selection(int *n,int x,int y) {
 }
 
 //-----------------------------------------------------------------------------
-//      Dibuja la regla de colores dentro de la barra de edicion
+//      Dibuja la gradient de colores dentro de la toolbar de edicion
 //-----------------------------------------------------------------------------
 
 void draw_ruler(void) {
@@ -3159,109 +3159,109 @@ void draw_ruler(void) {
   int s0=4,s1=0;
 
 
-  if (fondo_resaltado) { dac[0]=(dac[0]+32)%64; dac[1]=(dac[1]+32)%64; dac[2]=(dac[2]+32)%64; }
-  calcula_regla(regla);
-  if (fondo_resaltado) { dac[0]=(dac[0]+32)%64; dac[1]=(dac[1]+32)%64; dac[2]=(dac[2]+32)%64; }
+  if (highlight_background) { dac[0]=(dac[0]+32)%64; dac[1]=(dac[1]+32)%64; dac[2]=(dac[2]+32)%64; }
+  calculate_gradient(gradient);
+  if (highlight_background) { dac[0]=(dac[0]+32)%64; dac[1]=(dac[1]+32)%64; dac[2]=(dac[2]+32)%64; }
 
-  p=copia; copia=barra;
+  p=copia; copia=toolbar;
 
-  switch (reglas[regla].numcol) {
+  switch (gradients[gradient].num_colors) {
     case 8: s0=16; s1=5; break;
     case 16: s0=8; s1=1; break;
     case 32: s0=4; s1=-1; break;
   }
 
   for (a=_ir;a<_ir+128;a+=s0) {
-    n=reglas[regla].col[(a-_ir)/s0+1];
-    wbox(barra,vga_an/big2,19,n,a,2,s0-1,15);
-    wbox(barra,vga_an/big2,19,c0,a+s0-1,2,1,15);
+    n=gradients[gradient].colors[(a-_ir)/s0+1];
+    wbox(toolbar,vga_width/big2,19,n,a,2,s0-1,15);
+    wbox(toolbar,vga_width/big2,19,c0,a+s0-1,2,1,15);
     if (n==color) {
-      wbox(barra,vga_an/big2,19,c4,a,2,s0-1,1);
-      wbox(barra,vga_an/big2,19,c0,a,3,s0-1,1);
+      wbox(toolbar,vga_width/big2,19,c4,a,2,s0-1,1);
+      wbox(toolbar,vga_width/big2,19,c0,a,3,s0-1,1);
     }
-    if (!reglas[regla].fijo) {
-      if (reglas[regla].tipo) {
-        if (((a-_ir)/s0+1)%reglas[regla].tipo==0) {
-          wbox(barra,vga_an/big2,19,c0,a,10,s0-1,1); wbox(barra,vga_an/big2,19,c2,a,11,s0-1,6);
-          wput(barra,vga_an/big2,19,a+s1,11,32);
-          wbox(barra,vga_an/big2,19,c0,a-1,11,1,6); wbox(barra,vga_an/big2,19,c0,a+s0-1,11,1,6);
+    if (!gradients[gradient].fixed) {
+      if (gradients[gradient].type) {
+        if (((a-_ir)/s0+1)%gradients[gradient].type==0) {
+          wbox(toolbar,vga_width/big2,19,c0,a,10,s0-1,1); wbox(toolbar,vga_width/big2,19,c2,a,11,s0-1,6);
+          wput(toolbar,vga_width/big2,19,a+s1,11,32);
+          wbox(toolbar,vga_width/big2,19,c0,a-1,11,1,6); wbox(toolbar,vga_width/big2,19,c0,a+s0-1,11,1,6);
         }
       } else if (a==_ir) {
-        wbox(barra,vga_an/big2,19,c0,a,10,s0-1,1); wbox(barra,vga_an/big2,19,c2,a,11,s0-1,6);
-        wput(barra,vga_an/big2,19,a+s1,11,32);
-        wbox(barra,vga_an/big2,19,c0,a-1,11,1,6); wbox(barra,vga_an/big2,19,c0,a+s0-1,11,1,6);
+        wbox(toolbar,vga_width/big2,19,c0,a,10,s0-1,1); wbox(toolbar,vga_width/big2,19,c2,a,11,s0-1,6);
+        wput(toolbar,vga_width/big2,19,a+s1,11,32);
+        wbox(toolbar,vga_width/big2,19,c0,a-1,11,1,6); wbox(toolbar,vga_width/big2,19,c0,a+s0-1,11,1,6);
       }
     }
   }
 
-  wbox(barra,vga_an/big2,19,color,80,2,7,8); // Caja del color, invoca a select_color()
+  wbox(toolbar,vga_width/big2,19,color,80,2,7,8); // Caja del color, invoca a select_color()
 
-  if (textura_color==NULL || modo==0) {
+  if (textura_color==NULL || draw_mode==0) {
     n=(memptrsize)c1*3; med=dac[n]+dac[n+1]+dac[n+2];
     n=color*3;
     if (dac[n]+dac[n+1]+dac[n+2]>med) n=color; else n=c1;
-    wrectangle(barra,vga_an/big2,19,n,80,2,7,8);
+    wrectangle(toolbar,vga_width/big2,19,n,80,2,7,8);
   } else {
-    ptr=barra+2*big2*vga_an+80*big2;
+    ptr=toolbar+2*big2*vga_width+80*big2;
     if (big) {
       for (y=0;y<16;y++) for (x=0;x<14;x++) {
-        ptr[x+y*vga_an]=get_color(x,y);
+        ptr[x+y*vga_width]=get_color(x,y);
       }
     } else {
       for (y=0;y<8;y++) for (x=0;x<7;x++) {
-        ptr[x+y*vga_an]=get_color(x,y);
+        ptr[x+y*vga_width]=get_color(x,y);
       }
     }
   }
 
   // Selección de textura_color
 
-  wbox(barra,vga_an/big2,19,c2,80,2+9,7,6);
+  wbox(toolbar,vga_width/big2,19,c2,80,2+9,7,6);
 
-  wbox(barra,vga_an/big2,19,c3,80+1,2+10,1,4); // 'U'
-  wbox(barra,vga_an/big2,19,c3,80+5,2+10,1,4);
-  wbox(barra,vga_an/big2,19,c3,80+1,2+13,5,1);
+  wbox(toolbar,vga_width/big2,19,c3,80+1,2+10,1,4); // 'U'
+  wbox(toolbar,vga_width/big2,19,c3,80+5,2+10,1,4);
+  wbox(toolbar,vga_width/big2,19,c3,80+1,2+13,5,1);
 
   // Rectángulo del color 0
 
-  wrectangle(barra,vga_an/big2,19,c1,88,2,7,8);
-  wbox(barra,vga_an/big2,19,0,88+1,2+1,5,6);
+  wrectangle(toolbar,vga_width/big2,19,c1,88,2,7,8);
+  wbox(toolbar,vga_width/big2,19,0,88+1,2+1,5,6);
 
   // Selección de brush
 
-  wbox(barra,vga_an/big2,19,c2,88,2+9,7,6);
+  wbox(toolbar,vga_width/big2,19,c2,88,2+9,7,6);
 
-  wbox(barra,vga_an/big2,19,c3,88+1,2+10,5,1); // 'T'
-  wbox(barra,vga_an/big2,19,c3,88+3,2+10,1,4);
+  wbox(toolbar,vga_width/big2,19,c3,88+1,2+10,5,1); // 'T'
+  wbox(toolbar,vga_width/big2,19,c3,88+3,2+10,1,4);
 
   copia=p;
 
 }
 
 //-----------------------------------------------------------------------------
-//      Dibuja la regla de colores dentro de la ventana de selección de color
+//      Dibuja la gradient de colores dentro de la ventana de selección de color
 //-----------------------------------------------------------------------------
 
 void draw_ruler_selection(byte * p, int c, int d, int x, int y) {
   int n,s0=4,s1=0,a;
 
-  switch (reglas[regla].numcol) {
+  switch (gradients[gradient].num_colors) {
     case 8: s0=16; s1=5; break;
     case 16: s0=8; s1=1; break;
     case 32: s0=4; s1=-1; break;
   }
 
   for (a=x;a<x+128;a+=s0) {
-    n=reglas[regla].col[(a-x)/s0+1];
+    n=gradients[gradient].colors[(a-x)/s0+1];
     wbox(p,c,d,n,a,y,s0-1,15);
     wbox(p,c,d,c0,a+s0-1,y,1,15);
     if (n==color) {
       wbox(p,c,d,c4,a,y,s0-1,1);
       wbox(p,c,d,c0,a,y+1,s0-1,1);
     }
-    if (!reglas[regla].fijo) {
-      if (reglas[regla].tipo) {
-        if (((a-x)/s0+1)%reglas[regla].tipo==0) {
+    if (!gradients[gradient].fixed) {
+      if (gradients[gradient].type) {
+        if (((a-x)/s0+1)%gradients[gradient].type==0) {
           wbox(p,c,d,c0,a,y+8,s0-1,1);
           wbox(p,c,d,c2,a,y+9,s0-1,6);
           wput(p,c,d,a+s1,y+9,32);
@@ -3279,20 +3279,20 @@ void draw_ruler_selection(byte * p, int c, int d, int x, int y) {
   }
 
   wbox(p,c,d,c2,x+128,y,47,7);
-  switch(reglas[regla].numcol) {
+  switch(gradients[gradient].num_colors) {
     case 8: wwrite(p,c,d,x+128+23,y,1,texto[310],c3); break;
     case 16: wwrite(p,c,d,x+128+23,y,1,texto[311],c3); break;
     case 32: wwrite(p,c,d,x+128+23,y,1,texto[312],c3); break;
   }
 
   wbox(p,c,d,c2,x+128+48,y,47,7);
-  switch(reglas[regla].fijo) {
+  switch(gradients[gradient].fixed) {
     case 0: wwrite(p,c,d,x+128+71,y,1,texto[313],c3); break;
     case 1: wwrite(p,c,d,x+128+71,y,1,texto[314],c3); break;
   }
 
   wbox(p,c,d,c2,x+128,y+8,95,7);
-  switch(reglas[regla].tipo) {
+  switch(gradients[gradient].type) {
     case 0: wwrite(p,c,d,x+128+48,y+8,1,texto[315],c3); break;
     case 1: wwrite(p,c,d,x+128+48,y+8,1,texto[316],c3); break;
     case 2: wwrite(p,c,d,x+128+48,y+8,1,texto[317],c3); break;
@@ -3317,27 +3317,27 @@ void draw_help(int n) {
     // Si hay una ventana de ayuda, entonces la quita
 
     if ((m=determine_help())>0) {
-      v.primer_plano=1; v.estado=1; v.tipo=100;
+      v.foreground=1; v.state=1; v.type=100;
       move(0,m); call(v.close_handler);
       if (v.click_handler==help2 && old_prg!=NULL) {
         for (m=1;m<max_windows;m++) {
           if (ventana[m].click_handler==program2) {
-            if (ventana[m].prg==old_prg && ventana[m].primer_plano<2) {
-              ventana[m].estado=1;
+            if (ventana[m].prg==old_prg && ventana[m].foreground<2) {
+              ventana[m].state=1;
               wgra(ventana[m].ptr,ventana[m].an/big2,ventana[m].al/big2,c_b_low,2,2,ventana[m].an/big2-20,7);
-              if (text_len(ventana[m].titulo)+3>ventana[m].an/big2-20) {
-                wwrite_in_box(ventana[m].ptr,ventana[m].an/big2,ventana[m].an/big2-19,ventana[m].al/big2,4,2,0,ventana[m].titulo,c1);
-                wwrite_in_box(ventana[m].ptr,ventana[m].an/big2,ventana[m].an/big2-19,ventana[m].al/big2,3,2,0,ventana[m].titulo,c4);
+              if (text_len(ventana[m].title)+3>ventana[m].an/big2-20) {
+                wwrite_in_box(ventana[m].ptr,ventana[m].an/big2,ventana[m].an/big2-19,ventana[m].al/big2,4,2,0,ventana[m].title,c1);
+                wwrite_in_box(ventana[m].ptr,ventana[m].an/big2,ventana[m].an/big2-19,ventana[m].al/big2,3,2,0,ventana[m].title,c4);
               } else {
-                wwrite(ventana[m].ptr,ventana[m].an/big2,ventana[m].al/big2,3+(ventana[m].an/big2-20)/2,2,1,ventana[m].titulo,c1);
-                wwrite(ventana[m].ptr,ventana[m].an/big2,ventana[m].al/big2,2+(ventana[m].an/big2-20)/2,2,1,ventana[m].titulo,c4);
-              } v.estado=0; break;
+                wwrite(ventana[m].ptr,ventana[m].an/big2,ventana[m].al/big2,3+(ventana[m].an/big2-20)/2,2,1,ventana[m].title,c1);
+                wwrite(ventana[m].ptr,ventana[m].an/big2,ventana[m].al/big2,2+(ventana[m].an/big2-20)/2,2,1,ventana[m].title,c4);
+              } v.state=0; break;
             }
           }
         } old_prg=NULL;
       } divdelete(0);
-      zoom_background=0; v.tipo=0; v.primer_plano=0; v.estado=0;
-      fondo_resaltado=0; zoom_map(); hacer_zoom=0;
+      zoom_background=0; v.type=0; v.foreground=0; v.state=0;
+      highlight_background=0; zoom_map(); need_zoom=0;
     }
 
     // Crea un diálogo de ayuda...
@@ -3356,21 +3356,21 @@ void zoom_map2(void) {
   int n,m,c,x,y;
   byte *p,*q=copia;
 
-  p=map+zoom_y*map_an+zoom_x;
+  p=map+zoom_y*map_width+zoom_x;
 
-  if ((map_an<<zoom)<vga_an) { // Copia de este trozo en select_zoom()
-    zan=map_an<<zoom; zx=(vga_an-zan)/2; q+=zx; an=map_an;
+  if ((map_width<<zoom)<vga_width) { // Copia de este trozo en select_zoom()
+    zoom_win_width=map_width<<zoom; zoom_win_x=(vga_width-zoom_win_width)/2; q+=zoom_win_x; an=map_width;
   } else {
-    zx=0; an=vga_an>>zoom; zan=an<<zoom;
+    zoom_win_x=0; an=vga_width>>zoom; zoom_win_width=an<<zoom;
   }
 
-  if ((map_al<<zoom)<vga_al) {
-    zal=map_al<<zoom; zy=(vga_al-zal)/2; q+=zy*vga_an; al=map_al;
+  if ((map_height<<zoom)<vga_height) {
+    zoom_win_height=map_height<<zoom; zoom_win_y=(vga_height-zoom_win_height)/2; q+=zoom_win_y*vga_width; al=map_height;
   } else {
-    zy=0; al=vga_al>>zoom; zal=al<<zoom;
+    zoom_win_y=0; al=vga_height>>zoom; zoom_win_height=al<<zoom;
   }
 
-  if (zx || zy) blit_partial(zx,zy,zan,zal); else volcado_completo=1;
+  if (zoom_win_x || zoom_win_y) blit_partial(zoom_win_x,zoom_win_y,zoom_win_width,zoom_win_height); else full_redraw=1;
 
   x=zoom_x; y=zoom_y;
 
@@ -3381,8 +3381,8 @@ void zoom_map2(void) {
         *q++=*(ghost+*p*256+textura_color[(x+textura_x)%textura_an+((y+textura_y)%textura_al)*textura_an]);
         x++; p++;
       } while (--n);
-      y++; x-=an; p+=map_an-an;
-      q+=vga_an-an;
+      y++; x-=an; p+=map_width-an;
+      q+=vga_width-an;
     } while (--m);
     break;
 
@@ -3392,12 +3392,12 @@ void zoom_map2(void) {
         c=*(ghost+*p*256+textura_color[(x+textura_x)%textura_an+((y+textura_y)%textura_al)*textura_an]);
         c+=c*256;
         *(word*)q=c;
-        *(word*)(q+vga_an)=c;
+        *(word*)(q+vga_width)=c;
         q+=2;
         x++; p++;
       } while (--n);
-      y++; x-=an; p+=map_an-an;
-      q+=vga_an*2-an*2;
+      y++; x-=an; p+=map_width-an;
+      q+=vga_width*2-an*2;
     } while (--m);
     break;
 
@@ -3406,14 +3406,14 @@ void zoom_map2(void) {
       n=an; do {
         c=*(ghost+*p*256+textura_color[(x+textura_x)%textura_an+((y+textura_y)%textura_al)*textura_an]);
         c+=c*256; c+=c*65536;
-        *(int*)q=c; q+=vga_an;
-        *(int*)q=c; q+=vga_an;
-        *(int*)q=c; q+=vga_an;
-        *(int*)q=c; q-=vga_an*3-4;
+        *(int*)q=c; q+=vga_width;
+        *(int*)q=c; q+=vga_width;
+        *(int*)q=c; q+=vga_width;
+        *(int*)q=c; q-=vga_width*3-4;
         x++; p++;
       } while (--n);
-      y++; x-=an; p+=map_an-an;
-      q+=vga_an*4-an*4;
+      y++; x-=an; p+=map_width-an;
+      q+=vga_width*4-an*4;
     } while (--m);
     break;
 
@@ -3423,25 +3423,25 @@ void zoom_map2(void) {
         c=*(ghost+*p*256+textura_color[(x+textura_x)%textura_an+((y+textura_y)%textura_al)*textura_an]);
         c+=c*256; c+=c*65536;
         *(int*)q=c; q+=4;
-        *(int*)q=c; q+=vga_an;
+        *(int*)q=c; q+=vga_width;
         *(int*)q=c; q-=4;
-        *(int*)q=c; q+=vga_an;
+        *(int*)q=c; q+=vga_width;
         *(int*)q=c; q+=4;
-        *(int*)q=c; q+=vga_an;
+        *(int*)q=c; q+=vga_width;
         *(int*)q=c; q-=4;
-        *(int*)q=c; q+=vga_an;
+        *(int*)q=c; q+=vga_width;
         *(int*)q=c; q+=4;
-        *(int*)q=c; q+=vga_an;
+        *(int*)q=c; q+=vga_width;
         *(int*)q=c; q-=4;
-        *(int*)q=c; q+=vga_an;
+        *(int*)q=c; q+=vga_width;
         *(int*)q=c; q+=4;
-        *(int*)q=c; q+=vga_an;
+        *(int*)q=c; q+=vga_width;
         *(int*)q=c; q-=4;
-        *(int*)q=c; q-=vga_an*7-8;
+        *(int*)q=c; q-=vga_width*7-8;
         x++; p++;
       } while (--n);
-      y++; x-=an; p+=map_an-an;
-      q+=vga_an*8-an*8;
+      y++; x-=an; p+=map_width-an;
+      q+=vga_width*8-an*8;
     } while (--m);
     break;
   }
@@ -3481,17 +3481,17 @@ void blit_edit(void) {
   move_zoom();
   move_bar();
 
-  if (hacer_zoom==1) zoom_map();
-  else if (hacer_zoom==-1 && hacer_zoom_an>0 && hacer_zoom_al>0)
-    draw_edit_background(hacer_zoom_x,hacer_zoom_y,hacer_zoom_an,hacer_zoom_al);
-  hacer_zoom_an=0; hacer_zoom_al=0; hacer_zoom=0;
+  if (need_zoom==1) zoom_map();
+  else if (need_zoom==-1 && need_zoom_width>0 && need_zoom_height>0)
+    draw_edit_background(need_zoom_x,need_zoom_y,need_zoom_width,need_zoom_height);
+  need_zoom_width=0; need_zoom_height=0; need_zoom=0;
 
   bar_coords();
 
-  if (mouse_in(barra_x+48,barra_y+2,barra_x+barra_an-2,barra_y+17)) {
-    selected_icon=(mouse_x-barra_x-48)/16;
+  if (mouse_in(toolbar_x+48,toolbar_y+2,toolbar_x+toolbar_width-2,toolbar_y+17)) {
+    selected_icon=(mouse_x-toolbar_x-48)/16;
     if (bar[selected_icon]>1) {
-      wresalta_box(barra,vga_an/big2,19,48+selected_icon*16,2,15,15);
+      wresalta_box(toolbar,vga_width/big2,19,48+selected_icon*16,2,15,15);
     } else selected_icon=-1;
   } else selected_icon=-1;
 
@@ -3511,7 +3511,7 @@ void blit_edit(void) {
   if (key(_B) && !(barra_texto && sel_status==1)) {
     if (!b_pulsada) {
       b_pulsada=1;
-      fondo_resaltado^=1;
+      highlight_background^=1;
       dac[0]=(dac[0]+32)%64;
       dac[1]=(dac[1]+32)%64;
       dac[2]=(dac[2]+32)%64;
@@ -3522,7 +3522,7 @@ void blit_edit(void) {
 }
 
 //-----------------------------------------------------------------------------
-//      Selección de otra barra, desde la pantalla de edición
+//      Selección de otra toolbar, desde la pantalla de edición
 //-----------------------------------------------------------------------------
 
 int iconos_mode[]={14,2,177,160,161,178,162,179,163,164,180,165,131,100,191,190};
@@ -3531,53 +3531,53 @@ void select_mode(void) {
   int r;
 
   if (!key(_L_SHIFT) && !key(_R_SHIFT)) {
-    if (key(_F2)) { modo=101; return; }
-    if (key(_F3)) { modo=102; return; }
-    if (key(_F4)) { modo=103; return; }
-    if (key(_F5)) { modo=104; return; }
-    if (key(_F6)) { modo=105; return; }
-    if (key(_F7)) { modo=106; return; }
-    if (key(_F8)) { modo=107; return; }
-    if (key(_F9)) { modo=108; return; }
-    if (key(_F10)) { modo=109; return; }
-    if (key(_F11)) { modo=110; return; }
-    if (key(_F12)) { modo=111; return; }
+    if (key(_F2)) { draw_mode=101; return; }
+    if (key(_F3)) { draw_mode=102; return; }
+    if (key(_F4)) { draw_mode=103; return; }
+    if (key(_F5)) { draw_mode=104; return; }
+    if (key(_F6)) { draw_mode=105; return; }
+    if (key(_F7)) { draw_mode=106; return; }
+    if (key(_F8)) { draw_mode=107; return; }
+    if (key(_F9)) { draw_mode=108; return; }
+    if (key(_F10)) { draw_mode=109; return; }
+    if (key(_F11)) { draw_mode=110; return; }
+    if (key(_F12)) { draw_mode=111; return; }
   } else {
-    if (key(_F1)) { modo=112; return; }
-    if (key(_F2)) { modo=113; return; }
-    if (key(_F3)) { modo=100; return; }
+    if (key(_F1)) { draw_mode=112; return; }
+    if (key(_F2)) { draw_mode=113; return; }
+    if (key(_F3)) { draw_mode=100; return; }
   }
 
-  if (modo_seleccion==-1) iconos_mode[12]=131;
-  else if (modo_seleccion<4) iconos_mode[12]=131+modo_seleccion;
-  else iconos_mode[12]=modo_seleccion+167-4;
-  r=select_icon(barra_x+10,iconos_mode);
-  if (r>=0) modo=r+100;
+  if (mode_selection==-1) iconos_mode[12]=131;
+  else if (mode_selection<4) iconos_mode[12]=131+mode_selection;
+  else iconos_mode[12]=mode_selection+167-4;
+  r=select_icon(toolbar_x+10,iconos_mode);
+  if (r>=0) draw_mode=r+100;
 }
 
 //-----------------------------------------------------------------------------
-//      Selección de FX, desde una barra de edición
+//      Selección de FX, desde una toolbar de edición
 //-----------------------------------------------------------------------------
 
 void select_fx(int n,int * efecto) {
 
-  int icono_x=barra_x+48+n*16;
+  int icono_x=toolbar_x+48+n*16;
   int a,b,c,d;
   int ix,iy,wait=0;
   byte * p;
 
-  if (mouse_in(icono_x,barra_y+2,icono_x+15,barra_y+17) && (mouse_b&1)) {
+  if (mouse_in(icono_x,toolbar_y+2,icono_x+15,toolbar_y+17) && (mouse_b&1)) {
 
     c=88*big2; d=27*big2;
     if ((p=(byte*)malloc(c*d))==NULL) {
-     v_texto=(char *)texto[45]; show_dialog(err0); return; }
+     v_text=(char *)texto[45]; show_dialog(err0); return; }
 
     flush_bars(0);
 
-    a=barra_x+(icono_x-barra_x)*big2-(c-16*big2)/2;
-    if (barra_y>vga_al/2-9*big2) b=barra_y-d-1; else b=barra_y+19*big2+1;
-    if (a<barra_x) a=barra_x;
-    if (a+c>barra_x+barra_an*big2) a=barra_x+barra_an*big2-c;
+    a=toolbar_x+(icono_x-toolbar_x)*big2-(c-16*big2)/2;
+    if (toolbar_y>vga_height/2-9*big2) b=toolbar_y-d-1; else b=toolbar_y+19*big2+1;
+    if (a<toolbar_x) a=toolbar_x;
+    if (a+c>toolbar_x+toolbar_width*big2) a=toolbar_x+toolbar_width*big2-c;
     adjust_box(&a,&b,&c,&d); c/=big2; d/=big2;
     do {read_mouse();} while (mouse_b&1);
 
@@ -3617,15 +3617,15 @@ void select_fx(int n,int * efecto) {
         ix=mouse_shift_x-a; iy=mouse_shift_y-b;
         wrectangle(p,c,d,c4,0,0,c,d);
         while (mouse_b&1) {
-          save_mouse_bg(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,0);
+          save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,0);
           put(mouse_shift_x,mouse_shift_y,mouse_graf);
           blit_screen(copia);
-          save_mouse_bg(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,1);
+          save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,1);
       	  draw_edit_background(a,b,c*big2,d*big2);
           flush_bars(0);
           read_mouse();
           a=mouse_shift_x-ix; b=mouse_shift_y-iy;
-          wvolcado(copia,vga_an,vga_al,p,a,b,c*big2,d*big2,0);
+          wvolcado(copia,vga_width,vga_height,p,a,b,c*big2,d*big2,0);
           blit_partial(a,b,c*big2,d*big2);
         } wrectangle(p,c,d,c2,0,0,c,d);
       }
@@ -3635,13 +3635,13 @@ void select_fx(int n,int * efecto) {
         wbox(p,c,d,c4,12,19,*efecto*4,4);
       }
 
-      wvolcado(copia,vga_an,vga_al,p,a,b,c*big2,d*big2,0);
+      wvolcado(copia,vga_width,vga_height,p,a,b,c*big2,d*big2,0);
       blit_partial(a,b,c*big2,d*big2);
 
-      save_mouse_bg(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,0);
+      save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,0);
       put(mouse_shift_x,mouse_shift_y,mouse_graf);
       blit_screen(copia);
-      save_mouse_bg(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,1);
+      save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,1);
 
       if (wait==1) {
         wput(p,c,d,2,18,-37); wput(p,c,d,79,18,-38);
@@ -3650,51 +3650,51 @@ void select_fx(int n,int * efecto) {
 
     } while ((!mouse_b || wait) && !key(_ESC));
 
-    if (!mouse_in(barra_x,barra_y,barra_x+barra_an-1,barra_y+18) || !(mouse_b&1)
-        || mouse_in(icono_x,barra_y+2,icono_x+15,barra_y+17)) {
+    if (!mouse_in(toolbar_x,toolbar_y,toolbar_x+toolbar_width-1,toolbar_y+18) || !(mouse_b&1)
+        || mouse_in(icono_x,toolbar_y+2,icono_x+15,toolbar_y+17)) {
       wput(p,c,d,c-9,2,-45);
-      wvolcado(copia,vga_an,vga_al,p,a,b,c*big2,d*big2,0);
+      wvolcado(copia,vga_width,vga_height,p,a,b,c*big2,d*big2,0);
       blit_partial(a,b,c*big2,d*big2);
-      save_mouse_bg(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,0);
+      save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,0);
       put(mouse_shift_x,mouse_shift_y,mouse_graf); blit_screen(copia);
-      save_mouse_bg(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,1);
+      save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,1);
       do { read_mouse(); } while (mouse_b || key(_ESC));
     }
 
     draw_edit_background(a,b,c*big2,d*big2);
     flush_bars(0);
-    save_mouse_bg(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,0);
+    save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,0);
     put(mouse_shift_x,mouse_shift_y,mouse_graf); blit_screen(copia);
-    save_mouse_bg(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,1);
+    save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,1);
     free(p);
   }
 }
 
 //-----------------------------------------------------------------------------
-//      Selección de algoritmo de relleno, desde una barra de edición
+//      Selección de algoritmo de relleno, desde una toolbar de edición
 //-----------------------------------------------------------------------------
 
 void select_fill(int n) {
   int r;
-  r=select_icon(barra_x+48+n*16,iconos_fill);
-  if (r>=0) { modo_fill=r; bar[n]=iconos_fill[2+modo_fill]; put_bar(48+n*16,2,bar[n]); }
+  r=select_icon(toolbar_x+48+n*16,iconos_fill);
+  if (r>=0) { mode_fill=r; bar[n]=iconos_fill[2+mode_fill]; put_bar(48+n*16,2,bar[n]); }
 
 }
 
 //-----------------------------------------------------------------------------
-//      Selección de algoritmo de relleno, desde una barra de edición
+//      Selección de algoritmo de relleno, desde una toolbar de edición
 //-----------------------------------------------------------------------------
 
 int iconos_box[]={6,1,135,136,137,138,169,170};
 
 void select_box(int n) {
   int r;
-  r=select_icon(barra_x+48+n*16,iconos_box);
-  if (r>=0) { modo_seleccion=r; block_bar(0); }
+  r=select_icon(toolbar_x+48+n*16,iconos_box);
+  if (r>=0) { mode_selection=r; block_bar(0); }
 }
 
 //-----------------------------------------------------------------------------
-//      Selección de entre cualquier lista de iconos, en una barra de edición
+//      Selección de entre cualquier lista de iconos, en una toolbar de edición
 //-----------------------------------------------------------------------------
 
 int select_icon(int icono_x,int * iconos) {
@@ -3704,19 +3704,19 @@ int select_icon(int icono_x,int * iconos) {
   int r=-1,ix,iy;
   byte * p;
 
-  if (mouse_in(icono_x,barra_y+2,icono_x+15,barra_y+17) && (mouse_b&1)) {
+  if (mouse_in(icono_x,toolbar_y+2,icono_x+15,toolbar_y+17) && (mouse_b&1)) {
 
     num=*iconos++; col=*iconos++; fil=(num+col-1)/col;
     c=(col*16+3)*big2; d=(fil*16+11)*big2;
     if ((p=(byte*)malloc(c*d))==NULL) {
-      v_texto=(char *)texto[45]; show_dialog(err0); return(-1); }
+      v_text=(char *)texto[45]; show_dialog(err0); return(-1); }
 
     flush_bars(0);
 
-    a=barra_x+(icono_x-barra_x)*big2-(col-1)*8*big2-2*big2;
-    if (barra_y>vga_al/2-9*big2) b=barra_y-d-1; else b=barra_y+19*big2+1;
-    if (a<barra_x) a=barra_x;
-    if (a+c>barra_x+barra_an*big2) a=barra_x+barra_an*big2-c;
+    a=toolbar_x+(icono_x-toolbar_x)*big2-(col-1)*8*big2-2*big2;
+    if (toolbar_y>vga_height/2-9*big2) b=toolbar_y-d-1; else b=toolbar_y+19*big2+1;
+    if (a<toolbar_x) a=toolbar_x;
+    if (a+c>toolbar_x+toolbar_width*big2) a=toolbar_x+toolbar_width*big2-c;
     adjust_box(&a,&b,&c,&d); c/=big2; d/=big2;
     do {read_mouse();} while (mouse_b&1);
 
@@ -3740,26 +3740,26 @@ int select_icon(int icono_x,int * iconos) {
         ix=mouse_shift_x-a; iy=mouse_shift_y-b;
         wrectangle(p,c,d,c4,0,0,c,d);
         while (mouse_b&1) {
-          save_mouse_bg(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,0);
+          save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,0);
           put(mouse_shift_x,mouse_shift_y,mouse_graf);
           blit_screen(copia);
-          save_mouse_bg(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,1);
+          save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,1);
       	  draw_edit_background(a,b,c*big2,d*big2);
           flush_bars(0);
           read_mouse();
           a=mouse_shift_x-ix; b=mouse_shift_y-iy;
-          wvolcado(copia,vga_an,vga_al,p,a,b,c*big2,d*big2,0);
+          wvolcado(copia,vga_width,vga_height,p,a,b,c*big2,d*big2,0);
           blit_partial(a,b,c*big2,d*big2);
         } wrectangle(p,c,d,c2,0,0,c,d);
       }
 
-      wvolcado(copia,vga_an,vga_al,p,a,b,c*big2,d*big2,0);
+      wvolcado(copia,vga_width,vga_height,p,a,b,c*big2,d*big2,0);
       blit_partial(a,b,c*big2,d*big2);
 
-      save_mouse_bg(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,0);
+      save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,0);
       put(mouse_shift_x,mouse_shift_y,mouse_graf);
       blit_screen(copia);
-      save_mouse_bg(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,1);
+      save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,1);
 
     } while (!mouse_b && !key(_ESC));
 
@@ -3767,22 +3767,22 @@ int select_icon(int icono_x,int * iconos) {
       r=((mouse_y-b-10)/16)*col+(mouse_x-a-2)/16;
     } else r=-1;
 
-    if (!mouse_in(barra_x,barra_y,barra_x+barra_an-1,barra_y+18) || !(mouse_b&1)
-        || mouse_in(icono_x,barra_y+2,icono_x+15,barra_y+17)) {
+    if (!mouse_in(toolbar_x,toolbar_y,toolbar_x+toolbar_width-1,toolbar_y+18) || !(mouse_b&1)
+        || mouse_in(icono_x,toolbar_y+2,icono_x+15,toolbar_y+17)) {
       wput(p,c,d,c-9,2,-45);
-      wvolcado(copia,vga_an,vga_al,p,a,b,c*big2,d*big2,0);
+      wvolcado(copia,vga_width,vga_height,p,a,b,c*big2,d*big2,0);
       blit_partial(a,b,c*big2,d*big2);
-      save_mouse_bg(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,0);
+      save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,0);
       put(mouse_shift_x,mouse_shift_y,mouse_graf); blit_screen(copia);
-      save_mouse_bg(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,1);
+      save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,1);
       do { read_mouse(); } while (mouse_b || key(_ESC));
     }
 
     draw_edit_background(a,b,c*big2,d*big2);
     flush_bars(0);
-    save_mouse_bg(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,0);
+    save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,0);
     put(mouse_shift_x,mouse_shift_y,mouse_graf); blit_screen(copia);
-    save_mouse_bg(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,1);
+    save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,1);
 
     free(p);
   } return(r);
@@ -3790,19 +3790,19 @@ int select_icon(int icono_x,int * iconos) {
 }
 
 //-----------------------------------------------------------------------------
-//      Vuelca la pantalla (y barra) posicionando el raton si mouse_graf>=10
+//      Vuelca la pantalla (y toolbar) posicionando el raton si mouse_graf>=10
 //-----------------------------------------------------------------------------
 
 void blit_mouse() { blit_mouse_a(); blit_mouse_b(); }
 
 void blit_mouse_a(void) {
   int moux,mouy;
-  moux=zx+((mouse_x-zx)&(-(1<<zoom)));
-  mouy=zy+((mouse_y-zy)&(-(1<<zoom)));
+  moux=zoom_win_x+((mouse_x-zoom_win_x)&(-(1<<zoom)));
+  mouy=zoom_win_y+((mouse_y-zoom_win_y)&(-(1<<zoom)));
   if (mouse_graf<10) {
     flush_bars(0);
   } else {
-    save_mouse_bg(fondo_raton,moux,mouy,mouse_graf,0);
+    save_mouse_bg(mouse_background,moux,mouy,mouse_graf,0);
     put_bw(moux,mouy,mouse_graf);
     flush_bars(0);
   }
@@ -3810,14 +3810,14 @@ void blit_mouse_a(void) {
 
 void blit_mouse_b(void) {
   int moux,mouy;
-  moux=zx+((mouse_x-zx)&(-(1<<zoom)));
-  mouy=zy+((mouse_y-zy)&(-(1<<zoom)));
+  moux=zoom_win_x+((mouse_x-zoom_win_x)&(-(1<<zoom)));
+  mouy=zoom_win_y+((mouse_y-zoom_win_y)&(-(1<<zoom)));
   if (mouse_graf<10) {
-    save_mouse_bg(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,0);
+    save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,0);
     put(mouse_shift_x,mouse_shift_y,mouse_graf);
   } blit_screen(copia);
-  if (mouse_graf<10) save_mouse_bg(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,1);
-  else save_mouse_bg(fondo_raton,moux,mouy,mouse_graf,1);
+  if (mouse_graf<10) save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,1);
+  else save_mouse_bg(mouse_background,moux,mouy,mouse_graf,1);
 }
 
 //-----------------------------------------------------------------------------
@@ -3830,11 +3830,11 @@ void select_mask(int n) {
   int salir;
   byte * p;
 
-  if ((key(_M)&&hotkey) || (mouse_in(barra_x+48+n*16,barra_y+2,barra_x+55+n*16,barra_y+17) && (mouse_b&2))) {
-    c=(128+3)*big2; d=(128+11+8)*big2; a=barra_x;
-    if (barra_y>vga_al/2-8) b=barra_y-d-1; else b=barra_y+19*big2+1;
+  if ((key(_M)&&hotkey) || (mouse_in(toolbar_x+48+n*16,toolbar_y+2,toolbar_x+55+n*16,toolbar_y+17) && (mouse_b&2))) {
+    c=(128+3)*big2; d=(128+11+8)*big2; a=toolbar_x;
+    if (toolbar_y>vga_height/2-8) b=toolbar_y-d-1; else b=toolbar_y+19*big2+1;
     if ((p=(byte*)malloc(c*d))==NULL) {
-      v_texto=(char *)texto[45]; show_dialog(err0); return; }
+      v_text=(char *)texto[45]; show_dialog(err0); return; }
 
     adjust_box(&a,&b,&c,&d); c/=big2; d/=big2;
     do { read_mouse(); } while (mouse_b || key(_M));
@@ -3855,11 +3855,11 @@ void select_mask(int n) {
           wrectangle(p,c,d,c4,0,0,c,d);
           while (mouse_b&1) {
             read_mouse(); a=mouse_shift_x-ix; b=mouse_shift_y-iy;
-            wvolcado(copia,vga_an,vga_al,p,a,b,c*big2,d*big2,0);
+            wvolcado(copia,vga_width,vga_height,p,a,b,c*big2,d*big2,0);
             blit_partial(a,b,c*big2,d*big2);
-            save_mouse_bg(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,0);
+            save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,0);
             put(mouse_shift_x,mouse_shift_y,mouse_graf); blit_screen(copia);
-            save_mouse_bg(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,1);
+            save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,1);
             draw_edit_background(a,b,c*big2,d*big2);
             flush_bars(0);
           }
@@ -3873,7 +3873,7 @@ void select_mask(int n) {
       if (mouse_in(a+2,b+10,a+128+1,b+128+9)) {
         col=(mouse_x-a-2)/8+((mouse_y-b-10)/8)*16;
         if (mouse_b&1) {
-          if (col!=oldcol || !(old_mouse_b&1)) mask[col]^=1;
+          if (col!=oldcol || !(prev_mouse_buttons&1)) mask[col]^=1;
           draw_ruler();
         }
       }
@@ -3893,7 +3893,7 @@ void select_mask(int n) {
 
       if ((mouse_b&1) && !mouse_in(a,b,a+c-1,b+d-1)) {
         if (mouse_graf>=10) {
-          mask[*(map+coord_y*map_an+coord_x)]=1;
+          mask[*(map+coord_y*map_width+coord_x)]=1;
           draw_ruler();
         } else salir=1;
       }
@@ -3902,7 +3902,7 @@ void select_mask(int n) {
       paint_mask_window(p,c,d);
       x=1+(col%16)*8; y=9+(col/16)*8;
       wrectangle(p,c,d,c4,x,y,9,9);
-      wvolcado(copia,vga_an,vga_al,p,a,b,c*big2,d*big2,0);
+      wvolcado(copia,vga_width,vga_height,p,a,b,c*big2,d*big2,0);
       blit_partial(a,b,c*big2,d*big2);
       blit_mouse_b();
 
@@ -3911,14 +3911,14 @@ void select_mask(int n) {
       blit_partial(a+x*big2,b+y*big2,9*big2,9*big2);
 
     } while (!(mouse_b&2) && !key(_ESC) && !salir && !key(_M) &&
-             !salir_del_entorno &&
+             !exit_requested &&
              !((mouse_b&1) && mouse_in(a+c-9,b+2,a+c-2,b+9)));
 
-    if (!mouse_in(barra_x,barra_y,barra_x+barra_an-1,barra_y+18) || !(mouse_b&1)
-        || key(_M) || mouse_in(barra_x+48+n*16,barra_y+2,barra_x+57+n*16,barra_y+17)) {
+    if (!mouse_in(toolbar_x,toolbar_y,toolbar_x+toolbar_width-1,toolbar_y+18) || !(mouse_b&1)
+        || key(_M) || mouse_in(toolbar_x+48+n*16,toolbar_y+2,toolbar_x+57+n*16,toolbar_y+17)) {
       blit_mouse_a(); wput(p,c,d,c-9,2,-45);
       x=1+(col%16)*8; y=9+(col/16)*8; wrectangle(p,c,d,c4,x,y,9,9);
-      wvolcado(copia,vga_an,vga_al,p,a,b,c*big2,d*big2,0);
+      wvolcado(copia,vga_width,vga_height,p,a,b,c*big2,d*big2,0);
       blit_partial(a,b,c*big2,d*big2); blit_mouse_b();
       do { read_mouse(); } while (mouse_b || key(_ESC) || key(_M));
     }
@@ -3964,7 +3964,7 @@ void paint_mask_window(byte * p,int c,int d) {
 }
 
 //-----------------------------------------------------------------------------
-//      Selección de un color de la paleta, desde una barra de edición
+//      Selección de un color de la paleta, desde una toolbar de edición
 //-----------------------------------------------------------------------------
 
 #define max_texturas 1000
@@ -4045,17 +4045,17 @@ int create_mapbr_thumbs(struct t_listboxbr * l)
 
   n=m_maximo=0;
   for(con=0; con<max_windows; con++) {
-    if(ventana[con].tipo==100) {
-      thumb_map[n].an   = (int)ventana[con].mapa->map_an;
-      thumb_map[n].al   = (int)ventana[con].mapa->map_al;
+    if(ventana[con].type==100) {
+      thumb_map[n].an   = (int)ventana[con].mapa->map_width;
+      thumb_map[n].al   = (int)ventana[con].mapa->map_height;
       thumb_map[n].ptr  = (char *)ventana[con].mapa->map;
       thumb_map[n].Code = con;
       n++;
     }
   }
-  l->maximo=m_maximo=n;
+  l->total_items=m_maximo=n;
 
-  for(con=0; con<l->maximo; con++)
+  for(con=0; con<l->total_items; con++)
   {
 
     man  = thumb_map[con].RealAn = thumb_map[con].an;
@@ -4137,7 +4137,7 @@ void select_color(int n) { // Número de "icono" como parámetro
   int x,y,col,oldcol,ix,iy;
   int a,b,c,d;
   int salir,volcar;
-  int _regla,boton;
+  int _gradient,boton;
   byte reg[33];
   byte pal[768],xchg[256];
   byte * p;
@@ -4145,22 +4145,22 @@ void select_color(int n) { // Número de "icono" como parámetro
   byte *temp;
   int  man,mal;
 
-  if( (TipoTex&4) && ((key(_T)&&hotkey) || (mouse_in(barra_x+56+n*16,barra_y+11,barra_x+62+n*16,barra_y+17) && (mouse_b&1))) )
+  if( (TipoTex&4) && ((key(_T)&&hotkey) || (mouse_in(toolbar_x+56+n*16,toolbar_y+11,toolbar_x+62+n*16,toolbar_y+17) && (mouse_b&1))) )
   {
     TipoBrowser=BRUSH;
     show_dialog(MapperBrowseFPG0);
 
-    num_tex=ltexturasbr.inicial+ltexturasbr.zona-10; // Posicion en browser
+    num_tex=ltexturasbr.first_visible+ltexturasbr.zone-10; // Posicion en browser
     tex_cod=atoi(m3d_fpgcodesbr+num_tex*an_textura); // Codigo de esa posicion
 
-    if(thumb_tex[num_tex].Code==0 || !v_terminado) return;
+    if(thumb_tex[num_tex].Code==0 || !v_finished) return;
 
     man = thumb_tex[num_tex].RealAn;
     mal = thumb_tex[num_tex].RealAl;
 
     if((temp=(byte *)malloc(man*mal))==NULL)
     {
-      v_texto=(char *)texto[45];
+      v_text=(char *)texto[45];
       show_dialog(err0);
     }
     else
@@ -4170,7 +4170,7 @@ void select_color(int n) { // Número de "icono" como parámetro
       if(fread(temp, 1, man*mal, FilePaintFPG) != man*mal)
       {
         free(temp);
-        v_texto=(char *)texto[44];
+        v_text=(char *)texto[44];
         show_dialog(err0);
       }
       else
@@ -4196,15 +4196,15 @@ void select_color(int n) { // Número de "icono" como parámetro
     }
   }
 
-  if( (TipoTex&8) && ((key(_U) && hotkey) || (mouse_in(barra_x+56-8+n*16,barra_y+11,barra_x+62-8+n*16,barra_y+17) && (mouse_b&1))) )
+  if( (TipoTex&8) && ((key(_U) && hotkey) || (mouse_in(toolbar_x+56-8+n*16,toolbar_y+11,toolbar_x+62-8+n*16,toolbar_y+17) && (mouse_b&1))) )
   {
     TipoBrowser=MAPBR;
     show_dialog(MapperBrowseFPG0);
-    if(v_terminado) {
-      num_tex=thumb_map[ltexturasbr.inicial+ltexturasbr.zona-10].Code;
+    if(v_finished) {
+      num_tex=thumb_map[ltexturasbr.first_visible+ltexturasbr.zone-10].Code;
       textura_color=ventana[num_tex].mapa->map;
-      textura_an=ventana[num_tex].mapa->map_an;
-      textura_al=ventana[num_tex].mapa->map_al;
+      textura_an=ventana[num_tex].mapa->map_width;
+      textura_al=ventana[num_tex].mapa->map_height;
       textura_x=0;
       textura_y=0;
     }
@@ -4212,15 +4212,15 @@ void select_color(int n) { // Número de "icono" como parámetro
     draw_ruler();
   }
 
-  if ((key(_C)&&hotkey) || (mouse_in(barra_x+48+n*16,barra_y+2,barra_x+55+n*16,barra_y+10) && (mouse_b&1))) {
+  if ((key(_C)&&hotkey) || (mouse_in(toolbar_x+48+n*16,toolbar_y+2,toolbar_x+55+n*16,toolbar_y+10) && (mouse_b&1))) {
 
-    c=(128+3+32+64+8)*big2; d=(128+3+18+8)*big2; a=barra_x;
-    if (barra_y>vga_al/2-8) b=barra_y-d-1; else b=barra_y+19*big2+1;
+    c=(128+3+32+64+8)*big2; d=(128+3+18+8)*big2; a=toolbar_x;
+    if (toolbar_y>vga_height/2-8) b=toolbar_y-d-1; else b=toolbar_y+19*big2+1;
     if ((p=(byte*)malloc(c*d))==NULL) {
-      v_texto=(char *)texto[45]; show_dialog(err0); return; }
+      v_text=(char *)texto[45]; show_dialog(err0); return; }
     adjust_box(&a,&b,&c,&d); c/=big2; d/=big2;
 
-    salir=0; volcar=1; _regla=-1; boton=-1; col=color;
+    salir=0; volcar=1; _gradient=-1; boton=-1; col=color;
 
     do { read_mouse(); } while (mouse_b || key(_C));
 
@@ -4238,11 +4238,11 @@ void select_color(int n) { // Número de "icono" como parámetro
           wrectangle(p,c,d,c4,0,0,c,d);
           while (mouse_b&1) {
             read_mouse(); a=mouse_shift_x-ix; b=mouse_shift_y-iy;
-            wvolcado(copia,vga_an,vga_al,p,a,b,c*big2,d*big2,0);
+            wvolcado(copia,vga_width,vga_height,p,a,b,c*big2,d*big2,0);
             blit_partial(a,b,c*big2,d*big2);
-            save_mouse_bg(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,0);
+            save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,0);
             put(mouse_shift_x,mouse_shift_y,mouse_graf); blit_screen(copia);
-            save_mouse_bg(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,1);
+            save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,1);
             draw_edit_background(a,b,c*big2,d*big2);
             flush_bars(0);
           }
@@ -4258,7 +4258,7 @@ void select_color(int n) { // Número de "icono" como parámetro
       } else if (col!=oldcol && volcar!=1) volcar=2;
 
       if ((mouse_b&1) && mouse_in(a+170,b+10,a+233,b+128+9)) {
-        regla=(mouse_y-b-10)/8; draw_ruler(); volcar=1;
+        gradient=(mouse_y-b-10)/8; draw_ruler(); volcar=1;
       }
 
       if ((mouse_b&1) && mouse_in(a+138,b+140,a+138+95,b+140+15)) {
@@ -4266,50 +4266,50 @@ void select_color(int n) { // Número de "icono" como parámetro
         if (mouse_y>=b+132+16) x=2;
         else if (mouse_x<a+138+48) x=0; else x=1;
 
-        if (regla!=_regla || x!=boton) {
-          _regla=regla; boton=x;
-          switch(reglas[regla].numcol) {
-            case 32: for(x=0;x<=32;x++) reg[x]=reglas[regla].col[x];
+        if (gradient!=_gradient || x!=boton) {
+          _gradient=gradient; boton=x;
+          switch(gradients[gradient].num_colors) {
+            case 32: for(x=0;x<=32;x++) reg[x]=gradients[gradient].colors[x];
               break;
-            case 16: for (x=0;x<=32;x+=2) reg[x]=reglas[regla].col[x/2];
+            case 16: for (x=0;x<=32;x+=2) reg[x]=gradients[gradient].colors[x/2];
               for (x=0;x<32;x+=2) 
                 reg[x+1]=average_color(reg[x],reg[x+2]);
               break;
-            case 8: for (x=0;x<=32;x+=4) reg[x]=reglas[regla].col[x/4];
+            case 8: for (x=0;x<=32;x+=4) reg[x]=gradients[gradient].colors[x/4];
               for (x=0;x<32;x+=4) {
                 reg[x+2]=average_color(reg[x],reg[x+4]);
                 reg[x+1]=average_color(reg[x],reg[x+2]);
                 reg[x+3]=average_color(reg[x+2],reg[x+4]);
               } break;
-          } reg[1]=reglas[regla].col[1];
+          } reg[1]=gradients[gradient].colors[1];
         }
 
         if (boton==2) {
-          switch(reglas[regla].tipo) {
-            case 0: reglas[regla].tipo=1; break;
-            case 1: reglas[regla].tipo=2; break;
-            case 2: reglas[regla].tipo=4; break;
-            case 4: reglas[regla].tipo=8; break;
-            case 8: reglas[regla].tipo=0; break;
-	  } reglas[regla].fijo=0;
+          switch(gradients[gradient].type) {
+            case 0: gradients[gradient].type=1; break;
+            case 1: gradients[gradient].type=2; break;
+            case 2: gradients[gradient].type=4; break;
+            case 4: gradients[gradient].type=8; break;
+            case 8: gradients[gradient].type=0; break;
+	  } gradients[gradient].fixed=0;
         } else if (boton==0) {
-          switch(reglas[regla].numcol) {
-            case 8: reglas[regla].numcol=16; break;
-            case 16: reglas[regla].numcol=32; break;
-            case 32: reglas[regla].numcol=8; break;
-	  } reglas[regla].fijo=0;
-        } else reglas[regla].fijo^=1;
+          switch(gradients[gradient].num_colors) {
+            case 8: gradients[gradient].num_colors=16; break;
+            case 16: gradients[gradient].num_colors=32; break;
+            case 32: gradients[gradient].num_colors=8; break;
+	  } gradients[gradient].fixed=0;
+        } else gradients[gradient].fixed^=1;
 
-        if (boton==0 || boton==2) switch(reglas[regla].numcol) {
+        if (boton==0 || boton==2) switch(gradients[gradient].num_colors) {
           case 8:
-            for (x=2;x<=8;x++) reglas[regla].col[x]=reg[x*4];
-            reglas[regla].col[1]=reg[1]; break;
+            for (x=2;x<=8;x++) gradients[gradient].colors[x]=reg[x*4];
+            gradients[gradient].colors[1]=reg[1]; break;
           case 16:
-            for (x=2;x<=16;x++) reglas[regla].col[x]=reg[x*2];
-            reglas[regla].col[1]=reg[1]; break;
+            for (x=2;x<=16;x++) gradients[gradient].colors[x]=reg[x*2];
+            gradients[gradient].colors[1]=reg[1]; break;
           case 32:
-            for (x=2;x<=32;x++) reglas[regla].col[x]=reg[x];
-            reglas[regla].col[1]=reg[1]; break;
+            for (x=2;x<=32;x++) gradients[gradient].colors[x]=reg[x];
+            gradients[gradient].colors[1]=reg[1]; break;
         }
 
         draw_ruler(); volcar=1;
@@ -4318,9 +4318,9 @@ void select_color(int n) { // Número de "icono" como parámetro
 
       if (editable_selection(&x,a+10,b+128+12)) mouse_graf=2;
       else if (!mouse_in(a,b,a+c-1,b+d-1) &&
-               mouse_in(barra_x,barra_y,barra_x+barra_an-1,barra_y+18)) {
-        if (mouse_in(barra_x,barra_y+10,barra_x+9,barra_y+18)) mouse_graf=5;
-        else if (mouse_in(barra_x,barra_y,barra_x+9,barra_y+9) ||
+               mouse_in(toolbar_x,toolbar_y,toolbar_x+toolbar_width-1,toolbar_y+18)) {
+        if (mouse_in(toolbar_x,toolbar_y+10,toolbar_x+9,toolbar_y+18)) mouse_graf=5;
+        else if (mouse_in(toolbar_x,toolbar_y,toolbar_x+9,toolbar_y+9) ||
             editable(&x))
           mouse_graf=2;
       }
@@ -4333,44 +4333,44 @@ void select_color(int n) { // Número de "icono" como parámetro
         pinta_ventana_colores2(p,c,d,col);
         x=9+(col%16)*8; y=9+(col/16)*8;
         wrectangle(p,c,d,c4,x,y,9,9);
-        wvolcado(copia,vga_an,vga_al,p,a,b,c*big2,d*big2,0);
+        wvolcado(copia,vga_width,vga_height,p,a,b,c*big2,d*big2,0);
         blit_partial(a,b,c*big2,d*big2);
       } else if (volcar==2) { volcar=0;
         pinta_ventana_colores2(p,c,d,col);
         x=9+(col%16)*8; y=9+(col/16)*8;
         wrectangle(p,c,d,c4,x,y,9,9);
-        wvolcado(copia,vga_an,vga_al,p,a,b,c*big2,d*big2,0);
+        wvolcado(copia,vga_width,vga_height,p,a,b,c*big2,d*big2,0);
         blit_partial(a+x*big2,b+y*big2,9*big2,9*big2);
         blit_partial(a+138*big2,b+10*big2,31*big2,128*big2);
       }
 
-      save_mouse_bg(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,0);
+      save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,0);
       put(mouse_shift_x,mouse_shift_y,mouse_graf);
       blit_screen(copia);
-      save_mouse_bg(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,1);
+      save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,1);
 
       x=9+(col%16)*8; y=9+(col/16)*8;
       wrectangle(p,c,d,c0,x,y,9,9);
       blit_partial(a+x*big2,b+y*big2,9*big2,9*big2);
 
       if ((mouse_b&1) && mouse_in(a+10,b+132+8,a+137,b+147+8)) {
-        if (editable_selection(&x,a+10,b+132+8)) reglas[regla].col[x]=color;
+        if (editable_selection(&x,a+10,b+132+8)) gradients[gradient].colors[x]=color;
         else {
-          color=reglas[regla].col[x];
+          color=gradients[gradient].colors[x];
           remove_texture();
         }
         draw_ruler(); volcar=1;
       }
 
       if ((mouse_b&1) && !mouse_in(a,b,a+c-1,b+d-1)) {
-        if (mouse_in(barra_x,barra_y,barra_x+barra_an-1,barra_y+18)) {
-          if (mouse_in(barra_x+_ir,barra_y,barra_x+_ir+127,barra_y+18)) {
-            if (editable(&x)) reglas[regla].col[x]=color; else {
-              color=reglas[regla].col[x];
+        if (mouse_in(toolbar_x,toolbar_y,toolbar_x+toolbar_width-1,toolbar_y+18)) {
+          if (mouse_in(toolbar_x+_ir,toolbar_y,toolbar_x+_ir+127,toolbar_y+18)) {
+            if (editable(&x)) gradients[gradient].colors[x]=color; else {
+              color=gradients[gradient].colors[x];
               remove_texture();
             }
             draw_ruler(); volcar=1;
-          } else if (mouse_in(barra_x+_ir-8,barra_y,barra_x+_ir-1,barra_y+18)) {
+          } else if (mouse_in(toolbar_x+_ir-8,toolbar_y,toolbar_x+_ir-1,toolbar_y+18)) {
             if (textura_color!=NULL) {
               remove_texture();
               if (color!=0) { color_c0=color; color=0; }
@@ -4383,14 +4383,14 @@ void select_color(int n) { // Número de "icono" como parámetro
       }
 
     } while (!(mouse_b&2) && !key(_ESC) && !salir && !key(_C) &&
-             !salir_del_entorno &&
+             !exit_requested &&
              !((mouse_b&1) && mouse_in(a+c-9,b+2,a+c-2,b+9)));
 
-    if (!mouse_in(barra_x,barra_y,barra_x+barra_an-1,barra_y+18) || !(mouse_b&1)
-        || key(_C) || mouse_in(barra_x+48+n*16,barra_y+2,barra_x+57+n*16,barra_y+17)) {
+    if (!mouse_in(toolbar_x,toolbar_y,toolbar_x+toolbar_width-1,toolbar_y+18) || !(mouse_b&1)
+        || key(_C) || mouse_in(toolbar_x+48+n*16,toolbar_y+2,toolbar_x+57+n*16,toolbar_y+17)) {
       blit_mouse_a(); wput(p,c,d,c-9,2,-45);
       x=9+(col%16)*8; y=9+(col/16)*8; wrectangle(p,c,d,c4,x,y,9,9);
-      wvolcado(copia,vga_an,vga_al,p,a,b,c*big2,d*big2,0);
+      wvolcado(copia,vga_width,vga_height,p,a,b,c*big2,d*big2,0);
       blit_partial(a,b,c*big2,d*big2); blit_mouse_b();
       do { read_mouse(); } while (mouse_b || key(_ESC) || key(_C));
     }
@@ -4398,7 +4398,7 @@ void select_color(int n) { // Número de "icono" como parámetro
     draw_edit_background(a,b,c*big2,d*big2);
     test_mouse(); blit_mouse();
     free(p);
-  } else if ((ascii=='0' && hotkey) || (mouse_in(barra_x+56+n*16,barra_y+2,barra_x+62+n*16,barra_y+10) && (mouse_b&1))) {
+  } else if ((ascii=='0' && hotkey) || (mouse_in(toolbar_x+56+n*16,toolbar_y+2,toolbar_x+62+n*16,toolbar_y+10) && (mouse_b&1))) {
     if (textura_color!=NULL) {
       remove_texture();
       if (color!=0) { color_c0=color; color=0; }
@@ -4407,19 +4407,19 @@ void select_color(int n) { // Número de "icono" como parámetro
     }
     draw_ruler(); do {read_mouse();} while (mouse_b);
   } else if (scan_code==_S && hotkey) {
-    if (key(_L_SHIFT) || key(_R_SHIFT)) regla=(regla+1)%16; else color_up();
+    if (key(_L_SHIFT) || key(_R_SHIFT)) gradient=(gradient+1)%16; else color_up();
     draw_ruler();
   } else if (scan_code==_W && hotkey) {
-    if (key(_L_SHIFT) || key(_R_SHIFT)) { if (!regla--) regla=15; } else color_down();
+    if (key(_L_SHIFT) || key(_R_SHIFT)) { if (!gradient--) gradient=15; } else color_down();
     draw_ruler();
   } else if ((shift_status&4) && hotkey) {
     if ((key(_RIGHT) && scan_code) || scan_code==_P) color_up();
     if ((key(_LEFT) && scan_code) || scan_code==_O) color_down();
     if (key(_DOWN) || scan_code==_A) {
-      regla=(regla+1)%16; do { poll_keyboard(); } while (key(_DOWN));
+      gradient=(gradient+1)%16; do { poll_keyboard(); } while (key(_DOWN));
     }
     if (key(_UP) || scan_code==_Q) {
-      if (!regla--) { regla=15; } do { poll_keyboard(); } while (key(_UP));
+      if (!gradient--) { gradient=15; } do { poll_keyboard(); } while (key(_UP));
     }
     draw_ruler();
   } else select_mask(n);
@@ -4434,29 +4434,29 @@ void change_map(int adelante) {
   int n,old=0;
 
   if (back) {
-    undo_back(); if (hacer_zoom==1) zoom_map();
-    else if (hacer_zoom==-1 && hacer_zoom_an>0 && hacer_zoom_al>0)
-      draw_edit_background(hacer_zoom_x,hacer_zoom_y,hacer_zoom_an,hacer_zoom_al);
-    hacer_zoom_an=0; hacer_zoom_al=0; hacer_zoom=0; back=0;
+    undo_back(); if (need_zoom==1) zoom_map();
+    else if (need_zoom==-1 && need_zoom_width>0 && need_zoom_height>0)
+      draw_edit_background(need_zoom_x,need_zoom_y,need_zoom_width,need_zoom_height);
+    need_zoom_width=0; need_zoom_height=0; need_zoom=0; back=0;
   }
 
   v.mapa->zoom=zoom; v.mapa->zoom_x=zoom_x; v.mapa->zoom_y=zoom_y;
-  v.mapa->zoom_cx=zoom_cx; v.mapa->zoom_cy=zoom_cy; v.tipo=100;
+  v.mapa->zoom_cx=zoom_cx; v.mapa->zoom_cy=zoom_cy; v.type=100;
   call(v.paint_handler);
   copy(-1,0);
 
   if (adelante) {
     for (n=1;n<max_windows;n++) {
-      if (ventana[n].tipo==100 && ventana[n].mapa->map_an==map_an &&
-        ventana[n].mapa->map_al==map_al && ventana[n].primer_plano!=2) {
+      if (ventana[n].type==100 && ventana[n].mapa->map_width==map_width &&
+        ventana[n].mapa->map_height==map_height && ventana[n].foreground!=2) {
         copy(old,n);
         old=n;
       }
     }
   } else {
     for (n=max_windows-1;n>0;n--) {
-      if (ventana[n].tipo==100 && ventana[n].mapa->map_an==map_an &&
-        ventana[n].mapa->map_al==map_al && ventana[n].primer_plano!=2) {
+      if (ventana[n].type==100 && ventana[n].mapa->map_width==map_width &&
+        ventana[n].mapa->map_height==map_height && ventana[n].foreground!=2) {
         copy(old,n);
         old=n;
       }
@@ -4474,8 +4474,8 @@ void change_map(int adelante) {
   create_mapbr_thumbs(&lthumbmapbr);
 
   map=v.mapa->map;
-  codigo_mapa=v.mapa->codigo; v.tipo=0;
-  zoom_background=0; hacer_zoom=1;
+  current_map_code=v.mapa->code; v.type=0;
+  zoom_background=0; need_zoom=1;
 
 }
 
@@ -4485,20 +4485,20 @@ void change_map(int adelante) {
 
 void color_up(void) {
   int n,c=0;
-  for (n=1;n<=reglas[regla].numcol;n++)
-    if (reglas[regla].col[n]==color) c=n;
+  for (n=1;n<=gradients[gradient].num_colors;n++)
+    if (gradients[gradient].colors[n]==color) c=n;
   if (c) {
-    if (c<reglas[regla].numcol) color=reglas[regla].col[c+1];
-  } else color=reglas[regla].col[1];
+    if (c<gradients[gradient].num_colors) color=gradients[gradient].colors[c+1];
+  } else color=gradients[gradient].colors[1];
   remove_texture();
 }
 void color_down(void) {
   int n,c=0;
-  for (n=reglas[regla].numcol;n>=1;n--)
-    if (reglas[regla].col[n]==color) c=n;
+  for (n=gradients[gradient].num_colors;n>=1;n--)
+    if (gradients[gradient].colors[n]==color) c=n;
   if (c) {
-    if (c>1) color=reglas[regla].col[c-1];
-  } else color=reglas[regla].col[reglas[regla].numcol];
+    if (c>1) color=gradients[gradient].colors[c-1];
+  } else color=gradients[gradient].colors[gradients[gradient].num_colors];
   remove_texture();
 }
 
@@ -4536,24 +4536,24 @@ void paint_color_window(byte * p,int c,int d) {
 
   for (y=0;y<16;y++) {
     wbox(p,c,d,c1,170,10+y*8,4,7);
-    switch(reglas[y].numcol) {
+    switch(gradients[y].num_colors) {
       case 32: for (x=0;x<32;x++) {
-          wbox(p,c,d,reglas[y].col[x+1],175+x,10+y*8,1,7); } break;
+          wbox(p,c,d,gradients[y].colors[x+1],175+x,10+y*8,1,7); } break;
       case 16: for (x=0;x<16;x++) {
-          wbox(p,c,d,reglas[y].col[x+1],175+x*2,10+y*8,2,7); } break;
+          wbox(p,c,d,gradients[y].colors[x+1],175+x*2,10+y*8,2,7); } break;
       case 8: for (x=0;x<8;x++) {
-          wbox(p,c,d,reglas[y].col[x+1],175+x*4,10+y*8,4,7); } break;
+          wbox(p,c,d,gradients[y].colors[x+1],175+x*4,10+y*8,4,7); } break;
     }
-    wbox(p,c,d,c2,208,10+y*8,11,7); x=reglas[y].numcol;
+    wbox(p,c,d,c2,208,10+y*8,11,7); x=gradients[y].num_colors;
     num[2]=0; num[1]=x%10+48; num[0]=(x/10)%10+48;
     wwrite(p,c,d,209,10+y*8,0,(byte *)num,c3);
-    wbox(p,c,d,c2,220,10+y*8,6,7); x=reglas[y].tipo;
+    wbox(p,c,d,c2,220,10+y*8,6,7); x=gradients[y].type;
     num[1]=0; num[0]=x+48;
     wwrite(p,c,d,221,10+y*8,0,(byte *)num,c3);
     wbox(p,c,d,c2,227,10+y*8,6,7);
-    if (!reglas[y].fijo) wwrite(p,c,d,228,10+y*8,0,(byte *)"E",c3);
+    if (!gradients[y].fixed) wwrite(p,c,d,228,10+y*8,0,(byte *)"E",c3);
     else wwrite(p,c,d,228,10+y*8,0,(byte *)"F",c3);
-  } wput(p,c,d,170,10+regla*8,36);
+  } wput(p,c,d,170,10+gradient*8,36);
 
   wrectangle(p,c,d,c0,139,65+8,9,65);
   wrectangle(p,c,d,c0,149,65+8,9,65);
@@ -4601,8 +4601,8 @@ void pinta_ventana_colores2(byte * p,int c,int d,int col) {
 //-----------------------------------------------------------------------------
 
 void adjust_box(int*a,int*b,int*c,int*d) {
-  if (*a<0) *a=0; else if (*a+*c>vga_an) *a=vga_an-*c;
-  if (*b<0) *b=0; else if (*b+*d>vga_al) *b=vga_al-*d;
+  if (*a<0) *a=0; else if (*a+*c>vga_width) *a=vga_width-*c;
+  if (*b<0) *b=0; else if (*b+*d>vga_height) *b=vga_height-*d;
 }
 
 //-----------------------------------------------------------------------------
@@ -4612,28 +4612,28 @@ void adjust_box(int*a,int*b,int*c,int*d) {
 void move_bar(void) {
   int barx,bary;
 
-  if ((mouse_b&1) && mouse_in(barra_x,barra_y,barra_x+9,barra_y+9)) {
+  if ((mouse_b&1) && mouse_in(toolbar_x,toolbar_y,toolbar_x+9,toolbar_y+9)) {
 
-    wrectangle(barra,vga_an/big2,vga_al,c4,0,0,barra_an,19);
-    barx=barra_x-mouse_shift_x; bary=barra_y-mouse_shift_y;
+    wrectangle(toolbar,vga_width/big2,vga_height,c4,0,0,toolbar_width,19);
+    barx=toolbar_x-mouse_shift_x; bary=toolbar_y-mouse_shift_y;
     do {
       read_mouse();
-      draw_edit_background(barra_x-4,barra_y-big2,barra_an*big2+4,20*big2);
-      barra_x=mouse_shift_x+barx; barra_y=mouse_shift_y+bary; bar_coords();
+      draw_edit_background(toolbar_x-4,toolbar_y-big2,toolbar_width*big2+4,20*big2);
+      toolbar_x=mouse_shift_x+barx; toolbar_y=mouse_shift_y+bary; bar_coords();
       flush_bars(0);
       put(mouse_x,mouse_y,2);
       blit_screen(copia);
     } while (mouse_b&1); zoom_map();
 
-    wrectangle(barra,vga_an/big2,vga_al,c2,0,0,barra_an,19);
-    draw_edit_background(barra_x-4,barra_y-big2,barra_an*big2+4,20*big2);
+    wrectangle(toolbar,vga_width/big2,vga_height,c2,0,0,toolbar_width,19);
+    draw_edit_background(toolbar_x-4,toolbar_y-big2,toolbar_width*big2+4,20*big2);
     flush_bars(0);
 
   }
 }
 
 //-----------------------------------------------------------------------------
-//      Detecta el icono de zoom como segundo icono de la barra
+//      Detecta el icono de zoom como segundo icono de la toolbar
 //-----------------------------------------------------------------------------
 
 int iconos_zoom[]={4,1,101,102,103,104};
@@ -4641,10 +4641,10 @@ int iconos_zoom[]={4,1,101,102,103,104};
 void select_zoom(void) {
   int r=0,z=0;
 
-  if (mouse_in(barra_x,barra_y,barra_x+barra_an*big2-1,barra_y+19*big2-1)) {
+  if (mouse_in(toolbar_x,toolbar_y,toolbar_x+toolbar_width*big2-1,toolbar_y+19*big2-1)) {
     if (big && !mouse_shift) { mouse_shift=1;
-      mouse_x=barra_x+(mouse_shift_x-barra_x)/2;
-      mouse_y=barra_y+(mouse_shift_y-barra_y)/2;
+      mouse_x=toolbar_x+(mouse_shift_x-toolbar_x)/2;
+      mouse_y=toolbar_y+(mouse_shift_y-toolbar_y)/2;
     } else if (!big) mouse_shift=1;
   }
 
@@ -4654,43 +4654,43 @@ void select_zoom(void) {
     if (!mouse_shift) { zoom_cx=coord_x; zoom_cy=coord_y; }
   } else if ((z=(key(_Z)&&hotkey))) { zoom=(zoom+1)%4; r=0;
     if (!mouse_shift) { zoom_cx=coord_x; zoom_cy=coord_y; }
-  } else { r=select_icon(barra_x+48,iconos_zoom); if (r>=0) zoom=r; }
+  } else { r=select_icon(toolbar_x+48,iconos_zoom); if (r>=0) zoom=r; }
 
-  if (mouse_x>=zx+zan || mouse_x<zx || mouse_y>=zy+zal || mouse_y<zy) z=0;
+  if (mouse_x>=zoom_win_x+zoom_win_width || mouse_x<zoom_win_x || mouse_y>=zoom_win_y+zoom_win_height || mouse_y<zoom_win_y) z=0;
 
   if (r>=0) {
 
     bar[0]=101+zoom; put_bar(48,2,bar[0]); zoom_background=0;
 
-    if ((map_an<<zoom)<vga_an) { // Copia de este trozo en zoom_map
-      zan=map_an<<zoom; zx=(vga_an-zan)/2;
+    if ((map_width<<zoom)<vga_width) { // Copia de este trozo en zoom_map
+      zoom_win_width=map_width<<zoom; zoom_win_x=(vga_width-zoom_win_width)/2;
     } else {
-      zx=0; zan=(vga_an>>zoom)<<zoom;
+      zoom_win_x=0; zoom_win_width=(vga_width>>zoom)<<zoom;
     }
 
-    if ((map_al<<zoom)<vga_al) {
-      zal=map_al<<zoom; zy=(vga_al-zal)/2;
+    if ((map_height<<zoom)<vga_height) {
+      zoom_win_height=map_height<<zoom; zoom_win_y=(vga_height-zoom_win_height)/2;
     } else {
-      zy=0; zal=(vga_al>>zoom)<<zoom;
+      zoom_win_y=0; zoom_win_height=(vga_height>>zoom)<<zoom;
     }
 
-    zoom_x=zoom_cx-(zan/2)/(1<<zoom);
+    zoom_x=zoom_cx-(zoom_win_width/2)/(1<<zoom);
     if (zoom_x<=0) zoom_x=0;
-    else if (zoom_x+zan/(1<<zoom)>map_an) {
-      zoom_x=map_an-zan/(1<<zoom);
+    else if (zoom_x+zoom_win_width/(1<<zoom)>map_width) {
+      zoom_x=map_width-zoom_win_width/(1<<zoom);
       if (zoom_x<0) zoom_x=0;
     }
 
-    zoom_y=zoom_cy-(zal/2)/(1<<zoom);
+    zoom_y=zoom_cy-(zoom_win_height/2)/(1<<zoom);
     if (zoom_y<0) zoom_y=0;
-    else if (zoom_y+zal/(1<<zoom)>map_al) {
-      zoom_y=map_al-zal/(1<<zoom);
+    else if (zoom_y+zoom_win_height/(1<<zoom)>map_height) {
+      zoom_y=map_height-zoom_win_height/(1<<zoom);
       if (zoom_y<0) zoom_y=0;
     }
 
     if (z && !mouse_shift) {
-      mouse_x=zx+(coord_x-zoom_x)*(1<<zoom);
-      mouse_y=zy+(coord_y-zoom_y)*(1<<zoom);
+      mouse_x=zoom_win_x+(coord_x-zoom_x)*(1<<zoom);
+      mouse_y=zoom_win_y+(coord_y-zoom_y)*(1<<zoom);
       set_mouse(mouse_x,mouse_y);
       mouse_shift_x=mouse_x;
       mouse_shift_y=mouse_y;
@@ -4698,13 +4698,13 @@ void select_zoom(void) {
 
     do { read_mouse(); } while((mouse_b&1) || (key(_Z)&&hotkey));
 
-    hacer_zoom=1;
+    need_zoom=1;
   }
 
-  if (mouse_in(barra_x,barra_y,barra_x+barra_an*big2-1,barra_y+19*big2-1)) {
+  if (mouse_in(toolbar_x,toolbar_y,toolbar_x+toolbar_width*big2-1,toolbar_y+19*big2-1)) {
     if (big && !mouse_shift) { mouse_shift=1;
-      mouse_x=barra_x+(mouse_shift_x-barra_x)/2;
-      mouse_y=barra_y+(mouse_shift_y-barra_y)/2; }
+      mouse_x=toolbar_x+(mouse_shift_x-toolbar_x)/2;
+      mouse_y=toolbar_y+(mouse_shift_y-toolbar_y)/2; }
   }
    
   zoom=zoom%4;
@@ -4718,39 +4718,39 @@ void select_zoom(void) {
 void move_zoom(void) {
   int n,m=0;
 
-  if ((mouse_b&1) && mouse_in(barra_x+26,barra_y+2,barra_x+47,barra_y+17)) {
+  if ((mouse_b&1) && mouse_in(toolbar_x+26,toolbar_y+2,toolbar_x+47,toolbar_y+17)) {
     if (zoom_move==c3) zoom_move=c1; else zoom_move=c3;
     do {read_mouse();} while(mouse_b&1);
   }
 
   if (zoom_move==c3) {
     n=zoom_x;
-    if (zx==0 && zan>=vga_an) {
+    if (zoom_win_x==0 && zoom_win_width>=vga_width) {
       if (real_mouse_x<0) {
         zoom_x-=(-real_mouse_x)>>zoom;
         if (zoom_x<0) zoom_x=0;
         if (n!=zoom_x) m|=1;
-      } else if (real_mouse_x>=vga_an) {
-        zoom_x+=(real_mouse_x-vga_an+1)>>zoom;
-        if (zoom_x>map_an-vga_an/(1<<zoom)) zoom_x=map_an-vga_an/(1<<zoom);
+      } else if (real_mouse_x>=vga_width) {
+        zoom_x+=(real_mouse_x-vga_width+1)>>zoom;
+        if (zoom_x>map_width-vga_width/(1<<zoom)) zoom_x=map_width-vga_width/(1<<zoom);
         if (n!=zoom_x) m|=1;
       }
     }
     n=zoom_y;
-    if (zy==0 && zal>=vga_al) {
+    if (zoom_win_y==0 && zoom_win_height>=vga_height) {
       if (real_mouse_y<0) {
         zoom_y-=(-real_mouse_y)>>zoom;
         if (zoom_y<0) zoom_y=0;
         if (n!=zoom_y) m|=2;
-      } else if (real_mouse_y>=vga_al) {
-        zoom_y+=(real_mouse_y-vga_al+1)>>zoom;
-        if (zoom_y>map_al-vga_al/(1<<zoom)) zoom_y=map_al-vga_al/(1<<zoom);
+      } else if (real_mouse_y>=vga_height) {
+        zoom_y+=(real_mouse_y-vga_height+1)>>zoom;
+        if (zoom_y>map_height-vga_height/(1<<zoom)) zoom_y=map_height-vga_height/(1<<zoom);
         if (n!=zoom_y) m|=2;
       }
     }
-    if (m&1) zoom_cx=zoom_x+(vga_an/2)/(1<<zoom);
-    if (m&2) zoom_cy=zoom_y+(vga_al/2)/(1<<zoom);
-    if (m) hacer_zoom=1;
+    if (m&1) zoom_cx=zoom_x+(vga_width/2)/(1<<zoom);
+    if (m&2) zoom_cy=zoom_y+(vga_height/2)/(1<<zoom);
+    if (m) need_zoom=1;
   }
 
 }
@@ -4763,20 +4763,20 @@ void draw_bar(int _an) {
 
   int n; // Número de iconos
 
-  draw_edit_background(barra_x-4,barra_y,barra_an*big2+4,19*big2);
+  draw_edit_background(toolbar_x-4,toolbar_y,toolbar_width*big2+4,19*big2);
 
   n=0; while (bar[n]) n++;
-  barra_an=2+8+38+n*16+1+_an;
-  memset(barra,c0,vga_an*19*big2);
-  wrectangle(barra,vga_an/big2,19,c2,0,0,barra_an,19);
-  wgra(barra,vga_an/big2,19,c_b_low,2,2,7,7);
+  toolbar_width=2+8+38+n*16+1+_an;
+  memset(toolbar,c0,vga_width*19*big2);
+  wrectangle(toolbar,vga_width/big2,19,c2,0,0,toolbar_width,19);
+  wgra(toolbar,vga_width/big2,19,c_b_low,2,2,7,7);
 
   put_bar(2,10,35);
   n=0; while (bar[n]) {
     if (bar[n]>1) put_bar(48+n*16,2,bar[n]);
     n++;
   }
-  switch(modo) {
+  switch(draw_mode) {
     case 0: put_bar_inv(10,2,177); break;
     case 1: put_bar_inv(10,2,160); break;
     case 2: put_bar_inv(10,2,161); break;
@@ -4788,8 +4788,8 @@ void draw_bar(int _an) {
     case 8: put_bar_inv(10,2,180); break;
     case 9: put_bar_inv(10,2,165); break;
     case 10:
-      if (modo_seleccion<4) { put_bar_inv(10,2,131+modo_seleccion); }
-      else { put_bar_inv(10,2,modo_seleccion+167-4); } break;
+      if (mode_selection<4) { put_bar_inv(10,2,131+mode_selection); }
+      else { put_bar_inv(10,2,mode_selection+167-4); } break;
     case 11: put_bar_inv(10,2,100); break;
     case 12: put_bar_inv(10,2,191); break;
     case 13: put_bar_inv(10,2,190); break;
@@ -4797,22 +4797,22 @@ void draw_bar(int _an) {
 }
 
 //-----------------------------------------------------------------------------
-//      Imprime las coordenadas sobre el segundo icono de la barra
+//      Imprime las coordenadas sobre el segundo icono de la toolbar
 //-----------------------------------------------------------------------------
 
 void bar_coords(void) {
   byte * p;
   byte num[5];
 
-  wbox(barra,vga_an/big2,vga_al,c2,26,2,21,15);
-  p=copia; copia=barra; text_color=zoom_move; num[4]=0;
+  wbox(toolbar,vga_width/big2,vga_height,c2,26,2,21,15);
+  p=copia; copia=toolbar; text_color=zoom_move; num[4]=0;
 
-  if (coord_x>=0 && coord_x<map_an) {
+  if (coord_x>=0 && coord_x<map_width) {
     num[3]=coord_x%10+48; num[2]=(coord_x/10)%10+48; num[1]=(coord_x/100)%10+48;
     num[0]=(coord_x/1000)%10+48; writetxt(27,3,0,num);
   } else writetxt(27,3,0,(byte *)"000?");
 
-  if (coord_y>=0 && coord_y<map_al) {
+  if (coord_y>=0 && coord_y<map_height) {
     num[3]=coord_y%10+48; num[2]=(coord_y/10)%10+48; num[1]=(coord_y/100)%10+48;
     num[0]=(coord_y/1000)%10+48; writetxt(27,10,0,num);
   } else writetxt(27,10,0,(byte *)"000?");
@@ -4821,25 +4821,25 @@ void bar_coords(void) {
 }
 
 //-----------------------------------------------------------------------------
-//      Imprime el ancho y alto (lineas, cajas, ...) en la barra
+//      Imprime el ancho y alto (lineas, cajas, ...) en la toolbar
 //-----------------------------------------------------------------------------
 
 void analyze_bar(int an, int al) {
   byte * p;
   byte num[5];
 
-  wbox(barra,vga_an/big2,vga_al,c2,barra_an-23,2,21,15);
+  wbox(toolbar,vga_width/big2,vga_height,c2,toolbar_width-23,2,21,15);
 
-  p=copia; copia=barra; text_color=c4; num[4]=0;
+  p=copia; copia=toolbar; text_color=c4; num[4]=0;
   num[3]=an%10+48; num[2]=(an/10)%10+48; num[1]=(an/100)%10+48;
-  num[0]=(an/1000)%10+48; writetxt(barra_an-22,3,0,num);
+  num[0]=(an/1000)%10+48; writetxt(toolbar_width-22,3,0,num);
   num[3]=al%10+48; num[2]=(al/10)%10+48; num[1]=(al/100)%10+48;
-  num[0]=(al/1000)%10+48; writetxt(barra_an-22,10,0,num);
+  num[0]=(al/1000)%10+48; writetxt(toolbar_width-22,10,0,num);
   copia=p;
 }
 
 //-----------------------------------------------------------------------------
-//      Vuelca la barra (segun barra_x/y y barra_an)
+//      Flush the toolbar (based on toolbar_x/y and toolbar_width)
 //-----------------------------------------------------------------------------
 
 int new_bar(int an, int al) {
@@ -4848,15 +4848,15 @@ int new_bar(int an, int al) {
   for (n=0;n<10;n++) { if (!barras[n].on) break; } if (n==10) return(-1);
 
   if ((barras[n].ptr=(byte*)malloc(an*big2*al*big2))==NULL) {
-    v_texto=(char *)texto[45]; show_dialog(err0); return(-1);
+    v_text=(char *)texto[45]; show_dialog(err0); return(-1);
   }
 
   barras[n].on=1; barras[n].an=an; barras[n].al=al;
 
   an*=big2; al*=big2;
-  barras[n].x=barra_x;
-  if (barra_y>vga_al/2-9*big2) barras[n].y=barra_y-al-1;
-  else barras[n].y=barra_y+19*big2+1;
+  barras[n].x=toolbar_x;
+  if (toolbar_y>vga_height/2-9*big2) barras[n].y=toolbar_y-al-1;
+  else barras[n].y=toolbar_y+19*big2+1;
   adjust_box(&barras[n].x,&barras[n].y,&an,&al);
   an/=big2; al/=big2;
 
@@ -4871,10 +4871,10 @@ int new_bar(int an, int al) {
 void flush_bars(int oscurecidas) {
   int n;
 
-  // La barra principal se trata de forma especial, siempre está activa
+  // La toolbar principal se trata de forma especial, siempre está activa
 
-  if (!oscurecidas) flush_bar(barra,vga_an,barra_x,barra_y,barra_an,19);
-  else flush_bar_darkened(barra,vga_an,barra_x,barra_y,barra_an,19);
+  if (!oscurecidas) flush_bar(toolbar,vga_width,toolbar_x,toolbar_y,toolbar_width,19);
+  else flush_bar_darkened(toolbar,vga_width,toolbar_x,toolbar_y,toolbar_width,19);
 
   for (n=0;n<10;n++) if (barras[n].on) {
     if (!oscurecidas) {
@@ -4896,25 +4896,25 @@ void flush_bar(byte * p, int real_an, int x, int y, int an, int al) {
 
   blit_partial(x,y,an,al);
 
-  q=copia+y*vga_an+x;
+  q=copia+y*vga_width+x;
 
   if (x<0) salta_x=-x; else salta_x=0;
-  if (x+an>vga_an) resto_x=x+an-vga_an; else resto_x=0;
+  if (x+an>vga_width) resto_x=x+an-vga_width; else resto_x=0;
   long_x=an-salta_x-resto_x;
 
   resto_x+=real_an-an;
 
   if (y<0) salta_y=-y; else salta_y=0;
-  if (y+al>vga_al) resto_y=y+al-vga_al; else resto_y=0;
+  if (y+al>vga_height) resto_y=y+al-vga_height; else resto_y=0;
   long_y=al-salta_y-resto_y;
 
-  p+=vga_an*salta_y+salta_x; q+=vga_an*salta_y+salta_x;
+  p+=vga_width*salta_y+salta_x; q+=vga_width*salta_y+salta_x;
   resto_x+=salta_x; an=long_x;
   do {
     do {
       *q++=*p++;
     } while (--an);
-    q+=vga_an-(an=long_x); p+=resto_x;
+    q+=vga_width-(an=long_x); p+=resto_x;
   } while (--long_y);
 }
 
@@ -4928,42 +4928,42 @@ void flush_bar_darkened(byte * p, int real_an, int x, int y, int an, int al) {
 
   blit_partial(x,y,an,al);
 
-  q=copia+y*vga_an+x;
+  q=copia+y*vga_width+x;
 
   if (x<0) salta_x=-x; else salta_x=0;
-  if (x+an>vga_an) resto_x=x+an-vga_an; else resto_x=0;
+  if (x+an>vga_width) resto_x=x+an-vga_width; else resto_x=0;
   long_x=an-salta_x-resto_x;
 
   resto_x+=real_an-an;
 
   if (y<0) salta_y=-y; else salta_y=0;
-  if (y+al>vga_al) resto_y=y+al-vga_al; else resto_y=0;
+  if (y+al>vga_height) resto_y=y+al-vga_height; else resto_y=0;
   long_y=al-salta_y-resto_y;
 
-  p+=vga_an*salta_y+salta_x; q+=vga_an*salta_y+salta_x;
+  p+=vga_width*salta_y+salta_x; q+=vga_width*salta_y+salta_x;
   resto_x+=salta_x; an=long_x;
   do {
     do {
       *q++=*(ghost+c0*256+*p++);
     } while (--an);
-    q+=vga_an-(an=long_x); p+=resto_x;
+    q+=vga_width-(an=long_x); p+=resto_x;
   } while (--long_y);
 }
 
 //-----------------------------------------------------------------------------
-//      Pone un gráfico en la barra de edición
+//      Pone un gráfico en la toolbar de edición
 //-----------------------------------------------------------------------------
 
 void put_bar(int x,int y,int n) {
 
-  wput_in_box(barra,vga_an/big2,vga_an/big2,19,x,y,-n);
+  wput_in_box(toolbar,vga_width/big2,vga_width/big2,19,x,y,-n);
 
 }
 
 void put_bar_inv(int x,int y,int n) {
 
-  wput_in_box(barra,vga_an/big2,vga_an/big2,19,x,y,-n); // TODO: Highlight inversion does not render correctly
-  wresalta_box(barra,vga_an/big2,19,x,y,*((word*)graf[n])/big2,*((word*)(graf[n]+2))/big2);
+  wput_in_box(toolbar,vga_width/big2,vga_width/big2,19,x,y,-n); // TODO: Highlight inversion does not render correctly
+  wresalta_box(toolbar,vga_width/big2,19,x,y,*((word*)graf[n])/big2,*((word*)(graf[n]+2))/big2);
 
 }
 

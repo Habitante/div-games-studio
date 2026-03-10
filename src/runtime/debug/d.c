@@ -194,8 +194,8 @@ char * vnom=NULL; // Vector de nombres
 #define tpslo   26
 
 struct objeto {
-  int tipo;
-  int nombre;
+  int type;
+  int name;
   int bloque;
   int miembro;
   int v0,v1,v2,v3,v4,v5;
@@ -262,8 +262,8 @@ void init_debug(void) {
   FILE *f;
   int n;
 
-  for(n=0;n<max_windows;n++) ventana[n].tipo=0;
-  if ((fondo_raton=(byte*)malloc(2048))==NULL) exer(1);
+  for(n=0;n<max_windows;n++) ventana[n].type=0;
+  if ((mouse_background=(byte*)malloc(2048))==NULL) exer(1);
   init_big();
 
   if ((f=fopen("system/exec.dbg","rb"))!=NULL) {
@@ -315,38 +315,38 @@ void init_debug(void) {
 
   memset(visor,0,sizeof(int)*num_obj);
   for (n=0;n<num_obj;n++) {
-    if (o[n].tipo==tcglo || o[n].tipo==tcloc) visor[n]=2;
-    if (o[n].tipo==tcons && o[n].v1==1) visor[n]=2;
-    if ((o[n].tipo==tvloc || o[n].tipo==tvglo || o[n].tipo==tcons) &&
-       (vnom[o[n].nombre]=='a' || vnom[o[n].nombre]=='\xa0') &&
-       vnom[o[n].nombre+1]=='n' && vnom[o[n].nombre+2]=='g') visor[n]=4;
-    if (o[n].tipo==tcons && !strcmp(vnom+o[n].nombre,"pi")) visor[n]=4;
-    if ((o[n].tipo==tvloc || o[n].tipo==tvglo) &&
-       (vnom[o[n].nombre+2]=='e' || (vnom[o[n].nombre+2]>='0'&& vnom[o[n].nombre+2]<='9')) &&
-       vnom[o[n].nombre]=='i' && vnom[o[n].nombre+1]=='d') visor[n]=3;
-    if (o[n].tipo==tvloc && !strcmp(vnom+o[n].nombre,"caller_id")) visor[n]=3;
-    if (o[n].tipo==tvloc && !strcmp(vnom+o[n].nombre,"father")) visor[n]=3;
-    if (o[n].tipo==tvloc && !strcmp(vnom+o[n].nombre,"bigbro")) visor[n]=3;
-    if (o[n].tipo==tvloc && !strcmp(vnom+o[n].nombre,"smallbro")) visor[n]=3;
-    if (o[n].tipo==tvloc && !strcmp(vnom+o[n].nombre,"son")) visor[n]=3;
-    if (o[n].tipo==tvloc && !strcmp(vnom+o[n].nombre,"process_id")) visor[n]=3;
-    if (o[n].tipo==tvloc && !strcmp(vnom+o[n].nombre,"id_scan")) visor[n]=3;
-    if (o[n].tipo==tvloc && !strcmp(vnom+o[n].nombre,"type_scan")) visor[n]=3;
-    if (o[n].tipo==tvloc && !strcmp(vnom+o[n].nombre,"is_executed")) visor[n]=1;
-    if (o[n].tipo==tvloc && !strcmp(vnom+o[n].nombre,"is_painted")) visor[n]=1;
-    if (o[n].tipo==tvglo && !strcmp(vnom+o[n].nombre,"fading")) visor[n]=1;
-    if (o[n].tipo==ttglo && !strcmp(vnom+o[n].nombre,"argv")) visor[n]=2;
+    if (o[n].type==tcglo || o[n].type==tcloc) visor[n]=2;
+    if (o[n].type==tcons && o[n].v1==1) visor[n]=2;
+    if ((o[n].type==tvloc || o[n].type==tvglo || o[n].type==tcons) &&
+       (vnom[o[n].name]=='a' || vnom[o[n].name]=='\xa0') &&
+       vnom[o[n].name+1]=='n' && vnom[o[n].name+2]=='g') visor[n]=4;
+    if (o[n].type==tcons && !strcmp(vnom+o[n].name,"pi")) visor[n]=4;
+    if ((o[n].type==tvloc || o[n].type==tvglo) &&
+       (vnom[o[n].name+2]=='e' || (vnom[o[n].name+2]>='0'&& vnom[o[n].name+2]<='9')) &&
+       vnom[o[n].name]=='i' && vnom[o[n].name+1]=='d') visor[n]=3;
+    if (o[n].type==tvloc && !strcmp(vnom+o[n].name,"caller_id")) visor[n]=3;
+    if (o[n].type==tvloc && !strcmp(vnom+o[n].name,"father")) visor[n]=3;
+    if (o[n].type==tvloc && !strcmp(vnom+o[n].name,"bigbro")) visor[n]=3;
+    if (o[n].type==tvloc && !strcmp(vnom+o[n].name,"smallbro")) visor[n]=3;
+    if (o[n].type==tvloc && !strcmp(vnom+o[n].name,"son")) visor[n]=3;
+    if (o[n].type==tvloc && !strcmp(vnom+o[n].name,"process_id")) visor[n]=3;
+    if (o[n].type==tvloc && !strcmp(vnom+o[n].name,"id_scan")) visor[n]=3;
+    if (o[n].type==tvloc && !strcmp(vnom+o[n].name,"type_scan")) visor[n]=3;
+    if (o[n].type==tvloc && !strcmp(vnom+o[n].name,"is_executed")) visor[n]=1;
+    if (o[n].type==tvloc && !strcmp(vnom+o[n].name,"is_painted")) visor[n]=1;
+    if (o[n].type==tvglo && !strcmp(vnom+o[n].name,"fading")) visor[n]=1;
+    if (o[n].type==ttglo && !strcmp(vnom+o[n].name,"argv")) visor[n]=2;
 
-    if (o[n].tipo==ttglo && !strcmp(vnom+o[n].nombre,"name") &&
-        o[n-2].tipo==tsglo && !strcmp(vnom+o[n-2].nombre,"dirinfo")) visor[n]=2;
-    if (o[n].tipo==tvglo && !strcmp(vnom+o[n].nombre,"attrib") &&
-        o[n-13].tipo==tsglo && !strcmp(vnom+o[n-13].nombre,"fileinfo")) visor[n]=6;
+    if (o[n].type==ttglo && !strcmp(vnom+o[n].name,"name") &&
+        o[n-2].type==tsglo && !strcmp(vnom+o[n-2].name,"dirinfo")) visor[n]=2;
+    if (o[n].type==tvglo && !strcmp(vnom+o[n].name,"attrib") &&
+        o[n-13].type==tsglo && !strcmp(vnom+o[n-13].name,"fileinfo")) visor[n]=6;
   }
 
   // Inicializa los tiempos de los bloques de procesos
 
   for (n=0;n<num_obj;n++) {
-    if (o[n].tipo==tproc) {
+    if (o[n].type==tproc) {
       o[n].v4=0; // Time_exec
       o[n].v5=0; // Time_paint
     }
@@ -357,7 +357,7 @@ void init_debug(void) {
 }
 
 void end_debug(void) {
-  free(fondo_raton); 
+  free(mouse_background); 
   free(o);
   free(var);
   free(usado);
@@ -377,7 +377,7 @@ void init_big(void) {
   int n;
   byte *ptr;
 
-  if (vga_an>=640) { big=1; big2=2; } else { big=0; big2=1; }
+  if (vga_width>=640) { big=1; big2=2; } else { big=0; big2=1; }
 
   if (old_big>=0 && old_big!=big) {
     free(text_font);
@@ -450,26 +450,26 @@ void show_dialog(voidReturnType init_handler) {
   int x,y,an,al;
   int vtipo;
 
-  if (!ventana[max_windows-1].tipo) {
+  if (!ventana[max_windows-1].type) {
 
-    memmove(&ventana[1].tipo,&v.tipo,sizeof(tventana)*(max_windows-1));
+    memmove(&ventana[1].type,&v.type,sizeof(tventana)*(max_windows-1));
 
     //---------------------------------------------------------------------------
     // Los siguientes valores los debe definir init_handler, valores por defecto:
     //---------------------------------------------------------------------------
 
-    v.tipo=1;
-    v.primer_plano=1;
-    v.titulo=(byte *)"?";
+    v.type=1;
+    v.foreground=1;
+    v.title=(byte *)"?";
     v.paint_handler=dummy_handler;
     v.click_handler=dummy_handler;
     v.close_handler=dummy_handler;
     v.x=0;
     v.y=0;
-    v.an=vga_an;
-    v.al=vga_al;
-    v.estado=0;
-    v.volcar=0;
+    v.an=vga_width;
+    v.al=vga_height;
+    v.state=0;
+    v.redraw=0;
     v.items=0;
     v.selected_item=-1;
 
@@ -482,7 +482,7 @@ void show_dialog(voidReturnType init_handler) {
     if (no_volcar_nada) {
       x=profiler_x; y=profiler_y;
     } else {
-      x=vga_an/2-an/2; y=vga_al/2-al/2;
+      x=vga_width/2-an/2; y=vga_height/2-al/2;
     }
 
     v.x=x; v.y=y;
@@ -493,13 +493,13 @@ void show_dialog(voidReturnType init_handler) {
       // Pasa a segundo plano las ventanas que corresponda
       //---------------------------------------------------------------------------
 
-      vtipo=v.tipo; v.tipo=0;
+      vtipo=v.type; v.type=0;
 
-      if (ventana[1].tipo==1) { // Diálogo sobre diálogo
-        ventana[1].primer_plano=0; flush_window(1);
+      if (ventana[1].type==1) { // Diálogo sobre diálogo
+        ventana[1].foreground=0; flush_window(1);
       }
 
-      v.tipo=vtipo;
+      v.type=vtipo;
 
       //---------------------------------------------------------------------------
       // Inicializa la ventana
@@ -510,15 +510,15 @@ void show_dialog(voidReturnType init_handler) {
       memset(ptr,c0,an*al); if (big) { an/=2; al/=2; }
       wrectangle(ptr,an,al,c2,0,0,an,al);
       wput(ptr,an,al,an-9,2,35);
-      if (!strcmp((char *)v.titulo,(char *)text[1]) || !strcmp((char *)v.titulo,(char *)text[2]))
+      if (!strcmp((char *)v.title,(char *)text[1]) || !strcmp((char *)v.title,(char *)text[2]))
         wbox(ptr,an,al,c_r_low,2,2,an-12,7);
       else wbox(ptr,an,al,c_b_low,2,2,an-12,7);
-      if (text_len(v.titulo)+3>an-12) {
-        wwrite_in_box(ptr,an,an-11,al,4,2,0,v.titulo,c1);
-        wwrite_in_box(ptr,an,an-11,al,3,2,0,v.titulo,c4);
+      if (text_len(v.title)+3>an-12) {
+        wwrite_in_box(ptr,an,an-11,al,4,2,0,v.title,c1);
+        wwrite_in_box(ptr,an,an-11,al,3,2,0,v.title,c4);
       } else {
-        wwrite(ptr,an,al,3+(an-12)/2,2,1,v.titulo,c1);
-        wwrite(ptr,an,al,2+(an-12)/2,2,1,v.titulo,c4);
+        wwrite(ptr,an,al,3+(an-12)/2,2,1,v.title,c1);
+        wwrite(ptr,an,al,2+(an-12)/2,2,1,v.title,c4);
       }
 
       call(v.paint_handler);
@@ -529,7 +529,7 @@ void show_dialog(voidReturnType init_handler) {
 
       explode(x,y,an,al);
 
-      wvolcado(copia,vga_an,vga_al,ptr,x,y,an,al,0);
+      wvolcado(copia,vga_width,vga_height,ptr,x,y,an,al,0);
       blit_partial(x,y,an,al);
       do { dread_mouse(); } while(mouse_b&1);
       modal_loop();
@@ -539,8 +539,8 @@ void show_dialog(voidReturnType init_handler) {
     //---------------------------------------------------------------------------
 
     } else {
-      memmove(&v.tipo,&ventana[1].tipo,sizeof(tventana)*(max_windows-1));
-      ventana[max_windows-1].tipo=0;
+      memmove(&v.type,&ventana[1].type,sizeof(tventana)*(max_windows-1));
+      ventana[max_windows-1].type=0;
     }
   }
 }
@@ -558,12 +558,12 @@ void repaint_window(void) {
   wrectangle(v.ptr,an,al,c2,0,0,an,al);
   wput(v.ptr,an,al,an-9,2,35);
   wbox(v.ptr,an,al,c_b_low,2,2,an-12,7);
-  if (text_len(v.titulo)+3>an-20) {
-    wwrite_in_box(v.ptr,an,an-11,al,4,2,0,v.titulo,c1);
-    wwrite_in_box(v.ptr,an,an-11,al,3,2,0,v.titulo,c4);
+  if (text_len(v.title)+3>an-20) {
+    wwrite_in_box(v.ptr,an,an-11,al,4,2,0,v.title,c1);
+    wwrite_in_box(v.ptr,an,an-11,al,3,2,0,v.title,c4);
   } else {
-    wwrite(v.ptr,an,al,3+(an-12)/2,2,1,v.titulo,c1);
-    wwrite(v.ptr,an,al,2+(an-12)/2,2,1,v.titulo,c4);
+    wwrite(v.ptr,an,al,3+(an-12)/2,2,1,v.title,c1);
+    wwrite(v.ptr,an,al,2+(an-12)/2,2,1,v.title,c4);
   }
 }
 
@@ -577,7 +577,7 @@ void modal_loop(void) {
   int dialogo_invocado;
   int salir_del_dialogo=0;
 
-  fin_dialogo=0;
+  end_dialog=0;
   do {
 	ascii=0;scan_code=0; 
     poll_keyboard();
@@ -597,11 +597,11 @@ void modal_loop(void) {
     if (n==0) // Si ahora estamos en la barra, también se repinta la ventana
       if (!mouse_in(v.x+2*big2,v.y+10*big2,v.x+v.an-2*big2,v.y+v.al-2*big2)) n--;
 
-    if (n!=oldn && oldn==0) if (v.primer_plano==1) {
+    if (n!=oldn && oldn==0) if (v.foreground==1) {
       dialogo_invocado=1;
       wmouse_x=-1; wmouse_y=-1; m=mouse_b; mouse_b=0;
       call(v.click_handler); mouse_b=m;
-      if (v.volcar) { flush_window(0); v.volcar=0; }
+      if (v.redraw) { flush_window(0); v.redraw=0; }
       salir_del_dialogo=0;
     } oldn=max_windows; if (n<0) n++;
 
@@ -626,7 +626,7 @@ void modal_loop(void) {
       wmouse_x=mouse_x-v.x; wmouse_y=mouse_y-v.y;
       if (big) { wmouse_x/=2; wmouse_y/=2; }
       call(v.click_handler);
-      if (v.volcar) { flush_window(0); v.volcar=0; }
+      if (v.redraw) { flush_window(0); v.redraw=0; }
       oldn=0;
       salir_del_dialogo=0;
 
@@ -648,11 +648,11 @@ void modal_loop(void) {
       dialogo_invocado=1;
       wmouse_x=-1; wmouse_y=-1; m=mouse_b; mouse_b=0;
       call(v.click_handler); mouse_b=m;
-      if (v.volcar) { flush_window(0); v.volcar=0; }
+      if (v.redraw) { flush_window(0); v.redraw=0; }
       salir_del_dialogo=0;
     }
 
-    if (fin_dialogo && !salir_del_dialogo) {
+    if (end_dialog && !salir_del_dialogo) {
       close_window(); salir_del_dialogo=1;
     }
 
@@ -662,7 +662,7 @@ void modal_loop(void) {
 
     if (key(_ESC) && !key(_L_CTRL)) {
       for (n=0;n<v.items;n++)
-        if (v.item[n].tipo==2 && (v.item[n].estado&2)) break;
+        if (v.item[n].type==2 && (v.item[n].state&2)) break;
       if (n==v.items) { close_window(); salir_del_dialogo=1; }
     }
 
@@ -674,7 +674,7 @@ void modal_loop(void) {
       flush_copy();
     }
 
-  } while (!salir_del_dialogo); fin_dialogo=0;
+  } while (!salir_del_dialogo); end_dialog=0;
 
   get[0]=0;
 
@@ -693,14 +693,14 @@ void refresh_dialog(void) {
   memset(ptr,c0,an*al); if (big) { an/=2; al/=2; }
   wrectangle(ptr,an,al,c2,0,0,an,al);
   wput(ptr,an,al,an-9,2,35);
-  if (!strcmp((char *)v.titulo,(char *)text[1])) wbox(ptr,an,al,c_r_low,2,2,an-12,7);
+  if (!strcmp((char *)v.title,(char *)text[1])) wbox(ptr,an,al,c_r_low,2,2,an-12,7);
   else wbox(ptr,an,al,c_b_low,2,2,an-12,7);
-  if (text_len(v.titulo)+3>an-12) {
-    wwrite_in_box(ptr,an,an-11,al,4,2,0,v.titulo,c1);
-    wwrite_in_box(ptr,an,an-11,al,3,2,0,v.titulo,c4);
+  if (text_len(v.title)+3>an-12) {
+    wwrite_in_box(ptr,an,an-11,al,4,2,0,v.title,c1);
+    wwrite_in_box(ptr,an,an-11,al,3,2,0,v.title,c4);
   } else {
-    wwrite(ptr,an,al,3+(an-12)/2,2,1,v.titulo,c1);
-    wwrite(ptr,an,al,2+(an-12)/2,2,1,v.titulo,c4);
+    wwrite(ptr,an,al,3+(an-12)/2,2,1,v.title,c1);
+    wwrite(ptr,an,al,2+(an-12)/2,2,1,v.title,c4);
   }
 
   call(v.paint_handler);
@@ -723,11 +723,11 @@ void close_window(void) {
   } free(v.ptr);
 
   x=v.x; y=v.y; an=v.an; al=v.al;
-  memmove(&v.tipo,&ventana[1].tipo,sizeof(tventana)*(max_windows-1));
+  memmove(&v.type,&ventana[1].type,sizeof(tventana)*(max_windows-1));
   update_box(x,y,an,al);
 
-  if (v.tipo==1) { // Diálogo sobre diálogo solo abre el último
-    v.primer_plano=1; flush_window(0);
+  if (v.type==1) { // Diálogo sobre diálogo solo abre el último
+    v.foreground=1; flush_window(0);
   }
 
   do { dread_mouse(); } while((mouse_b&1) || key(_ESC));
@@ -752,14 +752,14 @@ void move_window(void) {
   do {
     x=v.x; y=v.y;
     v.x=mouse_x-ix; v.y=mouse_y-iy;
-    v.tipo=0; update_box(x,y,an,al); v.tipo=1;
+    v.type=0; update_box(x,y,an,al); v.type=1;
     flush_window(0);
     if (!no_volcar_nada) {
       flush_copy();
     }
   } while(mouse_b&1);
 
-  wrectangle(v.ptr,an/big2,al/big2,c2,0,0,an/big2,al/big2); v.volcar=1;
+  wrectangle(v.ptr,an/big2,al/big2,c2,0,0,an/big2,al/big2); v.redraw=1;
 }
 
 //-----------------------------------------------------------------------------
@@ -778,10 +778,10 @@ void flush_window(int m) {
 
   if (x<0) { an+=x; x=0; }
   if (y<0) { al+=y; y=0; }
-  if (x+an>vga_an) an=vga_an-x;
-  if (y+al>vga_al) al=vga_al-y;
+  if (x+an>vga_width) an=vga_width-x;
+  if (y+al>vga_height) al=vga_height-y;
 
-  for (n=m;n>=0;n--) if (ventana[n].tipo) if (collides_with(n,x,y,an,al)) {
+  for (n=m;n>=0;n--) if (ventana[n].type) if (collides_with(n,x,y,an,al)) {
 
     _ptr=ventana[n].ptr;
     salta_x=0; salta_y=0;
@@ -794,9 +794,9 @@ void flush_window(int m) {
     if (x+an<__x+_an) { salta_x+=__x+_an-x-an; _an-=__x+_an-x-an;  }
 
     if (_an>0 && _al>0) {
-      if (ventana[n].primer_plano==1)
-        wvolcado(copia,vga_an,vga_al,_ptr,__x,_y,_an,_al,salta_x);
-      else wvolcado_oscuro(copia,vga_an,vga_al,_ptr,__x,_y,_an,_al,salta_x);
+      if (ventana[n].foreground==1)
+        wvolcado(copia,vga_width,vga_height,_ptr,__x,_y,_an,_al,salta_x);
+      else wvolcado_oscuro(copia,vga_width,vga_height,_ptr,__x,_y,_an,_al,salta_x);
     }
 
   }
@@ -918,7 +918,7 @@ void wrectangle(byte*copia,int an_copia,int al_copia,byte c,int x,int y,int an,i
 //-----------------------------------------------------------------------------
 
 void put(int x,int y,int n) {
-  wput_in_box(copia,vga_an,vga_an,vga_al,x,y,n);
+  wput_in_box(copia,vga_width,vga_width,vga_height,x,y,n);
 }
 
 void wput(byte*copia,int an_copia,int al_copia,int x,int y,int n) {
@@ -1249,21 +1249,21 @@ void wtexc(byte*copia,int an_real_copia,int an_copia,int al_copia,
 //-----------------------------------------------------------------------------
 
 void explode(int x,int y,int an,int al) {
-  int n=0,tipo=v.tipo,b=big;
+  int n=0,tipo=v.type,b=big;
   int xx,yy,aan,aal;
   if (no_volcar_nada) return;
-  v.tipo=0; big=0;
+  v.type=0; big=0;
   update_box(x,y,an,al);
   while (++n<10) {
     aan=(an*n)/10; aal=(al*n)/10;
     xx=x+an/2-aan/2; yy=y+al/2-aal/2;
-    wrectangle(copia,vga_an,vga_al,c4,xx,yy,aan,aal);
+    wrectangle(copia,vga_width,vga_height,c4,xx,yy,aan,aal);
     blit_partial(xx,yy,aan,aal);
     retrace_wait();
     flush_copy();
     update_box(xx,yy,aan,1); update_box(xx,yy,1,aal);
     update_box(xx+aan-1,yy,1,aal); update_box(xx,yy+aal-1,aan,1);
-  } v.tipo=tipo; big=b;
+  } v.type=tipo; big=b;
 }
 
 void implode(int x,int y,int an,int al) {
@@ -1274,7 +1274,7 @@ void implode(int x,int y,int an,int al) {
     aan=(an*n)/10; if (!aan) aan=1;
     aal=(al*n)/10; if (!aal) aal=1;
     xx=x+an/2-aan/2; yy=y+al/2-aal/2;
-    wrectangle(copia,vga_an,vga_al,c4,xx,yy,aan,aal);
+    wrectangle(copia,vga_width,vga_height,c4,xx,yy,aan,aal);
     blit_partial(xx,yy,aan,aal);
     flush_copy();
     update_box(xx,yy,aan,aal);
@@ -1283,22 +1283,22 @@ void implode(int x,int y,int an,int al) {
 }
 
 void extrude(int x,int y,int an,int al,int x2,int y2,int an2,int al2) {
-  int n=9,tipo=v.tipo,b=big;
+  int n=9,tipo=v.type,b=big;
   int xx,yy,aan,aal;
   if (no_volcar_nada) return;
-  v.tipo=0; big=0;
+  v.type=0; big=0;
   update_box(x,y,an,al);
   do {
     aan=(an*n+an2*(10-n))/10;
     aal=(al*n+al2*(10-n))/10;
     xx=(x*n+x2*(10-n))/10;
     yy=(y*n+y2*(10-n))/10;
-    wrectangle(copia,vga_an,vga_al,c4,xx,yy,aan,aal);
+    wrectangle(copia,vga_width,vga_height,c4,xx,yy,aan,aal);
     blit_partial(xx,yy,aan,aal);
     flush_copy();
     update_box(xx,yy,aan,aal);
     retrace_wait();
-  } while (--n); big=b; v.tipo=tipo;
+  } while (--n); big=b; v.type=tipo;
 }
 
 //-----------------------------------------------------------------------------
@@ -1314,13 +1314,13 @@ void update_box(int x, int y, int an, int al) {
 
   if (x<0) { an+=x; x=0; }
   if (y<0) { al+=y; y=0; }
-  if (x+an>vga_an) an=vga_an-x;
-  if (y+al>vga_al) al=vga_al-y;
+  if (x+an>vga_width) an=vga_width-x;
+  if (y+al>vga_height) al=vga_height-y;
   if (an<=0 || al<=0) return;
 
   restore_wallpaper(x,y,an,al);
 
-  for (n=max_windows-1;n>=0;n--) if (ventana[n].tipo) if (collides_with(n,x,y,an,al)) {
+  for (n=max_windows-1;n>=0;n--) if (ventana[n].type) if (collides_with(n,x,y,an,al)) {
 
     _ptr=ventana[n].ptr;
     salta_x=0; salta_y=0;
@@ -1333,9 +1333,9 @@ void update_box(int x, int y, int an, int al) {
     if (x+an<__x+_an) { salta_x+=__x+_an-x-an; _an-=__x+_an-x-an;  }
 
     if (_an>0 && _al>0) {
-      if (ventana[n].primer_plano==1)
-        wvolcado(copia,vga_an,vga_al,_ptr,__x,_y,_an,_al,salta_x);
-      else wvolcado_oscuro(copia,vga_an,vga_al,_ptr,__x,_y,_an,_al,salta_x);
+      if (ventana[n].foreground==1)
+        wvolcado(copia,vga_width,vga_height,_ptr,__x,_y,_an,_al,salta_x);
+      else wvolcado_oscuro(copia,vga_width,vga_height,_ptr,__x,_y,_an,_al,salta_x);
     }
 
   }
@@ -1377,12 +1377,12 @@ void restore_wallpaper(int x,int y,int an,int al) {
   int n,_an;
 
   if (y<0) { y=0; } if (x<0) { x=0; }
-  if (y+al>vga_al) al=vga_al-y;
-  if (x+an>vga_an) an=vga_an-x;
+  if (y+al>vga_height) al=vga_height-y;
+  if (x+an>vga_width) an=vga_width-x;
 
   if (an>0 && al>0) {
-    p=copia+y*vga_an+x;
-    t=copia_debug+y*vga_an;
+    p=copia+y*vga_width+x;
+    t=copia_debug+y*vga_width;
     _an=an;
     do {
       n=x;
@@ -1390,7 +1390,7 @@ void restore_wallpaper(int x,int y,int an,int al) {
         *p=*(t+n);
         p++; n++;
       } while (--an);
-      an=_an; p+=vga_an-an; t+=vga_an;
+      an=_an; p+=vga_width-an; t+=vga_width;
     } while (--al);
   }
 }
@@ -1400,8 +1400,8 @@ void restore_wallpaper(int x,int y,int an,int al) {
 //-----------------------------------------------------------------------------
 
 void _button(byte *t,int x,int y,int c) {
-  v.item[v.items].tipo=1;
-  v.item[v.items].estado=0;
+  v.item[v.items].type=1;
+  v.item[v.items].state=0;
   v.item[v.items].button.texto=t;
   v.item[v.items].button.x=x;
   v.item[v.items].button.y=y;
@@ -1411,8 +1411,8 @@ void _button(byte *t,int x,int y,int c) {
 }
 
 void _get(byte *t,int x,int y,int an,byte *buffer,int lon_buffer,int r0,int r1) {
-  v.item[v.items].tipo=2;
-  v.item[v.items].estado=0;
+  v.item[v.items].type=2;
+  v.item[v.items].state=0;
   v.item[v.items].get.texto=t;
   v.item[v.items].get.x=x;
   v.item[v.items].get.y=y;
@@ -1426,8 +1426,8 @@ void _get(byte *t,int x,int y,int an,byte *buffer,int lon_buffer,int r0,int r1) 
 }
 
 void _flag(byte *t,int x,int y,int *valor) {
-  v.item[v.items].tipo=3;
-  v.item[v.items].estado=0;
+  v.item[v.items].type=3;
+  v.item[v.items].state=0;
   v.item[v.items].flag.texto=t;
   v.item[v.items].flag.x=x;
   v.item[v.items].flag.y=y;
@@ -1444,7 +1444,7 @@ void _show_items(void) {
   show_items_called=1;
   wbox(v.ptr,v.an/big2,v.al/big2,c2,2,10,v.an/big2-4,v.al/big2-12);
   while (n<v.items) {
-    switch(abs(v.item[n].tipo)) {
+    switch(abs(v.item[n].type)) {
       case 1: show_button(&v.item[n]); break;
       case 2: show_get(&v.item[n]); break;
       case 3: show_flag(&v.item[n]); break;
@@ -1457,7 +1457,7 @@ void _show_items2(void) {
   int n=0;
   show_items_called=1;
   while (n<v.items) {
-    switch(v.item[n].tipo) {
+    switch(v.item[n].type) {
       case 1: show_button(&v.item[n]); break;
       case 2: show_get(&v.item[n]); break;
       case 3: show_flag(&v.item[n]); break;
@@ -1477,7 +1477,7 @@ void show_get(t_item * i) {
   wwrite(v.ptr,v.an/big2,v.al/big2,i->get.x+1,i->get.y,0,i->get.texto,c12);
   wwrite(v.ptr,v.an/big2,v.al/big2,i->get.x,i->get.y,0,i->get.texto,c3);
   if (&v.item[v.selected_item]==i) {
-    if (i->estado&2) select_get(i,0,0);
+    if (i->state&2) select_get(i,0,0);
     select_get(i,1,0);
   }
 }
@@ -1486,23 +1486,23 @@ void select_get(t_item * i,int activo,int ocultar_error) {
   int n;
   if (activo) {
     wrectangle(v.ptr,v.an/big2,v.al/big2,c12,i->get.x-1,i->get.y+7,i->get.an+2,11);
-    if (i->estado&2) { strcpy(get,(char *)i->get.buffer); get_pos=strlen(get); }
-    i->estado&=1;
+    if (i->state&2) { strcpy(get,(char *)i->get.buffer); get_pos=strlen(get); }
+    i->state&=1;
   } else {
-    if (i->estado&2) {
+    if (i->state&2) {
       if (*get) {
         if (i->get.r0==i->get.r1) strcpy((char *)i->get.buffer,get); else {
           if (atoi(get)>=i->get.r0 && atoi(get)<=i->get.r1) itoa(atoi(get),(char *)i->get.buffer,10);
           else if (!ocultar_error && !show_items_called) {
             sprintf(combo_error,"%s [%d..%d].",(char *)text[4],i->get.r0,i->get.r1);
             text[3]=(byte *)combo_error;
-            v_texto=(char *)text[3]; show_dialog(err0);
+            v_text=(char *)text[3]; show_dialog(err0);
           }
         }
       }
     }
 
-    i->estado&=1;
+    i->state&=1;
 
     if (!superget) {
       wbox(v.ptr,v.an/big2,v.al/big2,c1,i->get.x,i->get.y+8,i->get.an,9);
@@ -1568,7 +1568,7 @@ void _process_items(void) {
   v.active_item=-1;
 
   if (v.selected_item!=-1) {
-    if (!v.estado && v.tipo==102) {
+    if (!v.state && v.type==102) {
       asc=ascii; kesc=kbdFLAGS[28];
       ascii=0; kbdFLAGS[28]=0;
     } else {
@@ -1576,19 +1576,19 @@ void _process_items(void) {
         ascii=0;
         _select_new_item(v.selected_item+1);
       }
-      if (ascii==0x1b) { // && (v.item[v.selected_item].estado&2)) {
-        if (v.item[v.selected_item].tipo==2) {
-          asc=ascii; kesc=kbdFLAGS[28]; est=v.item[v.selected_item].estado;
+      if (ascii==0x1b) { // && (v.item[v.selected_item].state&2)) {
+        if (v.item[v.selected_item].type==2) {
+          asc=ascii; kesc=kbdFLAGS[28]; est=v.item[v.selected_item].state;
           ascii=0;
           if (superget) strcpy((char *)v.item[v.selected_item].get.buffer,"");
           strcpy(get,(char *)v.item[v.selected_item].get.buffer);
           get_pos=strlen(get);
           select_get(&v.item[v.selected_item],0,1);
           select_get(&v.item[v.selected_item],1,1);
-          if (est==v.item[v.selected_item].estado) {
+          if (est==v.item[v.selected_item].state) {
             ascii=asc; kbdFLAGS[28]=kesc;
           } else {
-            v.volcar=1;
+            v.redraw=1;
             key(_ESC)=0;
           }
         }
@@ -1597,24 +1597,24 @@ void _process_items(void) {
   }
 
   while (n<v.items) {
-    switch(v.item[n].tipo) {
+    switch(v.item[n].type) {
       case 1:
         estado=button_status(n);
-        if (estado!=v.item[n].estado) process_button(n,estado);
+        if (estado!=v.item[n].state) process_button(n,estado);
         break;
       case 2:
         estado=get_status(n);
-        if (estado!=v.item[n].estado || estado>=2) process_get(n,estado);
+        if (estado!=v.item[n].state || estado>=2) process_get(n,estado);
         break;
       case 3:
         estado=flag_status(n);
-        if (estado!=v.item[n].estado) process_flag(n,estado);
+        if (estado!=v.item[n].state) process_flag(n,estado);
         break;
     } n++;
   }
 
   if (v.selected_item!=-1) {
-    if (!v.estado && v.tipo==102) {
+    if (!v.state && v.type==102) {
       ascii=asc; kbdFLAGS[28]=kesc;
     }
   }
@@ -1622,40 +1622,40 @@ void _process_items(void) {
 
 void _select_new_item(int i) {
   if (v.selected_item==i) return;
-  switch(abs(v.item[v.selected_item].tipo)) {
+  switch(abs(v.item[v.selected_item].type)) {
     case 1: select_button(&v.item[v.selected_item],0); break;
     case 2: select_get(&v.item[v.selected_item],0,0); break;
   }
   i--; do {
     i++;
     if (i>=v.items) i=0;
-  } while (v.item[i].tipo>=3 || v.item[i].tipo<1);
+  } while (v.item[i].type>=3 || v.item[i].type<1);
 
-  switch(v.item[v.selected_item=i].tipo) {
+  switch(v.item[v.selected_item=i].type) {
     case 1: select_button(&v.item[v.selected_item],1); break;
     case 2: select_get(&v.item[v.selected_item],1,0); break;
-  } v.volcar=1;
+  } v.redraw=1;
 }
 
 void _reselect_item(void) {
-  switch(v.item[v.selected_item].tipo) {
+  switch(v.item[v.selected_item].type) {
     case 1: select_button(&v.item[v.selected_item],0); break;
     case 2: select_get(&v.item[v.selected_item],0,0); break;
   }
-  switch(v.item[v.selected_item].tipo) {
+  switch(v.item[v.selected_item].type) {
     case 1: select_button(&v.item[v.selected_item],1); break;
     case 2: select_get(&v.item[v.selected_item],1,0); break;
-  } v.volcar=1;
+  } v.redraw=1;
 }
 
 void process_button(int n,int e) {
-  if (v.item[n].estado==3 && e!=3) { v.active_item=n; kbdFLAGS[28]=0; ascii=0; }
+  if (v.item[n].state==3 && e!=3) { v.active_item=n; kbdFLAGS[28]=0; ascii=0; }
   switch(e) {
     case 0:
       wwrite(v.ptr,v.an/big2,v.al/big2,v.item[n].button.x,v.item[n].button.y,
       v.item[n].button.center,v.item[n].button.texto,c3); break;
     case 1:
-      if (v.item[n].estado==2) v.active_item=n;
+      if (v.item[n].state==2) v.active_item=n;
       wwrite(v.ptr,v.an/big2,v.al/big2,v.item[n].button.x,v.item[n].button.y,
       v.item[n].button.center,v.item[n].button.texto,c4); break;
       break;
@@ -1665,11 +1665,11 @@ void process_button(int n,int e) {
     case 3:
       wwrite(v.ptr,v.an/big2,v.al/big2,v.item[n].button.x,v.item[n].button.y,
       v.item[n].button.center,v.item[n].button.texto,c0); break;
-  } v.item[n].estado=e; v.volcar=1;
+  } v.item[n].state=e; v.redraw=1;
 }
 
 int get_status(int n) {
-  int x=v.item[n].estado;
+  int x=v.item[n].state;
   if (strcmp((char *)v.item[n].get.texto,"")) {
     if (wmouse_in(v.item[n].get.x,v.item[n].get.y, // bit 0 "hilite"
       v.item[n].get.an,18)) x|=1; else x&=2;
@@ -1678,7 +1678,7 @@ int get_status(int n) {
       v.item[n].get.an,10)) x|=1; else x&=2;
   }
   if ((x&1)&&(mouse_b&1)) {
-    if (!(old_mouse_b&1) && (x&2)) x|=4;
+    if (!(prev_mouse_buttons&1) && (x&2)) x|=4;
     x|=2;
   }
   if ((ascii&&(ascii!=0x1b)&&v.selected_item==n)) { //||superget) {
@@ -1695,8 +1695,8 @@ int get_status(int n) {
 void process_get(int n,int e) {
   int old_e;
 
-  old_e=v.item[n].estado;
-  v.item[n].estado=e;
+  old_e=v.item[n].state;
+  v.item[n].state=e;
   if (!(old_e&2) && (e&2)) {
     _select_new_item(n);
      strcpy(get,(char *)v.item[n].get.buffer);
@@ -1705,12 +1705,12 @@ void process_get(int n,int e) {
 
   if (e&4) { *get=0; } e&=3;
 
-  switch(v.item[n].estado=e) {
+  switch(v.item[n].state=e) {
     case 2: get_input(n); break;
     case 3: get_input(n); break;
   }
 
-  switch(v.item[n].estado) {
+  switch(v.item[n].state) {
     case 2: case 0:
       wwrite(v.ptr,v.an/big2,v.al/big2,v.item[n].get.x,v.item[n].get.y,0,v.item[n].get.texto,c3);
       break;
@@ -1719,7 +1719,7 @@ void process_get(int n,int e) {
       break;
   }
 
-  if (old_e!=v.item[n].estado) v.volcar=1;
+  if (old_e!=v.item[n].state) v.redraw=1;
 }
 
 int flag_status(int n) {
@@ -1732,7 +1732,7 @@ int flag_status(int n) {
 
 void process_flag(int n,int e) {
 
-  if (v.item[n].estado==3 && e!=3) v.active_item=n;
+  if (v.item[n].state==3 && e!=3) v.active_item=n;
   switch(e) {
     case 0: wwrite(v.ptr,v.an/big2,v.al/big2,v.item[n].flag.x+8,v.item[n].flag.y,0,
       v.item[n].flag.texto,c3); break;
@@ -1740,13 +1740,13 @@ void process_flag(int n,int e) {
       v.item[n].flag.texto,c4); break;
     case 2: wwrite(v.ptr,v.an/big2,v.al/big2,v.item[n].flag.x+8,v.item[n].flag.y,0,
       v.item[n].flag.texto,c4);
-      if (v.item[n].estado==1) {
+      if (v.item[n].state==1) {
         v.active_item=n;
         if ((*v.item[n].flag.valor=!*v.item[n].flag.valor))
           wput(v.ptr,v.an/big2,v.al/big2,v.item[n].flag.x,v.item[n].flag.y,-59);
         else wput(v.ptr,v.an/big2,v.al/big2,v.item[n].flag.x,v.item[n].flag.y,58);
       } break;
-  } v.item[n].estado=e; v.volcar=1;
+  } v.item[n].state=e; v.redraw=1;
 }
 
 //-----------------------------------------------------------------------------
@@ -1767,11 +1767,11 @@ void get_input(int n) {
         strcpy(&get[get_pos-1],&get[get_pos]); get_pos--;
       }
       if (!*get && superget) strcpy((char *)v.item[v.selected_item].get.buffer,"");
-      v.volcar=1; break;
+      v.redraw=1; break;
     case 13: ascii=0; kbdFLAGS[28]=0; _select_new_item(n+1); return;
     default:
       if (!(shift_status&15) && ascii==0) {
-        l=v.volcar; v.volcar=1;
+        l=v.redraw; v.redraw=1;
         switch(scan_code) {
           case 77:
             get_pos++;
@@ -1784,7 +1784,7 @@ void get_input(int n) {
             memmove(&get[get_pos],&get[get_pos+1],strlen(&get[get_pos+1])+1);
             if (!*get && superget) strcpy((char *)v.item[v.selected_item].get.buffer,"");
             break;
-          default: v.volcar=l; break;
+          default: v.redraw=l; break;
         }
       } else if (ascii && char_len(ascii)>1 && (x=strlen(get))<v.item[n].get.lon_buffer-1) {
         strcpy(cwork,get);
@@ -1792,13 +1792,13 @@ void get_input(int n) {
         cwork[get_pos+1]=0;
         strcat(cwork,get+get_pos);
         strcpy(get,cwork);
-        get_pos++; v.volcar=1;
-        get[x++]=ascii; get[x]=0; v.volcar=1;
+        get_pos++; v.redraw=1;
+        get[x++]=ascii; get[x]=0; v.redraw=1;
       } break;
   }
 
-  if (v.volcar || get_cursor!=(system_clock&4)) {
-    v.volcar=1;
+  if (v.redraw || get_cursor!=(system_clock&4)) {
+    v.redraw=1;
 
     if (get_pos<0) get_pos=0; else if (get_pos>strlen(get)) get_pos=strlen(get);
 
@@ -1866,7 +1866,7 @@ void dread_mouse(void) {
   int386(0x33,&regs,&regs);
 
 
-  old_mouse_b=mouse_b;
+  prev_mouse_buttons=mouse_b;
   mouse_b=regs.w.bx;
 
   memset(&regs,0,sizeof(regs));
@@ -1889,11 +1889,11 @@ void dread_mouse(void) {
 
 
   if (mouse_x<0) { mouse_x=0; n++; }
-  else if (mouse_x>=vga_an) { mouse_x=vga_an-1; n++; }
+  else if (mouse_x>=vga_width) { mouse_x=vga_width-1; n++; }
   if (mouse_y<0) { mouse_y=0; n++; }
-  else if (mouse_y>=vga_al) { mouse_y=vga_al-1; n++; }
+  else if (mouse_y>=vga_height) { mouse_y=vga_height-1; n++; }
 
-  fprintf(stdout, "%d %d %d %d\n",mouse_x, vga_an, mouse_y, vga_al);
+  fprintf(stdout, "%d %d %d %d\n",mouse_x, vga_width, mouse_y, vga_height);
 
 
   if (n) set_mouse(mouse_x,mouse_y);
@@ -1908,10 +1908,10 @@ void dread_mouse(void) {
 void flush_copy(void) {
 
   dread_mouse();
-  save_mouse_bg(fondo_raton,mouse_x,mouse_y,mouse_graf,0);
+  save_mouse_bg(mouse_background,mouse_x,mouse_y,mouse_graf,0);
   put(mouse_x,mouse_y,mouse_graf);
   blit_screen(copia);
-  save_mouse_bg(fondo_raton,mouse_x,mouse_y,mouse_graf,1);
+  save_mouse_bg(mouse_background,mouse_x,mouse_y,mouse_graf,1);
 
   // **************************************************
 
@@ -1938,27 +1938,27 @@ void save_mouse_bg(byte * p, int x, int y, int n, int flag) {
   x-=*((word*)(graf[n]+4));
   y-=*((word*)(graf[n]+6));
 
-  if (x>=vga_an || y>=vga_al || x+an<=0 || y+al<=0) return;
+  if (x>=vga_width || y>=vga_height || x+an<=0 || y+al<=0) return;
 
   blit_partial(x,y,an,al);
 
-  q=copia+y*vga_an+x;
+  q=copia+y*vga_width+x;
 
   if (x<0) salta_x=-x; else salta_x=0;
-  if (x+an>vga_an) resto_x=x+an-vga_an; else resto_x=0;
+  if (x+an>vga_width) resto_x=x+an-vga_width; else resto_x=0;
   long_x=an-salta_x-resto_x;
 
   if (y<0) salta_y=-y; else salta_y=0;
-  if (y+al>vga_al) resto_y=y+al-vga_al; else resto_y=0;
+  if (y+al>vga_height) resto_y=y+al-vga_height; else resto_y=0;
   long_y=al-salta_y-resto_y;
 
-  p+=an*salta_y+salta_x; q+=vga_an*salta_y+salta_x;
+  p+=an*salta_y+salta_x; q+=vga_width*salta_y+salta_x;
   resto_x+=salta_x; an=long_x;
   do {
     do {
       if (flag) *q=*p; else *p=*q; p++; q++;
     } while (--an);
-    q+=vga_an-(an=long_x); p+=resto_x;
+    q+=vga_width-(an=long_x); p+=resto_x;
   } while (--long_y);
 }
 
@@ -1982,17 +1982,17 @@ int wmouse_in(int x, int y, int an, int al) {
 void err1(void) {
   int an=v.an/big2,al=v.al/big2;
   _show_items();
-  wwrite(v.ptr,an,al,4,12,0,(byte *)v_texto,c3);
+  wwrite(v.ptr,an,al,4,12,0,(byte *)v_text,c3);
 }
 
 void err2(void) {
   _process_items();
-  if (v.active_item==0) fin_dialogo=1;
+  if (v.active_item==0) end_dialog=1;
 }
 
 void err0(void) {
-  v.tipo=1; v.titulo=text[1];
-  v.an=text_len((byte *)v_texto)+8; v.al=38;
+  v.type=1; v.title=text[1];
+  v.an=text_len((byte *)v_text)+8; v.al=38;
   v.paint_handler=err1;
   v.click_handler=err2;
   _button(text[7],v.an/2,v.al-14,1);
@@ -2011,9 +2011,9 @@ void _err1(void) {
   wwrite(v.ptr,an,al,4,12,0,text[8],c4);
   if (num_obj) {
     for (n=0;n<num_obj;n++)
-      if (o[n].tipo==tproc && o[n].v0==mem[id+_Bloque]) break;
+      if (o[n].type==tproc && o[n].v0==mem[id+_Bloque]) break;
     if (n<num_obj)
-      wwrite(v.ptr,an,al,46,12,0,(byte *)vnom+o[n].nombre,c3);
+      wwrite(v.ptr,an,al,46,12,0,(byte *)vnom+o[n].name,c3);
     else wwrite(v.ptr,an,al,46,12,0,text[9],c3);
   } else wwrite(v.ptr,an,al,46,12,0,text[9],c3);
   wwrite(v.ptr,an,al,4,12+8,0,(byte *)text[10],c4);
@@ -2024,15 +2024,15 @@ void _err1(void) {
   itoa(num_error,cwork,10);
   wwrite(v.ptr,an,al,46,12+16,0,(byte *)cwork,c3);
 
-  wwrite(v.ptr,an,al,4,12+24,0,(byte *)v_texto,c3);
+  wwrite(v.ptr,an,al,4,12+24,0,(byte *)v_text,c3);
 }
 
 void _err2(void) {
   int n;
   _process_items();
-  if (v.active_item==0) fin_dialogo=1;
+  if (v.active_item==0) end_dialog=1;
   if (v.active_item==1) {
-    fin_dialogo=1;
+    end_dialog=1;
     n=0; while (n<nomitidos) {
       if (omitidos[n]==num_error) break;
       n++;
@@ -2043,14 +2043,14 @@ void _err2(void) {
   }
   if (v.active_item==2) {
     if (debug_active) call_to_debug=1;
-    fin_dialogo=1;
+    end_dialog=1;
   }
   if (v.active_item==3) exer(0);
 }
 
 void _err0(void) {
-  v.tipo=1; v.titulo=text[1];
-  v.an=text_len((byte *)v_texto)+8;
+  v.type=1; v.title=text[1];
+  v.an=text_len((byte *)v_text)+8;
   if (v.an<218+16) v.an=218+16;
   v.al=38+16+8;
   v.paint_handler=_err1;
@@ -2089,10 +2089,10 @@ void e(int texto) {
 
   smouse_x=mouse->x; smouse_y=mouse->y;
   set_mouse(mouse_x,mouse_y);
-  if (!v.tipo) memcpy(copia_debug,copia,vga_an*vga_al);
+  if (!v.type) memcpy(copia_debug,copia,vga_width*vga_height);
   dacout_r=0; dacout_g=0; dacout_b=0; dacout_speed=16;
 
-  mouse_graf=1; v_texto=(char *)text[texto]; show_dialog(_err0);
+  mouse_graf=1; v_text=(char *)text[texto]; show_dialog(_err0);
   dacout_r=dr; dacout_g=dg; dacout_b=db;
   reloj=reloj_e;
   ticks=ticks_e;
@@ -2109,9 +2109,9 @@ void deb1(void) {
   wwrite(v.ptr,an,al,4,12,0,text[8],c4);
   if (num_obj) {
     for (n=0;n<num_obj;n++)
-      if (o[n].tipo==tproc && o[n].v0==mem[id+_Bloque]) break;
+      if (o[n].type==tproc && o[n].v0==mem[id+_Bloque]) break;
     if (n<num_obj)
-      wwrite(v.ptr,an,al,46,12,0,(byte *)vnom+o[n].nombre,c3);
+      wwrite(v.ptr,an,al,46,12,0,(byte *)vnom+o[n].name,c3);
     else wwrite(v.ptr,an,al,46,12,0,text[9],c3);
   } else wwrite(v.ptr,an,al,46,12,0,text[9],c3);
 }
@@ -2120,20 +2120,20 @@ void deb2(void) {
   _process_items();
   if (v.active_item==2) {
     mem[ip-1]=0; // 'Nopea' el debug
-    fin_dialogo=1;
+    end_dialog=1;
   }
   if (v.active_item==0) {
     if (debug_active) {
       call_to_debug=1;
       process_stoped=id;
     }
-    fin_dialogo=1;
+    end_dialog=1;
   }
   if (v.active_item==1) exer(0);
 }
 
 void deb0(void) {
-  v.tipo=1; v.titulo=text[15];
+  v.type=1; v.title=text[15];
   v.an=190; v.al=38;
   v.paint_handler=deb1;
   v.click_handler=deb2;
@@ -2150,7 +2150,7 @@ void deb(void) {
 
   smouse_x=mouse->x; smouse_y=mouse->y;
   set_mouse(mouse_x,mouse_y);
-  if (!v.tipo) memcpy(copia_debug,copia,vga_an*vga_al);
+  if (!v.type) memcpy(copia_debug,copia,vga_width*vga_height);
   dacout_r=0; dacout_g=0; dacout_b=0; dacout_speed=16;
 
   mouse_graf=1; show_dialog(deb0);
@@ -2264,9 +2264,9 @@ void draw_proc_list(void) {
       wbox(ptr,an,al,c01,4,20+(m-ids_ini)*8,118,9); // Relleno listbox procesos
     } else x=c3;
     for (n=0;n<num_obj;n++)
-      if (o[n].tipo==tproc && o[n].v0==mem[ids[m]+_Bloque]) break;
+      if (o[n].type==tproc && o[n].v0==mem[ids[m]+_Bloque]) break;
     if (n<num_obj)
-       strcpy(msg,(char *)vnom+o[n].nombre);
+       strcpy(msg,(char *)vnom+o[n].name);
     else strcpy(msg,(char *)text[9]);
     strcat(msg,"(");
     itoa(mem[ids[m]+_Id],msg+strlen(msg),10);
@@ -2305,9 +2305,9 @@ void draw_proc_list(void) {
   wwrite(ptr,an,al,133,11,0,(byte*)msg,c3);
 
   for (n=0;n<num_obj;n++)
-    if (o[n].tipo==tproc && o[n].v0==mem[ids[ids_select]+_Bloque]) break;
+    if (o[n].type==tproc && o[n].v0==mem[ids[ids_select]+_Bloque]) break;
   if (n<num_obj)
-     strcpy(msg,vnom+o[n].nombre);
+     strcpy(msg,vnom+o[n].name);
   else strcpy(msg,(char *)text[9]);
 
   wbox(ptr,an,al,c1,134,20,118+304-256,9); // Caja nombre proceso
@@ -2467,7 +2467,7 @@ void debug(void) {
 
   dr=dacout_r; dg=dacout_g; db=dacout_b;
 
-  memcpy(copia_debug,copia,vga_an*vga_al);
+  memcpy(copia_debug,copia,vga_width*vga_height);
 
   new_palette=0; mouse_graf=1; show_dialog(debug0);
 
@@ -2504,7 +2504,7 @@ void create_variable_list(void) {
       if (usado[n]) continue;
       if (o[n].miembro) continue;
 
-      switch (o[n].tipo) {
+      switch (o[n].type) {
         case tcons:
           incluir=show_const; break;
         case tcglo: case tvglo: case ttglo: case tsglo:
@@ -2522,7 +2522,7 @@ void create_variable_list(void) {
         default: incluir=0; break;
       }
       if (incluir) {
-        if (!nuevo || (nuevo && strcmp(vnom+o[n].nombre,vnom+o[nuevo].nombre)==-1)) {
+        if (!nuevo || (nuevo && strcmp(vnom+o[n].name,vnom+o[nuevo].name)==-1)) {
           nuevo=n;
         }
       }
@@ -2534,7 +2534,7 @@ void create_variable_list(void) {
       var[num_var].miembro=0;
       usado[nuevo]=1;
 
-      switch (o[nuevo].tipo) {
+      switch (o[nuevo].type) {
         case tpigl: case tpwgl: case tpbgl: case tpcgl: case tpsgl:
         case tpilo: case tpwlo: case tpblo: case tpclo: case tpslo:
           var[num_var].indice=-1;
@@ -2544,10 +2544,10 @@ void create_variable_list(void) {
           break;
       } num_var++;
 
-      if (o[nuevo].tipo==tsglo || o[nuevo].tipo==tsloc) {
+      if (o[nuevo].type==tsglo || o[nuevo].type==tsloc) {
         member=nuevo+1; include_members(num_var,1,var[num_var-1].indice);
       }
-      if (o[nuevo].tipo==tpsgl || o[nuevo].tipo==tpslo) {
+      if (o[nuevo].type==tpsgl || o[nuevo].type==tpslo) {
         member=o[nuevo].v1+1; include_members(num_var,1,var[num_var-1].indice);
       }
     }
@@ -2560,13 +2560,13 @@ void exclude_members(int padre,int nivel,int index) {
   while (m==o[member].miembro) {
     if (index==-1) var[padre].objeto=-member;
     else var[padre].objeto=member;
-    switch (o[member].tipo) {
+    switch (o[member].type) {
       case tpigl: case tpwgl: case tpbgl: case tpcgl: case tpsgl:
       case tpilo: case tpwlo: case tpblo: case tpclo: case tpslo:
         var[padre].indice=-1;
         break;
     } padre++;
-    if (o[member].tipo==tsglo || o[member].tipo==tsloc) {
+    if (o[member].type==tsglo || o[member].type==tsloc) {
       member++; exclude_members(padre,nivel+1,index);
     } else member++;
   }
@@ -2585,7 +2585,7 @@ void include_members(int padre,int nivel,int index) {
     var[num_var].miembro=padre;
     usado[member]=1;
 
-    switch (o[member].tipo) {
+    switch (o[member].type) {
       case tpigl: case tpwgl: case tpbgl: case tpcgl: case tpsgl:
       case tpilo: case tpwlo: case tpblo: case tpclo: case tpslo:
         var[num_var].indice=-1;
@@ -2595,7 +2595,7 @@ void include_members(int padre,int nivel,int index) {
         break;
     } num_var++;
 
-    if (o[member].tipo==tsglo || o[member].tipo==tsloc) {
+    if (o[member].type==tsglo || o[member].type==tsloc) {
       member++; include_members(num_var,nivel+1,index);
     } else member++;
   }
@@ -2669,13 +2669,13 @@ void inspect2(void) {
     if (var_ini+10==++var_select) var_ini++;
     paint_var_list();
     flush_buffer();
-    v.volcar=1;
+    v.redraw=1;
   }
   if (scan_code==72 && var_select) {
     if (var_ini==var_select--) var_ini--;
     paint_var_list();
     flush_buffer();
-    v.volcar=1;
+    v.redraw=1;
   }
   if (scan_code==81) {
     for (n=0;n<10;n++) if (var_select+1<num_var) {
@@ -2683,7 +2683,7 @@ void inspect2(void) {
     }
     paint_var_list();
     flush_buffer();
-    v.volcar=1;
+    v.redraw=1;
   }
   if (scan_code==73) {
     for (n=0;n<10;n++) if (var_select) {
@@ -2691,7 +2691,7 @@ void inspect2(void) {
     }
     paint_var_list();
     flush_buffer();
-    v.volcar=1;
+    v.redraw=1;
   }
 
   if (wmouse_in(3,21,128+32+64-9,80) && (mouse_b&1)) {
@@ -2699,7 +2699,7 @@ void inspect2(void) {
     if (n<num_var) {
       var_select=n;
       paint_var_list();
-      v.volcar=1;
+      v.redraw=1;
     }
   }
 
@@ -2710,12 +2710,12 @@ void inspect2(void) {
         if (var_select) {
           if (var_ini==var_select--) var_ini--;
           paint_var_list();
-          v.volcar=1;
+          v.redraw=1;
         }
       }
-    } else if (boton==1) { wput(ptr,an,al,123+32+64,20,-39); boton=0; v.volcar=1; }
+    } else if (boton==1) { wput(ptr,an,al,123+32+64,20,-39); boton=0; v.redraw=1; }
     mouse_graf=7;
-  } else if (boton==1) { wput(ptr,an,al,123+32+64,20,-39); boton=0; v.volcar=1; }
+  } else if (boton==1) { wput(ptr,an,al,123+32+64,20,-39); boton=0; v.redraw=1; }
 
   if (wmouse_in(123+32+64,28,7,65)) {
     mouse_graf=13;
@@ -2725,7 +2725,7 @@ void inspect2(void) {
       if (var_select<var_ini) var_ini=var_select;
       if (var_select>=var_ini+10) var_ini=var_select-9;
       paint_var_list();
-      v.volcar=1;
+      v.redraw=1;
     }
   }
 
@@ -2736,12 +2736,12 @@ void inspect2(void) {
         if (var_select+1<num_var) {
           if (var_ini+10==++var_select) var_ini++;
           paint_var_list();
-          v.volcar=1;
+          v.redraw=1;
         }
       }
-    } else if (boton==2) { wput(ptr,an,al,123+32+64,94,-40); boton=0; v.volcar=1; }
+    } else if (boton==2) { wput(ptr,an,al,123+32+64,94,-40); boton=0; v.redraw=1; }
     mouse_graf=9;
-  } else if (boton==2) { wput(ptr,an,al,123+32+64,94,-40); boton=0; v.volcar=1; }
+  } else if (boton==2) { wput(ptr,an,al,123+32+64,94,-40); boton=0; v.redraw=1; }
 
   if (num_var) {
     if (var[var_select].objeto>0) {
@@ -2752,11 +2752,11 @@ void inspect2(void) {
 
   if (scan_code==71) { // Inicio
     if (var[var_select].objeto>0)
-    switch(o[var[var_select].objeto].tipo) {
+    switch(o[var[var_select].objeto].type) {
       case tpigl: case tpilo: case tpwgl: case tpwlo:
       case tpbgl: case tpblo: case tpcgl: case tpclo:
         var[var_select].indice=-1;
-        paint_var_list(); v.volcar=1;
+        paint_var_list(); v.redraw=1;
         break;
       case tpsgl: case tpslo:
         if (var[var_select].indice>-1) {
@@ -2770,28 +2770,28 @@ void inspect2(void) {
           }
           paint_var_list();
           paint_segment2();
-          v.volcar=1;
+          v.redraw=1;
         } break;
       default:
         var[var_select].indice=0;
-        paint_var_list(); v.volcar=1;
+        paint_var_list(); v.redraw=1;
         break;
     }
   }
 
   if (scan_code==79) { // Fin
     if (var[var_select].objeto>0)
-    switch(o[var[var_select].objeto].tipo) {
+    switch(o[var[var_select].objeto].type) {
       case tpigl: case tpilo: case tpwgl: case tpwlo:
       case tpbgl: case tpblo: case tpcgl: case tpclo:
         if (var[var_select].indice==-1) {
-          tipo=o[var[var_select].objeto].tipo;
-          switch(o[var[var_select].objeto].tipo) {
+          tipo=o[var[var_select].objeto].type;
+          switch(o[var[var_select].objeto].type) {
             case tpigl: case tpwgl: case tpbgl: case tpcgl: case tpsgl:
-              o[var[var_select].objeto].tipo=tvglo; break;
+              o[var[var_select].objeto].type=tvglo; break;
             case tpilo: case tpwlo: case tpblo: case tpclo: case tpslo:
-              o[var[var_select].objeto].tipo=tvloc; break;
-          } n=memo(get_offset(var_select)); o[var[var_select].objeto].tipo=tipo;
+              o[var[var_select].objeto].type=tvloc; break;
+          } n=memo(get_offset(var_select)); o[var[var_select].objeto].type=tipo;
           if (!n) break; // No si el puntero es NULL
         }
         if (o[var[var_select].objeto].v2==-1) {
@@ -2831,7 +2831,7 @@ void inspect2(void) {
       case tsglo: case tsloc:
         var[var_select].indice=o[var[var_select].objeto].v2-1;
         break;
-    } paint_var_list(); v.volcar=1;
+    } paint_var_list(); v.redraw=1;
   }
 
   if (num_var==0 && v.active_item<9) v.active_item=-1;
@@ -2839,31 +2839,31 @@ void inspect2(void) {
 
   switch(v.active_item) {
     case 0: // Change
-      if (o[var[var_select].objeto].tipo!=tcons) {
-        if (o[var[var_select].objeto].tipo==tsglo || o[var[var_select].objeto].tipo==tsloc ||
-           ((o[var[var_select].objeto].tipo==tpsgl || o[var[var_select].objeto].tipo==tpslo) && var[var_select].indice>=0)) {
-          v_texto=(char *)text[39]; show_dialog(err0);
-        } else if (o[var[var_select].objeto].tipo==tcglo || o[var[var_select].objeto].tipo==tcloc) {
-          show_dialog(changestring0); paint_var_list(); v.volcar=1;
+      if (o[var[var_select].objeto].type!=tcons) {
+        if (o[var[var_select].objeto].type==tsglo || o[var[var_select].objeto].type==tsloc ||
+           ((o[var[var_select].objeto].type==tpsgl || o[var[var_select].objeto].type==tpslo) && var[var_select].indice>=0)) {
+          v_text=(char *)text[39]; show_dialog(err0);
+        } else if (o[var[var_select].objeto].type==tcglo || o[var[var_select].objeto].type==tcloc) {
+          show_dialog(changestring0); paint_var_list(); v.redraw=1;
         } else {
-          show_dialog(change0); paint_var_list(); v.volcar=1;
+          show_dialog(change0); paint_var_list(); v.redraw=1;
         }
-      } else { v_texto=(char *)text[40]; show_dialog(err0); }
+      } else { v_text=(char *)text[40]; show_dialog(err0); }
       break;
     case 1: // Index--
       dec_index:
-      switch(o[var[var_select].objeto].tipo) {
+      switch(o[var[var_select].objeto].type) {
         case ttglo: case ttloc: case tsglo: case tsloc:
         case tbglo: case tbloc: case twglo: case twloc:
           if (var[var_select].indice>0) var[var_select].indice--;
           paint_var_list();
-          v.volcar=1;
+          v.redraw=1;
           break;
         case tpigl: case tpilo: case tpwgl: case tpwlo:
         case tpbgl: case tpblo: case tpcgl: case tpclo:
           if (var[var_select].indice>-1) var[var_select].indice--;
           paint_var_list();
-          v.volcar=1;
+          v.redraw=1;
           break;
         case tpsgl: case tpslo:
           if (var[var_select].indice>-1) {
@@ -2874,28 +2874,28 @@ void inspect2(void) {
               paint_segment2();
             }
             paint_var_list();
-            v.volcar=1;
+            v.redraw=1;
           } break;
       } break;
     case 2: // Index++
       inc_index:
-      switch(o[var[var_select].objeto].tipo) {
+      switch(o[var[var_select].objeto].type) {
         case tpigl: case tpilo: case tpwgl: case tpwlo:
         case tpbgl: case tpblo: case tpcgl: case tpclo:
           if (var[var_select].indice==-1) {
-            tipo=o[var[var_select].objeto].tipo;
-            switch(o[var[var_select].objeto].tipo) {
+            tipo=o[var[var_select].objeto].type;
+            switch(o[var[var_select].objeto].type) {
               case tpigl: case tpwgl: case tpbgl: case tpcgl: case tpsgl:
-                o[var[var_select].objeto].tipo=tvglo; break;
+                o[var[var_select].objeto].type=tvglo; break;
               case tpilo: case tpwlo: case tpblo: case tpclo: case tpslo:
-                o[var[var_select].objeto].tipo=tvloc; break;
-            } n=memo(get_offset(var_select)); o[var[var_select].objeto].tipo=tipo;
+                o[var[var_select].objeto].type=tvloc; break;
+            } n=memo(get_offset(var_select)); o[var[var_select].objeto].type=tipo;
             if (!n) break; // No si el puntero es NULL
           }
           if (o[var[var_select].objeto].v2==-1) {
             var[var_select].indice++;
             paint_var_list();
-            v.volcar=1;
+            v.redraw=1;
             break;
           }
           /* fall through */
@@ -2906,7 +2906,7 @@ void inspect2(void) {
           if (o[var[var_select].objeto].v4>-1) n*=o[var[var_select].objeto].v4+1;
           if (var[var_select].indice<n-1) var[var_select].indice++;
           paint_var_list();
-          v.volcar=1;
+          v.redraw=1;
           break;
         case tpsgl: case tpslo:
           if (var[var_select].indice==-1) {
@@ -2920,50 +2920,50 @@ void inspect2(void) {
             paint_segment2();
           }
           paint_var_list();
-          v.volcar=1;
+          v.redraw=1;
           break;
         case tsglo: case tsloc:
           if (var[var_select].indice<o[var[var_select].objeto].v2-1) var[var_select].indice++;
           paint_var_list();
-          v.volcar=1;
+          v.redraw=1;
           break;
       } break;
     case 3: // View as angle
       if (visor[var[var_select].objeto]==4) visor[var[var_select].objeto]=0;
       else visor[var[var_select].objeto]=4;
-      paint_var_list(); v.volcar=1;
+      paint_var_list(); v.redraw=1;
       break;
     case 4: // View as process
       if (visor[var[var_select].objeto]==3) visor[var[var_select].objeto]=0;
       else visor[var[var_select].objeto]=3;
-      paint_var_list(); v.volcar=1;
+      paint_var_list(); v.redraw=1;
       break;
     case 5: // View as text
       if (visor[var[var_select].objeto]==2) visor[var[var_select].objeto]=0;
       else visor[var[var_select].objeto]=2;
-      paint_var_list(); v.volcar=1;
+      paint_var_list(); v.redraw=1;
       break;
     case 6: // View as boolean
       if (visor[var[var_select].objeto]==1) visor[var[var_select].objeto]=0;
       else visor[var[var_select].objeto]=1;
-      paint_var_list(); v.volcar=1;
+      paint_var_list(); v.redraw=1;
       break;
     case 7: // View as Hex
       if (visor[var[var_select].objeto]==5) visor[var[var_select].objeto]=0;
       else visor[var[var_select].objeto]=5;
-      paint_var_list(); v.volcar=1;
+      paint_var_list(); v.redraw=1;
       break;
     case 8: // View as Bin
       if (visor[var[var_select].objeto]==6) visor[var[var_select].objeto]=0;
       else visor[var[var_select].objeto]=6;
-      paint_var_list(); v.volcar=1;
+      paint_var_list(); v.redraw=1;
       break;
     case 9: case 10: case 11: case 12: case 13: case 14:// Flags
       create_variable_list();
       var_ini=0; var_select=0;
       paint_var_list();
       paint_segment2();
-      v.volcar=1;
+      v.redraw=1;
       break;
   }
 }
@@ -2977,13 +2977,13 @@ char titulo[256];
 void inspect0(void) {
   int n,x=50;
 
-  v.tipo=1; v.titulo=(byte *)titulo;
+  v.type=1; v.title=(byte *)titulo;
   strcpy(titulo,(char *)text[41]);
 
   for (n=0;n<num_obj;n++)
-    if (o[n].tipo==tproc && o[n].v0==mem[ids[ids_select]+_Bloque]) break;
+    if (o[n].type==tproc && o[n].v0==mem[ids[ids_select]+_Bloque]) break;
   if (n<num_obj)
-     strcat(titulo,vnom+o[n].nombre);
+     strcat(titulo,vnom+o[n].name);
   else strcat(titulo,(char *)text[9]);
 
   strcat(titulo,"(");
@@ -3054,7 +3054,7 @@ void paint_var_list(void) {
       x=c4;
     } else x=c3;
     if (var[m].objeto<0) {
-      switch(o[abs(var[m].objeto)].tipo) {
+      switch(o[abs(var[m].objeto)].type) {
         case tcons: strcpy(msg,"CONST "); break;
         case tvglo: case tvloc: strcpy(msg,"INT "); break;
         case tcglo: case tcloc: strcpy(msg,"STRING "); break;
@@ -3065,68 +3065,68 @@ void paint_var_list(void) {
         case tpwgl: case tpwlo: strcpy(msg,"WORD POINTER "); break;
         case tpbgl: case tpblo: strcpy(msg,"BYTE POINTER "); break;
         case tpsgl: case tpslo: strcpy(msg,"STRUCT POINTER ");
-          strcat(msg,vnom+o[o[abs(var[m].objeto)].v1].nombre);
-          strcat(msg,vnom+o[o[abs(var[m].objeto)].v1].nombre);
+          strcat(msg,vnom+o[o[abs(var[m].objeto)].v1].name);
+          strcat(msg,vnom+o[o[abs(var[m].objeto)].v1].name);
           strupr(msg); strcat(msg," "); break;
         case tpcgl: case tpclo: strcpy(msg,"STRING POINTER "); break;
         case tsglo: case tsloc: strcpy(msg,"STRUCT "); break;
-      } strcat(msg,vnom+o[abs(var[m].objeto)].nombre); x=c2;
-    } else switch(o[var[m].objeto].tipo) {
+      } strcat(msg,vnom+o[abs(var[m].objeto)].name); x=c2;
+    } else switch(o[var[m].objeto].type) {
       case tcons:
         strcpy(msg,"CONST ");
-        strcat(msg,vnom+o[var[m].objeto].nombre);
+        strcat(msg,vnom+o[var[m].objeto].name);
         visualize(o[var[m].objeto].v0,var[m].objeto,msg);
         break;
       case tvglo: case tvloc:
         strcpy(msg,"INT ");
-        strcat(msg,vnom+o[var[m].objeto].nombre);
+        strcat(msg,vnom+o[var[m].objeto].name);
         visualize(memo(get_offset(m)),var[m].objeto,msg);
         break;
       case tcglo: case tcloc:
         strcpy(msg,"STRING ");
-        strcat(msg,vnom+o[var[m].objeto].nombre);
+        strcat(msg,vnom+o[var[m].objeto].name);
         visualize(get_offset(m),var[m].objeto,msg);
         break;
       case tbglo: case tbloc:
         strcpy(msg,"BYTE ");
-        strcat(msg,vnom+o[var[m].objeto].nombre);
+        strcat(msg,vnom+o[var[m].objeto].name);
         if (o[var[m].objeto].v3==-1 && o[var[m].objeto].v2==0) goto show_variable;
         else goto show_tabla;
       case twglo: case twloc:
         strcpy(msg,"WORD ");
-        strcat(msg,vnom+o[var[m].objeto].nombre);
+        strcat(msg,vnom+o[var[m].objeto].name);
         if (o[var[m].objeto].v3==-1 && o[var[m].objeto].v2==0) goto show_variable;
         else goto show_tabla;
       case ttglo: case ttloc:
         strcpy(msg,"INT ");
-        strcat(msg,vnom+o[var[m].objeto].nombre);
+        strcat(msg,vnom+o[var[m].objeto].name);
         if (o[var[m].objeto].v3==-1 && o[var[m].objeto].v2==0) goto show_variable;
         else goto show_tabla;
       case tpigl: case tpilo:
         strcpy(msg,"INT POINTER ");
-        strcat(msg,vnom+o[var[m].objeto].nombre);
+        strcat(msg,vnom+o[var[m].objeto].name);
         if (var[m].indice==-1) goto show_variable;
         else goto show_tabla;
       case tpwgl: case tpwlo:
         strcpy(msg,"WORD POINTER ");
-        strcat(msg,vnom+o[var[m].objeto].nombre);
+        strcat(msg,vnom+o[var[m].objeto].name);
         if (var[m].indice==-1) goto show_variable;
         else goto show_tabla;
       case tpbgl: case tpblo:
         strcpy(msg,"BYTE POINTER ");
-        strcat(msg,vnom+o[var[m].objeto].nombre);
+        strcat(msg,vnom+o[var[m].objeto].name);
         if (var[m].indice==-1) goto show_variable;
         else goto show_tabla;
       case tpsgl: case tpslo:
         strcpy(msg,"STRUCT POINTER ");
-        strcat(msg,vnom+o[o[var[m].objeto].v1].nombre);
+        strcat(msg,vnom+o[o[var[m].objeto].v1].name);
         strupr(msg); strcat(msg," ");
-        strcat(msg,vnom+o[var[m].objeto].nombre);
+        strcat(msg,vnom+o[var[m].objeto].name);
         if (var[m].indice==-1) goto show_variable;
         else goto show_indice;
       case tpcgl: case tpclo:
         strcpy(msg,"STRING POINTER ");
-        strcat(msg,vnom+o[var[m].objeto].nombre);
+        strcat(msg,vnom+o[var[m].objeto].name);
         if (var[m].indice==-1) goto show_variable;
         else goto show_tabla;
       show_tabla:
@@ -3147,28 +3147,28 @@ void paint_var_list(void) {
         strcat(msg,"]");
       show_variable:
         if (var[m].indice==-1) {
-          tipo=o[var[m].objeto].tipo;
-          switch(o[var[m].objeto].tipo) {
+          tipo=o[var[m].objeto].type;
+          switch(o[var[m].objeto].type) {
             case tpigl: case tpwgl: case tpbgl: case tpcgl: case tpsgl:
-              o[var[m].objeto].tipo=tvglo; break;
+              o[var[m].objeto].type=tvglo; break;
             case tpilo: case tpwlo: case tpblo: case tpclo: case tpslo:
-              o[var[m].objeto].tipo=tvloc; break;
+              o[var[m].objeto].type=tvloc; break;
           }
           if (!memo(get_offset(m))) strcat(msg," = NULL");
           else visualize(memo(get_offset(m)),var[m].objeto,msg);
-          o[var[m].objeto].tipo=tipo;
-        } else if (o[var[m].objeto].tipo==ttglo || o[var[m].objeto].tipo==ttloc || o[var[m].objeto].tipo==tpigl || o[var[m].objeto].tipo==tpilo) {
+          o[var[m].objeto].type=tipo;
+        } else if (o[var[m].objeto].type==ttglo || o[var[m].objeto].type==ttloc || o[var[m].objeto].type==tpigl || o[var[m].objeto].type==tpilo) {
           visualize(memo(get_offset(m)),var[m].objeto,msg);
-        } else if (o[var[m].objeto].tipo==twglo || o[var[m].objeto].tipo==twloc || o[var[m].objeto].tipo==tpwgl || o[var[m].objeto].tipo==tpwlo) {
+        } else if (o[var[m].objeto].type==twglo || o[var[m].objeto].type==twloc || o[var[m].objeto].type==tpwgl || o[var[m].objeto].type==tpwlo) {
           visualize(*get_offset_word(m),var[m].objeto,msg);
-        } else if (o[var[m].objeto].tipo==tbglo || o[var[m].objeto].tipo==tbloc || o[var[m].objeto].tipo==tpbgl || o[var[m].objeto].tipo==tpblo) {
+        } else if (o[var[m].objeto].type==tbglo || o[var[m].objeto].type==tbloc || o[var[m].objeto].type==tpbgl || o[var[m].objeto].type==tpblo) {
           visualize(*get_offset_byte(m),var[m].objeto,msg);
-        } else if (o[var[m].objeto].tipo==tpcgl || o[var[m].objeto].tipo==tpclo) {
+        } else if (o[var[m].objeto].type==tpcgl || o[var[m].objeto].type==tpclo) {
           visualize(*get_offset_byte(m),var[m].objeto,msg);
         } break;
       case tsglo: case tsloc:
         strcpy(msg,"STRUCT ");
-        strcat(msg,vnom+o[var[m].objeto].nombre);
+        strcat(msg,vnom+o[var[m].objeto].name);
         if (o[var[m].objeto].v4==-1 && o[var[m].objeto].v3==0) break;
       show_indice:
         strcat(msg,"[");
@@ -3230,9 +3230,9 @@ void visualize(int valor, int objeto, char * str) {
         for (n=0;n<iids;n++) if (ids[n]==valor) break;
         if (n<iids) {
           for (n=0;n<num_obj;n++)
-            if (o[n].tipo==tproc && o[n].v0==mem[valor+_Bloque]) break;
+            if (o[n].type==tproc && o[n].v0==mem[valor+_Bloque]) break;
           if (n<num_obj) {
-            strcat(str,(char *)vnom+o[n].nombre);
+            strcat(str,(char *)vnom+o[n].name);
             strcat(str,"("); n=1;
           } else n=0;
         } else n=0;
@@ -3271,7 +3271,7 @@ int get_offset(int m) {
 }
 
 int _get_offset(int m) {
-  if (var[m].miembro==0) switch(o[var[m].objeto].tipo) {
+  if (var[m].miembro==0) switch(o[var[m].objeto].type) {
     case tvglo:
       return(o[var[m].objeto].v0);
     case tcglo:
@@ -3306,7 +3306,7 @@ int _get_offset(int m) {
       if (var[m].indice>=0) return(memo(o[var[m].objeto].v0+ids[ids_select])+var[m].indice*o[o[var[m].objeto].v1].v1);
       else return(o[var[m].objeto].v0+ids[ids_select]);
   } else {
-    switch(o[var[m].objeto].tipo) {
+    switch(o[var[m].objeto].type) {
       case tvglo:
       case tvloc:
         return(o[var[m].objeto].v0+get_offset(var[m].miembro-1));
@@ -3336,7 +3336,7 @@ int _get_offset(int m) {
 }
 
 byte * _get_offset_byte(int m) {
-  if (var[m].miembro==0) switch(o[var[m].objeto].tipo) {
+  if (var[m].miembro==0) switch(o[var[m].objeto].type) {
     case tbglo:
       return(&memb[o[var[m].objeto].v0*4+var[m].indice]);
     case tbloc:
@@ -3349,7 +3349,7 @@ byte * _get_offset_byte(int m) {
     case tpclo:
       if (var[m].indice>=0) return(&memb[memo(o[var[m].objeto].v0+ids[ids_select])*4+var[m].indice]);
       else return(&memb[o[var[m].objeto].v0*4+ids[ids_select]*4]);
-  } else switch(o[var[m].objeto].tipo) {
+  } else switch(o[var[m].objeto].type) {
     case tbglo: case tbloc: case tpcgl: case tpclo:
       return(&memb[o[var[m].objeto].v0*4+var[m].indice+get_offset(var[m].miembro-1)*4]);
     case tpbgl:
@@ -3364,7 +3364,7 @@ byte * get_offset_byte(int m) {
 }
 
 word * _get_offset_word(int m) {
-  if (var[m].miembro==0) switch(o[var[m].objeto].tipo) {
+  if (var[m].miembro==0) switch(o[var[m].objeto].type) {
     case twglo:
       return((word*)&memb[o[var[m].objeto].v0*4+var[m].indice*2]);
     case twloc:
@@ -3375,7 +3375,7 @@ word * _get_offset_word(int m) {
     case tpwlo:
       if (var[m].indice>=0) return((word*)&memb[memo(o[var[m].objeto].v0+ids[ids_select])*4+var[m].indice*2]);
       else return((word*)&memb[o[var[m].objeto].v0*4+ids[ids_select]*4]);
-  } else switch(o[var[m].objeto].tipo) {
+  } else switch(o[var[m].objeto].type) {
     case twglo:
     case twloc:
       return((word*)&memb[o[var[m].objeto].v0*4+var[m].indice*2+get_offset(var[m].miembro-1)*4]);
@@ -3406,29 +3406,29 @@ void change2(void) {
     case 1:
       if (get_offset(var_select)==1) {
         if (atoi(buscar)<0 || atoi(buscar)>255) {
-          v_texto=(char *)text[54]; show_dialog(err0);
+          v_text=(char *)text[54]; show_dialog(err0);
         } else {
           *get_offset_byte(var_select)=(byte)atoi(buscar);
-          fin_dialogo=1;
+          end_dialog=1;
         }
       } else if (get_offset(var_select)==2) {
         if (atoi(buscar)<0 || atoi(buscar)>65535) {
-          v_texto=(char *)text[55]; show_dialog(err0);
+          v_text=(char *)text[55]; show_dialog(err0);
         } else {
           *get_offset_word(var_select)=(word)atoi(buscar);
-          fin_dialogo=1;
+          end_dialog=1;
         }
       } else {
         mem[get_offset(var_select)]=atoi(buscar);
-        fin_dialogo=1;
+        end_dialog=1;
       }
       break;
-    case 2: fin_dialogo=1; break;
+    case 2: end_dialog=1; break;
   }
 }
 
 void change0(void) {
-  v.tipo=1; v.titulo=text[56];
+  v.type=1; v.title=text[56];
   v.an=126; v.al=14+y_bt;
   v.paint_handler=change1;
   v.click_handler=change2;
@@ -3462,16 +3462,16 @@ void changestring2(void) {
       if (strlen(enterstring)<=o[var[var_select].objeto].v1+1)
         strcpy((char*)&mem[get_offset(var_select)],enterstring);
       else {
-        v_texto=(char *)text[59];
+        v_text=(char *)text[59];
         show_dialog(err0);
       }
-      fin_dialogo=1; break;
-    case 2: fin_dialogo=1; break;
+      end_dialog=1; break;
+    case 2: end_dialog=1; break;
   }
 }
 
 void changestring0(void) {
-  v.tipo=1; v.titulo=text[60];
+  v.type=1; v.title=text[60];
   v.an=226; v.al=14+y_bt;
   v.paint_handler=changestring1;
   v.click_handler=changestring2;
@@ -3558,10 +3558,10 @@ byte * change_mode(void) {
   v.an=304*big2; v.al=(146+46)*big2;
   if ((v.ptr=(byte*)malloc(v.an*v.al))==NULL) exer(1);
   if (v.x<0) { v.x=0; } if (v.y<0) { v.y=0; }
-  if (v.x+v.an>vga_an) v.x=vga_an-v.an;
-  if (v.y+v.al>vga_al) v.y=vga_al-v.al;
+  if (v.x+v.an>vga_width) v.x=vga_width-v.an;
+  if (v.y+v.al>vga_height) v.y=vga_height-v.al;
   repaint_window(); call(v.paint_handler);
-  v.volcar=1; volcado_completo=1;
+  v.redraw=1; full_redraw=1;
   return(v.ptr);
 }
 
@@ -3578,27 +3578,27 @@ void debug2(void) {
   if (!(shift_status&15) && ascii==0) {
 
     if (scan_code==80) {
-      f_down(); paint_code(); flush_buffer(); v.volcar=1;
+      f_down(); paint_code(); flush_buffer(); v.redraw=1;
     }
     if (scan_code==72) {
-      f_up(); paint_code(); flush_buffer(); v.volcar=1;
+      f_up(); paint_code(); flush_buffer(); v.redraw=1;
     }
     if (scan_code==81) {
       for (n=0;n<11;n++) f_down();
-      paint_code(); flush_buffer(); v.volcar=1;
+      paint_code(); flush_buffer(); v.redraw=1;
     }
     if (scan_code==73) {
       for (n=0;n<11;n++) f_up();
-      paint_code(); flush_buffer(); v.volcar=1;
+      paint_code(); flush_buffer(); v.redraw=1;
     }
     if (scan_code==71) {
-      f_home(); paint_code(); flush_buffer(); v.volcar=1;
+      f_home(); paint_code(); flush_buffer(); v.redraw=1;
     }
     if (scan_code==77) {
-      f_right(); paint_code(); flush_buffer(); v.volcar=1;
+      f_right(); paint_code(); flush_buffer(); v.redraw=1;
     }
     if (scan_code==75) {
-      f_left(); paint_code(); flush_buffer(); v.volcar=1;
+      f_left(); paint_code(); flush_buffer(); v.redraw=1;
     }
 
   } else if (shift_status&15) { // (Shift || Control || Alt)
@@ -3607,25 +3607,25 @@ void debug2(void) {
       kbdFLAGS[80]=0;
       if (ids_select+1<iids) {
         if (ids_ini+9==++ids_select) ids_ini++;
-        draw_proc_list(); v.volcar=1;
+        draw_proc_list(); v.redraw=1;
       }
     }
     if (kbdFLAGS[72]) {
       kbdFLAGS[72]=0;
       if (ids_select) {
         if (ids_ini==ids_select--) ids_ini--;
-        draw_proc_list(); v.volcar=1;
+        draw_proc_list(); v.redraw=1;
       }
     }
     if (scan_code==81 || scan_code==118) {
       for (n=0;n<9;n++) if (ids_select+1<iids) {
         if (ids_ini+9==++ids_select) ids_ini++;
-      } draw_proc_list(); v.volcar=1;
+      } draw_proc_list(); v.redraw=1;
     }
     if (scan_code==73 || scan_code==132) {
       for (n=0;n<9;n++) if (ids_select) {
         if (ids_ini==ids_select--) ids_ini--;
-      } draw_proc_list(); v.volcar=1;
+      } draw_proc_list(); v.redraw=1;
     }
 
   }
@@ -3635,7 +3635,7 @@ void debug2(void) {
     if (n<iids) {
       ids_select=n;
       draw_proc_list();
-      v.volcar=1;
+      v.redraw=1;
     }
   }
 
@@ -3646,12 +3646,12 @@ void debug2(void) {
         if (ids_select) {
           if (ids_ini==ids_select--) ids_ini--;
           draw_proc_list();
-          v.volcar=1;
+          v.redraw=1;
         }
       }
-    } else if (boton==1) { wput(ptr,an,al,123,20,-39); boton=0; v.volcar=1; }
+    } else if (boton==1) { wput(ptr,an,al,123,20,-39); boton=0; v.redraw=1; }
     mouse_graf=7;
-  } else if (boton==1) { wput(ptr,an,al,123,20,-39); boton=0; v.volcar=1; }
+  } else if (boton==1) { wput(ptr,an,al,123,20,-39); boton=0; v.redraw=1; }
 
   if (wmouse_in(123,28,7,105-16-32)) {
     mouse_graf=13;
@@ -3661,7 +3661,7 @@ void debug2(void) {
       if (ids_select<ids_ini) ids_ini=ids_select;
       if (ids_select>=ids_ini+9) ids_ini=ids_select-8;
       draw_proc_list();
-      v.volcar=1;
+      v.redraw=1;
     }
   }
 
@@ -3672,17 +3672,17 @@ void debug2(void) {
         if (ids_select+1<iids) {
           if (ids_ini+9==++ids_select) ids_ini++;
           draw_proc_list();
-          v.volcar=1;
+          v.redraw=1;
         }
       }
-    } else if (boton==2) { wput(ptr,an,al,123,134-16-32,-40); boton=0; v.volcar=1; }
+    } else if (boton==2) { wput(ptr,an,al,123,134-16-32,-40); boton=0; v.redraw=1; }
     mouse_graf=9;
-  } else if (boton==2) { wput(ptr,an,al,123,134-16-32,-40); boton=0; v.volcar=1; }
+  } else if (boton==2) { wput(ptr,an,al,123,134-16-32,-40); boton=0; v.redraw=1; }
 
   if ((mouse_b&1) && wmouse_in(48+5,147-16-32,an-52-5,41+16+32)) {
     linea_sel=linea0+(wmouse_y-(147-16-32))/8;
     if (linea_sel==linea0+11) linea_sel=linea0+10;
-    paint_code(); v.volcar=1;
+    paint_code(); v.redraw=1;
   }
 
   if (scan_code==_F4) goto go_here;
@@ -3702,10 +3702,10 @@ void debug2(void) {
       do {
         exec_process();
         if (new_mode) ptr=change_mode();
-        if (call_to_debug) { call(v.paint_handler); v.volcar=1; break; }
+        if (call_to_debug) { call(v.paint_handler); v.redraw=1; break; }
       } while (ide);
       if (call_to_debug) {
-        volcado_completo=1; call_to_debug=0;
+        full_redraw=1; call_to_debug=0;
         if (new_palette) { new_palette=0; repaint_window(); }
         break;
       }
@@ -3720,7 +3720,7 @@ void debug2(void) {
         ticks_debug=ticks;
         smouse_x=mouse->x; smouse_y=mouse->y;
         set_mouse(mouse_x,mouse_y);
-        memcpy(copia_debug,copia,vga_an*vga_al);
+        memcpy(copia_debug,copia,vga_width*vga_height);
         call(v.paint_handler);
         for (n=0;n<iids;n++) if (ids[n]==ids_old) break;
         if (n<iids) { // Si el proceso seleccionado antes sigue en la lista ...
@@ -3731,9 +3731,9 @@ void debug2(void) {
           determine_code();
         } if (new_palette) { new_palette=0; repaint_window(); }
         dread_mouse(); _process_items();
-        v.volcar=1; volcado_completo=1;
+        v.redraw=1; full_redraw=1;
         if (no_volcar_nada) show_dialog(profile0);
-      } else fin_dialogo=1;
+      } else end_dialog=1;
       break;
     case 1: // Goto
       goto_proc:
@@ -3741,7 +3741,7 @@ void debug2(void) {
       //int linea0;     // Número de línea inicial de la ventana del debugger
       //byte * plinea0; // Puntero a la primera línea de la ventana del debugger
       //int linea_sel; // Nº de línea seleccionada
-      if (v_aceptar) {
+      if (v_accept) {
         x_inicio=54;
         while (linea0>lp1[lp_select]) {
           linea0--; plinea0--; do { plinea0--; } while (*plinea0); plinea0++;
@@ -3749,7 +3749,7 @@ void debug2(void) {
         while (linea0<lp1[lp_select]) {
           linea0++; plinea0+=strlen((char *)plinea0)+1;
         }
-        linea_sel=linea0; paint_code(); flush_buffer(); v.volcar=1;
+        linea_sel=linea0; paint_code(); flush_buffer(); v.redraw=1;
       }
       break;
     case 2: // Breakpoint
@@ -3757,7 +3757,7 @@ void debug2(void) {
       for (n=0;n<max_breakpoint;n++) if (breakpoint[n].line==linea_sel) break;
       if (n<max_breakpoint) { // Se desactiva un breakpoint
         breakpoint[n].line=-1; mem[abs(breakpoint[n].offset)]=breakpoint[n].code;
-        paint_code(); v.volcar=1;
+        paint_code(); v.redraw=1;
       } else {
         for (n=0;n<max_breakpoint;n++) if (breakpoint[n].line==-1) break;
         if (n<max_breakpoint) {
@@ -3766,9 +3766,9 @@ void debug2(void) {
             breakpoint[n].offset=m;
             breakpoint[n].code=mem[m];
             mem[m]=ldbg;
-            paint_code(); v.volcar=1;
+            paint_code(); v.redraw=1;
           }
-        } else { v_texto=(char *)text[63]; show_dialog(err0); }
+        } else { v_text=(char *)text[63]; show_dialog(err0); }
       }
       break;
     case 3: // Go here!
@@ -3779,10 +3779,10 @@ void debug2(void) {
           breakpoint[n].code=linea_sel;
           do { trace_process();
             if (new_mode) ptr=change_mode();
-            if (call_to_debug) { call(v.paint_handler); v.volcar=1; break; }
+            if (call_to_debug) { call(v.paint_handler); v.redraw=1; break; }
           } while(ide && ((ip>=mem1 && ip<=mem2) || mem[ip]==lasp || mem[ip]==lasiasp || mem[ip]==lcarasiasp || mem[ip]==lfunasp));
           if (call_to_debug) {
-            volcado_completo=1; call_to_debug=0;
+            full_redraw=1; call_to_debug=0;
             if (new_palette) { new_palette=0; repaint_window(); }
             break;
           }
@@ -3790,18 +3790,18 @@ void debug2(void) {
           breakpoint[n].offset=-m;
           breakpoint[n].code=mem[m];
           mem[m]=ldbg;
-          fin_dialogo=1;
+          end_dialog=1;
         }
-      } else { v_texto=(char *)text[63]; show_dialog(err0); }
+      } else { v_text=(char *)text[63]; show_dialog(err0); }
       break;
     case 4: // Trace
       trace_proc:
       do { trace_process();
         if (new_mode) ptr=change_mode();
-        if (call_to_debug) { call(v.paint_handler); v.volcar=1; break; }
+        if (call_to_debug) { call(v.paint_handler); v.redraw=1; break; }
       } while(ide && ((ip>=mem1 && ip<=mem2) || mem[ip]==lasp || mem[ip]==lasiasp || mem[ip]==lcarasiasp || mem[ip]==lfunasp));
       if (call_to_debug) {
-        volcado_completo=1; call_to_debug=0;
+        full_redraw=1; call_to_debug=0;
         if (new_palette) { new_palette=0; repaint_window(); }
         break;
       }
@@ -3817,12 +3817,12 @@ void debug2(void) {
           ticks_debug=ticks;
           smouse_x=mouse->x; smouse_y=mouse->y;
           set_mouse(mouse_x,mouse_y);
-          memcpy(copia_debug,copia,vga_an*vga_al);
-          volcado_completo=1;
+          memcpy(copia_debug,copia,vga_width*vga_height);
+          full_redraw=1;
         } else if (new_palette) set_dac();
         if (new_palette) { new_palette=0; repaint_window(); }
-        ids_old=-1; call(v.paint_handler); v.volcar=1;
-      } else fin_dialogo=1;
+        ids_old=-1; call(v.paint_handler); v.redraw=1;
+      } else end_dialog=1;
       break;
     case 5: // Step
       step_proc:
@@ -3844,7 +3844,7 @@ void debug2(void) {
             get_line(breakpoint[n].offset);
             breakpoint[n].code=mem[breakpoint[n].offset];
             mem[breakpoint[n].offset]=ldbg;
-            fin_dialogo=1; break;
+            end_dialog=1; break;
           }
         }
       } // Si no quedan breakpoints, se hará un Trace.
@@ -3852,10 +3852,10 @@ void debug2(void) {
       process_level=0;
       do { trace_process();
         if (new_mode) ptr=change_mode();
-        if (call_to_debug) { call(v.paint_handler); v.volcar=1; break; }
+        if (call_to_debug) { call(v.paint_handler); v.redraw=1; break; }
       } while(ide && ((ip>=mem1 && ip<=mem2) || mem[ip]==lasp || mem[ip]==lasiasp || mem[ip]==lcarasiasp || mem[ip]==lfunasp || process_level>0));
       if (call_to_debug) {
-        volcado_completo=1; call_to_debug=0;
+        full_redraw=1; call_to_debug=0;
         if (new_palette) { new_palette=0; repaint_window(); }
         break;
       }
@@ -3871,18 +3871,18 @@ void debug2(void) {
           ticks_debug=ticks;
           smouse_x=mouse->x; smouse_y=mouse->y;
           set_mouse(mouse_x,mouse_y);
-          memcpy(copia_debug,copia,vga_an*vga_al);
-          volcado_completo=1;
+          memcpy(copia_debug,copia,vga_width*vga_height);
+          full_redraw=1;
         } else if (new_palette) set_dac();
         if (new_palette) { new_palette=0; repaint_window(); }
-        ids_old=-1; call(v.paint_handler); v.volcar=1;
-      } else fin_dialogo=1;
+        ids_old=-1; call(v.paint_handler); v.redraw=1;
+      } else end_dialog=1;
       break;
     case 6: // Inspect
       inspect_proc:
       bloque_actual=mem[ids[ids_select]+_Bloque];
       show_dialog(inspect0); draw_proc_list();
-      v.volcar=1; break;
+      v.redraw=1; break;
 
     case 7: // Profile
       profile_window:
@@ -3893,8 +3893,8 @@ void debug2(void) {
       exec_process();
       if (new_mode) ptr=change_mode();
       if (call_to_debug) {
-        call(v.paint_handler); v.volcar=1;
-        volcado_completo=1; call_to_debug=0;
+        call(v.paint_handler); v.redraw=1;
+        full_redraw=1; call_to_debug=0;
         if (new_palette) { new_palette=0; repaint_window(); }
       }
       if (procesos) {
@@ -3909,12 +3909,12 @@ void debug2(void) {
           ticks_debug=ticks;
           smouse_x=mouse->x; smouse_y=mouse->y;
           set_mouse(mouse_x,mouse_y);
-          memcpy(copia_debug,copia,vga_an*vga_al);
-          volcado_completo=1;
+          memcpy(copia_debug,copia,vga_width*vga_height);
+          full_redraw=1;
         } else if (new_palette) set_dac();
         if (new_palette) { new_palette=0; repaint_window(); }
-        ids_old=-1; call(v.paint_handler); v.volcar=1;
-      } else fin_dialogo=1;
+        ids_old=-1; call(v.paint_handler); v.redraw=1;
+      } else end_dialog=1;
       break;
   }
 
@@ -3925,7 +3925,7 @@ void debug3(void) {
 }
 
 void debug0(void) {
-  v.tipo=1; v.titulo=text[64];
+  v.type=1; v.title=text[64];
   v.an=304; v.al=146+46; // TODO: Keep in sync with change_mode dialog dimensions
   v.paint_handler=debug1;
   v.click_handler=debug2;
@@ -4204,30 +4204,30 @@ void process_list2(void) {
 
   if (scan_code==80 && lp_select+1<lp_num) {
     if (lp_ini+15==++lp_select) lp_ini++;
-    paint_process_list(); flush_buffer(); v.volcar=1;
+    paint_process_list(); flush_buffer(); v.redraw=1;
   }
   if (scan_code==72 && lp_select) {
     if (lp_ini==lp_select--) lp_ini--;
-    paint_process_list(); flush_buffer(); v.volcar=1;
+    paint_process_list(); flush_buffer(); v.redraw=1;
   }
   if (scan_code==81) {
     for (n=0;n<15;n++) if (lp_select+1<lp_num) {
       if (lp_ini+15==++lp_select) lp_ini++;
-    } paint_process_list(); flush_buffer(); v.volcar=1;
+    } paint_process_list(); flush_buffer(); v.redraw=1;
   }
   if (scan_code==73) {
     for (n=0;n<15;n++) if (lp_select) {
       if (lp_ini==lp_select--) lp_ini--;
-    } paint_process_list(); flush_buffer(); v.volcar=1;
+    } paint_process_list(); flush_buffer(); v.redraw=1;
   }
 
   if (wmouse_in(3,21,128+32-9,120) && (mouse_b&1)) {
     n=lp_ini+(wmouse_y-21)/8;
     if (n<lp_num) {
       if (lp_select!=n) {
-        lp_select=n; paint_process_list(); v.volcar=1;
-      } else if (!(old_mouse_b&1)) {
-        v_aceptar=1; fin_dialogo=1;
+        lp_select=n; paint_process_list(); v.redraw=1;
+      } else if (!(prev_mouse_buttons&1)) {
+        v_accept=1; end_dialog=1;
       }
     }
   }
@@ -4238,12 +4238,12 @@ void process_list2(void) {
         wput(ptr,an,al,123+32,20,-41); lp_boton=1;
         if (lp_select) {
           if (lp_ini==lp_select--) lp_ini--;
-          paint_process_list(); v.volcar=1;
+          paint_process_list(); v.redraw=1;
         }
       }
-    } else if (lp_boton==1) { wput(ptr,an,al,123+32,20,-39); lp_boton=0; v.volcar=1; }
+    } else if (lp_boton==1) { wput(ptr,an,al,123+32,20,-39); lp_boton=0; v.redraw=1; }
     mouse_graf=7;
-  } else if (lp_boton==1) { wput(ptr,an,al,123+32,20,-39); lp_boton=0; v.volcar=1; }
+  } else if (lp_boton==1) { wput(ptr,an,al,123+32,20,-39); lp_boton=0; v.redraw=1; }
 
 
   if (wmouse_in(123+32,28,7,105)) {
@@ -4253,7 +4253,7 @@ void process_list2(void) {
       lp_select=x*(lp_num-1);
       if (lp_select<lp_ini) lp_ini=lp_select;
       if (lp_select>=lp_ini+15) lp_ini=lp_select-14;
-      paint_process_list(); v.volcar=1;
+      paint_process_list(); v.redraw=1;
     }
   }
 
@@ -4263,25 +4263,25 @@ void process_list2(void) {
         wput(ptr,an,al,123+32,94+40,-42); lp_boton=2;
         if (lp_select+1<lp_num) {
           if (lp_ini+15==++lp_select) lp_ini++;
-          paint_process_list(); v.volcar=1;
+          paint_process_list(); v.redraw=1;
         }
       }
-    } else if (lp_boton==2) { wput(ptr,an,al,123+32,94+40,-40); lp_boton=0; v.volcar=1; }
+    } else if (lp_boton==2) { wput(ptr,an,al,123+32,94+40,-40); lp_boton=0; v.redraw=1; }
     mouse_graf=9;
-  } else if (lp_boton==2) { wput(ptr,an,al,123+32,94+40,-40); lp_boton=0; v.volcar=1; }
+  } else if (lp_boton==2) { wput(ptr,an,al,123+32,94+40,-40); lp_boton=0; v.redraw=1; }
 
   switch(v.active_item) {
-    case 0: if (lp_num) v_aceptar=1; fin_dialogo=1; break;
-    case 1: fin_dialogo=1; break;
+    case 0: if (lp_num) v_accept=1; end_dialog=1; break;
+    case 1: end_dialog=1; break;
     case 2:
       create_process_list();
       paint_process_list();
-      v.volcar=1; break;
+      v.redraw=1; break;
   }
 }
 
 void process_list0(void) {
-  v.tipo=1; v.titulo=text[75];
+  v.type=1; v.title=text[75];
 
   v.an=166; v.al=161;
   v.paint_handler=process_list1;
@@ -4290,7 +4290,7 @@ void process_list0(void) {
   _button(text[7],7,v.al-14,0);
   _button(text[58],v.an-8,v.al-14,2);
   _flag(text[76],v.an-text_len(text[76])-12,11,&lp_sort);
-  v_aceptar=0;
+  v_accept=0;
 }
 
 //-----------------------------------------------------------------------------
@@ -4395,7 +4395,7 @@ void create_profile_list(void) {
   f_exec_total=0; f_paint_total=0; f_max=0;
 
   for (n=0;n<num_obj;n++) {
-    if (o[n].tipo==tproc) {
+    if (o[n].type==tproc) {
       f_exec_total+=o[n].v4;
       f_paint_total+=o[n].v5;
       if (o[n].v4>f_max) f_max=o[n].v4;
@@ -4429,7 +4429,7 @@ void create_profile_list(void) {
   }
 
   for (n=0;n<num_obj;n++) {
-    if (o[n].tipo==tproc && (o[n].v4>f_time_total/10000 || o[n].v5>f_time_total/10000)) {
+    if (o[n].type==tproc && (o[n].v4>f_time_total/10000 || o[n].v5>f_time_total/10000)) {
       lp1[lp_num++]=n;
     }
   }
@@ -4483,7 +4483,7 @@ void paint_profile_list(void) {
     wwrite(ptr,an,al,an-10-65+32,lpy+1+(m-lp_ini)*lpal,1,(byte *)cwork,c_r_low0);
     wwrite(ptr,an,al,an-11-65+32,lpy+1+(m-lp_ini)*lpal,1,(byte *)cwork,c34);
 
-    wwrite_in_box(ptr,an,an-13-131,al,5,lpy+1+(m-lp_ini)*lpal,0,(byte *)vnom+o[lp1[m]].nombre,x);
+    wwrite_in_box(ptr,an,an-13-131,al,5,lpy+1+(m-lp_ini)*lpal,0,(byte *)vnom+o[lp1[m]].name,x);
     wbox(ptr,an,al,c0,4,lpy+(m-lp_ini)*lpal+lpal-1,an-16,1);
   }
 
@@ -4707,7 +4707,7 @@ void profile2(void) {
     n=lp_ini+(wmouse_y-lpy)/lpal;
     if (n<lp_num) {
       if (lp_select!=n) {
-        lp_select=n; paint_profile_list(); v.volcar=1;
+        lp_select=n; paint_profile_list(); v.redraw=1;
       }
     }
   }
@@ -4718,12 +4718,12 @@ void profile2(void) {
         wput(ptr,an,al,an-11,lpy,-41); lp_boton=1;
         if (lp_select) {
           if (lp_ini==lp_select--) lp_ini--;
-          paint_profile_list(); v.volcar=1;
+          paint_profile_list(); v.redraw=1;
         }
       }
-    } else if (lp_boton==1) { wput(ptr,an,al,an-11,lpy,-39); lp_boton=0; v.volcar=1; }
+    } else if (lp_boton==1) { wput(ptr,an,al,an-11,lpy,-39); lp_boton=0; v.redraw=1; }
     mouse_graf=7;
-  } else if (lp_boton==1) { wput(ptr,an,al,an-11,lpy,-39); lp_boton=0; v.volcar=1; }
+  } else if (lp_boton==1) { wput(ptr,an,al,an-11,lpy,-39); lp_boton=0; v.redraw=1; }
 
 
   if (wmouse_in(an-11,lpy+8,7,lpnum*lpal-17)) {
@@ -4733,7 +4733,7 @@ void profile2(void) {
       lp_select=x*(lp_num-1);
       if (lp_select<lp_ini) lp_ini=lp_select;
       if (lp_select>=lp_ini+lpnum) lp_ini=lp_select-lpnum+1;
-      paint_profile_list(); v.volcar=1;
+      paint_profile_list(); v.redraw=1;
     }
   }
 
@@ -4743,12 +4743,12 @@ void profile2(void) {
         wput(ptr,an,al,an-11,lpy+lpnum*lpal-8,-42); lp_boton=2;
         if (lp_select+1<lp_num) {
           if (lp_ini+lpnum==++lp_select) lp_ini++;
-          paint_profile_list(); v.volcar=1;
+          paint_profile_list(); v.redraw=1;
         }
       }
-    } else if (lp_boton==2) { wput(ptr,an,al,an-11,lpy+lpnum*lpal-8,-40); lp_boton=0; v.volcar=1; }
+    } else if (lp_boton==2) { wput(ptr,an,al,an-11,lpy+lpnum*lpal-8,-40); lp_boton=0; v.redraw=1; }
     mouse_graf=9;
-  } else if (lp_boton==2) { wput(ptr,an,al,an-11,lpy+lpnum*lpal-8,-40); lp_boton=0; v.volcar=1; }
+  } else if (lp_boton==2) { wput(ptr,an,al,an-11,lpy+lpnum*lpal-8,-40); lp_boton=0; v.redraw=1; }
 
   // Listbox funciones
 
@@ -4756,7 +4756,7 @@ void profile2(void) {
     n=lp2_ini+(wmouse_y-lp2y)/lp2al;
     if (n<lp2_num) {
       if (lp2_select!=n) {
-        lp2_select=n; paint_profile_list(); v.volcar=1;
+        lp2_select=n; paint_profile_list(); v.redraw=1;
       }
     }
   }
@@ -4767,12 +4767,12 @@ void profile2(void) {
         wput(ptr,an,al,an-lp2esp-11,lp2y,-41); lp2_boton=1;
         if (lp2_select) {
           if (lp2_ini==lp2_select--) lp2_ini--;
-          paint_profile_list(); v.volcar=1;
+          paint_profile_list(); v.redraw=1;
         }
       }
-    } else if (lp2_boton==1) { wput(ptr,an,al,an-lp2esp-11,lp2y,-39); lp2_boton=0; v.volcar=1; }
+    } else if (lp2_boton==1) { wput(ptr,an,al,an-lp2esp-11,lp2y,-39); lp2_boton=0; v.redraw=1; }
     mouse_graf=7;
-  } else if (lp2_boton==1) { wput(ptr,an,al,an-lp2esp-11,lp2y,-39); lp2_boton=0; v.volcar=1; }
+  } else if (lp2_boton==1) { wput(ptr,an,al,an-lp2esp-11,lp2y,-39); lp2_boton=0; v.redraw=1; }
 
 
   if (wmouse_in(an-lp2esp-11,lp2y+8,7,lp2num*lp2al-17)) {
@@ -4782,7 +4782,7 @@ void profile2(void) {
       lp2_select=x*(lp2_num-1);
       if (lp2_select<lp2_ini) lp2_ini=lp2_select;
       if (lp2_select>=lp2_ini+lp2num) lp2_ini=lp2_select-lp2num+1;
-      paint_profile_list(); v.volcar=1;
+      paint_profile_list(); v.redraw=1;
     }
   }
 
@@ -4792,12 +4792,12 @@ void profile2(void) {
         wput(ptr,an,al,an-lp2esp-11,lp2y+lp2num*lp2al-8,-42); lp2_boton=2;
         if (lp2_select+1<lp2_num) {
           if (lp2_ini+lp2num==++lp2_select) lp2_ini++;
-          paint_profile_list(); v.volcar=1;
+          paint_profile_list(); v.redraw=1;
         }
       }
-    } else if (lp2_boton==2) { wput(ptr,an,al,an-lp2esp-11,lp2y+lp2num*lp2al-8,-40); lp2_boton=0; v.volcar=1; }
+    } else if (lp2_boton==2) { wput(ptr,an,al,an-lp2esp-11,lp2y+lp2num*lp2al-8,-40); lp2_boton=0; v.redraw=1; }
     mouse_graf=9;
-  } else if (lp2_boton==2) { wput(ptr,an,al,an-lp2esp-11,lp2y+lp2num*lp2al-8,-40); lp2_boton=0; v.volcar=1; }
+  } else if (lp2_boton==2) { wput(ptr,an,al,an-lp2esp-11,lp2y+lp2num*lp2al-8,-40); lp2_boton=0; v.redraw=1; }
 
   if (scan_code==33 || kbdFLAGS[_F12]) goto profiler_next_frame;
 
@@ -4805,11 +4805,11 @@ void profile2(void) {
     case 0:
       profiler_next_frame: no_volcar_nada=1;
       profiler_x=v.x; profiler_y=v.y;
-      fin_dialogo=1;
+      end_dialog=1;
       break;
     case 1:
       for (n=0;n<num_obj;n++) {
-        if (o[n].tipo==tproc) {
+        if (o[n].type==tproc) {
           o[n].v4=0; // Time_exec
           o[n].v5=0; // Time_paint
         }
@@ -4818,18 +4818,18 @@ void profile2(void) {
       game_ticks=0.0f;
       game_frames=0.0f;
       call(v.paint_handler);
-      v.volcar=1;
+      v.redraw=1;
       break;
-    case 2: fin_dialogo=1; break;
+    case 2: end_dialog=1; break;
     case 3:
       call(v.paint_handler);
-      v.volcar=1;
+      v.redraw=1;
       break;
   }
 }
 
 void profile0(void) {
-  v.tipo=1; v.titulo=text[86];
+  v.type=1; v.title=text[86];
 
   v.an=256; v.al=165+15;
   v.paint_handler=profile1;

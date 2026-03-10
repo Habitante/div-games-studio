@@ -62,11 +62,11 @@ typedef struct tagRGBQUAD
 
 // PROT: int is_XYZ (byte * buffer);
 // DESC: Returns TRUE if the file is loaded into the buffer type XYZ, and Además 
-// returns the width / height of the bitmap in the variables map_an / p
+// returns the width / height of the bitmap in the variables map_width / p
 
 // PROT: void decompresses_XYZ (byte * buffer, byte * map vent int);
 // DESC: The function ó n receives the loaded file in buffer and another buffer
-// Map_an * map_al + map_an bytes (map), you have to unpack this
+// Map_an * map_height + map_width bytes (map), you have to unpack this
 // latest.
 // "Vent" indicates whether to charge the additional information window
 // (Such as checkpoints, see already defined formats)
@@ -76,7 +76,7 @@ typedef struct tagRGBQUAD
 // PROT: int record_XYZ (byte * Map, FILE * f);
 // DESC: You must save the bitmap in the filename. S own buffer addition
 // Containing the map, you have access to the following information:
-// - Map_an, map_al (map width and height in pixels)
+// - Map_an, map_height (map width and height in pixels)
 // - Dac [768] (palette file, 256 RGB values between 0 and 63)
 // When the file is recording MAP (own format) you have in addition s
 // - Map_codigo (number associated with the map, long integer, 4 bytes)
@@ -90,7 +90,7 @@ typedef struct tagRGBQUAD
 // NOTE: Any function that requires additional memory for your
 // Job, you can ask to malloc, and if you can not get the memory
 // Required, then you must create an informative error window
-// As follows: I = text v_texto [45]; dialogue ((voidReturnType) Err0);
+// As follows: I = text v_text [45]; dialogue ((voidReturnType) Err0);
 
 // NOTE 2: The only format that returns value to decompress is the JPG. EYE !!!
 
@@ -105,8 +105,8 @@ typedef struct tagRGBQUAD
 
 int is_MAP (byte * buffer) {
 	if (!strcmp((char *)buffer,"map\x1a\x0d\x0a")) {
-		map_an=*(word*)(buffer+8);
-		map_al=*(word*)(buffer+10);
+		map_width=*(word*)(buffer+8);
+		map_height=*(word*)(buffer+10);
 		return(1);
 	} else 
 		return(0);
@@ -116,20 +116,20 @@ void descomprime_MAP (byte * buffer, byte * mapa, int vent) {
 	
 	short npuntos;
 	if (vent) {
-		memcpy(&Codigo,buffer+12,4);
-		memcpy(Descripcion,buffer+16,32);
+		memcpy(&fpg_code,buffer+12,4);
+		memcpy(MapDescription,buffer+16,32);
 	}
 
 	memcpy(dac4,buffer+48,768);
 	memcpy(&npuntos,buffer+1392,2);
 	
 	if (vent) {
-		memcpy(reglas,buffer+816,sizeof(reglas));
+		memcpy(gradients,buffer+816,sizeof(gradients));
 		if(npuntos!=0)
-			memcpy(v_mapa->puntos,buffer+1394,npuntos*4);
+			memcpy(v_map->puntos,buffer+1394,npuntos*4);
 	}
 	
-	memcpy(mapa,buffer+1394+(npuntos*4),map_an*map_al);
+	memcpy(mapa,buffer+1394+(npuntos*4),map_width*map_height);
 }
 
 int save_MAP (byte * mapa, FILE * f) {
@@ -139,26 +139,26 @@ int save_MAP (byte * mapa, FILE * f) {
 	int i;
 
 	fwrite("map\x1a\x0d\x0a\x00\x00",8,1,f);      // +000 Cabecera y version
-	x=map_an; fwrite(&x,2,1,f);                   // +008 Ancho
-	x=map_al; fwrite(&x,2,1,f);                   // +010 Alto
-	y=ventana[v_ventana].mapa->Codigo; fwrite(&y,4,1,f);// +012 Código
+	x=map_width; fwrite(&x,2,1,f);                   // +008 Ancho
+	x=map_height; fwrite(&x,2,1,f);                   // +010 Alto
+	y=ventana[v_window].mapa->fpg_code; fwrite(&y,4,1,f);// +012 Código
 
-	fwrite(ventana[v_ventana].mapa->descripcion,32,1,f);// +016 Descripcion
+	fwrite(ventana[v_window].mapa->description,32,1,f);// +016 Descripcion
 	fwrite(dac,768,1,f);                          // +048 Paleta
-	fwrite(reglas,1,sizeof(reglas),f);            // +816 Reglas de color
+	fwrite(gradients,1,sizeof(gradients),f);            // +816 Reglas de color
 
 	npuntos=0;
 
 	for(i=511;i>=0;i-=2)
-		if(ventana[v_ventana].mapa->puntos[i]!=-1) {
+		if(ventana[v_window].mapa->puntos[i]!=-1) {
 				npuntos=(i+1)/2;
 				i=-1;
 		}
 
 	fwrite(&npuntos,2,1,f);                     // +1392 Numero de puntos
-	fwrite(&ventana[v_ventana].mapa->puntos,npuntos,4,f);
+	fwrite(&ventana[v_window].mapa->puntos,npuntos,4,f);
 
-	y=map_an*map_al;
+	y=map_width*map_height;
 
 	do { 
 		if (y>=768) {
@@ -221,8 +221,8 @@ int is_PCX(byte *buffer)
 			loes=1;
 	}
 
-	map_an=*(word*)(buffer+8)-*(word*)(buffer+4)+1;
-	map_al=*(word*)(buffer+10)-*(word*)(buffer+6)+1;
+	map_width=*(word*)(buffer+8)-*(word*)(buffer+4)+1;
+	map_height=*(word*)(buffer+10)-*(word*)(buffer+6)+1;
 
 	return(loes);
 }
@@ -254,26 +254,26 @@ void descomprime_PCX(byte *buffer, byte *mapa, int vent)
   memcpy((byte *)&header,buffer,sizeof(pcx_header));
   buffer+=128;                                  // Comienzo de la imagen
 
-  map_an = header.xmax - header.xmin + 1;
-  map_al = header.ymax - header.ymin + 1;
+  map_width = header.xmax - header.xmin + 1;
+  map_height = header.ymax - header.ymin + 1;
 
-  if((!map_an && !map_al) || map_an<0 || map_al<0) return;
+  if((!map_width && !map_height) || map_width<0 || map_height<0) return;
 
-  memset (mapa, 0, map_an * map_al);
+  memset (mapa, 0, map_width * map_height);
 
-  last_byte  = header.bytes_per_line * header.color_planes * map_al ;
+  last_byte  = header.bytes_per_line * header.color_planes * map_height ;
   bytes_line = header.bytes_per_line * header.color_planes;
 
   // Si es una imagen 24bpp
   if(header.color_planes==3)
   {
-    if ((pDest=(byte *)malloc((map_an+1)*(map_al+1)*3))==NULL)
+    if ((pDest=(byte *)malloc((map_width+1)*(map_height+1)*3))==NULL)
     {
-      v_texto=(char *)texto[45];
+      v_text=(char *)texto[45];
       show_dialog((voidReturnType)err0);
       return;
     }
-    memset (pDest, 0, (map_an+1)*(map_al+1)*3);
+    memset (pDest, 0, (map_width+1)*(map_height+1)*3);
     pSrc = pDest;
   }
   // Si es una imagen 4bpp
@@ -281,7 +281,7 @@ void descomprime_PCX(byte *buffer, byte *mapa, int vent)
   {
     if ((pDest=(byte *)malloc(last_byte))==NULL)
     {
-      v_texto=(char *)texto[45];
+      v_text=(char *)texto[45];
       show_dialog((voidReturnType)err0);
       return;
     }
@@ -325,7 +325,7 @@ void descomprime_PCX(byte *buffer, byte *mapa, int vent)
       }
       if(pixel_line==bytes_line) {
         pixel_line=0;
-        rep-=bytes_line-map_an;
+        rep-=bytes_line-map_width;
       }
       for(con=0;con<rep;con++) *pDest++=ch;
     } while(1);
@@ -339,10 +339,10 @@ void descomprime_PCX(byte *buffer, byte *mapa, int vent)
     pDest    = mapa;
     AuxPtr   = pSrc;
     pSrcLine = pSrc;
-    for (y=0; y<map_al; y++)                    // For each line...
+    for (y=0; y<map_height; y++)                    // For each line...
     {
       pSrc  = pSrcLine;
-      pixel = map_an;
+      pixel = map_width;
       for (x=0; x<header.bytes_per_line; x++) // For each byte...
       {
         for (con16=7; con16>=0 && pixel; con16--)        // For each pixel...
@@ -389,10 +389,10 @@ void descomprime_PCX(byte *buffer, byte *mapa, int vent)
       pDest    = mapa;
       AuxPtr   = pSrc;
       pSrcLine = pSrc;
-      for (y=0; y<map_al; y++)
+      for (y=0; y<map_height; y++)
       { // For each line...
         pSrc = pSrcLine;
-        for (x=0; x<map_an; x++)
+        for (x=0; x<map_width; x++)
         { // For each pixel...
           rgb_red   = *(pSrc);
           rgb_green = *(pSrc + header.bytes_per_line);
@@ -421,10 +421,10 @@ void descomprime_PCX(byte *buffer, byte *mapa, int vent)
       pDest    = mapa;
       AuxPtr   = pSrc;
       pSrcLine = pSrc;
-      for (y=0; y<map_al; y++)
+      for (y=0; y<map_height; y++)
       { // For each line...
         pSrc = pSrcLine;
-        for (x=0; x<map_an; x++)
+        for (x=0; x<map_width; x++)
         { // For each pixel...
           rgb_red   = *(pSrc);
           rgb_green = *(pSrc + header.bytes_per_line);
@@ -444,10 +444,10 @@ void descomprime_PCX(byte *buffer, byte *mapa, int vent)
       pDest    = mapa;
       AuxPtr   = pSrc;
       pSrcLine = pSrc;
-      for (y=0; y<map_al; y++)
+      for (y=0; y<map_height; y++)
       { // For each line...
         pSrc = pSrcLine;
-        for (x=0; x<map_an; x++)
+        for (x=0; x<map_width; x++)
         { // For each pixel...
           rgb_red   = *(pSrc);
           rgb_green = *(pSrc + header.bytes_per_line);
@@ -468,9 +468,9 @@ void descomprime_PCX(byte *buffer, byte *mapa, int vent)
 
   }
   if (vent) {
-    for(x=0;x<512;x++) v_mapa->puntos[x]=-1;
-    Codigo=0;
-    Descripcion[0]=0;
+    for(x=0;x<512;x++) v_map->puntos[x]=-1;
+    fpg_code=0;
+    MapDescription[0]=0;
   }
 }
 
@@ -492,31 +492,31 @@ int save_PCX(byte *mapa,FILE *f) {
         pcx.header.bits_per_pixel=8;
         pcx.header.xmin=0;
         pcx.header.ymin=0;
-        pcx.header.xmax=map_an-1;
-        pcx.header.ymax=map_al-1;
-        pcx.header.hres=map_an;
-        pcx.header.vres=map_al;
+        pcx.header.xmax=map_width-1;
+        pcx.header.ymax=map_height-1;
+        pcx.header.hres=map_width;
+        pcx.header.vres=map_height;
         pcx.header.color_planes=1;
-        pcx.header.bytes_per_line=map_an;
+        pcx.header.bytes_per_line=map_width;
         pcx.header.palette_type=0;
-        pcx.header.Hresol=map_an;
-        pcx.header.Vresol=map_al;
+        pcx.header.Hresol=map_width;
+        pcx.header.Vresol=map_height;
 
-        if ((cbuffer=(unsigned char *)malloc(map_an*map_al*2))==NULL)
+        if ((cbuffer=(unsigned char *)malloc(map_width*map_height*2))==NULL)
         {
                 //Error reservando memoria.
-                v_texto=(char *)texto[45]; show_dialog((voidReturnType)err0);
+                v_text=(char *)texto[45]; show_dialog((voidReturnType)err0);
                 return(1);
         }
         ActPixel=mapa[ptr];
-        while (ptr < map_an*map_al)
+        while (ptr < map_width*map_height)
         {
-                while((mapa[ptr]==ActPixel) && (ptr<map_an*map_al))
+                while((mapa[ptr]==ActPixel) && (ptr<map_width*map_height))
                 {
                         cntPixel++;
                         Desborde++;
                         ptr++;
-                        if(Desborde==map_an)
+                        if(Desborde==map_width)
                         {
                                 Desborde=0;
                                 break;
@@ -633,8 +633,8 @@ int is_BMP(byte *buffer)
      InfoHeader.biBitCount!=8 &&
      InfoHeader.biBitCount!=24) return(0);
 
-  map_an=InfoHeader.biWidth;
-  map_al=InfoHeader.biHeight;
+  map_width=InfoHeader.biWidth;
+  map_height=InfoHeader.biHeight;
 
   return(1);
 }
@@ -660,10 +660,10 @@ void descomprime_BMP(byte *buffer, byte *mapa, int vent)
 
   pSrc=buffer+14;
   memcpy(&InfoHeader,pSrc,40);
-  map_an = InfoHeader.biWidth;
-  map_al = InfoHeader.biHeight;
+  map_width = InfoHeader.biWidth;
+  map_height = InfoHeader.biHeight;
 
-  if((!map_an && !map_al) || map_an<0 || map_al<0) return;
+  if((!map_width && !map_height) || map_width<0 || map_height<0) return;
 
   pSrc=buffer+54;
   if(InfoHeader.biBitCount==8)
@@ -680,11 +680,11 @@ void descomprime_BMP(byte *buffer, byte *mapa, int vent)
   pSrc     = buffer+FileHeader.bfOffBits;
   pSrcLine = buffer+FileHeader.bfOffBits;
 
-  fixmap_an=map_an; if(map_an%4) fixmap_an+=4-(map_an%4);
+  fixmap_an=map_width; if(map_width%4) fixmap_an+=4-(map_width%4);
 
   pDest = mapa;
 
-  memset (pDest, 0, map_an * map_al);
+  memset (pDest, 0, map_width * map_height);
 
   // Descomprime el BMP si es necesario
 
@@ -692,9 +692,9 @@ void descomprime_BMP(byte *buffer, byte *mapa, int vent)
   {
     if(InfoHeader.biCompression==BI_RLE8)
     {
-      for (y=0; y<map_al && !bEOF; y++)
+      for (y=0; y<map_height && !bEOF; y++)
       { // For each line...
-        pDest = &mapa[map_an*map_al-map_an*(y+1)];
+        pDest = &mapa[map_width*map_height-map_width*(y+1)];
         bEOL=0;
         while (!bEOL)
         { // For each packet do
@@ -737,9 +737,9 @@ void descomprime_BMP(byte *buffer, byte *mapa, int vent)
     }
     else
     {
-      for(y=0;y<map_al;y++)
+      for(y=0;y<map_height;y++)
       {
-        memcpy(mapa+y*map_an,pSrc+((map_al-1)-y)*fixmap_an,map_an);
+        memcpy(mapa+y*map_width,pSrc+((map_height-1)-y)*fixmap_an,map_width);
       }
     }
     y=0;
@@ -757,9 +757,9 @@ void descomprime_BMP(byte *buffer, byte *mapa, int vent)
   {
     if(InfoHeader.biCompression==BI_RLE4)
     {
-      for (y=0; y<map_al && !bEOF; y++)
+      for (y=0; y<map_height && !bEOF; y++)
       { // For each line...
-        pDest = &mapa[map_an*map_al-map_an*(y+1)];
+        pDest = &mapa[map_width*map_height-map_width*(y+1)];
         bEOL=0;
         while (!bEOL)
         { // For each packet do
@@ -809,14 +809,14 @@ void descomprime_BMP(byte *buffer, byte *mapa, int vent)
     else
     {
       fixmap_an /= 2;
-      if(map_an & 1) fixmap_an += 2;
-      for(y=0;y<map_al;y++)
+      if(map_width & 1) fixmap_an += 2;
+      for(y=0;y<map_height;y++)
       {
         for(x=0; x<fixmap_an; x++)
         {
-          pixel = pSrc[((map_al-1)-y)*fixmap_an+x];
-          mapa[y*map_an+x*2]   = (pixel >> 4);
-          mapa[y*map_an+x*2+1] = (pixel  & 0x0F);
+          pixel = pSrc[((map_height-1)-y)*fixmap_an+x];
+          mapa[y*map_width+x*2]   = (pixel >> 4);
+          mapa[y*map_width+x*2+1] = (pixel  & 0x0F);
         }
       }
     }
@@ -850,13 +850,13 @@ void descomprime_BMP(byte *buffer, byte *mapa, int vent)
       }
 
       // Convierte de 24 a 8
-      fixmap_an=((map_an*3)/4)*4;
-      if(fixmap_an != map_an*3) fixmap_an+=4;
-      for (y=0; y<map_al; y++)
+      fixmap_an=((map_width*3)/4)*4;
+      if(fixmap_an != map_width*3) fixmap_an+=4;
+      for (y=0; y<map_height; y++)
       { // For each line...
-        pDest = &mapa[map_an*map_al-map_an*(y+1)];
+        pDest = &mapa[map_width*map_height-map_width*(y+1)];
         pSrc  = pSrcLine;
-        for (x=0; x<map_an; x++)
+        for (x=0; x<map_width; x++)
         { // For each pixel...
           rgb_red   = ((RGBQUAD *)pSrc)->rgbRed;
           rgb_green = ((RGBQUAD *)pSrc)->rgbGreen;
@@ -883,12 +883,12 @@ void descomprime_BMP(byte *buffer, byte *mapa, int vent)
 
       // Convierte de 24 a 8
       AuxPtr=pSrc;
-      fixmap_an=((map_an*3)/4)*4;
-      if(fixmap_an != map_an*3) fixmap_an+=4;
-      for (y=0; y<map_al; y++)
+      fixmap_an=((map_width*3)/4)*4;
+      if(fixmap_an != map_width*3) fixmap_an+=4;
+      for (y=0; y<map_height; y++)
       { // For each line...
         pSrc  = pSrcLine;
-        for (x=0; x<map_an; x++)
+        for (x=0; x<map_width; x++)
         { // For each pixel...
           rgb_red   = ((RGBQUAD *)pSrc)->rgbRed;
           rgb_green = ((RGBQUAD *)pSrc)->rgbGreen;
@@ -902,13 +902,13 @@ void descomprime_BMP(byte *buffer, byte *mapa, int vent)
       crear_paleta();
 
       // Convierte de 24 a 8
-      fixmap_an=((map_an*3)/4)*4;
-      if(fixmap_an != map_an*3) fixmap_an+=4;
-      for (y=0; y<map_al; y++)
+      fixmap_an=((map_width*3)/4)*4;
+      if(fixmap_an != map_width*3) fixmap_an+=4;
+      for (y=0; y<map_height; y++)
       { // For each line...
-        pDest = &mapa[map_an*map_al-map_an*(y+1)];
+        pDest = &mapa[map_width*map_height-map_width*(y+1)];
         pSrc  = pSrcLine;
-        for (x=0; x<map_an; x++)
+        for (x=0; x<map_width; x++)
         { // For each pixel...
           rgb_red   = ((RGBQUAD *)pSrc)->rgbRed;
           rgb_green = ((RGBQUAD *)pSrc)->rgbGreen;
@@ -928,9 +928,9 @@ void descomprime_BMP(byte *buffer, byte *mapa, int vent)
   }
 
   if (vent) {
-    for(x=0;x<512;x++) v_mapa->puntos[x]=-1;
-    Codigo=0;
-    Descripcion[0]=0;
+    for(x=0;x<512;x++) v_map->puntos[x]=-1;
+    fpg_code=0;
+    MapDescription[0]=0;
   }
 }
 
@@ -942,11 +942,11 @@ RGBQUAD              Bmpdac[256];
 int x,y=0;
 
 byte pad[4]={0,0,0,0};
-int pad_an = map_an + 4-(map_an%4);
+int pad_an = map_width + 4-(map_width%4);
 
 //BITMAPFILEHEADER
         FileHeader.bfType=0x4D42;
-        FileHeader.bfSize=1078+pad_an*map_al;
+        FileHeader.bfSize=1078+pad_an*map_height;
         FileHeader.bfReserved1=0;
         FileHeader.bfReserved2=0;
         FileHeader.bfOffBits=1078;
@@ -957,12 +957,12 @@ int pad_an = map_an + 4-(map_an%4);
         fwrite(&FileHeader.bfOffBits,4,1,f);
 //BITMAPINFOHEADER
         InfoHeader.biSize=40;
-        InfoHeader.biWidth=map_an;
-        InfoHeader.biHeight=map_al;
+        InfoHeader.biWidth=map_width;
+        InfoHeader.biHeight=map_height;
         InfoHeader.biPlanes=1;
         InfoHeader.biBitCount=8;
         InfoHeader.biCompression=0;
-        InfoHeader.biSizeImage=pad_an*map_al;
+        InfoHeader.biSizeImage=pad_an*map_height;
         InfoHeader.biXPelsPerMeter=0;
         InfoHeader.biYPelsPerMeter=0;
         InfoHeader.biClrUsed=0;
@@ -986,10 +986,10 @@ int pad_an = map_an + 4-(map_an%4);
                 Bmpdac[x].rgbBlue=dac[y++]*4;
         }
         fwrite(&Bmpdac,1024,1,f);
-        for(x=0;x<map_al;x++) {
-			fwrite(mapa+((map_al-1)-x)*map_an,1,map_an,f);
-			if(pad_an!=map_an)
-				fwrite(pad,1,pad_an-map_an,f);
+        for(x=0;x<map_height;x++) {
+			fwrite(mapa+((map_height-1)-x)*map_width,1,map_width,f);
+			if(pad_an!=map_width)
+				fwrite(pad,1,pad_an-map_width,f);
 		}
 return(1);
 }
@@ -1018,8 +1018,8 @@ int is_JPG(byte *buffer, int img_filesize)
   jpeg_mem_src(&cinfo, buffer, img_filesize);
   jpeg_read_header(&cinfo, TRUE);
   jpeg_start_decompress(&cinfo);
-  map_an = cinfo.output_width;
-  map_al = cinfo.output_height;
+  map_width = cinfo.output_width;
+  map_height = cinfo.output_height;
   jpeg_destroy_decompress(&cinfo);
 
   return(1);
@@ -1063,10 +1063,10 @@ int descomprime_JPG(byte *buffer, byte *mapa, int vent, int img_filesize)
   }
   jpeg_start_decompress(&cinfo);
 
-  map_an = cinfo.output_width;
-  map_al = cinfo.output_height;
+  map_width = cinfo.output_width;
+  map_height = cinfo.output_height;
 
-  if((!map_an && !map_al) || map_an<0 || map_al<0)
+  if((!map_width && !map_height) || map_width<0 || map_height<0)
   {
     jpeg_destroy_decompress(&cinfo);
     return(0);
@@ -1106,9 +1106,9 @@ int descomprime_JPG(byte *buffer, byte *mapa, int vent, int img_filesize)
   jpeg_destroy_decompress(&cinfo);
 
   if (vent) {
-    for(x=0;x<512;x++) v_mapa->puntos[x]=-1;
-    Codigo=0;
-    Descripcion[0]=0;
+    for(x=0;x<512;x++) v_map->puntos[x]=-1;
+    fpg_code=0;
+    MapDescription[0]=0;
   }
 
   return(1);
@@ -1122,7 +1122,7 @@ return (0);
 //-----------------------------------------------------------------------------
 
 // Quita de dac4 los colores no usados en el mapa
-// WARNING: Caller must save and restore 'paleta_original' before/after calling this function
+// WARNING: Caller must save and restore 'original_palette' before/after calling this function
 
 void quitar_colores(byte * buffer,int len) {
   byte pal[256],*fin;
@@ -1152,7 +1152,7 @@ int cargadac_FNT(char *name)
   file=fopen(name,"rb");
   if(file==NULL)
   {
-    v_texto=(char *)texto[44];
+    v_text=(char *)texto[44];
     show_dialog((voidReturnType)err0);
     return(0);
   }
@@ -1176,7 +1176,7 @@ int cargadac_FPG(char *name)
   file=fopen(name,"rb");
   if(file==NULL)
   {
-    v_texto=(char *)texto[44];
+    v_text=(char *)texto[44];
     show_dialog((voidReturnType)err0);
     return(0);
   }
@@ -1200,7 +1200,7 @@ int cargadac_PAL(char *name)
   file=fopen(name,"rb");
   if(file==NULL)
   {
-    v_texto=(char *)texto[44];
+    v_text=(char *)texto[44];
     show_dialog((voidReturnType)err0);
     return(0);
   }
@@ -1236,7 +1236,7 @@ int cargadac_MAP(char *name)
   file=fopen(name,"rb");
   if(file==NULL)
   {
-    v_texto=(char *)texto[44];
+    v_text=(char *)texto[44];
     show_dialog((voidReturnType)err0);
     return(0);
   }
@@ -1271,14 +1271,14 @@ int cargadac_MAP(char *name)
     }
 	memset(temp,0,man*mal+man);
 	
-    swap(man,map_an); swap(mal,map_al);
+    swap(man,map_width); swap(mal,map_height);
     descomprime_MAP(buffer,temp,0);
 
-    memcpy(paleta_original,dac4,768);
+    memcpy(original_palette,dac4,768);
 
-    quitar_colores(temp,map_an*map_al);
+    quitar_colores(temp,map_width*map_height);
 
-    swap(man,map_an); swap(mal,map_al);
+    swap(man,map_width); swap(mal,map_height);
     free(buffer);
     free(temp);
 
@@ -1303,7 +1303,7 @@ int cargadac_PCX(char *name)
   file=fopen(name,"rb");
   if(file==NULL)
   {
-    v_texto=(char *)texto[44];
+    v_text=(char *)texto[44];
     show_dialog((voidReturnType)err0);
     return(0);
   }
@@ -1346,16 +1346,16 @@ int cargadac_PCX(char *name)
       return(0);
     }
 
-    swap(man,map_an); swap(mal,map_al);
+    swap(man,map_width); swap(mal,map_height);
     cargar_paleta=1;
     descomprime_PCX(buffer,temp,0);
 
-    memcpy(paleta_original,dac4,768);
+    memcpy(original_palette,dac4,768);
 
-    if (header.color_planes==1) quitar_colores(temp,map_an*map_al);
+    if (header.color_planes==1) quitar_colores(temp,map_width*map_height);
 
     cargar_paleta=0;
-    swap(man,map_an); swap(mal,map_al);
+    swap(man,map_width); swap(mal,map_height);
     free(buffer);
     free(temp);
 
@@ -1392,7 +1392,7 @@ int cargadac_BMP(char *name)
   file=fopen(name,"rb");
   if(file==NULL)
   {
-    v_texto=(char *)texto[44]; show_dialog((voidReturnType)err0);
+    v_text=(char *)texto[44]; show_dialog((voidReturnType)err0);
     free(CopiaBuffer);
     return(0);
   }
@@ -1449,16 +1449,16 @@ int cargadac_BMP(char *name)
       return(0);
     }
 
-    swap(man,map_an); swap(mal,map_al);
+    swap(man,map_width); swap(mal,map_height);
     cargar_paleta=1;
     descomprime_BMP(buffer,temp,0);
 
-    memcpy(paleta_original,dac4,768);
+    memcpy(original_palette,dac4,768);
 
-    if (InfoHeader.biBitCount==8) quitar_colores(temp,map_an*map_al);
+    if (InfoHeader.biBitCount==8) quitar_colores(temp,map_width*map_height);
 
     cargar_paleta=0;
-    swap(man,map_an); swap(mal,map_al);
+    swap(man,map_width); swap(mal,map_height);
     free(buffer);
     free(temp);
     fclose(file);
@@ -1503,7 +1503,7 @@ int cargadac_JPG(char *name)
   file=fopen(name,"rb");
   if(file==NULL)
   {
-    v_texto=(char *)texto[44];
+    v_text=(char *)texto[44];
     show_dialog((voidReturnType)err0);
     return(0);
   }
@@ -1513,7 +1513,7 @@ int cargadac_JPG(char *name)
   fseek(file,0,SEEK_SET);
   if ((buffer=(byte *)malloc(img_filesize))==NULL)
   {
-    v_texto=(char *)texto[45]; show_dialog((voidReturnType)err0);
+    v_text=(char *)texto[45]; show_dialog((voidReturnType)err0);
     fclose(file);
     return(0);
   }
@@ -1561,7 +1561,7 @@ int cargadac_JPG(char *name)
     }
   }
 
-  memcpy(paleta_original,dac4,768);
+  memcpy(original_palette,dac4,768);
 
   jpeg_finish_decompress(&cinfo);
   jpeg_destroy_decompress(&cinfo);

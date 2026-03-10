@@ -38,7 +38,7 @@ void ReadHeadImageAndPoints(HeadFPG *MiHeadFPG,FILE *fpg)
         FPGimagen=(char *)malloc(MiHeadFPG->Ancho*MiHeadFPG->Alto);
         if(FPGimagen==NULL)
         {
-                v_texto=(char *)texto[45]; show_dialog(err0);
+                v_text=(char *)texto[45]; show_dialog(err0);
                 return;
         }
         if(MiHeadFPG->nPuntos!=0)
@@ -48,7 +48,7 @@ void ReadHeadImageAndPoints(HeadFPG *MiHeadFPG,FILE *fpg)
                 {
                         free(FPGimagen);
                         FPGimagen=NULL;
-                        v_texto=(char *)texto[45]; show_dialog(err0);
+                        v_text=(char *)texto[45]; show_dialog(err0);
                         return;
                 }
                 fread(FPGpuntos,MiHeadFPG->nPuntos*2,2,fpg);
@@ -79,26 +79,26 @@ void Crear_FPG(FPG *Fpg,char *Name)
 
 	fwrite(dac,768,1,fpg);
 
-	fwrite(reglas,sizeof(reglas),1,fpg);
+	fwrite(gradients,sizeof(gradients),1,fpg);
 	fclose(fpg);
 
 	if(Fpg->thumb_on) {
-		Fpg->lInfoFPG.columnas=3;
-		Fpg->lInfoFPG.lineas=2;
+		Fpg->lInfoFPG.columns=3;
+		Fpg->lInfoFPG.lines=2;
 		Fpg->lInfoFPG.an=47;
 		Fpg->lInfoFPG.al=26;
 	} else {
-		Fpg->lInfoFPG.columnas=1;
-		Fpg->lInfoFPG.lineas=6;
+		Fpg->lInfoFPG.columns=1;
+		Fpg->lInfoFPG.lines=6;
 		Fpg->lInfoFPG.an=143;
 		Fpg->lInfoFPG.al=8;
 	}
 
 	Fpg->lInfoFPG.x=3;
 	Fpg->lInfoFPG.y=11;
-	Fpg->lInfoFPG.lista=(char *)Fpg->CodDes;
-	Fpg->lInfoFPG.maximo=Fpg->nIndex;
-	Fpg->lInfoFPG.lista_an=38+2;
+	Fpg->lInfoFPG.list=(char *)Fpg->CodDes;
+	Fpg->lInfoFPG.total_items=Fpg->nIndex;
+	Fpg->lInfoFPG.item_width=38+2;
 }
 
 int Abrir_FPG(FPG *Fpg,char *Name) {
@@ -132,7 +132,7 @@ int Abrir_FPG(FPG *Fpg,char *Name) {
 	fread(newdac,768,1,fpg);
 	memcpy(dac4,newdac,768);
 	NewDacLoaded=1;
-	fread((byte *)reglas,1,sizeof(reglas),fpg);
+	fread((byte *)gradients,1,sizeof(gradients),fpg);
 
 	while(ReadHead(&kkhead,fpg)) {
 		Fpg->OffsGrf[kkhead.COD]=ftell(fpg)-FPG_HEAD;
@@ -145,22 +145,22 @@ int Abrir_FPG(FPG *Fpg,char *Name) {
 	fclose(fpg);
 
 	if(Fpg->thumb_on) {
-		Fpg->lInfoFPG.columnas=3;
-		Fpg->lInfoFPG.lineas=2;
+		Fpg->lInfoFPG.columns=3;
+		Fpg->lInfoFPG.lines=2;
 		Fpg->lInfoFPG.an=47;
 		Fpg->lInfoFPG.al=26;
 	} else {
-		Fpg->lInfoFPG.columnas=1;
-		Fpg->lInfoFPG.lineas=6;
+		Fpg->lInfoFPG.columns=1;
+		Fpg->lInfoFPG.lines=6;
 		Fpg->lInfoFPG.an=143;
 		Fpg->lInfoFPG.al=8;
 	}
 
 	Fpg->lInfoFPG.x=3;
 	Fpg->lInfoFPG.y=11;
-	Fpg->lInfoFPG.lista=(char *)Fpg->CodDes;
-	Fpg->lInfoFPG.maximo=Fpg->nIndex;
-	Fpg->lInfoFPG.lista_an=38+2;
+	Fpg->lInfoFPG.list=(char *)Fpg->CodDes;
+	Fpg->lInfoFPG.total_items=Fpg->nIndex;
+	Fpg->lInfoFPG.item_width=38+2;
 
 	return 1;
 }
@@ -260,7 +260,7 @@ FILE *fpg;
 
         if((fpg=fopen((char *)Fpg->ActualFile,"ab"))==NULL)
         {
-                v_texto=(char *)texto[43];
+                v_text=(char *)texto[43];
                 show_dialog(err0);
                 return 0;
         }
@@ -296,18 +296,18 @@ FILE *fpg;
         //Relee la informacion del fichero.
         if(!Abrir_FPG(Fpg,(char *)Fpg->ActualFile))
         {
-                v_texto=(char *)texto[43];
+                v_text=(char *)texto[43];
                 show_dialog(err0);
                 return 0;
         }
 
 //*******************************************************
 
-  while (Fpg->lInfoFPG.inicial+(Fpg->lInfoFPG.lineas-1)*Fpg->lInfoFPG.columnas+1>Fpg->lInfoFPG.maximo) {
-    Fpg->lInfoFPG.inicial-=Fpg->lInfoFPG.columnas;
+  while (Fpg->lInfoFPG.first_visible+(Fpg->lInfoFPG.lines-1)*Fpg->lInfoFPG.columns+1>Fpg->lInfoFPG.total_items) {
+    Fpg->lInfoFPG.first_visible-=Fpg->lInfoFPG.columns;
   }
 
-  if (Fpg->lInfoFPG.inicial<0) Fpg->lInfoFPG.inicial=0;
+  if (Fpg->lInfoFPG.first_visible<0) Fpg->lInfoFPG.first_visible=0;
 
   wmouse_x=-1; wmouse_y=-1;
   FPG_update_listbox_br(&Fpg->lInfoFPG);
@@ -316,7 +316,7 @@ FILE *fpg;
 //        paint_listbox(&Fpg->lInfoFPG);
 
 //*******************************************************
-        v.volcar=1;
+        v.redraw=1;
 
 return 1;
 }
@@ -370,7 +370,7 @@ byte MiTabla[256];
                 {
                         fclose(fpg);
                         fclose(Oldfpg);
-                        v_texto=(char *)texto[45]; show_dialog(err0);
+                        v_text=(char *)texto[45]; show_dialog(err0);
                         return 0;
                 }
                 //Comprobar memoria
@@ -382,7 +382,7 @@ byte MiTabla[256];
                                 fclose(fpg);
                                 fclose(Oldfpg);
                                 free(OtraImagen);
-                                v_texto=(char *)texto[45]; show_dialog(err0);
+                                v_text=(char *)texto[45]; show_dialog(err0);
                                 return 0;
                         }
                         fread(OtrosPuntos,MiOtraHeadFPG.nPuntos*2,2,fpg);
@@ -418,7 +418,7 @@ char *Buffer;
         Buffer=(char *)malloc(BUFFERCOPYLEN);
         if(Buffer==NULL)
         {
-                v_texto=(char *)texto[45]; show_dialog(err0);
+                v_text=(char *)texto[45]; show_dialog(err0);
                 return;
         }
         strcpy(full,tipo[4].path);
@@ -464,12 +464,12 @@ char *Buffer;
         div_strcpy((char *)Fpg->NombreFpg, sizeof(Fpg->NombreFpg), input);
 
         wgra(ventana[n].ptr,an,al,c_b_low,2,2,an-20,7);
-        if (text_len(ventana[n].titulo)+3>an-20) {
-          wwrite_in_box(ventana[n].ptr,an,an-19,al,4,2,0,ventana[n].titulo,c1);
-          wwrite_in_box(ventana[n].ptr,an,an-19,al,3,2,0,ventana[n].titulo,c4);
+        if (text_len(ventana[n].title)+3>an-20) {
+          wwrite_in_box(ventana[n].ptr,an,an-19,al,4,2,0,ventana[n].title,c1);
+          wwrite_in_box(ventana[n].ptr,an,an-19,al,3,2,0,ventana[n].title,c4);
         } else {
-          wwrite(ventana[n].ptr,an,al,3+(an-20)/2,2,1,ventana[n].titulo,c1);
-          wwrite(ventana[n].ptr,an,al,2+(an-20)/2,2,1,ventana[n].titulo,c4);
+          wwrite(ventana[n].ptr,an,al,3+(an-20)/2,2,1,ventana[n].title,c1);
+          wwrite(ventana[n].ptr,an,al,2+(an-20)/2,2,1,ventana[n].title,c4);
         } flush_window(n);
 
         fclose(FileOrg);
@@ -543,7 +543,7 @@ debugprintf("found COD at index: %d\n",n);
                         Progress((char *)texto[436],len,len);
                         fclose(fpg);
                         fclose(Oldfpg);
-                        v_texto=(char *)texto[45]; show_dialog(err0);
+                        v_text=(char *)texto[45]; show_dialog(err0);
                         return 0;
                 }
                 //Comprobar memoria
@@ -556,7 +556,7 @@ debugprintf("found COD at index: %d\n",n);
                                 fclose(fpg);
                                 fclose(Oldfpg);
                                 free(OtraImagen);
-                                v_texto=(char *)texto[45]; show_dialog(err0);
+                                v_text=(char *)texto[45]; show_dialog(err0);
                                 return 0;
                         }
                         fread(OtrosPuntos,MiOtraHeadFPG.nPuntos*2,2,fpg);
@@ -643,7 +643,7 @@ int Borrar_muchos_FPG(FPG *Fpg,int taggeds,int *array_del) {
       Progress((char *)texto[436],len,len);
       fclose(fpg);
       fclose(Oldfpg);
-      v_texto=(char *)texto[45]; show_dialog(err0);
+      v_text=(char *)texto[45]; show_dialog(err0);
       return 0;
     }
 
@@ -654,7 +654,7 @@ int Borrar_muchos_FPG(FPG *Fpg,int taggeds,int *array_del) {
         fclose(fpg);
         fclose(Oldfpg);
         free(OtraImagen);
-        v_texto=(char *)texto[45]; show_dialog(err0);
+        v_text=(char *)texto[45]; show_dialog(err0);
         return 0;
       } fread(OtrosPuntos,MiOtraHeadFPG.nPuntos*2,2,fpg);
     }

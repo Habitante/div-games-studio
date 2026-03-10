@@ -26,7 +26,7 @@ void show_thumb(struct t_listboxbr * l, int num);
 #define incremento_maximo 6553600
 int incremento=incremento_maximo;
 
-int opc_img[8]={0,0,1,1,0,1,1,1}; // imagenes on/off en ventanas (v_tipo)
+int opc_img[8]={0,0,1,1,0,1,1,1}; // imagenes on/off en ventanas (v_type)
                                   // 2-MAP, 3-PAL, 5-FNT, 6-IFS, 7-PCM
 int opc_pru=0; // Prueba de sonido on/off para sonidos y musicas
 char input2[32];
@@ -49,18 +49,18 @@ Mix_Chunk * smp=NULL;
 
 /*struct t_listboxbr{
   int x,y;              // Posición del listbox en la ventana
-  char * lista;         // El puntero a la lista
-  int lista_an;         // Nº de carácteres de cada registro
-  int columnas;         // Nº de columnas del listbox browser
-  int lineas;           // Nº de lineas
-  int an,al;            // Tamaño en pixels de cada casilla
+  char * list;         // List pointer
+  int item_width;       // Characters per item
+  int columns;          // Number of columns in browser listbox
+  int lines;            // Number of lines
+  int an,al;            // Pixel size of each cell
 
-  int inicial;          // Registro inicial visualizado (desde 0)
-  int maximo;           // Nº total de registros existentes (0 n/a)
+  int first_visible;    // First visible item index (from 0)
+  int max_items;        // Total item count (0 n/a)
   int s0,s1,slide;      // Posición inicial, final y actual de la "slide bar"
-  int zona;             // Zona seleccionada
-  int botones;          // Indica si esta pulsado el botón up(1) o down(2)
-  int creada;           // Indica si ya está creada la lista en pantalla
+  int zone;             // Selected zone
+  int buttons;          // Pressed button: up(1) or down(2)
+  int created;          // Whether list is already created on screen
 };*/
 
 
@@ -147,7 +147,7 @@ void print_path_br(void) {
 
   if(v_thumb==7)
     wbox_ancho=an-4-12-text_len(texto[419])-12-text_len(texto[567]);
-  else if(v_tipo==16)
+  else if(v_type==16)
     wbox_ancho=an-4-12-text_len(texto[567]);
   else if(v_thumb)
     wbox_ancho=an-4-12-text_len(texto[419]);
@@ -156,9 +156,9 @@ void print_path_br(void) {
 
   wbox(v.ptr,an,al,c12,3,11,wbox_ancho,8);
 
-  strcpy(full,tipo[v_tipo].path);
-  if (tipo[v_tipo].path[strlen(tipo[v_tipo].path)-1]!='/') {
-    strcat(full,"/"); } strcat(full,mascara);
+  strcpy(full,tipo[v_type].path);
+  if (tipo[v_type].path[strlen(tipo[v_type].path)-1]!='/') {
+    strcat(full,"/"); } strcat(full,file_mask);
 
   wwrite_in_box(v.ptr,an,wbox_ancho+2,al,5,12,0,(byte *)full,c1);
   wwrite_in_box(v.ptr,an,wbox_ancho+2,al,4,12,0,(byte *)full,c3);
@@ -217,9 +217,9 @@ void create_thumb_MAP(struct t_listboxbr * l){
     incremento=512;
   } else if (incremento<incremento_maximo) incremento+=512;
 
-  if (l->maximo) {
+  if (l->total_items) {
 
-    num=l->inicial;
+    num=l->first_visible;
     do {
       if (thumb[num].ptr==NULL && thumb[num].status>-1) {
         if (mouse_b==0) estado=1;
@@ -228,17 +228,17 @@ void create_thumb_MAP(struct t_listboxbr * l){
       if (thumb[num].ptr!=NULL && thumb[num].status>0) {
         estado=2; break;
       }
-      if (++num==l->maximo) num=0;
-    } while (num!=l->inicial);
+      if (++num==l->total_items) num=0;
+    } while (num!=l->first_visible);
 
     if (estado==0) { num=-1; return; }
 
     if (estado==1) { // Read a new thumbnail
 		char filename[255];
-		strcpy(filename,l->lista+(l->lista_an*num));
+		strcpy(filename,l->list+(l->item_width*num));
 		strupr(filename);
 		
-      if (strchr(l->lista+(l->lista_an*num),'.')!=NULL &&
+      if (strchr(l->list+(l->item_width*num),'.')!=NULL &&
 	  strcmp(strchr(filename,'.'),".MAP") &&
           strcmp(strchr(filename,'.'),".PCX") &&
           strcmp(strchr(filename,'.'),".BMP") &&
@@ -247,7 +247,7 @@ void create_thumb_MAP(struct t_listboxbr * l){
 
         estado=0; thumb[num].status=-1;
 
-      } else if ((f=fopen(l->lista+(l->lista_an*num),"rb"))!=NULL) {
+      } else if ((f=fopen(l->list+(l->item_width*num),"rb"))!=NULL) {
         fseek(f,0,SEEK_END);
         thumb[num].filesize=ftell(f);
         fseek(f,0,SEEK_SET);
@@ -272,7 +272,7 @@ void create_thumb_MAP(struct t_listboxbr * l){
       return;
     } else if (estado==2 && thumb[num].status!=thumb[num].filesize) { // Se continúa leyendo un thumbnail
 
-      if ((f=fopen(l->lista+(l->lista_an*num),"rb"))!=NULL) {
+      if ((f=fopen(l->list+(l->item_width*num),"rb"))!=NULL) {
         fseek(f,thumb[num].status,SEEK_SET);
         if (thumb[num].filesize-thumb[num].status>incremento) {
           if (fread(thumb[num].ptr+thumb[num].status,1,incremento,f)==incremento) {
@@ -300,18 +300,18 @@ void create_thumb_MAP(struct t_listboxbr * l){
 
       thumb[num].status=0;
 
-      man=map_an; mal=map_al;
+      man=map_width; mal=map_height;
       if (is_MAP((byte *)thumb[num].ptr)) tipomapa=1;
       else if (is_PCX((byte *)thumb[num].ptr)) tipomapa=2;
       else if (is_BMP((byte *)thumb[num].ptr)) tipomapa=3;
       else if (is_JPG((byte *)thumb[num].ptr,thumb[num].filesize)) tipomapa=4;
       else tipomapa=0;
-      swap(man,map_an); swap(mal,map_al);
+      swap(man,map_width); swap(mal,map_height);
 
       if (tipomapa) {
         if ((temp=(byte*)malloc(man*mal+man))!=NULL) {
 		  memset(temp,0,man*mal+man);
-          swap(man,map_an); swap(mal,map_al);
+          swap(man,map_width); swap(mal,map_height);
           n=1;
           switch (tipomapa) {
             case 1: descomprime_MAP((byte *)thumb[num].ptr,temp,0); break;
@@ -320,7 +320,7 @@ void create_thumb_MAP(struct t_listboxbr * l){
             case 4:
               n=descomprime_JPG((byte *)thumb[num].ptr,temp,0,thumb[num].filesize);
             break;
-          } swap(man,map_an); swap(mal,map_al);
+          } swap(man,map_width); swap(mal,map_height);
           free(thumb[num].ptr);
           if(!n) {
             free(temp);
@@ -435,9 +435,9 @@ void create_thumb_PAL(struct t_listboxbr * l)
     incremento=0;
   } else if (incremento<incremento_maximo) incremento+=128;
 
-  if (l->maximo && incremento>=FILE_CHUNK)
+  if (l->total_items && incremento>=FILE_CHUNK)
   {
-    num=l->inicial;
+    num=l->first_visible;
     do
     {
       if (thumb[num].ptr==NULL && thumb[num].status>-1)
@@ -445,11 +445,11 @@ void create_thumb_PAL(struct t_listboxbr * l)
         estado=1;
         break;
       }
-      if (++num==l->maximo) num=0;
-    } while (num!=l->inicial);
+      if (++num==l->total_items) num=0;
+    } while (num!=l->first_visible);
 
     if (estado==0) { num=-1; return; }
-	strcpy(filename,l->lista+(l->lista_an*num));
+	strcpy(filename,l->list+(l->item_width*num));
 	strupr(filename);
     // Se comienza a leer un nuevo thumbnail
     if (!strcmp(strchr(filename,'.'),".FPG"))
@@ -476,13 +476,13 @@ void create_thumb_PAL(struct t_listboxbr * l)
     }
     switch(tipo)
     {
-      case 1: tipo=cargadac_FPG(l->lista+l->lista_an*num); break;
-      case 2: tipo=cargadac_FNT(l->lista+l->lista_an*num); break;
-      case 3: tipo=cargadac_PCX(l->lista+l->lista_an*num); break;
-      case 4: tipo=cargadac_BMP(l->lista+l->lista_an*num); break;
-      case 5: tipo=cargadac_MAP(l->lista+l->lista_an*num); break;
-      case 6: tipo=cargadac_PAL(l->lista+l->lista_an*num); break;
-      case 7: tipo=cargadac_JPG(l->lista+l->lista_an*num); break;
+      case 1: tipo=cargadac_FPG(l->list+l->item_width*num); break;
+      case 2: tipo=cargadac_FNT(l->list+l->item_width*num); break;
+      case 3: tipo=cargadac_PCX(l->list+l->item_width*num); break;
+      case 4: tipo=cargadac_BMP(l->list+l->item_width*num); break;
+      case 5: tipo=cargadac_MAP(l->list+l->item_width*num); break;
+      case 6: tipo=cargadac_PAL(l->list+l->item_width*num); break;
+      case 7: tipo=cargadac_JPG(l->list+l->item_width*num); break;
     }
     if(!tipo)
     {
@@ -568,9 +568,9 @@ void create_thumb_FNT(struct t_listboxbr * l)
     incremento=512;
   } else if (incremento<incremento_maximo) incremento+=512;
 
-  if (l->maximo)
+  if (l->total_items)
   {
-    num=l->inicial;
+    num=l->first_visible;
     do
     {
       if (thumb[num].ptr==NULL && thumb[num].status>-1)
@@ -583,17 +583,17 @@ void create_thumb_FNT(struct t_listboxbr * l)
         estado=2;
         break;
       }
-      if (++num==l->maximo) num=0;
-    } while (num!=l->inicial);
+      if (++num==l->total_items) num=0;
+    } while (num!=l->first_visible);
 
     if (estado==0) { num=-1; return; }
 
     // read a new thumbnail
     if (estado==1)
     {
-		strcpy(filename,l->lista+(l->lista_an*num));
+		strcpy(filename,l->list+(l->item_width*num));
 		strupr(filename);
-		printf("%s %s\n",filename,l->lista+(l->lista_an*num));
+		printf("%s %s\n",filename,l->list+(l->item_width*num));
 		fflush(stdout);
       if(!strcmp(strchr(filename,'.'),".FNT"));
       else
@@ -602,7 +602,7 @@ void create_thumb_FNT(struct t_listboxbr * l)
         thumb[num].status=-1;
         return;
       }
-      if((f=fopen(l->lista+(l->lista_an*num),"rb"))==NULL)
+      if((f=fopen(l->list+(l->item_width*num),"rb"))==NULL)
       {
 	    estado=0;
         thumb[num].status=-1;
@@ -653,7 +653,7 @@ void create_thumb_FNT(struct t_listboxbr * l)
     // Se continúa leyendo un thumbnail
     else if (estado==2 && thumb[num].status!=thumb[num].filesize)
     {
-      if ((f=fopen(l->lista+(l->lista_an*num),"rb"))==NULL)
+      if ((f=fopen(l->list+(l->item_width*num),"rb"))==NULL)
       {
         estado=0;
         thumb[num].status=-1;
@@ -840,9 +840,9 @@ void create_thumb_IFS(struct t_listboxbr * l)
   
   num=-1;
 
-  if (l->maximo)
+  if (l->total_items)
   {
-    num=l->inicial;
+    num=l->first_visible;
     do
     {
       if (thumb[num].ptr==NULL && thumb[num].status>-1)
@@ -850,11 +850,11 @@ void create_thumb_IFS(struct t_listboxbr * l)
         estado=1;
         break;
       }
-      if (++num==l->maximo) num=0;
-    } while (num!=l->inicial);
+      if (++num==l->total_items) num=0;
+    } while (num!=l->first_visible);
 
     if (estado==0) { num=-1; return; }
-	strcpy(filename,l->lista+(l->lista_an*num));
+	strcpy(filename,l->list+(l->item_width*num));
 	strupr(filename);
 	
     if(strcmp(strchr(filename,'.'),".IFS"))
@@ -864,7 +864,7 @@ void create_thumb_IFS(struct t_listboxbr * l)
     }
 
     // Se comienza a leer un nuevo thumbnail
-    if ((fifs=fopen(l->lista+(l->lista_an*num),"rb"))==NULL)
+    if ((fifs=fopen(l->list+(l->item_width*num),"rb"))==NULL)
     {
       thumb[num].status=-1;
       return;
@@ -880,9 +880,9 @@ void create_thumb_IFS(struct t_listboxbr * l)
 
     while (pos<strlen(str)) {
       load_letter(str[pos++]);
-      if (map_an) {
-        ancho+=map_an+1;
-        if (map_al>alto) alto=map_al;
+      if (map_width) {
+        ancho+=map_width+1;
+        if (map_height>alto) alto=map_height;
       }
       if (map!=NULL) { free(map); map=NULL; }
     }
@@ -903,13 +903,13 @@ void create_thumb_IFS(struct t_listboxbr * l)
     pos=0; xini=0;
     while(pos<strlen(str)) {
       load_letter(str[pos++]);
-      if (map_an) {
-        for (y=0;y<map_al;y++) {
-          for (x=0;x<map_an;x++) {
-            if((xini+x)<101*big2) thumb[num].ptr[x+xini+y*ancho]=map[x+y*map_an];
+      if (map_width) {
+        for (y=0;y<map_height;y++) {
+          for (x=0;x<map_width;x++) {
+            if((xini+x)<101*big2) thumb[num].ptr[x+xini+y*ancho]=map[x+y*map_width];
           }
         }
-        xini+=map_an+1;
+        xini+=map_width+1;
       }
       if (map!=NULL) { free(map); map=NULL; }
     }
@@ -976,9 +976,9 @@ void create_thumb_PCM(struct t_listboxbr * l)
     incremento=512;
   } else if (incremento<incremento_maximo) incremento+=512;
 
-  if (l->maximo)
+  if (l->total_items)
   {
-    num=l->inicial;
+    num=l->first_visible;
     do
     {
       if (thumb[num].ptr==NULL && thumb[num].status>-1)
@@ -991,8 +991,8 @@ void create_thumb_PCM(struct t_listboxbr * l)
         estado=2;
         break;
       }
-      if (++num==l->maximo) num=0;
-    } while (num!=l->inicial);
+      if (++num==l->total_items) num=0;
+    } while (num!=l->first_visible);
 
     if (estado==0) { num=-1; return; }
 
@@ -1010,7 +1010,7 @@ void create_thumb_PCM(struct t_listboxbr * l)
       }
 #endif
       mem=(Mi_meminfo.Bloque_mas_grande_disponible+mem-1000000)/2;
-      if((f=fopen(l->lista+(l->lista_an*num),"rb"))==NULL)
+      if((f=fopen(l->list+(l->item_width*num),"rb"))==NULL)
       {
         estado=0;
         thumb[num].status=-1;
@@ -1027,10 +1027,10 @@ void create_thumb_PCM(struct t_listboxbr * l)
         thumb[num].status=-1;
         return;
       }
-      strcpy(filename,l->lista+(l->lista_an*num));
+      strcpy(filename,l->list+(l->item_width*num));
       strupr(filename);
       
-      if (IsWAV(l->lista+(l->lista_an*num)));
+      if (IsWAV(l->list+(l->item_width*num)));
       else if(!strcmp(strchr(filename,'.'),".PCM") );
       else
       {
@@ -1081,7 +1081,7 @@ void create_thumb_PCM(struct t_listboxbr * l)
     // Se continúa leyendo un thumbnail
     else if (estado==2 && thumb[num].status!=thumb[num].filesize)
     {
-      if ((f=fopen(l->lista+(l->lista_an*num),"rb"))==NULL)
+      if ((f=fopen(l->list+(l->item_width*num),"rb"))==NULL)
       {
         estado=0;
         thumb[num].status=-1;
@@ -1125,7 +1125,7 @@ void create_thumb_PCM(struct t_listboxbr * l)
 
 // Comienzo de conversion
 
-      if(IsWAV(l->lista+(l->lista_an*num)))
+      if(IsWAV(l->list+(l->item_width*num)))
       {
         WAV    = thumb[num].ptr;
         length = thumb[num].filesize;
@@ -1307,31 +1307,31 @@ void load_letter(uint8_t letra) {
   uint8_t rtbyte, error=0;
   short pixels,despY;
 
-  map_an=map_al=0;
+  map_width=map_height=0;
   offset=tifs[letra].desp;
   if (fseek(fifs,offset,SEEK_SET)) error=1;
-  if (fread(&map_al,2,1,fifs)<1) error=1;
+  if (fread(&map_height,2,1,fifs)<1) error=1;
   if (fread(&despY,2,1,fifs)<1) error=1;
-  if (fread(&map_an,2,1,fifs)<1) error=1;
+  if (fread(&map_width,2,1,fifs)<1) error=1;
   if (fread(&pixels,2,1,fifs)<1) error=1;
-  if (error) { map_an=0; return; }
+  if (error) { map_width=0; return; }
 
-  t=map_an*8-pixels; map_al+=despY;
+  t=map_width*8-pixels; map_height+=despY;
 
-  if (!map_an || !map_al) { map_an=0; return; }
+  if (!map_width || !map_height) { map_width=0; return; }
 
-  map=(byte*)malloc(map_al*map_an*8);
-  if (map==NULL) { map_an=0; return; }
-  memset(map,c1,map_al*map_an*8);
+  map=(byte*)malloc(map_height*map_width*8);
+  if (map==NULL) { map_width=0; return; }
+  memset(map,c1,map_height*map_width*8);
 
-  for (y=0;y<map_al-despY;y++)
-    for (x=0;x<map_an;x++) {
-      if (fread(&rtbyte,1,1,fifs)<1) { free(map); map=NULL; map_an=0; return; }
+  for (y=0;y<map_height-despY;y++)
+    for (x=0;x<map_width;x++) {
+      if (fread(&rtbyte,1,1,fifs)<1) { free(map); map=NULL; map_width=0; return; }
       for (j=0; j<8; j++)
         if (rtbyte & (1<<j)) map[((y+despY)*pixels+x*8+j)-t]=c3;
     }
 
-  map_an=pixels;
+  map_width=pixels;
 }
 
 //-----------------------------------------------------------------------------
@@ -1344,13 +1344,13 @@ void show_thumb(struct t_listboxbr * l, int num) {
   int px,py,x,y,ly,incy;
   char *p;
 
-  if (num>=l->inicial && num<l->inicial+l->lineas*l->columnas) {
+  if (num>=l->first_visible && num<l->first_visible+l->lines*l->columns) {
 
-    px=(l->x+1+(l->an+1)*((num-l->inicial)%l->columnas))*big2+(l->an*big2-thumb[num].an)/2;
+    px=(l->x+1+(l->an+1)*((num-l->first_visible)%l->columns))*big2+(l->an*big2-thumb[num].an)/2;
     if ((incy=((l->al-8)*big2-thumb[num].al)/2)<0) incy=0;
-    py=(l->y+1+(l->al+1)*((num-l->inicial)/l->columnas))*big2+incy;
+    py=(l->y+1+(l->al+1)*((num-l->first_visible)/l->columns))*big2+incy;
 
-    ly=(l->y+(l->al+1)*((num-l->inicial)/l->columnas)+l->al-8)*big2;
+    ly=(l->y+(l->al+1)*((num-l->first_visible)/l->columns)+l->al-8)*big2;
 
     if (thumb[num].ptr!=NULL && thumb[num].status==0) {
       for(y=0;y<thumb[num].al;y++)
@@ -1372,9 +1372,9 @@ void show_thumb(struct t_listboxbr * l, int num) {
     }
 
     py+=l->al-1;
-    p=l->lista+l->lista_an*num;
+    p=l->list+l->item_width*num;
 
-    if (l->zona-10==num-l->inicial) x=c4; else x=c3;
+    if (l->zone-10==num-l->first_visible) x=c4; else x=c3;
     if (text_len((byte *)p)<l->an-2 && opc_img[v_thumb]) {
       wwrite(ptr,an,al,px+l->an/2+1,py,7,(byte *)p,c0);
       wwrite(ptr,an,al,px+l->an/2,py,7,(byte *)p,x);
@@ -1383,7 +1383,7 @@ void show_thumb(struct t_listboxbr * l, int num) {
       wwrite_in_box(ptr,an,px+l->an-1,al,px+1,py,6,(byte *)p,x);
     }
 
-    v.volcar=1;
+    v.redraw=1;
   }
 }
 
@@ -1394,9 +1394,9 @@ void show_thumb(struct t_listboxbr * l, int num) {
 void browser0(void) {
   unsigned n,m,x;
 
-  v.tipo=1; // Diálogo
-  v.titulo=(byte *)v_texto;
-  v_thumb=v_tipo;
+  v.type=1; // Diálogo
+  v.title=(byte *)v_text;
+  v_thumb=v_type;
 
   num_taggeds = 0;
   ini_tagged  = 0;
@@ -1411,7 +1411,7 @@ void browser0(void) {
     v_thumb=0;
   }
 
-  if(v_thumb==7 || v_tipo==16)
+  if(v_thumb==7 || v_type==16)
   {
     FreeMOD();
     SongCode++;
@@ -1438,27 +1438,27 @@ void browser0(void) {
   v.click_handler=browser2;
   v.close_handler=browser3;
 
-  lextbr.maximo=0; n=0; // Crea la lista de extensiones
+  lextbr.total_items=0; n=0; // Crea la lista de extensiones
 
-  if (v_tipo==2 && v_modo>0) v_tipo=14;
-  if (v_tipo==7 && v_modo>0) v_tipo=11;
+  if (v_type==2 && v_mode>0) v_type=14;
+  if (v_type==7 && v_mode>0) v_type=11;
 
-  while ((x=tipo[v_tipo].ext[n++])) {
+  while ((x=tipo[v_type].ext[n++])) {
     m=0; while (x && x!=' ') {
-      ext[an_ext*lextbr.maximo+m++]=x;
-      if ((x=tipo[v_tipo].ext[n])) n++;
-    } ext[an_ext*(lextbr.maximo++)+m]=0;
+      ext[an_ext*lextbr.total_items+m++]=x;
+      if ((x=tipo[v_type].ext[n])) n++;
+    } ext[an_ext*(lextbr.total_items++)+m]=0;
   }
 
-  if (v_tipo==14) v_tipo=2;
-  if (v_tipo==11) v_tipo=7;
+  if (v_type==14) v_type=2;
+  if (v_type==11) v_type=7;
 
-  if (tipo[v_tipo].defecto>=0 && tipo[v_tipo].defecto<lextbr.maximo)
-    strcpy(input,&ext[an_ext*tipo[v_tipo].defecto]);
+  if (tipo[v_type].default_choice>=0 && tipo[v_type].default_choice<lextbr.total_items)
+    strcpy(input,&ext[an_ext*tipo[v_type].default_choice]);
   else strcpy(input,&ext[0]);
 
-  DIV_STRCPY(mascara,input);
-  v_terminado=0;
+  DIV_STRCPY(file_mask,input);
+  v_finished=0;
 
   _get(126,4,v.al-21,v.an-(24+text_len(texto[100])+text_len(texto[101])),(byte *)input,512,0,0);
 
@@ -1467,26 +1467,26 @@ void browser0(void) {
 
   if (v_thumb) _flag(419,v.an-12-text_len(texto[419]),12,&opc_img[v_thumb]);
 
-  _dos_setdrive(toupper(*tipo[v_tipo].path)-'A'+1,&n);
-  chdir(tipo[v_tipo].path);
+  _dos_setdrive(toupper(*tipo[v_type].path)-'A'+1,&n);
+  chdir(tipo[v_type].path);
 
   open_dir_br(); // Crea la lista de ficheros y directorios
 
-  if (v_modo==1) *input=0;
-  if (v_modo==2) strcpy(input,input2);
+  if (v_mode==1) *input=0;
+  if (v_mode==2) strcpy(input,input2);
 
-  larchivosbr.creada=0; ldirectoriosbr.creada=0;
-  lunidadesbr.creada=0; lextbr.creada=0;
+  larchivosbr.created=0; ldirectoriosbr.created=0;
+  lunidadesbr.created=0; lextbr.created=0;
 
-  n=0; while (unidades[n]) { // Crea la lista de unidades <X:>
-    *(unidad+an_unidad*n)='<'; *(unidad+an_unidad*n+1)=unidades[n];
+  n=0; while (drives[n]) { // Crea la lista de drives <X:>
+    *(unidad+an_unidad*n)='<'; *(unidad+an_unidad*n+1)=drives[n];
     *(unidad+an_unidad*n+2)=':'; *(unidad+an_unidad*n+3)='>';
     *(unidad+an_unidad*n+4)=0; n++;
-  } lunidadesbr.maximo=n;
+  } lunidadesbr.total_items=n;
 
   if(v_thumb==7)
     _flag(567,v.an-12-text_len(texto[419])-12-text_len(texto[567]),12,&opc_pru);
-  else if(v_tipo==16)
+  else if(v_type==16)
     _flag(567,v.an-12-text_len(texto[567]),12,&opc_pru);
 
   if (opc_img[v_thumb])
@@ -1495,22 +1495,22 @@ void browser0(void) {
     {
       case 5:
       case 6:
-        larchivosbr.columnas=2;
+        larchivosbr.columns=2;
         larchivosbr.an=103;
       break;
       default:
-        larchivosbr.columnas=4;
+        larchivosbr.columns=4;
         larchivosbr.an=51;
       break;
     }
-    larchivosbr.lineas=4;
+    larchivosbr.lines=4;
     larchivosbr.al=31;
   }
   else
   {
-    larchivosbr.columnas=3;
+    larchivosbr.columns=3;
     larchivosbr.an=68;
-    larchivosbr.lineas=14;
+    larchivosbr.lines=14;
     larchivosbr.al=8;
   }
 
@@ -1562,7 +1562,7 @@ void browser2(void) {
 
   create_thumbs();
 
-  estado=v.item[0].estado;
+  estado=v.item[0].state;
   _process_items();
 
   if (v.active_item==3)
@@ -1573,37 +1573,37 @@ void browser2(void) {
       {
         case 5:
         case 6:
-          larchivosbr.columnas=2;
+          larchivosbr.columns=2;
           larchivosbr.an=103;
         break;
         default:
-          larchivosbr.columnas=4;
+          larchivosbr.columns=4;
           larchivosbr.an=51;
         break;
       }
-      larchivosbr.lineas=4;
+      larchivosbr.lines=4;
       larchivosbr.al=31;
-      larchivosbr.inicial=0;
+      larchivosbr.first_visible=0;
       larchivosbr.slide=larchivosbr.s0;
-      larchivosbr.s1=larchivosbr.y+(larchivosbr.al*larchivosbr.lineas+larchivosbr.lineas+1)-12;
-      browser1(); v.volcar=1;
+      larchivosbr.s1=larchivosbr.y+(larchivosbr.al*larchivosbr.lines+larchivosbr.lines+1)-12;
+      browser1(); v.redraw=1;
     }
     else
     {
-      larchivosbr.columnas=3;
+      larchivosbr.columns=3;
       larchivosbr.an=68;
-      larchivosbr.lineas=14;
+      larchivosbr.lines=14;
       larchivosbr.al=8;
-      larchivosbr.inicial=0;
+      larchivosbr.first_visible=0;
       larchivosbr.slide=larchivosbr.s0;
-      larchivosbr.s1=larchivosbr.y+(larchivosbr.al*larchivosbr.lineas+larchivosbr.lineas+1)-12;
+      larchivosbr.s1=larchivosbr.y+(larchivosbr.al*larchivosbr.lines+larchivosbr.lines+1)-12;
       for (n=0;n<max_archivos;n++) {
         if (thumb[n].ptr!=NULL) {
           free(thumb[n].ptr); thumb[n].ptr=NULL;
         }
         thumb[n].status=0;
       }
-      browser1(); v.volcar=1;
+      browser1(); v.redraw=1;
     }
   }
 
@@ -1612,8 +1612,8 @@ void browser2(void) {
   update_listbox(&lunidadesbr);
   update_listbox(&lextbr);
 
-  if (v.item[0].estado>=2 && num_taggeds>0) {
-    for(num=0; num<larchivosbr.maximo; num++) thumb[num].tagged=0;
+  if (v.item[0].state>=2 && num_taggeds>0) {
+    for(num=0; num<larchivosbr.total_items; num++) thumb[num].tagged=0;
     num_taggeds=0;
     need_refresh=1;
   }
@@ -1622,25 +1622,25 @@ void browser2(void) {
     case 1:
       if(num_taggeds)
       {
-        v_terminado=1; v_existe=1;
+        v_finished=1; v_exists=1;
         return;
       }
       analyze_input();
     break;
-    case 2: fin_dialogo=1; break;
+    case 2: end_dialog=1; break;
   }
 
-  if ((mouse_b&1) && !(old_mouse_b&1))
+  if ((mouse_b&1) && !(prev_mouse_buttons&1))
   {
-    if (larchivosbr.zona>=10)
+    if (larchivosbr.zone>=10)
     {
-      if(v_tipo!=6 && !v_modo)
+      if(v_type!=6 && !v_mode)
       {
         if(shift_status&3) // SHIFT
         {
-          for(num=0; num<larchivosbr.maximo; num++) thumb[num].tagged=0;
+          for(num=0; num<larchivosbr.total_items; num++) thumb[num].tagged=0;
           num_taggeds=0;
-          selected=larchivosbr.zona-10+larchivosbr.inicial;
+          selected=larchivosbr.zone-10+larchivosbr.first_visible;
           if(selected>ini_tagged) pos1=ini_tagged, pos2=selected;
           else                    pos2=ini_tagged, pos1=selected;
           for(n=pos1; n<=pos2; n++)
@@ -1652,7 +1652,7 @@ void browser2(void) {
         else
         if(shift_status&4) // CTRL
         {
-          selected=larchivosbr.zona-10+larchivosbr.inicial;
+          selected=larchivosbr.zone-10+larchivosbr.first_visible;
           ini_tagged = selected;
           if(thumb[selected].tagged)
           {
@@ -1667,8 +1667,8 @@ void browser2(void) {
         }
         else
         {
-          for(num=0; num<larchivosbr.maximo; num++) thumb[num].tagged=0;
-          selected=larchivosbr.zona-10+larchivosbr.inicial;
+          for(num=0; num<larchivosbr.total_items; num++) thumb[num].tagged=0;
+          selected=larchivosbr.zone-10+larchivosbr.first_visible;
           thumb[selected].tagged = 1;
           num_taggeds            = 1;
           ini_tagged             = selected;
@@ -1676,41 +1676,41 @@ void browser2(void) {
       }
       else
       {
-        for(num=0; num<larchivosbr.maximo; num++) thumb[num].tagged=0;
-        selected=larchivosbr.zona-10+larchivosbr.inicial;
+        for(num=0; num<larchivosbr.total_items; num++) thumb[num].tagged=0;
+        selected=larchivosbr.zone-10+larchivosbr.first_visible;
         thumb[selected].tagged = 1;
         num_taggeds            = 1;
         ini_tagged             = selected;
       }
 
-      browser1(); v.volcar=1;
-      strcpy(full,archivo+(larchivosbr.zona-10+larchivosbr.inicial)*an_archivo);
+      browser1(); v.redraw=1;
+      strcpy(full,archivo+(larchivosbr.zone-10+larchivosbr.first_visible)*an_archivo);
 
       // TODO: Handle CTRL and SHIFT modifier keys
-      if (strcmp(input,full) || ((v_thumb==7 || v_tipo==16) && opc_pru))
+      if (strcmp(input,full) || ((v_thumb==7 || v_type==16) && opc_pru))
       {
         strcpy(input, full);
         browser1();
-        v.volcar=1;
+        v.redraw=1;
 #ifdef MIXER
 
         if(v_thumb==7 && opc_pru) {
 #ifdef NOTYET
           if ( judascfg_device == DEV_NOSOUND) {
             if ( SoundError ) {
-              v_texto=texto[549]; show_dialog(err0);
+              v_text=texto[549]; show_dialog(err0);
             } else {
-              v_texto=texto[548]; show_dialog(err0);
+              v_text=texto[548]; show_dialog(err0);
             } return;
           } else 
 #else
 			if(true) 
 #endif
 			{
-            strcpy(full,tipo[v_tipo].path);
-            if (tipo[v_tipo].path[strlen(tipo[v_tipo].path)-1]!='/')
+            strcpy(full,tipo[v_type].path);
+            if (tipo[v_type].path[strlen(tipo[v_type].path)-1]!='/')
               strcat(full,"/");
-            strcat(full,archivo+(larchivosbr.zona-10+larchivosbr.inicial)*an_archivo);
+            strcat(full,archivo+(larchivosbr.zone-10+larchivosbr.first_visible)*an_archivo);
 
 			Mix_HaltChannel(-1);
 			if ( smp !=NULL)
@@ -1735,12 +1735,12 @@ void browser2(void) {
               while (mouse_b&1) read_mouse();
             }
           }
-        } else if(v_tipo==16 && opc_pru) {
+        } else if(v_type==16 && opc_pru) {
 #ifdef NOTYET
-          strcpy(full,tipo[v_tipo].path);
-          if (tipo[v_tipo].path[strlen(tipo[v_tipo].path)-1]!='/')
+          strcpy(full,tipo[v_type].path);
+          if (tipo[v_type].path[strlen(tipo[v_type].path)-1]!='/')
             strcat(full,"/");
-          strcat(full,archivo+(larchivosbr.zona-10+larchivosbr.inicial)*an_archivo);
+          strcat(full,archivo+(larchivosbr.zone-10+larchivosbr.first_visible)*an_archivo);
 
           if(judas_channel[0].smp) judas_stopsample(0);
           if(smp!=NULL) { judas_freesample(smp); smp=NULL; }
@@ -1763,61 +1763,61 @@ void browser2(void) {
 #endif
         }
       } else {
-        if(num_taggeds==1) v_existe=1, v_terminado=1;
+        if(num_taggeds==1) v_exists=1, v_finished=1;
 #endif
       }
 
-    } else if (ldirectoriosbr.zona>=10) { v.volcar=1;
-      if (tipo[v_tipo].path[strlen(tipo[v_tipo].path)-1]!='/')
-        strcat(tipo[v_tipo].path,"/");
-      strcat(tipo[v_tipo].path,directorio+(ldirectoriosbr.zona-10+
-        ldirectoriosbr.inicial)*an_directorio);
-      chdir(tipo[v_tipo].path);
-      getcwd(tipo[v_tipo].path,PATH_MAX+1);
+    } else if (ldirectoriosbr.zone>=10) { v.redraw=1;
+      if (tipo[v_type].path[strlen(tipo[v_type].path)-1]!='/')
+        strcat(tipo[v_type].path,"/");
+      strcat(tipo[v_type].path,directorio+(ldirectoriosbr.zone-10+
+        ldirectoriosbr.first_visible)*an_directorio);
+      chdir(tipo[v_type].path);
+      getcwd(tipo[v_type].path,PATH_MAX+1);
       print_path_br();
-      larchivosbr.creada=0;
-      ldirectoriosbr.creada=0;
-      tipo[v_tipo].inicial=0;
+      larchivosbr.created=0;
+      ldirectoriosbr.created=0;
+      tipo[v_type].first_visible=0;
       open_dir_br();
 
       create_listbox_br(&larchivosbr);
       create_listbox(&ldirectoriosbr);
-    } else if (lunidadesbr.zona>=10) {
-      _dos_setdrive(unidades[lunidadesbr.zona-10+lunidadesbr.inicial]-'A'+1,&n);
-      getcwd(tipo[v_tipo].path,PATH_MAX+1);
-      if (tipo[v_tipo].path[0]==unidades[lunidadesbr.zona-10+lunidadesbr.inicial]) {
-        print_path_br(); v.volcar=1;
-        larchivosbr.creada=0;
-        ldirectoriosbr.creada=0;
-        tipo[v_tipo].inicial=0;
+    } else if (lunidadesbr.zone>=10) {
+      _dos_setdrive(drives[lunidadesbr.zone-10+lunidadesbr.first_visible]-'A'+1,&n);
+      getcwd(tipo[v_type].path,PATH_MAX+1);
+      if (tipo[v_type].path[0]==drives[lunidadesbr.zone-10+lunidadesbr.first_visible]) {
+        print_path_br(); v.redraw=1;
+        larchivosbr.created=0;
+        ldirectoriosbr.created=0;
+        tipo[v_type].first_visible=0;
         open_dir_br();
 
         create_listbox_br(&larchivosbr);
         create_listbox(&ldirectoriosbr);
       } else {
-        _dos_setdrive(tipo[v_tipo].path[0]-'A'+1,&n);
-        v_texto=(char *)texto[42]; show_dialog(err0); return;
+        _dos_setdrive(tipo[v_type].path[0]-'A'+1,&n);
+        v_text=(char *)texto[42]; show_dialog(err0); return;
       }
-    } else if (lextbr.zona>=10) { v.volcar=1;
-      tipo[v_tipo].defecto=lextbr.zona-10+lextbr.inicial;
-      strcpy(input,ext+(lextbr.zona-10+lextbr.inicial)*an_ext);
-      DIV_STRCPY(mascara,input);
-      tipo[v_tipo].inicial=0;
+    } else if (lextbr.zone>=10) { v.redraw=1;
+      tipo[v_type].default_choice=lextbr.zone-10+lextbr.first_visible;
+      strcpy(input,ext+(lextbr.zone-10+lextbr.first_visible)*an_ext);
+      DIV_STRCPY(file_mask,input);
+      tipo[v_type].first_visible=0;
       print_path_br();
-      larchivosbr.creada=0;
+      larchivosbr.created=0;
       open_dir_br();
 
       browser1();
-      v.volcar=1;
+      v.redraw=1;
     }
   }
 
-  if (v_terminado) fin_dialogo=1;
+  if (v_finished) end_dialog=1;
 
   if(need_refresh)
   {
     call((voidReturnType )v.paint_handler);
-    v.volcar=1;
+    v.redraw=1;
   }
 }
 
@@ -1829,7 +1829,7 @@ void browser3(void) {
   }
 
   _dos_setdrive(toupper(*tipo[1].path)-'A'+1,&n); chdir(tipo[1].path);
-  tipo[v_tipo].inicial=larchivosbr.inicial;
+  tipo[v_type].first_visible=larchivosbr.first_visible;
 
   for (n=0;n<max_archivos;n++) if (thumb[n].ptr!=NULL) {
     free(thumb[n].ptr);
@@ -1840,7 +1840,7 @@ void browser3(void) {
     song_playing=0;
   }
 
-  if(v_tipo==16) FreeMOD();
+  if(v_type==16) FreeMOD();
 #ifdef NOTYET
   if(v_thumb==7) {
     if(judas_channel[0].smp) judas_stopsample(0);
@@ -1857,12 +1857,12 @@ void open_dir_br(void) {
   unsigned n,m;
   struct find_t fileinfo;
 
-  n=0; m=_dos_findfirst(mascara,_A_NORMAL,&fileinfo);
+  n=0; m=_dos_findfirst(file_mask,_A_NORMAL,&fileinfo);
   while (m==0 && n<max_archivos) {
     strcpy(archivo+n++*an_archivo,fileinfo.name);
     m=_dos_findnext(&fileinfo);
-  } larchivosbr.maximo=n;
-  qsort(archivo,larchivosbr.maximo,(size_t)an_archivo,(int (*)(const void *, const void *))strcmp);
+  } larchivosbr.total_items=n;
+  qsort(archivo,larchivosbr.total_items,(size_t)an_archivo,(int (*)(const void *, const void *))strcmp);
 
   n=0; m=_dos_findfirst("*.*",_A_SUBDIR,&fileinfo);
   while (m==0 && n<max_directorios) {
@@ -1870,8 +1870,8 @@ void open_dir_br(void) {
       strcpy(directorio+n++*an_directorio,fileinfo.name);
    }
     m=_dos_findnext(&fileinfo);
-  } ldirectoriosbr.maximo=n;
-  qsort(directorio,ldirectoriosbr.maximo,an_directorio,(int (*)(const void *, const void *))strcmp);
+  } ldirectoriosbr.total_items=n;
+  qsort(directorio,ldirectoriosbr.total_items,an_directorio,(int (*)(const void *, const void *))strcmp);
 
   for (n=0;n<max_archivos;n++) {
     if (thumb[n].ptr!=NULL) {
@@ -1895,27 +1895,27 @@ void paint_listbox_br(struct t_listboxbr * l) {
 
   color_tag = c_b_low;
 
-  for(y=0;y<l->lineas;y++)
-    for(x=0; x<l->columnas; x++) {
+  for(y=0;y<l->lines;y++)
+    for(x=0; x<l->columns; x++) {
       wbox(ptr,an,al,c1,l->x+(x*(l->an+1))+1,l->y+(y*(l->al+1))+1,l->an,l->al-8);
-      if(thumb[l->inicial+y*l->columnas+x].tagged)
+      if(thumb[l->first_visible+y*l->columns+x].tagged)
         wbox(ptr,an,al,color_tag,l->x+(x*(l->an+1))+1,l->y+(y*(l->al+1))+1+l->al-8,l->an,8);
       else
         wbox(ptr,an,al,c01,l->x+(x*(l->an+1))+1,l->y+(y*(l->al+1))+1+l->al-8,l->an,8);
     }
 
-  if (wmouse_in(l->x,l->y,(l->an+1)*l->columnas,(l->al+1)*l->lineas)) { // Calcula zona
-    l->zona=((mouse_x-v.x)/big2-l->x)/(l->an+1)+(((mouse_y-v.y)/big2-l->y)/(l->al+1))*l->columnas;
-    if (l->zona>=l->maximo-l->inicial || l->zona>=l->lineas*l->columnas) l->zona=1;
-    else l->zona+=10;
-  } else if (wmouse_in(l->x+(l->an+1)*l->columnas,l->y,9,9)) l->zona=2;
-  else if (wmouse_in(l->x+(l->an+1)*l->columnas,l->y+(l->al+1)*l->lineas-8,9,9)) l->zona=3;
-  else if (wmouse_in(l->x+(l->an+1)*l->columnas,l->y+9,9,(l->al+1)*l->lineas-17)) l->zona=4;
-  else l->zona=0;
+  if (wmouse_in(l->x,l->y,(l->an+1)*l->columns,(l->al+1)*l->lines)) { // Calcula zona
+    l->zone=((mouse_x-v.x)/big2-l->x)/(l->an+1)+(((mouse_y-v.y)/big2-l->y)/(l->al+1))*l->columns;
+    if (l->zone>=l->total_items-l->first_visible || l->zone>=l->lines*l->columns) l->zone=1;
+    else l->zone+=10;
+  } else if (wmouse_in(l->x+(l->an+1)*l->columns,l->y,9,9)) l->zone=2;
+  else if (wmouse_in(l->x+(l->an+1)*l->columns,l->y+(l->al+1)*l->lines-8,9,9)) l->zone=3;
+  else if (wmouse_in(l->x+(l->an+1)*l->columns,l->y+9,9,(l->al+1)*l->lines-17)) l->zone=4;
+  else l->zone=0;
 
-  n=l->maximo-l->inicial;
-  if (n>l->lineas*l->columnas) n=l->lineas*l->columnas;
-  while (n>0) show_thumb(l,l->inicial+--n);
+  n=l->total_items-l->first_visible;
+  if (n>l->lines*l->columns) n=l->lines*l->columns;
+  while (n>0) show_thumb(l,l->first_visible+--n);
 
 }
 
@@ -1925,10 +1925,10 @@ void paint_slider_br(struct t_listboxbr * l) {
   int an=v.an,al=v.al;
   if (big) { an/=2; al/=2; }
 
-  wbox(ptr,an,al,c2,l->x+(l->an+1)*l->columnas+1,l->y+9,7,(l->al+1)*l->lineas-17);
-  if (l->slide>l->s0) wbox(ptr,an,al,c0,l->x+(l->an+1)*l->columnas+1,l->slide-1,7,1);
-  if (l->slide<l->s1) wbox(ptr,an,al,c0,l->x+(l->an+1)*l->columnas+1,l->slide+3,7,1);
-  wput(ptr,an,al,l->x+(l->an+1)*l->columnas+1,l->slide,43);
+  wbox(ptr,an,al,c2,l->x+(l->an+1)*l->columns+1,l->y+9,7,(l->al+1)*l->lines-17);
+  if (l->slide>l->s0) wbox(ptr,an,al,c0,l->x+(l->an+1)*l->columns+1,l->slide-1,7,1);
+  if (l->slide<l->s1) wbox(ptr,an,al,c0,l->x+(l->an+1)*l->columns+1,l->slide+3,7,1);
+  wput(ptr,an,al,l->x+(l->an+1)*l->columns+1,l->slide,43);
 
 }
 
@@ -1938,30 +1938,30 @@ void create_listbox_br(struct t_listboxbr * l) {
   int an=v.an/big2,al=v.al/big2;
   int x,y;
 
-  if (!l->creada) {
+  if (!l->created) {
     l->slide=l->s0=l->y+9;
-    l->s1=l->y+(l->al*l->lineas+l->lineas+1)-12;
-    l->botones=0;
-    l->creada=1;
-    l->zona=0;
+    l->s1=l->y+(l->al*l->lines+l->lines+1)-12;
+    l->buttons=0;
+    l->created=1;
+    l->zone=0;
     if (l==&larchivosbr) {
-      l->inicial=tipo[v_tipo].inicial;
-      if ((l->inicial+(l->lineas-1)*l->columnas)>=l->maximo) {
-        l->inicial=0;
+      l->first_visible=tipo[v_type].first_visible;
+      if ((l->first_visible+(l->lines-1)*l->columns)>=l->total_items) {
+        l->first_visible=0;
       }
-    } else l->inicial=0;
+    } else l->first_visible=0;
   }
 
-  wbox(ptr,an,al,c1,l->x,l->y,(l->an+1)*l->columnas,(l->al+1)*l->lineas);
+  wbox(ptr,an,al,c1,l->x,l->y,(l->an+1)*l->columns,(l->al+1)*l->lines);
 
-  for (y=0;y<l->lineas;y++)
-    for (x=0;x<l->columnas;x++)
+  for (y=0;y<l->lines;y++)
+    for (x=0;x<l->columns;x++)
       wrectangle(ptr,an,al,c0,l->x+(x*(l->an+1)),l->y+(y*(l->al+1)),l->an+2,l->al+2);
 
-  wrectangle(ptr,an,al,c0,l->x+(l->an+1)*l->columnas,l->y,9,(l->al+1)*l->lineas+1);
-  wrectangle(ptr,an,al,c0,l->x+(l->an+1)*l->columnas,l->y+8,9,(l->al+1)*l->lineas-15);
-  wput(ptr,an,al,l->x+(l->an+1)*l->columnas+1,l->y+1,-39);
-  wput(ptr,an,al,l->x+(l->an+1)*l->columnas+1,l->y+(l->al+1)*l->lineas-7,-40);
+  wrectangle(ptr,an,al,c0,l->x+(l->an+1)*l->columns,l->y,9,(l->al+1)*l->lines+1);
+  wrectangle(ptr,an,al,c0,l->x+(l->an+1)*l->columns,l->y+8,9,(l->al+1)*l->lines-15);
+  wput(ptr,an,al,l->x+(l->an+1)*l->columns+1,l->y+1,-39);
+  wput(ptr,an,al,l->x+(l->an+1)*l->columns+1,l->y+(l->al+1)*l->lines-7,-40);
 
   paint_listbox_br(l);
   paint_slider_br(l);
@@ -1975,87 +1975,87 @@ void create_listbox_br(struct t_listboxbr * l) {
 void update_listbox_br(struct t_listboxbr * l) {
   byte * ptr=v.ptr, *p;
   int an=v.an/big2,al=v.al/big2;
-  int n,old_zona=l->zona,x,y;
+  int n,old_zona=l->zone,x,y;
 
-  if (wmouse_in(l->x,l->y,(l->an+1)*l->columnas,(l->al+1)*l->lineas)) { // Calcula zona
-    l->zona=(wmouse_x-l->x)/(l->an+1)+((wmouse_y-l->y)/(l->al+1))*l->columnas;
-    if (l->zona>=l->maximo-l->inicial || l->zona>=l->lineas*l->columnas) l->zona=1;
-    else l->zona+=10;
-  } else if (wmouse_in(l->x+(l->an+1)*l->columnas,l->y,9,9)) l->zona=2;
-  else if (wmouse_in(l->x+(l->an+1)*l->columnas,l->y+(l->al+1)*l->lineas-8,9,9)) l->zona=3;
-  else if (wmouse_in(l->x+(l->an+1)*l->columnas,l->y+9,9,(l->al+1)*l->lineas-17)) l->zona=4;
-  else l->zona=0;
+  if (wmouse_in(l->x,l->y,(l->an+1)*l->columns,(l->al+1)*l->lines)) { // Calcula zona
+    l->zone=(wmouse_x-l->x)/(l->an+1)+((wmouse_y-l->y)/(l->al+1))*l->columns;
+    if (l->zone>=l->total_items-l->first_visible || l->zone>=l->lines*l->columns) l->zone=1;
+    else l->zone+=10;
+  } else if (wmouse_in(l->x+(l->an+1)*l->columns,l->y,9,9)) l->zone=2;
+  else if (wmouse_in(l->x+(l->an+1)*l->columns,l->y+(l->al+1)*l->lines-8,9,9)) l->zone=3;
+  else if (wmouse_in(l->x+(l->an+1)*l->columns,l->y+9,9,(l->al+1)*l->lines-17)) l->zone=4;
+  else l->zone=0;
 
-  if (old_zona!=l->zona) if (old_zona>=10) { // Desmarca zona
-    x=l->x+1+((old_zona-10)%l->columnas)*(l->an+1);
-    y=l->y+l->al+((old_zona-10)/l->columnas)*(l->al+1);
-    p=(byte *)l->lista+l->lista_an*(l->inicial+old_zona-10);
+  if (old_zona!=l->zone) if (old_zona>=10) { // Desmarca zona
+    x=l->x+1+((old_zona-10)%l->columns)*(l->an+1);
+    y=l->y+l->al+((old_zona-10)/l->columns)*(l->al+1);
+    p=(byte *)l->list+l->item_width*(l->first_visible+old_zona-10);
     if (text_len(p)<l->an-2 && opc_img[v_thumb]) {
       wwrite(ptr,an,al,x+l->an/2,y,7,p,c3);
     } else {
       wwrite_in_box(ptr,an,x+l->an-1,al,x+1,y,6,p,c3);
-    } v.volcar=1;
+    } v.redraw=1;
   }
 
-  if ((l->zona>0 && mouse_b&8) || (l->zona==2 && (mouse_b&1))) {
-    if (old_mouse_b&1) { retrace_wait(); retrace_wait(); retrace_wait(); retrace_wait(); }
-      if (l->inicial) {
-        l->inicial-=l->columnas; paint_listbox_br(l); v.volcar=1; }
-      wput(ptr,an,al,l->x+(l->an+1)*l->columnas+1,l->y+1,-41);
-      l->botones|=1; v.volcar=1;
-  } else if (l->botones&1) {
-    wput(ptr,an,al,l->x+(l->an+1)*l->columnas+1,l->y+1,-39);
-    l->botones^=1; v.volcar=1;
+  if ((l->zone>0 && mouse_b&8) || (l->zone==2 && (mouse_b&1))) {
+    if (prev_mouse_buttons&1) { retrace_wait(); retrace_wait(); retrace_wait(); retrace_wait(); }
+      if (l->first_visible) {
+        l->first_visible-=l->columns; paint_listbox_br(l); v.redraw=1; }
+      wput(ptr,an,al,l->x+(l->an+1)*l->columns+1,l->y+1,-41);
+      l->buttons|=1; v.redraw=1;
+  } else if (l->buttons&1) {
+    wput(ptr,an,al,l->x+(l->an+1)*l->columns+1,l->y+1,-39);
+    l->buttons^=1; v.redraw=1;
   }
 
-  if ((l->zona>0 && mouse_b&4) || (l->zona==3 && (mouse_b&1))) {
-    if (old_mouse_b&1) { retrace_wait(); retrace_wait(); retrace_wait(); retrace_wait(); }
-    n=l->maximo-l->inicial;
-    if (n>l->lineas*l->columnas) {
-      l->inicial+=l->columnas; paint_listbox_br(l); v.volcar=1; }
-    wput(ptr,an,al,l->x+(l->an+1)*l->columnas+1,l->y+(l->al+1)*l->lineas-7,-42);
-    l->botones|=2; v.volcar=1;
-  } else if (l->botones&2) {
-    wput(ptr,an,al,l->x+(l->an+1)*l->columnas+1,l->y+(l->al+1)*l->lineas-7,-40);
-    l->botones^=2; v.volcar=1;
+  if ((l->zone>0 && mouse_b&4) || (l->zone==3 && (mouse_b&1))) {
+    if (prev_mouse_buttons&1) { retrace_wait(); retrace_wait(); retrace_wait(); retrace_wait(); }
+    n=l->total_items-l->first_visible;
+    if (n>l->lines*l->columns) {
+      l->first_visible+=l->columns; paint_listbox_br(l); v.redraw=1; }
+    wput(ptr,an,al,l->x+(l->an+1)*l->columns+1,l->y+(l->al+1)*l->lines-7,-42);
+    l->buttons|=2; v.redraw=1;
+  } else if (l->buttons&2) {
+    wput(ptr,an,al,l->x+(l->an+1)*l->columns+1,l->y+(l->al+1)*l->lines-7,-40);
+    l->buttons^=2; v.redraw=1;
   }
 
-  if (l->zona==4 && (mouse_b&1)) {
+  if (l->zone==4 && (mouse_b&1)) {
     l->slide=wmouse_y-1;
     if (l->slide<l->s0) l->slide=l->s0;
     else if (l->slide>l->s1) l->slide=l->s1;
 
-    if (l->maximo>l->lineas*l->columnas) {
-      n=(l->maximo-l->lineas*l->columnas+l->columnas-1)/l->columnas;
+    if (l->total_items>l->lines*l->columns) {
+      n=(l->total_items-l->lines*l->columns+l->columns-1)/l->columns;
 
       n=0.5+(float)(n*(l->slide-l->s0))/(l->s1-l->s0);
 
-      if (n!=l->inicial/l->columnas) { l->inicial=n*l->columnas; paint_listbox_br(l); }
-    } paint_slider_br(l); v.volcar=1;
+      if (n!=l->first_visible/l->columns) { l->first_visible=n*l->columns; paint_listbox_br(l); }
+    } paint_slider_br(l); v.redraw=1;
 
   } else {
 
-    if (l->maximo<=l->lineas*l->columnas) n=l->s0;
+    if (l->total_items<=l->lines*l->columns) n=l->s0;
     else {
-      n=(l->maximo-l->lineas*l->columnas+l->columnas-1)/l->columnas;
+      n=(l->total_items-l->lines*l->columns+l->columns-1)/l->columns;
 
-      n=(l->s0*(n-l->inicial/l->columnas)+l->s1*(l->inicial/l->columnas))/n;
+      n=(l->s0*(n-l->first_visible/l->columns)+l->s1*(l->first_visible/l->columns))/n;
     }
-    if (n!=l->slide) { l->slide=n; paint_slider_br(l); v.volcar=1; }
+    if (n!=l->slide) { l->slide=n; paint_slider_br(l); v.redraw=1; }
   }
 
-  if (old_zona!=l->zona) if (l->zona>=10) { // Marca zona
-    x=l->x+1+((l->zona-10)%l->columnas)*(l->an+1);
-    y=l->y+l->al+((l->zona-10)/l->columnas)*(l->al+1);
-    p=(byte *)l->lista+l->lista_an*(l->inicial+l->zona-10);
+  if (old_zona!=l->zone) if (l->zone>=10) { // Marca zona
+    x=l->x+1+((l->zone-10)%l->columns)*(l->an+1);
+    y=l->y+l->al+((l->zone-10)/l->columns)*(l->al+1);
+    p=(byte *)l->list+l->item_width*(l->first_visible+l->zone-10);
     if (text_len(p)<l->an-2 && opc_img[v_thumb]) {
       wwrite(ptr,an,al,x+l->an/2,y,7,p,c4);
     } else {
       wwrite_in_box(ptr,an,x+l->an-1,al,x+1,y,6,p,c4);
-    } v.volcar=1;
+    } v.redraw=1;
   }
 
-  switch (l->zona) {
+  switch (l->zone) {
     case 2: mouse_graf=7; break;
     case 3: mouse_graf=9; break;
     case 4: mouse_graf=13; break;

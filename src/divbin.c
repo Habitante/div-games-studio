@@ -32,12 +32,12 @@ void Bin2(void)
 	FPG *MiMemoFPG;
 	struct tventana MiVentana;
 
-	if(arrastrar==4) {
+	if(dragging==4) {
 		
-		arrastrar=5; 
+		dragging=5; 
 		free_drag=0;
 		
-		switch(ventana[1].tipo) {
+		switch(ventana[1].type) {
 
 			case 100: // Map dragged to bin from desktop (alias for close map)
 				MiVentana=v;
@@ -47,30 +47,30 @@ void Bin2(void)
 			break;
 
 			case 101: // Item dragged from FPG to bin. Remove from FPG
-				v_titulo=(char *)texto[60];
-				v_texto=ventana[1].mapa->descripcion;
+				v_title=(char *)texto[60];
+				v_text=ventana[1].mapa->description;
 				show_dialog(aceptar0);
 
-				if(v_aceptar) {
+				if(v_accept) {
 					MiVentana=v;
 					MiMemoFPG=(FPG *)ventana[1].aux;
-					Borrar_FPG(MiMemoFPG,ventana[1].mapa->Codigo);
+					Borrar_FPG(MiMemoFPG,ventana[1].mapa->fpg_code);
 					v=ventana[1];
 
-					//if (MiMemoFPG->lInfoFPG.inicial+MiMemoFPG->lInfoFPG.lineas*MiMemoFPG->lInfoFPG.columnas>MiMemoFPG->lInfoFPG.maximo
-					//    && MiMemoFPG->lInfoFPG.inicial) MiMemoFPG->lInfoFPG.inicial--;
+					//if (MiMemoFPG->lInfoFPG.first_visible+MiMemoFPG->lInfoFPG.lines*MiMemoFPG->lInfoFPG.columns>MiMemoFPG->lInfoFPG.total_items
+					//    && MiMemoFPG->lInfoFPG.first_visible) MiMemoFPG->lInfoFPG.first_visible--;
 
-					while (MiMemoFPG->lInfoFPG.inicial+(MiMemoFPG->lInfoFPG.lineas-1)*MiMemoFPG->lInfoFPG.columnas+1>MiMemoFPG->lInfoFPG.maximo) {
-						MiMemoFPG->lInfoFPG.inicial-=MiMemoFPG->lInfoFPG.columnas;
+					while (MiMemoFPG->lInfoFPG.first_visible+(MiMemoFPG->lInfoFPG.lines-1)*MiMemoFPG->lInfoFPG.columns+1>MiMemoFPG->lInfoFPG.total_items) {
+						MiMemoFPG->lInfoFPG.first_visible-=MiMemoFPG->lInfoFPG.columns;
 					}
 
-					if (MiMemoFPG->lInfoFPG.inicial<0) MiMemoFPG->lInfoFPG.inicial=0;
+					if (MiMemoFPG->lInfoFPG.first_visible<0) MiMemoFPG->lInfoFPG.first_visible=0;
 
 					// FPG_paint_listbox_br(&MiMemoFPG->lInfoFPG);
 
 					FPG_update_listbox_br(&MiMemoFPG->lInfoFPG);
 
-					v.volcar=1;
+					v.redraw=1;
 					v=MiVentana;
 				}
 			break;
@@ -83,13 +83,13 @@ void Bin2(void)
 
 void Bin0(void)
 {
-	v.tipo=5;
+	v.type=5;
 	v.an=27;
 	v.al=34;
 	v.paint_handler=Bin1;
 	v.click_handler=Bin2;
-	v.titulo=(byte *)"";
-	v.nombre=texto[350];
+	v.title=(byte *)"";
+	v.name=texto[350];
 }
 
 void muestra_papelera()

@@ -318,7 +318,7 @@ void calc2(void) {
   oldcint = pcalc->cint;
   oldchex = pcalc->chex;
 
-  if (v.estado) superget=1; else superget=0;
+  if (v.state) superget=1; else superget=0;
   get=pcalc->cget;
   _process_items();    call(v.paint_handler);
 
@@ -336,7 +336,7 @@ void calc2(void) {
     } else strcpy(pcalc->cresult,(char *)texto[417]);
     wbox(v.ptr,an,al,c12,4,12,an-8-22-26,6);
     wwrite(v.ptr,an,al,4,12,0,(byte *)pcalc->cresult,c3);
-    v.volcar=1;
+    v.redraw=1;
   }
 }
 
@@ -345,11 +345,11 @@ void calc3(void) {
 }
 
 void calc0(void) {
-  v.tipo=102;
+  v.type=102;
   v.an=120;
   v.al=34;
-  v.titulo=texto[413];
-  v.nombre=texto[413];
+  v.title=texto[413];
+  v.name=texto[413];
   v.paint_handler=calc1;
   v.click_handler=calc2;
   v.close_handler=calc3;

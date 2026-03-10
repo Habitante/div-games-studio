@@ -392,9 +392,9 @@ struct _fileinfo { // x1
 GLOBAL struct _fileinfo * fileinfo;
 
 struct _video_modes { // x100
-  int ancho;          // Ancho del modo
-  int alto;           // alto del modo
-  int modo;           // Numero del modo
+  int width;          // Width of the video mode
+  int height;         // Height of the video mode
+  int mode;           // Video mode number
 };
 
 GLOBAL struct _video_modes * video_modes;
@@ -538,7 +538,7 @@ GLOBAL FILE * tabfiles[32]; // Tabla con los handles abiertos (a 0 los libres)
 // Variables globales para la interpretación - VARIABLES GRAFICAS
 //-----------------------------------------------------------------------------
 
-GLOBAL int vga_an,vga_al; // Dimensiones de la pantalla física
+GLOBAL int vga_width,vga_height; // Dimensiones de la pantalla física
 GLOBAL int vwidth, vheight; // Screen window dimensions
 GLOBAL int vvga_an,vvga_al; // Dimensiones de la pantalla física
 
@@ -572,7 +572,7 @@ GLOBAL int paleta_cargada; // Indica si ya se ha cargado alguna paleta
 
 GLOBAL int activar_paleta; // Indica si ya se ha cargado alguna paleta
 
-GLOBAL byte * cuad;
+GLOBAL byte * color_lookup;
 
 //-----------------------------------------------------------------------------
 // Textos de salida, en formato traducible
@@ -667,7 +667,7 @@ GLOBAL fnt_info f_i[max_fonts];
 #define max_textos 256  // Número máximo de textos en ejecución
 
 typedef struct _t_texto {
-  int tipo;     // Tipo de texto 0-normal, 1-&variable
+  int type;     // Tipo de texto 0-normal, 1-&variable
   byte * font;  // Puntero al font (byte h,car[256].an/.dir,data...)
   int x,y;      // Coordenadas del texto
   int ptr;      // Texto
@@ -686,7 +686,7 @@ GLOBAL t_texto texto[max_textos+1];
 #define max_drawings 16384 // Número máximo de primitivas en ejecución
 
 typedef struct _t_drawing {
-  int tipo;     // Tipo de primitiva 0-n/a, 1-linea, ...
+  int type;     // Tipo de primitiva 0-n/a, 1-linea, ...
   int color;    // color de la primitiva
   int porcentaje; // 0 Mínimo ... 15 Opaco
   int region;   // Región de clipping
@@ -700,7 +700,7 @@ GLOBAL t_drawing drawing[max_drawings];
 // Sistema de volcados parciales (juegos sin scroll) - Aún no implementado
 //-----------------------------------------------------------------------------
 
-GLOBAL int volcado_completo; // Indica si se ha modificado toda la copia de vga
+GLOBAL int full_redraw; // Indica si se ha modificado toda la copia de vga
                              // Por ahora se mantiene siempre a 1
 
 // Ya se ha implementado, la variable que controla ahora el tipo de
@@ -714,7 +714,7 @@ struct _im7 {
   int on,painted;
   int x,y,an,al;
   byte *map,*ext;
-  int map_an,map_al;
+  int map_width,map_height;
   int ext_an,ext_al;
 };
 
@@ -808,7 +808,7 @@ GLOBAL int buffer_an,buffer_al;         // Width & Height of buffer
 
 // char     8   header "fpg\x1a\x0d\x0a\x00\x00"
 // char   768   dac
-// char 16*36   reglas de color
+// char 16*36   gradients de color
 // --------------------- 1 ---------------------------
 // int      1   codigo	 del grafico (000-999)
 // int      1   longitud del grafico incluida cabezera
@@ -838,17 +838,17 @@ GLOBAL byte c0,c1,c2,c3,c4,text_color; // Colores del main_loop
 GLOBAL byte c01,c12,c23,c34; // Colores intermedios
 GLOBAL byte c_r,c_g,c_b,c_r_low,c_g_low,c_b_low;
 
-GLOBAL byte * fondo_raton; // Buffer para guardar el fondo del ratón
+GLOBAL byte * mouse_background; // Buffer to save the mouse background
 
 GLOBAL byte * graf_ptr, * graf[256];    // Gráficos del main_loop
 GLOBAL byte * text_font; // Font estándar, 7 puntos de alto, ancho proporcional
 
 GLOBAL int wmouse_x,wmouse_y; // Ratón dentro de una ventana
-GLOBAL int old_mouse_b;
+GLOBAL int prev_mouse_buttons;
 
 typedef struct _t_item {
-  int tipo;             // 0-ninguno,1-boton,2-get,3-switch
-  int estado;           // Estado del item (raton sobre él, pulsado o no ...)
+  int type;             // 0-none, 1-button, 2-get, 3-switch
+  int state;            // Item state (mouse hover, pressed, etc.)
   union {
     struct {
       byte * texto;
@@ -869,14 +869,14 @@ typedef struct _t_item {
 }t_item;
 
 typedef struct _tventana {
-  int tipo;                             // 0-n/a, 1-diálogo
-  int primer_plano;                     // 1-si 0-no (oscurecida)
-  byte * titulo;                        // Nombre en la barra de título
+  int type;                             // 0-n/a, 1-dialog
+  int foreground;                       // 1-yes 0-no (darkened)
+  byte * title;                         // Title bar text
   voidReturnType paint_handler,click_handler,close_handler;
-  int x,y,an,al;                        // Posición y dimensiones de la ventana
-  byte * ptr;                           // Buffer de la ventana
-  int estado;
-  int volcar;                           // Indica si se debe volcar la ventana
+  int x,y,an,al;                        // Window position and dimensions
+  byte * ptr;                           // Window buffer
+  int state;
+  int redraw;                           // Needs-redraw flag
   t_item item[max_items];        // Botones, gets, switches, etc...
   int items;                            // Nº de objetos definidos
   int active_item;                      // Cuando algún item produce un efecto
@@ -886,24 +886,24 @@ typedef struct _tventana {
 GLOBAL tventana ventana[max_windows];
 
 struct t_listbox{
-  int x,y;              // Posición del listbox en la ventana
-  char * lista;         // El puntero a la lista
-  int lista_an;         // Nº de carácteres de cada registro
-  int lista_al;         // Nº de registros visualizados de una vez
-  int an,al;            // Ancho en pixels de la zona de texto
-  int inicial;          // Registro inicial visualizado (desde 0)
-  int maximo;           // Nº total de registros existentes (0 n/a)
-  int s0,s1,slide;      // Posición inicial, final y actual de la "slide bar"
-  int zona;             // Zona seleccionada
-  int botones;          // Indica si esta pulsado el botón up(1) o down(2)
-  int creada;           // Indica si ya está creada la lista en pantalla
+  int x,y;              // Listbox position in window
+  char * list;          // List pointer
+  int item_width;       // Characters per item
+  int visible_items;    // Visible item count
+  int an,al;            // Text zone width in pixels
+  int first_visible;    // First visible index (from 0)
+  int total_items;        // Total item count (0 n/a)
+  int s0,s1,slide;      // Slide bar start, end, current position
+  int zone;             // Selected zone
+  int buttons;          // Pressed button: up(1) or down(2)
+  int created;          // Whether list is already created on screen
 };
 
-GLOBAL char * v_titulo;                 // Título de la ventana
-GLOBAL char * v_texto;                  // Texto de la ventana
-GLOBAL int v_aceptar;                   // Acceptar / Cancelar
+GLOBAL char * v_title;                  // Título de la ventana
+GLOBAL char * v_text;                   // Texto de la ventana
+GLOBAL int v_accept;                    // Acceptar / Cancelar
 
-GLOBAL int fin_dialogo;
+GLOBAL int end_dialog;
 
 GLOBAL int debugger_step,call_to_debug,process_stoped;
 
@@ -1048,7 +1048,7 @@ GLOBAL unsigned divnum;
 //  Modos de video
 //-----------------------------------------------------------------------------
 
-GLOBAL int VersionVesa;
+GLOBAL int vesa_version;
 
 void detect_vesa(void);
 

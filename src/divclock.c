@@ -17,7 +17,7 @@ static void Show_Time(void) {
   char cBuff[3];
   int Dig1, Dig2, Dig3, Dig4;
 
-  if (v.primer_plano != 2 || v.al > v._al) {
+  if (v.foreground != 2 || v.al > v._al) {
     an = v.an; al = v.al;
   } else {
     an = v._an; al = v._al;
@@ -37,10 +37,10 @@ static void Show_Time(void) {
   Dig3 = (cBuff[0] - '0') + 200;
   Dig4 = (cBuff[1] - '0') + 200;
 
-  if (ORDig1 != Dig1) { wput(ptr, an, al, 8, 14, Dig1); v.volcar = 1; ORDig1 = Dig1; }
-  if (ORDig2 != Dig2) { wput(ptr, an, al, 15, 14, Dig2); v.volcar = 1; ORDig2 = Dig2; }
-  if (ORDig3 != Dig3) { wput(ptr, an, al, 26, 14, Dig3); v.volcar = 1; ORDig3 = Dig3; }
-  if (ORDig4 != Dig4) { wput(ptr, an, al, 33, 14, Dig4); v.volcar = 1; ORDig4 = Dig4; }
+  if (ORDig1 != Dig1) { wput(ptr, an, al, 8, 14, Dig1); v.redraw = 1; ORDig1 = Dig1; }
+  if (ORDig2 != Dig2) { wput(ptr, an, al, 15, 14, Dig2); v.redraw = 1; ORDig2 = Dig2; }
+  if (ORDig3 != Dig3) { wput(ptr, an, al, 26, 14, Dig3); v.redraw = 1; ORDig3 = Dig3; }
+  if (ORDig4 != Dig4) { wput(ptr, an, al, 33, 14, Dig4); v.redraw = 1; ORDig4 = Dig4; }
 
   if (timeinfo->tm_sec % 2) {
     wbox(ptr, an, al, c4, 23, 17, 1, 1);
@@ -49,7 +49,7 @@ static void Show_Time(void) {
     wbox(ptr, an, al, c2, 23, 17, 1, 1);
     wbox(ptr, an, al, c2, 23, 19, 1, 1);
   }
-  v.volcar = 1;
+  v.redraw = 1;
 }
 
 void Clock1(void) {
@@ -69,15 +69,15 @@ void Clock3(void) {
 }
 
 void Clock0(void) {
-  v.tipo = 4;
+  v.type = 4;
   v.an = 47;
   v.al = 30;
-  v.titulo = texto[151];
+  v.title = texto[151];
   time(&dtime);
   timeinfo = localtime(&dtime);
   DIV_SPRINTF(cTimeForIcon, "%s [%02d%c%02d]", texto[151],
           timeinfo->tm_hour, timeinfo->tm_sec % 2 ? ';' : ' ', timeinfo->tm_min);
-  v.nombre = (byte *)cTimeForIcon;
+  v.name = (byte *)cTimeForIcon;
   v.paint_handler = Clock1;
   v.click_handler = Clock2;
   v.close_handler = Clock3;

@@ -212,7 +212,7 @@ void fade_wait(void) {
 }
 
 //-----------------------------------------------------------------------------
-//      Set Video Mode (vga_an y vga_al se definen en shared.h)
+//      Set Video Mode (vga_width y vga_height se definen en shared.h)
 //-----------------------------------------------------------------------------
 
 int LinealMode;
@@ -240,7 +240,7 @@ void madewith(void) {
 void setup_video_mode(void) {
 
 //#ifdef STDOUTLOG
-printf("setting new video mode %d %d %p\n",vga_an,vga_al,(void*)vga);
+printf("setting new video mode %d %d %p\n",vga_width,vga_height,(void*)vga);
 //#endif
 
 //hide the mouse
@@ -249,14 +249,14 @@ SDL_ShowCursor(SDL_DISABLE);
 #ifdef __EMSCRIPTEN__
 	
 	if(!vga)	
-		vga=OSDEP_SetVideoMode(vga_an, vga_al, 8, 0);
+		vga=OSDEP_SetVideoMode(vga_width, vga_height, 8, 0);
 #else
 
 		if(fsmode==1)
-			vga=OSDEP_SetVideoMode(vga_an, vga_al, 8, 1);
+			vga=OSDEP_SetVideoMode(vga_width, vga_height, 8, 1);
 
 		if(!vga || fsmode==0)
-			vga=OSDEP_SetVideoMode(vga_an, vga_al, 8, 0);
+			vga=OSDEP_SetVideoMode(vga_width, vga_height, 8, 0);
 
 #endif
 		printf("Set mode: %d,%d\n",vga->w,vga->h);
@@ -280,22 +280,22 @@ SDL_ShowCursor(SDL_DISABLE);
   // Comprueba primero si es un modo vesa
 
   for (n=0;n<num_video_modes;n++) {
-    if (vga_an==video_modes[n].ancho && vga_al==video_modes[n].alto) {
-      if (video_modes[n].modo && video_modes[n].modo<256000) { mode=video_modes[n].modo; break; }
+    if (vga_width==video_modes[n].width && vga_height==video_modes[n].height) {
+      if (video_modes[n].mode && video_modes[n].mode<256000) { mode=video_modes[n].mode; break; }
     }
   }
 
   if (n<num_video_modes) {
     modovesa=1;
-    if(VersionVesa<0x102) {
+    if(vesa_version<0x102) {
       if (!VBE_setVideoMode(mode)) error=1;
       else vga=(char *)0x0A0000;
     } else {
-      if(VersionVesa<0x200) {
+      if(vesa_version<0x200) {
         if(!SV_setMode(mode)) error=1;
         else vga=(char *)0x0A0000;
       } else {
-       	if (vbeSetMode (vga_an, vga_al, 8, &Screen) == 4) {
+       	if (vbeSetMode (vga_width, vga_height, 8, &Screen) == 4) {
           LinealMode=1;
           mode|=vbeLinearBuffer;
           if(!SV_setMode(mode)) {
@@ -310,7 +310,7 @@ SDL_ShowCursor(SDL_DISABLE);
         }
       }
     }
-  } else switch(vga_an*1000+vga_al) {
+  } else switch(vga_width*1000+vga_height) {
     case 320200: _setvideomode(_MRES256COLOR); break;
     case 320240: setup_modex(0); break;
     case 320400: setup_modex(1); break;
@@ -324,18 +324,18 @@ SDL_ShowCursor(SDL_DISABLE);
   
   if (error) {
     modovesa=0;
-    vga_an=320; vga_al=200; _setvideomode(_MRES256COLOR);
+    vga_width=320; vga_height=200; _setvideomode(_MRES256COLOR);
   }
 #endif
 
-  m_x=(float)vga_an/2.0;
-  m_y=(float)vga_al/2.0;
+  m_x=(float)vga_width/2.0;
+  m_y=(float)vga_height/2.0;
 
   if (demo) {
-    texto[max_textos].tipo=0;
+    texto[max_textos].type=0;
     texto[max_textos].centro=4;
-    texto[max_textos].y=vga_al/2;
-    texto[max_textos].x=vga_an/2;
+    texto[max_textos].y=vga_height/2;
+    texto[max_textos].x=vga_width/2;
     texto[max_textos].font=(byte*)fonts[0];
   } else texto[max_textos].font=0;
 
@@ -365,7 +365,7 @@ void setup_modex(int m) {
   memset(vga,0,65536);
 
   outp(CRTC_INDEX,CRTC_OFFSET);
-  outp(CRTC_INDEX+1,vga_an/8);
+  outp(CRTC_INDEX+1,vga_width/8);
 #endif
 }
 
@@ -401,9 +401,9 @@ void blit_sdl(byte *p) {
 
 	byte *q = (byte *)vga->pixels;
 	int vy;
-	for (vy=0; vy<vga_al; vy++) {
-		memcpy(q, p, vga_an);
-		p+=vga_an;
+	for (vy=0; vy<vga_height; vy++) {
+		memcpy(q, p, vga_width);
+		p+=vga_width;
 		q+=vga->pitch;
 	}
 
@@ -467,9 +467,9 @@ blit_sdl(p);
 
 #ifdef NOTYET
 
-  if (volcado_completo) {
+  if (full_redraw) {
     if (modovesa) blit_full_svga(p);
-    else switch(vga_an*1000+vga_al) {
+    else switch(vga_width*1000+vga_height) {
       case 320200: blit_full_320x200(p); break;
       case 320240: blit_full_modex(p); break;
       case 320400: blit_full_modex(p); break;
@@ -479,7 +479,7 @@ blit_sdl(p);
     }
   } else {
     if (modovesa) blit_partial_svga(p);
-    else switch(vga_an*1000+vga_al) {
+    else switch(vga_width*1000+vga_height) {
       case 320200: blit_partial_320x200(p); break;
       case 320240: blit_partial_modex(p); break;
       case 320400: blit_partial_modex(p); break;
@@ -508,7 +508,7 @@ void snapshot(byte *p) {
   } while (f!=NULL);
 
   f=fopen(cwork,"wb");
-  save_PCX(p,vga_an,vga_al,f);
+  save_PCX(p,vga_width,vga_height,f);
   fclose(f);
 }
 
@@ -612,7 +612,7 @@ int save_PCX(byte *mapa,int an,int al,FILE *f) {
 int save_MAP (byte * mapa, int an, int al, FILE * f) {
   int y;
   char cwork[32]="";
-  char reglas[576];
+  char gradients[576];
 
   fwrite("map\x1a\x0d\x0a\x00\x00",8,1,f);      // +000 Cabecera y version
   fwrite(&an,2,1,f);                   // +008 Ancho
@@ -623,12 +623,12 @@ int save_MAP (byte * mapa, int an, int al, FILE * f) {
   fwrite(paleta,768,1,f);                          // +048 Paleta
 
   for (y=0;y<16;y++) {
-    reglas[y*36]=16;
-    reglas[y*36+1]=0;
-    reglas[y*36+2]=0;
-    reglas[y*36+3]=0;
-    memset(&reglas[y*36+4],y*16,32);
-  } fwrite(reglas,1,sizeof(reglas),f);            // +816 Reglas de color
+    gradients[y*36]=16;
+    gradients[y*36+1]=0;
+    gradients[y*36+2]=0;
+    gradients[y*36+3]=0;
+    memset(&gradients[y*36+4],y*16,32);
+  } fwrite(gradients,1,sizeof(gradients),f);            // +816 Reglas de color
 
   y=0; fwrite(&y,2,1,f);                     // +1392 Numero de puntos
   fwrite(mapa,an*al,1,f);
@@ -641,19 +641,19 @@ int save_MAP (byte * mapa, int an, int al, FILE * f) {
 
 void restore(byte *q, byte *p) {
   int y=0,n=0;
-  if (vga_an<640 && vga_al>200) { // Modo-X
-    while (y<vga_al) {
+  if (vga_width<640 && vga_height>200) { // Modo-X
+    while (y<vga_height) {
       n=y*4;
       if (scan[n+1]) memcpy(q+scan[n]*4,p+scan[n]*4,scan[n+1]*4);
       if (scan[n+3]) memcpy(q+scan[n+2]*4,p+scan[n+2]*4,scan[n+3]*4);
-      q+=vga_an; p+=vga_an; y++;
+      q+=vga_width; p+=vga_width; y++;
     }
   } else {
-    while (y<vga_al) {
+    while (y<vga_height) {
       n=y*4;
       if (scan[n+1]) memcpy(q+scan[n],p+scan[n],scan[n+1]);
       if (scan[n+3]) memcpy(q+scan[n+2],p+scan[n+2],scan[n+3]);
-      q+=vga_an; p+=vga_an; y++;
+      q+=vga_width; p+=vga_width; y++;
     }
   }
 }
@@ -670,11 +670,11 @@ void blit_partial_320x200(byte *p) {
   RegScreen(p);
   #endif
 
-  while (y<vga_al) {
+  while (y<vga_height) {
     n=y*4;
     if (scan[n+1]) memcpy(q+scan[n],p+scan[n],scan[n+1]);
     if (scan[n+3]) memcpy(q+scan[n+2],p+scan[n+2],scan[n+3]);
-    q+=vga_an; p+=vga_an; y++;
+    q+=vga_width; p+=vga_width; y++;
   }
 }
 
@@ -682,7 +682,7 @@ void blit_full_320x200(byte *p) {
   #ifdef GRABADORA
   RegScreen(p);
   #endif
-  memcpy(vga,p,vga_an*vga_al);
+  memcpy(vga,p,vga_width*vga_height);
 }
 
 //-----------------------------------------------------------------------------
@@ -695,17 +695,17 @@ void blit_partial_svga(byte *p) {
   char *q=vga;
 
   if(LinealMode) {
-   while (y<vga_al) {
+   while (y<vga_height) {
      n=y*4;
      if (scan[n+1]) memcpy(q+scan[n],p+scan[n],scan[n+1]);
      if (scan[n+3]) memcpy(q+scan[n+2],p+scan[n+2],scan[n+3]);
-     q+=vga_an; p+=vga_an; y++;
+     q+=vga_width; p+=vga_width; y++;
    }
-  } else while (y<vga_al) {
+  } else while (y<vga_height) {
     n=y*4;
     if (scan[n+1]) {
-      page=(y*vga_an+scan[n])/65536;
-      point=(y*vga_an+scan[n])%65536;
+      page=(y*vga_width+scan[n])/65536;
+      point=(y*vga_width+scan[n])%65536;
       if (point+scan[n+1]>65536) {
         t1=65536-point;
         t2=scan[n+1]-t1;
@@ -719,8 +719,8 @@ void blit_partial_svga(byte *p) {
       }
     }
     if (scan[n+3]) {
-      page=(y*vga_an+scan[n+2])/65536;
-      point=(y*vga_an+scan[n+2])%65536;
+      page=(y*vga_width+scan[n+2])/65536;
+      point=(y*vga_width+scan[n+2])%65536;
       if (point+scan[n+3]>65536) {
         t1=65536-point;
         t2=scan[n+3]-t1;
@@ -732,7 +732,7 @@ void blit_partial_svga(byte *p) {
         if (page!=old_page) SV_setBank((signed long)(old_page=page));
         memcpy(vga+point,p+scan[n+2],scan[n+3]);
       }
-    } p+=vga_an; y++;
+    } p+=vga_width; y++;
   }
 #endif
 
@@ -740,7 +740,7 @@ void blit_partial_svga(byte *p) {
 
 void blit_full_svga(byte *p) {
 #ifdef DOS
-  int cnt=vga_an*vga_al;
+  int cnt=vga_width*vga_height;
   int tpv=0,ActPge=0;
 
   if(LinealMode) memcpy(vga,p,cnt);
@@ -760,23 +760,23 @@ void blit_full_svga(byte *p) {
 
 void blit_partial_modex(byte * p) {
 #ifdef DOS
-  int n,m=(vga_an*vga_al)/4,plano=0x100,y;
+  int n,m=(vga_width*vga_height)/4,plano=0x100,y;
   byte * v2, * p2;
 
   do { v2=vga+m; y=0; p2=p++; outpw(SC_INDEX,2+plano); plano<<=1;
-    while (y<vga_al) {
+    while (y<vga_height) {
       n=y*4;
       if (scan[n+1]) vgacpy(v2+scan[n],p2+scan[n]*4,scan[n+1]);
       if (scan[n+3]) vgacpy(v2+scan[n+2],p2+scan[n+2]*4,scan[n+3]);
-      v2+=vga_an/4; p2+=vga_an; y++; }
+      v2+=vga_width/4; p2+=vga_width; y++; }
   } while (plano<=0x800);
 
   outpw(SC_INDEX,0xF02); outp(0x3CE,5); outp(0x3CF,(inp(0x3CF)&252)+1);
-  y=0; v2=vga; while (y<vga_al) {
+  y=0; v2=vga; while (y<vga_height) {
     n=y*4;
     if (scan[n+1]) memcpyb(v2+scan[n],v2+scan[n]+m,scan[n+1]);
     if (scan[n+3]) memcpyb(v2+scan[n+2],v2+scan[n+2]+m,scan[n+3]);
-    v2+=vga_an/4; y++;
+    v2+=vga_width/4; y++;
   } outp(0x3CE,5); outp(0x3CF,inp(0x3CF)&252);
 
 #endif
@@ -784,7 +784,7 @@ void blit_partial_modex(byte * p) {
 
 void blit_full_modex(byte * p) {
 #ifdef DOS
-  int n=(vga_an*vga_al)/4;
+  int n=(vga_width*vga_height)/4;
 
   outpw(SC_INDEX,0x102); vgacpy(vga+n,p,n); p++;
   outpw(SC_INDEX,0x202); vgacpy(vga+n,p,n); p++;
@@ -820,24 +820,24 @@ void init_flush(void) {
 #ifndef DROID
 	 memset(&scan[0],0,MAX_YRES*sizeof(short)); 
 #endif
- volcado_completo=0; 
+ full_redraw=0; 
 }
 
 void blit_partial(int x,int y,int an,int al) {
   int ymax,xmax,n,d1,d2,x2;
 
-  if (an==vga_an && al==vga_al && x==0 && y==0) { volcado_completo=1; return; }
+  if (an==vga_width && al==vga_height && x==0 && y==0) { full_redraw=1; return; }
 
-  if (an>0 && al>0 && x<vga_an && y<vga_al) {
+  if (an>0 && al>0 && x<vga_width && y<vga_height) {
     if (x<0) { an+=x; x=0; }
     if (y<0) { al+=y; y=0; }
-    if (x+an>vga_an) { an=vga_an-x; }
-    if (y+al>vga_al) { al=vga_al-y; }
+    if (x+an>vga_width) { an=vga_width-x; }
+    if (y+al>vga_height) { al=vga_height-y; }
     if (an<=0 || al<=0) return;
     xmax=x+an-1; ymax=y+al-1;
 
     if (!modovesa) {
-      switch(vga_an*1000+vga_al) {
+      switch(vga_width*1000+vga_height) {
         case 320240: case 320400: case 360240: case 360360: case 376282: // Modos X
           x>>=2; xmax>>=2; an=xmax-x+1; break;
       }
@@ -1020,9 +1020,9 @@ void create_ghost_vc(int m) {
   struct t_tpuntos * p;
 
   if ((p=vcubos[m])!=NULL) do { num_puntos++;
-    dif=*(int*)(cuad+rr+(*p).r);
-    dif+=*(int*)(cuad+gg+(*p).g);
-    dif+=*(int*)(cuad+bb+(*p).b);
+    dif=*(int*)(color_lookup+rr+(*p).r);
+    dif+=*(int*)(color_lookup+gg+(*p).g);
+    dif+=*(int*)(color_lookup+bb+(*p).b);
     if (dif<find_min) { find_min=dif;
         find_col=((byte*)p-(byte*)tpuntos)/sizeof(struct t_tpuntos); }
   } while ((p=(*p).next)!=NULL);
@@ -1035,9 +1035,9 @@ void create_ghost_slow (void) {
 
   pal=dac4; endpal=dac4+768; dmin=65536;
   do {
-    dif=*(int*)(cuad+rr+*pal); pal++;
-    dif+=*(int*)(cuad+gg+*pal); pal++;
-    dif+=*(int*)(cuad+bb+*pal); pal+=4;
+    dif=*(int*)(color_lookup+rr+*pal); pal++;
+    dif+=*(int*)(color_lookup+gg+*pal); pal++;
+    dif+=*(int*)(color_lookup+bb+*pal); pal+=4;
     if (dif<dmin) { dmin=dif; color=pal-6; }
   } while (pal<endpal);
   find_col=(color-dac4)/3;

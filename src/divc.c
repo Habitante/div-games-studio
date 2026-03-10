@@ -753,11 +753,11 @@ void record_statement(void);  // Guarda las seis variables en el fichero
 // Tabla de objetos --------------------------------- *iobj primer objeto libre
 
 struct objeto {
-  byte tipo;    // Tipo de objeto
+  byte type;    // Tipo de objeto
   byte usado;   // Indica si el objeto ha sido usado antes de definirse
   byte * name;  // Puntero al nombre, para algún listado
   byte * ierror;// Puntero al código para determinar la columna si es necesario
-  int linea;    // Línea de código fuente, para informar del error
+  int line;    // Línea de código fuente, para informar del error
   int param;    // Indica que es un objeto declarado en los parámetros
   struct objeto * anterior; // Anterior objeto de igual nombre
   struct objeto * bloque;   // Bloque de este proceso (0-global/local N-private)
@@ -829,13 +829,13 @@ struct objeto {
       int num_par;
     } proc;
     struct {                                            // Funcion interna
-      int codigo;
+      int code;
       int num_par;
       int ret;      // 0-Int 1-String
       byte par[12]; // 0-Int 1-(Struct_name,name)
     } func;
     struct {                                            // Funcion externa
-      int codigo;
+      int code;
       int num_par;
     } fext;
   };
@@ -853,7 +853,7 @@ byte * vhash[256]; // Pointer to the vector of names
 //-----------------------------------------------------------------------------
 
 struct exp_ele {
-  byte tipo; // econs, eoper, erango, ewhoami, ecall
+  byte type; // econs, eoper, erango, ewhoami, ecall
   union {
     int valor;
     int token;
@@ -868,7 +868,7 @@ struct lex_ele { byte caracter;
        lex_simb[max_nodos], * ilex_simb, * lex_case[256];
 
 int pieza, pieza_num;
-struct objeto * o; // Cuando pieza=p_id, objeto de tipo (**o).tipo
+struct objeto * o; // Cuando pieza=p_id, objeto de tipo (**o).type
 struct objeto * bloque_actual; // Bloque que esta siendo analizado
 struct objeto * bloque_lexico; // Es 0 hasta las privadas del program
 
@@ -1096,7 +1096,7 @@ free_resources();
 
   i=obj; while (i<iobj) {
     if (i->usado) {
-      linea=i->linea; ierror=i->ierror; c_error(0,121);
+      linea=i->line; ierror=i->ierror; c_error(0,121);
     } i++;
   }
 
@@ -1157,7 +1157,7 @@ free_resources();
     }
   }
 
-  if (ejecutar_programa==3) mem[0]+=128;
+  if (run_mode==3) mem[0]+=128;
   if (ignore_errors) mem[0]+=512;
 
   if ((f=fopen("system/EXEC.EXE","wb"))!=NULL) {
@@ -1448,7 +1448,7 @@ void preload_objects (void) {
   while (pieza!=p_ultima) switch (pieza) {
     case p_const:
       lexer(); if (pieza!=p_id) c_error(0,7);
-      ob=o; if ((*ob).tipo!=tnone) c_error(0,7); (*ob).tipo=tcons;
+      ob=o; if ((*ob).type!=tnone) c_error(0,7); (*ob).type=tcons;
       lexer(); if (pieza!=p_asig) c_error(0,7);
       lexer();
       if (pieza==p_num) (*ob).cons.valor=pieza_num;
@@ -1460,9 +1460,9 @@ void preload_objects (void) {
       lexer(); break;
     case p_global:
       lexer(); if (pieza==p_id) {
-        ob=o; if ((*ob).tipo!=tnone) c_error(0,7);
+        ob=o; if ((*ob).type!=tnone) c_error(0,7);
         lexer(); if (pieza==p_corab) {
-          (*ob).tipo=ttglo;
+          (*ob).type=ttglo;
           (*ob).tglo.offset=imem;
           lexer(); if (pieza!=p_num) c_error(0,7);
           (*ob).tglo.len1=len=pieza_num;
@@ -1473,7 +1473,7 @@ void preload_objects (void) {
           lexer(); if (pieza!=p_corce) c_error(0,7);
           lexer();
         } else {
-          (*ob).tipo=tvglo;
+          (*ob).type=tvglo;
           (*ob).vglo.offset=imem;
           if (pieza!=p_asig) { c_error(0,7); } lexer();
           if (pieza==p_num) mem[imem++]=pieza_num;
@@ -1484,9 +1484,9 @@ void preload_objects (void) {
         }
       } else if (pieza==p_struct) {
         lexer(); if (pieza!=p_id) c_error(0,7);
-        ob=o; if ((*ob).tipo!=tnone) c_error(0,7);
+        ob=o; if ((*ob).type!=tnone) c_error(0,7);
         lexer(); if (pieza!=p_corab) c_error(0,7);
-        (*ob).tipo=tsglo; (*ob).sglo.offset=imem;
+        (*ob).type=tsglo; (*ob).sglo.offset=imem;
         lexer(); if (pieza!=p_num) c_error(0,7);
         (*ob).sglo.items1=pieza_num;
         (*ob).sglo.items2=(*ob).sglo.items3=-1;
@@ -1500,9 +1500,9 @@ void preload_objects (void) {
 
             lexer();
             if (pieza!=p_id) c_error(0,7);
-            if ((*o).tipo!=tnone) c_error(0,7);
+            if ((*o).type!=tnone) c_error(0,7);
             ob2=o; lexer();
-            (*ob2).tipo=tcglo;
+            (*ob2).type=tcglo;
             (*ob2).cglo.offset=len+1;
             if (pieza!=p_corab) { c_error(0,7); } lexer();
             if (((*ob2).cglo.totalen=constant())<0) { c_error(0,7); }
@@ -1518,10 +1518,10 @@ void preload_objects (void) {
           } else {
 
             if (pieza!=p_id) c_error(0,7);
-            if ((*o).tipo!=tnone) c_error(0,7);
+            if ((*o).type!=tnone) c_error(0,7);
             ob2=o; lexer();
             if (pieza==p_corab) {
-              (*ob2).tipo=ttglo;
+              (*ob2).type=ttglo;
               (*ob2).tglo.offset=len;
               lexer(); if (pieza!=p_num) c_error(0,7);
               (*ob2).tglo.len1=pieza_num;
@@ -1536,7 +1536,7 @@ void preload_objects (void) {
               if (pieza!=p_corce) c_error(0,7);
               lexer();
             } else {
-              (*ob2).tipo=tvglo;
+              (*ob2).type=tvglo;
               (*ob2).vglo.offset=len++;
               mem[imem++]=0;
               (*ob).sglo.len_item++;
@@ -1554,7 +1554,7 @@ void preload_objects (void) {
       } else c_error(0,7); break;
     case p_local:
       lexer(); if (pieza==p_id) {
-        ob=o; if ((*ob).tipo!=tnone) c_error(0,7); (*ob).tipo=tvloc;
+        ob=o; if ((*ob).type!=tnone) c_error(0,7); (*ob).type=tvloc;
         (*ob).vloc.offset=iloc;
         lexer(); if (pieza!=p_asig) c_error(0,7);
         lexer();
@@ -1566,9 +1566,9 @@ void preload_objects (void) {
         lexer();
       } else if (pieza==p_struct) {
         lexer(); if (pieza!=p_id) c_error(0,7);
-        ob=o; if ((*ob).tipo!=tnone) c_error(0,7);
+        ob=o; if ((*ob).type!=tnone) c_error(0,7);
         lexer(); if (pieza!=p_corab) c_error(0,7);
-        (*ob).tipo=tsloc; (*ob).sloc.offset=iloc;
+        (*ob).type=tsloc; (*ob).sloc.offset=iloc;
         lexer(); if (pieza!=p_num) c_error(0,7);
         (*ob).sloc.items1=pieza_num;
         (*ob).sloc.items2=(*ob).sloc.items3=-1;
@@ -1581,8 +1581,8 @@ void preload_objects (void) {
 
         while (pieza!=p_end) {
           if (pieza!=p_id) c_error(0,7);
-          if ((*o).tipo!=tnone) c_error(0,7);
-          (*o).tipo=tvloc; (*o).vloc.offset=len;
+          if ((*o).type!=tnone) c_error(0,7);
+          (*o).type=tvloc; (*o).vloc.offset=len;
           (*ob).sloc.len_item++;
           lexer();
           if (pieza==p_asig) {
@@ -1609,7 +1609,7 @@ void preload_objects (void) {
       else if (pieza==p_string) ret=1;
       else c_error(0,7);
       lexer(); if (pieza!=p_id) c_error(0,7);
-      ob=o; if ((*ob).tipo!=tnone) c_error(0,7); (*ob).tipo=tfunc;
+      ob=o; if ((*ob).type!=tnone) c_error(0,7); (*ob).type=tfunc;
       lexer(); if (pieza!=p_abrir) c_error(0,7);
       lexer(); len=0;
       while (pieza!=p_cerrar) {
@@ -1617,7 +1617,7 @@ void preload_objects (void) {
         (*ob).func.par[len++]=pieza_num;
         lexer(); if (pieza==p_coma) lexer();
       }
-      (*ob).func.codigo=cod;
+      (*ob).func.code=cod;
       (*ob).func.ret=ret;
       (*ob).func.num_par=len;
       lexer(); break;
@@ -1820,7 +1820,7 @@ void lexer(void) {
             if (num_obj++==max_obj) c_error(0,101);
             #endif
           } else {
-            if ((*o).tipo==tcons) pieza_num=(*o).cons.valor;
+            if ((*o).type==tcons) pieza_num=(*o).cons.valor;
           }
         }
       } else {
@@ -1969,9 +1969,9 @@ struct objeto * analiza_pointer(int tipo, int offset) {
   int len1,len2,len3;
 
   if (pieza!=p_id) c_error(1,148);
-  ob=o; if ((*ob).tipo!=tnone) {
+  ob=o; if ((*ob).type!=tnone) {
     if (parametros==-1 && (*ob).param==1 && (*ob).bloque==bloque_actual) {
-      if ((*ob).tipo==tipo) { // Se repite un pointer parámetro como private
+      if ((*ob).type==tipo) { // Se repite un pointer parámetro como private
         save_error(0); lexer();
         len1=-1; len2=-1; len3=-1;
         if (pieza==p_corab) { lexer();
@@ -2013,7 +2013,7 @@ struct objeto * analiza_pointer(int tipo, int offset) {
   if ((*ob).pilo.len2>-1) (*ob).pilo.totalen*=(*ob).pilo.len2+1;
   if ((*ob).pilo.len3>-1) (*ob).pilo.totalen*=(*ob).pilo.len3+1;
 
-  (*ob).tipo=tipo; (*ob).pilo.offset=offset;
+  (*ob).type=tipo; (*ob).pilo.offset=offset;
 
   return(ob);
 }
@@ -2025,9 +2025,9 @@ int analyze_pointer_struct(int tipo, int offset, struct objeto * estructura) {
   int items1,items2,items3;
 
   if (pieza!=p_id) c_error(1,148);
-  ob=o; if ((*ob).tipo!=tnone) {
+  ob=o; if ((*ob).type!=tnone) {
     if (parametros==-1 && (*ob).param==1 && (*ob).bloque==bloque_actual) {
-      if ((*ob).tipo==tipo) { // Se repite un pointer parámetro como private
+      if ((*ob).type==tipo) { // Se repite un pointer parámetro como private
         save_error(0); lexer();
         items1=-1; items2=-1; items3=-1;
         if (pieza==p_corab) { lexer();
@@ -2067,7 +2067,7 @@ int analyze_pointer_struct(int tipo, int offset, struct objeto * estructura) {
   if ((*ob).psgl.items2>-1) (*ob).psgl.totalitems*=(*ob).psgl.items2+1;
   if ((*ob).psgl.items3>-1) (*ob).psgl.totalitems*=(*ob).psgl.items3+1;
 
-  (*ob).tipo=tipo;                // tpsgl o tpslo
+  (*ob).type=tipo;                // tpsgl o tpslo
   (*ob).psgl.offset=offset;       // del pointer
   (*ob).psgl.ostruct=estructura;  // struct original
 
@@ -2097,8 +2097,8 @@ int analyze_struct(int offstruct) { // tras " struct id [ <const> ] " // id≡me
         old_member=member; member=NULL; lexer(); member=old_member;
         if (pieza!=p_id) { c_error(1,110); } ob=o;
 
-        if ((*ob).tipo==tnone) c_error(0,150); // No se define el pointer así
-        if ((*ob).tipo!=tsglo && (*ob).tipo!=tsloc) c_error(0,150);
+        if ((*ob).type==tnone) c_error(0,150); // No se define el pointer así
+        if ((*ob).type!=tsglo && (*ob).type!=tsloc) c_error(0,150);
         lexer();
         puntero_a_struct:
         analyze_pointer_struct(tpsgl,len,ob);
@@ -2121,9 +2121,9 @@ int analyze_struct(int offstruct) { // tras " struct id [ <const> ] " // id≡me
         if (pieza!=p_id) c_error(1,110);
         ob=o; 
         old_member=member; member=ob; lexer();
-        if ((*ob).tipo!=tnone) c_error(2,22);
+        if ((*ob).type!=tnone) c_error(2,22);
 
-        (*ob).tipo=tsglo; (*ob).sglo.offset=len;
+        (*ob).type=tsglo; (*ob).sglo.offset=len;
         if (pieza==p_corab) {
           member2=member; member=NULL; lexer();
           if (((*ob).sglo.items1=constant())<0) c_error(4,123);
@@ -2182,8 +2182,8 @@ int analyze_struct(int offstruct) { // tras " struct id [ <const> ] " // id≡me
       } else {
 
         if (pieza!=p_id) c_error(1,125);
-        ob=o; if ((*ob).tipo!=tnone) c_error(0,114); lexer();
-        (*ob).tipo=tcglo; (*ob).cglo.offset=len+1;
+        ob=o; if ((*ob).type!=tnone) c_error(0,114); lexer();
+        (*ob).type=tcglo; (*ob).cglo.offset=len+1;
         if (pieza==p_corab) {
           lexer();
           if (pieza==p_corce) {
@@ -2204,7 +2204,7 @@ int analyze_struct(int offstruct) { // tras " struct id [ <const> ] " // id≡me
           save_error(1);
           _itxt=itxt;
           lexer();
-          if (pieza!=p_lit && !(pieza==p_id && (*o).tipo==tcons && (*o).cons.literal))
+          if (pieza!=p_lit && !(pieza==p_id && (*o).type==tcons && (*o).cons.literal))
             c_error(3,128);
           if (strlen((char*)&mem[pieza_num])>(*ob).cglo.totalen+1)
             c_error(4,129);
@@ -2247,8 +2247,8 @@ int analyze_struct(int offstruct) { // tras " struct id [ <const> ] " // id≡me
       } else {
 
         if (pieza!=p_id) c_error(1,142);
-        ob=o; if ((*ob).tipo!=tnone) c_error(0,114); lexer();
-        (*ob).tipo=tbglo; (*ob).bglo.offset=len;
+        ob=o; if ((*ob).type!=tnone) c_error(0,114); lexer();
+        (*ob).type=tbglo; (*ob).bglo.offset=len;
         if (pieza==p_corab) { lexer();
           if (((*ob).bglo.len1=constant())<0) c_error(4,35);
           if (pieza==p_coma) {
@@ -2277,7 +2277,7 @@ int analyze_struct(int offstruct) { // tras " struct id [ <const> ] " // id≡me
             imem=_imem;
           } (*ob).bglo.totalen=((*ob).bglo.totalen+3)/4;
         } else {
-          (*ob).tipo=tbglo; (*ob).bglo.offset=len;
+          (*ob).type=tbglo; (*ob).bglo.offset=len;
           (*ob).bglo.len1=0;
           (*ob).bglo.len2=-1;
           (*ob).bglo.len3=-1;
@@ -2321,8 +2321,8 @@ int analyze_struct(int offstruct) { // tras " struct id [ <const> ] " // id≡me
       } else {
 
         if (pieza!=p_id) c_error(1,145);
-        ob=o; if ((*ob).tipo!=tnone) c_error(0,114); lexer();
-        (*ob).tipo=twglo; (*ob).wglo.offset=len;
+        ob=o; if ((*ob).type!=tnone) c_error(0,114); lexer();
+        (*ob).type=twglo; (*ob).wglo.offset=len;
         if (pieza==p_corab) { lexer();
           if (((*ob).wglo.len1=constant())<0) c_error(4,35);
           if (pieza==p_coma) {
@@ -2351,7 +2351,7 @@ int analyze_struct(int offstruct) { // tras " struct id [ <const> ] " // id≡me
             imem=_imem;
           } (*ob).wglo.totalen=((*ob).wglo.totalen+1)/2;
         } else {
-          (*ob).tipo=twglo; (*ob).wglo.offset=len;
+          (*ob).type=twglo; (*ob).wglo.offset=len;
           (*ob).wglo.len1=0;
           (*ob).wglo.len2=-1;
           (*ob).wglo.len3=-1;
@@ -2397,9 +2397,9 @@ int analyze_struct(int offstruct) { // tras " struct id [ <const> ] " // id≡me
 
       } else {
 
-        ob=o; if ((*ob).tipo!=tnone) c_error(0,114); lexer();
+        ob=o; if ((*ob).type!=tnone) c_error(0,114); lexer();
         if (pieza==p_corab) { lexer();                   // Miembro tabla ---
-          (*ob).tipo=ttglo; (*ob).tglo.offset=len;
+          (*ob).type=ttglo; (*ob).tglo.offset=len;
           if (((*ob).tglo.len1=constant())<0) c_error(4,35);
           if (pieza==p_coma) {
             lexer();
@@ -2424,7 +2424,7 @@ int analyze_struct(int offstruct) { // tras " struct id [ <const> ] " // id≡me
 
         } else {                                          // Miembro variable ---
 
-          (*ob).tipo=tvglo; (*ob).vglo.offset=len;
+          (*ob).type=tvglo; (*ob).vglo.offset=len;
           test_buffer(&mem,&imem_max,offstruct+len);
           if (pieza==p_asig) {
             lexer(); mem[offstruct+len]=constant();
@@ -2459,8 +2459,8 @@ int analyze_struct_local(int offstruct) { // tras " struct id [ <const> ] " // i
         old_member=member; member=NULL; lexer(); member=old_member;
         if (pieza!=p_id) { c_error(1,110); } ob=o;
 
-        if ((*ob).tipo==tnone) c_error(0,150); // No se define el pointer así
-        if ((*ob).tipo!=tsglo && (*ob).tipo!=tsloc) c_error(0,150);
+        if ((*ob).type==tnone) c_error(0,150); // No se define el pointer así
+        if ((*ob).type!=tsglo && (*ob).type!=tsloc) c_error(0,150);
         lexer();
         puntero_a_struct:
         analyze_pointer_struct(tpslo,len,ob);
@@ -2484,9 +2484,9 @@ int analyze_struct_local(int offstruct) { // tras " struct id [ <const> ] " // i
         ob=o; 
 
         old_member=member; member=ob; lexer();
-        if ((*ob).tipo!=tnone) c_error(2,22);
+        if ((*ob).type!=tnone) c_error(2,22);
 
-        (*ob).tipo=tsloc; (*ob).sloc.offset=len;
+        (*ob).type=tsloc; (*ob).sloc.offset=len;
         if (pieza==p_corab) {
           member2=member; member=NULL; lexer();
           if (((*ob).sloc.items1=constant())<0) c_error(4,123);
@@ -2543,8 +2543,8 @@ int analyze_struct_local(int offstruct) { // tras " struct id [ <const> ] " // i
       } else {
 
         if (pieza!=p_id) c_error(1,125);
-        ob=o; if ((*ob).tipo!=tnone) c_error(0,114); lexer();
-        (*ob).tipo=tcloc; (*ob).cloc.offset=len+1;
+        ob=o; if ((*ob).type!=tnone) c_error(0,114); lexer();
+        (*ob).type=tcloc; (*ob).cloc.offset=len+1;
         if (pieza==p_corab) {
           lexer();
           if (pieza==p_corce) {
@@ -2565,7 +2565,7 @@ int analyze_struct_local(int offstruct) { // tras " struct id [ <const> ] " // i
           save_error(1);
           _itxt=itxt;
           lexer();
-          if (pieza!=p_lit && !(pieza==p_id && (*o).tipo==tcons && (*o).cons.literal))
+          if (pieza!=p_lit && !(pieza==p_id && (*o).type==tcons && (*o).cons.literal))
             c_error(3,128);
           if (strlen((char*)&mem[pieza_num])>(*ob).cloc.totalen+1)
             c_error(4,129);
@@ -2607,8 +2607,8 @@ int analyze_struct_local(int offstruct) { // tras " struct id [ <const> ] " // i
       } else {
 
         if (pieza!=p_id) c_error(1,142);
-        ob=o; if ((*ob).tipo!=tnone) c_error(0,114); lexer();
-        (*ob).tipo=tbloc; (*ob).bloc.offset=len;
+        ob=o; if ((*ob).type!=tnone) c_error(0,114); lexer();
+        (*ob).type=tbloc; (*ob).bloc.offset=len;
         if (pieza==p_corab) { lexer();
           if (((*ob).bloc.len1=constant())<0) c_error(4,35);
           if (pieza==p_coma) {
@@ -2638,7 +2638,7 @@ int analyze_struct_local(int offstruct) { // tras " struct id [ <const> ] " // i
             iloc=_iloc;
           } (*ob).bloc.totalen=((*ob).bloc.totalen+3)/4;
         } else {
-          (*ob).tipo=tbloc; (*ob).bloc.offset=len;
+          (*ob).type=tbloc; (*ob).bloc.offset=len;
           (*ob).bloc.len1=0;
           (*ob).bloc.len2=-1;
           (*ob).bloc.len3=-1;
@@ -2682,8 +2682,8 @@ int analyze_struct_local(int offstruct) { // tras " struct id [ <const> ] " // i
       } else {
 
         if (pieza!=p_id) c_error(1,145);
-        ob=o; if ((*ob).tipo!=tnone) c_error(0,114); lexer();
-        (*ob).tipo=twloc; (*ob).wloc.offset=len;
+        ob=o; if ((*ob).type!=tnone) c_error(0,114); lexer();
+        (*ob).type=twloc; (*ob).wloc.offset=len;
         if (pieza==p_corab) { lexer();
           if (((*ob).wloc.len1=constant())<0) c_error(4,35);
           if (pieza==p_coma) {
@@ -2713,7 +2713,7 @@ int analyze_struct_local(int offstruct) { // tras " struct id [ <const> ] " // i
             iloc=_iloc;
           } (*ob).wloc.totalen=((*ob).wloc.totalen+1)/2;
         } else {
-          (*ob).tipo=twloc; (*ob).wloc.offset=len;
+          (*ob).type=twloc; (*ob).wloc.offset=len;
           (*ob).wloc.len1=0;
           (*ob).wloc.len2=-1;
           (*ob).wloc.len3=-1;
@@ -2759,9 +2759,9 @@ int analyze_struct_local(int offstruct) { // tras " struct id [ <const> ] " // i
 
       } else {
 
-        ob=o; if ((*ob).tipo!=tnone) c_error(0,114); lexer();
+        ob=o; if ((*ob).type!=tnone) c_error(0,114); lexer();
         if (pieza==p_corab) { lexer();    // Miembro tabla ---
-          (*ob).tipo=ttloc; (*ob).tloc.offset=len;
+          (*ob).type=ttloc; (*ob).tloc.offset=len;
           if (((*ob).tloc.len1=constant())<0) c_error(4,35);
           if (pieza==p_coma) {
             lexer();
@@ -2786,7 +2786,7 @@ int analyze_struct_local(int offstruct) { // tras " struct id [ <const> ] " // i
 
         } else {                                          // Miembro variable ---
 
-          (*ob).tipo=tvloc; (*ob).vloc.offset=len;
+          (*ob).type=tvloc; (*ob).vloc.offset=len;
           test_buffer(&loc,&iloc_max,offstruct+len);
           if (pieza==p_asig) {
             lexer(); loc[offstruct+len]=constant();
@@ -2822,8 +2822,8 @@ int analyze_struct_private(int offstruct) { // tras " struct id [ <const> ] " //
         old_member=member; member=NULL; lexer(); member=old_member;
         if (pieza!=p_id) { c_error(1,110); } ob=o;
 
-        if ((*ob).tipo==tnone) c_error(0,150); // No se define el pointer así
-        if ((*ob).tipo!=tsglo && (*ob).tipo!=tsloc) c_error(0,150);
+        if ((*ob).type==tnone) c_error(0,150); // No se define el pointer así
+        if ((*ob).type!=tsglo && (*ob).type!=tsloc) c_error(0,150);
         lexer();
         puntero_a_struct:
         analyze_pointer_struct(tpslo,len,ob);
@@ -2847,9 +2847,9 @@ int analyze_struct_private(int offstruct) { // tras " struct id [ <const> ] " //
         ob=o;
 
         old_member=member; member=ob; lexer();
-        if ((*ob).tipo!=tnone) c_error(2,22);
+        if ((*ob).type!=tnone) c_error(2,22);
 
-        (*ob).tipo=tsloc; (*ob).sloc.offset=len;
+        (*ob).type=tsloc; (*ob).sloc.offset=len;
         if (pieza==p_corab) {
           member2=member; member=NULL; lexer();
           if (((*ob).sloc.items1=constant())<0) c_error(4,123);
@@ -2906,8 +2906,8 @@ int analyze_struct_private(int offstruct) { // tras " struct id [ <const> ] " //
       } else {
 
         if (pieza!=p_id) c_error(1,125);
-        ob=o; if ((*ob).tipo!=tnone) c_error(0,114); lexer();
-        (*ob).tipo=tcloc; (*ob).cloc.offset=len+1;
+        ob=o; if ((*ob).type!=tnone) c_error(0,114); lexer();
+        (*ob).type=tcloc; (*ob).cloc.offset=len+1;
         if (pieza==p_corab) {
           lexer();
           if (pieza==p_corce) {
@@ -2928,7 +2928,7 @@ int analyze_struct_private(int offstruct) { // tras " struct id [ <const> ] " //
           save_error(1);
           _itxt=itxt;
           lexer();
-          if (pieza!=p_lit && !(pieza==p_id && (*o).tipo==tcons && (*o).cons.literal))
+          if (pieza!=p_lit && !(pieza==p_id && (*o).type==tcons && (*o).cons.literal))
             c_error(3,128);
           if (strlen((char*)&mem[pieza_num])>(*ob).cloc.totalen+1)
             c_error(4,129);
@@ -2970,8 +2970,8 @@ int analyze_struct_private(int offstruct) { // tras " struct id [ <const> ] " //
       } else {
 
         if (pieza!=p_id) c_error(1,142);
-        ob=o; if ((*ob).tipo!=tnone) c_error(0,114); lexer();
-        (*ob).tipo=tbloc; (*ob).bloc.offset=len;
+        ob=o; if ((*ob).type!=tnone) c_error(0,114); lexer();
+        (*ob).type=tbloc; (*ob).bloc.offset=len;
         if (pieza==p_corab) { lexer();
           if (((*ob).bloc.len1=constant())<0) c_error(4,35);
           if (pieza==p_coma) {
@@ -3000,7 +3000,7 @@ int analyze_struct_private(int offstruct) { // tras " struct id [ <const> ] " //
             imem=_imem;
           } (*ob).bloc.totalen=((*ob).bloc.totalen+3)/4;
         } else {
-          (*ob).tipo=tbloc; (*ob).bloc.offset=len;
+          (*ob).type=tbloc; (*ob).bloc.offset=len;
           (*ob).bloc.len1=0;
           (*ob).bloc.len2=-1;
           (*ob).bloc.len3=-1;
@@ -3044,8 +3044,8 @@ int analyze_struct_private(int offstruct) { // tras " struct id [ <const> ] " //
       } else {
 
         if (pieza!=p_id) c_error(1,145);
-        ob=o; if ((*ob).tipo!=tnone) c_error(0,114); lexer();
-        (*ob).tipo=twloc; (*ob).wloc.offset=len;
+        ob=o; if ((*ob).type!=tnone) c_error(0,114); lexer();
+        (*ob).type=twloc; (*ob).wloc.offset=len;
         if (pieza==p_corab) { lexer();
           if (((*ob).wloc.len1=constant())<0) c_error(4,35);
           if (pieza==p_coma) {
@@ -3074,7 +3074,7 @@ int analyze_struct_private(int offstruct) { // tras " struct id [ <const> ] " //
             imem=_imem;
           } (*ob).wloc.totalen=((*ob).wloc.totalen+1)/2;
         } else {
-          (*ob).tipo=twloc; (*ob).wloc.offset=len;
+          (*ob).type=twloc; (*ob).wloc.offset=len;
           (*ob).wloc.len1=0;
           (*ob).wloc.len2=-1;
           (*ob).wloc.len3=-1;
@@ -3120,9 +3120,9 @@ int analyze_struct_private(int offstruct) { // tras " struct id [ <const> ] " //
 
       } else {
 
-        ob=o; if ((*ob).tipo!=tnone) c_error(0,114); lexer();
+        ob=o; if ((*ob).type!=tnone) c_error(0,114); lexer();
         if (pieza==p_corab) { lexer();    // Miembro tabla ---
-          (*ob).tipo=ttloc; (*ob).tloc.offset=len;
+          (*ob).type=ttloc; (*ob).tloc.offset=len;
           if (((*ob).tloc.len1=constant())<0) c_error(4,35);
           if (pieza==p_coma) {
             lexer();
@@ -3147,7 +3147,7 @@ int analyze_struct_private(int offstruct) { // tras " struct id [ <const> ] " //
 
         } else {                                          // Miembro variable ---
 
-          (*ob).tipo=tvloc; (*ob).vloc.offset=len;
+          (*ob).type=tvloc; (*ob).vloc.offset=len;
 
           test_buffer(&mem,&imem_max,offstruct+len);
           if (pieza==p_asig) {
@@ -3202,7 +3202,7 @@ void parser (void) {
     do {
       if (pieza==p_ptocoma) { lexer(); break; }
       if (pieza==p_coma) lexer();
-      if (pieza==p_id && (*o).tipo==tcons) {
+      if (pieza==p_id && (*o).type==tcons) {
         switch((*o).cons.valor) {
           case 0: // _max_process
             lexer();
@@ -3289,7 +3289,7 @@ void parser (void) {
 
   statement_start(); lexer();
   if (pieza!=p_id) c_error(1,21);
-  ob=o; if ((*ob).tipo!=tnone) c_error(0,115); (*ob).tipo=tproc;
+  ob=o; if ((*ob).type!=tnone) c_error(0,115); (*ob).type=tproc;
   (*ob).proc.bloque=bloque_actual=ob;
   (*ob).proc.offset=0; (*ob).proc.num_par=0;
   lexer();
@@ -3300,7 +3300,7 @@ void parser (void) {
 	while(pieza==p_include) {
 		statement_start();
 		lexer();
-		if (pieza!=p_lit && !(pieza==p_id && (*o).tipo==tcons && (*o).cons.literal)) c_error(1,62);
+		if (pieza!=p_lit && !(pieza==p_id && (*o).type==tcons && (*o).cons.literal)) c_error(1,62);
 		old_source=source;
 		nombre_include=(byte*)&mem[pieza_num];
 
@@ -3321,11 +3321,11 @@ void parser (void) {
   if (pieza==p_const) {
     skip_semicolons();
     while (pieza==p_id) {
-      ob=o; if ((*ob).tipo!=tnone && (*ob).tipo!=tcons) c_error(0,116);
-      (*ob).tipo=tcons;
+      ob=o; if ((*ob).type!=tnone && (*ob).type!=tcons) c_error(0,116);
+      (*ob).type=tcons;
       lexer(); if (pieza!=p_asig) c_error(3,119);
       lexer();
-      if (pieza==p_lit || (pieza==p_id && (*o).tipo==tcons && (*o).cons.literal))
+      if (pieza==p_lit || (pieza==p_id && (*o).type==tcons && (*o).cons.literal))
         (*ob).cons.literal=1; else (*ob).cons.literal=0;
       (*ob).cons.valor=constant();
       if (!free_sintax) if (pieza!=p_ptocoma && pieza!=p_coma) c_error(3,66);
@@ -3356,8 +3356,8 @@ void parser (void) {
         if (pieza==p_pointer) { // Se define un puntero a struct
 
           lexer(); if (pieza!=p_id) c_error(1,110); ob=o;
-          if ((*ob).tipo==tnone) c_error(0,150); // No se define el pointer así
-          if ((*ob).tipo!=tsglo && (*ob).tipo!=tsloc) c_error(0,150);
+          if ((*ob).type==tnone) c_error(0,150); // No se define el pointer así
+          if ((*ob).type!=tsglo && (*ob).type!=tsloc) c_error(0,150);
           lexer();
           puntero_a_struct:
           analyze_pointer_struct(tpsgl,imem,ob);
@@ -3378,9 +3378,9 @@ void parser (void) {
           if (pieza!=p_id) c_error(1,110);
           ob=o; member=ob; lexer();
 
-          if ((*ob).tipo!=tnone) c_error(2,22);
+          if ((*ob).type!=tnone) c_error(2,22);
 
-          (*ob).tipo=tsglo; (*ob).sglo.offset=_imem=imem;
+          (*ob).type=tsglo; (*ob).sglo.offset=_imem=imem;
           if (pieza==p_corab) {
             member2=member; member=NULL; lexer();
             if (((*ob).sglo.items1=constant())<0) c_error(4,123);
@@ -3443,8 +3443,8 @@ void parser (void) {
         } else {
 
           if (pieza!=p_id) c_error(1,125);
-          ob=o; if ((*ob).tipo!=tnone) c_error(0,126); lexer();
-          (*ob).tipo=tcglo;
+          ob=o; if ((*ob).type!=tnone) c_error(0,126); lexer();
+          (*ob).type=tcglo;
           _imem=imem;
           (*ob).cglo.offset=_imem+1;
           if (pieza==p_corab) {
@@ -3463,7 +3463,7 @@ void parser (void) {
             save_error(1);
             _itxt=itxt;
             lexer();
-            if (pieza!=p_lit && !(pieza==p_id && (*o).tipo==tcons && (*o).cons.literal))
+            if (pieza!=p_lit && !(pieza==p_id && (*o).type==tcons && (*o).cons.literal))
               c_error(3,128);
             if (strlen((char*)&mem[pieza_num])>(*ob).cglo.totalen+1)
               c_error(4,129);
@@ -3501,8 +3501,8 @@ void parser (void) {
         } else {
 
           if (pieza!=p_id) c_error(1,142);
-          ob=o; if ((*ob).tipo!=tnone) c_error(0,117); lexer();
-          (*ob).tipo=tbglo; (*ob).bglo.offset=_imem=imem;
+          ob=o; if ((*ob).type!=tnone) c_error(0,117); lexer();
+          (*ob).type=tbglo; (*ob).bglo.offset=_imem=imem;
           if (pieza==p_corab) {
             lexer();
             if (pieza==p_corce) {
@@ -3537,7 +3537,7 @@ void parser (void) {
               } (*ob).bglo.totalen=((*ob).bglo.totalen+3)/4;
             }
           } else {                                          // Byte global
-            (*ob).tipo=tbglo; (*ob).bglo.offset=imem;
+            (*ob).type=tbglo; (*ob).bglo.offset=imem;
             (*ob).bglo.len1=0;
             (*ob).bglo.len2=-1;
             (*ob).bglo.len3=-1;
@@ -3574,8 +3574,8 @@ void parser (void) {
         } else {
 
           if (pieza!=p_id) c_error(1,145);
-          ob=o; if ((*ob).tipo!=tnone) c_error(0,117); lexer();
-          (*ob).tipo=twglo; (*ob).wglo.offset=_imem=imem;
+          ob=o; if ((*ob).type!=tnone) c_error(0,117); lexer();
+          (*ob).type=twglo; (*ob).wglo.offset=_imem=imem;
           if (pieza==p_corab) {
             lexer();
             if (pieza==p_corce) {
@@ -3610,7 +3610,7 @@ void parser (void) {
               } (*ob).wglo.totalen=((*ob).wglo.totalen+1)/2;
             }
           } else {                                          // Word global
-            (*ob).tipo=twglo; (*ob).wglo.offset=imem;
+            (*ob).type=twglo; (*ob).wglo.offset=imem;
             (*ob).wglo.len1=0;
             (*ob).wglo.len2=-1;
             (*ob).wglo.len3=-1;
@@ -3649,10 +3649,10 @@ void parser (void) {
 
         } else {
 
-          ob=o; if ((*ob).tipo!=tnone) c_error(0,117); lexer();
+          ob=o; if ((*ob).type!=tnone) c_error(0,117); lexer();
           if (pieza==p_corab) {                           // Tabla global
             lexer();
-            (*ob).tipo=ttglo; (*ob).tglo.offset=_imem=imem;
+            (*ob).type=ttglo; (*ob).tglo.offset=_imem=imem;
             if (pieza==p_corce) {
               lexer(); if (pieza!=p_asig) c_error(3,23); lexer();
               tglo_init(3);
@@ -3684,7 +3684,7 @@ void parser (void) {
 
           } else {                                          // Variable global
 
-            (*ob).tipo=tvglo; (*ob).vglo.offset=imem;
+            (*ob).type=tvglo; (*ob).vglo.offset=imem;
             if (pieza==p_asig) { lexer(); mem[imem]=constant(); }
             test_buffer(&mem,&imem_max,++imem);
 
@@ -3716,8 +3716,8 @@ void parser (void) {
         if (pieza==p_pointer) { // Se define un puntero a struct
 
           lexer(); if (pieza!=p_id) c_error(1,110); ob=o;
-          if ((*ob).tipo==tnone) c_error(0,150); // No se define el pointer así
-          if ((*ob).tipo!=tsglo && (*ob).tipo!=tsloc) c_error(0,150);
+          if ((*ob).type==tnone) c_error(0,150); // No se define el pointer así
+          if ((*ob).type!=tsglo && (*ob).type!=tsloc) c_error(0,150);
           lexer();
           puntero_a_struct_local:
           analyze_pointer_struct(tpslo,iloc,ob);
@@ -3738,9 +3738,9 @@ void parser (void) {
           if (pieza!=p_id) c_error(1,110);
           ob=o; member=ob; lexer();
 
-          if ((*ob).tipo!=tnone) c_error(2,22);
+          if ((*ob).type!=tnone) c_error(2,22);
 
-          (*ob).tipo=tsloc; (*ob).sloc.offset=_imem=iloc;
+          (*ob).type=tsloc; (*ob).sloc.offset=_imem=iloc;
           if (pieza==p_corab) {
             member2=member; member=NULL; lexer();
             if (((*ob).sloc.items1=constant())<0) c_error(4,123);
@@ -3799,8 +3799,8 @@ void parser (void) {
         } else {
 
           if (pieza!=p_id) c_error(1,125);
-          ob=o; if ((*ob).tipo!=tnone) c_error(0,126); lexer();
-          (*ob).tipo=tcloc;
+          ob=o; if ((*ob).type!=tnone) c_error(0,126); lexer();
+          (*ob).type=tcloc;
           _imem=iloc;
           (*ob).cloc.offset=_imem+1;
           if (pieza==p_corab) {
@@ -3819,7 +3819,7 @@ void parser (void) {
             save_error(1);
             _itxt=itxt;
             lexer();
-            if (pieza!=p_lit && !(pieza==p_id && (*o).tipo==tcons && (*o).cons.literal))
+            if (pieza!=p_lit && !(pieza==p_id && (*o).type==tcons && (*o).cons.literal))
               c_error(3,128);
             if (strlen((char*)&mem[pieza_num])>(*ob).cloc.totalen+1)
               c_error(4,129);
@@ -3857,8 +3857,8 @@ void parser (void) {
         } else {
 
           if (pieza!=p_id) c_error(1,142);
-          ob=o; if ((*ob).tipo!=tnone) c_error(0,117); lexer();
-          (*ob).tipo=tbloc; (*ob).bloc.offset=_imem=iloc;
+          ob=o; if ((*ob).type!=tnone) c_error(0,117); lexer();
+          (*ob).type=tbloc; (*ob).bloc.offset=_imem=iloc;
           if (pieza==p_corab) {
             lexer();
             if (pieza==p_corce) {
@@ -3893,7 +3893,7 @@ void parser (void) {
               } (*ob).bloc.totalen=((*ob).bloc.totalen+3)/4;
             }
           } else {                                          // Byte local
-            (*ob).tipo=tbloc; (*ob).bloc.offset=iloc;
+            (*ob).type=tbloc; (*ob).bloc.offset=iloc;
             (*ob).bloc.len1=0;
             (*ob).bloc.len2=-1;
             (*ob).bloc.len3=-1;
@@ -3930,8 +3930,8 @@ void parser (void) {
         } else {
 
           if (pieza!=p_id) c_error(1,145);
-          ob=o; if ((*ob).tipo!=tnone) c_error(0,117); lexer();
-          (*ob).tipo=twloc; (*ob).wloc.offset=_imem=iloc;
+          ob=o; if ((*ob).type!=tnone) c_error(0,117); lexer();
+          (*ob).type=twloc; (*ob).wloc.offset=_imem=iloc;
           if (pieza==p_corab) {
             lexer();
             if (pieza==p_corce) {
@@ -3966,7 +3966,7 @@ void parser (void) {
               } (*ob).wloc.totalen=((*ob).wloc.totalen+1)/2;
             }
           } else {                                          // Word local
-            (*ob).tipo=twloc; (*ob).wloc.offset=iloc;
+            (*ob).type=twloc; (*ob).wloc.offset=iloc;
             (*ob).wloc.len1=0;
             (*ob).wloc.len2=-1;
             (*ob).wloc.len3=-1;
@@ -4005,10 +4005,10 @@ void parser (void) {
 
         } else {
 
-          ob=o; if ((*ob).tipo!=tnone) c_error(0,117); lexer();
+          ob=o; if ((*ob).type!=tnone) c_error(0,117); lexer();
           if (pieza==p_corab) {                             // Tabla local
             lexer();
-            (*ob).tipo=ttloc; (*ob).tloc.offset=_imem=iloc;
+            (*ob).type=ttloc; (*ob).tloc.offset=_imem=iloc;
             if (pieza==p_corce) {
               lexer(); if (pieza!=p_asig) c_error(3,23); lexer();
               tloc_init(3);
@@ -4040,7 +4040,7 @@ void parser (void) {
 
           } else {                                          // Variable local
 
-            (*ob).tipo=tvloc; (*ob).vloc.offset=iloc;
+            (*ob).type=tvloc; (*ob).vloc.offset=iloc;
             if (pieza==p_asig) { lexer(); loc[iloc]=constant(); }
             test_buffer(&loc,&iloc_max,++iloc);
 
@@ -4096,12 +4096,12 @@ void parser (void) {
   while (pieza==p_process || pieza==p_function) {
     n=pieza; statement_start(); lexer();
     if (pieza!=p_id) { c_error(1,111); } ob=o; lexer();
-    if ((*ob).tipo==tproc && (*ob).usado) {
+    if ((*ob).type==tproc && (*ob).usado) {
       num_par=(*ob).proc.num_par; bloque_lexico=bloque_actual=ob;
       _imem=(*ob).proc.offset; while(_imem) {
          _imem_old=mem[_imem]; mem[_imem]=imem; _imem=_imem_old; }
-    } else if ((*ob).tipo==tnone) {
-      (*ob).usado=0; (*ob).tipo=tproc;
+    } else if ((*ob).type==tnone) {
+      (*ob).usado=0; (*ob).type=tproc;
       (*ob).proc.bloque=bloque_lexico=bloque_actual=ob;
     } else c_error(2,118);
     (*ob).proc.offset=imem; (*ob).proc.num_par=0;
@@ -4176,8 +4176,8 @@ void analyze_private(void) {
         if (pieza==p_pointer) { // Se define un puntero a struct
 
           lexer(); if (pieza!=p_id) c_error(1,110); ob=o;
-          if ((*ob).tipo==tnone) c_error(0,150); // No se define el pointer así
-          if ((*ob).tipo!=tsglo && (*ob).tipo!=tsloc) c_error(0,150);
+          if ((*ob).type==tnone) c_error(0,150); // No se define el pointer así
+          if ((*ob).type!=tsglo && (*ob).type!=tsloc) c_error(0,150);
           lexer();
           puntero_a_struct:
           if (analyze_pointer_struct(tpslo,iloc,ob)==1) {
@@ -4200,9 +4200,9 @@ void analyze_private(void) {
           if (pieza!=p_id) c_error(1,110);
           ob=o; member=ob; lexer();
 
-          if ((*ob).tipo!=tnone) c_error(2,22);
+          if ((*ob).type!=tnone) c_error(2,22);
 
-          (*ob).tipo=tsloc; (*ob).sloc.offset=_imem=imem;
+          (*ob).type=tsloc; (*ob).sloc.offset=_imem=imem;
           if (pieza==p_corab) {
             member2=member; member=NULL; lexer();
             if (((*ob).sloc.items1=constant())<0) c_error(4,123);
@@ -4269,9 +4269,9 @@ void analyze_private(void) {
         } else {
 
           if (pieza!=p_id) c_error(1,125);
-          ob=o; if ((*ob).tipo!=tnone) { // Mira si se repite un parámetro ...
+          ob=o; if ((*ob).type!=tnone) { // Mira si se repite un parámetro ...
             if (parametros==-1 && (*ob).param==1 && (*ob).bloque==bloque_actual) {
-              if ((*ob).tipo==tcloc) { // Se repite un string
+              if ((*ob).type==tcloc) { // Se repite un string
                 save_error(0);
                 lexer();
                 if (pieza==p_corab) {
@@ -4296,7 +4296,7 @@ void analyze_private(void) {
             } else c_error(0,126);
           } else lexer();
 
-          (*ob).tipo=tcloc;
+          (*ob).type=tcloc;
           _imem=imem;
           if (pieza==p_corab) {
             lexer();
@@ -4314,7 +4314,7 @@ void analyze_private(void) {
             save_error(1);
             _itxt=itxt;
             lexer();
-            if (pieza!=p_lit && !(pieza==p_id && (*o).tipo==tcons && (*o).cons.literal))
+            if (pieza!=p_lit && !(pieza==p_id && (*o).type==tcons && (*o).cons.literal))
               c_error(3,128);
             if (strlen((char*)&mem[pieza_num])>(*ob).cloc.totalen+1)
               c_error(4,129);
@@ -4355,9 +4355,9 @@ void analyze_private(void) {
         } else {
 
           if (pieza!=p_id) c_error(1,142);
-          ob=o; if ((*ob).tipo!=tnone) {
+          ob=o; if ((*ob).type!=tnone) {
             if (parametros==-1 && (*ob).param==1 && (*ob).bloque==bloque_actual) {
-              if ((*ob).tipo==tbloc) { // Se repite un byte parámetro
+              if ((*ob).type==tbloc) { // Se repite un byte parámetro
                 lexer();
                 if (pieza==p_corab) c_error(2,53);
                 else if (pieza==p_asig) c_error(0,54);
@@ -4372,7 +4372,7 @@ void analyze_private(void) {
             } else c_error(0,117);
           } else lexer();
 
-          (*ob).tipo=tbloc; _imem=imem;
+          (*ob).type=tbloc; _imem=imem;
           if (pieza==p_corab) {
             lexer();
             if (pieza==p_corce) {
@@ -4407,7 +4407,7 @@ void analyze_private(void) {
               } (*ob).bloc.totalen=((*ob).bloc.totalen+3)/4;
             }
           } else {                                          // Byte privado
-            (*ob).tipo=tbloc; (*ob).bloc.offset=imem;
+            (*ob).type=tbloc; (*ob).bloc.offset=imem;
             (*ob).bloc.len1=0;
             (*ob).bloc.len2=-1;
             (*ob).bloc.len3=-1;
@@ -4447,9 +4447,9 @@ void analyze_private(void) {
         } else {
 
           if (pieza!=p_id) c_error(1,145);
-          ob=o; if ((*ob).tipo!=tnone) {
+          ob=o; if ((*ob).type!=tnone) {
             if (parametros==-1 && (*ob).param==1 && (*ob).bloque==bloque_actual) {
-              if ((*ob).tipo==twloc) { // Se repite un word parámetro
+              if ((*ob).type==twloc) { // Se repite un word parámetro
                 lexer();
                 if (pieza==p_corab) c_error(2,53);
                 else if (pieza==p_asig) c_error(0,54);
@@ -4464,7 +4464,7 @@ void analyze_private(void) {
             } else c_error(0,117);
           } else lexer();
 
-          (*ob).tipo=twloc; _imem=imem;
+          (*ob).type=twloc; _imem=imem;
           if (pieza==p_corab) {
             lexer();
             if (pieza==p_corce) {
@@ -4499,7 +4499,7 @@ void analyze_private(void) {
               } (*ob).wloc.totalen=((*ob).wloc.totalen+1)/2;
             }
           } else {                                          // Word privado
-            (*ob).tipo=twloc; (*ob).wloc.offset=imem;
+            (*ob).type=twloc; (*ob).wloc.offset=imem;
             (*ob).wloc.len1=0;
             (*ob).wloc.len2=-1;
             (*ob).wloc.len3=-1;
@@ -4543,9 +4543,9 @@ void analyze_private(void) {
 
           // Si el objeto no es tnone, se repite un parámetro o bien es un error
 
-          ob=o; if ((*ob).tipo!=tnone) {
+          ob=o; if ((*ob).type!=tnone) {
             if (parametros==-1 && (*ob).param==1 && (*ob).bloque==bloque_actual) {
-              if ((*ob).tipo==tvloc) { // Se repite una variable local
+              if ((*ob).type==tvloc) { // Se repite una variable local
                 lexer();
                 if (pieza==p_corab) c_error(2,53);
                 else if (pieza==p_asig) c_error(0,54);
@@ -4562,7 +4562,7 @@ void analyze_private(void) {
 
           if (pieza==p_corab) {                             // Tabla privada
             lexer();
-            (*ob).tipo=ttloc; _imem=imem;
+            (*ob).type=ttloc; _imem=imem;
             if (pieza==p_corce) {
               lexer(); if (pieza!=p_asig) c_error(3,23); lexer();
               tglo_init(3);
@@ -4594,7 +4594,7 @@ void analyze_private(void) {
 
           } else {                                          // Variable privada
 
-            (*ob).tipo=tvloc; (*ob).vloc.offset=iloc++;
+            (*ob).type=tvloc; (*ob).vloc.offset=iloc++;
             if (pieza==p_asig) { lexer(); mem[imem]=constant(); }
             test_buffer(&mem,&imem_max,++imem);
           }
@@ -4704,7 +4704,7 @@ void tglo_init2(int tipo) {
       dup=2; lexer();
       if (pieza!=p_abrir) c_error(3,36);
 
-    } else if (pieza==p_lit || (pieza==p_id && (*o).tipo==tcons && (*o).cons.literal)) {
+    } else if (pieza==p_lit || (pieza==p_id && (*o).type==tcons && (*o).cons.literal)) {
 
       valor=pieza_num; lexer();
       if (pieza==p_abrir || pieza==p_dup) c_error(2,38);
@@ -4959,9 +4959,9 @@ void statement() {
         lexer();
         if (pieza!=p_id) c_error(0,67);
 
-        if ((*o).tipo==tvglo) {
+        if ((*o).type==tvglo) {
           dir=(*o).vglo.offset; g2(lcar,dir);
-        } else if ((*o).tipo==tvloc && (!(*o).bloque || (*o).bloque==bloque_actual)) {
+        } else if ((*o).type==tvloc && (!(*o).bloque || (*o).bloque==bloque_actual)) {
           dir=-(*o).vloc.offset;
           g2(lcar,-dir); g1(laid);
         } else c_error(0,67);
@@ -5156,9 +5156,9 @@ void statement() {
         expression();
         do {
           _exp--;
-        } while ((*_exp).tipo==eoper && (*_exp).token==p_string);
+        } while ((*_exp).type==eoper && (*_exp).token==p_string);
         error_27=27;
-        switch((*_exp).tipo) {
+        switch((*_exp).type) {
           case ecall: break;
           case efunc: break;
           case efext: break;
@@ -5236,7 +5236,7 @@ void con1() { // Operadores con asociatividad de izquierda a derecha ->
   while ((p=pieza)>=p_or && p<=p_andofs) {
     if (p>=p_xorptr) p-=p_xorptr-p_xor; // Convierte xorptr,andofs en xor,and
     lexer(); con2();
-    (*_exp).tipo=eoper; (*_exp++).token=p;
+    (*_exp).type=eoper; (*_exp++).token=p;
     tipo_factor=0;
   }
 }
@@ -5252,9 +5252,9 @@ void con2() {
       lexer(); exp3();
       if (tf==2 || tipo_factor==2) {
         p+=p_strigu-p_igu;
-        (*_exp).tipo=eoper; (*_exp++).token=p;
+        (*_exp).type=eoper; (*_exp++).token=p;
       } else {
-        (*_exp).tipo=eoper; (*_exp++).token=p;
+        (*_exp).type=eoper; (*_exp++).token=p;
       } tipo_factor=0; p=pieza;
     }
   } else {
@@ -5263,9 +5263,9 @@ void con2() {
       lexer(); exp3();
       if (tf==2 || tipo_factor==2) {
         p+=p_strigu-p_igu;
-        (*_exp).tipo=eoper; (*_exp++).token=p;
+        (*_exp).type=eoper; (*_exp++).token=p;
       } else {
-        (*_exp).tipo=eoper; (*_exp++).token=p;
+        (*_exp).type=eoper; (*_exp++).token=p;
       } tipo_factor=0;
     }
   }
@@ -5300,19 +5300,19 @@ void expression_cpa(void) {
   save_error(0);
   _linea=linea; _ierror=ierror; exp00(0);
   swap(linea,_linea); __ierror=ierror; ierror=_ierror;
-  if ((*(_exp-1)).tipo==eoper && (*(_exp-1)).token==p_pointer) {
+  if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_pointer) {
     _exp--; generate_expression(); g1(lcpa);
-  } else if ((*(_exp-1)).tipo==eoper && (*(_exp-1)).token==p_pointerchar) {
+  } else if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_pointerchar) {
     _exp--; generate_expression();
     if (hacer_strfix) { g2(lcar,0); g1(lstrfix); g1(lasp); }
     g1(lcpachr);
-  } else if ((*(_exp-1)).tipo==eoper && (*(_exp-1)).token==p_pointerbyte) {
+  } else if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_pointerbyte) {
     _exp--; generate_expression();
     g1(lcpachr);
-  } else if ((*(_exp-1)).tipo==eoper && (*(_exp-1)).token==p_pointerword) {
+  } else if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_pointerword) {
     _exp--; generate_expression();
     g1(lcpawor);
-  } else if ((*(_exp-1)).tipo==eoper && (*(_exp-1)).token==p_string) {
+  } else if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_string) {
     _exp--; generate_expression(); g1(lcpastr);
   } else c_error(4,44);
   linea=_linea; ierror=__ierror;
@@ -5323,7 +5323,7 @@ void generate_expression(void) {
   struct objeto * ob;
 
   do {
-    switch ((*e).tipo) {
+    switch ((*e).type) {
       case econs:
         g2(lcar,(*e).valor); break;
       case estring:
@@ -5336,9 +5336,9 @@ void generate_expression(void) {
         ob=(*e).objeto; g2(lcal,(*ob).proc.offset);
         if ((*ob).usado) { (*ob).proc.offset=imem-1; } break;
       case efunc:
-        ob=(*e).objeto; g2(lfun,(*ob).func.codigo); break;
+        ob=(*e).objeto; g2(lfun,(*ob).func.code); break;
       case efext:
-        ob=(*e).objeto; g2(lext,(*ob).fext.codigo); break;
+        ob=(*e).objeto; g2(lext,(*ob).fext.code); break;
       case echeck:
         g1(lchk); break;
       case enull:
@@ -5454,7 +5454,7 @@ int constant (void) {
   _linea=linea; _ierror=ierror; exp00(0);
   swap(linea,_linea); __ierror=ierror; ierror=_ierror;
 
-  do switch ((*e).tipo) {
+  do switch ((*e).type) {
     case econs:
       pila[++i]=(*e).valor; break;
     case estring:
@@ -5507,42 +5507,42 @@ void exp0() { // Operadores con asociatividad de derecha a izquierda <-
 
   exp1();
   if ((p=pieza)==p_asig || (p>=p_add_asig && p<=p_shl_asig)) {
-    if ((*(_exp-1)).tipo==eoper && (*(_exp-1)).token==p_pointer) {
+    if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_pointer) {
       _exp--; lexer();
       exp00(0);
-      (*_exp).tipo=eoper; (*_exp++).token=p;
-    } else if ((*(_exp-1)).tipo==eoper && (*(_exp-1)).token==p_pointerchar) {
+      (*_exp).type=eoper; (*_exp++).token=p;
+    } else if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_pointerchar) {
       if (p==p_asig) p=p_asigchar; else p+=p_add_asigchar-p_add_asig;
       _exp--; lexer();
       exp00(1); // cadena[1]="A";
-      if (hacer_strfix) { (*_exp).tipo=eoper; (*_exp++).token=p_strfix; }
-      (*_exp).tipo=eoper; (*_exp++).token=p;
-    } else if ((*(_exp-1)).tipo==eoper && (*(_exp-1)).token==p_pointerbyte) {
+      if (hacer_strfix) { (*_exp).type=eoper; (*_exp++).token=p_strfix; }
+      (*_exp).type=eoper; (*_exp++).token=p;
+    } else if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_pointerbyte) {
       if (p==p_asig) p=p_asigchar; else p+=p_add_asigchar-p_add_asig;
       _exp--; lexer();
       exp00(1); // mis_bytes[1]="A";
-      (*_exp).tipo=eoper; (*_exp++).token=p;
-    } else if ((*(_exp-1)).tipo==eoper && (*(_exp-1)).token==p_pointerword) {
+      (*_exp).type=eoper; (*_exp++).token=p;
+    } else if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_pointerword) {
       if (p==p_asig) p=p_asigword; else p+=p_add_asigword-p_add_asig;
       _exp--; lexer();
       exp00(0);
-      (*_exp).tipo=eoper; (*_exp++).token=p;
-    } else if ((*(_exp-1)).tipo==eoper && (*(_exp-1)).token==p_string) {
+      (*_exp).type=eoper; (*_exp++).token=p;
+    } else if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_string) {
       if (p==p_asig) { // cadena="..."; // Hacer el strcpy
         _exp--; lexer();
         exp00(2);
-        (*_exp).tipo=eoper; (*_exp++).token=p_strcpy;
-        (*_exp).tipo=eoper; (*_exp++).token=p_string; //Sigue habiendo una cadena en la pila
+        (*_exp).type=eoper; (*_exp++).token=p_strcpy;
+        (*_exp).type=eoper; (*_exp++).token=p_string; //Sigue habiendo una cadena en la pila
       } else if (p==p_add_asig) { // cadena+="..."; // Hacer el strcat
         _exp--; lexer();
         exp00(2);
-        (*_exp).tipo=eoper; (*_exp++).token=p_strcat;
-        (*_exp).tipo=eoper; (*_exp++).token=p_string; //Sigue habiendo una cadena en la pila
+        (*_exp).type=eoper; (*_exp++).token=p_strcat;
+        (*_exp).type=eoper; (*_exp++).token=p_string; //Sigue habiendo una cadena en la pila
       } else if (p==p_sub_asig) { // cadena-=n; // Quita caracteres
         _exp--; lexer();
         exp00(-1);
-        (*_exp).tipo=eoper; (*_exp++).token=p_strsub;
-        (*_exp).tipo=eoper; (*_exp++).token=p_string; //Sigue habiendo una cadena en la pila
+        (*_exp).type=eoper; (*_exp++).token=p_strsub;
+        (*_exp).type=eoper; (*_exp++).token=p_string; //Sigue habiendo una cadena en la pila
       } else c_error(0,133);
     } else c_error(0,39);
   } tipo_factor=0;
@@ -5554,7 +5554,7 @@ void exp1() { // Operadores con asociatividad de izquierda a derecha ->
   while ((p=pieza)>=p_or && p<=p_andofs) {
     if (p>=p_xorptr) p-=p_xorptr-p_xor; // Convierte xorptr,andofs en xor,and
     lexer(); div_exp2();
-    (*_exp).tipo=eoper; (*_exp++).token=p;
+    (*_exp).type=eoper; (*_exp++).token=p;
     tipo_factor=0;
   }
 }
@@ -5568,10 +5568,10 @@ void div_exp2() {
     if (tf==2 || tipo_factor==2) {
       // NOTE: When both operands are strings, comparison uses strcmp (not pointer equality).
       p+=p_strigu-p_igu;
-      (*_exp).tipo=eoper; (*_exp++).token=p;
+      (*_exp).type=eoper; (*_exp++).token=p;
       tipo_factor=0;
     } else {
-      (*_exp).tipo=eoper; (*_exp++).token=p;
+      (*_exp).type=eoper; (*_exp++).token=p;
     } tipo_factor=0;
   }
 }
@@ -5581,7 +5581,7 @@ void exp3() {
   exp4();
   while ((p=pieza)>=p_shr && p<=p_shl) {
     lexer(); exp4();
-    (*_exp).tipo=eoper; (*_exp++).token=p;
+    (*_exp).type=eoper; (*_exp++).token=p;
     tipo_factor=0;
   }
 }
@@ -5594,16 +5594,16 @@ void exp4() {
     if (p<=p_resta) p+=p_add-p_suma; // Convierte suma,resta en add,sub
     lexer(); exp5();
     if (p==p_add && (tf==2 || tipo_factor==2 || tipo_expresion==2)) {
-      (*_exp).tipo=eoper; (*_exp++).token=p_stradd;
-      (*_exp).tipo=eoper; (*_exp++).token=p_string; // Hay una cadena en la pila
+      (*_exp).type=eoper; (*_exp++).token=p_stradd;
+      (*_exp).type=eoper; (*_exp++).token=p_string; // Hay una cadena en la pila
       tipo_factor=2;
     } else if (p==p_sub && tf==2) {
-      if (tipo_factor==2) { (*_exp).tipo=eoper; (*_exp++).token=p_strlen; }
-      (*_exp).tipo=eoper; (*_exp++).token=p_strdec;
-      (*_exp).tipo=eoper; (*_exp++).token=p_string; // Hay una cadena en la pila
+      if (tipo_factor==2) { (*_exp).type=eoper; (*_exp++).token=p_strlen; }
+      (*_exp).type=eoper; (*_exp++).token=p_strdec;
+      (*_exp).type=eoper; (*_exp++).token=p_string; // Hay una cadena en la pila
       tipo_factor=2;
     } else {
-      (*_exp).tipo=eoper; (*_exp++).token=p;
+      (*_exp).type=eoper; (*_exp++).token=p;
       tipo_factor=0;
     }
   }
@@ -5615,7 +5615,7 @@ void exp5() {
   while ((p=pieza)>=p_mul && p<=p_multi) {
     if (p==p_multi) p=p_mul; // Convierte multi en mul
     lexer();  unary();
-    (*_exp).tipo=eoper; (*_exp++).token=p;
+    (*_exp).type=eoper; (*_exp++).token=p;
     tipo_factor=0;
   }
 }
@@ -5634,52 +5634,52 @@ void unary() {
     lexer();  unary(); // p = ( neg, pointer, offset, not )
 
     if (p==p_offset) {
-      if ((*(_exp-1)).tipo==eoper && (*(_exp-1)).token==p_pointer) _exp--;
-      else if ((*(_exp-1)).tipo==eoper && (*(_exp-1)).token==p_pointerchar) {
+      if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_pointer) _exp--;
+      else if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_pointerchar) {
         c_error(4,132); // &cadena[<exp>] ???
-      } else if ((*(_exp-1)).tipo==eoper && (*(_exp-1)).token==p_pointerbyte) {
-        if ((*(_exp-2)).tipo==econs && (*(_exp-2)).valor==0) _exp-=2;
+      } else if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_pointerbyte) {
+        if ((*(_exp-2)).type==econs && (*(_exp-2)).valor==0) _exp-=2;
         else c_error(4,132); // &bytes[<exp>] ???
-      } else if ((*(_exp-1)).tipo==eoper && (*(_exp-1)).token==p_pointerword) {
-        if ((*(_exp-2)).tipo==econs && (*(_exp-2)).valor==0) _exp-=2;
+      } else if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_pointerword) {
+        if ((*(_exp-2)).type==econs && (*(_exp-2)).valor==0) _exp-=2;
         else c_error(4,132); // &words[<exp>] ???
-      } else if ((*(_exp-1)).tipo==eoper && (*(_exp-1)).token==p_string) {
+      } else if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_string) {
         // &cadena ≡ cadena
       } else c_error(4,32);
     } else if (p==p_inc || p==p_dec) {
-      if ((*(_exp-1)).tipo==eoper && (*(_exp-1)).token==p_pointer) {
+      if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_pointer) {
         _exp--;
-        (*_exp).tipo=eoper; (*_exp++).token=p;
-      } else if ((*(_exp-1)).tipo==eoper && (*(_exp-1)).token==p_pointerchar) {
+        (*_exp).type=eoper; (*_exp++).token=p;
+      } else if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_pointerchar) {
         _exp--;
-        (*_exp).tipo=eoper; (*_exp++).token=p+p_incchar-p_inc;
-      } else if ((*(_exp-1)).tipo==eoper && (*(_exp-1)).token==p_pointerbyte) {
+        (*_exp).type=eoper; (*_exp++).token=p+p_incchar-p_inc;
+      } else if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_pointerbyte) {
         _exp--;
-        (*_exp).tipo=eoper; (*_exp++).token=p+p_incchar-p_inc;
-      } else if ((*(_exp-1)).tipo==eoper && (*(_exp-1)).token==p_pointerword) {
+        (*_exp).type=eoper; (*_exp++).token=p+p_incchar-p_inc;
+      } else if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_pointerword) {
         _exp--;
-        (*_exp).tipo=eoper; (*_exp++).token=p+p_incword-p_inc;
-      } else if ((*(_exp-1)).tipo==eoper && (*(_exp-1)).token==p_string) {
+        (*_exp).type=eoper; (*_exp++).token=p+p_incword-p_inc;
+      } else if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_string) {
         _exp--;
-        (*_exp).tipo=econs;
+        (*_exp).type=econs;
         if (p==p_inc) (*_exp++).valor=-1; else (*_exp++).valor=1;
-        (*_exp).tipo=eoper; (*_exp++).token=p_strsub;
-        (*_exp).tipo=eoper; (*_exp++).token=p_string;
+        (*_exp).type=eoper; (*_exp++).token=p_strsub;
+        (*_exp).type=eoper; (*_exp++).token=p_string;
       } else c_error(4,122);
     } else if (p==p_pointer) {
-      if ((*(_exp-1)).tipo==eoper && (*(_exp-1)).token==p_pointerchar) {
+      if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_pointerchar) {
         // *cadena[0] ≡ cadena[0]
-      } else if ((*(_exp-1)).tipo==eoper && (*(_exp-1)).token==p_pointerbyte) {
+      } else if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_pointerbyte) {
         // *cadena[0] ≡ cadena[0]
-      } else if ((*(_exp-1)).tipo==eoper && (*(_exp-1)).token==p_pointerword) {
+      } else if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_pointerword) {
         // *cadena[0] ≡ cadena[0]
-      } else if ((*(_exp-1)).tipo==eoper && (*(_exp-1)).token==p_string) {
+      } else if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_string) {
         // *cadena == cadena
       } else {
-        (*_exp).tipo=eoper; (*_exp++).token=p;
+        (*_exp).type=eoper; (*_exp++).token=p;
       }
     } else {
-      (*_exp).tipo=eoper; (*_exp++).token=p;
+      (*_exp).type=eoper; (*_exp++).token=p;
     }
 
   } else exp6();
@@ -5691,7 +5691,7 @@ void exp6() { // Operador de acceso a variables o tablas locales ajenas
 
   factor();
   while (pieza==p_punto) {
-    if (comprueba_id) (*_exp++).tipo=echeck;
+    if (comprueba_id) (*_exp++).type=echeck;
     e=_exp+1;
     acceso_remoto=1; lexer(); factor(); acceso_remoto=0;
 
@@ -5699,7 +5699,7 @@ void exp6() { // Operador de acceso a variables o tablas locales ajenas
     // pushes into the expression. The code below replaces it with p_add.
     // (Alternative: search for p_punto between e-1 and _exp.)
 
-    if ((*e).tipo==eoper && (*e).token==p_punto)
+    if ((*e).type==eoper && (*e).token==p_punto)
       (*e).token=p_add; else c_error(4,43);
 
   }
@@ -5725,34 +5725,34 @@ void factor(void) {
       lexer();
       exp00(0);
       if (pieza!=p_corce) c_error(3,26);
-      (*_exp).tipo=eoper; (*_exp++).token=p_pointer; lexer(); break;
+      (*_exp).type=eoper; (*_exp++).token=p_pointer; lexer(); break;
 
     case p_whoami:
-      (*_exp++).tipo=ewhoami; lexer();  break;
+      (*_exp++).type=ewhoami; lexer();  break;
 
     case p_num:
-      (*_exp).tipo=econs; (*_exp++).valor=pieza_num; lexer(); break;
+      (*_exp).type=econs; (*_exp++).valor=pieza_num; lexer(); break;
 
     case p_lit:
       tipo_factor=2;
       if (tipo_expresion==1) {
-        (*_exp).tipo=econs; (*_exp++).valor=(byte)mem[pieza_num];
+        (*_exp).type=econs; (*_exp++).valor=(byte)mem[pieza_num];
       } else {
-        (*_exp).tipo=estring; (*_exp++).valor=pieza_num;
-        if (tipo_expresion==-1) { (*_exp).tipo=eoper; (*_exp++).token=p_strlen; }
+        (*_exp).type=estring; (*_exp++).valor=pieza_num;
+        if (tipo_expresion==-1) { (*_exp).type=eoper; (*_exp++).token=p_strlen; }
       } lexer(); break;
 
     case p_type:
       lexer(); if (pieza!=p_id) c_error(0,112);
-      switch((*o).tipo) {
+      switch((*o).type) {
         case tnone:
-          (*o).linea=linea; (*o).ierror=ierror;
-          (*_exp).tipo=econs; (*_exp++).valor=(memptrsize)o; (*o).usado=1; break;
+          (*o).line=linea; (*o).ierror=ierror;
+          (*_exp).type=econs; (*_exp++).valor=(memptrsize)o; (*o).usado=1; break;
         case tproc:
-          (*_exp).tipo=econs; (*_exp++).valor=(memptrsize)o; break;
+          (*_exp).type=econs; (*_exp++).valor=(memptrsize)o; break;
         case tsglo:
           if ((*o).sglo.offset==long_header) { // type mouse ≡ 0
-            (*_exp).tipo=econs; (*_exp++).valor=0; break;
+            (*_exp).type=econs; (*_exp++).valor=0; break;
           }
           /* fall through */
         default: c_error(0,60);
@@ -5762,8 +5762,8 @@ void factor(void) {
 
       lexer(); if (pieza!=p_abrir) c_error(3,36);
       lexer(); if (pieza!=p_id) c_error(3,113);;
-      (*_exp).tipo=econs;
-      switch((*o).tipo) {
+      (*_exp).type=econs;
+      switch((*o).type) {
         case tsglo: case tsloc:
           (*_exp++).valor=(*o).sglo.len_item*(*o).sglo.totalitems; break;
         case tpsgl: case tpslo:
@@ -5787,15 +5787,15 @@ void factor(void) {
         lexer();
         if (pieza!=p_pointer) c_error(0,151); // No se define el pointer así
         lexer(); if (pieza!=p_id) c_error(1,110); obs=o;
-        if ((*obs).tipo==tnone) c_error(0,150); // No se define el pointer así
-        if ((*obs).tipo!=tsglo && (*obs).tipo!=tsloc) c_error(0,150);
+        if ((*obs).type==tnone) c_error(0,150); // No se define el pointer así
+        if ((*obs).type!=tsglo && (*obs).type!=tsloc) c_error(0,150);
         lexer(); ob=o;
         analyze_pointer_struct(tpslo,iloc++,obs);
-        (*ob).linea=linea; (*ob).ierror=ierror;
+        (*ob).line=linea; (*ob).ierror=ierror;
         (*ob).param=1; parametros++;
-        (*_exp).tipo=econs; (*_exp++).valor=(*ob).pslo.offset;
-        (*_exp).tipo=eoper; (*_exp++).token=p_punto;
-        (*_exp).tipo=eoper; (*_exp++).token=p_pointer;
+        (*_exp).type=econs; (*_exp++).valor=(*ob).pslo.offset;
+        (*_exp).type=eoper; (*_exp++).token=p_punto;
+        (*_exp).type=eoper; (*_exp++).token=p_pointer;
       } break;
 
     case p_string: // Se comprueba la declaración de un string parámetro
@@ -5806,18 +5806,18 @@ void factor(void) {
         if (pieza==p_pointer) { // Recibe un puntero a string
           lexer();
           ob=analiza_pointer(tpclo,iloc++);
-          (*ob).linea=linea; (*ob).ierror=ierror;
+          (*ob).line=linea; (*ob).ierror=ierror;
           (*ob).param=1; parametros++;
-          (*_exp).tipo=econs; (*_exp++).valor=(*ob).pclo.offset;
-          (*_exp).tipo=eoper; (*_exp++).token=p_punto;
-          (*_exp).tipo=eoper; (*_exp++).token=p_pointer;
+          (*_exp).type=econs; (*_exp++).valor=(*ob).pclo.offset;
+          (*_exp).type=eoper; (*_exp++).token=p_punto;
+          (*_exp).type=eoper; (*_exp++).token=p_pointer;
           break;
         }
         if (pieza!=p_id) c_error(1,125);
-        ob=o; if ((*ob).tipo!=tnone) c_error(0,126);
-        (*ob).linea=linea; (*ob).ierror=ierror;
+        ob=o; if ((*ob).type!=tnone) c_error(0,126);
+        (*ob).line=linea; (*ob).ierror=ierror;
         (*ob).param=1;
-        (*ob).tipo=tcloc; lexer();
+        (*ob).type=tcloc; lexer();
         if (pieza==p_corab) {
           lexer();
           if (pieza==p_corce) {
@@ -5841,9 +5841,9 @@ void factor(void) {
         (*ob).cloc.offset=iloc+1;
         iloc+=1+((*ob).cloc.totalen+5)/4;
         mem[_imem-1]=imem; // pri
-        (*_exp).tipo=estring; (*_exp++).valor=(*ob).cloc.offset;
-        (*_exp).tipo=eoper; (*_exp++).token=p_punto;
-        (*_exp).tipo=eoper; (*_exp++).token=p_string;
+        (*_exp).type=estring; (*_exp++).valor=(*ob).cloc.offset;
+        (*_exp).type=eoper; (*_exp++).token=p_punto;
+        (*_exp).type=eoper; (*_exp++).token=p_string;
       } break;
 
     case p_byte: // Se comprueba la declaración de un byte parámetro
@@ -5854,28 +5854,28 @@ void factor(void) {
         if (pieza==p_pointer) {
           lexer();
           ob=analiza_pointer(tpblo,iloc++);
-          (*ob).linea=linea; (*ob).ierror=ierror;
+          (*ob).line=linea; (*ob).ierror=ierror;
           (*ob).param=1; parametros++;
-          (*_exp).tipo=econs; (*_exp++).valor=(*ob).pblo.offset;
-          (*_exp).tipo=eoper; (*_exp++).token=p_punto;
-          (*_exp).tipo=eoper; (*_exp++).token=p_pointer;
+          (*_exp).type=econs; (*_exp++).valor=(*ob).pblo.offset;
+          (*_exp).type=eoper; (*_exp++).token=p_punto;
+          (*_exp).type=eoper; (*_exp++).token=p_pointer;
           break;
         }
         if (pieza!=p_id) c_error(1,142);
-        ob=o; if ((*ob).tipo!=tnone) c_error(0,126);
-        (*ob).linea=linea; (*ob).ierror=ierror;
+        ob=o; if ((*ob).type!=tnone) c_error(0,126);
+        (*ob).line=linea; (*ob).ierror=ierror;
         (*ob).param=1;
-        (*ob).tipo=tbloc; lexer();
+        (*ob).type=tbloc; lexer();
         if (pieza==p_corab) c_error(2,146);
         parametros++; (*ob).bloc.offset=iloc++;
         (*ob).bloc.len1=0;
         (*ob).bloc.len2=-1;
         (*ob).bloc.len3=-1;
         (*ob).bloc.totalen=1;
-        (*_exp).tipo=econs; (*_exp++).valor=(*ob).bloc.offset;
-        (*_exp).tipo=eoper; (*_exp++).token=p_punto;
-        (*_exp).tipo=econs; (*_exp++).valor=0;
-        (*_exp).tipo=eoper; (*_exp++).token=p_pointerbyte;
+        (*_exp).type=econs; (*_exp++).valor=(*ob).bloc.offset;
+        (*_exp).type=eoper; (*_exp++).token=p_punto;
+        (*_exp).type=econs; (*_exp++).valor=0;
+        (*_exp).type=eoper; (*_exp++).token=p_pointerbyte;
       } break;
 
     case p_word: // Se comprueba la declaración de un word parámetro
@@ -5886,28 +5886,28 @@ void factor(void) {
         if (pieza==p_pointer) {
           lexer();
           ob=analiza_pointer(tpwlo,iloc++);
-          (*ob).linea=linea; (*ob).ierror=ierror;
+          (*ob).line=linea; (*ob).ierror=ierror;
           (*ob).param=1; parametros++;
-          (*_exp).tipo=econs; (*_exp++).valor=(*ob).pwlo.offset;
-          (*_exp).tipo=eoper; (*_exp++).token=p_punto;
-          (*_exp).tipo=eoper; (*_exp++).token=p_pointer;
+          (*_exp).type=econs; (*_exp++).valor=(*ob).pwlo.offset;
+          (*_exp).type=eoper; (*_exp++).token=p_punto;
+          (*_exp).type=eoper; (*_exp++).token=p_pointer;
           break;
         }
         if (pieza!=p_id) c_error(1,145);
-        ob=o; if ((*ob).tipo!=tnone) c_error(0,126);
-        (*ob).linea=linea; (*ob).ierror=ierror;
+        ob=o; if ((*ob).type!=tnone) c_error(0,126);
+        (*ob).line=linea; (*ob).ierror=ierror;
         (*ob).param=1;
-        (*ob).tipo=twloc; lexer();
+        (*ob).type=twloc; lexer();
         if (pieza==p_corab) c_error(2,146);
         parametros++; (*ob).wloc.offset=iloc++;
         (*ob).wloc.len1=0;
         (*ob).wloc.len2=-1;
         (*ob).wloc.len3=-1;
         (*ob).wloc.totalen=1;
-        (*_exp).tipo=econs; (*_exp++).valor=(*ob).wloc.offset;
-        (*_exp).tipo=eoper; (*_exp++).token=p_punto;
-        (*_exp).tipo=econs; (*_exp++).valor=0;
-        (*_exp).tipo=eoper; (*_exp++).token=p_pointerword;
+        (*_exp).type=econs; (*_exp++).valor=(*ob).wloc.offset;
+        (*_exp).type=eoper; (*_exp++).token=p_punto;
+        (*_exp).type=econs; (*_exp++).valor=0;
+        (*_exp).type=eoper; (*_exp++).token=p_pointerword;
       } break;
 
 #pragma GCC diagnostic push
@@ -5925,31 +5925,31 @@ void factor(void) {
           } parametros++;
           lexer();
           ob=analiza_pointer(tpilo,iloc++);
-          (*ob).linea=linea; (*ob).ierror=ierror;
+          (*ob).line=linea; (*ob).ierror=ierror;
           (*ob).param=1;
-          (*_exp).tipo=econs; (*_exp++).valor=(*ob).pilo.offset;
-          (*_exp).tipo=eoper; (*_exp++).token=p_punto;
-          (*_exp).tipo=eoper; (*_exp++).token=p_pointer;
+          (*_exp).type=econs; (*_exp++).valor=(*ob).pilo.offset;
+          (*_exp).type=eoper; (*_exp++).token=p_punto;
+          (*_exp).type=eoper; (*_exp++).token=p_pointer;
           break;
         } else if (pieza!=p_id) c_error(1,149);
       }
 
-    case p_id: switch ((*o).tipo) {
+    case p_id: switch ((*o).type) {
 
       case tnone:
-        ob=o; (*ob).linea=linea; (*ob).ierror=ierror; lexer();
+        ob=o; (*ob).line=linea; (*ob).ierror=ierror; lexer();
         if (pieza!=p_abrir) {
           if (parametros>0) {
             if (pieza==p_corab) c_error(2,146);
             parametros++;
-            (*ob).tipo=tvloc; (*ob).vloc.offset=iloc++;
+            (*ob).type=tvloc; (*ob).vloc.offset=iloc++;
             (*ob).param=1;
-            (*_exp).tipo=econs; (*_exp++).valor=(*ob).vloc.offset;
-            (*_exp).tipo=eoper; (*_exp++).token=p_punto;
-            (*_exp).tipo=eoper; (*_exp++).token=p_pointer; break;
+            (*_exp).type=econs; (*_exp++).valor=(*ob).vloc.offset;
+            (*_exp).type=eoper; (*_exp++).token=p_punto;
+            (*_exp).type=eoper; (*_exp++).token=p_pointer; break;
           } else c_error(2,28);
         }
-        (*ob).usado=1; (*ob).tipo=tproc;
+        (*ob).usado=1; (*ob).type=tproc;
         (*ob).proc.bloque=ob; (*ob).proc.offset=0; (*ob).proc.num_par=0;
         lexer();
         while (pieza!=p_cerrar) {
@@ -5957,256 +5957,256 @@ void factor(void) {
           exp00(0);
           if (pieza!=p_cerrar) { if (pieza!=p_coma) c_error(3,25);
           else { lexer();  if (pieza==p_cerrar) c_error(3,45); } }
-        } (*_exp).tipo=ecall; (*_exp++).objeto=ob; lexer();  break;
+        } (*_exp).type=ecall; (*_exp++).objeto=ob; lexer();  break;
 
       case tcons:
         if ((*o).cons.literal) {
           tipo_factor=2;
           if (tipo_expresion==1) {
-            (*_exp).tipo=econs; (*_exp++).valor=(byte)mem[pieza_num];
+            (*_exp).type=econs; (*_exp++).valor=(byte)mem[pieza_num];
           } else if (tipo_expresion==-1) {
-            (*_exp).tipo=econs; (*_exp++).valor=pieza_num;
-            (*_exp).tipo=eoper; (*_exp++).token=p_strlen;
+            (*_exp).type=econs; (*_exp++).valor=pieza_num;
+            (*_exp).type=eoper; (*_exp++).token=p_strlen;
           } else {
-            (*_exp).tipo=econs; (*_exp++).valor=(*o).cons.valor;
+            (*_exp).type=econs; (*_exp++).valor=(*o).cons.valor;
           }
         } else {
-          (*_exp).tipo=econs; (*_exp++).valor=(*o).cons.valor;
+          (*_exp).type=econs; (*_exp++).valor=(*o).cons.valor;
         } lexer(); break;
 
       case tvglo:
-        (*_exp).tipo=econs; (*_exp++).valor=(*o).vglo.offset;
-        (*_exp).tipo=eoper; (*_exp++).token=p_pointer; lexer();  break;
+        (*_exp).type=econs; (*_exp++).valor=(*o).vglo.offset;
+        (*_exp).type=eoper; (*_exp++).token=p_pointer; lexer();  break;
         break;
 
       case ttglo:
       case tpigl:
         ob=o; offset=(*ob).tglo.offset;
         lexer();
-        (*_exp).tipo=econs; (*_exp++).valor=offset;
+        (*_exp).type=econs; (*_exp++).valor=offset;
         if (pieza==p_corab) {
-          if ((*ob).tipo==tpigl) {
-            (*_exp).tipo=eoper; (*_exp++).token=p_pointer;
-            if (comprueba_null) (*_exp++).tipo=enull;
+          if ((*ob).type==tpigl) {
+            (*_exp).type=eoper; (*_exp++).token=p_pointer;
+            if (comprueba_null) (*_exp++).type=enull;
           }
           lexer();
           exp00(0);
-          if ((*ob).tglo.len1>-1) if (comprueba_rango) { (*_exp).tipo=erango; (*_exp++).valor=(*ob).tglo.len1; }
+          if ((*ob).tglo.len1>-1) if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).tglo.len1; }
           if ((*ob).tglo.len2>-1) {
             if (pieza!=p_coma) c_error(3,130);
             lexer();
             exp00(0);
-            if (comprueba_rango) { (*_exp).tipo=erango; (*_exp++).valor=(*ob).tglo.len2; }
+            if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).tglo.len2; }
             if ((*ob).tglo.len3>-1) {
               if (pieza!=p_coma) c_error(3,130);
               lexer();
               exp00(0);
-              if (comprueba_rango) { (*_exp).tipo=erango; (*_exp++).valor=(*ob).tglo.len3; }
-              (*_exp).tipo=econs; (*_exp++).valor=(*ob).tglo.len2+1;
-              (*_exp).tipo=eoper; (*_exp++).token=p_mul;
-              (*_exp).tipo=eoper; (*_exp++).token=p_add;
+              if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).tglo.len3; }
+              (*_exp).type=econs; (*_exp++).valor=(*ob).tglo.len2+1;
+              (*_exp).type=eoper; (*_exp++).token=p_mul;
+              (*_exp).type=eoper; (*_exp++).token=p_add;
             }
-            (*_exp).tipo=econs; (*_exp++).valor=(*ob).tglo.len1+1;
-            (*_exp).tipo=eoper; (*_exp++).token=p_mul;
-            (*_exp).tipo=eoper; (*_exp++).token=p_add;
+            (*_exp).type=econs; (*_exp++).valor=(*ob).tglo.len1+1;
+            (*_exp).type=eoper; (*_exp++).token=p_mul;
+            (*_exp).type=eoper; (*_exp++).token=p_add;
           }
           if (pieza!=p_corce) c_error(3,26);
           lexer();
-          (*_exp).tipo=eoper; (*_exp++).token=p_add;
-        } (*_exp).tipo=eoper; (*_exp++).token=p_pointer; break;
+          (*_exp).type=eoper; (*_exp++).token=p_add;
+        } (*_exp).type=eoper; (*_exp++).token=p_pointer; break;
 
       case tbglo:
       case tpbgl:
       case tpcgl:
         ob=o; offset=(*ob).bglo.offset;
         lexer();
-        (*_exp).tipo=econs; (*_exp++).valor=offset;
-        if ((*ob).tipo==tpbgl || (*ob).tipo==tpcgl) {
-          (*_exp).tipo=eoper; (*_exp++).token=p_pointer;
+        (*_exp).type=econs; (*_exp++).valor=offset;
+        if ((*ob).type==tpbgl || (*ob).type==tpcgl) {
+          (*_exp).type=eoper; (*_exp++).token=p_pointer;
           if (pieza!=p_corab) break;
-          if (comprueba_null) (*_exp++).tipo=enull;
+          if (comprueba_null) (*_exp++).type=enull;
         }
         if (pieza==p_corab) {
           lexer();
           exp00(0);
-          if ((*ob).bglo.len1>-1) if (comprueba_rango) { (*_exp).tipo=erango; (*_exp++).valor=(*ob).bglo.len1; }
+          if ((*ob).bglo.len1>-1) if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).bglo.len1; }
           if ((*ob).bglo.len2>-1) {
             if (pieza!=p_coma) c_error(3,130);
             lexer();
             exp00(0);
-            if (comprueba_rango) { (*_exp).tipo=erango; (*_exp++).valor=(*ob).bglo.len2; }
+            if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).bglo.len2; }
             if ((*ob).bglo.len3>-1) {
               if (pieza!=p_coma) c_error(3,130);
               lexer();
               exp00(0);
-              if (comprueba_rango) { (*_exp).tipo=erango; (*_exp++).valor=(*ob).bglo.len3; }
-              (*_exp).tipo=econs; (*_exp++).valor=(*ob).bglo.len2+1;
-              (*_exp).tipo=eoper; (*_exp++).token=p_mul;
-              (*_exp).tipo=eoper; (*_exp++).token=p_add;
+              if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).bglo.len3; }
+              (*_exp).type=econs; (*_exp++).valor=(*ob).bglo.len2+1;
+              (*_exp).type=eoper; (*_exp++).token=p_mul;
+              (*_exp).type=eoper; (*_exp++).token=p_add;
             }
-            (*_exp).tipo=econs; (*_exp++).valor=(*ob).bglo.len1+1;
-            (*_exp).tipo=eoper; (*_exp++).token=p_mul;
-            (*_exp).tipo=eoper; (*_exp++).token=p_add;
+            (*_exp).type=econs; (*_exp++).valor=(*ob).bglo.len1+1;
+            (*_exp).type=eoper; (*_exp++).token=p_mul;
+            (*_exp).type=eoper; (*_exp++).token=p_add;
           }
           if (pieza!=p_corce) c_error(3,26);
           lexer();
         } else { // mi_byte ≡ mi_byte[0]
-          (*_exp).tipo=econs; (*_exp++).valor=0;
-        } (*_exp).tipo=eoper; (*_exp++).token=p_pointerbyte ; break;
+          (*_exp).type=econs; (*_exp++).valor=0;
+        } (*_exp).type=eoper; (*_exp++).token=p_pointerbyte ; break;
 
       case twglo:
       case tpwgl:
         ob=o; offset=(*ob).wglo.offset;
         lexer();
-        (*_exp).tipo=econs; (*_exp++).valor=offset;
-        if ((*ob).tipo==tpwgl) {
-          (*_exp).tipo=eoper; (*_exp++).token=p_pointer;
+        (*_exp).type=econs; (*_exp++).valor=offset;
+        if ((*ob).type==tpwgl) {
+          (*_exp).type=eoper; (*_exp++).token=p_pointer;
           if (pieza!=p_corab) break;
-          if (comprueba_null) (*_exp++).tipo=enull;
+          if (comprueba_null) (*_exp++).type=enull;
         }
         if (pieza==p_corab) {
           lexer();
           exp00(0);
-          if ((*ob).wglo.len1>-1) if (comprueba_rango) { (*_exp).tipo=erango; (*_exp++).valor=(*ob).wglo.len1; }
+          if ((*ob).wglo.len1>-1) if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).wglo.len1; }
           if ((*ob).wglo.len2>-1) {
             if (pieza!=p_coma) c_error(3,130);
             lexer();
             exp00(0);
-            if (comprueba_rango) { (*_exp).tipo=erango; (*_exp++).valor=(*ob).wglo.len2; }
+            if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).wglo.len2; }
             if ((*ob).wglo.len3>-1) {
               if (pieza!=p_coma) c_error(3,130);
               lexer();
               exp00(0);
-              if (comprueba_rango) { (*_exp).tipo=erango; (*_exp++).valor=(*ob).wglo.len3; }
-              (*_exp).tipo=econs; (*_exp++).valor=(*ob).wglo.len2+1;
-              (*_exp).tipo=eoper; (*_exp++).token=p_mul;
-              (*_exp).tipo=eoper; (*_exp++).token=p_add;
+              if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).wglo.len3; }
+              (*_exp).type=econs; (*_exp++).valor=(*ob).wglo.len2+1;
+              (*_exp).type=eoper; (*_exp++).token=p_mul;
+              (*_exp).type=eoper; (*_exp++).token=p_add;
             }
-            (*_exp).tipo=econs; (*_exp++).valor=(*ob).wglo.len1+1;
-            (*_exp).tipo=eoper; (*_exp++).token=p_mul;
-            (*_exp).tipo=eoper; (*_exp++).token=p_add;
+            (*_exp).type=econs; (*_exp++).valor=(*ob).wglo.len1+1;
+            (*_exp).type=eoper; (*_exp++).token=p_mul;
+            (*_exp).type=eoper; (*_exp++).token=p_add;
           }
           if (pieza!=p_corce) c_error(3,26);
           lexer();
         } else { // mi_byte ≡ mi_byte[0]
-          (*_exp).tipo=econs; (*_exp++).valor=0;
-        } (*_exp).tipo=eoper; (*_exp++).token=p_pointerword; break;
+          (*_exp).type=econs; (*_exp++).valor=0;
+        } (*_exp).type=eoper; (*_exp++).token=p_pointerword; break;
 
       case tcglo:
         ob=o; offset=(*ob).cglo.offset;
         lexer();
-        (*_exp).tipo=estring; (*_exp++).valor=offset;
+        (*_exp).type=estring; (*_exp++).valor=offset;
         if (pieza==p_corab) {
           lexer();
           exp00(0);
-          if (comprueba_rango) { (*_exp).tipo=erango; (*_exp++).valor=(*ob).cglo.totalen; }
+          if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).cglo.totalen; }
           if (pieza!=p_corce) c_error(3,26);
           lexer();
-          (*_exp).tipo=eoper; (*_exp++).token=p_pointerchar;
+          (*_exp).type=eoper; (*_exp++).token=p_pointerchar;
         } else {
           tipo_factor=2;
           if (tipo_expresion==1) {
-            (*_exp).tipo=econs; (*_exp++).valor=0;
-            (*_exp).tipo=eoper; (*_exp++).token=p_pointerchar;
+            (*_exp).type=econs; (*_exp++).valor=0;
+            (*_exp).type=eoper; (*_exp++).token=p_pointerchar;
           } else {
-            (*_exp).tipo=eoper; (*_exp++).token=p_string;
-            if (tipo_expresion==-1) { (*_exp).tipo=eoper; (*_exp++).token=p_strlen; }
+            (*_exp).type=eoper; (*_exp++).token=p_string;
+            if (tipo_expresion==-1) { (*_exp).type=eoper; (*_exp++).token=p_strlen; }
           }
         } break;
 
       case tsglo:
       case tpsgl:
-        ob=o; lexer(); (*_exp).tipo=econs; (*_exp++).valor=(*ob).sglo.offset;
-        if ((*ob).tipo==tpsgl) {
-          (*_exp).tipo=eoper; (*_exp++).token=p_pointer;
+        ob=o; lexer(); (*_exp).type=econs; (*_exp++).valor=(*ob).sglo.offset;
+        if ((*ob).type==tpsgl) {
+          (*_exp).type=eoper; (*_exp++).token=p_pointer;
           if (pieza!=p_corab && pieza!=p_punto) break;
-          if (comprueba_null) (*_exp++).tipo=enull;
+          if (comprueba_null) (*_exp++).type=enull;
         }
         if (pieza==p_corab) {
           lexer();
           exp00(0);
-          if ((*ob).sglo.items1>-1) if (comprueba_rango) { (*_exp).tipo=erango; (*_exp++).valor=(*ob).sglo.items1; }
+          if ((*ob).sglo.items1>-1) if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).sglo.items1; }
           if ((*ob).sglo.items2>-1) {
             if (pieza!=p_coma) c_error(3,131);
             lexer();
             exp00(0);
-            if (comprueba_rango) { (*_exp).tipo=erango; (*_exp++).valor=(*ob).sglo.items2; }
+            if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).sglo.items2; }
             if ((*ob).sglo.items3>-1) {
               if (pieza!=p_coma) c_error(3,131);
               lexer();
               exp00(0);
-              if (comprueba_rango) { (*_exp).tipo=erango; (*_exp++).valor=(*ob).sglo.items3; }
-              (*_exp).tipo=econs; (*_exp++).valor=(*ob).sglo.items2+1;
-              (*_exp).tipo=eoper; (*_exp++).token=p_mul;
-              (*_exp).tipo=eoper; (*_exp++).token=p_add;
+              if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).sglo.items3; }
+              (*_exp).type=econs; (*_exp++).valor=(*ob).sglo.items2+1;
+              (*_exp).type=eoper; (*_exp++).token=p_mul;
+              (*_exp).type=eoper; (*_exp++).token=p_add;
             }
-            (*_exp).tipo=econs; (*_exp++).valor=(*ob).sglo.items1+1;
-            (*_exp).tipo=eoper; (*_exp++).token=p_mul;
-            (*_exp).tipo=eoper; (*_exp++).token=p_add;
+            (*_exp).type=econs; (*_exp++).valor=(*ob).sglo.items1+1;
+            (*_exp).type=eoper; (*_exp++).token=p_mul;
+            (*_exp).type=eoper; (*_exp++).token=p_add;
           }
           if (pieza!=p_corce) { c_error(3,26); } lexer();
-          if ((*ob).tipo==tpsgl) {
-            (*_exp).tipo=econs; (*_exp++).valor=(*((*ob).psgl.ostruct)).sglo.len_item;
+          if ((*ob).type==tpsgl) {
+            (*_exp).type=econs; (*_exp++).valor=(*((*ob).psgl.ostruct)).sglo.len_item;
           } else {
-            (*_exp).tipo=econs; (*_exp++).valor=(*ob).sglo.len_item;
+            (*_exp).type=econs; (*_exp++).valor=(*ob).sglo.len_item;
           }
-          (*_exp).tipo=eoper; (*_exp++).token=p_mul;
-          (*_exp).tipo=eoper; (*_exp++).token=p_add;
+          (*_exp).type=eoper; (*_exp++).token=p_mul;
+          (*_exp).type=eoper; (*_exp++).token=p_add;
         }
         if (pieza==p_punto) {
           struct_pointer=p_pointer;
-          if ((*ob).tipo==tpsgl) member=(*ob).psgl.ostruct; else member=ob;
+          if ((*ob).type==tpsgl) member=(*ob).psgl.ostruct; else member=ob;
           lexer(); factor_struct();
-          (*_exp).tipo=eoper; (*_exp++).token=struct_pointer;
+          (*_exp).type=eoper; (*_exp++).token=struct_pointer;
         } else {
-          (*_exp).tipo=eoper; (*_exp++).token=p_pointer;
+          (*_exp).type=eoper; (*_exp++).token=p_pointer;
         } break;
 
       case tvloc:
         if (acceso_remoto && (*o).bloque) c_error(0,56);
-        (*_exp).tipo=econs; (*_exp++).valor=(*o).vloc.offset;
-        (*_exp).tipo=eoper; (*_exp++).token=p_punto;
-        (*_exp).tipo=eoper; (*_exp++).token=p_pointer; lexer(); break;
+        (*_exp).type=econs; (*_exp++).valor=(*o).vloc.offset;
+        (*_exp).type=eoper; (*_exp++).token=p_punto;
+        (*_exp).type=eoper; (*_exp++).token=p_pointer; lexer(); break;
 
       case ttloc:
       case tpilo:
         if (acceso_remoto && (*o).bloque) c_error(0,56);
         ob=o; offset=(*ob).tloc.offset;
         lexer();
-        (*_exp).tipo=econs; (*_exp++).valor=offset;
-        (*_exp).tipo=eoper; (*_exp++).token=p_punto;
+        (*_exp).type=econs; (*_exp++).valor=offset;
+        (*_exp).type=eoper; (*_exp++).token=p_punto;
         if (pieza==p_corab) {
-          if ((*ob).tipo==tpilo) {
-            (*_exp).tipo=eoper; (*_exp++).token=p_pointer;
-            if (comprueba_null) (*_exp++).tipo=enull;
+          if ((*ob).type==tpilo) {
+            (*_exp).type=eoper; (*_exp++).token=p_pointer;
+            if (comprueba_null) (*_exp++).type=enull;
           }
           acceso_remoto=0;
           lexer();
           exp00(0);
-          if ((*ob).tloc.len1>-1) if (comprueba_rango) { (*_exp).tipo=erango; (*_exp++).valor=(*ob).tloc.len1; }
+          if ((*ob).tloc.len1>-1) if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).tloc.len1; }
           if ((*ob).tloc.len2>-1) {
             if (pieza!=p_coma) c_error(3,130);
             lexer();
             exp00(0);
-            if (comprueba_rango) { (*_exp).tipo=erango; (*_exp++).valor=(*ob).tloc.len2; }
+            if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).tloc.len2; }
             if ((*ob).tloc.len3>-1) {
               if (pieza!=p_coma) c_error(3,130);
               lexer();
               exp00(0);
-              if (comprueba_rango) { (*_exp).tipo=erango; (*_exp++).valor=(*ob).tloc.len3; }
-              (*_exp).tipo=econs; (*_exp++).valor=(*ob).tloc.len2+1;
-              (*_exp).tipo=eoper; (*_exp++).token=p_mul;
-              (*_exp).tipo=eoper; (*_exp++).token=p_add;
+              if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).tloc.len3; }
+              (*_exp).type=econs; (*_exp++).valor=(*ob).tloc.len2+1;
+              (*_exp).type=eoper; (*_exp++).token=p_mul;
+              (*_exp).type=eoper; (*_exp++).token=p_add;
             }
-            (*_exp).tipo=econs; (*_exp++).valor=(*ob).tloc.len1+1;
-            (*_exp).tipo=eoper; (*_exp++).token=p_mul;
-            (*_exp).tipo=eoper; (*_exp++).token=p_add;
+            (*_exp).type=econs; (*_exp++).valor=(*ob).tloc.len1+1;
+            (*_exp).type=eoper; (*_exp++).token=p_mul;
+            (*_exp).type=eoper; (*_exp++).token=p_add;
           }
           if (pieza!=p_corce) c_error(3,26);
           lexer();
-          (*_exp).tipo=eoper; (*_exp++).token=p_add;
+          (*_exp).type=eoper; (*_exp++).token=p_add;
         }
-        (*_exp).tipo=eoper; (*_exp++).token=p_pointer; break;
+        (*_exp).type=eoper; (*_exp++).token=p_pointer; break;
 
       case tbloc:
       case tpblo:
@@ -6214,157 +6214,157 @@ void factor(void) {
         if (acceso_remoto && (*o).bloque) c_error(0,56);
         ob=o; offset=(*ob).bloc.offset;
         lexer();
-        (*_exp).tipo=econs; (*_exp++).valor=offset;
-        (*_exp).tipo=eoper; (*_exp++).token=p_punto;
-        if ((*ob).tipo==tpblo || (*ob).tipo==tpclo) {
-          (*_exp).tipo=eoper; (*_exp++).token=p_pointer;
+        (*_exp).type=econs; (*_exp++).valor=offset;
+        (*_exp).type=eoper; (*_exp++).token=p_punto;
+        if ((*ob).type==tpblo || (*ob).type==tpclo) {
+          (*_exp).type=eoper; (*_exp++).token=p_pointer;
           if (pieza!=p_corab) break;
-          if (comprueba_null) (*_exp++).tipo=enull;
+          if (comprueba_null) (*_exp++).type=enull;
         }
         if (pieza==p_corab) {
           acceso_remoto=0;
           lexer();
           exp00(0);
-          if ((*ob).bloc.len1>-1) if (comprueba_rango) { (*_exp).tipo=erango; (*_exp++).valor=(*ob).bloc.len1; }
+          if ((*ob).bloc.len1>-1) if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).bloc.len1; }
           if ((*ob).bloc.len2>-1) {
             if (pieza!=p_coma) c_error(3,130);
             lexer();
             exp00(0);
-            if (comprueba_rango) { (*_exp).tipo=erango; (*_exp++).valor=(*ob).bloc.len2; }
+            if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).bloc.len2; }
             if ((*ob).bloc.len3>-1) {
               if (pieza!=p_coma) c_error(3,130);
               lexer();
               exp00(0);
-              if (comprueba_rango) { (*_exp).tipo=erango; (*_exp++).valor=(*ob).bloc.len3; }
-              (*_exp).tipo=econs; (*_exp++).valor=(*ob).bloc.len2+1;
-              (*_exp).tipo=eoper; (*_exp++).token=p_mul;
-              (*_exp).tipo=eoper; (*_exp++).token=p_add;
+              if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).bloc.len3; }
+              (*_exp).type=econs; (*_exp++).valor=(*ob).bloc.len2+1;
+              (*_exp).type=eoper; (*_exp++).token=p_mul;
+              (*_exp).type=eoper; (*_exp++).token=p_add;
             }
-            (*_exp).tipo=econs; (*_exp++).valor=(*ob).bloc.len1+1;
-            (*_exp).tipo=eoper; (*_exp++).token=p_mul;
-            (*_exp).tipo=eoper; (*_exp++).token=p_add;
+            (*_exp).type=econs; (*_exp++).valor=(*ob).bloc.len1+1;
+            (*_exp).type=eoper; (*_exp++).token=p_mul;
+            (*_exp).type=eoper; (*_exp++).token=p_add;
           }
           if (pieza!=p_corce) c_error(3,26);
           lexer();
         } else { // mi_byte ≡ mi_byte[0]
-          (*_exp).tipo=econs; (*_exp++).valor=0;
-        } (*_exp).tipo=eoper; (*_exp++).token=p_pointerbyte ; break;
+          (*_exp).type=econs; (*_exp++).valor=0;
+        } (*_exp).type=eoper; (*_exp++).token=p_pointerbyte ; break;
 
       case twloc:
       case tpwlo:
         if (acceso_remoto && (*o).bloque) c_error(0,56);
         ob=o; offset=(*ob).wloc.offset;
         lexer();
-        (*_exp).tipo=econs; (*_exp++).valor=offset;
-        (*_exp).tipo=eoper; (*_exp++).token=p_punto;
-        if ((*ob).tipo==tpwlo) {
-          (*_exp).tipo=eoper; (*_exp++).token=p_pointer;
+        (*_exp).type=econs; (*_exp++).valor=offset;
+        (*_exp).type=eoper; (*_exp++).token=p_punto;
+        if ((*ob).type==tpwlo) {
+          (*_exp).type=eoper; (*_exp++).token=p_pointer;
           if (pieza!=p_corab) break;
-          if (comprueba_null) (*_exp++).tipo=enull;
+          if (comprueba_null) (*_exp++).type=enull;
         }
         if (pieza==p_corab) {
           acceso_remoto=0;
           lexer();
           exp00(0);
-          if ((*ob).wloc.len1>-1) if (comprueba_rango) { (*_exp).tipo=erango; (*_exp++).valor=(*ob).wloc.len1; }
+          if ((*ob).wloc.len1>-1) if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).wloc.len1; }
           if ((*ob).wloc.len2>-1) {
             if (pieza!=p_coma) c_error(3,130);
             lexer();
             exp00(0);
-            if (comprueba_rango) { (*_exp).tipo=erango; (*_exp++).valor=(*ob).wloc.len2; }
+            if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).wloc.len2; }
             if ((*ob).wloc.len3>-1) {
               if (pieza!=p_coma) c_error(3,130);
               lexer();
               exp00(0);
-              if (comprueba_rango) { (*_exp).tipo=erango; (*_exp++).valor=(*ob).wloc.len3; }
-              (*_exp).tipo=econs; (*_exp++).valor=(*ob).wloc.len2+1;
-              (*_exp).tipo=eoper; (*_exp++).token=p_mul;
-              (*_exp).tipo=eoper; (*_exp++).token=p_add;
+              if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).wloc.len3; }
+              (*_exp).type=econs; (*_exp++).valor=(*ob).wloc.len2+1;
+              (*_exp).type=eoper; (*_exp++).token=p_mul;
+              (*_exp).type=eoper; (*_exp++).token=p_add;
             }
-            (*_exp).tipo=econs; (*_exp++).valor=(*ob).wloc.len1+1;
-            (*_exp).tipo=eoper; (*_exp++).token=p_mul;
-            (*_exp).tipo=eoper; (*_exp++).token=p_add;
+            (*_exp).type=econs; (*_exp++).valor=(*ob).wloc.len1+1;
+            (*_exp).type=eoper; (*_exp++).token=p_mul;
+            (*_exp).type=eoper; (*_exp++).token=p_add;
           }
           if (pieza!=p_corce) c_error(3,26);
           lexer();
         } else { // mi_byte ≡ mi_byte[0]
-          (*_exp).tipo=econs; (*_exp++).valor=0;
-        } (*_exp).tipo=eoper; (*_exp++).token=p_pointerword; break;
+          (*_exp).type=econs; (*_exp++).valor=0;
+        } (*_exp).type=eoper; (*_exp++).token=p_pointerword; break;
 
       case tcloc:
         if (acceso_remoto && (*o).bloque) c_error(0,56);
         ob=o; offset=(*ob).cloc.offset;
         lexer();
-        (*_exp).tipo=estring; (*_exp++).valor=offset;
-        (*_exp).tipo=eoper; (*_exp++).token=p_punto;
+        (*_exp).type=estring; (*_exp++).valor=offset;
+        (*_exp).type=eoper; (*_exp++).token=p_punto;
         if (pieza==p_corab) {
           acceso_remoto=0;
           lexer();
           exp00(0);
-          if (comprueba_rango) { (*_exp).tipo=erango; (*_exp++).valor=(*ob).cloc.totalen; }
+          if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).cloc.totalen; }
           if (pieza!=p_corce) c_error(3,26);
           lexer();
-          (*_exp).tipo=eoper; (*_exp++).token=p_pointerchar;
+          (*_exp).type=eoper; (*_exp++).token=p_pointerchar;
         } else {
           tipo_factor=2;
           if (tipo_expresion==1) {
-            (*_exp).tipo=econs; (*_exp++).valor=0;
-            (*_exp).tipo=eoper; (*_exp++).token=p_pointerchar;
+            (*_exp).type=econs; (*_exp++).valor=0;
+            (*_exp).type=eoper; (*_exp++).token=p_pointerchar;
           } else {
-            (*_exp).tipo=eoper; (*_exp++).token=p_string;
-            if (tipo_expresion==-1) { (*_exp).tipo=eoper; (*_exp++).token=p_strlen; }
+            (*_exp).type=eoper; (*_exp++).token=p_string;
+            if (tipo_expresion==-1) { (*_exp).type=eoper; (*_exp++).token=p_strlen; }
           }
         } break;
 
       case tsloc:
       case tpslo:
         if (acceso_remoto && (*o).bloque) c_error(0,56);
-        ob=o; lexer(); (*_exp).tipo=econs; (*_exp++).valor=(*ob).sloc.offset;
-        (*_exp).tipo=eoper; (*_exp++).token=p_punto;
-        if ((*ob).tipo==tpslo) {
-          (*_exp).tipo=eoper; (*_exp++).token=p_pointer;
+        ob=o; lexer(); (*_exp).type=econs; (*_exp++).valor=(*ob).sloc.offset;
+        (*_exp).type=eoper; (*_exp++).token=p_punto;
+        if ((*ob).type==tpslo) {
+          (*_exp).type=eoper; (*_exp++).token=p_pointer;
           if (pieza!=p_corab && pieza!=p_punto) break;
-          if (comprueba_null) (*_exp++).tipo=enull;
+          if (comprueba_null) (*_exp++).type=enull;
         }
         if (pieza==p_corab) {
           acceso_remoto=0;
           lexer();
           exp00(0);
-          if ((*ob).sloc.items1>-1) if (comprueba_rango) { (*_exp).tipo=erango; (*_exp++).valor=(*ob).sloc.items1; }
+          if ((*ob).sloc.items1>-1) if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).sloc.items1; }
           if ((*ob).sloc.items2>-1) {
             if (pieza!=p_coma) c_error(3,131);
             lexer();
             exp00(0);
-            if (comprueba_rango) { (*_exp).tipo=erango; (*_exp++).valor=(*ob).sloc.items2; }
+            if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).sloc.items2; }
             if ((*ob).sloc.items3>-1) {
               if (pieza!=p_coma) c_error(3,131);
               lexer();
               exp00(0);
-              if (comprueba_rango) { (*_exp).tipo=erango; (*_exp++).valor=(*ob).sloc.items3; }
-              (*_exp).tipo=econs; (*_exp++).valor=(*ob).sloc.items2+1;
-              (*_exp).tipo=eoper; (*_exp++).token=p_mul;
-              (*_exp).tipo=eoper; (*_exp++).token=p_add;
+              if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).sloc.items3; }
+              (*_exp).type=econs; (*_exp++).valor=(*ob).sloc.items2+1;
+              (*_exp).type=eoper; (*_exp++).token=p_mul;
+              (*_exp).type=eoper; (*_exp++).token=p_add;
             }
-            (*_exp).tipo=econs; (*_exp++).valor=(*ob).sloc.items1+1;
-            (*_exp).tipo=eoper; (*_exp++).token=p_mul;
-            (*_exp).tipo=eoper; (*_exp++).token=p_add;
+            (*_exp).type=econs; (*_exp++).valor=(*ob).sloc.items1+1;
+            (*_exp).type=eoper; (*_exp++).token=p_mul;
+            (*_exp).type=eoper; (*_exp++).token=p_add;
           }
           if (pieza!=p_corce) { c_error(3,26); } lexer();
-          if ((*ob).tipo==tpslo) {
-            (*_exp).tipo=econs; (*_exp++).valor=(*((*ob).pslo.ostruct)).sloc.len_item;
+          if ((*ob).type==tpslo) {
+            (*_exp).type=econs; (*_exp++).valor=(*((*ob).pslo.ostruct)).sloc.len_item;
           } else {
-            (*_exp).tipo=econs; (*_exp++).valor=(*ob).sloc.len_item;
+            (*_exp).type=econs; (*_exp++).valor=(*ob).sloc.len_item;
           }
-          (*_exp).tipo=eoper; (*_exp++).token=p_mul;
-          (*_exp).tipo=eoper; (*_exp++).token=p_add;
+          (*_exp).type=eoper; (*_exp++).token=p_mul;
+          (*_exp).type=eoper; (*_exp++).token=p_add;
         }
         if (pieza==p_punto) {
           struct_pointer=p_pointer;
-          if ((*ob).tipo==tpslo) member=(*ob).psgl.ostruct; else member=ob;
+          if ((*ob).type==tpslo) member=(*ob).psgl.ostruct; else member=ob;
           lexer(); factor_struct();
-          (*_exp).tipo=eoper; (*_exp++).token=struct_pointer;
+          (*_exp).type=eoper; (*_exp++).token=struct_pointer;
         } else {
-          (*_exp).tipo=eoper; (*_exp++).token=p_pointer;
+          (*_exp).type=eoper; (*_exp++).token=p_pointer;
         } break;
 
       case tproc:
@@ -6376,12 +6376,12 @@ void factor(void) {
           else { lexer(); if (pieza==p_cerrar) c_error(3,45); } }
         }
         if (p!=(*ob).proc.num_par) c_error(1,46);
-        (*_exp).tipo=ecall; (*_exp++).objeto=ob; lexer(); break;
+        (*_exp).type=ecall; (*_exp++).objeto=ob; lexer(); break;
 
       case tfunc:
         ob=o; lexer(); if (pieza!=p_abrir) c_error(3,36);
 
-        if ((*ob).func.codigo==122) { // fopen("..."
+        if ((*ob).func.code==122) { // fopen("..."
           en_fopen=1;
           lexer();
           en_fopen=0;
@@ -6396,22 +6396,22 @@ void factor(void) {
 
             if (pieza!=p_id) c_error(0,152);
             if ((*o).member!=NULL) c_error(0,152);
-            if ((*o).tipo==tsglo) {
-              (*_exp).tipo=econs; (*_exp++).valor=(*o).sglo.offset;
-            } else if ((*o).tipo==tsloc) {
-              (*_exp).tipo=econs; (*_exp++).valor=(*o).sloc.offset;
-              (*_exp).tipo=eoper; (*_exp++).token=p_punto;
+            if ((*o).type==tsglo) {
+              (*_exp).type=econs; (*_exp++).valor=(*o).sglo.offset;
+            } else if ((*o).type==tsloc) {
+              (*_exp).type=econs; (*_exp++).valor=(*o).sloc.offset;
+              (*_exp).type=eoper; (*_exp++).token=p_punto;
             } else c_error(0,152);
-            (*_exp).tipo=econs; (*_exp++).valor=(*o).sglo.len_item;
-            (*_exp).tipo=econs; (*_exp++).valor=(*o).sglo.totalitems;
+            (*_exp).type=econs; (*_exp++).valor=(*o).sglo.len_item;
+            (*_exp).type=econs; (*_exp++).valor=(*o).sglo.totalitems;
             obs=o; lexer(); if (pieza!=p_coma) c_error(0,46);
             member=obs; lexer(); member=NULL;
             if (pieza!=p_id) c_error(0,153);
             if ((*o).member!=obs) c_error(0,153);
-            (*_exp).tipo=econs; (*_exp++).valor=(*o).vglo.offset;
-            (*_exp).tipo=econs;
-            if ((*o).tipo==tcglo || (*o).tipo==tcloc) (*_exp++).valor=1;
-            else if ((*o).tipo==tpcgl || (*o).tipo==tpclo) (*_exp++).valor=2;
+            (*_exp).type=econs; (*_exp++).valor=(*o).vglo.offset;
+            (*_exp).type=econs;
+            if ((*o).type==tcglo || (*o).type==tcloc) (*_exp++).valor=1;
+            else if ((*o).type==tpcgl || (*o).type==tpclo) (*_exp++).valor=2;
             else (*_exp++).valor=0;
             lexer();
           } else {                           // Parámetro del tipo 0 (genérico)
@@ -6422,7 +6422,7 @@ void factor(void) {
           else { lexer(); if (pieza==p_cerrar) c_error(3,45); } }
         }
         if (p!=(*ob).func.num_par) c_error(1,46);
-        (*_exp).tipo=efunc; (*_exp++).objeto=ob;
+        (*_exp).type=efunc; (*_exp++).objeto=ob;
         if ((*ob).func.ret==1) tipo_factor=2;
         lexer(); break;
 
@@ -6434,7 +6434,7 @@ void factor(void) {
           if (pieza!=p_cerrar) { if (pieza!=p_coma) c_error(3,25);
           else { lexer(); if (pieza==p_cerrar) c_error(3,45); } }
         } if (p!=(*ob).fext.num_par) c_error(1,46);
-        (*_exp).tipo=efext; (*_exp++).objeto=ob; lexer(); break;
+        (*_exp).type=efext; (*_exp++).objeto=ob; lexer(); break;
 
       default:
         if (error_27==27) c_error(1,27); else c_error(0,error_27);
@@ -6448,33 +6448,33 @@ void factor(void) {
   }
 
   if (pieza==p_inc || pieza==p_dec) {
-    if ((*(_exp-1)).tipo==eoper && (*(_exp-1)).token==p_pointer) {
+    if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_pointer) {
       _exp--;
-      (*_exp).tipo=eoper;
+      (*_exp).type=eoper;
       if (pieza==p_inc) (*_exp++).token=p_suma;
         else (*_exp++).token=p_resta;
-    } else if ((*(_exp-1)).tipo==eoper && (*(_exp-1)).token==p_pointerchar) {
+    } else if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_pointerchar) {
       _exp--;
-      (*_exp).tipo=eoper;
+      (*_exp).type=eoper;
       if (pieza==p_inc) (*_exp++).token=p_sumachar;
         else (*_exp++).token=p_restachar;
-    } else if ((*(_exp-1)).tipo==eoper && (*(_exp-1)).token==p_pointerbyte) {
+    } else if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_pointerbyte) {
       _exp--;
-      (*_exp).tipo=eoper;
+      (*_exp).type=eoper;
       if (pieza==p_inc) (*_exp++).token=p_sumachar;
         else (*_exp++).token=p_restachar;
-    } else if ((*(_exp-1)).tipo==eoper && (*(_exp-1)).token==p_pointerword) {
+    } else if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_pointerword) {
       _exp--;
-      (*_exp).tipo=eoper;
+      (*_exp).type=eoper;
       if (pieza==p_inc) (*_exp++).token=p_sumaword;
         else (*_exp++).token=p_restaword;
-    } else if ((*(_exp-1)).tipo==eoper && (*(_exp-1)).token==p_string) {
-      _exp--; (*_exp).tipo=econs;
+    } else if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_string) {
+      _exp--; (*_exp).type=econs;
       if (pieza==p_inc) (*_exp++).valor=-1;
         else (*_exp++).valor=1;
-      (*_exp).tipo=eoper;
+      (*_exp).type=eoper;
       (*_exp++).token=p_strsub;
-      (*_exp).tipo=eoper;
+      (*_exp).type=eoper;
       (*_exp++).token=p_string;
     } else c_error(4,122);
     lexer();
@@ -6485,372 +6485,372 @@ void factor_struct(void) {
   struct objeto * ob;
 
   if (pieza!=p_id) c_error(3,58);
-  switch ((*o).tipo) {
+  switch ((*o).type) {
 
     case tvglo:
-      (*_exp).tipo=econs; (*_exp++).valor=(*o).vglo.offset;
-      (*_exp).tipo=eoper; (*_exp++).token=p_add;
+      (*_exp).type=econs; (*_exp++).valor=(*o).vglo.offset;
+      (*_exp).type=eoper; (*_exp++).token=p_add;
       member=NULL; lexer();
       break;
 
     case ttglo:
     case tpigl:
-      (*_exp).tipo=econs; (*_exp++).valor=(*o).tglo.offset; ob=o;
-      (*_exp).tipo=eoper; (*_exp++).token=p_add;
+      (*_exp).type=econs; (*_exp++).valor=(*o).tglo.offset; ob=o;
+      (*_exp).type=eoper; (*_exp++).token=p_add;
       member=NULL; lexer();
       if (pieza==p_corab) {
-        if ((*ob).tipo==tpigl) {
-          (*_exp).tipo=eoper; (*_exp++).token=p_pointer;
-          if (comprueba_null) (*_exp++).tipo=enull;
+        if ((*ob).type==tpigl) {
+          (*_exp).type=eoper; (*_exp++).token=p_pointer;
+          if (comprueba_null) (*_exp++).type=enull;
         }
         lexer();
         exp00(0);
-        if ((*ob).tglo.len1>-1) if (comprueba_rango) { (*_exp).tipo=erango; (*_exp++).valor=(*ob).tglo.len1; }
+        if ((*ob).tglo.len1>-1) if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).tglo.len1; }
         if ((*ob).tglo.len2>-1) {
           if (pieza!=p_coma) c_error(3,130);
           lexer();
           exp00(0);
-          if (comprueba_rango) { (*_exp).tipo=erango; (*_exp++).valor=(*ob).tglo.len2; }
+          if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).tglo.len2; }
           if ((*ob).tglo.len3>-1) {
             if (pieza!=p_coma) c_error(3,130);
             lexer();
             exp00(0);
-            if (comprueba_rango) { (*_exp).tipo=erango; (*_exp++).valor=(*ob).tglo.len3; }
-            (*_exp).tipo=econs; (*_exp++).valor=(*ob).tglo.len2+1;
-            (*_exp).tipo=eoper; (*_exp++).token=p_mul;
-            (*_exp).tipo=eoper; (*_exp++).token=p_add;
+            if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).tglo.len3; }
+            (*_exp).type=econs; (*_exp++).valor=(*ob).tglo.len2+1;
+            (*_exp).type=eoper; (*_exp++).token=p_mul;
+            (*_exp).type=eoper; (*_exp++).token=p_add;
           }
-          (*_exp).tipo=econs; (*_exp++).valor=(*ob).tglo.len1+1;
-          (*_exp).tipo=eoper; (*_exp++).token=p_mul;
-          (*_exp).tipo=eoper; (*_exp++).token=p_add;
+          (*_exp).type=econs; (*_exp++).valor=(*ob).tglo.len1+1;
+          (*_exp).type=eoper; (*_exp++).token=p_mul;
+          (*_exp).type=eoper; (*_exp++).token=p_add;
         }
         if (pieza!=p_corce) { c_error(3,26); } lexer();
-        (*_exp).tipo=eoper; (*_exp++).token=p_add;
+        (*_exp).type=eoper; (*_exp++).token=p_add;
       } break;
 
     case tbglo:
     case tpbgl:
     case tpcgl:
-      (*_exp).tipo=econs; (*_exp++).valor=(*o).bglo.offset; ob=o;
-      (*_exp).tipo=eoper; (*_exp++).token=p_add;
+      (*_exp).type=econs; (*_exp++).valor=(*o).bglo.offset; ob=o;
+      (*_exp).type=eoper; (*_exp++).token=p_add;
       member=NULL; lexer();
-      if ((*ob).tipo==tpbgl || (*ob).tipo==tpcgl) {
+      if ((*ob).type==tpbgl || (*ob).type==tpcgl) {
         if (pieza!=p_corab) break;
-        (*_exp).tipo=eoper; (*_exp++).token=p_pointer;
-        if (comprueba_null) (*_exp++).tipo=enull;
+        (*_exp).type=eoper; (*_exp++).token=p_pointer;
+        if (comprueba_null) (*_exp++).type=enull;
       }
       if (pieza==p_corab) {
         lexer();
         exp00(0);
-        if ((*ob).bglo.len1>-1) if (comprueba_rango) { (*_exp).tipo=erango; (*_exp++).valor=(*ob).bglo.len1; }
+        if ((*ob).bglo.len1>-1) if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).bglo.len1; }
         if ((*ob).bglo.len2>-1) {
           if (pieza!=p_coma) c_error(3,130);
           lexer();
           exp00(0);
-          if (comprueba_rango) { (*_exp).tipo=erango; (*_exp++).valor=(*ob).bglo.len2; }
+          if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).bglo.len2; }
           if ((*ob).bglo.len3>-1) {
             if (pieza!=p_coma) c_error(3,130);
             lexer();
             exp00(0);
-            if (comprueba_rango) { (*_exp).tipo=erango; (*_exp++).valor=(*ob).bglo.len3; }
-            (*_exp).tipo=econs; (*_exp++).valor=(*ob).bglo.len2+1;
-            (*_exp).tipo=eoper; (*_exp++).token=p_mul;
-            (*_exp).tipo=eoper; (*_exp++).token=p_add;
+            if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).bglo.len3; }
+            (*_exp).type=econs; (*_exp++).valor=(*ob).bglo.len2+1;
+            (*_exp).type=eoper; (*_exp++).token=p_mul;
+            (*_exp).type=eoper; (*_exp++).token=p_add;
           }
-          (*_exp).tipo=econs; (*_exp++).valor=(*ob).bglo.len1+1;
-          (*_exp).tipo=eoper; (*_exp++).token=p_mul;
-          (*_exp).tipo=eoper; (*_exp++).token=p_add;
+          (*_exp).type=econs; (*_exp++).valor=(*ob).bglo.len1+1;
+          (*_exp).type=eoper; (*_exp++).token=p_mul;
+          (*_exp).type=eoper; (*_exp++).token=p_add;
         }
         if (pieza!=p_corce) { c_error(3,26); } lexer();
       } else { // mi_byte ≡ mi_byte[0]
-        (*_exp).tipo=econs; (*_exp++).valor=0;
+        (*_exp).type=econs; (*_exp++).valor=0;
       } struct_pointer=p_pointerbyte; break;
 
     case twglo:
     case tpwgl:
-      (*_exp).tipo=econs; (*_exp++).valor=(*o).wglo.offset; ob=o;
-      (*_exp).tipo=eoper; (*_exp++).token=p_add;
+      (*_exp).type=econs; (*_exp++).valor=(*o).wglo.offset; ob=o;
+      (*_exp).type=eoper; (*_exp++).token=p_add;
       member=NULL; lexer();
-      if ((*ob).tipo==tpwgl) {
+      if ((*ob).type==tpwgl) {
         if (pieza!=p_corab) break;
-        (*_exp).tipo=eoper; (*_exp++).token=p_pointer;
-        if (comprueba_null) (*_exp++).tipo=enull;
+        (*_exp).type=eoper; (*_exp++).token=p_pointer;
+        if (comprueba_null) (*_exp++).type=enull;
       }
       if (pieza==p_corab) {
         lexer();
         exp00(0);
-        if ((*ob).wglo.len1>-1) if (comprueba_rango) { (*_exp).tipo=erango; (*_exp++).valor=(*ob).wglo.len1; }
+        if ((*ob).wglo.len1>-1) if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).wglo.len1; }
         if ((*ob).wglo.len2>-1) {
           if (pieza!=p_coma) c_error(3,130);
           lexer();
           exp00(0);
-          if (comprueba_rango) { (*_exp).tipo=erango; (*_exp++).valor=(*ob).wglo.len2; }
+          if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).wglo.len2; }
           if ((*ob).wglo.len3>-1) {
             if (pieza!=p_coma) c_error(3,130);
             lexer();
             exp00(0);
-            if (comprueba_rango) { (*_exp).tipo=erango; (*_exp++).valor=(*ob).wglo.len3; }
-            (*_exp).tipo=econs; (*_exp++).valor=(*ob).wglo.len2+1;
-            (*_exp).tipo=eoper; (*_exp++).token=p_mul;
-            (*_exp).tipo=eoper; (*_exp++).token=p_add;
+            if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).wglo.len3; }
+            (*_exp).type=econs; (*_exp++).valor=(*ob).wglo.len2+1;
+            (*_exp).type=eoper; (*_exp++).token=p_mul;
+            (*_exp).type=eoper; (*_exp++).token=p_add;
           }
-          (*_exp).tipo=econs; (*_exp++).valor=(*ob).wglo.len1+1;
-          (*_exp).tipo=eoper; (*_exp++).token=p_mul;
-          (*_exp).tipo=eoper; (*_exp++).token=p_add;
+          (*_exp).type=econs; (*_exp++).valor=(*ob).wglo.len1+1;
+          (*_exp).type=eoper; (*_exp++).token=p_mul;
+          (*_exp).type=eoper; (*_exp++).token=p_add;
         }
         if (pieza!=p_corce) { c_error(3,26); } lexer();
       } else { // mi_byte ≡ mi_byte[0]
-        (*_exp).tipo=econs; (*_exp++).valor=0;
+        (*_exp).type=econs; (*_exp++).valor=0;
       } struct_pointer=p_pointerword; break;
 
     case tcglo:
-      (*_exp).tipo=estring; (*_exp++).valor=(*o).cglo.offset; ob=o;
-      (*_exp).tipo=eoper; (*_exp++).token=p_add;
+      (*_exp).type=estring; (*_exp++).valor=(*o).cglo.offset; ob=o;
+      (*_exp).type=eoper; (*_exp++).token=p_add;
       member=NULL; lexer();
       if (pieza==p_corab) {
         lexer();
         exp00(0);
-        if (comprueba_rango) { (*_exp).tipo=erango; (*_exp++).valor=(*ob).cglo.totalen; }
+        if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).cglo.totalen; }
         if (pieza!=p_corce) c_error(3,26);
         lexer();
         struct_pointer=p_pointerchar;
       } else {
         tipo_factor=2;
         if (tipo_expresion==1) {
-          (*_exp).tipo=econs; (*_exp++).valor=0;
+          (*_exp).type=econs; (*_exp++).valor=0;
           struct_pointer=p_pointerchar;
         } else {
-          if (tipo_expresion==-1) { (*_exp).tipo=eoper; (*_exp++).token=p_strlen; }
+          if (tipo_expresion==-1) { (*_exp).type=eoper; (*_exp++).token=p_strlen; }
           struct_pointer=p_string;
         }
       } break;
 
     case tsglo:
     case tpsgl:
-      (*_exp).tipo=econs; (*_exp++).valor=(*o).sglo.offset; ob=o;
-      (*_exp).tipo=eoper; (*_exp++).token=p_add;
+      (*_exp).type=econs; (*_exp++).valor=(*o).sglo.offset; ob=o;
+      (*_exp).type=eoper; (*_exp++).token=p_add;
       member=NULL; lexer();
-      if ((*ob).tipo==tpsgl) {
+      if ((*ob).type==tpsgl) {
         if (pieza!=p_corab && pieza!=p_punto) break;
-        (*_exp).tipo=eoper; (*_exp++).token=p_pointer;
-        if (comprueba_null) (*_exp++).tipo=enull;
+        (*_exp).type=eoper; (*_exp++).token=p_pointer;
+        if (comprueba_null) (*_exp++).type=enull;
       }
       if (pieza==p_corab) {
         lexer();
         exp00(0);
-        if ((*ob).sglo.items1>-1) if (comprueba_rango) { (*_exp).tipo=erango; (*_exp++).valor=(*ob).sglo.items1; }
+        if ((*ob).sglo.items1>-1) if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).sglo.items1; }
         if ((*ob).sglo.items2>-1) {
           if (pieza!=p_coma) c_error(3,131);
           lexer();
           exp00(0);
-          if (comprueba_rango) { (*_exp).tipo=erango; (*_exp++).valor=(*ob).sglo.items2; }
+          if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).sglo.items2; }
           if ((*ob).sglo.items3>-1) {
             if (pieza!=p_coma) c_error(3,131);
             lexer();
             exp00(0);
-            if (comprueba_rango) { (*_exp).tipo=erango; (*_exp++).valor=(*ob).sglo.items3; }
-            (*_exp).tipo=econs; (*_exp++).valor=(*ob).sglo.items2+1;
-            (*_exp).tipo=eoper; (*_exp++).token=p_mul;
-            (*_exp).tipo=eoper; (*_exp++).token=p_add;
+            if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).sglo.items3; }
+            (*_exp).type=econs; (*_exp++).valor=(*ob).sglo.items2+1;
+            (*_exp).type=eoper; (*_exp++).token=p_mul;
+            (*_exp).type=eoper; (*_exp++).token=p_add;
           }
-          (*_exp).tipo=econs; (*_exp++).valor=(*ob).sglo.items1+1;
-          (*_exp).tipo=eoper; (*_exp++).token=p_mul;
-          (*_exp).tipo=eoper; (*_exp++).token=p_add;
+          (*_exp).type=econs; (*_exp++).valor=(*ob).sglo.items1+1;
+          (*_exp).type=eoper; (*_exp++).token=p_mul;
+          (*_exp).type=eoper; (*_exp++).token=p_add;
         }
         if (pieza!=p_corce) { c_error(3,26); } lexer();
-        if ((*ob).tipo==tpsgl) {
-          (*_exp).tipo=econs; (*_exp++).valor=(*((*ob).psgl.ostruct)).sglo.len_item;
+        if ((*ob).type==tpsgl) {
+          (*_exp).type=econs; (*_exp++).valor=(*((*ob).psgl.ostruct)).sglo.len_item;
         } else {
-          (*_exp).tipo=econs; (*_exp++).valor=(*ob).sglo.len_item;
+          (*_exp).type=econs; (*_exp++).valor=(*ob).sglo.len_item;
         }
-        (*_exp).tipo=eoper; (*_exp++).token=p_mul;
-        (*_exp).tipo=eoper; (*_exp++).token=p_add;
+        (*_exp).type=eoper; (*_exp++).token=p_mul;
+        (*_exp).type=eoper; (*_exp++).token=p_add;
       }
       if (pieza==p_punto) {
-        if ((*ob).tipo==tpsgl) member=(*ob).psgl.ostruct; else member=ob;
+        if ((*ob).type==tpsgl) member=(*ob).psgl.ostruct; else member=ob;
         lexer(); factor_struct();
       } break;
 
     case tvloc:
-      (*_exp).tipo=econs; (*_exp++).valor=(*o).vloc.offset;
-      (*_exp).tipo=eoper; (*_exp++).token=p_add;
+      (*_exp).type=econs; (*_exp++).valor=(*o).vloc.offset;
+      (*_exp).type=eoper; (*_exp++).token=p_add;
       member=NULL; lexer(); break;
 
     case ttloc:
     case tpilo:
-      (*_exp).tipo=econs; (*_exp++).valor=(*o).tloc.offset; ob=o;
-      (*_exp).tipo=eoper; (*_exp++).token=p_add;
+      (*_exp).type=econs; (*_exp++).valor=(*o).tloc.offset; ob=o;
+      (*_exp).type=eoper; (*_exp++).token=p_add;
       member=NULL; lexer();
       if (pieza==p_corab) {
-        if ((*ob).tipo==tpilo) {
-          (*_exp).tipo=eoper; (*_exp++).token=p_pointer;
-          if (comprueba_null) (*_exp++).tipo=enull;
+        if ((*ob).type==tpilo) {
+          (*_exp).type=eoper; (*_exp++).token=p_pointer;
+          if (comprueba_null) (*_exp++).type=enull;
         }
         lexer();
         exp00(0);
-        if ((*ob).tloc.len1>-1) if (comprueba_rango) { (*_exp).tipo=erango; (*_exp++).valor=(*ob).tloc.len1; }
+        if ((*ob).tloc.len1>-1) if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).tloc.len1; }
         if ((*ob).tloc.len2>-1) {
           if (pieza!=p_coma) c_error(3,130);
           lexer();
           exp00(0);
-          if (comprueba_rango) { (*_exp).tipo=erango; (*_exp++).valor=(*ob).tloc.len2; }
+          if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).tloc.len2; }
           if ((*ob).tloc.len3>-1) {
             if (pieza!=p_coma) c_error(3,130);
             lexer();
             exp00(0);
-            if (comprueba_rango) { (*_exp).tipo=erango; (*_exp++).valor=(*ob).tloc.len3; }
-            (*_exp).tipo=econs; (*_exp++).valor=(*ob).tloc.len2+1;
-            (*_exp).tipo=eoper; (*_exp++).token=p_mul;
-            (*_exp).tipo=eoper; (*_exp++).token=p_add;
+            if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).tloc.len3; }
+            (*_exp).type=econs; (*_exp++).valor=(*ob).tloc.len2+1;
+            (*_exp).type=eoper; (*_exp++).token=p_mul;
+            (*_exp).type=eoper; (*_exp++).token=p_add;
           }
-          (*_exp).tipo=econs; (*_exp++).valor=(*ob).tloc.len1+1;
-          (*_exp).tipo=eoper; (*_exp++).token=p_mul;
-          (*_exp).tipo=eoper; (*_exp++).token=p_add;
+          (*_exp).type=econs; (*_exp++).valor=(*ob).tloc.len1+1;
+          (*_exp).type=eoper; (*_exp++).token=p_mul;
+          (*_exp).type=eoper; (*_exp++).token=p_add;
         }
         if (pieza!=p_corce) { c_error(3,26); } lexer();
-        (*_exp).tipo=eoper; (*_exp++).token=p_add;
+        (*_exp).type=eoper; (*_exp++).token=p_add;
       } break;
 
     case tbloc:
     case tpblo:
     case tpclo:
-      (*_exp).tipo=econs; (*_exp++).valor=(*o).bloc.offset; ob=o;
-      (*_exp).tipo=eoper; (*_exp++).token=p_add;
+      (*_exp).type=econs; (*_exp++).valor=(*o).bloc.offset; ob=o;
+      (*_exp).type=eoper; (*_exp++).token=p_add;
       member=NULL; lexer();
-      if ((*ob).tipo==tpblo || (*ob).tipo==tpcgl) {
+      if ((*ob).type==tpblo || (*ob).type==tpcgl) {
         if (pieza!=p_corab) break;
-        (*_exp).tipo=eoper; (*_exp++).token=p_pointer;
-        if (comprueba_null) (*_exp++).tipo=enull;
+        (*_exp).type=eoper; (*_exp++).token=p_pointer;
+        if (comprueba_null) (*_exp++).type=enull;
       }
       if (pieza==p_corab) {
         lexer();
         exp00(0);
-        if ((*ob).bloc.len1>-1) if (comprueba_rango) { (*_exp).tipo=erango; (*_exp++).valor=(*ob).bloc.len1; }
+        if ((*ob).bloc.len1>-1) if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).bloc.len1; }
         if ((*ob).bloc.len2>-1) {
           if (pieza!=p_coma) c_error(3,130);
           lexer();
           exp00(0);
-          if (comprueba_rango) { (*_exp).tipo=erango; (*_exp++).valor=(*ob).bloc.len2; }
+          if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).bloc.len2; }
           if ((*ob).bloc.len3>-1) {
             if (pieza!=p_coma) c_error(3,130);
             lexer();
             exp00(0);
-            if (comprueba_rango) { (*_exp).tipo=erango; (*_exp++).valor=(*ob).bloc.len3; }
-            (*_exp).tipo=econs; (*_exp++).valor=(*ob).bloc.len2+1;
-            (*_exp).tipo=eoper; (*_exp++).token=p_mul;
-            (*_exp).tipo=eoper; (*_exp++).token=p_add;
+            if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).bloc.len3; }
+            (*_exp).type=econs; (*_exp++).valor=(*ob).bloc.len2+1;
+            (*_exp).type=eoper; (*_exp++).token=p_mul;
+            (*_exp).type=eoper; (*_exp++).token=p_add;
           }
-          (*_exp).tipo=econs; (*_exp++).valor=(*ob).bloc.len1+1;
-          (*_exp).tipo=eoper; (*_exp++).token=p_mul;
-          (*_exp).tipo=eoper; (*_exp++).token=p_add;
+          (*_exp).type=econs; (*_exp++).valor=(*ob).bloc.len1+1;
+          (*_exp).type=eoper; (*_exp++).token=p_mul;
+          (*_exp).type=eoper; (*_exp++).token=p_add;
         }
         if (pieza!=p_corce) { c_error(3,26); } lexer();
       } else { // mi_byte ≡ mi_byte[0]
-        (*_exp).tipo=econs; (*_exp++).valor=0;
+        (*_exp).type=econs; (*_exp++).valor=0;
       } struct_pointer=p_pointerbyte; break;
 
     case twloc:
     case tpwlo:
-      (*_exp).tipo=econs; (*_exp++).valor=(*o).wloc.offset; ob=o;
-      (*_exp).tipo=eoper; (*_exp++).token=p_add;
+      (*_exp).type=econs; (*_exp++).valor=(*o).wloc.offset; ob=o;
+      (*_exp).type=eoper; (*_exp++).token=p_add;
       member=NULL; lexer();
-      if ((*ob).tipo==tpwlo) {
+      if ((*ob).type==tpwlo) {
         if (pieza!=p_corab) break;
-        (*_exp).tipo=eoper; (*_exp++).token=p_pointer;
-        if (comprueba_null) (*_exp++).tipo=enull;
+        (*_exp).type=eoper; (*_exp++).token=p_pointer;
+        if (comprueba_null) (*_exp++).type=enull;
       }
       if (pieza==p_corab) {
         lexer();
         exp00(0);
-        if ((*ob).wloc.len1>-1) if (comprueba_rango) { (*_exp).tipo=erango; (*_exp++).valor=(*ob).wloc.len1; }
+        if ((*ob).wloc.len1>-1) if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).wloc.len1; }
         if ((*ob).wloc.len2>-1) {
           if (pieza!=p_coma) c_error(3,130);
           lexer();
           exp00(0);
-          if (comprueba_rango) { (*_exp).tipo=erango; (*_exp++).valor=(*ob).wloc.len2; }
+          if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).wloc.len2; }
           if ((*ob).wloc.len3>-1) {
             if (pieza!=p_coma) c_error(3,130);
             lexer();
             exp00(0);
-            if (comprueba_rango) { (*_exp).tipo=erango; (*_exp++).valor=(*ob).wloc.len3; }
-            (*_exp).tipo=econs; (*_exp++).valor=(*ob).wloc.len2+1;
-            (*_exp).tipo=eoper; (*_exp++).token=p_mul;
-            (*_exp).tipo=eoper; (*_exp++).token=p_add;
+            if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).wloc.len3; }
+            (*_exp).type=econs; (*_exp++).valor=(*ob).wloc.len2+1;
+            (*_exp).type=eoper; (*_exp++).token=p_mul;
+            (*_exp).type=eoper; (*_exp++).token=p_add;
           }
-          (*_exp).tipo=econs; (*_exp++).valor=(*ob).wloc.len1+1;
-          (*_exp).tipo=eoper; (*_exp++).token=p_mul;
-          (*_exp).tipo=eoper; (*_exp++).token=p_add;
+          (*_exp).type=econs; (*_exp++).valor=(*ob).wloc.len1+1;
+          (*_exp).type=eoper; (*_exp++).token=p_mul;
+          (*_exp).type=eoper; (*_exp++).token=p_add;
         }
         if (pieza!=p_corce) { c_error(3,26); } lexer();
       } else { // mi_byte ≡ mi_byte[0]
-        (*_exp).tipo=econs; (*_exp++).valor=0;
+        (*_exp).type=econs; (*_exp++).valor=0;
       } struct_pointer=p_pointerword; break;
 
     case tcloc:
-      (*_exp).tipo=estring; (*_exp++).valor=(*o).cloc.offset; ob=o;
-      (*_exp).tipo=eoper; (*_exp++).token=p_add;
+      (*_exp).type=estring; (*_exp++).valor=(*o).cloc.offset; ob=o;
+      (*_exp).type=eoper; (*_exp++).token=p_add;
       member=NULL; lexer();
       if (pieza==p_corab) {
         lexer();
         exp00(0);
-        if (comprueba_rango) { (*_exp).tipo=erango; (*_exp++).valor=(*ob).cloc.totalen; }
+        if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).cloc.totalen; }
         if (pieza!=p_corce) c_error(3,26);
         lexer();
         struct_pointer=p_pointerchar;
       } else {
         tipo_factor=2;
         if (tipo_expresion==1) {
-          (*_exp).tipo=econs; (*_exp++).valor=0;
+          (*_exp).type=econs; (*_exp++).valor=0;
           struct_pointer=p_pointerchar;
         } else {
-          if (tipo_expresion==-1) { (*_exp).tipo=eoper; (*_exp++).token=p_strlen; }
+          if (tipo_expresion==-1) { (*_exp).type=eoper; (*_exp++).token=p_strlen; }
           struct_pointer=p_string;
         }
       } break;
 
     case tsloc:
     case tpslo:
-      (*_exp).tipo=econs; (*_exp++).valor=(*o).sloc.offset; ob=o;
-      (*_exp).tipo=eoper; (*_exp++).token=p_add;
+      (*_exp).type=econs; (*_exp++).valor=(*o).sloc.offset; ob=o;
+      (*_exp).type=eoper; (*_exp++).token=p_add;
       member=NULL; lexer();
-      if ((*ob).tipo==tpslo) {
+      if ((*ob).type==tpslo) {
         if (pieza!=p_corab && pieza!=p_punto) break;
-        (*_exp).tipo=eoper; (*_exp++).token=p_pointer;
-        if (comprueba_null) (*_exp++).tipo=enull;
+        (*_exp).type=eoper; (*_exp++).token=p_pointer;
+        if (comprueba_null) (*_exp++).type=enull;
       }
       if (pieza==p_corab) {
         lexer();
         exp00(0);
-        if ((*ob).sloc.items1>-1) if (comprueba_rango) { (*_exp).tipo=erango; (*_exp++).valor=(*ob).sloc.items1; }
+        if ((*ob).sloc.items1>-1) if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).sloc.items1; }
         if ((*ob).sloc.items2>-1) {
           if (pieza!=p_coma) c_error(3,131);
           lexer();
           exp00(0);
-          if (comprueba_rango) { (*_exp).tipo=erango; (*_exp++).valor=(*ob).sloc.items2; }
+          if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).sloc.items2; }
           if ((*ob).sloc.items3>-1) {
             if (pieza!=p_coma) c_error(3,131);
             lexer();
             exp00(0);
-            if (comprueba_rango) { (*_exp).tipo=erango; (*_exp++).valor=(*ob).sloc.items3; }
-            (*_exp).tipo=econs; (*_exp++).valor=(*ob).sloc.items2+1;
-            (*_exp).tipo=eoper; (*_exp++).token=p_mul;
-            (*_exp).tipo=eoper; (*_exp++).token=p_add;
+            if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).sloc.items3; }
+            (*_exp).type=econs; (*_exp++).valor=(*ob).sloc.items2+1;
+            (*_exp).type=eoper; (*_exp++).token=p_mul;
+            (*_exp).type=eoper; (*_exp++).token=p_add;
           }
-          (*_exp).tipo=econs; (*_exp++).valor=(*ob).sloc.items1+1;
-          (*_exp).tipo=eoper; (*_exp++).token=p_mul;
-          (*_exp).tipo=eoper; (*_exp++).token=p_add;
+          (*_exp).type=econs; (*_exp++).valor=(*ob).sloc.items1+1;
+          (*_exp).type=eoper; (*_exp++).token=p_mul;
+          (*_exp).type=eoper; (*_exp++).token=p_add;
         }
         if (pieza!=p_corce) { c_error(3,26); } lexer();
-        if ((*ob).tipo==tpslo) {
-          (*_exp).tipo=econs; (*_exp++).valor=(*((*ob).pslo.ostruct)).sloc.len_item;
+        if ((*ob).type==tpslo) {
+          (*_exp).type=econs; (*_exp++).valor=(*((*ob).pslo.ostruct)).sloc.len_item;
         } else {
-          (*_exp).tipo=econs; (*_exp++).valor=(*ob).sloc.len_item;
+          (*_exp).type=econs; (*_exp++).valor=(*ob).sloc.len_item;
         }
-        (*_exp).tipo=eoper; (*_exp++).token=p_mul;
-        (*_exp).tipo=eoper; (*_exp++).token=p_add;
+        (*_exp).type=eoper; (*_exp++).token=p_mul;
+        (*_exp).type=eoper; (*_exp++).token=p_add;
       }
       if (pieza==p_punto) {
-        if ((*ob).tipo==tpslo) member=(*ob).pslo.ostruct; else member=ob;
+        if ((*ob).type==tpslo) member=(*ob).pslo.ostruct; else member=ob;
         lexer(); factor_struct();
       } break;
 
@@ -6875,7 +6875,7 @@ void list_objects (void) {
   for (n=1;n<=8;n++) fprintf(sta,"[%u]: %u\n",n,mem[n]); fprintf(sta,"\n");
 
   for (n=0;n<num_obj;n++) {
-    switch(obj[n].tipo) {
+    switch(obj[n].type) {
       case tnone: fprintf(sta,"%5u\ttnone: %s",n,obj[n].name);
         if (obj[n].usado) fprintf(sta," (*) usado\n"); else fprintf(sta,"\n");
         break;
@@ -6981,12 +6981,12 @@ void list_objects (void) {
         break;
       case tfunc: fprintf(sta,"%5u\ttfunc: %s",n,obj[n].name);
         if (obj[n].usado) fprintf(sta," (*) usado\n"); else fprintf(sta,"\n");
-        fprintf(sta,"\tcodigo=%u\n",obj[n].func.codigo);
+        fprintf(sta,"\tcode=%u\n",obj[n].func.code);
         fprintf(sta,"\tnum_par=%u\n",obj[n].func.num_par);
         break;
       case tfext: fprintf(sta,"%5u\ttfext: %s",n,obj[n].name);
         if (obj[n].usado) fprintf(sta," (*) usado\n"); else fprintf(sta,"\n");
-        fprintf(sta,"\tcodigo=%u\n",obj[n].fext.codigo);
+        fprintf(sta,"\tcode=%u\n",obj[n].fext.code);
         fprintf(sta,"\tnum_par=%u\n",obj[n].fext.num_par);
         break;
       case tbglo: fprintf(sta,"%5u\ttbglo: %s",n,obj[n].name);
@@ -7046,8 +7046,8 @@ void save_dbg(void) {
   int n;
 
   struct {
-    int tipo;
-    int nombre;
+    int type;
+    int name;
     int bloque;
     int miembro;
     int v0,v1,v2,v3,v4,v5;
@@ -7063,8 +7063,8 @@ void save_dbg(void) {
   fwrite(&n,4,1,sta);
 
   for (n=0;n<num_obj;n++) {
-    ob.tipo=(memptrsize)obj[n].tipo;
-    ob.nombre=(memptrsize)obj[n].name-(memptrsize)vnom;
+    ob.type=(memptrsize)obj[n].type;
+    ob.name=(memptrsize)obj[n].name-(memptrsize)vnom;
     ob.bloque=(memptrsize)obj[n].bloque;
     ob.miembro=(memptrsize)obj[n].member;
     ob.v0=(memptrsize)obj[n].sglo.offset;
@@ -7073,7 +7073,7 @@ void save_dbg(void) {
     ob.v3=(memptrsize)obj[n].sglo.items1;
     ob.v4=(memptrsize)obj[n].sglo.items2;
     ob.v5=(memptrsize)obj[n].sglo.items3;
-    if (obj[n].tipo==tpsgl || obj[n].tipo==tpslo) ob.v1=(ob.v1-(memptrsize)&obj[0])/sizeof(struct objeto);
+    if (obj[n].type==tpsgl || obj[n].type==tpslo) ob.v1=(ob.v1-(memptrsize)&obj[0])/sizeof(struct objeto);
     // WARNING: Do not add objects after this point -- &obj[0] and sizeof(struct objeto) are used above as base address and stride.
     fwrite(&ob,sizeof(ob),1,sta);
   }
@@ -7422,7 +7422,7 @@ int compilado=0;
 void compile_pass1(void) {
   _show_items();
   wwrite(v.ptr,v.an/big2,v.al/big2,3,12,0,texto[206],c3);
-  wwrite(v.ptr,v.an/big2,v.al/big2,6+text_len(texto[206]),12,0,ventana[v_ventana+1].titulo,c4);
+  wwrite(v.ptr,v.an/big2,v.al/big2,6+text_len(texto[206]),12,0,ventana[v_window+1].title,c4);
 }
 
 extern uint8_t cerror[128];
@@ -7442,28 +7442,28 @@ void compile_pass2(void) {
       mensaje_compilacion(cerror);
     } else {
       mensaje_compilacion(texto[202]);
-      if (ejecutar_programa) fin_dialogo=1;
+      if (run_mode) end_dialog=1;
     }
-    mouse_graf=1; v.volcar=1;
+    mouse_graf=1; v.redraw=1;
   }
   _process_items();
-  if (v.active_item==0) fin_dialogo=1;
-  else if (v.active_item==1) { v_ayuda=1; fin_dialogo=1; }
+  if (v.active_item==0) end_dialog=1;
+  else if (v.active_item==1) { v_help=1; end_dialog=1; }
 }
 
 void compile_pass0(void) {
-  v.tipo=1; v.an=300; v.al=46;
-  switch (ejecutar_programa) {
-    case 0: v.titulo=texto[200]; break;
-    case 1: v.titulo=texto[235]; break;
-    case 2: v.titulo=texto[236]; break;
-    case 3: v.titulo=texto[241]; break;
+  v.type=1; v.an=300; v.al=46;
+  switch (run_mode) {
+    case 0: v.title=texto[200]; break;
+    case 1: v.title=texto[235]; break;
+    case 2: v.title=texto[236]; break;
+    case 3: v.title=texto[241]; break;
   }
   v.paint_handler=compile_pass1;
   v.click_handler=compile_pass2;
   _button(100,7,v.al-14,0);
   _button(125,v.an-8,v.al-14,2);
-  compilado=0; v_ayuda=0;
+  compilado=0; v_help=0;
 }
 
 void compile_program(void) {

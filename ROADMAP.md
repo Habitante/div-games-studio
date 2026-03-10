@@ -243,18 +243,22 @@ No behavioral changes — pure cleanup.
   - `editar()` → actually `editor()` in divedit.c
   - `menu_click()` → actually `menu_principal2()` in divhandl.c (not div.c)
 
-### Naming — next steps
-- [ ] Rename the worst single-letter globals (the `r,g,b,c,d,a` "generic counters"
-      in global.h — now tagged `// TODO(Sprint D)`)
+### Naming — completed and next steps
+- [x] Rename the worst single-letter globals (`r,g,b,c,d,a` + `FILE *f`) — Sprint D (2026-03-10)
+- [x] Rename all Spanish function names to English — Sprint F (2026-03-10, 331 renames)
+- [ ] Rename 59 Spanish-named global variables (`tapiz`, `volcado_completo`, `*_an`/`*_al`,
+      `modo_*`, `siguiente_orden`, etc.) — Sprint G
+- [ ] Rename ~30 Spanish struct field names across 8 major structs (`tprg`, `tmapa`,
+      `tventana`, `t_listbox`, `tipo_regla`, `tipo_undo`, etc.) — Sprint G
+- [ ] Translate ~3,663 Spanish comment lines across 47 files — Sprint H
 - [ ] Rename cryptic locals in the hottest paths (divc.c, divedit.c, runtime/i.c)
-- [ ] Document the meaning of `v.an`/`v.al` (width/height), `tapiz` (wallpaper),
-      `papelera` (clipboard), etc. in a glossary or inline
 
 ### Structural improvements
-- [ ] Consider splitting `divc.c` (9,346 lines) into lexer/parser/codegen modules
-- [ ] Consider splitting `div.c` (4,678 lines) into menu handling vs desktop management
+- [ ] Split `divc.c` (7,823 lines) into lexer/parser/codegen modules — Sprint I
+- [ ] Split `div.c` (4,940 lines) into desktop/dialogs modules — Sprint I
+- [ ] Split `divpaint.c` (4,969 lines) into tools/selection modules — Sprint I
 - [ ] Group related globals into context structs where it simplifies things
-- [ ] Normalize string handling patterns across the codebase
+- [ ] Normalize string handling patterns across the codebase — Sprint E
 
 ### Systematic modernization (agent-assisted sprints)
 
@@ -265,17 +269,25 @@ to make this codebase genuinely maintainable — by anyone, not just Daniel. Thi
    gets an English equivalent. The glossary (`reports/glossary-spanish-english.md`) is
    the Rosetta stone; the architecture docs provide the structural understanding needed
    to rename safely.
+   - ✅ Sprint D: single-letter globals (r,g,b,c,d,a) removed
+   - ✅ Sprint F: 331 Spanish function names → English
+   - Next: Sprint G (59 Spanish globals + ~30 struct fields → English)
+   - Then: Sprint H (~3,663 Spanish comment lines → English across 47 files)
 
 2. **Meaningful names everywhere** — not just replacing `tapiz` with `wallpaper`, but
    turning `a`, `b`, `c`, `n`, `nn`, `nnn` into names that reveal intent. This requires
    understanding what each variable actually does, file by file.
+   - ✅ Sprint D: single-letter globals done
+   - Future: cryptic locals in hottest paths (divc.c, divedit.c, runtime/i.c)
 
 3. **English comments on every non-obvious function** — not boilerplate docstrings, but
    the kind of "here's what this does and why" commentary that lets a new developer
    navigate 100K lines of C without having to reverse-engineer each function.
+   - ✅ Sprint C: 22 key functions documented
 
 4. **Structural decomposition** — the monster files (divc.c, div.c, divpaint.c) should
    be split along natural boundaries that the architecture docs have already identified.
+   - Next: Sprint I (file splitting)
 
 **Methodology:** This work is ideal for AI agent teams working in focused sprints —
 one file or subsystem at a time, using the architecture docs and glossary as context.

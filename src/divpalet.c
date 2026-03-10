@@ -257,9 +257,9 @@ void create_ghost_vc(int m) {
 
   if ((p=vcubos[m])!=NULL) do { 
 	  num_puntos++;
-    dif=*(int*)(cuad+r+(*p).r);
-    dif+=*(int*)(cuad+g+(*p).g);
-    dif+=*(int*)(cuad+b+(*p).b);
+    dif=*(int*)(color_lookup+r+(*p).r);
+    dif+=*(int*)(color_lookup+g+(*p).g);
+    dif+=*(int*)(color_lookup+b+(*p).b);
     if (dif<find_min) { find_min=dif;
         find_col=((byte*)p-(byte*)tpuntos)/sizeof(struct t_tpuntos); }
   } while ((p=(*p).next)!=NULL);
@@ -273,9 +273,9 @@ void create_ghost_slow (void) {
   color=dac4;
   pal=dac4; endpal=dac4+768; dmin=65536;
   do {
-    dif=*(int*)(cuad+r+*pal); pal++;
-    dif+=*(int*)(cuad+g+*pal); pal++;
-    dif+=*(int*)(cuad+b+*pal); pal+=4;
+    dif=*(int*)(color_lookup+r+*pal); pal++;
+    dif+=*(int*)(color_lookup+g+*pal); pal++;
+    dif+=*(int*)(color_lookup+b+*pal); pal+=4;
     if (dif<dmin) { dmin=dif; color=pal-6; }
   } while (pal<endpal);
   find_col=(color-dac4)/3;
@@ -304,9 +304,9 @@ byte find_color(byte r,byte g,byte b) {
   pal=dac4; endpal=dac4+768; dmin=65536;
   _r=(int)r*256; _g=(int)g*256; _b=(int)b*256;
   do {
-    dif=*(int*)(cuad+_r+*pal); pal++;
-    dif+=*(int*)(cuad+_g+*pal); pal++;
-    dif+=*(int*)(cuad+_b+*pal); pal++;
+    dif=*(int*)(color_lookup+_r+*pal); pal++;
+    dif+=*(int*)(color_lookup+_g+*pal); pal++;
+    dif+=*(int*)(color_lookup+_b+*pal); pal++;
     if (dif<dmin) { dmin=dif; color=pal-3; }
   } while (pal<endpal);
 
@@ -322,9 +322,9 @@ byte find_color_not0(byte r,byte g,byte b) {
   pal=dac4+3; endpal=dac4+768; dmin=65536;
   _r=(int)r*256; _g=(int)g*256; _b=(int)b*256;
   do {
-    dif=*(int*)(cuad+_r+*pal); pal++;
-    dif+=*(int*)(cuad+_g+*pal); pal++;
-    dif+=*(int*)(cuad+_b+*pal); pal++;
+    dif=*(int*)(color_lookup+_r+*pal); pal++;
+    dif+=*(int*)(color_lookup+_g+*pal); pal++;
+    dif+=*(int*)(color_lookup+_b+*pal); pal++;
     if (dif<dmin) { dmin=dif; color=pal-3; }
   } while (pal<endpal);
 
@@ -339,7 +339,7 @@ void ord_paleta0(void) {
   int n;
   create_dac4();
   for (n=0;n<256;n++)
-    paleta[n]=find_color(paleta_original[n*3],paleta_original[n*3+1],paleta_original[n*3+2]);
+    paleta[n]=find_color(original_palette[n*3],original_palette[n*3+1],original_palette[n*3+2]);
 }
 
 void ord_paleta1(void) {
@@ -422,9 +422,9 @@ byte find_ord(byte * dac) {
   if (b<0) b=0; else if (b>63) b=63;
   r2=(int)r*256; g2=(int)g*256; b2=(int)b*256;
   do if (*pal!=255) {
-    dif=*(int*)(cuad+r2+*pal*4); pal++;
-    dif+=*(int*)(cuad+g2+*pal*4); pal++;
-    dif+=*(int*)(cuad+b2+*pal*4); pal+=2;
+    dif=*(int*)(color_lookup+r2+*pal*4); pal++;
+    dif+=*(int*)(color_lookup+g2+*pal*4); pal++;
+    dif+=*(int*)(color_lookup+b2+*pal*4); pal+=2;
     if (dif<dmin) { dmin=dif; color=pal-4; }
   } else {
     pal+=4;
@@ -449,58 +449,58 @@ byte average_color(byte a,byte b) {
 }
 
 //-----------------------------------------------------------------------------
-//      Calcula que colores de la regla son los más cercanos a cada RGB
+//      Calcula que colores de la gradient son los más cercanos a cada RGB
 //-----------------------------------------------------------------------------
 
-void make_near_regla(void) {
+void make_nearest_gradient(void) {
 
    int n,i,min_dist,dist,c;
 
    for (n=0;n<190;n++) {
      min_dist=192;
-     for (i=0;i<=reglas[regla].numcol;i++) {
-       c=(int)reglas[regla].col[i]*3;
+     for (i=0;i<=gradients[gradient].num_colors;i++) {
+       c=(int)gradients[gradient].colors[i]*3;
        dist=dac[c]+dac[c+1]+dac[c+2];
        if (dist>n) dist=dist-n; else dist=n-dist;
-       if (dist<min_dist) { near_regla[n]=c/3; min_dist=dist; }
+       if (dist<min_dist) { nearest_gradient[n]=c/3; min_dist=dist; }
      }
    }
 }
 
 //-----------------------------------------------------------------------------
-//      Calcula los colores intermedios de la regla de colores
+//      Calcula los colores intermedios de la gradient de colores
 //-----------------------------------------------------------------------------
 
-void calcula_regla(int n) {
+void calculate_gradient(int n) {
 
   int a;
 
-  if (!reglas[n].fijo) { // Las reglas fijas no se pueden do_calculate
-    switch(reglas[n].tipo) {
+  if (!gradients[n].fixed) { // Las gradients fijas no se pueden do_calculate
+    switch(gradients[n].type) {
       case 0: // Lineal, el cálculo es obvio, se toman los colores en secuencia
-        for (a=1;a<32;a++) reglas[n].col[a+1]=reglas[n].col[a]+1;
+        for (a=1;a<32;a++) gradients[n].colors[a+1]=gradients[n].colors[a]+1;
         break;
       case 1: // Adaptable cada 1 color, no hay nada que do_calculate
         break;
       case 2: // Adaptable cada 2 colores, se rellenan con las medias
         for (a=0;a<32;a+=2)
-          reglas[n].col[a+1]=average_color(reglas[n].col[a],reglas[n].col[a+2]);
+          gradients[n].colors[a+1]=average_color(gradients[n].colors[a],gradients[n].colors[a+2]);
         break;
       case 4: // Adaptable cada 4
         for (a=0;a<32;a+=4) {
-          reglas[n].col[a+2]=average_color(reglas[n].col[a],reglas[n].col[a+4]);
-          reglas[n].col[a+1]=average_color(reglas[n].col[a],reglas[n].col[a+2]);
-          reglas[n].col[a+3]=average_color(reglas[n].col[a+2],reglas[n].col[a+4]);
+          gradients[n].colors[a+2]=average_color(gradients[n].colors[a],gradients[n].colors[a+4]);
+          gradients[n].colors[a+1]=average_color(gradients[n].colors[a],gradients[n].colors[a+2]);
+          gradients[n].colors[a+3]=average_color(gradients[n].colors[a+2],gradients[n].colors[a+4]);
         } break;
       case 8: // Adaptable cada 8
         for (a=0;a<32;a+=8) {
-          reglas[n].col[a+4]=average_color(reglas[n].col[a],reglas[n].col[a+8]);
-          reglas[n].col[a+2]=average_color(reglas[n].col[a],reglas[n].col[a+4]);
-          reglas[n].col[a+6]=average_color(reglas[n].col[a+4],reglas[n].col[a+8]);
-          reglas[n].col[a+1]=average_color(reglas[n].col[a],reglas[n].col[a+2]);
-          reglas[n].col[a+3]=average_color(reglas[n].col[a+2],reglas[n].col[a+4]);
-          reglas[n].col[a+5]=average_color(reglas[n].col[a+4],reglas[n].col[a+6]);
-          reglas[n].col[a+7]=average_color(reglas[n].col[a+6],reglas[n].col[a+8]);
+          gradients[n].colors[a+4]=average_color(gradients[n].colors[a],gradients[n].colors[a+8]);
+          gradients[n].colors[a+2]=average_color(gradients[n].colors[a],gradients[n].colors[a+4]);
+          gradients[n].colors[a+6]=average_color(gradients[n].colors[a+4],gradients[n].colors[a+8]);
+          gradients[n].colors[a+1]=average_color(gradients[n].colors[a],gradients[n].colors[a+2]);
+          gradients[n].colors[a+3]=average_color(gradients[n].colors[a+2],gradients[n].colors[a+4]);
+          gradients[n].colors[a+5]=average_color(gradients[n].colors[a+4],gradients[n].colors[a+6]);
+          gradients[n].colors[a+7]=average_color(gradients[n].colors[a+6],gradients[n].colors[a+8]);
         } break;
     }
   }
@@ -509,7 +509,7 @@ void calcula_regla(int n) {
 int hay_mapas(void) {
   int m,n=-1;
   for (m=0;m<max_windows;m++)
-  if (ventana[m].tipo==100) { n=m; break; }
+  if (ventana[m].type==100) { n=m; break; }
   return(n+1);
 }
 
@@ -530,37 +530,37 @@ void LoadPal() {
   int  num,n;
   FILE *f;
 
-  v_modo=0;
-  v_tipo=3;
-  v_texto=(char *)texto[777];
+  v_mode=0;
+  v_type=3;
+  v_text=(char *)texto[777];
   show_dialog(browser0);
-  if (!v_terminado) return;
+  if (!v_finished) return;
 
   if(!num_taggeds) {
-    strcpy(full,tipo[v_tipo].path);
+    strcpy(full,tipo[v_type].path);
     if (full[strlen(full)-1]!='/') strcat(full,"/");
     strcat(full, input);
     if ((f=fopen(full,"rb"))!=NULL) {
       fclose(f);
-      v_existe=1;
-    } else v_existe=0;
-    div_strcpy(larchivosbr.lista, larchivosbr.lista_an, input);
-    larchivosbr.maximo=1;
+      v_exists=1;
+    } else v_exists=0;
+    div_strcpy(larchivosbr.list, larchivosbr.item_width, input);
+    larchivosbr.total_items=1;
     thumb[0].tagged=1;
     num_taggeds=1;
   }
 
-  if (num_taggeds==1) for(num=0; num<larchivosbr.maximo; num++)
+  if (num_taggeds==1) for(num=0; num<larchivosbr.total_items; num++)
   {
     if(thumb[num].tagged)
     {
-      strcpy(input,larchivosbr.lista+larchivosbr.lista_an*num);
-      strcpy(full,tipo[v_tipo].path);
+      strcpy(input,larchivosbr.list+larchivosbr.item_width*num);
+      strcpy(full,tipo[v_type].path);
       if (full[strlen(full)-1]!='/') strcat(full,"/");
       strcat(full, input);
 
-      if (!v_existe) {
-        v_texto=(char *)texto[43];
+      if (!v_exists) {
+        v_text=(char *)texto[43];
         show_dialog(err0);
       } else {
         strcpy(PalName,full);
@@ -575,13 +575,13 @@ void LoadPal() {
 
         if(div_try) {
           if (hay_mapas()) {
-            v_titulo=(char *)texto[53];
-            v_texto=(char *)texto[321];
+            v_title=(char *)texto[53];
+            v_text=(char *)texto[321];
             show_dialog(aceptar0);
-          } else v_aceptar=1;
-          if(v_aceptar) RefPalAndDlg(0,1); else RefPalAndDlg(1,1);
+          } else v_accept=1;
+          if(v_accept) RefPalAndDlg(0,1); else RefPalAndDlg(1,1);
         } else {
-          v_texto=(char*)texto[46];
+          v_text=(char*)texto[46];
           show_dialog(err0);
           return;
         }
@@ -592,18 +592,18 @@ void LoadPal() {
 
     muestra=(byte*)malloc(32768);
     if (muestra==NULL) {
-      v_texto=(char *)texto[45];
+      v_text=(char *)texto[45];
       show_dialog(err0);
       return;
     }
     memset(muestra,0,32768);
 
-    for(num=0; num<larchivosbr.maximo; num++)
+    for(num=0; num<larchivosbr.total_items; num++)
     {
       if(thumb[num].tagged)
       {
-        strcpy(input,larchivosbr.lista+larchivosbr.lista_an*num);
-        strcpy(full,tipo[v_tipo].path);
+        strcpy(input,larchivosbr.list+larchivosbr.item_width*num);
+        strcpy(full,tipo[v_type].path);
         if (full[strlen(full)-1]!='/') strcat(full,"/");
         strcat(full, input);
 
@@ -628,11 +628,11 @@ void LoadPal() {
     free(muestra);
 
     if (hay_mapas()) {
-      v_titulo=(char *)texto[53];
-      v_texto=(char *)texto[321];
+      v_title=(char *)texto[53];
+      v_text=(char *)texto[321];
       show_dialog(aceptar0);
-    } else v_aceptar=1;
-    if(v_aceptar) RefPalAndDlg(0,1); else RefPalAndDlg(1,1);
+    } else v_accept=1;
+    if(v_accept) RefPalAndDlg(0,1); else RefPalAndDlg(1,1);
   }
 }
 
@@ -640,7 +640,7 @@ void Guarda_Pal()
 {
 int x;
 FILE *f;
-        strcpy(full,tipo[v_tipo].path);
+        strcpy(full,tipo[v_type].path);
         if (full[strlen(full)-1]!='/')
                 strcat(full,"/");
         strcat(full,input);
@@ -650,12 +650,12 @@ FILE *f;
                 fwrite("pal\x1a\x0d\x0a\x00\x00",8,1,f);
                 fwrite(dac,768,1,f);
                 for(x=0;x<16;x++)
-                        fwrite(&reglas[x],1,36,f);
+                        fwrite(&gradients[x],1,36,f);
                 fclose(f);
         }
         else
         {
-                v_texto=(char *)texto[47];
+                v_text=(char *)texto[47];
                 show_dialog(err0);
         }
 }
@@ -663,18 +663,18 @@ FILE *f;
 
 void SaveAsPal()
 {
-        v_modo=1;
-        v_tipo=10;
-        v_texto=(char *)texto[778];
+        v_mode=1;
+        v_type=10;
+        v_text=(char *)texto[778];
 	show_dialog(browser0);
-        if (v_terminado)
+        if (v_finished)
         {
-                if (v_existe)
+                if (v_exists)
                 {
-                        v_titulo=(char *)texto[139];
-                        v_texto=input;
+                        v_title=(char *)texto[139];
+                        v_text=input;
                         show_dialog(aceptar0);
-                        if (v_aceptar)
+                        if (v_accept)
                                 Guarda_Pal();
                 }
                 else
@@ -727,7 +727,7 @@ void RefPalAndDlg(int no_tocar_mapas,int guardar_original)
 
   // ************** Libera los thumbnails de los FPG
 
-  for (m=0;m<max_windows;m++) if (ventana[m].tipo==101) {
+  for (m=0;m<max_windows;m++) if (ventana[m].type==101) {
     MiFPG=(FPG *)ventana[m].aux;
 
     // Libera thumbnails de FPG
@@ -751,9 +751,9 @@ void RefPalAndDlg(int no_tocar_mapas,int guardar_original)
 
   if (!no_tocar_mapas) {
     for (n=1;n<max_windows;n++) {
-      if (ventana[n].tipo==100) {
+      if (ventana[n].type==100) {
         ptr=ventana[n].mapa->map;
-        sum=ventana[n].mapa->map_an*ventana[n].mapa->map_al;
+        sum=ventana[n].mapa->map_width*ventana[n].mapa->map_height;
         x=0; do { *ptr=xlat[*ptr]; ptr++; } while(++x<sum);
       }
     }
@@ -768,7 +768,7 @@ void RefPalAndDlg(int no_tocar_mapas,int guardar_original)
   }
 
   for (n=0;n<max_windows;n++) {
-    if (ventana[n].tipo==102 && !strcmp((char *)ventana[n].nombre,(char *)texto[83])) {
+    if (ventana[n].type==102 && !strcmp((char *)ventana[n].name,(char *)texto[83])) {
       Text1Col=xlat[Text1Col];
       Text2Col=xlat[Text2Col];
       Text3Col=xlat[Text3Col];
@@ -802,40 +802,40 @@ void RefPalAndDlg(int no_tocar_mapas,int guardar_original)
 
   for (n=1;n<max_windows;n++)
   {
-        if (ventana[n].tipo==104)
-                ReloadFont(n, (struct tventana *)&ventana[n].tipo);
+        if (ventana[n].type==104)
+                ReloadFont(n, (struct tventana *)&ventana[n].type);
   }
 
-  for (n=0;n<max_windows;n++) if (ventana[n].tipo) {
+  for (n=0;n<max_windows;n++) if (ventana[n].type) {
     wup(n);
     ptr=v.ptr;
-    if (ventana[n].primer_plano==2) { swap(v.an,v._an); swap(v.al,v._al); }
+    if (ventana[n].foreground==2) { swap(v.an,v._an); swap(v.al,v._al); }
     an=v.an; al=v.al; memset(ptr,c0,an*al); if (big) { an/=2; al/=2; }
     wrectangle(ptr,an,al,c2,0,0,an,al);
     wput(ptr,an,al,an-9,2,35);
     wput(ptr,an,al,an-17,2,37);
 
-    if (v.tipo>=100 && !v.estado) {
+    if (v.type>=100 && !v.state) {
       wgra(v.ptr,an,al,c1,2,2,an-20,7);
-      if (text_len(v.titulo)+3>an-20) {
-        wwrite_in_box(v.ptr,an,an-19,al,4,2,0,v.titulo,c0);
-        wwrite_in_box(v.ptr,an,an-19,al,3,2,0,v.titulo,c2);
+      if (text_len(v.title)+3>an-20) {
+        wwrite_in_box(v.ptr,an,an-19,al,4,2,0,v.title,c0);
+        wwrite_in_box(v.ptr,an,an-19,al,3,2,0,v.title,c2);
       } else {
-        wwrite(v.ptr,an,al,2+(an-20)/2,3,1,v.titulo,c0);
-        wwrite(v.ptr,an,al,2+(an-20)/2,2,1,v.titulo,c2);
+        wwrite(v.ptr,an,al,2+(an-20)/2,3,1,v.title,c0);
+        wwrite(v.ptr,an,al,2+(an-20)/2,2,1,v.title,c2);
       }
     } else {
       wgra(ptr,an,al,c_b_low,2,2,an-20,7);
-      if (text_len(v.titulo)+3>an-20) {
-        wwrite_in_box(ptr,an,an-19,al,4,2,0,v.titulo,c1);
-        wwrite_in_box(ptr,an,an-19,al,3,2,0,v.titulo,c4);
+      if (text_len(v.title)+3>an-20) {
+        wwrite_in_box(ptr,an,an-19,al,4,2,0,v.title,c1);
+        wwrite_in_box(ptr,an,an-19,al,3,2,0,v.title,c4);
       } else {
-        wwrite(ptr,an,al,3+(an-20)/2,2,1,v.titulo,c1);
-        wwrite(ptr,an,al,2+(an-20)/2,2,1,v.titulo,c4);
+        wwrite(ptr,an,al,3+(an-20)/2,2,1,v.title,c1);
+        wwrite(ptr,an,al,2+(an-20)/2,2,1,v.title,c4);
       }
     }
     call((voidReturnType )v.paint_handler);
-    if (v.primer_plano==2) { swap(v.an,v._an); swap(v.al,v._al); }
+    if (v.foreground==2) { swap(v.an,v._an); swap(v.al,v._al); }
     wdown(n);
   }
 
@@ -853,12 +853,12 @@ void RefPalAndDlg(int no_tocar_mapas,int guardar_original)
 
   // Adapta las gamas de color definidas por el usuario
 
-  crea_gama(Setupfile.t_gama,tapiz_gama);
+  create_gradient_colors(Setupfile.gradient_config,wallpaper_gradient);
 
-  // Restaura el tapiz de fondo
-  preparar_tapiz();
+  // Restore the background wallpaper
+  prepare_wallpaper();
 
-  update_box(0,0,vga_an,vga_al);
+  update_box(0,0,vga_width,vga_height);
 
   blit_screen(copia);
 
@@ -874,10 +874,10 @@ void RefPalAndDlg(int no_tocar_mapas,int guardar_original)
 
   for (n=0;n<768;n++) dac4[n]=dac[n]*4;
 
-  if (guardar_original) memcpy(paleta_original,dac,768);
+  if (guardar_original) memcpy(original_palette,dac,768);
 
   for (n=1;n<max_windows;n++) {
-    if (ventana[n].tipo==101) {
+    if (ventana[n].type==101) {
       if (RemapAllFiles(n)) n--;
     }
   }
@@ -952,7 +952,7 @@ void ordena2(void){
     if (wmouse_y>=10+66) ord+=2;
 
     if (ord!=ordenacion) {
-      v.volcar=1;
+      v.redraw=1;
       wrectangle(v.ptr,an,al,c2,2,10,65*2+3,65*2+3);
       wbox(v.ptr,an,al,c2,2+66,10,1,65*2+3);
       wbox(v.ptr,an,al,c2,2,10+66,65*2+3,1);
@@ -970,31 +970,31 @@ void ordena2(void){
   }
 
    switch (v.active_item) {
-      case 0: v_aceptar=1; fin_dialogo=1; break;
-      case 1: fin_dialogo=1; break;
+      case 0: v_accept=1; end_dialog=1; break;
+      case 1: end_dialog=1; break;
    }
 }
 
 void ordena0(void){
-  v.tipo=1; // Diálogo
-  v.estado=0;
+  v.type=1; // Diálogo
+  v.state=0;
   v.an=65*2+7;
   v.al=65*2+31;
-  v.titulo=texto[140];
+  v.title=texto[140];
 
   _button(100,7,v.al-14,0);
   _button(101,v.an-8,v.al-14,2);
 
   v.paint_handler=ordena1;
   v.click_handler=ordena2;
-  v_aceptar=0;
+  v_accept=0;
 }
 
-void ordena_paleta(void) {
+void sort_palette(void) {
   int n;
 
   show_dialog(ordena0);
-  if (v_aceptar) {
+  if (v_accept) {
     for (n=0;n<256;n++) {
       dac4[n*3]=dac[paleta[n]*3];
       dac4[n*3+1]=dac[paleta[n]*3+1];
@@ -1021,9 +1021,9 @@ word find_ord2(byte * dac) {
   if (b<0) b=0; else if (b>63) b=63;
   r2=(int)r*256; g2=(int)g*256; b2=(int)b*256;
   do if (*pal!=255) {
-    dif=*(int*)(cuad+r2+*pal*4); pal++;
-    dif+=*(int*)(cuad+g2+*pal*4); pal++;
-    dif+=*(int*)(cuad+b2+*pal*4); pal+=2;
+    dif=*(int*)(color_lookup+r2+*pal*4); pal++;
+    dif+=*(int*)(color_lookup+g2+*pal*4); pal++;
+    dif+=*(int*)(color_lookup+b2+*pal*4); pal+=2;
     if (dif<dmin) { dmin=dif; color=pal-4; }
   } else {
     pal+=4;
@@ -1032,16 +1032,16 @@ word find_ord2(byte * dac) {
   return((color-dac)/4);
 }
 
-void fusiona_paleta(void){
+void merge_palette(void){
   int div_try=0;
 
-  v_modo=0; v_tipo=3; v_texto=(char *)texto[781]; show_dialog(browser0);
+  v_mode=0; v_type=3; v_text=(char *)texto[781]; show_dialog(browser0);
 
-  if (v_terminado) {
-    if (!v_existe) {
-      v_texto=(char *)texto[43]; show_dialog(err0);
+  if (v_finished) {
+    if (!v_exists) {
+      v_text=(char *)texto[43]; show_dialog(err0);
     } else {
-      strcpy(full,tipo[v_tipo].path);
+      strcpy(full,tipo[v_type].path);
       if (full[strlen(full)-1]!='/') strcat(full,"/");
       strcat(full,input);
       strcpy(PalName,full);
@@ -1054,7 +1054,7 @@ void fusiona_paleta(void){
       div_try|=cargadac_PAL(PalName);
       div_try|=cargadac_JPG(PalName);
 
-      if(!div_try) { v_texto=(char *)texto[46]; show_dialog(err0); return; }
+      if(!div_try) { v_text=(char *)texto[46]; show_dialog(err0); return; }
 
       mouse_graf=3; blit_screen(copia);
 
@@ -1102,9 +1102,9 @@ void fusionar_paletas(void){
   // paleta[512] con los colores ordenados
 
   for (n=1;n<511;n++) {
-    dist[n]=*(int*)(cuad+pal[paleta[n]*4]*256+pal[paleta[n+1]*4]*4);
-    dist[n]+=*(int*)(cuad+pal[paleta[n]*4+1]*256+pal[paleta[n+1]*4+1]*4);
-    dist[n]+=*(int*)(cuad+pal[paleta[n]*4+2]*256+pal[paleta[n+1]*4+2]*4);
+    dist[n]=*(int*)(color_lookup+pal[paleta[n]*4]*256+pal[paleta[n+1]*4]*4);
+    dist[n]+=*(int*)(color_lookup+pal[paleta[n]*4+1]*256+pal[paleta[n+1]*4+1]*4);
+    dist[n]+=*(int*)(color_lookup+pal[paleta[n]*4+2]*256+pal[paleta[n+1]*4+2]*4);
   }
 
   // Dist con las distancias entre todos los colores consecutivos
@@ -1133,16 +1133,16 @@ void fusionar_paletas(void){
 
     if (cmin<c-1) {
       n=cmin;
-      dist[n]=*(int*)(cuad+pal[paleta[n]*4]*256+pal[paleta[n+1]*4]*4);
-      dist[n]+=*(int*)(cuad+pal[paleta[n]*4+1]*256+pal[paleta[n+1]*4+1]*4);
-      dist[n]+=*(int*)(cuad+pal[paleta[n]*4+2]*256+pal[paleta[n+1]*4+2]*4);
+      dist[n]=*(int*)(color_lookup+pal[paleta[n]*4]*256+pal[paleta[n+1]*4]*4);
+      dist[n]+=*(int*)(color_lookup+pal[paleta[n]*4+1]*256+pal[paleta[n+1]*4+1]*4);
+      dist[n]+=*(int*)(color_lookup+pal[paleta[n]*4+2]*256+pal[paleta[n+1]*4+2]*4);
     }
 
     if (cmin>1) {
       n=cmin-1;
-      dist[n]=*(int*)(cuad+pal[paleta[n]*4]*256+pal[paleta[n+1]*4]*4);
-      dist[n]+=*(int*)(cuad+pal[paleta[n]*4+1]*256+pal[paleta[n+1]*4+1]*4);
-      dist[n]+=*(int*)(cuad+pal[paleta[n]*4+2]*256+pal[paleta[n+1]*4+2]*4);
+      dist[n]=*(int*)(color_lookup+pal[paleta[n]*4]*256+pal[paleta[n+1]*4]*4);
+      dist[n]+=*(int*)(color_lookup+pal[paleta[n]*4+1]*256+pal[paleta[n+1]*4+1]*4);
+      dist[n]+=*(int*)(color_lookup+pal[paleta[n]*4+2]*256+pal[paleta[n+1]*4+2]*4);
     }
 
     c--;
@@ -1185,9 +1185,9 @@ word new_find_ord(byte * dac) {
   if (b<0) b=0; else if (b>63) b=63;
   r2=(int)r*256; g2=(int)g*256; b2=(int)b*256;
   do if (*pal<128) {
-    dif=*(int*)(cuad+r2+*pal*4); pal++;
-    dif+=*(int*)(cuad+g2+*pal*4); pal++;
-    dif+=*(int*)(cuad+b2+*pal*4); pal+=2;
+    dif=*(int*)(color_lookup+r2+*pal*4); pal++;
+    dif+=*(int*)(color_lookup+g2+*pal*4); pal++;
+    dif+=*(int*)(color_lookup+b2+*pal*4); pal+=2;
     if (dif<dmin) { dmin=dif; color=pal-4; }
   } else {
     pal+=4;
@@ -1242,9 +1242,9 @@ void crear_paleta(void){
   // paleta[num_colores] con los colores ordenados
 
   for (n=0;n<num_colores-1;n++) {
-    dist[n]=*(int*)(cuad+pal[paleta[n]*4]*256+pal[paleta[n+1]*4]*4);
-    dist[n]+=*(int*)(cuad+pal[paleta[n]*4+1]*256+pal[paleta[n+1]*4+1]*4);
-    dist[n]+=*(int*)(cuad+pal[paleta[n]*4+2]*256+pal[paleta[n+1]*4+2]*4);
+    dist[n]=*(int*)(color_lookup+pal[paleta[n]*4]*256+pal[paleta[n+1]*4]*4);
+    dist[n]+=*(int*)(color_lookup+pal[paleta[n]*4+1]*256+pal[paleta[n+1]*4+1]*4);
+    dist[n]+=*(int*)(color_lookup+pal[paleta[n]*4+2]*256+pal[paleta[n+1]*4+2]*4);
   }
 
   // Dist con las distancias entre todos los colores consecutivos
@@ -1269,9 +1269,9 @@ void crear_paleta(void){
 
     if (cmin<c-1) {
       n=cmin;
-      dist[n]=*(int*)(cuad+pal[paleta[n]*4]*256+pal[paleta[n+1]*4]*4);
-      dist[n]+=*(int*)(cuad+pal[paleta[n]*4+1]*256+pal[paleta[n+1]*4+1]*4);
-      dist[n]+=*(int*)(cuad+pal[paleta[n]*4+2]*256+pal[paleta[n+1]*4+2]*4);
+      dist[n]=*(int*)(color_lookup+pal[paleta[n]*4]*256+pal[paleta[n+1]*4]*4);
+      dist[n]+=*(int*)(color_lookup+pal[paleta[n]*4+1]*256+pal[paleta[n+1]*4+1]*4);
+      dist[n]+=*(int*)(color_lookup+pal[paleta[n]*4+2]*256+pal[paleta[n+1]*4+2]*4);
     }
 
     c--;
@@ -1309,15 +1309,15 @@ void crear_paleta(void){
 
 
 //-----------------------------------------------------------------------------
-//      Prepara el tapiz para una paleta en concreto
+//      Prepare the wallpaper for a specific palette
 //-----------------------------------------------------------------------------
 
-extern byte tapiz_gama[128];
+extern byte wallpaper_gradient[128];
 
-byte ctapiz[256];
+byte cwallpaper[256];
 extern SDL_Surface *vga;
 
-void preparar_tapiz(void) {
+void prepare_wallpaper(void) {
   FILE * f;
   int x,lon,tap_an,tap_al;
   byte *p,*q;
@@ -1329,25 +1329,25 @@ void preparar_tapiz(void) {
 
   if ((f=fopen(Setupfile.Desktop_Image,"rb"))==NULL) return;
   fseek(f,0,SEEK_END); lon=ftell(f); fseek(f,0,SEEK_SET);
-  if (tapiz!=NULL) { free(tapiz); tapiz=NULL; }
+  if (wallpaper!=NULL) { free(wallpaper); wallpaper=NULL; }
 
   if ((temp2=(byte*)malloc(lon))==NULL) { fclose(f); return; }
   if (fread(temp2,1,lon,f)!=lon) { fclose(f); free(temp2); return; }
   fclose(f);
 
-  tap_an=map_an; tap_al=map_al;
+  tap_an=map_width; tap_al=map_height;
   if (is_MAP(temp2)) x=1;
   else if (is_PCX(temp2)) x=2;
   else if (is_BMP(temp2)) x=3;
   else if (is_JPG(temp2,lon)) x=4;
   else x=0;
-  swap(map_an,tap_an); swap(map_al,tap_al);
+  swap(map_width,tap_an); swap(map_height,tap_al);
 
   if (!x) { free(temp2); return; }
 
   if ((temp=(byte*)malloc(tap_an*tap_al+tap_an))==NULL) { free(temp2); return; }
 
-  swap(map_an,tap_an); swap(map_al,tap_al);
+  swap(map_width,tap_an); swap(map_height,tap_al);
 
   memcpy(old_dac4,dac4,768);
   memcpy(old_dac,dac,768);
@@ -1358,32 +1358,32 @@ void preparar_tapiz(void) {
     case 2: descomprime_PCX(temp2,temp,0); break;
     case 3: descomprime_BMP(temp2,temp,0); break;
     case 4: descomprime_JPG(temp2,temp,0,lon); break;
-  } swap(map_an,tap_an); swap(map_al,tap_al);
+  } swap(map_width,tap_an); swap(map_height,tap_al);
   cargar_paleta=n;
 
   free(temp2); memcpy(pal,dac4,768); create_dac4();
 
   if (!Setupfile.Desktop_Gama) { // Si el fichero se muestra a color
     for (x=0,p=pal;x<256;x++,p+=3)
-      ctapiz[x]=fast_find_color(*p,*(p+1),*(p+2));
+      cwallpaper[x]=fast_find_color(*p,*(p+1),*(p+2));
     p=temp; q=p+tap_an*tap_al;
-    do *p=ctapiz[*p]; while (++p<q); // Lo adapta a la paleta actual
+    do *p=cwallpaper[*p]; while (++p<q); // Lo adapta a la paleta actual
   } else {
     for (x=0,p=pal;x<256;x++,p+=3)
-      ctapiz[x]=tapiz_gama[(*p+*(p+1)+*(p+2))*2/3];
+      cwallpaper[x]=wallpaper_gradient[(*p+*(p+1)+*(p+2))*2/3];
     p=temp; q=p+tap_an*tap_al;
-    do *p=ctapiz[*p]; while (++p<q);
+    do *p=cwallpaper[*p]; while (++p<q);
   }
 
   if (Setupfile.Desktop_Tile) {
-    mapa_tapiz=tapiz=temp;
-    tapiz_an=tap_an;
-    tapiz_al=tap_al;
+    wallpaper_map=wallpaper=temp;
+    wallpaper_width=tap_an;
+    wallpaper_height=tap_al;
   } else {
-    if ((p=(byte *)malloc(vga_an*vga_al))==NULL) { free(temp); tapiz=NULL; return; }
-    rescalar(temp,tap_an,tap_al,p,vga_an,vga_al);
+    if ((p=(byte *)malloc(vga_width*vga_height))==NULL) { free(temp); wallpaper=NULL; return; }
+    rescalar(temp,tap_an,tap_al,p,vga_width,vga_height);
     free(temp);
-    tapiz_an=vga_an; tapiz_al=vga_al; mapa_tapiz=tapiz=p;
+    wallpaper_width=vga_width; wallpaper_height=vga_height; wallpaper_map=wallpaper=p;
   }
 
   memcpy(dac,old_dac,768);
@@ -1465,20 +1465,20 @@ char cWork[20];
         else
                 wbox(v.ptr,an,al,c0,(SelColor%16)*8+4,(SelColor/16)*8+12,3,3);
 
-        lRed.creada=0;
-        lRed.maximo=72;
-        lBlu.creada=0;
-        lBlu.maximo=72;
-        lGre.creada=0;
-        lGre.maximo=72;
+        lRed.created=0;
+        lRed.total_items=72;
+        lBlu.created=0;
+        lBlu.total_items=72;
+        lGre.created=0;
+        lGre.total_items=72;
 
         create_listbox(&lRed);
         create_listbox(&lBlu);
         create_listbox(&lGre);
 
-        lRed.inicial=63-dac[SelColor*3];
-        lGre.inicial=63-dac[SelColor*3+1];
-        lBlu.inicial=63-dac[SelColor*3+2];
+        lRed.first_visible=63-dac[SelColor*3];
+        lGre.first_visible=63-dac[SelColor*3+1];
+        lBlu.first_visible=63-dac[SelColor*3+2];
 
         update_listbox(&lRed);
         update_listbox(&lBlu);
@@ -1501,11 +1501,11 @@ byte cIni,cFin;
 int an=v.an/big2,al=v.al/big2;
 
         _process_items();
-        v_pausa=1;
+        v_pause=1;
         update_listbox(&lRed);
         update_listbox(&lBlu);
         update_listbox(&lGre);
-        v_pausa=1;
+        v_pause=1;
         if(Accion)
                 mouse_graf=2;
         if((wmouse_y>10)&&(wmouse_y<138)&&(wmouse_x>2)&&(wmouse_x<130))
@@ -1538,11 +1538,11 @@ int an=v.an/big2,al=v.al/big2;
                         ax=((wmouse_x-2)/8);
                         ay=((wmouse_y-10)/8);
                         wrectangle(v.ptr,an,al,c4,(cColor%16)*8+1,(cColor/16)*8+9,9,9);
-                        lRed.inicial=63-dac[cColor*3];
-                        lGre.inicial=63-dac[cColor*3+1];
-                        lBlu.inicial=63-dac[cColor*3+2];
+                        lRed.first_visible=63-dac[cColor*3];
+                        lGre.first_visible=63-dac[cColor*3+1];
+                        lBlu.first_visible=63-dac[cColor*3+2];
                         Dentro=1;
-                        v.volcar=1;
+                        v.redraw=1;
                         OldColor=cColor;
                 }
                 if((mouse_b)&&(cColor!=SelColor))
@@ -1623,7 +1623,7 @@ int an=v.an/big2,al=v.al/big2;
                                 Accion=0;
                                 call((voidReturnType )v.paint_handler);
                         }
-                        v.volcar=1;
+                        v.redraw=1;
                 }                                
         }
         else
@@ -1653,35 +1653,35 @@ int an=v.an/big2,al=v.al/big2;
                         wwrite(v.ptr,an,al,147,63-7,0,texto[145],c3);
                         sprintf(cWork,"%02d",dac[SelColor*3+2]);
                         wwrite(v.ptr,an,al,140,63-7,2,(byte *)cWork,c3);
-                        lRed.inicial=63-dac[SelColor*3];
-                        lGre.inicial=63-dac[SelColor*3+1];
-                        lBlu.inicial=63-dac[SelColor*3+2];                        
+                        lRed.first_visible=63-dac[SelColor*3];
+                        lGre.first_visible=63-dac[SelColor*3+1];
+                        lBlu.first_visible=63-dac[SelColor*3+2];                        
                         wbox(v.ptr,an,al,SelColor,133,27,29,42-29);
-                        v.volcar=1;
+                        v.redraw=1;
                 }
         }
 
         //Barras de desplazamiento
-        if(lRed.zona!=sRed)
+        if(lRed.zone!=sRed)
         {
-                sRed=lRed.zona;
-                v.volcar=1;
+                sRed=lRed.zone;
+                v.redraw=1;
         }
-        if(lGre.zona!=sGre)
+        if(lGre.zone!=sGre)
         {
-                sGre=lGre.zona;
-                v.volcar=1;
+                sGre=lGre.zone;
+                v.redraw=1;
         }
-        if(lBlu.zona!=sBlu)
+        if(lBlu.zone!=sBlu)
         {
-                sBlu=lBlu.zona;
-                v.volcar=1;
+                sBlu=lBlu.zone;
+                v.redraw=1;
         }
 
-        if((old_mouse_b&1) && !(mouse_b&1))
+        if((prev_mouse_buttons&1) && !(mouse_b&1))
         {
                 Tocado=0;
-                switch(lRed.zona)
+                switch(lRed.zone)
                 {
                         case 2:
                                 do{read_mouse();}while(mouse_b);
@@ -1690,11 +1690,11 @@ int an=v.an/big2,al=v.al/big2;
                                 do{read_mouse();}while(mouse_b);
                                 /* fall through */
                         case 4:
-                                dac[SelColor*3]=63-lRed.inicial;
+                                dac[SelColor*3]=63-lRed.first_visible;
                                 Tocado=1;
                                 break;
                 }
-                switch(lGre.zona)
+                switch(lGre.zone)
                 {
                         case 2:
                                 do{read_mouse();}while(mouse_b);
@@ -1703,11 +1703,11 @@ int an=v.an/big2,al=v.al/big2;
                                 do{read_mouse();}while(mouse_b);
                                 /* fall through */
                         case 4:
-                                dac[SelColor*3+1]=63-lGre.inicial;
+                                dac[SelColor*3+1]=63-lGre.first_visible;
                                 Tocado=1;
                                 break;
                 }
-                switch(lBlu.zona)
+                switch(lBlu.zone)
                 {
                         case 2:
                                 do{read_mouse();}while(mouse_b);
@@ -1716,7 +1716,7 @@ int an=v.an/big2,al=v.al/big2;
                                 do{read_mouse();}while(mouse_b);
                                 /* fall through */
                         case 4:
-                                dac[SelColor*3+2]=63-lBlu.inicial;
+                                dac[SelColor*3+2]=63-lBlu.first_visible;
                                 Tocado=1;
                                 break;
                 }
@@ -1725,13 +1725,13 @@ int an=v.an/big2,al=v.al/big2;
                         Degradar=0;Copiar=0;Intercambiar=0;
                         Accion=0;
                         call((voidReturnType )v.paint_handler);
-                        lRed.inicial=63-dac[SelColor*3];
-                        lGre.inicial=63-dac[SelColor*3+1];
-                        lBlu.inicial=63-dac[SelColor*3+2];
+                        lRed.first_visible=63-dac[SelColor*3];
+                        lGre.first_visible=63-dac[SelColor*3+1];
+                        lBlu.first_visible=63-dac[SelColor*3+2];
                         find_colors();
                         refresh_dialog();
                         set_dac(dac);
-                        v.volcar=1;
+                        v.redraw=1;
                 }        
         }
 
@@ -1777,10 +1777,10 @@ int an=v.an/big2,al=v.al/big2;
         {
                         case 0:
                                 Retorno=1;
-                                fin_dialogo=1;
+                                end_dialog=1;
                                 break;
                         case 1:
-                                fin_dialogo=1;
+                                end_dialog=1;
                                 break;
                         case 2:                                
                                 //Deshace
@@ -1806,11 +1806,11 @@ int an=v.an/big2,al=v.al/big2;
                                 wwrite(v.ptr,an,al,147,63-7,0,texto[145],c3);
                                 sprintf(cWork,"%02d",dac[SelColor*3+2]);
                                 wwrite(v.ptr,an,al,140,63-7,2,(byte *)cWork,c3);
-                                lRed.inicial=63-dac[SelColor*3];
-                                lGre.inicial=63-dac[SelColor*3+1];
-                                lBlu.inicial=63-dac[SelColor*3+2];                        
+                                lRed.first_visible=63-dac[SelColor*3];
+                                lGre.first_visible=63-dac[SelColor*3+1];
+                                lBlu.first_visible=63-dac[SelColor*3+2];                        
 
-                                v.volcar=1;
+                                v.redraw=1;
                                 break;
         }
         wDegradar=Degradar;
@@ -1820,10 +1820,10 @@ int an=v.an/big2,al=v.al/big2;
 
 void InterPal0(void)
 {
-        v.tipo=1; // Diálogo
+        v.type=1; // Diálogo
         v.an=220-46-7;
         v.al=163+24-16;
-        v.titulo=texto[138];
+        v.title=texto[138];
         v.paint_handler=InterPal1;
         v.click_handler=InterPal2;
 
@@ -1859,13 +1859,13 @@ byte DacAux[768];
                 for (n=0;n<768;n++) if (DacAux[n]!=dac[n]) break;
                 if (n<768) {
                   if (hay_mapas()) {
-                    v_titulo=(char *)texto[53];
-                    v_texto=(char *)texto[321];
+                    v_title=(char *)texto[53];
+                    v_text=(char *)texto[321];
                     show_dialog(aceptar0);
-                  } else v_aceptar=1;
+                  } else v_accept=1;
                   memcpy(dac4,dac,768);
                   memcpy(dac,DacAux,768);
-                  if(v_aceptar) RefPalAndDlg(0,1); else RefPalAndDlg(1,1);
+                  if(v_accept) RefPalAndDlg(0,1); else RefPalAndDlg(1,1);
                 }
         }
 }

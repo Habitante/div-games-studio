@@ -41,18 +41,18 @@ void SDL_ToggleFS(SDL_Surface *surface)
     if (IsFullScreen(surface)) {
 		// Going windowed — restore saved windowed size
 		if (windowed_an >= 640 && windowed_al >= 480) {
-			vga_an = windowed_an;
-			vga_al = windowed_al;
+			vga_width = windowed_an;
+			vga_height = windowed_al;
 		} else {
 			// Fallback: use setup values or sensible default
-			vga_an = (VS_ANCHO >= 640) ? VS_ANCHO : 640;
-			vga_al = (VS_ALTO >= 480) ? VS_ALTO : 480;
+			vga_width = (VS_WIDTH >= 640) ? VS_WIDTH : 640;
+			vga_height = (VS_HEIGHT >= 480) ? VS_HEIGHT : 480;
 		}
 		fsmode=0;
 	} else {
 		// Going fullscreen — save current windowed size
-		windowed_an = vga_an;
-		windowed_al = vga_al;
+		windowed_an = vga_width;
+		windowed_al = vga_height;
 		fsmode=1;
 	}
 
@@ -122,7 +122,7 @@ void set_dac(byte *_dac) {
 }
 
 //-----------------------------------------------------------------------------
-//      Set Video Mode (vga_an y vga_al se definen en shared.h)
+//      Set Video Mode (vga_width y vga_height se definen en shared.h)
 //-----------------------------------------------------------------------------
 
 int LinealMode;
@@ -161,10 +161,10 @@ SDL_setFramerate(&fpsman, 60);
   fprintf(stdout,"full screen: %d\n",fsmode);
 
 	if(fsmode==0)
-		vga=OSDEP_SetVideoMode(vga_an, vga_al, CDEPTH, 0);
+		vga=OSDEP_SetVideoMode(vga_width, vga_height, CDEPTH, 0);
 
 	else
-		vga=OSDEP_SetVideoMode(vga_an, vga_al, CDEPTH,  1);
+		vga=OSDEP_SetVideoMode(vga_width, vga_height, CDEPTH,  1);
 
 	modovesa=1;
 	
@@ -196,13 +196,13 @@ return;
 
 	  int y=0,n;
 	  byte *oldp = (byte *)p;
-	  uint32_t x1=vga_an,y1=vga_al,w1=1,h1=1;
+	  uint32_t x1=vga_width,y1=vga_height,w1=1,h1=1;
 	SDL_Rect rc;  
 	byte *q = (byte *)vga->pixels;
 	uint32_t *q32 = (uint32_t *)vga->pixels;
 	SDL_LockSurface(vga);
 	
-  while (y<vga_al) {
+  while (y<vga_height) {
     n=y*4;
     if (scan[n+1]) {
 		memcpy(q+scan[n],p+scan[n],scan[n+1]);
@@ -232,7 +232,7 @@ return;
 	}
 
     q+=vga->pitch; 
-    p+=vga_an; 
+    p+=vga_width; 
     y++;
   }
   SDL_UnlockSurface(vga);
@@ -250,9 +250,9 @@ void blit_sdl(byte *p) {
 		SDL_LockSurface(vga);
 
 	byte *q = (byte *)vga->pixels;
-	for (vy=0; vy<vga_al; vy++) {
-		memcpy(q, p, vga_an);
-		p+=vga_an;
+	for (vy=0; vy<vga_height; vy++) {
+		memcpy(q, p, vga_width);
+		p+=vga_width;
 		q+=vga->pitch;
 	}
 
@@ -267,9 +267,9 @@ void blit_screen(byte *p) {
   if ((shift_status&4) && (shift_status&8) && scan_code==_P) snapshot(p);
 
 
-  if (volcado_completo) {
+  if (full_redraw) {
     if (modovesa) blit_sdl(p);
-    else switch(vga_an*1000+vga_al) {
+    else switch(vga_width*1000+vga_height) {
       case 320200: blit_full_320x200(p); break;
       case 320240: blit_full_modex(p); break;
       case 320400: blit_full_modex(p); break;
@@ -279,7 +279,7 @@ void blit_screen(byte *p) {
     }
   } else {
     if (modovesa) volcadosdlp(p); 
-    else switch(vga_an*1000+vga_al) {
+    else switch(vga_width*1000+vga_height) {
       case 320200: blit_partial_320x200(p); break;
       case 320240: blit_partial_modex(p); break;
       case 320400: blit_partial_modex(p); break;
@@ -303,7 +303,7 @@ void blit_screen(byte *p) {
 
 void snapshot(byte *p) {
   FILE * f;
-  int man=map_an,mal=map_al,n=0;
+  int man=map_width,mal=map_height,n=0;
   char cwork[128];
 
   do {
@@ -312,9 +312,9 @@ void snapshot(byte *p) {
   } while (f!=NULL);
 
   f=fopen(cwork,"wb");
-  map_an=vga_an; map_al=vga_al;
+  map_width=vga_width; map_height=vga_height;
   save_PCX(p,f);
-  map_an=man; map_al=mal;
+  map_width=man; map_height=mal;
   fclose(f);
 }
 
@@ -331,11 +331,11 @@ void blit_partial_320x200(byte *p) { // PARTIAL
   RegScreen(p);
   #endif
 
-  while (y<vga_al) {
+  while (y<vga_height) {
     n=y*4;
     if (scan[n+1]) memcpy(q+scan[n],p+scan[n],scan[n+1]);
     if (scan[n+3]) memcpy(q+scan[n+2],p+scan[n+2],scan[n+3]);
-    q+=vga_an; p+=vga_an; y++;
+    q+=vga_width; p+=vga_width; y++;
   }
 #endif
 }
@@ -345,7 +345,7 @@ void blit_full_320x200(byte *p) { // COMPLETE
   #ifdef GRABADORA
   RegScreen(p);
   #endif
-  memcpy(vga,p,vga_an*vga_al);
+  memcpy(vga,p,vga_width*vga_height);
 #endif
 }
 
@@ -358,17 +358,17 @@ void blit_partial_svga(byte *p) {
   char *q=(char *)vga->pixels;
 
   if(LinealMode) {
-   while (y<vga_al) {
+   while (y<vga_height) {
      n=y*4;
      if (scan[n+1]) memcpy(q+scan[n],p+scan[n],scan[n+1]);
      if (scan[n+3]) memcpy(q+scan[n+2],p+scan[n+2],scan[n+3]);
-     q+=vga_an; p+=vga_an; y++;
+     q+=vga_width; p+=vga_width; y++;
    }
-  } else while (y<vga_al) {
+  } else while (y<vga_height) {
     n=y*4;
     if (scan[n+1]) {
-      page=(y*vga_an+scan[n])/65536;
-      point=(y*vga_an+scan[n])%65536;
+      page=(y*vga_width+scan[n])/65536;
+      point=(y*vga_width+scan[n])%65536;
       if (point+scan[n+1]>65536) {
         t1=65536-point;
         t2=scan[n+1]-t1;
@@ -379,8 +379,8 @@ void blit_partial_svga(byte *p) {
       }
     }
     if (scan[n+3]) {
-      page=(y*vga_an+scan[n+2])/65536;
-      point=(y*vga_an+scan[n+2])%65536;
+      page=(y*vga_width+scan[n+2])/65536;
+      point=(y*vga_width+scan[n+2])%65536;
       if (point+scan[n+3]>65536) {
         t1=65536-point;
         t2=scan[n+3]-t1;
@@ -389,12 +389,12 @@ void blit_partial_svga(byte *p) {
       } else {
         memcpy(vga+point,p+scan[n+2],scan[n+3]);
       }
-    } p+=vga_an; y++;
+    } p+=vga_width; y++;
   }
 }
 
 void blit_full_svga(byte *p) {
-  int cnt=vga_an*vga_al;
+  int cnt=vga_width*vga_height;
   int tpv=0,ActPge=0;
 
   if(LinealMode) memcpy(vga,p,cnt);
@@ -413,23 +413,23 @@ void blit_full_svga(byte *p) {
 void blit_partial_modex(byte * p) {
 debugprintf("divvideo.cpp blit_partial_modex\n");
 #ifdef NOTYET
-  int n,m=(vga_an*vga_al)/4,plano=0x100,y;
+  int n,m=(vga_width*vga_height)/4,plano=0x100,y;
   byte * v2, * p2;
 
   do { v2=vga+m; y=0; p2=p++; outpw(SC_INDEX,2+plano); plano<<=1;
-    while (y<vga_al) {
+    while (y<vga_height) {
       n=y*4;
       if (scan[n+1]) vgacpy(v2+scan[n],p2+scan[n]*4,scan[n+1]);
       if (scan[n+3]) vgacpy(v2+scan[n+2],p2+scan[n+2]*4,scan[n+3]);
-      v2+=vga_an/4; p2+=vga_an; y++; }
+      v2+=vga_width/4; p2+=vga_width; y++; }
   } while (plano<=0x800);
 
   outpw(SC_INDEX,0xF02); outp(0x3CE,5); outp(0x3CF,(inp(0x3CF)&252)+1);
-  y=0; v2=vga; while (y<vga_al) {
+  y=0; v2=vga; while (y<vga_height) {
     n=y*4;
     if (scan[n+1]) memcpyb(v2+scan[n],v2+scan[n]+m,scan[n+1]);
     if (scan[n+3]) memcpyb(v2+scan[n+2],v2+scan[n+2]+m,scan[n+3]);
-    v2+=vga_an/4; y++;
+    v2+=vga_width/4; y++;
   } outp(0x3CE,5); outp(0x3CF,inp(0x3CF)&252);
 #endif
 }
@@ -437,7 +437,7 @@ debugprintf("divvideo.cpp blit_partial_modex\n");
 void blit_full_modex(byte * p) {
 	printf("divvideo.cpp - blit_full_modex\n");
 #ifdef NOTYET
-  int n=(vga_an*vga_al)/4;
+  int n=(vga_width*vga_height)/4;
 
   outpw(SC_INDEX,0x102); vgacpy(vga+n,p,n); p++;
   outpw(SC_INDEX,0x202); vgacpy(vga+n,p,n); p++;
@@ -475,24 +475,24 @@ return;
 //-----------------------------------------------------------------------------
 
 void init_flush(void) { 
-	memset(&scan[0],0,MAX_YRES*8); volcado_completo=0; 
+	memset(&scan[0],0,MAX_YRES*8); full_redraw=0; 
 }
 
 void blit_partial(int x,int y,int an,int al) {
   int ymax=0,xmax=0,n=0,d1=0,d2=0,x2=0;
 
-  if (an==vga_an && al==vga_al && x==0 && y==0) { volcado_completo=1; return; }
+  if (an==vga_width && al==vga_height && x==0 && y==0) { full_redraw=1; return; }
 
-  if (an>0 && al>0 && x<vga_an && y<vga_al) {
+  if (an>0 && al>0 && x<vga_width && y<vga_height) {
     if (x<0) { an+=x; x=0; }
     if (y<0) { al+=y; y=0; }
-    if (x+an>vga_an) { an=vga_an-x; }
-    if (y+al>vga_al) { al=vga_al-y; }
+    if (x+an>vga_width) { an=vga_width-x; }
+    if (y+al>vga_height) { al=vga_height-y; }
     if (an<=0 || al<=0) return;
     xmax=x+an-1; ymax=y+al-1;
 
     if (!modovesa) {
-      switch(vga_an*1000+vga_al) {
+      switch(vga_width*1000+vga_height) {
         case 320240: case 320400: case 360240: case 360360: case 376282: // Modos X
           x>>=2; xmax>>=2; an=xmax-x+1; break;
       }

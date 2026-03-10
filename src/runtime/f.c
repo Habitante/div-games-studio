@@ -19,7 +19,7 @@ void load_pal(void);
 int is_PCX(byte *buffer);
 void adapt_palette(byte * ptr, int len, byte * pal, byte * xlat);
 void put_screen(void);
-void texn2(byte * copia, int vga_an, byte * p, int x, int y, byte an, int al);
+void texn2(byte * copia, int vga_width, byte * p, int x, int y, byte an, int al);
 void get_token(void);
 void expres0(void);
 void expres1(void);
@@ -601,17 +601,17 @@ void descomprime_PCX(byte *buffer, byte *mapa)
   char ch, rep;
   pcx_header header;
   byte *pDest;
-  int map_an, map_al;
+  int map_width, map_height;
 
   memcpy((byte *)&header,buffer,sizeof(pcx_header));
   buffer+=128;                                  // Comienzo de la imagen
 
-  map_an = header.xmax - header.xmin + 1;
-  map_al = header.ymax - header.ymin + 1;
+  map_width = header.xmax - header.xmin + 1;
+  map_height = header.ymax - header.ymin + 1;
 
-  memset (mapa, 0, map_an * map_al);
+  memset (mapa, 0, map_width * map_height);
 
-  last_byte  = header.bytes_per_line * header.color_planes * map_al ;
+  last_byte  = header.bytes_per_line * header.color_planes * map_height ;
   bytes_line = header.bytes_per_line * header.color_planes;
 
   pDest = mapa;
@@ -631,7 +631,7 @@ void descomprime_PCX(byte *buffer, byte *mapa)
     }
     if(pixel_line==bytes_line) {
       pixel_line=0;
-      rep-=bytes_line-map_an;
+      rep-=bytes_line-map_width;
     }
     for(con=0;con<rep;con++) *pDest++=ch;
   } while(1);
@@ -1338,7 +1338,7 @@ void __write(void) {
   }
 
   if (x<max_textos) {
-    texto[x].tipo=0;
+    texto[x].type=0;
     texto[x].ptr=pila[sp--];
     if (pila[sp]<0 || pila[sp]>8) { e(117); pila[sp]=0; }
     texto[x].centro=pila[sp--];
@@ -1366,7 +1366,7 @@ void write_int(void) {
          pila[sp-3]==texto[x].x      ) break;
   }
   if (x<max_textos) {
-    texto[x].tipo=1;
+    texto[x].type=1;
     texto[x].ptr=pila[sp--];
     if (pila[sp]<0 || pila[sp]>8) { e(117); pila[sp]=0; }
     texto[x].centro=pila[sp--];
@@ -1467,8 +1467,8 @@ void define_region(void) {
 
   if (x<0) { an+=x; x=0; }
   if (y<0) { al+=y; y=0; }
-  if (x+an>vga_an) an=vga_an-x;
-  if (y+al>vga_al) al=vga_al-y;
+  if (x+an>vga_width) an=vga_width-x;
+  if (y+al>vga_height) al=vga_height-y;
   if (an<0 || al<0) { e(120); return; }
 
   if (n>=0 && n<max_region) {
@@ -1490,7 +1490,7 @@ void _xput(void) {
   y=pila[sp--]; x=pila[sp--];
   graf=pila[sp--]; file=pila[sp];
 
-  put_sprite(file,graf,x,y,angle,size,flags,reg,copia2,vga_an,vga_al);
+  put_sprite(file,graf,x,y,angle,size,flags,reg,copia2,vga_width,vga_height);
 
 }
 
@@ -1504,7 +1504,7 @@ void _put(void) {
   y=pila[sp--]; x=pila[sp--];
   graf=pila[sp--]; file=pila[sp];
 
-  put_sprite(file,graf,x,y,0,100,0,0,copia2,vga_an,vga_al);
+  put_sprite(file,graf,x,y,0,100,0,0,copia2,vga_width,vga_height);
 
 }
 
@@ -1562,7 +1562,7 @@ void map_block_copy(void) {
   int graf,x,y,an,al;
   int * ptrd,* ptr;
   byte * _copia=copia, * si;
-  int _vga_an=vga_an,_vga_al=vga_al;
+  int _vga_an=vga_width,_vga_al=vga_height;
 
   al=pila[sp--]; an=pila[sp--];
   y=pila[sp--]; x=pila[sp--]; graf=pila[sp--];
@@ -1578,16 +1578,16 @@ void map_block_copy(void) {
   if ((ptrd=g[file].grf[grafd])!=NULL) {
     if ((ptr=g[file].grf[graf])!=NULL) {
 
-      vga_an=ptrd[13]; vga_al=ptrd[14];
+      vga_width=ptrd[13]; vga_height=ptrd[14];
       copia=(byte*)ptrd+64+ptrd[15]*4;
 
       if (xd>0) clipx0=xd; else clipx0=0;
       if (yd>0) clipy0=yd; else clipy0=0;
-      if (xd+an<vga_an) clipx1=xd+an; else clipx1=vga_an;
-      if (yd+al<vga_al) clipy1=yd+al; else clipy1=vga_al;
+      if (xd+an<vga_width) clipx1=xd+an; else clipx1=vga_width;
+      if (yd+al<vga_height) clipy1=yd+al; else clipy1=vga_height;
 
-      if (clipx0>=vga_an || clipx1<=0) goto no;
-      if (clipy0>=vga_al || clipy1<=0) goto no;
+      if (clipx0>=vga_width || clipx1<=0) goto no;
+      if (clipy0>=vga_height || clipy1<=0) goto no;
       if (clipx0>=clipx1 || clipy0>=clipy1) goto no;
 
       an=ptr[13]; al=ptr[14];
@@ -1599,7 +1599,7 @@ void map_block_copy(void) {
       else if (x<clipx1 && y<clipy1 && x+an>clipx0 && y+al>clipy0) // Pinta sprite cortado
         sp_clipped(si,x,y,an,al,0);
 
-      no: copia=_copia; vga_an=_vga_an; vga_al=_vga_al;
+      no: copia=_copia; vga_width=_vga_an; vga_height=_vga_al;
     } else e(121);
   } else e(121);
 
@@ -1640,7 +1640,7 @@ void screen_copy(void) {
   if (divand<=0 || ald<=0 || an<=0 || al<=0) return;
 
   di=(byte*)ptr+64+ptr[15]*4+xr+yr*ptr[13];
-  old_si=copia+region[reg].x0+region[reg].y0*vga_an;
+  old_si=copia+region[reg].x0+region[reg].y0*vga_width;
 
   ixr=(float)(an*256)/(float)divand;
   iyr=(float)(al*256)/(float)ald;
@@ -1648,7 +1648,7 @@ void screen_copy(void) {
   an=divand; yr=0;
 
   do {
-    si=old_si+(yr>>8)*vga_an; xr=0;
+    si=old_si+(yr>>8)*vga_width; xr=0;
     do {
       *di=*(si+(xr>>8));
       di++; xr+=ixr;
@@ -1692,8 +1692,8 @@ void put_screen(void) {
   if (ptr[15]==0 || *((word*)ptr+32)==65535) { xg=ptr[13]/2; yg=ptr[14]/2;
   } else { xg=*((word*)ptr+32); yg=*((word*)ptr+33); }
 
-  memset(copia2,0,vga_an*vga_al);
-  put_sprite(file,graf,xg,yg,0,100,0,0,copia2,vga_an,vga_al);
+  memset(copia2,0,vga_width*vga_height);
+  put_sprite(file,graf,xg,yg,0,100,0,0,copia2,vga_width,vga_height);
 
 }
 
@@ -1705,8 +1705,8 @@ void put_pixel(void) {
   int x,y,color;
 
   color=pila[sp--]; y=pila[sp--]; x=pila[sp];
-  if (x>=0 && y>=0 && x<vga_an && y<vga_al) {
-    *(copia2+x+y*vga_an)=color;
+  if (x>=0 && y>=0 && x<vga_width && y<vga_height) {
+    *(copia2+x+y*vga_width)=color;
   }
 }
 
@@ -1718,8 +1718,8 @@ void get_pixel(void) {
   int x,y;
 
   y=pila[sp--]; x=pila[sp];
-  if (x>=0 && y>=0 && x<vga_an && y<vga_al) {
-    pila[sp]=(int)(*(copia2+x+y*vga_an));
+  if (x>=0 && y>=0 && x<vga_width && y<vga_height) {
+    pila[sp]=(int)(*(copia2+x+y*vga_width));
   } else pila[sp]=0;
 }
 
@@ -1798,7 +1798,7 @@ void get_point(void) {
 //----------------------------------------------------------------------------
 
 void clear_screen(void) {
-  memset(copia2,0,vga_an*vga_al);
+  memset(copia2,0,vga_width*vga_height);
   pila[++sp]=0;
 }
 
@@ -1951,24 +1951,24 @@ void set_mode(void) {
   int n;
 
   #ifdef DEBUG
-  if (v.tipo) new_mode=1; // Avisa al debugger de un cambio de modo de vídeo
+  if (v.type) new_mode=1; // Avisa al debugger de un cambio de modo de vídeo
   #endif
 
-  vga_an=pila[sp]/1000; vga_al=pila[sp]%1000;
-//	printf("Tring to set mode %dx%d\n",vga_an,vga_al);
+  vga_width=pila[sp]/1000; vga_height=pila[sp]%1000;
+//	printf("Tring to set mode %dx%d\n",vga_width,vga_height);
 
 // nonsense ?
   for (n=0;n<num_video_modes;n++) {
-    if (pila[sp]==video_modes[n].modo) {
-      vga_an=video_modes[n].ancho;
-      vga_al=video_modes[n].alto;
+    if (pila[sp]==video_modes[n].mode) {
+      vga_width=video_modes[n].width;
+      vga_height=video_modes[n].height;
       break;
     }
   }
 
 
-vvga_an = vga_an;
-vvga_al = vga_al;
+vvga_an = vga_width;
+vvga_al = vga_height;
 
 
   dacout_r=64; dacout_g=64; dacout_b=64; dacout_speed=8;
@@ -1991,15 +1991,15 @@ vvga_al = vga_al;
   }
 #endif
 
-  if((copia=(byte *) malloc(vga_an*vga_al))==NULL) exer(1);
-  memset(copia,0,vga_an*vga_al);
+  if((copia=(byte *) malloc(vga_width*vga_height))==NULL) exer(1);
+  memset(copia,0,vga_width*vga_height);
 
-  if((copia2=(byte *) malloc(vga_an*vga_al))==NULL) exer(1);
-  memset(copia2,0,vga_an*vga_al);
+  if((copia2=(byte *) malloc(vga_width*vga_height))==NULL) exer(1);
+  memset(copia2,0,vga_width*vga_height);
 
   #ifdef DEBUG
-  if((copia_debug=(byte *) malloc(vga_an*vga_al))==NULL) exer(1);
-  memset(copia_debug,0,vga_an*vga_al);
+  if((copia_debug=(byte *) malloc(vga_width*vga_height))==NULL) exer(1);
+  memset(copia_debug,0,vga_width*vga_height);
   #endif
 
   if (set_video_mode!=NULL) {
@@ -2007,7 +2007,7 @@ vvga_al = vga_al;
   } else {
     setup_video_mode();
   }
-  OSDEP_SetWindowSize(vga_an, vga_al);
+  OSDEP_SetWindowSize(vga_width, vga_height);
 
   dacout_speed=0; set_dac();
 
@@ -2017,7 +2017,7 @@ vvga_al = vga_al;
   } pila[sp]=0;
 
   region[0].x0=0; region[0].y0=0;
-  region[0].x1=vga_an; region[0].y1=vga_al;
+  region[0].x1=vga_width; region[0].y1=vga_height;
 
   #ifdef DEBUG
   init_big();
@@ -2025,9 +2025,9 @@ vvga_al = vga_al;
 
   fade_on(); sp--;
 
-  if(vwidth<vga_an || vheight < vga_al) {
-    vwidth = vga_an;
-    vheight = vga_al;
+  if(vwidth<vga_width || vheight < vga_height) {
+    vwidth = vga_width;
+    vheight = vga_height;
   }
 
 }
@@ -2268,7 +2268,7 @@ void start_fli(void) {
     pila[sp]=0; e(147);
   } else {
     fclose(es);
-    pila[sp]=StartFLI(full,(char *)copia2,vga_an,vga_al,x,y);
+    pila[sp]=StartFLI(full,(char *)copia2,vga_width,vga_height,x,y);
     if (pila[sp]==0) e(130);
   }
 #endif
@@ -2340,7 +2340,7 @@ return;
       setup_video_mode(); set_dac();
       set_mouse(mouse->x,mouse->y);
       readmouse();
-      volcado_completo=1;
+      full_redraw=1;
     } else {
 #ifdef DOS
       flushall();
@@ -2417,7 +2417,7 @@ void start_mode7(void) {
   if (ptr1==NULL && ptr2==NULL) { e(132); return; }
   if (ptr1==NULL) { ptr1=ptr2; ptr2=NULL; }
 
-  im7[n].map_an=ptr1[13]; im7[n].map_al=ptr1[14];
+  im7[n].map_width=ptr1[13]; im7[n].map_height=ptr1[14];
   im7[n].map=(byte*)ptr1+64+ptr1[15]*4;
 
   if (ptr2!=NULL) { im7[n].ext_an=ptr2[13]; im7[n].ext_al=ptr2[14]; } else im7[n].ext_an=0;
@@ -3743,7 +3743,7 @@ void _atan2(void) {
 void draw(void) {
   int x;
 
-  x=0; while (drawing[x].tipo && x<max_drawings) x++;
+  x=0; while (drawing[x].type && x<max_drawings) x++;
   if (x==max_drawings) { sp-=7; pila[sp]=0; e(172); return; }
 
   drawing[x].y1     = pila[sp--];
@@ -3753,14 +3753,14 @@ void draw(void) {
   drawing[x].region = pila[sp--];
   drawing[x].porcentaje = pila[sp--];
   drawing[x].color  = pila[sp--];
-  drawing[x].tipo   = pila[sp];
+  drawing[x].type   = pila[sp];
 
-  if (drawing[x].tipo<1 || drawing[x].tipo>tipo_mayor) { drawing[x].tipo=0; e(173); }
-  if (drawing[x].color<0 || drawing[x].color>255) { drawing[x].tipo=0; e(154); }
-  if (drawing[x].porcentaje<0 || drawing[x].porcentaje>15) { drawing[x].tipo=0; e(174); }
-  if (drawing[x].region<0 || drawing[x].region>=max_region) { drawing[x].tipo=0; e(108); }
+  if (drawing[x].type<1 || drawing[x].type>tipo_mayor) { drawing[x].type=0; e(173); }
+  if (drawing[x].color<0 || drawing[x].color>255) { drawing[x].type=0; e(154); }
+  if (drawing[x].porcentaje<0 || drawing[x].porcentaje>15) { drawing[x].type=0; e(174); }
+  if (drawing[x].region<0 || drawing[x].region>=max_region) { drawing[x].type=0; e(108); }
 
-  if (drawing[x].tipo) pila[sp]=x*2+1;
+  if (drawing[x].type) pila[sp]=x*2+1;
   else pila[sp]=0;
 
 }
@@ -3775,7 +3775,7 @@ void delete_draw(void) {
   if ((draw_id=pila[sp])==-1) {
 
     for (draw_id=0;draw_id<max_drawings;draw_id++) {
-      drawing[draw_id].tipo=0;
+      drawing[draw_id].type=0;
     }
 
   } else {
@@ -3784,9 +3784,9 @@ void delete_draw(void) {
       pila[sp]=0; e(175); return;
     } draw_id/=2;
 
-    if (drawing[draw_id].tipo==0) { pila[sp]=0; e(175); return; }
+    if (drawing[draw_id].type==0) { pila[sp]=0; e(175); return; }
 
-    drawing[draw_id].tipo=0;
+    drawing[draw_id].type=0;
   }
 }
 
@@ -3803,7 +3803,7 @@ void move_draw(void) {
     sp-=6; pila[sp]=0; e(175); return;
   } draw_id/=2;
 
-  if (drawing[draw_id].tipo==0) { pila[sp]=0; e(175); return; }
+  if (drawing[draw_id].type==0) { pila[sp]=0; e(175); return; }
 
   drawing[draw_id].y1     = pila[sp--];
   drawing[draw_id].x1     = pila[sp--];
@@ -3813,8 +3813,8 @@ void move_draw(void) {
   drawing[draw_id].color  = pila[sp--];
   pila[sp]=0;
 
-  if (drawing[draw_id].color<0 || drawing[draw_id].color>255) { drawing[draw_id].tipo=0; e(154); }
-  if (drawing[draw_id].porcentaje<0 || drawing[draw_id].porcentaje>15) { drawing[draw_id].tipo=0; e(174); }
+  if (drawing[draw_id].color<0 || drawing[draw_id].color>255) { drawing[draw_id].type=0; e(154); }
+  if (drawing[draw_id].porcentaje<0 || drawing[draw_id].porcentaje>15) { drawing[draw_id].type=0; e(174); }
 }
 
 
@@ -3931,15 +3931,15 @@ void write_in_map(void) {
 
 }
 
-void texn2(byte * copia, int vga_an, byte * p, int x, int y, byte an, int al) {
-  byte *q=copia+y*vga_an+x;
+void texn2(byte * copia, int vga_width, byte * p, int x, int y, byte an, int al) {
+  byte *q=copia+y*vga_width+x;
   int ancho=an;
 
   do {
     do {
       if (*p) { *q=*p; } p++; q++;
     } while (--an);
-    q+=vga_an-(an=ancho);
+    q+=vga_width-(an=ancho);
   } while (--al);
 }
 

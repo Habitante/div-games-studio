@@ -229,7 +229,7 @@ void Explode1(void) {
 
   _show_items();
 
-  crea_gama(exp_gama, exp_colores);
+  create_gradient_colors(exp_gama, exp_colores);
 
   wbox(v.ptr,an,al,c0,2,31,an-4,1);
 
@@ -251,8 +251,8 @@ void Explode2(void) {
   _process_items();
   switch(v.active_item)
   {
-    case 0: fin_dialogo=1; v_aceptar=1; break;
-    case 1: fin_dialogo=1; v_aceptar=0; break;
+    case 0: end_dialog=1; v_accept=1; break;
+    case 1: end_dialog=1; v_accept=0; break;
   }
   if(!(TipoA+TipoB+TipoC))
   {
@@ -287,21 +287,21 @@ void Explode2(void) {
   OldTipoC=TipoC;
   if (wmouse_in(an-70,18,66,11) && (mouse_b&1))
   {
-    gama=exp_colores;
-    t_gama=exp_gama;
+    gradient_buf=exp_colores;
+    gradient_config=exp_gama;
     show_dialog((voidReturnType)gama0);
-    if (v_aceptar) need_refresh=1;
+    if (v_accept) need_refresh=1;
   }
   if(need_refresh){
         call((voidReturnType )v.paint_handler);
-        v.volcar=1;
+        v.redraw=1;
   }
 }
 
 void Explode3(void)
 {
 
-        if(!v_aceptar)
+        if(!v_accept)
                 return;
 
         _n_frames=n_frames=atoi(cFrames);
@@ -318,9 +318,9 @@ void Explode3(void)
 
 void Explode0(void) {
 
-  v.tipo=1;
+  v.type=1;
 
-  v.titulo=texto[300];
+  v.title=texto[300];
   v.an=128;
   v.al=90+5;
   v.paint_handler=(voidReturnType)Explode1;
@@ -361,7 +361,7 @@ void Explode0(void) {
   _get(304,69-24+30,16+19,21,(byte *)cFrames,3,1,48);
   _get(305,69-24+30,16+38,21,(byte *)cper_points ,3,0,100);
 
-  v_aceptar=0;
+  v_accept=0;
 }
 
 void GenExplodes()
@@ -373,7 +373,7 @@ int x;
         create_dac4();
 
         show_dialog((voidReturnType)Explode0);
-        if(!v_aceptar)
+        if(!v_accept)
                 return;
         for(x=0;x<256;x++) ExpDac[x] = exp_colores[x/2];
   init_rnd(*system_clock,NULL);
@@ -407,38 +407,38 @@ int x;
   do {
     if (paint_explosion()) break;
 
-    map_an=exp_ancho;
-    map_al=exp_alto;
+    map_width=exp_ancho;
+    map_height=exp_alto;
 
     if (new_map(NULL)) break;
 
-    for(x=0;x<map_an*map_al;x++)
+    for(x=0;x<map_width*map_height;x++)
         v.mapa->map[x]=ExpDac[Buff_exp[x]];
 
-    v.mapa->zoom_cx=v.mapa->map_an/2;
-    v.mapa->zoom_cy=v.mapa->map_al/2;
+    v.mapa->zoom_cx=v.mapa->map_width/2;
+    v.mapa->zoom_cy=v.mapa->map_height/2;
 
-    x=(v.mapa->zoom_cx-vga_an/2);
+    x=(v.mapa->zoom_cx-vga_width/2);
     if (x<0)
         x=0;
     else
-        if (x+vga_an>v.mapa->map_an)
-          x=v.mapa->map_an-vga_an;
-    y=(v.mapa->zoom_cy-vga_al/2);
+        if (x+vga_width>v.mapa->map_width)
+          x=v.mapa->map_width-vga_width;
+    y=(v.mapa->zoom_cy-vga_height/2);
     if (y<0)
                 y=0;
         else
-                if(y+vga_al>v.mapa->map_al)
-                        y=v.mapa->map_al-vga_al;
+                if(y+vga_height>v.mapa->map_height)
+                        y=v.mapa->map_height-vga_height;
     v.mapa->zoom=0;
     v.mapa->zoom_x=x;
     v.mapa->zoom_y=y;
 
     for (n=0;n<512;n++)
         v.mapa->puntos[n]=-1;
-    v.mapa->Codigo=0;
+    v.mapa->fpg_code=0;
     call((voidReturnType )v.paint_handler);
-    wvolcado(copia,vga_an,vga_al,v.ptr,v.x,v.y,v.an,v.al,0);
+    wvolcado(copia,vga_width,vga_height,v.ptr,v.x,v.y,v.an,v.al,0);
 
     advance_points();
     n_frames-=2;

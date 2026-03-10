@@ -37,9 +37,9 @@ struct t_listbox lvol_ma={MIX_BAR3,11,DummyArrayForFakingPurposesUsedInMixer,1,5
 
 void mixer0(void)
 {
-  v.tipo   = 8;
-  v.titulo = texto[421];
-  v.nombre = texto[421];
+  v.type   = 8;
+  v.title = texto[421];
+  v.name = texto[421];
   v.an     =  59;
   v.al     =  76;
 
@@ -53,17 +53,17 @@ void mixer1(void)
 
   _show_items();
 
-  lvol_fx.creada = 0; lvol_fx.maximo = 20;
-  lvol_cd.creada = 0; lvol_cd.maximo = 20;
-  lvol_ma.creada = 0; lvol_ma.maximo = 20;
+  lvol_fx.created = 0; lvol_fx.total_items = 20;
+  lvol_cd.created = 0; lvol_cd.total_items = 20;
+  lvol_ma.created = 0; lvol_ma.total_items = 20;
 
   create_listbox(&lvol_fx);
   create_listbox(&lvol_cd);
   create_listbox(&lvol_ma);
 
-  lvol_fx.inicial = 15-Setupfile.vol_fx;
-  lvol_cd.inicial = 15-Setupfile.vol_cd;
-  lvol_ma.inicial = 15-Setupfile.vol_ma;
+  lvol_fx.first_visible = 15-Setupfile.vol_fx;
+  lvol_cd.first_visible = 15-Setupfile.vol_cd;
+  lvol_ma.first_visible = 15-Setupfile.vol_ma;
 
   create_listbox(&lvol_fx);
   create_listbox(&lvol_cd);
@@ -91,44 +91,44 @@ void mixer2(void)
 
   _process_items();
 
-  v_pausa=1;
+  v_pause=1;
   update_listbox(&lvol_fx);
   update_listbox(&lvol_cd);
   update_listbox(&lvol_ma);
-  v_pausa=0;
+  v_pause=0;
 
-  if(mouse_b && lvol_fx.zona==4)
+  if(mouse_b && lvol_fx.zone==4)
   {
-      Setupfile.vol_fx=15-lvol_fx.inicial;
+      Setupfile.vol_fx=15-lvol_fx.first_visible;
       Tocado=1;
   }
-  if( !(mouse_b&1) && (old_mouse_b&1) && (lvol_fx.zona==2 || lvol_fx.zona==3))
+  if( !(mouse_b&1) && (prev_mouse_buttons&1) && (lvol_fx.zone==2 || lvol_fx.zone==3))
   {
-      Setupfile.vol_fx=15-lvol_fx.inicial;
+      Setupfile.vol_fx=15-lvol_fx.first_visible;
       Tocado=1;
   }
-  if(mouse_b && lvol_cd.zona==4)
+  if(mouse_b && lvol_cd.zone==4)
   {
-      Setupfile.vol_cd=15-lvol_cd.inicial;
+      Setupfile.vol_cd=15-lvol_cd.first_visible;
       Tocado=1;
   }
-  if( !(mouse_b&1) && (old_mouse_b&1) && (lvol_cd.zona==2 || lvol_cd.zona==3))
+  if( !(mouse_b&1) && (prev_mouse_buttons&1) && (lvol_cd.zone==2 || lvol_cd.zone==3))
   {
-      Setupfile.vol_cd=15-lvol_cd.inicial;
+      Setupfile.vol_cd=15-lvol_cd.first_visible;
       Tocado=1;
   }
-  if(mouse_b && lvol_ma.zona==4)
+  if(mouse_b && lvol_ma.zone==4)
   {
-      Setupfile.vol_ma=15-lvol_ma.inicial;
+      Setupfile.vol_ma=15-lvol_ma.first_visible;
       Tocado=1;
   }
-  if( !(mouse_b&1) && (old_mouse_b&1) && (lvol_ma.zona==2 || lvol_ma.zona==3))
+  if( !(mouse_b&1) && (prev_mouse_buttons&1) && (lvol_ma.zone==2 || lvol_ma.zone==3))
   {
-      Setupfile.vol_ma=15-lvol_ma.inicial;
+      Setupfile.vol_ma=15-lvol_ma.first_visible;
       Tocado=1;
   }
 
-  if( !(mouse_b&1) && (old_mouse_b&1) )
+  if( !(mouse_b&1) && (prev_mouse_buttons&1) )
   {
     if(wmouse_in(MIX_BAR1-5, 57, 17, 17))
     {
@@ -150,12 +150,12 @@ void mixer2(void)
   if(Tocado) // Actualiza los valores del mixer
   {
     Tocado=0;
-    lvol_fx.inicial=15-Setupfile.vol_fx;
-    lvol_cd.inicial=15-Setupfile.vol_cd;
-    lvol_ma.inicial=15-Setupfile.vol_ma;
+    lvol_fx.first_visible=15-Setupfile.vol_fx;
+    lvol_cd.first_visible=15-Setupfile.vol_cd;
+    lvol_ma.first_visible=15-Setupfile.vol_ma;
     set_mixer();
     call((voidReturnType)v.paint_handler);
-    v.volcar=1;
+    v.redraw=1;
   }
 }
 

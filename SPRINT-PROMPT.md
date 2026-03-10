@@ -30,13 +30,15 @@ confirm zero warnings. Current baseline: **0 warnings** (Sprint A completed 2026
 
 ---
 
-## Recommended next session: Sprint F (continue) + Sprint E (parallel track)
+## Recommended next session: Sprint G (rename Spanish globals + struct fields)
 
-**Sprint D** is done. **Sprint F** (Spanish→English function names) batches 1-3 complete:
-- Batch 1 done: divclock.c, divbrush.c, diveffec.c, divbasic.c, divcolor.c (18 renames)
-- Batch 2 done: divbrow.c, divfpg.c, divedit.c, divhandl.c (112 renames across 20 files)
-- Batch 3 done: div.c, divpaint.c, divc.c (105 renames across 35 files)
-- Next: runtime files, then Sprint E (unsafe strings) as a parallel track.
+**All naming sprints complete so far:** Sprint D (single-letter globals), Sprint F (331 function renames).
+The next natural step is renaming the 59 Spanish-named global variables and ~30 Spanish
+struct field names. These identifiers flow through the entire codebase and are the biggest
+remaining readability barrier after functions.
+
+**After Sprint G:** Sprint H (translate Spanish comments), Sprint E (unsafe strings),
+Sprint I (file splitting).
 
 ---
 
@@ -106,116 +108,175 @@ Completed: All 7 single-letter globals removed from global.h (r,g,b,c,d,a + FILE
 
 ---
 
-### Sprint F: Rename Spanish functions to English (one file at a time)
+### Sprint F: Rename Spanish functions to English ✅ DONE (2026-03-10)
 
-**Goal:** Translate function names from Spanish to English using the glossary.
+Completed: 331 function renames across 4 batches (22 files, touching 39+ files total).
+- Batch 1: 5 small files (18 renames)
+- Batch 2: 4 medium files (112 renames)
+- Batch 3: 3 monster files — div.c, divpaint.c, divc.c (105 renames)
+- Batch 4: 10 runtime files (96 renames)
 
-**Batch 1 — small files** ✅ (done 2026-03-10):
-1. `divclock.c` — muestra_reloj → show_clock
-2. `divbrush.c` — 5 M3D_* functions renamed
-3. `divbasic.c` — 6 functions (rectangulo, salvaguarda, fondo_edicion, etc.)
-4. `diveffec.c` — 3 functions (crear_puntos, avanzar_puntos, pintar_explosion)
-5. `divcolor.c` — 3 functions (clexico, col_analiza_*)
+---
 
-**Batch 2 — medium files** ✅ (done 2026-03-10):
-6. `divbrow.c` — 14 functions (crear_thumbs, muestra_thumb, pinta_listboxbr, etc.)
-7. `divfpg.c` — 17 functions (nuevo_fichero, abrir_fichero, cierra_fpg, FPG_crear_*, etc.)
-8. `divedit.c` — 53 functions (programa*, f_marcar/desmarcar/cortar/pegar, buscar_texto,
-   sustituir_texto, guardar_prg, abrir_programa, lista_procesos, etc.)
-9. `divhandl.c` — 28 functions (crear_menu, pinta_menu, actualiza_menu, determina_*,
-   nuevo_mapa, crear_listbox, analizar_input, etc.)
-   Total: 112 renames across 20 files, zero warnings, all 4 targets build clean.
+### Sprint G: Rename Spanish globals + struct fields
 
-**Batch 3 — the monsters** ✅ (done 2026-03-10):
-10. `div.c` — 34 functions (inicializacion→initialization, entorno→main_loop,
-   finalizacion→finalization, nueva_ventana→new_window, cierra_ventana→close_window,
-   dialogo→show_dialog, activar→activate, desactivar→deactivate, and 26 more)
-11. `divpaint.c` — 43 functions (dibuja_barra→draw_bar, volcado_raton→blit_mouse,
-   cuentagotas→eyedropper, mover→move_selection, efectos→effects,
-   select_caja→select_rect (collision avoidance), and 37 more)
-12. `divc.c` — 28 functions (compilar→compile, lexico→lexer, sintactico→parser,
-   sentencia→statement, expresion→expression, condicion→condition, constante→constant,
-   compilar_programa→compile_program, and 20 more)
-   Total: 105 renames across 35 files, zero warnings, all 4 targets build clean.
+**Goal:** Translate the 59 Spanish-named global variables in `global.h` and ~30 Spanish
+struct field names across 8 major structs to English. This is the natural continuation
+of Sprint F (functions → globals → fields).
 
-**Batch 4 — runtime files** ✅ (done 2026-03-10):
-13. `runtime/i.c` — 9 functions (crea_cuad→create_color_lookup, guarda_pila→save_stack,
-   carga_pila→load_stack, actualiza_pila→update_stack, nucleo_exec→core_exec,
-   nucleo_trace→core_trace, elimina_proceso→kill_process, busca_packfile→find_packfile,
-   es_fps→is_fps)
-14. `runtime/f.c` — 12 functions (_object_avance→_object_advance, nueva_paleta→apply_palette
-   (collision avoidance with new_palette variable), es_PCX→is_PCX, es_MAP→is_MAP,
-   es_BMP→is_BMP, es_JPG→is_JPG, adaptar→adapt_palette, calcular→do_calculate,
-   evaluar→do_evaluate, _encriptar→_encrypt, _comprimir→_compress_file, capar→validate_address)
-15. `shared/run/v.c` — 20 functions (volcado→blit_screen, volcadosdl→blit_sdl,
-   volcado_parcial→blit_partial, volcadoc/p320200→blit_full/partial_320x200,
-   volcadoc/psvga→blit_full/partial_svga, volcadoc/px→blit_full/partial_modex,
-   graba_PCX→save_PCX, graba_MAP→save_MAP, set_paleta→update_palette,
-   retrazo→retrace_wait, svmode→setup_video_mode (collision avoidance with
-   set_video_mode function pointer), svmodex→setup_modex, rvmode→reset_video_mode,
-   crear_ghost→create_ghost, crear_ghost_vc/slow, media→average_color)
-16. `runtime/s.c` — 20 functions (mover_scroll→update_scroll, pinta_sprite→paint_sprite,
-   pinta_sprites_scroll/m7→paint_scroll_sprites/paint_sprites_m7, sp_cortado→sp_clipped,
-   sp_escalado→sp_scaled, sp_rotado→sp_rotated, sp_scanc→sp_scan_clipped,
-   sp_scancg→sp_scan_clipped_ghost, sp_scang→sp_scan_ghost, caja→draw_box,
-   caja_rellena→draw_filled_box, circulo→draw_circle, pinta_drawings→paint_drawings,
-   pinta_textos→paint_texts, texn→text_normal, texc→text_clipped, pinta_modo7→paint_mode7)
-17. `shared/run/c.c` — 5 functions (comprobar_colisiones→check_collisions,
-   test_cortado→test_clipped, test_escalado→test_scaled, test_rotado→test_rotated,
-   sp_rotado_p→sp_rotated_p)
-18. `runtime/debug/d.c` — 18 functions (pinta_segmento→paint_segment,
-   pinta_lista_var→paint_var_list, pinta_codigo→paint_code,
-   pinta_lista_proc→draw_proc_list (collision avoidance with existing paint_process_list),
-   incluye/excluye_miembros→include/exclude_members, determina_codigo→determine_code,
-   determina_ids→determine_ids, visualiza→visualize, crear_lista_variables→create_variable_list,
-   crear_lista_profile→create_profile_list, pintar_lista_profile→paint_profile_list,
-   f_abajo/arriba/derecha/izquierda→f_down/up/right/left)
-19. `divlengu.c` — 6 functions (inicializa_textos→initialize_texts,
-   analiza_textos→analyze_texts, an_numero/texto/comentario→analyze_number/text/comment,
-   finaliza_textos→finalize_texts)
-20. `divkeybo.c` — 3 functions (tecla_bios→bios_key, tecla→poll_keyboard,
-   vacia_buffer→flush_buffer)
-21. `shared/run/ia.c` — 2 functions (puede_ir→can_go, calcula_vertices→calculate_vertices)
-22. `det_vesa.c` — 1 function (detectar_vesa→detect_vesa)
-   Total: 96 renames across 39 files, zero warnings, all 4 targets build clean.
+**Part 1 — Global variables** (~59 renames, touches 30-40 files)
 
-**Next:** Sprint E (unsafe strings) or Sprint G (file splitting) — see Sprint menu above.
+These are declared as `GLOBAL_DATA` in `global.h` and referenced throughout the codebase.
+
+| Spanish global | → English | Notes |
+|----------------|-----------|-------|
+| `vga_an` | `vga_width` | VGA mode width |
+| `vga_al` | `vga_height` | VGA mode height |
+| `map_an` | `map_width` | current map width |
+| `map_al` | `map_height` | current map height |
+| `tapiz_an` | `wallpaper_width` | desktop background width |
+| `tapiz_al` | `wallpaper_height` | desktop background height |
+| `font_an` | `font_width` | font character width |
+| `font_al` | `font_height` | font character height |
+| `editor_font_an` | `editor_font_width` | editor font char width |
+| `editor_font_al` | `editor_font_height` | editor font char height |
+| `barra_an` | `toolbar_width` | toolbar width |
+| `barra_x` | `toolbar_x` | toolbar x position |
+| `barra_y` | `toolbar_y` | toolbar y position |
+| `tapiz` | `wallpaper` | desktop background bitmap |
+| `mapa_tapiz` | `wallpaper_map` | wallpaper tile map |
+| `copia` | `screen_copy` | virtual screen copy |
+| `mab` | `selection_mask` | bitmap mask for selection |
+| `ghost` | `ghost` | keep — already English |
+| `dac` | `palette` | check collision with existing |
+| `dac4` | `palette4` | check collision |
+| `cuad` | `color_lookup` | squared-difference palette table |
+| `reglas[]` | `gradients[]` | color gradient array |
+| `regla` | `gradient` | current gradient index |
+| `near_regla` | `nearest_gradient` | nearest color lookup |
+| `undo` | `undo` | keep — already English |
+| `volcado_completo` | `full_redraw` | flag: full screen redraw needed |
+| `siguiente_orden` | `next_order` | next window z-order |
+| `modo_de_retorno` | `return_mode` | return mode flag |
+| `modo_caja` | `mode_rect` | rectangle drawing mode |
+| `modo_circulo` | `mode_circle` | circle drawing mode |
+| `modo_fill` | `mode_fill` | keep — already English |
+| `modo_seleccion` | `mode_selection` | selection mode flag |
+| `zoom_background` | `zoom_background` | keep — already English |
+| `old_mouse_b` | `prev_mouse_buttons` | previous mouse button state |
+| `fondo_raton` | `mouse_background` | mouse background buffer |
+| `max_undos` | `max_undos` | keep — already English |
+| `undo_memory` | `undo_memory` | keep — already English |
+| `tundo` | `undo_table` | undo table struct |
+| `iundo` | `undo_index` | undo index |
+| `zx`, `zy`, `zan`, `zal` | `zoom_x`, `zoom_y`, `zoom_width`, `zoom_height` | zoom window |
+
+NOTE: Some globals above (ghost, undo, max_undos, etc.) are already English — skip those.
+Check for name collisions before each rename (grep the target name first).
+The `dac`/`dac4` renames need careful collision analysis — `palette` may already exist.
+
+**Part 2 — Struct field names** (~30 renames across 8 structs, touches 35+ files)
+
+| Struct | Field | → English | Notes |
+|--------|-------|-----------|-------|
+| `tprg` | `linea` | `line` | current line |
+| `tprg` | `columna` | `column` | current column |
+| `tprg` | `num_lineas` | `num_lines` | line count |
+| `tprg` | `linea_vieja` | `prev_line` | previous line |
+| `tprg` | `primera_linea` | `first_line` | first visible line |
+| `tprg` | `primera_columna` | `first_column` | first visible column |
+| `tprg` | `buffer_lon` | `buffer_len` | buffer length |
+| `tprg` | `file_lon` | `file_len` | file length |
+| `tmapa` | `map_an` | `map_width` | map width |
+| `tmapa` | `map_al` | `map_height` | map height |
+| `tmapa` | `codigo` | `code` | map identifier code |
+| `tmapa` | `Codigo` | `fpg_code` | FPG code |
+| `tmapa` | `descripcion` | `description` | map description |
+| `tmapa` | `grabado` | `saved` | saved-to-disk flag |
+| `tventana` | `tipo` | `type` | window type |
+| `tventana` | `orden` | `order` | z-order |
+| `tventana` | `primer_plano` | `foreground` | foreground flag |
+| `tventana` | `nombre` | `name` | icon name |
+| `tventana` | `titulo` | `title` | window title |
+| `tventana` | `estado` | `state` | button/item state |
+| `tventana` | `botones` | `buttons` | pressed buttons |
+| `tventana` | `volcar` | `redraw` | needs-redraw flag |
+| `t_listbox` | `lista` | `list` | list pointer |
+| `t_listbox` | `lista_an` | `item_width` | item width |
+| `t_listbox` | `lista_al` | `visible_items` | visible item count |
+| `t_listbox` | `inicial` | `first_visible` | first visible index |
+| `t_listbox` | `maximo` | `max_items` | total item count |
+| `t_listbox` | `zona` | `zone` | selected zone |
+| `t_listbox` | `botones` | `buttons` | up/down pressed |
+| `t_listbox` | `creada` | `created` | created flag |
+| `tipo_regla` | `numcol` | `num_colors` | number of colors |
+| `tipo_regla` | `tipo` | `type` | gradient type |
+| `tipo_regla` | `fijo` | `fixed` | fixed flag |
+| `tipo_regla` | `col[33]` | `colors[33]` | color array |
+| `tipo_undo` | `codigo` | `code` | map identifier |
+| `tipo_undo` | `modo` | `mode` | entry mode |
+| `ttipo` | `defecto` | `default_choice` | default selection |
+
+**Collision warnings:**
+- `tprg.linea` → `line` — very common word; grep carefully for false positives
+- `tmapa.codigo` / `tipo_undo.codigo` → `code` — same concern
+- `tventana.tipo` / `tipo_regla.tipo` → `type` — these are struct fields so scope is limited
+- Struct field renames are safer than globals (no global namespace collision possible)
+
+**Rules (same as Sprint F plus):**
+- Rename the declaration in the struct/global AND all access sites project-wide
+- For struct fields, search `structvar.fieldname` and `ptr->fieldname` patterns
+- For globals, search the bare name (they're accessed directly)
+- Be very careful with short names like `an`, `al` — they may appear as substrings
+  (e.g., `man`, `plan`, `canal`). Use word-boundary-aware search.
+- Build after each batch to confirm nothing broke
+- Do globals first (Part 1), then struct fields (Part 2)
+- Batch by struct or by naming pattern (all `*_an`/`*_al` → `*_width`/`*_height` together)
+
+---
+
+### Sprint H: Translate Spanish comments to English
+
+**Goal:** Translate ~3,663 lines of Spanish comments across 47 files to English.
+
+**Top targets by Spanish comment density:**
+| File | Spanish comment lines | % of file |
+|------|-----------------------|-----------|
+| divc.c | 777 | 9% |
+| runtime/f.c | 295 | 6% |
+| global.h | 273 | — |
+| runtime/debug/d.c | 269 | — |
+| divedit.c | 264 | 7% |
+| div.c | 252 | 5% |
+| divpaint.c | 203 | 4% |
+| divhandl.c | 196 | 5% |
 
 **Rules:**
-- Use the glossary (`reports/glossary-spanish-english.md`) as the primary reference
-- Every rename must be project-wide: rename the function, its declaration, and ALL call sites
-- Update any comments that reference the old name
-- Build after each rename to confirm nothing broke
-- Don't rename functions that are part of the OSDEP interface (those are already English)
-- Don't rename struct field names yet (that's a separate, more invasive sprint)
+- Translate the meaning, don't transliterate (e.g., "pone el color" → "set the color",
+  not "puts the color")
+- Keep the same comment style (// or /* */) and position
+- Don't add comments where none exist — only translate existing ones
+- This sprint is highly parallelizable: each file is independent
+- One agent per file, build after each file
 
-**Common translations:**
-| Spanish | English | Notes |
-|---------|---------|-------|
-| crear_* | create_* | |
-| borrar_* | delete_* | |
-| buscar_* | find_* / search_* | |
-| pintar_* / dibujar_* | draw_* / paint_* | |
-| cargar_* | load_* | |
-| guardar_* | save_* | |
-| cerrar_* / abrir_* | close_* / open_* | |
-| leer_* / escribir_* | read_* / write_* | |
-| poner_* / quitar_* | set_* / remove_* | |
-| mover_* / copiar_* | move_* / copy_* | |
-| inicializ* | init_* / initialize_* | |
-| finaliz* | finalize_* / cleanup_* | |
-| detectar_* | detect_* | |
-| mostrar_* / ocultar_* | show_* / hide_* | |
-| cambiar_* | change_* / switch_* | |
-| seleccion* | select_* | |
-| comprob* | check_* / verify_* | |
-| descomprim* | decompress_* | |
-| actualiz* | update_* / refresh_* | |
-| entorno | environment / main_loop | context-dependent |
-| volcado | blit / flip | screen dump |
-| tecla | key / keypress | |
-| raton | mouse | |
-| ventana | window | |
+---
+
+### Sprint I: Split monster files
+
+**Goal:** Split the 3 largest files along natural boundaries identified in the
+architecture docs.
+
+| File | Lines | Proposed split |
+|------|-------|----------------|
+| `divc.c` | 7,823 | `divc_lexer.c` + `divc_parser.c` + `divc_codegen.c` |
+| `divpaint.c` | 4,969 | `divpaint.c` + `divpaint_tools.c` + `divpaint_select.c` |
+| `div.c` | 4,940 | `div.c` + `div_desktop.c` + `div_dialogs.c` |
+
+**Rules:**
+- Extract functions into new files, add forward declarations in headers
+- Update CMakeLists.txt to compile the new files
+- No behavioral changes — pure structural refactoring
+- Static/file-scope globals may need to become shared or passed as parameters
 
 ---
 

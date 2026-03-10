@@ -59,7 +59,7 @@ void FPG2(void)
 	char tDescrip[32];
 
 	if(NewDacLoaded) { //EL FPG TRAE UNA PALETA NUEVA
-		v.volcar=0;
+		v.redraw=0;
 		NewDacLoaded=0;
 		RemapAllFiles(0);
 		return;
@@ -74,42 +74,42 @@ void FPG2(void)
 		case 0:
 			MiFPG->lInfoFPG.x=3;
 			MiFPG->lInfoFPG.y=11;
-			MiFPG->lInfoFPG.lista=(char *)MiFPG->CodDes;
-			MiFPG->lInfoFPG.maximo=MiFPG->nIndex;
-			MiFPG->lInfoFPG.lista_an=38+2;
-			MiFPG->lInfoFPG.inicial=0;
+			MiFPG->lInfoFPG.list=(char *)MiFPG->CodDes;
+			MiFPG->lInfoFPG.total_items=MiFPG->nIndex;
+			MiFPG->lInfoFPG.item_width=38+2;
+			MiFPG->lInfoFPG.first_visible=0;
 			
 			if(MiFPG->thumb_on) {
-				MiFPG->lInfoFPG.columnas=3;
-				MiFPG->lInfoFPG.lineas=2;
+				MiFPG->lInfoFPG.columns=3;
+				MiFPG->lInfoFPG.lines=2;
 				MiFPG->lInfoFPG.an=47;
 				MiFPG->lInfoFPG.al=26;
 			} else {
-				MiFPG->lInfoFPG.columnas=1;
-				MiFPG->lInfoFPG.lineas=6;
+				MiFPG->lInfoFPG.columns=1;
+				MiFPG->lInfoFPG.lines=6;
 				MiFPG->lInfoFPG.an=143;
 				MiFPG->lInfoFPG.al=8;
 			}
 			
 			FPG1(); 
-			v.volcar=1;
+			v.redraw=1;
 
 		break;
 
 		case 1:
 			FPG1();
-			v.volcar=1;
+			v.redraw=1;
 		break;
 	}
 
-	if((arrastrar==4)) { //Suelto
-		arrastrar=5; free_drag=0;
+	if((dragging==4)) { //Suelto
+		dragging=5; free_drag=0;
 		
-		if(ventana[1].mapa->Codigo) {
-			COD=ventana[1].mapa->Codigo;
-			memcpy(tDescrip,ventana[1].mapa->descripcion,32);
+		if(ventana[1].mapa->fpg_code) {
+			COD=ventana[1].mapa->fpg_code;
+			memcpy(tDescrip,ventana[1].mapa->description,32);
 		} else {
-			memcpy(tDescrip,ventana[1].titulo,32);
+			memcpy(tDescrip,ventana[1].title,32);
 			COD=MiFPG->LastUsed;
 			
 			while(MiFPG->OffsGrf[COD]) {
@@ -134,7 +134,7 @@ void FPG2(void)
 			}
 		}
 			Anadir_FPG(MiFPG,COD,(char *)tDescrip,(char *)ventana[1].mapa->filename,
-					ventana[1].mapa->map_an,ventana[1].mapa->map_al,
+					ventana[1].mapa->map_width,ventana[1].mapa->map_height,
 					nPuntos,(char *)ventana[1].mapa->puntos,(char *)ventana[1].mapa->map,0,1);
 
 			for(n=0; n<1000; n++) 
@@ -142,17 +142,17 @@ void FPG2(void)
 
 			call((voidReturnType )v.paint_handler);
 
-		v.volcar=1;
+		v.redraw=1;
 		free_drag=1;
 	}
 
-	if((MiFPG->FPGInfo)&&(MiFPG->lInfoFPG.zona>=10)&&(mouse_b&1)) {
+	if((MiFPG->FPGInfo)&&(MiFPG->lInfoFPG.zone>=10)&&(mouse_b&1)) {
 		mouse_b=0;
-		Elemento=MiFPG->DesIndex[(MiFPG->lInfoFPG.zona-10)+MiFPG->lInfoFPG.inicial];
+		Elemento=MiFPG->DesIndex[(MiFPG->lInfoFPG.zone-10)+MiFPG->lInfoFPG.first_visible];
 
 		if((fpg=fopen((char *)MiFPG->ActualFile,"rb"))==NULL) {
 			//Error: no es un encontro el fichero.(grfxch ?????)
-			v_texto=(char *)texto[43];
+			v_text=(char *)texto[43];
 			show_dialog(err0);
 			return;
 		}
@@ -173,18 +173,18 @@ void FPG2(void)
 
 		if (FPGimagen) free(FPGimagen);
 		if (FPGpuntos) free(FPGpuntos);
-		v.volcar=1;
+		v.redraw=1;
 		return;
 	}
 
-	if(arrastrar==1 && MiFPG->lInfoFPG.zona>=10 && !MiFPG->FPGInfo) {
-		arrastrar_graf=8;
-		arrastrar=2;
+	if(dragging==1 && MiFPG->lInfoFPG.zone>=10 && !MiFPG->FPGInfo) {
+		drag_graphic=8;
+		dragging=2;
 		return;
 	}
 
-	if ((MiFPG->lInfoFPG.zona>=10) && (mouse_b&1 || old_mouse_b&1) && (mouse_b!=old_mouse_b) && (arrastrar<3)) {
-		Elemento=(MiFPG->lInfoFPG.zona-10)+MiFPG->lInfoFPG.inicial;
+	if ((MiFPG->lInfoFPG.zone>=10) && (mouse_b&1 || prev_mouse_buttons&1) && (mouse_b!=prev_mouse_buttons) && (dragging<3)) {
+		Elemento=(MiFPG->lInfoFPG.zone-10)+MiFPG->lInfoFPG.first_visible;
 
 		if(MiFPG->CodDes[Elemento][0]==255) {
 			MiFPG->CodDes[Elemento][0]=175;
@@ -194,11 +194,11 @@ void FPG2(void)
 		  MiFPG->thumb[Elemento].tagged=0;
 		}
 		FPG_create_listbox_br(&MiFPG->lInfoFPG);
-		v.volcar=1;
+		v.redraw=1;
 	}
 
-	if ((arrastrar==3)&&(MiFPG->lInfoFPG.zona>=10)) {
-		Elemento=MiFPG->DesIndex[(MiFPG->lInfoFPG.zona-10)+MiFPG->lInfoFPG.inicial];
+	if ((dragging==3)&&(MiFPG->lInfoFPG.zone>=10)) {
+		Elemento=MiFPG->DesIndex[(MiFPG->lInfoFPG.zone-10)+MiFPG->lInfoFPG.first_visible];
 
 		if((fpg=fopen((char *)MiFPG->ActualFile,"rb"))==NULL) {
 			//Error: no es un encontro el fichero.(grfxch ?????)
@@ -207,31 +207,31 @@ void FPG2(void)
 		fseek(fpg,MiFPG->OffsGrf[Elemento],SEEK_SET);
 		ReadHead(&MiFPG->MiHeadFPG,fpg);
 
-		map_an=MiFPG->MiHeadFPG.Ancho;
-		map_al=MiFPG->MiHeadFPG.Alto;
+		map_width=MiFPG->MiHeadFPG.Ancho;
+		map_height=MiFPG->MiHeadFPG.Alto;
 
 		v.mapa=(struct tmapa *)malloc(sizeof(struct tmapa));
 
 		if(v.mapa==NULL) {
 			fclose(fpg);
-			v_texto=(char *)texto[45]; show_dialog(err0);
+			v_text=(char *)texto[45]; show_dialog(err0);
 			return;
 		}
-		v.mapa->map=(byte *)malloc(map_an*map_al);
+		v.mapa->map=(byte *)malloc(map_width*map_height);
 
 		if(v.mapa->map==NULL) {
 			fclose(fpg);
 			free(v.mapa);
-			v_texto=(char *)texto[45]; show_dialog(err0);
+			v_text=(char *)texto[45]; show_dialog(err0);
 			return;
 		}
 
-		v.mapa->map_an=MiFPG->MiHeadFPG.Ancho;
-		v.mapa->map_al=MiFPG->MiHeadFPG.Alto;
+		v.mapa->map_width=MiFPG->MiHeadFPG.Ancho;
+		v.mapa->map_height=MiFPG->MiHeadFPG.Alto;
 
 		v.mapa->TengoNombre=2;
-		v.mapa->Codigo=MiFPG->MiHeadFPG.COD;
-		memcpy(v.mapa->descripcion,MiFPG->MiHeadFPG.Descrip,32);
+		v.mapa->fpg_code=MiFPG->MiHeadFPG.COD;
+		memcpy(v.mapa->description,MiFPG->MiHeadFPG.Descrip,32);
 		memset(v.mapa->filename,0,13);
 		memcpy(v.mapa->filename,MiFPG->MiHeadFPG.Filename,12);
 
@@ -239,38 +239,38 @@ void FPG2(void)
 				v.mapa->puntos[x]=-1;
 		if(MiFPG->MiHeadFPG.nPuntos)
 				fread(v.mapa->puntos,MiFPG->MiHeadFPG.nPuntos,4,fpg);
-		fread(v.mapa->map,map_an,map_al,fpg);
+		fread(v.mapa->map,map_width,map_height,fpg);
 		fclose(fpg);
 
-		v.mapa->zoom_cx=v.mapa->map_an/2;
-		v.mapa->zoom_cy=v.mapa->map_al/2;
+		v.mapa->zoom_cx=v.mapa->map_width/2;
+		v.mapa->zoom_cy=v.mapa->map_height/2;
 
-		x=(v.mapa->zoom_cx-vga_an/2);
+		x=(v.mapa->zoom_cx-vga_width/2);
 		
 		if (x<0)
 			x=0;
-		else if (x+vga_an>v.mapa->map_an)
-			x=v.mapa->map_an-vga_an;
+		else if (x+vga_width>v.mapa->map_width)
+			x=v.mapa->map_width-vga_width;
 
-		y=(v.mapa->zoom_cy-vga_al/2);
+		y=(v.mapa->zoom_cy-vga_height/2);
 		
 		if (y<0)
 			y=0;
 		else
-			if(y+vga_al>v.mapa->map_al)
-				y=v.mapa->map_al-vga_al;
+			if(y+vga_height>v.mapa->map_height)
+				y=v.mapa->map_height-vga_height;
 		
 		v.mapa->zoom=0;
 		v.mapa->zoom_x=x;
 		v.mapa->zoom_y=y;
-		v.volcar=1;
+		v.redraw=1;
 		return;
-	} else if(arrastrar==3)
-		arrastrar=0;
+	} else if(dragging==3)
+		dragging=0;
 
-	v_pausa=1;
+	v_pause=1;
 	FPG_update_listbox_br(&MiFPG->lInfoFPG);
-	v_pausa=0;
+	v_pause=0;
 }
 
 void FPG3(void) {
@@ -291,7 +291,7 @@ void FPG0N(void) {
 	FPG *MiFPG;
 	int n;
 
-	v.tipo=101; // SOLIZABLE
+	v.type=101; // SOLIZABLE
 	v.an=159;
 	v.al=72+5;
 	v.paint_handler=FPG1;
@@ -307,13 +307,13 @@ void FPG0N(void) {
 		MiFPG->thumb[n].tagged=0;
 	}
 
-	MiFPG->lInfoFPG.creada=0;
+	MiFPG->lInfoFPG.created=0;
 	MiFPG->thumb_on=0;
 	Crear_FPG(MiFPG,full);
 	// Safe copy: NombreFpg is 13 bytes, truncate to fit FPG header
 	div_strcpy((char *)MiFPG->NombreFpg, sizeof(MiFPG->NombreFpg), input);
-	v.titulo=MiFPG->NombreFpg;
-	v.nombre=MiFPG->NombreFpg;
+	v.title=MiFPG->NombreFpg;
+	v.name=MiFPG->NombreFpg;
 	MiFPG->FPGInfo=0;
 
 	_flag(419,4,v.al-10,&MiFPG->thumb_on);
@@ -323,7 +323,7 @@ void FPG0N(void) {
 void FPG0A(void) {
 	FPG *MiFPG;
 	int n;
-	v.tipo=101; // SOLIZABLE
+	v.type=101; // SOLIZABLE
 	v.an=159;
 	v.al=72+5;
 	v.paint_handler=FPG1;
@@ -343,45 +343,45 @@ void FPG0A(void) {
 	Abrir_FPG(MiFPG,full);
 	// Safe copy: NombreFpg is 13 bytes, truncate to fit FPG header
 	div_strcpy((char *)MiFPG->NombreFpg, sizeof(MiFPG->NombreFpg), input);
-	v.titulo=MiFPG->NombreFpg;
-	v.nombre=MiFPG->NombreFpg;
+	v.title=MiFPG->NombreFpg;
+	v.name=MiFPG->NombreFpg;
 
 	_flag(419,4,v.al-10,&MiFPG->thumb_on);
 	_flag(108,(v.an-5)-(8*big2+text_len(texto[108])),v.al-10,&MiFPG->FPGInfo);
 }
 
 int new_file(void) {
-	v_aceptar=0;
-	v_modo=1;
-	v_tipo=4;
-	v_texto=(char *)texto[69];
+	v_accept=0;
+	v_mode=1;
+	v_type=4;
+	v_text=(char *)texto[69];
 	show_dialog(browser0);
 
-	strcpy(full,tipo[v_tipo].path);
+	strcpy(full,tipo[v_type].path);
 
 	if (full[strlen(full)-1]!='/') strcat(full,"//");
 	
 	strcat(full,input);
 
-	if (v_terminado)
+	if (v_finished)
 	{
-		if (!v_existe)
+		if (!v_exists)
 		{
-			v_aceptar=1;
+			v_accept=1;
 		}
 		else
 		{
-			v_titulo=(char *)texto[82];
-			v_texto=input;
+			v_title=(char *)texto[82];
+			v_text=input;
 			show_dialog(aceptar0);
 		}
-		if(v_aceptar)
+		if(v_accept)
 		{
 			v_aux=(byte *)malloc(sizeof(FPG));
 
 			if(v_aux==NULL)
 			{
-				v_texto=(char *)texto[45]; show_dialog(err0);
+				v_text=(char *)texto[45]; show_dialog(err0);
 				return 0;
 			}
 
@@ -419,13 +419,13 @@ void open_file(void) {
 	int  n;
 	byte pal[768];
 
-	v_modo=0; v_tipo=4;
-	v_texto=(char *)texto[70];
+	v_mode=0; v_type=4;
+	v_text=(char *)texto[70];
 	show_dialog(browser0);
-	if (!v_terminado) return;
+	if (!v_finished) return;
 
 	if(!num_taggeds) {
-		strcpy(full,tipo[v_tipo].path);
+		strcpy(full,tipo[v_type].path);
 
 		if (full[strlen(full)-1]!='/')
 			strcat(full,"/");
@@ -434,12 +434,12 @@ void open_file(void) {
 
 		if ((f=fopen(full,"rb"))!=NULL) {
 			fclose(f);
-			v_existe=1;
+			v_exists=1;
 		} else
-			v_existe=0;
+			v_exists=0;
 
-		div_strcpy(larchivosbr.lista, larchivosbr.lista_an, input);
-		larchivosbr.maximo=1;
+		div_strcpy(larchivosbr.list, larchivosbr.item_width, input);
+		larchivosbr.total_items=1;
 		thumb[0].tagged=1;
 		num_taggeds=1;
 	}
@@ -451,11 +451,11 @@ void open_file(void) {
 	muestra=NULL;
 	memcpy(pal,dac,768);
 
-	for(num=0; num<larchivosbr.maximo; num++) {
+	for(num=0; num<larchivosbr.total_items; num++) {
 
 		if(thumb[num].tagged) {
-			strcpy(input,larchivosbr.lista+larchivosbr.lista_an*num);
-			strcpy(full,tipo[v_tipo].path);
+			strcpy(input,larchivosbr.list+larchivosbr.item_width*num);
+			strcpy(full,tipo[v_type].path);
 
 			if (full[strlen(full)-1]!='/')
 				strcat(full,"/");
@@ -463,7 +463,7 @@ void open_file(void) {
 			strcat(full, input);
 
 			if((f=fopen(full,"rb"))==NULL) {
-				v_texto=(char *)texto[44];
+				v_text=(char *)texto[44];
 				show_dialog(err0);
 				continue;
 			}
@@ -472,7 +472,7 @@ void open_file(void) {
 
 			if (strcmp(cwork,"fpg\x1a\x0d\x0a")) {
 				fclose(f);
-				v_texto=(char *)texto[46];
+				v_text=(char *)texto[46];
 				show_dialog(err0);
 				continue;
 			}
@@ -530,7 +530,7 @@ void open_file(void) {
 		memcpy(paltratar,pal,768);
 		show_dialog(TratarPaleta0); // ¿Cargar paleta?
 
-		switch(v_aceptar) {
+		switch(v_accept) {
 			case 0: // Cancelar (no cargar)
 				return;
 			break;
@@ -554,11 +554,11 @@ void open_file(void) {
 	// *** Juanjo *** //
 	////////////////////
 
-	for(num=0; num<larchivosbr.maximo; num++) {
+	for(num=0; num<larchivosbr.total_items; num++) {
 
 		if(thumb[num].tagged) {
-			strcpy(input,larchivosbr.lista+larchivosbr.lista_an*num);
-			strcpy(full,tipo[v_tipo].path);
+			strcpy(input,larchivosbr.list+larchivosbr.item_width*num);
+			strcpy(full,tipo[v_type].path);
 
 			if (full[strlen(full)-1]!='/')
 				strcat(full,"/");
@@ -572,7 +572,7 @@ void open_file(void) {
 					if (!strcmp(cwork,"fpg\x1a\x0d\x0a")) {
 						v_aux=(byte *)malloc(sizeof(FPG));
 						if(v_aux==NULL) {
-							v_texto=(char *)texto[45];
+							v_text=(char *)texto[45];
 							show_dialog(err0);
 							continue;
 						}
@@ -580,21 +580,21 @@ void open_file(void) {
 						MiFPG=(FPG *)v_aux;
 						MiFPG->thumb_on=0;
 						MiFPG->FPGInfo=0;
-						MiFPG->lInfoFPG.creada=0;
+						MiFPG->lInfoFPG.created=0;
 						close_fpg(full);
 						memset(v_aux, 0, sizeof(FPG));
 						new_window(FPG0A);
 					} else { 
-						v_texto=(char *)texto[46];
+						v_text=(char *)texto[46];
 						show_dialog(err0); 
 					}
 				} else { 
 					fclose(f); 
-					v_texto=(char *)texto[44]; 
+					v_text=(char *)texto[44]; 
 					show_dialog(err0); 
 				}
 			} else { 
-				v_texto=(char *)texto[44]; 
+				v_text=(char *)texto[44]; 
 				show_dialog(err0); 
 			}
 		}
@@ -626,27 +626,27 @@ void Warning1(void) {
 	sprintf(cWork,(char *)texto[173],cNamev2convert);
 	wwrite(v.ptr,an,al,an/2,19,1,(byte *)cWork,c3);
 	wwrite(v.ptr,an,al,an/2,30,1,texto[174],c4);
-	v_aceptar=0;
+	v_accept=0;
 }
 
 void Warning2(void) {
 	_process_items();
 
 	switch(v.active_item) {
-		case 0: v_aceptar=1;
-			fin_dialogo=1;
+		case 0: v_accept=1;
+			end_dialog=1;
 		break;
 
-		case 1: v_aceptar=0;
-			fin_dialogo=1;
+		case 1: v_accept=0;
+			end_dialog=1;
 		break;
 	}
 }
 void Warning0(void) {
-	v.tipo=1; // Diálogo
+	v.type=1; // Diálogo
 	v.an=200;
 	v.al=60;
-	v.titulo=texto[171];
+	v.title=texto[171];
 	v.paint_handler=Warning1;
 	v.click_handler=Warning2;
 
@@ -680,22 +680,22 @@ int RemapAllFiles(int vent) {
 			return(0);
 	}
 
-	strcpy(cNamev2convert,(char *)ventana[vent].titulo);
+	strcpy(cNamev2convert,(char *)ventana[vent].title);
 	show_dialog(Warning0);
 
-	switch(v_aceptar) {
+	switch(v_accept) {
 		case 0:
 			move(0,vent);
 			close_window(); 
 		break;
 		
 		case 1:
-			v_titulo=(char *)texto[344];
-			v_texto=(char *)texto[345];
+			v_title=(char *)texto[344];
+			v_text=(char *)texto[345];
 			
 			show_dialog(aceptar0);
 			
-			if (v_aceptar) {
+			if (v_accept) {
 				RemapAllFileToPal(MiFPG);
 			} else {
 				move(0,vent); close_window();
@@ -766,14 +766,14 @@ void GetCode2(void) {
 		case 0:
 			if(atoi(cCodigo)!=0) {
 				RetValue=1;
-				fin_dialogo=1;
-				v.volcar=1;
+				end_dialog=1;
+				v.redraw=1;
 			}
 			break;
 
 		case 1:
-			fin_dialogo=1;
-			v.volcar=1;
+			end_dialog=1;
+			v.redraw=1;
 		break;
 	}
 }
@@ -783,10 +783,10 @@ void GetCode3(void) {
 }
 
 void GetCode0(void) {
-	v.tipo=1; // Diálogo
+	v.type=1; // Diálogo
 	v.an=180+25;
 	v.al=100-12;
-	v.titulo=texto[68];
+	v.title=texto[68];
 	v.paint_handler=GetCode1;
 	v.click_handler=GetCode2;
 	v.close_handler=GetCode3;
@@ -912,8 +912,8 @@ void Show_Taggeds()
 
 		ReadHead(&MiFPG->MiHeadFPG,fpg);
 
-		map_an=MiFPG->MiHeadFPG.Ancho;
-		map_al=MiFPG->MiHeadFPG.Alto;
+		map_width=MiFPG->MiHeadFPG.Ancho;
+		map_height=MiFPG->MiHeadFPG.Alto;
 
 		if (new_map(NULL)) {
 			//ERROR: Falta memoria.
@@ -922,8 +922,8 @@ void Show_Taggeds()
 		}
 
 		v.mapa->TengoNombre=1;
-		v.mapa->Codigo=MiFPG->MiHeadFPG.COD;
-		memcpy(v.mapa->descripcion,MiFPG->MiHeadFPG.Descrip,32);
+		v.mapa->fpg_code=MiFPG->MiHeadFPG.COD;
+		memcpy(v.mapa->description,MiFPG->MiHeadFPG.Descrip,32);
 		memset(v.mapa->filename,0,13);
 		memcpy(v.mapa->filename,MiFPG->MiHeadFPG.Filename,12);
 
@@ -933,27 +933,27 @@ void Show_Taggeds()
 		if(MiFPG->MiHeadFPG.nPuntos)
 			fread(v.mapa->puntos,MiFPG->MiHeadFPG.nPuntos,4,fpg);
 
-		fread(v.mapa->map,map_an,map_al,fpg);
+		fread(v.mapa->map,map_width,map_height,fpg);
 		fclose(fpg);
 
-		v.mapa->zoom_cx=v.mapa->map_an/2;
-		v.mapa->zoom_cy=v.mapa->map_al/2;
+		v.mapa->zoom_cx=v.mapa->map_width/2;
+		v.mapa->zoom_cy=v.mapa->map_height/2;
 
-		x=(v.mapa->zoom_cx-vga_an/2);
+		x=(v.mapa->zoom_cx-vga_width/2);
 
 		if (x<0)
 			x=0;
 		else
-			if (x+vga_an>v.mapa->map_an)
-				x=v.mapa->map_an-vga_an;
+			if (x+vga_width>v.mapa->map_width)
+				x=v.mapa->map_width-vga_width;
 
-		y=(v.mapa->zoom_cy-vga_al/2);
+		y=(v.mapa->zoom_cy-vga_height/2);
 
 		if (y<0)
 			y=0;
 		else
-			if(y+vga_al>v.mapa->map_al)
-				y=v.mapa->map_al-vga_al;
+			if(y+vga_height>v.mapa->map_height)
+				y=v.mapa->map_height-vga_height;
 
 		v.mapa->zoom=0;
 		v.mapa->zoom_x=x;
@@ -961,7 +961,7 @@ void Show_Taggeds()
 
 		activate();
 		call((voidReturnType )v.paint_handler);
-		wvolcado(copia,vga_an,vga_al,v.ptr,v.x,v.y,v.an,v.al,0);
+		wvolcado(copia,vga_width,vga_height,v.ptr,v.x,v.y,v.an,v.al,0);
 	}
 }
 
@@ -1003,11 +1003,11 @@ void Delete_Taggeds() {
 
 	wup(vent);
 
-	while (MiFPG->lInfoFPG.inicial+(MiFPG->lInfoFPG.lineas-1)*MiFPG->lInfoFPG.columnas+1>MiFPG->lInfoFPG.maximo) {
-		MiFPG->lInfoFPG.inicial-=MiFPG->lInfoFPG.columnas;
+	while (MiFPG->lInfoFPG.first_visible+(MiFPG->lInfoFPG.lines-1)*MiFPG->lInfoFPG.columns+1>MiFPG->lInfoFPG.total_items) {
+		MiFPG->lInfoFPG.first_visible-=MiFPG->lInfoFPG.columns;
 	}
 
-	if (MiFPG->lInfoFPG.inicial<0) MiFPG->lInfoFPG.inicial=0;
+	if (MiFPG->lInfoFPG.first_visible<0) MiFPG->lInfoFPG.first_visible=0;
 
 	wmouse_x=-1; wmouse_y=-1;
 	FPG_update_listbox_br(&MiFPG->lInfoFPG);
@@ -1030,26 +1030,26 @@ void printlist1(void) {
 void printlist2(void) {
 	_process_items();
 	switch(v.active_item) {
-		case 0: v_aceptar=1; fin_dialogo=1; break;
-		case 1: fin_dialogo=1; break;
+		case 0: v_accept=1; end_dialog=1; break;
+		case 1: end_dialog=1; break;
 		case 2: f_im=1; f_ar=0; _show_items(); break;
 		case 3: f_im=0; f_ar=1; _show_items(); break;
 	}
 }
 
 void printlist0(void) {
-	v.tipo=1;
+	v.type=1;
 	v.an=120;
 	v.al=38+10;
-	v.titulo=(byte *)v_titulo;
+	v.title=(byte *)v_title;
 	v.paint_handler=printlist1;
 	v.click_handler=printlist2;
 	_button(100,7,v.al-14,0);
 	_button(101,v.an-8,v.al-14,2);
 	_flag(448,4,12,&f_im);
 	_flag(449,4,12+9,&f_ar);
-	_get(414,16+text_len(texto[449]),12,v.an-20-text_len(texto[449]),(byte *)v_texto,15,0,0);
-	v_aceptar=0;
+	_get(414,16+text_len(texto[449]),12,v.an-20-text_len(texto[449]),(byte *)v_text,15,0,0);
+	v_accept=0;
 }
 
 void Print_List(void) {
@@ -1067,12 +1067,12 @@ void Print_List(void) {
 	if (!strlen(n_ar))
 		strcpy(n_ar,(char *)texto[451]);
 
-	v_texto=n_ar;
-	v_titulo=(char *)texto[438];
+	v_text=n_ar;
+	v_title=(char *)texto[438];
 
 	show_dialog(printlist0);
 
-	if (v_aceptar) {
+	if (v_accept) {
 
 		MiFPG=(FPG *)ventana[vent].aux;
 
@@ -1089,18 +1089,18 @@ void Print_List(void) {
 					fclose(f);
 					sprintf(cwork,"%s\\%s",tipo[1].path,n_ar);
 					strupr(cwork);
-					v_titulo=(char *)texto[450];
-					v_texto=cwork;
+					v_title=(char *)texto[450];
+					v_text=cwork;
 					show_dialog(aceptar0);
 					
-					if (!v_aceptar)
+					if (!v_accept)
 						return;
 				}
 
 				f=fopen(n_ar,"wb");
 
 				if (f==NULL) { 
-						v_texto=(char *)texto[47];
+						v_text=(char *)texto[47];
 						show_dialog(err0); 
 						return; 
 				}
@@ -1176,16 +1176,16 @@ void FPG_show_thumb(struct t_listboxbr * l, int num) {
 	int px,py,x,y,ly,incy;
 	char p[40];
 
-	if (num>=l->inicial && num<l->inicial+l->lineas*l->columnas) {
+	if (num>=l->first_visible && num<l->first_visible+l->lines*l->columns) {
 
-		px=(l->x+1+(l->an+1)*((num-l->inicial)%l->columnas))*big2+(l->an*big2-MiFPG->thumb[num].an)/2;
+		px=(l->x+1+(l->an+1)*((num-l->first_visible)%l->columns))*big2+(l->an*big2-MiFPG->thumb[num].an)/2;
 
 		if ((incy=((l->al-8)*big2-MiFPG->thumb[num].al)/2)<0)
 			incy=0;
 
-		py=(l->y+1+(l->al+1)*((num-l->inicial)/l->columnas))*big2+incy;
+		py=(l->y+1+(l->al+1)*((num-l->first_visible)/l->columns))*big2+incy;
 
-		ly=(l->y+(l->al+1)*((num-l->inicial)/l->columnas)+l->al-8)*big2;
+		ly=(l->y+(l->al+1)*((num-l->first_visible)/l->columns)+l->al-8)*big2;
 
 		if (MiFPG->thumb_on && MiFPG->thumb[num].ptr!=NULL && MiFPG->thumb[num].status==0) {
 			for(y=0;y<MiFPG->thumb[num].al;y++)
@@ -1207,10 +1207,10 @@ void FPG_show_thumb(struct t_listboxbr * l, int num) {
 		}
 
 		py+=l->al-1;
-		strcpy(p, l->lista+l->lista_an*num);
+		strcpy(p, l->list+l->item_width*num);
 		if(MiFPG->thumb_on) p[5]=0;
 
-		if (l->zona-10==num-l->inicial)
+		if (l->zone-10==num-l->first_visible)
 			x=c4; 
 		else 
 			x=c3;
@@ -1223,7 +1223,7 @@ void FPG_show_thumb(struct t_listboxbr * l, int num) {
 			wwrite_in_box(ptr,an,px+l->an-1,al,px+1,py,6,(byte *)p,x);
 		}
 
-		v.volcar=1;
+		v.redraw=1;
 	}
 }
 
@@ -1235,39 +1235,39 @@ void FPG_paint_listbox_br(struct t_listboxbr * l) {
 
 	color_tag = c_b_low;
 
-	for(y=0;y<l->lineas;y++)
-		for(x=0; x<l->columnas; x++) {
+	for(y=0;y<l->lines;y++)
+		for(x=0; x<l->columns; x++) {
 			wbox(ptr,an,al,c1,l->x+(x*(l->an+1))+1,l->y+(y*(l->al+1))+1,l->an,l->al-8);
 		
-			if(MiFPG->thumb[l->inicial+y*l->columnas+x].tagged)
+			if(MiFPG->thumb[l->first_visible+y*l->columns+x].tagged)
 				wbox(ptr,an,al,color_tag,l->x+(x*(l->an+1))+1,l->y+(y*(l->al+1))+1+l->al-8,l->an,8);
 			else
 				wbox(ptr,an,al,c01,l->x+(x*(l->an+1))+1,l->y+(y*(l->al+1))+1+l->al-8,l->an,8);
 		}
 
-	if (wmouse_in(l->x,l->y,(l->an+1)*l->columnas,(l->al+1)*l->lineas)) { // Calcula zona
-		l->zona=((mouse_x-v.x)/big2-l->x)/(l->an+1)+(((mouse_y-v.y)/big2-l->y)/(l->al+1))*l->columnas;
+	if (wmouse_in(l->x,l->y,(l->an+1)*l->columns,(l->al+1)*l->lines)) { // Calcula zona
+		l->zone=((mouse_x-v.x)/big2-l->x)/(l->an+1)+(((mouse_y-v.y)/big2-l->y)/(l->al+1))*l->columns;
 
-		if (l->zona>=l->maximo-l->inicial || l->zona>=l->lineas*l->columnas)
-			l->zona=1;
+		if (l->zone>=l->total_items-l->first_visible || l->zone>=l->lines*l->columns)
+			l->zone=1;
 		else 
-			l->zona+=10;
-	} else if (wmouse_in(l->x+(l->an+1)*l->columnas,l->y,9,9))
-		l->zona=2;
-	else if (wmouse_in(l->x+(l->an+1)*l->columnas,l->y+(l->al+1)*l->lineas-8,9,9)) 
-		l->zona=3;
-	else if (wmouse_in(l->x+(l->an+1)*l->columnas,l->y+9,9,(l->al+1)*l->lineas-17))
-		l->zona=4;
+			l->zone+=10;
+	} else if (wmouse_in(l->x+(l->an+1)*l->columns,l->y,9,9))
+		l->zone=2;
+	else if (wmouse_in(l->x+(l->an+1)*l->columns,l->y+(l->al+1)*l->lines-8,9,9)) 
+		l->zone=3;
+	else if (wmouse_in(l->x+(l->an+1)*l->columns,l->y+9,9,(l->al+1)*l->lines-17))
+		l->zone=4;
 	else 
-		l->zona=0;
+		l->zone=0;
 
-	n=l->maximo-l->inicial;
+	n=l->total_items-l->first_visible;
 	
-	if (n>l->lineas*l->columnas)
-		n=l->lineas*l->columnas;
+	if (n>l->lines*l->columns)
+		n=l->lines*l->columns;
 	
 	while (n>0) 
-		FPG_show_thumb(l,l->inicial+--n);
+		FPG_show_thumb(l,l->first_visible+--n);
 }
 
 void FPG_paint_slider_br(struct t_listboxbr * l) {
@@ -1276,15 +1276,15 @@ void FPG_paint_slider_br(struct t_listboxbr * l) {
 	int an=v.an,al=v.al;
 	if (big) { an/=2; al/=2; }
 
-	wbox(ptr,an,al,c2,l->x+(l->an+1)*l->columnas+1,l->y+9,7,(l->al+1)*l->lineas-17);
+	wbox(ptr,an,al,c2,l->x+(l->an+1)*l->columns+1,l->y+9,7,(l->al+1)*l->lines-17);
 
 	if (l->slide>l->s0)
-		wbox(ptr,an,al,c0,l->x+(l->an+1)*l->columnas+1,l->slide-1,7,1);
+		wbox(ptr,an,al,c0,l->x+(l->an+1)*l->columns+1,l->slide-1,7,1);
 	
 	if (l->slide<l->s1)
-		wbox(ptr,an,al,c0,l->x+(l->an+1)*l->columnas+1,l->slide+3,7,1);
+		wbox(ptr,an,al,c0,l->x+(l->an+1)*l->columns+1,l->slide+3,7,1);
 	
-	wput(ptr,an,al,l->x+(l->an+1)*l->columnas+1,l->slide,43);
+	wput(ptr,an,al,l->x+(l->an+1)*l->columns+1,l->slide,43);
 
 }
 
@@ -1294,28 +1294,28 @@ void FPG_create_listbox_br(struct t_listboxbr * l) {
 	int an=v.an/big2,al=v.al/big2;
 	int x,y;
 
-	if (!l->creada) {
+	if (!l->created) {
 		l->slide=l->s0=l->y+9;
-		l->s1=l->y+(l->al*l->lineas+l->lineas+1)-12;
-		l->botones=0;
-		l->creada=1;
-		l->zona=0;
-		l->inicial=tipo[v_tipo].inicial;
+		l->s1=l->y+(l->al*l->lines+l->lines+1)-12;
+		l->buttons=0;
+		l->created=1;
+		l->zone=0;
+		l->first_visible=tipo[v_type].first_visible;
 		
-		if ((l->inicial+(l->lineas-1)*l->columnas)>=l->maximo) 
-			l->inicial=0;
+		if ((l->first_visible+(l->lines-1)*l->columns)>=l->total_items) 
+			l->first_visible=0;
 	}
 
-	wbox(ptr,an,al,c1,l->x,l->y,(l->an+1)*l->columnas,(l->al+1)*l->lineas);
+	wbox(ptr,an,al,c1,l->x,l->y,(l->an+1)*l->columns,(l->al+1)*l->lines);
 
-	for (y=0;y<l->lineas;y++)
-		for (x=0;x<l->columnas;x++)
+	for (y=0;y<l->lines;y++)
+		for (x=0;x<l->columns;x++)
 			wrectangle(ptr,an,al,c0,l->x+(x*(l->an+1)),l->y+(y*(l->al+1)),l->an+2,l->al+2);
 
-	wrectangle(ptr,an,al,c0,l->x+(l->an+1)*l->columnas,l->y,9,(l->al+1)*l->lineas+1);
-	wrectangle(ptr,an,al,c0,l->x+(l->an+1)*l->columnas,l->y+8,9,(l->al+1)*l->lineas-15);
-	wput(ptr,an,al,l->x+(l->an+1)*l->columnas+1,l->y+1,-39);
-	wput(ptr,an,al,l->x+(l->an+1)*l->columnas+1,l->y+(l->al+1)*l->lineas-7,-40);
+	wrectangle(ptr,an,al,c0,l->x+(l->an+1)*l->columns,l->y,9,(l->al+1)*l->lines+1);
+	wrectangle(ptr,an,al,c0,l->x+(l->an+1)*l->columns,l->y+8,9,(l->al+1)*l->lines-15);
+	wput(ptr,an,al,l->x+(l->an+1)*l->columns+1,l->y+1,-39);
+	wput(ptr,an,al,l->x+(l->an+1)*l->columns+1,l->y+(l->al+1)*l->lines-7,-40);
 
 	FPG_paint_listbox_br(l);
 	FPG_paint_slider_br(l);
@@ -1326,31 +1326,31 @@ void FPG_update_listbox_br(struct t_listboxbr * l) {
 	FPG *MiFPG=(FPG *)v.aux;
 	byte * ptr=v.ptr;
 	int an=v.an/big2,al=v.al/big2;
-	int n,old_zona=l->zona,x,y;
+	int n,old_zona=l->zone,x,y;
 	char p[40];
 
-	if (wmouse_in(l->x,l->y,(l->an+1)*l->columnas,(l->al+1)*l->lineas)) { // Calcula zona
-		l->zona=(wmouse_x-l->x)/(l->an+1)+((wmouse_y-l->y)/(l->al+1))*l->columnas;
+	if (wmouse_in(l->x,l->y,(l->an+1)*l->columns,(l->al+1)*l->lines)) { // Calcula zona
+		l->zone=(wmouse_x-l->x)/(l->an+1)+((wmouse_y-l->y)/(l->al+1))*l->columns;
 
-		if (l->zona>=l->maximo-l->inicial || l->zona>=l->lineas*l->columnas)
-			l->zona=1;
+		if (l->zone>=l->total_items-l->first_visible || l->zone>=l->lines*l->columns)
+			l->zone=1;
 		else
-			l->zona+=10;
+			l->zone+=10;
 	
-	} else if (wmouse_in(l->x+(l->an+1)*l->columnas,l->y,9,9))
-		l->zona=2;
+	} else if (wmouse_in(l->x+(l->an+1)*l->columns,l->y,9,9))
+		l->zone=2;
 	
-	else if (wmouse_in(l->x+(l->an+1)*l->columnas,l->y+(l->al+1)*l->lineas-8,9,9))
-		l->zona=3;
+	else if (wmouse_in(l->x+(l->an+1)*l->columns,l->y+(l->al+1)*l->lines-8,9,9))
+		l->zone=3;
 	
-	else if (wmouse_in(l->x+(l->an+1)*l->columnas,l->y+9,9,(l->al+1)*l->lineas-17))
-		l->zona=4;
-	else l->zona=0;
+	else if (wmouse_in(l->x+(l->an+1)*l->columns,l->y+9,9,(l->al+1)*l->lines-17))
+		l->zone=4;
+	else l->zone=0;
 
-	if (old_zona!=l->zona) if (old_zona>=10) { // Desmarca zona
-		x=l->x+1+((old_zona-10)%l->columnas)*(l->an+1);
-		y=l->y+l->al+((old_zona-10)/l->columnas)*(l->al+1);
-		strcpy(p, l->lista+l->lista_an*(l->inicial+old_zona-10));
+	if (old_zona!=l->zone) if (old_zona>=10) { // Desmarca zona
+		x=l->x+1+((old_zona-10)%l->columns)*(l->an+1);
+		y=l->y+l->al+((old_zona-10)/l->columns)*(l->al+1);
+		strcpy(p, l->list+l->item_width*(l->first_visible+old_zona-10));
 	
 		if(MiFPG->thumb_on)
 			p[5]=0;
@@ -1360,58 +1360,58 @@ void FPG_update_listbox_br(struct t_listboxbr * l) {
 		} else {
 			wwrite_in_box(ptr,an,x+l->an-1,al,x+1,y,6,(byte *)p,c3);
 		} 
-		v.volcar=1;
+		v.redraw=1;
 	}
 
-	if ((mouse_b&8 && wmouse_x!=-1) || (l->zona==2 && ((mouse_b&1)||(v_pausa&&!(mouse_b&1)&&(old_mouse_b&1))))) {
-		if (mouse_b&8 || !v_pausa||(v_pausa&&!(mouse_b&1)&&(old_mouse_b&1))) {
+	if ((mouse_b&8 && wmouse_x!=-1) || (l->zone==2 && ((mouse_b&1)||(v_pause&&!(mouse_b&1)&&(prev_mouse_buttons&1))))) {
+		if (mouse_b&8 || !v_pause||(v_pause&&!(mouse_b&1)&&(prev_mouse_buttons&1))) {
 			
-			if ((old_mouse_b&1)&&!v_pausa) { 
+			if ((prev_mouse_buttons&1)&&!v_pause) { 
 				retrace_wait(); 
 				retrace_wait(); 
 			}
 			//---
-			if (l->inicial) {
-				l->inicial-=l->columnas; FPG_paint_listbox_br(l); v.volcar=1; 
+			if (l->first_visible) {
+				l->first_visible-=l->columns; FPG_paint_listbox_br(l); v.redraw=1; 
 			}
 			//---
 		}
 			//---
-		wput(ptr,an,al,l->x+(l->an+1)*l->columnas+1,l->y+1,-41);
-		l->botones|=1; v.volcar=1;
-	} else if (l->botones&1) {
-		wput(ptr,an,al,l->x+(l->an+1)*l->columnas+1,l->y+1,-39);
-		l->botones^=1; 
-		v.volcar=1;
+		wput(ptr,an,al,l->x+(l->an+1)*l->columns+1,l->y+1,-41);
+		l->buttons|=1; v.redraw=1;
+	} else if (l->buttons&1) {
+		wput(ptr,an,al,l->x+(l->an+1)*l->columns+1,l->y+1,-39);
+		l->buttons^=1; 
+		v.redraw=1;
 	}
 
-	if ((mouse_b&4 && wmouse_x!=-1)|| (l->zona==3 && ((mouse_b&1)||(v_pausa&&!(mouse_b&1)&&(old_mouse_b&1))))) {
+	if ((mouse_b&4 && wmouse_x!=-1)|| (l->zone==3 && ((mouse_b&1)||(v_pause&&!(mouse_b&1)&&(prev_mouse_buttons&1))))) {
 
-		if (mouse_b&4 || !v_pausa||(v_pausa&&!(mouse_b&1)&&(old_mouse_b&1))) {
+		if (mouse_b&4 || !v_pause||(v_pause&&!(mouse_b&1)&&(prev_mouse_buttons&1))) {
 
-			if ((old_mouse_b&1)&&!v_pausa) { 
+			if ((prev_mouse_buttons&1)&&!v_pause) { 
 				retrace_wait(); 
 				retrace_wait(); 
 			}
 			//---
-			n=l->maximo-l->inicial;
+			n=l->total_items-l->first_visible;
 			
-			if (n>l->lineas*l->columnas) {
-				l->inicial+=l->columnas; FPG_paint_listbox_br(l); v.volcar=1; 
+			if (n>l->lines*l->columns) {
+				l->first_visible+=l->columns; FPG_paint_listbox_br(l); v.redraw=1; 
 			}
 				//---
 		}
 				//---
-		wput(ptr,an,al,l->x+(l->an+1)*l->columnas+1,l->y+(l->al+1)*l->lineas-7,-42);
+		wput(ptr,an,al,l->x+(l->an+1)*l->columns+1,l->y+(l->al+1)*l->lines-7,-42);
 
-		l->botones|=2;
-		v.volcar=1;
-	} else if (l->botones&2) {
-		wput(ptr,an,al,l->x+(l->an+1)*l->columnas+1,l->y+(l->al+1)*l->lineas-7,-40);
-		l->botones^=2; v.volcar=1;
+		l->buttons|=2;
+		v.redraw=1;
+	} else if (l->buttons&2) {
+		wput(ptr,an,al,l->x+(l->an+1)*l->columns+1,l->y+(l->al+1)*l->lines-7,-40);
+		l->buttons^=2; v.redraw=1;
 	}
 
-	if (l->zona==4 && (mouse_b&1)) {
+	if (l->zone==4 && (mouse_b&1)) {
 		l->slide=wmouse_y-1;
 		
 		if (l->slide<l->s0) 
@@ -1419,39 +1419,39 @@ void FPG_update_listbox_br(struct t_listboxbr * l) {
 		else if (l->slide>l->s1)
 			l->slide=l->s1;
 
-		if (l->maximo>l->lineas*l->columnas) {
-			n=(l->maximo-l->lineas*l->columnas+l->columnas-1)/l->columnas;
+		if (l->total_items>l->lines*l->columns) {
+			n=(l->total_items-l->lines*l->columns+l->columns-1)/l->columns;
 
 			n=0.5+(float)(n*(l->slide-l->s0))/(l->s1-l->s0);
 
-			if (n!=l->inicial/l->columnas) {
-				l->inicial=n*l->columnas;
+			if (n!=l->first_visible/l->columns) {
+				l->first_visible=n*l->columns;
 				FPG_paint_listbox_br(l); 
 			}
 		} 
 		
-		FPG_paint_slider_br(l); v.volcar=1;
+		FPG_paint_slider_br(l); v.redraw=1;
 
 	} else {
 
-		if (l->maximo<=l->lineas*l->columnas)
+		if (l->total_items<=l->lines*l->columns)
 			n=l->s0;
 		else {
-			n=(l->maximo-l->lineas*l->columnas+l->columnas-1)/l->columnas;
+			n=(l->total_items-l->lines*l->columns+l->columns-1)/l->columns;
 
-			n=(l->s0*(n-l->inicial/l->columnas)+l->s1*(l->inicial/l->columnas))/n;
+			n=(l->s0*(n-l->first_visible/l->columns)+l->s1*(l->first_visible/l->columns))/n;
 		}
 
 		if (n!=l->slide) {
 			l->slide=n; FPG_paint_slider_br(l);
-			v.volcar=1; 
+			v.redraw=1; 
 		}
 	}
 
-	if (old_zona!=l->zona) if (l->zona>=10) { // Marca zona
-		x=l->x+1+((l->zona-10)%l->columnas)*(l->an+1);
-		y=l->y+l->al+((l->zona-10)/l->columnas)*(l->al+1);
-		strcpy(p, l->lista+l->lista_an*(l->inicial+l->zona-10));
+	if (old_zona!=l->zone) if (l->zone>=10) { // Marca zona
+		x=l->x+1+((l->zone-10)%l->columns)*(l->an+1);
+		y=l->y+l->al+((l->zone-10)/l->columns)*(l->al+1);
+		strcpy(p, l->list+l->item_width*(l->first_visible+l->zone-10));
 
 		if(MiFPG->thumb_on)
 			p[5]=0;
@@ -1461,10 +1461,10 @@ void FPG_update_listbox_br(struct t_listboxbr * l) {
 		} else {
 			wwrite_in_box(ptr,an,x+l->an-1,al,x+1,y,6,(byte *)p,c4);
 		} 
-		v.volcar=1;
+		v.redraw=1;
 	}
 
-	switch (l->zona) {
+	switch (l->zone) {
 		case 2: mouse_graf=7; break;
 		case 3: mouse_graf=9; break;
 		case 4: mouse_graf=13; break;
@@ -1495,8 +1495,8 @@ void create_thumb_FPG(struct t_listboxbr * l){
 	} else if (incremento<incremento_maximo)
 		incremento+=512;
 
-	if (l->maximo) {
-		num=l->inicial;
+	if (l->total_items) {
+		num=l->first_visible;
 	
 		do {
 		
@@ -1510,10 +1510,10 @@ void create_thumb_FPG(struct t_listboxbr * l){
 				estado=2; break;
 			}
 
-			if (++num==l->maximo)
+			if (++num==l->total_items)
 				num=0;
 		
-		} while (num!=l->inicial);
+		} while (num!=l->first_visible);
 
 		if (estado==0) {
 				num=-1;
@@ -1684,42 +1684,42 @@ void MAPtoFPG(struct tmapa * mapa) {
 	int  cod=1;
 	byte *imagen;
 
-	if((imagen=(byte *)malloc(mapa->map_an*mapa->map_al))==NULL) {
-		v_texto=(char *)texto[45];
+	if((imagen=(byte *)malloc(mapa->map_width*mapa->map_height))==NULL) {
+		v_text=(char *)texto[45];
 		show_dialog(err0);
 		return;
 	}
 
-	memcpy(imagen, mapa->map, mapa->map_an*mapa->map_al);
+	memcpy(imagen, mapa->map, mapa->map_width*mapa->map_height);
 
 	if(!select_file()) {
 		free(imagen);
 		return;
 	}
 
-	for(y=0; y<mapa->map_al; y++) {
-		for(x=0; x<mapa->map_an; x++) {
-			pos=y*mapa->map_an+x;
+	for(y=0; y<mapa->map_height; y++) {
+		for(x=0; x<mapa->map_width; x++) {
+			pos=y*mapa->map_width+x;
 
 			if(imagen[pos]) {
-				for(ancho=0; ancho<mapa->map_an-x; ancho++) {
+				for(ancho=0; ancho<mapa->map_width-x; ancho++) {
 					if(!imagen[pos+ancho])
 						break;
 					imagen[pos+ancho]=0;
 				}
 
 				imagen[pos]=1;
-				for(alto=0; alto<mapa->map_al-y; alto++) {
+				for(alto=0; alto<mapa->map_height-y; alto++) {
 					
-					if(!imagen[pos+alto*mapa->map_an]) 
+					if(!imagen[pos+alto*mapa->map_width]) 
 						break;
 					
-					imagen[pos+alto*mapa->map_an]=0;
+					imagen[pos+alto*mapa->map_width]=0;
 				}
 				
 				if((ancho-2)*(alto-2) <= 0) {
 					free(imagen);
-					v_texto=(char *)texto[551];
+					v_text=(char *)texto[551];
 					show_dialog(err0);
 					return;
 				}
@@ -1741,7 +1741,7 @@ void GetGrafMAP(struct tmapa *mapa, byte *imagen, int x, int y, int ancho, int a
 	char str_file[13];
 
 	if((buffer=(byte *)malloc(ancho*alto))==NULL) {
-		v_texto=(char *)texto[45];
+		v_text=(char *)texto[45];
 		show_dialog(err0);
 		return;
 	}
@@ -1749,16 +1749,16 @@ void GetGrafMAP(struct tmapa *mapa, byte *imagen, int x, int y, int ancho, int a
 	for(scan_y=0; scan_y<alto; scan_y++) {
 
 		for(scan_x=0; scan_x<ancho; scan_x++) {
-			pos             = (y+scan_y)*mapa->map_an+x+scan_x;
+			pos             = (y+scan_y)*mapa->map_width+x+scan_x;
 			buffer[index++] = imagen[pos];
 			imagen[pos]     = 0;
 		}
 
-		pos         = (y+scan_y)*mapa->map_an+x+scan_x;
+		pos         = (y+scan_y)*mapa->map_width+x+scan_x;
 		imagen[pos] = 0;
 	}
 
-	pos = (y+scan_y)*mapa->map_an+x;
+	pos = (y+scan_y)*mapa->map_width+x;
 	memset(&imagen[pos], 0, ancho+1);
 
 	while(MiFPG->OffsGrf[cod])
@@ -1802,11 +1802,11 @@ void FPGtoMAP(FPG *MiFPG) {
 	byte    *FPGimagen;
 	byte    *FPGmap;
 
-	lmapan=vga_an;
-	lmapal=vga_al;
+	lmapan=vga_width;
+	lmapal=vga_height;
 
 	if((fpg=fopen((char *)MiFPG->ActualFile,"rb"))==NULL) {
-		v_texto=(char *)texto[43];
+		v_text=(char *)texto[43];
 		show_dialog(err0);
 		return;
 	}
@@ -1837,7 +1837,7 @@ void FPGtoMAP(FPG *MiFPG) {
 
 	if((FPGmap=(byte *)malloc(lmapan*lmapal))==NULL) {
 		fclose(fpg);
-		v_texto=(char *)texto[45];
+		v_text=(char *)texto[45];
 		show_dialog(err0);
 		return;
 	}
@@ -1858,7 +1858,7 @@ void FPGtoMAP(FPG *MiFPG) {
 		if((FPGimagen=(byte *)malloc((lgraf[num].an-2)*(lgraf[num].al-2)))==NULL) {
 			fclose(fpg);
 			free(FPGmap);
-			v_texto=(char *)texto[45];
+			v_text=(char *)texto[45];
 			show_dialog(err0);
 			return;
 		}
@@ -1867,7 +1867,7 @@ void FPGtoMAP(FPG *MiFPG) {
 			fclose(fpg);
 			free(FPGmap);
 			free(FPGimagen);
-			v_texto=(char *)texto[44];
+			v_text=(char *)texto[44];
 			show_dialog(err0);
 			return;
 		}
@@ -1879,15 +1879,15 @@ void FPGtoMAP(FPG *MiFPG) {
 
 	fclose(fpg);
 
-	map_an=lmapan;
-	map_al=lmapal;
+	map_width=lmapan;
+	map_height=lmapal;
 
 	if (new_map(FPGmap)) {
 		free(FPGmap);
 		return;
 	}
 	call((voidReturnType )v.paint_handler);
-	v.volcar=1;
+	v.redraw=1;
 }
 
 void PutGrafMAP(byte *imagen, byte *mapa, int num) {
@@ -1984,7 +1984,7 @@ void close_fpg(char *fpg_path) {
   for(m=0;m<max_windows;m++)
   {
     MiFPG = (FPG *)ventana[m].aux;
-    if(ventana[m].tipo==101)
+    if(ventana[m].type==101)
     {
       if(!strcmp(fpg_path, (char *)MiFPG->ActualFile))
       {
@@ -2003,50 +2003,50 @@ void close_fpg(char *fpg_path) {
 int select_file(void) {
 	FPG *MiFPG;
 
-	v_aceptar=0;
-	v_modo=0;
-	v_tipo=4;
-	v_texto=(char *)texto[69];
+	v_accept=0;
+	v_mode=0;
+	v_type=4;
+	v_text=(char *)texto[69];
 	show_dialog(browser0);
 
-	strcpy(full,tipo[v_tipo].path);
+	strcpy(full,tipo[v_type].path);
 
 	if (full[strlen(full)-1]!='/') 
 		strcat(full,"/");
 
 	strcat(full,input);
 
-	if (v_terminado) {
-		if (!v_existe) {
-			v_aceptar=1;
+	if (v_finished) {
+		if (!v_exists) {
+			v_accept=1;
 		} else {
-			v_titulo=(char *)texto[82];
-			v_texto=input;
+			v_title=(char *)texto[82];
+			v_text=input;
 			show_dialog(replace_FPG_0);
 		}
 		
-		if(v_aceptar==1) {
+		if(v_accept==1) {
 			v_aux=(byte *)malloc(sizeof(FPG));
 
 			if(v_aux==NULL) {
-				v_texto=(char *)texto[45]; show_dialog(err0);
+				v_text=(char *)texto[45]; show_dialog(err0);
 				return 0;
 			}
 			close_fpg(full);
 			memset(v_aux, 0, sizeof(FPG));
 			new_window(FPG0N);
-		} else if(v_aceptar==2) {
+		} else if(v_accept==2) {
 			v_aux=(byte *)malloc(sizeof(FPG));
 
 			if(v_aux==NULL) {
-				v_texto=(char *)texto[45]; show_dialog(err0);
+				v_text=(char *)texto[45]; show_dialog(err0);
 				return 0;
 			}
 
 			MiFPG=(FPG *)v_aux;
 			MiFPG->thumb_on=0;
 			MiFPG->FPGInfo=0;
-			MiFPG->lInfoFPG.creada=0;
+			MiFPG->lInfoFPG.created=0;
 			close_fpg(full);
 			memset(v_aux, 0, sizeof(FPG));
 			new_window(FPG0A);
@@ -2066,38 +2066,38 @@ void replace_FPG_1(void) {
 	int an=v.an/big2,al=v.al/big2;
 	_show_items();
 
-	if (v_texto!=NULL) 
-		wwrite(v.ptr,an,al,an/2,12,1,(byte *)v_texto,c3);
+	if (v_text!=NULL) 
+		wwrite(v.ptr,an,al,an/2,12,1,(byte *)v_text,c3);
 }
 
 void replace_FPG_2(void) {
 	_process_items();
 
 	switch(v.active_item) {
-		case 0: v_aceptar=1; fin_dialogo=1; break;
-		case 1: v_aceptar=2; fin_dialogo=1; break;
-		case 2: v_aceptar=3; fin_dialogo=1; break;
+		case 0: v_accept=1; end_dialog=1; break;
+		case 1: v_accept=2; end_dialog=1; break;
+		case 2: v_accept=3; end_dialog=1; break;
 	}
 }
 
 void replace_FPG_0(void) {
 	int x2,x3;
 
-	v.tipo=1;
+	v.type=1;
 	v.an=text_len(texto[510])+text_len(texto[511])+text_len(texto[101])+16;
 	x2= 7+text_len(texto[510]+1)+10;
 	x3=x2+text_len(texto[511]+1)+10;
 
-	if (v_titulo!=NULL) { 
-		v.titulo=(byte *)v_titulo;
-		if (text_len((byte *)v_titulo)+14>v.an) 
-			v.an=text_len((byte *)v_titulo)+14; 
+	if (v_title!=NULL) { 
+		v.title=(byte *)v_title;
+		if (text_len((byte *)v_title)+14>v.an) 
+			v.an=text_len((byte *)v_title)+14; 
 	}
 
-	if (v_texto!=NULL) { 
+	if (v_text!=NULL) { 
 		v.al=38;
-		if (text_len((byte *)v_texto)+6>v.an) 
-			v.an=text_len((byte *)v_texto)+6;
+		if (text_len((byte *)v_text)+6>v.an) 
+			v.an=text_len((byte *)v_text)+6;
 	} else v.al=29;
 
 	v.paint_handler=replace_FPG_1;
@@ -2107,6 +2107,6 @@ void replace_FPG_0(void) {
 	_button(511,x2,v.al-14,0); // Añadir
 	_button(101,x3,v.al-14,0); // Cancelar
 
-	v_aceptar=3;
+	v_accept=3;
 }
 

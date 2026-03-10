@@ -117,7 +117,7 @@ void wbox_in_box(byte*copia,int an_real_copia,int an_copia,int al_copia,byte c,i
 //  Barra de título
 //-----------------------------------------------------------------------------
 
-char gradient[]={
+char dither_pattern[]={
   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
   0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
   0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,
@@ -166,7 +166,7 @@ void wgra(byte*copia,int an_copia,int al_copia,byte color,int x,int y,int an,int
       c=(cn-1)*xx*16/an; m=c%16; c/=16;
       yy=0;
       do {
-        if (gradient[m*16+(xx%4)+(yy%4)*4]) {
+        if (dither_pattern[m*16+(xx%4)+(yy%4)*4]) {
           copia[(y+yy)*an_copia+(x+xx)]=cs[c+1];
         } else {
           copia[(y+yy)*an_copia+(x+xx)]=cs[c];

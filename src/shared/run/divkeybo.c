@@ -270,8 +270,8 @@ byte oldhatval;
 void poll_keyboard(void) {
 SDL_Event event;
 if(vwidth == 0 && vheight == 0) {
-	vwidth = vga_an;
-	vheight = vga_al;
+	vwidth = vga_width;
+	vheight = vga_height;
 }
 	while(SDL_PollEvent(&event)) {	
 		// check keys
@@ -326,9 +326,9 @@ if(vwidth == 0 && vheight == 0) {
 		mouse->x = event.motion.x;
 		mouse->y = event.motion.y;
 
-		if(vga_an != vwidth || vga_al != vheight) {
-			mouse->x = (int)(event.motion.x*(float)((float)vga_an / (float)vwidth));
-			mouse->y = (int)(event.motion.y*(float)((float)vga_al / (float)vheight));
+		if(vga_width != vwidth || vga_height != vheight) {
+			mouse->x = (int)(event.motion.x*(float)((float)vga_width / (float)vwidth));
+			mouse->y = (int)(event.motion.y*(float)((float)vga_height / (float)vheight));
 			SDL_Log("Mouse: VX: %d VY: %d x: %d y: %d\n",mouse->x, mouse->y, event.motion.x,event.motion.y);
 		}
 

@@ -38,17 +38,17 @@ void sp_normal( byte * p, int x, int y, int an, int al,
 
   x-=xg; y-=yg;
 
-  q=map+y*map_an+x;
+  q=map+y*map_width+x;
 
   if (x<0) salta_x=-x; else salta_x=0;
-  if (x+an>map_an) resto_x=x+an-map_an; else resto_x=0;
+  if (x+an>map_width) resto_x=x+an-map_width; else resto_x=0;
   long_x=an-salta_x-resto_x;
 
   if (y<0) salta_y=-y; else salta_y=0;
-  if (y+al>map_al) resto_y=y+al-map_al; else resto_y=0;
+  if (y+al>map_height) resto_y=y+al-map_height; else resto_y=0;
   long_y=al-salta_y-resto_y;
 
-  p+=an*salta_y+salta_x; q+=map_an*salta_y+salta_x;
+  p+=an*salta_y+salta_x; q+=map_width*salta_y+salta_x;
   resto_x+=salta_x; an=long_x;
 
   switch(flags) {
@@ -59,7 +59,7 @@ void sp_normal( byte * p, int x, int y, int an, int al,
         if (*p) *q=*p;
         p++; q++;
       } while (--an);
-      q+=map_an-(an=long_x); p+=resto_x;
+      q+=map_width-(an=long_x); p+=resto_x;
     } while (--long_y);
     break;
 
@@ -69,7 +69,7 @@ void sp_normal( byte * p, int x, int y, int an, int al,
         if (*p) *q=*(ghost+*q+*p*256);
         p++; q++;
       } while (--an);
-      q+=map_an-(an=long_x); p+=resto_x;
+      q+=map_width-(an=long_x); p+=resto_x;
     } while (--long_y);
     break;
 
@@ -79,7 +79,7 @@ void sp_normal( byte * p, int x, int y, int an, int al,
         *q=*p;
         p++; q++;
       } while (--an);
-      q+=map_an-(an=long_x); p+=resto_x;
+      q+=map_width-(an=long_x); p+=resto_x;
     } while (--long_y);
     break;
 
@@ -89,7 +89,7 @@ void sp_normal( byte * p, int x, int y, int an, int al,
         *q=*(ghost+*q+*p*256);
         p++; q++;
       } while (--an);
-      q+=map_an-(an=long_x); p+=resto_x;
+      q+=map_width-(an=long_x); p+=resto_x;
     } while (--long_y);
     break;
 
@@ -106,17 +106,17 @@ void sp_normal_mask( byte * p, int x, int y, int an, int al,
 
   x-=xg; y-=yg;
 
-  q=map+y*map_an+x;
+  q=map+y*map_width+x;
 
   if (x<0) salta_x=-x; else salta_x=0;
-  if (x+an>map_an) resto_x=x+an-map_an; else resto_x=0;
+  if (x+an>map_width) resto_x=x+an-map_width; else resto_x=0;
   long_x=an-salta_x-resto_x;
 
   if (y<0) salta_y=-y; else salta_y=0;
-  if (y+al>map_al) resto_y=y+al-map_al; else resto_y=0;
+  if (y+al>map_height) resto_y=y+al-map_height; else resto_y=0;
   long_y=al-salta_y-resto_y;
 
-  p+=an*salta_y+salta_x; q+=map_an*salta_y+salta_x;
+  p+=an*salta_y+salta_x; q+=map_width*salta_y+salta_x;
   resto_x+=salta_x; an=long_x;
 
   switch(flags) {
@@ -127,7 +127,7 @@ void sp_normal_mask( byte * p, int x, int y, int an, int al,
         if (*p && !mask[*q]) *q=*p;
         p++; q++;
       } while (--an);
-      q+=map_an-(an=long_x); p+=resto_x;
+      q+=map_width-(an=long_x); p+=resto_x;
     } while (--long_y);
     break;
 
@@ -137,7 +137,7 @@ void sp_normal_mask( byte * p, int x, int y, int an, int al,
         if (*p && !mask[*q]) *q=*(ghost+*q+*p*256);
         p++; q++;
       } while (--an);
-      q+=map_an-(an=long_x); p+=resto_x;
+      q+=map_width-(an=long_x); p+=resto_x;
     } while (--long_y);
     break;
 
@@ -147,7 +147,7 @@ void sp_normal_mask( byte * p, int x, int y, int an, int al,
         if (!mask[*q]) *q=*p;
         p++; q++;
       } while (--an);
-      q+=map_an-(an=long_x); p+=resto_x;
+      q+=map_width-(an=long_x); p+=resto_x;
     } while (--long_y);
     break;
 
@@ -157,7 +157,7 @@ void sp_normal_mask( byte * p, int x, int y, int an, int al,
         if (!mask[*q]) *q=*(ghost+*q+*p*256);
         p++; q++;
       } while (--an);
-      q+=map_an-(an=long_x); p+=resto_x;
+      q+=map_width-(an=long_x); p+=resto_x;
     } while (--long_y);
     break;
 
@@ -206,7 +206,7 @@ void sp_rotated( byte * si, int x, int y, int an, int al, int xg, int yg,
     n+=2;
   } while (n<16);
 
-  l1=l0; hmax0=hmin; hmax1=hmin; ptrmap=map+hmin*map_an;
+  l1=l0; hmax0=hmin; hmax1=hmin; ptrmap=map+hmin*map_width;
 
   h=hmin; do {
 
@@ -266,24 +266,24 @@ void sp_rotated( byte * si, int x, int y, int an, int al, int xg, int yg,
       }
     }
 
-    if (h<map_al && h>=0 && x0.w[1]<map_an && x1.w[1]>=0 && x1.w[1]>x0.w[1]) {
+    if (h<map_height && h>=0 && x0.w[1]<map_width && x1.w[1]>=0 && x1.w[1]>x0.w[1]) {
     
     if (!mask_on) {
-      if (x0.w[1]<0) if (x1.w[1]>=map_an)
-        sp_scan_clipped(ptrmap,x1.w[1]-x0.w[1],map_an-1,-x0.w[1],si,an,g0x.l,g0y.l,g1x.l,g1y.l,flags);
+      if (x0.w[1]<0) if (x1.w[1]>=map_width)
+        sp_scan_clipped(ptrmap,x1.w[1]-x0.w[1],map_width-1,-x0.w[1],si,an,g0x.l,g0y.l,g1x.l,g1y.l,flags);
       else
         sp_scan_clipped(ptrmap,x1.w[1]-x0.w[1],x1.w[1],-x0.w[1],si,an,g0x.l,g0y.l,g1x.l,g1y.l,flags);
-      else if (x1.w[1]>=map_an)
-        sp_scan_clipped(ptrmap+x0.w[1],x1.w[1]-x0.w[1],map_an-1-x0.w[1],0,si,an,g0x.l,g0y.l,g1x.l,g1y.l,flags);
+      else if (x1.w[1]>=map_width)
+        sp_scan_clipped(ptrmap+x0.w[1],x1.w[1]-x0.w[1],map_width-1-x0.w[1],0,si,an,g0x.l,g0y.l,g1x.l,g1y.l,flags);
       else
         sp_scan(ptrmap+x0.w[1],x1.w[1]-x0.w[1],si,an,g0x.l,g0y.l,g1x.l,g1y.l,flags);
     } else {
-      if (x0.w[1]<0) if (x1.w[1]>=map_an)
-        sp_scanc_mask(ptrmap,x1.w[1]-x0.w[1],map_an-1,-x0.w[1],si,an,g0x.l,g0y.l,g1x.l,g1y.l,flags);
+      if (x0.w[1]<0) if (x1.w[1]>=map_width)
+        sp_scanc_mask(ptrmap,x1.w[1]-x0.w[1],map_width-1,-x0.w[1],si,an,g0x.l,g0y.l,g1x.l,g1y.l,flags);
       else
         sp_scanc_mask(ptrmap,x1.w[1]-x0.w[1],x1.w[1],-x0.w[1],si,an,g0x.l,g0y.l,g1x.l,g1y.l,flags);
-      else if (x1.w[1]>=map_an)
-        sp_scanc_mask(ptrmap+x0.w[1],x1.w[1]-x0.w[1],map_an-1-x0.w[1],0,si,an,g0x.l,g0y.l,g1x.l,g1y.l,flags);
+      else if (x1.w[1]>=map_width)
+        sp_scanc_mask(ptrmap+x0.w[1],x1.w[1]-x0.w[1],map_width-1-x0.w[1],0,si,an,g0x.l,g0y.l,g1x.l,g1y.l,flags);
       else
         sp_scan_mask(ptrmap+x0.w[1],x1.w[1]-x0.w[1],si,an,g0x.l,g0y.l,g1x.l,g1y.l,flags);
     }
@@ -292,7 +292,7 @@ void sp_rotated( byte * si, int x, int y, int an, int al, int xg, int yg,
 	
     x0.l+=ix0; x1.l+=ix1; g0x.l+=ig0x; g1x.l+=ig1x; g0y.l+=ig0y; g1y.l+=ig1y;
 
-    ptrmap+=map_an;
+    ptrmap+=map_width;
 
   } while (h++<hmax);
 
@@ -503,7 +503,7 @@ void sp_size( int *x, int *y, int *an, int *al, int xg, int yg,
   p[4]=*x+(int)((float)cos(a2)*d2); p[5]=*y+(int)(-(float)sin(a2)*d2);
   p[6]=*x+(int)((float)cos(a3)*d3); p[7]=*y+(int)(-(float)sin(a3)*d3);
 
-  x0=map_an; y0=map_al; x1=-map_an; y1=-map_al;
+  x0=map_width; y0=map_height; x1=-map_width; y1=-map_height;
 
   for (n=0;n<8;n++) {
     if (x0>p[n]) { x0=p[n]; } if (x1<p[n]) { x1=p[n]; } n++;
