@@ -103,7 +103,7 @@ typedef struct tagRGBQUAD
 //      MAP Format
 //-----------------------------------------------------------------------------
 
-int es_MAP (byte * buffer) {
+int is_MAP (byte * buffer) {
 	if (!strcmp((char *)buffer,"map\x1a\x0d\x0a")) {
 		map_an=*(word*)(buffer+8);
 		map_al=*(word*)(buffer+10);
@@ -132,7 +132,7 @@ void descomprime_MAP (byte * buffer, byte * mapa, int vent) {
 	memcpy(mapa,buffer+1394+(npuntos*4),map_an*map_al);
 }
 
-int graba_MAP (byte * mapa, FILE * f) {
+int save_MAP (byte * mapa, FILE * f) {
 
 	word x,npuntos=0;
 	int y;
@@ -209,7 +209,7 @@ struct pcx_struct {
 //      Functions
 //-----------------------------------------------------------------------------
 
-int es_PCX(byte *buffer)
+int is_PCX(byte *buffer)
 {
 	int loes=0;
 
@@ -228,7 +228,7 @@ int es_PCX(byte *buffer)
 }
 
 extern byte * muestra;
-extern byte nueva_paleta[768];
+extern byte apply_palette[768];
 extern int num_colores;
 void crear_paleta(void);
 void browser2(void);
@@ -462,7 +462,7 @@ void descomprime_PCX(byte *buffer, byte *mapa, int vent)
       free(muestra); free(pSrc=AuxPtr);
       muestra=old_muestra;
 
-      memcpy(&dac4[0],&nueva_paleta[0],768);
+      memcpy(&dac4[0],&apply_palette[0],768);
 
     }
 
@@ -474,7 +474,7 @@ void descomprime_PCX(byte *buffer, byte *mapa, int vent)
   }
 }
 
-int graba_PCX(byte *mapa,FILE *f) {
+int save_PCX(byte *mapa,FILE *f) {
   byte p[768];
   int x;
   byte *cbuffer;
@@ -614,7 +614,7 @@ typedef struct tagBITMAPINFOHEADER
 } BITMAPINFOHEADER;
 #endif
 
-int es_BMP(byte *buffer)
+int is_BMP(byte *buffer)
 {
   BITMAPFILEHEADER FileHeader;
   BITMAPINFOHEADER InfoHeader;
@@ -922,7 +922,7 @@ void descomprime_BMP(byte *buffer, byte *mapa, int vent)
 
       free(muestra);
       muestra=old_muestra;
-      memcpy(&dac4[0],&nueva_paleta[0],768);
+      memcpy(&dac4[0],&apply_palette[0],768);
 
     }
   }
@@ -998,7 +998,7 @@ return(1);
 //      Formato JPG
 //-----------------------------------------------------------------------------
 
-int es_JPG(byte *buffer, int img_filesize)
+int is_JPG(byte *buffer, int img_filesize)
 {
 	return 0;
 	

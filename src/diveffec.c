@@ -141,7 +141,7 @@ int paint_explosion(void) {
         for (y=0;y<exp_alto;y++)
         {
         Progress((char *)texto[434],y,exp_alto);
-        tecla(); if (key(_ESC)) { Progress((char *)texto[434],exp_alto,exp_alto); return(1); }
+        poll_keyboard(); if (key(_ESC)) { Progress((char *)texto[434],exp_alto,exp_alto); return(1); }
                 for (x=0;x<exp_ancho;x++)
                 {
                         exp_Coloracum=0;

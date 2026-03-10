@@ -15,19 +15,19 @@
 #include <time.h>
 #include <sched.h>
 
-void busca_packfile(void);
+void find_packfile(void);
 
 void InitHandler(int);
 int DetectBlaster(int*,int*,int*,int*,int*);
 int DetectGUS(int*,int*,int*,int*,int*);
 void system_font(void);
 void interprete (void);
-void crea_cuad(void);
+void create_color_lookup(void);
 void exec_process(void);
 void finalization (void);
-void elimina_proceso(int id);
-void nucleo_exec(void);
-void nucleo_trace(void);
+void kill_process(int id);
+void core_exec(void);
+void core_trace(void);
 int get_reloj(void);
 
 
@@ -387,7 +387,7 @@ void initialization (void) {
 
   ghost=(byte *)((uintptr_t)(ghost_inicial+512));//&0xFFFFFF00);
 
-  crea_cuad();
+  create_color_lookup();
 
   // Crea los dos primeros procesos, init y main
 
@@ -437,7 +437,7 @@ time(&dtime);
 
 init_rnd(dtime);
 
-  detectar_vesa();
+  detect_vesa();
 
   for (n=0;n<num_video_modes;n++) {
     if (video_modes[n].ancho==vga_an && video_modes[n].alto==vga_al) {
@@ -449,7 +449,7 @@ init_rnd(dtime);
 	vvga_al = vga_al;
 
 
-  svmode();
+  setup_video_mode();
   _mouse_x=mouse->x; _mouse_y=mouse->y;
 
   memset(&paleta[0],0,768); memset(&dac[0],0,768);
@@ -504,7 +504,7 @@ init_rnd(dtime);
 
   init_sin_cos(); // Tablas de seno y coseno para el modo7
 
-  memcpy(paleta,system_dac,768); nueva_paleta();
+  memcpy(paleta,system_dac,768); apply_palette();
 
   adaptar_paleta=0; // Hasta que no se llame a force_pal ...
 
@@ -518,7 +518,7 @@ init_rnd(dtime);
   npackfiles=0;
 
   #ifndef DEBUG
-  busca_packfile();
+  find_packfile();
   #endif
 
   init_flush();
@@ -545,7 +545,7 @@ init_rnd(dtime);
 //  Crea la tabla de cuadrados
 //-----------------------------------------------------------------------------
 
-void crea_cuad(void) {
+void create_color_lookup(void) {
   int a,b;
 
   if((cuad=(byte*)malloc(16384))==NULL) exer(1);
@@ -600,14 +600,14 @@ void system_font(void) {
 //-----------------------------------------------------------------------------
 
 // Funciones:
-//      guarda_pila(id,sp,mem[id+_SP]); // En lfrm y lfrf de funciones
-//      carga_pila(id);                 // En exec_process/trace_process
-//      actualiza_pila(id,valor);       // Pone un valor al final de la pila (rtf)
+//      save_stack(id,sp,mem[id+_SP]); // En lfrm y lfrf de funciones
+//      load_stack(id);                 // En exec_process/trace_process
+//      update_stack(id,valor);       // Pone un valor al final de la pila (rtf)
 
 // * (int *) mem[id+_SP] = {SP1,SP2,DATOS...}
 int stacks=0;
 
-void guarda_pila(int id, int sp1, int sp2) {
+void save_stack(int id, int sp1, int sp2) {
   int n;
   memptrsize * p;
   p=(memptrsize*)malloc((sp2-sp1+3)*sizeof(memptrsize));
@@ -630,10 +630,10 @@ void guarda_pila(int id, int sp1, int sp2) {
 
 /* Restore a process's saved execution stack from its heap-allocated backup.
  * Called when resuming a process in exec_process(). The backup (created by
- * guarda_pila) stores [sp_low, sp_high, data...]; this copies data back
+ * save_stack) stores [sp_low, sp_high, data...]; this copies data back
  * into pila[], sets sp to sp_high, and frees the backup.
  */
-void carga_pila(int id) {
+void load_stack(int id) {
   int n;
   int32_t * p;
   if (mem[id+_SP]) {
@@ -650,7 +650,7 @@ void carga_pila(int id) {
   } else sp=0;
 }
 
-void actualiza_pila(int id, int valor) {
+void update_stack(int id, int valor) {
   int32_t * p;
   if (mem[id+_SP]) {
     p=(int32_t*)(uintptr_t)stack[mem[id+_SP]];
@@ -675,11 +675,11 @@ void mainloop(void) {
 #ifndef DEBUG
   if(splashtime>0) {
     if(OSDEP_GetTicks()<splashtime) {
-      tecla();
+      poll_keyboard();
       return;
     } else {
       splashtime=0;
-      svmode();
+      setup_video_mode();
     }
   }
 #endif
@@ -727,7 +727,7 @@ void interprete (void)
 }
 
 #ifdef __EMSCRIPTEN__
-void es_fps(byte f) {
+void is_fps(byte f) {
 }	
 #endif
 //-----------------------------------------------------------------------------
@@ -781,7 +781,7 @@ void exec_process(void) {
 		} else {
 			id=ide;
 			ip=mem[id+_IP];
-			carga_pila(id);
+			load_stack(id);
 
 #ifdef DEBUG
 			continue_process:
@@ -789,7 +789,7 @@ void exec_process(void) {
 
 			max_reloj=get_reloj()+max_process_time;
 
-			nucleo_exec();
+			core_exec();
 
 			id=ide; 
 			
@@ -807,7 +807,7 @@ void exec_process(void) {
 
 int oo; // Para usos internos en el kernel
 
-void nucleo_exec() {
+void core_exec() {
 
 	do {
 		switch ((byte)mem[ip++]){
@@ -861,13 +861,13 @@ void trace_process(void) {
 		} else {
 			id=ide;
 			ip=mem[id+_IP];
-			carga_pila(id);
+			load_stack(id);
 
 			continue_process:
 
 			max_reloj=get_reloj()+max_process_time;
 
-			nucleo_trace();
+			core_trace();
 		}
 	}
 
@@ -878,7 +878,7 @@ void trace_process(void) {
 //  Núcleo interno del intérprete, cuando se está trazando
 //-----------------------------------------------------------------------------
 
-void nucleo_trace(void) {
+void core_trace(void) {
 
 	switch ((byte)mem[ip++]) {
 #define TRACE
@@ -928,12 +928,12 @@ void frame_start(void) {
 
 	ascii=0;
 	scan_code=0;
-	tecla();
+	poll_keyboard();
 
 	// Pause while app has lost focus (alt-tab, minimize)
 	while (app_paused && !alt_x) {
 		SDL_Delay(50);
-		tecla();
+		poll_keyboard();
 	}
 
   // Control screensaver
@@ -977,14 +977,14 @@ void frame_start(void) {
 				if (buffer_to_video!=NULL) 
 					buffer_to_video(); 
 				else
-					volcado((byte*)copia);
+					blit_screen((byte*)copia);
 			} while (!ss_exit);
 			
 			if (ss_end!=NULL) 
 				ss_end();
 
 			memcpy(copia,copia2,vga_an*vga_al);
-			volcado_parcial(0,0,vga_an,vga_al);
+			blit_partial(0,0,vga_an,vga_al);
 			ss_time_counter=get_reloj()+ss_time;
 		}
 	}
@@ -997,7 +997,7 @@ void frame_start(void) {
 
 	for (ide=id_start; ide<=id_end; ide+=iloc_len)
 		if (mem[ide+_Status]==1) 
-			elimina_proceso(ide);
+			kill_process(ide);
 
 #ifdef DEBUG
 	function_exec(255,get_ticks()-oreloj);
@@ -1063,7 +1063,7 @@ void frame_start(void) {
 		}
 #else
 		do {
-			retrazo();
+			retrace_wait();
 		} while (get_reloj()<(int)freloj);
 #endif
 		volcados_saltados=0;
@@ -1200,7 +1200,7 @@ void frame_end(void) {
 
 	for (ide=id_start; ide<=id_end; ide+=iloc_len) {
 		mem[ide+_Executed]=0; // Sin ejecutar
-		mem[ide+_x1]=-1; // Sin región de volcado
+		mem[ide+_x1]=-1; // Sin región de blit_screen
 	}
 
 	for (n=0;n<10;n++) {
@@ -1272,7 +1272,7 @@ void frame_end(void) {
 							memb[nullstring[1]*4]=0;
 							memb[nullstring[2]*4]=0;
 							memb[nullstring[3]*4]=0;
-							pinta_textos(0);
+							paint_texts(0);
 #ifdef DEBUG
 							function_exec(250,get_ticks()-oreloj);
 #endif
@@ -1296,7 +1296,7 @@ void frame_end(void) {
 								break;
 
 						if (n<max_drawings) {
-							pinta_drawings();
+							paint_drawings();
 #ifdef DEBUG
 							function_exec(250,get_ticks()-oreloj);
 #endif
@@ -1311,11 +1311,11 @@ void frame_end(void) {
 					else if (iscroll[snum].on==2) 
 						scroll_parallax();
 				} else if (m7ide) {
-					pinta_m7(m7ide-1);
+					paint_m7(m7ide-1);
 					im7[m7ide-1].painted=1;
 				} else if (ide) {
 					if (mem[ide+_Graph]>0 || mem[ide+_XGraph]>0) {
-						pinta_sprite();
+						paint_sprite();
 #ifdef DEBUG
 						process_paint(ide,get_ticks()-oreloj);
 #endif
@@ -1332,7 +1332,7 @@ void frame_end(void) {
 				ide=id; 
 
 				if (mem[ide+_Graph]>0 || mem[ide+_XGraph]>0) {
-					pinta_sprite();
+					paint_sprite();
 				}
 			}
 
@@ -1358,7 +1358,7 @@ void frame_end(void) {
 					memb[nullstring[1]*4]=0;
 					memb[nullstring[2]*4]=0;
 					memb[nullstring[3]*4]=0;
-					pinta_textos(0);
+					paint_texts(0);
 #ifdef DEBUG
 					function_exec(250,get_ticks()-oreloj);
 #endif
@@ -1367,7 +1367,7 @@ void frame_end(void) {
 #endif // NDEFNOTYET
 
 				if (demo)
-					pinta_textos(max_textos);
+					paint_texts(max_textos);
 
 				if (post_process_buffer!=NULL)
 					post_process_buffer();
@@ -1375,13 +1375,13 @@ void frame_end(void) {
     // Si se está haciendo un fade lo continúa
 
 				if (now_dacout_r!=dacout_r || now_dacout_g!=dacout_g || now_dacout_b!=dacout_b) {
-					set_paleta();
+					update_palette();
 					set_dac();
 					fading=1;
 					retra=1;
 				} else {
 					if (activar_paleta) {
-						set_paleta();
+						update_palette();
 						set_dac();
 						retra=1;
 						activar_paleta--;
@@ -1399,14 +1399,14 @@ void frame_end(void) {
 #endif
 
 					if (!retra && vsync)
-						retrazo();
+						retrace_wait();
 
 					if (buffer_to_video!=NULL) {
 						buffer_to_video();
 					} else {
 
 					  if (old_dump_type) {
-						volcado_completo=1; volcado((byte*)copia);
+						volcado_completo=1; blit_screen((byte*)copia);
 					  } else {
 
 							volcado_completo=0;
@@ -1414,42 +1414,42 @@ void frame_end(void) {
 							// Añade los volcados de este frame a los restore del anterior
 
 							for (n=id_start; n<=id_end; n+=iloc_len)
-								if (mem[n+_x1]!=-1) volcado_parcial(mem[n+_x0],mem[n+_y0],mem[n+_x1]-mem[n+_x0]+1,mem[n+_y1]-mem[n+_y0]+1);
+								if (mem[n+_x1]!=-1) blit_partial(mem[n+_x0],mem[n+_y0],mem[n+_x1]-mem[n+_x0]+1,mem[n+_y1]-mem[n+_y0]+1);
 									for (n=0;n<10;n++) {
 										if (im7[n].on)
-											volcado_parcial(im7[n].x,im7[n].y,im7[n].an,im7[n].al);
+											blit_partial(im7[n].x,im7[n].y,im7[n].an,im7[n].al);
 										
-										if (iscroll[n].on) volcado_parcial(iscroll[n].x,iscroll[n].y,iscroll[n].an,iscroll[n].al);
+										if (iscroll[n].on) blit_partial(iscroll[n].x,iscroll[n].y,iscroll[n].an,iscroll[n].al);
 									}
 
 							if (mouse_x1!=-1)
-								volcado_parcial(mouse_x0,mouse_y0,mouse_x1-mouse_x0+1,mouse_y1-mouse_y0+1);
+								blit_partial(mouse_x0,mouse_y0,mouse_x1-mouse_x0+1,mouse_y1-mouse_y0+1);
 
 							for (n=0;n<max_textos;n++)
 								if (texto[n].font && texto[n].an)
-									volcado_parcial(texto[n].x0,texto[n].y0,texto[n].an,texto[n].al);
+									blit_partial(texto[n].x0,texto[n].y0,texto[n].an,texto[n].al);
 
-							// Realiza un volcado parcial
+							// Realiza un blit_screen parcial
 
-							volcado((byte*)copia);
+							blit_screen((byte*)copia);
 
 						}
 
 						if (dump_type==0 || restore_type==0) { // Fija los restore para el siguiente frame
 
 							for (n=id_start; n<=id_end; n+=iloc_len)
-								if (mem[n+_x1]!=-1) volcado_parcial(mem[n+_x0],mem[n+_y0],mem[n+_x1]-mem[n+_x0]+1,mem[n+_y1]-mem[n+_y0]+1);
+								if (mem[n+_x1]!=-1) blit_partial(mem[n+_x0],mem[n+_y0],mem[n+_x1]-mem[n+_x0]+1,mem[n+_y1]-mem[n+_y0]+1);
 									for (n=0;n<10;n++) {
 										if (im7[n].on)
-											volcado_parcial(im7[n].x,im7[n].y,im7[n].an,im7[n].al);
+											blit_partial(im7[n].x,im7[n].y,im7[n].an,im7[n].al);
 										
 										if (iscroll[n].on)
-											volcado_parcial(iscroll[n].x,iscroll[n].y,iscroll[n].an,iscroll[n].al);
+											blit_partial(iscroll[n].x,iscroll[n].y,iscroll[n].an,iscroll[n].al);
 									}
-							if (mouse_x1!=-1) volcado_parcial(mouse_x0,mouse_y0,mouse_x1-mouse_x0+1,mouse_y1-mouse_y0+1);
+							if (mouse_x1!=-1) blit_partial(mouse_x0,mouse_y0,mouse_x1-mouse_x0+1,mouse_y1-mouse_y0+1);
 							for (n=0;n<max_textos+1;n++)
 								if (texto[n].font && texto[n].an)
-									volcado_parcial(texto[n].x0,texto[n].y0,texto[n].an,texto[n].al);
+									blit_partial(texto[n].x0,texto[n].y0,texto[n].an,texto[n].al);
 						}
 
 					}
@@ -1465,7 +1465,7 @@ void frame_end(void) {
 				}
 #endif
 
-	} // saltar volcado
+	} // saltar blit_screen
 
 }
 
@@ -1473,7 +1473,7 @@ void frame_end(void) {
 // Remove a process
 ///////////////////////////////////////////////////////////////////////////////
 
-void elimina_proceso(int id) {
+void kill_process(int id) {
 	int id2;
 
 #ifdef LLPROC
@@ -1532,7 +1532,7 @@ void finalization (void) {
 	dacout_speed=4;
 	fade_wait();
 
-	rvmode();
+	reset_video_mode();
 
 	kbdReset();
 
@@ -1642,7 +1642,7 @@ void exer(int e) {
 #endif
 
 
-	rvmode();
+	reset_video_mode();
 
 	kbdReset();
 
@@ -1689,7 +1689,7 @@ void e(int texto) {
 	} else {
 		printf("Error %d %s\n\n",texto,text[texto]);
 	}
-	rvmode();
+	reset_video_mode();
 
 	kbdReset();
 
@@ -1867,9 +1867,9 @@ if(argc>1 && exesize==0) {
 	fgets(prgpath, _MAX_PATH,fsf);
 	fclose(fsf);
 }
-  inicializa_textos((byte *)"system/lenguaje.int");
+  initialize_texts((byte *)"system/lenguaje.int");
 #else
-  inicializa_textos((byte *)argv[0]);
+  initialize_texts((byte *)argv[0]);
 #endif
 
 // check if div1 or div2 exe
@@ -2123,7 +2123,7 @@ int is_pak(FILE *f, char *name) {
 //  Search the packfile (for installed games)
 //////////////////////////////////////////////////////////////////////////////
 
-void busca_packfile(void) {
+void find_packfile(void) {
 #ifdef ZLIB
   #ifndef UNZ_MAXFILENAMEINZIP
     #define UNZ_MAXFILENAMEINZIP (256)

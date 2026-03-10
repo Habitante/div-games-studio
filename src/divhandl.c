@@ -67,7 +67,7 @@ int cargadac_FPG(char *name);
 int cargadac_PAL(char *name);
 void crear_paleta(void);
 
-extern byte nueva_paleta[768];
+extern byte apply_palette[768];
 extern byte * muestra;
 
 //-----------------------------------------------------------------------------
@@ -1035,7 +1035,7 @@ void generate_fontmap(void) {
 
   if (v_mapa!=NULL && v_mapa->map!=NULL) {
 
-    // Ojo! calcular "c4" como un color !=0 !=c4 que no esté
+    // Ojo! do_calculate "c4" como un color !=0 !=c4 que no esté
     // en el font y lo mas parecido a c4 posible
 
     memset(col,0,256);
@@ -2275,7 +2275,7 @@ void update_listbox(struct t_listbox * l) {
 
   if ((mouse_b&8 && l->zona>0) || (l->zona==2 && ((mouse_b&1)||(v_pausa&&!(mouse_b&1)&&(old_mouse_b&1))))) {
     if (!v_pausa||(v_pausa&&!(mouse_b&1)&&(old_mouse_b&1))) {
-        if ((old_mouse_b&1)&&!v_pausa) { retrazo(); retrazo(); }
+        if ((old_mouse_b&1)&&!v_pausa) { retrace_wait(); retrace_wait(); }
         if (l->inicial) {
           l->inicial--; paint_listbox(l); v.volcar=1; }
     }
@@ -2286,7 +2286,7 @@ void update_listbox(struct t_listbox * l) {
 
   if ((mouse_b&4 && l->zona>0) || (l->zona==3 && ((mouse_b&1)||(v_pausa&&!(mouse_b&1)&&(old_mouse_b&1))))) {
     if (!v_pausa||(v_pausa&&!(mouse_b&1)&&(old_mouse_b&1))) {
-      if ((old_mouse_b&1)&&!v_pausa) { retrazo(); retrazo(); }
+      if ((old_mouse_b&1)&&!v_pausa) { retrace_wait(); retrace_wait(); }
       n=l->maximo-l->inicial;
       if (n>l->lista_al) {
         l->inicial++; paint_listbox(l); v.volcar=1; }
@@ -2642,7 +2642,7 @@ void open_map(void) {
   if (muestra!=NULL) {
     crear_paleta();
     free(muestra);
-    memcpy(pal,nueva_paleta,768);
+    memcpy(pal,apply_palette,768);
   }
 
   // Tenemos en pal[] la paleta de los mapas a cargar
@@ -2695,10 +2695,10 @@ void open_map(void) {
           fseek(f,0,SEEK_SET);
           if (fread(buffer,1,n,f)==n) {
 
-            if (es_MAP(buffer)) tipomapa=1;
-            else if (es_PCX(buffer)) tipomapa=2;
-            else if (es_BMP(buffer)) tipomapa=3;
-            else if (es_JPG(buffer,n)) tipomapa=4;
+            if (is_MAP(buffer)) tipomapa=1;
+            else if (is_PCX(buffer)) tipomapa=2;
+            else if (is_BMP(buffer)) tipomapa=3;
+            else if (is_JPG(buffer,n)) tipomapa=4;
             else tipomapa=0;
 
             if (tipomapa) {
@@ -2802,8 +2802,8 @@ void save_map(void) {
       tipomapa=0;
 
       switch(tipomapa) {
-        case 0: e=graba_MAP(map,f); break;
-        case 1: e=graba_PCX(map,f); break;
+        case 0: e=save_MAP(map,f); break;
+        case 1: e=save_PCX(map,f); break;
         case 2: e=graba_BMP(map,f); break;
       } if (e==2) { v_texto=(char *)texto[48]; show_dialog(err0); }
 
@@ -2948,10 +2948,10 @@ int Colors[9],min_dist,i,dist;
           Colors[4]=c2;
           Colors[6]=c3;
           Colors[8]=c4;
-          Colors[1]=media(c0,c1);
-          Colors[3]=media(c1,c2);
-          Colors[5]=media(c2,c3);
-          Colors[7]=media(c3,c4);
+          Colors[1]=average_color(c0,c1);
+          Colors[3]=average_color(c1,c2);
+          Colors[5]=average_color(c2,c3);
+          Colors[7]=average_color(c3,c4);
 
           for (n=0;n<190;n++)
           {
@@ -3290,10 +3290,10 @@ int Colors[9],min_dist,i,dist;
           Colors[4]=c2;
           Colors[6]=c3;
           Colors[8]=c4;
-          Colors[1]=media(c0,c1);
-          Colors[3]=media(c1,c2);
-          Colors[5]=media(c2,c3);
-          Colors[7]=media(c3,c4);
+          Colors[1]=average_color(c0,c1);
+          Colors[3]=average_color(c1,c2);
+          Colors[5]=average_color(c2,c3);
+          Colors[7]=average_color(c3,c4);
 
           for (n=0;n<190;n++)
           {

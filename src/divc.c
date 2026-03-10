@@ -51,7 +51,7 @@
 // 45 - Fallo del coloreador (debajo de process ... poner ?????????)
 // 46 - Que en las listas de procesos (F5) aparezcan también las funciones (editor y debugger)
 // 47 - Fallo de que desaparezcan (completamente) los sprites en los modos 8
-// 48 - Pasar los IMPORT al comienzo del programa y emitir un error adecuado para los IMPORT antiguos (y adaptar help)
+// 48 - Pasar los IMPORT al comienzo del programa y emitir un error adecuado para los IMPORT antiguos (y adapt_palette help)
 // 49 - Quitado el formateador de listados (dejado todo en divfrm.cpp por si en el futuro se quiere hacer, de forma separada a divc.cpp)
 // 50 - Que las funciones puedan devolver un valor con return despues de haber hecho FRAME (sistema multipila)
 // 51 - Añadido el tipo INT opcional para los datos enteros convencionales en DIV 1
@@ -69,7 +69,7 @@
 // 62 - Punteros a estructuras STRUCT POINTER NOMBRESTRUCT tal; (por defecto a 0)
 // 63 - Resuelto el problema del acceso a los miembros de la estructura original
 // 64 - Soporte en el debugger para punteros a estructuras (!!! mas chungo de lo que yo pensaba)
-// 65 - Funcion de "capar()" direcciones en DEBUG para evitar en lo posible los page fault
+// 65 - Funcion de "validate_address()" direcciones en DEBUG para evitar en lo posible los page fault
 // 66 - Resueltos "n-mil" problemas con los putos punteros, el debugger y la madre que lo parió ...
 // 67 - Hacer que int/byte/word/string pointer p1,p2; defina dos punteros
 // 68 - Funcion screen_copy que puede pasar una region de pantalla a una region de un gráfico
@@ -7468,7 +7468,7 @@ void compile_pass0(void) {
 
 void compile_program(void) {
   show_dialog(compile_pass0);
-  tecla(); scan_code=0; ascii=0; mouse_b=0;
+  poll_keyboard(); scan_code=0; ascii=0; mouse_b=0;
 }
 
 //-----------------------------------------------------------------------------

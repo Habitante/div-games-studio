@@ -301,10 +301,10 @@ void create_thumb_MAP(struct t_listboxbr * l){
       thumb[num].status=0;
 
       man=map_an; mal=map_al;
-      if (es_MAP((byte *)thumb[num].ptr)) tipomapa=1;
-      else if (es_PCX((byte *)thumb[num].ptr)) tipomapa=2;
-      else if (es_BMP((byte *)thumb[num].ptr)) tipomapa=3;
-      else if (es_JPG((byte *)thumb[num].ptr,thumb[num].filesize)) tipomapa=4;
+      if (is_MAP((byte *)thumb[num].ptr)) tipomapa=1;
+      else if (is_PCX((byte *)thumb[num].ptr)) tipomapa=2;
+      else if (is_BMP((byte *)thumb[num].ptr)) tipomapa=3;
+      else if (is_JPG((byte *)thumb[num].ptr,thumb[num].filesize)) tipomapa=4;
       else tipomapa=0;
       swap(man,map_an); swap(mal,map_al);
 
@@ -1998,7 +1998,7 @@ void update_listbox_br(struct t_listboxbr * l) {
   }
 
   if ((l->zona>0 && mouse_b&8) || (l->zona==2 && (mouse_b&1))) {
-    if (old_mouse_b&1) { retrazo(); retrazo(); retrazo(); retrazo(); }
+    if (old_mouse_b&1) { retrace_wait(); retrace_wait(); retrace_wait(); retrace_wait(); }
       if (l->inicial) {
         l->inicial-=l->columnas; paint_listbox_br(l); v.volcar=1; }
       wput(ptr,an,al,l->x+(l->an+1)*l->columnas+1,l->y+1,-41);
@@ -2009,7 +2009,7 @@ void update_listbox_br(struct t_listboxbr * l) {
   }
 
   if ((l->zona>0 && mouse_b&4) || (l->zona==3 && (mouse_b&1))) {
-    if (old_mouse_b&1) { retrazo(); retrazo(); retrazo(); retrazo(); }
+    if (old_mouse_b&1) { retrace_wait(); retrace_wait(); retrace_wait(); retrace_wait(); }
     n=l->maximo-l->inicial;
     if (n>l->lineas*l->columnas) {
       l->inicial+=l->columnas; paint_listbox_br(l); v.volcar=1; }

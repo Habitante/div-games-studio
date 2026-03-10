@@ -12,12 +12,12 @@ void readmouse(void);
 #include "divsound.h"
 
 #ifdef __EMSCRIPTEN__
-extern void es_fps(byte);
+extern void is_fps(byte);
 #endif
 
 void load_pal(void);
-int es_PCX(byte *buffer);
-void adaptar(byte * ptr, int len, byte * pal, byte * xlat);
+int is_PCX(byte *buffer);
+void adapt_palette(byte * ptr, int len, byte * pal, byte * xlat);
 void put_screen(void);
 void texn2(byte * copia, int vga_an, byte * p, int x, int y, byte an, int al);
 void get_token(void);
@@ -27,16 +27,16 @@ void expres2(void);
 void expres3(void);
 void expres4(void);
 void expres5(void);
-void _encriptar(int encode, char * fichero, char * clave);
-void _comprimir(int encode, char *fichero);
+void _encrypt(int encode, char * fichero, char * clave);
+void _compress_file(int encode, char *fichero);
 
 
 extern int max_reloj;
 
-void _object_avance(int ide,int angulo,int velocidad);
+void _object_advance(int ide,int angulo,int velocidad);
 int joy_position(int eje);
 
-void _object_avance	(int ide,int angulo,int velocidad) {
+void _object_advance	(int ide,int angulo,int velocidad) {
 	mem[id+_X]+=get_distx(mem[id+_Angle],pila[sp]);
     mem[id+_Y]+=get_disty(mem[id+_Angle],pila[sp]);
 }
@@ -457,7 +457,7 @@ void load_pal(void) {
 
         if (strcmp((char *)pal,"map\x1a\x0d\x0a")) { // not a map file
 
-          if (es_PCX((byte*)pal)) { // Take the PCX palette
+          if (is_PCX((byte*)pal)) { // Take the PCX palette
 
             if (npackfiles) {
               m=read_packfile((byte*)&mem[pila[sp]]);
@@ -496,14 +496,14 @@ void load_pal(void) {
     dr=dacout_r; dg=dacout_g; db=dacout_b;
     if (dr<63 || dg<63 || db<63) { hacer_fade=1; fade_off(); sp--; }
     memcpy(paleta,pal+offs,768);
-    nueva_paleta();
+    apply_palette();
   }
 
   paleta_cargada=1;
   pila[sp]=1;
 }
 
-void nueva_paleta(void) {
+void apply_palette(void) {
   byte *p,c0,c1;
   int n;
 
@@ -519,7 +519,7 @@ void nueva_paleta(void) {
 
   memcpy(dac,paleta,768);
   init_ghost();
-  crear_ghost();
+  create_ghost();
 
   find_color(0,0,0); c0=find_col;
   find_color(63,63,63); c1=find_col;
@@ -531,7 +531,7 @@ void nueva_paleta(void) {
     } else p++;
   } last_c1=c1;
 
-  set_paleta();
+  update_palette();
 
   #ifdef DEBUG
   init_colors();
@@ -584,7 +584,7 @@ struct pcx_struct {
   int clength;
 };
 
-int es_PCX(byte *buffer) {
+int is_PCX(byte *buffer) {
   int loes=0;
 
   if(buffer[2]==1 && buffer[3]==8 && buffer[65]==1) loes=1;
@@ -645,7 +645,7 @@ void descomprime_PCX(byte *buffer, byte *mapa)
       dr=dacout_r; dg=dacout_g; db=dacout_b;
       if (dr<63 || dg<63 || db<63) { hacer_fade=1; fade_off(); sp--; }
       memcpy(paleta,buffer,768);
-      nueva_paleta();
+      apply_palette();
     } paleta_cargada=1;
   }
 }
@@ -685,7 +685,7 @@ void load_map(void) {
         dr=dacout_r; dg=dacout_g; db=dacout_b;
         if (dr<63 || dg<63 || db<63) { hacer_fade=1; fade_off(); sp--; }
         memcpy(paleta,ptr+48,768);
-        nueva_paleta();
+        apply_palette();
       } paleta_cargada=1;
     }
 
@@ -693,7 +693,7 @@ void load_map(void) {
     alto=*(word*)(ptr+10);
     npuntos=*(word*)(ptr+1392);
 
-    adaptar(ptr+1394+npuntos*4,ancho*alto,ptr+48,NULL);
+    adapt_palette(ptr+1394+npuntos*4,ancho*alto,ptr+48,NULL);
 
     ptr=ptr+1394-64;
 
@@ -706,7 +706,7 @@ void load_map(void) {
     } g[0].grf[next_map_code]=(int*)ptr;
     pila[sp]=next_map_code;
 
-  } else if (es_PCX(ptr)) {
+  } else if (is_PCX(ptr)) {
 
     memcpy((byte *)&header,ptr,sizeof(pcx_header));
     ancho   = header.xmax - header.xmin + 1;
@@ -720,7 +720,7 @@ void load_map(void) {
     buffer=(byte *)malloc(1394+ancho*alto);
     descomprime_PCX(ptr, &buffer[1394]);
 
-    adaptar(buffer+1394,ancho*alto,pcxdac,NULL);
+    adapt_palette(buffer+1394,ancho*alto,pcxdac,NULL);
 
     free(ptr);
 
@@ -854,7 +854,7 @@ fclose(es);
       dr=dacout_r; dg=dacout_g; db=dacout_b;
       if (dr<63 || dg<63 || db<63) { hacer_fade=1; fade_off(); sp--; }
       memcpy(paleta,ptr+8,768);
-      nueva_paleta();
+      apply_palette();
     } paleta_cargada=1;
   }
 
@@ -894,7 +894,7 @@ while(ftell(es)<file_len && len_>0 && num_>0) {
  	fread(mptr,1,len_,es);
  	lst[num_]=iptr=(int *)mptr;
  	  	 if (m!=palcrc) {
-		 adaptar(ptr+64+iptr[15]*4, iptr[13]*iptr[14], (byte*)(g[num].fpg)+8,&xlat[0]);
+		 adapt_palette(ptr+64+iptr[15]*4, iptr[13]*iptr[14], (byte*)(g[num].fpg)+8,&xlat[0]);
  	 } 	
 }
 fclose(es);
@@ -911,7 +911,7 @@ int *ptr_8=(int*)ptr3;
 	int len = *(ptr_8+1);
  
     lst[num]=iptr=ptr_4;
-    if (m!=palcrc) adaptar(ptr+64+iptr[15]*4, iptr[13]*iptr[14], (byte*)(g[num].fpg)+8,&xlat[0]);
+    if (m!=palcrc) adapt_palette(ptr+64+iptr[15]*4, iptr[13]*iptr[14], (byte*)(g[num].fpg)+8,&xlat[0]);
     ptr=(byte *)&ptr2[len];//(int*)(ptr[4]);
     ptr3=ptr;
     ptr2=ptr;
@@ -1009,13 +1009,13 @@ void refresh_scroll(void) {
 //      Move_scroll(snum) - mueve automática o manualmente el scroll
 //----------------------------------------------------------------------------
 
-void mover_scroll(int);
+void update_scroll(int);
 
 void _move_scroll(void) {
   snum=pila[sp];
   if(snum<0||snum>9) { e(107); return; }
-  if (iscroll[snum].on==1) mover_scroll(0);
-  else if (iscroll[snum].on==2) mover_scroll(1);
+  if (iscroll[snum].on==1) update_scroll(0);
+  else if (iscroll[snum].on==2) update_scroll(1);
 }
 
 //----------------------------------------------------------------------------
@@ -1053,7 +1053,7 @@ void stop_scroll(void) {
 //      Funcion que mata los procesos de scroll o modo-7 que ya no se ven
 //----------------------------------------------------------------------------
 
-void elimina_proceso(int);
+void kill_process(int);
 
 void kill_invisible(void) {
   int i,n=0;
@@ -1075,7 +1075,7 @@ void kill_invisible(void) {
 			}
 		}
 	}
-    if (n==10) elimina_proceso(i);
+    if (n==10) kill_process(i);
   }
 }
 
@@ -1235,7 +1235,7 @@ void load_fnt(void) {
   pila[sp]=ifonts;
 
   if (adaptar_paleta) {
-    adaptar(fonts[ifonts]+1356+sizeof(TABLAFNT)*256,f_i[ifonts].len-1356-sizeof(TABLAFNT)*256,fonts[ifonts]+8,NULL);
+    adapt_palette(fonts[ifonts]+1356+sizeof(TABLAFNT)*256,f_i[ifonts].len-1356-sizeof(TABLAFNT)*256,fonts[ifonts]+8,NULL);
     f_i[ifonts].syspal=palcrc;
   }
 
@@ -1278,7 +1278,7 @@ void checkpal_font(int ifonts) {
     }
 
     if (f_i[ifonts].fonpal!=palcrc) {
-      adaptar(fonts[ifonts]+1356+sizeof(TABLAFNT)*256,f_i[ifonts].len-1356-sizeof(TABLAFNT)*256,fonts[ifonts]+8,NULL);
+      adapt_palette(fonts[ifonts]+1356+sizeof(TABLAFNT)*256,f_i[ifonts].len-1356-sizeof(TABLAFNT)*256,fonts[ifonts]+8,NULL);
     }
 
     f_i[ifonts].syspal=palcrc;
@@ -1289,7 +1289,7 @@ void checkpal_font(int ifonts) {
 //      Adapta (ptr,len) siendo pal[] su paleta
 //----------------------------------------------------------------------------
 
-void adaptar(byte * ptr, int len, byte * pal, byte * xlat) {
+void adapt_palette(byte * ptr, int len, byte * pal, byte * xlat) {
   int n,m;
   byte _xlat[256];
   byte *endptr;
@@ -1597,7 +1597,7 @@ void map_block_copy(void) {
       if (x>=clipx0 && x+an<=clipx1 && y>=clipy0 && y+al<=clipy1) // Pinta sprite sin cortar
         sp_normal(si,x,y,an,al,0);
       else if (x<clipx1 && y<clipy1 && x+an>clipx0 && y+al>clipy0) // Pinta sprite cortado
-        sp_cortado(si,x,y,an,al,0);
+        sp_clipped(si,x,y,an,al,0);
 
       no: copia=_copia; vga_an=_vga_an; vga_al=_vga_al;
     } else e(121);
@@ -1607,7 +1607,7 @@ void map_block_copy(void) {
 
 //----------------------------------------------------------------------------
 //      Screen_copy(region,file,graf,x,y,an,al)
-//      (des-volcado escalado desde la una region de copia a un gráfico)
+//      (des-blit_screen escalado desde la una region de copia a un gráfico)
 //----------------------------------------------------------------------------
 
 void screen_copy(void) {
@@ -1855,7 +1855,7 @@ void save(void) {
   offset=pila[sp--];
   lon=lon*unit_size;
 
-  if (!capar(offset) || !capar(offset+lon)) { pila[sp]=0; e(122); return; }
+  if (!validate_address(offset) || !validate_address(offset+lon)) { pila[sp]=0; e(122); return; }
   es=open_save_file((byte*)&mem[pila[sp]]);
   if (es==NULL) { pila[sp]=0; e(123); return; }
 
@@ -1903,7 +1903,7 @@ void load(void) {
   if (unit_size<1) unit_size=1;
 
   offset=pila[sp--];
-  if (!capar(offset)) { pila[sp]=0; e(125); return; }
+  if (!validate_address(offset)) { pila[sp]=0; e(125); return; }
   //fprintf(stdout, "loading data from: %s\n",(byte*)&mem[pila[sp]]);
 
   if ((es=div_open_file((char*)&mem[pila[sp]]))==NULL) {
@@ -1913,7 +1913,7 @@ void load(void) {
     lon=read_packfile((byte*)&mem[pila[sp]]);
 
     if(lon>0) {
-      if (!capar(offset+lon)) { pila[sp]=0; e(125); return; }
+      if (!validate_address(offset+lon)) { pila[sp]=0; e(125); return; }
       memcpy(&mem[offset],packptr,lon);
       max_reloj+=get_reloj()-old_reloj;
       return;
@@ -1931,7 +1931,7 @@ void load(void) {
   fseek(es,0,SEEK_END); lon=ftell(es);///4; 
   printf("file len: %ld\n",ftell(es));
   fseek(es,0,SEEK_SET);
-  if (!capar(offset+lon)) { pila[sp]=0; e(125); return; }
+  if (!validate_address(offset+lon)) { pila[sp]=0; e(125); return; }
   lon=lon/unit_size;
   fbytes = fread(&mem[offset],unit_size,lon,es);
   if(fbytes !=lon) { 
@@ -2005,7 +2005,7 @@ vvga_al = vga_al;
   if (set_video_mode!=NULL) {
     set_video_mode();
   } else {
-    svmode();
+    setup_video_mode();
   }
   OSDEP_SetWindowSize(vga_an, vga_al);
 
@@ -2337,7 +2337,7 @@ return;
       set_mixer();
       _dos_setdrive((int)toupper(*cwork)-'A'+1,&n);
       chdir(cwork);
-      svmode(); set_dac();
+      setup_video_mode(); set_dac();
       set_mouse(mouse->x,mouse->y);
       readmouse();
       volcado_completo=1;
@@ -2457,7 +2457,7 @@ void stop_mode7(void) {
 void advance(void) {
 
   if (mem[id+_Ctype]==3) {
-    _object_avance(id,mem[id+_Angle],pila[sp]);
+    _object_advance(id,mem[id+_Angle],pila[sp]);
   }  else {
   
     mem[id+_X]+=get_distx(mem[id+_Angle],pila[sp]);
@@ -2475,7 +2475,7 @@ void x_advance(void) {
   int distancia=pila[sp--];
 
   if (mem[id+_Ctype]==3) {
-    _object_avance(id,pila[sp],distancia);
+    _object_advance(id,pila[sp],distancia);
   }
   else {
     mem[id+_X]+=get_distx(pila[sp],distancia);
@@ -2572,7 +2572,7 @@ void _exit_dos(void) {
   #ifdef DEBUG
   FILE * f;
   #endif
-  rvmode();
+  reset_video_mode();
   kbdReset();
 
   #ifdef DEBUG
@@ -2806,7 +2806,7 @@ void read_joy(void) {
 #endif
 }
 //----------------------------------------------------------------------------
-//      Convert_palette(file,graph,&new_palette)
+//      Convert_palette(file,graph,&apply_palette)
 //----------------------------------------------------------------------------
 
 void convert_palette(void) {
@@ -2816,7 +2816,7 @@ void convert_palette(void) {
 
   pal_ofs=pila[sp--]; graf=pila[sp--]; file=pila[sp];
 
-  if (!capar(pal_ofs) || !capar(pal_ofs+256)) { e(136); return; }
+  if (!validate_address(pal_ofs) || !validate_address(pal_ofs+256)) { e(136); return; }
   if (file<0 || file>max_fpgs) { e(109); return; }
   if (file) max_grf=1000; else max_grf=2000;
   if (graf<=0 || graf>=max_grf) { e(110); return; }
@@ -3272,7 +3272,7 @@ void _fread(void) {
   if (!(handle&1) || handle<1 || handle>63) { e(170); return; }
   if (tabfiles[handle/2]==0) { e(170); return; }
   f=(FILE *)tabfiles[handle/2];
-  if (!capar(offset) || !capar(offset+(lon*unit_size)/4)) { pila[sp]=0; e(125); return; }
+  if (!validate_address(offset) || !validate_address(offset+(lon*unit_size)/4)) { pila[sp]=0; e(125); return; }
   n=fread(&mem[offset],1,unit_size*lon,f); // Bytes leidos
   if ((n+unit_size-1)/unit_size<lon) {
     pila[sp]=0; e(127);
@@ -3300,7 +3300,7 @@ void _fwrite(void) {
   if (!(handle&1) || handle<1 || handle>63) { e(170); return; }
   if (tabfiles[handle/2]==0) { e(170); return; }
   f=(FILE *)tabfiles[handle/2];
-  if (!capar(offset) || !capar(offset+(lon*unit_size)/4)) { pila[sp]=0; e(122); return; }
+  if (!validate_address(offset) || !validate_address(offset+(lon*unit_size)/4)) { pila[sp]=0; e(122); return; }
   if (fwrite(&mem[offset],unit_size,lon,f)!=lon) { pila[sp]=0; e(124); } else pila[sp]=1;
   max_reloj+=get_reloj()-old_reloj;
 }
@@ -3822,8 +3822,8 @@ void move_draw(void) {
 //      Save_map/pcx(file,graph,"archivo.pcx") 1-Exito 0-Error
 //----------------------------------------------------------------------------
 
-int graba_PCX(byte *mapa,int an,int al,FILE *f);
-int graba_MAP(byte * mapa, int an, int al, FILE * f);
+int save_PCX(byte *mapa,int an,int al,FILE *f);
+int save_MAP(byte * mapa, int an, int al, FILE * f);
 
 void save_mapcx(int tipo) {
   int file,graph;
@@ -3847,9 +3847,9 @@ void save_mapcx(int tipo) {
 
   if ((f=open_save_file((byte *)cwork))==NULL) { e(123); return; }
   if (tipo) {
-    if (graba_PCX(buffer,an,al,f)) { fclose(f); e(100); return; }
+    if (save_PCX(buffer,an,al,f)) { fclose(f); e(100); return; }
   } else {
-    if (graba_MAP(buffer,an,al,f)) { fclose(f); e(100); return; }
+    if (save_MAP(buffer,an,al,f)) { fclose(f); e(100); return; }
   }
   fclose(f); pila[sp]=1;
 
@@ -3967,16 +3967,16 @@ struct {        // Para contener la expression analizada
 
 int iexpres;    // Número de elementos introducidos en expres[]
 
-double evaluar(void);
+double do_evaluate(void);
 
-void calcular(void) {
+void do_calculate(void) {
   double evaluacion;
   token=p_inicio;         // No hay ningun token inicialmente
   iexpres=0;              // Inicializa el contador de expresiones
   get_token();            // Obtiene el primer token
   expres0();              // Se analiza la expression
   if (token==p_ultimo) {  // Se analizó con éxito la expression
-    evaluacion=evaluar();
+    evaluacion=do_evaluate();
     if (token!=p_error) { // Se evaluó con éxito
       token=p_num;
       tnumero=evaluacion;
@@ -3984,7 +3984,7 @@ void calcular(void) {
   } else token=p_error;
 }
 
-double evaluar(void) {
+double do_evaluate(void) {
   double pila[64];
   int sp=0,n=0;
 
@@ -4184,7 +4184,7 @@ double get_num(void) { // Lee el número que hay en *expression (double en hex o
 
 void calculate(void) {
   expression=(char*)&mem[pila[sp]];
-  calcular();
+  do_calculate();
   if(token==p_num) pila[sp]=(int)tnumero;
   else            pila[sp]=0;
 }
@@ -4284,7 +4284,7 @@ void encode(void) {
   size   = pila[sp--];
   offset = pila[sp];
 
-  if (!capar(offset) || !capar(offset+size)) { pila[sp]=0; e(182); return; }
+  if (!validate_address(offset) || !validate_address(offset+size)) { pila[sp]=0; e(182); return; }
   pila[sp]=1;
 
   init_rnd_coder(size+33,(char*)&mem[clave]);
@@ -4325,14 +4325,14 @@ void encode_file(int encode) {
     strcat(cwork3,ft.name);
     if (_fullpath(cwork1, cwork3, _MAX_PATH)==NULL) strcpy(cwork1,ft.name);
     _dos_setfileattr(cwork1,_A_NORMAL);
-    _encriptar(encode,cwork1,(char *)clave);
+    _encrypt(encode,cwork1,(char *)clave);
     rc=_dos_findnext(&ft);
   }
 
   max_reloj+=get_reloj()-old_reloj;
 }
 
-void _encriptar(int encode, char * fichero, char * clave) {
+void _encrypt(int encode, char * fichero, char * clave) {
   char full[_MAX_PATH+1];
   char drive[_MAX_DRIVE+1];
   char dir[_MAX_DIR+1];
@@ -4427,14 +4427,14 @@ void _compress(int encode) {
     strcat(cwork3,ft.name);
     if (_fullpath(cwork1, cwork3, _MAX_PATH)==NULL) strcpy(cwork1,ft.name);
     _dos_setfileattr(cwork1,_A_NORMAL);
-    _comprimir(encode,cwork1);
+    _compress_file(encode,cwork1);
     rc=_dos_findnext(&ft);
   }
 
   max_reloj+=get_reloj()-old_reloj;
 }
 
-void _comprimir(int encode, char *fichero) {
+void _compress_file(int encode, char *fichero) {
   char full[_MAX_PATH+1];
   char drive[_MAX_DRIVE+1];
   char dir[_MAX_DIR+1];
@@ -4540,7 +4540,7 @@ void _comprimir(int encode, char *fichero) {
 // Does not cover all malloc'd ranges — may miss dynamically allocated regions.
 //----------------------------------------------------------------------------
 
-int capar(int dir) {
+int validate_address(int dir) {
   int n;
 
   if (dir>0 && dir<=imem_max) return(dir); else {

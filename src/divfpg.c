@@ -406,7 +406,7 @@ void fusionar_paletas(void);
 void TratarPaleta0(void);
 extern byte paltratar[768];
 
-extern byte nueva_paleta[768];
+extern byte apply_palette[768];
 extern byte * muestra;
 
 void open_file(void) {
@@ -515,7 +515,7 @@ void open_file(void) {
 	if (muestra!=NULL) {
 		crear_paleta();
 		free(muestra);
-		memcpy(pal,nueva_paleta,768);
+		memcpy(pal,apply_palette,768);
 	}
 
 	// Tenemos en pal[] la paleta de los FPGs a cargar
@@ -659,7 +659,7 @@ extern byte AuxPal[768];
 
 int RemapAllFiles(int vent) {
 
-	//Pregunta si se desea adaptar el FPG o cerrarlo
+	//Pregunta si se desea adapt_palette el FPG o cerrarlo
 
 	FPG *MiFPG=(FPG *)ventana[vent].aux;
 	byte p[768]; // para comparar la paleta de fichero con DAC
@@ -1367,8 +1367,8 @@ void FPG_update_listbox_br(struct t_listboxbr * l) {
 		if (mouse_b&8 || !v_pausa||(v_pausa&&!(mouse_b&1)&&(old_mouse_b&1))) {
 			
 			if ((old_mouse_b&1)&&!v_pausa) { 
-				retrazo(); 
-				retrazo(); 
+				retrace_wait(); 
+				retrace_wait(); 
 			}
 			//---
 			if (l->inicial) {
@@ -1390,8 +1390,8 @@ void FPG_update_listbox_br(struct t_listboxbr * l) {
 		if (mouse_b&4 || !v_pausa||(v_pausa&&!(mouse_b&1)&&(old_mouse_b&1))) {
 
 			if ((old_mouse_b&1)&&!v_pausa) { 
-				retrazo(); 
-				retrazo(); 
+				retrace_wait(); 
+				retrace_wait(); 
 			}
 			//---
 			n=l->maximo-l->inicial;

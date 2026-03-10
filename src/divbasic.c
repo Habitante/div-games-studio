@@ -71,7 +71,7 @@ void save_mouse_bg(byte * p, int x, int y, int n, int flag) {
 	if((x>vga_an) | (y>vga_al))
 		return;
 
-  volcado_parcial(x,y,an,al);
+  blit_partial(x,y,an,al);
 
   q=copia+y*vga_an+x;
 
@@ -183,7 +183,7 @@ void draw_edit_background(int x,int y,int an,int al) {
   if (y+al>vga_al) al=vga_al-y;
   if (an<=0 || al<=0) return;
 
-  volcado_parcial(x,y,an,al);
+  blit_partial(x,y,an,al);
 
   // TODO: Improve update_box() for better window background repaint
 
@@ -238,14 +238,14 @@ void draw_edit_background(int x,int y,int an,int al) {
   zx=zx+((_x0-zoom_x)<<zoom); zy=zy+((_y0-zoom_y)<<zoom);
   zoom_x=_x0; zoom_y=_y0;
   zan=(_x1-_x0+1)<<zoom; zal=(_y1-_y0+1)<<zoom;
-  volcado_parcial(zx,zy,zan,zal);
+  blit_partial(zx,zy,zan,zal);
   zoom_region=1; zoom_map(); zoom_region=0;
   zoom_x=_zoom_x; zoom_y=_zoom_y; zx=_zx; zy=_zy; zan=_zan; zal=_zal;
 
 }
 
 //-----------------------------------------------------------------------------
-//      Zoom, volcado de map(map_an*map_al) a copia segun zoom,zoom_x/y
+//      Zoom, blit_screen de map(map_an*map_al) a copia segun zoom,zoom_x/y
 //-----------------------------------------------------------------------------
 
 int an,al;
@@ -282,17 +282,17 @@ void zoom_map(void) {
         if (zy+zal<vga_al) {
           wbox(copia,vga_an,vga_al,c2,zx-2,zy+zal+1,zan+4,1);
           wbox(copia,vga_an,vga_al,c0,zx-1,zy+zal,zan+2,1);
-          volcado_parcial(0,zy+zal,vga_an,2); }
+          blit_partial(0,zy+zal,vga_an,2); }
         if (zx+zan<vga_an) {
           wbox(copia,vga_an,vga_al,c2,zx-2,zy-2,zan+4,1);
           wbox(copia,vga_an,vga_al,c0,zx-1,zy-1,zan+2,1);
-          volcado_parcial(zy+zan,0,2,vga_al); }
+          blit_partial(zy+zan,0,2,vga_al); }
         if (_big) { big=1; big2=2; }
       }
       zoom_background=1;
     }
 
-    if (zx || zy) volcado_parcial(zx,zy,zan,zal); else volcado_completo=1;
+    if (zx || zy) blit_partial(zx,zy,zan,zal); else volcado_completo=1;
 
   } else {
     p=zoom_p; q=zoom_q; an=zoom_an; al=zoom_al;
@@ -425,7 +425,7 @@ void interpolation_mode(void) {
 
     if (key(_ESC)||(mouse_b && mouse_in(barra_x,barra_y+10,barra_x+9,barra_y+18)))
       { put_bar(2,10,45); flush_bars(0);
-        put(mouse_x,mouse_y,mouse_graf); volcado(copia); }
+        put(mouse_x,mouse_y,mouse_graf); blit_screen(copia); }
 
     free(m1); free(m0);
   } else free(m0);
@@ -1039,7 +1039,7 @@ byte * save_undo(int x, int y, int an, int al) {
   } else {
     draw_edit_background(0,0,vga_an,vga_al);
     flush_bars(1);
-    volcado_completo=1; volcado(copia);
+    volcado_completo=1; blit_screen(copia);
     v_texto=(char *)texto[320]; show_dialog(err0); undo_error=1;
   }
 
@@ -1058,7 +1058,7 @@ int undo_back(void) {
 
   if (tundo[a].modo!=-1 && tundo[a].codigo==codigo_mapa) {
 
-    iundo=a; retrazo();
+    iundo=a; retrace_wait();
 
     x=tundo[a].x; y=tundo[a].y;
     an=tundo[a].an; al=tundo[a].al;
@@ -1095,7 +1095,7 @@ void undo_next(void) {
 
   if (tundo[iundo].modo!=-1 && tundo[iundo].codigo==codigo_mapa) {
 
-    retrazo();
+    retrace_wait();
 
     x=tundo[iundo].x; y=tundo[iundo].y;
     an=tundo[iundo].an; al=tundo[iundo].al;

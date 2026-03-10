@@ -216,7 +216,7 @@ void help2(void) {
     if (scan_code==72 || (mouse_graf==7 && (mouse_b&1) && wmouse_x!=-1)) {
       if (scan_code!=72) { if (!(v.botones&2)) {
         wput(v.ptr,an,al,an-9,10,-41); v.botones|=2;
-      } else { retrazo(); retrazo(); } }
+      } else { retrace_wait(); retrace_wait(); } }
       v.volcar++;
       if (help_line!=help_buffer+1) {
         help_line--; while (*(--help_line)); help_line++; help_l--;
@@ -233,7 +233,7 @@ void help2(void) {
     if (scan_code==80 || (mouse_graf==9 && (mouse_b&1) && wmouse_x!=-1)) {
       if (scan_code!=80) { if (!(v.botones&4)) {
         wput(v.ptr,an,al,an-9,al-17,-42); v.botones|=4;
-      } else { retrazo(); retrazo(); } } v.volcar++;
+      } else { retrace_wait(); retrace_wait(); } } v.volcar++;
       if (help_l+help_al<help_lines) { while (*(help_line++)); help_l++; }
       vuelca_help();
     } else if (v.botones&4) { wput(v.ptr,an,al,an-9,al-17,-40); v.botones^=4; v.volcar++; }
@@ -481,7 +481,7 @@ void resize_help(void) {
 
     save_mouse_bg(fondo_raton,_mx,my,mouse_graf,0);
     put(_mx,my,mouse_graf);
-    volcado(copia);
+    blit_screen(copia);
     save_mouse_bg(fondo_raton,_mx,my,mouse_graf,1);
 
   } while (mouse_b&1);
@@ -1107,7 +1107,7 @@ void arregla_linea(byte * end,int chars,int help_an) {
 void vuelca_help(void) {
   byte *si,*di,*old_di;
   int al,n,ch;
-  byte color=c0,color2=media(c0,c_b_low);
+  byte color=c0,color2=average_color(c0,c_b_low);
 
   wbox(v.ptr,v.an/big2,v.al/big2,c12,2,10+16,v.an/big2-12,v.al/big2-12-16);
 

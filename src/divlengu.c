@@ -15,18 +15,18 @@ byte *p,*q; // Punteros de lectura y escritura respectivamente.
 ///////////////////////////////////////////////////////////////////////////////
 //   Prototypes for this file
 ///////////////////////////////////////////////////////////////////////////////
-void analiza_textos(void);
+void analyze_texts(void);
 void coder(byte * ptr, int len, char * clave);
-void an_numero(void);
-void an_texto(void);
-void an_comentario(void);
+void analyze_number(void);
+void analyze_text(void);
+void analyze_comment(void);
 
 
 //-----------------------------------------------------------------------------
 //      Inicializa el sistema de textos
 //-----------------------------------------------------------------------------
 
-void inicializa_textos(byte * fichero) {
+void initialize_texts(byte * fichero) {
 
   FILE * f;
   int n;
@@ -40,7 +40,7 @@ void inicializa_textos(byte * fichero) {
       n=fread(textos,1,n,f);
       fclose(f);
       fin_textos=textos+n;
-      analiza_textos();
+      analyze_texts();
     } else fclose(f);
   }
 }
@@ -49,7 +49,7 @@ void inicializa_textos(byte * fichero) {
 //      Función de análisis de los textos
 //-----------------------------------------------------------------------------
 
-void analiza_textos(void) {
+void analyze_texts(void) {
 
   q=p=textos;
 
@@ -59,13 +59,13 @@ void analiza_textos(void) {
   }
 
   while(p<fin_textos)
-    if (*p>='0' && *p<='9') an_numero();
-    else if (*p=='"') an_texto();
-    else if (*p=='#') an_comentario();
+    if (*p>='0' && *p<='9') analyze_number();
+    else if (*p=='"') analyze_text();
+    else if (*p=='#') analyze_comment();
     else p++;
 }
 
-void an_numero(void) {
+void analyze_number(void) {
 
   numero=0; do {
     numero=numero*10+*p-'0'; p++;
@@ -73,12 +73,12 @@ void an_numero(void) {
   if (numero>=max_textos) numero=0;
 }
 
-void an_comentario(void) {
+void analyze_comment(void) {
 
   while (*p!='\n' && *p!='\r' && p<fin_textos) p++;
 }
 
-void an_texto(void) {
+void analyze_text(void) {
 
   texto[numero]=q; p++; numero++;
   while (*p!='"' && p<fin_textos && *p!='\r' && *p!='\n') {
@@ -96,7 +96,7 @@ void an_texto(void) {
 //      Finaliza el sistema de textos
 //-----------------------------------------------------------------------------
 
-void finaliza_textos(void) {
+void finalize_texts(void) {
 
   free(textos);
 }

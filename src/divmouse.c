@@ -57,7 +57,7 @@ void read_mouse(void) {
 	read_mouse2();
 
 	if (modo<100 && hotkey && !help_paint_active)
-		tecla();
+		poll_keyboard();
 
 	// When mouse is outside the window, force out-of-bounds so no UI
 	// element thinks it's being hovered (en_caja checks will all fail).
@@ -555,7 +555,7 @@ while(SDL_PollEvent(&event) )
 		barra_x=8*big2; barra_y=vga_al-27*big2; regla=0; actual_mouse=21; sel_status=0;
 
 		copia=(byte*)malloc(vga_an*vga_al+6)+6;
-		svmode();
+		setup_video_mode();
 		preparar_tapiz();
 	
 		if(strcmp((char *)v.titulo, (char *)texto[35])) {
@@ -588,7 +588,7 @@ while(SDL_PollEvent(&event) )
 		}
 		update_box(0,0,vga_an,vga_al);
 //		volcado_completo=1;
-		volcado(copia);
+		blit_screen(copia);
 		InitSound();
 		soundstopped=0;
 	}

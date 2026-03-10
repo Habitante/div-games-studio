@@ -48,8 +48,8 @@ int cas_inicial;    // Si la primera casilla está ocupada .. la desocupa
 //----------------------------------------------------------------------------
 
 int init_find(void);
-int calcula_vertices(int * ptr, int max_ver, int x0, int y0, int x1, int y1);
-void puede_ir(int x0,int y0,int x1,int y1);
+int calculate_vertices(int * ptr, int max_ver, int x0, int y0, int x1, int y1);
+void can_go(int x0,int y0,int x1,int y1);
 void path_line(void);
 void path_free(void);
 void expand(void);
@@ -76,7 +76,7 @@ void path_find(void) {
 
   // Comprueba límites de offset y size ...
 #ifdef DIV2
-  if (!capar(offset) || !capar(offset+size)) { e(122); return; }
+  if (!validate_address(offset) || !validate_address(offset+size)) { e(122); return; }
 #else
 
   if (offset<long_header || offset+size>imem_max) { e(e122); return; }
@@ -200,7 +200,7 @@ void path_find(void) {
 
   // Hay un camino, ahora obtiene los vértices en la tabla pasada como parámetro
 
-  pila[sp]=calcula_vertices(&mem[offset],size/2,mem[id+_X],mem[id+_Y],x,y);
+  pila[sp]=calculate_vertices(&mem[offset],size/2,mem[id+_X],mem[id+_Y],x,y);
 
   m(ax,ay)=cas_inicial;
 
@@ -310,13 +310,13 @@ int init_find(void) {
 //  Devuelve el número de vértices o 0 si salen demasiados vértices ...
 //----------------------------------------------------------------------------
 
-int calcula_vertices(int * ptr, int max_ver, int x0, int y0, int x1, int y1) {
+int calculate_vertices(int * ptr, int max_ver, int x0, int y0, int x1, int y1) {
   int * p=ptr+max_ver*2;  // Del último al primero, y luego memmove
   int num=max_ver;        // Para contar los vértices que lleva metidos en *ptr
   int d;                  // Distancia de la casilla actual al inicio
   int x,y;                // Siguiente punto
   int xx,yy;              // Punto actual (hasta el que SI puede ir seguro)
-  int newdir=0;           // Temporal (para calcular la siguiente casilla)
+  int newdir=0;           // Temporal (para do_calculate la siguiente casilla)
   int dir;                // Direcciones en las que puede ir ...
   int cas;                // Casilla actual (bx+by*max_map_size)
   int n;                  // Un simple contador
@@ -362,19 +362,19 @@ int calcula_vertices(int * ptr, int max_ver, int x0, int y0, int x1, int y1) {
           nextx[n]=xx-bx; nexty[n]=yy-by;
         }
 
-        puede_ir(x1,y1,x+nextx[7]*tile,y+nexty[7]*tile);
+        can_go(x1,y1,x+nextx[7]*tile,y+nexty[7]*tile);
         if (!choque_linea) {
           bx+=nextx[7]; by+=nexty[7];
         } else {
-          puede_ir(x1,y1,x+nextx[3]*tile,y+nexty[3]*tile);
+          can_go(x1,y1,x+nextx[3]*tile,y+nexty[3]*tile);
           if (!choque_linea) {
             bx+=nextx[3]; by+=nexty[3];
           } else {
-            puede_ir(x1,y1,x+nextx[1]*tile,y+nexty[1]*tile);
+            can_go(x1,y1,x+nextx[1]*tile,y+nexty[1]*tile);
             if (!choque_linea) {
               bx+=nextx[1]; by+=nexty[1];
             } else {
-              puede_ir(x1,y1,x+nextx[0]*tile,y+nexty[0]*tile);
+              can_go(x1,y1,x+nextx[0]*tile,y+nexty[0]*tile);
               bx+=nextx[0]; by+=nexty[0];
             }
           }
@@ -408,7 +408,7 @@ int calcula_vertices(int * ptr, int max_ver, int x0, int y0, int x1, int y1) {
           case 8: bx++; by++; cas+=1+max_map_size; x+=tile; y+=tile; break;
         }
 
-        puede_ir(x1,y1,x,y); // devuelve choque_linea=0/1
+        can_go(x1,y1,x,y); // devuelve choque_linea=0/1
 
       }
 
@@ -425,7 +425,7 @@ int calcula_vertices(int * ptr, int max_ver, int x0, int y0, int x1, int y1) {
   } while (!fin);
 
   if (x!=x0 || y!=y0) { // ¿es necesario ir al centro de la primera casilla?
-    puede_ir(x1,y1,x0,y0);
+    can_go(x1,y1,x0,y0);
     if (choque_linea) {
       if (!num) return(0);
       *(--p)=y; *(--p)=x; num--; // Un caso poco probable, pero bueno ...
@@ -438,10 +438,10 @@ int calcula_vertices(int * ptr, int max_ver, int x0, int y0, int x1, int y1) {
 }
 
 //----------------------------------------------------------------------------
-//  Determina si puede ir a un punto en línea recta (pathline/calcula_vertices)
+//  Determina si puede ir a un punto en línea recta (pathline/calculate_vertices)
 //----------------------------------------------------------------------------
 
-void puede_ir(int x0,int y0,int x1,int y1) {
+void can_go(int x0,int y0,int x1,int y1) {
   int tilesize;
   int dx,dy,a,b,d,x,y;
 
@@ -521,7 +521,7 @@ void path_line(void) {
 
   // Determina si puede ir desde (ax,ay) hasta (x,y)
 
-  puede_ir(ax,ay,x,y); if (!choque_linea) pila[sp]=1;
+  can_go(ax,ay,x,y); if (!choque_linea) pila[sp]=1;
 }
 
 //----------------------------------------------------------------------------

@@ -162,7 +162,7 @@ void demo1(void) {
   sprintf(cwork,"[ %s %d/31 ]",texto[396],exe_cola[1]-0xF31725AB);
 
   wrectangle(v.ptr,an,al,c1,3,12+27,an-6,16);
-  wbox(v.ptr,an,al,media(c_b_low,c0),4,12+28,an-8,14);
+  wbox(v.ptr,an,al,average_color(c_b_low,c0),4,12+28,an-8,14);
 
   if (exe_cola[1]-0xF31725AB>31) {
     wbox(v.ptr,an,al,c_r_low,4,12+28,an-8,14);
@@ -498,7 +498,7 @@ int main(int argc, char * argv[]) {
 		}
 		fclose(ftest);
 	}
-	inicializa_textos((uint8_t *)"system/lenguaje.div");
+	initialize_texts((uint8_t *)"system/lenguaje.div");
 
 	if(compilemode==1) {	
 		inicializa_compilador();
@@ -637,7 +637,7 @@ int main(int argc, char * argv[]) {
 
 	finalization();
 
-	finaliza_textos();
+	finalize_texts();
 
 #ifdef GRABADORA
 	EndGrabador();
@@ -664,11 +664,11 @@ char cbs[65],cbn,cgs[65],cgn,crs[65],crn;
 void create_title_bar(void) {
   int n,m;
 
-  cbs[0]=c_b_low; cbs[64]=media(c_b_low,c0); n=64;
+  cbs[0]=c_b_low; cbs[64]=average_color(c_b_low,c0); n=64;
   while (n>1) {
     m=0;
     while (m<64) {
-      cbs[m+n/2]=media(cbs[m],cbs[m+n]); m+=n;
+      cbs[m+n/2]=average_color(cbs[m],cbs[m+n]); m+=n;
     } n>>=1;
   } for (cbn=0,m=0;m<65;m++) if (cbs[m]!=cbs[cbn]) cbs[++cbn]=cbs[m]; cbn++;
 
@@ -676,15 +676,15 @@ void create_title_bar(void) {
   while (n>1) {
     m=0;
     while (m<64) {
-      cgs[m+n/2]=media(cgs[m],cgs[m+n]); m+=n;
+      cgs[m+n/2]=average_color(cgs[m],cgs[m+n]); m+=n;
     } n>>=1;
   } for (cgn=0,m=0;m<65;m++) if (cgs[m]!=cgs[cgn]) cgs[++cgn]=cgs[m]; cgn++;
 
-  crs[0]=media(c_r,c_r_low); crs[64]=media(c_r_low,c0); n=64;
+  crs[0]=average_color(c_r,c_r_low); crs[64]=average_color(c_r_low,c0); n=64;
   while (n>1) {
     m=0;
     while (m<64) {
-      crs[m+n/2]=media(crs[m],crs[m+n]); m+=n;
+      crs[m+n/2]=average_color(crs[m],crs[m+n]); m+=n;
     } n>>=1;
   } for (crn=0,m=0;m<65;m++) if (crs[m]!=crs[crn]) crs[++crn]=crs[m]; crn++;
 
@@ -715,7 +715,7 @@ void init_environment() {
   }
 
 	update_box(0,0,vga_an,vga_al);
-    volcado_completo=1; volcado(copia);
+    volcado_completo=1; blit_screen(copia);
     
   if(!Interpretando) {
     if (!strlen(user1) || !strlen(user2)) {
@@ -738,7 +738,7 @@ void init_environment() {
 //  if (test_video) show_dialog(test0);
 // Have we come back from running a prog?
   if (Interpretando) {
-    vacia_buffer();
+    flush_buffer();
     if ((f=fopen("system/exec.err","rb"))!=NULL) {
       fread(&error_code,4,1,f);
       if (error_code) show_dialog(interr0);
@@ -765,7 +765,7 @@ void init_environment() {
     primera_vez=0;
   }
 
-  vacia_buffer();
+  flush_buffer();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -864,7 +864,7 @@ void mainloop(void) {
 		goto fin_bucle_entorno; // end loop environment
 	}
 
-	tecla();
+	poll_keyboard();
 
 	//-------------------------------------------------------------------------
 	// Busca la ventana sobre la que estamos (n) n=max_windows si no hay
@@ -1266,10 +1266,10 @@ void mainloop(void) {
 			if (mouse_b&1) {
 				if (big) {
 					wput(copia,-vga_an,vga_al,v.x,v.y,-48);
-					volcado_parcial(v.x,v.y,14,14);
+					blit_partial(v.x,v.y,14,14);
 				} else {
 					wput(copia,vga_an,vga_al,v.x,v.y,-48);
-					volcado_parcial(v.x,v.y,7,7);
+					blit_partial(v.x,v.y,7,7);
 				}
 			}
 			
@@ -1668,10 +1668,10 @@ void mainloop(void) {
 	} else if (restore_button==2) {
 		if (big) {
 			wput(copia,-vga_an,vga_al,v.x,v.y,-38);
-			volcado_parcial(v.x,v.y,14,14);
+			blit_partial(v.x,v.y,14,14);
 		} else {
 			wput(copia,vga_an,vga_al,v.x,v.y,-38);
-			volcado_parcial(v.x,v.y,7,7);
+			blit_partial(v.x,v.y,7,7);
 		}
 	} else if (restore_button==3) {
 		if (big) 
@@ -1732,7 +1732,7 @@ void dialog_loop(void) {
 
 	dialogo_invocado=0;
 
-	tecla();
+	poll_keyboard();
 
 	//-------------------------------------------------------------------------
 	// Busca la ventana sobre la que estamos (n) n=max_windows si no hay
@@ -2007,10 +2007,10 @@ void maximize_window(void) {
 
   if (big) {
     wput(copia,-vga_an,vga_al,v.x,v.y,-48);
-    volcado_parcial(v.x,v.y,14,14);
+    blit_partial(v.x,v.y,14,14);
   } else {
     wput(copia,vga_an,vga_al,v.x,v.y,-48);
-    volcado_parcial(v.x,v.y,7,7);
+    blit_partial(v.x,v.y,7,7);
   }
   flush_copy();
 
@@ -2096,7 +2096,7 @@ void close_window(void) {
     if (big) wput(v.ptr,v.an/2,v.al/2,v.an/2-9,2,-45);
     else wput(v.ptr,v.an,v.al,v.an-9,2,-45);
     flush_window(0);
-    volcado_parcial(v.x,v.y,v.an,v.al);
+    blit_partial(v.x,v.y,v.an,v.al);
     flush_copy();
   }
 
@@ -2169,7 +2169,7 @@ void close_window(void) {
           } flush_window(0);
         }
       }
-  do { read_mouse(); tecla(); } while((mouse_b) || key(_ESC) || key(_T) || key(_U));
+  do { read_mouse(); poll_keyboard(); } while((mouse_b) || key(_ESC) || key(_T) || key(_U));
 
   scan_code=0; ascii=0; mouse_b=0;
 
@@ -2195,10 +2195,10 @@ void move_window(void) {
     x=mouse_x-ix; y=mouse_y-iy;
 
     wrectangle(copia,vga_an,vga_al,c4,x,y,an,al);
-    volcado_parcial(x,y,an,1);
-    volcado_parcial(x,y,1,al);
-    volcado_parcial(x,y+al-1,an,1);
-    volcado_parcial(x+an-1,y,1,al);
+    blit_partial(x,y,an,1);
+    blit_partial(x,y,1,al);
+    blit_partial(x,y+al-1,an,1);
+    blit_partial(x+an-1,y,1,al);
     flush_copy();
 
     if (modo<100) {
@@ -2391,7 +2391,7 @@ div_version=texto[safe];
 
       }
 	}
-  volcado_parcial(x,y,an,al);
+  blit_partial(x,y,an,al);
 
 }
 
@@ -2487,7 +2487,7 @@ void update_box2(int vent, int x, int y, int an, int al) {
 		}
   }
 
-  volcado_parcial(x,y,an,al);
+  blit_partial(x,y,an,al);
 }
 
 //-----------------------------------------------------------------------------
@@ -2659,7 +2659,7 @@ if(_ptr==NULL)
 	trc.w=ventana[n].an;
 	trc.h=ventana[n].al;
 
-	volcado_parcial(x,y,an,al);
+	blit_partial(x,y,an,al);
 
 
 }
@@ -2826,12 +2826,12 @@ void flush_copy(void) {
   if (modo<100) {
     save_mouse_bg(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,0);
     put(mouse_shift_x,mouse_shift_y,mouse_graf);
-    volcado(copia);
+    blit_screen(copia);
     save_mouse_bg(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,1);
   } else {
     save_mouse_bg(fondo_raton,mouse_x,mouse_y,mouse_graf,0);
     put(mouse_x,mouse_y,mouse_graf);
-    volcado(copia);
+    blit_screen(copia);
     save_mouse_bg(fondo_raton,mouse_x,mouse_y,mouse_graf,1);
   }
 }
@@ -3047,7 +3047,7 @@ void new_window(voidReturnType init_handler) {
 			v.exploding=0;
 		}		
         wvolcado(copia,vga_an,vga_al,ptr,x,y,an,al,0);
-        volcado_parcial(x,y,an,al);
+        blit_partial(x,y,an,al);
       }
 
     //---------------------------------------------------------------------------
@@ -3071,9 +3071,9 @@ void new_window(voidReturnType init_handler) {
           move(0,n-1);
           wrectangle(v.ptr,v.an/big2,v.al/big2,c4,0,0,v.an/big2,v.al/big2);
           init_flush(); flush_window(0);
-          retrazo(); flush_copy();
+          retrace_wait(); flush_copy();
           wrectangle(v.ptr,v.an/big2,v.al/big2,c2,0,0,v.an/big2,v.al/big2);
-          v.volcar=1; retrazo(); retrazo(); retrazo(); retrazo();
+          v.volcar=1; retrace_wait(); retrace_wait(); retrace_wait(); retrace_wait();
         }
       } else {
         divdelete(0);
@@ -3105,12 +3105,12 @@ void explode(int x,int y,int an,int al) {
     aan=(an*n)/10; aal=(al*n)/10;
     xx=x+an/2-aan/2; yy=y+al/2-aal/2;
     wrectangle(copia,vga_an,vga_al,c4,xx,yy,aan,aal);
-    volcado_parcial(xx,yy,aan,1);
-    volcado_parcial(xx,yy,1,aal);
-    volcado_parcial(xx,yy+aal-1,aan,1);
-    volcado_parcial(xx+aan-1,yy,1,aal);
+    blit_partial(xx,yy,aan,1);
+    blit_partial(xx,yy,1,aal);
+    blit_partial(xx,yy+aal-1,aan,1);
+    blit_partial(xx+aan-1,yy,1,aal);
     explode_num=n;
-    retrazo();
+    retrace_wait();
     flush_copy();
     if (modo<100) {
       if (b) big=1;
@@ -3136,10 +3136,10 @@ void implode(int x,int y,int an,int al) {
     aal=(al*n)/10; if (!aal) aal=1;
     xx=x+an/2-aan/2; yy=y+al/2-aal/2;
     wrectangle(copia,vga_an,vga_al,c4,xx,yy,aan,aal);
-    volcado_parcial(xx,yy,aan,1);
-    volcado_parcial(xx,yy,1,aal);
-    volcado_parcial(xx,yy+aal-1,aan,1);
-    volcado_parcial(xx+aan-1,yy,1,aal);
+    blit_partial(xx,yy,aan,1);
+    blit_partial(xx,yy,1,aal);
+    blit_partial(xx,yy+aal-1,aan,1);
+    blit_partial(xx+aan-1,yy,1,aal);
     explode_num=n;
     flush_copy();
     if (modo<100) {
@@ -3154,7 +3154,7 @@ void implode(int x,int y,int an,int al) {
       update_box(xx,yy+aal-1,aan,1);
       update_box(xx+aan-1,yy,1,aal);
     }
-    retrazo();
+    retrace_wait();
   } while (--n); big=b;
 }
 
@@ -3175,10 +3175,10 @@ void extrude(int x,int y,int an,int al,int x2,int y2,int an2,int al2) {
     xx=(x*n+x2*(10-n))/10;
     yy=(y*n+y2*(10-n))/10;
     wrectangle(copia,vga_an,vga_al,c4,xx,yy,aan,aal);
-    volcado_parcial(xx,yy,aan,1);
-    volcado_parcial(xx,yy,1,aal);
-    volcado_parcial(xx,yy+aal-1,aan,1);
-    volcado_parcial(xx+aan-1,yy,1,aal);
+    blit_partial(xx,yy,aan,1);
+    blit_partial(xx,yy,1,aal);
+    blit_partial(xx,yy+aal-1,aan,1);
+    blit_partial(xx+aan-1,yy,1,aal);
     if (primera_vez!=1) flush_copy();
 
     if (modo<100) {
@@ -3194,7 +3194,7 @@ void extrude(int x,int y,int an,int al,int x2,int y2,int an2,int al2) {
       update_box(xx+aan-1,yy,1,aal);
     }
 
-    if (primera_vez!=1) retrazo();
+    if (primera_vez!=1) retrace_wait();
 
   } while (--n); big=b; v.tipo=tipo;
 }
@@ -3318,7 +3318,7 @@ uint32_t colorkey=0;
 			v.exploding=0;
 		}
       wvolcado(copia,vga_an,vga_al,ptr,x,y,an,al,0);
-      volcado_parcial(x,y,an,al);
+      blit_partial(x,y,an,al);
       do { read_mouse(); } while(mouse_b&1);
       modal_loop();
 
@@ -3376,7 +3376,7 @@ void initialization(void) {
 	int num_=1;
 #endif
 
-	detectar_vesa();
+	detect_vesa();
 
 	printf("Num modes: %d (%d %d)\n",num_modos,vga_an, vga_al);
 
@@ -3623,7 +3623,7 @@ fclose(f);
     if (!Interpretando) { cprintf("%s",(char *)texto[11]); } // *** Cálculos sobre la paleta ***
     memcpy(dac,system_dac,768);
     init_ghost();
-    crear_ghost(1);
+    create_ghost(1);
   }
 
   if (!Interpretando) { printf("%s",(char *)texto[12]); } // *** Miscelánea ***
@@ -3661,12 +3661,12 @@ fclose(f);
 
   create_title_bar();
   
-  svmode(); 
+  setup_video_mode(); 
   set_dac(dac); 
   //read_mouse();
   preparar_tapiz();
   volcado_completo=1;
-  volcado(copia);
+  blit_screen(copia);
 
   InitSound();
   if(SoundActive) set_init_mixer();
@@ -3710,7 +3710,7 @@ void finalization(void) {
 
 
   if(modo_de_retorno==0 || modo_de_retorno==3)
-        rvmode();
+        reset_video_mode();
 
   end_lexcolor();
 

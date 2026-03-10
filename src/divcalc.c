@@ -55,16 +55,16 @@ struct {        // Para contener la expression analizada
 
 int iexpres;    // Número de elementos introducidos en expres[]
 
-double evaluar(void);
+double do_evaluate(void);
 
-void calcular(void) {
+void do_calculate(void) {
   double evaluacion;
   token=p_inicio;         // No hay ningun token inicialmente
   iexpres=0;              // Inicializa el contador de expresiones
   get_token();            // Obtiene el primer token
   expres0();              // Se analiza la expression
   if (token==p_ultimo) {  // Se analizó con éxito la expression
-    evaluacion=evaluar();
+    evaluacion=do_evaluate();
     if (token!=p_error) { // Se evaluó con éxito
       token=p_num;
       tnumero=evaluacion;
@@ -72,7 +72,7 @@ void calcular(void) {
   } else token=p_error;
 }
 
-double evaluar(void) {
+double do_evaluate(void) {
   double pila[64];
   int sp=0,n=0;
 
@@ -327,7 +327,7 @@ void calc2(void) {
 
   if (v.active_item>=0 && strlen(pcalc->ctext)) { // Se evalúa la expresión
     expression=pcalc->ctext;
-    calcular();
+    do_calculate();
 
     if (token==p_num) {
       if (pcalc->chex) sprintf(pcalc->cresult,"0x%x",(unsigned int)(memptrsize)tnumero);

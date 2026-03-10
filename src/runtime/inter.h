@@ -91,18 +91,18 @@ void mouse_window(void);
 
 // Video (v.cpp)
 
-void set_paleta (void);
+void update_palette (void);
 void set_dac(void);
-void retrazo(void);
+void retrace_wait(void);
 void fade_wait(void);
-void svmode(void);
-void rvmode(void);
+void setup_video_mode(void);
+void reset_video_mode(void);
 void init_flush(void);
-void volcado_parcial(int,int,int,int);
-void volcado(byte *);
+void blit_partial(int,int,int,int);
+void blit_screen(byte *);
 void restore(byte *,byte *);
 void init_ghost(void);
-void crear_ghost(void);
+void create_ghost(void);
 void find_color(byte,byte,byte);
 
 // Sprites (s.cpp)
@@ -110,23 +110,23 @@ void find_color(byte,byte,byte);
 void scroll_simple(void);
 void scroll_parallax(void);
 void put_sprite(int file, int graph, int x, int y, int size, int angle, int flags, int reg,byte *,int,int);
-void pinta_sprite(void);
+void paint_sprite(void);
 void sp_normal(byte * p, int x, int y, int an, int al, int flags);
-void sp_cortado(byte * p, int x, int y, int an, int al, int flags);
-void sp_escalado(byte*,int,int,int,int,int,int,int,int);
-void sp_rotado(byte*,int,int,int,int,int,int,int,int,int);
+void sp_clipped(byte * p, int x, int y, int an, int al, int flags);
+void sp_scaled(byte*,int,int,int,int,int,int,int,int);
+void sp_rotated(byte*,int,int,int,int,int,int,int,int,int);
 void sp_scan(byte * p,short n,byte * si,int an,int x0,int y0,int x1,int y1);
-void pinta_textos(int n);
-void pinta_drawings(void);
+void paint_texts(int n);
+void paint_drawings(void);
 void init_sin_cos(void);
-void pinta_m7(int);
+void paint_m7(int);
 int get_distx(int a,int d);
 int get_disty(int a,int d);
 
 // Functions (f.cpp)
 
 void function(void);
-void nueva_paleta(void);
+void apply_palette(void);
 void init_rnd(int);
 
 // Collision routines (c.cpp)
@@ -153,8 +153,8 @@ void memcpyb(byte * di, byte * si, int n);
 //      Functions exported by DIVLENGU (divlengu.cpp)
 ///////////////////////////////////////////////////////////////////////////////
 
-void inicializa_textos(byte * fichero);
-void finaliza_textos(void);
+void initialize_texts(byte * fichero);
+void finalize_texts(void);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Constants
@@ -462,7 +462,7 @@ void read_joy(void);
 #define _Frame      13 //Cuanto frame lleva el proceso (frame(n))
 #define _x0         14 //Caja ocupada por el sprite cada
 #define _y0         15 // vez que se pinta para realizar
-#define _x1         16 // volcado y restauración de fondo
+#define _x1         16 // blit_screen y restauración de fondo
 #define _y1         17 // parcial (dump_type==0 y restore_background==0)
 #define _FCount     18 //Cuenta de llamadas a funcion (para saltarse retornos en frame)
 #define _Caller     19   //ID del proceso o funcion llamador (0 si ha sido el kernel)
@@ -704,7 +704,7 @@ GLOBAL int volcado_completo; // Indica si se ha modificado toda la copia de vga
                              // Por ahora se mantiene siempre a 1
 
 // Ya se ha implementado, la variable que controla ahora el tipo de
-// volcado es la global dump_type, accesible por los programas
+// blit_screen es la global dump_type, accesible por los programas
 
 //-----------------------------------------------------------------------------
 // Sistema de modo 7 - Struct interno
@@ -946,7 +946,7 @@ void frame_end(void);
 
 //----------------------------------------------------------------------------
 
-byte media(byte a,byte b);
+byte average_color(byte a,byte b);
 
 GLOBAL int dr,dg,db;
 
@@ -957,8 +957,8 @@ GLOBAL byte kbdFLAGS[128];
 
 void kbdInit(void);
 void kbdReset(void);
-void tecla(void);
-void vacia_buffer(void);
+void poll_keyboard(void);
+void flush_buffer(void);
 
 //----------------------------------------------------------------------------
 
@@ -1039,7 +1039,7 @@ GLOBAL struct _packdir * packdir;
 
 GLOBAL byte * packptr;
 
-int capar(int dir); // Funcion para capar direcciones (0 si outbounds)
+int validate_address(int dir); // Funcion para validate_address direcciones (0 si outbounds)
 
 GLOBAL char divpath[PATH_MAX+1];
 GLOBAL unsigned divnum;
@@ -1050,7 +1050,7 @@ GLOBAL unsigned divnum;
 
 GLOBAL int VersionVesa;
 
-void detectar_vesa(void);
+void detect_vesa(void);
 
 //----------------------------------------------------------------------------
 //  Vuelca informacion en un fichero

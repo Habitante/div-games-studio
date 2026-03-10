@@ -10,13 +10,13 @@
 #define CDEPTH 8
 
 void snapshot(byte *p);
-void volcadocsvga(byte *p);
-void volcadoc320200(byte *p);
-void volcadocx(byte * p);
-void volcadopsvga(byte *p);
-void volcadop320200(byte *p);
-void volcadopx(byte * p);
-void volcadosdl(byte *p);
+void blit_full_svga(byte *p);
+void blit_full_320x200(byte *p);
+void blit_full_modex(byte * p);
+void blit_partial_svga(byte *p);
+void blit_partial_320x200(byte *p);
+void blit_partial_modex(byte * p);
+void blit_sdl(byte *p);
 
 ///////////////////////////////////////////////////////////////////////////////
 //	Declarations and module-level data
@@ -56,7 +56,7 @@ void SDL_ToggleFS(SDL_Surface *surface)
 		fsmode=1;
 	}
 
-	svmode();
+	setup_video_mode();
 	set_dac(dac);
 }
 
@@ -91,7 +91,7 @@ struct {
 
 FPSmanager fpsman;
 
-void retrazo(void) {
+void retrace_wait(void) {
 SDL_framerateDelay(&fpsman);
 
 #ifdef NOTYET
@@ -118,7 +118,7 @@ void set_dac(byte *_dac) {
 		if(!OSDEP_SetPalette(vga, colors, 0, 256)) {
 			printf("Failed to set palette :(\n");
 		}
-	retrazo();
+	retrace_wait();
 }
 
 //-----------------------------------------------------------------------------
@@ -150,7 +150,7 @@ SDL_Surface* copy_surface(SDL_Surface* source)
 }
 
 
-void svmode(void) {
+void setup_video_mode(void) {
  Uint32 colorkey=0;
  int vn=0;
 
@@ -171,15 +171,15 @@ SDL_setFramerate(&fpsman, 60);
 	set_dac(dac);
 }
 
-void svmodex(int m) {
-	printf("TODO - divvideo.cpp svmodex.cpp\n");
+void setup_modex(int m) {
+	printf("TODO - divvideo.cpp setup_modex.cpp\n");
 }
 
 //-----------------------------------------------------------------------------
 //      Reset Video Mode
 //-----------------------------------------------------------------------------
 
-void rvmode(void) {
+void reset_video_mode(void) {
 	if(IsFullScreen(vga))
 		SDL_ToggleFS(vga);
 }
@@ -191,7 +191,7 @@ void vgacpy(byte * q, byte * p, int n) ;
 
 
 void volcadosdlp(byte *p) {
-volcadosdl(p);
+blit_sdl(p);
 return;
 
 	  int y=0,n;
@@ -243,7 +243,7 @@ return;
 	return;
 }
 
-void volcadosdl(byte *p) {
+void blit_sdl(byte *p) {
 	int vy;
 
 	if(SDL_MUSTLOCK(vga))
@@ -262,30 +262,30 @@ void volcadosdl(byte *p) {
 	OSDEP_Flip(vga);
 }
 
-void volcado(byte *p) {
+void blit_screen(byte *p) {
 
   if ((shift_status&4) && (shift_status&8) && scan_code==_P) snapshot(p);
 
 
   if (volcado_completo) {
-    if (modovesa) volcadosdl(p);
+    if (modovesa) blit_sdl(p);
     else switch(vga_an*1000+vga_al) {
-      case 320200: volcadoc320200(p); break;
-      case 320240: volcadocx(p); break;
-      case 320400: volcadocx(p); break;
-      case 360240: volcadocx(p); break;
-      case 360360: volcadocx(p); break;
-      case 376282: volcadocx(p); break;
+      case 320200: blit_full_320x200(p); break;
+      case 320240: blit_full_modex(p); break;
+      case 320400: blit_full_modex(p); break;
+      case 360240: blit_full_modex(p); break;
+      case 360360: blit_full_modex(p); break;
+      case 376282: blit_full_modex(p); break;
     }
   } else {
     if (modovesa) volcadosdlp(p); 
     else switch(vga_an*1000+vga_al) {
-      case 320200: volcadop320200(p); break;
-      case 320240: volcadopx(p); break;
-      case 320400: volcadopx(p); break;
-      case 360240: volcadopx(p); break;
-      case 360360: volcadopx(p); break;
-      case 376282: volcadopx(p); break;
+      case 320200: blit_partial_320x200(p); break;
+      case 320240: blit_partial_modex(p); break;
+      case 320400: blit_partial_modex(p); break;
+      case 360240: blit_partial_modex(p); break;
+      case 360360: blit_partial_modex(p); break;
+      case 376282: blit_partial_modex(p); break;
     }
   } 
 
@@ -313,7 +313,7 @@ void snapshot(byte *p) {
 
   f=fopen(cwork,"wb");
   map_an=vga_an; map_al=vga_al;
-  graba_PCX(p,f);
+  save_PCX(p,f);
   map_an=man; map_al=mal;
   fclose(f);
 }
@@ -322,7 +322,7 @@ void snapshot(byte *p) {
 //      Dump mode 320x200
 //-----------------------------------------------------------------------------
 
-void volcadop320200(byte *p) { // PARTIAL
+void blit_partial_320x200(byte *p) { // PARTIAL
 #ifdef NOTYET
   int y=0,n;
   byte * q=(byte *)vga->pixels;
@@ -340,7 +340,7 @@ void volcadop320200(byte *p) { // PARTIAL
 #endif
 }
 
-void volcadoc320200(byte *p) { // COMPLETE
+void blit_full_320x200(byte *p) { // COMPLETE
 #ifdef NOTYET
   #ifdef GRABADORA
   RegScreen(p);
@@ -353,7 +353,7 @@ void volcadoc320200(byte *p) { // COMPLETE
 //      SVGA DUMP
 //-----------------------------------------------------------------------------
 
-void volcadopsvga(byte *p) {
+void blit_partial_svga(byte *p) {
   int y=0,page,old_page=-1751,point,t1,t2,n;
   char *q=(char *)vga->pixels;
 
@@ -393,7 +393,7 @@ void volcadopsvga(byte *p) {
   }
 }
 
-void volcadocsvga(byte *p) {
+void blit_full_svga(byte *p) {
   int cnt=vga_an*vga_al;
   int tpv=0,ActPge=0;
 
@@ -410,8 +410,8 @@ void volcadocsvga(byte *p) {
 //      Volcado en un modo-x
 //-----------------------------------------------------------------------------
 
-void volcadopx(byte * p) {
-debugprintf("divvideo.cpp volcadopx\n");
+void blit_partial_modex(byte * p) {
+debugprintf("divvideo.cpp blit_partial_modex\n");
 #ifdef NOTYET
   int n,m=(vga_an*vga_al)/4,plano=0x100,y;
   byte * v2, * p2;
@@ -434,8 +434,8 @@ debugprintf("divvideo.cpp volcadopx\n");
 #endif
 }
 
-void volcadocx(byte * p) {
-	printf("divvideo.cpp - volcadocx\n");
+void blit_full_modex(byte * p) {
+	printf("divvideo.cpp - blit_full_modex\n");
 #ifdef NOTYET
   int n=(vga_an*vga_al)/4;
 
@@ -453,7 +453,7 @@ void volcadocx(byte * p) {
 
 
 //-----------------------------------------------------------------------------
-//      Subrutinas de volcado genéricas
+//      Subrutinas de blit_screen genéricas
 //-----------------------------------------------------------------------------
 
 void vgacpy(byte * q, byte * p, int n) {
@@ -478,7 +478,7 @@ void init_flush(void) {
 	memset(&scan[0],0,MAX_YRES*8); volcado_completo=0; 
 }
 
-void volcado_parcial(int x,int y,int an,int al) {
+void blit_partial(int x,int y,int an,int al) {
   int ymax=0,xmax=0,n=0,d1=0,d2=0,x2=0;
 
   if (an==vga_an && al==vga_al && x==0 && y==0) { volcado_completo=1; return; }

@@ -22,15 +22,15 @@ SDL_Surface *vga=NULL;
 #endif
 
 void snapshot(byte *p);
-void volcadocsvga(byte *p);
-void volcadoc320200(byte *p);
-void volcadocx(byte * p);
-void volcadopsvga(byte *p);
-void volcadop320200(byte *p);
-void volcadopx(byte * p);
-int graba_PCX(byte *mapa,int an,int al,FILE *f);
-void crear_ghost_vc(int m);
-void crear_ghost_slow(void);
+void blit_full_svga(byte *p);
+void blit_full_320x200(byte *p);
+void blit_full_modex(byte * p);
+void blit_partial_svga(byte *p);
+void blit_partial_320x200(byte *p);
+void blit_partial_modex(byte * p);
+int save_PCX(byte *mapa,int an,int al,FILE *f);
+void create_ghost_vc(int m);
+void create_ghost_slow(void);
 
 // Check if SDL is already loaded
 
@@ -48,7 +48,7 @@ int SDL_ToggleFS(SDL_Surface *surface)
   else 
     fsmode=1;
   
-  svmode();
+  setup_video_mode();
   set_dac();
     return 1;
 }
@@ -97,7 +97,7 @@ extern int fli_palette_update;
 
 byte color_oscuro;
 
-void set_paleta (void) {
+void update_palette (void) {
   word n;
   n=abs(dacout_speed); // if (n>64) n=64;
 
@@ -157,12 +157,12 @@ void set_dac (void) {
 		printf("Failed to set palette :(\n");
 	}
 	
-	retrazo();
+	retrace_wait();
 #else
   union REGS regs;
   word n=0;
   if (fli_palette_update) return;
-  //retrazo();
+  //retrace_wait();
   outp(0x3c8,0);
   do {
     outp(0x3c9,dac[n++]);
@@ -187,7 +187,7 @@ void set_dac2 (void) {
 #endif
 }
 
-void retrazo (void) {
+void retrace_wait (void) {
 #ifdef DOS
   while (inp(0x3da)&8);
   while ((inp(0x3da)&8)==0);
@@ -199,11 +199,11 @@ void retrazo (void) {
 void fade_wait(void) {
 #ifdef DOS
   while (now_dacout_r!=dacout_r || now_dacout_g!=dacout_g || now_dacout_b!=dacout_b) {
-    set_paleta(); set_dac();
+    update_palette(); set_dac();
   }
 #else
   while (now_dacout_r!=dacout_r || now_dacout_g!=dacout_g || now_dacout_b!=dacout_b) {
-    set_paleta(); set_dac();
+    update_palette(); set_dac();
     OSDEP_Flip(vga);
     SDL_Delay(16);
   }
@@ -237,7 +237,7 @@ void madewith(void) {
 
 }
 
-void svmode(void) {
+void setup_video_mode(void) {
 
 //#ifdef STDOUTLOG
 printf("setting new video mode %d %d %p\n",vga_an,vga_al,(void*)vga);
@@ -312,11 +312,11 @@ SDL_ShowCursor(SDL_DISABLE);
     }
   } else switch(vga_an*1000+vga_al) {
     case 320200: _setvideomode(_MRES256COLOR); break;
-    case 320240: svmodex(0); break;
-    case 320400: svmodex(1); break;
-    case 360240: svmodex(2); break;
-    case 360360: svmodex(3); break;
-    case 376282: svmodex(4); break;
+    case 320240: setup_modex(0); break;
+    case 320400: setup_modex(1); break;
+    case 360240: setup_modex(2); break;
+    case 360360: setup_modex(3); break;
+    case 376282: setup_modex(4); break;
     default: error=1; break;
   }
 
@@ -346,7 +346,7 @@ if(splashtime>0)
 }
 
 
-void svmodex(int m) {
+void setup_modex(int m) {
 #ifdef DOS
   int n=0;
 
@@ -373,7 +373,7 @@ void svmodex(int m) {
 //      Reset Video Mode
 //-----------------------------------------------------------------------------
 
-void rvmode(void) {
+void reset_video_mode(void) {
 
 // Emscripten has its own fullscreen controls
 #ifndef __EMSCRIPTEN__
@@ -394,7 +394,7 @@ void rvmode(void) {
  * Copies row-by-row to handle pitch differences, then calls OSDEP_Flip()
  * which converts 8-bit->32-bit via palette and presents to screen.
  */
-void volcadosdl(byte *p) {
+void blit_sdl(byte *p) {
 
 	if(SDL_MUSTLOCK(vga))
 		SDL_LockSurface(vga);
@@ -424,7 +424,7 @@ extern int alt_x;
 
 #define maxframes 30000
 
-void volcado(byte *p) {
+void blit_screen(byte *p) {
 #ifndef __EMSCRIPTEN__
 if ((shift_status&4) && (shift_status&8) && key(_0)) {
 	recording = 1;
@@ -451,7 +451,7 @@ if ((shift_status&4) && (shift_status&8) && key(_9)) {
 
   if ((shift_status&4) && (shift_status&8) && key(_P)) {
     snapshot(p);
-    do {tecla();} while(key(_P));
+    do {poll_keyboard();} while(key(_P));
   }
   
   { static uint32_t fs_cooldown = 0;
@@ -461,31 +461,31 @@ if ((shift_status&4) && (shift_status&8) && key(_9)) {
   } }
 
 #endif
-  if (fli_palette_update) retrazo();
+  if (fli_palette_update) retrace_wait();
 
-volcadosdl(p);
+blit_sdl(p);
 
 #ifdef NOTYET
 
   if (volcado_completo) {
-    if (modovesa) volcadocsvga(p);
+    if (modovesa) blit_full_svga(p);
     else switch(vga_an*1000+vga_al) {
-      case 320200: volcadoc320200(p); break;
-      case 320240: volcadocx(p); break;
-      case 320400: volcadocx(p); break;
-      case 360240: volcadocx(p); break;
-      case 360360: volcadocx(p); break;
-      case 376282: volcadocx(p); break;
+      case 320200: blit_full_320x200(p); break;
+      case 320240: blit_full_modex(p); break;
+      case 320400: blit_full_modex(p); break;
+      case 360240: blit_full_modex(p); break;
+      case 360360: blit_full_modex(p); break;
+      case 376282: blit_full_modex(p); break;
     }
   } else {
-    if (modovesa) volcadopsvga(p);
+    if (modovesa) blit_partial_svga(p);
     else switch(vga_an*1000+vga_al) {
-      case 320200: volcadop320200(p); break;
-      case 320240: volcadopx(p); break;
-      case 320400: volcadopx(p); break;
-      case 360240: volcadopx(p); break;
-      case 360360: volcadopx(p); break;
-      case 376282: volcadopx(p); break;
+      case 320200: blit_partial_320x200(p); break;
+      case 320240: blit_partial_modex(p); break;
+      case 320400: blit_partial_modex(p); break;
+      case 360240: blit_partial_modex(p); break;
+      case 360360: blit_partial_modex(p); break;
+      case 376282: blit_partial_modex(p); break;
     }
   }
 #endif
@@ -508,7 +508,7 @@ void snapshot(byte *p) {
   } while (f!=NULL);
 
   f=fopen(cwork,"wb");
-  graba_PCX(p,vga_an,vga_al,f);
+  save_PCX(p,vga_an,vga_al,f);
   fclose(f);
 }
 
@@ -539,7 +539,7 @@ struct pcx_struct {
   int clength;
 };
 
-int graba_PCX(byte *mapa,int an,int al,FILE *f) {
+int save_PCX(byte *mapa,int an,int al,FILE *f) {
   byte p[768];
   int x;
   byte *cbuffer;
@@ -609,7 +609,7 @@ int graba_PCX(byte *mapa,int an,int al,FILE *f) {
         return(0);
 }
 
-int graba_MAP (byte * mapa, int an, int al, FILE * f) {
+int save_MAP (byte * mapa, int an, int al, FILE * f) {
   int y;
   char cwork[32]="";
   char reglas[576];
@@ -662,7 +662,7 @@ void restore(byte *q, byte *p) {
 //      Volcado en el modo 320x200
 //-----------------------------------------------------------------------------
 
-void volcadop320200(byte *p) {
+void blit_partial_320x200(byte *p) {
   int y=0,n;
   byte * q=(byte *)vga->pixels;
 
@@ -678,7 +678,7 @@ void volcadop320200(byte *p) {
   }
 }
 
-void volcadoc320200(byte *p) {
+void blit_full_320x200(byte *p) {
   #ifdef GRABADORA
   RegScreen(p);
   #endif
@@ -689,7 +689,7 @@ void volcadoc320200(byte *p) {
 //      Volcado en SVGA
 //-----------------------------------------------------------------------------
 
-void volcadopsvga(byte *p) {
+void blit_partial_svga(byte *p) {
 #ifdef DOS
   int y=0,page,old_page=-1751,point,t1,t2,n;
   char *q=vga;
@@ -738,7 +738,7 @@ void volcadopsvga(byte *p) {
 
 }
 
-void volcadocsvga(byte *p) {
+void blit_full_svga(byte *p) {
 #ifdef DOS
   int cnt=vga_an*vga_al;
   int tpv=0,ActPge=0;
@@ -758,7 +758,7 @@ void volcadocsvga(byte *p) {
 //      Volcado en un modo-x
 //-----------------------------------------------------------------------------
 
-void volcadopx(byte * p) {
+void blit_partial_modex(byte * p) {
 #ifdef DOS
   int n,m=(vga_an*vga_al)/4,plano=0x100,y;
   byte * v2, * p2;
@@ -782,7 +782,7 @@ void volcadopx(byte * p) {
 #endif
 }
 
-void volcadocx(byte * p) {
+void blit_full_modex(byte * p) {
 #ifdef DOS
   int n=(vga_an*vga_al)/4;
 
@@ -797,7 +797,7 @@ void volcadocx(byte * p) {
 }
 
 //-----------------------------------------------------------------------------
-//      Subrutinas de volcado genéricas
+//      Subrutinas de blit_screen genéricas
 //-----------------------------------------------------------------------------
 
 void vgacpy(byte * q, byte * p, int n) {
@@ -813,7 +813,7 @@ void vgacpy(byte * q, byte * p, int n) {
 }
 
 //-----------------------------------------------------------------------------
-//      Selecciona una ventana para su posterior volcado
+//      Selecciona una ventana para su posterior blit_screen
 //-----------------------------------------------------------------------------
 
 void init_flush(void) {
@@ -823,7 +823,7 @@ void init_flush(void) {
  volcado_completo=0; 
 }
 
-void volcado_parcial(int x,int y,int an,int al) {
+void blit_partial(int x,int y,int an,int al) {
   int ymax,xmax,n,d1,d2,x2;
 
   if (an==vga_an && al==vga_al && x==0 && y==0) { volcado_completo=1; return; }
@@ -938,7 +938,7 @@ int num_puntos;
  * the average of colors n and m, producing a 50% alpha-blend effect.
  * Uses a voxel-cube spatial index for fast nearest-color search.
  */
-void crear_ghost(void) {
+void create_ghost(void) {
 
   int n,m;
   int r3,g3,b3,vcubo;
@@ -960,40 +960,40 @@ void crear_ghost(void) {
 
       // Cubos de distancia sqr(0) --------------------------------------------
 
-      crear_ghost_vc(vcubo);
+      create_ghost_vc(vcubo);
 
       if (num_puntos>1) goto fast_ghost;
 
       // Cubos de distancia sqr(1) --------------------------------------------
 
-      if (r3>0) crear_ghost_vc(vcubo-64);
-      if (r3<7*64) crear_ghost_vc(vcubo+64);
-      if (g3>0) crear_ghost_vc(vcubo-8);
-      if (g3<7*8) crear_ghost_vc(vcubo+8);
-      if (b3>0) crear_ghost_vc(vcubo-1);
-      if (b3<7) crear_ghost_vc(vcubo+1);
+      if (r3>0) create_ghost_vc(vcubo-64);
+      if (r3<7*64) create_ghost_vc(vcubo+64);
+      if (g3>0) create_ghost_vc(vcubo-8);
+      if (g3<7*8) create_ghost_vc(vcubo+8);
+      if (b3>0) create_ghost_vc(vcubo-1);
+      if (b3<7) create_ghost_vc(vcubo+1);
 
       if (num_puntos>2) goto fast_ghost;
 
       // Cubos de distancia sqr(2) --------------------------------------------
 
       if (r3>0) {
-        if (g3>0) crear_ghost_vc(vcubo-64-8);
-        else { if (g3<7*8) crear_ghost_vc(vcubo-64+8); }
-        if (b3>0) crear_ghost_vc(vcubo-64-1);
-        else { if (b3<7) crear_ghost_vc(vcubo-64+1); }
+        if (g3>0) create_ghost_vc(vcubo-64-8);
+        else { if (g3<7*8) create_ghost_vc(vcubo-64+8); }
+        if (b3>0) create_ghost_vc(vcubo-64-1);
+        else { if (b3<7) create_ghost_vc(vcubo-64+1); }
       } else if (r3<7*64) {
-        if (g3>0) crear_ghost_vc(vcubo+64-8);
-        else { if (g3<7*8) crear_ghost_vc(vcubo+64+8); }
-        if (b3>0) crear_ghost_vc(vcubo+64-1);
-        else { if (b3<7) crear_ghost_vc(vcubo+64+1); }
+        if (g3>0) create_ghost_vc(vcubo+64-8);
+        else { if (g3<7*8) create_ghost_vc(vcubo+64+8); }
+        if (b3>0) create_ghost_vc(vcubo+64-1);
+        else { if (b3<7) create_ghost_vc(vcubo+64+1); }
       }
-      if (g3>0) { if (b3>0) crear_ghost_vc(vcubo-8-1);
-                else { if (b3<7) crear_ghost_vc(vcubo-8+1); } }
-      else if (g3<7*8) { if (b3>0) crear_ghost_vc(vcubo+8-1);
-                else { if (b3<7) crear_ghost_vc(vcubo+8+1); } }
+      if (g3>0) { if (b3>0) create_ghost_vc(vcubo-8-1);
+                else { if (b3<7) create_ghost_vc(vcubo-8+1); } }
+      else if (g3<7*8) { if (b3>0) create_ghost_vc(vcubo+8-1);
+                else { if (b3<7) create_ghost_vc(vcubo+8+1); } }
 
-      if (find_min==65536) crear_ghost_slow();
+      if (find_min==65536) create_ghost_slow();
 
       fast_ghost: *(ghost+n*256+m)=find_col;
                   *(ghost+m*256+n)=find_col;
@@ -1014,7 +1014,7 @@ void crear_ghost(void) {
 #endif
 }
 
-void crear_ghost_vc(int m) {
+void create_ghost_vc(int m) {
 
   int dif;
   struct t_tpuntos * p;
@@ -1028,7 +1028,7 @@ void crear_ghost_vc(int m) {
   } while ((p=(*p).next)!=NULL);
 }
 
-void crear_ghost_slow (void) {
+void create_ghost_slow (void) {
 
   int dmin,dif;
   byte *pal,*endpal,*color=NULL;
@@ -1059,7 +1059,7 @@ void find_color(byte r, byte g,byte b) { // Encuentra un color (que no sea el 0)
   find_col=(color-paleta)/3;
 }
 
-byte media(byte a,byte b) {
+byte average_color(byte a,byte b) {
   find_color(
       (paleta[a*3]+paleta[b*3])/2,
       (paleta[a*3+1]+paleta[b*3+1])/2,

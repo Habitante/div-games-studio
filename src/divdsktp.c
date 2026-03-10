@@ -665,10 +665,10 @@ int nueva_ventana_carga(voidReturnType init_handler,int nx,int ny)
         if (v.primer_plano==1)
           wvolcado(copia,vga_an,vga_al,ptr,x,y,an,al,0);
         else wvolcado_oscuro(copia,vga_an,vga_al,ptr,x,y,an,al,0);
-        volcado_parcial(x,y,an,al);
+        blit_partial(x,y,an,al);
       } else {
         flush_window(0);
-        volcado_parcial(v.x,v.y,v.an,v.al);
+        blit_partial(v.x,v.y,v.an,v.al);
       }
 
     //---------------------------------------------------------------------------

@@ -12,7 +12,7 @@ int compare_mode(void const *aa, void const *bb) {
 	return((int)(*a)*10000+*(a+1)>(int)(*b)*10000+*(b+1));
 }
 
-void detectar_vesa(void) { // Detects available video modes
+void detect_vesa(void) { // Detects available video modes
 	short *modelist;
 	int n;
 

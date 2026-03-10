@@ -42,7 +42,7 @@ void OSDEP_SetCaption(char *title, char *icon) {
 }
 
 OSDEP_VMode ** OSDEP_ListModes(void) {
-	return NULL; // Mode enumeration handled by detectar_vesa() fallback
+	return NULL; // Mode enumeration handled by detect_vesa() fallback
 }
 
 void OSDEP_WarpMouse(int x, int y) {

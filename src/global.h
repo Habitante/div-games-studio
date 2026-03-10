@@ -195,7 +195,7 @@ void select_zoom(void);
 ///////////////////////////////////////////////////////////////////////////////
 
 void sp_normal (byte*,int,int,int,int,int,int,int);
-void sp_rotado (byte*,int,int,int,int,int,int,int,float,float);
+void sp_rotated (byte*,int,int,int,int,int,int,int,float,float);
 void sp_size (int*,int*,int*,int*,int,int,float,float);
 void invierte_hor(byte*,int,int);
 void invierte_ver(byte*,int,int);
@@ -204,13 +204,13 @@ void invierte_ver(byte*,int,int);
 //      Functions exported by DIVVIDEO (divvideo.c)
 ///////////////////////////////////////////////////////////////////////////////
 
-void retrazo(void);
-void svmode(void);
-void rvmode(void);
+void retrace_wait(void);
+void setup_video_mode(void);
+void reset_video_mode(void);
 void set_dac(byte*);
 void init_flush(void);
-void volcado_parcial(int,int,int,int);
-void volcado(byte *);
+void blit_partial(int,int,int,int);
+void blit_screen(byte *);
 
 ///////////////////////////////////////////////////////////////////////////////
 //      Functions exported by DIVMOUSE (divmouse.c)
@@ -231,13 +231,13 @@ void mouse_window(void);
 
 void find_colors(void);
 void init_ghost(void);
-void crear_ghost(int);
+void create_ghost(int);
 void create_dac4();
 byte find_color(byte,byte,byte);
 byte find_color_not0(byte r,byte g,byte b);
 byte fast_find_color(byte fr,byte fg,byte fb);
 byte find_ord(byte*);
-byte media(byte,byte);
+byte average_color(byte,byte);
 void make_near_regla(void);
 void calcula_regla(int);
 
@@ -381,8 +381,8 @@ void wline(char *ptr,int realan,int an,int al,int x0, int y0, int x1, int y1, ch
 //      Functions exported by DIVLENGU (divlengu.c)
 ///////////////////////////////////////////////////////////////////////////////
 
-void inicializa_textos(byte * fichero);
-void finaliza_textos(void);
+void initialize_texts(byte * fichero);
+void finalize_texts(void);
 
 ///////////////////////////////////////////////////////////////////////////////
 //      Functions exported by DIVCDROM (divcdrom.c)
@@ -435,15 +435,15 @@ int Progress(char *titulo,int current,int total);
 //      Functions exported by DIVFORMA (divforma.c)
 ///////////////////////////////////////////////////////////////////////////////
 
-int es_MAP(byte *buffer);
+int is_MAP(byte *buffer);
 void descomprime_MAP(byte *buffer, byte *mapa, int);
-int graba_MAP(byte *mapa, FILE *f);
-int es_PCX(byte *buffer);
+int save_MAP(byte *mapa, FILE *f);
+int is_PCX(byte *buffer);
 void descomprime_PCX(byte *buffer, byte *mapa, int);
-int graba_PCX(byte *mapa, FILE *f);
-int es_BMP(byte *buffer);
+int save_PCX(byte *mapa, FILE *f);
+int is_BMP(byte *buffer);
 void descomprime_BMP(byte*buffer,byte*mapa,int);
-int es_JPG(byte *buffer, int img_filesize);
+int is_JPG(byte *buffer, int img_filesize);
 int descomprime_JPG(byte *buffer, byte *mapa, int vent, int img_filesize);
 int graba_BMP(byte *mapa, FILE *f);
 
@@ -739,7 +739,7 @@ struct tprg {
   int primera_columna;          // Desp. horizontal del fichero en pantalla
   char l[long_line+4];          // Buffer para la línea editada
   int line_size;                // Tamaño original de la línea editada
-  int linea_vieja;              // Línea anterior (para el volcado parcial)
+  int linea_vieja;              // Línea anterior (para el blit_screen parcial)
 };
 
 struct t_listbox{
@@ -826,7 +826,7 @@ GLOBAL_DATA int hiden[max_windows]; // Ventanas ocultadas al abrir un diálogo
 GLOBAL_DATA struct tmapa * ventanas_a_crear[max_windows];
 GLOBAL_DATA int num_ventanas_a_crear;
 
-GLOBAL_DATA int mouse_shift; // Para en big, adaptar las coordenadas dentro de barra
+GLOBAL_DATA int mouse_shift; // Para en big, adapt_palette las coordenadas dentro de barra
 GLOBAL_DATA int mouse_shift_x,mouse_shift_y;
 
 GLOBAL_DATA int fin_dialogo;
@@ -851,8 +851,8 @@ GLOBAL_DATA byte kbdFLAGS[128];
 
 void kbdInit(void);
 void kbdReset(void);
-void tecla(void);
-void vacia_buffer(void);
+void poll_keyboard(void);
+void flush_buffer(void);
 
 ///////////////////////////////////////////////////////////////////////////////
 //      Functions and structures exported by DIVFPG (divfpg.c)
@@ -1057,7 +1057,7 @@ GLOBAL_DATA char marcavga[128];
 
 GLOBAL_DATA int VersionVesa;
 
-void detectar_vesa(void);
+void detect_vesa(void);
 
 //////////////////////////////////////////////////////////////////////////////
 

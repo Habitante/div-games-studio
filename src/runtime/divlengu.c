@@ -15,18 +15,18 @@ byte *p_lengu,*q_lengu; // Punteros de lectura y escritura respectivamente.
 ///////////////////////////////////////////////////////////////////////////////
 //   Prototypes for this file
 ///////////////////////////////////////////////////////////////////////////////
-void analiza_textos(void);
+void analyze_texts(void);
 void coder(byte * ptr, int len, char * clave);
-void an_numero(void);
-void an_texto(void);
-void an_comentario(void);
+void analyze_number(void);
+void analyze_text(void);
+void analyze_comment(void);
 
 
 //-----------------------------------------------------------------------------
 //      Inicializa el sistema de textos
 //-----------------------------------------------------------------------------
 
-void inicializa_textos(byte * fichero) {
+void initialize_texts(byte * fichero) {
 
   FILE * f;
   int n;
@@ -42,7 +42,7 @@ void inicializa_textos(byte * fichero) {
       n=fread(textos,1,n,f);
       fclose(f);
       fin_textos=textos+n;
-      analiza_textos();
+      analyze_texts();
     } else fclose(f);
   }
 
@@ -56,7 +56,7 @@ void inicializa_textos(byte * fichero) {
       n=fread(textos,1,n,f);
       fclose(f);
       fin_textos=textos+n;
-      analiza_textos();
+      analyze_texts();
     } else fclose(f);
   } 
 
@@ -68,7 +68,7 @@ void inicializa_textos(byte * fichero) {
 //      Función de análisis de los textos
 //-----------------------------------------------------------------------------
 
-void analiza_textos(void) {
+void analyze_texts(void) {
 
   q_lengu=p_lengu=textos;
 
@@ -78,13 +78,13 @@ void analiza_textos(void) {
   }
 
   while(p_lengu<fin_textos)
-    if (*p_lengu>='0' && *p_lengu<='9') an_numero();
-    else if (*p_lengu=='"') an_texto();
-    else if (*p_lengu=='#') an_comentario();
+    if (*p_lengu>='0' && *p_lengu<='9') analyze_number();
+    else if (*p_lengu=='"') analyze_text();
+    else if (*p_lengu=='#') analyze_comment();
     else p_lengu++;
 }
 
-void an_numero(void) {
+void analyze_number(void) {
 
   numero=0; do {
     numero=numero*10+*p_lengu-'0'; p_lengu++;
@@ -92,12 +92,12 @@ void an_numero(void) {
   if (numero>=max_textos_sistema) numero=0;
 }
 
-void an_comentario(void) {
+void analyze_comment(void) {
 
   while (*p_lengu!='\n' && *p_lengu!='\r' && p_lengu<fin_textos) p_lengu++;
 }
 
-void an_texto(void) {
+void analyze_text(void) {
 
   text[numero]=q_lengu; p_lengu++; numero++;
   while (*p_lengu!='"' && p_lengu<fin_textos && *p_lengu!='\r' && *p_lengu!='\n') {
@@ -115,7 +115,7 @@ void an_texto(void) {
 //      Finaliza el sistema de textos
 //-----------------------------------------------------------------------------
 
-void finaliza_textos(void) {
+void finalize_texts(void) {
 
   free(textos);
 }

@@ -628,12 +628,12 @@ FILE *file;
         _c0=find_color_not0(dac[0],dac[1],dac[2]);
 
         for(x=1;x<256;x++) {
-                ifs.claros[x]=media(x,media(x,c4));
+                ifs.claros[x]=average_color(x,average_color(x,c4));
                 if (ifs.claros[x]==0) ifs.claros[x]=_c0;
         }
 
         for(x=1;x<256;x++) {
-                ifs.oscuros[x]=media(x,media(x,c0));
+                ifs.oscuros[x]=average_color(x,average_color(x,c0));
                 if (ifs.oscuros[x]==0) ifs.oscuros[x]=_c0;
         }
 

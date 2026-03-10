@@ -79,25 +79,25 @@ void get_input(int n);
 void save_mouse_bg(byte * p, int x, int y, int n, int flag);
 void process_graph(int id,byte *q,int van,int an,int al);
 
-void pinta_segmento(void);
-void incluye_miembros(int padre,int nivel,int index);
-void pinta_lista_var(void);
-void pinta_segmento2(void);
+void paint_segment(void);
+void include_members(int padre,int nivel,int index);
+void paint_var_list(void);
+void paint_segment2(void);
 int get_offset(int m);
 int memo(int dir);
-void visualiza(int valor, int objeto, char * str);
+void visualize(int valor, int objeto, char * str);
 int _get_offset(int m) ;
-void determina_codigo(void);
-void f_abajo(void);
-void pinta_codigo(void) ;
-void f_arriba(void);
+void determine_code(void);
+void f_down(void);
+void paint_code(void) ;
+void f_up(void);
 void f_home(void);
-void f_derecha(void) ;
-void f_izquierda(void);
+void f_right(void) ;
+void f_left(void);
 int get_ip(int n) ;
 void get_line(int n);
 void paint_process_segment(void);
-void pinta_segmento_profile(void);
+void paint_profile_segment(void);
 
 
 #define max_procesos 2048
@@ -217,7 +217,7 @@ struct variables {
 
 int num_var=0;  // Número de variables incluidas en var[]
 
-int var_ini;    // La primera variable que se visualiza en la ventana
+int var_ini;    // La primera variable que se visualize en la ventana
 int var_select; // La variable seleccionada
 
 int show_const=0,show_global=0,show_local=1,show_private=1;
@@ -229,8 +229,8 @@ int bloque_actual; // Proceso sobre el que se hace el inspect
 //----------------------------------------------------------------------------
 
 int iids,*ids;  // Identificadores de los procesos, por orden de ejecución
-int ids_ini;    // El primer proceso que se visualiza en la ventana
-int ids_select; // El proceso sobre el que se visualiza informacion 'Hi-lite'
+int ids_ini;    // El primer proceso que se visualize en la ventana
+int ids_select; // El proceso sobre el que se visualize informacion 'Hi-lite'
 int ids_next;   // El siguiente proceso dentro del orden de ejecución '>'
 
 //----------------------------------------------------------------------------
@@ -238,7 +238,7 @@ int ids_next;   // El siguiente proceso dentro del orden de ejecución '>'
 int lp1[512];     // Numero de línea en el que están los procesos
 char * lp2[512];  // Punteros a las líneas de los procesos
 int lp_num;       // Número de procesos en la lista
-int lp_ini;       // La primera variable que se visualiza en la ventana
+int lp_ini;       // La primera variable que se visualize en la ventana
 int lp_select;    // La variable seleccionada
 int lp_sort=0;    // Flag que indica si se ordena la lista
 
@@ -425,8 +425,8 @@ void init_big(void) {
 void init_colors(void) {
   find_color(0,0,0); c0=find_col;
   find_color(63,63,63); c4=find_col;
-  c2=media(c0,c4); c1=media(c0,c2); c3=media(c2,c4);
-  c01=media(c0,c1); c12=media(c1,c2); c23=media(c2,c3); c34=media(c3,c4);
+  c2=average_color(c0,c4); c1=average_color(c0,c2); c3=average_color(c2,c4);
+  c01=average_color(c0,c1); c12=average_color(c1,c2); c23=average_color(c2,c3); c34=average_color(c3,c4);
   find_color(63,0,0); c_r=find_col;
   find_color(0,63,0); c_g=find_col;
   find_color(0,0,63); c_b=find_col;
@@ -530,7 +530,7 @@ void show_dialog(voidReturnType init_handler) {
       explode(x,y,an,al);
 
       wvolcado(copia,vga_an,vga_al,ptr,x,y,an,al,0);
-      volcado_parcial(x,y,an,al);
+      blit_partial(x,y,an,al);
       do { dread_mouse(); } while(mouse_b&1);
       modal_loop();
 
@@ -580,7 +580,7 @@ void modal_loop(void) {
   fin_dialogo=0;
   do {
 	ascii=0;scan_code=0; 
-    tecla();
+    poll_keyboard();
     dialogo_invocado=0;
 
     //-------------------------------------------------------------------------
@@ -717,7 +717,7 @@ void close_window(void) {
   if (big) wput(v.ptr,v.an/2,v.al/2,v.an/2-9,2,-45);
   else wput(v.ptr,v.an,v.al,v.an-9,2,-45);
   flush_window(0);
-  volcado_parcial(v.x,v.y,v.an,v.al);
+  blit_partial(v.x,v.y,v.an,v.al);
   if (!no_volcar_nada) {
     flush_copy();
   } free(v.ptr);
@@ -801,7 +801,7 @@ void flush_window(int m) {
 
   }
 
-  volcado_parcial(x,y,an,al);
+  blit_partial(x,y,an,al);
 }
 
 //-----------------------------------------------------------------------------
@@ -1258,8 +1258,8 @@ void explode(int x,int y,int an,int al) {
     aan=(an*n)/10; aal=(al*n)/10;
     xx=x+an/2-aan/2; yy=y+al/2-aal/2;
     wrectangle(copia,vga_an,vga_al,c4,xx,yy,aan,aal);
-    volcado_parcial(xx,yy,aan,aal);
-    retrazo();
+    blit_partial(xx,yy,aan,aal);
+    retrace_wait();
     flush_copy();
     update_box(xx,yy,aan,1); update_box(xx,yy,1,aal);
     update_box(xx+aan-1,yy,1,aal); update_box(xx,yy+aal-1,aan,1);
@@ -1275,10 +1275,10 @@ void implode(int x,int y,int an,int al) {
     aal=(al*n)/10; if (!aal) aal=1;
     xx=x+an/2-aan/2; yy=y+al/2-aal/2;
     wrectangle(copia,vga_an,vga_al,c4,xx,yy,aan,aal);
-    volcado_parcial(xx,yy,aan,aal);
+    blit_partial(xx,yy,aan,aal);
     flush_copy();
     update_box(xx,yy,aan,aal);
-    retrazo();
+    retrace_wait();
   } while (--n); big=b;
 }
 
@@ -1294,10 +1294,10 @@ void extrude(int x,int y,int an,int al,int x2,int y2,int an2,int al2) {
     xx=(x*n+x2*(10-n))/10;
     yy=(y*n+y2*(10-n))/10;
     wrectangle(copia,vga_an,vga_al,c4,xx,yy,aan,aal);
-    volcado_parcial(xx,yy,aan,aal);
+    blit_partial(xx,yy,aan,aal);
     flush_copy();
     update_box(xx,yy,aan,aal);
-    retrazo();
+    retrace_wait();
   } while (--n); big=b; v.tipo=tipo;
 }
 
@@ -1340,7 +1340,7 @@ void update_box(int x, int y, int an, int al) {
 
   }
 
-  volcado_parcial(x,y,an,al);
+  blit_partial(x,y,an,al);
 }
 
 //-----------------------------------------------------------------------------
@@ -1855,7 +1855,7 @@ int button_status(int n) {
 void readmouse(void);
 
 void dread_mouse(void) {
-	tecla();
+	poll_keyboard();
   short ix,iy;
   int n=0;
 #ifdef DOS
@@ -1910,7 +1910,7 @@ void flush_copy(void) {
   dread_mouse();
   save_mouse_bg(fondo_raton,mouse_x,mouse_y,mouse_graf,0);
   put(mouse_x,mouse_y,mouse_graf);
-  volcado(copia);
+  blit_screen(copia);
   save_mouse_bg(fondo_raton,mouse_x,mouse_y,mouse_graf,1);
 
   // **************************************************
@@ -1940,7 +1940,7 @@ void save_mouse_bg(byte * p, int x, int y, int n, int flag) {
 
   if (x>=vga_an || y>=vga_al || x+an<=0 || y+al<=0) return;
 
-  volcado_parcial(x,y,an,al);
+  blit_partial(x,y,an,al);
 
   q=copia+y*vga_an+x;
 
@@ -2180,7 +2180,7 @@ int procesos_ejecutados(void) {
 //      Determina ids[] (lista de procesos, por orden de ejecución)
 //----------------------------------------------------------------------------
 
-void determina_ids(void) {
+void determine_ids(void) {
   int max,ide,id;
 
   iids=0; // Nº de procesos
@@ -2251,7 +2251,7 @@ void determina_ids(void) {
 //      Pinta la lista de procesos y la información relativa al seleccionado
 //----------------------------------------------------------------------------
 
-void pinta_lista_proc(void) {
+void draw_proc_list(void) {
   char msg[512];
   byte * ptr=v.ptr;
   int n,m,x;
@@ -2352,7 +2352,7 @@ void pinta_lista_proc(void) {
   wbox(ptr,an,al,c1,134,32,46,46); // Gráfico del proceso
   process_graph(ids[ids_select],ptr+32*big2*v.an+134*big2,v.an,46*big2,46*big2);
 
-  pinta_segmento();
+  paint_segment();
 }
 
 //----------------------------------------------------------------------------
@@ -2486,7 +2486,7 @@ void debug(void) {
 
 int member;
 
-void crear_lista_variables(void) {
+void create_variable_list(void) {
   int n,nuevo,incluir;
 
   memset(usado,0,sizeof(int)*num_obj);
@@ -2545,16 +2545,16 @@ void crear_lista_variables(void) {
       } num_var++;
 
       if (o[nuevo].tipo==tsglo || o[nuevo].tipo==tsloc) {
-        member=nuevo+1; incluye_miembros(num_var,1,var[num_var-1].indice);
+        member=nuevo+1; include_members(num_var,1,var[num_var-1].indice);
       }
       if (o[nuevo].tipo==tpsgl || o[nuevo].tipo==tpslo) {
-        member=o[nuevo].v1+1; incluye_miembros(num_var,1,var[num_var-1].indice);
+        member=o[nuevo].v1+1; include_members(num_var,1,var[num_var-1].indice);
       }
     }
   } while(nuevo);
 }
 
-void excluye_miembros(int padre,int nivel,int index) {
+void exclude_members(int padre,int nivel,int index) {
   int m;
   m=o[member].miembro;
   while (m==o[member].miembro) {
@@ -2567,12 +2567,12 @@ void excluye_miembros(int padre,int nivel,int index) {
         break;
     } padre++;
     if (o[member].tipo==tsglo || o[member].tipo==tsloc) {
-      member++; excluye_miembros(padre,nivel+1,index);
+      member++; exclude_members(padre,nivel+1,index);
     } else member++;
   }
 }
 
-void incluye_miembros(int padre,int nivel,int index) {
+void include_members(int padre,int nivel,int index) {
   int m;
 
   m=o[member].miembro;
@@ -2596,7 +2596,7 @@ void incluye_miembros(int padre,int nivel,int index) {
     } num_var++;
 
     if (o[member].tipo==tsglo || o[member].tipo==tsloc) {
-      member++; incluye_miembros(num_var,nivel+1,index);
+      member++; include_members(num_var,nivel+1,index);
     } else member++;
   }
 }
@@ -2623,7 +2623,7 @@ void inspect1(void) {
   wput(ptr,an,al,123+32+64,20,-39); // Boton arriba / abajo (pulsados 41,42)
   wput(ptr,an,al,123+32+64,134-40,-40);
 
-  crear_lista_variables();
+  create_variable_list();
 
   if (_var_ini!=-1 && num_var>1) {
     var_ini=_var_ini; var_select=_var_select;
@@ -2636,12 +2636,12 @@ void inspect1(void) {
 
   } else { var_ini=0; var_select=0; }
 
-  pinta_lista_var();
+  paint_var_list();
 
-  pinta_segmento2();
+  paint_segment2();
 }
 
-void pinta_segmento2(void) {
+void paint_segment2(void) {
   byte * ptr=v.ptr;
   int an=v.an/big2,al=v.al/big2;
   int min=27,max=89,n;
@@ -2667,30 +2667,30 @@ void inspect2(void) {
   _process_items();
   if (scan_code==80 && var_select+1<num_var) {
     if (var_ini+10==++var_select) var_ini++;
-    pinta_lista_var();
-    vacia_buffer();
+    paint_var_list();
+    flush_buffer();
     v.volcar=1;
   }
   if (scan_code==72 && var_select) {
     if (var_ini==var_select--) var_ini--;
-    pinta_lista_var();
-    vacia_buffer();
+    paint_var_list();
+    flush_buffer();
     v.volcar=1;
   }
   if (scan_code==81) {
     for (n=0;n<10;n++) if (var_select+1<num_var) {
       if (var_ini+10==++var_select) var_ini++;
     }
-    pinta_lista_var();
-    vacia_buffer();
+    paint_var_list();
+    flush_buffer();
     v.volcar=1;
   }
   if (scan_code==73) {
     for (n=0;n<10;n++) if (var_select) {
       if (var_ini==var_select--) var_ini--;
     }
-    pinta_lista_var();
-    vacia_buffer();
+    paint_var_list();
+    flush_buffer();
     v.volcar=1;
   }
 
@@ -2698,7 +2698,7 @@ void inspect2(void) {
     n=var_ini+(wmouse_y-21)/8;
     if (n<num_var) {
       var_select=n;
-      pinta_lista_var();
+      paint_var_list();
       v.volcar=1;
     }
   }
@@ -2709,7 +2709,7 @@ void inspect2(void) {
         wput(ptr,an,al,123+32+64,20,-41); boton=1;
         if (var_select) {
           if (var_ini==var_select--) var_ini--;
-          pinta_lista_var();
+          paint_var_list();
           v.volcar=1;
         }
       }
@@ -2724,7 +2724,7 @@ void inspect2(void) {
       var_select=x*(num_var-1);
       if (var_select<var_ini) var_ini=var_select;
       if (var_select>=var_ini+10) var_ini=var_select-9;
-      pinta_lista_var();
+      paint_var_list();
       v.volcar=1;
     }
   }
@@ -2735,7 +2735,7 @@ void inspect2(void) {
         wput(ptr,an,al,123+32+64,94,-42); boton=2;
         if (var_select+1<num_var) {
           if (var_ini+10==++var_select) var_ini++;
-          pinta_lista_var();
+          paint_var_list();
           v.volcar=1;
         }
       }
@@ -2756,25 +2756,25 @@ void inspect2(void) {
       case tpigl: case tpilo: case tpwgl: case tpwlo:
       case tpbgl: case tpblo: case tpcgl: case tpclo:
         var[var_select].indice=-1;
-        pinta_lista_var(); v.volcar=1;
+        paint_var_list(); v.volcar=1;
         break;
       case tpsgl: case tpslo:
         if (var[var_select].indice>-1) {
           var[var_select].indice=-1;
           if (!var[var_select].miembro) {
             member=o[var[var_select].objeto].v1+1;
-            excluye_miembros(var_select+1,1,var[var_select].indice);
+            exclude_members(var_select+1,1,var[var_select].indice);
             if (var_ini+10>num_var && var_ini) var_ini=num_var-10;
             if (var_ini<0) var_ini=0;
-            pinta_segmento2();
+            paint_segment2();
           }
-          pinta_lista_var();
-          pinta_segmento2();
+          paint_var_list();
+          paint_segment2();
           v.volcar=1;
         } break;
       default:
         var[var_select].indice=0;
-        pinta_lista_var(); v.volcar=1;
+        paint_var_list(); v.volcar=1;
         break;
     }
   }
@@ -2813,25 +2813,25 @@ void inspect2(void) {
           var[var_select].indice=0;
           if (!var[var_select].miembro) {
             member=o[var[var_select].objeto].v1+1;
-            excluye_miembros(var_select+1,1,var[var_select].indice);
-            pinta_segmento2();
+            exclude_members(var_select+1,1,var[var_select].indice);
+            paint_segment2();
           }
-          pinta_lista_var();
+          paint_var_list();
           break;
         }
         if (o[var[var_select].objeto].v3==-1) var[var_select].indice=0;
         else var[var_select].indice=o[var[var_select].objeto].v2-1;
         if (!var[var_select].miembro) {
           member=o[var[var_select].objeto].v1+1;
-          excluye_miembros(var_select+1,1,var[var_select].indice);
-          pinta_segmento2();
+          exclude_members(var_select+1,1,var[var_select].indice);
+          paint_segment2();
         }
-        pinta_lista_var();
+        paint_var_list();
         break;
       case tsglo: case tsloc:
         var[var_select].indice=o[var[var_select].objeto].v2-1;
         break;
-    } pinta_lista_var(); v.volcar=1;
+    } paint_var_list(); v.volcar=1;
   }
 
   if (num_var==0 && v.active_item<9) v.active_item=-1;
@@ -2844,9 +2844,9 @@ void inspect2(void) {
            ((o[var[var_select].objeto].tipo==tpsgl || o[var[var_select].objeto].tipo==tpslo) && var[var_select].indice>=0)) {
           v_texto=(char *)text[39]; show_dialog(err0);
         } else if (o[var[var_select].objeto].tipo==tcglo || o[var[var_select].objeto].tipo==tcloc) {
-          show_dialog(changestring0); pinta_lista_var(); v.volcar=1;
+          show_dialog(changestring0); paint_var_list(); v.volcar=1;
         } else {
-          show_dialog(change0); pinta_lista_var(); v.volcar=1;
+          show_dialog(change0); paint_var_list(); v.volcar=1;
         }
       } else { v_texto=(char *)text[40]; show_dialog(err0); }
       break;
@@ -2856,13 +2856,13 @@ void inspect2(void) {
         case ttglo: case ttloc: case tsglo: case tsloc:
         case tbglo: case tbloc: case twglo: case twloc:
           if (var[var_select].indice>0) var[var_select].indice--;
-          pinta_lista_var();
+          paint_var_list();
           v.volcar=1;
           break;
         case tpigl: case tpilo: case tpwgl: case tpwlo:
         case tpbgl: case tpblo: case tpcgl: case tpclo:
           if (var[var_select].indice>-1) var[var_select].indice--;
-          pinta_lista_var();
+          paint_var_list();
           v.volcar=1;
           break;
         case tpsgl: case tpslo:
@@ -2870,10 +2870,10 @@ void inspect2(void) {
             var[var_select].indice--;
             if (!var[var_select].miembro) {
               member=o[var[var_select].objeto].v1+1;
-              excluye_miembros(var_select+1,1,var[var_select].indice);
-              pinta_segmento2();
+              exclude_members(var_select+1,1,var[var_select].indice);
+              paint_segment2();
             }
-            pinta_lista_var();
+            paint_var_list();
             v.volcar=1;
           } break;
       } break;
@@ -2894,7 +2894,7 @@ void inspect2(void) {
           }
           if (o[var[var_select].objeto].v2==-1) {
             var[var_select].indice++;
-            pinta_lista_var();
+            paint_var_list();
             v.volcar=1;
             break;
           }
@@ -2905,7 +2905,7 @@ void inspect2(void) {
           if (o[var[var_select].objeto].v3>-1) n*=o[var[var_select].objeto].v3+1;
           if (o[var[var_select].objeto].v4>-1) n*=o[var[var_select].objeto].v4+1;
           if (var[var_select].indice<n-1) var[var_select].indice++;
-          pinta_lista_var();
+          paint_var_list();
           v.volcar=1;
           break;
         case tpsgl: case tpslo:
@@ -2916,53 +2916,53 @@ void inspect2(void) {
           else if (var[var_select].indice<o[var[var_select].objeto].v2-1) var[var_select].indice++;
           if (!var[var_select].miembro) {
             member=o[var[var_select].objeto].v1+1;
-            excluye_miembros(var_select+1,1,var[var_select].indice);
-            pinta_segmento2();
+            exclude_members(var_select+1,1,var[var_select].indice);
+            paint_segment2();
           }
-          pinta_lista_var();
+          paint_var_list();
           v.volcar=1;
           break;
         case tsglo: case tsloc:
           if (var[var_select].indice<o[var[var_select].objeto].v2-1) var[var_select].indice++;
-          pinta_lista_var();
+          paint_var_list();
           v.volcar=1;
           break;
       } break;
     case 3: // View as angle
       if (visor[var[var_select].objeto]==4) visor[var[var_select].objeto]=0;
       else visor[var[var_select].objeto]=4;
-      pinta_lista_var(); v.volcar=1;
+      paint_var_list(); v.volcar=1;
       break;
     case 4: // View as process
       if (visor[var[var_select].objeto]==3) visor[var[var_select].objeto]=0;
       else visor[var[var_select].objeto]=3;
-      pinta_lista_var(); v.volcar=1;
+      paint_var_list(); v.volcar=1;
       break;
     case 5: // View as text
       if (visor[var[var_select].objeto]==2) visor[var[var_select].objeto]=0;
       else visor[var[var_select].objeto]=2;
-      pinta_lista_var(); v.volcar=1;
+      paint_var_list(); v.volcar=1;
       break;
     case 6: // View as boolean
       if (visor[var[var_select].objeto]==1) visor[var[var_select].objeto]=0;
       else visor[var[var_select].objeto]=1;
-      pinta_lista_var(); v.volcar=1;
+      paint_var_list(); v.volcar=1;
       break;
     case 7: // View as Hex
       if (visor[var[var_select].objeto]==5) visor[var[var_select].objeto]=0;
       else visor[var[var_select].objeto]=5;
-      pinta_lista_var(); v.volcar=1;
+      paint_var_list(); v.volcar=1;
       break;
     case 8: // View as Bin
       if (visor[var[var_select].objeto]==6) visor[var[var_select].objeto]=0;
       else visor[var[var_select].objeto]=6;
-      pinta_lista_var(); v.volcar=1;
+      paint_var_list(); v.volcar=1;
       break;
     case 9: case 10: case 11: case 12: case 13: case 14:// Flags
-      crear_lista_variables();
+      create_variable_list();
       var_ini=0; var_select=0;
-      pinta_lista_var();
-      pinta_segmento2();
+      paint_var_list();
+      paint_segment2();
       v.volcar=1;
       break;
   }
@@ -3025,20 +3025,20 @@ void inspect0(void) {
 byte * capar_byte(byte * dir) {
   uintptr_t offset;
   offset=((uintptr_t)dir-(uintptr_t)mem)/4;
-  if (capar(offset)) return(dir); else return((byte*)mem);
+  if (validate_address(offset)) return(dir); else return((byte*)mem);
 }
 
 word * capar_word(word * dir) {
   uintptr_t offset;
   offset=((uintptr_t)dir-(uintptr_t)mem)/4;
-  if (capar(offset)) return(dir); else return((word*)mem);
+  if (validate_address(offset)) return(dir); else return((word*)mem);
 }
 
 int memo(int dir) {
-  return(mem[capar(dir)]);
+  return(mem[validate_address(dir)]);
 }
 
-void pinta_lista_var(void) {
+void paint_var_list(void) {
   char msg[512];
   byte * ptr=v.ptr,x;
   int an=v.an/big2,al=v.al/big2;
@@ -3075,17 +3075,17 @@ void pinta_lista_var(void) {
       case tcons:
         strcpy(msg,"CONST ");
         strcat(msg,vnom+o[var[m].objeto].nombre);
-        visualiza(o[var[m].objeto].v0,var[m].objeto,msg);
+        visualize(o[var[m].objeto].v0,var[m].objeto,msg);
         break;
       case tvglo: case tvloc:
         strcpy(msg,"INT ");
         strcat(msg,vnom+o[var[m].objeto].nombre);
-        visualiza(memo(get_offset(m)),var[m].objeto,msg);
+        visualize(memo(get_offset(m)),var[m].objeto,msg);
         break;
       case tcglo: case tcloc:
         strcpy(msg,"STRING ");
         strcat(msg,vnom+o[var[m].objeto].nombre);
-        visualiza(get_offset(m),var[m].objeto,msg);
+        visualize(get_offset(m),var[m].objeto,msg);
         break;
       case tbglo: case tbloc:
         strcpy(msg,"BYTE ");
@@ -3155,16 +3155,16 @@ void pinta_lista_var(void) {
               o[var[m].objeto].tipo=tvloc; break;
           }
           if (!memo(get_offset(m))) strcat(msg," = NULL");
-          else visualiza(memo(get_offset(m)),var[m].objeto,msg);
+          else visualize(memo(get_offset(m)),var[m].objeto,msg);
           o[var[m].objeto].tipo=tipo;
         } else if (o[var[m].objeto].tipo==ttglo || o[var[m].objeto].tipo==ttloc || o[var[m].objeto].tipo==tpigl || o[var[m].objeto].tipo==tpilo) {
-          visualiza(memo(get_offset(m)),var[m].objeto,msg);
+          visualize(memo(get_offset(m)),var[m].objeto,msg);
         } else if (o[var[m].objeto].tipo==twglo || o[var[m].objeto].tipo==twloc || o[var[m].objeto].tipo==tpwgl || o[var[m].objeto].tipo==tpwlo) {
-          visualiza(*get_offset_word(m),var[m].objeto,msg);
+          visualize(*get_offset_word(m),var[m].objeto,msg);
         } else if (o[var[m].objeto].tipo==tbglo || o[var[m].objeto].tipo==tbloc || o[var[m].objeto].tipo==tpbgl || o[var[m].objeto].tipo==tpblo) {
-          visualiza(*get_offset_byte(m),var[m].objeto,msg);
+          visualize(*get_offset_byte(m),var[m].objeto,msg);
         } else if (o[var[m].objeto].tipo==tpcgl || o[var[m].objeto].tipo==tpclo) {
-          visualiza(*get_offset_byte(m),var[m].objeto,msg);
+          visualize(*get_offset_byte(m),var[m].objeto,msg);
         } break;
       case tsglo: case tsloc:
         strcpy(msg,"STRUCT ");
@@ -3191,14 +3191,14 @@ void pinta_lista_var(void) {
     wwrite_in_box(ptr,an,144+9+64,al,10+var[m].tab*8,21+(m-var_ini)*8,0,(byte *)msg,x);
   }
 
-  pinta_segmento2();
+  paint_segment2();
 }
 
 //----------------------------------------------------------------------------
 //  Visualiza un objeto según su visor[]
 //----------------------------------------------------------------------------
 
-void visualiza(int valor, int objeto, char * str) {
+void visualize(int valor, int objeto, char * str) {
   int n;
   strcat(str," = ");
   switch(visor[objeto]) {
@@ -3267,7 +3267,7 @@ void visualiza(int valor, int objeto, char * str) {
 //----------------------------------------------------------------------------
 
 int get_offset(int m) {
-  return(capar(_get_offset(m)));
+  return(validate_address(_get_offset(m)));
 }
 
 int _get_offset(int m) {
@@ -3515,7 +3515,7 @@ void debug1(void) {
   wput(ptr,an,al,123,20,-39); // Boton arriba / abajo (pulsados 41,42)
   wput(ptr,an,al,123,139-5-16-32,-40);
 
-  determina_ids();
+  determine_ids();
 
   for (n=0;n<iids;n++) if (ids[n]==ids_old) break;
   if (n<iids) { // Si el proceso seleccionado antes sigue en la lista ...
@@ -3529,14 +3529,14 @@ void debug1(void) {
     ids_select=ids_next;
   }
 
-  pinta_lista_proc();
-  determina_codigo();
+  draw_proc_list();
+  determine_code();
 
   wbox(ptr,an,al,c0,1,144-16-32,an-2,1);
   wrectangle(ptr,an,al,c0,47,146-16-32,an-50,43+16+32);
 }
 
-void pinta_segmento(void) {
+void paint_segment(void) {
   byte * ptr=v.ptr;
   int an=v.an/big2,al=v.al/big2;
   int min=27,max=129-16-32,n;
@@ -3578,27 +3578,27 @@ void debug2(void) {
   if (!(shift_status&15) && ascii==0) {
 
     if (scan_code==80) {
-      f_abajo(); pinta_codigo(); vacia_buffer(); v.volcar=1;
+      f_down(); paint_code(); flush_buffer(); v.volcar=1;
     }
     if (scan_code==72) {
-      f_arriba(); pinta_codigo(); vacia_buffer(); v.volcar=1;
+      f_up(); paint_code(); flush_buffer(); v.volcar=1;
     }
     if (scan_code==81) {
-      for (n=0;n<11;n++) f_abajo();
-      pinta_codigo(); vacia_buffer(); v.volcar=1;
+      for (n=0;n<11;n++) f_down();
+      paint_code(); flush_buffer(); v.volcar=1;
     }
     if (scan_code==73) {
-      for (n=0;n<11;n++) f_arriba();
-      pinta_codigo(); vacia_buffer(); v.volcar=1;
+      for (n=0;n<11;n++) f_up();
+      paint_code(); flush_buffer(); v.volcar=1;
     }
     if (scan_code==71) {
-      f_home(); pinta_codigo(); vacia_buffer(); v.volcar=1;
+      f_home(); paint_code(); flush_buffer(); v.volcar=1;
     }
     if (scan_code==77) {
-      f_derecha(); pinta_codigo(); vacia_buffer(); v.volcar=1;
+      f_right(); paint_code(); flush_buffer(); v.volcar=1;
     }
     if (scan_code==75) {
-      f_izquierda(); pinta_codigo(); vacia_buffer(); v.volcar=1;
+      f_left(); paint_code(); flush_buffer(); v.volcar=1;
     }
 
   } else if (shift_status&15) { // (Shift || Control || Alt)
@@ -3607,25 +3607,25 @@ void debug2(void) {
       kbdFLAGS[80]=0;
       if (ids_select+1<iids) {
         if (ids_ini+9==++ids_select) ids_ini++;
-        pinta_lista_proc(); v.volcar=1;
+        draw_proc_list(); v.volcar=1;
       }
     }
     if (kbdFLAGS[72]) {
       kbdFLAGS[72]=0;
       if (ids_select) {
         if (ids_ini==ids_select--) ids_ini--;
-        pinta_lista_proc(); v.volcar=1;
+        draw_proc_list(); v.volcar=1;
       }
     }
     if (scan_code==81 || scan_code==118) {
       for (n=0;n<9;n++) if (ids_select+1<iids) {
         if (ids_ini+9==++ids_select) ids_ini++;
-      } pinta_lista_proc(); v.volcar=1;
+      } draw_proc_list(); v.volcar=1;
     }
     if (scan_code==73 || scan_code==132) {
       for (n=0;n<9;n++) if (ids_select) {
         if (ids_ini==ids_select--) ids_ini--;
-      } pinta_lista_proc(); v.volcar=1;
+      } draw_proc_list(); v.volcar=1;
     }
 
   }
@@ -3634,7 +3634,7 @@ void debug2(void) {
     n=ids_ini+(wmouse_y-21)/8;
     if (n<iids) {
       ids_select=n;
-      pinta_lista_proc();
+      draw_proc_list();
       v.volcar=1;
     }
   }
@@ -3645,7 +3645,7 @@ void debug2(void) {
         wput(ptr,an,al,123,20,-41); boton=1;
         if (ids_select) {
           if (ids_ini==ids_select--) ids_ini--;
-          pinta_lista_proc();
+          draw_proc_list();
           v.volcar=1;
         }
       }
@@ -3660,7 +3660,7 @@ void debug2(void) {
       ids_select=x*(iids-1);
       if (ids_select<ids_ini) ids_ini=ids_select;
       if (ids_select>=ids_ini+9) ids_ini=ids_select-8;
-      pinta_lista_proc();
+      draw_proc_list();
       v.volcar=1;
     }
   }
@@ -3671,7 +3671,7 @@ void debug2(void) {
         wput(ptr,an,al,123,134-16-32,-42); boton=2;
         if (ids_select+1<iids) {
           if (ids_ini+9==++ids_select) ids_ini++;
-          pinta_lista_proc();
+          draw_proc_list();
           v.volcar=1;
         }
       }
@@ -3682,7 +3682,7 @@ void debug2(void) {
   if ((mouse_b&1) && wmouse_in(48+5,147-16-32,an-52-5,41+16+32)) {
     linea_sel=linea0+(wmouse_y-(147-16-32))/8;
     if (linea_sel==linea0+11) linea_sel=linea0+10;
-    pinta_codigo(); v.volcar=1;
+    paint_code(); v.volcar=1;
   }
 
   if (scan_code==_F4) goto go_here;
@@ -3727,8 +3727,8 @@ void debug2(void) {
           ids_select=n; ids_ini=ids_select-ids_inc;
           if (ids_ini && ids_ini+13>iids) ids_ini=iids-13;
           if (ids_ini<0) ids_ini=0;
-          pinta_lista_proc();
-          determina_codigo();
+          draw_proc_list();
+          determine_code();
         } if (new_palette) { new_palette=0; repaint_window(); }
         dread_mouse(); _process_items();
         v.volcar=1; volcado_completo=1;
@@ -3749,7 +3749,7 @@ void debug2(void) {
         while (linea0<lp1[lp_select]) {
           linea0++; plinea0+=strlen((char *)plinea0)+1;
         }
-        linea_sel=linea0; pinta_codigo(); vacia_buffer(); v.volcar=1;
+        linea_sel=linea0; paint_code(); flush_buffer(); v.volcar=1;
       }
       break;
     case 2: // Breakpoint
@@ -3757,7 +3757,7 @@ void debug2(void) {
       for (n=0;n<max_breakpoint;n++) if (breakpoint[n].line==linea_sel) break;
       if (n<max_breakpoint) { // Se desactiva un breakpoint
         breakpoint[n].line=-1; mem[abs(breakpoint[n].offset)]=breakpoint[n].code;
-        pinta_codigo(); v.volcar=1;
+        paint_code(); v.volcar=1;
       } else {
         for (n=0;n<max_breakpoint;n++) if (breakpoint[n].line==-1) break;
         if (n<max_breakpoint) {
@@ -3766,7 +3766,7 @@ void debug2(void) {
             breakpoint[n].offset=m;
             breakpoint[n].code=mem[m];
             mem[m]=ldbg;
-            pinta_codigo(); v.volcar=1;
+            paint_code(); v.volcar=1;
           }
         } else { v_texto=(char *)text[63]; show_dialog(err0); }
       }
@@ -3881,7 +3881,7 @@ void debug2(void) {
     case 6: // Inspect
       inspect_proc:
       bloque_actual=mem[ids[ids_select]+_Bloque];
-      show_dialog(inspect0); pinta_lista_proc();
+      show_dialog(inspect0); draw_proc_list();
       v.volcar=1; break;
 
     case 7: // Profile
@@ -3968,7 +3968,7 @@ int get_ip(int n) { // A partir de una línea, obtiene la dirección IP de la st
   if (x<num_sentencias) return(line[x*6]); else return(-1);
 }
 
-void determina_codigo(void) { // Determina lo que se debe ver para "ids_next"
+void determine_code(void) { // Determina lo que se debe ver para "ids_next"
   byte * ptr=v.ptr;
   int an=v.an/big2,al=v.al/big2,l;
   char msg[256];
@@ -3991,11 +3991,11 @@ void determina_codigo(void) { // Determina lo que se debe ver para "ids_next"
 
   linea_sel=linea1;
 
-  pinta_codigo();
+  paint_code();
 
 }
 
-void pinta_codigo(void) { // Pinta el código
+void paint_code(void) { // Pinta el código
   byte * p=plinea0,c;
   int n,x,l=linea0;
   byte * ptr=v.ptr;
@@ -4050,15 +4050,15 @@ void f_home(void) {
   x_inicio=54;
 }
 
-void f_derecha(void) {
+void f_right(void) {
   x_inicio-=6;
 }
 
-void f_izquierda(void) {
+void f_left(void) {
   if (x_inicio<54) x_inicio+=6;
 }
 
-void f_arriba(void) {
+void f_up(void) {
   if (linea_sel) {
     linea_sel--;
     if (linea_sel<linea0) {
@@ -4067,7 +4067,7 @@ void f_arriba(void) {
   }
 }
 
-void f_abajo(void) {
+void f_down(void) {
   byte * p;
   int n;
 
@@ -4204,21 +4204,21 @@ void process_list2(void) {
 
   if (scan_code==80 && lp_select+1<lp_num) {
     if (lp_ini+15==++lp_select) lp_ini++;
-    paint_process_list(); vacia_buffer(); v.volcar=1;
+    paint_process_list(); flush_buffer(); v.volcar=1;
   }
   if (scan_code==72 && lp_select) {
     if (lp_ini==lp_select--) lp_ini--;
-    paint_process_list(); vacia_buffer(); v.volcar=1;
+    paint_process_list(); flush_buffer(); v.volcar=1;
   }
   if (scan_code==81) {
     for (n=0;n<15;n++) if (lp_select+1<lp_num) {
       if (lp_ini+15==++lp_select) lp_ini++;
-    } paint_process_list(); vacia_buffer(); v.volcar=1;
+    } paint_process_list(); flush_buffer(); v.volcar=1;
   }
   if (scan_code==73) {
     for (n=0;n<15;n++) if (lp_select) {
       if (lp_ini==lp_select--) lp_ini--;
-    } paint_process_list(); vacia_buffer(); v.volcar=1;
+    } paint_process_list(); flush_buffer(); v.volcar=1;
   }
 
   if (wmouse_in(3,21,128+32-9,120) && (mouse_b&1)) {
@@ -4299,7 +4299,7 @@ void process_list0(void) {
 
 //int lp1[512];     // Numero de objeto correspondiente a los procesos
 //int lp_num;       // Número de bloques de procesos en la lista
-//int lp_ini;       // El primer bloque que se visualiza en la ventana
+//int lp_ini;       // El primer bloque que se visualize en la ventana
 //int lp_select;    // El bloque de proceso seleccionado
 
 //int obj_start; // Inicio del primer objeto (&obj[0])
@@ -4386,7 +4386,7 @@ void process_paint(int id,int n) { // Id, ciclos
 
 int absolut=0;
 
-void crear_lista_profile(void) {
+void create_profile_list(void) {
   int n;
 
   lp_num=0; lp_ini=0; lp_select=0; // Procesos
@@ -4441,7 +4441,7 @@ void crear_lista_profile(void) {
   }
 }
 
-void pintar_lista_profile(void) {
+void paint_profile_list(void) {
   byte * ptr=v.ptr;
   int an=v.an/big2,al=v.al/big2;
   int m,x,porcen,porcen2;
@@ -4591,10 +4591,10 @@ void pintar_lista_profile(void) {
   wwrite(ptr,an,al,an-lp2esp+48,lp2y+1+lp2al* 5 ,1,(byte *)cwork,c_r_low0);
   wwrite(ptr,an,al,an-lp2esp+47,lp2y+1+lp2al* 5 ,1,(byte *)cwork,c34);
 
-  pinta_segmento_profile();
+  paint_profile_segment();
 }
 
-void pinta_segmento_profile(void) {
+void paint_profile_segment(void) {
   byte * ptr=v.ptr;
   int an=v.an/big2,al=v.al/big2;
   int min=lpy+7,max=lpy+lpnum*lpal-13,n;
@@ -4628,7 +4628,7 @@ void profile1(void) {
 
   _show_items();
 
-  crear_lista_profile();
+  create_profile_list();
 
   wrectangle(ptr,an,al,c0,3,12,an-6,11); // Overall speed %
   wbox(ptr,an,al,c_b_low0,4,13,an-8,9);
@@ -4685,7 +4685,7 @@ void profile1(void) {
   wput(ptr,an,al,an-lp2esp-11,lp2y,-39); // Boton arriba / abajo (pulsados 41,42)
   wput(ptr,an,al,an-lp2esp-11,lp2y+lp2num*lp2al-8,-40);
 
-  pintar_lista_profile();
+  paint_profile_list();
 }
 
 int lp2_boton;
@@ -4707,7 +4707,7 @@ void profile2(void) {
     n=lp_ini+(wmouse_y-lpy)/lpal;
     if (n<lp_num) {
       if (lp_select!=n) {
-        lp_select=n; pintar_lista_profile(); v.volcar=1;
+        lp_select=n; paint_profile_list(); v.volcar=1;
       }
     }
   }
@@ -4718,7 +4718,7 @@ void profile2(void) {
         wput(ptr,an,al,an-11,lpy,-41); lp_boton=1;
         if (lp_select) {
           if (lp_ini==lp_select--) lp_ini--;
-          pintar_lista_profile(); v.volcar=1;
+          paint_profile_list(); v.volcar=1;
         }
       }
     } else if (lp_boton==1) { wput(ptr,an,al,an-11,lpy,-39); lp_boton=0; v.volcar=1; }
@@ -4733,7 +4733,7 @@ void profile2(void) {
       lp_select=x*(lp_num-1);
       if (lp_select<lp_ini) lp_ini=lp_select;
       if (lp_select>=lp_ini+lpnum) lp_ini=lp_select-lpnum+1;
-      pintar_lista_profile(); v.volcar=1;
+      paint_profile_list(); v.volcar=1;
     }
   }
 
@@ -4743,7 +4743,7 @@ void profile2(void) {
         wput(ptr,an,al,an-11,lpy+lpnum*lpal-8,-42); lp_boton=2;
         if (lp_select+1<lp_num) {
           if (lp_ini+lpnum==++lp_select) lp_ini++;
-          pintar_lista_profile(); v.volcar=1;
+          paint_profile_list(); v.volcar=1;
         }
       }
     } else if (lp_boton==2) { wput(ptr,an,al,an-11,lpy+lpnum*lpal-8,-40); lp_boton=0; v.volcar=1; }
@@ -4756,7 +4756,7 @@ void profile2(void) {
     n=lp2_ini+(wmouse_y-lp2y)/lp2al;
     if (n<lp2_num) {
       if (lp2_select!=n) {
-        lp2_select=n; pintar_lista_profile(); v.volcar=1;
+        lp2_select=n; paint_profile_list(); v.volcar=1;
       }
     }
   }
@@ -4767,7 +4767,7 @@ void profile2(void) {
         wput(ptr,an,al,an-lp2esp-11,lp2y,-41); lp2_boton=1;
         if (lp2_select) {
           if (lp2_ini==lp2_select--) lp2_ini--;
-          pintar_lista_profile(); v.volcar=1;
+          paint_profile_list(); v.volcar=1;
         }
       }
     } else if (lp2_boton==1) { wput(ptr,an,al,an-lp2esp-11,lp2y,-39); lp2_boton=0; v.volcar=1; }
@@ -4782,7 +4782,7 @@ void profile2(void) {
       lp2_select=x*(lp2_num-1);
       if (lp2_select<lp2_ini) lp2_ini=lp2_select;
       if (lp2_select>=lp2_ini+lp2num) lp2_ini=lp2_select-lp2num+1;
-      pintar_lista_profile(); v.volcar=1;
+      paint_profile_list(); v.volcar=1;
     }
   }
 
@@ -4792,7 +4792,7 @@ void profile2(void) {
         wput(ptr,an,al,an-lp2esp-11,lp2y+lp2num*lp2al-8,-42); lp2_boton=2;
         if (lp2_select+1<lp2_num) {
           if (lp2_ini+lp2num==++lp2_select) lp2_ini++;
-          pintar_lista_profile(); v.volcar=1;
+          paint_profile_list(); v.volcar=1;
         }
       }
     } else if (lp2_boton==2) { wput(ptr,an,al,an-lp2esp-11,lp2y+lp2num*lp2al-8,-40); lp2_boton=0; v.volcar=1; }

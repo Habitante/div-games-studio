@@ -114,7 +114,7 @@ extern int columna_error;   // Error column num
   char l[long_line+4];          // Buffer para la línea editada
   int line_size;                // Tamaño original de la línea editada
 
-  int linea_vieja;              // Línea anterior (para el volcado parcial)
+  int linea_vieja;              // Línea anterior (para el blit_screen parcial)
 
   */
 
@@ -268,28 +268,28 @@ void program2(void) {
   if (mouse_graf==7 && (mouse_b&1) && wmouse_x!=-1) {
     if (!(v.botones&2)) {
       wput(v.ptr,an,al,an-9,10,-41); v.botones|=2;
-    } else { retrazo(); retrazo(); } v.volcar++;
+    } else { retrace_wait(); retrace_wait(); } v.volcar++;
     write_line(); retreat_vptr(); retreat_lptr(); read_line();
   } else if (v.botones&2) { wput(v.ptr,an,al,an-9,10,-39); v.botones^=2; v.volcar++; }
 
   if (mouse_graf==9 && (mouse_b&1) && wmouse_x!=-1) {
     if (!(v.botones&4)) {
       wput(v.ptr,an,al,an-9,al-17,-42); v.botones|=4;
-    } else { retrazo(); retrazo(); } v.volcar++;
+    } else { retrace_wait(); retrace_wait(); } v.volcar++;
     write_line(); advance_vptr(); advance_lptr(); read_line();
   } else if (v.botones&4) { wput(v.ptr,an,al,an-9,al-17,-40); v.botones^=4; v.volcar++; }
 
   if (mouse_graf==10 && (mouse_b&1) && wmouse_x!=-1) {
     if (!(v.botones&8)) {
       wput(v.ptr,an,al,2,al-9,-53); v.botones|=8;
-    } else { retrazo(); retrazo(); } v.volcar++;
+    } else { retrace_wait(); retrace_wait(); } v.volcar++;
     f_left();
   } else if (v.botones&8) { wput(v.ptr,an,al,2,al-9,-51); v.botones^=8; v.volcar++; }
 
   if (mouse_graf==11 && (mouse_b&1) && wmouse_x!=-1) {
     if (!(v.botones&16)) {
       wput(v.ptr,an,al,an-17,al-9,-54); v.botones|=16;
-    } else { retrazo(); retrazo(); } v.volcar++;
+    } else { retrace_wait(); retrace_wait(); } v.volcar++;
     f_right();
   } else if (v.botones&16) { wput(v.ptr,an,al,an-17,al-9,-52); v.botones^=16; v.volcar++; }
 
@@ -409,7 +409,7 @@ void editor() {
     }
   } edited=v.prg;
 
-  // tecla();
+  // poll_keyboard();
 
   delete_text_cursor();
 
@@ -1902,7 +1902,7 @@ void resize(void) {
 
     save_mouse_bg(fondo_raton,mx,my,mouse_graf,0);
     put(mx,my,mouse_graf);
-    volcado(copia);
+    blit_screen(copia);
     save_mouse_bg(fondo_raton,mx,my,mouse_graf,1);
 
   } while (mouse_b&1);
@@ -2971,7 +2971,7 @@ void open_program_for_fernando(char *nombre,char *path) {
 int lp1[512];     // Numero de línea en el que están los procesos
 byte * lp2[512];  // Punteros a las líneas de los procesos
 int lp_num;       // Número de procesos en la lista
-int lp_ini;       // La primera variable que se visualiza en la ventana
+int lp_ini;       // La primera variable que se visualize en la ventana
 int lp_select;    // La variable seleccionada
 int lp_sort=0;    // Flag que indica si se ordena la lista
 
@@ -3127,21 +3127,21 @@ void process_list2(void) {
 
   if (scan_code==80 && lp_select+1<lp_num) {
     if (lp_ini+15==++lp_select) lp_ini++;
-    paint_process_list(); vacia_buffer(); v.volcar=1;
+    paint_process_list(); flush_buffer(); v.volcar=1;
   }
   if (scan_code==72 && lp_select) {
     if (lp_ini==lp_select--) lp_ini--;
-    paint_process_list(); vacia_buffer(); v.volcar=1;
+    paint_process_list(); flush_buffer(); v.volcar=1;
   }
   if (scan_code==81) {
     for (n=0;n<15;n++) if (lp_select+1<lp_num) {
       if (lp_ini+15==++lp_select) lp_ini++;
-    } paint_process_list(); vacia_buffer(); v.volcar=1;
+    } paint_process_list(); flush_buffer(); v.volcar=1;
   }
   if (scan_code==73) {
     for (n=0;n<15;n++) if (lp_select) {
       if (lp_ini==lp_select--) lp_ini--;
-    } paint_process_list(); vacia_buffer(); v.volcar=1;
+    } paint_process_list(); flush_buffer(); v.volcar=1;
   }
 
   if (wmouse_in(3,21,128+132-9,120) && (mouse_b&1)) {

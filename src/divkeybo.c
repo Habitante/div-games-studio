@@ -117,14 +117,14 @@ void kbdReset(void)
 //      Espera una tecla, actualiza variables (ascii,scan_code y shift_status)
 //-----------------------------------------------------------------------------
 
-void tecla_bios(void) {
+void bios_key(void) {
 	// nothing to do
 }
 
 extern int reloj;
 
 //extern float m_x=0.0,m_y;
-void tecla(void) {
+void poll_keyboard(void) {
 mclock = SDL_GetTicks()/100;//(int)clock()/20000;
 reloj = SDL_GetTicks()/100;//(int)clock();
 }
@@ -133,8 +133,8 @@ reloj = SDL_GetTicks()/100;//(int)clock();
 //     Empty the keyboard buffer (real and internal)
 //-----------------------------------------------------------------------------
 
-void vacia_buffer(void) {
-//printf("vacia_buffer\n");
+void flush_buffer(void) {
+//printf("flush_buffer\n");
 #ifdef NOTYET
   union REGS r;
   struct SREGS s;

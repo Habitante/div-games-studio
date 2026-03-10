@@ -10,8 +10,8 @@
 // File-scope palette temps (formerly globals, used as implicit params between palette functions)
 static int r, g, b;
 
-void crear_ghost_vc(int m);
-void crear_ghost_slow (void);
+void create_ghost_vc(int m);
+void create_ghost_slow (void);
 void fusionar_paletas(void);
 void rescalar(byte *si,int sian,int sial,byte *di,int dian,int dial);
 
@@ -76,8 +76,8 @@ void find_colors(void) {
   c_num=find_color(colors_rgb[30],colors_rgb[31],colors_rgb[32]);
   c_lit=find_color(colors_rgb[33],colors_rgb[34],colors_rgb[35]);
 
-  c1=media(c0,c2); c3=media(c2,c4); ce01=media(c0,ce1); ce2=media(ce1,ce4);
-  c01=media(c0,c1); c12=media(c1,c2); c23=media(c2,c3); c34=media(c3,c4);
+  c1=average_color(c0,c2); c3=average_color(c2,c4); ce01=average_color(c0,ce1); ce2=average_color(ce1,ce4);
+  c01=average_color(c0,c1); c12=average_color(c1,c2); c23=average_color(c2,c3); c34=average_color(c3,c4);
   c_r=find_color(63,0,0); c_g=find_color(0,63,0); c_b=find_color(0,0,63);
   c_r_low=find_color(32,0,0); c_g_low=find_color(0,32,0);
   color_c0=c0;
@@ -140,40 +140,40 @@ byte fast_find_color(byte fr,byte fg,byte fb) {
 
   // Cubos de distancia sqr(0) --------------------------------------------
 
-  crear_ghost_vc(vcubo);
+  create_ghost_vc(vcubo);
 
   if (num_puntos>1) goto fast_find;
 
   // Cubos de distancia sqr(1) --------------------------------------------
 
-  if (r3>0) crear_ghost_vc(vcubo-64);
-  if (r3<7*64) crear_ghost_vc(vcubo+64);
-  if (g3>0) crear_ghost_vc(vcubo-8);
-  if (g3<7*8) crear_ghost_vc(vcubo+8);
-  if (b3>0) crear_ghost_vc(vcubo-1);
-  if (b3<7) crear_ghost_vc(vcubo+1);
+  if (r3>0) create_ghost_vc(vcubo-64);
+  if (r3<7*64) create_ghost_vc(vcubo+64);
+  if (g3>0) create_ghost_vc(vcubo-8);
+  if (g3<7*8) create_ghost_vc(vcubo+8);
+  if (b3>0) create_ghost_vc(vcubo-1);
+  if (b3<7) create_ghost_vc(vcubo+1);
 
   if (num_puntos>2) goto fast_find;
 
   // Cubos de distancia sqr(2) --------------------------------------------
 
   if (r3>0) {
-    if (g3>0) crear_ghost_vc(vcubo-64-8);
-    else { if (g3<7*8) crear_ghost_vc(vcubo-64+8); }
-    if (b3>0) crear_ghost_vc(vcubo-64-1);
-    else { if (b3<7) crear_ghost_vc(vcubo-64+1); }
+    if (g3>0) create_ghost_vc(vcubo-64-8);
+    else { if (g3<7*8) create_ghost_vc(vcubo-64+8); }
+    if (b3>0) create_ghost_vc(vcubo-64-1);
+    else { if (b3<7) create_ghost_vc(vcubo-64+1); }
   } else if (r3<7*64) {
-    if (g3>0) crear_ghost_vc(vcubo+64-8);
-    else { if (g3<7*8) crear_ghost_vc(vcubo+64+8); }
-    if (b3>0) crear_ghost_vc(vcubo+64-1);
-    else { if (b3<7) crear_ghost_vc(vcubo+64+1); }
+    if (g3>0) create_ghost_vc(vcubo+64-8);
+    else { if (g3<7*8) create_ghost_vc(vcubo+64+8); }
+    if (b3>0) create_ghost_vc(vcubo+64-1);
+    else { if (b3<7) create_ghost_vc(vcubo+64+1); }
   }
-  if (g3>0) { if (b3>0) crear_ghost_vc(vcubo-8-1);
-            else { if (b3<7) crear_ghost_vc(vcubo-8+1); }
-  } else if (g3<7*8) { if (b3>0) crear_ghost_vc(vcubo+8-1);
-            else { if (b3<7) crear_ghost_vc(vcubo+8+1); } }
+  if (g3>0) { if (b3>0) create_ghost_vc(vcubo-8-1);
+            else { if (b3<7) create_ghost_vc(vcubo-8+1); }
+  } else if (g3<7*8) { if (b3>0) create_ghost_vc(vcubo+8-1);
+            else { if (b3<7) create_ghost_vc(vcubo+8+1); } }
 
-  if (find_min==65536) crear_ghost_slow();
+  if (find_min==65536) create_ghost_slow();
 
   fast_find: return(find_col);
 }
@@ -182,7 +182,7 @@ byte fast_find_color(byte fr,byte fg,byte fb) {
 //      Función para la creación de la tabla ghost
 //-----------------------------------------------------------------------------
 
-void crear_ghost(int puntos) {
+void create_ghost(int puntos) {
 
   int n,m,punto=0;
   int r3,g3,b3,vcubo;
@@ -204,40 +204,40 @@ void crear_ghost(int puntos) {
 
       // Cubos de distancia sqr(0) --------------------------------------------
 
-      crear_ghost_vc(vcubo);
+      create_ghost_vc(vcubo);
 
       if (num_puntos>1) goto fast_ghost;
 
       // Cubos de distancia sqr(1) --------------------------------------------
 
-      if (r3>0) crear_ghost_vc(vcubo-64);
-      if (r3<7*64) crear_ghost_vc(vcubo+64);
-      if (g3>0) crear_ghost_vc(vcubo-8);
-      if (g3<7*8) crear_ghost_vc(vcubo+8);
-      if (b3>0) crear_ghost_vc(vcubo-1);
-      if (b3<7) crear_ghost_vc(vcubo+1);
+      if (r3>0) create_ghost_vc(vcubo-64);
+      if (r3<7*64) create_ghost_vc(vcubo+64);
+      if (g3>0) create_ghost_vc(vcubo-8);
+      if (g3<7*8) create_ghost_vc(vcubo+8);
+      if (b3>0) create_ghost_vc(vcubo-1);
+      if (b3<7) create_ghost_vc(vcubo+1);
 
       if (num_puntos>2) goto fast_ghost;
 
       // Cubos de distancia sqr(2) --------------------------------------------
 
       if (r3>0) {
-        if (g3>0) crear_ghost_vc(vcubo-64-8);
-        else { if (g3<7*8) crear_ghost_vc(vcubo-64+8); }
-        if (b3>0) crear_ghost_vc(vcubo-64-1);
-        else { if (b3<7) crear_ghost_vc(vcubo-64+1); }
+        if (g3>0) create_ghost_vc(vcubo-64-8);
+        else { if (g3<7*8) create_ghost_vc(vcubo-64+8); }
+        if (b3>0) create_ghost_vc(vcubo-64-1);
+        else { if (b3<7) create_ghost_vc(vcubo-64+1); }
       } else if (r3<7*64) {
-        if (g3>0) crear_ghost_vc(vcubo+64-8);
-        else { if (g3<7*8) crear_ghost_vc(vcubo+64+8); }
-        if (b3>0) crear_ghost_vc(vcubo+64-1);
-        else { if (b3<7) crear_ghost_vc(vcubo+64+1); }
+        if (g3>0) create_ghost_vc(vcubo+64-8);
+        else { if (g3<7*8) create_ghost_vc(vcubo+64+8); }
+        if (b3>0) create_ghost_vc(vcubo+64-1);
+        else { if (b3<7) create_ghost_vc(vcubo+64+1); }
       }
-      if (g3>0) { if (b3>0) crear_ghost_vc(vcubo-8-1);
-                else { if (b3<7) crear_ghost_vc(vcubo-8+1); }
-      } else if (g3<7*8) { if (b3>0) crear_ghost_vc(vcubo+8-1);
-                else { if (b3<7) crear_ghost_vc(vcubo+8+1); } }
+      if (g3>0) { if (b3>0) create_ghost_vc(vcubo-8-1);
+                else { if (b3<7) create_ghost_vc(vcubo-8+1); }
+      } else if (g3<7*8) { if (b3>0) create_ghost_vc(vcubo+8-1);
+                else { if (b3<7) create_ghost_vc(vcubo+8+1); } }
 
-      if (find_min==65536) crear_ghost_slow();
+      if (find_min==65536) create_ghost_slow();
 
       fast_ghost: *(ghost+n*256+m)=find_col;
                   *(ghost+m*256+n)=find_col;
@@ -250,7 +250,7 @@ void crear_ghost(int puntos) {
 
 }
 
-void crear_ghost_vc(int m) {
+void create_ghost_vc(int m) {
 
   int dif;
   struct t_tpuntos * p;
@@ -265,7 +265,7 @@ void crear_ghost_vc(int m) {
   } while ((p=(*p).next)!=NULL);
 }
 
-void crear_ghost_slow (void) {
+void create_ghost_slow (void) {
 
   int dmin,dif;
   byte *pal,*endpal,*color;
@@ -437,7 +437,7 @@ byte find_ord(byte * dac) {
 //      Media de dos colores (cálculo exacto)
 //-----------------------------------------------------------------------------
 
-byte media(byte a,byte b) {
+byte average_color(byte a,byte b) {
   create_dac4();
   return(
     find_color(
@@ -475,32 +475,32 @@ void calcula_regla(int n) {
 
   int a;
 
-  if (!reglas[n].fijo) { // Las reglas fijas no se pueden calcular
+  if (!reglas[n].fijo) { // Las reglas fijas no se pueden do_calculate
     switch(reglas[n].tipo) {
       case 0: // Lineal, el cálculo es obvio, se toman los colores en secuencia
         for (a=1;a<32;a++) reglas[n].col[a+1]=reglas[n].col[a]+1;
         break;
-      case 1: // Adaptable cada 1 color, no hay nada que calcular
+      case 1: // Adaptable cada 1 color, no hay nada que do_calculate
         break;
       case 2: // Adaptable cada 2 colores, se rellenan con las medias
         for (a=0;a<32;a+=2)
-          reglas[n].col[a+1]=media(reglas[n].col[a],reglas[n].col[a+2]);
+          reglas[n].col[a+1]=average_color(reglas[n].col[a],reglas[n].col[a+2]);
         break;
       case 4: // Adaptable cada 4
         for (a=0;a<32;a+=4) {
-          reglas[n].col[a+2]=media(reglas[n].col[a],reglas[n].col[a+4]);
-          reglas[n].col[a+1]=media(reglas[n].col[a],reglas[n].col[a+2]);
-          reglas[n].col[a+3]=media(reglas[n].col[a+2],reglas[n].col[a+4]);
+          reglas[n].col[a+2]=average_color(reglas[n].col[a],reglas[n].col[a+4]);
+          reglas[n].col[a+1]=average_color(reglas[n].col[a],reglas[n].col[a+2]);
+          reglas[n].col[a+3]=average_color(reglas[n].col[a+2],reglas[n].col[a+4]);
         } break;
       case 8: // Adaptable cada 8
         for (a=0;a<32;a+=8) {
-          reglas[n].col[a+4]=media(reglas[n].col[a],reglas[n].col[a+8]);
-          reglas[n].col[a+2]=media(reglas[n].col[a],reglas[n].col[a+4]);
-          reglas[n].col[a+6]=media(reglas[n].col[a+4],reglas[n].col[a+8]);
-          reglas[n].col[a+1]=media(reglas[n].col[a],reglas[n].col[a+2]);
-          reglas[n].col[a+3]=media(reglas[n].col[a+2],reglas[n].col[a+4]);
-          reglas[n].col[a+5]=media(reglas[n].col[a+4],reglas[n].col[a+6]);
-          reglas[n].col[a+7]=media(reglas[n].col[a+6],reglas[n].col[a+8]);
+          reglas[n].col[a+4]=average_color(reglas[n].col[a],reglas[n].col[a+8]);
+          reglas[n].col[a+2]=average_color(reglas[n].col[a],reglas[n].col[a+4]);
+          reglas[n].col[a+6]=average_color(reglas[n].col[a+4],reglas[n].col[a+8]);
+          reglas[n].col[a+1]=average_color(reglas[n].col[a],reglas[n].col[a+2]);
+          reglas[n].col[a+3]=average_color(reglas[n].col[a+2],reglas[n].col[a+4]);
+          reglas[n].col[a+5]=average_color(reglas[n].col[a+4],reglas[n].col[a+6]);
+          reglas[n].col[a+7]=average_color(reglas[n].col[a+6],reglas[n].col[a+8]);
         } break;
     }
   }
@@ -521,7 +521,7 @@ extern t_thumb thumb[max_archivos];
 extern int num_taggeds;
 
 extern byte * muestra;
-extern byte nueva_paleta[768];
+extern byte apply_palette[768];
 extern int num_colores;
 void crear_paleta(void);
 
@@ -624,7 +624,7 @@ void LoadPal() {
     }
 
     crear_paleta();
-    memcpy(&dac4[0],&nueva_paleta[0],768);
+    memcpy(&dac4[0],&apply_palette[0],768);
     free(muestra);
 
     if (hay_mapas()) {
@@ -795,7 +795,7 @@ void RefPalAndDlg(int no_tocar_mapas,int guardar_original)
 
   x=0; mouse_graf=3; flush_copy(); mouse_graf=1;
 
-  init_ghost(); crear_ghost(0); find_colors();
+  init_ghost(); create_ghost(0); find_colors();
   zoom_move=c3; color=0;
 
   create_title_bar();
@@ -860,7 +860,7 @@ void RefPalAndDlg(int no_tocar_mapas,int guardar_original)
 
   update_box(0,0,vga_an,vga_al);
 
-  volcado(copia);
+  blit_screen(copia);
 
         for (n=60;n>=0;n-=4)
         {
@@ -1056,7 +1056,7 @@ void fusiona_paleta(void){
 
       if(!div_try) { v_texto=(char *)texto[46]; show_dialog(err0); return; }
 
-      mouse_graf=3; volcado(copia);
+      mouse_graf=3; blit_screen(copia);
 
       fusionar_paletas();
 
@@ -1163,13 +1163,13 @@ void fusionar_paletas(void){
 //      Se requiere un puntero a una tabla RGB (32x32x32 bytes) con valores
 //      0 o 1 (según ese color esté presente o no en la muestra)
 //
-//  Salidas: nueva_paleta[] muestra[]
+//  Salidas: apply_palette[] muestra[]
 //      La paleta resultante y en la tabla original se han sustituido los
 //      valores a 1 por el correspondiente color de la paleta
 //-----------------------------------------------------------------------------
 
 byte * muestra;   // 32768
-byte nueva_paleta[768];
+byte apply_palette[768];
 int num_colores;
 extern int cargar_paleta;
 
@@ -1278,20 +1278,20 @@ void crear_paleta(void){
   }
 
   for (n=0;n<=c;n++) {
-    nueva_paleta[n*3+0]=pal[paleta[n]*4+0];
-    nueva_paleta[n*3+1]=pal[paleta[n]*4+1];
-    nueva_paleta[n*3+2]=pal[paleta[n]*4+2];
+    apply_palette[n*3+0]=pal[paleta[n]*4+0];
+    apply_palette[n*3+1]=pal[paleta[n]*4+1];
+    apply_palette[n*3+2]=pal[paleta[n]*4+2];
   }
 
   for (;n<=255;n++) {
-    nueva_paleta[n*3+0]=0;
-    nueva_paleta[n*3+1]=0;
-    nueva_paleta[n*3+2]=0;
+    apply_palette[n*3+0]=0;
+    apply_palette[n*3+1]=0;
+    apply_palette[n*3+2]=0;
   }
 
   free(dist); free(paleta); free(pal);
 
-  for (n=0;n<768;n++) dac4[n]=nueva_paleta[n]*4;
+  for (n=0;n<768;n++) dac4[n]=apply_palette[n]*4;
 
   for (n=0,c=0,rr=0;rr<32;rr++) for (gg=0;gg<32;gg++) for (bb=0;bb<32;bb++,n++)
     if (muestra[n]) {
@@ -1301,7 +1301,7 @@ void crear_paleta(void){
 
   create_dac4();
 
-  for (n=0;n<768;n++) if ((col=nueva_paleta[n])) nueva_paleta[n]=col*2+1;
+  for (n=0;n<768;n++) if ((col=apply_palette[n])) apply_palette[n]=col*2+1;
 
   if (!cargar_paleta) Progress((char *)texto[497],num_colores*4-256,num_colores*4-256);
 
@@ -1336,10 +1336,10 @@ void preparar_tapiz(void) {
   fclose(f);
 
   tap_an=map_an; tap_al=map_al;
-  if (es_MAP(temp2)) x=1;
-  else if (es_PCX(temp2)) x=2;
-  else if (es_BMP(temp2)) x=3;
-  else if (es_JPG(temp2,lon)) x=4;
+  if (is_MAP(temp2)) x=1;
+  else if (is_PCX(temp2)) x=2;
+  else if (is_BMP(temp2)) x=3;
+  else if (is_JPG(temp2,lon)) x=4;
   else x=0;
   swap(map_an,tap_an); swap(map_al,tap_al);
 

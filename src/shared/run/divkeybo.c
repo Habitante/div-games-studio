@@ -153,7 +153,7 @@ void kbdReset(void)
 //      Espera una tecla, actualiza variables (ascii,scan_code y shift_status)
 //-----------------------------------------------------------------------------
 
-void tecla_bios(void) {
+void bios_key(void) {
 #ifdef DOS
   int as,sc,ss;
   union REGS r;
@@ -267,7 +267,7 @@ void PrintEvent(const SDL_Event * event)
 int8_t hx=0,hy=0; // hat xy positions
 
 byte oldhatval;
-void tecla(void) {
+void poll_keyboard(void) {
 SDL_Event event;
 if(vwidth == 0 && vheight == 0) {
 	vwidth = vga_an;
@@ -389,7 +389,7 @@ if(vwidth == 0 && vheight == 0) {
   union REGS r;
   struct SREGS s;
 
-  tecla_bios();
+  bios_key();
 
   if (ibuf!=fbuf) {
     ascii=buf[ibuf]; scan_code=buf[ibuf+1]; shift_status=buf[ibuf+2];
@@ -408,7 +408,7 @@ if(vwidth == 0 && vheight == 0) {
 //      Vacia el buffer de teclado (real e interno)
 //-----------------------------------------------------------------------------
 
-void vacia_buffer(void) {
+void flush_buffer(void) {
 #ifdef DOS
   union REGS r;
   struct SREGS s;

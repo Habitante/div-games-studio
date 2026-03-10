@@ -14,9 +14,9 @@ void function_exec(int id,int n);
 int line_fx,color;
 
 void line(int x0, int y0, int x1, int y1);
-void caja(int x,int y,int an,int al);
-void caja_rellena(int x,int y,int an,int al);
-void circulo(int relleno,int x0,int y0,int x1,int y1);
+void draw_box(int x,int y,int an,int al);
+void draw_filled_box(int x,int y,int an,int al);
+void draw_circle(int relleno,int x0,int y0,int x1,int y1);
 void line_pixel(int x, int y);
 
 
@@ -27,14 +27,14 @@ void line_pixel(int x, int y);
 //----------------------------------------------------------------------------
 void move_scroll(int plano,int x,int y);
 void save_region(void);
-void sp_scanc(byte * p,short n,short m,short o,byte * si,int an,int x0,int y0,int x1,int y1);
-void sp_scancg(byte * p,short n,short m,short o,byte * si,int an,int x0,int y0,int x1,int y1);
+void sp_scan_clipped(byte * p,short n,short m,short o,byte * si,int an,int x0,int y0,int x1,int y1);
+void sp_scan_clipped_ghost(byte * p,short n,short m,short o,byte * si,int an,int x0,int y0,int x1,int y1);
 void sp_scan(byte * p,short n,byte * si,int an,int x0,int y0,int x1,int y1);
-void sp_scang(byte * p,short n,byte * si,int an,int x0,int y0,int x1,int y1);
-void texc(byte * p, int x, int y, byte an, int al);
-void texn(byte * p, int x, int y, byte an, int al);
-void pinta_modo7(int n,int camara_x, int camara_y, int camara_z, int angulo);
-void pinta_sprite_m7(int n,int ide,int x,int y,int size,int ang);
+void sp_scan_ghost(byte * p,short n,byte * si,int an,int x0,int y0,int x1,int y1);
+void text_clipped(byte * p, int x, int y, byte an, int al);
+void text_normal(byte * p, int x, int y, byte an, int al);
+void paint_mode7(int n,int camara_x, int camara_y, int camara_z, int angulo);
+void paint_sprite_m7(int n,int ide,int x,int y,int size,int ang);
 
 //----------------------------------------------------------------------------
 // Definicion de constantes
@@ -103,7 +103,7 @@ static unsigned int mul_16(long a, long b)
 // Función para pintar los sprites de un scroll ordenados por Z
 //----------------------------------------------------------------------------
 
-void pinta_sprites_scroll(void) {
+void paint_scroll_sprites(void) {
   #ifdef DEBUG
   int oreloj;
   #endif
@@ -122,7 +122,7 @@ void pinta_sprites_scroll(void) {
           (mem[id+_Cnumber]==0 || (mem[id+_Cnumber]&(1<<snum))) &&
           !mem[id+_Painted] && mem[id+_Z]>max) { ide=id; max=mem[id+_Z]; }
     if (ide) {
-      pinta_sprite(); mem[ide+_Painted]=1;
+      paint_sprite(); mem[ide+_Painted]=1;
       #ifdef DEBUG
       process_paint(ide,get_ticks()-oreloj);
       #endif
@@ -134,7 +134,7 @@ void pinta_sprites_scroll(void) {
 // Determina el movimiento de la ventana de scroll (automático o manual)
 //----------------------------------------------------------------------------
 
-void mover_scroll(int back) {
+void update_scroll(int back) {
   int i,x,y,ix,iy,r;
 
   if ((i=(scroll+snum)->camera)) { // Comprueba si el scroll es autómático
@@ -198,7 +198,7 @@ void scroll_simple(void) {
   #endif
   byte *di,*si;
 
-  mover_scroll(0);
+  update_scroll(0);
 
   si=iscroll[snum].sscr1; b=iscroll[snum].block1;
   di=copia+iscroll[snum].x+iscroll[snum].y*vga_an;
@@ -211,7 +211,7 @@ void scroll_simple(void) {
   #ifdef DEBUG
   function_exec(252,get_ticks()-oreloj);
   #endif
-  pinta_sprites_scroll();
+  paint_scroll_sprites();
 }
 
 //----------------------------------------------------------------------------
@@ -226,7 +226,7 @@ void scroll_parallax(void) {
   int nt,scan;
   byte *di,*si1,*si2;
 
-  mover_scroll(1); // Mueve los dos planos de scroll (auto o manualmente)
+  update_scroll(1); // Mueve los dos planos de scroll (auto o manualmente)
 
   si1=iscroll[snum].sscr1; si2=iscroll[snum].sscr2;
   b1=iscroll[snum].block1; b2=iscroll[snum].block2;
@@ -267,7 +267,7 @@ void scroll_parallax(void) {
   #ifdef DEBUG
   function_exec(252,get_ticks()-oreloj);
   #endif
-  pinta_sprites_scroll();
+  paint_scroll_sprites();
 }
 
 //----------------------------------------------------------------------------
@@ -839,16 +839,16 @@ void put_sprite(int file,int graph,int x,int y,int angle,int size,int flags,int 
     } else { xg=*((word*)ptr+32); yg=*((word*)ptr+33); }
 
     if (angle) {
-      sp_rotado(si,x,y,an,al,xg,yg,angle,size,flags);
+      sp_rotated(si,x,y,an,al,xg,yg,angle,size,flags);
     } else if (size!=100) {
-      sp_escalado(si,x,y,an,al,xg,yg,size,flags);
+      sp_scaled(si,x,y,an,al,xg,yg,size,flags);
     } else {
       if (flags&1) { xg=an-1-xg; } x-=xg;
       if (flags&2) { yg=al-1-yg; } y-=yg;
       if (x>=clipx0 && x+an<=clipx1 && y>=clipy0 && y+al<=clipy1) // Pinta sprite sin cortar
         sp_normal(si,x,y,an,al,flags);
       else if (x<clipx1 && y<clipy1 && x+an>clipx0 && y+al>clipy0) // Pinta sprite cortado
-        sp_cortado(si,x,y,an,al,flags);
+        sp_clipped(si,x,y,an,al,flags);
       x0s=x; x1s=x+an-1; y0s=y; y1s=y+al-1;
     }
 
@@ -863,10 +863,10 @@ void put_sprite(int file,int graph,int x,int y,int angle,int size,int flags,int 
 
 /* Render the sprite for process 'ide': looks up its graphic from the FPG,
  * applies animation tables (_XGraph), clipping region, and coordinate
- * transforms, then dispatches to sp_normal/sp_cortado/sp_escalado/sp_rotado
+ * transforms, then dispatches to sp_normal/sp_clipped/sp_scaled/sp_rotated
  * depending on angle, scale, and clipping. Color 0 is always transparent.
  */
-void pinta_sprite(void) { // Pinta un sprite (si se ve), según mem[ide+ ... ]
+void paint_sprite(void) { // Pinta un sprite (si se ve), según mem[ide+ ... ]
 
   int * ptr;
   byte * si;
@@ -919,10 +919,10 @@ void pinta_sprite(void) { // Pinta un sprite (si se ve), según mem[ide+ ... ]
     if (putsprite!=NULL) {
       putsprite(si,x,y,an,al,xg,yg,mem[ide+_Angle],mem[ide+_Size],mem[ide+_Flags]);
     } else if (mem[ide+_Angle] && mem[ide+_XGraph]<=0) {
-      sp_rotado(si,x,y,an,al,xg,yg,mem[ide+_Angle],mem[ide+_Size],mem[ide+_Flags]);
+      sp_rotated(si,x,y,an,al,xg,yg,mem[ide+_Angle],mem[ide+_Size],mem[ide+_Flags]);
       save_region();
     } else if (mem[ide+_Size]!=100) {
-      sp_escalado(si,x,y,an,al,xg,yg,mem[ide+_Size],mem[ide+_Flags]);
+      sp_scaled(si,x,y,an,al,xg,yg,mem[ide+_Size],mem[ide+_Flags]);
       save_region();
     } else {
       if (mem[ide+_Flags]&1) { xg=an-1-xg; } x-=xg;
@@ -930,7 +930,7 @@ void pinta_sprite(void) { // Pinta un sprite (si se ve), según mem[ide+ ... ]
       if (x>=clipx0 && x+an<=clipx1 && y>=clipy0 && y+al<=clipy1) // Pinta sprite sin cortar
         sp_normal(si,x,y,an,al,mem[ide+_Flags]);
       else if (x<clipx1 && y<clipy1 && x+an>clipx0 && y+al>clipy0) // Pinta sprite cortado
-        sp_cortado(si,x,y,an,al,mem[ide+_Flags]);
+        sp_clipped(si,x,y,an,al,mem[ide+_Flags]);
       x0s=x; x1s=x+an-1; y0s=y; y1s=y+al-1; save_region();
     }
   }
@@ -1025,7 +1025,7 @@ void sp_normal(byte * p, int x, int y, int an, int al, int flags) {
 // Sprite - cortado [espejado] [ghost]
 //----------------------------------------------------------------------------
 
-void sp_cortado(byte * p, int x, int y, int an, int al, int flags) {
+void sp_clipped(byte * p, int x, int y, int an, int al, int flags) {
 
   byte *q=copia+y*vga_an+x;
   int salta_x, long_x, resto_x;
@@ -1119,7 +1119,7 @@ void sp_cortado(byte * p, int x, int y, int an, int al, int flags) {
 // Sprite - escalado [cortado] [espejado] [ghost]
 //----------------------------------------------------------------------------
 
-void sp_escalado(byte * old_si, int x, int y, int an, int al, int xg, int yg,
+void sp_scaled(byte * old_si, int x, int y, int an, int al, int xg, int yg,
                  int size, int flags) {
 
   int salta_x, long_x, resto_x; // Referidas a pantalla
@@ -1180,7 +1180,7 @@ void sp_escalado(byte * old_si, int x, int y, int an, int al, int xg, int yg,
 // Sprite - rotado [escalado] [cortado] [espejado] [ghost]
 //----------------------------------------------------------------------------
 
-void sp_rotado(byte * si, int x, int y, int an, int al, int xg, int yg,
+void sp_rotated(byte * si, int x, int y, int an, int al, int xg, int yg,
                int ang, int size, int flags) {
 
   float d0,d1,d2,d3;
@@ -1307,16 +1307,16 @@ void sp_rotado(byte * si, int x, int y, int an, int al, int xg, int yg,
 
     if (h<clipy1 && h>=clipy0 && x0.w[1]<clipx1 && x1.w[1]>=clipx0 && x1.w[1]>x0.w[1]) {
     if (x0.w[1]<clipx0) { if (x1.w[1]>=clipx1) {
-      if (flags&4) sp_scancg(ptrcopia+clipx0,x1.w[1]-x0.w[1],clipx1-clipx0-1,clipx0-x0.w[1],si,an,g0x.l,g0y.l,g1x.l,g1y.l);
-      else sp_scanc(ptrcopia+clipx0,x1.w[1]-x0.w[1],clipx1-clipx0-1,clipx0-x0.w[1],si,an,g0x.l,g0y.l,g1x.l,g1y.l);
+      if (flags&4) sp_scan_clipped_ghost(ptrcopia+clipx0,x1.w[1]-x0.w[1],clipx1-clipx0-1,clipx0-x0.w[1],si,an,g0x.l,g0y.l,g1x.l,g1y.l);
+      else sp_scan_clipped(ptrcopia+clipx0,x1.w[1]-x0.w[1],clipx1-clipx0-1,clipx0-x0.w[1],si,an,g0x.l,g0y.l,g1x.l,g1y.l);
     } else {
-      if (flags&4) sp_scancg(ptrcopia+clipx0,x1.w[1]-x0.w[1],x1.w[1]-clipx0,clipx0-x0.w[1],si,an,g0x.l,g0y.l,g1x.l,g1y.l);
-      else sp_scanc(ptrcopia+clipx0,x1.w[1]-x0.w[1],x1.w[1]-clipx0,clipx0-x0.w[1],si,an,g0x.l,g0y.l,g1x.l,g1y.l);
+      if (flags&4) sp_scan_clipped_ghost(ptrcopia+clipx0,x1.w[1]-x0.w[1],x1.w[1]-clipx0,clipx0-x0.w[1],si,an,g0x.l,g0y.l,g1x.l,g1y.l);
+      else sp_scan_clipped(ptrcopia+clipx0,x1.w[1]-x0.w[1],x1.w[1]-clipx0,clipx0-x0.w[1],si,an,g0x.l,g0y.l,g1x.l,g1y.l);
     } } else if (x1.w[1]>=clipx1) {
-      if (flags&4) sp_scancg(ptrcopia+x0.w[1],x1.w[1]-x0.w[1],clipx1-1-x0.w[1],0,si,an,g0x.l,g0y.l,g1x.l,g1y.l);
-      else sp_scanc(ptrcopia+x0.w[1],x1.w[1]-x0.w[1],clipx1-1-x0.w[1],0,si,an,g0x.l,g0y.l,g1x.l,g1y.l);
+      if (flags&4) sp_scan_clipped_ghost(ptrcopia+x0.w[1],x1.w[1]-x0.w[1],clipx1-1-x0.w[1],0,si,an,g0x.l,g0y.l,g1x.l,g1y.l);
+      else sp_scan_clipped(ptrcopia+x0.w[1],x1.w[1]-x0.w[1],clipx1-1-x0.w[1],0,si,an,g0x.l,g0y.l,g1x.l,g1y.l);
     } else {
-      if (flags&4) sp_scang(ptrcopia+x0.w[1],x1.w[1]-x0.w[1],si,an,g0x.l,g0y.l,g1x.l,g1y.l);
+      if (flags&4) sp_scan_ghost(ptrcopia+x0.w[1],x1.w[1]-x0.w[1],si,an,g0x.l,g0y.l,g1x.l,g1y.l);
       else sp_scan(ptrcopia+x0.w[1],x1.w[1]-x0.w[1],si,an,g0x.l,g0y.l,g1x.l,g1y.l);
     } }
 
@@ -1338,7 +1338,7 @@ void sp_rotado(byte * si, int x, int y, int an, int al, int xg, int yg,
 // Impresión de un sprite rotado y escalado, sin cortar
 //----------------------------------------------------------------------------
 
-void sp_scanc(byte * p,short n,short m,short o,byte * si,int an,int x0,int y0,int x1,int y1) {
+void sp_scan_clipped(byte * p,short n,short m,short o,byte * si,int an,int x0,int y0,int x1,int y1) {
 
   union { int32_t l; int16_t w[2]; } x,y;
   byte c;
@@ -1353,7 +1353,7 @@ void sp_scanc(byte * p,short n,short m,short o,byte * si,int an,int x0,int y0,in
   } while (m--);
 }
 
-void sp_scancg(byte * p,short n,short m,short o,byte * si,int an,int x0,int y0,int x1,int y1) {
+void sp_scan_clipped_ghost(byte * p,short n,short m,short o,byte * si,int an,int x0,int y0,int x1,int y1) {
 
   union { int32_t l; int16_t w[2]; } x,y;
   byte c;
@@ -1386,7 +1386,7 @@ void sp_scan(byte * p,short n,byte * si,int an,int x0,int y0,int x1,int y1) {
   } while (n--);
 }
 
-void sp_scang(byte * p,short n,byte * si,int an,int x0,int y0,int x1,int y1) {
+void sp_scan_ghost(byte * p,short n,byte * si,int an,int x0,int y0,int x1,int y1) {
 
   union { int32_t l; int16_t w[2]; } x,y;
   byte c;
@@ -1404,7 +1404,7 @@ void sp_scang(byte * p,short n,byte * si,int an,int x0,int y0,int x1,int y1) {
 // Drawings
 //----------------------------------------------------------------------------
 
-void pinta_drawings(void) {
+void paint_drawings(void) {
   int x,y,an,al;
   int n=0;
 
@@ -1433,16 +1433,16 @@ void pinta_drawings(void) {
         line(drawing[n].x0,drawing[n].y0,drawing[n].x1,drawing[n].y1);
         break;
       case 2:
-        caja(x,y,an,al);
+        draw_box(x,y,an,al);
         break;
       case 3:
-        caja_rellena(x,y,an,al);
+        draw_filled_box(x,y,an,al);
         break;
       case 4:
-        circulo(0,x,y,x+an-1,y+al-1);
+        draw_circle(0,x,y,x+an-1,y+al-1);
         break;
       case 5:
-        circulo(1,x,y,x+an-1,y+al-1);
+        draw_circle(1,x,y,x+an-1,y+al-1);
         break;
     }
 
@@ -1454,7 +1454,7 @@ void pinta_drawings(void) {
 //      Dibuja una caja, según modo_caja, line_fx y color
 //-----------------------------------------------------------------------------
 
-void caja(int x,int y,int an,int al) {
+void draw_box(int x,int y,int an,int al) {
   line(x,y,x+an-1,y);
   line(x,y+al-1,x+an-1,y+al-1);
   al-=2; y++; if (al>0) do {
@@ -1462,7 +1462,7 @@ void caja(int x,int y,int an,int al) {
   } while (--al);
 }
 
-void caja_rellena(int x,int y,int an,int al) {
+void draw_filled_box(int x,int y,int an,int al) {
   do { line(x,y,x+an-1,y); y++; } while (--al);
 }
 
@@ -1470,7 +1470,7 @@ void caja_rellena(int x,int y,int an,int al) {
 //      Dibuja un círculo (line_fx y color)
 //-----------------------------------------------------------------------------
 
-void circulo(int relleno,int x0,int y0,int x1,int y1) {
+void draw_circle(int relleno,int x0,int y0,int x1,int y1) {
 
   int p[2048]; // Puntos de la circunferencia
   double cx,rx; // Centro y radio de la circunferencia
@@ -1734,7 +1734,7 @@ byte * ptr2;
                 }
                 else
                 {
-                        texc(fonts[0]+fnt[*ptr].offset,x,y+fnt[*ptr].incY,fnt[*ptr].ancho,fnt[*ptr].alto);
+                        text_clipped(fonts[0]+fnt[*ptr].offset,x,y+fnt[*ptr].incY,fnt[*ptr].ancho,fnt[*ptr].alto);
                         x=x+fnt[*ptr].ancho;
                         ptr++;
                 }
@@ -1742,7 +1742,7 @@ byte * ptr2;
 
 void checkpal_font(int ifonts);
 
-void pinta_textos(int n) { // E: texto[]
+void paint_texts(int n) { // E: texto[]
 
   int x,y,an,al;
   int fuente;
@@ -1815,19 +1815,19 @@ void pinta_textos(int n) { // E: texto[]
 	if (*ptr && x<0) {
           if (fnt[*ptr].ancho==0) { x+=f_i[fuente].espacio; ptr++;
           } else {
-            texc(texto[n].font+fnt[*ptr].offset,x,y+fnt[*ptr].incY,fnt[*ptr].ancho,fnt[*ptr].alto);
+            text_clipped(texto[n].font+fnt[*ptr].offset,x,y+fnt[*ptr].incY,fnt[*ptr].ancho,fnt[*ptr].alto);
             x=x+fnt[*ptr].ancho; ptr++; }
         }
 
 	while (*ptr && x+fnt[*ptr].ancho<=vga_an) {
           if (fnt[*ptr].ancho==0) { x+=f_i[fuente].espacio; ptr++; } else {
-          texn(texto[n].font+fnt[*ptr].offset,x,y+fnt[*ptr].incY,fnt[*ptr].ancho,fnt[*ptr].alto);
+          text_normal(texto[n].font+fnt[*ptr].offset,x,y+fnt[*ptr].incY,fnt[*ptr].ancho,fnt[*ptr].alto);
           x=x+fnt[*ptr].ancho; ptr++;
         } }
 
         if (*ptr && x<vga_an) {
           if (fnt[*ptr].ancho==0) { x+=f_i[fuente].espacio; ptr++; } else
-          texc(texto[n].font+fnt[*ptr].offset,x,y+fnt[*ptr].incY,fnt[*ptr].ancho,fnt[*ptr].alto);
+          text_clipped(texto[n].font+fnt[*ptr].offset,x,y+fnt[*ptr].incY,fnt[*ptr].ancho,fnt[*ptr].alto);
         }
 
       } else {
@@ -1838,7 +1838,7 @@ void pinta_textos(int n) { // E: texto[]
 
 	while (*ptr && x<vga_an)
           if (fnt[*ptr].ancho==0) { x+=f_i[fuente].espacio; ptr++; } else {
-          texc(texto[n].font+fnt[*ptr].offset,x,y+fnt[*ptr].incY,fnt[*ptr].ancho,fnt[*ptr].alto);
+          text_clipped(texto[n].font+fnt[*ptr].offset,x,y+fnt[*ptr].incY,fnt[*ptr].ancho,fnt[*ptr].alto);
           x=x+fnt[*ptr].ancho; ptr++;
         }
 
@@ -1847,7 +1847,7 @@ void pinta_textos(int n) { // E: texto[]
   } while (++n<max_textos);
 }
 
-void texn(byte * p, int x, int y, byte an, int al) {
+void text_normal(byte * p, int x, int y, byte an, int al) {
 
   byte *q=copia+y*vga_an+x;
   int ancho=an;
@@ -1860,7 +1860,7 @@ void texn(byte * p, int x, int y, byte an, int al) {
   } while (--al);
 }
 
-void texc(byte * p, int x, int y, byte an, int al) {
+void text_clipped(byte * p, int x, int y, byte an, int al) {
 
   byte *q=copia+y*vga_an+x;
   int salta_x, long_x, resto_x;
@@ -1892,9 +1892,9 @@ void texc(byte * p, int x, int y, byte an, int al) {
 // Pinta la ventana de modo 7
 //----------------------------------------------------------------------------
 
-void pinta_sprites_m7(int n,int cx,int cy,float ang);
+void paint_sprites_m7(int n,int cx,int cy,float ang);
 
-void pinta_m7(int n) {
+void paint_m7(int n) {
   int x,y;
   #ifdef DEBUG
   int oreloj=get_ticks();
@@ -1919,7 +1919,7 @@ void pinta_m7(int n) {
     y=-(mem[id+_Y]*65536-get_disty(mem[id+_Angle],distance*65536));
   }
 
-  pinta_modo7(n,x,height*16384,y,angle); //<<14
+  paint_mode7(n,x,height*16384,y,angle); //<<14
 
   if (post_process_m7!=NULL) post_process_m7();
 
@@ -1927,7 +1927,7 @@ void pinta_m7(int n) {
   function_exec(251,get_ticks()-oreloj);
   #endif
 
-  pinta_sprites_m7(n,x,-y,(float)((float)mem[id+_Angle]/radian));
+  paint_sprites_m7(n,x,-y,(float)((float)mem[id+_Angle]/radian));
 
 }
 
@@ -1935,7 +1935,7 @@ void pinta_m7(int n) {
 // Pinta los sprites del modo 7 (scroll snum)
 //----------------------------------------------------------------------------
 
-void pinta_sprites_m7(int n,int cx,int cy,float ang) { // Le pasamos la posición de la cámara
+void paint_sprites_m7(int n,int cx,int cy,float ang) { // Le pasamos la posición de la cámara
   int factor;
   #ifdef DEBUG
   int oreloj;
@@ -2010,7 +2010,7 @@ void pinta_sprites_m7(int n,int cx,int cy,float ang) { // Le pasamos la posició
         while (h<0) h+=4096;
         while (h>=4096) h-=4096;
 
-        pinta_sprite_m7(n,ide,anchura,altura,porcen,h);
+        paint_sprite_m7(n,ide,anchura,altura,porcen,h);
         #ifdef DEBUG
         process_paint(ide,get_ticks()-oreloj);
         #endif
@@ -2030,7 +2030,7 @@ void pinta_sprites_m7(int n,int cx,int cy,float ang) { // Le pasamos la posició
 // Pinta un sprite (mem[ide]) en el modo 7 (si está delante de la cámara)
 //----------------------------------------------------------------------------
 
-void pinta_sprite_m7(int n,int ide,int x,int y,int size,int ang) {
+void paint_sprite_m7(int n,int ide,int x,int y,int size,int ang) {
 
   int * ptr;
   byte * si;
@@ -2065,7 +2065,7 @@ void pinta_sprite_m7(int n,int ide,int x,int y,int size,int ang) {
       xg=ptr[13]/2; yg=ptr[14]-1;
     } else { xg=*((word*)ptr+32); yg=*((word*)ptr+33); }
 
-    sp_escalado(si,x,y,an,al,xg,yg,size,mem[ide+_Flags]);
+    sp_scaled(si,x,y,an,al,xg,yg,size,mem[ide+_Flags]);
 
   }
 }
@@ -2088,7 +2088,7 @@ int get_disty(int a,int d) {
 // Dibuja el mapa en perspectiva
 //----------------------------------------------------------------------------
 
-void pinta_modo7(int n,int camara_x, int camara_y, int camara_z, int angulo) {
+void paint_mode7(int n,int camara_x, int camara_y, int camara_z, int angulo) {
 
   int y,u,du,vv,dv,pos_x,pos_y;
   int ancho_m, alto_m, ancho_e, alto_e;

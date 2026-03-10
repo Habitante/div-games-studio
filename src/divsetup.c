@@ -200,7 +200,7 @@ void Get_Tapiz() {
 
 			if (fread(cwork,1,n,f)==n) {
 
-				if ( es_MAP((byte *)cwork) || es_PCX((byte *)cwork) || es_BMP((byte *)cwork) ) {
+				if ( is_MAP((byte *)cwork) || is_PCX((byte *)cwork) || is_BMP((byte *)cwork) ) {
 
 					DIV_STRCPY(Tap_name,input);
 					DIV_STRCPY(Tap_pathname,full);
@@ -213,7 +213,7 @@ void Get_Tapiz() {
 
 						if (fread(ptr,1,len,f)==len) {
 
-							if (es_JPG(ptr,len)) {
+							if (is_JPG(ptr,len)) {
 
 								DIV_STRCPY(Tap_name,input);
 								DIV_STRCPY(Tap_pathname,full);
@@ -836,8 +836,8 @@ void Cfg_Setup_end(void) {
     ce1=color_cfg[3]; ce4=color_cfg[4]; c_y=color_cfg[5];
     c_com=color_cfg[6]; c_sim=color_cfg[7]; c_res=color_cfg[8];
     c_pre=color_cfg[9]; c_num=color_cfg[10]; c_lit=color_cfg[11];
-    c1=media(c0,c2); c3=media(c2,c4); ce01=media(c0,ce1); ce2=media(ce1,ce4);
-    c01=media(c0,c1); c12=media(c1,c2); c23=media(c2,c3); c34=media(c3,c4);
+    c1=average_color(c0,c2); c3=average_color(c2,c4); ce01=average_color(c0,ce1); ce2=average_color(ce1,ce4);
+    c01=average_color(c0,c1); c12=average_color(c1,c2); c23=average_color(c2,c3); c34=average_color(c3,c4);
     zoom_move=c3;
 
     colors_rgb[0]=dac[c2*3]; colors_rgb[1]=dac[c2*3+1]; colors_rgb[2]=dac[c2*3+2];
@@ -929,7 +929,7 @@ void Cfg_Setup_end(void) {
 
     no_volcar_ventanas=0; cierra_rapido=0; exploding_windows=ew;
 
-    update_box(0,0,vga_an,vga_al); volcado(copia);
+    update_box(0,0,vga_an,vga_al); blit_screen(copia);
   }
 }
 
@@ -1053,10 +1053,10 @@ void preparar_tapiz_temp(void) {
   fclose(f);
 
   tap_an=map_an; tap_al=map_al;
-  if (es_MAP(x_tapiz)) x=1;
-  else if (es_PCX(x_tapiz)) x=2;
-  else if (es_BMP(x_tapiz)) x=3;
-  else if (es_JPG(x_tapiz,lon)) x=4;
+  if (is_MAP(x_tapiz)) x=1;
+  else if (is_PCX(x_tapiz)) x=2;
+  else if (is_BMP(x_tapiz)) x=3;
+  else if (is_JPG(x_tapiz,lon)) x=4;
   else x=0;
   an=map_an; al=map_al;
   swap(map_an,tap_an); swap(map_al,tap_al);

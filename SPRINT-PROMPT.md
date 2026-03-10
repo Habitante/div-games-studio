@@ -32,11 +32,11 @@ confirm zero warnings. Current baseline: **0 warnings** (Sprint A completed 2026
 
 ## Recommended next session: Sprint F (continue) + Sprint E (parallel track)
 
-**Sprint D** is done. **Sprint F** (Spanish→English function names) is in progress:
+**Sprint D** is done. **Sprint F** (Spanish→English function names) batches 1-3 complete:
 - Batch 1 done: divclock.c, divbrush.c, diveffec.c, divbasic.c, divcolor.c (18 renames)
 - Batch 2 done: divbrow.c, divfpg.c, divedit.c, divhandl.c (112 renames across 20 files)
-- Next: the monsters — div.c, divpaint.c, divc.c, then runtime files
-- Sprint E (unsafe strings) can slot in anywhere as a parallel track.
+- Batch 3 done: div.c, divpaint.c, divc.c (105 renames across 35 files)
+- Next: runtime files, then Sprint E (unsafe strings) as a parallel track.
 
 ---
 
@@ -126,8 +126,60 @@ Completed: All 7 single-letter globals removed from global.h (r,g,b,c,d,a + FILE
    nuevo_mapa, crear_listbox, analizar_input, etc.)
    Total: 112 renames across 20 files, zero warnings, all 4 targets build clean.
 
-**Next — the monsters** (these need structural understanding):
-10. `div.c` (4,900 lines), `divpaint.c` (4,949 lines), `divc.c` (7,795 lines)
+**Batch 3 — the monsters** ✅ (done 2026-03-10):
+10. `div.c` — 34 functions (inicializacion→initialization, entorno→main_loop,
+   finalizacion→finalization, nueva_ventana→new_window, cierra_ventana→close_window,
+   dialogo→show_dialog, activar→activate, desactivar→deactivate, and 26 more)
+11. `divpaint.c` — 43 functions (dibuja_barra→draw_bar, volcado_raton→blit_mouse,
+   cuentagotas→eyedropper, mover→move_selection, efectos→effects,
+   select_caja→select_rect (collision avoidance), and 37 more)
+12. `divc.c` — 28 functions (compilar→compile, lexico→lexer, sintactico→parser,
+   sentencia→statement, expresion→expression, condicion→condition, constante→constant,
+   compilar_programa→compile_program, and 20 more)
+   Total: 105 renames across 35 files, zero warnings, all 4 targets build clean.
+
+**Batch 4 — runtime files** ✅ (done 2026-03-10):
+13. `runtime/i.c` — 9 functions (crea_cuad→create_color_lookup, guarda_pila→save_stack,
+   carga_pila→load_stack, actualiza_pila→update_stack, nucleo_exec→core_exec,
+   nucleo_trace→core_trace, elimina_proceso→kill_process, busca_packfile→find_packfile,
+   es_fps→is_fps)
+14. `runtime/f.c` — 12 functions (_object_avance→_object_advance, nueva_paleta→apply_palette
+   (collision avoidance with new_palette variable), es_PCX→is_PCX, es_MAP→is_MAP,
+   es_BMP→is_BMP, es_JPG→is_JPG, adaptar→adapt_palette, calcular→do_calculate,
+   evaluar→do_evaluate, _encriptar→_encrypt, _comprimir→_compress_file, capar→validate_address)
+15. `shared/run/v.c` — 20 functions (volcado→blit_screen, volcadosdl→blit_sdl,
+   volcado_parcial→blit_partial, volcadoc/p320200→blit_full/partial_320x200,
+   volcadoc/psvga→blit_full/partial_svga, volcadoc/px→blit_full/partial_modex,
+   graba_PCX→save_PCX, graba_MAP→save_MAP, set_paleta→update_palette,
+   retrazo→retrace_wait, svmode→setup_video_mode (collision avoidance with
+   set_video_mode function pointer), svmodex→setup_modex, rvmode→reset_video_mode,
+   crear_ghost→create_ghost, crear_ghost_vc/slow, media→average_color)
+16. `runtime/s.c` — 20 functions (mover_scroll→update_scroll, pinta_sprite→paint_sprite,
+   pinta_sprites_scroll/m7→paint_scroll_sprites/paint_sprites_m7, sp_cortado→sp_clipped,
+   sp_escalado→sp_scaled, sp_rotado→sp_rotated, sp_scanc→sp_scan_clipped,
+   sp_scancg→sp_scan_clipped_ghost, sp_scang→sp_scan_ghost, caja→draw_box,
+   caja_rellena→draw_filled_box, circulo→draw_circle, pinta_drawings→paint_drawings,
+   pinta_textos→paint_texts, texn→text_normal, texc→text_clipped, pinta_modo7→paint_mode7)
+17. `shared/run/c.c` — 5 functions (comprobar_colisiones→check_collisions,
+   test_cortado→test_clipped, test_escalado→test_scaled, test_rotado→test_rotated,
+   sp_rotado_p→sp_rotated_p)
+18. `runtime/debug/d.c` — 18 functions (pinta_segmento→paint_segment,
+   pinta_lista_var→paint_var_list, pinta_codigo→paint_code,
+   pinta_lista_proc→draw_proc_list (collision avoidance with existing paint_process_list),
+   incluye/excluye_miembros→include/exclude_members, determina_codigo→determine_code,
+   determina_ids→determine_ids, visualiza→visualize, crear_lista_variables→create_variable_list,
+   crear_lista_profile→create_profile_list, pintar_lista_profile→paint_profile_list,
+   f_abajo/arriba/derecha/izquierda→f_down/up/right/left)
+19. `divlengu.c` — 6 functions (inicializa_textos→initialize_texts,
+   analiza_textos→analyze_texts, an_numero/texto/comentario→analyze_number/text/comment,
+   finaliza_textos→finalize_texts)
+20. `divkeybo.c` — 3 functions (tecla_bios→bios_key, tecla→poll_keyboard,
+   vacia_buffer→flush_buffer)
+21. `shared/run/ia.c` — 2 functions (puede_ir→can_go, calcula_vertices→calculate_vertices)
+22. `det_vesa.c` — 1 function (detectar_vesa→detect_vesa)
+   Total: 96 renames across 39 files, zero warnings, all 4 targets build clean.
+
+**Next:** Sprint E (unsafe strings) or Sprint G (file splitting) — see Sprint menu above.
 
 **Rules:**
 - Use the glossary (`reports/glossary-spanish-english.md`) as the primary reference

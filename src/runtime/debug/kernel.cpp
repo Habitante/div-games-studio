@@ -116,7 +116,7 @@ case lret:
   #endif
   sp=mem[id+_Param]-mem[id+_NumPar];
   pila[sp]=id; id=mem[id+_Caller];
-  elimina_proceso(pila[sp]);
+  kill_process(pila[sp]);
   if (!(id&1)) goto next_process1;
   ip=mem[id+_IP];
   break;
@@ -138,7 +138,7 @@ case lfrm:
     mem[pila[sp]+_Caller]++; // Caller dormido
     bp=sp; // Deja la pila aparcada en el lugar adecuado
     sp=mem[id+_Param]-mem[id+_NumPar]; // Y la prerara para retornar al anterior
-    guarda_pila(id,sp,bp);
+    save_stack(id,sp,bp);
     mem[id+_Status]=3; goto next_frm;
   } else {
     #ifdef DEBUG
@@ -216,9 +216,9 @@ case lrtf:
   sp=mem[id+_Param]-mem[id+_NumPar];
   pila[sp]=bp;
   bp=id; id=mem[id+_Caller];
-  elimina_proceso(bp);
+  kill_process(bp);
   if (!(id&1)) {
-    if (id) actualiza_pila(id-1,pila[sp]); // Un return de función (tras frame)
+    if (id) update_stack(id-1,pila[sp]); // Un return de función (tras frame)
     goto next_process1;
   }
   ip=mem[id+_IP];
@@ -251,7 +251,7 @@ case lfrf:
     mem[pila[sp]+_Caller]++; // Caller dormido
     bp=sp; // Deja la pila aparcada en el lugar adecuado
     sp=mem[id+_Param]-mem[id+_NumPar]; // Y la prerara para retornar al anterior
-    guarda_pila(id,sp,bp);
+    save_stack(id,sp,bp);
     mem[id+_Status]=3; goto next_frf;
   } else {
     mem[pila[sp]+_Caller]=0;

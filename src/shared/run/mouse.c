@@ -87,11 +87,11 @@ void readmouse(void) {
   short ix,iy;
   int keymouse=0,n=0;
 
-  tecla();
+  poll_keyboard();
 #ifdef DOS
   union REGS regs;
 
-//  tecla();
+//  poll_keyboard();
 
   mouse->left=0;
 
