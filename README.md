@@ -112,6 +112,23 @@ build/               CMake build output
   sequentially until the next block. To add/remove a menu item, edit `lenguaje.div`
   and the corresponding `case` in the menu's click handler.
 
+## Documentation & Reports
+
+The `reports/` directory contains detailed analyses of the codebase — essential reading
+for anyone trying to understand this 1990s C codebase. Think of them as Rosetta stones.
+
+| Report | What it covers |
+|--------|---------------|
+| [architecture-overview.md](reports/architecture-overview.md) | IDE startup → main loop → event processing; OSDEP abstraction layer; FPG/MAP/FNT/PAL binary formats |
+| [compiler-pipeline.md](reports/compiler-pipeline.md) | DIV language compiler: lexer → parser → codegen; 127-opcode EML instruction set |
+| [vm-and-runtime.md](reports/vm-and-runtime.md) | Stack-based VM interpreter; FRAME-based cooperative process scheduling; 8-bit rendering pipeline |
+| [glossary-spanish-english.md](reports/glossary-spanish-english.md) | ~150 Spanish identifiers translated to English (tapiz=wallpaper, papelera=clipboard, etc.) |
+| [video-system-audit.md](reports/video-system-audit.md) | SDL2 display/fullscreen system: what was broken, what was fixed |
+| [unsafe-string-audit.md](reports/unsafe-string-audit.md) | Buffer overflow risk audit: 38 high-risk sites fixed, ~690 low-risk remaining |
+| [sdl3-migration-report.md](reports/sdl3-migration-report.md) | Future SDL2→SDL3 migration plan: ~450 call sites, effort estimates |
+
+See [ROADMAP.md](ROADMAP.md) for the development plan and project vision.
+
 ## Supported platforms
 
 | Platform | Status |

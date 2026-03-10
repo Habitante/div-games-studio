@@ -62,7 +62,7 @@ Clean up first, ship second, then modernize based on what real users actually wa
 
 ### Still pending from Phase 0
 - [x] Remove hundreds of commented-out code blocks throughout
-  (52 files audited, ~1,500 lines removed, 28 review items resolved — see `reports/REVIEW-ITEMS.md`)
+  (52 files audited, ~1,500 lines removed, 28 review items resolved)
 - [x] Remove remaining `#ifdef TTF` dead code (~25 blocks across div.c, divwindo.c,
   divpalet.c, divsetup.c, divhelp.c, divvideo.c, global.h, osdep.h)
 
@@ -117,6 +117,7 @@ Make the compiler tell us what's actually broken. Fix the scariest stuff.
 - [x] Remove `-fpermissive` (was a no-op in C mode anyway)
 - Remaining: 626 LOW-severity warnings (misleading-indentation 260, parentheses 144,
   dangling-else 80, pointer-sign 51, missing-braces 18, misc 10)
+- Original baseline (2026-03-08): 1,745 warnings with `-Wall -Wextra -Wshadow`; all CRITICAL/HIGH fixed.
 
 ### Critical bugs fixed (found via `-Wall -Wextra` audit, 2026-03-08)
 - [x] `divc.c:1854`: `!ivnom.b[0]!='.'` operator precedence bug — `#include` path
@@ -176,6 +177,7 @@ but left the underlying infrastructure broken:
       IDE `volcadosdl()` — surface is always 8-bit, OSDEP_Flip handles conversion.
 - [x] Removed dead `nothing()` function from divvideo.c.
 - [x] Alt+Enter fullscreen toggle now works in both IDE and runtime.
+- See [`reports/video-system-audit.md`](reports/video-system-audit.md) for the full display system analysis.
 - [ ] `test_video` startup dialog disabled (item 9) — could be re-enabled now.
 - [ ] DPI-aware rendering (`SDL_WINDOW_ALLOW_HIGHDPI`) — future improvement.
 
@@ -194,7 +196,24 @@ but left the underlying infrastructure broken:
 One file at a time, make the code understandable to someone who isn't Daniel.
 No behavioral changes — pure cleanup.
 
-### Naming
+### Architecture docs ✓ (initial docs done 2026-03-09)
+- [x] Document the call graph from IDE startup → main loop → event processing
+      → [`reports/architecture-overview.md`](reports/architecture-overview.md)
+- [x] Document the compiler pipeline: lexer → parser → codegen → bytecode format
+      → [`reports/compiler-pipeline.md`](reports/compiler-pipeline.md) (127-opcode EML instruction set documented)
+- [x] Document the VM interpreter loop and process scheduling algorithm
+      → [`reports/vm-and-runtime.md`](reports/vm-and-runtime.md) (stack VM, FRAME-based cooperative multitasking)
+- [x] Document the rendering pipeline: 8-bit surface → palette blit → SDL2 texture
+      → [`reports/vm-and-runtime.md`](reports/vm-and-runtime.md) (rendering section)
+- [x] Document the FPG/MAP/FNT/PAL binary file formats
+      → [`reports/architecture-overview.md`](reports/architecture-overview.md) (file formats section)
+- [x] Document the OSDEP abstraction layer contract
+      → [`reports/architecture-overview.md`](reports/architecture-overview.md) (OSDEP section)
+- [x] Catalogue all 100+ globals in global.h with their roles
+      → [`reports/glossary-spanish-english.md`](reports/glossary-spanish-english.md) (~150 identifiers translated)
+- [ ] Review docs for accuracy (Daniel is the authority on compiler/VM internals)
+
+### Naming — initial pass
 - [ ] Rename the worst single-letter globals (the `r,g,b,c,d,a` "generic counters"
       in global.h:519 that even the original code says "OJO! Quitarlos")
 - [ ] Rename cryptic locals in the hottest paths (divc.c, divedit.c, runtime/i.c)
@@ -202,28 +221,43 @@ No behavioral changes — pure cleanup.
 - [ ] Document the meaning of `v.an`/`v.al` (width/height), `tapiz` (wallpaper),
       `papelera` (clipboard), etc. in a glossary or inline
 
-### Architecture ✓ (initial docs done 2026-03-09)
-- [x] Document the call graph from IDE startup → main loop → event processing
-      → `reports/architecture-overview.md`
-- [x] Document the compiler pipeline: lexer → parser → codegen → bytecode format
-      → `reports/compiler-pipeline.md` (127-opcode EML instruction set documented)
-- [x] Document the VM interpreter loop and process scheduling algorithm
-      → `reports/vm-and-runtime.md` (stack VM, FRAME-based cooperative multitasking)
-- [x] Document the rendering pipeline: 8-bit surface → palette blit → SDL2 texture
-      → `reports/vm-and-runtime.md` (rendering section)
-- [x] Document the FPG/MAP/FNT/PAL binary file formats
-      → `reports/architecture-overview.md` (file formats section)
-- [x] Document the OSDEP abstraction layer contract
-      → `reports/architecture-overview.md` (OSDEP section)
-- [x] Catalogue all 100+ globals in global.h with their roles
-      → `reports/glossary-spanish-english.md` (~150 identifiers translated)
-- [ ] Review docs for accuracy (Daniel is the authority on compiler/VM internals)
-
 ### Structural improvements
 - [ ] Consider splitting `divc.c` (9,346 lines) into lexer/parser/codegen modules
 - [ ] Consider splitting `div.c` (4,678 lines) into menu handling vs desktop management
 - [ ] Group related globals into context structs where it simplifies things
 - [ ] Normalize string handling patterns across the codebase
+
+### Systematic modernization (agent-assisted sprints)
+
+The long-term vision for Phase 2 goes far beyond renaming a few globals. The goal is
+to make this codebase genuinely maintainable — by anyone, not just Daniel. This means:
+
+1. **Full English translation** — every Spanish identifier, comment, and variable name
+   gets an English equivalent. The glossary (`reports/glossary-spanish-english.md`) is
+   the Rosetta stone; the architecture docs provide the structural understanding needed
+   to rename safely.
+
+2. **Meaningful names everywhere** — not just replacing `tapiz` with `wallpaper`, but
+   turning `a`, `b`, `c`, `n`, `nn`, `nnn` into names that reveal intent. This requires
+   understanding what each variable actually does, file by file.
+
+3. **English comments on every non-obvious function** — not boilerplate docstrings, but
+   the kind of "here's what this does and why" commentary that lets a new developer
+   navigate 100K lines of C without having to reverse-engineer each function.
+
+4. **Structural decomposition** — the monster files (divc.c, div.c, divpaint.c) should
+   be split along natural boundaries that the architecture docs have already identified.
+
+**Methodology:** This work is ideal for AI agent teams working in focused sprints —
+one file or subsystem at a time, using the architecture docs and glossary as context.
+Each sprint produces a self-contained PR that can be reviewed and merged independently.
+The reports/ directory exists precisely to give agents (and future contributors) the
+context they need to make correct changes without Daniel having to explain everything
+from scratch each time.
+
+**Constraints:** Every rename must be project-wide (no half-renamed identifiers). Every
+change must compile and pass the same smoke tests. Behavioral changes are out of scope —
+if a function is buggy, file a separate issue, don't "fix" it during a rename sprint.
 
 ---
 
@@ -237,7 +271,7 @@ for our audio code (native frequency ratio, raw PCM loading, unified audio type)
 Check `mingw-w64-i686-SDL3`, `mingw-w64-i686-SDL3_mixer` in MSYS2, plus Linux/macOS
 equivalents if cross-platform is a goal.
 
-See [`reports/SDL3-MIGRATION-REPORT.md`](reports/SDL3-MIGRATION-REPORT.md) for the
+See [`reports/sdl3-migration-report.md`](reports/sdl3-migration-report.md) for the
 full analysis (~450 call sites, ~5-8 days estimated effort).
 
 ### SDL_mixer → SDL3_mixer (largest task, ~3-5 days)
@@ -322,6 +356,27 @@ The door stays open. These are the deeper modernizations that would make DIV
 genuinely competitive as a creative tool, not just a nostalgia piece. Pursue them
 based on community demand and what feels right.
 
+### Codebase re-architecture
+The cleanup work in Phase 2 (English names, comments, structural decomposition) is
+the foundation. Once the code is readable and well-documented, deeper re-architecture
+becomes tractable:
+
+- [ ] **Module boundaries** — extract clear subsystems with defined interfaces
+  (compiler, VM, renderer, editor, asset pipeline) instead of the current "everything
+  talks to everything through globals" model
+- [ ] **Reduce global state** — move from 100+ globals in `global.h` to context structs
+  passed explicitly. This is the single biggest maintainability win.
+- [ ] **Clean header hierarchy** — replace the "include global.h everywhere" pattern
+  with per-module headers that declare only what they need
+- [ ] **Test harness** — unit tests for the compiler, VM, and file format parsers.
+  Currently untestable because everything depends on the full IDE being initialized.
+
+The re-architecture is designed to be done incrementally, one module at a time,
+using the same agent-assisted sprint methodology as the Phase 2 naming work. The
+architecture docs and glossary make each sprint self-contained: an agent (or human
+contributor) can pick up a module, understand its boundaries, and refactor it without
+needing to understand the entire 100K-line codebase.
+
 ### Rendering modernization
 - [ ] **True color (32-bit RGBA) rendering mode** — alongside classic 8-bit palette
   - Daniel has wanted this for years; always wished DIV allowed more than 256 colors
@@ -401,7 +456,8 @@ Things we're deliberately not doing (or not doing *yet*):
 - **MODE8 3D anything** — it was a regret in 1998, no need to double down. Deleted.
 - **Network/multiplayer code** — never really worked properly. Strip it.
 - **Mobile ports** — touch UX for an IDE is painful. Maybe runtime-only someday.
-- **Rewrite in another language** — the C codebase IS DIV; we clean it, not replace it.
+- **Rewrite in another language** — the C codebase IS DIV. We modernize it in place:
+  rename, decompose, document, and re-architect — but always in C, always incrementally.
 - **Breaking old programs** — existing .PRG files should still compile (except MODE8
   and network-specific code, which we're removing). New features are additive.
 - **Competing with Godot/Unity on features** — we are a focused creative tool with
