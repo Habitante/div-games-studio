@@ -284,7 +284,7 @@ void calc1(void) {
   _show_items();
   get=get_buffer;
   wbox(v.ptr,an,al,c12,3,11,an-6-22-26,8);
-  wrectangulo(v.ptr,an,al,c1,3,11,an-6-22-26,8);
+  wrectangle(v.ptr,an,al,c1,3,11,an-6-22-26,8);
   wwrite(v.ptr,an,al,4,12,0,(byte *)pcalc->cresult,c3);
 }
 

@@ -165,9 +165,9 @@ int forced_slider=0;
 #define p_res           0x103 // Id reservado
 #define p_pre           0x104 // Id predefinido
 
-void clexico(void);
+void color_lex(void);
 
-extern int cpieza;      // Token leido por clexico()
+extern int cpieza;      // Token leido por color_lex()
 extern byte * csource;  // Puntero al source, para compilar el programa
 extern int iscoment;    // Indica si está dentro de un comentario.
 
@@ -1446,7 +1446,7 @@ void avanza_vptr(void) {
     if (_csource==(char *)v.prg->vptr) {
       csource=(byte *)_csource; iscoment=_iscoment;
       v.prg->vptr=p+2;
-      while (csource<v.prg->vptr) clexico();
+      while (csource<v.prg->vptr) color_lex();
       _csource=(char *)v.prg->vptr; _iscoment=iscoment;
     } else v.prg->vptr=p+2;
     v.prg->primera_linea++;
@@ -1471,7 +1471,7 @@ void retrocede_vptr(void) {
         csource=(byte *)_csource; iscoment=_iscoment;
         v.prg->vptr=p; cpieza=-1;
         csource=p;
-        while (cpieza!=p_ultima) clexico();
+        while (cpieza!=p_ultima) color_lex();
         _csource=(char *)v.prg->vptr; _iscoment-=(iscoment-_iscoment);
       } else v.prg->vptr=p;
     } else {
@@ -1479,7 +1479,7 @@ void retrocede_vptr(void) {
         csource=(byte *)_csource; iscoment=_iscoment;
         v.prg->vptr=p+2; cpieza=-1;
         csource=p+2;
-        while (cpieza!=p_ultima) clexico();
+        while (cpieza!=p_ultima) color_lex();
         _csource=(char *)v.prg->vptr; _iscoment-=(iscoment-_iscoment);
       } v.prg->vptr=p+2;
     } v.prg->primera_linea--;
@@ -1523,7 +1523,7 @@ void rellena_colin(void) {  // Función para obtener los colores de la siguiente
   if (!coloreador || !strstr((const char *)v.titulo,".PRG")) {
     memset(colin,ce4,1024);
   } else do {
-    clexico();
+    color_lex();
     switch(cpieza) {
       case p_sym:
         while (i<csource-p) colin[i++]=c_sim;
@@ -1574,7 +1574,7 @@ void _completo(void) {
 
   if (_csource!=(char *)v.prg->vptr) {
     csource=v.prg->buffer; iscoment=0;
-    while (csource<v.prg->vptr) clexico();
+    while (csource<v.prg->vptr) color_lex();
     _csource=(char *)v.prg->vptr;
     csource=(byte *)_csource;
      _iscoment=iscoment;
@@ -1695,7 +1695,7 @@ void _parcial(void) {
 
   if (_csource!=(char *)v.prg->vptr) {
     csource=v.prg->buffer; iscoment=0;
-    while (csource<v.prg->vptr) clexico();
+    while (csource<v.prg->vptr) color_lex();
     _csource=(char *)v.prg->vptr;
     csource=(byte *)_csource;
      _iscoment=iscoment;
@@ -1703,7 +1703,7 @@ void _parcial(void) {
     csource=(byte *)_csource; iscoment=_iscoment;
   }
 
-  while (csource<v.prg->lptr) clexico();
+  while (csource<v.prg->lptr) color_lex();
   numrem=0; csource=(byte *)v.prg->l; rellena_colin();
   color_cursor=colin[v.prg->columna-1];
 
@@ -1900,10 +1900,10 @@ void resize(void) {
 
     an=v.an/big2; al=v.al/big2;
 
-    salvaguarda(fondo_raton,mx,my,mouse_graf,0);
+    save_mouse_bg(fondo_raton,mx,my,mouse_graf,0);
     put(mx,my,mouse_graf);
     volcado(copia);
-    salvaguarda(fondo_raton,mx,my,mouse_graf,1);
+    save_mouse_bg(fondo_raton,mx,my,mouse_graf,1);
 
   } while (mouse_b&1);
 
@@ -2028,7 +2028,7 @@ void repinta_ventana(void) {
   if (big) { an/=2; al/=2; }
 
   memset(v.ptr,c0,v.an*v.al);
-  wrectangulo(v.ptr,an,al,c2,0,0,an,al);
+  wrectangle(v.ptr,an,al,c2,0,0,an,al);
   wput(v.ptr,an,al,an-9,2,35);
 
   if (v.tipo==1) { // Los diálogos no se minimizan
@@ -3092,7 +3092,7 @@ void pinta_segmento_procesos(void) {
     n=min*(1-x)+max*x;
   }
 
-  wrectangulo(ptr,an,al,c0,122+132,n,9,5);
+  wrectangle(ptr,an,al,c0,122+132,n,9,5);
   wput(ptr,an,al,123+132,n+1,-43);
 }
 
@@ -3104,9 +3104,9 @@ void lista_procesos1(void) {
   wwrite(ptr,an,al,5,11,0,texto[379],c1);
   wwrite(ptr,an,al,4,11,0,texto[379],c3);
 
-  wrectangulo(ptr,an,al,c0,3,19,128+132,123); // Límites listbox procesos
-  wrectangulo(ptr,an,al,c0,122+132,19,9,123);
-  wrectangulo(ptr,an,al,c0,122+132,27,9,123-16);
+  wrectangle(ptr,an,al,c0,3,19,128+132,123); // Límites listbox procesos
+  wrectangle(ptr,an,al,c0,122+132,19,9,123);
+  wrectangle(ptr,an,al,c0,122+132,27,9,123-16);
 
   wput(ptr,an,al,123+132,20,-39); // Boton arriba / abajo (pulsados 41,42)
   wput(ptr,an,al,123+132,174-40,-40);

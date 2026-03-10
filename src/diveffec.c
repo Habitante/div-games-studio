@@ -80,7 +80,7 @@ char *Buff_exp;
 //	Crea el array de puntos
 //-----------------------------------------------------------------------------
 
-void crear_puntos(void) {
+void create_points(void) {
   int m,n,rx,ry;
   double ang,dist;
 
@@ -113,7 +113,7 @@ void crear_puntos(void) {
 //      Avanza un frame en la explosión
 //-----------------------------------------------------------------------------
 
-void avanzar_puntos(void) {
+void advance_points(void) {
   int m,n;
   for (m=0;m<n_exp;m++) {
         for (n=0;n<n_pun;n++)
@@ -133,7 +133,7 @@ void avanzar_puntos(void) {
 //	Pinta la explosión
 //-----------------------------------------------------------------------------
 
-int pintar_explosion(void) {
+int paint_explosion(void) {
   int m,x,y,dx,dy,n;
   int dist,exp_Color,exp_Coloracum;
 
@@ -236,7 +236,7 @@ void Explode1(void) {
   wbox(v.ptr,an,al,c0,2,74,an-4,1);
 
   wwrite(v.ptr,an,al,an-70,11,0,texto[181],c3);
-  wrectangulo(v.ptr,an,al,c0,an-70,18,66,11);
+  wrectangle(v.ptr,an,al,c0,an-70,18,66,11);
   for (x=0;x<64;x++) wbox(v.ptr,an,al,exp_colores[x*2],an-69+x,18+1,1,9);
 }
 
@@ -398,14 +398,14 @@ int x;
   cx=exp_ancho/2;
   cy=exp_alto/2;
   nf=n_frames;
-  crear_puntos();
+  create_points();
   n_frames*=2;
   if(exp_ancho<exp_alto)
         paso_frame=(exp_ancho*10000)/n_frames;
   else
         paso_frame=(exp_alto*10000)/n_frames;
   do {
-    if (pintar_explosion()) break;
+    if (paint_explosion()) break;
 
     map_an=exp_ancho;
     map_al=exp_alto;
@@ -440,7 +440,7 @@ int x;
     call((voidReturnType )v.paint_handler);
     wvolcado(copia,vga_an,vga_al,v.ptr,v.x,v.y,v.an,v.al,0);
 
-    avanzar_puntos();
+    advance_points();
     n_frames-=2;
   } while (n_frames);
 

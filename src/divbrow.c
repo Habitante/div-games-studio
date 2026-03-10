@@ -1956,10 +1956,10 @@ void crear_listboxbr(struct t_listboxbr * l) {
 
   for (y=0;y<l->lineas;y++)
     for (x=0;x<l->columnas;x++)
-      wrectangulo(ptr,an,al,c0,l->x+(x*(l->an+1)),l->y+(y*(l->al+1)),l->an+2,l->al+2);
+      wrectangle(ptr,an,al,c0,l->x+(x*(l->an+1)),l->y+(y*(l->al+1)),l->an+2,l->al+2);
 
-  wrectangulo(ptr,an,al,c0,l->x+(l->an+1)*l->columnas,l->y,9,(l->al+1)*l->lineas+1);
-  wrectangulo(ptr,an,al,c0,l->x+(l->an+1)*l->columnas,l->y+8,9,(l->al+1)*l->lineas-15);
+  wrectangle(ptr,an,al,c0,l->x+(l->an+1)*l->columnas,l->y,9,(l->al+1)*l->lineas+1);
+  wrectangle(ptr,an,al,c0,l->x+(l->an+1)*l->columnas,l->y+8,9,(l->al+1)*l->lineas-15);
   wput(ptr,an,al,l->x+(l->an+1)*l->columnas+1,l->y+1,-39);
   wput(ptr,an,al,l->x+(l->an+1)*l->columnas+1,l->y+(l->al+1)*l->lineas-7,-40);
 

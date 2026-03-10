@@ -30,16 +30,14 @@ confirm zero warnings. Current baseline: **0 warnings** (Sprint A completed 2026
 
 ---
 
-## Recommended next session: Sprint D + F (sequential, start small)
+## Recommended next session: Sprint F (continue) + Sprint E (parallel track)
 
-**Sprint D** (rename `r,g,b,c,d,a` globals) then **Sprint F** (Spanish→English function names):
-- D first: removes the worst globals, one at a time. Medium-high difficulty — `r`,`g`,`b`
-  are tricky because they're used both as generic counters AND as red/green/blue in palette code.
-- F second: start with small isolated files (divclock.c, divbrush.c, divbasic.c) to
-  establish the rename pattern, then work up to larger files.
+**Sprint D** is done. **Sprint F** (Spanish→English function names) is in progress:
+- Small files done: divclock.c, divbrush.c, diveffec.c
+- Next: divbasic.c, divcolor.c, then divbrow.c, divfpg.c, divedit.c, divhandl.c
 - Sprint E (unsafe strings) can slot in anywhere as a parallel track.
-- D is sequential (each global touches many files). F can be parallelized per-file
-  only if the file's functions have no cross-file call sites being renamed.
+- F can be parallelized per-file only if the file's functions have no cross-file
+  call sites being renamed.
 
 ---
 
@@ -69,28 +67,16 @@ Corrections: `get_token()`→`lexico()`, `make_ghost()`→`crear_ghost()`,
 
 ---
 
-### Sprint D: Rename the `r,g,b,c,d,a` generic globals
+### Sprint D: Rename the `r,g,b,c,d,a` generic globals ✅ DONE (2026-03-10)
 
-**Goal:** Eliminate the worst globals that even the original code flags as "OJO! Quitarlos"
-(watch out — remove these).
-
-**Target:** `global.h` line ~519: `GLOBAL_DATA int r,g,b,c,d,a;` and `GLOBAL_DATA FILE *f;`
-
-**Method:**
-1. For each global (`r`, `g`, `b`, `c`, `d`, `a`, `f`), grep every usage across the codebase
-2. In each function that uses them, replace with a properly-named local variable
-3. Once all usages are replaced, remove the global declaration from `global.h`
-
-**Difficulty:** Medium-High. These are used as throwaway counters/temps in dozens of
-functions. The names `r`, `g`, `b` are particularly tricky because they're also used
-meaningfully for red/green/blue in palette code — you need to distinguish those from
-the generic counter usage.
-
-**Rules:**
-- Every rename must be project-wide — no file can still reference the old global
-- Name locals descriptively: `row`, `col`, `idx`, `count`, `red`, `green`, `blue`, etc.
-- Build after each global is fully removed to confirm
-- `f` (FILE* global) → replace with local `FILE *file` or `FILE *fp` in each function
+Completed: All 7 single-letter globals removed from global.h (r,g,b,c,d,a + FILE *f).
+- `FILE *f`: 8 functions needed local declarations added (all others already had them)
+- `int a`: 13 functions (2 in div.c/divbasic.c, 11 in divpaint.c)
+- `int d`: 1 function (mab_aclarar in divpaint.c)
+- `int c`: 5 functions across 3 files
+- `int r,g,b`: all usages confined to divpalet.c — converted to file-static variables
+  (palette functions communicate r,g,b as implicit params between callees)
+- 11 files changed, zero warnings, all 4 targets build clean.
 
 ---
 

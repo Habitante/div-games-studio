@@ -223,8 +223,8 @@ void MOD1(void) {
 
   wbox       (v.ptr, an, al, c1, 2, 10, an-4, al-12-10);
   wbox       (v.ptr, an, al, c2, 2, 39, an-4,        9);
-  wrectangulo(v.ptr, an, al, c0, 1, 38, an-2,       11);
-  wrectangulo(v.ptr, an, al, c0, 1, 38,   21,       11);
+  wrectangle(v.ptr, an, al, c0, 1, 38, an-2,       11);
+  wrectangle(v.ptr, an, al, c0, 1, 38,   21,       11);
 
   if(Mix_PlayingMusic() && mymodinfo->SongCode == SongCode) {
     if(ModButton && ModWindow==v.orden) wput(v.ptr, an, al, 2, 39, -214);
@@ -1085,8 +1085,8 @@ void EditSound1(void)
 
   // Info del sonido
   wbox       (v.ptr, an, al,  c1, 4, 12, 69, 28);
-  wrectangulo(v.ptr, an, al,  c0, 3, 11, 71, 30);
-  wrectangulo(v.ptr, an, al,  c0, 3, 21, 71, 11);
+  wrectangle(v.ptr, an, al,  c0, 3, 11, 71, 30);
+  wrectangle(v.ptr, an, al,  c0, 3, 21, 71, 11);
   wwrite(v.ptr, an, al, 39, 13, 1, (byte *)mypcminfo->name, c3);
   itoa(mypcminfo->SoundFreq, cwork, 10);
   wwrite(v.ptr, an, al, 39, 23, 1, (byte *)cwork, c3);
@@ -1096,10 +1096,10 @@ void EditSound1(void)
   // Opciones de conversion
 
   // Zona de edicion
-  wrectangulo(v.ptr, an, al, c0, 3, 11+PosY, an_v+2, al_v+2);
+  wrectangle(v.ptr, an, al, c0, 3, 11+PosY, an_v+2, al_v+2);
   wbox       (v.ptr, an, al, c1, 4, 12+PosY,   an_v,   al_v);
 
-  wrectangulo(v.ptr, an, al, c0, 1, 11+PosY+al_v+5, an-2, 19);
+  wrectangle(v.ptr, an, al, c0, 1, 11+PosY+al_v+5, an-2, 19);
 
   if(sel_1<=sel_2)
   {
@@ -1282,7 +1282,7 @@ void RecSound1(void)
 
   // Mensaje de ayuda
   wbox(v.ptr, an, al, c12, 3, 29, an-6, 20);
-  wrectangulo(v.ptr, an, al,  c0, 3, 29, an-6, 20);
+  wrectangle(v.ptr, an, al,  c0, 3, 29, an-6, 20);
   wwrite_in_box(v.ptr,an,an-4,al,an/2,31,1,texto[563],c3);
   wwrite_in_box(v.ptr,an,an-4,al,an/2,40,1,texto[564],c3);
 

@@ -1237,7 +1237,7 @@ void calculadora(void);
 void menu_sistema2(void) {
   actualiza_menu(875,1,0); if ((old_mouse_b&1) && !(mouse_b&1)) {
     switch (v.estado) {
-      case 1: muestra_reloj(); break;
+      case 1: show_clock(); break;
       case 2: muestra_papelera(); break;
       case 3: calculadora(); break;
       case 4: dialogo(Vid_Setup0); break;
@@ -1568,7 +1568,7 @@ extern struct _thumb_map {
   int Cuad;
 } thumb_map[max_windows];
 
-void M3D_crear_thumbs(struct t_listboxbr * l, int prog);
+void M3D_create_thumbs(struct t_listboxbr * l, int prog);
 int  crear_mapbr_thumbs(struct t_listboxbr * l);
 void FreePaintThumbs(void);
 
@@ -1670,7 +1670,7 @@ void mapa2(void) {
     {
       strcpy((char *)brush_fpg_path, full);
       modo-=100;
-      M3D_crear_thumbs(&ltexturasbr,0);
+      M3D_create_thumbs(&ltexturasbr,0);
       modo+=100;
       TipoTex |= BRUSH; // Thumbnail type BRUSH
     }
@@ -1872,7 +1872,7 @@ void copyright1(void) {
   _show_items();
   wput(v.ptr,an,al,6,11,-50);
 
-  wrectangulo(v.ptr,an,al,c1,48+48,23,129,19);
+  wrectangle(v.ptr,an,al,c1,48+48,23,129,19);
   wbox(v.ptr,an,al,c12,48+48+1,23+1,129-2,19-2);
 
   wwrite(v.ptr,an,al,48+48+1,14,0,texto[485],c1);
@@ -2079,7 +2079,7 @@ void TratarPaleta1(void) {
   wbox(v.ptr,an,al,c1,xx+1,13,63,9);
 
   if (OpcPal[1]) {
-    wrectangulo(v.ptr,an,al,c0,4,12,an-8,11);
+    wrectangle(v.ptr,an,al,c0,4,12,an-8,11);
     wbox(v.ptr,an,al,c12,5,13,an-10,9);
     wwrite(v.ptr,an,al,an/2+1,14,1,(byte *)"+",c0);
     wwrite(v.ptr,an,al,an/2,14,1,(byte *)"+",c4);
@@ -2236,10 +2236,10 @@ void crear_listbox(struct t_listbox * l) {
     } else l->inicial=0;
   }
 
-  wrectangulo(ptr,an,al,c0,l->x,l->y,l->an,l->al);
+  wrectangle(ptr,an,al,c0,l->x,l->y,l->an,l->al);
   wbox(ptr,an,al,c1,l->x+1,l->y+1,l->an-2,l->al-2);
-  wrectangulo(ptr,an,al,c0,l->x+l->an-1,l->y,9,l->al);
-  wrectangulo(ptr,an,al,c0,l->x+l->an-1,l->y+8,9,l->al-16);
+  wrectangle(ptr,an,al,c0,l->x+l->an-1,l->y,9,l->al);
+  wrectangle(ptr,an,al,c0,l->x+l->an-1,l->y+8,9,l->al-16);
   wput(ptr,an,al,l->x+l->an,l->y+1,-39);
   wput(ptr,an,al,l->x+l->an,l->y+l->al-8,-40);
 
@@ -3199,7 +3199,7 @@ char cwork[5];
         wbox(ptr,an,al,c1,4,12,an-8,al-16);
 
         wbox(ptr,an,al,c_r_low,4,12,ProgressCurrent*(an-8)/ProgressTotal,al-16);
-        wrectangulo(ptr,an,al,c0,4,12,an-8,al-16);
+        wrectangle(ptr,an,al,c0,4,12,an-8,al-16);
         sprintf((char *)cwork,"%d%c",ProgressCurrent*100/ProgressTotal,'%');
         wwrite(ptr,an,al,4+(an-8)/2,(14+(al-16)/2)-2,4,(byte *)cwork,c3);
 }
@@ -3215,7 +3215,7 @@ char cwork[5];
         wbox(ptr,an,al,c1,4,12,an-8,al-16);
 
         wbox(ptr,an,al,c_r_low,4,12,ProgressCurrent*(an-8)/ProgressTotal,al-16);
-        wrectangulo(ptr,an,al,c0,4,12,an-8,al-16);
+        wrectangle(ptr,an,al,c0,4,12,an-8,al-16);
         sprintf(cwork,"%d%c",ProgressCurrent*100/ProgressTotal,'%');
         wwrite(ptr,an,al,4+(an-8)/2,(14+(al-16)/2)-2,4,(byte *)cwork,c3);
 }

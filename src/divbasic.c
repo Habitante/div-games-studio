@@ -11,7 +11,7 @@ void ayuda_dibujo(int); // Drawing support
 void draw_selection_box(int _x0,int _y0,int _x1,int _y1);
 void draw_selection_mab(void);
 void fill_inter(int an,int al);
-void volcado_inter(int an);
+void blit_interpolated(int an);
 void fill_scan(word x,word y);
 void fill_draw(void);
 void copy_block(byte *d,byte *s,int an,int al);
@@ -47,15 +47,15 @@ void box(byte c,int x0,int y0,int x1,int y1) {
 //      Draw a rectangle
 ///////////////////////////////////////////////////////////////////////////////
 
-void rectangulo(byte c,int x,int y,int an,int al) {
-  wrectangulo(copia,vga_an,vga_al,c,x,y,an,al);
+void rectangle(byte c,int x,int y,int an,int al) {
+  wrectangle(copia,vga_an,vga_al,c,x,y,an,al);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 //      Save ( flag = 0 ) or retrieve ( flag = 1) of a virtual box
 ///////////////////////////////////////////////////////////////////////////////
 
-void salvaguarda(byte * p, int x, int y, int n, int flag) {
+void save_mouse_bg(byte * p, int x, int y, int n, int flag) {
   byte *q;
   int an,al;
   int salta_x, long_x, resto_x;
@@ -170,7 +170,7 @@ static int zoom_porcion=0;
 int zoom_an,zoom_al;
 byte *zoom_p,*zoom_q;
 
-void fondo_edicion(int x,int y,int an,int al) {
+void draw_edit_background(int x,int y,int an,int al) {
 
   int _x0,_y0,_x1,_y1;
   int _zoom_x,_zoom_y;
@@ -387,7 +387,7 @@ void zoom_map(void) {
 //      Sub barra de fill interpolativo
 //-----------------------------------------------------------------------------
 
-void modo_inter(void) {
+void interpolation_mode(void) {
 
   int an,al;
 
@@ -415,13 +415,13 @@ void modo_inter(void) {
         do { read_mouse(); } while (mouse_b&1);
       }
 
-      volcado_inter(an);
+      blit_interpolated(an);
 
       volcado_edicion();
     } while (!(mouse_b&2) && !key(_ESC) && modo<100 &&
       !(mouse_b && mouse_in(barra_x,barra_y+10,barra_x+9,barra_y+18)));
 
-    volcado_inter(an);
+    blit_interpolated(an);
 
     if (key(_ESC)||(mouse_b && mouse_in(barra_x,barra_y+10,barra_x+9,barra_y+18)))
       { put_barra(2,10,45); volcar_barras(0);
@@ -605,7 +605,7 @@ void fill(word x,word y) {
       if ((original=(byte*)save_undo(a,b,c,d))!=NULL) {
         if (!mab_x0) original--;
         if (!mab_y0) original-=an_original;
-        modo_inter();
+        interpolation_mode();
       }
     } else {
       if (save_undo(mab_x0,mab_y0,mab_x1-mab_x0+1,mab_y1-mab_y0+1))
@@ -698,7 +698,7 @@ void fill_draw(void) {
 //      Volcado de la zona interpolada
 //-----------------------------------------------------------------------------
 
-void volcado_inter(int an) { // Vuelca a pantalla la zona interpolada
+void blit_interpolated(int an) { // Vuelca a pantalla la zona interpolada
 
   int x,y,n;
 
@@ -1037,7 +1037,7 @@ byte * save_undo(int x, int y, int an, int al) {
     ret=(byte *)(undo+start);
 
   } else {
-    fondo_edicion(0,0,vga_an,vga_al);
+    draw_edit_background(0,0,vga_an,vga_al);
     volcar_barras(1);
     volcado_completo=1; volcado(copia);
     v_texto=(char *)texto[320]; dialogo(err0); undo_error=1;

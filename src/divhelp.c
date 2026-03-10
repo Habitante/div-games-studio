@@ -460,7 +460,7 @@ void resize_help(void) {
 		window_surface(v.an,v.al,0);
 		
       if (modo<100) {
-        fondo_edicion(v.x,v.y,v.an>an?v.an:an,v.al>al?v.al:al);
+        draw_edit_background(v.x,v.y,v.an>an?v.an:an,v.al>al?v.al:al);
         volcar_barras(1);
       }
 
@@ -479,10 +479,10 @@ void resize_help(void) {
 
     al=v.al/big2;
 
-    salvaguarda(fondo_raton,_mx,my,mouse_graf,0);
+    save_mouse_bg(fondo_raton,_mx,my,mouse_graf,0);
     put(_mx,my,mouse_graf);
     volcado(copia);
-    salvaguarda(fondo_raton,_mx,my,mouse_graf,1);
+    save_mouse_bg(fondo_raton,_mx,my,mouse_graf,1);
 
   } while (mouse_b&1);
 

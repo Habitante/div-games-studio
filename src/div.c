@@ -161,7 +161,7 @@ void demo1(void) {
 
   sprintf(cwork,"[ %s %d/31 ]",texto[396],exe_cola[1]-0xF31725AB);
 
-  wrectangulo(v.ptr,an,al,c1,3,12+27,an-6,16);
+  wrectangle(v.ptr,an,al,c1,3,12+27,an-6,16);
   wbox(v.ptr,an,al,media(c_b_low,c0),4,12+28,an-8,14);
 
   if (exe_cola[1]-0xF31725AB>31) {
@@ -1960,7 +1960,7 @@ void se_ha_movido_desde(int x,int y,int an,int al) {
 
   n=v.tipo; v.tipo=0;
   if (modo<100) {
-    fondo_edicion(x,y,an,al);
+    draw_edit_background(x,y,an,al);
     volcar_barras(0);
     actualiza_dialogos(x,y,an,al);
   } else actualiza_caja(x,y,an,al);
@@ -2144,7 +2144,7 @@ void cierra_ventana(void) {
   x=v.x; y=v.y; an=v.an; al=v.al;
   divdelete(0);
   if (modo<100) {
-    fondo_edicion(x,y,an,al);
+    draw_edit_background(x,y,an,al);
     volcar_barras(0);
     actualiza_dialogos(x,y,an,al);
   } else actualiza_caja(x,y,an,al);
@@ -2194,7 +2194,7 @@ void mueve_ventana(void) {
   do {
     x=mouse_x-ix; y=mouse_y-iy;
 
-    wrectangulo(copia,vga_an,vga_al,c4,x,y,an,al);
+    wrectangle(copia,vga_an,vga_al,c4,x,y,an,al);
     volcado_parcial(x,y,an,1);
     volcado_parcial(x,y,1,al);
     volcado_parcial(x,y+al-1,an,1);
@@ -2203,7 +2203,7 @@ void mueve_ventana(void) {
 
     if (modo<100) {
       if (b) big=1;
-      fondo_edicion(x,y,an,al);
+      draw_edit_background(x,y,an,al);
       volcar_barras(0);
       actualiza_dialogos(x,y,an,al);
       big=0;
@@ -2263,7 +2263,7 @@ void mueve_ventana_completa(void) {
   oldx=v.x; oldy=v.y;
   ix=mouse_x-oldx; iy=mouse_y-oldy;
 
-  if (v.primer_plano==1) wrectangulo(v.ptr,an/big2,al/big2,c4,0,0,an/big2,al/big2);
+  if (v.primer_plano==1) wrectangle(v.ptr,an/big2,al/big2,c4,0,0,an/big2,al/big2);
 
   if (v.primer_plano==2) mover_ventana=1;
 
@@ -2280,7 +2280,7 @@ void mueve_ventana_completa(void) {
     vuelca_ventana(0);
   }
 
-  if (v.primer_plano==1) wrectangulo(v.ptr,an/big2,al/big2,c2,0,0,an/big2,al/big2);
+  if (v.primer_plano==1) wrectangle(v.ptr,an/big2,al/big2,c2,0,0,an/big2,al/big2);
 
   //---------------------------------------------------------------------------
   // Check if you pressed double-click to auto deploy window
@@ -2376,8 +2376,8 @@ div_version=texto[safe];
 
     if (n==0 && mover_ventana) {
       if (big) {
-        big=0; wrectangulo(copia,vga_an,vga_al,c4,v.x+16,v.y,v.an-16,v.al); big=1;
-      } else wrectangulo(copia,vga_an,vga_al,c4,v.x+8,v.y,v.an-8,v.al);
+        big=0; wrectangle(copia,vga_an,vga_al,c4,v.x+16,v.y,v.an-16,v.al); big=1;
+      } else wrectangle(copia,vga_an,vga_al,c4,v.x+8,v.y,v.an-8,v.al);
     } else {
       wwrite_in_box(copia+y*vga_an+x,vga_an,an,al,ventana[n].x+9*big2-x,ventana[n].y-y,10,ventana[n].nombre,c0);
       wwrite_in_box(copia+y*vga_an+x,vga_an,an,al,ventana[n].x+8*big2-x,ventana[n].y-y,10,ventana[n].nombre,c4);
@@ -2471,8 +2471,8 @@ void actualiza_caja2(int vent, int x, int y, int an, int al) {
 
     if (n==0 && mover_ventana) {
       if (big) {
-        big=0; wrectangulo(copia,vga_an,vga_al,c4,v.x+16,v.y,v.an-16,v.al); big=1;
-      } else wrectangulo(copia,vga_an,vga_al,c4,v.x+8,v.y,v.an-8,v.al);
+        big=0; wrectangle(copia,vga_an,vga_al,c4,v.x+16,v.y,v.an-16,v.al); big=1;
+      } else wrectangle(copia,vga_an,vga_al,c4,v.x+8,v.y,v.an-8,v.al);
     } else {
       wwrite_in_box(copia+y*vga_an+x,vga_an,an,al,ventana[n].x+9*big2-x,ventana[n].y-y,10,ventana[n].nombre,c0);
       wwrite_in_box(copia+y*vga_an+x,vga_an,an,al,ventana[n].x+8*big2-x,ventana[n].y-y,10,ventana[n].nombre,c4);
@@ -2824,15 +2824,15 @@ void volcado_copia(void) {
 
   if (leer_mouse) read_mouse();
   if (modo<100) {
-    salvaguarda(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,0);
+    save_mouse_bg(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,0);
     put(mouse_shift_x,mouse_shift_y,mouse_graf);
     volcado(copia);
-    salvaguarda(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,1);
+    save_mouse_bg(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,1);
   } else {
-    salvaguarda(fondo_raton,mouse_x,mouse_y,mouse_graf,0);
+    save_mouse_bg(fondo_raton,mouse_x,mouse_y,mouse_graf,0);
     put(mouse_x,mouse_y,mouse_graf);
     volcado(copia);
-    salvaguarda(fondo_raton,mouse_x,mouse_y,mouse_graf,1);
+    save_mouse_bg(fondo_raton,mouse_x,mouse_y,mouse_graf,1);
   }
 }
 
@@ -3002,7 +3002,7 @@ void nueva_ventana(voidReturnType init_handler) {
 
       memset(ptr,c0,an*al); if (big) { an/=2; al/=2; }
 
-      wrectangulo(ptr,an,al,c2,0,0,an,al);
+      wrectangle(ptr,an,al,c2,0,0,an,al);
       wput(ptr,an,al,an-9,2,35);
       
       if (v.tipo==1) { // Los diálogos no se minimizan
@@ -3069,10 +3069,10 @@ void nueva_ventana(voidReturnType init_handler) {
         } else { // Cuando el menu pedido ya está en primer plano lo resalta
           divdelete(0);
           move(0,n-1);
-          wrectangulo(v.ptr,v.an/big2,v.al/big2,c4,0,0,v.an/big2,v.al/big2);
+          wrectangle(v.ptr,v.an/big2,v.al/big2,c4,0,0,v.an/big2,v.al/big2);
           init_volcado(); vuelca_ventana(0);
           retrazo(); volcado_copia();
-          wrectangulo(v.ptr,v.an/big2,v.al/big2,c2,0,0,v.an/big2,v.al/big2);
+          wrectangle(v.ptr,v.an/big2,v.al/big2,c2,0,0,v.an/big2,v.al/big2);
           v.volcar=1; retrazo(); retrazo(); retrazo(); retrazo();
         }
       } else {
@@ -3096,7 +3096,7 @@ void explode(int x,int y,int an,int al) {
   v.tipo=0; big=0;
   if (modo<100) {
     if (b) big=1;
-    fondo_edicion(x,y,an,al);
+    draw_edit_background(x,y,an,al);
     volcar_barras(0);
     actualiza_dialogos(x,y,an,al);
     big=0;
@@ -3104,7 +3104,7 @@ void explode(int x,int y,int an,int al) {
   while (++n<10) {
     aan=(an*n)/10; aal=(al*n)/10;
     xx=x+an/2-aan/2; yy=y+al/2-aal/2;
-    wrectangulo(copia,vga_an,vga_al,c4,xx,yy,aan,aal);
+    wrectangle(copia,vga_an,vga_al,c4,xx,yy,aan,aal);
     volcado_parcial(xx,yy,aan,1);
     volcado_parcial(xx,yy,1,aal);
     volcado_parcial(xx,yy+aal-1,aan,1);
@@ -3114,7 +3114,7 @@ void explode(int x,int y,int an,int al) {
     volcado_copia();
     if (modo<100) {
       if (b) big=1;
-      fondo_edicion(xx,yy,aan,aal);
+      draw_edit_background(xx,yy,aan,aal);
       volcar_barras(0);
       actualiza_dialogos(xx,yy,aan,aal);
       big=0;
@@ -3135,7 +3135,7 @@ void implode(int x,int y,int an,int al) {
     aan=(an*n)/10; if (!aan) aan=1;
     aal=(al*n)/10; if (!aal) aal=1;
     xx=x+an/2-aan/2; yy=y+al/2-aal/2;
-    wrectangulo(copia,vga_an,vga_al,c4,xx,yy,aan,aal);
+    wrectangle(copia,vga_an,vga_al,c4,xx,yy,aan,aal);
     volcado_parcial(xx,yy,aan,1);
     volcado_parcial(xx,yy,1,aal);
     volcado_parcial(xx,yy+aal-1,aan,1);
@@ -3144,7 +3144,7 @@ void implode(int x,int y,int an,int al) {
     volcado_copia();
     if (modo<100) {
       if (b) big=1;
-      fondo_edicion(xx,yy,aan,aal);
+      draw_edit_background(xx,yy,aan,aal);
       volcar_barras(0);
       actualiza_dialogos(xx,yy,aan,aal);
       big=0;
@@ -3164,7 +3164,7 @@ void extrude(int x,int y,int an,int al,int x2,int y2,int an2,int al2) {
   v.tipo=0; big=0;
   if (modo<100) {
     if (b) big=1;
-    fondo_edicion(x,y,an,al);
+    draw_edit_background(x,y,an,al);
     volcar_barras(0);
     actualiza_dialogos(x,y,an,al);
     big=0;
@@ -3174,7 +3174,7 @@ void extrude(int x,int y,int an,int al,int x2,int y2,int an2,int al2) {
     aal=(al*n+al2*(10-n))/10;
     xx=(x*n+x2*(10-n))/10;
     yy=(y*n+y2*(10-n))/10;
-    wrectangulo(copia,vga_an,vga_al,c4,xx,yy,aan,aal);
+    wrectangle(copia,vga_an,vga_al,c4,xx,yy,aan,aal);
     volcado_parcial(xx,yy,aan,1);
     volcado_parcial(xx,yy,1,aal);
     volcado_parcial(xx,yy+aal-1,aan,1);
@@ -3183,7 +3183,7 @@ void extrude(int x,int y,int an,int al,int x2,int y2,int an2,int al2) {
 
     if (modo<100) {
       if (b) big=1;
-      fondo_edicion(xx,yy,aan,aal);
+      draw_edit_background(xx,yy,aan,aal);
       volcar_barras(0);
       actualiza_dialogos(xx,yy,aan,aal);
       big=0;
@@ -3292,7 +3292,7 @@ uint32_t colorkey=0;
 
       memset(ptr,c0,an*al); if (big) { an/=2; al/=2; }
 
-      wrectangulo(ptr,an,al,c2,0,0,an,al);
+      wrectangle(ptr,an,al,c2,0,0,an,al);
 
       wput(ptr,an,al,an-9,2,35);
       if (!strcmp((char *)v.titulo,(char *)texto[41]) || !strcmp((char *)v.titulo,(char *)texto[367]))
@@ -3339,7 +3339,7 @@ void refrescadialogo(void)
 	byte * ptr=v.ptr;
 	int an=v.an,al=v.al;
 	memset(ptr,c0,an*al); if (big) { an/=2; al/=2; }
-      wrectangulo(ptr,an,al,c2,0,0,an,al);
+      wrectangle(ptr,an,al,c2,0,0,an,al);
       wput(ptr,an,al,an-9,2,35);
       if (!strcmp((char *)v.titulo,(char *)texto[41])) wgra(ptr,an,al,c_r_low,2,2,an-12,7);
       else wgra(ptr,an,al,c_b_low,2,2,an-12,7);
@@ -3987,9 +3987,9 @@ void select_button(struct t_item * i,int activo) {
     case 7: x=x-(an>>1); y=y-al+1; break;
     case 8: x=x-an+1; y=y-al+1; break;
   } if (activo) {
-    wrectangulo(v.ptr,v.an/big2,v.al/big2,c12,x-4,y-4,an+8,al+8);
+    wrectangle(v.ptr,v.an/big2,v.al/big2,c12,x-4,y-4,an+8,al+8);
   } else {
-    wrectangulo(v.ptr,v.an/big2,v.al/big2,c2,x-4,y-4,an+8,al+8);
+    wrectangle(v.ptr,v.an/big2,v.al/big2,c2,x-4,y-4,an+8,al+8);
   }
 }
 
@@ -4008,7 +4008,7 @@ void select_get(struct t_item * i,int activo,int ocultar_error) {
   char cWork[128];
   int n;
   if (activo) {
-    wrectangulo(v.ptr,v.an/big2,v.al/big2,c12,i->get.x-1,i->get.y+7,i->get.an+2,11);
+    wrectangle(v.ptr,v.an/big2,v.al/big2,c12,i->get.x-1,i->get.y+7,i->get.an+2,11);
     if (i->estado&2) { 
 		strcpy((char *)get, (char *)i->get.buffer); 
 		get_pos=strlen(get); 
@@ -4028,7 +4028,7 @@ void select_get(struct t_item * i,int activo,int ocultar_error) {
     if (!superget) {
       wbox(v.ptr,v.an/big2,v.al/big2,c1,i->get.x,i->get.y+8,i->get.an,9);
       wwrite_in_box(v.ptr,v.an/big2,i->get.an-1+i->get.x,v.al/big2,i->get.x+1,i->get.y+9,0,i->get.buffer,c3);
-      wrectangulo(v.ptr,v.an/big2,v.al/big2,c2,i->get.x-1,i->get.y+7,i->get.an+2,11);
+      wrectangle(v.ptr,v.an/big2,v.al/big2,c2,i->get.x-1,i->get.y+7,i->get.an+2,11);
     }
 
     for (n=0;n<max_items;n++) if (i==&v.item[n]) v.active_item=n;

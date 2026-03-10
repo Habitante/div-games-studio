@@ -54,9 +54,9 @@ void pinta_sliderbr(struct t_listboxbr * l);
 // Forward declarations for this file
 void MapperBrowseFPG1(void);
 void MapperBrowseFPG2(void);
-void M3D_pinta_listboxbr(struct t_listboxbr * l);
-void M3D_muestra_thumb(struct t_listboxbr * l, int num);
-void M3D_crear_listboxbr(struct t_listboxbr * l);
+void M3D_paint_listboxbr(struct t_listboxbr * l);
+void M3D_show_thumb(struct t_listboxbr * l, int num);
+void M3D_create_listboxbr(struct t_listboxbr * l);
 
 //-----------------------------------------------------------------------------
 // Variables
@@ -139,10 +139,10 @@ int cmpcode(const void * a, const void * b)
 }
 
 //-----------------------------------------------------------------------------
-// M3D_crear_thumbs - Load FPG file and create brush thumbnails
+// M3D_create_thumbs - Load FPG file and create brush thumbnails
 //-----------------------------------------------------------------------------
 
-void M3D_crear_thumbs(struct t_listboxbr * l, int prog)
+void M3D_create_thumbs(struct t_listboxbr * l, int prog)
 {
   FILE       *FPG_F;
   FPG_header  FPG_H;
@@ -404,12 +404,12 @@ void M3D_crear_thumbs(struct t_listboxbr * l, int prog)
 }
 
 //-----------------------------------------------------------------------------
-// M3D_muestra_thumb - Display a thumbnail in the browser
+// M3D_show_thumb - Display a thumbnail in the browser
 //-----------------------------------------------------------------------------
 
 #define MAPBR 8
 
-void M3D_muestra_thumb(struct t_listboxbr * l, int num)
+void M3D_show_thumb(struct t_listboxbr * l, int num)
 {
   byte * ptr=v.ptr,c;
   int an=v.an/big2,al=v.al/big2;
@@ -490,10 +490,10 @@ void M3D_muestra_thumb(struct t_listboxbr * l, int num)
 }
 
 //-----------------------------------------------------------------------------
-// M3D_crear_listboxbr - Create a thumbnail listbox browser
+// M3D_create_listboxbr - Create a thumbnail listbox browser
 //-----------------------------------------------------------------------------
 
-void M3D_crear_listboxbr(struct t_listboxbr * l)
+void M3D_create_listboxbr(struct t_listboxbr * l)
 {
   byte *ptr=v.ptr;
   int an=v.an/big2,al=v.al/big2;
@@ -515,22 +515,22 @@ void M3D_crear_listboxbr(struct t_listboxbr * l)
 
   for (y=0;y<l->lineas;y++)
     for (x=0;x<l->columnas;x++)
-      wrectangulo(ptr,an,al,c0,l->x+(x*(l->an+1)),l->y+(y*(l->al+1)),l->an+2,l->al+2);
+      wrectangle(ptr,an,al,c0,l->x+(x*(l->an+1)),l->y+(y*(l->al+1)),l->an+2,l->al+2);
 
-  wrectangulo(ptr,an,al,c0,l->x+(l->an+1)*l->columnas,l->y,9,(l->al+1)*l->lineas+1);
-  wrectangulo(ptr,an,al,c0,l->x+(l->an+1)*l->columnas,l->y+8,9,(l->al+1)*l->lineas-15);
+  wrectangle(ptr,an,al,c0,l->x+(l->an+1)*l->columnas,l->y,9,(l->al+1)*l->lineas+1);
+  wrectangle(ptr,an,al,c0,l->x+(l->an+1)*l->columnas,l->y+8,9,(l->al+1)*l->lineas-15);
   wput(ptr,an,al,l->x+(l->an+1)*l->columnas+1,l->y+1,-39);
   wput(ptr,an,al,l->x+(l->an+1)*l->columnas+1,l->y+(l->al+1)*l->lineas-7,-40);
 
-  M3D_pinta_listboxbr(l);
+  M3D_paint_listboxbr(l);
   pinta_sliderbr(l);
 }
 
 //-----------------------------------------------------------------------------
-// M3D_actualiza_listboxbr - Update a thumbnail listbox browser
+// M3D_update_listboxbr - Update a thumbnail listbox browser
 //-----------------------------------------------------------------------------
 
-void M3D_actualiza_listboxbr(struct t_listboxbr * l)
+void M3D_update_listboxbr(struct t_listboxbr * l)
 {
   byte * ptr=v.ptr, *p;
   int an=v.an/big2,al=v.al/big2;
@@ -558,7 +558,7 @@ void M3D_actualiza_listboxbr(struct t_listboxbr * l)
   if (l->zona==2 && (mouse_b&1)) {
     if (old_mouse_b&1) { retrazo(); retrazo(); retrazo(); retrazo(); }
       if (l->inicial) {
-        l->inicial-=l->columnas; M3D_pinta_listboxbr(l); v.volcar=1; }
+        l->inicial-=l->columnas; M3D_paint_listboxbr(l); v.volcar=1; }
       wput(ptr,an,al,l->x+(l->an+1)*l->columnas+1,l->y+1,-41);
       l->botones|=1; v.volcar=1;
   } else if (l->botones&1) {
@@ -570,7 +570,7 @@ void M3D_actualiza_listboxbr(struct t_listboxbr * l)
     if (old_mouse_b&1) { retrazo(); retrazo(); retrazo(); retrazo(); }
     n=l->maximo-l->inicial;
     if (n>l->lineas*l->columnas) {
-      l->inicial+=l->columnas; M3D_pinta_listboxbr(l); v.volcar=1; }
+      l->inicial+=l->columnas; M3D_paint_listboxbr(l); v.volcar=1; }
     wput(ptr,an,al,l->x+(l->an+1)*l->columnas+1,l->y+(l->al+1)*l->lineas-7,-42);
     l->botones|=2; v.volcar=1;
   } else if (l->botones&2) {
@@ -588,7 +588,7 @@ void M3D_actualiza_listboxbr(struct t_listboxbr * l)
 
       n=0.5+(float)(n*(l->slide-l->s0))/(l->s1-l->s0);
 
-      if (n!=l->inicial/l->columnas) { l->inicial=n*l->columnas; M3D_pinta_listboxbr(l); }
+      if (n!=l->inicial/l->columnas) { l->inicial=n*l->columnas; M3D_paint_listboxbr(l); }
     } pinta_sliderbr(l); v.volcar=1;
 
   } else {
@@ -620,10 +620,10 @@ void M3D_actualiza_listboxbr(struct t_listboxbr * l)
 }
 
 //-----------------------------------------------------------------------------
-// M3D_pinta_listboxbr - Paint all thumbnails in the listbox
+// M3D_paint_listboxbr - Paint all thumbnails in the listbox
 //-----------------------------------------------------------------------------
 
-void M3D_pinta_listboxbr(struct t_listboxbr * l)
+void M3D_paint_listboxbr(struct t_listboxbr * l)
 {
   byte * ptr=v.ptr;
   int an=v.an/big2,al=v.al/big2;
@@ -646,7 +646,7 @@ void M3D_pinta_listboxbr(struct t_listboxbr * l)
 
   n=l->maximo-l->inicial;
   if (n>l->lineas*l->columnas) n=l->lineas*l->columnas;
-  while (n>0) M3D_muestra_thumb(l,l->inicial+--n);
+  while (n>0) M3D_show_thumb(l,l->inicial+--n);
 }
 
 //-----------------------------------------------------------------------------
@@ -713,7 +713,7 @@ void MapperBrowseFPG1(void)
 {
   _show_items();
 
-  M3D_crear_listboxbr(&ltexturasbr);
+  M3D_create_listboxbr(&ltexturasbr);
 }
 
 void MapperBrowseFPG2(void) {
@@ -723,7 +723,7 @@ void MapperBrowseFPG2(void) {
 
   _process_items();
 
-  M3D_actualiza_listboxbr(&ltexturasbr);
+  M3D_update_listboxbr(&ltexturasbr);
 
   if((mouse_b&1) && !(old_mouse_b&1))
   {
@@ -733,8 +733,8 @@ void MapperBrowseFPG2(void) {
       if(TipoBrowser==BRUSH) {
         old_pincel=num_pincel;
         num_pincel=ltexturasbr.inicial+ltexturasbr.zona-10;
-        M3D_muestra_thumb(&ltexturasbr,old_pincel);
-        M3D_muestra_thumb(&ltexturasbr,num_pincel);
+        M3D_show_thumb(&ltexturasbr,old_pincel);
+        M3D_show_thumb(&ltexturasbr,num_pincel);
         num_pincel=old_pincel;
       }
       FPG_thumbpos = 0;

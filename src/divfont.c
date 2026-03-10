@@ -84,9 +84,9 @@ int an=v.an,al=v.al,x,y,tal=24,tan=41;
         for(y=0;y<tal;y++)
                 for(x=0;x<tan;x++)
                         ptr[(y*an+x)+((big ? 86*2 : 86)*an+(big ? 4*2 : 4))]=Text3[y*tan+x];
-        wrectangulo(ptr,an/big2,al/big2,c0,4  ,86,41,24);
-        wrectangulo(ptr,an/big2,al/big2,c0,64 ,86,41,24);
-        wrectangulo(ptr,an/big2,al/big2,c0,124,86,41,24);
+        wrectangle(ptr,an/big2,al/big2,c0,4  ,86,41,24);
+        wrectangle(ptr,an/big2,al/big2,c0,64 ,86,41,24);
+        wrectangle(ptr,an/big2,al/big2,c0,124,86,41,24);
         v.volcar=1;
 }
 
@@ -755,7 +755,7 @@ int an=v.an/big2,al=v.al/big2;
         for(y=0;y<16;y++)
                 for(x=0;x<16;x++)
                         wbox(v.ptr,an,al,(y*16+x),x*8+2,y*8+10,7,7);
-        wrectangulo(v.ptr,an,al,c4,(SelColorFont%16)*8+1,(SelColorFont/16)*8+9,9,9);
+        wrectangle(v.ptr,an,al,c4,(SelColorFont%16)*8+1,(SelColorFont/16)*8+9,9,9);
         if(dac[SelColorFont*3]*dac[SelColorFont*3+1]*dac[SelColorFont*3+2]<(32*32*32))
                 wbox(v.ptr,an,al,c4,(SelColorFont%16)*8+4,(SelColorFont/16)*8+12,3,3);
         else
@@ -786,8 +786,8 @@ byte cColor;
                 cColor=((wmouse_y-10)/8)*16+((wmouse_x-2)/8);
                 if(cColor!=OldColor)
                 {
-                        wrectangulo(v.ptr,an,al,c0,(OldColor%16)*8+1,(OldColor/16)*8+9,9,9);
-                        wrectangulo(v.ptr,an,al,c4,(cColor%16)*8+1,(cColor/16)*8+9,9,9);
+                        wrectangle(v.ptr,an,al,c0,(OldColor%16)*8+1,(OldColor/16)*8+9,9,9);
+                        wrectangle(v.ptr,an,al,c4,(cColor%16)*8+1,(cColor/16)*8+9,9,9);
                         v.volcar=1;
                         OldColor=cColor;
                 }
@@ -807,8 +807,8 @@ byte cColor;
         }
         else
         {
-                wrectangulo(v.ptr,an,al,c0,(OldColor%16)*8+1,(OldColor/16)*8+9,9,9);
-                wrectangulo(v.ptr,an,al,c4,(SelColorFont%16)*8+1,(SelColorFont/16)*8+9,9,9);
+                wrectangle(v.ptr,an,al,c0,(OldColor%16)*8+1,(OldColor/16)*8+9,9,9);
+                wrectangle(v.ptr,an,al,c4,(SelColorFont%16)*8+1,(SelColorFont/16)*8+9,9,9);
                 OldColor=SelColorFont;
                 v.volcar=1;
         }
@@ -1017,9 +1017,9 @@ char cWork[4];
                 wwrite(v.ptr,an,al,45,68,0,texto[88],c4);
         else
                 wwrite(v.ptr,an,al,45,68,0,texto[89],c4);
-        wrectangulo(v.ptr,an,al,c0,an-68,10,1,al-30); //28
+        wrectangle(v.ptr,an,al,c0,an-68,10,1,al-30); //28
 
-        wrectangulo(v.ptr,an,al,c0,2,al-20,an-4,1);
+        wrectangle(v.ptr,an,al,c0,2,al-20,an-4,1);
 
 }
 int GenFontRet=0;

@@ -5,7 +5,7 @@
 
 #include "global.h"
 
-void col_analiza_ltlex(void);
+void col_analyze_ltlex(void);
 
 //-----------------------------------------------------------------------------
 
@@ -94,7 +94,7 @@ void init_lexcolor() {
 
   icvnom.b=cvnom;
 
-  col_analiza_ltlex();
+  col_analyze_ltlex();
 
   clex_case[' ']=(struct clex_ele*)l_spc;
   clex_case[tab]=(struct clex_ele*)l_spc;
@@ -103,7 +103,7 @@ void init_lexcolor() {
 
   incluye_nombres=0;
 
-//  col_analiza_ltobj();
+//  col_analyze_ltobj();
 }
 
 void end_lexcolor() {
@@ -114,7 +114,7 @@ void end_lexcolor() {
 //      Lexico (lee una nueva cpieza del *csource)
 //-----------------------------------------------------------------------------
 
-void clexico(void) {
+void color_lex(void) {
 
   byte ** ptr, * _ivnom, h, * _source=csource;
   struct clex_ele * e;
@@ -215,7 +215,7 @@ byte *_cbuf;
 //      Precarga de las estructuras léxicas, analiza el fichero ltlex.def
 //-----------------------------------------------------------------------------
 
-void col_analiza_ltlex(void){
+void col_analyze_ltlex(void){
 
   byte * buf, cont=1;
   int len;
@@ -285,7 +285,7 @@ void col_analiza_ltlex(void){
 //  Añade al vector hash las palabras predefinidas
 //-----------------------------------------------------------------------------
 
-void col_analiza_ltobj(void){
+void col_analyze_ltobj(void){
   byte * buf;
   int len;
 
@@ -299,7 +299,7 @@ void col_analiza_ltobj(void){
   incluye_nombres=1;
   csource=buf;
   do {
-    clexico();
+    color_lex();
   } while (csource<buf+len);
   incluye_nombres=0;
 

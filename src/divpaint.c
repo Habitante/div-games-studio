@@ -348,7 +348,7 @@ void edit_mode_2(void) {
     if (back) {
       undo_back(); if (hacer_zoom==1) zoom_map();
       else if (hacer_zoom==-1 && hacer_zoom_an>0 && hacer_zoom_al>0)
-        fondo_edicion(hacer_zoom_x,hacer_zoom_y,hacer_zoom_an,hacer_zoom_al);
+        draw_edit_background(hacer_zoom_x,hacer_zoom_y,hacer_zoom_an,hacer_zoom_al);
       hacer_zoom_an=0; hacer_zoom_al=0; hacer_zoom=0;
     }
 
@@ -415,7 +415,7 @@ void edit_mode_3(void) {
     if (back) {
       undo_back(); if (hacer_zoom==1) zoom_map();
       else if (hacer_zoom==-1 && hacer_zoom_an>0 && hacer_zoom_al>0)
-        fondo_edicion(hacer_zoom_x,hacer_zoom_y,hacer_zoom_an,hacer_zoom_al);
+        draw_edit_background(hacer_zoom_x,hacer_zoom_y,hacer_zoom_an,hacer_zoom_al);
       hacer_zoom_an=0; hacer_zoom_al=0; hacer_zoom=0;
     }
 
@@ -504,7 +504,7 @@ void edit_mode_4(void) {
     if (back) {
       undo_back(); if (hacer_zoom==1) zoom_map();
       else if (hacer_zoom==-1 && hacer_zoom_an>0 && hacer_zoom_al>0)
-        fondo_edicion(hacer_zoom_x,hacer_zoom_y,hacer_zoom_an,hacer_zoom_al);
+        draw_edit_background(hacer_zoom_x,hacer_zoom_y,hacer_zoom_an,hacer_zoom_al);
       hacer_zoom_an=0; hacer_zoom_al=0; hacer_zoom=0;
     }
 
@@ -600,7 +600,7 @@ void edit_mode_5(void) {
     if (back) {
       undo_back(); if (hacer_zoom==1) zoom_map();
       else if (hacer_zoom==-1 && hacer_zoom_an>0 && hacer_zoom_al>0)
-        fondo_edicion(hacer_zoom_x,hacer_zoom_y,hacer_zoom_an,hacer_zoom_al);
+        draw_edit_background(hacer_zoom_x,hacer_zoom_y,hacer_zoom_an,hacer_zoom_al);
       hacer_zoom_an=0; hacer_zoom_al=0; hacer_zoom=0;
     }
 
@@ -677,7 +677,7 @@ void edit_mode_6(void) {
     if (back) {
       undo_back(); if (hacer_zoom==1) zoom_map();
       else if (hacer_zoom==-1 && hacer_zoom_an>0 && hacer_zoom_al>0)
-        fondo_edicion(hacer_zoom_x,hacer_zoom_y,hacer_zoom_an,hacer_zoom_al);
+        draw_edit_background(hacer_zoom_x,hacer_zoom_y,hacer_zoom_an,hacer_zoom_al);
       hacer_zoom_an=0; hacer_zoom_al=0; hacer_zoom=0;
     }
 
@@ -769,7 +769,7 @@ void edit_mode_7(void) {
     if (back) {
       undo_back(); if (hacer_zoom==1) zoom_map();
       else if (hacer_zoom==-1 && hacer_zoom_an>0 && hacer_zoom_al>0)
-        fondo_edicion(hacer_zoom_x,hacer_zoom_y,hacer_zoom_an,hacer_zoom_al);
+        draw_edit_background(hacer_zoom_x,hacer_zoom_y,hacer_zoom_an,hacer_zoom_al);
       hacer_zoom_an=0; hacer_zoom_al=0; hacer_zoom=0;
     }
 
@@ -2909,10 +2909,10 @@ void mover(byte * sp, int an, int al) {
 
     zoom_map();
     volcar_barras(0);
-    salvaguarda(fondo_raton,mouse_shift_x,mouse_shift_y,_mouse_graf,0);
+    save_mouse_bg(fondo_raton,mouse_shift_x,mouse_shift_y,_mouse_graf,0);
     put(mouse_shift_x,mouse_shift_y,_mouse_graf);
     volcado(copia);
-    salvaguarda(fondo_raton,mouse_shift_x,mouse_shift_y,_mouse_graf,1);
+    save_mouse_bg(fondo_raton,mouse_shift_x,mouse_shift_y,_mouse_graf,1);
 
     if (mouse_graf>=10) switch(s) {
       case 0:
@@ -3200,7 +3200,7 @@ void dibuja_regla(void) {
     n=(memptrsize)c1*3; med=dac[n]+dac[n+1]+dac[n+2];
     n=color*3;
     if (dac[n]+dac[n+1]+dac[n+2]>med) n=color; else n=c1;
-    wrectangulo(barra,vga_an/big2,19,n,80,2,7,8);
+    wrectangle(barra,vga_an/big2,19,n,80,2,7,8);
   } else {
     ptr=barra+2*big2*vga_an+80*big2;
     if (big) {
@@ -3224,7 +3224,7 @@ void dibuja_regla(void) {
 
   // Rectángulo del color 0
 
-  wrectangulo(barra,vga_an/big2,19,c1,88,2,7,8);
+  wrectangle(barra,vga_an/big2,19,c1,88,2,7,8);
   wbox(barra,vga_an/big2,19,0,88+1,2+1,5,6);
 
   // Selección de brush
@@ -3483,7 +3483,7 @@ void volcado_edicion(void) {
 
   if (hacer_zoom==1) zoom_map();
   else if (hacer_zoom==-1 && hacer_zoom_an>0 && hacer_zoom_al>0)
-    fondo_edicion(hacer_zoom_x,hacer_zoom_y,hacer_zoom_an,hacer_zoom_al);
+    draw_edit_background(hacer_zoom_x,hacer_zoom_y,hacer_zoom_an,hacer_zoom_al);
   hacer_zoom_an=0; hacer_zoom_al=0; hacer_zoom=0;
 
   coord_barra();
@@ -3584,7 +3584,7 @@ void select_fx(int n,int * efecto) {
     do {
       read_mouse(); test_mouse_box(a,b,c,d); wait=0;
 
-      wrectangulo(p,c,d,c2,0,0,c,d);
+      wrectangle(p,c,d,c2,0,0,c,d);
       wbox(p,c,d,c0,1,1,c-2,d-2);
       wgra(p,c,d,c_b_low,2,2,c-12,7);
       wput(p,c,d,c-9,2,35);
@@ -3615,19 +3615,19 @@ void select_fx(int n,int * efecto) {
         if (mouse_b&1) { *efecto=iy; wait=2; }
       } else if (mouse_in(a+2,b+2,a+c-10,b+9)) {
         ix=mouse_shift_x-a; iy=mouse_shift_y-b;
-        wrectangulo(p,c,d,c4,0,0,c,d);
+        wrectangle(p,c,d,c4,0,0,c,d);
         while (mouse_b&1) {
-          salvaguarda(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,0);
+          save_mouse_bg(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,0);
           put(mouse_shift_x,mouse_shift_y,mouse_graf);
           volcado(copia);
-          salvaguarda(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,1);
-      	  fondo_edicion(a,b,c*big2,d*big2);
+          save_mouse_bg(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,1);
+      	  draw_edit_background(a,b,c*big2,d*big2);
           volcar_barras(0);
           read_mouse();
           a=mouse_shift_x-ix; b=mouse_shift_y-iy;
           wvolcado(copia,vga_an,vga_al,p,a,b,c*big2,d*big2,0);
           volcado_parcial(a,b,c*big2,d*big2);
-        } wrectangulo(p,c,d,c2,0,0,c,d);
+        } wrectangle(p,c,d,c2,0,0,c,d);
       }
 
       if (wait) {
@@ -3638,10 +3638,10 @@ void select_fx(int n,int * efecto) {
       wvolcado(copia,vga_an,vga_al,p,a,b,c*big2,d*big2,0);
       volcado_parcial(a,b,c*big2,d*big2);
 
-      salvaguarda(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,0);
+      save_mouse_bg(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,0);
       put(mouse_shift_x,mouse_shift_y,mouse_graf);
       volcado(copia);
-      salvaguarda(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,1);
+      save_mouse_bg(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,1);
 
       if (wait==1) {
         wput(p,c,d,2,18,-37); wput(p,c,d,79,18,-38);
@@ -3655,17 +3655,17 @@ void select_fx(int n,int * efecto) {
       wput(p,c,d,c-9,2,-45);
       wvolcado(copia,vga_an,vga_al,p,a,b,c*big2,d*big2,0);
       volcado_parcial(a,b,c*big2,d*big2);
-      salvaguarda(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,0);
+      save_mouse_bg(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,0);
       put(mouse_shift_x,mouse_shift_y,mouse_graf); volcado(copia);
-      salvaguarda(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,1);
+      save_mouse_bg(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,1);
       do { read_mouse(); } while (mouse_b || key(_ESC));
     }
 
-    fondo_edicion(a,b,c*big2,d*big2);
+    draw_edit_background(a,b,c*big2,d*big2);
     volcar_barras(0);
-    salvaguarda(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,0);
+    save_mouse_bg(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,0);
     put(mouse_shift_x,mouse_shift_y,mouse_graf); volcado(copia);
-    salvaguarda(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,1);
+    save_mouse_bg(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,1);
     free(p);
   }
 }
@@ -3723,7 +3723,7 @@ int select_icon(int icono_x,int * iconos) {
     do {
       read_mouse(); test_mouse_box(a,b,c,d);
 
-      wrectangulo(p,c,d,c2,0,0,c,d);
+      wrectangle(p,c,d,c2,0,0,c,d);
       wbox(p,c,d,c0,1,1,c-2,d-2);
       wgra(p,c,d,c_b_low,2,2,c-12,7);
       wput(p,c,d,c-9,2,35);
@@ -3738,28 +3738,28 @@ int select_icon(int icono_x,int * iconos) {
         wresalta_box(p,c,d,ix,iy,15,15);
       } else if (mouse_in(a+2,b+2,a+c-10,b+9)) {
         ix=mouse_shift_x-a; iy=mouse_shift_y-b;
-        wrectangulo(p,c,d,c4,0,0,c,d);
+        wrectangle(p,c,d,c4,0,0,c,d);
         while (mouse_b&1) {
-          salvaguarda(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,0);
+          save_mouse_bg(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,0);
           put(mouse_shift_x,mouse_shift_y,mouse_graf);
           volcado(copia);
-          salvaguarda(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,1);
-      	  fondo_edicion(a,b,c*big2,d*big2);
+          save_mouse_bg(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,1);
+      	  draw_edit_background(a,b,c*big2,d*big2);
           volcar_barras(0);
           read_mouse();
           a=mouse_shift_x-ix; b=mouse_shift_y-iy;
           wvolcado(copia,vga_an,vga_al,p,a,b,c*big2,d*big2,0);
           volcado_parcial(a,b,c*big2,d*big2);
-        } wrectangulo(p,c,d,c2,0,0,c,d);
+        } wrectangle(p,c,d,c2,0,0,c,d);
       }
 
       wvolcado(copia,vga_an,vga_al,p,a,b,c*big2,d*big2,0);
       volcado_parcial(a,b,c*big2,d*big2);
 
-      salvaguarda(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,0);
+      save_mouse_bg(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,0);
       put(mouse_shift_x,mouse_shift_y,mouse_graf);
       volcado(copia);
-      salvaguarda(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,1);
+      save_mouse_bg(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,1);
 
     } while (!mouse_b && !key(_ESC));
 
@@ -3772,17 +3772,17 @@ int select_icon(int icono_x,int * iconos) {
       wput(p,c,d,c-9,2,-45);
       wvolcado(copia,vga_an,vga_al,p,a,b,c*big2,d*big2,0);
       volcado_parcial(a,b,c*big2,d*big2);
-      salvaguarda(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,0);
+      save_mouse_bg(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,0);
       put(mouse_shift_x,mouse_shift_y,mouse_graf); volcado(copia);
-      salvaguarda(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,1);
+      save_mouse_bg(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,1);
       do { read_mouse(); } while (mouse_b || key(_ESC));
     }
 
-    fondo_edicion(a,b,c*big2,d*big2);
+    draw_edit_background(a,b,c*big2,d*big2);
     volcar_barras(0);
-    salvaguarda(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,0);
+    save_mouse_bg(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,0);
     put(mouse_shift_x,mouse_shift_y,mouse_graf); volcado(copia);
-    salvaguarda(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,1);
+    save_mouse_bg(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,1);
 
     free(p);
   } return(r);
@@ -3802,7 +3802,7 @@ void volcado_raton_a(void) {
   if (mouse_graf<10) {
     volcar_barras(0);
   } else {
-    salvaguarda(fondo_raton,moux,mouy,mouse_graf,0);
+    save_mouse_bg(fondo_raton,moux,mouy,mouse_graf,0);
     put_bw(moux,mouy,mouse_graf);
     volcar_barras(0);
   }
@@ -3813,11 +3813,11 @@ void volcado_raton_b(void) {
   moux=zx+((mouse_x-zx)&(-(1<<zoom)));
   mouy=zy+((mouse_y-zy)&(-(1<<zoom)));
   if (mouse_graf<10) {
-    salvaguarda(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,0);
+    save_mouse_bg(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,0);
     put(mouse_shift_x,mouse_shift_y,mouse_graf);
   } volcado(copia);
-  if (mouse_graf<10) salvaguarda(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,1);
-  else salvaguarda(fondo_raton,moux,mouy,mouse_graf,1);
+  if (mouse_graf<10) save_mouse_bg(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,1);
+  else save_mouse_bg(fondo_raton,moux,mouy,mouse_graf,1);
 }
 
 //-----------------------------------------------------------------------------
@@ -3852,18 +3852,18 @@ void select_mascara(int n) {
       if (mouse_in(a+2,b+2,a+c-10,b+9)) {
         ix=mouse_shift_x-a; iy=mouse_shift_y-b;
         if (mouse_b&1) {
-          wrectangulo(p,c,d,c4,0,0,c,d);
+          wrectangle(p,c,d,c4,0,0,c,d);
           while (mouse_b&1) {
             read_mouse(); a=mouse_shift_x-ix; b=mouse_shift_y-iy;
             wvolcado(copia,vga_an,vga_al,p,a,b,c*big2,d*big2,0);
             volcado_parcial(a,b,c*big2,d*big2);
-            salvaguarda(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,0);
+            save_mouse_bg(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,0);
             put(mouse_shift_x,mouse_shift_y,mouse_graf); volcado(copia);
-            salvaguarda(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,1);
-            fondo_edicion(a,b,c*big2,d*big2);
+            save_mouse_bg(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,1);
+            draw_edit_background(a,b,c*big2,d*big2);
             volcar_barras(0);
           }
-          wrectangulo(p,c,d,c2,0,0,c,d);
+          wrectangle(p,c,d,c2,0,0,c,d);
           test_mouse_box(a,b,c,d);
         }
       }
@@ -3901,13 +3901,13 @@ void select_mascara(int n) {
       volcado_raton_a();
       pinta_ventana_mascara(p,c,d);
       x=1+(col%16)*8; y=9+(col/16)*8;
-      wrectangulo(p,c,d,c4,x,y,9,9);
+      wrectangle(p,c,d,c4,x,y,9,9);
       wvolcado(copia,vga_an,vga_al,p,a,b,c*big2,d*big2,0);
       volcado_parcial(a,b,c*big2,d*big2);
       volcado_raton_b();
 
       x=1+(col%16)*8; y=9+(col/16)*8;
-      wrectangulo(p,c,d,c0,x,y,9,9);
+      wrectangle(p,c,d,c0,x,y,9,9);
       volcado_parcial(a+x*big2,b+y*big2,9*big2,9*big2);
 
     } while (!(mouse_b&2) && !key(_ESC) && !salir && !key(_M) &&
@@ -3917,13 +3917,13 @@ void select_mascara(int n) {
     if (!mouse_in(barra_x,barra_y,barra_x+barra_an-1,barra_y+18) || !(mouse_b&1)
         || key(_M) || mouse_in(barra_x+48+n*16,barra_y+2,barra_x+57+n*16,barra_y+17)) {
       volcado_raton_a(); wput(p,c,d,c-9,2,-45);
-      x=1+(col%16)*8; y=9+(col/16)*8; wrectangulo(p,c,d,c4,x,y,9,9);
+      x=1+(col%16)*8; y=9+(col/16)*8; wrectangle(p,c,d,c4,x,y,9,9);
       wvolcado(copia,vga_an,vga_al,p,a,b,c*big2,d*big2,0);
       volcado_parcial(a,b,c*big2,d*big2); volcado_raton_b();
       do { read_mouse(); } while (mouse_b || key(_ESC) || key(_M));
     }
 
-    fondo_edicion(a,b,c*big2,d*big2);
+    draw_edit_background(a,b,c*big2,d*big2);
     test_mouse(); volcado_raton();
     free(p);
   }
@@ -3938,7 +3938,7 @@ void select_mascara(int n) {
 void pinta_ventana_mascara(byte * p,int c,int d) {
   int n,x,y;
 
-  wrectangulo(p,c,d,c2,0,0,c,d); // Ventana
+  wrectangle(p,c,d,c2,0,0,c,d); // Ventana
   wbox(p,c,d,c0,1,1,c-2,d-2);
   wgra(p,c,d,c_b_low,2,2,c-12,7);
   wput(p,c,d,c-9,2,35);
@@ -4235,18 +4235,18 @@ void select_color(int n) { // Número de "icono" como parámetro
       if (mouse_in(a+2,b+2,a+c-10,b+9)) {
         ix=mouse_shift_x-a; iy=mouse_shift_y-b;
         if (mouse_b&1) {
-          wrectangulo(p,c,d,c4,0,0,c,d);
+          wrectangle(p,c,d,c4,0,0,c,d);
           while (mouse_b&1) {
             read_mouse(); a=mouse_shift_x-ix; b=mouse_shift_y-iy;
             wvolcado(copia,vga_an,vga_al,p,a,b,c*big2,d*big2,0);
             volcado_parcial(a,b,c*big2,d*big2);
-            salvaguarda(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,0);
+            save_mouse_bg(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,0);
             put(mouse_shift_x,mouse_shift_y,mouse_graf); volcado(copia);
-            salvaguarda(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,1);
-            fondo_edicion(a,b,c*big2,d*big2);
+            save_mouse_bg(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,1);
+            draw_edit_background(a,b,c*big2,d*big2);
             volcar_barras(0);
           }
-          wrectangulo(p,c,d,c2,0,0,c,d);
+          wrectangle(p,c,d,c2,0,0,c,d);
           volcar=1; test_mouse_box(a,b,c,d);
         }
       }
@@ -4332,25 +4332,25 @@ void select_color(int n) { // Número de "icono" como parámetro
         pinta_ventana_colores(p,c,d);
         pinta_ventana_colores2(p,c,d,col);
         x=9+(col%16)*8; y=9+(col/16)*8;
-        wrectangulo(p,c,d,c4,x,y,9,9);
+        wrectangle(p,c,d,c4,x,y,9,9);
         wvolcado(copia,vga_an,vga_al,p,a,b,c*big2,d*big2,0);
         volcado_parcial(a,b,c*big2,d*big2);
       } else if (volcar==2) { volcar=0;
         pinta_ventana_colores2(p,c,d,col);
         x=9+(col%16)*8; y=9+(col/16)*8;
-        wrectangulo(p,c,d,c4,x,y,9,9);
+        wrectangle(p,c,d,c4,x,y,9,9);
         wvolcado(copia,vga_an,vga_al,p,a,b,c*big2,d*big2,0);
         volcado_parcial(a+x*big2,b+y*big2,9*big2,9*big2);
         volcado_parcial(a+138*big2,b+10*big2,31*big2,128*big2);
       }
 
-      salvaguarda(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,0);
+      save_mouse_bg(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,0);
       put(mouse_shift_x,mouse_shift_y,mouse_graf);
       volcado(copia);
-      salvaguarda(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,1);
+      save_mouse_bg(fondo_raton,mouse_shift_x,mouse_shift_y,mouse_graf,1);
 
       x=9+(col%16)*8; y=9+(col/16)*8;
-      wrectangulo(p,c,d,c0,x,y,9,9);
+      wrectangle(p,c,d,c0,x,y,9,9);
       volcado_parcial(a+x*big2,b+y*big2,9*big2,9*big2);
 
       if ((mouse_b&1) && mouse_in(a+10,b+132+8,a+137,b+147+8)) {
@@ -4389,13 +4389,13 @@ void select_color(int n) { // Número de "icono" como parámetro
     if (!mouse_in(barra_x,barra_y,barra_x+barra_an-1,barra_y+18) || !(mouse_b&1)
         || key(_C) || mouse_in(barra_x+48+n*16,barra_y+2,barra_x+57+n*16,barra_y+17)) {
       volcado_raton_a(); wput(p,c,d,c-9,2,-45);
-      x=9+(col%16)*8; y=9+(col/16)*8; wrectangulo(p,c,d,c4,x,y,9,9);
+      x=9+(col%16)*8; y=9+(col/16)*8; wrectangle(p,c,d,c4,x,y,9,9);
       wvolcado(copia,vga_an,vga_al,p,a,b,c*big2,d*big2,0);
       volcado_parcial(a,b,c*big2,d*big2); volcado_raton_b();
       do { read_mouse(); } while (mouse_b || key(_ESC) || key(_C));
     }
 
-    fondo_edicion(a,b,c*big2,d*big2);
+    draw_edit_background(a,b,c*big2,d*big2);
     test_mouse(); volcado_raton();
     free(p);
   } else if ((ascii=='0' && hotkey) || (mouse_in(barra_x+56+n*16,barra_y+2,barra_x+62+n*16,barra_y+10) && (mouse_b&1))) {
@@ -4436,7 +4436,7 @@ void cambia_mapa(int adelante) {
   if (back) {
     undo_back(); if (hacer_zoom==1) zoom_map();
     else if (hacer_zoom==-1 && hacer_zoom_an>0 && hacer_zoom_al>0)
-      fondo_edicion(hacer_zoom_x,hacer_zoom_y,hacer_zoom_an,hacer_zoom_al);
+      draw_edit_background(hacer_zoom_x,hacer_zoom_y,hacer_zoom_an,hacer_zoom_al);
     hacer_zoom_an=0; hacer_zoom_al=0; hacer_zoom=0; back=0;
   }
 
@@ -4511,7 +4511,7 @@ void pinta_ventana_colores(byte * p,int c,int d) {
   int x,y;
   char num[3];
 
-  wrectangulo(p,c,d,c2,0,0,c,d); // Ventana
+  wrectangle(p,c,d,c2,0,0,c,d); // Ventana
   wbox(p,c,d,c0,1,1,c-2,d-2);
   wgra(p,c,d,c_b_low,2,2,c-12,7);
   wput(p,c,d,c-9,2,35);
@@ -4555,9 +4555,9 @@ void pinta_ventana_colores(byte * p,int c,int d) {
     else wwrite(p,c,d,228,10+y*8,0,(byte *)"F",c3);
   } wput(p,c,d,170,10+regla*8,36);
 
-  wrectangulo(p,c,d,c0,139,65+8,9,65);
-  wrectangulo(p,c,d,c0,149,65+8,9,65);
-  wrectangulo(p,c,d,c0,159,65+8,9,65);
+  wrectangle(p,c,d,c0,139,65+8,9,65);
+  wrectangle(p,c,d,c0,149,65+8,9,65);
+  wrectangle(p,c,d,c0,159,65+8,9,65);
 
   dibuja_regla_seleccion(p,c,d,10,128+12);
 
@@ -4571,7 +4571,7 @@ void pinta_ventana_colores2(byte * p,int c,int d,int col) {
   byte num[8];
   int x;
 
-  wrectangulo(p,c,d,c0,139,26,29,23);
+  wrectangle(p,c,d,c0,139,26,29,23);
   wbox(p,c,d,col,140,19+8,27,21);
 
   wbox(p,c,d,c2,138,10,31,16);
@@ -4614,19 +4614,19 @@ void mover_barra(void) {
 
   if ((mouse_b&1) && mouse_in(barra_x,barra_y,barra_x+9,barra_y+9)) {
 
-    wrectangulo(barra,vga_an/big2,vga_al,c4,0,0,barra_an,19);
+    wrectangle(barra,vga_an/big2,vga_al,c4,0,0,barra_an,19);
     barx=barra_x-mouse_shift_x; bary=barra_y-mouse_shift_y;
     do {
       read_mouse();
-      fondo_edicion(barra_x-4,barra_y-big2,barra_an*big2+4,20*big2);
+      draw_edit_background(barra_x-4,barra_y-big2,barra_an*big2+4,20*big2);
       barra_x=mouse_shift_x+barx; barra_y=mouse_shift_y+bary; coord_barra();
       volcar_barras(0);
       put(mouse_x,mouse_y,2);
       volcado(copia);
     } while (mouse_b&1); zoom_map();
 
-    wrectangulo(barra,vga_an/big2,vga_al,c2,0,0,barra_an,19);
-    fondo_edicion(barra_x-4,barra_y-big2,barra_an*big2+4,20*big2);
+    wrectangle(barra,vga_an/big2,vga_al,c2,0,0,barra_an,19);
+    draw_edit_background(barra_x-4,barra_y-big2,barra_an*big2+4,20*big2);
     volcar_barras(0);
 
   }
@@ -4763,12 +4763,12 @@ void dibuja_barra(int _an) {
 
   int n; // Número de iconos
 
-  fondo_edicion(barra_x-4,barra_y,barra_an*big2+4,19*big2);
+  draw_edit_background(barra_x-4,barra_y,barra_an*big2+4,19*big2);
 
   n=0; while (bar[n]) n++;
   barra_an=2+8+38+n*16+1+_an;
   memset(barra,c0,vga_an*19*big2);
-  wrectangulo(barra,vga_an/big2,19,c2,0,0,barra_an,19);
+  wrectangle(barra,vga_an/big2,19,c2,0,0,barra_an,19);
   wgra(barra,vga_an/big2,19,c_b_low,2,2,7,7);
 
   put_barra(2,10,35);
@@ -4860,7 +4860,7 @@ int nueva_barra(int an, int al) {
   ajusta_caja(&barras[n].x,&barras[n].y,&an,&al);
   an/=big2; al/=big2;
 
-  wrectangulo(barras[n].ptr,an,al,c2,0,0,an,al);
+  wrectangle(barras[n].ptr,an,al,c2,0,0,an,al);
   wbox(barras[n].ptr,an,al,c0,1,1,an-2,al-2);
   wgra(barras[n].ptr,an,al,c_b_low,2,2,an-12,7);
   wput(barras[n].ptr,an,al,an-9,2,35);

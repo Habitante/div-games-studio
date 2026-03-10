@@ -73,9 +73,9 @@ void mixer1(void)
   actualiza_listbox(&lvol_cd);
   actualiza_listbox(&lvol_ma);
 
-  wrectangulo(v.ptr, an, al, c0, MIX_BAR1-4, 56, 17, 17);
-  wrectangulo(v.ptr, an, al, c0, MIX_BAR2-4, 56, 17, 17);
-  wrectangulo(v.ptr, an, al, c0, MIX_BAR3-4, 56, 17, 17);
+  wrectangle(v.ptr, an, al, c0, MIX_BAR1-4, 56, 17, 17);
+  wrectangle(v.ptr, an, al, c0, MIX_BAR2-4, 56, 17, 17);
+  wrectangle(v.ptr, an, al, c0, MIX_BAR3-4, 56, 17, 17);
 
   if(Setupfile.mut_fx) wput(v.ptr, an, al, MIX_BAR1-3, 57, -225);
   else                 wput(v.ptr, an, al, MIX_BAR1-3, 57, -226);

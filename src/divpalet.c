@@ -811,7 +811,7 @@ void RefPalAndDlg(int no_tocar_mapas,int guardar_original)
     ptr=v.ptr;
     if (ventana[n].primer_plano==2) { swap(v.an,v._an); swap(v.al,v._al); }
     an=v.an; al=v.al; memset(ptr,c0,an*al); if (big) { an/=2; al/=2; }
-    wrectangulo(ptr,an,al,c2,0,0,an,al);
+    wrectangle(ptr,an,al,c2,0,0,an,al);
     wput(ptr,an,al,an-9,2,35);
     wput(ptr,an,al,an-17,2,37);
 
@@ -924,19 +924,19 @@ void ordena1(void){
   switch(ordenacion) {
     case 0:
       ord_paleta0();
-      wrectangulo(v.ptr,an,al,c4,2,10,67,67);
+      wrectangle(v.ptr,an,al,c4,2,10,67,67);
       break;
     case 1:
       ord_paleta1();
-      wrectangulo(v.ptr,an,al,c4,2+66,10,67,67);
+      wrectangle(v.ptr,an,al,c4,2+66,10,67,67);
       break;
     case 2:
       ord_paleta2();
-      wrectangulo(v.ptr,an,al,c4,2,10+66,67,67);
+      wrectangle(v.ptr,an,al,c4,2,10+66,67,67);
       break;
     case 3:
       ord_paleta3();
-      wrectangulo(v.ptr,an,al,c4,2+66,10+66,67,67);
+      wrectangle(v.ptr,an,al,c4,2+66,10+66,67,67);
       break;
   }
 }
@@ -953,17 +953,17 @@ void ordena2(void){
 
     if (ord!=ordenacion) {
       v.volcar=1;
-      wrectangulo(v.ptr,an,al,c2,2,10,65*2+3,65*2+3);
+      wrectangle(v.ptr,an,al,c2,2,10,65*2+3,65*2+3);
       wbox(v.ptr,an,al,c2,2+66,10,1,65*2+3);
       wbox(v.ptr,an,al,c2,2,10+66,65*2+3,1);
       switch(ord){
-        case 0: wrectangulo(v.ptr,an,al,c4,2,10,67,67);
+        case 0: wrectangle(v.ptr,an,al,c4,2,10,67,67);
           ord_paleta0(); break;
-        case 1: wrectangulo(v.ptr,an,al,c4,2+66,10,67,67);
+        case 1: wrectangle(v.ptr,an,al,c4,2+66,10,67,67);
           ord_paleta1(); break;
-        case 2: wrectangulo(v.ptr,an,al,c4,2,10+66,67,67);
+        case 2: wrectangle(v.ptr,an,al,c4,2,10+66,67,67);
           ord_paleta2(); break;
-        case 3: wrectangulo(v.ptr,an,al,c4,2+66,10+66,67,67);
+        case 3: wrectangle(v.ptr,an,al,c4,2+66,10+66,67,67);
           ord_paleta3(); break;
       } ordenacion=ord;
     }
@@ -1459,7 +1459,7 @@ char cWork[20];
                 for(x=0;x<16;x++)
                         wbox(v.ptr,an,al,(y*16+x),x*8+2,y*8+10,7,7);
 
-        wrectangulo(v.ptr,an,al,c4,(SelColor%16)*8+1,(SelColor/16)*8+9,9,9);
+        wrectangle(v.ptr,an,al,c4,(SelColor%16)*8+1,(SelColor/16)*8+9,9,9);
         if(dac[SelColor*3]*dac[SelColor*3+1]*dac[SelColor*3+2]<(32*32*32))
                 wbox(v.ptr,an,al,c4,(SelColor%16)*8+4,(SelColor/16)*8+12,3,3);
         else
@@ -1513,7 +1513,7 @@ int an=v.an/big2,al=v.al/big2;
                 cColor=((wmouse_y-10)/8)*16+((wmouse_x-2)/8);
                 if(cColor!=OldColor)
                 {
-                        wrectangulo(v.ptr,an,al,c0,(OldColor%16)*8+1,(OldColor/16)*8+9,9,9);
+                        wrectangle(v.ptr,an,al,c0,(OldColor%16)*8+1,(OldColor/16)*8+9,9,9);
                         wbox(v.ptr,an,al,cColor,133,27,29,42-29);
 
                         wbox(v.ptr,an,al,c2,130,11,29,15);
@@ -1537,7 +1537,7 @@ int an=v.an/big2,al=v.al/big2;
                         wwrite(v.ptr,an,al,140,63-7,2,(byte *)cWork,c3);
                         ax=((wmouse_x-2)/8);
                         ay=((wmouse_y-10)/8);
-                        wrectangulo(v.ptr,an,al,c4,(cColor%16)*8+1,(cColor/16)*8+9,9,9);
+                        wrectangle(v.ptr,an,al,c4,(cColor%16)*8+1,(cColor/16)*8+9,9,9);
                         lRed.inicial=63-dac[cColor*3];
                         lGre.inicial=63-dac[cColor*3+1];
                         lBlu.inicial=63-dac[cColor*3+2];
@@ -1578,8 +1578,8 @@ int an=v.an/big2,al=v.al/big2;
                                         
                                         find_colors();
                                         refrescadialogo();
-                                        wrectangulo(v.ptr,an,al,c0,(SelColor%16)*8+1,(SelColor/16)*8+9,9,9);
-                                        wrectangulo(v.ptr,an,al,c4,(cColor%16)*8+1,(cColor/16)*8+9,9,9);
+                                        wrectangle(v.ptr,an,al,c0,(SelColor%16)*8+1,(SelColor/16)*8+9,9,9);
+                                        wrectangle(v.ptr,an,al,c4,(cColor%16)*8+1,(cColor/16)*8+9,9,9);
                                         set_dac(dac);
                                         break;
                                 case 2:
@@ -1589,8 +1589,8 @@ int an=v.an/big2,al=v.al/big2;
                                         dac[cColor*3+2]=dac[SelColor*3+2];                                        
                                         find_colors();
                                         refrescadialogo();
-                                        wrectangulo(v.ptr,an,al,c0,(SelColor%16)*8+1,(SelColor/16)*8+9,9,9);
-                                        wrectangulo(v.ptr,an,al,c4,(cColor%16)*8+1,(cColor/16)*8+9,9,9);
+                                        wrectangle(v.ptr,an,al,c0,(SelColor%16)*8+1,(SelColor/16)*8+9,9,9);
+                                        wrectangle(v.ptr,an,al,c4,(cColor%16)*8+1,(cColor/16)*8+9,9,9);
                                         set_dac(dac);
                                         break;
                                 case 3:
@@ -1606,8 +1606,8 @@ int an=v.an/big2,al=v.al/big2;
                                         dac[cColor*3+2]=bWork;                                        
                                         find_colors();
                                         refrescadialogo();
-                                        wrectangulo(v.ptr,an,al,c0,(SelColor%16)*8+1,(SelColor/16)*8+9,9,9);
-                                        wrectangulo(v.ptr,an,al,c4,(cColor%16)*8+1,(cColor/16)*8+9,9,9);
+                                        wrectangle(v.ptr,an,al,c0,(SelColor%16)*8+1,(SelColor/16)*8+9,9,9);
+                                        wrectangle(v.ptr,an,al,c4,(cColor%16)*8+1,(cColor/16)*8+9,9,9);
                                         set_dac(dac);
                                         break;
                         }
@@ -1630,8 +1630,8 @@ int an=v.an/big2,al=v.al/big2;
         {
                 if(OldColor!=SelColor)
                 {
-                        wrectangulo(v.ptr,an,al,c0,(OldColor%16)*8+1,(OldColor/16)*8+9,9,9);
-                        wrectangulo(v.ptr,an,al,c4,(SelColor%16)*8+1,(SelColor/16)*8+9,9,9);
+                        wrectangle(v.ptr,an,al,c0,(OldColor%16)*8+1,(OldColor/16)*8+9,9,9);
+                        wrectangle(v.ptr,an,al,c4,(SelColor%16)*8+1,(SelColor/16)*8+9,9,9);
                         wbox(v.ptr,an,al,SelColor,133,27,29,42-29);
                         OldColor=SelColor;
 

@@ -150,7 +150,7 @@ void Setup1() {
   wbox(ptr,an,al,c0,2,60+19*3,an-4,1);
   wbox(ptr,an,al,c0,2,al-20,an-4,1);
 
-  wrectangulo(ptr,an,al,c0,140,29,144,89);
+  wrectangle(ptr,an,al,c0,140,29,144,89);
 
   if (imagen_install!=NULL) {
     for (y=0;y<87*big2;y++) for (x=0;x<142*big2;x++) {

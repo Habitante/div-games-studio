@@ -84,6 +84,6 @@ void Clock0(void) {
   ORDig1 = -1; ORDig2 = -1; ORDig3 = -1; ORDig4 = -1;
 }
 
-void muestra_reloj(void) {
+void show_clock(void) {
   nueva_ventana(Clock0);
 }

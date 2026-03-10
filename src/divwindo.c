@@ -208,7 +208,7 @@ void wresalta_box(byte*copia,int an_copia,int al_copia,int x,int y,int an,int al
 //      Dibuja un rectángulo
 //-----------------------------------------------------------------------------
 
-void wrectangulo(byte*copia,int an_copia,int al_copia,byte c,int x,int y,int an,int al) {
+void wrectangle(byte*copia,int an_copia,int al_copia,byte c,int x,int y,int an,int al) {
   wbox(copia,an_copia,al_copia,c,x,y,an,1);
   wbox(copia,an_copia,al_copia,c,x,y+al-1,an,1);
   wbox(copia,an_copia,al_copia,c,x,y+1,1,al-2);
@@ -575,12 +575,12 @@ void wwrite_in_box(byte*copia,int an_real_copia,int an_copia,int al_copia,
 	if (boton) {
 		if (c!=c0) {
 			wbox(copia,an_real_copia,al_copia,c2,x-2,y-2,an+4,al+4);
-			wrectangulo(copia,an_real_copia,al_copia,c0,x-3,y-3,an+6,al+6);
-			wrectangulo(copia,an_real_copia,al_copia,c3,x-2,y-2,an+3,1);
-			wrectangulo(copia,an_real_copia,al_copia,c3,x-2,y-2,1,al+3);
-			wrectangulo(copia,an_real_copia,al_copia,c4,x-2,y-2,1,1);
-			wrectangulo(copia,an_real_copia,al_copia,c1,x-1,y+al+1,an+3,1);
-			wrectangulo(copia,an_real_copia,al_copia,c1,x+an+1,y-1,1,al+3);
+			wrectangle(copia,an_real_copia,al_copia,c0,x-3,y-3,an+6,al+6);
+			wrectangle(copia,an_real_copia,al_copia,c3,x-2,y-2,an+3,1);
+			wrectangle(copia,an_real_copia,al_copia,c3,x-2,y-2,1,al+3);
+			wrectangle(copia,an_real_copia,al_copia,c4,x-2,y-2,1,1);
+			wrectangle(copia,an_real_copia,al_copia,c1,x-1,y+al+1,an+3,1);
+			wrectangle(copia,an_real_copia,al_copia,c1,x+an+1,y-1,1,al+3);
 			if (big) {
 				*(copia+(2*y-3)*an_real_copia*2+2*x-4)=c3;
 				*(copia+(2*y-4)*an_real_copia*2+2*x-3)=c3;
@@ -591,12 +591,12 @@ void wwrite_in_box(byte*copia,int an_real_copia,int an_copia,int al_copia,
 			}
 		} else {
 			wbox(copia,an_real_copia,al_copia,c1,x-2,y-2,an+4,al+4);
-			wrectangulo(copia,an_real_copia,al_copia,c0,x-3,y-3,an+6,al+6);
-			wrectangulo(copia,an_real_copia,al_copia,c0,x-2,y-2,an+3,1);
-			wrectangulo(copia,an_real_copia,al_copia,c0,x-2,y-2,1,al+3);
-			wrectangulo(copia,an_real_copia,al_copia,c2,x-1,y+al+1,an+3,1);
-			wrectangulo(copia,an_real_copia,al_copia,c2,x+an+1,y-1,1,al+3);
-			wrectangulo(copia,an_real_copia,al_copia,c3,x+an+1,y+al+1,1,1);
+			wrectangle(copia,an_real_copia,al_copia,c0,x-3,y-3,an+6,al+6);
+			wrectangle(copia,an_real_copia,al_copia,c0,x-2,y-2,an+3,1);
+			wrectangle(copia,an_real_copia,al_copia,c0,x-2,y-2,1,al+3);
+			wrectangle(copia,an_real_copia,al_copia,c2,x-1,y+al+1,an+3,1);
+			wrectangle(copia,an_real_copia,al_copia,c2,x+an+1,y-1,1,al+3);
+			wrectangle(copia,an_real_copia,al_copia,c3,x+an+1,y+al+1,1,1);
 
 			if (big) {
 				*(copia+(2*(y+al)+3)*an_real_copia*2+2*(x+an)+2)=c2;

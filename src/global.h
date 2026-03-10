@@ -144,16 +144,16 @@ void window_surface(int an, int al, byte type);
 
 void writetxt(int,int,int,byte*);
 void box(byte,int,int,int,int);
-void rectangulo(byte,int,int,int,int);
-void salvaguarda(byte * p, int x, int y, int n, int flag);
+void rectangle(byte,int,int,int,int);
+void save_mouse_bg(byte * p, int x, int y, int n, int flag);
 void put(int,int,int);
 void put_bw(int,int,int);
 void memxchg(byte*,byte*,int);
-void fondo_edicion(int,int,int,int);
+void draw_edit_background(int,int,int,int);
 void zoom_map(void);
 void fill_select(word,word);
 void fill(word,word);
-void modo_inter(void);
+void interpolation_mode(void);
 void set_mab(int,int);
 int is_mab(int,int);
 int is_near_mab(int,int);
@@ -363,7 +363,7 @@ void wgra(byte*copia,int an_copia,int al_copia,byte c,int x,int y,int an,int al)
 void wbox(byte*copia,int an_copia,int al_copia,byte c,int x,int y,int an,int al);
 void wresalta_box(byte*copia,int an_copia,int al_copia,int x,int y,int an,int al);
 void wbox_in_box(byte*copia,int an_real_copia,int an_copia,int al_copia,byte c,int x,int y,int an,int al);
-void wrectangulo(byte*copia,int an_copia,int al_copia,byte c,int x,int y,int an,int al);
+void wrectangle(byte*copia,int an_copia,int al_copia,byte c,int x,int y,int an,int al);
 void wput(byte*copia,int an_copia,int al_copia,int x,int y,int n);
 void wput_in_box(byte*copia,int an_real_copia,int an_copia,int al_copia,int x,int y,int n);
 void wvolcado(byte*copia,int an_copia,int al_copia,byte *p,int x,int y,int an,int al,int salta);
@@ -389,7 +389,7 @@ void finaliza_textos(void);
 ///////////////////////////////////////////////////////////////////////////////
 
 void muestra_cd_player();
-void muestra_reloj();
+void show_clock();
 void CDiv0(void);void CDiv1(void);
 void Clock0(void);void Clock1(void);
 void Bin0(void);void Bin1(void);

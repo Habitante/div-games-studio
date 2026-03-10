@@ -609,7 +609,7 @@ int nueva_ventana_carga(voidReturnType init_handler,int nx,int ny)
 		
       memset(ptr,c0,an*al); if (big) { an/=2; al/=2; }
 
-      wrectangulo(ptr,an,al,c2,0,0,an,al);
+      wrectangle(ptr,an,al,c2,0,0,an,al);
 
       wput(ptr,an,al,an-9,2,35);
       wput(ptr,an,al,an-17,2,37);

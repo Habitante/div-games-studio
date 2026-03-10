@@ -266,14 +266,14 @@ void Tap_Setup1(void) {
     x=-1;
   }
 
-  wrectangulo(v.ptr,an,al,c0,4,41,128+2,88+2);
+  wrectangle(v.ptr,an,al,c0,4,41,128+2,88+2);
   tapiz_thumb();
 
   wbox(v.ptr,an,al,c12,4,20,an-21,8);
   wwrite(v.ptr,an,al,4,12,0,texto[178],c3);
   wwrite(v.ptr,an,al,5,21,0,(byte *)Tap_name,c4);
 
-  wrectangulo(v.ptr,an,al,c0,an-38,24+8,34,7);
+  wrectangle(v.ptr,an,al,c0,an-38,24+8,34,7);
   for (x=0;x<32;x++) wbox(v.ptr,an,al,tapiz_gama[x*4],an-37+x,24+9,1,5);
 }
 
@@ -427,7 +427,7 @@ void MemInfo1(void) {
   wwrite(v.ptr,an,al,an/2+1,12,1,texto[463],c1);
   wwrite(v.ptr,an,al,an/2,12,1,texto[463],c4);
 
-  wrectangulo(v.ptr,an,al,c0,1,21,an-2,20);
+  wrectangle(v.ptr,an,al,c0,1,21,an-2,20);
   wbox(v.ptr,an,al,c1,2,22,an-4,18);
 
   wwrite_in_box(v.ptr+2,an,an-4,al,(an-4)/2+1,24,1,(byte *)user1,c0);
@@ -520,46 +520,46 @@ void Cfg_Setup1(void) {
 
   wwrite(v.ptr,an,al,5,12,0,texto[322],c1);
   wwrite(v.ptr,an,al,4,12,0,texto[322],c3);
-  wrectangulo(v.ptr,an,al,c0,12,21,9,9);
+  wrectangle(v.ptr,an,al,c0,12,21,9,9);
   wwrite(v.ptr,an,al,23,22,0,texto[323],c3);
-  wrectangulo(v.ptr,an,al,c0,52+25,21,9,9);
+  wrectangle(v.ptr,an,al,c0,52+25,21,9,9);
   wwrite(v.ptr,an,al,63+25,22,0,texto[324],c3);
-  wrectangulo(v.ptr,an,al,c0,92+34,21,9,9);
+  wrectangle(v.ptr,an,al,c0,92+34,21,9,9);
   wwrite(v.ptr,an,al,103+34,22,0,texto[325],c3);
 
   wbox(v.ptr,an,al,c0,2,32,an-4,1);
 
   wwrite(v.ptr,an,al,5,35,0,texto[326],c1);
   wwrite(v.ptr,an,al,4,35,0,texto[326],c3);
-  wrectangulo(v.ptr,an,al,c0,12,44,9,9);
+  wrectangle(v.ptr,an,al,c0,12,44,9,9);
   wwrite(v.ptr,an,al,23,45,0,texto[323],c3);
-  wrectangulo(v.ptr,an,al,c0,52+25,44,9,9);
+  wrectangle(v.ptr,an,al,c0,52+25,44,9,9);
   wwrite(v.ptr,an,al,63+25,45,0,texto[324],c3);
-  wrectangulo(v.ptr,an,al,c0,92+34,44,9,9);
+  wrectangle(v.ptr,an,al,c0,92+34,44,9,9);
   wwrite(v.ptr,an,al,103+34,45,0,texto[327],c3);
 
-  wrectangulo(v.ptr,an,al,c0,12,44+10,9,9);
+  wrectangle(v.ptr,an,al,c0,12,44+10,9,9);
   wwrite(v.ptr,an,al,23,45+10,0,texto[405],c3);
-  wrectangulo(v.ptr,an,al,c0,52+25,44+10,9,9);
+  wrectangle(v.ptr,an,al,c0,52+25,44+10,9,9);
   wwrite(v.ptr,an,al,63+25,45+10,0,texto[406],c3);
-  wrectangulo(v.ptr,an,al,c0,92+34,44+10,9,9);
+  wrectangle(v.ptr,an,al,c0,92+34,44+10,9,9);
   wwrite(v.ptr,an,al,103+34,45+10,0,texto[407],c3);
 
-  wrectangulo(v.ptr,an,al,c0,12,44+20,9,9);
+  wrectangle(v.ptr,an,al,c0,12,44+20,9,9);
   wwrite(v.ptr,an,al,23,45+20,0,texto[409],c3);
-  wrectangulo(v.ptr,an,al,c0,52+25,44+20,9,9);
+  wrectangle(v.ptr,an,al,c0,52+25,44+20,9,9);
   wwrite(v.ptr,an,al,63+25,45+20,0,texto[410],c3);
 
   wwrite(v.ptr,an,al,22+48,56+30,0,texto[328],c3);
-  wrectangulo(v.ptr,an,al,c0,52+50,55+30,9,9);
-  wrectangulo(v.ptr,an,al,c0,60+50,55+30,33,9);
-  wrectangulo(v.ptr,an,al,c0,92+50,55+30,9,9);
+  wrectangle(v.ptr,an,al,c0,52+50,55+30,9,9);
+  wrectangle(v.ptr,an,al,c0,60+50,55+30,33,9);
+  wrectangle(v.ptr,an,al,c0,92+50,55+30,9,9);
   wput(v.ptr,an,al,53+50,56+30,-51);
   wput(v.ptr,an,al,93+50,56+30,-52);
 
-  wrectangulo(v.ptr,an,al,c0,52+50,55+30+inc,9,9);
-  wrectangulo(v.ptr,an,al,c0,60+50,55+30+inc,33,9);
-  wrectangulo(v.ptr,an,al,c0,92+50,55+30+inc,9,9);
+  wrectangle(v.ptr,an,al,c0,52+50,55+30+inc,9,9);
+  wrectangle(v.ptr,an,al,c0,60+50,55+30+inc,33,9);
+  wrectangle(v.ptr,an,al,c0,92+50,55+30+inc,9,9);
   wput(v.ptr,an,al,53+50,56+30+inc,-51);
   wput(v.ptr,an,al,93+50,56+30+inc,-52);
   wwrite(v.ptr,an,al,101+18+50,56+30+inc,1,texto[544],c3);
@@ -584,7 +584,7 @@ void cfg_show_cursor(void) {
   int an=v.an/big2,al=v.al/big2;
 
   wwrite(v.ptr,an,al,103+30,70+30,0,texto[327],c3);
-  wrectangulo(v.ptr,an,al,c0,91+30,68+30,10,10);
+  wrectangle(v.ptr,an,al,c0,91+30,68+30,10,10);
   wbox(v.ptr,an,al,c1,92+30,69+30,8,8);
   if (big) {
     switch(paint_cursor) {
@@ -884,7 +884,7 @@ void Cfg_Setup_end(void) {
 
       ptr=v.ptr;
       an=v.an/big2; al=v.al/big2;
-      wrectangulo(ptr,an,al,c2,0,0,an,al);
+      wrectangle(ptr,an,al,c2,0,0,an,al);
       wput(ptr,an,al,an-9,2,35);
       wput(ptr,an,al,an-17,2,37);
 

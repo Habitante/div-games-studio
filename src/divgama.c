@@ -214,7 +214,7 @@ void gama1(void)
     else
       wput(v.ptr,an,al,button_coords[con].x,button_coords[con].y,-34);
 
-    wrectangulo(v.ptr, an, al, c0,
+    wrectangle(v.ptr, an, al, c0,
                 button_coords[con].x-4,   button_coords[con].y-15,   14, 14);
     wbox       (v.ptr, an, al, t_gama[con].color,
                 button_coords[con].x-4+1, button_coords[con].y-15+1, 12, 12);
@@ -222,7 +222,7 @@ void gama1(void)
 
   // Mostrar gama
 
-  wrectangulo(v.ptr, an, al, c0, gama_x, gama_y, gama_an, 4);
+  wrectangle(v.ptr, an, al, c0, gama_x, gama_y, gama_an, 4);
   for(con=0; con<128; con++)
   {
     wbox(v.ptr, an, al, gama[con],
