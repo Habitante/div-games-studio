@@ -1052,6 +1052,7 @@ byte * save_undo(int x, int y, int an, int al) {
 
 int undo_back(void) {
   int x,y,an,al;
+  int a;
 
   if (iundo) a=iundo-1; else a=max_undos-1;
 

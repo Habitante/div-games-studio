@@ -7,6 +7,9 @@
 #include "div_string.h"
 #include "fpgfile.hpp"
 
+// File-scope palette temps (formerly globals, used as implicit params between palette functions)
+static int r, g, b;
+
 void crear_ghost_vc(int m);
 void crear_ghost_slow (void);
 void fusionar_paletas(void);
@@ -636,6 +639,7 @@ void LoadPal() {
 void Guarda_Pal()
 {
 int x;
+FILE *f;
         strcpy(full,tipo[v_tipo].path);
         if (full[strlen(full)-1]!='/')
                 strcat(full,"/");

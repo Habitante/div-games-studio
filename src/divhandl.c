@@ -2781,6 +2781,7 @@ void guardar_mapa(void) {
   int e,tipomapa;
   int an=ventana[v_ventana].an,al=ventana[v_ventana].al;
   char filename[255];
+  FILE *f;
   
   if (big) { an/=2; al/=2; }
 
@@ -2904,7 +2905,7 @@ void Tamnio0()
 void Reducex2()
 {
 char *bufferaux;
-int n,p1,p2,p3,p4,man,mal;
+int n,p1,p2,p3,p4,man,mal,c;
 float x,y;
 struct tmapa *MiMap;
 float incx,incy;
@@ -3275,7 +3276,7 @@ int x,y,z,t,x0,y0,ant,min,max;
 float incx,incy;
 float fx,fy,cx,cy,rx,ry;
 float pp1,pp2,pp3,pp4;
-int r,b,g,regen=0;
+int r,b,g,c,regen=0;
 FILE *rgb_tab=NULL;
 char *rgb_table=NULL;
 char Tabla[190];

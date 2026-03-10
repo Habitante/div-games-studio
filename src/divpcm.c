@@ -478,6 +478,7 @@ void OpenSound(void) {
   pcminfo   *mypcminfo;
   Uint32 wav_length;
   Uint8 *wav_buffer;
+  FILE *f;
 
 #ifdef MIXER
 
@@ -844,6 +845,7 @@ void CloseSound(char *snd_path)
 void OpenSong(void) {
   int num;
   modinfo *mymodinfo;
+  FILE *f;
 
   v_modo=0;
   v_tipo=16;

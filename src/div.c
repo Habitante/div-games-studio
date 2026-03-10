@@ -3368,7 +3368,7 @@ void end_lexcolor(void);
 void inicializacion(void) {
 
 	FILE *f;
-	int n;
+	int n, a;
 	byte *ptr,*ptr2;
 
 #ifdef __EMSCRIPTEN__

@@ -498,8 +498,8 @@ GLOBAL_DATA byte * dac4; // Paleta con rangos 0..255
 
 GLOBAL_DATA word mab_x0,mab_x1,mab_y0,mab_y1; // Límites de la zona seleccionada en mab
 
-GLOBAL_DATA int r,g,b,c,d,a; // TODO(Sprint D): Replace these generic single-letter globals with properly named local variables
-GLOBAL_DATA FILE * f;        // Handle genérico de fichero
+// int r,g,b,c,d,a removed (Sprint D) — replaced with local variables or file-static in divpalet.c
+// FILE *f removed (Sprint D) — all usages now use local declarations
 
 GLOBAL_DATA byte c0,c1,c2,c3,c4,text_color; // Colores del entorno
 GLOBAL_DATA byte c01,c12,c23,c34; // Colores intermedios

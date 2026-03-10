@@ -301,6 +301,7 @@ void edit_mode_2(void) {
   int s; // Estado 0-espera 1er click, 1-espera 2do click
   int x0,y0; // Coordenadas iniciales
   int an,al;
+  int a;
 
   bar[0]=101+zoom; bar[1]=121;
   for (a=2;a<11;a++) { bar[a]=1; } bar[11]=166;
@@ -364,6 +365,7 @@ void edit_mode_3(void) {
   int s; // Estado 0-espera 1er click, 1-espera 2do click, 2-espera 3er click
   int x0,y0; // Coordenadas iniciales
   int an,al;
+  int a;
 
   bar[0]=101+zoom; bar[1]=121;
   for (a=2;a<11;a++) { bar[a]=1; } bar[11]=166;
@@ -428,6 +430,7 @@ void edit_mode_3(void) {
 void edit_mode_4(void) {
 
   int s; // Estado 0-espera 1er click, 1-espera 2do click, 2-3er..., 3-4to...
+  int a;
 
   int x0,y0; // Coordenadas iniciales
   int x1,y1; // Coordenadas finales
@@ -519,6 +522,7 @@ int tension=16;
 void edit_mode_5(void) {
 
   int s; // Estado 0-espera 1er click, 1-espera 2do click, 2-3er...
+  int a;
 
   int x0,y0; // Primer punto
   int x1,y1; // Segundo punto
@@ -624,6 +628,7 @@ void edit_mode_6(void) {
   int s; // Estado 0-espera 1er click, 1-espera 2do click
   int x0,y0; // Coordenadas iniciales
   int an,al;
+  int a;
 
   bar[0]=101+zoom; bar[1]=121;
   for (a=2;a<11;a++) { bar[a]=1; } bar[11]=166;
@@ -700,6 +705,7 @@ void edit_mode_7(void) {
   int s; // Estado 0-espera 1er click, 1-espera 2do click
   int x0,y0; // Coordenadas iniciales
   int an,al;
+  int a;
 
   bar[0]=101+zoom; bar[1]=121;
   for (a=2;a<11;a++) { bar[a]=1; } bar[11]=166;
@@ -913,6 +919,7 @@ void edit_mode_8(void) {
 int iconos_fill[]={4,1,114,115,116,118,1};
 
 void edit_mode_9(void) {
+  int a;
 
   bar[0]=101+zoom; bar[1]=121;
   for (a=2;a<11;a++) { bar[a]=1; } bar[11]=166;
@@ -1273,7 +1280,7 @@ void mab_invertir(void) {
 //-----------------------------------------------------------------------------
 
 void mab_mascara(void) {
-  int x,y;
+  int x,y,c;
   c=0;
 
   if (save_undo(mab_x0,mab_y0,mab_x1-mab_x0+1,mab_y1-mab_y0+1)) {
@@ -1300,7 +1307,7 @@ void mab_mascara(void) {
 //-----------------------------------------------------------------------------
 
 void mab_aclarar(byte color_aclarar) {
-  int x,y,n;
+  int x,y,n,a,b,c,d;
   byte p[256];
 
   if (save_undo(mab_x0,mab_y0,mab_x1-mab_x0+1,mab_y1-mab_y0+1)) {
@@ -1805,6 +1812,7 @@ int barra_texto=0; // Para no resaltar el background con la 'b'
 void edit_mode_12(void) {
   int spacelen,cnt,x,fan,fal,anmax,almax;
   int ms=modo_seleccion;
+  int a;
   int tx=-256,ty=-256; // Inicio del texto (para el enter)
   byte * font, * buffer;
   int ilon=0;
@@ -3146,7 +3154,7 @@ int editable_seleccion(int *n,int x,int y) {
 
 void dibuja_regla(void) {
   int x,y;
-  int n,med;
+  int n,med,a;
   byte * p,*ptr;
   int s0=4,s1=0;
 
@@ -3235,7 +3243,7 @@ void dibuja_regla(void) {
 //-----------------------------------------------------------------------------
 
 void dibuja_regla_seleccion(byte * p, int c, int d, int x, int y) {
-  int n,s0=4,s1=0;
+  int n,s0=4,s1=0,a;
 
   switch (reglas[regla].numcol) {
     case 8: s0=16; s1=5; break;

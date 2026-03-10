@@ -998,6 +998,7 @@ void compilar(void) {
   uLongf m;
   struct objeto * i;
   byte * q, * p;
+  FILE *f;
 
   program_type=0;
 

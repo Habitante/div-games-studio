@@ -693,6 +693,7 @@ void GetIfs()
 {
 int an=v.an/big2,al=v.al/big2;
 int  num;
+FILE *f;
 
         v_modo=0; v_tipo=6;
         v_texto=(char *)texto[77];

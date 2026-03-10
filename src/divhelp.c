@@ -791,6 +791,7 @@ void tabula_help(byte *si,byte *di,int lon) {
   int ultimo_cr=1,ultimo_cr_real=1,tex;
   int estado=0,chars,chars2,nchars,help_an2;
   int x,y;
+  FILE *f;
 
   *di++=0;
 
@@ -1162,7 +1163,7 @@ void vuelca_help(void) {
 //-----------------------------------------------------------------------------
 
 void put_image_line(int n,int linea,byte * di,int v_an) {
-  int   an, al, _an;
+  int   an, al, _an, c;
   byte  *si;
 
   if (!graf_help[n].offset) return;

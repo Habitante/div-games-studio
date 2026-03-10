@@ -2606,6 +2606,7 @@ void programa0_nuevo(void) {
 
 void guardar_prg(void) {
   int an=v.an/big2,al=v.al/big2;
+  FILE *f;
 
   strcpy(full,tipo[v_tipo].path);
   if (full[strlen(full)-1]!='/') strcat(full,"/");
