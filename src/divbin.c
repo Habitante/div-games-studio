@@ -7,8 +7,8 @@
 extern HeadFPG HeadFPGArrastre;
 void FPG2();
 
-void FPG_pinta_listboxbr      (struct t_listboxbr * l);
-void FPG_actualiza_listboxbr  (struct t_listboxbr * l);
+void FPG_paint_listbox_br      (struct t_listboxbr * l);
+void FPG_update_listbox_br  (struct t_listboxbr * l);
 
 
 
@@ -66,9 +66,9 @@ void Bin2(void)
 
 					if (MiMemoFPG->lInfoFPG.inicial<0) MiMemoFPG->lInfoFPG.inicial=0;
 
-					// FPG_pinta_listboxbr(&MiMemoFPG->lInfoFPG);
+					// FPG_paint_listbox_br(&MiMemoFPG->lInfoFPG);
 
-					FPG_actualiza_listboxbr(&MiMemoFPG->lInfoFPG);
+					FPG_update_listbox_br(&MiMemoFPG->lInfoFPG);
 
 					v.volcar=1;
 					v=MiVentana;

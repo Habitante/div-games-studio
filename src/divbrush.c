@@ -49,7 +49,7 @@ typedef struct {
 // External prototypes
 //-----------------------------------------------------------------------------
 
-void pinta_sliderbr(struct t_listboxbr * l);
+void paint_slider_br(struct t_listboxbr * l);
 
 // Forward declarations for this file
 void MapperBrowseFPG1(void);
@@ -523,7 +523,7 @@ void M3D_create_listboxbr(struct t_listboxbr * l)
   wput(ptr,an,al,l->x+(l->an+1)*l->columnas+1,l->y+(l->al+1)*l->lineas-7,-40);
 
   M3D_paint_listboxbr(l);
-  pinta_sliderbr(l);
+  paint_slider_br(l);
 }
 
 //-----------------------------------------------------------------------------
@@ -589,7 +589,7 @@ void M3D_update_listboxbr(struct t_listboxbr * l)
       n=0.5+(float)(n*(l->slide-l->s0))/(l->s1-l->s0);
 
       if (n!=l->inicial/l->columnas) { l->inicial=n*l->columnas; M3D_paint_listboxbr(l); }
-    } pinta_sliderbr(l); v.volcar=1;
+    } paint_slider_br(l); v.volcar=1;
 
   } else {
 
@@ -599,7 +599,7 @@ void M3D_update_listboxbr(struct t_listboxbr * l)
 
       n=(l->s0*(n-l->inicial/l->columnas)+l->s1*(l->inicial/l->columnas))/n;
     }
-    if (n!=l->slide) { l->slide=n; pinta_sliderbr(l); v.volcar=1; }
+    if (n!=l->slide) { l->slide=n; paint_slider_br(l); v.volcar=1; }
   }
 
   if (TipoBrowser!=MAPBR) {

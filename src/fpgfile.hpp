@@ -41,11 +41,11 @@ typedef struct _FPG{
         int RemapAllFile(FPG *Fpg);
         int RemapAllFileToPal(FPG *Fpg);
 
-        void FPG_crear_thumbs         (void);
-        void FPG_muestra_thumb        (struct t_listboxbr * l, int num);
-        void FPG_pinta_listboxbr      (struct t_listboxbr * l);
-        void FPG_pinta_sliderbr       (struct t_listboxbr * l);
-        void FPG_crear_listboxbr      (struct t_listboxbr * l);
-        void FPG_actualiza_listboxbr  (struct t_listboxbr * l);
-        void crear_un_thumb_FPG       (struct t_listboxbr * l);
+        void FPG_create_thumbs         (void);
+        void FPG_show_thumb        (struct t_listboxbr * l, int num);
+        void FPG_paint_listbox_br      (struct t_listboxbr * l);
+        void FPG_paint_slider_br       (struct t_listboxbr * l);
+        void FPG_create_listbox_br      (struct t_listboxbr * l);
+        void FPG_update_listbox_br  (struct t_listboxbr * l);
+        void create_thumb_FPG       (struct t_listboxbr * l);
 

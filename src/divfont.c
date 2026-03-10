@@ -96,7 +96,7 @@ int an=v.an/big2,al=v.al/big2;
 char cWork[10];
         _show_items();
 
-        crear_listbox(&lfontsizes);
+        create_listbox(&lfontsizes);
 
         wbox(v.ptr,an,al,c0,2,49,an-4,1);       // Linea horizontal superior
         wbox(v.ptr,an,al,c0,54,49,1,92-20);        // Linea vertical izquierda
@@ -397,7 +397,7 @@ char cWork[10];
           free_drag=1;
         }
 
-        actualiza_listbox(&lfontsizes);
+        update_listbox(&lfontsizes);
         if((lfontsizes.zona>=10)&&(mouse_b&1))
         {
                 FntAncho=FntAlto=fontTamanos[(lfontsizes.zona-10)+lfontsizes.inicial];
@@ -1570,7 +1570,7 @@ int n,y,x,TamaX=0,TamaY=0,fan,_fal=0,fal,init,cnt;
         map_an=TamaX;
         map_al=TamaY;
 
-        if (nuevo_mapa(NULL)) return;
+        if (new_map(NULL)) return;
 
         // 4 - Utiliza ShowCharBuffer() para pintar el texto en el mapa
 

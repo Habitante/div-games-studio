@@ -2,7 +2,7 @@
 #include "fpgfile.hpp"
 #include "div_string.h"
 
-int selecciona_fichero(void);
+int select_file(void);
 
 
 HeadFPG HeadFPGArrastre;
@@ -24,30 +24,30 @@ void MAPtoFPG               (struct tmapa * mapa);
 void GetGrafMAP             (struct tmapa *mapa, byte *imagen, int x, int y, int ancho, int alto, int cod);
 void FPGtoMAP               (FPG *MiFPG);
 void PutGrafMAP             (byte *imagen, byte *mapa, int num);
-void emplazar_map           (void);
-int  colisiona_con_map      (int n, int x, int y, int an, int al);
-void cierra_fpg             (char *fpg_path);
+void place_map           (void);
+int  collides_with_map      (int n, int x, int y, int an, int al);
+void close_fpg             (char *fpg_path);
 
-void sustituir_FPG_0(void);
-void sustituir_FPG_1(void);
-void sustituir_FPG_2(void);
+void replace_FPG_0(void);
+void replace_FPG_1(void);
+void replace_FPG_2(void);
 
 void FPG1(void) {
 	FPG *MiFPG=(FPG *)v.aux;
 	_show_items();
 
-	FPG_crear_listboxbr(&MiFPG->lInfoFPG);
+	FPG_create_listbox_br(&MiFPG->lInfoFPG);
 }
 
 int hay_mapas(void);
 
-void cargar_thumbs(void) {
+void load_thumbs(void) {
 	FPG *MiFPG=(FPG *)v.aux;
 
 	if(MiFPG->thumb_on)
-		FPG_crear_thumbs();
+		FPG_create_thumbs();
 	
-	FPG_actualiza_listboxbr(&MiFPG->lInfoFPG);
+	FPG_update_listbox_br(&MiFPG->lInfoFPG);
 }
 
 void FPG2(void)
@@ -66,7 +66,7 @@ void FPG2(void)
 	}
 
 	if(MiFPG->thumb_on)
-		FPG_crear_thumbs();
+		FPG_create_thumbs();
 
 	_process_items();
 
@@ -193,7 +193,7 @@ void FPG2(void)
 		  MiFPG->CodDes[Elemento][0]=255;
 		  MiFPG->thumb[Elemento].tagged=0;
 		}
-		FPG_crear_listboxbr(&MiFPG->lInfoFPG);
+		FPG_create_listbox_br(&MiFPG->lInfoFPG);
 		v.volcar=1;
 	}
 
@@ -269,7 +269,7 @@ void FPG2(void)
 		arrastrar=0;
 
 	v_pausa=1;
-	FPG_actualiza_listboxbr(&MiFPG->lInfoFPG);
+	FPG_update_listbox_br(&MiFPG->lInfoFPG);
 	v_pausa=0;
 }
 
@@ -350,7 +350,7 @@ void FPG0A(void) {
 	_flag(108,(v.an-5)-(8*big2+text_len(texto[108])),v.al-10,&MiFPG->FPGInfo);
 }
 
-int nuevo_fichero(void) {
+int new_file(void) {
 	v_aceptar=0;
 	v_modo=1;
 	v_tipo=4;
@@ -385,7 +385,7 @@ int nuevo_fichero(void) {
 				return 0;
 			}
 
-			cierra_fpg(full);
+			close_fpg(full);
 			memset(v_aux, 0, sizeof(FPG));
 			nueva_ventana(FPG0N);
 		}
@@ -409,7 +409,7 @@ extern byte paltratar[768];
 extern byte nueva_paleta[768];
 extern byte * muestra;
 
-void abrir_fichero(void) {
+void open_file(void) {
 	FPG *MiFPG;
 	char cwork[8];
 	FILE *f;
@@ -581,7 +581,7 @@ void abrir_fichero(void) {
 						MiFPG->thumb_on=0;
 						MiFPG->FPGInfo=0;
 						MiFPG->lInfoFPG.creada=0;
-						cierra_fpg(full);
+						close_fpg(full);
 						memset(v_aux, 0, sizeof(FPG));
 						nueva_ventana(FPG0A);
 					} else { 
@@ -885,7 +885,7 @@ void InitGetCode(void) {
 	dialogo(GetCode0);
 }
 
-int determina_fpg();
+int find_fpg_window();
 
 void Show_Taggeds()
 {
@@ -893,7 +893,7 @@ void Show_Taggeds()
 	int a,x,y,Elemento,n;
 	FILE *fpg;
 	
-	if (!(n=determina_fpg()))
+	if (!(n=find_fpg_window()))
 		return;
 	
 	MiFPG=(FPG *)ventana[n].aux;
@@ -915,7 +915,7 @@ void Show_Taggeds()
 		map_an=MiFPG->MiHeadFPG.Ancho;
 		map_al=MiFPG->MiHeadFPG.Alto;
 
-		if (nuevo_mapa(NULL)) {
+		if (new_map(NULL)) {
 			//ERROR: Falta memoria.
 			fclose(fpg);
 			return;
@@ -973,7 +973,7 @@ void Delete_Taggeds() {
 	int *array_del;
 	FILE *fpg;
 
-	if (!(vent=determina_fpg()))
+	if (!(vent=find_fpg_window()))
 		return;
 
 	MiFPG=(FPG *)ventana[vent].aux;
@@ -1010,7 +1010,7 @@ void Delete_Taggeds() {
 	if (MiFPG->lInfoFPG.inicial<0) MiFPG->lInfoFPG.inicial=0;
 
 	wmouse_x=-1; wmouse_y=-1;
-	FPG_actualiza_listboxbr(&MiFPG->lInfoFPG);
+	FPG_update_listbox_br(&MiFPG->lInfoFPG);
 	call((voidReturnType )v.paint_handler);
 	wdown(vent);
 	vuelca_ventana(vent);
@@ -1061,7 +1061,7 @@ void Print_List(void) {
 	char cwork[512],cwork2[13];
 	unsigned u;
 
-	if (!(vent=determina_fpg()))
+	if (!(vent=find_fpg_window()))
 		return;
 
 	if (!strlen(n_ar))
@@ -1150,17 +1150,17 @@ void Print_List(void) {
 
 extern int num;
 
-void FPG_crear_thumbs(void) {
+void FPG_create_thumbs(void) {
 	FPG *MiFPG=(FPG *)v.aux;
 
 	if (MiFPG->thumb_on) {
 		do {
-			crear_un_thumb_FPG(&(MiFPG->lInfoFPG));
+			create_thumb_FPG(&(MiFPG->lInfoFPG));
 			if (num>-1) {
 				if (MiFPG->thumb[num].ptr!=NULL && MiFPG->thumb[num].status==0) {
-					FPG_muestra_thumb(&(MiFPG->lInfoFPG),num); break;
+					FPG_show_thumb(&(MiFPG->lInfoFPG),num); break;
 				} else if (MiFPG->thumb[num].ptr==NULL && MiFPG->thumb[num].status==-1) {
-					FPG_muestra_thumb(&(MiFPG->lInfoFPG),num);
+					FPG_show_thumb(&(MiFPG->lInfoFPG),num);
 				} else 
 					break;
 			} else 
@@ -1169,7 +1169,7 @@ void FPG_crear_thumbs(void) {
 	}
 }
 
-void FPG_muestra_thumb(struct t_listboxbr * l, int num) {
+void FPG_show_thumb(struct t_listboxbr * l, int num) {
 	FPG *MiFPG=(FPG *)v.aux;
 	byte * ptr=v.ptr;
 	int an=v.an/big2,al=v.al/big2;
@@ -1227,7 +1227,7 @@ void FPG_muestra_thumb(struct t_listboxbr * l, int num) {
 	}
 }
 
-void FPG_pinta_listboxbr(struct t_listboxbr * l) {
+void FPG_paint_listbox_br(struct t_listboxbr * l) {
 	FPG *MiFPG=(FPG *)v.aux;
 	byte * ptr=v.ptr;
 	int an=v.an/big2,al=v.al/big2;
@@ -1267,10 +1267,10 @@ void FPG_pinta_listboxbr(struct t_listboxbr * l) {
 		n=l->lineas*l->columnas;
 	
 	while (n>0) 
-		FPG_muestra_thumb(l,l->inicial+--n);
+		FPG_show_thumb(l,l->inicial+--n);
 }
 
-void FPG_pinta_sliderbr(struct t_listboxbr * l) {
+void FPG_paint_slider_br(struct t_listboxbr * l) {
 
 	byte * ptr=v.ptr;
 	int an=v.an,al=v.al;
@@ -1288,7 +1288,7 @@ void FPG_pinta_sliderbr(struct t_listboxbr * l) {
 
 }
 
-void FPG_crear_listboxbr(struct t_listboxbr * l) {
+void FPG_create_listbox_br(struct t_listboxbr * l) {
 
 	byte * ptr=v.ptr;
 	int an=v.an/big2,al=v.al/big2;
@@ -1317,12 +1317,12 @@ void FPG_crear_listboxbr(struct t_listboxbr * l) {
 	wput(ptr,an,al,l->x+(l->an+1)*l->columnas+1,l->y+1,-39);
 	wput(ptr,an,al,l->x+(l->an+1)*l->columnas+1,l->y+(l->al+1)*l->lineas-7,-40);
 
-	FPG_pinta_listboxbr(l);
-	FPG_pinta_sliderbr(l);
+	FPG_paint_listbox_br(l);
+	FPG_paint_slider_br(l);
 
 }
 
-void FPG_actualiza_listboxbr(struct t_listboxbr * l) {
+void FPG_update_listbox_br(struct t_listboxbr * l) {
 	FPG *MiFPG=(FPG *)v.aux;
 	byte * ptr=v.ptr;
 	int an=v.an/big2,al=v.al/big2;
@@ -1372,7 +1372,7 @@ void FPG_actualiza_listboxbr(struct t_listboxbr * l) {
 			}
 			//---
 			if (l->inicial) {
-				l->inicial-=l->columnas; FPG_pinta_listboxbr(l); v.volcar=1; 
+				l->inicial-=l->columnas; FPG_paint_listbox_br(l); v.volcar=1; 
 			}
 			//---
 		}
@@ -1397,7 +1397,7 @@ void FPG_actualiza_listboxbr(struct t_listboxbr * l) {
 			n=l->maximo-l->inicial;
 			
 			if (n>l->lineas*l->columnas) {
-				l->inicial+=l->columnas; FPG_pinta_listboxbr(l); v.volcar=1; 
+				l->inicial+=l->columnas; FPG_paint_listbox_br(l); v.volcar=1; 
 			}
 				//---
 		}
@@ -1426,11 +1426,11 @@ void FPG_actualiza_listboxbr(struct t_listboxbr * l) {
 
 			if (n!=l->inicial/l->columnas) {
 				l->inicial=n*l->columnas;
-				FPG_pinta_listboxbr(l); 
+				FPG_paint_listbox_br(l); 
 			}
 		} 
 		
-		FPG_pinta_sliderbr(l); v.volcar=1;
+		FPG_paint_slider_br(l); v.volcar=1;
 
 	} else {
 
@@ -1443,7 +1443,7 @@ void FPG_actualiza_listboxbr(struct t_listboxbr * l) {
 		}
 
 		if (n!=l->slide) {
-			l->slide=n; FPG_pinta_sliderbr(l);
+			l->slide=n; FPG_paint_slider_br(l);
 			v.volcar=1; 
 		}
 	}
@@ -1471,7 +1471,7 @@ void FPG_actualiza_listboxbr(struct t_listboxbr * l) {
 	}
 }
 
-void crear_un_thumb_FPG(struct t_listboxbr * l){
+void create_thumb_FPG(struct t_listboxbr * l){
 	FPG *MiFPG=(FPG *)v.aux;
 	int estado=0,n,m;
 	int man,mal;
@@ -1692,7 +1692,7 @@ void MAPtoFPG(struct tmapa * mapa) {
 
 	memcpy(imagen, mapa->map, mapa->map_an*mapa->map_al);
 
-	if(!selecciona_fichero()) {
+	if(!select_file()) {
 		free(imagen);
 		return;
 	}
@@ -1828,7 +1828,7 @@ void FPGtoMAP(FPG *MiFPG) {
 	}
 
 	for(lnum=0; lnum<num; lnum++) {
-		emplazar_map();
+		place_map();
 
 		if(lmapal<lgraf[lnum].y+lgraf[lnum].al) {
 			lmapal=lgraf[lnum].y+lgraf[lnum].al;
@@ -1882,7 +1882,7 @@ void FPGtoMAP(FPG *MiFPG) {
 	map_an=lmapan;
 	map_al=lmapal;
 
-	if (nuevo_mapa(FPGmap)) {
+	if (new_map(FPGmap)) {
 		free(FPGmap);
 		return;
 	}
@@ -1915,7 +1915,7 @@ void PutGrafMAP(byte *imagen, byte *mapa, int num) {
 //      Algoritmo de emplazamiento de una imagen en el MAP
 //-----------------------------------------------------------------------------
 
-void emplazar_map(void) { // Emplaza grafico lnum
+void place_map(void) { // Emplaza grafico lnum
 	
 	int n,m,x,y,new_x;
 	int scans,scan[1000];
@@ -1951,7 +1951,7 @@ void emplazar_map(void) { // Emplaza grafico lnum
 		do {
 			x=new_x;
 			for(m=0; m<lnum; m++) {
-				if(colisiona_con_map(m,x-1,y-1,lgraf[lnum].an+2,lgraf[lnum].al+2)) {
+				if(collides_with_map(m,x-1,y-1,lgraf[lnum].an+2,lgraf[lnum].al+2)) {
 					if(lgraf[m].x+lgraf[m].an>=new_x) 
 						new_x=lgraf[m].x+lgraf[m].an+1;
 				}
@@ -1966,7 +1966,7 @@ void emplazar_map(void) { // Emplaza grafico lnum
 	}
 }
 
-int colisiona_con_map(int n, int x, int y, int an, int al) {
+int collides_with_map(int n, int x, int y, int an, int al) {
   if( y<lgraf[n].y+lgraf[n].al && y+al>lgraf[n].y &&
       x<lgraf[n].x+lgraf[n].an && x+an>lgraf[n].x )
     return(1);
@@ -1977,7 +1977,7 @@ int colisiona_con_map(int n, int x, int y, int an, int al) {
 //      Cierra un FPG duplicado
 //-----------------------------------------------------------------------------
 
-void cierra_fpg(char *fpg_path) {
+void close_fpg(char *fpg_path) {
   FPG *MiFPG;
   int m;
 
@@ -2000,7 +2000,7 @@ void cierra_fpg(char *fpg_path) {
 //      Selecciona un fichero para abrir o sobreescribir
 //-----------------------------------------------------------------------------
 
-int selecciona_fichero(void) {
+int select_file(void) {
 	FPG *MiFPG;
 
 	v_aceptar=0;
@@ -2022,7 +2022,7 @@ int selecciona_fichero(void) {
 		} else {
 			v_titulo=(char *)texto[82];
 			v_texto=input;
-			dialogo(sustituir_FPG_0);
+			dialogo(replace_FPG_0);
 		}
 		
 		if(v_aceptar==1) {
@@ -2032,7 +2032,7 @@ int selecciona_fichero(void) {
 				v_texto=(char *)texto[45]; dialogo(err0);
 				return 0;
 			}
-			cierra_fpg(full);
+			close_fpg(full);
 			memset(v_aux, 0, sizeof(FPG));
 			nueva_ventana(FPG0N);
 		} else if(v_aceptar==2) {
@@ -2047,7 +2047,7 @@ int selecciona_fichero(void) {
 			MiFPG->thumb_on=0;
 			MiFPG->FPGInfo=0;
 			MiFPG->lInfoFPG.creada=0;
-			cierra_fpg(full);
+			close_fpg(full);
 			memset(v_aux, 0, sizeof(FPG));
 			nueva_ventana(FPG0A);
 		} else 
@@ -2062,7 +2062,7 @@ int selecciona_fichero(void) {
 //      Sustituir o añadir FPG
 //-----------------------------------------------------------------------------
 
-void sustituir_FPG_1(void) {
+void replace_FPG_1(void) {
 	int an=v.an/big2,al=v.al/big2;
 	_show_items();
 
@@ -2070,7 +2070,7 @@ void sustituir_FPG_1(void) {
 		wwrite(v.ptr,an,al,an/2,12,1,(byte *)v_texto,c3);
 }
 
-void sustituir_FPG_2(void) {
+void replace_FPG_2(void) {
 	_process_items();
 
 	switch(v.active_item) {
@@ -2080,7 +2080,7 @@ void sustituir_FPG_2(void) {
 	}
 }
 
-void sustituir_FPG_0(void) {
+void replace_FPG_0(void) {
 	int x2,x3;
 
 	v.tipo=1;
@@ -2100,8 +2100,8 @@ void sustituir_FPG_0(void) {
 			v.an=text_len((byte *)v_texto)+6;
 	} else v.al=29;
 
-	v.paint_handler=sustituir_FPG_1;
-	v.click_handler=sustituir_FPG_2;
+	v.paint_handler=replace_FPG_1;
+	v.click_handler=replace_FPG_2;
 
 	_button(510, 7,v.al-14,0); // Reemplazar
 	_button(511,x2,v.al-14,0); // Añadir

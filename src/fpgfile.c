@@ -310,10 +310,10 @@ FILE *fpg;
   if (Fpg->lInfoFPG.inicial<0) Fpg->lInfoFPG.inicial=0;
 
   wmouse_x=-1; wmouse_y=-1;
-  FPG_actualiza_listboxbr(&Fpg->lInfoFPG);
+  FPG_update_listbox_br(&Fpg->lInfoFPG);
   call(v.paint_handler);
 
-//        pinta_listbox(&Fpg->lInfoFPG);
+//        paint_listbox(&Fpg->lInfoFPG);
 
 //*******************************************************
         v.volcar=1;
@@ -407,7 +407,7 @@ byte MiTabla[256];
 return 1;
 }
 #define BUFFERCOPYLEN 4096
-void cierra_fpg(char *fpg_path);
+void close_fpg(char *fpg_path);
 void SaveFPG(int n)
 {
 int an=ventana[n].an/big2,al=ventana[n].al/big2;
@@ -458,7 +458,7 @@ char *Buffer;
                 }
         }
 
-        cierra_fpg(full);
+        close_fpg(full);
 
         strcpy((char *)Fpg->ActualFile,full);
         div_strcpy((char *)Fpg->NombreFpg, sizeof(Fpg->NombreFpg), input);

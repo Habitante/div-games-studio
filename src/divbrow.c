@@ -13,12 +13,12 @@
 //   Prototypes for this file
 ///////////////////////////////////////////////////////////////////////////////
 
-void crear_un_thumb_MAP(struct t_listboxbr * l);
-void crear_un_thumb_PAL(struct t_listboxbr * l);
-void crear_un_thumb_FNT(struct t_listboxbr * l);
-void crear_un_thumb_IFS(struct t_listboxbr * l);
-void crear_un_thumb_PCM(struct t_listboxbr * l);
-void muestra_thumb(struct t_listboxbr * l, int num);
+void create_thumb_MAP(struct t_listboxbr * l);
+void create_thumb_PAL(struct t_listboxbr * l);
+void create_thumb_FNT(struct t_listboxbr * l);
+void create_thumb_IFS(struct t_listboxbr * l);
+void create_thumb_PCM(struct t_listboxbr * l);
+void show_thumb(struct t_listboxbr * l, int num);
 
 
 
@@ -103,13 +103,13 @@ struct _WAV_info {
 //  Prototipos
 //-----------------------------------------------------------------------------
 
-void analizar_input(void);
-void dir_abrirbr(void);
-void imprime_rutabr(void);
-void pinta_listboxbr(struct t_listboxbr * l);
-void pinta_sliderbr(struct t_listboxbr * l);
-void crear_listboxbr(struct t_listboxbr * l);
-void actualiza_listboxbr(struct t_listboxbr * l);
+void analyze_input(void);
+void open_dir_br(void);
+void print_path_br(void);
+void paint_listbox_br(struct t_listboxbr * l);
+void paint_slider_br(struct t_listboxbr * l);
+void create_listbox_br(struct t_listboxbr * l);
+void update_listbox_br(struct t_listboxbr * l);
 
 void crear_texto_prueba(char *,char);
 
@@ -134,7 +134,7 @@ int  Mem_GetHeapFree(void);
 
 TABLAIFS tifs[256];
 FILE *fifs;
-void carga_letra(uint8_t letra);
+void load_letter(uint8_t letra);
 
 //-----------------------------------------------------------------------------
 //  Imprime la ruta del directorio o fichero actual
@@ -142,7 +142,7 @@ void carga_letra(uint8_t letra);
 
 int wbox_ancho;
 
-void imprime_rutabr(void) {
+void print_path_br(void) {
   int an=v.an/big2,al=v.al/big2;
 
   if(v_thumb==7)
@@ -172,22 +172,22 @@ void imprime_rutabr(void) {
 int _omx,_omy,omx,omy,oclock=0;
 int num;
 
-void crear_thumbs(void) {
+void create_thumbs(void) {
   if (opc_img[v_thumb]) {
     do {
       switch(v_thumb) // 2-MAP, 3-PAL, 5-FNT, 6-IFS, 7-PCM
       {
-        case 2: crear_un_thumb_MAP(&larchivosbr); break;
-        case 3: crear_un_thumb_PAL(&larchivosbr); break;
-        case 5: crear_un_thumb_FNT(&larchivosbr); break;
-        case 6: crear_un_thumb_IFS(&larchivosbr); break;
-        case 7: crear_un_thumb_PCM(&larchivosbr); break;
+        case 2: create_thumb_MAP(&larchivosbr); break;
+        case 3: create_thumb_PAL(&larchivosbr); break;
+        case 5: create_thumb_FNT(&larchivosbr); break;
+        case 6: create_thumb_IFS(&larchivosbr); break;
+        case 7: create_thumb_PCM(&larchivosbr); break;
       }
       if (num>-1) {
         if (thumb[num].ptr!=NULL && thumb[num].status==0) {
-          muestra_thumb(&larchivosbr,num); break;
+          show_thumb(&larchivosbr,num); break;
         } else if (thumb[num].ptr==NULL && thumb[num].status==-1) {
-          muestra_thumb(&larchivosbr,num);
+          show_thumb(&larchivosbr,num);
           break; // NOTE: Break added to prevent flickering (at cost of some speed)
         } else break;
       } else break;
@@ -195,7 +195,7 @@ void crear_thumbs(void) {
   }
 }
 
-void crear_un_thumb_MAP(struct t_listboxbr * l){
+void create_thumb_MAP(struct t_listboxbr * l){
   int tipomapa,estado=0,n,m;
   int man,mal;
   FILE * f;
@@ -420,7 +420,7 @@ void crear_un_thumb_MAP(struct t_listboxbr * l){
 
 }
 
-void crear_un_thumb_PAL(struct t_listboxbr * l)
+void create_thumb_PAL(struct t_listboxbr * l)
 {
   int estado=0,n,tipo;
   byte pal[768];
@@ -544,7 +544,7 @@ extern int spacelen;
 extern char TestString2[21];
 extern char MiTabladeLetras[256];
 
-void crear_un_thumb_FNT(struct t_listboxbr * l)
+void create_thumb_FNT(struct t_listboxbr * l)
 {
   int estado=0, n, m, init, x, y, len;
   int fan, _fal=0, fal, cnt;
@@ -832,7 +832,7 @@ void crear_un_thumb_FNT(struct t_listboxbr * l)
   }
 }
 
-void crear_un_thumb_IFS(struct t_listboxbr * l)
+void create_thumb_IFS(struct t_listboxbr * l)
 {
   int estado=0,n,pos,ancho,alto,x,y,xini;
   char *str;
@@ -879,7 +879,7 @@ void crear_un_thumb_IFS(struct t_listboxbr * l)
     pos=0; ancho=0; alto=0;
 
     while (pos<strlen(str)) {
-      carga_letra(str[pos++]);
+      load_letter(str[pos++]);
       if (map_an) {
         ancho+=map_an+1;
         if (map_al>alto) alto=map_al;
@@ -902,7 +902,7 @@ void crear_un_thumb_IFS(struct t_listboxbr * l)
 
     pos=0; xini=0;
     while(pos<strlen(str)) {
-      carga_letra(str[pos++]);
+      load_letter(str[pos++]);
       if (map_an) {
         for (y=0;y<map_al;y++) {
           for (x=0;x<map_an;x++) {
@@ -944,7 +944,7 @@ typedef struct _meminfo{
 
 void GetFreeMem(meminfo *Meminfo);
 
-void crear_un_thumb_PCM(struct t_listboxbr * l)
+void create_thumb_PCM(struct t_listboxbr * l)
 {
   int estado=0,x,y,y0,y1,p0,p1,n;
   FILE *f;
@@ -1301,7 +1301,7 @@ void crear_un_thumb_PCM(struct t_listboxbr * l)
   }
 }
 
-void carga_letra(uint8_t letra) {
+void load_letter(uint8_t letra) {
   long offset;
   short x,y,j,t;
   uint8_t rtbyte, error=0;
@@ -1338,7 +1338,7 @@ void carga_letra(uint8_t letra) {
 //  Muestra un thumbnail en la ventana
 //-----------------------------------------------------------------------------
 
-void muestra_thumb(struct t_listboxbr * l, int num) {
+void show_thumb(struct t_listboxbr * l, int num) {
   byte * ptr=v.ptr;
   int an=v.an/big2,al=v.al/big2;
   int px,py,x,y,ly,incy;
@@ -1470,7 +1470,7 @@ void browser0(void) {
   _dos_setdrive(toupper(*tipo[v_tipo].path)-'A'+1,&n);
   chdir(tipo[v_tipo].path);
 
-  dir_abrirbr(); // Crea la lista de ficheros y directorios
+  open_dir_br(); // Crea la lista de ficheros y directorios
 
   if (v_modo==1) *input=0;
   if (v_modo==2) strcpy(input,input2);
@@ -1521,7 +1521,7 @@ void browser0(void) {
 void browser1(void) {
   int an=v.an/big2,al=v.al/big2;
 
-  _show_items(); imprime_rutabr();
+  _show_items(); print_path_br();
 
   wwrite(v.ptr,an,al,77, 20,0,texto[127],c3); // Archivos
   wwrite(v.ptr,an,al, 3, 20,0,texto[128],c3);
@@ -1534,10 +1534,10 @@ void browser1(void) {
     wwrite(v.ptr,an,al,40,111,0,texto[130],c3);
   }
 
-  crear_listboxbr(&larchivosbr);
-  crear_listbox(&ldirectoriosbr);
-  crear_listbox(&lunidadesbr);
-  crear_listbox(&lextbr);
+  create_listbox_br(&larchivosbr);
+  create_listbox(&ldirectoriosbr);
+  create_listbox(&lunidadesbr);
+  create_listbox(&lextbr);
 }
 
 int bload=0;
@@ -1560,7 +1560,7 @@ void browser2(void) {
   int need_refresh=0;
   int estado;
 
-  crear_thumbs();
+  create_thumbs();
 
   estado=v.item[0].estado;
   _process_items();
@@ -1607,10 +1607,10 @@ void browser2(void) {
     }
   }
 
-  actualiza_listboxbr(&larchivosbr);
-  actualiza_listbox(&ldirectoriosbr);
-  actualiza_listbox(&lunidadesbr);
-  actualiza_listbox(&lextbr);
+  update_listbox_br(&larchivosbr);
+  update_listbox(&ldirectoriosbr);
+  update_listbox(&lunidadesbr);
+  update_listbox(&lextbr);
 
   if (v.item[0].estado>=2 && num_taggeds>0) {
     for(num=0; num<larchivosbr.maximo; num++) thumb[num].tagged=0;
@@ -1625,7 +1625,7 @@ void browser2(void) {
         v_terminado=1; v_existe=1;
         return;
       }
-      analizar_input();
+      analyze_input();
     break;
     case 2: fin_dialogo=1; break;
   }
@@ -1774,26 +1774,26 @@ void browser2(void) {
         ldirectoriosbr.inicial)*an_directorio);
       chdir(tipo[v_tipo].path);
       getcwd(tipo[v_tipo].path,PATH_MAX+1);
-      imprime_rutabr();
+      print_path_br();
       larchivosbr.creada=0;
       ldirectoriosbr.creada=0;
       tipo[v_tipo].inicial=0;
-      dir_abrirbr();
+      open_dir_br();
 
-      crear_listboxbr(&larchivosbr);
-      crear_listbox(&ldirectoriosbr);
+      create_listbox_br(&larchivosbr);
+      create_listbox(&ldirectoriosbr);
     } else if (lunidadesbr.zona>=10) {
       _dos_setdrive(unidades[lunidadesbr.zona-10+lunidadesbr.inicial]-'A'+1,&n);
       getcwd(tipo[v_tipo].path,PATH_MAX+1);
       if (tipo[v_tipo].path[0]==unidades[lunidadesbr.zona-10+lunidadesbr.inicial]) {
-        imprime_rutabr(); v.volcar=1;
+        print_path_br(); v.volcar=1;
         larchivosbr.creada=0;
         ldirectoriosbr.creada=0;
         tipo[v_tipo].inicial=0;
-        dir_abrirbr();
+        open_dir_br();
 
-        crear_listboxbr(&larchivosbr);
-        crear_listbox(&ldirectoriosbr);
+        create_listbox_br(&larchivosbr);
+        create_listbox(&ldirectoriosbr);
       } else {
         _dos_setdrive(tipo[v_tipo].path[0]-'A'+1,&n);
         v_texto=(char *)texto[42]; dialogo(err0); return;
@@ -1803,9 +1803,9 @@ void browser2(void) {
       strcpy(input,ext+(lextbr.zona-10+lextbr.inicial)*an_ext);
       DIV_STRCPY(mascara,input);
       tipo[v_tipo].inicial=0;
-      imprime_rutabr();
+      print_path_br();
       larchivosbr.creada=0;
-      dir_abrirbr();
+      open_dir_br();
 
       browser1();
       v.volcar=1;
@@ -1853,7 +1853,7 @@ void browser3(void) {
 //  Read directories and files
 //-----------------------------------------------------------------------------
 
-void dir_abrirbr(void) {
+void open_dir_br(void) {
   unsigned n,m;
   struct find_t fileinfo;
 
@@ -1888,7 +1888,7 @@ void dir_abrirbr(void) {
 //  Crea la ventana de listbox tipo browser
 //-----------------------------------------------------------------------------
 
-void pinta_listboxbr(struct t_listboxbr * l) {
+void paint_listbox_br(struct t_listboxbr * l) {
   byte * ptr=v.ptr;
   int an=v.an/big2,al=v.al/big2;
   int n,y,x;
@@ -1915,11 +1915,11 @@ void pinta_listboxbr(struct t_listboxbr * l) {
 
   n=l->maximo-l->inicial;
   if (n>l->lineas*l->columnas) n=l->lineas*l->columnas;
-  while (n>0) muestra_thumb(l,l->inicial+--n);
+  while (n>0) show_thumb(l,l->inicial+--n);
 
 }
 
-void pinta_sliderbr(struct t_listboxbr * l) {
+void paint_slider_br(struct t_listboxbr * l) {
 
   byte * ptr=v.ptr;
   int an=v.an,al=v.al;
@@ -1932,7 +1932,7 @@ void pinta_sliderbr(struct t_listboxbr * l) {
 
 }
 
-void crear_listboxbr(struct t_listboxbr * l) {
+void create_listbox_br(struct t_listboxbr * l) {
 
   byte * ptr=v.ptr;
   int an=v.an/big2,al=v.al/big2;
@@ -1963,8 +1963,8 @@ void crear_listboxbr(struct t_listboxbr * l) {
   wput(ptr,an,al,l->x+(l->an+1)*l->columnas+1,l->y+1,-39);
   wput(ptr,an,al,l->x+(l->an+1)*l->columnas+1,l->y+(l->al+1)*l->lineas-7,-40);
 
-  pinta_listboxbr(l);
-  pinta_sliderbr(l);
+  paint_listbox_br(l);
+  paint_slider_br(l);
 
 }
 
@@ -1972,7 +1972,7 @@ void crear_listboxbr(struct t_listboxbr * l) {
 //  Actualiza el listbox del browser
 //-----------------------------------------------------------------------------
 
-void actualiza_listboxbr(struct t_listboxbr * l) {
+void update_listbox_br(struct t_listboxbr * l) {
   byte * ptr=v.ptr, *p;
   int an=v.an/big2,al=v.al/big2;
   int n,old_zona=l->zona,x,y;
@@ -2000,7 +2000,7 @@ void actualiza_listboxbr(struct t_listboxbr * l) {
   if ((l->zona>0 && mouse_b&8) || (l->zona==2 && (mouse_b&1))) {
     if (old_mouse_b&1) { retrazo(); retrazo(); retrazo(); retrazo(); }
       if (l->inicial) {
-        l->inicial-=l->columnas; pinta_listboxbr(l); v.volcar=1; }
+        l->inicial-=l->columnas; paint_listbox_br(l); v.volcar=1; }
       wput(ptr,an,al,l->x+(l->an+1)*l->columnas+1,l->y+1,-41);
       l->botones|=1; v.volcar=1;
   } else if (l->botones&1) {
@@ -2012,7 +2012,7 @@ void actualiza_listboxbr(struct t_listboxbr * l) {
     if (old_mouse_b&1) { retrazo(); retrazo(); retrazo(); retrazo(); }
     n=l->maximo-l->inicial;
     if (n>l->lineas*l->columnas) {
-      l->inicial+=l->columnas; pinta_listboxbr(l); v.volcar=1; }
+      l->inicial+=l->columnas; paint_listbox_br(l); v.volcar=1; }
     wput(ptr,an,al,l->x+(l->an+1)*l->columnas+1,l->y+(l->al+1)*l->lineas-7,-42);
     l->botones|=2; v.volcar=1;
   } else if (l->botones&2) {
@@ -2030,8 +2030,8 @@ void actualiza_listboxbr(struct t_listboxbr * l) {
 
       n=0.5+(float)(n*(l->slide-l->s0))/(l->s1-l->s0);
 
-      if (n!=l->inicial/l->columnas) { l->inicial=n*l->columnas; pinta_listboxbr(l); }
-    } pinta_sliderbr(l); v.volcar=1;
+      if (n!=l->inicial/l->columnas) { l->inicial=n*l->columnas; paint_listbox_br(l); }
+    } paint_slider_br(l); v.volcar=1;
 
   } else {
 
@@ -2041,7 +2041,7 @@ void actualiza_listboxbr(struct t_listboxbr * l) {
 
       n=(l->s0*(n-l->inicial/l->columnas)+l->s1*(l->inicial/l->columnas))/n;
     }
-    if (n!=l->slide) { l->slide=n; pinta_sliderbr(l); v.volcar=1; }
+    if (n!=l->slide) { l->slide=n; paint_slider_br(l); v.volcar=1; }
   }
 
   if (old_zona!=l->zona) if (l->zona>=10) { // Marca zona

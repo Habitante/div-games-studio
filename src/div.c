@@ -36,10 +36,10 @@ void heap_dump(void );
 void DebugFile(char *Cadena,char *Nombre);
 void save_prg_buffer(memptrsize);
 
-void maximizar(void);
+void maximize(void);
 void test0(void);
 void calc2(void);
-void cargar_thumbs(void);
+void load_thumbs(void);
 void mostrar_mod_meters(void);
 // MapperCreator2 removed (MODE8/3D map editor deleted)
 
@@ -895,7 +895,7 @@ void mainloop(void) {
 			if(v.tipo==101) 
 				MustCreate=0;
 
-			if (!nuevo_mapa(NULL)) {
+			if (!new_map(NULL)) {
 
 				if(MustCreate==0) {
 					  memcpy(v_mapa->filename,v.mapa->filename,13);
@@ -1308,7 +1308,7 @@ void mainloop(void) {
 			switch(v.tipo) {
 
 				case 101:
-					cargar_thumbs();
+					load_thumbs();
 				break;
 			
 				case 107:
@@ -1437,19 +1437,19 @@ void mainloop(void) {
 			switch(n) {
 
 				case 1:
-					dialogo(buscar_texto0);
+					dialogo(find_text0);
 					if (v_aceptar) 
-						buscar_texto();
+						find_text();
 				break;
 
 				case 2:
-					buscar_texto();
+					find_text();
 				break;
 
 				case 3:
-					dialogo(sustituir_texto0);
+					dialogo(replace_text0);
 					if (v_aceptar) 
-						sustituir_texto();
+						replace_text();
 				break;
 
 				case 4:
@@ -1459,7 +1459,7 @@ void mainloop(void) {
 					save_prg_buffer(0);
 					strcpy(tipo[8].path,v.prg->path);
 					strcpy(input,v.prg->filename);
-					guardar_prg();
+					save_program();
 				break;
 
 				case 5:
@@ -1484,7 +1484,7 @@ void mainloop(void) {
 					save_prg_buffer(0);
 					strcpy(tipo[8].path,v.prg->path);
 					strcpy(input,v.prg->filename);
-					guardar_prg();
+					save_program();
 					source_ptr=v.prg->buffer;
 					source_len=v.prg->file_lon;
 					v_ventana=0;
@@ -1511,22 +1511,22 @@ void mainloop(void) {
 					v_tipo=8; 
 					save_prg_buffer(0);
 				
-					dialogo(lista_procesos0);
+					dialogo(process_list0);
 					scan_code=0; 
 					ascii=0;
 					
 					if (v_aceptar) {
 						f_bop(); 
-						f_inicio();
+						f_home();
 
 						while (v.prg->linea>lp1[lp_select]) {
-							write_line(); retrocede_lptr();
-							read_line(); retrocede_vptr();
+							write_line(); retreat_lptr();
+							read_line(); retreat_vptr();
 						}
 						
 						while (v.prg->linea<lp1[lp_select]) {
-							write_line(); avanza_lptr();
-							read_line(); avanza_vptr();
+							write_line(); advance_lptr();
+							read_line(); advance_vptr();
 						} 
 						
 						v.volcar=2;
@@ -1534,7 +1534,7 @@ void mainloop(void) {
 				break;
 
 				case 9:
-					maximizar();
+					maximize();
 				break;
 			}
 		}
@@ -1580,7 +1580,7 @@ void mainloop(void) {
 				dialogo(err0);
 			} else {
 				mouse_graf=3; volcado_copia(); mouse_graf=1;
-				abrir_programa();
+				open_program();
 			}
 		}
 	}
@@ -2107,7 +2107,7 @@ void cierra_ventana(void) {
   
   if (v.click_handler==help2 && old_prg!=NULL) {
     for (m=1;m<max_windows;m++) {
-      if (ventana[m].click_handler==programa2 || ventana[m].click_handler==calc2) {
+      if (ventana[m].click_handler==program2 || ventana[m].click_handler==calc2) {
         if ((ventana[m].prg==old_prg || ventana[m].aux==(byte*)old_prg) && ventana[m].primer_plano<2) {
           ventana[m].estado=1;
           wgra(ventana[m].ptr,ventana[m].an/big2,ventana[m].al/big2,c_b_low,2,2,ventana[m].an/big2-20,7);

@@ -1803,7 +1803,7 @@ void edit_mode_11(void) {
 
 // TODO: Known bug -- screen refresh fails when combining undo with backspace during text deletion
 
-int determina_fnt(void);
+int find_font_window(void);
 void GetCharSizeBuffer(int WhatChar,int *ancho,int *alto,char *buffer);
 int ShowCharBuffer(int WhatChar,int cx,int cy,char *ptr,int an,char *buffer);
 
@@ -1823,7 +1823,7 @@ void edit_mode_12(void) {
   bar[12]=119; bar[13]=0;
   dibuja_barra(0); dibuja_regla();
 
-  if ((x=determina_fnt())) {
+  if ((x=find_font_window())) {
 
     // Puntero al font
 
@@ -3321,7 +3321,7 @@ void ayuda_dibujo(int n) {
       move(0,m); call(v.close_handler);
       if (v.click_handler==help2 && old_prg!=NULL) {
         for (m=1;m<max_windows;m++) {
-          if (ventana[m].click_handler==programa2) {
+          if (ventana[m].click_handler==program2) {
             if (ventana[m].prg==old_prg && ventana[m].primer_plano<2) {
               ventana[m].estado=1;
               wgra(ventana[m].ptr,ventana[m].an/big2,ventana[m].al/big2,c_b_low,2,2,ventana[m].an/big2-20,7);

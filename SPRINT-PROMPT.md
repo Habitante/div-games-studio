@@ -33,11 +33,10 @@ confirm zero warnings. Current baseline: **0 warnings** (Sprint A completed 2026
 ## Recommended next session: Sprint F (continue) + Sprint E (parallel track)
 
 **Sprint D** is done. **Sprint F** (Spanish→English function names) is in progress:
-- Small files done: divclock.c, divbrush.c, diveffec.c
-- Next: divbasic.c, divcolor.c, then divbrow.c, divfpg.c, divedit.c, divhandl.c
+- Batch 1 done: divclock.c, divbrush.c, diveffec.c, divbasic.c, divcolor.c (18 renames)
+- Batch 2 done: divbrow.c, divfpg.c, divedit.c, divhandl.c (112 renames across 20 files)
+- Next: the monsters — div.c, divpaint.c, divc.c, then runtime files
 - Sprint E (unsafe strings) can slot in anywhere as a parallel track.
-- F can be parallelized per-file only if the file's functions have no cross-file
-  call sites being renamed.
 
 ---
 
@@ -111,20 +110,23 @@ Completed: All 7 single-letter globals removed from global.h (r,g,b,c,d,a + FILE
 
 **Goal:** Translate function names from Spanish to English using the glossary.
 
-**Start with small, self-contained files** (to establish the pattern):
-1. `divclock.c` (~100 lines) — clock widget, very isolated
-2. `divbrush.c` (~300 lines) — brush browser, few cross-references
-3. `divbasic.c` (~800 lines) — calculator/expression evaluator
-4. `diveffec.c` (~500 lines) — screen transition effects
-5. `divcolor.c` (~600 lines) — palette editor
+**Batch 1 — small files** ✅ (done 2026-03-10):
+1. `divclock.c` — muestra_reloj → show_clock
+2. `divbrush.c` — 5 M3D_* functions renamed
+3. `divbasic.c` — 6 functions (rectangulo, salvaguarda, fondo_edicion, etc.)
+4. `diveffec.c` — 3 functions (crear_puntos, avanzar_puntos, pintar_explosion)
+5. `divcolor.c` — 3 functions (clexico, col_analiza_*)
 
-**Then move to larger files**, one per sprint:
-6. `divbrow.c` (2,066 lines) — file browser
-7. `divfpg.c` (2,112 lines) — FPG editor
-8. `divedit.c` (3,344 lines) — code editor
-9. `divhandl.c` (3,515 lines) — window/dialog handler
+**Batch 2 — medium files** ✅ (done 2026-03-10):
+6. `divbrow.c` — 14 functions (crear_thumbs, muestra_thumb, pinta_listboxbr, etc.)
+7. `divfpg.c` — 17 functions (nuevo_fichero, abrir_fichero, cierra_fpg, FPG_crear_*, etc.)
+8. `divedit.c` — 53 functions (programa*, f_marcar/desmarcar/cortar/pegar, buscar_texto,
+   sustituir_texto, guardar_prg, abrir_programa, lista_procesos, etc.)
+9. `divhandl.c` — 28 functions (crear_menu, pinta_menu, actualiza_menu, determina_*,
+   nuevo_mapa, crear_listbox, analizar_input, etc.)
+   Total: 112 renames across 20 files, zero warnings, all 4 targets build clean.
 
-**Leave the monsters for last** (these need structural understanding):
+**Next — the monsters** (these need structural understanding):
 10. `div.c` (4,900 lines), `divpaint.c` (4,949 lines), `divc.c` (7,795 lines)
 
 **Rules:**

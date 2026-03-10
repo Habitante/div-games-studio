@@ -325,7 +325,7 @@ void help2(void) {
                   v_prg->num_lineas=1;
                   n=v_prg->file_lon;
                   while (n--) if (*p++==13) v_prg->num_lineas++;
-                  nueva_ventana(programa0);
+                  nueva_ventana(program0);
                 }
 
               }
@@ -465,7 +465,7 @@ void resize_help(void) {
       }
 
       v.ptr=new_block;
-      repinta_ventana();
+      repaint_window();
       wput(v.ptr,v.an/big2,v.al/big2,v.an/big2-9,v.al/big2-9,-44);
       se_ha_movido_desde(v.x,v.y,an,al);
 
@@ -749,7 +749,7 @@ void help_xref(int n,int linea) {
           help_l=0;
           tabula_help(p+1,help_buffer,helpidx[n*2+1]-(p+1-h_buffer));
           if (linea!=-1) while (linea--) { while (*help_line++); help_l++; }
-          repinta_ventana(); vuelca_ventana(0);
+          repaint_window(); vuelca_ventana(0);
         }
       } fclose(f);
     }

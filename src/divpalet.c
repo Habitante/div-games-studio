@@ -1472,17 +1472,17 @@ char cWork[20];
         lGre.creada=0;
         lGre.maximo=72;
 
-        crear_listbox(&lRed);
-        crear_listbox(&lBlu);
-        crear_listbox(&lGre);
+        create_listbox(&lRed);
+        create_listbox(&lBlu);
+        create_listbox(&lGre);
 
         lRed.inicial=63-dac[SelColor*3];
         lGre.inicial=63-dac[SelColor*3+1];
         lBlu.inicial=63-dac[SelColor*3+2];
 
-        actualiza_listbox(&lRed);
-        actualiza_listbox(&lBlu);
-        actualiza_listbox(&lGre);        
+        update_listbox(&lRed);
+        update_listbox(&lBlu);
+        update_listbox(&lGre);        
 
 }
 
@@ -1502,9 +1502,9 @@ int an=v.an/big2,al=v.al/big2;
 
         _process_items();
         v_pausa=1;
-        actualiza_listbox(&lRed);
-        actualiza_listbox(&lBlu);
-        actualiza_listbox(&lGre);
+        update_listbox(&lRed);
+        update_listbox(&lBlu);
+        update_listbox(&lGre);
         v_pausa=1;
         if(Accion)
                 mouse_graf=2;

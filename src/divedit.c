@@ -9,55 +9,55 @@
 
 void _completo(void);
 void error_cursor(void);
-void f_desmarcar(void);
-void f_marcar(void);
+void f_unmark(void);
+void f_mark(void);
 void f_down(void);
 void f_up(void);
 void f_right(void);
 void f_left(void);
-void maximizar(void);
+void maximize(void);
 void resize(void);
 int get_slide_x(void);
 void editor(void); 
 void _parcial(void);
 void error_cursor2(void);
 void delete_text_cursor(void);
-void f_cortar_bloque(int borrar);
-void f_pegar_bloque(void);
+void f_cut_block(int borrar);
+void f_paste_block(void);
 int linelen(byte * p);
-void f_fin(void);
+void f_end(void);
 void f_word_right2(void);
 void f_word_left(void);
-void f_avpag(void);
+void f_page_down(void);
 void f_scroll(int n);
 void f_mscroll(int n);
-void f_repag(void);
-void f_destabulador(void);
+void f_page_up(void);
+void f_untab(void);
 void f_insert(void);
-void f_suprimir(void);
+void f_delete_char(void);
 void f_backspace(void);
-void f_tabulador(void);
+void f_tab(void);
 void f_delete(void);
 void f_word_right(void);
 void f_bof(void);
 void f_eof(void);
 void f_eop(void);
 void f_enter(void);
-void f_sobreescribir(void);
-void f_insertar(void);
-void quitar_espacios(void);
-void comprobar_memoria(int bloque_lon);
+void f_overwrite(void);
+void f_insert_char(void);
+void remove_spaces(void);
+void check_memory(int bloque_lon);
 void text_cursor(void);
 int in_block(void);
-void f_cortar(int borrar);
+void f_cut(int borrar);
 void test_cursor2(void);
 void delete_line(void);
-void barra_info(void);
-void barras_desplazamiento(void);
+void info_bar(void);
+void scrollbars(void);
 void put_char3(byte * ptr, int an, byte c,int block, byte color);
 void test_cursor(void);
 void put_char2(byte * ptr, int an, byte c,byte color);
-void pinta_segmento_procesos(void);
+void paint_process_segment(void);
 
 
 
@@ -144,8 +144,8 @@ int bloque_edit=0;      // 1-Bloque volatil en línea actual, 2-de varias línea
 
 int volcado_saltado=0;  // Para saltar volcados completos
 
-byte * avanza(byte * q);
-byte * retrocede(byte * q);
+byte * advance(byte * q);
+byte * retreat(byte * q);
 
 char color_cursor;
 
@@ -184,7 +184,7 @@ extern int numrem;
 //      Handles de la ventana tipo programa
 //-----------------------------------------------------------------------------
 
-void programa1(void) {
+void program1(void) {
   byte *ptr=v.ptr;
   int an=v.an,al=v.al;
   if (big) { an/=2; al/=2; }
@@ -201,7 +201,7 @@ void programa1(void) {
   wput(ptr,an,al,an-17,al-9,52);        // Derecha
 }
 
-void programa2(void) {
+void program2(void) {
   static byte bloque=0,bloque_x,bloque_y;
   int n,m,min,max;
   int an=v.an,al=v.al;
@@ -219,7 +219,7 @@ void programa2(void) {
           bloque=1; bloque_x=m; bloque_y=n;
         } else {
           if (bloque==1 && (m!=bloque_x || n!=bloque_y)) {
-            f_desmarcar(); bloque=2; f_marcar();
+            f_unmark(); bloque=2; f_mark();
           }
         }
         if (n>v.prg->num_lineas) n=v.prg->num_lineas;
@@ -231,10 +231,10 @@ void programa2(void) {
       }
     }
     if (v.volcar==0) {
-      if (bloque==2) { f_marcar(); v.volcar++; }
+      if (bloque==2) { f_mark(); v.volcar++; }
       bloque=0;
     }
-    if (mouse_b&2) { f_desmarcar(); v.volcar++; }
+    if (mouse_b&2) { f_unmark(); v.volcar++; }
   }
 
   if (wmouse_in(an-9,10,9,al-20)) { // Slider vert
@@ -258,7 +258,7 @@ void programa2(void) {
   } else if (v.botones&1) {
     v.botones^=1;
     if (mouse_graf==15 && wmouse_in(an-17,10,9,9)) {
-      maximizar();
+      maximize();
     } else {
       wput(v.ptr,an,al,an-17,10,56);
       v.volcar++;
@@ -269,14 +269,14 @@ void programa2(void) {
     if (!(v.botones&2)) {
       wput(v.ptr,an,al,an-9,10,-41); v.botones|=2;
     } else { retrazo(); retrazo(); } v.volcar++;
-    write_line(); retrocede_vptr(); retrocede_lptr(); read_line();
+    write_line(); retreat_vptr(); retreat_lptr(); read_line();
   } else if (v.botones&2) { wput(v.ptr,an,al,an-9,10,-39); v.botones^=2; v.volcar++; }
 
   if (mouse_graf==9 && (mouse_b&1) && wmouse_x!=-1) {
     if (!(v.botones&4)) {
       wput(v.ptr,an,al,an-9,al-17,-42); v.botones|=4;
     } else { retrazo(); retrazo(); } v.volcar++;
-    write_line(); avanza_vptr(); avanza_lptr(); read_line();
+    write_line(); advance_vptr(); advance_lptr(); read_line();
   } else if (v.botones&4) { wput(v.ptr,an,al,an-9,al-17,-40); v.botones^=4; v.volcar++; }
 
   if (mouse_graf==10 && (mouse_b&1) && wmouse_x!=-1) {
@@ -296,19 +296,19 @@ void programa2(void) {
   if (mouse_graf==12 && (mouse_b&1) && wmouse_x!=-1) resize();
 
   if (mouse_graf==13 && (mouse_b&1) && wmouse_x!=-1) {
-    f_bop(); f_inicio();
+    f_bop(); f_home();
     min=18; max=al-21;
     forced_slider=wmouse_y-1;
     if (forced_slider<min) forced_slider=min; else if (forced_slider>max) forced_slider=max;
     n=1+((v.prg->num_lineas-1)*(forced_slider-min))/(max-min);
     if (n<1) n=1; else if (n>v.prg->num_lineas) n=v.prg->num_lineas;
     while (v.prg->linea>n) {
-      write_line(); retrocede_lptr();
-      read_line(); retrocede_vptr();
+      write_line(); retreat_lptr();
+      read_line(); retreat_vptr();
     }
     while (v.prg->linea<n) {
-      write_line(); avanza_lptr();
-      read_line(); avanza_vptr();
+      write_line(); advance_lptr();
+      read_line(); advance_vptr();
     }
     v.botones|=128; v.volcar=2;
   } else {
@@ -330,7 +330,7 @@ void programa2(void) {
 }
 extern byte m_b;
 
-void programa3(void) {
+void program3(void) {
   if (kbloque && kprg==v.prg) 
 	kbloque=0;
   
@@ -341,7 +341,7 @@ void programa3(void) {
   
 }
 
-void programa0(void){
+void program0(void){
 
   v.tipo=102;
 
@@ -370,9 +370,9 @@ void programa0(void){
   v.titulo=(byte *)v_prg->filename;
   v.nombre=(byte *)v_prg->filename;
 
-  v.paint_handler=programa1;
-  v.click_handler=programa2;
-  v.close_handler=programa3;
+  v.paint_handler=program1;
+  v.click_handler=program2;
+  v.close_handler=program3;
 
 }
 
@@ -404,7 +404,7 @@ void editor() {
       if (ventana[n].tipo==102 && ventana[n].prg!=NULL && ventana[n].prg==edited) break;
     if (n<max_windows) {
       wup(n);
-      write_line(); read_line(); if (kbloque==1) f_marcar();
+      write_line(); read_line(); if (kbloque==1) f_mark();
       wdown(n);
     }
   } edited=v.prg;
@@ -423,62 +423,62 @@ void editor() {
     case 77:
       if (kcol2+1==v.prg->columna) kcol2++;
       else if (kcol1==v.prg->columna) kcol1++;
-      if (kcol1>kcol2) f_desmarcar();
+      if (kcol1>kcol2) f_unmark();
       f_right();
       break;
     case 75:
       if (v.prg->columna>1) {
         if (kcol2==v.prg->columna-1) kcol2--;
         else if (kcol1==v.prg->columna) kcol1--;
-        if (kcol1>kcol2) f_desmarcar();
+        if (kcol1>kcol2) f_unmark();
         f_left();
       } break;
-    case 82: f_cortar_bloque(2);                // shift+insertar
-      f_pegar_bloque(); f_desmarcar();
+    case 82: f_cut_block(2);                // shift+insertar
+      f_paste_block(); f_unmark();
       scan_code=0; break;
-    case 83: f_cortar_bloque(1);                // shift+suprimir
+    case 83: f_cut_block(1);                // shift+suprimir
       bloque_edit=0;
       scan_code=0; break;
     case 71:                                    // shift+inicio
       if (kcol1==v.prg->columna) kcol1=1;
       else { kcol2=kcol1-1; kcol1=1; }
-      if (kcol1>kcol2) f_desmarcar();
-      f_inicio(); break;
+      if (kcol1>kcol2) f_unmark();
+      f_home(); break;
     case 79:                                    // shift+fin
       if (kcol2+1==v.prg->columna) kcol2=linelen(v.prg->lptr);
       else { kcol1=kcol2+1; kcol2=linelen(v.prg->lptr); }
-      if (kcol1>kcol2) f_desmarcar();
-      f_fin(); break;
-    default: f_desmarcar(); break;
+      if (kcol1>kcol2) f_unmark();
+      f_end(); break;
+    default: f_unmark(); break;
 
   } else if ((shift_status&4) && !(shift_status&11)) {
 
     switch(scan_code) {
       case 0: break;
-      case 45: f_cortar_bloque(1);                // ctrl+x
+      case 45: f_cut_block(1);                // ctrl+x
         bloque_edit=0;
         scan_code=0; break;
-      case 46: f_cortar_bloque(0);                // ctrl+c
+      case 46: f_cut_block(0);                // ctrl+c
         scan_code=0; break;
-      case 47: f_cortar_bloque(2);                // ctrl+v
-        f_pegar_bloque(); f_desmarcar();
+      case 47: f_cut_block(2);                // ctrl+v
+        f_paste_block(); f_unmark();
         scan_code=0; break;
-      default: f_desmarcar(); break;
+      default: f_unmark(); break;
     }
 
     if (kbdFLAGS[82]) {                           // ctrl+ins
-      kbdFLAGS[82]=0; f_cortar_bloque(0);
+      kbdFLAGS[82]=0; f_cut_block(0);
       scan_code=0;
     }
 
   } else if (!(shift_status&15) && ascii==0) switch(scan_code) {
 
     case 0: break;
-    case 83: f_cortar_bloque(2);                // suprimir
+    case 83: f_cut_block(2);                // suprimir
       scan_code=0;
       bloque_edit=0;
       break;
-    default: f_desmarcar(); break;
+    default: f_unmark(); break;
 
   } else if ((shift_status&3) && (shift_status&4)) switch(scan_code) {
 
@@ -504,7 +504,7 @@ void editor() {
         f_up(); kfin=v.prg->lptr;
         kcol2=linelen(v.prg->lptr)+1;
         f_down(); v.prg->columna=n;
-      } else if (kcol1>kcol2) f_desmarcar();
+      } else if (kcol1>kcol2) f_unmark();
       scan_code=0; v.volcar++; break;
     case 115: // ctrl+shift+left
       f_up(); p=v.prg->lptr; f_down();
@@ -526,10 +526,10 @@ void editor() {
       if (kfin!=kini) {
         bloque_edit=2; kcol1=1; kini=v.prg->lptr;
         kfin=p; kcol2=linelen(p)+1;
-      } else if (kcol1>kcol2) f_desmarcar();
+      } else if (kcol1>kcol2) f_unmark();
       scan_code=0; v.volcar++; break;
 
-  } else if (scan_code) f_desmarcar();
+  } else if (scan_code) f_unmark();
   } // bloque_edit==1
 
 //-----------------------------------------------------------------------------
@@ -548,38 +548,38 @@ void editor() {
         kini=v.prg->lptr;
         kcol1=1;
       }
-      if (kini>kfin) f_desmarcar();
+      if (kini>kfin) f_unmark();
       v.volcar++; scan_code=0; break;
     case 81:                                    // shift+avance pág.
       if (kfin<v.prg->lptr) {
-        f_avpag();
+        f_page_down();
         f_up(); kfin=v.prg->lptr; f_down();
         kcol2=linelen(kfin)+1;
       } else if (kini==v.prg->lptr) {
-        f_avpag();
+        f_page_down();
         kini=v.prg->lptr; kcol1=1;
         if (kini>kfin) {
-          kini=avanza(kfin);
+          kini=advance(kfin);
           f_up(); kfin=v.prg->lptr; f_down();
           kcol2=linelen(kfin)+1;
         }
-      } if (kini>kfin) f_desmarcar();
+      } if (kini>kfin) f_unmark();
       v.volcar++; scan_code=0; break;
     case 73:                                    // shift+retroceso pág.
       if (kini==v.prg->lptr) {
-        f_repag();
+        f_page_up();
         kini=v.prg->lptr;
         kcol1=1;
       } else {
-        f_repag();
+        f_page_up();
         f_up(); kfin=v.prg->lptr; f_down();
         kcol2=linelen(kfin)+1;
         if (kini>kfin) {
-          kfin=retrocede(kini);
+          kfin=retreat(kini);
           kcol2=linelen(kfin)+1;
           kini=v.prg->lptr; kcol1=1;
         }
-      } if (kini>kfin) f_desmarcar();
+      } if (kini>kfin) f_unmark();
       v.volcar++; scan_code=0; break;
     case 72:                                    // shift+up
       if (kini==v.prg->lptr) {
@@ -595,48 +595,48 @@ void editor() {
             kcol2=linelen(v.prg->lptr)+1;
             f_down();
           } else {
-            f_desmarcar();
+            f_unmark();
           }
         }
       }
-      if (kini>kfin) f_desmarcar();
+      if (kini>kfin) f_unmark();
       v.volcar++; scan_code=0; break;
-    case 82: f_cortar_bloque(2);                // shift+insertar
-      f_pegar_bloque(); f_desmarcar();
+    case 82: f_cut_block(2);                // shift+insertar
+      f_paste_block(); f_unmark();
       scan_code=0; break;
-    case 83: f_cortar_bloque(1);                // shift+suprimir
+    case 83: f_cut_block(1);                // shift+suprimir
       bloque_edit=0;
       tipo_papelera=1; scan_code=0; break;
-    default: f_desmarcar(); break;
+    default: f_unmark(); break;
 
   } else if ((shift_status&4) && !(shift_status&11)) {
 
     switch(scan_code) {
       case 0: break;
-      case 45: f_cortar_bloque(1);                // ctrl+x
+      case 45: f_cut_block(1);                // ctrl+x
         bloque_edit=0;
         tipo_papelera=1; scan_code=0; break;
-      case 46: f_cortar_bloque(0);                // ctrl+c
+      case 46: f_cut_block(0);                // ctrl+c
         tipo_papelera=1; scan_code=0; break;
-      case 47: f_cortar_bloque(2);                // ctrl+v
-        f_pegar_bloque(); f_desmarcar();
+      case 47: f_cut_block(2);                // ctrl+v
+        f_paste_block(); f_unmark();
         scan_code=0; break;
-      default: f_desmarcar(); break;
+      default: f_unmark(); break;
     }
 
     if (kbdFLAGS[82]) {                           // ctrl+ins
-      kbdFLAGS[82]=0; f_cortar_bloque(0);
+      kbdFLAGS[82]=0; f_cut_block(0);
       tipo_papelera=1; scan_code=0;
     }
 
   } else if (!(shift_status&15) && ascii==0) switch(scan_code) {
 
     case 0: break;
-    case 83: f_cortar_bloque(2);                // suprimir
+    case 83: f_cut_block(2);                // suprimir
       scan_code=0;
       bloque_edit=0;
       break;
-    default: f_desmarcar(); break;
+    default: f_unmark(); break;
 
   } else if ((shift_status&3) && (shift_status&4)) switch(scan_code) {
 
@@ -650,7 +650,7 @@ void editor() {
         kini=v.prg->lptr;
         kcol1=1;
       }
-      if (kini>kfin) f_desmarcar();
+      if (kini>kfin) f_unmark();
       v.volcar++; scan_code=0; break;
       break;
     case 115: // ctrl+shift+left
@@ -663,10 +663,10 @@ void editor() {
         f_up(); kfin=v.prg->lptr; f_down();
         kcol2=linelen(kfin)+1;
       }
-      if (kini>kfin) f_desmarcar();
+      if (kini>kfin) f_unmark();
       v.volcar++; scan_code=0; break;
 
-  } else if (scan_code) f_desmarcar();
+  } else if (scan_code) f_unmark();
   } // bloque_edit==2
 
 //-----------------------------------------------------------------------------
@@ -675,7 +675,7 @@ void editor() {
 
   if ((shift_status&3) && !(shift_status&12)) switch(scan_code) {
     case 77:                                    // shift+right
-      f_desmarcar();
+      f_unmark();
       bloque_edit=1;
       kbloque=2; kprg=v.prg;
       kini=v.prg->lptr;
@@ -686,7 +686,7 @@ void editor() {
       break;
     case 75:                                    // shift+left
       if (v.prg->columna>1) {
-        f_desmarcar();
+        f_unmark();
         bloque_edit=1;
         kbloque=2; kprg=v.prg;
         kini=v.prg->lptr;
@@ -696,28 +696,28 @@ void editor() {
         kcol2=v.prg->columna;
       } break;
     case 80:                                    // shift+down
-      f_desmarcar();
+      f_unmark();
       bloque_edit=2;
       kbloque=2; kprg=v.prg;
       kini=v.prg->lptr;
       kfin=v.prg->lptr;
       kcol1=1; kcol2=linelen(v.prg->lptr)+1;
       f_down();
-      if (v.prg->lptr==kfin) f_desmarcar();
+      if (v.prg->lptr==kfin) f_unmark();
       break;
     case 81:                                    // shift+avance pág.
-      f_desmarcar();
+      f_unmark();
       bloque_edit=2;
       kbloque=2; kprg=v.prg;
       kini=v.prg->lptr; kcol1=1;
-      f_avpag();
+      f_page_down();
       f_up(); kfin=v.prg->lptr; f_down();
       kcol2=linelen(kfin)+1;
-      if (kini>kfin) f_desmarcar();
+      if (kini>kfin) f_unmark();
       break;
     case 72:                                    // shift+up
       if (v.prg->linea>1) {
-        f_desmarcar();
+        f_unmark();
         bloque_edit=2;
         kbloque=2; kprg=v.prg;
         f_up();
@@ -730,38 +730,38 @@ void editor() {
       kbloque=2; kprg=v.prg;
       f_up(); kfin=v.prg->lptr; f_down();
       kcol2=linelen(kfin)+1;
-      f_repag();
+      f_page_up();
       kini=v.prg->lptr; kcol1=1;
-      if (v.prg->lptr==kfin) f_desmarcar();
+      if (v.prg->lptr==kfin) f_unmark();
       break;
-    case 15: f_destabulador(); break;           // shift+tab
-    case 82: f_pegar_bloque();                  // shift+insertar
-             f_desmarcar(); break;
-    case 83: f_cortar_bloque(1); break;         // shift+suprimir
+    case 15: f_untab(); break;           // shift+tab
+    case 82: f_paste_block();                  // shift+insertar
+             f_unmark(); break;
+    case 83: f_cut_block(1); break;         // shift+suprimir
     case 71:                                    // shift+inicio
-      f_desmarcar();
+      f_unmark();
       bloque_edit=1;
       kbloque=2; kprg=v.prg;
       kini=v.prg->lptr;
       kfin=v.prg->lptr;
       kcol1=1;
       kcol2=v.prg->columna-1;
-      if (kcol1>kcol2) f_desmarcar();
-      f_inicio(); break;
+      if (kcol1>kcol2) f_unmark();
+      f_home(); break;
     case 79:                                    // shift+fin
-      f_desmarcar();
+      f_unmark();
       bloque_edit=1;
       kbloque=2; kprg=v.prg;
       kini=v.prg->lptr;
       kfin=v.prg->lptr;
       kcol1=v.prg->columna;
       kcol2=linelen(v.prg->lptr);
-      if (kcol1>kcol2) f_desmarcar();
-      f_fin(); break;
+      if (kcol1>kcol2) f_unmark();
+      f_end(); break;
 
   } else if ((shift_status&3) && (shift_status&4)) switch(scan_code) {
     case 116: // ctrl+shift+right
-      f_desmarcar();
+      f_unmark();
       bloque_edit=1;
       kbloque=2; kprg=v.prg;
       kini=v.prg->lptr;
@@ -775,10 +775,10 @@ void editor() {
         f_up(); kfin=v.prg->lptr;
         kcol2=linelen(v.prg->lptr)+1;
         f_down(); v.prg->columna=n;
-      } else if (kcol1>kcol2) f_desmarcar();
+      } else if (kcol1>kcol2) f_unmark();
       break;
     case 115: // ctrl+shift+left
-      f_desmarcar();
+      f_unmark();
       bloque_edit=1;
       kbloque=2; kprg=v.prg;
       kfin=v.prg->lptr;
@@ -790,7 +790,7 @@ void editor() {
       if (kfin!=kini) {
         bloque_edit=2; kcol1=1; kini=v.prg->lptr;
         kfin=p; kcol2=linelen(p)+1;
-      } else if (kcol1>kcol2) f_desmarcar();
+      } else if (kcol1>kcol2) f_unmark();
       break;
 
   } else if (!(shift_status&15) && ascii==0) switch(scan_code) {
@@ -798,17 +798,17 @@ void editor() {
     case 75: f_left(); break;                   // cursor left
     case 80: f_down(); break;                   // cursor down
     case 72: f_up(); break;                     // cursor up
-    case 71: f_inicio(); break;                 // inicio
-    case 79: f_fin(); break;                    // fin
-    case 81: f_avpag(); break;                  // avance pág.
-    case 73: f_repag(); break;                  // retroceso pág.
+    case 71: f_home(); break;                 // inicio
+    case 79: f_end(); break;                    // fin
+    case 81: f_page_down(); break;                  // avance pág.
+    case 73: f_page_up(); break;                  // retroceso pág.
     case 82: f_insert(); break;                 // insertar
-    case 83: f_suprimir(); break;               // suprimir
+    case 83: f_delete_char(); break;               // suprimir
 
   } else if (!(shift_status&15)) switch(scan_code) {
 
     case 14: f_backspace(); break;              // backspace
-    case 15: f_tabulador(); break;              // tabulador
+    case 15: f_tab(); break;              // tabulador
 
   } else if ((shift_status&4) && !(shift_status&11)) switch(scan_code) {
 
@@ -819,21 +819,21 @@ void editor() {
     case 118:case 81: f_eof(); break;           // ctrl+av.pág.
     case 119:case 71: f_bop(); break;           // ctrl+inicio.
     case 117:case 79: f_eop(); break;           // ctrl+fin.
-    case 45: f_cortar_bloque(1); break;         // ctrl+x
-    case 46: f_cortar_bloque(0); break;         // ctrl+c
-    case 47: f_pegar_bloque();                  // ctrl+v
-             f_desmarcar(); break;
+    case 45: f_cut_block(1); break;         // ctrl+x
+    case 46: f_cut_block(0); break;         // ctrl+c
+    case 47: f_paste_block();                  // ctrl+v
+             f_unmark(); break;
 
   } else if ((shift_status&8) && !(shift_status&7)) switch(scan_code) {
 
-    case 30: f_marcar(); break;                 // alt+a
-    case 22: f_desmarcar(); break;              // alt+u
+    case 30: f_mark(); break;                 // alt+a
+    case 22: f_unmark(); break;              // alt+u
     case 34:                                    // alt+g=alt+d
-    case 32: f_cortar_bloque(1); break;         // alt+d
+    case 32: f_cut_block(1); break;         // alt+d
     case 46: if (kbloque) {                     // alt+c
-      f_cortar_bloque(0); f_pegar_bloque(); } break;
+      f_cut_block(0); f_paste_block(); } break;
     case 50: if (kbloque) {                     // alt+m
-      f_cortar_bloque(1); f_pegar_bloque(); } break;
+      f_cut_block(1); f_paste_block(); } break;
 
   }
   } // bloque_edit==0
@@ -850,13 +850,13 @@ void editor() {
 
   if (!(shift_status&(4|8)) && ascii) {
     if (ascii==cr) f_enter(); else if (ascii!=0x1b) {
-      if (modo_cursor) f_sobreescribir(); else f_insertar();
+      if (modo_cursor) f_overwrite(); else f_insert_char();
     }
   }
 
-  quitar_espacios();
+  remove_spaces();
 
-  comprobar_memoria(0);
+  check_memory(0);
 
   if (v.volcar && ibuf!=fbuf) {
     volcado_saltado=1; v.volcar=0;
@@ -879,7 +879,7 @@ void editor() {
 //  char * lptr;                  // Puntero a la línea actual en el fichero
 //  char * vptr;                  // Puntero a la primera línea visualizada
 
-void comprobar_memoria(int bloque_lon) {
+void check_memory(int bloque_lon) {
   byte * p;
   int ip;
 
@@ -914,11 +914,11 @@ int linelen(byte * p) {
 //      Funciones de bloques
 //-----------------------------------------------------------------------------
 
-void f_marcar(void) {
+void f_mark(void) {
   int n;
   byte *s;
 
-  quitar_espacios();
+  remove_spaces();
 
   if (kbloque==2)
     if (kprg==v.prg) {
@@ -936,10 +936,10 @@ void f_marcar(void) {
         if (ventana[n].tipo==102 && ventana[n].prg==kprg && kprg!=NULL) break;
       if (n<max_windows) {
         wup(n);
-        f_desmarcar(); v.volcar=2; _completo();
+        f_unmark(); v.volcar=2; _completo();
         wdown(n);
         vuelca_ventana(n);
-      } kbloque=0; f_marcar();
+      } kbloque=0; f_mark();
     }
   else if (kbloque==1) {
     kbloque=2; kfin=v.prg->lptr;
@@ -953,14 +953,14 @@ void f_marcar(void) {
   } v.volcar++;
 }
 
-void f_desmarcar(void) {
+void f_unmark(void) {
   int n;
   if (kbloque && kprg!=v.prg) {
     for (n=0;n<max_windows;n++)
       if (ventana[n].tipo==102 && ventana[n].prg==kprg && kprg!=NULL) break;
     if (n<max_windows) {
       wup(n);
-      f_desmarcar(); v.volcar=2; _completo();
+      f_unmark(); v.volcar=2; _completo();
       wdown(n);
       vuelca_ventana(n);
     }
@@ -969,7 +969,7 @@ void f_desmarcar(void) {
 
 int t_p;
 
-void f_cortar_bloque(int borrar) {
+void f_cut_block(int borrar) {
   int n;
   t_p=0; // Tipo de papelera -> chars por defecto
   if (kbloque && kprg!=v.prg) {
@@ -977,19 +977,19 @@ void f_cortar_bloque(int borrar) {
       if (ventana[n].tipo==102 && ventana[n].prg==kprg && kprg!=NULL) break;
     if (n<max_windows) {
       wup(n);
-      f_cortar(borrar); v.volcar=2; _completo();
+      f_cut(borrar); v.volcar=2; _completo();
       wdown(n);
       vuelca_ventana(n);
     }
-  } else f_cortar(borrar);
+  } else f_cut(borrar);
   if (borrar!=2) { tipo_papelera=t_p; }
 }
 
-void f_cortar(int borrar) { // 0-Copiar, 1-Cortar, 2-Borrar
+void f_cut(int borrar) { // 0-Copiar, 1-Cortar, 2-Borrar
   int n,num_lineas,num_lineas2,num_lineas3;
   byte *k1,*k2;
 
-  if (kbloque==0) return; else if (kbloque&1) f_marcar();
+  if (kbloque==0) return; else if (kbloque&1) f_mark();
   write_line();
   if (kcol1>linelen(kini)) kcol1=linelen(kini)+1; // ->cr
   if (kcol2>linelen(kfin)) kcol2=linelen(kfin)+2; // ->lf
@@ -1078,12 +1078,12 @@ void test_cursor2(void) {
   if (v.prg->columna<v.prg->primera_columna)
     v.prg->primera_columna=v.prg->columna;
 
-  while(v.prg->linea>=v.prg->primera_linea+v.prg->al) avanza_vptr();
+  while(v.prg->linea>=v.prg->primera_linea+v.prg->al) advance_vptr();
 
-  while (v.prg->linea<v.prg->primera_linea) retrocede_vptr();
+  while (v.prg->linea<v.prg->primera_linea) retreat_vptr();
 }
 
-void f_pegar_bloque(void) {
+void f_paste_block(void) {
   byte *ini, *p;
   int espacios,n,col=0;
 
@@ -1091,9 +1091,9 @@ void f_pegar_bloque(void) {
 
   if (papelera!=NULL) {
 
-    f_desmarcar(); write_line();
+    f_unmark(); write_line();
 
-    comprobar_memoria(lon_papelera);
+    check_memory(lon_papelera);
 
     kbloque=2; kprg=v.prg; kini=v.prg->lptr; kcol1=v.prg->columna; // Fija kini
 
@@ -1161,10 +1161,10 @@ void f_left(void) {
 void f_down(void) {
   if (v.prg->lptr+v.prg->line_size<v.prg->buffer+v.prg->file_lon) {
     write_line();
-    avanza_lptr();
+    advance_lptr();
     read_line();
     if (v.prg->linea-v.prg->primera_linea==v.prg->al) {
-      avanza_vptr();
+      advance_vptr();
       v.volcar++;
     }
   } if (kbloque&1) v.volcar++;
@@ -1173,23 +1173,23 @@ void f_down(void) {
 void f_up(void) {
   if (v.prg->lptr>v.prg->buffer) {
     write_line();
-    retrocede_lptr();
+    retreat_lptr();
     read_line();
     if (v.prg->linea<v.prg->primera_linea) {
-      retrocede_vptr();
+      retreat_vptr();
       v.volcar++;
     }
   } if (kbloque&1) v.volcar++;
 }
 
-void f_inicio(void) {
+void f_home(void) {
   if (v.prg->primera_columna!=1) v.volcar++;
   v.prg->primera_columna=v.prg->columna=1;
 }
 
-void f_fin(void) {
+void f_end(void) {
   long n;
-  quitar_espacios();
+  remove_spaces();
   v.prg->columna=strlen(v.prg->l)+1;
   n=v.prg->columna-v.prg->primera_columna;
   if (n<0) {
@@ -1203,23 +1203,23 @@ void f_fin(void) {
 
 void f_scroll(int n) {
   write_line();
-  while (n--) { avanza_vptr(); avanza_lptr(); }
+  while (n--) { advance_vptr(); advance_lptr(); }
   read_line();
   v.volcar++;
 }
 
 void f_mscroll(int n) {
   write_line();
-  while (n--) { retrocede_vptr(); retrocede_lptr(); }
+  while (n--) { retreat_vptr(); retreat_lptr(); }
   read_line();
   v.volcar++;
 }
 
-void f_avpag(void) {
+void f_page_down(void) {
   f_scroll(v.prg->al);
 }
 
-void f_repag(void) {
+void f_page_up(void) {
   f_mscroll(v.prg->al);
 }
 
@@ -1227,10 +1227,10 @@ void f_insert(void) {
   modo_cursor^=1;
 }
 
-void f_suprimir(void) {
+void f_delete_char(void) {
   int n,n_chars;
   byte *p;
-  quitar_espacios();
+  remove_spaces();
   if (strlen(v.prg->l)<v.prg->columna) { // Junta dos líneas
     if (v.prg->lptr+v.prg->line_size+2<=v.prg->buffer+v.prg->file_lon) {
       for (n=strlen(v.prg->l);n<v.prg->columna-1;n++) v.prg->l[n]=' ';
@@ -1252,8 +1252,8 @@ void f_suprimir(void) {
       else if (kcol2==v.prg->columna) {
         if (kini==v.prg->lptr && kcol1==kcol2) kbloque=0;
         else if (kcol2==1) {
-          retrocede_lptr(); kfin=v.prg->lptr;
-          avanza_lptr(); kcol2=linelen(kfin)+1;
+          retreat_lptr(); kfin=v.prg->lptr;
+          advance_lptr(); kcol2=linelen(kfin)+1;
         } else kcol2--;
       }
     }
@@ -1261,37 +1261,37 @@ void f_suprimir(void) {
 }
 
 void f_backspace(void) {
-  quitar_espacios(); ascii=0;
+  remove_spaces(); ascii=0;
   if (strlen(v.prg->l)<v.prg->columna-1) f_left();
   else if (v.prg->columna!=1) {
-    f_left(); f_suprimir();
+    f_left(); f_delete_char();
   } else if (v.prg->lptr>v.prg->buffer) {
-    f_up(); f_fin(); f_suprimir();
+    f_up(); f_end(); f_delete_char();
   }
 }
 
-void f_tabulador(void) {
+void f_tab(void) {
   do {
-    if (modo_cursor) f_right(); else { ascii=' '; f_insertar(); }
+    if (modo_cursor) f_right(); else { ascii=' '; f_insert_char(); }
   } while (((v.prg->columna-1)%tab_size)!=0 && v.prg->columna<long_line-1);
   ascii=0;
 }
 
-void f_destabulador(void) {
+void f_untab(void) {
   if (v.prg->columna>1) do {
     if (modo_cursor) f_left(); else f_backspace();
   } while (((v.prg->columna-1)%tab_size)!=0);
   ascii=0;
 }
 
-void f_sobreescribir(void) {
+void f_overwrite(void) {
   if (v.prg->columna<long_line) {
-    if (strlen(v.prg->l)<v.prg->columna) f_insertar();
+    if (strlen(v.prg->l)<v.prg->columna) f_insert_char();
     else { v.prg->l[v.prg->columna-1]=ascii; f_right(); }
   }
 }
 
-void f_insertar(void) {
+void f_insert_char(void) {
   int n;
 
   if (v.prg->columna<long_line) {
@@ -1310,19 +1310,19 @@ void f_insertar(void) {
 
 void f_enter(void) {
   int n,t,lon;
-  quitar_espacios();
+  remove_spaces();
 
   if ((lon=strlen(v.prg->l))<v.prg->columna) { // Enter normal
     v.prg->l[lon++]=cr; v.prg->l[lon++]=lf; v.prg->l[lon]=0;
     t=0; while(v.prg->l[t]==' ') t++;
-    write_line(); avanza_lptr(); read_line();
-    if (v.prg->linea-v.prg->primera_linea==v.prg->al) avanza_vptr();
-    if (lon>2) { f_inicio(); while (t--) f_right(); }
+    write_line(); advance_lptr(); read_line();
+    if (v.prg->linea-v.prg->primera_linea==v.prg->al) advance_vptr();
+    if (lon>2) { f_home(); while (t--) f_right(); }
   } else { // Enter, divide la línea actual
     n=v.prg->columna-1;
     t=0; while(v.prg->l[t]==' ' && t<n) { lin[t]=' '; t++; }
     memcpy(lin+t,v.prg->l+n,long_line-n);
-    v.prg->l[n]=0; quitar_espacios(); n=strlen(v.prg->l);
+    v.prg->l[n]=0; remove_spaces(); n=strlen(v.prg->l);
     v.prg->l[n++]=cr; v.prg->l[n++]=lf; v.prg->l[n]=0;
 
     write_line();
@@ -1332,12 +1332,12 @@ void f_enter(void) {
     if (kfin==v.prg->lptr && kcol2>=v.prg->columna) {
       kfin+=n; kcol2=kcol2-v.prg->columna+t+1; }
 
-    avanza_lptr(); read_line();
+    advance_lptr(); read_line();
 
     memcpy(v.prg->l,lin,long_line);
 
-    if (v.prg->linea-v.prg->primera_linea==v.prg->al) avanza_vptr();
-    f_inicio(); while (t--) f_right();
+    if (v.prg->linea-v.prg->primera_linea==v.prg->al) advance_vptr();
+    f_home(); while (t--) f_right();
   } v.volcar++; v.prg->num_lineas++;
 }
 
@@ -1346,8 +1346,8 @@ void f_delete(void) {
   if (kini==v.prg->lptr && kfin==v.prg->lptr) kbloque=0;
   else if (kini==v.prg->lptr) kcol1=1;
   else if (kfin==v.prg->lptr) {
-    retrocede_lptr(); kfin=v.prg->lptr;
-    avanza_lptr(); kcol2=linelen(kfin)+1;
+    retreat_lptr(); kfin=v.prg->lptr;
+    advance_lptr(); kcol2=linelen(kfin)+1;
   } v.prg->l[0]=0;
   if (v.prg->lptr+v.prg->line_size+2<=v.prg->buffer+v.prg->file_lon) {
     delete_line(); read_line(); v.prg->num_lineas--; v.volcar++;
@@ -1360,7 +1360,7 @@ void f_word_right(void) {
     if (v.prg->columna<=strlen(v.prg->l)) f_right();
     else {
       if (v.prg->lptr+v.prg->line_size>=v.prg->buffer+v.prg->file_lon) break;
-      f_down(); f_inicio();
+      f_down(); f_home();
     } i=1;
     if (!lower[v.prg->l[v.prg->columna-1]]) i=0;
     else if (lower[v.prg->l[v.prg->columna-2]]) i=0;
@@ -1373,7 +1373,7 @@ void f_word_right2(void) {
     if (v.prg->columna<=strlen(v.prg->l)) f_right();
     else {
       if (v.prg->lptr+v.prg->line_size>=v.prg->buffer+v.prg->file_lon) break;
-      f_down(); f_inicio();
+      f_down(); f_home();
     } i=1;
     if (lower[v.prg->l[v.prg->columna-1]]) i=0;
     else if (!lower[v.prg->l[v.prg->columna-2]]) i=0;
@@ -1386,7 +1386,7 @@ void f_word_left(void) {
     if (v.prg->columna>1) f_left();
     else {
       if (v.prg->lptr==v.prg->buffer) break;
-      f_up(); f_fin();
+      f_up(); f_end();
     } i=1;
     if (v.prg->columna<=linelen(v.prg->lptr)+1) {
       if (v.prg->columna>1) {
@@ -1402,18 +1402,18 @@ void f_word_left(void) {
 void f_eof(void) {
   while (v.prg->lptr+v.prg->line_size<v.prg->buffer+v.prg->file_lon) {
     write_line();
-    avanza_lptr();
+    advance_lptr();
     read_line();
-    if (v.prg->linea-v.prg->primera_linea==v.prg->al) avanza_vptr();
+    if (v.prg->linea-v.prg->primera_linea==v.prg->al) advance_vptr();
   } v.volcar++;
 }
 
 void f_bof(void) {
   while (v.prg->lptr>v.prg->buffer) {
     write_line();
-    retrocede_lptr();
+    retreat_lptr();
     read_line();
-    if (v.prg->linea<v.prg->primera_linea) retrocede_vptr();
+    if (v.prg->linea<v.prg->primera_linea) retreat_vptr();
   } v.volcar++;
 }
 
@@ -1421,7 +1421,7 @@ void f_eop(void) {
   while (v.prg->lptr+v.prg->line_size<v.prg->buffer+v.prg->file_lon &&
          v.prg->linea-v.prg->primera_linea!=v.prg->al-1) {
     write_line();
-    avanza_lptr();
+    advance_lptr();
     read_line();
   } if (kbloque&1) v.volcar++;
 }
@@ -1438,7 +1438,7 @@ void f_bop(void) {
 //      Avance y retroceso por el fichero
 //-----------------------------------------------------------------------------
 
-void avanza_vptr(void) {
+void advance_vptr(void) {
   byte *p=v.prg->vptr;
 
   while (*p!=cr && p<v.prg->buffer+v.prg->file_lon) p++;
@@ -1453,7 +1453,7 @@ void avanza_vptr(void) {
   }
 }
 
-void avanza_lptr(void) {
+void advance_lptr(void) {
   byte *p=v.prg->lptr;
   while (*p!=cr && p<v.prg->buffer+v.prg->file_lon) p++;
   if (*p==cr && p<v.prg->buffer+v.prg->file_lon) {
@@ -1462,7 +1462,7 @@ void avanza_lptr(void) {
   }
 }
 
-void retrocede_vptr(void) {
+void retreat_vptr(void) {
   byte *p=v.prg->vptr;
   if (p!=v.prg->buffer) { p-=2;
     while (p>v.prg->buffer && (*p!=cr || p==v.prg->vptr-2)) p--;
@@ -1486,7 +1486,7 @@ void retrocede_vptr(void) {
   }
 }
 
-void retrocede_lptr(void) {
+void retreat_lptr(void) {
   byte *p=v.prg->lptr;
   if (p!=v.prg->buffer) { p-=2;
     while (p>v.prg->buffer && (*p!=cr || p==v.prg->lptr-2)) p--;
@@ -1498,13 +1498,13 @@ void retrocede_lptr(void) {
   }
 }
 
-byte * avanza(byte * q) {
+byte * advance(byte * q) {
   byte *p=q;
   while (*p!=cr && p<v.prg->buffer+v.prg->file_lon) p++;
   if (*p==cr && p<v.prg->buffer+v.prg->file_lon) return(p+2); else return(q);
 }
 
-byte * retrocede(byte * q) {
+byte * retreat(byte * q) {
   byte * p=q;
   if (p!=v.prg->buffer) { p-=2;
     while (p>v.prg->buffer && (*p!=cr || p==q-2)) p--;
@@ -1516,7 +1516,7 @@ byte * retrocede(byte * q) {
 //      Funcion de coloreado del fuente
 //-----------------------------------------------------------------------------
 
-void rellena_colin(void) {  // Función para obtener los colores de la siguiente línea
+void fill_color_line(void) {  // Función para obtener los colores de la siguiente línea
   unsigned char *p=csource;
   int i=0;
 
@@ -1594,8 +1594,8 @@ void _completo(void) {
     }
   }
 
-  barra_info();
-  barras_desplazamiento();
+  info_bar();
+  scrollbars();
 
   di=v.ptr+(v.an*18+2)*big2; // Volcado de la ventana de texto
   si=v.prg->vptr;
@@ -1638,7 +1638,7 @@ void _completo(void) {
     if (si!=v.prg->lptr) {
 
       i=0; csource=si;
-      if (si<v.prg->buffer+v.prg->file_lon) rellena_colin();
+      if (si<v.prg->buffer+v.prg->file_lon) fill_color_line();
       else memset(colin,ce4,1024);
 
       while (--ancho && *si!=cr && si<v.prg->buffer+v.prg->file_lon) {
@@ -1654,7 +1654,7 @@ void _completo(void) {
 
       s=si; si=(byte *)v.prg->l;
 
-      i=0; csource=si; rellena_colin();
+      i=0; csource=si; fill_color_line();
       color_cursor=colin[v.prg->columna-1];
 
       ancho=v.prg->primera_columna;
@@ -1704,7 +1704,7 @@ void _parcial(void) {
   }
 
   while (csource<v.prg->lptr) color_lex();
-  numrem=0; csource=(byte *)v.prg->l; rellena_colin();
+  numrem=0; csource=(byte *)v.prg->l; fill_color_line();
   color_cursor=colin[v.prg->columna-1];
 
   if (c_oldline==(char *)v.prg->lptr && numrem!=c_oldrem) {
@@ -1727,7 +1727,7 @@ void _parcial(void) {
     }
   }
 
-  barra_info();
+  info_bar();
 
   old_di=di=v.ptr+(v.an*18+2)*big2+linea*v.an*editor_font_al;
   si=v.prg->lptr;
@@ -1778,7 +1778,7 @@ void _parcial(void) {
 //      Impresión de las barras de desplazamiento
 //-----------------------------------------------------------------------------
 
-void barras_desplazamiento(void) {
+void scrollbars(void) {
   byte *ptr=v.ptr;
   int min,max,slider;
   int an=v.an,al=v.al;
@@ -1822,7 +1822,7 @@ int get_slide_x(void) {
 //      Impresión de la barra informativa
 //-----------------------------------------------------------------------------
 
-void barra_info(void) {
+void info_bar(void) {
   char num[16];
   byte *ptr=v.ptr;
   int ancho;
@@ -1888,7 +1888,7 @@ void resize(void) {
 	resize_surface();
 	
      test_cursor();
-      repinta_ventana();
+      repaint_window();
       wput(v.ptr,v.an/big2,v.al/big2,v.an/big2-9,v.al/big2-9,-44);
       se_ha_movido_desde(v.x,v.y,an,al);
       actualiza_caja(v.x,v.y,v.an>an?v.an:an,v.al>al?v.al:al);
@@ -1922,7 +1922,7 @@ void test_cursor(void) {
 
   if (v.prg->linea-v.prg->primera_linea>=v.prg->al) do {
     write_line();
-    retrocede_lptr();
+    retreat_lptr();
     read_line();
   } while (v.prg->linea>=v.prg->primera_linea+v.prg->al);
 
@@ -1934,7 +1934,7 @@ void test_cursor(void) {
 
 void extrude(int x,int y,int an,int al,int x2,int y2,int an2,int al2);
 
-void maximizar(void) {
+void maximize(void) {
   byte * new_block;
   int an=v.an,al=v.al;
   int _x,_y,_an,_al,_an2,_al2;
@@ -1968,7 +1968,7 @@ void maximizar(void) {
       v.ptr=new_block;
       resize_surface();
       test_cursor();
-      repinta_ventana();
+      repaint_window();
       v.x=vga_an/2-v.an/2; v.y=vga_al/2-v.al/2;
       // emplazar(1,&v.x,&v.y,v.an,v.al);
       if (exploding_windows) extrude(v.prg->old_x,v.prg->old_y,_an,_al,v.x,v.y,v.an,v.al);
@@ -2002,7 +2002,7 @@ void maximizar(void) {
       resize_surface();
 
       test_cursor();      
-      repinta_ventana();
+      repaint_window();
       v.x=v.prg->old_x;
       v.y=v.prg->old_y;
       if (v.x>vga_an-8*big2) v.x=vga_an-32*big2;
@@ -2023,7 +2023,7 @@ void maximizar(void) {
 //      Repinta una ventana (incluyendo barra e iconos)
 //-----------------------------------------------------------------------------
 
-void repinta_ventana(void) {
+void repaint_window(void) {
   int an=v.an,al=v.al;
   if (big) { an/=2; al/=2; }
 
@@ -2368,7 +2368,7 @@ void write_line(void) {
   byte *ini,*fin;
   int old_lon,lon;
 
-  quitar_espacios();
+  remove_spaces();
 
   old_lon=v.prg->file_lon;
   v.prg->file_lon+=strlen(v.prg->l)-v.prg->line_size;
@@ -2391,7 +2391,7 @@ void delete_line(void) {
   byte *ini,*fin;
   int old_lon,lon;
 
-  quitar_espacios();
+  remove_spaces();
 
   old_lon=v.prg->file_lon;
   v.prg->file_lon+=strlen(v.prg->l)-(v.prg->line_size+2);
@@ -2414,7 +2414,7 @@ void delete_line(void) {
 //      Quita los espacios al final de la línea actual (v.prg->l[])
 //-----------------------------------------------------------------------------
 
-void quitar_espacios(void) {
+void remove_spaces(void) {
   int n=strlen(v.prg->l)-1;
   while (n>=0) if (v.prg->l[n]==' ') v.prg->l[n--]=0; else n=-1;
 }
@@ -2428,7 +2428,7 @@ extern struct t_listboxbr larchivosbr;
 extern t_thumb thumb[max_archivos];
 extern int num_taggeds;
 
-void abrir_programa(void) {
+void open_program(void) {
 
   FILE *f;
   int n,x;
@@ -2515,7 +2515,7 @@ void abrir_programa(void) {
                 v_prg->lptr=v_prg->buffer;
                 pr=v.prg; v.prg=v_prg; read_line(); v.prg=pr;
 
-                nueva_ventana(programa0);
+                nueva_ventana(program0);
 
               } else { free(v_prg); free(buffer); v_texto=(char *)texto[46]; dialogo(err0); }
             } else { free(v_prg); free(buffer); v_texto=(char *)texto[44]; dialogo(err0); }
@@ -2531,7 +2531,7 @@ void abrir_programa(void) {
 }
 extern char user1[128], user2[128];
 
-void programa0_nuevo(void) {
+void program0_new(void) {
   byte *buffer;
   struct tprg * pr;
   int n;
@@ -2559,11 +2559,11 @@ void programa0_nuevo(void) {
       fprintf(f,"PROGRAM %s;\n\nBEGIN\n\n//Write your code here, make something amazing!\n\nEND\n\n",
               fname);
       fclose(f);
-      abrir_programa();
+      open_program();
     
       for(n=0;n<10;n++) {
         write_line();
-        avanza_lptr();
+        advance_lptr();
         read_line();
       }
 
@@ -2584,7 +2584,7 @@ void programa0_nuevo(void) {
         v_prg->lptr=buffer;
         pr=v.prg; v.prg=v_prg; read_line(); v.prg=pr;
         v_prg->num_lineas=1;
-        nueva_ventana(programa0);
+        nueva_ventana(program0);
         // Add the template
         strcpy((char *)buffer,"PROGRAM yourprg;");
         read_line();
@@ -2604,7 +2604,7 @@ void programa0_nuevo(void) {
 //      Guarda un programa a disco
 //-----------------------------------------------------------------------------
 
-void guardar_prg(void) {
+void save_program(void) {
   int an=v.an/big2,al=v.al/big2;
   FILE *f;
 
@@ -2643,7 +2643,7 @@ void guardar_prg(void) {
 //      Determina si se ha encontrado una cadena
 //-----------------------------------------------------------------------------
 
-int cadena_encontrada(char *p, char*q, int may_min, int completa) {
+int string_found(char *p, char*q, int may_min, int completa) {
   if (completa && lower[*(q-1)]) return(0);
   if (may_min) {
     while (*p) {
@@ -2669,11 +2669,11 @@ int cadena_encontrada(char *p, char*q, int may_min, int completa) {
 char buscar[32]={0};
 int may_min=0,completa=0;
 
-void buscar_texto0(void) {
+void find_text0(void) {
   v.tipo=1; v.titulo=texto[160];
   v.an=126; v.al=14+y_bt;
-  v.paint_handler=buscar_texto1;
-  v.click_handler=buscar_texto2;
+  v.paint_handler=find_text1;
+  v.click_handler=find_text2;
 
 //  strcpy(buscar,"");
 
@@ -2686,11 +2686,11 @@ void buscar_texto0(void) {
   v_aceptar=0;
 }
 
-void buscar_texto1(void) {
+void find_text1(void) {
   _show_items();
 }
 
-void buscar_texto2(void) {
+void find_text2(void) {
   _process_items();
   switch(v.active_item) {
     case 1: fin_dialogo=1; if (buscar[0]) v_aceptar=1; break;
@@ -2698,7 +2698,7 @@ void buscar_texto2(void) {
   }
 }
 
-void buscar_texto(void) {
+void find_text(void) {
   struct tprg mi_prg;
   int encontrado=0,n;
 
@@ -2713,11 +2713,11 @@ void buscar_texto(void) {
     if (v.prg->columna>strlen(v.prg->l)) {
       if (v.prg->linea<v.prg->num_lineas) {
         n=v.prg->linea;
-        write_line(); avanza_vptr(); avanza_lptr(); read_line();
-        f_inicio();
+        write_line(); advance_vptr(); advance_lptr(); read_line();
+        f_home();
       }
     } else {
-      if (cadena_encontrada(buscar,&v.prg->l[v.prg->columna-1],may_min,completa)) encontrado=1;
+      if (string_found(buscar,&v.prg->l[v.prg->columna-1],may_min,completa)) encontrado=1;
       else f_right();
     }
   }
@@ -2738,8 +2738,8 @@ void buscar_texto(void) {
 //      Sustituir un texto
 //-----------------------------------------------------------------------------
 
-void sustituir0(void);
-void sustituciones0(void);
+void replace0(void);
+void replacements0(void);
 
 #define y_st 69
 char buscar2[32]={0};
@@ -2747,14 +2747,14 @@ char sustituir[32]={0};
 int may_min2=0,completa2=0;
 int num_cambios;
 
-void sustituir_texto0(void) {
+void replace_text0(void) {
 
   v.tipo=1;
 
   v.titulo=texto[165];
   v.an=126; v.al=14+y_st;
-  v.paint_handler=sustituir_texto1;
-  v.click_handler=sustituir_texto2;
+  v.paint_handler=replace_text1;
+  v.click_handler=replace_text2;
 
   //strcpy(buscar2,"");
   //strcpy(sustituir,"");
@@ -2769,11 +2769,11 @@ void sustituir_texto0(void) {
   v_aceptar=0;
 }
 
-void sustituir_texto1(void) {
+void replace_text1(void) {
   _show_items();
 }
 
-void sustituir_texto2(void) {
+void replace_text2(void) {
   _process_items();
   switch(v.active_item) {
     case 2: fin_dialogo=1; if (buscar2[0]) v_aceptar=1; break;
@@ -2781,7 +2781,7 @@ void sustituir_texto2(void) {
   }
 }
 
-void sustituir_texto(void) {
+void replace_text(void) {
   struct tprg mi_prg;
   int encontrado,n;
 
@@ -2797,11 +2797,11 @@ void sustituir_texto(void) {
     while ((v.prg->linea<v.prg->num_lineas || v.prg->columna<=strlen(v.prg->l)) && !encontrado) {
       if (v.prg->columna>strlen(v.prg->l)) {
         if (v.prg->linea<v.prg->num_lineas) {
-          write_line(); avanza_vptr(); avanza_lptr(); read_line();
-          f_inicio();
+          write_line(); advance_vptr(); advance_lptr(); read_line();
+          f_home();
         }
       } else {
-        if (cadena_encontrada(buscar2,&v.prg->l[v.prg->columna-1],may_min2,completa2)) encontrado=1;
+        if (string_found(buscar2,&v.prg->l[v.prg->columna-1],may_min2,completa2)) encontrado=1;
         else f_right();
       }
     }
@@ -2814,17 +2814,17 @@ void sustituir_texto(void) {
       n=strlen(buscar2); while (n--) f_left();
       if (v_aceptar!=3) {
         v.volcar=2; _completo(); vuelca_ventana(0);
-        dialogo(sustituir0);
+        dialogo(replace0);
       }
       if (v_aceptar&1) {
         num_cambios++;
-        f_cortar_bloque(1);
+        f_cut_block(1);
         if (papelera!=NULL) free(papelera);
         papelera=sustituir;
         lon_papelera=strlen(sustituir);
         lineas_papelera=0;
-        f_pegar_bloque();
-        f_desmarcar();
+        f_paste_block();
+        f_unmark();
         papelera=NULL; while (lon_papelera--) f_right();
       } else if (v_aceptar==2) {
         f_right();
@@ -2835,7 +2835,7 @@ void sustituir_texto(void) {
 
   if (v_aceptar!=4) { memcpy(v.prg,&mi_prg,sizeof(struct tprg)); } // EOF
   v.volcar=2; _completo(); text_cursor();
-  dialogo(sustituciones0);
+  dialogo(replacements0);
 }
 
 //-----------------------------------------------------------------------------
@@ -2844,7 +2844,7 @@ void sustituir_texto(void) {
 
 void sustituir1(void) { _show_items(); }
 
-void sustituir2(void) {
+void replace2(void) {
   _process_items();
   switch(v.active_item) {
     case 0: v_aceptar=1; fin_dialogo=1; break; // SI
@@ -2854,7 +2854,7 @@ void sustituir2(void) {
   }
 }
 
-void sustituir0(void) {
+void replace0(void) {
   int x2,x3,x4;
   x2=7+text_len(texto[102]+1)+10;
   x3=x2+text_len(texto[103]+1)+10;
@@ -2862,7 +2862,7 @@ void sustituir0(void) {
   v.tipo=1; v.titulo=texto[190];
   v.an=x4+text_len(texto[101]+1)+7; v.al=29;
   v.paint_handler=sustituir1;
-  v.click_handler=sustituir2;
+  v.click_handler=replace2;
   _button(102,7,v.al-14,0);
   _button(103,x2,v.al-14,0);
   _button(124,x3,v.al-14,0);
@@ -2876,23 +2876,23 @@ void sustituir0(void) {
 
 char sus[128];
 
-void sustituciones1(void) {
+void replacements1(void) {
   _show_items();
   wwrite(v.ptr,v.an/big2,v.al/big2,(v.an/big2)/2,12,1,(byte *)sus,c3);
 }
-void sustituciones2(void) { _process_items(); if (!v.active_item) fin_dialogo=1; }
+void replacements2(void) { _process_items(); if (!v.active_item) fin_dialogo=1; }
 
-void sustituciones0(void) {
+void replacements0(void) {
   v.tipo=1; v.titulo=texto[191];
   itoa(num_cambios,sus,10);
   strcat(sus,(char *)texto[192]);
   v.an=text_len(texto[191])+28; v.al=38;
-  v.paint_handler=sustituciones1;
-  v.click_handler=sustituciones2;
+  v.paint_handler=replacements1;
+  v.click_handler=replacements2;
   _button(100,v.an/2,v.al-14,1);
 }
 
-void abrir_programa_para_fernando(char *nombre,char *path) {
+void open_program_for_fernando(char *nombre,char *path) {
   char wpath[_MAX_PATH];
   struct tprg * pr;
   FILE *f;
@@ -2954,7 +2954,7 @@ void abrir_programa_para_fernando(char *nombre,char *path) {
             v_prg->lptr=v_prg->buffer;
             pr=v.prg; v.prg=v_prg; read_line(); v.prg=pr;
 
-            nueva_ventana(programa0);
+            nueva_ventana(program0);
 
           } else { free(v_prg); free(buffer); v_texto=(char *)texto[46]; dialogo(err0); }
         } else { free(v_prg); free(buffer); v_texto=(char *)texto[44]; dialogo(err0); }
@@ -2975,7 +2975,7 @@ int lp_ini;       // La primera variable que se visualiza en la ventana
 int lp_select;    // La variable seleccionada
 int lp_sort=0;    // Flag que indica si se ordena la lista
 
-void crear_lista_procesos(char * buffer, int file_lon) {
+void create_process_list(char * buffer, int file_lon) {
   byte * p,* end,*q;
   char cwork[512],cwork2[256];
   int linea=1,n,m;
@@ -3058,7 +3058,7 @@ void crear_lista_procesos(char * buffer, int file_lon) {
 
 }
 
-void pintar_lista_procesos(void) {
+void paint_process_list(void) {
   byte * ptr=v.ptr,*p,*end;
   char cwork[512];
   int an=v.an/big2,al=v.al/big2;
@@ -3076,10 +3076,10 @@ void pintar_lista_procesos(void) {
     p=lp2[m]; n=0; while (*p!=cr && p<end) { cwork[n++]=*p; p++; } cwork[n]=0;
     wwrite_in_box(ptr,an,153+100,al,5,21+(m-lp_ini)*8,0,(byte *)cwork,x);
   }
-  pinta_segmento_procesos();
+  paint_process_segment();
 }
 
-void pinta_segmento_procesos(void) {
+void paint_process_segment(void) {
   byte * ptr=v.ptr;
   int an=v.an/big2,al=v.al/big2;
   int min=27,max=129,n;
@@ -3096,7 +3096,7 @@ void pinta_segmento_procesos(void) {
   wput(ptr,an,al,123+132,n+1,-43);
 }
 
-void lista_procesos1(void) {
+void process_list1(void) {
   byte * ptr=v.ptr;
   int an=v.an/big2,al=v.al/big2;
   _show_items();
@@ -3111,13 +3111,13 @@ void lista_procesos1(void) {
   wput(ptr,an,al,123+132,20,-39); // Boton arriba / abajo (pulsados 41,42)
   wput(ptr,an,al,123+132,174-40,-40);
 
-  crear_lista_procesos((char *)ventana[1].prg->buffer,ventana[1].prg->file_lon);
-  pintar_lista_procesos();
+  create_process_list((char *)ventana[1].prg->buffer,ventana[1].prg->file_lon);
+  paint_process_list();
 }
 
 int lp_boton;
 
-void lista_procesos2(void) {
+void process_list2(void) {
   int n;
   byte * ptr=v.ptr;
   int an=v.an/big2,al=v.al/big2;
@@ -3127,28 +3127,28 @@ void lista_procesos2(void) {
 
   if (scan_code==80 && lp_select+1<lp_num) {
     if (lp_ini+15==++lp_select) lp_ini++;
-    pintar_lista_procesos(); vacia_buffer(); v.volcar=1;
+    paint_process_list(); vacia_buffer(); v.volcar=1;
   }
   if (scan_code==72 && lp_select) {
     if (lp_ini==lp_select--) lp_ini--;
-    pintar_lista_procesos(); vacia_buffer(); v.volcar=1;
+    paint_process_list(); vacia_buffer(); v.volcar=1;
   }
   if (scan_code==81) {
     for (n=0;n<15;n++) if (lp_select+1<lp_num) {
       if (lp_ini+15==++lp_select) lp_ini++;
-    } pintar_lista_procesos(); vacia_buffer(); v.volcar=1;
+    } paint_process_list(); vacia_buffer(); v.volcar=1;
   }
   if (scan_code==73) {
     for (n=0;n<15;n++) if (lp_select) {
       if (lp_ini==lp_select--) lp_ini--;
-    } pintar_lista_procesos(); vacia_buffer(); v.volcar=1;
+    } paint_process_list(); vacia_buffer(); v.volcar=1;
   }
 
   if (wmouse_in(3,21,128+132-9,120) && (mouse_b&1)) {
     n=lp_ini+(wmouse_y-21)/8;
     if (n<lp_num) {
       if (lp_select!=n) {
-        lp_select=n; pintar_lista_procesos(); v.volcar=1;
+        lp_select=n; paint_process_list(); v.volcar=1;
       } else if (!(old_mouse_b&1)) {
         v_aceptar=1; fin_dialogo=1;
       }
@@ -3161,7 +3161,7 @@ void lista_procesos2(void) {
         wput(ptr,an,al,123+132,20,-41); lp_boton=1;
         if (lp_select) {
           if (lp_ini==lp_select--) lp_ini--;
-          pintar_lista_procesos(); v.volcar=1;
+          paint_process_list(); v.volcar=1;
         }
       }
     } else if (lp_boton==1) { wput(ptr,an,al,123+132,20,-39); lp_boton=0; v.volcar=1; }
@@ -3176,7 +3176,7 @@ void lista_procesos2(void) {
       lp_select=x*(lp_num-1);
       if (lp_select<lp_ini) lp_ini=lp_select;
       if (lp_select>=lp_ini+15) lp_ini=lp_select-14;
-      pintar_lista_procesos(); v.volcar=1;
+      paint_process_list(); v.volcar=1;
     }
   }
 
@@ -3186,7 +3186,7 @@ void lista_procesos2(void) {
         wput(ptr,an,al,123+132,94+40,-42); lp_boton=2;
         if (lp_select+1<lp_num) {
           if (lp_ini+15==++lp_select) lp_ini++;
-          pintar_lista_procesos(); v.volcar=1;
+          paint_process_list(); v.volcar=1;
         }
       }
     } else if (lp_boton==2) { wput(ptr,an,al,123+132,94+40,-40); lp_boton=0; v.volcar=1; }
@@ -3197,18 +3197,18 @@ void lista_procesos2(void) {
     case 0: if (lp_num) v_aceptar=1; fin_dialogo=1; break;
     case 1: fin_dialogo=1; break;
     case 2:
-      crear_lista_procesos((char *)ventana[1].prg->buffer,ventana[1].prg->file_lon);
-      pintar_lista_procesos();
+      create_process_list((char *)ventana[1].prg->buffer,ventana[1].prg->file_lon);
+      paint_process_list();
       v.volcar=1; break;
   }
 }
 
-void lista_procesos0(void) {
+void process_list0(void) {
   v.tipo=1; v.titulo=texto[380];
 
   v.an=166+100; v.al=161;
-  v.paint_handler=lista_procesos1;
-  v.click_handler=lista_procesos2;
+  v.paint_handler=process_list1;
+  v.click_handler=process_list2;
 
   _button(100,7,v.al-14,0);
   _button(101,v.an-8,v.al-14,2);
@@ -3241,24 +3241,24 @@ void goto_error(void) {
   if (linea_error>v.prg->num_lineas) { linea_error=v.prg->num_lineas; m=1; }  else m=0;
   if (linea_error<1) linea_error=1;
 
-  f_inicio();
+  f_home();
 
   if (v.prg->linea>linea_error) {
     while (v.prg->linea>linea_error) {
-      write_line(); retrocede_lptr();
-      read_line(); retrocede_vptr();
+      write_line(); retreat_lptr();
+      read_line(); retreat_vptr();
     }
   } else if (v.prg->linea<linea_error) {
     while (v.prg->linea<linea_error) {
-      write_line(); avanza_lptr();
-      read_line(); avanza_vptr();
+      write_line(); advance_lptr();
+      read_line(); advance_vptr();
     }
   }
 
-  if (v.prg->linea<=v.prg->primera_linea) retrocede_vptr();
-  if (v.prg->linea-v.prg->primera_linea>=v.prg->al-1) avanza_vptr();
+  if (v.prg->linea<=v.prg->primera_linea) retreat_vptr();
+  if (v.prg->linea-v.prg->primera_linea>=v.prg->al-1) advance_vptr();
 
-  if (m) f_fin(); else {
+  if (m) f_end(); else {
     v.prg->columna=columna_error;
     if (v.prg->columna-v.prg->primera_columna>=v.prg->an-1) {
       v.prg->primera_columna=v.prg->columna-v.prg->an+2;
@@ -3329,7 +3329,7 @@ void Print_Program(void) {
         return;
       }
 
-      f_cortar_bloque(0);
+      f_cut_block(0);
       v.volcar=2;
 
       buf=(byte *)papelera;

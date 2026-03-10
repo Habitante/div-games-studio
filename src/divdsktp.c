@@ -415,7 +415,7 @@ int UpLoad_Desktop()
 												v_terminado = 1;
 												
 												// load replacement prg							
-												abrir_programa();
+												open_program();
 											}
 										}
                                         break;
@@ -756,9 +756,9 @@ void carga_programa0(void)
   v.titulo=(byte *)v_prg->filename;
   v.nombre=(byte *)v_prg->filename;
 
-  v.paint_handler=programa1;
-  v.click_handler=programa2;
-  v.close_handler=programa3;
+  v.paint_handler=program1;
+  v.click_handler=program2;
+  v.close_handler=program3;
   v.volcar=2;
 
   test_cursor();

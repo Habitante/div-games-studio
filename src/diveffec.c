@@ -410,7 +410,7 @@ int x;
     map_an=exp_ancho;
     map_al=exp_alto;
 
-    if (nuevo_mapa(NULL)) break;
+    if (new_map(NULL)) break;
 
     for(x=0;x<map_an*map_al;x++)
         v.mapa->map[x]=ExpDac[Buff_exp[x]];

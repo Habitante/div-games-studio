@@ -425,7 +425,7 @@ void browser0(void); void browser2(void);
 void MapperWarning0(void); void MapperWarning1(void); void MapperWarning2(void);
 // MapperVisor declarations removed (MODE8/3D map editor deleted)
 
-int nuevo_mapa(byte *mapilla);
+int new_map(byte *mapilla);
 void nuevo_mapa3D(void);
 void RenderToMed();
 void Reducex2();
@@ -451,14 +451,14 @@ int graba_BMP(byte *mapa, FILE *f);
 //      Functions exported by DIVEDIT (divedit.c)
 ///////////////////////////////////////////////////////////////////////////////
 
-void programa0(void);void programa1(void);void programa2(void);void programa3(void);
-void programa0_nuevo(void);
-void guardar_prg(void);
-void abrir_programa(void);
-void buscar_texto0(void);void buscar_texto1(void);void buscar_texto2(void);
-void sustituir_texto0(void);void sustituir_texto1(void);void sustituir_texto2(void);
-void buscar_texto(void);void sustituir_texto(void);
-void repinta_ventana(void);
+void program0(void);void program1(void);void program2(void);void program3(void);
+void program0_new(void);
+void save_program(void);
+void open_program(void);
+void find_text0(void);void find_text1(void);void find_text2(void);
+void replace_text0(void);void replace_text1(void);void replace_text2(void);
+void find_text(void);void replace_text(void);
+void repaint_window(void);
 
 ///////////////////////////////////////////////////////////////////////////////
 //      Functions exported by DIVASM (divasm.c)
@@ -858,8 +858,8 @@ void vacia_buffer(void);
 //      Functions and structures exported by DIVFPG (divfpg.c)
 ///////////////////////////////////////////////////////////////////////////////
 
-int  nuevo_fichero(void);
-void abrir_fichero();
+int  new_file(void);
+void open_file();
 int RemapAllFiles(int vent);
 void SaveFPG(int n);
 void Delete_Taggeds();
@@ -885,9 +885,9 @@ void OpenFont();
 
 // divbrow.c
 
-void crear_listbox(struct t_listbox *l);
-void actualiza_listbox(struct t_listbox *l);
-void pinta_listbox(struct t_listbox *l);
+void create_listbox(struct t_listbox *l);
+void update_listbox(struct t_listbox *l);
+void paint_listbox(struct t_listbox *l);
 
 
 //-----------------------------------------------------------------------------
@@ -983,15 +983,15 @@ void crear_instalacion(void);
 //      Funciones de divedit exportadas
 //-----------------------------------------------------------------------------
 
-void lista_procesos0(void);
+void process_list0(void);
 void f_bop(void);
-void f_inicio(void);
+void f_home(void);
 void write_line(void);
 void read_line(void);
-void retrocede_lptr(void);
-void retrocede_vptr(void);
-void avanza_lptr(void);
-void avanza_vptr(void);
+void retreat_lptr(void);
+void retreat_vptr(void);
+void advance_lptr(void);
+void advance_vptr(void);
 
 extern int lp1[512],lp_select;
 

@@ -47,7 +47,7 @@ struct t_listbox lvgasizes={64+24,22,vgasizes,16,6,80};
 void Vid_Setup1(void) {
 char cWork[10];
   _show_items();
-  crear_listbox(&lvgasizes);
+  create_listbox(&lvgasizes);
   sprintf(cWork,"%dx%d",stvga_an,stvga_al);
 
   wwrite_in_box(v.ptr,v.an/big2,v.an/big2-3,v.al/big2,5   ,12,0,(byte *)marcavga,c1);
@@ -62,7 +62,7 @@ char cWork[10];
 void Vid_Setup2(void) {
 int need_refresh=0;
   _process_items();
-  actualiza_listbox(&lvgasizes);
+  update_listbox(&lvgasizes);
 
   switch(v.active_item)
   {
@@ -785,7 +785,7 @@ void Cfg_Setup_end(void) {
   int i;
 
   for (i=0,n=0;n<max_windows;n++) {
-    if (ventana[n].click_handler==(voidReturnType)programa2) i++;
+    if (ventana[n].click_handler==(voidReturnType)program2) i++;
   }
 
   if (i>24 || !v_aceptar) editor_font=old_editor_font;
@@ -863,7 +863,7 @@ void Cfg_Setup_end(void) {
       } if (n==max_windows) help_item=0;
       i=0; do {
         found=0;
-        for (n=max_windows-1;n>=0;n--) if (ventana[n].click_handler==(voidReturnType)programa2) {
+        for (n=max_windows-1;n>=0;n--) if (ventana[n].click_handler==(voidReturnType)program2) {
           memcpy(&vp[i].tipo,&ventana[n].tipo,sizeof(struct tventana)); i++;
           ventana[n].close_handler=(voidReturnType)dummy_handler;
           move(0,n); cierra_ventana();
@@ -957,9 +957,9 @@ void resize_program(void) {
 
   v.titulo=(byte *)v_prg->filename;
   v.nombre=(byte *)v_prg->filename;
-  v.paint_handler=(voidReturnType)programa1;
-  v.click_handler=(voidReturnType)programa2;
-  v.close_handler=(voidReturnType)programa3;
+  v.paint_handler=(voidReturnType)program1;
+  v.click_handler=(voidReturnType)program2;
+  v.close_handler=(voidReturnType)program3;
   v.volcar=2;
   test_cursor();
 }

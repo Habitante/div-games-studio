@@ -57,21 +57,21 @@ void mixer1(void)
   lvol_cd.creada = 0; lvol_cd.maximo = 20;
   lvol_ma.creada = 0; lvol_ma.maximo = 20;
 
-  crear_listbox(&lvol_fx);
-  crear_listbox(&lvol_cd);
-  crear_listbox(&lvol_ma);
+  create_listbox(&lvol_fx);
+  create_listbox(&lvol_cd);
+  create_listbox(&lvol_ma);
 
   lvol_fx.inicial = 15-Setupfile.vol_fx;
   lvol_cd.inicial = 15-Setupfile.vol_cd;
   lvol_ma.inicial = 15-Setupfile.vol_ma;
 
-  crear_listbox(&lvol_fx);
-  crear_listbox(&lvol_cd);
-  crear_listbox(&lvol_ma);
+  create_listbox(&lvol_fx);
+  create_listbox(&lvol_cd);
+  create_listbox(&lvol_ma);
 
-  actualiza_listbox(&lvol_fx);
-  actualiza_listbox(&lvol_cd);
-  actualiza_listbox(&lvol_ma);
+  update_listbox(&lvol_fx);
+  update_listbox(&lvol_cd);
+  update_listbox(&lvol_ma);
 
   wrectangle(v.ptr, an, al, c0, MIX_BAR1-4, 56, 17, 17);
   wrectangle(v.ptr, an, al, c0, MIX_BAR2-4, 56, 17, 17);
@@ -92,9 +92,9 @@ void mixer2(void)
   _process_items();
 
   v_pausa=1;
-  actualiza_listbox(&lvol_fx);
-  actualiza_listbox(&lvol_cd);
-  actualiza_listbox(&lvol_ma);
+  update_listbox(&lvol_fx);
+  update_listbox(&lvol_cd);
+  update_listbox(&lvol_ma);
   v_pausa=0;
 
   if(mouse_b && lvol_fx.zona==4)

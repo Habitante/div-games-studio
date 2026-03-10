@@ -14,7 +14,7 @@ int debug_active=1;             // Si esta variable se pone a 0, no se podrá
 //--------------------------------------------------------------------------
 
 void err0(void);
-void lista_procesos0(void);
+void process_list0(void);
 void profile0(void);
 byte * get_offset_byte(int m);
 word * get_offset_word(int m);
@@ -91,12 +91,12 @@ void determina_codigo(void);
 void f_abajo(void);
 void pinta_codigo(void) ;
 void f_arriba(void);
-void f_inicio(void);
+void f_home(void);
 void f_derecha(void) ;
 void f_izquierda(void);
 int get_ip(int n) ;
 void get_line(int n);
-void pinta_segmento_procesos(void);
+void paint_process_segment(void);
 void pinta_segmento_profile(void);
 
 
@@ -549,7 +549,7 @@ void dialogo(voidReturnType init_handler) {
 //      Repinta una ventana (incluyendo barra e iconos)
 //-----------------------------------------------------------------------------
 
-void repinta_ventana(void) {
+void repaint_window(void) {
   int an=v.an,al=v.al;
   if (big) { an/=2; al/=2; }
 
@@ -3560,7 +3560,7 @@ byte * change_mode(void) {
   if (v.x<0) { v.x=0; } if (v.y<0) { v.y=0; }
   if (v.x+v.an>vga_an) v.x=vga_an-v.an;
   if (v.y+v.al>vga_al) v.y=vga_al-v.al;
-  repinta_ventana(); call(v.paint_handler);
+  repaint_window(); call(v.paint_handler);
   v.volcar=1; volcado_completo=1;
   return(v.ptr);
 }
@@ -3592,7 +3592,7 @@ void debug2(void) {
       pinta_codigo(); vacia_buffer(); v.volcar=1;
     }
     if (scan_code==71) {
-      f_inicio(); pinta_codigo(); vacia_buffer(); v.volcar=1;
+      f_home(); pinta_codigo(); vacia_buffer(); v.volcar=1;
     }
     if (scan_code==77) {
       f_derecha(); pinta_codigo(); vacia_buffer(); v.volcar=1;
@@ -3706,7 +3706,7 @@ void debug2(void) {
       } while (ide);
       if (call_to_debug) {
         volcado_completo=1; call_to_debug=0;
-        if (new_palette) { new_palette=0; repinta_ventana(); }
+        if (new_palette) { new_palette=0; repaint_window(); }
         break;
       }
       if (procesos) {
@@ -3729,7 +3729,7 @@ void debug2(void) {
           if (ids_ini<0) ids_ini=0;
           pinta_lista_proc();
           determina_codigo();
-        } if (new_palette) { new_palette=0; repinta_ventana(); }
+        } if (new_palette) { new_palette=0; repaint_window(); }
         dread_mouse(); _process_items();
         v.volcar=1; volcado_completo=1;
         if (no_volcar_nada) dialogo(profile0);
@@ -3737,7 +3737,7 @@ void debug2(void) {
       break;
     case 1: // Goto
       goto_proc:
-      dialogo(lista_procesos0);
+      dialogo(process_list0);
       //int linea0;     // Número de línea inicial de la ventana del debugger
       //byte * plinea0; // Puntero a la primera línea de la ventana del debugger
       //int linea_sel; // Nº de línea seleccionada
@@ -3783,7 +3783,7 @@ void debug2(void) {
           } while(ide && ((ip>=mem1 && ip<=mem2) || mem[ip]==lasp || mem[ip]==lasiasp || mem[ip]==lcarasiasp || mem[ip]==lfunasp));
           if (call_to_debug) {
             volcado_completo=1; call_to_debug=0;
-            if (new_palette) { new_palette=0; repinta_ventana(); }
+            if (new_palette) { new_palette=0; repaint_window(); }
             break;
           }
           breakpoint[n].line=breakpoint[n].code;
@@ -3802,7 +3802,7 @@ void debug2(void) {
       } while(ide && ((ip>=mem1 && ip<=mem2) || mem[ip]==lasp || mem[ip]==lasiasp || mem[ip]==lcarasiasp || mem[ip]==lfunasp));
       if (call_to_debug) {
         volcado_completo=1; call_to_debug=0;
-        if (new_palette) { new_palette=0; repinta_ventana(); }
+        if (new_palette) { new_palette=0; repaint_window(); }
         break;
       }
       if (procesos) {
@@ -3820,7 +3820,7 @@ void debug2(void) {
           memcpy(copia_debug,copia,vga_an*vga_al);
           volcado_completo=1;
         } else if (new_palette) set_dac();
-        if (new_palette) { new_palette=0; repinta_ventana(); }
+        if (new_palette) { new_palette=0; repaint_window(); }
         ids_old=-1; call(v.paint_handler); v.volcar=1;
       } else fin_dialogo=1;
       break;
@@ -3856,7 +3856,7 @@ void debug2(void) {
       } while(ide && ((ip>=mem1 && ip<=mem2) || mem[ip]==lasp || mem[ip]==lasiasp || mem[ip]==lcarasiasp || mem[ip]==lfunasp || process_level>0));
       if (call_to_debug) {
         volcado_completo=1; call_to_debug=0;
-        if (new_palette) { new_palette=0; repinta_ventana(); }
+        if (new_palette) { new_palette=0; repaint_window(); }
         break;
       }
       if (procesos) {
@@ -3874,7 +3874,7 @@ void debug2(void) {
           memcpy(copia_debug,copia,vga_an*vga_al);
           volcado_completo=1;
         } else if (new_palette) set_dac();
-        if (new_palette) { new_palette=0; repinta_ventana(); }
+        if (new_palette) { new_palette=0; repaint_window(); }
         ids_old=-1; call(v.paint_handler); v.volcar=1;
       } else fin_dialogo=1;
       break;
@@ -3895,7 +3895,7 @@ void debug2(void) {
       if (call_to_debug) {
         call(v.paint_handler); v.volcar=1;
         volcado_completo=1; call_to_debug=0;
-        if (new_palette) { new_palette=0; repinta_ventana(); }
+        if (new_palette) { new_palette=0; repaint_window(); }
       }
       if (procesos) {
         if (procesos_ejecutados()) {
@@ -3912,7 +3912,7 @@ void debug2(void) {
           memcpy(copia_debug,copia,vga_an*vga_al);
           volcado_completo=1;
         } else if (new_palette) set_dac();
-        if (new_palette) { new_palette=0; repinta_ventana(); }
+        if (new_palette) { new_palette=0; repaint_window(); }
         ids_old=-1; call(v.paint_handler); v.volcar=1;
       } else fin_dialogo=1;
       break;
@@ -4046,7 +4046,7 @@ void pinta_codigo(void) { // Pinta el código
   }
 }
 
-void f_inicio(void) {
+void f_home(void) {
   x_inicio=54;
 }
 
@@ -4087,7 +4087,7 @@ void f_abajo(void) {
 
 extern byte strlower[256];
 
-void crear_lista_procesos(void) {
+void create_process_list(void) {
   byte *p,*q;
   char cwork[512];
   int linea=0,n;
@@ -4137,7 +4137,7 @@ void crear_lista_procesos(void) {
 
 }
 
-void pintar_lista_procesos(void) {
+void paint_process_list(void) {
   byte * ptr=v.ptr,*p;
   char cwork[512];
   int an=v.an/big2,al=v.al/big2;
@@ -4153,10 +4153,10 @@ void pintar_lista_procesos(void) {
     p=(byte *)lp2[m]; n=0; while (*p && p<end_source) { cwork[n++]=*p; p++; } cwork[n]=0;
     wwrite_in_box(ptr,an,153,al,5,21+(m-lp_ini)*8,0,(byte *)cwork,x);
   }
-  pinta_segmento_procesos();
+  paint_process_segment();
 }
 
-void pinta_segmento_procesos(void) {
+void paint_process_segment(void) {
   byte * ptr=v.ptr;
   int an=v.an/big2,al=v.al/big2;
   int min=27,max=129,n;
@@ -4173,7 +4173,7 @@ void pinta_segmento_procesos(void) {
   wput(ptr,an,al,123+32,n+1,-43);
 }
 
-void lista_procesos1(void) {
+void process_list1(void) {
   byte * ptr=v.ptr;
   int an=v.an/big2,al=v.al/big2;
   _show_items();
@@ -4188,13 +4188,13 @@ void lista_procesos1(void) {
   wput(ptr,an,al,123+32,20,-39); // Boton arriba / abajo (pulsados 41,42)
   wput(ptr,an,al,123+32,174-40,-40);
 
-  crear_lista_procesos();
-  pintar_lista_procesos();
+  create_process_list();
+  paint_process_list();
 }
 
 int lp_boton;
 
-void lista_procesos2(void) {
+void process_list2(void) {
   int n;
   byte * ptr=v.ptr;
   int an=v.an/big2,al=v.al/big2;
@@ -4204,28 +4204,28 @@ void lista_procesos2(void) {
 
   if (scan_code==80 && lp_select+1<lp_num) {
     if (lp_ini+15==++lp_select) lp_ini++;
-    pintar_lista_procesos(); vacia_buffer(); v.volcar=1;
+    paint_process_list(); vacia_buffer(); v.volcar=1;
   }
   if (scan_code==72 && lp_select) {
     if (lp_ini==lp_select--) lp_ini--;
-    pintar_lista_procesos(); vacia_buffer(); v.volcar=1;
+    paint_process_list(); vacia_buffer(); v.volcar=1;
   }
   if (scan_code==81) {
     for (n=0;n<15;n++) if (lp_select+1<lp_num) {
       if (lp_ini+15==++lp_select) lp_ini++;
-    } pintar_lista_procesos(); vacia_buffer(); v.volcar=1;
+    } paint_process_list(); vacia_buffer(); v.volcar=1;
   }
   if (scan_code==73) {
     for (n=0;n<15;n++) if (lp_select) {
       if (lp_ini==lp_select--) lp_ini--;
-    } pintar_lista_procesos(); vacia_buffer(); v.volcar=1;
+    } paint_process_list(); vacia_buffer(); v.volcar=1;
   }
 
   if (wmouse_in(3,21,128+32-9,120) && (mouse_b&1)) {
     n=lp_ini+(wmouse_y-21)/8;
     if (n<lp_num) {
       if (lp_select!=n) {
-        lp_select=n; pintar_lista_procesos(); v.volcar=1;
+        lp_select=n; paint_process_list(); v.volcar=1;
       } else if (!(old_mouse_b&1)) {
         v_aceptar=1; fin_dialogo=1;
       }
@@ -4238,7 +4238,7 @@ void lista_procesos2(void) {
         wput(ptr,an,al,123+32,20,-41); lp_boton=1;
         if (lp_select) {
           if (lp_ini==lp_select--) lp_ini--;
-          pintar_lista_procesos(); v.volcar=1;
+          paint_process_list(); v.volcar=1;
         }
       }
     } else if (lp_boton==1) { wput(ptr,an,al,123+32,20,-39); lp_boton=0; v.volcar=1; }
@@ -4253,7 +4253,7 @@ void lista_procesos2(void) {
       lp_select=x*(lp_num-1);
       if (lp_select<lp_ini) lp_ini=lp_select;
       if (lp_select>=lp_ini+15) lp_ini=lp_select-14;
-      pintar_lista_procesos(); v.volcar=1;
+      paint_process_list(); v.volcar=1;
     }
   }
 
@@ -4263,7 +4263,7 @@ void lista_procesos2(void) {
         wput(ptr,an,al,123+32,94+40,-42); lp_boton=2;
         if (lp_select+1<lp_num) {
           if (lp_ini+15==++lp_select) lp_ini++;
-          pintar_lista_procesos(); v.volcar=1;
+          paint_process_list(); v.volcar=1;
         }
       }
     } else if (lp_boton==2) { wput(ptr,an,al,123+32,94+40,-40); lp_boton=0; v.volcar=1; }
@@ -4274,18 +4274,18 @@ void lista_procesos2(void) {
     case 0: if (lp_num) v_aceptar=1; fin_dialogo=1; break;
     case 1: fin_dialogo=1; break;
     case 2:
-      crear_lista_procesos();
-      pintar_lista_procesos();
+      create_process_list();
+      paint_process_list();
       v.volcar=1; break;
   }
 }
 
-void lista_procesos0(void) {
+void process_list0(void) {
   v.tipo=1; v.titulo=text[75];
 
   v.an=166; v.al=161;
-  v.paint_handler=lista_procesos1;
-  v.click_handler=lista_procesos2;
+  v.paint_handler=process_list1;
+  v.click_handler=process_list2;
 
   _button(text[7],7,v.al-14,0);
   _button(text[58],v.an-8,v.al-14,2);

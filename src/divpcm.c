@@ -55,7 +55,7 @@ void wline                  (char *ptr,int realan,int an,int al,int x0, int y0, 
 void linea_pixel            (char * ptr, int an, int realan, int al, int x, int y, char color);
 
 void set_mixer(void);
-int  determina_pcm(void);
+int  find_pcm_window(void);
 
 char SoundName[255];
 char SoundPathName[256];
