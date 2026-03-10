@@ -30,15 +30,15 @@ confirm zero warnings. Current baseline: **0 warnings** (Sprint A completed 2026
 
 ---
 
-## Recommended next session: Sprint G (rename Spanish globals + struct fields)
+## Recommended next session: Sprint H (translate Spanish comments to English)
 
-**All naming sprints complete so far:** Sprint D (single-letter globals), Sprint F (331 function renames).
-The next natural step is renaming the 59 Spanish-named global variables and ~30 Spanish
-struct field names. These identifiers flow through the entire codebase and are the biggest
-remaining readability barrier after functions.
+**All naming sprints complete so far:** Sprint D (single-letter globals), Sprint F (331
+function renames), Sprint G (~131 global + struct field renames). The identifiers are now
+largely English. The biggest remaining readability barrier is the ~3,663 lines of Spanish
+comments across 47 files.
 
-**After Sprint G:** Sprint H (translate Spanish comments), Sprint E (unsafe strings),
-Sprint I (file splitting).
+**After Sprint H:** Sprint E (unsafe strings), Sprint I (file splitting), then the
+deferred high-occurrence renames (copia, ventana, texto).
 
 ---
 
@@ -62,22 +62,13 @@ Completed: 47 OJO markers resolved across the entire codebase (0 remaining).
 ### Sprint C: English comments on top 22 functions ✅ DONE (2026-03-10)
 
 Completed: 22 key functions documented with English comment blocks.
-Corrections: `get_token()`→`lexico()`, `make_ghost()`→`crear_ghost()`,
-`editar()`→`editor()`, `menu_click()`→`menu_principal2()` (in divhandl.c).
-`insertar_nombre()` doesn't exist standalone — logic inline in `lexico()`.
 
 ---
 
 ### Sprint D: Rename the `r,g,b,c,d,a` generic globals ✅ DONE (2026-03-10)
 
 Completed: All 7 single-letter globals removed from global.h (r,g,b,c,d,a + FILE *f).
-- `FILE *f`: 8 functions needed local declarations added (all others already had them)
-- `int a`: 13 functions (2 in div.c/divbasic.c, 11 in divpaint.c)
-- `int d`: 1 function (mab_aclarar in divpaint.c)
-- `int c`: 5 functions across 3 files
-- `int r,g,b`: all usages confined to divpalet.c — converted to file-static variables
-  (palette functions communicate r,g,b as implicit params between callees)
-- 11 files changed, zero warnings, all 4 targets build clean.
+11 files changed, zero warnings, all 4 targets build clean.
 
 ---
 
@@ -118,120 +109,37 @@ Completed: 331 function renames across 4 batches (22 files, touching 39+ files t
 
 ---
 
-### Sprint G: Rename Spanish globals + struct fields
+### Sprint G: Rename Spanish globals + struct fields ✅ DONE (2026-03-10)
 
-**Goal:** Translate the 59 Spanish-named global variables in `global.h` and ~30 Spanish
-struct field names across 8 major structs to English. This is the natural continuation
-of Sprint F (functions → globals → fields).
+Completed: ~131 identifier renames across 8 batches, 44 files, ~6,900 line changes.
 
-**Part 1 — Global variables** (~59 renames, touches 30-40 files)
+**Part 1 — Global variables (~98 renames):**
+- Width/height: `vga_an`→`vga_width`, `map_an`→`map_width`, `font_an`→`font_width`,
+  `tapiz_an`→`wallpaper_width`, `barra_an`→`toolbar_width`, etc.
+- Wallpaper: `tapiz`→`wallpaper`, `mapa_tapiz`→`wallpaper_map`
+- Modes: `modo_caja`→`mode_rect`, `modo`→`draw_mode`, `volcado_completo`→`full_redraw`
+- Control: `salir_del_entorno`→`exit_requested`, `fin_dialogo`→`end_dialog`
+- Palette: `reglas`→`gradients`, `regla`→`gradient`, `cuad`→`color_lookup`
+- Zoom: `zx`→`zoom_win_x`, `hacer_zoom`→`need_zoom`
+- Selection: `mab`→`selection_mask` + all compounds
+- Dialog: all `v_titulo`→`v_title`, `v_texto`→`v_text`, etc.
+- Misc: `ejecutar_programa`→`run_mode`, `barra`→`toolbar`, `mascara`→`file_mask`, etc.
 
-These are declared as `GLOBAL_DATA` in `global.h` and referenced throughout the codebase.
+**Part 2 — Struct fields (~33 renames):**
+- `tprg`: `linea`→`line`, `columna`→`column`, `num_lineas`→`num_lines`, etc.
+- `tmapa`: `codigo`→`code`, `Codigo`→`fpg_code`, `descripcion`→`description`
+- `tventana`: `tipo`→`type`, `volcar`→`redraw`, `titulo`→`title`, etc.
+- `t_listbox`: `lista`→`list`, `maximo`→`total_items`, `zona`→`zone`, etc.
+- `tipo_regla`: `numcol`→`num_colors`, `col`→`colors`
+- `tipo_undo`: `modo`→`mode`; `ttipo`: `defecto`→`default_choice`
 
-| Spanish global | → English | Notes |
-|----------------|-----------|-------|
-| `vga_an` | `vga_width` | VGA mode width |
-| `vga_al` | `vga_height` | VGA mode height |
-| `map_an` | `map_width` | current map width |
-| `map_al` | `map_height` | current map height |
-| `tapiz_an` | `wallpaper_width` | desktop background width |
-| `tapiz_al` | `wallpaper_height` | desktop background height |
-| `font_an` | `font_width` | font character width |
-| `font_al` | `font_height` | font character height |
-| `editor_font_an` | `editor_font_width` | editor font char width |
-| `editor_font_al` | `editor_font_height` | editor font char height |
-| `barra_an` | `toolbar_width` | toolbar width |
-| `barra_x` | `toolbar_x` | toolbar x position |
-| `barra_y` | `toolbar_y` | toolbar y position |
-| `tapiz` | `wallpaper` | desktop background bitmap |
-| `mapa_tapiz` | `wallpaper_map` | wallpaper tile map |
-| `copia` | `screen_copy` | virtual screen copy |
-| `mab` | `selection_mask` | bitmap mask for selection |
-| `ghost` | `ghost` | keep — already English |
-| `dac` | `palette` | check collision with existing |
-| `dac4` | `palette4` | check collision |
-| `cuad` | `color_lookup` | squared-difference palette table |
-| `reglas[]` | `gradients[]` | color gradient array |
-| `regla` | `gradient` | current gradient index |
-| `near_regla` | `nearest_gradient` | nearest color lookup |
-| `undo` | `undo` | keep — already English |
-| `volcado_completo` | `full_redraw` | flag: full screen redraw needed |
-| `siguiente_orden` | `next_order` | next window z-order |
-| `modo_de_retorno` | `return_mode` | return mode flag |
-| `modo_caja` | `mode_rect` | rectangle drawing mode |
-| `modo_circulo` | `mode_circle` | circle drawing mode |
-| `modo_fill` | `mode_fill` | keep — already English |
-| `modo_seleccion` | `mode_selection` | selection mode flag |
-| `zoom_background` | `zoom_background` | keep — already English |
-| `old_mouse_b` | `prev_mouse_buttons` | previous mouse button state |
-| `fondo_raton` | `mouse_background` | mouse background buffer |
-| `max_undos` | `max_undos` | keep — already English |
-| `undo_memory` | `undo_memory` | keep — already English |
-| `tundo` | `undo_table` | undo table struct |
-| `iundo` | `undo_index` | undo index |
-| `zx`, `zy`, `zan`, `zal` | `zoom_x`, `zoom_y`, `zoom_width`, `zoom_height` | zoom window |
+**Collisions handled:** `gradient` vs `dither_pattern`, `total_items` (not `max_items`),
+`fpg_code` (not `code`). **Kept as-is:** `dac`/`dac4` (VGA DAC term, `palette` collision).
 
-NOTE: Some globals above (ghost, undo, max_undos, etc.) are already English — skip those.
-Check for name collisions before each rename (grep the target name first).
-The `dac`/`dac4` renames need careful collision analysis — `palette` may already exist.
-
-**Part 2 — Struct field names** (~30 renames across 8 structs, touches 35+ files)
-
-| Struct | Field | → English | Notes |
-|--------|-------|-----------|-------|
-| `tprg` | `linea` | `line` | current line |
-| `tprg` | `columna` | `column` | current column |
-| `tprg` | `num_lineas` | `num_lines` | line count |
-| `tprg` | `linea_vieja` | `prev_line` | previous line |
-| `tprg` | `primera_linea` | `first_line` | first visible line |
-| `tprg` | `primera_columna` | `first_column` | first visible column |
-| `tprg` | `buffer_lon` | `buffer_len` | buffer length |
-| `tprg` | `file_lon` | `file_len` | file length |
-| `tmapa` | `map_an` | `map_width` | map width |
-| `tmapa` | `map_al` | `map_height` | map height |
-| `tmapa` | `codigo` | `code` | map identifier code |
-| `tmapa` | `Codigo` | `fpg_code` | FPG code |
-| `tmapa` | `descripcion` | `description` | map description |
-| `tmapa` | `grabado` | `saved` | saved-to-disk flag |
-| `tventana` | `tipo` | `type` | window type |
-| `tventana` | `orden` | `order` | z-order |
-| `tventana` | `primer_plano` | `foreground` | foreground flag |
-| `tventana` | `nombre` | `name` | icon name |
-| `tventana` | `titulo` | `title` | window title |
-| `tventana` | `estado` | `state` | button/item state |
-| `tventana` | `botones` | `buttons` | pressed buttons |
-| `tventana` | `volcar` | `redraw` | needs-redraw flag |
-| `t_listbox` | `lista` | `list` | list pointer |
-| `t_listbox` | `lista_an` | `item_width` | item width |
-| `t_listbox` | `lista_al` | `visible_items` | visible item count |
-| `t_listbox` | `inicial` | `first_visible` | first visible index |
-| `t_listbox` | `maximo` | `max_items` | total item count |
-| `t_listbox` | `zona` | `zone` | selected zone |
-| `t_listbox` | `botones` | `buttons` | up/down pressed |
-| `t_listbox` | `creada` | `created` | created flag |
-| `tipo_regla` | `numcol` | `num_colors` | number of colors |
-| `tipo_regla` | `tipo` | `type` | gradient type |
-| `tipo_regla` | `fijo` | `fixed` | fixed flag |
-| `tipo_regla` | `col[33]` | `colors[33]` | color array |
-| `tipo_undo` | `codigo` | `code` | map identifier |
-| `tipo_undo` | `modo` | `mode` | entry mode |
-| `ttipo` | `defecto` | `default_choice` | default selection |
-
-**Collision warnings:**
-- `tprg.linea` → `line` — very common word; grep carefully for false positives
-- `tmapa.codigo` / `tipo_undo.codigo` → `code` — same concern
-- `tventana.tipo` / `tipo_regla.tipo` → `type` — these are struct fields so scope is limited
-- Struct field renames are safer than globals (no global namespace collision possible)
-
-**Rules (same as Sprint F plus):**
-- Rename the declaration in the struct/global AND all access sites project-wide
-- For struct fields, search `structvar.fieldname` and `ptr->fieldname` patterns
-- For globals, search the bare name (they're accessed directly)
-- Be very careful with short names like `an`, `al` — they may appear as substrings
-  (e.g., `man`, `plan`, `canal`). Use word-boundary-aware search.
-- Build after each batch to confirm nothing broke
-- Do globals first (Part 1), then struct fields (Part 2)
-- Batch by struct or by naming pattern (all `*_an`/`*_al` → `*_width`/`*_height` together)
+**Deferred (high-occurrence, need special handling):**
+- `copia` (375 occurrences — also used as function parameter name in divwindo.c)
+- `ventana` (619 occurrences across 26 files — the window array)
+- `texto` (905 occurrences across 37 files — UI text array)
 
 ---
 
@@ -280,6 +188,26 @@ architecture docs.
 
 ---
 
+### Sprint J: Rename deferred high-occurrence globals
+
+**Goal:** Rename the 3 Spanish globals deferred from Sprint G due to their high
+occurrence counts and entanglement with function parameters.
+
+| Global | Occurrences | Challenge |
+|--------|-------------|-----------|
+| `copia` → `screen_copy` | 375 across 22 files | Also used as parameter name in divwindo.c functions (`byte *copia`) — need to rename params too, plus `an_copia`/`al_copia` |
+| `ventana` → `windows` | 619 across 26 files | The window array. `#define v ventana[0]` must update too. Pervasive. |
+| `texto` → `texts` | 905 across 37 files | UI string array. Also used as struct field in `t_item.button.texto` etc. |
+
+**Rules:**
+- For `copia`: also rename `copia_surface`→`screen_copy_surface`, and the function
+  parameter `byte *copia` in divwindo.c to `byte *dest` (it's a destination buffer)
+- For `ventana`: update `#define v ventana[0]` → `#define v windows[0]`
+- For `texto`: rename struct fields `t_item.button.texto` etc. too
+- Each rename is one batch — build after each
+
+---
+
 ## Agent team methodology
 
 For any sprint, use parallel agents where possible:
@@ -291,7 +219,7 @@ Agent 3: File C (read → modify → build-verify)
 ```
 
 **Independence rule:** Two agents can work in parallel ONLY if they modify different
-files. If a rename touches multiple files (Sprint D, F), it must be done sequentially
+files. If a rename touches multiple files (Sprint D, F, G), it must be done sequentially
 or by a single agent.
 
 **Context loading:** Each agent should read:
@@ -310,5 +238,5 @@ or by a single agent.
 4. **32-bit only.** `sizeof(int) == sizeof(void*)`. Don't introduce 64-bit assumptions.
 5. **UTF-8 source files.** All source files are UTF-8. Use `\xNN` for high bytes in
    string/char literals (lookup tables, font data).
-6. **No new files** unless splitting a large file (Sprint G, future).
+6. **No new files** unless splitting a large file (Sprint I).
 7. **Commit after each sprint** with a descriptive message.
