@@ -127,7 +127,7 @@ void clexico(void) {
 
     case l_cr :
       if ((*++_source)==lf) _source++;
-      cpieza=p_ultima; break; // eol/eof OJO!!! esto es DIVPRO
+      cpieza=p_ultima; break; // NOTE: EOL/EOF handling inherited from DIV Professional
 
     case l_id :
       if (iscoment>0) { cpieza=p_rem; _source++; break; }

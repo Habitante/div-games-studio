@@ -320,7 +320,7 @@ SDL_ShowCursor(SDL_DISABLE);
     default: error=1; break;
   }
 
-  // OJO!, esto provoca que, en equipos sin VESA, se vea en "320x200 BIG"
+  // Fallback: on systems without VESA, force 320x200 mode
   
   if (error) {
     modovesa=0;
@@ -390,6 +390,10 @@ void rvmode(void) {
 //-----------------------------------------------------------------------------
 //      Dump buffer to VGA
 //-----------------------------------------------------------------------------
+/* Blit the 8-bit paletted framebuffer (p) to the SDL2 display surface (vga).
+ * Copies row-by-row to handle pitch differences, then calls OSDEP_Flip()
+ * which converts 8-bit->32-bit via palette and presents to screen.
+ */
 void volcadosdl(byte *p) {
 
 	if(SDL_MUSTLOCK(vga))
@@ -929,6 +933,11 @@ void init_ghost(void) {
 int rr,gg,bb;
 int num_puntos;
 
+/* Build the 256x256 ghost (transparency) lookup table. For every pair of
+ * palette indices (n, m), ghost[n*256+m] = the palette index closest to
+ * the average of colors n and m, producing a 50% alpha-blend effect.
+ * Uses a voxel-cube spatial index for fast nearest-color search.
+ */
 void crear_ghost(void) {
 
   int n,m;

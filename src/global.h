@@ -55,7 +55,7 @@ void call(const voidReturnType func); // void funcion(void); int n=(int)funcion;
 #include "divkeybo.h"
 // divmap3d.hpp removed (MODE8/3D map editor deleted)
 
-  // OJO !!! JUDAS !!!
+  // NOTE: Originally from JUDAS sound library, now uses SDL2_mixer
 #include "judas/judas.h"
 #include "judas/timer.h"
 
@@ -498,7 +498,7 @@ GLOBAL_DATA byte * dac4; // Paleta con rangos 0..255
 
 GLOBAL_DATA word mab_x0,mab_x1,mab_y0,mab_y1; // Límites de la zona seleccionada en mab
 
-GLOBAL_DATA int r,g,b,c,d,a; // Contadores genéricos OJO! Quitarlos
+GLOBAL_DATA int r,g,b,c,d,a; // TODO(Sprint D): Replace these generic single-letter globals with properly named local variables
 GLOBAL_DATA FILE * f;        // Handle genérico de fichero
 
 GLOBAL_DATA byte c0,c1,c2,c3,c4,text_color; // Colores del entorno

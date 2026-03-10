@@ -185,7 +185,7 @@ void fondo_edicion(int x,int y,int an,int al) {
 
   volcado_parcial(x,y,an,al);
 
-  // Repone el fondo del sistema de ventanas, OJO *** mejorar actualiza_caja();
+  // TODO: Improve actualiza_caja() for better window background repaint
 
   if (zx || zy) if (x<zx || y<zy || x+an>zx+zan || y+al>zy+zal) actualiza_caja(x,y,an,al);
 
@@ -726,7 +726,7 @@ void draw_selection_mab(void) {
   x1=zoom_x+(zan>>zoom)-1; if (mab_x1<x1) x1=mab_x1;
   y1=zoom_y+(zal>>zoom)-1; if (mab_y1<y1) y1=mab_y1;
 
-  // OJO !!!
+  // NOTE: Old direct-pointer calculation replaced by the per-zoom switch below
   // p=copia+(zy+((y0-zoom_y)<<zoom))*vga_an+zx+((x0-zoom_x)<<zoom);
 
   if (x1>=x0 && y1>=y0) switch(zoom) {

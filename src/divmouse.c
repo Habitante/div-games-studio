@@ -369,6 +369,10 @@ void PrintEvent(const SDL_Event * event)
     }
 }
 
+/* Main event pump: polls all SDL events and updates input state.
+ * Processes mouse motion/buttons, keyboard scancodes, joystick axes,
+ * text input, mouse wheel, window events, and quit requests.
+ */
 void read_mouse2(void) {
 
 	scan_code  =0;
@@ -546,9 +550,10 @@ while(SDL_PollEvent(&event) )
 			barra=NULL;
 		}
 			
-		barra=(byte*)malloc(vga_an*19*big2); //OJO
+		barra=(byte*)malloc(vga_an*19*big2);
+		if (!barra) return;
 		barra_x=8*big2; barra_y=vga_al-27*big2; regla=0; actual_mouse=21; sel_status=0;
-		
+
 		copia=(byte*)malloc(vga_an*vga_al+6)+6;
 		svmode();
 		preparar_tapiz();

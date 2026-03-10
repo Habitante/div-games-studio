@@ -1122,7 +1122,7 @@ return (0);
 //-----------------------------------------------------------------------------
 
 // Quita de dac4 los colores no usados en el mapa
-// OJO, quien llame a esta funcion debe guardar y restaurar "paleta_original"
+// WARNING: Caller must save and restore 'paleta_original' before/after calling this function
 
 void quitar_colores(byte * buffer,int len) {
   byte pal[256],*fin;

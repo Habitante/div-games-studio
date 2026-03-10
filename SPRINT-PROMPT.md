@@ -30,13 +30,16 @@ confirm zero warnings. Current baseline: **0 warnings** (Sprint A completed 2026
 
 ---
 
-## Recommended next session: Sprint B + C (parallel)
+## Recommended next session: Sprint D + F (sequential, start small)
 
-**Sprint B** (OJO markers) and **Sprint C** (English comments) can run together:
-- C is comments-only (zero risk), B is minimal fixes — no file conflicts
-- Both build context that makes Sprint D (globals) and F (renames) safer later
-- After B+C, do Sprint D (globals) then F (renames, starting small)
-- Sprint E (unsafe strings) can slot in anywhere as a parallel track
+**Sprint D** (rename `r,g,b,c,d,a` globals) then **Sprint F** (Spanish→English function names):
+- D first: removes the worst globals, one at a time. Medium-high difficulty — `r`,`g`,`b`
+  are tricky because they're used both as generic counters AND as red/green/blue in palette code.
+- F second: start with small isolated files (divclock.c, divbrush.c, divbasic.c) to
+  establish the rename pattern, then work up to larger files.
+- Sprint E (unsafe strings) can slot in anywhere as a parallel track.
+- D is sequential (each global touches many files). F can be parallelized per-file
+  only if the file's functions have no cross-file call sites being renamed.
 
 ---
 
@@ -49,62 +52,20 @@ No behavioral changes. Build is fully warning-clean.
 
 ---
 
-### Sprint B: Resolve all 27 OJO markers
+### Sprint B: Resolve all OJO markers ✅ DONE (2026-03-10)
 
-**Goal:** Address every "OJO" (watch-out) comment left by the original developer.
-
-**OJO locations** (grep for `OJO` in src/):
-- `div.c:492` — missing error if `lenguaje.div` not found → add file-exists check
-- `div.c:3395`, `divmouse.c:549` — malloc edge case for `barra` buffer
-- `divbasic.c:188,727` — background repaint + generic flag
-- `divbrow.c:191,1689` — performance tradeoff + incomplete CTRL/SHIFT
-- `divc.c` (10 OJOs) — compiler design questions, bounds checks, optimization hints
-- `divcolor.c:130` — EOL/EOF handling
-- `divedit.c:1022,2608` — error messages, file cleanup
-- `divforma.c:1119` — palette save/restore contract
-- `divhandl.c:2715,2794,2864` — decompression errors, file cleanup, magic values
-- `divinsta.c:864` — unimplemented protected install mode
-- `divpaint.c:1793` — undo+backspace refresh bug
-
-**Method:** For each OJO:
-1. Read the surrounding code (±50 lines) to understand context
-2. Decide: fix it, document it, or remove the OJO if it's no longer relevant
-3. If fixing, keep the change minimal — no refactoring
-4. If it's a design question with no clear answer, convert to a `// TODO:` with English explanation
+Completed: 47 OJO markers resolved across the entire codebase (0 remaining).
+6 fixed with code (lenguaje.div check, malloc guards, partial file cleanup),
+~22 converted to English WARNING/NOTE, ~12 to TODO, ~7 removed (obsolete).
 
 ---
 
-### Sprint C: English comments on top 20 functions
+### Sprint C: English comments on top 22 functions ✅ DONE (2026-03-10)
 
-**Goal:** Add a 2-4 line English comment block above each function explaining what it
-does, its key parameters, and any non-obvious behavior.
-
-**Priority functions** (most impactful for future contributors):
-
-IDE core:
-- `div.c` → `entorno()` (main IDE loop), `inicializacion()`, `finalizacion()`
-- `div.c` → `menu_click()`, `crear_menu()`, `actualiza_menu()`
-- `divmouse.c` → `read_mouse2()` (event pump + mouse state)
-- `divedit.c` → `editar()` (code editor main loop)
-
-Compiler:
-- `divc.c` → `compilar()` (top-level compile entry), `compilar2()`, `expresion()`
-- `divc.c` → `get_token()` (lexer), `insertar_nombre()` (symbol table)
-
-Runtime:
-- `runtime/i.c` → `interprete()` (VM main loop), `frame_start()`, `carga_pila()`
-- `runtime/s.c` → `pinta_sprite()` (sprite blitter), `make_ghost()` (transparency)
-- `runtime/f.c` → top-level built-in function dispatcher
-
-Rendering:
-- `shared/run/v.c` → `volcadosdl()` (blit 8-bit surface to SDL texture)
-- `shared/osdep/osd_sdl2.c` → `OSDEP_Flip()`, `OSDEP_SetVideoMode()`, `OSDEP_SetPalette()`
-
-**Rules:**
-- Use the glossary and architecture docs to understand what each function does
-- Comment style: `/* brief description \n * detail \n */` above the function
-- Don't add comments to functions that are already self-explanatory
-- Don't modify any code — comments only
+Completed: 22 key functions documented with English comment blocks.
+Corrections: `get_token()`→`lexico()`, `make_ghost()`→`crear_ghost()`,
+`editar()`→`editor()`, `menu_click()`→`menu_principal2()` (in divhandl.c).
+`insertar_nombre()` doesn't exist standalone — logic inline in `lexico()`.
 
 ---
 

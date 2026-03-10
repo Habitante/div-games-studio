@@ -1036,9 +1036,8 @@ void preparar_tapiz_temp(void) {
   byte old_dac4[768];
 
 
-  // *** OJO ***
-  // Mosaico/rescalado
-  // Abrir el map indicado y no siempre "tapiz.map"
+  // TODO: Support tiling/rescaling and loading a user-specified map file
+  // instead of always using "tapiz.map"
 
   if ((f=fopen(Tap_pathname,"rb"))==NULL) return;
   fseek(f,0,SEEK_END); lon=ftell(f); fseek(f,0,SEEK_SET);

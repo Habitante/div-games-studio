@@ -1,10 +1,10 @@
 
-// **** OJO **** La función que genera el texto es void CreateText()
-// **** ShowFont? es la ventana de font (el font se carga en memoria), GetText es el díalogo con el "input text"
-// El v.aux de ShowFont apunta a la siguiente información al llamar a CreateText()
-// v.aux -> filename, v.aux+14 -> path, v.aux+RES_FOR_NAME -> fichero FNT
-// No se hace FntAux=v.aux+RES_FOR_NAME; antes de llamar a CreateText, es decir, FntAux apunta al fichero
-// El string se pasa a CreateText en cCharsToPrint[128]
+// NOTE: The main text rendering function is CreateText()
+// ShowFont is the font window (font loaded in memory), GetText is the "input text" dialog
+// When calling CreateText(), v.aux of ShowFont points to:
+//   v.aux -> filename, v.aux+14 -> path, v.aux+RES_FOR_NAME -> FNT file data
+// FntAux is NOT set to v.aux+RES_FOR_NAME before calling CreateText (FntAux already points to the file)
+// The string is passed to CreateText via cCharsToPrint[128]
 
 #include "global.h"
 #include "div_string.h"

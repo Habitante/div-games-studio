@@ -1838,7 +1838,7 @@ void PollRecord(void)
   int  length;
 
   if((f=fopen(SoundFile,"ab"))==NULL) {
-    v_texto=(char *)texto[47];  // OJO !!! Cambiar mensaje de error
+    v_texto=(char *)texto[47];  // TODO: Use a more specific error message for sound recording failure
     dialogo(err0);
 #ifdef NOTYET
     spkoff();
@@ -1871,7 +1871,7 @@ void PollRecord(void)
   fclose(f);
   if((f=fopen(SoundFile,"rb+"))==NULL)
   {
-    v_texto=(char *)texto[47];  // OJO !!! Cambiar mensaje de error
+    v_texto=(char *)texto[47];  // TODO: Use a more specific error message for sound file reopen failure
     dialogo(err0);
 #ifdef NOTYET
     spkoff();

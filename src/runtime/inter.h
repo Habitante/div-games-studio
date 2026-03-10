@@ -399,7 +399,7 @@ struct _video_modes { // x100
 
 GLOBAL struct _video_modes * video_modes;
 
-// *** OJO *** Indicar además de aquí en la inicialización de i.cpp y el div.h ***
+// WARNING: end_struct offset must match the initialization in i.c and div.h
 
 #define end_struct long_header+14+10*10+10*7+8+11+9+10*4+1026+146+32*3
 

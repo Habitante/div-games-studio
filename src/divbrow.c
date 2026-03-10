@@ -188,7 +188,7 @@ void crear_thumbs(void) {
           muestra_thumb(&larchivosbr,num); break;
         } else if (thumb[num].ptr==NULL && thumb[num].status==-1) {
           muestra_thumb(&larchivosbr,num);
-          break; // OJO *** Este break no estaba (elimina parpadeos, pero enlentece)
+          break; // NOTE: Break added to prevent flickering (at cost of some speed)
         } else break;
       } else break;
     } while (1);
@@ -1686,7 +1686,7 @@ void browser2(void) {
       browser1(); v.volcar=1;
       strcpy(full,archivo+(larchivosbr.zona-10+larchivosbr.inicial)*an_archivo);
 
-      // OJO !!! Tener en cuenta CTRL y SHIFT
+      // TODO: Handle CTRL and SHIFT modifier keys
       if (strcmp(input,full) || ((v_thumb==7 || v_tipo==16) && opc_pru))
       {
         strcpy(input, full);

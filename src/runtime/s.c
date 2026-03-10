@@ -861,6 +861,11 @@ void put_sprite(int file,int graph,int x,int y,int angle,int size,int flags,int 
 //      La función que pinta los sprites de los procesos
 //----------------------------------------------------------------------------
 
+/* Render the sprite for process 'ide': looks up its graphic from the FPG,
+ * applies animation tables (_XGraph), clipping region, and coordinate
+ * transforms, then dispatches to sp_normal/sp_cortado/sp_escalado/sp_rotado
+ * depending on angle, scale, and clipping. Color 0 is always transparent.
+ */
 void pinta_sprite(void) { // Pinta un sprite (si se ve), según mem[ide+ ... ]
 
   int * ptr;

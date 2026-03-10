@@ -91,8 +91,12 @@ void menu_principal1(void) {
 	pinta_menu(750); 
 }
 
+/* Click handler for the top menu bar.
+ * Dispatches mouse clicks to the appropriate submenu (Programs, Palettes,
+ * Maps, Graphics, Fonts, Sounds, System, Help) based on which item is hit.
+ */
 void menu_principal2(void) {
-	actualiza_menu(750,1,0); 
+	actualiza_menu(750,1,0);
 	if ((old_mouse_b&1) && !(mouse_b&1)) {
 		switch (v.estado) {
 			case 1: 
@@ -1255,6 +1259,10 @@ void menu_sistema2(void) {
 //      Create a new menu
 //-----------------------------------------------------------------------------
 
+/* Build a dropdown menu window from consecutive texto[] entries.
+ * The first entry is the icon label, the second is the title; subsequent
+ * non-NULL entries become menu items. Calculates window dimensions.
+ */
 void crear_menu(int menu) {
 
   int an;
@@ -1308,7 +1316,11 @@ void pinta_menu(int menu) {
 //      Toggle selected menu options
 //-----------------------------------------------------------------------------
 
-void actualiza_menu(int menu,int min,int max) { // (Min,Max) Opciones prohibidas
+/* Update menu state: highlight the item under the cursor and handle clicks.
+ * Items in the range [min..max] are disabled (greyed out). Executes the
+ * selected action on mouse-button release.
+ */
+void actualiza_menu(int menu,int min,int max) {
 	byte * ptr=v.ptr,*p,*q;
 	int an=v.an/big2,al=v.al/big2,n;
 
@@ -2715,8 +2727,8 @@ void abrir_mapa(void) {
                     continue;
                   }
 
-                  // OJO!!! No se comprueba si se produce un error al descomprimir
-                  // Ver todos los sitios donde se llame a descomprime_?
+                  // NOTE: descomprime_MAP/PCX/BMP return void, so errors cannot be checked here.
+                  // Only descomprime_JPG returns a status (already handled above).
 
                   ExternUseBufferMap=(char	 *)v_mapa->map;
 
@@ -2794,9 +2806,12 @@ void guardar_mapa(void) {
         case 2: e=graba_BMP(map,f); break;
       } if (e==2) { v_texto=(char *)texto[48]; dialogo(err0); }
 
-      // *** OJO, se debe borrar el fichero si no se pudo grabar entero
-
-      fclose(f);
+      if (e || ferror(f)) {
+        fclose(f);
+        remove(full); // Delete partial file on write failure
+      } else {
+        fclose(f);
+      }
 
     } else { v_texto=(char *)texto[47]; dialogo(err0); e=1; }
   } else { v_texto=(char *)texto[47]; dialogo(err0); e=1; }
@@ -2864,7 +2879,7 @@ void Tamnio3()
 
 void Tamnio0()
 {
-  v.tipo=1; // OJO ******************
+  v.tipo=1; // Window type 1 = dialog
 
   v.titulo=texto[63];
   v.an=126+50;

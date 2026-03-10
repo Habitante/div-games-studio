@@ -490,7 +490,15 @@ int main(int argc, char * argv[]) {
 		tipo[n].defecto=0; tipo[n].inicial=0;
 	}
 
-	inicializa_textos((uint8_t *)"system/lenguaje.div"); // OJO emitir un error si lenguaje.div no existe
+	{
+		FILE *ftest = fopen("system/lenguaje.div", "rb");
+		if (ftest == NULL) {
+			fprintf(stderr, "FATAL: system/lenguaje.div not found. Cannot start.\n");
+			exit(1);
+		}
+		fclose(ftest);
+	}
+	inicializa_textos((uint8_t *)"system/lenguaje.div");
 
 	if(compilemode==1) {	
 		inicializa_compilador();
@@ -1682,6 +1690,10 @@ void mainloop(void) {
 
 }
 
+/* IDE main loop (desktop environment).
+ * Repeatedly calls mainloop() to pump events, manage windows, and render
+ * the desktop until salir_del_entorno is set (quit requested).
+ */
 void entorno(void) {
 	div_started = 1;
 	int n,m,oldn=max_windows;
@@ -3349,6 +3361,10 @@ void refrescadialogo(void)
 void init_lexcolor(void);
 void end_lexcolor(void);
 
+/* IDE startup: allocate all core buffers and load essential resources.
+ * Sets up video mode, keyboard, help index, palette tables, UI fonts,
+ * icon graphics, sound system, and the paint toolbar.
+ */
 void inicializacion(void) {
 
 	FILE *f;
@@ -3409,7 +3425,7 @@ void inicializacion(void) {
   
 	ghost=(byte*)malloc(65536); // 256*256 combinations
 
-	barra=(byte*)malloc(vga_an*19*big2); //OJO
+	barra=(byte*)malloc(vga_an*19*big2);
 	fill_dac=(byte*)malloc(256);
 	error_window=(byte*)malloc(640*38*2);
 
@@ -3657,9 +3673,12 @@ fclose(f);
 }
 
 //-----------------------------------------------------------------------------
-//      Return from program 
+//      Return from program
 //-----------------------------------------------------------------------------
 
+/* IDE shutdown: free all buffers allocated by inicializacion().
+ * Restores video mode, shuts down the syntax colorizer and keyboard.
+ */
 void finalizacion(void) {
 
   if(undo!=NULL) {
@@ -4358,8 +4377,11 @@ void desactivar(void) { // Minimiza: se desactiva
   }
 }
 
-void activar(void) { // Maximiza: se activa *** OJO *** se llama en varias
-  int m;           // ocasiones, además de al maximizarse, ver "div.cpp"
+/* Activate the front window: highlight its title bar as focused.
+ * NOTE: Called from multiple places, not just maximize — see original div.cpp.
+ */
+void activar(void) {
+  int m;
   int an=v.an,al=v.al;
   if (big) { an/=2; al/=2; }
 

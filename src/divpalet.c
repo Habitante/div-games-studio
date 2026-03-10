@@ -123,7 +123,7 @@ void init_ghost(void) {
 
 //-----------------------------------------------------------------------------
 //      Función de búsqueda rápida de un color
-//      OJO!!! Antes hay que llamar a create_dac4();
+//      WARNING: create_dac4() must be called before this function
 //-----------------------------------------------------------------------------
 
 byte fast_find_color(byte fr,byte fg,byte fb) {
@@ -289,7 +289,7 @@ void create_dac4(void) {
 
 //-----------------------------------------------------------------------------
 //      Busca un color (r,g,b) en la paleta (búsqueda completa)
-//      OJO!!! Antes hay que llamar a create_dac4();
+//      WARNING: create_dac4() must be called before this function
 //-----------------------------------------------------------------------------
 
 byte find_color(byte r,byte g,byte b) {

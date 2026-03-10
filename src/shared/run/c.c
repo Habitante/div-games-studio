@@ -142,9 +142,9 @@ void graphic_info(void) {
 // Funcion principal del lenguaje collision(tipo de proceso)
 //----------------------------------------------------------------------------
 
-// *** OJO, Detecta choques pantalla-pantalla, scroll-scroll y pantalla-scroll
-// Pero los gráficos que están en scroll detectan colisiones sólo en el primer
-// scroll en el que están (aunque estén en varios)
+// WARNING: Detects collisions between screen-screen, scroll-scroll, and
+// screen-scroll sprites. Sprites on a scroll only test collision against
+// the first scroll they belong to, even if visible on multiple scrolls.
 
 void collision(void) {
 

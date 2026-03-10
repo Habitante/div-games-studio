@@ -216,11 +216,37 @@ No behavioral changes — pure cleanup.
       → [`reports/glossary-spanish-english.md`](reports/glossary-spanish-english.md) (~150 identifiers translated)
 - [ ] Review docs for accuracy (Daniel is the authority on compiler/VM internals)
 
-### Naming — initial pass
+### Resolve OJO markers ✓ (Sprint B, done 2026-03-10)
+- [x] All 47 "OJO" (watch-out) comments resolved across the entire codebase (0 remaining)
+  - ~12 converted to English `// TODO:` comments (actionable items for future sprints)
+  - ~22 converted to English `// WARNING:` or `// NOTE:` (design constraints, caller contracts)
+  - ~6 fixed with minimal code changes:
+    - `div.c`: Fatal error + exit if `lenguaje.div` missing (was silent crash)
+    - `divmouse.c`: NULL check after `barra` malloc
+    - `divedit.c`: Zero clipboard length on alloc failure; delete partial files on write error
+    - `divhandl.c`: `ferror()` check + `remove()` for partial file writes
+  - ~7 removed entirely (references to deleted features: MODE8, CDROM, network, JUDAS)
+  - `global.h:501` (`r,g,b,c,d,a`) tagged as `// TODO(Sprint D):`
+
+### English function comments ✓ (Sprint C, done 2026-03-10)
+- [x] 22 key functions documented with 2-4 line English comment blocks:
+  - IDE core: `entorno()`, `inicializacion()`, `finalizacion()`, `activar()`,
+    `menu_principal2()`, `crear_menu()`, `actualiza_menu()`, `editor()`
+  - Compiler: `compilar()`, `lexico()`, `expresion()`, `compilar2()`
+  - Runtime VM: `interprete()`, `frame_start()`, `carga_pila()`, `function()`
+  - Rendering: `pinta_sprite()`, `crear_ghost()`, `volcadosdl()`
+  - OSDEP: `OSDEP_Flip()`, `OSDEP_SetVideoMode()`, `OSDEP_SetPalette()`
+- Function name corrections discovered during sprint:
+  - `get_token()` → actually `lexico()` (the lexer)
+  - `insertar_nombre()` → doesn't exist standalone; logic is inline in `lexico()`
+  - `make_ghost()` → actually `crear_ghost()` (in v.c, not s.c)
+  - `editar()` → actually `editor()` in divedit.c
+  - `menu_click()` → actually `menu_principal2()` in divhandl.c (not div.c)
+
+### Naming — next steps
 - [ ] Rename the worst single-letter globals (the `r,g,b,c,d,a` "generic counters"
-      in global.h:519 that even the original code says "OJO! Quitarlos")
+      in global.h — now tagged `// TODO(Sprint D)`)
 - [ ] Rename cryptic locals in the hottest paths (divc.c, divedit.c, runtime/i.c)
-- [ ] Add English comments to the top 20 most cryptic functions
 - [ ] Document the meaning of `v.an`/`v.al` (width/height), `tapiz` (wallpaper),
       `papelera` (clipboard), etc. in a glossary or inline
 
@@ -317,7 +343,7 @@ The features needed so a modern developer won't rage-quit in the first 10 minute
 ### Critical UX
 - [ ] **Undo/redo in code editor** — the single most important missing feature
 - [ ] **UI scaling** (2x, 3x, 4x integer scale of internal resolution)
-- [ ] **English UI by default** (lenguaje.div translation exists — verify completeness)
+- [ ] **English UI by default** (lenguaje.div translation exists — verify completeness and correctness)
 - [ ] **Project templates** ("Hello World", "Platformer", "Shoot'em Up" skeletons)
 - [ ] **One-click export** (package divrun + bytecode + data → distributable folder/zip)
 - [ ] **Modern gamepad support** (SDL_GameController API, not raw SDL_Joystick)

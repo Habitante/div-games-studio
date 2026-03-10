@@ -1794,7 +1794,7 @@ void edit_mode_11(void) {
 //      Texto
 //-----------------------------------------------------------------------------
 
-// *** OJO *** fallo refresco al combinar undo y backspace para borrar el texto
+// TODO: Known bug -- screen refresh fails when combining undo with backspace during text deletion
 
 int determina_fnt(void);
 void GetCharSizeBuffer(int WhatChar,int *ancho,int *alto,char *buffer);
@@ -4954,7 +4954,7 @@ void put_barra(int x,int y,int n) {
 
 void put_barra_inv(int x,int y,int n) {
 
-  wput_in_box(barra,vga_an/big2,vga_an/big2,19,x,y,-n); //*** OJO *** esto no vale
+  wput_in_box(barra,vga_an/big2,vga_an/big2,19,x,y,-n); // TODO: Highlight inversion does not render correctly
   wresalta_box(barra,vga_an/big2,19,x,y,*((word*)graf[n])/big2,*((word*)(graf[n]+2))/big2);
 
 }

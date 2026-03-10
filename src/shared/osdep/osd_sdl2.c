@@ -66,6 +66,11 @@ SDL_Log("VW: %d VH: %d W: %d H: %d\n",vwidth, vheight, w,h);
 
 }
 
+/* Create or reconfigure the SDL2 window, renderer, surfaces, and texture.
+ * On first call creates the window; on subsequent calls resizes or toggles
+ * fullscreen. Always (re)creates the 8-bit and 32-bit surfaces plus the
+ * streaming texture at the requested logical resolution.
+ */
 OSDEP_Surface * OSDEP_SetVideoMode(int width, int height, int bpp, char fs) {
 
 	SDL_Log("Setting Videomode to %d x %d (fs=%d)\n", width, height, fs);
@@ -122,6 +127,10 @@ OSDEP_Surface * OSDEP_SetVideoMode(int width, int height, int bpp, char fs) {
 }
 
 
+/* Present the current frame: blits the 8-bit paletted surface (buffer8) to
+ * a 32-bit surface (palette conversion), uploads to the GPU texture, and
+ * calls SDL_RenderPresent(). This is the final step of every frame.
+ */
 void OSDEP_Flip(OSDEP_Surface *s) {
 	void *pixels;
   int pitch;
@@ -146,6 +155,10 @@ void OSDEP_UpdateRect(SDL_Surface *screen, Sint32 x, Sint32 y, Sint32 w, Sint32 
 	OSDEP_Flip(screen);
 }
 
+/* Update the 256-color palette on the given 8-bit surface. Called whenever
+ * the game palette changes (fade effects, load_pal, etc.). The colors array
+ * must contain at least firstcolor+ncolors entries.
+ */
 int OSDEP_SetPalette(OSDEP_Surface *surface, OSDEP_Color *colors, int firstcolor, int ncolors) {
 	SDL_SetPaletteColors(surface->format->palette, colors + firstcolor, firstcolor, ncolors);
 	return 1;

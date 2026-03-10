@@ -1,7 +1,7 @@
 
 //----------------------------------------------------------------------------
-//      Funciones del debugger y diálogos de error
-//      *** OJO *** La funcion trace_process() está en i.cpp
+//      Debugger functions and error dialogs
+//      Note: trace_process() is defined in i.c, not here.
 //----------------------------------------------------------------------------
 
 #include "../inter.h"
@@ -1366,7 +1366,8 @@ int colisiona_con(int a, int x, int y, int an, int al) {
 }
 
 //----------------------------------------------------------------------------
-//      Void restaura tapiz *** OJO *** aquí se debe actualizar el fondo
+//      Restore wallpaper/background under debugger windows
+// TODO: Should also update the background when the game state changes.
 //----------------------------------------------------------------------------
 
 void restaura_tapiz(int x,int y,int an,int al) {
@@ -3830,9 +3831,9 @@ void debug2(void) {
 
       for (iip=mem1;iip<mem2;iip++) {
 
-        // ¡OJO!, para saber si la sentencia siguiente llama a una función,
-        // se busca un call. Esto es algo impreciso, ya que un cal es un
-        // "26", y puede haber un dato constante con ese valor.
+        // WARNING: To detect if the next statement calls a function, we scan
+        // for the 'lcal' opcode (value 26). This is imprecise because a
+        // constant integer with the same value could cause a false match.
 
         if (mem[iip]==lcal) if (memo(mem[iip+1])==ltyp && memo(mem[iip+1]+2)==lnop) {
           for (n=0;n<max_breakpoint;n++) if (breakpoint[n].line==-1) break;
@@ -3925,7 +3926,7 @@ void debug3(void) {
 
 void debug0(void) {
   v.tipo=1; v.titulo=text[64];
-  v.an=304; v.al=146+46; // OJO Ponerlo también en change mode
+  v.an=304; v.al=146+46; // TODO: Keep in sync with change_mode dialog dimensions
   v.paint_handler=debug1;
   v.click_handler=debug2;
   v.close_handler=debug3;

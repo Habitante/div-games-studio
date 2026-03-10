@@ -1,13 +1,5 @@
-
-// *** OJO *** Poner un M8 donde haya un M7 ...
-
-// *** OJO *** Quitar los OJOID de aqu- y de kernel
-
-// quitar los //net de aqui y de f.cpp
-
-// *** OJO *** Que el usuario pueda determinar de alguna forma imem_max
-//             (o bien el número de procesos máximo)
-// OJO !!! Convertir imem_max en variable
+// TODO: Allow the user to configure imem_max (maximum memory / max process count)
+// at runtime instead of it being a compile-time constant.
 
 ///////////////////////////////////////////////////////////////////////////////
 // Libraries used
@@ -636,6 +628,11 @@ void guarda_pila(int id, int sp1, int sp2) {
   } else mem[id+_SP]=0;
 }
 
+/* Restore a process's saved execution stack from its heap-allocated backup.
+ * Called when resuming a process in exec_process(). The backup (created by
+ * guarda_pila) stores [sp_low, sp_high, data...]; this copies data back
+ * into pila[], sets sp to sp_high, and frees the backup.
+ */
 void carga_pila(int id) {
   int n;
   int32_t * p;
@@ -709,6 +706,10 @@ void mainloop(void) {
 #endif
 }
 
+/* VM entry point: initializes the runtime, then runs the main game loop
+ * until all processes are dead or the user presses Ctrl+Esc / Alt+X.
+ * Calls finalizacion() on exit to free all runtime resources.
+ */
 void interprete (void)
 {
   inicializacion();
@@ -913,6 +914,11 @@ double game_frames=0.0f;
 #endif
 
 
+/* Begin-of-frame housekeeping: polls input, pauses when app loses focus,
+ * eliminates dead processes (Status==1), updates the 10 user timers,
+ * calculates FPS, enforces frame timing / frame-skip, and resets per-frame
+ * flags so every live process is eligible for execution and painting.
+ */
 void frame_start(void) {
 	int n,old_reloj;
 
@@ -1143,7 +1149,7 @@ void frame_end(void) {
 
 	if (!saltar_volcado) {
 
-	// *** OJO *** Restaura las zonas de copia fuera del scroll y del modo 7
+	// Restore framebuffer regions outside scroll/mode7 areas from the clean backup
 
 #ifdef DEBUG
 	oreloj=get_ticks();

@@ -100,8 +100,8 @@
 
 // SOLUCION 1: POINTERS BYTE/WORD LIMITADOS A TABLAS BYTE/WORD
 
-// OJO! No se podrá hacer ptrbyte++ (ya que incrementará 4 bytes)
-//      ni ptrword++, que incrementará 2 words
+// NOTE: ptrbyte++ increments by 4 bytes (sizeof(int)), not 1 byte,
+//       and ptrword++ increments by 2 words, not 1 word.
 
 // (*)  A la hora de hacer que *ptrbyte sea ptrbyte[0] (supongo que añadiendo
 //      un nuevo tipo de ¿p_pointerb?), se debería emitir un error al hacer
@@ -130,8 +130,8 @@
 
 // SOLUCION 2: POINTERS BYTE/WORD RELATIVOS A &MEM[0]
 
-//    - OJO, quizá los punteros a byte y word deberían ser diferentes
-//    - (que pointerb/w fueran un offset byte/word relativo a &memb[0])
+//    - NOTE: byte and word pointers could be different types
+//    - (pointerb/w could be a byte/word offset relative to &memb[0])
 //    - ¿Nuevo diseño para: tpwgl tpwlo tpbgl tpblo? (teniéndolos siempre multiplicados *2 o *4)
 //    - a) en incializacion se debe multiplicar *2 o *4 la constante (ptrbyte=&tablabyte)
 //    - b) como cojones se hace ptrbyte=&loquesea ? (como paso de parámetro, asignación, etc...)
@@ -185,9 +185,8 @@
 //    - Además, ¿como iban a devolver offset o sizeof() un float si el
 //      lenguaje no los maneja?
 
-// OJO! EN ESTA VERSION TODAVIA NO HE HECHO NINGUNA BURRADA
-//      RELATIVA A MULTIPLICAR LOS OFFSET POR 4 !!!!!!!!!!!
-//      (en una ocasión lo intenté .. y lo acabé deshaciendo todo)
+// NOTE: Offsets are NOT multiplied by 4 in this version.
+//       (This was attempted once but reverted.)
 
 // -----------------------------------------------------------------------------
 
@@ -203,7 +202,7 @@
 
 // Tablas y estructuras multidimensionales
 // revisar errores: 35, ...
-// OJO en la ayuda con las tablas y las estrucuturas de SOLO una dimensión
+// TODO: Review help text for single-dimension tables and structs
 
 //-----------------------------------------------------------------------------
 //      DIV - Compilador Interno
@@ -989,6 +988,11 @@ void mensaje_compilacion(byte * p) {
 #define uLongf unsigned long
 #endif
 
+/* Top-level compilation entry point.
+ * Resets all compiler state, loads lexer/object tables, allocates output
+ * buffers, runs the parser, fills the executable header, and writes the
+ * compressed bytecode to system/EXEC.EXE.
+ */
 void compilar(void) {
   int n;
   uLongf m;
@@ -1033,7 +1037,8 @@ free_resources();
 
   inicio_objetos=ivnom.b;
 
-  // *** OJO *** Estos dos errores no son "memoria insuficiente"
+  // NOTE: These fopen failures would report "insufficient memory" (error 0),
+  // but the actual cause is a file-creation failure, not a memory issue.
 	linf=fopen("system/exec.fs","wb");
 	if(linf) {
 		fwrite(&fsmode,1,1,linf);
@@ -1422,8 +1427,7 @@ void analiza_ltlex(void){
 //      Precarga de la tabla de objetos, analiza el fichero ltobj.def
 //-----------------------------------------------------------------------------
 
-//      OJO, en este proceso no se comprueban los límites de memoria
-
+// WARNING: Memory limits are not checked during object preloading.
 
 void precarga_obj (void) {
 
@@ -1740,6 +1744,11 @@ byte * next_lexico(byte * _source, int coment, int linea) { // No genera nunca e
 int IsWAV(char *FileName);
 int en_fopen=0;
 
+/* Lexer: reads the next token from the source buffer.
+ * Sets global 'pieza' to the token type, 'pieza_num' for numeric/literal
+ * values, and 'o' for identifier objects. Also handles hash-table lookup
+ * and insertion of new identifiers into the symbol table.
+ */
 void lexico(void) {
 
   struct objeto * * ptr_o;
@@ -4143,9 +4152,9 @@ void sintactico (void) {
   // Analiza las variables privadas de un bloque, como las locales
   //---------------------------------------------------------------------------
 
-    // *** OJO *** No se debe permitir #id.tvpri
-    //             pues fallaría a no ser que #id fuera del mismo tipo que el
-    //             proceso actual (hermano)
+    // WARNING: Remote access to private variables (#id.private_var) must not
+    //          be allowed, unless #id is the same process type as the current
+    //          one (i.e., a sibling process).
 
 void analiza_private(void) {
   struct objeto * ob=NULL, * member2;
@@ -4632,7 +4641,7 @@ void tloc_init(int tipo) {
   if (!free_sintax) if (pieza!=p_ptocoma) c_error(3,66);
 }
 
-// OJO!!! tglo_init no puede llamar a test_buffer !!!
+// WARNING: tglo_init must NOT call test_buffer (buffer may be swapped via tloc_init).
 
 #undef memptrsize
 #if __WORDSIZE == 64
@@ -5265,6 +5274,11 @@ void con2() {
 //      Analisis de una expresión (genera código para calcularla)
 //-----------------------------------------------------------------------------
 
+/* Expression parser entry point (recursive descent).
+ * Builds a postfix expression tree in tabexp[] via exp00(), then
+ * emits bytecode by calling generar_expresion(). Saves and restores
+ * error-reporting state around the parse.
+ */
 void expresion(void) {
   byte * __ierror, * _ierror;
   int _linea;
@@ -5551,7 +5565,7 @@ void div_exp2() {
     tf=tipo_factor;
     lexico(); exp3();
     if (tf==2 || tipo_factor==2) {
-      // OJO, p==q no se hará el strcmp() si son dos punteros a cadenas
+      // NOTE: When both operands are strings, comparison uses strcmp (not pointer equality).
       p+=p_strigu-p_igu;
       (*_exp).tipo=eoper; (*_exp++).token=p;
       tipo_factor=0;
@@ -5680,9 +5694,9 @@ void exp6() { // Operador de acceso a variables o tablas locales ajenas
     e=_exp+1;
     acceso_remoto=1; lexico(); factor(); acceso_remoto=0;
 
-    // OJO, el <p_punto> DEBE SER LO SEGUNDO que el <factor>
-    // introduzca en la <expresión>, no quedan más cojones.
-    // (bueno, si, hacer aquí una búsqueda del p_punto entre e-1 y _exp ...)
+    // WARNING: p_punto (dot-access) MUST be the SECOND element that factor()
+    // pushes into the expression. The code below replaces it with p_add.
+    // (Alternative: search for p_punto between e-1 and _exp.)
 
     if ((*e).tipo==eoper && (*e).token==p_punto)
       (*e).token=p_add; else c_error(4,43);
@@ -7059,7 +7073,7 @@ void save_dbg(void) {
     ob.v4=(memptrsize)obj[n].sglo.items2;
     ob.v5=(memptrsize)obj[n].sglo.items3;
     if (obj[n].tipo==tpsgl || obj[n].tipo==tpslo) ob.v1=(ob.v1-(memptrsize)&obj[0])/sizeof(struct objeto);
-    // OJO ! que no se pueden añadir objetos aquí (ver uso de &obj[0] y sizeof(struct objeto))
+    // WARNING: Do not add objects after this point -- &obj[0] and sizeof(struct objeto) are used above as base address and stride.
     fwrite(&ob,sizeof(ob),1,sta);
   }
 
@@ -7413,6 +7427,11 @@ void compilar1(void) {
 extern uint8_t cerror[128];
 void get_error(int n);
 
+/* Compile dialog click handler (UI callback).
+ * Runs the actual compilation via comp() on first click, then displays
+ * the result (error message or success). Subsequent clicks handle the
+ * OK/Help buttons in the dialog.
+ */
 void compilar2(void) {
   if (compilado==0) {
     compilado=1; mouse_graf=3; numero_error=-1;
@@ -7462,13 +7481,14 @@ void compilar_programa(void) {
 //  Optimización peephole de código intermedio EML
 //-----------------------------------------------------------------------------
 
-// *** OJO!!! *** quizá se pueda quitar "dir" y esa comprobación absurda ...
+// TODO: Consider removing the 'dir' field from the peephole struct and its
+//       associated validation check, if it proves redundant.
 
-//struct {      // Peephole, "mirilla" de optimizacion
-//  int dir;    // Dirección
-//  int param;  // Indica el número de parametros de la instruccion
+//struct {      // Peephole optimization window
+//  int dir;    // Address (position in mem[])
+//  int param;  // Number of parameters for the instruction
 //  int op;     // Opcode
-//} code[16];   // En code[15] debe quedar siempre la última instrucción generada
+//} code[16];   // code[15] always holds the last generated instruction
 
 void g1(int op) {
   if (optimizar) gen(0,op,0); else mem[imem++]=op;

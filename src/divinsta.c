@@ -860,11 +860,11 @@ strcpy(cWork,full);
 
 //-----------------------------------------------------------------------------
 
-  // Aquí se creará el "PACKFILE.DAT" con los archivos pertinentes
-  // *** OJO *** Cuando el usuario seleccione la opción "Instalación protegida"
-  // nfiles es el número de ficheros totales (EXE + OVL [+ SETUP] + char * ins)
-  // Crea el directorio en hdir[].name/offset/len1/len2
-  // y su cabecera en dirhead.packname/head/crc1/crc2/crc3/nfiles
+  // NOTE: Protected installation mode was planned but never implemented
+  // (not needed for modern distribution).
+  // nfiles = total files (EXE + OVL [+ SETUP] + char * ins)
+  // Directory entries stored in hdir[].name/offset/len1/len2
+  // Header stored in dirhead.packname/head/crc1/crc2/crc3/nfiles
 
   if (dirhead.nfiles) {
 

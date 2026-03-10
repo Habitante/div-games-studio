@@ -1879,7 +1879,7 @@ void _save(void) {
   es=open_save_file((byte*)&mem[pila[sp]]);
   if (es==NULL) {
     pila[sp]=0;
-//    e(123); // OJO! Para que no de error en los CD-ROM
+// Save failure is silently ignored (file may be on read-only media)
     return;
   }
 //  if (fwrite(&mem[offset],unit_size,lon,es)!=lon) e(124);
@@ -4206,8 +4206,8 @@ void __itoa(void) {
 //      malloc(elementos) - Retorna 0 o índice de mem (impar)
 //----------------------------------------------------------------------------
 
-// OJO El único problema es que los STRING dentro de un malloc no tendrán la
-//     marca de cadena 0xDAD... !!!
+// TODO: STRING variables inside malloc'd blocks lack the 0xDAD... sentinel
+// marker, so the runtime cannot distinguish them from raw integer data.
 
 void _malloc(void) {
   byte * p;
@@ -4536,7 +4536,8 @@ void _comprimir(int encode, char *fichero) {
 // funciones de modo texto ... ???
 
 //----------------------------------------------------------------------------
-// Funcion para evitar los page fault (--- OJO con incluir los malloc !!!)
+// WARNING: Validates a memory address against mem[] bounds and malloc'd blocks.
+// Does not cover all malloc'd ranges — may miss dynamically allocated regions.
 //----------------------------------------------------------------------------
 
 int capar(int dir) {
@@ -4557,6 +4558,11 @@ int capar(int dir) {
 extern int f_time[256]; // Tiempo consumido por las diferentes funciones
 #endif
 
+/* Built-in function dispatcher: called by the 'lfun' opcode. Reads the
+ * function code from mem[ip], then dispatches via a large switch to the
+ * corresponding runtime function (signal, collision, load_fpg, sound, etc.).
+ * Arguments are popped from pila[] by each handler; results pushed back.
+ */
 void function(void) {
 
   #ifdef DEBUG

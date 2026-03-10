@@ -382,6 +382,10 @@ void programa0(void){
 
 struct tprg * edited;
 
+/* Code editor main loop (click handler for program editor windows).
+ * Processes keyboard input for text editing, block selection, search/replace,
+ * cursor movement, and scrollbar interaction. Called once per frame.
+ */
 void editor() {
   byte * p;
   int n;
@@ -1021,9 +1025,8 @@ void f_cortar(int borrar) { // 0-Copiar, 1-Cortar, 2-Borrar
 		free(papelera);
 		
     if ((papelera=(char *)malloc(lon_papelera=k2-k1+1))==NULL) {
-
-      // *** OJO *** Error "no hay memoria"
-
+      // TODO: Show "out of memory" error to the user (clipboard not updated)
+      lon_papelera=0;
     } else {
       memcpy(papelera,k1,lon_papelera);
       lineas_papelera=num_lineas;
@@ -2608,9 +2611,15 @@ void guardar_prg(void) {
   if (full[strlen(full)-1]!='/') strcat(full,"/");
   strcat(full,input);
   if ((f=fopen(full,"wb"))!=NULL) {
+    size_t written;
     write_line();
-    fwrite(v.prg->buffer,1,v.prg->file_lon,f);
-    fclose(f); // *** OJO, se debe borrar el fichero si no se pudo grabar entero
+    written = fwrite(v.prg->buffer,1,v.prg->file_lon,f);
+    fclose(f);
+    if (written != (size_t)v.prg->file_lon) {
+      remove(full); // Delete partial file
+      v_texto=(char *)texto[47]; dialogo(err0);
+      return;
+    }
 
     div_strcpy(v.prg->path, sizeof(v.prg->path), tipo[v_tipo].path);
     div_strcpy(v.prg->filename, sizeof(v.prg->filename), input);
