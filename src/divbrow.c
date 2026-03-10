@@ -157,8 +157,8 @@ void imprime_rutabr(void) {
   wbox(v.ptr,an,al,c12,3,11,wbox_ancho,8);
 
   strcpy(full,tipo[v_tipo].path);
-  if (tipo[v_tipo].path[strlen(tipo[v_tipo].path)-1]!='/')
-    strcat(full,"/"); strcat(full,mascara);
+  if (tipo[v_tipo].path[strlen(tipo[v_tipo].path)-1]!='/') {
+    strcat(full,"/"); } strcat(full,mascara);
 
   wwrite_in_box(v.ptr,an,wbox_ancho+2,al,5,12,0,(byte *)full,c1);
   wwrite_in_box(v.ptr,an,wbox_ancho+2,al,4,12,0,(byte *)full,c3);
@@ -208,7 +208,7 @@ void crear_un_thumb_MAP(struct t_listboxbr * l){
 
   num=-1;
 
-  if (n=abs(_omx-mouse_x)+abs(_omy-mouse_y)+mouse_b*10) {
+  if ((n=abs(_omx-mouse_x)+abs(_omy-mouse_y)+mouse_b*10)) {
     incremento=(float)incremento/((float)n/20.0+1.0);
     incremento/=256; incremento*=256;
     if (incremento<512) incremento=512;
@@ -238,7 +238,7 @@ void crear_un_thumb_MAP(struct t_listboxbr * l){
 		strcpy(filename,l->lista+(l->lista_an*num));
 		strupr(filename);
 		
-      if (strchr(l->lista+(l->lista_an*num),'.')>0 &&
+      if (strchr(l->lista+(l->lista_an*num),'.')!=NULL &&
 	  strcmp(strchr(filename,'.'),".MAP") &&
           strcmp(strchr(filename,'.'),".PCX") &&
           strcmp(strchr(filename,'.'),".BMP") &&
@@ -429,7 +429,7 @@ void crear_un_thumb_PAL(struct t_listboxbr * l)
   char filename[255];
   num=-1;
 
-  if (n=abs(_omx-mouse_x)+abs(_omy-mouse_y)+mouse_b*10) {
+  if ((n=abs(_omx-mouse_x)+abs(_omy-mouse_y)+mouse_b*10)) {
     incremento=0;
   } else if (ascii) {
     incremento=0;
@@ -557,7 +557,7 @@ void crear_un_thumb_FNT(struct t_listboxbr * l)
   char filename[255];
   num=-1;
 
-  if (n=abs(_omx-mouse_x)+abs(_omy-mouse_y)+mouse_b*10)
+  if ((n=abs(_omx-mouse_x)+abs(_omy-mouse_y)+mouse_b*10))
   {
     incremento=(float)incremento/((float)n/20.0+1.0);
     incremento/=256; incremento*=256;
@@ -965,7 +965,7 @@ void crear_un_thumb_PCM(struct t_listboxbr * l)
   
   num=-1;
 
-  if (n=abs(_omx-mouse_x)+abs(_omy-mouse_y)+mouse_b*10)
+  if ((n=abs(_omx-mouse_x)+abs(_omy-mouse_y)+mouse_b*10))
   {
     incremento=(float)incremento/((float)n/20.0+1.0);
     incremento/=256; incremento*=256;
@@ -1238,7 +1238,7 @@ void crear_un_thumb_PCM(struct t_listboxbr * l)
       }
       memset(thumb[num].ptr,c1,thumb[num].an*thumb[num].al);
 
-      if (thumb[num].filesize>1)
+      if (thumb[num].filesize>1) {
       if (thumb[num].filesize<3*thumb[num].an)
       {
         step = (float)thumb[num].an/(float)(thumb[num].filesize-1);
@@ -1287,7 +1287,7 @@ void crear_un_thumb_PCM(struct t_listboxbr * l)
           } while (y++<y1);
         }
       }
-      free(temp);
+      } free(temp);
     }
   }
 
@@ -1443,10 +1443,10 @@ void browser0(void) {
   if (v_tipo==2 && v_modo>0) v_tipo=14;
   if (v_tipo==7 && v_modo>0) v_tipo=11;
 
-  while (x=tipo[v_tipo].ext[n++]) {
+  while ((x=tipo[v_tipo].ext[n++])) {
     m=0; while (x && x!=' ') {
       ext[an_ext*lextbr.maximo+m++]=x;
-      if (x=tipo[v_tipo].ext[n]) n++;
+      if ((x=tipo[v_tipo].ext[n])) n++;
     } ext[an_ext*(lextbr.maximo++)+m]=0;
   }
 

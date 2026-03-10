@@ -132,7 +132,7 @@ void clexico(void) {
     case l_id :
       if (iscoment>0) { cpieza=p_rem; _source++; break; }
       _ivnom=icvnom.b; *icvnom.p++=0; *icvnom.p++=(byte*)0x100; h=0;
-      while (*icvnom.b=lower[*_source++]) h=((byte)(h<<1)+(h>>7))^(*icvnom.b++);
+      while ((*icvnom.b=lower[*_source++])) h=((byte)(h<<1)+(h>>7))^(*icvnom.b++);
       icvnom.b++; _source--;
       if (icvnom.b-cvnom>max_obj*long_med_id) { icvnom.b=_ivnom; cpieza=p_id; break; }
       ptr=&cvhash[h];
@@ -157,7 +157,7 @@ void clexico(void) {
       } break;
 
     case l_spc:
-      while ((*++_source)==' '); cpieza=p_spc; break;
+      while ((*++_source)==' ') {} cpieza=p_spc; break;
 
     case l_lit:
       if (iscoment>0) { cpieza=p_rem; _source++; break; }
@@ -186,7 +186,7 @@ void clexico(void) {
     default: // puntero a un clex_ele
 
       e=clex_case[*_source++]; _ivnom=_source; cpieza=(*e).token;
-      while (e=(*e).siguiente) {
+      while ((e=(*e).siguiente)) {
         while (*_source!=(*e).caracter && (*e).alternativa) e=(*e).alternativa;
         if (*_source++==(*e).caracter && (*e).token) {
           cpieza=(*e).token; _ivnom=_source;
@@ -239,7 +239,7 @@ void col_analiza_ltlex(void){
     case  cr:
       if (*buf==cr) cont=0; else { buf++; } break;
     case ';':
-      while (*buf!=cr) buf++; break;
+      while (*buf!=cr) { buf++; } break;
     case '&':
       *buf=lower[*buf]; if (*buf>='0' && *buf<='9') t=(*buf++-'0')<<4;
       else if (*buf>='a' && *buf<='f') t=(*buf++-'a'+10)<<4; else col_error(0,2);
@@ -248,7 +248,7 @@ void col_analiza_ltlex(void){
       if (*buf==cr || *buf==' ' || *buf==tab) break;
       else if (lower[*buf]) {           //Analiza una palabra reservada
         _ivnom=icvnom.b; *icvnom.p++=0; *icvnom.p++=(byte *)t; h=0;
-        while (*icvnom.b=lower[*buf++]) h=((byte)(h<<1)+(h>>7))^(*icvnom.b++);
+        while ((*icvnom.b=lower[*buf++])) h=((byte)(h<<1)+(h>>7))^(*icvnom.b++);
         ptr=&cvhash[h]; while (*ptr) ptr=(byte **)*ptr; *ptr=_ivnom;
         buf--; icvnom.b++;
       } else if (t>=0x78 && t<=0x7b) {  //Analiza un delimitador de literal
@@ -267,9 +267,10 @@ void col_analiza_ltlex(void){
             e=(*e).siguiente;
             while ((*e).caracter!=*buf && (*e).alternativa)
               e=(*e).alternativa;
-            if ((*e).caracter!=*buf)
+            if ((*e).caracter!=*buf) {
               if (cnum_nodos++==max_nodos) col_error(0,3);
               else e=(*e).alternativa=iclex_simb++;
+            }
           } (*e).caracter=*buf++;
         } (*e).token=t;
       } break;

@@ -68,7 +68,7 @@ void salvaguarda(byte * p, int x, int y, int n, int flag) {
   y-=*((word*)(graf[n]+6));
 
 
-	if(x>vga_an | y>vga_al)
+	if((x>vga_an) | (y>vga_al))
 		return;
 
   volcado_parcial(x,y,an,al);
@@ -151,7 +151,7 @@ void put_bw(int x,int y,int n) { // Puts a contrasting graphic (mouse edition )
 void memxchg(byte *d, byte *s, int n) {
   int m,x;
 
-  if (m=n/4) do {
+  if ((m=n/4)) do {
     x=*(int*)s; *(int*)s=*(int*)d; *(int*)d=x;
     d+=4; s+=4;
   } while (--m);
@@ -393,7 +393,7 @@ void modo_inter(void) {
 
   an=mab_x1-mab_x0+1+4; al=mab_y1-mab_y0+1+4;
 
-  if ((m0=(word*)malloc(an*al*2))!=NULL)
+  if ((m0=(word*)malloc(an*al*2))!=NULL) {
   if ((m1=(word*)malloc(an*al*2))!=NULL) {
 
     make_near_regla();
@@ -429,6 +429,7 @@ void modo_inter(void) {
 
     free(m1); free(m0);
   } else free(m0);
+  }
 
   if (m0==NULL || m1==NULL) {
     v_texto=(char *)texto[45]; dialogo(err0);
@@ -450,12 +451,12 @@ void fill_inter(int an,int al) { // Rellena con medias una zona
   // 1 - Desplaza m0 hacia derecha abajo un pixel
 
   for (y=al-1;y>0;y--) for (x=an-1;x>0;x--) *(m0+y*an+x)=*(m0+(y-1)*an+x-1);
-  for (x=0;x<an;x++) *(m0+x)=0; for (y=0;y<al;y++) *(m0+y*an)=0;
+  for (x=0;x<an;x++) { *(m0+x)=0; } for (y=0;y<al;y++) { *(m0+y*an)=0; }
 
   // 2 - Refresca en m0 el alambre de puntos que rodean a la zona
 
   for (y=mab_y0-1;y<=mab_y1+1;y++) if (y>=0 && y<map_al)
-    for (x=mab_x0-1;x<=mab_x1+1;x++) if (x>=0 && x<map_an)
+    for (x=mab_x0-1;x<=mab_x1+1;x++) if (x>=0 && x<map_an) {
       if (is_near_mab(x,y)) {
         n=*(original+(y-mab_y0+1)*(an_original)+(x-mab_x0+1));
         n=(dac[n*3]+dac[n*3+1]+dac[n*3+2])*256+256;
@@ -463,6 +464,7 @@ void fill_inter(int an,int al) { // Rellena con medias una zona
       } else if (!is_mab(x,y)) {
         *(m0+(y-mab_y0+2)*an+(x-mab_x0+2))=0;
       }
+    }
 
   // Interpola de m0 a m1
 
@@ -471,35 +473,35 @@ void fill_inter(int an,int al) { // Rellena con medias una zona
   for (y=0;y<al-1;y++) {
     for (x=0;x<an-1;x++) {
 
-        if (n0=*si) // Pone en *(di) la media de los cuatro *(si+?)
-             if (n1=*(si+1))
-                  if (n2=*(si+an))
-                       if (n3=*(si+an+1))
+        if ((n0=*si)) // Pone en *(di) la media de los cuatro *(si+?)
+             if ((n1=*(si+1)))
+                  if ((n2=*(si+an)))
+                       if ((n3=*(si+an+1)))
                             *di=(n0+n1+n2+n3)>>2;
                        else *di=(n0+n1+n2)/3;
-                  else if (n3=*(si+an+1))
+                  else if ((n3=*(si+an+1)))
                             *di=(n0+n1+n3)/3;
                        else *di=(n0+n1)>>1;
-             else if (n2=*(si+an))
-                       if (n3=*(si+an+1))
+             else if ((n2=*(si+an)))
+                       if ((n3=*(si+an+1)))
                             *di=(n0+n2+n3)/3;
                        else *di=(n0+n2)>>1;
-                  else if (n3=*(si+an+1))
+                  else if ((n3=*(si+an+1)))
                             *di=(n0+n3)>>1;
                        else *di=n0;
-        else if (n1=*(si+1))
-                  if (n2=*(si+an))
-                       if (n3=*(si+an+1))
+        else if ((n1=*(si+1)))
+                  if ((n2=*(si+an)))
+                       if ((n3=*(si+an+1)))
                             *di=(n1+n2+n3)/3;
                        else *di=(n1+n2)>>1;
-                  else if (n3=*(si+an+1))
+                  else if ((n3=*(si+an+1)))
                             *di=(n1+n3)>>1;
                        else *di=n1;
-             else if (n2=*(si+an))
-                       if (n3=*(si+an+1))
+             else if ((n2=*(si+an)))
+                       if ((n3=*(si+an+1)))
                             *di=(n2+n3)>>1;
                        else *di=n2;
-                  else if (n3=*(si+an+1))
+                  else if ((n3=*(si+an+1)))
                             *di=n3;
                        else *di=0;
       si++; di++;
@@ -513,35 +515,35 @@ void fill_inter(int an,int al) { // Rellena con medias una zona
   for (y=0;y<al-1;y++) {
     for (x=0;x<an-1;x++) {
 
-        if (n0=*si) // Pone en *(di) la media de los cuatro *(si+?)
-             if (n1=*(si+1))
-                  if (n2=*(si+an))
-                       if (n3=*(si+an+1))
+        if ((n0=*si)) // Pone en *(di) la media de los cuatro *(si+?)
+             if ((n1=*(si+1)))
+                  if ((n2=*(si+an)))
+                       if ((n3=*(si+an+1)))
                             *di=(n0+n1+n2+n3)>>2;
                        else *di=(n0+n1+n2)/3;
-                  else if (n3=*(si+an+1))
+                  else if ((n3=*(si+an+1)))
                             *di=(n0+n1+n3)/3;
                        else *di=(n0+n1)>>1;
-             else if (n2=*(si+an))
-                       if (n3=*(si+an+1))
+             else if ((n2=*(si+an)))
+                       if ((n3=*(si+an+1)))
                             *di=(n0+n2+n3)/3;
                        else *di=(n0+n2)>>1;
-                  else if (n3=*(si+an+1))
+                  else if ((n3=*(si+an+1)))
                             *di=(n0+n3)>>1;
                        else *di=n0;
-        else if (n1=*(si+1))
-                  if (n2=*(si+an))
-                       if (n3=*(si+an+1))
+        else if ((n1=*(si+1)))
+                  if ((n2=*(si+an)))
+                       if ((n3=*(si+an+1)))
                             *di=(n1+n2+n3)/3;
                        else *di=(n1+n2)>>1;
-                  else if (n3=*(si+an+1))
+                  else if ((n3=*(si+an+1)))
                             *di=(n1+n3)>>1;
                        else *di=n1;
-             else if (n2=*(si+an))
-                       if (n3=*(si+an+1))
+             else if ((n2=*(si+an)))
+                       if ((n3=*(si+an+1)))
                             *di=(n2+n3)>>1;
                        else *di=n2;
-                  else if (n3=*(si+an+1))
+                  else if ((n3=*(si+an+1)))
                             *di=n3;
                        else *di=0;
 
@@ -628,8 +630,8 @@ void fill_scan(word x,word y) {
   x0=x; do x0--; while (x0>=0 && fill_dac[*(map+y*map_an+x0)]); x0++;
   x1=x; do x1++; while (x1<map_an && fill_dac[*(map+y*map_an+x1)]); x1--;
 
-  if (x0<mab_x0) mab_x0=x0; if (x1>mab_x1) mab_x1=x1;
-  if (y<mab_y0) mab_y0=y; if (y>mab_y1) mab_y1=y;
+  if (x0<mab_x0) { mab_x0=x0; } if (x1>mab_x1) { mab_x1=x1; }
+  if (y<mab_y0) { mab_y0=y; } if (y>mab_y1) { mab_y1=y; }
 
   for (x=x0;x<=x1;x++) set_mab(x,y);
 
@@ -733,12 +735,13 @@ void draw_selection_mab(void) {
       inc32=y*map_an+x0; _mab=mab+(inc32>>5); inc32&=31;
       p=copia+(zy+y-zoom_y)*vga_an+(zx+x0-zoom_x); c=(cclock^y^x0)&1;
       for (x=x0;x<=x1;x++,p++,c^=1) {
-        if (*_mab) if ((*_mab)&(1<<inc32))
+        if (*_mab) { if ((*_mab)&(1<<inc32)) {
             if (y==0 || x==0 || y==map_al-1 || x==map_an-1)  {
               if (c) *p=g0; else *p=g4;
             } else if (!is_mab(x,y-1) || !is_mab(x-1,y) || !is_mab(x,y+1) || !is_mab(x+1,y)) {
               if (c) *p=g0; else *p=g4;
             }
+        } }
         if (!(inc32=(inc32+1)&31)) _mab++;
       }
     } break;
@@ -875,7 +878,7 @@ void draw_selection_box(int _x0,int _y0,int _x1,int _y1) {
   if (x1>=zx && x0<zx+zan && y1>=zy && y0<zy+zal) {
 
     if (y0>=zy) {
-      if (x0<zx) x0=zx; if (x1>=zx+zan) x1=zx+zan-1;
+      if (x0<zx) { x0=zx; } if (x1>=zx+zan) { x1=zx+zan-1; }
       n=x1-x0+1;
       p=copia+vga_an*y0+x0;
       if ((y0^cclock)&1) do {
@@ -887,7 +890,7 @@ void draw_selection_box(int _x0,int _y0,int _x1,int _y1) {
     }
 
     if (y1<zy+zal) {
-      if (x0<zx) x0=zx; if (x1>=zx+zan) x1=zx+zan-1;
+      if (x0<zx) { x0=zx; } if (x1>=zx+zan) { x1=zx+zan-1; }
       n=x1-x0+1;
       p=copia+vga_an*y1+x0;
       if ((y1^cclock)&1) do {
@@ -902,7 +905,7 @@ void draw_selection_box(int _x0,int _y0,int _x1,int _y1) {
     x1=zx+(_x1<<zoom)-(zoom_x<<zoom)+(1<<zoom)-1;
 
     if (x0>=zx) {
-      if (y0<zy) y0=zy; if (y1>=zy+zal) y1=zy+zal-1;
+      if (y0<zy) { y0=zy; } if (y1>=zy+zal) { y1=zy+zal-1; }
       n=y1-y0+1;
       p=copia+vga_an*y0+x0;
       if ((x0^cclock)&1) do {
@@ -915,7 +918,7 @@ void draw_selection_box(int _x0,int _y0,int _x1,int _y1) {
     }
 
     if (x1<zx+zan) {
-      if (y0<zy) y0=zy; if (y1>=zy+zal) y1=zy+zal-1;
+      if (y0<zy) { y0=zy; } if (y1>=zy+zal) { y1=zy+zal-1; }
       n=y1-y0+1;
       p=copia+vga_an*y0+x1;
       if ((x1^cclock)&1) do {
@@ -973,8 +976,10 @@ byte * save_undo(int x, int y, int an, int al) {
   int a,start,end; // Inicio y fin del bloque guardado (en undo[])
   byte *ret=0;
 
-  if (x<0) {an+=x; x=0; } if (y<0) {al+=y; y=0; }
-  if (x+an>map_an) an=map_an-x; if (y+al>map_al) al=map_al-y;
+  if (x<0) { an+=x; x=0; }
+  if (y<0) { al+=y; y=0; }
+  if (x+an>map_an) { an=map_an-x; }
+  if (y+al>map_al) { al=map_al-y; }
   if (an<=0 || al<=0) return((byte *)-1);
 
   // Determina la zona de zoom a refrescar

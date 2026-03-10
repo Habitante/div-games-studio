@@ -411,7 +411,7 @@ void editor() {
 
 //-----------------------------------------------------------------------------
 
-  if (bloque_edit==1) // Bloque edit en una línea
+  if (bloque_edit==1) { // Bloque edit en una línea
 
   if ((shift_status&3) && !(shift_status&12)) switch(scan_code) {
 
@@ -526,10 +526,11 @@ void editor() {
       scan_code=0; v.volcar++; break;
 
   } else if (scan_code) f_desmarcar();
+  } // bloque_edit==1
 
 //-----------------------------------------------------------------------------
 
-  if (bloque_edit==2) // Bloque edit de varias líneas.
+  if (bloque_edit==2) { // Bloque edit de varias líneas.
 
   if ((shift_status&3) && !(shift_status&12)) switch(scan_code) {
     case 0: break;
@@ -662,10 +663,11 @@ void editor() {
       v.volcar++; scan_code=0; break;
 
   } else if (scan_code) f_desmarcar();
+  } // bloque_edit==2
 
 //-----------------------------------------------------------------------------
 
-  if (bloque_edit==0) // Solo si no hay un bloque de tipo edit
+  if (bloque_edit==0) { // Solo si no hay un bloque de tipo edit
 
   if ((shift_status&3) && !(shift_status&12)) switch(scan_code) {
     case 77:                                    // shift+right
@@ -830,7 +832,8 @@ void editor() {
       f_cortar_bloque(1); f_pegar_bloque(); } break;
 
   }
-  
+  } // bloque_edit==0
+
   if(mouse_b&4 && wmouse_x!=-1) {
 	  f_scroll(3);
   }
@@ -1241,14 +1244,16 @@ void f_suprimir(void) {
   } else { // Suprime un carácter
     for (n=v.prg->columna-1;n<strlen(v.prg->l);n++) v.prg->l[n]=v.prg->l[n+1];
     if (kini==v.prg->lptr && kcol1>v.prg->columna) kcol1--;
-    if (kfin==v.prg->lptr)
+    if (kfin==v.prg->lptr) {
       if (kcol2>v.prg->columna) kcol2--;
-      else if (kcol2==v.prg->columna)
+      else if (kcol2==v.prg->columna) {
         if (kini==v.prg->lptr && kcol1==kcol2) kbloque=0;
         else if (kcol2==1) {
           retrocede_lptr(); kfin=v.prg->lptr;
           avanza_lptr(); kcol2=linelen(kfin)+1;
         } else kcol2--;
+      }
+    }
   }
 }
 
@@ -2570,7 +2575,7 @@ void programa0_nuevo(void) {
           div_strcpy(v_prg->filename, sizeof(v_prg->filename), input);
           div_strcpy(v_prg->path, sizeof(v_prg->path), tipo[v_tipo].path);
 //        n-=buffer_grow;
-        n=strlen(buffer);
+        n=strlen((char *)buffer);
         v_prg->file_lon=n;
         v_prg->buffer=buffer;
         v_prg->lptr=buffer;
@@ -2578,11 +2583,11 @@ void programa0_nuevo(void) {
         v_prg->num_lineas=1;
         nueva_ventana(programa0);
         // Add the template
-        strcpy(buffer,"PROGRAM yourprg;");
+        strcpy((char *)buffer,"PROGRAM yourprg;");
         read_line();
         f_enter();
             // Add the template
-        strcat(buffer,"BEGIN");
+        strcat((char *)buffer,"BEGIN");
          // Your code here\n\n END");
         f_enter();
         
@@ -2970,7 +2975,7 @@ void crear_lista_procesos(char * buffer, int file_lon) {
   lp_num=0; lp_ini=0; lp_select=0;
 
   do {
-    while (*p!=lf && p<end) p++; p++; linea++;
+    while (*p!=lf && p<end) { p++; } p++; linea++;
     if (p<end) {
       while (*p==' ' && p<end) p++;
       if (p+7<end) {

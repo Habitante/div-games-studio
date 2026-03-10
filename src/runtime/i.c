@@ -314,6 +314,7 @@ void GetFree4kBlocks(void);
 int DOSalloc4k(void);
 int DPMIalloc4k(void);
 
+#ifdef __WATCOMC__
 #pragma aux DOSalloc4k =\
         "mov bx,0100h",\
         "mov ax,0100h",\
@@ -339,6 +340,7 @@ int DPMIalloc4k(void);
         "mov dx,cx",\
         "done:",\
         modify [ax bx cx si di] value [edx];
+#endif /* __WATCOMC__ */
 
 //-----------------------------------------------------------------------------
 // Initialise (setup)
@@ -375,7 +377,7 @@ void inicializacion (void) {
   inicio_privadas=iloc_pub_len;
   imem=mem[8];            // Final code , local and texts ( length cmp ) | Final de código, locales y textos (longitud del cmp)
 
-  if (iloc_len&1) iloc_len++; if (!(imem&1)) imem++;
+  if (iloc_len&1) { iloc_len++; } if (!(imem&1)) { imem++; }
 
   if((copia=(byte*)malloc(vga_an*vga_al))==NULL) exer(1);
   memset(copia,0,vga_an*vga_al);
@@ -851,19 +853,21 @@ void trace_process(void) {
 
 	id_old=ide;
 
-	if (ide) if (mem[ide+_Frame]>=100) {
-		mem[ide+_Frame]-=100;
-		mem[ide+_Executed]=1;
-	} else {
-		id=ide;
-		ip=mem[id+_IP];
-		carga_pila(id);
+	if (ide) {
+		if (mem[ide+_Frame]>=100) {
+			mem[ide+_Frame]-=100;
+			mem[ide+_Executed]=1;
+		} else {
+			id=ide;
+			ip=mem[id+_IP];
+			carga_pila(id);
 
-		continue_process:
+			continue_process:
 
-		max_reloj=get_reloj()+max_process_time;
+			max_reloj=get_reloj()+max_process_time;
 
-		nucleo_trace();
+			nucleo_trace();
+		}
 	}
 
 	id=ide;
@@ -1212,25 +1216,28 @@ void frame_end(void) {
 
       ide=0; m7ide=0; scrollide=0; otheride=0; max=0x80000000;
 
-		for (id=id_start; id<=id_end; id+=iloc_len)
+		for (id=id_start; id<=id_end; id+=iloc_len) {
 			if ((mem[id+_Status]==2 || mem[id+_Status]==4) && mem[id+_Ctype]==0 &&
 				!mem[id+_Executed] && mem[id+_Z]>max) {
-				
-				ide=id; 
-				max=mem[id+_Z]; 
+
+				ide=id;
+				max=mem[id+_Z];
 
 			}
+		}
 
-			for (n=0;n<10;n++)
+			for (n=0;n<10;n++) {
 				if (im7[n].on && (m7+n)->z>=max && !im7[n].painted) {
-					m7ide=n+1; 
+					m7ide=n+1;
 					max=(m7+n)->z;
 				}
+			}
 
-				for (n=0;n<10;n++)
+				for (n=0;n<10;n++) {
 					if (iscroll[n].on && (scroll+n)->z>=max && !iscroll[n].painted) {
 						scrollide=n+1; max=(scroll+n)->z;
 					}
+				}
 
 				if (text_z>=max && !textos_pintados) {
 					max=text_z;
@@ -1469,7 +1476,7 @@ void elimina_proceso(int id) {
 
 	mem[id+_Status]=0; procesos--;
 
-	if (id2=mem[id+_Father]) {
+	if ((id2=mem[id+_Father])) {
 		if (mem[id2+_Son]==id) mem[id2+_Son]=mem[id+_BigBro];
 			if (mem[id+_FCount]>0 && mem[id2+_Status]==3) {
 				mem[id2+_Executed]=0;
@@ -1477,9 +1484,9 @@ void elimina_proceso(int id) {
 			}
 	}
 
-	if (id2=mem[id+_BigBro]) mem[id2+_SmallBro]=mem[id+_SmallBro];
-		if (id2=mem[id+_SmallBro]) mem[id2+_BigBro]=mem[id+_BigBro];
-			if (id2=mem[id+_Son]) {
+	if ((id2=mem[id+_BigBro])) mem[id2+_SmallBro]=mem[id+_SmallBro];
+		if ((id2=mem[id+_SmallBro])) mem[id2+_BigBro]=mem[id+_BigBro];
+			if ((id2=mem[id+_Son])) {
 				do {
 					mem[id2+_Father]=id_init;
 					mem[id2+_Caller]=0;
@@ -2146,13 +2153,13 @@ void busca_packfile(void) {
   // look for paks in embedded zip
   if(datastartpos>0) {
     zip = unzOpen(exebin);
-    fprintf(stdout,"%x\n",zip);
+    fprintf(stdout,"%x\n",(unsigned int)(uintptr_t)zip);
     // found zip. search for .pak files
     if(unzGoToFirstFile(zip)==UNZ_OK) {
       do {
         if (unzGetCurrentFileInfo(zip, &fileInfo, szCurrentFileName, sizeof(szCurrentFileName)-1, NULL, 0, NULL, 0) == UNZ_OK) {
           fprintf(stdout,"found file: %s\n",szCurrentFileName);
-          f = memz_open_file(szCurrentFileName);
+          f = memz_open_file((unsigned char *)szCurrentFileName);
           fprintf(stdout,"TESTING %s\n",szCurrentFileName);
           if(f) {
             if(is_pak(f,szCurrentFileName)) {

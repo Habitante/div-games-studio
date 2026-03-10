@@ -16,6 +16,7 @@ char exebin[255];
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 #include "zlib.h"
 #include "unzip.h"
 #include "osdep.h"
@@ -125,7 +126,7 @@ int len = divz_open_file(full);
 
 if(len) {
 out = fmemopen(zipptr,len,"rb");
-printf("zipptr %x, len: %d\n",zipptr, len);
+printf("zipptr %x, len: %d\n",(unsigned)(uintptr_t)zipptr, len);
 
 return out;
 }
@@ -140,7 +141,7 @@ if(!len) {
 
 if(len) {
 out = fmemopen(zipptr,len,"rb");
-printf("zipptr %x, len: %d\n",zipptr, len);
+printf("zipptr %x, len: %d\n",(unsigned)(uintptr_t)zipptr, len);
 
 return out;
 }
@@ -168,13 +169,14 @@ if(datastartpos==0)
 else
 	zip = (unzFile*)unzOpen(exebin);
 
-printf("loaded zip: %x %s %d\n",zip,exebin,datastartpos);
+printf("loaded zip: %x %s %d\n",(unsigned)(uintptr_t)zip,exebin,datastartpos);
 
 
 printf("Looking for %s\n",full);
 
-if(zip==NULL)
+if(zip==NULL) {
 	return 0;
+}
 
 	unzGoToFirstFile(zip);
 				if(unzLocateFile (zip,full,2)==UNZ_OK)
@@ -197,7 +199,7 @@ if(zip==NULL)
 				 readBytes = unzReadCurrentFile(zip, zipptr, fileInfo.uncompressed_size);
 				unzClose(zip);
 				zip=NULL;
-				printf("Read %d of %d byte\n", readBytes, fileInfo.uncompressed_size);
+				printf("Read %d of %lu byte\n", readBytes, fileInfo.uncompressed_size);
 				return readBytes;
 					}
 
@@ -585,8 +587,9 @@ extern int ZEXPORT unzClose ( unzFile file)
 		return UNZ_PARAMERROR;
 	s=(unz_s*)file;
 
-    if (s->pfile_in_zip_read!=NULL)
+    if (s->pfile_in_zip_read!=NULL) {
         unzCloseCurrentFile(file);
+    }
 
 	fclose(s->file);
 	TRYFREE(s);
@@ -895,11 +898,13 @@ extern int ZEXPORT unzLocateFile (
 	uLong pos_in_central_dirSaved;
 
 
-	if (file==NULL)
+	if (file==NULL) {
 		return UNZ_PARAMERROR;
+	}
 
-    if (strlen(szFileName)>=UNZ_MAXFILENAMEINZIP)
+    if (strlen(szFileName)>=UNZ_MAXFILENAMEINZIP) {
         return UNZ_PARAMERROR;
+    }
 
 	s=(unz_s*)file;
 	if (!s->current_file_ok)
@@ -977,8 +982,9 @@ local int unzlocal_CheckCurrentFileCoherencyHeader (
 		err=UNZ_BADZIPFILE;
 
     if ((err==UNZ_OK) && (s->cur_file_info.compression_method!=0) &&
-                         (s->cur_file_info.compression_method!=Z_DEFLATED))
+                         (s->cur_file_info.compression_method!=Z_DEFLATED)) {
         err=UNZ_BADZIPFILE;
+    }
 
 	if (unzlocal_getLong(s->file,&uData) != UNZ_OK) /* date/time */
 		err=UNZ_ERRNO;
@@ -1042,8 +1048,9 @@ extern int ZEXPORT unzOpenCurrentFile (
 	if (!s->current_file_ok)
 		return UNZ_PARAMERROR;
 
-    if (s->pfile_in_zip_read != NULL)
+    if (s->pfile_in_zip_read != NULL) {
         unzCloseCurrentFile(file);
+    }
 
 	if (unzlocal_CheckCurrentFileCoherencyHeader(s,&iSizeVar,
 				&offset_local_extrafield,&size_local_extrafield)!=UNZ_OK)

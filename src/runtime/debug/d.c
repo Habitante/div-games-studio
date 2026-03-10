@@ -294,7 +294,7 @@ void init_debug(void) {
     } else { fclose(f); exer(1); }
   } else line=NULL;
 
-  if (line!=NULL)
+  if (line!=NULL) {
     if ((f=fopen("system/exec.pgm","rb"))!=NULL) {
       fseek(f,0,SEEK_END); n=ftell(f);
       if ((source=(byte *)malloc(n))!=NULL) {
@@ -304,6 +304,7 @@ void init_debug(void) {
         end_source=source+n;
       } else { fclose(f); exer(1); }
     } else { free(line); line=NULL; }
+  }
 
   if ((var=(struct variables *)malloc(sizeof(struct variables)*num_obj))==NULL) exer(1);
   if ((ids=(int *)malloc(sizeof(int)*max_procesos))==NULL) exer(1);
@@ -618,7 +619,8 @@ void entorno_dialogo(void) {
     // Si estamos dentro del contenido de una ventana ...
     //-------------------------------------------------------------------------
 
-    if (n==0) if (mouse_in(v.x+2*big2,v.y+10*big2,v.x+v.an-2*big2,v.y+v.al-2*big2)) {
+    if (n==0) {
+      if (mouse_in(v.x+2*big2,v.y+10*big2,v.x+v.an-2*big2,v.y+v.al-2*big2)) {
 
       dialogo_invocado=1;
       wmouse_x=mouse_x-v.x; wmouse_y=mouse_y-v.y;
@@ -635,6 +637,7 @@ void entorno_dialogo(void) {
       if (mouse_graf==5 && (mouse_b&1)) {
         cierra_ventana(); salir_del_dialogo=1;
       } oldn=-1;
+    }
     }
 
     //-------------------------------------------------------------------------
@@ -790,9 +793,11 @@ void vuelca_ventana(int m) {
     if (x>__x) { salta_x+=x-__x; _ptr+=salta_x; __x=x; _an-=salta_x; }
     if (x+an<__x+_an) { salta_x+=__x+_an-x-an; _an-=__x+_an-x-an;  }
 
-    if (_an>0 && _al>0) if (ventana[n].primer_plano==1)
-      wvolcado(copia,vga_an,vga_al,_ptr,__x,_y,_an,_al,salta_x);
-    else wvolcado_oscuro(copia,vga_an,vga_al,_ptr,__x,_y,_an,_al,salta_x);
+    if (_an>0 && _al>0) {
+      if (ventana[n].primer_plano==1)
+        wvolcado(copia,vga_an,vga_al,_ptr,__x,_y,_an,_al,salta_x);
+      else wvolcado_oscuro(copia,vga_an,vga_al,_ptr,__x,_y,_an,_al,salta_x);
+    }
 
   }
 
@@ -1065,7 +1070,7 @@ int text_len(byte * ptr) {
 
   if (big) an/=2;
 
-  if (an) an--; return(an);
+  if (an) { an--; } return(an);
 
 }
 
@@ -1136,22 +1141,24 @@ void wwrite_in_box(byte*copia,int an_real_copia,int an_copia,int al_copia,
     case 8: x=x-an+1; y=y-al+1; break;
   }
 
-  if (boton) if (c!=c0) {
-    wbox(copia,an_real_copia,al_copia,c2,x-2,y-2,an+4,al+4);
-    wrectangulo(copia,an_real_copia,al_copia,c0,x-3,y-3,an+6,al+6);
-    wrectangulo(copia,an_real_copia,al_copia,c3,x-2,y-2,an+3,1);
-    wrectangulo(copia,an_real_copia,al_copia,c3,x-2,y-2,1,al+3);
-    wrectangulo(copia,an_real_copia,al_copia,c4,x-2,y-2,1,1);
-    wrectangulo(copia,an_real_copia,al_copia,c1,x-1,y+al+1,an+3,1);
-    wrectangulo(copia,an_real_copia,al_copia,c1,x+an+1,y-1,1,al+3);
-  } else {
-    wbox(copia,an_real_copia,al_copia,c1,x-2,y-2,an+4,al+4);
-    wrectangulo(copia,an_real_copia,al_copia,c0,x-3,y-3,an+6,al+6);
-    wrectangulo(copia,an_real_copia,al_copia,c0,x-2,y-2,an+3,1);
-    wrectangulo(copia,an_real_copia,al_copia,c0,x-2,y-2,1,al+3);
-    wrectangulo(copia,an_real_copia,al_copia,c2,x-1,y+al+1,an+3,1);
-    wrectangulo(copia,an_real_copia,al_copia,c2,x+an+1,y-1,1,al+3);
-    wrectangulo(copia,an_real_copia,al_copia,c3,x+an+1,y+al+1,1,1);
+  if (boton) {
+    if (c!=c0) {
+      wbox(copia,an_real_copia,al_copia,c2,x-2,y-2,an+4,al+4);
+      wrectangulo(copia,an_real_copia,al_copia,c0,x-3,y-3,an+6,al+6);
+      wrectangulo(copia,an_real_copia,al_copia,c3,x-2,y-2,an+3,1);
+      wrectangulo(copia,an_real_copia,al_copia,c3,x-2,y-2,1,al+3);
+      wrectangulo(copia,an_real_copia,al_copia,c4,x-2,y-2,1,1);
+      wrectangulo(copia,an_real_copia,al_copia,c1,x-1,y+al+1,an+3,1);
+      wrectangulo(copia,an_real_copia,al_copia,c1,x+an+1,y-1,1,al+3);
+    } else {
+      wbox(copia,an_real_copia,al_copia,c1,x-2,y-2,an+4,al+4);
+      wrectangulo(copia,an_real_copia,al_copia,c0,x-3,y-3,an+6,al+6);
+      wrectangulo(copia,an_real_copia,al_copia,c0,x-2,y-2,an+3,1);
+      wrectangulo(copia,an_real_copia,al_copia,c0,x-2,y-2,1,al+3);
+      wrectangulo(copia,an_real_copia,al_copia,c2,x-1,y+al+1,an+3,1);
+      wrectangulo(copia,an_real_copia,al_copia,c2,x+an+1,y-1,1,al+3);
+      wrectangulo(copia,an_real_copia,al_copia,c3,x+an+1,y+al+1,1,1);
+    }
   }
 
   if (centro_org&0xFF00) {
@@ -1206,7 +1213,7 @@ void wtexn(byte*copia,int an_real_copia,byte*p,int x,int y,byte an,int al,byte c
 
   do {
     do {
-      if (*p) *q=c; p++; q++;
+      if (*p) { *q=c; } p++; q++;
     } while (--an);
     q+=an_real_copia-(an=ancho);
   } while (--al);
@@ -1231,7 +1238,7 @@ void wtexc(byte*copia,int an_real_copia,int an_copia,int al_copia,
   resto_x+=salta_x; an=long_x;
   do {
     do {
-      if (*p) *q=c; p++; q++;
+      if (*p) { *q=c; } p++; q++;
     } while (--an);
     q+=an_real_copia-(an=long_x); p+=resto_x;
   } while (--long_y);
@@ -1325,9 +1332,11 @@ void actualiza_caja(int x, int y, int an, int al) {
     if (x>__x) { salta_x+=x-__x; _ptr+=salta_x; __x=x; _an-=salta_x; }
     if (x+an<__x+_an) { salta_x+=__x+_an-x-an; _an-=__x+_an-x-an;  }
 
-    if (_an>0 && _al>0) if (ventana[n].primer_plano==1)
-      wvolcado(copia,vga_an,vga_al,_ptr,__x,_y,_an,_al,salta_x);
-    else wvolcado_oscuro(copia,vga_an,vga_al,_ptr,__x,_y,_an,_al,salta_x);
+    if (_an>0 && _al>0) {
+      if (ventana[n].primer_plano==1)
+        wvolcado(copia,vga_an,vga_al,_ptr,__x,_y,_an,_al,salta_x);
+      else wvolcado_oscuro(copia,vga_an,vga_al,_ptr,__x,_y,_an,_al,salta_x);
+    }
 
   }
 
@@ -1366,7 +1375,7 @@ void restaura_tapiz(int x,int y,int an,int al) {
   byte *t;
   int n,_an;
 
-  if (y<0) y=0; if (x<0) x=0;
+  if (y<0) { y=0; } if (x<0) { x=0; }
   if (y+al>vga_al) al=vga_al-y;
   if (x+an>vga_an) an=vga_an-x;
 
@@ -1479,12 +1488,16 @@ void select_get(t_item * i,int activo,int ocultar_error) {
     if (i->estado&2) { strcpy(get,(char *)i->get.buffer); get_pos=strlen(get); }
     i->estado&=1;
   } else {
-    if (i->estado&2) if (*get) if (i->get.r0==i->get.r1) strcpy((char *)i->get.buffer,get); else {
-      if (atoi(get)>=i->get.r0 && atoi(get)<=i->get.r1) itoa(atoi(get),(char *)i->get.buffer,10);
-      else if (!ocultar_error && !show_items_called) {
-        sprintf(combo_error,"%s [%d..%d].",text[4],i->get.r0,text[5],i->get.r1,text[6]);
-        text[3]=(byte *)combo_error;
-        v_texto=(char *)text[3]; dialogo(err0);
+    if (i->estado&2) {
+      if (*get) {
+        if (i->get.r0==i->get.r1) strcpy((char *)i->get.buffer,get); else {
+          if (atoi(get)>=i->get.r0 && atoi(get)<=i->get.r1) itoa(atoi(get),(char *)i->get.buffer,10);
+          else if (!ocultar_error && !show_items_called) {
+            sprintf(combo_error,"%s [%d..%d].",(char *)text[4],i->get.r0,i->get.r1);
+            text[3]=(byte *)combo_error;
+            v_texto=(char *)text[3]; dialogo(err0);
+          }
+        }
       }
     }
 
@@ -1689,7 +1702,7 @@ void process_get(int n,int e) {
      get_pos=strlen(get);
   }
 
-  if (e&4) *get=0; e&=3;
+  if (e&4) { *get=0; } e&=3;
 
   switch(v.item[n].estado=e) {
     case 2: get_input(n); break;
@@ -1728,7 +1741,7 @@ void process_flag(int n,int e) {
       v.item[n].flag.texto,c4);
       if (v.item[n].estado==1) {
         v.active_item=n;
-        if (*v.item[n].flag.valor=!*v.item[n].flag.valor)
+        if ((*v.item[n].flag.valor=!*v.item[n].flag.valor))
           wput(v.ptr,v.an/big2,v.al/big2,v.item[n].flag.x,v.item[n].flag.y,-59);
         else wput(v.ptr,v.an/big2,v.al/big2,v.item[n].flag.x,v.item[n].flag.y,58);
       } break;
@@ -2784,6 +2797,7 @@ void inspect2(void) {
           var[var_select].indice=0;
           break;
         }
+        /* fall through */
       case ttglo: case ttloc:
       case tbglo: case tbloc:
       case twglo: case twloc:
@@ -2883,6 +2897,7 @@ void inspect2(void) {
             v.volcar=1;
             break;
           }
+          /* fall through */
         case ttglo: case ttloc:
         case tbglo: case tbloc: case twglo: case twloc:
           n=o[var[var_select].objeto].v2+1;
@@ -3204,7 +3219,7 @@ void visualiza(int valor, int objeto, char * str) {
         strcat(str,"\"");
       } else if (valor>=0 && valor<=255) {
         if (valor==0) strcat(str,"<EOL>");
-        else sprintf(str+strlen(str),"\"%c\"\0",valor);
+        else sprintf(str+strlen(str),"\"%c\"",valor);
       } else itoa(valor,str+strlen(str),10);
       break;
     case 3: // Process
@@ -3230,7 +3245,7 @@ void visualiza(int valor, int objeto, char * str) {
       sprintf(str+strlen(str),"%.3f\xa7, %.4f rad",(float)valor/1000.0,(float)valor/radian);
       break;
     case 5: // Hex
-      sprintf(str+strlen(str),"0x%X\0",valor);
+      sprintf(str+strlen(str),"0x%X",valor);
       break;
     case 6: // Bin
       for (n=0;n<32;n++) if (valor&0x80000000) break; else valor<<=1;
@@ -3262,6 +3277,7 @@ int _get_offset(int m) {
       return(o[var[m].objeto].v0);
     case ttglo:
       if (var[m].indice>=0) return(o[var[m].objeto].v0+var[m].indice);
+      /* fall through */
     case tpigl:
       if (var[m].indice>=0) return(memo(o[var[m].objeto].v0)+var[m].indice);
       else return(o[var[m].objeto].v0);
@@ -3540,7 +3556,7 @@ byte * change_mode(void) {
   new_mode=0; free(v.ptr);
   v.an=304*big2; v.al=(146+46)*big2;
   if ((v.ptr=(byte*)malloc(v.an*v.al))==NULL) exer(1);
-  if (v.x<0) v.x=0; if (v.y<0) v.y=0;
+  if (v.x<0) { v.x=0; } if (v.y<0) { v.y=0; }
   if (v.x+v.an>vga_an) v.x=vga_an-v.an;
   if (v.y+v.al>vga_al) v.y=vga_al-v.al;
   repinta_ventana(); call(v.paint_handler);
@@ -4002,7 +4018,7 @@ void pinta_codigo(void) { // Pinta el código
       wput(ptr,an,al,48,148-16-32+n*8,36);
       c=*(p+columna1); *(p+columna1)=0; x=x_inicio-54;
       wwrite_in_box(ptr+54*big2,an,an-59,al,x,148-16-32+n*8,0,p,c3);
-      if (text_len(p)) x+=text_len(p)+1; *(p+columna1)=c;
+      if (text_len(p)) { x+=text_len(p)+1; } *(p+columna1)=c;
       if (l==linea2) {
         c=*(p+columna2+1); *(p+columna2+1)=0;
         wwrite_in_box(ptr+54*big2,an,an-59,al,x+1,148-16-32+n*8,0,p+columna1,c0);
@@ -4078,7 +4094,7 @@ void crear_lista_procesos(void) {
   p=source+1; lp_num=0; lp_ini=0; lp_select=0;
 
   do {
-    while (*p && p<end_source) p++; p++; linea++;
+    while (*p && p<end_source) { p++; } p++; linea++;
     if (p<end_source) {
       while (*p==' ' && p<end_source) p++;
       if (p+9<end_source) {
@@ -4303,10 +4319,12 @@ int lp2_select; //???
 
 unsigned int get_tick(void);
 
+#ifdef __WATCOMC__
 #pragma aux get_tick= \
  "mov ecx,10h"        \
  "db 0fh,032h"        \
  parm[] value[eax] modify[eax ecx edx]
+#endif
 
 // "rdmsr"
 // "mov cl,4"
@@ -4314,12 +4332,14 @@ unsigned int get_tick(void);
 
 void reset_tick(void);
 
+#ifdef __WATCOMC__
 #pragma aux reset_tick= \
  "mov ecx,10h"          \
  "xor edx,edx"          \
  "xor eax,eax"          \
  "db 0fh,030h"          \
  parm[] modify[ecx eax edx]
+#endif
 
 // "wrmsr"
 
@@ -4440,9 +4460,10 @@ void pintar_lista_profile(void) {
     porcen2=(unsigned)(((double)o[lp1[m]].v4*(double)10000.0)/(double)f_max);
     wbox(ptr,an,al,c_g_low, an-11-130,lpy+(m-lp_ini)*lpal,(64*porcen2)/10000,lpal-1);
     sprintf(cwork,"%d.%02d%c",porcen/100,porcen%100,'%');
-    if (absolut)
+    if (absolut) {
       if (game_frames>0) sprintf(cwork,"%d",(int)((o[lp1[m]].v4*100)/game_frames));
       else sprintf(cwork,"0");
+    }
 
     wwrite(ptr,an,al,an-10-130+32,lpy+1+(m-lp_ini)*lpal,1,(byte *)cwork,c_g_low0);
     wwrite(ptr,an,al,an-11-130+32,lpy+1+(m-lp_ini)*lpal,1,(byte *)cwork,c34);
@@ -4453,9 +4474,10 @@ void pintar_lista_profile(void) {
     porcen2=(unsigned)(((double)o[lp1[m]].v5*(double)10000.0)/(double)f_max);
     wbox(ptr,an,al,c_r_low, an-11-65,lpy+(m-lp_ini)*lpal,(64*porcen2)/10000,lpal-1);
     sprintf(cwork,"%d.%02d%c",porcen/100,porcen%100,'%');
-    if (absolut)
+    if (absolut) {
       if (game_frames>0) sprintf(cwork,"%d",(int)((o[lp1[m]].v5*100)/game_frames));
       else sprintf(cwork,"0");
+    }
 
     wwrite(ptr,an,al,an-10-65+32,lpy+1+(m-lp_ini)*lpal,1,(byte *)cwork,c_r_low0);
     wwrite(ptr,an,al,an-11-65+32,lpy+1+(m-lp_ini)*lpal,1,(byte *)cwork,c34);
@@ -4478,9 +4500,10 @@ void pintar_lista_profile(void) {
     porcen2=(unsigned)(((double)f_time[(uintptr_t)lp2[m]]*(double)10000.0)/(double)f_max);
     wbox(ptr,an,al,c_g_low, an-lp2esp-11-65,lp2y+(m-lp2_ini)*lp2al,(64*porcen2)/10000,lpal-1);
     sprintf(cwork,"%d.%02d%c",porcen/100,porcen%100,'%');
-    if (absolut)
+    if (absolut) {
       if (game_frames>0) sprintf(cwork,"%d",(int)((f_time[(uintptr_t)lp2[m]]*100)/game_frames));
       else sprintf(cwork,"0");
+    }
 
     wwrite(ptr,an,al,an-lp2esp-10-33,lp2y+1+(m-lp2_ini)*lp2al,1,(byte *)cwork,c_g_low0);
     wwrite(ptr,an,al,an-lp2esp-11-33,lp2y+1+(m-lp2_ini)*lp2al,1,(byte *)cwork,c34);
@@ -4495,9 +4518,10 @@ void pintar_lista_profile(void) {
   porcen2=(unsigned)(((double)f_time[255]*(double)10000.0)/(double)f_max);
   wbox(ptr,an,al,c_g_low,  an-lp2esp-1,lp2al* 0 +lp2y,((lp2esp-3)*porcen2)/10000,lp2al-1);
   sprintf(cwork,"%s %d.%02d%c",text[77],porcen/100,porcen%100,'%');
-  if (absolut)
+  if (absolut) {
     if (game_frames>0) sprintf(cwork,"%s %d",text[77],(int)((f_time[255]*100)/game_frames));
     else sprintf(cwork,"%s 0", text[77]);
+  }
   wwrite(ptr,an,al,an-lp2esp+48,lp2y+1+lp2al* 0 ,1,(byte *)cwork,c_g_low0);
   wwrite(ptr,an,al,an-lp2esp+47,lp2y+1+lp2al* 0 ,1,(byte *)cwork,c34);
 
@@ -4507,9 +4531,10 @@ void pintar_lista_profile(void) {
   porcen2=(unsigned)(((double)f_time[254]*(double)10000.0)/(double)f_max);
   wbox(ptr,an,al,c_r_low,  an-lp2esp-1,lp2al* 1 +lp2y,((lp2esp-3)*porcen2)/10000,lp2al-1);
   sprintf(cwork,"%s %d.%02d%c",text[78],porcen/100,porcen%100,'%');
-  if (absolut)
+  if (absolut) {
     if (game_frames>0) sprintf(cwork,"%s %d",text[78],(int)((f_time[254]*100)/game_frames));
     else sprintf(cwork,"%s 0",text[78]);
+  }
   wwrite(ptr,an,al,an-lp2esp+48,lp2y+1+lp2al* 1 ,1,(byte *)cwork,c_r_low0);
   wwrite(ptr,an,al,an-lp2esp+47,lp2y+1+lp2al* 1 ,1,(byte *)cwork,c34);
 
@@ -4519,9 +4544,10 @@ void pintar_lista_profile(void) {
   porcen2=(unsigned)(((double)f_time[253]*(double)10000.0)/(double)f_max);
   wbox(ptr,an,al,c_r_low,  an-lp2esp-1,lp2al* 2 +lp2y,((lp2esp-3)*porcen2)/10000,lp2al-1);
   sprintf(cwork,"%s %d.%02d%c",text[79],porcen/100,porcen%100,'%');
-  if (absolut)
+  if (absolut) {
     if (game_frames>0) sprintf(cwork,"%s %d",text[79],(int)((f_time[253]*100)/game_frames));
     else sprintf(cwork,"%s 0",text[79]);
+  }
   wwrite(ptr,an,al,an-lp2esp+48,lp2y+1+lp2al* 2 ,1,(byte *)cwork,c_r_low0);
   wwrite(ptr,an,al,an-lp2esp+47,lp2y+1+lp2al* 2 ,1,(byte *)cwork,c34);
 
@@ -4531,9 +4557,10 @@ void pintar_lista_profile(void) {
   porcen2=(unsigned)(((double)f_time[252]*(double)10000.0)/(double)f_max);
   wbox(ptr,an,al,c_r_low,  an-lp2esp-1,lp2al* 3 +lp2y,((lp2esp-3)*porcen2)/10000,lp2al-1);
   sprintf(cwork,"Scroll %d.%02d%c",porcen/100,porcen%100,'%');
-  if (absolut)
+  if (absolut) {
     if (game_frames>0) sprintf(cwork,"Scroll %d",(int)((f_time[252]*100)/game_frames));
     else sprintf(cwork,"Scroll 0");
+  }
   wwrite(ptr,an,al,an-lp2esp+48,lp2y+1+lp2al* 3 ,1,(byte *)cwork,c_r_low0);
   wwrite(ptr,an,al,an-lp2esp+47,lp2y+1+lp2al* 3 ,1,(byte *)cwork,c34);
 
@@ -4543,9 +4570,10 @@ void pintar_lista_profile(void) {
   porcen2=(unsigned)(((double)f_time[251]*(double)10000.0)/(double)f_max);
   wbox(ptr,an,al,c_r_low,  an-lp2esp-1,lp2al* 4 +lp2y,((lp2esp-3)*porcen2)/10000,lp2al-1);
   sprintf(cwork,"%s %d.%02d%c",text[80],porcen/100,porcen%100,'%');
-  if (absolut)
+  if (absolut) {
     if (game_frames>0) sprintf(cwork,"%s %d",text[80],(int)((f_time[251]*100)/game_frames));
     else sprintf(cwork,"%s 0",text[80]);
+  }
   wwrite(ptr,an,al,an-lp2esp+48,lp2y+1+lp2al* 4 ,1,(byte *)cwork,c_r_low0);
   wwrite(ptr,an,al,an-lp2esp+47,lp2y+1+lp2al* 4 ,1,(byte *)cwork,c34);
 
@@ -4555,9 +4583,10 @@ void pintar_lista_profile(void) {
   porcen2=(unsigned)(((double)f_time[250]*(double)10000.0)/(double)f_max);
   wbox(ptr,an,al,c_r_low,  an-lp2esp-1,lp2al* 5 +lp2y,((lp2esp-3)*porcen2)/10000,lp2al-1);
   sprintf(cwork,"%s %d.%02d%c",text[81],porcen/100,porcen%100,'%');
-  if (absolut)
+  if (absolut) {
     if (game_frames>0) sprintf(cwork,"%s %d",text[81],(int)((f_time[250]*100)/game_frames));
     else sprintf(cwork,"%s 0",text[81]);
+  }
   wwrite(ptr,an,al,an-lp2esp+48,lp2y+1+lp2al* 5 ,1,(byte *)cwork,c_r_low0);
   wwrite(ptr,an,al,an-lp2esp+47,lp2y+1+lp2al* 5 ,1,(byte *)cwork,c34);
 
@@ -4610,9 +4639,10 @@ void profile1(void) {
   } else x=0;
   wbox(ptr,an,al,c_b_low,4,13,((an-8)*x)/10000,9);
   sprintf(cwork,"%s %d.%02d%c",text[82],x/100,x%100,'%');
-  if (absolut)
+  if (absolut) {
     if (game_frames>0) sprintf(cwork,"%s = %d",text[83],(int)(((double)(f_exec_total+f_paint_total)/game_frames)*100.0));
     else sprintf(cwork,"%s = 0",text[83]);
+  }
   wwrite(ptr,an,al,an/2,14,1,(byte *)cwork,c_b_low0);
   wwrite(ptr,an,al,an/2,14,1,(byte *)cwork,c34);
 
@@ -4621,9 +4651,10 @@ void profile1(void) {
   x=(unsigned)(((double)f_exec_total*(double)10000.0)/(double)f_time_total);
   wbox(ptr,an,al,c_g_low,4,12+14,((an/2-6)*x)/10000,9);
   sprintf(cwork,"%s %d.%02d%c",text[84],x/100,x%100,'%');
-  if (absolut)
+  if (absolut) {
     if (game_frames>0) sprintf(cwork,"%s %d",text[84],(int)((f_exec_total*100)/game_frames));
     else sprintf(cwork,"%s = 0",text[84]);
+  }
   wwrite(ptr,an,al,4+(an/2-4)/2,13+14,1,(byte *)cwork,c_g_low0);
   wwrite(ptr,an,al,3+(an/2-4)/2,13+14,1,(byte *)cwork,c34);
 
@@ -4632,9 +4663,10 @@ void profile1(void) {
   x=(unsigned)(((double)f_paint_total*(double)10000.0)/(double)f_time_total);
   wbox(ptr,an,al,c_r_low,an/2+2,12+14,((an/2-6)*x)/10000,9);
   sprintf(cwork,"%s %d.%02d%c",text[85],x/100,x%100,'%');
-  if (absolut)
+  if (absolut) {
     if (game_frames>0) sprintf(cwork,"%s %d",text[85],(int)((f_paint_total*100)/game_frames));
     else sprintf(cwork,"%s = 0",text[85]);
+  }
   wwrite(ptr,an,al,an/2+3+(an/2-4)/2,13+14,1,(byte *)cwork,c_r_low0);
   wwrite(ptr,an,al,an/2+2+(an/2-4)/2,13+14,1,(byte *)cwork,c34);
 

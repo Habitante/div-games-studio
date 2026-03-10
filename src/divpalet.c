@@ -165,10 +165,10 @@ byte fast_find_color(byte fr,byte fg,byte fb) {
     if (b3>0) crear_ghost_vc(vcubo+64-1);
     else { if (b3<7) crear_ghost_vc(vcubo+64+1); }
   }
-  if (g3>0) if (b3>0) crear_ghost_vc(vcubo-8-1);
+  if (g3>0) { if (b3>0) crear_ghost_vc(vcubo-8-1);
             else { if (b3<7) crear_ghost_vc(vcubo-8+1); }
-  else if (g3<7*8) if (b3>0) crear_ghost_vc(vcubo+8-1);
-            else { if (b3<7) crear_ghost_vc(vcubo+8+1); }
+  } else if (g3<7*8) { if (b3>0) crear_ghost_vc(vcubo+8-1);
+            else { if (b3<7) crear_ghost_vc(vcubo+8+1); } }
 
   if (find_min==65536) crear_ghost_slow();
 
@@ -229,10 +229,10 @@ void crear_ghost(int puntos) {
         if (b3>0) crear_ghost_vc(vcubo+64-1);
         else { if (b3<7) crear_ghost_vc(vcubo+64+1); }
       }
-      if (g3>0) if (b3>0) crear_ghost_vc(vcubo-8-1);
+      if (g3>0) { if (b3>0) crear_ghost_vc(vcubo-8-1);
                 else { if (b3<7) crear_ghost_vc(vcubo-8+1); }
-      else if (g3<7*8) if (b3>0) crear_ghost_vc(vcubo+8-1);
-                else { if (b3<7) crear_ghost_vc(vcubo+8+1); }
+      } else if (g3<7*8) { if (b3>0) crear_ghost_vc(vcubo+8-1);
+                else { if (b3<7) crear_ghost_vc(vcubo+8+1); } }
 
       if (find_min==65536) crear_ghost_slow();
 
@@ -1297,7 +1297,7 @@ void crear_paleta(void){
 
   create_dac4();
 
-  for (n=0;n<768;n++) if (col=nueva_paleta[n]) nueva_paleta[n]=col*2+1;
+  for (n=0;n<768;n++) if ((col=nueva_paleta[n])) nueva_paleta[n]=col*2+1;
 
   if (!cargar_paleta) Progress((char *)texto[497],num_colores*4-256,num_colores*4-256);
 
@@ -1681,8 +1681,10 @@ int an=v.an/big2,al=v.al/big2;
                 {
                         case 2:
                                 do{read_mouse();}while(mouse_b);
+                                /* fall through */
                         case 3:
                                 do{read_mouse();}while(mouse_b);
+                                /* fall through */
                         case 4:
                                 dac[SelColor*3]=63-lRed.inicial;
                                 Tocado=1;
@@ -1692,8 +1694,10 @@ int an=v.an/big2,al=v.al/big2;
                 {
                         case 2:
                                 do{read_mouse();}while(mouse_b);
+                                /* fall through */
                         case 3:
                                 do{read_mouse();}while(mouse_b);
+                                /* fall through */
                         case 4:
                                 dac[SelColor*3+1]=63-lGre.inicial;
                                 Tocado=1;
@@ -1703,8 +1707,10 @@ int an=v.an/big2,al=v.al/big2;
                 {
                         case 2:
                                 do{read_mouse();}while(mouse_b);
+                                /* fall through */
                         case 3:
                                 do{read_mouse();}while(mouse_b);
+                                /* fall through */
                         case 4:
                                 dac[SelColor*3+2]=63-lBlu.inicial;
                                 Tocado=1;

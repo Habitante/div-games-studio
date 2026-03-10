@@ -36,7 +36,7 @@ int pcm2wav(FILE *in, long inlen, FILE *out, long outlen)
     fseek(in,0,SEEK_SET);
 	
     if ((c=fread(ptr,1,inlen,in))!=inlen) {
-      printf("\n\nError: %d %d No se pudo leer el archivo.\n",c,inlen);
+      printf("\n\nError: %d %ld No se pudo leer el archivo.\n",c,inlen);
       free(ptr);
 	  return 3;
     }

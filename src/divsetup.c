@@ -952,7 +952,7 @@ void resize_program(void) {
     ventana_aux.al=v.al;
   }
   if (big) {
-    if (v.an&1) v.an++; if (v.al&1) v.al++; v.an=-v.an;
+    if (v.an&1) { v.an++; } if (v.al&1) { v.al++; } v.an=-v.an;
   }
 
   v.titulo=(byte *)v_prg->filename;

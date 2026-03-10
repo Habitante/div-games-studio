@@ -589,8 +589,9 @@ debugprintf("found COD at index: %d\n",n);
         
         rename(ActualPath,(char *)Fpg->ActualFile);
         
-        if(!Abrir_FPG(Fpg,(char *)Fpg->ActualFile))
+        if(!Abrir_FPG(Fpg,(char *)Fpg->ActualFile)) {
                 return 0;
+        }
 		return 1;
 }
 

@@ -294,7 +294,7 @@ strcpy(result->name,result2.name);
 	result->size = result2.size;
 
 if((type == _A_NORMAL && result2.attrib!=_A_SUBDIR) ||
-	type == _A_SUBDIR && result2.attrib&_A_SUBDIR) {
+	(type == _A_SUBDIR && (result2.attrib&_A_SUBDIR))) {
 		
 		if(type == _A_SUBDIR) {
 			if ( !strcmp(findmask,"*.*") ) // match everything

@@ -63,19 +63,19 @@ struct {
   int crt[20];
 } modox[5]={
 
-  {0xe3,0x0d06,0x3e07,0x4109,0xea10,0xac11,0xdf12,0x0014,0xe715, //320x240
-   0x0616,0xe317,0},
+  {0xe3,{0x0d06,0x3e07,0x4109,0xea10,0xac11,0xdf12,0x0014,0xe715, //320x240
+   0x0616,0xe317,0}},
 
-  {0xe3,0x4009,0x0014,0xe317,0}, //320x400
+  {0xe3,{0x4009,0x0014,0xe317,0}}, //320x400
 
-  {0xe7,0x6b00,0x5901,0x5a02,0x8e03,0x5e04,0x8a05,0x0d06,0x3e07, //360x240
-   0x4109,0xea10,0xac11,0xdf12,0x2d13,0x0014,0xe715,0x0616,0xe317,0},
+  {0xe7,{0x6b00,0x5901,0x5a02,0x8e03,0x5e04,0x8a05,0x0d06,0x3e07, //360x240
+   0x4109,0xea10,0xac11,0xdf12,0x2d13,0x0014,0xe715,0x0616,0xe317,0}},
 
-  {0xe7,0x6b00,0x5901,0x5a02,0x8e03,0x5e04,0x8a05,0x4009,0x8810, //360x360
-   0x8511,0x6712,0x2d13,0x0014,0x6d15,0xba16,0xe317,0},
+  {0xe7,{0x6b00,0x5901,0x5a02,0x8e03,0x5e04,0x8a05,0x4009,0x8810, //360x360
+   0x8511,0x6712,0x2d13,0x0014,0x6d15,0xba16,0xe317,0}},
 
-  {0xe7,0x6e00,0x5d01,0x5e02,0x9103,0x6204,0x8f05,0x6206,0xf007, //376x282
-   0x6109,0x310f,0x3710,0x8911,0x3312,0x2f13,0x0014,0x3c15,0x5c16,0xe317,0}
+  {0xe7,{0x6e00,0x5d01,0x5e02,0x9103,0x6204,0x8f05,0x6206,0xf007, //376x282
+   0x6109,0x310f,0x3710,0x8911,0x3312,0x2f13,0x0014,0x3c15,0x5c16,0xe317,0}}
 };
 
 //-----------------------------------------------------------------------------
@@ -120,12 +120,12 @@ void set_paleta (void) {
   }
 
   n=0; do {
-    if (now_dacout_r>paleta[n]) dac[n]=0; else dac[n]=paleta[n]-now_dacout_r;
-    if (dac[n]>63) dac[n]=63; n++;
-    if (now_dacout_g>paleta[n]) dac[n]=0; else dac[n]=paleta[n]-now_dacout_g;
-    if (dac[n]>63) dac[n]=63; n++;
-    if (now_dacout_b>paleta[n]) dac[n]=0; else dac[n]=paleta[n]-now_dacout_b;
-    if (dac[n]>63) dac[n]=63; n++;
+    if (now_dacout_r>paleta[n]) { dac[n]=0; } else { dac[n]=paleta[n]-now_dacout_r; }
+    if (dac[n]>63) { dac[n]=63; } n++;
+    if (now_dacout_g>paleta[n]) { dac[n]=0; } else { dac[n]=paleta[n]-now_dacout_g; }
+    if (dac[n]>63) { dac[n]=63; } n++;
+    if (now_dacout_b>paleta[n]) { dac[n]=0; } else { dac[n]=paleta[n]-now_dacout_b; }
+    if (dac[n]>63) { dac[n]=63; } n++;
   } while (n<768);
 
   color_oscuro=0;
@@ -240,7 +240,7 @@ void madewith(void) {
 void svmode(void) {
 
 //#ifdef STDOUTLOG
-printf("setting new video mode %d %d %x\n",vga_an,vga_al,vga);
+printf("setting new video mode %d %d %p\n",vga_an,vga_al,(void*)vga);
 //#endif
 
 //hide the mouse
@@ -263,7 +263,7 @@ SDL_ShowCursor(SDL_DISABLE);
 
 
 #ifdef STDOUTLOG
-	printf("SET VIDEO MODE %x\n",vga);
+	printf("SET VIDEO MODE %p\n",(void*)vga);
 #endif
 	OSDEP_SetCaption( "DIVDX 3.01", "" );
 
@@ -825,8 +825,10 @@ void volcado_parcial(int x,int y,int an,int al) {
   if (an==vga_an && al==vga_al && x==0 && y==0) { volcado_completo=1; return; }
 
   if (an>0 && al>0 && x<vga_an && y<vga_al) {
-    if (x<0) { an+=x; x=0; } if (y<0) { al+=y; y=0; }
-    if (x+an>vga_an) an=vga_an-x; if (y+al>vga_al) al=vga_al-y;
+    if (x<0) { an+=x; x=0; }
+    if (y<0) { al+=y; y=0; }
+    if (x+an>vga_an) { an=vga_an-x; }
+    if (y+al>vga_al) { al=vga_al-y; }
     if (an<=0 || al<=0) return;
     xmax=x+an-1; ymax=y+al-1;
 
@@ -977,10 +979,10 @@ void crear_ghost(void) {
         if (b3>0) crear_ghost_vc(vcubo+64-1);
         else { if (b3<7) crear_ghost_vc(vcubo+64+1); }
       }
-      if (g3>0) if (b3>0) crear_ghost_vc(vcubo-8-1);
-                else { if (b3<7) crear_ghost_vc(vcubo-8+1); }
-      else if (g3<7*8) if (b3>0) crear_ghost_vc(vcubo+8-1);
-                else { if (b3<7) crear_ghost_vc(vcubo+8+1); }
+      if (g3>0) { if (b3>0) crear_ghost_vc(vcubo-8-1);
+                else { if (b3<7) crear_ghost_vc(vcubo-8+1); } }
+      else if (g3<7*8) { if (b3>0) crear_ghost_vc(vcubo+8-1);
+                else { if (b3<7) crear_ghost_vc(vcubo+8+1); } }
 
       if (find_min==65536) crear_ghost_slow();
 

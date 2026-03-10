@@ -107,8 +107,8 @@ int no_volcar_ventanas=0;
 byte lower[256]=
   "                                   #$           0123456789      "
   " abcdefghijklmnopqrstuvwxyz    _ abcdefghijklmnopqrstuvwxyz     "
-  "\xef\xbf\xbdueaaaa\xef\xbf\xbdeeeiiiaae\xef\xbf\xbd\xef\xbf\xbdooouuyou\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbdaiou\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd                        "
-  "                                                              ";
+  " ueaaaa eeeiiiaae  ooouuyou     aiou                            "
+  "                                                               ";
 
 int show_items_called=0;
 int test_video=0;
@@ -486,8 +486,9 @@ int main(int argc, char * argv[]) {
 	tipo[15].ext="*.WLD *.*"; // 3D Map files
 	tipo[16].ext="*.* *.MOD *.S3M *.XM *.MID"; // Tracker modules
 
-	for (n=0;n<24;n++) 
-		tipo[n].defecto=0; tipo[n].inicial=0; 
+	for (n=0;n<24;n++) {
+		tipo[n].defecto=0; tipo[n].inicial=0;
+	}
 
 	inicializa_textos((uint8_t *)"system/lenguaje.div"); // OJO emitir un error si lenguaje.div no existe
 
@@ -1079,7 +1080,7 @@ void mainloop(void) {
 	// If we are within the contents of a window ...
 	//-------------------------------------------------------------------------
 
-	if (n==0 && v.primer_plano==1) 
+	if (n==0 && v.primer_plano==1) {
 		if (mouse_in(v.x+2*big2,v.y+10*big2,v.x+v.an-2*big2,v.y+v.al-2*big2)) {
 
 			llamar=1; // Llamamos a su click_handler
@@ -1243,6 +1244,7 @@ void mainloop(void) {
 			oldn=-1;
 
 		}
+	}
 
 	//-------------------------------------------------------------------------
 	// Estamos sobre un icono
@@ -1879,12 +1881,12 @@ void dialog_loop(void) {
 		(modo<100 && (mouse_b&2))) {
 		
 		for (n=0;n<v.items;n++)
-			if (v.item[n].tipo==2 && (v.item[n].estado&2)) 
+			if (v.item[n].tipo==2 && (v.item[n].estado&2))
 				break;
-			if (n==v.items) { 
-				cierra_ventana(); 
-				salir_del_dialogo=1; 
-			}
+		if (n==v.items) {
+			cierra_ventana();
+			salir_del_dialogo=1;
+		}
 	}
 
 	//-------------------------------------------------------------------------
@@ -2309,14 +2311,14 @@ void actualiza_caja(int x, int y, int an, int al) {
   int salta_x=0,salta_y=0;
 
 
-  char *div_version;
+  byte *div_version;
 
 #ifdef GIT_SHA1
 
 char divver[255];
 strcpy(divver,"DIVDX BUILD ");
 strcat(divver, GIT_SHA1);
-div_version = divver;
+div_version = (byte *)divver;
 
 #else
 div_version=texto[safe];
@@ -2352,9 +2354,11 @@ div_version=texto[safe];
     if (x>_x) { salta_x+=x-_x; _ptr+=salta_x; _x=x; _an-=salta_x; }
     if (x+an<_x+_an) { salta_x+=_x+_an-x-an; _an-=_x+_an-x-an;  }
 
-    if (_an>0 && _al>0) if (ventana[n].primer_plano==1)
+    if (_an>0 && _al>0) {
+      if (ventana[n].primer_plano==1)
     		wvolcado(copia,vga_an,vga_al,_ptr,_x,_y,_an,_al,salta_x);
-    else wvolcado_oscuro(copia,vga_an,vga_al,_ptr,_x,_y,_an,_al,salta_x);
+      else wvolcado_oscuro(copia,vga_an,vga_al,_ptr,_x,_y,_an,_al,salta_x);
+    }
 
   } else {
 
@@ -2367,10 +2371,11 @@ div_version=texto[safe];
       wwrite_in_box(copia+y*vga_an+x,vga_an,an,al,ventana[n].x+8*big2-x,ventana[n].y-y,10,ventana[n].nombre,c4);
     }
 
-    if (x<ventana[n].x+7*big2)
+    if (x<ventana[n].x+7*big2) {
       if (big) {
         wput_in_box(copia+y*vga_an+x,vga_an,-an,al,ventana[n].x-x,ventana[n].y-y,38);
       } else wput_in_box(copia+y*vga_an+x,vga_an,an,al,ventana[n].x-x,ventana[n].y-y,38);
+    }
 
       }
 	}
@@ -2403,9 +2408,11 @@ void actualiza_dialogos(int x, int y, int an, int al) {
     if (x>_x) { salta_x+=x-_x; _ptr+=salta_x; _x=x; _an-=salta_x; }
     if (x+an<_x+_an) { salta_x+=_x+_an-x-an; _an-=_x+_an-x-an;  }
 
-    if (_an>0 && _al>0) if (ventana[n].primer_plano==1)
+    if (_an>0 && _al>0) {
+      if (ventana[n].primer_plano==1)
    		 	wvolcado(copia,vga_an,vga_al,_ptr,_x,_y,_an,_al,salta_x);
-    else wvolcado_oscuro(copia,vga_an,vga_al,_ptr,_x,_y,_an,_al,salta_x);
+      else wvolcado_oscuro(copia,vga_an,vga_al,_ptr,_x,_y,_an,_al,salta_x);
+    }
 
   }
 }
@@ -2429,7 +2436,7 @@ void actualiza_caja2(int vent, int x, int y, int an, int al) {
   if (y+al>vga_al) al=vga_al-y;
   if (an<=0 || al<=0) return;
 
-  for (n=vent;n>=0;n--) if (ventana[n].tipo) if (colisiona_con(n,x,y,an,al))
+  for (n=vent;n>=0;n--) if (ventana[n].tipo) if (colisiona_con(n,x,y,an,al)) {
   if (ventana[n].primer_plano<2) {
 
     _ptr=ventana[n].ptr;
@@ -2442,9 +2449,11 @@ void actualiza_caja2(int vent, int x, int y, int an, int al) {
     if (x>_x) { salta_x+=x-_x; _ptr+=salta_x; _x=x; _an-=salta_x; }
     if (x+an<_x+_an) { salta_x+=_x+_an-x-an; _an-=_x+_an-x-an;  }
 
-    if (_an>0 && _al>0) if (ventana[n].primer_plano==1)
+    if (_an>0 && _al>0) {
+      if (ventana[n].primer_plano==1)
     		wvolcado(copia,vga_an,vga_al,_ptr,_x,_y,_an,_al,salta_x);
-    else wvolcado_oscuro(copia,vga_an,vga_al,_ptr,_x,_y,_an,_al,salta_x);
+      else wvolcado_oscuro(copia,vga_an,vga_al,_ptr,_x,_y,_an,_al,salta_x);
+    }
 
   } else {
 
@@ -2457,12 +2466,14 @@ void actualiza_caja2(int vent, int x, int y, int an, int al) {
       wwrite_in_box(copia+y*vga_an+x,vga_an,an,al,ventana[n].x+8*big2-x,ventana[n].y-y,10,ventana[n].nombre,c4);
     }
 
-    if (x<ventana[n].x+7*big2)
+    if (x<ventana[n].x+7*big2) {
     	if (big) {
         	wput_in_box(copia+y*vga_an+x,vga_an,-an,al,ventana[n].x-x,ventana[n].y-y,38);
       } else wput_in_box(copia+y*vga_an+x,vga_an,an,al,ventana[n].x-x,ventana[n].y-y,38);
+    }
 
 		}
+  }
 
   volcado_parcial(x,y,an,al);
 }
@@ -2514,7 +2525,8 @@ void restaura_tapiz(int x,int y,int an,int al) {
   byte *t;
   int n,_an;
 
-  if (y<0) y=0; if (x<0) x=0;
+  if (y<0) y=0;
+  if (x<0) x=0;
   if (y+al>vga_al) al=vga_al-y;
   if (x+an>vga_an) an=vga_an-x;
 
@@ -2592,7 +2604,7 @@ SDL_Rect trc;
   if (x+an>vga_an) an=vga_an-x;
   if (y+al>vga_al) al=vga_al-y;
 
-  for (n=m;n>=0;n--) if (ventana[n].tipo) if (colisiona_con(n,x,y,an,al))
+  for (n=m;n>=0;n--) if (ventana[n].tipo) if (colisiona_con(n,x,y,an,al)) {
   if (ventana[n].primer_plano<2) {
 
     _ptr=ventana[n].ptr;
@@ -2621,11 +2633,13 @@ if(_ptr==NULL)
     wwrite_in_box(copia+y*vga_an+x,vga_an,an,al,ventana[n].x+9*big2-x,ventana[n].y-y,10,ventana[n].nombre,c0);
     wwrite_in_box(copia+y*vga_an+x,vga_an,an,al,ventana[n].x+8*big2-x,ventana[n].y-y,10,ventana[n].nombre,c4);
 
-    if (x<ventana[n].x+7*big2)
+    if (x<ventana[n].x+7*big2) {
     	if (big) {
       		wput_in_box(copia+y*vga_an+x,vga_an,-an,al,ventana[n].x-x,ventana[n].y-y,38);
       } else wput_in_box(copia+y*vga_an+x,vga_an,an,al,ventana[n].x-x,ventana[n].y-y,38);
+    }
 
+  }
   }
 
 	trc.x=ventana[n].x;
@@ -2655,7 +2669,7 @@ void emplazar(int flag,int*_x,int*_y,int an,int al) {
     *_y=-1; scan[0]=vga_al-al;
   } scanes=1;
 
-  for (n=1;n<max_windows;n++) if (ventana[n].tipo) if (flag&1) {
+  for (n=1;n<max_windows;n++) if (ventana[n].tipo) { if (flag&1) {
     if ((y=ventana[n].y+ventana[n].al+1)<vga_al) {
       x=0; do { x++; } while (x<scanes && y>scan[x]);
       if (x==scanes) scan[scanes++]=y;
@@ -2673,7 +2687,7 @@ void emplazar(int flag,int*_x,int*_y,int an,int al) {
         scan[x]=y; scanes++;
       }
     }
-  }
+  } }
 
   // Segundo ... algoritmo de colocación ...
 
@@ -2733,10 +2747,12 @@ int calcular_colision(int x,int y,int an,int al) {
   int n,c,colision=0;
 
   for (n=1;n<max_windows;n++) {
-    if (ventana[n].tipo)
-      if (c=cuanto_colisiona_con(n,x,y,an,al))
+    if (ventana[n].tipo) {
+      if ((c=cuanto_colisiona_con(n,x,y,an,al))) {
         if (ventana[n].primer_plano) colision+=vga_an*vga_al+c;
         else colision+=vga_an*vga_al/4+c;
+      }
+    }
   } return(colision);
 }
 
@@ -2877,7 +2893,7 @@ void nueva_ventana(voidReturnType init_handler) {
 	v.ptr=NULL;
     call(init_handler);
 
-    if (big) if (v.an>0) { v.an=v.an*2; v.al=v.al*2; } else v.an=-v.an;
+    if (big) { if (v.an>0) { v.an=v.an*2; v.al=v.al*2; } else v.an=-v.an; }
 
     an=v.an; al=v.al;
 
@@ -3067,7 +3083,8 @@ void explode(int x,int y,int an,int al) {
   int xx,yy,aan,aal;
   v.tipo=0; big=0;
   if (modo<100) {
-    if (b) big=1; fondo_edicion(x,y,an,al);
+    if (b) big=1;
+    fondo_edicion(x,y,an,al);
     volcar_barras(0);
     actualiza_dialogos(x,y,an,al);
     big=0;
@@ -3222,7 +3239,7 @@ uint32_t colorkey=0;
 
     call((voidReturnType )init_handler);
 
-    if (big) if (v.an>0) { v.an=v.an*2; v.al=v.al*2; } else v.an=-v.an;
+    if (big) { if (v.an>0) { v.an=v.an*2; v.al=v.al*2; } else v.an=-v.an; }
 
     an=v.an; al=v.al;
     x=vga_an/2-an/2; y=vga_al/2-al/2;
@@ -3676,7 +3693,7 @@ void finalizacion(void) {
   if(modo_de_retorno==0 || modo_de_retorno==3)
         rvmode();
 
-	end_lexcolor();
+  end_lexcolor();
 
   kbdReset();
 }
@@ -3979,13 +3996,13 @@ void select_get(struct t_item * i,int activo,int ocultar_error) {
 	}
     i->estado&=1;
   } else {
-    if (i->estado&2) if (*get) if (i->get.r0==i->get.r1) strcpy((char *)i->get.buffer,get); else {
+    if (i->estado&2) { if (*get) { if (i->get.r0==i->get.r1) strcpy((char *)i->get.buffer,get); else {
       if (atoi(get)>=i->get.r0 && atoi(get)<=i->get.r1) itoa(atoi(get),(char *)i->get.buffer,10);
       else if (!ocultar_error && !show_items_called) {
         sprintf(cWork,"%s [%d..%d].",texto[49],i->get.r0,i->get.r1);
         v_texto=cWork; dialogo(err0);
       }
-    }
+    } } }
 
     i->estado&=1;
 
@@ -4178,7 +4195,8 @@ void process_get(int n,int e) {
      get_pos=strlen(get);
   }
 
-  if (e&4) *get=0; e&=3;
+  if (e&4) *get=0;
+  e&=3;
 
   switch(v.item[n].estado=e) {
     case 2: get_input(n); break;
@@ -4217,7 +4235,7 @@ void process_flag(int n,int e) {
       v.item[n].flag.texto,c4);
       if (v.item[n].estado==1) {
         v.active_item=n;
-        if (*v.item[n].flag.valor=!*v.item[n].flag.valor)
+        if ((*v.item[n].flag.valor=!*v.item[n].flag.valor))
           wput(v.ptr,v.an/big2,v.al/big2,v.item[n].flag.x,v.item[n].flag.y,-59);
         else wput(v.ptr,v.an/big2,v.al/big2,v.item[n].flag.x,v.item[n].flag.y,58);
       } break;
@@ -4849,7 +4867,7 @@ void check_oldpif(void) {
   byte pif[1024];
   FILE * f;
   char winpath[128];
-  char cwork[128],*name;
+  char cwork[256],*name;
   char drive[_MAX_DRIVE+1];
   char dir[_MAX_DIR+1];
   char fname[_MAX_FNAME+1];
@@ -4859,7 +4877,7 @@ void check_oldpif(void) {
   fread(winpath,1,128,f);
   fclose(f);
 
-  sprintf(cwork,"%s/DIVGAM~1.PIF",winpath);
+  snprintf(cwork,sizeof(cwork),"%s/DIVGAM~1.PIF",winpath);
 
   if ((f=fopen(cwork,"rb"))!=NULL) {
 

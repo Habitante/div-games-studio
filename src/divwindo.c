@@ -394,7 +394,7 @@ void wvolcado_oscuro(byte*copia,int an_copia,int al_copia,
 	SDL_Rect trc;
 	
 	for (vn=0;vn<max_windows;vn++) {
-		if(ventana[vn].ptr>0)
+		if(ventana[vn].ptr!=NULL)
 		if(ventana[vn].ptr==p) {
 			break;
 		}

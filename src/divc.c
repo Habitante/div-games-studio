@@ -1188,7 +1188,7 @@ free_resources();
   }
 
   // _case_sensitive
-  memcpy(lower+129,"ueaaaa\x87eeeiiiaae\x91\x91ooouuyou\x9b\x9c\x9d\x9e\x9faiou",35);
+  memcpy(lower+129,"ueaaaa\x87" "eeeiiiaae\x91\x91ooouuyou\x9b\x9c\x9d\x9e\x9f" "aiou",35);
   memcpy(lower+'A',"abcdefghijklmnopqrstuvwxyz",26);
   lower['\xa5']='\xa4';
 
@@ -1262,13 +1262,13 @@ void c_error(word tipo, word e) {
   }
 
   if (tipo==1) {
-    if (*(_p+1)==' ' || *(_p+1)==cr || *(_p+1)==lf) columna++; columna++;
+    if (*(_p+1)==' ' || *(_p+1)==cr || *(_p+1)==lf) { columna++; } columna++;
   } else if (tipo==3) columna++;
 
   columna_error=columna;
 
   // _case_sensitive
-  memcpy(lower+129,"ueaaaa\x87eeeiiiaae\x91\x91ooouuyou\x9b\x9c\x9d\x9e\x9faiou",35);
+  memcpy(lower+129,"ueaaaa\x87" "eeeiiiaae\x91\x91ooouuyou\x9b\x9c\x9d\x9e\x9f" "aiou",35);
   memcpy(lower+'A',"abcdefghijklmnopqrstuvwxyz",26);
   lower['\xa5']='\xa4';
 
@@ -1370,7 +1370,7 @@ void analiza_ltlex(void){
     case  cr:
       if (*buf==cr) cont=0; else { linea++; buf++; } break;
     case ';':
-      while (*buf!=cr) buf++; break;
+      while (*buf!=cr) { buf++; } break;
     case '&':
       *buf=lower[*buf]; if (*buf>='0' && *buf<='9') t=(*buf++-'0')<<4;
       else if (*buf>='a' && *buf<='f') t=(*buf++-'a'+10)<<4; else c_error(0,2);
@@ -1382,8 +1382,8 @@ void analiza_ltlex(void){
         *ivnom.p++=0; 
         *ivnom.p++=(byte*)t; 
         h=0;
-        while (*ivnom.b=lower[*buf++]) h=((byte)(h<<1)+(h>>7))^(*ivnom.b++);
-        ptr=&vhash[h]; while (*ptr) ptr=(byte **)*ptr; 
+        while ((*ivnom.b=lower[*buf++])) h=((byte)(h<<1)+(h>>7))^(*ivnom.b++);
+        ptr=&vhash[h]; while (*ptr) ptr=(byte **)*ptr;
 	*ptr=_ivnom;
         
 	buf--; ivnom.b++;
@@ -1396,16 +1396,17 @@ void analiza_ltlex(void){
         } else buf++;
         while (*buf!=' ' && *buf!=tab && *buf!=cr) {
           if (lower[*buf]) c_error(0,4);
-          if ((*e).siguiente==0)
+          if ((*e).siguiente==0) {
             if (num_nodos++==max_nodos) c_error(0,3);
             else e=(*e).siguiente=ilex_simb++;
-          else {
+          } else {
             e=(*e).siguiente;
             while ((*e).caracter!=*buf && (*e).alternativa)
               e=(*e).alternativa;
-            if ((*e).caracter!=*buf)
+            if ((*e).caracter!=*buf) {
               if (num_nodos++==max_nodos) c_error(0,3);
               else e=(*e).alternativa=ilex_simb++;
+            }
           } (*e).caracter=*buf++;
         } (*e).token=t;
       } break;
@@ -1469,7 +1470,7 @@ void precarga_obj (void) {
         } else {
           (*ob).tipo=tvglo;
           (*ob).vglo.offset=imem;
-          if (pieza!=p_asig) c_error(0,7); lexico();
+          if (pieza!=p_asig) { c_error(0,7); } lexico();
           if (pieza==p_num) mem[imem++]=pieza_num;
           else if (pieza==p_sub) {
             lexico(); if (pieza!=p_num) c_error(0,7);
@@ -1487,7 +1488,7 @@ void precarga_obj (void) {
         (*ob).sglo.totalitems=pieza_num+1;
         lexico(); if (pieza!=p_corce) c_error(0,7);
         (*ob).sglo.len_item=0; member=ob; lexico();
-        if (pieza==p_end) c_error(0,7); len=0;
+        if (pieza==p_end) { c_error(0,7); } len=0;
         while (pieza!=p_end) {
 
           if (pieza==p_string) {
@@ -1498,10 +1499,10 @@ void precarga_obj (void) {
             ob2=o; lexico();
             (*ob2).tipo=tcglo;
             (*ob2).cglo.offset=len+1;
-            if (pieza!=p_corab) c_error(0,7); lexico();
-            if (((*ob2).cglo.totalen=constante())<0) c_error(0,7);
-            if ((*ob2).cglo.totalen>0xFFFFF) c_error(0,7);
-            if (pieza!=p_corce) c_error(0,7); lexico();
+            if (pieza!=p_corab) { c_error(0,7); } lexico();
+            if (((*ob2).cglo.totalen=constante())<0) { c_error(0,7); }
+            if ((*ob2).cglo.totalen>0xFFFFF) { c_error(0,7); }
+            if (pieza!=p_corce) { c_error(0,7); } lexico();
 
             mem[imem]=0xDAD00000|(*ob2).cglo.totalen;
             len+=1+((*ob2).cglo.totalen+5)/4;
@@ -1673,7 +1674,7 @@ byte * next_lexico(byte * _source, int coment, int linea) { // No genera nunca e
     case l_id :
       if (coment) { _source++; goto lex_scan; }
       _ivnom=ivnom.b; *ivnom.p++=0; *ivnom.p++=0; h=0;
-      while (*ivnom.b=lower[*_source++]) h=((byte)(h<<1)+(h>>7))^(*ivnom.b++);
+      while ((*ivnom.b=lower[*_source++])) h=((byte)(h<<1)+(h>>7))^(*ivnom.b++);
       ivnom.b++; _source--;
       ptr=&vhash[h];
       while (*ptr!=NULL && strcmp((char *)(ptr+2),(char *)_ivnom+ptr8)) ptr=(byte **)*ptr;
@@ -1691,7 +1692,7 @@ byte * next_lexico(byte * _source, int coment, int linea) { // No genera nunca e
       } break;
 
     case l_spc:
-      while ((*++_source)==' '); goto lex_scan;
+      while ((*++_source)==' ') {} goto lex_scan;
 
     case l_lit:
       if (coment) { _source++; goto lex_scan; }
@@ -1706,7 +1707,7 @@ byte * next_lexico(byte * _source, int coment, int linea) { // No genera nunca e
     default: // puntero a un lex_ele
       e=lex_case[*_source++]; next_pieza=(*e).token; _ivnom=_source;
 
-      while (e=(*e).siguiente) {
+      while ((e=(*e).siguiente)) {
         while (*_source!=(*e).caracter && (*e).alternativa) e=(*e).alternativa;
         if (*_source++==(*e).caracter && (*e).token) {
           next_pieza=(*e).token; _ivnom=_source;
@@ -1714,7 +1715,7 @@ byte * next_lexico(byte * _source, int coment, int linea) { // No genera nunca e
       } _source=_ivnom;
 
       if (next_pieza==p_rem && !coment) {
-        while (*_source!=cr) _source++; goto lex_scan;
+        while (*_source!=cr) { _source++; } goto lex_scan;
       }
 
       if (next_pieza==p_ini_rem) {
@@ -1776,9 +1777,9 @@ void lexico(void) {
     case l_id :
       if (coment) { pieza=p_rem; _source++; break; }
       _ivnom=ivnom.b; *ivnom.p++=0; *ivnom.p++=0; h=0;
-      while (*ivnom.b=lower[*_source++]) h=((byte)(h<<1)+(h>>7))^(*ivnom.b++);
-      ivnom.b++; 
-      _source--; 
+      while ((*ivnom.b=lower[*_source++])) h=((byte)(h<<1)+(h>>7))^(*ivnom.b++);
+      ivnom.b++;
+      _source--;
       if (ivnom.b-vnom>max_obj*long_med_id) c_error(0,100);
 
       ptr=&vhash[h];
@@ -1821,7 +1822,7 @@ void lexico(void) {
       } break;
 
     case l_spc:
-      while ((*++_source)==' '); goto lex_scan;
+      while ((*++_source)==' ') {} goto lex_scan;
 
     case l_lit:
       if (coment) { pieza=p_rem; _source++; break; }
@@ -1912,7 +1913,7 @@ void lexico(void) {
     default: // puntero a un lex_ele
 
       e=lex_case[*_source++]; _ivnom=_source; pieza=(*e).token;
-      while (e=(*e).siguiente) {
+      while ((e=(*e).siguiente)) {
         while (*_source!=(*e).caracter && (*e).alternativa) e=(*e).alternativa;
         if (*_source++==(*e).caracter && (*e).token) {
           pieza=(*e).token; _ivnom=_source;
@@ -1932,7 +1933,7 @@ void lexico(void) {
         goto lex_scan;
       }
 
-      if (pieza==p_ultima) if (coment) c_error(0,55); else c_error(0,12);
+      if (pieza==p_ultima) { if (coment) c_error(0,55); else c_error(0,12); }
 
       break;
 
@@ -1972,7 +1973,7 @@ struct objeto * analiza_pointer(int tipo, int offset) {
               lexico();
               if ((len3=constante())<0) c_error(4,35);
             }
-          } if (pieza!=p_corce) c_error(3,26); lexico();
+          } if (pieza!=p_corce) { c_error(3,26); } lexico();
         }
         if (len1!=(*ob).pilo.len1 || len2!=(*ob).pilo.len2 || len3!=(*ob).pilo.len3) c_error(4,141);
         else if (pieza==p_asig) c_error(0,54);
@@ -1996,7 +1997,7 @@ struct objeto * analiza_pointer(int tipo, int offset) {
         if (((*ob).pilo.len3=constante())<0) c_error(4,35);
       }
     }
-    if (pieza!=p_corce) c_error(3,26); lexico();
+    if (pieza!=p_corce) { c_error(3,26); } lexico();
   } (*ob).pilo.totalen=0;
   if ((*ob).pilo.len1>-1) (*ob).pilo.totalen=(*ob).pilo.len1+1;
   if ((*ob).pilo.len2>-1) (*ob).pilo.totalen*=(*ob).pilo.len2+1;
@@ -2028,7 +2029,7 @@ int analiza_pointer_struct(int tipo, int offset, struct objeto * estructura) {
               lexico();
               if ((items3=constante())<0) c_error(4,35);
             }
-          } if (pieza!=p_corce) c_error(3,26); lexico();
+          } if (pieza!=p_corce) { c_error(3,26); } lexico();
         }
         if (items1!=(*ob).psgl.items1 || items2!=(*ob).psgl.items2 || items3!=(*ob).psgl.items3) c_error(4,141);
         else if (pieza==p_asig) c_error(0,54);
@@ -2050,7 +2051,7 @@ int analiza_pointer_struct(int tipo, int offset, struct objeto * estructura) {
         if (((*ob).psgl.items3=constante())<0) c_error(4,35);
       }
     }
-    if (pieza!=p_corce) c_error(3,26); lexico();
+    if (pieza!=p_corce) { c_error(3,26); } lexico();
   } (*ob).psgl.totalitems=0;
   if ((*ob).psgl.items1>-1) (*ob).psgl.totalitems=(*ob).psgl.items1+1;
   if ((*ob).psgl.items2>-1) (*ob).psgl.totalitems*=(*ob).psgl.items2+1;
@@ -2084,7 +2085,7 @@ int analiza_struct(int offstruct) { // tras " struct id [ <const> ] " // id≡me
       if (pieza==p_pointer) { // Se define un puntero a struct
 
         old_member=member; member=NULL; lexico(); member=old_member;
-        if (pieza!=p_id) c_error(1,110); ob=o;
+        if (pieza!=p_id) { c_error(1,110); } ob=o;
 
         if ((*ob).tipo==tnone) c_error(0,150); // No se define el pointer así
         if ((*ob).tipo!=tsglo && (*ob).tipo!=tsloc) c_error(0,150);
@@ -2128,7 +2129,7 @@ int analiza_struct(int offstruct) { // tras " struct id [ <const> ] " // id≡me
           (*ob).sglo.totalitems=(*ob).sglo.items1+1;
           if ((*ob).sglo.items2>-1) (*ob).sglo.totalitems*=(*ob).sglo.items2+1;
           if ((*ob).sglo.items3>-1) (*ob).sglo.totalitems*=(*ob).sglo.items3+1;
-          if (pieza!=p_corce) c_error(3,26); lexico();
+          if (pieza!=p_corce) { c_error(3,26); } lexico();
         } else {
           (*ob).sglo.totalitems=1;
           (*ob).sglo.items1=0; (*ob).sglo.items2=-1; (*ob).sglo.items3=-1;
@@ -2251,7 +2252,7 @@ int analiza_struct(int offstruct) { // tras " struct id [ <const> ] " // id≡me
           (*ob).bglo.totalen=(*ob).bglo.len1+1;
           if ((*ob).bglo.len2>-1) (*ob).bglo.totalen*=(*ob).bglo.len2+1;
           if ((*ob).bglo.len3>-1) (*ob).bglo.totalen*=(*ob).bglo.len3+1;
-          if (pieza!=p_corce) c_error(3,26); lexico();
+          if (pieza!=p_corce) { c_error(3,26); } lexico();
           test_buffer(&mem,&imem_max,offstruct+len+((*ob).bglo.totalen+3)/4);
 
           test_buffer(&frm,&ifrm_max,offstruct+len+((*ob).bglo.totalen+3)/4);
@@ -2325,7 +2326,7 @@ int analiza_struct(int offstruct) { // tras " struct id [ <const> ] " // id≡me
           (*ob).wglo.totalen=(*ob).wglo.len1+1;
           if ((*ob).wglo.len2>-1) (*ob).wglo.totalen*=(*ob).wglo.len2+1;
           if ((*ob).wglo.len3>-1) (*ob).wglo.totalen*=(*ob).wglo.len3+1;
-          if (pieza!=p_corce) c_error(3,26); lexico();
+          if (pieza!=p_corce) { c_error(3,26); } lexico();
           test_buffer(&mem,&imem_max,offstruct+len+((*ob).wglo.totalen+1)/2);
 
           test_buffer(&frm,&ifrm_max,offstruct+len+((*ob).wglo.totalen+1)/2);
@@ -2401,7 +2402,7 @@ int analiza_struct(int offstruct) { // tras " struct id [ <const> ] " // id≡me
           (*ob).tglo.totalen=(*ob).tglo.len1+1;
           if ((*ob).tglo.len2>-1) (*ob).tglo.totalen*=(*ob).tglo.len2+1;
           if ((*ob).tglo.len3>-1) (*ob).tglo.totalen*=(*ob).tglo.len3+1;
-          if (pieza!=p_corce) c_error(3,26); lexico();
+          if (pieza!=p_corce) { c_error(3,26); } lexico();
 
           test_buffer(&mem,&imem_max,offstruct+len+(*ob).tglo.totalen);
           if (pieza==p_asig) {
@@ -2446,7 +2447,7 @@ int analiza_struct_local(int offstruct) { // tras " struct id [ <const> ] " // i
       if (pieza==p_pointer) { // Se define un puntero a struct
 
         old_member=member; member=NULL; lexico(); member=old_member;
-        if (pieza!=p_id) c_error(1,110); ob=o;
+        if (pieza!=p_id) { c_error(1,110); } ob=o;
 
         if ((*ob).tipo==tnone) c_error(0,150); // No se define el pointer así
         if ((*ob).tipo!=tsglo && (*ob).tipo!=tsloc) c_error(0,150);
@@ -2491,7 +2492,7 @@ int analiza_struct_local(int offstruct) { // tras " struct id [ <const> ] " // i
           (*ob).sloc.totalitems=(*ob).sloc.items1+1;
           if ((*ob).sloc.items2>-1) (*ob).sloc.totalitems*=(*ob).sloc.items2+1;
           if ((*ob).sloc.items3>-1) (*ob).sloc.totalitems*=(*ob).sloc.items3+1;
-          if (pieza!=p_corce) c_error(3,26); lexico();
+          if (pieza!=p_corce) { c_error(3,26); } lexico();
         } else {
           (*ob).sloc.totalitems=1;
           (*ob).sloc.items1=0; (*ob).sloc.items2=-1; (*ob).sloc.items3=-1;
@@ -2611,7 +2612,7 @@ int analiza_struct_local(int offstruct) { // tras " struct id [ <const> ] " // i
           (*ob).bloc.totalen=(*ob).bloc.len1+1;
           if ((*ob).bloc.len2>-1) (*ob).bloc.totalen*=(*ob).bloc.len2+1;
           if ((*ob).bloc.len3>-1) (*ob).bloc.totalen*=(*ob).bloc.len3+1;
-          if (pieza!=p_corce) c_error(3,26); lexico();
+          if (pieza!=p_corce) { c_error(3,26); } lexico();
 
           test_buffer(&loc,&iloc_max,offstruct+len+((*ob).bloc.totalen+3)/4);
 
@@ -2686,7 +2687,7 @@ int analiza_struct_local(int offstruct) { // tras " struct id [ <const> ] " // i
           (*ob).wloc.totalen=(*ob).wloc.len1+1;
           if ((*ob).wloc.len2>-1) (*ob).wloc.totalen*=(*ob).wloc.len2+1;
           if ((*ob).wloc.len3>-1) (*ob).wloc.totalen*=(*ob).wloc.len3+1;
-          if (pieza!=p_corce) c_error(3,26); lexico();
+          if (pieza!=p_corce) { c_error(3,26); } lexico();
 
           test_buffer(&loc,&iloc_max,offstruct+len+((*ob).wloc.totalen+1)/2);
 
@@ -2763,7 +2764,7 @@ int analiza_struct_local(int offstruct) { // tras " struct id [ <const> ] " // i
           (*ob).tloc.totalen=(*ob).tloc.len1+1;
           if ((*ob).tloc.len2>-1) (*ob).tloc.totalen*=(*ob).tloc.len2+1;
           if ((*ob).tloc.len3>-1) (*ob).tloc.totalen*=(*ob).tloc.len3+1;
-          if (pieza!=p_corce) c_error(3,26); lexico();
+          if (pieza!=p_corce) { c_error(3,26); } lexico();
 
           test_buffer(&loc,&iloc_max,offstruct+len+(*ob).tloc.totalen);
           if (pieza==p_asig) {
@@ -2809,7 +2810,7 @@ int analiza_struct_private(int offstruct) { // tras " struct id [ <const> ] " //
       if (pieza==p_pointer) { // Se define un puntero a struct
 
         old_member=member; member=NULL; lexico(); member=old_member;
-        if (pieza!=p_id) c_error(1,110); ob=o;
+        if (pieza!=p_id) { c_error(1,110); } ob=o;
 
         if ((*ob).tipo==tnone) c_error(0,150); // No se define el pointer así
         if ((*ob).tipo!=tsglo && (*ob).tipo!=tsloc) c_error(0,150);
@@ -2854,7 +2855,7 @@ int analiza_struct_private(int offstruct) { // tras " struct id [ <const> ] " //
           (*ob).sloc.totalitems=(*ob).sloc.items1+1;
           if ((*ob).sloc.items2>-1) (*ob).sloc.totalitems*=(*ob).sloc.items2+1;
           if ((*ob).sloc.items3>-1) (*ob).sloc.totalitems*=(*ob).sloc.items3+1;
-          if (pieza!=p_corce) c_error(3,26); lexico();
+          if (pieza!=p_corce) { c_error(3,26); } lexico();
         } else {
           (*ob).sloc.totalitems=1;
           (*ob).sloc.items1=0; (*ob).sloc.items2=-1; (*ob).sloc.items3=-1;
@@ -2974,7 +2975,7 @@ int analiza_struct_private(int offstruct) { // tras " struct id [ <const> ] " //
           (*ob).bloc.totalen=(*ob).bloc.len1+1;
           if ((*ob).bloc.len2>-1) (*ob).bloc.totalen*=(*ob).bloc.len2+1;
           if ((*ob).bloc.len3>-1) (*ob).bloc.totalen*=(*ob).bloc.len3+1;
-          if (pieza!=p_corce) c_error(3,26); lexico();
+          if (pieza!=p_corce) { c_error(3,26); } lexico();
           test_buffer(&mem,&imem_max,offstruct+len+((*ob).bloc.totalen+3)/4);
 
           test_buffer(&frm,&ifrm_max,offstruct+len+((*ob).bloc.totalen+3)/4);
@@ -3048,7 +3049,7 @@ int analiza_struct_private(int offstruct) { // tras " struct id [ <const> ] " //
           (*ob).wloc.totalen=(*ob).wloc.len1+1;
           if ((*ob).wloc.len2>-1) (*ob).wloc.totalen*=(*ob).wloc.len2+1;
           if ((*ob).wloc.len3>-1) (*ob).wloc.totalen*=(*ob).wloc.len3+1;
-          if (pieza!=p_corce) c_error(3,26); lexico();
+          if (pieza!=p_corce) { c_error(3,26); } lexico();
           test_buffer(&mem,&imem_max,offstruct+len+((*ob).wloc.totalen+1)/2);
 
           test_buffer(&frm,&ifrm_max,offstruct+len+((*ob).wloc.totalen+1)/2);
@@ -3124,7 +3125,7 @@ int analiza_struct_private(int offstruct) { // tras " struct id [ <const> ] " //
           (*ob).tloc.totalen=(*ob).tloc.len1+1;
           if ((*ob).tloc.len2>-1) (*ob).tloc.totalen*=(*ob).tloc.len2+1;
           if ((*ob).tloc.len3>-1) (*ob).tloc.totalen*=(*ob).tloc.len3+1;
-          if (pieza!=p_corce) c_error(3,26); lexico();
+          if (pieza!=p_corce) { c_error(3,26); } lexico();
 
           test_buffer(&mem,&imem_max,offstruct+len+(*ob).tloc.totalen);
           if (pieza==p_asig) {
@@ -3385,7 +3386,7 @@ void sintactico (void) {
             (*ob).sglo.totalitems=(*ob).sglo.items1+1;
             if ((*ob).sglo.items2>-1) (*ob).sglo.totalitems*=(*ob).sglo.items2+1;
             if ((*ob).sglo.items3>-1) (*ob).sglo.totalitems*=(*ob).sglo.items3+1;
-            if (pieza!=p_corce) c_error(3,26); lexico();
+            if (pieza!=p_corce) { c_error(3,26); } lexico();
           } else {
             (*ob).sglo.totalitems=1;
             (*ob).sglo.items1=0; (*ob).sglo.items2=-1; (*ob).sglo.items3=-1;
@@ -3516,7 +3517,7 @@ void sintactico (void) {
               (*ob).bglo.totalen=(*ob).bglo.len1+1;
               if ((*ob).bglo.len2>-1) (*ob).bglo.totalen*=(*ob).bglo.len2+1;
               if ((*ob).bglo.len3>-1) (*ob).bglo.totalen*=(*ob).bglo.len3+1;
-              if (pieza!=p_corce) c_error(3,26); lexico();
+              if (pieza!=p_corce) { c_error(3,26); } lexico();
               if (pieza==p_asig) {
                 save_error(1);
                 lexico();
@@ -3589,7 +3590,7 @@ void sintactico (void) {
               (*ob).wglo.totalen=(*ob).wglo.len1+1;
               if ((*ob).wglo.len2>-1) (*ob).wglo.totalen*=(*ob).wglo.len2+1;
               if ((*ob).wglo.len3>-1) (*ob).wglo.totalen*=(*ob).wglo.len3+1;
-              if (pieza!=p_corce) c_error(3,26); lexico();
+              if (pieza!=p_corce) { c_error(3,26); } lexico();
               if (pieza==p_asig) {
                 save_error(1);
                 lexico();
@@ -3662,7 +3663,7 @@ void sintactico (void) {
               (*ob).tglo.totalen=(*ob).tglo.len1+1;
               if ((*ob).tglo.len2>-1) (*ob).tglo.totalen*=(*ob).tglo.len2+1;
               if ((*ob).tglo.len3>-1) (*ob).tglo.totalen*=(*ob).tglo.len3+1;
-              if (pieza!=p_corce) c_error(3,26); lexico();
+              if (pieza!=p_corce) { c_error(3,26); } lexico();
               if (pieza==p_asig) {
                 save_error(1);
                 lexico(); tglo_init(3);
@@ -3745,7 +3746,7 @@ void sintactico (void) {
             (*ob).sloc.totalitems=(*ob).sloc.items1+1;
             if ((*ob).sloc.items2>-1) (*ob).sloc.totalitems*=(*ob).sloc.items2+1;
             if ((*ob).sloc.items3>-1) (*ob).sloc.totalitems*=(*ob).sloc.items3+1;
-            if (pieza!=p_corce) c_error(3,26); lexico();
+            if (pieza!=p_corce) { c_error(3,26); } lexico();
           } else {
             (*ob).sloc.totalitems=1;
             (*ob).sloc.items1=0; (*ob).sloc.items2=-1; (*ob).sloc.items3=-1;
@@ -3872,7 +3873,7 @@ void sintactico (void) {
               (*ob).bloc.totalen=(*ob).bloc.len1+1;
               if ((*ob).bloc.len2>-1) (*ob).bloc.totalen*=(*ob).bloc.len2+1;
               if ((*ob).bloc.len3>-1) (*ob).bloc.totalen*=(*ob).bloc.len3+1;
-              if (pieza!=p_corce) c_error(3,26); lexico();
+              if (pieza!=p_corce) { c_error(3,26); } lexico();
               if (pieza==p_asig) {
                 save_error(1);
                 lexico();
@@ -3945,7 +3946,7 @@ void sintactico (void) {
               (*ob).wloc.totalen=(*ob).wloc.len1+1;
               if ((*ob).wloc.len2>-1) (*ob).wloc.totalen*=(*ob).wloc.len2+1;
               if ((*ob).wloc.len3>-1) (*ob).wloc.totalen*=(*ob).wloc.len3+1;
-              if (pieza!=p_corce) c_error(3,26); lexico();
+              if (pieza!=p_corce) { c_error(3,26); } lexico();
               if (pieza==p_asig) {
                 save_error(1);
                 lexico();
@@ -4018,7 +4019,7 @@ void sintactico (void) {
               (*ob).tloc.totalen=(*ob).tloc.len1+1;
               if ((*ob).tloc.len2>-1) (*ob).tloc.totalen*=(*ob).tloc.len2+1;
               if ((*ob).tloc.len3>-1) (*ob).tloc.totalen*=(*ob).tloc.len3+1;
-              if (pieza!=p_corce) c_error(3,26); lexico();
+              if (pieza!=p_corce) { c_error(3,26); } lexico();
               if (pieza==p_asig) {
                 save_error(1);
                 lexico(); tloc_init(3);
@@ -4060,7 +4061,7 @@ void sintactico (void) {
   parametros=-1;
   bloque_lexico=bloque_actual;
   n=iloc; analiza_private();
-  if (iloc>iloc_len) iloc_len=iloc; iloc=n;
+  if (iloc>iloc_len) { iloc_len=iloc; } iloc=n;
   parametros=0;
 
   g1(lfrm);
@@ -4071,7 +4072,7 @@ void sintactico (void) {
 
   sentencia();
 
-  if (pieza!=p_end) c_error(0,40); inicio_sentencia();
+  if (pieza!=p_end) { c_error(0,40); } inicio_sentencia();
   g1(lret);
   pasa_ptocoma(); final_sentencia(); grabar_sentencia();
 
@@ -4084,7 +4085,7 @@ void sintactico (void) {
   save_error(0);
   while (pieza==p_process || pieza==p_function) {
     n=pieza; inicio_sentencia(); lexico();
-    if (pieza!=p_id) c_error(1,111); ob=o; lexico();
+    if (pieza!=p_id) { c_error(1,111); } ob=o; lexico();
     if ((*ob).tipo==tproc && (*ob).usado) {
       num_par=(*ob).proc.num_par; bloque_lexico=bloque_actual=ob;
       _imem=(*ob).proc.offset; while(_imem) {
@@ -4104,10 +4105,11 @@ void sintactico (void) {
 
     while (pieza!=p_cerrar) {
       (*ob).proc.num_par++; expresion_cpa();
-      if (pieza!=p_cerrar) if (pieza!=p_coma) c_error(3,25);
-        else { lexico(); if (pieza==p_cerrar) c_error(3,45); }
-    } if ((*ob).usado)
+      if (pieza!=p_cerrar) { if (pieza!=p_coma) c_error(3,25);
+        else { lexico(); if (pieza==p_cerrar) c_error(3,45); } }
+    } if ((*ob).usado) {
       if (num_par==(*ob).proc.num_par) (*ob).usado=0; else c_error(0,46);
+    }
 
     pasa_ptocoma(); final_sentencia();
 
@@ -4121,12 +4123,12 @@ void sintactico (void) {
 
     analiza_private(); parametros=0;
 
-    if (iloc>iloc_len) iloc_len=iloc; iloc=n;
+    if (iloc>iloc_len) { iloc_len=iloc; } iloc=n;
 
-    if (pieza!=p_begin) c_error(0,29); lexico();
+    if (pieza!=p_begin) { c_error(0,29); } lexico();
     final=imem-1; grabar_sentencia();
     sentencia();
-    if (pieza!=p_end) c_error(0,40); inicio_sentencia();
+    if (pieza!=p_end) { c_error(0,40); } inicio_sentencia();
     g1(lret);
     pasa_ptocoma(); final_sentencia(); grabar_sentencia();
 
@@ -4206,7 +4208,7 @@ void analiza_private(void) {
             (*ob).sloc.totalitems=(*ob).sloc.items1+1;
             if ((*ob).sloc.items2>-1) (*ob).sloc.totalitems*=(*ob).sloc.items2+1;
             if ((*ob).sloc.items3>-1) (*ob).sloc.totalitems*=(*ob).sloc.items3+1;
-            if (pieza!=p_corce) c_error(3,26); lexico();
+            if (pieza!=p_corce) { c_error(3,26); } lexico();
           } else {
             (*ob).sloc.totalitems=1;
             (*ob).sloc.items1=0; (*ob).sloc.items2=-1; (*ob).sloc.items3=-1;
@@ -4385,7 +4387,7 @@ void analiza_private(void) {
               (*ob).bloc.totalen=(*ob).bloc.len1+1;
               if ((*ob).bloc.len2>-1) (*ob).bloc.totalen*=(*ob).bloc.len2+1;
               if ((*ob).bloc.len3>-1) (*ob).bloc.totalen*=(*ob).bloc.len3+1;
-              if (pieza!=p_corce) c_error(3,26); lexico();
+              if (pieza!=p_corce) { c_error(3,26); } lexico();
               if (pieza==p_asig) {
                 save_error(1);
                 lexico();
@@ -4477,7 +4479,7 @@ void analiza_private(void) {
               (*ob).wloc.totalen=(*ob).wloc.len1+1;
               if ((*ob).wloc.len2>-1) (*ob).wloc.totalen*=(*ob).wloc.len2+1;
               if ((*ob).wloc.len3>-1) (*ob).wloc.totalen*=(*ob).wloc.len3+1;
-              if (pieza!=p_corce) c_error(3,26); lexico();
+              if (pieza!=p_corce) { c_error(3,26); } lexico();
               if (pieza==p_asig) {
                 save_error(1);
                 lexico();
@@ -4571,7 +4573,7 @@ void analiza_private(void) {
               (*ob).tloc.totalen=(*ob).tloc.len1+1;
               if ((*ob).tloc.len2>-1) (*ob).tloc.totalen*=(*ob).tloc.len2+1;
               if ((*ob).tloc.len3>-1) (*ob).tloc.totalen*=(*ob).tloc.len3+1;
-              if (pieza!=p_corce) c_error(3,26); lexico();
+              if (pieza!=p_corce) { c_error(3,26); } lexico();
               if (pieza==p_asig) {
                 save_error(1); lexico(); tglo_init(3);
                 if (imem-_imem>(*ob).tloc.totalen) c_error(4,33); }
@@ -4632,6 +4634,7 @@ void tloc_init(int tipo) {
 
 // OJO!!! tglo_init no puede llamar a test_buffer !!!
 
+#undef memptrsize
 #if __WORDSIZE == 64
 #define memptrsize int64_t
 #else
@@ -4916,7 +4919,7 @@ void sentencia() {
         g2(ljpf,0); im2=imem-1;
         final_sentencia(); grabar_sentencia();
         sentencia();
-        if (pieza!=p_end) c_error(0,40); inicio_sentencia();
+        if (pieza!=p_end) { c_error(0,40); } inicio_sentencia();
         lexico();
         g2(ljmp,im1); mem[im2]=imem;
         while (tbreak[--itbreak]!=0) mem[tbreak[itbreak]]=imem;
@@ -4954,9 +4957,9 @@ void sentencia() {
         } else c_error(0,67);
 
         lexico();
-        if (pieza!=p_asig) c_error(3,68); lexico();
+        if (pieza!=p_asig) { c_error(3,68); } lexico();
         from=constante();
-        if (pieza!=p_to) c_error(1,69); lexico();
+        if (pieza!=p_to) { c_error(1,69); } lexico();
         to=constante();
         if (from==to) c_error(4,71);
         if (pieza==p_step) {
@@ -4982,11 +4985,11 @@ void sentencia() {
         g2(ljpf,0); im2=imem-1;
 
         final_sentencia(); grabar_sentencia();
-        if (!free_sintax) if (pieza!=p_ptocoma) c_error(3,66);
+        if (!free_sintax) { if (pieza!=p_ptocoma) c_error(3,66); }
         while (pieza==p_ptocoma || pieza==p_coma) lexico();
 
         sentencia();
-        if (pieza!=p_end) c_error(0,40); inicio_sentencia();
+        if (pieza!=p_end) { c_error(0,40); } inicio_sentencia();
         lexico();
 
         im3=imem; // Posición del continue
@@ -5010,12 +5013,12 @@ void sentencia() {
         inicio_sentencia();
         tbreak[itbreak++]=0; tcont[itcont++]=0;
         lexico();
-        if (pieza!=p_abrir) c_error(3,36); lexico();
+        if (pieza!=p_abrir) { c_error(3,36); } lexico();
         if (pieza!=p_ptocoma) {
           expresion(); g1(lasp);
           while (pieza==p_coma) { lexico(); expresion(); g1(lasp); }
         } im1=imem;
-        if (pieza!=p_ptocoma) c_error(3,47); lexico();
+        if (pieza!=p_ptocoma) { c_error(3,47); } lexico();
         if (pieza==p_ptocoma) {
           g2(lcar,1);
         } else expresion();
@@ -5023,16 +5026,16 @@ void sentencia() {
         while (pieza==p_coma) { lexico(); expresion();
           g2(ljpf,im2); im2=imem-1; }
         g2(ljmp,0); im3=imem-1;
-        if (pieza!=p_ptocoma) c_error(3,47); lexico();
+        if (pieza!=p_ptocoma) { c_error(3,47); } lexico();
         if (pieza!=p_cerrar) {
           expresion(); g1(lasp);
           while (pieza==p_coma) { lexico(); expresion(); g1(lasp); }
         }
         g2(ljmp,im1);
-        if (pieza!=p_cerrar) c_error(3,25); lexico();
+        if (pieza!=p_cerrar) { c_error(3,25); } lexico();
         final_sentencia(); grabar_sentencia();
         mem[im3++]=imem; sentencia();
-        if (pieza!=p_end) c_error(0,40); inicio_sentencia(); lexico();
+        if (pieza!=p_end) { c_error(0,40); } inicio_sentencia(); lexico();
           g2(ljmp,im3);
           do { im1=mem[im2]; mem[im2]=imem; im2=im1; } while(im2);
         while (tbreak[--itbreak]!=0) mem[tbreak[itbreak]]=imem;
@@ -5076,19 +5079,19 @@ void sentencia() {
 
           } else if (pieza==p_default) {
             lexico();
-            if (im1) mem[im1]=imem; im1=0;
+            if (im1) { mem[im1]=imem; } im1=0;
           } else c_error(0,50);
-          if (!free_sintax) if (pieza!=p_ptocoma) c_error(3,65);
+          if (!free_sintax) { if (pieza!=p_ptocoma) c_error(3,65); }
           while (pieza==p_ptocoma || pieza==p_coma) lexico();
           g1(lasp);
           final_sentencia(); grabar_sentencia();
           sentencia();
-          if (pieza!=p_end) c_error(0,51); inicio_sentencia();
+          if (pieza!=p_end) { c_error(0,51); } inicio_sentencia();
             g2(ljmp,im2); im2=imem-1;
           pasa_ptocoma();
           final_sentencia(); grabar_sentencia();
         } inicio_sentencia();
-        if (im1) mem[im1]=imem; g1(lasp);
+        if (im1) { mem[im1]=imem; } g1(lasp);
         while(im2) { im1=mem[im2]; mem[im2]=imem; im2=im1; }
         lexico();
         final_sentencia(); grabar_sentencia(); break;
@@ -5116,15 +5119,15 @@ void sentencia() {
         break;
       case p_break:
         inicio_sentencia();
-        if (itbreak==0) c_error(0,48); lexico();
-        if (!free_sintax) if (pieza!=p_ptocoma) c_error(3,66);
+        if (itbreak==0) { c_error(0,48); } lexico();
+        if (!free_sintax) { if (pieza!=p_ptocoma) c_error(3,66); }
         while (pieza==p_ptocoma || pieza==p_coma) lexico();
         g2(ljmp,0); tbreak[itbreak++]=imem-1;
         final_sentencia(); grabar_sentencia(); break;
       case p_continue:
         inicio_sentencia();
-        if (itcont==0) c_error(0,49); lexico();
-        if (!free_sintax) if (pieza!=p_ptocoma) c_error(3,66);
+        if (itcont==0) { c_error(0,49); } lexico();
+        if (!free_sintax) { if (pieza!=p_ptocoma) c_error(3,66); }
         while (pieza==p_ptocoma || pieza==p_coma) lexico();
         g2(ljmp,0); tcont[itcont++]=imem-1;
         final_sentencia(); grabar_sentencia(); break;
@@ -5133,7 +5136,7 @@ void sentencia() {
         lexico(); g2(lclo,0); im1=imem-1;
         final_sentencia(); grabar_sentencia();
         sentencia();
-        if (pieza!=p_end) c_error(0,40); lexico();
+        if (pieza!=p_end) { c_error(0,40); } lexico();
         mem[im1]=imem; break;
       case p_ptocoma:
         lexico(); break;
@@ -5316,7 +5319,7 @@ void generar_expresion(void) {
         g1(lcid); break;
       case ecall:
         ob=(*e).objeto; g2(lcal,(*ob).proc.offset);
-        if ((*ob).usado) (*ob).proc.offset=imem-1; break;
+        if ((*ob).usado) { (*ob).proc.offset=imem-1; } break;
       case efunc:
         ob=(*e).objeto; g2(lfun,(*ob).func.codigo); break;
       case efext:
@@ -5701,7 +5704,7 @@ void factor(void) {
 
     case p_abrir:
       lexico(); exp00(tipo_expresion);
-      if (pieza!=p_cerrar) c_error(3,25); lexico();  break;
+      if (pieza!=p_cerrar) { c_error(3,25); } lexico();  break;
 
     case p_corab:
       lexico();
@@ -5736,6 +5739,7 @@ void factor(void) {
           if ((*o).sglo.offset==long_header) { // type mouse ≡ 0
             (*_exp).tipo=econs; (*_exp++).valor=0; break;
           }
+          /* fall through */
         default: c_error(0,60);
       } lexico(); break;
 
@@ -5813,7 +5817,7 @@ void factor(void) {
             _exp=e;
           }
         } else (*ob).cloc.totalen=255;
-        if (parametros>1) g2(lpar,parametros-1); parametros=1;
+        if (parametros>1) { g2(lpar,parametros-1); } parametros=1;
         g2(lpri,0); _imem=imem;
         imem+=1+((*ob).cloc.totalen+5)/4;
         test_buffer(&mem,&imem_max,imem);
@@ -5891,14 +5895,16 @@ void factor(void) {
         (*_exp).tipo=eoper; (*_exp++).token=p_pointerword;
       } break;
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
     case p_int: // Se comprueba la declaración de un int parámetro
       if (parametros<=0) {
         if (error_27==27) c_error(1,27); else c_error(0,error_27);
       } else {
         lexico();
         if (pieza==p_pointer) {
-
     case p_pointer: // Declaración de un puntero a int parámetro
+#pragma GCC diagnostic pop
           if (parametros<=0) {
             if (error_27==27) c_error(1,27); else c_error(0,error_27);
           } parametros++;
@@ -5934,8 +5940,8 @@ void factor(void) {
         while (pieza!=p_cerrar) {
           (*ob).proc.num_par++;
           exp00(0);
-          if (pieza!=p_cerrar) if (pieza!=p_coma) c_error(3,25);
-          else { lexico();  if (pieza==p_cerrar) c_error(3,45); }
+          if (pieza!=p_cerrar) { if (pieza!=p_coma) c_error(3,25);
+          else { lexico();  if (pieza==p_cerrar) c_error(3,45); } }
         } (*_exp).tipo=ecall; (*_exp++).objeto=ob; lexico();  break;
 
       case tcons:
@@ -6123,7 +6129,7 @@ void factor(void) {
             (*_exp).tipo=eoper; (*_exp++).token=p_mul;
             (*_exp).tipo=eoper; (*_exp++).token=p_add;
           }
-          if (pieza!=p_corce) c_error(3,26); lexico();
+          if (pieza!=p_corce) { c_error(3,26); } lexico();
           if ((*ob).tipo==tpsgl) {
             (*_exp).tipo=econs; (*_exp++).valor=(*((*ob).psgl.ostruct)).sglo.len_item;
           } else {
@@ -6328,7 +6334,7 @@ void factor(void) {
             (*_exp).tipo=eoper; (*_exp++).token=p_mul;
             (*_exp).tipo=eoper; (*_exp++).token=p_add;
           }
-          if (pieza!=p_corce) c_error(3,26); lexico();
+          if (pieza!=p_corce) { c_error(3,26); } lexico();
           if ((*ob).tipo==tpslo) {
             (*_exp).tipo=econs; (*_exp++).valor=(*((*ob).pslo.ostruct)).sloc.len_item;
           } else {
@@ -6351,8 +6357,8 @@ void factor(void) {
         p=0; while (pieza!=p_cerrar) { // p≡num_par
           p++;
           exp00(0);
-          if (pieza!=p_cerrar) if (pieza!=p_coma) c_error(3,25);
-          else { lexico(); if (pieza==p_cerrar) c_error(3,45); }
+          if (pieza!=p_cerrar) { if (pieza!=p_coma) c_error(3,25);
+          else { lexico(); if (pieza==p_cerrar) c_error(3,45); } }
         }
         if (p!=(*ob).proc.num_par) c_error(1,46);
         (*_exp).tipo=ecall; (*_exp++).objeto=ob; lexico(); break;
@@ -6397,8 +6403,8 @@ void factor(void) {
             exp00(0);
           } p++;
 
-          if (pieza!=p_cerrar) if (pieza!=p_coma) c_error(3,25);
-          else { lexico(); if (pieza==p_cerrar) c_error(3,45); }
+          if (pieza!=p_cerrar) { if (pieza!=p_coma) c_error(3,25);
+          else { lexico(); if (pieza==p_cerrar) c_error(3,45); } }
         }
         if (p!=(*ob).func.num_par) c_error(1,46);
         (*_exp).tipo=efunc; (*_exp++).objeto=ob;
@@ -6410,8 +6416,8 @@ void factor(void) {
         p=0; while (pieza!=p_cerrar) { // p≡num_par
           p++;
           exp00(0);
-          if (pieza!=p_cerrar) if (pieza!=p_coma) c_error(3,25);
-          else { lexico(); if (pieza==p_cerrar) c_error(3,45); }
+          if (pieza!=p_cerrar) { if (pieza!=p_coma) c_error(3,25);
+          else { lexico(); if (pieza==p_cerrar) c_error(3,45); } }
         } if (p!=(*ob).fext.num_par) c_error(1,46);
         (*_exp).tipo=efext; (*_exp++).objeto=ob; lexico(); break;
 
@@ -6503,7 +6509,7 @@ void factor_struct(void) {
           (*_exp).tipo=eoper; (*_exp++).token=p_mul;
           (*_exp).tipo=eoper; (*_exp++).token=p_add;
         }
-        if (pieza!=p_corce) c_error(3,26); lexico();
+        if (pieza!=p_corce) { c_error(3,26); } lexico();
         (*_exp).tipo=eoper; (*_exp++).token=p_add;
       } break;
 
@@ -6540,7 +6546,7 @@ void factor_struct(void) {
           (*_exp).tipo=eoper; (*_exp++).token=p_mul;
           (*_exp).tipo=eoper; (*_exp++).token=p_add;
         }
-        if (pieza!=p_corce) c_error(3,26); lexico();
+        if (pieza!=p_corce) { c_error(3,26); } lexico();
       } else { // mi_byte ≡ mi_byte[0]
         (*_exp).tipo=econs; (*_exp++).valor=0;
       } struct_pointer=p_pointerbyte; break;
@@ -6577,7 +6583,7 @@ void factor_struct(void) {
           (*_exp).tipo=eoper; (*_exp++).token=p_mul;
           (*_exp).tipo=eoper; (*_exp++).token=p_add;
         }
-        if (pieza!=p_corce) c_error(3,26); lexico();
+        if (pieza!=p_corce) { c_error(3,26); } lexico();
       } else { // mi_byte ≡ mi_byte[0]
         (*_exp).tipo=econs; (*_exp++).valor=0;
       } struct_pointer=p_pointerword; break;
@@ -6636,7 +6642,7 @@ void factor_struct(void) {
           (*_exp).tipo=eoper; (*_exp++).token=p_mul;
           (*_exp).tipo=eoper; (*_exp++).token=p_add;
         }
-        if (pieza!=p_corce) c_error(3,26); lexico();
+        if (pieza!=p_corce) { c_error(3,26); } lexico();
         if ((*ob).tipo==tpsgl) {
           (*_exp).tipo=econs; (*_exp++).valor=(*((*ob).psgl.ostruct)).sglo.len_item;
         } else {
@@ -6686,7 +6692,7 @@ void factor_struct(void) {
           (*_exp).tipo=eoper; (*_exp++).token=p_mul;
           (*_exp).tipo=eoper; (*_exp++).token=p_add;
         }
-        if (pieza!=p_corce) c_error(3,26); lexico();
+        if (pieza!=p_corce) { c_error(3,26); } lexico();
         (*_exp).tipo=eoper; (*_exp++).token=p_add;
       } break;
 
@@ -6723,7 +6729,7 @@ void factor_struct(void) {
           (*_exp).tipo=eoper; (*_exp++).token=p_mul;
           (*_exp).tipo=eoper; (*_exp++).token=p_add;
         }
-        if (pieza!=p_corce) c_error(3,26); lexico();
+        if (pieza!=p_corce) { c_error(3,26); } lexico();
       } else { // mi_byte ≡ mi_byte[0]
         (*_exp).tipo=econs; (*_exp++).valor=0;
       } struct_pointer=p_pointerbyte; break;
@@ -6760,7 +6766,7 @@ void factor_struct(void) {
           (*_exp).tipo=eoper; (*_exp++).token=p_mul;
           (*_exp).tipo=eoper; (*_exp++).token=p_add;
         }
-        if (pieza!=p_corce) c_error(3,26); lexico();
+        if (pieza!=p_corce) { c_error(3,26); } lexico();
       } else { // mi_byte ≡ mi_byte[0]
         (*_exp).tipo=econs; (*_exp++).valor=0;
       } struct_pointer=p_pointerword; break;
@@ -6819,7 +6825,7 @@ void factor_struct(void) {
           (*_exp).tipo=eoper; (*_exp++).token=p_mul;
           (*_exp).tipo=eoper; (*_exp++).token=p_add;
         }
-        if (pieza!=p_corce) c_error(3,26); lexico();
+        if (pieza!=p_corce) { c_error(3,26); } lexico();
         if ((*ob).tipo==tpslo) {
           (*_exp).tipo=econs; (*_exp++).valor=(*((*ob).pslo.ostruct)).sloc.len_item;
         } else {
@@ -7280,7 +7286,7 @@ FILE * open_multi(char *file, char *mode) {
   }
 
   strcpy(full,(char*)file); // full filename
-  if ( f = fpopen(full))
+  if ((f = fpopen((byte *)full)))
     return f;
 
   if ((f=fopen(full,mode))) // "paz\fixero.est"
@@ -7292,12 +7298,13 @@ FILE * open_multi(char *file, char *mode) {
 
   _splitpath(full,drive,dir,fname,ext);
 
-  if (strchr(ext,'.')==NULL) 
-    strcpy(full,ext); 
-  else 
+  if (strchr(ext,'.')==NULL) {
+    strcpy(full,ext);
+  } else {
     strcpy(full,strchr(ext,'.')+1);
-    
-    if (strlen(full) && file[0]!='/') 
+  }
+
+    if (strlen(full) && file[0]!='/')
     strcat(full,"/");
 
     strcat(full,(char*)file);
@@ -7305,7 +7312,7 @@ FILE * open_multi(char *file, char *mode) {
   if ((f=fopen(full,mode))) // "est\paz\fixero.est"
     return f;
 
-  if ( f = fpopen(full))
+  if ((f = fpopen((byte *)full)))
     return f;
 
   strupr(full);
@@ -7313,7 +7320,7 @@ FILE * open_multi(char *file, char *mode) {
   if ((f=fopen(full,mode))) // "est\paz\fixero.est"
   return f;
 
-  if ( f=fpopen(full) )
+  if ((f=fpopen((byte *)full)))
     return f;
     
   strcpy(full,fname);
@@ -7322,7 +7329,7 @@ FILE * open_multi(char *file, char *mode) {
   if ((f=fopen(full,mode))) // "fixero.est"
     return f;
 
-  if ( f = fpopen(full))
+  if ((f = fpopen((byte *)full)))
     return f;
 
   strupr(full);
@@ -7330,7 +7337,7 @@ FILE * open_multi(char *file, char *mode) {
   if ((f=fopen(full,mode))) // "fixero.est"
     return f;
 
-  if ( f = fpopen(full))
+  if ((f = fpopen((byte *)full)))
     return f;
 
   strlwr(full);
@@ -7338,7 +7345,7 @@ FILE * open_multi(char *file, char *mode) {
   if ((f=fopen(full,mode))) // "fixero.est"
     return f;
 
-  if ( f = fpopen(full))
+  if ((f = fpopen((byte *)full)))
     return f;
 
   if (strchr(ext,'.')==NULL)
@@ -7355,7 +7362,7 @@ FILE * open_multi(char *file, char *mode) {
   if ((f=fopen(full,mode))) // "est\fixero.est"
     return f;
 
-  if ( f = fpopen(full))
+  if ((f = fpopen((byte *)full)))
     return f;
 
   strlwr(full);
@@ -7363,7 +7370,7 @@ FILE * open_multi(char *file, char *mode) {
   if ((f=fopen(full,mode))) // "est\fixero.est"
     return f;
 
-  if ( f = fpopen(full))
+  if ((f = fpopen((byte *)full)))
     return f;
 
   return NULL;
@@ -7701,7 +7708,7 @@ void plexico(void) {
     case l_id :
       if (coment) { pieza=p_rem; _source++; break; }
       _ivnom=ivnom.b; *ivnom.p++=0; *ivnom.p++=0; h=0;
-      while (*ivnom.b=lower[*_source++]) h=((byte)(h<<1)+(h>>7))^(*ivnom.b++);
+      while ((*ivnom.b=lower[*_source++])) h=((byte)(h<<1)+(h>>7))^(*ivnom.b++);
       ivnom.b++; _source--; if (ivnom.b-vnom>max_obj*long_med_id) c_error(0,100);
       ptr=&vhash[h];
       while (*ptr && strcmp((char *)(ptr+2),(char *)(_ivnom+ptr8))) ptr=(byte **)*ptr;
@@ -7719,7 +7726,7 @@ void plexico(void) {
       } break;
 
     case l_spc:
-      while ((*++_source)==' '); goto lex_scan;
+      while ((*++_source)==' ') {} goto lex_scan;
 
     case l_lit:
       if (coment) { pieza=p_rem; _source++; break; }
@@ -7751,7 +7758,7 @@ void plexico(void) {
 
     default: // puntero a un lex_ele
       e=lex_case[*_source++]; _ivnom=_source; pieza=(*e).token;
-      while (e=(*e).siguiente) {
+      while ((e=(*e).siguiente)) {
         while (*_source!=(*e).caracter && (*e).alternativa) e=(*e).alternativa;
         if (*_source++==(*e).caracter && (*e).token) {
           pieza=(*e).token; _ivnom=_source;
@@ -7772,7 +7779,7 @@ void plexico(void) {
         goto lex_scan;
       }
 
-      if (pieza==p_ultima) if (coment) c_error(0,55); else c_error(0,12);
+      if (pieza==p_ultima) { if (coment) c_error(0,55); else c_error(0,12); }
       break;
 
   } source=_source; ierror_end=_source-1;

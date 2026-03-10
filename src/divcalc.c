@@ -330,8 +330,8 @@ void calc2(void) {
     calcular();
 
     if (token==p_num) {
-      if (pcalc->chex) sprintf(pcalc->cresult,"0x%x",(memptrsize)tnumero);
-      else if (pcalc->cint) sprintf(pcalc->cresult,"%d",(memptrsize)tnumero);
+      if (pcalc->chex) sprintf(pcalc->cresult,"0x%x",(unsigned int)(memptrsize)tnumero);
+      else if (pcalc->cint) sprintf(pcalc->cresult,"%d",(int)(memptrsize)tnumero);
       else sprintf(pcalc->cresult,"%g",tnumero);
     } else strcpy(pcalc->cresult,(char *)texto[417]);
     wbox(v.ptr,an,al,c12,4,12,an-8-22-26,6);

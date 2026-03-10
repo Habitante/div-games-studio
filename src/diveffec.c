@@ -11,7 +11,7 @@
 #define max_pun 64      // Número máximo de puntos de control
 #define max_exp 8       // Número máximo de explosiones base
 #define DEEP    4
-#pragma on (check_stack);
+// #pragma on (check_stack)  /* Watcom-specific, not needed */
 
 #ifndef uchar
 #define uchar unsigned char

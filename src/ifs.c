@@ -312,9 +312,9 @@ short PintaOutline()
                 else if (ifs.brillo==1 || ifs.brillo==2)
                 switch(cont)
                 {
-                  case 2:       if (*(ptr-1-anchoTotal)>=255-i)
+                  case 2:       if (*(ptr-1-anchoTotal)>=255-i) {
                             *ptr2=negro;
-                        else *ptr2=blanco; break;
+                        } else { *ptr2=blanco; } break;
                   case 1:
                   case 2+1:
                   case 4+2+1:
@@ -734,10 +734,9 @@ int Jorge_Crea_el_font(int GenCode)
                     texturarBody();
                     texturarOutline();
                     unirOutlineConBody();
-                }
-               else
+                } else {
                 texturarBody();
-
+                }
                 if (ifs.sombraX || ifs.sombraY)
                 {
                     if ((ret=PintaSombra()))

@@ -214,9 +214,9 @@ void help2(void) {
     }
 
     if (scan_code==72 || (mouse_graf==7 && (mouse_b&1) && wmouse_x!=-1)) {
-      if (scan_code!=72) if (!(v.botones&2)) {
+      if (scan_code!=72) { if (!(v.botones&2)) {
         wput(v.ptr,an,al,an-9,10,-41); v.botones|=2;
-      } else { retrazo(); retrazo(); }
+      } else { retrazo(); retrazo(); } }
       v.volcar++;
       if (help_line!=help_buffer+1) {
         help_line--; while (*(--help_line)); help_line++; help_l--;
@@ -231,9 +231,9 @@ void help2(void) {
     }
 
     if (scan_code==80 || (mouse_graf==9 && (mouse_b&1) && wmouse_x!=-1)) {
-      if (scan_code!=80) if (!(v.botones&4)) {
+      if (scan_code!=80) { if (!(v.botones&4)) {
         wput(v.ptr,an,al,an-9,al-17,-42); v.botones|=4;
-      } else { retrazo(); retrazo(); } v.volcar++;
+      } else { retrazo(); retrazo(); } } v.volcar++;
       if (help_l+help_al<help_lines) { while (*(help_line++)); help_l++; }
       vuelca_help();
     } else if (v.botones&4) { wput(v.ptr,an,al,an-9,al-17,-40); v.botones^=4; v.volcar++; }
@@ -275,7 +275,7 @@ void help2(void) {
       my=(mouse_y-v.y-(10+16)*big2)/font_al;
 
       p=help_line; while (p+1<help_end && my) {
-        while (*p++); my--;
+        while (*p++) {} my--;
       } si=p; while (*si++);
 
       if (p+1<help_end) { // We are in a line of hypertext, in mx
@@ -306,7 +306,7 @@ void help2(void) {
 
                 while (*si!=6) si++;
                 while (*si++==6) {
-                  while (c=*si++) {
+                  while ((c=*si++)) {
                     if (c>=32) *di++=c; else *di++=' ';
                   } *di++=13; *di++=10;
                 } di-=2;
@@ -698,7 +698,7 @@ void get_error(int n) {
     if((f=fopen("help/help.div","rb"))!=NULL) {
       fseek(f,helpidx[n*2],SEEK_SET);
       fread(p,1,128-strlen(cerror),f); fclose(f);
-      while (*p!='}') p++; *p=0;
+      while (*p!='}') { p++; } *p=0;
     }
   }
 
@@ -1174,7 +1174,7 @@ void put_image_line(int n,int linea,byte * di,int v_an) {
   do {
     an=_an;
     do {
-      if (c=*si++) *di=c;
+      if ((c=*si++)) *di=c;
       di++;
     } while(--an);
     di+=v_an-_an;
@@ -1362,7 +1362,7 @@ void printlist0(void);
 void Print_Help(void) {
   byte * print_buffer, * p, * _help_end;
   int n;
-  char cwork[128];
+  char cwork[512];
   unsigned u;
   FILE * f, * g;
 

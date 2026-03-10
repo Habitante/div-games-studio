@@ -79,7 +79,7 @@ void getvarname(int i, char *name) {
 		if(i>=mem[6] && i<255) {
 if(localvar==0)
 	i+=mem[5];
-			sprintf(name,"var%d",i,mem[1]-1);
+			sprintf(name,"var%d",i);
 
 			if(i>=iloc_len && i<=iloc_len+12) {
 				
@@ -172,7 +172,7 @@ els = (int *)malloc(size*5);
 	
 	char name[255];
 	
-	char cmd[255];
+	char cmd[512];
 	memset(cmd,0,255);
 	printf("pos is %d %d\n",i,size);
 	
@@ -668,7 +668,7 @@ i=mem[1]-1;
 
 			case 18:
 				if(stack[sp-1]==0)
-					sprintf(cmd,"delete_text(all_text)",stack[sp-1]);
+					sprintf(cmd,"delete_text(all_text)");
 				else
 					sprintf(cmd,"delete_text(%d)",stack[sp-1]);
 

@@ -176,7 +176,7 @@ FILE * open_multi(char *file, char *mode) {
 
   strcpy(full,(char*)file); // full filename
 #ifdef DEBUG
-  if ( f = fpopen(full, mode))
+  if ((f = fpopen((byte *)full, mode)))
     return f;
 #endif
 
@@ -189,21 +189,22 @@ FILE * open_multi(char *file, char *mode) {
 
   _splitpath(full,drive,dir,fname,ext);
 
-  if (strchr(ext,'.')==NULL) 
-    strcpy(full,ext); 
-  else 
+  if (strchr(ext,'.')==NULL) {
+    strcpy(full,ext);
+  } else {
     strcpy(full,strchr(ext,'.')+1);
-    
-    if (strlen(full) && file[0]!='/') 
+  }
+
+  if (strlen(full) && file[0]!='/')
     strcat(full,"/");
 
-    strcat(full,(char*)file);
+  strcat(full,(char*)file);
 
   if ((f=fopen(full,mode))) // "est\paz\fixero.est"
     return f;
 
-#ifdef DEBUG  
-  if ( f = fpopen(full, mode))
+#ifdef DEBUG
+  if ((f = fpopen((byte *)full, mode)))
     return f;
 #endif
 
@@ -213,7 +214,7 @@ FILE * open_multi(char *file, char *mode) {
   return f;
 
 #ifdef DEBUG
-  if ( f=fpopen(full, mode) )
+  if ((f=fpopen((byte *)full, mode)))
     return f;
 #endif
     
@@ -224,7 +225,7 @@ FILE * open_multi(char *file, char *mode) {
     return f;
 
 #ifdef DEBUG
-  if ( f = fpopen(full, mode))
+  if ((f = fpopen((byte *)full, mode)))
     return f;
 #endif
 
@@ -234,7 +235,7 @@ FILE * open_multi(char *file, char *mode) {
     return f;
 
 #ifdef DEBUG
-  if ( f = fpopen(full, mode))
+  if ((f = fpopen((byte *)full, mode)))
     return f;
 #endif
 
@@ -244,7 +245,7 @@ FILE * open_multi(char *file, char *mode) {
     return f;
 
 #ifdef DEBUG
-  if ( f = fpopen(full, mode))
+  if ((f = fpopen((byte *)full, mode)))
     return f;
 #endif
 
@@ -263,7 +264,7 @@ FILE * open_multi(char *file, char *mode) {
     return f;
 
 #ifdef DEBUG
-  if ( f = fpopen(full, mode))
+  if ((f = fpopen((byte *)full, mode)))
     return f;
 #endif
 
@@ -273,13 +274,13 @@ FILE * open_multi(char *file, char *mode) {
     return f;
 
 #ifdef DEBUG
-  if ( f = fpopen(full, mode))
+  if ((f = fpopen((byte *)full, mode)))
     return f;
 #endif
 
 #ifdef ZLIB
     if(mode[0]!='w')
-      if(f=memz_open_file(file))
+      if((f=memz_open_file((byte *)file)))
         return f;
 #endif
 
@@ -387,7 +388,7 @@ while (*ff!=0) {
         if ((f=fopen(packfile,"rb"))==NULL) {
 #ifndef DEBUG
 #ifdef ZLIB
-          f=memz_open_file(packfile);
+          f=memz_open_file((byte *)packfile);
 #endif
 #endif
         }
@@ -443,16 +444,16 @@ void load_pal(void) {
     free(packptr);
   } else {
     palfuera:
-    if ((es=div_open_file((byte*)&mem[pila[sp]]))==NULL) {
+    if ((es=div_open_file((char*)&mem[pila[sp]]))==NULL) {
       pila[sp]=0; e(102); return;
     } else {
       fread(pal,1,1352,es); fclose(es);
     }
   }
 
-  if (strcmp((char *)pal,"pal\x1a\x0d\x0a")) // not a pal file
-    if (strcmp((char *)pal,"fpg\x1a\x0d\x0a")) // not an fpg
-      if (strcmp((char *)pal,"fnt\x1a\x0d\x0a")) // not a fnt file
+  if (strcmp((char *)pal,"pal\x1a\x0d\x0a")) { // not a pal file
+    if (strcmp((char *)pal,"fpg\x1a\x0d\x0a")) { // not an fpg
+      if (strcmp((char *)pal,"fnt\x1a\x0d\x0a")) { // not a fnt file
 
         if (strcmp((char *)pal,"map\x1a\x0d\x0a")) { // not a map file
 
@@ -467,7 +468,7 @@ void load_pal(void) {
               free(packptr);
             } else {
               palfuera2:
-              if ((es=div_open_file((byte*)&mem[pila[sp]]))==NULL) {
+              if ((es=div_open_file((char*)&mem[pila[sp]]))==NULL) {
                 pila[sp]=0; e(102); return;
               } else {
                 fseek(es,-768,SEEK_END);
@@ -486,6 +487,9 @@ void load_pal(void) {
           }
 
         } else offs=48;
+      }
+    }
+  }
 
   for (m=0;m<768;m++) if (pal[m+offs]!=paleta[m]) break;
   if (m<768) {
@@ -659,7 +663,7 @@ void load_map(void) {
     ptr=packptr; file_len=m;
   } else {
     mapfuera:
-    if ((es=div_open_file((byte*)&mem[pila[sp]]))==NULL) {
+    if ((es=div_open_file((char*)&mem[pila[sp]]))==NULL) {
       pila[sp]=0; e(143); return;
     } else {
       fseek(es,0,SEEK_END); file_len=ftell(es);
@@ -811,9 +815,9 @@ void load_fpg(void) {
   } else {
     fpgfuera:
 #ifdef STDOUTLOG
-    printf("fpg wanted is [%s]\n",&mem[pila[sp]]);
+    printf("fpg wanted is [%s]\n",(char *)&mem[pila[sp]]);
 #endif
-    if ((es=div_open_file((byte*)&mem[pila[sp]]))==NULL) {
+    if ((es=div_open_file((char*)&mem[pila[sp]]))==NULL) {
       pila[sp]=0; e(105); return;
     } else {
       fseek(es,0,SEEK_END); file_len=ftell(es);
@@ -827,7 +831,7 @@ file_len=1352;
         fseek(es,0,SEEK_SET);
         n=fread(ptr,1,file_len,es);        
 #ifdef STDOUTLOG
-        printf("ptr is %x\n",ptr);
+        printf("ptr is %p\n",(void *)ptr);
         printf("read %d bytes of %d\n",n,file_len); 
 #endif
 
@@ -835,7 +839,7 @@ file_len=1352;
 fclose(es);
 #endif
 #ifdef STDOUTLOG
-	printf("fpg pointer is %x\n",(int**)ptr);
+	printf("fpg pointer is %p\n",(void *)ptr);
 #endif
       } else { fclose(es); pila[sp]=0; e(100); return; }
     }
@@ -867,7 +871,7 @@ fclose(es);
   g[num].grf=lst; 
 
 #ifdef STDOUTLOG
-printf("num: %d ptr: %x\n",num,ptr);
+printf("num: %d ptr: %p\n",num,(void *)ptr);
 #endif
 
 #ifdef __EMSCRIPTEN__
@@ -914,7 +918,7 @@ int *ptr_8=(int*)ptr3;
   }
 #endif
 #ifdef STDOUTLOG
-printf("fpg search ended, %x: ptr: %x\n",(byte *)g[num].fpg+file_len,ptr);
+printf("fpg search ended, %p: ptr: %p\n",(void *)((byte *)g[num].fpg+file_len),(void *)ptr);
 #endif
   pila[sp]=num;
   max_reloj+=get_reloj()-old_reloj;
@@ -1187,7 +1191,7 @@ void load_fnt(void) {
     fonts[ifonts]=ptr;
   } else {
     fntfuera:
-    if ((es=div_open_file((byte*)&mem[pila[sp]]))==NULL) {
+    if ((es=div_open_file((char*)&mem[pila[sp]]))==NULL) {
       pila[sp]=0; e(114); return;
     } else {
       fseek(es,0,SEEK_END); file_len=ftell(es);
@@ -1260,7 +1264,7 @@ void checkpal_font(int ifonts) {
         free(packptr);
       } else {
         fntfuera:
-        if ((es=div_open_file((byte*)&mem[pila[sp]]))==NULL) return; else {
+        if ((es=div_open_file((char*)&mem[pila[sp]]))==NULL) return; else {
           fseek(es,0,SEEK_END); file_len=ftell(es);
           if (file_len!=f_i[ifonts].len) return;
           fseek(es,0,SEEK_SET);
@@ -1629,7 +1633,8 @@ void screen_copy(void) {
 
   if ((ptr=g[file].grf[graf])==NULL) { e(121); return; }
 
-  if (xr<0) xr=0; if (yr<0) yr=0;
+  if (xr<0) xr=0;
+  if (yr<0) yr=0;
   if (xr+divand>ptr[13]) divand=ptr[13]-xr;
   if (yr+ald>ptr[14]) ald=ptr[14]-yr;
   if (divand<=0 || ald<=0 || an<=0 || al<=0) return;
@@ -1810,7 +1815,7 @@ FILE * open_save_file(byte * file) {
   char fname[_MAX_FNAME+1];
   char ext[_MAX_EXT+1];
 
-  f = open_multi(file,"wb");
+  f = open_multi((char *)file,"wb");
   return f;
 }
 
@@ -1830,10 +1835,10 @@ FILE * open_save_file(byte * file) {
 	 if(*ff =='\\') *ff='/';
     	ff++;
   }
-  
-  printf("Looking for save file: %s\n",file);
 
-  f=open_multi(file,"wb");
+  printf("Looking for save file: %s\n",(char *)file);
+
+  f=open_multi((char *)file,"wb");
   return f;
 }
 
@@ -1901,7 +1906,7 @@ void load(void) {
   if (!capar(offset)) { pila[sp]=0; e(125); return; }
   //fprintf(stdout, "loading data from: %s\n",(byte*)&mem[pila[sp]]);
 
-  if ((es=div_open_file((byte*)&mem[pila[sp]]))==NULL) {
+  if ((es=div_open_file((char*)&mem[pila[sp]]))==NULL) {
   
     // if not found, check pak
     // this way files override paks
@@ -1924,7 +1929,7 @@ void load(void) {
   //fprintf(stdout, "File loaded: %s\n", full);
 
   fseek(es,0,SEEK_END); lon=ftell(es);///4; 
-  printf("file len: %d\n",ftell(es));
+  printf("file len: %ld\n",ftell(es));
   fseek(es,0,SEEK_SET);
   if (!capar(offset+lon)) { pila[sp]=0; e(125); return; }
   lon=lon/unit_size;
@@ -2045,7 +2050,7 @@ void load_pcm(void) {
     ptr=(char *)packptr; file_len=m;
   } else {
     pcmfuera:
-    if ((es=div_open_file((byte*)&mem[pila[sp]]))==NULL) {
+    if ((es=div_open_file((char*)&mem[pila[sp]]))==NULL) {
       pila[sp]=-1; e(128); return;
     } else {
       fseek(es,0,SEEK_END); file_len=ftell(es);
@@ -2152,7 +2157,7 @@ void load_song(void) {
     ptr=(char *)packptr; file_len=m;
   } else {
     songfuera:
-    if ((es=div_open_file((byte*)&mem[pila[sp]]))==NULL) {
+    if ((es=div_open_file((char*)&mem[pila[sp]]))==NULL) {
       pila[sp]=-1; e(167); return;
     } else {
       fseek(es,0,SEEK_END); file_len=ftell(es);
@@ -2259,7 +2264,7 @@ void start_fli(void) {
   y=pila[sp--]; x=pila[sp--];
 
 #ifdef USE_FLI
-  if ((es=div_open_file((byte*)&mem[pila[sp]]))==NULL) {
+  if ((es=div_open_file((char*)&mem[pila[sp]]))==NULL) {
     pila[sp]=0; e(147);
   } else {
     fclose(es);
@@ -2513,7 +2518,7 @@ void fade_off(void) {
 
 void _sqrt(void) {
   int x=abs(pila[sp]);
-  if (x<2147483648) pila[sp]=sqrt(x); else pila[sp]=999999999;
+  if (x>=0) pila[sp]=sqrt(x); else pila[sp]=999999999;
 }
 
 //----------------------------------------------------------------------------
@@ -3178,7 +3183,7 @@ void _fopen(void) { // Busca el archivo, ya que puede haber sido incluido en la 
 
 #ifdef DEBUG
 // check for file in prg dir
-	f=__fpopen(full,modo);
+	f=__fpopen((byte *)full,modo);
 #endif
 
   if(f==NULL) {
@@ -3932,7 +3937,7 @@ void texn2(byte * copia, int vga_an, byte * p, int x, int y, byte an, int al) {
 
   do {
     do {
-      if (*p) *q=*p; p++; q++;
+      if (*p) { *q=*p; } p++; q++;
     } while (--an);
     q+=vga_an-(an=ancho);
   } while (--al);

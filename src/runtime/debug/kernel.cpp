@@ -102,7 +102,7 @@ if((id_start+((procesos-2)*iloc_len)) == id_end)
   if (id>id_end) { if (id>imem_max-iloc_len) exer(2); id_end=id; if(id_end>id_max) id_max = id_end;}
   memcpy(&mem[id],&mem[iloc],iloc_pub_len<<2);
   mem[id+_Id]=id;
-  if (mem[id+_BigBro]=mem[id2+_Son]) mem[mem[id+_BigBro]+_SmallBro]=id;
+  if ((mem[id+_BigBro]=mem[id2+_Son])) mem[mem[id+_BigBro]+_SmallBro]=id;
   mem[id2+_Son]=id; mem[id+_Father]=mem[id+_Caller]=id2;
   if (mem[ip+2]==lnop) mem[id+_FCount]=mem[id2+_FCount]+1; // Función
   #ifdef DEBUG
@@ -160,8 +160,8 @@ case lcse:
   if (pila[sp-1]==pila[sp]) ip++; else ip=mem[ip];
   sp--; break;
 case lcsr:
-  if (pila[sp-2]>=pila[sp-1] && pila[sp-2]<=pila[sp]) ip++;
-  else ip=mem[ip]; sp-=2; break;
+  if (pila[sp-2]>=pila[sp-1] && pila[sp-2]<=pila[sp]) { ip++; }
+  else { ip=mem[ip]; } sp-=2; break;
 case lshr: pila[sp-1]>>=pila[sp]; sp--; break;
 case lshl: pila[sp-1]<<=pila[sp]; sp--; break;
 case lipt:
@@ -229,7 +229,7 @@ case lclo:
   if (id>id_end) { if (id>imem_max-iloc_len) exer(2); id_end=id; }
   memcpy(&mem[id],&mem[id2],iloc_len<<2);
   mem[id+_Id]=id; mem[id+_IP]=ip+1; mem[id+_Caller]=0;
-  if (mem[id+_BigBro]=mem[id2+_Son]) mem[mem[id+_BigBro]+_SmallBro]=id;
+  if ((mem[id+_BigBro]=mem[id2+_Son])) mem[mem[id+_BigBro]+_SmallBro]=id;
   mem[id+_SmallBro]=0; mem[id+_Son]=0;
   mem[id2+_Son]=id; mem[id+_Father]=id2;
   id=id2; ip=mem[ip]; break;

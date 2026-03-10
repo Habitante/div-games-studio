@@ -189,7 +189,7 @@ void menu_programas2(void) {
         } break;
 
       case 3:
-        if (n=determina_prg()) {
+        if ((n=determina_prg())) {
           v_titulo=(char *)texto[188]; v_texto=(char *)ventana[n].titulo;
           dialogo(aceptar0);
           if (v_aceptar) {
@@ -200,7 +200,7 @@ void menu_programas2(void) {
         break;
 
       case 4:
-        if (n=determina_prg()) {
+        if ((n=determina_prg())) {
           vuelca_ventana(0);
           save_prg_buffer(n);
           mouse_graf=3; volcado_copia(); mouse_graf=1;
@@ -213,7 +213,7 @@ void menu_programas2(void) {
         } break;
 
       case 5:
-        if (n=determina_prg()) {
+        if ((n=determina_prg())) {
           save_prg_buffer(n);
           v_modo=1; v_texto=(char *)texto[906];
           dialogo(browser0);
@@ -235,7 +235,7 @@ void menu_programas2(void) {
       case 6: nueva_ventana(menu_edicion0); break;
 
       case 8:
-        if (n=determina_prg()) {
+        if ((n=determina_prg())) {
           save_prg_buffer(n);
           source_ptr=ventana[n].prg->buffer;
           source_len=ventana[n].prg->file_lon;
@@ -251,7 +251,7 @@ void menu_programas2(void) {
 
       case 7:
       case 9:
-        if (n=determina_prg()) {
+        if ((n=determina_prg())) {
           save_prg_buffer(n);
           mouse_graf=3; volcado_copia(); mouse_graf=1;
           wup(n);
@@ -275,7 +275,7 @@ void menu_programas2(void) {
         } break;
 
       case 10:
-        if (n=determina_prg()) {
+        if ((n=determina_prg())) {
           save_prg_buffer(n);
           source_ptr=ventana[n].prg->buffer;
           source_len=ventana[n].prg->file_lon;
@@ -299,7 +299,7 @@ void menu_programas2(void) {
         } break;
 
       case 11:
-        if (n=determina_prg()) {
+        if ((n=determina_prg())) {
           v_ventana=n;
           Print_Program();
         } break;
@@ -340,44 +340,44 @@ void menu_edicion2(void) {
     switch (v.estado) {
 
       case 1: // Delete line
-        if (n=determina_prg()) { wup(n);
+        if ((n=determina_prg())) { wup(n);
           f_delete();
           _completo(); v.volcar=2; wdown(n); vuelca_ventana(n);
         } break;
 
       case 2: // Mark
-        if (n=determina_prg()) { wup(n);
+        if ((n=determina_prg())) { wup(n);
           f_marcar();
           _completo(); v.volcar=2; wdown(n); vuelca_ventana(n);
         } break;
 
       case 3: // Unmark
-        if (n=determina_prg()) { wup(n);
+        if ((n=determina_prg())) { wup(n);
           f_desmarcar();
           _completo(); v.volcar=2; wdown(n); vuelca_ventana(n);
         } break;
 
       case 4: // Cut
-        if (n=determina_prg()) { wup(n);
+        if ((n=determina_prg())) { wup(n);
           f_cortar_bloque(1);
           _completo(); v.volcar=2; wdown(n); vuelca_ventana(n);
         } break;
 
       case 5: // Copy
-        if (n=determina_prg()) { wup(n);
+        if ((n=determina_prg())) { wup(n);
           f_cortar_bloque(0);
           _completo(); v.volcar=2; wdown(n); vuelca_ventana(n);
         } break;
 
       case 6: // Paste
-        if (n=determina_prg()) { wup(n);
+        if ((n=determina_prg())) { wup(n);
           f_pegar_bloque();
           f_desmarcar();
           _completo(); v.volcar=2; wdown(n); vuelca_ventana(n);
         } break;
 
       case 7:
-        if (n=determina_prg()) {
+        if ((n=determina_prg())) {
           wmouse_x=-1; wmouse_y=-1; mouse_b=0; call(v.click_handler);
           if (v.volcar) { vuelca_ventana(0); v.volcar=0; }
           move(0,n);
@@ -404,7 +404,7 @@ void menu_edicion2(void) {
         } break;
 
       case 8:
-        if (n=determina_prg()) {
+        if ((n=determina_prg())) {
           dialogo(buscar_texto0);
           if (v_aceptar) {
             move(0,n);
@@ -417,7 +417,7 @@ void menu_edicion2(void) {
         } break;
 
       case 9:
-        if (n=determina_prg()) {
+        if ((n=determina_prg())) {
           wmouse_x=-1; wmouse_y=-1; mouse_b=0; call((voidReturnType )v.click_handler);
           if (v.volcar) { vuelca_ventana(0); v.volcar=0; }
           move(0,n);
@@ -429,7 +429,7 @@ void menu_edicion2(void) {
         } break;
 
       case 10:
-        if (n=determina_prg()) {
+        if ((n=determina_prg())) {
           dialogo(sustituir_texto0);
           if (v_aceptar) {
             move(0,n);
@@ -529,7 +529,7 @@ void menu_mapas2(void) {
         } break;
 
       case 3: // Cerrar mapa
-        if (n=determina_mapa()) {
+        if ((n=determina_mapa())) {
           v_titulo=(char *)texto[50]; v_texto=(char *)ventana[n].titulo;
           dialogo(aceptar0);
           if (v_aceptar) {
@@ -547,7 +547,7 @@ void menu_mapas2(void) {
         } break;
 
       case 5: // Guardar mapa
-        if (n=determina_mapa()) {
+        if ((n=determina_mapa())) {
           if (strchr((const char *)ventana[n].titulo,' ')!=NULL) goto no_tiene_nombre;
           if (ventana[n].mapa->path[0]==0) {
             v_modo=2;
@@ -585,7 +585,7 @@ void menu_mapas2(void) {
         mapa_busqueda(); break;
 
       case 9: // Editar el mapa
-        if (n=determina_mapa()) {
+        if ((n=determina_mapa())) {
           pinta_menu(800); v.estado=0;
           move(0,n);
           if (v.primer_plano==0) {
@@ -636,19 +636,21 @@ int comprobar_fichero(void) {
   if (full[strlen(full)-1]!='/') strcat(full,"/");
   strcat(full,input);
 
-  if (v_terminado) if ((f=fopen(full,"rb"))!=NULL) { // Se ha elegido uno
-    if (fread(cwork,1,8,f)==8) {
-      fclose(f);
-      if (!strcmp(cwork,"fpg\x1a\x0d\x0a")) {
-        if (!v_existe) {
-          v_texto=(char *)texto[43];
-          dialogo(err0);
-        } else {
-          return(1);
-        }
-      } else { v_texto=(char *)texto[46]; dialogo(err0); }
-    } else { fclose(f); v_texto=(char *)texto[44]; dialogo(err0); }
-  } else { v_texto=(char *)texto[44]; dialogo(err0); }
+  if (v_terminado) {
+    if ((f=fopen(full,"rb"))!=NULL) { // Se ha elegido uno
+      if (fread(cwork,1,8,f)==8) {
+        fclose(f);
+        if (!strcmp(cwork,"fpg\x1a\x0d\x0a")) {
+          if (!v_existe) {
+            v_texto=(char *)texto[43];
+            dialogo(err0);
+          } else {
+            return(1);
+          }
+        } else { v_texto=(char *)texto[46]; dialogo(err0); }
+      } else { fclose(f); v_texto=(char *)texto[44]; dialogo(err0); }
+    } else { v_texto=(char *)texto[44]; dialogo(err0); }
+  }
 
   return(0);
 }
@@ -760,7 +762,7 @@ void menu_graficos2(void) {
         break;
 
       case 3: // Cerrar fichero
-        if (n=determina_fpg()) {
+        if ((n=determina_fpg())) {
           v_titulo=(char *)texto[81]; v_texto=(char *)ventana[n].titulo;
           dialogo(aceptar0);
           if (v_aceptar) {
@@ -770,7 +772,7 @@ void menu_graficos2(void) {
         } break;
 
       case 4: // fichero guardar como...
-        if (n=determina_fpg()) {
+        if ((n=determina_fpg())) {
           v_modo=1; v_texto=(char *)texto[830];
           dialogo(browser0);
           if (v_terminado) {
@@ -814,13 +816,13 @@ void menu_graficos2(void) {
         break;
 
       case 8:
-        if(n=determina_fpg()) {
+        if((n=determina_fpg())) {
           FPGtoMAP((FPG *)(ventana[n].aux));
         }
         break;
 
       case 9:
-        if(n=determina_map()) {
+        if((n=determina_map())) {
           MAPtoFPG(ventana[n].mapa);
         }
         break;
@@ -870,25 +872,25 @@ void menu_fuentes2(void) {
         break;
 
       case 3:
-        if (n=determina_fnt()) {
+        if ((n=determina_fnt())) {
           move(0,n); cierra_ventana();
         } break;
 
       case 4:
-        if (n=determina_fnt()) {
+        if ((n=determina_fnt())) {
           FntAux=(char *)(ventana[n].aux+RES_FOR_NAME);
           dialogo(GetText0);
           if(v_aceptar) CreateText();
         } break;
 
       case 5:
-        if (n=determina_fnt()) {
+        if ((n=determina_fnt())) {
           FntAux=(char *)(ventana[n].aux+RES_FOR_NAME);
           gen_fontmap();
         } break;
 
       case 6:
-        if (n=determina_mapa()) imp_fontmap();
+        if ((n=determina_mapa())) imp_fontmap();
         break;
     }
   }
@@ -953,8 +955,9 @@ void imp_fontmap(void) {
         } else {
           *p++=x-x0+1; *p++=y-y0+1; *p++=y0-1; *p++=di-buffer;
           for (;y0<=y;y0++) for (_x0=x0;_x0<=x;_x0++) *di++=mapa(_x0,y0);
-        } if (chars++==256) goto end_bucle;
-        if ((x+=2)>=map_an) goto end_bucle; y=0;
+        }
+        if (chars++==256) goto end_bucle;
+        if ((x+=2)>=map_an) { goto end_bucle; } y=0;
       }
     }
   }
@@ -1033,7 +1036,7 @@ void gen_fontmap(void) {
 
     memset(col,0,256);
     ptr=(char*)p+256*16; for (;ptr<FntEnd;ptr++) col[*ptr]=1;
-    if (FntEnd-ptr>1024) FntEnd=ptr+1024; r=128; g=64; b=0;
+    if (FntEnd-ptr>1024) { FntEnd=ptr+1024; } r=128; g=64; b=0;
     ptr=(char*)p+256*16; for (;ptr<FntEnd;ptr++) {
       n=*ptr; n*=3; r+=dac[n]; g+=dac[n+1]; b+=dac[n+2]; }
     if (r<g) { g=0; if (r<b) { r=32; b=0; } else { r=0; b=32; }
@@ -1121,14 +1124,14 @@ void menu_sonidos2(void) {
         break;
 
       case 3:
-        if (n=determina_pcm()) {
+        if ((n=determina_pcm())) {
           v_titulo=(char *)texto[338]; v_texto=(char *)ventana[n].titulo;
           dialogo(aceptar0);
           if (v_aceptar) { move(0,n); cierra_ventana(); }
         } break;
 
       case 4:
-        if (n=determina_pcm()) {
+        if ((n=determina_pcm())) {
           if (strchr((const char *)ventana[n].titulo,' ')!=NULL) goto no_tiene_nombre_sonido;
           mouse_graf=3; volcado_copia(); mouse_graf=1;
           mypcminfo=(pcminfo *)ventana[n].aux;
@@ -1140,7 +1143,7 @@ void menu_sonidos2(void) {
 
       case 5:
       no_tiene_nombre_sonido:
-        if (n=determina_pcm()) {
+        if ((n=determina_pcm())) {
           v_tipo=7; v_modo=1; v_texto=(char *)texto[339];
           dialogo(browser0);
           if (v_terminado) {
@@ -1167,7 +1170,7 @@ void menu_sonidos2(void) {
         } break;
 
       case 6:
-        if (n=determina_pcm()) {
+        if ((n=determina_pcm())) {
           pcminfo_aux=ventana[n].aux;
           v_tipo=7; v_texto=(char *)texto[349];
 
@@ -1199,7 +1202,7 @@ void menu_sonidos2(void) {
         break;
 
       case 9:
-        if (n=determina_mod()) {
+        if ((n=determina_mod())) {
           v_titulo=(char *)texto[513]; v_texto=(char *)ventana[n].titulo;
           dialogo(aceptar0);
           if (v_aceptar) { move(0,n); cierra_ventana(); }
@@ -1243,7 +1246,7 @@ void menu_sistema2(void) {
       case 8: dialogo(about0); break;
       case 9:
         v_titulo=(char *)texto[40]; v_texto=NULL; dialogo(aceptar0);
-        if (v_aceptar) salir_del_entorno=1; break;
+        if (v_aceptar) { salir_del_entorno=1; } break;
     }
   }
 }
@@ -1495,7 +1498,7 @@ void mapa1(void) {
       *(ghost+*(word*)(si+ansi*y2+x2))*256+
       *(ghost+*(word*)(si+ansi*(y2+1)+x2)));
   else {
-    if (!an) an++; if (!al) al++;
+    if (!an) { an++; } if (!al) { al++; }
     for (y=0,y2=0;y<al;y++,y2+=2) for (x=0,x2=0;x<an;x++,x2+=2)
       *(di+andi*y+x)=*(si+ansi*y2+x2);
   }
@@ -1694,7 +1697,7 @@ void mapa2(void) {
           break;
         default: edit_scr(); break;
       }
-      if (modo<100) put_barra(2,10,45); volcado_raton();
+      if (modo<100) { put_barra(2,10,45); } volcado_raton();
       do { read_mouse(); } while (mouse_b || key(_ESC));
     } while (modo>=100); mouse_graf=1;
 
@@ -2157,7 +2160,7 @@ void pinta_listbox(struct t_listbox * l) {
 
   wbox(ptr,an,al,c1,l->x+1,l->y+1,l->an-2,l->al-2);
 
-  if (n=l->maximo) { // Si hay elementos en la lista
+  if ((n=l->maximo)) { // Si hay elementos en la lista
     n-=l->inicial; p=l->lista+l->lista_an*l->inicial;
     y=l->y+2; if (n>l->lista_al) n=l->lista_al;
     do {
@@ -2830,11 +2833,11 @@ char cWork[5];
                 return;
         _show_items();
         wwrite(v.ptr,an,al,4,11,0,texto[133],c3);
-        sprintf(cWork,"%d",(char *)ventana[n].mapa->map_an);
+        sprintf(cWork,"%d",ventana[n].mapa->map_an);
         wwrite(v.ptr,an,al,4,20,0,(byte *)cWork,c3);
 
         wwrite(v.ptr,an,al,4,30,0,texto[134],c3);
-        sprintf(cWork,"%d",(char *)ventana[n].mapa->map_al);
+        sprintf(cWork,"%d",ventana[n].mapa->map_al);
         wwrite(v.ptr,an,al,4,39,0,(byte *)cWork,c3);
         v_aceptar=0;
 }
@@ -2871,7 +2874,7 @@ void Tamnio0()
   v.close_handler=Tamnio3;
 
   sprintf(cAncho,"%d",map_an);
-  sprintf(cAlto ,"%d",(char *)map_al);
+  sprintf(cAlto ,"%d",map_al);
 
   _get(133,42,11,30,(byte *)cAncho,5,1,9999);
   _get(134,42,30,30,(byte *)cAlto,5,1,9999);

@@ -115,8 +115,11 @@ Make the compiler tell us what's actually broken. Fix the scariest stuff.
       empty-body (19), int-in-bool-context (3)
 - [x] Fix pointer/int cast warnings — replaced `(memptrsize)` with `(uintptr_t)`/`(intptr_t)`
 - [x] Remove `-fpermissive` (was a no-op in C mode anyway)
-- Remaining: 626 LOW-severity warnings (misleading-indentation 260, parentheses 144,
-  dangling-else 80, pointer-sign 51, missing-braces 18, misc 10)
+- [x] Fix all 626 LOW-severity warnings (Sprint A, 2026-03-10): misleading-indentation (260),
+  parentheses (144), dangling-else (80), pointer-sign (51), format strings (28),
+  missing-braces (18), implicit-fallthrough (11), unknown-pragmas (7), misc (27).
+  Added braces, parentheses, casts, `/* fall through */` comments across 35 files.
+  Zero behavioral changes. **Build is now fully warning-clean.**
 - Original baseline (2026-03-08): 1,745 warnings with `-Wall -Wextra -Wshadow`; all CRITICAL/HIGH fixed.
 
 ### Critical bugs fixed (found via `-Wall -Wextra` audit, 2026-03-08)

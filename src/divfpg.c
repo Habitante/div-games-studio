@@ -127,12 +127,12 @@ void FPG2(void)
 				COD=1;
 		}
 		nPuntos=0;
-		for(x=511;x>=0;x-=2)
+		for(x=511;x>=0;x-=2) {
 			if(ventana[1].mapa->puntos[x]!=-1) {
 				nPuntos=(x+1)/2;
 				x=-1;
 			}
-
+		}
 			Anadir_FPG(MiFPG,COD,(char *)tDescrip,(char *)ventana[1].mapa->filename,
 					ventana[1].mapa->map_an,ventana[1].mapa->map_al,
 					nPuntos,(char *)ventana[1].mapa->puntos,(char *)ventana[1].mapa->map,0,1);
@@ -727,9 +727,9 @@ void GetCode1(void) {
 	wwrite(v.ptr,an,al,4,32,0,texto[133],c3);
 	wwrite(v.ptr,an,al,4,42,0,texto[134],c3);
 
-	sprintf(cWork,"%d",(char *)GetCodeAncho);
+	sprintf(cWork,"%d",GetCodeAncho);
 	wwrite(v.ptr,an,al,34,32,0,(byte *)cWork,c4);
-	sprintf(cWork,"%d",(char *)GetCodeAlto);
+	sprintf(cWork,"%d",GetCodeAlto);
 	wwrite(v.ptr,an,al,34,42,0,(byte *)cWork,c4);
 
 	wwrite(v.ptr,an,al,64,32,0,texto[152],c3);
@@ -1058,7 +1058,7 @@ void Print_List(void) {
 	FILE * f=NULL, * g;
 	int n,vent;
 	int _num=0,num=0;
-	char cwork[128],cwork2[13];
+	char cwork[512],cwork2[13];
 	unsigned u;
 
 	if (!(vent=determina_fpg()))
@@ -1482,7 +1482,7 @@ void crear_un_thumb_FPG(struct t_listboxbr * l){
 
 	num=-1;
 
-	if (n=abs(_omx-mouse_x)+abs(_omy-mouse_y)+mouse_b*10) {
+	if ((n=abs(_omx-mouse_x)+abs(_omy-mouse_y)+mouse_b*10)) {
 		incremento=(float)incremento/((float)n/20.0+1.0);
 		incremento/=256; incremento*=256;
 		

@@ -101,7 +101,7 @@ void PCM1(void) {
   buffer=mypcminfo->SoundData;
   length=mypcminfo->SoundSize;
 
-  if (length>1)
+  if (length>1) {
   if (length<3*Ancho)
   {
     step = (float)Ancho/(float)(length-1);
@@ -147,6 +147,7 @@ void PCM1(void) {
       } while (y++<y1);
     }
   }
+  } // length>1
 }
 
 extern int ns,chn;
@@ -1126,7 +1127,7 @@ void EditSound1(void)
   buffer=(short *)mypcminfo->SI->abuf;
   length=mypcminfo->SI->alen/2;
 #endif
-  if (length>1)
+  if (length>1) {
   if (length<3*Ancho)
   {
     step = (float)Ancho/(float)(length-1);
@@ -1173,6 +1174,7 @@ void EditSound1(void)
       } while (y++<y1);
     }
   }
+  } // length>1
 }
 
 void EditSound2(void)

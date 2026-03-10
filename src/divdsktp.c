@@ -531,7 +531,7 @@ int nueva_ventana_carga(voidReturnType init_handler,int nx,int ny)
 
     call((voidReturnType )init_handler);
 
-    if (big) if (v.an>0) { v.an=v.an*2; v.al=v.al*2; } else v.an=-v.an;
+    if (big) { if (v.an>0) { v.an=v.an*2; v.al=v.al*2; } else v.an=-v.an; }
 
     an=v.an; al=v.al;
 

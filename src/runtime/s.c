@@ -137,7 +137,7 @@ void pinta_sprites_scroll(void) {
 void mover_scroll(int back) {
   int i,x,y,ix,iy,r;
 
-  if (i=(scroll+snum)->camera) { // Comprueba si el scroll es autómático
+  if ((i=(scroll+snum)->camera)) { // Comprueba si el scroll es autómático
     if (i>=id_start && i<=id_end && mem[i]==i) {
       ix=mem[i+_X]; iy=mem[i+_Y];
       if (mem[i+_Resolution]) { ix/=mem[i+_Resolution]; iy/=mem[i+_Resolution]; }
@@ -340,7 +340,7 @@ void set_scroll(int plano,int x,int y) {
       fast[iscan].inc[0]=0;
       esdato=0;
       do {
-        if (kk=*si++) {
+        if ((kk=*si++)) {
           if (esdato) {
             if (nt<max_inc) fast[iscan].inc[nt]++;
           } else {
@@ -822,9 +822,9 @@ void put_sprite(int file,int graph,int x,int y,int angle,int size,int flags,int 
   } else {
     clipx0=region[reg].x0; clipx1=region[reg].x1;
     clipy0=region[reg].y0; clipy1=region[reg].y1;
-    if (clipx0<0) clipx0=0; if (clipx1>copan) clipx1=copan;
+    if (clipx0<0) { clipx0=0; } if (clipx1>copan) { clipx1=copan; }
     if (clipx0>=copan || clipx1<=0) return;
-    if (clipy0<0) clipy0=0; if (clipy1>copal) clipy1=copal;
+    if (clipy0<0) { clipy0=0; } if (clipy1>copal) { clipy1=copal; }
     if (clipy0>=copal || clipy1<=0) return;
   }
 
@@ -843,8 +843,8 @@ void put_sprite(int file,int graph,int x,int y,int angle,int size,int flags,int 
     } else if (size!=100) {
       sp_escalado(si,x,y,an,al,xg,yg,size,flags);
     } else {
-      if (flags&1) xg=an-1-xg; x-=xg;
-      if (flags&2) yg=al-1-yg; y-=yg;
+      if (flags&1) { xg=an-1-xg; } x-=xg;
+      if (flags&2) { yg=al-1-yg; } y-=yg;
       if (x>=clipx0 && x+an<=clipx1 && y>=clipy0 && y+al<=clipy1) // Pinta sprite sin cortar
         sp_normal(si,x,y,an,al,flags);
       else if (x<clipx1 && y<clipy1 && x+an>clipx0 && y+al>clipy0) // Pinta sprite cortado
@@ -920,8 +920,8 @@ void pinta_sprite(void) { // Pinta un sprite (si se ve), según mem[ide+ ... ]
       sp_escalado(si,x,y,an,al,xg,yg,mem[ide+_Size],mem[ide+_Flags]);
       save_region();
     } else {
-      if (mem[ide+_Flags]&1) xg=an-1-xg; x-=xg;
-      if (mem[ide+_Flags]&2) yg=al-1-yg; y-=yg;
+      if (mem[ide+_Flags]&1) { xg=an-1-xg; } x-=xg;
+      if (mem[ide+_Flags]&2) { yg=al-1-yg; } y-=yg;
       if (x>=clipx0 && x+an<=clipx1 && y>=clipy0 && y+al<=clipy1) // Pinta sprite sin cortar
         sp_normal(si,x,y,an,al,mem[ide+_Flags]);
       else if (x<clipx1 && y<clipy1 && x+an>clipx0 && y+al>clipy0) // Pinta sprite cortado
@@ -933,8 +933,8 @@ void pinta_sprite(void) { // Pinta un sprite (si se ve), según mem[ide+ ... ]
 
 void save_region(void) {
   if (mem[ide+_Ctype]==0){
-    if (clipx0>x0s) x0s=clipx0; if (clipx1<x1s) x1s=clipx1;
-    if (clipy0>y0s) y0s=clipy0; if (clipy1<y1s) y1s=clipy1;
+    if (clipx0>x0s) { x0s=clipx0; } if (clipx1<x1s) { x1s=clipx1; }
+    if (clipy0>y0s) { y0s=clipy0; } if (clipy1<y1s) { y1s=clipy1; }
     if (x1s<x0s || y1s<y0s) return;
     mem[ide+_x0]=x0s; mem[ide+_y0]=y0s;
     mem[ide+_x1]=x1s; mem[ide+_y1]=y1s;
@@ -954,7 +954,7 @@ void sp_normal(byte * p, int x, int y, int an, int al, int flags) {
     case 0: //--
       do {
         do {
-          if (*p) *q=*p; p++; q++;
+          if (*p) { *q=*p; } p++; q++;
         } while (--an);
         q+=vga_an-(an=ancho);
       } while (--al); break;
@@ -962,7 +962,7 @@ void sp_normal(byte * p, int x, int y, int an, int al, int flags) {
       p+=an-1;
       do {
         do {
-          if (*p) *q=*p; p--; q++;
+          if (*p) { *q=*p; } p--; q++;
         } while (--an);
         q+=vga_an-(an=ancho); p+=an*2;
       } while (--al); break;
@@ -970,7 +970,7 @@ void sp_normal(byte * p, int x, int y, int an, int al, int flags) {
       p+=(al-1)*an;
       do {
         do {
-          if (*p) *q=*p; p++; q++;
+          if (*p) { *q=*p; } p++; q++;
         } while (--an);
         q+=vga_an-(an=ancho); p-=an*2;
       } while (--al); break;
@@ -978,7 +978,7 @@ void sp_normal(byte * p, int x, int y, int an, int al, int flags) {
       p+=al*an-1;
       do {
         do {
-          if (*p) *q=*p; p--; q++;
+          if (*p) { *q=*p; } p--; q++;
         } while (--an);
         q+=vga_an-(an=ancho);
       } while (--al); break;
@@ -1040,7 +1040,7 @@ void sp_cortado(byte * p, int x, int y, int an, int al, int flags) {
       resto_x+=salta_x; an=long_x;
       do {
         do {
-          if (*p) *q=*p; p++; q++;
+          if (*p) { *q=*p; } p++; q++;
         } while (--an);
         q+=vga_an-(an=long_x); p+=resto_x;
       } while (--long_y); break;
@@ -1049,7 +1049,7 @@ void sp_cortado(byte * p, int x, int y, int an, int al, int flags) {
       resto_x+=salta_x; salta_x=long_x;
       do {
         do {
-          if (*p) *q=*p; p--; q++;
+          if (*p) { *q=*p; } p--; q++;
         } while (--salta_x);
         q+=vga_an-(salta_x=long_x); p+=an+long_x;
       } while (--long_y); break;
@@ -1058,7 +1058,7 @@ void sp_cortado(byte * p, int x, int y, int an, int al, int flags) {
       resto_x+=salta_x; salta_x=long_x;
       do {
         do {
-          if (*p) *q=*p; p++; q++;
+          if (*p) { *q=*p; } p++; q++;
         } while (--salta_x);
         q+=vga_an-(salta_x=long_x); p+=resto_x-an*2;
       } while (--long_y); break;
@@ -1067,7 +1067,7 @@ void sp_cortado(byte * p, int x, int y, int an, int al, int flags) {
       resto_x+=salta_x; salta_x=long_x;
       do {
         do {
-          if (*p) *q=*p; p--; q++;
+          if (*p) { *q=*p; } p--; q++;
         } while (--salta_x);
         q+=vga_an-(salta_x=long_x); p-=resto_x;
       } while (--long_y); break;
@@ -1162,7 +1162,7 @@ void sp_escalado(byte * old_si, int x, int y, int an, int al, int xg, int yg,
   else do {
     si=old_si+(yr>>8)*old_an;
     do {
-      if (c=*(si+(xr>>8))) *di=c;
+      if ((c=*(si+(xr>>8)))) *di=c;
       di++; xr+=ixr;
     } while (--an);
     yr+=iyr; xr=old_xr;
@@ -1300,19 +1300,20 @@ void sp_rotado(byte * si, int x, int y, int an, int al, int xg, int yg,
      kk=g0y.l; g0y.l=g1y.l; g1y.l=kk;
     }
 
-    if (h<clipy1 && h>=clipy0 && x0.w[1]<clipx1 && x1.w[1]>=clipx0 && x1.w[1]>x0.w[1])
-    if (x0.w[1]<clipx0) if (x1.w[1]>=clipx1)
+    if (h<clipy1 && h>=clipy0 && x0.w[1]<clipx1 && x1.w[1]>=clipx0 && x1.w[1]>x0.w[1]) {
+    if (x0.w[1]<clipx0) { if (x1.w[1]>=clipx1) {
       if (flags&4) sp_scancg(ptrcopia+clipx0,x1.w[1]-x0.w[1],clipx1-clipx0-1,clipx0-x0.w[1],si,an,g0x.l,g0y.l,g1x.l,g1y.l);
       else sp_scanc(ptrcopia+clipx0,x1.w[1]-x0.w[1],clipx1-clipx0-1,clipx0-x0.w[1],si,an,g0x.l,g0y.l,g1x.l,g1y.l);
-    else
+    } else {
       if (flags&4) sp_scancg(ptrcopia+clipx0,x1.w[1]-x0.w[1],x1.w[1]-clipx0,clipx0-x0.w[1],si,an,g0x.l,g0y.l,g1x.l,g1y.l);
       else sp_scanc(ptrcopia+clipx0,x1.w[1]-x0.w[1],x1.w[1]-clipx0,clipx0-x0.w[1],si,an,g0x.l,g0y.l,g1x.l,g1y.l);
-    else if (x1.w[1]>=clipx1)
+    } } else if (x1.w[1]>=clipx1) {
       if (flags&4) sp_scancg(ptrcopia+x0.w[1],x1.w[1]-x0.w[1],clipx1-1-x0.w[1],0,si,an,g0x.l,g0y.l,g1x.l,g1y.l);
       else sp_scanc(ptrcopia+x0.w[1],x1.w[1]-x0.w[1],clipx1-1-x0.w[1],0,si,an,g0x.l,g0y.l,g1x.l,g1y.l);
-    else
+    } else {
       if (flags&4) sp_scang(ptrcopia+x0.w[1],x1.w[1]-x0.w[1],si,an,g0x.l,g0y.l,g1x.l,g1y.l);
       else sp_scan(ptrcopia+x0.w[1],x1.w[1]-x0.w[1],si,an,g0x.l,g0y.l,g1x.l,g1y.l);
+    } }
 
     if ((flags&3)==1 || (flags&3)==2) {
       kk=x0.l; x0.l=x1.l; x1.l=kk;
@@ -1342,7 +1343,7 @@ void sp_scanc(byte * p,short n,short m,short o,byte * si,int an,int x0,int y0,in
   if (o) { x.l+=x0*o; y.l+=y0*o; }
 
   do {
-    if (c=*(si+x.w[1]+y.w[1]*an)) *p=c; p++;
+    if ((c=*(si+x.w[1]+y.w[1]*an))) { *p=c; } p++;
     x.l+=x0; y.l+=y0;
   } while (m--);
 }
@@ -1375,7 +1376,7 @@ void sp_scan(byte * p,short n,byte * si,int an,int x0,int y0,int x1,int y1) {
   x.l=x0; y.l=y0; x0=(x1-x0)/n; y0=(y1-y0)/n;
 
   do {
-    if (c=*(si+x.w[1]+y.w[1]*an)) *p=c; p++;
+    if ((c=*(si+x.w[1]+y.w[1]*an))) { *p=c; } p++;
     x.l+=x0; y.l+=y0;
   } while (n--);
 }
@@ -1806,21 +1807,23 @@ void pinta_textos(int n) { // E: texto[]
           }
         }
 
-	if (*ptr && x<0)
+	if (*ptr && x<0) {
           if (fnt[*ptr].ancho==0) { x+=f_i[fuente].espacio; ptr++;
           } else {
             texc(texto[n].font+fnt[*ptr].offset,x,y+fnt[*ptr].incY,fnt[*ptr].ancho,fnt[*ptr].alto);
             x=x+fnt[*ptr].ancho; ptr++; }
+        }
 
-	while (*ptr && x+fnt[*ptr].ancho<=vga_an)
+	while (*ptr && x+fnt[*ptr].ancho<=vga_an) {
           if (fnt[*ptr].ancho==0) { x+=f_i[fuente].espacio; ptr++; } else {
           texn(texto[n].font+fnt[*ptr].offset,x,y+fnt[*ptr].incY,fnt[*ptr].ancho,fnt[*ptr].alto);
           x=x+fnt[*ptr].ancho; ptr++;
-        }
+        } }
 
-        if (*ptr && x<vga_an)
+        if (*ptr && x<vga_an) {
           if (fnt[*ptr].ancho==0) { x+=f_i[fuente].espacio; ptr++; } else
           texc(texto[n].font+fnt[*ptr].offset,x,y+fnt[*ptr].incY,fnt[*ptr].ancho,fnt[*ptr].alto);
+        }
 
       } else {
 
@@ -1846,7 +1849,7 @@ void texn(byte * p, int x, int y, byte an, int al) {
 
   do {
     do {
-      if (*p) *q=*p; p++; q++;
+      if (*p) { *q=*p; } p++; q++;
     } while (--an);
     q+=vga_an-(an=ancho);
   } while (--al);
@@ -1874,7 +1877,7 @@ void texc(byte * p, int x, int y, byte an, int al) {
   resto_x+=salta_x; an=long_x;
   do {
     do {
-      if (*p) *q=*p; p++; q++;
+      if (*p) { *q=*p; } p++; q++;
     } while (--an);
     q+=vga_an-(an=long_x); p+=resto_x;
   } while (--long_y);

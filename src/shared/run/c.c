@@ -73,8 +73,8 @@ void out_region(void) {
     sp_size_scaled(&x,&y,&an,&al,xg,yg,mem[id+_Size],mem[id+_Flags]);
     an=an-x+1; al=al-y+1;
   } else {
-    if (mem[id+_Flags]&1) xg=an-1-xg; x-=xg;
-    if (mem[id+_Flags]&2) yg=al-1-yg; y-=yg;
+    if (mem[id+_Flags]&1) { xg=an-1-xg; } x-=xg;
+    if (mem[id+_Flags]&2) { yg=al-1-yg; } y-=yg;
   }
 
   // Ya tiene region[reg].(x0..y1) y sprite(x,y,an,al)
@@ -382,8 +382,8 @@ void sp_size( int *x, int *y, int *xx, int *yy, int xg, int yg,
   *x=0x7fffffff; *y=0x7fffffff; *xx=0x80000000; *yy=0x80000000;
 
   for (n=0;n<8;n++) {
-    if (*x>p[n]) *x=p[n]; if (*xx<p[n]) *xx=p[n]; n++;
-    if (*y>p[n]) *y=p[n]; if (*yy<p[n]) *yy=p[n];
+    if (*x>p[n]) { *x=p[n]; } if (*xx<p[n]) { *xx=p[n]; } n++;
+    if (*y>p[n]) { *y=p[n]; } if (*yy<p[n]) { *yy=p[n]; }
   }
 
 }
@@ -404,7 +404,7 @@ void sp_size_scaled( int *x, int *y, int *xx, int *yy, int xg, int yg,
 
   x1=x0+(*xx*size)/100-1; y1=y0+(*yy*size)/100-1;
 
-  if (x1<x0) x1=x0; if (y1<y0) y1=y0; // ***
+  if (x1<x0) { x1=x0; } if (y1<y0) { y1=y0; } // ***
 
   *x=x0; *y=y0; *xx=x1; *yy=y1;
 
@@ -439,8 +439,8 @@ void put_collision(byte * buffer, int * ptr, int x, int y, int xg, int yg, int a
     x-=ix; y-=iy;
     sp_escalado(si,x,y,an,al,xg,yg,size,flags);
   } else {
-    if (flags&1) xg=an-1-xg; x-=xg+ix;
-    if (flags&2) yg=al-1-yg; y-=yg+iy;
+    if (flags&1) { xg=an-1-xg; } x-=xg+ix;
+    if (flags&2) { yg=al-1-yg; } y-=yg+iy;
     if (x>=clipx0 && x+an<=clipx1 && y>=clipy0 && y+al<=clipy1) // Pinta sprite sin cortar
       sp_normal(si,x,y,an,al,flags);
     else if (x<clipx1 && y<clipy1 && x+an>clipx0 && y+al>clipy0) // Pinta sprite cortado
@@ -588,8 +588,8 @@ void test_collision(byte * buffer, int * ptr, int x, int y, int xg, int yg, int 
     x-=ix; y-=iy;
     test_escalado(si,x,y,an,al,xg,yg,size,flags);
   } else {
-    if (flags&1) xg=an-1-xg; x-=xg+ix;
-    if (flags&2) yg=al-1-yg; y-=yg+iy;
+    if (flags&1) { xg=an-1-xg; } x-=xg+ix;
+    if (flags&2) { yg=al-1-yg; } y-=yg+iy;
     if (x>=clipx0 && x+an<=clipx1 && y>=clipy0 && y+al<=clipy1) // Pinta sprite sin cortar
       test_normal(si,x,y,an,al,flags);
     else if (x<clipx1 && y<clipy1 && x+an>clipx0 && y+al>clipy0) // Pinta sprite cortado
@@ -853,13 +853,15 @@ void test_rotado(byte * si, int an, int al, int flags) {
      kk=g0y.l; g0y.l=g1y.l; g1y.l=kk;
     }
 
-    if (h<clipy1 && h>=clipy0 && x0.w[1]<clipx1 && x1.w[1]>=clipx0 && x1.w[1]>x0.w[1])
-    if (x0.w[1]<clipx0) if (x1.w[1]>=clipx1)
-      test_scanc(ptrcopia+clipx0,x1.w[1]-x0.w[1],clipx1-clipx0-1,clipx0-x0.w[1],si,an,g0x.l,g0y.l,g1x.l,g1y.l);
-    else test_scanc(ptrcopia+clipx0,x1.w[1]-x0.w[1],x1.w[1]-clipx0,clipx0-x0.w[1],si,an,g0x.l,g0y.l,g1x.l,g1y.l);
-    else if (x1.w[1]>=clipx1)
-      test_scanc(ptrcopia+x0.w[1],x1.w[1]-x0.w[1],clipx1-1-x0.w[1],0,si,an,g0x.l,g0y.l,g1x.l,g1y.l);
-    else test_scan(ptrcopia+x0.w[1],x1.w[1]-x0.w[1],si,an,g0x.l,g0y.l,g1x.l,g1y.l);
+    if (h<clipy1 && h>=clipy0 && x0.w[1]<clipx1 && x1.w[1]>=clipx0 && x1.w[1]>x0.w[1]) {
+      if (x0.w[1]<clipx0) {
+        if (x1.w[1]>=clipx1)
+          test_scanc(ptrcopia+clipx0,x1.w[1]-x0.w[1],clipx1-clipx0-1,clipx0-x0.w[1],si,an,g0x.l,g0y.l,g1x.l,g1y.l);
+        else test_scanc(ptrcopia+clipx0,x1.w[1]-x0.w[1],x1.w[1]-clipx0,clipx0-x0.w[1],si,an,g0x.l,g0y.l,g1x.l,g1y.l);
+      } else if (x1.w[1]>=clipx1)
+        test_scanc(ptrcopia+x0.w[1],x1.w[1]-x0.w[1],clipx1-1-x0.w[1],0,si,an,g0x.l,g0y.l,g1x.l,g1y.l);
+      else test_scan(ptrcopia+x0.w[1],x1.w[1]-x0.w[1],si,an,g0x.l,g0y.l,g1x.l,g1y.l);
+    }
 
     if ((flags&3)==1 || (flags&3)==2) {
       kk=x0.l; x0.l=x1.l; x1.l=kk;
