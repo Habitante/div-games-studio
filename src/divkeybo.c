@@ -1,6 +1,6 @@
 
 //-----------------------------------------------------------------------------
-//      Pruebas con la interrupción de teclado
+//      Keyboard interrupt handler
 //-----------------------------------------------------------------------------
 
 #include "global.h"
@@ -16,8 +16,8 @@ byte * shift = (byte *) 0x417; // Shift status
 #endif
 
 byte buf[64*3]; // {ascii,scan_code,shift_status}
-int ibuf=0; // Puntero al buffer, inicio de la cola
-int fbuf=0; // Puntero al buffer, fin de la cola
+int ibuf=0; // Buffer pointer, start of queue
+int fbuf=0; // Buffer pointer, end of queue
 
 //-----------------------------------------------------------------------------
 // Interrupt handler related functions.
@@ -114,7 +114,7 @@ void kbdReset(void)
 }
 
 //-----------------------------------------------------------------------------
-//      Espera una tecla, actualiza variables (ascii,scan_code y shift_status)
+//      Wait for a key, update variables (ascii, scan_code and shift_status)
 //-----------------------------------------------------------------------------
 
 void bios_key(void) {

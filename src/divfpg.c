@@ -58,7 +58,7 @@ void FPG2(void)
 	FILE *fpg;
 	char tDescrip[32];
 
-	if(NewDacLoaded) { //EL FPG TRAE UNA PALETA NUEVA
+	if(NewDacLoaded) { // The FPG has a new palette
 		v.redraw=0;
 		NewDacLoaded=0;
 		RemapAllFiles(0);
@@ -102,7 +102,7 @@ void FPG2(void)
 		break;
 	}
 
-	if((dragging==4)) { //Suelto
+	if((dragging==4)) { // Released
 		dragging=5; free_drag=0;
 		
 		if(ventana[1].mapa->fpg_code) {
@@ -151,7 +151,7 @@ void FPG2(void)
 		Elemento=MiFPG->DesIndex[(MiFPG->lInfoFPG.zone-10)+MiFPG->lInfoFPG.first_visible];
 
 		if((fpg=fopen((char *)MiFPG->ActualFile,"rb"))==NULL) {
-			//Error: no es un encontro el fichero.(grfxch ?????)
+			// Error: file not found
 			v_text=(char *)texto[43];
 			show_dialog(err0);
 			return;
@@ -201,7 +201,7 @@ void FPG2(void)
 		Elemento=MiFPG->DesIndex[(MiFPG->lInfoFPG.zone-10)+MiFPG->lInfoFPG.first_visible];
 
 		if((fpg=fopen((char *)MiFPG->ActualFile,"rb"))==NULL) {
-			//Error: no es un encontro el fichero.(grfxch ?????)
+			// Error: file not found
 			return;
 		}
 		fseek(fpg,MiFPG->OffsGrf[Elemento],SEEK_SET);
@@ -277,7 +277,7 @@ void FPG3(void) {
 	FPG *MiFPG=(FPG *)v.aux;
 	int n;
 
-	// Libera thumbnails de FPG
+	// Free FPG thumbnails
 	for(n=0; n<1000; n++) {
 		if(MiFPG->thumb[n].ptr!=NULL)
 			free(MiFPG->thumb[n].ptr);
@@ -291,7 +291,7 @@ void FPG0N(void) {
 	FPG *MiFPG;
 	int n;
 
-	v.type=101; // SOLIZABLE
+	v.type=101; // Droppable
 	v.an=159;
 	v.al=72+5;
 	v.paint_handler=FPG1;
@@ -323,7 +323,7 @@ void FPG0N(void) {
 void FPG0A(void) {
 	FPG *MiFPG;
 	int n;
-	v.type=101; // SOLIZABLE
+	v.type=101; // Droppable
 	v.an=159;
 	v.al=72+5;
 	v.paint_handler=FPG1;
@@ -396,7 +396,7 @@ int new_file(void) {
 	return 0;
 }
 
-#define max_archivos 512 // ------------------------------- Listbox de archivos
+#define max_archivos 512 // ------------------------------- File listbox
 extern struct t_listboxbr larchivosbr;
 extern t_thumb thumb[max_archivos];
 extern int num_taggeds;
@@ -447,7 +447,7 @@ void open_file(void) {
 	////////////////////
 	// *** Juanjo *** //
 
-	n=0; // Número de paletas distintas
+	n=0; // Number of distinct palettes
 	muestra=NULL;
 	memcpy(pal,dac,768);
 
@@ -518,7 +518,7 @@ void open_file(void) {
 		memcpy(pal,apply_palette,768);
 	}
 
-	// Tenemos en pal[] la paleta de los FPGs a cargar
+	// Now pal[] holds the palette of the FPGs to load
 
 	x=0; 
 	sum=0; 
@@ -528,23 +528,23 @@ void open_file(void) {
 
 	if (sum) {
 		memcpy(paltratar,pal,768);
-		show_dialog(TratarPaleta0); // ¿Cargar paleta?
+		show_dialog(TratarPaleta0); // Load palette?
 
 		switch(v_accept) {
-			case 0: // Cancelar (no cargar)
+			case 0: // Cancel (don't load)
 				return;
 			break;
-			
-			case 1: // Adaptar los mapas a la paleta del sistema
+
+			case 1: // Remap graphics to system palette
 				break;
 
-			case 2: // Fusionar paletas
+			case 2: // Merge palettes
 				memcpy(dac4,pal,768);
 				fusionar_paletas();
 				RefPalAndDlg(0,1);
 			break;
-			
-			case 3: // Activar la nueva paleta
+
+			case 3: // Apply new palette
 				memcpy(dac4,pal,768);
 				RefPalAndDlg(0,1);
 			break;
@@ -565,7 +565,7 @@ void open_file(void) {
 
 			strcat(full, input);
 
-			if ((f=fopen(full,"rb"))!=NULL) { // Se ha elegido uno
+			if ((f=fopen(full,"rb"))!=NULL) { // A file was selected
 				if (fread(cwork,1,8,f)==8) {
 					fclose(f);
 
@@ -643,7 +643,7 @@ void Warning2(void) {
 	}
 }
 void Warning0(void) {
-	v.type=1; // Diálogo
+	v.type=1; // Dialog
 	v.an=200;
 	v.al=60;
 	v.title=texto[171];
@@ -659,10 +659,10 @@ extern byte AuxPal[768];
 
 int RemapAllFiles(int vent) {
 
-	//Pregunta si se desea adapt_palette el FPG o cerrarlo
+	// Ask whether to remap the FPG palette or close it
 
 	FPG *MiFPG=(FPG *)ventana[vent].aux;
-	byte p[768]; // para comparar la paleta de fichero con DAC
+	byte p[768]; // to compare file palette with DAC
 	FILE * f;
 	int sum,x;
 
@@ -706,7 +706,7 @@ int RemapAllFiles(int vent) {
 	return(1);
 }
 
-//Dialogo de codigos
+// Graphic code dialog
 extern int GetCodeAncho;
 extern int GetCodeAlto;
 extern char *GetCodeImagen;
@@ -783,7 +783,7 @@ void GetCode3(void) {
 }
 
 void GetCode0(void) {
-	v.type=1; // Diálogo
+	v.type=1; // Dialog
 	v.an=180+25;
 	v.al=100-12;
 	v.title=texto[68];
@@ -809,7 +809,7 @@ void InitGetCode(void) {
 	if(atoi(cCodigo)==0)
 		strcpy(cCodigo,"1");
 
-	// Crea el thumbnail
+	// Create the thumbnail
 
 	if (GetCodeAncho>70*big2 || GetCodeAlto>44*big2) {
 
@@ -904,7 +904,7 @@ void Show_Taggeds()
 		Elemento=MiFPG->DesIndex[a];
 
 		if((fpg=fopen((char *)MiFPG->ActualFile,"rb"))==NULL) {
-			//Error: no es un encontro el fichero.(grfxch ?????)
+			// Error: file not found
 			return;
 		}
 
@@ -916,7 +916,7 @@ void Show_Taggeds()
 		map_height=MiFPG->MiHeadFPG.Alto;
 
 		if (new_map(NULL)) {
-			//ERROR: Falta memoria.
+			// ERROR: Out of memory
 			fclose(fpg);
 			return;
 		}
@@ -985,7 +985,7 @@ void Delete_Taggeds() {
 	if ((array_del=(int *)malloc(taggeds*4))==NULL) 
 		return;
 
-	if((fpg=fopen((char *)MiFPG->ActualFile,"rb"))==NULL) { // No debería fallar esto
+	if((fpg=fopen((char *)MiFPG->ActualFile,"rb"))==NULL) { // This should never fail
 		free(array_del); return;
 	}
 
@@ -1017,7 +1017,7 @@ void Delete_Taggeds() {
 }
 
 //-----------------------------------------------------------------------------
-//  Opción de impresión de la lista de gráficos de un fichero
+//  Print graphic list from a file
 //-----------------------------------------------------------------------------
 
 int f_im=1,f_ar=0;
@@ -1107,7 +1107,7 @@ void Print_List(void) {
 			}
 
 			g=fopen((char *)MiFPG->ActualFile,"rb");
-			if (g==NULL) { // No debería pasar nunca
+			if (g==NULL) { // This should never happen
 			
 				if(f_ar) 
 					fclose(f);
@@ -1145,7 +1145,7 @@ void Print_List(void) {
 }
 
 //-----------------------------------------------------------------------------
-//  Funciones del browser de FPG
+//  FPG browser functions
 //-----------------------------------------------------------------------------
 
 extern int num;
@@ -1245,28 +1245,28 @@ void FPG_paint_listbox_br(struct t_listboxbr * l) {
 				wbox(ptr,an,al,c01,l->x+(x*(l->an+1))+1,l->y+(y*(l->al+1))+1+l->al-8,l->an,8);
 		}
 
-	if (wmouse_in(l->x,l->y,(l->an+1)*l->columns,(l->al+1)*l->lines)) { // Calcula zona
+	if (wmouse_in(l->x,l->y,(l->an+1)*l->columns,(l->al+1)*l->lines)) { // Calculate zone
 		l->zone=((mouse_x-v.x)/big2-l->x)/(l->an+1)+(((mouse_y-v.y)/big2-l->y)/(l->al+1))*l->columns;
 
 		if (l->zone>=l->total_items-l->first_visible || l->zone>=l->lines*l->columns)
 			l->zone=1;
-		else 
+		else
 			l->zone+=10;
 	} else if (wmouse_in(l->x+(l->an+1)*l->columns,l->y,9,9))
 		l->zone=2;
-	else if (wmouse_in(l->x+(l->an+1)*l->columns,l->y+(l->al+1)*l->lines-8,9,9)) 
+	else if (wmouse_in(l->x+(l->an+1)*l->columns,l->y+(l->al+1)*l->lines-8,9,9))
 		l->zone=3;
 	else if (wmouse_in(l->x+(l->an+1)*l->columns,l->y+9,9,(l->al+1)*l->lines-17))
 		l->zone=4;
-	else 
+	else
 		l->zone=0;
 
 	n=l->total_items-l->first_visible;
-	
+
 	if (n>l->lines*l->columns)
 		n=l->lines*l->columns;
-	
-	while (n>0) 
+
+	while (n>0)
 		FPG_show_thumb(l,l->first_visible+--n);
 }
 
@@ -1329,7 +1329,7 @@ void FPG_update_listbox_br(struct t_listboxbr * l) {
 	int n,old_zona=l->zone,x,y;
 	char p[40];
 
-	if (wmouse_in(l->x,l->y,(l->an+1)*l->columns,(l->al+1)*l->lines)) { // Calcula zona
+	if (wmouse_in(l->x,l->y,(l->an+1)*l->columns,(l->al+1)*l->lines)) { // Calculate zone
 		l->zone=(wmouse_x-l->x)/(l->an+1)+((wmouse_y-l->y)/(l->al+1))*l->columns;
 
 		if (l->zone>=l->total_items-l->first_visible || l->zone>=l->lines*l->columns)
@@ -1347,7 +1347,7 @@ void FPG_update_listbox_br(struct t_listboxbr * l) {
 		l->zone=4;
 	else l->zone=0;
 
-	if (old_zona!=l->zone) if (old_zona>=10) { // Desmarca zona
+	if (old_zona!=l->zone) if (old_zona>=10) { // Unhighlight zone
 		x=l->x+1+((old_zona-10)%l->columns)*(l->an+1);
 		y=l->y+l->al+((old_zona-10)/l->columns)*(l->al+1);
 		strcpy(p, l->list+l->item_width*(l->first_visible+old_zona-10));
@@ -1448,7 +1448,7 @@ void FPG_update_listbox_br(struct t_listboxbr * l) {
 		}
 	}
 
-	if (old_zona!=l->zone) if (l->zone>=10) { // Marca zona
+	if (old_zona!=l->zone) if (l->zone>=10) { // Highlight zone
 		x=l->x+1+((l->zone-10)%l->columns)*(l->an+1);
 		y=l->y+l->al+((l->zone-10)/l->columns)*(l->al+1);
 		strcpy(p, l->list+l->item_width*(l->first_visible+l->zone-10));
@@ -1520,7 +1520,7 @@ void create_thumb_FPG(struct t_listboxbr * l){
 				return; 
 		}
 
-		if (estado==1) { // Se comienza a leer un nuevo thumbnail
+		if (estado==1) { // Start reading a new thumbnail
 
 			if ((f=fopen((char *)MiFPG->ActualFile,"rb"))!=NULL) {
 				fseek(f,MiFPG->OffsGrf[MiFPG->DesIndex[num]],SEEK_SET);
@@ -1558,7 +1558,7 @@ void create_thumb_FPG(struct t_listboxbr * l){
 				estado=0; MiFPG->thumb[num].status=-1;
 			}
 			return;
-		} else if (estado==2 && MiFPG->thumb[num].status!=MiFPG->thumb[num].filesize) { // Se continúa leyendo un thumbnail
+		} else if (estado==2 && MiFPG->thumb[num].status!=MiFPG->thumb[num].filesize) { // Continue reading a thumbnail
 
 			if ((f=fopen((char *)MiFPG->ActualFile,"rb"))!=NULL) {
 				fseek(f,MiFPG->OffsGrf[MiFPG->DesIndex[num]],SEEK_SET);
@@ -1589,7 +1589,7 @@ void create_thumb_FPG(struct t_listboxbr * l){
 			return;
 		}
 
-		// Y ahora crea el thumbnail si el fichero se cargó ya completo
+		// Now create the thumbnail if the file is fully loaded
 		if (estado==2 && MiFPG->thumb[num].status==MiFPG->thumb[num].filesize && abs(_omx-mouse_x)+abs(_omy-mouse_y)+mouse_b+ascii==0) {
 
 			MiFPG->thumb[num].status=0;
@@ -1597,7 +1597,7 @@ void create_thumb_FPG(struct t_listboxbr * l){
 			mal  = MiFPG->thumb[num].al;
 			temp = (byte *)MiFPG->thumb[num].ptr;
 
-			// Crea el thumbnail
+			// Create the thumbnail
 			if (man>47*big2 || mal>26*big2) {
 				coefredx=(float)man/(float)(47*2*big2);
 				coefredy=(float)mal/(float)(26*2*big2);
@@ -1674,7 +1674,7 @@ void create_thumb_FPG(struct t_listboxbr * l){
 }
 
 //-----------------------------------------------------------------------------
-//  Funciones para importar mapas
+//  Functions for importing maps into FPG
 //-----------------------------------------------------------------------------
 
 void MAPtoFPG(struct tmapa * mapa) {
@@ -1785,7 +1785,7 @@ void GetGrafMAP(struct tmapa *mapa, byte *imagen, int x, int y, int ancho, int a
 }
 
 //-----------------------------------------------------------------------------
-//  Funciones para exportar mapas
+//  Functions for exporting maps from FPG
 //-----------------------------------------------------------------------------
 
 struct {
@@ -1894,28 +1894,28 @@ void PutGrafMAP(byte *imagen, byte *mapa, int num) {
 	int x, y;
 	int pos_im, pos_ma;
 
-	// Linea superior e inferior
+	// Top and bottom border lines
 	memset(&mapa[lgraf[num].y*lmapan+lgraf[num].x], c4, lgraf[num].an);
 	memset(&mapa[(lgraf[num].y+lgraf[num].al-1)*lmapan+lgraf[num].x], c4, lgraf[num].an);
 
 	for(y=0; y<lgraf[num].al-2; y++) {
-		mapa[(y+lgraf[num].y+1)*lmapan+lgraf[num].x]=c4; // Columna izquierda
+		mapa[(y+lgraf[num].y+1)*lmapan+lgraf[num].x]=c4; // Left column
 		
 		for(x=0; x<lgraf[num].an-2; x++) {
 			pos_im = y*(lgraf[num].an-2)+x;
 			pos_ma = (y+lgraf[num].y+1)*lmapan+x+lgraf[num].x+1;
-			mapa[pos_ma]=imagen[pos_im]; // Grafico
+			mapa[pos_ma]=imagen[pos_im]; // Graphic data
 		}
 
-		mapa[(y+lgraf[num].y+1)*lmapan+x+lgraf[num].x+1]=c4; // Columna derecha
+		mapa[(y+lgraf[num].y+1)*lmapan+x+lgraf[num].x+1]=c4; // Right column
 	}
 }
 
 //-----------------------------------------------------------------------------
-//      Algoritmo de emplazamiento de una imagen en el MAP
+//      Placement algorithm for an image in the MAP
 //-----------------------------------------------------------------------------
 
-void place_map(void) { // Emplaza grafico lnum
+void place_map(void) { // Place graphic lnum
 	
 	int n,m,x,y,new_x;
 	int scans,scan[1000];
@@ -1925,7 +1925,7 @@ void place_map(void) { // Emplaza grafico lnum
 	scan[0]       = 0;
 	scans         = 1;
 
-	// Primero crea en scan[] una lista de posibles alturas (0+fines de ventana)
+	// First create in scan[] a list of possible heights (0 + window bottoms)
 	for(n=0; n<lnum; n++) {
 		y=lgraf[n].y+lgraf[n].al+1;
 
@@ -1944,7 +1944,7 @@ void place_map(void) { // Emplaza grafico lnum
 
 	}
 
-	// Segundo ... algoritmo de colocación ...
+	// Second ... placement algorithm ...
 	for(n=0; n<scans; n++) {
 		y = scan[n];
 		new_x = 0;
@@ -1974,7 +1974,7 @@ int collides_with_map(int n, int x, int y, int an, int al) {
 }
 
 //-----------------------------------------------------------------------------
-//      Cierra un FPG duplicado
+//      Close a duplicate FPG
 //-----------------------------------------------------------------------------
 
 void close_fpg(char *fpg_path) {
@@ -1997,7 +1997,7 @@ void close_fpg(char *fpg_path) {
 }
 
 //-----------------------------------------------------------------------------
-//      Selecciona un fichero para abrir o sobreescribir
+//      Select a file to open or overwrite
 //-----------------------------------------------------------------------------
 
 int select_file(void) {
@@ -2059,7 +2059,7 @@ int select_file(void) {
 }
 
 //-----------------------------------------------------------------------------
-//      Sustituir o añadir FPG
+//      Replace or add to FPG
 //-----------------------------------------------------------------------------
 
 void replace_FPG_1(void) {
@@ -2103,9 +2103,9 @@ void replace_FPG_0(void) {
 	v.paint_handler=replace_FPG_1;
 	v.click_handler=replace_FPG_2;
 
-	_button(510, 7,v.al-14,0); // Reemplazar
-	_button(511,x2,v.al-14,0); // Añadir
-	_button(101,x3,v.al-14,0); // Cancelar
+	_button(510, 7,v.al-14,0); // Replace
+	_button(511,x2,v.al-14,0); // Add
+	_button(101,x3,v.al-14,0); // Cancel
 
 	v_accept=3;
 }

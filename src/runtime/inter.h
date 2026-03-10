@@ -160,77 +160,77 @@ void finalize_texts(void);
 // Constants
 ///////////////////////////////////////////////////////////////////////////////
 
-#define max_exp 512	  // Máximo número de elementos en una expresión
-#define long_pila 2048	  // Longitud de la pila en ejecución
+#define max_exp 512	  // Maximum number of elements in an expression
+#define long_pila 2048	  // Execution stack length
 
 #define swap(a,b) {a^=b;b^=a;a^=b;}
 
 //-----------------------------------------------------------------------------
-// Mnemónico/Código/Operandos (Generación de código EML, "*" ≡ "aún no usado")
+// Mnemonic/Opcode/Operands (EML code generation, "*" = "not yet used")
 //-----------------------------------------------------------------------------
 
-#define lnop  0 // *            No operación
-#define lcar  1 // valor        Carga una constant en pila
-#define lasi  2 //              Saca valor, offset y mete el valor en [offset]
-#define lori  3 //              Or lógico
-#define lxor  4 //              Xor, or exclusivo
-#define land  5 //              And lógico, operador sobre condiciones
-#define ligu  6 //              Igual, operador logico de comparación
-#define ldis  7 //              Distinto, true si los 2 valores son diferentes
-#define lmay  8 //              Mayor, comparación con signo
-#define lmen  9 //              Menor, idem
-#define lmei 10 //              Menor o igual
-#define lmai 11 //              Mayor o igual
-#define ladd 12 //              Suma dos constantes
-#define lsub 13 //              Resta, operación binaria
-#define lmul 14 //              Multiplicación
-#define ldiv 15 //              División de enteros
-#define lmod 16 //              Módulo, resto de la división
-#define lneg 17 //              Negación, cambia de signo una constant
-#define lptr 18 //              Pointer, saca offset y mete [offset]
-#define lnot 19 //              Negación binaria, bit a bit
-#define laid 20 //              Suma id a la constant de la pila
-#define lcid 21 //              Carga id en la pila
-#define lrng 22 // offset, len  Realiza una comparación de rango
-#define ljmp 23 // offset       Salta a una dirección de mem[]
-#define ljpf 24 // offset       Salta si un valor es falso a una dirección
-#define lfun 25 // código       Llamada a un proceso interno, ej. signal()
-#define lcal 26 // offset       Crea un nuevo proceso en el programa
-#define lret 27 // num_par      Auto-eliminación del proceso
-#define lasp 28 //              Desecha un valor apilado
-#define lfrm 29 // num_par      Detiene por este frame la ejecución del proceso
-#define lcbp 30 // num_par      Inicializa el puntero a los parámetros locales
-#define lcpa 31 //              Saca offset, lee parámetro [offset] y bp++
-#define ltyp 32 // bloque       Define el tipo de proceso actual (colisiones)
-#define lpri 33 // offset       Salta a la dirección, y carga var. privadas
-#define lcse 34 // offset       Si switch <> expresión, salta al offfset
-#define lcsr 35 // offset       Si switch no esta en el rango, salta al offset
-#define lshr 36 //              Shift right (binario)
-#define lshl 37 //              Shift left (binario)
-#define lipt 38 //              Incremento y pointer
-#define lpti 39 //              Pointer e incremento
-#define ldpt 40 //              Decremento y pointer
-#define lptd 41 //              Pointer y decremento
-#define lada 42 //              Add-asignación
-#define lsua 43 //              Sub-asignación
-#define lmua 44 //              Mul-asignación
-#define ldia 45 //              Div-asignación
-#define lmoa 46 //              Mod-asignación
-#define lana 47 //              And-asignación
-#define lora 48 //              Or-asignación
-#define lxoa 49 //              Xor-asignación
-#define lsra 50 //              Shr-asignación
-#define lsla 51 //              Shl-asignación
-#define lpar 52 // num_par_pri  Define el número de parámetros privados
-#define lrtf 53 // num_par      Auto-eliminación del proceso, devuelve un valor
-#define lclo 54 // offset       Crea un clon del proceso actual
-#define lfrf 55 // num_par      Pseudo-Frame (frame a un porcentaje, frame(100)==frame)
-#define limp 56 // offset text  Importa una DLL externa
-#define lext 57 // código       Llama a una función externa
-#define lchk 58 //              Comprueba la validez de un identificador
-#define ldbg 59 //              Invoca al debugger
+#define lnop  0 // *            No operation
+#define lcar  1 // value        Push constant onto stack
+#define lasi  2 //              Pop value and offset, store value at [offset]
+#define lori  3 //              Logical OR
+#define lxor  4 //              XOR, exclusive OR
+#define land  5 //              Logical AND, condition operator
+#define ligu  6 //              Equal, logical comparison operator
+#define ldis  7 //              Not equal, true if 2 values differ
+#define lmay  8 //              Greater than, signed comparison
+#define lmen  9 //              Less than, signed comparison
+#define lmei 10 //              Less than or equal
+#define lmai 11 //              Greater than or equal
+#define ladd 12 //              Add two constants
+#define lsub 13 //              Subtract, binary operation
+#define lmul 14 //              Multiply
+#define ldiv 15 //              Integer division
+#define lmod 16 //              Modulo, division remainder
+#define lneg 17 //              Negate, flip sign of a constant
+#define lptr 18 //              Pointer, pop offset and push [offset]
+#define lnot 19 //              Bitwise NOT, bit by bit
+#define laid 20 //              Add id to constant on stack
+#define lcid 21 //              Push id onto stack
+#define lrng 22 // offset, len  Perform range check
+#define ljmp 23 // offset       Jump to a mem[] address
+#define ljpf 24 // offset       Jump if false to an address
+#define lfun 25 // code         Call an internal function, e.g. signal()
+#define lcal 26 // offset       Create a new process in the program
+#define lret 27 // num_par      Process self-termination
+#define lasp 28 //              Discard a stacked value
+#define lfrm 29 // num_par      Suspend process execution for this frame
+#define lcbp 30 // num_par      Initialize local parameter pointer
+#define lcpa 31 //              Pop offset, read parameter [offset] and bp++
+#define ltyp 32 // block        Set current process type (for collisions)
+#define lpri 33 // offset       Jump to address and load private variables
+#define lcse 34 // offset       If switch != expression, jump to offset
+#define lcsr 35 // offset       If switch not in range, jump to offset
+#define lshr 36 //              Shift right (bitwise)
+#define lshl 37 //              Shift left (bitwise)
+#define lipt 38 //              Pre-increment and pointer
+#define lpti 39 //              Pointer and post-increment
+#define ldpt 40 //              Pre-decrement and pointer
+#define lptd 41 //              Pointer and post-decrement
+#define lada 42 //              Add-assign
+#define lsua 43 //              Sub-assign
+#define lmua 44 //              Mul-assign
+#define ldia 45 //              Div-assign
+#define lmoa 46 //              Mod-assign
+#define lana 47 //              And-assign
+#define lora 48 //              Or-assign
+#define lxoa 49 //              Xor-assign
+#define lsra 50 //              Shr-assign
+#define lsla 51 //              Shl-assign
+#define lpar 52 // num_par_pri  Set the number of private parameters
+#define lrtf 53 // num_par      Process self-termination, returns a value
+#define lclo 54 // offset       Clone current process
+#define lfrf 55 // num_par      Pseudo-frame (frame at percentage, frame(100)==frame)
+#define limp 56 // offset text  Import an external DLL
+#define lext 57 // code         Call an external function
+#define lchk 58 //              Validate an identifier
+#define ldbg 59 //              Invoke the debugger
 
-// Instrucciones añadidas para la optimización (DIV 2.0)
+// Instructions added for optimization (DIV 2.0)
 
 #define lcar2 60
 #define lcar3 61
@@ -251,70 +251,70 @@ void finalize_texts(void);
 #define lcarsub 76
 #define lcardiv 77
 
-// Instrucciones añadidas para el manejo de cadenas
+// Instructions added for string handling
 
-#define lptrchr 78 // Pointer, saca (index, offset) y mete [offset+byte index]
-#define lasichr 79 // Saca (valor, index, offset) y mete el valor en [offset+byte index]
-#define liptchr 80 // Incremento y pointer
-#define lptichr 81 // Pointer e incremento
-#define ldptchr 82 // Decremento y pointer
-#define lptdchr 83 // Pointer y decremento
-#define ladachr 84 // Add-asignación
-#define lsuachr 85 // Sub-asignación
-#define lmuachr 86 // Mul-asignación
-#define ldiachr 87 // Div-asignación
-#define lmoachr 88 // Mod-asignación
-#define lanachr 89 // And-asignación
-#define lorachr 90 // Or-asignación
-#define lxoachr 91 // Xor-asignación
-#define lsrachr 92 // Shr-asignación
-#define lslachr 93 // Shl-asignación
-#define lcpachr 94 // Saca offset, lee parámetro [offset] y bp++
+#define lptrchr 78 // Pointer, pop (index, offset) and push [offset+byte index]
+#define lasichr 79 // Pop (value, index, offset) and store value at [offset+byte index]
+#define liptchr 80 // Pre-increment and pointer
+#define lptichr 81 // Pointer and post-increment
+#define ldptchr 82 // Pre-decrement and pointer
+#define lptdchr 83 // Pointer and post-decrement
+#define ladachr 84 // Add-assign
+#define lsuachr 85 // Sub-assign
+#define lmuachr 86 // Mul-assign
+#define ldiachr 87 // Div-assign
+#define lmoachr 88 // Mod-assign
+#define lanachr 89 // And-assign
+#define lorachr 90 // Or-assign
+#define lxoachr 91 // Xor-assign
+#define lsrachr 92 // Shr-assign
+#define lslachr 93 // Shl-assign
+#define lcpachr 94 // Pop offset, read parameter [offset] and bp++
 
-#define lstrcpy 95 // Saca si, di, y hace strcpy(mem[di],[si]) (deja di en pila)
-#define lstrfix 96 // Amplia una cadena antes de meter un char en ella
-#define lstrcat 97 // Concatena dos cadenas (opera como strcpy)
-#define lstradd 98 // Suma dos strings "en el aire" y deja en pila el puntero al aire
-#define lstrdec 99  // Añade o quita caracteres a una cadena
-#define lstrsub 100 // Quita caracteres a una cadena (-=)
-#define lstrlen 101 // Sustituye una cadena por su longitud
-#define lstrigu 102 // Comparacion de igualdad de dos cadenas
-#define lstrdis 103 // Cadenas distintas
-#define lstrmay 104 // Cadena mayor
-#define lstrmen 105 // Cadena menor
-#define lstrmei 106 // Cadena mayor o igual
-#define lstrmai 107 // Cadena menor o igual
-#define lcpastr 108 // Carga un parámetro en una cadena
+#define lstrcpy 95 // Pop si, di, and do strcpy(mem[di],[si]) (leave di on stack)
+#define lstrfix 96 // Extend a string before inserting a char into it
+#define lstrcat 97 // Concatenate two strings (operates like strcpy)
+#define lstradd 98 // Add two strings into a temporary and push pointer to it
+#define lstrdec 99  // Add or remove characters from a string
+#define lstrsub 100 // Remove characters from a string (-=)
+#define lstrlen 101 // Replace a string with its length
+#define lstrigu 102 // String equality comparison
+#define lstrdis 103 // Strings not equal
+#define lstrmay 104 // String greater than
+#define lstrmen 105 // String less than
+#define lstrmei 106 // String greater than or equal
+#define lstrmai 107 // String less than or equal
+#define lcpastr 108 // Load a parameter into a string
 
-// Instrucciones añadidas para el manejo de Words
+// Instructions added for word handling
 
-#define lptrwor 109 // Pointer, saca (index, offset) y mete [offset+byte index]
-#define lasiwor 110 // Saca (valor, index, offset) y mete el valor en [offset+byte index]
-#define liptwor 111 // Incremento y pointer
-#define lptiwor 112 // Pointer e incremento
-#define ldptwor 113 // Decremento y pointer
-#define lptdwor 114 // Pointer y decremento
-#define ladawor 115 // Add-asignación
-#define lsuawor 116 // Sub-asignación
-#define lmuawor 117 // Mul-asignación
-#define ldiawor 118 // Div-asignación
-#define lmoawor 119 // Mod-asignación
-#define lanawor 120 // And-asignación
-#define lorawor 121 // Or-asignación
-#define lxoawor 122 // Xor-asignación
-#define lsrawor 123 // Shr-asignación
-#define lslawor 124 // Shl-asignación
-#define lcpawor 125 // Saca offset, lee parámetro [offset] y bp++
+#define lptrwor 109 // Pointer, pop (index, offset) and push [offset+word index]
+#define lasiwor 110 // Pop (value, index, offset) and store value at [offset+word index]
+#define liptwor 111 // Pre-increment and pointer
+#define lptiwor 112 // Pointer and post-increment
+#define ldptwor 113 // Pre-decrement and pointer
+#define lptdwor 114 // Pointer and post-decrement
+#define ladawor 115 // Add-assign
+#define lsuawor 116 // Sub-assign
+#define lmuawor 117 // Mul-assign
+#define ldiawor 118 // Div-assign
+#define lmoawor 119 // Mod-assign
+#define lanawor 120 // And-assign
+#define lorawor 121 // Or-assign
+#define lxoawor 122 // Xor-assign
+#define lsrawor 123 // Shr-assign
+#define lslawor 124 // Shl-assign
+#define lcpawor 125 // Pop offset, read parameter [offset] and bp++
 
-// Miscelánea
+// Miscellaneous
 
-#define lnul    126 // Comprueba que un puntero no sea NULL
+#define lnul    126 // Check that a pointer is not NULL
 
-//----------------------------------------------------------------------------- // Variables globales de los programas //-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------- // Global variables of the programs //-----------------------------------------------------------------------------
 
-#define long_header 9    // Longitud de la cabecera al inicio de los programas
+#define long_header 9    // Header length at the start of programs
 
-GLOBAL int imem_max;     // Memoria principal de la máquina destino
+GLOBAL int imem_max;     // Main memory of the target machine
 
 struct _mouse { // x1
   int x,y,z,file,graph,angle,size,flags,region,left,middle,right,cursor,speed;
@@ -371,22 +371,22 @@ GLOBAL struct _dirinfo * dirinfo;
 
 struct _fileinfo { // x1
   int fullpath_fix;
-  char fullpath[256];  // Nombre completo
-  int  drive;          // Unidad de disco
+  char fullpath[256];  // Full path name
+  int  drive;          // Disk drive
   int dir_fix;
-  char dir[256];       // Directorio
+  char dir[256];       // Directory
   int name_fix;
-  char name[12];       // Nombre
+  char name[12];       // File name
   int ext_fix;
   char ext[8];         // Extension
-  int  size;           // Tamaño (en bytes)
-  int  day;            // Dia
-  int  month;          // Mes
-  int  year;           // Año
-  int  hour;           // Hora
-  int  min;            // Minuto
-  int  sec;            // Segundo
-  int  attrib;         // Atributos
+  int  size;           // Size (in bytes)
+  int  day;            // Day
+  int  month;          // Month
+  int  year;           // Year
+  int  hour;           // Hour
+  int  min;            // Minute
+  int  sec;            // Second
+  int  attrib;         // Attributes
 };
 
 GLOBAL struct _fileinfo * fileinfo;
@@ -436,202 +436,202 @@ GLOBAL int joy_timeout;
 void read_joy(void);
 
 //-----------------------------------------------------------------------------
-// Variables locales del sistema de sprites (las primeras no son públicas)
+// Sprite system local variables (the first ones are not public)
 //-----------------------------------------------------------------------------
 
-#define _Id         0  //Para comprobar validez de accesos externos
-#define _IdScan     1  //Recorrido del resto de los procesos (p.ej.colisiones)
-#define _Bloque     2  //Identificador del tipo de proceso (para colisiones)
-#define _BlScan     3  //Ultimo tipo de proceso scaneado en el último recorrido
-#define _Status     4  //Estado (0 dead, 1 killed, 2 alive, 3 sleept, 4 freezed)
-#define _NumPar     5  //Número de parámetros del proceso
-#define _Param      6  //Puntero a los parámetros pasados al proceso (en pila)
-#define _IP         7  //Puntero de ejecución (la siguiente al frame anterior)
-#define _SP         8  //Puntero de pila (stack pointer del proceso)
-#define _Executed   9  //Indica para cada frame si el proceso ya se ejecutó
-#define _Painted    10 //Indica si el proceso ya ha sido pintado
+#define _Id         0  //Used to validate external accesses
+#define _IdScan     1  //Scan index for iterating other processes (e.g. collisions)
+#define _Bloque     2  //Process type identifier (for collisions)
+#define _BlScan     3  //Last process type scanned in the last iteration
+#define _Status     4  //State (0 dead, 1 killed, 2 alive, 3 asleep, 4 frozen)
+#define _NumPar     5  //Number of process parameters
+#define _Param      6  //Pointer to parameters passed to the process (on stack)
+#define _IP         7  //Instruction pointer (next after previous frame)
+#define _SP         8  //Stack pointer (process stack pointer)
+#define _Executed   9  //Whether the process has already executed this frame
+#define _Painted    10 //Whether the process has already been painted
 
-// Las siguientes 2 variables son duales, segun el proceso sea de m7 o m8
+// The following 2 variables are dual-purpose, depending on mode 7 or mode 8
 
-#define _Dist1      11 //Distancia 1, para el modo 7
-#define _Dist2      12 //Distancia 2, para el modo 7
+#define _Dist1      11 //Distance 1, for mode 7
+#define _Dist2      12 //Distance 2, for mode 7
 
 // _M8_Object removed (MODE8 deleted)
-#define _Old_Ctype  12 //Antiguo _Ctype
+#define _Old_Ctype  12 //Previous _Ctype
 
-#define _Frame      13 //Cuanto frame lleva el proceso (frame(n))
-#define _x0         14 //Caja ocupada por el sprite cada
-#define _y0         15 // vez que se pinta para realizar
-#define _x1         16 // blit_screen y restauración de fondo
-#define _y1         17 // parcial (dump_type==0 y restore_background==0)
-#define _FCount     18 //Cuenta de llamadas a funcion (para saltarse retornos en frame)
-#define _Caller     19   //ID del proceso o funcion llamador (0 si ha sido el kernel)
+#define _Frame      13 //Frame progress of the process (frame(n))
+#define _x0         14 //Bounding box occupied by the sprite
+#define _y0         15 // each time it is painted, used for
+#define _x1         16 // blit_screen and background restoration
+#define _y1         17 // (dump_type==0 and restore_background==0)
+#define _FCount     18 //Function call count (to skip returns during frame)
+#define _Caller     19   //ID of the calling process or function (0 if kernel)
 
-#define _Father     20 //Id del padre del proceso (0 si no existe)
-#define _Son        21 //Id del último hijo que ha creado (0 sne)
-#define _SmallBro   22 //Id del hermano menor del proceso (0 sne)
-#define _BigBro     23 //Id del hermanos mayor (más viejo) del proceso (0 sne)
-#define _Priority   24 //Prioridad de proceso (positivo o negativo)
-#define _Ctype      25 //Indica si es relativo a pantalla, parallax o mode 7
-#define _X          26 //Coordenada x (del centro gravitatorio del gráfico)
-#define _Y          27 //Coordenada y (idem)
-#define _Z          28 //Coordenada z (Prioridad para la impresión)
-#define _Graph      29 //Código del gráfico (se corresponde con los ficheros)
-#define _Flags      30 //Define espejados horizontales y verticales
-#define _Size       31 //Tamaño (%) del gráfico
-#define _Angle      32 //Angulo de rotación del gráfico (0 gráfico normal)
-#define _Region     33 //Región con la que hacer el clipping del gráfico
-#define _File       34 //FPG que contiene los gráficos del proceso
-#define _XGraph     35 //Puntero a tabla: nºgraficos,graf_angulo_0,...
-#define _Height     36 //Altura de los procesos en el modo 7 (pix/4)
-#define _Cnumber    37 //Indica en que scroll o m7 se verá el gráfico
-#define _Resolution 38 //Resolución de las coordenadas x,y para este proceso
+#define _Father     20 //Parent process id (0 if none)
+#define _Son        21 //Last child created (0 if none)
+#define _SmallBro   22 //Younger sibling id (0 if none)
+#define _BigBro     23 //Older sibling id (0 if none)
+#define _Priority   24 //Process priority (positive or negative)
+#define _Ctype      25 //Coordinate type: screen, parallax, or mode 7
+#define _X          26 //X coordinate (of the graphic's center of gravity)
+#define _Y          27 //Y coordinate (same)
+#define _Z          28 //Z coordinate (rendering priority)
+#define _Graph      29 //Graphic code (corresponds to files)
+#define _Flags      30 //Horizontal and vertical mirror flags
+#define _Size       31 //Graphic size (percentage)
+#define _Angle      32 //Graphic rotation angle (0 = normal)
+#define _Region     33 //Clipping region for the graphic
+#define _File       34 //FPG containing the process graphics
+#define _XGraph     35 //Pointer to table: num_graphics,graphic_angle_0,...
+#define _Height     36 //Process height in mode 7 (pix/4)
+#define _Cnumber    37 //Which scroll or m7 will display the graphic
+#define _Resolution 38 //Coordinate resolution for x,y of this process
 // _Radius, _M8_Wall, _M8_Sector, _M8_NextSector, _M8_Step removed (MODE8 deleted)
 
 //-----------------------------------------------------------------------------
-//  Memoria de la máquina destino
+//  Target machine memory
 //-----------------------------------------------------------------------------
 
-GLOBAL int pila[long_pila+max_exp+64]; // cálculo de expresiones (compilación y ejecución)
+GLOBAL int pila[long_pila+max_exp+64]; // Expression evaluation (compilation and execution)
 
 GLOBAL int * mem, imem, iloc, iloc_pub_len, iloc_len;
 GLOBAL byte * memb;
 GLOBAL word * memw;
 
 //-----------------------------------------------------------------------------
-// Variables globales para la interpretación - VARIABLES DE PROCESO
+// Global variables for interpretation - PROCESS VARIABLES
 //-----------------------------------------------------------------------------
 
-GLOBAL int inicio_privadas; // Inicio de variables privadas (proceso en ejecución)
+GLOBAL int inicio_privadas; // Start of private variables (running process)
 
-GLOBAL int ip;        // Puntero de programa
+GLOBAL int ip;        // Program pointer (instruction pointer)
 
-GLOBAL int sp;          // Puntero de pila
+GLOBAL int sp;          // Stack pointer
 
-GLOBAL int bp;          // Puntero auxiliar de pila
+GLOBAL int bp;          // Auxiliary stack pointer (base pointer)
 
-GLOBAL int id_init;     // Inicio del proceso init (padre de todos)
+GLOBAL int id_init;     // Start of the init process (parent of all)
 
-GLOBAL int id_start;    // Inicio del primer proceso (sus locales y privadas)
+GLOBAL int id_start;    // Start of the first process (its locals and privates)
 
-GLOBAL int id_end;      // Inicio del último proceso hasta el momento
+GLOBAL int id_end;      // Start of the last process created so far
 
 GLOBAL int id_max;
 
-GLOBAL int id_old;      // Para saber por donde se está procesando
+GLOBAL int id_old;      // Tracks which process is currently being executed
 
 GLOBAL int procesos;    // Number of living processes in the program
 
-GLOBAL int ide,id;      // Proceso en proceso
+GLOBAL int ide,id;      // Current process being processed
 
-GLOBAL int id2;         // Identificador extra para las llamadas a procesos (cal)
-
-//-----------------------------------------------------------------------------
-// Variables globales para el control de handles
-//-----------------------------------------------------------------------------
-
-GLOBAL int numfiles;     // Numero de ficheros abiertos al comenzar el interprete
-
-GLOBAL FILE * tabfiles[32]; // Tabla con los handles abiertos (a 0 los libres)
+GLOBAL int id2;         // Extra identifier for process calls (cal)
 
 //-----------------------------------------------------------------------------
-// Variables globales para la interpretación - VARIABLES GRAFICAS
+// Global variables for file handle management
 //-----------------------------------------------------------------------------
 
-GLOBAL int vga_width,vga_height; // Dimensiones de la pantalla física
+GLOBAL int numfiles;     // Number of open files when interpreter started
+
+GLOBAL FILE * tabfiles[32]; // Table of open handles (0 = free)
+
+//-----------------------------------------------------------------------------
+// Global variables for interpretation - GRAPHICS VARIABLES
+//-----------------------------------------------------------------------------
+
+GLOBAL int vga_width,vga_height; // Physical screen dimensions
 GLOBAL int vwidth, vheight; // Screen window dimensions
-GLOBAL int vvga_an,vvga_al; // Dimensiones de la pantalla física
+GLOBAL int vvga_an,vvga_al; // Physical screen dimensions (legacy)
 
 GLOBAL byte fsmode;
 
 GLOBAL char prgpath[_MAX_PATH];
 
-GLOBAL byte *copia;     // Copia virtual de pantalla
+GLOBAL byte *copia;     // Virtual screen copy (working framebuffer)
 
-GLOBAL byte *copia2;    // Segunda copia, fondo de sprites fuera del scroll
+GLOBAL byte *copia2;    // Second copy, sprite background outside scroll
 
 #ifdef DEBUG
-GLOBAL byte *copia_debug;       // Tercera copia, solo para el debug (dialogos)
+GLOBAL byte *copia_debug;       // Third copy, debug only (dialogs)
 #endif
 
-GLOBAL byte paleta[768]; // Paleta actual del programa
+GLOBAL byte paleta[768]; // Current program palette
 
-GLOBAL int palcrc;      // CRC de la paleta actual del programa
+GLOBAL int palcrc;      // CRC of the current program palette
 
-GLOBAL int adaptar_paleta; // Autoadaptar archivos cargados a la paleta activa
+GLOBAL int adaptar_paleta; // Auto-adapt loaded files to the active palette
 
-GLOBAL byte dac[768];   // Paleta real activa en pantalla
+GLOBAL byte dac[768];   // Active palette on screen
 
-GLOBAL byte dac4[768];  // Paleta multiplicada por 4
+GLOBAL byte dac4[768];  // Palette multiplied by 4
 
-GLOBAL int dacout_r,dacout_g,dacout_b,dacout_speed; // Fade, que restar y a que veloc.
+GLOBAL int dacout_r,dacout_g,dacout_b,dacout_speed; // Fade: amount to subtract and speed
 
-GLOBAL int now_dacout_r,now_dacout_g,now_dacout_b; // Situación actual de dac[]
+GLOBAL int now_dacout_r,now_dacout_g,now_dacout_b; // Current state of dac[]
 
-GLOBAL int paleta_cargada; // Indica si ya se ha cargado alguna paleta
+GLOBAL int paleta_cargada; // Whether a palette has been loaded
 
-GLOBAL int activar_paleta; // Indica si ya se ha cargado alguna paleta
+GLOBAL int activar_paleta; // Whether the palette needs to be applied
 
 GLOBAL byte * color_lookup;
 
 //-----------------------------------------------------------------------------
-// Textos de salida, en formato traducible
+// Output texts, in translatable format
 //-----------------------------------------------------------------------------
 
-#define max_textos_sistema 256         // Nº máx. de textos permitidos (lenguaje.div)
+#define max_textos_sistema 256         // Max number of allowed texts (lenguaje.div)
 
 GLOBAL byte *text[max_textos_sistema];
 GLOBAL int  num_error;
 
 //-----------------------------------------------------------------------------
-// Ficheros de gráficos (*.FPG de DIV)
+// Graphic files (*.FPG from DIV)
 //-----------------------------------------------------------------------------
 
-typedef struct _t_g { // Estructura para un fpg
-  int * * fpg; // Fichero cargado en memoria
-  int * * grf; // Punteros a los gráficos (g[n].grf[000..999])
+typedef struct _t_g { // Structure for an FPG file
+  int * * fpg; // File loaded in memory
+  int * * grf; // Pointers to graphics (g[n].grf[000..999])
 }t_g;
 
-// El primer fpg puede contener hasta 2000 gráficos, a partir de 1000 son los
-// gráficos cargados con load_map (sus códigos 1000..1999)
+// The first FPG can hold up to 2000 graphics; from 1000 onward they are
+// graphics loaded with load_map (codes 1000..1999)
 
 GLOBAL int next_map_code,max_grf;
 
-#define max_fpgs 64     // Numero máximo de fpgs cargados
+#define max_fpgs 64     // Maximum number of loaded FPGs
 
-GLOBAL t_g g[max_fpgs]; // Array de los fpg
-
-//-----------------------------------------------------------------------------
-// Variables genéricas usadas por varias funciones
-//-----------------------------------------------------------------------------
-
-GLOBAL FILE * es;       // Lectura de ficheros en la interpretación (fpg, voc, ...)
-
-GLOBAL int file_len;    // Lectura de ficheros en la interpretación
-
-GLOBAL word * ptr;      // Puntero general para un malloc en ejecución
-
-GLOBAL int x,y;         // Coordenadas genéricas para su uso en funciones internas
-
-GLOBAL float angulo;    // Angulo genérico para su uso en funciones internas
+GLOBAL t_g g[max_fpgs]; // Array of FPG files
 
 //-----------------------------------------------------------------------------
-// Sistema de regiones de visualización
+// Generic variables used by multiple functions
 //-----------------------------------------------------------------------------
 
-#define max_region 32   // Número máximo de regiones definidas
+GLOBAL FILE * es;       // File reading during interpretation (fpg, voc, ...)
 
-typedef struct _t_region { // Zonas de clipping, referidas a pantalla
+GLOBAL int file_len;    // File reading during interpretation
+
+GLOBAL word * ptr;      // General pointer for a runtime malloc
+
+GLOBAL int x,y;         // Generic coordinates for use in internal functions
+
+GLOBAL float angulo;    // Generic angle for use in internal functions
+
+//-----------------------------------------------------------------------------
+// Display region system
+//-----------------------------------------------------------------------------
+
+#define max_region 32   // Maximum number of defined regions
+
+typedef struct _t_region { // Clipping zones, relative to screen
   int x0,x1;
   int y0,y1;
 }t_region;
 
-GLOBAL t_region region[max_region]; // Array de regiones
+GLOBAL t_region region[max_region]; // Array of regions
 
-GLOBAL int clipx0,clipx1,clipy0,clipy1; // Región de clipping
+GLOBAL int clipx0,clipx1,clipy0,clipy1; // Clipping region
 
 //-----------------------------------------------------------------------------
-// Sistema de font (*.FNT generados con DIV)
+// Font system (*.FNT files generated with DIV)
 //-----------------------------------------------------------------------------
 
 typedef struct _TABLAFNT{
@@ -642,72 +642,72 @@ typedef struct _TABLAFNT{
 }TABLAFNT;
 
 typedef struct _fnt_info{
-  int ancho;            // Ancho medio del font
-  int espacio;          // Longitud en pixels del espacio en blanco
-  int espaciado;        // Espaciado entre carácteres (además del propio ancho)
-  int alto;             // Altura máxima del font
-  int fonpal;           // CRC de su paleta
-  int syspal;           // CRC de la paleta a la que está adaptado
-  int len;              // Longitud del archivo FNT
-  char name[80];        // Nombre del archivo FNT
+  int ancho;            // Average font width
+  int espacio;          // Space character width in pixels
+  int espaciado;        // Inter-character spacing (in addition to glyph width)
+  int alto;             // Maximum font height
+  int fonpal;           // CRC of its palette
+  int syspal;           // CRC of the palette it is adapted to
+  int len;              // FNT file length
+  char name[80];        // FNT file name
 } fnt_info;
 
-#define max_fonts 32    // Número máximo de fonts en ejecución
+#define max_fonts 32    // Maximum number of fonts at runtime
 
-GLOBAL byte * fonts[max_fonts]; // Fonts cargados en ejecución (0-no cargado)
+GLOBAL byte * fonts[max_fonts]; // Fonts loaded at runtime (0=not loaded)
 
 GLOBAL TABLAFNT * fnt;
 
 GLOBAL fnt_info f_i[max_fonts];
 
 //-----------------------------------------------------------------------------
-// Sistema de impresión de textos
+// Text rendering system
 //-----------------------------------------------------------------------------
 
-#define max_textos 256  // Número máximo de textos en ejecución
+#define max_textos 256  // Maximum number of texts at runtime
 
 typedef struct _t_texto {
-  int type;     // Tipo de texto 0-normal, 1-&variable
-  byte * font;  // Puntero al font (byte h,car[256].an/.dir,data...)
-  int x,y;      // Coordenadas del texto
-  int ptr;      // Texto
-  int centro;   // Tipo de centrado 0-normal (decha), 1-centrado horiz, ...
-  int region;   // Región de clipping
-  int x0,y0;    // Region ocupada por el texto
-  int an,al;    // para los volcados parciales
+  int type;     // Text type: 0=normal, 1=&variable
+  byte * font;  // Pointer to font (byte h,car[256].an/.dir,data...)
+  int x,y;      // Text coordinates
+  int ptr;      // Text content
+  int centro;   // Alignment type: 0=left, 1=centered, ...
+  int region;   // Clipping region
+  int x0,y0;    // Region occupied by the text
+  int an,al;    // For partial screen blits
 }t_texto;
 
 GLOBAL t_texto texto[max_textos+1];
 
 //-----------------------------------------------------------------------------
-// Sistema de impresión de primitivas gráficas
+// Drawing primitives system
 //-----------------------------------------------------------------------------
 
-#define max_drawings 16384 // Número máximo de primitivas en ejecución
+#define max_drawings 16384 // Maximum number of primitives at runtime
 
 typedef struct _t_drawing {
-  int type;     // Tipo de primitiva 0-n/a, 1-linea, ...
-  int color;    // color de la primitiva
-  int porcentaje; // 0 Mínimo ... 15 Opaco
-  int region;   // Región de clipping
-  int x0,y0;    // Coordenada sup/izqd de la primitiva
-  int x1,y1;    // Coordenada inf/dcha de la primitiva
+  int type;     // Primitive type: 0=n/a, 1=line, ...
+  int color;    // Primitive color
+  int porcentaje; // 0=minimum ... 15=opaque
+  int region;   // Clipping region
+  int x0,y0;    // Top-left coordinate of the primitive
+  int x1,y1;    // Bottom-right coordinate of the primitive
 } t_drawing;
 
 GLOBAL t_drawing drawing[max_drawings];
 
 //-----------------------------------------------------------------------------
-// Sistema de volcados parciales (juegos sin scroll) - Aún no implementado
+// Partial blit system (games without scroll) - Now implemented
 //-----------------------------------------------------------------------------
 
-GLOBAL int full_redraw; // Indica si se ha modificado toda la copia de vga
-                             // Por ahora se mantiene siempre a 1
+GLOBAL int full_redraw; // Whether the entire VGA copy has been modified
+                             // Currently always kept at 1
 
-// Ya se ha implementado, la variable que controla ahora el tipo de
-// blit_screen es la global dump_type, accesible por los programas
+// Now implemented; the variable controlling the blit_screen type
+// is the global dump_type, accessible by programs
 
 //-----------------------------------------------------------------------------
-// Sistema de modo 7 - Struct interno
+// Mode 7 system - Internal struct
 //-----------------------------------------------------------------------------
 
 struct _im7 {
@@ -721,15 +721,15 @@ struct _im7 {
 GLOBAL struct _im7 im7[10];
 
 //-----------------------------------------------------------------------------
-// Sistema de scroll parallax - Struct interno
+// Parallax scroll system - Internal struct
 //-----------------------------------------------------------------------------
 
 #define max_inc 32
 
-typedef struct _tfast { // Tabla de incrementos para el primer plano
-  int nt;               // 0..max_inc-1 Nº de tramos, >=max_inc Desbordamiento
-  short inc[max_inc];   // Salto,datos,salto,datos,...
-} tfast;                // Hasta 1024x768
+typedef struct _tfast { // Increment table for the foreground plane
+  int nt;               // 0..max_inc-1 number of spans, >=max_inc overflow
+  short inc[max_inc];   // Skip,data,skip,data,...
+} tfast;                // Up to 1024x768
 
 struct _iscroll { // x10
   int on,painted;
@@ -745,14 +745,14 @@ struct _iscroll { // x10
   tfast * fast;
 };
 
-// Uso de la tabla fast:
+// Usage of the fast table:
 //   iscroll[snum].fast=(tfast*)malloc(iscroll[snum].al*sizeof(tfast));
 //   fast=iscroll[snum].fast;
 //   fast[n].nt; // iscroll[snum].iscan;
 
 GLOBAL struct _iscroll iscroll[10];
 
-GLOBAL int snum; // Variable para indicar sobre que scroll se trata
+GLOBAL int snum; // Indicates which scroll is being processed
 
 ///////////////////////////////////////////////////////////////////////////////
 // Dynamic system memory - Internal Struct
@@ -770,13 +770,13 @@ GLOBAL struct _divmalloc divmalloc[256];
 // Variables for palette control
 ///////////////////////////////////////////////////////////////////////////////
 
-GLOBAL byte * ghost; // Tabla de ghost layering
-GLOBAL byte * ghost_inicial; // Las primeras 256 medias de la tabla ghost
+GLOBAL byte * ghost; // Ghost blending table
+GLOBAL byte * ghost_inicial; // First 256 half-blends of the ghost table
 
-GLOBAL byte _r,_g,_b,find_col; // Cálculos sobre la paleta (tabla ghost)
+GLOBAL byte _r,_g,_b,find_col; // Palette calculations (ghost table)
 GLOBAL int find_min;
 
-GLOBAL byte last_c1;    // Ultimo color del font del sistema (en paleta cargada)
+GLOBAL byte last_c1;    // Last system font color (in loaded palette)
 
 ///////////////////////////////////////////////////////////////////////////////
 // Frame limiter
@@ -807,18 +807,18 @@ GLOBAL int buffer_an,buffer_al;         // Width & Height of buffer
 //////////////////////////////////////////////////////////////////////////////
 
 // char     8   header "fpg\x1a\x0d\x0a\x00\x00"
-// char   768   dac
-// char 16*36   gradients de color
+// char   768   dac (palette)
+// char 16*36   color gradients
 // --------------------- 1 ---------------------------
-// int      1   codigo	 del grafico (000-999)
-// int      1   longitud del grafico incluida cabezera
-// char    32   descripcion del grafico
-// char    12   nombre del fichero desde el que se creo
+// int      1   graphic code (000-999)
+// int      1   graphic length including header
+// char    32   graphic description
+// char    12   source file name it was created from
 // int      1   width
 // int      1   height
-// int      1   n - number of points
-// short  2*n   pooints {x,y}
-// char an*al   graphic data
+// int      1   n - number of control points
+// short  2*n   points {x,y}
+// char  w*h    graphic data
 // --------------------- N ---------------------------
 
 #ifdef DEBUG
@@ -828,22 +828,22 @@ GLOBAL int buffer_an,buffer_al;         // Width & Height of buffer
 //////////////////////////////////////////////////////////////////////////////
 
 #define v ventana[0]
-#define max_items 24    // Nº máximo de objetos en una ventana
-#define max_windows 8   // Nº máximo de ventanas
+#define max_items 24    // Maximum number of items in a window
+#define max_windows 8   // Maximum number of windows
 
 GLOBAL int big,big2; // big(0,1), big2(1,2)
 GLOBAL int mouse_graf;
 
-GLOBAL byte c0,c1,c2,c3,c4,text_color; // Colores del main_loop
-GLOBAL byte c01,c12,c23,c34; // Colores intermedios
+GLOBAL byte c0,c1,c2,c3,c4,text_color; // Main loop colors
+GLOBAL byte c01,c12,c23,c34; // Intermediate colors
 GLOBAL byte c_r,c_g,c_b,c_r_low,c_g_low,c_b_low;
 
 GLOBAL byte * mouse_background; // Buffer to save the mouse background
 
-GLOBAL byte * graf_ptr, * graf[256];    // Gráficos del main_loop
-GLOBAL byte * text_font; // Font estándar, 7 puntos de alto, ancho proporcional
+GLOBAL byte * graf_ptr, * graf[256];    // Main loop graphics
+GLOBAL byte * text_font; // Standard font, 7 pixels tall, proportional width
 
-GLOBAL int wmouse_x,wmouse_y; // Ratón dentro de una ventana
+GLOBAL int wmouse_x,wmouse_y; // Mouse position within a window
 GLOBAL int prev_mouse_buttons;
 
 typedef struct _t_item {
@@ -877,10 +877,10 @@ typedef struct _tventana {
   byte * ptr;                           // Window buffer
   int state;
   int redraw;                           // Needs-redraw flag
-  t_item item[max_items];        // Botones, gets, switches, etc...
-  int items;                            // Nº de objetos definidos
-  int active_item;                      // Cuando algún item produce un efecto
-  int selected_item;                    // El itemáseleccionado (para teclado)
+  t_item item[max_items];        // Buttons, gets, switches, etc.
+  int items;                            // Number of defined items
+  int active_item;                      // When an item triggers an effect
+  int selected_item;                    // Currently selected item (for keyboard)
 }tventana;
 
 GLOBAL tventana ventana[max_windows];
@@ -899,16 +899,16 @@ struct t_listbox{
   int created;          // Whether list is already created on screen
 };
 
-GLOBAL char * v_title;                  // Título de la ventana
-GLOBAL char * v_text;                   // Texto de la ventana
-GLOBAL int v_accept;                    // Acceptar / Cancelar
+GLOBAL char * v_title;                  // Window title
+GLOBAL char * v_text;                   // Window text
+GLOBAL int v_accept;                    // Accept / Cancel
 
 GLOBAL int end_dialog;
 
 GLOBAL int debugger_step,call_to_debug,process_stoped;
 
 //----------------------------------------------------------------------------
-//      Funciones de debug
+//      Debug functions
 //----------------------------------------------------------------------------
 
 void init_debug(void);
@@ -918,7 +918,7 @@ void init_colors(void);
 void init_big(void);
 
 //----------------------------------------------------------------------------
-//  Breakpoints en el debugger
+//  Debugger breakpoints
 //----------------------------------------------------------------------------
 
 #define max_breakpoint 32
@@ -937,7 +937,7 @@ GLOBAL int new_palette,new_mode;
 
 #endif
 
-GLOBAL int v_function;                  // Función en ejecución actualmente
+GLOBAL int v_function;                  // Currently executing function
 
 //----------------------------------------------------------------------------
 
@@ -962,7 +962,7 @@ void flush_buffer(void);
 
 //----------------------------------------------------------------------------
 
-GLOBAL int x0s,x1s,y0s,y1s;    // Región ocupada por un sprite al ser pintado
+GLOBAL int x0s,x1s,y0s,y1s;    // Region occupied by a sprite when painted
 
 //----------------------------------------------------------------------------
 
@@ -983,7 +983,7 @@ void set_mouse(int,int);
 extern int _mouse_x,_mouse_y;
 
 //-----------------------------------------------------------------------------
-// Funciones a implementar en DLL
+// Functions to be implemented in DLLs
 //-----------------------------------------------------------------------------
 
 // DLL_2
@@ -1039,13 +1039,13 @@ GLOBAL struct _packdir * packdir;
 
 GLOBAL byte * packptr;
 
-int validate_address(int dir); // Funcion para validate_address direcciones (0 si outbounds)
+int validate_address(int dir); // Validate addresses (0 if out of bounds)
 
 GLOBAL char divpath[PATH_MAX+1];
 GLOBAL unsigned divnum;
 
 //-----------------------------------------------------------------------------
-//  Modos de video
+//  Video modes
 //-----------------------------------------------------------------------------
 
 GLOBAL int vesa_version;
@@ -1053,7 +1053,7 @@ GLOBAL int vesa_version;
 void detect_vesa(void);
 
 //----------------------------------------------------------------------------
-//  Vuelca informacion en un fichero
+//  Dump information to a file
 //----------------------------------------------------------------------------
 
 void DebugInfo  (char *Msg);
@@ -1064,7 +1064,7 @@ void DebugData  (int Val);
 GLOBAL int demo;
 
 //----------------------------------------------------------------------------
-//      Mensajes de error en ejecución
+//      Runtime error messages
 //----------------------------------------------------------------------------
 
 void e(int texto);

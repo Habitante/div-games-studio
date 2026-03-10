@@ -1,6 +1,6 @@
 
 //-----------------------------------------------------------------------------
-//      Módulo de análisis de setup.cfg
+//      Setup.cfg configuration module
 //-----------------------------------------------------------------------------
 
 #include "global.h"
@@ -13,7 +13,7 @@ void cfg_show_mouse(void);
 void cfg_show_cursor(void);
 
 //-----------------------------------------------------------------------------
-//      Variables a nivel de módulo
+//      Module-level variables
 //-----------------------------------------------------------------------------
 
 int stnot_big;
@@ -116,7 +116,7 @@ void Vid_Setup3(void) {
 	v_title=(char *)texto[385];
     v_text =(char *)texto[386];
 //    show_dialog((voidReturnType)info0);
-    exit_requested=1; //Salida directa sin preguntar
+    exit_requested=1; // Direct exit without asking
     return_mode=2;
     
   }
@@ -187,7 +187,7 @@ void Get_Tapiz() {
 
 		if(v_exists) {
 
-			if ((f=fopen(full,"rb"))!=NULL) { // Se ha elegido uno
+			if ((f=fopen(full,"rb"))!=NULL) { // A file was selected
 
 			fseek(f,0,SEEK_END);
 			len=ftell(f);
@@ -356,15 +356,15 @@ void Tap_Setup0(void)
 }
 
 typedef struct _meminfo{
-        unsigned long Bloque_mas_grande_disponible; // largestáblock available
-        unsigned Maximo_de_paginas_desbloqueadas; // Maximum pages unblocked
-        unsigned Pagina_bloqueable_mas_grande; // Lockable larger page
+        unsigned long Bloque_mas_grande_disponible; // Largest block available
+        unsigned Maximo_de_paginas_desbloqueadas; // Maximum unlocked pages
+        unsigned Pagina_bloqueable_mas_grande; // Largest lockable page
         unsigned Espacio_de_direccionamiento_lineal; // Linear address space
         unsigned Numero_de_paginas_libres_disponibles; // Number of free pages available
         unsigned Numero_de_paginas_fisicas_libres; // Number of free physical pages
         unsigned Total_de_paginas_fisicas; // Total physical pages
         unsigned Espacio_de_direccionamiento_lineal_libre; // Free linear address space
-        unsigned Tamano_del_fichero_de_paginas; // File size pages
+        unsigned Tamano_del_fichero_de_paginas; // Page file size
         unsigned reserved[3];
 }meminfo;
 
@@ -488,7 +488,7 @@ void MemInfo0(void) {
 }
 
 //-----------------------------------------------------------------------------
-//  Ventana de configuración
+//  Configuration window
 //-----------------------------------------------------------------------------
 
 char color_cfg[12];
@@ -942,7 +942,7 @@ void resize_program(void) {
   v.al=(12+16)*big2+font_height*v_prg->al;
 
   if (v.an>vga_width) {
-    v.prg->an=(vga_width-12*big2)/font_width; // Calcula tamaño (en chr) maximizada
+    v.prg->an=(vga_width-12*big2)/font_width; // Calculate maximized size (in chars)
     v.an=(4+8)*big2+font_width*v.prg->an;
     ventana_aux.an=v.an;
   }
@@ -1006,7 +1006,7 @@ void wallpaper_thumb(void)
   free(x_wallpaper);
   x_wallpaper=NULL;
 
-  // Lo pinta en pantalla
+  // Draw it on screen
 
   thumb_pos=5*big2+(42*big2)*v.an;
 
@@ -1098,7 +1098,7 @@ void prepare_wallpaper_temp(void) {
     for (x=0,p=pal;x<256;x++,p+=3)
       x_cwallpaper[x]=fast_find_color(*p,*(p+1),*(p+2));
     p=temp; q=p+tap_an*tap_al;
-    do *p=x_cwallpaper[*p]; while (++p<q); // Lo adapta a la paleta actual
+    do *p=x_cwallpaper[*p]; while (++p<q); // Remap to the current palette
   } else {
     for (x=0,p=pal;x<256;x++,p+=3)
       x_cwallpaper[x]=wallpaper_gradient[(*p+*(p+1)+*(p+2))*2/3];
@@ -1110,7 +1110,7 @@ void prepare_wallpaper_temp(void) {
 
   if (Tap_mosaico) {
     x_wallpaper_width=vga_width; x_wallpaper_height=vga_height; x_wallpaper_map=x_wallpaper=p;
-    // Hace el mosaico
+    // Build the tiled mosaic
 
     for(y=0; y<vga_height; y++)
     {

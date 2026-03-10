@@ -1,6 +1,6 @@
 
 //-----------------------------------------------------------------------------
-//      Módulo de operaciones sobre el dac o paleta
+//      Palette (DAC) operations module
 //-----------------------------------------------------------------------------
 
 #include "global.h"
@@ -18,7 +18,7 @@ void rescalar(byte *si,int sian,int sial,byte *di,int dian,int dial);
 
 
 
-//Prototipos de funciones de cargar paleta del fichero: DIVFORMA.CPP
+// Prototypes for palette loading functions from DIVFORMA.CPP
 
 extern int exp_Color0,exp_Color1,exp_Color2;
 
@@ -31,26 +31,26 @@ int cargadac_FPG(char *name);
 int cargadac_PAL(char *name);
 
 //-----------------------------------------------------------------------------
-//      Variables globales del módulo
+//      Module global variables
 //-----------------------------------------------------------------------------
 
-struct t_tpuntos { // Para la creación de la tabla ghost
+struct t_tpuntos { // For ghost table creation
   int r,g,b;
   struct t_tpuntos * next;
 } tpuntos[256];
 
-struct t_tpuntos * vcubos[512]; // Para la creación de la tabla ghost
+struct t_tpuntos * vcubos[512]; // For ghost table creation
 
-byte _r,_g,_b,find_col; // Cálculos sobre la paleta
+byte _r,_g,_b,find_col; // Palette calculations
 
-int find_min; // Cálculo del color más próximo
+int find_min; // Nearest color calculation
 
 byte paleta[768];
 
 int num_puntos;
 
 //-----------------------------------------------------------------------------
-//      Busca los colores c0..c4 del main_loop
+//      Find the environment colors c0..c4 for main_loop
 //-----------------------------------------------------------------------------
 
 void find_colors(void) {
@@ -98,7 +98,7 @@ void find_colors(void) {
 }
 
 //-----------------------------------------------------------------------------
-//      Funciones para la creación de la tabla ghost
+//      Ghost table creation functions
 //-----------------------------------------------------------------------------
 
 void init_ghost(void) {
@@ -125,7 +125,7 @@ void init_ghost(void) {
 }
 
 //-----------------------------------------------------------------------------
-//      Función de búsqueda rápida de un color
+//      Fast color lookup function
 //      WARNING: create_dac4() must be called before this function
 //-----------------------------------------------------------------------------
 
@@ -138,13 +138,13 @@ byte fast_find_color(byte fr,byte fg,byte fb) {
   find_min=65536;
   num_puntos=0;
 
-  // Cubos de distancia sqr(0) --------------------------------------------
+  // Distance cubes sqr(0) --------------------------------------------
 
   create_ghost_vc(vcubo);
 
   if (num_puntos>1) goto fast_find;
 
-  // Cubos de distancia sqr(1) --------------------------------------------
+  // Distance cubes sqr(1) --------------------------------------------
 
   if (r3>0) create_ghost_vc(vcubo-64);
   if (r3<7*64) create_ghost_vc(vcubo+64);
@@ -155,7 +155,7 @@ byte fast_find_color(byte fr,byte fg,byte fb) {
 
   if (num_puntos>2) goto fast_find;
 
-  // Cubos de distancia sqr(2) --------------------------------------------
+  // Distance cubes sqr(2) --------------------------------------------
 
   if (r3>0) {
     if (g3>0) create_ghost_vc(vcubo-64-8);
@@ -179,7 +179,7 @@ byte fast_find_color(byte fr,byte fg,byte fb) {
 }
 
 //-----------------------------------------------------------------------------
-//      Función para la creación de la tabla ghost
+//      Ghost table creation function
 //-----------------------------------------------------------------------------
 
 void create_ghost(int puntos) {
@@ -202,13 +202,13 @@ void create_ghost(int puntos) {
       find_min=65536;
       num_puntos=0;
 
-      // Cubos de distancia sqr(0) --------------------------------------------
+      // Distance cubes sqr(0) --------------------------------------------
 
       create_ghost_vc(vcubo);
 
       if (num_puntos>1) goto fast_ghost;
 
-      // Cubos de distancia sqr(1) --------------------------------------------
+      // Distance cubes sqr(1) --------------------------------------------
 
       if (r3>0) create_ghost_vc(vcubo-64);
       if (r3<7*64) create_ghost_vc(vcubo+64);
@@ -219,7 +219,7 @@ void create_ghost(int puntos) {
 
       if (num_puntos>2) goto fast_ghost;
 
-      // Cubos de distancia sqr(2) --------------------------------------------
+      // Distance cubes sqr(2) --------------------------------------------
 
       if (r3>0) {
         if (g3>0) create_ghost_vc(vcubo-64-8);
@@ -282,7 +282,7 @@ void create_ghost_slow (void) {
 }
 
 //-----------------------------------------------------------------------------
-//      Saca dac4[] de dac[]
+//      Generate dac4[] from dac[]
 //-----------------------------------------------------------------------------
 
 void create_dac4(void) {
@@ -291,7 +291,7 @@ void create_dac4(void) {
 }
 
 //-----------------------------------------------------------------------------
-//      Busca un color (r,g,b) en la paleta (búsqueda completa)
+//      Find a color (r,g,b) in the palette (full search)
 //      WARNING: create_dac4() must be called before this function
 //-----------------------------------------------------------------------------
 
@@ -332,7 +332,7 @@ byte find_color_not0(byte r,byte g,byte b) {
 }
 
 //-----------------------------------------------------------------------------
-//      Función de ordenación de la paleta
+//      Palette sorting function
 //-----------------------------------------------------------------------------
 
 void ord_paleta0(void) {
@@ -434,7 +434,7 @@ byte find_ord(byte * dac) {
 }
 
 //-----------------------------------------------------------------------------
-//      Media de dos colores (cálculo exacto)
+//      Average of two colors (exact calculation)
 //-----------------------------------------------------------------------------
 
 byte average_color(byte a,byte b) {
@@ -449,7 +449,7 @@ byte average_color(byte a,byte b) {
 }
 
 //-----------------------------------------------------------------------------
-//      Calcula que colores de la gradient son los más cercanos a cada RGB
+//      Calculate which gradient colors are nearest to each RGB
 //-----------------------------------------------------------------------------
 
 void make_nearest_gradient(void) {
@@ -468,31 +468,31 @@ void make_nearest_gradient(void) {
 }
 
 //-----------------------------------------------------------------------------
-//      Calcula los colores intermedios de la gradient de colores
+//      Calculate the intermediate colors of a color gradient
 //-----------------------------------------------------------------------------
 
 void calculate_gradient(int n) {
 
   int a;
 
-  if (!gradients[n].fixed) { // Las gradients fijas no se pueden do_calculate
+  if (!gradients[n].fixed) { // Fixed gradients cannot be recalculated
     switch(gradients[n].type) {
-      case 0: // Lineal, el cálculo es obvio, se toman los colores en secuencia
+      case 0: // Linear, straightforward: colors taken in sequence
         for (a=1;a<32;a++) gradients[n].colors[a+1]=gradients[n].colors[a]+1;
         break;
-      case 1: // Adaptable cada 1 color, no hay nada que do_calculate
+      case 1: // Adaptive every 1 color, nothing to calculate
         break;
-      case 2: // Adaptable cada 2 colores, se rellenan con las medias
+      case 2: // Adaptive every 2 colors, fill with averages
         for (a=0;a<32;a+=2)
           gradients[n].colors[a+1]=average_color(gradients[n].colors[a],gradients[n].colors[a+2]);
         break;
-      case 4: // Adaptable cada 4
+      case 4: // Adaptive every 4
         for (a=0;a<32;a+=4) {
           gradients[n].colors[a+2]=average_color(gradients[n].colors[a],gradients[n].colors[a+4]);
           gradients[n].colors[a+1]=average_color(gradients[n].colors[a],gradients[n].colors[a+2]);
           gradients[n].colors[a+3]=average_color(gradients[n].colors[a+2],gradients[n].colors[a+4]);
         } break;
-      case 8: // Adaptable cada 8
+      case 8: // Adaptive every 8
         for (a=0;a<32;a+=8) {
           gradients[n].colors[a+4]=average_color(gradients[n].colors[a],gradients[n].colors[a+8]);
           gradients[n].colors[a+2]=average_color(gradients[n].colors[a],gradients[n].colors[a+4]);
@@ -515,7 +515,7 @@ int hay_mapas(void) {
 
 char PalName[_MAX_PATH+1]="";
 
-#define max_archivos 512 // ------------------------------- Listbox de archivos
+#define max_archivos 512 // ------------------------------- File listbox
 extern struct t_listboxbr larchivosbr;
 extern t_thumb thumb[max_archivos];
 extern int num_taggeds;
@@ -685,7 +685,7 @@ void SaveAsPal()
 }
 
 //-----------------------------------------------------------------------------
-//      Refresca todo el main_loop tras cambiar una paleta
+//      Refresh the entire environment after a palette change
 //-----------------------------------------------------------------------------
 void ReloadFont(int ventana, struct tventana *vntn);
 
@@ -720,17 +720,17 @@ void RefPalAndDlg(int no_tocar_mapas,int guardar_original)
   byte xlat[768];
   int tal=24*big2,tan=41*big2;
 
-  // Se comprueba si la paleta nueva es diferente
+  // Check if the new palette is different
 
   x=0; sum=0; do { sum+=abs((int)dac[x]-(int)dac4[x]); } while (++x<768);
   if (!sum) { x=0; do dac4[x]=dac[x]*4; while (++x<768); return; }
 
-  // ************** Libera los thumbnails de los FPG
+  // ************** Free FPG thumbnails
 
   for (m=0;m<max_windows;m++) if (ventana[m].type==101) {
     MiFPG=(FPG *)ventana[m].aux;
 
-    // Libera thumbnails de FPG
+    // Free FPG thumbnails
     for(n=0; n<1000; n++)
     {
       if(MiFPG->thumb[n].ptr!=NULL) free(MiFPG->thumb[n].ptr);
@@ -742,7 +742,7 @@ void RefPalAndDlg(int no_tocar_mapas,int guardar_original)
   memcpy(pal,dac,768);
   memcpy(dac,dac4,768);
 
-  // *** Adapta los mapas viejos a la nueva paleta
+  // *** Remap existing graphics to the new palette
 
   create_dac4();
   xlat[0]=0;
@@ -851,7 +851,7 @@ void RefPalAndDlg(int no_tocar_mapas,int guardar_original)
 
   create_dac4();
 
-  // Adapta las gamas de color definidas por el usuario
+  // Adapt user-defined color gradients to the new palette
 
   create_gradient_colors(Setupfile.gradient_config,wallpaper_gradient);
 
@@ -889,7 +889,7 @@ void RefPalAndDlg(int no_tocar_mapas,int guardar_original)
 }
 
 //-----------------------------------------------------------------------------
-//      Ordenar paleta
+//      Sort palette
 //-----------------------------------------------------------------------------
 
 int ordenacion=0;
@@ -976,7 +976,7 @@ void ordena2(void){
 }
 
 void ordena0(void){
-  v.type=1; // Diálogo
+  v.type=1; // Dialog
   v.state=0;
   v.an=65*2+7;
   v.al=65*2+31;
@@ -1004,7 +1004,7 @@ void sort_palette(void) {
 }
 
 //-----------------------------------------------------------------------------
-//      Fusión de dos paletas diferentes
+//      Merge two different palettes
 //-----------------------------------------------------------------------------
 
 // byte paleta[768]
@@ -1066,15 +1066,15 @@ void merge_palette(void){
   } create_dac4();
 }
 
-// Toma dos paletas (una en dac y otra en dac4) y devuelve la mezcla en dac4
+// Takes two palettes (one in dac, one in dac4) and returns the merged result in dac4
 
 void fusionar_paletas(void){
-  byte pal[2048]; // Dos paletas en formato R,G,B,sum(RGB),R,G,B,sum(RGB)...
+  byte pal[2048]; // Two palettes in R,G,B,sum(RGB) format
   word paleta[512];
   int dist[512];
   int n,c,min,cmin=0;
 
-  // paleta vieja en dac, nueva en dac4
+  // Old palette in dac, new palette in dac4
 
   n=0; do {
     pal[n*4+3]=(pal[n*4]=dac[n*3])+(pal[n*4+1]=dac[n*3+1])+(pal[n*4+2]=dac[n*3+2]);
@@ -1084,7 +1084,7 @@ void fusionar_paletas(void){
     pal[1024+n*4+3]=(pal[1024+n*4]=dac4[n*3])+(pal[1024+n*4+1]=dac4[n*3+1])+(pal[1024+n*4+2]=dac4[n*3+2]);
   } while (++n<256);
 
-  // pal[2048] preparado con { R,G,B,SUM }
+  // pal[2048] prepared with { R,G,B,SUM }
 
   r=0; g=0; b=0; pal[c0*4]=255; paleta[0]=c0;
   n=1; do {
@@ -1093,13 +1093,13 @@ void fusionar_paletas(void){
     pal[c*4]=255; paleta[n]=c;
   } while (++n<512);
 
-  // Restaura pal
+  // Restore pal
 
   for (n=0;n<512;n++) {
     pal[n*4]=pal[n*4+3]-(pal[n*4+1]+pal[n*4+2]);
   }
 
-  // paleta[512] con los colores ordenados
+  // paleta[512] with colors sorted
 
   for (n=1;n<511;n++) {
     dist[n]=*(int*)(color_lookup+pal[paleta[n]*4]*256+pal[paleta[n+1]*4]*4);
@@ -1107,18 +1107,18 @@ void fusionar_paletas(void){
     dist[n]+=*(int*)(color_lookup+pal[paleta[n]*4+2]*256+pal[paleta[n+1]*4+2]*4);
   }
 
-  // Dist con las distancias entre todos los colores consecutivos
+  // dist[] with distances between all consecutive colors
 
   c=511; while (c>255) {
 
     min=64*64*64;
-    for (n=1;n<c;n++) { // Busca la distancia mínima de todas
+    for (n=1;n<c;n++) { // Find the minimum distance
       if (dist[n]<min) {
         cmin=n; min=dist[n];
       }
     }
 
-    // paleta[cmin],paleta[cmin+1] colores a fusionar
+    // paleta[cmin],paleta[cmin+1] are the colors to merge
 
     r=(pal[paleta[cmin]*4]+pal[paleta[cmin+1]*4])/2;
     g=(pal[paleta[cmin]*4+1]+pal[paleta[cmin+1]*4+1])/2;
@@ -1157,15 +1157,15 @@ void fusionar_paletas(void){
 }
 
 //-----------------------------------------------------------------------------
-//  Creación de una paleta a partir de una muestra de colores
+//  Create a palette from a color sample
 //
-//  Entradas: muestra[]
-//      Se requiere un puntero a una tabla RGB (32x32x32 bytes) con valores
-//      0 o 1 (según ese color esté presente o no en la muestra)
+//  Input: muestra[]
+//      Pointer to an RGB table (32x32x32 bytes) with values
+//      0 or 1 (whether that color is present in the sample or not)
 //
-//  Salidas: apply_palette[] muestra[]
-//      La paleta resultante y en la tabla original se han sustituido los
-//      valores a 1 por el correspondiente color de la paleta
+//  Output: apply_palette[] muestra[]
+//      The resulting palette; in the original table, values of 1 have been
+//      replaced with the corresponding palette color index
 //-----------------------------------------------------------------------------
 
 byte * muestra;   // 32768
@@ -1197,19 +1197,19 @@ word new_find_ord(byte * dac) {
 }
 
 void crear_paleta(void){
-  byte * pal; // Una lista de colores en formato R,G,B,sum(RGB),R,G,B,sum(RGB)..
+  byte * pal; // Color list in R,G,B,sum(RGB) format
   word * paleta;
   int * dist;
   int rr,gg,bb,n;
   int c,min,cmin=0;
   byte col;
 
-  // Cuenta el número de colores y genera pal[]
+  // Count colors and generate pal[]
 
   if ((pal=(byte*)malloc(32768*4))==NULL) return;
 
-  muestra[0]=1;                 // El color negro siempre se incluye
-  muestra[(31*32+31)*32+31]=1;  // El color blanco idem
+  muestra[0]=1;                 // Black is always included
+  muestra[(31*32+31)*32+31]=1;  // White is always included
 
   for (num_colores=0,n=0,rr=0;rr<32;rr++) for (gg=0;gg<32;gg++) for (bb=0;bb<32;bb++,n++) {
     if (muestra[n]) {
@@ -1223,7 +1223,7 @@ void crear_paleta(void){
   if ((paleta=(word*)malloc(num_colores*2+10))==NULL) { free(pal); return; }
   if ((dist=(int*)malloc(num_colores*4+10))==NULL) { free(paleta); free(pal); return; }
 
-  // pal[num_colores] preparado con { R,G,B,0 }
+  // pal[num_colores] prepared with { R,G,B,0 }
 
   r=0; g=0; b=0; pal[0]+=128; paleta[0]=0;
   n=1; do {
@@ -1233,13 +1233,13 @@ void crear_paleta(void){
     pal[c*4]+=128; paleta[n]=c;
   } while (++n<num_colores);
 
-  // Restaura pal
+  // Restore pal
 
   for (n=0;n<num_colores;n++) {
     if (pal[n*4]>=128) pal[n*4]-=128;
   }
 
-  // paleta[num_colores] con los colores ordenados
+  // paleta[num_colores] with colors sorted
 
   for (n=0;n<num_colores-1;n++) {
     dist[n]=*(int*)(color_lookup+pal[paleta[n]*4]*256+pal[paleta[n+1]*4]*4);
@@ -1247,20 +1247,20 @@ void crear_paleta(void){
     dist[n]+=*(int*)(color_lookup+pal[paleta[n]*4+2]*256+pal[paleta[n+1]*4+2]*4);
   }
 
-  // Dist con las distancias entre todos los colores consecutivos
+  // dist[] with distances between all consecutive colors
 
   c=num_colores-1; while (c>255) {
 
     if (!cargar_paleta) if ((c&127)==0) Progress((char *)texto[497],num_colores*2+num_colores-c,num_colores*4-256);
 
     min=64*64*64;
-    for (n=0;n<c;n++) { // Busca la distancia mínima de todas
+    for (n=0;n<c;n++) { // Find the minimum distance
       if (dist[n]<min) {
         cmin=n; min=dist[n];
       }
     }
 
-    // paleta[cmin+1] color a eliminar
+    // paleta[cmin+1] is the color to eliminate
 
     if (c-cmin>0) {
       memmove(&paleta[cmin+1],&paleta[cmin+2],sizeof(word)*(c-cmin));
@@ -1363,11 +1363,11 @@ void prepare_wallpaper(void) {
 
   free(temp2); memcpy(pal,dac4,768); create_dac4();
 
-  if (!Setupfile.Desktop_Gama) { // Si el fichero se muestra a color
+  if (!Setupfile.Desktop_Gama) { // If the file is displayed in color
     for (x=0,p=pal;x<256;x++,p+=3)
       cwallpaper[x]=fast_find_color(*p,*(p+1),*(p+2));
     p=temp; q=p+tap_an*tap_al;
-    do *p=cwallpaper[*p]; while (++p<q); // Lo adapta a la paleta actual
+    do *p=cwallpaper[*p]; while (++p<q); // Remap to the current palette
   } else {
     for (x=0,p=pal;x<256;x++,p+=3)
       cwallpaper[x]=wallpaper_gradient[(*p+*(p+1)+*(p+2))*2/3];
@@ -1410,7 +1410,7 @@ void rescalar(byte *si,int sian,int sial,byte *di,int dian,int dial) {
 }
 
 //-----------------------------------------------------------------------------
-//      Funciones de edición de la paleta
+//      Palette editing functions
 //-----------------------------------------------------------------------------
 
 char Valores[72*1];
@@ -1551,7 +1551,7 @@ int an=v.an/big2,al=v.al/big2;
                         switch(Accion)
                         {
                                 case 1:
-                                        //Degradar
+                                        //Gradient fill
                                         if(SelColor>cColor)
                                         {
                                                 cIni=cColor;
@@ -1583,7 +1583,7 @@ int an=v.an/big2,al=v.al/big2;
                                         set_dac(dac);
                                         break;
                                 case 2:
-                                        //Copiar                                        
+                                        //Copy
                                         dac[cColor*3]=dac[SelColor*3];
                                         dac[cColor*3+1]=dac[SelColor*3+1];
                                         dac[cColor*3+2]=dac[SelColor*3+2];                                        
@@ -1594,7 +1594,7 @@ int an=v.an/big2,al=v.al/big2;
                                         set_dac(dac);
                                         break;
                                 case 3:
-                                        //Intercambiar
+                                        //Swap
                                         bWork=dac[SelColor*3];
                                         dac[SelColor*3]=dac[cColor*3];
                                         dac[cColor*3]=bWork;
@@ -1661,7 +1661,7 @@ int an=v.an/big2,al=v.al/big2;
                 }
         }
 
-        //Barras de desplazamiento
+        //Scrollbars
         if(lRed.zone!=sRed)
         {
                 sRed=lRed.zone;
@@ -1783,7 +1783,7 @@ int an=v.an/big2,al=v.al/big2;
                                 end_dialog=1;
                                 break;
                         case 2:                                
-                                //Deshace
+                                //Undo
                                 memcpy(dac,paleta,768);
 
                                 find_colors();
@@ -1795,7 +1795,7 @@ int an=v.an/big2,al=v.al/big2;
 
                                 boton(4,an/2,al-13,1,c0);
 
-                                //refresca valores y barras
+                                //Refresh values and scrollbars
                                 wbox(v.ptr,an,al,c2,130,63-21,25,20);
                                 wwrite(v.ptr,an,al,147,63-21,0,texto[143],c3);
                                 sprintf(cWork,"%02d",dac[SelColor*3]);
@@ -1820,7 +1820,7 @@ int an=v.an/big2,al=v.al/big2;
 
 void InterPal0(void)
 {
-        v.type=1; // Diálogo
+        v.type=1; // Dialog
         v.an=220-46-7;
         v.al=163+24-16;
         v.title=texto[138];
@@ -1837,7 +1837,7 @@ void InterPal0(void)
 }
 
 //-----------------------------------------------------------------------------
-//	Funciones propias del menú de paleta
+//	Palette menu functions
 //-----------------------------------------------------------------------------
 
 void EditPal()

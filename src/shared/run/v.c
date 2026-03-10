@@ -56,7 +56,7 @@ int SDL_ToggleFS(SDL_Surface *surface)
 
 #define MAX_YRES 2048
 
-short scan[MAX_YRES*4]; // Por scan [x,an,x,an] se definen hasta 2 segmentos a volcar
+short scan[MAX_YRES*4]; // Per scanline [x,width,x,width] up to 2 blit segments
 
 struct {
   byte dot;
@@ -79,20 +79,20 @@ struct {
 };
 
 //-----------------------------------------------------------------------------
-//      Tabla ghost
+//      Ghost (transparency) table
 //-----------------------------------------------------------------------------
 
-struct t_tpuntos { // Para la creación de la tabla ghost
+struct t_tpuntos { // For building the ghost table
   int r,g,b;
   struct t_tpuntos * next;
 } tpuntos[256];
 
-struct t_tpuntos * vcubos[512]; // Para la creación de la tabla ghost
+struct t_tpuntos * vcubos[512]; // For building the ghost table
 
 extern int fli_palette_update;
 
 //----------------------------------------------------------------------------
-// Función para poner la paleta
+// Function to set the palette
 //----------------------------------------------------------------------------
 
 byte color_oscuro;
@@ -212,7 +212,7 @@ void fade_wait(void) {
 }
 
 //-----------------------------------------------------------------------------
-//      Set Video Mode (vga_width y vga_height se definen en shared.h)
+//      Set Video Mode (vga_width and vga_height are defined in shared.h)
 //-----------------------------------------------------------------------------
 
 int LinealMode;
@@ -277,7 +277,7 @@ SDL_ShowCursor(SDL_DISABLE);
   LinealMode=0;
   modovesa=0;
 
-  // Comprueba primero si es un modo vesa
+  // First check if it's a VESA mode
 
   for (n=0;n<num_video_modes;n++) {
     if (vga_width==video_modes[n].width && vga_height==video_modes[n].height) {
@@ -614,13 +614,13 @@ int save_MAP (byte * mapa, int an, int al, FILE * f) {
   char cwork[32]="";
   char gradients[576];
 
-  fwrite("map\x1a\x0d\x0a\x00\x00",8,1,f);      // +000 Cabecera y version
-  fwrite(&an,2,1,f);                   // +008 Ancho
-  fwrite(&al,2,1,f);                   // +010 Alto
-  y=1; fwrite(&y,4,1,f);// +012 Código
+  fwrite("map\x1a\x0d\x0a\x00\x00",8,1,f);      // +000 Header and version
+  fwrite(&an,2,1,f);                   // +008 Width
+  fwrite(&al,2,1,f);                   // +010 Height
+  y=1; fwrite(&y,4,1,f);// +012 Code
 
-  fwrite(cwork,32,1,f);// +016 Descripcion
-  fwrite(paleta,768,1,f);                          // +048 Paleta
+  fwrite(cwork,32,1,f);// +016 Description
+  fwrite(paleta,768,1,f);                          // +048 Palette
 
   for (y=0;y<16;y++) {
     gradients[y*36]=16;
@@ -628,15 +628,15 @@ int save_MAP (byte * mapa, int an, int al, FILE * f) {
     gradients[y*36+2]=0;
     gradients[y*36+3]=0;
     memset(&gradients[y*36+4],y*16,32);
-  } fwrite(gradients,1,sizeof(gradients),f);            // +816 Reglas de color
+  } fwrite(gradients,1,sizeof(gradients),f);            // +816 Color rules
 
-  y=0; fwrite(&y,2,1,f);                     // +1392 Numero de puntos
+  y=0; fwrite(&y,2,1,f);                     // +1392 Number of control points
   fwrite(mapa,an*al,1,f);
   return(0);
 }
 
 //-----------------------------------------------------------------------------
-//      Restauración parcial del fondo a la copia
+//      Partial background restore to the framebuffer copy
 //-----------------------------------------------------------------------------
 
 void restore(byte *q, byte *p) {
@@ -659,7 +659,7 @@ void restore(byte *q, byte *p) {
 }
 
 //-----------------------------------------------------------------------------
-//      Volcado en el modo 320x200
+//      Blit in 320x200 mode
 //-----------------------------------------------------------------------------
 
 void blit_partial_320x200(byte *p) {
@@ -686,7 +686,7 @@ void blit_full_320x200(byte *p) {
 }
 
 //-----------------------------------------------------------------------------
-//      Volcado en SVGA
+//      Blit in SVGA mode
 //-----------------------------------------------------------------------------
 
 void blit_partial_svga(byte *p) {
@@ -755,7 +755,7 @@ void blit_full_svga(byte *p) {
 }
 
 //-----------------------------------------------------------------------------
-//      Volcado en un modo-x
+//      Blit in Mode-X
 //-----------------------------------------------------------------------------
 
 void blit_partial_modex(byte * p) {
@@ -797,7 +797,7 @@ void blit_full_modex(byte * p) {
 }
 
 //-----------------------------------------------------------------------------
-//      Subrutinas de blit_screen genéricas
+//      Generic blit_screen subroutines
 //-----------------------------------------------------------------------------
 
 void vgacpy(byte * q, byte * p, int n) {
@@ -813,7 +813,7 @@ void vgacpy(byte * q, byte * p, int n) {
 }
 
 //-----------------------------------------------------------------------------
-//      Selecciona una ventana para su posterior blit_screen
+//      Mark a window region for subsequent blit_screen
 //-----------------------------------------------------------------------------
 
 void init_flush(void) {
@@ -838,59 +838,59 @@ void blit_partial(int x,int y,int an,int al) {
 
     if (!modovesa) {
       switch(vga_width*1000+vga_height) {
-        case 320240: case 320400: case 360240: case 360360: case 376282: // Modos X
+        case 320240: case 320400: case 360240: case 360360: case 376282: // Mode-X modes
           x>>=2; xmax>>=2; an=xmax-x+1; break;
       }
     }
 
     while (y<=ymax) { n=y*4;
-      if (scan[n+1]==0) {         // Caso 1, el scan estaba vacío ...
+      if (scan[n+1]==0) {         // Case 1: scanline was empty ...
         scan[n]=x; scan[n+1]=an;
-      } else if (scan[n+3]==0) {  // Caso 2, ya hay un scan definido ...
-        if (x>scan[n]+scan[n+1] || x+an<scan[n]) { // ... hueco entre medias
+      } else if (scan[n+3]==0) {  // Case 2: one segment already defined ...
+        if (x>scan[n]+scan[n+1] || x+an<scan[n]) { // ... gap in between
           if (x>scan[n]) {
             scan[n+2]=x; scan[n+3]=an;
           } else {
             scan[n+2]=scan[n]; scan[n+3]=scan[n+1];
             scan[n]=x; scan[n+1]=an;
           }
-        } else { // ... no hay hueco, amplia el primer scan
+        } else { // ... no gap, extend the first segment
           if (x<(x2=scan[n])) scan[n]=x;
           if (x+an>x2+scan[n+1]) scan[n+1]=x+an-scan[n];
           else scan[n+1]=x2+scan[n+1]-scan[n];
         }
-      } else {                    // Caso 3, hay 2 scanes definidos ...
+      } else {                    // Case 3: two segments already defined ...
         if (x<=scan[n]+scan[n+1] && x+an>=scan[n+2]) {
-          // Caso 3.1, se tapa el hueco anterior -> queda un solo scan
+          // Case 3.1: fills the gap -> merges into a single segment
           if (x<scan[n]) scan[n]=x;
           if (x+an>scan[n+2]+scan[n+3]) scan[n+1]=x+an-scan[n]; else scan[n+1]=scan[n+2]+scan[n+3]-scan[n];
           scan[n+2]=0; scan[n+3]=0;
         } else {
-          if (x>scan[n]+scan[n+1] || x+an<scan[n]) { // No choca con 1-
-            if (x>scan[n+2]+scan[n+3] || x+an<scan[n+2]) { // No choca con 2-
-              // Caso 3.4, el nuevo no colisiona con ninguno, se calcula el espacio
-              // hasta ambos, y se fusiona con el más cercano
+          if (x>scan[n]+scan[n+1] || x+an<scan[n]) { // No overlap with 1st
+            if (x>scan[n+2]+scan[n+3] || x+an<scan[n+2]) { // No overlap with 2nd
+              // Case 3.4: no overlap with either, calculate distance
+              // to both and merge with the nearest
               if (x+an<scan[n]) d1=scan[n]-(x+an); else d1=x-(scan[n]+scan[n+1]);
               if (x+an<scan[n+2]) d2=scan[n+2]-(x+an); else d2=x-(scan[n+2]+scan[n+3]);
               if (d1<=d2) {
-                // Caso 3.4.1 se fusiona con el primero
+                // Case 3.4.1: merge with the first segment
                 if (x<(x2=scan[n])) scan[n]=x;
                 if (x+an>x2+scan[n+1]) scan[n+1]=x+an-scan[n];
                 else scan[n+1]=x2+scan[n+1]-scan[n];
               } else {
-                // Caso 3.4.2 se fusiona con el segundo
+                // Case 3.4.2: merge with the second segment
                 if (x<(x2=scan[n+2])) scan[n+2]=x;
                 if (x+an>x2+scan[n+3]) scan[n+3]=x+an-scan[n+2];
                 else scan[n+3]=x2+scan[n+3]-scan[n+2];
               }
             } else {
-              // Caso 3.3, el nuevo colisiona con el 2-, se fusionan
+              // Case 3.3: overlaps with the 2nd segment, merge them
               if (x<(x2=scan[n+2])) scan[n+2]=x;
               if (x+an>x2+scan[n+3]) scan[n+3]=x+an-scan[n+2];
               else scan[n+3]=x2+scan[n+3]-scan[n+2];
             }
           } else {
-            // Caso 3.2, el nuevo colisiona con el 1-, se fusionan
+            // Case 3.2: overlaps with the 1st segment, merge them
             if (x<(x2=scan[n])) scan[n]=x;
             if (x+an>x2+scan[n+1]) scan[n+1]=x+an-scan[n];
             else scan[n+1]=x2+scan[n+1]-scan[n];
@@ -902,7 +902,7 @@ void blit_partial(int x,int y,int an,int al) {
 }
 
 //-----------------------------------------------------------------------------
-//      Funciones para la creación de la tabla ghost
+//      Functions for building the ghost (transparency) table
 //-----------------------------------------------------------------------------
 
 void init_ghost(void) {
@@ -927,7 +927,7 @@ void init_ghost(void) {
 }
 
 //-----------------------------------------------------------------------------
-//      Función para la creación de la tabla ghost
+//      Function for building the ghost table
 //-----------------------------------------------------------------------------
 
 int rr,gg,bb;
@@ -958,13 +958,13 @@ void create_ghost(void) {
       find_min=65536;
       num_puntos=0;
 
-      // Cubos de distancia sqr(0) --------------------------------------------
+      // Distance cubes sqr(0) ------------------------------------------------
 
       create_ghost_vc(vcubo);
 
       if (num_puntos>1) goto fast_ghost;
 
-      // Cubos de distancia sqr(1) --------------------------------------------
+      // Distance cubes sqr(1) ------------------------------------------------
 
       if (r3>0) create_ghost_vc(vcubo-64);
       if (r3<7*64) create_ghost_vc(vcubo+64);
@@ -975,7 +975,7 @@ void create_ghost(void) {
 
       if (num_puntos>2) goto fast_ghost;
 
-      // Cubos de distancia sqr(2) --------------------------------------------
+      // Distance cubes sqr(2) ------------------------------------------------
 
       if (r3>0) {
         if (g3>0) create_ghost_vc(vcubo-64-8);
@@ -1043,7 +1043,7 @@ void create_ghost_slow (void) {
   find_col=(color-dac4)/3;
 }
 
-void find_color(byte r, byte g,byte b) { // Encuentra un color (que no sea el 0)
+void find_color(byte r, byte g,byte b) { // Find a color (excluding index 0)
 
   int dmin,dif;
   byte *pal,*endpal,*color=NULL;

@@ -42,7 +42,7 @@ void mouse_off (void) {
 }
 
 //-----------------------------------------------------------------------------
-//      Define la región de movimiento del ratón (pantalla completa)
+//      Define the mouse movement region (full screen)
 //-----------------------------------------------------------------------------
 
 void mouse_window(void) {
@@ -116,7 +116,7 @@ void readmouse(void) {
   m_x+=(float)ix/(1.0+((float)mouse->speed/3.0));
   m_y+=(float)iy/(1.0+((float)mouse->speed/3.0));
 
-  // Control del ratón con el teclado
+  // Keyboard-driven mouse control
 
   if (mouse->cursor&1) {
 

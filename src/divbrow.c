@@ -1,6 +1,6 @@
 
 //-----------------------------------------------------------------------------
-//      Módulo que contiene el código de los handler de ventanas thumbnail
+//      Thumbnail browser window handlers
 //-----------------------------------------------------------------------------
 
 #include "global.h"
@@ -26,9 +26,9 @@ void show_thumb(struct t_listboxbr * l, int num);
 #define incremento_maximo 6553600
 int incremento=incremento_maximo;
 
-int opc_img[8]={0,0,1,1,0,1,1,1}; // imagenes on/off en ventanas (v_type)
+int opc_img[8]={0,0,1,1,0,1,1,1}; // thumbnails on/off per window type (v_type)
                                   // 2-MAP, 3-PAL, 5-FNT, 6-IFS, 7-PCM
-int opc_pru=0; // Prueba de sonido on/off para sonidos y musicas
+int opc_pru=0; // Sound preview on/off for sounds and music
 char input2[32];
 byte color_tag;
 int num_taggeds;
@@ -44,11 +44,11 @@ Mix_Chunk * smp=NULL;
 #endif
 
 //-----------------------------------------------------------------------------
-//      Variables del módulo
+//      Module variables
 //-----------------------------------------------------------------------------
 
 /*struct t_listboxbr{
-  int x,y;              // Posición del listbox en la ventana
+  int x,y;              // Listbox position in the window
   char * list;         // List pointer
   int item_width;       // Characters per item
   int columns;          // Number of columns in browser listbox
@@ -57,7 +57,7 @@ Mix_Chunk * smp=NULL;
 
   int first_visible;    // First visible item index (from 0)
   int max_items;        // Total item count (0 n/a)
-  int s0,s1,slide;      // Posición inicial, final y actual de la "slide bar"
+  int s0,s1,slide;      // Start, end and current position of the slide bar
   int zone;             // Selected zone
   int buttons;          // Pressed button: up(1) or down(2)
   int created;          // Whether list is already created on screen
@@ -85,13 +85,13 @@ struct t_listbox lextbr={40,121,ext,an_ext,4,28};
 #define alto_br  180
 
 //-----------------------------------------------------------------------------
-//  Estructura para guardar las reducciones de los mapas
+//  Structure to store map thumbnail reductions
 //-----------------------------------------------------------------------------
 
 t_thumb thumb[max_archivos];
 
 //-----------------------------------------------------------------------------
-//  Estructura de sonido WAV
+//  WAV sound structure
 //-----------------------------------------------------------------------------
 
 struct _WAV_info {
@@ -100,7 +100,7 @@ struct _WAV_info {
 } WAV_info;
 
 //-----------------------------------------------------------------------------
-//  Prototipos
+//  Prototypes
 //-----------------------------------------------------------------------------
 
 void analyze_input(void);
@@ -137,7 +137,7 @@ FILE *fifs;
 void load_letter(uint8_t letra);
 
 //-----------------------------------------------------------------------------
-//  Imprime la ruta del directorio o fichero actual
+//  Print the current directory or file path
 //-----------------------------------------------------------------------------
 
 int wbox_ancho;
@@ -166,7 +166,7 @@ void print_path_br(void) {
 }
 
 //-----------------------------------------------------------------------------
-//  Crea los thumbnail
+//  Create thumbnails
 //-----------------------------------------------------------------------------
 
 int _omx,_omy,omx,omy,oclock=0;
@@ -270,7 +270,7 @@ void create_thumb_MAP(struct t_listboxbr * l){
         fclose(f);
       } else { estado=0; thumb[num].status=-1; }
       return;
-    } else if (estado==2 && thumb[num].status!=thumb[num].filesize) { // Se continúa leyendo un thumbnail
+    } else if (estado==2 && thumb[num].status!=thumb[num].filesize) { // Continue reading a thumbnail
 
       if ((f=fopen(l->list+(l->item_width*num),"rb"))!=NULL) {
         fseek(f,thumb[num].status,SEEK_SET);
@@ -293,7 +293,7 @@ void create_thumb_MAP(struct t_listboxbr * l){
 
     }
 
-    // Y ahora crea el thumbnail si el fichero se cargó ya completo
+    // Now create the thumbnail if the file is fully loaded
 
     if (estado==2 && thumb[num].status==thumb[num].filesize &&
         abs(_omx-mouse_x)+abs(_omy-mouse_y)+mouse_b+ascii==0) {
@@ -332,14 +332,14 @@ void create_thumb_MAP(struct t_listboxbr * l){
           create_dac4();
           for (n=0;n<256;n++) xlat[n]=fast_find_color(pal[n*3],pal[n*3+1],pal[n*3+2]);
 
-          if (man<=51*big2 && mal<=31*big2) { // El grafico se deja tal cual
+          if (man<=51*big2 && mal<=31*big2) { // Graphic fits as-is
 
             thumb[num].an=man; thumb[num].al=mal;
             for (n=thumb[num].an*thumb[num].al-1;n>=0;n--) {
               temp[n]=xlat[temp[n]];
             } thumb[num].ptr=(char *)temp;
 
-          } else { // Crea el thumbnail
+          } else { // Create the thumbnail
 
             coefredx=man/((float)51*2*(float)big2);
             coefredy=mal/((float)31*2*(float)big2);
@@ -367,7 +367,7 @@ void create_thumb_MAP(struct t_listboxbr * l){
                 } a+=coefredy;
               }
 
-              // Aplica la tabla xlat[] al thumbnail
+              // Apply the xlat[] table to the thumbnail
 
               for (n=thumb[num].an*thumb[num].al-1;n>=0;n--) {
                 temp2[n]=xlat[temp2[n]];
@@ -451,7 +451,7 @@ void create_thumb_PAL(struct t_listboxbr * l)
     if (estado==0) { num=-1; return; }
 	strcpy(filename,l->list+(l->item_width*num));
 	strupr(filename);
-    // Se comienza a leer un nuevo thumbnail
+    // Start reading a new thumbnail
     if (!strcmp(strchr(filename,'.'),".FPG"))
       tipo=1;
     else if(!strcmp(strchr(filename,'.'),".FNT"))
@@ -491,12 +491,12 @@ void create_thumb_PAL(struct t_listboxbr * l)
       return;
     }
 
-    // Copia paleta a pal, restaura dac4 y crea paleta en xlat a partir de pal
+    // Copy palette to pal, restore dac4 and create xlat lookup from pal
     memcpy(pal,dac4,768);
     create_dac4();
     for (n=0;n<256;n++) xlat[n]=fast_find_color(pal[n*3],pal[n*3+1],pal[n*3+2]);
 
-    // Crea el thumbnail de la paleta
+    // Create the palette thumbnail
     thumb[num].an = 32*big2;
     thumb[num].al = 16*big2;
     if ((thumb[num].ptr=(char *)malloc((thumb[num].an*thumb[num].al)))==NULL)
@@ -650,7 +650,7 @@ void create_thumb_FNT(struct t_listboxbr * l)
       fclose(f);
     }
 
-    // Se continúa leyendo un thumbnail
+    // Continue reading a thumbnail
     else if (estado==2 && thumb[num].status!=thumb[num].filesize)
     {
       if ((f=fopen(l->list+(l->item_width*num),"rb"))==NULL)
@@ -689,7 +689,7 @@ void create_thumb_FNT(struct t_listboxbr * l)
       return;
     }
 
-    // Now create the thumbnail if the file is complete ó Loaded
+    // Now create the thumbnail if the file is fully loaded
     if (estado==2 && thumb[num].status==thumb[num].filesize &&
         abs(_omx-mouse_x)+abs(_omy-mouse_y)+mouse_b+ascii==0)
     {
@@ -753,7 +753,7 @@ void create_thumb_FNT(struct t_listboxbr * l)
 
       if (TamaX>101*big2 || TamaY>22*big2)
       {
-        // Crea el thumbnail
+        // Create the thumbnail
         coefredx = TamaX/((float)101*2*(float)big2);
         coefredy = TamaY/((float)22*2*(float)big2);
         if(coefredx>coefredy) coefredy=coefredx;
@@ -863,7 +863,7 @@ void create_thumb_IFS(struct t_listboxbr * l)
       return;
     }
 
-    // Se comienza a leer un nuevo thumbnail
+    // Start reading a new thumbnail
     if ((fifs=fopen(l->list+(l->item_width*num),"rb"))==NULL)
     {
       thumb[num].status=-1;
@@ -996,7 +996,7 @@ void create_thumb_PCM(struct t_listboxbr * l)
 
     if (estado==0) { num=-1; return; }
 
-    // Se comienza a leer un nuevo thumbnail
+    // Start reading a new thumbnail
     if (estado==1)
     {
 #ifdef NOTYET
@@ -1078,7 +1078,7 @@ void create_thumb_PCM(struct t_listboxbr * l)
       fclose(f);
     }
 
-    // Se continúa leyendo un thumbnail
+    // Continue reading a thumbnail
     else if (estado==2 && thumb[num].status!=thumb[num].filesize)
     {
       if ((f=fopen(l->list+(l->item_width*num),"rb"))==NULL)
@@ -1117,13 +1117,13 @@ void create_thumb_PCM(struct t_listboxbr * l)
       return;
     }
 
-    // Y ahora crea el thumbnail si el fichero se cargó ya completo
+    // Now create the thumbnail if the file is fully loaded
     if (estado==2 && thumb[num].status==thumb[num].filesize &&
         abs(_omx-mouse_x)+abs(_omy-mouse_y)+mouse_b+ascii==0)
     {
       thumb[num].status=0;
 
-// Comienzo de conversion
+// Start of conversion
 
       if(IsWAV(l->list+(l->item_width*num)))
       {
@@ -1175,7 +1175,7 @@ void create_thumb_PCM(struct t_listboxbr * l)
         free(thumb[num].ptr);
         thumb[num].ptr=NULL;
 
-        //Paso 1 de 16 a 8
+        // Step 1: convert 16-bit to 8-bit
         if((MyHeadDC.dwAvgBytesPerSec/MyHeadDC.dwSamplePerSec)/MyHeadDC.wChannels==2)
         {
                 length/=2;
@@ -1186,7 +1186,7 @@ void create_thumb_PCM(struct t_listboxbr * l)
                   thumb[num].status=-1;
                   return;
                 }
-                //printf("16 a 8 ...\n");
+                //printf("16 to 8 ...\n");
                 for(x=0;x<length;x++) {
                         BufferOut[x]=0x80+(BuffAux[x]>>8);
                 }
@@ -1194,7 +1194,7 @@ void create_thumb_PCM(struct t_listboxbr * l)
                 BufferIn=BufferOut;
         }
 
-        //Paso 2 de Estereo a mono
+        // Step 2: convert stereo to mono
         if(MyHeadDC.wChannels==2)
         {
                 length/=2;
@@ -1216,7 +1216,7 @@ void create_thumb_PCM(struct t_listboxbr * l)
         thumb[num].filesize = length;
       }
 
-// Fin de conversion
+// End of conversion
 
       thumb[num].an = 51*big2;
       thumb[num].al = 24*big2;
@@ -1263,7 +1263,7 @@ void create_thumb_PCM(struct t_listboxbr * l)
       else
       {
         step=(float)thumb[num].filesize/(float)thumb[num].an;
-        //printf("Pintando ...\n");
+        //printf("Drawing ...\n");
         for(x=0;x<thumb[num].an;x++)
         {
 
@@ -1335,7 +1335,7 @@ void load_letter(uint8_t letra) {
 }
 
 //-----------------------------------------------------------------------------
-//  Muestra un thumbnail en la ventana
+//  Display a thumbnail in the window
 //-----------------------------------------------------------------------------
 
 void show_thumb(struct t_listboxbr * l, int num) {
@@ -1388,13 +1388,13 @@ void show_thumb(struct t_listboxbr * l, int num) {
 }
 
 //-----------------------------------------------------------------------------
-//  Codigo principal del browser
+//  Browser main code
 //-----------------------------------------------------------------------------
 
 void browser0(void) {
   unsigned n,m,x;
 
-  v.type=1; // Diálogo
+  v.type=1; // Dialog
   v.title=(byte *)v_text;
   v_thumb=v_type;
 
@@ -1438,7 +1438,7 @@ void browser0(void) {
   v.click_handler=browser2;
   v.close_handler=browser3;
 
-  lextbr.total_items=0; n=0; // Crea la lista de extensiones
+  lextbr.total_items=0; n=0; // Create the list of extensions
 
   if (v_type==2 && v_mode>0) v_type=14;
   if (v_type==7 && v_mode>0) v_type=11;
@@ -1470,7 +1470,7 @@ void browser0(void) {
   _dos_setdrive(toupper(*tipo[v_type].path)-'A'+1,&n);
   chdir(tipo[v_type].path);
 
-  open_dir_br(); // Crea la lista de ficheros y directorios
+  open_dir_br(); // Create file and directory lists
 
   if (v_mode==1) *input=0;
   if (v_mode==2) strcpy(input,input2);
@@ -1478,7 +1478,7 @@ void browser0(void) {
   larchivosbr.created=0; ldirectoriosbr.created=0;
   lunidadesbr.created=0; lextbr.created=0;
 
-  n=0; while (drives[n]) { // Crea la lista de drives <X:>
+  n=0; while (drives[n]) { // Create the drive list <X:>
     *(unidad+an_unidad*n)='<'; *(unidad+an_unidad*n+1)=drives[n];
     *(unidad+an_unidad*n+2)=':'; *(unidad+an_unidad*n+3)='>';
     *(unidad+an_unidad*n+4)=0; n++;
@@ -1523,7 +1523,7 @@ void browser1(void) {
 
   _show_items(); print_path_br();
 
-  wwrite(v.ptr,an,al,77, 20,0,texto[127],c3); // Archivos
+  wwrite(v.ptr,an,al,77, 20,0,texto[127],c3); // Files
   wwrite(v.ptr,an,al, 3, 20,0,texto[128],c3);
 
   if(v_thumb) {
@@ -1885,7 +1885,7 @@ void open_dir_br(void) {
 }
 
 //-----------------------------------------------------------------------------
-//  Crea la ventana de listbox tipo browser
+//  Create the browser-style listbox window
 //-----------------------------------------------------------------------------
 
 void paint_listbox_br(struct t_listboxbr * l) {
@@ -1904,7 +1904,7 @@ void paint_listbox_br(struct t_listboxbr * l) {
         wbox(ptr,an,al,c01,l->x+(x*(l->an+1))+1,l->y+(y*(l->al+1))+1+l->al-8,l->an,8);
     }
 
-  if (wmouse_in(l->x,l->y,(l->an+1)*l->columns,(l->al+1)*l->lines)) { // Calcula zona
+  if (wmouse_in(l->x,l->y,(l->an+1)*l->columns,(l->al+1)*l->lines)) { // Calculate zone
     l->zone=((mouse_x-v.x)/big2-l->x)/(l->an+1)+(((mouse_y-v.y)/big2-l->y)/(l->al+1))*l->columns;
     if (l->zone>=l->total_items-l->first_visible || l->zone>=l->lines*l->columns) l->zone=1;
     else l->zone+=10;
@@ -1969,7 +1969,7 @@ void create_listbox_br(struct t_listboxbr * l) {
 }
 
 //-----------------------------------------------------------------------------
-//  Actualiza el listbox del browser
+//  Update the browser listbox
 //-----------------------------------------------------------------------------
 
 void update_listbox_br(struct t_listboxbr * l) {
@@ -1977,7 +1977,7 @@ void update_listbox_br(struct t_listboxbr * l) {
   int an=v.an/big2,al=v.al/big2;
   int n,old_zona=l->zone,x,y;
 
-  if (wmouse_in(l->x,l->y,(l->an+1)*l->columns,(l->al+1)*l->lines)) { // Calcula zona
+  if (wmouse_in(l->x,l->y,(l->an+1)*l->columns,(l->al+1)*l->lines)) { // Calculate zone
     l->zone=(wmouse_x-l->x)/(l->an+1)+((wmouse_y-l->y)/(l->al+1))*l->columns;
     if (l->zone>=l->total_items-l->first_visible || l->zone>=l->lines*l->columns) l->zone=1;
     else l->zone+=10;
@@ -1986,7 +1986,7 @@ void update_listbox_br(struct t_listboxbr * l) {
   else if (wmouse_in(l->x+(l->an+1)*l->columns,l->y+9,9,(l->al+1)*l->lines-17)) l->zone=4;
   else l->zone=0;
 
-  if (old_zona!=l->zone) if (old_zona>=10) { // Desmarca zona
+  if (old_zona!=l->zone) if (old_zona>=10) { // Unhighlight zone
     x=l->x+1+((old_zona-10)%l->columns)*(l->an+1);
     y=l->y+l->al+((old_zona-10)/l->columns)*(l->al+1);
     p=(byte *)l->list+l->item_width*(l->first_visible+old_zona-10);
@@ -2044,7 +2044,7 @@ void update_listbox_br(struct t_listboxbr * l) {
     if (n!=l->slide) { l->slide=n; paint_slider_br(l); v.redraw=1; }
   }
 
-  if (old_zona!=l->zone) if (l->zone>=10) { // Marca zona
+  if (old_zona!=l->zone) if (l->zone>=10) { // Highlight zone
     x=l->x+1+((l->zone-10)%l->columns)*(l->an+1);
     y=l->y+l->al+((l->zone-10)/l->columns)*(l->al+1);
     p=(byte *)l->list+l->item_width*(l->first_visible+l->zone-10);

@@ -30,15 +30,16 @@ confirm zero warnings. Current baseline: **0 warnings** (Sprint A completed 2026
 
 ---
 
-## Recommended next session: Sprint H (translate Spanish comments to English)
+## Recommended next session: Sprint E (unsafe strings) or Sprint I (file splitting)
 
-**All naming sprints complete so far:** Sprint D (single-letter globals), Sprint F (331
-function renames), Sprint G (~131 global + struct field renames). The identifiers are now
-largely English. The biggest remaining readability barrier is the ~3,663 lines of Spanish
-comments across 47 files.
+**All naming + comment sprints complete:** Sprint D (single-letter globals), Sprint F (331
+function renames), Sprint G (~131 global + struct field renames), Sprint H (~3,170 Spanish
+comments → English across 34 files). The codebase is now predominantly English.
 
-**After Sprint H:** Sprint E (unsafe strings), Sprint I (file splitting), then the
-deferred high-occurrence renames (copia, ventana, texto).
+**Next priorities:**
+- Sprint E: Convert unsafe strcpy/sprintf/strcat to safe helpers (top 6 files, ~770 calls)
+- Sprint I: Split the 3 monster files (divc.c, div.c, divpaint.c) along natural boundaries
+- Sprint J: Rename deferred high-occurrence globals (copia, ventana, texto)
 
 ---
 
@@ -143,29 +144,15 @@ Completed: ~131 identifier renames across 8 batches, 44 files, ~6,900 line chang
 
 ---
 
-### Sprint H: Translate Spanish comments to English
+### Sprint H: Translate Spanish comments to English ✅ DONE (2026-03-10)
 
-**Goal:** Translate ~3,663 lines of Spanish comments across 47 files to English.
-
-**Top targets by Spanish comment density:**
-| File | Spanish comment lines | % of file |
-|------|-----------------------|-----------|
-| divc.c | 777 | 9% |
-| runtime/f.c | 295 | 6% |
-| global.h | 273 | — |
-| runtime/debug/d.c | 269 | — |
-| divedit.c | 264 | 7% |
-| div.c | 252 | 5% |
-| divpaint.c | 203 | 4% |
-| divhandl.c | 196 | 5% |
-
-**Rules:**
-- Translate the meaning, don't transliterate (e.g., "pone el color" → "set the color",
-  not "puts the color")
-- Keep the same comment style (// or /* */) and position
-- Don't add comments where none exist — only translate existing ones
-- This sprint is highly parallelizable: each file is independent
-- One agent per file, build after each file
+Completed: ~3,170 Spanish comment lines translated to English across 34 files.
+20+ parallel agents, 3 batches. Top files by translation volume:
+- divc.c (~120 translations across 3 section agents)
+- d.c (217), divedit.c (187), divpaint.c (~100+), f.c (~85)
+- divhandl.c (~70+), div.c (~65), global.h (55), divhelp.c (55)
+- inter.h (~120), ia.c (~50), s.c (~45), divbasic.c (37)
+- Plus 21 smaller files with 1-30 translations each
 
 ---
 

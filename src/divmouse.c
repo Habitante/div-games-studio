@@ -1,6 +1,6 @@
 
 //-----------------------------------------------------------------------------
-//      Módulo de acceso al ratón
+//      Mouse access module
 //-----------------------------------------------------------------------------
 
 #include "global.h"
@@ -20,7 +20,7 @@ int div_started = 0;
 
 
 //-----------------------------------------------------------------------------
-//      Comprueba si el ratón está en una caja
+//      Check if the mouse is inside a box
 //-----------------------------------------------------------------------------
 
 int mouse_in(int x, int y, int x2, int y2) {
@@ -102,7 +102,7 @@ void read_mouse(void) {
 	}
 
 
-	} else if (draw_mode<100 && hotkey && !help_paint_active) { // Las teclas están solo activas en edición
+	} else if (draw_mode<100 && hotkey && !help_paint_active) { // Keys are only active in edit mode
 
 		if (!(shift_status&4)) {
 

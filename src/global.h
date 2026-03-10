@@ -19,7 +19,7 @@
 //      Global Variables
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifdef DEFINIR_AQUI // DEFINED HERE
+#ifdef DEFINIR_AQUI // Defined here
 #define GLOBAL_DATA
 #else
 #define GLOBAL_DATA extern
@@ -90,7 +90,7 @@ void call(const voidReturnType func); // void funcion(void); int n=(int)funcion;
 //unsigned int
 
 
-#define max_archivos 512 // ------------------------------- Listbox de archivos
+#define max_archivos 512 // ------------------------------- File listbox
 #define an_archivo (255)
 #define max_directorios 2048
 #define an_directorio (255)
@@ -269,15 +269,15 @@ typedef struct _SetupFile{
 
         // Video mode
         int Vid_mode;
-        int Vid_modeAncho; // video mode width
-        int Vid_modeAlto;  // video mode height
-        int Vid_modeBig;   // "big" video mode
+        int Vid_modeAncho; // Video mode width
+        int Vid_modeAlto;  // Video mode height
+        int Vid_modeBig;   // "Big" video mode
 
         // Undo system
         int Max_undo;
         int Undo_memory;
 
-        // Sistema de Directorios
+        // Directory system
         char Dir_cwd[_MAX_PATH+1];
         char Dir_map[_MAX_PATH+1];
         char Dir_pal[_MAX_PATH+1];
@@ -352,7 +352,7 @@ GLOBAL_DATA int VS_HEIGHT;
 GLOBAL_DATA int VS_BIG;
 void Vid_Setup0();
 
-// Configuracion de Tapiz
+// Wallpaper configuration
 void Tap_Setup0(void);
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -473,58 +473,58 @@ void GenExplodes();
 
 ///////////////////////////////////////////////////////////////////////////////
 //      Global variables shared between several modules
-//      Las variables GLOBAL_DATA se definen en DIVOS, el resto solo las declara
+//      GLOBAL_DATA variables are defined in DIVOS, the rest only declare them
 ///////////////////////////////////////////////////////////////////////////////
 
 GLOBAL_DATA int big,big2; // big(0,1), big2(1,2)
 
 GLOBAL_DATA byte * error_window;
 
-GLOBAL_DATA int map_width, map_height; // Dimensiones del mapa editado
-GLOBAL_DATA int vga_width,vga_height; // Modo de video (id vga_width*1000+vga_height, ej.320200)
+GLOBAL_DATA int map_width, map_height; // Dimensions of the edited map
+GLOBAL_DATA int vga_width,vga_height; // Video mode (id vga_width*1000+vga_height, e.g. 320200)
 GLOBAL_DATA int vwidth,vheight; // Window Screen Size
 
-GLOBAL_DATA int fpg_code;            //Codigo del mapa
-GLOBAL_DATA char MapDescription[32]; //Descripcion del mapa
+GLOBAL_DATA int fpg_code;            // Map code
+GLOBAL_DATA char MapDescription[32]; // Map description
 
 GLOBAL_DATA byte * wallpaper; // Background graphic for the window main_loop
-GLOBAL_DATA byte * wallpaper_map; // Inicio del bitmap (wallpaper_width,wallpaper_height)
-GLOBAL_DATA byte * fill_dac; // Valores a 1 para los colores que puedan estar en la zona
-GLOBAL_DATA byte * map; // Mapa editado (el dibujo, no el main_loop)
+GLOBAL_DATA byte * wallpaper_map; // Start of bitmap data (wallpaper_width,wallpaper_height)
+GLOBAL_DATA byte * fill_dac; // Set to 1 for colors that may be in the fill zone
+GLOBAL_DATA byte * map; // Edited map (the drawing, not the main_loop)
 GLOBAL_DATA int * selection_mask; // Edited map (bitmap for zone selection)
-GLOBAL_DATA byte * ghost; // Tabla ghost-layering para la paleta del objeto editado
-GLOBAL_DATA byte * dac; // Paleta del objeto editado
-GLOBAL_DATA byte * dac4; // Paleta con rangos 0..255
+GLOBAL_DATA byte * ghost; // Ghost-layering table for the edited object's palette
+GLOBAL_DATA byte * dac; // Palette of the edited object
+GLOBAL_DATA byte * dac4; // Palette with 0..255 range
 
 GLOBAL_DATA word sel_mask_x0,sel_mask_x1,sel_mask_y0,sel_mask_y1; // Bounds of zone selected in selection_mask
 
 // int r,g,b,c,d,a removed (Sprint D) — replaced with local variables or file-static in divpalet.c
 // FILE *f removed (Sprint D) — all usages now use local declarations
 
-GLOBAL_DATA byte c0,c1,c2,c3,c4,text_color; // Colores del main_loop
-GLOBAL_DATA byte c01,c12,c23,c34; // Colores intermedios
+GLOBAL_DATA byte c0,c1,c2,c3,c4,text_color; // IDE environment colors
+GLOBAL_DATA byte c01,c12,c23,c34; // Intermediate colors
 GLOBAL_DATA byte c_r,c_g,c_b,c_r_low,c_g_low,c_b_low,c_y;
 GLOBAL_DATA byte c_com,c_sim,c_res,c_pre,c_num,c_lit;
 
 GLOBAL_DATA int highlight_background;
 
-GLOBAL_DATA byte mask[256]; // Máscara para divpaint
+GLOBAL_DATA byte mask[256]; // Paint mask for divpaint
 GLOBAL_DATA int mask_on;
 
 extern int hotkey;
 
 GLOBAL_DATA int wallpaper_width,wallpaper_height;
 
-GLOBAL_DATA int mouse_x,mouse_y,mouse_b,mouse_graf; // Ratón
+GLOBAL_DATA int mouse_x,mouse_y,mouse_b,mouse_graf; // Mouse
 GLOBAL_DATA int real_mouse_x,real_mouse_y;
 
-GLOBAL_DATA int prev_mouse_buttons; // ¿Cual era el valor del raton la última vez?
+GLOBAL_DATA int prev_mouse_buttons; // Previous mouse button state
 
-GLOBAL_DATA byte * color_lookup; // Diferencias elevadas al color_lookuprado para la paleta
+GLOBAL_DATA byte * color_lookup; // Squared differences table for palette color matching
 
 GLOBAL_DATA int * system_clock, cclock, mclock;
 
-GLOBAL_DATA byte * copia; // Copia virtual de pantalla (del main_loop)
+GLOBAL_DATA byte * copia; // Virtual screen copy (IDE framebuffer)
 
 GLOBAL_DATA SDL_Surface *copia_surface;
 GLOBAL_DATA	SDL_Surface *tempsurface;
@@ -536,27 +536,27 @@ GLOBAL_DATA uint32_t colorkey;
 GLOBAL_DATA uint32_t rmask, gmask, bmask, amask;
 GLOBAL_DATA byte explode_num;
 
-GLOBAL_DATA byte * undo; // Copias del mapa editado (para deshacer, NULL si falta memoria)
+GLOBAL_DATA byte * undo; // Copies of edited map (for undo, NULL if out of memory)
 GLOBAL_DATA byte * toolbar; // Paint editor toolbar buffer
 
 GLOBAL_DATA int undo_error;
 
-GLOBAL_DATA int coord_x,coord_y; // Coordenadas sobre el mapa en edición
+GLOBAL_DATA int coord_x,coord_y; // Coordinates on the map being edited
 
-GLOBAL_DATA int zoom,zoom_x,zoom_y; // Zoom activo en edición (zoom=0..3)
+GLOBAL_DATA int zoom,zoom_x,zoom_y; // Active zoom in editor (zoom=0..3)
 
 GLOBAL_DATA int zoom_win_x,zoom_win_y,zoom_win_width,zoom_win_height; // Zoom window in screen copy
 
-GLOBAL_DATA int zoom_background; // Si se ha pintado el fondo de la ventana de zoom
+GLOBAL_DATA int zoom_background; // Whether the zoom window background has been drawn
 
-GLOBAL_DATA int need_zoom; // Indica si es necesario volver a volcar el zoom de map
+GLOBAL_DATA int need_zoom; // Whether the map zoom needs to be redrawn
 GLOBAL_DATA int need_zoom_x,need_zoom_y,need_zoom_width,need_zoom_height;
 
-GLOBAL_DATA int zoom_cx,zoom_cy; // Centro lógico del zoom
+GLOBAL_DATA int zoom_cx,zoom_cy; // Logical center of the zoom
 
 GLOBAL_DATA int _mouse_x,_mouse_y;
 
-GLOBAL_DATA byte color,old_color,color_c0; // Color/es seleccionado/s
+GLOBAL_DATA byte color,old_color,color_c0; // Selected color(s)
 
 //GLOBAL_DATA 
 struct callback_data {
@@ -571,17 +571,17 @@ extern struct callback_data cbd;
 //GLOBAL_DATA 
 struct tipo_regla{
   byte num_colors;  // 8,16,32
-  byte type;    // 0 (lineal), 1-2-4-8 (adaptable cada n colores)
-  byte fixed;    // 0 (No), 1 (Sí)
+  byte type;    // 0 (linear), 1-2-4-8 (adaptive every n colors)
+  byte fixed;    // 0 (No), 1 (Yes)
   byte colors[33]; // Black(c0) + Up to 32 colors per (num_colors,type)
 };
 
 
 GLOBAL_DATA struct tipo_regla gradients[16];
 
-GLOBAL_DATA int gradient; // Numero de gradient (gama de color) seleccionada
+GLOBAL_DATA int gradient; // Selected gradient (color range) number
 
-GLOBAL_DATA byte nearest_gradient[190]; // El color de la gradient más cercano a cada RGB
+GLOBAL_DATA byte nearest_gradient[190]; // Nearest gradient color for each RGB
 
 GLOBAL_DATA int toolbar_x,toolbar_y,toolbar_width; // Paint toolbar position
 
@@ -589,7 +589,7 @@ GLOBAL_DATA int draw_mode; // Drawing mode (0=pencil,1=lines,2=bezier, ...) (+10
 
 GLOBAL_DATA byte * mouse_background; // Buffer to save the mouse background
 
-GLOBAL_DATA byte * graf_ptr, * graf[256];    // Gráficos del main_loop
+GLOBAL_DATA byte * graf_ptr, * graf[256];    // IDE environment graphics
 
 //GLOBAL_DATA 
 struct tgraf_help {
@@ -599,19 +599,19 @@ struct tgraf_help {
   byte * ptr;
 };
 
-GLOBAL_DATA struct tgraf_help graf_help[384];  // Gráficos del hipertexto (inicio,an,al,ptr)
-GLOBAL_DATA char help_xlat[256];               // Para convertir los gráficos de la ayuda
+GLOBAL_DATA struct tgraf_help graf_help[384];  // Hypertext graphics (offset,width,height,ptr)
+GLOBAL_DATA char help_xlat[256];               // Translation table for help graphics
 
-GLOBAL_DATA byte * text_font; // Font estándar, 7 puntos de alto, ancho proporcional
+GLOBAL_DATA byte * text_font; // Standard font, 7 pixels tall, proportional width
 
 GLOBAL_DATA SDL_Color colors[256];
 
-GLOBAL_DATA byte * font; // Font para el editor de programas / hipertexto
-GLOBAL_DATA int font_width,font_height; // Ancho y alto de los carácteres
-GLOBAL_DATA int editor_font_width,editor_font_height; // Ancho y alto de los carácteres
+GLOBAL_DATA byte * font; // Font for the program editor / hypertext
+GLOBAL_DATA int font_width,font_height; // Character width and height
+GLOBAL_DATA int editor_font_width,editor_font_height; // Editor character width and height
 GLOBAL_DATA int char_size; // font_width*font_height
 
-GLOBAL_DATA int current_mouse; // Dibujo del ratón
+GLOBAL_DATA int current_mouse; // Mouse cursor graphic
 
 //GLOBAL_DATA 
 struct tipo_undo {               // Circular undo table
@@ -623,31 +623,31 @@ GLOBAL_DATA struct tipo_undo *undo_table;
 
 GLOBAL_DATA int undo_index; // Index into undo_table[], first free element
 
-GLOBAL_DATA int zoom_move; // Indica (con c3, c4) si se autodesplaza el zoom (paint)
+GLOBAL_DATA int zoom_move; // Whether zoom auto-scrolls (paint) (uses c3, c4)
 
-GLOBAL_DATA int sel_status; // Indica si pinta sobre copia alguna seleccion
-GLOBAL_DATA int sel_x0, sel_x1, sel_y0, sel_y1; // Para selecciones tipo caja
+GLOBAL_DATA int sel_status; // Whether any selection is drawn on screen copy
+GLOBAL_DATA int sel_x0, sel_x1, sel_y0, sel_y1; // Box-type selection bounds
 
-// *** Trama de fill_stack : x0, x1, x, y, inc_y (10 bytes)
+// *** Fill stack layout: x0, x1, x, y, inc_y (10 bytes)
 
 GLOBAL_DATA word * fss, * fsp, * fsp_max; // Fill stack segment, Fill stack pointer
 GLOBAL_DATA byte * original;
 
-GLOBAL_DATA int bar[16]; // Dibujo de la barra
+GLOBAL_DATA int bar[16]; // Toolbar graphics
 
-GLOBAL_DATA int mode_rect; // Indica si pintamos rectángulos o cajas
-GLOBAL_DATA int mode_circle; // Indica si pintamos círculos o redondeles
-GLOBAL_DATA int mode_fill; // Indica el algoritmo usado para los rellenos
-GLOBAL_DATA int mode_selection; // Indica el modo de seleccionar una zona
-GLOBAL_DATA int selected_icon; // (barra) -1 si no hay selec. ninguno, 0-zoom, ...
+GLOBAL_DATA int mode_rect; // Whether to draw rectangles or filled boxes
+GLOBAL_DATA int mode_circle; // Whether to draw circles or filled circles
+GLOBAL_DATA int mode_fill; // Fill algorithm mode
+GLOBAL_DATA int mode_selection; // Selection mode
+GLOBAL_DATA int selected_icon; // (toolbar) -1 if none selected, 0-zoom, ...
 
-GLOBAL_DATA int full_redraw; // Indica si se ha modificado toda la copia de vga
+GLOBAL_DATA int full_redraw; // Whether the entire VGA screen copy has been modified
 
-GLOBAL_DATA byte * texto[max_textos]; // Textos de salida, en formato traducible
+GLOBAL_DATA byte * texto[max_textos]; // Output text strings, in translatable format
 
-GLOBAL_DATA int wmouse_x,wmouse_y; // Ratón dentro de una ventana
+GLOBAL_DATA int wmouse_x,wmouse_y; // Mouse position within a window
 
-#define max_items 24    // Nº máximo de objetos en una ventana
+#define max_items 24    // Maximum number of items in a window
 
 //GLOBAL_DATA 
 struct t_item {
@@ -674,31 +674,31 @@ struct t_item {
 
 //GLOBAL_DATA 
 struct tventana {
-  int type;                             // 0-none, 1-show_dialog, 2-menu, 3-paleta
-                                        // 4-timer, 5-papelera, 7-barra_progreso
+  int type;                             // 0-none, 1-show_dialog, 2-menu, 3-palette
+                                        // 4-timer, 5-trash, 7-progress_bar
                                         // 8-mixer
-                                        // 100-map (>=100 objetos excluibles)
+                                        // 100-map (>=100 excludable objects)
                                         // 101-fpg 102-prg-gen_fnt-hlp 104-fnt
-                                        // 105-pcm 106-map3D 107-modulo de musica
+                                        // 105-pcm 106-map3D 107-music module
   int order;                            // Window z-order
   int foreground;                     // 0-No, 1-Yes, 2-Minimized
   byte * name;                        // Icon name
   byte * title;                       // Title bar text
   voidReturnType paint_handler,click_handler,close_handler;
-  int x,y,an,al;                        // Posición y dimensiones de la ventana
-  int _x,_y,_an,_al;                    // Posición salvada al minimizarse
-  byte * ptr;                           // Buffer de la ventana
-  struct tmapa * mapa;                  // Puntero a otro struct tipo mapa
-  struct tprg * prg;                    // Puntero a otro struct tipo prg
+  int x,y,an,al;                        // Window position and dimensions
+  int _x,_y,_an,_al;                    // Position saved when minimized
+  byte * ptr;                           // Window buffer
+  struct tmapa * mapa;                  // Pointer to associated map struct
+  struct tprg * prg;                    // Pointer to associated program struct
   int redraw;                           // Needs-redraw flag
   int state;                           // Button/item state
   int buttons;                         // Pressed buttons bitmask
-  byte * aux;                           // Puntero auxiliar para chorradas varias
-  struct t_item item[max_items];        // Botones, gets, switches, etc...
-  int items;                            // Nº de objetos definidos
-  int active_item;                      // Cuando algún item produce un efecto
-  int selected_item;                    // El itemáseleccionado (para teclado)
-  int lado;                             // 0 Derecha, 1 Izquierda (autoemplazar con doble click)
+  byte * aux;                           // Auxiliary pointer for miscellaneous data
+  struct t_item item[max_items];        // Buttons, gets, switches, etc.
+  int items;                            // Number of defined items
+  int active_item;                      // Which item triggered an action
+  int selected_item;                    // Currently selected item (for keyboard)
+  int lado;                             // 0 Right, 1 Left (auto-place on double-click)
   int exploding;
 	
 };
@@ -708,17 +708,17 @@ GLOBAL_DATA struct tventana ventana[max_windows];
 
 //GLOBAL_DATA 
 struct tmapa {
-  char TengoNombre;                     // La nueva ventana cogera el filename
+  char TengoNombre;                     // New window will take the filename
   int code;                           // Map identifier (for undo)
-  int fpg_code;                         // Código de este mapa (para el FPG)
-  char path[_MAX_PATH+1];               // Path del fichero asociado
-  char filename[255];                  // Nombre del fichero asociado
-  byte * map;                           // Mapa
-  int map_width,map_height;                    // Dimensiones del mapa (pixels)
-  int zoom,zoom_x,zoom_y,zoom_cx,zoom_cy; // Porción editada del mapa
+  int fpg_code;                         // Map code (for the FPG)
+  char path[_MAX_PATH+1];               // Path of associated file
+  char filename[255];                  // Associated filename
+  byte * map;                           // Map data
+  int map_width,map_height;                    // Map dimensions (pixels)
+  int zoom,zoom_x,zoom_y,zoom_cx,zoom_cy; // Edited portion of the map
   byte saved;                         // Saved to disk flag (yes/no)
   char description[32];                 // Map description string
-  short puntos[512];                    // Hasta 256 puntos x,y
+  short puntos[512];                    // Up to 256 control points (x,y)
 };
 
 struct tprg {
@@ -772,23 +772,23 @@ struct t_listboxbr{
   int created;          // Whether list is already created on screen
 };
 
-// Parámetros para algunas ventanas
+// Parameters for some windows
 
-GLOBAL_DATA char * v_title;                  // Título de la ventana
-GLOBAL_DATA char * v_text;                   // Texto de la ventana
-GLOBAL_DATA byte * v_aux;                    // Para asignar memoria antes de llamar a creador
-GLOBAL_DATA int v_mode;                      // 0-abrir, 1-guardar como
+GLOBAL_DATA char * v_title;                  // Window title
+GLOBAL_DATA char * v_text;                   // Window text
+GLOBAL_DATA byte * v_aux;                    // Memory allocated before calling the creator
+GLOBAL_DATA int v_mode;                      // 0-open, 1-save as
 GLOBAL_DATA int v_type;                      // 2-map, 3-pal, 4-grf, 5-fnt, 6-ifs, 7-pcm, 8-prg
 GLOBAL_DATA int v_thumb;                     // 2-map, 3-pal, 4-grf, 5-fnt, 6-ifs, 7-pcm, 0-prg
-GLOBAL_DATA int v_finished;                  // Indica si se ha seleccionado un fichero
-GLOBAL_DATA int v_exists;                    // Indica si el fichero existe
-GLOBAL_DATA int v_accept;                    // Indica si se eligió aceptar / cancelar
-GLOBAL_DATA int v_window;                    // Ventana tratada (ej. mapa a guardar)
-GLOBAL_DATA int v_help;                      // Indica si se pidió ayuda
-GLOBAL_DATA int v_pause;                     // Indica si se debe hacer pausa (en los listbox)
-GLOBAL_DATA struct tmapa * v_map;            // Puntero a un mapa
-GLOBAL_DATA struct tprg * v_prg;		// Buffer de la ventana
-GLOBAL_DATA struct tprg * eprg;		// Buffer de la ventana
+GLOBAL_DATA int v_finished;                  // Whether a file has been selected
+GLOBAL_DATA int v_exists;                    // Whether the file exists
+GLOBAL_DATA int v_accept;                    // Whether accept or cancel was chosen
+GLOBAL_DATA int v_window;                    // Target window (e.g. map to save)
+GLOBAL_DATA int v_help;                      // Whether help was requested
+GLOBAL_DATA int v_pause;                     // Whether to pause (in listboxes)
+GLOBAL_DATA struct tmapa * v_map;            // Pointer to a map
+GLOBAL_DATA struct tprg * v_prg;		// Window buffer
+GLOBAL_DATA struct tprg * eprg;		// Window buffer
 
 GLOBAL_DATA int next_map_code;               // Code of next loaded map
 GLOBAL_DATA int current_map_code;            // Code of current edited map
@@ -798,19 +798,19 @@ GLOBAL_DATA int next_code;                   // Code for next created map
 GLOBAL_DATA int exit_requested;
 
 //GLOBAL_DATA 
-struct ttipo {                   // Información de los diferentes tipos
-  char path[PATH_MAX+1];                // Su path por defecto
-  char * ext;                           // Extensiones .: "*.MAP *.PCX *.*"
+struct ttipo {                   // Information for each file type
+  char path[PATH_MAX+1];                // Default path
+  char * ext;                           // Extensions e.g.: "*.MAP *.PCX *.*"
   int default_choice;         // Default extension selection
-  int first_visible;         // Posicion del listbox de ficheros en abrir0
+  int first_visible;         // File listbox position in open dialog
 };
 
 GLOBAL_DATA struct ttipo tipo[24]; // Paths 0-(current working directory),
                               // 1-(path d.exe), 2-MAP, 3-PAL, 4-FPG, 5-FNT,
-                              // 6-IFS, 7-PCM, 8-PRG, 9-MAP(tapices),
+                              // 6-IFS, 7-PCM, 8-PRG, 9-MAP(wallpapers),
                               // 10-PAL(?), 11-PCM(save as,?), 12-PRJ,
-                              // 13-(genérico *.*), 14-MAP(grabar), 15-WLD
-                              // 16-Modulo de musica
+                              // 13-(generic *.*), 14-MAP(save), 15-WLD
+                              // 16-Music module
 
 GLOBAL_DATA char drives[26+1];
 
@@ -818,20 +818,20 @@ GLOBAL_DATA char shift_status,ascii,scan_code;
 
 GLOBAL_DATA char full[_MAX_PATH+1];
 GLOBAL_DATA char file_mask[512]; // File mask for directory listing
-GLOBAL_DATA char input[512];   // Cuadro de diálogo para introducir el nombre
+GLOBAL_DATA char input[512];   // Dialog box for entering the filename
 
 
-GLOBAL_DATA int hidden[max_windows]; // Ventanas ocultadas al abrir un diálogo
+GLOBAL_DATA int hidden[max_windows]; // Windows hidden when opening a dialog
 
 GLOBAL_DATA struct tmapa * windows_to_create[max_windows];
 GLOBAL_DATA int num_windows_to_create;
 
-GLOBAL_DATA int mouse_shift; // Para en big, adapt_palette las coordenadas dentro de barra
+GLOBAL_DATA int mouse_shift; // For big mode, adjusts coordinates within the toolbar
 GLOBAL_DATA int mouse_shift_x,mouse_shift_y;
 
 GLOBAL_DATA int end_dialog;
 
-GLOBAL_DATA int double_click,double_click_x,double_click_y; // Para detectar doble click
+GLOBAL_DATA int double_click,double_click_x,double_click_y; // For detecting double-click
 
 GLOBAL_DATA int dragging,drag_x,drag_y,drag_graphic;
 
@@ -866,17 +866,17 @@ void Delete_Taggeds();
 void Show_Taggeds();
 
 //-----------------------------------------------------------------------------
-//      Functions and structures exported by the paper
+//      Functions and structures exported by the trash can
 //-----------------------------------------------------------------------------
 
-void muestra_papelera(); // trash shows (?)
+void muestra_papelera(); // Show trash can
 
 //-----------------------------------------------------------------------------
 //      Functions and structures exported by the (sound) recorder
 //-----------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------
-//      Funciones y estructuras exportadas el generador de fonts
+//      Functions and structures exported by the font generator
 //-----------------------------------------------------------------------------
 
 void OpenGenFont();
@@ -891,7 +891,7 @@ void paint_listbox(struct t_listbox *l);
 
 
 //-----------------------------------------------------------------------------
-//      Funciones y estructuras exportadas por DIVPCM
+//      Functions and structures exported by DIVPCM
 //-----------------------------------------------------------------------------
 
 #define MOD 1
@@ -967,20 +967,20 @@ void goto_error(void);
 //      Hypertext
 //-----------------------------------------------------------------------------
 
-void make_helpidx(void);        // Crea el índice de términos
-void load_index(void);          // Carga el glosario
-void help(int n);               // Crea una ventana de hipertexto
+void make_helpidx(void);        // Create the term index
+void load_index(void);          // Load the glossary
+void help(int n);               // Create a hypertext window
 void help0(void);void help1(void);void help2(void);void help3(void);
 void tabula_help(byte *si,byte *di,int lon);
 
 //-----------------------------------------------------------------------------
-//      Instalación
+//      Installation
 //-----------------------------------------------------------------------------
 
 void crear_instalacion(void);
 
 //-----------------------------------------------------------------------------
-//      Funciones de divedit exportadas
+//      Exported divedit functions
 //-----------------------------------------------------------------------------
 
 void process_list0(void);
@@ -996,7 +996,7 @@ void advance_vptr(void);
 extern int lp1[512],lp_select;
 
 //-----------------------------------------------------------------------------
-//      Funciones de movimiento de ventanas
+//      Window movement functions
 //-----------------------------------------------------------------------------
 
 void copy(int a,int b);
@@ -1008,7 +1008,7 @@ void wup(int a);
 void wdown(int a);
 
 //-----------------------------------------------------------------------------
-//      Prototipos de divgama
+//      Prototypes for divgama
 //-----------------------------------------------------------------------------
 
 void create_gradient_colors(struct _gcolor * gradient_config,byte * gradient_buf);
@@ -1025,16 +1025,16 @@ GLOBAL_DATA struct _gcolor * gradient_config;
 // M3D_info struct removed (MODE8/3D map editor deleted)
 
 //-----------------------------------------------------------------------------
-//  Estructura para guardar reducciones
+//  Structure for storing thumbnails
 //-----------------------------------------------------------------------------
 
 typedef struct {
-  int an,al;            // Ancho y Alto de la reducción
-  char * ptr;           // ==NULL si el thumbnail no se ha comenzado a cargar
+  int an,al;            // Width and height of the thumbnail
+  char * ptr;           // ==NULL if the thumbnail has not started loading
   SDL_Surface *surfaceptr;
-  int status;           // -1-No es una imagen, 0-Cargado, +N-Nº de bytes leidos
-  int filesize;         // Longitud en bytes del fichero
-  int tagged;           // Si esta señalizado o no (1/0)
+  int status;           // -1-Not an image, 0-Loaded, +N-Number of bytes read
+  int filesize;         // File size in bytes
+  int tagged;           // Whether tagged or not (1/0)
 } t_thumb;
 
 GLOBAL_DATA int sound_freq;

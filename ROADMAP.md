@@ -250,7 +250,7 @@ No behavioral changes — pure cleanup.
 - [x] Rename ~33 Spanish struct field names across 8 structs — Sprint G (2026-03-10)
 - [ ] Rename remaining high-occurrence Spanish globals: `copia` (375), `ventana` (619),
       `texto` (905) — deferred from Sprint G (need special handling)
-- [ ] Translate ~3,663 Spanish comment lines across 47 files — Sprint H
+- [x] Translate ~3,170 Spanish comment lines across 34 files — Sprint H (2026-03-10)
 - [ ] Rename cryptic locals in the hottest paths (divc.c, divedit.c, runtime/i.c)
 
 ### Structural improvements
@@ -272,7 +272,7 @@ to make this codebase genuinely maintainable — by anyone, not just Daniel. Thi
    - ✅ Sprint D: single-letter globals (r,g,b,c,d,a) removed
    - ✅ Sprint F: 331 Spanish function names → English
    - ✅ Sprint G: ~131 globals + struct fields → English (44 files, 6,900 lines)
-   - Next: Sprint H (~3,663 Spanish comment lines → English across 47 files)
+   - ✅ Sprint H: ~3,170 Spanish comment lines → English across 34 files
 
 2. **Meaningful names everywhere** — not just replacing `tapiz` with `wallpaper`, but
    turning `a`, `b`, `c`, `n`, `nn`, `nnn` into names that reveal intent. This requires

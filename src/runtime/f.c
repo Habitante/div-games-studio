@@ -62,7 +62,7 @@ extern int omitidos[128];
 extern int nomitidos;
 
 //----------------------------------------------------------------------------
-//  Para arreglar el puto bug de /oneatx /fp5 en i.cpp
+//  Fix for the /oneatx /fp5 bug in i.cpp
 //----------------------------------------------------------------------------
 
 static int n_reloj=0, o_reloj=0;
@@ -76,7 +76,7 @@ int get_reloj(void) {
 }
 
 //----------------------------------------------------------------------------
-//      Signal(proceso,señal)
+//      Signal(process,signal)
 //----------------------------------------------------------------------------
 
 void _signal(void) {
@@ -113,7 +113,7 @@ void signal_tree(int p, int s) {
 }
 
 //----------------------------------------------------------------------------
-//      Key(tecla)
+//      Key(key_code)
 //----------------------------------------------------------------------------
 
 void _key(void) {
@@ -122,8 +122,8 @@ void _key(void) {
 }
 
 //----------------------------------------------------------------------------
-//  Funcion para localizar y abrir un fichero (pal,fpg,fnt,...)
-//  Esta función debe seguir el mismo algoritmo en F.CPP y DIVC.CPP
+//  Function to locate and open a file (pal,fpg,fnt,...)
+//  This function must follow the same algorithm in F.CPP and DIVC.CPP
 //----------------------------------------------------------------------------
 
 char full[_MAX_PATH+1];
@@ -310,7 +310,7 @@ FILE * div_open_file(char * file) {
 }
 
 //----------------------------------------------------------------------------
-//  Al guardar un archivo (save*()), lo quita del packfile (si está)
+//  When saving a file (save*()), remove it from the packfile (if present)
 //----------------------------------------------------------------------------
 
 void packfile_del(char * file) {
@@ -333,7 +333,7 @@ void packfile_del(char * file) {
   for (n=0;n<npackfiles;n++)
     if (!strcmp(full,packdir[n].filename)) break;
 
-  if (n<npackfiles) { // Si el archivo está en el packfile ...
+  if (n<npackfiles) { // If the file is in the packfile ...
 
     if ((f=fopen(packfile,"rb+"))!=NULL) {
       strcpy(packdir[n].filename,"");
@@ -348,8 +348,8 @@ void packfile_del(char * file) {
 }
 
 //----------------------------------------------------------------------------
-//  Lee un archivo del packfile (en byte * packptr), devuelve:
-//  -1 Not found, -2 Not enough memory, N Longitud fichero
+//  Read a file from the packfile (into byte * packptr), returns:
+//  -1 Not found, -2 Not enough memory, N File length
 //----------------------------------------------------------------------------
 
 int read_packfile(byte * file) {
@@ -414,7 +414,7 @@ while (*ff!=0) {
 
 
 //----------------------------------------------------------------------------
-//      Load_pal(fichero)
+//      Load_pal(file)
 //----------------------------------------------------------------------------
 
 int hacer_fade=0;
@@ -543,7 +543,7 @@ void apply_palette(void) {
 }
 
 //----------------------------------------------------------------------------
-//      Unload_map(codigo)
+//      Unload_map(code)
 //----------------------------------------------------------------------------
 
 void unload_map(void) {
@@ -554,7 +554,7 @@ void unload_map(void) {
 }
 
 //----------------------------------------------------------------------------
-//      Load_map(fichero) - Devuelve el código del gráfico (1000..1999)
+//      Load_map(file) - Returns the graphic code (1000..1999)
 //----------------------------------------------------------------------------
 
 typedef struct _pcx_header {
@@ -604,7 +604,7 @@ void descomprime_PCX(byte *buffer, byte *mapa)
   int map_width, map_height;
 
   memcpy((byte *)&header,buffer,sizeof(pcx_header));
-  buffer+=128;                                  // Comienzo de la imagen
+  buffer+=128;                                  // Start of image data
 
   map_width = header.xmax - header.xmin + 1;
   map_height = header.ymax - header.ymin + 1;
@@ -617,12 +617,12 @@ void descomprime_PCX(byte *buffer, byte *mapa)
   pDest = mapa;
 
   do {
-    ch=*buffer++;                               // Copia uno por defecto.
-    if((ch&192)==192) {                         // Si RLE entonces
-      rep=(ch&63);                              // rep = nº de veces a copiar.
+    ch=*buffer++;                               // Copy one by default.
+    if((ch&192)==192) {                         // If RLE then
+      rep=(ch&63);                              // rep = number of times to copy.
       ch=*buffer++;
     } else rep=1;
-    pixel+=rep;                                 // Controla que no nos salgamos.
+    pixel+=rep;                                 // Bounds check.
     pixel_line+=rep;
     if(pixel>last_byte) {
       rep-=pixel-last_byte;
@@ -741,8 +741,8 @@ void load_map(void) {
 }
 
 //----------------------------------------------------------------------------
-//      New_map(ancho,alto,centro_x,centro_y,color) - Devuelve el código
-//      Se descarga igualmente con unload_map(código)
+//      New_map(width,height,center_x,center_y,color) - Returns the code
+//      Unloaded with unload_map(code)
 //----------------------------------------------------------------------------
 
 void new_map(void) {
@@ -752,7 +752,7 @@ void new_map(void) {
   color=pila[sp--]; cy=pila[sp--]; cx=pila[sp--];
   alto=pila[sp--]; ancho=pila[sp]; pila[sp]=0;
 
-  // Comprueba límites an/al/color ...
+  // Check width/height/color bounds ...
 
   if (ancho<1 || alto<1 || ancho>32768 || alto>32768) { e(153); return; }
   if (color<0 || color>255) { e(154); return; }
@@ -761,7 +761,7 @@ void new_map(void) {
   if ((ptr=(byte *)malloc(1330+64+4+ancho*alto))!=NULL) {
     ptr+=1330; // fix load_map/unload_map
     *((int*)ptr+13)=ancho; *((int*)ptr+14)=alto;
-    *((int*)ptr+15)=1; // Se define un punto de control (el centro)
+    *((int*)ptr+15)=1; // Define one control point (the center)
     *((word*)ptr+32)=cx; *((word*)ptr+33)=cy;
     memset(ptr+4+64,color,ancho*alto);
 
@@ -774,7 +774,7 @@ void new_map(void) {
 }
 
 //----------------------------------------------------------------------------
-//      Load_fpg(fichero) - Devuelve el código del fichero 0..max_fpgs
+//      Load_fpg(file) - Returns the file code 0..max_fpgs
 //----------------------------------------------------------------------------
 #define STDOUTLOG
 
@@ -899,7 +899,7 @@ while(ftell(es)<file_len && len_>0 && num_>0) {
 }
 fclose(es);
 #else
-ptr+=1352; // Longitud cabecera fpg
+ptr+=1352; // FPG header length
 ptr2=ptr;
 ptr3=ptr;
 
@@ -925,7 +925,7 @@ printf("fpg search ended, %p: ptr: %p\n",(void *)((byte *)g[num].fpg+file_len),(
 }
 
 //----------------------------------------------------------------------------
-//      Start_scroll(snum,fichero,graf1,graf2,region,flags)
+//      Start_scroll(snum,file,graf1,graf2,region,flags)
 //----------------------------------------------------------------------------
 
 void set_scroll(int plano,int x,int y);
@@ -961,7 +961,7 @@ void start_scroll(void) {
   if (ptr1==NULL && ptr2==NULL) { e(112); return; }
   if (ptr1==NULL) { ptr1=ptr2; ptr2=NULL; }
 
-  if (ptr2==NULL) s=1; else s=2; // Tipo de scroll, normal(1) o parallax(2)
+  if (ptr2==NULL) s=1; else s=2; // Scroll type: normal(1) or parallax(2)
 
   iscroll[snum].map1_an=ptr1[13]; iscroll[snum].map1_al=ptr1[14]; iscroll[snum].map1=(byte*)ptr1+64+ptr1[15]*4;
   if (iscroll[snum].an>iscroll[snum].map1_an) iscroll[snum].map_flags|=1;
@@ -972,7 +972,7 @@ void start_scroll(void) {
   if ((iscroll[snum].fast=(tfast*)malloc(iscroll[snum].al*sizeof(tfast)))==NULL) { e(100); return; }
   iscroll[snum].sscr1=iscroll[snum]._sscr1; iscroll[snum].block1=iscroll[snum].al;
   iscroll[snum].on=s; set_scroll(0,iscroll[snum].map1_x,iscroll[snum].map1_y);
-  iscroll[snum].on=0; // Si hay algún error (malloc), no habrá scroll
+  iscroll[snum].on=0; // If any error (malloc) occurs, there will be no scroll
 
   if (s==2) {
     iscroll[snum].map2_an=ptr2[13]; iscroll[snum].map2_al=ptr2[14]; iscroll[snum].map2=(byte*)ptr2+64+ptr2[15]*4;
@@ -987,7 +987,7 @@ void start_scroll(void) {
     iscroll[snum].on=2; set_scroll(1,iscroll[snum].map2_x,iscroll[snum].map2_y);
   }
 
-  iscroll[snum].on=s; // Al final si no ha habido errores, fija la variable scroll
+  iscroll[snum].on=s; // Finally, if no errors occurred, set the scroll variable
 
   (scroll+snum)->x0=iscroll[snum].map1_x;
   (scroll+snum)->y0=iscroll[snum].map1_y;
@@ -1006,7 +1006,7 @@ void refresh_scroll(void) {
 }
 
 //----------------------------------------------------------------------------
-//      Move_scroll(snum) - mueve automática o manualmente el scroll
+//      Move_scroll(snum) - moves the scroll automatically or manually
 //----------------------------------------------------------------------------
 
 void update_scroll(int);
@@ -1050,7 +1050,7 @@ void stop_scroll(void) {
 }
 
 //----------------------------------------------------------------------------
-//      Funcion que mata los procesos de scroll o modo-7 que ya no se ven
+//      Kill processes in scroll or mode-7 that are no longer visible
 //----------------------------------------------------------------------------
 
 void kill_process(int);
@@ -1080,7 +1080,7 @@ void kill_invisible(void) {
 }
 
 //----------------------------------------------------------------------------
-//      Get_id(tipo)
+//      Get_id(type)
 //----------------------------------------------------------------------------
 
 void get_id(void) {
@@ -1100,7 +1100,7 @@ void get_id(void) {
 }
 
 //----------------------------------------------------------------------------
-//      Get_disx(angulo,dist)
+//      Get_disx(angle,dist)
 //----------------------------------------------------------------------------
 
 void get_disx(void) {
@@ -1109,7 +1109,7 @@ void get_disx(void) {
 }
 
 //----------------------------------------------------------------------------
-//      Get_disy(angulo,dist)
+//      Get_disy(angle,dist)
 //----------------------------------------------------------------------------
 
 void get_disy(void) {
@@ -1160,7 +1160,7 @@ void fade(void) {
 }
 
 //----------------------------------------------------------------------------
-//      Unload_fnt(codigo_font)
+//      Unload_fnt(font_code)
 //----------------------------------------------------------------------------
 
 void unload_fnt(void) {
@@ -1172,7 +1172,7 @@ void unload_fnt(void) {
 }
 
 //----------------------------------------------------------------------------
-//      Load_fnt(fichero) - Devuelve codigo_font
+//      Load_fnt(file) - Returns font_code
 //----------------------------------------------------------------------------
 
 void load_fnt(void) {
@@ -1243,7 +1243,7 @@ void load_fnt(void) {
 }
 
 //----------------------------------------------------------------------------
-//      Adapta un font a la paleta del systema (tiene "palcrc" calculado)
+//      Adapt a font to the system palette (uses computed "palcrc")
 //----------------------------------------------------------------------------
 
 void checkpal_font(int ifonts) {
@@ -1252,7 +1252,7 @@ void checkpal_font(int ifonts) {
   if (!fonts[ifonts]) return;
   if (f_i[ifonts].syspal!=palcrc) {
 
-    if (f_i[ifonts].syspal!=f_i[ifonts].fonpal) { // Debe "recargarlo"
+    if (f_i[ifonts].syspal!=f_i[ifonts].fonpal) { // Must reload it
 
       if (npackfiles) {
         file_len=read_packfile((byte*)&mem[pila[sp]]);
@@ -1286,7 +1286,7 @@ void checkpal_font(int ifonts) {
 }
 
 //----------------------------------------------------------------------------
-//      Adapta (ptr,len) siendo pal[] su paleta
+//      Adapt (ptr,len) where pal[] is its palette
 //----------------------------------------------------------------------------
 
 void adapt_palette(byte * ptr, int len, byte * pal, byte * xlat) {
@@ -1320,7 +1320,7 @@ void adapt_palette(byte * ptr, int len, byte * pal, byte * xlat) {
 }
 
 //----------------------------------------------------------------------------
-//      Write(font,x,y,centro,ptr)
+//      Write(font,x,y,alignment,ptr)
 //----------------------------------------------------------------------------
 
 void __write(void) {
@@ -1350,7 +1350,7 @@ void __write(void) {
 }
 
 //----------------------------------------------------------------------------
-//      Write_int(font,x,y,centro,&num)
+//      Write_int(font,x,y,alignment,&num)
 //----------------------------------------------------------------------------
 
 void write_int(void) {
@@ -1378,7 +1378,7 @@ void write_int(void) {
 }
 
 //----------------------------------------------------------------------------
-//      Delete_text(t_id o all_text)
+//      Delete_text(t_id or all_text)
 //----------------------------------------------------------------------------
 
 void delete_text(void) {
@@ -1399,7 +1399,7 @@ void move_text(void) {
 }
 
 //----------------------------------------------------------------------------
-//      Unload_fpg(codigo) - Devuelve el código del fichero 0..max_fpgs
+//      Unload_fpg(code) - Returns the file code 0..max_fpgs
 //----------------------------------------------------------------------------
 
 void unload_fpg(void) {
@@ -1418,7 +1418,7 @@ void unload_fpg(void) {
 //      Rand(min,max)
 //----------------------------------------------------------------------------
 
-union {byte b[128]; int d[32];} seed; // Seed aleatorio (127 bytes + PTR)
+union {byte b[128]; int d[32];} seed; // Random seed (127 bytes + PTR)
 
 byte rnd(void) {
 byte ptr;
@@ -1454,7 +1454,7 @@ void init_rnd(int n){
 void rand_seed(void) { init_rnd(pila[sp]); }
 
 //----------------------------------------------------------------------------
-//      Define_region(n,x,y,an,al)
+//      Define_region(n,x,y,width,height)
 //----------------------------------------------------------------------------
 
 void define_region(void) {
@@ -1554,7 +1554,7 @@ void map_put(void) {
 }
 
 //----------------------------------------------------------------------------
-//      Map_block_copy(file,graf_dest,x_dest,y_dest,graf,x,y,an,al)
+//      Map_block_copy(file,graf_dest,x_dest,y_dest,graf,x,y,width,height)
 //----------------------------------------------------------------------------
 
 void map_block_copy(void) {
@@ -1594,9 +1594,9 @@ void map_block_copy(void) {
       si=(byte*)ptr+64+ptr[15]*4;
       x=xd-x; y=yd-y;
 
-      if (x>=clipx0 && x+an<=clipx1 && y>=clipy0 && y+al<=clipy1) // Pinta sprite sin cortar
+      if (x>=clipx0 && x+an<=clipx1 && y>=clipy0 && y+al<=clipy1) // Draw sprite unclipped
         sp_normal(si,x,y,an,al,0);
-      else if (x<clipx1 && y<clipy1 && x+an>clipx0 && y+al>clipy0) // Pinta sprite cortado
+      else if (x<clipx1 && y<clipy1 && x+an>clipx0 && y+al>clipy0) // Draw sprite clipped
         sp_clipped(si,x,y,an,al,0);
 
       no: copia=_copia; vga_width=_vga_an; vga_height=_vga_al;
@@ -1606,8 +1606,8 @@ void map_block_copy(void) {
 }
 
 //----------------------------------------------------------------------------
-//      Screen_copy(region,file,graf,x,y,an,al)
-//      (des-blit_screen escalado desde la una region de copia a un gráfico)
+//      Screen_copy(region,file,graf,x,y,width,height)
+//      (scaled reverse-blit from a screen region to a graphic)
 //----------------------------------------------------------------------------
 
 void screen_copy(void) {
@@ -1803,10 +1803,10 @@ void clear_screen(void) {
 }
 
 //----------------------------------------------------------------------------
-//      Save(fichero,offset,long)
+//      Save(file,offset,length)
 //----------------------------------------------------------------------------
 
-#ifdef DEBUG // Versión con debugger.
+#ifdef DEBUG // Version with debugger.
 
 FILE * open_save_file(byte * file) {
   FILE * f;
@@ -1819,7 +1819,7 @@ FILE * open_save_file(byte * file) {
   return f;
 }
 
-#else         // Versión instalaciones.
+#else         // Release version.
 
 FILE * open_save_file(byte * file) {
   FILE * f;
@@ -1893,7 +1893,7 @@ void _save(void) {
 
 
 //----------------------------------------------------------------------------
-//      Load(fichero,offset)
+//      Load(file,offset)
 //----------------------------------------------------------------------------
 
 void load(void) {
@@ -1943,7 +1943,7 @@ void load(void) {
 }
 
 //----------------------------------------------------------------------------
-//      Set_mode(modo)
+//      Set_mode(mode)
 //----------------------------------------------------------------------------
 
 void set_mode(void) {
@@ -1951,7 +1951,7 @@ void set_mode(void) {
   int n;
 
   #ifdef DEBUG
-  if (v.type) new_mode=1; // Avisa al debugger de un cambio de modo de vídeo
+  if (v.type) new_mode=1; // Notify the debugger of a video mode change
   #endif
 
   vga_width=pila[sp]/1000; vga_height=pila[sp]%1000;
@@ -2033,7 +2033,7 @@ vvga_al = vga_height;
 }
 
 //----------------------------------------------------------------------------
-//      Load_pcm(fichero,loop)
+//      Load_pcm(file,loop)
 //----------------------------------------------------------------------------
 
 void load_pcm(void) {
@@ -2070,7 +2070,7 @@ void load_pcm(void) {
 }
 
 //----------------------------------------------------------------------------
-//      Unload_pcm(id_sonido)
+//      Unload_pcm(sound_id)
 //----------------------------------------------------------------------------
 
 void unload_pcm(void) {
@@ -2078,7 +2078,7 @@ void unload_pcm(void) {
 }
 
 //----------------------------------------------------------------------------
-//      Sound(id_sonido,volumen,frecuencia)
+//      Sound(sound_id,volume,frequency)
 //----------------------------------------------------------------------------
 
 void _sound(void) {
@@ -2099,7 +2099,7 @@ pila[sp]=0;
 }
 
 //----------------------------------------------------------------------------
-//      Stop_sound(id_canal)
+//      Stop_sound(channel_id)
 //----------------------------------------------------------------------------
 
 extern int MusicChannels;
@@ -2117,7 +2117,7 @@ void stop_sound(void) {
 }
 
 //----------------------------------------------------------------------------
-//      Change_sound(id_canal,volumen,frecuencia)
+//      Change_sound(channel_id,volume,frequency)
 //----------------------------------------------------------------------------
 
 void change_sound(void) {
@@ -2129,7 +2129,7 @@ void change_sound(void) {
 }
 
 //----------------------------------------------------------------------------
-//      Change_channel(id_canal,volumen,panning)
+//      Change_channel(channel_id,volume,panning)
 //----------------------------------------------------------------------------
 
 void change_channel(void) {
@@ -2141,7 +2141,7 @@ void change_channel(void) {
 }
 
 //----------------------------------------------------------------------------
-//      load_song(fichero,loop)
+//      load_song(file,loop)
 //----------------------------------------------------------------------------
 
 void load_song(void) {
@@ -2176,7 +2176,7 @@ void load_song(void) {
 }
 
 //----------------------------------------------------------------------------
-//      unload_song(id_cancion)
+//      unload_song(song_id)
 //----------------------------------------------------------------------------
 
 void unload_song(void) {
@@ -2184,7 +2184,7 @@ void unload_song(void) {
 }
 
 //----------------------------------------------------------------------------
-//      song(id_cancion)
+//      song(song_id)
 //----------------------------------------------------------------------------
 
 void song(void)
@@ -2225,7 +2225,7 @@ void get_song_line(void) {
 }
 
 //----------------------------------------------------------------------------
-//      is_playing_sound(id_canal)
+//      is_playing_sound(channel_id)
 //----------------------------------------------------------------------------
 
 void is_playing_sound(void) {
@@ -2241,7 +2241,7 @@ void is_playing_song(void) {
 }
 
 //----------------------------------------------------------------------------
-//      Set_fps(nº fps,max nº saltos)
+//      Set_fps(fps, max frame skips)
 //----------------------------------------------------------------------------
 void mainloop(void);
 
@@ -2256,7 +2256,7 @@ void set_fps(void) {
 }
 
 //----------------------------------------------------------------------------
-//      Start_fli("fichero",x,y) devuelve nº frames
+//      Start_fli("file",x,y) returns number of frames
 //----------------------------------------------------------------------------
 
 void start_fli(void) {
@@ -2278,7 +2278,7 @@ pila[sp]=0;
 }
 
 //----------------------------------------------------------------------------
-//      Frame_fli() devuelve 0-fin fli, 1-continúa
+//      Frame_fli() returns 0-end of fli, 1-continues
 //----------------------------------------------------------------------------
 
 void frame_fli(void) {
@@ -2308,7 +2308,7 @@ void reset_fli(void) {
 }
 
 //----------------------------------------------------------------------------
-//      System("comando")
+//      System("command")
 //----------------------------------------------------------------------------
 
 void _system(void) {
@@ -2383,7 +2383,7 @@ void fget_angle(void) {
 // CD function stubs removed (CDDA deleted)
 
 //----------------------------------------------------------------------------
-//      Start_mode7(n,fichero,graf1,graf2,region,horizonte)
+//      Start_mode7(n,file,graf1,graf2,region,horizon)
 //----------------------------------------------------------------------------
 
 void start_mode7(void) {
@@ -2434,7 +2434,7 @@ void start_mode7(void) {
 
   if (im7[n].ext_an && im7[n].ext_al) im7[n].ext=(byte*)ptr2+64+ptr2[15]*4; else im7[n].ext=NULL;
 
-  im7[n].on=1; // Al final si no ha habido errores, fija la variable m7
+  im7[n].on=1; // Finally, if no errors occurred, set the m7 variable
 }
 
 //----------------------------------------------------------------------------
@@ -2485,7 +2485,7 @@ void x_advance(void) {
 }
 
 //----------------------------------------------------------------------------
-//      Abs(valor)
+//      Abs(value)
 //----------------------------------------------------------------------------
 
 void _abs(void) {
@@ -2538,7 +2538,7 @@ void _pow(void) {
 }
 
 //----------------------------------------------------------------------------
-//      Near_angle(angle1,angle2,angle_inc) - devuelve "new_angle1"
+//      Near_angle(angle1,angle2,angle_inc) - returns "new_angle1"
 //----------------------------------------------------------------------------
 
 void near_angle(void) {
@@ -2565,7 +2565,7 @@ void let_me_alone(void) {
 }
 
 //----------------------------------------------------------------------------
-//      Exit("Mensaje",error_level)
+//      Exit("message",error_level)
 //----------------------------------------------------------------------------
 
 void _exit_dos(void) {
@@ -2593,7 +2593,7 @@ void _exit_dos(void) {
 }
 
 //----------------------------------------------------------------------------
-//      Roll_palette(col_inicial,num_col,inc)
+//      Roll_palette(start_color,num_colors,inc)
 //----------------------------------------------------------------------------
 
 void roll_palette(void) {
@@ -2667,7 +2667,7 @@ void get_real_point(void) {
 }
 
 //----------------------------------------------------------------------------
-//      Get_joy_button(boton 0..3)
+//      Get_joy_button(button 0..3)
 //----------------------------------------------------------------------------
 
 #define  GAME_PORT   0x201
@@ -2690,7 +2690,7 @@ pila[sp]=0;
 }
 
 //----------------------------------------------------------------------------
-//      Get_joy_position(eje 0..3)
+//      Get_joy_position(axis 0..3)
 //----------------------------------------------------------------------------
 
 int ej[4]={-1,-1,-1,-1};
@@ -2740,7 +2740,7 @@ return OSDEP_JoystickGetAxis(divjoy,pila[sp])/100;
 }
 
 //----------------------------------------------------------------------------
-//      Read_joy() - Lectura del joystick con auto-calibración - INTERNA
+//      Read_joy() - Joystick reading with auto-calibration - INTERNAL
 //----------------------------------------------------------------------------
 
 int joy_cx=0,joy_cy=0,joy_x0,joy_x1,joy_y0,joy_y1,init_joy=0;
@@ -2761,7 +2761,7 @@ void read_joy(void) {
 
   if (init_joy<=10) {
 
-      if (x==0 || y==0) return; // Los timeout no los tiene en cuenta
+      if (x==0 || y==0) return; // Timeouts are not taken into account
 
       if (init_joy<10) {
         joy_cx+=x; joy_cy+=y;
@@ -2877,7 +2877,7 @@ void set_color(void) {
 }
 
 //----------------------------------------------------------------------------
-//      Find_color(r,g,b) Devuelve un color de la paleta (1..255)
+//      Find_color(r,g,b) Returns a palette color (1..255)
 //----------------------------------------------------------------------------
 
 void _find_color(void) {
@@ -2893,7 +2893,7 @@ void _find_color(void) {
 }
 
 //----------------------------------------------------------------------------
-//      Funciones de cadenas
+//      String functions
 //----------------------------------------------------------------------------
 
 void _strchar(void) { // char("0") -> 48
@@ -2953,7 +2953,7 @@ void _strcmp(void) {
   } sp--;
 }
 
-void _strchr(void) { // ej: strchr(cadena,"aeiou") -> -1 No se encontro, N Posición
+void _strchr(void) { // e.g.: strchr(string,"aeiou") -> -1 Not found, N Position
   char * p;
   if ((unsigned)pila[sp]>255) p=strpbrk((char*)&mem[pila[sp-1]],(char*)&mem[pila[sp]]);
   else p=strchr((char*)&mem[pila[sp-1]],(char)pila[sp]);
@@ -3043,7 +3043,7 @@ void strdelend(char * s,int n) {
   }
 }
 
-void _strdel(void) { // (cadena,n,m) borra <n> char del inicio y <m> del final
+void _strdel(void) { // (string,n,m) delete <n> chars from start and <m> from end
   int m=pila[sp--];
   int n=pila[sp--];
 
@@ -3051,10 +3051,10 @@ void _strdel(void) { // (cadena,n,m) borra <n> char del inicio y <m> del final
 
   if ((mem[pila[sp]-1]&0xFFFFF)+1<strlen((char*)&mem[pila[sp]])-n-m) { e(140); return; }
 
-  if (n>m) { // Borra primero del inicio
+  if (n>m) { // Delete from start first
     strdelbeg((char*)&mem[pila[sp]],n);
     strdelend((char*)&mem[pila[sp]],m);
-  } else { // Borra primero del final
+  } else { // Delete from end first
     strdelend((char*)&mem[pila[sp]],m);
     strdelbeg((char*)&mem[pila[sp]],n);
   }
@@ -3062,7 +3062,7 @@ void _strdel(void) { // (cadena,n,m) borra <n> char del inicio y <m> del final
 }
 
 //----------------------------------------------------------------------------
-//  Función de ordenación / desordenación de estructuras (nombre,campo,modo)
+//  Structure sort / shuffle function (name,field,mode)
 //----------------------------------------------------------------------------
 
 byte xlat_rnd[256];
@@ -3134,37 +3134,37 @@ void sort(void) {
 }
 
 //----------------------------------------------------------------------------
-// Funciones de ficheros (además de load/save)
+// File functions (in addition to load/save)
 //----------------------------------------------------------------------------
 
 /*
-function 122 int fopen(0,0)         // Casi como en C (filename,"rwa+") (siempre modo binario)
-function 123 int fclose(0)          // Casi como en C (handle) pero si handle es 0 hace un fcloseall
-function 124 int fread(0,0,0)       // Casi como en C (&buffer,longitud(en ints),handle) pero con sólo una longitud de ints
-function 125 int fwrite(0,0,0)      // Inversa a fread (&buffer,longitud,handle)
-function 126 int fseek(0,0,0)       // Idéntica a C (handle,posicion,modo) (modo seek_set/cur/end)
-function 127 int ftell(0)           // Idéntica a C (handle)
-function 128 int filelength(0)      // Longitud de un fichero abierto (handle)
-function 129 int flush()            // Vacia buffers de escritura y devuelve nº de ficheros abiertos
+function 122 int fopen(0,0)         // Similar to C (filename,"rwa+") (always binary mode)
+function 123 int fclose(0)          // Similar to C (handle) but if handle is 0, does fcloseall
+function 124 int fread(0,0,0)       // Similar to C (&buffer,length(in ints),handle) but with a single int length
+function 125 int fwrite(0,0,0)      // Inverse of fread (&buffer,length,handle)
+function 126 int fseek(0,0,0)       // Identical to C (handle,position,mode) (mode seek_set/cur/end)
+function 127 int ftell(0)           // Identical to C (handle)
+function 128 int filelength(0)      // Length of an open file (handle)
+function 129 int flush()            // Flush write buffers and return number of open files
 
-function 130 int get_dirinfo(0,0)   // Lee un directorio ("dir\*.pr?",_hidden+_system+_subdir) en la estructura dirinfo(files,name[]) y devuelve "files" (número)
-function 131 string get_fileinfo(0) // Rellena la estructura fileinfo (fullpath (o cwd), drive, dir, name, ext, size, date, time, attrib) y devuelve puntero a "fullpath" o "cwd"
+function 130 int get_dirinfo(0,0)   // Read a directory ("dir\*.pr?",_hidden+_system+_subdir) into the dirinfo(files,name[]) struct and return "files" (count)
+function 131 string get_fileinfo(0) // Fill the fileinfo struct (fullpath (or cwd), drive, dir, name, ext, size, date, time, attrib) and return pointer to "fullpath" or "cwd"
 
-function 132 int getdrive()         // Devuelve la unidad actual (1-A, 2-B, ...)
-function 133 int setdrive(0)        // Fija la unidad actual (idem)
-function 134 int chdir(0)           // Cambia el directorio actual ("..")
-function 135 int mkdir(0)           // Crea un directorio nuevo (a partir del cwd)
-function 136 int remove(0)          // Borra archivos o directorios (se aceptan comodines) (auto rmdir)
-function 137 int disk_free(0)       // Espacio disponible en una unidad (en Kbs)
-function 138 int memory_free()      // Memoria disponible (en Kbs)
-function 139 int ignore_error(0)    // Ignorar un error de ejecución (número)
+function 132 int getdrive()         // Returns current drive (1-A, 2-B, ...)
+function 133 int setdrive(0)        // Set current drive (same)
+function 134 int chdir(0)           // Change current directory ("..")
+function 135 int mkdir(0)           // Create a new directory (from cwd)
+function 136 int remove(0)          // Delete files or directories (wildcards accepted) (auto rmdir)
+function 137 int disk_free(0)       // Free space on a drive (in KBs)
+function 138 int memory_free()      // Available memory (in KBs)
+function 139 int ignore_error(0)    // Ignore a runtime error (number)
 */
 
 //----------------------------------------------------------------------------
-//      fopen((filename,"rwa+") (siempre modo binario)
+//      fopen((filename,"rwa+") (always binary mode)
 //----------------------------------------------------------------------------
 
-void _fopen(void) { // Busca el archivo, ya que puede haber sido incluido en la instalación
+void _fopen(void) { // Search for the file, as it may have been included in the installation
   char drive[_MAX_DRIVE+1];
   char dir[_MAX_DIR+1];
   char fname[_MAX_FNAME+1];
@@ -3256,7 +3256,7 @@ void _fclose(void) {
 }
 
 //----------------------------------------------------------------------------
-//      fread(&buffer, longitud(en unit_size), handle)
+//      fread(&buffer, length(in unit_size), handle)
 //----------------------------------------------------------------------------
 
 void _fread(void) {
@@ -3273,7 +3273,7 @@ void _fread(void) {
   if (tabfiles[handle/2]==0) { e(170); return; }
   f=(FILE *)tabfiles[handle/2];
   if (!validate_address(offset) || !validate_address(offset+(lon*unit_size)/4)) { pila[sp]=0; e(125); return; }
-  n=fread(&mem[offset],1,unit_size*lon,f); // Bytes leidos
+  n=fread(&mem[offset],1,unit_size*lon,f); // Bytes read
   if ((n+unit_size-1)/unit_size<lon) {
     pila[sp]=0; e(127);
   } else {
@@ -3284,7 +3284,7 @@ void _fread(void) {
 }
 
 //----------------------------------------------------------------------------
-//      fwrite(&buffer,longitud(en unit_size),handle)
+//      fwrite(&buffer,length(in unit_size),handle)
 //----------------------------------------------------------------------------
 
 void _fwrite(void) {
@@ -3368,15 +3368,15 @@ void flush(void) {
 }
 
 //----------------------------------------------------------------------------
-//      get_dirinfo(mascara, atributos)
+//      get_dirinfo(mask, attributes)
 //----------------------------------------------------------------------------
 
 // function 130 int get_dirinfo(0,0)
-// Lee un directorio ("dir\*.pr?",_hidden+_system+_subdir)
-// en la estructura dirinfo(files,name[]) y devuelve "files" (número)
+// Read a directory ("dir\*.pr?",_hidden+_system+_subdir)
+// into the dirinfo(files,name[]) struct and return "files" (count)
 
 void get_dirinfo(void) {
-  //char * filenames (en mem[imem_max+258*5])
+  //char * filenames (in mem[imem_max+258*5])
   //dirinfo->files
   //dirinfo->name[]
 
@@ -3451,7 +3451,7 @@ void get_fileinfo(void) {
 }
 
 //----------------------------------------------------------------------------
-//      getdrive() devuelve número de unidad (1-A, 2-B, 3-C, ...)
+//      getdrive() returns drive number (1-A, 2-B, 3-C, ...)
 //----------------------------------------------------------------------------
 
 void getdrive(void) {
@@ -3463,7 +3463,7 @@ void getdrive(void) {
 }
 
 //----------------------------------------------------------------------------
-//      setdrive(unidad)
+//      setdrive(drive)
 //----------------------------------------------------------------------------
 
 void setdrive(void) {
@@ -3473,7 +3473,7 @@ void setdrive(void) {
 }
 
 //----------------------------------------------------------------------------
-//      chdir(directorio) 1 - exito, 0 - error
+//      chdir(directory) 1 - success, 0 - error
 //----------------------------------------------------------------------------
 
 void div_chdir(void) {
@@ -3481,7 +3481,7 @@ void div_chdir(void) {
 }
 
 //----------------------------------------------------------------------------
-//      mkdir(directorio)
+//      mkdir(directory)
 //----------------------------------------------------------------------------
 
 void _mkdir(void) {
@@ -3549,26 +3549,26 @@ void remove_file(void) {
 }
 
 //----------------------------------------------------------------------------
-// Funciones de memoria o sistema
+// Memory and system functions
 //----------------------------------------------------------------------------
 
 /*
-function 137 int disk_free(0)                      // Espacio disponible en una (unidad), en bytes
-function 138 int memory_free()                     // Memoria disponible (en Kbs)
-function 139 int ignore_error(0)                   // Ignorar un error de ejecución (número)
+function 137 int disk_free(0)                      // Free space on a (drive), in bytes
+function 138 int memory_free()                     // Available memory (in KBs)
+function 139 int ignore_error(0)                   // Ignore a runtime error (number)
 */
 
 typedef struct _meminfo{
-        unsigned Bloque_mas_grande_disponible;
-        unsigned Maximo_de_paginas_desbloqueadas;
-        unsigned Pagina_bloqueable_mas_grande;
-        unsigned Espacio_de_direccionamiento_lineal;
-        unsigned Numero_de_paginas_libres_disponibles;
-        unsigned Numero_de_paginas_fisicas_libres;
-        unsigned Total_de_paginas_fisicas;
-        unsigned Espacio_de_direccionamiento_lineal_libre;
-        unsigned Tamano_del_fichero_de_paginas;
-        unsigned reservado[3];
+        unsigned Bloque_mas_grande_disponible;      // Largest available block
+        unsigned Maximo_de_paginas_desbloqueadas;    // Max unlocked pages
+        unsigned Pagina_bloqueable_mas_grande;        // Largest lockable page
+        unsigned Espacio_de_direccionamiento_lineal;  // Linear address space
+        unsigned Numero_de_paginas_libres_disponibles; // Number of free pages available
+        unsigned Numero_de_paginas_fisicas_libres;     // Number of free physical pages
+        unsigned Total_de_paginas_fisicas;              // Total physical pages
+        unsigned Espacio_de_direccionamiento_lineal_libre; // Free linear address space
+        unsigned Tamano_del_fichero_de_paginas;         // Page file size
+        unsigned reservado[3];                          // Reserved
 }meminfo;
 
 int Mem_GetHeapFree()
@@ -3603,7 +3603,7 @@ void GetFreeMem(meminfo *Meminfo)
 }
 
 //----------------------------------------------------------------------------
-//      disk_free(unidad)
+//      disk_free(drive)
 //----------------------------------------------------------------------------
 
 void disk_free(void) {
@@ -3614,9 +3614,9 @@ void disk_free(void) {
 
   regs.w.ax=0x4409;
   regs.w.bx=pila[sp];
-  int386(0x21, &regs, &regs);           // información de dispositivo
-  if (!(regs.w.cflag & INTR_CF)) {      // si no hubo error
-    if (!(regs.w.dx & (1<<9))) {        // i/o no permitida
+  int386(0x21, &regs, &regs);           // device information
+  if (!(regs.w.cflag & INTR_CF)) {      // if no error
+    if (!(regs.w.dx & (1<<9))) {        // i/o not allowed
       structdiskfree.avail_clusters=0;
       _dos_getdiskfree(pila[sp], &structdiskfree);
       MBfree=structdiskfree.sectors_per_cluster * structdiskfree.bytes_per_sector;
@@ -3646,7 +3646,7 @@ pila[++sp]=0;
 }
 
 //----------------------------------------------------------------------------
-//      ignore_error(numero)
+//      ignore_error(number)
 //----------------------------------------------------------------------------
 
 void ignore_error(void) {
@@ -3662,11 +3662,11 @@ void ignore_error(void) {
 }
 
 //----------------------------------------------------------------------------
-// Funciones matematicas
+// Math functions
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-//      sin(angulo) Devuelve el seno de un angulo dado en milesimas
+//      sin(angle) Returns the sine of an angle given in thousandths
 //----------------------------------------------------------------------------
 
 #define pi     180000
@@ -3686,7 +3686,7 @@ void _asin(void) {
 }
 
 //----------------------------------------------------------------------------
-//      cos(angulo) Devuelve el coseno de un angulo dado en milesimas
+//      cos(angle) Returns the cosine of an angle given in thousandths
 //----------------------------------------------------------------------------
 
 void _cos(void) {
@@ -3703,7 +3703,7 @@ void _acos(void) {
 }
 
 //----------------------------------------------------------------------------
-//      tan(angulo) Devuelve la tangente de un angulo dado en milesimas
+//      tan(angle) Returns the tangent of an angle given in thousandths
 //----------------------------------------------------------------------------
 
 void _tan(void) {
@@ -3735,10 +3735,10 @@ void _atan2(void) {
 }
 
 //----------------------------------------------------------------------------
-//      draw(tipo, color, x0, y0, x1, y1)
+//      draw(type, color, x0, y0, x1, y1)
 //----------------------------------------------------------------------------
 
-#define tipo_mayor 5 // 1-Linea 2-Rectángulo 3-Rec.Relleno 4-Circulo 5-Cir.Rell.
+#define tipo_mayor 5 // 1-Line 2-Rectangle 3-Filled Rect. 4-Circle 5-Filled Circle
 
 void draw(void) {
   int x;
@@ -3791,7 +3791,7 @@ void delete_draw(void) {
 }
 
 //----------------------------------------------------------------------------
-//      move_draw(draw_id, color, porcen, x0, y0, x1, y1)
+//      move_draw(draw_id, color, opacity, x0, y0, x1, y1)
 //----------------------------------------------------------------------------
 
 void move_draw(void) {
@@ -3819,7 +3819,7 @@ void move_draw(void) {
 
 
 //----------------------------------------------------------------------------
-//      Save_map/pcx(file,graph,"archivo.pcx") 1-Exito 0-Error
+//      Save_map/pcx(file,graph,"filename.pcx") 1-Success 0-Error
 //----------------------------------------------------------------------------
 
 int save_PCX(byte *mapa,int an,int al,FILE *f);
@@ -3857,8 +3857,8 @@ void save_mapcx(int tipo) {
 }
 
 //----------------------------------------------------------------------------
-//      Write_in_map(font,texto,centro) - Devuelve el código del mapa
-//      Se descarga igualmente con unload_map(código)
+//      Write_in_map(font,text,alignment) - Returns the map code
+//      Unloaded with unload_map(code)
 //----------------------------------------------------------------------------
 
 void write_in_map(void) {
@@ -3907,7 +3907,7 @@ void write_in_map(void) {
   if ((ptr=(byte *)malloc(1330+64+4+an*al))!=NULL) {
     ptr+=1330; // fix load_map/unload_map
     *((int*)ptr+13)=an; *((int*)ptr+14)=al;
-    *((int*)ptr+15)=1; // Se define un punto de control (el centro)
+    *((int*)ptr+15)=1; // Define one control point (the center)
     *((word*)ptr+32)=cx; *((word*)ptr+33)=cy;
     memset(ptr+4+64,0,an*al);
 
@@ -3918,7 +3918,7 @@ void write_in_map(void) {
 
   } else e(100);
 
-  cx=0; // Pintar el texto (ptr2) en ptr+68 (an*al)
+  cx=0; // Draw the text (ptr2) into ptr+68 (an*al)
 
   while (*ptr2 && cx+fnt[*ptr2].ancho<=an) {
     if (fnt[*ptr2].ancho==0) {
@@ -3944,40 +3944,40 @@ void texn2(byte * copia, int vga_width, byte * p, int x, int y, byte an, int al)
 }
 
 //----------------------------------------------------------------------------
-//      calculate(expression matematica) Si error devuelve 0, si no el resultado
+//      calculate(math expression) Returns 0 on error, otherwise the result
 //----------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------
-//    Evaluador de expresiones (se le pasa el puntero en `expression')
-//    Si todo fue bien, devuelve token=p_num y tnumero=n
+//    Expression evaluator (pointer passed in `expression')
+//    If successful, returns token=p_num and tnumero=n
 //-----------------------------------------------------------------------------
 
 enum tokens { p_inicio, p_ultimo, p_error, p_num, p_abrir, p_cerrar, p_add,
               p_sub, p_mul, p_div, p_mod, p_shl, p_shr, p_xor, p_or, p_and,
               p_not, p_sqrt, p_neg };
 
-int token;      // Del tipo enumerado anterior
-double tnumero;  // Cuando token==p_num
-char * expression;     // Puntero a la expresión asciiz
+int token;      // From the enum above
+double tnumero;  // When token==p_num
+char * expression;     // Pointer to the ASCIIZ expression
 
-struct {        // Para contener la expression analizada
+struct {        // Holds the parsed expression
   int token;
   double numero;
 } expres[64];
 
-int iexpres;    // Número de elementos introducidos en expres[]
+int iexpres;    // Number of elements stored in expres[]
 
 double do_evaluate(void);
 
 void do_calculate(void) {
   double evaluacion;
-  token=p_inicio;         // No hay ningun token inicialmente
-  iexpres=0;              // Inicializa el contador de expresiones
-  get_token();            // Obtiene el primer token
-  expres0();              // Se analiza la expression
-  if (token==p_ultimo) {  // Se analizó con éxito la expression
+  token=p_inicio;         // No token initially
+  iexpres=0;              // Initialize expression counter
+  get_token();            // Get the first token
+  expres0();              // Parse the expression
+  if (token==p_ultimo) {  // Expression parsed successfully
     evaluacion=do_evaluate();
-    if (token!=p_error) { // Se evaluó con éxito
+    if (token!=p_error) { // Evaluated successfully
       token=p_num;
       tnumero=evaluacion;
     }
@@ -4066,7 +4066,7 @@ void expres3() { // * / %
   }
 }
 
-void expres4() { // signo !
+void expres4() { // sign !
   int p;
 
   while ((p=token)==p_add) { get_token();  }
@@ -4147,11 +4147,11 @@ void get_token(void) {
   }
 }
 
-double get_num(void) { // Lee el número que hay en *expression (double en hex o dec)
+double get_num(void) { // Read the number at *expression (double in hex or dec)
   double x=0;
   double dec=10;
 
-  if (*expression=='0' && tolower(*(expression+1))=='x') { // Numeros en hex
+  if (*expression=='0' && tolower(*(expression+1))=='x') { // Hex numbers
 
     expression+=2;
     if ((*expression>='0' && *expression<='9') || (tolower(*expression)>='a' && tolower(*expression)<='f')) {
@@ -4190,7 +4190,7 @@ void calculate(void) {
 }
 
 //----------------------------------------------------------------------------
-//      itoa(int) Devuelve la cadena
+//      itoa(int) Returns the string
 //----------------------------------------------------------------------------
 
 extern int nullstring[4];
@@ -4203,7 +4203,7 @@ void __itoa(void) {
 }
 
 //----------------------------------------------------------------------------
-//      malloc(elementos) - Retorna 0 o índice de mem (impar)
+//      malloc(elements) - Returns 0 or mem index (odd)
 //----------------------------------------------------------------------------
 
 // TODO: STRING variables inside malloc'd blocks lack the 0xDAD... sentinel
@@ -4246,7 +4246,7 @@ void _malloc(void) {
 }
 
 //----------------------------------------------------------------------------
-//      free(índice de mem)
+//      free(mem index)
 //----------------------------------------------------------------------------
 
 void _free(void) {
@@ -4269,7 +4269,7 @@ void _free(void) {
 }
 
 //----------------------------------------------------------------------------
-//      encode(offset, size, clave) Devuelve 0 - 1
+//      encode(offset, size, key) Returns 0 - 1
 //----------------------------------------------------------------------------
 
 void init_rnd_coder(int n, char * clave);
@@ -4296,7 +4296,7 @@ void encode(void) {
 }
 
 //----------------------------------------------------------------------------
-//      encode_file(fichero, clave) Devuelve 0 - 1
+//      encode_file(file, key) Returns 0 - 1
 //----------------------------------------------------------------------------
 
 void encode_file(int encode) {
@@ -4387,7 +4387,7 @@ void _encrypt(int encode, char * fichero, char * clave) {
     rename(full,fichero); free(ptr); pila[sp]=0; e(105); return;
   }
 
-  // Si todo ha ido bien ...
+  // If everything went well ...
 
   fclose(f);
   free(ptr);
@@ -4396,7 +4396,7 @@ void _encrypt(int encode, char * fichero, char * clave) {
 }
 
 //----------------------------------------------------------------------------
-//      compress(fichero) Devuelve 0 - 1
+//      compress(file) Returns 0 - 1
 //----------------------------------------------------------------------------
 
 int divcompress    (unsigned char *dest,   unsigned long *destLen,
@@ -4469,7 +4469,7 @@ void _compress_file(int encode, char *fichero) {
       free(ptr_dest); free(ptr); pila[sp]=0; e(100); return;
     }
 
-    // Si no se gana espacio, se deja el fichero sin comprimir
+    // If no space is saved, leave the file uncompressed
 
     if (size2>=size-12) { free(ptr_dest); free(ptr); return; }
 
@@ -4522,7 +4522,7 @@ void _compress_file(int encode, char *fichero) {
     rename(full,fichero); free(ptr_dest); pila[sp]=0; e(105); return;
   }
 
-  // Si todo ha ido bien ...
+  // If everything went well ...
 
   fclose(f);
   free(ptr_dest);
@@ -4533,7 +4533,7 @@ void _compress_file(int encode, char *fichero) {
 //----------------------------------------------------------------------------
 
 // write ... printf, fprintf, itoatoi, calculate, ...
-// funciones de modo texto ... ???
+// text mode functions ... ???
 
 //----------------------------------------------------------------------------
 // WARNING: Validates a memory address against mem[] bounds and malloc'd blocks.
@@ -4551,11 +4551,11 @@ int validate_address(int dir) {
 }
 
 //----------------------------------------------------------------------------
-// Switch principal
+// Main switch
 //----------------------------------------------------------------------------
 
 #ifdef DEBUG
-extern int f_time[256]; // Tiempo consumido por las diferentes funciones
+extern int f_time[256]; // Time consumed by each function
 #endif
 
 /* Built-in function dispatcher: called by the 'lfun' opcode. Reads the
@@ -4747,8 +4747,8 @@ void function(void) {
   #endif
 }
 
-// Añadir una función:
-// En ltobj.def, en el case anterior y fname (y doc: add.prg y help)
+// To add a function:
+// In ltobj.def, in the switch above, and in fname (and docs: add.prg and help)
 
 char * fname[]={
 "signal","key","load_pal","load_fpg","start_scroll","stop_scroll","out_region",
@@ -4765,7 +4765,7 @@ char * fname[]={
 "get_joy_button","get_joy_position","convert_palette","load_map/pcx","reset_sound",
 "unload_map/pcx","unload_fnt","set_volume",
 
-// Nuevas funciones añadidas para DIV 2.0
+// New functions added for DIV 2.0
 
 "set_color","net_join_game","net_get_games","","x_advance","char",
 "path_find","path_line","path_free","new_map","","",

@@ -1,10 +1,10 @@
 
 //----------------------------------------------------------------------------
-// Código de las funciones de detección de colisión
+// Collision detection functions
 //----------------------------------------------------------------------------
 #include "inter.h"
 //----------------------------------------------------------------------------
-// Cabeceras
+// Headers
 //----------------------------------------------------------------------------
 int  check_collisions(int i,int bloque,int scroll);
 void test_collision(byte * buffer, int * ptr, int x, int y, int xg, int yg, int angle, int size, int flags);
@@ -17,14 +17,14 @@ void test_scanc(byte * p,short n,short m,short o,byte * si,int an,int x0,int y0,
 void test_scan(byte * p,short n,byte * si,int an,int x0,int y0,int x1,int y1);
 
 //----------------------------------------------------------------------------
-// Variables definidas a nivel de módulo
+// Module-level variables
 //----------------------------------------------------------------------------
 
 int colisiona;
 int p[24];
 
 //----------------------------------------------------------------------------
-//      Out_region(id,region) - solo para gráficos de pantalla o scroll
+//      Out_region(id,region) - only for screen or scroll graphics
 //----------------------------------------------------------------------------
 
 void out_region(void) {
@@ -33,13 +33,13 @@ void out_region(void) {
   int xg,yg,xg1,yg1,x,y,an,al;
   int * ptr,n,m;
 
-  reg=pila[sp--]; id=pila[sp]; pila[sp]=1; // Por defecto no está en la region
+  reg=pila[sp--]; id=pila[sp]; pila[sp]=1; // Default: not in the region
 
   if (mem[id+_Ctype]==2) { e(137); return; }
 
   file=mem[id+_File]; graph=mem[id+_Graph]; angle=mem[id+_Angle];
 
-  if (reg<0 || reg>=max_region) { e(108); return; } // Ya tiene region[reg].(x0..y1)
+  if (reg<0 || reg>=max_region) { e(108); return; } // Already has region[reg].(x0..y1)
 
   if (file<0 || file>max_fpgs) { e(109); return; }
 
@@ -77,33 +77,33 @@ void out_region(void) {
     if (mem[id+_Flags]&2) { yg=al-1-yg; } y-=yg;
   }
 
-  // Ya tiene region[reg].(x0..y1) y sprite(x,y,an,al)
+  // Already has region[reg].(x0..y1) and sprite(x,y,an,al)
 
   if (mem[id+_Ctype]==1) {
 
     for (n=0;n<10;n++)if(iscroll[n].on&&(mem[id+_Cnumber]==0||(mem[id+_Cnumber]&(1<<n)))) {
 
-      xg=x+iscroll[n].x-iscroll[n].map1_x; // Posición del sprite en el scroll
+      xg=x+iscroll[n].x-iscroll[n].map1_x; // Sprite position in the scroll
       yg=y+iscroll[n].y-iscroll[n].map1_y;
 
-      xg1=xg+an; yg1=yg+al; // 1º Intersección de xg,yg,an,al e iscroll[n]
+      xg1=xg+an; yg1=yg+al; // 1st intersection of xg,yg,an,al and iscroll[n]
 
       if (iscroll[n].x>xg) xg=iscroll[n].x;
       if (iscroll[n].y>yg) yg=iscroll[n].y;
       if (iscroll[n].x+iscroll[n].an<xg1) xg1=iscroll[n].x+iscroll[n].an;
       if (iscroll[n].y+iscroll[n].al<yg1) yg1=iscroll[n].y+iscroll[n].al;
 
-      if (xg>=xg1 || yg>=yg1) continue; // Si no hay intersección, continua
+      if (xg>=xg1 || yg>=yg1) continue; // No intersection, skip
 
       if (xg<region[reg].x1 && yg<region[reg].y1 && xg1>region[reg].x0 &&
-        yg1>region[reg].y0) { pila[sp]=0; return; } // Si está en la región
+        yg1>region[reg].y0) { pila[sp]=0; return; } // It is in the region
 
     }
 
   } else if (mem[id+_Ctype]==0) {
 
     if (x<region[reg].x1 && y<region[reg].y1 && x+an>region[reg].x0 &&
-        y+al>region[reg].y0) pila[sp]=0; // Si está en la región
+        y+al>region[reg].y0) pila[sp]=0; // It is in the region
 
   }
 }
@@ -130,16 +130,16 @@ void graphic_info(void) {
   } else { xg=*((word*)ptr+32); yg=*((word*)ptr+33); }
 
   switch(pila[sp+2]) {
-    case 0: pila[sp]=ptr[13]; break;                    //g_an (original)
-    case 1: pila[sp]=ptr[14]; break;                    //g_al (original)
-    case 2: pila[sp]=xg; break;                         //g_x_centro
-    case 3: pila[sp]=yg; break;                         //g_y_centro
+    case 0: pila[sp]=ptr[13]; break;                    //g_width (original)
+    case 1: pila[sp]=ptr[14]; break;                    //g_height (original)
+    case 2: pila[sp]=xg; break;                         //g_x_center
+    case 3: pila[sp]=yg; break;                         //g_y_center
     default: e(138);
   }
 }
 
 //----------------------------------------------------------------------------
-// Funcion principal del lenguaje collision(tipo de proceso)
+// Main language function collision(process type)
 //----------------------------------------------------------------------------
 
 // WARNING: Detects collisions between screen-screen, scroll-scroll, and
@@ -148,13 +148,13 @@ void graphic_info(void) {
 
 void collision(void) {
 
-  int i,bloque; // Recorre procesos de _IdScan en adelante, si _IdScan=0 desde start
+  int i,bloque; // Iterates processes from _IdScan onwards; if _IdScan=0 from start
   int file,graph,angle;
-  int x,y,n,m;  // Coordenadas del proceso actual
-  int64_t xg,yg;  // Centro gravitatorio del gráfico del proceso actual
+  int x,y,n,m;  // Current process coordinates
+  int64_t xg,yg;  // Center of gravity of the current process graphic
   int * ptr;
 
-  bloque=pila[sp]; pila[sp]=0; // Por defecto no colisiona
+  bloque=pila[sp]; pila[sp]=0; // Default: no collision
 
   if (mem[id+_Ctype]==2) { e(139); return; }
 
@@ -204,11 +204,11 @@ void collision(void) {
   if ((buffer=(byte *)malloc(buffer_an*buffer_al))==NULL) { e(100); return; }
   memset(buffer,0,buffer_an*buffer_al);
 
-  // Ahora se tiene que pintar el sprite en el buffer(clip...)
+  // Now paint the sprite into the buffer(clip...)
 
   put_collision(buffer,ptr,x,y,xg,yg,angle,mem[id+_Size],mem[id+_Flags]);
 
-  // Ya tiene region del sprite clipx0..clipy1 (si es en pantalla)
+  // Already has sprite region clipx0..clipy1 (if on screen)
 
   if (mem[id+_Ctype]==1) {
     for(n=0;n<10;n++)if(iscroll[n].on&&(mem[id+_Cnumber]==0||(mem[id+_Cnumber]&(1<<n)))) {
@@ -223,7 +223,7 @@ void collision(void) {
 }
 
 //----------------------------------------------------------------------------
-// Comprueba colisiones del sprite id (en buffer) con el resto (i..id_end)
+// Check collisions of sprite id (in buffer) against the rest (i..id_end)
 //----------------------------------------------------------------------------
 
 int check_collisions(int i,int bloque,int scroll) {
@@ -244,12 +244,12 @@ int check_collisions(int i,int bloque,int scroll) {
     if (i!=id && mem[i+_Bloque]==bloque && (mem[i+_Status]==2 ||
       	mem[i+_Status]==4) && mem[i+_Ctype]<2) {
 
-      if (mem[i+_Ctype]==1) { // Si es de scroll, determina que scroll (n)
-        if (scroll<0) { // Choque de pantalla con scroll - el primero activo
+      if (mem[i+_Ctype]==1) { // If scroll sprite, determine which scroll (n)
+        if (scroll<0) { // Screen vs scroll collision - first active
       	  for(n=0;n<10;n++)
       	    if(iscroll[n].on&&(mem[i+_Cnumber]==0||(mem[i+_Cnumber]&(1<<n)))) break;
       	  if (n==10) continue;
-        } else { // Choque de scroll con scroll - simpre que coincidan en el 1º
+        } else { // Scroll vs scroll collision - only if they share the 1st scroll
       	  if (mem[i+_Cnumber] && !(mem[i+_Cnumber]&(1<<scroll))) continue;
       	  else n=scroll;
       	}
@@ -289,12 +289,12 @@ int check_collisions(int i,int bloque,int scroll) {
 
       if (angle) {
 
-        // Distancia de seguridad
+        // Safety distance
 
         if (dist==0) dist=(int)sqrt((buffer_an*buffer_an+buffer_al*buffer_al)/4);
         an=((int)sqrt(ptr[13]*ptr[13]+ptr[14]*ptr[14])*mem[i+_Size])/100+dist;
 
-        // Distancia real
+        // Actual distance
 
         xx=(clipx0+clipx1)/2-x; yy=(clipy0+clipy1)/2-y; al=(int)sqrt(xx*xx+yy*yy);
 
@@ -340,7 +340,7 @@ int check_collisions(int i,int bloque,int scroll) {
 }
 
 //-----------------------------------------------------------------------------
-//      Devuelve la caja en la que se encuentra un gráfico rotado y escalado
+//      Returns the bounding box of a rotated and scaled graphic
 //-----------------------------------------------------------------------------
 
 void sp_size( int *x, int *y, int *xx, int *yy, int xg, int yg,
@@ -389,13 +389,13 @@ void sp_size( int *x, int *y, int *xx, int *yy, int xg, int yg,
 }
 
 //-----------------------------------------------------------------------------
-//      Devuelve la caja en la que se encuentra un gráfico rotado y/o escalado
+//      Returns the bounding box of a scaled graphic
 //-----------------------------------------------------------------------------
 
 void sp_size_scaled( int *x, int *y, int *xx, int *yy, int xg, int yg,
                      int size, int flags) {
 
-  int x0,y0,x1,y1; // Ventana ocupada por el sprite en el plano de copia
+  int x0,y0,x1,y1; // Area occupied by the sprite on the framebuffer
 
   if (flags&1) x0=*x-((*xx-1-xg)*size)/100;
   else x0=*x-(xg*size)/100;
@@ -411,13 +411,13 @@ void sp_size_scaled( int *x, int *y, int *xx, int *yy, int xg, int yg,
 }
 
 //----------------------------------------------------------------------------
-//      Funcion externa para pintar gráficos (para las colisiones)
+//      External function to render graphics (for collisions)
 //----------------------------------------------------------------------------
 
 void put_collision(byte * buffer, int * ptr, int x, int y, int xg, int yg, int angle, int size, int flags) {
 
   byte * si;
-  int an,al; // Información respecto a pantalla del grafico
+  int an,al; // Graphic screen dimensions
   byte * _copia;
   int _vga_an,_vga_al;
   int ix,iy;
@@ -441,9 +441,9 @@ void put_collision(byte * buffer, int * ptr, int x, int y, int xg, int yg, int a
   } else {
     if (flags&1) { xg=an-1-xg; } x-=xg+ix;
     if (flags&2) { yg=al-1-yg; } y-=yg+iy;
-    if (x>=clipx0 && x+an<=clipx1 && y>=clipy0 && y+al<=clipy1) // Pinta sprite sin cortar
+    if (x>=clipx0 && x+an<=clipx1 && y>=clipy0 && y+al<=clipy1) // Render unclipped sprite
       sp_normal(si,x,y,an,al,flags);
-    else if (x<clipx1 && y<clipy1 && x+an>clipx0 && y+al>clipy0) // Pinta sprite cortado
+    else if (x<clipx1 && y<clipy1 && x+an>clipx0 && y+al>clipy0) // Render clipped sprite
       sp_clipped(si,x,y,an,al,flags);
   }
 
@@ -455,13 +455,13 @@ void put_collision(byte * buffer, int * ptr, int x, int y, int xg, int yg, int a
 }
 
 //----------------------------------------------------------------------------
-// Sprite - rotado [escalado] [cortado] [espejado] [ghost]
+// Sprite - rotated [scaled] [clipped] [mirrored] [ghost]
 //----------------------------------------------------------------------------
 
 void sp_rotated_p(byte * si, int an, int al, int flags) {
 
-  int h,hmin,hmax; // Altura minima y maxima
-  int n,l0=0,l1;   // Lado 0 y lado 1 (indices p[])
+  int h,hmin,hmax; // Minimum and maximum height
+  int n,l0=0,l1;   // Side 0 and side 1 (p[] indices)
 
   int hmax0,hmax1;
   union { int l; short w[2]; } x0,x1,g0x={0},g1x={0},g0y={0},g1y={0};
@@ -560,13 +560,13 @@ void sp_rotated_p(byte * si, int an, int al, int flags) {
 }
 
 //----------------------------------------------------------------------------
-//      Funcion externa para comprobar gráficos (para las colisiones)
+//      External function to test graphics (for collisions)
 //----------------------------------------------------------------------------
 
 void test_collision(byte * buffer, int * ptr, int x, int y, int xg, int yg, int angle, int size, int flags) {
 
   byte * si;
-  int an,al; // Información respecto a pantalla del grafico
+  int an,al; // Graphic screen dimensions
   byte * _copia;
   int _vga_an,_vga_al;
   int ix,iy;
@@ -590,9 +590,9 @@ void test_collision(byte * buffer, int * ptr, int x, int y, int xg, int yg, int 
   } else {
     if (flags&1) { xg=an-1-xg; } x-=xg+ix;
     if (flags&2) { yg=al-1-yg; } y-=yg+iy;
-    if (x>=clipx0 && x+an<=clipx1 && y>=clipy0 && y+al<=clipy1) // Pinta sprite sin cortar
+    if (x>=clipx0 && x+an<=clipx1 && y>=clipy0 && y+al<=clipy1) // Test unclipped sprite
       test_normal(si,x,y,an,al,flags);
-    else if (x<clipx1 && y<clipy1 && x+an>clipx0 && y+al>clipy0) // Pinta sprite cortado
+    else if (x<clipx1 && y<clipy1 && x+an>clipx0 && y+al>clipy0) // Test clipped sprite
       test_clipped(si,x,y,an,al,flags);
   }
 
@@ -604,7 +604,7 @@ void test_collision(byte * buffer, int * ptr, int x, int y, int xg, int yg, int 
 }
 
 //----------------------------------------------------------------------------
-// Testásprite - [espejado] [ghost]
+// Test sprite - [mirrored] [ghost]
 //----------------------------------------------------------------------------
 
 void test_normal(byte * p, int x, int y, int an, int al, int flags) {
@@ -652,7 +652,7 @@ void test_normal(byte * p, int x, int y, int an, int al, int flags) {
 }
 
 //----------------------------------------------------------------------------
-// Testásprite - cortado [espejado] [ghost]
+// Test sprite - clipped [mirrored] [ghost]
 //----------------------------------------------------------------------------
 
 void test_clipped(byte * p, int x, int y, int an, int al, int flags) {
@@ -714,14 +714,14 @@ void test_clipped(byte * p, int x, int y, int an, int al, int flags) {
 }
 
 //----------------------------------------------------------------------------
-// Testásprite - escalado [cortado] [espejado] [ghost]
+// Test sprite - scaled [clipped] [mirrored] [ghost]
 //----------------------------------------------------------------------------
 
 void test_scaled(byte * old_si, int x, int y, int an, int al, int xg, int yg,
                    int size, int flags) {
 
-  int x0,y0,x1,y1; // Ventana ocupada por el sprite en el plano de copia
-  int salta_x, long_x, resto_x; // Referidas a pantalla
+  int x0,y0,x1,y1; // Area occupied by the sprite on the framebuffer
+  int salta_x, long_x, resto_x; // Screen-relative
   int salta_y, long_y, resto_y;
   int xr,ixr,yr,iyr,old_xr,old_an;
   byte *si,*di;
@@ -766,13 +766,13 @@ void test_scaled(byte * old_si, int x, int y, int an, int al, int xg, int yg,
 }
 
 //----------------------------------------------------------------------------
-// Testásprite - rotado [escalado] [cortado] [espejado] [ghost]
+// Test sprite - rotated [scaled] [clipped] [mirrored] [ghost]
 //----------------------------------------------------------------------------
 
 void test_rotated(byte * si, int an, int al, int flags) {
 
-  int h,hmin,hmax; // Altura minima y maxima
-  int n,l0=0,l1;     // Lado 0 y lado 1 (indices p[])
+  int h,hmin,hmax; // Minimum and maximum height
+  int n,l0=0,l1;     // Side 0 and side 1 (p[] indices)
 
   int hmax0,hmax1;
   union { int l; short w[2]; } x0,x1,g0x={0},g1x={0},g0y={0},g1y={0};

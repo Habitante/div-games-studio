@@ -1,6 +1,6 @@
 
 //-----------------------------------------------------------------------------
-//      Funciones para el coloreado del fuente
+//      Source code syntax colorizer functions
 //-----------------------------------------------------------------------------
 
 #include "global.h"
@@ -9,38 +9,38 @@ void col_analyze_ltlex(void);
 
 //-----------------------------------------------------------------------------
 
-#define max_obj 768     // Límite máximo de objetos del compilador
-#define long_med_id 16  // Longitud media de los identificadores (+4+4+1)
+#define max_obj 768     // Maximum compiler object count
+#define long_med_id 16  // Average identifier length (+4+4+1)
 
-#define max_nodos 128   // Máximo número de nodos del léxico para símbolos
+#define max_nodos 128   // Maximum lexer symbol nodes
 
-#define cr 13           // Retorno de carro
-#define lf 10           // Salto de linea
-#define tab 9           // Tabulación
+#define cr 13           // Carriage return
+#define lf 10           // Line feed
+#define tab 9           // Tab
 
-#define l_err 0         // Valores de lex_case, si no son punteros a lex_simb
-#define l_cr  1         // Fin de linea (l_err Carácter no esperado)
-#define l_id  2         // Identificador o palabra reservada
-#define l_spc 3         // Espacios y tabulaciones
+#define l_err 0         // lex_case values when not pointers to lex_simb
+#define l_cr  1         // End of line (l_err = unexpected character)
+#define l_id  2         // Identifier or reserved word
+#define l_spc 3         // Spaces and tabs
 #define l_lit 4         // Literal
-#define l_num 5         // Constante numérica
+#define l_num 5         // Numeric constant
 
-#define p_ultima        0x00 // Fin de fichero <EOF>
+#define p_ultima        0x00 // End of file <EOF>
 
 #define p_process       0x07 // Process
 
-#define p_ini_rem       0x7d // Inicio comentario
-#define p_end_rem       0x7e // Fin comentario
-#define p_rem           0x7f // Comentario de una linea
+#define p_ini_rem       0x7d // Comment start
+#define p_end_rem       0x7e // Comment end
+#define p_rem           0x7f // Single-line comment
 
-#define p_id            0xfd // Identificador
-#define p_num           0xfe // Número
+#define p_id            0xfd // Identifier
+#define p_num           0xfe // Number
 
-#define p_spc           0x100 // Espacios
-#define p_sym           0x101 // Símbolo
-#define p_lit           0x102 // Literal entre comillas
-#define p_res           0x103 // Id reservado
-#define p_pre           0x104 // Id predefinido
+#define p_spc           0x100 // Spaces
+#define p_sym           0x101 // Symbol
+#define p_lit           0x102 // Quoted literal
+#define p_res           0x103 // Reserved word id
+#define p_pre           0x104 // Predefined id
 
 //-----------------------------------------------------------------------------
 
@@ -51,15 +51,15 @@ struct clex_ele {
   struct clex_ele * siguiente;
 } clex_simb[max_nodos], * iclex_simb, * clex_case[256];
 
-int cnum_nodos; // Número de nodos ocupados en clex_simb
+int cnum_nodos; // Number of nodes used in clex_simb
 
-int iscoment; // Indica si está dentro de un comentario.
-int numrem;   // Relación entre /* y */
+int iscoment; // Whether inside a comment
+int numrem;   // Nesting level of /* and */
 
-byte * cvnom=NULL; // Vector de nombres (cad_hash:int, pieza (o iobj):int, asciiz)
+byte * cvnom=NULL; // Name vector (hash_chain:int, token (or iobj):int, asciiz)
 union { byte*b; byte**p; } icvnom;
 
-byte * cvhash[256]; // Punteros al vector de nombres;
+byte * cvhash[256]; // Pointers into the name vector
 
 int cpieza;
 
@@ -68,7 +68,7 @@ byte * csource;
 int incluye_nombres;
 
 //-----------------------------------------------------------------------------
-//      Función de error (!!!) (solo para cuando analiza ltlex)
+//      Error function (!!!) (only used when analyzing ltlex)
 //-----------------------------------------------------------------------------
 
 void col_error(int n, int m) {
@@ -76,7 +76,7 @@ void col_error(int n, int m) {
 }
 
 //-----------------------------------------------------------------------------
-//      Función de inicialización del coloreador
+//      Syntax colorizer initialization
 //-----------------------------------------------------------------------------
 
 void init_lexcolor() {
@@ -111,7 +111,7 @@ void end_lexcolor() {
 }
 
 //-----------------------------------------------------------------------------
-//      Lexico (lee una nueva cpieza del *csource)
+//      Lexer (reads the next token from *csource)
 //-----------------------------------------------------------------------------
 
 void color_lex(void) {
@@ -120,7 +120,7 @@ void color_lex(void) {
   struct clex_ele * e;
   int n;
 
-  switch ((uintptr_t)clex_case[*_source]) { // Puntero a un clex_ele o l_???
+  switch ((uintptr_t)clex_case[*_source]) { // Pointer to a clex_ele or l_???
 
     case l_err:
       cpieza=p_rem; _source++; break;
@@ -137,21 +137,21 @@ void color_lex(void) {
       if (icvnom.b-cvnom>max_obj*long_med_id) { icvnom.b=_ivnom; cpieza=p_id; break; }
       ptr=&cvhash[h];
       while (*ptr && strcmp((char *)(ptr+2),(char *)_ivnom+ptr8)) ptr=(byte **)*ptr;
-      if (!strcmp((char *)(ptr+2),(char *)_ivnom+ptr8)) { // id encontrado
-        icvnom.b=_ivnom; // lo saca de cvnom
+      if (!strcmp((char *)(ptr+2),(char *)_ivnom+ptr8)) { // id found
+        icvnom.b=_ivnom; // remove it from cvnom
         cpieza=(intptr_t)*(ptr+1);
-        if (cpieza<256 && cpieza>=0) { // palabra reservada (token)
+        if (cpieza<256 && cpieza>=0) { // reserved word (token)
           if (cpieza==p_rem) {
             while (*_source!=cr && *_source) _source++;
           } else cpieza=p_res;
-        } else { // objeto (id anterior)
+        } else { // object (previous id)
           cpieza=p_pre;
         }
-      } else { // id nuevo
+      } else { // new id
         if (incluye_nombres) {
-          *ptr=_ivnom; // añade un nuevo id
+          *ptr=_ivnom; // add a new id
         } else {
-          icvnom.b=_ivnom; // lo saca de cvnom
+          icvnom.b=_ivnom; // remove it from cvnom
         }
         cpieza=p_id;
       } break;
@@ -161,7 +161,7 @@ void color_lex(void) {
 
     case l_lit:
       if (iscoment>0) { cpieza=p_rem; _source++; break; }
-      cpieza=p_lit; h=*_source; _ivnom=icvnom.b; // Literal entre dos h
+      cpieza=p_lit; h=*_source; _ivnom=icvnom.b; // Literal delimited by h
       do { _source++;
            if (*_source==cr || !*_source) break;
            if (*_source==h)
@@ -183,7 +183,7 @@ void color_lex(void) {
       } else do { _source++; } while ((uintptr_t)clex_case[*_source]==l_num);
       break;
 
-    default: // puntero a un clex_ele
+    default: // pointer to a clex_ele
 
       e=clex_case[*_source++]; _ivnom=_source; cpieza=(*e).token;
       while ((e=(*e).siguiente)) {
@@ -208,11 +208,11 @@ void color_lex(void) {
 
 //-----------------------------------------------------------------------------
 
-FILE * cdef; // Para el analizador de "ltlex.def"
+FILE * cdef; // For the "ltlex.def" analyzer
 byte *_cbuf;
 
 //-----------------------------------------------------------------------------
-//      Precarga de las estructuras léxicas, analiza el fichero ltlex.def
+//      Preload lexical structures by parsing the ltlex.def file
 //-----------------------------------------------------------------------------
 
 void col_analyze_ltlex(void){
@@ -222,7 +222,7 @@ void col_analyze_ltlex(void){
   struct clex_ele * e;
 
   int t=0; //token (cpieza)
-  byte h; //hash (para id)
+  byte h; //hash (for id)
   byte * _ivnom;
   byte * * ptr;
 
@@ -246,14 +246,14 @@ void col_analyze_ltlex(void){
       *buf=lower[*buf]; if (*buf>='0' && *buf<='9') t+=(*buf++-'0');
       else if (*buf>='a' && *buf<='f') t+=(*buf++-'a'+10); else col_error(0,2);
       if (*buf==cr || *buf==' ' || *buf==tab) break;
-      else if (lower[*buf]) {           //Analiza una palabra reservada
+      else if (lower[*buf]) {           //Parse a reserved word
         _ivnom=icvnom.b; *icvnom.p++=0; *icvnom.p++=(byte *)t; h=0;
         while ((*icvnom.b=lower[*buf++])) h=((byte)(h<<1)+(h>>7))^(*icvnom.b++);
         ptr=&cvhash[h]; while (*ptr) ptr=(byte **)*ptr; *ptr=_ivnom;
         buf--; icvnom.b++;
-      } else if (t>=0x78 && t<=0x7b) {  //Analiza un delimitador de literal
+      } else if (t>=0x78 && t<=0x7b) {  //Parse a literal delimiter
         clex_case[*buf]=(struct clex_ele*)l_lit;
-      } else {                          //Analiza un nuevo símbolo
+      } else {                          //Parse a new symbol
         if ((e=clex_case[*buf])==0) {
           if (cnum_nodos++==max_nodos) col_error(0,3);
           e=clex_case[*buf]=iclex_simb++; (*e).caracter=*buf++;
@@ -282,7 +282,7 @@ void col_analyze_ltlex(void){
 }
 
 //-----------------------------------------------------------------------------
-//  Añade al vector hash las palabras predefinidas
+//  Add predefined words to the hash vector
 //-----------------------------------------------------------------------------
 
 void col_analyze_ltobj(void){

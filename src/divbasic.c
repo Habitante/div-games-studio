@@ -163,7 +163,7 @@ void memxchg(byte *d, byte *s, int n) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-//      MEGARUTINA para reponer el fondo de una caja en edición
+//      Main routine to restore the background of an editing box
 ///////////////////////////////////////////////////////////////////////////////
 
 static int zoom_region=0;
@@ -211,9 +211,9 @@ void draw_edit_background(int x,int y,int an,int al) {
 
   if (_big) { big=1; big2=2; }
 
-  // Llama a zoom_map para que actualice la caja correspondiente
+  // Call zoom_map to update the corresponding box
 
-  // 1 - Intersección entre zoom y ventana en la copia
+  // 1 - Intersection between zoom and window in the framebuffer
 
   _x0=(x>zoom_win_x)?x:zoom_win_x;
   _y0=(y>zoom_win_y)?y:zoom_win_y;
@@ -222,7 +222,7 @@ void draw_edit_background(int x,int y,int an,int al) {
 
   if (_x1<_x0 || _y1<_y0) return;
 
-  // 2 - Calcular el pimer pixel y ultimo pixel del mapa
+  // 2 - Calculate the first and last pixel of the map
 
   _x0=((_x0-zoom_win_x)>>zoom)+zoom_x;
   _y0=((_y0-zoom_win_y)>>zoom)+zoom_y;
@@ -245,7 +245,7 @@ void draw_edit_background(int x,int y,int an,int al) {
 }
 
 //-----------------------------------------------------------------------------
-//      Zoom, blit_screen de map(map_width*map_height) a copia segun zoom,zoom_x/y
+//      Zoom, blit map(map_width*map_height) to framebuffer according to zoom,zoom_x/y
 //-----------------------------------------------------------------------------
 
 int an,al;
@@ -261,7 +261,7 @@ void zoom_map(void) {
     p=map+zoom_y*map_width+zoom_x;
     q=copia;
 
-    if ((map_width<<zoom)<vga_width) { // Copia de este trozo en select_zoom()
+    if ((map_width<<zoom)<vga_width) { // This chunk is copied in select_zoom()
       zoom_win_width=map_width<<zoom; zoom_win_x=(vga_width-zoom_win_width)/2; q+=zoom_win_x; an=map_width;
     } else {
       zoom_win_x=0; an=vga_width>>zoom; zoom_win_width=an<<zoom;
@@ -384,7 +384,7 @@ void zoom_map(void) {
 }
 
 //-----------------------------------------------------------------------------
-//      Sub barra de fill interpolativo
+//      Interpolative fill toolbar sub-mode
 //-----------------------------------------------------------------------------
 
 void interpolation_mode(void) {
@@ -439,21 +439,21 @@ void interpolation_mode(void) {
 }
 
 //-----------------------------------------------------------------------------
-//      Interpolación
+//      Interpolation
 //-----------------------------------------------------------------------------
 
-void fill_inter(int an,int al) { // Rellena con medias una zona
+void fill_inter(int an,int al) { // Fill a region with averaged values
 
   int x,y;
   word *si,*di,n0,n1,n2,n3;
   int n;
 
-  // 1 - Desplaza m0 hacia derecha abajo un pixel
+  // 1 - Shift m0 one pixel down-right
 
   for (y=al-1;y>0;y--) for (x=an-1;x>0;x--) *(m0+y*an+x)=*(m0+(y-1)*an+x-1);
   for (x=0;x<an;x++) { *(m0+x)=0; } for (y=0;y<al;y++) { *(m0+y*an)=0; }
 
-  // 2 - Refresca en m0 el alambre de puntos que rodean a la zona
+  // 2 - Refresh in m0 the border pixels surrounding the region
 
   for (y=sel_mask_y0-1;y<=sel_mask_y1+1;y++) if (y>=0 && y<map_height)
     for (x=sel_mask_x0-1;x<=sel_mask_x1+1;x++) if (x>=0 && x<map_width) {
@@ -466,14 +466,14 @@ void fill_inter(int an,int al) { // Rellena con medias una zona
       }
     }
 
-  // Interpola de m0 a m1
+  // Interpolate from m0 to m1
 
   si=m0; di=m1;
 
   for (y=0;y<al-1;y++) {
     for (x=0;x<an-1;x++) {
 
-        if ((n0=*si)) // Pone en *(di) la media de los cuatro *(si+?)
+        if ((n0=*si)) // Store in *(di) the average of the four *(si+?)
              if ((n1=*(si+1)))
                   if ((n2=*(si+an)))
                        if ((n3=*(si+an+1)))
@@ -508,14 +508,14 @@ void fill_inter(int an,int al) { // Rellena con medias una zona
     } si++; di++;
   }
 
-  // Y ahora interpola de m1 a m0
+  // Now interpolate from m1 to m0
 
   si=m1; di=m0;
 
   for (y=0;y<al-1;y++) {
     for (x=0;x<an-1;x++) {
 
-        if ((n0=*si)) // Pone en *(di) la media de los cuatro *(si+?)
+        if ((n0=*si)) // Store in *(di) the average of the four *(si+?)
              if ((n1=*(si+1)))
                   if ((n2=*(si+an)))
                        if ((n3=*(si+an+1)))
@@ -554,7 +554,7 @@ void fill_inter(int an,int al) { // Rellena con medias una zona
 }
 
 //-----------------------------------------------------------------------------
-//      Selecciona un bloque por un relleno (x,y,fill_dac)
+//      Select a region by flood fill (x,y,fill_dac)
 //-----------------------------------------------------------------------------
 
 void fill_select(word x,word y) {
@@ -571,7 +571,7 @@ void fill_select(word x,word y) {
 }
 
 //-----------------------------------------------------------------------------
-//      Relleno de una zona (que contiene colores fill_dac) con un color
+//      Fill a region (containing fill_dac colors) with a color
 //-----------------------------------------------------------------------------
 
 void fill(word x,word y) {
@@ -585,10 +585,10 @@ void fill(word x,word y) {
     memset(selection_mask,0,((map_width*map_height+31)/32)*4);
 
     if (mode_fill==2) {
-      memset(fill_dac,1,256); // Rellena hasta el color seleccionado
+      memset(fill_dac,1,256); // Fill up to the selected color
       fill_dac[color]=0;
     } else {
-      memset(fill_dac,0,256); // Rellena el color de map(x,y)
+      memset(fill_dac,0,256); // Fill the color at map(x,y)
       fill_dac[*(map+y*map_width+x)]=1;
     }
 
@@ -619,7 +619,7 @@ void fill(word x,word y) {
 }
 
 //-----------------------------------------------------------------------------
-//      Algoritmo de fill (por scanes)
+//      Fill algorithm (scanline-based)
 //-----------------------------------------------------------------------------
 
 void fill_scan(word x,word y) {
@@ -640,9 +640,9 @@ void fill_scan(word x,word y) {
   x=x0; sigue_scan_0:
 
   if (y>0) while (x<=x1) {
-    if (!is_selection_mask(x,y-1)) // Si no está pintado
-      if (fill_dac[*(map+(y-1)*map_width+x)]) // Si se tiene que pintar
-        if (fsp<fsp_max) { // Si se puede pintar
+    if (!is_selection_mask(x,y-1)) // If not already filled
+      if (fill_dac[*(map+(y-1)*map_width+x)]) // If it needs to be filled
+        if (fsp<fsp_max) { // If there is stack space
           *fsp=x0; fsp++; *fsp=x1; fsp++;
           *fsp=x+2; fsp++; *fsp=y; fsp++;
           *fsp=0; fsp++; y--;
@@ -654,9 +654,9 @@ void fill_scan(word x,word y) {
   x=x0; sigue_scan_1:
 
   if (y<map_height-1) while (x<=x1) {
-    if (!is_selection_mask(x,y+1)) // Si no está pintado
-      if (fill_dac[*(map+(y+1)*map_width+x)]) // Si se tiene que pintar
-        if (fsp<fsp_max) { // Si se puede pintar
+    if (!is_selection_mask(x,y+1)) // If not already filled
+      if (fill_dac[*(map+(y+1)*map_width+x)]) // If it needs to be filled
+        if (fsp<fsp_max) { // If there is stack space
           *fsp=x0; fsp++; *fsp=x1; fsp++;
           *fsp=x+2; fsp++; *fsp=y; fsp++;
           *fsp=1; fsp++; y++;
@@ -665,7 +665,7 @@ void fill_scan(word x,word y) {
     x++;
   }
 
-  if (fsp>fss) { // Mientras queden scanes sin terminar
+  if (fsp>fss) { // While there are unfinished scanlines
     fsp-=2; y=*fsp; fsp--; x=*fsp;
     fsp--; x1=*fsp; fsp--; x0=*fsp;
     if (*(fsp+4)) goto sigue_scan_1; else goto sigue_scan_0;
@@ -674,7 +674,7 @@ void fill_scan(word x,word y) {
 }
 
 //-----------------------------------------------------------------------------
-//      Relleno del fill
+//      Draw the fill result
 //-----------------------------------------------------------------------------
 
 extern byte * textura_color;
@@ -695,10 +695,10 @@ void fill_draw(void) {
 }
 
 //-----------------------------------------------------------------------------
-//      Volcado de la zona interpolada
+//      Blit the interpolated region
 //-----------------------------------------------------------------------------
 
-void blit_interpolated(int an) { // Vuelca a pantalla la zona interpolada
+void blit_interpolated(int an) { // Blit the interpolated region to screen
 
   int x,y,n;
 
@@ -710,12 +710,12 @@ void blit_interpolated(int an) { // Vuelca a pantalla la zona interpolada
 }
 
 //-----------------------------------------------------------------------------
-//      Dibuja una selección de mapa de bits (según zoom,zoom_x/y,sel_mask_*)
+//      Draw a bitmap selection (according to zoom,zoom_x/y,sel_mask_*)
 //-----------------------------------------------------------------------------
 
 void draw_selection_mask(void) {
 
-  int x0,y0,x1,y1; // Intersección de la zona seleccionada y lo visto en zoom
+  int x0,y0,x1,y1; // Intersection of the selected region and the visible zoom area
   int x,y,c;
   byte *p,g0=c0,g4=c4;
   word g04,g40;
@@ -860,7 +860,7 @@ void draw_selection_mask(void) {
 }
 
 //-----------------------------------------------------------------------------
-//      Dibuja una caja de selección (según zoom,zoom_x/y)
+//      Draw a selection box (according to zoom,zoom_x/y)
 //-----------------------------------------------------------------------------
 
 void draw_selection_box(int _x0,int _y0,int _x1,int _y1) {
@@ -932,26 +932,26 @@ void draw_selection_box(int _x0,int _y0,int _x1,int _y1) {
 }
 
 //-----------------------------------------------------------------------------
-//      Funciones del mapa de bits, poner un pixel
+//      Bitmap functions, set a pixel
 //-----------------------------------------------------------------------------
 
-void set_selection_mask(int x,int y) { // Pone un pixel en el mapa de bits
+void set_selection_mask(int x,int y) { // Set a pixel in the bitmap
 
-  x+=y*map_width; // Nº de bit en el buffer
-  y=x>>5; // Nº de int en el buffer
-  x&=31; // Nº de bit en el int
+  x+=y*map_width; // Bit index in the buffer
+  y=x>>5; // Int index in the buffer
+  x&=31; // Bit index within the int
   *(selection_mask+y)|=1<<x;
 }
 
 //-----------------------------------------------------------------------------
-//      Funciones del mapa de bits, consultar un pixel
+//      Bitmap functions, test a pixel
 //-----------------------------------------------------------------------------
 
-int is_selection_mask(int x,int y) { // Consulta un pixel en el mapa de bits
+int is_selection_mask(int x,int y) { // Test a pixel in the bitmap
 
-  x+=y*map_width; // Nº de bit en el buffer
-  y=x>>5; // Nº de int en el buffer
-  x&=31; // Nº de bit en el int
+  x+=y*map_width; // Bit index in the buffer
+  y=x>>5; // Int index in the buffer
+  x&=31; // Bit index within the int
   return(*(selection_mask+y)&(1<<x));
 }
 
@@ -968,12 +968,12 @@ int is_near_selection_mask(int x,int y) {
 }
 
 //-----------------------------------------------------------------------------
-//      UNDO - Guarda la zona ocupada por una acción, antes de realizarla claro
+//      UNDO - Save the region affected by an action, before performing it
 //-----------------------------------------------------------------------------
 
 byte * save_undo(int x, int y, int an, int al) {
 
-  int a,start,end; // Inicio y fin del bloque guardado (en undo[])
+  int a,start,end; // Start and end of the saved block (in undo[])
   byte *ret=0;
 
   if (x<0) { an+=x; x=0; }
@@ -982,7 +982,7 @@ byte * save_undo(int x, int y, int an, int al) {
   if (y+al>map_height) { al=map_height-y; }
   if (an<=0 || al<=0) return((byte *)-1);
 
-  // Determina la zona de zoom a refrescar
+  // Determine the zoom region to refresh
 
   if (x<zoom_x) need_zoom_x=zoom_win_x-((zoom_x-x)<<zoom);
   else need_zoom_x=zoom_win_x+((x-zoom_x)<<zoom);
@@ -1007,7 +1007,7 @@ byte * save_undo(int x, int y, int an, int al) {
 
   if (start+an*al>undo_memory) start=0;
 
-  // Si una acción ocupa más de undo_memory, entonces no la guardamos.
+  // If an action exceeds undo_memory, don't save it.
 
   if ((end=start+an*al)<=undo_memory) {
 
@@ -1018,7 +1018,7 @@ byte * save_undo(int x, int y, int an, int al) {
 
     undo_table[undo_index].mode=draw_mode;
 
-    // Nos cargamos los bloques machacados
+    // Invalidate any overwritten blocks
 
     for (a=0;a<max_undos;a++)
       if (a!=undo_index && undo_table[a].mode!=-1)
@@ -1026,13 +1026,13 @@ byte * save_undo(int x, int y, int an, int al) {
            (undo_table[a].start>=start && undo_table[a].start<end))
            undo_table[a].mode=-1;
 
-    // Guardamos la zona que ocupará la acción realizada.
+    // Save the region that will be affected by the action.
 
     copy_block(undo+start,map+x+y*map_width,an,al);
 
     undo_table[undo_index].code=current_map_code;
 
-    undo_index=(undo_index+1)%max_undos; undo_table[undo_index].mode=-1; // Se prohibe undo_next()
+    undo_index=(undo_index+1)%max_undos; undo_table[undo_index].mode=-1; // Disable undo_next()
 
     ret=(byte *)(undo+start);
 
@@ -1047,7 +1047,7 @@ byte * save_undo(int x, int y, int an, int al) {
 }
 
 //-----------------------------------------------------------------------------
-//      UNDO - Restaura la zona ocupada por la última acción.
+//      UNDO - Restore the region affected by the last action.
 //-----------------------------------------------------------------------------
 
 int undo_back(void) {
@@ -1065,7 +1065,7 @@ int undo_back(void) {
 
     xchg_block(undo+undo_table[a].start,map+x+y*map_width,an,al);
 
-    // Determina la zona de zoom a refrescar
+    // Determine the zoom region to refresh
 
     if (x<zoom_x) need_zoom_x=zoom_win_x-((zoom_x-x)<<zoom);
     else need_zoom_x=zoom_win_x+((x-zoom_x)<<zoom);
@@ -1087,7 +1087,7 @@ int undo_back(void) {
 }
 
 //-----------------------------------------------------------------------------
-//      UNDO - Rehace la untima acción desecha con undo_back()
+//      UNDO - Redo the last action undone with undo_back()
 //-----------------------------------------------------------------------------
 
 void undo_next(void) {
@@ -1102,7 +1102,7 @@ void undo_next(void) {
 
     xchg_block(undo+undo_table[undo_index].start,map+x+y*map_width,an,al);
 
-    // Determina la zona de zoom a refrescar
+    // Determine the zoom region to refresh
 
     if (x<zoom_x) need_zoom_x=zoom_win_x-((zoom_x-x)<<zoom);
     else need_zoom_x=zoom_win_x+((x-zoom_x)<<zoom);
@@ -1126,7 +1126,7 @@ void undo_next(void) {
 }
 
 //-----------------------------------------------------------------------------
-//      Copia un bloque del mapa a memoria
+//      Copy a block from the map to memory
 //-----------------------------------------------------------------------------
 
 void copy_block(byte *d,byte *s,int an,int al) {
@@ -1138,7 +1138,7 @@ void copy_block(byte *d,byte *s,int an,int al) {
 }
 
 //-----------------------------------------------------------------------------
-//      Intercambia un bloque entre el mapa y memoria
+//      Swap a block between the map and memory
 //-----------------------------------------------------------------------------
 
 void xchg_block(byte *d,byte *s,int an,int al) {

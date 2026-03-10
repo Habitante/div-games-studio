@@ -1,6 +1,6 @@
 
 //-----------------------------------------------------------------------------
-//      Pruebas con la interrupción de teclado
+//      Keyboard interrupt handler
 //-----------------------------------------------------------------------------
 
 #include "inter.h"
@@ -32,8 +32,8 @@ byte * shift = (byte *) 0x417; // Shift status
 #endif
 
 byte buf[64*3]; // {ascii,scan_code,shift_status}
-int ibuf=0; // Puntero al buffer, inicio de la cola
-int fbuf=0; // Puntero al buffer, fin de la cola
+int ibuf=0; // Buffer pointer, start of queue
+int fbuf=0; // Buffer pointer, end of queue
 
 //-----------------------------------------------------------------------------
 // Interrupt handler related functions.
@@ -150,7 +150,7 @@ void kbdReset(void)
 }
 
 //-----------------------------------------------------------------------------
-//      Espera una tecla, actualiza variables (ascii,scan_code y shift_status)
+//      Wait for a key, update variables (ascii, scan_code and shift_status)
 //-----------------------------------------------------------------------------
 
 void bios_key(void) {
@@ -405,7 +405,7 @@ if(vwidth == 0 && vheight == 0) {
 }
 
 //-----------------------------------------------------------------------------
-//      Vacia el buffer de teclado (real e interno)
+//      Flush the keyboard buffer (real and internal)
 //-----------------------------------------------------------------------------
 
 void flush_buffer(void) {
@@ -419,5 +419,5 @@ void flush_buffer(void) {
   ascii=0; scan_code=0;
   r.h.ah=2; int386x(0x16,&r,&r,&s); shift_status=r.h.al;
 #endif
-  ibuf=fbuf=0; // Vacia el buffer interno
+  ibuf=fbuf=0; // Flush the internal buffer
 }

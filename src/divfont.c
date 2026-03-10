@@ -98,14 +98,14 @@ char cWork[10];
 
         create_listbox(&lfontsizes);
 
-        wbox(v.ptr,an,al,c0,2,49,an-4,1);       // Linea horizontal superior
-        wbox(v.ptr,an,al,c0,54,49,1,92-20);        // Linea vertical izquierda
-        wbox(v.ptr,an,al,c0,114,49,1,92-20);       // Linea vertical derecha
-        wbox(v.ptr,an,al,c0,18+67,10,1,39);     // Linea vertical sup-media
+        wbox(v.ptr,an,al,c0,2,49,an-4,1);       // Upper horizontal line
+        wbox(v.ptr,an,al,c0,54,49,1,92-20);        // Left vertical line
+        wbox(v.ptr,an,al,c0,114,49,1,92-20);       // Right vertical line
+        wbox(v.ptr,an,al,c0,18+67,10,1,39);     // Upper-middle vertical line
 
-        wbox(v.ptr,an,al,c2,24-8,61-1,16,8); // Borde oscuro del Outline
-        wbox(v.ptr,an,al,c2,84-8,61-1,16,8); // Borde oscuro de la somx
-        wbox(v.ptr,an,al,c2,84-8,75-1,16,8); // Borde oscuro de la somy
+        wbox(v.ptr,an,al,c2,24-8,61-1,16,8); // Dark border for Outline
+        wbox(v.ptr,an,al,c2,84-8,61-1,16,8); // Dark border for shadow X
+        wbox(v.ptr,an,al,c2,84-8,75-1,16,8); // Dark border for shadow Y
 
         wwrite(v.ptr,an,al,4+60+20,51,1,texto[86],c3);
         wwrite(v.ptr,an,al,24+60,61,1,(byte *)itoa(OutLine,cWork,10),c3);
@@ -118,16 +118,16 @@ char cWork[10];
         wwrite(v.ptr,an,al,124-120+20,51,1,texto[91],c3);
 
         wwrite(v.ptr,an,al,4,12,0,texto[84],c3);
-        wbox(v.ptr,an,al,c2,4,19,66,8); // Borde oscuro del Font
+        wbox(v.ptr,an,al,c2,4,19,66,8); // Dark border for Font
         wwrite(v.ptr,an,al,4,19,0,(byte *)FontName,c4);
         wwrite(v.ptr,an,al,4,31,0,texto[85],c3);
-        wbox(v.ptr,an,al,c2,4,38,66,8); // Borde oscuro de Face
+        wbox(v.ptr,an,al,c2,4,38,66,8); // Dark border for Face
         wwrite(v.ptr,an,al,4,38,0,(byte *)FaceName,c4);
 
         ShowText();
 
-        wbox(v.ptr,an,al,c0,2,al-38-3,an-4,1);  // Linea horizontal inferior
-        wbox(v.ptr,an,al,c0,2,al-20,an-4,1);  // Linea horizontal inferior
+        wbox(v.ptr,an,al,c0,2,al-38-3,an-4,1);  // Lower horizontal line
+        wbox(v.ptr,an,al,c0,2,al-20,an-4,1);  // Lower horizontal line
 }
 
 void close_old_fnt(void) {
@@ -622,7 +622,7 @@ FILE *file;
 
         memcpy(ifs.tabla,MiTabladeLetras,256);
 
-        ifs.claros[0]=0; // El color transparente se mantiene
+        ifs.claros[0]=0; // Transparent color stays unchanged
         ifs.oscuros[0]=0;
 
         _c0=find_color_not0(dac[0],dac[1],dac[2]);
@@ -676,7 +676,7 @@ int an=v.an/big2,al=v.al/big2;
                 DIV_STRCPY(FontPathName,tipo[v_type].path);
                 if (!IS_PATH_SEP(FontPathName[strlen(FontPathName)-1])) strcat(FontPathName,"/");
                 DIV_STRCAT(FontPathName,input);
-                wbox(v.ptr,an,al,c2,4,19,66,8); // Borde oscuro del Font
+                wbox(v.ptr,an,al,c2,4,19,66,8); // Dark border for Font
                 wwrite(v.ptr,an,al,4,19,0,(byte *)FontName,c4);
                 v.redraw=1;
         }
@@ -684,7 +684,7 @@ int an=v.an/big2,al=v.al/big2;
 
 //-----------------------------------------------------------------------------
 
-#define max_archivos 512 // ------------------------------- Listbox de archivos
+#define max_archivos 512 // ------------------------------- File listbox
 extern struct t_listboxbr larchivosbr;
 extern t_thumb thumb[max_archivos];
 extern int num_taggeds;
@@ -732,7 +732,7 @@ FILE *f;
                             DIV_STRCAT(FacePathName,input);
                           }
                         }
-                        wbox(v.ptr,an,al,c2,4,38,66,8); // Borde oscuro de Face
+                        wbox(v.ptr,an,al,c2,4,38,66,8); // Dark border for Face
                         wwrite(v.ptr,an,al,4,38,0,(byte *)FaceName,c4);
                         v.redraw=1;
                 }
@@ -822,7 +822,7 @@ void Selcolor3(void)
 
 void Selcolor0(void)
 {
-        v.type=1; // Diálogo
+        v.type=1; // Dialog
         v.an=131;
         v.al=157;
         v.title=texto[78];
@@ -861,23 +861,23 @@ char *MyBuffer,*BuffAux;
         ptr+=11*big2*can+2*big2;
 
         if((can-4*big2)>=TamaX)
-        {//Si es mas estrecho que la ventana, centralo en esta
+        {// Narrower than window: center in window
                 bancho=TamaX;
                 ptr+=((can-4*big2)-TamaX)/2+1;
         }
         else
-        {//Si es mas ancho que la ventana, centra el BuffAux.
+        {// Wider than window: center the buffer
                 bancho=(can-4*big2);
                 BuffAux+=(TamaX-(can-4*big2))/2;
         }
 
         if((cal-29*big2)>=TamaY)
-        {//Si es mas alto que la ventana, centralo en esta
+        {// Shorter than window: center in window
                 balto=TamaY;
                 ptr+=(((cal-29*big2)-TamaY)/2)*can;
         }
         else
-        {//Si es mas alto que la ventana, centra el BuffAux.
+        {// Taller than window: center the buffer
                 balto=(cal-29*big2);
                 BuffAux+=((TamaY-(cal-29*big2))/2)*TamaX;
         }
@@ -918,7 +918,7 @@ void Preview0()
     if(TamaY<fal) TamaY=fal;
   } if (TamaY==0) TamaY=_fal;
 
-        v.type=1; // Diálogo
+        v.type=1; // Dialog
         if(big) { TX=TamaX/2; TY=TamaY/2; } else { TX=TamaX; TY=TamaY; }
         v.an=TX+6;
         if(v.an<60)
@@ -1057,7 +1057,7 @@ int GenCode=0;
 }
 void GenFont0(void)
 {
-        v.type=1; // Diálogo
+        v.type=1; // Dialog
         v.an=169-26;
         v.al=103;
         v.title=texto[852];
@@ -1100,23 +1100,23 @@ char *MyBuffer,*BuffAux;
         ptr+=11*big2*can+2*big2;
 
         if((can-4*big2)>=TamaX)
-        {//Si es mas estrecho que la ventana, centralo en esta
+        {// Narrower than window: center in window
                 bancho=TamaX;
                 ptr+=((can-4*big2)-TamaX)/2+1;
         }
         else
-        {//Si es mas ancho que la ventana, centra el BuffAux.
+        {// Wider than window: center the buffer
                 bancho=(can-4*big2);
                 BuffAux+=(TamaX-(can-4*big2))/2;
         }
 
         if((cal-29*big2)>=TamaY)
-        {//Si es mas alto que la ventana, centralo en esta
+        {// Shorter than window: center in window
                 balto=TamaY;
                 ptr+=(((cal-29*big2)-TamaY)/2)*can;
         }
         else
-        {//Si es mas alto que la ventana, centra el BuffAux.
+        {// Taller than window: center the buffer
                 balto=(cal-29*big2);
                 BuffAux+=((TamaY-(cal-29*big2))/2)*TamaX;
         }
@@ -1157,7 +1157,7 @@ void Preview20()
     TamaX+=fan;
     if(TamaY<fal) TamaY=fal;
   } if (TamaY==0) TamaY=_fal; if (TamaX==0) TamaX=1;
-        v.type=1; // Diálogo
+        v.type=1; // Dialog
 
         if(big) { TX=TamaX/2; TY=TamaY/2; } else { TX=TamaX; TY=TamaY; }
         v.an=TX+6;
@@ -1279,7 +1279,7 @@ void ShowFont1(void)
 
   if (TamaX>ancho_w*big2 || TamaY>alto_w*big2)
   {
-    // Crea la reducción del thumbnail
+    // Create the thumbnail reduction
     coefredx = TamaX/((float)ancho_w*(float)big2);
     coefredy = TamaY/((float)alto_w*(float)big2);
     if(coefredx>coefredy) coefredy=coefredx;
@@ -1384,11 +1384,11 @@ int Length;
                 return;
         }
 
-        // v.aux -> filename, v.aux+14 -> path, v.aux+RES_FOR_NAME -> fichero FNT
+        // v.aux -> filename, v.aux+14 -> path, v.aux+RES_FOR_NAME -> FNT file data
 
         memset(v.aux,0,RES_FOR_NAME);
         memcpy(v.aux,Load_FontName,strlen(Load_FontName));
-        memcpy(v.aux+14,Load_FontPathName,strlen(Load_FontPathName));//Path completo
+        memcpy(v.aux+14,Load_FontPathName,strlen(Load_FontPathName));//Full path
         fread(v.aux+RES_FOR_NAME,Length,1,file);
         ConvertFntToPal((char *)v.aux+RES_FOR_NAME);
         fclose(file);
@@ -1422,13 +1422,13 @@ int Length;
         }
         memset(vntn->aux,0,RES_FOR_NAME);
         memcpy(vntn->aux,Load_FontName,strlen(Load_FontName));
-        memcpy(vntn->aux+14,Load_FontPathName,strlen(Load_FontPathName));//Path completo
+        memcpy(vntn->aux+14,Load_FontPathName,strlen(Load_FontPathName));//Full path
         fread(vntn->aux+RES_FOR_NAME,Length,1,file);
         ConvertFntToPal((char *)vntn->aux+RES_FOR_NAME);
         fclose(file);
 }
 
-#define max_archivos 512 // ------------------------------- Listbox de archivos
+#define max_archivos 512 // ------------------------------- File listbox
 extern struct t_listboxbr larchivosbr;
 extern t_thumb thumb[max_archivos];
 extern int num_taggeds;
@@ -1471,7 +1471,7 @@ void OpenFont(void) {
       if (full[strlen(full)-1]!='/') strcat(full,"/");
       strcat(full, input);
 
-      if ((f=fopen(full,"rb"))!=NULL) { // Se ha elegido uno
+      if ((f=fopen(full,"rb"))!=NULL) { // A file was selected
         if (fread(cwork,1,8,f)==8) {
           fclose(f);
           if (!strcmp(cwork,"fnt\x1a\x0d\x0a")) {
@@ -1535,7 +1535,7 @@ void CreateText()
 {
 int n,y,x,TamaX=0,TamaY=0,fan,_fal=0,fal,init,cnt;
 
-        // 1 - Determina la longitud del espacio
+        // 1 - Determine the space width
 
         if (!strlen(cCharsToPrint)) return;
 
@@ -1553,7 +1553,7 @@ int n,y,x,TamaX=0,TamaY=0,fan,_fal=0,fal,init,cnt;
         }
         spacelen=(spacelen/cnt)/2;
 
-        // 2 - Calcula en TamaX x TamaY las dimensiones del texto a pintar
+        // 2 - Calculate the text dimensions in TamaX x TamaY
 
         for(x=0;x<strlen(cCharsToPrint);x++)
         {
@@ -1565,14 +1565,14 @@ int n,y,x,TamaX=0,TamaY=0,fan,_fal=0,fal,init,cnt;
                         TamaY=fal;
         } if (TamaY==0) TamaY=_fal;
 
-        // 3 - Crea un mapa de ese tamaño
+        // 3 - Create a map of that size
 
         map_width=TamaX;
         map_height=TamaY;
 
         if (new_map(NULL)) return;
 
-        // 4 - Utiliza ShowCharBuffer() para pintar el texto en el mapa
+        // 4 - Use ShowCharBuffer() to render the text into the map
 
         init=0;
         for(x=0;x<strlen(cCharsToPrint);x++)
@@ -1581,7 +1581,7 @@ int n,y,x,TamaX=0,TamaY=0,fan,_fal=0,fal,init,cnt;
                 else
                         init+=spacelen;
 
-        // 5 - Define el zoom del mapa
+        // 5 - Set the map zoom
 
         v.mapa->zoom_cx=v.mapa->map_width/2;
         v.mapa->zoom_cy=v.mapa->map_height/2;
@@ -1602,14 +1602,14 @@ int n,y,x,TamaX=0,TamaY=0,fan,_fal=0,fal,init,cnt;
         v.mapa->zoom_x=x;
         v.mapa->zoom_y=y;
 
-        // 6 - Inicializa los puntos de control y el código
+        // 6 - Initialize control points and graphic code
 
         for (n=0;n<512;n++)
                 v.mapa->puntos[n]=-1;
 
         v.mapa->fpg_code=0;
 
-        // 7 - Llama al paint handler para refrescar la ventana y la vuelca
+        // 7 - Call the paint handler to refresh the window and blit it
 
         call((voidReturnType )v.paint_handler);
         wvolcado(copia,vga_width,vga_height,v.ptr,v.x,v.y,v.an,v.al,0);

@@ -1,6 +1,6 @@
 
 //-----------------------------------------------------------------------------
-//      Módulo que contiene el código de lectura/escritura de formatos gráficos
+//      Graphics format read/write module
 //-----------------------------------------------------------------------------
 
 #include "global.h"
@@ -22,7 +22,7 @@ static jmp_buf jmp_error_ptr;
 #endif
 
 // ----------------------------------------------------------------------------
-//      Constantes
+//      Constants
 // ----------------------------------------------------------------------------
 
 #ifndef BI_RGB
@@ -41,7 +41,7 @@ static jmp_buf jmp_error_ptr;
 #define RGBA_ALPHA  3
 
 // ----------------------------------------------------------------------------
-//      Estructuras
+//      Structures
 // ----------------------------------------------------------------------------
 
 typedef struct tagRGBQUAD
@@ -60,39 +60,38 @@ typedef struct tagRGBQUAD
 
 // - Create the following functions in divforma.cpp (if the type is XYZ)
 
-// PROT: int is_XYZ (byte * buffer);
-// DESC: Returns TRUE if the file is loaded into the buffer type XYZ, and Además 
-// returns the width / height of the bitmap in the variables map_width / p
+// PROT: int is_XYZ(byte *buffer);
+// DESC: Returns TRUE if the file loaded into buffer is of type XYZ. Also
+// returns the bitmap's width/height in map_width/map_height.
 
-// PROT: void decompresses_XYZ (byte * buffer, byte * map vent int);
-// DESC: The function ó n receives the loaded file in buffer and another buffer
-// Map_an * map_height + map_width bytes (map), you have to unpack this
-// latest.
-// "Vent" indicates whether to charge the additional information window
-// (Such as checkpoints, see already defined formats)
-// If the file has palette, it must be stored in the buffer
-// 768 bytes called dac4 []
+// PROT: void decompress_XYZ(byte *buffer, byte *map, int vent);
+// DESC: Receives the loaded file in buffer and a destination buffer of
+// map_width * map_height + map_width bytes (map); must unpack the file
+// into that buffer.
+// "vent" indicates whether to load additional window info
+// (such as control points; see existing format implementations).
+// If the file has a palette, it must be stored in the
+// 768-byte buffer called dac4[].
 
-// PROT: int record_XYZ (byte * Map, FILE * f);
-// DESC: You must save the bitmap in the filename. S own buffer addition
-// Containing the map, you have access to the following information:
-// - Map_an, map_height (map width and height in pixels)
-// - Dac [768] (palette file, 256 RGB values between 0 and 63)
-// When the file is recording MAP (own format) you have in addition s
-// - Map_codigo (number associated with the map, long integer, 4 bytes)
-// - Map_centro_x / y (center of the map)
-// - Map_descripcion [32] (descriptive comment map)
-// The function returns TRUE if the file has been recorded without any problems,
-// Or FALSE if there was not enough disk space.
-// Al pricipio should assume "f" a clever binary file for writing
-// Must be written on with fwrite, and in the end should not close
+// PROT: int save_XYZ(byte *map, FILE *f);
+// DESC: Save the bitmap to the file. In addition to the buffer
+// containing the map, you have access to:
+// - map_width, map_height (bitmap dimensions in pixels)
+// - dac[768] (palette, 256 RGB values in 0..63 range)
+// When recording MAP (native format) you also have:
+// - map_code (integer code associated with the map, 4 bytes)
+// - map_center_x/y (center point of the map)
+// - map_description[32] (descriptive text for the map)
+// Returns TRUE if the file was saved successfully,
+// or FALSE if there was not enough disk space.
+// On entry, assume "f" is a binary file opened for writing.
+// Write using fwrite; do not close the file on exit.
 
-// NOTE: Any function that requires additional memory for your
-// Job, you can ask to malloc, and if you can not get the memory
-// Required, then you must create an informative error window
-// As follows: I = text v_text [45]; dialogue ((voidReturnType) Err0);
+// NOTE: Any function that needs extra memory can use malloc. If
+// the allocation fails, show an error dialog:
+//   v_text = texto[45]; show_dialog(err0);
 
-// NOTE 2: The only format that returns value to decompress is the JPG. EYE !!!
+// NOTE 2: The only format whose decompress function returns a value is JPG.
 
 // - Finally you must call the three functions created in divhandl.cpp
 // And divbrow.cpp (look, for example, "MAP" on these two sources) and put
@@ -100,7 +99,7 @@ typedef struct tagRGBQUAD
 // Tambi n have to be put in divsetup.cpp and divpalet.cpp (preparing Skin)
 
 //-----------------------------------------------------------------------------
-//      MAP Format
+//      MAP format
 //-----------------------------------------------------------------------------
 
 int is_MAP (byte * buffer) {
@@ -138,14 +137,14 @@ int save_MAP (byte * mapa, FILE * f) {
 	int y;
 	int i;
 
-	fwrite("map\x1a\x0d\x0a\x00\x00",8,1,f);      // +000 Cabecera y version
-	x=map_width; fwrite(&x,2,1,f);                   // +008 Ancho
-	x=map_height; fwrite(&x,2,1,f);                   // +010 Alto
-	y=ventana[v_window].mapa->fpg_code; fwrite(&y,4,1,f);// +012 Código
+	fwrite("map\x1a\x0d\x0a\x00\x00",8,1,f);      // +000 Header and version
+	x=map_width; fwrite(&x,2,1,f);                   // +008 Width
+	x=map_height; fwrite(&x,2,1,f);                   // +010 Height
+	y=ventana[v_window].mapa->fpg_code; fwrite(&y,4,1,f);// +012 Code
 
-	fwrite(ventana[v_window].mapa->description,32,1,f);// +016 Descripcion
-	fwrite(dac,768,1,f);                          // +048 Paleta
-	fwrite(gradients,1,sizeof(gradients),f);            // +816 Reglas de color
+	fwrite(ventana[v_window].mapa->description,32,1,f);// +016 Description
+	fwrite(dac,768,1,f);                          // +048 Palette
+	fwrite(gradients,1,sizeof(gradients),f);            // +816 Color gradients
 
 	npuntos=0;
 
@@ -155,7 +154,7 @@ int save_MAP (byte * mapa, FILE * f) {
 				i=-1;
 		}
 
-	fwrite(&npuntos,2,1,f);                     // +1392 Numero de puntos
+	fwrite(&npuntos,2,1,f);                     // +1392 Number of control points
 	fwrite(&ventana[v_window].mapa->puntos,npuntos,4,f);
 
 	y=map_width*map_height;
@@ -172,7 +171,7 @@ int save_MAP (byte * mapa, FILE * f) {
 }
 
 //-----------------------------------------------------------------------------
-//      Formato PCX
+//      PCX format
 //-----------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------
@@ -252,7 +251,7 @@ void descomprime_PCX(byte *buffer, byte *mapa, int vent)
   byte *old_muestra;
 
   memcpy((byte *)&header,buffer,sizeof(pcx_header));
-  buffer+=128;                                  // Comienzo de la imagen
+  buffer+=128;                                  // Start of image data
 
   map_width = header.xmax - header.xmin + 1;
   map_height = header.ymax - header.ymin + 1;
@@ -264,7 +263,7 @@ void descomprime_PCX(byte *buffer, byte *mapa, int vent)
   last_byte  = header.bytes_per_line * header.color_planes * map_height ;
   bytes_line = header.bytes_per_line * header.color_planes;
 
-  // Si es una imagen 24bpp
+  // If it's a 24bpp image
   if(header.color_planes==3)
   {
     if ((pDest=(byte *)malloc((map_width+1)*(map_height+1)*3))==NULL)
@@ -276,7 +275,7 @@ void descomprime_PCX(byte *buffer, byte *mapa, int vent)
     memset (pDest, 0, (map_width+1)*(map_height+1)*3);
     pSrc = pDest;
   }
-  // Si es una imagen 4bpp
+  // If it's a 4bpp image
   else if(header.color_planes==4)
   {
     if ((pDest=(byte *)malloc(last_byte))==NULL)
@@ -290,15 +289,15 @@ void descomprime_PCX(byte *buffer, byte *mapa, int vent)
   }
   else pDest = mapa;
 
-  if(header.bits_per_pixel!=8 || header.color_planes!=1) // Si no es 8bpp
+  if(header.bits_per_pixel!=8 || header.color_planes!=1) // If not 8bpp
   {
     do {
-      ch=*buffer++;                               // Copia uno por defecto.
-      if((ch&192)==192) {                         // Si RLE entonces
-        rep=(ch&63);                              // rep = nº de veces a copiar.
+      ch=*buffer++;                               // Copy one by default.
+      if((ch&192)==192) {                         // If RLE then
+        rep=(ch&63);                              // rep = number of times to copy.
         ch=*buffer++;
       } else rep=1;
-      pixel+=rep;                                 // Controla que no nos salgamos.
+      pixel+=rep;                                 // Bounds check.
       if(pixel>last_byte) {
         rep-=pixel-last_byte;
         for(con=0;con<rep;con++) *pDest++=ch;
@@ -311,12 +310,12 @@ void descomprime_PCX(byte *buffer, byte *mapa, int vent)
   if(header.bits_per_pixel==8 && header.color_planes==1)
   {
     do {
-      ch=*buffer++;                               // Copia uno por defecto.
-      if((ch&192)==192) {                         // Si RLE entonces
-        rep=(ch&63);                              // rep = nº de veces a copiar.
+      ch=*buffer++;                               // Copy one by default.
+      if((ch&192)==192) {                         // If RLE then
+        rep=(ch&63);                              // rep = number of times to copy.
         ch=*buffer++;
       } else rep=1;
-      pixel+=rep;                                 // Controla que no nos salgamos.
+      pixel+=rep;                                 // Bounds check.
       pixel_line+=rep;
       if(pixel>last_byte) {
         rep-=pixel-last_byte;
@@ -335,7 +334,7 @@ void descomprime_PCX(byte *buffer, byte *mapa, int vent)
   }
   else if(header.bits_per_pixel==1 && header.color_planes==4)
   {
-    // Convierte de 4 a 8
+    // Convert from 4 to 8 bpp
     pDest    = mapa;
     AuxPtr   = pSrc;
     pSrcLine = pSrc;
@@ -367,7 +366,7 @@ void descomprime_PCX(byte *buffer, byte *mapa, int vent)
     memset(&dac4[48], 0, 720);
     for (con=0; con<48; con++) dac4[con] /= 4;
   }
-  else                                          // Si es 24bpp.
+  else                                          // If it's 24bpp.
   {
 
     old_muestra=muestra;
@@ -378,14 +377,14 @@ void descomprime_PCX(byte *buffer, byte *mapa, int vent)
       if (muestra!=NULL) free(muestra);
       muestra=old_muestra;
 
-      // Crea la paleta 3-3-2
+      // Create the 3-3-2 palette
       for(rgb_color=0; rgb_color<256; rgb_color++) {
         Pcxdac[rgb_color].rgbRed   = (rgb_color & 0xE0) >> 5;
         Pcxdac[rgb_color].rgbGreen = (rgb_color & 0x1C) >> 2;
         Pcxdac[rgb_color].rgbBlue  = (rgb_color & 0x03);
       }
 
-      // Convierte de 24 a 8
+      // Convert from 24 to 8 bpp
       pDest    = mapa;
       AuxPtr   = pSrc;
       pSrcLine = pSrc;
@@ -406,7 +405,7 @@ void descomprime_PCX(byte *buffer, byte *mapa, int vent)
 
       free(pSrc=AuxPtr);
 
-      // Pasa los coeficientes a dac4 (valores de 0 a 63)
+      // Store coefficients in dac4 (values 0 to 63)
       for(x=0; x<256; x++) {
         dac4[x*3+0] = Pcxdac[x].rgbRed   *  9;
         dac4[x*3+1] = Pcxdac[x].rgbGreen *  9;
@@ -417,7 +416,7 @@ void descomprime_PCX(byte *buffer, byte *mapa, int vent)
 
       memset(muestra,0,32768);
 
-      // Convierte de 24 a 8
+      // Convert from 24 to 8 bpp
       pDest    = mapa;
       AuxPtr   = pSrc;
       pSrcLine = pSrc;
@@ -440,7 +439,7 @@ void descomprime_PCX(byte *buffer, byte *mapa, int vent)
 
       crear_paleta();
 
-      // Convierte de 24 a 8
+      // Convert from 24 to 8 bpp
       pDest    = mapa;
       AuxPtr   = pSrc;
       pSrcLine = pSrc;
@@ -504,7 +503,7 @@ int save_PCX(byte *mapa,FILE *f) {
 
         if ((cbuffer=(unsigned char *)malloc(map_width*map_height*2))==NULL)
         {
-                //Error reservando memoria.
+                // Memory allocation error.
                 v_text=(char *)texto[45]; show_dialog((voidReturnType)err0);
                 return(1);
         }
@@ -549,7 +548,7 @@ int save_PCX(byte *mapa,FILE *f) {
 }
 
 //-----------------------------------------------------------------------------
-//  Rutina de descompresión de RLE optimizada
+//  Optimized RLE decompression routine
 //-----------------------------------------------------------------------------
 
 byte * descomprime_rle(byte * buffer,unsigned int bytes_line,unsigned int last_byte,byte * pDest) {
@@ -559,12 +558,12 @@ byte * descomprime_rle(byte * buffer,unsigned int bytes_line,unsigned int last_b
   char ch, rep;
 
   do {
-    ch=*buffer++;                               // Copia uno por defecto.
-    if((ch&192)==192) {                         // Si RLE entonces
-      rep=(ch&63);                              // rep = nº de veces a copiar.
+    ch=*buffer++;                               // Copy one by default.
+    if((ch&192)==192) {                         // If RLE then
+      rep=(ch&63);                              // rep = number of times to copy.
       ch=*buffer++;
     } else rep=1;
-    pixel+=rep;                                 // Controla que no nos salgamos.
+    pixel+=rep;                                 // Bounds check.
     pixel_line+=rep;
     if(pixel>last_byte) {
       rep-=pixel-last_byte;
@@ -582,7 +581,7 @@ byte * descomprime_rle(byte * buffer,unsigned int bytes_line,unsigned int last_b
 }
 
 //-----------------------------------------------------------------------------
-//      Formato BMP
+//      BMP format
 //-----------------------------------------------------------------------------
 
 #ifndef _WINDOWS_
@@ -686,7 +685,7 @@ void descomprime_BMP(byte *buffer, byte *mapa, int vent)
 
   memset (pDest, 0, map_width * map_height);
 
-  // Descomprime el BMP si es necesario
+  // Decompress the BMP if needed
 
   if(InfoHeader.biBitCount==8)
   {
@@ -713,11 +712,11 @@ void descomprime_BMP(byte *buffer, byte *mapa, int vent)
                 bEOL = 1;
                 bEOF = 1;
                 break;
-              case 2:  // Delta (No soportado)
+              case 2:  // Delta (Not supported)
                 bEOL = 1;
                 bEOF = 1;
                 break;
-              default: // Copia absoluta de bytes (de 3 a 255)
+              default: // Absolute byte copy (3 to 255)
                 memcpy (pDest, pSrc, RunLength);
                 pDest += RunLength;
                 pSrc  += RunLength;
@@ -778,11 +777,11 @@ void descomprime_BMP(byte *buffer, byte *mapa, int vent)
                 bEOL = 1;
                 bEOF = 1;
                 break;
-              case 2:  // Delta (No soportado)
+              case 2:  // Delta (Not supported)
                 bEOL = 1;
                 bEOF = 1;
                 break;
-              default: // Copia absoluta de bytes (de 3 a 255)
+              default: // Absolute byte copy (3 to 255)
                 for(x=0; x<RunLength; x++)
                 {
                   if(x&1) { *pDest = (*pSrc  & 0x0F); pDest++; pSrc++;}
@@ -831,7 +830,7 @@ void descomprime_BMP(byte *buffer, byte *mapa, int vent)
     }
     for(; x<256; x++) dac4[y++] = 0, dac4[y++] = 0, dac4[y++] = 0;
   }
-  else if(InfoHeader.biBitCount==24) // BMP de 24 bpp
+  else if(InfoHeader.biBitCount==24) // 24 bpp BMP
   {
     old_muestra=muestra;
     muestra=(byte*)malloc(32768);
@@ -841,7 +840,7 @@ void descomprime_BMP(byte *buffer, byte *mapa, int vent)
       if (muestra!=NULL) free(muestra);
       muestra=old_muestra;
 
-      // Crea la paleta 3-3-2
+      // Create the 3-3-2 palette
       for(rgb_color=0; rgb_color<256; rgb_color++)
       {
         Bmpdac[rgb_color].rgbRed   = (rgb_color & 0xE0) >> 5;
@@ -849,7 +848,7 @@ void descomprime_BMP(byte *buffer, byte *mapa, int vent)
         Bmpdac[rgb_color].rgbBlue  = (rgb_color & 0x03);
       }
 
-      // Convierte de 24 a 8
+      // Convert from 24 to 8 bpp
       fixmap_an=((map_width*3)/4)*4;
       if(fixmap_an != map_width*3) fixmap_an+=4;
       for (y=0; y<map_height; y++)
@@ -868,7 +867,7 @@ void descomprime_BMP(byte *buffer, byte *mapa, int vent)
         pSrcLine += fixmap_an;
       }
 
-      // Pasa los coeficientes a dac4 (valores de 0 a 63)
+      // Store coefficients in dac4 (values 0 to 63)
       y=0;
       for(x=0; x<256; x++)
       {
@@ -881,7 +880,7 @@ void descomprime_BMP(byte *buffer, byte *mapa, int vent)
 
       memset(muestra,0,32768);
 
-      // Convierte de 24 a 8
+      // Convert from 24 to 8 bpp
       AuxPtr=pSrc;
       fixmap_an=((map_width*3)/4)*4;
       if(fixmap_an != map_width*3) fixmap_an+=4;
@@ -901,7 +900,7 @@ void descomprime_BMP(byte *buffer, byte *mapa, int vent)
 
       crear_paleta();
 
-      // Convierte de 24 a 8
+      // Convert from 24 to 8 bpp
       fixmap_an=((map_width*3)/4)*4;
       if(fixmap_an != map_width*3) fixmap_an+=4;
       for (y=0; y<map_height; y++)
@@ -995,7 +994,7 @@ return(1);
 }
 
 //-----------------------------------------------------------------------------
-//      Formato JPG
+//      JPG format
 //-----------------------------------------------------------------------------
 
 int is_JPG(byte *buffer, int img_filesize)
@@ -1082,7 +1081,7 @@ int descomprime_JPG(byte *buffer, byte *mapa, int vent, int img_filesize)
     memcpy(&mapa[(cinfo.output_scanline-1)*cinfo.output_width],
            buffer_scanline[0], row_stride);
   }
-  // Pasa los coeficientes a dac4 (valores de 0 a 63)
+  // Convert coefficients to dac4 (values 0 to 63)
 
   if (cinfo.jpeg_color_space==JCS_GRAYSCALE) {
     y=0;
@@ -1118,10 +1117,10 @@ return (0);
 }
 
 //-----------------------------------------------------------------------------
-//  Funciones para cargar la paleta de un archivo
+//  Functions for loading palette from a file
 //-----------------------------------------------------------------------------
 
-// Quita de dac4 los colores no usados en el mapa
+// Remove from dac4 the colors not used in the map
 // WARNING: Caller must save and restore 'original_palette' before/after calling this function
 
 void quitar_colores(byte * buffer,int len) {
@@ -1542,7 +1541,7 @@ int cargadac_JPG(char *name)
     jpeg_read_scanlines(&cinfo, buffer_scanline, 1);
   }
 
-  // Pasa los coeficientes a dac4 (valores de 0 a 63)
+  // Convert coefficients to dac4 (values 0 to 63)
   if (cinfo.jpeg_color_space==JCS_GRAYSCALE) {
     y=0;
     for(x=0; x<256; x++)

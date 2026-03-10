@@ -59,7 +59,7 @@ int get_ticks(void);
 int tiempo_restore=0;
 int tiempo_volcado=0;
 
-int process_level=0; // Para contabilizar los cal/ret (para el step del debug)
+int process_level=0; // Track call/ret nesting (for debugger step)
 
 int nullstring[4];
 int nstring=0;
@@ -363,11 +363,11 @@ void initialization (void) {
   dirinfo=(struct _dirinfo*)&mem[long_header+14+10*10+10*7+8+11+9+10*4];
   fileinfo=(struct _fileinfo*)&mem[long_header+14+10*10+10*7+8+11+9+10*4+1026];
   video_modes=(struct _video_modes*)&mem[long_header+14+10*10+10*7+8+11+9+10*4+1026+146];
-  iloc=mem[2];            // Start of local variables | Inicio de la imagen de las variables locales
-  iloc_len=mem[6]+mem[5]; // Length of local ( public and private ) | Longitud de las locales (públicas y privadas)
-  iloc_pub_len=mem[6];  	// Length of local public variables | Longitud de las variables locales públicas
+  iloc=mem[2];            // Start of local variables
+  iloc_len=mem[6]+mem[5]; // Length of local (public and private)
+  iloc_pub_len=mem[6];  	// Length of local public variables
   inicio_privadas=iloc_pub_len;
-  imem=mem[8];            // Final code , local and texts ( length cmp ) | Final de código, locales y textos (longitud del cmp)
+  imem=mem[8];            // End of code, locals, and texts (compiled length)
 
   if (iloc_len&1) { iloc_len++; } if (!(imem&1)) { imem++; }
 
@@ -389,7 +389,7 @@ void initialization (void) {
 
   create_color_lookup();
 
-  // Crea los dos primeros procesos, init y main
+  // Create the first two processes: init and main
 
   procesos=1; id_init=imem; imem+=iloc_len; id_start=id_end=imem;
 
@@ -466,9 +466,9 @@ init_rnd(dtime);
   mouse->size=100;
   mouse->speed=2;
 
-  check_mouse(); // mouse->cursor = 1-No hay ratón, 0-Si hay
+  check_mouse(); // mouse->cursor = 1-No mouse, 0-Mouse present
 
-  for (n=0;n<10;n++) { // En un principio no hay sistema de scroll, ni de m7
+  for (n=0;n<10;n++) { // Initially there is no scroll or mode-7 system
     (scroll+n)->z=512;
     (scroll+n)->ratio=200;
     (scroll+n)->region1=-1;
@@ -502,11 +502,11 @@ init_rnd(dtime);
 
   saltar_volcado=0; volcados_saltados=0;
 
-  init_sin_cos(); // Tablas de seno y coseno para el modo7
+  init_sin_cos(); // Sine and cosine tables for mode-7
 
   memcpy(paleta,system_dac,768); apply_palette();
 
-  adaptar_paleta=0; // Hasta que no se llame a force_pal ...
+  adaptar_paleta=0; // Until force_pal is called...
 
   #ifdef DEBUG
   #ifndef __EMSCRIPTEN__
@@ -542,7 +542,7 @@ init_rnd(dtime);
 }
 
 //-----------------------------------------------------------------------------
-//  Crea la tabla de color_lookuprados
+//  Create the squared-difference color lookup table
 //-----------------------------------------------------------------------------
 
 void create_color_lookup(void) {
@@ -558,7 +558,7 @@ void create_color_lookup(void) {
 }
 
 //-----------------------------------------------------------------------------
-//      Carga el font del sistema
+//      Load the system font
 //-----------------------------------------------------------------------------
 
 #include "06x08.h"
@@ -596,15 +596,15 @@ void system_font(void) {
 }
 
 //-----------------------------------------------------------------------------
-// Sistema multi-pila para funciones (DIV 2)
+// Multi-stack system for functions (DIV 2)
 //-----------------------------------------------------------------------------
 
-// Funciones:
-//      save_stack(id,sp,mem[id+_SP]); // En lfrm y lfrf de funciones
-//      load_stack(id);                 // En exec_process/trace_process
-//      update_stack(id,valor);       // Pone un valor al final de la pila (rtf)
+// Functions:
+//      save_stack(id,sp,mem[id+_SP]); // In lfrm and lfrf of functions
+//      load_stack(id);                 // In exec_process/trace_process
+//      update_stack(id,value);        // Set a value at the end of the stack (rtf)
 
-// * (int *) mem[id+_SP] = {SP1,SP2,DATOS...}
+// * (int *) mem[id+_SP] = {SP1,SP2,DATA...}
 int stacks=0;
 
 void save_stack(int id, int sp1, int sp2) {
@@ -731,7 +731,7 @@ void is_fps(byte f) {
 }	
 #endif
 //-----------------------------------------------------------------------------
-// Procesa el siguiente proceso
+// Execute the next process
 //-----------------------------------------------------------------------------
 #ifdef DEBUG
 int oreloj;
@@ -802,10 +802,10 @@ void exec_process(void) {
 }
 
 //-----------------------------------------------------------------------------
-//  Núcleo interno del intérprete
+//  Interpreter core execution loop
 //-----------------------------------------------------------------------------
 
-int oo; // Para usos internos en el kernel
+int oo; // For internal kernel use
 
 void core_exec() {
 
@@ -821,7 +821,7 @@ void core_exec() {
 }
 
 //-----------------------------------------------------------------------------
-// Procesa la siguiente instruccion del siguiente proceso
+// Execute the next instruction of the next process (single-step trace)
 //-----------------------------------------------------------------------------
 
 #ifdef DEBUG
@@ -875,7 +875,7 @@ void trace_process(void) {
 }
 
 //-----------------------------------------------------------------------------
-//  Núcleo interno del intérprete, cuando se está trazando
+//  Interpreter core execution loop, when tracing
 //-----------------------------------------------------------------------------
 
 void core_trace(void) {
@@ -1036,7 +1036,7 @@ void frame_start(void) {
 	} function_exec(255,get_ticks()-oreloj);
 #endif
 
-	if (get_reloj()>(freloj+ireloj/3)) { // Permite comerse hasta un tercio del sgte frame
+	if (get_reloj()>(freloj+ireloj/3)) { // Allow consuming up to one third of the next frame
 		if (volcados_saltados<max_saltos) {
 			volcados_saltados++;
 			saltar_volcado=1;
@@ -1080,11 +1080,11 @@ void frame_start(void) {
 	for (ide=id_start; ide<=id_end; ide+=iloc_len)
 		mem[ide+_Executed]=0;
 
-// Fija la prioridad máxima, para ejecutar procesos según _Priority
+// Set maximum priority for executing processes by _Priority
 
-	id_old=id_start; // El siguiente a procesar
+	id_old=id_start; // Next process to execute
 
-// Posiciona las variables del ratón
+// Position mouse variables
 
 	readmouse();
 
@@ -1145,7 +1145,7 @@ void frame_end(void) {
 	emscripten_run_script (buf);
 #endif
 
-	// Si el usuario modificó mouse.x o mouse.y, posiciona el ratón debidamente
+	// If the user modified mouse.x or mouse.y, reposition the mouse accordingly
 
 	if (!saltar_volcado) {
 
@@ -1196,11 +1196,11 @@ void frame_end(void) {
 	}
 #endif
 
-    // Pinta los sprites, por orden de _Z (a mayor z se pinta antes)
+    // Render sprites sorted by _Z (higher Z is rendered first/behind)
 
 	for (ide=id_start; ide<=id_end; ide+=iloc_len) {
-		mem[ide+_Executed]=0; // Sin ejecutar
-		mem[ide+_x1]=-1; // Sin región de blit_screen
+		mem[ide+_Executed]=0; // Not executed
+		mem[ide+_x1]=-1; // No blit_screen region
 	}
 
 	for (n=0;n<10;n++) {
@@ -1268,7 +1268,7 @@ void frame_end(void) {
 								break;
 
 						if (n<max_textos) {
-							memb[nullstring[0]*4]=0; // El texto "en el aire" no se muestra nunca
+							memb[nullstring[0]*4]=0; // The "floating" text is never shown
 							memb[nullstring[1]*4]=0;
 							memb[nullstring[2]*4]=0;
 							memb[nullstring[3]*4]=0;
@@ -1354,7 +1354,7 @@ void frame_end(void) {
 						break;
 
 				if (n<max_textos) {
-					memb[nullstring[0]*4]=0; // El texto "en el aire" no se muestra nunca
+					memb[nullstring[0]*4]=0; // The "floating" null text is never shown
 					memb[nullstring[1]*4]=0;
 					memb[nullstring[2]*4]=0;
 					memb[nullstring[3]*4]=0;
@@ -1372,7 +1372,7 @@ void frame_end(void) {
 				if (post_process_buffer!=NULL)
 					post_process_buffer();
 
-    // Si se está haciendo un fade lo continúa
+    // If a fade is in progress, continue it
 
 				if (now_dacout_r!=dacout_r || now_dacout_g!=dacout_g || now_dacout_b!=dacout_b) {
 					update_palette();
@@ -1411,7 +1411,7 @@ void frame_end(void) {
 
 							full_redraw=0;
 
-							// Añade los volcados de este frame a los restore del anterior
+							// Add this frame's blit regions to the previous frame's restore list
 
 							for (n=id_start; n<=id_end; n+=iloc_len)
 								if (mem[n+_x1]!=-1) blit_partial(mem[n+_x0],mem[n+_y0],mem[n+_x1]-mem[n+_x0]+1,mem[n+_y1]-mem[n+_y0]+1);
@@ -1429,13 +1429,13 @@ void frame_end(void) {
 								if (texto[n].font && texto[n].an)
 									blit_partial(texto[n].x0,texto[n].y0,texto[n].an,texto[n].al);
 
-							// Realiza un blit_screen parcial
+							// Perform a partial blit_screen
 
 							blit_screen((byte*)copia);
 
 						}
 
-						if (dump_type==0 || restore_type==0) { // Fija los restore para el siguiente frame
+						if (dump_type==0 || restore_type==0) { // Set up restore regions for the next frame
 
 							for (n=id_start; n<=id_end; n+=iloc_len)
 								if (mem[n+_x1]!=-1) blit_partial(mem[n+_x0],mem[n+_y0],mem[n+_x1]-mem[n+_x0]+1,mem[n+_y1]-mem[n+_y0]+1);
@@ -1465,7 +1465,7 @@ void frame_end(void) {
 				}
 #endif
 
-	} // saltar blit_screen
+	} // skip blit_screen
 
 }
 
@@ -1978,7 +1978,7 @@ dump(len-div1stubsize);
 
     mem=(int*)((((uintptr_t)mem+3)/4)*4);
 
-    filenames=(char*)&mem[imem_max+258*5]; // Buffer de 16*1025 para dirinfo[].name
+    filenames=(char*)&mem[imem_max+258*5]; // Buffer of 16*1025 for dirinfo[].name
 
     memset(mem,0,4*imem_max+1032*5);
     // To add strings (on the fly?) "in the air"

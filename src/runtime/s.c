@@ -1,6 +1,6 @@
 
 //----------------------------------------------------------------------------
-// Funciones de sprites, textos y scroll
+// Sprite, text, and scroll rendering functions
 //----------------------------------------------------------------------------
 
 #include "inter.h"
@@ -23,7 +23,7 @@ void line_pixel(int x, int y);
 
 
 //----------------------------------------------------------------------------
-// cabeceras
+// Prototypes
 //----------------------------------------------------------------------------
 void move_scroll(int plano,int x,int y);
 void save_region(void);
@@ -37,7 +37,7 @@ void paint_mode7(int n,int camara_x, int camara_y, int camara_z, int angulo);
 void paint_sprite_m7(int n,int ide,int x,int y,int size,int ang);
 
 //----------------------------------------------------------------------------
-// Definicion de constantes
+// Angle constants (in 4096-unit degrees)
 //----------------------------------------------------------------------------
 
 #define grados_0    0
@@ -50,13 +50,13 @@ void paint_sprite_m7(int n,int ide,int x,int y,int size,int ang);
 #define grados_giro 16
 
 //----------------------------------------------------------------------------
-// Variables del módulo
+// Module variables
 //----------------------------------------------------------------------------
 
 int seno[grados_360+1], coseno[grados_360+1]; //m7
 
 //----------------------------------------------------------------------------
-// Tabla para fast scroll parallax
+// Fast scroll parallax lookup table
 //----------------------------------------------------------------------------
 
 tfast * fast;
@@ -64,7 +64,7 @@ tfast * fast;
 #ifdef DOS
 
 //----------------------------------------------------------------------------
-// Multiplica dos numeros de 8.24
+// Multiply two 8.24 fixed-point numbers
 //----------------------------------------------------------------------------
 extern int mul_24(int, int);
 #pragma aux mul_24 =    \
@@ -72,7 +72,7 @@ extern int mul_24(int, int);
         "shrd eax,edx,24" \
         parm caller [EDX] [EAX] value [EAX]
 //----------------------------------------------------------------------------
-//  Multiplica dos numeros de 16.16
+//  Multiply two 16.16 fixed-point numbers
 //----------------------------------------------------------------------------
 extern int mul_16(int, int);
 #pragma aux mul_16 =    \
@@ -100,7 +100,7 @@ static unsigned int mul_16(long a, long b)
 
 
 //----------------------------------------------------------------------------
-// Función para pintar los sprites de un scroll ordenados por Z
+// Paint scroll sprites sorted by Z order
 //----------------------------------------------------------------------------
 
 void paint_scroll_sprites(void) {
@@ -131,13 +131,13 @@ void paint_scroll_sprites(void) {
 }
 
 //----------------------------------------------------------------------------
-// Determina el movimiento de la ventana de scroll (automático o manual)
+// Determine scroll window movement (automatic camera or manual)
 //----------------------------------------------------------------------------
 
 void update_scroll(int back) {
   int i,x,y,ix,iy,r;
 
-  if ((i=(scroll+snum)->camera)) { // Comprueba si el scroll es autómático
+  if ((i=(scroll+snum)->camera)) { // Check if scroll has automatic camera tracking
     if (i>=id_start && i<=id_end && mem[i]==i) {
       ix=mem[i+_X]; iy=mem[i+_Y];
       if (mem[i+_Resolution]) { ix/=mem[i+_Resolution]; iy/=mem[i+_Resolution]; }
@@ -148,7 +148,7 @@ void update_scroll(int back) {
         if (y<region[r].y0) iy=y-region[r].y0;
         if (x>=region[r].x1) ix=x-(region[r].x1-1);
         if (y>=region[r].y1) iy=y-(region[r].y1-1);
-      } else { // No hay region1 de bloqueo de scroll, se tiende al centro
+      } else { // No lock region1 defined, center camera on target
         ix-=iscroll[snum].an/2; iy-=iscroll[snum].al/2;
         ix-=iscroll[snum].map1_x; iy-=iscroll[snum].map1_y;
       }
@@ -178,7 +178,7 @@ void update_scroll(int back) {
         move_scroll(1,ix*100/(scroll+snum)->ratio,iy*100/(scroll+snum)->ratio);
       }
     }
-  } else { // Comprueba si se mueve el scroll manualmente
+  } else { // Check if scroll is moved manually
     if ((scroll+snum)->x0!=iscroll[snum].map1_x || (scroll+snum)->y0!=iscroll[snum].map1_y) {
       move_scroll(0,(scroll+snum)->x0-iscroll[snum].map1_x,(scroll+snum)->y0-iscroll[snum].map1_y);
     } if (back) if ((scroll+snum)->x1!=iscroll[snum].map2_x || (scroll+snum)->y1!=iscroll[snum].map2_y) {
@@ -226,7 +226,7 @@ void scroll_parallax(void) {
   int nt,scan;
   byte *di,*si1,*si2;
 
-  update_scroll(1); // Mueve los dos planos de scroll (auto o manualmente)
+  update_scroll(1); // Move both scroll planes (auto or manual)
 
   si1=iscroll[snum].sscr1; si2=iscroll[snum].sscr2;
   b1=iscroll[snum].block1; b2=iscroll[snum].block2;
@@ -316,9 +316,9 @@ void set_scroll(int plano,int x,int y) {
 
   si+=y*an+x;
 
-  // Dispone de (di,iscroll[snum].an/al) < (si,x,y,an,al)
+  // Copy map region (si,x,y,an,al) into scroll buffer (di,iscroll[snum].an/al)
 
-/* Se ha quitado esta optimización
+/* This optimization was removed
   if (x+iscroll[snum].an<=an && y+iscroll[snum].al<=al) {
     y=iscroll[snum].al; do {
       memcpy(di,si,iscroll[snum].an);
@@ -336,7 +336,7 @@ void set_scroll(int plano,int x,int y) {
       _si=si;
       nx=_nx;
       x=iscroll[snum].an;
-      nt=0; // número de tramos
+      nt=0; // number of segments
       fast[iscan].inc[0]=0;
       esdato=0;
       do {
@@ -390,11 +390,11 @@ void set_scroll(int plano,int x,int y) {
 }
 
 //----------------------------------------------------------------------------
-// Recalcula la ristra de incrementos para un scan (0..vga_height-1)
+// Recalculate the increment list for a scanline (0..vga_height-1)
 //----------------------------------------------------------------------------
 
-void process_scan(int n) { // Reprocesa un scan por completo
-  int in; // indice de fast[in].{nt,inc[]}
+void process_scan(int n) { // Fully reprocess a scanline
+  int in; // index into fast[in].{nt,inc[]}
   byte *si;
   int resta,an;
   int nt=0,esdato=0;
@@ -431,7 +431,7 @@ void process_scan(int n) { // Reprocesa un scan por completo
 }
 
 //----------------------------------------------------------------------------
-// Entra un pixel en todas las líneas por la derecha (sale por la izda)
+// Shift all scanlines right by one pixel (exits on the left)
 //----------------------------------------------------------------------------
 
 void process_scan_right(void) {
@@ -439,22 +439,22 @@ void process_scan_right(void) {
   byte * si;
 
   block=iscroll[snum].block1;
-  si=iscroll[snum].sscr1+iscroll[snum].an-1; // Final de la primera línea
+  si=iscroll[snum].sscr1+iscroll[snum].an-1; // End of the first scanline
   in=iscroll[snum].iscan;
   n=iscroll[snum].al;
   fast=iscroll[snum].fast;
 
   do {
 
-    // 1º quita el pixel por la izquierda ...
+    // 1. Remove the pixel on the left ...
 
-    if (fast[in].inc[0]) { // Si empieza con fondo
+    if (fast[in].inc[0]) { // If it starts with background
       fast[in].inc[0]--;
     } else {
-      if (fast[in].inc[1]) { // Si empieza con primer plano
+      if (fast[in].inc[1]) { // If it starts with foreground
 	fast[in].inc[1]--;
       }
-      if (!fast[in].inc[1]) { // Se acabaron un par de tramos
+      if (!fast[in].inc[1]) { // A pair of segments was exhausted
 	fast[in].nt-=2;
         memmove(&fast[in].inc[0],&fast[in].inc[2],(max_inc-2)*2);
 
@@ -464,18 +464,18 @@ void process_scan_right(void) {
       }
     }
 
-    // 2º añade el pixel por la derecha ...
+    // 2. Add the pixel on the right ...
 
-    if (*si) { // Si viene primer plano
-      if (fast[in].nt&1) { // Si el tramo acaba en primer plano
+    if (*si) { // If incoming pixel is foreground
+      if (fast[in].nt&1) { // If the segment ends with foreground
 	if (fast[in].nt<max_inc) fast[in].inc[fast[in].nt]++;
-      } else { // Si acaba en fondo
+      } else { // If it ends with background
 	if (++fast[in].nt<max_inc) fast[in].inc[fast[in].nt]=1;
       }
-    } else { // Si viene fondo
-      if (fast[in].nt&1) { // Si el tramo acaba en primer plano
+    } else { // If incoming pixel is background
+      if (fast[in].nt&1) { // If the segment ends with foreground
 	if (++fast[in].nt<max_inc) fast[in].inc[fast[in].nt]=1;
-      } else { // Si acaba en fondo
+      } else { // If it ends with background
 	if (fast[in].nt<max_inc) fast[in].inc[fast[in].nt]++;
       }
     }
@@ -491,7 +491,7 @@ void process_scan_right(void) {
 }
 
 //----------------------------------------------------------------------------
-// Entra un pixel en todas las líneas por la izquierda (sale por la dcha)
+// Shift all scanlines left by one pixel (exits on the right)
 //----------------------------------------------------------------------------
 
 void process_scan_left(void) {
@@ -499,26 +499,26 @@ void process_scan_left(void) {
   byte * si;
 
   block=iscroll[snum].block1;
-  si=iscroll[snum].sscr1+iscroll[snum].an-1; // Final de la primera línea
+  si=iscroll[snum].sscr1+iscroll[snum].an-1; // End of the first scanline
   in=iscroll[snum].iscan;
   n=iscroll[snum].al;
   fast=iscroll[snum].fast;
 
   do {
 
-    // 1º quita el pixel por la derecha ...
+    // 1. Remove the pixel on the right ...
 
     if (fast[in].nt<max_inc) {
       if (!--fast[in].inc[fast[in].nt]) fast[in].nt--;
-    } else { // Caso complicado
-      if (fast[in].nt&1) { // Si la línea acababa en primer plano ...
-        if (!*si) {        // ... y ahora acaba en fondo
+    } else { // Complex case
+      if (fast[in].nt&1) { // If the line ended with foreground ...
+        if (!*si) {        // ... and now ends with background
           if (--fast[in].nt==max_inc-1) {
             process_scan(iscroll[snum].al-n); goto cont_loop;
           }
         }
-      } else {       // Si la línea acababa en fondo ...
-        if (*si) {   // ... y ahora acaba en primer plano
+      } else {       // If the line ended with background ...
+        if (*si) {   // ... and now ends with foreground
           if (--fast[in].nt==max_inc-1) {
             process_scan(iscroll[snum].al-n); goto cont_loop;
           }
@@ -526,19 +526,19 @@ void process_scan_left(void) {
       }
     }
 
-    // 2º añade el pixel por la izquierda ...
+    // 2. Add the pixel on the left ...
 
-    if (*(si-iscroll[snum].an+1)) { // Si viene primer plano
-      if (!fast[in].inc[0]) { // Si el tramo comienza en primer plano
+    if (*(si-iscroll[snum].an+1)) { // If incoming pixel is foreground
+      if (!fast[in].inc[0]) { // If the segment begins with foreground
         fast[in].inc[1]++;
-      } else { // Si comienza con fondo
+      } else { // If it begins with background
         fast[in].nt+=2;
         if (fast[in].nt<max_inc) {
           memmove(&fast[in].inc[2],&fast[in].inc[0],(max_inc-2)*2);
           fast[in].inc[0]=0; fast[in].inc[1]=1;
         }
       }
-    } else { // Si viene fondo
+    } else { // If incoming pixel is background
       fast[in].inc[0]++;
     }
 
@@ -619,7 +619,7 @@ void move_scroll(int plano,int x,int y) {
     if (plano==0) {
       iscroll[snum].sscr1=scroll_right(iscroll[snum]._sscr1,iscroll[snum].sscr1,&iscroll[snum].block1,iscroll[snum].map1,iscroll[snum].map1_an,iscroll[snum].map1_al,x++,y);
       if (iscroll[snum].on==2) {
-        process_scan_right(); // Entra un scan por la derecha (sale por la izda)
+        process_scan_right(); // New pixel enters from the right (exits left)
       }
     } else {
       iscroll[snum].sscr2=scroll_right(iscroll[snum]._sscr2,iscroll[snum].sscr2,&iscroll[snum].block2,iscroll[snum].map2,iscroll[snum].map2_an,iscroll[snum].map2_al,x++,y);
@@ -630,7 +630,7 @@ void move_scroll(int plano,int x,int y) {
     if (plano==0) {
       iscroll[snum].sscr1=scroll_left(iscroll[snum]._sscr1,iscroll[snum].sscr1,&iscroll[snum].block1,iscroll[snum].map1,iscroll[snum].map1_an,iscroll[snum].map1_al,x--,y);
       if (iscroll[snum].on==2) {
-        process_scan_left(); // Entra un scan por la izda (sale por la dcha)
+        process_scan_left(); // New pixel enters from the left (exits right)
       }
     } else {
       iscroll[snum].sscr2=scroll_left(iscroll[snum]._sscr2,iscroll[snum].sscr2,&iscroll[snum].block2,iscroll[snum].map2,iscroll[snum].map2_an,iscroll[snum].map2_al,x--,y);
@@ -672,16 +672,16 @@ void move_scroll(int plano,int x,int y) {
 }
 
 //----------------------------------------------------------------------------
-// Funciones de scroll unidireccional
+// Single-direction scroll functions
 //----------------------------------------------------------------------------
 
 byte * scroll_right(byte * _buf, byte * buf, int * block,
                     byte * map, int an, int al, int x, int y) {
 
-  // Ventana de scroll (_buf,iscroll[snum].an,iscroll[snum].al(+1))
-  // Número de scanes del primer bloque (*block)
-  // Puntero al inicio actual del scroll (buf)
-  // Mapa en (map,an,al) coordenadas inicio scroll (x,y)
+  // Scroll window buffer (_buf, iscroll[snum].an, iscroll[snum].al(+1))
+  // Number of scanlines in the first block (*block)
+  // Pointer to current scroll start (buf)
+  // Map at (map,an,al), scroll origin coordinates (x,y)
 
   int n,m,b;
   byte * ret;
@@ -691,7 +691,7 @@ byte * scroll_right(byte * _buf, byte * buf, int * block,
   if (x<0) x=(an-1)-((-x-1)%an); else x=x%an;
   if (y<0) y=(al-1)-((-y-1)%al); else y=y%al;
 
-  m=al-y; map+=y*an+x; // 1er. pixel en el mapa
+  m=al-y; map+=y*an+x; // First pixel in the map
 
   buf++; if (buf==_buf+iscroll[snum].an*iscroll[snum].al) {
     memcpy(_buf,_buf+iscroll[snum].an*iscroll[snum].al,iscroll[snum].an); buf=_buf; *block=iscroll[snum].al;
@@ -722,7 +722,7 @@ byte * scroll_left(byte * _buf, byte * buf, int * block,
   if (x<0) x=(an-1)-((-x-1)%an); else x=x%an;
   if (y<0) y=(al-1)-((-y-1)%al); else y=y%al;
 
-  m=al-y; map+=y*an+x; // 1er. pixel en el mapa
+  m=al-y; map+=y*an+x; // First pixel in the map
 
   if (buf==_buf) {
     memcpy(_buf+iscroll[snum].an*iscroll[snum].al,_buf,iscroll[snum].an);
@@ -754,7 +754,7 @@ byte * scroll_down(byte * _buf, byte * buf, int * block,
   if (x<0) x=(an-1)-((-x-1)%an); else x=x%an;
   if (y<0) y=(al-1)-((-y-1)%al); else y=y%al;
 
-  m=an-x; map+=y*an+x; // 1er. pixel en el mapa
+  m=an-x; map+=y*an+x; // First pixel in the map
 
   buf+=iscroll[snum].an; if (buf>=_buf+iscroll[snum].an*iscroll[snum].al) {
     buf-=iscroll[snum].an*iscroll[snum].al; *block=iscroll[snum].al;
@@ -782,7 +782,7 @@ byte * scroll_up(byte * _buf, byte * buf, int * block,
   if (x<0) x=(an-1)-((-x-1)%an); else x=x%an;
   if (y<0) y=(al-1)-((-y-1)%al); else y=y%al;
 
-  m=an-x; map+=y*an+x; // 1er. pixel en el mapa
+  m=an-x; map+=y*an+x; // First pixel in the map
 
   buf-=iscroll[snum].an; if (buf<_buf) {
     buf+=iscroll[snum].an*iscroll[snum].al; *block=1;
@@ -799,14 +799,14 @@ byte * scroll_up(byte * _buf, byte * buf, int * block,
 }
 
 //----------------------------------------------------------------------------
-//      Funcion externa para pintar gráficos (para el put del lenguaje)
+//      External function to render graphics (for the language's PUT command)
 //----------------------------------------------------------------------------
 
 void put_sprite(int file,int graph,int x,int y,int angle,int size,int flags,int reg,byte * cop,int copan,int copal) {
 
   int * ptr;
   byte * si;
-  int an,al; // Información respecto a pantalla del grafico
+  int an,al; // Graphic width and height on screen
   int xg,yg;
   byte * _copia=copia;
   int _vga_an=vga_width,_vga_al=vga_height;
@@ -845,9 +845,9 @@ void put_sprite(int file,int graph,int x,int y,int angle,int size,int flags,int 
     } else {
       if (flags&1) { xg=an-1-xg; } x-=xg;
       if (flags&2) { yg=al-1-yg; } y-=yg;
-      if (x>=clipx0 && x+an<=clipx1 && y>=clipy0 && y+al<=clipy1) // Pinta sprite sin cortar
+      if (x>=clipx0 && x+an<=clipx1 && y>=clipy0 && y+al<=clipy1) // Fully visible sprite
         sp_normal(si,x,y,an,al,flags);
-      else if (x<clipx1 && y<clipy1 && x+an>clipx0 && y+al>clipy0) // Pinta sprite cortado
+      else if (x<clipx1 && y<clipy1 && x+an>clipx0 && y+al>clipy0) // Clipped sprite
         sp_clipped(si,x,y,an,al,flags);
       x0s=x; x1s=x+an-1; y0s=y; y1s=y+al-1;
     }
@@ -858,7 +858,7 @@ void put_sprite(int file,int graph,int x,int y,int angle,int size,int flags,int 
 }
 
 //----------------------------------------------------------------------------
-//      La función que pinta los sprites de los procesos
+//      Render a process's sprite
 //----------------------------------------------------------------------------
 
 /* Render the sprite for process 'ide': looks up its graphic from the FPG,
@@ -866,11 +866,11 @@ void put_sprite(int file,int graph,int x,int y,int angle,int size,int flags,int 
  * transforms, then dispatches to sp_normal/sp_clipped/sp_scaled/sp_rotated
  * depending on angle, scale, and clipping. Color 0 is always transparent.
  */
-void paint_sprite(void) { // Pinta un sprite (si se ve), según mem[ide+ ... ]
+void paint_sprite(void) { // Render a sprite (if visible), using mem[ide+ ... ]
 
   int * ptr;
   byte * si;
-  int x,y,an,al; // Información respecto a pantalla del grafico
+  int x,y,an,al; // Graphic width and height on screen
   int xg,yg;
   int n,m;
 
@@ -927,9 +927,9 @@ void paint_sprite(void) { // Pinta un sprite (si se ve), según mem[ide+ ... ]
     } else {
       if (mem[ide+_Flags]&1) { xg=an-1-xg; } x-=xg;
       if (mem[ide+_Flags]&2) { yg=al-1-yg; } y-=yg;
-      if (x>=clipx0 && x+an<=clipx1 && y>=clipy0 && y+al<=clipy1) // Pinta sprite sin cortar
+      if (x>=clipx0 && x+an<=clipx1 && y>=clipy0 && y+al<=clipy1) // Fully visible sprite
         sp_normal(si,x,y,an,al,mem[ide+_Flags]);
-      else if (x<clipx1 && y<clipy1 && x+an>clipx0 && y+al>clipy0) // Pinta sprite cortado
+      else if (x<clipx1 && y<clipy1 && x+an>clipx0 && y+al>clipy0) // Clipped sprite
         sp_clipped(si,x,y,an,al,mem[ide+_Flags]);
       x0s=x; x1s=x+an-1; y0s=y; y1s=y+al-1; save_region();
     }
@@ -947,7 +947,7 @@ void save_region(void) {
 }
 
 //----------------------------------------------------------------------------
-// Sprite - [espejado] [ghost]
+// Sprite - [mirrored] [ghost]
 //----------------------------------------------------------------------------
 
 void sp_normal(byte * p, int x, int y, int an, int al, int flags) {
@@ -1022,7 +1022,7 @@ void sp_normal(byte * p, int x, int y, int an, int al, int flags) {
 }
 
 //----------------------------------------------------------------------------
-// Sprite - cortado [espejado] [ghost]
+// Sprite - clipped [mirrored] [ghost]
 //----------------------------------------------------------------------------
 
 void sp_clipped(byte * p, int x, int y, int an, int al, int flags) {
@@ -1116,13 +1116,13 @@ void sp_clipped(byte * p, int x, int y, int an, int al, int flags) {
 }
 
 //----------------------------------------------------------------------------
-// Sprite - escalado [cortado] [espejado] [ghost]
+// Sprite - scaled [clipped] [mirrored] [ghost]
 //----------------------------------------------------------------------------
 
 void sp_scaled(byte * old_si, int x, int y, int an, int al, int xg, int yg,
                  int size, int flags) {
 
-  int salta_x, long_x, resto_x; // Referidas a pantalla
+  int salta_x, long_x, resto_x; // In screen coordinates
   int salta_y, long_y, resto_y;
   int xr,ixr,yr,iyr,old_xr,old_an;
   byte *si,*di,c;
@@ -1177,7 +1177,7 @@ void sp_scaled(byte * old_si, int x, int y, int an, int al, int xg, int yg,
 }
 
 //----------------------------------------------------------------------------
-// Sprite - rotado [escalado] [cortado] [espejado] [ghost]
+// Sprite - rotated [scaled] [clipped] [mirrored] [ghost]
 //----------------------------------------------------------------------------
 
 void sp_rotated(byte * si, int x, int y, int an, int al, int xg, int yg,
@@ -1187,8 +1187,8 @@ void sp_rotated(byte * si, int x, int y, int an, int al, int xg, int yg,
   float a0,a1,a2,a3;
   float a,s;
   int p[24];
-  int h,hmin,hmax; // Altura minima y maxima
-  int n,l0=0,l1;   // Lado 0 y lado 1 (indices p[])
+  int h,hmin,hmax; // Minimum and maximum height
+  int n,l0=0,l1;   // Side 0 and side 1 (indices into p[])
 
   int hmax0,hmax1;
   union { int32_t l; int16_t w[2]; } x0,x1,g0x={0},g1x={0},g0y={0},g1y={0};
@@ -1335,7 +1335,7 @@ void sp_rotated(byte * si, int x, int y, int an, int al, int xg, int yg,
 }
 
 //----------------------------------------------------------------------------
-// Impresión de un sprite rotado y escalado, sin cortar
+// Render a rotated and scaled sprite scanline, with clipping
 //----------------------------------------------------------------------------
 
 void sp_scan_clipped(byte * p,short n,short m,short o,byte * si,int an,int x0,int y0,int x1,int y1) {
@@ -1370,7 +1370,7 @@ void sp_scan_clipped_ghost(byte * p,short n,short m,short o,byte * si,int an,int
 }
 
 //----------------------------------------------------------------------------
-// Impresión de un sprite rotado y escalado, cortando
+// Render a rotated and scaled sprite scanline, without clipping
 //----------------------------------------------------------------------------
 
 void sp_scan(byte * p,short n,byte * si,int an,int x0,int y0,int x1,int y1) {
@@ -1451,7 +1451,7 @@ void paint_drawings(void) {
 }
 
 //-----------------------------------------------------------------------------
-//      Dibuja una caja, según mode_rect, line_fx y color
+//      Draw a rectangle using mode_rect, line_fx, and color
 //-----------------------------------------------------------------------------
 
 void draw_box(int x,int y,int an,int al) {
@@ -1467,14 +1467,14 @@ void draw_filled_box(int x,int y,int an,int al) {
 }
 
 //-----------------------------------------------------------------------------
-//      Dibuja un círculo (line_fx y color)
+//      Draw a circle (using line_fx and color)
 //-----------------------------------------------------------------------------
 
 void draw_circle(int relleno,int x0,int y0,int x1,int y1) {
 
-  int p[2048]; // Puntos de la circunferencia
-  double cx,rx; // Centro y radio de la circunferencia
-  int an,al; // Ancho y alto
+  int p[2048]; // Points on the circumference
+  double cx,rx; // Center and radius of the circle
+  int an,al; // Width and height
   double y,ymed,nsin;
   int n,xa,xb,ya,yb;
 
@@ -1522,7 +1522,7 @@ void draw_circle(int relleno,int x0,int y0,int x1,int y1) {
 }
 
 //----------------------------------------------------------------------------
-// Funciones de primitivas graficas
+// Graphics primitive functions
 //----------------------------------------------------------------------------
 
 void line(int x0, int y0, int x1, int y1) {
@@ -1578,7 +1578,7 @@ void line(int x0, int y0, int x1, int y1) {
 }
 
 //----------------------------------------------------------------------------
-// Pone un pixel con el nivel de opacidad en line_fx (0..15)
+// Draw a pixel with opacity level line_fx (0..15)
 //----------------------------------------------------------------------------
 
 void line_pixel(int x, int y) {
@@ -1681,7 +1681,7 @@ void line_pixel(int x, int y) {
         if (d!=*p) *p=d; else if (c!=*p) *p=c; else if (b!=*p) *p=b; else if (a!=*p) *p=a; else *p=color;
         break;
 
-      case 15: // Poner un color
+      case 15: // Solid color
         *p=color;
         break;
 
@@ -1692,7 +1692,7 @@ void line_pixel(int x, int y) {
 
 
 //----------------------------------------------------------------------------
-// Textos
+// Text rendering
 //----------------------------------------------------------------------------
 
 void text_out(char *ptr,int x,int y)
@@ -1764,9 +1764,9 @@ void paint_texts(int n) { // E: texto[]
         ptr=numero; break;
     }
 
-    texto[n].an=0; // Inicializa la region a volcar para este texto
+    texto[n].an=0; // Initialize the blit region for this text
 
-    x=texto[n].x;                     // X primer carácter
+    x=texto[n].x;                     // X of first character
     y=texto[n].y;                     // Y
 
     fuente=0; while (fuente<max_fonts) {
@@ -1802,7 +1802,7 @@ void paint_texts(int n) { // E: texto[]
 
       texto[n].x0=x; texto[n].y0=y; texto[n].an=an; texto[n].al=al;
 
-      if (y>=0 && y+al<=vga_height) { // El texto coge entero (coord. y)
+      if (y>=0 && y+al<=vga_height) { // Text fits entirely (y coordinate)
 
         while (*ptr && x+fnt[*ptr].ancho<=0) {
           if (fnt[*ptr].ancho==0) {
@@ -1889,7 +1889,7 @@ void text_clipped(byte * p, int x, int y, byte an, int al) {
 }
 
 //----------------------------------------------------------------------------
-// Pinta la ventana de modo 7
+// Render the mode-7 window
 //----------------------------------------------------------------------------
 
 void paint_sprites_m7(int n,int cx,int cy,float ang);
@@ -1932,10 +1932,10 @@ void paint_m7(int n) {
 }
 
 //----------------------------------------------------------------------------
-// Pinta los sprites del modo 7 (scroll snum)
+// Render mode-7 sprites (scroll snum)
 //----------------------------------------------------------------------------
 
-void paint_sprites_m7(int n,int cx,int cy,float ang) { // Le pasamos la posición de la cámara
+void paint_sprites_m7(int n,int cx,int cy,float ang) { // Takes the camera position
   int factor;
   #ifdef DEBUG
   int oreloj;
@@ -1947,7 +1947,7 @@ void paint_sprites_m7(int n,int cx,int cy,float ang) { // Le pasamos la posició
 
   factor=(((m7+n)->focus*im7[n].an*16)/320);
 
-  // Pre-calcula _Dist1 y _Dist2 para cada objeto del modo-7
+  // Pre-calculate _Dist1 and _Dist2 for each mode-7 object
 
   for (id=id_start; id<=id_end; id+=iloc_len) {
     if ((mem[id+_Status]==2 || mem[id+_Status]==4) && mem[id+_Ctype]==2
@@ -1968,7 +1968,7 @@ void paint_sprites_m7(int n,int cx,int cy,float ang) { // Le pasamos la posició
     } else mem[id+_Dist1]=0;
   }
 
-  // Pinta los objetos visibles dentro del modo-7
+  // Render visible objects within mode-7
 
   for (ide=id_start; ide<=id_end; ide+=iloc_len) mem[ide+_Painted]=0;
 
@@ -1989,7 +1989,7 @@ void paint_sprites_m7(int n,int cx,int cy,float ang) { // Le pasamos la posició
     }
 
     if (ide) {
-      if (max>=32) { // No pinta el objeto si está en las coordenadas de la cámara (ñ2)
+      if (max>=32) { // Don't render objects at the camera's own coordinates
 
         h=(m7+n)->height-mem[ide+_Height];
         altura=(h*(max-factor))/(max); // en pix/4
@@ -2015,7 +2015,7 @@ void paint_sprites_m7(int n,int cx,int cy,float ang) { // Le pasamos la posició
         process_paint(ide,get_ticks()-oreloj);
         #endif
 
-        // *** Pixel blanco en la base del objeto ***
+        // *** Debug: white pixel at the object's base ***
         // if (altura<vga_height && altura>=0 && anchura<vga_width && anchura>=0) {
         //   *(copia+altura*vga_width+anchura)=127;
         // }
@@ -2027,21 +2027,21 @@ void paint_sprites_m7(int n,int cx,int cy,float ang) { // Le pasamos la posició
 }
 
 //----------------------------------------------------------------------------
-// Pinta un sprite (mem[ide]) en el modo 7 (si está delante de la cámara)
+// Render a sprite (mem[ide]) in mode-7 (if it is in front of the camera)
 //----------------------------------------------------------------------------
 
 void paint_sprite_m7(int n,int ide,int x,int y,int size,int ang) {
 
   int * ptr;
   byte * si;
-  int an,al; // Información respecto a pantalla del grafico
+  int an,al; // Graphic width and height on screen
   int xg,yg;
   int m,p;
 
   if (mem[ide+_File]>max_fpgs || mem[ide+_File]<0) return;
   if ((p=mem[ide+_XGraph])>0) {
     m=mem[p]; if (m<1 || m>256) return;
-    // ang es el ángulo de visión del gráfico (0..4096), m el número de particiones
+    // ang is the viewing angle of the graphic (0..4096), m is the number of partitions
     mem[ide+_Flags]&=254;
     mem[ide+_Graph]=((ang+4096/(m*2))*m)/4096;
     if (mem[ide+_Graph]>=m) mem[ide+_Graph]=0;
@@ -2058,8 +2058,8 @@ void paint_sprite_m7(int n,int ide,int x,int y,int size,int ang) {
 
   if ((ptr=g[mem[ide+_File]].grf[mem[ide+_Graph]])!=NULL) {
 
-    an=ptr[13]; al=ptr[14];     // Ancho y Alto del gráfico
-    si=(byte*)ptr+64+ptr[15]*4; // Inicio del gráfico
+    an=ptr[13]; al=ptr[14];     // Graphic width and height
+    si=(byte*)ptr+64+ptr[15]*4; // Start of graphic data
 
     if (ptr[15]==0 || *((word*)ptr+32)==65535) {
       xg=ptr[13]/2; yg=ptr[14]-1;
@@ -2071,7 +2071,7 @@ void paint_sprite_m7(int n,int ide,int x,int y,int size,int ang) {
 }
 
 //----------------------------------------------------------------------------
-// Get_distx/y(angulo,dist)
+// Get_distx/y(angle,dist)
 //----------------------------------------------------------------------------
 
 int get_distx(int a,int d) {
@@ -2085,7 +2085,7 @@ int get_disty(int a,int d) {
 }
 
 //----------------------------------------------------------------------------
-// Dibuja el mapa en perspectiva
+// Render the map in perspective (mode-7 floor)
 //----------------------------------------------------------------------------
 
 void paint_mode7(int n,int camara_x, int camara_y, int camara_z, int angulo) {
@@ -2149,14 +2149,14 @@ void paint_mode7(int n,int camara_x, int camara_y, int camara_z, int angulo) {
 
 
 //----------------------------------------------------------------------------
-// Inicializa la tabla de senos y cosenos
+// Initialize the sine and cosine lookup tables
 //----------------------------------------------------------------------------
 
 void init_sin_cos()
 {
   int i;
 
-  for (i=0;i<grados_90;i++) { // Generamos la tabla del seno y el coseno
+  for (i=0;i<grados_90;i++) { // Generate the sine and cosine tables
     seno[i]=256*sin((float)i*1131/737280)*65536;
     seno[grados_180-i]=seno[i];
     seno[grados_180+i]=-seno[i];

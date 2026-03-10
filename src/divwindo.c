@@ -1,6 +1,6 @@
 
 //-----------------------------------------------------------------------------
-//      Módulo que contiene las primitivas básicas para ventanas
+//      Basic window drawing primitives
 //-----------------------------------------------------------------------------
 
 #include "global.h"
@@ -77,7 +77,7 @@ int ratonboton(int n,int x,int y,int centro) {
 }
 
 //-----------------------------------------------------------------------------
-//      Dibuja una caja en pantalla
+//      Draw a filled box on screen
 //-----------------------------------------------------------------------------
 
 void wbox(byte*copia,int an_copia,int al_copia,byte c,int x,int y,int an,int al) {
@@ -114,7 +114,7 @@ void wbox_in_box(byte*copia,int an_real_copia,int an_copia,int al_copia,byte c,i
 }
 
 //-----------------------------------------------------------------------------
-//  Barra de título
+//  Title bar
 //-----------------------------------------------------------------------------
 
 char dither_pattern[]={
@@ -177,7 +177,7 @@ void wgra(byte*copia,int an_copia,int al_copia,byte color,int x,int y,int an,int
 }
 
 //-----------------------------------------------------------------------------
-//      Resalta una caja, como un icono sobre el que se ponga el cursor
+//      Highlight a box, like an icon under the cursor
 //-----------------------------------------------------------------------------
 
 void wresalta_box(byte*copia,int an_copia,int al_copia,int x,int y,int an,int al) {
@@ -205,7 +205,7 @@ void wresalta_box(byte*copia,int an_copia,int al_copia,int x,int y,int an,int al
 }
 
 //-----------------------------------------------------------------------------
-//      Dibuja un rectángulo
+//      Draw a rectangle outline
 //-----------------------------------------------------------------------------
 
 void wrectangle(byte*copia,int an_copia,int al_copia,byte c,int x,int y,int an,int al) {
@@ -431,7 +431,7 @@ void wvolcado_oscuro(byte*copia,int an_copia,int al_copia,
 }
 
 //-----------------------------------------------------------------------------
-//      Funciones de impresión de un texto
+//      Text rendering functions
 //-----------------------------------------------------------------------------
 typedef  struct { byte an; word dir; } sscar;
 // * car;
@@ -616,7 +616,7 @@ void wwrite_in_box(byte*copia,int an_real_copia,int an_copia,int al_copia,
 
 
 	if (y<al_copia && y+al>0) {
-		if (y>=0 && y+al<=al_copia) { // El texto coge entero (coord. y)
+		if (y>=0 && y+al<=al_copia) { // Text fits entirely (y axis)
 			while (*ptr && x+car[*ptr].an<=0) { 
 				x=x+car[*ptr].an; 
 				ptr++; 

@@ -1,211 +1,211 @@
 
-// Strings, nuevo: p_string, cglo, cloc, p_*char, l*chr, ...
-// 00 - optimizacion de código intermedio
-// 00 - tablas y estructuras de hasta 3 dimensiones
-// 01 - añadir strings globales
-// 02 - probar en PRG, y provocar todos los nuevos errores
-// 03 - añadir nuevo set de instrucciones al intérprete
-// 04 - Preparar el debugger para el soporte de strings
-// 05 - añadir strings locales y privadas
-// 06 - comprobacion de rango en ejecución (strings con prefijo 0xdad00000)
-// 07 - long_header=9, en lugar de 36
-// 08 - strings globales miembros
-// 09 - strings locales miembros
-// 10 - inicialización de estructuras contemplando los strings miembros
-// 11 - STRING p,q; define 2 cadenas (en lugar de una cadena y un int)
-// 12 - Poder inicializar los registros en las estructuras globalmente (struct pepe[9] x=10; end)
-// 13 - Sentencia compiler_options (_max_process,_extended_conditions,_simple_conditions,_case_sensitive,_ignore_errors,_free_sintax)
-// 14 - Auto "\0" y ZERO2SPACE al poner un char en un string (strfix)
-// 15 - Nuevo sistema de tipos (int/char/string) en expresiones y condiciones (tipo_expresion)
-// 16 - Auto conversion de "A" a char("A") en asignaciones a char (literal/constant literal/string -> char)
-// 17 - Sobrecarga de = += + en operaciones de cadenas (strcpy,strcat,stradd)
-// 18 - Añadir y quitar caracteres con string++/--, string-=n, string-n (strdec,strsub,strlen)
-// 19 - Poder definir literales en varias lineas del fuente (varios consecutivos se convierten en uno)
-// 20 - Corregido fallo del coloreador de listados (al llegar un eof con /* sin cerrar)
-// 21 - Comparaciones entre cadenas (strigu/dis/may/men/mai/mei)
-// 22 - Nuevo sistema con 4 strings "en el aire" para permitir mas operaciones con cadenas (+/-)
-// 23 - Descartada la idea de pasar los offset a bytes (se pretendia hacer para &cadena[n],
-//      bytes y words: pero en [ptr+n] no se puede saber por cuanto multiplicar n)
-// 24 - Solucionados algunos fallos relacionados con los accesos remotos
-// 25 - Unidas las reservadas del modo7 con las del modo 8
-// 26 - Añadidas la opciones _no_check (no comprobar rangos ni ides) y _no_strfix
-// 27 - Funciones ascii: char,strcpy,strcat,strlen,strcmp,strchr,strstr,strset,upper,lower y strdel
-// 28 - Habilitado un 'parche' para indicar al compilador que algunas funciones devuelven un string
-// 29 - Poder recibir un parametro en un string/char global o local (cpachr, cpastr)
-// 30 - Habilitado un sistema multi-par/pri y arreglados algunos temas de las llamadas a procesos
-// 31 - Habilitada la idea de recibir un parámetro en un string private, incluso indicando su longitud (ej, proc(string s[2]))
-// 32 - Permitir la redeclaracion del parámetro string dentro de la seccion private (con la misma longitud)
-// 33 - Procesos tipo "function" (no retornan al llamador hasta haber terminado) (FCount,CallerId)
-// 34 - Arreglado el tema de los retornos de function (al caller del último proceso)
-// 35 - Poder hacer STEP sobre funciones (se hace un go here! a la siguiente statement)
-// 36 - Añadir bytes globales y un nuevo, nuevamente, sistema de inicialización de datos
-//      (ver p_byte, bglo y p_pointerbyte)
-// 37 - Preparar el debugger para el soporte de bytes y words
-// 38 - Ultimos cambios en el Debugger (en Ver datos), y conversión al Castellano.
-// 39 - Añadir bytes locales y privados (bloc)
-// 40 - Bytes miembros de estructuras (globales/locales y privados)
-// 41 - Inicialización de estructuras contemplando los bytes miembros (frm,ifrm_max)
-// 42 - Añadidas al intérprete instrucciones para el manejo de words (???wor)
-// 43 - Words al igual que bytes (wglo wloc *word ???wor)
-// 44 - Poder recibir un byte o word como parámetro (y redeclararlo como private)
-// 45 - Fallo del coloreador (debajo de process ... poner ?????????)
-// 46 - Que en las listas de procesos (F5) aparezcan también las funciones (editor y debugger)
-// 47 - Fallo de que desaparezcan (completamente) los sprites en los modos 8
-// 48 - Pasar los IMPORT al comienzo del programa y emitir un error adecuado para los IMPORT antiguos (y adapt_palette help)
-// 49 - Quitado el formateador de listados (dejado todo en divfrm.cpp por si en el futuro se quiere hacer, de forma separada a divc.cpp)
-// 50 - Que las funciones puedan devolver un valor con return despues de haber hecho FRAME (sistema multipila)
-// 51 - Añadido el tipo INT opcional para los datos enteros convencionales en DIV 1
-// 52 - Declaración de punteros a INT globales/locales/privados y miembros de estructuras (tpigl,tpilo) de hasta 3 dimensiones
-// 53 - Utilización de punteros INT, generación de código para los mismos (y pruebas)
-// 54 - Soporte en el debugger para punteros INT globales y locales (p, p[0], p[1], ...)
-// 55 - Punteros a int como parámetros y redeclaración en sección PRIVATE
-// 56 - Prohibir la redeclaración de variables private (solo si es 1 vez como parametro y otra como private)
-// 57 - Punteros a byte/word, tanto global como local y private, member o no, declaración y código
-// 58 - Soporte en el debugger de punteros de tipo byte y word (globales y locales)
-// 59 - Eliminada la posibilidad de utilizar * para definir un puntero (y en el debugger se usa POINTER)
-//      (esto es importante para no animar a utilizar *puntero después ...)
-// 60 - Probar punteros int/word/byte (glo/loc/pri/mem/par)
-// 61 - Implementados "string pointer" exactamente igual que los "byte pointer" (sólo varia la visualización en el debug)
-// 62 - Punteros a estructuras STRUCT POINTER NOMBRESTRUCT tal; (por defecto a 0)
-// 63 - Resuelto el problema del acceso a los miembros de la estructura original
-// 64 - Soporte en el debugger para punteros a estructuras (!!! mas chungo de lo que yo pensaba)
-// 65 - Funcion de "validate_address()" direcciones en DEBUG para evitar en lo posible los page fault
-// 66 - Resueltos "n-mil" problemas con los putos punteros, el debugger y la madre que lo parió ...
-// 67 - Hacer que int/byte/word/string pointer p1,p2; defina dos punteros
-// 68 - Funcion screen_copy que puede pasar una region de pantalla a una region de un gráfico
-// 69 - Argc/argv al igual que en C, con los parámetros del programa
-// 70 - Nuevo sistema de carga de funciones, definiendo el retorno y el tipo de los parámetros
-//      (y eliminadas las excepciones antes contempladas con las funciones de cadenas)
-// 71 - Funcion de ordenación y desordenación (nombre_estructura,campo,modo)
-// 72 - Minimizado el buffer circular de teclado en la ejecución de los juegos
-// 73 - Comprobar accesos a "NULL pointed data" de lectura/escritura
-// 74 - Opciones _no_id_check _no_range_check _no_null_check (englobadas en _no_check)
-// 75 - Opcion de compilacion _no_optimize (para poder deshabiliatar la optimizacion)
+// Strings, new: p_string, cglo, cloc, p_*char, l*chr, ...
+// 00 - intermediate code optimization
+// 00 - tables and structs up to 3 dimensions
+// 01 - add global strings
+// 02 - test in PRG, trigger all new errors
+// 03 - add new instruction set to interpreter
+// 04 - prepare debugger for string support
+// 05 - add local and private strings
+// 06 - runtime range checking (strings with 0xdad00000 prefix)
+// 07 - long_header=9, instead of 36
+// 08 - global member strings
+// 09 - local member strings
+// 10 - struct initialization handling member strings
+// 11 - STRING p,q; defines 2 strings (instead of one string and one int)
+// 12 - allow initializing records in structs globally (struct pepe[9] x=10; end)
+// 13 - compiler_options statement (_max_process,_extended_conditions,_simple_conditions,_case_sensitive,_ignore_errors,_free_sintax)
+// 14 - auto "\0" and ZERO2SPACE when putting a char in a string (strfix)
+// 15 - new type system (int/char/string) in expressions and conditions (tipo_expresion)
+// 16 - auto conversion of "A" to char("A") in char assignments (literal/constant literal/string -> char)
+// 17 - operator overloading of = += + for string operations (strcpy,strcat,stradd)
+// 18 - add and remove chars with string++/--, string-=n, string-n (strdec,strsub,strlen)
+// 19 - allow defining literals across multiple source lines (consecutive ones merge into one)
+// 20 - fixed syntax colorizer bug (on reaching eof with unclosed /*)
+// 21 - string comparisons (strigu/dis/may/men/mai/mei)
+// 22 - new system with 4 "in-flight" strings to allow more string operations (+/-)
+// 23 - discarded the idea of converting offsets to bytes (intended for &string[n],
+//      bytes and words: but in [ptr+n] we can't know by how much to multiply n)
+// 24 - fixed some bugs related to remote access
+// 25 - merged mode7 reserved words with mode 8 ones
+// 26 - added _no_check (skip range and id checks) and _no_strfix options
+// 27 - ASCII functions: char,strcpy,strcat,strlen,strcmp,strchr,strstr,strset,upper,lower and strdel
+// 28 - enabled a patch to tell the compiler that some functions return a string
+// 29 - allow receiving a parameter in a global or local string/char (cpachr, cpastr)
+// 30 - enabled multi-par/pri system and fixed some issues with process calls
+// 31 - enabled receiving a parameter in a private string, including its length (e.g., proc(string s[2]))
+// 32 - allow redeclaring a string parameter inside the private section (with the same length)
+// 33 - "function" type processes (don't return to caller until finished) (FCount,CallerId)
+// 34 - fixed function return handling (to the caller of the last process)
+// 35 - allow STEP over functions (does a "go here!" to the next statement)
+// 36 - add global bytes and a new, again, data initialization system
+//      (see p_byte, bglo and p_pointerbyte)
+// 37 - prepare debugger for byte and word support
+// 38 - final debugger changes (in View Data), and Spanish translation.
+// 39 - add local and private bytes (bloc)
+// 40 - byte members of structs (global/local and private)
+// 41 - struct initialization handling byte members (frm,ifrm_max)
+// 42 - added word handling instructions to interpreter (???wor)
+// 43 - words same as bytes (wglo wloc *word ???wor)
+// 44 - allow receiving a byte or word as parameter (and redeclaring as private)
+// 45 - colorizer bug (below process ... put ?????????)
+// 46 - show functions in process lists (F5) too (editor and debugger)
+// 47 - bug where sprites disappeared completely in mode 8
+// 48 - move IMPORTs to program start and emit proper error for old-style IMPORTs (and adapt_palette help)
+// 49 - removed listing formatter (left in divfrm.cpp in case it's needed later, separate from divc.cpp)
+// 50 - allow functions to return a value with return after FRAME (multi-stack system)
+// 51 - added optional INT type for conventional integer data in DIV 1
+// 52 - INT pointer declaration for global/local/private and struct members (tpigl,tpilo) up to 3 dimensions
+// 53 - INT pointer usage, code generation for them (and testing)
+// 54 - debugger support for global and local INT pointers (p, p[0], p[1], ...)
+// 55 - int pointers as parameters and redeclaration in PRIVATE section
+// 56 - forbid private variable redeclaration (only once as parameter and once as private)
+// 57 - byte/word pointers, global/local/private, member or not, declaration and code
+// 58 - debugger support for byte and word pointers (global and local)
+// 59 - removed the ability to use * to define a pointer (debugger uses POINTER instead)
+//      (important to discourage using *pointer later ...)
+// 60 - test int/word/byte pointers (glo/loc/pri/mem/par)
+// 61 - implemented "string pointer" exactly like "byte pointer" (only display differs in debug)
+// 62 - struct pointers: STRUCT POINTER STRUCTNAME var; (defaults to 0)
+// 63 - fixed access to members of the original struct
+// 64 - debugger support for struct pointers (!!! harder than expected)
+// 65 - validate_address() function in DEBUG to prevent page faults where possible
+// 66 - fixed countless problems with pointers, the debugger, and everything else ...
+// 67 - make int/byte/word/string pointer p1,p2; define two pointers
+// 68 - screen_copy function to copy a screen region to a graphic region
+// 69 - argc/argv like in C, with program parameters
+// 70 - new function loading system, defining return type and parameter types
+//      (and removed previously special-cased string function exceptions)
+// 71 - sort and shuffle functions (struct_name,field,mode)
+// 72 - minimized keyboard ring buffer during game execution
+// 73 - check "NULL pointed data" read/write access
+// 74 - options _no_id_check _no_range_check _no_null_check (grouped under _no_check)
+// 75 - compile option _no_optimize (to disable optimization)
 
 //    fopen, fclose, fread, fwrite, fseek, ftell, filelen (ver flushall, fcloseall)
 //    findfisrt, findnext, fullpath, splitpath, set/getcwd, set/getdrive, fprintf
 //    remove (danidel), chdir, mkdir
 
-//    - explicar los nuevos errores (strings, bytes, words y pointers) en help
-//    - funciones de malloc/free
-//    - escribir libro
+//    - document new errors (strings, bytes, words and pointers) in help
+//    - malloc/free functions
+//    - write book
 
-// A - Poder hacer includes de {constantes/globales/locales/procesos}
-// C - Multiasignaciones, utilizando variables privadas ocultas (x=3,45,y*10,2..4,-8;)
-// D - pensar algun truquillo tipo "macros" facil de implementar y que quede bien
-// E - Finalizar el autoformateador de listados
-// F - Generar un NFO informativo del programa compilado (TAB+LST+EML)
+// A - Allow includes of {constants/globals/locals/processes}
+// C - Multi-assignments, using hidden private variables (x=3,45,y*10,2..4,-8;)
+// D - think of some "macro" trick easy to implement that works well
+// E - Finish the auto-formatter for listings
+// F - Generate an informative NFO of the compiled program (TAB+LST+EML)
 
 // -----------------------------------------------------------------------------
 
-// SOLUCION 1: POINTERS BYTE/WORD LIMITADOS A TABLAS BYTE/WORD
+// SOLUTION 1: BYTE/WORD POINTERS LIMITED TO BYTE/WORD TABLES
 
 // NOTE: ptrbyte++ increments by 4 bytes (sizeof(int)), not 1 byte,
 //       and ptrword++ increments by 2 words, not 1 word.
 
-// (*)  A la hora de hacer que *ptrbyte sea ptrbyte[0] (supongo que añadiendo
-//      un nuevo tipo de ¿p_pointerb?), se debería emitir un error al hacer
-//      ++, --, +=, etc. sobre un p_pointerb/w ...
-//    - Problema, ¿como prohibir ptrbyte=ptrbyte+1;?
-//    - También se podrían permitir las operaciones, aunque los resultados fueran erróneos
+// (*)  To make *ptrbyte equivalent to ptrbyte[0] (presumably by adding
+//      a new type like p_pointerb?), we should emit an error on
+//      ++, --, +=, etc. on a p_pointerb/w ...
+//    - Problem: how to forbid ptrbyte=ptrbyte+1;?
+//    - We could also allow the operations, even if the results are wrong
 
-//    - Aun así, ¿como explicar a la gente que ptrint++ funciona, pero que ptrbyte++ no?
+//    - Even so, how to explain that ptrint++ works, but ptrbyte++ doesn't?
 
-//    - Ventajas: ya está (casi) hecho, no presenta incompatibilidades con
-//      DIV1, hay poco tiempo disponible ..., aun así, se permite el uso
-//      de memoria dinámica ... y siempre se podrá pasar a la SOLUCION 3 más
-//      adelante
+//    - Advantages: it's (almost) done, no incompatibilities with
+//      DIV1, little time available ..., still allows
+//      dynamic memory usage ... and we can always switch to SOLUTION 3
+//      later
 
-//    - aunque quizá esto no se debería llamar pointer ... sino algo como
-//      "táblas dinámicas" (por que se pueden hacer mallocs de las mismas)
+//    - perhaps this shouldn't be called pointer ... but something like
+//      "dynamic tables" (since you can malloc them)
 
-//    - Hombre, también serviría para pasar tablas y estructuras por parámetros.
-//    - Quizá se debería prohibir utilizar "p_mul" (*) para diferenciarlos de
-//      los punteros en C.
+//    - Also useful for passing tables and structs as parameters.
+//    - Perhaps we should forbid using "p_mul" (*) to differentiate them from
+//      C pointers.
 
-//    - El problema es: ¿Se prohibe operar (sumas y demás) con ptrbyte/word? -> NO
+//    - The question is: forbid arithmetic (add, etc.) on ptrbyte/word? -> NO
 
-//    - ¿Poder utilizar *ptrbyte como ptrbyte[0] ? -> NO, ya que ello induciría
-//      al acceso de bytes con *ptrbyte, cuando no es posible
+//    - Allow *ptrbyte as ptrbyte[0]? -> NO, since that would suggest
+//      byte access with *ptrbyte, which isn't possible
 
-// SOLUCION 2: POINTERS BYTE/WORD RELATIVOS A &MEM[0]
+// SOLUTION 2: BYTE/WORD POINTERS RELATIVE TO &MEM[0]
 
 //    - NOTE: byte and word pointers could be different types
 //    - (pointerb/w could be a byte/word offset relative to &memb[0])
-//    - ¿Nuevo diseño para: tpwgl tpwlo tpbgl tpblo? (teniéndolos siempre multiplicados *2 o *4)
-//    - a) en incializacion se debe multiplicar *2 o *4 la constant (ptrbyte=&tablabyte)
-//    - b) como cojones se hace ptrbyte=&loquesea ? (como paso de parámetro, asignación, etc...)
-//    - c) y que pasa con ¿ptrword=ptrbyte?
-//    - d) es más, ¿y que pasa si se envia como parámetro un ptrbyte y se recibe un ptrint?
+//    - New design for tpwgl tpwlo tpbgl tpblo? (keeping them always multiplied *2 or *4)
+//    - a) during initialization must multiply *2 or *4 the constant (ptrbyte=&tablabyte)
+//    - b) how the hell do you do ptrbyte=&whatever? (parameter passing, assignment, etc...)
+//    - c) and what about ptrword=ptrbyte?
+//    - d) moreover, what if a ptrbyte is sent as parameter but received as ptrint?
 
-//    - Solo podría hacerse de forma que todos los accesos de lectura a ptrbyte se dividiera por 4
-//      y en los de escritura se multiplicara por cuatro, y aun así:
-//      ¡¡¡ fallaría ptrbyte1=ptrbyte2 !!! (o pasando y recibiendo un ptrbyte parámetro)
-//      ¿[ptrbyte+n] ... y *ptrbyte?
+//    - Could only be done by dividing all ptrbyte reads by 4
+//      and multiplying writes by 4, and even then:
+//      ptrbyte1=ptrbyte2 would FAIL!!! (or passing/receiving a ptrbyte parameter)
+//      [ptrbyte+n] ... and *ptrbyte?
 
-//    - Es una gilipollez, ya que ptrbyte=ptrbyte+1 le seguiría sumando 4 !!!
+//    - This is nonsense, since ptrbyte=ptrbyte+1 would still add 4!!!
 
-//    - Ventajas: Pues que no sé si en este caso la virtud estará en el
-//      término medio ...
+//    - Advantages: not sure if the middle ground is the
+//      right approach here...
 
-// SOLUCION 3: PASAR TODOS LOS OFFSET A BYTE
+// SOLUTION 3: CONVERT ALL OFFSETS TO BYTE
 
-//    - Debería haber alguna forma de tener todos los offset multiplicados por 4 (en bytes)
+//    - There should be some way to have all offsets multiplied by 4 (in bytes)
 
-//    - Problemas: ["ptr"+n] (por cuanto multiplicar n), además de como resolver
-//      [ptrint+ptrbyte+2*x...], acceso en el intérprete a todos los datos de mem
-//      mem[id+_Graph], los propios id (multiplicarlos o no?- > mejor no, y hacer que el p_punto los multiplique,
-//      ya que, además deben ser impares), programas antiguos que hicieran uso de punteros
-//      (p=&kk; *p..., p++, *p... para ello se debería emitir un error de compilación al utilizar *p o [p],
-//      obligando a que redeclaren p como un ptrint), que ptrint++ sea ptrint+=4 y ptrword++ sea ptrword+=2,
+//    - Problems: ["ptr"+n] (by how much to multiply n), plus how to resolve
+//      [ptrint+ptrbyte+2*x...], interpreter access to all mem data
+//      mem[id+_Graph], the IDs themselves (multiply or not? -> better not, let p_punto multiply,
+//      since they must also be odd), old programs using pointers
+//      (p=&kk; *p..., p++, *p... should emit a compile error when using *p or [p],
+//      forcing redeclaration of p as ptrint), ptrint++ becomes ptrint+=4 and ptrword++ becomes ptrword+=2,
 
-//    - Cambiarian tambien los sizeof(), ahora en bytes, y las operaciones con
-//      ficheros, aumentando la incompatibilidad con DIV1 (ya que la gente podría
-//      haber utilizado un save("pepe.dat",&tabla,10) ...
+//    - sizeof() would also change to bytes, and file operations too,
+//      increasing DIV1 incompatibility (since users may have used
+//      save("pepe.dat",&table,10) ...
 
-//    - Resumiendo: que los problemas gordos son el intérprete (sobre todo, ya
-//      que era un rollo eso del "#define memo(x) *(int*)(memb+x)" ),
-//      el de [ptr???+???] (y ptrint++), y las incompatibilidades con DIV1
+//    - Summary: the big problems are the interpreter (especially
+//      the "#define memo(x) *(int*)(memb+x)" approach),
+//      [ptr???+???] (and ptrint++), and DIV1 incompatibilities
 
-//    - Ventajas: El acceso libre a cualquier tipo de dato, la simplificación
-//      de strings, el poder hacer que "byte a" ocupe realmente sólo un byte, ...
-//      que es la forma correcta de hacerlo, y que si no se hace ahora quizá
-//      no se pueda hacer nunca.
+//    - Advantages: free access to any data type, string simplification,
+//      making "byte a" actually occupy only one byte, ...
+//      it's the correct way to do it, and if not done now it may
+//      never be done.
 
-// SOLUCION 4: PASAR LOS OFFSET A FLOAT
+// SOLUTION 4: CONVERT OFFSETS TO FLOAT
 
-//    - Se que a bote pronto parace una gilipollez, pero ¿no sería lo ideal
-//      poder tener como offset de bytes numeros .25, .50 y .75?
+//    - I know this sounds crazy at first, but wouldn't it be ideal
+//      to have byte offsets as .25, .50 and .75?
 
-//    - Lo guay sería que ptrint++ seguiría sumando 1.0
+//    - The cool thing is ptrint++ would still add 1.0
 
-//    - y para los accesos a bytes se sumaría .25, el problema es que todo
-//      se llenaría de llamadas a _CHP e iria muy lento
+//    - and for byte access you'd add .25, the problem is everything
+//      would be full of _CHP calls and run very slowly
 
-//    - Además, ¿como iban a devolver offset o sizeof() un float si el
-//      lenguaje no los maneja?
+//    - Also, how would offset or sizeof() return a float if the
+//      language doesn't support them?
 
 // NOTE: Offsets are NOT multiplied by 4 in this version.
 //       (This was attempted once but reverted.)
 
 // -----------------------------------------------------------------------------
 
-// Optimización de codigo intermedio
+// Intermediate code optimization
 
-// 1er paso: Crear una función de generación de mnemónicos, en lugar de un
-//           acceso libre a mem[], para localizar el problema de la optimización
+// 1st step: Create a mnemonic generation function, instead of
+//           direct access to mem[], to isolate the optimization problem
 
-// no se puede generar codigo a byte, pero si utilizar el sistema de "byte"
-// como compresion de los EXE, descomprimiendo en el intérprete al cargar
+// can't generate bytecode directly, but can use the "byte" system
+// as EXE compression, decompressing in the interpreter on load
 
 // -----------------------------------------------------------------------------
 
-// Tablas y estructuras multidimensionales
-// revisar errores: 35, ...
+// Multidimensional tables and structs
+// review errors: 35, ...
 // TODO: Review help text for single-dimension tables and structs
 
 //-----------------------------------------------------------------------------
-//      DIV - Compilador Interno
+//      DIV - Internal Compiler
 //-----------------------------------------------------------------------------
 
 #include "global.h"
@@ -255,46 +255,46 @@ void add_code(int dir, int param, int op);
 
 
 //-----------------------------------------------------------------------------
-//      Constantes
+//      Constants
 //-----------------------------------------------------------------------------
 
-#define version "0c88b" //Versión del compilador
+#define version "0c88b" //Compiler version
 
 #ifndef SHARE
-#define max_obj 8192    //Compiler object maximum limit compiler
-#define long_med_id 16  //Longitud media de los identificadores (+4+4+1)
+#define max_obj 8192    //Compiler object maximum limit
+#define long_med_id 16  //Average identifier length (+4+4+1)
 #else
-#define max_obj 700     //El malvado tiene 626 ...
-#define long_med_id 20  //Longitud media de los identificadores (+4+4+1)
+#define max_obj 700     //The shareware version has 626 ...
+#define long_med_id 20  //Average identifier length (+4+4+1)
 #endif
 
-#define max_nodos 128   //Máximo número de nodos del léxico para símbolos
-#define max_exp 512     //Máximo número de elementos en una expresión
-#define long_header 9   //Longitud de la cabecera al inicio de los programas
-#define long_pila 2048  //Longitud de la pila en ejecución
+#define max_nodos 128   //Maximum number of lexer symbol nodes
+#define max_exp 512     //Maximum number of elements in an expression
+#define long_header 9   //Header length at program start
+#define long_pila 2048  //Execution stack length
 
 #define default_buffer    (16384*8)
 #define security_distance (4096*8)
 #define buffer_grow       (16384*8)
 
-#define cr 13           //Retorno de carro
-#define lf 10           //Salto de linea
-#define tab 9           //Tabulación
+#define cr 13           //Carriage return
+#define lf 10           //Line feed
+#define tab 9           //Tab
 
 //-----------------------------------------------------------------------------
 
-#define l_err 0         //Valores de lex_case, si no son punteros a lex_simb
-#define l_cr  1         //Fin de linea (l_err Carácter no esperado)
-#define l_id  2         //Identificador o palabra reservada
-#define l_spc 3         //Espacios y tabulaciones
+#define l_err 0         //lex_case values, when not pointers to lex_simb
+#define l_cr  1         //End of line (l_err = unexpected character)
+#define l_id  2         //Identifier or reserved word
+#define l_spc 3         //Spaces and tabs
 #define l_lit 4         //Literal
-#define l_num 5         //Constante numérica
+#define l_num 5         //Numeric constant
 
 //-----------------------------------------------------------------------------
-//      Valores sintácticos o tokens (pieza)
+//      Syntactic values / tokens (pieza)
 //-----------------------------------------------------------------------------
 
-#define p_ultima        0x00 //Fin de fichero <EOF>
+#define p_ultima        0x00 //End of file <EOF>
 
 #define p_program       0x01
 #define p_const         0x02
@@ -415,9 +415,9 @@ void add_code(int dir, int param, int op);
 #define p_shr_asig      0x73
 #define p_shl_asig      0x74
 
-#define p_ini_rem       0x7d //Inicio comentario
-#define p_end_rem       0x7e //Fin comentario
-#define p_rem           0x7f //Comentario de una linea
+#define p_ini_rem       0x7d //Begin comment
+#define p_end_rem       0x7e //End comment
+#define p_rem           0x7f //Single-line comment
 
 #define p_strigu        0xc0
 #define p_strdis        0xc1
@@ -470,13 +470,13 @@ void add_code(int dir, int param, int op);
 
 #define p_pointerbyte   0xf7
 
-#define p_lit           0xfc //Puntero al literal (txt) en pieza_num
-#define p_id            0xfd //o es un ptr a vnom (a un ptr al objeto)
-#define p_num           0xfe //Número en pieza_num
+#define p_lit           0xfc //Pointer to literal (txt) in pieza_num
+#define p_id            0xfd //or a ptr to vnom (to an object ptr)
+#define p_num           0xfe //Number in pieza_num
 
 //-----------------------------------------------------------------------------
 
-#define tnone   0       // Tipos de objetos en obj[]
+#define tnone   0       // Object types in obj[]
 #define tcons   1
 #define tvglo   2
 #define ttglo   3
@@ -488,105 +488,105 @@ void add_code(int dir, int param, int op);
 #define tfunc   9
 #define tsglo   10
 #define tsloc   11
-#define tfext   12      // Función de una librería externa
+#define tfext   12      // External library function
 
-#define tbglo   13      // Byte global
+#define tbglo   13      // Global byte
 #define twglo   14
 #define tbloc   15
 #define twloc   16
 
-#define tpigl   17      // Puntero a ints global (un ttglo direccionable)
-#define tpilo   18      // Puntero a ints local (idem)
+#define tpigl   17      // Global int pointer (an addressable ttglo)
+#define tpilo   18      // Local int pointer (same)
 
-#define tpwgl   19      // Punteros a word
+#define tpwgl   19      // Word pointers
 #define tpwlo   20
-#define tpbgl   21      // Punteros a byte
+#define tpbgl   21      // Byte pointers
 #define tpblo   22
 
-#define tpcgl   23      // Punteros a string
+#define tpcgl   23      // String pointers
 #define tpclo   24
-#define tpsgl   25      // Punteros a struct
+#define tpsgl   25      // Struct pointers
 #define tpslo   26
 
 //-----------------------------------------------------------------------------
 
-#define econs   0       // Constante          // Tipos de elementos en tabexp[]
-#define eoper   1       // Operador
-#define erango  2       // Comprobación de rango
-#define ewhoami 3       // Identificador de proceso
-#define ecall   4       // Creación de un proceso
-#define efunc   5       // Llamada a una función interna
-#define efext   6       // Llamada a una función externa
-#define echeck  7       // Comprobación de validez de un identificador
-#define estring 8       // Cadena de texto (su offset constant)
-#define enull   9       // Comprobación de NULL pointer
+#define econs   0       // Constant            // Element types in tabexp[]
+#define eoper   1       // Operator
+#define erango  2       // Range check
+#define ewhoami 3       // Process identifier
+#define ecall   4       // Process creation
+#define efunc   5       // Internal function call
+#define efext   6       // External function call
+#define echeck  7       // Identifier validity check
+#define estring 8       // Text string (its constant offset)
+#define enull   9       // NULL pointer check
 
 //-----------------------------------------------------------------------------
 
-//-Mnemónico-Códg.-Operandos (Generación de código EML, "*" ≡ "aún no usado")
+//-Mnemonic--Code--Operands (EML code generation, "*" = "not yet used")
 
-#define lnop  0 // *            No operación
-#define lcar  1 // valor        Carga una constant en pila
-#define lasi  2 //              Saca valor, offset y mete el valor en [offset]
-#define lori  3 //              Or lógico
-#define lxor  4 //              Xor, or exclusivo
-#define land  5 //              And lógico, operador sobre condiciones
-#define ligu  6 //              Igual, operador logico de comparación
-#define ldis  7 //              Distinto, true si los 2 valores son diferentes
-#define lmay  8 //              Mayor, comparación con signo
-#define lmen  9 //              Menor, idem
-#define lmei 10 //              Menor o igual
-#define lmai 11 //              Mayor o igual
-#define ladd 12 //              Suma dos constantes
-#define lsub 13 //              Resta, operación binaria
-#define lmul 14 //              Multiplicación
-#define ldiv 15 //              División de enteros
-#define lmod 16 //              Módulo, resto de la división
-#define lneg 17 //              Negación, cambia de signo una constant
-#define lptr 18 //              Pointer, saca offset y mete [offset]
-#define lnot 19 //              Negación binaria, bit a bit
-#define laid 20 //              Suma id a la constant de la pila
-#define lcid 21 //              Carga id en la pila
-#define lrng 22 // rango        Realiza una comparación de rango
-#define ljmp 23 // offset       Salta a una dirección de mem[]
-#define ljpf 24 // offset       Salta si un valor es falso a una dirección
-#define lfun 25 // código       Llamada a un proceso interno, ej. signal()
-#define lcal 26 // offset       Crea un nuevo proceso en el programa
-#define lret 27 //              Auto-eliminación del proceso
-#define lasp 28 //              Desecha un valor apilado
-#define lfrm 29 //              Detiene por este frame la ejecución del proceso
-#define lcbp 30 // num_par      Inicializa el puntero a los parámetros locales
-#define lcpa 31 //              Saca offset, lee parámetro [offset] y bp++
-#define ltyp 32 // bloque       Define el tipo de proceso actual (colisiones)
-#define lpri 33 // offset       Salta a la dirección, y carga var. privadas
-#define lcse 34 // offset       Si switch <> expresión, salta al offset
-#define lcsr 35 // offset       Si switch no esta en el rango, salta al offset
-#define lshr 36 //              Rotacion a la derecha (modo C, >>)
-#define lshl 37 //              Rotacion a la izquierda (modo C, <<)
-#define lipt 38 //              Incremento y pointer
-#define lpti 39 //              Pointer e incremento
-#define ldpt 40 //              Decremento y pointer
-#define lptd 41 //              Pointer y decremento
-#define lada 42 //              Add-asignación
-#define lsua 43 //              Sub-asignación
-#define lmua 44 //              Mul-asignación
-#define ldia 45 //              Div-asignación
-#define lmoa 46 //              Mod-asignación
-#define lana 47 //              And-asignación
-#define lora 48 //              Or-asignación
-#define lxoa 49 //              Xor-asignación
-#define lsra 50 //              Shr-asignación
-#define lsla 51 //              Shl-asignación
-#define lpar 52 // num_par_pri  Define el número de parámetros privados
-#define lrtf 53 //              Auto-eliminación del proceso, devuelve un valor
-#define lclo 54 // offset       Crea un clon del proceso actual
-#define lfrf 55 //              Pseudo-Frame (frame a un porcentaje, frame(100)==frame)
-#define limp 56 // offset text  Importa una DLL externa
-#define lext 57 // código       Llama a una función externa
-#define lchk 58 //              Comprueba la validez de un identificador
-#define ldbg 59 //              Invoca al debugger
+#define lnop  0 // *            No operation
+#define lcar  1 // value        Push a constant onto the stack
+#define lasi  2 //              Pop value and offset, store value at [offset]
+#define lori  3 //              Logical or
+#define lxor  4 //              Xor, exclusive or
+#define land  5 //              Logical and, condition operator
+#define ligu  6 //              Equal, logical comparison
+#define ldis  7 //              Not equal, true if 2 values differ
+#define lmay  8 //              Greater than, signed comparison
+#define lmen  9 //              Less than, same
+#define lmei 10 //              Less than or equal
+#define lmai 11 //              Greater than or equal
+#define ladd 12 //              Add two constants
+#define lsub 13 //              Subtract, binary operation
+#define lmul 14 //              Multiply
+#define ldiv 15 //              Integer division
+#define lmod 16 //              Modulo, division remainder
+#define lneg 17 //              Negate, change sign of a constant
+#define lptr 18 //              Pointer, pop offset and push [offset]
+#define lnot 19 //              Bitwise not, bit by bit
+#define laid 20 //              Add id to the constant on stack
+#define lcid 21 //              Push id onto the stack
+#define lrng 22 // range        Perform a range check
+#define ljmp 23 // offset       Jump to a mem[] address
+#define ljpf 24 // offset       Jump if false to an address
+#define lfun 25 // code         Call an internal function, e.g. signal()
+#define lcal 26 // offset       Create a new process in the program
+#define lret 27 //              Process self-termination
+#define lasp 28 //              Discard a stacked value
+#define lfrm 29 //              Suspend process execution for this frame
+#define lcbp 30 // num_par      Initialize local parameter pointer
+#define lcpa 31 //              Pop offset, read parameter [offset] and bp++
+#define ltyp 32 // block        Define current process type (collisions)
+#define lpri 33 // offset       Jump to address, and load private vars
+#define lcse 34 // offset       If switch != expression, jump to offset
+#define lcsr 35 // offset       If switch not in range, jump to offset
+#define lshr 36 //              Right shift (C-style, >>)
+#define lshl 37 //              Left shift (C-style, <<)
+#define lipt 38 //              Pre-increment and pointer
+#define lpti 39 //              Pointer and post-increment
+#define ldpt 40 //              Pre-decrement and pointer
+#define lptd 41 //              Pointer and post-decrement
+#define lada 42 //              Add-assign
+#define lsua 43 //              Sub-assign
+#define lmua 44 //              Mul-assign
+#define ldia 45 //              Div-assign
+#define lmoa 46 //              Mod-assign
+#define lana 47 //              And-assign
+#define lora 48 //              Or-assign
+#define lxoa 49 //              Xor-assign
+#define lsra 50 //              Shr-assign
+#define lsla 51 //              Shl-assign
+#define lpar 52 // num_par_pri  Define number of private parameters
+#define lrtf 53 //              Process self-termination, returns a value
+#define lclo 54 // offset       Clone the current process
+#define lfrf 55 //              Pseudo-frame (frame at percentage, frame(100)==frame)
+#define limp 56 // offset text  Import an external DLL
+#define lext 57 // code         Call an external function
+#define lchk 58 //              Check identifier validity
+#define ldbg 59 //              Invoke the debugger
 
-// Instrucciones añadidas para la optimización (DIV 2.0)
+// Instructions added for optimization (DIV 2.0)
 
 #define lcar2 60
 #define lcar3 61
@@ -607,69 +607,69 @@ void add_code(int dir, int param, int op);
 #define lcarsub 76
 #define lcardiv 77
 
-// Instrucciones añadidas para el manejo de caracteres
+// Instructions added for character handling
 
-#define lptrchr 78  // Pointer, saca (index, offset) y mete [offset+byte index]
-#define lasichr 79  // Saca (valor, index, offset) y mete el valor en [offset+byte index]
-#define liptchr 80  // Incremento y pointer
-#define lptichr 81  // Pointer e incremento
-#define ldptchr 82  // Decremento y pointer
-#define lptdchr 83  // Pointer y decremento
-#define ladachr 84  // Add-asignación
-#define lsuachr 85  // Sub-asignación
-#define lmuachr 86  // Mul-asignación
-#define ldiachr 87  // Div-asignación
-#define lmoachr 88  // Mod-asignación
-#define lanachr 89  // And-asignación
-#define lorachr 90  // Or-asignación
-#define lxoachr 91  // Xor-asignación
-#define lsrachr 92  // Shr-asignación
-#define lslachr 93  // Shl-asignación
-#define lcpachr 94  // Saca offset, lee parámetro [offset] y bp++
+#define lptrchr 78  // Pointer, pop (index, offset) and push [offset+byte index]
+#define lasichr 79  // Pop (value, index, offset) and store value at [offset+byte index]
+#define liptchr 80  // Pre-increment and pointer
+#define lptichr 81  // Pointer and post-increment
+#define ldptchr 82  // Pre-decrement and pointer
+#define lptdchr 83  // Pointer and post-decrement
+#define ladachr 84  // Add-assign
+#define lsuachr 85  // Sub-assign
+#define lmuachr 86  // Mul-assign
+#define ldiachr 87  // Div-assign
+#define lmoachr 88  // Mod-assign
+#define lanachr 89  // And-assign
+#define lorachr 90  // Or-assign
+#define lxoachr 91  // Xor-assign
+#define lsrachr 92  // Shr-assign
+#define lslachr 93  // Shl-assign
+#define lcpachr 94  // Pop offset, read parameter [offset] and bp++
 
-// Instrucciones añadidas para el manejo de cadenas
+// Instructions added for string handling
 
-#define lstrcpy 95  // Saca si, di, y hace strcpy(mem[di],[si]) (deja di en pila)
-#define lstrfix 96  // Amplia una cadena antes de meter un char en ella
-#define lstrcat 97  // Concatena dos cadenas (opera como strcpy)
-#define lstradd 98  // Suma dos strings "en el aire" y deja en pila el puntero al aire
-#define lstrdec 99  // Añade o quita caracteres a una cadena
-#define lstrsub 100 // Quita caracteres a una cadena (-=)
-#define lstrlen 101 // Sustituye una cadena por su longitud
-#define lstrigu 102 // Comparacion de igualdad de dos cadenas
-#define lstrdis 103 // Cadenas distintas
-#define lstrmay 104 // Cadena mayor
-#define lstrmen 105 // Cadena menor
-#define lstrmei 106 // Cadena mayor o igual
-#define lstrmai 107 // Cadena menor o igual
-#define lcpastr 108 // Carga un parámetro en una cadena
+#define lstrcpy 95  // Pop si, di, and do strcpy(mem[di],[si]) (leave di on stack)
+#define lstrfix 96  // Expand a string before inserting a char into it
+#define lstrcat 97  // Concatenate two strings (operates like strcpy)
+#define lstradd 98  // Add two "in-flight" strings and leave pointer on stack
+#define lstrdec 99  // Add or remove chars from a string
+#define lstrsub 100 // Remove chars from a string (-=)
+#define lstrlen 101 // Replace a string with its length
+#define lstrigu 102 // String equality comparison
+#define lstrdis 103 // Strings not equal
+#define lstrmay 104 // String greater than
+#define lstrmen 105 // String less than
+#define lstrmei 106 // String greater than or equal
+#define lstrmai 107 // String less than or equal
+#define lcpastr 108 // Load a parameter into a string
 
-// Instrucciones añadidas para el manejo de Words
+// Instructions added for word handling
 
-#define lptrwor 109 // Pointer, saca (index, offset) y mete [offset+byte index]
-#define lasiwor 110 // Saca (valor, index, offset) y mete el valor en [offset+byte index]
-#define liptwor 111 // Incremento y pointer
-#define lptiwor 112 // Pointer e incremento
-#define ldptwor 113 // Decremento y pointer
-#define lptdwor 114 // Pointer y decremento
-#define ladawor 115 // Add-asignación
-#define lsuawor 116 // Sub-asignación
-#define lmuawor 117 // Mul-asignación
-#define ldiawor 118 // Div-asignación
-#define lmoawor 119 // Mod-asignación
-#define lanawor 120 // And-asignación
-#define lorawor 121 // Or-asignación
-#define lxoawor 122 // Xor-asignación
-#define lsrawor 123 // Shr-asignación
-#define lslawor 124 // Shl-asignación
-#define lcpawor 125 // Saca offset, lee parámetro [offset] y bp++
+#define lptrwor 109 // Pointer, pop (index, offset) and push [offset+word index]
+#define lasiwor 110 // Pop (value, index, offset) and store value at [offset+word index]
+#define liptwor 111 // Pre-increment and pointer
+#define lptiwor 112 // Pointer and post-increment
+#define ldptwor 113 // Pre-decrement and pointer
+#define lptdwor 114 // Pointer and post-decrement
+#define ladawor 115 // Add-assign
+#define lsuawor 116 // Sub-assign
+#define lmuawor 117 // Mul-assign
+#define ldiawor 118 // Div-assign
+#define lmoawor 119 // Mod-assign
+#define lanawor 120 // And-assign
+#define lorawor 121 // Or-assign
+#define lxoawor 122 // Xor-assign
+#define lsrawor 123 // Shr-assign
+#define lslawor 124 // Shl-assign
+#define lcpawor 125 // Pop offset, read parameter [offset] and bp++
 
-// Miscelánea
+// Miscellaneous
 
-#define lnul    126 // Comprueba que un puntero no sea NULL
+#define lnul    126 // Check that a pointer is not NULL
 
 //-----------------------------------------------------------------------------
-//      Prototipos
+//      Prototypes
 //-----------------------------------------------------------------------------
 
 void c_error(word,word);
@@ -699,7 +699,7 @@ void comp_exit(void)
 
 
 //-----------------------------------------------------------------------------
-//      Variables globales del compilador
+//      Compiler global variables
 //-----------------------------------------------------------------------------
 
 #include "div_stub.h"
@@ -729,112 +729,112 @@ FILE * div_open_file(char * file);
 
 //-----------------------------------------------------------------------------
 
-int old_linea; // Situación en el fichero del token anterior al último leido
+int old_linea; // File position of the token before the last one read
 byte * old_ierror, * old_ierror_end;
 
-// El último token leido está en (linea,ierror,ierror_end)
+// The last token read is at (linea,ierror,ierror_end)
 
 byte * ultima_linea,cero=0;
 
 //-----------------------------------------------------------------------------
 
-// Informacion para EXEC.LIN (posicion en mem y fuente de cada statement)
+// Info for EXEC.LIN (position in mem and source of each statement)
 
-int inicio,final;     // Direcciones inicial y final de mem[] de la statement
-int linea1,columna1;  // Posicion en la que comienza la statement en el fuente
-int linea2,columna2;  // Posicion en la que acaba la statement en el fuente
+int inicio,final;     // Start and end addresses in mem[] of the statement
+int linea1,columna1;  // Position where the statement begins in source
+int linea2,columna2;  // Position where the statement ends in source
 
-void statement_start(void);  // Fija inicio, linea1, columna1
-void statement_end(void);   // Fija final, linea2, columna2
-void record_statement(void);  // Guarda las seis variables en el fichero
+void statement_start(void);  // Set inicio, linea1, columna1
+void statement_end(void);   // Set final, linea2, columna2
+void record_statement(void);  // Write the six variables to file
 
 //-----------------------------------------------------------------------------
 
-// Tabla de objetos --------------------------------- *iobj primer objeto libre
+// Object table --------------------------------- *iobj = first free object
 
 struct objeto {
-  byte type;    // Tipo de objeto
-  byte usado;   // Indica si el objeto ha sido usado antes de definirse
-  byte * name;  // Puntero al nombre, para algún listado
-  byte * ierror;// Puntero al código para determinar la columna si es necesario
-  int line;    // Línea de código fuente, para informar del error
-  int param;    // Indica que es un objeto declarado en los parámetros
-  struct objeto * anterior; // Anterior objeto de igual nombre
-  struct objeto * bloque;   // Bloque de este proceso (0-global/local N-private)
-  struct objeto * member;   // Indica a que struct pertenece (0-n/a)
+  byte type;    // Object type
+  byte usado;   // Whether the object was used before being defined
+  byte * name;  // Pointer to name, for listing output
+  byte * ierror;// Pointer to source code for determining column if needed
+  int line;    // Source line number, for error reporting
+  int param;    // Whether this object was declared in parameters
+  struct objeto * anterior; // Previous object with the same name
+  struct objeto * bloque;   // Block for this process (0-global/local N-private)
+  struct objeto * member;   // Which struct it belongs to (0-n/a)
   union {
-    struct {                                            // Constante
+    struct {                                            // Constant
       int valor;
-      int literal;                                      // 0-no, 1-si
+      int literal;                                      // 0-no, 1-yes
     } cons;
-    struct {                                            // Variable global
+    struct {                                            // Global variable
       int offset;
     } vglo;
-    struct {                                            // Tabla global
+    struct {                                            // Global table
       int offset;
-      int totalen;                                      // numero total de elementos
-      int len1,len2,len3;                               // len2/3==-1 si n/a
+      int totalen;                                      // total number of elements
+      int len1,len2,len3;                               // len2/3==-1 if n/a
     } tglo,pigl;
-    struct {                                            // Byte global
+    struct {                                            // Global byte
       int offset;
-      int totalen;                                      // numero total de elementos
-      int len1,len2,len3;                               // len2/3==-1 si n/a
+      int totalen;                                      // total number of elements
+      int len1,len2,len3;                               // len2/3==-1 if n/a
     } bglo,pbgl;
-    struct {                                            // Word global
+    struct {                                            // Global word
       int offset;
-      int totalen;                                      // numero total de elementos
-      int len1,len2,len3;                               // len2/3==-1 si n/a
+      int totalen;                                      // total number of elements
+      int len1,len2,len3;                               // len2/3==-1 if n/a
     } wglo,pwgl;
-    struct {                                            // Cadena (string) global
+    struct {                                            // Global string
       int offset;
-      int totalen;                                      // numero total de elementos
+      int totalen;                                      // total number of elements
     } cglo,pcgl;
     struct {                                            // Struct
       int offset;
-      int len_item;                                     // Número de campos
-      int totalitems;                                   // Numero total de registros
-      int items1,items2,items3;                         // -1 si n/a
+      int len_item;                                     // Number of fields
+      int totalitems;                                   // Total number of records
+      int items1,items2,items3;                         // -1 if n/a
     } sglo,sloc;
     struct {                                            // Struct pointer
       int offset;
-      struct objeto * ostruct;                          // Puntero al struct
-      int totalitems;                                   // Número total de registros
-      int items1,items2,items3;                         // -1 si n/a
+      struct objeto * ostruct;                          // Pointer to struct
+      int totalitems;                                   // Total number of records
+      int items1,items2,items3;                         // -1 if n/a
     } psgl,pslo;
-    struct {                                            // Variable local
+    struct {                                            // Local variable
       int offset;
     } vloc;
-    struct {                                            // Tabla local
+    struct {                                            // Local table
       int offset;
       int totalen;
       int len1,len2,len3;
     } tloc,pilo;
-    struct {                                            // Byte local
+    struct {                                            // Local byte
       int offset;
-      int totalen;                                      // numero total de elementos
-      int len1,len2,len3;                               // len2/3==-1 si n/a
+      int totalen;                                      // total number of elements
+      int len1,len2,len3;                               // len2/3==-1 if n/a
     } bloc,pblo;
-    struct {                                            // Word local
+    struct {                                            // Local word
       int offset;
-      int totalen;                                      // numero total de elementos
-      int len1,len2,len3;                               // len2/3==-1 si n/a
+      int totalen;                                      // total number of elements
+      int len1,len2,len3;                               // len2/3==-1 if n/a
     } wloc,pwlo;
-    struct {                                            // Cadena (string) local
+    struct {                                            // Local string
       int offset;
-      int totalen;                                      // numero total de elementos
+      int totalen;                                      // total number of elements
     } cloc,pclo;
-    struct {                                            // Proceso
+    struct {                                            // Process
       struct objeto * bloque;
       int offset;
       int num_par;
     } proc;
-    struct {                                            // Funcion interna
+    struct {                                            // Internal function
       int code;
       int num_par;
       int ret;      // 0-Int 1-String
       byte par[12]; // 0-Int 1-(Struct_name,name)
     } func;
-    struct {                                            // Funcion externa
+    struct {                                            // External function
       int code;
       int num_par;
     } fext;
@@ -843,10 +843,10 @@ struct objeto {
 
 //-----------------------------------------------------------------------------
 
-byte * vnom=NULL; // Vector de nombres (cad_hash:int, pieza (o iobj):int, asciiz)
+byte * vnom=NULL; // Name vector (hash_chain:int, pieza (or iobj):int, asciiz)
 union { byte*b; byte**p; } ivnom;
 
-byte * inicio_objetos; // Para el crear listado de la tabla de objetos
+byte * inicio_objetos; // For generating the object table listing
 
 byte * vhash[256]; // Pointer to the vector of names
 
@@ -868,11 +868,11 @@ struct lex_ele { byte caracter;
        lex_simb[max_nodos], * ilex_simb, * lex_case[256];
 
 int pieza, pieza_num;
-struct objeto * o; // Cuando pieza=p_id, objeto de tipo (**o).type
-struct objeto * bloque_actual; // Bloque que esta siendo analizado
-struct objeto * bloque_lexico; // Es 0 hasta las privadas del program
+struct objeto * o; // When pieza=p_id, object of type (**o).type
+struct objeto * bloque_actual; // Block currently being analyzed
+struct objeto * bloque_lexico; // 0 until program's private section
 
-struct objeto * member; // !=0 al declarar/acceder un miembro de un struct
+struct objeto * member; // !=0 when declaring/accessing a struct member
 
 int linea, num_nodos, num_obj;
 
@@ -882,7 +882,7 @@ int num_obj_predefinidos;
 
 int parametros;
 
-int acceso_remoto; // Para no permitir id.private
+int acceso_remoto; // To disallow id.private
 
 //-----------------------------------------------------------------------------
 
@@ -896,7 +896,7 @@ int itcont;
 
 //-----------------------------------------------------------------------------
 
-int pila[long_pila+max_exp+64]; // cálculo de expresiones (compilación y ejecución)
+int pila[long_pila+max_exp+64]; // expression evaluation (compilation and execution)
 
 int32_t * mem_ory=NULL, * frm=NULL;
 int32_t * mem=NULL, * loc=NULL;
@@ -906,15 +906,15 @@ int itxt, ifrm_max;
 
 byte * imemptr;
 
-int iloc_len; // final de las variables locales incluyendo las privadas
+int iloc_len; // end of local variables including private ones
 
-// mem[]        vector de memoria destino
-// imem         puntero para la generación de datos y código
-// imem_max     fin de la memoria destino (indice máximo de mem[])
-// iloc         inicio en mem[] de las variables locales (inicializadas)
-// iloc_len     longitud de las variables locales
+// mem[]        destination memory vector
+// imem         pointer for data and code generation
+// imem_max     end of destination memory (maximum index of mem[])
+// iloc         start in mem[] of local variables (initialized)
+// iloc_len     length of local variables
 
-//------------- Inserción en la tabla de expresiones, acceso a variables
+//------------- Expression table insertion, variable access
 
 //vglo           &vglo ptr
 //tglo[_exp]     &tglo <_exp> add rng ptr
@@ -926,21 +926,21 @@ int iloc_len; // final de las variables locales incluyendo las privadas
 //proc.tloc[_exp] &proc ptr &tloc <_exp> add rng add ptr
 
 //-----------------------------------------------------------------------------
-//      Variables relacionadas con el listado formateado
+//      Formatted listing variables
 //-----------------------------------------------------------------------------
 
-int coment=0;           // 0-Código, 1-Dentro de comentario, 2-Anidado, ...
-int convert=0;          // Indica si se deben generar ya los token en ls
+int coment=0;           // 0-Code, 1-Inside comment, 2-Nested, ...
+int convert=0;          // Whether to generate tokens in listing
 
 //-----------------------------------------------------------------------------
-//      Información sobre los errores
+//      Error information
 //-----------------------------------------------------------------------------
 
 int numero_error=-1;
 int linea_error;
 int columna_error;
 
-int error_27=27;        // Para emitir "se esperaba una statement"
+int error_27=27;        // To emit "statement expected"
 
 //-----------------------------------------------------------------------------
 
@@ -948,21 +948,21 @@ int program_type=0;
 
 //-----------------------------------------------------------------------------
 
-struct {      // Peephole, "mirilla" para el optimizador
-  int dir;    // Dirección
-  int param;  // Indica si ese opcode tiene parámetro
+struct {      // Peephole optimization window
+  int dir;    // Address
+  int param;  // Whether this opcode has a parameter
   int op;     // Opcode
-} code[16];   // En code[15] debe quedar siempre la última instrucción generada
+} code[16];   // code[15] must always hold the last generated instruction
 
 //-----------------------------------------------------------------------------
-//      Inicialización del compilador
+//      Compiler initialization
 //-----------------------------------------------------------------------------
 
 FILE * linf; // EXEC.LIN
 FILE * lprg; // EXEC.PGM
 FILE * lins; // EXEC.INS
 
-FILE * def; // Para el analizador de "ltlex.def"
+FILE * def; // For the "ltlex.def" analyzer
 byte *_buf;
 
 void inicializa_compilador(void) {
@@ -971,7 +971,7 @@ void inicializa_compilador(void) {
 }
 
 //-----------------------------------------------------------------------------
-//      Prepara la compilacion para un programa
+//      Prepare compilation for a program
 //-----------------------------------------------------------------------------
 
 void mensaje_compilacion(byte * p) {
@@ -1082,7 +1082,7 @@ free_resources();
   acceso_remoto=0; parametros=0; linea=1;
 
   itxt=inicio_textos=imem;
-  psintactico(); // Para obtener "longitud_textos"
+  psintactico(); // To obtain "longitud_textos"
   imem+=longitud_textos;
 
   test_buffer(&mem,&imem_max,imem);
@@ -1101,12 +1101,12 @@ free_resources();
   }
 
   mem[2]=imem;
-  mem[3]=max_process; // Antes long_header, ahora no se utiliza
-  mem[4]=0; // Antes mem[1]-mem[3] (long datos globales), ahora no se utiliza
+  mem[3]=max_process; // Previously long_header, now unused
+  mem[4]=0; // Previously mem[1]-mem[3] (global data length), now unused
   mem[5]=iloc_len-iloc;
   mem[6]=iloc;
-  mem[7]=0; // Antes imem+iloc (inicio textos), ahora no se utiliza
-  mem[8]=imem+iloc; // Número de elementos ocupados en mem[]
+  mem[7]=0; // Previously imem+iloc (text start), now unused
+  mem[8]=imem+iloc; // Number of elements used in mem[]
 
   mensaje_compilacion(texto[204]);
 
@@ -1140,7 +1140,7 @@ free_resources();
 	if (!compress(q,(uLongf*)&m,p,(unsigned long)n)) 
 #endif 
 	{
-        fwrite(&n,1,4,f); // mem[0]..mem[8],longitud_datos_descomp,datos comp...
+        fwrite(&n,1,4,f); // mem[0]..mem[8],uncompressed_data_length,compressed_data...
         fwrite(q,1,m,f);
         free(q); free(p);
         fclose(f);
@@ -1176,7 +1176,7 @@ free_resources();
 	  if (!compress(q,(uLongf*)&m,p,n)) 
 #endif
 	  {
-        fwrite(&n,1,4,f); // mem[0]..mem[8],longitud_datos_descomp,datos comp...
+        fwrite(&n,1,4,f); // mem[0]..mem[8],uncompressed_data_length,compressed_data...
         fwrite(q,1,m,f);
         free(q); free(p);
         fclose(f);
@@ -1225,13 +1225,13 @@ void free_resources(void) {
 }
 
 //-----------------------------------------------------------------------------
-//      Errores internos del compilador
+//      Internal compiler errors
 //-----------------------------------------------------------------------------
 
 int _le,_t;
 byte *_ie;
 
-void save_error(word tipo) { // Guarda una posicion de error (de 0 .. 3)
+void save_error(word tipo) { // Save an error position (0 .. 3)
   switch(tipo) {
     case 0: _le=linea; _ie=ierror; break;
     case 1: _le=old_linea; _ie=old_ierror_end; break;
@@ -1240,11 +1240,11 @@ void save_error(word tipo) { // Guarda una posicion de error (de 0 .. 3)
   } _t=tipo;
 }
 
-// 0 - Inicio de la pieza actual
-// 1 - Final de la pieza anterior mas un espacio (si se puede)
-// 2 - Inicio de la pieza anterior
-// 3 - Final de la pieza anterior
-// 4 - Error guardado con save_error(0..3)
+// 0 - Start of current token
+// 1 - End of previous token plus one space (if possible)
+// 2 - Start of previous token
+// 3 - End of previous token
+// 4 - Error saved with save_error(0..3)
 
 void c_error(word tipo, word e) {
   int columna=0;
@@ -1282,7 +1282,7 @@ void c_error(word tipo, word e) {
 }
 
 //-----------------------------------------------------------------------------
-//  Con el primer token leido guarda el inicio de una statement
+//  With the first token read, save the start of a statement
 //-----------------------------------------------------------------------------
 
 void statement_start(void) {
@@ -1297,7 +1297,7 @@ void statement_start(void) {
 }
 
 //-----------------------------------------------------------------------------
-//  Con el primer token que no es de la sentecia guarda el fin de una statement
+//  With the first token not belonging to the statement, save the end of a statement
 //-----------------------------------------------------------------------------
 
 void statement_end(void) {
@@ -1313,7 +1313,7 @@ void statement_end(void) {
 }
 
 //-----------------------------------------------------------------------------
-//  Guarda un registro (inicio,final,linea1,...) en EXEC.LIN
+//  Write a record (inicio,final,linea1,...) to EXEC.LIN
 //-----------------------------------------------------------------------------
 
 void record_statement(void) {
@@ -1326,7 +1326,7 @@ void record_statement(void) {
 }
 
 //-----------------------------------------------------------------------------
-//      Comprueba los límites de un buffer de generación de código
+//      Check code generation buffer limits
 //-----------------------------------------------------------------------------
 
 void test_buffer(int * * buffer,int * maximo,int n) {
@@ -1346,7 +1346,7 @@ void test_buffer(int * * buffer,int * maximo,int n) {
 }
 
 //-----------------------------------------------------------------------------
-//      Precarga de las estructuras léxicas, analiza el fichero ltlex.def
+//      Preload lexical structures, analyze the ltlex.def file
 //-----------------------------------------------------------------------------
 
 void analyze_ltlex(void){
@@ -1355,7 +1355,7 @@ void analyze_ltlex(void){
   int len;
   struct lex_ele * e;
 
-  int t; //token (pieza)
+  int t; //token
   byte h; //hash (for id)
   byte * _ivnom;
   byte * * ptr;
@@ -1393,9 +1393,9 @@ void analyze_ltlex(void){
 	*ptr=_ivnom;
         
 	buf--; ivnom.b++;
-      } else if (t>=0x78 && t<=0x7b) {  //Analiza un delimitador de literal
+      } else if (t>=0x78 && t<=0x7b) {  //Analyzes a literal delimiter
         lex_case[*buf]=(struct lex_ele*)l_lit;
-      } else {                          //Analiza un nuevo símbolo
+      } else {                          //Analyzes a new symbol
         if ((e=lex_case[*buf])==0) {
           if (num_nodos++==max_nodos) c_error(0,3);
           e=lex_case[*buf]=ilex_simb++; (*e).caracter=*buf++;
@@ -1425,7 +1425,7 @@ void analyze_ltlex(void){
 }
 
 //-----------------------------------------------------------------------------
-//      Precarga de la tabla de objetos, analiza el fichero ltobj.def
+//      Preload the object table, analyze the ltobj.def file
 //-----------------------------------------------------------------------------
 
 // WARNING: Memory limits are not checked during object preloading.
@@ -1631,14 +1631,14 @@ void preload_objects (void) {
 }
 
 //-----------------------------------------------------------------------------
-//  Adivina cual será la siguiente pieza lexica leida (y donde estará)
+//  Predict the next lexical token to be read (and where it will be)
 //-----------------------------------------------------------------------------
 
 int next_pieza;
 int next_linea;
 byte * next_source;
 
-byte * next_lexico(byte * _source, int coment, int linea) { // No genera nunca errores
+byte * next_lexico(byte * _source, int coment, int linea) { // Never generates errors
 
   byte ** ptr, * _ivnom, h;
   struct lex_ele * e;
@@ -1683,17 +1683,17 @@ byte * next_lexico(byte * _source, int coment, int linea) { // No genera nunca e
       ivnom.b++; _source--;
       ptr=&vhash[h];
       while (*ptr!=NULL && strcmp((char *)(ptr+2),(char *)_ivnom+ptr8)) ptr=(byte **)*ptr;
-      if (!strcmp((char *)(ptr+2),(char *)_ivnom+ptr8)) { // id encontrado
-        ivnom.b=_ivnom; // lo saca de vnom
+      if (!strcmp((char *)(ptr+2),(char *)_ivnom+ptr8)) { // id found
+        ivnom.b=_ivnom; // remove it from vnom
         next_pieza=(intptr_t)*(ptr+1);
-        if (next_pieza<256 && next_pieza>=0) { // palabra reservada (token)
+        if (next_pieza<256 && next_pieza>=0) { // reserved word (token)
           if (next_pieza==p_rem) { while (*_source!=cr) _source++; goto lex_scan; }
-        } else { // objeto (id anterior)
+        } else { // object (existing id)
           next_pieza=p_id;
         }
       } else {
-        ivnom.b=_ivnom; // lo saca de vnom
-        next_pieza=p_id; // id nuevo
+        ivnom.b=_ivnom; // remove it from vnom
+        next_pieza=p_id; // new id
       } break;
 
     case l_spc:
@@ -1709,7 +1709,7 @@ byte * next_lexico(byte * _source, int coment, int linea) { // No genera nunca e
       next_pieza=p_num;
       break;
 
-    default: // puntero a un lex_ele
+    default: // pointer to a lex_ele
       e=lex_case[*_source++]; next_pieza=(*e).token; _ivnom=_source;
 
       while ((e=(*e).siguiente)) {
@@ -1739,7 +1739,7 @@ byte * next_lexico(byte * _source, int coment, int linea) { // No genera nunca e
 
 
 //-----------------------------------------------------------------------------
-//      Lexico (lee una nueva pieza del *source)
+//      Lexer (reads a new token from *source)
 //-----------------------------------------------------------------------------
 
 int IsWAV(char *FileName);
@@ -1769,7 +1769,7 @@ void lexer(void) {
   if (!coment) {old_linea=linea; old_ierror=ierror; old_ierror_end=ierror_end;}
 
   lex_scan: ierror=_source;
-  switch ((uintptr_t)lex_case[*_source]) { // Puntero a un lex_ele o l_???
+  switch ((uintptr_t)lex_case[*_source]) { // Pointer to a lex_ele or l_???
 
     case l_err:
       if (coment) { pieza=p_rem; _source++; } else c_error(0,10); break;
@@ -1798,13 +1798,13 @@ void lexer(void) {
 	  }
 	  
       if (!strcmp((char *)(ptr+2),(char *)_ivnom+ptr8)) { // id found
-        ivnom.b=_ivnom; // lo saca de vnom
+        ivnom.b=_ivnom; // remove it from vnom
         pieza=(intptr_t)*(ptr+1);
         if (pieza<256 && pieza>=0) { // reserved word (t	oken)
 			
           if (pieza==p_rem) { while (*_source!=cr) _source++; goto lex_scan; }
 
-        } else { // objeto (id anterior)
+        } else { // object (existing id)
           ptr_o=(struct objeto **)(ptr+1); o=*ptr_o; pieza=p_id;
           while(o!=NULL && ( ((*o).bloque && bloque_lexico!=(*o).bloque) ||
                              ((*o).member!=member) )) o=(*o).anterior;
@@ -1824,7 +1824,7 @@ void lexer(void) {
           }
         }
       } else {
-        *ptr=_ivnom; ptr_o=(struct objeto **)(_ivnom+ptr4); *ptr_o=o=iobj++; pieza=p_id; // id nuevo
+        *ptr=_ivnom; ptr_o=(struct objeto **)(_ivnom+ptr4); *ptr_o=o=iobj++; pieza=p_id; // new id
         (*o).name=(byte *)_ivnom+ptr8;
         (*o).member=member;
         if (parametros) (*o).bloque=bloque_actual;
@@ -1836,7 +1836,7 @@ void lexer(void) {
 
     case l_lit:
       if (coment) { pieza=p_rem; _source++; break; }
-      pieza=p_lit; h=*_source; _ivnom=ivnom.b; // Literal entre dos h
+      pieza=p_lit; h=*_source; _ivnom=ivnom.b; // Literal between two h delimiters
       do {
         if (*++_source==cr) c_error(0,11);
         if (*_source==h)
@@ -1867,7 +1867,7 @@ void lexer(void) {
 
         empaquetable=0;
 
-        // Determinar si el archivo es empaquetable ...
+        // Determine whether the file is packable ...
 
         _splitpath(full,(char *)drive,(char *)dir,(char *)fname,(char *)ext);
         strupr((char *)ext);
@@ -1920,7 +1920,7 @@ void lexer(void) {
       } while ((uintptr_t)lex_case[*_source]==l_num);
       break;
 
-    default: // puntero a un lex_ele
+    default: // pointer to a lex_ele
 
       e=lex_case[*_source++]; _ivnom=_source; pieza=(*e).token;
       while ((e=(*e).siguiente)) {
@@ -1951,7 +1951,7 @@ void lexer(void) {
 }
 
 //-----------------------------------------------------------------------------
-//      Pasa varias comas o puntos y coma seguidos
+//      Skip consecutive commas or semicolons
 //-----------------------------------------------------------------------------
 
 void skip_semicolons(void) {
@@ -1961,7 +1961,7 @@ void skip_semicolons(void) {
 }
 
 //-----------------------------------------------------------------------------
-//      Análisis de una declaración pointer (int, word o byte)
+//      Pointer declaration analysis (int, word or byte)
 //-----------------------------------------------------------------------------
 
 struct objeto * analiza_pointer(int tipo, int offset) {
@@ -1971,7 +1971,7 @@ struct objeto * analiza_pointer(int tipo, int offset) {
   if (pieza!=p_id) c_error(1,148);
   ob=o; if ((*ob).type!=tnone) {
     if (parametros==-1 && (*ob).param==1 && (*ob).bloque==bloque_actual) {
-      if ((*ob).type==tipo) { // Se repite un pointer parámetro como private
+      if ((*ob).type==tipo) { // Redeclaring a pointer parameter as private
         save_error(0); lexer();
         len1=-1; len2=-1; len3=-1;
         if (pieza==p_corab) { lexer();
@@ -1989,7 +1989,7 @@ struct objeto * analiza_pointer(int tipo, int offset) {
         else if (pieza==p_asig) c_error(0,54);
         else {
           while (pieza==p_ptocoma || pieza==p_coma) lexer();
-          (*ob).param++; // No permite volver a redeclararlo
+          (*ob).param++; // Prevent re-declaring it again
           return(NULL);
         }
       } else c_error(0,117);
@@ -2027,7 +2027,7 @@ int analyze_pointer_struct(int tipo, int offset, struct objeto * estructura) {
   if (pieza!=p_id) c_error(1,148);
   ob=o; if ((*ob).type!=tnone) {
     if (parametros==-1 && (*ob).param==1 && (*ob).bloque==bloque_actual) {
-      if ((*ob).type==tipo) { // Se repite un pointer parámetro como private
+      if ((*ob).type==tipo) { // Redeclaring a pointer parameter as private
         save_error(0); lexer();
         items1=-1; items2=-1; items3=-1;
         if (pieza==p_corab) { lexer();
@@ -2044,7 +2044,7 @@ int analyze_pointer_struct(int tipo, int offset, struct objeto * estructura) {
         if (items1!=(*ob).psgl.items1 || items2!=(*ob).psgl.items2 || items3!=(*ob).psgl.items3) c_error(4,141);
         else if (pieza==p_asig) c_error(0,54);
         else {
-          (*ob).param++; return(0); // No permite volver a redeclararlo
+          (*ob).param++; return(0); // Prevent re-declaring it again
         }
       } else c_error(0,117);
     } else c_error(0,117);
@@ -2067,18 +2067,18 @@ int analyze_pointer_struct(int tipo, int offset, struct objeto * estructura) {
   if ((*ob).psgl.items2>-1) (*ob).psgl.totalitems*=(*ob).psgl.items2+1;
   if ((*ob).psgl.items3>-1) (*ob).psgl.totalitems*=(*ob).psgl.items3+1;
 
-  (*ob).type=tipo;                // tpsgl o tpslo
-  (*ob).psgl.offset=offset;       // del pointer
-  (*ob).psgl.ostruct=estructura;  // struct original
+  (*ob).type=tipo;                // tpsgl or tpslo
+  (*ob).psgl.offset=offset;       // pointer offset
+  (*ob).psgl.ostruct=estructura;  // original struct
 
   return(1);
 }
 
 //-----------------------------------------------------------------------------
-//      Analisis sintáctico (dirige todo el proceso de compilación)
+//      Parser (drives the entire compilation process)
 //-----------------------------------------------------------------------------
 
-int analyze_struct(int offstruct) { // tras " struct id [ <const> ] " // id≡member
+int analyze_struct(int offstruct) { // after " struct id [ <const> ] " // id==member
   int len=0,dup,i,_itxt,_imem;
   struct objeto * ob;
   struct objeto * old_member,* member2;
@@ -2088,16 +2088,16 @@ int analyze_struct(int offstruct) { // tras " struct id [ <const> ] " // id≡me
 
   while (pieza!=p_end) {
 
-    if (pieza==p_struct) {                              // Miembro struct ---
+    if (pieza==p_struct) {                              // Struct member ---
 
       lexer();
 
-      if (pieza==p_pointer) { // Se define un puntero a struct
+      if (pieza==p_pointer) { // Defining a struct pointer
 
         old_member=member; member=NULL; lexer(); member=old_member;
         if (pieza!=p_id) { c_error(1,110); } ob=o;
 
-        if ((*ob).type==tnone) c_error(0,150); // No se define el pointer así
+        if ((*ob).type==tnone) c_error(0,150); // Pointer can't be defined this way
         if ((*ob).type!=tsglo && (*ob).type!=tsloc) c_error(0,150);
         lexer();
         puntero_a_struct:
@@ -2161,11 +2161,11 @@ int analyze_struct(int offstruct) { // tras " struct id [ <const> ] " // id≡me
         member=old_member; lexer();
         while (pieza==p_ptocoma) lexer();
       }
-    } else if (pieza==p_string) {                     // Miembro cadena
+    } else if (pieza==p_string) {                     // String member
 
       lexer();
 
-      if (pieza==p_pointer) { // Miembro puntero a byte
+      if (pieza==p_pointer) { // Byte pointer member
 
         lexer(); puntero1:
         ob=analiza_pointer(tpcgl,len);
@@ -2212,7 +2212,7 @@ int analyze_struct(int offstruct) { // tras " struct id [ <const> ] " // id≡me
           mem[offstruct+len]=0xDAD00000|(*ob).cglo.totalen;
           memmove((char*)&mem[offstruct+len+1],(char*)&mem[pieza_num],strlen((char*)&mem[pieza_num])+1);
           len+=1+((*ob).cglo.totalen+5)/4;
-          itxt=_itxt; // Saca la cadena del segmento de textos
+          itxt=_itxt; // Remove the string from the text segment
           lexer();
         } else {
           test_buffer(&mem,&imem_max,offstruct+len);
@@ -2226,11 +2226,11 @@ int analyze_struct(int offstruct) { // tras " struct id [ <const> ] " // id≡me
         while (pieza==p_ptocoma || pieza==p_coma) lexer();
       }
 
-    } else if (pieza==p_byte) {                         // Miembro byte ---
+    } else if (pieza==p_byte) {                         // Byte member ---
 
       lexer();
 
-      if (pieza==p_pointer) { // Miembro puntero a byte
+      if (pieza==p_pointer) { // Byte pointer member
 
         lexer(); puntero2:
         ob=analiza_pointer(tpbgl,len);
@@ -2301,11 +2301,11 @@ int analyze_struct(int offstruct) { // tras " struct id [ <const> ] " // id≡me
         while (pieza==p_ptocoma || pieza==p_coma) lexer();
       }
 
-    } else if (pieza==p_word) {                         // Miembro word ---
+    } else if (pieza==p_word) {                         // Word member ---
 
       lexer();
 
-      if (pieza==p_pointer) { // Miembro puntero a word
+      if (pieza==p_pointer) { // Word pointer member
 
         lexer(); puntero3:
         ob=analiza_pointer(tpwgl,len);
@@ -2382,7 +2382,7 @@ int analyze_struct(int offstruct) { // tras " struct id [ <const> ] " // id≡me
         if (pieza!=p_id && pieza!=p_pointer) c_error(1,149);
       }
 
-      if (pieza==p_pointer) { // Miembro puntero a int
+      if (pieza==p_pointer) { // Int pointer member
 
         lexer(); puntero4:
         ob=analiza_pointer(tpigl,len);
@@ -2398,7 +2398,7 @@ int analyze_struct(int offstruct) { // tras " struct id [ <const> ] " // id≡me
       } else {
 
         ob=o; if ((*ob).type!=tnone) c_error(0,114); lexer();
-        if (pieza==p_corab) { lexer();                   // Miembro tabla ---
+        if (pieza==p_corab) { lexer();                   // Table member ---
           (*ob).type=ttglo; (*ob).tglo.offset=len;
           if (((*ob).tglo.len1=constant())<0) c_error(4,35);
           if (pieza==p_coma) {
@@ -2422,7 +2422,7 @@ int analyze_struct(int offstruct) { // tras " struct id [ <const> ] " // id≡me
             imem=_imem;
           } len+=(*ob).tglo.totalen;
 
-        } else {                                          // Miembro variable ---
+        } else {                                          // Variable member ---
 
           (*ob).type=tvglo; (*ob).vglo.offset=len;
           test_buffer(&mem,&imem_max,offstruct+len);
@@ -2440,7 +2440,7 @@ int analyze_struct(int offstruct) { // tras " struct id [ <const> ] " // id≡me
 
 //---------------------------------------------------------------------------
 
-int analyze_struct_local(int offstruct) { // tras " struct id [ <const> ] " // id≡member
+int analyze_struct_local(int offstruct) { // after " struct id [ <const> ] " // id==member
   int len=0,dup,i,_itxt,_iloc;
   struct objeto * ob;
   struct objeto * old_member,* member2;
@@ -2450,16 +2450,16 @@ int analyze_struct_local(int offstruct) { // tras " struct id [ <const> ] " // i
 
   while (pieza!=p_end) {
 
-    if (pieza==p_struct) {                              // Miembro struct ---
+    if (pieza==p_struct) {                              // Struct member ---
 
       lexer();
 
-      if (pieza==p_pointer) { // Se define un puntero a struct
+      if (pieza==p_pointer) { // Defining a struct pointer
 
         old_member=member; member=NULL; lexer(); member=old_member;
         if (pieza!=p_id) { c_error(1,110); } ob=o;
 
-        if ((*ob).type==tnone) c_error(0,150); // No se define el pointer así
+        if ((*ob).type==tnone) c_error(0,150); // Pointer can't be defined this way
         if ((*ob).type!=tsglo && (*ob).type!=tsloc) c_error(0,150);
         lexer();
         puntero_a_struct:
@@ -2523,11 +2523,11 @@ int analyze_struct_local(int offstruct) { // tras " struct id [ <const> ] " // i
         while (pieza==p_ptocoma) lexer();
       }
 
-    } else if (pieza==p_string) {                     // Miembro cadena
+    } else if (pieza==p_string) {                     // String member
 
       lexer();
 
-      if (pieza==p_pointer) { // Miembro puntero a byte
+      if (pieza==p_pointer) { // Byte pointer member
 
         lexer(); puntero1:
         ob=analiza_pointer(tpclo,len);
@@ -2573,7 +2573,7 @@ int analyze_struct_local(int offstruct) { // tras " struct id [ <const> ] " // i
           loc[offstruct+len]=0xDAD00000|(*ob).cloc.totalen;
           strcpy((char*)&loc[offstruct+len+1],(char*)&mem[pieza_num]);
           len+=1+((*ob).cloc.totalen+5)/4;
-          itxt=_itxt; // Saca la cadena del segmento de textos
+          itxt=_itxt; // Remove the string from the text segment
           lexer();
         } else {
           test_buffer(&loc,&iloc_max,offstruct+len);
@@ -2587,11 +2587,11 @@ int analyze_struct_local(int offstruct) { // tras " struct id [ <const> ] " // i
         while (pieza==p_ptocoma || pieza==p_coma) lexer();
       }
 
-    } else if (pieza==p_byte) {                         // Miembro byte ---
+    } else if (pieza==p_byte) {                         // Byte member ---
 
       lexer();
 
-      if (pieza==p_pointer) { // Miembro puntero a byte
+      if (pieza==p_pointer) { // Byte pointer member
 
         lexer(); puntero2:
         ob=analiza_pointer(tpblo,len);
@@ -2662,11 +2662,11 @@ int analyze_struct_local(int offstruct) { // tras " struct id [ <const> ] " // i
         while (pieza==p_ptocoma || pieza==p_coma) lexer();
       }
 
-    } else if (pieza==p_word) {                         // Miembro word ---
+    } else if (pieza==p_word) {                         // Word member ---
 
       lexer();
 
-      if (pieza==p_pointer) { // Miembro puntero a word
+      if (pieza==p_pointer) { // Word pointer member
 
         lexer(); puntero3:
         ob=analiza_pointer(tpwlo,len);
@@ -2744,7 +2744,7 @@ int analyze_struct_local(int offstruct) { // tras " struct id [ <const> ] " // i
         if (pieza!=p_id && pieza!=p_pointer) c_error(1,149);
       }
 
-      if (pieza==p_pointer) { // Miembro puntero a int
+      if (pieza==p_pointer) { // Int pointer member
 
         lexer(); puntero4:
         ob=analiza_pointer(tpilo,len);
@@ -2760,7 +2760,7 @@ int analyze_struct_local(int offstruct) { // tras " struct id [ <const> ] " // i
       } else {
 
         ob=o; if ((*ob).type!=tnone) c_error(0,114); lexer();
-        if (pieza==p_corab) { lexer();    // Miembro tabla ---
+        if (pieza==p_corab) { lexer();    // Table member ---
           (*ob).type=ttloc; (*ob).tloc.offset=len;
           if (((*ob).tloc.len1=constant())<0) c_error(4,35);
           if (pieza==p_coma) {
@@ -2784,7 +2784,7 @@ int analyze_struct_local(int offstruct) { // tras " struct id [ <const> ] " // i
             iloc=_iloc;
           } len+=(*ob).tloc.totalen;
 
-        } else {                                          // Miembro variable ---
+        } else {                                          // Variable member ---
 
           (*ob).type=tvloc; (*ob).vloc.offset=len;
           test_buffer(&loc,&iloc_max,offstruct+len);
@@ -2803,7 +2803,7 @@ int analyze_struct_local(int offstruct) { // tras " struct id [ <const> ] " // i
 
 //---------------------------------------------------------------------------
 
-int analyze_struct_private(int offstruct) { // tras " struct id [ <const> ] " // id≡member
+int analyze_struct_private(int offstruct) { // after " struct id [ <const> ] " // id=member
   int len=0,dup,i,_itxt,_imem;
   struct objeto * ob;
   struct objeto * old_member,* member2;
@@ -2813,16 +2813,16 @@ int analyze_struct_private(int offstruct) { // tras " struct id [ <const> ] " //
 
   while (pieza!=p_end) {
 
-    if (pieza==p_struct) {                              // Miembro struct ---
+    if (pieza==p_struct) {                              // Struct member ---
 
       lexer();
 
-      if (pieza==p_pointer) { // Se define un puntero a struct
+      if (pieza==p_pointer) { // Defining a struct pointer
 
         old_member=member; member=NULL; lexer(); member=old_member;
         if (pieza!=p_id) { c_error(1,110); } ob=o;
 
-        if ((*ob).type==tnone) c_error(0,150); // No se define el pointer así
+        if ((*ob).type==tnone) c_error(0,150); // Pointer can't be defined this way
         if ((*ob).type!=tsglo && (*ob).type!=tsloc) c_error(0,150);
         lexer();
         puntero_a_struct:
@@ -2886,11 +2886,11 @@ int analyze_struct_private(int offstruct) { // tras " struct id [ <const> ] " //
         while (pieza==p_ptocoma) lexer();
       }
 
-    } else if (pieza==p_string) {                     // Miembro cadena
+    } else if (pieza==p_string) {                     // String member
 
       lexer();
 
-      if (pieza==p_pointer) { // Miembro puntero a byte
+      if (pieza==p_pointer) { // Byte pointer member
 
         lexer(); puntero1:
         ob=analiza_pointer(tpclo,len);
@@ -2936,7 +2936,7 @@ int analyze_struct_private(int offstruct) { // tras " struct id [ <const> ] " //
           mem[offstruct+len]=0xDAD00000|(*ob).cloc.totalen;
           memmove((char*)&mem[offstruct+len+1],(char*)&mem[pieza_num],strlen((char*)&mem[pieza_num])+1);
           len+=1+((*ob).cloc.totalen+5)/4;
-          itxt=_itxt; // Saca la cadena del segmento de textos
+          itxt=_itxt; // Remove the string from the text segment
           lexer();
         } else {
           test_buffer(&mem,&imem_max,offstruct+len);
@@ -2950,11 +2950,11 @@ int analyze_struct_private(int offstruct) { // tras " struct id [ <const> ] " //
         while (pieza==p_ptocoma || pieza==p_coma) lexer();
       }
 
-    } else if (pieza==p_byte) {                         // Miembro byte ---
+    } else if (pieza==p_byte) {                         // Byte member ---
 
       lexer();
 
-      if (pieza==p_pointer) { // Miembro puntero a byte
+      if (pieza==p_pointer) { // Byte pointer member
 
         lexer(); puntero2:
         ob=analiza_pointer(tpblo,len);
@@ -3024,11 +3024,11 @@ int analyze_struct_private(int offstruct) { // tras " struct id [ <const> ] " //
         while (pieza==p_ptocoma || pieza==p_coma) lexer();
       }
 
-    } else if (pieza==p_word) {                         // Miembro word ---
+    } else if (pieza==p_word) {                         // Word member ---
 
       lexer();
 
-      if (pieza==p_pointer) { // Miembro puntero a word
+      if (pieza==p_pointer) { // Word pointer member
 
         lexer(); puntero3:
         ob=analiza_pointer(tpwlo,len);
@@ -3105,7 +3105,7 @@ int analyze_struct_private(int offstruct) { // tras " struct id [ <const> ] " //
         if (pieza!=p_id && pieza!=p_pointer) c_error(1,149);
       }
 
-      if (pieza==p_pointer) { // Miembro puntero a int
+      if (pieza==p_pointer) { // Int pointer member
 
         lexer(); puntero4:
         ob=analiza_pointer(tpilo,len);
@@ -3121,7 +3121,7 @@ int analyze_struct_private(int offstruct) { // tras " struct id [ <const> ] " //
       } else {
 
         ob=o; if ((*ob).type!=tnone) c_error(0,114); lexer();
-        if (pieza==p_corab) { lexer();    // Miembro tabla ---
+        if (pieza==p_corab) { lexer();    // Table member ---
           (*ob).type=ttloc; (*ob).tloc.offset=len;
           if (((*ob).tloc.len1=constant())<0) c_error(4,35);
           if (pieza==p_coma) {
@@ -3145,7 +3145,7 @@ int analyze_struct_private(int offstruct) { // tras " struct id [ <const> ] " //
             imem=_imem;
           } len+=(*ob).tloc.totalen;
 
-        } else {                                          // Miembro variable ---
+        } else {                                          // Variable member ---
 
           (*ob).type=tvloc; (*ob).vloc.offset=len;
 
@@ -3181,12 +3181,12 @@ void parser (void) {
   lexer();
 
   //---------------------------------------------------------------------------
-  // Opciones de compilacion
+  // Compiler options
   //---------------------------------------------------------------------------
-  // p_compiler_options {opcion} {;}
+  // p_compiler_options {option} {;}
   //---------------------------------------------------------------------------
 
-  max_process=0; // Valores de las opciones por defecto
+  max_process=0; // Default option values
   ignore_errors=0;
   free_sintax=0;
   extended_conditions=0;
@@ -3273,7 +3273,7 @@ void parser (void) {
   }
 
   //---------------------------------------------------------------------------
-  // Cabecera
+  // Header
   //---------------------------------------------------------------------------
   // p_program p_id {;}
   //---------------------------------------------------------------------------
@@ -3313,7 +3313,7 @@ void parser (void) {
 		statement_end();
 	}
   //---------------------------------------------------------------------------
-  // Zona de constantes
+  // Constants section
   //---------------------------------------------------------------------------
   // [ p_const {;} { p_id p_asig <exp> {; | ,} } ]
   //---------------------------------------------------------------------------
@@ -3334,7 +3334,7 @@ void parser (void) {
   }
 
   //---------------------------------------------------------------------------
-  // Variables globales, pueden usarse en expresiones constantes
+  // Global variables, can be used in constant expressions
   //---------------------------------------------------------------------------
   // <variable> := p_id [ p_asig <exp> ] {;}
   //
@@ -3353,10 +3353,10 @@ void parser (void) {
 
         lexer();
 
-        if (pieza==p_pointer) { // Se define un puntero a struct
+        if (pieza==p_pointer) { // Defining a struct pointer
 
           lexer(); if (pieza!=p_id) c_error(1,110); ob=o;
-          if ((*ob).type==tnone) c_error(0,150); // No se define el pointer así
+          if ((*ob).type==tnone) c_error(0,150); // Pointer can't be defined this way
           if ((*ob).type!=tsglo && (*ob).type!=tsloc) c_error(0,150);
           lexer();
           puntero_a_struct:
@@ -3425,11 +3425,11 @@ void parser (void) {
           test_buffer(&mem,&imem_max,imem);
         }
 
-      } else if (pieza==p_string) {                     // Cadena global
+      } else if (pieza==p_string) {                     // Global string
 
         lexer();
 
-        if (pieza==p_pointer) { // Puntero a byte
+        if (pieza==p_pointer) { // Byte pointer
 
           lexer(); puntero1:
           ob=analiza_pointer(tpcgl,imem);
@@ -3467,10 +3467,10 @@ void parser (void) {
               c_error(3,128);
             if (strlen((char*)&mem[pieza_num])>(*ob).cglo.totalen+1)
               c_error(4,129);
-            imem=_imem+1+((*ob).cglo.totalen+5)/4; // ej. c[32] -> c[0]..c[32],NUL
+            imem=_imem+1+((*ob).cglo.totalen+5)/4; // e.g. c[32] -> c[0]..c[32],NUL
             test_buffer(&mem,&imem_max,imem);
             memmove((char*)&mem[_imem+1],(char*)&mem[pieza_num],strlen((char*)&mem[pieza_num])+1);
-            itxt=_itxt; // Saca la cadena del segmento de textos
+            itxt=_itxt; // Remove the string from the text segment
             lexer();
           } else {
             imem=_imem+1+((*ob).cglo.totalen+5)/4;
@@ -3483,11 +3483,11 @@ void parser (void) {
           while (pieza==p_ptocoma || pieza==p_coma) lexer();
         }
 
-      } else if (pieza==p_byte) {                       // Tabla Byte global
+      } else if (pieza==p_byte) {                       // Global byte array
 
         lexer();
 
-        if (pieza==p_pointer) { // Puntero a byte
+        if (pieza==p_pointer) { // Byte pointer
 
           lexer(); puntero2:
           ob=analiza_pointer(tpbgl,imem);
@@ -3536,7 +3536,7 @@ void parser (void) {
                 if (imemptr-oimemptr>(*ob).bglo.totalen) c_error(4,33);
               } (*ob).bglo.totalen=((*ob).bglo.totalen+3)/4;
             }
-          } else {                                          // Byte global
+          } else {                                          // Global byte
             (*ob).type=tbglo; (*ob).bglo.offset=imem;
             (*ob).bglo.len1=0;
             (*ob).bglo.len2=-1;
@@ -3556,11 +3556,11 @@ void parser (void) {
           while (pieza==p_ptocoma || pieza==p_coma) lexer();
         }
 
-      } else if (pieza==p_word) {                       // Tabla Word global
+      } else if (pieza==p_word) {                       // Global word array
 
         lexer();
 
-        if (pieza==p_pointer) { // Puntero a word
+        if (pieza==p_pointer) { // Word pointer
 
           lexer(); puntero3:
           ob=analiza_pointer(tpwgl,imem);
@@ -3609,7 +3609,7 @@ void parser (void) {
                 if (imemptr-oimemptr>(*ob).wglo.totalen*2) c_error(4,33);
               } (*ob).wglo.totalen=((*ob).wglo.totalen+1)/2;
             }
-          } else {                                          // Word global
+          } else {                                          // Global word
             (*ob).type=twglo; (*ob).wglo.offset=imem;
             (*ob).wglo.len1=0;
             (*ob).wglo.len2=-1;
@@ -3636,7 +3636,7 @@ void parser (void) {
           if (pieza!=p_id && pieza!=p_pointer) c_error(1,149);
         }
 
-        if (pieza==p_pointer) { // Puntero a int
+        if (pieza==p_pointer) { // Int pointer
 
           lexer(); puntero4:
           ob=analiza_pointer(tpigl,imem);
@@ -3650,7 +3650,7 @@ void parser (void) {
         } else {
 
           ob=o; if ((*ob).type!=tnone) c_error(0,117); lexer();
-          if (pieza==p_corab) {                           // Tabla global
+          if (pieza==p_corab) {                           // Global table
             lexer();
             (*ob).type=ttglo; (*ob).tglo.offset=_imem=imem;
             if (pieza==p_corce) {
@@ -3682,7 +3682,7 @@ void parser (void) {
             imem=_imem+(*ob).tglo.totalen;
             test_buffer(&mem,&imem_max,imem);
 
-          } else {                                          // Variable global
+          } else {                                          // Global variable
 
             (*ob).type=tvglo; (*ob).vglo.offset=imem;
             if (pieza==p_asig) { lexer(); mem[imem]=constant(); }
@@ -3697,7 +3697,7 @@ void parser (void) {
   }
 
   //---------------------------------------------------------------------------
-  // Variables locales, no se pueden usar en expresiones constantes
+  // Local variables, cannot be used in constant expressions
   //---------------------------------------------------------------------------
   // <variable> := p_id [ p_asig <exp> ] {;}
   //
@@ -3713,10 +3713,10 @@ void parser (void) {
 
         lexer();
 
-        if (pieza==p_pointer) { // Se define un puntero a struct
+        if (pieza==p_pointer) { // Defining a struct pointer
 
           lexer(); if (pieza!=p_id) c_error(1,110); ob=o;
-          if ((*ob).type==tnone) c_error(0,150); // No se define el pointer así
+          if ((*ob).type==tnone) c_error(0,150); // Pointer can't be defined this way
           if ((*ob).type!=tsglo && (*ob).type!=tsloc) c_error(0,150);
           lexer();
           puntero_a_struct_local:
@@ -3781,11 +3781,11 @@ void parser (void) {
           test_buffer(&loc,&iloc_max,iloc);
         }
 
-      } else if (pieza==p_string) {                     // Cadena local
+      } else if (pieza==p_string) {                     // Local string
 
         lexer();
 
-        if (pieza==p_pointer) { // Puntero a byte
+        if (pieza==p_pointer) { // Byte pointer
 
           lexer(); puntero5:
           ob=analiza_pointer(tpclo,iloc);
@@ -3823,10 +3823,10 @@ void parser (void) {
               c_error(3,128);
             if (strlen((char*)&mem[pieza_num])>(*ob).cloc.totalen+1)
               c_error(4,129);
-            iloc=_imem+1+((*ob).cloc.totalen+5)/4; // ej. c[32] -> c[0]..c[32],NUL
+            iloc=_imem+1+((*ob).cloc.totalen+5)/4; // e.g. c[32] -> c[0]..c[32],NUL
             test_buffer(&loc,&iloc_max,iloc);
             strcpy((char*)&loc[_imem+1],(char*)&mem[pieza_num]);
-            itxt=_itxt; // Saca la cadena del segmento de textos
+            itxt=_itxt; // Remove the string from the text segment
             lexer();
           } else {
             iloc=_imem+1+((*ob).cloc.totalen+5)/4;
@@ -3839,11 +3839,11 @@ void parser (void) {
           while (pieza==p_ptocoma || pieza==p_coma) lexer();
         }
 
-      } else if (pieza==p_byte) {                       // Tabla Byte local
+      } else if (pieza==p_byte) {                       // Local byte array
 
         lexer();
 
-        if (pieza==p_pointer) { // Puntero a byte
+        if (pieza==p_pointer) { // Byte pointer
 
           lexer(); puntero6:
           ob=analiza_pointer(tpblo,iloc);
@@ -3912,11 +3912,11 @@ void parser (void) {
           while (pieza==p_ptocoma || pieza==p_coma) lexer();
         }
 
-      } else if (pieza==p_word) {                       // Tabla Word local
+      } else if (pieza==p_word) {                       // Local word array
 
         lexer();
 
-        if (pieza==p_pointer) { // Puntero a byte
+        if (pieza==p_pointer) { // Word pointer
 
           lexer(); puntero7:
           ob=analiza_pointer(tpwlo,iloc);
@@ -3992,7 +3992,7 @@ void parser (void) {
           if (pieza!=p_id && pieza!=p_pointer) c_error(1,149);
         }
 
-        if (pieza==p_pointer) { // Miembro puntero a int
+        if (pieza==p_pointer) { // Int pointer member
 
           lexer(); puntero8:
           ob=analiza_pointer(tpilo,iloc);
@@ -4006,7 +4006,7 @@ void parser (void) {
         } else {
 
           ob=o; if ((*ob).type!=tnone) c_error(0,117); lexer();
-          if (pieza==p_corab) {                             // Tabla local
+          if (pieza==p_corab) {                             // Local table
             lexer();
             (*ob).type=ttloc; (*ob).tloc.offset=_imem=iloc;
             if (pieza==p_corce) {
@@ -4053,18 +4053,18 @@ void parser (void) {
   }
 
   //---------------------------------------------------------------------------
-  // Código principal
+  // Main code
   //---------------------------------------------------------------------------
 
-  // Genera el salto al inicio del código (long_header)
+  // Generate jump to start of code (long_header)
 
   mem[0]=program_type; mem[1]=imem; iloc_len=iloc;
 
   g2(ltyp,(intptr_t)bloque_actual);
   g2(lcbp,0);
-  if (pieza==p_import) c_error(0,147); // Advertir a usuarios de DIV 1
-  // El primer FRAME, y la carga de variables PRIVATE, se ejecutan
-  // conjuntamente en el BEGIN del programa principal.
+  if (pieza==p_import) c_error(0,147); // Warn DIV 1 users
+  // The first FRAME and PRIVATE variable loading are executed
+  // together in the BEGIN of the main program.
 
   final=imem;
 
@@ -4087,7 +4087,7 @@ void parser (void) {
   skip_semicolons(); statement_end(); record_statement();
 
   //---------------------------------------------------------------------------
-  // Procesos
+  // Processes
   //---------------------------------------------------------------------------
   // p_process p_id p_abrir [ id { , id } ] p_cerrar { ; } p_begin ... p_end
   //---------------------------------------------------------------------------
@@ -4127,7 +4127,7 @@ void parser (void) {
       g2(lpar,parametros-1);
     }
 
-    parametros=-1; // Para que los parámetros se puedan repetir como PRIVATE
+    parametros=-1; // Allow parameters to be redeclared as PRIVATE
 
     num_par=mem[_imem]=(*ob).proc.num_par;
 
@@ -4150,7 +4150,7 @@ void parser (void) {
 }
 
   //---------------------------------------------------------------------------
-  // Analiza las variables privadas de un bloque, como las locales
+  // Parse private variables of a block, like locals
   //---------------------------------------------------------------------------
 
     // WARNING: Remote access to private variables (#id.private_var) must not
@@ -4173,10 +4173,10 @@ void analyze_private(void) {
 
         lexer();
 
-        if (pieza==p_pointer) { // Se define un puntero a struct
+        if (pieza==p_pointer) { // Defining a struct pointer
 
           lexer(); if (pieza!=p_id) c_error(1,110); ob=o;
-          if ((*ob).type==tnone) c_error(0,150); // No se define el pointer así
+          if ((*ob).type==tnone) c_error(0,150); // Pointer can't be defined this way
           if ((*ob).type!=tsglo && (*ob).type!=tsloc) c_error(0,150);
           lexer();
           puntero_a_struct:
@@ -4250,11 +4250,11 @@ void analyze_private(void) {
           test_buffer(&mem,&imem_max,imem);
         }
 
-      } else if (pieza==p_string) {                     // Cadena privada
+      } else if (pieza==p_string) {                     // Private string
 
         lexer();
 
-        if (pieza==p_pointer) { // Puntero a byte
+        if (pieza==p_pointer) { // Byte pointer
 
           lexer(); puntero1:
           ob=analiza_pointer(tpclo,iloc);
@@ -4269,9 +4269,9 @@ void analyze_private(void) {
         } else {
 
           if (pieza!=p_id) c_error(1,125);
-          ob=o; if ((*ob).type!=tnone) { // Mira si se repite un parámetro ...
+          ob=o; if ((*ob).type!=tnone) { // Check if a parameter is redeclared ...
             if (parametros==-1 && (*ob).param==1 && (*ob).bloque==bloque_actual) {
-              if ((*ob).type==tcloc) { // Se repite un string
+              if ((*ob).type==tcloc) { // String parameter redeclared
                 save_error(0);
                 lexer();
                 if (pieza==p_corab) {
@@ -4318,10 +4318,10 @@ void analyze_private(void) {
               c_error(3,128);
             if (strlen((char*)&mem[pieza_num])>(*ob).cloc.totalen+1)
               c_error(4,129);
-            imem=_imem+1+((*ob).cloc.totalen+5)/4; // ej. c[32] -> c[0]..c[32],NUL
+            imem=_imem+1+((*ob).cloc.totalen+5)/4; // e.g. c[32] -> c[0]..c[32],NUL
             test_buffer(&mem,&imem_max,imem);
             memmove((char*)&mem[_imem+1],(char*)&mem[pieza_num],strlen((char*)&mem[pieza_num])+1);
-            itxt=_itxt; // Saca la cadena del segmento de textos
+            itxt=_itxt; // Remove the string from the text segment
             lexer();
           } else {
             imem=_imem+1+((*ob).cloc.totalen+5)/4;
@@ -4336,11 +4336,11 @@ void analyze_private(void) {
           while (pieza==p_ptocoma || pieza==p_coma) lexer();
         }
 
-      } else if (pieza==p_byte) {                       // Tabla Byte privado
+      } else if (pieza==p_byte) {                       // Private byte array
 
         lexer();
 
-        if (pieza==p_pointer) { // Puntero a byte
+        if (pieza==p_pointer) { // Byte pointer
 
           lexer(); puntero2:
           ob=analiza_pointer(tpblo,iloc);
@@ -4357,7 +4357,7 @@ void analyze_private(void) {
           if (pieza!=p_id) c_error(1,142);
           ob=o; if ((*ob).type!=tnone) {
             if (parametros==-1 && (*ob).param==1 && (*ob).bloque==bloque_actual) {
-              if ((*ob).type==tbloc) { // Se repite un byte parámetro
+              if ((*ob).type==tbloc) { // Byte parameter redeclared
                 lexer();
                 if (pieza==p_corab) c_error(2,53);
                 else if (pieza==p_asig) c_error(0,54);
@@ -4406,7 +4406,7 @@ void analyze_private(void) {
                 if (imemptr-oimemptr>(*ob).bloc.totalen) c_error(4,33);
               } (*ob).bloc.totalen=((*ob).bloc.totalen+3)/4;
             }
-          } else {                                          // Byte privado
+          } else {                                          // Private byte
             (*ob).type=tbloc; (*ob).bloc.offset=imem;
             (*ob).bloc.len1=0;
             (*ob).bloc.len2=-1;
@@ -4428,11 +4428,11 @@ void analyze_private(void) {
           while (pieza==p_ptocoma || pieza==p_coma) lexer();
         }
 
-      } else if (pieza==p_word) {                       // Tabla Word privada
+      } else if (pieza==p_word) {                       // Private word array
 
         lexer();
 
-        if (pieza==p_pointer) { // Puntero a byte
+        if (pieza==p_pointer) { // Word pointer
 
           lexer(); puntero3:
           ob=analiza_pointer(tpwlo,iloc);
@@ -4449,7 +4449,7 @@ void analyze_private(void) {
           if (pieza!=p_id) c_error(1,145);
           ob=o; if ((*ob).type!=tnone) {
             if (parametros==-1 && (*ob).param==1 && (*ob).bloque==bloque_actual) {
-              if ((*ob).type==twloc) { // Se repite un word parámetro
+              if ((*ob).type==twloc) { // Word parameter redeclared
                 lexer();
                 if (pieza==p_corab) c_error(2,53);
                 else if (pieza==p_asig) c_error(0,54);
@@ -4498,7 +4498,7 @@ void analyze_private(void) {
                 if (imemptr-oimemptr>(*ob).wloc.totalen*2) c_error(4,33);
               } (*ob).wloc.totalen=((*ob).wloc.totalen+1)/2;
             }
-          } else {                                          // Word privado
+          } else {                                          // Private word
             (*ob).type=twloc; (*ob).wloc.offset=imem;
             (*ob).wloc.len1=0;
             (*ob).wloc.len2=-1;
@@ -4527,7 +4527,7 @@ void analyze_private(void) {
           if (pieza!=p_id && pieza!=p_pointer) c_error(1,149);
         }
 
-        if (pieza==p_pointer) { // Miembro puntero a int
+        if (pieza==p_pointer) { // Int pointer member
 
           lexer(); puntero4:
           ob=analiza_pointer(tpilo,iloc);
@@ -4541,11 +4541,11 @@ void analyze_private(void) {
 
         } else {
 
-          // Si el objeto no es tnone, se repite un parámetro o bien es un error
+          // If the object is not tnone, it's a redeclared parameter or an error
 
           ob=o; if ((*ob).type!=tnone) {
             if (parametros==-1 && (*ob).param==1 && (*ob).bloque==bloque_actual) {
-              if ((*ob).type==tvloc) { // Se repite una variable local
+              if ((*ob).type==tvloc) { // Local variable redeclared
                 lexer();
                 if (pieza==p_corab) c_error(2,53);
                 else if (pieza==p_asig) c_error(0,54);
@@ -4560,7 +4560,7 @@ void analyze_private(void) {
             } else c_error(0,117);
           } else lexer();
 
-          if (pieza==p_corab) {                             // Tabla privada
+          if (pieza==p_corab) {                             // Private table
             lexer();
             (*ob).type=ttloc; _imem=imem;
             if (pieza==p_corce) {
@@ -4592,7 +4592,7 @@ void analyze_private(void) {
             test_buffer(&mem,&imem_max,imem);
             (*ob).tloc.offset=iloc; iloc+=(*ob).tloc.totalen;
 
-          } else {                                          // Variable privada
+          } else {                                          // Private variable
 
             (*ob).type=tvloc; (*ob).vloc.offset=iloc++;
             if (pieza==p_asig) { lexer(); mem[imem]=constant(); }
@@ -4611,14 +4611,14 @@ void analyze_private(void) {
 }
 
   //---------------------------------------------------------------------------
-  // Inicialización de tablas (a mem[imem++])
+  // Table initialization (to mem[imem++])
   //---------------------------------------------------------------------------
   // <init>  := ( <string> | <exp> [ [p_dup] p_abrir <init> p_cerrar ] )
   //            [ p_coma <init>]
   //---------------------------------------------------------------------------
 
 
-void tglo_init(memptrsize tipo) { // Tipo: 0-Int o variado (struct), 1-Word, 2-Byte
+void tglo_init(memptrsize tipo) { // Type: 0-Int or mixed (struct), 1-Word, 2-Byte
   if (tipo==3) { memset(frm,0,ifrm_max*sizeof(memptrsize)); tipo=0; }
   imemptr=(byte*)&mem[imem];
   tglo_init2(tipo);
@@ -4658,7 +4658,7 @@ void tglo_init2(int tipo) {
 
   while (1) {
 
-    // Mira si finaliza la inicialización de datos
+    // Check if data initialization ends
 
     if (pieza==p_cerrar || pieza==p_ptocoma) {
       if (*(imemptr-(memptrsize)mem+(memptrsize)frm)==1 || tipo==1) {
@@ -4676,7 +4676,7 @@ void tglo_init2(int tipo) {
       return;
     }
 
-    // Una coma sola, como "3,,4", avanza una posición (y define un 0)
+    // A lone comma, like "3,,4", advances one position (and defines a 0)
 
     if (pieza==p_coma) {
       if (*(imemptr-(memptrsize)mem+(memptrsize)frm)==1 || tipo==1) {
@@ -4709,7 +4709,7 @@ void tglo_init2(int tipo) {
       valor=pieza_num; lexer();
       if (pieza==p_abrir || pieza==p_dup) c_error(2,38);
 
-      // Mete un literal en un dato de tipo string
+      // Store a literal in a string-type field
 
       if ((((memptrsize)imemptr-(memptrsize)mem)%4)==0) {
         imem=((memptrsize)imemptr-(memptrsize)mem+3)/4;
@@ -4724,11 +4724,11 @@ void tglo_init2(int tipo) {
         }
       }
 
-      // Mete un valor literal en otro tipo de dato (en lugar de un string)
+      // Store a literal value in a non-string data type
 
-      if (*(imemptr-(memptrsize)mem+(memptrsize)frm)==1 || tipo==1) { // Un string en words (el puntero short)
+      if (*(imemptr-(memptrsize)mem+(memptrsize)frm)==1 || tipo==1) { // A string in words (short pointer)
 
-        imemptr=(byte*)(((memptrsize)imemptr+1)&-2); // Lo hace par
+        imemptr=(byte*)(((memptrsize)imemptr+1)&-2); // Align to even
         *((word*)imemptr)=valor;
         imemptr+=2;
         imem=((memptrsize)imemptr-(memptrsize)mem+3)/4;
@@ -4736,7 +4736,7 @@ void tglo_init2(int tipo) {
         if (pieza!=p_coma) return;
         lexer(); continue;
 
-      } else if (*(imemptr-(memptrsize)mem+(memptrsize)frm)==2 || tipo==2) { // Un string en bytes
+      } else if (*(imemptr-(memptrsize)mem+(memptrsize)frm)==2 || tipo==2) { // A string in bytes
 
         oimemptr=imemptr;
         while (*(oimemptr-(memptrsize)mem+(memptrsize)frm)==2) oimemptr++;
@@ -4748,7 +4748,7 @@ void tglo_init2(int tipo) {
         if (pieza!=p_coma) return;
         lexer(); continue;
 
-      } else { // Un string en un int (el puntero long, como en DIV 1)
+      } else { // A string in an int (long pointer, as in DIV 1)
 
         imem=((memptrsize)imemptr-(memptrsize)mem+3)/4;
         mem[imem++]=valor;
@@ -4768,12 +4768,12 @@ void tglo_init2(int tipo) {
             if (frm[imem]==0xdad00000) c_error(2,128);
           }
 
-          // Mete un valor numérico en la memoria
+          // Store a numeric value in memory
 
-          if (*(imemptr-(memptrsize)mem+(memptrsize)frm)==1 || tipo==1) { // En un word
+          if (*(imemptr-(memptrsize)mem+(memptrsize)frm)==1 || tipo==1) { // Into a word
 
             if (valor<0 || valor>65535) c_error(2,144);
-            imemptr=(byte*)(((memptrsize)imemptr+1)&-2); // Lo hace par
+            imemptr=(byte*)(((memptrsize)imemptr+1)&-2); // Align to even
             *((word*)imemptr)=valor;
             imemptr+=2;
             imem=((memptrsize)imemptr-(memptrsize)mem+3)/4;
@@ -4781,7 +4781,7 @@ void tglo_init2(int tipo) {
             if (pieza!=p_coma) return;
             lexer(); continue;
 
-          } else if (*(imemptr-(memptrsize)mem+(memptrsize)frm)==2 || tipo==2) { // En un byte
+          } else if (*(imemptr-(memptrsize)mem+(memptrsize)frm)==2 || tipo==2) { // Into a byte
 
             if (valor<0 || valor>255) c_error(2,143);
             *imemptr++=valor;
@@ -4790,7 +4790,7 @@ void tglo_init2(int tipo) {
             if (pieza!=p_coma) return;
             lexer(); continue;
 
-          } else { // En un int (lo normal en DIV 1)
+          } else { // Into an int (the default in DIV 1)
 
             imem=((memptrsize)imemptr-(memptrsize)mem+3)/4;
             mem[imem++]=valor;
@@ -4807,25 +4807,25 @@ void tglo_init2(int tipo) {
       } else dup=valor;
     }
 
-    // Duplica una secuencia de valores
+    // Duplicate a sequence of values
 
     if (dup<1) c_error(2,38);
     lexer();
 
-    // Analiza la secuencia como otra inicialización ...
+    // Parse the sequence as another initialization ...
 
     oimemptr=imemptr;
     tglo_init2(tipo);
     if (pieza!=p_cerrar) c_error(3,25);
 
-    // Y la duplica el número de veces indicado
+    // And duplicate it the specified number of times
 
     if (dup>1) {
       len=imemptr-oimemptr;
       while (--dup) {
         for (n=0;n<len;n++) {
 
-          // Comprueba que las cadenas caigan sobre si mismas en los dup()...
+          // Check that strings align with themselves in dup()...
           if ((((memptrsize)imemptr-(memptrsize)mem)%4)==0) {
             imem=((memptrsize)imemptr-(memptrsize)mem+3)/4;
             _imem=((memptrsize)oimemptr+n-(memptrsize)mem+3)/4;
@@ -4835,12 +4835,12 @@ void tglo_init2(int tipo) {
             } else if (frm[_imem]==0xdad00000) c_error(3,136);
           }
 
-          // Comprueba que los words caigan sobre words
+          // Check that words align with words
           if (*(byte*)((memptrsize)imemptr-(memptrsize)mem+(memptrsize)frm)==1) {
             if (*(byte*)((memptrsize)oimemptr+n-(memptrsize)mem+(memptrsize)frm)!=1) c_error(3,136);
           } else if (*(byte*)((memptrsize)oimemptr+n-(memptrsize)mem+(memptrsize)frm)==1) c_error(3,136);
 
-          // Comprueba que los bytes caigan sobre bytes
+          // Check that bytes align with bytes
           if (*(byte*)((memptrsize)imemptr-(memptrsize)mem+(memptrsize)frm)==2) {
             if (*(byte*)((memptrsize)oimemptr+n-(memptrsize)mem+(memptrsize)frm)!=2) c_error(3,136);
           } else if (*(byte*)((memptrsize)oimemptr+n-(memptrsize)mem+(memptrsize)frm)==2) c_error(3,136);
@@ -4860,7 +4860,7 @@ void tglo_init2(int tipo) {
 }
 
 //-----------------------------------------------------------------------------
-//      Analisis de un bloque de sentencias;
+//      Statement block analysis;
 //-----------------------------------------------------------------------------
 
 void statement() {
@@ -4980,12 +4980,12 @@ void statement() {
         } else {
           if (from<to) step=1; else step=-1;
         }
-        g2(lcar,from); // Asignación del from
+        g2(lcar,from); // Assign the from value
         g1(lasi); g1(lasp);
 
-        im1=imem; // Inicio del bucle
+        im1=imem; // Loop start
 
-        if (dir>=0) { // Comparación de la condición de permanencia
+        if (dir>=0) { // Loop continuation condition check
           g2(lcar,dir);
         } else {
           g2(lcar,-dir); g1(laid);
@@ -5002,9 +5002,9 @@ void statement() {
         if (pieza!=p_end) { c_error(0,40); } statement_start();
         lexer();
 
-        im3=imem; // Posición del continue
+        im3=imem; // Continue position
 
-        if (dir>=0) { // Incremento y vuelta al inicio del bucle
+        if (dir>=0) { // Increment and jump back to loop start
           g2(lcar,dir); 
         } else {
           g2(lcar,-dir); g1(laid);
@@ -5194,17 +5194,17 @@ void statement() {
 }
 
 //-----------------------------------------------------------------------------
-//      Analisis de una condición (genera código para calcularla)
+//      Condition analysis (generates code to evaluate it)
 //-----------------------------------------------------------------------------
 
-int tipo_expresion=0; // 0 - int, 1 - char o byte, 2 - string
-int tipo_factor=0;    // idem
+int tipo_expresion=0; // 0 - int, 1 - char or byte, 2 - string
+int tipo_factor=0;    // same
 
 void condition(void) {
   byte * __ierror, * _ierror;
   int _linea;
 
-  if (extended_conditions) { expression(); return; } // Como en DIV 1
+  if (extended_conditions) { expression(); return; } // Same as DIV 1
 
   _exp=tabexp;
   save_error(0);
@@ -5221,7 +5221,7 @@ void con00(int tipo_exp) {
   tipo_expresion=te;
 }
 
-void con0() { // Operadores con asociatividad de derecha a izquierda <-
+void con0() { // Right-to-left associativity operators <-
   int p;
 
   con1();
@@ -5230,11 +5230,11 @@ void con0() { // Operadores con asociatividad de derecha a izquierda <-
   }
 }
 
-void con1() { // Operadores con asociatividad de izquierda a derecha ->
+void con1() { // Left-to-right associativity operators ->
   int p;
   con2();
   while ((p=pieza)>=p_or && p<=p_andofs) {
-    if (p>=p_xorptr) p-=p_xorptr-p_xor; // Convierte xorptr,andofs en xor,and
+    if (p>=p_xorptr) p-=p_xorptr-p_xor; // Convert xorptr,andofs to xor,and
     lexer(); con2();
     (*_exp).type=eoper; (*_exp++).token=p;
     tipo_factor=0;
@@ -5272,7 +5272,7 @@ void con2() {
 }
 
 //-----------------------------------------------------------------------------
-//      Analisis de una expresión (genera código para calcularla)
+//      Expression analysis (generates code to evaluate it)
 //-----------------------------------------------------------------------------
 
 /* Expression parser entry point (recursive descent).
@@ -5429,7 +5429,7 @@ void generate_expression(void) {
         case p_strmai: g1(lstrmai); break;
 
         case p_pointerbyte: g1(lptrchr); break;
-        case p_string: break; // Es como un p_pointer nulo, que no se hace
+        case p_string: break; // Like a null p_pointer, no-op
 
         default: c_error(4,41);
       } break;
@@ -5439,8 +5439,8 @@ void generate_expression(void) {
 }
 
 //-----------------------------------------------------------------------------
-//      Analisis de una expresión constant
-//      No se procesan valores locales ni llamadas a otros procesos
+//      Constant expression analysis
+//      Local values and calls to other processes are not handled
 //-----------------------------------------------------------------------------
 
 int constant (void) {
@@ -5477,8 +5477,8 @@ int constant (void) {
       case p_mod: if (pila[i]==0) c_error(4,34); pila[i-1]%=pila[i]; i--; break;
       case p_neg: pila[i]=-pila[i]; break;
 
-// Creo que se quitó los pointer (y los rangos, por consiguiente) por los FROM,
-// ya que provocaba confusion el tomar como constant una variable ...
+// I think pointers (and ranges, consequently) were removed because of FROM,
+// since it caused confusion to treat a variable as a constant ...
 
       case p_not: pila[i]^=-1; break;
       case p_shr: pila[i-1]>>=pila[i]; i--; break;
@@ -5492,7 +5492,7 @@ int constant (void) {
 }
 
 //-----------------------------------------------------------------------------
-//      Análisis de una expresión a *tabexp
+//      Expression analysis into *tabexp
 //-----------------------------------------------------------------------------
 
 void exp00(int tipo_exp) {
@@ -5502,7 +5502,7 @@ void exp00(int tipo_exp) {
   tipo_expresion=te;
 }
 
-void exp0() { // Operadores con asociatividad de derecha a izquierda <-
+void exp0() { // Right-to-left associativity operators <-
   int p;
 
   exp1();
@@ -5514,13 +5514,13 @@ void exp0() { // Operadores con asociatividad de derecha a izquierda <-
     } else if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_pointerchar) {
       if (p==p_asig) p=p_asigchar; else p+=p_add_asigchar-p_add_asig;
       _exp--; lexer();
-      exp00(1); // cadena[1]="A";
+      exp00(1); // e.g. string[1]="A";
       if (hacer_strfix) { (*_exp).type=eoper; (*_exp++).token=p_strfix; }
       (*_exp).type=eoper; (*_exp++).token=p;
     } else if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_pointerbyte) {
       if (p==p_asig) p=p_asigchar; else p+=p_add_asigchar-p_add_asig;
       _exp--; lexer();
-      exp00(1); // mis_bytes[1]="A";
+      exp00(1); // e.g. my_bytes[1]="A";
       (*_exp).type=eoper; (*_exp++).token=p;
     } else if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_pointerword) {
       if (p==p_asig) p=p_asigword; else p+=p_add_asigword-p_add_asig;
@@ -5528,31 +5528,31 @@ void exp0() { // Operadores con asociatividad de derecha a izquierda <-
       exp00(0);
       (*_exp).type=eoper; (*_exp++).token=p;
     } else if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_string) {
-      if (p==p_asig) { // cadena="..."; // Hacer el strcpy
+      if (p==p_asig) { // string="..."; // Do strcpy
         _exp--; lexer();
         exp00(2);
         (*_exp).type=eoper; (*_exp++).token=p_strcpy;
-        (*_exp).type=eoper; (*_exp++).token=p_string; //Sigue habiendo una cadena en la pila
-      } else if (p==p_add_asig) { // cadena+="..."; // Hacer el strcat
+        (*_exp).type=eoper; (*_exp++).token=p_string; // A string remains on the stack
+      } else if (p==p_add_asig) { // string+="..."; // Do strcat
         _exp--; lexer();
         exp00(2);
         (*_exp).type=eoper; (*_exp++).token=p_strcat;
-        (*_exp).type=eoper; (*_exp++).token=p_string; //Sigue habiendo una cadena en la pila
-      } else if (p==p_sub_asig) { // cadena-=n; // Quita caracteres
+        (*_exp).type=eoper; (*_exp++).token=p_string; // A string remains on the stack
+      } else if (p==p_sub_asig) { // string-=n; // Remove characters
         _exp--; lexer();
         exp00(-1);
         (*_exp).type=eoper; (*_exp++).token=p_strsub;
-        (*_exp).type=eoper; (*_exp++).token=p_string; //Sigue habiendo una cadena en la pila
+        (*_exp).type=eoper; (*_exp++).token=p_string; // A string remains on the stack
       } else c_error(0,133);
     } else c_error(0,39);
   } tipo_factor=0;
 }
 
-void exp1() { // Operadores con asociatividad de izquierda a derecha ->
+void exp1() { // Left-to-right associativity operators ->
   int p;
   div_exp2();
   while ((p=pieza)>=p_or && p<=p_andofs) {
-    if (p>=p_xorptr) p-=p_xorptr-p_xor; // Convierte xorptr,andofs en xor,and
+    if (p>=p_xorptr) p-=p_xorptr-p_xor; // Convert xorptr,andofs to xor,and
     lexer(); div_exp2();
     (*_exp).type=eoper; (*_exp++).token=p;
     tipo_factor=0;
@@ -5591,16 +5591,16 @@ void exp4() {
   exp5();
   while ((p=pieza)>=p_suma && p<=p_sub && (p<=p_resta || p>=p_add) ) {
     tf=tipo_factor;
-    if (p<=p_resta) p+=p_add-p_suma; // Convierte suma,resta en add,sub
+    if (p<=p_resta) p+=p_add-p_suma; // Convert suma,resta to add,sub
     lexer(); exp5();
     if (p==p_add && (tf==2 || tipo_factor==2 || tipo_expresion==2)) {
       (*_exp).type=eoper; (*_exp++).token=p_stradd;
-      (*_exp).type=eoper; (*_exp++).token=p_string; // Hay una cadena en la pila
+      (*_exp).type=eoper; (*_exp++).token=p_string; // A string is on the stack
       tipo_factor=2;
     } else if (p==p_sub && tf==2) {
       if (tipo_factor==2) { (*_exp).type=eoper; (*_exp++).token=p_strlen; }
       (*_exp).type=eoper; (*_exp++).token=p_strdec;
-      (*_exp).type=eoper; (*_exp++).token=p_string; // Hay una cadena en la pila
+      (*_exp).type=eoper; (*_exp++).token=p_string; // A string is on the stack
       tipo_factor=2;
     } else {
       (*_exp).type=eoper; (*_exp++).token=p;
@@ -5613,7 +5613,7 @@ void exp5() {
   int p;
   unary();
   while ((p=pieza)>=p_mul && p<=p_multi) {
-    if (p==p_multi) p=p_mul; // Convierte multi en mul
+    if (p==p_multi) p=p_mul; // Convert multi to mul
     lexer();  unary();
     (*_exp).type=eoper; (*_exp++).token=p;
     tipo_factor=0;
@@ -5628,15 +5628,15 @@ void unary() {
 
     if (parametros>0 && p==p_pointer) { factor(); return; }
 
-    if (p>=p_sub && p<=p_mul) p-=p_sub-p_neg; // Conv. sub,mul en neg,pointer
-    else if (p>=p_xorptr && p<=p_andofs) p+=p_pointer-p_xorptr; //xorptr,andofs pointer,offset
+    if (p>=p_sub && p<=p_mul) p-=p_sub-p_neg; // Convert sub,mul to neg,pointer
+    else if (p>=p_xorptr && p<=p_andofs) p+=p_pointer-p_xorptr; //xorptr,andofs to pointer,offset
 
     lexer();  unary(); // p = ( neg, pointer, offset, not )
 
     if (p==p_offset) {
       if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_pointer) _exp--;
       else if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_pointerchar) {
-        c_error(4,132); // &cadena[<exp>] ???
+        c_error(4,132); // &string[<exp>] ???
       } else if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_pointerbyte) {
         if ((*(_exp-2)).type==econs && (*(_exp-2)).valor==0) _exp-=2;
         else c_error(4,132); // &bytes[<exp>] ???
@@ -5644,7 +5644,7 @@ void unary() {
         if ((*(_exp-2)).type==econs && (*(_exp-2)).valor==0) _exp-=2;
         else c_error(4,132); // &words[<exp>] ???
       } else if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_string) {
-        // &cadena ≡ cadena
+        // &string == string
       } else c_error(4,32);
     } else if (p==p_inc || p==p_dec) {
       if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_pointer) {
@@ -5668,13 +5668,13 @@ void unary() {
       } else c_error(4,122);
     } else if (p==p_pointer) {
       if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_pointerchar) {
-        // *cadena[0] ≡ cadena[0]
+        // *string[0] == string[0]
       } else if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_pointerbyte) {
-        // *cadena[0] ≡ cadena[0]
+        // *string[0] == string[0]
       } else if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_pointerword) {
-        // *cadena[0] ≡ cadena[0]
+        // *string[0] == string[0]
       } else if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_string) {
-        // *cadena == cadena
+        // *string == string
       } else {
         (*_exp).type=eoper; (*_exp++).token=p;
       }
@@ -5686,7 +5686,7 @@ void unary() {
 
 }
 
-void exp6() { // Operador de acceso a variables o tablas locales ajenas
+void exp6() { // Operator for accessing other processes' local variables or tables
   struct exp_ele * e;
 
   factor();
@@ -5715,7 +5715,7 @@ void factor(void) {
 
   tipo_factor=0;
 
-  switch (pieza) { // analisis de un factor
+  switch (pieza) { // factor analysis
 
     case p_abrir:
       lexer(); exp00(tipo_expresion);
@@ -5780,14 +5780,14 @@ void factor(void) {
       } lexer(); if (pieza!=p_cerrar) c_error(3,25); lexer();
       break;
 
-    case p_struct: // Se comprueba la declaración de un puntero a struct parámetro
+    case p_struct: // Check for struct pointer parameter declaration
       if (parametros<=0) {
         if (error_27==27) c_error(1,27); else c_error(0,error_27);
       } else {
         lexer();
-        if (pieza!=p_pointer) c_error(0,151); // No se define el pointer así
+        if (pieza!=p_pointer) c_error(0,151); // Pointer can't be defined this way
         lexer(); if (pieza!=p_id) c_error(1,110); obs=o;
-        if ((*obs).type==tnone) c_error(0,150); // No se define el pointer así
+        if ((*obs).type==tnone) c_error(0,150); // Pointer can't be defined this way
         if ((*obs).type!=tsglo && (*obs).type!=tsloc) c_error(0,150);
         lexer(); ob=o;
         analyze_pointer_struct(tpslo,iloc++,obs);
@@ -5798,12 +5798,12 @@ void factor(void) {
         (*_exp).type=eoper; (*_exp++).token=p_pointer;
       } break;
 
-    case p_string: // Se comprueba la declaración de un string parámetro
+    case p_string: // Check for string parameter declaration
       if (parametros<=0) {
         if (error_27==27) c_error(1,27); else c_error(0,error_27);
       } else {
         lexer();
-        if (pieza==p_pointer) { // Recibe un puntero a string
+        if (pieza==p_pointer) { // Receives a pointer to string
           lexer();
           ob=analiza_pointer(tpclo,iloc++);
           (*ob).line=linea; (*ob).ierror=ierror;
@@ -5846,7 +5846,7 @@ void factor(void) {
         (*_exp).type=eoper; (*_exp++).token=p_string;
       } break;
 
-    case p_byte: // Se comprueba la declaración de un byte parámetro
+    case p_byte: // Check for byte parameter declaration
       if (parametros<=0) {
         if (error_27==27) c_error(1,27); else c_error(0,error_27);
       } else {
@@ -5878,7 +5878,7 @@ void factor(void) {
         (*_exp).type=eoper; (*_exp++).token=p_pointerbyte;
       } break;
 
-    case p_word: // Se comprueba la declaración de un word parámetro
+    case p_word: // Check for word parameter declaration
       if (parametros<=0) {
         if (error_27==27) c_error(1,27); else c_error(0,error_27);
       } else {
@@ -5912,13 +5912,13 @@ void factor(void) {
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
-    case p_int: // Se comprueba la declaración de un int parámetro
+    case p_int: // Check for int parameter declaration
       if (parametros<=0) {
         if (error_27==27) c_error(1,27); else c_error(0,error_27);
       } else {
         lexer();
         if (pieza==p_pointer) {
-    case p_pointer: // Declaración de un puntero a int parámetro
+    case p_pointer: // Pointer-to-int parameter declaration
 #pragma GCC diagnostic pop
           if (parametros<=0) {
             if (error_27==27) c_error(1,27); else c_error(0,error_27);
@@ -6389,10 +6389,10 @@ void factor(void) {
 
         p=0; while (pieza!=p_cerrar) { // p≡num_par
 
-          if ((*ob).func.par[p]==1) { // Parámetro del tipo 1 (struct,campo)
+          if ((*ob).func.par[p]==1) { // Type 1 parameter (struct,field)
 
-            // RECIBE: nombre_struct,nombre_campo
-            // GENERA: offset_struct,len_item,totalen,offset_campo,tipo_campo
+            // RECEIVES: struct_name,field_name
+            // GENERATES: struct_offset,len_item,totalen,field_offset,field_type
 
             if (pieza!=p_id) c_error(0,152);
             if ((*o).member!=NULL) c_error(0,152);
@@ -6414,7 +6414,7 @@ void factor(void) {
             else if ((*o).type==tpcgl || (*o).type==tpclo) (*_exp++).valor=2;
             else (*_exp++).valor=0;
             lexer();
-          } else {                           // Parámetro del tipo 0 (genérico)
+          } else {                           // Type 0 parameter (generic)
             exp00(0);
           } p++;
 
@@ -6859,7 +6859,7 @@ void factor_struct(void) {
 }
 
 //-----------------------------------------------------------------------------
-//      Graba el fichero de la tabla de objetos
+//      Write the object table file
 //-----------------------------------------------------------------------------
 
 #ifdef listados
@@ -7036,10 +7036,10 @@ void list_objects (void) {
 #endif
 
 //-----------------------------------------------------------------------------
-//      Graba el fichero con información para debugging
+//      Write the debugging info file
 //-----------------------------------------------------------------------------
 
-// Ojo, falta grabar items1,items2 e items3 (o len1,len2,len3 para tablas)
+// NOTE: items1,items2,items3 (or len1,len2,len3 for tables) are not saved yet
 
 void save_dbg(void) {
   FILE * sta;
@@ -7087,7 +7087,7 @@ void save_dbg(void) {
 }
 
 //-----------------------------------------------------------------------------
-//    Graba los parámetros de ejecución para el intérprete
+//    Write the execution parameters for the interpreter
 //-----------------------------------------------------------------------------
 
 void save_exec_bin(void) {
@@ -7103,7 +7103,7 @@ void save_exec_bin(void) {
 }
 
 //-----------------------------------------------------------------------------
-//      Graba el fichero ensamblador
+//      Write the assembler listing file
 //-----------------------------------------------------------------------------
 
 #ifdef listados
@@ -7257,8 +7257,8 @@ void list_assembler (void) {
 #endif
 
 //----------------------------------------------------------------------------
-//  Funcion para localizar y abrir un fichero (pal,fpg,fnt,...)
-//  Esta función debe seguir el mismo algoritmo en F.CPP y DIVC.CPP
+//  Function to locate and open a file (pal,fpg,fnt,...)
+//  This function must follow the same algorithm as in F.CPP and DIVC.CPP
 //----------------------------------------------------------------------------
 FILE *__fpopen (byte *file, char *mode) {
 	
@@ -7472,14 +7472,14 @@ void compile_program(void) {
 }
 
 //-----------------------------------------------------------------------------
-//  Funciones de generación de código
+//  Code generation functions
 //-----------------------------------------------------------------------------
 
 // void g1(int op) { mem[imem++]=op; }
 // void g2(int op, int pa) { mem[imem++]=op; mem[imem++]=pa; }
 
 //-----------------------------------------------------------------------------
-//  Optimización peephole de código intermedio EML
+//  Peephole optimization of EML intermediate code
 //-----------------------------------------------------------------------------
 
 // TODO: Consider removing the 'dir' field from the peephole struct and its
@@ -7653,7 +7653,7 @@ void gen(int param, int op, int pa) {
       } else if (code[15].op==lcar){
         if (mem[imem-1]==1) remove_code(1);
         else if (mem[imem-1]!=0) {
-          code[15].op=mem[imem-2]=lcardiv; // Un cardiv nunca será "cardiv 0"
+          code[15].op=mem[imem-2]=lcardiv; // A cardiv will never be "cardiv 0"
           optimizado=1;
         }
       } break;
@@ -7707,7 +7707,7 @@ void add_code(int dir, int param, int op) {
 }
 
 //-----------------------------------------------------------------------------
-//      Precompilación
+//      Precompilation
 //-----------------------------------------------------------------------------
 
 void plexico(void) {
@@ -7717,7 +7717,7 @@ void plexico(void) {
   if (!coment) {old_linea=linea; old_ierror=ierror; old_ierror_end=ierror_end;}
 
   lex_scan: ierror=_source;
-  switch ((uintptr_t)lex_case[*_source]) { // Puntero a un lex_ele o l_???
+  switch ((uintptr_t)lex_case[*_source]) { // Pointer to a lex_ele or l_???
 
     case l_err:
       if (coment) { pieza=p_rem; _source++; } else c_error(0,10); break;
@@ -7734,16 +7734,16 @@ void plexico(void) {
       ptr=&vhash[h];
       while (*ptr && strcmp((char *)(ptr+2),(char *)(_ivnom+ptr8))) ptr=(byte **)*ptr;
       if (!strcmp((char *)(ptr+2),(char *)_ivnom+ptr8)) { // id found
-        ivnom.b=_ivnom; // lo saca de vnom
+        ivnom.b=_ivnom; // remove it from vnom
         pieza=(intptr_t)*(ptr+1);
-        if (pieza<256 && pieza>=0) { // palabra reservada (token)
+        if (pieza<256 && pieza>=0) { // reserved word (token)
           if (pieza==p_rem) { while (*_source!=cr) _source++; goto lex_scan; }
-        } else { // objeto (id anterior)
+        } else { // object (existing id)
           pieza=p_id;
         }
       } else {
-        ivnom.b=_ivnom; // lo saca de vnom
-        pieza=p_id; // id nuevo
+        ivnom.b=_ivnom; // remove it from vnom
+        pieza=p_id; // new id
       } break;
 
     case l_spc:
@@ -7751,14 +7751,14 @@ void plexico(void) {
 
     case l_lit:
       if (coment) { pieza=p_rem; _source++; break; }
-      pieza=p_lit; h=*_source; _ivnom=ivnom.b; // Literal entre dos h
+      pieza=p_lit; h=*_source; _ivnom=ivnom.b; // Literal between two h delimiters
       do { if (*++_source==cr) c_error(0,11);
            if (*_source==h)
              if (*(_source+1)==h) *_ivnom=*++_source; else *_ivnom=0;
            else *_ivnom=*_source;
       } while (*_ivnom++); _source++;
       longitud_textos+=(strlen((char *)ivnom.b)+ptr4)/4;
-      ivnom.b=_ivnom; // lo saca de vnom
+      ivnom.b=_ivnom; // remove it from vnom
       break;
 
     case l_num:
@@ -7777,7 +7777,7 @@ void plexico(void) {
       } while ((uintptr_t)lex_case[*_source]==l_num);
       break;
 
-    default: // puntero a un lex_ele
+    default: // pointer to a lex_ele
       e=lex_case[*_source++]; _ivnom=_source; pieza=(*e).token;
       while ((e=(*e).siguiente)) {
         while (*_source!=(*e).caracter && (*e).alternativa) e=(*e).alternativa;

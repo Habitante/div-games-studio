@@ -254,9 +254,9 @@ FILE *fpg;
                         return 1;
         }
 
-        if(BorrarAntiguo) Borrar_FPG(Fpg,OLDCOD); // Borra el antiguo
+        if(BorrarAntiguo) Borrar_FPG(Fpg,OLDCOD); // Delete the old one
 
-        if(Fpg->OffsGrf[COD]!=0) Borrar_FPG(Fpg,COD); // Si se machaca uno
+        if(Fpg->OffsGrf[COD]!=0) Borrar_FPG(Fpg,COD); // If overwriting an existing one
 
         if((fpg=fopen((char *)Fpg->ActualFile,"ab"))==NULL)
         {
@@ -293,7 +293,7 @@ FILE *fpg;
         fwrite((byte *)Imagen,Ancho*Alto,1,fpg);
         fclose(fpg);
 
-        //Relee la informacion del fichero.
+        // Re-read file information
         if(!Abrir_FPG(Fpg,(char *)Fpg->ActualFile))
         {
                 v_text=(char *)texto[43];
@@ -335,7 +335,7 @@ FILE *Oldfpg;
 int y;
 byte MiTabla[256];
 
-        //Nombre del fichero temporal
+        // Temporary file name
         strcpy(ActualPath,(char *)Fpg->ActualFile);
         for(x=strlen(ActualPath);x>=0;x--)
                 if(IS_PATH_SEP(ActualPath[x]))
@@ -353,7 +353,7 @@ byte MiTabla[256];
                 return 0;
         }
 
-        //Copia Cabecera de grafico
+        // Copy graphic header
         fread(tmp,8,1,fpg);
         fwrite(tmp,8,1,Oldfpg);
         fread(tmp,768,1,fpg);
@@ -373,7 +373,7 @@ byte MiTabla[256];
                         v_text=(char *)texto[45]; show_dialog(err0);
                         return 0;
                 }
-                //Comprobar memoria
+                // Check memory
                 if(MiOtraHeadFPG.nPuntos!=0)
                 {
                         OtrosPuntos=(short *)malloc(MiOtraHeadFPG.nPuntos*4);
@@ -477,7 +477,7 @@ char *Buffer;
         free(Buffer);
 }
 
-int Borrar_FPG(FPG *Fpg,int COD) // Papelera, machacar uno existente y al cambiar el código a uno
+int Borrar_FPG(FPG *Fpg,int COD) // Trash, overwrite existing entry, or when changing a graphic's code
 {
 struct tipo_regla CopiaReglas[16];
 HeadFPG MiOtraHeadFPG;
@@ -491,7 +491,7 @@ FILE *Oldfpg;
 
 debugprintf("Deleting map %d\n",COD);
 
-        //Nombre del fichero temporal
+        // Temporary file name
         strcpy(ActualPath,(char *)Fpg->ActualFile);
         for(x=strlen(ActualPath);x>=0;x--)
                 if(IS_PATH_SEP(ActualPath[x]))
@@ -525,7 +525,7 @@ debugprintf("found COD at index: %d\n",n);
         fseek(fpg,0,SEEK_SET);
         Progress((char *)texto[436],0,len);
 
-        //Copia Cabecera de grafico
+        // Copy graphic header
         fread(tmp,8,1,fpg);
         fwrite(tmp,8,1,Oldfpg);
         fread(tmp,768,1,fpg);
@@ -546,7 +546,7 @@ debugprintf("found COD at index: %d\n",n);
                         v_text=(char *)texto[45]; show_dialog(err0);
                         return 0;
                 }
-                //Comprobar memoria
+                // Check memory
                 if(MiOtraHeadFPG.nPuntos!=0)
                 {
                         OtrosPuntos=(short *)malloc(MiOtraHeadFPG.nPuntos*4);
@@ -607,7 +607,7 @@ int Borrar_muchos_FPG(FPG *Fpg,int taggeds,int *array_del) {
   FILE *fpg;
   FILE *Oldfpg;
 
-  strcpy(ActualPath,(char *)Fpg->ActualFile); //Nombre del fichero temporal
+  strcpy(ActualPath,(char *)Fpg->ActualFile); // Temporary file name
   for(x=strlen(ActualPath);x>=0;x--)
     if(IS_PATH_SEP(ActualPath[x])) x=-1; else ActualPath[x]=0;
   strcat(ActualPath,"_DIV_.FPG");
@@ -626,7 +626,7 @@ int Borrar_muchos_FPG(FPG *Fpg,int taggeds,int *array_del) {
   fseek(fpg,0,SEEK_SET);
   Progress((char *)texto[436],0,len);
 
-  fread(tmp,8,1,fpg); //Copia Cabecera de grafico
+  fread(tmp,8,1,fpg); // Copy graphic header
   fwrite(tmp,8,1,Oldfpg);
   fread(tmp,768,1,fpg);
   fwrite(tmp,768,1,Oldfpg);
@@ -647,7 +647,7 @@ int Borrar_muchos_FPG(FPG *Fpg,int taggeds,int *array_del) {
       return 0;
     }
 
-    if(MiOtraHeadFPG.nPuntos!=0) { // Comprobar memoria
+    if(MiOtraHeadFPG.nPuntos!=0) { // Check memory
       OtrosPuntos=(short *)malloc(MiOtraHeadFPG.nPuntos*4);
       if(OtrosPuntos==NULL) {
         Progress((char *)texto[436],len,len);

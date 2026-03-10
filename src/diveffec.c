@@ -1,15 +1,15 @@
 //-----------------------------------------------------------------------------
-//      Módulo para la creacion de explosiones
+//      Module for creating explosions
 //-----------------------------------------------------------------------------
 
 #include "global.h"
 
 //-----------------------------------------------------------------------------
-//      Definiciones
+//      Definitions
 //-----------------------------------------------------------------------------
 
-#define max_pun 64      // Número máximo de puntos de control
-#define max_exp 8       // Número máximo de explosiones base
+#define max_pun 64      // Maximum number of control points
+#define max_exp 8       // Maximum number of base explosions
 #define DEEP    4
 // #pragma on (check_stack)  /* Watcom-specific, not needed */
 
@@ -30,39 +30,39 @@
 #endif
 
 //-----------------------------------------------------------------------------
-//      Declaracion de procedimientos internos
+//      Internal function declarations
 //-----------------------------------------------------------------------------
 
-void init_rnd(int,char*); // Inicializa el generador aleatorio con un int y clave
-byte rndb(void);	    	  // Obtiene un byte del generador aleatorio
-int  rnd(void); 		      // Obtiene un int del generador aleatorio
+void init_rnd(int,char*); // Initialize the random generator with an int and key
+byte rndb(void);	    	  // Get a byte from the random generator
+int  rnd(void); 		      // Get an int from the random generator
 
 void gama0(void);
 byte exp_colores[128];
 struct _gcolor exp_gama[9];
 
 //-----------------------------------------------------------------------------
-//      Tablas y variables globales
+//      Tables and global variables
 //-----------------------------------------------------------------------------
 
 int cx,cy;
 int ExpGama;
 
-struct tp {			// Estructura para los puntos de la explosión
-  int x,y;                      // Coordenadas del punto
-  int radio;                    // Radio efectivo del punto
-  int fuerza;                   // Fuerza central del punto
+struct tp {			// Structure for explosion points
+  int x,y;                      // Point coordinates
+  int radio;                    // Effective radius of the point
+  int fuerza;                   // Central force of the point
   int xr,yr;                    // Coord. * 10000
-  int ix,iy;                    // Incrementos
+  int ix,iy;                    // Increments
 };
 
-struct te {                     // Estructura para una explosión base
+struct te {                     // Structure for a base explosion
   struct tp p[max_pun];
   byte * ptr;
 } e[max_exp];
 
 //-----------------------------------------------------------------------------
-//      Parámetros para crear la explosión
+//      Parameters for creating the explosion
 //-----------------------------------------------------------------------------
 
 int exp_ancho=32;      // 8..256
@@ -77,7 +77,7 @@ int per_points;
 char *Buff_exp;
 
 //-----------------------------------------------------------------------------
-//	Crea el array de puntos
+//	Create the point array
 //-----------------------------------------------------------------------------
 
 void create_points(void) {
@@ -88,8 +88,8 @@ void create_points(void) {
 
     for (n=0;n<n_pun;n++) {
 
-      ang=(double)rnd()/10000.0; // Angulo (?)
-      dist=(double)(rnd()%10000)/10000.0; // Distancia (0 .. 0.8)
+      ang=(double)rnd()/10000.0; // Angle (?)
+      dist=(double)(rnd()%10000)/10000.0; // Distance (0 .. 0.8)
 
       e[m].p[n].ix=cos(ang)*10000.0;
       e[m].p[n].iy=sin(ang)*10000.0;
@@ -110,7 +110,7 @@ void create_points(void) {
 }
 
 //-----------------------------------------------------------------------------
-//      Avanza un frame en la explosión
+//      Advance one frame in the explosion
 //-----------------------------------------------------------------------------
 
 void advance_points(void) {
@@ -130,7 +130,7 @@ void advance_points(void) {
 }
 
 //-----------------------------------------------------------------------------
-//	Pinta la explosión
+//	Render the explosion
 //-----------------------------------------------------------------------------
 
 int paint_explosion(void) {
