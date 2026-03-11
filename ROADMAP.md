@@ -74,16 +74,17 @@ We are NOT in a rush. Each step should be done carefully, verified, and document
 before moving on. Every sprint must update project docs (ROADMAP.md, MEMORY.md,
 README.md) as part of its deliverables.
 
-### 2C-1. Apply coding standards
+### 2C-1. Apply coding standards ✓
 
-`.clang-format` and `.editorconfig` exist but haven't been applied to the codebase.
-
-- [ ] Apply formatting incrementally via `git clang-format` (changed lines only)
-      or in controlled batches — not a single whole-codebase reformat
-- [ ] Watch for name collisions when applying naming conventions — two different
-      Spanish names might map to the same English name
-- [ ] Decide on naming convention: `snake_case` for functions/variables? Keep
-      existing mixed style? Document the decision here once made.
+- [x] Applied `clang-format` (v20.1.8) to 82 project source files. Third-party
+      and data headers excluded (listed in `.clang-format-ignore`).
+- [x] `.git-blame-ignore-revs` created so `git blame` skips the formatting commit.
+- [x] Snake_case collision analysis completed — 18 collisions found, all in the
+      runtime-wrapper vs. implementation pattern. Full report in
+      [`docs/snake-case-collision-report.md`](docs/snake-case-collision-report.md).
+- [x] **Naming convention decided:** `snake_case` for functions/variables/structs/
+      typedefs. `UPPER_CASE` for macros/enum constants. `OSDEP_*`/`SDL_*`/`Mix_*`
+      preserved as-is.
 
 ### 2C-2. Source reorganization
 

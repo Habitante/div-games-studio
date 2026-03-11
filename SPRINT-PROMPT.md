@@ -61,10 +61,16 @@ Use `memmove()` for overlapping buffers.
 ## Coding standards
 
 - `.clang-format` and `.editorconfig` define the project style
-- Apply formatting incrementally via `git clang-format` on changed lines,
-  not whole-codebase reformats
+- **Formatting applied:** All 82 project source files are formatted. Apply
+  `clang-format -i` to any new/changed files before committing.
+- `.clang-format-ignore` lists excluded files (third-party, data headers)
+- `.git-blame-ignore-revs` — formatting commit excluded from git blame
+- **Naming convention:** `snake_case` for functions, variables, structs, typedefs.
+  `UPPER_CASE` for macros and enum constants. `OSDEP_*`/`SDL_*`/`Mix_*` preserved.
+- **Collision report:** `docs/snake-case-collision-report.md` — 18 known collisions
+  (runtime wrappers vs. implementations). Resolve with module prefix on implementations.
 - Watch for name collisions when renaming — two different Spanish names might
-  map to the same English name
+  map to the same English name. Abbreviations (DOS, DPMI, FPG, BMP) need manual review.
 - When in doubt about the intent of code, consult the original MSDOS source
   in `original_msdos_source/` for comparison
 
