@@ -1,13 +1,14 @@
 # Snake_case Collision Report
 
 Generated: 2026-03-11 | Phase 2C-1 | clang-format 20.1.8
+**Updated: 2026-03-11** | Phase 2C-4a: All 18 collisions resolved, 76 functions renamed.
 
 ## Summary
 
 - **1,596** unique public identifiers analyzed (functions, globals, structs)
 - **1,204** (75%) already snake_case — no change needed
-- **392** (25%) need conversion
-- **18 collisions** found — all follow the same pattern (see below)
+- **392** (25%) needed conversion → **76 resolved** in Phase 2C-4a, ~316 remaining
+- **18 collisions** found — **all resolved** via module-prefixed implementation names
 
 ## Collisions: Runtime wrapper vs. implementation
 

@@ -126,9 +126,12 @@ changes. Static/file-scope globals may need to become shared or passed as parame
 
 ### 2C-4. Remaining identifier renames
 
-Global/public identifiers are mostly English now, but file-local variables and
-function parameters still have plenty of Spanish and cryptic single-letter names.
-Priority files (largest, most-read):
+**2C-4a (done):** 76 PascalCase/Spanish functions renamed to snake_case with
+module prefixes across 25 files. All 18 snake_case collisions resolved.
+Modules: `sound_` (18), `fli_` (16), `fpg_` (12), `pal_` (10), `fmt_` (20).
+
+Still remaining — file-local variables and function parameters have plenty of
+Spanish and cryptic single-letter names. Priority files (largest, most-read):
 
 - [ ] divc.c / lexer / parser — the compiler is the most complex code
 - [ ] divedit.c — code editor, frequently modified
