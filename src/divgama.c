@@ -10,9 +10,9 @@
 //-----------------------------------------------------------------------------
 
 #define ancho_ga 138
-#define alto_ga   60
-#define gama_x     4
-#define gama_y    12
+#define alto_ga  60
+#define gama_x   4
+#define gama_y   12
 #define gama_an  130
 
 //-----------------------------------------------------------------------------
@@ -48,104 +48,119 @@ void Selcolor0(void);
 //  Crea una gama a partir de los colores selecionados
 //-----------------------------------------------------------------------------
 
-void create_gradient_colors(struct _gcolor * gradient_config, byte * gradient_buf) {
+void create_gradient_colors(struct _gcolor *gradient_config, byte *gradient_buf) {
   int con, boton1, boton2, n;
   float tmp_r, tmp_g, tmp_b;
 
-  for (n=0;n<9;n++) if (gradient_config[n].selec) {
-    gradient_config[n].color=find_color(gradient_config[n].r,gradient_config[n].g,gradient_config[n].b);
-  }
+  for (n = 0; n < 9; n++)
+    if (gradient_config[n].selec) {
+      gradient_config[n].color =
+          find_color(gradient_config[n].r, gradient_config[n].g, gradient_config[n].b);
+    }
 
-  if(!gradient_config[0].selec)
-  {
+  if (!gradient_config[0].selec) {
     gradient_config[0].color = find_color(0, 0, 0);
-    gradient_config[0].r = dac[gradient_config[0].color*3];
-    gradient_config[0].g = dac[gradient_config[0].color*3+1];
-    gradient_config[0].b = dac[gradient_config[0].color*3+2];
+    gradient_config[0].r = dac[gradient_config[0].color * 3];
+    gradient_config[0].g = dac[gradient_config[0].color * 3 + 1];
+    gradient_config[0].b = dac[gradient_config[0].color * 3 + 2];
   }
 
-  if(!gradient_config[8].selec)
-  {
+  if (!gradient_config[8].selec) {
     gradient_config[8].color = find_color(63, 63, 63);
-    gradient_config[8].r = dac[gradient_config[8].color*3];
-    gradient_config[8].g = dac[gradient_config[8].color*3+1];
-    gradient_config[8].b = dac[gradient_config[8].color*3+2];
+    gradient_config[8].r = dac[gradient_config[8].color * 3];
+    gradient_config[8].g = dac[gradient_config[8].color * 3 + 1];
+    gradient_config[8].b = dac[gradient_config[8].color * 3 + 2];
   }
 
-  tmp_r=gradient_config[0].r;
-  tmp_g=gradient_config[0].g;
-  tmp_b=gradient_config[0].b;
+  tmp_r = gradient_config[0].r;
+  tmp_g = gradient_config[0].g;
+  tmp_b = gradient_config[0].b;
 
-  boton1=0, boton2=0;
-  while(1)
-  {
+  boton1 = 0, boton2 = 0;
+  while (1) {
     boton2++;
-    if(gradient_config[boton2].selec || boton2==8)
-    {
-      while(boton1+1<boton2)
-      {
-        tmp_r += ((float)gradient_config[boton2].r-tmp_r)/(float)(boton2-boton1);
-        tmp_g += ((float)gradient_config[boton2].g-tmp_g)/(float)(boton2-boton1);
-        tmp_b += ((float)gradient_config[boton2].b-tmp_b)/(float)(boton2-boton1);
+    if (gradient_config[boton2].selec || boton2 == 8) {
+      while (boton1 + 1 < boton2) {
+        tmp_r += ((float)gradient_config[boton2].r - tmp_r) / (float)(boton2 - boton1);
+        tmp_g += ((float)gradient_config[boton2].g - tmp_g) / (float)(boton2 - boton1);
+        tmp_b += ((float)gradient_config[boton2].b - tmp_b) / (float)(boton2 - boton1);
 
-        if (tmp_r>63.0) tmp_r=63.0; else if (tmp_r<0.0) tmp_r=0.0;
-        if (tmp_g>63.0) tmp_g=63.0; else if (tmp_g<0.0) tmp_g=0.0;
-        if (tmp_b>63.0) tmp_b=63.0; else if (tmp_b<0.0) tmp_b=0.0;
+        if (tmp_r > 63.0)
+          tmp_r = 63.0;
+        else if (tmp_r < 0.0)
+          tmp_r = 0.0;
+        if (tmp_g > 63.0)
+          tmp_g = 63.0;
+        else if (tmp_g < 0.0)
+          tmp_g = 0.0;
+        if (tmp_b > 63.0)
+          tmp_b = 63.0;
+        else if (tmp_b < 0.0)
+          tmp_b = 0.0;
 
         boton1++;
 
-        gradient_config[boton1].color = find_color(tmp_r,tmp_g,tmp_b);
-        gradient_config[boton1].r = dac[gradient_config[boton1].color*3];
-        gradient_config[boton1].g = dac[gradient_config[boton1].color*3+1];
-        gradient_config[boton1].b = dac[gradient_config[boton1].color*3+2];
+        gradient_config[boton1].color = find_color(tmp_r, tmp_g, tmp_b);
+        gradient_config[boton1].r = dac[gradient_config[boton1].color * 3];
+        gradient_config[boton1].g = dac[gradient_config[boton1].color * 3 + 1];
+        gradient_config[boton1].b = dac[gradient_config[boton1].color * 3 + 2];
 
-        if (gradient_config[boton1].color!=gradient_config[boton1-1].color) {
-          tmp_r=gradient_config[boton1].r;
-          tmp_g=gradient_config[boton1].g;
-          tmp_b=gradient_config[boton1].b;
+        if (gradient_config[boton1].color != gradient_config[boton1 - 1].color) {
+          tmp_r = gradient_config[boton1].r;
+          tmp_g = gradient_config[boton1].g;
+          tmp_b = gradient_config[boton1].b;
         }
       }
-      boton1=boton2;
+      boton1 = boton2;
     }
-    if(boton2==8) break;
+    if (boton2 == 8)
+      break;
   }
 
-  for(con=0; con<8; con++) gradient_buf[con*16] = gradient_config[con].color;
+  for (con = 0; con < 8; con++)
+    gradient_buf[con * 16] = gradient_config[con].color;
   gradient_buf[127] = gradient_config[8].color;
 
-  tmp_r=gradient_config[0].r;
-  tmp_g=gradient_config[0].g;
-  tmp_b=gradient_config[0].b;
+  tmp_r = gradient_config[0].r;
+  tmp_g = gradient_config[0].g;
+  tmp_b = gradient_config[0].b;
 
-  boton1=0, boton2=0;
-  while(1)
-  {
+  boton1 = 0, boton2 = 0;
+  while (1) {
     boton2++;
-    if(boton2%16==0 || boton2==127)
-    {
-      while(boton1+1<boton2)
-      {
-        tmp_r += ((float)dac[gradient_buf[boton2]*3]-tmp_r)/(float)(boton2-boton1);
-        tmp_g += ((float)dac[gradient_buf[boton2]*3+1]-tmp_g)/(float)(boton2-boton1);
-        tmp_b += ((float)dac[gradient_buf[boton2]*3+2]-tmp_b)/(float)(boton2-boton1);
+    if (boton2 % 16 == 0 || boton2 == 127) {
+      while (boton1 + 1 < boton2) {
+        tmp_r += ((float)dac[gradient_buf[boton2] * 3] - tmp_r) / (float)(boton2 - boton1);
+        tmp_g += ((float)dac[gradient_buf[boton2] * 3 + 1] - tmp_g) / (float)(boton2 - boton1);
+        tmp_b += ((float)dac[gradient_buf[boton2] * 3 + 2] - tmp_b) / (float)(boton2 - boton1);
 
-        if (tmp_r>63.0) tmp_r=63.0; else if (tmp_r<0.0) tmp_r=0.0;
-        if (tmp_g>63.0) tmp_g=63.0; else if (tmp_g<0.0) tmp_g=0.0;
-        if (tmp_b>63.0) tmp_b=63.0; else if (tmp_b<0.0) tmp_b=0.0;
+        if (tmp_r > 63.0)
+          tmp_r = 63.0;
+        else if (tmp_r < 0.0)
+          tmp_r = 0.0;
+        if (tmp_g > 63.0)
+          tmp_g = 63.0;
+        else if (tmp_g < 0.0)
+          tmp_g = 0.0;
+        if (tmp_b > 63.0)
+          tmp_b = 63.0;
+        else if (tmp_b < 0.0)
+          tmp_b = 0.0;
 
         boton1++;
 
-        gradient_buf[boton1] = find_color(tmp_r,tmp_g,tmp_b);
+        gradient_buf[boton1] = find_color(tmp_r, tmp_g, tmp_b);
 
-        if (gradient_buf[boton1]!=gradient_buf[boton1-1]) {
-          tmp_r = dac[gradient_buf[boton1]*3];
-          tmp_g = dac[gradient_buf[boton1]*3+1];
-          tmp_b = dac[gradient_buf[boton1]*3+2];
+        if (gradient_buf[boton1] != gradient_buf[boton1 - 1]) {
+          tmp_r = dac[gradient_buf[boton1] * 3];
+          tmp_g = dac[gradient_buf[boton1] * 3 + 1];
+          tmp_b = dac[gradient_buf[boton1] * 3 + 2];
         }
       }
-      boton1=boton2;
+      boton1 = boton2;
     }
-    if(boton2==127) break;
+    if (boton2 == 127)
+      break;
   }
 }
 
@@ -153,127 +168,116 @@ void create_gradient_colors(struct _gcolor * gradient_config, byte * gradient_bu
 //  Codigo principal del show_dialog de gamas
 //-----------------------------------------------------------------------------
 
-void gama0(void)
-{
+void gama0(void) {
   int con;
 
-  v.type=1;
+  v.type = 1;
 
-  v.title=texts[420];
-  v.an=ancho_ga;
-  v.al=alto_ga;
+  v.title = texts[420];
+  v.an = ancho_ga;
+  v.al = alto_ga;
 
-  v.paint_handler=(voidReturnType)gama1;
-  v.click_handler=(voidReturnType)gama2;
-  v.close_handler=(voidReturnType)gama3;
+  v.paint_handler = (voidReturnType)gama1;
+  v.click_handler = (voidReturnType)gama2;
+  v.close_handler = (voidReturnType)gama3;
 
-  for(con=0; con<9; con++)
-  {
+  for (con = 0; con < 9; con++) {
     button_coords[con].y = 33;
   }
 
   button_coords[0].x = 10;
-  button_coords[1].x = button_coords[0].x+14;
-  button_coords[2].x = button_coords[0].x+14*2;
-  button_coords[3].x = button_coords[0].x+14*3;
-  button_coords[4].x = button_coords[0].x+14*4;
-  button_coords[5].x = button_coords[0].x+14*5;
-  button_coords[6].x = button_coords[0].x+14*6;
-  button_coords[7].x = button_coords[0].x+14*7;
-  button_coords[8].x = button_coords[0].x+14*8;
+  button_coords[1].x = button_coords[0].x + 14;
+  button_coords[2].x = button_coords[0].x + 14 * 2;
+  button_coords[3].x = button_coords[0].x + 14 * 3;
+  button_coords[4].x = button_coords[0].x + 14 * 4;
+  button_coords[5].x = button_coords[0].x + 14 * 5;
+  button_coords[6].x = button_coords[0].x + 14 * 6;
+  button_coords[7].x = button_coords[0].x + 14 * 7;
+  button_coords[8].x = button_coords[0].x + 14 * 8;
 
   // Aqui se inicializa el estado de la gama y los botones (r, g, b y selec)
 
   create_dac4();
-  memcpy(mis_colores,gradient_buf,128);
-  memcpy(mi_gama,gradient_config,sizeof(mi_gama));
+  memcpy(mis_colores, gradient_buf, 128);
+  memcpy(mi_gama, gradient_config, sizeof(mi_gama));
 
   // Botones Aceptar/Cancelar
 
-  _button(100,    7, v.al-14, 0);
-  _button(101, v.an-8, v.al-14, 2);
+  _button(100, 7, v.al - 14, 0);
+  _button(101, v.an - 8, v.al - 14, 2);
 
-  v_accept=0;
+  v_accept = 0;
 }
 
-void gama1(void)
-{
-  int an=v.an/big2,al=v.al/big2;
+void gama1(void) {
+  int an = v.an / big2, al = v.al / big2;
   int con;
 
   _show_items();
 
-  create_gradient_colors(gradient_config,gradient_buf);
+  create_gradient_colors(gradient_config, gradient_buf);
 
   // Mostrar botones
 
-  for(con=0; con<9; con++)
-  {
-    if(gradient_config[con].selec)
-      wput(v.ptr,an,al,button_coords[con].x,button_coords[con].y,-44);
+  for (con = 0; con < 9; con++) {
+    if (gradient_config[con].selec)
+      wput(v.ptr, an, al, button_coords[con].x, button_coords[con].y, -44);
     else
-      wput(v.ptr,an,al,button_coords[con].x,button_coords[con].y,-34);
+      wput(v.ptr, an, al, button_coords[con].x, button_coords[con].y, -34);
 
-    wrectangle(v.ptr, an, al, c0,
-                button_coords[con].x-4,   button_coords[con].y-15,   14, 14);
-    wbox       (v.ptr, an, al, gradient_config[con].color,
-                button_coords[con].x-4+1, button_coords[con].y-15+1, 12, 12);
+    wrectangle(v.ptr, an, al, c0, button_coords[con].x - 4, button_coords[con].y - 15, 14, 14);
+    wbox(v.ptr, an, al, gradient_config[con].color, button_coords[con].x - 4 + 1,
+         button_coords[con].y - 15 + 1, 12, 12);
   }
 
   // Mostrar gama
 
   wrectangle(v.ptr, an, al, c0, gama_x, gama_y, gama_an, 4);
-  for(con=0; con<128; con++)
-  {
-    wbox(v.ptr, an, al, gradient_buf[con],
-         gama_x+con+1, gama_y+1, 1, 2);
+  for (con = 0; con < 128; con++) {
+    wbox(v.ptr, an, al, gradient_buf[con], gama_x + con + 1, gama_y + 1, 1, 2);
   }
 }
 
-void gama2(void)
-{
+void gama2(void) {
   int con;
 
   _process_items();
 
-  switch(v.active_item)
-  {
-    case 0: end_dialog=1; v_accept=1; break;
-    case 1: end_dialog=1; break;
+  switch (v.active_item) {
+  case 0:
+    end_dialog = 1;
+    v_accept = 1;
+    break;
+  case 1:
+    end_dialog = 1;
+    break;
   }
 
-  if( !(mouse_b&1) && (prev_mouse_buttons&1) )
-  {
-    for (con=0; con<9; con++)
-    {
-      if ( wmouse_in(button_coords[con].x,button_coords[con].y,7,7) )
-      {
+  if (!(mouse_b & 1) && (prev_mouse_buttons & 1)) {
+    for (con = 0; con < 9; con++) {
+      if (wmouse_in(button_coords[con].x, button_coords[con].y, 7, 7)) {
         gradient_config[con].selec = !gradient_config[con].selec;
-        call((voidReturnType )v.paint_handler);
-        v.redraw=1;
-      }
-      else
-      if ( wmouse_in(button_coords[con].x-3, button_coords[con].y-15, 14, 14) )
-      {
+        call((voidReturnType)v.paint_handler);
+        v.redraw = 1;
+      } else if (wmouse_in(button_coords[con].x - 3, button_coords[con].y - 15, 14, 14)) {
         show_dialog((voidReturnType)Selcolor0);
-        if(SelColorOk)
-        {
+        if (SelColorOk) {
           gradient_config[con].selec = 1;
           gradient_config[con].color = SelColorFont;
-          gradient_config[con].r     = dac[SelColorFont*3];
-          gradient_config[con].g     = dac[SelColorFont*3+1];
-          gradient_config[con].b     = dac[SelColorFont*3+2];
+          gradient_config[con].r = dac[SelColorFont * 3];
+          gradient_config[con].g = dac[SelColorFont * 3 + 1];
+          gradient_config[con].b = dac[SelColorFont * 3 + 2];
         }
       }
     }
-    call((voidReturnType )v.paint_handler);
-    v.redraw=1;
+    call((voidReturnType)v.paint_handler);
+    v.redraw = 1;
   }
 }
 
 void gama3(void) {
   if (!v_accept) {
-    memcpy(gradient_buf,mis_colores,128);
-    memcpy(gradient_config,mi_gama,sizeof(mi_gama));
+    memcpy(gradient_buf, mis_colores, 128);
+    memcpy(gradient_config, mi_gama, sizeof(mi_gama));
   }
 }

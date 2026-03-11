@@ -7,109 +7,117 @@
 
 extern SDL_Surface *vga;
 
-void bwput_in_box(byte*dest,int dest_pitch,int dest_width,int dest_height,int x,int y,int n);
-void wtexc(byte*dest,int dest_pitch,int dest_width,int dest_height,
-           byte*p,int x,int y,byte an,int al,byte c);
+void bwput_in_box(byte *dest, int dest_pitch, int dest_width, int dest_height, int x, int y, int n);
+void wtexc(byte *dest, int dest_pitch, int dest_width, int dest_height, byte *p, int x, int y,
+           byte an, int al, byte c);
 
-void wtexn(byte*dest,int dest_pitch,byte*p,int x,int y,byte an,int al,byte c) ;
+void wtexn(byte *dest, int dest_pitch, byte *p, int x, int y, byte an, int al, byte c);
 
-           
+
 //-----------------------------------------------------------------------------
 //      Draw a button on a window
 //-----------------------------------------------------------------------------
 
 // button
 
-void boton(int n,int x,int y,int centro,int color) {
-	wwrite(v.ptr,v.an/big2,v.al/big2,x,y,centro,texts[100+n],color);
+void boton(int n, int x, int y, int centro, int color) {
+  wwrite(v.ptr, v.an / big2, v.al / big2, x, y, centro, texts[100 + n], color);
 }
 
 // Mouse button
-int ratonboton(int n,int x,int y,int centro) {
-	int an,al;
-	int mx=wmouse_x,my=wmouse_y;
+int ratonboton(int n, int x, int y, int centro) {
+  int an, al;
+  int mx = wmouse_x, my = wmouse_y;
 
-	an=text_len(texts[100+n]+1); 
-	al=7;
+  an = text_len(texts[100 + n] + 1);
+  al = 7;
 
-	switch (centro) {
-		case 0: 
-		break;
-		
-		case 1: 
-			x=x-(an>>1); 
-		break;
-		
-		case 2: 
-			x=x-an+1; 
-		break;
-		
-		case 3: 
-			y=y-(al>>1); 
-		break;
-		
-		case 4: 
-			x=x-(an>>1);
-			y=y-(al>>1); 
-		break;
-		
-		case 5: 
-			x=x-an+1; 
-			y=y-(al>>1); 
-		break;
-		
-		case 6: 
-			y=y-al+1; 
-		break;
-		
-		case 7: 
-			x=x-(an>>1); 
-			y=y-al+1; 
-		break;
-		
-		case 8: 
-			x=x-an+1; 
-			y=y-al+1; 
-		break;
-	}
+  switch (centro) {
+  case 0:
+    break;
 
-	return(mx>=x-3 && mx<=x+an+3 && my>=y-3 && my<=y+al+3);
+  case 1:
+    x = x - (an >> 1);
+    break;
+
+  case 2:
+    x = x - an + 1;
+    break;
+
+  case 3:
+    y = y - (al >> 1);
+    break;
+
+  case 4:
+    x = x - (an >> 1);
+    y = y - (al >> 1);
+    break;
+
+  case 5:
+    x = x - an + 1;
+    y = y - (al >> 1);
+    break;
+
+  case 6:
+    y = y - al + 1;
+    break;
+
+  case 7:
+    x = x - (an >> 1);
+    y = y - al + 1;
+    break;
+
+  case 8:
+    x = x - an + 1;
+    y = y - al + 1;
+    break;
+  }
+
+  return (mx >= x - 3 && mx <= x + an + 3 && my >= y - 3 && my <= y + al + 3);
 }
 
 //-----------------------------------------------------------------------------
 //      Draw a filled box on screen
 //-----------------------------------------------------------------------------
 
-void wbox(byte*dest,int dest_width,int dest_height,byte c,int x,int y,int an,int al) {
-  wbox_in_box(dest,dest_width,dest_width,dest_height,c,x,y,an,al);
+void wbox(byte *dest, int dest_width, int dest_height, byte c, int x, int y, int an, int al) {
+  wbox_in_box(dest, dest_width, dest_width, dest_height, c, x, y, an, al);
 }
 
-void wbox_in_box(byte*dest,int dest_pitch,int dest_width,int dest_height,byte c,int x,int y,int an,int al) {
+void wbox_in_box(byte *dest, int dest_pitch, int dest_width, int dest_height, byte c, int x, int y,
+                 int an, int al) {
+  byte *p;
 
-	byte *p;
+  if (big) {
+    dest_pitch *= 2;
+    dest_width *= 2;
+    dest_height *= 2;
+    x *= 2;
+    y *= 2;
+    an *= 2;
+    al *= 2;
+  }
 
-	if (big) {
-		dest_pitch*=2; dest_width*=2; dest_height*=2;
-		x*=2; y*=2; an*=2; al*=2;
-	}
 
-	
+  if (y < 0) {
+    al += y;
+    y = 0;
+  }
+  if (x < 0) {
+    an += x;
+    x = 0;
+  }
+  if (y + al > dest_height)
+    al = dest_height - y;
+  if (x + an > dest_width)
+    an = dest_width - x;
 
-
-  if (y<0) {al+=y; y=0;}
-  if (x<0) {an+=x; x=0;}
-  if (y+al>dest_height) al=dest_height-y;
-  if (x+an>dest_width) an=dest_width-x;
-
-  if (an>0 && al>0) {
-    p=dest+y*dest_pitch+x;
+  if (an > 0 && al > 0) {
+    p = dest + y * dest_pitch + x;
     do {
-      memset(p,c,an);
-      p+=dest_pitch;
+      memset(p, c, an);
+      p += dest_pitch;
     } while (--al);
-
-
-    
   }
 }
 
@@ -117,62 +125,71 @@ void wbox_in_box(byte*dest,int dest_pitch,int dest_width,int dest_height,byte c,
 //  Title bar
 //-----------------------------------------------------------------------------
 
-char dither_pattern[]={
-  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-  0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-  0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,
-  0,1,0,0,0,0,0,0,0,1,0,1,0,0,0,0,
-  0,1,0,1,0,0,0,0,0,1,0,1,0,0,0,0,
-  0,1,0,1,1,0,0,0,0,1,0,1,0,0,0,0,
-  0,1,0,1,1,0,0,0,0,1,0,1,0,0,1,0,
-  0,1,0,1,1,0,0,0,0,1,0,1,1,0,1,0,
-  0,1,0,1,1,0,1,0,0,1,0,1,1,0,1,0,
-  1,1,0,1,1,0,1,0,0,1,0,1,1,0,1,0,
-  1,1,0,1,1,0,1,0,0,1,1,1,1,0,1,0,
-  1,1,0,1,1,0,1,0,1,1,1,1,1,0,1,0,
-  1,1,1,1,1,0,1,0,1,1,1,1,1,0,1,0,
-  1,1,1,1,1,1,1,0,1,1,1,1,1,0,1,0,
-  1,1,1,1,1,1,1,0,1,1,1,1,1,0,1,1,
-  1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,
-  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
+char dither_pattern[] = {
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0,
+    0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 1, 0, 1, 0,
+    0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 1, 0, 1,
+    1, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0,
+    1, 1, 0, 1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 0, 1, 1, 1, 1, 0, 1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1,
+    1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1,
+    1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
 
-extern char cbs[65],cbn,cgs[65],cgn,crs[65],crn;
+extern char cbs[65], cbn, cgs[65], cgn, crs[65], crn;
 
-void wgra(byte*dest,int dest_width,int dest_height,byte color,int x,int y,int an,int al) {
-  int xx,yy,c,m;
-  char * cs, cn;
+void wgra(byte *dest, int dest_width, int dest_height, byte color, int x, int y, int an, int al) {
+  int xx, yy, c, m;
+  char *cs, cn;
 
   if (big) {
-    dest_width*=2; dest_height*=2;
-    x*=2; y*=2; an*=2; al*=2;
+    dest_width *= 2;
+    dest_height *= 2;
+    x *= 2;
+    y *= 2;
+    an *= 2;
+    al *= 2;
   }
 
-  if (y<0) {al+=y; y=0;}
-  if (x<0) {an+=x; x=0;}
-  if (y+al>dest_height) al=dest_height-y;
-  if (x+an>dest_width) an=dest_width-x;
+  if (y < 0) {
+    al += y;
+    y = 0;
+  }
+  if (x < 0) {
+    an += x;
+    x = 0;
+  }
+  if (y + al > dest_height)
+    al = dest_height - y;
+  if (x + an > dest_width)
+    an = dest_width - x;
 
-  if (color==c_r_low) {
-    cn=crn; cs=crs;
-  } else if (color==c1) {
-    cn=cgn; cs=cgs;
+  if (color == c_r_low) {
+    cn = crn;
+    cs = crs;
+  } else if (color == c1) {
+    cn = cgn;
+    cs = cgs;
   } else {
-    cn=cbn; cs=cbs;
+    cn = cbn;
+    cs = cbs;
   }
 
-  if (an>0 && al>0) {
-    xx=0;
+  if (an > 0 && al > 0) {
+    xx = 0;
     do {
-      c=(cn-1)*xx*16/an; m=c%16; c/=16;
-      yy=0;
+      c = (cn - 1) * xx * 16 / an;
+      m = c % 16;
+      c /= 16;
+      yy = 0;
       do {
-        if (dither_pattern[m*16+(xx%4)+(yy%4)*4]) {
-          dest[(y+yy)*dest_width+(x+xx)]=cs[c+1];
+        if (dither_pattern[m * 16 + (xx % 4) + (yy % 4) * 4]) {
+          dest[(y + yy) * dest_width + (x + xx)] = cs[c + 1];
         } else {
-          dest[(y+yy)*dest_width+(x+xx)]=cs[c];
+          dest[(y + yy) * dest_width + (x + xx)] = cs[c];
         }
-      } while (++yy<al);
-    } while (++xx<an);
+      } while (++yy < al);
+    } while (++xx < an);
   }
 }
 
@@ -180,26 +197,43 @@ void wgra(byte*dest,int dest_width,int dest_height,byte color,int x,int y,int an
 //      Highlight a box, like an icon under the cursor
 //-----------------------------------------------------------------------------
 
-void wresalta_box(byte*dest,int dest_width,int dest_height,int x,int y,int an,int al) {
+void wresalta_box(byte *dest, int dest_width, int dest_height, int x, int y, int an, int al) {
   byte *p;
 
   if (big) {
-    dest_width*=2; dest_height*=2;
-    x*=2; y*=2; an*=2; al*=2;
+    dest_width *= 2;
+    dest_height *= 2;
+    x *= 2;
+    y *= 2;
+    an *= 2;
+    al *= 2;
   }
 
-  if (y<0) {al+=y; y=0;}
-  if (x<0) {an+=x; x=0;}
-  if (y+al>dest_height) al=dest_height-y;
-  if (x+an>dest_width) an=dest_width-x;
+  if (y < 0) {
+    al += y;
+    y = 0;
+  }
+  if (x < 0) {
+    an += x;
+    x = 0;
+  }
+  if (y + al > dest_height)
+    al = dest_height - y;
+  if (x + an > dest_width)
+    an = dest_width - x;
 
-  if (an>0 && al>0) {
-    p=dest+y*dest_width+x; x=an;
+  if (an > 0 && al > 0) {
+    p = dest + y * dest_width + x;
+    x = an;
     do {
       do {
-        if (*p==c2) *p=c1; else if (*p==c3) *p=c2; p++;
+        if (*p == c2)
+          *p = c1;
+        else if (*p == c3)
+          *p = c2;
+        p++;
       } while (--an);
-      p+=dest_width-(an=x);
+      p += dest_width - (an = x);
     } while (--al);
   }
 }
@@ -208,511 +242,650 @@ void wresalta_box(byte*dest,int dest_width,int dest_height,int x,int y,int an,in
 //      Draw a rectangle outline
 //-----------------------------------------------------------------------------
 
-void wrectangle(byte*dest,int dest_width,int dest_height,byte c,int x,int y,int an,int al) {
-  wbox(dest,dest_width,dest_height,c,x,y,an,1);
-  wbox(dest,dest_width,dest_height,c,x,y+al-1,an,1);
-  wbox(dest,dest_width,dest_height,c,x,y+1,1,al-2);
-  wbox(dest,dest_width,dest_height,c,x+an-1,y+1,1,al-2);
+void wrectangle(byte *dest, int dest_width, int dest_height, byte c, int x, int y, int an, int al) {
+  wbox(dest, dest_width, dest_height, c, x, y, an, 1);
+  wbox(dest, dest_width, dest_height, c, x, y + al - 1, an, 1);
+  wbox(dest, dest_width, dest_height, c, x, y + 1, 1, al - 2);
+  wbox(dest, dest_width, dest_height, c, x + an - 1, y + 1, 1, al - 2);
 }
 
 //-----------------------------------------------------------------------------
 //      Puts a graph
 //-----------------------------------------------------------------------------
 
-void wput(byte*dest,int dest_width,int dest_height,int x,int y,int n) {
-  wput_in_box(dest,dest_width,dest_width,dest_height,x,y,n);
+void wput(byte *dest, int dest_width, int dest_height, int x, int y, int n) {
+  wput_in_box(dest, dest_width, dest_width, dest_height, x, y, n);
 }
 
-void wput_in_box(byte*dest,int dest_pitch,int dest_width,int dest_height,int x,int y,int n) {
-
-  int al,an;
+void wput_in_box(byte *dest, int dest_pitch, int dest_width, int dest_height, int x, int y, int n) {
+  int al, an;
   int block;
-  byte *p,*q;
+  byte *p, *q;
   int salta_x, long_x, resto_x;
   int salta_y, long_y, resto_y;
 
-  if (big) { 
-	if ((n>=32 || n<0) && n!=233) { 
-		bwput_in_box(dest,dest_pitch,dest_width,dest_height,x,y,n); return; 
-	}
-}
-  else {
-	if (n==mouse_graf && mouse_shift) { x=mouse_shift_x; y=mouse_shift_y; }
-}
-  if (n<0) { n=-n; block=1; } else block=0;
-
-  p=graf[n]+8;
-
-  al=*((word*)(graf[n]+2));
-  an=*((word*)graf[n]);
-
-  x-=*((word*)(graf[n]+4));
-  y-=*((word*)(graf[n]+6));
-
-  q=dest+y*dest_pitch+x;
-
-  if (x<0) salta_x=-x; else salta_x=0;
-  if (x+an>dest_width) resto_x=x+an-dest_width; else resto_x=0;
-  if ((long_x=an-salta_x-resto_x)<=0) return;
-
-  if (y<0) salta_y=-y; else salta_y=0;
-  if (y+al>dest_height) resto_y=y+al-dest_height; else resto_y=0;
-  if ((long_y=al-salta_y-resto_y)<=0) return;
-
-  p+=an*salta_y+salta_x; q+=dest_pitch*salta_y+salta_x;
-  resto_x+=salta_x; an=long_x;
-  
-  
-  if (block) do {
-    do {
-      switch(*p) {
-        case 0: *q=c0; break;
-        case 1: *q=c1; break;
-        case 2: *q=c2; break;
-        case 3: *q=c3; break;
-        case 4: *q=c4; break;
-      } p++; q++;
-    } while (--an);
-    q+=dest_pitch-(an=long_x); p+=resto_x;
-  } while (--long_y);
-  else do {
-    do {
-      switch(*p) {
-        case 1: *q=c1; break;
-        case 2: *q=c2; break;
-        case 3: *q=c3; break;
-        case 4: *q=c4; break;
-      } p++; q++;
-    } while (--an);
-    q+=dest_pitch-(an=long_x); p+=resto_x;
-  } while (--long_y);
-}
-
-void bwput_in_box(byte*dest,int dest_pitch,int dest_width,int dest_height,int x,int y,int n) {
-
-  int al,an;
-  int block;
-  byte *p,*q;
-  int salta_x, long_x, resto_x;
-  int salta_y, long_y, resto_y;
-
-  if (n<0) { n=-n; block=1; } else block=0;
-
-  p=graf[n]+8;
-
-  al=*((word*)(graf[n]+2));
-  an=*((word*)graf[n]);
-
-  x-=*((word*)(graf[n]+4)); 
-  y-=*((word*)(graf[n]+6));
-
-  if (dest_width>0) {
-    dest_pitch*=2; dest_width*=2; dest_height*=2; x*=2; y*=2;
+  if (big) {
+    if ((n >= 32 || n < 0) && n != 233) {
+      bwput_in_box(dest, dest_pitch, dest_width, dest_height, x, y, n);
+      return;
+    }
   } else {
-    dest_width=-dest_width; if (dest_pitch<0) dest_pitch=-dest_pitch;
+    if (n == mouse_graf && mouse_shift) {
+      x = mouse_shift_x;
+      y = mouse_shift_y;
+    }
+  }
+  if (n < 0) {
+    n = -n;
+    block = 1;
+  } else
+    block = 0;
+
+  p = graf[n] + 8;
+
+  al = *((word *)(graf[n] + 2));
+  an = *((word *)graf[n]);
+
+  x -= *((word *)(graf[n] + 4));
+  y -= *((word *)(graf[n] + 6));
+
+  q = dest + y * dest_pitch + x;
+
+  if (x < 0)
+    salta_x = -x;
+  else
+    salta_x = 0;
+  if (x + an > dest_width)
+    resto_x = x + an - dest_width;
+  else
+    resto_x = 0;
+  if ((long_x = an - salta_x - resto_x) <= 0)
+    return;
+
+  if (y < 0)
+    salta_y = -y;
+  else
+    salta_y = 0;
+  if (y + al > dest_height)
+    resto_y = y + al - dest_height;
+  else
+    resto_y = 0;
+  if ((long_y = al - salta_y - resto_y) <= 0)
+    return;
+
+  p += an * salta_y + salta_x;
+  q += dest_pitch * salta_y + salta_x;
+  resto_x += salta_x;
+  an = long_x;
+
+
+  if (block)
+    do {
+      do {
+        switch (*p) {
+        case 0:
+          *q = c0;
+          break;
+        case 1:
+          *q = c1;
+          break;
+        case 2:
+          *q = c2;
+          break;
+        case 3:
+          *q = c3;
+          break;
+        case 4:
+          *q = c4;
+          break;
+        }
+        p++;
+        q++;
+      } while (--an);
+      q += dest_pitch - (an = long_x);
+      p += resto_x;
+    } while (--long_y);
+  else
+    do {
+      do {
+        switch (*p) {
+        case 1:
+          *q = c1;
+          break;
+        case 2:
+          *q = c2;
+          break;
+        case 3:
+          *q = c3;
+          break;
+        case 4:
+          *q = c4;
+          break;
+        }
+        p++;
+        q++;
+      } while (--an);
+      q += dest_pitch - (an = long_x);
+      p += resto_x;
+    } while (--long_y);
+}
+
+void bwput_in_box(byte *dest, int dest_pitch, int dest_width, int dest_height, int x, int y,
+                  int n) {
+  int al, an;
+  int block;
+  byte *p, *q;
+  int salta_x, long_x, resto_x;
+  int salta_y, long_y, resto_y;
+
+  if (n < 0) {
+    n = -n;
+    block = 1;
+  } else
+    block = 0;
+
+  p = graf[n] + 8;
+
+  al = *((word *)(graf[n] + 2));
+  an = *((word *)graf[n]);
+
+  x -= *((word *)(graf[n] + 4));
+  y -= *((word *)(graf[n] + 6));
+
+  if (dest_width > 0) {
+    dest_pitch *= 2;
+    dest_width *= 2;
+    dest_height *= 2;
+    x *= 2;
+    y *= 2;
+  } else {
+    dest_width = -dest_width;
+    if (dest_pitch < 0)
+      dest_pitch = -dest_pitch;
   }
 
-  q=dest+y*dest_pitch+x;
+  q = dest + y * dest_pitch + x;
 
-  if (x<0) salta_x=-x; else salta_x=0;
-  if (x+an>dest_width) resto_x=x+an-dest_width; else resto_x=0;
-  if ((long_x=an-salta_x-resto_x)<=0) return;
+  if (x < 0)
+    salta_x = -x;
+  else
+    salta_x = 0;
+  if (x + an > dest_width)
+    resto_x = x + an - dest_width;
+  else
+    resto_x = 0;
+  if ((long_x = an - salta_x - resto_x) <= 0)
+    return;
 
-  if (y<0) salta_y=-y; else salta_y=0;
-  if (y+al>dest_height) resto_y=y+al-dest_height; else resto_y=0;
-  if ((long_y=al-salta_y-resto_y)<=0) return;
+  if (y < 0)
+    salta_y = -y;
+  else
+    salta_y = 0;
+  if (y + al > dest_height)
+    resto_y = y + al - dest_height;
+  else
+    resto_y = 0;
+  if ((long_y = al - salta_y - resto_y) <= 0)
+    return;
 
-  p+=an*salta_y+salta_x; q+=dest_pitch*salta_y+salta_x;
-  resto_x+=salta_x; an=long_x;
+  p += an * salta_y + salta_x;
+  q += dest_pitch * salta_y + salta_x;
+  resto_x += salta_x;
+  an = long_x;
 
-  if (block) do {
+  if (block)
     do {
-      switch(*p) {
-        case 0: *q=c0; break;
-        case 1: *q=c1; break;
-        case 2: *q=c2; break;
-        case 3: *q=c3; break;
-        case 4: *q=c4; break;
-      } p++; q++;
-    } while (--an);
-    q+=dest_pitch-(an=long_x); p+=resto_x;
-  } while (--long_y);
-  else do {
+      do {
+        switch (*p) {
+        case 0:
+          *q = c0;
+          break;
+        case 1:
+          *q = c1;
+          break;
+        case 2:
+          *q = c2;
+          break;
+        case 3:
+          *q = c3;
+          break;
+        case 4:
+          *q = c4;
+          break;
+        }
+        p++;
+        q++;
+      } while (--an);
+      q += dest_pitch - (an = long_x);
+      p += resto_x;
+    } while (--long_y);
+  else
     do {
-      switch(*p) {
-        case 1: *q=c1; break;
-        case 2: *q=c2; break;
-        case 3: *q=c3; break;
-        case 4: *q=c4; break;
-      } p++; q++;
-    } while (--an);
-    q+=dest_pitch-(an=long_x); p+=resto_x;
-  } while (--long_y);
+      do {
+        switch (*p) {
+        case 1:
+          *q = c1;
+          break;
+        case 2:
+          *q = c2;
+          break;
+        case 3:
+          *q = c3;
+          break;
+        case 4:
+          *q = c4;
+          break;
+        }
+        p++;
+        q++;
+      } while (--an);
+      q += dest_pitch - (an = long_x);
+      p += resto_x;
+    } while (--long_y);
 }
 
 //-----------------------------------------------------------------------------
 //      Dump window
 //-----------------------------------------------------------------------------
 
-void wvolcado(byte*dest,int dest_width,int dest_height,
-              byte *p,int x,int y,int an,int al,int salta) {
+void wvolcado(byte *dest, int dest_width, int dest_height, byte *p, int x, int y, int an, int al,
+              int salta) {
+  byte *q;
+  int salta_x, long_x, resto_x;
+  int salta_y, long_y, resto_y;
+  int vn = 0;
 
-	byte *q;
-	int salta_x, long_x, resto_x;
-	int salta_y, long_y, resto_y;
-	int vn=0;
+  q = dest + y * dest_width + x;
 
-	q=dest+y*dest_width+x;
+  if (x < 0)
+    salta_x = -x;
+  else
+    salta_x = 0;
+  if (x + an > dest_width)
+    resto_x = x + an - dest_width + salta;
+  else
+    resto_x = salta;
+  long_x = an + salta - salta_x - resto_x;
 
-  if (x<0) salta_x=-x; else salta_x=0;
-  if (x+an>dest_width) resto_x=x+an-dest_width+salta; else resto_x=salta;
-  long_x=an+salta-salta_x-resto_x;
+  if (y < 0)
+    salta_y = -y;
+  else
+    salta_y = 0;
+  if (y + al > dest_height)
+    resto_y = y + al - dest_height;
+  else
+    resto_y = 0;
+  long_y = al - salta_y - resto_y;
 
-  if (y<0) salta_y=-y; else salta_y=0;
-  if (y+al>dest_height) resto_y=y+al-dest_height; else resto_y=0;
-  long_y=al-salta_y-resto_y;
-
-  p+=an*salta_y+salta_x; q+=dest_width*salta_y+salta_x;
-  resto_x+=salta_x+long_x; an=long_x;
+  p += an * salta_y + salta_x;
+  q += dest_width * salta_y + salta_x;
+  resto_x += salta_x + long_x;
+  an = long_x;
   do {
-    memcpy(q,p,an); q+=dest_width; p+=resto_x;
-  } while (--long_y >0 && q<(dest+(dest_width*dest_height)));
+    memcpy(q, p, an);
+    q += dest_width;
+    p += resto_x;
+  } while (--long_y > 0 && q < (dest + (dest_width * dest_height)));
 }
 
 //-----------------------------------------------------------------------------
 //      draw hidden (greyed) Window
 //-----------------------------------------------------------------------------
 
-void wvolcado_oscuro(byte*dest,int dest_width,int dest_height,
-              byte *p,int x,int y,int an,int al,int salta) {
-
-  byte *q,*_ghost;
+void wvolcado_oscuro(byte *dest, int dest_width, int dest_height, byte *p, int x, int y, int an,
+                     int al, int salta) {
+  byte *q, *_ghost;
   int salta_x, long_x, resto_x;
   int salta_y, long_y, resto_y;
-	int vn=0;
+  int vn = 0;
 
-	SDL_Rect trc;
-	
-	for (vn=0;vn<max_windows;vn++) {
-		if(window[vn].ptr!=NULL)
-		if(window[vn].ptr==p) {
-			break;
-		}
-	}
-  q=dest+y*dest_width+x;
-  _ghost=ghost+256*(int)c0;
+  SDL_Rect trc;
 
-  if (x<0) salta_x=-x; else salta_x=0;
-  if (x+an>dest_width) resto_x=x+an-dest_width+salta; else resto_x=salta;
-  long_x=an+salta-salta_x-resto_x;
+  for (vn = 0; vn < max_windows; vn++) {
+    if (window[vn].ptr != NULL)
+      if (window[vn].ptr == p) {
+        break;
+      }
+  }
+  q = dest + y * dest_width + x;
+  _ghost = ghost + 256 * (int)c0;
 
-  if (y<0) salta_y=-y; else salta_y=0;
-  if (y+al>dest_height) resto_y=y+al-dest_height; else resto_y=0;
-  long_y=al-salta_y-resto_y;
+  if (x < 0)
+    salta_x = -x;
+  else
+    salta_x = 0;
+  if (x + an > dest_width)
+    resto_x = x + an - dest_width + salta;
+  else
+    resto_x = salta;
+  long_x = an + salta - salta_x - resto_x;
 
-  p+=an*salta_y+salta_x; q+=dest_width*salta_y+salta_x;
-  resto_x+=salta_x; an=long_x;
+  if (y < 0)
+    salta_y = -y;
+  else
+    salta_y = 0;
+  if (y + al > dest_height)
+    resto_y = y + al - dest_height;
+  else
+    resto_y = 0;
+  long_y = al - salta_y - resto_y;
+
+  p += an * salta_y + salta_x;
+  q += dest_width * salta_y + salta_x;
+  resto_x += salta_x;
+  an = long_x;
 
   do {
     do {
-      *q=*(_ghost+*p);
-      p++; q++;
+      *q = *(_ghost + *p);
+      p++;
+      q++;
     } while (--an);
-    
-    q+=dest_width-(an=long_x); p+=resto_x;
+
+    q += dest_width - (an = long_x);
+    p += resto_x;
   } while (--long_y);
 
 
-	trc.x=x;
-	trc.y=y;
-	trc.w=dest_width;
-	trc.h=dest_height;
-
+  trc.x = x;
+  trc.y = y;
+  trc.w = dest_width;
+  trc.h = dest_height;
 }
 
 //-----------------------------------------------------------------------------
 //      Text rendering functions
 //-----------------------------------------------------------------------------
-typedef  struct { byte an; word dir; } sscar;
+typedef struct {
+  byte an;
+  word dir;
+} sscar;
 // * car;
 
 int char_len(char c) {
-	sscar *car;
-  car=(sscar *)(text_font+1); return(car[c].an);
+  sscar *car;
+  car = (sscar *)(text_font + 1);
+  return (car[c].an);
 }
 
-int text_len(byte * ptr) {
-
-	int an;
-
-	sscar *car;
-
-	car=(sscar*)(text_font+1); an=0;
-	while (*ptr) {
-		an+=car[*ptr].an;
-		ptr++;
-	}
-	if (big)
-		an/=2;
-
-	if (an)
-		an--;
-
-
-	return(an);
-
-}
-
-
-int text_len2(byte * ptr) {
+int text_len(byte *ptr) {
   int an;
-	sscar *car;
-	car=(sscar*)(text_font+1);
-	an=0;
 
-	while (*ptr) { 
-		an+=car[*ptr].an; 
-		ptr++; 
-	}
+  sscar *car;
 
-	debugprintf("text_len2 %s: %d\n",ptr,an);
+  car = (sscar *)(text_font + 1);
+  an = 0;
+  while (*ptr) {
+    an += car[*ptr].an;
+    ptr++;
+  }
+  if (big)
+    an /= 2;
 
-	if (big) 
-		an/=2; 
-	
-	return(an-1);
+  if (an)
+    an--;
+
+
+  return (an);
 }
 
-void wwrite(byte*dest,int dest_width,int dest_height,
-            int x,int y,int centro,byte * ptr,byte c) {
-				
-	wwrite_in_box(dest,dest_width,dest_width,dest_height,x,y,centro,ptr,c);
+
+int text_len2(byte *ptr) {
+  int an;
+  sscar *car;
+  car = (sscar *)(text_font + 1);
+  an = 0;
+
+  while (*ptr) {
+    an += car[*ptr].an;
+    ptr++;
+  }
+
+  debugprintf("text_len2 %s: %d\n", ptr, an);
+
+  if (big)
+    an /= 2;
+
+  return (an - 1);
+}
+
+void wwrite(byte *dest, int dest_width, int dest_height, int x, int y, int centro, byte *ptr,
+            byte c) {
+  wwrite_in_box(dest, dest_width, dest_width, dest_height, x, y, centro, ptr, c);
 }
 
 extern SDL_Surface *vga;
 
 extern struct t_listboxbr larchivosbr;
 
-void wwrite_in_box(byte*dest,int dest_pitch,int dest_width,int dest_height,
-            int x,int y,int centro,byte * ptr,byte c) {
+void wwrite_in_box(byte *dest, int dest_pitch, int dest_width, int dest_height, int x, int y,
+                   int centro, byte *ptr, byte c) {
+  int an, al, boton, multi;
 
-	int an,al,boton,multi;
+  byte *font;
 
-	byte * font;
+  sscar *car;
 
-	sscar *car;
+  if (centro >= 10) {
+    centro -= 10;
+    multi = 1;
+  } else
+    multi = 0;
 
-	if (centro>=10) { 
-		centro-=10; 
-		multi=1; 
-	} else 
-		multi=0;
+  if (*ptr == '\xd') {
+    boton = 1;
+    ptr++;
+  } else
+    boton = 0;
 
-	if (*ptr=='\xd') { 
-		boton=1; 
-		ptr++; 
-	} else boton=0;
+  car = (sscar *)(text_font + 1);
 
-	car=(sscar*)(text_font+1);
+  if (big && !multi) {
+    an = text_len(ptr);
+    al = 7;
+  } else {
+    font = ptr;
+    an = 0;
 
-	if (big&&!multi) {
-		an=text_len(ptr); al=7;
-	} else {
-		font=ptr; 
-		an=0; 
-		
-		while (*font) { 
-			an+=car[*font].an; 
-			font++; 
-		}
-		
-		al=*text_font; if (an) an--;
-	}
+    while (*font) {
+      an += car[*font].an;
+      font++;
+    }
 
-	font=text_font+1025;
+    al = *text_font;
+    if (an)
+      an--;
+  }
 
-	switch (centro) {
-		case 0: 
-		break;
-		
-		case 1: 
-			x=x-(an>>1); 
-		break;
-		
-		case 2: 
-			x=x-an+1; 
-		break;
-		
-		case 3: 
-			y=y-(al>>1); 
-		break;
-		
-		case 4: 
-			x=x-(an>>1); 
-			y=y-(al>>1); 
-		break;
-		
-		case 5: 
-			x=x-an+1; 
-			y=y-(al>>1); 
-		break;
-		
-		case 6: 
-			y=y-al+1; 
-		break;
-		
-		case 7: 
-			x=x-(an>>1); 
-			y=y-al+1; 
-		break;
-		
-		case 8: 
-			x=x-an+1; 
-			y=y-al+1; 
-		break;
-	}
+  font = text_font + 1025;
 
-	if (boton) {
-		if (c!=c0) {
-			wbox(dest,dest_pitch,dest_height,c2,x-2,y-2,an+4,al+4);
-			wrectangle(dest,dest_pitch,dest_height,c0,x-3,y-3,an+6,al+6);
-			wrectangle(dest,dest_pitch,dest_height,c3,x-2,y-2,an+3,1);
-			wrectangle(dest,dest_pitch,dest_height,c3,x-2,y-2,1,al+3);
-			wrectangle(dest,dest_pitch,dest_height,c4,x-2,y-2,1,1);
-			wrectangle(dest,dest_pitch,dest_height,c1,x-1,y+al+1,an+3,1);
-			wrectangle(dest,dest_pitch,dest_height,c1,x+an+1,y-1,1,al+3);
-			if (big) {
-				*(dest+(2*y-3)*dest_pitch*2+2*x-4)=c3;
-				*(dest+(2*y-4)*dest_pitch*2+2*x-3)=c3;
-				*(dest+(2*y-4)*dest_pitch*2+2*(x+an)+2)=c3;
-				*(dest+(2*y-3)*dest_pitch*2+2*(x+an)+3)=c1;
-				*(dest+(2*(y+al)+2)*dest_pitch*2+2*x-4)=c3;
-				*(dest+(2*(y+al)+3)*dest_pitch*2+2*x-3)=c1;
-			}
-		} else {
-			wbox(dest,dest_pitch,dest_height,c1,x-2,y-2,an+4,al+4);
-			wrectangle(dest,dest_pitch,dest_height,c0,x-3,y-3,an+6,al+6);
-			wrectangle(dest,dest_pitch,dest_height,c0,x-2,y-2,an+3,1);
-			wrectangle(dest,dest_pitch,dest_height,c0,x-2,y-2,1,al+3);
-			wrectangle(dest,dest_pitch,dest_height,c2,x-1,y+al+1,an+3,1);
-			wrectangle(dest,dest_pitch,dest_height,c2,x+an+1,y-1,1,al+3);
-			wrectangle(dest,dest_pitch,dest_height,c3,x+an+1,y+al+1,1,1);
+  switch (centro) {
+  case 0:
+    break;
 
-			if (big) {
-				*(dest+(2*(y+al)+3)*dest_pitch*2+2*(x+an)+2)=c2;
-				*(dest+(2*(y+al)+2)*dest_pitch*2+2*(x+an)+3)=c2;
-				*(dest+(2*y-4)*dest_pitch*2+2*(x+an)+2)=c0;
-				*(dest+(2*y-3)*dest_pitch*2+2*(x+an)+3)=c2;
-				*(dest+(2*(y+al)+2)*dest_pitch*2+2*x-4)=c0;
-				*(dest+(2*(y+al)+3)*dest_pitch*2+2*x-3)=c2;
-			}
-		}
-	}
+  case 1:
+    x = x - (an >> 1);
+    break;
 
-	if (big&&!multi) {
-		dest_pitch*=2; dest_width*=2; dest_height*=2;
-		x*=2; y*=2; an*=2; al*=2;
-	}
+  case 2:
+    x = x - an + 1;
+    break;
+
+  case 3:
+    y = y - (al >> 1);
+    break;
+
+  case 4:
+    x = x - (an >> 1);
+    y = y - (al >> 1);
+    break;
+
+  case 5:
+    x = x - an + 1;
+    y = y - (al >> 1);
+    break;
+
+  case 6:
+    y = y - al + 1;
+    break;
+
+  case 7:
+    x = x - (an >> 1);
+    y = y - al + 1;
+    break;
+
+  case 8:
+    x = x - an + 1;
+    y = y - al + 1;
+    break;
+  }
+
+  if (boton) {
+    if (c != c0) {
+      wbox(dest, dest_pitch, dest_height, c2, x - 2, y - 2, an + 4, al + 4);
+      wrectangle(dest, dest_pitch, dest_height, c0, x - 3, y - 3, an + 6, al + 6);
+      wrectangle(dest, dest_pitch, dest_height, c3, x - 2, y - 2, an + 3, 1);
+      wrectangle(dest, dest_pitch, dest_height, c3, x - 2, y - 2, 1, al + 3);
+      wrectangle(dest, dest_pitch, dest_height, c4, x - 2, y - 2, 1, 1);
+      wrectangle(dest, dest_pitch, dest_height, c1, x - 1, y + al + 1, an + 3, 1);
+      wrectangle(dest, dest_pitch, dest_height, c1, x + an + 1, y - 1, 1, al + 3);
+      if (big) {
+        *(dest + (2 * y - 3) * dest_pitch * 2 + 2 * x - 4) = c3;
+        *(dest + (2 * y - 4) * dest_pitch * 2 + 2 * x - 3) = c3;
+        *(dest + (2 * y - 4) * dest_pitch * 2 + 2 * (x + an) + 2) = c3;
+        *(dest + (2 * y - 3) * dest_pitch * 2 + 2 * (x + an) + 3) = c1;
+        *(dest + (2 * (y + al) + 2) * dest_pitch * 2 + 2 * x - 4) = c3;
+        *(dest + (2 * (y + al) + 3) * dest_pitch * 2 + 2 * x - 3) = c1;
+      }
+    } else {
+      wbox(dest, dest_pitch, dest_height, c1, x - 2, y - 2, an + 4, al + 4);
+      wrectangle(dest, dest_pitch, dest_height, c0, x - 3, y - 3, an + 6, al + 6);
+      wrectangle(dest, dest_pitch, dest_height, c0, x - 2, y - 2, an + 3, 1);
+      wrectangle(dest, dest_pitch, dest_height, c0, x - 2, y - 2, 1, al + 3);
+      wrectangle(dest, dest_pitch, dest_height, c2, x - 1, y + al + 1, an + 3, 1);
+      wrectangle(dest, dest_pitch, dest_height, c2, x + an + 1, y - 1, 1, al + 3);
+      wrectangle(dest, dest_pitch, dest_height, c3, x + an + 1, y + al + 1, 1, 1);
+
+      if (big) {
+        *(dest + (2 * (y + al) + 3) * dest_pitch * 2 + 2 * (x + an) + 2) = c2;
+        *(dest + (2 * (y + al) + 2) * dest_pitch * 2 + 2 * (x + an) + 3) = c2;
+        *(dest + (2 * y - 4) * dest_pitch * 2 + 2 * (x + an) + 2) = c0;
+        *(dest + (2 * y - 3) * dest_pitch * 2 + 2 * (x + an) + 3) = c2;
+        *(dest + (2 * (y + al) + 2) * dest_pitch * 2 + 2 * x - 4) = c0;
+        *(dest + (2 * (y + al) + 3) * dest_pitch * 2 + 2 * x - 3) = c2;
+      }
+    }
+  }
+
+  if (big && !multi) {
+    dest_pitch *= 2;
+    dest_width *= 2;
+    dest_height *= 2;
+    x *= 2;
+    y *= 2;
+    an *= 2;
+    al *= 2;
+  }
 
 
-	if (y<dest_height && y+al>0) {
-		if (y>=0 && y+al<=dest_height) { // Text fits entirely (y axis)
-			while (*ptr && x+car[*ptr].an<=0) { 
-				x=x+car[*ptr].an; 
-				ptr++; 
-			}
-			
-			if (*ptr && x<0) {
-				wtexc(dest,dest_pitch,dest_width,dest_height,font+car[*ptr].dir,x,y,car[*ptr].an,al,c);
-				x=x+car[*ptr].an; 
-				ptr++; 
-			}
-			
-			while (*ptr && x+car[*ptr].an<=dest_width) {
-				wtexn(dest,dest_pitch,font+car[*ptr].dir,x,y,car[*ptr].an,al,c);
-				x=x+car[*ptr].an; 
-				ptr++; 
-			}
-			
-			if (*ptr && x<dest_width)
-				wtexc(dest,dest_pitch,dest_width,dest_height,font+car[*ptr].dir,x,y,car[*ptr].an,al,c);
-		} else {
-			while (*ptr && x+car[*ptr].an<=0) { 
-				x=x+car[*ptr].an; 
-				ptr++; 
-			}
-			while (*ptr && x<dest_width) {
-				wtexc(dest,dest_pitch,dest_width,dest_height,font+car[*ptr].dir,x,y,car[*ptr].an,al,c);
-				x=x+car[*ptr].an; ptr++; 
-			}
-		}
-	}
+  if (y < dest_height && y + al > 0) {
+    if (y >= 0 && y + al <= dest_height) { // Text fits entirely (y axis)
+      while (*ptr && x + car[*ptr].an <= 0) {
+        x = x + car[*ptr].an;
+        ptr++;
+      }
 
+      if (*ptr && x < 0) {
+        wtexc(dest, dest_pitch, dest_width, dest_height, font + car[*ptr].dir, x, y, car[*ptr].an,
+              al, c);
+        x = x + car[*ptr].an;
+        ptr++;
+      }
+
+      while (*ptr && x + car[*ptr].an <= dest_width) {
+        wtexn(dest, dest_pitch, font + car[*ptr].dir, x, y, car[*ptr].an, al, c);
+        x = x + car[*ptr].an;
+        ptr++;
+      }
+
+      if (*ptr && x < dest_width)
+        wtexc(dest, dest_pitch, dest_width, dest_height, font + car[*ptr].dir, x, y, car[*ptr].an,
+              al, c);
+    } else {
+      while (*ptr && x + car[*ptr].an <= 0) {
+        x = x + car[*ptr].an;
+        ptr++;
+      }
+      while (*ptr && x < dest_width) {
+        wtexc(dest, dest_pitch, dest_width, dest_height, font + car[*ptr].dir, x, y, car[*ptr].an,
+              al, c);
+        x = x + car[*ptr].an;
+        ptr++;
+      }
+    }
+  }
 }
 
-void wtexn(byte*dest,int dest_pitch,byte*p,int x,int y,byte an,int al,byte c) {
+void wtexn(byte *dest, int dest_pitch, byte *p, int x, int y, byte an, int al, byte c) {
+  byte *q = dest + y * dest_pitch + x;
+  int ancho = an;
 
-	byte *q=dest+y*dest_pitch+x;
-	int ancho=an;
-
-	do {
-		do {
-			if (*p) 
-				*q=c; 
-			p++; 
-			q++;
-		} while (--an);
-		q+=dest_pitch-(an=ancho);
-	} while (--al);
+  do {
+    do {
+      if (*p)
+        *q = c;
+      p++;
+      q++;
+    } while (--an);
+    q += dest_pitch - (an = ancho);
+  } while (--al);
 }
 
-void wtexc(byte*dest,int dest_pitch,int dest_width,int dest_height,
-           byte*p,int x,int y,byte an,int al,byte c) {
+void wtexc(byte *dest, int dest_pitch, int dest_width, int dest_height, byte *p, int x, int y,
+           byte an, int al, byte c) {
+  byte *q = dest + y * dest_pitch + x;
 
-	byte *q=dest+y*dest_pitch+x;
+  int salta_x, long_x, resto_x;
+  int salta_y, long_y, resto_y;
 
-	int salta_x, long_x, resto_x;
-	int salta_y, long_y, resto_y;
+  if (x < 0)
+    salta_x = -x;
+  else
+    salta_x = 0;
 
-	if (x<0) 
-		salta_x=-x; 
-	else 
-		salta_x=0;
-	
-	if (x+an>dest_width) 
-		resto_x=x+an-dest_width; 
-	else 
-		resto_x=0;
+  if (x + an > dest_width)
+    resto_x = x + an - dest_width;
+  else
+    resto_x = 0;
 
-	long_x=an-salta_x-resto_x;
+  long_x = an - salta_x - resto_x;
 
-	if (y<0) 
-		salta_y=-y; 
-	else 
-		salta_y=0;
+  if (y < 0)
+    salta_y = -y;
+  else
+    salta_y = 0;
 
-	if (y+al>dest_height) 
-		resto_y=y+al-dest_height; 
-	else 
-		resto_y=0;
+  if (y + al > dest_height)
+    resto_y = y + al - dest_height;
+  else
+    resto_y = 0;
 
-	long_y=al-salta_y-resto_y;
+  long_y = al - salta_y - resto_y;
 
-	p+=an*salta_y+salta_x; 
-	q+=dest_pitch*salta_y+salta_x;
-	resto_x+=salta_x; 
-	an=long_x;
+  p += an * salta_y + salta_x;
+  q += dest_pitch * salta_y + salta_x;
+  resto_x += salta_x;
+  an = long_x;
 
-	do {
-		do {
-			if (*p) 
-				*q=c; 
-			p++; 
-			q++;
-		} while (--an);
+  do {
+    do {
+      if (*p)
+        *q = c;
+      p++;
+      q++;
+    } while (--an);
 
-		q+=dest_pitch-(an=long_x); 
-		p+=resto_x;
-	} while (--long_y);
+    q += dest_pitch - (an = long_x);
+    p += resto_x;
+  } while (--long_y);
 }
-

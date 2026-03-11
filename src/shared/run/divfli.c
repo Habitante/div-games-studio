@@ -8,15 +8,15 @@
 static void Error_Reporter(char *msg);
 static void Palette_Update(TFUByte (*palette)[256][3]);
 
-TFAnimation *animation=NULL;
+TFAnimation *animation = NULL;
 char *CBuffer;
-int CBuff_alt,TFOffset;
+int CBuff_alt, TFOffset;
 int CBuff_anc;
 TFUByte *TFframe, (*TFpalette)[256][3];
 TFAnimationInfo info;
 char TFNombre[256];
 
-int fli_palette_update=0;
+int fli_palette_update = 0;
 
 struct {
   FILE *file;
@@ -24,21 +24,21 @@ struct {
   Uint32 membufSize;
   Uint8 *pFrame;
   Uint8 *pChunk;
-  Uint16 FrameCount;    /* Frame Counter */
+  Uint16 FrameCount; /* Frame Counter */
   /*
   */
-  Uint32 HeaderSize;    /* Fli file size */
-  Uint16 HeaderCheck;   /* Fli header check */
-  Uint16 HeaderFrames;  /* Number of frames in flic */
-  Uint16 HeaderWidth;   /* Fli width */
-  Uint16 HeaderHeight;  /* Fli heigth */
-  Uint16 HeaderDepth;   /* Color depth */
-  Uint16 HeaderSpeed;   /* Number of video ticks between frame */
-  Uint32 FrameSize;     /* Frame size in bytes */
-  Uint16 FrameCheck;    /* Frame check */
-  Uint16 FrameChunks;   /* Number of chunks in frame */
-  Uint32 ChunkSize;     /* Size of chunk */
-  Uint16 ChunkType;     /* Type of chunk */
+  Uint32 HeaderSize;   /* Fli file size */
+  Uint16 HeaderCheck;  /* Fli header check */
+  Uint16 HeaderFrames; /* Number of frames in flic */
+  Uint16 HeaderWidth;  /* Fli width */
+  Uint16 HeaderHeight; /* Fli heigth */
+  Uint16 HeaderDepth;  /* Color depth */
+  Uint16 HeaderSpeed;  /* Number of video ticks between frame */
+  Uint32 FrameSize;    /* Frame size in bytes */
+  Uint16 FrameCheck;   /* Frame check */
+  Uint16 FrameChunks;  /* Number of chunks in frame */
+  Uint32 ChunkSize;    /* Size of chunk */
+  Uint16 ChunkType;    /* Type of chunk */
   /*
   */
   OSDEP_Surface *mainscreen;
@@ -54,203 +54,204 @@ struct {
 } flc;
 
 void ReadU16(uint16_t *tmp1, uint8_t *tmp2) {
-	*tmp1= ((Uint8)*(tmp2+1)<<8)+(Uint8)*(tmp2);
+  *tmp1 = ((Uint8) * (tmp2 + 1) << 8) + (Uint8) * (tmp2);
 }
 
 void ReadU32(uint32_t *tmp1, uint8_t *tmp2) {
-	*tmp1= (((((((Uint8)*(tmp2+3)<<8)+((Uint8)*(tmp2+2)))<<8)+((Uint8)*(tmp2+1)))<<8)+(Uint8)*(tmp2));
+  *tmp1 = (((((((Uint8) * (tmp2 + 3) << 8) + ((Uint8) * (tmp2 + 2))) << 8) + ((Uint8) * (tmp2 + 1)))
+            << 8) +
+           (Uint8) * (tmp2));
 }
 
-void FlcReadFile(Uint32 size)
-{ if(size>flc.membufSize) {
-    if(!(flc.pMembuf=(byte *)realloc(flc.pMembuf, size+1))) {
+void FlcReadFile(Uint32 size) {
+  if (size > flc.membufSize) {
+    if (!(flc.pMembuf = (byte *)realloc(flc.pMembuf, size + 1))) {
       printf("Realloc failed: %d\n", size);
       exit(1);
     }
   }
 
-  if(fread(flc.pMembuf, sizeof(Uint8), size, flc.file)==0) {
+  if (fread(flc.pMembuf, sizeof(Uint8), size, flc.file) == 0) {
     printf("Can't read flx file");
     exit(1);
   }
 } /* FlcReadFile */
 
 #ifdef DIV1
-extern FILE * div_open_file(byte * file);
+extern FILE *div_open_file(byte *file);
 #else
-extern FILE * div_open_file(char * file);
+extern FILE *div_open_file(char *file);
 #endif
 
 int FlcCheckHeader(char *filename) {
 #ifdef DIV1
- if((flc.file=div_open_file((byte *)filename))==NULL) 
+  if ((flc.file = div_open_file((byte *)filename)) == NULL)
 #else
- if((flc.file=div_open_file((char *)filename))==NULL) 
+  if ((flc.file = div_open_file((char *)filename)) == NULL)
 #endif
 
-    return(1);
-  
+    return (1);
+
 
   FlcReadFile(128);
 
   ReadU32(&flc.HeaderSize, flc.pMembuf);
-  ReadU16(&flc.HeaderCheck, flc.pMembuf+4);
-  ReadU16(&flc.HeaderFrames, flc.pMembuf+6);
-  ReadU16(&flc.HeaderWidth, flc.pMembuf+8);
-  ReadU16(&flc.HeaderHeight, flc.pMembuf+10);
-  ReadU16(&flc.HeaderDepth, flc.pMembuf+12);
-  ReadU16(&flc.HeaderSpeed, flc.pMembuf+16);
+  ReadU16(&flc.HeaderCheck, flc.pMembuf + 4);
+  ReadU16(&flc.HeaderFrames, flc.pMembuf + 6);
+  ReadU16(&flc.HeaderWidth, flc.pMembuf + 8);
+  ReadU16(&flc.HeaderHeight, flc.pMembuf + 10);
+  ReadU16(&flc.HeaderDepth, flc.pMembuf + 12);
+  ReadU16(&flc.HeaderSpeed, flc.pMembuf + 16);
 
 
-  if((flc.HeaderCheck==0x0AF12) || (flc.HeaderCheck==0x0AF11)) { 
-    flc.screen_w=flc.HeaderWidth;
-    flc.screen_h=flc.HeaderHeight;
-    flc.screen_depth=8;
-    if(flc.HeaderCheck==0x0AF11) {
-      flc.HeaderSpeed*=1000/70;
+  if ((flc.HeaderCheck == 0x0AF12) || (flc.HeaderCheck == 0x0AF11)) {
+    flc.screen_w = flc.HeaderWidth;
+    flc.screen_h = flc.HeaderHeight;
+    flc.screen_depth = 8;
+    if (flc.HeaderCheck == 0x0AF11) {
+      flc.HeaderSpeed *= 1000 / 70;
     }
-    return(0);
+    return (0);
   }
-  return(1);
+  return (1);
 } /* FlcCheckHeader */
 
-void FlcInitFirstFrame()
-{ flc.FrameSize=16;
-  flc.FrameCount=0;
-  if(fseek(flc.file, 128, SEEK_SET)) {
+void FlcInitFirstFrame() {
+  flc.FrameSize = 16;
+  flc.FrameCount = 0;
+  if (fseek(flc.file, 128, SEEK_SET)) {
     printf("Fseek read failed\n");
-    exit (1);
+    exit(1);
   };
   FlcReadFile(flc.FrameSize);
 } /* FlcInitFirstFrame */
 
 extern OSDEP_Surface *vga;
 
-int StartFLI(char *flinombre, char *Buffer, int Buff_anc,int Buff_alt,int cx,int cy)
-{
-	char nombre[strlen(flinombre)+10];
-	flc.pMembuf=NULL;
-	flc.membufSize=0;
-	flc.mainscreen=vga;//Buffer;
-	flc.buffer=(byte *)Buffer;
-	
-	div_strcpy(nombre,sizeof(nombre),flinombre);
-	
-	if(FlcCheckHeader(nombre)) {
-		printf("Wrong header\n");
-		return 0;
-	}
-printf("Loaded %s\n",nombre);
-FlcInitFirstFrame();
-printf("Frames: %d\n",flc.HeaderFrames);
-return flc.HeaderFrames;
+int StartFLI(char *flinombre, char *Buffer, int Buff_anc, int Buff_alt, int cx, int cy) {
+  char nombre[strlen(flinombre) + 10];
+  flc.pMembuf = NULL;
+  flc.membufSize = 0;
+  flc.mainscreen = vga; //Buffer;
+  flc.buffer = (byte *)Buffer;
+
+  div_strcpy(nombre, sizeof(nombre), flinombre);
+
+  if (FlcCheckHeader(nombre)) {
+    printf("Wrong header\n");
+    return 0;
+  }
+  printf("Loaded %s\n", nombre);
+  FlcInitFirstFrame();
+  printf("Frames: %d\n", flc.HeaderFrames);
+  return flc.HeaderFrames;
 }
 
-void COLORS256()
-{ Uint8 *pSrc;
+void COLORS256() {
+  Uint8 *pSrc;
   Uint16 NumColorPackets;
   Uint16 NumColors;
   Uint8 NumColorsSkip;
   int i;
 
-  pSrc=flc.pChunk+6;
+  pSrc = flc.pChunk + 6;
   ReadU16(&NumColorPackets, pSrc);
-  pSrc+=2;
-  while(NumColorPackets--) {
-    NumColorsSkip=*(pSrc++);
-    if(!(NumColors=*(pSrc++))) {
-      NumColors=256;
+  pSrc += 2;
+  while (NumColorPackets--) {
+    NumColorsSkip = *(pSrc++);
+    if (!(NumColors = *(pSrc++))) {
+      NumColors = 256;
     }
-    i=0;
-    while(NumColors--) {
-      flc.colors[i].r=*(pSrc++);
-      flc.colors[i].g=*(pSrc++);
-      flc.colors[i].b=*(pSrc++);
+    i = 0;
+    while (NumColors--) {
+      flc.colors[i].r = *(pSrc++);
+      flc.colors[i].g = *(pSrc++);
+      flc.colors[i].b = *(pSrc++);
       i++;
     }
     OSDEP_SetPalette(flc.mainscreen, flc.colors, NumColorsSkip, i);
   }
 } /* COLORS256 */
 
-void SS2()
-{ Uint8 *pSrc, *pDst, *pTmpDst;
+void SS2() {
+  Uint8 *pSrc, *pDst, *pTmpDst;
   Sint8 CountData;
   Uint8 ColumSkip, Fill1, Fill2;
   Uint16 Lines, Count;
 
-  pSrc=flc.pChunk+6;
-  pDst=flc.buffer;//mainscreen;//->pixels;
+  pSrc = flc.pChunk + 6;
+  pDst = flc.buffer; //mainscreen;//->pixels;
   ReadU16(&Lines, pSrc);
-  pSrc+=2;
-  while(Lines--) {
+  pSrc += 2;
+  while (Lines--) {
     ReadU16(&Count, pSrc);
-    pSrc+=2;
+    pSrc += 2;
 
-    while(Count & 0xc000) {
-/* Upper bits 11 - Lines skip 
+    while (Count & 0xc000) {
+      /* Upper bits 11 - Lines skip 
 */
-      if((Count & 0xc000)==0xc000) {  // 0xc000h = 1100000000000000
-        pDst+=(0x10000-Count)*vga_width;//flc.mainscreen->pitch;
+      if ((Count & 0xc000) == 0xc000) {        // 0xc000h = 1100000000000000
+        pDst += (0x10000 - Count) * vga_width; //flc.mainscreen->pitch;
       }
 
-      if((Count & 0xc000)==0x4000) {  // 0x4000h = 0100000000000000
+      if ((Count & 0xc000) == 0x4000) { // 0x4000h = 0100000000000000
 /* Upper bits 01 - Last pixel
 */
 #ifdef DEBUG
-            printf("Last pixel not implemented");
+        printf("Last pixel not implemented");
 #endif
       }
       ReadU16(&Count, pSrc);
-      pSrc+=2;
+      pSrc += 2;
     }
 
-    if((Count & 0xc000)==0x0000) {      // 0xc000h = 1100000000000000
-      pTmpDst=pDst;
-      while(Count--) {
-        ColumSkip=*(pSrc++);
-        pTmpDst+=ColumSkip;
-        CountData=*(pSrc++);
-        if(CountData>0) {
-          while(CountData--) {
-            *(pTmpDst++)=*(pSrc++);
-            *(pTmpDst++)=*(pSrc++);
+    if ((Count & 0xc000) == 0x0000) { // 0xc000h = 1100000000000000
+      pTmpDst = pDst;
+      while (Count--) {
+        ColumSkip = *(pSrc++);
+        pTmpDst += ColumSkip;
+        CountData = *(pSrc++);
+        if (CountData > 0) {
+          while (CountData--) {
+            *(pTmpDst++) = *(pSrc++);
+            *(pTmpDst++) = *(pSrc++);
           }
-        } else { 
-          if(CountData<0) {
-            CountData=(0x100-CountData);
-            Fill1=*(pSrc++);
-            Fill2=*(pSrc++);
-            while(CountData--) {
-              *(pTmpDst++)=Fill1;
-              *(pTmpDst++)=Fill2;
+        } else {
+          if (CountData < 0) {
+            CountData = (0x100 - CountData);
+            Fill1 = *(pSrc++);
+            Fill2 = *(pSrc++);
+            while (CountData--) {
+              *(pTmpDst++) = Fill1;
+              *(pTmpDst++) = Fill2;
             }
           }
         }
       }
-      pDst+=vga_width;//=flc.mainscreen->pitch;
-    } 
+      pDst += vga_width; //=flc.mainscreen->pitch;
+    }
   }
 } /* SS2 */
 
-void DECODE_COLOR()
-{ Uint8 *pSrc;
+void DECODE_COLOR() {
+  Uint8 *pSrc;
   Uint16 NumColors, NumColorPackets;
   Uint8 NumColorsSkip;
   int i;
 
-  pSrc=flc.pChunk+6;
+  pSrc = flc.pChunk + 6;
   ReadU16(&NumColorPackets, pSrc);
-  pSrc+=2;
-  while(NumColorPackets--) {
-    NumColorsSkip=*(pSrc++);
-    if(!(NumColors=*(pSrc++))) {
-      NumColors=256;
+  pSrc += 2;
+  while (NumColorPackets--) {
+    NumColorsSkip = *(pSrc++);
+    if (!(NumColors = *(pSrc++))) {
+      NumColors = 256;
     }
-    i=0;
-    while(NumColors--) {
-      flc.colors[i].r=*(pSrc++)<<2;
-      flc.colors[i].g=*(pSrc++)<<2;
-      flc.colors[i].b=*(pSrc++)<<2;
+    i = 0;
+    while (NumColors--) {
+      flc.colors[i].r = *(pSrc++) << 2;
+      flc.colors[i].g = *(pSrc++) << 2;
+      flc.colors[i].b = *(pSrc++) << 2;
       i++;
     }
     OSDEP_SetPalette(flc.mainscreen, flc.colors, NumColorsSkip, i);
@@ -258,219 +259,211 @@ void DECODE_COLOR()
 } /* DECODE_COLOR  */
 
 
-void DECODE_COPY()
-{ Uint8 *pSrc, *pDst;
+void DECODE_COPY() {
+  Uint8 *pSrc, *pDst;
   int Lines = flc.screen_h;
-  pSrc=flc.pChunk+6;
-  pDst=flc.buffer;//mainscreen;/->pixels;
-  while(Lines-- > 0) {
+  pSrc = flc.pChunk + 6;
+  pDst = flc.buffer; //mainscreen;/->pixels;
+  while (Lines-- > 0) {
     memcpy(pDst, pSrc, flc.screen_w);
-    pSrc+=flc.screen_w;
-    pDst+=vga_width;//flc.mainscreen->pitch;
+    pSrc += flc.screen_w;
+    pDst += vga_width; //flc.mainscreen->pitch;
   }
 } /* DECODE_COPY */
 
-void _BLACK()
-{ Uint8 *pDst;
+void _BLACK() {
+  Uint8 *pDst;
   int Lines = flc.screen_h;
-  pDst=flc.buffer;//mainscreen->pixels;
-  while(Lines-- > 0) {
+  pDst = flc.buffer; //mainscreen->pixels;
+  while (Lines-- > 0) {
     memset(pDst, 0, flc.screen_w);
-    pDst+=vga_width;//flc.mainscreen->pitch;
+    pDst += vga_width; //flc.mainscreen->pitch;
   }
 } /* BLACK */
 
-void DECODE_BRUN()
-{ Uint8 *pSrc, *pDst, *pTmpDst, Fill;
+void DECODE_BRUN() {
+  Uint8 *pSrc, *pDst, *pTmpDst, Fill;
   Sint8 CountData;
   int HeightCount, PacketsCount;
 
-  HeightCount=flc.HeaderHeight;
-  pSrc=flc.pChunk+6;
-  pDst=flc.buffer;//mainscreen->pixels;
-  while(HeightCount--) {
-    pTmpDst=pDst;
-    PacketsCount=*(pSrc++);
-    while(PacketsCount--) {
-      CountData=*(pSrc++);
-      if(CountData>0) {
-        Fill=*(pSrc++);
-        while(CountData--) {
-          *(pTmpDst++)=Fill;
+  HeightCount = flc.HeaderHeight;
+  pSrc = flc.pChunk + 6;
+  pDst = flc.buffer; //mainscreen->pixels;
+  while (HeightCount--) {
+    pTmpDst = pDst;
+    PacketsCount = *(pSrc++);
+    while (PacketsCount--) {
+      CountData = *(pSrc++);
+      if (CountData > 0) {
+        Fill = *(pSrc++);
+        while (CountData--) {
+          *(pTmpDst++) = Fill;
         }
-      } else { 
-        if(CountData<0) {
-          CountData=(0x100-CountData);
-          while(CountData--) {
-          *(pTmpDst++)=*(pSrc++);
+      } else {
+        if (CountData < 0) {
+          CountData = (0x100 - CountData);
+          while (CountData--) {
+            *(pTmpDst++) = *(pSrc++);
           }
         }
       }
     }
-    pDst+=vga_width;//flc.mainscreen->pitch;
+    pDst += vga_width; //flc.mainscreen->pitch;
   }
 } /* DECODE_BRUN */
 
 
-void DECODE_LC() 
-{ Uint8 *pSrc, *pDst, *pTmpDst;
+void DECODE_LC() {
+  Uint8 *pSrc, *pDst, *pTmpDst;
   Sint8 CountData;
   Uint8 CountSkip;
   Uint8 Fill;
   Uint16 Lines, tmp;
   int PacketsCount;
 
-  pSrc=flc.pChunk+6;
-  pDst=flc.buffer;//mainscreen->pixels;
+  pSrc = flc.pChunk + 6;
+  pDst = flc.buffer; //mainscreen->pixels;
 
   ReadU16(&tmp, pSrc);
-  pSrc+=2;
-  pDst+=vga_width;//tmp*flc.mainscreen->pitch;
+  pSrc += 2;
+  pDst += vga_width; //tmp*flc.mainscreen->pitch;
   ReadU16(&Lines, pSrc);
-  pSrc+=2;
-  while(Lines--) {
-    pTmpDst=pDst;
-    PacketsCount=*(pSrc++);
-    while(PacketsCount--) {
-      CountSkip=*(pSrc++);
-      pTmpDst+=CountSkip;
-      CountData=*(pSrc++);
-      if(CountData>0) {
-        while(CountData--) {
-          *(pTmpDst++)=*(pSrc++);
+  pSrc += 2;
+  while (Lines--) {
+    pTmpDst = pDst;
+    PacketsCount = *(pSrc++);
+    while (PacketsCount--) {
+      CountSkip = *(pSrc++);
+      pTmpDst += CountSkip;
+      CountData = *(pSrc++);
+      if (CountData > 0) {
+        while (CountData--) {
+          *(pTmpDst++) = *(pSrc++);
         }
-      } else { 
-        if(CountData<0) {
-          CountData=(0x100-CountData);
-          Fill=*(pSrc++);
-          while(CountData--) {
-            *(pTmpDst++)=Fill;
+      } else {
+        if (CountData < 0) {
+          CountData = (0x100 - CountData);
+          Fill = *(pSrc++);
+          while (CountData--) {
+            *(pTmpDst++) = Fill;
           }
         }
       }
     }
-    pDst+=vga_width;//flc.mainscreen->pitch;
+    pDst += vga_width; //flc.mainscreen->pitch;
   }
 } /* DECODE_LC */
 
 
-int FlcCheckFrame()
-{ flc.pFrame=flc.pMembuf+flc.FrameSize-16;
-  ReadU32(&flc.FrameSize, flc.pFrame+0);
-  ReadU16(&flc.FrameCheck, flc.pFrame+4);
-  ReadU16(&flc.FrameChunks, flc.pFrame+6);
+int FlcCheckFrame() {
+  flc.pFrame = flc.pMembuf + flc.FrameSize - 16;
+  ReadU32(&flc.FrameSize, flc.pFrame + 0);
+  ReadU16(&flc.FrameCheck, flc.pFrame + 4);
+  ReadU16(&flc.FrameChunks, flc.pFrame + 6);
 
 
-  flc.pFrame+=16;
-  if(flc.FrameCheck==0x0f1fa) { 
-    return(0);
+  flc.pFrame += 16;
+  if (flc.FrameCheck == 0x0f1fa) {
+    return (0);
   }
 
-  if(flc.FrameCheck==0x0f100) { 
+  if (flc.FrameCheck == 0x0f100) {
 #ifdef DEBUG
     printf("Ani info!!!\n");
 #endif
-    return(0);
+    return (0);
   }
 
-  return(1);
+  return (1);
 } /* FlcCheckFrame */
 
 
 extern SDL_Surface *vga;
 
-void FlcDoOneFrame()
-{ int ChunkCount; 
-  ChunkCount=flc.FrameChunks;
-  flc.pChunk=flc.pMembuf;
-  while(ChunkCount--) {
-    ReadU32(&flc.ChunkSize, flc.pChunk+0);
-    ReadU16(&flc.ChunkType, flc.pChunk+4);
+void FlcDoOneFrame() {
+  int ChunkCount;
+  ChunkCount = flc.FrameChunks;
+  flc.pChunk = flc.pMembuf;
+  while (ChunkCount--) {
+    ReadU32(&flc.ChunkSize, flc.pChunk + 0);
+    ReadU16(&flc.ChunkType, flc.pChunk + 4);
 
 
-    switch(flc.ChunkType) {
-      case 4:
-        COLORS256();
+    switch (flc.ChunkType) {
+    case 4:
+      COLORS256();
       break;
-      case 7:
-        SS2();
+    case 7:
+      SS2();
       break;
-      case 11:
-        DECODE_COLOR();
+    case 11:
+      DECODE_COLOR();
       break;
-      case 12:
-        DECODE_LC();
+    case 12:
+      DECODE_LC();
       break;
-      case 13:
-        _BLACK();
+    case 13:
+      _BLACK();
       break;
-      case 15:
-        DECODE_BRUN();
+    case 15:
+      DECODE_BRUN();
       break;
-      case 16:
-        DECODE_COPY();
+    case 16:
+      DECODE_COPY();
       break;
-      case 18:
+    case 18:
 #ifdef DEBUG
-        printf("Chunk 18 not yet done.\n");
+      printf("Chunk 18 not yet done.\n");
 #endif
       break;
-      default:
-        printf("Ieek an non implemented chunk type: %d\n", flc.ChunkType);
+    default:
+      printf("Ieek an non implemented chunk type: %d\n", flc.ChunkType);
     }
-    
-    flc.pChunk+=flc.ChunkSize;
+
+    flc.pChunk += flc.ChunkSize;
   }
 } /* FlcDoOneFrame */
-int Nextframe()
-{
-	flc.FrameCount++;
-	
-	if(flc.FrameCount>flc.HeaderFrames)
-		return 0;
-    
-    if(FlcCheckFrame()) {
-      if (flc.FrameCount<=flc.HeaderFrames) {
-        printf("Frame failure -- corrupt file?\n");
-        return 0;
-      } else {
-		  return 0;
-	  }
+int Nextframe() {
+  flc.FrameCount++;
+
+  if (flc.FrameCount > flc.HeaderFrames)
+    return 0;
+
+  if (FlcCheckFrame()) {
+    if (flc.FrameCount <= flc.HeaderFrames) {
+      printf("Frame failure -- corrupt file?\n");
+      return 0;
+    } else {
+      return 0;
     }
-     FlcReadFile(flc.FrameSize);
+  }
+  FlcReadFile(flc.FrameSize);
 
-    if(flc.FrameCheck!=0x0f100) {
-      FlcDoOneFrame();
-      /* TODO: Track which rectangles have really changed */
-      OSDEP_UpdateRect(flc.mainscreen, 0, 0, 0, 0);
-    }
+  if (flc.FrameCheck != 0x0f100) {
+    FlcDoOneFrame();
+    /* TODO: Track which rectangles have really changed */
+    OSDEP_UpdateRect(flc.mainscreen, 0, 0, 0, 0);
+  }
 
-return(flc.FrameCount);
+  return (flc.FrameCount);
 }
 
-void EndFli()
-{
-	if(flc.file!=NULL)
-		fclose(flc.file);
-	if(flc.pMembuf!=NULL) {
-		free(flc.pMembuf);
-		flc.pMembuf=NULL;
-	}
+void EndFli() {
+  if (flc.file != NULL)
+    fclose(flc.file);
+  if (flc.pMembuf != NULL) {
+    free(flc.pMembuf);
+    flc.pMembuf = NULL;
+  }
 
-	flc.pMembuf=NULL;
-	flc.file=NULL;
-
+  flc.pMembuf = NULL;
+  flc.file = NULL;
 }
 
-void ResetFli()
-{
-}
+void ResetFli() {}
 
 int quit_warning;
 
-static void Error_Reporter(char *msg)
-{
-}
+static void Error_Reporter(char *msg) {}
 
-static void Palette_Update(TFUByte (*TFpalette)[256][3]) {
-}
+static void Palette_Update(TFUByte (*TFpalette)[256][3]) {}

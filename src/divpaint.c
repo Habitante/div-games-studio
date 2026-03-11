@@ -11,14 +11,14 @@ void draw_ruler(void);
 void draw_help(int n);
 void edit_ruler(void);
 void select_color(int n);
-void select_fx(int n,int * efecto);
+void select_fx(int n, int *efecto);
 void line(int x0, int y0, int x1, int y1, int inc0);
 void analyze_bar(int an, int al);
-void bezier(int x0,int y0,int x1,int y1,int _x0,int _y0,int _x1,int _y1,int inc0);
-int select_icon(int icono_x,int * iconos);
-void draw_box(int x0,int y0,int x1,int y1);
-void draw_circle(int x0,int y0,int x1,int y1,int relleno);
-void _line_pixel(int x,int y);
+void bezier(int x0, int y0, int x1, int y1, int _x0, int _y0, int _x1, int _y1, int inc0);
+int select_icon(int icono_x, int *iconos);
+void draw_box(int x0, int y0, int x1, int y1);
+void draw_circle(int x0, int y0, int x1, int y1, int relleno);
+void _line_pixel(int x, int y);
 void select_fill(int n);
 void select_box(int n);
 void box_to_sel_mask(void);
@@ -34,11 +34,11 @@ void test_next(void);
 void test_sel(void);
 void test_sel_mask(void);
 void write_char(int x, int y, byte c);
-void write_char2(int x, int y, byte * si, int font_width, int font_height);
-void line_pixel(int x,int y);
-void circulo_scan2(int x,int y,int an);
-void circulo_scan(int x,int y,int an);
-int editable(int *n);	
+void write_char2(int x, int y, byte *si, int font_width, int font_height);
+void line_pixel(int x, int y);
+void circulo_scan2(int x, int y, int an);
+void circulo_scan(int x, int y, int an);
+int editable(int *n);
 void eyedropper(void);
 void move_zoom(void);
 void move_bar(void);
@@ -46,16 +46,16 @@ void bar_coords(void);
 void select_mode(void);
 void change_map(int adelante);
 void blit_mouse(void);
-void adjust_box(int*a,int*b,int*c,int*d);
+void adjust_box(int *a, int *b, int *c, int *d);
 void blit_mouse_a(void);
 void blit_mouse_b(void);
-void paint_mask_window(byte * p,int c,int d);
-void paint_color_window(byte * p,int c,int d);
-void paint_window_colors2(byte * p,int c,int d,int col) ;
+void paint_mask_window(byte *p, int c, int d);
+void paint_color_window(byte *p, int c, int d);
+void paint_window_colors2(byte *p, int c, int d, int col);
 void color_up(void);
 void color_down(void);
-void flush_bar(byte * p, int real_an, int x, int y, int an, int al) ;
-void flush_bar_darkened(byte * p, int real_an, int x, int y, int an, int al);
+void flush_bar(byte *p, int real_an, int x, int y, int an, int al);
+void flush_bar_darkened(byte *p, int real_an, int x, int y, int an, int al);
 
 
 //-----------------------------------------------------------------------------
@@ -64,15 +64,15 @@ void flush_bar_darkened(byte * p, int real_an, int x, int y, int an, int al);
 
 struct {
   int on;
-  byte * ptr;
-  int x,y,an,al;
+  byte *ptr;
+  int x, y, an, al;
 } barras[10];
 
 //-----------------------------------------------------------------------------
 //      Constants
 //-----------------------------------------------------------------------------
 
-#define _ir 96 // Color gradient start position on the edit screen
+#define _ir     96 // Color gradient start position on the edit screen
 #define max_int 65536
 
 extern int cierra_rapido;
@@ -85,24 +85,24 @@ int back; // Whether an undo is needed after blit_screen
 //      Global variables for this module
 //-----------------------------------------------------------------------------
 
-int zoom_dx,zoom_dy,zoom_sx,zoom_sy;
-int zoom_speed=4; // higher -> slower, lower -> faster
-int _tab=0;
+int zoom_dx, zoom_dy, zoom_sx, zoom_sy;
+int zoom_speed = 4; // higher -> slower, lower -> faster
+int _tab = 0;
 
-int hotkey=1; // Whether hotkeys are enabled (disabled during text toolbar input)
+int hotkey = 1; // Whether hotkeys are enabled (disabled during text toolbar input)
 
-int num_punto=0;
+int num_punto = 0;
 
 //-----------------------------------------------------------------------------
 
-int line_fx=16; // Drawing mode for the line
+int line_fx = 16; // Drawing mode for the line
 
-int efecto1=16,efecto2=16,efecto3=16,efecto4=16,efecto5=16;
-int efecto6=16,efecto7=16,efecto8=4,efecto12=16;
+int efecto1 = 16, efecto2 = 16, efecto3 = 16, efecto4 = 16, efecto5 = 16;
+int efecto6 = 16, efecto7 = 16, efecto8 = 4, efecto12 = 16;
 
 int focos[128]; // Fill seed points (x,y), up to 64 different (-1,?) -> n/a
 
-int difuminar=0;
+int difuminar = 0;
 
 //-----------------------------------------------------------------------------
 //      Brush-related variables
@@ -110,104 +110,140 @@ int difuminar=0;
 
 // The brush is a bitmap of intensities between 0 (0%) and 16 (100%)
 
-byte pincel_por_defecto[16]={ 16,16,16,16,
-                              16,16,16,16,
-                              16,16,16,16,
-                              16,16,16,16 };
+byte pincel_por_defecto[16] = {16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16};
 
-byte *pincel=&pincel_por_defecto[0];
-int pincel_an=1,pincel_al=1;
+byte *pincel = &pincel_por_defecto[0];
+int pincel_an = 1, pincel_al = 1;
 
-int tipo_pincel=0; // 0-b/w, 1-grayscale
-int num_pincel=0;
+int tipo_pincel = 0; // 0-b/w, 1-grayscale
+int num_pincel = 0;
 
 //-----------------------------------------------------------------------------
 //      Texture-related variables
 //-----------------------------------------------------------------------------
 
-byte * textura_color=NULL; // When NULL, draw with solid color
-int textura_an=2,textura_al=2;
-int textura_x=0,textura_y=0;
+byte *textura_color = NULL; // When NULL, draw with solid color
+int textura_an = 2, textura_al = 2;
+int textura_x = 0, textura_y = 0;
 
 //-----------------------------------------------------------------------------
 //      Get color from the texture
 //-----------------------------------------------------------------------------
 
 void remove_texture(void) {
-  if (textura_color!=NULL) {
-    textura_color=NULL;
+  if (textura_color != NULL) {
+    textura_color = NULL;
   }
 }
 
-byte get_color(int x,int y) {
-  return(*(textura_color+(x+textura_x)%textura_an+((y+textura_y)%textura_al)*textura_an));
+byte get_color(int x, int y) {
+  return (*(textura_color + (x + textura_x) % textura_an +
+            ((y + textura_y) % textura_al) * textura_an));
 }
 
 //-----------------------------------------------------------------------------
 //      Edit screen (generic editing, no draw_mode defined)
 //-----------------------------------------------------------------------------
 
-void test_mouse_box(int a,int b,int c, int d) {
-  if (mouse_in(a,b,a+c*big2-1,b+d*big2-1)) {
-    if (big && !mouse_shift) { mouse_shift=1;
-      mouse_x=a+(mouse_shift_x-a)/2;
-      mouse_y=b+(mouse_shift_y-b)/2; }
-    if (mouse_in(a+2,b+2,a+c-10,b+9)) mouse_graf=2;
-    else if (mouse_in(a+c-9,b+2,a+c-2,b+9)) mouse_graf=5;
-    else mouse_graf=1;
-  } else if (mouse_in(toolbar_x,toolbar_y,toolbar_x+toolbar_width*big2-1,toolbar_y+19*big2-1)) {
-    if (big && !mouse_shift) { mouse_shift=1;
-      mouse_x=toolbar_x+(mouse_shift_x-toolbar_x)/2;
-      mouse_y=toolbar_y+(mouse_shift_y-toolbar_y)/2; }
-    if (mouse_in(toolbar_x,toolbar_y,toolbar_x+9,toolbar_y+9)) mouse_graf=2;
-    else if (mouse_in(toolbar_x,toolbar_y+10,toolbar_x+9,toolbar_y+18)) mouse_graf=5;
-    else mouse_graf=1;
-  } else mouse_graf=1;
+void test_mouse_box(int a, int b, int c, int d) {
+  if (mouse_in(a, b, a + c * big2 - 1, b + d * big2 - 1)) {
+    if (big && !mouse_shift) {
+      mouse_shift = 1;
+      mouse_x = a + (mouse_shift_x - a) / 2;
+      mouse_y = b + (mouse_shift_y - b) / 2;
+    }
+    if (mouse_in(a + 2, b + 2, a + c - 10, b + 9))
+      mouse_graf = 2;
+    else if (mouse_in(a + c - 9, b + 2, a + c - 2, b + 9))
+      mouse_graf = 5;
+    else
+      mouse_graf = 1;
+  } else if (mouse_in(toolbar_x, toolbar_y, toolbar_x + toolbar_width * big2 - 1,
+                      toolbar_y + 19 * big2 - 1)) {
+    if (big && !mouse_shift) {
+      mouse_shift = 1;
+      mouse_x = toolbar_x + (mouse_shift_x - toolbar_x) / 2;
+      mouse_y = toolbar_y + (mouse_shift_y - toolbar_y) / 2;
+    }
+    if (mouse_in(toolbar_x, toolbar_y, toolbar_x + 9, toolbar_y + 9))
+      mouse_graf = 2;
+    else if (mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18))
+      mouse_graf = 5;
+    else
+      mouse_graf = 1;
+  } else
+    mouse_graf = 1;
 }
 
-void test_mouse_box2(int a,int b,int c, int d) {
-  if (mouse_in(a,b,a+c*big2-1,b+d*big2-1)) {
-    if (big && !mouse_shift) { mouse_shift=1;
-      mouse_x=a+(mouse_shift_x-a)/2;
-      mouse_y=b+(mouse_shift_y-b)/2; }
-    if (mouse_in(a,b+2,a+c-10,b+9)) mouse_graf=2;
-    else if (mouse_in(a+c-9,b+2,a+c-2,b+9)) mouse_graf=5;
-    else mouse_graf=1;
-  } else if (mouse_in(toolbar_x,toolbar_y,toolbar_x+toolbar_width*big2-1,toolbar_y+19*big2-1)) {
-    if (big && !mouse_shift) { mouse_shift=1;
-      mouse_x=toolbar_x+(mouse_shift_x-toolbar_x)/2;
-      mouse_y=toolbar_y+(mouse_shift_y-toolbar_y)/2; }
-    if (mouse_in(toolbar_x,toolbar_y,toolbar_x+9,toolbar_y+9)) mouse_graf=2;
-    else if (mouse_in(toolbar_x,toolbar_y+10,toolbar_x+9,toolbar_y+18)) mouse_graf=5;
-    else mouse_graf=1;
-  } else if (mouse_in(zoom_win_x,zoom_win_y,zoom_win_x+zoom_win_width-1,zoom_win_y+zoom_win_height-1)) mouse_graf=current_mouse-zoom;
-         else mouse_graf=1;
+void test_mouse_box2(int a, int b, int c, int d) {
+  if (mouse_in(a, b, a + c * big2 - 1, b + d * big2 - 1)) {
+    if (big && !mouse_shift) {
+      mouse_shift = 1;
+      mouse_x = a + (mouse_shift_x - a) / 2;
+      mouse_y = b + (mouse_shift_y - b) / 2;
+    }
+    if (mouse_in(a, b + 2, a + c - 10, b + 9))
+      mouse_graf = 2;
+    else if (mouse_in(a + c - 9, b + 2, a + c - 2, b + 9))
+      mouse_graf = 5;
+    else
+      mouse_graf = 1;
+  } else if (mouse_in(toolbar_x, toolbar_y, toolbar_x + toolbar_width * big2 - 1,
+                      toolbar_y + 19 * big2 - 1)) {
+    if (big && !mouse_shift) {
+      mouse_shift = 1;
+      mouse_x = toolbar_x + (mouse_shift_x - toolbar_x) / 2;
+      mouse_y = toolbar_y + (mouse_shift_y - toolbar_y) / 2;
+    }
+    if (mouse_in(toolbar_x, toolbar_y, toolbar_x + 9, toolbar_y + 9))
+      mouse_graf = 2;
+    else if (mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18))
+      mouse_graf = 5;
+    else
+      mouse_graf = 1;
+  } else if (mouse_in(zoom_win_x, zoom_win_y, zoom_win_x + zoom_win_width - 1,
+                      zoom_win_y + zoom_win_height - 1))
+    mouse_graf = current_mouse - zoom;
+  else
+    mouse_graf = 1;
 }
 
 void test_mouse(void) {
-  if (mouse_in(toolbar_x,toolbar_y,toolbar_x+toolbar_width*big2-1,toolbar_y+19*big2-1)) {
-    if (big && !mouse_shift) { mouse_shift=1;
-      mouse_x=toolbar_x+(mouse_shift_x-toolbar_x)/2;
-      mouse_y=toolbar_y+(mouse_shift_y-toolbar_y)/2; }
-    if (mouse_in(toolbar_x,toolbar_y,toolbar_x+9,toolbar_y+9)) mouse_graf=2;
-    else if (mouse_in(toolbar_x,toolbar_y+10,toolbar_x+9,toolbar_y+18)) mouse_graf=5;
-    else mouse_graf=1;
-  } else if (mouse_in(zoom_win_x,zoom_win_y,zoom_win_x+zoom_win_width-1,zoom_win_y+zoom_win_height-1)) mouse_graf=current_mouse-zoom;
-         else mouse_graf=1;
+  if (mouse_in(toolbar_x, toolbar_y, toolbar_x + toolbar_width * big2 - 1,
+               toolbar_y + 19 * big2 - 1)) {
+    if (big && !mouse_shift) {
+      mouse_shift = 1;
+      mouse_x = toolbar_x + (mouse_shift_x - toolbar_x) / 2;
+      mouse_y = toolbar_y + (mouse_shift_y - toolbar_y) / 2;
+    }
+    if (mouse_in(toolbar_x, toolbar_y, toolbar_x + 9, toolbar_y + 9))
+      mouse_graf = 2;
+    else if (mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18))
+      mouse_graf = 5;
+    else
+      mouse_graf = 1;
+  } else if (mouse_in(zoom_win_x, zoom_win_y, zoom_win_x + zoom_win_width - 1,
+                      zoom_win_y + zoom_win_height - 1))
+    mouse_graf = current_mouse - zoom;
+  else
+    mouse_graf = 1;
 }
 
 void edit_scr(void) {
-
-  bar[0]=101+zoom; bar[1]=0; draw_bar(0);
+  bar[0] = 101 + zoom;
+  bar[1] = 0;
+  draw_bar(0);
 
   do {
-    read_mouse(); select_zoom(); test_mouse();
+    read_mouse();
+    select_zoom();
+    test_mouse();
 
     // ...
 
     blit_edit();
-  } while (!exit_requested && !(mouse_b&2) && !key(_ESC) && draw_mode<100 &&
-    !(mouse_b && mouse_in(toolbar_x,toolbar_y+10,toolbar_x+9,toolbar_y+18)));
+  } while (!exit_requested && !(mouse_b & 2) && !key(_ESC) && draw_mode < 100 &&
+           !(mouse_b && mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18)));
 }
 
 //-----------------------------------------------------------------------------
@@ -217,32 +253,46 @@ void edit_scr(void) {
 void edit_mode_0(void) {
   int n;
 
-  bar[0]=101+zoom; bar[1]=121;
-  for (n=2;n<11;n++) { bar[n]=1; } bar[11]=166; bar[12]=0;
-  draw_bar(0); draw_ruler();
+  bar[0] = 101 + zoom;
+  bar[1] = 121;
+  for (n = 2; n < 11; n++) {
+    bar[n] = 1;
+  }
+  bar[11] = 166;
+  bar[12] = 0;
+  draw_bar(0);
+  draw_ruler();
 
   do {
     draw_help(1295);
-    edit_ruler(); select_color(2);
-    if (((mouse_b&1) && !(prev_mouse_buttons&1)) && mouse_graf>=10) {
-      if (!mask[*(map+coord_x+coord_y*map_width)]) {
-        if (*(map+coord_x+coord_y*map_width)!=color) {
-          save_undo(coord_x,coord_y,1,1);
-          *(map+coord_x+coord_y*map_width)=color;
+    edit_ruler();
+    select_color(2);
+    if (((mouse_b & 1) && !(prev_mouse_buttons & 1)) && mouse_graf >= 10) {
+      if (!mask[*(map + coord_x + coord_y * map_width)]) {
+        if (*(map + coord_x + coord_y * map_width) != color) {
+          save_undo(coord_x, coord_y, 1, 1);
+          *(map + coord_x + coord_y * map_width) = color;
         } else {
-          save_undo(coord_x,coord_y,1,1);
-          *(map+coord_x+coord_y*map_width)=0;
+          save_undo(coord_x, coord_y, 1, 1);
+          *(map + coord_x + coord_y * map_width) = 0;
         }
       }
     }
 
-    if (((mouse_b&1) && selected_icon==1) || (scan_code==14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
-      undo_back(); do {read_mouse();} while(mouse_b&1);
-    } else if (scan_code==14 && (key(_L_SHIFT)||key(_R_SHIFT))) { undo_next(); need_zoom=1; }
+    if (((mouse_b & 1) && selected_icon == 1) ||
+        (scan_code == 14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
+      undo_back();
+      do {
+        read_mouse();
+      } while (mouse_b & 1);
+    } else if (scan_code == 14 && (key(_L_SHIFT) || key(_R_SHIFT))) {
+      undo_next();
+      need_zoom = 1;
+    }
 
     blit_edit();
-  } while (!exit_requested && !(mouse_b&2) && !key(_ESC) && draw_mode<100 &&
-    !(mouse_b && mouse_in(toolbar_x,toolbar_y+10,toolbar_x+9,toolbar_y+18)));
+  } while (!exit_requested && !(mouse_b & 2) && !key(_ESC) && draw_mode < 100 &&
+           !(mouse_b && mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18)));
 }
 
 //-----------------------------------------------------------------------------
@@ -250,47 +300,66 @@ void edit_mode_0(void) {
 //-----------------------------------------------------------------------------
 
 void edit_mode_1(void) {
+  int _x, _y, a, _a = 0, _b = 0;
 
-  int _x,_y,a,_a=0,_b=0;
+  bar[0] = 101 + zoom;
+  bar[1] = 121;
+  for (a = 2; a < 11; a++) {
+    bar[a] = 1;
+  }
+  bar[11] = 166;
+  bar[12] = 119;
+  bar[13] = 0;
 
-  bar[0]=101+zoom; bar[1]=121;
-  for (a=2;a<11;a++) { bar[a]=1; } bar[11]=166;
-  bar[12]=119; bar[13]=0;
-
-  draw_bar(0); draw_ruler();
+  draw_bar(0);
+  draw_ruler();
 
   do {
     draw_help(1295);
     edit_ruler();
-    select_fx(12,&efecto1);
+    select_fx(12, &efecto1);
     select_color(2);
 
-    a=-1; // Last action performed (this iteration) - undefined
+    a = -1; // Last action performed (this iteration) - undefined
 
-    if ((mouse_b&1) && mouse_graf>=10) {
+    if ((mouse_b & 1) && mouse_graf >= 10) {
+      if (key(_D))
+        difuminar = 1;
 
-      if (key(_D)) difuminar=1;
-
-      if (_b==0 || coord_x!=_x || coord_y!=_y) {
-        a=1; line_fx=efecto1;
-        if (_a==1) line(_x,_y,coord_x,coord_y,0);
-        else line(coord_x,coord_y,coord_x,coord_y,0);
+      if (_b == 0 || coord_x != _x || coord_y != _y) {
+        a = 1;
+        line_fx = efecto1;
+        if (_a == 1)
+          line(_x, _y, coord_x, coord_y, 0);
+        else
+          line(coord_x, coord_y, coord_x, coord_y, 0);
       }
 
-      difuminar=0;
+      difuminar = 0;
 
-    } else a=0;
+    } else
+      a = 0;
 
-    if (a>=0) _a=a; // Save the last action
+    if (a >= 0)
+      _a = a; // Save the last action
 
-    if (((mouse_b&1) && selected_icon==1) || (scan_code==14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
-      undo_back(); do {read_mouse();} while(mouse_b&1);
-    } else if (scan_code==14 && (key(_L_SHIFT)||key(_R_SHIFT))) { undo_next(); need_zoom=1; }
+    if (((mouse_b & 1) && selected_icon == 1) ||
+        (scan_code == 14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
+      undo_back();
+      do {
+        read_mouse();
+      } while (mouse_b & 1);
+    } else if (scan_code == 14 && (key(_L_SHIFT) || key(_R_SHIFT))) {
+      undo_next();
+      need_zoom = 1;
+    }
 
-    _x=coord_x; _y=coord_y; _b=mouse_b;
+    _x = coord_x;
+    _y = coord_y;
+    _b = mouse_b;
     blit_edit();
-  } while (!exit_requested && !(mouse_b&2) && !key(_ESC) && draw_mode<100 &&
-    !(mouse_b && mouse_in(toolbar_x,toolbar_y+10,toolbar_x+9,toolbar_y+18)));
+  } while (!exit_requested && !(mouse_b & 2) && !key(_ESC) && draw_mode < 100 &&
+           !(mouse_b && mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18)));
 }
 
 //-----------------------------------------------------------------------------
@@ -298,63 +367,104 @@ void edit_mode_1(void) {
 //-----------------------------------------------------------------------------
 
 void edit_mode_2(void) {
-
-  int s; // State 0-wait 1st click, 1-wait 2nd click
-  int x0,y0; // Starting coordinates
-  int an,al;
+  int s;      // State 0-wait 1st click, 1-wait 2nd click
+  int x0, y0; // Starting coordinates
+  int an, al;
   int a;
 
-  bar[0]=101+zoom; bar[1]=121;
-  for (a=2;a<11;a++) { bar[a]=1; } bar[11]=166;
-  bar[12]=119; bar[13]=0; bar[14]=0;
-  draw_bar(22); draw_ruler();
+  bar[0] = 101 + zoom;
+  bar[1] = 121;
+  for (a = 2; a < 11; a++) {
+    bar[a] = 1;
+  }
+  bar[11] = 166;
+  bar[12] = 119;
+  bar[13] = 0;
+  bar[14] = 0;
+  draw_bar(22);
+  draw_ruler();
 
-  s=0; do {
+  s = 0;
+  do {
     draw_help(1295);
-    edit_ruler(); select_fx(12,&efecto2); select_color(2);
+    edit_ruler();
+    select_fx(12, &efecto2);
+    select_color(2);
 
-    if (key(_D)) difuminar=1;
+    if (key(_D))
+      difuminar = 1;
 
-    an=-1; al=-1; back=0; switch(s) {
-      case 0:
-        if ((mouse_b&1) && mouse_graf>=10) {
-          s=1; x0=coord_x; y0=coord_y;
-          do {read_mouse();} while(mouse_b&1);
-        } break;
-      case 1:
-        if (mouse_graf>=10) {
-          line_fx=efecto2; undo_error=0;
-          line(x0,y0,coord_x,coord_y,1);
-          if (undo_error) s=0; else {
-            an=(x0>coord_x)?x0-coord_x:coord_x-x0;
-            al=(y0>coord_y)?y0-coord_y:coord_y-y0;
-            if (mouse_b&1) {
-              s=0; do {read_mouse();} while (mouse_b&1);
-            } else if (mouse_b || key(_ESC)) {
-              do {read_mouse();} while (mouse_b || key(_ESC)); s=0; back=1;
-            } else back=1;
-          }
-        } break;
+    an = -1;
+    al = -1;
+    back = 0;
+    switch (s) {
+    case 0:
+      if ((mouse_b & 1) && mouse_graf >= 10) {
+        s = 1;
+        x0 = coord_x;
+        y0 = coord_y;
+        do {
+          read_mouse();
+        } while (mouse_b & 1);
+      }
+      break;
+    case 1:
+      if (mouse_graf >= 10) {
+        line_fx = efecto2;
+        undo_error = 0;
+        line(x0, y0, coord_x, coord_y, 1);
+        if (undo_error)
+          s = 0;
+        else {
+          an = (x0 > coord_x) ? x0 - coord_x : coord_x - x0;
+          al = (y0 > coord_y) ? y0 - coord_y : coord_y - y0;
+          if (mouse_b & 1) {
+            s = 0;
+            do {
+              read_mouse();
+            } while (mouse_b & 1);
+          } else if (mouse_b || key(_ESC)) {
+            do {
+              read_mouse();
+            } while (mouse_b || key(_ESC));
+            s = 0;
+            back = 1;
+          } else
+            back = 1;
+        }
+      }
+      break;
     }
 
-    difuminar=0;
+    difuminar = 0;
 
-    if (((mouse_b&1) && selected_icon==1) || (scan_code==14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
-      undo_back(); do {read_mouse();} while(mouse_b&1);
-    } else if (scan_code==14 && (key(_L_SHIFT)||key(_R_SHIFT))) { undo_next(); need_zoom=1; }
+    if (((mouse_b & 1) && selected_icon == 1) ||
+        (scan_code == 14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
+      undo_back();
+      do {
+        read_mouse();
+      } while (mouse_b & 1);
+    } else if (scan_code == 14 && (key(_L_SHIFT) || key(_R_SHIFT))) {
+      undo_next();
+      need_zoom = 1;
+    }
 
-    analyze_bar(an+1,al+1);
+    analyze_bar(an + 1, al + 1);
     blit_edit();
 
     if (back) {
-      undo_back(); if (need_zoom==1) zoom_map();
-      else if (need_zoom==-1 && need_zoom_width>0 && need_zoom_height>0)
-        draw_edit_background(need_zoom_x,need_zoom_y,need_zoom_width,need_zoom_height);
-      need_zoom_width=0; need_zoom_height=0; need_zoom=0;
+      undo_back();
+      if (need_zoom == 1)
+        zoom_map();
+      else if (need_zoom == -1 && need_zoom_width > 0 && need_zoom_height > 0)
+        draw_edit_background(need_zoom_x, need_zoom_y, need_zoom_width, need_zoom_height);
+      need_zoom_width = 0;
+      need_zoom_height = 0;
+      need_zoom = 0;
     }
 
-  } while (!exit_requested && !(mouse_b&2) && !(key(_ESC)&&s!=1) && draw_mode<100 &&
-    !(mouse_b && mouse_in(toolbar_x,toolbar_y+10,toolbar_x+9,toolbar_y+18)));
+  } while (!exit_requested && !(mouse_b & 2) && !(key(_ESC) && s != 1) && draw_mode < 100 &&
+           !(mouse_b && mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18)));
 }
 
 //-----------------------------------------------------------------------------
@@ -362,66 +472,107 @@ void edit_mode_2(void) {
 //-----------------------------------------------------------------------------
 
 void edit_mode_3(void) {
-
-  int s; // State 0-wait 1st click, 1-wait 2nd click, 2-wait 3rd click
-  int x0,y0; // Starting coordinates
-  int an,al;
+  int s;      // State 0-wait 1st click, 1-wait 2nd click, 2-wait 3rd click
+  int x0, y0; // Starting coordinates
+  int an, al;
   int a;
 
-  bar[0]=101+zoom; bar[1]=121;
-  for (a=2;a<11;a++) { bar[a]=1; } bar[11]=166;
-  bar[12]=119; bar[13]=0; bar[14]=0;
-  draw_bar(22); draw_ruler();
+  bar[0] = 101 + zoom;
+  bar[1] = 121;
+  for (a = 2; a < 11; a++) {
+    bar[a] = 1;
+  }
+  bar[11] = 166;
+  bar[12] = 119;
+  bar[13] = 0;
+  bar[14] = 0;
+  draw_bar(22);
+  draw_ruler();
 
-  s=0; do {
+  s = 0;
+  do {
     draw_help(1295);
-    edit_ruler(); select_fx(12,&efecto3); select_color(2);
+    edit_ruler();
+    select_fx(12, &efecto3);
+    select_color(2);
 
-    if (key(_D)) difuminar=1;
+    if (key(_D))
+      difuminar = 1;
 
-    an=-1; al=-1;
-    back=0; 
-    switch(s) {
-      case 0:
-        if ((mouse_b&1) && mouse_graf>=10) {
-          s=1; x0=coord_x; y0=coord_y;
-          do {read_mouse();} while(mouse_b&1);
-        } break;
-      case 1: case 2:
-        if (mouse_graf>=10) {
-          line_fx=efecto3; undo_error=0;
-          line(x0,y0,coord_x,coord_y,s&1);
-          if (undo_error) s=0; else {
-            an=(x0>coord_x)?x0-coord_x:coord_x-x0;
-            al=(y0>coord_y)?y0-coord_y:coord_y-y0;
-            if (mouse_b&1) {
-              s=2; x0=coord_x; y0=coord_y;
-              do {read_mouse();} while (mouse_b&1);
-            } else if (mouse_b || key(_ESC)) {
-              do {read_mouse();} while (mouse_b || key(_ESC)); s=0; back=1;
-            } else back=1;
-          }
-        } break;
+    an = -1;
+    al = -1;
+    back = 0;
+    switch (s) {
+    case 0:
+      if ((mouse_b & 1) && mouse_graf >= 10) {
+        s = 1;
+        x0 = coord_x;
+        y0 = coord_y;
+        do {
+          read_mouse();
+        } while (mouse_b & 1);
+      }
+      break;
+    case 1:
+    case 2:
+      if (mouse_graf >= 10) {
+        line_fx = efecto3;
+        undo_error = 0;
+        line(x0, y0, coord_x, coord_y, s & 1);
+        if (undo_error)
+          s = 0;
+        else {
+          an = (x0 > coord_x) ? x0 - coord_x : coord_x - x0;
+          al = (y0 > coord_y) ? y0 - coord_y : coord_y - y0;
+          if (mouse_b & 1) {
+            s = 2;
+            x0 = coord_x;
+            y0 = coord_y;
+            do {
+              read_mouse();
+            } while (mouse_b & 1);
+          } else if (mouse_b || key(_ESC)) {
+            do {
+              read_mouse();
+            } while (mouse_b || key(_ESC));
+            s = 0;
+            back = 1;
+          } else
+            back = 1;
+        }
+      }
+      break;
     }
 
-    difuminar=0;
+    difuminar = 0;
 
-    if (((mouse_b&1) && selected_icon==1) || (scan_code==14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
-      undo_back(); do {read_mouse();} while(mouse_b&1);
-    } else if (scan_code==14 && (key(_L_SHIFT)||key(_R_SHIFT))) { undo_next(); need_zoom=1; }
+    if (((mouse_b & 1) && selected_icon == 1) ||
+        (scan_code == 14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
+      undo_back();
+      do {
+        read_mouse();
+      } while (mouse_b & 1);
+    } else if (scan_code == 14 && (key(_L_SHIFT) || key(_R_SHIFT))) {
+      undo_next();
+      need_zoom = 1;
+    }
 
-    analyze_bar(an+1,al+1);
+    analyze_bar(an + 1, al + 1);
     blit_edit();
 
     if (back) {
-      undo_back(); if (need_zoom==1) zoom_map();
-      else if (need_zoom==-1 && need_zoom_width>0 && need_zoom_height>0)
-        draw_edit_background(need_zoom_x,need_zoom_y,need_zoom_width,need_zoom_height);
-      need_zoom_width=0; need_zoom_height=0; need_zoom=0;
+      undo_back();
+      if (need_zoom == 1)
+        zoom_map();
+      else if (need_zoom == -1 && need_zoom_width > 0 && need_zoom_height > 0)
+        draw_edit_background(need_zoom_x, need_zoom_y, need_zoom_width, need_zoom_height);
+      need_zoom_width = 0;
+      need_zoom_height = 0;
+      need_zoom = 0;
     }
 
-  } while (!exit_requested && !(mouse_b&2) && !(key(_ESC)&&s!=1) && draw_mode<100 &&
-    !(mouse_b && mouse_in(toolbar_x,toolbar_y+10,toolbar_x+9,toolbar_y+18)));
+  } while (!exit_requested && !(mouse_b & 2) && !(key(_ESC) && s != 1) && draw_mode < 100 &&
+           !(mouse_b && mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18)));
 }
 
 //-----------------------------------------------------------------------------
@@ -429,353 +580,602 @@ void edit_mode_3(void) {
 //-----------------------------------------------------------------------------
 
 void edit_mode_4(void) {
-
   int s; // State 0-wait 1st click, 1-wait 2nd click, 2-3rd..., 3-4th...
   int a;
 
-  int x0,y0; // Starting coordinates
-  int x1,y1; // Ending coordinates
-  int _x0,_y0; // Initial slope
+  int x0, y0;   // Starting coordinates
+  int x1, y1;   // Ending coordinates
+  int _x0, _y0; // Initial slope
 
-  bar[0]=101+zoom; bar[1]=121;
-  for (a=2;a<11;a++) { bar[a]=1; } bar[11]=166;
-  bar[12]=119; bar[13]=0;
-  draw_bar(0); draw_ruler();
+  bar[0] = 101 + zoom;
+  bar[1] = 121;
+  for (a = 2; a < 11; a++) {
+    bar[a] = 1;
+  }
+  bar[11] = 166;
+  bar[12] = 119;
+  bar[13] = 0;
+  draw_bar(0);
+  draw_ruler();
 
-  s=0; do {
+  s = 0;
+  do {
     draw_help(1295);
-    edit_ruler(); select_fx(12,&efecto4); select_color(2);
+    edit_ruler();
+    select_fx(12, &efecto4);
+    select_color(2);
 
-    if (key(_D)) difuminar=1;
+    if (key(_D))
+      difuminar = 1;
 
-    back=0; switch(s) {
-      case 0:
-        if ((mouse_b&1) && mouse_graf>=10) {
-          s=1; x0=coord_x; y0=coord_y;
-          do {read_mouse();} while(mouse_b&1);
-        } break;
-      case 1:
-        if (mouse_graf>=10) {
-          line_fx=efecto4; undo_error=0;
-          line(x0,y0,coord_x,coord_y,1);
-          if (undo_error) s=0; else {
-            if (mouse_b&1) {
-              s=2; x1=coord_x; y1=coord_y;
-              do {read_mouse();} while (mouse_b&1);
-            } else if (mouse_b || key(_ESC)) {
-              do {read_mouse();} while (mouse_b || key(_ESC)); s=0;
-            } back=1;
+    back = 0;
+    switch (s) {
+    case 0:
+      if ((mouse_b & 1) && mouse_graf >= 10) {
+        s = 1;
+        x0 = coord_x;
+        y0 = coord_y;
+        do {
+          read_mouse();
+        } while (mouse_b & 1);
+      }
+      break;
+    case 1:
+      if (mouse_graf >= 10) {
+        line_fx = efecto4;
+        undo_error = 0;
+        line(x0, y0, coord_x, coord_y, 1);
+        if (undo_error)
+          s = 0;
+        else {
+          if (mouse_b & 1) {
+            s = 2;
+            x1 = coord_x;
+            y1 = coord_y;
+            do {
+              read_mouse();
+            } while (mouse_b & 1);
+          } else if (mouse_b || key(_ESC)) {
+            do {
+              read_mouse();
+            } while (mouse_b || key(_ESC));
+            s = 0;
           }
-        } break;
-      case 2:
-        if (mouse_graf>=10) {
-          line_fx=efecto4; undo_error=0;
-          bezier(x0,y0,x1,y1,coord_x,coord_y,coord_x,coord_y,1);
-          if (undo_error) s=0; else {
-            if (mouse_b&1) {
-              s=3; _x0=coord_x; _y0=coord_y;
-              do {read_mouse();} while (mouse_b&1);
-            } else if (mouse_b || key(_ESC)) {
-              do {read_mouse();} while (mouse_b || key(_ESC)); s=0;
-            } back=1;
+          back = 1;
+        }
+      }
+      break;
+    case 2:
+      if (mouse_graf >= 10) {
+        line_fx = efecto4;
+        undo_error = 0;
+        bezier(x0, y0, x1, y1, coord_x, coord_y, coord_x, coord_y, 1);
+        if (undo_error)
+          s = 0;
+        else {
+          if (mouse_b & 1) {
+            s = 3;
+            _x0 = coord_x;
+            _y0 = coord_y;
+            do {
+              read_mouse();
+            } while (mouse_b & 1);
+          } else if (mouse_b || key(_ESC)) {
+            do {
+              read_mouse();
+            } while (mouse_b || key(_ESC));
+            s = 0;
           }
-        } break;
-      case 3:
-        if (mouse_graf>=10) {
-          line_fx=efecto4; undo_error=0;
-          bezier(x0,y0,x1,y1,_x0,_y0,coord_x,coord_y,1);
-          if (undo_error) s=0; else {
-            if (mouse_b&1) {
-              s=0; do {read_mouse();} while (mouse_b&1);
-            } else if (mouse_b || key(_ESC)) {
-              do {read_mouse();} while (mouse_b || key(_ESC)); s=0; back=1;
-            } else back=1;
-          }
-        } break;
+          back = 1;
+        }
+      }
+      break;
+    case 3:
+      if (mouse_graf >= 10) {
+        line_fx = efecto4;
+        undo_error = 0;
+        bezier(x0, y0, x1, y1, _x0, _y0, coord_x, coord_y, 1);
+        if (undo_error)
+          s = 0;
+        else {
+          if (mouse_b & 1) {
+            s = 0;
+            do {
+              read_mouse();
+            } while (mouse_b & 1);
+          } else if (mouse_b || key(_ESC)) {
+            do {
+              read_mouse();
+            } while (mouse_b || key(_ESC));
+            s = 0;
+            back = 1;
+          } else
+            back = 1;
+        }
+      }
+      break;
     }
 
-    difuminar=0;
+    difuminar = 0;
 
-    if (((mouse_b&1) && selected_icon==1) || (scan_code==14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
-      undo_back(); do {read_mouse();} while(mouse_b&1);
-    } else if (scan_code==14 && (key(_L_SHIFT)||key(_R_SHIFT))) { undo_next(); need_zoom=1; }
+    if (((mouse_b & 1) && selected_icon == 1) ||
+        (scan_code == 14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
+      undo_back();
+      do {
+        read_mouse();
+      } while (mouse_b & 1);
+    } else if (scan_code == 14 && (key(_L_SHIFT) || key(_R_SHIFT))) {
+      undo_next();
+      need_zoom = 1;
+    }
 
     blit_edit();
 
     if (back) {
-      undo_back(); if (need_zoom==1) zoom_map();
-      else if (need_zoom==-1 && need_zoom_width>0 && need_zoom_height>0)
-        draw_edit_background(need_zoom_x,need_zoom_y,need_zoom_width,need_zoom_height);
-      need_zoom_width=0; need_zoom_height=0; need_zoom=0;
+      undo_back();
+      if (need_zoom == 1)
+        zoom_map();
+      else if (need_zoom == -1 && need_zoom_width > 0 && need_zoom_height > 0)
+        draw_edit_background(need_zoom_x, need_zoom_y, need_zoom_width, need_zoom_height);
+      need_zoom_width = 0;
+      need_zoom_height = 0;
+      need_zoom = 0;
     }
 
-  } while (!exit_requested && !(mouse_b&2) && !(key(_ESC)&&s!=1) && draw_mode<100 &&
-    !(mouse_b && mouse_in(toolbar_x,toolbar_y+10,toolbar_x+9,toolbar_y+18)));
+  } while (!exit_requested && !(mouse_b & 2) && !(key(_ESC) && s != 1) && draw_mode < 100 &&
+           !(mouse_b && mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18)));
 }
 
 //-----------------------------------------------------------------------------
 //      Edit screen (continuous Bezier curves)
 //-----------------------------------------------------------------------------
 
-int bezier_x,bezier_y;
-int tension=16;
+int bezier_x, bezier_y;
+int tension = 16;
 
 void edit_mode_5(void) {
-
   int s; // State 0-wait 1st click, 1-wait 2nd click, 2-3rd...
   int a;
 
-  int x0,y0; // First point
-  int x1,y1; // Second point
+  int x0, y0; // First point
+  int x1, y1; // Second point
 
   float ang;
 
-  bar[0]=101+zoom; bar[1]=121;
-  for (a=2;a<11;a++) { bar[a]=1; } bar[11]=166;
-  bar[12]=119; bar[13]=0;
-  draw_bar(0); draw_ruler();
+  bar[0] = 101 + zoom;
+  bar[1] = 121;
+  for (a = 2; a < 11; a++) {
+    bar[a] = 1;
+  }
+  bar[11] = 166;
+  bar[12] = 119;
+  bar[13] = 0;
+  draw_bar(0);
+  draw_ruler();
 
-  s=0; do {
+  s = 0;
+  do {
     draw_help(1295);
-    edit_ruler(); select_fx(12,&efecto5); select_color(2);
+    edit_ruler();
+    select_fx(12, &efecto5);
+    select_color(2);
 
-    if (key(_D)) difuminar=1;
+    if (key(_D))
+      difuminar = 1;
 
-    back=0; 
+    back = 0;
 
-    switch(s) {
-      case 0:
-        if ((mouse_b&1) && mouse_graf>=10) {
-          s=1; x0=coord_x; y0=coord_y;
-          do {read_mouse();} while(mouse_b&1);
-        } break;
-      case 1:
-        if (mouse_graf>=10) {
-          line_fx=efecto5; undo_error=0;
-          line(x0,y0,coord_x,coord_y,1);
-          if (undo_error) s=0; else {
-            if (mouse_b&1) {
-              s=2; x0=x0-coord_x; y0=coord_y-y0;
-              if (!x0 && !y0) ang=0; else ang=atan2(y0,x0);
-              x1=coord_x; y1=coord_y;
-              do {read_mouse();} while (mouse_b&1);
-            } else if (mouse_b || key(_ESC)) {
-              back=1;
-              do {read_mouse();} while (mouse_b || key(_ESC)); s=0;
-            } else  back=1;
-          }
-        } break;
-      case 2:
-        if (mouse_graf>=10) {
-          y0=sqrt(abs(coord_x-x1)*abs(coord_x-x1)+abs(coord_y-y1)*abs(coord_y-y1));
+    switch (s) {
+    case 0:
+      if ((mouse_b & 1) && mouse_graf >= 10) {
+        s = 1;
+        x0 = coord_x;
+        y0 = coord_y;
+        do {
+          read_mouse();
+        } while (mouse_b & 1);
+      }
+      break;
+    case 1:
+      if (mouse_graf >= 10) {
+        line_fx = efecto5;
+        undo_error = 0;
+        line(x0, y0, coord_x, coord_y, 1);
+        if (undo_error)
+          s = 0;
+        else {
+          if (mouse_b & 1) {
+            s = 2;
+            x0 = x0 - coord_x;
+            y0 = coord_y - y0;
+            if (!x0 && !y0)
+              ang = 0;
+            else
+              ang = atan2(y0, x0);
+            x1 = coord_x;
+            y1 = coord_y;
+            do {
+              read_mouse();
+            } while (mouse_b & 1);
+          } else if (mouse_b || key(_ESC)) {
+            back = 1;
+            do {
+              read_mouse();
+            } while (mouse_b || key(_ESC));
+            s = 0;
+          } else
+            back = 1;
+        }
+      }
+      break;
+    case 2:
+      if (mouse_graf >= 10) {
+        y0 = sqrt(abs(coord_x - x1) * abs(coord_x - x1) + abs(coord_y - y1) * abs(coord_y - y1));
 
-          if (key(0xd) || key (0x4e)) tension++;
-          if (key(0xc) || (key (0x4a) && tension)) tension--;
-          y0=tension;
+        if (key(0xd) || key(0x4e))
+          tension++;
+        if (key(0xc) || (key(0x4a) && tension))
+          tension--;
+        y0 = tension;
 
-          x0=x1-(long)((float)cos(ang)*y0); y0=y1+(long)((float)sin(ang)*y0);
-          line_fx=efecto5; undo_error=0;
-          bezier(x1,y1,coord_x,coord_y,x0,y0,coord_x,coord_y,0);
-          if (undo_error) s=0; else {
-            if (mouse_b&1) {
-              x0=bezier_x-coord_x; y0=coord_y-bezier_y;
-              if (!x0 && !y0) ang=0; else ang=atan2(y0,x0);
-              x1=coord_x; y1=coord_y;
-              do {read_mouse();} while (mouse_b&1);
-            } else if (mouse_b || key(_ESC)) {
-              back=1;
-              do {read_mouse();} while (mouse_b || key(_ESC)); s=0;
-            } else back=1;
-          }
-        } break;
+        x0 = x1 - (long)((float)cos(ang) * y0);
+        y0 = y1 + (long)((float)sin(ang) * y0);
+        line_fx = efecto5;
+        undo_error = 0;
+        bezier(x1, y1, coord_x, coord_y, x0, y0, coord_x, coord_y, 0);
+        if (undo_error)
+          s = 0;
+        else {
+          if (mouse_b & 1) {
+            x0 = bezier_x - coord_x;
+            y0 = coord_y - bezier_y;
+            if (!x0 && !y0)
+              ang = 0;
+            else
+              ang = atan2(y0, x0);
+            x1 = coord_x;
+            y1 = coord_y;
+            do {
+              read_mouse();
+            } while (mouse_b & 1);
+          } else if (mouse_b || key(_ESC)) {
+            back = 1;
+            do {
+              read_mouse();
+            } while (mouse_b || key(_ESC));
+            s = 0;
+          } else
+            back = 1;
+        }
+      }
+      break;
     }
 
-    difuminar=0;
+    difuminar = 0;
 
-    if (((mouse_b&1) && selected_icon==1) || (scan_code==14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
-      undo_back(); do {read_mouse();} while(mouse_b&1);
-    } else if (scan_code==14 && (key(_L_SHIFT)||key(_R_SHIFT))) { undo_next(); need_zoom=1; }
+    if (((mouse_b & 1) && selected_icon == 1) ||
+        (scan_code == 14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
+      undo_back();
+      do {
+        read_mouse();
+      } while (mouse_b & 1);
+    } else if (scan_code == 14 && (key(_L_SHIFT) || key(_R_SHIFT))) {
+      undo_next();
+      need_zoom = 1;
+    }
 
     blit_edit();
 
     if (back) {
-      undo_back(); if (need_zoom==1) zoom_map();
-      else if (need_zoom==-1 && need_zoom_width>0 && need_zoom_height>0)
-        draw_edit_background(need_zoom_x,need_zoom_y,need_zoom_width,need_zoom_height);
-      need_zoom_width=0; need_zoom_height=0; need_zoom=0;
+      undo_back();
+      if (need_zoom == 1)
+        zoom_map();
+      else if (need_zoom == -1 && need_zoom_width > 0 && need_zoom_height > 0)
+        draw_edit_background(need_zoom_x, need_zoom_y, need_zoom_width, need_zoom_height);
+      need_zoom_width = 0;
+      need_zoom_height = 0;
+      need_zoom = 0;
     }
 
-  } while (!exit_requested && !(mouse_b&2) && !(key(_ESC)&&s!=1) && draw_mode<100 &&
-    !(mouse_b && mouse_in(toolbar_x,toolbar_y+10,toolbar_x+9,toolbar_y+18)));
+  } while (!exit_requested && !(mouse_b & 2) && !(key(_ESC) && s != 1) && draw_mode < 100 &&
+           !(mouse_b && mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18)));
 }
 
 //-----------------------------------------------------------------------------
 //      Edit screen (rectangles)
 //-----------------------------------------------------------------------------
 
-int iconos_caja[]={2,1,110,111};
+int iconos_caja[] = {2, 1, 110, 111};
 
 void select_rect(int n) {
   int r;
-  r=select_icon(toolbar_x+48+n*16,iconos_caja);
-  if (r>=0) {
-    mode_rect=r; bar[13]=iconos_caja[2+mode_rect];
-    draw_bar(22); draw_ruler();
+  r = select_icon(toolbar_x + 48 + n * 16, iconos_caja);
+  if (r >= 0) {
+    mode_rect = r;
+    bar[13] = iconos_caja[2 + mode_rect];
+    draw_bar(22);
+    draw_ruler();
   }
 }
 
 void edit_mode_6(void) {
-
-  int s; // State 0-wait 1st click, 1-wait 2nd click
-  int x0,y0; // Starting coordinates
-  int an,al;
+  int s;      // State 0-wait 1st click, 1-wait 2nd click
+  int x0, y0; // Starting coordinates
+  int an, al;
   int a;
 
-  bar[0]=101+zoom; bar[1]=121;
-  for (a=2;a<11;a++) { bar[a]=1; } bar[11]=166;
-  bar[12]=119; bar[13]=iconos_caja[2+mode_rect]; bar[14]=0; bar[15]=0;
-  draw_bar(22); draw_ruler();
+  bar[0] = 101 + zoom;
+  bar[1] = 121;
+  for (a = 2; a < 11; a++) {
+    bar[a] = 1;
+  }
+  bar[11] = 166;
+  bar[12] = 119;
+  bar[13] = iconos_caja[2 + mode_rect];
+  bar[14] = 0;
+  bar[15] = 0;
+  draw_bar(22);
+  draw_ruler();
 
-  s=0; do {
+  s = 0;
+  do {
     draw_help(1295);
-    edit_ruler(); select_fx(12,&efecto6); select_color(2);
+    edit_ruler();
+    select_fx(12, &efecto6);
+    select_color(2);
 
-    an=map_width*2; al=0; back=0; switch(s) {
-      case 0:
-        if ((mouse_b&1) && mouse_graf>=10) {
-          s=1; x0=coord_x; y0=coord_y;
-          do {read_mouse();} while(mouse_b&1);
-        } break;
-      case 1:
-        if (mouse_graf>=10) {
-          line_fx=efecto6;
-          an=coord_x-x0; al=coord_y-y0;
-          if (key(_L_CTRL) || key(_R_CTRL)) {
-            if (abs(an)>abs(al)) { if (al<0) al=-abs(an); else al=abs(an); }
-            else { if (an<0) an=-abs(al); else an=abs(al); }
-            undo_error=0; draw_box(x0,y0,x0+an,y0+al); if (undo_error) s=0;
+    an = map_width * 2;
+    al = 0;
+    back = 0;
+    switch (s) {
+    case 0:
+      if ((mouse_b & 1) && mouse_graf >= 10) {
+        s = 1;
+        x0 = coord_x;
+        y0 = coord_y;
+        do {
+          read_mouse();
+        } while (mouse_b & 1);
+      }
+      break;
+    case 1:
+      if (mouse_graf >= 10) {
+        line_fx = efecto6;
+        an = coord_x - x0;
+        al = coord_y - y0;
+        if (key(_L_CTRL) || key(_R_CTRL)) {
+          if (abs(an) > abs(al)) {
+            if (al < 0)
+              al = -abs(an);
+            else
+              al = abs(an);
           } else {
-            undo_error=0; draw_box(x0,y0,coord_x,coord_y); if (undo_error) s=0;
+            if (an < 0)
+              an = -abs(al);
+            else
+              an = abs(al);
           }
-          if (mouse_b&1) {
-            s=0; do {read_mouse();} while (mouse_b&1);
-          } else if (mouse_b || key(_ESC)) {
-            do {read_mouse();} while (mouse_b || key(_ESC)); s=0; back=1;
-          } else back=1;
-        } break;
+          undo_error = 0;
+          draw_box(x0, y0, x0 + an, y0 + al);
+          if (undo_error)
+            s = 0;
+        } else {
+          undo_error = 0;
+          draw_box(x0, y0, coord_x, coord_y);
+          if (undo_error)
+            s = 0;
+        }
+        if (mouse_b & 1) {
+          s = 0;
+          do {
+            read_mouse();
+          } while (mouse_b & 1);
+        } else if (mouse_b || key(_ESC)) {
+          do {
+            read_mouse();
+          } while (mouse_b || key(_ESC));
+          s = 0;
+          back = 1;
+        } else
+          back = 1;
+      }
+      break;
     }
 
-    if (((mouse_b&1) && selected_icon==1) || (scan_code==14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
-      undo_back(); do {read_mouse();} while(mouse_b&1);
-    } else if (scan_code==14 && (key(_L_SHIFT)||key(_R_SHIFT))) { undo_next(); need_zoom=1; }
+    if (((mouse_b & 1) && selected_icon == 1) ||
+        (scan_code == 14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
+      undo_back();
+      do {
+        read_mouse();
+      } while (mouse_b & 1);
+    } else if (scan_code == 14 && (key(_L_SHIFT) || key(_R_SHIFT))) {
+      undo_next();
+      need_zoom = 1;
+    }
 
     select_rect(13);
 
-    if (an==map_width*2) analyze_bar(0,0);
-    else analyze_bar(abs(an)+1,abs(al)+1);
+    if (an == map_width * 2)
+      analyze_bar(0, 0);
+    else
+      analyze_bar(abs(an) + 1, abs(al) + 1);
     blit_edit();
 
     if (back) {
-      undo_back(); if (need_zoom==1) zoom_map();
-      else if (need_zoom==-1 && need_zoom_width>0 && need_zoom_height>0)
-        draw_edit_background(need_zoom_x,need_zoom_y,need_zoom_width,need_zoom_height);
-      need_zoom_width=0; need_zoom_height=0; need_zoom=0;
+      undo_back();
+      if (need_zoom == 1)
+        zoom_map();
+      else if (need_zoom == -1 && need_zoom_width > 0 && need_zoom_height > 0)
+        draw_edit_background(need_zoom_x, need_zoom_y, need_zoom_width, need_zoom_height);
+      need_zoom_width = 0;
+      need_zoom_height = 0;
+      need_zoom = 0;
     }
 
-  } while (!exit_requested && !(mouse_b&2) && !(key(_ESC)&&s!=1) && draw_mode<100 &&
-    !(mouse_b && mouse_in(toolbar_x,toolbar_y+10,toolbar_x+9,toolbar_y+18)));
+  } while (!exit_requested && !(mouse_b & 2) && !(key(_ESC) && s != 1) && draw_mode < 100 &&
+           !(mouse_b && mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18)));
 }
 
 //-----------------------------------------------------------------------------
 //      Edit screen (circles)
 //-----------------------------------------------------------------------------
 
-int iconos_circulo[]={4,1,175,176,112,113};
+int iconos_circulo[] = {4, 1, 175, 176, 112, 113};
 
 void select_circle(int n) {
   int r;
-  r=select_icon(toolbar_x+48+n*16,iconos_circulo);
-  if (r>=0) {
-    mode_circle=r; bar[13]=iconos_circulo[2+mode_circle];
-    draw_bar(22); draw_ruler();
+  r = select_icon(toolbar_x + 48 + n * 16, iconos_circulo);
+  if (r >= 0) {
+    mode_circle = r;
+    bar[13] = iconos_circulo[2 + mode_circle];
+    draw_bar(22);
+    draw_ruler();
   }
 }
 
 void edit_mode_7(void) {
-
-  int s; // State 0-wait 1st click, 1-wait 2nd click
-  int x0,y0; // Starting coordinates
-  int an,al;
+  int s;      // State 0-wait 1st click, 1-wait 2nd click
+  int x0, y0; // Starting coordinates
+  int an, al;
   int a;
 
-  bar[0]=101+zoom; bar[1]=121;
-  for (a=2;a<11;a++) { bar[a]=1; } bar[11]=166;
-  bar[12]=119; bar[13]=iconos_circulo[2+mode_circle]; bar[14]=0; bar[15]=0;
-  draw_bar(22); draw_ruler();
+  bar[0] = 101 + zoom;
+  bar[1] = 121;
+  for (a = 2; a < 11; a++) {
+    bar[a] = 1;
+  }
+  bar[11] = 166;
+  bar[12] = 119;
+  bar[13] = iconos_circulo[2 + mode_circle];
+  bar[14] = 0;
+  bar[15] = 0;
+  draw_bar(22);
+  draw_ruler();
 
-  s=0; do {
+  s = 0;
+  do {
     draw_help(1295);
-    edit_ruler(); select_fx(12,&efecto7); select_color(2);
+    edit_ruler();
+    select_fx(12, &efecto7);
+    select_color(2);
 
-    an=map_width*2; al=0; back=0; switch(s) {
-      case 0:
-        if ((mouse_b&1) && mouse_graf>=10) {
-          s=1; x0=coord_x; y0=coord_y;
-          do {read_mouse();} while(mouse_b&1);
-        } break;
-      case 1:
-        if (mouse_graf>=10) {
-          line_fx=efecto7;
-          if (mode_circle<2) {
-            an=coord_x-x0; al=coord_y-y0;
-            if (key(_L_CTRL) || key(_R_CTRL)) {
-              if (abs(an)>abs(al)) { if (al<0) al=-abs(an); else al=abs(an); }
-              else { if (an<0) an=-abs(al); else an=abs(al); }
-              undo_error=0; draw_circle(x0,y0,x0+an,y0+al,mode_circle&1);
-              if (undo_error) s=0;
+    an = map_width * 2;
+    al = 0;
+    back = 0;
+    switch (s) {
+    case 0:
+      if ((mouse_b & 1) && mouse_graf >= 10) {
+        s = 1;
+        x0 = coord_x;
+        y0 = coord_y;
+        do {
+          read_mouse();
+        } while (mouse_b & 1);
+      }
+      break;
+    case 1:
+      if (mouse_graf >= 10) {
+        line_fx = efecto7;
+        if (mode_circle < 2) {
+          an = coord_x - x0;
+          al = coord_y - y0;
+          if (key(_L_CTRL) || key(_R_CTRL)) {
+            if (abs(an) > abs(al)) {
+              if (al < 0)
+                al = -abs(an);
+              else
+                al = abs(an);
             } else {
-              undo_error=0; draw_circle(x0,y0,coord_x,coord_y,mode_circle&1);
-              if (undo_error) s=0;
+              if (an < 0)
+                an = -abs(al);
+              else
+                an = abs(al);
             }
+            undo_error = 0;
+            draw_circle(x0, y0, x0 + an, y0 + al, mode_circle & 1);
+            if (undo_error)
+              s = 0;
           } else {
-            an=coord_x-x0; al=coord_y-y0;
-            if (key(_L_CTRL) || key(_R_CTRL)) {
-              if (abs(an)>abs(al)) { if (al<0) al=-abs(an); else al=abs(an); }
-              else { if (an<0) an=-abs(al); else an=abs(al); }
-              undo_error=0; draw_circle(x0-an,y0-an,x0+an,y0+an,mode_circle&1);
-              if (undo_error) s=0;
-            } else {
-              undo_error=0; draw_circle(x0-an,y0-al,x0+an,y0+al,mode_circle&1);
-              if (undo_error) s=0;
-            }
+            undo_error = 0;
+            draw_circle(x0, y0, coord_x, coord_y, mode_circle & 1);
+            if (undo_error)
+              s = 0;
           }
-          if (mouse_b&1) {
-            s=0; do {read_mouse();} while (mouse_b&1);
-          } else if (mouse_b || key(_ESC)) {
-            do {read_mouse();} while (mouse_b || key(_ESC)); s=0; back=1;
-          } else back=1;
-        } break;
+        } else {
+          an = coord_x - x0;
+          al = coord_y - y0;
+          if (key(_L_CTRL) || key(_R_CTRL)) {
+            if (abs(an) > abs(al)) {
+              if (al < 0)
+                al = -abs(an);
+              else
+                al = abs(an);
+            } else {
+              if (an < 0)
+                an = -abs(al);
+              else
+                an = abs(al);
+            }
+            undo_error = 0;
+            draw_circle(x0 - an, y0 - an, x0 + an, y0 + an, mode_circle & 1);
+            if (undo_error)
+              s = 0;
+          } else {
+            undo_error = 0;
+            draw_circle(x0 - an, y0 - al, x0 + an, y0 + al, mode_circle & 1);
+            if (undo_error)
+              s = 0;
+          }
+        }
+        if (mouse_b & 1) {
+          s = 0;
+          do {
+            read_mouse();
+          } while (mouse_b & 1);
+        } else if (mouse_b || key(_ESC)) {
+          do {
+            read_mouse();
+          } while (mouse_b || key(_ESC));
+          s = 0;
+          back = 1;
+        } else
+          back = 1;
+      }
+      break;
     }
 
-    if (((mouse_b&1) && selected_icon==1) || (scan_code==14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
-      undo_back(); do {read_mouse();} while(mouse_b&1);
-    } else if (scan_code==14 && (key(_L_SHIFT)||key(_R_SHIFT))) { undo_next(); need_zoom=1; }
+    if (((mouse_b & 1) && selected_icon == 1) ||
+        (scan_code == 14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
+      undo_back();
+      do {
+        read_mouse();
+      } while (mouse_b & 1);
+    } else if (scan_code == 14 && (key(_L_SHIFT) || key(_R_SHIFT))) {
+      undo_next();
+      need_zoom = 1;
+    }
 
     select_circle(13);
 
-    if (an==map_width*2) analyze_bar(0,0);
-    else analyze_bar(abs(an)+1,abs(al)+1);
+    if (an == map_width * 2)
+      analyze_bar(0, 0);
+    else
+      analyze_bar(abs(an) + 1, abs(al) + 1);
     blit_edit();
 
     if (back) {
-      undo_back(); if (need_zoom==1) zoom_map();
-      else if (need_zoom==-1 && need_zoom_width>0 && need_zoom_height>0)
-        draw_edit_background(need_zoom_x,need_zoom_y,need_zoom_width,need_zoom_height);
-      need_zoom_width=0; need_zoom_height=0; need_zoom=0;
+      undo_back();
+      if (need_zoom == 1)
+        zoom_map();
+      else if (need_zoom == -1 && need_zoom_width > 0 && need_zoom_height > 0)
+        draw_edit_background(need_zoom_x, need_zoom_y, need_zoom_width, need_zoom_height);
+      need_zoom_width = 0;
+      need_zoom_height = 0;
+      need_zoom = 0;
     }
 
-  } while (!exit_requested && !(mouse_b&2) && !(key(_ESC)&&s!=1) && draw_mode<100 &&
-    !(mouse_b && mouse_in(toolbar_x,toolbar_y+10,toolbar_x+9,toolbar_y+18)));
+  } while (!exit_requested && !(mouse_b & 2) && !(key(_ESC) && s != 1) && draw_mode < 100 &&
+           !(mouse_b && mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18)));
 }
 
 //-----------------------------------------------------------------------------
@@ -783,30 +1183,55 @@ void edit_mode_7(void) {
 //-----------------------------------------------------------------------------
 
 void zoom_region(int x, int y, int an, int al) {
-
-  if (x<0) { an+=x; x=0; }
-  if (y<0) { al+=y; y=0; }
-  if (x+an>map_width) { an=map_width-x; }
-  if (y+al>map_height) { al=map_height-y; }
-  if (an<=0 || al<=0) return;
+  if (x < 0) {
+    an += x;
+    x = 0;
+  }
+  if (y < 0) {
+    al += y;
+    y = 0;
+  }
+  if (x + an > map_width) {
+    an = map_width - x;
+  }
+  if (y + al > map_height) {
+    al = map_height - y;
+  }
+  if (an <= 0 || al <= 0)
+    return;
 
   // Determine the zoom region to refresh
 
-  if (x<zoom_x) need_zoom_x=zoom_win_x-((zoom_x-x)<<zoom);
-  else need_zoom_x=zoom_win_x+((x-zoom_x)<<zoom);
-  if (y<zoom_y) need_zoom_y=zoom_win_y+((y-zoom_y)<<zoom);
-  else need_zoom_y=zoom_win_y+((y-zoom_y)<<zoom);
-  need_zoom_width=an<<zoom; need_zoom_height=al<<zoom;
+  if (x < zoom_x)
+    need_zoom_x = zoom_win_x - ((zoom_x - x) << zoom);
+  else
+    need_zoom_x = zoom_win_x + ((x - zoom_x) << zoom);
+  if (y < zoom_y)
+    need_zoom_y = zoom_win_y + ((y - zoom_y) << zoom);
+  else
+    need_zoom_y = zoom_win_y + ((y - zoom_y) << zoom);
+  need_zoom_width = an << zoom;
+  need_zoom_height = al << zoom;
 
-  if (need_zoom_x+need_zoom_width<=zoom_win_x || need_zoom_y+need_zoom_height<=zoom_win_y ||
-      need_zoom_x>=zoom_win_x+zoom_win_width || need_zoom_y>=zoom_win_y+zoom_win_height) {
-    need_zoom_width=0; need_zoom_height=0;
+  if (need_zoom_x + need_zoom_width <= zoom_win_x || need_zoom_y + need_zoom_height <= zoom_win_y ||
+      need_zoom_x >= zoom_win_x + zoom_win_width || need_zoom_y >= zoom_win_y + zoom_win_height) {
+    need_zoom_width = 0;
+    need_zoom_height = 0;
   } else {
-    if (need_zoom_x<zoom_win_x) { need_zoom_width-=zoom_win_x-need_zoom_x; need_zoom_x=zoom_win_x; }
-    if (need_zoom_y<zoom_win_y) { need_zoom_height-=zoom_win_y-need_zoom_y; need_zoom_y=zoom_win_y; }
-    if (need_zoom_x+need_zoom_width>zoom_win_x+zoom_win_width) need_zoom_width=zoom_win_x+zoom_win_width-need_zoom_x;
-    if (need_zoom_y+need_zoom_height>zoom_win_y+zoom_win_height) need_zoom_height=zoom_win_y+zoom_win_height-need_zoom_y;
-    if (!need_zoom) need_zoom=-1;
+    if (need_zoom_x < zoom_win_x) {
+      need_zoom_width -= zoom_win_x - need_zoom_x;
+      need_zoom_x = zoom_win_x;
+    }
+    if (need_zoom_y < zoom_win_y) {
+      need_zoom_height -= zoom_win_y - need_zoom_y;
+      need_zoom_y = zoom_win_y;
+    }
+    if (need_zoom_x + need_zoom_width > zoom_win_x + zoom_win_width)
+      need_zoom_width = zoom_win_x + zoom_win_width - need_zoom_x;
+    if (need_zoom_y + need_zoom_height > zoom_win_y + zoom_win_height)
+      need_zoom_height = zoom_win_y + zoom_win_height - need_zoom_y;
+    if (!need_zoom)
+      need_zoom = -1;
   }
 }
 
@@ -815,101 +1240,127 @@ void zoom_region(int x, int y, int an, int al) {
 //-----------------------------------------------------------------------------
 
 #define undo_spray -1
-#define undo_box 4
+#define undo_box   4
 
-int modo_spray=2,clock_spray;
-int iconos_spray[]={6,1,181,182,183,184,185,186};
+int modo_spray = 2, clock_spray;
+int iconos_spray[] = {6, 1, 181, 182, 183, 184, 185, 186};
 
 void select_spray(int n) {
   int r;
-  r=select_icon(toolbar_x+48+n*16,iconos_spray);
-  if (r>=0) {
-    modo_spray=r; bar[13]=iconos_spray[2+modo_spray];
-    draw_bar(0); draw_ruler();
+  r = select_icon(toolbar_x + 48 + n * 16, iconos_spray);
+  if (r >= 0) {
+    modo_spray = r;
+    bar[13] = iconos_spray[2 + modo_spray];
+    draw_bar(0);
+    draw_ruler();
   }
 }
 
 extern int reloj;
 
-void init_rnd(int n, char * clave);
+void init_rnd(int n, char *clave);
 byte rndb();
 int rnd();
 
 void edit_mode_8(void) {
   byte col;
-  int n,m,x,y;
-  int u=undo_spray,ux,uy; // Number of saved actions and in which box
+  int n, m, x, y;
+  int u = undo_spray, ux, uy; // Number of saved actions and in which box
 
-  clock_spray=-1;
+  clock_spray = -1;
 
-  bar[0]=101+zoom; bar[1]=121;
-  for (n=2;n<11;n++) { bar[n]=1; } bar[11]=166; bar[12]=119;
-  bar[13]=iconos_spray[2+modo_spray]; bar[14]=0;
-  draw_bar(0); draw_ruler();
-  init_rnd(0,"");
+  bar[0] = 101 + zoom;
+  bar[1] = 121;
+  for (n = 2; n < 11; n++) {
+    bar[n] = 1;
+  }
+  bar[11] = 166;
+  bar[12] = 119;
+  bar[13] = iconos_spray[2 + modo_spray];
+  bar[14] = 0;
+  draw_bar(0);
+  draw_ruler();
+  init_rnd(0, "");
 
   do {
     draw_help(1295);
-    edit_ruler(); select_color(2); select_fx(12,&efecto8);
+    edit_ruler();
+    select_color(2);
+    select_fx(12, &efecto8);
 
-    if (key(_D)) difuminar=1;
+    if (key(_D))
+      difuminar = 1;
 
-    if ((mouse_b&1) && mouse_graf>=10) {
-
-      if (clock_spray!=-1) {
-
-        if (u==undo_spray || abs(coord_x-ux)>undo_box || abs(coord_y-uy)>undo_box) {
-          u=0; ux=coord_x; uy=coord_y;
-          save_undo(coord_x-pincel_an/2-undo_box,coord_y-pincel_al/2-undo_box,
-            pincel_an+undo_box*2+1,pincel_al+undo_box*2+1);
+    if ((mouse_b & 1) && mouse_graf >= 10) {
+      if (clock_spray != -1) {
+        if (u == undo_spray || abs(coord_x - ux) > undo_box || abs(coord_y - uy) > undo_box) {
+          u = 0;
+          ux = coord_x;
+          uy = coord_y;
+          save_undo(coord_x - pincel_an / 2 - undo_box, coord_y - pincel_al / 2 - undo_box,
+                    pincel_an + undo_box * 2 + 1, pincel_al + undo_box * 2 + 1);
         } else {
-          zoom_region(coord_x-pincel_an/2,coord_y-pincel_al/2,
-            pincel_an*2+1,pincel_al*2+1); u++;
+          zoom_region(coord_x - pincel_an / 2, coord_y - pincel_al / 2, pincel_an * 2 + 1,
+                      pincel_al * 2 + 1);
+          u++;
         }
 
-        m=pincel_an*pincel_al*(reloj-clock_spray);
-        clock_spray=reloj;
+        m = pincel_an * pincel_al * (reloj - clock_spray);
+        clock_spray = reloj;
 
-        if (textura_color==NULL) {
+        if (textura_color == NULL) {
           while (m--) {
-            if (rndb()<(8<<modo_spray)) {
-              x=rnd()%pincel_an;
-              y=rnd()%pincel_al;
-              if (pincel[x+y*pincel_an]) {
-                line_fx=efecto8;
-                _line_pixel(coord_x+x-pincel_an/2,coord_y+y-pincel_al/2);
+            if (rndb() < (8 << modo_spray)) {
+              x = rnd() % pincel_an;
+              y = rnd() % pincel_al;
+              if (pincel[x + y * pincel_an]) {
+                line_fx = efecto8;
+                _line_pixel(coord_x + x - pincel_an / 2, coord_y + y - pincel_al / 2);
               }
             }
           }
         } else {
-          col=color;
+          col = color;
           while (m--) {
-            if (rndb()<(8<<modo_spray)) {
-              x=rnd()%pincel_an;
-              y=rnd()%pincel_al;
-              if (pincel[x+y*pincel_an]) {
-                line_fx=efecto8;
-                color=get_color(coord_x+x-pincel_an/2,coord_y+y-pincel_al/2);
-                _line_pixel(coord_x+x-pincel_an/2,coord_y+y-pincel_al/2);
+            if (rndb() < (8 << modo_spray)) {
+              x = rnd() % pincel_an;
+              y = rnd() % pincel_al;
+              if (pincel[x + y * pincel_an]) {
+                line_fx = efecto8;
+                color = get_color(coord_x + x - pincel_an / 2, coord_y + y - pincel_al / 2);
+                _line_pixel(coord_x + x - pincel_an / 2, coord_y + y - pincel_al / 2);
               }
             }
-          } color=col;
+          }
+          color = col;
         }
-      } else clock_spray=reloj;
+      } else
+        clock_spray = reloj;
 
-    } else clock_spray=-1;
+    } else
+      clock_spray = -1;
 
-    difuminar=0;
+    difuminar = 0;
 
-    if (((mouse_b&1) && selected_icon==1) || (scan_code==14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
-      undo_back(); do {read_mouse();} while(mouse_b&1);
-    } else if (scan_code==14 && (key(_L_SHIFT)||key(_R_SHIFT))) { undo_next(); need_zoom=1; }
+    if (((mouse_b & 1) && selected_icon == 1) ||
+        (scan_code == 14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
+      undo_back();
+      do {
+        read_mouse();
+      } while (mouse_b & 1);
+    } else if (scan_code == 14 && (key(_L_SHIFT) || key(_R_SHIFT))) {
+      undo_next();
+      need_zoom = 1;
+    }
 
-    n=modo_spray; select_spray(13); if (n!=modo_spray) u=undo_spray;
+    n = modo_spray;
+    select_spray(13);
+    if (n != modo_spray)
+      u = undo_spray;
 
     blit_edit();
-  } while (!exit_requested && !(mouse_b&2) && !key(_ESC) && draw_mode<100 &&
-    !(mouse_b && mouse_in(toolbar_x,toolbar_y+10,toolbar_x+9,toolbar_y+18)));
+  } while (!exit_requested && !(mouse_b & 2) && !key(_ESC) && draw_mode < 100 &&
+           !(mouse_b && mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18)));
 }
 
 
@@ -917,34 +1368,51 @@ void edit_mode_8(void) {
 //      Edit screen (fills)
 //-----------------------------------------------------------------------------
 
-int iconos_fill[]={4,1,114,115,116,118,1};
+int iconos_fill[] = {4, 1, 114, 115, 116, 118, 1};
 
 void edit_mode_9(void) {
   int a;
 
-  bar[0]=101+zoom; bar[1]=121;
-  for (a=2;a<11;a++) { bar[a]=1; } bar[11]=166;
-  bar[12]=iconos_fill[2+mode_fill]; bar[13]=0;
-  draw_bar(0); draw_ruler();
+  bar[0] = 101 + zoom;
+  bar[1] = 121;
+  for (a = 2; a < 11; a++) {
+    bar[a] = 1;
+  }
+  bar[11] = 166;
+  bar[12] = iconos_fill[2 + mode_fill];
+  bar[13] = 0;
+  draw_bar(0);
+  draw_ruler();
 
   do {
     draw_help(1295);
-    edit_ruler(); select_fill(12); select_color(2);
+    edit_ruler();
+    select_fill(12);
+    select_color(2);
 
-    if ((mouse_b&1) && !(prev_mouse_buttons&1) && mouse_graf>=10) {
-      if (!mask[*(map+coord_y*map_width+coord_x)] && (*(map+coord_y*map_width+coord_x)!=color || mode_fill==3 || textura_color!=NULL)) {
-        fill(coord_x,coord_y);
+    if ((mouse_b & 1) && !(prev_mouse_buttons & 1) && mouse_graf >= 10) {
+      if (!mask[*(map + coord_y * map_width + coord_x)] &&
+          (*(map + coord_y * map_width + coord_x) != color || mode_fill == 3 ||
+           textura_color != NULL)) {
+        fill(coord_x, coord_y);
       }
     }
 
-    if (((mouse_b&1) && selected_icon==1) || (scan_code==14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
-      undo_back(); do {read_mouse();} while(mouse_b&1);
-    } else if (scan_code==14 && (key(_L_SHIFT)||key(_R_SHIFT))) { undo_next(); need_zoom=1; }
+    if (((mouse_b & 1) && selected_icon == 1) ||
+        (scan_code == 14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
+      undo_back();
+      do {
+        read_mouse();
+      } while (mouse_b & 1);
+    } else if (scan_code == 14 && (key(_L_SHIFT) || key(_R_SHIFT))) {
+      undo_next();
+      need_zoom = 1;
+    }
 
     blit_edit();
 
-  } while (!exit_requested && !(mouse_b&2) && !key(_ESC) && draw_mode<100 &&
-    !(mouse_b && mouse_in(toolbar_x,toolbar_y+10,toolbar_x+9,toolbar_y+18)));
+  } while (!exit_requested && !(mouse_b & 2) && !key(_ESC) && draw_mode < 100 &&
+           !(mouse_b && mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18)));
 }
 
 //-----------------------------------------------------------------------------
@@ -954,199 +1422,401 @@ void edit_mode_9(void) {
 void block_bar(int n) {
   int a;
 
-  switch(n) {
-    case 0:
-      bar[0]=101+zoom; bar[1]=121; for (a=2;a<11;a++) bar[a]=1;
-      bar[11]=166; bar[13]=0; bar[14]=0;
-      if (mode_selection<4) bar[12]=135+mode_selection;
-      else bar[12]=mode_selection+169-4;
-      draw_bar(22); draw_ruler();
-      break;
-    case 1:
-      bar[0]=101+zoom; bar[1]=121; for (a=2;a<11;a++) bar[a]=1;
-      bar[11]=166; // Eyedropper
-      bar[12]=139; // Move
-      bar[13]=171; // Fx
-      bar[14]=172; // Window
-      bar[15]=0; bar[16]=0;
-      draw_bar(22); draw_ruler(); break;
+  switch (n) {
+  case 0:
+    bar[0] = 101 + zoom;
+    bar[1] = 121;
+    for (a = 2; a < 11; a++)
+      bar[a] = 1;
+    bar[11] = 166;
+    bar[13] = 0;
+    bar[14] = 0;
+    if (mode_selection < 4)
+      bar[12] = 135 + mode_selection;
+    else
+      bar[12] = mode_selection + 169 - 4;
+    draw_bar(22);
+    draw_ruler();
+    break;
+  case 1:
+    bar[0] = 101 + zoom;
+    bar[1] = 121;
+    for (a = 2; a < 11; a++)
+      bar[a] = 1;
+    bar[11] = 166; // Eyedropper
+    bar[12] = 139; // Move
+    bar[13] = 171; // Fx
+    bar[14] = 172; // Window
+    bar[15] = 0;
+    bar[16] = 0;
+    draw_bar(22);
+    draw_ruler();
+    break;
   }
 }
 
 void edit_mode_10(void) {
-  int an,al;
-  int x,y,a,b,aa,bb;
+  int an, al;
+  int x, y, a, b, aa, bb;
   int s; // s: State 0-wait 1st click, 1-wait 2nd click, ...
-  int * m;
+  int *m;
 
   block_bar(0);
 
-  s=0; do {
+  s = 0;
+  do {
     draw_help(1295);
-    edit_ruler(); select_color(2);
+    edit_ruler();
+    select_color(2);
 
-    if (((mouse_b&1) && selected_icon==1) || (scan_code==14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
-      undo_back(); need_zoom=1; do {read_mouse();} while(mouse_b&1);
-    } else if (scan_code==14 && (key(_L_SHIFT)||key(_R_SHIFT))) { undo_next(); need_zoom=1; }
+    if (((mouse_b & 1) && selected_icon == 1) ||
+        (scan_code == 14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
+      undo_back();
+      need_zoom = 1;
+      do {
+        read_mouse();
+      } while (mouse_b & 1);
+    } else if (scan_code == 14 && (key(_L_SHIFT) || key(_R_SHIFT))) {
+      undo_next();
+      need_zoom = 1;
+    }
 
-    switch(s) {
-      case 0: case 1:
-        select_box(12); break;
+    switch (s) {
+    case 0:
+    case 1:
+      select_box(12);
+      break;
 
-      case 2: case 3:
+    case 2:
+    case 3:
 
-        if ((mouse_b&1) && selected_icon==12) { // *** Move, Copy, ...
-          do {read_mouse();} while(mouse_b&1);
-          sel_status=0; box_to_sel_mask(); move_selection(NULL,0,0);
-          if (draw_mode<100) { block_bar(1); sel_status=1; }
-          zoom_background=0; need_zoom=1;
-          do {read_mouse();} while(mouse_b || key(_ESC));
+      if ((mouse_b & 1) && selected_icon == 12) { // *** Move, Copy, ...
+        do {
+          read_mouse();
+        } while (mouse_b & 1);
+        sel_status = 0;
+        box_to_sel_mask();
+        move_selection(NULL, 0, 0);
+        if (draw_mode < 100) {
+          block_bar(1);
+          sel_status = 1;
         }
-        if ((mouse_b&1) && selected_icon==13) { // *** Effects
-          do {read_mouse();} while(mouse_b&1);
-          box_to_sel_mask(); effects();
-          if (draw_mode<100) { block_bar(1); sel_status=1; }
-          zoom_background=0; need_zoom=1;
-          do {read_mouse();} while(mouse_b || key(_ESC));
+        zoom_background = 0;
+        need_zoom = 1;
+        do {
+          read_mouse();
+        } while (mouse_b || key(_ESC));
+      }
+      if ((mouse_b & 1) && selected_icon == 13) { // *** Effects
+        do {
+          read_mouse();
+        } while (mouse_b & 1);
+        box_to_sel_mask();
+        effects();
+        if (draw_mode < 100) {
+          block_bar(1);
+          sel_status = 1;
         }
-        if (((mouse_b&1) && selected_icon==14) || key(_K)) { // *** Cut to window
-          s=0; sel_status=0; block_bar(0); need_zoom=1;
-	  cut_map();
-          do {read_mouse();} while(mouse_b || key(_ESC));
-        } break;
+        zoom_background = 0;
+        need_zoom = 1;
+        do {
+          read_mouse();
+        } while (mouse_b || key(_ESC));
+      }
+      if (((mouse_b & 1) && selected_icon == 14) || key(_K)) { // *** Cut to window
+        s = 0;
+        sel_status = 0;
+        block_bar(0);
+        need_zoom = 1;
+        cut_map();
+        do {
+          read_mouse();
+        } while (mouse_b || key(_ESC));
+      }
+      break;
     }
 
     test_previous();
 
-    if ((key(_L_CTRL)||key(_R_CTRL)) && (mouse_b&1) && mouse_graf>=10 && sel_status && s>=2) {
-      if (mode_selection==0 || mode_selection==4 || (mode_selection==3 && s<2)) {
-        x=coord_x-(sel_x1-sel_x0)/2;
-        y=coord_y-(sel_y1-sel_y0)/2;
-        if (x<0) { x=0; } if (y<0) { y=0; }
-        if (x+sel_x1-sel_x0>=map_width) { x=map_width-(sel_x1-sel_x0)-1; }
-        if (y+sel_y1-sel_y0>=map_height) { y=map_height-(sel_y1-sel_y0)-1; }
-        sel_x1-=sel_x0; sel_x0=x; sel_x1+=x;
-        sel_y1-=sel_y0; sel_y0=y; sel_y1+=y;
+    if ((key(_L_CTRL) || key(_R_CTRL)) && (mouse_b & 1) && mouse_graf >= 10 && sel_status &&
+        s >= 2) {
+      if (mode_selection == 0 || mode_selection == 4 || (mode_selection == 3 && s < 2)) {
+        x = coord_x - (sel_x1 - sel_x0) / 2;
+        y = coord_y - (sel_y1 - sel_y0) / 2;
+        if (x < 0) {
+          x = 0;
+        }
+        if (y < 0) {
+          y = 0;
+        }
+        if (x + sel_x1 - sel_x0 >= map_width) {
+          x = map_width - (sel_x1 - sel_x0) - 1;
+        }
+        if (y + sel_y1 - sel_y0 >= map_height) {
+          y = map_height - (sel_y1 - sel_y0) - 1;
+        }
+        sel_x1 -= sel_x0;
+        sel_x0 = x;
+        sel_x1 += x;
+        sel_y1 -= sel_y0;
+        sel_y0 = y;
+        sel_y1 += y;
       } else {
-        x=coord_x-(sel_mask_x1-sel_mask_x0)/2;
-        y=coord_y-(sel_mask_y1-sel_mask_y0)/2;
-        if (x<0) { x=0; } if (y<0) { y=0; }
-      	if (x+sel_mask_x1-sel_mask_x0>=map_width) x=map_width-(sel_mask_x1-sel_mask_x0)-1;
-      	if (y+sel_mask_y1-sel_mask_y0>=map_height) y=map_height-(sel_mask_y1-sel_mask_y0)-1;
-        if ((m=(int*)malloc(((map_width*map_height+31)/32)*4))!=NULL) {
-      	  memcpy(m,selection_mask,((map_width*map_height+31)/32)*4);
-      	  memset(selection_mask,0,((map_width*map_height+31)/32)*4);
-          for (a=sel_mask_y0;a<=sel_mask_y1;a++)
-            for (b=sel_mask_x0;b<=sel_mask_x1;b++) {
-              aa=a; bb=b; bb+=aa*map_width; aa=bb>>5; bb&=31;
-              if (*(m+aa)&(1<<bb)) set_selection_mask(b+x-sel_mask_x0,a+y-sel_mask_y0);
+        x = coord_x - (sel_mask_x1 - sel_mask_x0) / 2;
+        y = coord_y - (sel_mask_y1 - sel_mask_y0) / 2;
+        if (x < 0) {
+          x = 0;
+        }
+        if (y < 0) {
+          y = 0;
+        }
+        if (x + sel_mask_x1 - sel_mask_x0 >= map_width)
+          x = map_width - (sel_mask_x1 - sel_mask_x0) - 1;
+        if (y + sel_mask_y1 - sel_mask_y0 >= map_height)
+          y = map_height - (sel_mask_y1 - sel_mask_y0) - 1;
+        if ((m = (int *)malloc(((map_width * map_height + 31) / 32) * 4)) != NULL) {
+          memcpy(m, selection_mask, ((map_width * map_height + 31) / 32) * 4);
+          memset(selection_mask, 0, ((map_width * map_height + 31) / 32) * 4);
+          for (a = sel_mask_y0; a <= sel_mask_y1; a++)
+            for (b = sel_mask_x0; b <= sel_mask_x1; b++) {
+              aa = a;
+              bb = b;
+              bb += aa * map_width;
+              aa = bb >> 5;
+              bb &= 31;
+              if (*(m + aa) & (1 << bb))
+                set_selection_mask(b + x - sel_mask_x0, a + y - sel_mask_y0);
             }
-      	  sel_mask_x1-=sel_mask_x0; sel_mask_x0=x; sel_mask_x1+=x;
-      	  sel_mask_y1-=sel_mask_y0; sel_mask_y0=y; sel_mask_y1+=y;
+          sel_mask_x1 -= sel_mask_x0;
+          sel_mask_x0 = x;
+          sel_mask_x1 += x;
+          sel_mask_y1 -= sel_mask_y0;
+          sel_mask_y0 = y;
+          sel_mask_y1 += y;
           free(m);
         } else {
-          v_text=(char *)texts[45]; show_dialog(err0);
+          v_text = (char *)texts[45];
+          show_dialog(err0);
         }
       }
-    } else switch(mode_selection) {
-      case 0: s=edit_mode_6_box(s); break;
-      case 1: s=edit_mode_6_fill(s); break;
-      case 2: s=edit_mode_6_lines(s); break;
-      case 3: s=edit_mode_6_boxes(s); break;
-      case 4: s=edit_mode_6_box_auto(s); break;
-      case 5: s=edit_mode_6_fill(s); break;
-    }
+    } else
+      switch (mode_selection) {
+      case 0:
+        s = edit_mode_6_box(s);
+        break;
+      case 1:
+        s = edit_mode_6_fill(s);
+        break;
+      case 2:
+        s = edit_mode_6_lines(s);
+        break;
+      case 3:
+        s = edit_mode_6_boxes(s);
+        break;
+      case 4:
+        s = edit_mode_6_box_auto(s);
+        break;
+      case 5:
+        s = edit_mode_6_fill(s);
+        break;
+      }
 
     test_next();
 
-    if (mode_selection==0 || mode_selection==4 || (mode_selection==3 && s<2)) {
-      if (sel_x1>=sel_x0) an=sel_x1-sel_x0+1; else an=sel_x0-sel_x1+1;
-      if (sel_y1>=sel_y0) al=sel_y1-sel_y0+1; else al=sel_y0-sel_y1+1;
-      if (sel_status==0) { an=0; al=0; }
+    if (mode_selection == 0 || mode_selection == 4 || (mode_selection == 3 && s < 2)) {
+      if (sel_x1 >= sel_x0)
+        an = sel_x1 - sel_x0 + 1;
+      else
+        an = sel_x0 - sel_x1 + 1;
+      if (sel_y1 >= sel_y0)
+        al = sel_y1 - sel_y0 + 1;
+      else
+        al = sel_y0 - sel_y1 + 1;
+      if (sel_status == 0) {
+        an = 0;
+        al = 0;
+      }
     } else {
-      if (sel_mask_x1>=sel_mask_x0) an=sel_mask_x1-sel_mask_x0+1; else an=sel_mask_x0-sel_mask_x1+1;
-      if (sel_mask_y1>=sel_mask_y0) al=sel_mask_y1-sel_mask_y0+1; else al=sel_mask_y0-sel_mask_y1+1;
-      if (sel_status==0) { an=0; al=0; }
-    } analyze_bar(an,al);
+      if (sel_mask_x1 >= sel_mask_x0)
+        an = sel_mask_x1 - sel_mask_x0 + 1;
+      else
+        an = sel_mask_x0 - sel_mask_x1 + 1;
+      if (sel_mask_y1 >= sel_mask_y0)
+        al = sel_mask_y1 - sel_mask_y0 + 1;
+      else
+        al = sel_mask_y0 - sel_mask_y1 + 1;
+      if (sel_status == 0) {
+        an = 0;
+        al = 0;
+      }
+    }
+    analyze_bar(an, al);
 
     blit_edit();
-  } while (!exit_requested && !(mouse_b&2) && !(key(_ESC)&&s!=1&&s!=2) && draw_mode<100 &&
-    !(mouse_b && mouse_in(toolbar_x,toolbar_y+10,toolbar_x+9,toolbar_y+18)));
+  } while (!exit_requested && !(mouse_b & 2) && !(key(_ESC) && s != 1 && s != 2) &&
+           draw_mode < 100 &&
+           !(mouse_b && mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18)));
 
-  sel_status=0;
+  sel_status = 0;
 }
 
 void test_previous(void) {
-
   // All this is added to calculate the region to refresh, instead of
   // doing a simple "need_zoom=1"
 
-  need_zoom_x=map_width; need_zoom_y=map_height;
-  need_zoom_width=0; need_zoom_height=0;
+  need_zoom_x = map_width;
+  need_zoom_y = map_height;
+  need_zoom_width = 0;
+  need_zoom_height = 0;
 
-  if (sel_status) switch(mode_selection) {
-    case 0: test_sel(); break;
-    case 1: test_sel_mask(); break;
-    case 2: test_sel_mask(); break;
-    case 3: test_sel(); test_sel_mask(); break;
-    case 4: test_sel(); break;
-    case 5: test_sel_mask(); break;
-  }
-
+  if (sel_status)
+    switch (mode_selection) {
+    case 0:
+      test_sel();
+      break;
+    case 1:
+      test_sel_mask();
+      break;
+    case 2:
+      test_sel_mask();
+      break;
+    case 3:
+      test_sel();
+      test_sel_mask();
+      break;
+    case 4:
+      test_sel();
+      break;
+    case 5:
+      test_sel_mask();
+      break;
+    }
 }
 void test_next(void) {
-  int x,y,an,al;
+  int x, y, an, al;
 
-  if (sel_status) switch(mode_selection) {
-    case -1: test_sel(); break;
-    case 0: test_sel(); break;
-    case 1: test_sel_mask(); break;
-    case 2: test_sel_mask(); break;
-    case 3: test_sel(); test_sel_mask(); break;
-    case 4: test_sel(); break;
-    case 5: test_sel_mask(); break;
-  }
+  if (sel_status)
+    switch (mode_selection) {
+    case -1:
+      test_sel();
+      break;
+    case 0:
+      test_sel();
+      break;
+    case 1:
+      test_sel_mask();
+      break;
+    case 2:
+      test_sel_mask();
+      break;
+    case 3:
+      test_sel();
+      test_sel_mask();
+      break;
+    case 4:
+      test_sel();
+      break;
+    case 5:
+      test_sel_mask();
+      break;
+    }
 
   // Determine the zoom region to refresh on screen
 
-  x=need_zoom_x; y=need_zoom_y;
-  an=need_zoom_width-need_zoom_x+1;
-  al=need_zoom_height-need_zoom_y+1;
+  x = need_zoom_x;
+  y = need_zoom_y;
+  an = need_zoom_width - need_zoom_x + 1;
+  al = need_zoom_height - need_zoom_y + 1;
 
-  if (x<zoom_x) need_zoom_x=zoom_win_x-((zoom_x-x)<<zoom);
-  else need_zoom_x=zoom_win_x+((x-zoom_x)<<zoom);
-  if (y<zoom_y) need_zoom_y=zoom_win_y+((y-zoom_y)<<zoom);
-  else need_zoom_y=zoom_win_y+((y-zoom_y)<<zoom);
-  need_zoom_width=an<<zoom; need_zoom_height=al<<zoom;
+  if (x < zoom_x)
+    need_zoom_x = zoom_win_x - ((zoom_x - x) << zoom);
+  else
+    need_zoom_x = zoom_win_x + ((x - zoom_x) << zoom);
+  if (y < zoom_y)
+    need_zoom_y = zoom_win_y + ((y - zoom_y) << zoom);
+  else
+    need_zoom_y = zoom_win_y + ((y - zoom_y) << zoom);
+  need_zoom_width = an << zoom;
+  need_zoom_height = al << zoom;
 
-  if (need_zoom_x+need_zoom_width<=zoom_win_x || need_zoom_y+need_zoom_height<=zoom_win_y ||
-      need_zoom_x>=zoom_win_x+zoom_win_width || need_zoom_y>=zoom_win_y+zoom_win_height) {
-    need_zoom_width=0; need_zoom_height=0;
+  if (need_zoom_x + need_zoom_width <= zoom_win_x || need_zoom_y + need_zoom_height <= zoom_win_y ||
+      need_zoom_x >= zoom_win_x + zoom_win_width || need_zoom_y >= zoom_win_y + zoom_win_height) {
+    need_zoom_width = 0;
+    need_zoom_height = 0;
   } else {
-    if (need_zoom_x<zoom_win_x) { need_zoom_width-=zoom_win_x-need_zoom_x; need_zoom_x=zoom_win_x; }
-    if (need_zoom_y<zoom_win_y) { need_zoom_height-=zoom_win_y-need_zoom_y; need_zoom_y=zoom_win_y; }
-    if (need_zoom_x+need_zoom_width>zoom_win_x+zoom_win_width) need_zoom_width=zoom_win_x+zoom_win_width-need_zoom_x;
-    if (need_zoom_y+need_zoom_height>zoom_win_y+zoom_win_height) need_zoom_height=zoom_win_y+zoom_win_height-need_zoom_y;
-    if (!need_zoom) need_zoom=-1;
+    if (need_zoom_x < zoom_win_x) {
+      need_zoom_width -= zoom_win_x - need_zoom_x;
+      need_zoom_x = zoom_win_x;
+    }
+    if (need_zoom_y < zoom_win_y) {
+      need_zoom_height -= zoom_win_y - need_zoom_y;
+      need_zoom_y = zoom_win_y;
+    }
+    if (need_zoom_x + need_zoom_width > zoom_win_x + zoom_win_width)
+      need_zoom_width = zoom_win_x + zoom_win_width - need_zoom_x;
+    if (need_zoom_y + need_zoom_height > zoom_win_y + zoom_win_height)
+      need_zoom_height = zoom_win_y + zoom_win_height - need_zoom_y;
+    if (!need_zoom)
+      need_zoom = -1;
   }
 
   // Refresh region calculated
 
-  cclock=(*system_clock)>>1;
+  cclock = (*system_clock) >> 1;
 }
 
 void test_sel(void) {
-  if (need_zoom_x>sel_x0) { need_zoom_x=sel_x0; } if (need_zoom_x>sel_x1) { need_zoom_x=sel_x1; }
-  if (need_zoom_y>sel_y0) { need_zoom_y=sel_y0; } if (need_zoom_y>sel_y1) { need_zoom_y=sel_y1; }
-  if (need_zoom_width<sel_x0) { need_zoom_width=sel_x0; } if (need_zoom_width<sel_x1) { need_zoom_width=sel_x1; }
-  if (need_zoom_height<sel_y0) { need_zoom_height=sel_y0; } if (need_zoom_height<sel_y1) { need_zoom_height=sel_y1; }
+  if (need_zoom_x > sel_x0) {
+    need_zoom_x = sel_x0;
+  }
+  if (need_zoom_x > sel_x1) {
+    need_zoom_x = sel_x1;
+  }
+  if (need_zoom_y > sel_y0) {
+    need_zoom_y = sel_y0;
+  }
+  if (need_zoom_y > sel_y1) {
+    need_zoom_y = sel_y1;
+  }
+  if (need_zoom_width < sel_x0) {
+    need_zoom_width = sel_x0;
+  }
+  if (need_zoom_width < sel_x1) {
+    need_zoom_width = sel_x1;
+  }
+  if (need_zoom_height < sel_y0) {
+    need_zoom_height = sel_y0;
+  }
+  if (need_zoom_height < sel_y1) {
+    need_zoom_height = sel_y1;
+  }
 }
 
 void test_sel_mask(void) {
-  if (need_zoom_x>sel_mask_x0) { need_zoom_x=sel_mask_x0; } if (need_zoom_x>sel_mask_x1) { need_zoom_x=sel_mask_x1; }
-  if (need_zoom_y>sel_mask_y0) { need_zoom_y=sel_mask_y0; } if (need_zoom_y>sel_mask_y1) { need_zoom_y=sel_mask_y1; }
-  if (need_zoom_width<sel_mask_x0) { need_zoom_width=sel_mask_x0; } if (need_zoom_width<sel_mask_x1) { need_zoom_width=sel_mask_x1; }
-  if (need_zoom_height<sel_mask_y0) { need_zoom_height=sel_mask_y0; } if (need_zoom_height<sel_mask_y1) { need_zoom_height=sel_mask_y1; }
+  if (need_zoom_x > sel_mask_x0) {
+    need_zoom_x = sel_mask_x0;
+  }
+  if (need_zoom_x > sel_mask_x1) {
+    need_zoom_x = sel_mask_x1;
+  }
+  if (need_zoom_y > sel_mask_y0) {
+    need_zoom_y = sel_mask_y0;
+  }
+  if (need_zoom_y > sel_mask_y1) {
+    need_zoom_y = sel_mask_y1;
+  }
+  if (need_zoom_width < sel_mask_x0) {
+    need_zoom_width = sel_mask_x0;
+  }
+  if (need_zoom_width < sel_mask_x1) {
+    need_zoom_width = sel_mask_x1;
+  }
+  if (need_zoom_height < sel_mask_y0) {
+    need_zoom_height = sel_mask_y0;
+  }
+  if (need_zoom_height < sel_mask_y1) {
+    need_zoom_height = sel_mask_y1;
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -1154,49 +1824,55 @@ void test_sel_mask(void) {
 //-----------------------------------------------------------------------------
 
 void cut_map(void) {
-
-  int x,y,an,al;
+  int x, y, an, al;
   byte *p;
 
   // 1. Allocate memory for a tmapa struct
-  if ((v_map=(struct tmapa *)malloc(sizeof(struct tmapa)))!=NULL) {
-
-    box_to_sel_mask(); an=sel_mask_x1-sel_mask_x0+1; al=sel_mask_y1-sel_mask_y0+1;
+  if ((v_map = (struct tmapa *)malloc(sizeof(struct tmapa))) != NULL) {
+    box_to_sel_mask();
+    an = sel_mask_x1 - sel_mask_x0 + 1;
+    al = sel_mask_y1 - sel_mask_y0 + 1;
 
     // 2. Allocate memory for the map
-    if ((v_map->map=(byte *)malloc(an*al))!=NULL) {
-
+    if ((v_map->map = (byte *)malloc(an * al)) != NULL) {
       // 2b. Copy the map contents
-      p=v_map->map;
-      for (y=sel_mask_y0;y<=sel_mask_y1;y++) for (x=sel_mask_x0;x<=sel_mask_x1;x++)
-        if (is_selection_mask(x,y)) *p++=*(map+y*map_width+x); else *p++=0;
+      p = v_map->map;
+      for (y = sel_mask_y0; y <= sel_mask_y1; y++)
+        for (x = sel_mask_x0; x <= sel_mask_x1; x++)
+          if (is_selection_mask(x, y))
+            *p++ = *(map + y * map_width + x);
+          else
+            *p++ = 0;
 
       // 4. Set the remaining variables
-      div_strcpy(v_map->filename,sizeof(v_map->filename),(char *)texts[136]);
-      ltoa(next_code++,v_map->filename+strlen(v_map->filename),10);
-      *v_map->path='\0';
-      v_map->map_width=an;
-      v_map->map_height=al;
-      for (x=0;x<512;x+=2) {
-        if (v.mapa->puntos[x]>=sel_mask_x0 && v.mapa->puntos[x]<=sel_mask_x1 &&
-            v.mapa->puntos[x+1]>=sel_mask_y0 && v.mapa->puntos[x+1]<=sel_mask_y1) {
-          v_map->puntos[x]=v.mapa->puntos[x]-sel_mask_x0;
-          v_map->puntos[x+1]=v.mapa->puntos[x+1]-sel_mask_y0;
+      div_strcpy(v_map->filename, sizeof(v_map->filename), (char *)texts[136]);
+      ltoa(next_code++, v_map->filename + strlen(v_map->filename), 10);
+      *v_map->path = '\0';
+      v_map->map_width = an;
+      v_map->map_height = al;
+      for (x = 0; x < 512; x += 2) {
+        if (v.mapa->puntos[x] >= sel_mask_x0 && v.mapa->puntos[x] <= sel_mask_x1 &&
+            v.mapa->puntos[x + 1] >= sel_mask_y0 && v.mapa->puntos[x + 1] <= sel_mask_y1) {
+          v_map->puntos[x] = v.mapa->puntos[x] - sel_mask_x0;
+          v_map->puntos[x + 1] = v.mapa->puntos[x + 1] - sel_mask_y0;
         } else {
-          v_map->puntos[x]=-1;
-          v_map->puntos[x+1]=-1;
+          v_map->puntos[x] = -1;
+          v_map->puntos[x + 1] = -1;
         }
       }
-      v_map->TengoNombre=0;// No description by default
-      v_map->fpg_code=0;
-      windows_to_create[num_windows_to_create++]=v_map;
+      v_map->TengoNombre = 0; // No description by default
+      v_map->fpg_code = 0;
+      windows_to_create[num_windows_to_create++] = v_map;
 
     } else {
-      v_text=(char *)texts[45]; show_dialog(err0); free(v_map);
+      v_text = (char *)texts[45];
+      show_dialog(err0);
+      free(v_map);
     }
 
   } else {
-    v_text=(char *)texts[45]; show_dialog(err0);
+    v_text = (char *)texts[45];
+    show_dialog(err0);
   }
 }
 
@@ -1205,15 +1881,16 @@ void cut_map(void) {
 //-----------------------------------------------------------------------------
 
 void box_to_sel_mask(void) {
+  int x, y;
 
-  int x,y;
-
-  if (mode_selection==0 || mode_selection==4) {
-    sel_mask_x0=sel_x0; sel_mask_y0=sel_y0;
-    sel_mask_x1=sel_x1; sel_mask_y1=sel_y1;
-    for (y=sel_mask_y0;y<=sel_mask_y1;y++)
-      for (x=sel_mask_x0;x<=sel_mask_x1;x++)
-        set_selection_mask(x,y);
+  if (mode_selection == 0 || mode_selection == 4) {
+    sel_mask_x0 = sel_x0;
+    sel_mask_y0 = sel_y0;
+    sel_mask_x1 = sel_x1;
+    sel_mask_y1 = sel_y1;
+    for (y = sel_mask_y0; y <= sel_mask_y1; y++)
+      for (x = sel_mask_x0; x <= sel_mask_x1; x++)
+        set_selection_mask(x, y);
   }
 }
 
@@ -1222,17 +1899,20 @@ void box_to_sel_mask(void) {
 //-----------------------------------------------------------------------------
 
 void sel_mask_delete(void) {
-  int x,y;
+  int x, y;
 
-  if (save_undo(sel_mask_x0,sel_mask_y0,sel_mask_x1-sel_mask_x0+1,sel_mask_y1-sel_mask_y0+1)) {
-    if (textura_color==NULL) {
-      for (y=sel_mask_y0;y<=sel_mask_y1;y++)
-        for (x=sel_mask_x0;x<=sel_mask_x1;x++)
-          if (is_selection_mask(x,y)) *(map+x+y*map_width)=color;
+  if (save_undo(sel_mask_x0, sel_mask_y0, sel_mask_x1 - sel_mask_x0 + 1,
+                sel_mask_y1 - sel_mask_y0 + 1)) {
+    if (textura_color == NULL) {
+      for (y = sel_mask_y0; y <= sel_mask_y1; y++)
+        for (x = sel_mask_x0; x <= sel_mask_x1; x++)
+          if (is_selection_mask(x, y))
+            *(map + x + y * map_width) = color;
     } else {
-      for (y=sel_mask_y0;y<=sel_mask_y1;y++)
-        for (x=sel_mask_x0;x<=sel_mask_x1;x++)
-          if (is_selection_mask(x,y)) *(map+x+y*map_width)=get_color(x,y);
+      for (y = sel_mask_y0; y <= sel_mask_y1; y++)
+        for (x = sel_mask_x0; x <= sel_mask_x1; x++)
+          if (is_selection_mask(x, y))
+            *(map + x + y * map_width) = get_color(x, y);
     }
   }
 }
@@ -1242,17 +1922,18 @@ void sel_mask_delete(void) {
 //-----------------------------------------------------------------------------
 
 void sel_mask_ruler(void) {
-  int x,y;
+  int x, y;
   int c;
 
-  if (save_undo(sel_mask_x0,sel_mask_y0,sel_mask_x1-sel_mask_x0+1,sel_mask_y1-sel_mask_y0+1)) {
+  if (save_undo(sel_mask_x0, sel_mask_y0, sel_mask_x1 - sel_mask_x0 + 1,
+                sel_mask_y1 - sel_mask_y0 + 1)) {
     make_nearest_gradient();
-    for (y=sel_mask_y0;y<=sel_mask_y1;y++)
-      for (x=sel_mask_x0;x<=sel_mask_x1;x++)
-        if (is_selection_mask(x,y)) {
-          c=(memptrsize)*(map+x+y*map_width)*3;
-          c=dac[c]+dac[c+1]+dac[c+2];
-          *(map+x+y*map_width)=nearest_gradient[c];
+    for (y = sel_mask_y0; y <= sel_mask_y1; y++)
+      for (x = sel_mask_x0; x <= sel_mask_x1; x++)
+        if (is_selection_mask(x, y)) {
+          c = (memptrsize) * (map + x + y * map_width) * 3;
+          c = dac[c] + dac[c + 1] + dac[c + 2];
+          *(map + x + y * map_width) = nearest_gradient[c];
         }
   }
 }
@@ -1262,17 +1943,19 @@ void sel_mask_ruler(void) {
 //-----------------------------------------------------------------------------
 
 void sel_mask_invert(void) {
-  int x,y;
+  int x, y;
   byte p[256];
 
-  if (save_undo(sel_mask_x0,sel_mask_y0,sel_mask_x1-sel_mask_x0+1,sel_mask_y1-sel_mask_y0+1)) {
+  if (save_undo(sel_mask_x0, sel_mask_y0, sel_mask_x1 - sel_mask_x0 + 1,
+                sel_mask_y1 - sel_mask_y0 + 1)) {
     create_dac4();
-    for (x=0;x<256;x++) {
-      p[x]=find_color(63-dac[x*3],63-dac[x*3+1],63-dac[x*3+2]);
+    for (x = 0; x < 256; x++) {
+      p[x] = find_color(63 - dac[x * 3], 63 - dac[x * 3 + 1], 63 - dac[x * 3 + 2]);
     }
-    for (y=sel_mask_y0;y<=sel_mask_y1;y++)
-      for (x=sel_mask_x0;x<=sel_mask_x1;x++)
-        if (is_selection_mask(x,y)) *(map+x+y*map_width)=p[*(map+x+y*map_width)];
+    for (y = sel_mask_y0; y <= sel_mask_y1; y++)
+      for (x = sel_mask_x0; x <= sel_mask_x1; x++)
+        if (is_selection_mask(x, y))
+          *(map + x + y * map_width) = p[*(map + x + y * map_width)];
   }
 }
 
@@ -1281,24 +1964,34 @@ void sel_mask_invert(void) {
 //-----------------------------------------------------------------------------
 
 void sel_mask_mask(void) {
-  int x,y,c;
-  c=0;
+  int x, y, c;
+  c = 0;
 
-  if (save_undo(sel_mask_x0,sel_mask_y0,sel_mask_x1-sel_mask_x0+1,sel_mask_y1-sel_mask_y0+1)) {
-    for (y=sel_mask_y0;y<=sel_mask_y1;y++)
-      for (x=sel_mask_x0;x<=sel_mask_x1;x++)
-        if (is_selection_mask(x,y))
-          if (!*(map+x+y*map_width)) {
-            c=0;
-            if (x>0) c|=*(map+x-1+y*map_width);
-            if (c==color) c=0;
-            if (y>0) c|=*(map+x+(y-1)*map_width);
-            if (c==color) c=0;
-            if (x<map_width-1) c|=*(map+x+1+y*map_width);
-            if (c==color) c=0;
-            if (y<map_height-1) c|=*(map+x+(y+1)*map_width);
-            if (c==color) c=0;
-            if (c) *(map+x+y*map_width)=color;
+  if (save_undo(sel_mask_x0, sel_mask_y0, sel_mask_x1 - sel_mask_x0 + 1,
+                sel_mask_y1 - sel_mask_y0 + 1)) {
+    for (y = sel_mask_y0; y <= sel_mask_y1; y++)
+      for (x = sel_mask_x0; x <= sel_mask_x1; x++)
+        if (is_selection_mask(x, y))
+          if (!*(map + x + y * map_width)) {
+            c = 0;
+            if (x > 0)
+              c |= *(map + x - 1 + y * map_width);
+            if (c == color)
+              c = 0;
+            if (y > 0)
+              c |= *(map + x + (y - 1) * map_width);
+            if (c == color)
+              c = 0;
+            if (x < map_width - 1)
+              c |= *(map + x + 1 + y * map_width);
+            if (c == color)
+              c = 0;
+            if (y < map_height - 1)
+              c |= *(map + x + (y + 1) * map_width);
+            if (c == color)
+              c = 0;
+            if (c)
+              *(map + x + y * map_width) = color;
           }
   }
 }
@@ -1308,18 +2001,33 @@ void sel_mask_mask(void) {
 //-----------------------------------------------------------------------------
 
 void sel_mask_lighten(byte color_aclarar) {
-  int x,y,n,a,b,c,d;
+  int x, y, n, a, b, c, d;
   byte p[256];
 
-  if (save_undo(sel_mask_x0,sel_mask_y0,sel_mask_x1-sel_mask_x0+1,sel_mask_y1-sel_mask_y0+1)) {
-    for (x=0;x<256;x++) {
-      n=x*256; p[x]=x;
-      a=*(ghost+n+color_aclarar); b=*(ghost+n+a); c=*(ghost+n+b); d=*(ghost+n+c);
-      if (d!=p[x]) p[x]=d; else if (c!=p[x]) p[x]=c; else if (b!=p[x]) p[x]=b; else if (a!=p[x]) p[x]=a; else p[x]=color_aclarar;
+  if (save_undo(sel_mask_x0, sel_mask_y0, sel_mask_x1 - sel_mask_x0 + 1,
+                sel_mask_y1 - sel_mask_y0 + 1)) {
+    for (x = 0; x < 256; x++) {
+      n = x * 256;
+      p[x] = x;
+      a = *(ghost + n + color_aclarar);
+      b = *(ghost + n + a);
+      c = *(ghost + n + b);
+      d = *(ghost + n + c);
+      if (d != p[x])
+        p[x] = d;
+      else if (c != p[x])
+        p[x] = c;
+      else if (b != p[x])
+        p[x] = b;
+      else if (a != p[x])
+        p[x] = a;
+      else
+        p[x] = color_aclarar;
     }
-    for (y=sel_mask_y0;y<=sel_mask_y1;y++)
-      for (x=sel_mask_x0;x<=sel_mask_x1;x++)
-        if (is_selection_mask(x,y)) *(map+x+y*map_width)=p[*(map+x+y*map_width)];
+    for (y = sel_mask_y0; y <= sel_mask_y1; y++)
+      for (x = sel_mask_x0; x <= sel_mask_x1; x++)
+        if (is_selection_mask(x, y))
+          *(map + x + y * map_width) = p[*(map + x + y * map_width)];
   }
 }
 
@@ -1328,35 +2036,49 @@ void sel_mask_lighten(byte color_aclarar) {
 //-----------------------------------------------------------------------------
 
 void sel_mask_antialias(void) {
-  int x,y;
-  int an,al;
-  byte * p;
-  int cx,cy,_c;
+  int x, y;
+  int an, al;
+  byte *p;
+  int cx, cy, _c;
 
-  an=sel_mask_x1-sel_mask_x0+1; al=sel_mask_y1-sel_mask_y0+1;
-  if ((p=(byte*)malloc(map_width*map_height))!=NULL) {
-    if (save_undo(sel_mask_x0,sel_mask_y0,an,al)) {
-      for (y=sel_mask_y0;y<=sel_mask_y1;y++)
-        for (x=sel_mask_x0;x<=sel_mask_x1;x++)
-          if (is_selection_mask(x,y)) {
-            _c=*(map+x+y*map_width);
-            if (x>0) cx=*(map+x-1+y*map_width)*256; else cx=_c*256;
-            if (x<map_width-1) cx=*(ghost+cx+*(map+x+1+y*map_width)); else cx=*(ghost+cx+_c);
-            if (y>0) cy=*(map+x+(y-1)*map_width)*256; else cy=_c*256;
-            if (y<map_height-1) cy=*(ghost+cy+*(map+x+(y+1)*map_width)); else cy=*(ghost+cy+_c);
-            cx=*(ghost+cx*256+cy);
-            _c=*(ghost+_c*256+cx);
-            *(p+(x-sel_mask_x0)+(y-sel_mask_y0)*an)=(byte)_c;
+  an = sel_mask_x1 - sel_mask_x0 + 1;
+  al = sel_mask_y1 - sel_mask_y0 + 1;
+  if ((p = (byte *)malloc(map_width * map_height)) != NULL) {
+    if (save_undo(sel_mask_x0, sel_mask_y0, an, al)) {
+      for (y = sel_mask_y0; y <= sel_mask_y1; y++)
+        for (x = sel_mask_x0; x <= sel_mask_x1; x++)
+          if (is_selection_mask(x, y)) {
+            _c = *(map + x + y * map_width);
+            if (x > 0)
+              cx = *(map + x - 1 + y * map_width) * 256;
+            else
+              cx = _c * 256;
+            if (x < map_width - 1)
+              cx = *(ghost + cx + *(map + x + 1 + y * map_width));
+            else
+              cx = *(ghost + cx + _c);
+            if (y > 0)
+              cy = *(map + x + (y - 1) * map_width) * 256;
+            else
+              cy = _c * 256;
+            if (y < map_height - 1)
+              cy = *(ghost + cy + *(map + x + (y + 1) * map_width));
+            else
+              cy = *(ghost + cy + _c);
+            cx = *(ghost + cx * 256 + cy);
+            _c = *(ghost + _c * 256 + cx);
+            *(p + (x - sel_mask_x0) + (y - sel_mask_y0) * an) = (byte)_c;
           }
-      for (y=sel_mask_y0;y<=sel_mask_y1;y++)
-        for (x=sel_mask_x0;x<=sel_mask_x1;x++)
-          if (is_selection_mask(x,y)) {
-            *(map+x+y*map_width)=*(p+(x-sel_mask_x0)+(y-sel_mask_y0)*an);
+      for (y = sel_mask_y0; y <= sel_mask_y1; y++)
+        for (x = sel_mask_x0; x <= sel_mask_x1; x++)
+          if (is_selection_mask(x, y)) {
+            *(map + x + y * map_width) = *(p + (x - sel_mask_x0) + (y - sel_mask_y0) * an);
           }
       free(p);
     }
   } else {
-    v_text=(char *)texts[45]; show_dialog(err0);
+    v_text = (char *)texts[45];
+    show_dialog(err0);
   }
 }
 
@@ -1365,39 +2087,63 @@ void sel_mask_antialias(void) {
 //-----------------------------------------------------------------------------
 
 int edit_mode_6_box(int s) {
+  switch (s) {
+  case 0:
+    if ((mouse_b & 1) && mouse_graf >= 10) {
+      s = 1;
+      sel_x0 = coord_x;
+      sel_y0 = coord_y;
+      do {
+        read_mouse();
+      } while (mouse_b & 1);
+    }
+    break;
 
-  switch(s) {
-    case 0:
-      if ((mouse_b&1) && mouse_graf>=10) {
-        s=1; sel_x0=coord_x; sel_y0=coord_y;
-        do {read_mouse();} while(mouse_b&1);
-      } break;
+  case 1:
+    if (mouse_graf >= 10) {
+      sel_x1 = coord_x;
+      sel_y1 = coord_y;
+      sel_status = 1;
+      if (mouse_b & 1) {
+        if (sel_x0 > sel_x1)
+          swap(sel_x0, sel_x1);
+        if (sel_y0 > sel_y1)
+          swap(sel_y0, sel_y1);
+        s = 2;
+        block_bar(1);
+      } else if (mouse_b || key(_ESC)) {
+        s = 0;
+        sel_status = 0;
+        do {
+          read_mouse();
+        } while (mouse_b || key(_ESC));
+      }
+    } else
+      sel_status = 0;
+    break;
 
-    case 1:
-      if (mouse_graf>=10) {
-        sel_x1=coord_x; sel_y1=coord_y;
-        sel_status=1; if (mouse_b&1) {
-          if (sel_x0>sel_x1) swap(sel_x0,sel_x1);
-          if (sel_y0>sel_y1) swap(sel_y0,sel_y1);
-          s=2; block_bar(1);
-        } else if (mouse_b || key(_ESC)) {
-          s=0; sel_status=0;
-          do {read_mouse();} while (mouse_b || key(_ESC));
-        }
-      } else sel_status=0; break;
-
-    case 2:
-      sel_status=1;
-      if ((mouse_b&1) && mouse_graf>=10) {
-        if (coord_x>=(sel_x0+sel_x1*3)/4) sel_x1=coord_x;
-        else if (coord_x<=(sel_x0*3+sel_x1)/4) sel_x0=coord_x;
-        if (coord_y>=(sel_y0+sel_y1*3)/4) sel_y1=coord_y;
-        else if (coord_y<=(sel_y0*3+sel_y1)/4) sel_y0=coord_y;
-      } else if ((mouse_b&2) || key(_ESC)) {
-        s=0; sel_status=0; block_bar(0);
-        do {read_mouse();} while (mouse_b || key(_ESC));
-      } break;
-  } return(s);
+  case 2:
+    sel_status = 1;
+    if ((mouse_b & 1) && mouse_graf >= 10) {
+      if (coord_x >= (sel_x0 + sel_x1 * 3) / 4)
+        sel_x1 = coord_x;
+      else if (coord_x <= (sel_x0 * 3 + sel_x1) / 4)
+        sel_x0 = coord_x;
+      if (coord_y >= (sel_y0 + sel_y1 * 3) / 4)
+        sel_y1 = coord_y;
+      else if (coord_y <= (sel_y0 * 3 + sel_y1) / 4)
+        sel_y0 = coord_y;
+    } else if ((mouse_b & 2) || key(_ESC)) {
+      s = 0;
+      sel_status = 0;
+      block_bar(0);
+      do {
+        read_mouse();
+      } while (mouse_b || key(_ESC));
+    }
+    break;
+  }
+  return (s);
 }
 
 //-----------------------------------------------------------------------------
@@ -1405,84 +2151,167 @@ int edit_mode_6_box(int s) {
 //-----------------------------------------------------------------------------
 
 int edit_mode_6_box_auto(int s) {
+  int x, y, n, m;
+  int x0, y0, x1, y1;
 
-  int x,y,n,m;
-  int x0,y0,x1,y1;
-
-  switch(s) {
-    case 0:
-    case 2:
-      if ((mouse_b&1) && mouse_graf>=10) {
-
-        if (*(map+coord_y*map_width+coord_x)) {
-
-          if (s==0 || (coord_x<sel_x0 || coord_x>sel_x1 || coord_y<sel_y0 || coord_y>sel_y1)) {
-            x0=coord_x; x1=coord_x; y0=coord_y; y1=coord_y;
-	    sel_x0=map_width; sel_y0=map_height; sel_x1=0; sel_y1=0;
-          } else {
-	    x0=sel_x0; x1=sel_x1; y0=sel_y0; y1=sel_y1;
-	  }
-
-          do { m=0;
-
-            // Expand the box ...
-            n=0; if (y0>0) {
-              for (x=x0;x<=x1;x++) if (*(map+(y0-1)*map_width+x)) n++;
-              if (n) { y0--; } m+=n; }
-            n=0; if (y1<map_height-1) {
-              for (x=x0;x<=x1;x++) if (*(map+(y1+1)*map_width+x)) n++;
-              if (n) { y1++; } m+=n; }
-            n=0; if (x0>0) {
-              for (y=y0;y<=y1;y++) if (*(map+y*map_width+x0-1)) n++;
-              if (n) { x0--; } m+=n; }
-            n=0; if (x1<map_width-1) {
-              for (y=y0;y<=y1;y++) if (*(map+y*map_width+x1+1)) n++;
-              if (n) { x1++; } m+=n; }
-
-	    // Shrink the box ...
-	    n=0; if (y0<y1) {
-	      for (x=x0;x<=x1;x++) if (*(map+y0*map_width+x)) n++;
-	      if (!n) {y0++;m++;} }
-	    n=0; if (y0<y1) {
-	      for (x=x0;x<=x1;x++) if (*(map+y1*map_width+x)) n++;
-	      if (!n) {y1--;m++;} }
-	    n=0; if (x0<x1) {
-	      for (y=y0;y<=y1;y++) if (*(map+y*map_width+x0)) n++;
-	      if (!n) {x0++;m++;} }
-	    n=0; if (x0<x1) {
-	      for (y=y0;y<=y1;y++) if (*(map+y*map_width+x1)) n++;
-	      if (!n) {x1--;m++;} }
-
-          } while (m);
-
-          if (sel_x0==x0 && sel_x1==x1 && sel_y0==y0 && sel_y1==y1) {
-	    if (x0>0) { sel_x0--; } if (y0>0) { sel_y0--; }
-	    if (x1<map_width-1) { sel_x1++; } if (y1<map_height-1) { sel_y1++; }
-	  } else {
-	    sel_x0=x0; sel_y0=y0; sel_x1=x1; sel_y1=y1;
-	  }
-
-	  s=2; sel_status=1; block_bar(1);
-
+  switch (s) {
+  case 0:
+  case 2:
+    if ((mouse_b & 1) && mouse_graf >= 10) {
+      if (*(map + coord_y * map_width + coord_x)) {
+        if (s == 0 ||
+            (coord_x < sel_x0 || coord_x > sel_x1 || coord_y < sel_y0 || coord_y > sel_y1)) {
+          x0 = coord_x;
+          x1 = coord_x;
+          y0 = coord_y;
+          y1 = coord_y;
+          sel_x0 = map_width;
+          sel_y0 = map_height;
+          sel_x1 = 0;
+          sel_y1 = 0;
         } else {
-
-          sel_status=0; s=0; block_bar(0);
-
+          x0 = sel_x0;
+          x1 = sel_x1;
+          y0 = sel_y0;
+          y1 = sel_y1;
         }
 
-        do {read_mouse();} while(mouse_b&1);
+        do {
+          m = 0;
 
-      } else if ((mouse_b&2) || key(_ESC)) {
+          // Expand the box ...
+          n = 0;
+          if (y0 > 0) {
+            for (x = x0; x <= x1; x++)
+              if (*(map + (y0 - 1) * map_width + x))
+                n++;
+            if (n) {
+              y0--;
+            }
+            m += n;
+          }
+          n = 0;
+          if (y1 < map_height - 1) {
+            for (x = x0; x <= x1; x++)
+              if (*(map + (y1 + 1) * map_width + x))
+                n++;
+            if (n) {
+              y1++;
+            }
+            m += n;
+          }
+          n = 0;
+          if (x0 > 0) {
+            for (y = y0; y <= y1; y++)
+              if (*(map + y * map_width + x0 - 1))
+                n++;
+            if (n) {
+              x0--;
+            }
+            m += n;
+          }
+          n = 0;
+          if (x1 < map_width - 1) {
+            for (y = y0; y <= y1; y++)
+              if (*(map + y * map_width + x1 + 1))
+                n++;
+            if (n) {
+              x1++;
+            }
+            m += n;
+          }
 
-        if (s==2) {
-          s=0; sel_status=0; block_bar(0);
-          do {read_mouse();} while (mouse_b || key(_ESC));
+          // Shrink the box ...
+          n = 0;
+          if (y0 < y1) {
+            for (x = x0; x <= x1; x++)
+              if (*(map + y0 * map_width + x))
+                n++;
+            if (!n) {
+              y0++;
+              m++;
+            }
+          }
+          n = 0;
+          if (y0 < y1) {
+            for (x = x0; x <= x1; x++)
+              if (*(map + y1 * map_width + x))
+                n++;
+            if (!n) {
+              y1--;
+              m++;
+            }
+          }
+          n = 0;
+          if (x0 < x1) {
+            for (y = y0; y <= y1; y++)
+              if (*(map + y * map_width + x0))
+                n++;
+            if (!n) {
+              x0++;
+              m++;
+            }
+          }
+          n = 0;
+          if (x0 < x1) {
+            for (y = y0; y <= y1; y++)
+              if (*(map + y * map_width + x1))
+                n++;
+            if (!n) {
+              x1--;
+              m++;
+            }
+          }
+
+        } while (m);
+
+        if (sel_x0 == x0 && sel_x1 == x1 && sel_y0 == y0 && sel_y1 == y1) {
+          if (x0 > 0) {
+            sel_x0--;
+          }
+          if (y0 > 0) {
+            sel_y0--;
+          }
+          if (x1 < map_width - 1) {
+            sel_x1++;
+          }
+          if (y1 < map_height - 1) {
+            sel_y1++;
+          }
+        } else {
+          sel_x0 = x0;
+          sel_y0 = y0;
+          sel_x1 = x1;
+          sel_y1 = y1;
         }
 
-      } break;
+        s = 2;
+        sel_status = 1;
+        block_bar(1);
 
-  } return(s);
+      } else {
+        sel_status = 0;
+        s = 0;
+        block_bar(0);
+      }
 
+      do {
+        read_mouse();
+      } while (mouse_b & 1);
+
+    } else if ((mouse_b & 2) || key(_ESC)) {
+      if (s == 2) {
+        s = 0;
+        sel_status = 0;
+        block_bar(0);
+        do {
+          read_mouse();
+        } while (mouse_b || key(_ESC));
+      }
+    }
+    break;
+  }
+  return (s);
 }
 
 //-----------------------------------------------------------------------------
@@ -1490,34 +2319,98 @@ int edit_mode_6_box_auto(int s) {
 //-----------------------------------------------------------------------------
 
 void sel_mask_line(int x0, int y0, int x1, int y1) {
+  int dx, dy, a, b, d, x, y;
 
-  int dx,dy,a,b,d,x,y;
+  if (x0 > x1) {
+    x = x1;
+    dx = x0 - x1;
+  } else {
+    x = x0;
+    dx = x1 - x0;
+  }
+  if (y0 > y1) {
+    y = y1;
+    dy = y0 - y1;
+  } else {
+    y = y0;
+    dy = y1 - y0;
+  }
 
-  if (x0>x1) {x=x1; dx=x0-x1;} else {x=x0; dx=x1-x0;}
-  if (y0>y1) {y=y1; dy=y0-y1;} else {y=y0; dy=y1-y0;}
-
-  if (!dx && !dy) set_selection_mask(x0,y0); else {
-
-    if (dy<=dx) {
-      if (x0>x1) { set_selection_mask(x1,y1); x0--; swap(x0,x1); swap(y0,y1); }
-      d=2*dy-dx; a=2*dy; b=2*(dy-dx); x=x0; y=y0;
-      if (y0<=y1) while (x<x1) {
-        if (d<=0) { d+=a; x++; } else { d+=b; x++; y++; }
-        set_selection_mask(x,y);
-      } else while (x<x1) {
-        if (d<=0) { d+=a; x++; } else { d+=b; x++; y--; }
-        set_selection_mask(x,y);
+  if (!dx && !dy)
+    set_selection_mask(x0, y0);
+  else {
+    if (dy <= dx) {
+      if (x0 > x1) {
+        set_selection_mask(x1, y1);
+        x0--;
+        swap(x0, x1);
+        swap(y0, y1);
       }
-    } else  {
-      if (y0>y1) { set_selection_mask(x1,y1); y0--; swap(x0,x1); swap(y0,y1); }
-      d=2*dx-dy; a=2*dx; b=2*(dx-dy); x=x0; y=y0;
-      if (x0<=x1) while (y<y1) {
-        if (d<=0) { d+=a; y++; } else { d+=b; y++; x++; }
-        set_selection_mask(x,y);
-      } else while (y<y1) {
-        if (d<=0) { d+=a; y++; } else { d+=b; y++; x--; }
-        set_selection_mask(x,y);
+      d = 2 * dy - dx;
+      a = 2 * dy;
+      b = 2 * (dy - dx);
+      x = x0;
+      y = y0;
+      if (y0 <= y1)
+        while (x < x1) {
+          if (d <= 0) {
+            d += a;
+            x++;
+          } else {
+            d += b;
+            x++;
+            y++;
+          }
+          set_selection_mask(x, y);
+        }
+      else
+        while (x < x1) {
+          if (d <= 0) {
+            d += a;
+            x++;
+          } else {
+            d += b;
+            x++;
+            y--;
+          }
+          set_selection_mask(x, y);
+        }
+    } else {
+      if (y0 > y1) {
+        set_selection_mask(x1, y1);
+        y0--;
+        swap(x0, x1);
+        swap(y0, y1);
       }
+      d = 2 * dx - dy;
+      a = 2 * dx;
+      b = 2 * (dx - dy);
+      x = x0;
+      y = y0;
+      if (x0 <= x1)
+        while (y < y1) {
+          if (d <= 0) {
+            d += a;
+            y++;
+          } else {
+            d += b;
+            y++;
+            x++;
+          }
+          set_selection_mask(x, y);
+        }
+      else
+        while (y < y1) {
+          if (d <= 0) {
+            d += a;
+            y++;
+          } else {
+            d += b;
+            y++;
+            x--;
+          }
+          set_selection_mask(x, y);
+        }
     }
   }
 }
@@ -1528,63 +2421,97 @@ void sel_mask_line(int x0, int y0, int x1, int y1) {
 
 word poligono[2048]; // Up to 1024 points for polygon selection
 int n_puntos;
-int k1,k2,xmin,trans;
+int k1, k2, xmin, trans;
 
-void find_first_x_from(int xi,int y) {
-  int x0,y0,x1,y1,n,x;
+void find_first_x_from(int xi, int y) {
+  int x0, y0, x1, y1, n, x;
 
-  trans=0; xmin=max_int;
+  trans = 0;
+  xmin = max_int;
 
-  for (n=0;n<n_puntos-1;n++) {
-    x0=poligono[n*2]; y0=poligono[n*2+1];
-    x1=poligono[n*2+2]; y1=poligono[n*2+3];
-    if (y0>y1) { swap(x0,x1); swap(y0,y1); }
-    if (y0<=y && y1>=y && y0!=y1) {
-      x=(float)x0+(float)((x1-x0)*(y-y0))/(float)(y1-y0);
-      if (x>xi && x<xmin) xmin=x;
+  for (n = 0; n < n_puntos - 1; n++) {
+    x0 = poligono[n * 2];
+    y0 = poligono[n * 2 + 1];
+    x1 = poligono[n * 2 + 2];
+    y1 = poligono[n * 2 + 3];
+    if (y0 > y1) {
+      swap(x0, x1);
+      swap(y0, y1);
+    }
+    if (y0 <= y && y1 >= y && y0 != y1) {
+      x = (float)x0 + (float)((x1 - x0) * (y - y0)) / (float)(y1 - y0);
+      if (x > xi && x < xmin)
+        xmin = x;
     }
   }
 
   // Got xmin, now count k1 and k2 updating the transition flag
 
-  if (xmin!=max_int) for (n=0;n<n_puntos-1;n++) {
-    x0=poligono[n*2]; y0=poligono[n*2+1];
-    x1=poligono[n*2+2]; y1=poligono[n*2+3];
-    if (y0>y1) { swap(x0,x1); swap(y0,y1); }
-    if (y0<=y && y1>=y && y0!=y1) {
-      x=(float)x0+(float)((x1-x0)*(y-y0))/(float)(y1-y0);
-      if (x==xmin) {
-        if (y==y0) { k1++; if (k1!=k2) trans^=1; }
-        else if (y==y1) { k2++; if (k1!=k2) trans^=1; }
-        else trans^=1;
-        while (k1<k2-1) { k1+=2; } while (k2<k1-1) { k2+=2; }
+  if (xmin != max_int)
+    for (n = 0; n < n_puntos - 1; n++) {
+      x0 = poligono[n * 2];
+      y0 = poligono[n * 2 + 1];
+      x1 = poligono[n * 2 + 2];
+      y1 = poligono[n * 2 + 3];
+      if (y0 > y1) {
+        swap(x0, x1);
+        swap(y0, y1);
+      }
+      if (y0 <= y && y1 >= y && y0 != y1) {
+        x = (float)x0 + (float)((x1 - x0) * (y - y0)) / (float)(y1 - y0);
+        if (x == xmin) {
+          if (y == y0) {
+            k1++;
+            if (k1 != k2)
+              trans ^= 1;
+          } else if (y == y1) {
+            k2++;
+            if (k1 != k2)
+              trans ^= 1;
+          } else
+            trans ^= 1;
+          while (k1 < k2 - 1) {
+            k1 += 2;
+          }
+          while (k2 < k1 - 1) {
+            k2 += 2;
+          }
+        }
       }
     }
-  }
 }
 
 void fill_polygon(void) {
-  int y0,y1; // Start and end Y coordinates
-  int x0,dentro;
-  int m,n;
+  int y0, y1; // Start and end Y coordinates
+  int x0, dentro;
+  int m, n;
 
-  y0=map_height; y1=0;
+  y0 = map_height;
+  y1 = 0;
 
-  for (n=1;n<n_puntos*2;n+=2) {
-    if (poligono[n]<y0) y0=poligono[n];
-    if (poligono[n]>y1) y1=poligono[n];
+  for (n = 1; n < n_puntos * 2; n += 2) {
+    if (poligono[n] < y0)
+      y0 = poligono[n];
+    if (poligono[n] > y1)
+      y1 = poligono[n];
   }
 
-  for (n=y0;n<=y1;n++) {
-    x0=-1; k1=0; k2=0; dentro=0;
+  for (n = y0; n <= y1; n++) {
+    x0 = -1;
+    k1 = 0;
+    k2 = 0;
+    dentro = 0;
     do {
-      find_first_x_from(x0,n);
-      if (xmin!=max_int) {
+      find_first_x_from(x0, n);
+      if (xmin != max_int) {
         if (dentro) {
-          for (m=x0+1;m<=xmin;m++) set_selection_mask(m,n);
-        } dentro^=trans; x0=xmin;
+          for (m = x0 + 1; m <= xmin; m++)
+            set_selection_mask(m, n);
+        }
+        dentro ^= trans;
+        x0 = xmin;
       }
-    } while (xmin!=max_int);
+    } while (xmin != max_int);
   }
 }
 
@@ -1593,60 +2520,89 @@ void fill_polygon(void) {
 //-----------------------------------------------------------------------------
 
 int edit_mode_6_lines(int s) {
+  static int oldx, oldy;
 
-  static int oldx,oldy;
+  switch (s) {
+  case 0:
+    if ((mouse_b & 1) && mouse_graf >= 10) {
+      s = 1;
+      n_puntos = 1;
+      poligono[0] = coord_x;
+      poligono[1] = coord_y;
+      memset(selection_mask, 0, ((map_width * map_height + 31) / 32) * 4);
+      sel_mask_x0 = sel_mask_x1 = coord_x;
+      sel_mask_y0 = sel_mask_y1 = coord_y;
+      set_selection_mask(coord_x, coord_y);
+      oldx = coord_x;
+      oldy = coord_y;
+    }
+    break;
 
-  switch(s) {
-    case 0:
-      if ((mouse_b&1) && mouse_graf>=10) {
-        s=1; n_puntos=1;
-        poligono[0]=coord_x; poligono[1]=coord_y;
-        memset(selection_mask,0,((map_width*map_height+31)/32)*4);
-        sel_mask_x0=sel_mask_x1=coord_x; sel_mask_y0=sel_mask_y1=coord_y;
-        set_selection_mask(coord_x,coord_y);
-        oldx=coord_x; oldy=coord_y;
-      } break;
-
-    case 1:
-      sel_status=1;
-      if ((mouse_b&1) && mouse_graf>=10 && n_puntos<1024 &&
-         (poligono[n_puntos*2-2]!=coord_x||poligono[n_puntos*2-1]!=coord_y)) {
-        poligono[n_puntos*2]=coord_x;
-        poligono[n_puntos*2+1]=coord_y; n_puntos++;
-        if (coord_x<sel_mask_x0) sel_mask_x0=coord_x; else if (coord_x>sel_mask_x1) sel_mask_x1=coord_x;
-        if (coord_y<sel_mask_y0) sel_mask_y0=coord_y; else if (coord_y>sel_mask_y1) sel_mask_y1=coord_y;
-        sel_mask_line(oldx,oldy,coord_x,coord_y);
-        oldx=coord_x; oldy=coord_y;
-        if (n_puntos>3 && oldx>=poligono[0]-1 && oldx<=poligono[0]+1 &&
-            oldy>=poligono[1]-1 && oldy<=poligono[1]+1) {
-          if (oldx!=poligono[0] || oldy!=poligono[1]) {
-            poligono[n_puntos*2]=poligono[0];
-            poligono[n_puntos*2+1]=poligono[1]; n_puntos++;
-          }
-          fill_polygon();
-          s=2; block_bar(1);
+  case 1:
+    sel_status = 1;
+    if ((mouse_b & 1) && mouse_graf >= 10 && n_puntos < 1024 &&
+        (poligono[n_puntos * 2 - 2] != coord_x || poligono[n_puntos * 2 - 1] != coord_y)) {
+      poligono[n_puntos * 2] = coord_x;
+      poligono[n_puntos * 2 + 1] = coord_y;
+      n_puntos++;
+      if (coord_x < sel_mask_x0)
+        sel_mask_x0 = coord_x;
+      else if (coord_x > sel_mask_x1)
+        sel_mask_x1 = coord_x;
+      if (coord_y < sel_mask_y0)
+        sel_mask_y0 = coord_y;
+      else if (coord_y > sel_mask_y1)
+        sel_mask_y1 = coord_y;
+      sel_mask_line(oldx, oldy, coord_x, coord_y);
+      oldx = coord_x;
+      oldy = coord_y;
+      if (n_puntos > 3 && oldx >= poligono[0] - 1 && oldx <= poligono[0] + 1 &&
+          oldy >= poligono[1] - 1 && oldy <= poligono[1] + 1) {
+        if (oldx != poligono[0] || oldy != poligono[1]) {
+          poligono[n_puntos * 2] = poligono[0];
+          poligono[n_puntos * 2 + 1] = poligono[1];
+          n_puntos++;
         }
-      } else if ((mouse_b&2) || key(_ESC)) {
-        if (n_puntos>2) {
-          poligono[n_puntos*2]=poligono[0];
-          poligono[n_puntos*2+1]=poligono[1]; n_puntos++;
-          sel_mask_line(oldx,oldy,poligono[0],poligono[1]);
-          fill_polygon();
-          s=2; block_bar(1);
-          do {read_mouse();} while (mouse_b || key(_ESC));
-        } else {
-          s=0; sel_status=0; block_bar(0);
-          do {read_mouse();} while (mouse_b || key(_ESC));
-        }
-      } break;
+        fill_polygon();
+        s = 2;
+        block_bar(1);
+      }
+    } else if ((mouse_b & 2) || key(_ESC)) {
+      if (n_puntos > 2) {
+        poligono[n_puntos * 2] = poligono[0];
+        poligono[n_puntos * 2 + 1] = poligono[1];
+        n_puntos++;
+        sel_mask_line(oldx, oldy, poligono[0], poligono[1]);
+        fill_polygon();
+        s = 2;
+        block_bar(1);
+        do {
+          read_mouse();
+        } while (mouse_b || key(_ESC));
+      } else {
+        s = 0;
+        sel_status = 0;
+        block_bar(0);
+        do {
+          read_mouse();
+        } while (mouse_b || key(_ESC));
+      }
+    }
+    break;
 
-    case 2: sel_status=1;
-      if ((mouse_b&2) || key(_ESC)) {
-        s=0; sel_status=0; block_bar(0);
-        do {read_mouse();} while (mouse_b || key(_ESC));
-      } break;
-
-  } return(s);
+  case 2:
+    sel_status = 1;
+    if ((mouse_b & 2) || key(_ESC)) {
+      s = 0;
+      sel_status = 0;
+      block_bar(0);
+      do {
+        read_mouse();
+      } while (mouse_b || key(_ESC));
+    }
+    break;
+  }
+  return (s);
 }
 
 //-----------------------------------------------------------------------------
@@ -1654,47 +2610,75 @@ int edit_mode_6_lines(int s) {
 //-----------------------------------------------------------------------------
 
 int edit_mode_6_fill(int s) {
-
   int n;
 
-  switch(s) {
-    case 0:
-      if ((mouse_b&1) && mouse_graf>=10) {
-        if (mode_selection==1) {
-          memset(fill_dac,0,256);
-          fill_dac[*(map+coord_y*map_width+coord_x)]=1;
-        } else { memset(fill_dac,1,256); fill_dac[0]=0; }
-        s=2; memset(focos,-1,512);
-        focos[0]=coord_x; focos[1]=coord_y;
-        memset(selection_mask,0,((map_width*map_height+31)/32)*4);
-        sel_mask_x0=map_width; sel_mask_y0=map_height; sel_mask_x1=0; sel_mask_y1=0;
-        fill_select(coord_x,coord_y);
-        if (is_selection_mask(coord_x,coord_y)) block_bar(1); else s=0;
-        do {read_mouse();} while(mouse_b&1);
-      } break;
+  switch (s) {
+  case 0:
+    if ((mouse_b & 1) && mouse_graf >= 10) {
+      if (mode_selection == 1) {
+        memset(fill_dac, 0, 256);
+        fill_dac[*(map + coord_y * map_width + coord_x)] = 1;
+      } else {
+        memset(fill_dac, 1, 256);
+        fill_dac[0] = 0;
+      }
+      s = 2;
+      memset(focos, -1, 512);
+      focos[0] = coord_x;
+      focos[1] = coord_y;
+      memset(selection_mask, 0, ((map_width * map_height + 31) / 32) * 4);
+      sel_mask_x0 = map_width;
+      sel_mask_y0 = map_height;
+      sel_mask_x1 = 0;
+      sel_mask_y1 = 0;
+      fill_select(coord_x, coord_y);
+      if (is_selection_mask(coord_x, coord_y))
+        block_bar(1);
+      else
+        s = 0;
+      do {
+        read_mouse();
+      } while (mouse_b & 1);
+    }
+    break;
 
-    case 2:
-      sel_status=1;
-      if ((mouse_b&1) && mouse_graf>=10) {
-        if (mode_selection==1) fill_dac[*(map+coord_y*map_width+coord_x)]=1;
-        n=0; while(n<126 && focos[n]>=0) n+=2;
-        focos[n]=coord_x; focos[n+1]=coord_y;
-        memset(selection_mask,0,((map_width*map_height+31)/32)*4);
-        for (n=0;n<128;n+=2)
-          if (focos[n]>=0) {
-            if (!is_selection_mask(focos[n],focos[n+1])) {
-              fill_select(focos[n],focos[n+1]);
-              if (!is_selection_mask(focos[n],focos[n+1])) {
-                s=0; sel_status=0; block_bar(0);
-                do {read_mouse();} while (mouse_b || key(_ESC));
-              }
-            } else focos[n]=-1;
-          }
-      } else if ((mouse_b&2) || key(_ESC)) {
-        s=0; sel_status=0; block_bar(0);
-        do {read_mouse();} while (mouse_b || key(_ESC));
-      } break;
-  } return(s);
+  case 2:
+    sel_status = 1;
+    if ((mouse_b & 1) && mouse_graf >= 10) {
+      if (mode_selection == 1)
+        fill_dac[*(map + coord_y * map_width + coord_x)] = 1;
+      n = 0;
+      while (n < 126 && focos[n] >= 0)
+        n += 2;
+      focos[n] = coord_x;
+      focos[n + 1] = coord_y;
+      memset(selection_mask, 0, ((map_width * map_height + 31) / 32) * 4);
+      for (n = 0; n < 128; n += 2)
+        if (focos[n] >= 0) {
+          if (!is_selection_mask(focos[n], focos[n + 1])) {
+            fill_select(focos[n], focos[n + 1]);
+            if (!is_selection_mask(focos[n], focos[n + 1])) {
+              s = 0;
+              sel_status = 0;
+              block_bar(0);
+              do {
+                read_mouse();
+              } while (mouse_b || key(_ESC));
+            }
+          } else
+            focos[n] = -1;
+        }
+    } else if ((mouse_b & 2) || key(_ESC)) {
+      s = 0;
+      sel_status = 0;
+      block_bar(0);
+      do {
+        read_mouse();
+      } while (mouse_b || key(_ESC));
+    }
+    break;
+  }
+  return (s);
 }
 
 //-----------------------------------------------------------------------------
@@ -1702,69 +2686,116 @@ int edit_mode_6_fill(int s) {
 //-----------------------------------------------------------------------------
 
 int edit_mode_6_boxes(int s) {
+  int x, y;
 
-  int x,y;
+  switch (s) {
+  case 0:
+    if ((mouse_b & 1) && mouse_graf >= 10) {
+      s = 1;
+      sel_x0 = coord_x;
+      sel_y0 = coord_y;
+      memset(selection_mask, 0, ((map_width * map_height + 31) / 32) * 4);
+      sel_mask_x0 = map_width;
+      sel_mask_y0 = map_height;
+      sel_mask_x1 = 0;
+      sel_mask_y1 = 0;
+      do {
+        read_mouse();
+      } while (mouse_b & 1);
+    }
+    break;
 
-  switch(s) {
-    case 0:
-      if ((mouse_b&1) && mouse_graf>=10) {
-        s=1; sel_x0=coord_x; sel_y0=coord_y;
-        memset(selection_mask,0,((map_width*map_height+31)/32)*4);
-        sel_mask_x0=map_width; sel_mask_y0=map_height; sel_mask_x1=0; sel_mask_y1=0;
-        do {read_mouse();} while(mouse_b&1);
-      } break;
+  case 1:
+    if (mouse_graf >= 10) {
+      sel_x1 = coord_x;
+      sel_y1 = coord_y;
+      sel_status = 1;
+      if (mouse_b & 1) {
+        if (sel_x0 > sel_x1)
+          swap(sel_x0, sel_x1);
+        if (sel_y0 > sel_y1)
+          swap(sel_y0, sel_y1);
+        sel_mask_x0 = sel_x0;
+        sel_mask_x1 = sel_x1;
+        sel_mask_y0 = sel_y0;
+        sel_mask_y1 = sel_y1;
+        for (y = sel_y0; y <= sel_y1; y++)
+          for (x = sel_x0; x <= sel_x1; x++)
+            set_selection_mask(x, y);
+        sel_x1 = -1;
+        s = 2;
+        block_bar(1);
+        do {
+          read_mouse();
+        } while (mouse_b & 1);
+      } else if (mouse_b || key(_ESC)) {
+        s = 0;
+        sel_status = 0;
+        do {
+          read_mouse();
+        } while (mouse_b || key(_ESC));
+      }
+    } else
+      sel_status = 0;
+    break;
 
-    case 1:
-      if (mouse_graf>=10) {
-        sel_x1=coord_x; sel_y1=coord_y; sel_status=1;
-        if (mouse_b&1) {
-          if (sel_x0>sel_x1) swap(sel_x0,sel_x1);
-          if (sel_y0>sel_y1) swap(sel_y0,sel_y1);
-	  sel_mask_x0=sel_x0; sel_mask_x1=sel_x1;
-	  sel_mask_y0=sel_y0; sel_mask_y1=sel_y1;
-	  for (y=sel_y0;y<=sel_y1;y++)
-	    for (x=sel_x0;x<=sel_x1;x++)
-	      set_selection_mask(x,y);
-          sel_x1=-1; s=2; block_bar(1);
-          do {read_mouse();} while(mouse_b&1);
-        } else if (mouse_b || key(_ESC)) {
-          s=0; sel_status=0;
-          do {read_mouse();} while (mouse_b || key(_ESC));
-        }
-      } else sel_status=0; break;
+  case 2:
+    sel_status = 1;
+    if ((mouse_b & 1) && mouse_graf >= 10) {
+      s = 3;
+      sel_x0 = coord_x;
+      sel_y0 = coord_y;
+      do {
+        read_mouse();
+      } while (mouse_b & 1);
+    } else if ((mouse_b & 2) || key(_ESC)) {
+      s = 0;
+      sel_status = 0;
+      block_bar(0);
+      do {
+        read_mouse();
+      } while (mouse_b || key(_ESC));
+    }
+    break;
 
-    case 2:
-      sel_status=1;
-      if ((mouse_b&1) && mouse_graf>=10) {
-        s=3; sel_x0=coord_x; sel_y0=coord_y;
-        do {read_mouse();} while(mouse_b&1);
-      } else if ((mouse_b&2) || key(_ESC)) {
-        s=0; sel_status=0; block_bar(0);
-        do {read_mouse();} while (mouse_b || key(_ESC));
-      } break;
-
-    case 3:
-      sel_status=1;
-      if (mouse_graf>=10) {
-        sel_x1=coord_x; sel_y1=coord_y;
-      } else sel_x1=-1;
-      if ((mouse_b&1) && mouse_graf>=10) {
-        if (sel_x0>sel_x1) swap(sel_x0,sel_x1);
-        if (sel_y0>sel_y1) swap(sel_y0,sel_y1);
-        if (sel_x0<sel_mask_x0) sel_mask_x0=sel_x0;
-        if (sel_x1>sel_mask_x1) sel_mask_x1=sel_x1;
-	if (sel_y0<sel_mask_y0) sel_mask_y0=sel_y0;
-        if (sel_y1>sel_mask_y1) sel_mask_y1=sel_y1;
-        for (y=sel_y0;y<=sel_y1;y++)
-          for (x=sel_x0;x<=sel_x1;x++)
-            set_selection_mask(x,y);
-	s=2; sel_x1=-1;
-        do {read_mouse();} while(mouse_b&1);
-      } else if ((mouse_b&2) || key(_ESC)) {
-        sel_x1=-1; s=2;
-        do {read_mouse();} while (mouse_b || key(_ESC));
-      } break;
-  } return(s);
+  case 3:
+    sel_status = 1;
+    if (mouse_graf >= 10) {
+      sel_x1 = coord_x;
+      sel_y1 = coord_y;
+    } else
+      sel_x1 = -1;
+    if ((mouse_b & 1) && mouse_graf >= 10) {
+      if (sel_x0 > sel_x1)
+        swap(sel_x0, sel_x1);
+      if (sel_y0 > sel_y1)
+        swap(sel_y0, sel_y1);
+      if (sel_x0 < sel_mask_x0)
+        sel_mask_x0 = sel_x0;
+      if (sel_x1 > sel_mask_x1)
+        sel_mask_x1 = sel_x1;
+      if (sel_y0 < sel_mask_y0)
+        sel_mask_y0 = sel_y0;
+      if (sel_y1 > sel_mask_y1)
+        sel_mask_y1 = sel_y1;
+      for (y = sel_y0; y <= sel_y1; y++)
+        for (x = sel_x0; x <= sel_x1; x++)
+          set_selection_mask(x, y);
+      s = 2;
+      sel_x1 = -1;
+      do {
+        read_mouse();
+      } while (mouse_b & 1);
+    } else if ((mouse_b & 2) || key(_ESC)) {
+      sel_x1 = -1;
+      s = 2;
+      do {
+        read_mouse();
+      } while (mouse_b || key(_ESC));
+    }
+    break;
+  }
+  return (s);
 }
 
 //-----------------------------------------------------------------------------
@@ -1772,30 +2803,51 @@ int edit_mode_6_boxes(int s) {
 //-----------------------------------------------------------------------------
 
 void edit_mode_11(void) {
-
-  bar[0]=101+zoom; bar[1]=153; bar[2]=121; bar[3]=120; bar[4]=154;
-  bar[5]=0; draw_bar(0);
+  bar[0] = 101 + zoom;
+  bar[1] = 153;
+  bar[2] = 121;
+  bar[3] = 120;
+  bar[4] = 154;
+  bar[5] = 0;
+  draw_bar(0);
 
   do {
     draw_help(1295);
-    read_mouse(); select_zoom(); test_mouse();
+    read_mouse();
+    select_zoom();
+    test_mouse();
 
-    if (mouse_b&1) switch (selected_icon) {
-    case 1:
-      undo_back(); break;
-    case 2:
-      undo_back(); do {read_mouse();} while(mouse_b&1); break;
-    case 3:
-      undo_next(); do {read_mouse();} while(mouse_b&1); break;
-    case 4:
-      undo_next(); break;
+    if (mouse_b & 1)
+      switch (selected_icon) {
+      case 1:
+        undo_back();
+        break;
+      case 2:
+        undo_back();
+        do {
+          read_mouse();
+        } while (mouse_b & 1);
+        break;
+      case 3:
+        undo_next();
+        do {
+          read_mouse();
+        } while (mouse_b & 1);
+        break;
+      case 4:
+        undo_next();
+        break;
+      }
+    if (scan_code == 14 && !key(_L_SHIFT) && !key(_R_SHIFT))
+      undo_back();
+    else if (scan_code == 14 && (key(_L_SHIFT) || key(_R_SHIFT))) {
+      undo_next();
+      need_zoom = 1;
     }
-    if (scan_code==14 && !key(_L_SHIFT) && !key(_R_SHIFT)) undo_back();
-    else if (scan_code==14 && (key(_L_SHIFT)||key(_R_SHIFT))) { undo_next(); need_zoom=1; }
 
     blit_edit();
-  } while (!exit_requested && !(mouse_b&2) && !key(_ESC) && draw_mode<100 &&
-    !(mouse_b && mouse_in(toolbar_x,toolbar_y+10,toolbar_x+9,toolbar_y+18)));
+  } while (!exit_requested && !(mouse_b & 2) && !key(_ESC) && draw_mode < 100 &&
+           !(mouse_b && mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18)));
 }
 
 //-----------------------------------------------------------------------------
@@ -1805,135 +2857,188 @@ void edit_mode_11(void) {
 // TODO: Known bug -- screen refresh fails when combining undo with backspace during text deletion
 
 int find_font_window(void);
-void GetCharSizeBuffer(int WhatChar,int *ancho,int *alto,char *buffer);
-int ShowCharBuffer(int WhatChar,int cx,int cy,char *ptr,int an,char *buffer);
+void GetCharSizeBuffer(int WhatChar, int *ancho, int *alto, char *buffer);
+int ShowCharBuffer(int WhatChar, int cx, int cy, char *ptr, int an, char *buffer);
 
-int barra_texto=0; // Prevent background highlight toggle with 'b' key
+int barra_texto = 0; // Prevent background highlight toggle with 'b' key
 
 void edit_mode_12(void) {
-  int spacelen,cnt,x,fan,fal,anmax,almax;
-  int ms=mode_selection;
+  int spacelen, cnt, x, fan, fal, anmax, almax;
+  int ms = mode_selection;
   int a;
-  int tx=-256,ty=-256; // Text start position (for enter/newline)
-  byte * font, * buffer;
-  int ilon=0;
+  int tx = -256, ty = -256; // Text start position (for enter/newline)
+  byte *font, *buffer;
+  int ilon = 0;
   byte lon[256];
 
-  mode_selection=0; bar[0]=101+zoom; bar[1]=121;
-  for (a=2;a<11;a++) { bar[a]=1; } bar[11]=166;
-  bar[12]=119; bar[13]=0;
-  draw_bar(0); draw_ruler();
+  mode_selection = 0;
+  bar[0] = 101 + zoom;
+  bar[1] = 121;
+  for (a = 2; a < 11; a++) {
+    bar[a] = 1;
+  }
+  bar[11] = 166;
+  bar[12] = 119;
+  bar[13] = 0;
+  draw_bar(0);
+  draw_ruler();
 
-  if ((x=find_font_window())) {
-
+  if ((x = find_font_window())) {
     // Pointer to font
 
-    font=window[x].aux+RES_FOR_NAME;
+    font = window[x].aux + RES_FOR_NAME;
 
     // Determine spacelen
 
-    spacelen=0; cnt=0;
-    for(x=0;x<255;x++) {
-      GetCharSizeBuffer(x,&fan,&fal,(char *)font);
-      if(fan!=1) { cnt++; spacelen+=fan; }
-    } spacelen=(spacelen/cnt)/2;
+    spacelen = 0;
+    cnt = 0;
+    for (x = 0; x < 255; x++) {
+      GetCharSizeBuffer(x, &fan, &fal, (char *)font);
+      if (fan != 1) {
+        cnt++;
+        spacelen += fan;
+      }
+    }
+    spacelen = (spacelen / cnt) / 2;
 
     // Determine max width and height
 
-    anmax=0; almax=0; for(x=0;x<255;x++) {
-      GetCharSizeBuffer(x,&fan,&fal,(char *)font);
-      if(fan==1) fan=spacelen;
-      if(anmax<fan) anmax=fan;
-      if(almax<fal) almax=fal;
+    anmax = 0;
+    almax = 0;
+    for (x = 0; x < 255; x++) {
+      GetCharSizeBuffer(x, &fan, &fal, (char *)font);
+      if (fan == 1)
+        fan = spacelen;
+      if (anmax < fan)
+        anmax = fan;
+      if (almax < fal)
+        almax = fal;
     }
 
     // Allocate memory for the buffer
 
-    if ((buffer=(byte*)malloc(anmax*almax))!=NULL) {
-      memset(buffer,0,anmax*almax);
+    if ((buffer = (byte *)malloc(anmax * almax)) != NULL) {
+      memset(buffer, 0, anmax * almax);
     } else {
-      v_text=(char *)texts[45]; show_dialog(err0);
-      font=NULL;
+      v_text = (char *)texts[45];
+      show_dialog(err0);
+      font = NULL;
     }
 
-  } else font=NULL; // Will draw with the editor's built-in font
+  } else
+    font = NULL; // Will draw with the editor's built-in font
 
-  barra_texto=1;
+  barra_texto = 1;
 
   do {
     draw_help(1295);
-    edit_ruler(); select_fx(12,&efecto12); select_color(2);
+    edit_ruler();
+    select_fx(12, &efecto12);
+    select_color(2);
 
-    test_previous(); if (!hotkey) poll_keyboard();
+    test_previous();
+    if (!hotkey)
+      poll_keyboard();
 
-    if (font==NULL) {
-
+    if (font == NULL) {
       // Write with the system font
 
-      if (mouse_graf>=10 && (mouse_b&1) && !key(_SPC)) {
-        sel_x0=coord_x-font_width/2; sel_y0=coord_y-font_height/2;
-        sel_x1=sel_x0+font_width-1; sel_y1=sel_y0+font_height-1;
-        sel_status=1; hotkey=0; tx=sel_x0; ty=sel_y0;
-      } else if (((mouse_b&2) || key(_ESC)) && sel_status) {
-        sel_status=0; hotkey=1;
-        do {read_mouse();} while((mouse_b&2) || key(_ESC));
+      if (mouse_graf >= 10 && (mouse_b & 1) && !key(_SPC)) {
+        sel_x0 = coord_x - font_width / 2;
+        sel_y0 = coord_y - font_height / 2;
+        sel_x1 = sel_x0 + font_width - 1;
+        sel_y1 = sel_y0 + font_height - 1;
+        sel_status = 1;
+        hotkey = 0;
+        tx = sel_x0;
+        ty = sel_y0;
+      } else if (((mouse_b & 2) || key(_ESC)) && sel_status) {
+        sel_status = 0;
+        hotkey = 1;
+        do {
+          read_mouse();
+        } while ((mouse_b & 2) || key(_ESC));
       }
-      if (sel_status==1) {
-        if (ascii==13) {
-          ty+=font_height; sel_x0=tx; sel_y0=ty;
-          sel_x1=sel_x0+font_width-1; sel_y1=sel_y0+font_height-1;
-        } else if (scan_code==14) {
-          if (sel_x0!=tx) {
+      if (sel_status == 1) {
+        if (ascii == 13) {
+          ty += font_height;
+          sel_x0 = tx;
+          sel_y0 = ty;
+          sel_x1 = sel_x0 + font_width - 1;
+          sel_y1 = sel_y0 + font_height - 1;
+        } else if (scan_code == 14) {
+          if (sel_x0 != tx) {
             if (undo_back()) {
               test_previous();
-              sel_x0-=font_width; sel_x1-=font_width;
+              sel_x0 -= font_width;
+              sel_x1 -= font_width;
             }
           }
-        } else if (ascii && scan_code!=15 && scan_code!=1 && ilon<256) {
-          if (save_undo(sel_x0,sel_y0,font_width,font_height)) {
+        } else if (ascii && scan_code != 15 && scan_code != 1 && ilon < 256) {
+          if (save_undo(sel_x0, sel_y0, font_width, font_height)) {
             test_previous(); // To counteract the effect of save_undo()
-            line_fx=efecto12; write_char(sel_x0,sel_y0,ascii);
-            sel_x0+=font_width; sel_x1+=font_width;
+            line_fx = efecto12;
+            write_char(sel_x0, sel_y0, ascii);
+            sel_x0 += font_width;
+            sel_x1 += font_width;
           }
         }
       }
     } else {
-
       // Write with the selected font
 
-      if (mouse_graf>=10 && (mouse_b&1)) {
-        sel_x0=coord_x-spacelen/2; sel_y0=coord_y-almax/2;
-        sel_x1=sel_x0+spacelen-1; sel_y1=sel_y0+almax-1;
-        sel_status=1; hotkey=0; tx=sel_x0; ty=sel_y0; ilon=0;
-      } else if (((mouse_b&2) || key(_ESC)) && sel_status) {
-        sel_status=0; hotkey=1;
-        do {read_mouse();} while((mouse_b&2) || key(_ESC));
+      if (mouse_graf >= 10 && (mouse_b & 1)) {
+        sel_x0 = coord_x - spacelen / 2;
+        sel_y0 = coord_y - almax / 2;
+        sel_x1 = sel_x0 + spacelen - 1;
+        sel_y1 = sel_y0 + almax - 1;
+        sel_status = 1;
+        hotkey = 0;
+        tx = sel_x0;
+        ty = sel_y0;
+        ilon = 0;
+      } else if (((mouse_b & 2) || key(_ESC)) && sel_status) {
+        sel_status = 0;
+        hotkey = 1;
+        do {
+          read_mouse();
+        } while ((mouse_b & 2) || key(_ESC));
       }
-      if (sel_status==1) {
-        if (ascii==13) {
-          ty+=almax; sel_x0=tx; sel_y0=ty;
-          sel_x1=sel_x0+spacelen-1; sel_y1=sel_y0+almax-1; ilon=0;
-        } else if (scan_code==14) {
-          if (sel_x0!=tx) {
+      if (sel_status == 1) {
+        if (ascii == 13) {
+          ty += almax;
+          sel_x0 = tx;
+          sel_y0 = ty;
+          sel_x1 = sel_x0 + spacelen - 1;
+          sel_y1 = sel_y0 + almax - 1;
+          ilon = 0;
+        } else if (scan_code == 14) {
+          if (sel_x0 != tx) {
             if (undo_back()) {
               test_previous();
-              sel_x0-=lon[--ilon]; sel_x1-=lon[ilon];
+              sel_x0 -= lon[--ilon];
+              sel_x1 -= lon[ilon];
             }
           }
-        } else if (ascii && scan_code!=15 && scan_code!=1 && ilon<256) {
-          GetCharSizeBuffer(ascii,&fan,&fal,(char *)font);
-          if (fan==1) {
-            if (save_undo(sel_x0,sel_y1,1,1)) {
+        } else if (ascii && scan_code != 15 && scan_code != 1 && ilon < 256) {
+          GetCharSizeBuffer(ascii, &fan, &fal, (char *)font);
+          if (fan == 1) {
+            if (save_undo(sel_x0, sel_y1, 1, 1)) {
               test_previous();
-              sel_x0+=spacelen; sel_x1+=spacelen; lon[ilon++]=spacelen;
+              sel_x0 += spacelen;
+              sel_x1 += spacelen;
+              lon[ilon++] = spacelen;
             }
           } else {
-            memset(buffer,0,anmax*almax);
-            if (save_undo(sel_x0,sel_y0,fan,almax)) {
+            memset(buffer, 0, anmax * almax);
+            if (save_undo(sel_x0, sel_y0, fan, almax)) {
               test_previous(); // To counteract the effect of save_undo()
-              ShowCharBuffer(ascii,0,0,(char *)buffer,anmax,(char *)font);
-              line_fx=efecto12; write_char2(sel_x0,sel_y0,buffer,anmax,almax);
-              sel_x0+=fan; sel_x1+=fan; lon[ilon++]=fan;
+              ShowCharBuffer(ascii, 0, 0, (char *)buffer, anmax, (char *)font);
+              line_fx = efecto12;
+              write_char2(sel_x0, sel_y0, buffer, anmax, almax);
+              sel_x0 += fan;
+              sel_x1 += fan;
+              lon[ilon++] = fan;
             }
           }
         }
@@ -1942,27 +3047,40 @@ void edit_mode_12(void) {
 
     test_next();
 
-    if (((mouse_b&1) && selected_icon==1) || ((scan_code==14&&hotkey) && !key(_L_SHIFT) && !key(_R_SHIFT))) {
-      if (sel_x0!=tx) {
+    if (((mouse_b & 1) && selected_icon == 1) ||
+        ((scan_code == 14 && hotkey) && !key(_L_SHIFT) && !key(_R_SHIFT))) {
+      if (sel_x0 != tx) {
         if (undo_back()) {
-          if (font==NULL) {
-            sel_x0-=font_width; sel_x1-=font_width;
+          if (font == NULL) {
+            sel_x0 -= font_width;
+            sel_x1 -= font_width;
           } else {
-            sel_x0-=lon[--ilon]; sel_x1-=lon[ilon];
+            sel_x0 -= lon[--ilon];
+            sel_x1 -= lon[ilon];
           }
         }
-      } else undo_back();
-      need_zoom=1;
-      do {read_mouse();} while(mouse_b&1);
-    } else if ((scan_code==14&&hotkey) && (key(_L_SHIFT)||key(_R_SHIFT))) { undo_next(); need_zoom=1; }
+      } else
+        undo_back();
+      need_zoom = 1;
+      do {
+        read_mouse();
+      } while (mouse_b & 1);
+    } else if ((scan_code == 14 && hotkey) && (key(_L_SHIFT) || key(_R_SHIFT))) {
+      undo_next();
+      need_zoom = 1;
+    }
 
     blit_edit();
-  } while (!exit_requested && !(mouse_b&2) && !(key(_ESC) && hotkey) && draw_mode<100 &&
-    !(mouse_b && mouse_in(toolbar_x,toolbar_y+10,toolbar_x+9,toolbar_y+18)));
+  } while (!exit_requested && !(mouse_b & 2) && !(key(_ESC) && hotkey) && draw_mode < 100 &&
+           !(mouse_b && mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18)));
 
-  barra_texto=0;
+  barra_texto = 0;
 
-  hotkey=1; sel_status=0; mode_selection=ms; if (font!=NULL) free(buffer);
+  hotkey = 1;
+  sel_status = 0;
+  mode_selection = ms;
+  if (font != NULL)
+    free(buffer);
 }
 
 //-----------------------------------------------------------------------------
@@ -1970,68 +3088,96 @@ void edit_mode_12(void) {
 //-----------------------------------------------------------------------------
 
 void write_char(int x, int y, byte c) {
-  int n,m;
+  int n, m;
   byte *si;
   byte col;
 
-  if (textura_color==NULL) {
-    si=font+c*font_width*font_height;
-    n=font_height; do {
-      m=font_width; do {
-        if (*si) _line_pixel(x,y);
-        si++; x++;
+  if (textura_color == NULL) {
+    si = font + c * font_width * font_height;
+    n = font_height;
+    do {
+      m = font_width;
+      do {
+        if (*si)
+          _line_pixel(x, y);
+        si++;
+        x++;
       } while (--m);
-      x-=font_width; y++;
+      x -= font_width;
+      y++;
     } while (--n);
   } else {
-    col=color;
-    si=font+c*font_width*font_height;
-    n=font_height; do {
-      m=font_width; do {
-        color=get_color(x,y);
-        if (*si) _line_pixel(x,y);
-        si++; x++;
+    col = color;
+    si = font + c * font_width * font_height;
+    n = font_height;
+    do {
+      m = font_width;
+      do {
+        color = get_color(x, y);
+        if (*si)
+          _line_pixel(x, y);
+        si++;
+        x++;
       } while (--m);
-      x-=font_width; y++;
+      x -= font_width;
+      y++;
     } while (--n);
-    color=col;
+    color = col;
   }
 }
 
-void write_char2(int x, int y, byte * si, int font_width, int font_height) {
-  int n,m;
-  byte c=color,*g;
+void write_char2(int x, int y, byte *si, int font_width, int font_height) {
+  int n, m;
+  byte c = color, *g;
 
-  if (textura_color!=NULL) {
-    n=font_height; do {
-      m=font_width; do {
+  if (textura_color != NULL) {
+    n = font_height;
+    do {
+      m = font_width;
+      do {
         if (*si) {
-          color=*(ghost+(memptrsize)get_color(x,y)*256+*si);
-          _line_pixel(x,y);
+          color = *(ghost + (memptrsize)get_color(x, y) * 256 + *si);
+          _line_pixel(x, y);
         }
-        si++; x++;
+        si++;
+        x++;
       } while (--m);
-      x-=font_width; y++;
+      x -= font_width;
+      y++;
     } while (--n);
   } else if (!c) {
-    n=font_height; do {
-      m=font_width; do {
-        if (*si) { color=*si; _line_pixel(x,y); }
-        si++; x++;
+    n = font_height;
+    do {
+      m = font_width;
+      do {
+        if (*si) {
+          color = *si;
+          _line_pixel(x, y);
+        }
+        si++;
+        x++;
       } while (--m);
-      x-=font_width; y++;
+      x -= font_width;
+      y++;
     } while (--n);
   } else {
-    g=ghost+(memptrsize)c*256;
-    n=font_height; do {
-      m=font_width; do {
-        if (*si) { color=*(g+*si); _line_pixel(x,y); }
-        si++; x++;
+    g = ghost + (memptrsize)c * 256;
+    n = font_height;
+    do {
+      m = font_width;
+      do {
+        if (*si) {
+          color = *(g + *si);
+          _line_pixel(x, y);
+        }
+        si++;
+        x++;
       } while (--m);
-      x-=font_width; y++;
+      x -= font_width;
+      y++;
     } while (--n);
   }
-  color=c;
+  color = c;
 }
 
 //-----------------------------------------------------------------------------
@@ -2039,130 +3185,194 @@ void write_char2(int x, int y, byte * si, int font_width, int font_height) {
 //-----------------------------------------------------------------------------
 
 void edit_mode_13(void) {
-
-  byte * p;
+  byte *p;
   int m;
   char num[8];
-  int m_s=mode_selection;
+  int m_s = mode_selection;
 
-  bar[0]=101+zoom; bar[1]=192; bar[2]=1; bar[3]=193;
-  bar[4]=0; bar[5]=0; draw_bar(22); mode_selection=-1;
+  bar[0] = 101 + zoom;
+  bar[1] = 192;
+  bar[2] = 1;
+  bar[3] = 193;
+  bar[4] = 0;
+  bar[5] = 0;
+  draw_bar(22);
+  mode_selection = -1;
 
   do {
     draw_help(1295);
-    read_mouse(); select_zoom(); test_mouse();
+    read_mouse();
+    select_zoom();
+    test_mouse();
 
-    switch(scan_code) {
-      case 0x4A: num_punto--;   break; // -
-      case 0x4E: num_punto++;   break; // +
-      case 0x49: num_punto-=10; break; // PgUp
-      case 0x51: num_punto+=10; break; // PgDn
-      case 0x47: num_punto=0;   break; // Home
-      case 0x4F:                       // End
-        for(m=0;m<512;m+=2) if(v.mapa->puntos[m]!=-1) num_punto=m/2;
+    switch (scan_code) {
+    case 0x4A:
+      num_punto--;
+      break; // -
+    case 0x4E:
+      num_punto++;
+      break; // +
+    case 0x49:
+      num_punto -= 10;
+      break; // PgUp
+    case 0x51:
+      num_punto += 10;
+      break; // PgDn
+    case 0x47:
+      num_punto = 0;
+      break;   // Home
+    case 0x4F: // End
+      for (m = 0; m < 512; m += 2)
+        if (v.mapa->puntos[m] != -1)
+          num_punto = m / 2;
+      break;
+    }
+
+    if (mouse_b & 1)
+      switch (selected_icon) {
+      case 1:
+        num_punto--;
+        do {
+          read_mouse();
+        } while (mouse_b & 1);
         break;
+      case 3:
+        num_punto++;
+        do {
+          read_mouse();
+        } while (mouse_b & 1);
+        break;
+      }
+
+    if (num_punto < 0)
+      num_punto = 0;
+    if (num_punto > 255)
+      num_punto = 255;
+
+    need_zoom_x = map_width;
+    need_zoom_y = map_height;
+    need_zoom_width = 0;
+    need_zoom_height = 0;
+
+    for (m = 0; m < 512; m += 2)
+      if (v.mapa->puntos[m] != -1) {
+        sel_x0 = v.mapa->puntos[m] - 1;
+        sel_x1 = v.mapa->puntos[m] + 1;
+        sel_y0 = v.mapa->puntos[m + 1] - 1;
+        sel_y1 = v.mapa->puntos[m + 1] + 1;
+        test_sel();
+      }
+
+    if (scan_code == 0x53) { // Delete
+      v.mapa->puntos[num_punto * 2] = -1;
+      v.mapa->puntos[num_punto * 2 + 1] = -1;
     }
 
-    if (mouse_b&1) switch (selected_icon) {
-      case 1: num_punto--; do {read_mouse();} while(mouse_b&1); break;
-      case 3: num_punto++; do {read_mouse();} while(mouse_b&1); break;
-    }
-
-    if (num_punto<  0) num_punto=  0;
-    if (num_punto>255) num_punto=255;
-
-    need_zoom_x=map_width; need_zoom_y=map_height;
-    need_zoom_width=0; need_zoom_height=0;
-
-    for (m=0;m<512;m+=2) if (v.mapa->puntos[m]!=-1) {
-      sel_x0=v.mapa->puntos[m]-1;
-      sel_x1=v.mapa->puntos[m]+1;
-      sel_y0=v.mapa->puntos[m+1]-1;
-      sel_y1=v.mapa->puntos[m+1]+1;
-      test_sel();
-    }
-
-    if (scan_code==0x53) { // Delete
-      v.mapa->puntos[num_punto*2]=-1;
-      v.mapa->puntos[num_punto*2+1]=-1;
-    }
-
-    if (mouse_graf>=10 && (mouse_b&1)) {
-      if ((v.mapa->puntos[num_punto*2]==coord_x) & (v.mapa->puntos[num_punto*2+1]==coord_y)) {
-        v.mapa->puntos[num_punto*2]=-1; v.mapa->puntos[num_punto*2+1]=-1;
+    if (mouse_graf >= 10 && (mouse_b & 1)) {
+      if ((v.mapa->puntos[num_punto * 2] == coord_x) &
+          (v.mapa->puntos[num_punto * 2 + 1] == coord_y)) {
+        v.mapa->puntos[num_punto * 2] = -1;
+        v.mapa->puntos[num_punto * 2 + 1] = -1;
       } else {
-        v.mapa->puntos[num_punto*2]=coord_x; v.mapa->puntos[num_punto*2+1]=coord_y;
-      } do read_mouse(); while (mouse_b&1);
-      sel_x0=coord_x-1;
-      sel_x1=coord_x+1;
-      sel_y0=coord_y-1;
-      sel_y1=coord_y+1;
+        v.mapa->puntos[num_punto * 2] = coord_x;
+        v.mapa->puntos[num_punto * 2 + 1] = coord_y;
+      }
+      do
+        read_mouse();
+      while (mouse_b & 1);
+      sel_x0 = coord_x - 1;
+      sel_x1 = coord_x + 1;
+      sel_y0 = coord_y - 1;
+      sel_y1 = coord_y + 1;
       test_sel();
     }
 
-    sel_status=1; test_next();
+    sel_status = 1;
+    test_next();
 
-    if (v.mapa->puntos[num_punto*2]!=-1)
-      analyze_bar(v.mapa->puntos[num_punto*2],v.mapa->puntos[num_punto*2+1]);
+    if (v.mapa->puntos[num_punto * 2] != -1)
+      analyze_bar(v.mapa->puntos[num_punto * 2], v.mapa->puntos[num_punto * 2 + 1]);
     else {
-      wbox(toolbar,vga_width/big2,vga_height,c2,toolbar_width-23,2,21,15);
-      p=screen_buffer; screen_buffer=toolbar; text_color=c4;
-      writetxt(toolbar_width-22,3,0,(byte *)"????");
-      writetxt(toolbar_width-22,10,0,(byte *)"????");
-      screen_buffer=p;
+      wbox(toolbar, vga_width / big2, vga_height, c2, toolbar_width - 23, 2, 21, 15);
+      p = screen_buffer;
+      screen_buffer = toolbar;
+      text_color = c4;
+      writetxt(toolbar_width - 22, 3, 0, (byte *)"????");
+      writetxt(toolbar_width - 22, 10, 0, (byte *)"????");
+      screen_buffer = p;
     }
 
-    wbox(toolbar,vga_width/big2,19,c2,48+2*16,2,15,15);
+    wbox(toolbar, vga_width / big2, 19, c2, 48 + 2 * 16, 2, 15, 15);
 
-    num[3]=0;
-    num[2]=48+num_punto%10;
-    num[1]=48+(num_punto/10)%10;
-    num[0]=48+(num_punto/100)%10;
+    num[3] = 0;
+    num[2] = 48 + num_punto % 10;
+    num[1] = 48 + (num_punto / 10) % 10;
+    num[0] = 48 + (num_punto / 100) % 10;
 
-    wwrite(toolbar,vga_width/big2,19,56+2*16,6,1,(byte *)num,c1);
-    wwrite(toolbar,vga_width/big2,19,55+2*16,6,1,(byte *)num,c4);
+    wwrite(toolbar, vga_width / big2, 19, 56 + 2 * 16, 6, 1, (byte *)num, c1);
+    wwrite(toolbar, vga_width / big2, 19, 55 + 2 * 16, 6, 1, (byte *)num, c4);
 
     blit_edit();
 
-  } while (!exit_requested && !(mouse_b&2) && !key(_ESC) && draw_mode<100 &&
-    !(mouse_b && mouse_in(toolbar_x,toolbar_y+10,toolbar_x+9,toolbar_y+18)));
+  } while (!exit_requested && !(mouse_b & 2) && !key(_ESC) && draw_mode < 100 &&
+           !(mouse_b && mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18)));
 
-  sel_status=0; mode_selection=m_s;
+  sel_status = 0;
+  mode_selection = m_s;
 }
 
 //-----------------------------------------------------------------------------
 //      Draw a Bezier curve
 //-----------------------------------------------------------------------------
 
-void bezier(int x0,int y0,int x1,int y1,int _x0,int _y0,int _x1,int _y1,int inc0) {
-
-  float t,t2,t3,it,it2,it3;
-  int n=0;
-  int a,b;
+void bezier(int x0, int y0, int x1, int y1, int _x0, int _y0, int _x1, int _y1, int inc0) {
+  float t, t2, t3, it, it2, it3;
+  int n = 0;
+  int a, b;
   int p[66];
-  int x,y,_x,_y;
+  int x, y, _x, _y;
 
-  x=_x=x0; y=_y=y0;
+  x = _x = x0;
+  y = _y = y0;
 
   do {
-    t=(float)n/32; it=1-t; t2=t*t; t3=t2*t; it2=it*it; it3=it2*it;
-    a=it3*x0+3*t*it2*_x0+3*t2*it*_x1+t3*x1;
-    b=it3*y0+3*t*it2*_y0+3*t2*it*_y1+t3*y1;
-    p[n*2]=a; p[n*2+1]=b;
-    if (a<x) { x=a; } if (a>_x) { _x=a; }
-    if (b<y) { y=b; } if (b>_y) { _y=b; }
-  } while (n++<32);
+    t = (float)n / 32;
+    it = 1 - t;
+    t2 = t * t;
+    t3 = t2 * t;
+    it2 = it * it;
+    it3 = it2 * it;
+    a = it3 * x0 + 3 * t * it2 * _x0 + 3 * t2 * it * _x1 + t3 * x1;
+    b = it3 * y0 + 3 * t * it2 * _y0 + 3 * t2 * it * _y1 + t3 * y1;
+    p[n * 2] = a;
+    p[n * 2 + 1] = b;
+    if (a < x) {
+      x = a;
+    }
+    if (a > _x) {
+      _x = a;
+    }
+    if (b < y) {
+      y = b;
+    }
+    if (b > _y) {
+      _y = b;
+    }
+  } while (n++ < 32);
 
-  if (save_undo(x-pincel_an/2,y-pincel_al/2,_x-x+1+pincel_an,_y-y+1+pincel_al)) {
-    if (inc0) line_pixel(p[0],p[1]);
-    n=1; do {
-      if (p[n*2]!=p[n*2-2] || p[n*2+1]!=p[n*2-1])
-        line(p[n*2-2],p[n*2-1],p[n*2],p[n*2+1],-1);
-    } while (n++<32);
+  if (save_undo(x - pincel_an / 2, y - pincel_al / 2, _x - x + 1 + pincel_an,
+                _y - y + 1 + pincel_al)) {
+    if (inc0)
+      line_pixel(p[0], p[1]);
+    n = 1;
+    do {
+      if (p[n * 2] != p[n * 2 - 2] || p[n * 2 + 1] != p[n * 2 - 1])
+        line(p[n * 2 - 2], p[n * 2 - 1], p[n * 2], p[n * 2 + 1], -1);
+    } while (n++ < 32);
 
-    bezier_x=p[48]; bezier_y=p[49];
+    bezier_x = p[48];
+    bezier_y = p[49];
   }
-
 }
 
 //-----------------------------------------------------------------------------
@@ -2171,38 +3381,108 @@ void bezier(int x0,int y0,int x1,int y1,int _x0,int _y0,int _x1,int _y1,int inc0
 //-----------------------------------------------------------------------------
 
 void line0(int x0, int y0, int x1, int y1, int inc0) {
+  int dx = 0, dy = 0, a = 0, b = 0, d = 0, x = 0, y = 0;
+  int64_t unded = 1;
 
-  int dx=0,dy=0,a=0,b=0,d=0,x=0,y=0;
-  int64_t unded=1;
+  if (x0 > x1) {
+    x = x1;
+    dx = x0 - x1;
+  } else {
+    x = x0;
+    dx = x1 - x0;
+  }
+  if (y0 > y1) {
+    y = y1;
+    dy = y0 - y1;
+  } else {
+    y = y0;
+    dy = y1 - y0;
+  }
 
-  if (x0>x1) {x=x1; dx=x0-x1;} else {x=x0; dx=x1-x0;}
-  if (y0>y1) {y=y1; dy=y0-y1;} else {y=y0; dy=y1-y0;}
-
-  if (inc0==-1) inc0=0; else unded=(intptr_t)save_undo(x-pincel_an/2,y-pincel_al/2,dx+1+pincel_an,dy+1+pincel_al);
+  if (inc0 == -1)
+    inc0 = 0;
+  else
+    unded = (intptr_t)save_undo(x - pincel_an / 2, y - pincel_al / 2, dx + 1 + pincel_an,
+                                dy + 1 + pincel_al);
 
   if (unded) {
-    if (!dx && !dy) line_pixel(x0,y0); else {
-      if (inc0) line_pixel(x0,y0);
-      if (dy<=dx) {
-        if (x0>x1) { line_pixel(x1,y1); x0--; swap(x0,x1); swap(y0,y1); }
-        d=2*dy-dx; a=2*dy; b=2*(dy-dx); x=x0; y=y0;
-        if (y0<=y1) while (x<x1) {
-          if (d<=0) { d+=a; x++; } else { d+=b; x++; y++; }
-          line_pixel(x,y);
-        } else while (x<x1) {
-          if (d<=0) { d+=a; x++; } else { d+=b; x++; y--; }
-          line_pixel(x,y);
+    if (!dx && !dy)
+      line_pixel(x0, y0);
+    else {
+      if (inc0)
+        line_pixel(x0, y0);
+      if (dy <= dx) {
+        if (x0 > x1) {
+          line_pixel(x1, y1);
+          x0--;
+          swap(x0, x1);
+          swap(y0, y1);
         }
-      } else  {
-        if (y0>y1) { line_pixel(x1,y1); y0--; swap(x0,x1); swap(y0,y1); }
-        d=2*dx-dy; a=2*dx; b=2*(dx-dy); x=x0; y=y0;
-        if (x0<=x1) while (y<y1) {
-          if (d<=0) { d+=a; y++; } else { d+=b; y++; x++; }
-          line_pixel(x,y);
-        } else while (y<y1) {
-          if (d<=0) { d+=a; y++; } else { d+=b; y++; x--; }
-          line_pixel(x,y);
+        d = 2 * dy - dx;
+        a = 2 * dy;
+        b = 2 * (dy - dx);
+        x = x0;
+        y = y0;
+        if (y0 <= y1)
+          while (x < x1) {
+            if (d <= 0) {
+              d += a;
+              x++;
+            } else {
+              d += b;
+              x++;
+              y++;
+            }
+            line_pixel(x, y);
+          }
+        else
+          while (x < x1) {
+            if (d <= 0) {
+              d += a;
+              x++;
+            } else {
+              d += b;
+              x++;
+              y--;
+            }
+            line_pixel(x, y);
+          }
+      } else {
+        if (y0 > y1) {
+          line_pixel(x1, y1);
+          y0--;
+          swap(x0, x1);
+          swap(y0, y1);
         }
+        d = 2 * dx - dy;
+        a = 2 * dx;
+        b = 2 * (dx - dy);
+        x = x0;
+        y = y0;
+        if (x0 <= x1)
+          while (y < y1) {
+            if (d <= 0) {
+              d += a;
+              y++;
+            } else {
+              d += b;
+              y++;
+              x++;
+            }
+            line_pixel(x, y);
+          }
+        else
+          while (y < y1) {
+            if (d <= 0) {
+              d += a;
+              y++;
+            } else {
+              d += b;
+              y++;
+              x--;
+            }
+            line_pixel(x, y);
+          }
       }
     }
   }
@@ -2211,56 +3491,159 @@ void line0(int x0, int y0, int x1, int y1, int inc0) {
 // Extended version that also draws bottom-to-top and right-to-left
 
 void line(int x0, int y0, int x1, int y1, int inc0) {
-  int dx=0,dy=0,a=0,b=0,d=0,x=0,y=0;
-  int64_t unded=1;
+  int dx = 0, dy = 0, a = 0, b = 0, d = 0, x = 0, y = 0;
+  int64_t unded = 1;
 
-  if (x0>x1) {x=x1; dx=x0-x1;} else {x=x0; dx=x1-x0;}
-  if (y0>y1) {y=y1; dy=y0-y1;} else {y=y0; dy=y1-y0;}
+  if (x0 > x1) {
+    x = x1;
+    dx = x0 - x1;
+  } else {
+    x = x0;
+    dx = x1 - x0;
+  }
+  if (y0 > y1) {
+    y = y1;
+    dy = y0 - y1;
+  } else {
+    y = y0;
+    dy = y1 - y0;
+  }
 
-  if (inc0==-1) inc0=0; else unded=(intptr_t)save_undo(x-pincel_an/2,y-pincel_al/2,dx+1+pincel_an,dy+1+pincel_al);
+  if (inc0 == -1)
+    inc0 = 0;
+  else
+    unded = (intptr_t)save_undo(x - pincel_an / 2, y - pincel_al / 2, dx + 1 + pincel_an,
+                                dy + 1 + pincel_al);
 
   if (unded) {
-    if (!dx && !dy) line_pixel(x0,y0); else {
-      if (inc0) line_pixel(x0,y0);
-      if (dy<=dx) {
-        if (x0<=x1) {
-          d=2*dy-dx; a=2*dy; b=2*(dy-dx); x=x0; y=y0;
-          if (y0<=y1) while (x<x1) {
-            if (d<=0) { d+=a; x++; } else { d+=b; x++; y++; }
-            line_pixel(x,y);
-          } else while (x<x1) {
-            if (d<=0) { d+=a; x++; } else { d+=b; x++; y--; }
-            line_pixel(x,y);
-          }
+    if (!dx && !dy)
+      line_pixel(x0, y0);
+    else {
+      if (inc0)
+        line_pixel(x0, y0);
+      if (dy <= dx) {
+        if (x0 <= x1) {
+          d = 2 * dy - dx;
+          a = 2 * dy;
+          b = 2 * (dy - dx);
+          x = x0;
+          y = y0;
+          if (y0 <= y1)
+            while (x < x1) {
+              if (d <= 0) {
+                d += a;
+                x++;
+              } else {
+                d += b;
+                x++;
+                y++;
+              }
+              line_pixel(x, y);
+            }
+          else
+            while (x < x1) {
+              if (d <= 0) {
+                d += a;
+                x++;
+              } else {
+                d += b;
+                x++;
+                y--;
+              }
+              line_pixel(x, y);
+            }
         } else {
-          d=2*dy-dx; a=2*dy; b=2*(dy-dx); x=x0; y=y0;
-          if (y0<=y1) while (x>x1) {
-            if (d<=0) { d+=a; x--; } else { d+=b; x--; y++; }
-            line_pixel(x,y);
-          } else while (x>x1) {
-            if (d<=0) { d+=a; x--; } else { d+=b; x--; y--; }
-            line_pixel(x,y);
-          }
+          d = 2 * dy - dx;
+          a = 2 * dy;
+          b = 2 * (dy - dx);
+          x = x0;
+          y = y0;
+          if (y0 <= y1)
+            while (x > x1) {
+              if (d <= 0) {
+                d += a;
+                x--;
+              } else {
+                d += b;
+                x--;
+                y++;
+              }
+              line_pixel(x, y);
+            }
+          else
+            while (x > x1) {
+              if (d <= 0) {
+                d += a;
+                x--;
+              } else {
+                d += b;
+                x--;
+                y--;
+              }
+              line_pixel(x, y);
+            }
         }
-      } else  {
-        if (y0<=y1) {
-          d=2*dx-dy; a=2*dx; b=2*(dx-dy); x=x0; y=y0;
-          if (x0<=x1) while (y<y1) {
-            if (d<=0) { d+=a; y++; } else { d+=b; y++; x++; }
-            line_pixel(x,y);
-          } else while (y<y1) {
-            if (d<=0) { d+=a; y++; } else { d+=b; y++; x--; }
-            line_pixel(x,y);
-          }
+      } else {
+        if (y0 <= y1) {
+          d = 2 * dx - dy;
+          a = 2 * dx;
+          b = 2 * (dx - dy);
+          x = x0;
+          y = y0;
+          if (x0 <= x1)
+            while (y < y1) {
+              if (d <= 0) {
+                d += a;
+                y++;
+              } else {
+                d += b;
+                y++;
+                x++;
+              }
+              line_pixel(x, y);
+            }
+          else
+            while (y < y1) {
+              if (d <= 0) {
+                d += a;
+                y++;
+              } else {
+                d += b;
+                y++;
+                x--;
+              }
+              line_pixel(x, y);
+            }
         } else {
-          d=2*dx-dy; a=2*dx; b=2*(dx-dy); x=x0; y=y0;
-          if (x0<=x1) while (y>y1) {
-            if (d<=0) { d+=a; y--; } else { d+=b; y--; x++; }
-            line_pixel(x,y);
-          } else while (y>y1) {
-            if (d<=0) { d+=a; y--; } else { d+=b; y--; x--; }
-            line_pixel(x,y);
-          }
+          d = 2 * dx - dy;
+          a = 2 * dx;
+          b = 2 * (dx - dy);
+          x = x0;
+          y = y0;
+          if (x0 <= x1)
+            while (y > y1) {
+              if (d <= 0) {
+                d += a;
+                y--;
+              } else {
+                d += b;
+                y--;
+                x++;
+              }
+              line_pixel(x, y);
+            }
+          else
+            while (y > y1) {
+              if (d <= 0) {
+                d += a;
+                y--;
+              } else {
+                d += b;
+                y--;
+                x--;
+              }
+              line_pixel(x, y);
+            }
         }
       }
     }
@@ -2274,365 +3657,731 @@ void line(int x0, int y0, int x1, int y1, int inc0) {
 int color256;
 
 void pixel(byte *p) {
-
-  byte a,b,c,d;
+  byte a, b, c, d;
   int n;
 
-  if (mask_on) if (mask[*p]) return;
+  if (mask_on)
+    if (mask[*p])
+      return;
 
-  switch(line_fx) {
-
+  switch (line_fx) {
   case 0: // Remove a color
-    if (*p==color) *p=0;
+    if (*p == color)
+      *p = 0;
     break;
 
   case 1:
-    n=(memptrsize)*p*256;
-    a=*(ghost+n+color); b=*(ghost+n+a); c=*(ghost+n+b); d=*(ghost+n+c);
-    if (d!=*p) *p=d; else if (c!=*p) *p=c; else if (b!=*p) *p=b; else if (a!=*p) *p=a; else *p=color;
+    n = (memptrsize)*p * 256;
+    a = *(ghost + n + color);
+    b = *(ghost + n + a);
+    c = *(ghost + n + b);
+    d = *(ghost + n + c);
+    if (d != *p)
+      *p = d;
+    else if (c != *p)
+      *p = c;
+    else if (b != *p)
+      *p = b;
+    else if (a != *p)
+      *p = a;
+    else
+      *p = color;
     break;
 
   case 2:
-    n=(memptrsize)*p*256;
-    a=*(ghost+n+color); b=*(ghost+n+a); c=*(ghost+n+b);
-    if (c!=*p) *p=c; else if (b!=*p) *p=b; else if (a!=*p) *p=a; else *p=color;
+    n = (memptrsize)*p * 256;
+    a = *(ghost + n + color);
+    b = *(ghost + n + a);
+    c = *(ghost + n + b);
+    if (c != *p)
+      *p = c;
+    else if (b != *p)
+      *p = b;
+    else if (a != *p)
+      *p = a;
+    else
+      *p = color;
     break;
 
   case 3:
-    n=(memptrsize)*p*256;
-    a=*(ghost+n+color); b=*(ghost+n+a); c=*(ghost+n+b); d=*(ghost+b+c*256);
-    if (d!=*p) *p=d; else if (c!=*p) *p=c; else if (b!=*p) *p=b; else if (a!=*p) *p=a; else *p=color;
+    n = (memptrsize)*p * 256;
+    a = *(ghost + n + color);
+    b = *(ghost + n + a);
+    c = *(ghost + n + b);
+    d = *(ghost + b + c * 256);
+    if (d != *p)
+      *p = d;
+    else if (c != *p)
+      *p = c;
+    else if (b != *p)
+      *p = b;
+    else if (a != *p)
+      *p = a;
+    else
+      *p = color;
     break;
 
   case 4: // *** 25% ****
-    n=(memptrsize)*p*256;
-    a=*(ghost+n+color); b=*(ghost+n+a);
-    if (b!=*p) *p=b; else if (a!=*p) *p=a; else *p=color;
+    n = (memptrsize)*p * 256;
+    a = *(ghost + n + color);
+    b = *(ghost + n + a);
+    if (b != *p)
+      *p = b;
+    else if (a != *p)
+      *p = a;
+    else
+      *p = color;
     break;
 
   case 5:
-    n=(memptrsize)*p*256;
-    a=*(ghost+n+color); b=*(ghost+n+a); c=*(ghost+a+b*256); d=*(ghost+b+c*256);
-    if (d!=*p) *p=d; else if (c!=*p) *p=c; else if (b!=*p) *p=b; else if (a!=*p) *p=a; else *p=color;
+    n = (memptrsize)*p * 256;
+    a = *(ghost + n + color);
+    b = *(ghost + n + a);
+    c = *(ghost + a + b * 256);
+    d = *(ghost + b + c * 256);
+    if (d != *p)
+      *p = d;
+    else if (c != *p)
+      *p = c;
+    else if (b != *p)
+      *p = b;
+    else if (a != *p)
+      *p = a;
+    else
+      *p = color;
     break;
 
   case 6:
-    n=(memptrsize)*p*256;
-    a=*(ghost+n+color); b=*(ghost+n+a); c=*(ghost+a+b*256);
-    if (c!=*p) *p=c; else if (b!=*p) *p=b; else if (a!=*p) *p=a; else *p=color;
+    n = (memptrsize)*p * 256;
+    a = *(ghost + n + color);
+    b = *(ghost + n + a);
+    c = *(ghost + a + b * 256);
+    if (c != *p)
+      *p = c;
+    else if (b != *p)
+      *p = b;
+    else if (a != *p)
+      *p = a;
+    else
+      *p = color;
     break;
 
   case 7:
-    n=(memptrsize)*p*256;
-    a=*(ghost+n+color); b=*(ghost+n+a); c=*(ghost+a+b*256); d=*(ghost+a+c*256);
-    if (d!=*p) *p=d; else if (c!=*p) *p=c; else if (b!=*p) *p=b; else if (a!=*p) *p=a; else *p=color;
+    n = (memptrsize)*p * 256;
+    a = *(ghost + n + color);
+    b = *(ghost + n + a);
+    c = *(ghost + a + b * 256);
+    d = *(ghost + a + c * 256);
+    if (d != *p)
+      *p = d;
+    else if (c != *p)
+      *p = c;
+    else if (b != *p)
+      *p = b;
+    else if (a != *p)
+      *p = a;
+    else
+      *p = color;
     break;
 
   case 8: // *** 50% ****
-    n=(memptrsize)*p*256; a=*(ghost+n+color);
-    if (a!=*p) *p=a; else *p=color;
+    n = (memptrsize)*p * 256;
+    a = *(ghost + n + color);
+    if (a != *p)
+      *p = a;
+    else
+      *p = color;
     break;
 
   case 9:
-    n=(memptrsize)*p*256; color256=color*256;
-    a=*(ghost+n+color); b=*(ghost+color256+a); c=*(ghost+a+b*256); d=*(ghost+a+c*256);
-    if (d!=*p) *p=d; else if (c!=*p) *p=c; else if (b!=*p) *p=b; else if (a!=*p) *p=a; else *p=color;
+    n = (memptrsize)*p * 256;
+    color256 = color * 256;
+    a = *(ghost + n + color);
+    b = *(ghost + color256 + a);
+    c = *(ghost + a + b * 256);
+    d = *(ghost + a + c * 256);
+    if (d != *p)
+      *p = d;
+    else if (c != *p)
+      *p = c;
+    else if (b != *p)
+      *p = b;
+    else if (a != *p)
+      *p = a;
+    else
+      *p = color;
     break;
 
   case 10:
-    n=(memptrsize)*p*256; color256=color*256;
-    a=*(ghost+n+color); b=*(ghost+color256+a); c=*(ghost+a+b*256);
-    if (c!=*p) *p=c; else if (b!=*p) *p=b; else if (a!=*p) *p=a; else *p=color;
+    n = (memptrsize)*p * 256;
+    color256 = color * 256;
+    a = *(ghost + n + color);
+    b = *(ghost + color256 + a);
+    c = *(ghost + a + b * 256);
+    if (c != *p)
+      *p = c;
+    else if (b != *p)
+      *p = b;
+    else if (a != *p)
+      *p = a;
+    else
+      *p = color;
     break;
 
   case 11:
-    n=(memptrsize)*p*256; color256=color*256;
-    a=*(ghost+n+color); b=*(ghost+color256+a); c=*(ghost+a+b*256); d=*(ghost+b+c*256);
-    if (d!=*p) *p=d; else if (c!=*p) *p=c; else if (b!=*p) *p=b; else if (a!=*p) *p=a; else *p=color;
+    n = (memptrsize)*p * 256;
+    color256 = color * 256;
+    a = *(ghost + n + color);
+    b = *(ghost + color256 + a);
+    c = *(ghost + a + b * 256);
+    d = *(ghost + b + c * 256);
+    if (d != *p)
+      *p = d;
+    else if (c != *p)
+      *p = c;
+    else if (b != *p)
+      *p = b;
+    else if (a != *p)
+      *p = a;
+    else
+      *p = color;
     break;
 
   case 12: // *** 75% ****
-    n=(memptrsize)*p*256; color256=color*256;
-    a=*(ghost+n+color); b=*(ghost+color256+a);
-    if (b!=*p) *p=b; else if (a!=*p) *p=a; else *p=color;
+    n = (memptrsize)*p * 256;
+    color256 = color * 256;
+    a = *(ghost + n + color);
+    b = *(ghost + color256 + a);
+    if (b != *p)
+      *p = b;
+    else if (a != *p)
+      *p = a;
+    else
+      *p = color;
     break;
 
   case 13:
-    n=(memptrsize)*p*256; color256=color*256;
-    a=*(ghost+n+color); b=*(ghost+color256+a); c=*(ghost+color256+b); d=*(ghost+b+c*256);
-    if (d!=*p) *p=d; else if (c!=*p) *p=c; else if (b!=*p) *p=b; else if (a!=*p) *p=a; else *p=color;
+    n = (memptrsize)*p * 256;
+    color256 = color * 256;
+    a = *(ghost + n + color);
+    b = *(ghost + color256 + a);
+    c = *(ghost + color256 + b);
+    d = *(ghost + b + c * 256);
+    if (d != *p)
+      *p = d;
+    else if (c != *p)
+      *p = c;
+    else if (b != *p)
+      *p = b;
+    else if (a != *p)
+      *p = a;
+    else
+      *p = color;
     break;
 
   case 14:
-    n=(memptrsize)*p*256; color256=color*256;
-    a=*(ghost+n+color); b=*(ghost+color256+a); c=*(ghost+color256+b);
-    if (c!=*p) *p=c; else if (b!=*p) *p=b; else if (a!=*p) *p=a; else *p=color;
+    n = (memptrsize)*p * 256;
+    color256 = color * 256;
+    a = *(ghost + n + color);
+    b = *(ghost + color256 + a);
+    c = *(ghost + color256 + b);
+    if (c != *p)
+      *p = c;
+    else if (b != *p)
+      *p = b;
+    else if (a != *p)
+      *p = a;
+    else
+      *p = color;
     break;
 
   case 15:
-    n=(memptrsize)*p*256; color256=color*256;
-    a=*(ghost+n+color); b=*(ghost+color256+a); c=*(ghost+color256+b); d=*(ghost+color256+c);
-    if (d!=*p) *p=d; else if (c!=*p) *p=c; else if (b!=*p) *p=b; else if (a!=*p) *p=a; else *p=color;
+    n = (memptrsize)*p * 256;
+    color256 = color * 256;
+    a = *(ghost + n + color);
+    b = *(ghost + color256 + a);
+    c = *(ghost + color256 + b);
+    d = *(ghost + color256 + c);
+    if (d != *p)
+      *p = d;
+    else if (c != *p)
+      *p = c;
+    else if (b != *p)
+      *p = b;
+    else if (a != *p)
+      *p = a;
+    else
+      *p = color;
     break;
 
   case 16: // Set a color
-    *p=color;
+    *p = color;
     break;
-
   }
 }
 
 void pixel_sin_mask(byte *p) {
-
-  byte a,b,c,d;
+  byte a, b, c, d;
   int n;
 
-  switch(line_fx) {
-
+  switch (line_fx) {
   case 0: // Remove a color
-    if (*p==color) *p=0;
+    if (*p == color)
+      *p = 0;
     break;
 
   case 1:
-    n=(memptrsize)*p*256;
-    a=*(ghost+n+color); b=*(ghost+n+a); c=*(ghost+n+b); d=*(ghost+n+c);
-    if (d!=*p) *p=d; else if (c!=*p) *p=c; else if (b!=*p) *p=b; else if (a!=*p) *p=a; else *p=color;
+    n = (memptrsize)*p * 256;
+    a = *(ghost + n + color);
+    b = *(ghost + n + a);
+    c = *(ghost + n + b);
+    d = *(ghost + n + c);
+    if (d != *p)
+      *p = d;
+    else if (c != *p)
+      *p = c;
+    else if (b != *p)
+      *p = b;
+    else if (a != *p)
+      *p = a;
+    else
+      *p = color;
     break;
 
   case 2:
-    n=(memptrsize)*p*256;
-    a=*(ghost+n+color); b=*(ghost+n+a); c=*(ghost+n+b);
-    if (c!=*p) *p=c; else if (b!=*p) *p=b; else if (a!=*p) *p=a; else *p=color;
+    n = (memptrsize)*p * 256;
+    a = *(ghost + n + color);
+    b = *(ghost + n + a);
+    c = *(ghost + n + b);
+    if (c != *p)
+      *p = c;
+    else if (b != *p)
+      *p = b;
+    else if (a != *p)
+      *p = a;
+    else
+      *p = color;
     break;
 
   case 3:
-    n=(memptrsize)*p*256;
-    a=*(ghost+n+color); b=*(ghost+n+a); c=*(ghost+n+b); d=*(ghost+b+c*256);
-    if (d!=*p) *p=d; else if (c!=*p) *p=c; else if (b!=*p) *p=b; else if (a!=*p) *p=a; else *p=color;
+    n = (memptrsize)*p * 256;
+    a = *(ghost + n + color);
+    b = *(ghost + n + a);
+    c = *(ghost + n + b);
+    d = *(ghost + b + c * 256);
+    if (d != *p)
+      *p = d;
+    else if (c != *p)
+      *p = c;
+    else if (b != *p)
+      *p = b;
+    else if (a != *p)
+      *p = a;
+    else
+      *p = color;
     break;
 
   case 4: // *** 25% ****
-    n=(memptrsize)*p*256;
-    a=*(ghost+n+color); b=*(ghost+n+a);
-    if (b!=*p) *p=b; else if (a!=*p) *p=a; else *p=color;
+    n = (memptrsize)*p * 256;
+    a = *(ghost + n + color);
+    b = *(ghost + n + a);
+    if (b != *p)
+      *p = b;
+    else if (a != *p)
+      *p = a;
+    else
+      *p = color;
     break;
 
   case 5:
-    n=(memptrsize)*p*256;
-    a=*(ghost+n+color); b=*(ghost+n+a); c=*(ghost+a+b*256); d=*(ghost+b+c*256);
-    if (d!=*p) *p=d; else if (c!=*p) *p=c; else if (b!=*p) *p=b; else if (a!=*p) *p=a; else *p=color;
+    n = (memptrsize)*p * 256;
+    a = *(ghost + n + color);
+    b = *(ghost + n + a);
+    c = *(ghost + a + b * 256);
+    d = *(ghost + b + c * 256);
+    if (d != *p)
+      *p = d;
+    else if (c != *p)
+      *p = c;
+    else if (b != *p)
+      *p = b;
+    else if (a != *p)
+      *p = a;
+    else
+      *p = color;
     break;
 
   case 6:
-    n=(memptrsize)*p*256;
-    a=*(ghost+n+color); b=*(ghost+n+a); c=*(ghost+a+b*256);
-    if (c!=*p) *p=c; else if (b!=*p) *p=b; else if (a!=*p) *p=a; else *p=color;
+    n = (memptrsize)*p * 256;
+    a = *(ghost + n + color);
+    b = *(ghost + n + a);
+    c = *(ghost + a + b * 256);
+    if (c != *p)
+      *p = c;
+    else if (b != *p)
+      *p = b;
+    else if (a != *p)
+      *p = a;
+    else
+      *p = color;
     break;
 
   case 7:
-    n=(memptrsize)*p*256;
-    a=*(ghost+n+color); b=*(ghost+n+a); c=*(ghost+a+b*256); d=*(ghost+a+c*256);
-    if (d!=*p) *p=d; else if (c!=*p) *p=c; else if (b!=*p) *p=b; else if (a!=*p) *p=a; else *p=color;
+    n = (memptrsize)*p * 256;
+    a = *(ghost + n + color);
+    b = *(ghost + n + a);
+    c = *(ghost + a + b * 256);
+    d = *(ghost + a + c * 256);
+    if (d != *p)
+      *p = d;
+    else if (c != *p)
+      *p = c;
+    else if (b != *p)
+      *p = b;
+    else if (a != *p)
+      *p = a;
+    else
+      *p = color;
     break;
 
   case 8: // *** 50% ****
-    n=(memptrsize)*p*256; a=*(ghost+n+color);
-    if (a!=*p) *p=a; else *p=color;
+    n = (memptrsize)*p * 256;
+    a = *(ghost + n + color);
+    if (a != *p)
+      *p = a;
+    else
+      *p = color;
     break;
 
   case 9:
-    n=(memptrsize)*p*256; color256=color*256;
-    a=*(ghost+n+color); b=*(ghost+color256+a); c=*(ghost+a+b*256); d=*(ghost+a+c*256);
-    if (d!=*p) *p=d; else if (c!=*p) *p=c; else if (b!=*p) *p=b; else if (a!=*p) *p=a; else *p=color;
+    n = (memptrsize)*p * 256;
+    color256 = color * 256;
+    a = *(ghost + n + color);
+    b = *(ghost + color256 + a);
+    c = *(ghost + a + b * 256);
+    d = *(ghost + a + c * 256);
+    if (d != *p)
+      *p = d;
+    else if (c != *p)
+      *p = c;
+    else if (b != *p)
+      *p = b;
+    else if (a != *p)
+      *p = a;
+    else
+      *p = color;
     break;
 
   case 10:
-    n=(memptrsize)*p*256; color256=color*256;
-    a=*(ghost+n+color); b=*(ghost+color256+a); c=*(ghost+a+b*256);
-    if (c!=*p) *p=c; else if (b!=*p) *p=b; else if (a!=*p) *p=a; else *p=color;
+    n = (memptrsize)*p * 256;
+    color256 = color * 256;
+    a = *(ghost + n + color);
+    b = *(ghost + color256 + a);
+    c = *(ghost + a + b * 256);
+    if (c != *p)
+      *p = c;
+    else if (b != *p)
+      *p = b;
+    else if (a != *p)
+      *p = a;
+    else
+      *p = color;
     break;
 
   case 11:
-    n=(memptrsize)*p*256; color256=color*256;
-    a=*(ghost+n+color); b=*(ghost+color256+a); c=*(ghost+a+b*256); d=*(ghost+b+c*256);
-    if (d!=*p) *p=d; else if (c!=*p) *p=c; else if (b!=*p) *p=b; else if (a!=*p) *p=a; else *p=color;
+    n = (memptrsize)*p * 256;
+    color256 = color * 256;
+    a = *(ghost + n + color);
+    b = *(ghost + color256 + a);
+    c = *(ghost + a + b * 256);
+    d = *(ghost + b + c * 256);
+    if (d != *p)
+      *p = d;
+    else if (c != *p)
+      *p = c;
+    else if (b != *p)
+      *p = b;
+    else if (a != *p)
+      *p = a;
+    else
+      *p = color;
     break;
 
   case 12: // *** 75% ****
-    n=(memptrsize)*p*256; color256=color*256;
-    a=*(ghost+n+color); b=*(ghost+color256+a);
-    if (b!=*p) *p=b; else if (a!=*p) *p=a; else *p=color;
+    n = (memptrsize)*p * 256;
+    color256 = color * 256;
+    a = *(ghost + n + color);
+    b = *(ghost + color256 + a);
+    if (b != *p)
+      *p = b;
+    else if (a != *p)
+      *p = a;
+    else
+      *p = color;
     break;
 
   case 13:
-    n=(memptrsize)*p*256; color256=color*256;
-    a=*(ghost+n+color); b=*(ghost+color256+a); c=*(ghost+color256+b); d=*(ghost+b+c*256);
-    if (d!=*p) *p=d; else if (c!=*p) *p=c; else if (b!=*p) *p=b; else if (a!=*p) *p=a; else *p=color;
+    n = (memptrsize)*p * 256;
+    color256 = color * 256;
+    a = *(ghost + n + color);
+    b = *(ghost + color256 + a);
+    c = *(ghost + color256 + b);
+    d = *(ghost + b + c * 256);
+    if (d != *p)
+      *p = d;
+    else if (c != *p)
+      *p = c;
+    else if (b != *p)
+      *p = b;
+    else if (a != *p)
+      *p = a;
+    else
+      *p = color;
     break;
 
   case 14:
-    n=(memptrsize)*p*256; color256=color*256;
-    a=*(ghost+n+color); b=*(ghost+color256+a); c=*(ghost+color256+b);
-    if (c!=*p) *p=c; else if (b!=*p) *p=b; else if (a!=*p) *p=a; else *p=color;
+    n = (memptrsize)*p * 256;
+    color256 = color * 256;
+    a = *(ghost + n + color);
+    b = *(ghost + color256 + a);
+    c = *(ghost + color256 + b);
+    if (c != *p)
+      *p = c;
+    else if (b != *p)
+      *p = b;
+    else if (a != *p)
+      *p = a;
+    else
+      *p = color;
     break;
 
   case 15:
-    n=(memptrsize)*p*256; color256=color*256;
-    a=*(ghost+n+color); b=*(ghost+color256+a); c=*(ghost+color256+b); d=*(ghost+color256+c);
-    if (d!=*p) *p=d; else if (c!=*p) *p=c; else if (b!=*p) *p=b; else if (a!=*p) *p=a; else *p=color;
+    n = (memptrsize)*p * 256;
+    color256 = color * 256;
+    a = *(ghost + n + color);
+    b = *(ghost + color256 + a);
+    c = *(ghost + color256 + b);
+    d = *(ghost + color256 + c);
+    if (d != *p)
+      *p = d;
+    else if (c != *p)
+      *p = c;
+    else if (b != *p)
+      *p = b;
+    else if (a != *p)
+      *p = a;
+    else
+      *p = color;
     break;
 
   case 16: // Set a color
-    *p=color;
+    *p = color;
     break;
-
   }
 }
 
-void line_pixel(int x,int y) { // Brush
-  int xx=0,yy=0,_line_fx=line_fx;
-  byte *q,*p,col;
+void line_pixel(int x, int y) { // Brush
+  int xx = 0, yy = 0, _line_fx = line_fx;
+  byte *q, *p, col;
 
-  x-=pincel_an/2; y-=pincel_al/2;
+  x -= pincel_an / 2;
+  y -= pincel_al / 2;
 
-  if (textura_color==NULL) {
+  if (textura_color == NULL) {
     if (tipo_pincel) {
-      if (x>=0 && y>=0 && x+pincel_an<=map_width && y+pincel_al<=map_height && !difuminar) {
-        q=map+x+y*map_width; p=pincel;
+      if (x >= 0 && y >= 0 && x + pincel_an <= map_width && y + pincel_al <= map_height &&
+          !difuminar) {
+        q = map + x + y * map_width;
+        p = pincel;
         if (mask_on) {
           do {
             do {
-              if ((line_fx=*p) && *q!=color) { pixel(q); } q++; p++;
-            } while (++xx<pincel_an);
-            xx=0; q-=pincel_an-map_width;
-          } while (++yy<pincel_al);
+              if ((line_fx = *p) && *q != color) {
+                pixel(q);
+              }
+              q++;
+              p++;
+            } while (++xx < pincel_an);
+            xx = 0;
+            q -= pincel_an - map_width;
+          } while (++yy < pincel_al);
         } else {
           do {
             do {
-              if ((line_fx=*p) && *q!=color) { pixel_sin_mask(q); } q++; p++;
-            } while (++xx<pincel_an);
-            xx=0; q-=pincel_an-map_width;
-          } while (++yy<pincel_al);
+              if ((line_fx = *p) && *q != color) {
+                pixel_sin_mask(q);
+              }
+              q++;
+              p++;
+            } while (++xx < pincel_an);
+            xx = 0;
+            q -= pincel_an - map_width;
+          } while (++yy < pincel_al);
         }
       } else {
         do {
           do {
-            if ((line_fx=pincel[xx+yy*pincel_an])) {
-              _line_pixel(x+xx,y+yy);
+            if ((line_fx = pincel[xx + yy * pincel_an])) {
+              _line_pixel(x + xx, y + yy);
             }
-          } while (++xx<pincel_an);
-          xx=0;
-        } while (++yy<pincel_al);
+          } while (++xx < pincel_an);
+          xx = 0;
+        } while (++yy < pincel_al);
       }
     } else {
-      if (x>=0 && y>=0 && x+pincel_an<=map_width && y+pincel_al<=map_height && !difuminar) {
-        q=map+x+y*map_width; p=pincel;
+      if (x >= 0 && y >= 0 && x + pincel_an <= map_width && y + pincel_al <= map_height &&
+          !difuminar) {
+        q = map + x + y * map_width;
+        p = pincel;
         if (mask_on) {
           do {
             do {
-              if (*p && *q!=color) { pixel(q); } q++; p++;
-            } while (++xx<pincel_an);
-            xx=0; q-=pincel_an-map_width;
-          } while (++yy<pincel_al);
+              if (*p && *q != color) {
+                pixel(q);
+              }
+              q++;
+              p++;
+            } while (++xx < pincel_an);
+            xx = 0;
+            q -= pincel_an - map_width;
+          } while (++yy < pincel_al);
         } else {
           do {
             do {
-              if (*p && *q!=color) { pixel_sin_mask(q); } q++; p++;
-            } while (++xx<pincel_an);
-            xx=0; q-=pincel_an-map_width;
-          } while (++yy<pincel_al);
+              if (*p && *q != color) {
+                pixel_sin_mask(q);
+              }
+              q++;
+              p++;
+            } while (++xx < pincel_an);
+            xx = 0;
+            q -= pincel_an - map_width;
+          } while (++yy < pincel_al);
         }
       } else {
         do {
           do {
-            if (pincel[xx+yy*pincel_an]) {
-              _line_pixel(x+xx,y+yy);
+            if (pincel[xx + yy * pincel_an]) {
+              _line_pixel(x + xx, y + yy);
             }
-          } while (++xx<pincel_an);
-          xx=0;
-        } while (++yy<pincel_al);
+          } while (++xx < pincel_an);
+          xx = 0;
+        } while (++yy < pincel_al);
       }
     }
   } else {
-    col=color;
+    col = color;
     if (tipo_pincel) {
-      if (x>=0 && y>=0 && x+pincel_an<=map_width && y+pincel_al<=map_height && !difuminar) {
-        q=map+x+y*map_width; p=pincel;
+      if (x >= 0 && y >= 0 && x + pincel_an <= map_width && y + pincel_al <= map_height &&
+          !difuminar) {
+        q = map + x + y * map_width;
+        p = pincel;
         if (mask_on) {
           do {
             do {
-              color=get_color(x+xx,y+yy);
-              if ((line_fx=*p) && *q!=color) { pixel(q); } q++; p++;
-            } while (++xx<pincel_an);
-            xx=0; q-=pincel_an-map_width;
-          } while (++yy<pincel_al);
+              color = get_color(x + xx, y + yy);
+              if ((line_fx = *p) && *q != color) {
+                pixel(q);
+              }
+              q++;
+              p++;
+            } while (++xx < pincel_an);
+            xx = 0;
+            q -= pincel_an - map_width;
+          } while (++yy < pincel_al);
         } else {
           do {
             do {
-              color=get_color(x+xx,y+yy);
-              if ((line_fx=*p) && *q!=color) { pixel_sin_mask(q); } q++; p++;
-            } while (++xx<pincel_an);
-            xx=0; q-=pincel_an-map_width;
-          } while (++yy<pincel_al);
+              color = get_color(x + xx, y + yy);
+              if ((line_fx = *p) && *q != color) {
+                pixel_sin_mask(q);
+              }
+              q++;
+              p++;
+            } while (++xx < pincel_an);
+            xx = 0;
+            q -= pincel_an - map_width;
+          } while (++yy < pincel_al);
         }
       } else {
         do {
           do {
-            if ((line_fx=pincel[xx+yy*pincel_an])) {
-              color=get_color(x+xx,y+yy);
-              _line_pixel(x+xx,y+yy);
+            if ((line_fx = pincel[xx + yy * pincel_an])) {
+              color = get_color(x + xx, y + yy);
+              _line_pixel(x + xx, y + yy);
             }
-          } while (++xx<pincel_an);
-          xx=0;
-        } while (++yy<pincel_al);
+          } while (++xx < pincel_an);
+          xx = 0;
+        } while (++yy < pincel_al);
       }
     } else {
-      if (x>=0 && y>=0 && x+pincel_an<=map_width && y+pincel_al<=map_height && !difuminar) {
-        q=map+x+y*map_width; p=pincel;
+      if (x >= 0 && y >= 0 && x + pincel_an <= map_width && y + pincel_al <= map_height &&
+          !difuminar) {
+        q = map + x + y * map_width;
+        p = pincel;
         if (mask_on) {
           do {
             do {
-              color=get_color(x+xx,y+yy);
-              if (*p && *q!=color) { pixel(q); } q++; p++;
-            } while (++xx<pincel_an);
-            xx=0; q-=pincel_an-map_width;
-          } while (++yy<pincel_al);
+              color = get_color(x + xx, y + yy);
+              if (*p && *q != color) {
+                pixel(q);
+              }
+              q++;
+              p++;
+            } while (++xx < pincel_an);
+            xx = 0;
+            q -= pincel_an - map_width;
+          } while (++yy < pincel_al);
         } else {
           do {
             do {
-              color=get_color(x+xx,y+yy);
-              if (*p && *q!=color) { pixel_sin_mask(q); } q++; p++;
-            } while (++xx<pincel_an);
-            xx=0; q-=pincel_an-map_width;
-          } while (++yy<pincel_al);
+              color = get_color(x + xx, y + yy);
+              if (*p && *q != color) {
+                pixel_sin_mask(q);
+              }
+              q++;
+              p++;
+            } while (++xx < pincel_an);
+            xx = 0;
+            q -= pincel_an - map_width;
+          } while (++yy < pincel_al);
         }
       } else {
         do {
           do {
-            if (pincel[xx+yy*pincel_an]) {
-              color=get_color(x+xx,y+yy);
-              _line_pixel(x+xx,y+yy);
+            if (pincel[xx + yy * pincel_an]) {
+              color = get_color(x + xx, y + yy);
+              _line_pixel(x + xx, y + yy);
             }
-          } while (++xx<pincel_an);
-          xx=0;
-        } while (++yy<pincel_al);
+          } while (++xx < pincel_an);
+          xx = 0;
+        } while (++yy < pincel_al);
       }
     }
-    color=col;
-  } line_fx=_line_fx;
+    color = col;
+  }
+  line_fx = _line_fx;
 }
 
-void _line_pixel(int x,int y) { // A single pixel (for line_pixel, spray and writes)
-  byte c1,c2,_color=color;
+void _line_pixel(int x, int y) { // A single pixel (for line_pixel, spray and writes)
+  byte c1, c2, _color = color;
 
-  if (x>=0 && y>=0 && x<map_width && y<map_height) {
+  if (x >= 0 && y >= 0 && x < map_width && y < map_height) {
     if (difuminar) {
-      if (x<map_width-1 && x>0) c1=*(ghost+*(map+x+y*map_width-1)*256+*(map+x+y*map_width+1));
-        else c1=*(map+x+y*map_width);
-      if (y<map_height-1 && y>0) c2=*(ghost+*(map+x+(y-1)*map_width)*256+*(map+x+(y+1)*map_width));
-        else c2=*(map+x+y*map_width);
-      _color=color; color=*(ghost+(memptrsize)c1*256+c2); pixel(map+x+y*map_width); color=_color;
-    } else pixel(map+x+y*map_width);
+      if (x < map_width - 1 && x > 0)
+        c1 = *(ghost + *(map + x + y * map_width - 1) * 256 + *(map + x + y * map_width + 1));
+      else
+        c1 = *(map + x + y * map_width);
+      if (y < map_height - 1 && y > 0)
+        c2 = *(ghost + *(map + x + (y - 1) * map_width) * 256 + *(map + x + (y + 1) * map_width));
+      else
+        c2 = *(map + x + y * map_width);
+      _color = color;
+      color = *(ghost + (memptrsize)c1 * 256 + c2);
+      pixel(map + x + y * map_width);
+      color = _color;
+    } else
+      pixel(map + x + y * map_width);
   }
 }
 
@@ -2640,21 +4389,31 @@ void _line_pixel(int x,int y) { // A single pixel (for line_pixel, spray and wri
 //      Draw a box, based on mode_rect, line_fx and color
 //-----------------------------------------------------------------------------
 
-void draw_box(int x0,int y0,int x1,int y1) {
+void draw_box(int x0, int y0, int x1, int y1) {
+  int an, al;
 
-  int an,al;
+  if (x0 > x1)
+    swap(x0, x1);
+  an = x1 - x0 + 1;
+  if (y0 > y1)
+    swap(y0, y1);
+  al = y1 - y0 + 1;
 
-  if (x0>x1) swap(x0,x1); an=x1-x0+1;
-  if (y0>y1) swap(y0,y1); al=y1-y0+1;
-
-  if (save_undo(x0-pincel_an/2,y0-pincel_al/2,an+pincel_an,al+pincel_al)) {
+  if (save_undo(x0 - pincel_an / 2, y0 - pincel_al / 2, an + pincel_an, al + pincel_al)) {
     if (mode_rect) {
-      do { circulo_scan2(x0,y0++,an); } while (--al);
-    } else  {
-      circulo_scan(x0,y0,an); circulo_scan(x0,y0+al-1,an);
-      al-=2; y0++; if (al>0) do {
-        line_pixel(x0,y0); line_pixel(x0+an-1,y0++);
+      do {
+        circulo_scan2(x0, y0++, an);
       } while (--al);
+    } else {
+      circulo_scan(x0, y0, an);
+      circulo_scan(x0, y0 + al - 1, an);
+      al -= 2;
+      y0++;
+      if (al > 0)
+        do {
+          line_pixel(x0, y0);
+          line_pixel(x0 + an - 1, y0++);
+        } while (--al);
     }
   }
 }
@@ -2663,83 +4422,139 @@ void draw_box(int x0,int y0,int x1,int y1) {
 //      Draw a circle, based on mode_circle, line_fx and color
 //-----------------------------------------------------------------------------
 
-void draw_circle(int x0,int y0,int x1,int y1,int relleno) {
+void draw_circle(int x0, int y0, int x1, int y1, int relleno) {
+  int p[2048];   // Points on the circumference
+  double cx, rx; // Center and radius of the circumference
+  int an, al;    // Width and height
+  double y, ymed, nsin;
+  int n, xa, xb, ya, yb;
 
-  int p[2048]; // Points on the circumference
-  double cx,rx; // Center and radius of the circumference
-  int an,al; // Width and height
-  double y,ymed,nsin;
-  int n,xa,xb,ya,yb;
+  if (x0 > x1)
+    swap(x0, x1);
+  an = x1 - x0 + 1;
+  if (y0 > y1)
+    swap(y0, y1);
+  al = y1 - y0 + 1;
+  if (al > 1024)
+    return;
 
-  if (x0>x1) swap(x0,x1); an=x1-x0+1;
-  if (y0>y1) swap(y0,y1); al=y1-y0+1; if (al>1024) return;
+  if (save_undo(x0 - pincel_an / 2, y0 - pincel_al / 2, an + pincel_an, al + pincel_al)) {
+    rx = (double)(an - 1) / 2.0;
+    cx = rx + x0 + 0.5;
+    y = (double)y0 + 0.5;
+    ymed = (double)(y1 + y0 + 1) / 2.0;
 
-  if (save_undo(x0-pincel_an/2,y0-pincel_al/2,an+pincel_an,al+pincel_al)) {
+    n = 0;
+    do {
+      nsin = 1 - (y - y0) / (ymed - y0);
+      xb = cx + cos(asin(nsin)) * rx;
+      xa = x0 + (x1 - xb);
+      ya = y;
+      yb = y1 - (ya - y0);
+      if (!(n && p[n - 2] == ya)) {
+        p[n++] = xa;
+        p[n++] = xb;
+        p[n++] = ya;
+        p[n++] = yb;
+      }
+    } while (y++ < ymed);
 
-    rx=(double)(an-1)/2.0; cx=rx+x0+0.5;
-    y=(double)y0+0.5; ymed=(double)(y1+y0+1)/2.0;
-
-    n=0; do {
-      nsin=1-(y-y0)/(ymed-y0);
-      xb=cx+cos(asin(nsin))*rx; xa=x0+(x1-xb); ya=y; yb=y1-(ya-y0);
-      if (!(n && p[n-2]==ya)) {
-        p[n++]=xa; p[n++]=xb; p[n++]=ya; p[n++]=yb; }
-    } while (y++<ymed);
-
-    if (n>4) if (p[n-1]==p[n-6]) n-=4;
-    if (al>2 && an>2 && p[0]==p[4] && p[0]+1<p[1]) { p[0]=p[4]+1; p[1]=p[5]-1; }
-    if (al==2) { p[0]=x0; p[1]=x1; p[4]=x0; p[5]=x1; }
+    if (n > 4)
+      if (p[n - 1] == p[n - 6])
+        n -= 4;
+    if (al > 2 && an > 2 && p[0] == p[4] && p[0] + 1 < p[1]) {
+      p[0] = p[4] + 1;
+      p[1] = p[5] - 1;
+    }
+    if (al == 2) {
+      p[0] = x0;
+      p[1] = x1;
+      p[4] = x0;
+      p[5] = x1;
+    }
 
     if (relleno) {
       do {
-        yb=p[--n]; ya=p[--n]; xb=p[--n]; xa=p[--n];
-        circulo_scan2(xa,ya,xb-xa+1);
-        if (yb!=ya) circulo_scan2(xa,yb,xb-xa+1);
+        yb = p[--n];
+        ya = p[--n];
+        xb = p[--n];
+        xa = p[--n];
+        circulo_scan2(xa, ya, xb - xa + 1);
+        if (yb != ya)
+          circulo_scan2(xa, yb, xb - xa + 1);
       } while (n);
     } else {
       do {
-        yb=p[--n]; ya=p[--n]; xb=p[--n]; xa=p[--n]; if (n) {
-          if (p[n-3]+1>=xb) {
-            line_pixel(xa,ya); if (xb!=xa) line_pixel(xb,ya);
-            if (yb!=ya) { line_pixel(xa,yb); if (xb!=xa) line_pixel(xb,yb); }
+        yb = p[--n];
+        ya = p[--n];
+        xb = p[--n];
+        xa = p[--n];
+        if (n) {
+          if (p[n - 3] + 1 >= xb) {
+            line_pixel(xa, ya);
+            if (xb != xa)
+              line_pixel(xb, ya);
+            if (yb != ya) {
+              line_pixel(xa, yb);
+              if (xb != xa)
+                line_pixel(xb, yb);
+            }
           } else {
-            circulo_scan(xa,ya,p[n-4]-xa);
-            circulo_scan(p[n-3]+1,ya,xb-p[n-3]);
-            if (yb!=ya) {
-              circulo_scan(xa,yb,p[n-4]-xa); circulo_scan(p[n-3]+1,yb,xb-p[n-3]); } }
+            circulo_scan(xa, ya, p[n - 4] - xa);
+            circulo_scan(p[n - 3] + 1, ya, xb - p[n - 3]);
+            if (yb != ya) {
+              circulo_scan(xa, yb, p[n - 4] - xa);
+              circulo_scan(p[n - 3] + 1, yb, xb - p[n - 3]);
+            }
+          }
         } else {
-          circulo_scan(xa,ya,xb-xa+1);
-          if (yb!=ya) circulo_scan(xa,yb,xb-xa+1);
+          circulo_scan(xa, ya, xb - xa + 1);
+          if (yb != ya)
+            circulo_scan(xa, yb, xb - xa + 1);
         }
       } while (n);
     }
   }
 }
 
-void circulo_scan(int x,int y,int an) {
-  line_pixel(x,y);
-  line(x,y,x+an-1,y,-1);
+void circulo_scan(int x, int y, int an) {
+  line_pixel(x, y);
+  line(x, y, x + an - 1, y, -1);
 }
 
-void circulo_scan2(int x,int y,int an) {
-  byte *p,col;
-  if (textura_color==NULL) {
-    if (y>=0 && y<map_height && x<map_width && x+an>0) {
-      if (x<0) { an+=x; x=0; }
-      if (x+an>map_width) { an=map_width-x; }
-      p=map+y*map_width+x; do pixel(p++); while (--an);
+void circulo_scan2(int x, int y, int an) {
+  byte *p, col;
+  if (textura_color == NULL) {
+    if (y >= 0 && y < map_height && x < map_width && x + an > 0) {
+      if (x < 0) {
+        an += x;
+        x = 0;
+      }
+      if (x + an > map_width) {
+        an = map_width - x;
+      }
+      p = map + y * map_width + x;
+      do
+        pixel(p++);
+      while (--an);
     }
   } else {
-    col=color;
-    if (y>=0 && y<map_height && x<map_width && x+an>0) {
-      if (x<0) { an+=x; x=0; }
-      if (x+an>map_width) { an=map_width-x; }
-      p=map+y*map_width+x;
+    col = color;
+    if (y >= 0 && y < map_height && x < map_width && x + an > 0) {
+      if (x < 0) {
+        an += x;
+        x = 0;
+      }
+      if (x + an > map_width) {
+        an = map_width - x;
+      }
+      p = map + y * map_width + x;
       do {
-        color=get_color(x++,y);
+        color = get_color(x++, y);
         pixel(p++);
       } while (--an);
-    } color=col;
+    }
+    color = col;
   }
 }
 
@@ -2748,225 +4563,381 @@ void circulo_scan2(int x,int y,int an) {
 //-----------------------------------------------------------------------------
 
 void edit_ruler(void) {
-    int n;
+  int n;
 
-    read_mouse(); select_zoom(); test_mouse();
-    if ((key(_L_SHIFT) || key(_R_SHIFT)) && (mouse_b&1) && mouse_graf>=10) {
-      color=*(map+coord_y*map_width+coord_x);
-      remove_texture();
-      draw_ruler(); mouse_b=0;
-    }
+  read_mouse();
+  select_zoom();
+  test_mouse();
+  if ((key(_L_SHIFT) || key(_R_SHIFT)) && (mouse_b & 1) && mouse_graf >= 10) {
+    color = *(map + coord_y * map_width + coord_x);
+    remove_texture();
+    draw_ruler();
+    mouse_b = 0;
+  }
 
-    if ((mouse_b&1) && mouse_in(toolbar_x+_ir,toolbar_y,toolbar_x+_ir+127,toolbar_y+18)) {
-      if (editable(&n)) gradients[gradient].colors[n]=color;
-      else color=gradients[gradient].colors[n];
-      remove_texture();
-      draw_ruler();
-    }
+  if ((mouse_b & 1) &&
+      mouse_in(toolbar_x + _ir, toolbar_y, toolbar_x + _ir + 127, toolbar_y + 18)) {
+    if (editable(&n))
+      gradients[gradient].colors[n] = color;
+    else
+      color = gradients[gradient].colors[n];
+    remove_texture();
+    draw_ruler();
+  }
 
-    if ((mouse_b&1) && selected_icon==11) {
-      do {read_mouse();} while(mouse_b&1);
-      eyedropper(); draw_ruler();
-      do {read_mouse();} while(mouse_b || key(_ESC));
-    }
+  if ((mouse_b & 1) && selected_icon == 11) {
+    do {
+      read_mouse();
+    } while (mouse_b & 1);
+    eyedropper();
+    draw_ruler();
+    do {
+      read_mouse();
+    } while (mouse_b || key(_ESC));
+  }
 }
 
 //-----------------------------------------------------------------------------
 //      Toolbar for move, copy, rotate, scale, etc.
 //-----------------------------------------------------------------------------
 
-void move_selection(byte * sp, int an, int al) {
-
-  int x,y;
-  int _x,_y;
-  int _an,_al;
-  int xg,yg;
-  byte * p;
-  int _coord_x=0,_coord_y=0;
+void move_selection(byte *sp, int an, int al) {
+  int x, y;
+  int _x, _y;
+  int _an, _al;
+  int xg, yg;
+  byte *p;
+  int _coord_x = 0, _coord_y = 0;
   int _mouse_graf;
 
-  int ghost=0,block=0;
-  float size=1,ang=0,old_float;
-  int s=0; // Status 0-Normal, 1-Rotating_a, 2-Rotating_b, 3-Scaling_a, 4-...
+  int ghost = 0, block = 0;
+  float size = 1, ang = 0, old_float;
+  int s = 0; // Status 0-Normal, 1-Rotating_a, 2-Rotating_b, 3-Scaling_a, 4-...
 
   byte num[5];
 
-  if (sp==NULL) {
-    an=sel_mask_x1-sel_mask_x0+1; al=sel_mask_y1-sel_mask_y0+1;
-    if ((sp=(byte*)malloc(an*al))==NULL) {
-      v_text=(char *)texts[45]; show_dialog(err0); return; }
-    memset(sp,0,an*al); // Create the sprite in sp
-    for (y=sel_mask_y0;y<=sel_mask_y1;y++)
-      for (x=sel_mask_x0;x<=sel_mask_x1;x++)
-        if (is_selection_mask(x,y)) *(sp+x-sel_mask_x0+(y-sel_mask_y0)*an)=*(map+x+y*map_width);
+  if (sp == NULL) {
+    an = sel_mask_x1 - sel_mask_x0 + 1;
+    al = sel_mask_y1 - sel_mask_y0 + 1;
+    if ((sp = (byte *)malloc(an * al)) == NULL) {
+      v_text = (char *)texts[45];
+      show_dialog(err0);
+      return;
+    }
+    memset(sp, 0, an * al); // Create the sprite in sp
+    for (y = sel_mask_y0; y <= sel_mask_y1; y++)
+      for (x = sel_mask_x0; x <= sel_mask_x1; x++)
+        if (is_selection_mask(x, y))
+          *(sp + x - sel_mask_x0 + (y - sel_mask_y0) * an) = *(map + x + y * map_width);
   }
 
-  bar[0]=101+zoom; bar[1]=121; bar[2]=105+ghost; bar[3]=122+block;
-  bar[4]=125; bar[5]=124; bar[6]=126; bar[7]=127; bar[8]=129; bar[9]=0;
-  draw_bar(0); put_bar_inv(10,2,139);
+  bar[0] = 101 + zoom;
+  bar[1] = 121;
+  bar[2] = 105 + ghost;
+  bar[3] = 122 + block;
+  bar[4] = 125;
+  bar[5] = 124;
+  bar[6] = 126;
+  bar[7] = 127;
+  bar[8] = 129;
+  bar[9] = 0;
+  draw_bar(0);
+  put_bar_inv(10, 2, 139);
 
   do {
     draw_help(1295);
-    read_mouse(); select_zoom(); test_mouse();
+    read_mouse();
+    select_zoom();
+    test_mouse();
 
-    if (s==0) {
-
-      if (((mouse_b&1) && selected_icon==1) || (scan_code==14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
-        undo_back(); do {read_mouse();} while(mouse_b&1);
-      } else if (scan_code==14 && (key(_L_SHIFT)||key(_R_SHIFT))) { undo_next(); need_zoom=1; }
-
-      if ((mouse_b&1) && selected_icon==2) {
-        ghost^=1; bar[2]=105+ghost;
-        draw_bar(0); put_bar_inv(10,2,139);
-        do {read_mouse();} while(mouse_b&1);
+    if (s == 0) {
+      if (((mouse_b & 1) && selected_icon == 1) ||
+          (scan_code == 14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
+        undo_back();
+        do {
+          read_mouse();
+        } while (mouse_b & 1);
+      } else if (scan_code == 14 && (key(_L_SHIFT) || key(_R_SHIFT))) {
+        undo_next();
+        need_zoom = 1;
       }
 
-      if ((mouse_b&1) && selected_icon==3) {
-        block^=1; bar[3]=122+block;
-        draw_bar(0); put_bar_inv(10,2,139);
-        do {read_mouse();} while(mouse_b&1);
+      if ((mouse_b & 1) && selected_icon == 2) {
+        ghost ^= 1;
+        bar[2] = 105 + ghost;
+        draw_bar(0);
+        put_bar_inv(10, 2, 139);
+        do {
+          read_mouse();
+        } while (mouse_b & 1);
       }
 
-      if ((mouse_b&1) && selected_icon==4) {
-        invierte_hor(sp,an,al);
-        do {read_mouse();} while(mouse_b&1);
+      if ((mouse_b & 1) && selected_icon == 3) {
+        block ^= 1;
+        bar[3] = 122 + block;
+        draw_bar(0);
+        put_bar_inv(10, 2, 139);
+        do {
+          read_mouse();
+        } while (mouse_b & 1);
       }
 
-      if ((mouse_b&1) && selected_icon==5) {
-        invierte_ver(sp,an,al);
-        do {read_mouse();} while(mouse_b&1);
+      if ((mouse_b & 1) && selected_icon == 4) {
+        invierte_hor(sp, an, al);
+        do {
+          read_mouse();
+        } while (mouse_b & 1);
       }
 
-      if ((mouse_b&1) && selected_icon==6) {
-        s=1; bar[1]=0; bar[2]=0; draw_bar(22); put_bar_inv(10,2,126);
-        old_float=ang; do {read_mouse();} while(mouse_b&1);
+      if ((mouse_b & 1) && selected_icon == 5) {
+        invierte_ver(sp, an, al);
+        do {
+          read_mouse();
+        } while (mouse_b & 1);
       }
 
-      if ((mouse_b&1) && selected_icon==7) {
-        s=3; bar[1]=0; bar[2]=0; draw_bar(22); put_bar_inv(10,2,127);
-        old_float=size; do {read_mouse();} while(mouse_b&1);
+      if ((mouse_b & 1) && selected_icon == 6) {
+        s = 1;
+        bar[1] = 0;
+        bar[2] = 0;
+        draw_bar(22);
+        put_bar_inv(10, 2, 126);
+        old_float = ang;
+        do {
+          read_mouse();
+        } while (mouse_b & 1);
       }
 
-      if ((mouse_b&1) && selected_icon==8) {
-        box_to_sel_mask(); sel_mask_delete();
-        do {read_mouse();} while(mouse_b&1);
+      if ((mouse_b & 1) && selected_icon == 7) {
+        s = 3;
+        bar[1] = 0;
+        bar[2] = 0;
+        draw_bar(22);
+        put_bar_inv(10, 2, 127);
+        old_float = size;
+        do {
+          read_mouse();
+        } while (mouse_b & 1);
       }
 
+      if ((mouse_b & 1) && selected_icon == 8) {
+        box_to_sel_mask();
+        sel_mask_delete();
+        do {
+          read_mouse();
+        } while (mouse_b & 1);
+      }
     }
 
     move_zoom();
     move_bar();
 
-    if (key(_H)) { blit_screen(screen_buffer); do { poll_keyboard(); } while (key(_H)); }
+    if (key(_H)) {
+      blit_screen(screen_buffer);
+      do {
+        poll_keyboard();
+      } while (key(_H));
+    }
 
     bar_coords();
 
-    if (s!=2 && s!=4) { _coord_x=coord_x; _coord_y=coord_y; }
-
-    if (s==1 || s==2) {
-      _x=coord_x-_coord_x; _y=_coord_y-coord_y;
-      if (!_x && !_y) ang=0; else ang=atan2(_y,_x);
-      xg=ang*57.295779761; if (xg<0) xg+=360;
-      wbox(toolbar,vga_width/big2,19,c2,toolbar_width-23,2,21,15);
-      p=screen_buffer; screen_buffer=toolbar; text_color=c3;
-      num[4]=0; num[3]='\xa7'; num[2]=xg%10+48; num[1]=(xg/10)%10+48;
-      num[0]=(xg/100)%10+48; writetxt(toolbar_width-21,6,0,num); screen_buffer=p;
+    if (s != 2 && s != 4) {
+      _coord_x = coord_x;
+      _coord_y = coord_y;
     }
 
-    if (s==3 || s==4) {
-      _x=coord_x+coord_y-_coord_x-_coord_y;
-      if ((size=1+(float)_x/100)<0) size=0;
-      xg=size*100;
-      wbox(toolbar,vga_width/big2,19,c2,toolbar_width-23,2,21,15);
-      p=screen_buffer; screen_buffer=toolbar; text_color=c3;
-      num[4]=0; num[3]='%'; num[2]=xg%10+48; num[1]=(xg/10)%10+48;
-      num[0]=(xg/100)%10+48; writetxt(toolbar_width-22,6,0,num); screen_buffer=p;
+    if (s == 1 || s == 2) {
+      _x = coord_x - _coord_x;
+      _y = _coord_y - coord_y;
+      if (!_x && !_y)
+        ang = 0;
+      else
+        ang = atan2(_y, _x);
+      xg = ang * 57.295779761;
+      if (xg < 0)
+        xg += 360;
+      wbox(toolbar, vga_width / big2, 19, c2, toolbar_width - 23, 2, 21, 15);
+      p = screen_buffer;
+      screen_buffer = toolbar;
+      text_color = c3;
+      num[4] = 0;
+      num[3] = '\xa7';
+      num[2] = xg % 10 + 48;
+      num[1] = (xg / 10) % 10 + 48;
+      num[0] = (xg / 100) % 10 + 48;
+      writetxt(toolbar_width - 21, 6, 0, num);
+      screen_buffer = p;
     }
 
-    if (mouse_in(toolbar_x+48,toolbar_y+2,toolbar_x+toolbar_width-2,toolbar_y+17)) {
-      selected_icon=(mouse_x-toolbar_x-48)/16;
-      if (bar[selected_icon]>1) {
-        wresalta_box(toolbar,vga_width/big2,19,48+selected_icon*16,2,15,15);
-      } else selected_icon=-1;
-    } else selected_icon=-1;
+    if (s == 3 || s == 4) {
+      _x = coord_x + coord_y - _coord_x - _coord_y;
+      if ((size = 1 + (float)_x / 100) < 0)
+        size = 0;
+      xg = size * 100;
+      wbox(toolbar, vga_width / big2, 19, c2, toolbar_width - 23, 2, 21, 15);
+      p = screen_buffer;
+      screen_buffer = toolbar;
+      text_color = c3;
+      num[4] = 0;
+      num[3] = '%';
+      num[2] = xg % 10 + 48;
+      num[1] = (xg / 10) % 10 + 48;
+      num[0] = (xg / 100) % 10 + 48;
+      writetxt(toolbar_width - 22, 6, 0, num);
+      screen_buffer = p;
+    }
 
-    if ((_mouse_graf=mouse_graf)>=10) {
-      if (_coord_x>=0 && _coord_y>=0 && _coord_x<map_width && _coord_y<map_height) {
-        xg=an/2; yg=al/2;
-        if (size==1 && ang==0) {
-          if (save_undo(_coord_x-xg,_coord_y-yg,an,al))
-            sp_normal(sp,_coord_x,_coord_y,an,al,xg,yg,block*2+ghost);
-          else draw_mode=110;
+    if (mouse_in(toolbar_x + 48, toolbar_y + 2, toolbar_x + toolbar_width - 2, toolbar_y + 17)) {
+      selected_icon = (mouse_x - toolbar_x - 48) / 16;
+      if (bar[selected_icon] > 1) {
+        wresalta_box(toolbar, vga_width / big2, 19, 48 + selected_icon * 16, 2, 15, 15);
+      } else
+        selected_icon = -1;
+    } else
+      selected_icon = -1;
+
+    if ((_mouse_graf = mouse_graf) >= 10) {
+      if (_coord_x >= 0 && _coord_y >= 0 && _coord_x < map_width && _coord_y < map_height) {
+        xg = an / 2;
+        yg = al / 2;
+        if (size == 1 && ang == 0) {
+          if (save_undo(_coord_x - xg, _coord_y - yg, an, al))
+            sp_normal(sp, _coord_x, _coord_y, an, al, xg, yg, block * 2 + ghost);
+          else
+            draw_mode = 110;
         } else {
-          _an=an; _al=al; _x=_coord_x; _y=_coord_y;
-          sp_size(&_x,&_y,&_an,&_al,xg,yg,ang,size);
-          if (save_undo(_x,_y,_an,_al))
-            sp_rotated(sp,_coord_x,_coord_y,an,al,xg,yg,block*2+ghost,ang,size);
-          else draw_mode=110;
+          _an = an;
+          _al = al;
+          _x = _coord_x;
+          _y = _coord_y;
+          sp_size(&_x, &_y, &_an, &_al, xg, yg, ang, size);
+          if (save_undo(_x, _y, _an, _al))
+            sp_rotated(sp, _coord_x, _coord_y, an, al, xg, yg, block * 2 + ghost, ang, size);
+          else
+            draw_mode = 110;
         }
       }
-      if (s==2 || s==4) _mouse_graf=1; else _mouse_graf=2;
+      if (s == 2 || s == 4)
+        _mouse_graf = 1;
+      else
+        _mouse_graf = 2;
     }
 
     zoom_map();
     flush_bars(0);
-    save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,_mouse_graf,0);
-    put(mouse_shift_x,mouse_shift_y,_mouse_graf);
+    save_mouse_bg(mouse_background, mouse_shift_x, mouse_shift_y, _mouse_graf, 0);
+    put(mouse_shift_x, mouse_shift_y, _mouse_graf);
     blit_screen(screen_buffer);
-    save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,_mouse_graf,1);
+    save_mouse_bg(mouse_background, mouse_shift_x, mouse_shift_y, _mouse_graf, 1);
 
-    if (mouse_graf>=10) switch(s) {
+    if (mouse_graf >= 10)
+      switch (s) {
       case 0:
-        if (mouse_b&1) do {read_mouse();} while(mouse_b);
-        else undo_back();
+        if (mouse_b & 1)
+          do {
+            read_mouse();
+          } while (mouse_b);
+        else
+          undo_back();
         break;
       case 1:
         undo_back();
-        if (mouse_b&1) { do {read_mouse();} while(mouse_b); s=2; }
-        if (mouse_b&2 || key(_ESC)) {
-          bar[1]=121; bar[2]=105+ghost; draw_bar(0); put_bar_inv(10,2,139);
-          do {read_mouse();} while(mouse_b||key(_ESC)); s=0; ang=old_float;}
+        if (mouse_b & 1) {
+          do {
+            read_mouse();
+          } while (mouse_b);
+          s = 2;
+        }
+        if (mouse_b & 2 || key(_ESC)) {
+          bar[1] = 121;
+          bar[2] = 105 + ghost;
+          draw_bar(0);
+          put_bar_inv(10, 2, 139);
+          do {
+            read_mouse();
+          } while (mouse_b || key(_ESC));
+          s = 0;
+          ang = old_float;
+        }
         break;
       case 2:
         undo_back();
         if (mouse_b || key(_ESC)) {
-          if (!(mouse_b&1)) ang=old_float;
-          bar[1]=121; bar[2]=105+ghost; draw_bar(0); put_bar_inv(10,2,139);
-          do {read_mouse();} while(mouse_b||key(_ESC)); s=0; }
+          if (!(mouse_b & 1))
+            ang = old_float;
+          bar[1] = 121;
+          bar[2] = 105 + ghost;
+          draw_bar(0);
+          put_bar_inv(10, 2, 139);
+          do {
+            read_mouse();
+          } while (mouse_b || key(_ESC));
+          s = 0;
+        }
         break;
       case 3:
         undo_back();
-        if (mouse_b&1) { do {read_mouse();} while(mouse_b); s=4; }
-        if (mouse_b&2 || key(_ESC)) {
-          bar[1]=121; bar[2]=105+ghost; draw_bar(0); put_bar_inv(10,2,139);
-          do {read_mouse();} while(mouse_b||key(_ESC)); s=0; size=old_float;}
+        if (mouse_b & 1) {
+          do {
+            read_mouse();
+          } while (mouse_b);
+          s = 4;
+        }
+        if (mouse_b & 2 || key(_ESC)) {
+          bar[1] = 121;
+          bar[2] = 105 + ghost;
+          draw_bar(0);
+          put_bar_inv(10, 2, 139);
+          do {
+            read_mouse();
+          } while (mouse_b || key(_ESC));
+          s = 0;
+          size = old_float;
+        }
         break;
       case 4:
         undo_back();
         if (mouse_b || key(_ESC)) {
-          if (!(mouse_b&1)) size=old_float;
-          bar[1]=121; bar[2]=105+ghost; draw_bar(0); put_bar_inv(10,2,139);
-          do {read_mouse();} while(mouse_b||key(_ESC)); s=0; }
+          if (!(mouse_b & 1))
+            size = old_float;
+          bar[1] = 121;
+          bar[2] = 105 + ghost;
+          draw_bar(0);
+          put_bar_inv(10, 2, 139);
+          do {
+            read_mouse();
+          } while (mouse_b || key(_ESC));
+          s = 0;
+        }
         break;
-    }
+      }
 
-    if (selected_icon>=0) put_bar(48+selected_icon*16,2,bar[selected_icon]);
+    if (selected_icon >= 0)
+      put_bar(48 + selected_icon * 16, 2, bar[selected_icon]);
 
     select_mode();
 
-    if (scan_code==_TAB) {
-      if (!_tab) { _tab=1;
-        if (key(_L_SHIFT) || key(_R_SHIFT)) change_map(0);
-        else change_map(1);
+    if (scan_code == _TAB) {
+      if (!_tab) {
+        _tab = 1;
+        if (key(_L_SHIFT) || key(_R_SHIFT))
+          change_map(0);
+        else
+          change_map(1);
       }
-    } else _tab=0;
+    } else
+      _tab = 0;
 
-  } while (!exit_requested && !(mouse_b&2) && !(key(_ESC)&&!s) && draw_mode<100 &&
-    !(mouse_b && mouse_in(toolbar_x,toolbar_y+10,toolbar_x+9,toolbar_y+18)));
+  } while (!exit_requested && !(mouse_b & 2) && !(key(_ESC) && !s) && draw_mode < 100 &&
+           !(mouse_b && mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18)));
 
-  if (key(_ESC)||(mouse_b && mouse_in(toolbar_x,toolbar_y+10,toolbar_x+9,toolbar_y+18)))
-    { put_bar(2,10,45); flush_bars(0);
-      put(mouse_x,mouse_y,mouse_graf); blit_screen(screen_buffer); }
+  if (key(_ESC) ||
+      (mouse_b && mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18))) {
+    put_bar(2, 10, 45);
+    flush_bars(0);
+    put(mouse_x, mouse_y, mouse_graf);
+    blit_screen(screen_buffer);
+  }
 
   free(sp);
 }
@@ -2977,60 +4948,101 @@ void move_selection(byte * sp, int an, int al) {
 //-----------------------------------------------------------------------------
 
 void effects(void) {
-
-  bar[0]=101+zoom; bar[1]=121; bar[2]=140; bar[3]=194;
-  bar[4]=128; bar[5]=142; bar[6]=143; bar[7]=150; bar[8]=0;
-  draw_bar(0); put_bar_inv(10,2,171); need_zoom=1;
+  bar[0] = 101 + zoom;
+  bar[1] = 121;
+  bar[2] = 140;
+  bar[3] = 194;
+  bar[4] = 128;
+  bar[5] = 142;
+  bar[6] = 143;
+  bar[7] = 150;
+  bar[8] = 0;
+  draw_bar(0);
+  put_bar_inv(10, 2, 171);
+  need_zoom = 1;
 
   do {
     draw_help(1295);
-    read_mouse(); select_zoom(); test_mouse();
+    read_mouse();
+    select_zoom();
+    test_mouse();
 
-    if (((mouse_b&1) && selected_icon==1) || (scan_code==14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
-      undo_back(); do {read_mouse();} while(mouse_b&1);
-    } else if (scan_code==14 && (key(_L_SHIFT)||key(_R_SHIFT))) { undo_next(); need_zoom=1; }
-
-    if ((mouse_b&1) && selected_icon==2) { // Remap to gradient
-      sel_mask_ruler(); need_zoom=1;
-      do {read_mouse();} while(mouse_b&1);
+    if (((mouse_b & 1) && selected_icon == 1) ||
+        (scan_code == 14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
+      undo_back();
+      do {
+        read_mouse();
+      } while (mouse_b & 1);
+    } else if (scan_code == 14 && (key(_L_SHIFT) || key(_R_SHIFT))) {
+      undo_next();
+      need_zoom = 1;
     }
 
-    if ((mouse_b&1) && selected_icon==3) { // Invert
-      sel_mask_invert(); need_zoom=1;
-      do {read_mouse();} while(mouse_b&1);
+    if ((mouse_b & 1) && selected_icon == 2) { // Remap to gradient
+      sel_mask_ruler();
+      need_zoom = 1;
+      do {
+        read_mouse();
+      } while (mouse_b & 1);
     }
 
-    if ((mouse_b&1) && selected_icon==4) { // Mask
-      sel_mask_mask(); need_zoom=1;
-      do {read_mouse();} while(mouse_b&1);
+    if ((mouse_b & 1) && selected_icon == 3) { // Invert
+      sel_mask_invert();
+      need_zoom = 1;
+      do {
+        read_mouse();
+      } while (mouse_b & 1);
     }
 
-    if ((mouse_b&1) && selected_icon==5) { // Lighten
-      sel_mask_lighten(c4); need_zoom=1;
-      do {read_mouse();} while(mouse_b&1);
+    if ((mouse_b & 1) && selected_icon == 4) { // Mask
+      sel_mask_mask();
+      need_zoom = 1;
+      do {
+        read_mouse();
+      } while (mouse_b & 1);
     }
 
-    if ((mouse_b&1) && selected_icon==6) { // Darken
-      sel_mask_lighten(c0); need_zoom=1;
-      do {read_mouse();} while(mouse_b&1);
+    if ((mouse_b & 1) && selected_icon == 5) { // Lighten
+      sel_mask_lighten(c4);
+      need_zoom = 1;
+      do {
+        read_mouse();
+      } while (mouse_b & 1);
     }
 
-    if ((mouse_b&1) && selected_icon==7) { // Anti-alias
-      sel_mask_antialias(); need_zoom=1;
-      do {read_mouse();} while(mouse_b&1);
+    if ((mouse_b & 1) && selected_icon == 6) { // Darken
+      sel_mask_lighten(c0);
+      need_zoom = 1;
+      do {
+        read_mouse();
+      } while (mouse_b & 1);
     }
 
-    need_zoom_x=map_width; need_zoom_y=map_height;
-    need_zoom_width=0; need_zoom_height=0;
+    if ((mouse_b & 1) && selected_icon == 7) { // Anti-alias
+      sel_mask_antialias();
+      need_zoom = 1;
+      do {
+        read_mouse();
+      } while (mouse_b & 1);
+    }
+
+    need_zoom_x = map_width;
+    need_zoom_y = map_height;
+    need_zoom_width = 0;
+    need_zoom_height = 0;
     test_next();
 
     blit_edit();
-  } while (!exit_requested && !(mouse_b&2) && !key(_ESC) && draw_mode<100 &&
-    !(mouse_b && mouse_in(toolbar_x,toolbar_y+10,toolbar_x+9,toolbar_y+18)));
+  } while (!exit_requested && !(mouse_b & 2) && !key(_ESC) && draw_mode < 100 &&
+           !(mouse_b && mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18)));
 
-  if (key(_ESC)||(mouse_b && mouse_in(toolbar_x,toolbar_y+10,toolbar_x+9,toolbar_y+18)))
-    { put_bar(2,10,45); flush_bars(0);
-      put(mouse_x,mouse_y,mouse_graf); blit_screen(screen_buffer); }
+  if (key(_ESC) ||
+      (mouse_b && mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18))) {
+    put_bar(2, 10, 45);
+    flush_bars(0);
+    put(mouse_x, mouse_y, mouse_graf);
+    blit_screen(screen_buffer);
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -3038,62 +5050,87 @@ void effects(void) {
 //-----------------------------------------------------------------------------
 
 void eyedropper(void) {
-
-  byte * _toolbar, * _saved_buffer;
+  byte *_toolbar, *_saved_buffer;
   int _bar[16];
   int _toolbar_width;
-  int col=color;
+  int col = color;
   byte num[8];
 
-  if ((_toolbar=(byte*)malloc(vga_width*19*big2))!=NULL) {
-    memcpy(_toolbar,toolbar,vga_width*19*big2); memcpy(_bar,bar,16*4); _toolbar_width=toolbar_width;
+  if ((_toolbar = (byte *)malloc(vga_width * 19 * big2)) != NULL) {
+    memcpy(_toolbar, toolbar, vga_width * 19 * big2);
+    memcpy(_bar, bar, 16 * 4);
+    _toolbar_width = toolbar_width;
 
-    bar[0]=101+zoom; bar[1]=1; bar[2]=1; bar[3]=1; bar[4]=0;
-    draw_bar(0); put_bar_inv(10,2,166); need_zoom=1;
+    bar[0] = 101 + zoom;
+    bar[1] = 1;
+    bar[2] = 1;
+    bar[3] = 1;
+    bar[4] = 0;
+    draw_bar(0);
+    put_bar_inv(10, 2, 166);
+    need_zoom = 1;
 
     do {
       draw_help(1295);
-      read_mouse(); select_zoom(); test_mouse();
+      read_mouse();
+      select_zoom();
+      test_mouse();
 
-      if ((mouse_b&1) && mouse_graf>=10) {
-        col=*(map+coord_x+coord_y*map_width);
-        color=col; mouse_b=2;
+      if ((mouse_b & 1) && mouse_graf >= 10) {
+        col = *(map + coord_x + coord_y * map_width);
+        color = col;
+        mouse_b = 2;
         remove_texture();
       }
 
-      if (mouse_graf>=10) {
-        col=*(map+coord_x+coord_y*map_width);
-        _saved_buffer=screen_buffer; screen_buffer=toolbar;
-        wbox(toolbar,vga_width/big2,19,col,64,2,15,15);
-        wbox(toolbar,vga_width/big2,19,c2,80,2,31,15);
-        text_color=c4;
-        num[2]=col%10+48; num[1]=(col/10)%10+48; num[0]=(col/100)%10+48;
-        div_strcpy((char *)&num[3],sizeof(num)-3,"Dec"); writetxt(109,3,2,num);
-        num[1]=(col%16>9)?col%16+55:col%16+48; num[0]=(col/16>9)?col/16+55:col/16+48;
-        div_strcpy((char *)&num[2],sizeof(num)-2,"Hex"); writetxt(109,10,2,num);
-        screen_buffer=_saved_buffer;
+      if (mouse_graf >= 10) {
+        col = *(map + coord_x + coord_y * map_width);
+        _saved_buffer = screen_buffer;
+        screen_buffer = toolbar;
+        wbox(toolbar, vga_width / big2, 19, col, 64, 2, 15, 15);
+        wbox(toolbar, vga_width / big2, 19, c2, 80, 2, 31, 15);
+        text_color = c4;
+        num[2] = col % 10 + 48;
+        num[1] = (col / 10) % 10 + 48;
+        num[0] = (col / 100) % 10 + 48;
+        div_strcpy((char *)&num[3], sizeof(num) - 3, "Dec");
+        writetxt(109, 3, 2, num);
+        num[1] = (col % 16 > 9) ? col % 16 + 55 : col % 16 + 48;
+        num[0] = (col / 16 > 9) ? col / 16 + 55 : col / 16 + 48;
+        div_strcpy((char *)&num[2], sizeof(num) - 2, "Hex");
+        writetxt(109, 10, 2, num);
+        screen_buffer = _saved_buffer;
       } else {
-        _saved_buffer=screen_buffer; screen_buffer=toolbar;
-        wbox(toolbar,vga_width/big2,19,c1,64,2,15,15);
-        wbox(toolbar,vga_width/big2,19,c2,80,2,31,15);
-        screen_buffer=_saved_buffer;
+        _saved_buffer = screen_buffer;
+        screen_buffer = toolbar;
+        wbox(toolbar, vga_width / big2, 19, c1, 64, 2, 15, 15);
+        wbox(toolbar, vga_width / big2, 19, c2, 80, 2, 31, 15);
+        screen_buffer = _saved_buffer;
       }
 
       blit_edit();
-    } while (!exit_requested && !(mouse_b&2) && !key(_ESC) && draw_mode<100 &&
-      !(mouse_b && mouse_in(toolbar_x,toolbar_y+10,toolbar_x+9,toolbar_y+18)));
+    } while (!exit_requested && !(mouse_b & 2) && !key(_ESC) && draw_mode < 100 &&
+             !(mouse_b && mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18)));
 
-    if (key(_ESC)||(mouse_b && mouse_in(toolbar_x,toolbar_y+10,toolbar_x+9,toolbar_y+18)))
-      { put_bar(2,10,45); flush_bars(0);
-        put(mouse_x,mouse_y,mouse_graf); blit_screen(screen_buffer); }
+    if (key(_ESC) ||
+        (mouse_b && mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18))) {
+      put_bar(2, 10, 45);
+      flush_bars(0);
+      put(mouse_x, mouse_y, mouse_graf);
+      blit_screen(screen_buffer);
+    }
 
-    memcpy(toolbar,_toolbar,vga_width*19*big2); memcpy(bar,_bar,16*4); toolbar_width=_toolbar_width;
+    memcpy(toolbar, _toolbar, vga_width * 19 * big2);
+    memcpy(bar, _bar, 16 * 4);
+    toolbar_width = _toolbar_width;
     free(_toolbar);
   } else {
-    v_text=(char *)texts[45]; show_dialog(err0);
+    v_text = (char *)texts[45];
+    show_dialog(err0);
   }
 
-  zoom_background=0; need_zoom=1;
+  zoom_background = 0;
+  need_zoom = 1;
 }
 
 //-----------------------------------------------------------------------------
@@ -3102,24 +5139,58 @@ void eyedropper(void) {
 //-----------------------------------------------------------------------------
 
 int editable(int *n) {
-  int r=4;
+  int r = 4;
 
-  switch(gradients[gradient].num_colors) {
-    case 8: r=16; break; case 16: r=8; break; case 32: r=4; break; }
-  *n=(mouse_x-toolbar_x-_ir)/r+1;
+  switch (gradients[gradient].num_colors) {
+  case 8:
+    r = 16;
+    break;
+  case 16:
+    r = 8;
+    break;
+  case 32:
+    r = 4;
+    break;
+  }
+  *n = (mouse_x - toolbar_x - _ir) / r + 1;
 
   if (!gradients[gradient].fixed) {
-    if (mouse_y>=toolbar_y+11 && mouse_y<=toolbar_y+18
-        && mouse_x>=toolbar_x+_ir && mouse_x<toolbar_x+_ir+128) {
-      switch(gradients[gradient].type) {
-        case 0: if (*n==1) r=1; else r=0; break;
-        case 1: r=1; break;
-        case 2: if (*n%2==0) r=1; else r=0; break;
-        case 4: if (*n%4==0) r=1; else r=0; break;
-        case 8: if (*n%8==0) r=1; else r=0; break;
-      } return(r);
-    } else return(0);
-  } else return(0);
+    if (mouse_y >= toolbar_y + 11 && mouse_y <= toolbar_y + 18 && mouse_x >= toolbar_x + _ir &&
+        mouse_x < toolbar_x + _ir + 128) {
+      switch (gradients[gradient].type) {
+      case 0:
+        if (*n == 1)
+          r = 1;
+        else
+          r = 0;
+        break;
+      case 1:
+        r = 1;
+        break;
+      case 2:
+        if (*n % 2 == 0)
+          r = 1;
+        else
+          r = 0;
+        break;
+      case 4:
+        if (*n % 4 == 0)
+          r = 1;
+        else
+          r = 0;
+        break;
+      case 8:
+        if (*n % 8 == 0)
+          r = 1;
+        else
+          r = 0;
+        break;
+      }
+      return (r);
+    } else
+      return (0);
+  } else
+    return (0);
 }
 
 //-----------------------------------------------------------------------------
@@ -3128,25 +5199,58 @@ int editable(int *n) {
 //      - Version for the gradient in the select_color window -
 //-----------------------------------------------------------------------------
 
-int editable_selection(int *n,int x,int y) {
-  int r=4;
+int editable_selection(int *n, int x, int y) {
+  int r = 4;
 
-  switch(gradients[gradient].num_colors) {
-    case 8: r=16; break; case 16: r=8; break; case 32: r=4; break; }
-  *n=(mouse_x-x)/r+1;
+  switch (gradients[gradient].num_colors) {
+  case 8:
+    r = 16;
+    break;
+  case 16:
+    r = 8;
+    break;
+  case 32:
+    r = 4;
+    break;
+  }
+  *n = (mouse_x - x) / r + 1;
 
   if (!gradients[gradient].fixed) {
-    if (mouse_y>=y+9 && mouse_y<y+16
-        && mouse_x>=x && mouse_x<x+128) {
-      switch(gradients[gradient].type) {
-        case 0: if (*n==1) r=1; else r=0; break;
-        case 1: r=1; break;
-        case 2: if (*n%2==0) r=1; else r=0; break;
-        case 4: if (*n%4==0) r=1; else r=0; break;
-        case 8: if (*n%8==0) r=1; else r=0; break;
-      } return(r);
-    } else return(0);
-  } else return(0);
+    if (mouse_y >= y + 9 && mouse_y < y + 16 && mouse_x >= x && mouse_x < x + 128) {
+      switch (gradients[gradient].type) {
+      case 0:
+        if (*n == 1)
+          r = 1;
+        else
+          r = 0;
+        break;
+      case 1:
+        r = 1;
+        break;
+      case 2:
+        if (*n % 2 == 0)
+          r = 1;
+        else
+          r = 0;
+        break;
+      case 4:
+        if (*n % 4 == 0)
+          r = 1;
+        else
+          r = 0;
+        break;
+      case 8:
+        if (*n % 8 == 0)
+          r = 1;
+        else
+          r = 0;
+        break;
+      }
+      return (r);
+    } else
+      return (0);
+  } else
+    return (0);
 }
 
 //-----------------------------------------------------------------------------
@@ -3154,197 +5258,267 @@ int editable_selection(int *n,int x,int y) {
 //-----------------------------------------------------------------------------
 
 void draw_ruler(void) {
-  int x,y;
-  int n,med,a;
-  byte * p,*ptr;
-  int s0=4,s1=0;
+  int x, y;
+  int n, med, a;
+  byte *p, *ptr;
+  int s0 = 4, s1 = 0;
 
 
-  if (highlight_background) { dac[0]=(dac[0]+32)%64; dac[1]=(dac[1]+32)%64; dac[2]=(dac[2]+32)%64; }
+  if (highlight_background) {
+    dac[0] = (dac[0] + 32) % 64;
+    dac[1] = (dac[1] + 32) % 64;
+    dac[2] = (dac[2] + 32) % 64;
+  }
   calculate_gradient(gradient);
-  if (highlight_background) { dac[0]=(dac[0]+32)%64; dac[1]=(dac[1]+32)%64; dac[2]=(dac[2]+32)%64; }
-
-  p=screen_buffer; screen_buffer=toolbar;
-
-  switch (gradients[gradient].num_colors) {
-    case 8: s0=16; s1=5; break;
-    case 16: s0=8; s1=1; break;
-    case 32: s0=4; s1=-1; break;
+  if (highlight_background) {
+    dac[0] = (dac[0] + 32) % 64;
+    dac[1] = (dac[1] + 32) % 64;
+    dac[2] = (dac[2] + 32) % 64;
   }
 
-  for (a=_ir;a<_ir+128;a+=s0) {
-    n=gradients[gradient].colors[(a-_ir)/s0+1];
-    wbox(toolbar,vga_width/big2,19,n,a,2,s0-1,15);
-    wbox(toolbar,vga_width/big2,19,c0,a+s0-1,2,1,15);
-    if (n==color) {
-      wbox(toolbar,vga_width/big2,19,c4,a,2,s0-1,1);
-      wbox(toolbar,vga_width/big2,19,c0,a,3,s0-1,1);
+  p = screen_buffer;
+  screen_buffer = toolbar;
+
+  switch (gradients[gradient].num_colors) {
+  case 8:
+    s0 = 16;
+    s1 = 5;
+    break;
+  case 16:
+    s0 = 8;
+    s1 = 1;
+    break;
+  case 32:
+    s0 = 4;
+    s1 = -1;
+    break;
+  }
+
+  for (a = _ir; a < _ir + 128; a += s0) {
+    n = gradients[gradient].colors[(a - _ir) / s0 + 1];
+    wbox(toolbar, vga_width / big2, 19, n, a, 2, s0 - 1, 15);
+    wbox(toolbar, vga_width / big2, 19, c0, a + s0 - 1, 2, 1, 15);
+    if (n == color) {
+      wbox(toolbar, vga_width / big2, 19, c4, a, 2, s0 - 1, 1);
+      wbox(toolbar, vga_width / big2, 19, c0, a, 3, s0 - 1, 1);
     }
     if (!gradients[gradient].fixed) {
       if (gradients[gradient].type) {
-        if (((a-_ir)/s0+1)%gradients[gradient].type==0) {
-          wbox(toolbar,vga_width/big2,19,c0,a,10,s0-1,1); wbox(toolbar,vga_width/big2,19,c2,a,11,s0-1,6);
-          wput(toolbar,vga_width/big2,19,a+s1,11,32);
-          wbox(toolbar,vga_width/big2,19,c0,a-1,11,1,6); wbox(toolbar,vga_width/big2,19,c0,a+s0-1,11,1,6);
+        if (((a - _ir) / s0 + 1) % gradients[gradient].type == 0) {
+          wbox(toolbar, vga_width / big2, 19, c0, a, 10, s0 - 1, 1);
+          wbox(toolbar, vga_width / big2, 19, c2, a, 11, s0 - 1, 6);
+          wput(toolbar, vga_width / big2, 19, a + s1, 11, 32);
+          wbox(toolbar, vga_width / big2, 19, c0, a - 1, 11, 1, 6);
+          wbox(toolbar, vga_width / big2, 19, c0, a + s0 - 1, 11, 1, 6);
         }
-      } else if (a==_ir) {
-        wbox(toolbar,vga_width/big2,19,c0,a,10,s0-1,1); wbox(toolbar,vga_width/big2,19,c2,a,11,s0-1,6);
-        wput(toolbar,vga_width/big2,19,a+s1,11,32);
-        wbox(toolbar,vga_width/big2,19,c0,a-1,11,1,6); wbox(toolbar,vga_width/big2,19,c0,a+s0-1,11,1,6);
+      } else if (a == _ir) {
+        wbox(toolbar, vga_width / big2, 19, c0, a, 10, s0 - 1, 1);
+        wbox(toolbar, vga_width / big2, 19, c2, a, 11, s0 - 1, 6);
+        wput(toolbar, vga_width / big2, 19, a + s1, 11, 32);
+        wbox(toolbar, vga_width / big2, 19, c0, a - 1, 11, 1, 6);
+        wbox(toolbar, vga_width / big2, 19, c0, a + s0 - 1, 11, 1, 6);
       }
     }
   }
 
-  wbox(toolbar,vga_width/big2,19,color,80,2,7,8); // Color box, triggers select_color()
+  wbox(toolbar, vga_width / big2, 19, color, 80, 2, 7, 8); // Color box, triggers select_color()
 
-  if (textura_color==NULL || draw_mode==0) {
-    n=(memptrsize)c1*3; med=dac[n]+dac[n+1]+dac[n+2];
-    n=color*3;
-    if (dac[n]+dac[n+1]+dac[n+2]>med) n=color; else n=c1;
-    wrectangle(toolbar,vga_width/big2,19,n,80,2,7,8);
+  if (textura_color == NULL || draw_mode == 0) {
+    n = (memptrsize)c1 * 3;
+    med = dac[n] + dac[n + 1] + dac[n + 2];
+    n = color * 3;
+    if (dac[n] + dac[n + 1] + dac[n + 2] > med)
+      n = color;
+    else
+      n = c1;
+    wrectangle(toolbar, vga_width / big2, 19, n, 80, 2, 7, 8);
   } else {
-    ptr=toolbar+2*big2*vga_width+80*big2;
+    ptr = toolbar + 2 * big2 * vga_width + 80 * big2;
     if (big) {
-      for (y=0;y<16;y++) for (x=0;x<14;x++) {
-        ptr[x+y*vga_width]=get_color(x,y);
-      }
+      for (y = 0; y < 16; y++)
+        for (x = 0; x < 14; x++) {
+          ptr[x + y * vga_width] = get_color(x, y);
+        }
     } else {
-      for (y=0;y<8;y++) for (x=0;x<7;x++) {
-        ptr[x+y*vga_width]=get_color(x,y);
-      }
+      for (y = 0; y < 8; y++)
+        for (x = 0; x < 7; x++) {
+          ptr[x + y * vga_width] = get_color(x, y);
+        }
     }
   }
 
   // Texture color selection
 
-  wbox(toolbar,vga_width/big2,19,c2,80,2+9,7,6);
+  wbox(toolbar, vga_width / big2, 19, c2, 80, 2 + 9, 7, 6);
 
-  wbox(toolbar,vga_width/big2,19,c3,80+1,2+10,1,4); // 'U'
-  wbox(toolbar,vga_width/big2,19,c3,80+5,2+10,1,4);
-  wbox(toolbar,vga_width/big2,19,c3,80+1,2+13,5,1);
+  wbox(toolbar, vga_width / big2, 19, c3, 80 + 1, 2 + 10, 1, 4); // 'U'
+  wbox(toolbar, vga_width / big2, 19, c3, 80 + 5, 2 + 10, 1, 4);
+  wbox(toolbar, vga_width / big2, 19, c3, 80 + 1, 2 + 13, 5, 1);
 
   // Color 0 rectangle
 
-  wrectangle(toolbar,vga_width/big2,19,c1,88,2,7,8);
-  wbox(toolbar,vga_width/big2,19,0,88+1,2+1,5,6);
+  wrectangle(toolbar, vga_width / big2, 19, c1, 88, 2, 7, 8);
+  wbox(toolbar, vga_width / big2, 19, 0, 88 + 1, 2 + 1, 5, 6);
 
   // Brush selection
 
-  wbox(toolbar,vga_width/big2,19,c2,88,2+9,7,6);
+  wbox(toolbar, vga_width / big2, 19, c2, 88, 2 + 9, 7, 6);
 
-  wbox(toolbar,vga_width/big2,19,c3,88+1,2+10,5,1); // 'T'
-  wbox(toolbar,vga_width/big2,19,c3,88+3,2+10,1,4);
+  wbox(toolbar, vga_width / big2, 19, c3, 88 + 1, 2 + 10, 5, 1); // 'T'
+  wbox(toolbar, vga_width / big2, 19, c3, 88 + 3, 2 + 10, 1, 4);
 
-  screen_buffer=p;
-
+  screen_buffer = p;
 }
 
 //-----------------------------------------------------------------------------
 //      Draw the color gradient within the color selection window
 //-----------------------------------------------------------------------------
 
-void draw_ruler_selection(byte * p, int c, int d, int x, int y) {
-  int n,s0=4,s1=0,a;
+void draw_ruler_selection(byte *p, int c, int d, int x, int y) {
+  int n, s0 = 4, s1 = 0, a;
 
   switch (gradients[gradient].num_colors) {
-    case 8: s0=16; s1=5; break;
-    case 16: s0=8; s1=1; break;
-    case 32: s0=4; s1=-1; break;
+  case 8:
+    s0 = 16;
+    s1 = 5;
+    break;
+  case 16:
+    s0 = 8;
+    s1 = 1;
+    break;
+  case 32:
+    s0 = 4;
+    s1 = -1;
+    break;
   }
 
-  for (a=x;a<x+128;a+=s0) {
-    n=gradients[gradient].colors[(a-x)/s0+1];
-    wbox(p,c,d,n,a,y,s0-1,15);
-    wbox(p,c,d,c0,a+s0-1,y,1,15);
-    if (n==color) {
-      wbox(p,c,d,c4,a,y,s0-1,1);
-      wbox(p,c,d,c0,a,y+1,s0-1,1);
+  for (a = x; a < x + 128; a += s0) {
+    n = gradients[gradient].colors[(a - x) / s0 + 1];
+    wbox(p, c, d, n, a, y, s0 - 1, 15);
+    wbox(p, c, d, c0, a + s0 - 1, y, 1, 15);
+    if (n == color) {
+      wbox(p, c, d, c4, a, y, s0 - 1, 1);
+      wbox(p, c, d, c0, a, y + 1, s0 - 1, 1);
     }
     if (!gradients[gradient].fixed) {
       if (gradients[gradient].type) {
-        if (((a-x)/s0+1)%gradients[gradient].type==0) {
-          wbox(p,c,d,c0,a,y+8,s0-1,1);
-          wbox(p,c,d,c2,a,y+9,s0-1,6);
-          wput(p,c,d,a+s1,y+9,32);
-          wbox(p,c,d,c0,a-1,y+9,1,6);
-          wbox(p,c,d,c0,a+s0-1,y+9,1,6);
+        if (((a - x) / s0 + 1) % gradients[gradient].type == 0) {
+          wbox(p, c, d, c0, a, y + 8, s0 - 1, 1);
+          wbox(p, c, d, c2, a, y + 9, s0 - 1, 6);
+          wput(p, c, d, a + s1, y + 9, 32);
+          wbox(p, c, d, c0, a - 1, y + 9, 1, 6);
+          wbox(p, c, d, c0, a + s0 - 1, y + 9, 1, 6);
         }
-      } else if (a==x) {
-        wbox(p,c,d,c0,a,y+8,s0-1,1);
-        wbox(p,c,d,c2,a,y+9,s0-1,6);
-        wput(p,c,d,a+s1,y+9,32);
-        wbox(p,c,d,c0,a-1,y+9,1,6);
-        wbox(p,c,d,c0,a+s0-1,y+9,1,6);
+      } else if (a == x) {
+        wbox(p, c, d, c0, a, y + 8, s0 - 1, 1);
+        wbox(p, c, d, c2, a, y + 9, s0 - 1, 6);
+        wput(p, c, d, a + s1, y + 9, 32);
+        wbox(p, c, d, c0, a - 1, y + 9, 1, 6);
+        wbox(p, c, d, c0, a + s0 - 1, y + 9, 1, 6);
       }
     }
   }
 
-  wbox(p,c,d,c2,x+128,y,47,7);
-  switch(gradients[gradient].num_colors) {
-    case 8: wwrite(p,c,d,x+128+23,y,1,texts[310],c3); break;
-    case 16: wwrite(p,c,d,x+128+23,y,1,texts[311],c3); break;
-    case 32: wwrite(p,c,d,x+128+23,y,1,texts[312],c3); break;
+  wbox(p, c, d, c2, x + 128, y, 47, 7);
+  switch (gradients[gradient].num_colors) {
+  case 8:
+    wwrite(p, c, d, x + 128 + 23, y, 1, texts[310], c3);
+    break;
+  case 16:
+    wwrite(p, c, d, x + 128 + 23, y, 1, texts[311], c3);
+    break;
+  case 32:
+    wwrite(p, c, d, x + 128 + 23, y, 1, texts[312], c3);
+    break;
   }
 
-  wbox(p,c,d,c2,x+128+48,y,47,7);
-  switch(gradients[gradient].fixed) {
-    case 0: wwrite(p,c,d,x+128+71,y,1,texts[313],c3); break;
-    case 1: wwrite(p,c,d,x+128+71,y,1,texts[314],c3); break;
+  wbox(p, c, d, c2, x + 128 + 48, y, 47, 7);
+  switch (gradients[gradient].fixed) {
+  case 0:
+    wwrite(p, c, d, x + 128 + 71, y, 1, texts[313], c3);
+    break;
+  case 1:
+    wwrite(p, c, d, x + 128 + 71, y, 1, texts[314], c3);
+    break;
   }
 
-  wbox(p,c,d,c2,x+128,y+8,95,7);
-  switch(gradients[gradient].type) {
-    case 0: wwrite(p,c,d,x+128+48,y+8,1,texts[315],c3); break;
-    case 1: wwrite(p,c,d,x+128+48,y+8,1,texts[316],c3); break;
-    case 2: wwrite(p,c,d,x+128+48,y+8,1,texts[317],c3); break;
-    case 4: wwrite(p,c,d,x+128+48,y+8,1,texts[318],c3); break;
-    case 8: wwrite(p,c,d,x+128+48,y+8,1,texts[319],c3); break;
+  wbox(p, c, d, c2, x + 128, y + 8, 95, 7);
+  switch (gradients[gradient].type) {
+  case 0:
+    wwrite(p, c, d, x + 128 + 48, y + 8, 1, texts[315], c3);
+    break;
+  case 1:
+    wwrite(p, c, d, x + 128 + 48, y + 8, 1, texts[316], c3);
+    break;
+  case 2:
+    wwrite(p, c, d, x + 128 + 48, y + 8, 1, texts[317], c3);
+    break;
+  case 4:
+    wwrite(p, c, d, x + 128 + 48, y + 8, 1, texts[318], c3);
+    break;
+  case 8:
+    wwrite(p, c, d, x + 128 + 48, y + 8, 1, texts[319], c3);
+    break;
   }
-
 }
 
 //-----------------------------------------------------------------------------
 //      Help within the drawing editor
 //-----------------------------------------------------------------------------
 
-extern struct tprg * old_prg;
+extern struct tprg *old_prg;
 void help_paint(memptrsize);
 
 void draw_help(int n) {
-  int m=0;
+  int m = 0;
 
   if (!key(_L_SHIFT) && !key(_R_SHIFT) && key(_F1)) {
-
     // If there is a help window, remove it
 
-    if ((m=determine_help())>0) {
-      v.foreground=1; v.state=1; v.type=100;
-      move(0,m); call(v.close_handler);
-      if (v.click_handler==help2 && old_prg!=NULL) {
-        for (m=1;m<max_windows;m++) {
-          if (window[m].click_handler==program2) {
-            if (window[m].prg==old_prg && window[m].foreground<2) {
-              window[m].state=1;
-              wgra(window[m].ptr,window[m].an/big2,window[m].al/big2,c_b_low,2,2,window[m].an/big2-20,7);
-              if (text_len(window[m].title)+3>window[m].an/big2-20) {
-                wwrite_in_box(window[m].ptr,window[m].an/big2,window[m].an/big2-19,window[m].al/big2,4,2,0,window[m].title,c1);
-                wwrite_in_box(window[m].ptr,window[m].an/big2,window[m].an/big2-19,window[m].al/big2,3,2,0,window[m].title,c4);
+    if ((m = determine_help()) > 0) {
+      v.foreground = 1;
+      v.state = 1;
+      v.type = 100;
+      move(0, m);
+      call(v.close_handler);
+      if (v.click_handler == help2 && old_prg != NULL) {
+        for (m = 1; m < max_windows; m++) {
+          if (window[m].click_handler == program2) {
+            if (window[m].prg == old_prg && window[m].foreground < 2) {
+              window[m].state = 1;
+              wgra(window[m].ptr, window[m].an / big2, window[m].al / big2, c_b_low, 2, 2,
+                   window[m].an / big2 - 20, 7);
+              if (text_len(window[m].title) + 3 > window[m].an / big2 - 20) {
+                wwrite_in_box(window[m].ptr, window[m].an / big2, window[m].an / big2 - 19,
+                              window[m].al / big2, 4, 2, 0, window[m].title, c1);
+                wwrite_in_box(window[m].ptr, window[m].an / big2, window[m].an / big2 - 19,
+                              window[m].al / big2, 3, 2, 0, window[m].title, c4);
               } else {
-                wwrite(window[m].ptr,window[m].an/big2,window[m].al/big2,3+(window[m].an/big2-20)/2,2,1,window[m].title,c1);
-                wwrite(window[m].ptr,window[m].an/big2,window[m].al/big2,2+(window[m].an/big2-20)/2,2,1,window[m].title,c4);
-              } v.state=0; break;
+                wwrite(window[m].ptr, window[m].an / big2, window[m].al / big2,
+                       3 + (window[m].an / big2 - 20) / 2, 2, 1, window[m].title, c1);
+                wwrite(window[m].ptr, window[m].an / big2, window[m].al / big2,
+                       2 + (window[m].an / big2 - 20) / 2, 2, 1, window[m].title, c4);
+              }
+              v.state = 0;
+              break;
             }
           }
-        } old_prg=NULL;
-      } divdelete(0);
-      zoom_background=0; v.type=0; v.foreground=0; v.state=0;
-      highlight_background=0; zoom_map(); need_zoom=0;
+        }
+        old_prg = NULL;
+      }
+      divdelete(0);
+      zoom_background = 0;
+      v.type = 0;
+      v.foreground = 0;
+      v.state = 0;
+      highlight_background = 0;
+      zoom_map();
+      need_zoom = 0;
     }
 
     // Create a help dialog...
 
     help_paint(n);
-
   }
 }
 
@@ -3353,100 +5527,163 @@ void draw_help(int n) {
 //-----------------------------------------------------------------------------
 
 void zoom_map2(void) {
-  int an,al;
-  int n,m,c,x,y;
-  byte *p,*q=screen_buffer;
+  int an, al;
+  int n, m, c, x, y;
+  byte *p, *q = screen_buffer;
 
-  p=map+zoom_y*map_width+zoom_x;
+  p = map + zoom_y * map_width + zoom_x;
 
-  if ((map_width<<zoom)<vga_width) { // Copy of this chunk in select_zoom()
-    zoom_win_width=map_width<<zoom; zoom_win_x=(vga_width-zoom_win_width)/2; q+=zoom_win_x; an=map_width;
+  if ((map_width << zoom) < vga_width) { // Copy of this chunk in select_zoom()
+    zoom_win_width = map_width << zoom;
+    zoom_win_x = (vga_width - zoom_win_width) / 2;
+    q += zoom_win_x;
+    an = map_width;
   } else {
-    zoom_win_x=0; an=vga_width>>zoom; zoom_win_width=an<<zoom;
+    zoom_win_x = 0;
+    an = vga_width >> zoom;
+    zoom_win_width = an << zoom;
   }
 
-  if ((map_height<<zoom)<vga_height) {
-    zoom_win_height=map_height<<zoom; zoom_win_y=(vga_height-zoom_win_height)/2; q+=zoom_win_y*vga_width; al=map_height;
+  if ((map_height << zoom) < vga_height) {
+    zoom_win_height = map_height << zoom;
+    zoom_win_y = (vga_height - zoom_win_height) / 2;
+    q += zoom_win_y * vga_width;
+    al = map_height;
   } else {
-    zoom_win_y=0; al=vga_height>>zoom; zoom_win_height=al<<zoom;
+    zoom_win_y = 0;
+    al = vga_height >> zoom;
+    zoom_win_height = al << zoom;
   }
 
-  if (zoom_win_x || zoom_win_y) blit_partial(zoom_win_x,zoom_win_y,zoom_win_width,zoom_win_height); else full_redraw=1;
+  if (zoom_win_x || zoom_win_y)
+    blit_partial(zoom_win_x, zoom_win_y, zoom_win_width, zoom_win_height);
+  else
+    full_redraw = 1;
 
-  x=zoom_x; y=zoom_y;
+  x = zoom_x;
+  y = zoom_y;
 
   switch (zoom) {
   case 0:
-    m=al; do {
-      n=an; do {
-        *q++=*(ghost+*p*256+textura_color[(x+textura_x)%textura_an+((y+textura_y)%textura_al)*textura_an]);
-        x++; p++;
+    m = al;
+    do {
+      n = an;
+      do {
+        *q++ = *(ghost + *p * 256 +
+                 textura_color[(x + textura_x) % textura_an +
+                               ((y + textura_y) % textura_al) * textura_an]);
+        x++;
+        p++;
       } while (--n);
-      y++; x-=an; p+=map_width-an;
-      q+=vga_width-an;
+      y++;
+      x -= an;
+      p += map_width - an;
+      q += vga_width - an;
     } while (--m);
     break;
 
   case 1:
-    m=al; do {
-      n=an; do {
-        c=*(ghost+*p*256+textura_color[(x+textura_x)%textura_an+((y+textura_y)%textura_al)*textura_an]);
-        c+=c*256;
-        *(word*)q=c;
-        *(word*)(q+vga_width)=c;
-        q+=2;
-        x++; p++;
+    m = al;
+    do {
+      n = an;
+      do {
+        c = *(ghost + *p * 256 +
+              textura_color[(x + textura_x) % textura_an +
+                            ((y + textura_y) % textura_al) * textura_an]);
+        c += c * 256;
+        *(word *)q = c;
+        *(word *)(q + vga_width) = c;
+        q += 2;
+        x++;
+        p++;
       } while (--n);
-      y++; x-=an; p+=map_width-an;
-      q+=vga_width*2-an*2;
+      y++;
+      x -= an;
+      p += map_width - an;
+      q += vga_width * 2 - an * 2;
     } while (--m);
     break;
 
   case 2:
-    m=al; do {
-      n=an; do {
-        c=*(ghost+*p*256+textura_color[(x+textura_x)%textura_an+((y+textura_y)%textura_al)*textura_an]);
-        c+=c*256; c+=c*65536;
-        *(int*)q=c; q+=vga_width;
-        *(int*)q=c; q+=vga_width;
-        *(int*)q=c; q+=vga_width;
-        *(int*)q=c; q-=vga_width*3-4;
-        x++; p++;
+    m = al;
+    do {
+      n = an;
+      do {
+        c = *(ghost + *p * 256 +
+              textura_color[(x + textura_x) % textura_an +
+                            ((y + textura_y) % textura_al) * textura_an]);
+        c += c * 256;
+        c += c * 65536;
+        *(int *)q = c;
+        q += vga_width;
+        *(int *)q = c;
+        q += vga_width;
+        *(int *)q = c;
+        q += vga_width;
+        *(int *)q = c;
+        q -= vga_width * 3 - 4;
+        x++;
+        p++;
       } while (--n);
-      y++; x-=an; p+=map_width-an;
-      q+=vga_width*4-an*4;
+      y++;
+      x -= an;
+      p += map_width - an;
+      q += vga_width * 4 - an * 4;
     } while (--m);
     break;
 
   case 3:
-    m=al; do {
-      n=an; do {
-        c=*(ghost+*p*256+textura_color[(x+textura_x)%textura_an+((y+textura_y)%textura_al)*textura_an]);
-        c+=c*256; c+=c*65536;
-        *(int*)q=c; q+=4;
-        *(int*)q=c; q+=vga_width;
-        *(int*)q=c; q-=4;
-        *(int*)q=c; q+=vga_width;
-        *(int*)q=c; q+=4;
-        *(int*)q=c; q+=vga_width;
-        *(int*)q=c; q-=4;
-        *(int*)q=c; q+=vga_width;
-        *(int*)q=c; q+=4;
-        *(int*)q=c; q+=vga_width;
-        *(int*)q=c; q-=4;
-        *(int*)q=c; q+=vga_width;
-        *(int*)q=c; q+=4;
-        *(int*)q=c; q+=vga_width;
-        *(int*)q=c; q-=4;
-        *(int*)q=c; q-=vga_width*7-8;
-        x++; p++;
+    m = al;
+    do {
+      n = an;
+      do {
+        c = *(ghost + *p * 256 +
+              textura_color[(x + textura_x) % textura_an +
+                            ((y + textura_y) % textura_al) * textura_an]);
+        c += c * 256;
+        c += c * 65536;
+        *(int *)q = c;
+        q += 4;
+        *(int *)q = c;
+        q += vga_width;
+        *(int *)q = c;
+        q -= 4;
+        *(int *)q = c;
+        q += vga_width;
+        *(int *)q = c;
+        q += 4;
+        *(int *)q = c;
+        q += vga_width;
+        *(int *)q = c;
+        q -= 4;
+        *(int *)q = c;
+        q += vga_width;
+        *(int *)q = c;
+        q += 4;
+        *(int *)q = c;
+        q += vga_width;
+        *(int *)q = c;
+        q -= 4;
+        *(int *)q = c;
+        q += vga_width;
+        *(int *)q = c;
+        q += 4;
+        *(int *)q = c;
+        q += vga_width;
+        *(int *)q = c;
+        q -= 4;
+        *(int *)q = c;
+        q -= vga_width * 7 - 8;
+        x++;
+        p++;
       } while (--n);
-      y++; x-=an; p+=map_width-an;
-      q+=vga_width*8-an*8;
+      y++;
+      x -= an;
+      p += map_width - an;
+      q += vga_width * 8 - an * 8;
     } while (--m);
     break;
   }
-
 }
 
 
@@ -3457,216 +5694,309 @@ void zoom_map2(void) {
 int b_pulsada;
 
 void blit_edit(void) {
-  int mx,my;
+  int mx, my;
 
-  if (key(_X) && textura_color!=NULL) {
-    zoom_region(0,0,32768,32768);
+  if (key(_X) && textura_color != NULL) {
+    zoom_region(0, 0, 32768, 32768);
     zoom_map2();
     blit_mouse();
     do {
-      mx=mouse_x; my=mouse_y;
+      mx = mouse_x;
+      my = mouse_y;
       read_mouse();
-      if (mx!=mouse_x || my!=mouse_y) {
-        textura_x+=mx-mouse_x;
-        textura_y+=my-mouse_y;
-        if (textura_x<0) textura_x+=textura_an;
-        if (textura_y<0) textura_y+=textura_al;
-        zoom_region(0,0,32768,32768);
+      if (mx != mouse_x || my != mouse_y) {
+        textura_x += mx - mouse_x;
+        textura_y += my - mouse_y;
+        if (textura_x < 0)
+          textura_x += textura_an;
+        if (textura_y < 0)
+          textura_y += textura_al;
+        zoom_region(0, 0, 32768, 32768);
         zoom_map2();
         blit_mouse();
       }
     } while (key(_X));
-    zoom_region(0,0,32768,32768);
+    zoom_region(0, 0, 32768, 32768);
   }
 
   move_zoom();
   move_bar();
 
-  if (need_zoom==1) zoom_map();
-  else if (need_zoom==-1 && need_zoom_width>0 && need_zoom_height>0)
-    draw_edit_background(need_zoom_x,need_zoom_y,need_zoom_width,need_zoom_height);
-  need_zoom_width=0; need_zoom_height=0; need_zoom=0;
+  if (need_zoom == 1)
+    zoom_map();
+  else if (need_zoom == -1 && need_zoom_width > 0 && need_zoom_height > 0)
+    draw_edit_background(need_zoom_x, need_zoom_y, need_zoom_width, need_zoom_height);
+  need_zoom_width = 0;
+  need_zoom_height = 0;
+  need_zoom = 0;
 
   bar_coords();
 
-  if (mouse_in(toolbar_x+48,toolbar_y+2,toolbar_x+toolbar_width-2,toolbar_y+17)) {
-    selected_icon=(mouse_x-toolbar_x-48)/16;
-    if (bar[selected_icon]>1) {
-      wresalta_box(toolbar,vga_width/big2,19,48+selected_icon*16,2,15,15);
-    } else selected_icon=-1;
-  } else selected_icon=-1;
+  if (mouse_in(toolbar_x + 48, toolbar_y + 2, toolbar_x + toolbar_width - 2, toolbar_y + 17)) {
+    selected_icon = (mouse_x - toolbar_x - 48) / 16;
+    if (bar[selected_icon] > 1) {
+      wresalta_box(toolbar, vga_width / big2, 19, 48 + selected_icon * 16, 2, 15, 15);
+    } else
+      selected_icon = -1;
+  } else
+    selected_icon = -1;
 
   blit_mouse();
 
-  if (selected_icon>=0) put_bar(48+selected_icon*16,2,bar[selected_icon]);
+  if (selected_icon >= 0)
+    put_bar(48 + selected_icon * 16, 2, bar[selected_icon]);
 
   select_mode();
 
-  if (scan_code==_TAB) {
-    if (!_tab) { _tab=1;
-      if (key(_L_SHIFT) || key(_R_SHIFT)) change_map(0);
-      else change_map(1);
+  if (scan_code == _TAB) {
+    if (!_tab) {
+      _tab = 1;
+      if (key(_L_SHIFT) || key(_R_SHIFT))
+        change_map(0);
+      else
+        change_map(1);
     }
-  } else _tab=0;
+  } else
+    _tab = 0;
 
-  if (key(_B) && !(barra_texto && sel_status==1)) {
+  if (key(_B) && !(barra_texto && sel_status == 1)) {
     if (!b_pulsada) {
-      b_pulsada=1;
-      highlight_background^=1;
-      dac[0]=(dac[0]+32)%64;
-      dac[1]=(dac[1]+32)%64;
-      dac[2]=(dac[2]+32)%64;
+      b_pulsada = 1;
+      highlight_background ^= 1;
+      dac[0] = (dac[0] + 32) % 64;
+      dac[1] = (dac[1] + 32) % 64;
+      dac[2] = (dac[2] + 32) % 64;
       set_dac(dac);
     }
-  } else b_pulsada=0;
-
+  } else
+    b_pulsada = 0;
 }
 
 //-----------------------------------------------------------------------------
 //      Select another toolbar, from the edit screen
 //-----------------------------------------------------------------------------
 
-int iconos_mode[]={14,2,177,160,161,178,162,179,163,164,180,165,131,100,191,190};
+int iconos_mode[] = {14, 2, 177, 160, 161, 178, 162, 179, 163, 164, 180, 165, 131, 100, 191, 190};
 
 void select_mode(void) {
   int r;
 
   if (!key(_L_SHIFT) && !key(_R_SHIFT)) {
-    if (key(_F2)) { draw_mode=101; return; }
-    if (key(_F3)) { draw_mode=102; return; }
-    if (key(_F4)) { draw_mode=103; return; }
-    if (key(_F5)) { draw_mode=104; return; }
-    if (key(_F6)) { draw_mode=105; return; }
-    if (key(_F7)) { draw_mode=106; return; }
-    if (key(_F8)) { draw_mode=107; return; }
-    if (key(_F9)) { draw_mode=108; return; }
-    if (key(_F10)) { draw_mode=109; return; }
-    if (key(_F11)) { draw_mode=110; return; }
-    if (key(_F12)) { draw_mode=111; return; }
+    if (key(_F2)) {
+      draw_mode = 101;
+      return;
+    }
+    if (key(_F3)) {
+      draw_mode = 102;
+      return;
+    }
+    if (key(_F4)) {
+      draw_mode = 103;
+      return;
+    }
+    if (key(_F5)) {
+      draw_mode = 104;
+      return;
+    }
+    if (key(_F6)) {
+      draw_mode = 105;
+      return;
+    }
+    if (key(_F7)) {
+      draw_mode = 106;
+      return;
+    }
+    if (key(_F8)) {
+      draw_mode = 107;
+      return;
+    }
+    if (key(_F9)) {
+      draw_mode = 108;
+      return;
+    }
+    if (key(_F10)) {
+      draw_mode = 109;
+      return;
+    }
+    if (key(_F11)) {
+      draw_mode = 110;
+      return;
+    }
+    if (key(_F12)) {
+      draw_mode = 111;
+      return;
+    }
   } else {
-    if (key(_F1)) { draw_mode=112; return; }
-    if (key(_F2)) { draw_mode=113; return; }
-    if (key(_F3)) { draw_mode=100; return; }
+    if (key(_F1)) {
+      draw_mode = 112;
+      return;
+    }
+    if (key(_F2)) {
+      draw_mode = 113;
+      return;
+    }
+    if (key(_F3)) {
+      draw_mode = 100;
+      return;
+    }
   }
 
-  if (mode_selection==-1) iconos_mode[12]=131;
-  else if (mode_selection<4) iconos_mode[12]=131+mode_selection;
-  else iconos_mode[12]=mode_selection+167-4;
-  r=select_icon(toolbar_x+10,iconos_mode);
-  if (r>=0) draw_mode=r+100;
+  if (mode_selection == -1)
+    iconos_mode[12] = 131;
+  else if (mode_selection < 4)
+    iconos_mode[12] = 131 + mode_selection;
+  else
+    iconos_mode[12] = mode_selection + 167 - 4;
+  r = select_icon(toolbar_x + 10, iconos_mode);
+  if (r >= 0)
+    draw_mode = r + 100;
 }
 
 //-----------------------------------------------------------------------------
 //      FX selection, from an editing toolbar
 //-----------------------------------------------------------------------------
 
-void select_fx(int n,int * efecto) {
+void select_fx(int n, int *efecto) {
+  int icono_x = toolbar_x + 48 + n * 16;
+  int a, b, c, d;
+  int ix, iy, wait = 0;
+  byte *p;
 
-  int icono_x=toolbar_x+48+n*16;
-  int a,b,c,d;
-  int ix,iy,wait=0;
-  byte * p;
-
-  if (mouse_in(icono_x,toolbar_y+2,icono_x+15,toolbar_y+17) && (mouse_b&1)) {
-
-    c=88*big2; d=27*big2;
-    if ((p=(byte*)malloc(c*d))==NULL) {
-     v_text=(char *)texts[45]; show_dialog(err0); return; }
+  if (mouse_in(icono_x, toolbar_y + 2, icono_x + 15, toolbar_y + 17) && (mouse_b & 1)) {
+    c = 88 * big2;
+    d = 27 * big2;
+    if ((p = (byte *)malloc(c * d)) == NULL) {
+      v_text = (char *)texts[45];
+      show_dialog(err0);
+      return;
+    }
 
     flush_bars(0);
 
-    a=toolbar_x+(icono_x-toolbar_x)*big2-(c-16*big2)/2;
-    if (toolbar_y>vga_height/2-9*big2) b=toolbar_y-d-1; else b=toolbar_y+19*big2+1;
-    if (a<toolbar_x) a=toolbar_x;
-    if (a+c>toolbar_x+toolbar_width*big2) a=toolbar_x+toolbar_width*big2-c;
-    adjust_box(&a,&b,&c,&d); c/=big2; d/=big2;
-    do {read_mouse();} while (mouse_b&1);
+    a = toolbar_x + (icono_x - toolbar_x) * big2 - (c - 16 * big2) / 2;
+    if (toolbar_y > vga_height / 2 - 9 * big2)
+      b = toolbar_y - d - 1;
+    else
+      b = toolbar_y + 19 * big2 + 1;
+    if (a < toolbar_x)
+      a = toolbar_x;
+    if (a + c > toolbar_x + toolbar_width * big2)
+      a = toolbar_x + toolbar_width * big2 - c;
+    adjust_box(&a, &b, &c, &d);
+    c /= big2;
+    d /= big2;
+    do {
+      read_mouse();
+    } while (mouse_b & 1);
 
     do {
-      read_mouse(); test_mouse_box(a,b,c,d); wait=0;
+      read_mouse();
+      test_mouse_box(a, b, c, d);
+      wait = 0;
 
-      wrectangle(p,c,d,c2,0,0,c,d);
-      wbox(p,c,d,c0,1,1,c-2,d-2);
-      wgra(p,c,d,c_b_low,2,2,c-12,7);
-      wput(p,c,d,c-9,2,35);
+      wrectangle(p, c, d, c2, 0, 0, c, d);
+      wbox(p, c, d, c0, 1, 1, c - 2, d - 2);
+      wgra(p, c, d, c_b_low, 2, 2, c - 12, 7);
+      wput(p, c, d, c - 9, 2, 35);
 
-      wput(p,c,d,2,10,33);
-      wbox(p,c,d,c1,12,19,64,4);
-      wbox(p,c,d,c4,12,19,*efecto*4,4);
+      wput(p, c, d, 2, 10, 33);
+      wbox(p, c, d, c1, 12, 19, 64, 4);
+      wbox(p, c, d, c4, 12, 19, *efecto * 4, 4);
 
-      if (mouse_in(a+2,b+18,a+9,b+25)) {
-        mouse_graf=4;
-        if (mouse_b&1) {
-          wput(p,c,d,2,18,-47); wait=1;
-          if (*efecto>1) (*efecto)--;
+      if (mouse_in(a + 2, b + 18, a + 9, b + 25)) {
+        mouse_graf = 4;
+        if (mouse_b & 1) {
+          wput(p, c, d, 2, 18, -47);
+          wait = 1;
+          if (*efecto > 1)
+            (*efecto)--;
         }
-      } else if (mouse_in(a+79,b+18,a+86,b+25)) {
-        mouse_graf=6;
-        if (mouse_b&1) {
-          wput(p,c,d,79,18,-48); wait=1;
-          if (*efecto<16) (*efecto)++;
+      } else if (mouse_in(a + 79, b + 18, a + 86, b + 25)) {
+        mouse_graf = 6;
+        if (mouse_b & 1) {
+          wput(p, c, d, 79, 18, -48);
+          wait = 1;
+          if (*efecto < 16)
+            (*efecto)++;
         }
-      } else if (mouse_in(a+2,b+10,a+86,b+25)) {
-        if (mouse_x<a+12) ix=12;
-        else if (mouse_x>a+72) ix=72;
-        else ix=mouse_x-a;
-        iy=(ix-8)/4; ix=11+iy*4;
-        wbox(p,c,d,c4,ix,18,1,1);
-        wbox(p,c,d,c4,ix,23,1,1);
-        if (mouse_b&1) { *efecto=iy; wait=2; }
-      } else if (mouse_in(a+2,b+2,a+c-10,b+9)) {
-        ix=mouse_shift_x-a; iy=mouse_shift_y-b;
-        wrectangle(p,c,d,c4,0,0,c,d);
-        while (mouse_b&1) {
-          save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,0);
-          put(mouse_shift_x,mouse_shift_y,mouse_graf);
+      } else if (mouse_in(a + 2, b + 10, a + 86, b + 25)) {
+        if (mouse_x < a + 12)
+          ix = 12;
+        else if (mouse_x > a + 72)
+          ix = 72;
+        else
+          ix = mouse_x - a;
+        iy = (ix - 8) / 4;
+        ix = 11 + iy * 4;
+        wbox(p, c, d, c4, ix, 18, 1, 1);
+        wbox(p, c, d, c4, ix, 23, 1, 1);
+        if (mouse_b & 1) {
+          *efecto = iy;
+          wait = 2;
+        }
+      } else if (mouse_in(a + 2, b + 2, a + c - 10, b + 9)) {
+        ix = mouse_shift_x - a;
+        iy = mouse_shift_y - b;
+        wrectangle(p, c, d, c4, 0, 0, c, d);
+        while (mouse_b & 1) {
+          save_mouse_bg(mouse_background, mouse_shift_x, mouse_shift_y, mouse_graf, 0);
+          put(mouse_shift_x, mouse_shift_y, mouse_graf);
           blit_screen(screen_buffer);
-          save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,1);
-      	  draw_edit_background(a,b,c*big2,d*big2);
+          save_mouse_bg(mouse_background, mouse_shift_x, mouse_shift_y, mouse_graf, 1);
+          draw_edit_background(a, b, c * big2, d * big2);
           flush_bars(0);
           read_mouse();
-          a=mouse_shift_x-ix; b=mouse_shift_y-iy;
-          wvolcado(screen_buffer,vga_width,vga_height,p,a,b,c*big2,d*big2,0);
-          blit_partial(a,b,c*big2,d*big2);
-        } wrectangle(p,c,d,c2,0,0,c,d);
+          a = mouse_shift_x - ix;
+          b = mouse_shift_y - iy;
+          wvolcado(screen_buffer, vga_width, vga_height, p, a, b, c * big2, d * big2, 0);
+          blit_partial(a, b, c * big2, d * big2);
+        }
+        wrectangle(p, c, d, c2, 0, 0, c, d);
       }
 
       if (wait) {
-        wbox(p,c,d,c1,12,19,64,4);
-        wbox(p,c,d,c4,12,19,*efecto*4,4);
+        wbox(p, c, d, c1, 12, 19, 64, 4);
+        wbox(p, c, d, c4, 12, 19, *efecto * 4, 4);
       }
 
-      wvolcado(screen_buffer,vga_width,vga_height,p,a,b,c*big2,d*big2,0);
-      blit_partial(a,b,c*big2,d*big2);
+      wvolcado(screen_buffer, vga_width, vga_height, p, a, b, c * big2, d * big2, 0);
+      blit_partial(a, b, c * big2, d * big2);
 
-      save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,0);
-      put(mouse_shift_x,mouse_shift_y,mouse_graf);
+      save_mouse_bg(mouse_background, mouse_shift_x, mouse_shift_y, mouse_graf, 0);
+      put(mouse_shift_x, mouse_shift_y, mouse_graf);
       blit_screen(screen_buffer);
-      save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,1);
+      save_mouse_bg(mouse_background, mouse_shift_x, mouse_shift_y, mouse_graf, 1);
 
-      if (wait==1) {
-        wput(p,c,d,2,18,-37); wput(p,c,d,79,18,-38);
-        do { read_mouse(); } while (mouse_b&1);
+      if (wait == 1) {
+        wput(p, c, d, 2, 18, -37);
+        wput(p, c, d, 79, 18, -38);
+        do {
+          read_mouse();
+        } while (mouse_b & 1);
       }
 
     } while ((!mouse_b || wait) && !key(_ESC));
 
-    if (!mouse_in(toolbar_x,toolbar_y,toolbar_x+toolbar_width-1,toolbar_y+18) || !(mouse_b&1)
-        || mouse_in(icono_x,toolbar_y+2,icono_x+15,toolbar_y+17)) {
-      wput(p,c,d,c-9,2,-45);
-      wvolcado(screen_buffer,vga_width,vga_height,p,a,b,c*big2,d*big2,0);
-      blit_partial(a,b,c*big2,d*big2);
-      save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,0);
-      put(mouse_shift_x,mouse_shift_y,mouse_graf); blit_screen(screen_buffer);
-      save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,1);
-      do { read_mouse(); } while (mouse_b || key(_ESC));
+    if (!mouse_in(toolbar_x, toolbar_y, toolbar_x + toolbar_width - 1, toolbar_y + 18) ||
+        !(mouse_b & 1) || mouse_in(icono_x, toolbar_y + 2, icono_x + 15, toolbar_y + 17)) {
+      wput(p, c, d, c - 9, 2, -45);
+      wvolcado(screen_buffer, vga_width, vga_height, p, a, b, c * big2, d * big2, 0);
+      blit_partial(a, b, c * big2, d * big2);
+      save_mouse_bg(mouse_background, mouse_shift_x, mouse_shift_y, mouse_graf, 0);
+      put(mouse_shift_x, mouse_shift_y, mouse_graf);
+      blit_screen(screen_buffer);
+      save_mouse_bg(mouse_background, mouse_shift_x, mouse_shift_y, mouse_graf, 1);
+      do {
+        read_mouse();
+      } while (mouse_b || key(_ESC));
     }
 
-    draw_edit_background(a,b,c*big2,d*big2);
+    draw_edit_background(a, b, c * big2, d * big2);
     flush_bars(0);
-    save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,0);
-    put(mouse_shift_x,mouse_shift_y,mouse_graf); blit_screen(screen_buffer);
-    save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,1);
+    save_mouse_bg(mouse_background, mouse_shift_x, mouse_shift_y, mouse_graf, 0);
+    put(mouse_shift_x, mouse_shift_y, mouse_graf);
+    blit_screen(screen_buffer);
+    save_mouse_bg(mouse_background, mouse_shift_x, mouse_shift_y, mouse_graf, 1);
     free(p);
   }
 }
@@ -3677,148 +6007,186 @@ void select_fx(int n,int * efecto) {
 
 void select_fill(int n) {
   int r;
-  r=select_icon(toolbar_x+48+n*16,iconos_fill);
-  if (r>=0) { mode_fill=r; bar[n]=iconos_fill[2+mode_fill]; put_bar(48+n*16,2,bar[n]); }
-
+  r = select_icon(toolbar_x + 48 + n * 16, iconos_fill);
+  if (r >= 0) {
+    mode_fill = r;
+    bar[n] = iconos_fill[2 + mode_fill];
+    put_bar(48 + n * 16, 2, bar[n]);
+  }
 }
 
 //-----------------------------------------------------------------------------
 //      Block selection algorithm, from an editing toolbar
 //-----------------------------------------------------------------------------
 
-int iconos_box[]={6,1,135,136,137,138,169,170};
+int iconos_box[] = {6, 1, 135, 136, 137, 138, 169, 170};
 
 void select_box(int n) {
   int r;
-  r=select_icon(toolbar_x+48+n*16,iconos_box);
-  if (r>=0) { mode_selection=r; block_bar(0); }
+  r = select_icon(toolbar_x + 48 + n * 16, iconos_box);
+  if (r >= 0) {
+    mode_selection = r;
+    block_bar(0);
+  }
 }
 
 //-----------------------------------------------------------------------------
 //      Select from any icon list, in an editing toolbar
 //-----------------------------------------------------------------------------
 
-int select_icon(int icono_x,int * iconos) {
+int select_icon(int icono_x, int *iconos) {
+  int a, b, c, d;
+  int num, col, fil;
+  int r = -1, ix, iy;
+  byte *p;
 
-  int a,b,c,d;
-  int num,col,fil;
-  int r=-1,ix,iy;
-  byte * p;
-
-  if (mouse_in(icono_x,toolbar_y+2,icono_x+15,toolbar_y+17) && (mouse_b&1)) {
-
-    num=*iconos++; col=*iconos++; fil=(num+col-1)/col;
-    c=(col*16+3)*big2; d=(fil*16+11)*big2;
-    if ((p=(byte*)malloc(c*d))==NULL) {
-      v_text=(char *)texts[45]; show_dialog(err0); return(-1); }
+  if (mouse_in(icono_x, toolbar_y + 2, icono_x + 15, toolbar_y + 17) && (mouse_b & 1)) {
+    num = *iconos++;
+    col = *iconos++;
+    fil = (num + col - 1) / col;
+    c = (col * 16 + 3) * big2;
+    d = (fil * 16 + 11) * big2;
+    if ((p = (byte *)malloc(c * d)) == NULL) {
+      v_text = (char *)texts[45];
+      show_dialog(err0);
+      return (-1);
+    }
 
     flush_bars(0);
 
-    a=toolbar_x+(icono_x-toolbar_x)*big2-(col-1)*8*big2-2*big2;
-    if (toolbar_y>vga_height/2-9*big2) b=toolbar_y-d-1; else b=toolbar_y+19*big2+1;
-    if (a<toolbar_x) a=toolbar_x;
-    if (a+c>toolbar_x+toolbar_width*big2) a=toolbar_x+toolbar_width*big2-c;
-    adjust_box(&a,&b,&c,&d); c/=big2; d/=big2;
-    do {read_mouse();} while (mouse_b&1);
+    a = toolbar_x + (icono_x - toolbar_x) * big2 - (col - 1) * 8 * big2 - 2 * big2;
+    if (toolbar_y > vga_height / 2 - 9 * big2)
+      b = toolbar_y - d - 1;
+    else
+      b = toolbar_y + 19 * big2 + 1;
+    if (a < toolbar_x)
+      a = toolbar_x;
+    if (a + c > toolbar_x + toolbar_width * big2)
+      a = toolbar_x + toolbar_width * big2 - c;
+    adjust_box(&a, &b, &c, &d);
+    c /= big2;
+    d /= big2;
+    do {
+      read_mouse();
+    } while (mouse_b & 1);
 
     do {
-      read_mouse(); test_mouse_box(a,b,c,d);
+      read_mouse();
+      test_mouse_box(a, b, c, d);
 
-      wrectangle(p,c,d,c2,0,0,c,d);
-      wbox(p,c,d,c0,1,1,c-2,d-2);
-      wgra(p,c,d,c_b_low,2,2,c-12,7);
-      wput(p,c,d,c-9,2,35);
+      wrectangle(p, c, d, c2, 0, 0, c, d);
+      wbox(p, c, d, c0, 1, 1, c - 2, d - 2);
+      wgra(p, c, d, c_b_low, 2, 2, c - 12, 7);
+      wput(p, c, d, c - 9, 2, 35);
 
-      r=0; while (r<num) {
-        wput(p,c,d,2+(r%col)*16,10+(r/col)*16,*iconos++); r++;
-      } iconos-=num;
+      r = 0;
+      while (r < num) {
+        wput(p, c, d, 2 + (r % col) * 16, 10 + (r / col) * 16, *iconos++);
+        r++;
+      }
+      iconos -= num;
 
-      if (mouse_in(a+2,b+10,a+c-2,b+d-2)) {
-        r=((mouse_y-b-10)/16)*col+(mouse_x-a-2)/16;
-        ix=2+(r%col)*16; iy=10+(r/col)*16;
-        wresalta_box(p,c,d,ix,iy,15,15);
-      } else if (mouse_in(a+2,b+2,a+c-10,b+9)) {
-        ix=mouse_shift_x-a; iy=mouse_shift_y-b;
-        wrectangle(p,c,d,c4,0,0,c,d);
-        while (mouse_b&1) {
-          save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,0);
-          put(mouse_shift_x,mouse_shift_y,mouse_graf);
+      if (mouse_in(a + 2, b + 10, a + c - 2, b + d - 2)) {
+        r = ((mouse_y - b - 10) / 16) * col + (mouse_x - a - 2) / 16;
+        ix = 2 + (r % col) * 16;
+        iy = 10 + (r / col) * 16;
+        wresalta_box(p, c, d, ix, iy, 15, 15);
+      } else if (mouse_in(a + 2, b + 2, a + c - 10, b + 9)) {
+        ix = mouse_shift_x - a;
+        iy = mouse_shift_y - b;
+        wrectangle(p, c, d, c4, 0, 0, c, d);
+        while (mouse_b & 1) {
+          save_mouse_bg(mouse_background, mouse_shift_x, mouse_shift_y, mouse_graf, 0);
+          put(mouse_shift_x, mouse_shift_y, mouse_graf);
           blit_screen(screen_buffer);
-          save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,1);
-      	  draw_edit_background(a,b,c*big2,d*big2);
+          save_mouse_bg(mouse_background, mouse_shift_x, mouse_shift_y, mouse_graf, 1);
+          draw_edit_background(a, b, c * big2, d * big2);
           flush_bars(0);
           read_mouse();
-          a=mouse_shift_x-ix; b=mouse_shift_y-iy;
-          wvolcado(screen_buffer,vga_width,vga_height,p,a,b,c*big2,d*big2,0);
-          blit_partial(a,b,c*big2,d*big2);
-        } wrectangle(p,c,d,c2,0,0,c,d);
+          a = mouse_shift_x - ix;
+          b = mouse_shift_y - iy;
+          wvolcado(screen_buffer, vga_width, vga_height, p, a, b, c * big2, d * big2, 0);
+          blit_partial(a, b, c * big2, d * big2);
+        }
+        wrectangle(p, c, d, c2, 0, 0, c, d);
       }
 
-      wvolcado(screen_buffer,vga_width,vga_height,p,a,b,c*big2,d*big2,0);
-      blit_partial(a,b,c*big2,d*big2);
+      wvolcado(screen_buffer, vga_width, vga_height, p, a, b, c * big2, d * big2, 0);
+      blit_partial(a, b, c * big2, d * big2);
 
-      save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,0);
-      put(mouse_shift_x,mouse_shift_y,mouse_graf);
+      save_mouse_bg(mouse_background, mouse_shift_x, mouse_shift_y, mouse_graf, 0);
+      put(mouse_shift_x, mouse_shift_y, mouse_graf);
       blit_screen(screen_buffer);
-      save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,1);
+      save_mouse_bg(mouse_background, mouse_shift_x, mouse_shift_y, mouse_graf, 1);
 
     } while (!mouse_b && !key(_ESC));
 
-    if ((mouse_b&1) && mouse_in(a+2,b+10,a+c-2,b+d-2)) {
-      r=((mouse_y-b-10)/16)*col+(mouse_x-a-2)/16;
-    } else r=-1;
+    if ((mouse_b & 1) && mouse_in(a + 2, b + 10, a + c - 2, b + d - 2)) {
+      r = ((mouse_y - b - 10) / 16) * col + (mouse_x - a - 2) / 16;
+    } else
+      r = -1;
 
-    if (!mouse_in(toolbar_x,toolbar_y,toolbar_x+toolbar_width-1,toolbar_y+18) || !(mouse_b&1)
-        || mouse_in(icono_x,toolbar_y+2,icono_x+15,toolbar_y+17)) {
-      wput(p,c,d,c-9,2,-45);
-      wvolcado(screen_buffer,vga_width,vga_height,p,a,b,c*big2,d*big2,0);
-      blit_partial(a,b,c*big2,d*big2);
-      save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,0);
-      put(mouse_shift_x,mouse_shift_y,mouse_graf); blit_screen(screen_buffer);
-      save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,1);
-      do { read_mouse(); } while (mouse_b || key(_ESC));
+    if (!mouse_in(toolbar_x, toolbar_y, toolbar_x + toolbar_width - 1, toolbar_y + 18) ||
+        !(mouse_b & 1) || mouse_in(icono_x, toolbar_y + 2, icono_x + 15, toolbar_y + 17)) {
+      wput(p, c, d, c - 9, 2, -45);
+      wvolcado(screen_buffer, vga_width, vga_height, p, a, b, c * big2, d * big2, 0);
+      blit_partial(a, b, c * big2, d * big2);
+      save_mouse_bg(mouse_background, mouse_shift_x, mouse_shift_y, mouse_graf, 0);
+      put(mouse_shift_x, mouse_shift_y, mouse_graf);
+      blit_screen(screen_buffer);
+      save_mouse_bg(mouse_background, mouse_shift_x, mouse_shift_y, mouse_graf, 1);
+      do {
+        read_mouse();
+      } while (mouse_b || key(_ESC));
     }
 
-    draw_edit_background(a,b,c*big2,d*big2);
+    draw_edit_background(a, b, c * big2, d * big2);
     flush_bars(0);
-    save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,0);
-    put(mouse_shift_x,mouse_shift_y,mouse_graf); blit_screen(screen_buffer);
-    save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,1);
+    save_mouse_bg(mouse_background, mouse_shift_x, mouse_shift_y, mouse_graf, 0);
+    put(mouse_shift_x, mouse_shift_y, mouse_graf);
+    blit_screen(screen_buffer);
+    save_mouse_bg(mouse_background, mouse_shift_x, mouse_shift_y, mouse_graf, 1);
 
     free(p);
-  } return(r);
-
+  }
+  return (r);
 }
 
 //-----------------------------------------------------------------------------
 //      Blit the screen (and toolbar), positioning the mouse if mouse_graf>=10
 //-----------------------------------------------------------------------------
 
-void blit_mouse() { blit_mouse_a(); blit_mouse_b(); }
+void blit_mouse() {
+  blit_mouse_a();
+  blit_mouse_b();
+}
 
 void blit_mouse_a(void) {
-  int moux,mouy;
-  moux=zoom_win_x+((mouse_x-zoom_win_x)&(-(1<<zoom)));
-  mouy=zoom_win_y+((mouse_y-zoom_win_y)&(-(1<<zoom)));
-  if (mouse_graf<10) {
+  int moux, mouy;
+  moux = zoom_win_x + ((mouse_x - zoom_win_x) & (-(1 << zoom)));
+  mouy = zoom_win_y + ((mouse_y - zoom_win_y) & (-(1 << zoom)));
+  if (mouse_graf < 10) {
     flush_bars(0);
   } else {
-    save_mouse_bg(mouse_background,moux,mouy,mouse_graf,0);
-    put_bw(moux,mouy,mouse_graf);
+    save_mouse_bg(mouse_background, moux, mouy, mouse_graf, 0);
+    put_bw(moux, mouy, mouse_graf);
     flush_bars(0);
   }
 }
 
 void blit_mouse_b(void) {
-  int moux,mouy;
-  moux=zoom_win_x+((mouse_x-zoom_win_x)&(-(1<<zoom)));
-  mouy=zoom_win_y+((mouse_y-zoom_win_y)&(-(1<<zoom)));
-  if (mouse_graf<10) {
-    save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,0);
-    put(mouse_shift_x,mouse_shift_y,mouse_graf);
-  } blit_screen(screen_buffer);
-  if (mouse_graf<10) save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,1);
-  else save_mouse_bg(mouse_background,moux,mouy,mouse_graf,1);
+  int moux, mouy;
+  moux = zoom_win_x + ((mouse_x - zoom_win_x) & (-(1 << zoom)));
+  mouy = zoom_win_y + ((mouse_y - zoom_win_y) & (-(1 << zoom)));
+  if (mouse_graf < 10) {
+    save_mouse_bg(mouse_background, mouse_shift_x, mouse_shift_y, mouse_graf, 0);
+    put(mouse_shift_x, mouse_shift_y, mouse_graf);
+  }
+  blit_screen(screen_buffer);
+  if (mouse_graf < 10)
+    save_mouse_bg(mouse_background, mouse_shift_x, mouse_shift_y, mouse_graf, 1);
+  else
+    save_mouse_bg(mouse_background, moux, mouy, mouse_graf, 1);
 }
 
 //-----------------------------------------------------------------------------
@@ -3826,142 +6194,184 @@ void blit_mouse_b(void) {
 //-----------------------------------------------------------------------------
 
 void select_mask(int n) {
-  int x,y,col,oldcol,ix,iy;
-  int a,b,c,d,i;
+  int x, y, col, oldcol, ix, iy;
+  int a, b, c, d, i;
   int salir;
-  byte * p;
+  byte *p;
 
-  if ((key(_M)&&hotkey) || (mouse_in(toolbar_x+48+n*16,toolbar_y+2,toolbar_x+55+n*16,toolbar_y+17) && (mouse_b&2))) {
-    c=(128+3)*big2; d=(128+11+8)*big2; a=toolbar_x;
-    if (toolbar_y>vga_height/2-8) b=toolbar_y-d-1; else b=toolbar_y+19*big2+1;
-    if ((p=(byte*)malloc(c*d))==NULL) {
-      v_text=(char *)texts[45]; show_dialog(err0); return; }
+  if ((key(_M) && hotkey) ||
+      (mouse_in(toolbar_x + 48 + n * 16, toolbar_y + 2, toolbar_x + 55 + n * 16, toolbar_y + 17) &&
+       (mouse_b & 2))) {
+    c = (128 + 3) * big2;
+    d = (128 + 11 + 8) * big2;
+    a = toolbar_x;
+    if (toolbar_y > vga_height / 2 - 8)
+      b = toolbar_y - d - 1;
+    else
+      b = toolbar_y + 19 * big2 + 1;
+    if ((p = (byte *)malloc(c * d)) == NULL) {
+      v_text = (char *)texts[45];
+      show_dialog(err0);
+      return;
+    }
 
-    adjust_box(&a,&b,&c,&d); c/=big2; d/=big2;
-    do { read_mouse(); } while (mouse_b || key(_M));
+    adjust_box(&a, &b, &c, &d);
+    c /= big2;
+    d /= big2;
+    do {
+      read_mouse();
+    } while (mouse_b || key(_M));
 
-    salir=0; col=color;
+    salir = 0;
+    col = color;
 
     do {
-      read_mouse(); test_mouse_box2(a,b,c,d);
+      read_mouse();
+      test_mouse_box2(a, b, c, d);
 
-      oldcol=col;
-      col=color;
+      oldcol = col;
+      col = color;
 
       // Move the window
 
-      if (mouse_in(a+2,b+2,a+c-10,b+9)) {
-        ix=mouse_shift_x-a; iy=mouse_shift_y-b;
-        if (mouse_b&1) {
-          wrectangle(p,c,d,c4,0,0,c,d);
-          while (mouse_b&1) {
-            read_mouse(); a=mouse_shift_x-ix; b=mouse_shift_y-iy;
-            wvolcado(screen_buffer,vga_width,vga_height,p,a,b,c*big2,d*big2,0);
-            blit_partial(a,b,c*big2,d*big2);
-            save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,0);
-            put(mouse_shift_x,mouse_shift_y,mouse_graf); blit_screen(screen_buffer);
-            save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,1);
-            draw_edit_background(a,b,c*big2,d*big2);
+      if (mouse_in(a + 2, b + 2, a + c - 10, b + 9)) {
+        ix = mouse_shift_x - a;
+        iy = mouse_shift_y - b;
+        if (mouse_b & 1) {
+          wrectangle(p, c, d, c4, 0, 0, c, d);
+          while (mouse_b & 1) {
+            read_mouse();
+            a = mouse_shift_x - ix;
+            b = mouse_shift_y - iy;
+            wvolcado(screen_buffer, vga_width, vga_height, p, a, b, c * big2, d * big2, 0);
+            blit_partial(a, b, c * big2, d * big2);
+            save_mouse_bg(mouse_background, mouse_shift_x, mouse_shift_y, mouse_graf, 0);
+            put(mouse_shift_x, mouse_shift_y, mouse_graf);
+            blit_screen(screen_buffer);
+            save_mouse_bg(mouse_background, mouse_shift_x, mouse_shift_y, mouse_graf, 1);
+            draw_edit_background(a, b, c * big2, d * big2);
             flush_bars(0);
           }
-          wrectangle(p,c,d,c2,0,0,c,d);
-          test_mouse_box(a,b,c,d);
+          wrectangle(p, c, d, c2, 0, 0, c, d);
+          test_mouse_box(a, b, c, d);
         }
       }
 
       // Determine the color we are over
 
-      if (mouse_in(a+2,b+10,a+128+1,b+128+9)) {
-        col=(mouse_x-a-2)/8+((mouse_y-b-10)/8)*16;
-        if (mouse_b&1) {
-          if (col!=oldcol || !(prev_mouse_buttons&1)) mask[col]^=1;
+      if (mouse_in(a + 2, b + 10, a + 128 + 1, b + 128 + 9)) {
+        col = (mouse_x - a - 2) / 8 + ((mouse_y - b - 10) / 8) * 16;
+        if (mouse_b & 1) {
+          if (col != oldcol || !(prev_mouse_buttons & 1))
+            mask[col] ^= 1;
           draw_ruler();
         }
       }
 
       // Invert / Clear
 
-      if ((mouse_b&1) && mouse_in(a+2,b+d-9,a+c-2,b+d-2)) {
-        if (mouse_x<a+c/2) {
-          for (i=0;i<256;i++) mask[i]^=1;
+      if ((mouse_b & 1) && mouse_in(a + 2, b + d - 9, a + c - 2, b + d - 2)) {
+        if (mouse_x < a + c / 2) {
+          for (i = 0; i < 256; i++)
+            mask[i] ^= 1;
         } else {
-          memset(mask,0,256);
-        } 
-        do { read_mouse(); } while (mouse_b);
+          memset(mask, 0, 256);
+        }
+        do {
+          read_mouse();
+        } while (mouse_b);
       }
 
       // Pick a color from the screen
 
-      if ((mouse_b&1) && !mouse_in(a,b,a+c-1,b+d-1)) {
-        if (mouse_graf>=10) {
-          mask[*(map+coord_y*map_width+coord_x)]=1;
+      if ((mouse_b & 1) && !mouse_in(a, b, a + c - 1, b + d - 1)) {
+        if (mouse_graf >= 10) {
+          mask[*(map + coord_y * map_width + coord_x)] = 1;
           draw_ruler();
-        } else salir=1;
+        } else
+          salir = 1;
       }
 
       blit_mouse_a();
-      paint_mask_window(p,c,d);
-      x=1+(col%16)*8; y=9+(col/16)*8;
-      wrectangle(p,c,d,c4,x,y,9,9);
-      wvolcado(screen_buffer,vga_width,vga_height,p,a,b,c*big2,d*big2,0);
-      blit_partial(a,b,c*big2,d*big2);
+      paint_mask_window(p, c, d);
+      x = 1 + (col % 16) * 8;
+      y = 9 + (col / 16) * 8;
+      wrectangle(p, c, d, c4, x, y, 9, 9);
+      wvolcado(screen_buffer, vga_width, vga_height, p, a, b, c * big2, d * big2, 0);
+      blit_partial(a, b, c * big2, d * big2);
       blit_mouse_b();
 
-      x=1+(col%16)*8; y=9+(col/16)*8;
-      wrectangle(p,c,d,c0,x,y,9,9);
-      blit_partial(a+x*big2,b+y*big2,9*big2,9*big2);
+      x = 1 + (col % 16) * 8;
+      y = 9 + (col / 16) * 8;
+      wrectangle(p, c, d, c0, x, y, 9, 9);
+      blit_partial(a + x * big2, b + y * big2, 9 * big2, 9 * big2);
 
-    } while (!(mouse_b&2) && !key(_ESC) && !salir && !key(_M) &&
-             !exit_requested &&
-             !((mouse_b&1) && mouse_in(a+c-9,b+2,a+c-2,b+9)));
+    } while (!(mouse_b & 2) && !key(_ESC) && !salir && !key(_M) && !exit_requested &&
+             !((mouse_b & 1) && mouse_in(a + c - 9, b + 2, a + c - 2, b + 9)));
 
-    if (!mouse_in(toolbar_x,toolbar_y,toolbar_x+toolbar_width-1,toolbar_y+18) || !(mouse_b&1)
-        || key(_M) || mouse_in(toolbar_x+48+n*16,toolbar_y+2,toolbar_x+57+n*16,toolbar_y+17)) {
-      blit_mouse_a(); wput(p,c,d,c-9,2,-45);
-      x=1+(col%16)*8; y=9+(col/16)*8; wrectangle(p,c,d,c4,x,y,9,9);
-      wvolcado(screen_buffer,vga_width,vga_height,p,a,b,c*big2,d*big2,0);
-      blit_partial(a,b,c*big2,d*big2); blit_mouse_b();
-      do { read_mouse(); } while (mouse_b || key(_ESC) || key(_M));
+    if (!mouse_in(toolbar_x, toolbar_y, toolbar_x + toolbar_width - 1, toolbar_y + 18) ||
+        !(mouse_b & 1) || key(_M) ||
+        mouse_in(toolbar_x + 48 + n * 16, toolbar_y + 2, toolbar_x + 57 + n * 16, toolbar_y + 17)) {
+      blit_mouse_a();
+      wput(p, c, d, c - 9, 2, -45);
+      x = 1 + (col % 16) * 8;
+      y = 9 + (col / 16) * 8;
+      wrectangle(p, c, d, c4, x, y, 9, 9);
+      wvolcado(screen_buffer, vga_width, vga_height, p, a, b, c * big2, d * big2, 0);
+      blit_partial(a, b, c * big2, d * big2);
+      blit_mouse_b();
+      do {
+        read_mouse();
+      } while (mouse_b || key(_ESC) || key(_M));
     }
 
-    draw_edit_background(a,b,c*big2,d*big2);
-    test_mouse(); blit_mouse();
+    draw_edit_background(a, b, c * big2, d * big2);
+    test_mouse();
+    blit_mouse();
     free(p);
   }
 
-  mask_on=0; for (i=0;i<256;i++) if (mask[i]) mask_on=1;
+  mask_on = 0;
+  for (i = 0; i < 256; i++)
+    if (mask[i])
+      mask_on = 1;
 }
 
 //-----------------------------------------------------------------------------
 //      Draw the mask selection window
 //-----------------------------------------------------------------------------
 
-void paint_mask_window(byte * p,int c,int d) {
-  int n,x,y;
+void paint_mask_window(byte *p, int c, int d) {
+  int n, x, y;
 
-  wrectangle(p,c,d,c2,0,0,c,d); // Window
-  wbox(p,c,d,c0,1,1,c-2,d-2);
-  wgra(p,c,d,c_b_low,2,2,c-12,7);
-  wput(p,c,d,c-9,2,35);
+  wrectangle(p, c, d, c2, 0, 0, c, d); // Window
+  wbox(p, c, d, c0, 1, 1, c - 2, d - 2);
+  wgra(p, c, d, c_b_low, 2, 2, c - 12, 7);
+  wput(p, c, d, c - 9, 2, 35);
 
   // Box and palette
 
-  for (y=0;y<16;y++) for (x=0;x<16;x++)
-    wbox(p,c,d,y*16+x,2+x*8,10+y*8,7,7);
+  for (y = 0; y < 16; y++)
+    for (x = 0; x < 16; x++)
+      wbox(p, c, d, y * 16 + x, 2 + x * 8, 10 + y * 8, 7, 7);
 
-  for (n=0;n<256;n++) if (mask[n]) {
-    x=(memptrsize)c2*3; x=dac[x]+dac[x+1]+dac[x+2];
-    y=(memptrsize)n*3; y=dac[y]+dac[y+1]+dac[y+2];
-    if (y>=x) wbox(p,c,d,c0,4+(n%16)*8,12+(n/16)*8,3,3);
-    else wbox(p,c,d,c4,4+(n%16)*8,12+(n/16)*8,3,3);
-  }
+  for (n = 0; n < 256; n++)
+    if (mask[n]) {
+      x = (memptrsize)c2 * 3;
+      x = dac[x] + dac[x + 1] + dac[x + 2];
+      y = (memptrsize)n * 3;
+      y = dac[y] + dac[y + 1] + dac[y + 2];
+      if (y >= x)
+        wbox(p, c, d, c0, 4 + (n % 16) * 8, 12 + (n / 16) * 8, 3, 3);
+      else
+        wbox(p, c, d, c4, 4 + (n % 16) * 8, 12 + (n / 16) * 8, 3, 3);
+    }
 
-  wbox(p,c,d,c2,2,d-9,c-4,7);
-  wbox(p,c,d,c0,c/2,d-9,1,7);
+  wbox(p, c, d, c2, 2, d - 9, c - 4, 7);
+  wbox(p, c, d, c0, c / 2, d - 9, 1, 7);
 
-  wwrite(p,c,d,c/4,d-9,1,texts[306],c3);
-  wwrite(p,c,d,c*3/4,d-9,1,texts[307],c3);
-
+  wwrite(p, c, d, c / 4, d - 9, 1, texts[306], c3);
+  wwrite(p, c, d, c * 3 / 4, d - 9, 1, texts[307], c3);
 }
 
 //-----------------------------------------------------------------------------
@@ -3969,7 +6379,7 @@ void paint_mask_window(byte * p,int c,int d) {
 //-----------------------------------------------------------------------------
 
 #define max_texturas 1000
-#define an_textura   (3+1) // 000 - 999
+#define an_textura   (3 + 1) // 000 - 999
 
 #define BRUSH 4
 #define MAPBR 8
@@ -3979,13 +6389,13 @@ extern int t_maximo;
 extern int f_maximo;
 extern int FPG_thumbpos;
 extern byte brush_fpg_path[256];
-extern char m3d_fpgcodesbr[max_texturas*an_textura];
+extern char m3d_fpgcodesbr[max_texturas * an_textura];
 extern struct t_listboxbr ltexturasbr;
 extern struct _thumb_tex {
-  int an,al;            // Width and height of the thumbnail
-  int RealAn, RealAl;   // Width and height of the texture
-  char * ptr;           // ==NULL if the thumbnail has not started loading
-  int status;           // 0-Not a valid texture, 1-Loaded
+  int an, al;         // Width and height of the thumbnail
+  int RealAn, RealAl; // Width and height of the texture
+  char *ptr;          // ==NULL if the thumbnail has not started loading
+  int status;         // 0-Not a valid texture, 1-Loaded
   int FilePos;
   int Code;
   int Cuad;
@@ -3995,15 +6405,15 @@ extern FILE *FilePaintFPG;
 
 extern struct t_listboxbr copia_br;
 
-int m_maximo=0;
-struct t_listboxbr lthumbmapbr={3-2,11-2,NULL,0,4,4,32,32};
-int TipoBrowser=0;
+int m_maximo = 0;
+struct t_listboxbr lthumbmapbr = {3 - 2, 11 - 2, NULL, 0, 4, 4, 32, 32};
+int TipoBrowser = 0;
 
-struct _thumb_map { // Brush map thumbnails
-  int an,al;            // Width and height of the thumbnail
-  int RealAn, RealAl;   // Width and height of the texture
-  char * ptr;           // ==NULL if the thumbnail has not started loading
-  int status;           // 0-Not a valid texture, 1-Loaded
+struct _thumb_map {   // Brush map thumbnails
+  int an, al;         // Width and height of the thumbnail
+  int RealAn, RealAl; // Width and height of the texture
+  char *ptr;          // ==NULL if the thumbnail has not started loading
+  int status;         // 0-Not a valid texture, 1-Loaded
   int FilePos;
   int Code;
   int Cuad;
@@ -4011,420 +6421,555 @@ struct _thumb_map { // Brush map thumbnails
 
 void MapperBrowseFPG0(void);
 
-void FreePaintThumbs(void)
-{
+void FreePaintThumbs(void) {
   int n;
 
-  for(n=0; n<max_texturas; n++)
-  {
-    if(thumb_tex[n].ptr!=NULL)
-    {
+  for (n = 0; n < max_texturas; n++) {
+    if (thumb_tex[n].ptr != NULL) {
       free(thumb_tex[n].ptr);
-      thumb_tex[n].ptr=NULL;
+      thumb_tex[n].ptr = NULL;
     }
   }
-  for(n=0; n<max_windows; n++)
-  {
-    if(thumb_map[n].ptr!=NULL)
-    {
+  for (n = 0; n < max_windows; n++) {
+    if (thumb_map[n].ptr != NULL) {
       free(thumb_map[n].ptr);
-      thumb_map[n].ptr=NULL;
+      thumb_map[n].ptr = NULL;
     }
   }
 }
 
-int create_mapbr_thumbs(struct t_listboxbr * l)
-{
-  int         n, con;
-  int         m;
-  int         man, mal;
-  byte        *temp, *temp2;
-  float       coefredy, coefredx, a, b;
-  int         x, y;
+int create_mapbr_thumbs(struct t_listboxbr *l) {
+  int n, con;
+  int m;
+  int man, mal;
+  byte *temp, *temp2;
+  float coefredy, coefredx, a, b;
+  int x, y;
 
   FPG_thumbpos = 0;
 
-  n=m_maximo=0;
-  for(con=0; con<max_windows; con++) {
-    if(window[con].type==100) {
-      thumb_map[n].an   = (int)window[con].mapa->map_width;
-      thumb_map[n].al   = (int)window[con].mapa->map_height;
-      thumb_map[n].ptr  = (char *)window[con].mapa->map;
+  n = m_maximo = 0;
+  for (con = 0; con < max_windows; con++) {
+    if (window[con].type == 100) {
+      thumb_map[n].an = (int)window[con].mapa->map_width;
+      thumb_map[n].al = (int)window[con].mapa->map_height;
+      thumb_map[n].ptr = (char *)window[con].mapa->map;
       thumb_map[n].Code = con;
       n++;
     }
   }
-  l->total_items=m_maximo=n;
+  l->total_items = m_maximo = n;
 
-  for(con=0; con<l->total_items; con++)
-  {
-
-    man  = thumb_map[con].RealAn = thumb_map[con].an;
-    mal  = thumb_map[con].RealAl = thumb_map[con].al;
+  for (con = 0; con < l->total_items; con++) {
+    man = thumb_map[con].RealAn = thumb_map[con].an;
+    mal = thumb_map[con].RealAl = thumb_map[con].al;
     temp = (byte *)thumb_map[con].ptr;
 
-    if(man<=32*big2 && mal<=32*big2) // The graphic is kept as-is
+    if (man <= 32 * big2 && mal <= 32 * big2) // The graphic is kept as-is
     {
-      if((thumb_map[con].ptr=(char *)malloc(man*mal))==NULL)
-      {
-        thumb_map[con].ptr    = NULL;
+      if ((thumb_map[con].ptr = (char *)malloc(man * mal)) == NULL) {
+        thumb_map[con].ptr = NULL;
         thumb_map[con].status = 0;
         continue;
       }
-      memcpy(thumb_map[con].ptr, temp, man*mal);
-    }
-    else // Create the thumbnail
+      memcpy(thumb_map[con].ptr, temp, man * mal);
+    } else // Create the thumbnail
     {
+      coefredx = man / ((float)32 * 2 * (float)big2);
+      coefredy = mal / ((float)32 * 2 * (float)big2);
+      if (coefredx < coefredy)
+        coefredx = coefredy;
+      else
+        coefredy = coefredx;
+      thumb_map[con].an = (float)man / coefredx + 0.5;
+      thumb_map[con].al = (float)mal / coefredy + 0.5;
+      thumb_map[con].an &= -2;
+      thumb_map[con].al &= -2;
+      if (thumb_map[con].an < 2)
+        thumb_map[con].an = 2;
+      if (thumb_map[con].al < 2)
+        thumb_map[con].al = 2;
 
-      coefredx=man/((float)32*2*(float)big2);
-      coefredy=mal/((float)32*2*(float)big2);
-      if (coefredx<coefredy) coefredx=coefredy; else coefredy=coefredx;
-      thumb_map[con].an=(float)man/coefredx+0.5;
-      thumb_map[con].al=(float)mal/coefredy+0.5;
-      thumb_map[con].an&=-2; thumb_map[con].al&=-2;
-      if(thumb_map[con].an<2) thumb_map[con].an=2;
-      if(thumb_map[con].al<2) thumb_map[con].al=2;
+      if (coefredx * (float)(thumb_map[con].an - 1) >= (float)man)
+        coefredx = (float)(man - 1) / (float)(thumb_map[con].an - 1);
+      if (coefredy * (float)(thumb_map[con].al - 1) >= (float)mal)
+        coefredy = (float)(mal - 1) / (float)(thumb_map[con].al - 1);
 
-      if (coefredx*(float)(thumb_map[con].an-1)>=(float)man)
-        coefredx=(float)(man-1)/(float)(thumb_map[con].an-1);
-      if (coefredy*(float)(thumb_map[con].al-1)>=(float)mal)
-        coefredy=(float)(mal-1)/(float)(thumb_map[con].al-1);
-
-      if((temp2=(byte *)malloc(thumb_map[con].an*thumb_map[con].al))==NULL)
-      {
-        thumb_map[con].ptr    = NULL;
+      if ((temp2 = (byte *)malloc(thumb_map[con].an * thumb_map[con].al)) == NULL) {
+        thumb_map[con].ptr = NULL;
         thumb_map[con].status = 0;
         continue;
       }
 
-      memset(temp2,0,thumb_map[con].an*thumb_map[con].al);
+      memset(temp2, 0, thumb_map[con].an * thumb_map[con].al);
 
-      a=(float)0.0;
-      for(y=0;y<thumb_map[con].al;y++) {
-        b=(float)0.0;
-        for(x=0;x<thumb_map[con].an;x++) {
-          temp2[y*thumb_map[con].an+x]=temp[((memptrsize)a)*man+(memptrsize)b];
-          b+=coefredx;
-        } a+=coefredy;
+      a = (float)0.0;
+      for (y = 0; y < thumb_map[con].al; y++) {
+        b = (float)0.0;
+        for (x = 0; x < thumb_map[con].an; x++) {
+          temp2[y * thumb_map[con].an + x] = temp[((memptrsize)a) * man + (memptrsize)b];
+          b += coefredx;
+        }
+        a += coefredy;
       }
 
-      if((thumb_map[con].ptr=(char *)malloc((thumb_map[con].an*thumb_map[con].al)/4))==NULL)
-      {
+      if ((thumb_map[con].ptr = (char *)malloc((thumb_map[con].an * thumb_map[con].al) / 4)) ==
+          NULL) {
         free(temp2);
-        thumb_map[con].ptr    = NULL;
+        thumb_map[con].ptr = NULL;
         thumb_map[con].status = 0;
         break;
       }
 
-      for (y=0;y<thumb_map[con].al;y+=2)
-      {
-        for (x=0;x<thumb_map[con].an;x+=2)
-        {
-          n=*(ghost+temp2[x+y*thumb_map[con].an]*256+temp2[x+1+y*thumb_map[con].an]);
-          m=*(ghost+temp2[x+(y+1)*thumb_map[con].an]*256+temp2[x+1+(y+1)*thumb_map[con].an]);
-          thumb_map[con].ptr[x/2+(y/2)*(thumb_map[con].an/2)]=*(ghost+n*256+m);
+      for (y = 0; y < thumb_map[con].al; y += 2) {
+        for (x = 0; x < thumb_map[con].an; x += 2) {
+          n = *(ghost + temp2[x + y * thumb_map[con].an] * 256 +
+                temp2[x + 1 + y * thumb_map[con].an]);
+          m = *(ghost + temp2[x + (y + 1) * thumb_map[con].an] * 256 +
+                temp2[x + 1 + (y + 1) * thumb_map[con].an]);
+          thumb_map[con].ptr[x / 2 + (y / 2) * (thumb_map[con].an / 2)] = *(ghost + n * 256 + m);
         }
       }
-      thumb_map[con].an/=2; thumb_map[con].al/=2;
+      thumb_map[con].an /= 2;
+      thumb_map[con].al /= 2;
       free(temp2);
     }
     thumb_map[con].status = 1;
   }
 
-  return(1);
+  return (1);
 }
 
 void select_color(int n) { // Icon number as parameter
-  int x,y,col,oldcol,ix,iy;
-  int a,b,c,d;
-  int salir,volcar;
-  int _gradient,boton;
+  int x, y, col, oldcol, ix, iy;
+  int a, b, c, d;
+  int salir, volcar;
+  int _gradient, boton;
   byte reg[33];
-  byte pal[768],xchg[256];
-  byte * p;
+  byte pal[768], xchg[256];
+  byte *p;
   int num_tex, tex_cod;
   byte *temp;
-  int  man,mal;
+  int man, mal;
 
-  if( (TipoTex&4) && ((key(_T)&&hotkey) || (mouse_in(toolbar_x+56+n*16,toolbar_y+11,toolbar_x+62+n*16,toolbar_y+17) && (mouse_b&1))) )
-  {
-    TipoBrowser=BRUSH;
+  if ((TipoTex & 4) && ((key(_T) && hotkey) || (mouse_in(toolbar_x + 56 + n * 16, toolbar_y + 11,
+                                                         toolbar_x + 62 + n * 16, toolbar_y + 17) &&
+                                                (mouse_b & 1)))) {
+    TipoBrowser = BRUSH;
     show_dialog(MapperBrowseFPG0);
 
-    num_tex=ltexturasbr.first_visible+ltexturasbr.zone-10; // Position in browser
-    tex_cod=atoi(m3d_fpgcodesbr+num_tex*an_textura); // Code at that position
+    num_tex = ltexturasbr.first_visible + ltexturasbr.zone - 10; // Position in browser
+    tex_cod = atoi(m3d_fpgcodesbr + num_tex * an_textura);       // Code at that position
 
-    if(thumb_tex[num_tex].Code==0 || !v_finished) return;
+    if (thumb_tex[num_tex].Code == 0 || !v_finished)
+      return;
 
     man = thumb_tex[num_tex].RealAn;
     mal = thumb_tex[num_tex].RealAl;
 
-    if((temp=(byte *)malloc(man*mal))==NULL)
-    {
-      v_text=(char *)texts[45];
+    if ((temp = (byte *)malloc(man * mal)) == NULL) {
+      v_text = (char *)texts[45];
       show_dialog(err0);
-    }
-    else
-    {
+    } else {
       fseek(FilePaintFPG, thumb_tex[num_tex].FilePos, SEEK_SET);
 
-      if(fread(temp, 1, man*mal, FilePaintFPG) != man*mal)
-      {
+      if (fread(temp, 1, man * mal, FilePaintFPG) != man * mal) {
         free(temp);
-        v_text=(char *)texts[44];
+        v_text = (char *)texts[44];
         show_dialog(err0);
-      }
-      else
-      {
-        if(pincel!=&pincel_por_defecto[0]) free(pincel);
-        tipo_pincel=0;
-        num_pincel=num_tex;
-        pincel=temp; temp=NULL;
-        pincel_an=man; pincel_al=mal;
+      } else {
+        if (pincel != &pincel_por_defecto[0])
+          free(pincel);
+        tipo_pincel = 0;
+        num_pincel = num_tex;
+        pincel = temp;
+        temp = NULL;
+        pincel_an = man;
+        pincel_al = mal;
 
-        fseek(FilePaintFPG,8,SEEK_SET);
-        memcpy(pal,dac,768);
-        fread(pal,1,768,FilePaintFPG);
+        fseek(FilePaintFPG, 8, SEEK_SET);
+        memcpy(pal, dac, 768);
+        fread(pal, 1, 768, FilePaintFPG);
 
         // Brush in {pincel, man x mal, pal}
 
-        for (n=0;n<256;n++) xchg[n]=(pal[n*3]+pal[n*3+1]+pal[n*3+2]+3)/12;
-        tipo_pincel=0;
-        for (n=0;n<man*mal;n++)
-          if ((pincel[n]=xchg[pincel[n]]))
-            if (pincel[n]!=16) tipo_pincel=1;
+        for (n = 0; n < 256; n++)
+          xchg[n] = (pal[n * 3] + pal[n * 3 + 1] + pal[n * 3 + 2] + 3) / 12;
+        tipo_pincel = 0;
+        for (n = 0; n < man * mal; n++)
+          if ((pincel[n] = xchg[pincel[n]]))
+            if (pincel[n] != 16)
+              tipo_pincel = 1;
       }
     }
   }
 
-  if( (TipoTex&8) && ((key(_U) && hotkey) || (mouse_in(toolbar_x+56-8+n*16,toolbar_y+11,toolbar_x+62-8+n*16,toolbar_y+17) && (mouse_b&1))) )
-  {
-    TipoBrowser=MAPBR;
+  if ((TipoTex & 8) &&
+      ((key(_U) && hotkey) || (mouse_in(toolbar_x + 56 - 8 + n * 16, toolbar_y + 11,
+                                        toolbar_x + 62 - 8 + n * 16, toolbar_y + 17) &&
+                               (mouse_b & 1)))) {
+    TipoBrowser = MAPBR;
     show_dialog(MapperBrowseFPG0);
-    if(v_finished) {
-      num_tex=thumb_map[ltexturasbr.first_visible+ltexturasbr.zone-10].Code;
-      textura_color=window[num_tex].mapa->map;
-      textura_an=window[num_tex].mapa->map_width;
-      textura_al=window[num_tex].mapa->map_height;
-      textura_x=0;
-      textura_y=0;
+    if (v_finished) {
+      num_tex = thumb_map[ltexturasbr.first_visible + ltexturasbr.zone - 10].Code;
+      textura_color = window[num_tex].mapa->map;
+      textura_an = window[num_tex].mapa->map_width;
+      textura_al = window[num_tex].mapa->map_height;
+      textura_x = 0;
+      textura_y = 0;
     }
     memcpy(&ltexturasbr, &copia_br, sizeof(ltexturasbr));
     draw_ruler();
   }
 
-  if ((key(_C)&&hotkey) || (mouse_in(toolbar_x+48+n*16,toolbar_y+2,toolbar_x+55+n*16,toolbar_y+10) && (mouse_b&1))) {
+  if ((key(_C) && hotkey) ||
+      (mouse_in(toolbar_x + 48 + n * 16, toolbar_y + 2, toolbar_x + 55 + n * 16, toolbar_y + 10) &&
+       (mouse_b & 1))) {
+    c = (128 + 3 + 32 + 64 + 8) * big2;
+    d = (128 + 3 + 18 + 8) * big2;
+    a = toolbar_x;
+    if (toolbar_y > vga_height / 2 - 8)
+      b = toolbar_y - d - 1;
+    else
+      b = toolbar_y + 19 * big2 + 1;
+    if ((p = (byte *)malloc(c * d)) == NULL) {
+      v_text = (char *)texts[45];
+      show_dialog(err0);
+      return;
+    }
+    adjust_box(&a, &b, &c, &d);
+    c /= big2;
+    d /= big2;
 
-    c=(128+3+32+64+8)*big2; d=(128+3+18+8)*big2; a=toolbar_x;
-    if (toolbar_y>vga_height/2-8) b=toolbar_y-d-1; else b=toolbar_y+19*big2+1;
-    if ((p=(byte*)malloc(c*d))==NULL) {
-      v_text=(char *)texts[45]; show_dialog(err0); return; }
-    adjust_box(&a,&b,&c,&d); c/=big2; d/=big2;
-
-    salir=0; volcar=1; _gradient=-1; boton=-1; col=color;
-
-    do { read_mouse(); } while (mouse_b || key(_C));
+    salir = 0;
+    volcar = 1;
+    _gradient = -1;
+    boton = -1;
+    col = color;
 
     do {
-      read_mouse(); test_mouse_box(a,b,c,d);
+      read_mouse();
+    } while (mouse_b || key(_C));
 
-      oldcol=col;
-      col=color;
+    do {
+      read_mouse();
+      test_mouse_box(a, b, c, d);
+
+      oldcol = col;
+      col = color;
 
       // Move the window
 
-      if (mouse_in(a+2,b+2,a+c-10,b+9)) {
-        ix=mouse_shift_x-a; iy=mouse_shift_y-b;
-        if (mouse_b&1) {
-          wrectangle(p,c,d,c4,0,0,c,d);
-          while (mouse_b&1) {
-            read_mouse(); a=mouse_shift_x-ix; b=mouse_shift_y-iy;
-            wvolcado(screen_buffer,vga_width,vga_height,p,a,b,c*big2,d*big2,0);
-            blit_partial(a,b,c*big2,d*big2);
-            save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,0);
-            put(mouse_shift_x,mouse_shift_y,mouse_graf); blit_screen(screen_buffer);
-            save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,1);
-            draw_edit_background(a,b,c*big2,d*big2);
+      if (mouse_in(a + 2, b + 2, a + c - 10, b + 9)) {
+        ix = mouse_shift_x - a;
+        iy = mouse_shift_y - b;
+        if (mouse_b & 1) {
+          wrectangle(p, c, d, c4, 0, 0, c, d);
+          while (mouse_b & 1) {
+            read_mouse();
+            a = mouse_shift_x - ix;
+            b = mouse_shift_y - iy;
+            wvolcado(screen_buffer, vga_width, vga_height, p, a, b, c * big2, d * big2, 0);
+            blit_partial(a, b, c * big2, d * big2);
+            save_mouse_bg(mouse_background, mouse_shift_x, mouse_shift_y, mouse_graf, 0);
+            put(mouse_shift_x, mouse_shift_y, mouse_graf);
+            blit_screen(screen_buffer);
+            save_mouse_bg(mouse_background, mouse_shift_x, mouse_shift_y, mouse_graf, 1);
+            draw_edit_background(a, b, c * big2, d * big2);
             flush_bars(0);
           }
-          wrectangle(p,c,d,c2,0,0,c,d);
-          volcar=1; test_mouse_box(a,b,c,d);
+          wrectangle(p, c, d, c2, 0, 0, c, d);
+          volcar = 1;
+          test_mouse_box(a, b, c, d);
         }
       }
 
-      if (mouse_in(a+10,b+10,a+128+9,b+128+9)) {
-        col=(mouse_x-a-10)/8+((mouse_y-b-10)/8)*16;
-        if (mouse_b&1) { color=col; remove_texture(); draw_ruler(); volcar=1; }
-        else if (col!=oldcol && volcar!=1) volcar=2;
-      } else if (col!=oldcol && volcar!=1) volcar=2;
+      if (mouse_in(a + 10, b + 10, a + 128 + 9, b + 128 + 9)) {
+        col = (mouse_x - a - 10) / 8 + ((mouse_y - b - 10) / 8) * 16;
+        if (mouse_b & 1) {
+          color = col;
+          remove_texture();
+          draw_ruler();
+          volcar = 1;
+        } else if (col != oldcol && volcar != 1)
+          volcar = 2;
+      } else if (col != oldcol && volcar != 1)
+        volcar = 2;
 
-      if ((mouse_b&1) && mouse_in(a+170,b+10,a+233,b+128+9)) {
-        gradient=(mouse_y-b-10)/8; draw_ruler(); volcar=1;
+      if ((mouse_b & 1) && mouse_in(a + 170, b + 10, a + 233, b + 128 + 9)) {
+        gradient = (mouse_y - b - 10) / 8;
+        draw_ruler();
+        volcar = 1;
       }
 
-      if ((mouse_b&1) && mouse_in(a+138,b+140,a+138+95,b+140+15)) {
+      if ((mouse_b & 1) && mouse_in(a + 138, b + 140, a + 138 + 95, b + 140 + 15)) {
+        if (mouse_y >= b + 132 + 16)
+          x = 2;
+        else if (mouse_x < a + 138 + 48)
+          x = 0;
+        else
+          x = 1;
 
-        if (mouse_y>=b+132+16) x=2;
-        else if (mouse_x<a+138+48) x=0; else x=1;
-
-        if (gradient!=_gradient || x!=boton) {
-          _gradient=gradient; boton=x;
-          switch(gradients[gradient].num_colors) {
-            case 32: for(x=0;x<=32;x++) reg[x]=gradients[gradient].colors[x];
-              break;
-            case 16: for (x=0;x<=32;x+=2) reg[x]=gradients[gradient].colors[x/2];
-              for (x=0;x<32;x+=2) 
-                reg[x+1]=average_color(reg[x],reg[x+2]);
-              break;
-            case 8: for (x=0;x<=32;x+=4) reg[x]=gradients[gradient].colors[x/4];
-              for (x=0;x<32;x+=4) {
-                reg[x+2]=average_color(reg[x],reg[x+4]);
-                reg[x+1]=average_color(reg[x],reg[x+2]);
-                reg[x+3]=average_color(reg[x+2],reg[x+4]);
-              } break;
-          } reg[1]=gradients[gradient].colors[1];
-        }
-
-        if (boton==2) {
-          switch(gradients[gradient].type) {
-            case 0: gradients[gradient].type=1; break;
-            case 1: gradients[gradient].type=2; break;
-            case 2: gradients[gradient].type=4; break;
-            case 4: gradients[gradient].type=8; break;
-            case 8: gradients[gradient].type=0; break;
-	  } gradients[gradient].fixed=0;
-        } else if (boton==0) {
-          switch(gradients[gradient].num_colors) {
-            case 8: gradients[gradient].num_colors=16; break;
-            case 16: gradients[gradient].num_colors=32; break;
-            case 32: gradients[gradient].num_colors=8; break;
-	  } gradients[gradient].fixed=0;
-        } else gradients[gradient].fixed^=1;
-
-        if (boton==0 || boton==2) switch(gradients[gradient].num_colors) {
-          case 8:
-            for (x=2;x<=8;x++) gradients[gradient].colors[x]=reg[x*4];
-            gradients[gradient].colors[1]=reg[1]; break;
-          case 16:
-            for (x=2;x<=16;x++) gradients[gradient].colors[x]=reg[x*2];
-            gradients[gradient].colors[1]=reg[1]; break;
+        if (gradient != _gradient || x != boton) {
+          _gradient = gradient;
+          boton = x;
+          switch (gradients[gradient].num_colors) {
           case 32:
-            for (x=2;x<=32;x++) gradients[gradient].colors[x]=reg[x];
-            gradients[gradient].colors[1]=reg[1]; break;
+            for (x = 0; x <= 32; x++)
+              reg[x] = gradients[gradient].colors[x];
+            break;
+          case 16:
+            for (x = 0; x <= 32; x += 2)
+              reg[x] = gradients[gradient].colors[x / 2];
+            for (x = 0; x < 32; x += 2)
+              reg[x + 1] = average_color(reg[x], reg[x + 2]);
+            break;
+          case 8:
+            for (x = 0; x <= 32; x += 4)
+              reg[x] = gradients[gradient].colors[x / 4];
+            for (x = 0; x < 32; x += 4) {
+              reg[x + 2] = average_color(reg[x], reg[x + 4]);
+              reg[x + 1] = average_color(reg[x], reg[x + 2]);
+              reg[x + 3] = average_color(reg[x + 2], reg[x + 4]);
+            }
+            break;
+          }
+          reg[1] = gradients[gradient].colors[1];
         }
 
-        draw_ruler(); volcar=1;
-        do read_mouse(); while (mouse_b&1);
-      } else if (!mouse_in(a+138,b+140,a+138+95,b+140+15)) boton=-1;
+        if (boton == 2) {
+          switch (gradients[gradient].type) {
+          case 0:
+            gradients[gradient].type = 1;
+            break;
+          case 1:
+            gradients[gradient].type = 2;
+            break;
+          case 2:
+            gradients[gradient].type = 4;
+            break;
+          case 4:
+            gradients[gradient].type = 8;
+            break;
+          case 8:
+            gradients[gradient].type = 0;
+            break;
+          }
+          gradients[gradient].fixed = 0;
+        } else if (boton == 0) {
+          switch (gradients[gradient].num_colors) {
+          case 8:
+            gradients[gradient].num_colors = 16;
+            break;
+          case 16:
+            gradients[gradient].num_colors = 32;
+            break;
+          case 32:
+            gradients[gradient].num_colors = 8;
+            break;
+          }
+          gradients[gradient].fixed = 0;
+        } else
+          gradients[gradient].fixed ^= 1;
 
-      if (editable_selection(&x,a+10,b+128+12)) mouse_graf=2;
-      else if (!mouse_in(a,b,a+c-1,b+d-1) &&
-               mouse_in(toolbar_x,toolbar_y,toolbar_x+toolbar_width-1,toolbar_y+18)) {
-        if (mouse_in(toolbar_x,toolbar_y+10,toolbar_x+9,toolbar_y+18)) mouse_graf=5;
-        else if (mouse_in(toolbar_x,toolbar_y,toolbar_x+9,toolbar_y+9) ||
-            editable(&x))
-          mouse_graf=2;
+        if (boton == 0 || boton == 2)
+          switch (gradients[gradient].num_colors) {
+          case 8:
+            for (x = 2; x <= 8; x++)
+              gradients[gradient].colors[x] = reg[x * 4];
+            gradients[gradient].colors[1] = reg[1];
+            break;
+          case 16:
+            for (x = 2; x <= 16; x++)
+              gradients[gradient].colors[x] = reg[x * 2];
+            gradients[gradient].colors[1] = reg[1];
+            break;
+          case 32:
+            for (x = 2; x <= 32; x++)
+              gradients[gradient].colors[x] = reg[x];
+            gradients[gradient].colors[1] = reg[1];
+            break;
+          }
+
+        draw_ruler();
+        volcar = 1;
+        do
+          read_mouse();
+        while (mouse_b & 1);
+      } else if (!mouse_in(a + 138, b + 140, a + 138 + 95, b + 140 + 15))
+        boton = -1;
+
+      if (editable_selection(&x, a + 10, b + 128 + 12))
+        mouse_graf = 2;
+      else if (!mouse_in(a, b, a + c - 1, b + d - 1) &&
+               mouse_in(toolbar_x, toolbar_y, toolbar_x + toolbar_width - 1, toolbar_y + 18)) {
+        if (mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18))
+          mouse_graf = 5;
+        else if (mouse_in(toolbar_x, toolbar_y, toolbar_x + 9, toolbar_y + 9) || editable(&x))
+          mouse_graf = 2;
       }
 
       // Blit: 0-Nothing (mouse), 1-Color info, 2-Entire window.
 
-      if (volcar==1) { volcar=0;
+      if (volcar == 1) {
+        volcar = 0;
         flush_bars(0);
-        paint_color_window(p,c,d);
-        paint_window_colors2(p,c,d,col);
-        x=9+(col%16)*8; y=9+(col/16)*8;
-        wrectangle(p,c,d,c4,x,y,9,9);
-        wvolcado(screen_buffer,vga_width,vga_height,p,a,b,c*big2,d*big2,0);
-        blit_partial(a,b,c*big2,d*big2);
-      } else if (volcar==2) { volcar=0;
-        paint_window_colors2(p,c,d,col);
-        x=9+(col%16)*8; y=9+(col/16)*8;
-        wrectangle(p,c,d,c4,x,y,9,9);
-        wvolcado(screen_buffer,vga_width,vga_height,p,a,b,c*big2,d*big2,0);
-        blit_partial(a+x*big2,b+y*big2,9*big2,9*big2);
-        blit_partial(a+138*big2,b+10*big2,31*big2,128*big2);
+        paint_color_window(p, c, d);
+        paint_window_colors2(p, c, d, col);
+        x = 9 + (col % 16) * 8;
+        y = 9 + (col / 16) * 8;
+        wrectangle(p, c, d, c4, x, y, 9, 9);
+        wvolcado(screen_buffer, vga_width, vga_height, p, a, b, c * big2, d * big2, 0);
+        blit_partial(a, b, c * big2, d * big2);
+      } else if (volcar == 2) {
+        volcar = 0;
+        paint_window_colors2(p, c, d, col);
+        x = 9 + (col % 16) * 8;
+        y = 9 + (col / 16) * 8;
+        wrectangle(p, c, d, c4, x, y, 9, 9);
+        wvolcado(screen_buffer, vga_width, vga_height, p, a, b, c * big2, d * big2, 0);
+        blit_partial(a + x * big2, b + y * big2, 9 * big2, 9 * big2);
+        blit_partial(a + 138 * big2, b + 10 * big2, 31 * big2, 128 * big2);
       }
 
-      save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,0);
-      put(mouse_shift_x,mouse_shift_y,mouse_graf);
+      save_mouse_bg(mouse_background, mouse_shift_x, mouse_shift_y, mouse_graf, 0);
+      put(mouse_shift_x, mouse_shift_y, mouse_graf);
       blit_screen(screen_buffer);
-      save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,1);
+      save_mouse_bg(mouse_background, mouse_shift_x, mouse_shift_y, mouse_graf, 1);
 
-      x=9+(col%16)*8; y=9+(col/16)*8;
-      wrectangle(p,c,d,c0,x,y,9,9);
-      blit_partial(a+x*big2,b+y*big2,9*big2,9*big2);
+      x = 9 + (col % 16) * 8;
+      y = 9 + (col / 16) * 8;
+      wrectangle(p, c, d, c0, x, y, 9, 9);
+      blit_partial(a + x * big2, b + y * big2, 9 * big2, 9 * big2);
 
-      if ((mouse_b&1) && mouse_in(a+10,b+132+8,a+137,b+147+8)) {
-        if (editable_selection(&x,a+10,b+132+8)) gradients[gradient].colors[x]=color;
+      if ((mouse_b & 1) && mouse_in(a + 10, b + 132 + 8, a + 137, b + 147 + 8)) {
+        if (editable_selection(&x, a + 10, b + 132 + 8))
+          gradients[gradient].colors[x] = color;
         else {
-          color=gradients[gradient].colors[x];
+          color = gradients[gradient].colors[x];
           remove_texture();
         }
-        draw_ruler(); volcar=1;
+        draw_ruler();
+        volcar = 1;
       }
 
-      if ((mouse_b&1) && !mouse_in(a,b,a+c-1,b+d-1)) {
-        if (mouse_in(toolbar_x,toolbar_y,toolbar_x+toolbar_width-1,toolbar_y+18)) {
-          if (mouse_in(toolbar_x+_ir,toolbar_y,toolbar_x+_ir+127,toolbar_y+18)) {
-            if (editable(&x)) gradients[gradient].colors[x]=color; else {
-              color=gradients[gradient].colors[x];
+      if ((mouse_b & 1) && !mouse_in(a, b, a + c - 1, b + d - 1)) {
+        if (mouse_in(toolbar_x, toolbar_y, toolbar_x + toolbar_width - 1, toolbar_y + 18)) {
+          if (mouse_in(toolbar_x + _ir, toolbar_y, toolbar_x + _ir + 127, toolbar_y + 18)) {
+            if (editable(&x))
+              gradients[gradient].colors[x] = color;
+            else {
+              color = gradients[gradient].colors[x];
               remove_texture();
             }
-            draw_ruler(); volcar=1;
-          } else if (mouse_in(toolbar_x+_ir-8,toolbar_y,toolbar_x+_ir-1,toolbar_y+18)) {
-            if (textura_color!=NULL) {
+            draw_ruler();
+            volcar = 1;
+          } else if (mouse_in(toolbar_x + _ir - 8, toolbar_y, toolbar_x + _ir - 1,
+                              toolbar_y + 18)) {
+            if (textura_color != NULL) {
               remove_texture();
-              if (color!=0) { color_c0=color; color=0; }
+              if (color != 0) {
+                color_c0 = color;
+                color = 0;
+              }
             } else {
-              if (color==0) color=color_c0; else { color_c0=color; color=0; }
+              if (color == 0)
+                color = color_c0;
+              else {
+                color_c0 = color;
+                color = 0;
+              }
             }
-            draw_ruler(); do {read_mouse();} while (mouse_b); volcar=1;
-          } else salir=1;
-        } else salir=1;
+            draw_ruler();
+            do {
+              read_mouse();
+            } while (mouse_b);
+            volcar = 1;
+          } else
+            salir = 1;
+        } else
+          salir = 1;
       }
 
-    } while (!(mouse_b&2) && !key(_ESC) && !salir && !key(_C) &&
-             !exit_requested &&
-             !((mouse_b&1) && mouse_in(a+c-9,b+2,a+c-2,b+9)));
+    } while (!(mouse_b & 2) && !key(_ESC) && !salir && !key(_C) && !exit_requested &&
+             !((mouse_b & 1) && mouse_in(a + c - 9, b + 2, a + c - 2, b + 9)));
 
-    if (!mouse_in(toolbar_x,toolbar_y,toolbar_x+toolbar_width-1,toolbar_y+18) || !(mouse_b&1)
-        || key(_C) || mouse_in(toolbar_x+48+n*16,toolbar_y+2,toolbar_x+57+n*16,toolbar_y+17)) {
-      blit_mouse_a(); wput(p,c,d,c-9,2,-45);
-      x=9+(col%16)*8; y=9+(col/16)*8; wrectangle(p,c,d,c4,x,y,9,9);
-      wvolcado(screen_buffer,vga_width,vga_height,p,a,b,c*big2,d*big2,0);
-      blit_partial(a,b,c*big2,d*big2); blit_mouse_b();
-      do { read_mouse(); } while (mouse_b || key(_ESC) || key(_C));
+    if (!mouse_in(toolbar_x, toolbar_y, toolbar_x + toolbar_width - 1, toolbar_y + 18) ||
+        !(mouse_b & 1) || key(_C) ||
+        mouse_in(toolbar_x + 48 + n * 16, toolbar_y + 2, toolbar_x + 57 + n * 16, toolbar_y + 17)) {
+      blit_mouse_a();
+      wput(p, c, d, c - 9, 2, -45);
+      x = 9 + (col % 16) * 8;
+      y = 9 + (col / 16) * 8;
+      wrectangle(p, c, d, c4, x, y, 9, 9);
+      wvolcado(screen_buffer, vga_width, vga_height, p, a, b, c * big2, d * big2, 0);
+      blit_partial(a, b, c * big2, d * big2);
+      blit_mouse_b();
+      do {
+        read_mouse();
+      } while (mouse_b || key(_ESC) || key(_C));
     }
 
-    draw_edit_background(a,b,c*big2,d*big2);
-    test_mouse(); blit_mouse();
+    draw_edit_background(a, b, c * big2, d * big2);
+    test_mouse();
+    blit_mouse();
     free(p);
-  } else if ((ascii=='0' && hotkey) || (mouse_in(toolbar_x+56+n*16,toolbar_y+2,toolbar_x+62+n*16,toolbar_y+10) && (mouse_b&1))) {
-    if (textura_color!=NULL) {
+  } else if ((ascii == '0' && hotkey) || (mouse_in(toolbar_x + 56 + n * 16, toolbar_y + 2,
+                                                   toolbar_x + 62 + n * 16, toolbar_y + 10) &&
+                                          (mouse_b & 1))) {
+    if (textura_color != NULL) {
       remove_texture();
-      if (color!=0) { color_c0=color; color=0; }
+      if (color != 0) {
+        color_c0 = color;
+        color = 0;
+      }
     } else {
-      if (color==0) color=color_c0; else { color_c0=color; color=0; }
-    }
-    draw_ruler(); do {read_mouse();} while (mouse_b);
-  } else if (scan_code==_S && hotkey) {
-    if (key(_L_SHIFT) || key(_R_SHIFT)) gradient=(gradient+1)%16; else color_up();
-    draw_ruler();
-  } else if (scan_code==_W && hotkey) {
-    if (key(_L_SHIFT) || key(_R_SHIFT)) { if (!gradient--) gradient=15; } else color_down();
-    draw_ruler();
-  } else if ((shift_status&4) && hotkey) {
-    if ((key(_RIGHT) && scan_code) || scan_code==_P) color_up();
-    if ((key(_LEFT) && scan_code) || scan_code==_O) color_down();
-    if (key(_DOWN) || scan_code==_A) {
-      gradient=(gradient+1)%16; do { poll_keyboard(); } while (key(_DOWN));
-    }
-    if (key(_UP) || scan_code==_Q) {
-      if (!gradient--) { gradient=15; } do { poll_keyboard(); } while (key(_UP));
+      if (color == 0)
+        color = color_c0;
+      else {
+        color_c0 = color;
+        color = 0;
+      }
     }
     draw_ruler();
-  } else select_mask(n);
-
+    do {
+      read_mouse();
+    } while (mouse_b);
+  } else if (scan_code == _S && hotkey) {
+    if (key(_L_SHIFT) || key(_R_SHIFT))
+      gradient = (gradient + 1) % 16;
+    else
+      color_up();
+    draw_ruler();
+  } else if (scan_code == _W && hotkey) {
+    if (key(_L_SHIFT) || key(_R_SHIFT)) {
+      if (!gradient--)
+        gradient = 15;
+    } else
+      color_down();
+    draw_ruler();
+  } else if ((shift_status & 4) && hotkey) {
+    if ((key(_RIGHT) && scan_code) || scan_code == _P)
+      color_up();
+    if ((key(_LEFT) && scan_code) || scan_code == _O)
+      color_down();
+    if (key(_DOWN) || scan_code == _A) {
+      gradient = (gradient + 1) % 16;
+      do {
+        poll_keyboard();
+      } while (key(_DOWN));
+    }
+    if (key(_UP) || scan_code == _Q) {
+      if (!gradient--) {
+        gradient = 15;
+      }
+      do {
+        poll_keyboard();
+      } while (key(_UP));
+    }
+    draw_ruler();
+  } else
+    select_mask(n);
 }
 
 //-----------------------------------------------------------------------------
@@ -4432,52 +6977,62 @@ void select_color(int n) { // Icon number as parameter
 //-----------------------------------------------------------------------------
 
 void change_map(int adelante) {
-  int n,old=0;
+  int n, old = 0;
 
   if (back) {
-    undo_back(); if (need_zoom==1) zoom_map();
-    else if (need_zoom==-1 && need_zoom_width>0 && need_zoom_height>0)
-      draw_edit_background(need_zoom_x,need_zoom_y,need_zoom_width,need_zoom_height);
-    need_zoom_width=0; need_zoom_height=0; need_zoom=0; back=0;
+    undo_back();
+    if (need_zoom == 1)
+      zoom_map();
+    else if (need_zoom == -1 && need_zoom_width > 0 && need_zoom_height > 0)
+      draw_edit_background(need_zoom_x, need_zoom_y, need_zoom_width, need_zoom_height);
+    need_zoom_width = 0;
+    need_zoom_height = 0;
+    need_zoom = 0;
+    back = 0;
   }
 
-  v.mapa->zoom=zoom; v.mapa->zoom_x=zoom_x; v.mapa->zoom_y=zoom_y;
-  v.mapa->zoom_cx=zoom_cx; v.mapa->zoom_cy=zoom_cy; v.type=100;
+  v.mapa->zoom = zoom;
+  v.mapa->zoom_x = zoom_x;
+  v.mapa->zoom_y = zoom_y;
+  v.mapa->zoom_cx = zoom_cx;
+  v.mapa->zoom_cy = zoom_cy;
+  v.type = 100;
   call(v.paint_handler);
-  copy(-1,0);
+  copy(-1, 0);
 
   if (adelante) {
-    for (n=1;n<max_windows;n++) {
-      if (window[n].type==100 && window[n].mapa->map_width==map_width &&
-        window[n].mapa->map_height==map_height && window[n].foreground!=2) {
-        copy(old,n);
-        old=n;
+    for (n = 1; n < max_windows; n++) {
+      if (window[n].type == 100 && window[n].mapa->map_width == map_width &&
+          window[n].mapa->map_height == map_height && window[n].foreground != 2) {
+        copy(old, n);
+        old = n;
       }
     }
   } else {
-    for (n=max_windows-1;n>0;n--) {
-      if (window[n].type==100 && window[n].mapa->map_width==map_width &&
-        window[n].mapa->map_height==map_height && window[n].foreground!=2) {
-        copy(old,n);
-        old=n;
+    for (n = max_windows - 1; n > 0; n--) {
+      if (window[n].type == 100 && window[n].mapa->map_width == map_width &&
+          window[n].mapa->map_height == map_height && window[n].foreground != 2) {
+        copy(old, n);
+        old = n;
       }
     }
   }
 
-  copy(old,-1);
+  copy(old, -1);
 
-  for(n=0; n<max_windows; n++) {
-    if(thumb_map[n].ptr!=NULL) {
+  for (n = 0; n < max_windows; n++) {
+    if (thumb_map[n].ptr != NULL) {
       free(thumb_map[n].ptr);
-      thumb_map[n].ptr=NULL;
+      thumb_map[n].ptr = NULL;
     }
   }
   create_mapbr_thumbs(&lthumbmapbr);
 
-  map=v.mapa->map;
-  current_map_code=v.mapa->code; v.type=0;
-  zoom_background=0; need_zoom=1;
-
+  map = v.mapa->map;
+  current_map_code = v.mapa->code;
+  v.type = 0;
+  zoom_background = 0;
+  need_zoom = 1;
 }
 
 //-----------------------------------------------------------------------------
@@ -4485,21 +7040,27 @@ void change_map(int adelante) {
 //-----------------------------------------------------------------------------
 
 void color_up(void) {
-  int n,c=0;
-  for (n=1;n<=gradients[gradient].num_colors;n++)
-    if (gradients[gradient].colors[n]==color) c=n;
+  int n, c = 0;
+  for (n = 1; n <= gradients[gradient].num_colors; n++)
+    if (gradients[gradient].colors[n] == color)
+      c = n;
   if (c) {
-    if (c<gradients[gradient].num_colors) color=gradients[gradient].colors[c+1];
-  } else color=gradients[gradient].colors[1];
+    if (c < gradients[gradient].num_colors)
+      color = gradients[gradient].colors[c + 1];
+  } else
+    color = gradients[gradient].colors[1];
   remove_texture();
 }
 void color_down(void) {
-  int n,c=0;
-  for (n=gradients[gradient].num_colors;n>=1;n--)
-    if (gradients[gradient].colors[n]==color) c=n;
+  int n, c = 0;
+  for (n = gradients[gradient].num_colors; n >= 1; n--)
+    if (gradients[gradient].colors[n] == color)
+      c = n;
   if (c) {
-    if (c>1) color=gradients[gradient].colors[c-1];
-  } else color=gradients[gradient].colors[gradients[gradient].num_colors];
+    if (c > 1)
+      color = gradients[gradient].colors[c - 1];
+  } else
+    color = gradients[gradient].colors[gradients[gradient].num_colors];
   remove_texture();
 }
 
@@ -4507,103 +7068,143 @@ void color_down(void) {
 //      Draw the color selection window
 //-----------------------------------------------------------------------------
 
-void paint_color_window(byte * p,int c,int d) {
-
-  int x,y;
+void paint_color_window(byte *p, int c, int d) {
+  int x, y;
   char num[8];
 
-  wrectangle(p,c,d,c2,0,0,c,d); // Window
-  wbox(p,c,d,c0,1,1,c-2,d-2);
-  wgra(p,c,d,c_b_low,2,2,c-12,7);
-  wput(p,c,d,c-9,2,35);
+  wrectangle(p, c, d, c2, 0, 0, c, d); // Window
+  wbox(p, c, d, c0, 1, 1, c - 2, d - 2);
+  wgra(p, c, d, c_b_low, 2, 2, c - 12, 7);
+  wput(p, c, d, c - 9, 2, 35);
 
   // Box and palette
 
-  wbox(p,c,d,c2,2,10,7,145);
-  wbox(p,c,d,c2,9,138,224,1);
-  wbox(p,c,d,c2,138,10,31,128);
-  for (y=0;y<16;y++) for (x=0;x<16;x++)
-    wbox(p,c,d,y*16+x,10+x*8,10+y*8,7,7);
+  wbox(p, c, d, c2, 2, 10, 7, 145);
+  wbox(p, c, d, c2, 9, 138, 224, 1);
+  wbox(p, c, d, c2, 138, 10, 31, 128);
+  for (y = 0; y < 16; y++)
+    for (x = 0; x < 16; x++)
+      wbox(p, c, d, y * 16 + x, 10 + x * 8, 10 + y * 8, 7, 7);
 
-  x=(memptrsize)c2*3; x=dac[x]+dac[x+1]+dac[x+2];
-  y=(memptrsize)color*3; y=dac[y]+dac[y+1]+dac[y+2];
+  x = (memptrsize)c2 * 3;
+  x = dac[x] + dac[x + 1] + dac[x + 2];
+  y = (memptrsize)color * 3;
+  y = dac[y] + dac[y + 1] + dac[y + 2];
 
-  if (y>=x) wbox(p,c,d,c0,12+(color%16)*8,12+(color/16)*8,3,3);
-  else wbox(p,c,d,c4,12+(color%16)*8,12+(color/16)*8,3,3);
+  if (y >= x)
+    wbox(p, c, d, c0, 12 + (color % 16) * 8, 12 + (color / 16) * 8, 3, 3);
+  else
+    wbox(p, c, d, c4, 12 + (color % 16) * 8, 12 + (color / 16) * 8, 3, 3);
 
-  wbox(p,c,d,c2,138,10,31,63);
+  wbox(p, c, d, c2, 138, 10, 31, 63);
 
   // Gradients
 
-  for (y=0;y<16;y++) {
-    wbox(p,c,d,c1,170,10+y*8,4,7);
-    switch(gradients[y].num_colors) {
-      case 32: for (x=0;x<32;x++) {
-          wbox(p,c,d,gradients[y].colors[x+1],175+x,10+y*8,1,7); } break;
-      case 16: for (x=0;x<16;x++) {
-          wbox(p,c,d,gradients[y].colors[x+1],175+x*2,10+y*8,2,7); } break;
-      case 8: for (x=0;x<8;x++) {
-          wbox(p,c,d,gradients[y].colors[x+1],175+x*4,10+y*8,4,7); } break;
+  for (y = 0; y < 16; y++) {
+    wbox(p, c, d, c1, 170, 10 + y * 8, 4, 7);
+    switch (gradients[y].num_colors) {
+    case 32:
+      for (x = 0; x < 32; x++) {
+        wbox(p, c, d, gradients[y].colors[x + 1], 175 + x, 10 + y * 8, 1, 7);
+      }
+      break;
+    case 16:
+      for (x = 0; x < 16; x++) {
+        wbox(p, c, d, gradients[y].colors[x + 1], 175 + x * 2, 10 + y * 8, 2, 7);
+      }
+      break;
+    case 8:
+      for (x = 0; x < 8; x++) {
+        wbox(p, c, d, gradients[y].colors[x + 1], 175 + x * 4, 10 + y * 8, 4, 7);
+      }
+      break;
     }
-    wbox(p,c,d,c2,208,10+y*8,11,7); x=gradients[y].num_colors;
-    num[2]=0; num[1]=x%10+48; num[0]=(x/10)%10+48;
-    wwrite(p,c,d,209,10+y*8,0,(byte *)num,c3);
-    wbox(p,c,d,c2,220,10+y*8,6,7); x=gradients[y].type;
-    num[1]=0; num[0]=x+48;
-    wwrite(p,c,d,221,10+y*8,0,(byte *)num,c3);
-    wbox(p,c,d,c2,227,10+y*8,6,7);
-    if (!gradients[y].fixed) wwrite(p,c,d,228,10+y*8,0,(byte *)"E",c3);
-    else wwrite(p,c,d,228,10+y*8,0,(byte *)"F",c3);
-  } wput(p,c,d,170,10+gradient*8,36);
+    wbox(p, c, d, c2, 208, 10 + y * 8, 11, 7);
+    x = gradients[y].num_colors;
+    num[2] = 0;
+    num[1] = x % 10 + 48;
+    num[0] = (x / 10) % 10 + 48;
+    wwrite(p, c, d, 209, 10 + y * 8, 0, (byte *)num, c3);
+    wbox(p, c, d, c2, 220, 10 + y * 8, 6, 7);
+    x = gradients[y].type;
+    num[1] = 0;
+    num[0] = x + 48;
+    wwrite(p, c, d, 221, 10 + y * 8, 0, (byte *)num, c3);
+    wbox(p, c, d, c2, 227, 10 + y * 8, 6, 7);
+    if (!gradients[y].fixed)
+      wwrite(p, c, d, 228, 10 + y * 8, 0, (byte *)"E", c3);
+    else
+      wwrite(p, c, d, 228, 10 + y * 8, 0, (byte *)"F", c3);
+  }
+  wput(p, c, d, 170, 10 + gradient * 8, 36);
 
-  wrectangle(p,c,d,c0,139,65+8,9,65);
-  wrectangle(p,c,d,c0,149,65+8,9,65);
-  wrectangle(p,c,d,c0,159,65+8,9,65);
+  wrectangle(p, c, d, c0, 139, 65 + 8, 9, 65);
+  wrectangle(p, c, d, c0, 149, 65 + 8, 9, 65);
+  wrectangle(p, c, d, c0, 159, 65 + 8, 9, 65);
 
-  draw_ruler_selection(p,c,d,10,128+12);
-
+  draw_ruler_selection(p, c, d, 10, 128 + 12);
 }
 
 //-----------------------------------------------------------------------------
 //	Color window info panel for the selected color
 //-----------------------------------------------------------------------------
 
-void paint_window_colors2(byte * p,int c,int d,int col) {
+void paint_window_colors2(byte *p, int c, int d, int col) {
   byte num[8];
   int x;
 
-  wrectangle(p,c,d,c0,139,26,29,23);
-  wbox(p,c,d,col,140,19+8,27,21);
+  wrectangle(p, c, d, c0, 139, 26, 29, 23);
+  wbox(p, c, d, col, 140, 19 + 8, 27, 21);
 
-  wbox(p,c,d,c2,138,10,31,16);
-  num[2]=col%10+48; num[1]=(col/10)%10+48; num[0]=(col/100)%10+48;
-  div_strcpy((char *)&num[3],sizeof(num)-3,"Dec"); wwrite(p,c,d,167,11,2,num,c4);
-  num[1]=(col%16>9)?col%16+55:col%16+48; num[0]=(col/16>9)?col/16+55:col/16+48;
-  div_strcpy((char *)&num[2],sizeof(num)-2,"Hex"); wwrite(p,c,d,167,19,2,num,c4);
+  wbox(p, c, d, c2, 138, 10, 31, 16);
+  num[2] = col % 10 + 48;
+  num[1] = (col / 10) % 10 + 48;
+  num[0] = (col / 100) % 10 + 48;
+  div_strcpy((char *)&num[3], sizeof(num) - 3, "Dec");
+  wwrite(p, c, d, 167, 11, 2, num, c4);
+  num[1] = (col % 16 > 9) ? col % 16 + 55 : col % 16 + 48;
+  num[0] = (col / 16 > 9) ? col / 16 + 55 : col / 16 + 48;
+  div_strcpy((char *)&num[2], sizeof(num) - 2, "Hex");
+  wwrite(p, c, d, 167, 19, 2, num, c4);
 
-  wbox(p,c,d,c1,140,66+8,7,63);
-  if ((x=dac[col*3])) wbox(p,c,d,c_r,140,129-x+8,7,x);
-  wbox(p,c,d,c1,150,66+8,7,63);
-  if ((x=dac[col*3+1])) wbox(p,c,d,c_g,150,129-x+8,7,x);
-  wbox(p,c,d,c1,160,66+8,7,63);
-  if ((x=dac[col*3+2])) wbox(p,c,d,c_b,160,129-x+8,7,x);
+  wbox(p, c, d, c1, 140, 66 + 8, 7, 63);
+  if ((x = dac[col * 3]))
+    wbox(p, c, d, c_r, 140, 129 - x + 8, 7, x);
+  wbox(p, c, d, c1, 150, 66 + 8, 7, 63);
+  if ((x = dac[col * 3 + 1]))
+    wbox(p, c, d, c_g, 150, 129 - x + 8, 7, x);
+  wbox(p, c, d, c1, 160, 66 + 8, 7, 63);
+  if ((x = dac[col * 3 + 2]))
+    wbox(p, c, d, c_b, 160, 129 - x + 8, 7, x);
 
-  wbox(p,c,d,c2,138,41+8,31,23);
-  num[1]=dac[col*3]%10+48; num[0]=dac[col*3]/10+48;
-  div_strcpy((char *)&num[2],sizeof(num)-2," Red"); wwrite(p,c,d,139,42+8,0,num,c3);
-  num[1]=dac[col*3+1]%10+48; num[0]=dac[col*3+1]/10+48;
-  div_strcpy((char *)&num[2],sizeof(num)-2," Grn."); wwrite(p,c,d,139,50+8,0,num,c3);
-  num[1]=dac[col*3+2]%10+48; num[0]=dac[col*3+2]/10+48;
-  div_strcpy((char *)&num[2],sizeof(num)-2," Blue"); wwrite(p,c,d,139,58+8,0,num,c3);
+  wbox(p, c, d, c2, 138, 41 + 8, 31, 23);
+  num[1] = dac[col * 3] % 10 + 48;
+  num[0] = dac[col * 3] / 10 + 48;
+  div_strcpy((char *)&num[2], sizeof(num) - 2, " Red");
+  wwrite(p, c, d, 139, 42 + 8, 0, num, c3);
+  num[1] = dac[col * 3 + 1] % 10 + 48;
+  num[0] = dac[col * 3 + 1] / 10 + 48;
+  div_strcpy((char *)&num[2], sizeof(num) - 2, " Grn.");
+  wwrite(p, c, d, 139, 50 + 8, 0, num, c3);
+  num[1] = dac[col * 3 + 2] % 10 + 48;
+  num[0] = dac[col * 3 + 2] / 10 + 48;
+  div_strcpy((char *)&num[2], sizeof(num) - 2, " Blue");
+  wwrite(p, c, d, 139, 58 + 8, 0, num, c3);
 }
 
 //-----------------------------------------------------------------------------
 //      Adjust a box (a,b,c,d) to fit entirely within the screen
 //-----------------------------------------------------------------------------
 
-void adjust_box(int*a,int*b,int*c,int*d) {
-  if (*a<0) *a=0; else if (*a+*c>vga_width) *a=vga_width-*c;
-  if (*b<0) *b=0; else if (*b+*d>vga_height) *b=vga_height-*d;
+void adjust_box(int *a, int *b, int *c, int *d) {
+  if (*a < 0)
+    *a = 0;
+  else if (*a + *c > vga_width)
+    *a = vga_width - *c;
+  if (*b < 0)
+    *b = 0;
+  else if (*b + *d > vga_height)
+    *b = vga_height - *d;
 }
 
 //-----------------------------------------------------------------------------
@@ -4611,25 +7212,27 @@ void adjust_box(int*a,int*b,int*c,int*d) {
 //-----------------------------------------------------------------------------
 
 void move_bar(void) {
-  int barx,bary;
+  int barx, bary;
 
-  if ((mouse_b&1) && mouse_in(toolbar_x,toolbar_y,toolbar_x+9,toolbar_y+9)) {
-
-    wrectangle(toolbar,vga_width/big2,vga_height,c4,0,0,toolbar_width,19);
-    barx=toolbar_x-mouse_shift_x; bary=toolbar_y-mouse_shift_y;
+  if ((mouse_b & 1) && mouse_in(toolbar_x, toolbar_y, toolbar_x + 9, toolbar_y + 9)) {
+    wrectangle(toolbar, vga_width / big2, vga_height, c4, 0, 0, toolbar_width, 19);
+    barx = toolbar_x - mouse_shift_x;
+    bary = toolbar_y - mouse_shift_y;
     do {
       read_mouse();
-      draw_edit_background(toolbar_x-4,toolbar_y-big2,toolbar_width*big2+4,20*big2);
-      toolbar_x=mouse_shift_x+barx; toolbar_y=mouse_shift_y+bary; bar_coords();
+      draw_edit_background(toolbar_x - 4, toolbar_y - big2, toolbar_width * big2 + 4, 20 * big2);
+      toolbar_x = mouse_shift_x + barx;
+      toolbar_y = mouse_shift_y + bary;
+      bar_coords();
       flush_bars(0);
-      put(mouse_x,mouse_y,2);
+      put(mouse_x, mouse_y, 2);
       blit_screen(screen_buffer);
-    } while (mouse_b&1); zoom_map();
+    } while (mouse_b & 1);
+    zoom_map();
 
-    wrectangle(toolbar,vga_width/big2,vga_height,c2,0,0,toolbar_width,19);
-    draw_edit_background(toolbar_x-4,toolbar_y-big2,toolbar_width*big2+4,20*big2);
+    wrectangle(toolbar, vga_width / big2, vga_height, c2, 0, 0, toolbar_width, 19);
+    draw_edit_background(toolbar_x - 4, toolbar_y - big2, toolbar_width * big2 + 4, 20 * big2);
     flush_bars(0);
-
   }
 }
 
@@ -4637,79 +7240,116 @@ void move_bar(void) {
 //      Detect the zoom icon as the second toolbar icon
 //-----------------------------------------------------------------------------
 
-int iconos_zoom[]={4,1,101,102,103,104};
+int iconos_zoom[] = {4, 1, 101, 102, 103, 104};
 
 void select_zoom(void) {
-  int r=0,z=0;
+  int r = 0, z = 0;
 
-  if (mouse_in(toolbar_x,toolbar_y,toolbar_x+toolbar_width*big2-1,toolbar_y+19*big2-1)) {
-    if (big && !mouse_shift) { mouse_shift=1;
-      mouse_x=toolbar_x+(mouse_shift_x-toolbar_x)/2;
-      mouse_y=toolbar_y+(mouse_shift_y-toolbar_y)/2;
-    } else if (!big) mouse_shift=1;
+  if (mouse_in(toolbar_x, toolbar_y, toolbar_x + toolbar_width * big2 - 1,
+               toolbar_y + 19 * big2 - 1)) {
+    if (big && !mouse_shift) {
+      mouse_shift = 1;
+      mouse_x = toolbar_x + (mouse_shift_x - toolbar_x) / 2;
+      mouse_y = toolbar_y + (mouse_shift_y - toolbar_y) / 2;
+    } else if (!big)
+      mouse_shift = 1;
   }
 
-  if (mouse_b&8 && zoom>0) { zoom--; r=0;
-    if (!mouse_shift) { zoom_cx=coord_x; zoom_cy=coord_y; }
-  } else if (mouse_b&4 && zoom<3) { zoom++; r=0;
-    if (!mouse_shift) { zoom_cx=coord_x; zoom_cy=coord_y; }
-  } else if ((z=(key(_Z)&&hotkey))) { zoom=(zoom+1)%4; r=0;
-    if (!mouse_shift) { zoom_cx=coord_x; zoom_cy=coord_y; }
-  } else { r=select_icon(toolbar_x+48,iconos_zoom); if (r>=0) zoom=r; }
+  if (mouse_b & 8 && zoom > 0) {
+    zoom--;
+    r = 0;
+    if (!mouse_shift) {
+      zoom_cx = coord_x;
+      zoom_cy = coord_y;
+    }
+  } else if (mouse_b & 4 && zoom < 3) {
+    zoom++;
+    r = 0;
+    if (!mouse_shift) {
+      zoom_cx = coord_x;
+      zoom_cy = coord_y;
+    }
+  } else if ((z = (key(_Z) && hotkey))) {
+    zoom = (zoom + 1) % 4;
+    r = 0;
+    if (!mouse_shift) {
+      zoom_cx = coord_x;
+      zoom_cy = coord_y;
+    }
+  } else {
+    r = select_icon(toolbar_x + 48, iconos_zoom);
+    if (r >= 0)
+      zoom = r;
+  }
 
-  if (mouse_x>=zoom_win_x+zoom_win_width || mouse_x<zoom_win_x || mouse_y>=zoom_win_y+zoom_win_height || mouse_y<zoom_win_y) z=0;
+  if (mouse_x >= zoom_win_x + zoom_win_width || mouse_x < zoom_win_x ||
+      mouse_y >= zoom_win_y + zoom_win_height || mouse_y < zoom_win_y)
+    z = 0;
 
-  if (r>=0) {
+  if (r >= 0) {
+    bar[0] = 101 + zoom;
+    put_bar(48, 2, bar[0]);
+    zoom_background = 0;
 
-    bar[0]=101+zoom; put_bar(48,2,bar[0]); zoom_background=0;
-
-    if ((map_width<<zoom)<vga_width) { // Copy of this chunk in zoom_map
-      zoom_win_width=map_width<<zoom; zoom_win_x=(vga_width-zoom_win_width)/2;
+    if ((map_width << zoom) < vga_width) { // Copy of this chunk in zoom_map
+      zoom_win_width = map_width << zoom;
+      zoom_win_x = (vga_width - zoom_win_width) / 2;
     } else {
-      zoom_win_x=0; zoom_win_width=(vga_width>>zoom)<<zoom;
+      zoom_win_x = 0;
+      zoom_win_width = (vga_width >> zoom) << zoom;
     }
 
-    if ((map_height<<zoom)<vga_height) {
-      zoom_win_height=map_height<<zoom; zoom_win_y=(vga_height-zoom_win_height)/2;
+    if ((map_height << zoom) < vga_height) {
+      zoom_win_height = map_height << zoom;
+      zoom_win_y = (vga_height - zoom_win_height) / 2;
     } else {
-      zoom_win_y=0; zoom_win_height=(vga_height>>zoom)<<zoom;
+      zoom_win_y = 0;
+      zoom_win_height = (vga_height >> zoom) << zoom;
     }
 
-    zoom_x=zoom_cx-(zoom_win_width/2)/(1<<zoom);
-    if (zoom_x<=0) zoom_x=0;
-    else if (zoom_x+zoom_win_width/(1<<zoom)>map_width) {
-      zoom_x=map_width-zoom_win_width/(1<<zoom);
-      if (zoom_x<0) zoom_x=0;
+    zoom_x = zoom_cx - (zoom_win_width / 2) / (1 << zoom);
+    if (zoom_x <= 0)
+      zoom_x = 0;
+    else if (zoom_x + zoom_win_width / (1 << zoom) > map_width) {
+      zoom_x = map_width - zoom_win_width / (1 << zoom);
+      if (zoom_x < 0)
+        zoom_x = 0;
     }
 
-    zoom_y=zoom_cy-(zoom_win_height/2)/(1<<zoom);
-    if (zoom_y<0) zoom_y=0;
-    else if (zoom_y+zoom_win_height/(1<<zoom)>map_height) {
-      zoom_y=map_height-zoom_win_height/(1<<zoom);
-      if (zoom_y<0) zoom_y=0;
+    zoom_y = zoom_cy - (zoom_win_height / 2) / (1 << zoom);
+    if (zoom_y < 0)
+      zoom_y = 0;
+    else if (zoom_y + zoom_win_height / (1 << zoom) > map_height) {
+      zoom_y = map_height - zoom_win_height / (1 << zoom);
+      if (zoom_y < 0)
+        zoom_y = 0;
     }
 
     if (z && !mouse_shift) {
-      mouse_x=zoom_win_x+(coord_x-zoom_x)*(1<<zoom);
-      mouse_y=zoom_win_y+(coord_y-zoom_y)*(1<<zoom);
-      set_mouse(mouse_x,mouse_y);
-      mouse_shift_x=mouse_x;
-      mouse_shift_y=mouse_y;
+      mouse_x = zoom_win_x + (coord_x - zoom_x) * (1 << zoom);
+      mouse_y = zoom_win_y + (coord_y - zoom_y) * (1 << zoom);
+      set_mouse(mouse_x, mouse_y);
+      mouse_shift_x = mouse_x;
+      mouse_shift_y = mouse_y;
     }
 
-    do { read_mouse(); } while((mouse_b&1) || (key(_Z)&&hotkey));
+    do {
+      read_mouse();
+    } while ((mouse_b & 1) || (key(_Z) && hotkey));
 
-    need_zoom=1;
+    need_zoom = 1;
   }
 
-  if (mouse_in(toolbar_x,toolbar_y,toolbar_x+toolbar_width*big2-1,toolbar_y+19*big2-1)) {
-    if (big && !mouse_shift) { mouse_shift=1;
-      mouse_x=toolbar_x+(mouse_shift_x-toolbar_x)/2;
-      mouse_y=toolbar_y+(mouse_shift_y-toolbar_y)/2; }
+  if (mouse_in(toolbar_x, toolbar_y, toolbar_x + toolbar_width * big2 - 1,
+               toolbar_y + 19 * big2 - 1)) {
+    if (big && !mouse_shift) {
+      mouse_shift = 1;
+      mouse_x = toolbar_x + (mouse_shift_x - toolbar_x) / 2;
+      mouse_y = toolbar_y + (mouse_shift_y - toolbar_y) / 2;
+    }
   }
-   
-  zoom=zoom%4;
 
+  zoom = zoom % 4;
 }
 
 //-----------------------------------------------------------------------------
@@ -4717,43 +7357,58 @@ void select_zoom(void) {
 //-----------------------------------------------------------------------------
 
 void move_zoom(void) {
-  int n,m=0;
+  int n, m = 0;
 
-  if ((mouse_b&1) && mouse_in(toolbar_x+26,toolbar_y+2,toolbar_x+47,toolbar_y+17)) {
-    if (zoom_move==c3) zoom_move=c1; else zoom_move=c3;
-    do {read_mouse();} while(mouse_b&1);
+  if ((mouse_b & 1) && mouse_in(toolbar_x + 26, toolbar_y + 2, toolbar_x + 47, toolbar_y + 17)) {
+    if (zoom_move == c3)
+      zoom_move = c1;
+    else
+      zoom_move = c3;
+    do {
+      read_mouse();
+    } while (mouse_b & 1);
   }
 
-  if (zoom_move==c3) {
-    n=zoom_x;
-    if (zoom_win_x==0 && zoom_win_width>=vga_width) {
-      if (real_mouse_x<0) {
-        zoom_x-=(-real_mouse_x)>>zoom;
-        if (zoom_x<0) zoom_x=0;
-        if (n!=zoom_x) m|=1;
-      } else if (real_mouse_x>=vga_width) {
-        zoom_x+=(real_mouse_x-vga_width+1)>>zoom;
-        if (zoom_x>map_width-vga_width/(1<<zoom)) zoom_x=map_width-vga_width/(1<<zoom);
-        if (n!=zoom_x) m|=1;
+  if (zoom_move == c3) {
+    n = zoom_x;
+    if (zoom_win_x == 0 && zoom_win_width >= vga_width) {
+      if (real_mouse_x < 0) {
+        zoom_x -= (-real_mouse_x) >> zoom;
+        if (zoom_x < 0)
+          zoom_x = 0;
+        if (n != zoom_x)
+          m |= 1;
+      } else if (real_mouse_x >= vga_width) {
+        zoom_x += (real_mouse_x - vga_width + 1) >> zoom;
+        if (zoom_x > map_width - vga_width / (1 << zoom))
+          zoom_x = map_width - vga_width / (1 << zoom);
+        if (n != zoom_x)
+          m |= 1;
       }
     }
-    n=zoom_y;
-    if (zoom_win_y==0 && zoom_win_height>=vga_height) {
-      if (real_mouse_y<0) {
-        zoom_y-=(-real_mouse_y)>>zoom;
-        if (zoom_y<0) zoom_y=0;
-        if (n!=zoom_y) m|=2;
-      } else if (real_mouse_y>=vga_height) {
-        zoom_y+=(real_mouse_y-vga_height+1)>>zoom;
-        if (zoom_y>map_height-vga_height/(1<<zoom)) zoom_y=map_height-vga_height/(1<<zoom);
-        if (n!=zoom_y) m|=2;
+    n = zoom_y;
+    if (zoom_win_y == 0 && zoom_win_height >= vga_height) {
+      if (real_mouse_y < 0) {
+        zoom_y -= (-real_mouse_y) >> zoom;
+        if (zoom_y < 0)
+          zoom_y = 0;
+        if (n != zoom_y)
+          m |= 2;
+      } else if (real_mouse_y >= vga_height) {
+        zoom_y += (real_mouse_y - vga_height + 1) >> zoom;
+        if (zoom_y > map_height - vga_height / (1 << zoom))
+          zoom_y = map_height - vga_height / (1 << zoom);
+        if (n != zoom_y)
+          m |= 2;
       }
     }
-    if (m&1) zoom_cx=zoom_x+(vga_width/2)/(1<<zoom);
-    if (m&2) zoom_cy=zoom_y+(vga_height/2)/(1<<zoom);
-    if (m) need_zoom=1;
+    if (m & 1)
+      zoom_cx = zoom_x + (vga_width / 2) / (1 << zoom);
+    if (m & 2)
+      zoom_cy = zoom_y + (vga_height / 2) / (1 << zoom);
+    if (m)
+      need_zoom = 1;
   }
-
 }
 
 //-----------------------------------------------------------------------------
@@ -4761,39 +7416,72 @@ void move_zoom(void) {
 //-----------------------------------------------------------------------------
 
 void draw_bar(int _an) {
-
   int n; // Number of icons
 
-  draw_edit_background(toolbar_x-4,toolbar_y,toolbar_width*big2+4,19*big2);
+  draw_edit_background(toolbar_x - 4, toolbar_y, toolbar_width * big2 + 4, 19 * big2);
 
-  n=0; while (bar[n]) n++;
-  toolbar_width=2+8+38+n*16+1+_an;
-  memset(toolbar,c0,vga_width*19*big2);
-  wrectangle(toolbar,vga_width/big2,19,c2,0,0,toolbar_width,19);
-  wgra(toolbar,vga_width/big2,19,c_b_low,2,2,7,7);
+  n = 0;
+  while (bar[n])
+    n++;
+  toolbar_width = 2 + 8 + 38 + n * 16 + 1 + _an;
+  memset(toolbar, c0, vga_width * 19 * big2);
+  wrectangle(toolbar, vga_width / big2, 19, c2, 0, 0, toolbar_width, 19);
+  wgra(toolbar, vga_width / big2, 19, c_b_low, 2, 2, 7, 7);
 
-  put_bar(2,10,35);
-  n=0; while (bar[n]) {
-    if (bar[n]>1) put_bar(48+n*16,2,bar[n]);
+  put_bar(2, 10, 35);
+  n = 0;
+  while (bar[n]) {
+    if (bar[n] > 1)
+      put_bar(48 + n * 16, 2, bar[n]);
     n++;
   }
-  switch(draw_mode) {
-    case 0: put_bar_inv(10,2,177); break;
-    case 1: put_bar_inv(10,2,160); break;
-    case 2: put_bar_inv(10,2,161); break;
-    case 3: put_bar_inv(10,2,178); break;
-    case 4: put_bar_inv(10,2,162); break;
-    case 5: put_bar_inv(10,2,179); break;
-    case 6: put_bar_inv(10,2,163); break;
-    case 7: put_bar_inv(10,2,164); break;
-    case 8: put_bar_inv(10,2,180); break;
-    case 9: put_bar_inv(10,2,165); break;
-    case 10:
-      if (mode_selection<4) { put_bar_inv(10,2,131+mode_selection); }
-      else { put_bar_inv(10,2,mode_selection+167-4); } break;
-    case 11: put_bar_inv(10,2,100); break;
-    case 12: put_bar_inv(10,2,191); break;
-    case 13: put_bar_inv(10,2,190); break;
+  switch (draw_mode) {
+  case 0:
+    put_bar_inv(10, 2, 177);
+    break;
+  case 1:
+    put_bar_inv(10, 2, 160);
+    break;
+  case 2:
+    put_bar_inv(10, 2, 161);
+    break;
+  case 3:
+    put_bar_inv(10, 2, 178);
+    break;
+  case 4:
+    put_bar_inv(10, 2, 162);
+    break;
+  case 5:
+    put_bar_inv(10, 2, 179);
+    break;
+  case 6:
+    put_bar_inv(10, 2, 163);
+    break;
+  case 7:
+    put_bar_inv(10, 2, 164);
+    break;
+  case 8:
+    put_bar_inv(10, 2, 180);
+    break;
+  case 9:
+    put_bar_inv(10, 2, 165);
+    break;
+  case 10:
+    if (mode_selection < 4) {
+      put_bar_inv(10, 2, 131 + mode_selection);
+    } else {
+      put_bar_inv(10, 2, mode_selection + 167 - 4);
+    }
+    break;
+  case 11:
+    put_bar_inv(10, 2, 100);
+    break;
+  case 12:
+    put_bar_inv(10, 2, 191);
+    break;
+  case 13:
+    put_bar_inv(10, 2, 190);
+    break;
   }
 }
 
@@ -4802,23 +7490,34 @@ void draw_bar(int _an) {
 //-----------------------------------------------------------------------------
 
 void bar_coords(void) {
-  byte * p;
+  byte *p;
   byte num[5];
 
-  wbox(toolbar,vga_width/big2,vga_height,c2,26,2,21,15);
-  p=screen_buffer; screen_buffer=toolbar; text_color=zoom_move; num[4]=0;
+  wbox(toolbar, vga_width / big2, vga_height, c2, 26, 2, 21, 15);
+  p = screen_buffer;
+  screen_buffer = toolbar;
+  text_color = zoom_move;
+  num[4] = 0;
 
-  if (coord_x>=0 && coord_x<map_width) {
-    num[3]=coord_x%10+48; num[2]=(coord_x/10)%10+48; num[1]=(coord_x/100)%10+48;
-    num[0]=(coord_x/1000)%10+48; writetxt(27,3,0,num);
-  } else writetxt(27,3,0,(byte *)"000?");
+  if (coord_x >= 0 && coord_x < map_width) {
+    num[3] = coord_x % 10 + 48;
+    num[2] = (coord_x / 10) % 10 + 48;
+    num[1] = (coord_x / 100) % 10 + 48;
+    num[0] = (coord_x / 1000) % 10 + 48;
+    writetxt(27, 3, 0, num);
+  } else
+    writetxt(27, 3, 0, (byte *)"000?");
 
-  if (coord_y>=0 && coord_y<map_height) {
-    num[3]=coord_y%10+48; num[2]=(coord_y/10)%10+48; num[1]=(coord_y/100)%10+48;
-    num[0]=(coord_y/1000)%10+48; writetxt(27,10,0,num);
-  } else writetxt(27,10,0,(byte *)"000?");
+  if (coord_y >= 0 && coord_y < map_height) {
+    num[3] = coord_y % 10 + 48;
+    num[2] = (coord_y / 10) % 10 + 48;
+    num[1] = (coord_y / 100) % 10 + 48;
+    num[0] = (coord_y / 1000) % 10 + 48;
+    writetxt(27, 10, 0, num);
+  } else
+    writetxt(27, 10, 0, (byte *)"000?");
 
-  screen_buffer=p;
+  screen_buffer = p;
 }
 
 //-----------------------------------------------------------------------------
@@ -4826,17 +7525,26 @@ void bar_coords(void) {
 //-----------------------------------------------------------------------------
 
 void analyze_bar(int an, int al) {
-  byte * p;
+  byte *p;
   byte num[5];
 
-  wbox(toolbar,vga_width/big2,vga_height,c2,toolbar_width-23,2,21,15);
+  wbox(toolbar, vga_width / big2, vga_height, c2, toolbar_width - 23, 2, 21, 15);
 
-  p=screen_buffer; screen_buffer=toolbar; text_color=c4; num[4]=0;
-  num[3]=an%10+48; num[2]=(an/10)%10+48; num[1]=(an/100)%10+48;
-  num[0]=(an/1000)%10+48; writetxt(toolbar_width-22,3,0,num);
-  num[3]=al%10+48; num[2]=(al/10)%10+48; num[1]=(al/100)%10+48;
-  num[0]=(al/1000)%10+48; writetxt(toolbar_width-22,10,0,num);
-  screen_buffer=p;
+  p = screen_buffer;
+  screen_buffer = toolbar;
+  text_color = c4;
+  num[4] = 0;
+  num[3] = an % 10 + 48;
+  num[2] = (an / 10) % 10 + 48;
+  num[1] = (an / 100) % 10 + 48;
+  num[0] = (an / 1000) % 10 + 48;
+  writetxt(toolbar_width - 22, 3, 0, num);
+  num[3] = al % 10 + 48;
+  num[2] = (al / 10) % 10 + 48;
+  num[1] = (al / 100) % 10 + 48;
+  num[0] = (al / 1000) % 10 + 48;
+  writetxt(toolbar_width - 22, 10, 0, num);
+  screen_buffer = p;
 }
 
 //-----------------------------------------------------------------------------
@@ -4846,27 +7554,40 @@ void analyze_bar(int an, int al) {
 int new_bar(int an, int al) {
   int n;
 
-  for (n=0;n<10;n++) { if (!barras[n].on) break; } if (n==10) return(-1);
+  for (n = 0; n < 10; n++) {
+    if (!barras[n].on)
+      break;
+  }
+  if (n == 10)
+    return (-1);
 
-  if ((barras[n].ptr=(byte*)malloc(an*big2*al*big2))==NULL) {
-    v_text=(char *)texts[45]; show_dialog(err0); return(-1);
+  if ((barras[n].ptr = (byte *)malloc(an * big2 * al * big2)) == NULL) {
+    v_text = (char *)texts[45];
+    show_dialog(err0);
+    return (-1);
   }
 
-  barras[n].on=1; barras[n].an=an; barras[n].al=al;
+  barras[n].on = 1;
+  barras[n].an = an;
+  barras[n].al = al;
 
-  an*=big2; al*=big2;
-  barras[n].x=toolbar_x;
-  if (toolbar_y>vga_height/2-9*big2) barras[n].y=toolbar_y-al-1;
-  else barras[n].y=toolbar_y+19*big2+1;
-  adjust_box(&barras[n].x,&barras[n].y,&an,&al);
-  an/=big2; al/=big2;
+  an *= big2;
+  al *= big2;
+  barras[n].x = toolbar_x;
+  if (toolbar_y > vga_height / 2 - 9 * big2)
+    barras[n].y = toolbar_y - al - 1;
+  else
+    barras[n].y = toolbar_y + 19 * big2 + 1;
+  adjust_box(&barras[n].x, &barras[n].y, &an, &al);
+  an /= big2;
+  al /= big2;
 
-  wrectangle(barras[n].ptr,an,al,c2,0,0,an,al);
-  wbox(barras[n].ptr,an,al,c0,1,1,an-2,al-2);
-  wgra(barras[n].ptr,an,al,c_b_low,2,2,an-12,7);
-  wput(barras[n].ptr,an,al,an-9,2,35);
+  wrectangle(barras[n].ptr, an, al, c2, 0, 0, an, al);
+  wbox(barras[n].ptr, an, al, c0, 1, 1, an - 2, al - 2);
+  wgra(barras[n].ptr, an, al, c_b_low, 2, 2, an - 12, 7);
+  wput(barras[n].ptr, an, al, an - 9, 2, 35);
 
-  return(0);
+  return (0);
 }
 
 void flush_bars(int oscurecidas) {
@@ -4874,80 +7595,118 @@ void flush_bars(int oscurecidas) {
 
   // The main toolbar is treated specially, it is always active
 
-  if (!oscurecidas) flush_bar(toolbar,vga_width,toolbar_x,toolbar_y,toolbar_width,19);
-  else flush_bar_darkened(toolbar,vga_width,toolbar_x,toolbar_y,toolbar_width,19);
+  if (!oscurecidas)
+    flush_bar(toolbar, vga_width, toolbar_x, toolbar_y, toolbar_width, 19);
+  else
+    flush_bar_darkened(toolbar, vga_width, toolbar_x, toolbar_y, toolbar_width, 19);
 
-  for (n=0;n<10;n++) if (barras[n].on) {
-    if (!oscurecidas) {
-      flush_bar(barras[n].ptr,barras[n].an,barras[n].x,barras[n].y,barras[n].an,barras[n].al);
-    } else {
-      flush_bar_darkened(barras[n].ptr,barras[n].an,barras[n].x,barras[n].y,barras[n].an,barras[n].al);
+  for (n = 0; n < 10; n++)
+    if (barras[n].on) {
+      if (!oscurecidas) {
+        flush_bar(barras[n].ptr, barras[n].an, barras[n].x, barras[n].y, barras[n].an,
+                  barras[n].al);
+      } else {
+        flush_bar_darkened(barras[n].ptr, barras[n].an, barras[n].x, barras[n].y, barras[n].an,
+                           barras[n].al);
+      }
     }
-  }
-
 }
 
-void flush_bar(byte * p, int real_an, int x, int y, int an, int al) {
-
-  byte * q;
+void flush_bar(byte *p, int real_an, int x, int y, int an, int al) {
+  byte *q;
   int salta_x, long_x, resto_x;
   int salta_y, long_y, resto_y;
 
-  if (big) { an*=2; al*=2; }
+  if (big) {
+    an *= 2;
+    al *= 2;
+  }
 
-  blit_partial(x,y,an,al);
+  blit_partial(x, y, an, al);
 
-  q=screen_buffer+y*vga_width+x;
+  q = screen_buffer + y * vga_width + x;
 
-  if (x<0) salta_x=-x; else salta_x=0;
-  if (x+an>vga_width) resto_x=x+an-vga_width; else resto_x=0;
-  long_x=an-salta_x-resto_x;
+  if (x < 0)
+    salta_x = -x;
+  else
+    salta_x = 0;
+  if (x + an > vga_width)
+    resto_x = x + an - vga_width;
+  else
+    resto_x = 0;
+  long_x = an - salta_x - resto_x;
 
-  resto_x+=real_an-an;
+  resto_x += real_an - an;
 
-  if (y<0) salta_y=-y; else salta_y=0;
-  if (y+al>vga_height) resto_y=y+al-vga_height; else resto_y=0;
-  long_y=al-salta_y-resto_y;
+  if (y < 0)
+    salta_y = -y;
+  else
+    salta_y = 0;
+  if (y + al > vga_height)
+    resto_y = y + al - vga_height;
+  else
+    resto_y = 0;
+  long_y = al - salta_y - resto_y;
 
-  p+=vga_width*salta_y+salta_x; q+=vga_width*salta_y+salta_x;
-  resto_x+=salta_x; an=long_x;
+  p += vga_width * salta_y + salta_x;
+  q += vga_width * salta_y + salta_x;
+  resto_x += salta_x;
+  an = long_x;
   do {
     do {
-      *q++=*p++;
+      *q++ = *p++;
     } while (--an);
-    q+=vga_width-(an=long_x); p+=resto_x;
+    q += vga_width - (an = long_x);
+    p += resto_x;
   } while (--long_y);
 }
 
-void flush_bar_darkened(byte * p, int real_an, int x, int y, int an, int al) {
-
-  byte * q;
+void flush_bar_darkened(byte *p, int real_an, int x, int y, int an, int al) {
+  byte *q;
   int salta_x, long_x, resto_x;
   int salta_y, long_y, resto_y;
 
-  if (big) { an*=2; al*=2; }
+  if (big) {
+    an *= 2;
+    al *= 2;
+  }
 
-  blit_partial(x,y,an,al);
+  blit_partial(x, y, an, al);
 
-  q=screen_buffer+y*vga_width+x;
+  q = screen_buffer + y * vga_width + x;
 
-  if (x<0) salta_x=-x; else salta_x=0;
-  if (x+an>vga_width) resto_x=x+an-vga_width; else resto_x=0;
-  long_x=an-salta_x-resto_x;
+  if (x < 0)
+    salta_x = -x;
+  else
+    salta_x = 0;
+  if (x + an > vga_width)
+    resto_x = x + an - vga_width;
+  else
+    resto_x = 0;
+  long_x = an - salta_x - resto_x;
 
-  resto_x+=real_an-an;
+  resto_x += real_an - an;
 
-  if (y<0) salta_y=-y; else salta_y=0;
-  if (y+al>vga_height) resto_y=y+al-vga_height; else resto_y=0;
-  long_y=al-salta_y-resto_y;
+  if (y < 0)
+    salta_y = -y;
+  else
+    salta_y = 0;
+  if (y + al > vga_height)
+    resto_y = y + al - vga_height;
+  else
+    resto_y = 0;
+  long_y = al - salta_y - resto_y;
 
-  p+=vga_width*salta_y+salta_x; q+=vga_width*salta_y+salta_x;
-  resto_x+=salta_x; an=long_x;
+  p += vga_width * salta_y + salta_x;
+  q += vga_width * salta_y + salta_x;
+  resto_x += salta_x;
+  an = long_x;
   do {
     do {
-      *q++=*(ghost+c0*256+*p++);
+      *q++ = *(ghost + c0 * 256 + *p++);
     } while (--an);
-    q+=vga_width-(an=long_x); p+=resto_x;
+    q += vga_width - (an = long_x);
+    p += resto_x;
   } while (--long_y);
 }
 
@@ -4955,16 +7714,13 @@ void flush_bar_darkened(byte * p, int real_an, int x, int y, int an, int al) {
 //      Place a graphic on the editing toolbar
 //-----------------------------------------------------------------------------
 
-void put_bar(int x,int y,int n) {
-
-  wput_in_box(toolbar,vga_width/big2,vga_width/big2,19,x,y,-n);
-
+void put_bar(int x, int y, int n) {
+  wput_in_box(toolbar, vga_width / big2, vga_width / big2, 19, x, y, -n);
 }
 
-void put_bar_inv(int x,int y,int n) {
-
-  wput_in_box(toolbar,vga_width/big2,vga_width/big2,19,x,y,-n); // TODO: Highlight inversion does not render correctly
-  wresalta_box(toolbar,vga_width/big2,19,x,y,*((word*)graf[n])/big2,*((word*)(graf[n]+2))/big2);
-
+void put_bar_inv(int x, int y, int n) {
+  wput_in_box(toolbar, vga_width / big2, vga_width / big2, 19, x, y,
+              -n); // TODO: Highlight inversion does not render correctly
+  wresalta_box(toolbar, vga_width / big2, 19, x, y, *((word *)graf[n]) / big2,
+               *((word *)(graf[n] + 2)) / big2);
 }
-

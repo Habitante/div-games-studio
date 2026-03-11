@@ -215,13 +215,13 @@
 #include <zlib.h>
 #endif
 
-void list_objects (void);
-void list_assembler (void);
+void list_objects(void);
+void list_assembler(void);
 
 void delete_code(void);
-void preload_objects (void);
+void preload_objects(void);
 void psintactico(void);
-void test_buffer(int * * buffer,int * maximo,int n);
+void test_buffer(int **buffer, int *maximo, int n);
 void save_dbg(void);
 void save_exec_bin(void);
 void tloc_init(int tipo);
@@ -252,9 +252,6 @@ void remove_code(int i);
 void add_code(int dir, int param, int op);
 
 
-
-
-
 //-----------------------------------------------------------------------------
 //      Constants
 //-----------------------------------------------------------------------------
@@ -262,280 +259,280 @@ void add_code(int dir, int param, int op);
 #define version "0c88b" //Compiler version
 
 #ifndef SHARE
-#define max_obj 8192    //Compiler object maximum limit
-#define long_med_id 16  //Average identifier length (+4+4+1)
+#define max_obj     8192 //Compiler object maximum limit
+#define long_med_id 16   //Average identifier length (+4+4+1)
 #else
-#define max_obj 700     //The shareware version has 626 ...
+#define max_obj     700 //The shareware version has 626 ...
 #define long_med_id 20  //Average identifier length (+4+4+1)
 #endif
 
-#define max_nodos 128   //Maximum number of lexer symbol nodes
-#define max_exp 512     //Maximum number of elements in an expression
-#define long_header 9   //Header length at program start
-#define long_pila 2048  //Execution stack length
+#define max_nodos   128  //Maximum number of lexer symbol nodes
+#define max_exp     512  //Maximum number of elements in an expression
+#define long_header 9    //Header length at program start
+#define long_pila   2048 //Execution stack length
 
-#define default_buffer    (16384*8)
-#define security_distance (4096*8)
-#define buffer_grow       (16384*8)
+#define default_buffer    (16384 * 8)
+#define security_distance (4096 * 8)
+#define buffer_grow       (16384 * 8)
 
-#define cr 13           //Carriage return
-#define lf 10           //Line feed
-#define tab 9           //Tab
+#define cr  13 //Carriage return
+#define lf  10 //Line feed
+#define tab 9  //Tab
 
 //-----------------------------------------------------------------------------
 
-#define l_err 0         //lex_case values, when not pointers to lex_simb
-#define l_cr  1         //End of line (l_err = unexpected character)
-#define l_id  2         //Identifier or reserved word
-#define l_spc 3         //Spaces and tabs
-#define l_lit 4         //Literal
-#define l_num 5         //Numeric constant
+#define l_err 0 //lex_case values, when not pointers to lex_simb
+#define l_cr  1 //End of line (l_err = unexpected character)
+#define l_id  2 //Identifier or reserved word
+#define l_spc 3 //Spaces and tabs
+#define l_lit 4 //Literal
+#define l_num 5 //Numeric constant
 
 //-----------------------------------------------------------------------------
 //      Syntactic values / tokens (pieza)
 //-----------------------------------------------------------------------------
 
-#define p_ultima        0x00 //End of file <EOF>
+#define p_ultima 0x00 //End of file <EOF>
 
-#define p_program       0x01
-#define p_const         0x02
-#define p_global        0x03
-#define p_local         0x04
-#define p_begin         0x05
-#define p_end           0x06
-#define p_process       0x07
-#define p_private       0x08
-#define p_struct        0x09
-#define p_import        0x0A
-#define p_include       0x75 
+#define p_program 0x01
+#define p_const   0x02
+#define p_global  0x03
+#define p_local   0x04
+#define p_begin   0x05
+#define p_end     0x06
+#define p_process 0x07
+#define p_private 0x08
+#define p_struct  0x09
+#define p_import  0x0A
+#define p_include 0x75
 
 #define p_setup_program 0x0B
 
-#define p_string        0x0C
-#define p_byte          0x0D
-#define p_word          0x0E
-#define p_int           0x0F
+#define p_string 0x0C
+#define p_byte   0x0D
+#define p_word   0x0E
+#define p_int    0x0F
 
 #define p_compiler_options 0x10
-#define p_function      0x11
+#define p_function         0x11
 
-#define p_until         0x16
-#define p_else          0x17
+#define p_until 0x16
+#define p_else  0x17
 
-#define p_return        0x18
+#define p_return 0x18
 
-#define p_from          0x19
-#define p_to            0x1a
-#define p_step          0x1b
-#define p_if            0x20
-#define p_loop          0x21
-#define p_while         0x22
-#define p_repeat        0x23
-#define p_for           0x24
-#define p_switch        0x25
-#define p_case          0x26
-#define p_default       0x27
+#define p_from    0x19
+#define p_to      0x1a
+#define p_step    0x1b
+#define p_if      0x20
+#define p_loop    0x21
+#define p_while   0x22
+#define p_repeat  0x23
+#define p_for     0x24
+#define p_switch  0x25
+#define p_case    0x26
+#define p_default 0x27
 
-#define p_frame         0x28
+#define p_frame 0x28
 
-#define p_break         0x29
-#define p_continue      0x2A
+#define p_break    0x29
+#define p_continue 0x2A
 
-#define p_clone         0x2B
+#define p_clone 0x2B
 
-#define p_debug         0x2C
+#define p_debug 0x2C
 
-#define p_ptocoma       0x30
-#define p_coma          0x31
-#define p_corab         0x32
-#define p_corce         0x33
+#define p_ptocoma 0x30
+#define p_coma    0x31
+#define p_corab   0x32
+#define p_corce   0x33
 
-#define p_asig          0x38
+#define p_asig 0x38
 
-#define p_dup           0x3C
+#define p_dup 0x3C
 
-#define p_abrir         0x40
-#define p_cerrar        0x41
+#define p_abrir  0x40
+#define p_cerrar 0x41
 
-#define p_suma          0x44
-#define p_resta         0x45
+#define p_suma  0x44
+#define p_resta 0x45
 
-#define p_shr           0x46
-#define p_shl           0x47
+#define p_shr 0x46
+#define p_shl 0x47
 
-#define p_or            0x48
-#define p_xor           0x49
-#define p_and           0x4a
+#define p_or  0x48
+#define p_xor 0x49
+#define p_and 0x4a
 
-#define p_xorptr        0x4b
-#define p_andofs        0x4c
+#define p_xorptr 0x4b
+#define p_andofs 0x4c
 
-#define p_neg           0x4e
-#define p_pointer       0x4f
+#define p_neg     0x4e
+#define p_pointer 0x4f
 
-#define p_offset        0x50
-#define p_not           0x51
+#define p_offset 0x50
+#define p_not    0x51
 
-#define p_add           0x52
-#define p_sub           0x53
+#define p_add 0x52
+#define p_sub 0x53
 
-#define p_mul           0x54
-#define p_div           0x55
-#define p_mod           0x56
-#define p_multi         0x57
+#define p_mul   0x54
+#define p_div   0x55
+#define p_mod   0x56
+#define p_multi 0x57
 
-#define p_inc           0x58
-#define p_dec           0x59
+#define p_inc 0x58
+#define p_dec 0x59
 
-#define p_igu           0x5b
-#define p_dis           0x5c
+#define p_igu 0x5b
+#define p_dis 0x5c
 
-#define p_may           0x5d
-#define p_men           0x5e
-#define p_mei           0x5f
-#define p_mai           0x60
+#define p_may 0x5d
+#define p_men 0x5e
+#define p_mei 0x5f
+#define p_mai 0x60
 
-#define p_sizeof        0x66
+#define p_sizeof 0x66
 
-#define p_type          0x67
+#define p_type 0x67
 
-#define p_whoami        0x68
+#define p_whoami 0x68
 
-#define p_punto         0x69
+#define p_punto 0x69
 
-#define p_rango         0x6a
+#define p_rango 0x6a
 
-#define p_add_asig      0x6b
-#define p_sub_asig      0x6c
-#define p_mul_asig      0x6d
-#define p_div_asig      0x6e
-#define p_mod_asig      0x6f
-#define p_and_asig      0x70
-#define p_or_asig       0x71
-#define p_xor_asig      0x72
-#define p_shr_asig      0x73
-#define p_shl_asig      0x74
+#define p_add_asig 0x6b
+#define p_sub_asig 0x6c
+#define p_mul_asig 0x6d
+#define p_div_asig 0x6e
+#define p_mod_asig 0x6f
+#define p_and_asig 0x70
+#define p_or_asig  0x71
+#define p_xor_asig 0x72
+#define p_shr_asig 0x73
+#define p_shl_asig 0x74
 
-#define p_ini_rem       0x7d //Begin comment
-#define p_end_rem       0x7e //End comment
-#define p_rem           0x7f //Single-line comment
+#define p_ini_rem 0x7d //Begin comment
+#define p_end_rem 0x7e //End comment
+#define p_rem     0x7f //Single-line comment
 
-#define p_strigu        0xc0
-#define p_strdis        0xc1
-#define p_strmay        0xc2
-#define p_strmen        0xc3
-#define p_strmei        0xc4
-#define p_strmai        0xc5
+#define p_strigu 0xc0
+#define p_strdis 0xc1
+#define p_strmay 0xc2
+#define p_strmen 0xc3
+#define p_strmei 0xc4
+#define p_strmai 0xc5
 
-#define p_pointerword   0xd0
-#define p_sumaword      0xd1
-#define p_restaword     0xd2
-#define p_incword       0xd3
-#define p_decword       0xd4
-#define p_asigword      0xd5
-#define p_add_asigword  0xd6
-#define p_sub_asigword  0xd7
-#define p_mul_asigword  0xd8
-#define p_div_asigword  0xd9
-#define p_mod_asigword  0xda
-#define p_and_asigword  0xdb
-#define p_or_asigword   0xdc
-#define p_xor_asigword  0xdd
-#define p_shr_asigword  0xde
-#define p_shl_asigword  0xdf
+#define p_pointerword  0xd0
+#define p_sumaword     0xd1
+#define p_restaword    0xd2
+#define p_incword      0xd3
+#define p_decword      0xd4
+#define p_asigword     0xd5
+#define p_add_asigword 0xd6
+#define p_sub_asigword 0xd7
+#define p_mul_asigword 0xd8
+#define p_div_asigword 0xd9
+#define p_mod_asigword 0xda
+#define p_and_asigword 0xdb
+#define p_or_asigword  0xdc
+#define p_xor_asigword 0xdd
+#define p_shr_asigword 0xde
+#define p_shl_asigword 0xdf
 
-#define p_pointerchar   0xe0
-#define p_sumachar      0xe1
-#define p_restachar     0xe2
-#define p_incchar       0xe3
-#define p_decchar       0xe4
-#define p_asigchar      0xe5
-#define p_add_asigchar  0xe6
-#define p_sub_asigchar  0xe7
-#define p_mul_asigchar  0xe8
-#define p_div_asigchar  0xe9
-#define p_mod_asigchar  0xea
-#define p_and_asigchar  0xeb
-#define p_or_asigchar   0xec
-#define p_xor_asigchar  0xed
-#define p_shr_asigchar  0xee
-#define p_shl_asigchar  0xef
+#define p_pointerchar  0xe0
+#define p_sumachar     0xe1
+#define p_restachar    0xe2
+#define p_incchar      0xe3
+#define p_decchar      0xe4
+#define p_asigchar     0xe5
+#define p_add_asigchar 0xe6
+#define p_sub_asigchar 0xe7
+#define p_mul_asigchar 0xe8
+#define p_div_asigchar 0xe9
+#define p_mod_asigchar 0xea
+#define p_and_asigchar 0xeb
+#define p_or_asigchar  0xec
+#define p_xor_asigchar 0xed
+#define p_shr_asigchar 0xee
+#define p_shl_asigchar 0xef
 
-#define p_strcpy        0xf0
-#define p_strfix        0xf1
-#define p_strcat        0xf2
-#define p_stradd        0xf3
-#define p_strdec        0xf4
-#define p_strsub        0xf5
-#define p_strlen        0xf6
+#define p_strcpy 0xf0
+#define p_strfix 0xf1
+#define p_strcat 0xf2
+#define p_stradd 0xf3
+#define p_strdec 0xf4
+#define p_strsub 0xf5
+#define p_strlen 0xf6
 
-#define p_pointerbyte   0xf7
+#define p_pointerbyte 0xf7
 
-#define p_lit           0xfc //Pointer to literal (txt) in pieza_num
-#define p_id            0xfd //or a ptr to vnom (to an object ptr)
-#define p_num           0xfe //Number in pieza_num
-
-//-----------------------------------------------------------------------------
-
-#define tnone   0       // Object types in obj[]
-#define tcons   1
-#define tvglo   2
-#define ttglo   3
-#define tcglo   4
-#define tvloc   5
-#define ttloc   6
-#define tcloc   7
-#define tproc   8
-#define tfunc   9
-#define tsglo   10
-#define tsloc   11
-#define tfext   12      // External library function
-
-#define tbglo   13      // Global byte
-#define twglo   14
-#define tbloc   15
-#define twloc   16
-
-#define tpigl   17      // Global int pointer (an addressable ttglo)
-#define tpilo   18      // Local int pointer (same)
-
-#define tpwgl   19      // Word pointers
-#define tpwlo   20
-#define tpbgl   21      // Byte pointers
-#define tpblo   22
-
-#define tpcgl   23      // String pointers
-#define tpclo   24
-#define tpsgl   25      // Struct pointers
-#define tpslo   26
+#define p_lit 0xfc //Pointer to literal (txt) in pieza_num
+#define p_id  0xfd //or a ptr to vnom (to an object ptr)
+#define p_num 0xfe //Number in pieza_num
 
 //-----------------------------------------------------------------------------
 
-#define econs   0       // Constant            // Element types in tabexp[]
-#define eoper   1       // Operator
-#define erango  2       // Range check
-#define ewhoami 3       // Process identifier
-#define ecall   4       // Process creation
-#define efunc   5       // Internal function call
-#define efext   6       // External function call
-#define echeck  7       // Identifier validity check
-#define estring 8       // Text string (its constant offset)
-#define enull   9       // NULL pointer check
+#define tnone 0 // Object types in obj[]
+#define tcons 1
+#define tvglo 2
+#define ttglo 3
+#define tcglo 4
+#define tvloc 5
+#define ttloc 6
+#define tcloc 7
+#define tproc 8
+#define tfunc 9
+#define tsglo 10
+#define tsloc 11
+#define tfext 12 // External library function
+
+#define tbglo 13 // Global byte
+#define twglo 14
+#define tbloc 15
+#define twloc 16
+
+#define tpigl 17 // Global int pointer (an addressable ttglo)
+#define tpilo 18 // Local int pointer (same)
+
+#define tpwgl 19 // Word pointers
+#define tpwlo 20
+#define tpbgl 21 // Byte pointers
+#define tpblo 22
+
+#define tpcgl 23 // String pointers
+#define tpclo 24
+#define tpsgl 25 // Struct pointers
+#define tpslo 26
+
+//-----------------------------------------------------------------------------
+
+#define econs   0 // Constant            // Element types in tabexp[]
+#define eoper   1 // Operator
+#define erango  2 // Range check
+#define ewhoami 3 // Process identifier
+#define ecall   4 // Process creation
+#define efunc   5 // Internal function call
+#define efext   6 // External function call
+#define echeck  7 // Identifier validity check
+#define estring 8 // Text string (its constant offset)
+#define enull   9 // NULL pointer check
 
 //-----------------------------------------------------------------------------
 
 //-Mnemonic--Code--Operands (EML code generation, "*" = "not yet used")
 
-#define lnop  0 // *            No operation
-#define lcar  1 // value        Push a constant onto the stack
-#define lasi  2 //              Pop value and offset, store value at [offset]
-#define lori  3 //              Logical or
-#define lxor  4 //              Xor, exclusive or
-#define land  5 //              Logical and, condition operator
-#define ligu  6 //              Equal, logical comparison
-#define ldis  7 //              Not equal, true if 2 values differ
-#define lmay  8 //              Greater than, signed comparison
-#define lmen  9 //              Less than, same
+#define lnop 0  // *            No operation
+#define lcar 1  // value        Push a constant onto the stack
+#define lasi 2  //              Pop value and offset, store value at [offset]
+#define lori 3  //              Logical or
+#define lxor 4  //              Xor, exclusive or
+#define land 5  //              Logical and, condition operator
+#define ligu 6  //              Equal, logical comparison
+#define ldis 7  //              Not equal, true if 2 values differ
+#define lmay 8  //              Greater than, signed comparison
+#define lmen 9  //              Less than, same
 #define lmei 10 //              Less than or equal
 #define lmai 11 //              Greater than or equal
 #define ladd 12 //              Add two constants
@@ -589,44 +586,44 @@ void add_code(int dir, int param, int op);
 
 // Instructions added for optimization (DIV 2.0)
 
-#define lcar2 60
-#define lcar3 61
-#define lcar4 62
-#define lasiasp 63
-#define lcaraid 64
-#define lcarptr 65
-#define laidptr 66
+#define lcar2      60
+#define lcar3      61
+#define lcar4      62
+#define lasiasp    63
+#define lcaraid    64
+#define lcarptr    65
+#define laidptr    66
 #define lcaraidptr 67
 #define lcaraidcpa 68
-#define laddptr 69
-#define lfunasp 70
-#define lcaradd 71
+#define laddptr    69
+#define lfunasp    70
+#define lcaradd    71
 #define lcaraddptr 72
-#define lcarmul 73
+#define lcarmul    73
 #define lcarmuladd 74
 #define lcarasiasp 75
-#define lcarsub 76
-#define lcardiv 77
+#define lcarsub    76
+#define lcardiv    77
 
 // Instructions added for character handling
 
-#define lptrchr 78  // Pointer, pop (index, offset) and push [offset+byte index]
-#define lasichr 79  // Pop (value, index, offset) and store value at [offset+byte index]
-#define liptchr 80  // Pre-increment and pointer
-#define lptichr 81  // Pointer and post-increment
-#define ldptchr 82  // Pre-decrement and pointer
-#define lptdchr 83  // Pointer and post-decrement
-#define ladachr 84  // Add-assign
-#define lsuachr 85  // Sub-assign
-#define lmuachr 86  // Mul-assign
-#define ldiachr 87  // Div-assign
-#define lmoachr 88  // Mod-assign
-#define lanachr 89  // And-assign
-#define lorachr 90  // Or-assign
-#define lxoachr 91  // Xor-assign
-#define lsrachr 92  // Shr-assign
-#define lslachr 93  // Shl-assign
-#define lcpachr 94  // Pop offset, read parameter [offset] and bp++
+#define lptrchr 78 // Pointer, pop (index, offset) and push [offset+byte index]
+#define lasichr 79 // Pop (value, index, offset) and store value at [offset+byte index]
+#define liptchr 80 // Pre-increment and pointer
+#define lptichr 81 // Pointer and post-increment
+#define ldptchr 82 // Pre-decrement and pointer
+#define lptdchr 83 // Pointer and post-decrement
+#define ladachr 84 // Add-assign
+#define lsuachr 85 // Sub-assign
+#define lmuachr 86 // Mul-assign
+#define ldiachr 87 // Div-assign
+#define lmoachr 88 // Mod-assign
+#define lanachr 89 // And-assign
+#define lorachr 90 // Or-assign
+#define lxoachr 91 // Xor-assign
+#define lsrachr 92 // Shr-assign
+#define lslachr 93 // Shl-assign
+#define lcpachr 94 // Pop offset, read parameter [offset] and bp++
 
 // Instructions added for string handling
 
@@ -667,14 +664,14 @@ void add_code(int dir, int param, int op);
 
 // Miscellaneous
 
-#define lnul    126 // Check that a pointer is not NULL
+#define lnul 126 // Check that a pointer is not NULL
 
 //-----------------------------------------------------------------------------
 //      Prototypes
 //-----------------------------------------------------------------------------
 
-void c_error(word,word);
-void analiza_comandos(word,byte**);
+void c_error(word, word);
+void analiza_comandos(word, byte **);
 void prepare_compilation(void);
 void analyze_ltlex(void);
 void lexer(void);
@@ -686,17 +683,14 @@ int constant(void);
 
 static jmp_buf buf;
 
-void comp(void)
-{
-	if (!setjmp(buf))
-		compile();
+void comp(void) {
+  if (!setjmp(buf))
+    compile();
 }
 
-void comp_exit(void)
-{
-     longjmp(buf,1);        
+void comp_exit(void) {
+  longjmp(buf, 1);
 }
-
 
 
 //-----------------------------------------------------------------------------
@@ -705,11 +699,11 @@ void comp_exit(void)
 
 #include "div_stub.h"
 
-byte file_in[_MAX_PATH+1],file_out[_MAX_PATH+1];
+byte file_in[_MAX_PATH + 1], file_out[_MAX_PATH + 1];
 
-FILE * fin, * fout;
-byte * _source=NULL;
-byte * source, * ierror, * ierror_end;
+FILE *fin, *fout;
+byte *_source = NULL;
+byte *source, *ierror, *ierror_end;
 
 int longitud_textos;
 int inicio_textos;
@@ -726,130 +720,133 @@ int optimizar;
 
 //-----------------------------------------------------------------------------
 
-FILE * div_open_file(char * file);
+FILE *div_open_file(char *file);
 
 //-----------------------------------------------------------------------------
 
 int old_linea; // File position of the token before the last one read
-byte * old_ierror, * old_ierror_end;
+byte *old_ierror, *old_ierror_end;
 
 // The last token read is at (linea,ierror,ierror_end)
 
-byte * ultima_linea,cero=0;
+byte *ultima_linea, cero = 0;
 
 //-----------------------------------------------------------------------------
 
 // Info for EXEC.LIN (position in mem and source of each statement)
 
-int inicio,final;     // Start and end addresses in mem[] of the statement
-int linea1,columna1;  // Position where the statement begins in source
-int linea2,columna2;  // Position where the statement ends in source
+int inicio, final;    // Start and end addresses in mem[] of the statement
+int linea1, columna1; // Position where the statement begins in source
+int linea2, columna2; // Position where the statement ends in source
 
 void statement_start(void);  // Set inicio, linea1, columna1
-void statement_end(void);   // Set final, linea2, columna2
-void record_statement(void);  // Write the six variables to file
+void statement_end(void);    // Set final, linea2, columna2
+void record_statement(void); // Write the six variables to file
 
 //-----------------------------------------------------------------------------
 
 // Object table --------------------------------- *iobj = first free object
 
 struct objeto {
-  byte type;    // Object type
-  byte usado;   // Whether the object was used before being defined
-  byte * name;  // Pointer to name, for listing output
-  byte * ierror;// Pointer to source code for determining column if needed
-  int line;    // Source line number, for error reporting
-  int param;    // Whether this object was declared in parameters
-  struct objeto * anterior; // Previous object with the same name
-  struct objeto * bloque;   // Block for this process (0-global/local N-private)
-  struct objeto * member;   // Which struct it belongs to (0-n/a)
+  byte type;               // Object type
+  byte usado;              // Whether the object was used before being defined
+  byte *name;              // Pointer to name, for listing output
+  byte *ierror;            // Pointer to source code for determining column if needed
+  int line;                // Source line number, for error reporting
+  int param;               // Whether this object was declared in parameters
+  struct objeto *anterior; // Previous object with the same name
+  struct objeto *bloque;   // Block for this process (0-global/local N-private)
+  struct objeto *member;   // Which struct it belongs to (0-n/a)
   union {
-    struct {                                            // Constant
+    struct { // Constant
       int valor;
-      int literal;                                      // 0-no, 1-yes
+      int literal; // 0-no, 1-yes
     } cons;
-    struct {                                            // Global variable
+    struct { // Global variable
       int offset;
     } vglo;
-    struct {                                            // Global table
+    struct { // Global table
       int offset;
-      int totalen;                                      // total number of elements
-      int len1,len2,len3;                               // len2/3==-1 if n/a
-    } tglo,pigl;
-    struct {                                            // Global byte
+      int totalen;          // total number of elements
+      int len1, len2, len3; // len2/3==-1 if n/a
+    } tglo, pigl;
+    struct { // Global byte
       int offset;
-      int totalen;                                      // total number of elements
-      int len1,len2,len3;                               // len2/3==-1 if n/a
-    } bglo,pbgl;
-    struct {                                            // Global word
+      int totalen;          // total number of elements
+      int len1, len2, len3; // len2/3==-1 if n/a
+    } bglo, pbgl;
+    struct { // Global word
       int offset;
-      int totalen;                                      // total number of elements
-      int len1,len2,len3;                               // len2/3==-1 if n/a
-    } wglo,pwgl;
-    struct {                                            // Global string
+      int totalen;          // total number of elements
+      int len1, len2, len3; // len2/3==-1 if n/a
+    } wglo, pwgl;
+    struct { // Global string
       int offset;
-      int totalen;                                      // total number of elements
-    } cglo,pcgl;
-    struct {                                            // Struct
+      int totalen; // total number of elements
+    } cglo, pcgl;
+    struct { // Struct
       int offset;
-      int len_item;                                     // Number of fields
-      int totalitems;                                   // Total number of records
-      int items1,items2,items3;                         // -1 if n/a
-    } sglo,sloc;
-    struct {                                            // Struct pointer
+      int len_item;               // Number of fields
+      int totalitems;             // Total number of records
+      int items1, items2, items3; // -1 if n/a
+    } sglo, sloc;
+    struct { // Struct pointer
       int offset;
-      struct objeto * ostruct;                          // Pointer to struct
-      int totalitems;                                   // Total number of records
-      int items1,items2,items3;                         // -1 if n/a
-    } psgl,pslo;
-    struct {                                            // Local variable
+      struct objeto *ostruct;     // Pointer to struct
+      int totalitems;             // Total number of records
+      int items1, items2, items3; // -1 if n/a
+    } psgl, pslo;
+    struct { // Local variable
       int offset;
     } vloc;
-    struct {                                            // Local table
+    struct { // Local table
       int offset;
       int totalen;
-      int len1,len2,len3;
-    } tloc,pilo;
-    struct {                                            // Local byte
+      int len1, len2, len3;
+    } tloc, pilo;
+    struct { // Local byte
       int offset;
-      int totalen;                                      // total number of elements
-      int len1,len2,len3;                               // len2/3==-1 if n/a
-    } bloc,pblo;
-    struct {                                            // Local word
+      int totalen;          // total number of elements
+      int len1, len2, len3; // len2/3==-1 if n/a
+    } bloc, pblo;
+    struct { // Local word
       int offset;
-      int totalen;                                      // total number of elements
-      int len1,len2,len3;                               // len2/3==-1 if n/a
-    } wloc,pwlo;
-    struct {                                            // Local string
+      int totalen;          // total number of elements
+      int len1, len2, len3; // len2/3==-1 if n/a
+    } wloc, pwlo;
+    struct { // Local string
       int offset;
-      int totalen;                                      // total number of elements
-    } cloc,pclo;
-    struct {                                            // Process
-      struct objeto * bloque;
+      int totalen; // total number of elements
+    } cloc, pclo;
+    struct { // Process
+      struct objeto *bloque;
       int offset;
       int num_par;
     } proc;
-    struct {                                            // Internal function
+    struct { // Internal function
       int code;
       int num_par;
       int ret;      // 0-Int 1-String
       byte par[12]; // 0-Int 1-(Struct_name,name)
     } func;
-    struct {                                            // External function
+    struct { // External function
       int code;
       int num_par;
     } fext;
   };
-} obj[max_obj], * iobj; // ----------------------------------------------------
+} obj[max_obj], *iobj; // ----------------------------------------------------
 
 //-----------------------------------------------------------------------------
 
-byte * vnom=NULL; // Name vector (hash_chain:int, pieza (or iobj):int, asciiz)
-union { byte*b; byte**p; } ivnom;
+byte *vnom = NULL; // Name vector (hash_chain:int, pieza (or iobj):int, asciiz)
+union {
+  byte *b;
+  byte **p;
+} ivnom;
 
-byte * inicio_objetos; // For generating the object table listing
+byte *inicio_objetos; // For generating the object table listing
 
-byte * vhash[256]; // Pointer to the vector of names
+byte *vhash[256]; // Pointer to the vector of names
 
 //-----------------------------------------------------------------------------
 
@@ -858,22 +855,23 @@ struct exp_ele {
   union {
     int valor;
     int token;
-    struct objeto * objeto;
+    struct objeto *objeto;
   };
 } tabexp[max_exp], *_exp;
 
-struct lex_ele { byte caracter;
-         byte token;
-                 struct lex_ele * alternativa;
-                 struct lex_ele * siguiente; } 
-       lex_simb[max_nodos], * ilex_simb, * lex_case[256];
+struct lex_ele {
+  byte caracter;
+  byte token;
+  struct lex_ele *alternativa;
+  struct lex_ele *siguiente;
+} lex_simb[max_nodos], *ilex_simb, *lex_case[256];
 
 int pieza, pieza_num;
-struct objeto * o; // When pieza=p_id, object of type (**o).type
-struct objeto * bloque_actual; // Block currently being analyzed
-struct objeto * bloque_lexico; // 0 until program's private section
+struct objeto *o;             // When pieza=p_id, object of type (**o).type
+struct objeto *bloque_actual; // Block currently being analyzed
+struct objeto *bloque_lexico; // 0 until program's private section
 
-struct objeto * member; // !=0 when declaring/accessing a struct member
+struct objeto *member; // !=0 when declaring/accessing a struct member
 
 int linea, num_nodos, num_obj;
 
@@ -897,15 +895,15 @@ int itcont;
 
 //-----------------------------------------------------------------------------
 
-int pila[long_pila+max_exp+64]; // expression evaluation (compilation and execution)
+int pila[long_pila + max_exp + 64]; // expression evaluation (compilation and execution)
 
-int32_t * mem_ory=NULL, * frm=NULL;
-int32_t * mem=NULL, * loc=NULL;
+int32_t *mem_ory = NULL, *frm = NULL;
+int32_t *mem = NULL, *loc = NULL;
 int imem, imem_max;
 int iloc, iloc_max;
 int itxt, ifrm_max;
 
-byte * imemptr;
+byte *imemptr;
 
 int iloc_len; // end of local variables including private ones
 
@@ -930,59 +928,62 @@ int iloc_len; // end of local variables including private ones
 //      Formatted listing variables
 //-----------------------------------------------------------------------------
 
-int coment=0;           // 0-Code, 1-Inside comment, 2-Nested, ...
-int convert=0;          // Whether to generate tokens in listing
+int coment = 0;  // 0-Code, 1-Inside comment, 2-Nested, ...
+int convert = 0; // Whether to generate tokens in listing
 
 //-----------------------------------------------------------------------------
 //      Error information
 //-----------------------------------------------------------------------------
 
-int numero_error=-1;
+int numero_error = -1;
 int linea_error;
 int columna_error;
 
-int error_27=27;        // To emit "statement expected"
+int error_27 = 27; // To emit "statement expected"
 
 //-----------------------------------------------------------------------------
 
-int program_type=0;
+int program_type = 0;
 
 //-----------------------------------------------------------------------------
 
-struct {      // Peephole optimization window
-  int dir;    // Address
-  int param;  // Whether this opcode has a parameter
-  int op;     // Opcode
-} code[16];   // code[15] must always hold the last generated instruction
+struct {     // Peephole optimization window
+  int dir;   // Address
+  int param; // Whether this opcode has a parameter
+  int op;    // Opcode
+} code[16];  // code[15] must always hold the last generated instruction
 
 //-----------------------------------------------------------------------------
 //      Compiler initialization
 //-----------------------------------------------------------------------------
 
-FILE * linf; // EXEC.LIN
-FILE * lprg; // EXEC.PGM
-FILE * lins; // EXEC.INS
+FILE *linf; // EXEC.LIN
+FILE *lprg; // EXEC.PGM
+FILE *lins; // EXEC.INS
 
-FILE * def; // For the "ltlex.def" analyzer
+FILE *def; // For the "ltlex.def" analyzer
 byte *_buf;
 
 void inicializa_compilador(void) {
   int n;
-  for (n=0;n<256;n++) if (lower[n]==' ') lower[n]=0;
+  for (n = 0; n < 256; n++)
+    if (lower[n] == ' ')
+      lower[n] = 0;
 }
 
 //-----------------------------------------------------------------------------
 //      Prepare compilation for a program
 //-----------------------------------------------------------------------------
 
-void mensaje_compilacion(byte * p) {
-  if(compilemode) {
-	  fprintf(stdout,"%s\n",p);
+void mensaje_compilacion(byte *p) {
+  if (compilemode) {
+    fprintf(stdout, "%s\n", p);
   } else {
-   wbox(v.ptr,v.an/big2,v.al/big2,c2,2,20,v.an/big2-4,7);
-   wwrite(v.ptr,v.an/big2,v.al/big2,3,20,0,p,c3);
-   flush_window(0); flush_copy();
- }
+    wbox(v.ptr, v.an / big2, v.al / big2, c2, 2, 20, v.an / big2 - 4, 7);
+    wwrite(v.ptr, v.an / big2, v.al / big2, 3, 20, 0, p, c3);
+    flush_window(0);
+    flush_copy();
+  }
 }
 
 #ifndef ZLIB
@@ -997,222 +998,283 @@ void mensaje_compilacion(byte * p) {
 void compile(void) {
   int n;
   uLongf m;
-  struct objeto * i;
-  byte * q, * p;
+  struct objeto *i;
+  byte *q, *p;
   FILE *f;
 
-  program_type=0;
+  program_type = 0;
 
-free_resources();
+  free_resources();
 
   mensaje_compilacion(texts[201]);
 
-  vnom=NULL; mem_ory=NULL;
-  mem=NULL; loc=NULL; frm=NULL;
-  def=NULL; _buf=NULL; _source=NULL;
+  vnom = NULL;
+  mem_ory = NULL;
+  mem = NULL;
+  loc = NULL;
+  frm = NULL;
+  def = NULL;
+  _buf = NULL;
+  _source = NULL;
 
-  itbreak=0; itcont=0; convert=0; coment=0;
+  itbreak = 0;
+  itcont = 0;
+  convert = 0;
+  coment = 0;
 
-  member=NULL; bloque_actual=NULL; bloque_lexico=NULL;
+  member = NULL;
+  bloque_actual = NULL;
+  bloque_lexico = NULL;
 
   delete_code();
 
-  memset(obj,0,sizeof(obj)); iobj=obj; num_obj=0;
-  memset(lex_simb,0,sizeof(lex_simb)); ilex_simb=lex_simb; num_nodos=0;
-  memset(vhash,0,sizeof(vhash));
+  memset(obj, 0, sizeof(obj));
+  iobj = obj;
+  num_obj = 0;
+  memset(lex_simb, 0, sizeof(lex_simb));
+  ilex_simb = lex_simb;
+  num_nodos = 0;
+  memset(vhash, 0, sizeof(vhash));
 
-  for (n=0;n<256;n++)
+  for (n = 0; n < 256; n++)
     if (lower[n])
-      if (n>='0' && n<='9') lex_case[n]=(struct lex_ele*)l_num;
-      else lex_case[n]=(struct lex_ele*)l_id;
-    else lex_case[n]=(struct lex_ele*)l_err;
+      if (n >= '0' && n <= '9')
+        lex_case[n] = (struct lex_ele *)l_num;
+      else
+        lex_case[n] = (struct lex_ele *)l_id;
+    else
+      lex_case[n] = (struct lex_ele *)l_err;
 
-  if ((vnom=(byte *) malloc(max_obj*long_med_id+1024))==NULL) c_error(0,0);
+  if ((vnom = (byte *)malloc(max_obj * long_med_id + 1024)) == NULL)
+    c_error(0, 0);
 
-  ivnom.b=vnom;
+  ivnom.b = vnom;
 
   analyze_ltlex();
 
-  lex_case[' ']=(struct lex_ele*)l_spc;
-  lex_case[tab]=(struct lex_ele*)l_spc;
-  lex_case[cr]=(struct lex_ele*)l_cr;
+  lex_case[' '] = (struct lex_ele *)l_spc;
+  lex_case[tab] = (struct lex_ele *)l_spc;
+  lex_case[cr] = (struct lex_ele *)l_cr;
 
-  inicio_objetos=ivnom.b;
+  inicio_objetos = ivnom.b;
 
   // NOTE: These fopen failures would report "insufficient memory" (error 0),
   // but the actual cause is a file-creation failure, not a memory issue.
-	linf=fopen("system/exec.fs","wb");
-	if(linf) {
-		fwrite(&fsmode,1,1,linf);
-		fclose(linf);
-	}
-	linf = fopen("system/exec.path","wb");
-	if(linf) {
-		fputs((char *)&tipo[8],linf);
-		fclose(linf);
-	}
-  if ((linf=fopen("system/exec.lin","wb"))==NULL) c_error(0,0);
-  if ((lprg=fopen("system/exec.pgm","wb"))==NULL) c_error(0,0);
+  linf = fopen("system/exec.fs", "wb");
+  if (linf) {
+    fwrite(&fsmode, 1, 1, linf);
+    fclose(linf);
+  }
+  linf = fopen("system/exec.path", "wb");
+  if (linf) {
+    fputs((char *)&tipo[8], linf);
+    fclose(linf);
+  }
+  if ((linf = fopen("system/exec.lin", "wb")) == NULL)
+    c_error(0, 0);
+  if ((lprg = fopen("system/exec.pgm", "wb")) == NULL)
+    c_error(0, 0);
 
-  
 
-  imem_max=default_buffer; imem=0;
-  if ((mem_ory=mem=(int*)malloc(imem_max*sizeof(memptrsize)))==NULL) c_error(0,0);
-  memset(mem,0,imem_max*sizeof(memptrsize));
+  imem_max = default_buffer;
+  imem = 0;
+  if ((mem_ory = mem = (int *)malloc(imem_max * sizeof(memptrsize))) == NULL)
+    c_error(0, 0);
+  memset(mem, 0, imem_max * sizeof(memptrsize));
 
-  iloc_max=default_buffer/2; iloc=0; iloc_len=0;
-  if ((loc=(int*)malloc(iloc_max*sizeof(memptrsize)))==NULL) c_error(0,0);
-  memset(loc,0,iloc_max*sizeof(memptrsize));
+  iloc_max = default_buffer / 2;
+  iloc = 0;
+  iloc_len = 0;
+  if ((loc = (int *)malloc(iloc_max * sizeof(memptrsize))) == NULL)
+    c_error(0, 0);
+  memset(loc, 0, iloc_max * sizeof(memptrsize));
 
-  ifrm_max=default_buffer/2;
-  if ((frm=(int*)malloc(ifrm_max*sizeof(memptrsize)))==NULL) c_error(0,0);
-  memset(frm,0,ifrm_max*sizeof(memptrsize));
+  ifrm_max = default_buffer / 2;
+  if ((frm = (int *)malloc(ifrm_max * sizeof(memptrsize))) == NULL)
+    c_error(0, 0);
+  memset(frm, 0, ifrm_max * sizeof(memptrsize));
 
   mensaje_compilacion(texts[203]);
 
-  imem=long_header;
+  imem = long_header;
 
   preload_objects(); // No literals in the preloaded objects
 
   mensaje_compilacion(texts[200]);
 
-  source=source_ptr; _source=source;
-  *(source+source_len)=cr; *(source+source_len+1)=cr;
+  source = source_ptr;
+  _source = source;
+  *(source + source_len) = cr;
+  *(source + source_len + 1) = cr;
 
-  convert=1; ultima_linea=source;
-  acceso_remoto=0; parametros=0; linea=1;
+  convert = 1;
+  ultima_linea = source;
+  acceso_remoto = 0;
+  parametros = 0;
+  linea = 1;
 
-  itxt=inicio_textos=imem;
+  itxt = inicio_textos = imem;
   psintactico(); // To obtain "longitud_textos"
-  imem+=longitud_textos;
+  imem += longitud_textos;
 
-  test_buffer(&mem,&imem_max,imem);
+  test_buffer(&mem, &imem_max, imem);
 
-  num_obj_predefinidos=num_obj;
+  num_obj_predefinidos = num_obj;
 
-  convert=1; ultima_linea=source; fwrite(&cero,1,1,lprg);
-  acceso_remoto=0; parametros=0; linea=1;
+  convert = 1;
+  ultima_linea = source;
+  fwrite(&cero, 1, 1, lprg);
+  acceso_remoto = 0;
+  parametros = 0;
+  linea = 1;
 
   parser();
 
-  i=obj; while (i<iobj) {
+  i = obj;
+  while (i < iobj) {
     if (i->usado) {
-      linea=i->line; ierror=i->ierror; c_error(0,121);
-    } i++;
+      linea = i->line;
+      ierror = i->ierror;
+      c_error(0, 121);
+    }
+    i++;
   }
 
-  mem[2]=imem;
-  mem[3]=max_process; // Previously long_header, now unused
-  mem[4]=0; // Previously mem[1]-mem[3] (global data length), now unused
-  mem[5]=iloc_len-iloc;
-  mem[6]=iloc;
-  mem[7]=0; // Previously imem+iloc (text start), now unused
-  mem[8]=imem+iloc; // Number of elements used in mem[]
+  mem[2] = imem;
+  mem[3] = max_process; // Previously long_header, now unused
+  mem[4] = 0;           // Previously mem[1]-mem[3] (global data length), now unused
+  mem[5] = iloc_len - iloc;
+  mem[6] = iloc;
+  mem[7] = 0;           // Previously imem+iloc (text start), now unused
+  mem[8] = imem + iloc; // Number of elements used in mem[]
 
   mensaje_compilacion(texts[204]);
 
   save_dbg();
   save_exec_bin();
 
-  #ifdef listados
+#ifdef listados
   list_objects();
   list_assembler();
-  #endif
+#endif
 
   mensaje_compilacion(texts[205]);
 
-  #ifdef SHARE
-  mem[0]+=1024;
-  #endif
-
-  if (program_type==1) if ((f=fopen("install/setup.ovl","wb"))!=NULL) {
-    fwrite(div_stub,1,602,f);
-    p=(byte*)malloc((imem+iloc)*4);
-    m=(imem+iloc)*4+1024;
-    q=(byte*)malloc(m);
-    if (p!=NULL && q!=NULL) {
-      fwrite(mem,4,9,f);
-      memcpy(p,&mem[9],(imem-9)*4);
-      memcpy(p+(imem-9)*4,loc,iloc*4);
-      n=(imem-9+iloc)*4;
-#ifndef ZLIB
-      if (true) 
-#else
-	if (!compress(q,(uLongf*)&m,p,(unsigned long)n)) 
-#endif 
-	{
-        fwrite(&n,1,4,f); // mem[0]..mem[8],uncompressed_data_length,compressed_data...
-        fwrite(q,1,m,f);
-        free(q); free(p);
-        fclose(f);
-      } else {
-        free(q); free(p);
-        fclose(f);
-        c_error(0,0);
-      }
-    } else {
-      if (p!=NULL) free(p);
-      if (q!=NULL) free(q);
-      fclose(f);
-      c_error(0,0);
-    }
-  }
-
-  if (run_mode==3) mem[0]+=128;
-  if (ignore_errors) mem[0]+=512;
-
-  if ((f=fopen("system/EXEC.EXE","wb"))!=NULL) {
-    fwrite(div_stub,1,602,f);
-    p=(byte*)malloc((imem+iloc)*4);
-    m=(imem+iloc)*4+1024;
-    q=(byte*)malloc(m);
-    if (p!=NULL && q!=NULL) {
-      fwrite(mem,4,9,f); // mem[0..8]
-      memcpy(p,&mem[9],(imem-9)*4);
-      memcpy(p+(imem-9)*4,loc,iloc*4);
-      n=(imem-9+iloc)*4;
-#ifndef ZLIB
-      if (true) 
-#else
-	  if (!compress(q,(uLongf*)&m,p,n)) 
+#ifdef SHARE
+  mem[0] += 1024;
 #endif
-	  {
-        fwrite(&n,1,4,f); // mem[0]..mem[8],uncompressed_data_length,compressed_data...
-        fwrite(q,1,m,f);
-        free(q); free(p);
+
+  if (program_type == 1)
+    if ((f = fopen("install/setup.ovl", "wb")) != NULL) {
+      fwrite(div_stub, 1, 602, f);
+      p = (byte *)malloc((imem + iloc) * 4);
+      m = (imem + iloc) * 4 + 1024;
+      q = (byte *)malloc(m);
+      if (p != NULL && q != NULL) {
+        fwrite(mem, 4, 9, f);
+        memcpy(p, &mem[9], (imem - 9) * 4);
+        memcpy(p + (imem - 9) * 4, loc, iloc * 4);
+        n = (imem - 9 + iloc) * 4;
+#ifndef ZLIB
+        if (true)
+#else
+        if (!compress(q, (uLongf *)&m, p, (unsigned long)n))
+#endif
+        {
+          fwrite(&n, 1, 4, f); // mem[0]..mem[8],uncompressed_data_length,compressed_data...
+          fwrite(q, 1, m, f);
+          free(q);
+          free(p);
+          fclose(f);
+        } else {
+          free(q);
+          free(p);
+          fclose(f);
+          c_error(0, 0);
+        }
+      } else {
+        if (p != NULL)
+          free(p);
+        if (q != NULL)
+          free(q);
+        fclose(f);
+        c_error(0, 0);
+      }
+    }
+
+  if (run_mode == 3)
+    mem[0] += 128;
+  if (ignore_errors)
+    mem[0] += 512;
+
+  if ((f = fopen("system/EXEC.EXE", "wb")) != NULL) {
+    fwrite(div_stub, 1, 602, f);
+    p = (byte *)malloc((imem + iloc) * 4);
+    m = (imem + iloc) * 4 + 1024;
+    q = (byte *)malloc(m);
+    if (p != NULL && q != NULL) {
+      fwrite(mem, 4, 9, f); // mem[0..8]
+      memcpy(p, &mem[9], (imem - 9) * 4);
+      memcpy(p + (imem - 9) * 4, loc, iloc * 4);
+      n = (imem - 9 + iloc) * 4;
+#ifndef ZLIB
+      if (true)
+#else
+      if (!compress(q, (uLongf *)&m, p, n))
+#endif
+      {
+        fwrite(&n, 1, 4, f); // mem[0]..mem[8],uncompressed_data_length,compressed_data...
+        fwrite(q, 1, m, f);
+        free(q);
+        free(p);
         fclose(f);
       } else {
-        free(q); free(p);
+        free(q);
+        free(p);
         fclose(f);
-        c_error(0,0);
+        c_error(0, 0);
       }
     } else {
-      if (p!=NULL) free(p);
-      if (q!=NULL) free(q);
+      if (p != NULL)
+        free(p);
+      if (q != NULL)
+        free(q);
       fclose(f);
-      c_error(0,0);
+      c_error(0, 0);
     }
   }
 
   // _case_sensitive
-  memcpy(lower+129,"ueaaaa\x87" "eeeiiiaae\x91\x91ooouuyou\x9b\x9c\x9d\x9e\x9f" "aiou",35);
-  memcpy(lower+'A',"abcdefghijklmnopqrstuvwxyz",26);
-  lower['\xa5']='\xa4';
+  memcpy(lower + 129,
+         "ueaaaa\x87"
+         "eeeiiiaae\x91\x91ooouuyou\x9b\x9c\x9d\x9e\x9f"
+         "aiou",
+         35);
+  memcpy(lower + 'A', "abcdefghijklmnopqrstuvwxyz", 26);
+  lower['\xa5'] = '\xa4';
 
   comp_exit();
-
 }
 
 void free_resources(void) {
-  if (def!=NULL) fclose(def); 
-  if (_buf!=NULL) free(_buf);
-  if (frm!=NULL) free(frm);
-  if (loc!=NULL) free(loc);
-  if (mem!=NULL) free(mem);
-  if (lins!=NULL) fclose(lins);
-  if (lprg!=NULL) fclose(lprg);
-  if (linf!=NULL) fclose(linf);
-  if (vnom!=NULL) free(vnom);
+  if (def != NULL)
+    fclose(def);
+  if (_buf != NULL)
+    free(_buf);
+  if (frm != NULL)
+    free(frm);
+  if (loc != NULL)
+    free(loc);
+  if (mem != NULL)
+    free(mem);
+  if (lins != NULL)
+    fclose(lins);
+  if (lprg != NULL)
+    fclose(lprg);
+  if (linf != NULL)
+    fclose(linf);
+  if (vnom != NULL)
+    free(vnom);
 
   def = NULL;
   _buf = NULL;
@@ -1229,16 +1291,29 @@ void free_resources(void) {
 //      Internal compiler errors
 //-----------------------------------------------------------------------------
 
-int _le,_t;
+int _le, _t;
 byte *_ie;
 
 void save_error(word tipo) { // Save an error position (0 .. 3)
-  switch(tipo) {
-    case 0: _le=linea; _ie=ierror; break;
-    case 1: _le=old_linea; _ie=old_ierror_end; break;
-    case 2: _le=old_linea; _ie=old_ierror; break;
-    case 3: _le=old_linea; _ie=old_ierror_end; break;
-  } _t=tipo;
+  switch (tipo) {
+  case 0:
+    _le = linea;
+    _ie = ierror;
+    break;
+  case 1:
+    _le = old_linea;
+    _ie = old_ierror_end;
+    break;
+  case 2:
+    _le = old_linea;
+    _ie = old_ierror;
+    break;
+  case 3:
+    _le = old_linea;
+    _ie = old_ierror_end;
+    break;
+  }
+  _t = tipo;
 }
 
 // 0 - Start of current token
@@ -1248,36 +1323,63 @@ void save_error(word tipo) { // Save an error position (0 .. 3)
 // 4 - Error saved with save_error(0..3)
 
 void c_error(word tipo, word e) {
-  int columna=0;
-  byte *_p=NULL,*p=NULL;
+  int columna = 0;
+  byte *_p = NULL, *p = NULL;
 
-  numero_error=e;
+  numero_error = e;
 
-  switch(tipo) {
-    case 0: linea_error=linea; p=ierror; break;
-    case 1: linea_error=old_linea; _p=p=old_ierror_end; break;
-    case 2: linea_error=old_linea; p=old_ierror; break;
-    case 3: linea_error=old_linea; _p=p=old_ierror_end; break;
-    case 4: linea_error=_le; _p=p=_ie; tipo=_t; break;
+  switch (tipo) {
+  case 0:
+    linea_error = linea;
+    p = ierror;
+    break;
+  case 1:
+    linea_error = old_linea;
+    _p = p = old_ierror_end;
+    break;
+  case 2:
+    linea_error = old_linea;
+    p = old_ierror;
+    break;
+  case 3:
+    linea_error = old_linea;
+    _p = p = old_ierror_end;
+    break;
+  case 4:
+    linea_error = _le;
+    _p = p = _ie;
+    tipo = _t;
+    break;
   }
 
-  if (e>=10) {
-    while (--p>=source_ptr) {
-      if (*p==cr) break;
+  if (e >= 10) {
+    while (--p >= source_ptr) {
+      if (*p == cr)
+        break;
       columna++;
-    } if (p<source_ptr) columna++;
+    }
+    if (p < source_ptr)
+      columna++;
   }
 
-  if (tipo==1) {
-    if (*(_p+1)==' ' || *(_p+1)==cr || *(_p+1)==lf) { columna++; } columna++;
-  } else if (tipo==3) columna++;
+  if (tipo == 1) {
+    if (*(_p + 1) == ' ' || *(_p + 1) == cr || *(_p + 1) == lf) {
+      columna++;
+    }
+    columna++;
+  } else if (tipo == 3)
+    columna++;
 
-  columna_error=columna;
+  columna_error = columna;
 
   // _case_sensitive
-  memcpy(lower+129,"ueaaaa\x87" "eeeiiiaae\x91\x91ooouuyou\x9b\x9c\x9d\x9e\x9f" "aiou",35);
-  memcpy(lower+'A',"abcdefghijklmnopqrstuvwxyz",26);
-  lower['\xa5']='\xa4';
+  memcpy(lower + 129,
+         "ueaaaa\x87"
+         "eeeiiiaae\x91\x91ooouuyou\x9b\x9c\x9d\x9e\x9f"
+         "aiou",
+         35);
+  memcpy(lower + 'A', "abcdefghijklmnopqrstuvwxyz", 26);
+  lower['\xa5'] = '\xa4';
 
   comp_exit();
 }
@@ -1287,14 +1389,17 @@ void c_error(word tipo, word e) {
 //-----------------------------------------------------------------------------
 
 void statement_start(void) {
-  byte * p=ierror-1;
-  inicio=imem;
-  linea1=linea;
-  columna1=0;
-  if(p<_source)
-		p=_source;
-		
-  while (*p!=cr && *p!=lf && p>_source) { columna1++; p--; }
+  byte *p = ierror - 1;
+  inicio = imem;
+  linea1 = linea;
+  columna1 = 0;
+  if (p < _source)
+    p = _source;
+
+  while (*p != cr && *p != lf && p > _source) {
+    columna1++;
+    p--;
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -1302,15 +1407,18 @@ void statement_start(void) {
 //-----------------------------------------------------------------------------
 
 void statement_end(void) {
-  byte * p=old_ierror_end-1;
-  final=imem-1;
-  linea2=old_linea;
-  columna2=0;
+  byte *p = old_ierror_end - 1;
+  final = imem - 1;
+  linea2 = old_linea;
+  columna2 = 0;
 
-    if(p<_source)
-		p=_source;
+  if (p < _source)
+    p = _source;
 
-  while (*p!=cr && *p!=lf && p>_source) { columna2++; p--; }
+  while (*p != cr && *p != lf && p > _source) {
+    columna2++;
+    p--;
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -1318,31 +1426,36 @@ void statement_end(void) {
 //-----------------------------------------------------------------------------
 
 void record_statement(void) {
-  fwrite(&inicio,4,1,linf);
-  fwrite(&final,4,1,linf);
-  fwrite(&linea1,4,1,linf);
-  fwrite(&columna1,4,1,linf);
-  fwrite(&linea2,4,1,linf);
-  fwrite(&columna2,4,1,linf);
+  fwrite(&inicio, 4, 1, linf);
+  fwrite(&final, 4, 1, linf);
+  fwrite(&linea1, 4, 1, linf);
+  fwrite(&columna1, 4, 1, linf);
+  fwrite(&linea2, 4, 1, linf);
+  fwrite(&columna2, 4, 1, linf);
 }
 
 //-----------------------------------------------------------------------------
 //      Check code generation buffer limits
 //-----------------------------------------------------------------------------
 
-void test_buffer(int * * buffer,int * maximo,int n) {
+void test_buffer(int **buffer, int *maximo, int n) {
   int max;
 
-  if (n+buffer_grow>2*1000*1000) c_error(0,0);
+  if (n + buffer_grow > 2 * 1000 * 1000)
+    c_error(0, 0);
 
-  if (n>*maximo-security_distance) {
-    max=*maximo; *maximo=n+buffer_grow; max=*maximo-max;
-    if (*buffer==mem) {
-      if ((*buffer=mem_ory=(int *)realloc(*buffer,*maximo*sizeof(memptrsize)))==NULL) c_error(0,0);
+  if (n > *maximo - security_distance) {
+    max = *maximo;
+    *maximo = n + buffer_grow;
+    max = *maximo - max;
+    if (*buffer == mem) {
+      if ((*buffer = mem_ory = (int *)realloc(*buffer, *maximo * sizeof(memptrsize))) == NULL)
+        c_error(0, 0);
     } else {
-      if ((*buffer=(int *)realloc(*buffer,*maximo*sizeof(memptrsize)))==NULL) c_error(0,0);
+      if ((*buffer = (int *)realloc(*buffer, *maximo * sizeof(memptrsize))) == NULL)
+        c_error(0, 0);
     }
-    memset((byte*)*buffer+(*maximo-max)*sizeof(memptrsize),0,max*sizeof(memptrsize));
+    memset((byte *)*buffer + (*maximo - max) * sizeof(memptrsize), 0, max * sizeof(memptrsize));
   }
 }
 
@@ -1350,79 +1463,118 @@ void test_buffer(int * * buffer,int * maximo,int n) {
 //      Preload lexical structures, analyze the ltlex.def file
 //-----------------------------------------------------------------------------
 
-void analyze_ltlex(void){
-
-  byte * buf, cont=1;
+void analyze_ltlex(void) {
+  byte *buf, cont = 1;
   int len;
-  struct lex_ele * e;
+  struct lex_ele *e;
 
-  int t; //token
+  int t;  //token
   byte h; //hash (for id)
-  byte * _ivnom;
-  byte * * ptr;
+  byte *_ivnom;
+  byte **ptr;
 
-  if ((def=fopen("system/ltlex.def","rb"))==NULL) c_error(0,1);
-  fseek(def,0,SEEK_END); len=ftell(def);
-  if ((_buf=buf=(byte *) malloc(len+2))==NULL) c_error(0,0);
-  fseek(def,0,SEEK_SET);
-  len=fread(buf,1,len,def);
-  *(buf+len)=cr; *(buf+len+1)=cr;
+  if ((def = fopen("system/ltlex.def", "rb")) == NULL)
+    c_error(0, 1);
+  fseek(def, 0, SEEK_END);
+  len = ftell(def);
+  if ((_buf = buf = (byte *)malloc(len + 2)) == NULL)
+    c_error(0, 0);
+  fseek(def, 0, SEEK_SET);
+  len = fread(buf, 1, len, def);
+  *(buf + len) = cr;
+  *(buf + len + 1) = cr;
 
-  linea=1;
+  linea = 1;
   do {
-
-	 switch (*buf++) {
-    case ' ': case tab:
+    switch (*buf++) {
+    case ' ':
+    case tab:
       break;
-    case  cr:
-      if (*buf==cr) cont=0; else { linea++; buf++; } break;
+    case cr:
+      if (*buf == cr)
+        cont = 0;
+      else {
+        linea++;
+        buf++;
+      }
+      break;
     case ';':
-      while (*buf!=cr) { buf++; } break;
+      while (*buf != cr) {
+        buf++;
+      }
+      break;
     case '&':
-      *buf=lower[*buf]; if (*buf>='0' && *buf<='9') t=(*buf++-'0')<<4;
-      else if (*buf>='a' && *buf<='f') t=(*buf++-'a'+10)<<4; else c_error(0,2);
-      *buf=lower[*buf]; if (*buf>='0' && *buf<='9') t+=(*buf++-'0');
-      else if (*buf>='a' && *buf<='f') t+=(*buf++-'a'+10); else c_error(0,2);
-      if (*buf==cr || *buf==' ' || *buf==tab) break;
-      else if (lower[*buf]) {           //Analyzes a keyword
-        _ivnom=ivnom.b; 
-        *ivnom.p++=0; 
-        *ivnom.p++=(byte*)t; 
-        h=0;
-        while ((*ivnom.b=lower[*buf++])) h=((byte)(h<<1)+(h>>7))^(*ivnom.b++);
-        ptr=&vhash[h]; while (*ptr) ptr=(byte **)*ptr;
-	*ptr=_ivnom;
-        
-	buf--; ivnom.b++;
-      } else if (t>=0x78 && t<=0x7b) {  //Analyzes a literal delimiter
-        lex_case[*buf]=(struct lex_ele*)l_lit;
-      } else {                          //Analyzes a new symbol
-        if ((e=lex_case[*buf])==0) {
-          if (num_nodos++==max_nodos) c_error(0,3);
-          e=lex_case[*buf]=ilex_simb++; (*e).caracter=*buf++;
-        } else buf++;
-        while (*buf!=' ' && *buf!=tab && *buf!=cr) {
-          if (lower[*buf]) c_error(0,4);
-          if ((*e).siguiente==0) {
-            if (num_nodos++==max_nodos) c_error(0,3);
-            else e=(*e).siguiente=ilex_simb++;
+      *buf = lower[*buf];
+      if (*buf >= '0' && *buf <= '9')
+        t = (*buf++ - '0') << 4;
+      else if (*buf >= 'a' && *buf <= 'f')
+        t = (*buf++ - 'a' + 10) << 4;
+      else
+        c_error(0, 2);
+      *buf = lower[*buf];
+      if (*buf >= '0' && *buf <= '9')
+        t += (*buf++ - '0');
+      else if (*buf >= 'a' && *buf <= 'f')
+        t += (*buf++ - 'a' + 10);
+      else
+        c_error(0, 2);
+      if (*buf == cr || *buf == ' ' || *buf == tab)
+        break;
+      else if (lower[*buf]) { //Analyzes a keyword
+        _ivnom = ivnom.b;
+        *ivnom.p++ = 0;
+        *ivnom.p++ = (byte *)t;
+        h = 0;
+        while ((*ivnom.b = lower[*buf++]))
+          h = ((byte)(h << 1) + (h >> 7)) ^ (*ivnom.b++);
+        ptr = &vhash[h];
+        while (*ptr)
+          ptr = (byte **)*ptr;
+        *ptr = _ivnom;
+
+        buf--;
+        ivnom.b++;
+      } else if (t >= 0x78 && t <= 0x7b) { //Analyzes a literal delimiter
+        lex_case[*buf] = (struct lex_ele *)l_lit;
+      } else { //Analyzes a new symbol
+        if ((e = lex_case[*buf]) == 0) {
+          if (num_nodos++ == max_nodos)
+            c_error(0, 3);
+          e = lex_case[*buf] = ilex_simb++;
+          (*e).caracter = *buf++;
+        } else
+          buf++;
+        while (*buf != ' ' && *buf != tab && *buf != cr) {
+          if (lower[*buf])
+            c_error(0, 4);
+          if ((*e).siguiente == 0) {
+            if (num_nodos++ == max_nodos)
+              c_error(0, 3);
+            else
+              e = (*e).siguiente = ilex_simb++;
           } else {
-            e=(*e).siguiente;
-            while ((*e).caracter!=*buf && (*e).alternativa)
-              e=(*e).alternativa;
-            if ((*e).caracter!=*buf) {
-              if (num_nodos++==max_nodos) c_error(0,3);
-              else e=(*e).alternativa=ilex_simb++;
+            e = (*e).siguiente;
+            while ((*e).caracter != *buf && (*e).alternativa)
+              e = (*e).alternativa;
+            if ((*e).caracter != *buf) {
+              if (num_nodos++ == max_nodos)
+                c_error(0, 3);
+              else
+                e = (*e).alternativa = ilex_simb++;
             }
-          } (*e).caracter=*buf++;
-        } (*e).token=t;
-      } break;
-  } 
-  }while (cont);
+          }
+          (*e).caracter = *buf++;
+        }
+        (*e).token = t;
+      }
+      break;
+    }
+  } while (cont);
 
-  free(_buf); _buf=NULL;
-  fclose(def); def=NULL;
-
+  free(_buf);
+  _buf = NULL;
+  fclose(def);
+  def = NULL;
 }
 
 //-----------------------------------------------------------------------------
@@ -1431,204 +1583,332 @@ void analyze_ltlex(void){
 
 // WARNING: Memory limits are not checked during object preloading.
 
-void preload_objects (void) {
+void preload_objects(void) {
+  int len, ret, cod;
+  struct objeto *ob;
+  struct objeto *ob2;
 
-  int len,ret,cod;
-  struct objeto * ob;
-  struct objeto * ob2;
+  if ((def = fopen("system/ltobj.def", "rb")) == NULL)
+    c_error(0, 6);
+  fseek(def, 0, SEEK_END);
+  len = ftell(def);
+  if ((_buf = source = (byte *)malloc(len + 2)) == NULL)
+    c_error(0, 0);
+  fseek(def, 0, SEEK_SET);
+  len = fread(source, 1, len, def);
+  *(source + len) = cr;
+  *(source + len + 1) = cr;
 
-  if ((def=fopen("system/ltobj.def","rb"))==NULL) c_error(0,6);
-  fseek(def,0,SEEK_END); len=ftell(def);
-  if ((_buf=source=(byte *) malloc(len+2))==NULL) c_error(0,0);
-  fseek(def,0,SEEK_SET);
-  len=fread(source,1,len,def);
-  *(source+len)=cr; *(source+len+1)=cr;
+  linea = 1;
+  lexer();
 
-  linea=1; lexer();
-
-  while (pieza!=p_ultima) switch (pieza) {
+  while (pieza != p_ultima)
+    switch (pieza) {
     case p_const:
-      lexer(); if (pieza!=p_id) c_error(0,7);
-      ob=o; if ((*ob).type!=tnone) c_error(0,7); (*ob).type=tcons;
-      lexer(); if (pieza!=p_asig) c_error(0,7);
       lexer();
-      if (pieza==p_num) (*ob).cons.valor=pieza_num;
-      else if (pieza==p_sub) {
-        lexer(); if (pieza!=p_num) c_error(0,7);
-        (*ob).cons.valor=-pieza_num;
-      } else c_error(0,7);
-      (*ob).cons.literal=0;
-      lexer(); break;
+      if (pieza != p_id)
+        c_error(0, 7);
+      ob = o;
+      if ((*ob).type != tnone)
+        c_error(0, 7);
+      (*ob).type = tcons;
+      lexer();
+      if (pieza != p_asig)
+        c_error(0, 7);
+      lexer();
+      if (pieza == p_num)
+        (*ob).cons.valor = pieza_num;
+      else if (pieza == p_sub) {
+        lexer();
+        if (pieza != p_num)
+          c_error(0, 7);
+        (*ob).cons.valor = -pieza_num;
+      } else
+        c_error(0, 7);
+      (*ob).cons.literal = 0;
+      lexer();
+      break;
     case p_global:
-      lexer(); if (pieza==p_id) {
-        ob=o; if ((*ob).type!=tnone) c_error(0,7);
-        lexer(); if (pieza==p_corab) {
-          (*ob).type=ttglo;
-          (*ob).tglo.offset=imem;
-          lexer(); if (pieza!=p_num) c_error(0,7);
-          (*ob).tglo.len1=len=pieza_num;
-          (*ob).tglo.len2=-1;
-          (*ob).tglo.len3=-1;
-          (*ob).tglo.totalen=len+1;
-          do { mem[imem++]=0; } while (len--);
-          lexer(); if (pieza!=p_corce) c_error(0,7);
+      lexer();
+      if (pieza == p_id) {
+        ob = o;
+        if ((*ob).type != tnone)
+          c_error(0, 7);
+        lexer();
+        if (pieza == p_corab) {
+          (*ob).type = ttglo;
+          (*ob).tglo.offset = imem;
+          lexer();
+          if (pieza != p_num)
+            c_error(0, 7);
+          (*ob).tglo.len1 = len = pieza_num;
+          (*ob).tglo.len2 = -1;
+          (*ob).tglo.len3 = -1;
+          (*ob).tglo.totalen = len + 1;
+          do {
+            mem[imem++] = 0;
+          } while (len--);
+          lexer();
+          if (pieza != p_corce)
+            c_error(0, 7);
           lexer();
         } else {
-          (*ob).type=tvglo;
-          (*ob).vglo.offset=imem;
-          if (pieza!=p_asig) { c_error(0,7); } lexer();
-          if (pieza==p_num) mem[imem++]=pieza_num;
-          else if (pieza==p_sub) {
-            lexer(); if (pieza!=p_num) c_error(0,7);
-            mem[imem++]=-pieza_num;
-          } else c_error(0,7); lexer();
-        }
-      } else if (pieza==p_struct) {
-        lexer(); if (pieza!=p_id) c_error(0,7);
-        ob=o; if ((*ob).type!=tnone) c_error(0,7);
-        lexer(); if (pieza!=p_corab) c_error(0,7);
-        (*ob).type=tsglo; (*ob).sglo.offset=imem;
-        lexer(); if (pieza!=p_num) c_error(0,7);
-        (*ob).sglo.items1=pieza_num;
-        (*ob).sglo.items2=(*ob).sglo.items3=-1;
-        (*ob).sglo.totalitems=pieza_num+1;
-        lexer(); if (pieza!=p_corce) c_error(0,7);
-        (*ob).sglo.len_item=0; member=ob; lexer();
-        if (pieza==p_end) { c_error(0,7); } len=0;
-        while (pieza!=p_end) {
-
-          if (pieza==p_string) {
-
+          (*ob).type = tvglo;
+          (*ob).vglo.offset = imem;
+          if (pieza != p_asig) {
+            c_error(0, 7);
+          }
+          lexer();
+          if (pieza == p_num)
+            mem[imem++] = pieza_num;
+          else if (pieza == p_sub) {
             lexer();
-            if (pieza!=p_id) c_error(0,7);
-            if ((*o).type!=tnone) c_error(0,7);
-            ob2=o; lexer();
-            (*ob2).type=tcglo;
-            (*ob2).cglo.offset=len+1;
-            if (pieza!=p_corab) { c_error(0,7); } lexer();
-            if (((*ob2).cglo.totalen=constant())<0) { c_error(0,7); }
-            if ((*ob2).cglo.totalen>0xFFFFF) { c_error(0,7); }
-            if (pieza!=p_corce) { c_error(0,7); } lexer();
+            if (pieza != p_num)
+              c_error(0, 7);
+            mem[imem++] = -pieza_num;
+          } else
+            c_error(0, 7);
+          lexer();
+        }
+      } else if (pieza == p_struct) {
+        lexer();
+        if (pieza != p_id)
+          c_error(0, 7);
+        ob = o;
+        if ((*ob).type != tnone)
+          c_error(0, 7);
+        lexer();
+        if (pieza != p_corab)
+          c_error(0, 7);
+        (*ob).type = tsglo;
+        (*ob).sglo.offset = imem;
+        lexer();
+        if (pieza != p_num)
+          c_error(0, 7);
+        (*ob).sglo.items1 = pieza_num;
+        (*ob).sglo.items2 = (*ob).sglo.items3 = -1;
+        (*ob).sglo.totalitems = pieza_num + 1;
+        lexer();
+        if (pieza != p_corce)
+          c_error(0, 7);
+        (*ob).sglo.len_item = 0;
+        member = ob;
+        lexer();
+        if (pieza == p_end) {
+          c_error(0, 7);
+        }
+        len = 0;
+        while (pieza != p_end) {
+          if (pieza == p_string) {
+            lexer();
+            if (pieza != p_id)
+              c_error(0, 7);
+            if ((*o).type != tnone)
+              c_error(0, 7);
+            ob2 = o;
+            lexer();
+            (*ob2).type = tcglo;
+            (*ob2).cglo.offset = len + 1;
+            if (pieza != p_corab) {
+              c_error(0, 7);
+            }
+            lexer();
+            if (((*ob2).cglo.totalen = constant()) < 0) {
+              c_error(0, 7);
+            }
+            if ((*ob2).cglo.totalen > 0xFFFFF) {
+              c_error(0, 7);
+            }
+            if (pieza != p_corce) {
+              c_error(0, 7);
+            }
+            lexer();
 
-            mem[imem]=0xDAD00000|(*ob2).cglo.totalen;
-            len+=1+((*ob2).cglo.totalen+5)/4;
-            mem[imem+1]=0;
-            imem+=1+((*ob2).cglo.totalen+5)/4;
-            (*ob).sglo.len_item+=1+((*ob2).cglo.totalen+5)/4;
+            mem[imem] = 0xDAD00000 | (*ob2).cglo.totalen;
+            len += 1 + ((*ob2).cglo.totalen + 5) / 4;
+            mem[imem + 1] = 0;
+            imem += 1 + ((*ob2).cglo.totalen + 5) / 4;
+            (*ob).sglo.len_item += 1 + ((*ob2).cglo.totalen + 5) / 4;
 
           } else {
-
-            if (pieza!=p_id) c_error(0,7);
-            if ((*o).type!=tnone) c_error(0,7);
-            ob2=o; lexer();
-            if (pieza==p_corab) {
-              (*ob2).type=ttglo;
-              (*ob2).tglo.offset=len;
-              lexer(); if (pieza!=p_num) c_error(0,7);
-              (*ob2).tglo.len1=pieza_num;
-              (*ob2).tglo.len2=-1;
-              (*ob2).tglo.len3=-1;
-              (*ob2).tglo.totalen=pieza_num+1;
-              len+=pieza_num+1;
-              memset(&mem[imem],0,(pieza_num+1)*4);
-              imem+=pieza_num+1;
-              (*ob).sglo.len_item+=pieza_num+1;
+            if (pieza != p_id)
+              c_error(0, 7);
+            if ((*o).type != tnone)
+              c_error(0, 7);
+            ob2 = o;
+            lexer();
+            if (pieza == p_corab) {
+              (*ob2).type = ttglo;
+              (*ob2).tglo.offset = len;
               lexer();
-              if (pieza!=p_corce) c_error(0,7);
+              if (pieza != p_num)
+                c_error(0, 7);
+              (*ob2).tglo.len1 = pieza_num;
+              (*ob2).tglo.len2 = -1;
+              (*ob2).tglo.len3 = -1;
+              (*ob2).tglo.totalen = pieza_num + 1;
+              len += pieza_num + 1;
+              memset(&mem[imem], 0, (pieza_num + 1) * 4);
+              imem += pieza_num + 1;
+              (*ob).sglo.len_item += pieza_num + 1;
+              lexer();
+              if (pieza != p_corce)
+                c_error(0, 7);
               lexer();
             } else {
-              (*ob2).type=tvglo;
-              (*ob2).vglo.offset=len++;
-              mem[imem++]=0;
+              (*ob2).type = tvglo;
+              (*ob2).vglo.offset = len++;
+              mem[imem++] = 0;
               (*ob).sglo.len_item++;
             }
-
           }
+        }
+        member = NULL;
+        lexer();
 
-        } member=NULL; lexer();
-
-        if ((*ob).sglo.totalitems>1) {
-          len=((*ob).sglo.totalitems-1)*(*ob).sglo.len_item-1;
-          do { mem[imem]=mem[imem-(*ob).sglo.len_item]; imem++; } while (len--);
+        if ((*ob).sglo.totalitems > 1) {
+          len = ((*ob).sglo.totalitems - 1) * (*ob).sglo.len_item - 1;
+          do {
+            mem[imem] = mem[imem - (*ob).sglo.len_item];
+            imem++;
+          } while (len--);
         }
 
-      } else c_error(0,7); break;
+      } else
+        c_error(0, 7);
+      break;
     case p_local:
-      lexer(); if (pieza==p_id) {
-        ob=o; if ((*ob).type!=tnone) c_error(0,7); (*ob).type=tvloc;
-        (*ob).vloc.offset=iloc;
-        lexer(); if (pieza!=p_asig) c_error(0,7);
+      lexer();
+      if (pieza == p_id) {
+        ob = o;
+        if ((*ob).type != tnone)
+          c_error(0, 7);
+        (*ob).type = tvloc;
+        (*ob).vloc.offset = iloc;
         lexer();
-        if (pieza==p_num) loc[iloc++]=pieza_num;
-        else if (pieza==p_sub) {
-          lexer(); if (pieza!=p_num) c_error(0,7);
-          loc[iloc++]=-pieza_num;
-        } else c_error(0,7);
+        if (pieza != p_asig)
+          c_error(0, 7);
         lexer();
-      } else if (pieza==p_struct) {
-        lexer(); if (pieza!=p_id) c_error(0,7);
-        ob=o; if ((*ob).type!=tnone) c_error(0,7);
-        lexer(); if (pieza!=p_corab) c_error(0,7);
-        (*ob).type=tsloc; (*ob).sloc.offset=iloc;
-        lexer(); if (pieza!=p_num) c_error(0,7);
-        (*ob).sloc.items1=pieza_num;
-        (*ob).sloc.items2=(*ob).sloc.items3=-1;
-        (*ob).sloc.totalitems=pieza_num+1;
-        lexer(); if (pieza!=p_corce) c_error(0,7);
-        (*ob).sloc.len_item=0; member=ob; lexer();
-        if (pieza==p_end) c_error(0,7);
+        if (pieza == p_num)
+          loc[iloc++] = pieza_num;
+        else if (pieza == p_sub) {
+          lexer();
+          if (pieza != p_num)
+            c_error(0, 7);
+          loc[iloc++] = -pieza_num;
+        } else
+          c_error(0, 7);
+        lexer();
+      } else if (pieza == p_struct) {
+        lexer();
+        if (pieza != p_id)
+          c_error(0, 7);
+        ob = o;
+        if ((*ob).type != tnone)
+          c_error(0, 7);
+        lexer();
+        if (pieza != p_corab)
+          c_error(0, 7);
+        (*ob).type = tsloc;
+        (*ob).sloc.offset = iloc;
+        lexer();
+        if (pieza != p_num)
+          c_error(0, 7);
+        (*ob).sloc.items1 = pieza_num;
+        (*ob).sloc.items2 = (*ob).sloc.items3 = -1;
+        (*ob).sloc.totalitems = pieza_num + 1;
+        lexer();
+        if (pieza != p_corce)
+          c_error(0, 7);
+        (*ob).sloc.len_item = 0;
+        member = ob;
+        lexer();
+        if (pieza == p_end)
+          c_error(0, 7);
 
-        len=0;
+        len = 0;
 
-        while (pieza!=p_end) {
-          if (pieza!=p_id) c_error(0,7);
-          if ((*o).type!=tnone) c_error(0,7);
-          (*o).type=tvloc; (*o).vloc.offset=len;
+        while (pieza != p_end) {
+          if (pieza != p_id)
+            c_error(0, 7);
+          if ((*o).type != tnone)
+            c_error(0, 7);
+          (*o).type = tvloc;
+          (*o).vloc.offset = len;
           (*ob).sloc.len_item++;
           lexer();
-          if (pieza==p_asig) {
+          if (pieza == p_asig) {
             lexer();
-            if (pieza==p_num) loc[iloc+len]=pieza_num;
-            else if (pieza==p_sub) {
-              lexer(); if (pieza!=p_num) c_error(0,7);
-              loc[iloc+len]=-pieza_num;
-            } else c_error(0,7);
+            if (pieza == p_num)
+              loc[iloc + len] = pieza_num;
+            else if (pieza == p_sub) {
+              lexer();
+              if (pieza != p_num)
+                c_error(0, 7);
+              loc[iloc + len] = -pieza_num;
+            } else
+              c_error(0, 7);
             lexer();
-          } else loc[iloc+len]=0;
+          } else
+            loc[iloc + len] = 0;
           len++;
         }
 
-        iloc+=(*ob).sloc.totalitems*(*ob).sloc.len_item;
+        iloc += (*ob).sloc.totalitems * (*ob).sloc.len_item;
 
-        member=NULL; lexer();
-      } else c_error(0,7); break;
+        member = NULL;
+        lexer();
+      } else
+        c_error(0, 7);
+      break;
 
     case p_function: // function 0 int signal(0,0) // ....
-      lexer(); if (pieza!=p_num) c_error(0,7);
-      cod=pieza_num; lexer();
-      if (pieza==p_int) ret=0;
-      else if (pieza==p_string) ret=1;
-      else c_error(0,7);
-      lexer(); if (pieza!=p_id) c_error(0,7);
-      ob=o; if ((*ob).type!=tnone) c_error(0,7); (*ob).type=tfunc;
-      lexer(); if (pieza!=p_abrir) c_error(0,7);
-      lexer(); len=0;
-      while (pieza!=p_cerrar) {
-        if (pieza!=p_num) c_error(0,7);
-        (*ob).func.par[len++]=pieza_num;
-        lexer(); if (pieza==p_coma) lexer();
+      lexer();
+      if (pieza != p_num)
+        c_error(0, 7);
+      cod = pieza_num;
+      lexer();
+      if (pieza == p_int)
+        ret = 0;
+      else if (pieza == p_string)
+        ret = 1;
+      else
+        c_error(0, 7);
+      lexer();
+      if (pieza != p_id)
+        c_error(0, 7);
+      ob = o;
+      if ((*ob).type != tnone)
+        c_error(0, 7);
+      (*ob).type = tfunc;
+      lexer();
+      if (pieza != p_abrir)
+        c_error(0, 7);
+      lexer();
+      len = 0;
+      while (pieza != p_cerrar) {
+        if (pieza != p_num)
+          c_error(0, 7);
+        (*ob).func.par[len++] = pieza_num;
+        lexer();
+        if (pieza == p_coma)
+          lexer();
       }
-      (*ob).func.code=cod;
-      (*ob).func.ret=ret;
-      (*ob).func.num_par=len;
-      lexer(); break;
+      (*ob).func.code = cod;
+      (*ob).func.ret = ret;
+      (*ob).func.num_par = len;
+      lexer();
+      break;
 
-    default: c_error(0,7); break;
-  }
+    default:
+      c_error(0, 7);
+      break;
+    }
 
-  free(_buf); _buf=NULL;
-  fclose(def); def=NULL;
-
+  free(_buf);
+  _buf = NULL;
+  fclose(def);
+  def = NULL;
 }
 
 //-----------------------------------------------------------------------------
@@ -1637,105 +1917,148 @@ void preload_objects (void) {
 
 int next_pieza;
 int next_linea;
-byte * next_source;
+byte *next_source;
 
-byte * next_lexico(byte * _source, int coment, int linea) { // Never generates errors
+byte *next_lexico(byte *_source, int coment, int linea) { // Never generates errors
 
-  byte ** ptr, * _ivnom, h;
-  struct lex_ele * e;
+  byte **ptr, *_ivnom, h;
+  struct lex_ele *e;
 
   if (!coment && linea) {
-    old_linea=linea; old_ierror=ierror; old_ierror_end=ierror_end;
+    old_linea = linea;
+    old_ierror = ierror;
+    old_ierror_end = ierror_end;
   }
 
-  lex_scan:
+lex_scan:
 
-  if (linea) ierror=_source;
-  next_source=_source;
+  if (linea)
+    ierror = _source;
+  next_source = _source;
 
   switch ((uintptr_t)lex_case[*_source]) {
+  case l_err:
+    if (coment) {
+      _source++;
+      goto lex_scan;
+    }
+    next_pieza = 0;
+    break;
 
-    case l_err:
-      if (coment) { _source++; goto lex_scan; }
-      next_pieza=0; break;
-
-    case l_cr :
-      if (linea) {
-
-        if (convert) {
-          fwrite(ultima_linea,1,_source-ultima_linea,lprg);
-          fwrite(&cero,1,1,lprg);
-        }
-
-        linea++; if ((*++_source)==lf) { _source++; ultima_linea=_source; goto lex_scan; }
-        next_pieza=0; break;
-
-      } else {
-
-        if ((*++_source)==lf) { _source++; goto lex_scan; }
-        next_pieza=0; break;
-
+  case l_cr:
+    if (linea) {
+      if (convert) {
+        fwrite(ultima_linea, 1, _source - ultima_linea, lprg);
+        fwrite(&cero, 1, 1, lprg);
       }
 
-    case l_id :
-      if (coment) { _source++; goto lex_scan; }
-      _ivnom=ivnom.b; *ivnom.p++=0; *ivnom.p++=0; h=0;
-      while ((*ivnom.b=lower[*_source++])) h=((byte)(h<<1)+(h>>7))^(*ivnom.b++);
-      ivnom.b++; _source--;
-      ptr=&vhash[h];
-      while (*ptr!=NULL && strcmp((char *)(ptr+2),(char *)_ivnom+ptr8)) ptr=(byte **)*ptr;
-      if (!strcmp((char *)(ptr+2),(char *)_ivnom+ptr8)) { // id found
-        ivnom.b=_ivnom; // remove it from vnom
-        next_pieza=(intptr_t)*(ptr+1);
-        if (next_pieza<256 && next_pieza>=0) { // reserved word (token)
-          if (next_pieza==p_rem) { while (*_source!=cr) _source++; goto lex_scan; }
-        } else { // object (existing id)
-          next_pieza=p_id;
-        }
-      } else {
-        ivnom.b=_ivnom; // remove it from vnom
-        next_pieza=p_id; // new id
-      } break;
-
-    case l_spc:
-      while ((*++_source)==' ') {} goto lex_scan;
-
-    case l_lit:
-      if (coment) { _source++; goto lex_scan; }
-      next_pieza=p_lit;
-      break;
-
-    case l_num:
-      if (coment) { _source++; goto lex_scan; }
-      next_pieza=p_num;
-      break;
-
-    default: // pointer to a lex_ele
-      e=lex_case[*_source++]; next_pieza=(*e).token; _ivnom=_source;
-
-      while ((e=(*e).siguiente)) {
-        while (*_source!=(*e).caracter && (*e).alternativa) e=(*e).alternativa;
-        if (*_source++==(*e).caracter && (*e).token) {
-          next_pieza=(*e).token; _ivnom=_source;
-        }
-      } _source=_ivnom;
-
-      if (next_pieza==p_rem && !coment) {
-        while (*_source!=cr) { _source++; } goto lex_scan;
-      }
-
-      if (next_pieza==p_ini_rem) {
-        coment++; do {
-          _source=next_lexico(_source,coment,linea);
-          linea=next_linea;
-        } while (next_pieza!=p_end_rem);
-        coment--;
+      linea++;
+      if ((*++_source) == lf) {
+        _source++;
+        ultima_linea = _source;
         goto lex_scan;
-      } break;
+      }
+      next_pieza = 0;
+      break;
 
+    } else {
+      if ((*++_source) == lf) {
+        _source++;
+        goto lex_scan;
+      }
+      next_pieza = 0;
+      break;
+    }
+
+  case l_id:
+    if (coment) {
+      _source++;
+      goto lex_scan;
+    }
+    _ivnom = ivnom.b;
+    *ivnom.p++ = 0;
+    *ivnom.p++ = 0;
+    h = 0;
+    while ((*ivnom.b = lower[*_source++]))
+      h = ((byte)(h << 1) + (h >> 7)) ^ (*ivnom.b++);
+    ivnom.b++;
+    _source--;
+    ptr = &vhash[h];
+    while (*ptr != NULL && strcmp((char *)(ptr + 2), (char *)_ivnom + ptr8))
+      ptr = (byte **)*ptr;
+    if (!strcmp((char *)(ptr + 2), (char *)_ivnom + ptr8)) { // id found
+      ivnom.b = _ivnom;                                      // remove it from vnom
+      next_pieza = (intptr_t)*(ptr + 1);
+      if (next_pieza < 256 && next_pieza >= 0) { // reserved word (token)
+        if (next_pieza == p_rem) {
+          while (*_source != cr)
+            _source++;
+          goto lex_scan;
+        }
+      } else { // object (existing id)
+        next_pieza = p_id;
+      }
+    } else {
+      ivnom.b = _ivnom;  // remove it from vnom
+      next_pieza = p_id; // new id
+    }
+    break;
+
+  case l_spc:
+    while ((*++_source) == ' ') {}
+    goto lex_scan;
+
+  case l_lit:
+    if (coment) {
+      _source++;
+      goto lex_scan;
+    }
+    next_pieza = p_lit;
+    break;
+
+  case l_num:
+    if (coment) {
+      _source++;
+      goto lex_scan;
+    }
+    next_pieza = p_num;
+    break;
+
+  default: // pointer to a lex_ele
+    e = lex_case[*_source++];
+    next_pieza = (*e).token;
+    _ivnom = _source;
+
+    while ((e = (*e).siguiente)) {
+      while (*_source != (*e).caracter && (*e).alternativa)
+        e = (*e).alternativa;
+      if (*_source++ == (*e).caracter && (*e).token) {
+        next_pieza = (*e).token;
+        _ivnom = _source;
+      }
+    }
+    _source = _ivnom;
+
+    if (next_pieza == p_rem && !coment) {
+      while (*_source != cr) {
+        _source++;
+      }
+      goto lex_scan;
+    }
+
+    if (next_pieza == p_ini_rem) {
+      coment++;
+      do {
+        _source = next_lexico(_source, coment, linea);
+        linea = next_linea;
+      } while (next_pieza != p_end_rem);
+      coment--;
+      goto lex_scan;
+    }
+    break;
   }
-  next_linea=linea;
-  return(_source);
+  next_linea = linea;
+  return (_source);
 }
 
 
@@ -1744,7 +2067,7 @@ byte * next_lexico(byte * _source, int coment, int linea) { // Never generates e
 //-----------------------------------------------------------------------------
 
 int IsWAV(char *FileName);
-int en_fopen=0;
+int en_fopen = 0;
 
 /* Lexer: reads the next token from the source buffer.
  * Sets global 'pieza' to the token type, 'pieza_num' for numeric/literal
@@ -1752,203 +2075,300 @@ int en_fopen=0;
  * and insertion of new identifiers into the symbol table.
  */
 void lexer(void) {
-
-  struct objeto * * ptr_o;
-  byte ** ptr, * _ivnom, h, * _source=source;
-  struct lex_ele * e;
+  struct objeto **ptr_o;
+  byte **ptr, *_ivnom, h, *_source = source;
+  struct lex_ele *e;
   char cwork[66];
-  FILE * f;
+  FILE *f;
 
   int empaquetable;
-  char drive[_MAX_DRIVE+1];
-  char dir[_MAX_DIR+1];
-  char fname[_MAX_FNAME+1];
-  char ext[_MAX_EXT+1];
+  char drive[_MAX_DRIVE + 1];
+  char dir[_MAX_DIR + 1];
+  char fname[_MAX_FNAME + 1];
+  char ext[_MAX_EXT + 1];
 
   int n;
 
-  if (!coment) {old_linea=linea; old_ierror=ierror; old_ierror_end=ierror_end;}
+  if (!coment) {
+    old_linea = linea;
+    old_ierror = ierror;
+    old_ierror_end = ierror_end;
+  }
 
-  lex_scan: ierror=_source;
+lex_scan:
+  ierror = _source;
   switch ((uintptr_t)lex_case[*_source]) { // Pointer to a lex_ele or l_???
 
-    case l_err:
-      if (coment) { pieza=p_rem; _source++; } else c_error(0,10); break;
+  case l_err:
+    if (coment) {
+      pieza = p_rem;
+      _source++;
+    } else
+      c_error(0, 10);
+    break;
 
-    case l_cr :
+  case l_cr:
 
-      if (convert) {
-        fwrite(ultima_linea,1,_source-ultima_linea,lprg);
-        fwrite(&cero,1,1,lprg);
-      }
+    if (convert) {
+      fwrite(ultima_linea, 1, _source - ultima_linea, lprg);
+      fwrite(&cero, 1, 1, lprg);
+    }
 
-      linea++; if ((*++_source)==lf) { _source++; ultima_linea=_source; goto lex_scan; }
-      pieza=p_ultima; break; // eof
+    linea++;
+    if ((*++_source) == lf) {
+      _source++;
+      ultima_linea = _source;
+      goto lex_scan;
+    }
+    pieza = p_ultima;
+    break; // eof
 
-    case l_id :
-      if (coment) { pieza=p_rem; _source++; break; }
-      _ivnom=ivnom.b; *ivnom.p++=0; *ivnom.p++=0; h=0;
-      while ((*ivnom.b=lower[*_source++])) h=((byte)(h<<1)+(h>>7))^(*ivnom.b++);
-      ivnom.b++;
-      _source--;
-      if (ivnom.b-vnom>max_obj*long_med_id) c_error(0,100);
+  case l_id:
+    if (coment) {
+      pieza = p_rem;
+      _source++;
+      break;
+    }
+    _ivnom = ivnom.b;
+    *ivnom.p++ = 0;
+    *ivnom.p++ = 0;
+    h = 0;
+    while ((*ivnom.b = lower[*_source++]))
+      h = ((byte)(h << 1) + (h >> 7)) ^ (*ivnom.b++);
+    ivnom.b++;
+    _source--;
+    if (ivnom.b - vnom > max_obj * long_med_id)
+      c_error(0, 100);
 
-      ptr=&vhash[h];
-      while (*ptr && strcmp((char *)(ptr+2),((char *)_ivnom+ptr8))!=0) {
-		  ptr=(byte**)*ptr; 
-	  }
-	  
-      if (!strcmp((char *)(ptr+2),(char *)_ivnom+ptr8)) { // id found
-        ivnom.b=_ivnom; // remove it from vnom
-        pieza=(intptr_t)*(ptr+1);
-        if (pieza<256 && pieza>=0) { // reserved word (t	oken)
-			
-          if (pieza==p_rem) { while (*_source!=cr) _source++; goto lex_scan; }
+    ptr = &vhash[h];
+    while (*ptr && strcmp((char *)(ptr + 2), ((char *)_ivnom + ptr8)) != 0) {
+      ptr = (byte **)*ptr;
+    }
 
-        } else { // object (existing id)
-          ptr_o=(struct objeto **)(ptr+1); o=*ptr_o; pieza=p_id;
-          while(o!=NULL && ( ((*o).bloque && bloque_lexico!=(*o).bloque) ||
-                             ((*o).member!=member) )) o=(*o).anterior;
-          if(o==NULL) { // Not found
-            o=iobj++; (*o).anterior=*ptr_o; *ptr_o=o;
-            (*o).name=(byte*)(ptr_o+1);
-            (*o).member=member;
-            (*o).param=0;
-            if (parametros) (*o).bloque=bloque_actual;
-            #ifndef SHARE
-            if (num_obj++==max_obj) c_error(0,102);
-            #else
-            if (num_obj++==max_obj) c_error(0,101);
-            #endif
-          } else {
-            if ((*o).type==tcons) pieza_num=(*o).cons.valor;
-          }
+    if (!strcmp((char *)(ptr + 2), (char *)_ivnom + ptr8)) { // id found
+      ivnom.b = _ivnom;                                      // remove it from vnom
+      pieza = (intptr_t)*(ptr + 1);
+      if (pieza < 256 && pieza >= 0) { // reserved word (t	oken)
+
+        if (pieza == p_rem) {
+          while (*_source != cr)
+            _source++;
+          goto lex_scan;
         }
-      } else {
-        *ptr=_ivnom; ptr_o=(struct objeto **)(_ivnom+ptr4); *ptr_o=o=iobj++; pieza=p_id; // new id
-        (*o).name=(byte *)_ivnom+ptr8;
-        (*o).member=member;
-        if (parametros) (*o).bloque=bloque_actual;
-        if (num_obj++==max_obj) c_error(0,102);
-      } break;
 
-    case l_spc:
-      while ((*++_source)==' ') {} goto lex_scan;
+      } else { // object (existing id)
+        ptr_o = (struct objeto **)(ptr + 1);
+        o = *ptr_o;
+        pieza = p_id;
+        while (o != NULL &&
+               (((*o).bloque && bloque_lexico != (*o).bloque) || ((*o).member != member)))
+          o = (*o).anterior;
+        if (o == NULL) { // Not found
+          o = iobj++;
+          (*o).anterior = *ptr_o;
+          *ptr_o = o;
+          (*o).name = (byte *)(ptr_o + 1);
+          (*o).member = member;
+          (*o).param = 0;
+          if (parametros)
+            (*o).bloque = bloque_actual;
+#ifndef SHARE
+          if (num_obj++ == max_obj)
+            c_error(0, 102);
+#else
+          if (num_obj++ == max_obj)
+            c_error(0, 101);
+#endif
+        } else {
+          if ((*o).type == tcons)
+            pieza_num = (*o).cons.valor;
+        }
+      }
+    } else {
+      *ptr = _ivnom;
+      ptr_o = (struct objeto **)(_ivnom + ptr4);
+      *ptr_o = o = iobj++;
+      pieza = p_id; // new id
+      (*o).name = (byte *)_ivnom + ptr8;
+      (*o).member = member;
+      if (parametros)
+        (*o).bloque = bloque_actual;
+      if (num_obj++ == max_obj)
+        c_error(0, 102);
+    }
+    break;
 
-    case l_lit:
-      if (coment) { pieza=p_rem; _source++; break; }
-      pieza=p_lit; h=*_source; _ivnom=ivnom.b; // Literal between two h delimiters
+  case l_spc:
+    while ((*++_source) == ' ') {}
+    goto lex_scan;
+
+  case l_lit:
+    if (coment) {
+      pieza = p_rem;
+      _source++;
+      break;
+    }
+    pieza = p_lit;
+    h = *_source;
+    _ivnom = ivnom.b; // Literal between two h delimiters
+    do {
+      if (*++_source == cr)
+        c_error(0, 11);
+      if (*_source == h)
+        if (*(_source + 1) == h)
+          *_ivnom = *++_source;
+        else
+          *_ivnom = 0;
+      else
+        *_ivnom = *_source;
+    } while (*_ivnom++);
+    _source++;
+
+    next_lexico(_source, 0, 0);
+    while (next_pieza == p_lit) {
+      next_lexico(_source, 0, linea);
+      linea = next_linea;
+      _source = next_source;
+      h = *_source;
+      _ivnom--;
       do {
-        if (*++_source==cr) c_error(0,11);
-        if (*_source==h)
-          if (*(_source+1)==h) *_ivnom=*++_source; else *_ivnom=0;
-        else *_ivnom=*_source;
-      } while (*_ivnom++); _source++;
+        if (*++_source == cr)
+          c_error(0, 11);
+        if (*_source == h)
+          if (*(_source + 1) == h)
+            *_ivnom = *++_source;
+          else
+            *_ivnom = 0;
+        else
+          *_ivnom = *_source;
+      } while (*_ivnom++);
+      _source++;
+      next_lexico(_source, 0, 0);
+    }
 
-      next_lexico(_source,0,0);
-      while (next_pieza==p_lit) {
-        next_lexico(_source,0,linea);
-        linea=next_linea;
-        _source=next_source;
-        h=*_source; _ivnom--;
-        do {
-          if (*++_source==cr) c_error(0,11);
-          if (*_source==h)
-            if (*(_source+1)==h) *_ivnom=*++_source; else *_ivnom=0;
-          else *_ivnom=*_source;
-        } while (*_ivnom++); _source++;
-        next_lexico(_source,0,0);
+    n = (strlen((char *)ivnom.b) + ptr4) / 4;
+    memcpy(&mem_ory[itxt], ivnom.b, strlen((char *)ivnom.b) + 1);
+
+    if (ivnom.b[0] != '.' && (ivnom.b[0] != '/' && ivnom.b[1] != 0) &&
+        strcmp("/", (char *)ivnom.b) && (f = div_open_file((char *)ivnom.b)) != NULL) {
+      fprintf(stdout, "FOUND FILE: [%s] [%s] [%s]\n", (char *)ivnom.b, full, (char *)&tipo[8]);
+
+      empaquetable = 0;
+
+      // Determine whether the file is packable ...
+
+      _splitpath(full, (char *)drive, (char *)dir, (char *)fname, (char *)ext);
+      strupr((char *)ext);
+
+      if (!stricmp((char *)ext, ".MOD") || !stricmp((char *)ext, ".S3M") ||
+          !stricmp((char *)ext, ".XM")) {
+        empaquetable = 1;
+      } else if (!stricmp((char *)ext, ".PCM")) {
+        empaquetable = 1;
+      } else if (!stricmp((char *)ext, ".PCX")) {
+        if (fread(cwork, 1, 66, f) > 0) {
+          if (cwork[2] == 1 && cwork[3] == 8 && cwork[65] == 1)
+            empaquetable = 1;
+        }
+      } else if (fread(cwork, 1, 8, f) > 0) {
+        if (!strcmp((char *)cwork, "pal\x1a\x0d\x0a"))
+          empaquetable = 1;
+        if (!strcmp((char *)cwork, "map\x1a\x0d\x0a"))
+          empaquetable = 1;
+        if (!strcmp((char *)cwork, "fpg\x1a\x0d\x0a"))
+          empaquetable = 1;
+        if (!strcmp((char *)cwork, "fnt\x1a\x0d\x0a"))
+          empaquetable = 1;
+        if (!strcmp((char *)cwork, "wld\x1a\x0d\x0a"))
+          empaquetable = 1;
+        if (!strcmp((char *)cwork, "wld\x1a\x0d\x0a\x01"))
+          empaquetable = 1;
       }
 
-      n=(strlen((char *)ivnom.b)+ptr4)/4;
-      memcpy(&mem_ory[itxt],ivnom.b,strlen((char *)ivnom.b)+1);
+      fclose(f);
 
-      if (ivnom.b[0]!='.' && (ivnom.b[0]!='/' && ivnom.b[1]!=0) && strcmp("/",(char *)ivnom.b) && (f=div_open_file((char *)ivnom.b))!=NULL) {
-	      fprintf(stdout,"FOUND FILE: [%s] [%s] [%s]\n",(char *)ivnom.b,full,(char *)&tipo[8]);
+      if (IsWAV(full))
+        empaquetable = 1;
 
-        empaquetable=0;
+      // ???
+      empaquetable = 1;
 
-        // Determine whether the file is packable ...
+      if (!empaquetable || en_fopen)
+        fwrite("+", 1, 1, lins);
+      fwrite(full, 1, strlen(full) + 1, lins);
+      fflush(lins);
+    }
 
-        _splitpath(full,(char *)drive,(char *)dir,(char *)fname,(char *)ext);
-        strupr((char *)ext);
+    pieza_num = itxt;
+    itxt += n;
+    break;
 
-        if (!stricmp((char *)ext,".MOD") || !stricmp((char *)ext,".S3M") || !stricmp((char *)ext,".XM")) {
-          empaquetable=1;
-        } else if (!stricmp((char *)ext,".PCM")) {
-          empaquetable=1;
-        } else if (!stricmp((char *)ext,".PCX")) {
-          if (fread(cwork,1,66,f)>0) {
-            if(cwork[2]==1 && cwork[3]==8 && cwork[65]==1) empaquetable=1;
-          }
-        } else if (fread(cwork,1,8,f)>0) {
-          if (!strcmp((char *)cwork,"pal\x1a\x0d\x0a")) empaquetable=1;
-          if (!strcmp((char *)cwork,"map\x1a\x0d\x0a")) empaquetable=1;
-          if (!strcmp((char *)cwork,"fpg\x1a\x0d\x0a")) empaquetable=1;
-          if (!strcmp((char *)cwork,"fnt\x1a\x0d\x0a")) empaquetable=1;
-          if (!strcmp((char *)cwork,"wld\x1a\x0d\x0a")) empaquetable=1;
-          if (!strcmp((char *)cwork,"wld\x1a\x0d\x0a\x01")) empaquetable=1;
-        }
-
-        fclose(f);
-
-        if (IsWAV(full)) empaquetable=1;
-
-        // ???
-		empaquetable=1;
-
-        if (!empaquetable || en_fopen) fwrite("+",1,1,lins);
-        fwrite(full,1,strlen(full)+1,lins);
-        fflush(lins);
-      }
-
-      pieza_num=itxt; itxt+=n; break;
-
-    case l_num:
-      if (coment) { pieza=p_rem; _source++; break; }
-
-      pieza=p_num; pieza_num=0;
-      if (*_source=='0' && lower[*(_source+1)]=='x') {
-        _source+=2;
-        while ((uintptr_t)lex_case[*_source]==l_num ||
-               (lower[*_source]>='a' && lower[*_source]<='f')) {
-          if ((uintptr_t)lex_case[*_source]==l_num)
-            pieza_num=pieza_num*16+*_source++-0x30;
-          else pieza_num=pieza_num*16+lower[*_source++]-'a'+10;
-        }
-      } else do {
-        pieza_num=pieza_num*10+*_source++-0x30;
-      } while ((uintptr_t)lex_case[*_source]==l_num);
+  case l_num:
+    if (coment) {
+      pieza = p_rem;
+      _source++;
       break;
+    }
 
-    default: // pointer to a lex_ele
-
-      e=lex_case[*_source++]; _ivnom=_source; pieza=(*e).token;
-      while ((e=(*e).siguiente)) {
-        while (*_source!=(*e).caracter && (*e).alternativa) e=(*e).alternativa;
-        if (*_source++==(*e).caracter && (*e).token) {
-          pieza=(*e).token; _ivnom=_source;
-        }
-      } _source=_ivnom;
-
-      if (pieza==p_rem && !coment) {
-        while (*_source!=cr) _source++;
-        goto lex_scan;
+    pieza = p_num;
+    pieza_num = 0;
+    if (*_source == '0' && lower[*(_source + 1)] == 'x') {
+      _source += 2;
+      while ((uintptr_t)lex_case[*_source] == l_num ||
+             (lower[*_source] >= 'a' && lower[*_source] <= 'f')) {
+        if ((uintptr_t)lex_case[*_source] == l_num)
+          pieza_num = pieza_num * 16 + *_source++ - 0x30;
+        else
+          pieza_num = pieza_num * 16 + lower[*_source++] - 'a' + 10;
       }
-      if (pieza==p_ini_rem) {
-        coment++;
-        do {
-           source=_source; lexer(); _source=source;
-        } while (pieza!=p_end_rem);
-        coment--;
-        goto lex_scan;
+    } else
+      do {
+        pieza_num = pieza_num * 10 + *_source++ - 0x30;
+      } while ((uintptr_t)lex_case[*_source] == l_num);
+    break;
+
+  default: // pointer to a lex_ele
+
+    e = lex_case[*_source++];
+    _ivnom = _source;
+    pieza = (*e).token;
+    while ((e = (*e).siguiente)) {
+      while (*_source != (*e).caracter && (*e).alternativa)
+        e = (*e).alternativa;
+      if (*_source++ == (*e).caracter && (*e).token) {
+        pieza = (*e).token;
+        _ivnom = _source;
       }
+    }
+    _source = _ivnom;
 
-      if (pieza==p_ultima) { if (coment) c_error(0,55); else c_error(0,12); }
+    if (pieza == p_rem && !coment) {
+      while (*_source != cr)
+        _source++;
+      goto lex_scan;
+    }
+    if (pieza == p_ini_rem) {
+      coment++;
+      do {
+        source = _source;
+        lexer();
+        _source = source;
+      } while (pieza != p_end_rem);
+      coment--;
+      goto lex_scan;
+    }
 
-      break;
+    if (pieza == p_ultima) {
+      if (coment)
+        c_error(0, 55);
+      else
+        c_error(0, 12);
+    }
 
-  } source=_source; ierror_end=_source-1;
+    break;
+  }
+  source = _source;
+  ierror_end = _source - 1;
 }
 
 //-----------------------------------------------------------------------------
@@ -1958,121 +2378,189 @@ void lexer(void) {
 void skip_semicolons(void) {
   do {
     lexer();
-  } while (pieza==p_ptocoma);
+  } while (pieza == p_ptocoma);
 }
 
 //-----------------------------------------------------------------------------
 //      Pointer declaration analysis (int, word or byte)
 //-----------------------------------------------------------------------------
 
-struct objeto * analiza_pointer(int tipo, int offset) {
-  struct objeto * ob;
-  int len1,len2,len3;
+struct objeto *analiza_pointer(int tipo, int offset) {
+  struct objeto *ob;
+  int len1, len2, len3;
 
-  if (pieza!=p_id) c_error(1,148);
-  ob=o; if ((*ob).type!=tnone) {
-    if (parametros==-1 && (*ob).param==1 && (*ob).bloque==bloque_actual) {
-      if ((*ob).type==tipo) { // Redeclaring a pointer parameter as private
-        save_error(0); lexer();
-        len1=-1; len2=-1; len3=-1;
-        if (pieza==p_corab) { lexer();
-          if ((len1=constant())<0) c_error(4,35);
-          if (pieza==p_coma) {
-            lexer();
-            if ((len2=constant())<0) c_error(4,35);
-            if (pieza==p_coma) {
-              lexer();
-              if ((len3=constant())<0) c_error(4,35);
-            }
-          } if (pieza!=p_corce) { c_error(3,26); } lexer();
-        }
-        if (len1!=(*ob).pilo.len1 || len2!=(*ob).pilo.len2 || len3!=(*ob).pilo.len3) c_error(4,141);
-        else if (pieza==p_asig) c_error(0,54);
-        else {
-          while (pieza==p_ptocoma || pieza==p_coma) lexer();
-          (*ob).param++; // Prevent re-declaring it again
-          return(NULL);
-        }
-      } else c_error(0,117);
-    } else c_error(0,117);
-  } else lexer();
-  if (parametros==-1) (*ob).bloque=bloque_actual;
-  (*ob).pilo.len1=-1; (*ob).pilo.len2=-1; (*ob).pilo.len3=-1;
-  if (pieza==p_corab) { lexer();
-    if (((*ob).pilo.len1=constant())<0) c_error(4,35);
-    if (pieza==p_coma) {
-      lexer();
-      if (((*ob).pilo.len2=constant())<0) c_error(4,35);
-      if (pieza==p_coma) {
+  if (pieza != p_id)
+    c_error(1, 148);
+  ob = o;
+  if ((*ob).type != tnone) {
+    if (parametros == -1 && (*ob).param == 1 && (*ob).bloque == bloque_actual) {
+      if ((*ob).type == tipo) { // Redeclaring a pointer parameter as private
+        save_error(0);
         lexer();
-        if (((*ob).pilo.len3=constant())<0) c_error(4,35);
+        len1 = -1;
+        len2 = -1;
+        len3 = -1;
+        if (pieza == p_corab) {
+          lexer();
+          if ((len1 = constant()) < 0)
+            c_error(4, 35);
+          if (pieza == p_coma) {
+            lexer();
+            if ((len2 = constant()) < 0)
+              c_error(4, 35);
+            if (pieza == p_coma) {
+              lexer();
+              if ((len3 = constant()) < 0)
+                c_error(4, 35);
+            }
+          }
+          if (pieza != p_corce) {
+            c_error(3, 26);
+          }
+          lexer();
+        }
+        if (len1 != (*ob).pilo.len1 || len2 != (*ob).pilo.len2 || len3 != (*ob).pilo.len3)
+          c_error(4, 141);
+        else if (pieza == p_asig)
+          c_error(0, 54);
+        else {
+          while (pieza == p_ptocoma || pieza == p_coma)
+            lexer();
+          (*ob).param++; // Prevent re-declaring it again
+          return (NULL);
+        }
+      } else
+        c_error(0, 117);
+    } else
+      c_error(0, 117);
+  } else
+    lexer();
+  if (parametros == -1)
+    (*ob).bloque = bloque_actual;
+  (*ob).pilo.len1 = -1;
+  (*ob).pilo.len2 = -1;
+  (*ob).pilo.len3 = -1;
+  if (pieza == p_corab) {
+    lexer();
+    if (((*ob).pilo.len1 = constant()) < 0)
+      c_error(4, 35);
+    if (pieza == p_coma) {
+      lexer();
+      if (((*ob).pilo.len2 = constant()) < 0)
+        c_error(4, 35);
+      if (pieza == p_coma) {
+        lexer();
+        if (((*ob).pilo.len3 = constant()) < 0)
+          c_error(4, 35);
       }
     }
-    if (pieza!=p_corce) { c_error(3,26); } lexer();
-  } (*ob).pilo.totalen=0;
-  if ((*ob).pilo.len1>-1) (*ob).pilo.totalen=(*ob).pilo.len1+1;
-  if ((*ob).pilo.len2>-1) (*ob).pilo.totalen*=(*ob).pilo.len2+1;
-  if ((*ob).pilo.len3>-1) (*ob).pilo.totalen*=(*ob).pilo.len3+1;
+    if (pieza != p_corce) {
+      c_error(3, 26);
+    }
+    lexer();
+  }
+  (*ob).pilo.totalen = 0;
+  if ((*ob).pilo.len1 > -1)
+    (*ob).pilo.totalen = (*ob).pilo.len1 + 1;
+  if ((*ob).pilo.len2 > -1)
+    (*ob).pilo.totalen *= (*ob).pilo.len2 + 1;
+  if ((*ob).pilo.len3 > -1)
+    (*ob).pilo.totalen *= (*ob).pilo.len3 + 1;
 
-  (*ob).type=tipo; (*ob).pilo.offset=offset;
+  (*ob).type = tipo;
+  (*ob).pilo.offset = offset;
 
-  return(ob);
+  return (ob);
 }
 
 //-----------------------------------------------------------------------------
 
-int analyze_pointer_struct(int tipo, int offset, struct objeto * estructura) {
-  struct objeto * ob;
-  int items1,items2,items3;
+int analyze_pointer_struct(int tipo, int offset, struct objeto *estructura) {
+  struct objeto *ob;
+  int items1, items2, items3;
 
-  if (pieza!=p_id) c_error(1,148);
-  ob=o; if ((*ob).type!=tnone) {
-    if (parametros==-1 && (*ob).param==1 && (*ob).bloque==bloque_actual) {
-      if ((*ob).type==tipo) { // Redeclaring a pointer parameter as private
-        save_error(0); lexer();
-        items1=-1; items2=-1; items3=-1;
-        if (pieza==p_corab) { lexer();
-          if ((items1=constant())<0) c_error(4,35);
-          if (pieza==p_coma) {
-            lexer();
-            if ((items2=constant())<0) c_error(4,35);
-            if (pieza==p_coma) {
-              lexer();
-              if ((items3=constant())<0) c_error(4,35);
-            }
-          } if (pieza!=p_corce) { c_error(3,26); } lexer();
-        }
-        if (items1!=(*ob).psgl.items1 || items2!=(*ob).psgl.items2 || items3!=(*ob).psgl.items3) c_error(4,141);
-        else if (pieza==p_asig) c_error(0,54);
-        else {
-          (*ob).param++; return(0); // Prevent re-declaring it again
-        }
-      } else c_error(0,117);
-    } else c_error(0,117);
-  } else lexer();
-  if (parametros==-1) (*ob).bloque=bloque_actual;
-  (*ob).psgl.items1=-1; (*ob).psgl.items2=-1; (*ob).psgl.items3=-1;
-  if (pieza==p_corab) { lexer();
-    if (((*ob).psgl.items1=constant())<0) c_error(4,35);
-    if (pieza==p_coma) {
-      lexer();
-      if (((*ob).psgl.items2=constant())<0) c_error(4,35);
-      if (pieza==p_coma) {
+  if (pieza != p_id)
+    c_error(1, 148);
+  ob = o;
+  if ((*ob).type != tnone) {
+    if (parametros == -1 && (*ob).param == 1 && (*ob).bloque == bloque_actual) {
+      if ((*ob).type == tipo) { // Redeclaring a pointer parameter as private
+        save_error(0);
         lexer();
-        if (((*ob).psgl.items3=constant())<0) c_error(4,35);
+        items1 = -1;
+        items2 = -1;
+        items3 = -1;
+        if (pieza == p_corab) {
+          lexer();
+          if ((items1 = constant()) < 0)
+            c_error(4, 35);
+          if (pieza == p_coma) {
+            lexer();
+            if ((items2 = constant()) < 0)
+              c_error(4, 35);
+            if (pieza == p_coma) {
+              lexer();
+              if ((items3 = constant()) < 0)
+                c_error(4, 35);
+            }
+          }
+          if (pieza != p_corce) {
+            c_error(3, 26);
+          }
+          lexer();
+        }
+        if (items1 != (*ob).psgl.items1 || items2 != (*ob).psgl.items2 ||
+            items3 != (*ob).psgl.items3)
+          c_error(4, 141);
+        else if (pieza == p_asig)
+          c_error(0, 54);
+        else {
+          (*ob).param++;
+          return (0); // Prevent re-declaring it again
+        }
+      } else
+        c_error(0, 117);
+    } else
+      c_error(0, 117);
+  } else
+    lexer();
+  if (parametros == -1)
+    (*ob).bloque = bloque_actual;
+  (*ob).psgl.items1 = -1;
+  (*ob).psgl.items2 = -1;
+  (*ob).psgl.items3 = -1;
+  if (pieza == p_corab) {
+    lexer();
+    if (((*ob).psgl.items1 = constant()) < 0)
+      c_error(4, 35);
+    if (pieza == p_coma) {
+      lexer();
+      if (((*ob).psgl.items2 = constant()) < 0)
+        c_error(4, 35);
+      if (pieza == p_coma) {
+        lexer();
+        if (((*ob).psgl.items3 = constant()) < 0)
+          c_error(4, 35);
       }
     }
-    if (pieza!=p_corce) { c_error(3,26); } lexer();
-  } (*ob).psgl.totalitems=0;
-  if ((*ob).psgl.items1>-1) (*ob).psgl.totalitems=(*ob).psgl.items1+1;
-  if ((*ob).psgl.items2>-1) (*ob).psgl.totalitems*=(*ob).psgl.items2+1;
-  if ((*ob).psgl.items3>-1) (*ob).psgl.totalitems*=(*ob).psgl.items3+1;
+    if (pieza != p_corce) {
+      c_error(3, 26);
+    }
+    lexer();
+  }
+  (*ob).psgl.totalitems = 0;
+  if ((*ob).psgl.items1 > -1)
+    (*ob).psgl.totalitems = (*ob).psgl.items1 + 1;
+  if ((*ob).psgl.items2 > -1)
+    (*ob).psgl.totalitems *= (*ob).psgl.items2 + 1;
+  if ((*ob).psgl.items3 > -1)
+    (*ob).psgl.totalitems *= (*ob).psgl.items3 + 1;
 
-  (*ob).type=tipo;                // tpsgl or tpslo
-  (*ob).psgl.offset=offset;       // pointer offset
-  (*ob).psgl.ostruct=estructura;  // original struct
+  (*ob).type = tipo;               // tpsgl or tpslo
+  (*ob).psgl.offset = offset;      // pointer offset
+  (*ob).psgl.ostruct = estructura; // original struct
 
-  return(1);
+  return (1);
 }
 
 //-----------------------------------------------------------------------------
@@ -2080,1101 +2568,1574 @@ int analyze_pointer_struct(int tipo, int offset, struct objeto * estructura) {
 //-----------------------------------------------------------------------------
 
 int analyze_struct(int offstruct) { // after " struct id [ <const> ] " // id==member
-  int len=0,dup,i,_itxt,_imem;
-  struct objeto * ob;
-  struct objeto * old_member,* member2;
-  byte * oimemptr;
+  int len = 0, dup, i, _itxt, _imem;
+  struct objeto *ob;
+  struct objeto *old_member, *member2;
+  byte *oimemptr;
 
-  while (pieza==p_ptocoma) lexer();
+  while (pieza == p_ptocoma)
+    lexer();
 
-  while (pieza!=p_end) {
-
-    if (pieza==p_struct) {                              // Struct member ---
+  while (pieza != p_end) {
+    if (pieza == p_struct) { // Struct member ---
 
       lexer();
 
-      if (pieza==p_pointer) { // Defining a struct pointer
+      if (pieza == p_pointer) { // Defining a struct pointer
 
-        old_member=member; member=NULL; lexer(); member=old_member;
-        if (pieza!=p_id) { c_error(1,110); } ob=o;
-
-        if ((*ob).type==tnone) c_error(0,150); // Pointer can't be defined this way
-        if ((*ob).type!=tsglo && (*ob).type!=tsloc) c_error(0,150);
+        old_member = member;
+        member = NULL;
         lexer();
-        puntero_a_struct:
-        analyze_pointer_struct(tpsgl,len,ob);
-        test_buffer(&mem,&imem_max,offstruct+len);
-        if (pieza==p_asig) {
-          lexer(); mem[offstruct+len]=constant();
-        } len+=1;
+        member = old_member;
+        if (pieza != p_id) {
+          c_error(1, 110);
+        }
+        ob = o;
 
-        if (pieza==p_coma) {
+        if ((*ob).type == tnone)
+          c_error(0, 150); // Pointer can't be defined this way
+        if ((*ob).type != tsglo && (*ob).type != tsloc)
+          c_error(0, 150);
+        lexer();
+puntero_a_struct:
+        analyze_pointer_struct(tpsgl, len, ob);
+        test_buffer(&mem, &imem_max, offstruct + len);
+        if (pieza == p_asig) {
           lexer();
-          if (pieza==p_pointer) lexer();
+          mem[offstruct + len] = constant();
+        }
+        len += 1;
+
+        if (pieza == p_coma) {
+          lexer();
+          if (pieza == p_pointer)
+            lexer();
           goto puntero_a_struct;
         } else {
-          if (!free_sintax) if (pieza!=p_ptocoma) c_error(3,137);
-          while (pieza==p_ptocoma || pieza==p_coma) lexer();
+          if (!free_sintax)
+            if (pieza != p_ptocoma)
+              c_error(3, 137);
+          while (pieza == p_ptocoma || pieza == p_coma)
+            lexer();
         }
 
       } else {
+        if (pieza != p_id)
+          c_error(1, 110);
+        ob = o;
+        old_member = member;
+        member = ob;
+        lexer();
+        if ((*ob).type != tnone)
+          c_error(2, 22);
 
-        if (pieza!=p_id) c_error(1,110);
-        ob=o; 
-        old_member=member; member=ob; lexer();
-        if ((*ob).type!=tnone) c_error(2,22);
-
-        (*ob).type=tsglo; (*ob).sglo.offset=len;
-        if (pieza==p_corab) {
-          member2=member; member=NULL; lexer();
-          if (((*ob).sglo.items1=constant())<0) c_error(4,123);
-          if (pieza==p_coma) {
+        (*ob).type = tsglo;
+        (*ob).sglo.offset = len;
+        if (pieza == p_corab) {
+          member2 = member;
+          member = NULL;
+          lexer();
+          if (((*ob).sglo.items1 = constant()) < 0)
+            c_error(4, 123);
+          if (pieza == p_coma) {
             lexer();
-            if (((*ob).sglo.items2=constant())<0) c_error(4,123);
-            if (pieza==p_coma) {
+            if (((*ob).sglo.items2 = constant()) < 0)
+              c_error(4, 123);
+            if (pieza == p_coma) {
               lexer();
-              if (((*ob).sglo.items3=constant())<0) c_error(4,123);
-            } else (*ob).sglo.items3=-1;
-          } else { (*ob).sglo.items2=-1; (*ob).sglo.items3=-1; }
-          member=member2;
-          (*ob).sglo.totalitems=(*ob).sglo.items1+1;
-          if ((*ob).sglo.items2>-1) (*ob).sglo.totalitems*=(*ob).sglo.items2+1;
-          if ((*ob).sglo.items3>-1) (*ob).sglo.totalitems*=(*ob).sglo.items3+1;
-          if (pieza!=p_corce) { c_error(3,26); } lexer();
+              if (((*ob).sglo.items3 = constant()) < 0)
+                c_error(4, 123);
+            } else
+              (*ob).sglo.items3 = -1;
+          } else {
+            (*ob).sglo.items2 = -1;
+            (*ob).sglo.items3 = -1;
+          }
+          member = member2;
+          (*ob).sglo.totalitems = (*ob).sglo.items1 + 1;
+          if ((*ob).sglo.items2 > -1)
+            (*ob).sglo.totalitems *= (*ob).sglo.items2 + 1;
+          if ((*ob).sglo.items3 > -1)
+            (*ob).sglo.totalitems *= (*ob).sglo.items3 + 1;
+          if (pieza != p_corce) {
+            c_error(3, 26);
+          }
+          lexer();
         } else {
-          (*ob).sglo.totalitems=1;
-          (*ob).sglo.items1=0; (*ob).sglo.items2=-1; (*ob).sglo.items3=-1;
+          (*ob).sglo.totalitems = 1;
+          (*ob).sglo.items1 = 0;
+          (*ob).sglo.items2 = -1;
+          (*ob).sglo.items3 = -1;
         }
-        if (((*ob).sglo.len_item=analyze_struct(offstruct+len))==0) c_error(0,57);
-        i=offstruct+len; dup=(*ob).sglo.totalitems+1;
-        if (dup>1) {
-          test_buffer(&mem,&imem_max,i+(*ob).sglo.len_item*(*ob).sglo.totalitems);
-          test_buffer(&frm,&ifrm_max,i+(*ob).sglo.len_item*(*ob).sglo.totalitems);
+        if (((*ob).sglo.len_item = analyze_struct(offstruct + len)) == 0)
+          c_error(0, 57);
+        i = offstruct + len;
+        dup = (*ob).sglo.totalitems + 1;
+        if (dup > 1) {
+          test_buffer(&mem, &imem_max, i + (*ob).sglo.len_item * (*ob).sglo.totalitems);
+          test_buffer(&frm, &ifrm_max, i + (*ob).sglo.len_item * (*ob).sglo.totalitems);
           while (--dup) {
-          	if(i!=offstruct+len) {
-	            memcpy(&mem[i],&mem[offstruct+len],(*ob).sglo.len_item<<2);
-	            memcpy(&frm[i],&frm[offstruct+len],(*ob).sglo.len_item<<2);
-	        }
-            i+=(*ob).sglo.len_item;
+            if (i != offstruct + len) {
+              memcpy(&mem[i], &mem[offstruct + len], (*ob).sglo.len_item << 2);
+              memcpy(&frm[i], &frm[offstruct + len], (*ob).sglo.len_item << 2);
+            }
+            i += (*ob).sglo.len_item;
           }
         }
-        len+=(*ob).sglo.len_item*(*ob).sglo.totalitems;
-        member=old_member; lexer();
-        while (pieza==p_ptocoma) lexer();
+        len += (*ob).sglo.len_item * (*ob).sglo.totalitems;
+        member = old_member;
+        lexer();
+        while (pieza == p_ptocoma)
+          lexer();
       }
-    } else if (pieza==p_string) {                     // String member
+    } else if (pieza == p_string) { // String member
 
       lexer();
 
-      if (pieza==p_pointer) { // Byte pointer member
+      if (pieza == p_pointer) { // Byte pointer member
 
-        lexer(); puntero1:
-        ob=analiza_pointer(tpcgl,len);
-        test_buffer(&mem,&imem_max,offstruct+len);
-        if (pieza==p_asig) {
-          lexer(); mem[offstruct+len]=constant();
-        } len+=1;
+        lexer();
+puntero1:
+        ob = analiza_pointer(tpcgl, len);
+        test_buffer(&mem, &imem_max, offstruct + len);
+        if (pieza == p_asig) {
+          lexer();
+          mem[offstruct + len] = constant();
+        }
+        len += 1;
 
-        if (pieza==p_coma) {
-          lexer(); if (pieza==p_pointer) lexer();
+        if (pieza == p_coma) {
+          lexer();
+          if (pieza == p_pointer)
+            lexer();
           goto puntero1;
         }
 
       } else {
-
-        if (pieza!=p_id) c_error(1,125);
-        ob=o; if ((*ob).type!=tnone) c_error(0,114); lexer();
-        (*ob).type=tcglo; (*ob).cglo.offset=len+1;
-        if (pieza==p_corab) {
+        if (pieza != p_id)
+          c_error(1, 125);
+        ob = o;
+        if ((*ob).type != tnone)
+          c_error(0, 114);
+        lexer();
+        (*ob).type = tcglo;
+        (*ob).cglo.offset = len + 1;
+        if (pieza == p_corab) {
           lexer();
-          if (pieza==p_corce) {
+          if (pieza == p_corce) {
             lexer();
-            (*ob).cglo.totalen=255;
+            (*ob).cglo.totalen = 255;
           } else {
-            if (((*ob).cglo.totalen=constant())<0) c_error(4,127);
-            if ((*ob).cglo.totalen>0xFFFFF) c_error(4,135);
-            if (pieza!=p_corce) c_error(3,26);
+            if (((*ob).cglo.totalen = constant()) < 0)
+              c_error(4, 127);
+            if ((*ob).cglo.totalen > 0xFFFFF)
+              c_error(4, 135);
+            if (pieza != p_corce)
+              c_error(3, 26);
             lexer();
           }
-        } else (*ob).cglo.totalen=255;
+        } else
+          (*ob).cglo.totalen = 255;
 
-        test_buffer(&frm,&ifrm_max,offstruct+len);
-        frm[offstruct+len]=0xDAD00000;
+        test_buffer(&frm, &ifrm_max, offstruct + len);
+        frm[offstruct + len] = 0xDAD00000;
 
-        if (pieza==p_asig) {
+        if (pieza == p_asig) {
           save_error(1);
-          _itxt=itxt;
+          _itxt = itxt;
           lexer();
-          if (pieza!=p_lit && !(pieza==p_id && (*o).type==tcons && (*o).cons.literal))
-            c_error(3,128);
-          if (strlen((char*)&mem[pieza_num])>(*ob).cglo.totalen+1)
-            c_error(4,129);
-          test_buffer(&mem,&imem_max,offstruct+len);
-          mem[offstruct+len]=0xDAD00000|(*ob).cglo.totalen;
-          memmove((char*)&mem[offstruct+len+1],(char*)&mem[pieza_num],strlen((char*)&mem[pieza_num])+1);
-          len+=1+((*ob).cglo.totalen+5)/4;
-          itxt=_itxt; // Remove the string from the text segment
+          if (pieza != p_lit && !(pieza == p_id && (*o).type == tcons && (*o).cons.literal))
+            c_error(3, 128);
+          if (strlen((char *)&mem[pieza_num]) > (*ob).cglo.totalen + 1)
+            c_error(4, 129);
+          test_buffer(&mem, &imem_max, offstruct + len);
+          mem[offstruct + len] = 0xDAD00000 | (*ob).cglo.totalen;
+          memmove((char *)&mem[offstruct + len + 1], (char *)&mem[pieza_num],
+                  strlen((char *)&mem[pieza_num]) + 1);
+          len += 1 + ((*ob).cglo.totalen + 5) / 4;
+          itxt = _itxt; // Remove the string from the text segment
           lexer();
         } else {
-          test_buffer(&mem,&imem_max,offstruct+len);
-          mem[offstruct+len]=0xDAD00000|(*ob).cglo.totalen;
-          len+=1+((*ob).cglo.totalen+5)/4;
+          test_buffer(&mem, &imem_max, offstruct + len);
+          mem[offstruct + len] = 0xDAD00000 | (*ob).cglo.totalen;
+          len += 1 + ((*ob).cglo.totalen + 5) / 4;
         }
       }
 
-      if (pieza==p_coma) pieza=p_string; else {
-        if (!free_sintax) if (pieza!=p_ptocoma) c_error(3,137);
-        while (pieza==p_ptocoma || pieza==p_coma) lexer();
+      if (pieza == p_coma)
+        pieza = p_string;
+      else {
+        if (!free_sintax)
+          if (pieza != p_ptocoma)
+            c_error(3, 137);
+        while (pieza == p_ptocoma || pieza == p_coma)
+          lexer();
       }
 
-    } else if (pieza==p_byte) {                         // Byte member ---
+    } else if (pieza == p_byte) { // Byte member ---
 
       lexer();
 
-      if (pieza==p_pointer) { // Byte pointer member
+      if (pieza == p_pointer) { // Byte pointer member
 
-        lexer(); puntero2:
-        ob=analiza_pointer(tpbgl,len);
-        test_buffer(&mem,&imem_max,offstruct+len);
-        if (pieza==p_asig) {
-          lexer(); mem[offstruct+len]=constant();
-        } len+=1;
+        lexer();
+puntero2:
+        ob = analiza_pointer(tpbgl, len);
+        test_buffer(&mem, &imem_max, offstruct + len);
+        if (pieza == p_asig) {
+          lexer();
+          mem[offstruct + len] = constant();
+        }
+        len += 1;
 
-        if (pieza==p_coma) {
-          lexer(); if (pieza==p_pointer) lexer();
+        if (pieza == p_coma) {
+          lexer();
+          if (pieza == p_pointer)
+            lexer();
           goto puntero2;
         }
 
       } else {
-
-        if (pieza!=p_id) c_error(1,142);
-        ob=o; if ((*ob).type!=tnone) c_error(0,114); lexer();
-        (*ob).type=tbglo; (*ob).bglo.offset=len;
-        if (pieza==p_corab) { lexer();
-          if (((*ob).bglo.len1=constant())<0) c_error(4,35);
-          if (pieza==p_coma) {
+        if (pieza != p_id)
+          c_error(1, 142);
+        ob = o;
+        if ((*ob).type != tnone)
+          c_error(0, 114);
+        lexer();
+        (*ob).type = tbglo;
+        (*ob).bglo.offset = len;
+        if (pieza == p_corab) {
+          lexer();
+          if (((*ob).bglo.len1 = constant()) < 0)
+            c_error(4, 35);
+          if (pieza == p_coma) {
             lexer();
-            if (((*ob).bglo.len2=constant())<0) c_error(4,35);
-            if (pieza==p_coma) {
+            if (((*ob).bglo.len2 = constant()) < 0)
+              c_error(4, 35);
+            if (pieza == p_coma) {
               lexer();
-              if (((*ob).bglo.len3=constant())<0) c_error(4,35);
-            } else (*ob).bglo.len3=-1;
-          } else { (*ob).bglo.len2=-1; (*ob).bglo.len3=-1; }
-          (*ob).bglo.totalen=(*ob).bglo.len1+1;
-          if ((*ob).bglo.len2>-1) (*ob).bglo.totalen*=(*ob).bglo.len2+1;
-          if ((*ob).bglo.len3>-1) (*ob).bglo.totalen*=(*ob).bglo.len3+1;
-          if (pieza!=p_corce) { c_error(3,26); } lexer();
-          test_buffer(&mem,&imem_max,offstruct+len+((*ob).bglo.totalen+3)/4);
+              if (((*ob).bglo.len3 = constant()) < 0)
+                c_error(4, 35);
+            } else
+              (*ob).bglo.len3 = -1;
+          } else {
+            (*ob).bglo.len2 = -1;
+            (*ob).bglo.len3 = -1;
+          }
+          (*ob).bglo.totalen = (*ob).bglo.len1 + 1;
+          if ((*ob).bglo.len2 > -1)
+            (*ob).bglo.totalen *= (*ob).bglo.len2 + 1;
+          if ((*ob).bglo.len3 > -1)
+            (*ob).bglo.totalen *= (*ob).bglo.len3 + 1;
+          if (pieza != p_corce) {
+            c_error(3, 26);
+          }
+          lexer();
+          test_buffer(&mem, &imem_max, offstruct + len + ((*ob).bglo.totalen + 3) / 4);
 
-          test_buffer(&frm,&ifrm_max,offstruct+len+((*ob).bglo.totalen+3)/4);
-          memset(&frm[offstruct+len],2,(*ob).bglo.totalen);
+          test_buffer(&frm, &ifrm_max, offstruct + len + ((*ob).bglo.totalen + 3) / 4);
+          memset(&frm[offstruct + len], 2, (*ob).bglo.totalen);
 
-          if (pieza==p_asig) {
-            _imem=imem; imem=offstruct+len;
-            save_error(1); lexer();
-            oimemptr=(byte*)&mem[imem];
-            tglo_init(2);
-            if (imemptr-oimemptr>(*ob).bglo.totalen) c_error(4,33);
-            imem=_imem;
-          } (*ob).bglo.totalen=((*ob).bglo.totalen+3)/4;
-        } else {
-          (*ob).type=tbglo; (*ob).bglo.offset=len;
-          (*ob).bglo.len1=0;
-          (*ob).bglo.len2=-1;
-          (*ob).bglo.len3=-1;
-          (*ob).bglo.totalen=1; // 1 int
-
-          test_buffer(&frm,&ifrm_max,offstruct+len);
-          frm[offstruct+len]=2;
-
-          if (pieza==p_asig) {
+          if (pieza == p_asig) {
+            _imem = imem;
+            imem = offstruct + len;
             save_error(1);
             lexer();
-            test_buffer(&mem,&imem_max,offstruct+len);
-            mem[offstruct+len]=constant();
-            if (mem[offstruct+len]<0 || mem[offstruct+len]>255) c_error(4,143);
+            oimemptr = (byte *)&mem[imem];
+            tglo_init(2);
+            if (imemptr - oimemptr > (*ob).bglo.totalen)
+              c_error(4, 33);
+            imem = _imem;
           }
-        } len+=(*ob).bglo.totalen;
+          (*ob).bglo.totalen = ((*ob).bglo.totalen + 3) / 4;
+        } else {
+          (*ob).type = tbglo;
+          (*ob).bglo.offset = len;
+          (*ob).bglo.len1 = 0;
+          (*ob).bglo.len2 = -1;
+          (*ob).bglo.len3 = -1;
+          (*ob).bglo.totalen = 1; // 1 int
+
+          test_buffer(&frm, &ifrm_max, offstruct + len);
+          frm[offstruct + len] = 2;
+
+          if (pieza == p_asig) {
+            save_error(1);
+            lexer();
+            test_buffer(&mem, &imem_max, offstruct + len);
+            mem[offstruct + len] = constant();
+            if (mem[offstruct + len] < 0 || mem[offstruct + len] > 255)
+              c_error(4, 143);
+          }
+        }
+        len += (*ob).bglo.totalen;
       }
 
-      if (pieza==p_coma) pieza=p_byte; else {
-        if (!free_sintax) if (pieza!=p_ptocoma) c_error(3,137);
-        while (pieza==p_ptocoma || pieza==p_coma) lexer();
+      if (pieza == p_coma)
+        pieza = p_byte;
+      else {
+        if (!free_sintax)
+          if (pieza != p_ptocoma)
+            c_error(3, 137);
+        while (pieza == p_ptocoma || pieza == p_coma)
+          lexer();
       }
 
-    } else if (pieza==p_word) {                         // Word member ---
+    } else if (pieza == p_word) { // Word member ---
 
       lexer();
 
-      if (pieza==p_pointer) { // Word pointer member
+      if (pieza == p_pointer) { // Word pointer member
 
-        lexer(); puntero3:
-        ob=analiza_pointer(tpwgl,len);
-        test_buffer(&mem,&imem_max,offstruct+len);
-        if (pieza==p_asig) {
-          lexer(); mem[offstruct+len]=constant();
-        } len+=1;
-        if (pieza==p_coma) {
-          lexer(); if (pieza==p_pointer) lexer();
+        lexer();
+puntero3:
+        ob = analiza_pointer(tpwgl, len);
+        test_buffer(&mem, &imem_max, offstruct + len);
+        if (pieza == p_asig) {
+          lexer();
+          mem[offstruct + len] = constant();
+        }
+        len += 1;
+        if (pieza == p_coma) {
+          lexer();
+          if (pieza == p_pointer)
+            lexer();
           goto puntero3;
         }
 
       } else {
-
-        if (pieza!=p_id) c_error(1,145);
-        ob=o; if ((*ob).type!=tnone) c_error(0,114); lexer();
-        (*ob).type=twglo; (*ob).wglo.offset=len;
-        if (pieza==p_corab) { lexer();
-          if (((*ob).wglo.len1=constant())<0) c_error(4,35);
-          if (pieza==p_coma) {
+        if (pieza != p_id)
+          c_error(1, 145);
+        ob = o;
+        if ((*ob).type != tnone)
+          c_error(0, 114);
+        lexer();
+        (*ob).type = twglo;
+        (*ob).wglo.offset = len;
+        if (pieza == p_corab) {
+          lexer();
+          if (((*ob).wglo.len1 = constant()) < 0)
+            c_error(4, 35);
+          if (pieza == p_coma) {
             lexer();
-            if (((*ob).wglo.len2=constant())<0) c_error(4,35);
-            if (pieza==p_coma) {
+            if (((*ob).wglo.len2 = constant()) < 0)
+              c_error(4, 35);
+            if (pieza == p_coma) {
               lexer();
-              if (((*ob).wglo.len3=constant())<0) c_error(4,35);
-            } else (*ob).wglo.len3=-1;
-          } else { (*ob).wglo.len2=-1; (*ob).wglo.len3=-1; }
-          (*ob).wglo.totalen=(*ob).wglo.len1+1;
-          if ((*ob).wglo.len2>-1) (*ob).wglo.totalen*=(*ob).wglo.len2+1;
-          if ((*ob).wglo.len3>-1) (*ob).wglo.totalen*=(*ob).wglo.len3+1;
-          if (pieza!=p_corce) { c_error(3,26); } lexer();
-          test_buffer(&mem,&imem_max,offstruct+len+((*ob).wglo.totalen+1)/2);
+              if (((*ob).wglo.len3 = constant()) < 0)
+                c_error(4, 35);
+            } else
+              (*ob).wglo.len3 = -1;
+          } else {
+            (*ob).wglo.len2 = -1;
+            (*ob).wglo.len3 = -1;
+          }
+          (*ob).wglo.totalen = (*ob).wglo.len1 + 1;
+          if ((*ob).wglo.len2 > -1)
+            (*ob).wglo.totalen *= (*ob).wglo.len2 + 1;
+          if ((*ob).wglo.len3 > -1)
+            (*ob).wglo.totalen *= (*ob).wglo.len3 + 1;
+          if (pieza != p_corce) {
+            c_error(3, 26);
+          }
+          lexer();
+          test_buffer(&mem, &imem_max, offstruct + len + ((*ob).wglo.totalen + 1) / 2);
 
-          test_buffer(&frm,&ifrm_max,offstruct+len+((*ob).wglo.totalen+1)/2);
-          memset(&frm[offstruct+len],1,(*ob).wglo.totalen*2);
+          test_buffer(&frm, &ifrm_max, offstruct + len + ((*ob).wglo.totalen + 1) / 2);
+          memset(&frm[offstruct + len], 1, (*ob).wglo.totalen * 2);
 
-          if (pieza==p_asig) {
-            _imem=imem; imem=offstruct+len;
-            save_error(1); lexer();
-            oimemptr=(byte*)&mem[imem];
-            tglo_init(1);
-            if (imemptr-oimemptr>(*ob).wglo.totalen*2) c_error(4,33);
-            imem=_imem;
-          } (*ob).wglo.totalen=((*ob).wglo.totalen+1)/2;
-        } else {
-          (*ob).type=twglo; (*ob).wglo.offset=len;
-          (*ob).wglo.len1=0;
-          (*ob).wglo.len2=-1;
-          (*ob).wglo.len3=-1;
-          (*ob).wglo.totalen=1; // 1 int
-
-          test_buffer(&frm,&ifrm_max,offstruct+len);
-          frm[offstruct+len]=1;
-
-          if (pieza==p_asig) {
+          if (pieza == p_asig) {
+            _imem = imem;
+            imem = offstruct + len;
             save_error(1);
             lexer();
-            test_buffer(&mem,&imem_max,offstruct+len);
-            mem[offstruct+len]=constant();
-            if (mem[offstruct+len]<0 || mem[offstruct+len]>65535) c_error(4,144);
+            oimemptr = (byte *)&mem[imem];
+            tglo_init(1);
+            if (imemptr - oimemptr > (*ob).wglo.totalen * 2)
+              c_error(4, 33);
+            imem = _imem;
           }
-        } len+=(*ob).wglo.totalen;
+          (*ob).wglo.totalen = ((*ob).wglo.totalen + 1) / 2;
+        } else {
+          (*ob).type = twglo;
+          (*ob).wglo.offset = len;
+          (*ob).wglo.len1 = 0;
+          (*ob).wglo.len2 = -1;
+          (*ob).wglo.len3 = -1;
+          (*ob).wglo.totalen = 1; // 1 int
+
+          test_buffer(&frm, &ifrm_max, offstruct + len);
+          frm[offstruct + len] = 1;
+
+          if (pieza == p_asig) {
+            save_error(1);
+            lexer();
+            test_buffer(&mem, &imem_max, offstruct + len);
+            mem[offstruct + len] = constant();
+            if (mem[offstruct + len] < 0 || mem[offstruct + len] > 65535)
+              c_error(4, 144);
+          }
+        }
+        len += (*ob).wglo.totalen;
       }
 
-      if (pieza==p_coma) pieza=p_word; else {
-        if (!free_sintax) if (pieza!=p_ptocoma) c_error(3,137);
-        while (pieza==p_ptocoma || pieza==p_coma) lexer();
+      if (pieza == p_coma)
+        pieza = p_word;
+      else {
+        if (!free_sintax)
+          if (pieza != p_ptocoma)
+            c_error(3, 137);
+        while (pieza == p_ptocoma || pieza == p_coma)
+          lexer();
       }
 
-    } else if (pieza==p_int || pieza==p_id || pieza==p_pointer) {
-
-      if (pieza==p_int) {
+    } else if (pieza == p_int || pieza == p_id || pieza == p_pointer) {
+      if (pieza == p_int) {
         lexer();
-        if (pieza!=p_id && pieza!=p_pointer) c_error(1,149);
+        if (pieza != p_id && pieza != p_pointer)
+          c_error(1, 149);
       }
 
-      if (pieza==p_pointer) { // Int pointer member
+      if (pieza == p_pointer) { // Int pointer member
 
-        lexer(); puntero4:
-        ob=analiza_pointer(tpigl,len);
-        test_buffer(&mem,&imem_max,offstruct+len);
-        if (pieza==p_asig) {
-          lexer(); mem[offstruct+len]=constant();
-        } len+=1;
-        if (pieza==p_coma) {
-          lexer(); if (pieza==p_pointer) lexer();
+        lexer();
+puntero4:
+        ob = analiza_pointer(tpigl, len);
+        test_buffer(&mem, &imem_max, offstruct + len);
+        if (pieza == p_asig) {
+          lexer();
+          mem[offstruct + len] = constant();
+        }
+        len += 1;
+        if (pieza == p_coma) {
+          lexer();
+          if (pieza == p_pointer)
+            lexer();
           goto puntero4;
         }
 
       } else {
-
-        ob=o; if ((*ob).type!=tnone) c_error(0,114); lexer();
-        if (pieza==p_corab) { lexer();                   // Table member ---
-          (*ob).type=ttglo; (*ob).tglo.offset=len;
-          if (((*ob).tglo.len1=constant())<0) c_error(4,35);
-          if (pieza==p_coma) {
+        ob = o;
+        if ((*ob).type != tnone)
+          c_error(0, 114);
+        lexer();
+        if (pieza == p_corab) {
+          lexer(); // Table member ---
+          (*ob).type = ttglo;
+          (*ob).tglo.offset = len;
+          if (((*ob).tglo.len1 = constant()) < 0)
+            c_error(4, 35);
+          if (pieza == p_coma) {
             lexer();
-            if (((*ob).tglo.len2=constant())<0) c_error(4,35);
-            if (pieza==p_coma) {
+            if (((*ob).tglo.len2 = constant()) < 0)
+              c_error(4, 35);
+            if (pieza == p_coma) {
               lexer();
-              if (((*ob).tglo.len3=constant())<0) c_error(4,35);
-            } else (*ob).tglo.len3=-1;
-          } else { (*ob).tglo.len2=-1; (*ob).tglo.len3=-1; }
-          (*ob).tglo.totalen=(*ob).tglo.len1+1;
-          if ((*ob).tglo.len2>-1) (*ob).tglo.totalen*=(*ob).tglo.len2+1;
-          if ((*ob).tglo.len3>-1) (*ob).tglo.totalen*=(*ob).tglo.len3+1;
-          if (pieza!=p_corce) { c_error(3,26); } lexer();
+              if (((*ob).tglo.len3 = constant()) < 0)
+                c_error(4, 35);
+            } else
+              (*ob).tglo.len3 = -1;
+          } else {
+            (*ob).tglo.len2 = -1;
+            (*ob).tglo.len3 = -1;
+          }
+          (*ob).tglo.totalen = (*ob).tglo.len1 + 1;
+          if ((*ob).tglo.len2 > -1)
+            (*ob).tglo.totalen *= (*ob).tglo.len2 + 1;
+          if ((*ob).tglo.len3 > -1)
+            (*ob).tglo.totalen *= (*ob).tglo.len3 + 1;
+          if (pieza != p_corce) {
+            c_error(3, 26);
+          }
+          lexer();
 
-          test_buffer(&mem,&imem_max,offstruct+len+(*ob).tglo.totalen);
-          if (pieza==p_asig) {
-            _imem=imem; imem=offstruct+len;
-            save_error(1); lexer(); tglo_init(0);
-            if (imem-(offstruct+len)>(*ob).tglo.totalen) c_error(4,33);
-            imem=_imem;
-          } len+=(*ob).tglo.totalen;
+          test_buffer(&mem, &imem_max, offstruct + len + (*ob).tglo.totalen);
+          if (pieza == p_asig) {
+            _imem = imem;
+            imem = offstruct + len;
+            save_error(1);
+            lexer();
+            tglo_init(0);
+            if (imem - (offstruct + len) > (*ob).tglo.totalen)
+              c_error(4, 33);
+            imem = _imem;
+          }
+          len += (*ob).tglo.totalen;
 
-        } else {                                          // Variable member ---
+        } else { // Variable member ---
 
-          (*ob).type=tvglo; (*ob).vglo.offset=len;
-          test_buffer(&mem,&imem_max,offstruct+len);
-          if (pieza==p_asig) {
-            lexer(); mem[offstruct+len]=constant();
-          } len+=1;
-
+          (*ob).type = tvglo;
+          (*ob).vglo.offset = len;
+          test_buffer(&mem, &imem_max, offstruct + len);
+          if (pieza == p_asig) {
+            lexer();
+            mem[offstruct + len] = constant();
+          }
+          len += 1;
         }
       }
-      if (!free_sintax) if (pieza!=p_ptocoma && pieza!=p_coma) c_error(3,66);
-      while (pieza==p_ptocoma || pieza==p_coma) lexer();
-    } else c_error(0,58);
-  } return(len);
+      if (!free_sintax)
+        if (pieza != p_ptocoma && pieza != p_coma)
+          c_error(3, 66);
+      while (pieza == p_ptocoma || pieza == p_coma)
+        lexer();
+    } else
+      c_error(0, 58);
+  }
+  return (len);
 }
 
 //---------------------------------------------------------------------------
 
 int analyze_struct_local(int offstruct) { // after " struct id [ <const> ] " // id==member
-  int len=0,dup,i,_itxt,_iloc;
-  struct objeto * ob;
-  struct objeto * old_member,* member2;
-  byte * oimemptr;
+  int len = 0, dup, i, _itxt, _iloc;
+  struct objeto *ob;
+  struct objeto *old_member, *member2;
+  byte *oimemptr;
 
-  while (pieza==p_ptocoma) lexer();
+  while (pieza == p_ptocoma)
+    lexer();
 
-  while (pieza!=p_end) {
-
-    if (pieza==p_struct) {                              // Struct member ---
+  while (pieza != p_end) {
+    if (pieza == p_struct) { // Struct member ---
 
       lexer();
 
-      if (pieza==p_pointer) { // Defining a struct pointer
+      if (pieza == p_pointer) { // Defining a struct pointer
 
-        old_member=member; member=NULL; lexer(); member=old_member;
-        if (pieza!=p_id) { c_error(1,110); } ob=o;
-
-        if ((*ob).type==tnone) c_error(0,150); // Pointer can't be defined this way
-        if ((*ob).type!=tsglo && (*ob).type!=tsloc) c_error(0,150);
+        old_member = member;
+        member = NULL;
         lexer();
-        puntero_a_struct:
-        analyze_pointer_struct(tpslo,len,ob);
-        test_buffer(&loc,&iloc_max,offstruct+len);
-        if (pieza==p_asig) {
-          lexer(); loc[offstruct+len]=constant();
-        } len+=1;
+        member = old_member;
+        if (pieza != p_id) {
+          c_error(1, 110);
+        }
+        ob = o;
 
-        if (pieza==p_coma) {
+        if ((*ob).type == tnone)
+          c_error(0, 150); // Pointer can't be defined this way
+        if ((*ob).type != tsglo && (*ob).type != tsloc)
+          c_error(0, 150);
+        lexer();
+puntero_a_struct:
+        analyze_pointer_struct(tpslo, len, ob);
+        test_buffer(&loc, &iloc_max, offstruct + len);
+        if (pieza == p_asig) {
           lexer();
-          if (pieza==p_pointer) lexer();
+          loc[offstruct + len] = constant();
+        }
+        len += 1;
+
+        if (pieza == p_coma) {
+          lexer();
+          if (pieza == p_pointer)
+            lexer();
           goto puntero_a_struct;
         } else {
-          if (!free_sintax) if (pieza!=p_ptocoma) c_error(3,137);
-          while (pieza==p_ptocoma || pieza==p_coma) lexer();
+          if (!free_sintax)
+            if (pieza != p_ptocoma)
+              c_error(3, 137);
+          while (pieza == p_ptocoma || pieza == p_coma)
+            lexer();
         }
 
       } else {
+        if (pieza != p_id)
+          c_error(1, 110);
+        ob = o;
 
-        if (pieza!=p_id) c_error(1,110);
-        ob=o; 
+        old_member = member;
+        member = ob;
+        lexer();
+        if ((*ob).type != tnone)
+          c_error(2, 22);
 
-        old_member=member; member=ob; lexer();
-        if ((*ob).type!=tnone) c_error(2,22);
-
-        (*ob).type=tsloc; (*ob).sloc.offset=len;
-        if (pieza==p_corab) {
-          member2=member; member=NULL; lexer();
-          if (((*ob).sloc.items1=constant())<0) c_error(4,123);
-          if (pieza==p_coma) {
+        (*ob).type = tsloc;
+        (*ob).sloc.offset = len;
+        if (pieza == p_corab) {
+          member2 = member;
+          member = NULL;
+          lexer();
+          if (((*ob).sloc.items1 = constant()) < 0)
+            c_error(4, 123);
+          if (pieza == p_coma) {
             lexer();
-            if (((*ob).sloc.items2=constant())<0) c_error(4,123);
-            if (pieza==p_coma) {
+            if (((*ob).sloc.items2 = constant()) < 0)
+              c_error(4, 123);
+            if (pieza == p_coma) {
               lexer();
-              if (((*ob).sloc.items3=constant())<0) c_error(4,123);
-            } else (*ob).sloc.items3=-1;
-          } else { (*ob).sloc.items2=-1; (*ob).sloc.items3=-1; }
-          member=member2;
-          (*ob).sloc.totalitems=(*ob).sloc.items1+1;
-          if ((*ob).sloc.items2>-1) (*ob).sloc.totalitems*=(*ob).sloc.items2+1;
-          if ((*ob).sloc.items3>-1) (*ob).sloc.totalitems*=(*ob).sloc.items3+1;
-          if (pieza!=p_corce) { c_error(3,26); } lexer();
+              if (((*ob).sloc.items3 = constant()) < 0)
+                c_error(4, 123);
+            } else
+              (*ob).sloc.items3 = -1;
+          } else {
+            (*ob).sloc.items2 = -1;
+            (*ob).sloc.items3 = -1;
+          }
+          member = member2;
+          (*ob).sloc.totalitems = (*ob).sloc.items1 + 1;
+          if ((*ob).sloc.items2 > -1)
+            (*ob).sloc.totalitems *= (*ob).sloc.items2 + 1;
+          if ((*ob).sloc.items3 > -1)
+            (*ob).sloc.totalitems *= (*ob).sloc.items3 + 1;
+          if (pieza != p_corce) {
+            c_error(3, 26);
+          }
+          lexer();
         } else {
-          (*ob).sloc.totalitems=1;
-          (*ob).sloc.items1=0; (*ob).sloc.items2=-1; (*ob).sloc.items3=-1;
+          (*ob).sloc.totalitems = 1;
+          (*ob).sloc.items1 = 0;
+          (*ob).sloc.items2 = -1;
+          (*ob).sloc.items3 = -1;
         }
-        if (((*ob).sloc.len_item=analyze_struct_local(offstruct+len))==0) c_error(0,57);
-        i=offstruct+len; dup=(*ob).sloc.totalitems+1;
-        if (dup>1) {
-          test_buffer(&loc,&iloc_max,i+(*ob).sloc.len_item*(*ob).sloc.totalitems);
-          test_buffer(&frm,&ifrm_max,i+(*ob).sloc.len_item*(*ob).sloc.totalitems);
+        if (((*ob).sloc.len_item = analyze_struct_local(offstruct + len)) == 0)
+          c_error(0, 57);
+        i = offstruct + len;
+        dup = (*ob).sloc.totalitems + 1;
+        if (dup > 1) {
+          test_buffer(&loc, &iloc_max, i + (*ob).sloc.len_item * (*ob).sloc.totalitems);
+          test_buffer(&frm, &ifrm_max, i + (*ob).sloc.len_item * (*ob).sloc.totalitems);
           while (--dup) {
-            memcpy(&loc[i],&loc[offstruct+len],(*ob).sloc.len_item<<2);
-            memcpy(&frm[i],&frm[offstruct+len],(*ob).sloc.len_item<<2);
-            i+=(*ob).sloc.len_item;
+            memcpy(&loc[i], &loc[offstruct + len], (*ob).sloc.len_item << 2);
+            memcpy(&frm[i], &frm[offstruct + len], (*ob).sloc.len_item << 2);
+            i += (*ob).sloc.len_item;
           }
         }
-        len+=(*ob).sloc.len_item*(*ob).sloc.totalitems;
-        member=old_member; lexer();
-        while (pieza==p_ptocoma) lexer();
+        len += (*ob).sloc.len_item * (*ob).sloc.totalitems;
+        member = old_member;
+        lexer();
+        while (pieza == p_ptocoma)
+          lexer();
       }
 
-    } else if (pieza==p_string) {                     // String member
+    } else if (pieza == p_string) { // String member
 
       lexer();
 
-      if (pieza==p_pointer) { // Byte pointer member
+      if (pieza == p_pointer) { // Byte pointer member
 
-        lexer(); puntero1:
-        ob=analiza_pointer(tpclo,len);
-        test_buffer(&loc,&iloc_max,offstruct+len);
-        if (pieza==p_asig) {
-          lexer(); loc[offstruct+len]=constant();
-        } len+=1;
-        if (pieza==p_coma) {
-          lexer(); if (pieza==p_pointer) lexer();
+        lexer();
+puntero1:
+        ob = analiza_pointer(tpclo, len);
+        test_buffer(&loc, &iloc_max, offstruct + len);
+        if (pieza == p_asig) {
+          lexer();
+          loc[offstruct + len] = constant();
+        }
+        len += 1;
+        if (pieza == p_coma) {
+          lexer();
+          if (pieza == p_pointer)
+            lexer();
           goto puntero1;
         }
 
       } else {
-
-        if (pieza!=p_id) c_error(1,125);
-        ob=o; if ((*ob).type!=tnone) c_error(0,114); lexer();
-        (*ob).type=tcloc; (*ob).cloc.offset=len+1;
-        if (pieza==p_corab) {
+        if (pieza != p_id)
+          c_error(1, 125);
+        ob = o;
+        if ((*ob).type != tnone)
+          c_error(0, 114);
+        lexer();
+        (*ob).type = tcloc;
+        (*ob).cloc.offset = len + 1;
+        if (pieza == p_corab) {
           lexer();
-          if (pieza==p_corce) {
+          if (pieza == p_corce) {
             lexer();
-            (*ob).cloc.totalen=255;
+            (*ob).cloc.totalen = 255;
           } else {
-            if (((*ob).cloc.totalen=constant())<0) c_error(4,127);
-            if ((*ob).cloc.totalen>0xFFFFF) c_error(4,135);
-            if (pieza!=p_corce) c_error(3,26);
+            if (((*ob).cloc.totalen = constant()) < 0)
+              c_error(4, 127);
+            if ((*ob).cloc.totalen > 0xFFFFF)
+              c_error(4, 135);
+            if (pieza != p_corce)
+              c_error(3, 26);
             lexer();
           }
-        } else (*ob).cloc.totalen=255;
+        } else
+          (*ob).cloc.totalen = 255;
 
-        test_buffer(&frm,&ifrm_max,offstruct+len);
-        frm[offstruct+len]=0xDAD00000;
+        test_buffer(&frm, &ifrm_max, offstruct + len);
+        frm[offstruct + len] = 0xDAD00000;
 
-        if (pieza==p_asig) {
+        if (pieza == p_asig) {
           save_error(1);
-          _itxt=itxt;
+          _itxt = itxt;
           lexer();
-          if (pieza!=p_lit && !(pieza==p_id && (*o).type==tcons && (*o).cons.literal))
-            c_error(3,128);
-          if (strlen((char*)&mem[pieza_num])>(*ob).cloc.totalen+1)
-            c_error(4,129);
-          test_buffer(&loc,&iloc_max,offstruct+len);
-          loc[offstruct+len]=0xDAD00000|(*ob).cloc.totalen;
-          div_strcpy((char*)&loc[offstruct+len+1],(*ob).cloc.totalen+1,(char*)&mem[pieza_num]);
-          len+=1+((*ob).cloc.totalen+5)/4;
-          itxt=_itxt; // Remove the string from the text segment
+          if (pieza != p_lit && !(pieza == p_id && (*o).type == tcons && (*o).cons.literal))
+            c_error(3, 128);
+          if (strlen((char *)&mem[pieza_num]) > (*ob).cloc.totalen + 1)
+            c_error(4, 129);
+          test_buffer(&loc, &iloc_max, offstruct + len);
+          loc[offstruct + len] = 0xDAD00000 | (*ob).cloc.totalen;
+          div_strcpy((char *)&loc[offstruct + len + 1], (*ob).cloc.totalen + 1,
+                     (char *)&mem[pieza_num]);
+          len += 1 + ((*ob).cloc.totalen + 5) / 4;
+          itxt = _itxt; // Remove the string from the text segment
           lexer();
         } else {
-          test_buffer(&loc,&iloc_max,offstruct+len);
-          loc[offstruct+len]=0xDAD00000|(*ob).cloc.totalen;
-          len+=1+((*ob).cloc.totalen+5)/4;
+          test_buffer(&loc, &iloc_max, offstruct + len);
+          loc[offstruct + len] = 0xDAD00000 | (*ob).cloc.totalen;
+          len += 1 + ((*ob).cloc.totalen + 5) / 4;
         }
       }
 
-      if (pieza==p_coma) pieza=p_string; else {
-        if (!free_sintax) if (pieza!=p_ptocoma) c_error(3,137);
-        while (pieza==p_ptocoma || pieza==p_coma) lexer();
+      if (pieza == p_coma)
+        pieza = p_string;
+      else {
+        if (!free_sintax)
+          if (pieza != p_ptocoma)
+            c_error(3, 137);
+        while (pieza == p_ptocoma || pieza == p_coma)
+          lexer();
       }
 
-    } else if (pieza==p_byte) {                         // Byte member ---
+    } else if (pieza == p_byte) { // Byte member ---
 
       lexer();
 
-      if (pieza==p_pointer) { // Byte pointer member
+      if (pieza == p_pointer) { // Byte pointer member
 
-        lexer(); puntero2:
-        ob=analiza_pointer(tpblo,len);
-        test_buffer(&loc,&iloc_max,offstruct+len);
-        if (pieza==p_asig) {
-          lexer(); loc[offstruct+len]=constant();
-        } len+=1;
-        if (pieza==p_coma) {
-          lexer(); if (pieza==p_pointer) lexer();
+        lexer();
+puntero2:
+        ob = analiza_pointer(tpblo, len);
+        test_buffer(&loc, &iloc_max, offstruct + len);
+        if (pieza == p_asig) {
+          lexer();
+          loc[offstruct + len] = constant();
+        }
+        len += 1;
+        if (pieza == p_coma) {
+          lexer();
+          if (pieza == p_pointer)
+            lexer();
           goto puntero2;
         }
 
       } else {
-
-        if (pieza!=p_id) c_error(1,142);
-        ob=o; if ((*ob).type!=tnone) c_error(0,114); lexer();
-        (*ob).type=tbloc; (*ob).bloc.offset=len;
-        if (pieza==p_corab) { lexer();
-          if (((*ob).bloc.len1=constant())<0) c_error(4,35);
-          if (pieza==p_coma) {
+        if (pieza != p_id)
+          c_error(1, 142);
+        ob = o;
+        if ((*ob).type != tnone)
+          c_error(0, 114);
+        lexer();
+        (*ob).type = tbloc;
+        (*ob).bloc.offset = len;
+        if (pieza == p_corab) {
+          lexer();
+          if (((*ob).bloc.len1 = constant()) < 0)
+            c_error(4, 35);
+          if (pieza == p_coma) {
             lexer();
-            if (((*ob).bloc.len2=constant())<0) c_error(4,35);
-            if (pieza==p_coma) {
+            if (((*ob).bloc.len2 = constant()) < 0)
+              c_error(4, 35);
+            if (pieza == p_coma) {
               lexer();
-              if (((*ob).bloc.len3=constant())<0) c_error(4,35);
-            } else (*ob).bloc.len3=-1;
-          } else { (*ob).bloc.len2=-1; (*ob).bloc.len3=-1; }
-          (*ob).bloc.totalen=(*ob).bloc.len1+1;
-          if ((*ob).bloc.len2>-1) (*ob).bloc.totalen*=(*ob).bloc.len2+1;
-          if ((*ob).bloc.len3>-1) (*ob).bloc.totalen*=(*ob).bloc.len3+1;
-          if (pieza!=p_corce) { c_error(3,26); } lexer();
+              if (((*ob).bloc.len3 = constant()) < 0)
+                c_error(4, 35);
+            } else
+              (*ob).bloc.len3 = -1;
+          } else {
+            (*ob).bloc.len2 = -1;
+            (*ob).bloc.len3 = -1;
+          }
+          (*ob).bloc.totalen = (*ob).bloc.len1 + 1;
+          if ((*ob).bloc.len2 > -1)
+            (*ob).bloc.totalen *= (*ob).bloc.len2 + 1;
+          if ((*ob).bloc.len3 > -1)
+            (*ob).bloc.totalen *= (*ob).bloc.len3 + 1;
+          if (pieza != p_corce) {
+            c_error(3, 26);
+          }
+          lexer();
 
-          test_buffer(&loc,&iloc_max,offstruct+len+((*ob).bloc.totalen+3)/4);
+          test_buffer(&loc, &iloc_max, offstruct + len + ((*ob).bloc.totalen + 3) / 4);
 
-          test_buffer(&frm,&ifrm_max,offstruct+len+((*ob).bloc.totalen+3)/4);
-          memset(&frm[offstruct+len],2,(*ob).bloc.totalen);
+          test_buffer(&frm, &ifrm_max, offstruct + len + ((*ob).bloc.totalen + 3) / 4);
+          memset(&frm[offstruct + len], 2, (*ob).bloc.totalen);
 
-          if (pieza==p_asig) {
-            _iloc=iloc; iloc=offstruct+len;
-            save_error(1); lexer();
-            oimemptr=(byte*)&loc[iloc];
-            tloc_init(2);
-            if (imemptr-oimemptr>(*ob).bloc.totalen) c_error(4,33);
-            iloc=_iloc;
-          } (*ob).bloc.totalen=((*ob).bloc.totalen+3)/4;
-        } else {
-          (*ob).type=tbloc; (*ob).bloc.offset=len;
-          (*ob).bloc.len1=0;
-          (*ob).bloc.len2=-1;
-          (*ob).bloc.len3=-1;
-          (*ob).bloc.totalen=1; // 1 int
-
-          test_buffer(&frm,&ifrm_max,offstruct+len);
-          frm[offstruct+len]=2;
-
-          if (pieza==p_asig) {
+          if (pieza == p_asig) {
+            _iloc = iloc;
+            iloc = offstruct + len;
             save_error(1);
             lexer();
-            test_buffer(&loc,&iloc_max,offstruct+len);
-            loc[offstruct+len]=constant();
-            if (loc[offstruct+len]<0 || loc[offstruct+len]>255) c_error(4,143);
+            oimemptr = (byte *)&loc[iloc];
+            tloc_init(2);
+            if (imemptr - oimemptr > (*ob).bloc.totalen)
+              c_error(4, 33);
+            iloc = _iloc;
           }
-        } len+=(*ob).bloc.totalen;
+          (*ob).bloc.totalen = ((*ob).bloc.totalen + 3) / 4;
+        } else {
+          (*ob).type = tbloc;
+          (*ob).bloc.offset = len;
+          (*ob).bloc.len1 = 0;
+          (*ob).bloc.len2 = -1;
+          (*ob).bloc.len3 = -1;
+          (*ob).bloc.totalen = 1; // 1 int
+
+          test_buffer(&frm, &ifrm_max, offstruct + len);
+          frm[offstruct + len] = 2;
+
+          if (pieza == p_asig) {
+            save_error(1);
+            lexer();
+            test_buffer(&loc, &iloc_max, offstruct + len);
+            loc[offstruct + len] = constant();
+            if (loc[offstruct + len] < 0 || loc[offstruct + len] > 255)
+              c_error(4, 143);
+          }
+        }
+        len += (*ob).bloc.totalen;
       }
 
-      if (pieza==p_coma) pieza=p_byte; else {
-        if (!free_sintax) if (pieza!=p_ptocoma) c_error(3,137);
-        while (pieza==p_ptocoma || pieza==p_coma) lexer();
+      if (pieza == p_coma)
+        pieza = p_byte;
+      else {
+        if (!free_sintax)
+          if (pieza != p_ptocoma)
+            c_error(3, 137);
+        while (pieza == p_ptocoma || pieza == p_coma)
+          lexer();
       }
 
-    } else if (pieza==p_word) {                         // Word member ---
+    } else if (pieza == p_word) { // Word member ---
 
       lexer();
 
-      if (pieza==p_pointer) { // Word pointer member
+      if (pieza == p_pointer) { // Word pointer member
 
-        lexer(); puntero3:
-        ob=analiza_pointer(tpwlo,len);
-        test_buffer(&loc,&iloc_max,offstruct+len);
-        if (pieza==p_asig) {
-          lexer(); loc[offstruct+len]=constant();
-        } len+=1;
-        if (pieza==p_coma) {
-          lexer(); if (pieza==p_pointer) lexer();
+        lexer();
+puntero3:
+        ob = analiza_pointer(tpwlo, len);
+        test_buffer(&loc, &iloc_max, offstruct + len);
+        if (pieza == p_asig) {
+          lexer();
+          loc[offstruct + len] = constant();
+        }
+        len += 1;
+        if (pieza == p_coma) {
+          lexer();
+          if (pieza == p_pointer)
+            lexer();
           goto puntero3;
         }
 
       } else {
-
-        if (pieza!=p_id) c_error(1,145);
-        ob=o; if ((*ob).type!=tnone) c_error(0,114); lexer();
-        (*ob).type=twloc; (*ob).wloc.offset=len;
-        if (pieza==p_corab) { lexer();
-          if (((*ob).wloc.len1=constant())<0) c_error(4,35);
-          if (pieza==p_coma) {
+        if (pieza != p_id)
+          c_error(1, 145);
+        ob = o;
+        if ((*ob).type != tnone)
+          c_error(0, 114);
+        lexer();
+        (*ob).type = twloc;
+        (*ob).wloc.offset = len;
+        if (pieza == p_corab) {
+          lexer();
+          if (((*ob).wloc.len1 = constant()) < 0)
+            c_error(4, 35);
+          if (pieza == p_coma) {
             lexer();
-            if (((*ob).wloc.len2=constant())<0) c_error(4,35);
-            if (pieza==p_coma) {
+            if (((*ob).wloc.len2 = constant()) < 0)
+              c_error(4, 35);
+            if (pieza == p_coma) {
               lexer();
-              if (((*ob).wloc.len3=constant())<0) c_error(4,35);
-            } else (*ob).wloc.len3=-1;
-          } else { (*ob).wloc.len2=-1; (*ob).wloc.len3=-1; }
-          (*ob).wloc.totalen=(*ob).wloc.len1+1;
-          if ((*ob).wloc.len2>-1) (*ob).wloc.totalen*=(*ob).wloc.len2+1;
-          if ((*ob).wloc.len3>-1) (*ob).wloc.totalen*=(*ob).wloc.len3+1;
-          if (pieza!=p_corce) { c_error(3,26); } lexer();
+              if (((*ob).wloc.len3 = constant()) < 0)
+                c_error(4, 35);
+            } else
+              (*ob).wloc.len3 = -1;
+          } else {
+            (*ob).wloc.len2 = -1;
+            (*ob).wloc.len3 = -1;
+          }
+          (*ob).wloc.totalen = (*ob).wloc.len1 + 1;
+          if ((*ob).wloc.len2 > -1)
+            (*ob).wloc.totalen *= (*ob).wloc.len2 + 1;
+          if ((*ob).wloc.len3 > -1)
+            (*ob).wloc.totalen *= (*ob).wloc.len3 + 1;
+          if (pieza != p_corce) {
+            c_error(3, 26);
+          }
+          lexer();
 
-          test_buffer(&loc,&iloc_max,offstruct+len+((*ob).wloc.totalen+1)/2);
+          test_buffer(&loc, &iloc_max, offstruct + len + ((*ob).wloc.totalen + 1) / 2);
 
-          test_buffer(&frm,&ifrm_max,offstruct+len+((*ob).wloc.totalen+1)/2);
-          memset(&frm[offstruct+len],1,(*ob).wloc.totalen*2);
+          test_buffer(&frm, &ifrm_max, offstruct + len + ((*ob).wloc.totalen + 1) / 2);
+          memset(&frm[offstruct + len], 1, (*ob).wloc.totalen * 2);
 
-          if (pieza==p_asig) {
-            _iloc=iloc; iloc=offstruct+len;
-            save_error(1); lexer();
-            oimemptr=(byte*)&loc[iloc];
-            tloc_init(1);
-            if (imemptr-oimemptr>(*ob).wloc.totalen*2) c_error(4,33);
-            iloc=_iloc;
-          } (*ob).wloc.totalen=((*ob).wloc.totalen+1)/2;
-        } else {
-          (*ob).type=twloc; (*ob).wloc.offset=len;
-          (*ob).wloc.len1=0;
-          (*ob).wloc.len2=-1;
-          (*ob).wloc.len3=-1;
-          (*ob).wloc.totalen=1; // 1 int
-
-          test_buffer(&frm,&ifrm_max,offstruct+len);
-          frm[offstruct+len]=1;
-
-          if (pieza==p_asig) {
+          if (pieza == p_asig) {
+            _iloc = iloc;
+            iloc = offstruct + len;
             save_error(1);
             lexer();
-            test_buffer(&loc,&iloc_max,offstruct+len);
-            loc[offstruct+len]=constant();
-            if (loc[offstruct+len]<0 || loc[offstruct+len]>65535) c_error(4,144);
+            oimemptr = (byte *)&loc[iloc];
+            tloc_init(1);
+            if (imemptr - oimemptr > (*ob).wloc.totalen * 2)
+              c_error(4, 33);
+            iloc = _iloc;
           }
-        } len+=(*ob).wloc.totalen;
+          (*ob).wloc.totalen = ((*ob).wloc.totalen + 1) / 2;
+        } else {
+          (*ob).type = twloc;
+          (*ob).wloc.offset = len;
+          (*ob).wloc.len1 = 0;
+          (*ob).wloc.len2 = -1;
+          (*ob).wloc.len3 = -1;
+          (*ob).wloc.totalen = 1; // 1 int
+
+          test_buffer(&frm, &ifrm_max, offstruct + len);
+          frm[offstruct + len] = 1;
+
+          if (pieza == p_asig) {
+            save_error(1);
+            lexer();
+            test_buffer(&loc, &iloc_max, offstruct + len);
+            loc[offstruct + len] = constant();
+            if (loc[offstruct + len] < 0 || loc[offstruct + len] > 65535)
+              c_error(4, 144);
+          }
+        }
+        len += (*ob).wloc.totalen;
       }
 
-      if (pieza==p_coma) pieza=p_word; else {
-        if (!free_sintax) if (pieza!=p_ptocoma) c_error(3,137);
-        while (pieza==p_ptocoma || pieza==p_coma) lexer();
+      if (pieza == p_coma)
+        pieza = p_word;
+      else {
+        if (!free_sintax)
+          if (pieza != p_ptocoma)
+            c_error(3, 137);
+        while (pieza == p_ptocoma || pieza == p_coma)
+          lexer();
       }
 
-    } else if (pieza==p_int || pieza==p_id || pieza==p_pointer) {
-
-      if (pieza==p_int) {
+    } else if (pieza == p_int || pieza == p_id || pieza == p_pointer) {
+      if (pieza == p_int) {
         lexer();
-        if (pieza!=p_id && pieza!=p_pointer) c_error(1,149);
+        if (pieza != p_id && pieza != p_pointer)
+          c_error(1, 149);
       }
 
-      if (pieza==p_pointer) { // Int pointer member
+      if (pieza == p_pointer) { // Int pointer member
 
-        lexer(); puntero4:
-        ob=analiza_pointer(tpilo,len);
-        test_buffer(&loc,&iloc_max,offstruct+len);
-        if (pieza==p_asig) {
-          lexer(); loc[offstruct+len]=constant();
-        } len+=1;
-        if (pieza==p_coma) {
-          lexer(); if (pieza==p_pointer) lexer();
+        lexer();
+puntero4:
+        ob = analiza_pointer(tpilo, len);
+        test_buffer(&loc, &iloc_max, offstruct + len);
+        if (pieza == p_asig) {
+          lexer();
+          loc[offstruct + len] = constant();
+        }
+        len += 1;
+        if (pieza == p_coma) {
+          lexer();
+          if (pieza == p_pointer)
+            lexer();
           goto puntero4;
         }
 
       } else {
-
-        ob=o; if ((*ob).type!=tnone) c_error(0,114); lexer();
-        if (pieza==p_corab) { lexer();    // Table member ---
-          (*ob).type=ttloc; (*ob).tloc.offset=len;
-          if (((*ob).tloc.len1=constant())<0) c_error(4,35);
-          if (pieza==p_coma) {
+        ob = o;
+        if ((*ob).type != tnone)
+          c_error(0, 114);
+        lexer();
+        if (pieza == p_corab) {
+          lexer(); // Table member ---
+          (*ob).type = ttloc;
+          (*ob).tloc.offset = len;
+          if (((*ob).tloc.len1 = constant()) < 0)
+            c_error(4, 35);
+          if (pieza == p_coma) {
             lexer();
-            if (((*ob).tloc.len2=constant())<0) c_error(4,35);
-            if (pieza==p_coma) {
+            if (((*ob).tloc.len2 = constant()) < 0)
+              c_error(4, 35);
+            if (pieza == p_coma) {
               lexer();
-              if (((*ob).tloc.len3=constant())<0) c_error(4,35);
-            } else (*ob).tloc.len3=-1;
-          } else { (*ob).tloc.len2=-1; (*ob).tloc.len3=-1; }
-          (*ob).tloc.totalen=(*ob).tloc.len1+1;
-          if ((*ob).tloc.len2>-1) (*ob).tloc.totalen*=(*ob).tloc.len2+1;
-          if ((*ob).tloc.len3>-1) (*ob).tloc.totalen*=(*ob).tloc.len3+1;
-          if (pieza!=p_corce) { c_error(3,26); } lexer();
+              if (((*ob).tloc.len3 = constant()) < 0)
+                c_error(4, 35);
+            } else
+              (*ob).tloc.len3 = -1;
+          } else {
+            (*ob).tloc.len2 = -1;
+            (*ob).tloc.len3 = -1;
+          }
+          (*ob).tloc.totalen = (*ob).tloc.len1 + 1;
+          if ((*ob).tloc.len2 > -1)
+            (*ob).tloc.totalen *= (*ob).tloc.len2 + 1;
+          if ((*ob).tloc.len3 > -1)
+            (*ob).tloc.totalen *= (*ob).tloc.len3 + 1;
+          if (pieza != p_corce) {
+            c_error(3, 26);
+          }
+          lexer();
 
-          test_buffer(&loc,&iloc_max,offstruct+len+(*ob).tloc.totalen);
-          if (pieza==p_asig) {
-            _iloc=iloc; iloc=offstruct+len;
-            save_error(1); lexer(); tloc_init(0);
-            if (iloc-(offstruct+len)>(*ob).tloc.totalen) c_error(4,33);
-            iloc=_iloc;
-          } len+=(*ob).tloc.totalen;
+          test_buffer(&loc, &iloc_max, offstruct + len + (*ob).tloc.totalen);
+          if (pieza == p_asig) {
+            _iloc = iloc;
+            iloc = offstruct + len;
+            save_error(1);
+            lexer();
+            tloc_init(0);
+            if (iloc - (offstruct + len) > (*ob).tloc.totalen)
+              c_error(4, 33);
+            iloc = _iloc;
+          }
+          len += (*ob).tloc.totalen;
 
-        } else {                                          // Variable member ---
+        } else { // Variable member ---
 
-          (*ob).type=tvloc; (*ob).vloc.offset=len;
-          test_buffer(&loc,&iloc_max,offstruct+len);
-          if (pieza==p_asig) {
-            lexer(); loc[offstruct+len]=constant();
-          } len+=1;
-
+          (*ob).type = tvloc;
+          (*ob).vloc.offset = len;
+          test_buffer(&loc, &iloc_max, offstruct + len);
+          if (pieza == p_asig) {
+            lexer();
+            loc[offstruct + len] = constant();
+          }
+          len += 1;
         }
       }
-      if (!free_sintax) if (pieza!=p_ptocoma && pieza!=p_coma) c_error(3,66);
-      while (pieza==p_ptocoma || pieza==p_coma) lexer();
-    } else c_error(0,58);
-    (*ob).bloque=bloque_lexico;
-  } return(len);
+      if (!free_sintax)
+        if (pieza != p_ptocoma && pieza != p_coma)
+          c_error(3, 66);
+      while (pieza == p_ptocoma || pieza == p_coma)
+        lexer();
+    } else
+      c_error(0, 58);
+    (*ob).bloque = bloque_lexico;
+  }
+  return (len);
 }
 
 //---------------------------------------------------------------------------
 
 int analyze_struct_private(int offstruct) { // after " struct id [ <const> ] " // id=member
-  int len=0,dup,i,_itxt,_imem;
-  struct objeto * ob;
-  struct objeto * old_member,* member2;
-  byte * oimemptr;
+  int len = 0, dup, i, _itxt, _imem;
+  struct objeto *ob;
+  struct objeto *old_member, *member2;
+  byte *oimemptr;
 
-  while (pieza==p_ptocoma) lexer();
+  while (pieza == p_ptocoma)
+    lexer();
 
-  while (pieza!=p_end) {
-
-    if (pieza==p_struct) {                              // Struct member ---
+  while (pieza != p_end) {
+    if (pieza == p_struct) { // Struct member ---
 
       lexer();
 
-      if (pieza==p_pointer) { // Defining a struct pointer
+      if (pieza == p_pointer) { // Defining a struct pointer
 
-        old_member=member; member=NULL; lexer(); member=old_member;
-        if (pieza!=p_id) { c_error(1,110); } ob=o;
-
-        if ((*ob).type==tnone) c_error(0,150); // Pointer can't be defined this way
-        if ((*ob).type!=tsglo && (*ob).type!=tsloc) c_error(0,150);
+        old_member = member;
+        member = NULL;
         lexer();
-        puntero_a_struct:
-        analyze_pointer_struct(tpslo,len,ob);
-        test_buffer(&mem,&imem_max,offstruct+len);
-        if (pieza==p_asig) {
-          lexer(); mem[offstruct+len]=constant();
-        } len+=1;
+        member = old_member;
+        if (pieza != p_id) {
+          c_error(1, 110);
+        }
+        ob = o;
 
-        if (pieza==p_coma) {
+        if ((*ob).type == tnone)
+          c_error(0, 150); // Pointer can't be defined this way
+        if ((*ob).type != tsglo && (*ob).type != tsloc)
+          c_error(0, 150);
+        lexer();
+puntero_a_struct:
+        analyze_pointer_struct(tpslo, len, ob);
+        test_buffer(&mem, &imem_max, offstruct + len);
+        if (pieza == p_asig) {
           lexer();
-          if (pieza==p_pointer) lexer();
+          mem[offstruct + len] = constant();
+        }
+        len += 1;
+
+        if (pieza == p_coma) {
+          lexer();
+          if (pieza == p_pointer)
+            lexer();
           goto puntero_a_struct;
         } else {
-          if (!free_sintax) if (pieza!=p_ptocoma) c_error(3,137);
-          while (pieza==p_ptocoma || pieza==p_coma) lexer();
+          if (!free_sintax)
+            if (pieza != p_ptocoma)
+              c_error(3, 137);
+          while (pieza == p_ptocoma || pieza == p_coma)
+            lexer();
         }
 
       } else {
+        if (pieza != p_id)
+          c_error(1, 110);
+        ob = o;
 
-        if (pieza!=p_id) c_error(1,110);
-        ob=o;
+        old_member = member;
+        member = ob;
+        lexer();
+        if ((*ob).type != tnone)
+          c_error(2, 22);
 
-        old_member=member; member=ob; lexer();
-        if ((*ob).type!=tnone) c_error(2,22);
-
-        (*ob).type=tsloc; (*ob).sloc.offset=len;
-        if (pieza==p_corab) {
-          member2=member; member=NULL; lexer();
-          if (((*ob).sloc.items1=constant())<0) c_error(4,123);
-          if (pieza==p_coma) {
+        (*ob).type = tsloc;
+        (*ob).sloc.offset = len;
+        if (pieza == p_corab) {
+          member2 = member;
+          member = NULL;
+          lexer();
+          if (((*ob).sloc.items1 = constant()) < 0)
+            c_error(4, 123);
+          if (pieza == p_coma) {
             lexer();
-            if (((*ob).sloc.items2=constant())<0) c_error(4,123);
-            if (pieza==p_coma) {
+            if (((*ob).sloc.items2 = constant()) < 0)
+              c_error(4, 123);
+            if (pieza == p_coma) {
               lexer();
-              if (((*ob).sloc.items3=constant())<0) c_error(4,123);
-            } else (*ob).sloc.items3=-1;
-          } else { (*ob).sloc.items2=-1; (*ob).sloc.items3=-1; }
-          member=member2;
-          (*ob).sloc.totalitems=(*ob).sloc.items1+1;
-          if ((*ob).sloc.items2>-1) (*ob).sloc.totalitems*=(*ob).sloc.items2+1;
-          if ((*ob).sloc.items3>-1) (*ob).sloc.totalitems*=(*ob).sloc.items3+1;
-          if (pieza!=p_corce) { c_error(3,26); } lexer();
+              if (((*ob).sloc.items3 = constant()) < 0)
+                c_error(4, 123);
+            } else
+              (*ob).sloc.items3 = -1;
+          } else {
+            (*ob).sloc.items2 = -1;
+            (*ob).sloc.items3 = -1;
+          }
+          member = member2;
+          (*ob).sloc.totalitems = (*ob).sloc.items1 + 1;
+          if ((*ob).sloc.items2 > -1)
+            (*ob).sloc.totalitems *= (*ob).sloc.items2 + 1;
+          if ((*ob).sloc.items3 > -1)
+            (*ob).sloc.totalitems *= (*ob).sloc.items3 + 1;
+          if (pieza != p_corce) {
+            c_error(3, 26);
+          }
+          lexer();
         } else {
-          (*ob).sloc.totalitems=1;
-          (*ob).sloc.items1=0; (*ob).sloc.items2=-1; (*ob).sloc.items3=-1;
+          (*ob).sloc.totalitems = 1;
+          (*ob).sloc.items1 = 0;
+          (*ob).sloc.items2 = -1;
+          (*ob).sloc.items3 = -1;
         }
-        if (((*ob).sloc.len_item=analyze_struct_private(offstruct+len))==0) c_error(0,57);
-        i=offstruct+len; dup=(*ob).sloc.totalitems+1;
-        if (dup>1) {
-          test_buffer(&mem,&imem_max,i+(*ob).sloc.len_item*(*ob).sloc.totalitems);
-          test_buffer(&frm,&ifrm_max,i+(*ob).sloc.len_item*(*ob).sloc.totalitems);
+        if (((*ob).sloc.len_item = analyze_struct_private(offstruct + len)) == 0)
+          c_error(0, 57);
+        i = offstruct + len;
+        dup = (*ob).sloc.totalitems + 1;
+        if (dup > 1) {
+          test_buffer(&mem, &imem_max, i + (*ob).sloc.len_item * (*ob).sloc.totalitems);
+          test_buffer(&frm, &ifrm_max, i + (*ob).sloc.len_item * (*ob).sloc.totalitems);
           while (--dup) {
-            memcpy(&mem[i],&mem[offstruct+len],(*ob).sloc.len_item<<2);
-            memcpy(&frm[i],&frm[offstruct+len],(*ob).sloc.len_item<<2);
-            i+=(*ob).sloc.len_item;
+            memcpy(&mem[i], &mem[offstruct + len], (*ob).sloc.len_item << 2);
+            memcpy(&frm[i], &frm[offstruct + len], (*ob).sloc.len_item << 2);
+            i += (*ob).sloc.len_item;
           }
         }
-        len+=(*ob).sloc.len_item*(*ob).sloc.totalitems;
-        member=old_member; lexer();
-        while (pieza==p_ptocoma) lexer();
+        len += (*ob).sloc.len_item * (*ob).sloc.totalitems;
+        member = old_member;
+        lexer();
+        while (pieza == p_ptocoma)
+          lexer();
       }
 
-    } else if (pieza==p_string) {                     // String member
+    } else if (pieza == p_string) { // String member
 
       lexer();
 
-      if (pieza==p_pointer) { // Byte pointer member
+      if (pieza == p_pointer) { // Byte pointer member
 
-        lexer(); puntero1:
-        ob=analiza_pointer(tpclo,len);
-        test_buffer(&mem,&imem_max,offstruct+len);
-        if (pieza==p_asig) {
-          lexer(); mem[offstruct+len]=constant();
-        } len+=1;
-        if (pieza==p_coma) {
-          lexer(); if (pieza==p_pointer) lexer();
+        lexer();
+puntero1:
+        ob = analiza_pointer(tpclo, len);
+        test_buffer(&mem, &imem_max, offstruct + len);
+        if (pieza == p_asig) {
+          lexer();
+          mem[offstruct + len] = constant();
+        }
+        len += 1;
+        if (pieza == p_coma) {
+          lexer();
+          if (pieza == p_pointer)
+            lexer();
           goto puntero1;
         }
 
       } else {
-
-        if (pieza!=p_id) c_error(1,125);
-        ob=o; if ((*ob).type!=tnone) c_error(0,114); lexer();
-        (*ob).type=tcloc; (*ob).cloc.offset=len+1;
-        if (pieza==p_corab) {
+        if (pieza != p_id)
+          c_error(1, 125);
+        ob = o;
+        if ((*ob).type != tnone)
+          c_error(0, 114);
+        lexer();
+        (*ob).type = tcloc;
+        (*ob).cloc.offset = len + 1;
+        if (pieza == p_corab) {
           lexer();
-          if (pieza==p_corce) {
+          if (pieza == p_corce) {
             lexer();
-            (*ob).cloc.totalen=255;
+            (*ob).cloc.totalen = 255;
           } else {
-            if (((*ob).cloc.totalen=constant())<0) c_error(4,127);
-            if ((*ob).cloc.totalen>0xFFFFF) c_error(4,135);
-            if (pieza!=p_corce) c_error(3,26);
+            if (((*ob).cloc.totalen = constant()) < 0)
+              c_error(4, 127);
+            if ((*ob).cloc.totalen > 0xFFFFF)
+              c_error(4, 135);
+            if (pieza != p_corce)
+              c_error(3, 26);
             lexer();
           }
-        } else (*ob).cloc.totalen=255;
+        } else
+          (*ob).cloc.totalen = 255;
 
-        test_buffer(&frm,&ifrm_max,offstruct+len);
-        frm[offstruct+len]=0xDAD00000;
+        test_buffer(&frm, &ifrm_max, offstruct + len);
+        frm[offstruct + len] = 0xDAD00000;
 
-        if (pieza==p_asig) {
+        if (pieza == p_asig) {
           save_error(1);
-          _itxt=itxt;
+          _itxt = itxt;
           lexer();
-          if (pieza!=p_lit && !(pieza==p_id && (*o).type==tcons && (*o).cons.literal))
-            c_error(3,128);
-          if (strlen((char*)&mem[pieza_num])>(*ob).cloc.totalen+1)
-            c_error(4,129);
-          test_buffer(&mem,&imem_max,offstruct+len);
-          mem[offstruct+len]=0xDAD00000|(*ob).cloc.totalen;
-          memmove((char*)&mem[offstruct+len+1],(char*)&mem[pieza_num],strlen((char*)&mem[pieza_num])+1);
-          len+=1+((*ob).cloc.totalen+5)/4;
-          itxt=_itxt; // Remove the string from the text segment
+          if (pieza != p_lit && !(pieza == p_id && (*o).type == tcons && (*o).cons.literal))
+            c_error(3, 128);
+          if (strlen((char *)&mem[pieza_num]) > (*ob).cloc.totalen + 1)
+            c_error(4, 129);
+          test_buffer(&mem, &imem_max, offstruct + len);
+          mem[offstruct + len] = 0xDAD00000 | (*ob).cloc.totalen;
+          memmove((char *)&mem[offstruct + len + 1], (char *)&mem[pieza_num],
+                  strlen((char *)&mem[pieza_num]) + 1);
+          len += 1 + ((*ob).cloc.totalen + 5) / 4;
+          itxt = _itxt; // Remove the string from the text segment
           lexer();
         } else {
-          test_buffer(&mem,&imem_max,offstruct+len);
-          mem[offstruct+len]=0xDAD00000|(*ob).cloc.totalen;
-          len+=1+((*ob).cloc.totalen+5)/4;
+          test_buffer(&mem, &imem_max, offstruct + len);
+          mem[offstruct + len] = 0xDAD00000 | (*ob).cloc.totalen;
+          len += 1 + ((*ob).cloc.totalen + 5) / 4;
         }
       }
 
-      if (pieza==p_coma) pieza=p_string; else {
-        if (!free_sintax) if (pieza!=p_ptocoma) c_error(3,137);
-        while (pieza==p_ptocoma || pieza==p_coma) lexer();
+      if (pieza == p_coma)
+        pieza = p_string;
+      else {
+        if (!free_sintax)
+          if (pieza != p_ptocoma)
+            c_error(3, 137);
+        while (pieza == p_ptocoma || pieza == p_coma)
+          lexer();
       }
 
-    } else if (pieza==p_byte) {                         // Byte member ---
+    } else if (pieza == p_byte) { // Byte member ---
 
       lexer();
 
-      if (pieza==p_pointer) { // Byte pointer member
+      if (pieza == p_pointer) { // Byte pointer member
 
-        lexer(); puntero2:
-        ob=analiza_pointer(tpblo,len);
-        test_buffer(&mem,&imem_max,offstruct+len);
-        if (pieza==p_asig) {
-          lexer(); mem[offstruct+len]=constant();
-        } len+=1;
-        if (pieza==p_coma) {
-          lexer(); if (pieza==p_pointer) lexer();
+        lexer();
+puntero2:
+        ob = analiza_pointer(tpblo, len);
+        test_buffer(&mem, &imem_max, offstruct + len);
+        if (pieza == p_asig) {
+          lexer();
+          mem[offstruct + len] = constant();
+        }
+        len += 1;
+        if (pieza == p_coma) {
+          lexer();
+          if (pieza == p_pointer)
+            lexer();
           goto puntero2;
         }
 
       } else {
-
-        if (pieza!=p_id) c_error(1,142);
-        ob=o; if ((*ob).type!=tnone) c_error(0,114); lexer();
-        (*ob).type=tbloc; (*ob).bloc.offset=len;
-        if (pieza==p_corab) { lexer();
-          if (((*ob).bloc.len1=constant())<0) c_error(4,35);
-          if (pieza==p_coma) {
+        if (pieza != p_id)
+          c_error(1, 142);
+        ob = o;
+        if ((*ob).type != tnone)
+          c_error(0, 114);
+        lexer();
+        (*ob).type = tbloc;
+        (*ob).bloc.offset = len;
+        if (pieza == p_corab) {
+          lexer();
+          if (((*ob).bloc.len1 = constant()) < 0)
+            c_error(4, 35);
+          if (pieza == p_coma) {
             lexer();
-            if (((*ob).bloc.len2=constant())<0) c_error(4,35);
-            if (pieza==p_coma) {
+            if (((*ob).bloc.len2 = constant()) < 0)
+              c_error(4, 35);
+            if (pieza == p_coma) {
               lexer();
-              if (((*ob).bloc.len3=constant())<0) c_error(4,35);
-            } else (*ob).bloc.len3=-1;
-          } else { (*ob).bloc.len2=-1; (*ob).bloc.len3=-1; }
-          (*ob).bloc.totalen=(*ob).bloc.len1+1;
-          if ((*ob).bloc.len2>-1) (*ob).bloc.totalen*=(*ob).bloc.len2+1;
-          if ((*ob).bloc.len3>-1) (*ob).bloc.totalen*=(*ob).bloc.len3+1;
-          if (pieza!=p_corce) { c_error(3,26); } lexer();
-          test_buffer(&mem,&imem_max,offstruct+len+((*ob).bloc.totalen+3)/4);
+              if (((*ob).bloc.len3 = constant()) < 0)
+                c_error(4, 35);
+            } else
+              (*ob).bloc.len3 = -1;
+          } else {
+            (*ob).bloc.len2 = -1;
+            (*ob).bloc.len3 = -1;
+          }
+          (*ob).bloc.totalen = (*ob).bloc.len1 + 1;
+          if ((*ob).bloc.len2 > -1)
+            (*ob).bloc.totalen *= (*ob).bloc.len2 + 1;
+          if ((*ob).bloc.len3 > -1)
+            (*ob).bloc.totalen *= (*ob).bloc.len3 + 1;
+          if (pieza != p_corce) {
+            c_error(3, 26);
+          }
+          lexer();
+          test_buffer(&mem, &imem_max, offstruct + len + ((*ob).bloc.totalen + 3) / 4);
 
-          test_buffer(&frm,&ifrm_max,offstruct+len+((*ob).bloc.totalen+3)/4);
-          memset(&frm[offstruct+len],2,(*ob).bloc.totalen);
+          test_buffer(&frm, &ifrm_max, offstruct + len + ((*ob).bloc.totalen + 3) / 4);
+          memset(&frm[offstruct + len], 2, (*ob).bloc.totalen);
 
-          if (pieza==p_asig) {
-            _imem=imem; imem=offstruct+len;
-            save_error(1); lexer();
-            oimemptr=(byte*)&mem[imem];
-            tglo_init(2);
-            if (imemptr-oimemptr>(*ob).bloc.totalen) c_error(4,33);
-            imem=_imem;
-          } (*ob).bloc.totalen=((*ob).bloc.totalen+3)/4;
-        } else {
-          (*ob).type=tbloc; (*ob).bloc.offset=len;
-          (*ob).bloc.len1=0;
-          (*ob).bloc.len2=-1;
-          (*ob).bloc.len3=-1;
-          (*ob).bloc.totalen=1; // 1 int
-
-          test_buffer(&frm,&ifrm_max,offstruct+len);
-          frm[offstruct+len]=2;
-
-          if (pieza==p_asig) {
+          if (pieza == p_asig) {
+            _imem = imem;
+            imem = offstruct + len;
             save_error(1);
             lexer();
-            test_buffer(&mem,&imem_max,offstruct+len);
-            mem[offstruct+len]=constant();
-            if (mem[offstruct+len]<0 || mem[offstruct+len]>255) c_error(4,143);
+            oimemptr = (byte *)&mem[imem];
+            tglo_init(2);
+            if (imemptr - oimemptr > (*ob).bloc.totalen)
+              c_error(4, 33);
+            imem = _imem;
           }
-        } len+=(*ob).bloc.totalen;
+          (*ob).bloc.totalen = ((*ob).bloc.totalen + 3) / 4;
+        } else {
+          (*ob).type = tbloc;
+          (*ob).bloc.offset = len;
+          (*ob).bloc.len1 = 0;
+          (*ob).bloc.len2 = -1;
+          (*ob).bloc.len3 = -1;
+          (*ob).bloc.totalen = 1; // 1 int
+
+          test_buffer(&frm, &ifrm_max, offstruct + len);
+          frm[offstruct + len] = 2;
+
+          if (pieza == p_asig) {
+            save_error(1);
+            lexer();
+            test_buffer(&mem, &imem_max, offstruct + len);
+            mem[offstruct + len] = constant();
+            if (mem[offstruct + len] < 0 || mem[offstruct + len] > 255)
+              c_error(4, 143);
+          }
+        }
+        len += (*ob).bloc.totalen;
       }
 
-      if (pieza==p_coma) pieza=p_byte; else {
-        if (!free_sintax) if (pieza!=p_ptocoma) c_error(3,137);
-        while (pieza==p_ptocoma || pieza==p_coma) lexer();
+      if (pieza == p_coma)
+        pieza = p_byte;
+      else {
+        if (!free_sintax)
+          if (pieza != p_ptocoma)
+            c_error(3, 137);
+        while (pieza == p_ptocoma || pieza == p_coma)
+          lexer();
       }
 
-    } else if (pieza==p_word) {                         // Word member ---
+    } else if (pieza == p_word) { // Word member ---
 
       lexer();
 
-      if (pieza==p_pointer) { // Word pointer member
+      if (pieza == p_pointer) { // Word pointer member
 
-        lexer(); puntero3:
-        ob=analiza_pointer(tpwlo,len);
-        test_buffer(&mem,&imem_max,offstruct+len);
-        if (pieza==p_asig) {
-          lexer(); mem[offstruct+len]=constant();
-        } len+=1;
-        if (pieza==p_coma) {
-          lexer(); if (pieza==p_pointer) lexer();
+        lexer();
+puntero3:
+        ob = analiza_pointer(tpwlo, len);
+        test_buffer(&mem, &imem_max, offstruct + len);
+        if (pieza == p_asig) {
+          lexer();
+          mem[offstruct + len] = constant();
+        }
+        len += 1;
+        if (pieza == p_coma) {
+          lexer();
+          if (pieza == p_pointer)
+            lexer();
           goto puntero3;
         }
 
       } else {
-
-        if (pieza!=p_id) c_error(1,145);
-        ob=o; if ((*ob).type!=tnone) c_error(0,114); lexer();
-        (*ob).type=twloc; (*ob).wloc.offset=len;
-        if (pieza==p_corab) { lexer();
-          if (((*ob).wloc.len1=constant())<0) c_error(4,35);
-          if (pieza==p_coma) {
+        if (pieza != p_id)
+          c_error(1, 145);
+        ob = o;
+        if ((*ob).type != tnone)
+          c_error(0, 114);
+        lexer();
+        (*ob).type = twloc;
+        (*ob).wloc.offset = len;
+        if (pieza == p_corab) {
+          lexer();
+          if (((*ob).wloc.len1 = constant()) < 0)
+            c_error(4, 35);
+          if (pieza == p_coma) {
             lexer();
-            if (((*ob).wloc.len2=constant())<0) c_error(4,35);
-            if (pieza==p_coma) {
+            if (((*ob).wloc.len2 = constant()) < 0)
+              c_error(4, 35);
+            if (pieza == p_coma) {
               lexer();
-              if (((*ob).wloc.len3=constant())<0) c_error(4,35);
-            } else (*ob).wloc.len3=-1;
-          } else { (*ob).wloc.len2=-1; (*ob).wloc.len3=-1; }
-          (*ob).wloc.totalen=(*ob).wloc.len1+1;
-          if ((*ob).wloc.len2>-1) (*ob).wloc.totalen*=(*ob).wloc.len2+1;
-          if ((*ob).wloc.len3>-1) (*ob).wloc.totalen*=(*ob).wloc.len3+1;
-          if (pieza!=p_corce) { c_error(3,26); } lexer();
-          test_buffer(&mem,&imem_max,offstruct+len+((*ob).wloc.totalen+1)/2);
+              if (((*ob).wloc.len3 = constant()) < 0)
+                c_error(4, 35);
+            } else
+              (*ob).wloc.len3 = -1;
+          } else {
+            (*ob).wloc.len2 = -1;
+            (*ob).wloc.len3 = -1;
+          }
+          (*ob).wloc.totalen = (*ob).wloc.len1 + 1;
+          if ((*ob).wloc.len2 > -1)
+            (*ob).wloc.totalen *= (*ob).wloc.len2 + 1;
+          if ((*ob).wloc.len3 > -1)
+            (*ob).wloc.totalen *= (*ob).wloc.len3 + 1;
+          if (pieza != p_corce) {
+            c_error(3, 26);
+          }
+          lexer();
+          test_buffer(&mem, &imem_max, offstruct + len + ((*ob).wloc.totalen + 1) / 2);
 
-          test_buffer(&frm,&ifrm_max,offstruct+len+((*ob).wloc.totalen+1)/2);
-          memset(&frm[offstruct+len],1,(*ob).wloc.totalen*2);
+          test_buffer(&frm, &ifrm_max, offstruct + len + ((*ob).wloc.totalen + 1) / 2);
+          memset(&frm[offstruct + len], 1, (*ob).wloc.totalen * 2);
 
-          if (pieza==p_asig) {
-            _imem=imem; imem=offstruct+len;
-            save_error(1); lexer();
-            oimemptr=(byte*)&mem[imem];
-            tglo_init(1);
-            if (imemptr-oimemptr>(*ob).wloc.totalen*2) c_error(4,33);
-            imem=_imem;
-          } (*ob).wloc.totalen=((*ob).wloc.totalen+1)/2;
-        } else {
-          (*ob).type=twloc; (*ob).wloc.offset=len;
-          (*ob).wloc.len1=0;
-          (*ob).wloc.len2=-1;
-          (*ob).wloc.len3=-1;
-          (*ob).wloc.totalen=1; // 1 int
-
-          test_buffer(&frm,&ifrm_max,offstruct+len);
-          frm[offstruct+len]=1;
-
-          if (pieza==p_asig) {
+          if (pieza == p_asig) {
+            _imem = imem;
+            imem = offstruct + len;
             save_error(1);
             lexer();
-            test_buffer(&mem,&imem_max,offstruct+len);
-            mem[offstruct+len]=constant();
-            if (mem[offstruct+len]<0 || mem[offstruct+len]>65535) c_error(4,144);
+            oimemptr = (byte *)&mem[imem];
+            tglo_init(1);
+            if (imemptr - oimemptr > (*ob).wloc.totalen * 2)
+              c_error(4, 33);
+            imem = _imem;
           }
-        } len+=(*ob).wloc.totalen;
+          (*ob).wloc.totalen = ((*ob).wloc.totalen + 1) / 2;
+        } else {
+          (*ob).type = twloc;
+          (*ob).wloc.offset = len;
+          (*ob).wloc.len1 = 0;
+          (*ob).wloc.len2 = -1;
+          (*ob).wloc.len3 = -1;
+          (*ob).wloc.totalen = 1; // 1 int
+
+          test_buffer(&frm, &ifrm_max, offstruct + len);
+          frm[offstruct + len] = 1;
+
+          if (pieza == p_asig) {
+            save_error(1);
+            lexer();
+            test_buffer(&mem, &imem_max, offstruct + len);
+            mem[offstruct + len] = constant();
+            if (mem[offstruct + len] < 0 || mem[offstruct + len] > 65535)
+              c_error(4, 144);
+          }
+        }
+        len += (*ob).wloc.totalen;
       }
 
-      if (pieza==p_coma) pieza=p_word; else {
-        if (!free_sintax) if (pieza!=p_ptocoma) c_error(3,137);
-        while (pieza==p_ptocoma || pieza==p_coma) lexer();
+      if (pieza == p_coma)
+        pieza = p_word;
+      else {
+        if (!free_sintax)
+          if (pieza != p_ptocoma)
+            c_error(3, 137);
+        while (pieza == p_ptocoma || pieza == p_coma)
+          lexer();
       }
 
-    } else if (pieza==p_int || pieza==p_id || pieza==p_pointer) {
-
-      if (pieza==p_int) {
+    } else if (pieza == p_int || pieza == p_id || pieza == p_pointer) {
+      if (pieza == p_int) {
         lexer();
-        if (pieza!=p_id && pieza!=p_pointer) c_error(1,149);
+        if (pieza != p_id && pieza != p_pointer)
+          c_error(1, 149);
       }
 
-      if (pieza==p_pointer) { // Int pointer member
+      if (pieza == p_pointer) { // Int pointer member
 
-        lexer(); puntero4:
-        ob=analiza_pointer(tpilo,len);
-        test_buffer(&mem,&imem_max,offstruct+len);
-        if (pieza==p_asig) {
-          lexer(); mem[offstruct+len]=constant();
-        } len+=1;
-        if (pieza==p_coma) {
-          lexer(); if (pieza==p_pointer) lexer();
+        lexer();
+puntero4:
+        ob = analiza_pointer(tpilo, len);
+        test_buffer(&mem, &imem_max, offstruct + len);
+        if (pieza == p_asig) {
+          lexer();
+          mem[offstruct + len] = constant();
+        }
+        len += 1;
+        if (pieza == p_coma) {
+          lexer();
+          if (pieza == p_pointer)
+            lexer();
           goto puntero4;
         }
 
       } else {
-
-        ob=o; if ((*ob).type!=tnone) c_error(0,114); lexer();
-        if (pieza==p_corab) { lexer();    // Table member ---
-          (*ob).type=ttloc; (*ob).tloc.offset=len;
-          if (((*ob).tloc.len1=constant())<0) c_error(4,35);
-          if (pieza==p_coma) {
+        ob = o;
+        if ((*ob).type != tnone)
+          c_error(0, 114);
+        lexer();
+        if (pieza == p_corab) {
+          lexer(); // Table member ---
+          (*ob).type = ttloc;
+          (*ob).tloc.offset = len;
+          if (((*ob).tloc.len1 = constant()) < 0)
+            c_error(4, 35);
+          if (pieza == p_coma) {
             lexer();
-            if (((*ob).tloc.len2=constant())<0) c_error(4,35);
-            if (pieza==p_coma) {
+            if (((*ob).tloc.len2 = constant()) < 0)
+              c_error(4, 35);
+            if (pieza == p_coma) {
               lexer();
-              if (((*ob).tloc.len3=constant())<0) c_error(4,35);
-            } else (*ob).tloc.len3=-1;
-          } else { (*ob).tloc.len2=-1; (*ob).tloc.len3=-1; }
-          (*ob).tloc.totalen=(*ob).tloc.len1+1;
-          if ((*ob).tloc.len2>-1) (*ob).tloc.totalen*=(*ob).tloc.len2+1;
-          if ((*ob).tloc.len3>-1) (*ob).tloc.totalen*=(*ob).tloc.len3+1;
-          if (pieza!=p_corce) { c_error(3,26); } lexer();
+              if (((*ob).tloc.len3 = constant()) < 0)
+                c_error(4, 35);
+            } else
+              (*ob).tloc.len3 = -1;
+          } else {
+            (*ob).tloc.len2 = -1;
+            (*ob).tloc.len3 = -1;
+          }
+          (*ob).tloc.totalen = (*ob).tloc.len1 + 1;
+          if ((*ob).tloc.len2 > -1)
+            (*ob).tloc.totalen *= (*ob).tloc.len2 + 1;
+          if ((*ob).tloc.len3 > -1)
+            (*ob).tloc.totalen *= (*ob).tloc.len3 + 1;
+          if (pieza != p_corce) {
+            c_error(3, 26);
+          }
+          lexer();
 
-          test_buffer(&mem,&imem_max,offstruct+len+(*ob).tloc.totalen);
-          if (pieza==p_asig) {
-            _imem=imem; imem=offstruct+len;
-            save_error(1); lexer(); tglo_init(0);
-            if (imem-(offstruct+len)>(*ob).tloc.totalen) c_error(4,33);
-            imem=_imem;
-          } len+=(*ob).tloc.totalen;
+          test_buffer(&mem, &imem_max, offstruct + len + (*ob).tloc.totalen);
+          if (pieza == p_asig) {
+            _imem = imem;
+            imem = offstruct + len;
+            save_error(1);
+            lexer();
+            tglo_init(0);
+            if (imem - (offstruct + len) > (*ob).tloc.totalen)
+              c_error(4, 33);
+            imem = _imem;
+          }
+          len += (*ob).tloc.totalen;
 
-        } else {                                          // Variable member ---
+        } else { // Variable member ---
 
-          (*ob).type=tvloc; (*ob).vloc.offset=len;
+          (*ob).type = tvloc;
+          (*ob).vloc.offset = len;
 
-          test_buffer(&mem,&imem_max,offstruct+len);
-          if (pieza==p_asig) {
-            lexer(); mem[offstruct+len]=constant();
-          } len+=1;
-
+          test_buffer(&mem, &imem_max, offstruct + len);
+          if (pieza == p_asig) {
+            lexer();
+            mem[offstruct + len] = constant();
+          }
+          len += 1;
         }
       }
 
-      if (!free_sintax) if (pieza!=p_ptocoma && pieza!=p_coma) c_error(3,66);
-      while (pieza==p_ptocoma || pieza==p_coma) lexer();
+      if (!free_sintax)
+        if (pieza != p_ptocoma && pieza != p_coma)
+          c_error(3, 66);
+      while (pieza == p_ptocoma || pieza == p_coma)
+        lexer();
 
-    } else c_error(0,58);
-    (*ob).bloque=bloque_lexico;
-  } return(len);
+    } else
+      c_error(0, 58);
+    (*ob).bloque = bloque_lexico;
+  }
+  return (len);
 }
 
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
 
-void parser (void) {
-
-  struct objeto * ob, * member2;
-  int _imem,_imem_old,num_par=0,n;
-  byte * old_source,*nombre_dll,*oimemptr, *nombre_include;
-  int _itxt,dup;
+void parser(void) {
+  struct objeto *ob, *member2;
+  int _imem, _imem_old, num_par = 0, n;
+  byte *old_source, *nombre_dll, *oimemptr, *nombre_include;
+  int _itxt, dup;
   char cWork[256];
 
   int num_extern;
@@ -3187,88 +4148,100 @@ void parser (void) {
   // p_compiler_options {option} {;}
   //---------------------------------------------------------------------------
 
-  max_process=0; // Default option values
-  ignore_errors=0;
-  free_sintax=0;
-  extended_conditions=0;
-  simple_conditions=0;
-  comprueba_rango=1;
-  comprueba_id=1;
-  comprueba_null=1;
-  hacer_strfix=1;
-  optimizar=1;
+  max_process = 0; // Default option values
+  ignore_errors = 0;
+  free_sintax = 0;
+  extended_conditions = 0;
+  simple_conditions = 0;
+  comprueba_rango = 1;
+  comprueba_id = 1;
+  comprueba_null = 1;
+  hacer_strfix = 1;
+  optimizar = 1;
 
-  if (pieza==p_compiler_options) {
+  if (pieza == p_compiler_options) {
     lexer();
     do {
-      if (pieza==p_ptocoma) { lexer(); break; }
-      if (pieza==p_coma) lexer();
-      if (pieza==p_id && (*o).type==tcons) {
-        switch((*o).cons.valor) {
-          case 0: // _max_process
-            lexer();
-            if (pieza!=p_asig) c_error(3,139);
-            lexer();
-            max_process=constant();
-            if (max_process<0) max_process=0;
-            break;
-          case 1: // _extended_conditions
-            lexer();
-            extended_conditions=1;
-            break;
-          case 2: // _simple_conditions
-            lexer();
-            simple_conditions=1;
-            break;
-          case 3: // _case_sensitive
-            lexer();
-            memcpy(lower+129,"\x81\x82\x83\x84\x85\x86\x87\x88\x89\x8a\x8b\x8c\x8d\x84\x86\x82\x91\x91\x93\x94\x95\x96\x97\x98\x94\x81\x9b\x9c\x9d\x9e\x9f\xa0\xa1\xa2\xa3",35);
-            memcpy(lower+'A',"ABCDEFGHIJKLMNOPQRSTUVWXYZ",26);
-            lower['\xa5']='\xa5';
-            break;
-          case 4: // _ignore_errors
-            lexer();
-            ignore_errors=1;
-            break;
-          case 5: // _free_sintax
-            lexer();
-            free_sintax=1;
-            break;
-          case 6: // _no_check
-            lexer();
-            comprueba_rango=0;
-            comprueba_id=0;
-            comprueba_null=0;
-            break;
-          case 7: // _no_strfix
-            lexer();
-            hacer_strfix=0;
-            break;
-          case 8: // _no_optimization
-            lexer();
-            optimizar=0;
-            break;
-          case 9: // _no_range_check
-            lexer();
-            comprueba_rango=0;
-            break;
-          case 10: // _no_id_check
-            lexer();
-            comprueba_id=0;
-            break;
-          case 11: // _no_null_check
-            lexer();
-            comprueba_null=0;
-            break;
-          default:
-            c_error(0,138);
-            break;
+      if (pieza == p_ptocoma) {
+        lexer();
+        break;
+      }
+      if (pieza == p_coma)
+        lexer();
+      if (pieza == p_id && (*o).type == tcons) {
+        switch ((*o).cons.valor) {
+        case 0: // _max_process
+          lexer();
+          if (pieza != p_asig)
+            c_error(3, 139);
+          lexer();
+          max_process = constant();
+          if (max_process < 0)
+            max_process = 0;
+          break;
+        case 1: // _extended_conditions
+          lexer();
+          extended_conditions = 1;
+          break;
+        case 2: // _simple_conditions
+          lexer();
+          simple_conditions = 1;
+          break;
+        case 3: // _case_sensitive
+          lexer();
+          memcpy(lower + 129,
+                 "\x81\x82\x83\x84\x85\x86\x87\x88\x89\x8a\x8b\x8c\x8d\x84\x86\x82\x91\x91\x93\x94"
+                 "\x95\x96\x97\x98\x94\x81\x9b\x9c\x9d\x9e\x9f\xa0\xa1\xa2\xa3",
+                 35);
+          memcpy(lower + 'A', "ABCDEFGHIJKLMNOPQRSTUVWXYZ", 26);
+          lower['\xa5'] = '\xa5';
+          break;
+        case 4: // _ignore_errors
+          lexer();
+          ignore_errors = 1;
+          break;
+        case 5: // _free_sintax
+          lexer();
+          free_sintax = 1;
+          break;
+        case 6: // _no_check
+          lexer();
+          comprueba_rango = 0;
+          comprueba_id = 0;
+          comprueba_null = 0;
+          break;
+        case 7: // _no_strfix
+          lexer();
+          hacer_strfix = 0;
+          break;
+        case 8: // _no_optimization
+          lexer();
+          optimizar = 0;
+          break;
+        case 9: // _no_range_check
+          lexer();
+          comprueba_rango = 0;
+          break;
+        case 10: // _no_id_check
+          lexer();
+          comprueba_id = 0;
+          break;
+        case 11: // _no_null_check
+          lexer();
+          comprueba_null = 0;
+          break;
+        default:
+          c_error(0, 138);
+          break;
         }
       } else {
         if (!free_sintax) {
-          if (pieza==p_program) c_error(3,66);
-          else c_error(0,138);
-        } else break;
+          if (pieza == p_program)
+            c_error(3, 66);
+          else
+            c_error(0, 138);
+        } else
+          break;
       }
     } while (1);
   }
@@ -3280,57 +4253,83 @@ void parser (void) {
   //---------------------------------------------------------------------------
 
   save_error(0);
-  if (pieza!=p_program && pieza!=p_setup_program) c_error(4,20);
+  if (pieza != p_program && pieza != p_setup_program)
+    c_error(4, 20);
 
-  if (pieza==p_setup_program) {
-    program_type=1; 
-    div_strcpy((char *)cWork,sizeof(cWork),"install/setup.ins");
-  } else div_strcpy((char *)cWork,sizeof(cWork),"system/exec.ins");
-  if ((lins=fopen((char *)cWork,"wb"))==NULL) c_error(0,0);
+  if (pieza == p_setup_program) {
+    program_type = 1;
+    div_strcpy((char *)cWork, sizeof(cWork), "install/setup.ins");
+  } else
+    div_strcpy((char *)cWork, sizeof(cWork), "system/exec.ins");
+  if ((lins = fopen((char *)cWork, "wb")) == NULL)
+    c_error(0, 0);
 
-  statement_start(); lexer();
-  if (pieza!=p_id) c_error(1,21);
-  ob=o; if ((*ob).type!=tnone) c_error(0,115); (*ob).type=tproc;
-  (*ob).proc.bloque=bloque_actual=ob;
-  (*ob).proc.offset=0; (*ob).proc.num_par=0;
+  statement_start();
   lexer();
-  if (!free_sintax) if (pieza!=p_ptocoma) c_error(3,66);
-  while (pieza==p_ptocoma || pieza==p_coma) lexer();
+  if (pieza != p_id)
+    c_error(1, 21);
+  ob = o;
+  if ((*ob).type != tnone)
+    c_error(0, 115);
+  (*ob).type = tproc;
+  (*ob).proc.bloque = bloque_actual = ob;
+  (*ob).proc.offset = 0;
+  (*ob).proc.num_par = 0;
+  lexer();
+  if (!free_sintax)
+    if (pieza != p_ptocoma)
+      c_error(3, 66);
+  while (pieza == p_ptocoma || pieza == p_coma)
+    lexer();
   statement_end();
 
-	while(pieza==p_include) {
-		statement_start();
-		lexer();
-		if (pieza!=p_lit && !(pieza==p_id && (*o).type==tcons && (*o).cons.literal)) c_error(1,62);
-		old_source=source;
-		nombre_include=(byte*)&mem[pieza_num];
+  while (pieza == p_include) {
+    statement_start();
+    lexer();
+    if (pieza != p_lit && !(pieza == p_id && (*o).type == tcons && (*o).cons.literal))
+      c_error(1, 62);
+    old_source = source;
+    nombre_include = (byte *)&mem[pieza_num];
 
 
-	//
-		
-		source=old_source; lexer();
-		if (!free_sintax) if (pieza!=p_ptocoma) c_error(3,66);
-		while (pieza==p_ptocoma || pieza==p_coma) lexer();
-		statement_end();
-	}
+    //
+
+    source = old_source;
+    lexer();
+    if (!free_sintax)
+      if (pieza != p_ptocoma)
+        c_error(3, 66);
+    while (pieza == p_ptocoma || pieza == p_coma)
+      lexer();
+    statement_end();
+  }
   //---------------------------------------------------------------------------
   // Constants section
   //---------------------------------------------------------------------------
   // [ p_const {;} { p_id p_asig <exp> {; | ,} } ]
   //---------------------------------------------------------------------------
 
-  if (pieza==p_const) {
+  if (pieza == p_const) {
     skip_semicolons();
-    while (pieza==p_id) {
-      ob=o; if ((*ob).type!=tnone && (*ob).type!=tcons) c_error(0,116);
-      (*ob).type=tcons;
-      lexer(); if (pieza!=p_asig) c_error(3,119);
+    while (pieza == p_id) {
+      ob = o;
+      if ((*ob).type != tnone && (*ob).type != tcons)
+        c_error(0, 116);
+      (*ob).type = tcons;
       lexer();
-      if (pieza==p_lit || (pieza==p_id && (*o).type==tcons && (*o).cons.literal))
-        (*ob).cons.literal=1; else (*ob).cons.literal=0;
-      (*ob).cons.valor=constant();
-      if (!free_sintax) if (pieza!=p_ptocoma && pieza!=p_coma) c_error(3,66);
-      while (pieza==p_ptocoma || pieza==p_coma) lexer();
+      if (pieza != p_asig)
+        c_error(3, 119);
+      lexer();
+      if (pieza == p_lit || (pieza == p_id && (*o).type == tcons && (*o).cons.literal))
+        (*ob).cons.literal = 1;
+      else
+        (*ob).cons.literal = 0;
+      (*ob).cons.valor = constant();
+      if (!free_sintax)
+        if (pieza != p_ptocoma && pieza != p_coma)
+          c_error(3, 66);
+      while (pieza == p_ptocoma || pieza == p_coma)
+        lexer();
     }
   }
 
@@ -3346,353 +4345,518 @@ void parser (void) {
   //            [ p_coma <init>]
   //---------------------------------------------------------------------------
 
-  if (pieza==p_global) {
+  if (pieza == p_global) {
     skip_semicolons();
-    while (pieza==p_id || pieza==p_int || pieza==p_pointer || pieza==p_struct || pieza==p_string || pieza==p_byte || pieza==p_word) {
-
-      if (pieza==p_struct) {                            // Struct global
+    while (pieza == p_id || pieza == p_int || pieza == p_pointer || pieza == p_struct ||
+           pieza == p_string || pieza == p_byte || pieza == p_word) {
+      if (pieza == p_struct) { // Struct global
 
         lexer();
 
-        if (pieza==p_pointer) { // Defining a struct pointer
+        if (pieza == p_pointer) { // Defining a struct pointer
 
-          lexer(); if (pieza!=p_id) c_error(1,110); ob=o;
-          if ((*ob).type==tnone) c_error(0,150); // Pointer can't be defined this way
-          if ((*ob).type!=tsglo && (*ob).type!=tsloc) c_error(0,150);
           lexer();
-          puntero_a_struct:
-          analyze_pointer_struct(tpsgl,imem,ob);
-          if (pieza==p_asig) { lexer(); mem[imem]=constant(); }
-          test_buffer(&mem,&imem_max,imem++);
-
-          if (pieza==p_coma) {
+          if (pieza != p_id)
+            c_error(1, 110);
+          ob = o;
+          if ((*ob).type == tnone)
+            c_error(0, 150); // Pointer can't be defined this way
+          if ((*ob).type != tsglo && (*ob).type != tsloc)
+            c_error(0, 150);
+          lexer();
+puntero_a_struct:
+          analyze_pointer_struct(tpsgl, imem, ob);
+          if (pieza == p_asig) {
             lexer();
-            if (pieza==p_pointer) lexer();
+            mem[imem] = constant();
+          }
+          test_buffer(&mem, &imem_max, imem++);
+
+          if (pieza == p_coma) {
+            lexer();
+            if (pieza == p_pointer)
+              lexer();
             goto puntero_a_struct;
           } else {
-            if (!free_sintax) if (pieza!=p_ptocoma) c_error(3,137);
-            while (pieza==p_ptocoma || pieza==p_coma) lexer();
+            if (!free_sintax)
+              if (pieza != p_ptocoma)
+                c_error(3, 137);
+            while (pieza == p_ptocoma || pieza == p_coma)
+              lexer();
           }
 
         } else {
+          if (pieza != p_id)
+            c_error(1, 110);
+          ob = o;
+          member = ob;
+          lexer();
 
-          if (pieza!=p_id) c_error(1,110);
-          ob=o; member=ob; lexer();
+          if ((*ob).type != tnone)
+            c_error(2, 22);
 
-          if ((*ob).type!=tnone) c_error(2,22);
-
-          (*ob).type=tsglo; (*ob).sglo.offset=_imem=imem;
-          if (pieza==p_corab) {
-            member2=member; member=NULL; lexer();
-            if (((*ob).sglo.items1=constant())<0) c_error(4,123);
-            if (pieza==p_coma) {
+          (*ob).type = tsglo;
+          (*ob).sglo.offset = _imem = imem;
+          if (pieza == p_corab) {
+            member2 = member;
+            member = NULL;
+            lexer();
+            if (((*ob).sglo.items1 = constant()) < 0)
+              c_error(4, 123);
+            if (pieza == p_coma) {
               lexer();
-              if (((*ob).sglo.items2=constant())<0) c_error(4,123);
-              if (pieza==p_coma) {
+              if (((*ob).sglo.items2 = constant()) < 0)
+                c_error(4, 123);
+              if (pieza == p_coma) {
                 lexer();
-                if (((*ob).sglo.items3=constant())<0) c_error(4,123);
-              } else (*ob).sglo.items3=-1;
-            } else { (*ob).sglo.items2=-1; (*ob).sglo.items3=-1; }
-            member=member2;
-            (*ob).sglo.totalitems=(*ob).sglo.items1+1;
-            if ((*ob).sglo.items2>-1) (*ob).sglo.totalitems*=(*ob).sglo.items2+1;
-            if ((*ob).sglo.items3>-1) (*ob).sglo.totalitems*=(*ob).sglo.items3+1;
-            if (pieza!=p_corce) { c_error(3,26); } lexer();
-          } else {
-            (*ob).sglo.totalitems=1;
-            (*ob).sglo.items1=0; (*ob).sglo.items2=-1; (*ob).sglo.items3=-1;
-          }
-          if (((*ob).sglo.len_item=analyze_struct(_imem))==0) c_error(0,57);
-          member=NULL; lexer();
-          imem=(*ob).sglo.offset; dup=(*ob).sglo.totalitems+1;
-          if (dup>1) {
-            test_buffer(&mem,&imem_max,imem+(*ob).sglo.len_item*(*ob).sglo.totalitems);
-            test_buffer(&frm,&ifrm_max,imem+(*ob).sglo.len_item*(*ob).sglo.totalitems);
-            while (--dup) {
-            	if(imem!=_imem) {
-	              memcpy(&mem[imem],&mem[_imem],(*ob).sglo.len_item<<2);
-	              memcpy(&frm[imem],&frm[_imem],(*ob).sglo.len_item<<2);
-	            }
-              imem+=(*ob).sglo.len_item;
+                if (((*ob).sglo.items3 = constant()) < 0)
+                  c_error(4, 123);
+              } else
+                (*ob).sglo.items3 = -1;
+            } else {
+              (*ob).sglo.items2 = -1;
+              (*ob).sglo.items3 = -1;
             }
-          } imem=_imem;
-          if (pieza==p_asig) {
+            member = member2;
+            (*ob).sglo.totalitems = (*ob).sglo.items1 + 1;
+            if ((*ob).sglo.items2 > -1)
+              (*ob).sglo.totalitems *= (*ob).sglo.items2 + 1;
+            if ((*ob).sglo.items3 > -1)
+              (*ob).sglo.totalitems *= (*ob).sglo.items3 + 1;
+            if (pieza != p_corce) {
+              c_error(3, 26);
+            }
+            lexer();
+          } else {
+            (*ob).sglo.totalitems = 1;
+            (*ob).sglo.items1 = 0;
+            (*ob).sglo.items2 = -1;
+            (*ob).sglo.items3 = -1;
+          }
+          if (((*ob).sglo.len_item = analyze_struct(_imem)) == 0)
+            c_error(0, 57);
+          member = NULL;
+          lexer();
+          imem = (*ob).sglo.offset;
+          dup = (*ob).sglo.totalitems + 1;
+          if (dup > 1) {
+            test_buffer(&mem, &imem_max, imem + (*ob).sglo.len_item * (*ob).sglo.totalitems);
+            test_buffer(&frm, &ifrm_max, imem + (*ob).sglo.len_item * (*ob).sglo.totalitems);
+            while (--dup) {
+              if (imem != _imem) {
+                memcpy(&mem[imem], &mem[_imem], (*ob).sglo.len_item << 2);
+                memcpy(&frm[imem], &frm[_imem], (*ob).sglo.len_item << 2);
+              }
+              imem += (*ob).sglo.len_item;
+            }
+          }
+          imem = _imem;
+          if (pieza == p_asig) {
             save_error(1);
-            lexer(); tglo_init(0);
-            if (imem-_imem-1>=(*ob).sglo.len_item*(*ob).sglo.totalitems) c_error(4,120);
-          } while (pieza==p_ptocoma) lexer();
+            lexer();
+            tglo_init(0);
+            if (imem - _imem - 1 >= (*ob).sglo.len_item * (*ob).sglo.totalitems)
+              c_error(4, 120);
+          }
+          while (pieza == p_ptocoma)
+            lexer();
 
-          imem=_imem+(*ob).sglo.len_item*(*ob).sglo.totalitems;
-          test_buffer(&mem,&imem_max,imem);
+          imem = _imem + (*ob).sglo.len_item * (*ob).sglo.totalitems;
+          test_buffer(&mem, &imem_max, imem);
         }
 
-      } else if (pieza==p_string) {                     // Global string
+      } else if (pieza == p_string) { // Global string
 
         lexer();
 
-        if (pieza==p_pointer) { // Byte pointer
+        if (pieza == p_pointer) { // Byte pointer
 
-          lexer(); puntero1:
-          ob=analiza_pointer(tpcgl,imem);
-          if (pieza==p_asig) { lexer(); mem[imem]=constant(); }
-          test_buffer(&mem,&imem_max,++imem);
-          if (pieza==p_coma) {
-            lexer(); if (pieza==p_pointer) lexer();
+          lexer();
+puntero1:
+          ob = analiza_pointer(tpcgl, imem);
+          if (pieza == p_asig) {
+            lexer();
+            mem[imem] = constant();
+          }
+          test_buffer(&mem, &imem_max, ++imem);
+          if (pieza == p_coma) {
+            lexer();
+            if (pieza == p_pointer)
+              lexer();
             goto puntero1;
           }
 
         } else {
-
-          if (pieza!=p_id) c_error(1,125);
-          ob=o; if ((*ob).type!=tnone) c_error(0,126); lexer();
-          (*ob).type=tcglo;
-          _imem=imem;
-          (*ob).cglo.offset=_imem+1;
-          if (pieza==p_corab) {
+          if (pieza != p_id)
+            c_error(1, 125);
+          ob = o;
+          if ((*ob).type != tnone)
+            c_error(0, 126);
+          lexer();
+          (*ob).type = tcglo;
+          _imem = imem;
+          (*ob).cglo.offset = _imem + 1;
+          if (pieza == p_corab) {
             lexer();
-            if (pieza==p_corce) {
+            if (pieza == p_corce) {
               lexer();
-              (*ob).cglo.totalen=255;
+              (*ob).cglo.totalen = 255;
             } else {
-              if (((*ob).cglo.totalen=constant())<0) c_error(4,127);
-              if ((*ob).cglo.totalen>0xFFFFF) c_error(4,135);
-              if (pieza!=p_corce) c_error(3,26);
+              if (((*ob).cglo.totalen = constant()) < 0)
+                c_error(4, 127);
+              if ((*ob).cglo.totalen > 0xFFFFF)
+                c_error(4, 135);
+              if (pieza != p_corce)
+                c_error(3, 26);
               lexer();
             }
-          } else (*ob).cglo.totalen=255;
-          if (pieza==p_asig) {
+          } else
+            (*ob).cglo.totalen = 255;
+          if (pieza == p_asig) {
             save_error(1);
-            _itxt=itxt;
+            _itxt = itxt;
             lexer();
-            if (pieza!=p_lit && !(pieza==p_id && (*o).type==tcons && (*o).cons.literal))
-              c_error(3,128);
-            if (strlen((char*)&mem[pieza_num])>(*ob).cglo.totalen+1)
-              c_error(4,129);
-            imem=_imem+1+((*ob).cglo.totalen+5)/4; // e.g. c[32] -> c[0]..c[32],NUL
-            test_buffer(&mem,&imem_max,imem);
-            memmove((char*)&mem[_imem+1],(char*)&mem[pieza_num],strlen((char*)&mem[pieza_num])+1);
-            itxt=_itxt; // Remove the string from the text segment
+            if (pieza != p_lit && !(pieza == p_id && (*o).type == tcons && (*o).cons.literal))
+              c_error(3, 128);
+            if (strlen((char *)&mem[pieza_num]) > (*ob).cglo.totalen + 1)
+              c_error(4, 129);
+            imem = _imem + 1 + ((*ob).cglo.totalen + 5) / 4; // e.g. c[32] -> c[0]..c[32],NUL
+            test_buffer(&mem, &imem_max, imem);
+            memmove((char *)&mem[_imem + 1], (char *)&mem[pieza_num],
+                    strlen((char *)&mem[pieza_num]) + 1);
+            itxt = _itxt; // Remove the string from the text segment
             lexer();
           } else {
-            imem=_imem+1+((*ob).cglo.totalen+5)/4;
-            test_buffer(&mem,&imem_max,imem);
-          } mem[_imem]=0xDAD00000|(*ob).cglo.totalen;
+            imem = _imem + 1 + ((*ob).cglo.totalen + 5) / 4;
+            test_buffer(&mem, &imem_max, imem);
+          }
+          mem[_imem] = 0xDAD00000 | (*ob).cglo.totalen;
         }
 
-        if (pieza==p_coma) pieza=p_string; else {
-          if (!free_sintax) if (pieza!=p_ptocoma) c_error(3,137);
-          while (pieza==p_ptocoma || pieza==p_coma) lexer();
+        if (pieza == p_coma)
+          pieza = p_string;
+        else {
+          if (!free_sintax)
+            if (pieza != p_ptocoma)
+              c_error(3, 137);
+          while (pieza == p_ptocoma || pieza == p_coma)
+            lexer();
         }
 
-      } else if (pieza==p_byte) {                       // Global byte array
+      } else if (pieza == p_byte) { // Global byte array
 
         lexer();
 
-        if (pieza==p_pointer) { // Byte pointer
+        if (pieza == p_pointer) { // Byte pointer
 
-          lexer(); puntero2:
-          ob=analiza_pointer(tpbgl,imem);
-          if (pieza==p_asig) { lexer(); mem[imem]=constant(); }
-          test_buffer(&mem,&imem_max,++imem);
-          if (pieza==p_coma) {
-            lexer(); if (pieza==p_pointer) lexer();
+          lexer();
+puntero2:
+          ob = analiza_pointer(tpbgl, imem);
+          if (pieza == p_asig) {
+            lexer();
+            mem[imem] = constant();
+          }
+          test_buffer(&mem, &imem_max, ++imem);
+          if (pieza == p_coma) {
+            lexer();
+            if (pieza == p_pointer)
+              lexer();
             goto puntero2;
           }
 
         } else {
-
-          if (pieza!=p_id) c_error(1,142);
-          ob=o; if ((*ob).type!=tnone) c_error(0,117); lexer();
-          (*ob).type=tbglo; (*ob).bglo.offset=_imem=imem;
-          if (pieza==p_corab) {
+          if (pieza != p_id)
+            c_error(1, 142);
+          ob = o;
+          if ((*ob).type != tnone)
+            c_error(0, 117);
+          lexer();
+          (*ob).type = tbglo;
+          (*ob).bglo.offset = _imem = imem;
+          if (pieza == p_corab) {
             lexer();
-            if (pieza==p_corce) {
-              lexer(); if (pieza!=p_asig) c_error(3,23); lexer();
-              oimemptr=(byte*)&mem[imem];
+            if (pieza == p_corce) {
+              lexer();
+              if (pieza != p_asig)
+                c_error(3, 23);
+              lexer();
+              oimemptr = (byte *)&mem[imem];
               tglo_init(2);
-              (*ob).bglo.len1=imemptr-oimemptr-1;
-              (*ob).bglo.len2=-1;
-              (*ob).bglo.len3=-1;
-              (*ob).bglo.totalen=((*ob).bglo.len1+4)/4;
+              (*ob).bglo.len1 = imemptr - oimemptr - 1;
+              (*ob).bglo.len2 = -1;
+              (*ob).bglo.len3 = -1;
+              (*ob).bglo.totalen = ((*ob).bglo.len1 + 4) / 4;
             } else {
-              if (((*ob).bglo.len1=constant())<0) c_error(4,35);
-              if (pieza==p_coma) {
+              if (((*ob).bglo.len1 = constant()) < 0)
+                c_error(4, 35);
+              if (pieza == p_coma) {
                 lexer();
-                if (((*ob).bglo.len2=constant())<0) c_error(4,35);
-                if (pieza==p_coma) {
+                if (((*ob).bglo.len2 = constant()) < 0)
+                  c_error(4, 35);
+                if (pieza == p_coma) {
                   lexer();
-                  if (((*ob).bglo.len3=constant())<0) c_error(4,35);
-                } else (*ob).bglo.len3=-1;
-              } else { (*ob).bglo.len2=-1; (*ob).bglo.len3=-1; }
+                  if (((*ob).bglo.len3 = constant()) < 0)
+                    c_error(4, 35);
+                } else
+                  (*ob).bglo.len3 = -1;
+              } else {
+                (*ob).bglo.len2 = -1;
+                (*ob).bglo.len3 = -1;
+              }
 
-              (*ob).bglo.totalen=(*ob).bglo.len1+1;
-              if ((*ob).bglo.len2>-1) (*ob).bglo.totalen*=(*ob).bglo.len2+1;
-              if ((*ob).bglo.len3>-1) (*ob).bglo.totalen*=(*ob).bglo.len3+1;
-              if (pieza!=p_corce) { c_error(3,26); } lexer();
-              if (pieza==p_asig) {
+              (*ob).bglo.totalen = (*ob).bglo.len1 + 1;
+              if ((*ob).bglo.len2 > -1)
+                (*ob).bglo.totalen *= (*ob).bglo.len2 + 1;
+              if ((*ob).bglo.len3 > -1)
+                (*ob).bglo.totalen *= (*ob).bglo.len3 + 1;
+              if (pieza != p_corce) {
+                c_error(3, 26);
+              }
+              lexer();
+              if (pieza == p_asig) {
                 save_error(1);
                 lexer();
-                oimemptr=(byte*)&mem[imem];
+                oimemptr = (byte *)&mem[imem];
                 tglo_init(2);
-                if (imemptr-oimemptr>(*ob).bglo.totalen) c_error(4,33);
-              } (*ob).bglo.totalen=((*ob).bglo.totalen+3)/4;
+                if (imemptr - oimemptr > (*ob).bglo.totalen)
+                  c_error(4, 33);
+              }
+              (*ob).bglo.totalen = ((*ob).bglo.totalen + 3) / 4;
             }
-          } else {                                          // Global byte
-            (*ob).type=tbglo; (*ob).bglo.offset=imem;
-            (*ob).bglo.len1=0;
-            (*ob).bglo.len2=-1;
-            (*ob).bglo.len3=-1;
-            (*ob).bglo.totalen=1; // 1 int
-            if (pieza==p_asig) {
+          } else { // Global byte
+            (*ob).type = tbglo;
+            (*ob).bglo.offset = imem;
+            (*ob).bglo.len1 = 0;
+            (*ob).bglo.len2 = -1;
+            (*ob).bglo.len3 = -1;
+            (*ob).bglo.totalen = 1; // 1 int
+            if (pieza == p_asig) {
               save_error(1);
               lexer();
-              mem[imem]=constant();
-              if (mem[imem]<0 || mem[imem]>255) c_error(4,143);
+              mem[imem] = constant();
+              if (mem[imem] < 0 || mem[imem] > 255)
+                c_error(4, 143);
             }
-          } imem=_imem+(*ob).bglo.totalen; test_buffer(&mem,&imem_max,imem);
+          }
+          imem = _imem + (*ob).bglo.totalen;
+          test_buffer(&mem, &imem_max, imem);
         }
 
-        if (pieza==p_coma) pieza=p_byte; else {
-          if (!free_sintax) if (pieza!=p_ptocoma) c_error(3,137);
-          while (pieza==p_ptocoma || pieza==p_coma) lexer();
+        if (pieza == p_coma)
+          pieza = p_byte;
+        else {
+          if (!free_sintax)
+            if (pieza != p_ptocoma)
+              c_error(3, 137);
+          while (pieza == p_ptocoma || pieza == p_coma)
+            lexer();
         }
 
-      } else if (pieza==p_word) {                       // Global word array
+      } else if (pieza == p_word) { // Global word array
 
         lexer();
 
-        if (pieza==p_pointer) { // Word pointer
+        if (pieza == p_pointer) { // Word pointer
 
-          lexer(); puntero3:
-          ob=analiza_pointer(tpwgl,imem);
-          if (pieza==p_asig) { lexer(); mem[imem]=constant(); }
-          test_buffer(&mem,&imem_max,++imem);
-          if (pieza==p_coma) {
-            lexer(); if (pieza==p_pointer) lexer();
+          lexer();
+puntero3:
+          ob = analiza_pointer(tpwgl, imem);
+          if (pieza == p_asig) {
+            lexer();
+            mem[imem] = constant();
+          }
+          test_buffer(&mem, &imem_max, ++imem);
+          if (pieza == p_coma) {
+            lexer();
+            if (pieza == p_pointer)
+              lexer();
             goto puntero3;
           }
 
         } else {
-
-          if (pieza!=p_id) c_error(1,145);
-          ob=o; if ((*ob).type!=tnone) c_error(0,117); lexer();
-          (*ob).type=twglo; (*ob).wglo.offset=_imem=imem;
-          if (pieza==p_corab) {
+          if (pieza != p_id)
+            c_error(1, 145);
+          ob = o;
+          if ((*ob).type != tnone)
+            c_error(0, 117);
+          lexer();
+          (*ob).type = twglo;
+          (*ob).wglo.offset = _imem = imem;
+          if (pieza == p_corab) {
             lexer();
-            if (pieza==p_corce) {
-              lexer(); if (pieza!=p_asig) c_error(3,23); lexer();
-              oimemptr=(byte*)&mem[imem];
+            if (pieza == p_corce) {
+              lexer();
+              if (pieza != p_asig)
+                c_error(3, 23);
+              lexer();
+              oimemptr = (byte *)&mem[imem];
               tglo_init(1);
-              (*ob).wglo.len1=(imemptr-oimemptr)/2-1;
-              (*ob).wglo.len2=-1;
-              (*ob).wglo.len3=-1;
-              (*ob).wglo.totalen=((*ob).wglo.len1+2)/2;
+              (*ob).wglo.len1 = (imemptr - oimemptr) / 2 - 1;
+              (*ob).wglo.len2 = -1;
+              (*ob).wglo.len3 = -1;
+              (*ob).wglo.totalen = ((*ob).wglo.len1 + 2) / 2;
             } else {
-              if (((*ob).wglo.len1=constant())<0) c_error(4,35);
-              if (pieza==p_coma) {
+              if (((*ob).wglo.len1 = constant()) < 0)
+                c_error(4, 35);
+              if (pieza == p_coma) {
                 lexer();
-                if (((*ob).wglo.len2=constant())<0) c_error(4,35);
-                if (pieza==p_coma) {
+                if (((*ob).wglo.len2 = constant()) < 0)
+                  c_error(4, 35);
+                if (pieza == p_coma) {
                   lexer();
-                  if (((*ob).wglo.len3=constant())<0) c_error(4,35);
-                } else (*ob).wglo.len3=-1;
-              } else { (*ob).wglo.len2=-1; (*ob).wglo.len3=-1; }
+                  if (((*ob).wglo.len3 = constant()) < 0)
+                    c_error(4, 35);
+                } else
+                  (*ob).wglo.len3 = -1;
+              } else {
+                (*ob).wglo.len2 = -1;
+                (*ob).wglo.len3 = -1;
+              }
 
-              (*ob).wglo.totalen=(*ob).wglo.len1+1;
-              if ((*ob).wglo.len2>-1) (*ob).wglo.totalen*=(*ob).wglo.len2+1;
-              if ((*ob).wglo.len3>-1) (*ob).wglo.totalen*=(*ob).wglo.len3+1;
-              if (pieza!=p_corce) { c_error(3,26); } lexer();
-              if (pieza==p_asig) {
+              (*ob).wglo.totalen = (*ob).wglo.len1 + 1;
+              if ((*ob).wglo.len2 > -1)
+                (*ob).wglo.totalen *= (*ob).wglo.len2 + 1;
+              if ((*ob).wglo.len3 > -1)
+                (*ob).wglo.totalen *= (*ob).wglo.len3 + 1;
+              if (pieza != p_corce) {
+                c_error(3, 26);
+              }
+              lexer();
+              if (pieza == p_asig) {
                 save_error(1);
                 lexer();
-                oimemptr=(byte*)&mem[imem];
+                oimemptr = (byte *)&mem[imem];
                 tglo_init(1);
-                if (imemptr-oimemptr>(*ob).wglo.totalen*2) c_error(4,33);
-              } (*ob).wglo.totalen=((*ob).wglo.totalen+1)/2;
+                if (imemptr - oimemptr > (*ob).wglo.totalen * 2)
+                  c_error(4, 33);
+              }
+              (*ob).wglo.totalen = ((*ob).wglo.totalen + 1) / 2;
             }
-          } else {                                          // Global word
-            (*ob).type=twglo; (*ob).wglo.offset=imem;
-            (*ob).wglo.len1=0;
-            (*ob).wglo.len2=-1;
-            (*ob).wglo.len3=-1;
-            (*ob).wglo.totalen=1; // 1 int
-            if (pieza==p_asig) {
+          } else { // Global word
+            (*ob).type = twglo;
+            (*ob).wglo.offset = imem;
+            (*ob).wglo.len1 = 0;
+            (*ob).wglo.len2 = -1;
+            (*ob).wglo.len3 = -1;
+            (*ob).wglo.totalen = 1; // 1 int
+            if (pieza == p_asig) {
               save_error(1);
               lexer();
-              mem[imem]=constant();
-              if (mem[imem]<0 || mem[imem]>65535) c_error(4,144);
+              mem[imem] = constant();
+              if (mem[imem] < 0 || mem[imem] > 65535)
+                c_error(4, 144);
             }
-          } imem=_imem+(*ob).wglo.totalen; test_buffer(&mem,&imem_max,imem);
+          }
+          imem = _imem + (*ob).wglo.totalen;
+          test_buffer(&mem, &imem_max, imem);
         }
 
-        if (pieza==p_coma) pieza=p_word; else {
-          if (!free_sintax) if (pieza!=p_ptocoma) c_error(3,137);
-          while (pieza==p_ptocoma || pieza==p_coma) lexer();
+        if (pieza == p_coma)
+          pieza = p_word;
+        else {
+          if (!free_sintax)
+            if (pieza != p_ptocoma)
+              c_error(3, 137);
+          while (pieza == p_ptocoma || pieza == p_coma)
+            lexer();
         }
 
-      } else if (pieza==p_int || pieza==p_id || pieza==p_pointer) {
-
-        if (pieza==p_int) {
+      } else if (pieza == p_int || pieza == p_id || pieza == p_pointer) {
+        if (pieza == p_int) {
           lexer();
-          if (pieza!=p_id && pieza!=p_pointer) c_error(1,149);
+          if (pieza != p_id && pieza != p_pointer)
+            c_error(1, 149);
         }
 
-        if (pieza==p_pointer) { // Int pointer
+        if (pieza == p_pointer) { // Int pointer
 
-          lexer(); puntero4:
-          ob=analiza_pointer(tpigl,imem);
-          if (pieza==p_asig) { lexer(); mem[imem]=constant(); }
-          test_buffer(&mem,&imem_max,++imem);
-          if (pieza==p_coma) {
-            lexer(); if (pieza==p_pointer) lexer();
+          lexer();
+puntero4:
+          ob = analiza_pointer(tpigl, imem);
+          if (pieza == p_asig) {
+            lexer();
+            mem[imem] = constant();
+          }
+          test_buffer(&mem, &imem_max, ++imem);
+          if (pieza == p_coma) {
+            lexer();
+            if (pieza == p_pointer)
+              lexer();
             goto puntero4;
           }
 
         } else {
-
-          ob=o; if ((*ob).type!=tnone) c_error(0,117); lexer();
-          if (pieza==p_corab) {                           // Global table
+          ob = o;
+          if ((*ob).type != tnone)
+            c_error(0, 117);
+          lexer();
+          if (pieza == p_corab) { // Global table
             lexer();
-            (*ob).type=ttglo; (*ob).tglo.offset=_imem=imem;
-            if (pieza==p_corce) {
-              lexer(); if (pieza!=p_asig) c_error(3,23); lexer();
+            (*ob).type = ttglo;
+            (*ob).tglo.offset = _imem = imem;
+            if (pieza == p_corce) {
+              lexer();
+              if (pieza != p_asig)
+                c_error(3, 23);
+              lexer();
               tglo_init(3);
-              (*ob).tglo.len1=imem-_imem-1;
-              (*ob).tglo.len2=-1;
-              (*ob).tglo.len3=-1;
-              (*ob).tglo.totalen=imem-_imem;
+              (*ob).tglo.len1 = imem - _imem - 1;
+              (*ob).tglo.len2 = -1;
+              (*ob).tglo.len3 = -1;
+              (*ob).tglo.totalen = imem - _imem;
             } else {
-              if (((*ob).tglo.len1=constant())<0) c_error(4,35);
-              if (pieza==p_coma) {
+              if (((*ob).tglo.len1 = constant()) < 0)
+                c_error(4, 35);
+              if (pieza == p_coma) {
                 lexer();
-                if (((*ob).tglo.len2=constant())<0) c_error(4,35);
-                if (pieza==p_coma) {
+                if (((*ob).tglo.len2 = constant()) < 0)
+                  c_error(4, 35);
+                if (pieza == p_coma) {
                   lexer();
-                  if (((*ob).tglo.len3=constant())<0) c_error(4,35);
-                } else (*ob).tglo.len3=-1;
-              } else { (*ob).tglo.len2=-1; (*ob).tglo.len3=-1; }
-              (*ob).tglo.totalen=(*ob).tglo.len1+1;
-              if ((*ob).tglo.len2>-1) (*ob).tglo.totalen*=(*ob).tglo.len2+1;
-              if ((*ob).tglo.len3>-1) (*ob).tglo.totalen*=(*ob).tglo.len3+1;
-              if (pieza!=p_corce) { c_error(3,26); } lexer();
-              if (pieza==p_asig) {
+                  if (((*ob).tglo.len3 = constant()) < 0)
+                    c_error(4, 35);
+                } else
+                  (*ob).tglo.len3 = -1;
+              } else {
+                (*ob).tglo.len2 = -1;
+                (*ob).tglo.len3 = -1;
+              }
+              (*ob).tglo.totalen = (*ob).tglo.len1 + 1;
+              if ((*ob).tglo.len2 > -1)
+                (*ob).tglo.totalen *= (*ob).tglo.len2 + 1;
+              if ((*ob).tglo.len3 > -1)
+                (*ob).tglo.totalen *= (*ob).tglo.len3 + 1;
+              if (pieza != p_corce) {
+                c_error(3, 26);
+              }
+              lexer();
+              if (pieza == p_asig) {
                 save_error(1);
-                lexer(); tglo_init(3);
-                if (imem-_imem>(*ob).tglo.totalen) c_error(4,33); }
+                lexer();
+                tglo_init(3);
+                if (imem - _imem > (*ob).tglo.totalen)
+                  c_error(4, 33);
+              }
             }
-            imem=_imem+(*ob).tglo.totalen;
-            test_buffer(&mem,&imem_max,imem);
+            imem = _imem + (*ob).tglo.totalen;
+            test_buffer(&mem, &imem_max, imem);
 
-          } else {                                          // Global variable
+          } else { // Global variable
 
-            (*ob).type=tvglo; (*ob).vglo.offset=imem;
-            if (pieza==p_asig) { lexer(); mem[imem]=constant(); }
-            test_buffer(&mem,&imem_max,++imem);
-
+            (*ob).type = tvglo;
+            (*ob).vglo.offset = imem;
+            if (pieza == p_asig) {
+              lexer();
+              mem[imem] = constant();
+            }
+            test_buffer(&mem, &imem_max, ++imem);
           }
         }
-        if (!free_sintax) if (pieza!=p_ptocoma && pieza!=p_coma) c_error(3,66);
-        while (pieza==p_ptocoma || pieza==p_coma) lexer();
+        if (!free_sintax)
+          if (pieza != p_ptocoma && pieza != p_coma)
+            c_error(3, 66);
+        while (pieza == p_ptocoma || pieza == p_coma)
+          lexer();
       }
     }
   }
@@ -3706,349 +4870,513 @@ void parser (void) {
   //                       | <exp> p_corce [ p_asig <init> ] ) {;}
   //---------------------------------------------------------------------------
 
-  if (pieza==p_local) {
+  if (pieza == p_local) {
     skip_semicolons();
-    while (pieza==p_id || pieza==p_int || pieza==p_pointer || pieza==p_struct || pieza==p_string || pieza==p_byte || pieza==p_word) {
-
-      if (pieza==p_struct) {
-
+    while (pieza == p_id || pieza == p_int || pieza == p_pointer || pieza == p_struct ||
+           pieza == p_string || pieza == p_byte || pieza == p_word) {
+      if (pieza == p_struct) {
         lexer();
 
-        if (pieza==p_pointer) { // Defining a struct pointer
+        if (pieza == p_pointer) { // Defining a struct pointer
 
-          lexer(); if (pieza!=p_id) c_error(1,110); ob=o;
-          if ((*ob).type==tnone) c_error(0,150); // Pointer can't be defined this way
-          if ((*ob).type!=tsglo && (*ob).type!=tsloc) c_error(0,150);
           lexer();
-          puntero_a_struct_local:
-          analyze_pointer_struct(tpslo,iloc,ob);
-          if (pieza==p_asig) { lexer(); loc[iloc]=constant(); }
-          test_buffer(&loc,&iloc_max,iloc++);
-
-          if (pieza==p_coma) {
+          if (pieza != p_id)
+            c_error(1, 110);
+          ob = o;
+          if ((*ob).type == tnone)
+            c_error(0, 150); // Pointer can't be defined this way
+          if ((*ob).type != tsglo && (*ob).type != tsloc)
+            c_error(0, 150);
+          lexer();
+puntero_a_struct_local:
+          analyze_pointer_struct(tpslo, iloc, ob);
+          if (pieza == p_asig) {
             lexer();
-            if (pieza==p_pointer) lexer();
+            loc[iloc] = constant();
+          }
+          test_buffer(&loc, &iloc_max, iloc++);
+
+          if (pieza == p_coma) {
+            lexer();
+            if (pieza == p_pointer)
+              lexer();
             goto puntero_a_struct_local;
           } else {
-            if (!free_sintax) if (pieza!=p_ptocoma) c_error(3,137);
-            while (pieza==p_ptocoma || pieza==p_coma) lexer();
+            if (!free_sintax)
+              if (pieza != p_ptocoma)
+                c_error(3, 137);
+            while (pieza == p_ptocoma || pieza == p_coma)
+              lexer();
           }
 
         } else {
+          if (pieza != p_id)
+            c_error(1, 110);
+          ob = o;
+          member = ob;
+          lexer();
 
-          if (pieza!=p_id) c_error(1,110);
-          ob=o; member=ob; lexer();
+          if ((*ob).type != tnone)
+            c_error(2, 22);
 
-          if ((*ob).type!=tnone) c_error(2,22);
-
-          (*ob).type=tsloc; (*ob).sloc.offset=_imem=iloc;
-          if (pieza==p_corab) {
-            member2=member; member=NULL; lexer();
-            if (((*ob).sloc.items1=constant())<0) c_error(4,123);
-            if (pieza==p_coma) {
+          (*ob).type = tsloc;
+          (*ob).sloc.offset = _imem = iloc;
+          if (pieza == p_corab) {
+            member2 = member;
+            member = NULL;
+            lexer();
+            if (((*ob).sloc.items1 = constant()) < 0)
+              c_error(4, 123);
+            if (pieza == p_coma) {
               lexer();
-              if (((*ob).sloc.items2=constant())<0) c_error(4,123);
-              if (pieza==p_coma) {
+              if (((*ob).sloc.items2 = constant()) < 0)
+                c_error(4, 123);
+              if (pieza == p_coma) {
                 lexer();
-                if (((*ob).sloc.items3=constant())<0) c_error(4,123);
-              } else (*ob).sloc.items3=-1;
-            } else { (*ob).sloc.items2=-1; (*ob).sloc.items3=-1; }
-            member=member2;
-            (*ob).sloc.totalitems=(*ob).sloc.items1+1;
-            if ((*ob).sloc.items2>-1) (*ob).sloc.totalitems*=(*ob).sloc.items2+1;
-            if ((*ob).sloc.items3>-1) (*ob).sloc.totalitems*=(*ob).sloc.items3+1;
-            if (pieza!=p_corce) { c_error(3,26); } lexer();
-          } else {
-            (*ob).sloc.totalitems=1;
-            (*ob).sloc.items1=0; (*ob).sloc.items2=-1; (*ob).sloc.items3=-1;
-          }
-          if (((*ob).sloc.len_item=analyze_struct_local(_imem))==0) c_error(0,57);
-          member=NULL; lexer();
-          iloc=(*ob).sloc.offset; dup=(*ob).sloc.totalitems+1;
-          if (dup>1) {
-            test_buffer(&loc,&iloc_max,iloc+(*ob).sloc.len_item*(*ob).sloc.totalitems);
-            test_buffer(&frm,&ifrm_max,imem+(*ob).sloc.len_item*(*ob).sloc.totalitems);
-            while (--dup) {
-              memcpy(&loc[iloc],&loc[_imem],(*ob).sloc.len_item<<2);
-              memcpy(&frm[iloc],&frm[_imem],(*ob).sloc.len_item<<2);
-              iloc+=(*ob).sloc.len_item;
+                if (((*ob).sloc.items3 = constant()) < 0)
+                  c_error(4, 123);
+              } else
+                (*ob).sloc.items3 = -1;
+            } else {
+              (*ob).sloc.items2 = -1;
+              (*ob).sloc.items3 = -1;
             }
-          } iloc=_imem;
-          if (pieza==p_asig) {
-            save_error(1); lexer(); tloc_init(0);
-            if (iloc-_imem-1>=(*ob).sloc.len_item*(*ob).sloc.totalitems) c_error(4,120);
-          } while (pieza==p_ptocoma) lexer();
-          iloc=_imem+(*ob).sloc.len_item*(*ob).sloc.totalitems;
-          test_buffer(&loc,&iloc_max,iloc);
+            member = member2;
+            (*ob).sloc.totalitems = (*ob).sloc.items1 + 1;
+            if ((*ob).sloc.items2 > -1)
+              (*ob).sloc.totalitems *= (*ob).sloc.items2 + 1;
+            if ((*ob).sloc.items3 > -1)
+              (*ob).sloc.totalitems *= (*ob).sloc.items3 + 1;
+            if (pieza != p_corce) {
+              c_error(3, 26);
+            }
+            lexer();
+          } else {
+            (*ob).sloc.totalitems = 1;
+            (*ob).sloc.items1 = 0;
+            (*ob).sloc.items2 = -1;
+            (*ob).sloc.items3 = -1;
+          }
+          if (((*ob).sloc.len_item = analyze_struct_local(_imem)) == 0)
+            c_error(0, 57);
+          member = NULL;
+          lexer();
+          iloc = (*ob).sloc.offset;
+          dup = (*ob).sloc.totalitems + 1;
+          if (dup > 1) {
+            test_buffer(&loc, &iloc_max, iloc + (*ob).sloc.len_item * (*ob).sloc.totalitems);
+            test_buffer(&frm, &ifrm_max, imem + (*ob).sloc.len_item * (*ob).sloc.totalitems);
+            while (--dup) {
+              memcpy(&loc[iloc], &loc[_imem], (*ob).sloc.len_item << 2);
+              memcpy(&frm[iloc], &frm[_imem], (*ob).sloc.len_item << 2);
+              iloc += (*ob).sloc.len_item;
+            }
+          }
+          iloc = _imem;
+          if (pieza == p_asig) {
+            save_error(1);
+            lexer();
+            tloc_init(0);
+            if (iloc - _imem - 1 >= (*ob).sloc.len_item * (*ob).sloc.totalitems)
+              c_error(4, 120);
+          }
+          while (pieza == p_ptocoma)
+            lexer();
+          iloc = _imem + (*ob).sloc.len_item * (*ob).sloc.totalitems;
+          test_buffer(&loc, &iloc_max, iloc);
         }
 
-      } else if (pieza==p_string) {                     // Local string
+      } else if (pieza == p_string) { // Local string
 
         lexer();
 
-        if (pieza==p_pointer) { // Byte pointer
+        if (pieza == p_pointer) { // Byte pointer
 
-          lexer(); puntero5:
-          ob=analiza_pointer(tpclo,iloc);
-          if (pieza==p_asig) { lexer(); loc[iloc]=constant(); }
-          test_buffer(&loc,&iloc_max,++iloc);
-          if (pieza==p_coma) {
-            lexer(); if (pieza==p_pointer) lexer();
+          lexer();
+puntero5:
+          ob = analiza_pointer(tpclo, iloc);
+          if (pieza == p_asig) {
+            lexer();
+            loc[iloc] = constant();
+          }
+          test_buffer(&loc, &iloc_max, ++iloc);
+          if (pieza == p_coma) {
+            lexer();
+            if (pieza == p_pointer)
+              lexer();
             goto puntero5;
           }
 
         } else {
-
-          if (pieza!=p_id) c_error(1,125);
-          ob=o; if ((*ob).type!=tnone) c_error(0,126); lexer();
-          (*ob).type=tcloc;
-          _imem=iloc;
-          (*ob).cloc.offset=_imem+1;
-          if (pieza==p_corab) {
+          if (pieza != p_id)
+            c_error(1, 125);
+          ob = o;
+          if ((*ob).type != tnone)
+            c_error(0, 126);
+          lexer();
+          (*ob).type = tcloc;
+          _imem = iloc;
+          (*ob).cloc.offset = _imem + 1;
+          if (pieza == p_corab) {
             lexer();
-            if (pieza==p_corce) {
+            if (pieza == p_corce) {
               lexer();
-              (*ob).cloc.totalen=255;
+              (*ob).cloc.totalen = 255;
             } else {
-              if (((*ob).cloc.totalen=constant())<0) c_error(4,127);
-              if ((*ob).cloc.totalen>0xFFFFF) c_error(4,135);
-              if (pieza!=p_corce) c_error(3,26);
+              if (((*ob).cloc.totalen = constant()) < 0)
+                c_error(4, 127);
+              if ((*ob).cloc.totalen > 0xFFFFF)
+                c_error(4, 135);
+              if (pieza != p_corce)
+                c_error(3, 26);
               lexer();
             }
-          } else (*ob).cloc.totalen=255;
-          if (pieza==p_asig) {
+          } else
+            (*ob).cloc.totalen = 255;
+          if (pieza == p_asig) {
             save_error(1);
-            _itxt=itxt;
+            _itxt = itxt;
             lexer();
-            if (pieza!=p_lit && !(pieza==p_id && (*o).type==tcons && (*o).cons.literal))
-              c_error(3,128);
-            if (strlen((char*)&mem[pieza_num])>(*ob).cloc.totalen+1)
-              c_error(4,129);
-            iloc=_imem+1+((*ob).cloc.totalen+5)/4; // e.g. c[32] -> c[0]..c[32],NUL
-            test_buffer(&loc,&iloc_max,iloc);
-            div_strcpy((char*)&loc[_imem+1],(*ob).cloc.totalen+1,(char*)&mem[pieza_num]);
-            itxt=_itxt; // Remove the string from the text segment
+            if (pieza != p_lit && !(pieza == p_id && (*o).type == tcons && (*o).cons.literal))
+              c_error(3, 128);
+            if (strlen((char *)&mem[pieza_num]) > (*ob).cloc.totalen + 1)
+              c_error(4, 129);
+            iloc = _imem + 1 + ((*ob).cloc.totalen + 5) / 4; // e.g. c[32] -> c[0]..c[32],NUL
+            test_buffer(&loc, &iloc_max, iloc);
+            div_strcpy((char *)&loc[_imem + 1], (*ob).cloc.totalen + 1, (char *)&mem[pieza_num]);
+            itxt = _itxt; // Remove the string from the text segment
             lexer();
           } else {
-            iloc=_imem+1+((*ob).cloc.totalen+5)/4;
-            test_buffer(&loc,&iloc_max,iloc);
-          } loc[_imem]=0xDAD00000|(*ob).cloc.totalen;
+            iloc = _imem + 1 + ((*ob).cloc.totalen + 5) / 4;
+            test_buffer(&loc, &iloc_max, iloc);
+          }
+          loc[_imem] = 0xDAD00000 | (*ob).cloc.totalen;
         }
 
-        if (pieza==p_coma) pieza=p_string; else {
-          if (!free_sintax) if (pieza!=p_ptocoma) c_error(3,137);
-          while (pieza==p_ptocoma || pieza==p_coma) lexer();
+        if (pieza == p_coma)
+          pieza = p_string;
+        else {
+          if (!free_sintax)
+            if (pieza != p_ptocoma)
+              c_error(3, 137);
+          while (pieza == p_ptocoma || pieza == p_coma)
+            lexer();
         }
 
-      } else if (pieza==p_byte) {                       // Local byte array
+      } else if (pieza == p_byte) { // Local byte array
 
         lexer();
 
-        if (pieza==p_pointer) { // Byte pointer
+        if (pieza == p_pointer) { // Byte pointer
 
-          lexer(); puntero6:
-          ob=analiza_pointer(tpblo,iloc);
-          if (pieza==p_asig) { lexer(); loc[iloc]=constant(); }
-          test_buffer(&loc,&iloc_max,++iloc);
-          if (pieza==p_coma) {
-            lexer(); if (pieza==p_pointer) lexer();
+          lexer();
+puntero6:
+          ob = analiza_pointer(tpblo, iloc);
+          if (pieza == p_asig) {
+            lexer();
+            loc[iloc] = constant();
+          }
+          test_buffer(&loc, &iloc_max, ++iloc);
+          if (pieza == p_coma) {
+            lexer();
+            if (pieza == p_pointer)
+              lexer();
             goto puntero6;
           }
 
         } else {
-
-          if (pieza!=p_id) c_error(1,142);
-          ob=o; if ((*ob).type!=tnone) c_error(0,117); lexer();
-          (*ob).type=tbloc; (*ob).bloc.offset=_imem=iloc;
-          if (pieza==p_corab) {
+          if (pieza != p_id)
+            c_error(1, 142);
+          ob = o;
+          if ((*ob).type != tnone)
+            c_error(0, 117);
+          lexer();
+          (*ob).type = tbloc;
+          (*ob).bloc.offset = _imem = iloc;
+          if (pieza == p_corab) {
             lexer();
-            if (pieza==p_corce) {
-              lexer(); if (pieza!=p_asig) c_error(3,23); lexer();
-              oimemptr=(byte*)&loc[iloc];
+            if (pieza == p_corce) {
+              lexer();
+              if (pieza != p_asig)
+                c_error(3, 23);
+              lexer();
+              oimemptr = (byte *)&loc[iloc];
               tloc_init(2);
-              (*ob).bloc.len1=imemptr-oimemptr-1;
-              (*ob).bloc.len2=-1;
-              (*ob).bloc.len3=-1;
-              (*ob).bloc.totalen=((*ob).bloc.len1+4)/4;
+              (*ob).bloc.len1 = imemptr - oimemptr - 1;
+              (*ob).bloc.len2 = -1;
+              (*ob).bloc.len3 = -1;
+              (*ob).bloc.totalen = ((*ob).bloc.len1 + 4) / 4;
             } else {
-              if (((*ob).bloc.len1=constant())<0) c_error(4,35);
-              if (pieza==p_coma) {
+              if (((*ob).bloc.len1 = constant()) < 0)
+                c_error(4, 35);
+              if (pieza == p_coma) {
                 lexer();
-                if (((*ob).bloc.len2=constant())<0) c_error(4,35);
-                if (pieza==p_coma) {
+                if (((*ob).bloc.len2 = constant()) < 0)
+                  c_error(4, 35);
+                if (pieza == p_coma) {
                   lexer();
-                  if (((*ob).bloc.len3=constant())<0) c_error(4,35);
-                } else (*ob).bloc.len3=-1;
-              } else { (*ob).bloc.len2=-1; (*ob).bloc.len3=-1; }
+                  if (((*ob).bloc.len3 = constant()) < 0)
+                    c_error(4, 35);
+                } else
+                  (*ob).bloc.len3 = -1;
+              } else {
+                (*ob).bloc.len2 = -1;
+                (*ob).bloc.len3 = -1;
+              }
 
-              (*ob).bloc.totalen=(*ob).bloc.len1+1;
-              if ((*ob).bloc.len2>-1) (*ob).bloc.totalen*=(*ob).bloc.len2+1;
-              if ((*ob).bloc.len3>-1) (*ob).bloc.totalen*=(*ob).bloc.len3+1;
-              if (pieza!=p_corce) { c_error(3,26); } lexer();
-              if (pieza==p_asig) {
+              (*ob).bloc.totalen = (*ob).bloc.len1 + 1;
+              if ((*ob).bloc.len2 > -1)
+                (*ob).bloc.totalen *= (*ob).bloc.len2 + 1;
+              if ((*ob).bloc.len3 > -1)
+                (*ob).bloc.totalen *= (*ob).bloc.len3 + 1;
+              if (pieza != p_corce) {
+                c_error(3, 26);
+              }
+              lexer();
+              if (pieza == p_asig) {
                 save_error(1);
                 lexer();
-                oimemptr=(byte*)&loc[iloc];
+                oimemptr = (byte *)&loc[iloc];
                 tloc_init(2);
-                if (imemptr-oimemptr>(*ob).bloc.totalen) c_error(4,33);
-              } (*ob).bloc.totalen=((*ob).bloc.totalen+3)/4;
+                if (imemptr - oimemptr > (*ob).bloc.totalen)
+                  c_error(4, 33);
+              }
+              (*ob).bloc.totalen = ((*ob).bloc.totalen + 3) / 4;
             }
-          } else {                                          // Byte local
-            (*ob).type=tbloc; (*ob).bloc.offset=iloc;
-            (*ob).bloc.len1=0;
-            (*ob).bloc.len2=-1;
-            (*ob).bloc.len3=-1;
-            (*ob).bloc.totalen=1; // 1 int
-            if (pieza==p_asig) {
+          } else { // Byte local
+            (*ob).type = tbloc;
+            (*ob).bloc.offset = iloc;
+            (*ob).bloc.len1 = 0;
+            (*ob).bloc.len2 = -1;
+            (*ob).bloc.len3 = -1;
+            (*ob).bloc.totalen = 1; // 1 int
+            if (pieza == p_asig) {
               save_error(1);
               lexer();
-              loc[iloc]=constant();
-              if (loc[iloc]<0 || loc[iloc]>255) c_error(4,143);
+              loc[iloc] = constant();
+              if (loc[iloc] < 0 || loc[iloc] > 255)
+                c_error(4, 143);
             }
-          } iloc=_imem+(*ob).bloc.totalen; test_buffer(&loc,&iloc_max,iloc);
+          }
+          iloc = _imem + (*ob).bloc.totalen;
+          test_buffer(&loc, &iloc_max, iloc);
         }
 
-        if (pieza==p_coma) pieza=p_byte; else {
-          if (!free_sintax) if (pieza!=p_ptocoma) c_error(3,137);
-          while (pieza==p_ptocoma || pieza==p_coma) lexer();
+        if (pieza == p_coma)
+          pieza = p_byte;
+        else {
+          if (!free_sintax)
+            if (pieza != p_ptocoma)
+              c_error(3, 137);
+          while (pieza == p_ptocoma || pieza == p_coma)
+            lexer();
         }
 
-      } else if (pieza==p_word) {                       // Local word array
+      } else if (pieza == p_word) { // Local word array
 
         lexer();
 
-        if (pieza==p_pointer) { // Word pointer
+        if (pieza == p_pointer) { // Word pointer
 
-          lexer(); puntero7:
-          ob=analiza_pointer(tpwlo,iloc);
-          if (pieza==p_asig) { lexer(); loc[iloc]=constant(); }
-          test_buffer(&loc,&iloc_max,++iloc);
-          if (pieza==p_coma) {
-            lexer(); if (pieza==p_pointer) lexer();
+          lexer();
+puntero7:
+          ob = analiza_pointer(tpwlo, iloc);
+          if (pieza == p_asig) {
+            lexer();
+            loc[iloc] = constant();
+          }
+          test_buffer(&loc, &iloc_max, ++iloc);
+          if (pieza == p_coma) {
+            lexer();
+            if (pieza == p_pointer)
+              lexer();
             goto puntero7;
           }
 
         } else {
-
-          if (pieza!=p_id) c_error(1,145);
-          ob=o; if ((*ob).type!=tnone) c_error(0,117); lexer();
-          (*ob).type=twloc; (*ob).wloc.offset=_imem=iloc;
-          if (pieza==p_corab) {
+          if (pieza != p_id)
+            c_error(1, 145);
+          ob = o;
+          if ((*ob).type != tnone)
+            c_error(0, 117);
+          lexer();
+          (*ob).type = twloc;
+          (*ob).wloc.offset = _imem = iloc;
+          if (pieza == p_corab) {
             lexer();
-            if (pieza==p_corce) {
-              lexer(); if (pieza!=p_asig) c_error(3,23); lexer();
-              oimemptr=(byte*)&loc[iloc];
+            if (pieza == p_corce) {
+              lexer();
+              if (pieza != p_asig)
+                c_error(3, 23);
+              lexer();
+              oimemptr = (byte *)&loc[iloc];
               tloc_init(1);
-              (*ob).wloc.len1=(imemptr-oimemptr)/2-1;
-              (*ob).wloc.len2=-1;
-              (*ob).wloc.len3=-1;
-              (*ob).wloc.totalen=((*ob).wloc.len1+2)/2;
+              (*ob).wloc.len1 = (imemptr - oimemptr) / 2 - 1;
+              (*ob).wloc.len2 = -1;
+              (*ob).wloc.len3 = -1;
+              (*ob).wloc.totalen = ((*ob).wloc.len1 + 2) / 2;
             } else {
-              if (((*ob).wloc.len1=constant())<0) c_error(4,35);
-              if (pieza==p_coma) {
+              if (((*ob).wloc.len1 = constant()) < 0)
+                c_error(4, 35);
+              if (pieza == p_coma) {
                 lexer();
-                if (((*ob).wloc.len2=constant())<0) c_error(4,35);
-                if (pieza==p_coma) {
+                if (((*ob).wloc.len2 = constant()) < 0)
+                  c_error(4, 35);
+                if (pieza == p_coma) {
                   lexer();
-                  if (((*ob).wloc.len3=constant())<0) c_error(4,35);
-                } else (*ob).wloc.len3=-1;
-              } else { (*ob).wloc.len2=-1; (*ob).wloc.len3=-1; }
+                  if (((*ob).wloc.len3 = constant()) < 0)
+                    c_error(4, 35);
+                } else
+                  (*ob).wloc.len3 = -1;
+              } else {
+                (*ob).wloc.len2 = -1;
+                (*ob).wloc.len3 = -1;
+              }
 
-              (*ob).wloc.totalen=(*ob).wloc.len1+1;
-              if ((*ob).wloc.len2>-1) (*ob).wloc.totalen*=(*ob).wloc.len2+1;
-              if ((*ob).wloc.len3>-1) (*ob).wloc.totalen*=(*ob).wloc.len3+1;
-              if (pieza!=p_corce) { c_error(3,26); } lexer();
-              if (pieza==p_asig) {
+              (*ob).wloc.totalen = (*ob).wloc.len1 + 1;
+              if ((*ob).wloc.len2 > -1)
+                (*ob).wloc.totalen *= (*ob).wloc.len2 + 1;
+              if ((*ob).wloc.len3 > -1)
+                (*ob).wloc.totalen *= (*ob).wloc.len3 + 1;
+              if (pieza != p_corce) {
+                c_error(3, 26);
+              }
+              lexer();
+              if (pieza == p_asig) {
                 save_error(1);
                 lexer();
-                oimemptr=(byte*)&loc[iloc];
+                oimemptr = (byte *)&loc[iloc];
                 tloc_init(1);
-                if (imemptr-oimemptr>(*ob).wloc.totalen*2) c_error(4,33);
-              } (*ob).wloc.totalen=((*ob).wloc.totalen+1)/2;
+                if (imemptr - oimemptr > (*ob).wloc.totalen * 2)
+                  c_error(4, 33);
+              }
+              (*ob).wloc.totalen = ((*ob).wloc.totalen + 1) / 2;
             }
-          } else {                                          // Word local
-            (*ob).type=twloc; (*ob).wloc.offset=iloc;
-            (*ob).wloc.len1=0;
-            (*ob).wloc.len2=-1;
-            (*ob).wloc.len3=-1;
-            (*ob).wloc.totalen=1; // 1 int
-            if (pieza==p_asig) {
+          } else { // Word local
+            (*ob).type = twloc;
+            (*ob).wloc.offset = iloc;
+            (*ob).wloc.len1 = 0;
+            (*ob).wloc.len2 = -1;
+            (*ob).wloc.len3 = -1;
+            (*ob).wloc.totalen = 1; // 1 int
+            if (pieza == p_asig) {
               save_error(1);
               lexer();
-              loc[iloc]=constant();
-              if (loc[iloc]<0 || loc[iloc]>65535) c_error(4,144);
+              loc[iloc] = constant();
+              if (loc[iloc] < 0 || loc[iloc] > 65535)
+                c_error(4, 144);
             }
-          } iloc=_imem+(*ob).wloc.totalen; test_buffer(&loc,&iloc_max,iloc);
+          }
+          iloc = _imem + (*ob).wloc.totalen;
+          test_buffer(&loc, &iloc_max, iloc);
         }
 
-        if (pieza==p_coma) pieza=p_word; else {
-          if (!free_sintax) if (pieza!=p_ptocoma) c_error(3,137);
-          while (pieza==p_ptocoma || pieza==p_coma) lexer();
+        if (pieza == p_coma)
+          pieza = p_word;
+        else {
+          if (!free_sintax)
+            if (pieza != p_ptocoma)
+              c_error(3, 137);
+          while (pieza == p_ptocoma || pieza == p_coma)
+            lexer();
         }
 
-      } else if (pieza==p_int || pieza==p_id || pieza==p_pointer) {
-
-        if (pieza==p_int) {
+      } else if (pieza == p_int || pieza == p_id || pieza == p_pointer) {
+        if (pieza == p_int) {
           lexer();
-          if (pieza!=p_id && pieza!=p_pointer) c_error(1,149);
+          if (pieza != p_id && pieza != p_pointer)
+            c_error(1, 149);
         }
 
-        if (pieza==p_pointer) { // Int pointer member
+        if (pieza == p_pointer) { // Int pointer member
 
-          lexer(); puntero8:
-          ob=analiza_pointer(tpilo,iloc);
-          if (pieza==p_asig) { lexer(); loc[iloc]=constant(); }
-          test_buffer(&loc,&iloc_max,++iloc);
-          if (pieza==p_coma) {
-            lexer(); if (pieza==p_pointer) lexer();
+          lexer();
+puntero8:
+          ob = analiza_pointer(tpilo, iloc);
+          if (pieza == p_asig) {
+            lexer();
+            loc[iloc] = constant();
+          }
+          test_buffer(&loc, &iloc_max, ++iloc);
+          if (pieza == p_coma) {
+            lexer();
+            if (pieza == p_pointer)
+              lexer();
             goto puntero8;
           }
 
         } else {
-
-          ob=o; if ((*ob).type!=tnone) c_error(0,117); lexer();
-          if (pieza==p_corab) {                             // Local table
+          ob = o;
+          if ((*ob).type != tnone)
+            c_error(0, 117);
+          lexer();
+          if (pieza == p_corab) { // Local table
             lexer();
-            (*ob).type=ttloc; (*ob).tloc.offset=_imem=iloc;
-            if (pieza==p_corce) {
-              lexer(); if (pieza!=p_asig) c_error(3,23); lexer();
+            (*ob).type = ttloc;
+            (*ob).tloc.offset = _imem = iloc;
+            if (pieza == p_corce) {
+              lexer();
+              if (pieza != p_asig)
+                c_error(3, 23);
+              lexer();
               tloc_init(3);
-              (*ob).tloc.len1=iloc-_imem-1;
-              (*ob).tloc.len2=-1;
-              (*ob).tloc.len3=-1;
-              (*ob).tloc.totalen=iloc-_imem;
+              (*ob).tloc.len1 = iloc - _imem - 1;
+              (*ob).tloc.len2 = -1;
+              (*ob).tloc.len3 = -1;
+              (*ob).tloc.totalen = iloc - _imem;
             } else {
-              if (((*ob).tloc.len1=constant())<0) c_error(4,35);
-              if (pieza==p_coma) {
+              if (((*ob).tloc.len1 = constant()) < 0)
+                c_error(4, 35);
+              if (pieza == p_coma) {
                 lexer();
-                if (((*ob).tloc.len2=constant())<0) c_error(4,35);
-                if (pieza==p_coma) {
+                if (((*ob).tloc.len2 = constant()) < 0)
+                  c_error(4, 35);
+                if (pieza == p_coma) {
                   lexer();
-                  if (((*ob).tloc.len3=constant())<0) c_error(4,35);
-                } else (*ob).tloc.len3=-1;
-              } else { (*ob).tloc.len2=-1; (*ob).tloc.len3=-1; }
-              (*ob).tloc.totalen=(*ob).tloc.len1+1;
-              if ((*ob).tloc.len2>-1) (*ob).tloc.totalen*=(*ob).tloc.len2+1;
-              if ((*ob).tloc.len3>-1) (*ob).tloc.totalen*=(*ob).tloc.len3+1;
-              if (pieza!=p_corce) { c_error(3,26); } lexer();
-              if (pieza==p_asig) {
+                  if (((*ob).tloc.len3 = constant()) < 0)
+                    c_error(4, 35);
+                } else
+                  (*ob).tloc.len3 = -1;
+              } else {
+                (*ob).tloc.len2 = -1;
+                (*ob).tloc.len3 = -1;
+              }
+              (*ob).tloc.totalen = (*ob).tloc.len1 + 1;
+              if ((*ob).tloc.len2 > -1)
+                (*ob).tloc.totalen *= (*ob).tloc.len2 + 1;
+              if ((*ob).tloc.len3 > -1)
+                (*ob).tloc.totalen *= (*ob).tloc.len3 + 1;
+              if (pieza != p_corce) {
+                c_error(3, 26);
+              }
+              lexer();
+              if (pieza == p_asig) {
                 save_error(1);
-                lexer(); tloc_init(3);
-                if (iloc-_imem>(*ob).tloc.totalen) c_error(4,33); }
+                lexer();
+                tloc_init(3);
+                if (iloc - _imem > (*ob).tloc.totalen)
+                  c_error(4, 33);
+              }
             }
-            iloc=_imem+(*ob).tloc.totalen;
-            test_buffer(&loc,&iloc_max,iloc);
+            iloc = _imem + (*ob).tloc.totalen;
+            test_buffer(&loc, &iloc_max, iloc);
 
-          } else {                                          // Variable local
+          } else { // Variable local
 
-            (*ob).type=tvloc; (*ob).vloc.offset=iloc;
-            if (pieza==p_asig) { lexer(); loc[iloc]=constant(); }
-            test_buffer(&loc,&iloc_max,++iloc);
-
+            (*ob).type = tvloc;
+            (*ob).vloc.offset = iloc;
+            if (pieza == p_asig) {
+              lexer();
+              loc[iloc] = constant();
+            }
+            test_buffer(&loc, &iloc_max, ++iloc);
           }
         }
-        if (!free_sintax) if (pieza!=p_ptocoma && pieza!=p_coma) c_error(3,66);
-        while (pieza==p_ptocoma || pieza==p_coma) lexer();
+        if (!free_sintax)
+          if (pieza != p_ptocoma && pieza != p_coma)
+            c_error(3, 66);
+        while (pieza == p_ptocoma || pieza == p_coma)
+          lexer();
       }
     }
   }
@@ -4059,33 +5387,49 @@ void parser (void) {
 
   // Generate jump to start of code (long_header)
 
-  mem[0]=program_type; mem[1]=imem; iloc_len=iloc;
+  mem[0] = program_type;
+  mem[1] = imem;
+  iloc_len = iloc;
 
-  g2(ltyp,(intptr_t)bloque_actual);
-  g2(lcbp,0);
-  if (pieza==p_import) c_error(0,147); // Warn DIV 1 users
+  g2(ltyp, (intptr_t)bloque_actual);
+  g2(lcbp, 0);
+  if (pieza == p_import)
+    c_error(0, 147); // Warn DIV 1 users
   // The first FRAME and PRIVATE variable loading are executed
   // together in the BEGIN of the main program.
 
-  final=imem;
+  final = imem;
 
-  parametros=-1;
-  bloque_lexico=bloque_actual;
-  n=iloc; analyze_private();
-  if (iloc>iloc_len) { iloc_len=iloc; } iloc=n;
-  parametros=0;
+  parametros = -1;
+  bloque_lexico = bloque_actual;
+  n = iloc;
+  analyze_private();
+  if (iloc > iloc_len) {
+    iloc_len = iloc;
+  }
+  iloc = n;
+  parametros = 0;
 
   g1(lfrm);
 
-  if (pieza!=p_begin) c_error(0,29);
-  statement_start(); inicio=final;
-  lexer(); statement_end(); record_statement();
+  if (pieza != p_begin)
+    c_error(0, 29);
+  statement_start();
+  inicio = final;
+  lexer();
+  statement_end();
+  record_statement();
 
   statement();
 
-  if (pieza!=p_end) { c_error(0,40); } statement_start();
+  if (pieza != p_end) {
+    c_error(0, 40);
+  }
+  statement_start();
   g1(lret);
-  skip_semicolons(); statement_end(); record_statement();
+  skip_semicolons();
+  statement_end();
+  record_statement();
 
   //---------------------------------------------------------------------------
   // Processes
@@ -4094,553 +5438,810 @@ void parser (void) {
   //---------------------------------------------------------------------------
 
   save_error(0);
-  while (pieza==p_process || pieza==p_function) {
-    n=pieza; statement_start(); lexer();
-    if (pieza!=p_id) { c_error(1,111); } ob=o; lexer();
-    if ((*ob).type==tproc && (*ob).usado) {
-      num_par=(*ob).proc.num_par; bloque_lexico=bloque_actual=ob;
-      _imem=(*ob).proc.offset; while(_imem) {
-         _imem_old=mem[_imem]; mem[_imem]=imem; _imem=_imem_old; }
-    } else if ((*ob).type==tnone) {
-      (*ob).usado=0; (*ob).type=tproc;
-      (*ob).proc.bloque=bloque_lexico=bloque_actual=ob;
-    } else c_error(2,118);
-    (*ob).proc.offset=imem; (*ob).proc.num_par=0;
+  while (pieza == p_process || pieza == p_function) {
+    n = pieza;
+    statement_start();
+    lexer();
+    if (pieza != p_id) {
+      c_error(1, 111);
+    }
+    ob = o;
+    lexer();
+    if ((*ob).type == tproc && (*ob).usado) {
+      num_par = (*ob).proc.num_par;
+      bloque_lexico = bloque_actual = ob;
+      _imem = (*ob).proc.offset;
+      while (_imem) {
+        _imem_old = mem[_imem];
+        mem[_imem] = imem;
+        _imem = _imem_old;
+      }
+    } else if ((*ob).type == tnone) {
+      (*ob).usado = 0;
+      (*ob).type = tproc;
+      (*ob).proc.bloque = bloque_lexico = bloque_actual = ob;
+    } else
+      c_error(2, 118);
+    (*ob).proc.offset = imem;
+    (*ob).proc.num_par = 0;
 
-    g2(ltyp,(intptr_t)bloque_actual);
-    if (n==p_function) g1(lnop);
-    g2(lcbp,0); _imem=imem-1;
-    if (pieza!=p_abrir) c_error(3,36);
+    g2(ltyp, (intptr_t)bloque_actual);
+    if (n == p_function)
+      g1(lnop);
+    g2(lcbp, 0);
+    _imem = imem - 1;
+    if (pieza != p_abrir)
+      c_error(3, 36);
 
-    parametros=1; n=iloc; lexer();
+    parametros = 1;
+    n = iloc;
+    lexer();
 
-    while (pieza!=p_cerrar) {
-      (*ob).proc.num_par++; expression_cpa();
-      if (pieza!=p_cerrar) { if (pieza!=p_coma) c_error(3,25);
-        else { lexer(); if (pieza==p_cerrar) c_error(3,45); } }
-    } if ((*ob).usado) {
-      if (num_par==(*ob).proc.num_par) (*ob).usado=0; else c_error(0,46);
+    while (pieza != p_cerrar) {
+      (*ob).proc.num_par++;
+      expression_cpa();
+      if (pieza != p_cerrar) {
+        if (pieza != p_coma)
+          c_error(3, 25);
+        else {
+          lexer();
+          if (pieza == p_cerrar)
+            c_error(3, 45);
+        }
+      }
+    }
+    if ((*ob).usado) {
+      if (num_par == (*ob).proc.num_par)
+        (*ob).usado = 0;
+      else
+        c_error(0, 46);
     }
 
-    skip_semicolons(); statement_end();
+    skip_semicolons();
+    statement_end();
 
-    if (parametros>1) {
-      g2(lpar,parametros-1);
+    if (parametros > 1) {
+      g2(lpar, parametros - 1);
     }
 
-    parametros=-1; // Allow parameters to be redeclared as PRIVATE
+    parametros = -1; // Allow parameters to be redeclared as PRIVATE
 
-    num_par=mem[_imem]=(*ob).proc.num_par;
+    num_par = mem[_imem] = (*ob).proc.num_par;
 
-    analyze_private(); parametros=0;
+    analyze_private();
+    parametros = 0;
 
-    if (iloc>iloc_len) { iloc_len=iloc; } iloc=n;
+    if (iloc > iloc_len) {
+      iloc_len = iloc;
+    }
+    iloc = n;
 
-    if (pieza!=p_begin) { c_error(0,29); } lexer();
-    final=imem-1; record_statement();
+    if (pieza != p_begin) {
+      c_error(0, 29);
+    }
+    lexer();
+    final = imem - 1;
+    record_statement();
     statement();
-    if (pieza!=p_end) { c_error(0,40); } statement_start();
+    if (pieza != p_end) {
+      c_error(0, 40);
+    }
+    statement_start();
     g1(lret);
-    skip_semicolons(); statement_end(); record_statement();
+    skip_semicolons();
+    statement_end();
+    record_statement();
 
     save_error(0);
   }
 
-  if (pieza!=p_ultima) c_error(4,52);
-
+  if (pieza != p_ultima)
+    c_error(4, 52);
 }
 
-  //---------------------------------------------------------------------------
-  // Parse private variables of a block, like locals
-  //---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+// Parse private variables of a block, like locals
+//---------------------------------------------------------------------------
 
-    // WARNING: Remote access to private variables (#id.private_var) must not
-    //          be allowed, unless #id is the same process type as the current
-    //          one (i.e., a sibling process).
+// WARNING: Remote access to private variables (#id.private_var) must not
+//          be allowed, unless #id is the same process type as the current
+//          one (i.e., a sibling process).
 
 void analyze_private(void) {
-  struct objeto * ob=NULL, * member2;
-  int _imem,_imem_old,_itxt,dup;
+  struct objeto *ob = NULL, *member2;
+  int _imem, _imem_old, _itxt, dup;
   byte *oimemptr;
 
-  if (pieza==p_private) {
+  if (pieza == p_private) {
     skip_semicolons();
 
-    g2(lpri,0); _imem_old=imem-1;
+    g2(lpri, 0);
+    _imem_old = imem - 1;
 
-    while (pieza==p_id || pieza==p_int || pieza==p_pointer || pieza==p_struct || pieza==p_string || pieza==p_byte || pieza==p_word) {
-
-      if (pieza==p_struct) {
-
+    while (pieza == p_id || pieza == p_int || pieza == p_pointer || pieza == p_struct ||
+           pieza == p_string || pieza == p_byte || pieza == p_word) {
+      if (pieza == p_struct) {
         lexer();
 
-        if (pieza==p_pointer) { // Defining a struct pointer
+        if (pieza == p_pointer) { // Defining a struct pointer
 
-          lexer(); if (pieza!=p_id) c_error(1,110); ob=o;
-          if ((*ob).type==tnone) c_error(0,150); // Pointer can't be defined this way
-          if ((*ob).type!=tsglo && (*ob).type!=tsloc) c_error(0,150);
           lexer();
-          puntero_a_struct:
-          if (analyze_pointer_struct(tpslo,iloc,ob)==1) {
+          if (pieza != p_id)
+            c_error(1, 110);
+          ob = o;
+          if ((*ob).type == tnone)
+            c_error(0, 150); // Pointer can't be defined this way
+          if ((*ob).type != tsglo && (*ob).type != tsloc)
+            c_error(0, 150);
+          lexer();
+puntero_a_struct:
+          if (analyze_pointer_struct(tpslo, iloc, ob) == 1) {
             iloc++;
-            if (pieza==p_asig) { lexer(); mem[imem]=constant(); }
-            test_buffer(&mem,&imem_max,++imem);
+            if (pieza == p_asig) {
+              lexer();
+              mem[imem] = constant();
+            }
+            test_buffer(&mem, &imem_max, ++imem);
           }
 
-          if (pieza==p_coma) {
+          if (pieza == p_coma) {
             lexer();
-            if (pieza==p_pointer) lexer();
+            if (pieza == p_pointer)
+              lexer();
             goto puntero_a_struct;
           } else {
-            if (!free_sintax) if (pieza!=p_ptocoma) c_error(3,137);
-            while (pieza==p_ptocoma || pieza==p_coma) lexer();
+            if (!free_sintax)
+              if (pieza != p_ptocoma)
+                c_error(3, 137);
+            while (pieza == p_ptocoma || pieza == p_coma)
+              lexer();
           }
 
         } else {
+          if (pieza != p_id)
+            c_error(1, 110);
+          ob = o;
+          member = ob;
+          lexer();
 
-          if (pieza!=p_id) c_error(1,110);
-          ob=o; member=ob; lexer();
+          if ((*ob).type != tnone)
+            c_error(2, 22);
 
-          if ((*ob).type!=tnone) c_error(2,22);
-
-          (*ob).type=tsloc; (*ob).sloc.offset=_imem=imem;
-          if (pieza==p_corab) {
-            member2=member; member=NULL; lexer();
-            if (((*ob).sloc.items1=constant())<0) c_error(4,123);
-            if (pieza==p_coma) {
+          (*ob).type = tsloc;
+          (*ob).sloc.offset = _imem = imem;
+          if (pieza == p_corab) {
+            member2 = member;
+            member = NULL;
+            lexer();
+            if (((*ob).sloc.items1 = constant()) < 0)
+              c_error(4, 123);
+            if (pieza == p_coma) {
               lexer();
-              if (((*ob).sloc.items2=constant())<0) c_error(4,123);
-              if (pieza==p_coma) {
+              if (((*ob).sloc.items2 = constant()) < 0)
+                c_error(4, 123);
+              if (pieza == p_coma) {
                 lexer();
-                if (((*ob).sloc.items3=constant())<0) c_error(4,123);
-              } else (*ob).sloc.items3=-1;
-            } else { (*ob).sloc.items2=-1; (*ob).sloc.items3=-1; }
-            member=member2;
-            (*ob).sloc.totalitems=(*ob).sloc.items1+1;
-            if ((*ob).sloc.items2>-1) (*ob).sloc.totalitems*=(*ob).sloc.items2+1;
-            if ((*ob).sloc.items3>-1) (*ob).sloc.totalitems*=(*ob).sloc.items3+1;
-            if (pieza!=p_corce) { c_error(3,26); } lexer();
-          } else {
-            (*ob).sloc.totalitems=1;
-            (*ob).sloc.items1=0; (*ob).sloc.items2=-1; (*ob).sloc.items3=-1;
-          }
-          if (((*ob).sloc.len_item=analyze_struct_private(_imem))==0) c_error(0,57);
-
-          member=NULL; lexer();
-
-          imem=(*ob).sloc.offset; dup=(*ob).sloc.totalitems+1;
-          if (dup>1) {
-            test_buffer(&mem,&imem_max,imem+(*ob).sloc.len_item*(*ob).sloc.totalitems);
-            test_buffer(&frm,&ifrm_max,imem+(*ob).sloc.len_item*(*ob).sloc.totalitems);
-            while (--dup) {
-            	if(imem!=_imem) {
-	              memcpy(&mem[imem],&mem[_imem],(*ob).sloc.len_item<<2);
-	              memcpy(&frm[imem],&frm[_imem],(*ob).sloc.len_item<<2);
-	          	}
-              	imem+=(*ob).sloc.len_item;
+                if (((*ob).sloc.items3 = constant()) < 0)
+                  c_error(4, 123);
+              } else
+                (*ob).sloc.items3 = -1;
+            } else {
+              (*ob).sloc.items2 = -1;
+              (*ob).sloc.items3 = -1;
             }
-          } imem=_imem;
+            member = member2;
+            (*ob).sloc.totalitems = (*ob).sloc.items1 + 1;
+            if ((*ob).sloc.items2 > -1)
+              (*ob).sloc.totalitems *= (*ob).sloc.items2 + 1;
+            if ((*ob).sloc.items3 > -1)
+              (*ob).sloc.totalitems *= (*ob).sloc.items3 + 1;
+            if (pieza != p_corce) {
+              c_error(3, 26);
+            }
+            lexer();
+          } else {
+            (*ob).sloc.totalitems = 1;
+            (*ob).sloc.items1 = 0;
+            (*ob).sloc.items2 = -1;
+            (*ob).sloc.items3 = -1;
+          }
+          if (((*ob).sloc.len_item = analyze_struct_private(_imem)) == 0)
+            c_error(0, 57);
 
-          if (pieza==p_asig) {
-            save_error(1); lexer(); tglo_init(0);
-            if (imem-_imem-1>=(*ob).sloc.len_item*(*ob).sloc.totalitems) c_error(4,120);
-          } while (pieza==p_ptocoma) lexer();
+          member = NULL;
+          lexer();
 
-          imem=_imem+(*ob).sloc.len_item*(*ob).sloc.totalitems;
-          (*ob).sloc.offset=iloc; iloc+=(*ob).sloc.len_item*(*ob).sloc.totalitems;
-          test_buffer(&mem,&imem_max,imem);
+          imem = (*ob).sloc.offset;
+          dup = (*ob).sloc.totalitems + 1;
+          if (dup > 1) {
+            test_buffer(&mem, &imem_max, imem + (*ob).sloc.len_item * (*ob).sloc.totalitems);
+            test_buffer(&frm, &ifrm_max, imem + (*ob).sloc.len_item * (*ob).sloc.totalitems);
+            while (--dup) {
+              if (imem != _imem) {
+                memcpy(&mem[imem], &mem[_imem], (*ob).sloc.len_item << 2);
+                memcpy(&frm[imem], &frm[_imem], (*ob).sloc.len_item << 2);
+              }
+              imem += (*ob).sloc.len_item;
+            }
+          }
+          imem = _imem;
+
+          if (pieza == p_asig) {
+            save_error(1);
+            lexer();
+            tglo_init(0);
+            if (imem - _imem - 1 >= (*ob).sloc.len_item * (*ob).sloc.totalitems)
+              c_error(4, 120);
+          }
+          while (pieza == p_ptocoma)
+            lexer();
+
+          imem = _imem + (*ob).sloc.len_item * (*ob).sloc.totalitems;
+          (*ob).sloc.offset = iloc;
+          iloc += (*ob).sloc.len_item * (*ob).sloc.totalitems;
+          test_buffer(&mem, &imem_max, imem);
         }
 
-      } else if (pieza==p_string) {                     // Private string
+      } else if (pieza == p_string) { // Private string
 
         lexer();
 
-        if (pieza==p_pointer) { // Byte pointer
+        if (pieza == p_pointer) { // Byte pointer
 
-          lexer(); puntero1:
-          ob=analiza_pointer(tpclo,iloc);
-          if (ob==NULL) continue; else iloc++;
-          if (pieza==p_asig) { lexer(); mem[imem]=constant(); }
-          test_buffer(&mem,&imem_max,++imem);
-          if (pieza==p_coma) {
-            lexer(); if (pieza==p_pointer) lexer();
+          lexer();
+puntero1:
+          ob = analiza_pointer(tpclo, iloc);
+          if (ob == NULL)
+            continue;
+          else
+            iloc++;
+          if (pieza == p_asig) {
+            lexer();
+            mem[imem] = constant();
+          }
+          test_buffer(&mem, &imem_max, ++imem);
+          if (pieza == p_coma) {
+            lexer();
+            if (pieza == p_pointer)
+              lexer();
             goto puntero1;
           }
 
         } else {
-
-          if (pieza!=p_id) c_error(1,125);
-          ob=o; if ((*ob).type!=tnone) { // Check if a parameter is redeclared ...
-            if (parametros==-1 && (*ob).param==1 && (*ob).bloque==bloque_actual) {
-              if ((*ob).type==tcloc) { // String parameter redeclared
+          if (pieza != p_id)
+            c_error(1, 125);
+          ob = o;
+          if ((*ob).type != tnone) { // Check if a parameter is redeclared ...
+            if (parametros == -1 && (*ob).param == 1 && (*ob).bloque == bloque_actual) {
+              if ((*ob).type == tcloc) { // String parameter redeclared
                 save_error(0);
                 lexer();
-                if (pieza==p_corab) {
+                if (pieza == p_corab) {
                   lexer();
-                  if (pieza==p_corce) {
+                  if (pieza == p_corce) {
                     lexer();
-                    dup=255;
+                    dup = 255;
                   } else {
-                    dup=constant();
-                    if (pieza!=p_corce) c_error(3,26);
+                    dup = constant();
+                    if (pieza != p_corce)
+                      c_error(3, 26);
                     lexer();
                   }
-                } else dup=255;
-                if (dup!=(*ob).cloc.totalen) c_error(4,141);
-                else if (pieza==p_asig) c_error(0,54);
+                } else
+                  dup = 255;
+                if (dup != (*ob).cloc.totalen)
+                  c_error(4, 141);
+                else if (pieza == p_asig)
+                  c_error(0, 54);
                 else {
-                  while (pieza==p_ptocoma || pieza==p_coma) lexer();
+                  while (pieza == p_ptocoma || pieza == p_coma)
+                    lexer();
                   (*ob).param++;
                   continue;
                 }
-              } else c_error(0,126);
-            } else c_error(0,126);
-          } else lexer();
-
-          (*ob).type=tcloc;
-          _imem=imem;
-          if (pieza==p_corab) {
+              } else
+                c_error(0, 126);
+            } else
+              c_error(0, 126);
+          } else
             lexer();
-            if (pieza==p_corce) {
+
+          (*ob).type = tcloc;
+          _imem = imem;
+          if (pieza == p_corab) {
+            lexer();
+            if (pieza == p_corce) {
               lexer();
-              (*ob).cloc.totalen=255;
+              (*ob).cloc.totalen = 255;
             } else {
-              if (((*ob).cloc.totalen=constant())<0) c_error(4,127);
-              if ((*ob).cloc.totalen>0xFFFFF) c_error(4,135);
-              if (pieza!=p_corce) c_error(3,26);
+              if (((*ob).cloc.totalen = constant()) < 0)
+                c_error(4, 127);
+              if ((*ob).cloc.totalen > 0xFFFFF)
+                c_error(4, 135);
+              if (pieza != p_corce)
+                c_error(3, 26);
               lexer();
             }
-          } else (*ob).cloc.totalen=255;
-          if (pieza==p_asig) {
+          } else
+            (*ob).cloc.totalen = 255;
+          if (pieza == p_asig) {
             save_error(1);
-            _itxt=itxt;
+            _itxt = itxt;
             lexer();
-            if (pieza!=p_lit && !(pieza==p_id && (*o).type==tcons && (*o).cons.literal))
-              c_error(3,128);
-            if (strlen((char*)&mem[pieza_num])>(*ob).cloc.totalen+1)
-              c_error(4,129);
-            imem=_imem+1+((*ob).cloc.totalen+5)/4; // e.g. c[32] -> c[0]..c[32],NUL
-            test_buffer(&mem,&imem_max,imem);
-            memmove((char*)&mem[_imem+1],(char*)&mem[pieza_num],strlen((char*)&mem[pieza_num])+1);
-            itxt=_itxt; // Remove the string from the text segment
+            if (pieza != p_lit && !(pieza == p_id && (*o).type == tcons && (*o).cons.literal))
+              c_error(3, 128);
+            if (strlen((char *)&mem[pieza_num]) > (*ob).cloc.totalen + 1)
+              c_error(4, 129);
+            imem = _imem + 1 + ((*ob).cloc.totalen + 5) / 4; // e.g. c[32] -> c[0]..c[32],NUL
+            test_buffer(&mem, &imem_max, imem);
+            memmove((char *)&mem[_imem + 1], (char *)&mem[pieza_num],
+                    strlen((char *)&mem[pieza_num]) + 1);
+            itxt = _itxt; // Remove the string from the text segment
             lexer();
           } else {
-            imem=_imem+1+((*ob).cloc.totalen+5)/4;
-            test_buffer(&mem,&imem_max,imem);
-          } mem[_imem]=0xDAD00000|(*ob).cloc.totalen;
-          (*ob).cloc.offset=iloc+1;
-          iloc+=1+((*ob).cloc.totalen+5)/4;
+            imem = _imem + 1 + ((*ob).cloc.totalen + 5) / 4;
+            test_buffer(&mem, &imem_max, imem);
+          }
+          mem[_imem] = 0xDAD00000 | (*ob).cloc.totalen;
+          (*ob).cloc.offset = iloc + 1;
+          iloc += 1 + ((*ob).cloc.totalen + 5) / 4;
         }
 
-        if (pieza==p_coma) pieza=p_string; else {
-          if (!free_sintax) if (pieza!=p_ptocoma) c_error(3,137);
-          while (pieza==p_ptocoma || pieza==p_coma) lexer();
+        if (pieza == p_coma)
+          pieza = p_string;
+        else {
+          if (!free_sintax)
+            if (pieza != p_ptocoma)
+              c_error(3, 137);
+          while (pieza == p_ptocoma || pieza == p_coma)
+            lexer();
         }
 
-      } else if (pieza==p_byte) {                       // Private byte array
+      } else if (pieza == p_byte) { // Private byte array
 
         lexer();
 
-        if (pieza==p_pointer) { // Byte pointer
+        if (pieza == p_pointer) { // Byte pointer
 
-          lexer(); puntero2:
-          ob=analiza_pointer(tpblo,iloc);
-          if (ob==NULL) continue; else iloc++;
-          if (pieza==p_asig) { lexer(); mem[imem]=constant(); }
-          test_buffer(&mem,&imem_max,++imem);
-          if (pieza==p_coma) {
-            lexer(); if (pieza==p_pointer) lexer();
+          lexer();
+puntero2:
+          ob = analiza_pointer(tpblo, iloc);
+          if (ob == NULL)
+            continue;
+          else
+            iloc++;
+          if (pieza == p_asig) {
+            lexer();
+            mem[imem] = constant();
+          }
+          test_buffer(&mem, &imem_max, ++imem);
+          if (pieza == p_coma) {
+            lexer();
+            if (pieza == p_pointer)
+              lexer();
             goto puntero2;
           }
 
         } else {
-
-          if (pieza!=p_id) c_error(1,142);
-          ob=o; if ((*ob).type!=tnone) {
-            if (parametros==-1 && (*ob).param==1 && (*ob).bloque==bloque_actual) {
-              if ((*ob).type==tbloc) { // Byte parameter redeclared
+          if (pieza != p_id)
+            c_error(1, 142);
+          ob = o;
+          if ((*ob).type != tnone) {
+            if (parametros == -1 && (*ob).param == 1 && (*ob).bloque == bloque_actual) {
+              if ((*ob).type == tbloc) { // Byte parameter redeclared
                 lexer();
-                if (pieza==p_corab) c_error(2,53);
-                else if (pieza==p_asig) c_error(0,54);
+                if (pieza == p_corab)
+                  c_error(2, 53);
+                else if (pieza == p_asig)
+                  c_error(0, 54);
                 else {
-                  while (pieza==p_ptocoma || pieza==p_coma) {
+                  while (pieza == p_ptocoma || pieza == p_coma) {
                     lexer();
                   }
                   (*ob).param++;
                   continue;
                 }
-              } else c_error(0,117);
-            } else c_error(0,117);
-          } else lexer();
-
-          (*ob).type=tbloc; _imem=imem;
-          if (pieza==p_corab) {
+              } else
+                c_error(0, 117);
+            } else
+              c_error(0, 117);
+          } else
             lexer();
-            if (pieza==p_corce) {
-              lexer(); if (pieza!=p_asig) c_error(3,23); lexer();
-              oimemptr=(byte*)&mem[imem];
-              tglo_init(2);
-              (*ob).bloc.len1=imemptr-oimemptr-1;
-              (*ob).bloc.len2=-1;
-              (*ob).bloc.len3=-1;
-              (*ob).bloc.totalen=((*ob).bloc.len1+4)/4;
-            } else {
-              if (((*ob).bloc.len1=constant())<0) c_error(4,35);
-              if (pieza==p_coma) {
-                lexer();
-                if (((*ob).bloc.len2=constant())<0) c_error(4,35);
-                if (pieza==p_coma) {
-                  lexer();
-                  if (((*ob).bloc.len3=constant())<0) c_error(4,35);
-                } else (*ob).bloc.len3=-1;
-              } else { (*ob).bloc.len2=-1; (*ob).bloc.len3=-1; }
 
-              (*ob).bloc.totalen=(*ob).bloc.len1+1;
-              if ((*ob).bloc.len2>-1) (*ob).bloc.totalen*=(*ob).bloc.len2+1;
-              if ((*ob).bloc.len3>-1) (*ob).bloc.totalen*=(*ob).bloc.len3+1;
-              if (pieza!=p_corce) { c_error(3,26); } lexer();
-              if (pieza==p_asig) {
+          (*ob).type = tbloc;
+          _imem = imem;
+          if (pieza == p_corab) {
+            lexer();
+            if (pieza == p_corce) {
+              lexer();
+              if (pieza != p_asig)
+                c_error(3, 23);
+              lexer();
+              oimemptr = (byte *)&mem[imem];
+              tglo_init(2);
+              (*ob).bloc.len1 = imemptr - oimemptr - 1;
+              (*ob).bloc.len2 = -1;
+              (*ob).bloc.len3 = -1;
+              (*ob).bloc.totalen = ((*ob).bloc.len1 + 4) / 4;
+            } else {
+              if (((*ob).bloc.len1 = constant()) < 0)
+                c_error(4, 35);
+              if (pieza == p_coma) {
+                lexer();
+                if (((*ob).bloc.len2 = constant()) < 0)
+                  c_error(4, 35);
+                if (pieza == p_coma) {
+                  lexer();
+                  if (((*ob).bloc.len3 = constant()) < 0)
+                    c_error(4, 35);
+                } else
+                  (*ob).bloc.len3 = -1;
+              } else {
+                (*ob).bloc.len2 = -1;
+                (*ob).bloc.len3 = -1;
+              }
+
+              (*ob).bloc.totalen = (*ob).bloc.len1 + 1;
+              if ((*ob).bloc.len2 > -1)
+                (*ob).bloc.totalen *= (*ob).bloc.len2 + 1;
+              if ((*ob).bloc.len3 > -1)
+                (*ob).bloc.totalen *= (*ob).bloc.len3 + 1;
+              if (pieza != p_corce) {
+                c_error(3, 26);
+              }
+              lexer();
+              if (pieza == p_asig) {
                 save_error(1);
                 lexer();
-                oimemptr=(byte*)&mem[imem];
+                oimemptr = (byte *)&mem[imem];
                 tglo_init(2);
-                if (imemptr-oimemptr>(*ob).bloc.totalen) c_error(4,33);
-              } (*ob).bloc.totalen=((*ob).bloc.totalen+3)/4;
+                if (imemptr - oimemptr > (*ob).bloc.totalen)
+                  c_error(4, 33);
+              }
+              (*ob).bloc.totalen = ((*ob).bloc.totalen + 3) / 4;
             }
-          } else {                                          // Private byte
-            (*ob).type=tbloc; (*ob).bloc.offset=imem;
-            (*ob).bloc.len1=0;
-            (*ob).bloc.len2=-1;
-            (*ob).bloc.len3=-1;
-            (*ob).bloc.totalen=1; // 1 int
-            if (pieza==p_asig) {
+          } else { // Private byte
+            (*ob).type = tbloc;
+            (*ob).bloc.offset = imem;
+            (*ob).bloc.len1 = 0;
+            (*ob).bloc.len2 = -1;
+            (*ob).bloc.len3 = -1;
+            (*ob).bloc.totalen = 1; // 1 int
+            if (pieza == p_asig) {
               save_error(1);
               lexer();
-              mem[imem]=constant();
-              if (mem[imem]<0 || mem[imem]>255) c_error(4,143);
+              mem[imem] = constant();
+              if (mem[imem] < 0 || mem[imem] > 255)
+                c_error(4, 143);
             }
           }
-          imem=_imem+(*ob).bloc.totalen; test_buffer(&mem,&imem_max,imem);
-          (*ob).bloc.offset=iloc; iloc+=(*ob).bloc.totalen;
+          imem = _imem + (*ob).bloc.totalen;
+          test_buffer(&mem, &imem_max, imem);
+          (*ob).bloc.offset = iloc;
+          iloc += (*ob).bloc.totalen;
         }
 
-        if (pieza==p_coma) pieza=p_byte; else {
-          if (!free_sintax) if (pieza!=p_ptocoma) c_error(3,137);
-          while (pieza==p_ptocoma || pieza==p_coma) lexer();
+        if (pieza == p_coma)
+          pieza = p_byte;
+        else {
+          if (!free_sintax)
+            if (pieza != p_ptocoma)
+              c_error(3, 137);
+          while (pieza == p_ptocoma || pieza == p_coma)
+            lexer();
         }
 
-      } else if (pieza==p_word) {                       // Private word array
+      } else if (pieza == p_word) { // Private word array
 
         lexer();
 
-        if (pieza==p_pointer) { // Word pointer
+        if (pieza == p_pointer) { // Word pointer
 
-          lexer(); puntero3:
-          ob=analiza_pointer(tpwlo,iloc);
-          if (ob==NULL) continue; else iloc++;
-          if (pieza==p_asig) { lexer(); mem[imem]=constant(); }
-          test_buffer(&mem,&imem_max,++imem);
-          if (pieza==p_coma) {
-            lexer(); if (pieza==p_pointer) lexer();
+          lexer();
+puntero3:
+          ob = analiza_pointer(tpwlo, iloc);
+          if (ob == NULL)
+            continue;
+          else
+            iloc++;
+          if (pieza == p_asig) {
+            lexer();
+            mem[imem] = constant();
+          }
+          test_buffer(&mem, &imem_max, ++imem);
+          if (pieza == p_coma) {
+            lexer();
+            if (pieza == p_pointer)
+              lexer();
             goto puntero3;
           }
 
         } else {
-
-          if (pieza!=p_id) c_error(1,145);
-          ob=o; if ((*ob).type!=tnone) {
-            if (parametros==-1 && (*ob).param==1 && (*ob).bloque==bloque_actual) {
-              if ((*ob).type==twloc) { // Word parameter redeclared
+          if (pieza != p_id)
+            c_error(1, 145);
+          ob = o;
+          if ((*ob).type != tnone) {
+            if (parametros == -1 && (*ob).param == 1 && (*ob).bloque == bloque_actual) {
+              if ((*ob).type == twloc) { // Word parameter redeclared
                 lexer();
-                if (pieza==p_corab) c_error(2,53);
-                else if (pieza==p_asig) c_error(0,54);
+                if (pieza == p_corab)
+                  c_error(2, 53);
+                else if (pieza == p_asig)
+                  c_error(0, 54);
                 else {
-                  while (pieza==p_ptocoma || pieza==p_coma) {
+                  while (pieza == p_ptocoma || pieza == p_coma) {
                     lexer();
                   }
                   (*ob).param++;
                   continue;
                 }
-              } else c_error(0,117);
-            } else c_error(0,117);
-          } else lexer();
-
-          (*ob).type=twloc; _imem=imem;
-          if (pieza==p_corab) {
+              } else
+                c_error(0, 117);
+            } else
+              c_error(0, 117);
+          } else
             lexer();
-            if (pieza==p_corce) {
-              lexer(); if (pieza!=p_asig) c_error(3,23); lexer();
-              oimemptr=(byte*)&mem[imem];
-              tglo_init(1);
-              (*ob).wloc.len1=(imemptr-oimemptr)/2-1;
-              (*ob).wloc.len2=-1;
-              (*ob).wloc.len3=-1;
-              (*ob).wloc.totalen=((*ob).wloc.len1+2)/2;
-            } else {
-              if (((*ob).wloc.len1=constant())<0) c_error(4,35);
-              if (pieza==p_coma) {
-                lexer();
-                if (((*ob).wloc.len2=constant())<0) c_error(4,35);
-                if (pieza==p_coma) {
-                  lexer();
-                  if (((*ob).wloc.len3=constant())<0) c_error(4,35);
-                } else (*ob).wloc.len3=-1;
-              } else { (*ob).wloc.len2=-1; (*ob).wloc.len3=-1; }
 
-              (*ob).wloc.totalen=(*ob).wloc.len1+1;
-              if ((*ob).wloc.len2>-1) (*ob).wloc.totalen*=(*ob).wloc.len2+1;
-              if ((*ob).wloc.len3>-1) (*ob).wloc.totalen*=(*ob).wloc.len3+1;
-              if (pieza!=p_corce) { c_error(3,26); } lexer();
-              if (pieza==p_asig) {
+          (*ob).type = twloc;
+          _imem = imem;
+          if (pieza == p_corab) {
+            lexer();
+            if (pieza == p_corce) {
+              lexer();
+              if (pieza != p_asig)
+                c_error(3, 23);
+              lexer();
+              oimemptr = (byte *)&mem[imem];
+              tglo_init(1);
+              (*ob).wloc.len1 = (imemptr - oimemptr) / 2 - 1;
+              (*ob).wloc.len2 = -1;
+              (*ob).wloc.len3 = -1;
+              (*ob).wloc.totalen = ((*ob).wloc.len1 + 2) / 2;
+            } else {
+              if (((*ob).wloc.len1 = constant()) < 0)
+                c_error(4, 35);
+              if (pieza == p_coma) {
+                lexer();
+                if (((*ob).wloc.len2 = constant()) < 0)
+                  c_error(4, 35);
+                if (pieza == p_coma) {
+                  lexer();
+                  if (((*ob).wloc.len3 = constant()) < 0)
+                    c_error(4, 35);
+                } else
+                  (*ob).wloc.len3 = -1;
+              } else {
+                (*ob).wloc.len2 = -1;
+                (*ob).wloc.len3 = -1;
+              }
+
+              (*ob).wloc.totalen = (*ob).wloc.len1 + 1;
+              if ((*ob).wloc.len2 > -1)
+                (*ob).wloc.totalen *= (*ob).wloc.len2 + 1;
+              if ((*ob).wloc.len3 > -1)
+                (*ob).wloc.totalen *= (*ob).wloc.len3 + 1;
+              if (pieza != p_corce) {
+                c_error(3, 26);
+              }
+              lexer();
+              if (pieza == p_asig) {
                 save_error(1);
                 lexer();
-                oimemptr=(byte*)&mem[imem];
+                oimemptr = (byte *)&mem[imem];
                 tglo_init(1);
-                if (imemptr-oimemptr>(*ob).wloc.totalen*2) c_error(4,33);
-              } (*ob).wloc.totalen=((*ob).wloc.totalen+1)/2;
+                if (imemptr - oimemptr > (*ob).wloc.totalen * 2)
+                  c_error(4, 33);
+              }
+              (*ob).wloc.totalen = ((*ob).wloc.totalen + 1) / 2;
             }
-          } else {                                          // Private word
-            (*ob).type=twloc; (*ob).wloc.offset=imem;
-            (*ob).wloc.len1=0;
-            (*ob).wloc.len2=-1;
-            (*ob).wloc.len3=-1;
-            (*ob).wloc.totalen=1; // 1 int
-            if (pieza==p_asig) {
+          } else { // Private word
+            (*ob).type = twloc;
+            (*ob).wloc.offset = imem;
+            (*ob).wloc.len1 = 0;
+            (*ob).wloc.len2 = -1;
+            (*ob).wloc.len3 = -1;
+            (*ob).wloc.totalen = 1; // 1 int
+            if (pieza == p_asig) {
               save_error(1);
               lexer();
-              mem[imem]=constant();
-              if (mem[imem]<0 || mem[imem]>65535) c_error(4,144);
+              mem[imem] = constant();
+              if (mem[imem] < 0 || mem[imem] > 65535)
+                c_error(4, 144);
             }
           }
-          imem=_imem+(*ob).wloc.totalen; test_buffer(&mem,&imem_max,imem);
-          (*ob).wloc.offset=iloc; iloc+=(*ob).wloc.totalen;
+          imem = _imem + (*ob).wloc.totalen;
+          test_buffer(&mem, &imem_max, imem);
+          (*ob).wloc.offset = iloc;
+          iloc += (*ob).wloc.totalen;
         }
 
-        if (pieza==p_coma) pieza=p_word; else {
-          if (!free_sintax) if (pieza!=p_ptocoma) c_error(3,137);
-          while (pieza==p_ptocoma || pieza==p_coma) lexer();
+        if (pieza == p_coma)
+          pieza = p_word;
+        else {
+          if (!free_sintax)
+            if (pieza != p_ptocoma)
+              c_error(3, 137);
+          while (pieza == p_ptocoma || pieza == p_coma)
+            lexer();
         }
 
-      } else if (pieza==p_int || pieza==p_id || pieza==p_pointer) {
-
-        if (pieza==p_int) {
+      } else if (pieza == p_int || pieza == p_id || pieza == p_pointer) {
+        if (pieza == p_int) {
           lexer();
-          if (pieza!=p_id && pieza!=p_pointer) c_error(1,149);
+          if (pieza != p_id && pieza != p_pointer)
+            c_error(1, 149);
         }
 
-        if (pieza==p_pointer) { // Int pointer member
+        if (pieza == p_pointer) { // Int pointer member
 
-          lexer(); puntero4:
-          ob=analiza_pointer(tpilo,iloc);
-          if (ob==NULL) continue; else iloc++;
-          if (pieza==p_asig) { lexer(); mem[imem]=constant(); }
-          test_buffer(&mem,&imem_max,++imem);
-          if (pieza==p_coma) {
-            lexer(); if (pieza==p_pointer) lexer();
+          lexer();
+puntero4:
+          ob = analiza_pointer(tpilo, iloc);
+          if (ob == NULL)
+            continue;
+          else
+            iloc++;
+          if (pieza == p_asig) {
+            lexer();
+            mem[imem] = constant();
+          }
+          test_buffer(&mem, &imem_max, ++imem);
+          if (pieza == p_coma) {
+            lexer();
+            if (pieza == p_pointer)
+              lexer();
             goto puntero4;
           }
 
         } else {
-
           // If the object is not tnone, it's a redeclared parameter or an error
 
-          ob=o; if ((*ob).type!=tnone) {
-            if (parametros==-1 && (*ob).param==1 && (*ob).bloque==bloque_actual) {
-              if ((*ob).type==tvloc) { // Local variable redeclared
+          ob = o;
+          if ((*ob).type != tnone) {
+            if (parametros == -1 && (*ob).param == 1 && (*ob).bloque == bloque_actual) {
+              if ((*ob).type == tvloc) { // Local variable redeclared
                 lexer();
-                if (pieza==p_corab) c_error(2,53);
-                else if (pieza==p_asig) c_error(0,54);
+                if (pieza == p_corab)
+                  c_error(2, 53);
+                else if (pieza == p_asig)
+                  c_error(0, 54);
                 else {
-                  while (pieza==p_ptocoma || pieza==p_coma) {
+                  while (pieza == p_ptocoma || pieza == p_coma) {
                     lexer();
                   }
                   (*ob).param++;
                   continue;
                 }
-              } else c_error(0,117);
-            } else c_error(0,117);
-          } else lexer();
-
-          if (pieza==p_corab) {                             // Private table
+              } else
+                c_error(0, 117);
+            } else
+              c_error(0, 117);
+          } else
             lexer();
-            (*ob).type=ttloc; _imem=imem;
-            if (pieza==p_corce) {
-              lexer(); if (pieza!=p_asig) c_error(3,23); lexer();
+
+          if (pieza == p_corab) { // Private table
+            lexer();
+            (*ob).type = ttloc;
+            _imem = imem;
+            if (pieza == p_corce) {
+              lexer();
+              if (pieza != p_asig)
+                c_error(3, 23);
+              lexer();
               tglo_init(3);
-              (*ob).tloc.len1=imem-_imem-1;
-              (*ob).tloc.len2=-1;
-              (*ob).tloc.len3=-1;
-              (*ob).tloc.totalen=imem-_imem;
+              (*ob).tloc.len1 = imem - _imem - 1;
+              (*ob).tloc.len2 = -1;
+              (*ob).tloc.len3 = -1;
+              (*ob).tloc.totalen = imem - _imem;
             } else {
-              if (((*ob).tloc.len1=constant())<0) c_error(4,35);
-              if (pieza==p_coma) {
+              if (((*ob).tloc.len1 = constant()) < 0)
+                c_error(4, 35);
+              if (pieza == p_coma) {
                 lexer();
-                if (((*ob).tloc.len2=constant())<0) c_error(4,35);
-                if (pieza==p_coma) {
+                if (((*ob).tloc.len2 = constant()) < 0)
+                  c_error(4, 35);
+                if (pieza == p_coma) {
                   lexer();
-                  if (((*ob).tloc.len3=constant())<0) c_error(4,35);
-                } else (*ob).tloc.len3=-1;
-              } else { (*ob).tloc.len2=-1; (*ob).tloc.len3=-1; }
-              (*ob).tloc.totalen=(*ob).tloc.len1+1;
-              if ((*ob).tloc.len2>-1) (*ob).tloc.totalen*=(*ob).tloc.len2+1;
-              if ((*ob).tloc.len3>-1) (*ob).tloc.totalen*=(*ob).tloc.len3+1;
-              if (pieza!=p_corce) { c_error(3,26); } lexer();
-              if (pieza==p_asig) {
-                save_error(1); lexer(); tglo_init(3);
-                if (imem-_imem>(*ob).tloc.totalen) c_error(4,33); }
+                  if (((*ob).tloc.len3 = constant()) < 0)
+                    c_error(4, 35);
+                } else
+                  (*ob).tloc.len3 = -1;
+              } else {
+                (*ob).tloc.len2 = -1;
+                (*ob).tloc.len3 = -1;
+              }
+              (*ob).tloc.totalen = (*ob).tloc.len1 + 1;
+              if ((*ob).tloc.len2 > -1)
+                (*ob).tloc.totalen *= (*ob).tloc.len2 + 1;
+              if ((*ob).tloc.len3 > -1)
+                (*ob).tloc.totalen *= (*ob).tloc.len3 + 1;
+              if (pieza != p_corce) {
+                c_error(3, 26);
+              }
+              lexer();
+              if (pieza == p_asig) {
+                save_error(1);
+                lexer();
+                tglo_init(3);
+                if (imem - _imem > (*ob).tloc.totalen)
+                  c_error(4, 33);
+              }
             }
-            imem=_imem+(*ob).tloc.totalen;
-            test_buffer(&mem,&imem_max,imem);
-            (*ob).tloc.offset=iloc; iloc+=(*ob).tloc.totalen;
+            imem = _imem + (*ob).tloc.totalen;
+            test_buffer(&mem, &imem_max, imem);
+            (*ob).tloc.offset = iloc;
+            iloc += (*ob).tloc.totalen;
 
-          } else {                                          // Private variable
+          } else { // Private variable
 
-            (*ob).type=tvloc; (*ob).vloc.offset=iloc++;
-            if (pieza==p_asig) { lexer(); mem[imem]=constant(); }
-            test_buffer(&mem,&imem_max,++imem);
+            (*ob).type = tvloc;
+            (*ob).vloc.offset = iloc++;
+            if (pieza == p_asig) {
+              lexer();
+              mem[imem] = constant();
+            }
+            test_buffer(&mem, &imem_max, ++imem);
           }
         }
-        if (!free_sintax) if (pieza!=p_ptocoma && pieza!=p_coma) c_error(3,66);
-        while (pieza==p_ptocoma || pieza==p_coma) lexer();
-      } (*ob).bloque=bloque_actual;
+        if (!free_sintax)
+          if (pieza != p_ptocoma && pieza != p_coma)
+            c_error(3, 66);
+        while (pieza == p_ptocoma || pieza == p_coma)
+          lexer();
+      }
+      (*ob).bloque = bloque_actual;
     }
 
-    mem[_imem_old]=imem;
-
+    mem[_imem_old] = imem;
   };
-
 }
 
-  //---------------------------------------------------------------------------
-  // Table initialization (to mem[imem++])
-  //---------------------------------------------------------------------------
-  // <init>  := ( <string> | <exp> [ [p_dup] p_abrir <init> p_cerrar ] )
-  //            [ p_coma <init>]
-  //---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+// Table initialization (to mem[imem++])
+//---------------------------------------------------------------------------
+// <init>  := ( <string> | <exp> [ [p_dup] p_abrir <init> p_cerrar ] )
+//            [ p_coma <init>]
+//---------------------------------------------------------------------------
 
 
 void tglo_init(memptrsize tipo) { // Type: 0-Int or mixed (struct), 1-Word, 2-Byte
-  if (tipo==3) { memset(frm,0,ifrm_max*sizeof(memptrsize)); tipo=0; }
-  imemptr=(byte*)&mem[imem];
+  if (tipo == 3) {
+    memset(frm, 0, ifrm_max * sizeof(memptrsize));
+    tipo = 0;
+  }
+  imemptr = (byte *)&mem[imem];
   tglo_init2(tipo);
-  if (!free_sintax) if (pieza!=p_ptocoma) c_error(3,66);
+  if (!free_sintax)
+    if (pieza != p_ptocoma)
+      c_error(3, 66);
 }
 
 void tloc_init(int tipo) {
-  int * ptr;
+  int *ptr;
 
-  if (tipo==3) { memset(frm,0,ifrm_max*sizeof(memptrsize)); tipo=0; }
+  if (tipo == 3) {
+    memset(frm, 0, ifrm_max * sizeof(memptrsize));
+    tipo = 0;
+  }
 
-  ptr=mem; mem=loc; loc=ptr;
-  swap(imem,iloc); swap(imem_max,iloc_max);
+  ptr = mem;
+  mem = loc;
+  loc = ptr;
+  swap(imem, iloc);
+  swap(imem_max, iloc_max);
 
-  imemptr=(byte*)&mem[imem];
+  imemptr = (byte *)&mem[imem];
   tglo_init2(tipo);
 
-  ptr=mem; mem=loc; loc=ptr;
-  swap(imem,iloc); swap(imem_max,iloc_max);
+  ptr = mem;
+  mem = loc;
+  loc = ptr;
+  swap(imem, iloc);
+  swap(imem_max, iloc_max);
 
-  if (!free_sintax) if (pieza!=p_ptocoma) c_error(3,66);
+  if (!free_sintax)
+    if (pieza != p_ptocoma)
+      c_error(3, 66);
 }
 
 // WARNING: tglo_init must NOT call test_buffer (buffer may be swapped via tloc_init).
@@ -4654,206 +6255,249 @@ void tloc_init(int tipo) {
 
 
 void tglo_init2(int tipo) {
-  int valor,dup,_imem,len,n;
+  int valor, dup, _imem, len, n;
   byte *oimemptr;
 
   while (1) {
-
     // Check if data initialization ends
 
-    if (pieza==p_cerrar || pieza==p_ptocoma) {
-      if (*(imemptr-(memptrsize)mem+(memptrsize)frm)==1 || tipo==1) {
-        imemptr+=2;
-        imem=((memptrsize)imemptr-(memptrsize)mem+3)/4;
-        if (*(imemptr-(memptrsize)mem+(memptrsize)frm)!=1 && tipo!=1) imemptr=(byte*)&mem[imem];
-      } else if (*(imemptr-(memptrsize)mem+(memptrsize)frm)==2 || tipo==2) {
+    if (pieza == p_cerrar || pieza == p_ptocoma) {
+      if (*(imemptr - (memptrsize)mem + (memptrsize)frm) == 1 || tipo == 1) {
+        imemptr += 2;
+        imem = ((memptrsize)imemptr - (memptrsize)mem + 3) / 4;
+        if (*(imemptr - (memptrsize)mem + (memptrsize)frm) != 1 && tipo != 1)
+          imemptr = (byte *)&mem[imem];
+      } else if (*(imemptr - (memptrsize)mem + (memptrsize)frm) == 2 || tipo == 2) {
         imemptr++;
-        imem=((memptrsize)imemptr-(memptrsize)mem+3)/4;
-        if (*(imemptr-(memptrsize)mem+(memptrsize)frm)!=2 && tipo!=2) imemptr=(byte*)&mem[imem];
+        imem = ((memptrsize)imemptr - (memptrsize)mem + 3) / 4;
+        if (*(imemptr - (memptrsize)mem + (memptrsize)frm) != 2 && tipo != 2)
+          imemptr = (byte *)&mem[imem];
       } else {
-        imemptr+=4;
-        imem=((memptrsize)imemptr-(memptrsize)mem+3)/4;
+        imemptr += 4;
+        imem = ((memptrsize)imemptr - (memptrsize)mem + 3) / 4;
       }
       return;
     }
 
     // A lone comma, like "3,,4", advances one position (and defines a 0)
 
-    if (pieza==p_coma) {
-      if (*(imemptr-(memptrsize)mem+(memptrsize)frm)==1 || tipo==1) {
-        (*(word*)imemptr)=0;
-        imemptr+=2;
-        imem=((memptrsize)imemptr-(memptrsize)mem+3)/4;
-        if (*(imemptr-(memptrsize)mem+(memptrsize)frm)!=1 && tipo!=1) imemptr=(byte*)&mem[imem];
-      } else if (*(imemptr-(memptrsize)mem+(memptrsize)frm)==2 || tipo==2) {
-        *imemptr++=0;
-        imem=((memptrsize)imemptr-(memptrsize)mem+3)/4;
-        if (*(imemptr-(memptrsize)mem+(memptrsize)frm)!=2 && tipo!=2) imemptr=(byte*)&mem[imem];
+    if (pieza == p_coma) {
+      if (*(imemptr - (memptrsize)mem + (memptrsize)frm) == 1 || tipo == 1) {
+        (*(word *)imemptr) = 0;
+        imemptr += 2;
+        imem = ((memptrsize)imemptr - (memptrsize)mem + 3) / 4;
+        if (*(imemptr - (memptrsize)mem + (memptrsize)frm) != 1 && tipo != 1)
+          imemptr = (byte *)&mem[imem];
+      } else if (*(imemptr - (memptrsize)mem + (memptrsize)frm) == 2 || tipo == 2) {
+        *imemptr++ = 0;
+        imem = ((memptrsize)imemptr - (memptrsize)mem + 3) / 4;
+        if (*(imemptr - (memptrsize)mem + (memptrsize)frm) != 2 && tipo != 2)
+          imemptr = (byte *)&mem[imem];
       } else {
-        imemptr+=4;
-        imem=((memptrsize)imemptr-(memptrsize)mem+3)/4;
+        imemptr += 4;
+        imem = ((memptrsize)imemptr - (memptrsize)mem + 3) / 4;
       }
-      lexer(); continue;
+      lexer();
+      continue;
     }
 
-    if (pieza==p_abrir) { // Dup x 1
+    if (pieza == p_abrir) { // Dup x 1
 
-      dup=1;
+      dup = 1;
 
-    } else if (pieza==p_dup) { // Dup x 2
+    } else if (pieza == p_dup) { // Dup x 2
 
-      dup=2; lexer();
-      if (pieza!=p_abrir) c_error(3,36);
+      dup = 2;
+      lexer();
+      if (pieza != p_abrir)
+        c_error(3, 36);
 
-    } else if (pieza==p_lit || (pieza==p_id && (*o).type==tcons && (*o).cons.literal)) {
-
-      valor=pieza_num; lexer();
-      if (pieza==p_abrir || pieza==p_dup) c_error(2,38);
+    } else if (pieza == p_lit || (pieza == p_id && (*o).type == tcons && (*o).cons.literal)) {
+      valor = pieza_num;
+      lexer();
+      if (pieza == p_abrir || pieza == p_dup)
+        c_error(2, 38);
 
       // Store a literal in a string-type field
 
-      if ((((memptrsize)imemptr-(memptrsize)mem)%4)==0) {
-        imem=((memptrsize)imemptr-(memptrsize)mem+3)/4;
-        if (frm[imem]==0xdad00000) {
-          if (strlen((char*)&mem_ory[valor])>(mem[imem]&0xFFFFF)+1) c_error(2,129);
-          _imem=imem;
-          imem+=1+((mem[imem]&0xFFFFF)+5)/4;
-          imemptr=(byte*)&mem[imem];
-          div_strcpy((char*)&mem[_imem+1],(mem[_imem]&0xFFFFF)+2,(char*)&mem_ory[valor]);
-          if (pieza!=p_coma) return;
-          lexer(); continue;
+      if ((((memptrsize)imemptr - (memptrsize)mem) % 4) == 0) {
+        imem = ((memptrsize)imemptr - (memptrsize)mem + 3) / 4;
+        if (frm[imem] == 0xdad00000) {
+          if (strlen((char *)&mem_ory[valor]) > (mem[imem] & 0xFFFFF) + 1)
+            c_error(2, 129);
+          _imem = imem;
+          imem += 1 + ((mem[imem] & 0xFFFFF) + 5) / 4;
+          imemptr = (byte *)&mem[imem];
+          div_strcpy((char *)&mem[_imem + 1], (mem[_imem] & 0xFFFFF) + 2, (char *)&mem_ory[valor]);
+          if (pieza != p_coma)
+            return;
+          lexer();
+          continue;
         }
       }
 
       // Store a literal value in a non-string data type
 
-      if (*(imemptr-(memptrsize)mem+(memptrsize)frm)==1 || tipo==1) { // A string in words (short pointer)
+      if (*(imemptr - (memptrsize)mem + (memptrsize)frm) == 1 ||
+          tipo == 1) { // A string in words (short pointer)
 
-        imemptr=(byte*)(((memptrsize)imemptr+1)&-2); // Align to even
-        *((word*)imemptr)=valor;
-        imemptr+=2;
-        imem=((memptrsize)imemptr-(memptrsize)mem+3)/4;
-        if (*(imemptr-(memptrsize)mem+(memptrsize)frm)!=1 && tipo!=1) imemptr=(byte*)&mem[imem];
-        if (pieza!=p_coma) return;
-        lexer(); continue;
+        imemptr = (byte *)(((memptrsize)imemptr + 1) & -2); // Align to even
+        *((word *)imemptr) = valor;
+        imemptr += 2;
+        imem = ((memptrsize)imemptr - (memptrsize)mem + 3) / 4;
+        if (*(imemptr - (memptrsize)mem + (memptrsize)frm) != 1 && tipo != 1)
+          imemptr = (byte *)&mem[imem];
+        if (pieza != p_coma)
+          return;
+        lexer();
+        continue;
 
-      } else if (*(imemptr-(memptrsize)mem+(memptrsize)frm)==2 || tipo==2) { // A string in bytes
+      } else if (*(imemptr - (memptrsize)mem + (memptrsize)frm) == 2 ||
+                 tipo == 2) { // A string in bytes
 
-        oimemptr=imemptr;
-        while (*(oimemptr-(memptrsize)mem+(memptrsize)frm)==2) oimemptr++;
-        if (tipo==0) if (strlen((char*)&mem_ory[valor])>(memptrsize)(oimemptr-imemptr)) c_error(2,33);
-        div_strcpy((char *)imemptr,(memptrsize)(oimemptr-imemptr)+1,(char*)&mem_ory[valor]);
-        imemptr+=strlen((char *)imemptr);
-        imem=((memptrsize)imemptr-(memptrsize)mem+3)/4;
-        if (*(imemptr-(memptrsize)mem+(memptrsize)frm)!=2 && tipo!=2) imemptr=(byte*)&mem[imem];
-        if (pieza!=p_coma) return;
-        lexer(); continue;
+        oimemptr = imemptr;
+        while (*(oimemptr - (memptrsize)mem + (memptrsize)frm) == 2)
+          oimemptr++;
+        if (tipo == 0)
+          if (strlen((char *)&mem_ory[valor]) > (memptrsize)(oimemptr - imemptr))
+            c_error(2, 33);
+        div_strcpy((char *)imemptr, (memptrsize)(oimemptr - imemptr) + 1, (char *)&mem_ory[valor]);
+        imemptr += strlen((char *)imemptr);
+        imem = ((memptrsize)imemptr - (memptrsize)mem + 3) / 4;
+        if (*(imemptr - (memptrsize)mem + (memptrsize)frm) != 2 && tipo != 2)
+          imemptr = (byte *)&mem[imem];
+        if (pieza != p_coma)
+          return;
+        lexer();
+        continue;
 
       } else { // A string in an int (long pointer, as in DIV 1)
 
-        imem=((memptrsize)imemptr-(memptrsize)mem+3)/4;
-        mem[imem++]=valor;
-        imemptr=(byte*)&mem[imem];
-        if (pieza!=p_coma) return;
-        lexer(); continue;
-
+        imem = ((memptrsize)imemptr - (memptrsize)mem + 3) / 4;
+        mem[imem++] = valor;
+        imemptr = (byte *)&mem[imem];
+        if (pieza != p_coma)
+          return;
+        lexer();
+        continue;
       }
 
     } else {
-      valor=constant();
-      if (pieza!=p_abrir) {
-        if (pieza!=p_dup) {
-
-          if ((((memptrsize)imemptr-(memptrsize)mem)%4)==0) {
-            imem=((memptrsize)imemptr-(memptrsize)mem+3)/4;
-            if (frm[imem]==0xdad00000) c_error(2,128);
+      valor = constant();
+      if (pieza != p_abrir) {
+        if (pieza != p_dup) {
+          if ((((memptrsize)imemptr - (memptrsize)mem) % 4) == 0) {
+            imem = ((memptrsize)imemptr - (memptrsize)mem + 3) / 4;
+            if (frm[imem] == 0xdad00000)
+              c_error(2, 128);
           }
 
           // Store a numeric value in memory
 
-          if (*(imemptr-(memptrsize)mem+(memptrsize)frm)==1 || tipo==1) { // Into a word
+          if (*(imemptr - (memptrsize)mem + (memptrsize)frm) == 1 || tipo == 1) { // Into a word
 
-            if (valor<0 || valor>65535) c_error(2,144);
-            imemptr=(byte*)(((memptrsize)imemptr+1)&-2); // Align to even
-            *((word*)imemptr)=valor;
-            imemptr+=2;
-            imem=((memptrsize)imemptr-(memptrsize)mem+3)/4;
-            if (*(imemptr-(memptrsize)mem+(memptrsize)frm)!=1 && tipo!=1) imemptr=(byte*)&mem[imem];
-            if (pieza!=p_coma) return;
-            lexer(); continue;
+            if (valor < 0 || valor > 65535)
+              c_error(2, 144);
+            imemptr = (byte *)(((memptrsize)imemptr + 1) & -2); // Align to even
+            *((word *)imemptr) = valor;
+            imemptr += 2;
+            imem = ((memptrsize)imemptr - (memptrsize)mem + 3) / 4;
+            if (*(imemptr - (memptrsize)mem + (memptrsize)frm) != 1 && tipo != 1)
+              imemptr = (byte *)&mem[imem];
+            if (pieza != p_coma)
+              return;
+            lexer();
+            continue;
 
-          } else if (*(imemptr-(memptrsize)mem+(memptrsize)frm)==2 || tipo==2) { // Into a byte
+          } else if (*(imemptr - (memptrsize)mem + (memptrsize)frm) == 2 ||
+                     tipo == 2) { // Into a byte
 
-            if (valor<0 || valor>255) c_error(2,143);
-            *imemptr++=valor;
-            imem=((memptrsize)imemptr-(memptrsize)mem+3)/4;
-            if (*(imemptr-(memptrsize)mem+(memptrsize)frm)!=2 && tipo!=2) imemptr=(byte*)&mem[imem];
-            if (pieza!=p_coma) return;
-            lexer(); continue;
+            if (valor < 0 || valor > 255)
+              c_error(2, 143);
+            *imemptr++ = valor;
+            imem = ((memptrsize)imemptr - (memptrsize)mem + 3) / 4;
+            if (*(imemptr - (memptrsize)mem + (memptrsize)frm) != 2 && tipo != 2)
+              imemptr = (byte *)&mem[imem];
+            if (pieza != p_coma)
+              return;
+            lexer();
+            continue;
 
           } else { // Into an int (the default in DIV 1)
 
-            imem=((memptrsize)imemptr-(memptrsize)mem+3)/4;
-            mem[imem++]=valor;
-            imemptr=(byte*)&mem[imem];
-            if (pieza!=p_coma) return;
-            lexer(); continue;
-
+            imem = ((memptrsize)imemptr - (memptrsize)mem + 3) / 4;
+            mem[imem++] = valor;
+            imemptr = (byte *)&mem[imem];
+            if (pieza != p_coma)
+              return;
+            lexer();
+            continue;
           }
 
         } else {
-          dup=valor; lexer();
-          if (pieza!=p_abrir) c_error(3,36);
+          dup = valor;
+          lexer();
+          if (pieza != p_abrir)
+            c_error(3, 36);
         }
-      } else dup=valor;
+      } else
+        dup = valor;
     }
 
     // Duplicate a sequence of values
 
-    if (dup<1) c_error(2,38);
+    if (dup < 1)
+      c_error(2, 38);
     lexer();
 
     // Parse the sequence as another initialization ...
 
-    oimemptr=imemptr;
+    oimemptr = imemptr;
     tglo_init2(tipo);
-    if (pieza!=p_cerrar) c_error(3,25);
+    if (pieza != p_cerrar)
+      c_error(3, 25);
 
     // And duplicate it the specified number of times
 
-    if (dup>1) {
-      len=imemptr-oimemptr;
+    if (dup > 1) {
+      len = imemptr - oimemptr;
       while (--dup) {
-        for (n=0;n<len;n++) {
-
+        for (n = 0; n < len; n++) {
           // Check that strings align with themselves in dup()...
-          if ((((memptrsize)imemptr-(memptrsize)mem)%4)==0) {
-            imem=((memptrsize)imemptr-(memptrsize)mem+3)/4;
-            _imem=((memptrsize)oimemptr+n-(memptrsize)mem+3)/4;
-            if (frm[imem]==0xdad00000) {
-              if (frm[_imem]!=0xdad00000) c_error(3,136);
-              else if (mem[imem]!=mem[_imem]) c_error(3,136);
-            } else if (frm[_imem]==0xdad00000) c_error(3,136);
+          if ((((memptrsize)imemptr - (memptrsize)mem) % 4) == 0) {
+            imem = ((memptrsize)imemptr - (memptrsize)mem + 3) / 4;
+            _imem = ((memptrsize)oimemptr + n - (memptrsize)mem + 3) / 4;
+            if (frm[imem] == 0xdad00000) {
+              if (frm[_imem] != 0xdad00000)
+                c_error(3, 136);
+              else if (mem[imem] != mem[_imem])
+                c_error(3, 136);
+            } else if (frm[_imem] == 0xdad00000)
+              c_error(3, 136);
           }
 
           // Check that words align with words
-          if (*(byte*)((memptrsize)imemptr-(memptrsize)mem+(memptrsize)frm)==1) {
-            if (*(byte*)((memptrsize)oimemptr+n-(memptrsize)mem+(memptrsize)frm)!=1) c_error(3,136);
-          } else if (*(byte*)((memptrsize)oimemptr+n-(memptrsize)mem+(memptrsize)frm)==1) c_error(3,136);
+          if (*(byte *)((memptrsize)imemptr - (memptrsize)mem + (memptrsize)frm) == 1) {
+            if (*(byte *)((memptrsize)oimemptr + n - (memptrsize)mem + (memptrsize)frm) != 1)
+              c_error(3, 136);
+          } else if (*(byte *)((memptrsize)oimemptr + n - (memptrsize)mem + (memptrsize)frm) == 1)
+            c_error(3, 136);
 
           // Check that bytes align with bytes
-          if (*(byte*)((memptrsize)imemptr-(memptrsize)mem+(memptrsize)frm)==2) {
-            if (*(byte*)((memptrsize)oimemptr+n-(memptrsize)mem+(memptrsize)frm)!=2) c_error(3,136);
-          } else if (*(byte*)((memptrsize)oimemptr+n-(memptrsize)mem+(memptrsize)frm)==2) c_error(3,136);
+          if (*(byte *)((memptrsize)imemptr - (memptrsize)mem + (memptrsize)frm) == 2) {
+            if (*(byte *)((memptrsize)oimemptr + n - (memptrsize)mem + (memptrsize)frm) != 2)
+              c_error(3, 136);
+          } else if (*(byte *)((memptrsize)oimemptr + n - (memptrsize)mem + (memptrsize)frm) == 2)
+            c_error(3, 136);
 
-          *imemptr++=*(oimemptr+n);
+          *imemptr++ = *(oimemptr + n);
         }
       }
     }
 
     lexer();
-    if (pieza!=p_coma) {
-      imem=((memptrsize)imemptr-(memptrsize)mem+3)/4;
+    if (pieza != p_coma) {
+      imem = ((memptrsize)imemptr - (memptrsize)mem + 3) / 4;
       return;
     }
     lexer();
@@ -4865,331 +6509,604 @@ void tglo_init2(int tipo) {
 //-----------------------------------------------------------------------------
 
 void statement() {
+  int im1, im2, im3, im4;
+  int dir, from, to, step;
 
-  int im1,im2,im3,im4;
-  int dir,from,to,step;
-
-  while (pieza>=p_return) {
-    test_buffer(&mem,&imem_max,imem);
+  while (pieza >= p_return) {
+    test_buffer(&mem, &imem_max, imem);
     switch (pieza) {
-      case p_return:
-        statement_start();
-        lexer(); if (pieza==p_abrir) {
-          lexer(); if (pieza!=p_cerrar) {
-            expression(); if (pieza!=p_cerrar) c_error(3,25);
-            g1(lrtf);
-            } else {
-            g1(lret);
-            } lexer();
-          } else {
+    case p_return:
+      statement_start();
+      lexer();
+      if (pieza == p_abrir) {
+        lexer();
+        if (pieza != p_cerrar) {
+          expression();
+          if (pieza != p_cerrar)
+            c_error(3, 25);
+          g1(lrtf);
+        } else {
           g1(lret);
         }
-        if (!free_sintax) if (pieza!=p_ptocoma) c_error(3,66);
-        while (pieza==p_ptocoma || pieza==p_coma) lexer();
-        statement_end(); record_statement(); break;
-      case p_if:
+        lexer();
+      } else {
+        g1(lret);
+      }
+      if (!free_sintax)
+        if (pieza != p_ptocoma)
+          c_error(3, 66);
+      while (pieza == p_ptocoma || pieza == p_coma)
+        lexer();
+      statement_end();
+      record_statement();
+      break;
+    case p_if:
+      statement_start();
+      lexer();
+      if (!free_sintax)
+        if (pieza != p_abrir)
+          c_error(3, 36);
+      if (pieza == p_abrir)
+        lexer();
+      condition();
+      if (!free_sintax)
+        if (pieza != p_cerrar)
+          c_error(3, 25);
+      if (pieza == p_cerrar)
+        lexer();
+      g2(ljpf, 0);
+      im1 = imem - 1;
+      statement_end();
+      record_statement();
+      statement();
+      if (pieza == p_else) {
         statement_start();
         lexer();
-        if (!free_sintax) if (pieza!=p_abrir) c_error(3,36);
-        if (pieza==p_abrir) lexer();
-        condition();
-        if (!free_sintax) if (pieza!=p_cerrar) c_error(3,25);
-        if (pieza==p_cerrar) lexer();
-        g2(ljpf,0); im1=imem-1;
-        statement_end(); record_statement();
+        g2(ljmp, 0);
+        mem[im1] = imem;
+        im1 = imem - 1;
+        statement_end();
+        record_statement();
         statement();
-        if (pieza==p_else) {
-          statement_start();
+      }
+      mem[im1] = imem;
+      if (pieza != p_end)
+        c_error(0, 40);
+      lexer();
+      break;
+    case p_loop:
+      tbreak[itbreak++] = 0;
+      tcont[itcont++] = 0;
+      lexer();
+      im1 = imem;
+      statement();
+      if (pieza != p_end)
+        c_error(0, 40);
+      statement_start();
+      lexer();
+      g2(ljmp, im1);
+      while (tbreak[--itbreak] != 0)
+        mem[tbreak[itbreak]] = imem;
+      while (tcont[--itcont] != 0)
+        mem[tcont[itcont]] = im1;
+      statement_end();
+      record_statement();
+      break;
+    case p_while:
+      statement_start();
+      tbreak[itbreak++] = 0;
+      tcont[itcont++] = 0;
+      im1 = imem;
+      lexer();
+      if (!free_sintax)
+        if (pieza != p_abrir)
+          c_error(3, 36);
+      if (pieza == p_abrir)
+        lexer();
+      condition();
+      if (!free_sintax)
+        if (pieza != p_cerrar)
+          c_error(3, 25);
+      if (pieza == p_cerrar)
+        lexer();
+      g2(ljpf, 0);
+      im2 = imem - 1;
+      statement_end();
+      record_statement();
+      statement();
+      if (pieza != p_end) {
+        c_error(0, 40);
+      }
+      statement_start();
+      lexer();
+      g2(ljmp, im1);
+      mem[im2] = imem;
+      while (tbreak[--itbreak] != 0)
+        mem[tbreak[itbreak]] = imem;
+      while (tcont[--itcont] != 0)
+        mem[tcont[itcont]] = im1;
+      statement_end();
+      record_statement();
+      break;
+    case p_repeat:
+      tbreak[itbreak++] = 0;
+      tcont[itcont++] = 0;
+      lexer();
+      im1 = imem;
+      statement();
+      if (pieza != p_until)
+        c_error(0, 42);
+      statement_start();
+      lexer();
+      if (!free_sintax)
+        if (pieza != p_abrir)
+          c_error(3, 36);
+      if (pieza == p_abrir)
+        lexer();
+      condition();
+      if (!free_sintax)
+        if (pieza != p_cerrar)
+          c_error(3, 25);
+      if (pieza == p_cerrar)
+        lexer();
+      g2(ljpf, im1);
+      while (tbreak[--itbreak] != 0)
+        mem[tbreak[itbreak]] = imem;
+      while (tcont[--itcont] != 0)
+        mem[tcont[itcont]] = im1;
+      statement_end();
+      record_statement();
+      break;
+    case p_from:
+      statement_start();
+      tbreak[itbreak++] = 0;
+      tcont[itcont++] = 0;
+      lexer();
+      if (pieza != p_id)
+        c_error(0, 67);
+
+      if ((*o).type == tvglo) {
+        dir = (*o).vglo.offset;
+        g2(lcar, dir);
+      } else if ((*o).type == tvloc && (!(*o).bloque || (*o).bloque == bloque_actual)) {
+        dir = -(*o).vloc.offset;
+        g2(lcar, -dir);
+        g1(laid);
+      } else
+        c_error(0, 67);
+
+      lexer();
+      if (pieza != p_asig) {
+        c_error(3, 68);
+      }
+      lexer();
+      from = constant();
+      if (pieza != p_to) {
+        c_error(1, 69);
+      }
+      lexer();
+      to = constant();
+      if (from == to)
+        c_error(4, 71);
+      if (pieza == p_step) {
+        lexer();
+        step = constant();
+        if (from < to && step <= 0)
+          c_error(4, 70);
+        if (from > to && step >= 0)
+          c_error(4, 70);
+      } else {
+        if (from < to)
+          step = 1;
+        else
+          step = -1;
+      }
+      g2(lcar, from); // Assign the from value
+      g1(lasi);
+      g1(lasp);
+
+      im1 = imem; // Loop start
+
+      if (dir >= 0) { // Loop continuation condition check
+        g2(lcar, dir);
+      } else {
+        g2(lcar, -dir);
+        g1(laid);
+      }
+      g1(lptr);
+      g2(lcar, to);
+      if (step > 0)
+        g1(lmei);
+      else
+        g1(lmai);
+      g2(ljpf, 0);
+      im2 = imem - 1;
+
+      statement_end();
+      record_statement();
+      if (!free_sintax) {
+        if (pieza != p_ptocoma)
+          c_error(3, 66);
+      }
+      while (pieza == p_ptocoma || pieza == p_coma)
+        lexer();
+
+      statement();
+      if (pieza != p_end) {
+        c_error(0, 40);
+      }
+      statement_start();
+      lexer();
+
+      im3 = imem; // Continue position
+
+      if (dir >= 0) { // Increment and jump back to loop start
+        g2(lcar, dir);
+      } else {
+        g2(lcar, -dir);
+        g1(laid);
+      }
+      g2(lcar, step);
+      g1(lada);
+      g1(lasp);
+      g2(ljmp, im1);
+      mem[im2] = imem;
+
+      while (tbreak[--itbreak] != 0)
+        mem[tbreak[itbreak]] = imem;
+      while (tcont[--itcont] != 0)
+        mem[tcont[itcont]] = im3;
+      statement_end();
+      record_statement();
+
+      break;
+
+    case p_for:
+      statement_start();
+      tbreak[itbreak++] = 0;
+      tcont[itcont++] = 0;
+      lexer();
+      if (pieza != p_abrir) {
+        c_error(3, 36);
+      }
+      lexer();
+      if (pieza != p_ptocoma) {
+        expression();
+        g1(lasp);
+        while (pieza == p_coma) {
           lexer();
-          g2(ljmp,0); mem[im1]=imem; im1=imem-1;
-          statement_end(); record_statement();
-          statement();
-          }
-        mem[im1]=imem; if (pieza!=p_end) c_error(0,40); lexer();
-        break;
-      case p_loop:
-        tbreak[itbreak++]=0; tcont[itcont++]=0;
-        lexer();
-        im1=imem; statement();
-        if (pieza!=p_end) c_error(0,40);
-        statement_start(); lexer();
-        g2(ljmp,im1);
-        while (tbreak[--itbreak]!=0) mem[tbreak[itbreak]]=imem;
-        while (tcont[--itcont]!=0) mem[tcont[itcont]]=im1;
-        statement_end(); record_statement();
-        break;
-      case p_while:
-        statement_start();
-        tbreak[itbreak++]=0; tcont[itcont++]=0; im1=imem;
-        lexer();
-        if (!free_sintax) if (pieza!=p_abrir) c_error(3,36);
-        if (pieza==p_abrir) lexer();
-        condition();
-        if (!free_sintax) if (pieza!=p_cerrar) c_error(3,25);
-        if (pieza==p_cerrar) lexer();
-        g2(ljpf,0); im2=imem-1;
-        statement_end(); record_statement();
-        statement();
-        if (pieza!=p_end) { c_error(0,40); } statement_start();
-        lexer();
-        g2(ljmp,im1); mem[im2]=imem;
-        while (tbreak[--itbreak]!=0) mem[tbreak[itbreak]]=imem;
-        while (tcont[--itcont]!=0) mem[tcont[itcont]]=im1;
-        statement_end(); record_statement();
-        break;
-      case p_repeat:
-        tbreak[itbreak++]=0; tcont[itcont++]=0;
-        lexer();
-        im1=imem; statement();
-        if (pieza!=p_until) c_error(0,42);
-        statement_start();
-        lexer();
-        if (!free_sintax) if (pieza!=p_abrir) c_error(3,36);
-        if (pieza==p_abrir) lexer();
-        condition();
-        if (!free_sintax) if (pieza!=p_cerrar) c_error(3,25);
-        if (pieza==p_cerrar) lexer();
-        g2(ljpf,im1);
-        while (tbreak[--itbreak]!=0) mem[tbreak[itbreak]]=imem;
-        while (tcont[--itcont]!=0) mem[tcont[itcont]]=im1;
-        statement_end(); record_statement();
-        break;
-      case p_from:
-        statement_start();
-        tbreak[itbreak++]=0; tcont[itcont++]=0;
-        lexer();
-        if (pieza!=p_id) c_error(0,67);
-
-        if ((*o).type==tvglo) {
-          dir=(*o).vglo.offset; g2(lcar,dir);
-        } else if ((*o).type==tvloc && (!(*o).bloque || (*o).bloque==bloque_actual)) {
-          dir=-(*o).vloc.offset;
-          g2(lcar,-dir); g1(laid);
-        } else c_error(0,67);
-
-        lexer();
-        if (pieza!=p_asig) { c_error(3,68); } lexer();
-        from=constant();
-        if (pieza!=p_to) { c_error(1,69); } lexer();
-        to=constant();
-        if (from==to) c_error(4,71);
-        if (pieza==p_step) {
-          lexer();
-          step=constant();
-          if (from<to && step<=0) c_error(4,70);
-          if (from>to && step>=0) c_error(4,70);
-        } else {
-          if (from<to) step=1; else step=-1;
-        }
-        g2(lcar,from); // Assign the from value
-        g1(lasi); g1(lasp);
-
-        im1=imem; // Loop start
-
-        if (dir>=0) { // Loop continuation condition check
-          g2(lcar,dir);
-        } else {
-          g2(lcar,-dir); g1(laid);
-        }
-        g1(lptr); g2(lcar,to);
-        if (step>0) g1(lmei); else g1(lmai);
-        g2(ljpf,0); im2=imem-1;
-
-        statement_end(); record_statement();
-        if (!free_sintax) { if (pieza!=p_ptocoma) c_error(3,66); }
-        while (pieza==p_ptocoma || pieza==p_coma) lexer();
-
-        statement();
-        if (pieza!=p_end) { c_error(0,40); } statement_start();
-        lexer();
-
-        im3=imem; // Continue position
-
-        if (dir>=0) { // Increment and jump back to loop start
-          g2(lcar,dir); 
-        } else {
-          g2(lcar,-dir); g1(laid);
-        }
-        g2(lcar,step);
-        g1(lada); g1(lasp);
-        g2(ljmp,im1); mem[im2]=imem;
-
-        while (tbreak[--itbreak]!=0) mem[tbreak[itbreak]]=imem;
-        while (tcont[--itcont]!=0) mem[tcont[itcont]]=im3;
-        statement_end(); record_statement();
-
-        break;
-
-      case p_for:
-        statement_start();
-        tbreak[itbreak++]=0; tcont[itcont++]=0;
-        lexer();
-        if (pieza!=p_abrir) { c_error(3,36); } lexer();
-        if (pieza!=p_ptocoma) {
-          expression(); g1(lasp);
-          while (pieza==p_coma) { lexer(); expression(); g1(lasp); }
-        } im1=imem;
-        if (pieza!=p_ptocoma) { c_error(3,47); } lexer();
-        if (pieza==p_ptocoma) {
-          g2(lcar,1);
-        } else expression();
-        g2(ljpf,0); im2=imem-1;
-        while (pieza==p_coma) { lexer(); expression();
-          g2(ljpf,im2); im2=imem-1; }
-        g2(ljmp,0); im3=imem-1;
-        if (pieza!=p_ptocoma) { c_error(3,47); } lexer();
-        if (pieza!=p_cerrar) {
-          expression(); g1(lasp);
-          while (pieza==p_coma) { lexer(); expression(); g1(lasp); }
-        }
-        g2(ljmp,im1);
-        if (pieza!=p_cerrar) { c_error(3,25); } lexer();
-        statement_end(); record_statement();
-        mem[im3++]=imem; statement();
-        if (pieza!=p_end) { c_error(0,40); } statement_start(); lexer();
-          g2(ljmp,im3);
-          do { im1=mem[im2]; mem[im2]=imem; im2=im1; } while(im2);
-        while (tbreak[--itbreak]!=0) mem[tbreak[itbreak]]=imem;
-          while (tcont[--itcont]!=0) mem[tcont[itcont]]=im3;
-        statement_end(); record_statement();
-        break;
-      case p_switch:
-        statement_start();
-        lexer();
-        if (!free_sintax) if (pieza!=p_abrir) c_error(3,36);
-        if (pieza==p_abrir) lexer();
-        condition();
-        if (!free_sintax) if (pieza!=p_cerrar) c_error(3,25);
-        if (pieza==p_cerrar) lexer();
-        while (pieza==p_ptocoma) {
-          lexer();
-        }
-        statement_end(); record_statement();
-        im1=0; im2=0;
-        while (pieza!=p_end) {
-          statement_start();
-          if (pieza==p_case) {
-            im3=0; do {
-
-              lexer();
-              if (im1) mem[im1]=imem;
-              expression(); if (pieza!=p_rango) {
-                g2(lcse,0); im1=imem-1;
-              } else {
-                lexer(); expression();
-                g2(lcsr,0); im1=imem-1;
-              }
-
-              if (pieza==p_coma) {
-                g2(ljmp,im3); im3=imem-1;
-              }
-
-            } while (pieza==p_coma);
-
-            while(im3) { im4=mem[im3]; mem[im3]=imem; im3=im4; }
-
-          } else if (pieza==p_default) {
-            lexer();
-            if (im1) { mem[im1]=imem; } im1=0;
-          } else c_error(0,50);
-          if (!free_sintax) { if (pieza!=p_ptocoma) c_error(3,65); }
-          while (pieza==p_ptocoma || pieza==p_coma) lexer();
+          expression();
           g1(lasp);
-          statement_end(); record_statement();
-          statement();
-          if (pieza!=p_end) { c_error(0,51); } statement_start();
-            g2(ljmp,im2); im2=imem-1;
-          skip_semicolons();
-          statement_end(); record_statement();
-        } statement_start();
-        if (im1) { mem[im1]=imem; } g1(lasp);
-        while(im2) { im1=mem[im2]; mem[im2]=imem; im2=im1; }
+        }
+      }
+      im1 = imem;
+      if (pieza != p_ptocoma) {
+        c_error(3, 47);
+      }
+      lexer();
+      if (pieza == p_ptocoma) {
+        g2(lcar, 1);
+      } else
+        expression();
+      g2(ljpf, 0);
+      im2 = imem - 1;
+      while (pieza == p_coma) {
         lexer();
-        statement_end(); record_statement(); break;
-      case p_frame:
+        expression();
+        g2(ljpf, im2);
+        im2 = imem - 1;
+      }
+      g2(ljmp, 0);
+      im3 = imem - 1;
+      if (pieza != p_ptocoma) {
+        c_error(3, 47);
+      }
+      lexer();
+      if (pieza != p_cerrar) {
+        expression();
+        g1(lasp);
+        while (pieza == p_coma) {
+          lexer();
+          expression();
+          g1(lasp);
+        }
+      }
+      g2(ljmp, im1);
+      if (pieza != p_cerrar) {
+        c_error(3, 25);
+      }
+      lexer();
+      statement_end();
+      record_statement();
+      mem[im3++] = imem;
+      statement();
+      if (pieza != p_end) {
+        c_error(0, 40);
+      }
+      statement_start();
+      lexer();
+      g2(ljmp, im3);
+      do {
+        im1 = mem[im2];
+        mem[im2] = imem;
+        im2 = im1;
+      } while (im2);
+      while (tbreak[--itbreak] != 0)
+        mem[tbreak[itbreak]] = imem;
+      while (tcont[--itcont] != 0)
+        mem[tcont[itcont]] = im3;
+      statement_end();
+      record_statement();
+      break;
+    case p_switch:
+      statement_start();
+      lexer();
+      if (!free_sintax)
+        if (pieza != p_abrir)
+          c_error(3, 36);
+      if (pieza == p_abrir)
+        lexer();
+      condition();
+      if (!free_sintax)
+        if (pieza != p_cerrar)
+          c_error(3, 25);
+      if (pieza == p_cerrar)
+        lexer();
+      while (pieza == p_ptocoma) {
+        lexer();
+      }
+      statement_end();
+      record_statement();
+      im1 = 0;
+      im2 = 0;
+      while (pieza != p_end) {
         statement_start();
-        lexer(); if (pieza==p_abrir) {
-          lexer(); if (pieza!=p_cerrar) {
-            expression(); if (pieza!=p_cerrar) c_error(3,25);
-            g1(lfrf);
-          } else {
-            g1(lfrm);
-          } lexer();
+        if (pieza == p_case) {
+          im3 = 0;
+          do {
+            lexer();
+            if (im1)
+              mem[im1] = imem;
+            expression();
+            if (pieza != p_rango) {
+              g2(lcse, 0);
+              im1 = imem - 1;
+            } else {
+              lexer();
+              expression();
+              g2(lcsr, 0);
+              im1 = imem - 1;
+            }
+
+            if (pieza == p_coma) {
+              g2(ljmp, im3);
+              im3 = imem - 1;
+            }
+
+          } while (pieza == p_coma);
+
+          while (im3) {
+            im4 = mem[im3];
+            mem[im3] = imem;
+            im3 = im4;
+          }
+
+        } else if (pieza == p_default) {
+          lexer();
+          if (im1) {
+            mem[im1] = imem;
+          }
+          im1 = 0;
+        } else
+          c_error(0, 50);
+        if (!free_sintax) {
+          if (pieza != p_ptocoma)
+            c_error(3, 65);
+        }
+        while (pieza == p_ptocoma || pieza == p_coma)
+          lexer();
+        g1(lasp);
+        statement_end();
+        record_statement();
+        statement();
+        if (pieza != p_end) {
+          c_error(0, 51);
+        }
+        statement_start();
+        g2(ljmp, im2);
+        im2 = imem - 1;
+        skip_semicolons();
+        statement_end();
+        record_statement();
+      }
+      statement_start();
+      if (im1) {
+        mem[im1] = imem;
+      }
+      g1(lasp);
+      while (im2) {
+        im1 = mem[im2];
+        mem[im2] = imem;
+        im2 = im1;
+      }
+      lexer();
+      statement_end();
+      record_statement();
+      break;
+    case p_frame:
+      statement_start();
+      lexer();
+      if (pieza == p_abrir) {
+        lexer();
+        if (pieza != p_cerrar) {
+          expression();
+          if (pieza != p_cerrar)
+            c_error(3, 25);
+          g1(lfrf);
         } else {
           g1(lfrm);
         }
-        if (!free_sintax) if (pieza!=p_ptocoma) c_error(3,66);
-        while (pieza==p_ptocoma || pieza==p_coma) lexer();
-        statement_end(); record_statement(); break;
-      case p_debug:
-        statement_start();
-        g1(ldbg); lexer();
-        if (!free_sintax) if (pieza!=p_ptocoma) c_error(3,66);
-        while (pieza==p_ptocoma || pieza==p_coma) lexer();
-        statement_end(); record_statement();
+        lexer();
+      } else {
+        g1(lfrm);
+      }
+      if (!free_sintax)
+        if (pieza != p_ptocoma)
+          c_error(3, 66);
+      while (pieza == p_ptocoma || pieza == p_coma)
+        lexer();
+      statement_end();
+      record_statement();
+      break;
+    case p_debug:
+      statement_start();
+      g1(ldbg);
+      lexer();
+      if (!free_sintax)
+        if (pieza != p_ptocoma)
+          c_error(3, 66);
+      while (pieza == p_ptocoma || pieza == p_coma)
+        lexer();
+      statement_end();
+      record_statement();
+      break;
+    case p_break:
+      statement_start();
+      if (itbreak == 0) {
+        c_error(0, 48);
+      }
+      lexer();
+      if (!free_sintax) {
+        if (pieza != p_ptocoma)
+          c_error(3, 66);
+      }
+      while (pieza == p_ptocoma || pieza == p_coma)
+        lexer();
+      g2(ljmp, 0);
+      tbreak[itbreak++] = imem - 1;
+      statement_end();
+      record_statement();
+      break;
+    case p_continue:
+      statement_start();
+      if (itcont == 0) {
+        c_error(0, 49);
+      }
+      lexer();
+      if (!free_sintax) {
+        if (pieza != p_ptocoma)
+          c_error(3, 66);
+      }
+      while (pieza == p_ptocoma || pieza == p_coma)
+        lexer();
+      g2(ljmp, 0);
+      tcont[itcont++] = imem - 1;
+      statement_end();
+      record_statement();
+      break;
+    case p_clone:
+      statement_start();
+      lexer();
+      g2(lclo, 0);
+      im1 = imem - 1;
+      statement_end();
+      record_statement();
+      statement();
+      if (pieza != p_end) {
+        c_error(0, 40);
+      }
+      lexer();
+      mem[im1] = imem;
+      break;
+    case p_ptocoma:
+      lexer();
+      break;
+    default:
+      statement_start();
+      error_27 = 124;
+      expression();
+      do {
+        _exp--;
+      } while ((*_exp).type == eoper && (*_exp).token == p_string);
+      error_27 = 27;
+      switch ((*_exp).type) {
+      case ecall:
         break;
-      case p_break:
-        statement_start();
-        if (itbreak==0) { c_error(0,48); } lexer();
-        if (!free_sintax) { if (pieza!=p_ptocoma) c_error(3,66); }
-        while (pieza==p_ptocoma || pieza==p_coma) lexer();
-        g2(ljmp,0); tbreak[itbreak++]=imem-1;
-        statement_end(); record_statement(); break;
-      case p_continue:
-        statement_start();
-        if (itcont==0) { c_error(0,49); } lexer();
-        if (!free_sintax) { if (pieza!=p_ptocoma) c_error(3,66); }
-        while (pieza==p_ptocoma || pieza==p_coma) lexer();
-        g2(ljmp,0); tcont[itcont++]=imem-1;
-        statement_end(); record_statement(); break;
-      case p_clone:
-        statement_start();
-        lexer(); g2(lclo,0); im1=imem-1;
-        statement_end(); record_statement();
-        statement();
-        if (pieza!=p_end) { c_error(0,40); } lexer();
-        mem[im1]=imem; break;
-      case p_ptocoma:
-        lexer(); break;
-      default:
-        statement_start();
-        error_27=124;
-        expression();
-        do {
-          _exp--;
-        } while ((*_exp).type==eoper && (*_exp).token==p_string);
-        error_27=27;
-        switch((*_exp).type) {
-          case ecall: break;
-          case efunc: break;
-          case efext: break;
-          case eoper:
-            switch((*_exp).token) {
-              case p_asig: case p_inc: case p_suma: case p_dec: case p_resta:
-              case p_add_asig: case p_sub_asig: case p_mul_asig:
-              case p_div_asig: case p_mod_asig: case p_and_asig:
-              case p_or_asig: case p_xor_asig: case p_shr_asig: case p_shl_asig:
+      case efunc:
+        break;
+      case efext:
+        break;
+      case eoper:
+        switch ((*_exp).token) {
+        case p_asig:
+        case p_inc:
+        case p_suma:
+        case p_dec:
+        case p_resta:
+        case p_add_asig:
+        case p_sub_asig:
+        case p_mul_asig:
+        case p_div_asig:
+        case p_mod_asig:
+        case p_and_asig:
+        case p_or_asig:
+        case p_xor_asig:
+        case p_shr_asig:
+        case p_shl_asig:
 
-              case p_asigword: case p_incword: case p_sumaword: case p_decword: case p_restaword:
-              case p_add_asigword: case p_sub_asigword: case p_mul_asigword:
-              case p_div_asigword: case p_mod_asigword: case p_and_asigword:
-              case p_or_asigword: case p_xor_asigword: case p_shr_asigword: case p_shl_asigword:
+        case p_asigword:
+        case p_incword:
+        case p_sumaword:
+        case p_decword:
+        case p_restaword:
+        case p_add_asigword:
+        case p_sub_asigword:
+        case p_mul_asigword:
+        case p_div_asigword:
+        case p_mod_asigword:
+        case p_and_asigword:
+        case p_or_asigword:
+        case p_xor_asigword:
+        case p_shr_asigword:
+        case p_shl_asigword:
 
-              case p_asigchar: case p_incchar: case p_sumachar: case p_decchar: case p_restachar:
-              case p_add_asigchar: case p_sub_asigchar: case p_mul_asigchar:
-              case p_div_asigchar: case p_mod_asigchar: case p_and_asigchar:
-              case p_or_asigchar: case p_xor_asigchar: case p_shr_asigchar: case p_shl_asigchar:
+        case p_asigchar:
+        case p_incchar:
+        case p_sumachar:
+        case p_decchar:
+        case p_restachar:
+        case p_add_asigchar:
+        case p_sub_asigchar:
+        case p_mul_asigchar:
+        case p_div_asigchar:
+        case p_mod_asigchar:
+        case p_and_asigchar:
+        case p_or_asigchar:
+        case p_xor_asigchar:
+        case p_shr_asigchar:
+        case p_shl_asigchar:
 
-              case p_strcpy: case p_strcat: case p_strsub: break;
-              default: c_error(4,64); break;
-            } break;
-          default: c_error(4,64);
+        case p_strcpy:
+        case p_strcat:
+        case p_strsub:
+          break;
+        default:
+          c_error(4, 64);
+          break;
         }
-        if (!free_sintax) if (pieza!=p_ptocoma) c_error(3,66);
-        while (pieza==p_ptocoma || pieza==p_coma) lexer();
-        g1(lasp);
-        statement_end(); record_statement();
         break;
+      default:
+        c_error(4, 64);
+      }
+      if (!free_sintax)
+        if (pieza != p_ptocoma)
+          c_error(3, 66);
+      while (pieza == p_ptocoma || pieza == p_coma)
+        lexer();
+      g1(lasp);
+      statement_end();
+      record_statement();
+      break;
     }
   }
 }
@@ -5198,76 +7115,97 @@ void statement() {
 //      Condition analysis (generates code to evaluate it)
 //-----------------------------------------------------------------------------
 
-int tipo_expresion=0; // 0 - int, 1 - char or byte, 2 - string
-int tipo_factor=0;    // same
+int tipo_expresion = 0; // 0 - int, 1 - char or byte, 2 - string
+int tipo_factor = 0;    // same
 
 void condition(void) {
-  byte * __ierror, * _ierror;
+  byte *__ierror, *_ierror;
   int _linea;
 
-  if (extended_conditions) { expression(); return; } // Same as DIV 1
+  if (extended_conditions) {
+    expression();
+    return;
+  } // Same as DIV 1
 
-  _exp=tabexp;
+  _exp = tabexp;
   save_error(0);
-  _linea=linea; _ierror=ierror; con00(0);
-  swap(linea,_linea); __ierror=ierror; ierror=_ierror;
+  _linea = linea;
+  _ierror = ierror;
+  con00(0);
+  swap(linea, _linea);
+  __ierror = ierror;
+  ierror = _ierror;
   generate_expression();
-  linea=_linea; ierror=__ierror;
+  linea = _linea;
+  ierror = __ierror;
 }
 
 void con00(int tipo_exp) {
-  int te=tipo_expresion;
-  tipo_expresion=tipo_exp;
+  int te = tipo_expresion;
+  tipo_expresion = tipo_exp;
   con0();
-  tipo_expresion=te;
+  tipo_expresion = te;
 }
 
 void con0() { // Right-to-left associativity operators <-
   int p;
 
   con1();
-  if ((p=pieza)==p_asig || (p>=p_add_asig && p<=p_shl_asig)) {
-    c_error(0,140);
+  if ((p = pieza) == p_asig || (p >= p_add_asig && p <= p_shl_asig)) {
+    c_error(0, 140);
   }
 }
 
 void con1() { // Left-to-right associativity operators ->
   int p;
   con2();
-  while ((p=pieza)>=p_or && p<=p_andofs) {
-    if (p>=p_xorptr) p-=p_xorptr-p_xor; // Convert xorptr,andofs to xor,and
-    lexer(); con2();
-    (*_exp).type=eoper; (*_exp++).token=p;
-    tipo_factor=0;
+  while ((p = pieza) >= p_or && p <= p_andofs) {
+    if (p >= p_xorptr)
+      p -= p_xorptr - p_xor; // Convert xorptr,andofs to xor,and
+    lexer();
+    con2();
+    (*_exp).type = eoper;
+    (*_exp++).token = p;
+    tipo_factor = 0;
   }
 }
 
 void con2() {
-  int p,tf;
+  int p, tf;
   exp3();
   if (simple_conditions) {
-    p=pieza;
-    while ((p>=p_igu && p<=p_mai)||p==p_asig)  {
-      tf=tipo_factor;
-      if (p==p_asig) p=p_igu;
-      lexer(); exp3();
-      if (tf==2 || tipo_factor==2) {
-        p+=p_strigu-p_igu;
-        (*_exp).type=eoper; (*_exp++).token=p;
+    p = pieza;
+    while ((p >= p_igu && p <= p_mai) || p == p_asig) {
+      tf = tipo_factor;
+      if (p == p_asig)
+        p = p_igu;
+      lexer();
+      exp3();
+      if (tf == 2 || tipo_factor == 2) {
+        p += p_strigu - p_igu;
+        (*_exp).type = eoper;
+        (*_exp++).token = p;
       } else {
-        (*_exp).type=eoper; (*_exp++).token=p;
-      } tipo_factor=0; p=pieza;
+        (*_exp).type = eoper;
+        (*_exp++).token = p;
+      }
+      tipo_factor = 0;
+      p = pieza;
     }
   } else {
-    while ((p=pieza)>=p_igu && p<=p_mai) {
-      tf=tipo_factor;
-      lexer(); exp3();
-      if (tf==2 || tipo_factor==2) {
-        p+=p_strigu-p_igu;
-        (*_exp).type=eoper; (*_exp++).token=p;
+    while ((p = pieza) >= p_igu && p <= p_mai) {
+      tf = tipo_factor;
+      lexer();
+      exp3();
+      if (tf == 2 || tipo_factor == 2) {
+        p += p_strigu - p_igu;
+        (*_exp).type = eoper;
+        (*_exp++).token = p;
       } else {
-        (*_exp).type=eoper; (*_exp++).token=p;
-      } tipo_factor=0;
+        (*_exp).type = eoper;
+        (*_exp++).token = p;
+      }
+      tipo_factor = 0;
     }
   }
 }
@@ -5282,161 +7220,364 @@ void con2() {
  * error-reporting state around the parse.
  */
 void expression(void) {
-  byte * __ierror, * _ierror;
+  byte *__ierror, *_ierror;
   int _linea;
 
-  _exp=tabexp;
+  _exp = tabexp;
   save_error(0);
-  _linea=linea; _ierror=ierror; exp00(0);
-  swap(linea,_linea); __ierror=ierror; ierror=_ierror;
+  _linea = linea;
+  _ierror = ierror;
+  exp00(0);
+  swap(linea, _linea);
+  __ierror = ierror;
+  ierror = _ierror;
   generate_expression();
-  linea=_linea; ierror=__ierror;
+  linea = _linea;
+  ierror = __ierror;
 }
 
 void expression_cpa(void) {
-  byte * __ierror, * _ierror;
+  byte *__ierror, *_ierror;
   int _linea;
 
-  _exp=tabexp;
+  _exp = tabexp;
   save_error(0);
-  _linea=linea; _ierror=ierror; exp00(0);
-  swap(linea,_linea); __ierror=ierror; ierror=_ierror;
-  if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_pointer) {
-    _exp--; generate_expression(); g1(lcpa);
-  } else if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_pointerchar) {
-    _exp--; generate_expression();
-    if (hacer_strfix) { g2(lcar,0); g1(lstrfix); g1(lasp); }
+  _linea = linea;
+  _ierror = ierror;
+  exp00(0);
+  swap(linea, _linea);
+  __ierror = ierror;
+  ierror = _ierror;
+  if ((*(_exp - 1)).type == eoper && (*(_exp - 1)).token == p_pointer) {
+    _exp--;
+    generate_expression();
+    g1(lcpa);
+  } else if ((*(_exp - 1)).type == eoper && (*(_exp - 1)).token == p_pointerchar) {
+    _exp--;
+    generate_expression();
+    if (hacer_strfix) {
+      g2(lcar, 0);
+      g1(lstrfix);
+      g1(lasp);
+    }
     g1(lcpachr);
-  } else if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_pointerbyte) {
-    _exp--; generate_expression();
+  } else if ((*(_exp - 1)).type == eoper && (*(_exp - 1)).token == p_pointerbyte) {
+    _exp--;
+    generate_expression();
     g1(lcpachr);
-  } else if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_pointerword) {
-    _exp--; generate_expression();
+  } else if ((*(_exp - 1)).type == eoper && (*(_exp - 1)).token == p_pointerword) {
+    _exp--;
+    generate_expression();
     g1(lcpawor);
-  } else if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_string) {
-    _exp--; generate_expression(); g1(lcpastr);
-  } else c_error(4,44);
-  linea=_linea; ierror=__ierror;
+  } else if ((*(_exp - 1)).type == eoper && (*(_exp - 1)).token == p_string) {
+    _exp--;
+    generate_expression();
+    g1(lcpastr);
+  } else
+    c_error(4, 44);
+  linea = _linea;
+  ierror = __ierror;
 }
 
 void generate_expression(void) {
-  struct exp_ele * e=tabexp;
-  struct objeto * ob;
+  struct exp_ele *e = tabexp;
+  struct objeto *ob;
 
   do {
     switch ((*e).type) {
-      case econs:
-        g2(lcar,(*e).valor); break;
-      case estring:
-        g2(lcar,(*e).valor); break;
-      case erango:
-        g2(lrng,(*e).valor); break;
-      case ewhoami:
-        g1(lcid); break;
-      case ecall:
-        ob=(*e).objeto; g2(lcal,(*ob).proc.offset);
-        if ((*ob).usado) { (*ob).proc.offset=imem-1; } break;
-      case efunc:
-        ob=(*e).objeto; g2(lfun,(*ob).func.code); break;
-      case efext:
-        ob=(*e).objeto; g2(lext,(*ob).fext.code); break;
-      case echeck:
-        g1(lchk); break;
-      case enull:
-        g1(lnul); break;
-      case eoper: switch((*e).token) {
-        case p_asig: g1(lasi); break;
-        case p_or: g1(lori); break;
-        case p_xor: g1(lxor); break;
-        case p_and: g1(land); break;
-        case p_igu: g1(ligu); break;
-        case p_dis: g1(ldis); break;
-        case p_may: g1(lmay); break;
-        case p_men: g1(lmen); break;
-        case p_mei: g1(lmei); break;
-        case p_mai: g1(lmai); break;
-        case p_add: g1(ladd); break;
-        case p_sub: g1(lsub); break;
-        case p_mul: g1(lmul); break;
-        case p_div: g1(ldiv); break;
-        case p_mod: g1(lmod); break;
-        case p_neg: g1(lneg); break;
-        case p_pointer: g1(lptr); break;
-        case p_not: g1(lnot); break;
-        case p_punto: g1(laid); break;
-        case p_shr: g1(lshr); break;
-        case p_shl: g1(lshl); break;
-        case p_inc: g1(lipt); break;
-        case p_suma: g1(lpti); break;
-        case p_dec: g1(ldpt); break;
-        case p_resta: g1(lptd); break;
-        case p_add_asig: g1(lada); break;
-        case p_sub_asig: g1(lsua); break;
-        case p_mul_asig: g1(lmua); break;
-        case p_div_asig: g1(ldia); break;
-        case p_mod_asig: g1(lmoa); break;
-        case p_and_asig: g1(lana); break;
-        case p_or_asig: g1(lora); break;
-        case p_xor_asig: g1(lxoa); break;
-        case p_shr_asig: g1(lsra); break;
-        case p_shl_asig: g1(lsla); break;
+    case econs:
+      g2(lcar, (*e).valor);
+      break;
+    case estring:
+      g2(lcar, (*e).valor);
+      break;
+    case erango:
+      g2(lrng, (*e).valor);
+      break;
+    case ewhoami:
+      g1(lcid);
+      break;
+    case ecall:
+      ob = (*e).objeto;
+      g2(lcal, (*ob).proc.offset);
+      if ((*ob).usado) {
+        (*ob).proc.offset = imem - 1;
+      }
+      break;
+    case efunc:
+      ob = (*e).objeto;
+      g2(lfun, (*ob).func.code);
+      break;
+    case efext:
+      ob = (*e).objeto;
+      g2(lext, (*ob).fext.code);
+      break;
+    case echeck:
+      g1(lchk);
+      break;
+    case enull:
+      g1(lnul);
+      break;
+    case eoper:
+      switch ((*e).token) {
+      case p_asig:
+        g1(lasi);
+        break;
+      case p_or:
+        g1(lori);
+        break;
+      case p_xor:
+        g1(lxor);
+        break;
+      case p_and:
+        g1(land);
+        break;
+      case p_igu:
+        g1(ligu);
+        break;
+      case p_dis:
+        g1(ldis);
+        break;
+      case p_may:
+        g1(lmay);
+        break;
+      case p_men:
+        g1(lmen);
+        break;
+      case p_mei:
+        g1(lmei);
+        break;
+      case p_mai:
+        g1(lmai);
+        break;
+      case p_add:
+        g1(ladd);
+        break;
+      case p_sub:
+        g1(lsub);
+        break;
+      case p_mul:
+        g1(lmul);
+        break;
+      case p_div:
+        g1(ldiv);
+        break;
+      case p_mod:
+        g1(lmod);
+        break;
+      case p_neg:
+        g1(lneg);
+        break;
+      case p_pointer:
+        g1(lptr);
+        break;
+      case p_not:
+        g1(lnot);
+        break;
+      case p_punto:
+        g1(laid);
+        break;
+      case p_shr:
+        g1(lshr);
+        break;
+      case p_shl:
+        g1(lshl);
+        break;
+      case p_inc:
+        g1(lipt);
+        break;
+      case p_suma:
+        g1(lpti);
+        break;
+      case p_dec:
+        g1(ldpt);
+        break;
+      case p_resta:
+        g1(lptd);
+        break;
+      case p_add_asig:
+        g1(lada);
+        break;
+      case p_sub_asig:
+        g1(lsua);
+        break;
+      case p_mul_asig:
+        g1(lmua);
+        break;
+      case p_div_asig:
+        g1(ldia);
+        break;
+      case p_mod_asig:
+        g1(lmoa);
+        break;
+      case p_and_asig:
+        g1(lana);
+        break;
+      case p_or_asig:
+        g1(lora);
+        break;
+      case p_xor_asig:
+        g1(lxoa);
+        break;
+      case p_shr_asig:
+        g1(lsra);
+        break;
+      case p_shl_asig:
+        g1(lsla);
+        break;
 
-        case p_pointerword: g1(lptrwor); break;
-        case p_sumaword: g1(lptiwor); break;
-        case p_restaword: g1(lptdwor); break;
-        case p_incword: g1(liptwor); break;
-        case p_decword: g1(ldptwor); break;
-        case p_asigword: g1(lasiwor); break;
-        case p_add_asigword: g1(ladawor); break;
-        case p_sub_asigword: g1(lsuawor); break;
-        case p_mul_asigword: g1(lmuawor); break;
-        case p_div_asigword: g1(ldiawor); break;
-        case p_mod_asigword: g1(lmoawor); break;
-        case p_and_asigword: g1(lanawor); break;
-        case p_or_asigword: g1(lorawor); break;
-        case p_xor_asigword: g1(lxoawor); break;
-        case p_shr_asigword: g1(lsrawor); break;
-        case p_shl_asigword: g1(lslawor); break;
+      case p_pointerword:
+        g1(lptrwor);
+        break;
+      case p_sumaword:
+        g1(lptiwor);
+        break;
+      case p_restaword:
+        g1(lptdwor);
+        break;
+      case p_incword:
+        g1(liptwor);
+        break;
+      case p_decword:
+        g1(ldptwor);
+        break;
+      case p_asigword:
+        g1(lasiwor);
+        break;
+      case p_add_asigword:
+        g1(ladawor);
+        break;
+      case p_sub_asigword:
+        g1(lsuawor);
+        break;
+      case p_mul_asigword:
+        g1(lmuawor);
+        break;
+      case p_div_asigword:
+        g1(ldiawor);
+        break;
+      case p_mod_asigword:
+        g1(lmoawor);
+        break;
+      case p_and_asigword:
+        g1(lanawor);
+        break;
+      case p_or_asigword:
+        g1(lorawor);
+        break;
+      case p_xor_asigword:
+        g1(lxoawor);
+        break;
+      case p_shr_asigword:
+        g1(lsrawor);
+        break;
+      case p_shl_asigword:
+        g1(lslawor);
+        break;
 
-        case p_pointerchar: g1(lptrchr); break;
-        case p_sumachar: g1(lptichr); break;
-        case p_restachar: g1(lptdchr); break;
-        case p_incchar: g1(liptchr); break;
-        case p_decchar: g1(ldptchr); break;
-        case p_asigchar: g1(lasichr); break;
-        case p_add_asigchar: g1(ladachr); break;
-        case p_sub_asigchar: g1(lsuachr); break;
-        case p_mul_asigchar: g1(lmuachr); break;
-        case p_div_asigchar: g1(ldiachr); break;
-        case p_mod_asigchar: g1(lmoachr); break;
-        case p_and_asigchar: g1(lanachr); break;
-        case p_or_asigchar: g1(lorachr); break;
-        case p_xor_asigchar: g1(lxoachr); break;
-        case p_shr_asigchar: g1(lsrachr); break;
-        case p_shl_asigchar: g1(lslachr); break;
+      case p_pointerchar:
+        g1(lptrchr);
+        break;
+      case p_sumachar:
+        g1(lptichr);
+        break;
+      case p_restachar:
+        g1(lptdchr);
+        break;
+      case p_incchar:
+        g1(liptchr);
+        break;
+      case p_decchar:
+        g1(ldptchr);
+        break;
+      case p_asigchar:
+        g1(lasichr);
+        break;
+      case p_add_asigchar:
+        g1(ladachr);
+        break;
+      case p_sub_asigchar:
+        g1(lsuachr);
+        break;
+      case p_mul_asigchar:
+        g1(lmuachr);
+        break;
+      case p_div_asigchar:
+        g1(ldiachr);
+        break;
+      case p_mod_asigchar:
+        g1(lmoachr);
+        break;
+      case p_and_asigchar:
+        g1(lanachr);
+        break;
+      case p_or_asigchar:
+        g1(lorachr);
+        break;
+      case p_xor_asigchar:
+        g1(lxoachr);
+        break;
+      case p_shr_asigchar:
+        g1(lsrachr);
+        break;
+      case p_shl_asigchar:
+        g1(lslachr);
+        break;
 
-        case p_strcpy: g1(lstrcpy); break;
-        case p_strfix: g1(lstrfix); break;
-        case p_strcat: g1(lstrcat); break;
-        case p_stradd: g1(lstradd); break;
-        case p_strdec: g1(lstrdec); break;
-        case p_strsub: g1(lstrsub); break;
-        case p_strlen: g1(lstrlen); break;
-        case p_strigu: g1(lstrigu); break;
-        case p_strdis: g1(lstrdis); break;
-        case p_strmay: g1(lstrmay); break;
-        case p_strmen: g1(lstrmen); break;
-        case p_strmei: g1(lstrmei); break;
-        case p_strmai: g1(lstrmai); break;
+      case p_strcpy:
+        g1(lstrcpy);
+        break;
+      case p_strfix:
+        g1(lstrfix);
+        break;
+      case p_strcat:
+        g1(lstrcat);
+        break;
+      case p_stradd:
+        g1(lstradd);
+        break;
+      case p_strdec:
+        g1(lstrdec);
+        break;
+      case p_strsub:
+        g1(lstrsub);
+        break;
+      case p_strlen:
+        g1(lstrlen);
+        break;
+      case p_strigu:
+        g1(lstrigu);
+        break;
+      case p_strdis:
+        g1(lstrdis);
+        break;
+      case p_strmay:
+        g1(lstrmay);
+        break;
+      case p_strmen:
+        g1(lstrmen);
+        break;
+      case p_strmei:
+        g1(lstrmei);
+        break;
+      case p_strmai:
+        g1(lstrmai);
+        break;
 
-        case p_pointerbyte: g1(lptrchr); break;
-        case p_string: break; // Like a null p_pointer, no-op
+      case p_pointerbyte:
+        g1(lptrchr);
+        break;
+      case p_string:
+        break; // Like a null p_pointer, no-op
 
-        default: c_error(4,41);
-      } break;
-      default: c_error(4,41);
+      default:
+        c_error(4, 41);
+      }
+      break;
+    default:
+      c_error(4, 41);
     }
-  } while (++e!=_exp);
+  } while (++e != _exp);
 }
 
 //-----------------------------------------------------------------------------
@@ -5444,52 +7585,121 @@ void generate_expression(void) {
 //      Local values and calls to other processes are not handled
 //-----------------------------------------------------------------------------
 
-int constant (void) {
-
-  byte * __ierror, * _ierror;
-  struct exp_ele * e=_exp=tabexp;
-  int _linea, i=0;
+int constant(void) {
+  byte *__ierror, *_ierror;
+  struct exp_ele *e = _exp = tabexp;
+  int _linea, i = 0;
 
   save_error(0);
 
-  _linea=linea; _ierror=ierror; exp00(0);
-  swap(linea,_linea); __ierror=ierror; ierror=_ierror;
+  _linea = linea;
+  _ierror = ierror;
+  exp00(0);
+  swap(linea, _linea);
+  __ierror = ierror;
+  ierror = _ierror;
 
-  do switch ((*e).type) {
+  do
+    switch ((*e).type) {
     case econs:
-      pila[++i]=(*e).valor; break;
+      pila[++i] = (*e).valor;
+      break;
     case estring:
-      pila[++i]=(*e).valor; break;
+      pila[++i] = (*e).valor;
+      break;
 
-    case eoper: switch((*e).token) {
-      case p_or: pila[i-1]|=pila[i]; i--; break;
-      case p_xor: pila[i-1]^=pila[i]; i--; break;
-      case p_and: pila[i-1]&=pila[i]; i--; break;
-      case p_igu: pila[i-1]=pila[i-1]==pila[i]; i--; break;
-      case p_dis: pila[i-1]=pila[i-1]!=pila[i]; i--; break;
-      case p_may: pila[i-1]=pila[i-1]>pila[i]; i--; break;
-      case p_men: pila[i-1]=pila[i-1]<pila[i]; i--; break;
-      case p_mei: pila[i-1]=pila[i-1]<=pila[i]; i--; break;
-      case p_mai: pila[i-1]=pila[i-1]>=pila[i]; i--; break;
-      case p_add: pila[i-1]+=pila[i]; i--; break;
-      case p_sub: pila[i-1]-=pila[i]; i--; break;
-      case p_mul: pila[i-1]*=pila[i]; i--; break;
-      case p_div: if (pila[i]==0) c_error(4,34); pila[i-1]/=pila[i]; i--; break;
-      case p_mod: if (pila[i]==0) c_error(4,34); pila[i-1]%=pila[i]; i--; break;
-      case p_neg: pila[i]=-pila[i]; break;
+    case eoper:
+      switch ((*e).token) {
+      case p_or:
+        pila[i - 1] |= pila[i];
+        i--;
+        break;
+      case p_xor:
+        pila[i - 1] ^= pila[i];
+        i--;
+        break;
+      case p_and:
+        pila[i - 1] &= pila[i];
+        i--;
+        break;
+      case p_igu:
+        pila[i - 1] = pila[i - 1] == pila[i];
+        i--;
+        break;
+      case p_dis:
+        pila[i - 1] = pila[i - 1] != pila[i];
+        i--;
+        break;
+      case p_may:
+        pila[i - 1] = pila[i - 1] > pila[i];
+        i--;
+        break;
+      case p_men:
+        pila[i - 1] = pila[i - 1] < pila[i];
+        i--;
+        break;
+      case p_mei:
+        pila[i - 1] = pila[i - 1] <= pila[i];
+        i--;
+        break;
+      case p_mai:
+        pila[i - 1] = pila[i - 1] >= pila[i];
+        i--;
+        break;
+      case p_add:
+        pila[i - 1] += pila[i];
+        i--;
+        break;
+      case p_sub:
+        pila[i - 1] -= pila[i];
+        i--;
+        break;
+      case p_mul:
+        pila[i - 1] *= pila[i];
+        i--;
+        break;
+      case p_div:
+        if (pila[i] == 0)
+          c_error(4, 34);
+        pila[i - 1] /= pila[i];
+        i--;
+        break;
+      case p_mod:
+        if (pila[i] == 0)
+          c_error(4, 34);
+        pila[i - 1] %= pila[i];
+        i--;
+        break;
+      case p_neg:
+        pila[i] = -pila[i];
+        break;
 
-// I think pointers (and ranges, consequently) were removed because of FROM,
-// since it caused confusion to treat a variable as a constant ...
+        // I think pointers (and ranges, consequently) were removed because of FROM,
+        // since it caused confusion to treat a variable as a constant ...
 
-      case p_not: pila[i]^=-1; break;
-      case p_shr: pila[i-1]>>=pila[i]; i--; break;
-      case p_shl: pila[i-1]<<=pila[i]; i--; break;
-      default: c_error(4,30);
-    } break;
-    default: c_error(4,30);
-  }while (++e!=_exp);
+      case p_not:
+        pila[i] ^= -1;
+        break;
+      case p_shr:
+        pila[i - 1] >>= pila[i];
+        i--;
+        break;
+      case p_shl:
+        pila[i - 1] <<= pila[i];
+        i--;
+        break;
+      default:
+        c_error(4, 30);
+      }
+      break;
+    default:
+      c_error(4, 30);
+    }
+  while (++e != _exp);
 
-  linea=_linea; ierror=__ierror; return(pila[i]);
+  linea = _linea;
+  ierror = __ierror;
+  return (pila[i]);
 }
 
 //-----------------------------------------------------------------------------
@@ -5497,115 +7707,166 @@ int constant (void) {
 //-----------------------------------------------------------------------------
 
 void exp00(int tipo_exp) {
-  int te=tipo_expresion;
-  tipo_expresion=tipo_exp;
+  int te = tipo_expresion;
+  tipo_expresion = tipo_exp;
   exp0();
-  tipo_expresion=te;
+  tipo_expresion = te;
 }
 
 void exp0() { // Right-to-left associativity operators <-
   int p;
 
   exp1();
-  if ((p=pieza)==p_asig || (p>=p_add_asig && p<=p_shl_asig)) {
-    if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_pointer) {
-      _exp--; lexer();
+  if ((p = pieza) == p_asig || (p >= p_add_asig && p <= p_shl_asig)) {
+    if ((*(_exp - 1)).type == eoper && (*(_exp - 1)).token == p_pointer) {
+      _exp--;
+      lexer();
       exp00(0);
-      (*_exp).type=eoper; (*_exp++).token=p;
-    } else if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_pointerchar) {
-      if (p==p_asig) p=p_asigchar; else p+=p_add_asigchar-p_add_asig;
-      _exp--; lexer();
+      (*_exp).type = eoper;
+      (*_exp++).token = p;
+    } else if ((*(_exp - 1)).type == eoper && (*(_exp - 1)).token == p_pointerchar) {
+      if (p == p_asig)
+        p = p_asigchar;
+      else
+        p += p_add_asigchar - p_add_asig;
+      _exp--;
+      lexer();
       exp00(1); // e.g. string[1]="A";
-      if (hacer_strfix) { (*_exp).type=eoper; (*_exp++).token=p_strfix; }
-      (*_exp).type=eoper; (*_exp++).token=p;
-    } else if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_pointerbyte) {
-      if (p==p_asig) p=p_asigchar; else p+=p_add_asigchar-p_add_asig;
-      _exp--; lexer();
+      if (hacer_strfix) {
+        (*_exp).type = eoper;
+        (*_exp++).token = p_strfix;
+      }
+      (*_exp).type = eoper;
+      (*_exp++).token = p;
+    } else if ((*(_exp - 1)).type == eoper && (*(_exp - 1)).token == p_pointerbyte) {
+      if (p == p_asig)
+        p = p_asigchar;
+      else
+        p += p_add_asigchar - p_add_asig;
+      _exp--;
+      lexer();
       exp00(1); // e.g. my_bytes[1]="A";
-      (*_exp).type=eoper; (*_exp++).token=p;
-    } else if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_pointerword) {
-      if (p==p_asig) p=p_asigword; else p+=p_add_asigword-p_add_asig;
-      _exp--; lexer();
+      (*_exp).type = eoper;
+      (*_exp++).token = p;
+    } else if ((*(_exp - 1)).type == eoper && (*(_exp - 1)).token == p_pointerword) {
+      if (p == p_asig)
+        p = p_asigword;
+      else
+        p += p_add_asigword - p_add_asig;
+      _exp--;
+      lexer();
       exp00(0);
-      (*_exp).type=eoper; (*_exp++).token=p;
-    } else if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_string) {
-      if (p==p_asig) { // string="..."; // Do strcpy
-        _exp--; lexer();
+      (*_exp).type = eoper;
+      (*_exp++).token = p;
+    } else if ((*(_exp - 1)).type == eoper && (*(_exp - 1)).token == p_string) {
+      if (p == p_asig) { // string="..."; // Do strcpy
+        _exp--;
+        lexer();
         exp00(2);
-        (*_exp).type=eoper; (*_exp++).token=p_strcpy;
-        (*_exp).type=eoper; (*_exp++).token=p_string; // A string remains on the stack
-      } else if (p==p_add_asig) { // string+="..."; // Do strcat
-        _exp--; lexer();
+        (*_exp).type = eoper;
+        (*_exp++).token = p_strcpy;
+        (*_exp).type = eoper;
+        (*_exp++).token = p_string; // A string remains on the stack
+      } else if (p == p_add_asig) { // string+="..."; // Do strcat
+        _exp--;
+        lexer();
         exp00(2);
-        (*_exp).type=eoper; (*_exp++).token=p_strcat;
-        (*_exp).type=eoper; (*_exp++).token=p_string; // A string remains on the stack
-      } else if (p==p_sub_asig) { // string-=n; // Remove characters
-        _exp--; lexer();
+        (*_exp).type = eoper;
+        (*_exp++).token = p_strcat;
+        (*_exp).type = eoper;
+        (*_exp++).token = p_string; // A string remains on the stack
+      } else if (p == p_sub_asig) { // string-=n; // Remove characters
+        _exp--;
+        lexer();
         exp00(-1);
-        (*_exp).type=eoper; (*_exp++).token=p_strsub;
-        (*_exp).type=eoper; (*_exp++).token=p_string; // A string remains on the stack
-      } else c_error(0,133);
-    } else c_error(0,39);
-  } tipo_factor=0;
+        (*_exp).type = eoper;
+        (*_exp++).token = p_strsub;
+        (*_exp).type = eoper;
+        (*_exp++).token = p_string; // A string remains on the stack
+      } else
+        c_error(0, 133);
+    } else
+      c_error(0, 39);
+  }
+  tipo_factor = 0;
 }
 
 void exp1() { // Left-to-right associativity operators ->
   int p;
   div_exp2();
-  while ((p=pieza)>=p_or && p<=p_andofs) {
-    if (p>=p_xorptr) p-=p_xorptr-p_xor; // Convert xorptr,andofs to xor,and
-    lexer(); div_exp2();
-    (*_exp).type=eoper; (*_exp++).token=p;
-    tipo_factor=0;
+  while ((p = pieza) >= p_or && p <= p_andofs) {
+    if (p >= p_xorptr)
+      p -= p_xorptr - p_xor; // Convert xorptr,andofs to xor,and
+    lexer();
+    div_exp2();
+    (*_exp).type = eoper;
+    (*_exp++).token = p;
+    tipo_factor = 0;
   }
 }
 
 void div_exp2() {
-  int p,tf;
+  int p, tf;
   exp3();
-  while ((p=pieza)>=p_igu && p<=p_mai) {
-    tf=tipo_factor;
-    lexer(); exp3();
-    if (tf==2 || tipo_factor==2) {
+  while ((p = pieza) >= p_igu && p <= p_mai) {
+    tf = tipo_factor;
+    lexer();
+    exp3();
+    if (tf == 2 || tipo_factor == 2) {
       // NOTE: When both operands are strings, comparison uses strcmp (not pointer equality).
-      p+=p_strigu-p_igu;
-      (*_exp).type=eoper; (*_exp++).token=p;
-      tipo_factor=0;
+      p += p_strigu - p_igu;
+      (*_exp).type = eoper;
+      (*_exp++).token = p;
+      tipo_factor = 0;
     } else {
-      (*_exp).type=eoper; (*_exp++).token=p;
-    } tipo_factor=0;
+      (*_exp).type = eoper;
+      (*_exp++).token = p;
+    }
+    tipo_factor = 0;
   }
 }
 
 void exp3() {
   int p;
   exp4();
-  while ((p=pieza)>=p_shr && p<=p_shl) {
-    lexer(); exp4();
-    (*_exp).type=eoper; (*_exp++).token=p;
-    tipo_factor=0;
+  while ((p = pieza) >= p_shr && p <= p_shl) {
+    lexer();
+    exp4();
+    (*_exp).type = eoper;
+    (*_exp++).token = p;
+    tipo_factor = 0;
   }
 }
 
 void exp4() {
-  int p,tf;
+  int p, tf;
   exp5();
-  while ((p=pieza)>=p_suma && p<=p_sub && (p<=p_resta || p>=p_add) ) {
-    tf=tipo_factor;
-    if (p<=p_resta) p+=p_add-p_suma; // Convert suma,resta to add,sub
-    lexer(); exp5();
-    if (p==p_add && (tf==2 || tipo_factor==2 || tipo_expresion==2)) {
-      (*_exp).type=eoper; (*_exp++).token=p_stradd;
-      (*_exp).type=eoper; (*_exp++).token=p_string; // A string is on the stack
-      tipo_factor=2;
-    } else if (p==p_sub && tf==2) {
-      if (tipo_factor==2) { (*_exp).type=eoper; (*_exp++).token=p_strlen; }
-      (*_exp).type=eoper; (*_exp++).token=p_strdec;
-      (*_exp).type=eoper; (*_exp++).token=p_string; // A string is on the stack
-      tipo_factor=2;
+  while ((p = pieza) >= p_suma && p <= p_sub && (p <= p_resta || p >= p_add)) {
+    tf = tipo_factor;
+    if (p <= p_resta)
+      p += p_add - p_suma; // Convert suma,resta to add,sub
+    lexer();
+    exp5();
+    if (p == p_add && (tf == 2 || tipo_factor == 2 || tipo_expresion == 2)) {
+      (*_exp).type = eoper;
+      (*_exp++).token = p_stradd;
+      (*_exp).type = eoper;
+      (*_exp++).token = p_string; // A string is on the stack
+      tipo_factor = 2;
+    } else if (p == p_sub && tf == 2) {
+      if (tipo_factor == 2) {
+        (*_exp).type = eoper;
+        (*_exp++).token = p_strlen;
+      }
+      (*_exp).type = eoper;
+      (*_exp++).token = p_strdec;
+      (*_exp).type = eoper;
+      (*_exp++).token = p_string; // A string is on the stack
+      tipo_factor = 2;
     } else {
-      (*_exp).type=eoper; (*_exp++).token=p;
-      tipo_factor=0;
+      (*_exp).type = eoper;
+      (*_exp++).token = p;
+      tipo_factor = 0;
     }
   }
 }
@@ -5613,1249 +7874,2129 @@ void exp4() {
 void exp5() {
   int p;
   unary();
-  while ((p=pieza)>=p_mul && p<=p_multi) {
-    if (p==p_multi) p=p_mul; // Convert multi to mul
-    lexer();  unary();
-    (*_exp).type=eoper; (*_exp++).token=p;
-    tipo_factor=0;
+  while ((p = pieza) >= p_mul && p <= p_multi) {
+    if (p == p_multi)
+      p = p_mul; // Convert multi to mul
+    lexer();
+    unary();
+    (*_exp).type = eoper;
+    (*_exp++).token = p;
+    tipo_factor = 0;
   }
 }
 
 void unary() {
   int p;
 
-  while ((p=pieza)==p_add) { lexer();  }
-  if ((p>=p_xorptr && p<=p_mul) || (p==p_inc || p==p_dec)) {
-
-    if (parametros>0 && p==p_pointer) { factor(); return; }
-
-    if (p>=p_sub && p<=p_mul) p-=p_sub-p_neg; // Convert sub,mul to neg,pointer
-    else if (p>=p_xorptr && p<=p_andofs) p+=p_pointer-p_xorptr; //xorptr,andofs to pointer,offset
-
-    lexer();  unary(); // p = ( neg, pointer, offset, not )
-
-    if (p==p_offset) {
-      if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_pointer) _exp--;
-      else if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_pointerchar) {
-        c_error(4,132); // &string[<exp>] ???
-      } else if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_pointerbyte) {
-        if ((*(_exp-2)).type==econs && (*(_exp-2)).valor==0) _exp-=2;
-        else c_error(4,132); // &bytes[<exp>] ???
-      } else if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_pointerword) {
-        if ((*(_exp-2)).type==econs && (*(_exp-2)).valor==0) _exp-=2;
-        else c_error(4,132); // &words[<exp>] ???
-      } else if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_string) {
-        // &string == string
-      } else c_error(4,32);
-    } else if (p==p_inc || p==p_dec) {
-      if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_pointer) {
-        _exp--;
-        (*_exp).type=eoper; (*_exp++).token=p;
-      } else if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_pointerchar) {
-        _exp--;
-        (*_exp).type=eoper; (*_exp++).token=p+p_incchar-p_inc;
-      } else if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_pointerbyte) {
-        _exp--;
-        (*_exp).type=eoper; (*_exp++).token=p+p_incchar-p_inc;
-      } else if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_pointerword) {
-        _exp--;
-        (*_exp).type=eoper; (*_exp++).token=p+p_incword-p_inc;
-      } else if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_string) {
-        _exp--;
-        (*_exp).type=econs;
-        if (p==p_inc) (*_exp++).valor=-1; else (*_exp++).valor=1;
-        (*_exp).type=eoper; (*_exp++).token=p_strsub;
-        (*_exp).type=eoper; (*_exp++).token=p_string;
-      } else c_error(4,122);
-    } else if (p==p_pointer) {
-      if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_pointerchar) {
-        // *string[0] == string[0]
-      } else if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_pointerbyte) {
-        // *string[0] == string[0]
-      } else if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_pointerword) {
-        // *string[0] == string[0]
-      } else if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_string) {
-        // *string == string
-      } else {
-        (*_exp).type=eoper; (*_exp++).token=p;
-      }
-    } else {
-      (*_exp).type=eoper; (*_exp++).token=p;
+  while ((p = pieza) == p_add) {
+    lexer();
+  }
+  if ((p >= p_xorptr && p <= p_mul) || (p == p_inc || p == p_dec)) {
+    if (parametros > 0 && p == p_pointer) {
+      factor();
+      return;
     }
 
-  } else exp6();
+    if (p >= p_sub && p <= p_mul)
+      p -= p_sub - p_neg; // Convert sub,mul to neg,pointer
+    else if (p >= p_xorptr && p <= p_andofs)
+      p += p_pointer - p_xorptr; //xorptr,andofs to pointer,offset
 
+    lexer();
+    unary(); // p = ( neg, pointer, offset, not )
+
+    if (p == p_offset) {
+      if ((*(_exp - 1)).type == eoper && (*(_exp - 1)).token == p_pointer)
+        _exp--;
+      else if ((*(_exp - 1)).type == eoper && (*(_exp - 1)).token == p_pointerchar) {
+        c_error(4, 132); // &string[<exp>] ???
+      } else if ((*(_exp - 1)).type == eoper && (*(_exp - 1)).token == p_pointerbyte) {
+        if ((*(_exp - 2)).type == econs && (*(_exp - 2)).valor == 0)
+          _exp -= 2;
+        else
+          c_error(4, 132); // &bytes[<exp>] ???
+      } else if ((*(_exp - 1)).type == eoper && (*(_exp - 1)).token == p_pointerword) {
+        if ((*(_exp - 2)).type == econs && (*(_exp - 2)).valor == 0)
+          _exp -= 2;
+        else
+          c_error(4, 132); // &words[<exp>] ???
+      } else if ((*(_exp - 1)).type == eoper && (*(_exp - 1)).token == p_string) {
+        // &string == string
+      } else
+        c_error(4, 32);
+    } else if (p == p_inc || p == p_dec) {
+      if ((*(_exp - 1)).type == eoper && (*(_exp - 1)).token == p_pointer) {
+        _exp--;
+        (*_exp).type = eoper;
+        (*_exp++).token = p;
+      } else if ((*(_exp - 1)).type == eoper && (*(_exp - 1)).token == p_pointerchar) {
+        _exp--;
+        (*_exp).type = eoper;
+        (*_exp++).token = p + p_incchar - p_inc;
+      } else if ((*(_exp - 1)).type == eoper && (*(_exp - 1)).token == p_pointerbyte) {
+        _exp--;
+        (*_exp).type = eoper;
+        (*_exp++).token = p + p_incchar - p_inc;
+      } else if ((*(_exp - 1)).type == eoper && (*(_exp - 1)).token == p_pointerword) {
+        _exp--;
+        (*_exp).type = eoper;
+        (*_exp++).token = p + p_incword - p_inc;
+      } else if ((*(_exp - 1)).type == eoper && (*(_exp - 1)).token == p_string) {
+        _exp--;
+        (*_exp).type = econs;
+        if (p == p_inc)
+          (*_exp++).valor = -1;
+        else
+          (*_exp++).valor = 1;
+        (*_exp).type = eoper;
+        (*_exp++).token = p_strsub;
+        (*_exp).type = eoper;
+        (*_exp++).token = p_string;
+      } else
+        c_error(4, 122);
+    } else if (p == p_pointer) {
+      if ((*(_exp - 1)).type == eoper && (*(_exp - 1)).token == p_pointerchar) {
+        // *string[0] == string[0]
+      } else if ((*(_exp - 1)).type == eoper && (*(_exp - 1)).token == p_pointerbyte) {
+        // *string[0] == string[0]
+      } else if ((*(_exp - 1)).type == eoper && (*(_exp - 1)).token == p_pointerword) {
+        // *string[0] == string[0]
+      } else if ((*(_exp - 1)).type == eoper && (*(_exp - 1)).token == p_string) {
+        // *string == string
+      } else {
+        (*_exp).type = eoper;
+        (*_exp++).token = p;
+      }
+    } else {
+      (*_exp).type = eoper;
+      (*_exp++).token = p;
+    }
+
+  } else
+    exp6();
 }
 
 void exp6() { // Operator for accessing other processes' local variables or tables
-  struct exp_ele * e;
+  struct exp_ele *e;
 
   factor();
-  while (pieza==p_punto) {
-    if (comprueba_id) (*_exp++).type=echeck;
-    e=_exp+1;
-    acceso_remoto=1; lexer(); factor(); acceso_remoto=0;
+  while (pieza == p_punto) {
+    if (comprueba_id)
+      (*_exp++).type = echeck;
+    e = _exp + 1;
+    acceso_remoto = 1;
+    lexer();
+    factor();
+    acceso_remoto = 0;
 
     // WARNING: p_punto (dot-access) MUST be the SECOND element that factor()
     // pushes into the expression. The code below replaces it with p_add.
     // (Alternative: search for p_punto between e-1 and _exp.)
 
-    if ((*e).type==eoper && (*e).token==p_punto)
-      (*e).token=p_add; else c_error(4,43);
-
+    if ((*e).type == eoper && (*e).token == p_punto)
+      (*e).token = p_add;
+    else
+      c_error(4, 43);
   }
 }
 
 int struct_pointer; // p_pointer / p_pointerchar / p_string / p_pointerbyte / p_pointerword
 
 void factor(void) {
-  struct objeto * ob;
-  struct objeto * obs;
-  int p,offset,_imem;
-  struct exp_ele * e;
+  struct objeto *ob;
+  struct objeto *obs;
+  int p, offset, _imem;
+  struct exp_ele *e;
 
-  tipo_factor=0;
+  tipo_factor = 0;
 
   switch (pieza) { // factor analysis
 
-    case p_abrir:
-      lexer(); exp00(tipo_expresion);
-      if (pieza!=p_cerrar) { c_error(3,25); } lexer();  break;
+  case p_abrir:
+    lexer();
+    exp00(tipo_expresion);
+    if (pieza != p_cerrar) {
+      c_error(3, 25);
+    }
+    lexer();
+    break;
 
-    case p_corab:
-      lexer();
-      exp00(0);
-      if (pieza!=p_corce) c_error(3,26);
-      (*_exp).type=eoper; (*_exp++).token=p_pointer; lexer(); break;
+  case p_corab:
+    lexer();
+    exp00(0);
+    if (pieza != p_corce)
+      c_error(3, 26);
+    (*_exp).type = eoper;
+    (*_exp++).token = p_pointer;
+    lexer();
+    break;
 
-    case p_whoami:
-      (*_exp++).type=ewhoami; lexer();  break;
+  case p_whoami:
+    (*_exp++).type = ewhoami;
+    lexer();
+    break;
 
-    case p_num:
-      (*_exp).type=econs; (*_exp++).valor=pieza_num; lexer(); break;
+  case p_num:
+    (*_exp).type = econs;
+    (*_exp++).valor = pieza_num;
+    lexer();
+    break;
 
-    case p_lit:
-      tipo_factor=2;
-      if (tipo_expresion==1) {
-        (*_exp).type=econs; (*_exp++).valor=(byte)mem[pieza_num];
-      } else {
-        (*_exp).type=estring; (*_exp++).valor=pieza_num;
-        if (tipo_expresion==-1) { (*_exp).type=eoper; (*_exp++).token=p_strlen; }
-      } lexer(); break;
+  case p_lit:
+    tipo_factor = 2;
+    if (tipo_expresion == 1) {
+      (*_exp).type = econs;
+      (*_exp++).valor = (byte)mem[pieza_num];
+    } else {
+      (*_exp).type = estring;
+      (*_exp++).valor = pieza_num;
+      if (tipo_expresion == -1) {
+        (*_exp).type = eoper;
+        (*_exp++).token = p_strlen;
+      }
+    }
+    lexer();
+    break;
 
-    case p_type:
-      lexer(); if (pieza!=p_id) c_error(0,112);
-      switch((*o).type) {
-        case tnone:
-          (*o).line=linea; (*o).ierror=ierror;
-          (*_exp).type=econs; (*_exp++).valor=(memptrsize)o; (*o).usado=1; break;
-        case tproc:
-          (*_exp).type=econs; (*_exp++).valor=(memptrsize)o; break;
-        case tsglo:
-          if ((*o).sglo.offset==long_header) { // type mouse ≡ 0
-            (*_exp).type=econs; (*_exp++).valor=0; break;
-          }
-          /* fall through */
-        default: c_error(0,60);
-      } lexer(); break;
-
-    case p_sizeof:
-
-      lexer(); if (pieza!=p_abrir) c_error(3,36);
-      lexer(); if (pieza!=p_id) c_error(3,113);;
-      (*_exp).type=econs;
-      switch((*o).type) {
-        case tsglo: case tsloc:
-          (*_exp++).valor=(*o).sglo.len_item*(*o).sglo.totalitems; break;
-        case tpsgl: case tpslo:
-          (*_exp++).valor=(*((*o).psgl.ostruct)).sglo.len_item*(*o).sglo.totalitems; break;
-        case ttglo: case ttloc:
-        case tbglo: case tbloc:
-        case twglo: case twloc:
-          (*_exp++).valor=(*o).tglo.totalen; break;
-        case tcglo: case tcloc:
-          (*_exp++).valor=((*o).cglo.totalen+5)/4; break;
-        case tvglo: case tvloc:
-          (*_exp++).valor=1; break;
-        default: c_error(0,61);
-      } lexer(); if (pieza!=p_cerrar) c_error(3,25); lexer();
+  case p_type:
+    lexer();
+    if (pieza != p_id)
+      c_error(0, 112);
+    switch ((*o).type) {
+    case tnone:
+      (*o).line = linea;
+      (*o).ierror = ierror;
+      (*_exp).type = econs;
+      (*_exp++).valor = (memptrsize)o;
+      (*o).usado = 1;
       break;
+    case tproc:
+      (*_exp).type = econs;
+      (*_exp++).valor = (memptrsize)o;
+      break;
+    case tsglo:
+      if ((*o).sglo.offset == long_header) { // type mouse ≡ 0
+        (*_exp).type = econs;
+        (*_exp++).valor = 0;
+        break;
+      }
+      /* fall through */
+    default:
+      c_error(0, 60);
+    }
+    lexer();
+    break;
 
-    case p_struct: // Check for struct pointer parameter declaration
-      if (parametros<=0) {
-        if (error_27==27) c_error(1,27); else c_error(0,error_27);
-      } else {
-        lexer();
-        if (pieza!=p_pointer) c_error(0,151); // Pointer can't be defined this way
-        lexer(); if (pieza!=p_id) c_error(1,110); obs=o;
-        if ((*obs).type==tnone) c_error(0,150); // Pointer can't be defined this way
-        if ((*obs).type!=tsglo && (*obs).type!=tsloc) c_error(0,150);
-        lexer(); ob=o;
-        analyze_pointer_struct(tpslo,iloc++,obs);
-        (*ob).line=linea; (*ob).ierror=ierror;
-        (*ob).param=1; parametros++;
-        (*_exp).type=econs; (*_exp++).valor=(*ob).pslo.offset;
-        (*_exp).type=eoper; (*_exp++).token=p_punto;
-        (*_exp).type=eoper; (*_exp++).token=p_pointer;
-      } break;
+  case p_sizeof:
 
-    case p_string: // Check for string parameter declaration
-      if (parametros<=0) {
-        if (error_27==27) c_error(1,27); else c_error(0,error_27);
-      } else {
+    lexer();
+    if (pieza != p_abrir)
+      c_error(3, 36);
+    lexer();
+    if (pieza != p_id)
+      c_error(3, 113);
+    ;
+    (*_exp).type = econs;
+    switch ((*o).type) {
+    case tsglo:
+    case tsloc:
+      (*_exp++).valor = (*o).sglo.len_item * (*o).sglo.totalitems;
+      break;
+    case tpsgl:
+    case tpslo:
+      (*_exp++).valor = (*((*o).psgl.ostruct)).sglo.len_item * (*o).sglo.totalitems;
+      break;
+    case ttglo:
+    case ttloc:
+    case tbglo:
+    case tbloc:
+    case twglo:
+    case twloc:
+      (*_exp++).valor = (*o).tglo.totalen;
+      break;
+    case tcglo:
+    case tcloc:
+      (*_exp++).valor = ((*o).cglo.totalen + 5) / 4;
+      break;
+    case tvglo:
+    case tvloc:
+      (*_exp++).valor = 1;
+      break;
+    default:
+      c_error(0, 61);
+    }
+    lexer();
+    if (pieza != p_cerrar)
+      c_error(3, 25);
+    lexer();
+    break;
+
+  case p_struct: // Check for struct pointer parameter declaration
+    if (parametros <= 0) {
+      if (error_27 == 27)
+        c_error(1, 27);
+      else
+        c_error(0, error_27);
+    } else {
+      lexer();
+      if (pieza != p_pointer)
+        c_error(0, 151); // Pointer can't be defined this way
+      lexer();
+      if (pieza != p_id)
+        c_error(1, 110);
+      obs = o;
+      if ((*obs).type == tnone)
+        c_error(0, 150); // Pointer can't be defined this way
+      if ((*obs).type != tsglo && (*obs).type != tsloc)
+        c_error(0, 150);
+      lexer();
+      ob = o;
+      analyze_pointer_struct(tpslo, iloc++, obs);
+      (*ob).line = linea;
+      (*ob).ierror = ierror;
+      (*ob).param = 1;
+      parametros++;
+      (*_exp).type = econs;
+      (*_exp++).valor = (*ob).pslo.offset;
+      (*_exp).type = eoper;
+      (*_exp++).token = p_punto;
+      (*_exp).type = eoper;
+      (*_exp++).token = p_pointer;
+    }
+    break;
+
+  case p_string: // Check for string parameter declaration
+    if (parametros <= 0) {
+      if (error_27 == 27)
+        c_error(1, 27);
+      else
+        c_error(0, error_27);
+    } else {
+      lexer();
+      if (pieza == p_pointer) { // Receives a pointer to string
         lexer();
-        if (pieza==p_pointer) { // Receives a pointer to string
+        ob = analiza_pointer(tpclo, iloc++);
+        (*ob).line = linea;
+        (*ob).ierror = ierror;
+        (*ob).param = 1;
+        parametros++;
+        (*_exp).type = econs;
+        (*_exp++).valor = (*ob).pclo.offset;
+        (*_exp).type = eoper;
+        (*_exp++).token = p_punto;
+        (*_exp).type = eoper;
+        (*_exp++).token = p_pointer;
+        break;
+      }
+      if (pieza != p_id)
+        c_error(1, 125);
+      ob = o;
+      if ((*ob).type != tnone)
+        c_error(0, 126);
+      (*ob).line = linea;
+      (*ob).ierror = ierror;
+      (*ob).param = 1;
+      (*ob).type = tcloc;
+      lexer();
+      if (pieza == p_corab) {
+        lexer();
+        if (pieza == p_corce) {
           lexer();
-          ob=analiza_pointer(tpclo,iloc++);
-          (*ob).line=linea; (*ob).ierror=ierror;
-          (*ob).param=1; parametros++;
-          (*_exp).type=econs; (*_exp++).valor=(*ob).pclo.offset;
-          (*_exp).type=eoper; (*_exp++).token=p_punto;
-          (*_exp).type=eoper; (*_exp++).token=p_pointer;
-          break;
+          (*ob).cloc.totalen = 255;
+        } else {
+          e = _exp;
+          if (((*ob).cloc.totalen = constant()) < 0)
+            c_error(4, 127);
+          if ((*ob).cloc.totalen > 0xFFFFF)
+            c_error(4, 135);
+          if (pieza != p_corce)
+            c_error(3, 26);
+          lexer();
+          _exp = e;
         }
-        if (pieza!=p_id) c_error(1,125);
-        ob=o; if ((*ob).type!=tnone) c_error(0,126);
-        (*ob).line=linea; (*ob).ierror=ierror;
-        (*ob).param=1;
-        (*ob).type=tcloc; lexer();
-        if (pieza==p_corab) {
-          lexer();
-          if (pieza==p_corce) {
-            lexer();
-            (*ob).cloc.totalen=255;
-          } else {
-            e=_exp;
-            if (((*ob).cloc.totalen=constant())<0) c_error(4,127);
-            if ((*ob).cloc.totalen>0xFFFFF) c_error(4,135);
-            if (pieza!=p_corce) c_error(3,26);
-            lexer();
-            _exp=e;
-          }
-        } else (*ob).cloc.totalen=255;
-        if (parametros>1) { g2(lpar,parametros-1); } parametros=1;
-        g2(lpri,0); _imem=imem;
-        imem+=1+((*ob).cloc.totalen+5)/4;
-        test_buffer(&mem,&imem_max,imem);
-        mem[_imem]=0xDAD00000|(*ob).cloc.totalen;
-        memset(&mem[imem+1],0,(((*ob).cloc.totalen+5)&-5));
-        (*ob).cloc.offset=iloc+1;
-        iloc+=1+((*ob).cloc.totalen+5)/4;
-        mem[_imem-1]=imem; // pri
-        (*_exp).type=estring; (*_exp++).valor=(*ob).cloc.offset;
-        (*_exp).type=eoper; (*_exp++).token=p_punto;
-        (*_exp).type=eoper; (*_exp++).token=p_string;
-      } break;
+      } else
+        (*ob).cloc.totalen = 255;
+      if (parametros > 1) {
+        g2(lpar, parametros - 1);
+      }
+      parametros = 1;
+      g2(lpri, 0);
+      _imem = imem;
+      imem += 1 + ((*ob).cloc.totalen + 5) / 4;
+      test_buffer(&mem, &imem_max, imem);
+      mem[_imem] = 0xDAD00000 | (*ob).cloc.totalen;
+      memset(&mem[imem + 1], 0, (((*ob).cloc.totalen + 5) & -5));
+      (*ob).cloc.offset = iloc + 1;
+      iloc += 1 + ((*ob).cloc.totalen + 5) / 4;
+      mem[_imem - 1] = imem; // pri
+      (*_exp).type = estring;
+      (*_exp++).valor = (*ob).cloc.offset;
+      (*_exp).type = eoper;
+      (*_exp++).token = p_punto;
+      (*_exp).type = eoper;
+      (*_exp++).token = p_string;
+    }
+    break;
 
-    case p_byte: // Check for byte parameter declaration
-      if (parametros<=0) {
-        if (error_27==27) c_error(1,27); else c_error(0,error_27);
-      } else {
+  case p_byte: // Check for byte parameter declaration
+    if (parametros <= 0) {
+      if (error_27 == 27)
+        c_error(1, 27);
+      else
+        c_error(0, error_27);
+    } else {
+      lexer();
+      if (pieza == p_pointer) {
         lexer();
-        if (pieza==p_pointer) {
-          lexer();
-          ob=analiza_pointer(tpblo,iloc++);
-          (*ob).line=linea; (*ob).ierror=ierror;
-          (*ob).param=1; parametros++;
-          (*_exp).type=econs; (*_exp++).valor=(*ob).pblo.offset;
-          (*_exp).type=eoper; (*_exp++).token=p_punto;
-          (*_exp).type=eoper; (*_exp++).token=p_pointer;
-          break;
-        }
-        if (pieza!=p_id) c_error(1,142);
-        ob=o; if ((*ob).type!=tnone) c_error(0,126);
-        (*ob).line=linea; (*ob).ierror=ierror;
-        (*ob).param=1;
-        (*ob).type=tbloc; lexer();
-        if (pieza==p_corab) c_error(2,146);
-        parametros++; (*ob).bloc.offset=iloc++;
-        (*ob).bloc.len1=0;
-        (*ob).bloc.len2=-1;
-        (*ob).bloc.len3=-1;
-        (*ob).bloc.totalen=1;
-        (*_exp).type=econs; (*_exp++).valor=(*ob).bloc.offset;
-        (*_exp).type=eoper; (*_exp++).token=p_punto;
-        (*_exp).type=econs; (*_exp++).valor=0;
-        (*_exp).type=eoper; (*_exp++).token=p_pointerbyte;
-      } break;
+        ob = analiza_pointer(tpblo, iloc++);
+        (*ob).line = linea;
+        (*ob).ierror = ierror;
+        (*ob).param = 1;
+        parametros++;
+        (*_exp).type = econs;
+        (*_exp++).valor = (*ob).pblo.offset;
+        (*_exp).type = eoper;
+        (*_exp++).token = p_punto;
+        (*_exp).type = eoper;
+        (*_exp++).token = p_pointer;
+        break;
+      }
+      if (pieza != p_id)
+        c_error(1, 142);
+      ob = o;
+      if ((*ob).type != tnone)
+        c_error(0, 126);
+      (*ob).line = linea;
+      (*ob).ierror = ierror;
+      (*ob).param = 1;
+      (*ob).type = tbloc;
+      lexer();
+      if (pieza == p_corab)
+        c_error(2, 146);
+      parametros++;
+      (*ob).bloc.offset = iloc++;
+      (*ob).bloc.len1 = 0;
+      (*ob).bloc.len2 = -1;
+      (*ob).bloc.len3 = -1;
+      (*ob).bloc.totalen = 1;
+      (*_exp).type = econs;
+      (*_exp++).valor = (*ob).bloc.offset;
+      (*_exp).type = eoper;
+      (*_exp++).token = p_punto;
+      (*_exp).type = econs;
+      (*_exp++).valor = 0;
+      (*_exp).type = eoper;
+      (*_exp++).token = p_pointerbyte;
+    }
+    break;
 
-    case p_word: // Check for word parameter declaration
-      if (parametros<=0) {
-        if (error_27==27) c_error(1,27); else c_error(0,error_27);
-      } else {
+  case p_word: // Check for word parameter declaration
+    if (parametros <= 0) {
+      if (error_27 == 27)
+        c_error(1, 27);
+      else
+        c_error(0, error_27);
+    } else {
+      lexer();
+      if (pieza == p_pointer) {
         lexer();
-        if (pieza==p_pointer) {
-          lexer();
-          ob=analiza_pointer(tpwlo,iloc++);
-          (*ob).line=linea; (*ob).ierror=ierror;
-          (*ob).param=1; parametros++;
-          (*_exp).type=econs; (*_exp++).valor=(*ob).pwlo.offset;
-          (*_exp).type=eoper; (*_exp++).token=p_punto;
-          (*_exp).type=eoper; (*_exp++).token=p_pointer;
-          break;
-        }
-        if (pieza!=p_id) c_error(1,145);
-        ob=o; if ((*ob).type!=tnone) c_error(0,126);
-        (*ob).line=linea; (*ob).ierror=ierror;
-        (*ob).param=1;
-        (*ob).type=twloc; lexer();
-        if (pieza==p_corab) c_error(2,146);
-        parametros++; (*ob).wloc.offset=iloc++;
-        (*ob).wloc.len1=0;
-        (*ob).wloc.len2=-1;
-        (*ob).wloc.len3=-1;
-        (*ob).wloc.totalen=1;
-        (*_exp).type=econs; (*_exp++).valor=(*ob).wloc.offset;
-        (*_exp).type=eoper; (*_exp++).token=p_punto;
-        (*_exp).type=econs; (*_exp++).valor=0;
-        (*_exp).type=eoper; (*_exp++).token=p_pointerword;
-      } break;
+        ob = analiza_pointer(tpwlo, iloc++);
+        (*ob).line = linea;
+        (*ob).ierror = ierror;
+        (*ob).param = 1;
+        parametros++;
+        (*_exp).type = econs;
+        (*_exp++).valor = (*ob).pwlo.offset;
+        (*_exp).type = eoper;
+        (*_exp++).token = p_punto;
+        (*_exp).type = eoper;
+        (*_exp++).token = p_pointer;
+        break;
+      }
+      if (pieza != p_id)
+        c_error(1, 145);
+      ob = o;
+      if ((*ob).type != tnone)
+        c_error(0, 126);
+      (*ob).line = linea;
+      (*ob).ierror = ierror;
+      (*ob).param = 1;
+      (*ob).type = twloc;
+      lexer();
+      if (pieza == p_corab)
+        c_error(2, 146);
+      parametros++;
+      (*ob).wloc.offset = iloc++;
+      (*ob).wloc.len1 = 0;
+      (*ob).wloc.len2 = -1;
+      (*ob).wloc.len3 = -1;
+      (*ob).wloc.totalen = 1;
+      (*_exp).type = econs;
+      (*_exp++).valor = (*ob).wloc.offset;
+      (*_exp).type = eoper;
+      (*_exp++).token = p_punto;
+      (*_exp).type = econs;
+      (*_exp++).valor = 0;
+      (*_exp).type = eoper;
+      (*_exp++).token = p_pointerword;
+    }
+    break;
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
-    case p_int: // Check for int parameter declaration
-      if (parametros<=0) {
-        if (error_27==27) c_error(1,27); else c_error(0,error_27);
-      } else {
-        lexer();
-        if (pieza==p_pointer) {
-    case p_pointer: // Pointer-to-int parameter declaration
+  case p_int: // Check for int parameter declaration
+    if (parametros <= 0) {
+      if (error_27 == 27)
+        c_error(1, 27);
+      else
+        c_error(0, error_27);
+    } else {
+      lexer();
+      if (pieza == p_pointer) {
+      case p_pointer: // Pointer-to-int parameter declaration
 #pragma GCC diagnostic pop
-          if (parametros<=0) {
-            if (error_27==27) c_error(1,27); else c_error(0,error_27);
-          } parametros++;
-          lexer();
-          ob=analiza_pointer(tpilo,iloc++);
-          (*ob).line=linea; (*ob).ierror=ierror;
-          (*ob).param=1;
-          (*_exp).type=econs; (*_exp++).valor=(*ob).pilo.offset;
-          (*_exp).type=eoper; (*_exp++).token=p_punto;
-          (*_exp).type=eoper; (*_exp++).token=p_pointer;
+        if (parametros <= 0) {
+          if (error_27 == 27)
+            c_error(1, 27);
+          else
+            c_error(0, error_27);
+        }
+        parametros++;
+        lexer();
+        ob = analiza_pointer(tpilo, iloc++);
+        (*ob).line = linea;
+        (*ob).ierror = ierror;
+        (*ob).param = 1;
+        (*_exp).type = econs;
+        (*_exp++).valor = (*ob).pilo.offset;
+        (*_exp).type = eoper;
+        (*_exp++).token = p_punto;
+        (*_exp).type = eoper;
+        (*_exp++).token = p_pointer;
+        break;
+      } else if (pieza != p_id)
+        c_error(1, 149);
+    }
+
+  case p_id:
+    switch ((*o).type) {
+    case tnone:
+      ob = o;
+      (*ob).line = linea;
+      (*ob).ierror = ierror;
+      lexer();
+      if (pieza != p_abrir) {
+        if (parametros > 0) {
+          if (pieza == p_corab)
+            c_error(2, 146);
+          parametros++;
+          (*ob).type = tvloc;
+          (*ob).vloc.offset = iloc++;
+          (*ob).param = 1;
+          (*_exp).type = econs;
+          (*_exp++).valor = (*ob).vloc.offset;
+          (*_exp).type = eoper;
+          (*_exp++).token = p_punto;
+          (*_exp).type = eoper;
+          (*_exp++).token = p_pointer;
           break;
-        } else if (pieza!=p_id) c_error(1,149);
+        } else
+          c_error(2, 28);
       }
-
-    case p_id: switch ((*o).type) {
-
-      case tnone:
-        ob=o; (*ob).line=linea; (*ob).ierror=ierror; lexer();
-        if (pieza!=p_abrir) {
-          if (parametros>0) {
-            if (pieza==p_corab) c_error(2,146);
-            parametros++;
-            (*ob).type=tvloc; (*ob).vloc.offset=iloc++;
-            (*ob).param=1;
-            (*_exp).type=econs; (*_exp++).valor=(*ob).vloc.offset;
-            (*_exp).type=eoper; (*_exp++).token=p_punto;
-            (*_exp).type=eoper; (*_exp++).token=p_pointer; break;
-          } else c_error(2,28);
-        }
-        (*ob).usado=1; (*ob).type=tproc;
-        (*ob).proc.bloque=ob; (*ob).proc.offset=0; (*ob).proc.num_par=0;
-        lexer();
-        while (pieza!=p_cerrar) {
-          (*ob).proc.num_par++;
-          exp00(0);
-          if (pieza!=p_cerrar) { if (pieza!=p_coma) c_error(3,25);
-          else { lexer();  if (pieza==p_cerrar) c_error(3,45); } }
-        } (*_exp).type=ecall; (*_exp++).objeto=ob; lexer();  break;
-
-      case tcons:
-        if ((*o).cons.literal) {
-          tipo_factor=2;
-          if (tipo_expresion==1) {
-            (*_exp).type=econs; (*_exp++).valor=(byte)mem[pieza_num];
-          } else if (tipo_expresion==-1) {
-            (*_exp).type=econs; (*_exp++).valor=pieza_num;
-            (*_exp).type=eoper; (*_exp++).token=p_strlen;
-          } else {
-            (*_exp).type=econs; (*_exp++).valor=(*o).cons.valor;
+      (*ob).usado = 1;
+      (*ob).type = tproc;
+      (*ob).proc.bloque = ob;
+      (*ob).proc.offset = 0;
+      (*ob).proc.num_par = 0;
+      lexer();
+      while (pieza != p_cerrar) {
+        (*ob).proc.num_par++;
+        exp00(0);
+        if (pieza != p_cerrar) {
+          if (pieza != p_coma)
+            c_error(3, 25);
+          else {
+            lexer();
+            if (pieza == p_cerrar)
+              c_error(3, 45);
           }
+        }
+      }
+      (*_exp).type = ecall;
+      (*_exp++).objeto = ob;
+      lexer();
+      break;
+
+    case tcons:
+      if ((*o).cons.literal) {
+        tipo_factor = 2;
+        if (tipo_expresion == 1) {
+          (*_exp).type = econs;
+          (*_exp++).valor = (byte)mem[pieza_num];
+        } else if (tipo_expresion == -1) {
+          (*_exp).type = econs;
+          (*_exp++).valor = pieza_num;
+          (*_exp).type = eoper;
+          (*_exp++).token = p_strlen;
         } else {
-          (*_exp).type=econs; (*_exp++).valor=(*o).cons.valor;
-        } lexer(); break;
-
-      case tvglo:
-        (*_exp).type=econs; (*_exp++).valor=(*o).vglo.offset;
-        (*_exp).type=eoper; (*_exp++).token=p_pointer; lexer();  break;
-        break;
-
-      case ttglo:
-      case tpigl:
-        ob=o; offset=(*ob).tglo.offset;
-        lexer();
-        (*_exp).type=econs; (*_exp++).valor=offset;
-        if (pieza==p_corab) {
-          if ((*ob).type==tpigl) {
-            (*_exp).type=eoper; (*_exp++).token=p_pointer;
-            if (comprueba_null) (*_exp++).type=enull;
-          }
-          lexer();
-          exp00(0);
-          if ((*ob).tglo.len1>-1) if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).tglo.len1; }
-          if ((*ob).tglo.len2>-1) {
-            if (pieza!=p_coma) c_error(3,130);
-            lexer();
-            exp00(0);
-            if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).tglo.len2; }
-            if ((*ob).tglo.len3>-1) {
-              if (pieza!=p_coma) c_error(3,130);
-              lexer();
-              exp00(0);
-              if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).tglo.len3; }
-              (*_exp).type=econs; (*_exp++).valor=(*ob).tglo.len2+1;
-              (*_exp).type=eoper; (*_exp++).token=p_mul;
-              (*_exp).type=eoper; (*_exp++).token=p_add;
-            }
-            (*_exp).type=econs; (*_exp++).valor=(*ob).tglo.len1+1;
-            (*_exp).type=eoper; (*_exp++).token=p_mul;
-            (*_exp).type=eoper; (*_exp++).token=p_add;
-          }
-          if (pieza!=p_corce) c_error(3,26);
-          lexer();
-          (*_exp).type=eoper; (*_exp++).token=p_add;
-        } (*_exp).type=eoper; (*_exp++).token=p_pointer; break;
-
-      case tbglo:
-      case tpbgl:
-      case tpcgl:
-        ob=o; offset=(*ob).bglo.offset;
-        lexer();
-        (*_exp).type=econs; (*_exp++).valor=offset;
-        if ((*ob).type==tpbgl || (*ob).type==tpcgl) {
-          (*_exp).type=eoper; (*_exp++).token=p_pointer;
-          if (pieza!=p_corab) break;
-          if (comprueba_null) (*_exp++).type=enull;
+          (*_exp).type = econs;
+          (*_exp++).valor = (*o).cons.valor;
         }
-        if (pieza==p_corab) {
-          lexer();
-          exp00(0);
-          if ((*ob).bglo.len1>-1) if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).bglo.len1; }
-          if ((*ob).bglo.len2>-1) {
-            if (pieza!=p_coma) c_error(3,130);
-            lexer();
-            exp00(0);
-            if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).bglo.len2; }
-            if ((*ob).bglo.len3>-1) {
-              if (pieza!=p_coma) c_error(3,130);
-              lexer();
-              exp00(0);
-              if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).bglo.len3; }
-              (*_exp).type=econs; (*_exp++).valor=(*ob).bglo.len2+1;
-              (*_exp).type=eoper; (*_exp++).token=p_mul;
-              (*_exp).type=eoper; (*_exp++).token=p_add;
-            }
-            (*_exp).type=econs; (*_exp++).valor=(*ob).bglo.len1+1;
-            (*_exp).type=eoper; (*_exp++).token=p_mul;
-            (*_exp).type=eoper; (*_exp++).token=p_add;
-          }
-          if (pieza!=p_corce) c_error(3,26);
-          lexer();
-        } else { // mi_byte ≡ mi_byte[0]
-          (*_exp).type=econs; (*_exp++).valor=0;
-        } (*_exp).type=eoper; (*_exp++).token=p_pointerbyte ; break;
+      } else {
+        (*_exp).type = econs;
+        (*_exp++).valor = (*o).cons.valor;
+      }
+      lexer();
+      break;
 
-      case twglo:
-      case tpwgl:
-        ob=o; offset=(*ob).wglo.offset;
-        lexer();
-        (*_exp).type=econs; (*_exp++).valor=offset;
-        if ((*ob).type==tpwgl) {
-          (*_exp).type=eoper; (*_exp++).token=p_pointer;
-          if (pieza!=p_corab) break;
-          if (comprueba_null) (*_exp++).type=enull;
+    case tvglo:
+      (*_exp).type = econs;
+      (*_exp++).valor = (*o).vglo.offset;
+      (*_exp).type = eoper;
+      (*_exp++).token = p_pointer;
+      lexer();
+      break;
+      break;
+
+    case ttglo:
+    case tpigl:
+      ob = o;
+      offset = (*ob).tglo.offset;
+      lexer();
+      (*_exp).type = econs;
+      (*_exp++).valor = offset;
+      if (pieza == p_corab) {
+        if ((*ob).type == tpigl) {
+          (*_exp).type = eoper;
+          (*_exp++).token = p_pointer;
+          if (comprueba_null)
+            (*_exp++).type = enull;
         }
-        if (pieza==p_corab) {
+        lexer();
+        exp00(0);
+        if ((*ob).tglo.len1 > -1)
+          if (comprueba_rango) {
+            (*_exp).type = erango;
+            (*_exp++).valor = (*ob).tglo.len1;
+          }
+        if ((*ob).tglo.len2 > -1) {
+          if (pieza != p_coma)
+            c_error(3, 130);
           lexer();
           exp00(0);
-          if ((*ob).wglo.len1>-1) if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).wglo.len1; }
-          if ((*ob).wglo.len2>-1) {
-            if (pieza!=p_coma) c_error(3,130);
+          if (comprueba_rango) {
+            (*_exp).type = erango;
+            (*_exp++).valor = (*ob).tglo.len2;
+          }
+          if ((*ob).tglo.len3 > -1) {
+            if (pieza != p_coma)
+              c_error(3, 130);
             lexer();
             exp00(0);
-            if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).wglo.len2; }
-            if ((*ob).wglo.len3>-1) {
-              if (pieza!=p_coma) c_error(3,130);
-              lexer();
-              exp00(0);
-              if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).wglo.len3; }
-              (*_exp).type=econs; (*_exp++).valor=(*ob).wglo.len2+1;
-              (*_exp).type=eoper; (*_exp++).token=p_mul;
-              (*_exp).type=eoper; (*_exp++).token=p_add;
+            if (comprueba_rango) {
+              (*_exp).type = erango;
+              (*_exp++).valor = (*ob).tglo.len3;
             }
-            (*_exp).type=econs; (*_exp++).valor=(*ob).wglo.len1+1;
-            (*_exp).type=eoper; (*_exp++).token=p_mul;
-            (*_exp).type=eoper; (*_exp++).token=p_add;
+            (*_exp).type = econs;
+            (*_exp++).valor = (*ob).tglo.len2 + 1;
+            (*_exp).type = eoper;
+            (*_exp++).token = p_mul;
+            (*_exp).type = eoper;
+            (*_exp++).token = p_add;
           }
-          if (pieza!=p_corce) c_error(3,26);
-          lexer();
-        } else { // mi_byte ≡ mi_byte[0]
-          (*_exp).type=econs; (*_exp++).valor=0;
-        } (*_exp).type=eoper; (*_exp++).token=p_pointerword; break;
-
-      case tcglo:
-        ob=o; offset=(*ob).cglo.offset;
+          (*_exp).type = econs;
+          (*_exp++).valor = (*ob).tglo.len1 + 1;
+          (*_exp).type = eoper;
+          (*_exp++).token = p_mul;
+          (*_exp).type = eoper;
+          (*_exp++).token = p_add;
+        }
+        if (pieza != p_corce)
+          c_error(3, 26);
         lexer();
-        (*_exp).type=estring; (*_exp++).valor=offset;
-        if (pieza==p_corab) {
+        (*_exp).type = eoper;
+        (*_exp++).token = p_add;
+      }
+      (*_exp).type = eoper;
+      (*_exp++).token = p_pointer;
+      break;
+
+    case tbglo:
+    case tpbgl:
+    case tpcgl:
+      ob = o;
+      offset = (*ob).bglo.offset;
+      lexer();
+      (*_exp).type = econs;
+      (*_exp++).valor = offset;
+      if ((*ob).type == tpbgl || (*ob).type == tpcgl) {
+        (*_exp).type = eoper;
+        (*_exp++).token = p_pointer;
+        if (pieza != p_corab)
+          break;
+        if (comprueba_null)
+          (*_exp++).type = enull;
+      }
+      if (pieza == p_corab) {
+        lexer();
+        exp00(0);
+        if ((*ob).bglo.len1 > -1)
+          if (comprueba_rango) {
+            (*_exp).type = erango;
+            (*_exp++).valor = (*ob).bglo.len1;
+          }
+        if ((*ob).bglo.len2 > -1) {
+          if (pieza != p_coma)
+            c_error(3, 130);
           lexer();
           exp00(0);
-          if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).cglo.totalen; }
-          if (pieza!=p_corce) c_error(3,26);
+          if (comprueba_rango) {
+            (*_exp).type = erango;
+            (*_exp++).valor = (*ob).bglo.len2;
+          }
+          if ((*ob).bglo.len3 > -1) {
+            if (pieza != p_coma)
+              c_error(3, 130);
+            lexer();
+            exp00(0);
+            if (comprueba_rango) {
+              (*_exp).type = erango;
+              (*_exp++).valor = (*ob).bglo.len3;
+            }
+            (*_exp).type = econs;
+            (*_exp++).valor = (*ob).bglo.len2 + 1;
+            (*_exp).type = eoper;
+            (*_exp++).token = p_mul;
+            (*_exp).type = eoper;
+            (*_exp++).token = p_add;
+          }
+          (*_exp).type = econs;
+          (*_exp++).valor = (*ob).bglo.len1 + 1;
+          (*_exp).type = eoper;
+          (*_exp++).token = p_mul;
+          (*_exp).type = eoper;
+          (*_exp++).token = p_add;
+        }
+        if (pieza != p_corce)
+          c_error(3, 26);
+        lexer();
+      } else { // mi_byte ≡ mi_byte[0]
+        (*_exp).type = econs;
+        (*_exp++).valor = 0;
+      }
+      (*_exp).type = eoper;
+      (*_exp++).token = p_pointerbyte;
+      break;
+
+    case twglo:
+    case tpwgl:
+      ob = o;
+      offset = (*ob).wglo.offset;
+      lexer();
+      (*_exp).type = econs;
+      (*_exp++).valor = offset;
+      if ((*ob).type == tpwgl) {
+        (*_exp).type = eoper;
+        (*_exp++).token = p_pointer;
+        if (pieza != p_corab)
+          break;
+        if (comprueba_null)
+          (*_exp++).type = enull;
+      }
+      if (pieza == p_corab) {
+        lexer();
+        exp00(0);
+        if ((*ob).wglo.len1 > -1)
+          if (comprueba_rango) {
+            (*_exp).type = erango;
+            (*_exp++).valor = (*ob).wglo.len1;
+          }
+        if ((*ob).wglo.len2 > -1) {
+          if (pieza != p_coma)
+            c_error(3, 130);
           lexer();
-          (*_exp).type=eoper; (*_exp++).token=p_pointerchar;
+          exp00(0);
+          if (comprueba_rango) {
+            (*_exp).type = erango;
+            (*_exp++).valor = (*ob).wglo.len2;
+          }
+          if ((*ob).wglo.len3 > -1) {
+            if (pieza != p_coma)
+              c_error(3, 130);
+            lexer();
+            exp00(0);
+            if (comprueba_rango) {
+              (*_exp).type = erango;
+              (*_exp++).valor = (*ob).wglo.len3;
+            }
+            (*_exp).type = econs;
+            (*_exp++).valor = (*ob).wglo.len2 + 1;
+            (*_exp).type = eoper;
+            (*_exp++).token = p_mul;
+            (*_exp).type = eoper;
+            (*_exp++).token = p_add;
+          }
+          (*_exp).type = econs;
+          (*_exp++).valor = (*ob).wglo.len1 + 1;
+          (*_exp).type = eoper;
+          (*_exp++).token = p_mul;
+          (*_exp).type = eoper;
+          (*_exp++).token = p_add;
+        }
+        if (pieza != p_corce)
+          c_error(3, 26);
+        lexer();
+      } else { // mi_byte ≡ mi_byte[0]
+        (*_exp).type = econs;
+        (*_exp++).valor = 0;
+      }
+      (*_exp).type = eoper;
+      (*_exp++).token = p_pointerword;
+      break;
+
+    case tcglo:
+      ob = o;
+      offset = (*ob).cglo.offset;
+      lexer();
+      (*_exp).type = estring;
+      (*_exp++).valor = offset;
+      if (pieza == p_corab) {
+        lexer();
+        exp00(0);
+        if (comprueba_rango) {
+          (*_exp).type = erango;
+          (*_exp++).valor = (*ob).cglo.totalen;
+        }
+        if (pieza != p_corce)
+          c_error(3, 26);
+        lexer();
+        (*_exp).type = eoper;
+        (*_exp++).token = p_pointerchar;
+      } else {
+        tipo_factor = 2;
+        if (tipo_expresion == 1) {
+          (*_exp).type = econs;
+          (*_exp++).valor = 0;
+          (*_exp).type = eoper;
+          (*_exp++).token = p_pointerchar;
         } else {
-          tipo_factor=2;
-          if (tipo_expresion==1) {
-            (*_exp).type=econs; (*_exp++).valor=0;
-            (*_exp).type=eoper; (*_exp++).token=p_pointerchar;
-          } else {
-            (*_exp).type=eoper; (*_exp++).token=p_string;
-            if (tipo_expresion==-1) { (*_exp).type=eoper; (*_exp++).token=p_strlen; }
+          (*_exp).type = eoper;
+          (*_exp++).token = p_string;
+          if (tipo_expresion == -1) {
+            (*_exp).type = eoper;
+            (*_exp++).token = p_strlen;
           }
-        } break;
-
-      case tsglo:
-      case tpsgl:
-        ob=o; lexer(); (*_exp).type=econs; (*_exp++).valor=(*ob).sglo.offset;
-        if ((*ob).type==tpsgl) {
-          (*_exp).type=eoper; (*_exp++).token=p_pointer;
-          if (pieza!=p_corab && pieza!=p_punto) break;
-          if (comprueba_null) (*_exp++).type=enull;
         }
-        if (pieza==p_corab) {
+      }
+      break;
+
+    case tsglo:
+    case tpsgl:
+      ob = o;
+      lexer();
+      (*_exp).type = econs;
+      (*_exp++).valor = (*ob).sglo.offset;
+      if ((*ob).type == tpsgl) {
+        (*_exp).type = eoper;
+        (*_exp++).token = p_pointer;
+        if (pieza != p_corab && pieza != p_punto)
+          break;
+        if (comprueba_null)
+          (*_exp++).type = enull;
+      }
+      if (pieza == p_corab) {
+        lexer();
+        exp00(0);
+        if ((*ob).sglo.items1 > -1)
+          if (comprueba_rango) {
+            (*_exp).type = erango;
+            (*_exp++).valor = (*ob).sglo.items1;
+          }
+        if ((*ob).sglo.items2 > -1) {
+          if (pieza != p_coma)
+            c_error(3, 131);
           lexer();
           exp00(0);
-          if ((*ob).sglo.items1>-1) if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).sglo.items1; }
-          if ((*ob).sglo.items2>-1) {
-            if (pieza!=p_coma) c_error(3,131);
+          if (comprueba_rango) {
+            (*_exp).type = erango;
+            (*_exp++).valor = (*ob).sglo.items2;
+          }
+          if ((*ob).sglo.items3 > -1) {
+            if (pieza != p_coma)
+              c_error(3, 131);
             lexer();
             exp00(0);
-            if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).sglo.items2; }
-            if ((*ob).sglo.items3>-1) {
-              if (pieza!=p_coma) c_error(3,131);
-              lexer();
-              exp00(0);
-              if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).sglo.items3; }
-              (*_exp).type=econs; (*_exp++).valor=(*ob).sglo.items2+1;
-              (*_exp).type=eoper; (*_exp++).token=p_mul;
-              (*_exp).type=eoper; (*_exp++).token=p_add;
+            if (comprueba_rango) {
+              (*_exp).type = erango;
+              (*_exp++).valor = (*ob).sglo.items3;
             }
-            (*_exp).type=econs; (*_exp++).valor=(*ob).sglo.items1+1;
-            (*_exp).type=eoper; (*_exp++).token=p_mul;
-            (*_exp).type=eoper; (*_exp++).token=p_add;
+            (*_exp).type = econs;
+            (*_exp++).valor = (*ob).sglo.items2 + 1;
+            (*_exp).type = eoper;
+            (*_exp++).token = p_mul;
+            (*_exp).type = eoper;
+            (*_exp++).token = p_add;
           }
-          if (pieza!=p_corce) { c_error(3,26); } lexer();
-          if ((*ob).type==tpsgl) {
-            (*_exp).type=econs; (*_exp++).valor=(*((*ob).psgl.ostruct)).sglo.len_item;
-          } else {
-            (*_exp).type=econs; (*_exp++).valor=(*ob).sglo.len_item;
-          }
-          (*_exp).type=eoper; (*_exp++).token=p_mul;
-          (*_exp).type=eoper; (*_exp++).token=p_add;
+          (*_exp).type = econs;
+          (*_exp++).valor = (*ob).sglo.items1 + 1;
+          (*_exp).type = eoper;
+          (*_exp++).token = p_mul;
+          (*_exp).type = eoper;
+          (*_exp++).token = p_add;
         }
-        if (pieza==p_punto) {
-          struct_pointer=p_pointer;
-          if ((*ob).type==tpsgl) member=(*ob).psgl.ostruct; else member=ob;
-          lexer(); factor_struct();
-          (*_exp).type=eoper; (*_exp++).token=struct_pointer;
+        if (pieza != p_corce) {
+          c_error(3, 26);
+        }
+        lexer();
+        if ((*ob).type == tpsgl) {
+          (*_exp).type = econs;
+          (*_exp++).valor = (*((*ob).psgl.ostruct)).sglo.len_item;
         } else {
-          (*_exp).type=eoper; (*_exp++).token=p_pointer;
-        } break;
-
-      case tvloc:
-        if (acceso_remoto && (*o).bloque) c_error(0,56);
-        (*_exp).type=econs; (*_exp++).valor=(*o).vloc.offset;
-        (*_exp).type=eoper; (*_exp++).token=p_punto;
-        (*_exp).type=eoper; (*_exp++).token=p_pointer; lexer(); break;
-
-      case ttloc:
-      case tpilo:
-        if (acceso_remoto && (*o).bloque) c_error(0,56);
-        ob=o; offset=(*ob).tloc.offset;
+          (*_exp).type = econs;
+          (*_exp++).valor = (*ob).sglo.len_item;
+        }
+        (*_exp).type = eoper;
+        (*_exp++).token = p_mul;
+        (*_exp).type = eoper;
+        (*_exp++).token = p_add;
+      }
+      if (pieza == p_punto) {
+        struct_pointer = p_pointer;
+        if ((*ob).type == tpsgl)
+          member = (*ob).psgl.ostruct;
+        else
+          member = ob;
         lexer();
-        (*_exp).type=econs; (*_exp++).valor=offset;
-        (*_exp).type=eoper; (*_exp++).token=p_punto;
-        if (pieza==p_corab) {
-          if ((*ob).type==tpilo) {
-            (*_exp).type=eoper; (*_exp++).token=p_pointer;
-            if (comprueba_null) (*_exp++).type=enull;
+        factor_struct();
+        (*_exp).type = eoper;
+        (*_exp++).token = struct_pointer;
+      } else {
+        (*_exp).type = eoper;
+        (*_exp++).token = p_pointer;
+      }
+      break;
+
+    case tvloc:
+      if (acceso_remoto && (*o).bloque)
+        c_error(0, 56);
+      (*_exp).type = econs;
+      (*_exp++).valor = (*o).vloc.offset;
+      (*_exp).type = eoper;
+      (*_exp++).token = p_punto;
+      (*_exp).type = eoper;
+      (*_exp++).token = p_pointer;
+      lexer();
+      break;
+
+    case ttloc:
+    case tpilo:
+      if (acceso_remoto && (*o).bloque)
+        c_error(0, 56);
+      ob = o;
+      offset = (*ob).tloc.offset;
+      lexer();
+      (*_exp).type = econs;
+      (*_exp++).valor = offset;
+      (*_exp).type = eoper;
+      (*_exp++).token = p_punto;
+      if (pieza == p_corab) {
+        if ((*ob).type == tpilo) {
+          (*_exp).type = eoper;
+          (*_exp++).token = p_pointer;
+          if (comprueba_null)
+            (*_exp++).type = enull;
+        }
+        acceso_remoto = 0;
+        lexer();
+        exp00(0);
+        if ((*ob).tloc.len1 > -1)
+          if (comprueba_rango) {
+            (*_exp).type = erango;
+            (*_exp++).valor = (*ob).tloc.len1;
           }
-          acceso_remoto=0;
+        if ((*ob).tloc.len2 > -1) {
+          if (pieza != p_coma)
+            c_error(3, 130);
           lexer();
           exp00(0);
-          if ((*ob).tloc.len1>-1) if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).tloc.len1; }
-          if ((*ob).tloc.len2>-1) {
-            if (pieza!=p_coma) c_error(3,130);
+          if (comprueba_rango) {
+            (*_exp).type = erango;
+            (*_exp++).valor = (*ob).tloc.len2;
+          }
+          if ((*ob).tloc.len3 > -1) {
+            if (pieza != p_coma)
+              c_error(3, 130);
             lexer();
             exp00(0);
-            if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).tloc.len2; }
-            if ((*ob).tloc.len3>-1) {
-              if (pieza!=p_coma) c_error(3,130);
-              lexer();
-              exp00(0);
-              if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).tloc.len3; }
-              (*_exp).type=econs; (*_exp++).valor=(*ob).tloc.len2+1;
-              (*_exp).type=eoper; (*_exp++).token=p_mul;
-              (*_exp).type=eoper; (*_exp++).token=p_add;
+            if (comprueba_rango) {
+              (*_exp).type = erango;
+              (*_exp++).valor = (*ob).tloc.len3;
             }
-            (*_exp).type=econs; (*_exp++).valor=(*ob).tloc.len1+1;
-            (*_exp).type=eoper; (*_exp++).token=p_mul;
-            (*_exp).type=eoper; (*_exp++).token=p_add;
+            (*_exp).type = econs;
+            (*_exp++).valor = (*ob).tloc.len2 + 1;
+            (*_exp).type = eoper;
+            (*_exp++).token = p_mul;
+            (*_exp).type = eoper;
+            (*_exp++).token = p_add;
           }
-          if (pieza!=p_corce) c_error(3,26);
-          lexer();
-          (*_exp).type=eoper; (*_exp++).token=p_add;
+          (*_exp).type = econs;
+          (*_exp++).valor = (*ob).tloc.len1 + 1;
+          (*_exp).type = eoper;
+          (*_exp++).token = p_mul;
+          (*_exp).type = eoper;
+          (*_exp++).token = p_add;
         }
-        (*_exp).type=eoper; (*_exp++).token=p_pointer; break;
-
-      case tbloc:
-      case tpblo:
-      case tpclo:
-        if (acceso_remoto && (*o).bloque) c_error(0,56);
-        ob=o; offset=(*ob).bloc.offset;
+        if (pieza != p_corce)
+          c_error(3, 26);
         lexer();
-        (*_exp).type=econs; (*_exp++).valor=offset;
-        (*_exp).type=eoper; (*_exp++).token=p_punto;
-        if ((*ob).type==tpblo || (*ob).type==tpclo) {
-          (*_exp).type=eoper; (*_exp++).token=p_pointer;
-          if (pieza!=p_corab) break;
-          if (comprueba_null) (*_exp++).type=enull;
-        }
-        if (pieza==p_corab) {
-          acceso_remoto=0;
+        (*_exp).type = eoper;
+        (*_exp++).token = p_add;
+      }
+      (*_exp).type = eoper;
+      (*_exp++).token = p_pointer;
+      break;
+
+    case tbloc:
+    case tpblo:
+    case tpclo:
+      if (acceso_remoto && (*o).bloque)
+        c_error(0, 56);
+      ob = o;
+      offset = (*ob).bloc.offset;
+      lexer();
+      (*_exp).type = econs;
+      (*_exp++).valor = offset;
+      (*_exp).type = eoper;
+      (*_exp++).token = p_punto;
+      if ((*ob).type == tpblo || (*ob).type == tpclo) {
+        (*_exp).type = eoper;
+        (*_exp++).token = p_pointer;
+        if (pieza != p_corab)
+          break;
+        if (comprueba_null)
+          (*_exp++).type = enull;
+      }
+      if (pieza == p_corab) {
+        acceso_remoto = 0;
+        lexer();
+        exp00(0);
+        if ((*ob).bloc.len1 > -1)
+          if (comprueba_rango) {
+            (*_exp).type = erango;
+            (*_exp++).valor = (*ob).bloc.len1;
+          }
+        if ((*ob).bloc.len2 > -1) {
+          if (pieza != p_coma)
+            c_error(3, 130);
           lexer();
           exp00(0);
-          if ((*ob).bloc.len1>-1) if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).bloc.len1; }
-          if ((*ob).bloc.len2>-1) {
-            if (pieza!=p_coma) c_error(3,130);
+          if (comprueba_rango) {
+            (*_exp).type = erango;
+            (*_exp++).valor = (*ob).bloc.len2;
+          }
+          if ((*ob).bloc.len3 > -1) {
+            if (pieza != p_coma)
+              c_error(3, 130);
             lexer();
             exp00(0);
-            if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).bloc.len2; }
-            if ((*ob).bloc.len3>-1) {
-              if (pieza!=p_coma) c_error(3,130);
-              lexer();
-              exp00(0);
-              if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).bloc.len3; }
-              (*_exp).type=econs; (*_exp++).valor=(*ob).bloc.len2+1;
-              (*_exp).type=eoper; (*_exp++).token=p_mul;
-              (*_exp).type=eoper; (*_exp++).token=p_add;
+            if (comprueba_rango) {
+              (*_exp).type = erango;
+              (*_exp++).valor = (*ob).bloc.len3;
             }
-            (*_exp).type=econs; (*_exp++).valor=(*ob).bloc.len1+1;
-            (*_exp).type=eoper; (*_exp++).token=p_mul;
-            (*_exp).type=eoper; (*_exp++).token=p_add;
+            (*_exp).type = econs;
+            (*_exp++).valor = (*ob).bloc.len2 + 1;
+            (*_exp).type = eoper;
+            (*_exp++).token = p_mul;
+            (*_exp).type = eoper;
+            (*_exp++).token = p_add;
           }
-          if (pieza!=p_corce) c_error(3,26);
-          lexer();
-        } else { // mi_byte ≡ mi_byte[0]
-          (*_exp).type=econs; (*_exp++).valor=0;
-        } (*_exp).type=eoper; (*_exp++).token=p_pointerbyte ; break;
-
-      case twloc:
-      case tpwlo:
-        if (acceso_remoto && (*o).bloque) c_error(0,56);
-        ob=o; offset=(*ob).wloc.offset;
-        lexer();
-        (*_exp).type=econs; (*_exp++).valor=offset;
-        (*_exp).type=eoper; (*_exp++).token=p_punto;
-        if ((*ob).type==tpwlo) {
-          (*_exp).type=eoper; (*_exp++).token=p_pointer;
-          if (pieza!=p_corab) break;
-          if (comprueba_null) (*_exp++).type=enull;
+          (*_exp).type = econs;
+          (*_exp++).valor = (*ob).bloc.len1 + 1;
+          (*_exp).type = eoper;
+          (*_exp++).token = p_mul;
+          (*_exp).type = eoper;
+          (*_exp++).token = p_add;
         }
-        if (pieza==p_corab) {
-          acceso_remoto=0;
+        if (pieza != p_corce)
+          c_error(3, 26);
+        lexer();
+      } else { // mi_byte ≡ mi_byte[0]
+        (*_exp).type = econs;
+        (*_exp++).valor = 0;
+      }
+      (*_exp).type = eoper;
+      (*_exp++).token = p_pointerbyte;
+      break;
+
+    case twloc:
+    case tpwlo:
+      if (acceso_remoto && (*o).bloque)
+        c_error(0, 56);
+      ob = o;
+      offset = (*ob).wloc.offset;
+      lexer();
+      (*_exp).type = econs;
+      (*_exp++).valor = offset;
+      (*_exp).type = eoper;
+      (*_exp++).token = p_punto;
+      if ((*ob).type == tpwlo) {
+        (*_exp).type = eoper;
+        (*_exp++).token = p_pointer;
+        if (pieza != p_corab)
+          break;
+        if (comprueba_null)
+          (*_exp++).type = enull;
+      }
+      if (pieza == p_corab) {
+        acceso_remoto = 0;
+        lexer();
+        exp00(0);
+        if ((*ob).wloc.len1 > -1)
+          if (comprueba_rango) {
+            (*_exp).type = erango;
+            (*_exp++).valor = (*ob).wloc.len1;
+          }
+        if ((*ob).wloc.len2 > -1) {
+          if (pieza != p_coma)
+            c_error(3, 130);
           lexer();
           exp00(0);
-          if ((*ob).wloc.len1>-1) if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).wloc.len1; }
-          if ((*ob).wloc.len2>-1) {
-            if (pieza!=p_coma) c_error(3,130);
+          if (comprueba_rango) {
+            (*_exp).type = erango;
+            (*_exp++).valor = (*ob).wloc.len2;
+          }
+          if ((*ob).wloc.len3 > -1) {
+            if (pieza != p_coma)
+              c_error(3, 130);
             lexer();
             exp00(0);
-            if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).wloc.len2; }
-            if ((*ob).wloc.len3>-1) {
-              if (pieza!=p_coma) c_error(3,130);
-              lexer();
-              exp00(0);
-              if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).wloc.len3; }
-              (*_exp).type=econs; (*_exp++).valor=(*ob).wloc.len2+1;
-              (*_exp).type=eoper; (*_exp++).token=p_mul;
-              (*_exp).type=eoper; (*_exp++).token=p_add;
+            if (comprueba_rango) {
+              (*_exp).type = erango;
+              (*_exp++).valor = (*ob).wloc.len3;
             }
-            (*_exp).type=econs; (*_exp++).valor=(*ob).wloc.len1+1;
-            (*_exp).type=eoper; (*_exp++).token=p_mul;
-            (*_exp).type=eoper; (*_exp++).token=p_add;
+            (*_exp).type = econs;
+            (*_exp++).valor = (*ob).wloc.len2 + 1;
+            (*_exp).type = eoper;
+            (*_exp++).token = p_mul;
+            (*_exp).type = eoper;
+            (*_exp++).token = p_add;
           }
-          if (pieza!=p_corce) c_error(3,26);
-          lexer();
-        } else { // mi_byte ≡ mi_byte[0]
-          (*_exp).type=econs; (*_exp++).valor=0;
-        } (*_exp).type=eoper; (*_exp++).token=p_pointerword; break;
-
-      case tcloc:
-        if (acceso_remoto && (*o).bloque) c_error(0,56);
-        ob=o; offset=(*ob).cloc.offset;
+          (*_exp).type = econs;
+          (*_exp++).valor = (*ob).wloc.len1 + 1;
+          (*_exp).type = eoper;
+          (*_exp++).token = p_mul;
+          (*_exp).type = eoper;
+          (*_exp++).token = p_add;
+        }
+        if (pieza != p_corce)
+          c_error(3, 26);
         lexer();
-        (*_exp).type=estring; (*_exp++).valor=offset;
-        (*_exp).type=eoper; (*_exp++).token=p_punto;
-        if (pieza==p_corab) {
-          acceso_remoto=0;
-          lexer();
-          exp00(0);
-          if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).cloc.totalen; }
-          if (pieza!=p_corce) c_error(3,26);
-          lexer();
-          (*_exp).type=eoper; (*_exp++).token=p_pointerchar;
+      } else { // mi_byte ≡ mi_byte[0]
+        (*_exp).type = econs;
+        (*_exp++).valor = 0;
+      }
+      (*_exp).type = eoper;
+      (*_exp++).token = p_pointerword;
+      break;
+
+    case tcloc:
+      if (acceso_remoto && (*o).bloque)
+        c_error(0, 56);
+      ob = o;
+      offset = (*ob).cloc.offset;
+      lexer();
+      (*_exp).type = estring;
+      (*_exp++).valor = offset;
+      (*_exp).type = eoper;
+      (*_exp++).token = p_punto;
+      if (pieza == p_corab) {
+        acceso_remoto = 0;
+        lexer();
+        exp00(0);
+        if (comprueba_rango) {
+          (*_exp).type = erango;
+          (*_exp++).valor = (*ob).cloc.totalen;
+        }
+        if (pieza != p_corce)
+          c_error(3, 26);
+        lexer();
+        (*_exp).type = eoper;
+        (*_exp++).token = p_pointerchar;
+      } else {
+        tipo_factor = 2;
+        if (tipo_expresion == 1) {
+          (*_exp).type = econs;
+          (*_exp++).valor = 0;
+          (*_exp).type = eoper;
+          (*_exp++).token = p_pointerchar;
         } else {
-          tipo_factor=2;
-          if (tipo_expresion==1) {
-            (*_exp).type=econs; (*_exp++).valor=0;
-            (*_exp).type=eoper; (*_exp++).token=p_pointerchar;
-          } else {
-            (*_exp).type=eoper; (*_exp++).token=p_string;
-            if (tipo_expresion==-1) { (*_exp).type=eoper; (*_exp++).token=p_strlen; }
+          (*_exp).type = eoper;
+          (*_exp++).token = p_string;
+          if (tipo_expresion == -1) {
+            (*_exp).type = eoper;
+            (*_exp++).token = p_strlen;
           }
-        } break;
-
-      case tsloc:
-      case tpslo:
-        if (acceso_remoto && (*o).bloque) c_error(0,56);
-        ob=o; lexer(); (*_exp).type=econs; (*_exp++).valor=(*ob).sloc.offset;
-        (*_exp).type=eoper; (*_exp++).token=p_punto;
-        if ((*ob).type==tpslo) {
-          (*_exp).type=eoper; (*_exp++).token=p_pointer;
-          if (pieza!=p_corab && pieza!=p_punto) break;
-          if (comprueba_null) (*_exp++).type=enull;
         }
-        if (pieza==p_corab) {
-          acceso_remoto=0;
+      }
+      break;
+
+    case tsloc:
+    case tpslo:
+      if (acceso_remoto && (*o).bloque)
+        c_error(0, 56);
+      ob = o;
+      lexer();
+      (*_exp).type = econs;
+      (*_exp++).valor = (*ob).sloc.offset;
+      (*_exp).type = eoper;
+      (*_exp++).token = p_punto;
+      if ((*ob).type == tpslo) {
+        (*_exp).type = eoper;
+        (*_exp++).token = p_pointer;
+        if (pieza != p_corab && pieza != p_punto)
+          break;
+        if (comprueba_null)
+          (*_exp++).type = enull;
+      }
+      if (pieza == p_corab) {
+        acceso_remoto = 0;
+        lexer();
+        exp00(0);
+        if ((*ob).sloc.items1 > -1)
+          if (comprueba_rango) {
+            (*_exp).type = erango;
+            (*_exp++).valor = (*ob).sloc.items1;
+          }
+        if ((*ob).sloc.items2 > -1) {
+          if (pieza != p_coma)
+            c_error(3, 131);
           lexer();
           exp00(0);
-          if ((*ob).sloc.items1>-1) if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).sloc.items1; }
-          if ((*ob).sloc.items2>-1) {
-            if (pieza!=p_coma) c_error(3,131);
+          if (comprueba_rango) {
+            (*_exp).type = erango;
+            (*_exp++).valor = (*ob).sloc.items2;
+          }
+          if ((*ob).sloc.items3 > -1) {
+            if (pieza != p_coma)
+              c_error(3, 131);
             lexer();
             exp00(0);
-            if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).sloc.items2; }
-            if ((*ob).sloc.items3>-1) {
-              if (pieza!=p_coma) c_error(3,131);
-              lexer();
-              exp00(0);
-              if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).sloc.items3; }
-              (*_exp).type=econs; (*_exp++).valor=(*ob).sloc.items2+1;
-              (*_exp).type=eoper; (*_exp++).token=p_mul;
-              (*_exp).type=eoper; (*_exp++).token=p_add;
+            if (comprueba_rango) {
+              (*_exp).type = erango;
+              (*_exp++).valor = (*ob).sloc.items3;
             }
-            (*_exp).type=econs; (*_exp++).valor=(*ob).sloc.items1+1;
-            (*_exp).type=eoper; (*_exp++).token=p_mul;
-            (*_exp).type=eoper; (*_exp++).token=p_add;
+            (*_exp).type = econs;
+            (*_exp++).valor = (*ob).sloc.items2 + 1;
+            (*_exp).type = eoper;
+            (*_exp++).token = p_mul;
+            (*_exp).type = eoper;
+            (*_exp++).token = p_add;
           }
-          if (pieza!=p_corce) { c_error(3,26); } lexer();
-          if ((*ob).type==tpslo) {
-            (*_exp).type=econs; (*_exp++).valor=(*((*ob).pslo.ostruct)).sloc.len_item;
-          } else {
-            (*_exp).type=econs; (*_exp++).valor=(*ob).sloc.len_item;
-          }
-          (*_exp).type=eoper; (*_exp++).token=p_mul;
-          (*_exp).type=eoper; (*_exp++).token=p_add;
+          (*_exp).type = econs;
+          (*_exp++).valor = (*ob).sloc.items1 + 1;
+          (*_exp).type = eoper;
+          (*_exp++).token = p_mul;
+          (*_exp).type = eoper;
+          (*_exp++).token = p_add;
         }
-        if (pieza==p_punto) {
-          struct_pointer=p_pointer;
-          if ((*ob).type==tpslo) member=(*ob).psgl.ostruct; else member=ob;
-          lexer(); factor_struct();
-          (*_exp).type=eoper; (*_exp++).token=struct_pointer;
+        if (pieza != p_corce) {
+          c_error(3, 26);
+        }
+        lexer();
+        if ((*ob).type == tpslo) {
+          (*_exp).type = econs;
+          (*_exp++).valor = (*((*ob).pslo.ostruct)).sloc.len_item;
         } else {
-          (*_exp).type=eoper; (*_exp++).token=p_pointer;
-        } break;
-
-      case tproc:
-        ob=o; lexer(); if (pieza!=p_abrir) c_error(3,36); lexer();
-        p=0; while (pieza!=p_cerrar) { // p≡num_par
-          p++;
-          exp00(0);
-          if (pieza!=p_cerrar) { if (pieza!=p_coma) c_error(3,25);
-          else { lexer(); if (pieza==p_cerrar) c_error(3,45); } }
+          (*_exp).type = econs;
+          (*_exp++).valor = (*ob).sloc.len_item;
         }
-        if (p!=(*ob).proc.num_par) c_error(1,46);
-        (*_exp).type=ecall; (*_exp++).objeto=ob; lexer(); break;
+        (*_exp).type = eoper;
+        (*_exp++).token = p_mul;
+        (*_exp).type = eoper;
+        (*_exp++).token = p_add;
+      }
+      if (pieza == p_punto) {
+        struct_pointer = p_pointer;
+        if ((*ob).type == tpslo)
+          member = (*ob).psgl.ostruct;
+        else
+          member = ob;
+        lexer();
+        factor_struct();
+        (*_exp).type = eoper;
+        (*_exp++).token = struct_pointer;
+      } else {
+        (*_exp).type = eoper;
+        (*_exp++).token = p_pointer;
+      }
+      break;
 
-      case tfunc:
-        ob=o; lexer(); if (pieza!=p_abrir) c_error(3,36);
-
-        if ((*ob).func.code==122) { // fopen("..."
-          en_fopen=1;
-          lexer();
-          en_fopen=0;
-        } else lexer();
-
-        p=0; while (pieza!=p_cerrar) { // p≡num_par
-
-          if ((*ob).func.par[p]==1) { // Type 1 parameter (struct,field)
-
-            // RECEIVES: struct_name,field_name
-            // GENERATES: struct_offset,len_item,totalen,field_offset,field_type
-
-            if (pieza!=p_id) c_error(0,152);
-            if ((*o).member!=NULL) c_error(0,152);
-            if ((*o).type==tsglo) {
-              (*_exp).type=econs; (*_exp++).valor=(*o).sglo.offset;
-            } else if ((*o).type==tsloc) {
-              (*_exp).type=econs; (*_exp++).valor=(*o).sloc.offset;
-              (*_exp).type=eoper; (*_exp++).token=p_punto;
-            } else c_error(0,152);
-            (*_exp).type=econs; (*_exp++).valor=(*o).sglo.len_item;
-            (*_exp).type=econs; (*_exp++).valor=(*o).sglo.totalitems;
-            obs=o; lexer(); if (pieza!=p_coma) c_error(0,46);
-            member=obs; lexer(); member=NULL;
-            if (pieza!=p_id) c_error(0,153);
-            if ((*o).member!=obs) c_error(0,153);
-            (*_exp).type=econs; (*_exp++).valor=(*o).vglo.offset;
-            (*_exp).type=econs;
-            if ((*o).type==tcglo || (*o).type==tcloc) (*_exp++).valor=1;
-            else if ((*o).type==tpcgl || (*o).type==tpclo) (*_exp++).valor=2;
-            else (*_exp++).valor=0;
+    case tproc:
+      ob = o;
+      lexer();
+      if (pieza != p_abrir)
+        c_error(3, 36);
+      lexer();
+      p = 0;
+      while (pieza != p_cerrar) { // p≡num_par
+        p++;
+        exp00(0);
+        if (pieza != p_cerrar) {
+          if (pieza != p_coma)
+            c_error(3, 25);
+          else {
             lexer();
-          } else {                           // Type 0 parameter (generic)
-            exp00(0);
-          } p++;
-
-          if (pieza!=p_cerrar) { if (pieza!=p_coma) c_error(3,25);
-          else { lexer(); if (pieza==p_cerrar) c_error(3,45); } }
+            if (pieza == p_cerrar)
+              c_error(3, 45);
+          }
         }
-        if (p!=(*ob).func.num_par) c_error(1,46);
-        (*_exp).type=efunc; (*_exp++).objeto=ob;
-        if ((*ob).func.ret==1) tipo_factor=2;
-        lexer(); break;
+      }
+      if (p != (*ob).proc.num_par)
+        c_error(1, 46);
+      (*_exp).type = ecall;
+      (*_exp++).objeto = ob;
+      lexer();
+      break;
 
-      case tfext:
-        ob=o; lexer(); if (pieza!=p_abrir) c_error(3,36); lexer();
-        p=0; while (pieza!=p_cerrar) { // p≡num_par
-          p++;
+    case tfunc:
+      ob = o;
+      lexer();
+      if (pieza != p_abrir)
+        c_error(3, 36);
+
+      if ((*ob).func.code == 122) { // fopen("..."
+        en_fopen = 1;
+        lexer();
+        en_fopen = 0;
+      } else
+        lexer();
+
+      p = 0;
+      while (pieza != p_cerrar) { // p≡num_par
+
+        if ((*ob).func.par[p] == 1) { // Type 1 parameter (struct,field)
+
+          // RECEIVES: struct_name,field_name
+          // GENERATES: struct_offset,len_item,totalen,field_offset,field_type
+
+          if (pieza != p_id)
+            c_error(0, 152);
+          if ((*o).member != NULL)
+            c_error(0, 152);
+          if ((*o).type == tsglo) {
+            (*_exp).type = econs;
+            (*_exp++).valor = (*o).sglo.offset;
+          } else if ((*o).type == tsloc) {
+            (*_exp).type = econs;
+            (*_exp++).valor = (*o).sloc.offset;
+            (*_exp).type = eoper;
+            (*_exp++).token = p_punto;
+          } else
+            c_error(0, 152);
+          (*_exp).type = econs;
+          (*_exp++).valor = (*o).sglo.len_item;
+          (*_exp).type = econs;
+          (*_exp++).valor = (*o).sglo.totalitems;
+          obs = o;
+          lexer();
+          if (pieza != p_coma)
+            c_error(0, 46);
+          member = obs;
+          lexer();
+          member = NULL;
+          if (pieza != p_id)
+            c_error(0, 153);
+          if ((*o).member != obs)
+            c_error(0, 153);
+          (*_exp).type = econs;
+          (*_exp++).valor = (*o).vglo.offset;
+          (*_exp).type = econs;
+          if ((*o).type == tcglo || (*o).type == tcloc)
+            (*_exp++).valor = 1;
+          else if ((*o).type == tpcgl || (*o).type == tpclo)
+            (*_exp++).valor = 2;
+          else
+            (*_exp++).valor = 0;
+          lexer();
+        } else { // Type 0 parameter (generic)
           exp00(0);
-          if (pieza!=p_cerrar) { if (pieza!=p_coma) c_error(3,25);
-          else { lexer(); if (pieza==p_cerrar) c_error(3,45); } }
-        } if (p!=(*ob).fext.num_par) c_error(1,46);
-        (*_exp).type=efext; (*_exp++).objeto=ob; lexer(); break;
+        }
+        p++;
 
-      default:
-        if (error_27==27) c_error(1,27); else c_error(0,error_27);
-        break;
+        if (pieza != p_cerrar) {
+          if (pieza != p_coma)
+            c_error(3, 25);
+          else {
+            lexer();
+            if (pieza == p_cerrar)
+              c_error(3, 45);
+          }
+        }
+      }
+      if (p != (*ob).func.num_par)
+        c_error(1, 46);
+      (*_exp).type = efunc;
+      (*_exp++).objeto = ob;
+      if ((*ob).func.ret == 1)
+        tipo_factor = 2;
+      lexer();
+      break;
 
-    } break;
+    case tfext:
+      ob = o;
+      lexer();
+      if (pieza != p_abrir)
+        c_error(3, 36);
+      lexer();
+      p = 0;
+      while (pieza != p_cerrar) { // p≡num_par
+        p++;
+        exp00(0);
+        if (pieza != p_cerrar) {
+          if (pieza != p_coma)
+            c_error(3, 25);
+          else {
+            lexer();
+            if (pieza == p_cerrar)
+              c_error(3, 45);
+          }
+        }
+      }
+      if (p != (*ob).fext.num_par)
+        c_error(1, 46);
+      (*_exp).type = efext;
+      (*_exp++).objeto = ob;
+      lexer();
+      break;
 
     default:
-      if (error_27==27) c_error(1,27); else c_error(0,error_27);
+      if (error_27 == 27)
+        c_error(1, 27);
+      else
+        c_error(0, error_27);
       break;
+    }
+    break;
+
+  default:
+    if (error_27 == 27)
+      c_error(1, 27);
+    else
+      c_error(0, error_27);
+    break;
   }
 
-  if (pieza==p_inc || pieza==p_dec) {
-    if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_pointer) {
+  if (pieza == p_inc || pieza == p_dec) {
+    if ((*(_exp - 1)).type == eoper && (*(_exp - 1)).token == p_pointer) {
       _exp--;
-      (*_exp).type=eoper;
-      if (pieza==p_inc) (*_exp++).token=p_suma;
-        else (*_exp++).token=p_resta;
-    } else if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_pointerchar) {
+      (*_exp).type = eoper;
+      if (pieza == p_inc)
+        (*_exp++).token = p_suma;
+      else
+        (*_exp++).token = p_resta;
+    } else if ((*(_exp - 1)).type == eoper && (*(_exp - 1)).token == p_pointerchar) {
       _exp--;
-      (*_exp).type=eoper;
-      if (pieza==p_inc) (*_exp++).token=p_sumachar;
-        else (*_exp++).token=p_restachar;
-    } else if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_pointerbyte) {
+      (*_exp).type = eoper;
+      if (pieza == p_inc)
+        (*_exp++).token = p_sumachar;
+      else
+        (*_exp++).token = p_restachar;
+    } else if ((*(_exp - 1)).type == eoper && (*(_exp - 1)).token == p_pointerbyte) {
       _exp--;
-      (*_exp).type=eoper;
-      if (pieza==p_inc) (*_exp++).token=p_sumachar;
-        else (*_exp++).token=p_restachar;
-    } else if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_pointerword) {
+      (*_exp).type = eoper;
+      if (pieza == p_inc)
+        (*_exp++).token = p_sumachar;
+      else
+        (*_exp++).token = p_restachar;
+    } else if ((*(_exp - 1)).type == eoper && (*(_exp - 1)).token == p_pointerword) {
       _exp--;
-      (*_exp).type=eoper;
-      if (pieza==p_inc) (*_exp++).token=p_sumaword;
-        else (*_exp++).token=p_restaword;
-    } else if ((*(_exp-1)).type==eoper && (*(_exp-1)).token==p_string) {
-      _exp--; (*_exp).type=econs;
-      if (pieza==p_inc) (*_exp++).valor=-1;
-        else (*_exp++).valor=1;
-      (*_exp).type=eoper;
-      (*_exp++).token=p_strsub;
-      (*_exp).type=eoper;
-      (*_exp++).token=p_string;
-    } else c_error(4,122);
+      (*_exp).type = eoper;
+      if (pieza == p_inc)
+        (*_exp++).token = p_sumaword;
+      else
+        (*_exp++).token = p_restaword;
+    } else if ((*(_exp - 1)).type == eoper && (*(_exp - 1)).token == p_string) {
+      _exp--;
+      (*_exp).type = econs;
+      if (pieza == p_inc)
+        (*_exp++).valor = -1;
+      else
+        (*_exp++).valor = 1;
+      (*_exp).type = eoper;
+      (*_exp++).token = p_strsub;
+      (*_exp).type = eoper;
+      (*_exp++).token = p_string;
+    } else
+      c_error(4, 122);
     lexer();
   }
 }
 
 void factor_struct(void) {
-  struct objeto * ob;
+  struct objeto *ob;
 
-  if (pieza!=p_id) c_error(3,58);
+  if (pieza != p_id)
+    c_error(3, 58);
   switch ((*o).type) {
+  case tvglo:
+    (*_exp).type = econs;
+    (*_exp++).valor = (*o).vglo.offset;
+    (*_exp).type = eoper;
+    (*_exp++).token = p_add;
+    member = NULL;
+    lexer();
+    break;
 
-    case tvglo:
-      (*_exp).type=econs; (*_exp++).valor=(*o).vglo.offset;
-      (*_exp).type=eoper; (*_exp++).token=p_add;
-      member=NULL; lexer();
-      break;
-
-    case ttglo:
-    case tpigl:
-      (*_exp).type=econs; (*_exp++).valor=(*o).tglo.offset; ob=o;
-      (*_exp).type=eoper; (*_exp++).token=p_add;
-      member=NULL; lexer();
-      if (pieza==p_corab) {
-        if ((*ob).type==tpigl) {
-          (*_exp).type=eoper; (*_exp++).token=p_pointer;
-          if (comprueba_null) (*_exp++).type=enull;
-        }
-        lexer();
-        exp00(0);
-        if ((*ob).tglo.len1>-1) if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).tglo.len1; }
-        if ((*ob).tglo.len2>-1) {
-          if (pieza!=p_coma) c_error(3,130);
-          lexer();
-          exp00(0);
-          if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).tglo.len2; }
-          if ((*ob).tglo.len3>-1) {
-            if (pieza!=p_coma) c_error(3,130);
-            lexer();
-            exp00(0);
-            if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).tglo.len3; }
-            (*_exp).type=econs; (*_exp++).valor=(*ob).tglo.len2+1;
-            (*_exp).type=eoper; (*_exp++).token=p_mul;
-            (*_exp).type=eoper; (*_exp++).token=p_add;
-          }
-          (*_exp).type=econs; (*_exp++).valor=(*ob).tglo.len1+1;
-          (*_exp).type=eoper; (*_exp++).token=p_mul;
-          (*_exp).type=eoper; (*_exp++).token=p_add;
-        }
-        if (pieza!=p_corce) { c_error(3,26); } lexer();
-        (*_exp).type=eoper; (*_exp++).token=p_add;
-      } break;
-
-    case tbglo:
-    case tpbgl:
-    case tpcgl:
-      (*_exp).type=econs; (*_exp++).valor=(*o).bglo.offset; ob=o;
-      (*_exp).type=eoper; (*_exp++).token=p_add;
-      member=NULL; lexer();
-      if ((*ob).type==tpbgl || (*ob).type==tpcgl) {
-        if (pieza!=p_corab) break;
-        (*_exp).type=eoper; (*_exp++).token=p_pointer;
-        if (comprueba_null) (*_exp++).type=enull;
+  case ttglo:
+  case tpigl:
+    (*_exp).type = econs;
+    (*_exp++).valor = (*o).tglo.offset;
+    ob = o;
+    (*_exp).type = eoper;
+    (*_exp++).token = p_add;
+    member = NULL;
+    lexer();
+    if (pieza == p_corab) {
+      if ((*ob).type == tpigl) {
+        (*_exp).type = eoper;
+        (*_exp++).token = p_pointer;
+        if (comprueba_null)
+          (*_exp++).type = enull;
       }
-      if (pieza==p_corab) {
+      lexer();
+      exp00(0);
+      if ((*ob).tglo.len1 > -1)
+        if (comprueba_rango) {
+          (*_exp).type = erango;
+          (*_exp++).valor = (*ob).tglo.len1;
+        }
+      if ((*ob).tglo.len2 > -1) {
+        if (pieza != p_coma)
+          c_error(3, 130);
         lexer();
         exp00(0);
-        if ((*ob).bglo.len1>-1) if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).bglo.len1; }
-        if ((*ob).bglo.len2>-1) {
-          if (pieza!=p_coma) c_error(3,130);
+        if (comprueba_rango) {
+          (*_exp).type = erango;
+          (*_exp++).valor = (*ob).tglo.len2;
+        }
+        if ((*ob).tglo.len3 > -1) {
+          if (pieza != p_coma)
+            c_error(3, 130);
           lexer();
           exp00(0);
-          if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).bglo.len2; }
-          if ((*ob).bglo.len3>-1) {
-            if (pieza!=p_coma) c_error(3,130);
-            lexer();
-            exp00(0);
-            if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).bglo.len3; }
-            (*_exp).type=econs; (*_exp++).valor=(*ob).bglo.len2+1;
-            (*_exp).type=eoper; (*_exp++).token=p_mul;
-            (*_exp).type=eoper; (*_exp++).token=p_add;
+          if (comprueba_rango) {
+            (*_exp).type = erango;
+            (*_exp++).valor = (*ob).tglo.len3;
           }
-          (*_exp).type=econs; (*_exp++).valor=(*ob).bglo.len1+1;
-          (*_exp).type=eoper; (*_exp++).token=p_mul;
-          (*_exp).type=eoper; (*_exp++).token=p_add;
+          (*_exp).type = econs;
+          (*_exp++).valor = (*ob).tglo.len2 + 1;
+          (*_exp).type = eoper;
+          (*_exp++).token = p_mul;
+          (*_exp).type = eoper;
+          (*_exp++).token = p_add;
         }
-        if (pieza!=p_corce) { c_error(3,26); } lexer();
-      } else { // mi_byte ≡ mi_byte[0]
-        (*_exp).type=econs; (*_exp++).valor=0;
-      } struct_pointer=p_pointerbyte; break;
-
-    case twglo:
-    case tpwgl:
-      (*_exp).type=econs; (*_exp++).valor=(*o).wglo.offset; ob=o;
-      (*_exp).type=eoper; (*_exp++).token=p_add;
-      member=NULL; lexer();
-      if ((*ob).type==tpwgl) {
-        if (pieza!=p_corab) break;
-        (*_exp).type=eoper; (*_exp++).token=p_pointer;
-        if (comprueba_null) (*_exp++).type=enull;
+        (*_exp).type = econs;
+        (*_exp++).valor = (*ob).tglo.len1 + 1;
+        (*_exp).type = eoper;
+        (*_exp++).token = p_mul;
+        (*_exp).type = eoper;
+        (*_exp++).token = p_add;
       }
-      if (pieza==p_corab) {
+      if (pieza != p_corce) {
+        c_error(3, 26);
+      }
+      lexer();
+      (*_exp).type = eoper;
+      (*_exp++).token = p_add;
+    }
+    break;
+
+  case tbglo:
+  case tpbgl:
+  case tpcgl:
+    (*_exp).type = econs;
+    (*_exp++).valor = (*o).bglo.offset;
+    ob = o;
+    (*_exp).type = eoper;
+    (*_exp++).token = p_add;
+    member = NULL;
+    lexer();
+    if ((*ob).type == tpbgl || (*ob).type == tpcgl) {
+      if (pieza != p_corab)
+        break;
+      (*_exp).type = eoper;
+      (*_exp++).token = p_pointer;
+      if (comprueba_null)
+        (*_exp++).type = enull;
+    }
+    if (pieza == p_corab) {
+      lexer();
+      exp00(0);
+      if ((*ob).bglo.len1 > -1)
+        if (comprueba_rango) {
+          (*_exp).type = erango;
+          (*_exp++).valor = (*ob).bglo.len1;
+        }
+      if ((*ob).bglo.len2 > -1) {
+        if (pieza != p_coma)
+          c_error(3, 130);
         lexer();
         exp00(0);
-        if ((*ob).wglo.len1>-1) if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).wglo.len1; }
-        if ((*ob).wglo.len2>-1) {
-          if (pieza!=p_coma) c_error(3,130);
+        if (comprueba_rango) {
+          (*_exp).type = erango;
+          (*_exp++).valor = (*ob).bglo.len2;
+        }
+        if ((*ob).bglo.len3 > -1) {
+          if (pieza != p_coma)
+            c_error(3, 130);
           lexer();
           exp00(0);
-          if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).wglo.len2; }
-          if ((*ob).wglo.len3>-1) {
-            if (pieza!=p_coma) c_error(3,130);
-            lexer();
-            exp00(0);
-            if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).wglo.len3; }
-            (*_exp).type=econs; (*_exp++).valor=(*ob).wglo.len2+1;
-            (*_exp).type=eoper; (*_exp++).token=p_mul;
-            (*_exp).type=eoper; (*_exp++).token=p_add;
+          if (comprueba_rango) {
+            (*_exp).type = erango;
+            (*_exp++).valor = (*ob).bglo.len3;
           }
-          (*_exp).type=econs; (*_exp++).valor=(*ob).wglo.len1+1;
-          (*_exp).type=eoper; (*_exp++).token=p_mul;
-          (*_exp).type=eoper; (*_exp++).token=p_add;
+          (*_exp).type = econs;
+          (*_exp++).valor = (*ob).bglo.len2 + 1;
+          (*_exp).type = eoper;
+          (*_exp++).token = p_mul;
+          (*_exp).type = eoper;
+          (*_exp++).token = p_add;
         }
-        if (pieza!=p_corce) { c_error(3,26); } lexer();
-      } else { // mi_byte ≡ mi_byte[0]
-        (*_exp).type=econs; (*_exp++).valor=0;
-      } struct_pointer=p_pointerword; break;
+        (*_exp).type = econs;
+        (*_exp++).valor = (*ob).bglo.len1 + 1;
+        (*_exp).type = eoper;
+        (*_exp++).token = p_mul;
+        (*_exp).type = eoper;
+        (*_exp++).token = p_add;
+      }
+      if (pieza != p_corce) {
+        c_error(3, 26);
+      }
+      lexer();
+    } else { // mi_byte ≡ mi_byte[0]
+      (*_exp).type = econs;
+      (*_exp++).valor = 0;
+    }
+    struct_pointer = p_pointerbyte;
+    break;
 
-    case tcglo:
-      (*_exp).type=estring; (*_exp++).valor=(*o).cglo.offset; ob=o;
-      (*_exp).type=eoper; (*_exp++).token=p_add;
-      member=NULL; lexer();
-      if (pieza==p_corab) {
+  case twglo:
+  case tpwgl:
+    (*_exp).type = econs;
+    (*_exp++).valor = (*o).wglo.offset;
+    ob = o;
+    (*_exp).type = eoper;
+    (*_exp++).token = p_add;
+    member = NULL;
+    lexer();
+    if ((*ob).type == tpwgl) {
+      if (pieza != p_corab)
+        break;
+      (*_exp).type = eoper;
+      (*_exp++).token = p_pointer;
+      if (comprueba_null)
+        (*_exp++).type = enull;
+    }
+    if (pieza == p_corab) {
+      lexer();
+      exp00(0);
+      if ((*ob).wglo.len1 > -1)
+        if (comprueba_rango) {
+          (*_exp).type = erango;
+          (*_exp++).valor = (*ob).wglo.len1;
+        }
+      if ((*ob).wglo.len2 > -1) {
+        if (pieza != p_coma)
+          c_error(3, 130);
         lexer();
         exp00(0);
-        if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).cglo.totalen; }
-        if (pieza!=p_corce) c_error(3,26);
-        lexer();
-        struct_pointer=p_pointerchar;
+        if (comprueba_rango) {
+          (*_exp).type = erango;
+          (*_exp++).valor = (*ob).wglo.len2;
+        }
+        if ((*ob).wglo.len3 > -1) {
+          if (pieza != p_coma)
+            c_error(3, 130);
+          lexer();
+          exp00(0);
+          if (comprueba_rango) {
+            (*_exp).type = erango;
+            (*_exp++).valor = (*ob).wglo.len3;
+          }
+          (*_exp).type = econs;
+          (*_exp++).valor = (*ob).wglo.len2 + 1;
+          (*_exp).type = eoper;
+          (*_exp++).token = p_mul;
+          (*_exp).type = eoper;
+          (*_exp++).token = p_add;
+        }
+        (*_exp).type = econs;
+        (*_exp++).valor = (*ob).wglo.len1 + 1;
+        (*_exp).type = eoper;
+        (*_exp++).token = p_mul;
+        (*_exp).type = eoper;
+        (*_exp++).token = p_add;
+      }
+      if (pieza != p_corce) {
+        c_error(3, 26);
+      }
+      lexer();
+    } else { // mi_byte ≡ mi_byte[0]
+      (*_exp).type = econs;
+      (*_exp++).valor = 0;
+    }
+    struct_pointer = p_pointerword;
+    break;
+
+  case tcglo:
+    (*_exp).type = estring;
+    (*_exp++).valor = (*o).cglo.offset;
+    ob = o;
+    (*_exp).type = eoper;
+    (*_exp++).token = p_add;
+    member = NULL;
+    lexer();
+    if (pieza == p_corab) {
+      lexer();
+      exp00(0);
+      if (comprueba_rango) {
+        (*_exp).type = erango;
+        (*_exp++).valor = (*ob).cglo.totalen;
+      }
+      if (pieza != p_corce)
+        c_error(3, 26);
+      lexer();
+      struct_pointer = p_pointerchar;
+    } else {
+      tipo_factor = 2;
+      if (tipo_expresion == 1) {
+        (*_exp).type = econs;
+        (*_exp++).valor = 0;
+        struct_pointer = p_pointerchar;
       } else {
-        tipo_factor=2;
-        if (tipo_expresion==1) {
-          (*_exp).type=econs; (*_exp++).valor=0;
-          struct_pointer=p_pointerchar;
-        } else {
-          if (tipo_expresion==-1) { (*_exp).type=eoper; (*_exp++).token=p_strlen; }
-          struct_pointer=p_string;
+        if (tipo_expresion == -1) {
+          (*_exp).type = eoper;
+          (*_exp++).token = p_strlen;
         }
-      } break;
-
-    case tsglo:
-    case tpsgl:
-      (*_exp).type=econs; (*_exp++).valor=(*o).sglo.offset; ob=o;
-      (*_exp).type=eoper; (*_exp++).token=p_add;
-      member=NULL; lexer();
-      if ((*ob).type==tpsgl) {
-        if (pieza!=p_corab && pieza!=p_punto) break;
-        (*_exp).type=eoper; (*_exp++).token=p_pointer;
-        if (comprueba_null) (*_exp++).type=enull;
+        struct_pointer = p_string;
       }
-      if (pieza==p_corab) {
+    }
+    break;
+
+  case tsglo:
+  case tpsgl:
+    (*_exp).type = econs;
+    (*_exp++).valor = (*o).sglo.offset;
+    ob = o;
+    (*_exp).type = eoper;
+    (*_exp++).token = p_add;
+    member = NULL;
+    lexer();
+    if ((*ob).type == tpsgl) {
+      if (pieza != p_corab && pieza != p_punto)
+        break;
+      (*_exp).type = eoper;
+      (*_exp++).token = p_pointer;
+      if (comprueba_null)
+        (*_exp++).type = enull;
+    }
+    if (pieza == p_corab) {
+      lexer();
+      exp00(0);
+      if ((*ob).sglo.items1 > -1)
+        if (comprueba_rango) {
+          (*_exp).type = erango;
+          (*_exp++).valor = (*ob).sglo.items1;
+        }
+      if ((*ob).sglo.items2 > -1) {
+        if (pieza != p_coma)
+          c_error(3, 131);
         lexer();
         exp00(0);
-        if ((*ob).sglo.items1>-1) if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).sglo.items1; }
-        if ((*ob).sglo.items2>-1) {
-          if (pieza!=p_coma) c_error(3,131);
+        if (comprueba_rango) {
+          (*_exp).type = erango;
+          (*_exp++).valor = (*ob).sglo.items2;
+        }
+        if ((*ob).sglo.items3 > -1) {
+          if (pieza != p_coma)
+            c_error(3, 131);
           lexer();
           exp00(0);
-          if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).sglo.items2; }
-          if ((*ob).sglo.items3>-1) {
-            if (pieza!=p_coma) c_error(3,131);
-            lexer();
-            exp00(0);
-            if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).sglo.items3; }
-            (*_exp).type=econs; (*_exp++).valor=(*ob).sglo.items2+1;
-            (*_exp).type=eoper; (*_exp++).token=p_mul;
-            (*_exp).type=eoper; (*_exp++).token=p_add;
+          if (comprueba_rango) {
+            (*_exp).type = erango;
+            (*_exp++).valor = (*ob).sglo.items3;
           }
-          (*_exp).type=econs; (*_exp++).valor=(*ob).sglo.items1+1;
-          (*_exp).type=eoper; (*_exp++).token=p_mul;
-          (*_exp).type=eoper; (*_exp++).token=p_add;
+          (*_exp).type = econs;
+          (*_exp++).valor = (*ob).sglo.items2 + 1;
+          (*_exp).type = eoper;
+          (*_exp++).token = p_mul;
+          (*_exp).type = eoper;
+          (*_exp++).token = p_add;
         }
-        if (pieza!=p_corce) { c_error(3,26); } lexer();
-        if ((*ob).type==tpsgl) {
-          (*_exp).type=econs; (*_exp++).valor=(*((*ob).psgl.ostruct)).sglo.len_item;
-        } else {
-          (*_exp).type=econs; (*_exp++).valor=(*ob).sglo.len_item;
-        }
-        (*_exp).type=eoper; (*_exp++).token=p_mul;
-        (*_exp).type=eoper; (*_exp++).token=p_add;
+        (*_exp).type = econs;
+        (*_exp++).valor = (*ob).sglo.items1 + 1;
+        (*_exp).type = eoper;
+        (*_exp++).token = p_mul;
+        (*_exp).type = eoper;
+        (*_exp++).token = p_add;
       }
-      if (pieza==p_punto) {
-        if ((*ob).type==tpsgl) member=(*ob).psgl.ostruct; else member=ob;
-        lexer(); factor_struct();
-      } break;
-
-    case tvloc:
-      (*_exp).type=econs; (*_exp++).valor=(*o).vloc.offset;
-      (*_exp).type=eoper; (*_exp++).token=p_add;
-      member=NULL; lexer(); break;
-
-    case ttloc:
-    case tpilo:
-      (*_exp).type=econs; (*_exp++).valor=(*o).tloc.offset; ob=o;
-      (*_exp).type=eoper; (*_exp++).token=p_add;
-      member=NULL; lexer();
-      if (pieza==p_corab) {
-        if ((*ob).type==tpilo) {
-          (*_exp).type=eoper; (*_exp++).token=p_pointer;
-          if (comprueba_null) (*_exp++).type=enull;
-        }
-        lexer();
-        exp00(0);
-        if ((*ob).tloc.len1>-1) if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).tloc.len1; }
-        if ((*ob).tloc.len2>-1) {
-          if (pieza!=p_coma) c_error(3,130);
-          lexer();
-          exp00(0);
-          if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).tloc.len2; }
-          if ((*ob).tloc.len3>-1) {
-            if (pieza!=p_coma) c_error(3,130);
-            lexer();
-            exp00(0);
-            if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).tloc.len3; }
-            (*_exp).type=econs; (*_exp++).valor=(*ob).tloc.len2+1;
-            (*_exp).type=eoper; (*_exp++).token=p_mul;
-            (*_exp).type=eoper; (*_exp++).token=p_add;
-          }
-          (*_exp).type=econs; (*_exp++).valor=(*ob).tloc.len1+1;
-          (*_exp).type=eoper; (*_exp++).token=p_mul;
-          (*_exp).type=eoper; (*_exp++).token=p_add;
-        }
-        if (pieza!=p_corce) { c_error(3,26); } lexer();
-        (*_exp).type=eoper; (*_exp++).token=p_add;
-      } break;
-
-    case tbloc:
-    case tpblo:
-    case tpclo:
-      (*_exp).type=econs; (*_exp++).valor=(*o).bloc.offset; ob=o;
-      (*_exp).type=eoper; (*_exp++).token=p_add;
-      member=NULL; lexer();
-      if ((*ob).type==tpblo || (*ob).type==tpcgl) {
-        if (pieza!=p_corab) break;
-        (*_exp).type=eoper; (*_exp++).token=p_pointer;
-        if (comprueba_null) (*_exp++).type=enull;
+      if (pieza != p_corce) {
+        c_error(3, 26);
       }
-      if (pieza==p_corab) {
-        lexer();
-        exp00(0);
-        if ((*ob).bloc.len1>-1) if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).bloc.len1; }
-        if ((*ob).bloc.len2>-1) {
-          if (pieza!=p_coma) c_error(3,130);
-          lexer();
-          exp00(0);
-          if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).bloc.len2; }
-          if ((*ob).bloc.len3>-1) {
-            if (pieza!=p_coma) c_error(3,130);
-            lexer();
-            exp00(0);
-            if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).bloc.len3; }
-            (*_exp).type=econs; (*_exp++).valor=(*ob).bloc.len2+1;
-            (*_exp).type=eoper; (*_exp++).token=p_mul;
-            (*_exp).type=eoper; (*_exp++).token=p_add;
-          }
-          (*_exp).type=econs; (*_exp++).valor=(*ob).bloc.len1+1;
-          (*_exp).type=eoper; (*_exp++).token=p_mul;
-          (*_exp).type=eoper; (*_exp++).token=p_add;
-        }
-        if (pieza!=p_corce) { c_error(3,26); } lexer();
-      } else { // mi_byte ≡ mi_byte[0]
-        (*_exp).type=econs; (*_exp++).valor=0;
-      } struct_pointer=p_pointerbyte; break;
-
-    case twloc:
-    case tpwlo:
-      (*_exp).type=econs; (*_exp++).valor=(*o).wloc.offset; ob=o;
-      (*_exp).type=eoper; (*_exp++).token=p_add;
-      member=NULL; lexer();
-      if ((*ob).type==tpwlo) {
-        if (pieza!=p_corab) break;
-        (*_exp).type=eoper; (*_exp++).token=p_pointer;
-        if (comprueba_null) (*_exp++).type=enull;
-      }
-      if (pieza==p_corab) {
-        lexer();
-        exp00(0);
-        if ((*ob).wloc.len1>-1) if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).wloc.len1; }
-        if ((*ob).wloc.len2>-1) {
-          if (pieza!=p_coma) c_error(3,130);
-          lexer();
-          exp00(0);
-          if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).wloc.len2; }
-          if ((*ob).wloc.len3>-1) {
-            if (pieza!=p_coma) c_error(3,130);
-            lexer();
-            exp00(0);
-            if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).wloc.len3; }
-            (*_exp).type=econs; (*_exp++).valor=(*ob).wloc.len2+1;
-            (*_exp).type=eoper; (*_exp++).token=p_mul;
-            (*_exp).type=eoper; (*_exp++).token=p_add;
-          }
-          (*_exp).type=econs; (*_exp++).valor=(*ob).wloc.len1+1;
-          (*_exp).type=eoper; (*_exp++).token=p_mul;
-          (*_exp).type=eoper; (*_exp++).token=p_add;
-        }
-        if (pieza!=p_corce) { c_error(3,26); } lexer();
-      } else { // mi_byte ≡ mi_byte[0]
-        (*_exp).type=econs; (*_exp++).valor=0;
-      } struct_pointer=p_pointerword; break;
-
-    case tcloc:
-      (*_exp).type=estring; (*_exp++).valor=(*o).cloc.offset; ob=o;
-      (*_exp).type=eoper; (*_exp++).token=p_add;
-      member=NULL; lexer();
-      if (pieza==p_corab) {
-        lexer();
-        exp00(0);
-        if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).cloc.totalen; }
-        if (pieza!=p_corce) c_error(3,26);
-        lexer();
-        struct_pointer=p_pointerchar;
+      lexer();
+      if ((*ob).type == tpsgl) {
+        (*_exp).type = econs;
+        (*_exp++).valor = (*((*ob).psgl.ostruct)).sglo.len_item;
       } else {
-        tipo_factor=2;
-        if (tipo_expresion==1) {
-          (*_exp).type=econs; (*_exp++).valor=0;
-          struct_pointer=p_pointerchar;
-        } else {
-          if (tipo_expresion==-1) { (*_exp).type=eoper; (*_exp++).token=p_strlen; }
-          struct_pointer=p_string;
-        }
-      } break;
-
-    case tsloc:
-    case tpslo:
-      (*_exp).type=econs; (*_exp++).valor=(*o).sloc.offset; ob=o;
-      (*_exp).type=eoper; (*_exp++).token=p_add;
-      member=NULL; lexer();
-      if ((*ob).type==tpslo) {
-        if (pieza!=p_corab && pieza!=p_punto) break;
-        (*_exp).type=eoper; (*_exp++).token=p_pointer;
-        if (comprueba_null) (*_exp++).type=enull;
+        (*_exp).type = econs;
+        (*_exp++).valor = (*ob).sglo.len_item;
       }
-      if (pieza==p_corab) {
+      (*_exp).type = eoper;
+      (*_exp++).token = p_mul;
+      (*_exp).type = eoper;
+      (*_exp++).token = p_add;
+    }
+    if (pieza == p_punto) {
+      if ((*ob).type == tpsgl)
+        member = (*ob).psgl.ostruct;
+      else
+        member = ob;
+      lexer();
+      factor_struct();
+    }
+    break;
+
+  case tvloc:
+    (*_exp).type = econs;
+    (*_exp++).valor = (*o).vloc.offset;
+    (*_exp).type = eoper;
+    (*_exp++).token = p_add;
+    member = NULL;
+    lexer();
+    break;
+
+  case ttloc:
+  case tpilo:
+    (*_exp).type = econs;
+    (*_exp++).valor = (*o).tloc.offset;
+    ob = o;
+    (*_exp).type = eoper;
+    (*_exp++).token = p_add;
+    member = NULL;
+    lexer();
+    if (pieza == p_corab) {
+      if ((*ob).type == tpilo) {
+        (*_exp).type = eoper;
+        (*_exp++).token = p_pointer;
+        if (comprueba_null)
+          (*_exp++).type = enull;
+      }
+      lexer();
+      exp00(0);
+      if ((*ob).tloc.len1 > -1)
+        if (comprueba_rango) {
+          (*_exp).type = erango;
+          (*_exp++).valor = (*ob).tloc.len1;
+        }
+      if ((*ob).tloc.len2 > -1) {
+        if (pieza != p_coma)
+          c_error(3, 130);
         lexer();
         exp00(0);
-        if ((*ob).sloc.items1>-1) if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).sloc.items1; }
-        if ((*ob).sloc.items2>-1) {
-          if (pieza!=p_coma) c_error(3,131);
+        if (comprueba_rango) {
+          (*_exp).type = erango;
+          (*_exp++).valor = (*ob).tloc.len2;
+        }
+        if ((*ob).tloc.len3 > -1) {
+          if (pieza != p_coma)
+            c_error(3, 130);
           lexer();
           exp00(0);
-          if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).sloc.items2; }
-          if ((*ob).sloc.items3>-1) {
-            if (pieza!=p_coma) c_error(3,131);
-            lexer();
-            exp00(0);
-            if (comprueba_rango) { (*_exp).type=erango; (*_exp++).valor=(*ob).sloc.items3; }
-            (*_exp).type=econs; (*_exp++).valor=(*ob).sloc.items2+1;
-            (*_exp).type=eoper; (*_exp++).token=p_mul;
-            (*_exp).type=eoper; (*_exp++).token=p_add;
+          if (comprueba_rango) {
+            (*_exp).type = erango;
+            (*_exp++).valor = (*ob).tloc.len3;
           }
-          (*_exp).type=econs; (*_exp++).valor=(*ob).sloc.items1+1;
-          (*_exp).type=eoper; (*_exp++).token=p_mul;
-          (*_exp).type=eoper; (*_exp++).token=p_add;
+          (*_exp).type = econs;
+          (*_exp++).valor = (*ob).tloc.len2 + 1;
+          (*_exp).type = eoper;
+          (*_exp++).token = p_mul;
+          (*_exp).type = eoper;
+          (*_exp++).token = p_add;
         }
-        if (pieza!=p_corce) { c_error(3,26); } lexer();
-        if ((*ob).type==tpslo) {
-          (*_exp).type=econs; (*_exp++).valor=(*((*ob).pslo.ostruct)).sloc.len_item;
-        } else {
-          (*_exp).type=econs; (*_exp++).valor=(*ob).sloc.len_item;
-        }
-        (*_exp).type=eoper; (*_exp++).token=p_mul;
-        (*_exp).type=eoper; (*_exp++).token=p_add;
+        (*_exp).type = econs;
+        (*_exp++).valor = (*ob).tloc.len1 + 1;
+        (*_exp).type = eoper;
+        (*_exp++).token = p_mul;
+        (*_exp).type = eoper;
+        (*_exp++).token = p_add;
       }
-      if (pieza==p_punto) {
-        if ((*ob).type==tpslo) member=(*ob).pslo.ostruct; else member=ob;
-        lexer(); factor_struct();
-      } break;
+      if (pieza != p_corce) {
+        c_error(3, 26);
+      }
+      lexer();
+      (*_exp).type = eoper;
+      (*_exp++).token = p_add;
+    }
+    break;
 
-    default: c_error(3,58); break;
+  case tbloc:
+  case tpblo:
+  case tpclo:
+    (*_exp).type = econs;
+    (*_exp++).valor = (*o).bloc.offset;
+    ob = o;
+    (*_exp).type = eoper;
+    (*_exp++).token = p_add;
+    member = NULL;
+    lexer();
+    if ((*ob).type == tpblo || (*ob).type == tpcgl) {
+      if (pieza != p_corab)
+        break;
+      (*_exp).type = eoper;
+      (*_exp++).token = p_pointer;
+      if (comprueba_null)
+        (*_exp++).type = enull;
+    }
+    if (pieza == p_corab) {
+      lexer();
+      exp00(0);
+      if ((*ob).bloc.len1 > -1)
+        if (comprueba_rango) {
+          (*_exp).type = erango;
+          (*_exp++).valor = (*ob).bloc.len1;
+        }
+      if ((*ob).bloc.len2 > -1) {
+        if (pieza != p_coma)
+          c_error(3, 130);
+        lexer();
+        exp00(0);
+        if (comprueba_rango) {
+          (*_exp).type = erango;
+          (*_exp++).valor = (*ob).bloc.len2;
+        }
+        if ((*ob).bloc.len3 > -1) {
+          if (pieza != p_coma)
+            c_error(3, 130);
+          lexer();
+          exp00(0);
+          if (comprueba_rango) {
+            (*_exp).type = erango;
+            (*_exp++).valor = (*ob).bloc.len3;
+          }
+          (*_exp).type = econs;
+          (*_exp++).valor = (*ob).bloc.len2 + 1;
+          (*_exp).type = eoper;
+          (*_exp++).token = p_mul;
+          (*_exp).type = eoper;
+          (*_exp++).token = p_add;
+        }
+        (*_exp).type = econs;
+        (*_exp++).valor = (*ob).bloc.len1 + 1;
+        (*_exp).type = eoper;
+        (*_exp++).token = p_mul;
+        (*_exp).type = eoper;
+        (*_exp++).token = p_add;
+      }
+      if (pieza != p_corce) {
+        c_error(3, 26);
+      }
+      lexer();
+    } else { // mi_byte ≡ mi_byte[0]
+      (*_exp).type = econs;
+      (*_exp++).valor = 0;
+    }
+    struct_pointer = p_pointerbyte;
+    break;
+
+  case twloc:
+  case tpwlo:
+    (*_exp).type = econs;
+    (*_exp++).valor = (*o).wloc.offset;
+    ob = o;
+    (*_exp).type = eoper;
+    (*_exp++).token = p_add;
+    member = NULL;
+    lexer();
+    if ((*ob).type == tpwlo) {
+      if (pieza != p_corab)
+        break;
+      (*_exp).type = eoper;
+      (*_exp++).token = p_pointer;
+      if (comprueba_null)
+        (*_exp++).type = enull;
+    }
+    if (pieza == p_corab) {
+      lexer();
+      exp00(0);
+      if ((*ob).wloc.len1 > -1)
+        if (comprueba_rango) {
+          (*_exp).type = erango;
+          (*_exp++).valor = (*ob).wloc.len1;
+        }
+      if ((*ob).wloc.len2 > -1) {
+        if (pieza != p_coma)
+          c_error(3, 130);
+        lexer();
+        exp00(0);
+        if (comprueba_rango) {
+          (*_exp).type = erango;
+          (*_exp++).valor = (*ob).wloc.len2;
+        }
+        if ((*ob).wloc.len3 > -1) {
+          if (pieza != p_coma)
+            c_error(3, 130);
+          lexer();
+          exp00(0);
+          if (comprueba_rango) {
+            (*_exp).type = erango;
+            (*_exp++).valor = (*ob).wloc.len3;
+          }
+          (*_exp).type = econs;
+          (*_exp++).valor = (*ob).wloc.len2 + 1;
+          (*_exp).type = eoper;
+          (*_exp++).token = p_mul;
+          (*_exp).type = eoper;
+          (*_exp++).token = p_add;
+        }
+        (*_exp).type = econs;
+        (*_exp++).valor = (*ob).wloc.len1 + 1;
+        (*_exp).type = eoper;
+        (*_exp++).token = p_mul;
+        (*_exp).type = eoper;
+        (*_exp++).token = p_add;
+      }
+      if (pieza != p_corce) {
+        c_error(3, 26);
+      }
+      lexer();
+    } else { // mi_byte ≡ mi_byte[0]
+      (*_exp).type = econs;
+      (*_exp++).valor = 0;
+    }
+    struct_pointer = p_pointerword;
+    break;
+
+  case tcloc:
+    (*_exp).type = estring;
+    (*_exp++).valor = (*o).cloc.offset;
+    ob = o;
+    (*_exp).type = eoper;
+    (*_exp++).token = p_add;
+    member = NULL;
+    lexer();
+    if (pieza == p_corab) {
+      lexer();
+      exp00(0);
+      if (comprueba_rango) {
+        (*_exp).type = erango;
+        (*_exp++).valor = (*ob).cloc.totalen;
+      }
+      if (pieza != p_corce)
+        c_error(3, 26);
+      lexer();
+      struct_pointer = p_pointerchar;
+    } else {
+      tipo_factor = 2;
+      if (tipo_expresion == 1) {
+        (*_exp).type = econs;
+        (*_exp++).valor = 0;
+        struct_pointer = p_pointerchar;
+      } else {
+        if (tipo_expresion == -1) {
+          (*_exp).type = eoper;
+          (*_exp++).token = p_strlen;
+        }
+        struct_pointer = p_string;
+      }
+    }
+    break;
+
+  case tsloc:
+  case tpslo:
+    (*_exp).type = econs;
+    (*_exp++).valor = (*o).sloc.offset;
+    ob = o;
+    (*_exp).type = eoper;
+    (*_exp++).token = p_add;
+    member = NULL;
+    lexer();
+    if ((*ob).type == tpslo) {
+      if (pieza != p_corab && pieza != p_punto)
+        break;
+      (*_exp).type = eoper;
+      (*_exp++).token = p_pointer;
+      if (comprueba_null)
+        (*_exp++).type = enull;
+    }
+    if (pieza == p_corab) {
+      lexer();
+      exp00(0);
+      if ((*ob).sloc.items1 > -1)
+        if (comprueba_rango) {
+          (*_exp).type = erango;
+          (*_exp++).valor = (*ob).sloc.items1;
+        }
+      if ((*ob).sloc.items2 > -1) {
+        if (pieza != p_coma)
+          c_error(3, 131);
+        lexer();
+        exp00(0);
+        if (comprueba_rango) {
+          (*_exp).type = erango;
+          (*_exp++).valor = (*ob).sloc.items2;
+        }
+        if ((*ob).sloc.items3 > -1) {
+          if (pieza != p_coma)
+            c_error(3, 131);
+          lexer();
+          exp00(0);
+          if (comprueba_rango) {
+            (*_exp).type = erango;
+            (*_exp++).valor = (*ob).sloc.items3;
+          }
+          (*_exp).type = econs;
+          (*_exp++).valor = (*ob).sloc.items2 + 1;
+          (*_exp).type = eoper;
+          (*_exp++).token = p_mul;
+          (*_exp).type = eoper;
+          (*_exp++).token = p_add;
+        }
+        (*_exp).type = econs;
+        (*_exp++).valor = (*ob).sloc.items1 + 1;
+        (*_exp).type = eoper;
+        (*_exp++).token = p_mul;
+        (*_exp).type = eoper;
+        (*_exp++).token = p_add;
+      }
+      if (pieza != p_corce) {
+        c_error(3, 26);
+      }
+      lexer();
+      if ((*ob).type == tpslo) {
+        (*_exp).type = econs;
+        (*_exp++).valor = (*((*ob).pslo.ostruct)).sloc.len_item;
+      } else {
+        (*_exp).type = econs;
+        (*_exp++).valor = (*ob).sloc.len_item;
+      }
+      (*_exp).type = eoper;
+      (*_exp++).token = p_mul;
+      (*_exp).type = eoper;
+      (*_exp++).token = p_add;
+    }
+    if (pieza == p_punto) {
+      if ((*ob).type == tpslo)
+        member = (*ob).pslo.ostruct;
+      else
+        member = ob;
+      lexer();
+      factor_struct();
+    }
+    break;
+
+  default:
+    c_error(3, 58);
+    break;
   }
 }
 
@@ -6865,170 +10006,268 @@ void factor_struct(void) {
 
 #ifdef listados
 
-void list_objects (void) {
-  FILE * sta;
-  int n,o,l;
+void list_objects(void) {
+  FILE *sta;
+  int n, o, l;
 
-  sta=fopen("div.tab","wb");
+  sta = fopen("div.tab", "wb");
 
-  fprintf(sta,"\xfe Objetos de %s - DIV Versi\xa2n " version "\n\n",file_in);
+  fprintf(sta, "\xfe Objetos de %s - DIV Versi\xa2n " version "\n\n", file_in);
 
-  for (n=1;n<=8;n++) fprintf(sta,"[%u]: %u\n",n,mem[n]); fprintf(sta,"\n");
+  for (n = 1; n <= 8; n++)
+    fprintf(sta, "[%u]: %u\n", n, mem[n]);
+  fprintf(sta, "\n");
 
-  for (n=0;n<num_obj;n++) {
-    switch(obj[n].type) {
-      case tnone: fprintf(sta,"%5u\ttnone: %s",n,obj[n].name);
-        if (obj[n].usado) fprintf(sta," (*) usado\n"); else fprintf(sta,"\n");
-        break;
-      case tcons: fprintf(sta,"%5u\ttcons: %s",n,obj[n].name);
-        if (obj[n].usado) fprintf(sta," (*) usado\n"); else fprintf(sta,"\n");
-        fprintf(sta,"\tvalor=%u\n",obj[n].cons.valor);
-        break;
-      case tvglo: fprintf(sta,"%5u\ttvglo: %s",n,obj[n].name);
-        if (obj[n].usado) fprintf(sta," (*) usado\n"); else fprintf(sta,"\n");
-        fprintf(sta,"\toffset=%u\n",o=obj[n].vglo.offset);
-        if (obj[n].member) fprintf(sta,"\tmember of %s\n",(*obj[n].member).name);
-        else fprintf(sta,"\tvalor=%u\n",mem[o]);
-        break;
-      case ttglo: fprintf(sta,"%5u\tttglo: %s",n,obj[n].name);
-        if (obj[n].usado) fprintf(sta," (*) usado\n"); else fprintf(sta,"\n");
-        fprintf(sta,"\toffset=%u\n",o=obj[n].tglo.offset);
-        fprintf(sta,"\tlen1=%u\n",obj[n].tglo.len1);
-        fprintf(sta,"\tlen2=%u\n",obj[n].tglo.len2);
-        fprintf(sta,"\tlen3=%u\n",obj[n].tglo.len3);
-        fprintf(sta,"\ttotalen=%u\n",obj[n].tglo.totalen);
-        if (obj[n].member) fprintf(sta,"\tmember of %s\n",(*obj[n].member).name);
-        break;
-      case tpbgl: case tpwgl: case tpcgl:
-      case tpigl: fprintf(sta,"%5u\ttp?gl: %s",n,obj[n].name);
-        if (obj[n].usado) fprintf(sta," (*) usado\n"); else fprintf(sta,"\n");
-        fprintf(sta,"\toffset=%u\n",o=obj[n].tglo.offset);
-        fprintf(sta,"\tlen1=%u\n",obj[n].tglo.len1);
-        fprintf(sta,"\tlen2=%u\n",obj[n].tglo.len2);
-        fprintf(sta,"\tlen3=%u\n",obj[n].tglo.len3);
-        fprintf(sta,"\ttotalen=%u\n",obj[n].tglo.totalen);
-        if (obj[n].member) fprintf(sta,"\tmember of %s\n",(*obj[n].member).name);
-        break;
-      case tsglo: fprintf(sta,"%5u\ttsglo: %s",n,obj[n].name);
-        if (obj[n].usado) fprintf(sta," (*) usado\n"); else fprintf(sta,"\n");
-        fprintf(sta,"\toffset=%u\n",o=obj[n].sglo.offset);
-        fprintf(sta,"\titems1=%u\n",obj[n].sglo.items1);
-        fprintf(sta,"\titems2=%u\n",obj[n].sglo.items2);
-        fprintf(sta,"\titems3=%u\n",obj[n].sglo.items3);
-        fprintf(sta,"\ttotalitems=%u\n",l=obj[n].sglo.totalitems);
-        fprintf(sta,"\tlen_item=%u\n",obj[n].sglo.len_item);
-        if (obj[n].member) fprintf(sta,"\tmember of %s\n",(*obj[n].member).name);
-        break;
-      case tpsgl: fprintf(sta,"%5u\ttpsgl: %s",n,obj[n].name);
-        if (obj[n].usado) fprintf(sta," (*) usado\n"); else fprintf(sta,"\n");
-        fprintf(sta,"\toffset=%u\n",o=obj[n].sglo.offset);
-        fprintf(sta,"\titems1=%u\n",obj[n].sglo.items1);
-        fprintf(sta,"\titems2=%u\n",obj[n].sglo.items2);
-        fprintf(sta,"\titems3=%u\n",obj[n].sglo.items3);
-        fprintf(sta,"\ttotalitems=%u\n",l=obj[n].sglo.totalitems);
-        fprintf(sta,"\tlen_item=%u\n",obj[n].sglo.len_item);
-        if (obj[n].member) fprintf(sta,"\tmember of %s\n",(*obj[n].member).name);
-        break;
-      case tvloc: fprintf(sta,"%5u\ttvloc: %s",n,obj[n].name);
-        if (obj[n].usado) fprintf(sta," (*) usado\n"); else fprintf(sta,"\n");
-        fprintf(sta,"\toffset=%u\n",o=obj[n].vloc.offset);
-        if (obj[n].member) fprintf(sta,"\tmember of %s\n",(*obj[n].member).name);
-        else fprintf(sta,"\tvalor=%u\n",loc[o]);
-        break;
-      case ttloc: fprintf(sta,"%5u\tttloc: %s",n,obj[n].name);
-        if (obj[n].usado) fprintf(sta," (*) usado\n"); else fprintf(sta,"\n");
-        fprintf(sta,"\toffset=%u\n",o=obj[n].tloc.offset);
-        fprintf(sta,"\tlen1=%u\n",obj[n].tloc.len1);
-        fprintf(sta,"\tlen2=%u\n",obj[n].tloc.len2);
-        fprintf(sta,"\tlen3=%u\n",obj[n].tloc.len3);
-        fprintf(sta,"\ttotalen=%u\n",obj[n].tloc.totalen);
-        if (obj[n].member) fprintf(sta,"\tmember of %s\n",(*obj[n].member).name);
-        break;
-      case tpblo: case tpwlo: case tpclo:
-      case tpilo: fprintf(sta,"%5u\ttp?lo: %s",n,obj[n].name);
-        if (obj[n].usado) fprintf(sta," (*) usado\n"); else fprintf(sta,"\n");
-        fprintf(sta,"\toffset=%u\n",o=obj[n].tloc.offset);
-        fprintf(sta,"\tlen1=%u\n",obj[n].tloc.len1);
-        fprintf(sta,"\tlen2=%u\n",obj[n].tloc.len2);
-        fprintf(sta,"\tlen3=%u\n",obj[n].tloc.len3);
-        fprintf(sta,"\ttotalen=%u\n",obj[n].tloc.totalen);
-        if (obj[n].member) fprintf(sta,"\tmember of %s\n",(*obj[n].member).name);
-        break;
-      case tsloc: fprintf(sta,"%5u\ttsloc: %s",n,obj[n].name);
-        if (obj[n].usado) fprintf(sta," (*) usado\n"); else fprintf(sta,"\n");
-        fprintf(sta,"\toffset=%u\n",o=obj[n].sloc.offset);
-        fprintf(sta,"\titems1=%u\n",obj[n].sloc.items1);
-        fprintf(sta,"\titems2=%u\n",obj[n].sloc.items2);
-        fprintf(sta,"\titems3=%u\n",obj[n].sloc.items3);
-        fprintf(sta,"\ttotalitems=%u\n",l=obj[n].sloc.totalitems);
-        fprintf(sta,"\tlen_item=%u\n",obj[n].sloc.len_item);
-        if (obj[n].member) fprintf(sta,"\tmember of %s\n",(*obj[n].member).name);
-        break;
-      case tpslo: fprintf(sta,"%5u\ttpslo: %s",n,obj[n].name);
-        if (obj[n].usado) fprintf(sta," (*) usado\n"); else fprintf(sta,"\n");
-        fprintf(sta,"\toffset=%u\n",o=obj[n].sloc.offset);
-        fprintf(sta,"\titems1=%u\n",obj[n].sloc.items1);
-        fprintf(sta,"\titems2=%u\n",obj[n].sloc.items2);
-        fprintf(sta,"\titems3=%u\n",obj[n].sloc.items3);
-        fprintf(sta,"\ttotalitems=%u\n",l=obj[n].sloc.totalitems);
-        fprintf(sta,"\tlen_item=%u\n",obj[n].sloc.len_item);
-        if (obj[n].member) fprintf(sta,"\tmember of %s\n",(*obj[n].member).name);
-        break;
-      case tproc: fprintf(sta,"%5u\ttproc: %s",n,obj[n].name);
-        if (obj[n].usado) fprintf(sta," (*) usado\n"); else fprintf(sta,"\n");
-        fprintf(sta,"\ttipo=%u\n",(memptrsize)(obj[n].proc.bloque));
-        fprintf(sta,"\toffset=%u\n",obj[n].proc.offset);
-        fprintf(sta,"\tnum_par=%u\n",obj[n].proc.num_par);
-        break;
-      case tfunc: fprintf(sta,"%5u\ttfunc: %s",n,obj[n].name);
-        if (obj[n].usado) fprintf(sta," (*) usado\n"); else fprintf(sta,"\n");
-        fprintf(sta,"\tcode=%u\n",obj[n].func.code);
-        fprintf(sta,"\tnum_par=%u\n",obj[n].func.num_par);
-        break;
-      case tfext: fprintf(sta,"%5u\ttfext: %s",n,obj[n].name);
-        if (obj[n].usado) fprintf(sta," (*) usado\n"); else fprintf(sta,"\n");
-        fprintf(sta,"\tcode=%u\n",obj[n].fext.code);
-        fprintf(sta,"\tnum_par=%u\n",obj[n].fext.num_par);
-        break;
-      case tbglo: fprintf(sta,"%5u\ttbglo: %s",n,obj[n].name);
-        if (obj[n].usado) fprintf(sta," (*) usado\n"); else fprintf(sta,"\n");
-        fprintf(sta,"\toffset=%u\n",o=obj[n].bglo.offset);
-        fprintf(sta,"\tlen1=%u\n",obj[n].bglo.len1);
-        fprintf(sta,"\tlen2=%u\n",obj[n].bglo.len2);
-        fprintf(sta,"\tlen3=%u\n",obj[n].bglo.len3);
-        fprintf(sta,"\ttotalen=%u\n",obj[n].bglo.totalen);
-        if (obj[n].member) fprintf(sta,"\tmember of %s\n",(*obj[n].member).name);
-        break;
-      case tbloc: fprintf(sta,"%5u\ttbloc: %s",n,obj[n].name);
-        if (obj[n].usado) fprintf(sta," (*) usado\n"); else fprintf(sta,"\n");
-        fprintf(sta,"\toffset=%u\n",o=obj[n].bglo.offset);
-        fprintf(sta,"\tlen1=%u\n",obj[n].bglo.len1);
-        fprintf(sta,"\tlen2=%u\n",obj[n].bglo.len2);
-        fprintf(sta,"\tlen3=%u\n",obj[n].bglo.len3);
-        fprintf(sta,"\ttotalen=%u\n",obj[n].bglo.totalen);
-        if (obj[n].member) fprintf(sta,"\tmember of %s\n",(*obj[n].member).name);
-        break;
-      case twglo: fprintf(sta,"%5u\ttwglo: %s",n,obj[n].name);
-        if (obj[n].usado) fprintf(sta," (*) usado\n"); else fprintf(sta,"\n");
-        fprintf(sta,"\toffset=%u\n",o=obj[n].bglo.offset);
-        fprintf(sta,"\tlen1=%u\n",obj[n].bglo.len1);
-        fprintf(sta,"\tlen2=%u\n",obj[n].bglo.len2);
-        fprintf(sta,"\tlen3=%u\n",obj[n].bglo.len3);
-        fprintf(sta,"\ttotalen=%u\n",obj[n].bglo.totalen);
-        if (obj[n].member) fprintf(sta,"\tmember of %s\n",(*obj[n].member).name);
-        break;
-      case twloc: fprintf(sta,"%5u\ttwloc: %s",n,obj[n].name);
-        if (obj[n].usado) fprintf(sta," (*) usado\n"); else fprintf(sta,"\n");
-        fprintf(sta,"\toffset=%u\n",o=obj[n].bglo.offset);
-        fprintf(sta,"\tlen1=%u\n",obj[n].bglo.len1);
-        fprintf(sta,"\tlen2=%u\n",obj[n].bglo.len2);
-        fprintf(sta,"\tlen3=%u\n",obj[n].bglo.len3);
-        fprintf(sta,"\ttotalen=%u\n",obj[n].bglo.totalen);
-        if (obj[n].member) fprintf(sta,"\tmember of %s\n",(*obj[n].member).name);
-        break;
+  for (n = 0; n < num_obj; n++) {
+    switch (obj[n].type) {
+    case tnone:
+      fprintf(sta, "%5u\ttnone: %s", n, obj[n].name);
+      if (obj[n].usado)
+        fprintf(sta, " (*) usado\n");
+      else
+        fprintf(sta, "\n");
+      break;
+    case tcons:
+      fprintf(sta, "%5u\ttcons: %s", n, obj[n].name);
+      if (obj[n].usado)
+        fprintf(sta, " (*) usado\n");
+      else
+        fprintf(sta, "\n");
+      fprintf(sta, "\tvalor=%u\n", obj[n].cons.valor);
+      break;
+    case tvglo:
+      fprintf(sta, "%5u\ttvglo: %s", n, obj[n].name);
+      if (obj[n].usado)
+        fprintf(sta, " (*) usado\n");
+      else
+        fprintf(sta, "\n");
+      fprintf(sta, "\toffset=%u\n", o = obj[n].vglo.offset);
+      if (obj[n].member)
+        fprintf(sta, "\tmember of %s\n", (*obj[n].member).name);
+      else
+        fprintf(sta, "\tvalor=%u\n", mem[o]);
+      break;
+    case ttglo:
+      fprintf(sta, "%5u\tttglo: %s", n, obj[n].name);
+      if (obj[n].usado)
+        fprintf(sta, " (*) usado\n");
+      else
+        fprintf(sta, "\n");
+      fprintf(sta, "\toffset=%u\n", o = obj[n].tglo.offset);
+      fprintf(sta, "\tlen1=%u\n", obj[n].tglo.len1);
+      fprintf(sta, "\tlen2=%u\n", obj[n].tglo.len2);
+      fprintf(sta, "\tlen3=%u\n", obj[n].tglo.len3);
+      fprintf(sta, "\ttotalen=%u\n", obj[n].tglo.totalen);
+      if (obj[n].member)
+        fprintf(sta, "\tmember of %s\n", (*obj[n].member).name);
+      break;
+    case tpbgl:
+    case tpwgl:
+    case tpcgl:
+    case tpigl:
+      fprintf(sta, "%5u\ttp?gl: %s", n, obj[n].name);
+      if (obj[n].usado)
+        fprintf(sta, " (*) usado\n");
+      else
+        fprintf(sta, "\n");
+      fprintf(sta, "\toffset=%u\n", o = obj[n].tglo.offset);
+      fprintf(sta, "\tlen1=%u\n", obj[n].tglo.len1);
+      fprintf(sta, "\tlen2=%u\n", obj[n].tglo.len2);
+      fprintf(sta, "\tlen3=%u\n", obj[n].tglo.len3);
+      fprintf(sta, "\ttotalen=%u\n", obj[n].tglo.totalen);
+      if (obj[n].member)
+        fprintf(sta, "\tmember of %s\n", (*obj[n].member).name);
+      break;
+    case tsglo:
+      fprintf(sta, "%5u\ttsglo: %s", n, obj[n].name);
+      if (obj[n].usado)
+        fprintf(sta, " (*) usado\n");
+      else
+        fprintf(sta, "\n");
+      fprintf(sta, "\toffset=%u\n", o = obj[n].sglo.offset);
+      fprintf(sta, "\titems1=%u\n", obj[n].sglo.items1);
+      fprintf(sta, "\titems2=%u\n", obj[n].sglo.items2);
+      fprintf(sta, "\titems3=%u\n", obj[n].sglo.items3);
+      fprintf(sta, "\ttotalitems=%u\n", l = obj[n].sglo.totalitems);
+      fprintf(sta, "\tlen_item=%u\n", obj[n].sglo.len_item);
+      if (obj[n].member)
+        fprintf(sta, "\tmember of %s\n", (*obj[n].member).name);
+      break;
+    case tpsgl:
+      fprintf(sta, "%5u\ttpsgl: %s", n, obj[n].name);
+      if (obj[n].usado)
+        fprintf(sta, " (*) usado\n");
+      else
+        fprintf(sta, "\n");
+      fprintf(sta, "\toffset=%u\n", o = obj[n].sglo.offset);
+      fprintf(sta, "\titems1=%u\n", obj[n].sglo.items1);
+      fprintf(sta, "\titems2=%u\n", obj[n].sglo.items2);
+      fprintf(sta, "\titems3=%u\n", obj[n].sglo.items3);
+      fprintf(sta, "\ttotalitems=%u\n", l = obj[n].sglo.totalitems);
+      fprintf(sta, "\tlen_item=%u\n", obj[n].sglo.len_item);
+      if (obj[n].member)
+        fprintf(sta, "\tmember of %s\n", (*obj[n].member).name);
+      break;
+    case tvloc:
+      fprintf(sta, "%5u\ttvloc: %s", n, obj[n].name);
+      if (obj[n].usado)
+        fprintf(sta, " (*) usado\n");
+      else
+        fprintf(sta, "\n");
+      fprintf(sta, "\toffset=%u\n", o = obj[n].vloc.offset);
+      if (obj[n].member)
+        fprintf(sta, "\tmember of %s\n", (*obj[n].member).name);
+      else
+        fprintf(sta, "\tvalor=%u\n", loc[o]);
+      break;
+    case ttloc:
+      fprintf(sta, "%5u\tttloc: %s", n, obj[n].name);
+      if (obj[n].usado)
+        fprintf(sta, " (*) usado\n");
+      else
+        fprintf(sta, "\n");
+      fprintf(sta, "\toffset=%u\n", o = obj[n].tloc.offset);
+      fprintf(sta, "\tlen1=%u\n", obj[n].tloc.len1);
+      fprintf(sta, "\tlen2=%u\n", obj[n].tloc.len2);
+      fprintf(sta, "\tlen3=%u\n", obj[n].tloc.len3);
+      fprintf(sta, "\ttotalen=%u\n", obj[n].tloc.totalen);
+      if (obj[n].member)
+        fprintf(sta, "\tmember of %s\n", (*obj[n].member).name);
+      break;
+    case tpblo:
+    case tpwlo:
+    case tpclo:
+    case tpilo:
+      fprintf(sta, "%5u\ttp?lo: %s", n, obj[n].name);
+      if (obj[n].usado)
+        fprintf(sta, " (*) usado\n");
+      else
+        fprintf(sta, "\n");
+      fprintf(sta, "\toffset=%u\n", o = obj[n].tloc.offset);
+      fprintf(sta, "\tlen1=%u\n", obj[n].tloc.len1);
+      fprintf(sta, "\tlen2=%u\n", obj[n].tloc.len2);
+      fprintf(sta, "\tlen3=%u\n", obj[n].tloc.len3);
+      fprintf(sta, "\ttotalen=%u\n", obj[n].tloc.totalen);
+      if (obj[n].member)
+        fprintf(sta, "\tmember of %s\n", (*obj[n].member).name);
+      break;
+    case tsloc:
+      fprintf(sta, "%5u\ttsloc: %s", n, obj[n].name);
+      if (obj[n].usado)
+        fprintf(sta, " (*) usado\n");
+      else
+        fprintf(sta, "\n");
+      fprintf(sta, "\toffset=%u\n", o = obj[n].sloc.offset);
+      fprintf(sta, "\titems1=%u\n", obj[n].sloc.items1);
+      fprintf(sta, "\titems2=%u\n", obj[n].sloc.items2);
+      fprintf(sta, "\titems3=%u\n", obj[n].sloc.items3);
+      fprintf(sta, "\ttotalitems=%u\n", l = obj[n].sloc.totalitems);
+      fprintf(sta, "\tlen_item=%u\n", obj[n].sloc.len_item);
+      if (obj[n].member)
+        fprintf(sta, "\tmember of %s\n", (*obj[n].member).name);
+      break;
+    case tpslo:
+      fprintf(sta, "%5u\ttpslo: %s", n, obj[n].name);
+      if (obj[n].usado)
+        fprintf(sta, " (*) usado\n");
+      else
+        fprintf(sta, "\n");
+      fprintf(sta, "\toffset=%u\n", o = obj[n].sloc.offset);
+      fprintf(sta, "\titems1=%u\n", obj[n].sloc.items1);
+      fprintf(sta, "\titems2=%u\n", obj[n].sloc.items2);
+      fprintf(sta, "\titems3=%u\n", obj[n].sloc.items3);
+      fprintf(sta, "\ttotalitems=%u\n", l = obj[n].sloc.totalitems);
+      fprintf(sta, "\tlen_item=%u\n", obj[n].sloc.len_item);
+      if (obj[n].member)
+        fprintf(sta, "\tmember of %s\n", (*obj[n].member).name);
+      break;
+    case tproc:
+      fprintf(sta, "%5u\ttproc: %s", n, obj[n].name);
+      if (obj[n].usado)
+        fprintf(sta, " (*) usado\n");
+      else
+        fprintf(sta, "\n");
+      fprintf(sta, "\ttipo=%u\n", (memptrsize)(obj[n].proc.bloque));
+      fprintf(sta, "\toffset=%u\n", obj[n].proc.offset);
+      fprintf(sta, "\tnum_par=%u\n", obj[n].proc.num_par);
+      break;
+    case tfunc:
+      fprintf(sta, "%5u\ttfunc: %s", n, obj[n].name);
+      if (obj[n].usado)
+        fprintf(sta, " (*) usado\n");
+      else
+        fprintf(sta, "\n");
+      fprintf(sta, "\tcode=%u\n", obj[n].func.code);
+      fprintf(sta, "\tnum_par=%u\n", obj[n].func.num_par);
+      break;
+    case tfext:
+      fprintf(sta, "%5u\ttfext: %s", n, obj[n].name);
+      if (obj[n].usado)
+        fprintf(sta, " (*) usado\n");
+      else
+        fprintf(sta, "\n");
+      fprintf(sta, "\tcode=%u\n", obj[n].fext.code);
+      fprintf(sta, "\tnum_par=%u\n", obj[n].fext.num_par);
+      break;
+    case tbglo:
+      fprintf(sta, "%5u\ttbglo: %s", n, obj[n].name);
+      if (obj[n].usado)
+        fprintf(sta, " (*) usado\n");
+      else
+        fprintf(sta, "\n");
+      fprintf(sta, "\toffset=%u\n", o = obj[n].bglo.offset);
+      fprintf(sta, "\tlen1=%u\n", obj[n].bglo.len1);
+      fprintf(sta, "\tlen2=%u\n", obj[n].bglo.len2);
+      fprintf(sta, "\tlen3=%u\n", obj[n].bglo.len3);
+      fprintf(sta, "\ttotalen=%u\n", obj[n].bglo.totalen);
+      if (obj[n].member)
+        fprintf(sta, "\tmember of %s\n", (*obj[n].member).name);
+      break;
+    case tbloc:
+      fprintf(sta, "%5u\ttbloc: %s", n, obj[n].name);
+      if (obj[n].usado)
+        fprintf(sta, " (*) usado\n");
+      else
+        fprintf(sta, "\n");
+      fprintf(sta, "\toffset=%u\n", o = obj[n].bglo.offset);
+      fprintf(sta, "\tlen1=%u\n", obj[n].bglo.len1);
+      fprintf(sta, "\tlen2=%u\n", obj[n].bglo.len2);
+      fprintf(sta, "\tlen3=%u\n", obj[n].bglo.len3);
+      fprintf(sta, "\ttotalen=%u\n", obj[n].bglo.totalen);
+      if (obj[n].member)
+        fprintf(sta, "\tmember of %s\n", (*obj[n].member).name);
+      break;
+    case twglo:
+      fprintf(sta, "%5u\ttwglo: %s", n, obj[n].name);
+      if (obj[n].usado)
+        fprintf(sta, " (*) usado\n");
+      else
+        fprintf(sta, "\n");
+      fprintf(sta, "\toffset=%u\n", o = obj[n].bglo.offset);
+      fprintf(sta, "\tlen1=%u\n", obj[n].bglo.len1);
+      fprintf(sta, "\tlen2=%u\n", obj[n].bglo.len2);
+      fprintf(sta, "\tlen3=%u\n", obj[n].bglo.len3);
+      fprintf(sta, "\ttotalen=%u\n", obj[n].bglo.totalen);
+      if (obj[n].member)
+        fprintf(sta, "\tmember of %s\n", (*obj[n].member).name);
+      break;
+    case twloc:
+      fprintf(sta, "%5u\ttwloc: %s", n, obj[n].name);
+      if (obj[n].usado)
+        fprintf(sta, " (*) usado\n");
+      else
+        fprintf(sta, "\n");
+      fprintf(sta, "\toffset=%u\n", o = obj[n].bglo.offset);
+      fprintf(sta, "\tlen1=%u\n", obj[n].bglo.len1);
+      fprintf(sta, "\tlen2=%u\n", obj[n].bglo.len2);
+      fprintf(sta, "\tlen3=%u\n", obj[n].bglo.len3);
+      fprintf(sta, "\ttotalen=%u\n", obj[n].bglo.totalen);
+      if (obj[n].member)
+        fprintf(sta, "\tmember of %s\n", (*obj[n].member).name);
+      break;
     }
-    fprintf(sta,"\tbloque(%u), anterior(%u)\n",obj[n].bloque,obj[n].anterior);
-    fprintf(sta,"\n");
+    fprintf(sta, "\tbloque(%u), anterior(%u)\n", obj[n].bloque, obj[n].anterior);
+    fprintf(sta, "\n");
   }
 
   fclose(sta);
@@ -7043,7 +10282,7 @@ void list_objects (void) {
 // NOTE: items1,items2,items3 (or len1,len2,len3 for tables) are not saved yet
 
 void save_dbg(void) {
-  FILE * sta;
+  FILE *sta;
   int n;
 
   struct {
@@ -7051,38 +10290,39 @@ void save_dbg(void) {
     int name;
     int bloque;
     int miembro;
-    int v0,v1,v2,v3,v4,v5;
+    int v0, v1, v2, v3, v4, v5;
   } ob;
 
-  sta=fopen("system/exec.dbg","wb");
+  sta = fopen("system/exec.dbg", "wb");
 
-  fwrite(&num_obj,4,1,sta);
-  fwrite(&num_obj_predefinidos,4,1,sta);
-  n=(memptrsize)&obj[0];
-  fwrite(&n,4,1,sta);
-  n=sizeof(struct objeto);
-  fwrite(&n,4,1,sta);
+  fwrite(&num_obj, 4, 1, sta);
+  fwrite(&num_obj_predefinidos, 4, 1, sta);
+  n = (memptrsize)&obj[0];
+  fwrite(&n, 4, 1, sta);
+  n = sizeof(struct objeto);
+  fwrite(&n, 4, 1, sta);
 
-  for (n=0;n<num_obj;n++) {
-    ob.type=(memptrsize)obj[n].type;
-    ob.name=(memptrsize)obj[n].name-(memptrsize)vnom;
-    ob.bloque=(memptrsize)obj[n].bloque;
-    ob.miembro=(memptrsize)obj[n].member;
-    ob.v0=(memptrsize)obj[n].sglo.offset;
-    ob.v1=(memptrsize)obj[n].sglo.len_item;
-    ob.v2=(memptrsize)obj[n].sglo.totalitems;
-    ob.v3=(memptrsize)obj[n].sglo.items1;
-    ob.v4=(memptrsize)obj[n].sglo.items2;
-    ob.v5=(memptrsize)obj[n].sglo.items3;
-    if (obj[n].type==tpsgl || obj[n].type==tpslo) ob.v1=(ob.v1-(memptrsize)&obj[0])/sizeof(struct objeto);
+  for (n = 0; n < num_obj; n++) {
+    ob.type = (memptrsize)obj[n].type;
+    ob.name = (memptrsize)obj[n].name - (memptrsize)vnom;
+    ob.bloque = (memptrsize)obj[n].bloque;
+    ob.miembro = (memptrsize)obj[n].member;
+    ob.v0 = (memptrsize)obj[n].sglo.offset;
+    ob.v1 = (memptrsize)obj[n].sglo.len_item;
+    ob.v2 = (memptrsize)obj[n].sglo.totalitems;
+    ob.v3 = (memptrsize)obj[n].sglo.items1;
+    ob.v4 = (memptrsize)obj[n].sglo.items2;
+    ob.v5 = (memptrsize)obj[n].sglo.items3;
+    if (obj[n].type == tpsgl || obj[n].type == tpslo)
+      ob.v1 = (ob.v1 - (memptrsize)&obj[0]) / sizeof(struct objeto);
     // WARNING: Do not add objects after this point -- &obj[0] and sizeof(struct objeto) are used above as base address and stride.
-    fwrite(&ob,sizeof(ob),1,sta);
+    fwrite(&ob, sizeof(ob), 1, sta);
   }
 
-  n=(memptrsize)ivnom.b-(memptrsize)vnom;
-  fwrite(&n,4,1,sta);
+  n = (memptrsize)ivnom.b - (memptrsize)vnom;
+  fwrite(&n, 4, 1, sta);
 
-  fwrite(vnom,1,n,sta);
+  fwrite(vnom, 1, n, sta);
 
   fclose(sta);
 }
@@ -7092,13 +10332,13 @@ void save_dbg(void) {
 //-----------------------------------------------------------------------------
 
 void save_exec_bin(void) {
-  FILE * sta;
+  FILE *sta;
 
-  sta=fopen("system/exec.bin","wb");
+  sta = fopen("system/exec.bin", "wb");
 
-  fwrite(&Setupfile.vol_fx,1,1,sta);
-  fwrite(&Setupfile.vol_cd,1,1,sta);
-  fwrite(&Setupfile.vol_ma,1,1,sta);
+  fwrite(&Setupfile.vol_fx, 1, 1, sta);
+  fwrite(&Setupfile.vol_cd, 1, 1, sta);
+  fwrite(&Setupfile.vol_ma, 1, 1, sta);
 
   fclose(sta);
 }
@@ -7109,150 +10349,437 @@ void save_exec_bin(void) {
 
 #ifdef listados
 
-void list_assembler (void) {
+void list_assembler(void) {
+  FILE *sta;
+  int i = mem[1];
 
-  FILE * sta;
-  int i=mem[1];
+  sta = fopen("div.eml", "wt");
 
-  sta=fopen("div.eml","wt");
+  fprintf(sta, "\xfe C\xa2digo EML de %s - DIV Versi\xa2n " version "\n", file_in);
 
-  fprintf(sta,"\xfe C\xa2digo EML de %s - DIV Versi\xa2n " version "\n",file_in);
+  while (i < imem) {
+    switch ((byte)mem[i]) {
+    case lnop:
+      fprintf(sta, "%5u\tnop", i);
+      break;
+    case lcar:
+      fprintf(sta, "%5u\tcar %u", i, mem[i + 1]);
+      i++;
+      break;
+    case lasi:
+      fprintf(sta, "%5u\tasi", i);
+      break;
+    case lori:
+      fprintf(sta, "%5u\tori", i);
+      break;
+    case lxor:
+      fprintf(sta, "%5u\txor", i);
+      break;
+    case land:
+      fprintf(sta, "%5u\tand", i);
+      break;
+    case ligu:
+      fprintf(sta, "%5u\tigu", i);
+      break;
+    case ldis:
+      fprintf(sta, "%5u\tdis", i);
+      break;
+    case lmay:
+      fprintf(sta, "%5u\tmay", i);
+      break;
+    case lmen:
+      fprintf(sta, "%5u\tmen", i);
+      break;
+    case lmei:
+      fprintf(sta, "%5u\tmei", i);
+      break;
+    case lmai:
+      fprintf(sta, "%5u\tmai", i);
+      break;
+    case ladd:
+      fprintf(sta, "%5u\tadd", i);
+      break;
+    case lsub:
+      fprintf(sta, "%5u\tsub", i);
+      break;
+    case lmul:
+      fprintf(sta, "%5u\tmul", i);
+      break;
+    case ldiv:
+      fprintf(sta, "%5u\tdiv", i);
+      break;
+    case lmod:
+      fprintf(sta, "%5u\tmod", i);
+      break;
+    case lneg:
+      fprintf(sta, "%5u\tneg", i);
+      break;
+    case lptr:
+      fprintf(sta, "%5u\tptr", i);
+      break;
+    case lnot:
+      fprintf(sta, "%5u\tnot", i);
+      break;
+    case laid:
+      fprintf(sta, "%5u\taid", i);
+      break;
+    case lcid:
+      fprintf(sta, "%5u\tcid", i);
+      break;
+    case lrng:
+      fprintf(sta, "%5u\trng %u", i, mem[i + 1]);
+      i++;
+      break;
+    case ljmp:
+      fprintf(sta, "%5u\tjmp %u", i, mem[i + 1]);
+      i++;
+      break;
+    case ljpf:
+      fprintf(sta, "%5u\tjpf %u", i, mem[i + 1]);
+      i++;
+      break;
+    case lfun:
+      fprintf(sta, "%5u\tfun %u", i, mem[i + 1]);
+      i++;
+      break;
+    case lcal:
+      fprintf(sta, "%5u\tcal %u", i, mem[i + 1]);
+      i++;
+      break;
+    case lret:
+      fprintf(sta, "%5u\tret", i);
+      break;
+    case lasp:
+      fprintf(sta, "%5u\tasp", i);
+      break;
+    case lfrm:
+      fprintf(sta, "%5u\tfrm", i);
+      break;
+    case lcbp:
+      fprintf(sta, "%5u\tcbp %u", i, mem[i + 1]);
+      i++;
+      break;
+    case lcpa:
+      fprintf(sta, "%5u\tcpa", i);
+      break;
+    case ltyp:
+      fprintf(sta, "\n%5u\ttyp %u", i, mem[i + 1]);
+      i++;
+      break;
+    case lpri:
+      fprintf(sta, "%5u\tpri %u", i, mem[i + 1]);
+      i++;
+      break;
+    case lcse:
+      fprintf(sta, "%5u\tcse %u", i, mem[i + 1]);
+      i++;
+      break;
+    case lcsr:
+      fprintf(sta, "%5u\tcsr %u", i, mem[i + 1]);
+      i++;
+      break;
+    case lshr:
+      fprintf(sta, "%5u\tshr", i);
+      break;
+    case lshl:
+      fprintf(sta, "%5u\tshl", i);
+      break;
+    case lipt:
+      fprintf(sta, "%5u\tipt", i);
+      break;
+    case lpti:
+      fprintf(sta, "%5u\tpti", i);
+      break;
+    case ldpt:
+      fprintf(sta, "%5u\tdpt", i);
+      break;
+    case lptd:
+      fprintf(sta, "%5u\tptd", i);
+      break;
+    case lada:
+      fprintf(sta, "%5u\tada", i);
+      break;
+    case lsua:
+      fprintf(sta, "%5u\tsua", i);
+      break;
+    case lmua:
+      fprintf(sta, "%5u\tmua", i);
+      break;
+    case ldia:
+      fprintf(sta, "%5u\tdia", i);
+      break;
+    case lmoa:
+      fprintf(sta, "%5u\tmoa", i);
+      break;
+    case lana:
+      fprintf(sta, "%5u\tana", i);
+      break;
+    case lora:
+      fprintf(sta, "%5u\tora", i);
+      break;
+    case lxoa:
+      fprintf(sta, "%5u\txoa", i);
+      break;
+    case lsra:
+      fprintf(sta, "%5u\tsra", i);
+      break;
+    case lsla:
+      fprintf(sta, "%5u\tsla", i);
+      break;
+    case lpar:
+      fprintf(sta, "%5u\tpar %u", i, mem[i + 1]);
+      i++;
+      break;
+    case lrtf:
+      fprintf(sta, "%5u\trtf", i);
+      break;
+    case lclo:
+      fprintf(sta, "%5u\tclo %u", i, mem[i + 1]);
+      i++;
+      break;
+    case lfrf:
+      fprintf(sta, "%5u\tfrf", i);
+      break;
+    case limp:
+      fprintf(sta, "%5u\timp %u", i, mem[i + 1]);
+      i++;
+      break;
+    case lext:
+      fprintf(sta, "%5u\text %u", i, mem[i + 1]);
+      i++;
+      break;
+    case lchk:
+      fprintf(sta, "%5u\tchk", i);
+      break;
+    case ldbg:
+      fprintf(sta, "%5u\tdbg", i);
+      break;
 
-  while (i<imem) { switch ((byte)mem[i]) {
-    case lnop: fprintf(sta,"%5u\tnop",i); break;
-    case lcar: fprintf(sta,"%5u\tcar %u",i,mem[i+1]); i++; break;
-    case lasi: fprintf(sta,"%5u\tasi",i); break;
-    case lori: fprintf(sta,"%5u\tori",i); break;
-    case lxor: fprintf(sta,"%5u\txor",i); break;
-    case land: fprintf(sta,"%5u\tand",i); break;
-    case ligu: fprintf(sta,"%5u\tigu",i); break;
-    case ldis: fprintf(sta,"%5u\tdis",i); break;
-    case lmay: fprintf(sta,"%5u\tmay",i); break;
-    case lmen: fprintf(sta,"%5u\tmen",i); break;
-    case lmei: fprintf(sta,"%5u\tmei",i); break;
-    case lmai: fprintf(sta,"%5u\tmai",i); break;
-    case ladd: fprintf(sta,"%5u\tadd",i); break;
-    case lsub: fprintf(sta,"%5u\tsub",i); break;
-    case lmul: fprintf(sta,"%5u\tmul",i); break;
-    case ldiv: fprintf(sta,"%5u\tdiv",i); break;
-    case lmod: fprintf(sta,"%5u\tmod",i); break;
-    case lneg: fprintf(sta,"%5u\tneg",i); break;
-    case lptr: fprintf(sta,"%5u\tptr",i); break;
-    case lnot: fprintf(sta,"%5u\tnot",i); break;
-    case laid: fprintf(sta,"%5u\taid",i); break;
-    case lcid: fprintf(sta,"%5u\tcid",i); break;
-    case lrng: fprintf(sta,"%5u\trng %u",i,mem[i+1]); i++; break;
-    case ljmp: fprintf(sta,"%5u\tjmp %u",i,mem[i+1]); i++; break;
-    case ljpf: fprintf(sta,"%5u\tjpf %u",i,mem[i+1]); i++; break;
-    case lfun: fprintf(sta,"%5u\tfun %u",i,mem[i+1]); i++; break;
-    case lcal: fprintf(sta,"%5u\tcal %u",i,mem[i+1]); i++; break;
-    case lret: fprintf(sta,"%5u\tret",i); break;
-    case lasp: fprintf(sta,"%5u\tasp",i); break;
-    case lfrm: fprintf(sta,"%5u\tfrm",i); break;
-    case lcbp: fprintf(sta,"%5u\tcbp %u",i,mem[i+1]); i++; break;
-    case lcpa: fprintf(sta,"%5u\tcpa",i); break;
-    case ltyp: fprintf(sta,"\n%5u\ttyp %u",i,mem[i+1]); i++; break;
-    case lpri: fprintf(sta,"%5u\tpri %u",i,mem[i+1]); i++; break;
-    case lcse: fprintf(sta,"%5u\tcse %u",i,mem[i+1]); i++; break;
-    case lcsr: fprintf(sta,"%5u\tcsr %u",i,mem[i+1]); i++; break;
-    case lshr: fprintf(sta,"%5u\tshr",i); break;
-    case lshl: fprintf(sta,"%5u\tshl",i); break;
-    case lipt: fprintf(sta,"%5u\tipt",i); break;
-    case lpti: fprintf(sta,"%5u\tpti",i); break;
-    case ldpt: fprintf(sta,"%5u\tdpt",i); break;
-    case lptd: fprintf(sta,"%5u\tptd",i); break;
-    case lada: fprintf(sta,"%5u\tada",i); break;
-    case lsua: fprintf(sta,"%5u\tsua",i); break;
-    case lmua: fprintf(sta,"%5u\tmua",i); break;
-    case ldia: fprintf(sta,"%5u\tdia",i); break;
-    case lmoa: fprintf(sta,"%5u\tmoa",i); break;
-    case lana: fprintf(sta,"%5u\tana",i); break;
-    case lora: fprintf(sta,"%5u\tora",i); break;
-    case lxoa: fprintf(sta,"%5u\txoa",i); break;
-    case lsra: fprintf(sta,"%5u\tsra",i); break;
-    case lsla: fprintf(sta,"%5u\tsla",i); break;
-    case lpar: fprintf(sta,"%5u\tpar %u",i,mem[i+1]); i++; break;
-    case lrtf: fprintf(sta,"%5u\trtf",i); break;
-    case lclo: fprintf(sta,"%5u\tclo %u",i,mem[i+1]); i++; break;
-    case lfrf: fprintf(sta,"%5u\tfrf",i); break;
-    case limp: fprintf(sta,"%5u\timp %u",i,mem[i+1]); i++; break;
-    case lext: fprintf(sta,"%5u\text %u",i,mem[i+1]); i++; break;
-    case lchk: fprintf(sta,"%5u\tchk",i); break;
-    case ldbg: fprintf(sta,"%5u\tdbg",i); break;
+    case lcar2:
+      fprintf(sta, "%5u\tcar2 %u %u", i, mem[i + 1], mem[i + 2]);
+      i += 2;
+      break;
+    case lcar3:
+      fprintf(sta, "%5u\tcar3 %u %u %u", i, mem[i + 1], mem[i + 2], mem[i + 3]);
+      i += 3;
+      break;
+    case lcar4:
+      fprintf(sta, "%5u\tcar4 %u %u %u %u", i, mem[i + 1], mem[i + 2], mem[i + 3], mem[i + 4]);
+      i += 4;
+      break;
+    case lasiasp:
+      fprintf(sta, "%5u\tasiasp", i);
+      break;
+    case lcaraid:
+      fprintf(sta, "%5u\tcaraid %u", i, mem[i + 1]);
+      i++;
+      break;
+    case lcarptr:
+      fprintf(sta, "%5u\tcarptr %u", i, mem[i + 1]);
+      i++;
+      break;
+    case laidptr:
+      fprintf(sta, "%5u\taidptr", i);
+      break;
+    case lcaraidptr:
+      fprintf(sta, "%5u\tcaraidptr %u", i, mem[i + 1]);
+      i++;
+      break;
+    case lcaraidcpa:
+      fprintf(sta, "%5u\tcaraidcpa %u", i, mem[i + 1]);
+      i++;
+      break;
+    case laddptr:
+      fprintf(sta, "%5u\taddptr", i);
+      break;
+    case lfunasp:
+      fprintf(sta, "%5u\tfunasp %u", i, mem[i + 1]);
+      i++;
+      break;
+    case lcaradd:
+      fprintf(sta, "%5u\tcaradd %u", i, mem[i + 1]);
+      i++;
+      break;
+    case lcaraddptr:
+      fprintf(sta, "%5u\tcaraddptr %u", i, mem[i + 1]);
+      i++;
+      break;
+    case lcarmul:
+      fprintf(sta, "%5u\tcarmul %u", i, mem[i + 1]);
+      i++;
+      break;
+    case lcarmuladd:
+      fprintf(sta, "%5u\tcarmuladd %u", i, mem[i + 1]);
+      i++;
+      break;
+    case lcarasiasp:
+      fprintf(sta, "%5u\tcarasiasp %u", i, mem[i + 1]);
+      i++;
+      break;
+    case lcarsub:
+      fprintf(sta, "%5u\tcarsub %u", i, mem[i + 1]);
+      i++;
+      break;
+    case lcardiv:
+      fprintf(sta, "%5u\tcardiv %u", i, mem[i + 1]);
+      i++;
+      break;
 
-    case lcar2: fprintf(sta,"%5u\tcar2 %u %u",i,mem[i+1],mem[i+2]); i+=2; break;
-    case lcar3: fprintf(sta,"%5u\tcar3 %u %u %u",i,mem[i+1],mem[i+2],mem[i+3]); i+=3; break;
-    case lcar4: fprintf(sta,"%5u\tcar4 %u %u %u %u",i,mem[i+1],mem[i+2],mem[i+3],mem[i+4]); i+=4; break;
-    case lasiasp: fprintf(sta,"%5u\tasiasp",i); break;
-    case lcaraid: fprintf(sta,"%5u\tcaraid %u",i,mem[i+1]); i++; break;
-    case lcarptr: fprintf(sta,"%5u\tcarptr %u",i,mem[i+1]); i++; break;
-    case laidptr: fprintf(sta,"%5u\taidptr",i); break;
-    case lcaraidptr: fprintf(sta,"%5u\tcaraidptr %u",i,mem[i+1]); i++; break;
-    case lcaraidcpa: fprintf(sta,"%5u\tcaraidcpa %u",i,mem[i+1]); i++; break;
-    case laddptr: fprintf(sta,"%5u\taddptr",i); break;
-    case lfunasp: fprintf(sta,"%5u\tfunasp %u",i,mem[i+1]); i++; break;
-    case lcaradd: fprintf(sta,"%5u\tcaradd %u",i,mem[i+1]); i++; break;
-    case lcaraddptr: fprintf(sta,"%5u\tcaraddptr %u",i,mem[i+1]); i++; break;
-    case lcarmul: fprintf(sta,"%5u\tcarmul %u",i,mem[i+1]); i++; break;
-    case lcarmuladd: fprintf(sta,"%5u\tcarmuladd %u",i,mem[i+1]); i++; break;
-    case lcarasiasp: fprintf(sta,"%5u\tcarasiasp %u",i,mem[i+1]); i++; break;
-    case lcarsub: fprintf(sta,"%5u\tcarsub %u",i,mem[i+1]); i++; break;
-    case lcardiv: fprintf(sta,"%5u\tcardiv %u",i,mem[i+1]); i++; break;
+    case lptrwor:
+      fprintf(sta, "%5u\tptrwor", i);
+      break;
+    case lasiwor:
+      fprintf(sta, "%5u\tasiwor", i);
+      break;
+    case liptwor:
+      fprintf(sta, "%5u\tiptwor", i);
+      break;
+    case lptiwor:
+      fprintf(sta, "%5u\tptiwor", i);
+      break;
+    case ldptwor:
+      fprintf(sta, "%5u\tdptwor", i);
+      break;
+    case lptdwor:
+      fprintf(sta, "%5u\tptdwor", i);
+      break;
+    case ladawor:
+      fprintf(sta, "%5u\tadawor", i);
+      break;
+    case lsuawor:
+      fprintf(sta, "%5u\tsuawor", i);
+      break;
+    case lmuawor:
+      fprintf(sta, "%5u\tmuawor", i);
+      break;
+    case ldiawor:
+      fprintf(sta, "%5u\tdiawor", i);
+      break;
+    case lmoawor:
+      fprintf(sta, "%5u\tmoawor", i);
+      break;
+    case lanawor:
+      fprintf(sta, "%5u\tanawor", i);
+      break;
+    case lorawor:
+      fprintf(sta, "%5u\torawor", i);
+      break;
+    case lxoawor:
+      fprintf(sta, "%5u\txoawor", i);
+      break;
+    case lsrawor:
+      fprintf(sta, "%5u\tsrawor", i);
+      break;
+    case lslawor:
+      fprintf(sta, "%5u\tslawor", i);
+      break;
+    case lcpawor:
+      fprintf(sta, "%5u\tcpawor", i);
+      break;
 
-    case lptrwor: fprintf(sta,"%5u\tptrwor",i); break;
-    case lasiwor: fprintf(sta,"%5u\tasiwor",i); break;
-    case liptwor: fprintf(sta,"%5u\tiptwor",i); break;
-    case lptiwor: fprintf(sta,"%5u\tptiwor",i); break;
-    case ldptwor: fprintf(sta,"%5u\tdptwor",i); break;
-    case lptdwor: fprintf(sta,"%5u\tptdwor",i); break;
-    case ladawor: fprintf(sta,"%5u\tadawor",i); break;
-    case lsuawor: fprintf(sta,"%5u\tsuawor",i); break;
-    case lmuawor: fprintf(sta,"%5u\tmuawor",i); break;
-    case ldiawor: fprintf(sta,"%5u\tdiawor",i); break;
-    case lmoawor: fprintf(sta,"%5u\tmoawor",i); break;
-    case lanawor: fprintf(sta,"%5u\tanawor",i); break;
-    case lorawor: fprintf(sta,"%5u\torawor",i); break;
-    case lxoawor: fprintf(sta,"%5u\txoawor",i); break;
-    case lsrawor: fprintf(sta,"%5u\tsrawor",i); break;
-    case lslawor: fprintf(sta,"%5u\tslawor",i); break;
-    case lcpawor: fprintf(sta,"%5u\tcpawor",i); break;
+    case lptrchr:
+      fprintf(sta, "%5u\tptrchr", i);
+      break;
+    case lasichr:
+      fprintf(sta, "%5u\tasichr", i);
+      break;
+    case liptchr:
+      fprintf(sta, "%5u\tiptchr", i);
+      break;
+    case lptichr:
+      fprintf(sta, "%5u\tptichr", i);
+      break;
+    case ldptchr:
+      fprintf(sta, "%5u\tdptchr", i);
+      break;
+    case lptdchr:
+      fprintf(sta, "%5u\tptdchr", i);
+      break;
+    case ladachr:
+      fprintf(sta, "%5u\tadachr", i);
+      break;
+    case lsuachr:
+      fprintf(sta, "%5u\tsuachr", i);
+      break;
+    case lmuachr:
+      fprintf(sta, "%5u\tmuachr", i);
+      break;
+    case ldiachr:
+      fprintf(sta, "%5u\tdiachr", i);
+      break;
+    case lmoachr:
+      fprintf(sta, "%5u\tmoachr", i);
+      break;
+    case lanachr:
+      fprintf(sta, "%5u\tanachr", i);
+      break;
+    case lorachr:
+      fprintf(sta, "%5u\torachr", i);
+      break;
+    case lxoachr:
+      fprintf(sta, "%5u\txoachr", i);
+      break;
+    case lsrachr:
+      fprintf(sta, "%5u\tsrachr", i);
+      break;
+    case lslachr:
+      fprintf(sta, "%5u\tslachr", i);
+      break;
+    case lcpachr:
+      fprintf(sta, "%5u\tcpachr", i);
+      break;
 
-    case lptrchr: fprintf(sta,"%5u\tptrchr",i); break;
-    case lasichr: fprintf(sta,"%5u\tasichr",i); break;
-    case liptchr: fprintf(sta,"%5u\tiptchr",i); break;
-    case lptichr: fprintf(sta,"%5u\tptichr",i); break;
-    case ldptchr: fprintf(sta,"%5u\tdptchr",i); break;
-    case lptdchr: fprintf(sta,"%5u\tptdchr",i); break;
-    case ladachr: fprintf(sta,"%5u\tadachr",i); break;
-    case lsuachr: fprintf(sta,"%5u\tsuachr",i); break;
-    case lmuachr: fprintf(sta,"%5u\tmuachr",i); break;
-    case ldiachr: fprintf(sta,"%5u\tdiachr",i); break;
-    case lmoachr: fprintf(sta,"%5u\tmoachr",i); break;
-    case lanachr: fprintf(sta,"%5u\tanachr",i); break;
-    case lorachr: fprintf(sta,"%5u\torachr",i); break;
-    case lxoachr: fprintf(sta,"%5u\txoachr",i); break;
-    case lsrachr: fprintf(sta,"%5u\tsrachr",i); break;
-    case lslachr: fprintf(sta,"%5u\tslachr",i); break;
-    case lcpachr: fprintf(sta,"%5u\tcpachr",i); break;
+    case lstrcpy:
+      fprintf(sta, "%5u\tstrcpy", i);
+      break;
+    case lstrfix:
+      fprintf(sta, "%5u\tstrfix", i);
+      break;
+    case lstrcat:
+      fprintf(sta, "%5u\tstrcat", i);
+      break;
+    case lstradd:
+      fprintf(sta, "%5u\tstradd", i);
+      break;
+    case lstrdec:
+      fprintf(sta, "%5u\tstrdec", i);
+      break;
+    case lstrsub:
+      fprintf(sta, "%5u\tstrsub", i);
+      break;
+    case lstrlen:
+      fprintf(sta, "%5u\tstrlen", i);
+      break;
+    case lstrigu:
+      fprintf(sta, "%5u\tstrigu", i);
+      break;
+    case lstrdis:
+      fprintf(sta, "%5u\tstrdis", i);
+      break;
+    case lstrmay:
+      fprintf(sta, "%5u\tstrmay", i);
+      break;
+    case lstrmen:
+      fprintf(sta, "%5u\tstrmen", i);
+      break;
+    case lstrmei:
+      fprintf(sta, "%5u\tstrmei", i);
+      break;
+    case lstrmai:
+      fprintf(sta, "%5u\tstrmai", i);
+      break;
+    case lcpastr:
+      fprintf(sta, "%5u\tcpastr", i);
+      break;
 
-    case lstrcpy: fprintf(sta,"%5u\tstrcpy",i); break;
-    case lstrfix: fprintf(sta,"%5u\tstrfix",i); break;
-    case lstrcat: fprintf(sta,"%5u\tstrcat",i); break;
-    case lstradd: fprintf(sta,"%5u\tstradd",i); break;
-    case lstrdec: fprintf(sta,"%5u\tstrdec",i); break;
-    case lstrsub: fprintf(sta,"%5u\tstrsub",i); break;
-    case lstrlen: fprintf(sta,"%5u\tstrlen",i); break;
-    case lstrigu: fprintf(sta,"%5u\tstrigu",i); break;
-    case lstrdis: fprintf(sta,"%5u\tstrdis",i); break;
-    case lstrmay: fprintf(sta,"%5u\tstrmay",i); break;
-    case lstrmen: fprintf(sta,"%5u\tstrmen",i); break;
-    case lstrmei: fprintf(sta,"%5u\tstrmei",i); break;
-    case lstrmai: fprintf(sta,"%5u\tstrmai",i); break;
-    case lcpastr: fprintf(sta,"%5u\tcpastr",i); break;
-
-    default: fprintf(sta,"***"); break;
-  } fprintf(sta,"\n"); i++; }
-  fclose (sta);
+    default:
+      fprintf(sta, "***");
+      break;
+    }
+    fprintf(sta, "\n");
+    i++;
+  }
+  fclose(sta);
 }
 
 #endif
@@ -7261,71 +10788,70 @@ void list_assembler (void) {
 //  Function to locate and open a file (pal,fpg,fnt,...)
 //  This function must follow the same algorithm as in F.CPP and DIVC.CPP
 //----------------------------------------------------------------------------
-FILE *__fpopen (byte *file, char *mode) {
-	
-	char fprgpath[_MAX_PATH*2];
-	FILE *f;
-
-	div_strcpy(fprgpath,sizeof(fprgpath),(char *)&tipo[8]);
-	div_strcat(fprgpath,sizeof(fprgpath),"/");
-	div_strcat(fprgpath,sizeof(fprgpath),full);
-	
-	if ((f=fopen(fprgpath,mode))) { // prgpath/file
-		div_strcpy(full,sizeof(full), fprgpath);
-		printf("Found %s in prg dir [%s]\n",file, prgpath);
-		return f;
-	}
-
-	return NULL;
-	
-}
-
-
-FILE * fpopen ( byte * file) {
-	return __fpopen(file,"rb");
-}
-
-FILE * open_multi(char *file, char *mode) {
+FILE *__fpopen(byte *file, char *mode) {
+  char fprgpath[_MAX_PATH * 2];
   FILE *f;
-  char drive[_MAX_DRIVE+1];
-  char dir[_MAX_DIR+1];
-  char fname[_MAX_FNAME+1];
-  char ext[_MAX_EXT+1];
+
+  div_strcpy(fprgpath, sizeof(fprgpath), (char *)&tipo[8]);
+  div_strcat(fprgpath, sizeof(fprgpath), "/");
+  div_strcat(fprgpath, sizeof(fprgpath), full);
+
+  if ((f = fopen(fprgpath, mode))) { // prgpath/file
+    div_strcpy(full, sizeof(full), fprgpath);
+    printf("Found %s in prg dir [%s]\n", file, prgpath);
+    return f;
+  }
+
+  return NULL;
+}
+
+
+FILE *fpopen(byte *file) {
+  return __fpopen(file, "rb");
+}
+
+FILE *open_multi(char *file, char *mode) {
+  FILE *f;
+  char drive[_MAX_DRIVE + 1];
+  char dir[_MAX_DIR + 1];
+  char fname[_MAX_FNAME + 1];
+  char ext[_MAX_EXT + 1];
 
   char remote[255];
 
   char *ff = (char *)file;
 
-  while (*ff!=0) {
-    if(*ff =='\\') *ff='/';
-      ff++;
+  while (*ff != 0) {
+    if (*ff == '\\')
+      *ff = '/';
+    ff++;
   }
 
-  div_strcpy(full,sizeof(full),(char*)file); // full filename
+  div_strcpy(full, sizeof(full), (char *)file); // full filename
   if ((f = fpopen((byte *)full)))
     return f;
 
-  if ((f=fopen(full,mode))) // "paz\fixero.est"
+  if ((f = fopen(full, mode))) // "paz\fixero.est"
     return f;
 
-    
-  if (_fullpath(full,(char*)file,_MAX_PATH)==NULL) 
-    return(NULL);
 
-  _splitpath(full,drive,dir,fname,ext);
+  if (_fullpath(full, (char *)file, _MAX_PATH) == NULL)
+    return (NULL);
 
-  if (strchr(ext,'.')==NULL) {
-    div_strcpy(full,sizeof(full),ext);
+  _splitpath(full, drive, dir, fname, ext);
+
+  if (strchr(ext, '.') == NULL) {
+    div_strcpy(full, sizeof(full), ext);
   } else {
-    div_strcpy(full,sizeof(full),strchr(ext,'.')+1);
+    div_strcpy(full, sizeof(full), strchr(ext, '.') + 1);
   }
 
-    if (strlen(full) && file[0]!='/')
-    div_strcat(full,sizeof(full),"/");
+  if (strlen(full) && file[0] != '/')
+    div_strcat(full, sizeof(full), "/");
 
-    div_strcat(full,sizeof(full),(char*)file);
+  div_strcat(full, sizeof(full), (char *)file);
 
-  if ((f=fopen(full,mode))) // "est\paz\fixero.est"
+  if ((f = fopen(full, mode))) // "est\paz\fixero.est"
     return f;
 
   if ((f = fpopen((byte *)full)))
@@ -7333,16 +10859,16 @@ FILE * open_multi(char *file, char *mode) {
 
   strupr(full);
 
-  if ((f=fopen(full,mode))) // "est\paz\fixero.est"
-  return f;
-
-  if ((f=fpopen((byte *)full)))
+  if ((f = fopen(full, mode))) // "est\paz\fixero.est"
     return f;
-    
-  div_strcpy(full,sizeof(full),fname);
-  div_strcat(full,sizeof(full),ext);
 
-  if ((f=fopen(full,mode))) // "fixero.est"
+  if ((f = fpopen((byte *)full)))
+    return f;
+
+  div_strcpy(full, sizeof(full), fname);
+  div_strcat(full, sizeof(full), ext);
+
+  if ((f = fopen(full, mode))) // "fixero.est"
     return f;
 
   if ((f = fpopen((byte *)full)))
@@ -7350,7 +10876,7 @@ FILE * open_multi(char *file, char *mode) {
 
   strupr(full);
 
-  if ((f=fopen(full,mode))) // "fixero.est"
+  if ((f = fopen(full, mode))) // "fixero.est"
     return f;
 
   if ((f = fpopen((byte *)full)))
@@ -7358,24 +10884,24 @@ FILE * open_multi(char *file, char *mode) {
 
   strlwr(full);
 
-  if ((f=fopen(full,mode))) // "fixero.est"
+  if ((f = fopen(full, mode))) // "fixero.est"
     return f;
 
   if ((f = fpopen((byte *)full)))
     return f;
 
-  if (strchr(ext,'.')==NULL)
-    div_strcpy(full,sizeof(full),ext);
+  if (strchr(ext, '.') == NULL)
+    div_strcpy(full, sizeof(full), ext);
   else
-    div_strcpy(full,sizeof(full),strchr(ext,'.')+1);
+    div_strcpy(full, sizeof(full), strchr(ext, '.') + 1);
 
   if (strlen(full))
-    div_strcat(full,sizeof(full),"/");
+    div_strcat(full, sizeof(full), "/");
 
-  div_strcat(full,sizeof(full),fname);
-  div_strcat(full,sizeof(full),ext);
+  div_strcat(full, sizeof(full), fname);
+  div_strcat(full, sizeof(full), ext);
 
-  if ((f=fopen(full,mode))) // "est\fixero.est"
+  if ((f = fopen(full, mode))) // "est\fixero.est"
     return f;
 
   if ((f = fpopen((byte *)full)))
@@ -7383,7 +10909,7 @@ FILE * open_multi(char *file, char *mode) {
 
   strlwr(full);
 
-  if ((f=fopen(full,mode))) // "est\fixero.est"
+  if ((f = fopen(full, mode))) // "est\fixero.est"
     return f;
 
   if ((f = fpopen((byte *)full)))
@@ -7392,25 +10918,25 @@ FILE * open_multi(char *file, char *mode) {
   return NULL;
 }
 
-FILE * div_open_file(char * file) {
-  FILE * f,*fe;
+FILE *div_open_file(char *file) {
+  FILE *f, *fe;
   char *ff = (char *)file;
 
 #ifdef DEBUG
-  printf("opening file: [%s]\n",file);
+  printf("opening file: [%s]\n", file);
 #endif
 
-  if(strlen((const char *)file)<1)
-  	return NULL;
-
-  if(strlen((char *)file)==0) 
+  if (strlen((const char *)file) < 1)
     return NULL;
 
-  f=open_multi(file,"r");
+  if (strlen((char *)file) == 0)
+    return NULL;
 
-  if(!f)
-  	div_strcpy(full,sizeof(full),"");
-  return(f);
+  f = open_multi(file, "r");
+
+  if (!f)
+    div_strcpy(full, sizeof(full), "");
+  return (f);
 }
 
 //-----------------------------------------------------------------------------
@@ -7418,12 +10944,13 @@ FILE * div_open_file(char * file) {
 //-----------------------------------------------------------------------------
 
 uint8_t e_msg[32];
-int compilado=0;
+int compilado = 0;
 
 void compile_pass1(void) {
   _show_items();
-  wwrite(v.ptr,v.an/big2,v.al/big2,3,12,0,texts[206],c3);
-  wwrite(v.ptr,v.an/big2,v.al/big2,6+text_len(texts[206]),12,0,window[v_window+1].title,c4);
+  wwrite(v.ptr, v.an / big2, v.al / big2, 3, 12, 0, texts[206], c3);
+  wwrite(v.ptr, v.an / big2, v.al / big2, 6 + text_len(texts[206]), 12, 0,
+         window[v_window + 1].title, c4);
 }
 
 extern uint8_t cerror[128];
@@ -7435,41 +10962,63 @@ void get_error(int n);
  * OK/Help buttons in the dialog.
  */
 void compile_pass2(void) {
-  if (compilado==0) {
-    compilado=1; mouse_graf=3; numero_error=-1;
+  if (compilado == 0) {
+    compilado = 1;
+    mouse_graf = 3;
+    numero_error = -1;
     comp();
-    if (numero_error>=0) {
-        get_error(500+numero_error);
+    if (numero_error >= 0) {
+      get_error(500 + numero_error);
       mensaje_compilacion(cerror);
     } else {
       mensaje_compilacion(texts[202]);
-      if (run_mode) end_dialog=1;
+      if (run_mode)
+        end_dialog = 1;
     }
-    mouse_graf=1; v.redraw=1;
+    mouse_graf = 1;
+    v.redraw = 1;
   }
   _process_items();
-  if (v.active_item==0) end_dialog=1;
-  else if (v.active_item==1) { v_help=1; end_dialog=1; }
+  if (v.active_item == 0)
+    end_dialog = 1;
+  else if (v.active_item == 1) {
+    v_help = 1;
+    end_dialog = 1;
+  }
 }
 
 void compile_pass0(void) {
-  v.type=1; v.an=300; v.al=46;
+  v.type = 1;
+  v.an = 300;
+  v.al = 46;
   switch (run_mode) {
-    case 0: v.title=texts[200]; break;
-    case 1: v.title=texts[235]; break;
-    case 2: v.title=texts[236]; break;
-    case 3: v.title=texts[241]; break;
+  case 0:
+    v.title = texts[200];
+    break;
+  case 1:
+    v.title = texts[235];
+    break;
+  case 2:
+    v.title = texts[236];
+    break;
+  case 3:
+    v.title = texts[241];
+    break;
   }
-  v.paint_handler=compile_pass1;
-  v.click_handler=compile_pass2;
-  _button(100,7,v.al-14,0);
-  _button(125,v.an-8,v.al-14,2);
-  compilado=0; v_help=0;
+  v.paint_handler = compile_pass1;
+  v.click_handler = compile_pass2;
+  _button(100, 7, v.al - 14, 0);
+  _button(125, v.an - 8, v.al - 14, 2);
+  compilado = 0;
+  v_help = 0;
 }
 
 void compile_program(void) {
   show_dialog(compile_pass0);
-  poll_keyboard(); scan_code=0; ascii=0; mouse_b=0;
+  poll_keyboard();
+  scan_code = 0;
+  ascii = 0;
+  mouse_b = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -7493,218 +11042,273 @@ void compile_program(void) {
 //} code[16];   // code[15] always holds the last generated instruction
 
 void g1(int op) {
-  if (optimizar) gen(0,op,0); else mem[imem++]=op;
+  if (optimizar)
+    gen(0, op, 0);
+  else
+    mem[imem++] = op;
 }
 
 void g2(int op, int pa) {
-  if (optimizar) gen(1,op,pa); else { mem[imem++]=op; mem[imem++]=pa; }
+  if (optimizar)
+    gen(1, op, pa);
+  else {
+    mem[imem++] = op;
+    mem[imem++] = pa;
+  }
 }
 
 int optimizado;
 
 void gen(int param, int op, int pa) {
-  optimizado=0;
+  optimizado = 0;
 
-  switch(op) {
-    case lcar:
-      if (code[15].op==lcar) {
-        code[15].op=mem[imem-2]=lcar2;
-        code[15].param=2;
-        mem[imem++]=pa; optimizado=1;
-      } else if (code[15].op==lcar2) {
-        code[15].op=mem[imem-3]=lcar3;
-        code[15].param=3;
-        mem[imem++]=pa; optimizado=1;
-      } else if (code[15].op==lcar3) {
-        code[15].op=mem[imem-4]=lcar4;
-        code[15].param=4;
-        mem[imem++]=pa; optimizado=1;
-      } break;
-    case lasp:
-      if (code[15].op==lasi) {
-        if (code[14].op==lcar) {
-          remove_code(1);
-          code[15].op=mem[imem-2]=lcarasiasp;
-        } else {
-          code[15].op=mem[imem-1]=lasiasp;
-          optimizado=1;
-        }
-      } else if (code[15].op==lfun) {
-        code[15].op=mem[imem-2]=lfunasp;
-        optimizado=1;
-      } break;
-    case laid:
-      if (code[15].op==lcar) {
-        code[15].op=mem[imem-2]=lcaraid;
-        optimizado=1;
-      } break;
-    case lptr:
-      if (code[15].op==lcar) {
-        code[15].op=mem[imem-2]=lcarptr;
-        optimizado=1;
-      } else if (code[15].op==lcaradd) {
-        code[15].op=mem[imem-2]=lcaraddptr;
-        optimizado=1;
-      } else if (code[15].op==laid) {
-        code[15].op=mem[imem-1]=laidptr;
-        optimizado=1;
-      } else if (code[15].op==ladd) {
-        code[15].op=mem[imem-1]=laddptr;
-        optimizado=1;
-      } else if (code[15].op==lcaraid) {
-        code[15].op=mem[imem-2]=lcaraidptr;
-        optimizado=1;
-      } break;
-    case lcpa:
-      if (code[15].op==lcaraid) {
-        code[15].op=mem[imem-2]=lcaraidcpa;
-        optimizado=1;
-      } break;
-    case ladd:
-      if (code[15].op==lcar2){
-        code[15].op=mem[imem-3]=lcar;
-        code[15].param=1;
-        mem[imem-2]+=mem[imem-1];
-        imem--; optimizado=1;
-      } else if (code[15].op==lcar3){
-        code[15].op=mem[imem-4]=lcar2;
-        code[15].param=2;
-        mem[imem-2]+=mem[imem-1];
-        imem--; optimizado=1;
-      } else if (code[15].op==lcar4){
-        code[15].op=mem[imem-5]=lcar3;
-        code[15].param=3;
-        mem[imem-2]+=mem[imem-1];
-        imem--; optimizado=1;
-      } else if (code[15].op==lcar){
-        if (mem[imem-1]==0) remove_code(1); else {
-          code[15].op=mem[imem-2]=lcaradd;
-          optimizado=1;
-        }
-      } else if (code[15].op==lcarmul){
-        code[15].op=mem[imem-2]=lcarmuladd;
-        optimizado=1;
-      } break;
-    case lmul:
-      if (code[15].op==lcar2){
-        code[15].op=mem[imem-3]=lcar;
-        code[15].param=1;
-        mem[imem-2]*=mem[imem-1];
-        imem--; optimizado=1;
-      } else if (code[15].op==lcar3){
-        code[15].op=mem[imem-4]=lcar2;
-        code[15].param=2;
-        mem[imem-2]*=mem[imem-1];
-        imem--; optimizado=1;
-      } else if (code[15].op==lcar4){
-        code[15].op=mem[imem-5]=lcar3;
-        code[15].param=3;
-        mem[imem-2]*=mem[imem-1];
-        imem--; optimizado=1;
-      } else if (code[15].op==lcar){
-        if (mem[imem-1]==1) remove_code(1); else {
-          code[15].op=mem[imem-2]=lcarmul;
-          optimizado=1;
-        }
-      } break;
-    case lsub:
-      if (code[15].op==lcar2){
-        code[15].op=mem[imem-3]=lcar;
-        code[15].param=1;
-        mem[imem-2]-=mem[imem-1];
-        imem--; optimizado=1;
-      } else if (code[15].op==lcar3){
-        code[15].op=mem[imem-4]=lcar2;
-        code[15].param=2;
-        mem[imem-2]-=mem[imem-1];
-        imem--; optimizado=1;
-      } else if (code[15].op==lcar4){
-        code[15].op=mem[imem-5]=lcar3;
-        code[15].param=3;
-        mem[imem-2]-=mem[imem-1];
-        imem--; optimizado=1;
-      } else if (code[15].op==lcar){
-        if (mem[imem-1]==0) remove_code(1); else {
-          code[15].op=mem[imem-2]=lcarsub;
-          optimizado=1;
-        }
-      } break;
-    case ldiv:
-      if (code[15].op==lcar2){
-        if (mem[imem-1]!=0) {
-          code[15].op=mem[imem-3]=lcar;
-          code[15].param=1;
-          mem[imem-2]/=mem[imem-1];
-          imem--; optimizado=1;
-        }
-      } else if (code[15].op==lcar3){
-        if (mem[imem-1]!=0) {
-          code[15].op=mem[imem-4]=lcar2;
-          code[15].param=2;
-          mem[imem-2]/=mem[imem-1];
-          imem--; optimizado=1;
-        }
-      } else if (code[15].op==lcar4){
-        if (mem[imem-1]!=0) {
-          code[15].op=mem[imem-5]=lcar3;
-          code[15].param=3;
-          mem[imem-2]/=mem[imem-1];
-          imem--; optimizado=1;
-        }
-      } else if (code[15].op==lcar){
-        if (mem[imem-1]==1) remove_code(1);
-        else if (mem[imem-1]!=0) {
-          code[15].op=mem[imem-2]=lcardiv; // A cardiv will never be "cardiv 0"
-          optimizado=1;
-        }
-      } break;
-    case lneg:
-      if (code[15].op==lcar || code[15].op==lcar2 || code[15].op==lcar3 || code[15].op==lcar4) {
-        mem[imem-1]=-mem[imem-1]; optimizado=1;
+  switch (op) {
+  case lcar:
+    if (code[15].op == lcar) {
+      code[15].op = mem[imem - 2] = lcar2;
+      code[15].param = 2;
+      mem[imem++] = pa;
+      optimizado = 1;
+    } else if (code[15].op == lcar2) {
+      code[15].op = mem[imem - 3] = lcar3;
+      code[15].param = 3;
+      mem[imem++] = pa;
+      optimizado = 1;
+    } else if (code[15].op == lcar3) {
+      code[15].op = mem[imem - 4] = lcar4;
+      code[15].param = 4;
+      mem[imem++] = pa;
+      optimizado = 1;
+    }
+    break;
+  case lasp:
+    if (code[15].op == lasi) {
+      if (code[14].op == lcar) {
+        remove_code(1);
+        code[15].op = mem[imem - 2] = lcarasiasp;
+      } else {
+        code[15].op = mem[imem - 1] = lasiasp;
+        optimizado = 1;
       }
-      break;
-    case lnot:
-      if (code[15].op==lcar || code[15].op==lcar2 || code[15].op==lcar3 || code[15].op==lcar4) {
-        mem[imem-1]=mem[imem-1]^-1; optimizado=1;
+    } else if (code[15].op == lfun) {
+      code[15].op = mem[imem - 2] = lfunasp;
+      optimizado = 1;
+    }
+    break;
+  case laid:
+    if (code[15].op == lcar) {
+      code[15].op = mem[imem - 2] = lcaraid;
+      optimizado = 1;
+    }
+    break;
+  case lptr:
+    if (code[15].op == lcar) {
+      code[15].op = mem[imem - 2] = lcarptr;
+      optimizado = 1;
+    } else if (code[15].op == lcaradd) {
+      code[15].op = mem[imem - 2] = lcaraddptr;
+      optimizado = 1;
+    } else if (code[15].op == laid) {
+      code[15].op = mem[imem - 1] = laidptr;
+      optimizado = 1;
+    } else if (code[15].op == ladd) {
+      code[15].op = mem[imem - 1] = laddptr;
+      optimizado = 1;
+    } else if (code[15].op == lcaraid) {
+      code[15].op = mem[imem - 2] = lcaraidptr;
+      optimizado = 1;
+    }
+    break;
+  case lcpa:
+    if (code[15].op == lcaraid) {
+      code[15].op = mem[imem - 2] = lcaraidcpa;
+      optimizado = 1;
+    }
+    break;
+  case ladd:
+    if (code[15].op == lcar2) {
+      code[15].op = mem[imem - 3] = lcar;
+      code[15].param = 1;
+      mem[imem - 2] += mem[imem - 1];
+      imem--;
+      optimizado = 1;
+    } else if (code[15].op == lcar3) {
+      code[15].op = mem[imem - 4] = lcar2;
+      code[15].param = 2;
+      mem[imem - 2] += mem[imem - 1];
+      imem--;
+      optimizado = 1;
+    } else if (code[15].op == lcar4) {
+      code[15].op = mem[imem - 5] = lcar3;
+      code[15].param = 3;
+      mem[imem - 2] += mem[imem - 1];
+      imem--;
+      optimizado = 1;
+    } else if (code[15].op == lcar) {
+      if (mem[imem - 1] == 0)
+        remove_code(1);
+      else {
+        code[15].op = mem[imem - 2] = lcaradd;
+        optimizado = 1;
       }
-      break;
+    } else if (code[15].op == lcarmul) {
+      code[15].op = mem[imem - 2] = lcarmuladd;
+      optimizado = 1;
+    }
+    break;
+  case lmul:
+    if (code[15].op == lcar2) {
+      code[15].op = mem[imem - 3] = lcar;
+      code[15].param = 1;
+      mem[imem - 2] *= mem[imem - 1];
+      imem--;
+      optimizado = 1;
+    } else if (code[15].op == lcar3) {
+      code[15].op = mem[imem - 4] = lcar2;
+      code[15].param = 2;
+      mem[imem - 2] *= mem[imem - 1];
+      imem--;
+      optimizado = 1;
+    } else if (code[15].op == lcar4) {
+      code[15].op = mem[imem - 5] = lcar3;
+      code[15].param = 3;
+      mem[imem - 2] *= mem[imem - 1];
+      imem--;
+      optimizado = 1;
+    } else if (code[15].op == lcar) {
+      if (mem[imem - 1] == 1)
+        remove_code(1);
+      else {
+        code[15].op = mem[imem - 2] = lcarmul;
+        optimizado = 1;
+      }
+    }
+    break;
+  case lsub:
+    if (code[15].op == lcar2) {
+      code[15].op = mem[imem - 3] = lcar;
+      code[15].param = 1;
+      mem[imem - 2] -= mem[imem - 1];
+      imem--;
+      optimizado = 1;
+    } else if (code[15].op == lcar3) {
+      code[15].op = mem[imem - 4] = lcar2;
+      code[15].param = 2;
+      mem[imem - 2] -= mem[imem - 1];
+      imem--;
+      optimizado = 1;
+    } else if (code[15].op == lcar4) {
+      code[15].op = mem[imem - 5] = lcar3;
+      code[15].param = 3;
+      mem[imem - 2] -= mem[imem - 1];
+      imem--;
+      optimizado = 1;
+    } else if (code[15].op == lcar) {
+      if (mem[imem - 1] == 0)
+        remove_code(1);
+      else {
+        code[15].op = mem[imem - 2] = lcarsub;
+        optimizado = 1;
+      }
+    }
+    break;
+  case ldiv:
+    if (code[15].op == lcar2) {
+      if (mem[imem - 1] != 0) {
+        code[15].op = mem[imem - 3] = lcar;
+        code[15].param = 1;
+        mem[imem - 2] /= mem[imem - 1];
+        imem--;
+        optimizado = 1;
+      }
+    } else if (code[15].op == lcar3) {
+      if (mem[imem - 1] != 0) {
+        code[15].op = mem[imem - 4] = lcar2;
+        code[15].param = 2;
+        mem[imem - 2] /= mem[imem - 1];
+        imem--;
+        optimizado = 1;
+      }
+    } else if (code[15].op == lcar4) {
+      if (mem[imem - 1] != 0) {
+        code[15].op = mem[imem - 5] = lcar3;
+        code[15].param = 3;
+        mem[imem - 2] /= mem[imem - 1];
+        imem--;
+        optimizado = 1;
+      }
+    } else if (code[15].op == lcar) {
+      if (mem[imem - 1] == 1)
+        remove_code(1);
+      else if (mem[imem - 1] != 0) {
+        code[15].op = mem[imem - 2] = lcardiv; // A cardiv will never be "cardiv 0"
+        optimizado = 1;
+      }
+    }
+    break;
+  case lneg:
+    if (code[15].op == lcar || code[15].op == lcar2 || code[15].op == lcar3 ||
+        code[15].op == lcar4) {
+      mem[imem - 1] = -mem[imem - 1];
+      optimizado = 1;
+    }
+    break;
+  case lnot:
+    if (code[15].op == lcar || code[15].op == lcar2 || code[15].op == lcar3 ||
+        code[15].op == lcar4) {
+      mem[imem - 1] = mem[imem - 1] ^ -1;
+      optimizado = 1;
+    }
+    break;
   }
 
   if (!optimizado) {
-    if (imem-code[15].dir>2) delete_code();
-    add_code(imem,param,op);
-    if (param) { mem[imem++]=op; mem[imem++]=pa; } else mem[imem++]=op;
+    if (imem - code[15].dir > 2)
+      delete_code();
+    add_code(imem, param, op);
+    if (param) {
+      mem[imem++] = op;
+      mem[imem++] = pa;
+    } else
+      mem[imem++] = op;
   }
-
 }
 
 void remove_code(int i) {
   int n;
-  optimizado=1;
+  optimizado = 1;
   while (i--) {
-    imem-=code[15].param+1;
-    for (n=15;n>0;n--) {
-      code[n].dir=code[n-1].dir;
-      code[n].param=code[n-1].param;
-      code[n].op=code[n-1].op;
-    } code[0].dir=0; code[0].param=0; code[0].op=0;
+    imem -= code[15].param + 1;
+    for (n = 15; n > 0; n--) {
+      code[n].dir = code[n - 1].dir;
+      code[n].param = code[n - 1].param;
+      code[n].op = code[n - 1].op;
+    }
+    code[0].dir = 0;
+    code[0].param = 0;
+    code[0].op = 0;
   }
 }
 
 void delete_code(void) {
   int n;
-  for (n=0;n<16;n++) {
-    code[n].dir=0; code[n].param=0; code[n].op=0;
+  for (n = 0; n < 16; n++) {
+    code[n].dir = 0;
+    code[n].param = 0;
+    code[n].op = 0;
   }
 }
 
 void add_code(int dir, int param, int op) {
   int n;
-  for (n=0;n<15;n++) {
-    code[n].dir=code[n+1].dir;
-    code[n].param=code[n+1].param;
-    code[n].op=code[n+1].op;
-  } code[15].dir=dir; code[15].param=param; code[15].op=op;
+  for (n = 0; n < 15; n++) {
+    code[n].dir = code[n + 1].dir;
+    code[n].param = code[n + 1].param;
+    code[n].op = code[n + 1].op;
+  }
+  code[15].dir = dir;
+  code[15].param = param;
+  code[15].op = op;
 }
 
 //-----------------------------------------------------------------------------
@@ -7712,113 +11316,180 @@ void add_code(int dir, int param, int op) {
 //-----------------------------------------------------------------------------
 
 void plexico(void) {
-  byte ** ptr, * _ivnom, h, * _source=source;
-  struct lex_ele * e;
+  byte **ptr, *_ivnom, h, *_source = source;
+  struct lex_ele *e;
 
-  if (!coment) {old_linea=linea; old_ierror=ierror; old_ierror_end=ierror_end;}
+  if (!coment) {
+    old_linea = linea;
+    old_ierror = ierror;
+    old_ierror_end = ierror_end;
+  }
 
-  lex_scan: ierror=_source;
+lex_scan:
+  ierror = _source;
   switch ((uintptr_t)lex_case[*_source]) { // Pointer to a lex_ele or l_???
 
-    case l_err:
-      if (coment) { pieza=p_rem; _source++; } else c_error(0,10); break;
+  case l_err:
+    if (coment) {
+      pieza = p_rem;
+      _source++;
+    } else
+      c_error(0, 10);
+    break;
 
-    case l_cr :
-      linea++; if ((*++_source)==lf) { _source++; ultima_linea=_source; goto lex_scan; }
-      pieza=p_ultima; break; // eof
+  case l_cr:
+    linea++;
+    if ((*++_source) == lf) {
+      _source++;
+      ultima_linea = _source;
+      goto lex_scan;
+    }
+    pieza = p_ultima;
+    break; // eof
 
-    case l_id :
-      if (coment) { pieza=p_rem; _source++; break; }
-      _ivnom=ivnom.b; *ivnom.p++=0; *ivnom.p++=0; h=0;
-      while ((*ivnom.b=lower[*_source++])) h=((byte)(h<<1)+(h>>7))^(*ivnom.b++);
-      ivnom.b++; _source--; if (ivnom.b-vnom>max_obj*long_med_id) c_error(0,100);
-      ptr=&vhash[h];
-      while (*ptr && strcmp((char *)(ptr+2),(char *)(_ivnom+ptr8))) ptr=(byte **)*ptr;
-      if (!strcmp((char *)(ptr+2),(char *)_ivnom+ptr8)) { // id found
-        ivnom.b=_ivnom; // remove it from vnom
-        pieza=(intptr_t)*(ptr+1);
-        if (pieza<256 && pieza>=0) { // reserved word (token)
-          if (pieza==p_rem) { while (*_source!=cr) _source++; goto lex_scan; }
-        } else { // object (existing id)
-          pieza=p_id;
-        }
-      } else {
-        ivnom.b=_ivnom; // remove it from vnom
-        pieza=p_id; // new id
-      } break;
-
-    case l_spc:
-      while ((*++_source)==' ') {} goto lex_scan;
-
-    case l_lit:
-      if (coment) { pieza=p_rem; _source++; break; }
-      pieza=p_lit; h=*_source; _ivnom=ivnom.b; // Literal between two h delimiters
-      do { if (*++_source==cr) c_error(0,11);
-           if (*_source==h)
-             if (*(_source+1)==h) *_ivnom=*++_source; else *_ivnom=0;
-           else *_ivnom=*_source;
-      } while (*_ivnom++); _source++;
-      longitud_textos+=(strlen((char *)ivnom.b)+ptr4)/4;
-      ivnom.b=_ivnom; // remove it from vnom
+  case l_id:
+    if (coment) {
+      pieza = p_rem;
+      _source++;
       break;
-
-    case l_num:
-      if (coment) { pieza=p_rem; _source++; break; }
-      pieza=p_num; pieza_num=0;
-      if (*_source=='0' && lower[*(_source+1)]=='x') {
-        _source+=2;
-        while ((uintptr_t)lex_case[*_source]==l_num ||
-               (lower[*_source]>='a' && lower[*_source]<='f')) {
-          if ((uintptr_t)lex_case[*_source]==l_num)
-            pieza_num=pieza_num*16+*_source++-0x30;
-          else pieza_num=pieza_num*16+lower[*_source++]-'a'+10;
+    }
+    _ivnom = ivnom.b;
+    *ivnom.p++ = 0;
+    *ivnom.p++ = 0;
+    h = 0;
+    while ((*ivnom.b = lower[*_source++]))
+      h = ((byte)(h << 1) + (h >> 7)) ^ (*ivnom.b++);
+    ivnom.b++;
+    _source--;
+    if (ivnom.b - vnom > max_obj * long_med_id)
+      c_error(0, 100);
+    ptr = &vhash[h];
+    while (*ptr && strcmp((char *)(ptr + 2), (char *)(_ivnom + ptr8)))
+      ptr = (byte **)*ptr;
+    if (!strcmp((char *)(ptr + 2), (char *)_ivnom + ptr8)) { // id found
+      ivnom.b = _ivnom;                                      // remove it from vnom
+      pieza = (intptr_t)*(ptr + 1);
+      if (pieza < 256 && pieza >= 0) { // reserved word (token)
+        if (pieza == p_rem) {
+          while (*_source != cr)
+            _source++;
+          goto lex_scan;
         }
-      } else do {
-        pieza_num=pieza_num*10+*_source++-0x30;
-      } while ((uintptr_t)lex_case[*_source]==l_num);
-      break;
-
-    default: // pointer to a lex_ele
-      e=lex_case[*_source++]; _ivnom=_source; pieza=(*e).token;
-      while ((e=(*e).siguiente)) {
-        while (*_source!=(*e).caracter && (*e).alternativa) e=(*e).alternativa;
-        if (*_source++==(*e).caracter && (*e).token) {
-          pieza=(*e).token; _ivnom=_source;
-        }
-      } _source=_ivnom;
-
-      if (pieza==p_rem && !coment) {
-        while (*_source!=cr) _source++;
-        goto lex_scan;
+      } else { // object (existing id)
+        pieza = p_id;
       }
+    } else {
+      ivnom.b = _ivnom; // remove it from vnom
+      pieza = p_id;     // new id
+    }
+    break;
 
-      if (pieza==p_ini_rem) {
-        coment++;
-        do {
-           source=_source; plexico(); _source=source;
-        } while (pieza!=p_end_rem);
-        coment--;
-        goto lex_scan;
-      }
+  case l_spc:
+    while ((*++_source) == ' ') {}
+    goto lex_scan;
 
-      if (pieza==p_ultima) { if (coment) c_error(0,55); else c_error(0,12); }
+  case l_lit:
+    if (coment) {
+      pieza = p_rem;
+      _source++;
       break;
+    }
+    pieza = p_lit;
+    h = *_source;
+    _ivnom = ivnom.b; // Literal between two h delimiters
+    do {
+      if (*++_source == cr)
+        c_error(0, 11);
+      if (*_source == h)
+        if (*(_source + 1) == h)
+          *_ivnom = *++_source;
+        else
+          *_ivnom = 0;
+      else
+        *_ivnom = *_source;
+    } while (*_ivnom++);
+    _source++;
+    longitud_textos += (strlen((char *)ivnom.b) + ptr4) / 4;
+    ivnom.b = _ivnom; // remove it from vnom
+    break;
 
-  } source=_source; ierror_end=_source-1;
+  case l_num:
+    if (coment) {
+      pieza = p_rem;
+      _source++;
+      break;
+    }
+    pieza = p_num;
+    pieza_num = 0;
+    if (*_source == '0' && lower[*(_source + 1)] == 'x') {
+      _source += 2;
+      while ((uintptr_t)lex_case[*_source] == l_num ||
+             (lower[*_source] >= 'a' && lower[*_source] <= 'f')) {
+        if ((uintptr_t)lex_case[*_source] == l_num)
+          pieza_num = pieza_num * 16 + *_source++ - 0x30;
+        else
+          pieza_num = pieza_num * 16 + lower[*_source++] - 'a' + 10;
+      }
+    } else
+      do {
+        pieza_num = pieza_num * 10 + *_source++ - 0x30;
+      } while ((uintptr_t)lex_case[*_source] == l_num);
+    break;
+
+  default: // pointer to a lex_ele
+    e = lex_case[*_source++];
+    _ivnom = _source;
+    pieza = (*e).token;
+    while ((e = (*e).siguiente)) {
+      while (*_source != (*e).caracter && (*e).alternativa)
+        e = (*e).alternativa;
+      if (*_source++ == (*e).caracter && (*e).token) {
+        pieza = (*e).token;
+        _ivnom = _source;
+      }
+    }
+    _source = _ivnom;
+
+    if (pieza == p_rem && !coment) {
+      while (*_source != cr)
+        _source++;
+      goto lex_scan;
+    }
+
+    if (pieza == p_ini_rem) {
+      coment++;
+      do {
+        source = _source;
+        plexico();
+        _source = source;
+      } while (pieza != p_end_rem);
+      coment--;
+      goto lex_scan;
+    }
+
+    if (pieza == p_ultima) {
+      if (coment)
+        c_error(0, 55);
+      else
+        c_error(0, 12);
+    }
+    break;
+  }
+  source = _source;
+  ierror_end = _source - 1;
 }
 
 void psintactico(void) {
-  byte * _ivnom=ivnom.b;
+  byte *_ivnom = ivnom.b;
 
-  longitud_textos=0;
+  longitud_textos = 0;
 
   do {
     plexico();
-  } while (pieza!=p_ultima);
+  } while (pieza != p_ultima);
 
-  ivnom.b=_ivnom;
-  source=source_ptr;
-  _source=source;
-  coment=0;
-
+  ivnom.b = _ivnom;
+  source = source_ptr;
+  _source = source;
+  coment = 0;
 }

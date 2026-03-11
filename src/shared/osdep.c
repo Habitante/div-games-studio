@@ -15,79 +15,72 @@
 #else
 
 
-char * strupr(char *s)
-{
-char *ucs = (char *) s;
-  for ( ; *ucs != '\0'; ucs++)
-    {
-      *ucs = toupper(*s++);
-    }
+char *strupr(char *s) {
+  char *ucs = (char *)s;
+  for (; *ucs != '\0'; ucs++) {
+    *ucs = toupper(*s++);
+  }
   return ucs;
 }
 
-char * _strupr(char *string)
-{
-	int x=0;
-	char *st = string;
-	if(string>0 && strlen(string)>0) {
-	st = (char *)malloc(strlen(string));
-	
-  for(x=0;x<strlen(string);x++)
-    st[x] = toupper((unsigned char) string[x]);
+char *_strupr(char *string) {
+  int x = 0;
+  char *st = string;
+  if (string > 0 && strlen(string) > 0) {
+    st = (char *)malloc(strlen(string));
 
-st[x]=0;
+    for (x = 0; x < strlen(string); x++)
+      st[x] = toupper((unsigned char)string[x]);
+
+    st[x] = 0;
     return st;
 
-}
-else return " ";
+  } else
+    return " ";
 }
 
-char * strlwr(char *s)
-{
-char *ucs = (char *) s;
-  for ( ; *ucs != '\0'; ucs++)
-    {
-      *ucs = tolower(*s++);
-    }
+char *strlwr(char *s) {
+  char *ucs = (char *)s;
+  for (; *ucs != '\0'; ucs++) {
+    *ucs = tolower(*s++);
+  }
   return ucs;
 }
 
 
-char * _strlwr(char *string)
-{
-	int x=0;
-	char *st = string;
-	if(strlen(string)>0) {
-st = (char *)malloc(strlen(string));
-	
-  for(x=0;x<strlen(string);x++) 
-    st[x] = tolower((unsigned char) string[x]);
+char *_strlwr(char *string) {
+  int x = 0;
+  char *st = string;
+  if (strlen(string) > 0) {
+    st = (char *)malloc(strlen(string));
 
-st[x]=0;
-}
-   return st;
+    for (x = 0; x < strlen(string); x++)
+      st[x] = tolower((unsigned char)string[x]);
+
+    st[x] = 0;
+  }
+  return st;
 }
 
 #endif
 
 
-void _dos_setdrive( unsigned __drivenum, unsigned *__drives )
-{
-	char c[3];
-	c[0]=__drivenum+'A'-1;
-	c[1]=':';
-	c[2]=0;
+void _dos_setdrive(unsigned __drivenum, unsigned *__drives) {
+  char c[3];
+  c[0] = __drivenum + 'A' - 1;
+  c[1] = ':';
+  c[2] = 0;
 }
 
-char * itoa(long n, char *buf, int len)
-{
-    if (n<0) len++; // room for negative sign '-'
-    snprintf(buf, len+1, "%ld", n);
-    return   buf;
+char *itoa(long n, char *buf, int len) {
+  if (n < 0)
+    len++; // room for negative sign '-'
+  snprintf(buf, len + 1, "%ld", n);
+  return buf;
 }
 
-void call(const voidReturnType func) {	
-	func();
+void call(const voidReturnType func) {
+  func();
 }
 
 
@@ -106,10 +99,8 @@ void call(const voidReturnType func) {
 // Comment:    Note that the concept of an extension is not available in Linux,
 //             nevertheless it is considered
 
-void _splitpath(const char* Path,char* Drive,char* Directory,char*
-Filename,char* Extension)
-{
-  char* CopyOfPath = (char*) Path;
+void _splitpath(const char *Path, char *Drive, char *Directory, char *Filename, char *Extension) {
+  char *CopyOfPath = (char *)Path;
   int Counter = 0;
   int Last = 0;
   int Rest = 0;
@@ -119,56 +110,50 @@ Filename,char* Extension)
   // but considered anyway
   Drive = NULL;
 
-  while(*CopyOfPath != '\0')
-    {
-      // search for the last slash
-      while(*CopyOfPath != '/' && *CopyOfPath != '\0')
-        {
-          CopyOfPath++;
-          Counter++;
-        }
-      if(*CopyOfPath == '/')
-        {
-          CopyOfPath++;
-         Counter++;
-          Last = Counter;
-        }
-      else
-          Rest = Counter - Last;
+  while (*CopyOfPath != '\0') {
+    // search for the last slash
+    while (*CopyOfPath != '/' && *CopyOfPath != '\0') {
+      CopyOfPath++;
+      Counter++;
     }
+    if (*CopyOfPath == '/') {
+      CopyOfPath++;
+      Counter++;
+      Last = Counter;
+    } else
+      Rest = Counter - Last;
+  }
   // directory is the first part of the path until the
   // last slash appears
-  strncpy(Directory,Path,Last);
+  strncpy(Directory, Path, Last);
   // strncpy doesnt add a '\0'
   Directory[Last] = '\0';
   // Filename is the part behind the last slahs
-  div_strcpy(Filename,_MAX_FNAME+1,CopyOfPath -= Rest);
+  div_strcpy(Filename, _MAX_FNAME + 1, CopyOfPath -= Rest);
   // get extension if there is any
   char *ext = Extension;
-  while(*Filename != '\0')
-  {
+  while (*Filename != '\0') {
     // the part behind the point is called extension in windows systems
     // at least that is what i thought apperantly the '.' is used as part
     // of the extension too .
-    if(*Filename == '.')
-      {
-		  *Filename = '\0';
-		  *Filename++;
-		  *Extension = '.';
-		  *Extension++;
-        while(*Filename != '\0')
-        {
-          *Extension = *Filename;
-          Extension++;
-          Filename++;
-        }
+    if (*Filename == '.') {
+      *Filename = '\0';
+      *Filename++;
+      *Extension = '.';
+      *Extension++;
+      while (*Filename != '\0') {
+        *Extension = *Filename;
+        Extension++;
+        Filename++;
       }
-      if(*Filename != '\0')
-        {Filename++;}
+    }
+    if (*Filename != '\0') {
+      Filename++;
+    }
   }
   *Extension = '\0';
   Extension = ext;
-  
+
   return;
 }
 
@@ -182,32 +167,27 @@ Filename,char* Extension)
 // Comment:    Note that the concept of an extension is not available in Linux,
 //             nevertheless it is considered
 
-void _makepath(char* Path,const char* Drive,const char* Directory,
-       const char* File,const char* Extension)
-{  
-  while(*Drive != '\0' && Drive != NULL)
-  {
+void _makepath(char *Path, const char *Drive, const char *Directory, const char *File,
+               const char *Extension) {
+  while (*Drive != '\0' && Drive != NULL) {
     *Path = *Drive;
     Path++;
     Drive++;
   }
-  while(*Directory != '\0' && Directory != NULL)
-  {
+  while (*Directory != '\0' && Directory != NULL) {
     *Path = *Directory;
-    Path ++;
-    Directory ++;
+    Path++;
+    Directory++;
   }
-  while(*File != '\0' && File != NULL)
-  {
+  while (*File != '\0' && File != NULL) {
     *Path = *File;
-    Path ++;
-    File ++;
+    Path++;
+    File++;
   }
-  while(*Extension != '\0' && Extension != NULL)
-  {
+  while (*Extension != '\0' && Extension != NULL) {
     *Path = *Extension;
-    Path ++;
-    Extension ++;
+    Path++;
+    Extension++;
   }
   *Path = '\0';
   return;
@@ -220,99 +200,93 @@ void _makepath(char* Path,const char* Drive,const char* Directory,
 //             The actual process and not for a forked one which would be true
 //             for system("cd DIR");
 
-int _chdir(const char* Directory)
-{
-	if(Directory!=NULL && strlen(Directory)>0)
-		chdir(Directory);
+int _chdir(const char *Directory) {
+  if (Directory != NULL && strlen(Directory) > 0)
+    chdir(Directory);
 
   return 0;
 }
 
-char *_fullpath(char *_FullPath,const char *_Path,size_t _SizeInBytes) {
-	if (realpath(_Path, _FullPath) == NULL)
-		div_strcpy(_FullPath, _SizeInBytes, _Path);
-	return _FullPath;
+char *_fullpath(char *_FullPath, const char *_Path, size_t _SizeInBytes) {
+  if (realpath(_Path, _FullPath) == NULL)
+    div_strcpy(_FullPath, _SizeInBytes, _Path);
+  return _FullPath;
 }
 
 
-int nummatch=0;
-int np=0;
-int type=0;
+int nummatch = 0;
+int np = 0;
+int type = 0;
 
 char findmask[255];
 char findname[2048];
 
-struct dirent **namelist=NULL;
+struct dirent **namelist = NULL;
 
 unsigned int _dos_findfirst(char *name, unsigned int attr, struct find_t *result) {
- unsigned int ret =0;
+  unsigned int ret = 0;
 
-div_strcpy(findmask,sizeof(findmask),name);
-strlwr(findmask);
+  div_strcpy(findmask, sizeof(findmask), name);
+  strlwr(findmask);
 
-if(namelist!=NULL) {
-	while(++np<nummatch) {
-		free(namelist[np]);
-	}
-	free(namelist);
-	namelist=NULL;
+  if (namelist != NULL) {
+    while (++np < nummatch) {
+      free(namelist[np]);
+    }
+    free(namelist);
+    namelist = NULL;
+  }
+
+  nummatch = scandir(".", &namelist, 0, alphasort);
+  np = -1;
+  type = attr;
+
+  ret = _dos_findnext(result);
+
+  return (ret);
 }
-
-    nummatch = scandir(".", &namelist, 0, alphasort); 
-np=-1;
-type = attr;
-
-ret =_dos_findnext(result);
-
-return (ret);
-
-
-							}
 unsigned int _dos_findnext(struct find_t *result) {
-while(++np<nummatch) {
-	div_strcpy(result->name,sizeof(result->name),namelist[np]->d_name);
-	result->attrib=0;
-	if(result->name[0]!='.' || ( result->name[0]=='.' &&  result->name[1]=='.')) {
-		if(namelist[np]->d_type == DT_DIR && type == _A_SUBDIR) {
-			
-			// only if searching via wildcard - fixes "new"
-			if(strchr(findmask,'*')) {
-				free(namelist[np]);
-				result->attrib=16;
-				return 0;
-			}
-		} 
-		div_strcpy(findname, sizeof(findname), result->name);
+  while (++np < nummatch) {
+    div_strcpy(result->name, sizeof(result->name), namelist[np]->d_name);
+    result->attrib = 0;
+    if (result->name[0] != '.' || (result->name[0] == '.' && result->name[1] == '.')) {
+      if (namelist[np]->d_type == DT_DIR && type == _A_SUBDIR) {
+        // only if searching via wildcard - fixes "new"
+        if (strchr(findmask, '*')) {
+          free(namelist[np]);
+          result->attrib = 16;
+          return 0;
+        }
+      }
+      div_strcpy(findname, sizeof(findname), result->name);
 
-	if (fnmatch(findmask, findname, FNM_PATHNAME | FNM_CASEFOLD)==0){
-		
-		if(namelist[np]->d_type != DT_DIR && type == _A_NORMAL) {
-			free(namelist[np]);
-			result->attrib=0;
-			return 0;
-		} 
-	}
-}
-if(np<nummatch)
-	free(namelist[np]);
-}
-	return 1;
+      if (fnmatch(findmask, findname, FNM_PATHNAME | FNM_CASEFOLD) == 0) {
+        if (namelist[np]->d_type != DT_DIR && type == _A_NORMAL) {
+          free(namelist[np]);
+          result->attrib = 0;
+          return 0;
+        }
+      }
+    }
+    if (np < nummatch)
+      free(namelist[np]);
+  }
+  return 1;
 }
 
 unsigned int _dos_setfileattr(const char *filename, unsigned int attr) {
-	return 1;
+  return 1;
 }
 
 void __mkdir(char *dir) {
-	printf("mkdir %s\n",dir);
+  printf("mkdir %s\n", dir);
 }
 
 
-void textcolor(int attr, int fg, int bg)
-{	char command[13];
+void textcolor(int attr, int fg, int bg) {
+  char command[13];
 
-	/* Command is the control command to the terminal */
-	div_snprintf(command, sizeof(command), "%c[%d;%d;%dm", 0x1B, attr, fg + 30, bg + 40);
-	printf("%s", command);
+  /* Command is the control command to the terminal */
+  div_snprintf(command, sizeof(command), "%c[%d;%d;%dm", 0x1B, attr, fg + 30, bg + 40);
+  printf("%s", command);
 }
-

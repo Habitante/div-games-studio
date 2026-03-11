@@ -15,6 +15,12 @@ Read these files first (use Agent/Explore for parallel reads):
 6. `src/global.h` — all globals, type aliases, macros
 7. `src/div_string.h` — safe string helpers
 
+## Your role
+
+You lead, I provide support when necessary. However, be mindful of preserving your precious context, use agent teams where it could help you. Your responsability is to lead the agents team, and leave the codebase and documentation always in a better state at the end. Any changes made to the repo, must be reflected on the documentation before context ends. And roadmap must be updated.
+
+Feel free to discuss with me high-level strategy, and re-focus next roadmap efforts to any areas you think are most critical / important to tackle first.
+
 ## Build & verify
 
 ```bash

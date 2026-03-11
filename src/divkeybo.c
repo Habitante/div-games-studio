@@ -9,36 +9,32 @@
 //-----------------------------------------------------------------------------
 // IRQ Data
 //-----------------------------------------------------------------------------
-byte buf[64*3]; // {ascii,scan_code,shift_status}
-int ibuf=0; // Buffer pointer, start of queue
-int fbuf=0; // Buffer pointer, end of queue
+byte buf[64 * 3]; // {ascii,scan_code,shift_status}
+int ibuf = 0;     // Buffer pointer, start of queue
+int fbuf = 0;     // Buffer pointer, end of queue
 
 //-----------------------------------------------------------------------------
 // Interrupt handler related functions.
 //-----------------------------------------------------------------------------
 
-int ctrl_c=0;
+int ctrl_c = 0;
 
-void __far __interrupt __loadds IrqHandler(void)
-{
-}
+void __far __interrupt __loadds IrqHandler(void) {}
 //-----------------------------------------------------------------------------
 // Function to initialize the handler.
 //-----------------------------------------------------------------------------
 
-void kbdInit(void)
-{
-	// call osdep keyboard init
-	OSDEP_keyInit();
+void kbdInit(void) {
+  // call osdep keyboard init
+  OSDEP_keyInit();
 }
 
 //-----------------------------------------------------------------------------
 // Function to uninitialize the handler.
 //-----------------------------------------------------------------------------
 
-void kbdReset(void)
-{
-	// nothing to do
+void kbdReset(void) {
+  // nothing to do
 }
 
 //-----------------------------------------------------------------------------
@@ -46,15 +42,15 @@ void kbdReset(void)
 //-----------------------------------------------------------------------------
 
 void bios_key(void) {
-	// nothing to do
+  // nothing to do
 }
 
 extern int reloj;
 
 //extern float m_x=0.0,m_y;
 void poll_keyboard(void) {
-mclock = SDL_GetTicks()/100;//(int)clock()/20000;
-reloj = SDL_GetTicks()/100;//(int)clock();
+  mclock = SDL_GetTicks() / 100; //(int)clock()/20000;
+  reloj = SDL_GetTicks() / 100;  //(int)clock();
 }
 
 //-----------------------------------------------------------------------------
@@ -62,6 +58,5 @@ reloj = SDL_GetTicks()/100;//(int)clock();
 //-----------------------------------------------------------------------------
 
 void flush_buffer(void) {
-  ibuf=fbuf=0; // Empty the internal buffer
+  ibuf = fbuf = 0; // Empty the internal buffer
 }
-

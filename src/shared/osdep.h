@@ -35,16 +35,12 @@
 #endif
 
 #ifndef _MAX_FNAME
-#define _MAX_FNAME 256+100
+#define _MAX_FNAME 256 + 100
 #endif
 
 #ifndef _MAX_EXT
 #define _MAX_EXT 64
 #endif
-
-
-
-
 
 
 #if __WORDSIZE == 32
@@ -54,15 +50,15 @@
 #endif
 
 
-#define far /*far*/
-#define __far /*__far*/
-#define __near /*__near*/
-#define __interrupt /* __interrupt */
-#define __loadds /* __loadds */
-#define _HARDERR_FAIL 0
+#define far             /*far*/
+#define __far           /*__far*/
+#define __near          /*__near*/
+#define __interrupt     /* __interrupt */
+#define __loadds        /* __loadds */
+#define _HARDERR_FAIL   0
 #define _HARDERR_IGNORE 1
 
-#ifndef __stdcall 
+#ifndef __stdcall
 #define __stdcall /* __stdcall */
 #endif
 
@@ -74,30 +70,29 @@
 #ifdef __EMSCRIPTEN__
 #include <string.h>
 #else
-extern char * strupr(char *string);
-extern char * strlwr(char *string);
+extern char *strupr(char *string);
+extern char *strlwr(char *string);
 #endif
 
-extern void _dos_setdrive( unsigned __drivenum, unsigned *__drives );
+extern void _dos_setdrive(unsigned __drivenum, unsigned *__drives);
 #ifndef __WIN32__
-char * itoa(long n, char *buf, int len);
+char *itoa(long n, char *buf, int len);
 #endif
 
-#define ltoa itoa 
-#define stdprn stdout
+#define ltoa    itoa
+#define stdprn  stdout
 #define stricmp strcasecmp
 
 
 #if !defined(__MINGW32__)
-extern void _splitpath (
-   const char *path,  // Path Input
-   char *drive,       // Drive     : Output
-   char *dir,         // Directory : Output
-   char *fname,       // Filename  : Output
-   char *ext          // Extension : Output
+extern void _splitpath(const char *path, // Path Input
+                       char *drive,      // Drive     : Output
+                       char *dir,        // Directory : Output
+                       char *fname,      // Filename  : Output
+                       char *ext         // Extension : Output
 );
 
-extern char *_fullpath(char *_FullPath,const char *_Path,size_t _SizeInBytes);
+extern char *_fullpath(char *_FullPath, const char *_Path, size_t _SizeInBytes);
 #endif
 
 
@@ -146,46 +141,39 @@ struct find_t {
 //Archive file
 #endif
 
-unsigned int _dos_findfirst(char *name, unsigned int attr, 
-                            struct find_t *result);
+unsigned int _dos_findfirst(char *name, unsigned int attr, struct find_t *result);
 unsigned int _dos_findnext(struct find_t *result);
 
 unsigned int _dos_setfileattr(const char *filename, unsigned int attr);
 
 void __mkdir(char *dir);
 
-void _dos_getdrive( unsigned int *drive);
+void _dos_getdrive(unsigned int *drive);
 #if !defined(__MINGW32__)
-void _makepath(
-   char *path,
-   const char *drive,
-   const char *dir,
-   const char *fname,
-   const char *ext 
-);
+void _makepath(char *path, const char *drive, const char *dir, const char *fname, const char *ext);
 #endif
 
 extern void compile(void);
-extern int _chdir(const char* Directory);
+extern int _chdir(const char *Directory);
 
 //#define SoundInfo SDL_AudioSpec
 
-#define TXTRESET		0
-#define BRIGHT 		1
-#define DIM		2
-#define UNDERLINE 	3
-#define BLINK		4
-#define REVERSE		7
-#define HIDDEN		8
+#define TXTRESET  0
+#define BRIGHT    1
+#define DIM       2
+#define UNDERLINE 3
+#define BLINK     4
+#define REVERSE   7
+#define HIDDEN    8
 
-#define BLACK 		0
-#define RED		1
-#define GREEN		2
-#define YELLOW		3
-#define BLUE		4
-#define MAGENTA		5
-#define CYAN		6
-#define	WHITE		7
+#define BLACK   0
+#define RED     1
+#define GREEN   2
+#define YELLOW  3
+#define BLUE    4
+#define MAGENTA 5
+#define CYAN    6
+#define WHITE   7
 
 
 void textcolor(int attr, int fg, int bg);
@@ -199,4 +187,3 @@ void textcolor(int attr, int fg, int bg);
 #endif
 
 #endif // __OSDEP_H
-

@@ -1,0 +1,6 @@
+# Formatting-only commits — skip in git blame
+# Usage: git config blame.ignoreRevsFile .git-blame-ignore-revs
+# Or:    git blame --ignore-revs-file .git-blame-ignore-revs
+
+# 2C-1: Apply clang-format to 82 project source files
+# (commit hash will be added after commit)

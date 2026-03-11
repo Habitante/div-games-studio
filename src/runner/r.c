@@ -6,7 +6,7 @@
 #ifdef __WIN32
 #include <SDL2/SDL.h>
 #endif
-#ifndef TARGET 
+#ifndef TARGET
 #define TARGET "div"
 #endif
 
@@ -15,18 +15,18 @@
 #endif
 
 #ifdef WIN32
-#define ide "system\\"TARGET
-#define dbg "system\\"RDEBUG
+#define ide "system\\" TARGET
+#define dbg "system\\" RDEBUG
 #else
-#define ide "system/"TARGET
-#define dbg "system/"RDEBUG
+#define ide "system/" TARGET
+#define dbg "system/" RDEBUG
 
 #endif
 
 #ifdef WIN32
 #include <windows.h>
 #elif _POSIX_C_SOURCE >= 199309L
-#include <time.h>   // for nanosleep
+#include <time.h> // for nanosleep
 #else
 #include <unistd.h> // for usleep
 #endif
@@ -34,14 +34,14 @@
 void sleep_ms(int milliseconds) // cross-platformásleep function
 {
 #ifdef WIN32
-    Sleep(milliseconds);
+  Sleep(milliseconds);
 #elif _POSIX_C_SOURCE >= 199309L
-    struct timespec ts;
-    ts.tv_sec = milliseconds / 1000;
-    ts.tv_nsec = (milliseconds % 1000) * 1000000;
-    nanosleep(&ts, NULL);
+  struct timespec ts;
+  ts.tv_sec = milliseconds / 1000;
+  ts.tv_nsec = (milliseconds % 1000) * 1000000;
+  nanosleep(&ts, NULL);
 #else
-    usleep(milliseconds * 1000);
+  usleep(milliseconds * 1000);
 #endif
 }
 
@@ -53,69 +53,65 @@ void sleep_ms(int milliseconds) // cross-platformásleep function
 #endif
 
 
-
-
 int main(int argc, char *argv[]) {
 #ifdef __WIN32
-freopen( "CON", "w", stdout );
-freopen( "CON", "w", stderr );
+  freopen("CON", "w", stdout);
+  freopen("CON", "w", stderr);
 #endif
 
 #ifdef DEBUG
-printf("[%s]\n",ide);
-printf("[%s]\n",dbg);
+  printf("[%s]\n", ide);
+  printf("[%s]\n", dbg);
 #endif
 
 #ifdef __APPLE__
- CFBundleRef mainBundle = CFBundleGetMainBundle();
-        CFURLRef resourcesURL = CFBundleCopyBundleURL(mainBundle);
-	CFStringRef str = CFURLCopyFileSystemPath( resourcesURL, kCFURLPOSIXPathStyle );
-	CFRelease(resourcesURL);
-	char path[PATH_MAX];
-	
-	CFStringGetCString( str, path, FILENAME_MAX, kCFStringEncodingASCII );
-	CFRelease(str);
-	printf("%s\n", path);
-div_strcat(path,sizeof(path),"/Contents/Resources/");
-chdir(path);
+  CFBundleRef mainBundle = CFBundleGetMainBundle();
+  CFURLRef resourcesURL = CFBundleCopyBundleURL(mainBundle);
+  CFStringRef str = CFURLCopyFileSystemPath(resourcesURL, kCFURLPOSIXPathStyle);
+  CFRelease(resourcesURL);
+  char path[PATH_MAX];
+
+  CFStringGetCString(str, path, FILENAME_MAX, kCFStringEncodingASCII);
+  CFRelease(str);
+  printf("%s\n", path);
+  div_strcat(path, sizeof(path), "/Contents/Resources/");
+  chdir(path);
 
 #endif
 
-int a=0;
-char init[255];
-div_strcpy(init,sizeof(init),ide);
-div_strcat(init,sizeof(init)," INIT");
+  int a = 0;
+  char init[255];
+  div_strcpy(init, sizeof(init), ide);
+  div_strcat(init, sizeof(init), " INIT");
 
-while(a++<argc-1) {
-	div_strcat(init,sizeof(init)," ");
-	div_strcat(init,sizeof(init),argv[a]);
-}
+  while (a++ < argc - 1) {
+    div_strcat(init, sizeof(init), " ");
+    div_strcat(init, sizeof(init), argv[a]);
+  }
 
 
+  int ret = system(init);
+  //printf("%d returned\n",ret);
 
-int ret = system(init);
-//printf("%d returned\n",ret);
-
-while(ret == 1 || ret ==2 || ret==256 || ret == 512) {
+  while (ret == 1 || ret == 2 || ret == 256 || ret == 512) {
 #ifndef WIN32
-sleep_ms(1000);
+    sleep_ms(1000);
 #endif
 
-	if(ret == 1 || ret==256) {
-		system( dbg " system/EXEC.EXE");
-		ret=system(ide);
-	}
+    if (ret == 1 || ret == 256) {
+      system(dbg " system/EXEC.EXE");
+      ret = system(ide);
+    }
 #ifdef DEBUG
-printf("%d\n",ret);
+    printf("%d\n", ret);
 #endif
-  
-#ifndef WIN32
-sleep_ms(1000);
-#endif
-	if(ret == 2 || ret==512) {
-		ret=system(ide " TEST");
-	}
-}
-return ret;
-}
 
+#ifndef WIN32
+    sleep_ms(1000);
+#endif
+    if (ret == 2 || ret == 512) {
+      ret = system(ide " TEST");
+    }
+  }
+  return ret;
+}

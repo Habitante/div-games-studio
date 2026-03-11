@@ -18,8 +18,8 @@ typedef SDL_Color OSDEP_Color;
 typedef SDL_Surface OSDEP_Surface;
 
 typedef struct _OSDEP_VMode {
-	int w;
-	int h;
+  int w;
+  int h;
 } OSDEP_VMode;
 
 extern uint8_t OSDEP_key[2048];
@@ -35,10 +35,10 @@ void OSDEP_Flip(OSDEP_Surface *s);
 uint32_t OSDEP_GetTicks(void);
 void OSDEP_UpdateRect(SDL_Surface *screen, Sint32 x, Sint32 y, Sint32 w, Sint32 h);
 int OSDEP_IsFullScreen(void);
-OSDEP_VMode ** OSDEP_ListModes(void);
+OSDEP_VMode **OSDEP_ListModes(void);
 
 void OSDEP_SetCaption(char *title, char *icon);
-OSDEP_Surface * OSDEP_SetVideoMode(int width, int height, int bpp, char fs);
+OSDEP_Surface *OSDEP_SetVideoMode(int width, int height, int bpp, char fs);
 
 int OSDEP_SetPalette(OSDEP_Surface *surface, OSDEP_Color *colors, int firstcolor, int ncolors);
 
@@ -53,7 +53,7 @@ int OSDEP_JoystickNumAxes(int n);
 uint8_t OSDEP_JoystickGetButton(OSDEP_Joystick *joystick, int button);
 int16_t OSDEP_JoystickGetAxis(OSDEP_Joystick *joystick, int axis);
 
-char * OSDEP_JoystickName(int n);
+char *OSDEP_JoystickName(int n);
 
 void OSDEP_SetWindowSize(int w, int h);
 
