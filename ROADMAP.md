@@ -59,7 +59,7 @@ One file at a time, make the code understandable to someone who isn't Daniel.
 No behavioral changes — pure cleanup.
 
 ### Completed cleanup work
-- Architecture docs: 7 reports in reports/ (architecture-overview, compiler-pipeline, vm-and-runtime, glossary, video-system-audit, unsafe-string-audit, sdl3-migration-report)
+- Architecture docs: 7 reports in docs/ (architecture-overview, compiler-pipeline, vm-and-runtime, glossary, video-system-audit, unsafe-string-audit, sdl3-migration-report)
 - OJO markers: 47 to 0 resolved (Sprint B)
 - English comments: 22 key functions documented (Sprint C), ~3,170 Spanish comments translated (Sprint H)
 - Single-letter globals: r,g,b,c,d,a + FILE *f removed (Sprint D)
@@ -98,7 +98,7 @@ to make this codebase genuinely maintainable — by anyone, not just Daniel. Thi
 **Methodology:** This work is ideal for AI agent teams working in focused sprints —
 one file or subsystem at a time, using the architecture docs and glossary as context.
 Each sprint produces a self-contained PR that can be reviewed and merged independently.
-The reports/ directory exists precisely to give agents (and future contributors) the
+The docs/ directory exists precisely to give agents (and future contributors) the
 context they need to make correct changes without Daniel having to explain everything
 from scratch each time.
 
@@ -118,7 +118,7 @@ for our audio code (native frequency ratio, raw PCM loading, unified audio type)
 Check `mingw-w64-i686-SDL3`, `mingw-w64-i686-SDL3_mixer` in MSYS2, plus Linux/macOS
 equivalents if cross-platform is a goal.
 
-See [`reports/sdl3-migration-report.md`](reports/sdl3-migration-report.md) for the
+See [`docs/sdl3-migration-report.md`](docs/sdl3-migration-report.md) for the
 full analysis (~450 call sites, ~5-8 days estimated effort).
 
 ### SDL_mixer → SDL3_mixer (largest task, ~3-5 days)

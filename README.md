@@ -105,27 +105,28 @@ build/               CMake build output
 - **32-bit code**: The codebase assumes `sizeof(int) == sizeof(void*)` in many
   places. It must be compiled as 32-bit.
 - **UI strings and menus**: All IDE text comes from `system/lenguaje.div`, loaded
-  into the `texto[]` array at startup. Entries are numbered (`391 "Some text"`).
+  into the `texts[]` array at startup. Entries are numbered (`391 "Some text"`).
   Menus are defined as consecutive blocks anchored at a base index — e.g. the Maps
-  menu starts at `800`, so `texto[800]` is the tab label, `texto[801]` the title,
-  and `texto[802..]` are the menu items in order. `crear_menu(800)` reads entries
+  menu starts at `800`, so `texts[800]` is the tab label, `texts[801]` the title,
+  and `texts[802..]` are the menu items in order. `create_menu(800)` reads entries
   sequentially until the next block. To add/remove a menu item, edit `lenguaje.div`
   and the corresponding `case` in the menu's click handler.
 
-## Documentation & Reports
+## Documentation
 
-The `reports/` directory contains detailed analyses of the codebase — essential reading
+The `docs/` directory contains detailed analyses of the codebase — essential reading
 for anyone trying to understand this 1990s C codebase. Think of them as Rosetta stones.
 
 | Report | What it covers |
 |--------|---------------|
-| [architecture-overview.md](reports/architecture-overview.md) | IDE startup → main loop → event processing; OSDEP abstraction layer; FPG/MAP/FNT/PAL binary formats |
-| [compiler-pipeline.md](reports/compiler-pipeline.md) | DIV language compiler: lexer → parser → codegen; 127-opcode EML instruction set |
-| [vm-and-runtime.md](reports/vm-and-runtime.md) | Stack-based VM interpreter; FRAME-based cooperative process scheduling; 8-bit rendering pipeline |
-| [glossary-spanish-english.md](reports/glossary-spanish-english.md) | ~150 Spanish identifiers translated to English (tapiz=wallpaper, papelera=clipboard, etc.) |
-| [video-system-audit.md](reports/video-system-audit.md) | SDL2 display/fullscreen system: what was broken, what was fixed |
-| [unsafe-string-audit.md](reports/unsafe-string-audit.md) | Buffer overflow risk audit: 38 high-risk sites fixed, ~690 low-risk remaining |
-| [sdl3-migration-report.md](reports/sdl3-migration-report.md) | Future SDL2→SDL3 migration plan: ~450 call sites, effort estimates |
+| [architecture-overview.md](docs/architecture-overview.md) | IDE startup → main loop → event processing; OSDEP abstraction layer; FPG/MAP/FNT/PAL binary formats |
+| [compiler-pipeline.md](docs/compiler-pipeline.md) | DIV language compiler: lexer → parser → codegen; 127-opcode EML instruction set |
+| [vm-and-runtime.md](docs/vm-and-runtime.md) | Stack-based VM interpreter; FRAME-based cooperative process scheduling; 8-bit rendering pipeline |
+| [sdl3-migration-report.md](docs/sdl3-migration-report.md) | Future SDL2→SDL3 migration plan: ~450 call sites, effort estimates |
+
+Older reports (glossary, video system audit, unsafe string audit) have been moved to
+`docs/archive/` — they were useful during early cleanup phases but are now largely
+superseded by the renamed codebase.
 
 See [ROADMAP.md](ROADMAP.md) for the development plan and project vision.
 

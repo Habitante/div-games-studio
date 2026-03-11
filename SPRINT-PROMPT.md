@@ -9,10 +9,10 @@ The codebase compiles and runs on Windows (32-bit MinGW). All 4 targets build cl
 Read these files to understand the codebase (use Agent/Explore for parallel reads):
 
 1. `ROADMAP.md` — project vision, completed phases, what's next
-2. `reports/architecture-overview.md` — IDE startup, main loop, OSDEP layer, file formats
-3. `reports/compiler-pipeline.md` — DIV compiler: lexer, parser, 127-opcode bytecode
-4. `reports/vm-and-runtime.md` — stack VM, process scheduling, rendering pipeline
-5. `reports/glossary-spanish-english.md` — ~150 Spanish identifiers translated to English
+2. `docs/architecture-overview.md` — IDE startup, main loop, OSDEP layer, file formats
+3. `docs/compiler-pipeline.md` — DIV compiler: lexer, parser, 127-opcode bytecode
+4. `docs/vm-and-runtime.md` — stack VM, process scheduling, rendering pipeline
+5. `docs/archive/glossary-spanish-english.md` — ~150 Spanish identifiers translated to English
 6. `src/global.h` — all 180+ globals, type aliases, macros
 7. `src/div_string.h` — safe string helpers already available
 
@@ -119,7 +119,7 @@ or by a single agent.
 
 **Context loading:** Each agent should read:
 - The target file
-- `reports/glossary-spanish-english.md` (for translations)
+- `docs/archive/glossary-spanish-english.md` (for translations)
 - `src/global.h` (for type/macro context)
 - Any header the target file includes
 

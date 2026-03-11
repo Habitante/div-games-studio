@@ -63,15 +63,15 @@ stack pointer (`_SP` field). The stack grows upward (increasing `sp`).
 
 ## 2. Interpreter Loop
 
-### Entry: `interprete()` in `src/runtime/i.c` (line 709)
+### Entry: `interprete()` in `src/runtime/i.c` (line 713)
 
 ```c
 void interprete(void) {
-    inicializacion();
+    initialization();
     while (procesos && !(kbdFLAGS[_ESC] && kbdFLAGS[_L_CTRL]) && !alt_x) {
         mainloop();
     }
-    finalizacion();
+    finalization();
 }
 ```
 
@@ -81,7 +81,7 @@ The game runs until all processes are dead, or Ctrl+Esc / Alt+X is pressed.
 
 Each frame:
 
-1. **`frame_start()`** (line 911):
+1. **`frame_start()`** (line 922):
    - Polls keyboard/mouse events via `tecla()`
    - Pauses if app lost focus (`app_paused` flag)
    - Handles screensaver activation
@@ -100,15 +100,15 @@ Each frame:
    } while (ide);
    ```
 
-3. **`frame_end()`** (line 1122):
+3. **`frame_end()`** (line 1133):
    - Restores background
    - Sorts and paints all sprites by Z-order
    - Handles scrolling backgrounds and Mode 7
    - Renders text objects and drawings
    - Updates palette fading
-   - Blits to screen via `volcado()`
+   - Blits to screen via `blit_screen()`
 
-### Process Execution: `exec_process()` at line 740
+### Process Execution: `exec_process()` at line 744
 
 Selects the highest-priority unexecuted process:
 
@@ -125,12 +125,12 @@ do {
 
 If a process has a partial frame (`_Frame >= 100`), it decrements by 100 and
 skips execution. Otherwise, it loads the process's saved IP and stack, then
-calls `nucleo_exec()`.
+calls `core_exec()`.
 
-### Bytecode Execution: `nucleo_exec()` at line 806
+### Bytecode Execution: `core_exec()` at line 810
 
 ```c
-void nucleo_exec() {
+void core_exec() {
     do {
         switch ((byte)mem[ip++]) {
             #include "debug/kernel.cpp"
@@ -226,7 +226,7 @@ case lret:
     sp = mem[id+_Param] - mem[id+_NumPar];
     pila[sp] = id;
     id = mem[id+_Caller];
-    elimina_proceso(pila[sp]);     // Kill the current process
+    kill_process(pila[sp]);        // Kill the current process
     if (!(id & 1)) goto next_process1;
     ip = mem[id+_IP];
     break;
@@ -362,7 +362,7 @@ The runtime uses SDL2_mixer for audio:
   for playback
 - 32 channels available (`channel(0)` through `channel(31)`)
 
-### Clock: `get_reloj()` in `src/runtime/f.c` (line 69)
+### Clock: `get_reloj()` in `src/runtime/f.c` (line 70)
 
 ```c
 int get_reloj(void) {
@@ -373,8 +373,8 @@ int get_reloj(void) {
 }
 ```
 
-Returns milliseconds since start. The `reloj` variable accumulates time
-deltas to avoid issues with SDL tick counter wrapping.
+Returns milliseconds since start. The `reloj` variable (not yet renamed)
+accumulates time deltas to avoid issues with SDL tick counter wrapping.
 
 ---
 
@@ -384,13 +384,13 @@ deltas to avoid issues with SDL tick counter wrapping.
 
 The rendering pipeline is entirely 8-bit paletted. Each frame:
 
-1. **Restore background** -- Copy `copia2` (clean background) back to `copia`
+1. **Restore background** -- Copy `back_buffer` (clean background) back to `screen_buffer`
    (working framebuffer)
 2. **Sort and paint** -- All visible entities are painted in Z-order
-3. **Blit to display** -- The 8-bit `copia` buffer is converted to 32-bit and
+3. **Blit to display** -- The 8-bit `screen_buffer` is converted to 32-bit and
    presented via SDL2
 
-### Sprite Sorting and Painting: `frame_end()` at line 1122
+### Sprite Sorting and Painting: `frame_end()` at line 1133
 
 The rendering uses a priority-based selection loop (not a pre-sorted array):
 
@@ -411,8 +411,8 @@ do {
     // Paint whichever has the highest Z
     if (otheride) { ... }
     else if (scrollide) { scroll_simple() or scroll_parallax(); }
-    else if (m7ide) { pinta_m7(); }
-    else if (ide) { pinta_sprite(); }
+    else if (m7ide) { paint_m7(); }
+    else if (ide) { paint_sprite(); }
 
 } while (ide || m7ide || scrollide || otheride);
 ```
@@ -420,7 +420,7 @@ do {
 This means entities are painted from highest Z to lowest Z (back to front).
 Higher `_Z` values appear behind lower ones.
 
-### Sprite Rendering: `pinta_sprite()` in `src/runtime/s.c` (line 864)
+### Sprite Rendering: `paint_sprite()` in `src/runtime/s.c` (line 869)
 
 For each process with a visible graphic:
 
@@ -432,22 +432,22 @@ For each process with a visible graphic:
 5. Choose rendering method:
    - **`sp_normal()`** -- No rotation or scaling. Direct byte copy with optional
      horizontal/vertical flip and ghost transparency.
-   - **`sp_cortado()`** -- Same as normal but with clipping.
-   - **`sp_escalado()`** -- Scaled rendering using fixed-point stepping.
-   - **`sp_rotado()`** -- Rotated rendering using sine/cosine lookup tables
+   - **`sp_clipped()`** -- Same as normal but with clipping.
+   - **`sp_scaled()`** -- Scaled rendering using fixed-point stepping.
+   - **`sp_rotated()`** -- Rotated rendering using sine/cosine lookup tables
      (4096-entry table for full rotation).
 6. Save the painted region in `mem[ide+_x0.._y1]` for partial screen updates.
 
-### Normal Sprite: `sp_normal()` at line 948
+### Normal Sprite: `sp_normal()` at line 953
 
 ```c
 void sp_normal(byte * p, int x, int y, int an, int al, int flags) {
-    byte *q = copia + y*vga_an + x;
+    byte *q = screen_buffer + y*vga_width + x;
     switch (flags & 7) {
         case 0: // No flip, no ghost
             while (al--) {
                 for (n=0; n<an; n++) if (p[n]) q[n] = p[n];
-                p += an; q += vga_an;
+                p += an; q += vga_width;
             }
             break;
         case 4: // Ghost transparency (50% blend using ghost table)
@@ -470,7 +470,7 @@ Implements hardware-style scrolling backgrounds:
 - Background maps tile/wrap as the viewport moves
 - Sprites with `_Ctype==1` are drawn relative to the scroll position
 
-### Mode 7: `pinta_m7()` and `pinta_modo7()`
+### Mode 7: `paint_m7()` and `paint_mode7()`
 
 Mode 7-style floor/ceiling rendering (like SNES):
 - Uses `m7[N]` struct: camera, height, distance, horizon, focus, color
@@ -483,10 +483,10 @@ Mode 7-style floor/ceiling rendering (like SNES):
 **Runtime rendering path:**
 
 ```
-copia (byte* working buffer)
+screen_buffer (byte* working buffer)
   |
   v
-volcado(copia) or volcado_parcial()  -- copies to OSDEP_buffer8
+blit_screen(screen_buffer) or blit_partial()  -- copies to OSDEP_buffer8
   |
   v
 OSDEP_Flip()
@@ -499,8 +499,8 @@ OSDEP_Flip()
 **Palette management:**
 
 ```c
-void set_paleta(void);    // Applies fade (dacout_r/g/b) to base palette (dac[])
-void set_dac(void);       // Calls OSDEP_SetPalette() with the modified palette
+void update_palette(void);  // Applies fade (dacout_r/g/b) to base palette (dac[])
+void set_dac(void);         // Calls OSDEP_SetPalette() with the modified palette
 ```
 
 The palette fading system smoothly interpolates `now_dacout_r/g/b` toward
@@ -513,7 +513,7 @@ target `dacout_r/g/b` values at a rate controlled by `dacout_speed`.
 
 When `dump_type == 0`, the runtime tracks dirty rectangles. Each painted sprite
 records its bounding box in `mem[ide+_x0.._y1]`. The `restore()` function
-only copies back the regions that were modified, and `volcado_parcial()` only
+only copies back the regions that were modified, and `blit_partial()` only
 blits the changed regions. This optimization is important for the original DOS
 version but less critical with SDL2.
 

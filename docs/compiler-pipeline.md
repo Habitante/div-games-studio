@@ -8,21 +8,21 @@ Logica", Logical Machine Assembler) that runs on the DIV virtual machine.
 
 ## 1. Compilation Entry Point
 
-### `compilar()` at line 992
+### `compile()` at line 997
 
 Called from `comp()` (line 689), which wraps it in a `setjmp`/`longjmp` for
 error recovery. The compilation pipeline:
 
 1. **Reset state** -- Clear object table, lexer tables, hash table, peephole buffer
 2. **Allocate `vnom`** -- Name vector for identifiers (`max_obj * long_med_id` bytes)
-3. **`analiza_ltlex()`** -- Load lexer definition from `system/ltlex.def`
-4. **`precarga_obj()`** -- Load predefined objects from `system/ltobj.def`
+3. **`analyze_ltlex()`** -- Load lexer definition from `system/ltlex.def`
+4. **`preload_objects()`** -- Load predefined objects from `system/ltobj.def`
    (built-in constants, globals, locals, structs, functions)
 5. **Allocate `mem[]`** -- Main output buffer (starts at 128KB, grows as needed)
 6. **Allocate `loc[]`** -- Local variable template buffer
 7. **Allocate `frm[]`** -- Frame/initialization data buffer
 8. **`psintactico()`** -- Pre-parse to determine string literal total length
-9. **`sintactico()`** -- Full parse + code generation
+9. **`parser()`** -- Full parse + code generation
 10. **Check unused objects** -- Error if any identifier was used but never defined
 11. **Fill header** -- `mem[0..8]` with program metadata
 12. **`save_dbg()`** -- Write debug info to `system/exec.lin`, `exec.pgm`
@@ -57,7 +57,7 @@ error recovery. The compilation pipeline:
 
 ## 2. Lexer
 
-### Lexer Initialization: `analiza_ltlex()` at line 1346
+### Lexer Initialization: `analyze_ltlex()` at line 1353
 
 The lexer is table-driven. Its tables are loaded from `system/ltlex.def`, a
 definition file that maps:
@@ -99,7 +99,7 @@ character set for identifiers:
 - Accented characters (Latin-1 range 0x80-0xFF, mapped to lowercase equivalents)
 - `#` and `$` are included as valid identifier characters
 
-### Tokenization: `lexico()` at line 1742
+### Tokenization: `lexer()` at line 1754
 
 The main lexer function. Sets global `pieza` (current token) and `pieza_num`
 (numeric value for numbers/literals). Also tracks `linea`, `ierror`,
@@ -163,11 +163,11 @@ String literals (delimited by `"`) are:
 
 ```c
 struct objeto {
-    byte tipo;              // Object type (tnone, tcons, tvglo, ttglo, ...)
+    byte type;              // Object type (tnone, tcons, tvglo, ttglo, ...)
     byte usado;             // 1 if referenced before definition
     byte * name;            // Pointer to name string in vnom
     byte * ierror;          // Source position for error reporting
-    int linea;              // Source line number
+    int line;               // Source line number
     int param;              // 1 if declared as a parameter
     struct objeto * anterior;  // Previous object with same name (scope chain)
     struct objeto * bloque;    // Owning process (NULL for global/local scope)
@@ -214,7 +214,7 @@ When looking up an identifier:
 3. The lookup walks the chain, matching `bloque` and `member` to find the
    correct scope
 
-### Predefined Objects: `precarga_obj()` at line 1427
+### Predefined Objects: `preload_objects()` at line 1434
 
 Loaded from `system/ltobj.def`. This file defines:
 - Built-in constants (e.g., `true`, `false`, `_max_process`, screen resolutions)
@@ -229,7 +229,7 @@ Loaded from `system/ltobj.def`. This file defines:
 
 ### Grammar Overview
 
-DIV uses a recursive descent parser. `sintactico()` (line 3160) handles the
+DIV uses a recursive descent parser. `parser()` (line 3172) handles the
 top-level program structure:
 
 ```
@@ -266,7 +266,7 @@ Variables can be declared as:
 - Pointer: `INT POINTER p;`, `BYTE POINTER p;`
 - Struct: `STRUCT name[N] field1; field2; END`
 
-### Statement Parsing: `sentencia()` at line 4853
+### Statement Parsing: `statement()` at line 4867
 
 Handles all control flow constructs:
 
@@ -286,9 +286,9 @@ Handles all control flow constructs:
 | `CONTINUE` | `CONTINUE` (jump to loop increment) |
 | `DEBUG` | `DEBUG` (invoke debugger) |
 
-Statements also include assignments (`expr;`) which are parsed via `expresion()`.
+Statements also include assignments (`expr;`) which are parsed via `expression()`.
 
-### Expression Parsing: `expresion()` at line 5265
+### Expression Parsing: `expression()` at line 5284
 
 Expressions use a two-phase approach:
 
@@ -296,7 +296,7 @@ Expressions use a two-phase approach:
    expression into `tabexp[]`, an array of `exp_ele` elements in postfix
    (reverse Polish) notation.
 
-2. **Phase 2: Generate code** -- `generar_expresion()` (line 5303) walks
+2. **Phase 2: Generate code** -- `generate_expression()` (line 5322) walks
    `tabexp[]` and emits bytecode instructions.
 
 The expression parser is recursive descent with explicit precedence levels:
@@ -312,8 +312,8 @@ exp00 -> con00 (handles type coercion)
               exp3 -> exp4 [<<|>> exp4]*  -- shifts
                 exp4 -> exp5 [+|- exp5]*  -- addition
                   exp5 -> exp6 [*|/|% exp6]*  -- multiplication
-                    exp6 -> unario  -- unary operators
-                      unario -> factor  -- atoms
+                    exp6 -> unary  -- unary operators
+                      unary -> factor  -- atoms
 ```
 
 `factor()` handles:
