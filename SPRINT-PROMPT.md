@@ -30,26 +30,46 @@ confirm zero warnings. Current baseline: **0 warnings** (Sprint A completed 2026
 
 ---
 
-## Completed sprints (for reference)
+## Current state and next priorities
 
-- **Sprint A** (2026-03-10): 626 LOW warnings → 0 across 35 files
-- **Sprint B** (2026-03-10): 47 OJO markers → 0 across entire codebase
-- **Sprint C** (2026-03-10): 22 key functions documented with English comments
-- **Sprint D** (2026-03-10): 7 single-letter globals removed from global.h
-- **Sprint E** (2026-03-11): ~1,030 unsafe string calls → safe helpers across 31 files
-  (5 exceptions: 4 in divinsta.c heap ptrs, 1 in 3rd-party zip.c)
-- **Sprint F** (2026-03-10): 331 Spanish function names → English across 39+ files
-- **Sprint G** (2026-03-10): ~131 globals + struct fields renamed, 44 files, ~6,900 lines
-- **Sprint H** (2026-03-10): ~3,170 Spanish comment lines → English across 34 files
-- **Sprint J** (2026-03-11): 3 high-frequency globals renamed, 39 files, ~4,034 lines
-  (copia→screen_buffer, ventana→window, texto→texts)
+**All translation + safety sprints complete:** Sprint A (warnings), B (OJO markers),
+C (function comments), D (single-letter globals), E (unsafe strings — 1,030 calls),
+F (331 function renames), G (~131 global/struct renames), H (~3,170 comment translations),
+J (copia/ventana/texto renames).
+
+**Next: Phase 2B modernization** — see `plans/cozy-fluttering-sun.md` or discuss with Daniel.
+Priorities: dead code removal (135 #ifdef blocks), source reorganization into modules,
+file renaming, monster file splitting (divc.c, div.c, divpaint.c).
 
 ---
 
-## Recommended next session: Sprint I (file splitting)
+## Completed sprints (reference)
 
-The codebase is now predominantly English, warning-clean, and string-safe.
-The main remaining structural issue is the 3 monster files.
+| Sprint | Date | What | Scale |
+|--------|------|------|-------|
+| A | 2026-03-10 | 626 LOW warnings → 0 | 35 files |
+| B | 2026-03-10 | 47 OJO markers → 0 | 6 code fixes, ~22 WARNING/NOTE, ~12 TODO |
+| C | 2026-03-10 | 22 key functions documented | English comment blocks |
+| D | 2026-03-10 | 7 single-letter globals removed | 11 files |
+| E | 2026-03-11 | ~1,030 unsafe string calls → safe helpers | 31 files, 2 overflows found |
+| F | 2026-03-10 | 331 Spanish function names → English | 39+ files |
+| G | 2026-03-10 | ~131 globals + struct fields → English | 44 files, ~6,900 lines |
+| H | 2026-03-10 | ~3,170 Spanish comments → English | 34 files |
+| J | 2026-03-11 | 3 high-frequency globals renamed | 39 files, ~4,034 lines |
+
+## Safe string helpers reference (from Sprint E)
+
+**Helpers** (in `src/div_string.h`):
+- `div_strcpy(dst, sizeof(dst), src)` — bounded copy
+- `div_strcat(dst, sizeof(dst), src)` — bounded concatenation
+- `div_snprintf(dst, sizeof(dst), fmt, ...)` — bounded format
+- `DIV_STRCPY`/`DIV_STRCAT`/`DIV_SPRINTF` — macro versions using sizeof automatically
+
+**Rules for future string work:**
+- Use `sizeof(dst)` when dst is a stack array
+- For heap-allocated or pointer-passed buffers, find the allocation size
+- For overlapping buffers, use `memmove()` instead
+- Don't change behavior — just add bounds checking
 
 ---
 
@@ -75,7 +95,7 @@ architecture docs.
 ### Future work (lower priority)
 
 - Rename cryptic locals in hottest paths (divc.c, divedit.c, runtime/i.c)
-- Unify byte types: pick `uint8_t` everywhere, stop mixing `byte`/`char`/`uchar`
+- Unify byte types: pick `uint8_t` everywhere, stop mixing `byte`/`char`/`uchar` (warning, some code might rely on having some signed or unsigned bytes)
 - Fix or remove commented-out `free()` in runtime stack management (i.c:778)
 - Audit `PrintEvent` pattern for similar `#ifdef`-body bugs
 - Re-enable `test_video` startup dialog

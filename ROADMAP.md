@@ -15,182 +15,41 @@ Clean up first, ship second, then modernize based on what real users actually wa
 
 ## Phase 0 — Archaeology & Dead Code Removal ✓
 
-**Completed 2026-03-06.** 118 files changed, 145 insertions, ~41,000 deletions.
+**Completed 2026-03-06/07.** ~41,000 lines removed across 118 files.
 
-### What was removed
-- [x] CD-ROM/CDDA code: `cdrom.c`, `divcdrom.c`, `runtime/cdrom.c` (clock widget preserved → `divclock.c`)
-- [x] MODE8/VPE 3D engine: `runtime/vpe/` (38 files deleted)
-- [x] Visor 3D sprite generator: `visor/` (21 files deleted, `divspr.c` → stub)
-- [x] DLL plugin system: all `DIVDLL` infrastructure removed from divc.c, runtime, div1run
-- [x] `div1run/unused/` directory (3 files)
-- [x] `other/` directory (7 files)
-- [x] Dead `#ifdef` branches: GCW, PSP, Pandora, GP2X, Amiga, Atari ST, PS2
-- [x] Dead cmake toolchain files (7 deleted, kept: windows-native, linux, osx, defaults)
-- [x] `shared/lib/portrend/` (3 files), `shared/mikedll.c`, `shared/divdll.h`
-- [x] Network code: NETLIB/NETPLAY blocks, `net.c`, `net.h`, `netlib.h`
-- [x] Fixed CMakeLists.txt `exec_program("git")` → `execute_process()` with fallback
-
-### Additional cleanup (done 2026-03-07)
-- [x] Cleaned up bundled sdlgfx — removed unused files, kept only `SDL_framerate.c/.h`
-- [x] Dropped DIV1 runtime (`div1run/`, ~3,000 lines) — orphaned, never called from IDE or launcher
-- [x] `.gitignore` already in place since initial commit
-- [x] Hidden from menus: CD Player (CDDA code removed), DOS Shell (no DOS), disabled Alt+S
-- Clock, Trash icon, Calculator: keep — still functional
-- [x] Removed 3D Map Editor: `divmap3d.c` (4,198 lines), `divmap3d.hpp`, `div/WLD/` data,
-  all menu entries, help docs, help.idx entries, and cross-references
-- [x] Removed MODE8 language remnants: 14 function stubs + struct _m8 + M8_* locals from runtime
-- [x] Removed CD music language remnants: play_cd/stop_cd/is_playing_cd stubs from runtime
-- [x] Extracted brush/texture browser from divmap3d.c → new `divbrush.c` (paint editor dependency)
-- [x] Removed Sprite Generator: `divspr.c` stub, menu entry, `div/GENSPR/` data directory, `generador_sprites()` declaration
-
-### Line ending normalization (done 2026-03-07)
-- [x] Fixed `divlengu.c` (IDE + runtime) to accept both CRLF and LF-only files
-- [x] Fixed `divhelp.c` `tabula_help()`/`tabula_help2()` for CRLF and LF-only
-- [x] Replaced broken `ú`/char-250 forced line break in help with `{br}` tag
-- [x] Added `.gitattributes` with `* text=auto eol=lf`
-- [x] Converted `lenguaje.div`, `lenguaje.int`, `help.div`, `help.idx` to LF
-- [x] Converted `lenguaje.int` from Latin-1 to UTF-8
-
-### SDL2 port bug fixes (done 2026-03-07)
-- [x] Fixed Shift+letter in editor: `SDL_TEXTINPUT` was setting `scan_code` to ASCII
-  value, colliding with DOS scan codes ('M'=77=Right, 'P'=80=Down, 'Q'=81=PgDn)
-- [x] Fixed mouse wheel runaway scroll: wheel bits persisted across frames when no
-  SDL events were queued, causing continuous scrolling until another event arrived
-- [x] Restored `.PRG` extension check for syntax colorizer (was commented out)
-- [x] Fixed `f_cortar_bloque(memptrsize)` back to `f_cortar_bloque(int)`
-- [x] Removed 3 dead `#ifdef TTF` blocks from `divedit.c`
-
-### Still pending from Phase 0
-- [x] Remove hundreds of commented-out code blocks throughout
-  (52 files audited, ~1,500 lines removed, 28 review items resolved)
-- [x] Remove remaining `#ifdef TTF` dead code (~25 blocks across div.c, divwindo.c,
-  divpalet.c, divsetup.c, divhelp.c, divvideo.c, global.h, osdep.h)
-
-### Build system cleanup ✓
-- [x] Remove dead cmake options and platform branches
-  (removed SDL1 branch, libgit2, SDL_image, DEMOTARGET, APPLE block, dead JUDAS refs;
-   deleted 4 dead toolchains: windows.cmake, linux.cmake, osx.cmake, pi.cmake;
-   deleted 6 dead scripts: app.sh, makedll.sh, makedroid.bat, makegcw.bat, makehtml.bat, makepnd.bat;
-   CMakeLists.txt reduced from 376 to 161 lines)
-- [x] Add a DLL auto-copy step so first-time build "just works"
-  (`tools/copy_dlls.sh` — uses objdump to recursively find and copy mingw DLLs; runs as post-build step)
-- [x] Add a one-command build script wrapper
-  (`build.sh` at project root — sets PATH, runs cmake + make; supports `--clean`)
+Removed: CD-ROM/CDDA, MODE8/VPE 3D engine (38 files), Visor sprite generator (21 files),
+DLL plugin system, div1run, network code, dead platform branches (GCW/PSP/Pandora/GP2X),
+3D Map Editor, Sprite Generator. Fixed SDL2 port bugs (Shift+letter collision, mouse wheel
+runaway, editor .PRG colorizer). Cleaned bundled sdlgfx. Normalized line endings. Added
+build.sh wrapper and DLL auto-copy post-build step.
 
 ---
 
 ## Phase 0.5 — Fix File Encoding (Latin-1 → UTF-8) ✓
 
-**Completed 2026-03-06.** 53 files converted, all string literals hex-escaped.
-
-The codebase was Latin-1 encoded (from the MS-DOS era). Modern editors and tools
-silently corrupted files by converting them to UTF-8, breaking character lookup
-tables used by the compiler's lexical analyzer.
-
-### What was done
-- [x] Replaced all high bytes in string/char literals with `\xNN` hex escapes
-  - 4 character lookup tables in `divc.c` (used by lexer for accented identifiers)
-  - 1 corrupted `lower[256]` table in `div.c` (was already broken in git HEAD)
-  - 39 Spanish error message strings in `div1run/inter.h` (div1run since removed)
-  - 127 font bitmap data lines in `SDL_gfxPrimitives_font.h` (sdlgfx since cleaned up)
-  - Display strings in `divfont.c`, `divhandl.c`, `divhelp.c`, `divpaint.c`, `runtime/debug/d.c`
-- [x] Converted all 53 Latin-1 source files to UTF-8
-- [x] Verified: build succeeds, F11 compile works, runtime works, debug works
-- 7 "binary" headers remain (font/animation embedded data) — not editable text
+**Completed 2026-03-06.** 53 files converted from Latin-1 to UTF-8. All high-byte
+string/char literals replaced with `\xNN` hex escapes. Character lookup tables in
+divc.c preserved via hex escapes.
 
 ---
 
 ## Phase 1 — Stabilization & Warnings
 
-Make the compiler tell us what's actually broken. Fix the scariest stuff.
+**Completed 2026-03-09.** Replaced `-w` with `-Wall -Wextra`, fixed all 342 warnings
+(CRITICAL through LOW). Zero warnings since Sprint A (2026-03-10).
 
-### Enable warnings ✓ (done 2026-03-09)
-- [x] Replace `-w` (suppress all warnings) with `-Wall -Wextra` in CMakeLists.txt
-  - Original baseline: 1,745 warnings → after Phase 0 dead code removal: 342
-  - Suppressed low-value: `-Wno-shadow -Wno-unused-parameter -Wno-sign-compare
-    -Wno-missing-field-initializers -Wno-char-subscripts`
-  - Third-party files (zip.c, SDL_framerate.c) suppressed with per-file `-w`
-- [x] Fix all CRITICAL/HIGH warnings: use-after-free, -Wrestrict (52 sites),
-      missing returns, abs-on-unsigned (14), pointer casts (50+), maybe-uninitialized (128),
-      empty-body (19), int-in-bool-context (3)
-- [x] Fix pointer/int cast warnings — replaced `(memptrsize)` with `(uintptr_t)`/`(intptr_t)`
-- [x] Remove `-fpermissive` (was a no-op in C mode anyway)
-- [x] Fix all 626 LOW-severity warnings (Sprint A, 2026-03-10): misleading-indentation (260),
-  parentheses (144), dangling-else (80), pointer-sign (51), format strings (28),
-  missing-braces (18), implicit-fallthrough (11), unknown-pragmas (7), misc (27).
-  Added braces, parentheses, casts, `/* fall through */` comments across 35 files.
-  Zero behavioral changes. **Build is now fully warning-clean.**
-- Original baseline (2026-03-08): 1,745 warnings with `-Wall -Wextra -Wshadow`; all CRITICAL/HIGH fixed.
+Key fixes: operator precedence bug in #include path (divc.c), use-after-free in BMP palette
+loader (divforma.c), 6 missing return statements, destructive OSDEP_IsFullScreen() replaced
+with proper SDL2 query, fullscreen toggle, video mode dialog, streaming texture, integer
+scaling, safe string helpers (div_string.h — 38 high-risk sites + Sprint E's ~1,030 calls).
+Removed SDL1/Emscripten preprocessor branches. Normalized path separators.
 
-### Critical bugs fixed (found via `-Wall -Wextra` audit, 2026-03-08)
-- [x] `divc.c:1854`: `!ivnom.b[0]!='.'` operator precedence bug — `#include` path
-      "skip dot-files" check was always true. Present since original code.
-- [x] `divforma.c:1403`: use-after-free — BMP palette loader read from freed
-      `CopiaBuffer`. Moved `free()` to after palette memcpy in each branch.
-- [x] Missing return statements: `divc.c` div_open_file_mode(), `div.c` GetHeapFree()/
-      GetMemoryFree(), `divpack.c` pack(), `divsound.c` GetSongPos()/GetSongLine(),
-      `divkeybo.c` GetIRQVector(). Added appropriate fallback returns.
-- [x] `div.c` determina_unidades(): void function had `return -1`/`return 0` — fixed.
-
-### Fix known landmines
-- [x] `divkeybo.c`: DOS BIOS pointers (`0x417`, `0x41a`, `0x41c`) guarded with `#ifdef DOS`
-- [x] `div.c:2949`: `red_panel.png` already fixed to relative path; `v.c` recording path fixed too
-- [x] Audit unsafe `sprintf`/`strcpy` calls — see `reports/unsafe-string-audit.md`.
-      Created `src/div_string.h` with safe helpers (div_strcpy, div_strcat, div_snprintf,
-      IS_PATH_SEP). Phase 1 fixed 38 high-risk sites + 15 path separators.
-      Sprint E (2026-03-11) converted remaining ~1,030 calls across 31 files.
-      Only 5 exceptions remain (4 unknown-size heap ptrs in divinsta.c, 1 in 3rd-party zip.c).
-- [ ] Audit the `PrintEvent` pattern for similar `#ifdef`-body bugs (divmouse.c:506 was one)
-- [x] Fix window close button — was already working via `SDL_QUIT` → `salir_del_entorno`.
-      Fixed inner loops (dialog, paint color/mask pickers) that blocked exit until dismissed.
-- [x] Fix focus loss handling: runtime pauses game + audio on alt-tab/minimize,
-      resumes on focus regain. IDE unaffected (editor doesn't need to pause).
-- [x] Fix mouse-outside-window: IDE and runtime now report `mouse_x=mouse_y=-1` when
-      mouse leaves the window, so UI hover/hit tests fail naturally instead of freezing
-      at the last edge position.
-- [x] Fix spacebar-as-click in paint editor: magic value `0xfffd` had mouse wheel bits
-      set (bits 2-3), causing SDL port's `select_zoom()` to misinterpret spacebar as
-      wheel-up → zoom-out. Changed to `0x8001` (bit 0 = left click, bit 15 = spacebar marker).
-- [x] Fix `select_zoom()` crash: SDL port added mouse wheel zoom with `(zoom-1)%4` which
-      produces -1 when zoom=0 (C modulo preserves sign), then `1 << -1` = undefined behavior.
-      Fixed with explicit bounds checking and separated wheel/Z-key/icon into distinct branches.
-- [ ] Fix or remove the commented-out `free()` in runtime stack management (`i.c:778`)
-
-### Fix video mode / display system
-The entire video mode and fullscreen system is broken in the SDL2 port.
-In the original DOS version, everything was fullscreen (no choice), and the
-IDE listed available VGA/VESA modes. The SDL2 port made everything windowed
-but left the underlying infrastructure broken:
-
-- [x] `OSDEP_IsFullScreen()` — was destroying the window + calling SDL_Quit().
-      Replaced with `SDL_GetWindowFlags()` query. Alt+Enter and shutdown no longer crash.
-- [x] `OSDEP_ListModes()` / `detectar_vesa()` — fallback had 8 modes but `num_modos`
-      stayed 0. Fixed: `num_modos=8`, video mode dialog now shows entries.
-- [x] `OSDEP_SetVideoMode()` — now honors the `fs` parameter. Uses
-      `SDL_WINDOW_FULLSCREEN_DESKTOP` for fullscreen, `SDL_WINDOW_RESIZABLE` for windowed.
-      Added `SDL_RenderSetLogicalSize()` + `SDL_RenderSetIntegerScale()` for proper
-      pixel-art scaling with letterboxing at any window size.
-- [x] `OSDEP_SetCaption()` — now calls `SDL_SetWindowTitle()` (was storing but never applying).
-- [x] `OSDEP_SetPalette()` — now uses actual `firstcolor`/`ncolors` params (was hardcoded 0,256).
-- [x] Texture changed from STATIC to STREAMING (`SDL_TEXTUREACCESS_STREAMING`) for
-      efficient per-frame updates.
-- [x] Removed dead `divWindow`/`divRender`/`divTexture` globals (v.c, divvideo.c).
-- [x] Removed dead code in runtime `volcadosdl()` (NULL pointer SDL calls).
-- [x] Removed dead Mode X planar copy and manual 32/24/16-bit pixel conversion in
-      IDE `volcadosdl()` — surface is always 8-bit, OSDEP_Flip handles conversion.
-- [x] Removed dead `nothing()` function from divvideo.c.
-- [x] Alt+Enter fullscreen toggle now works in both IDE and runtime.
-- See [`reports/video-system-audit.md`](reports/video-system-audit.md) for the full display system analysis.
-- [ ] `test_video` startup dialog disabled (item 9) — could be re-enabled now.
-- [ ] DPI-aware rendering (`SDL_WINDOW_ALLOW_HIGHDPI`) — future improvement.
-
-### Normalize basics
-- [x] Remove SDL1 / Emscripten preprocessor branches (30 `#ifdef SDL2` / `#ifndef SDL2` /
-      `#ifdef SDL` / `__EMSCRIPTEN__` blocks removed across 11 files; deleted `osd_sdl12.c`,
-      `osd_sdl12.h`, `osd_sdl.h`; merged declarations into `osd_sdl2.h`; removed `-DSDL2=2`
-      from CMakeLists.txt)
-- [ ] Unify byte types: pick `uint8_t` everywhere, stop mixing `byte`/`char`/`uchar`
-- [x] Normalize path separators — 15 sites fixed via `IS_PATH_SEP()` macro (done 2026-03-09)
+### Remaining Phase 1 items
+- [ ] Audit the `PrintEvent` pattern for similar `#ifdef`-body bugs
+- [ ] Fix or remove the commented-out `free()` in runtime stack management (i.c:778)
+- [ ] `test_video` startup dialog — could be re-enabled
+- [ ] DPI-aware rendering (SDL_WINDOW_ALLOW_HIGHDPI)
+- [ ] Unify byte types: pick `uint8_t` everywhere
 
 ---
 
@@ -199,59 +58,16 @@ but left the underlying infrastructure broken:
 One file at a time, make the code understandable to someone who isn't Daniel.
 No behavioral changes — pure cleanup.
 
-### Architecture docs ✓ (initial docs done 2026-03-09)
-- [x] Document the call graph from IDE startup → main loop → event processing
-      → [`reports/architecture-overview.md`](reports/architecture-overview.md)
-- [x] Document the compiler pipeline: lexer → parser → codegen → bytecode format
-      → [`reports/compiler-pipeline.md`](reports/compiler-pipeline.md) (127-opcode EML instruction set documented)
-- [x] Document the VM interpreter loop and process scheduling algorithm
-      → [`reports/vm-and-runtime.md`](reports/vm-and-runtime.md) (stack VM, FRAME-based cooperative multitasking)
-- [x] Document the rendering pipeline: 8-bit surface → palette blit → SDL2 texture
-      → [`reports/vm-and-runtime.md`](reports/vm-and-runtime.md) (rendering section)
-- [x] Document the FPG/MAP/FNT/PAL binary file formats
-      → [`reports/architecture-overview.md`](reports/architecture-overview.md) (file formats section)
-- [x] Document the OSDEP abstraction layer contract
-      → [`reports/architecture-overview.md`](reports/architecture-overview.md) (OSDEP section)
-- [x] Catalogue all 100+ globals in global.h with their roles
-      → [`reports/glossary-spanish-english.md`](reports/glossary-spanish-english.md) (~150 identifiers translated)
-- [ ] Review docs for accuracy (Daniel is the authority on compiler/VM internals)
-
-### Resolve OJO markers ✓ (Sprint B, done 2026-03-10)
-- [x] All 47 "OJO" (watch-out) comments resolved across the entire codebase (0 remaining)
-  - ~12 converted to English `// TODO:` comments (actionable items for future sprints)
-  - ~22 converted to English `// WARNING:` or `// NOTE:` (design constraints, caller contracts)
-  - ~6 fixed with minimal code changes:
-    - `div.c`: Fatal error + exit if `lenguaje.div` missing (was silent crash)
-    - `divmouse.c`: NULL check after `barra` malloc
-    - `divedit.c`: Zero clipboard length on alloc failure; delete partial files on write error
-    - `divhandl.c`: `ferror()` check + `remove()` for partial file writes
-  - ~7 removed entirely (references to deleted features: MODE8, CDROM, network, JUDAS)
-  - `global.h:501` (`r,g,b,c,d,a`) tagged as `// TODO(Sprint D):`
-
-### English function comments ✓ (Sprint C, done 2026-03-10)
-- [x] 22 key functions documented with 2-4 line English comment blocks:
-  - IDE core: `entorno()`, `inicializacion()`, `finalizacion()`, `activar()`,
-    `menu_principal2()`, `crear_menu()`, `actualiza_menu()`, `editor()`
-  - Compiler: `compilar()`, `lexico()`, `expresion()`, `compilar2()`
-  - Runtime VM: `interprete()`, `frame_start()`, `carga_pila()`, `function()`
-  - Rendering: `pinta_sprite()`, `crear_ghost()`, `volcadosdl()`
-  - OSDEP: `OSDEP_Flip()`, `OSDEP_SetVideoMode()`, `OSDEP_SetPalette()`
-- Function name corrections discovered during sprint:
-  - `get_token()` → actually `lexico()` (the lexer)
-  - `insertar_nombre()` → doesn't exist standalone; logic is inline in `lexico()`
-  - `make_ghost()` → actually `crear_ghost()` (in v.c, not s.c)
-  - `editar()` → actually `editor()` in divedit.c
-  - `menu_click()` → actually `menu_principal2()` in divhandl.c (not div.c)
-
-### Naming — completed and next steps
-- [x] Rename the worst single-letter globals (`r,g,b,c,d,a` + `FILE *f`) — Sprint D (2026-03-10)
-- [x] Rename all Spanish function names to English — Sprint F (2026-03-10, 331 renames)
-- [x] Rename ~98 Spanish-named global variables to English — Sprint G (2026-03-10, 44 files)
-- [x] Rename ~33 Spanish struct field names across 8 structs — Sprint G (2026-03-10)
-- [x] Rename remaining high-occurrence Spanish globals — Sprint J (2026-03-11, 39 files):
-      `copia`→`screen_buffer` (360 occ), `ventana`→`window` (489 occ), `texto`→`texts` (880 occ)
-      Plus ~25 related identifiers (struct types, fields, function params, locals)
-- [x] Translate ~3,170 Spanish comment lines across 34 files — Sprint H (2026-03-10)
+### Completed cleanup work
+- Architecture docs: 7 reports in reports/ (architecture-overview, compiler-pipeline, vm-and-runtime, glossary, video-system-audit, unsafe-string-audit, sdl3-migration-report)
+- OJO markers: 47 to 0 resolved (Sprint B)
+- English comments: 22 key functions documented (Sprint C), ~3,170 Spanish comments translated (Sprint H)
+- Single-letter globals: r,g,b,c,d,a + FILE *f removed (Sprint D)
+- Function renames: 331 Spanish to English across 39+ files (Sprint F)
+- Global/struct renames: ~131 identifiers across 44 files (Sprint G)
+- High-frequency globals: copia to screen_buffer, ventana to window, texto to texts across 39 files (Sprint J)
+- Unsafe strings: ~1,030 calls converted to safe helpers across 31 files (Sprint E)
+- [ ] Review architecture docs for accuracy (Daniel is the authority on compiler/VM internals)
 - [ ] Rename cryptic locals in the hottest paths (divc.c, divedit.c, runtime/i.c)
 
 ### Structural improvements
@@ -259,10 +75,6 @@ No behavioral changes — pure cleanup.
 - [ ] Split `div.c` (4,940 lines) into desktop/dialogs modules — Sprint I
 - [ ] Split `divpaint.c` (4,969 lines) into tools/selection modules — Sprint I
 - [ ] Group related globals into context structs where it simplifies things
-- [x] Normalize string handling patterns across the codebase — Sprint E (2026-03-11):
-  ~1,030 unsafe strcpy/strcat/sprintf calls converted to safe div_string.h helpers
-  across 31 files. 2 actual buffer overflows found+fixed in divpaint.c.
-  Only 5 exceptions remain: 4 in divinsta.c (heap pointers, unknown size), 1 in zip.c (3rd-party)
 
 ### Systematic modernization (agent-assisted sprints)
 
@@ -270,28 +82,18 @@ The long-term vision for Phase 2 goes far beyond renaming a few globals. The goa
 to make this codebase genuinely maintainable — by anyone, not just Daniel. This means:
 
 1. **Full English translation** — every Spanish identifier, comment, and variable name
-   gets an English equivalent. The glossary (`reports/glossary-spanish-english.md`) is
-   the Rosetta stone; the architecture docs provide the structural understanding needed
-   to rename safely.
-   - ✅ Sprint D: single-letter globals (r,g,b,c,d,a) removed
-   - ✅ Sprint F: 331 Spanish function names → English
-   - ✅ Sprint G: ~131 globals + struct fields → English (44 files, 6,900 lines)
-   - ✅ Sprint H: ~3,170 Spanish comment lines → English across 34 files
+   gets an English equivalent. Largely complete (Sprints D/F/G/H/J — see completed work above).
 
 2. **Meaningful names everywhere** — not just replacing `tapiz` with `wallpaper`, but
-   turning `a`, `b`, `c`, `n`, `nn`, `nnn` into names that reveal intent. This requires
-   understanding what each variable actually does, file by file.
-   - ✅ Sprint D: single-letter globals done
-   - Future: cryptic locals in hottest paths (divc.c, divedit.c, runtime/i.c)
+   turning `a`, `b`, `c`, `n`, `nn`, `nnn` into names that reveal intent. Single-letter
+   globals done; cryptic locals in hottest paths (divc.c, divedit.c, runtime/i.c) remain.
 
-3. **English comments on every non-obvious function** — not boilerplate docstrings, but
-   the kind of "here's what this does and why" commentary that lets a new developer
-   navigate 100K lines of C without having to reverse-engineer each function.
-   - ✅ Sprint C: 22 key functions documented
+3. **English comments on every non-obvious function** — 22 key functions documented
+   (Sprint C), ~3,170 comment lines translated (Sprint H). Ongoing for new/changed code.
 
 4. **Structural decomposition** — the monster files (divc.c, div.c, divpaint.c) should
    be split along natural boundaries that the architecture docs have already identified.
-   - Next: Sprint I (file splitting)
+   Next: Sprint I (file splitting).
 
 **Methodology:** This work is ideal for AI agent teams working in focused sprints —
 one file or subsystem at a time, using the architecture docs and glossary as context.

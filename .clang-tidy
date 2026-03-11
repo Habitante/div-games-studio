@@ -1,0 +1,40 @@
+---
+# DIV Games Studio - Naming Convention Enforcement
+# Run selectively: clang-tidy --checks='-*,readability-identifier-naming' <file>
+# Or via git integration: clang-tidy-diff.py
+
+Checks: '-*,readability-identifier-naming'
+
+CheckOptions:
+  # Functions: snake_case
+  - key: readability-identifier-naming.FunctionCase
+    value: lower_case
+
+  # Variables: snake_case
+  - key: readability-identifier-naming.VariableCase
+    value: lower_case
+  - key: readability-identifier-naming.GlobalVariableCase
+    value: lower_case
+  - key: readability-identifier-naming.LocalVariableCase
+    value: lower_case
+  - key: readability-identifier-naming.ParameterCase
+    value: lower_case
+
+  # Structs and typedefs: snake_case
+  - key: readability-identifier-naming.StructCase
+    value: lower_case
+  - key: readability-identifier-naming.TypedefCase
+    value: lower_case
+
+  # Macros and constants: UPPER_CASE
+  - key: readability-identifier-naming.MacroDefinitionCase
+    value: UPPER_CASE
+  - key: readability-identifier-naming.EnumConstantCase
+    value: UPPER_CASE
+
+  # Exceptions for legacy patterns we're keeping
+  - key: readability-identifier-naming.GlobalVariableIgnoredRegexp
+    value: '^(OSDEP_|SDL_|Mix_|MIX_)'
+  - key: readability-identifier-naming.FunctionIgnoredRegexp
+    value: '^(OSDEP_|SDL_|Mix_|MIX_|DIV_)'
+...

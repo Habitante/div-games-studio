@@ -40,7 +40,11 @@
       "WebSearch",
       "Bash(xargs -I {} basename {})",
       "Bash(find . -name '*.c' -exec wc -l {} +)",
-      "Bash(find . -name '*.h' -exec wc -l {} +)"
+      "Bash(find . -name '*.h' -exec wc -l {} +)",
+      "Bash(rm -v convert_to_utf8.py fix_encoding.py scan_encoding.py AndroidAppSettings.cfg AndroidBuild.sh Makefile.droid Makefile.html Makefile.html2 .travis.yml bitbucket-pipelines.yml params.json index.html)",
+      "Bash(rm -rv javascripts/ stylesheets/)",
+      "Bash(mkdir -p /c/Src/div/reports/archive)",
+      "Bash(mv -v glossary-spanish-english.md video-system-audit.md unsafe-string-audit.md archive/)"
     ]
   }
 }

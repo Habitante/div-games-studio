@@ -1,0 +1,55 @@
+---
+# DIV Games Studio - Code Formatting Config
+# Applied incrementally via `git clang-format` (format only changed lines)
+# Do NOT reformat the entire codebase at once.
+
+BasedOnStyle: LLVM
+Language: Cpp
+
+# Indentation
+IndentWidth: 2
+TabWidth: 2
+UseTab: Never
+IndentCaseLabels: false
+IndentGotoLabels: false
+NamespaceIndentation: None
+
+# Braces (K&R style - opening brace on same line)
+BreakBeforeBraces: Attach
+
+# Line width
+ColumnLimit: 100
+
+# Short forms
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortBlocksOnASingleLine: Empty
+AllowShortCaseLabelsOnASingleLine: false
+
+# Spaces
+SpaceAfterCStyleCast: false
+SpaceBeforeParens: ControlStatements
+SpacesInParentheses: false
+SpaceInEmptyParentheses: false
+
+# Pointers
+PointerAlignment: Right
+DerivePointerAlignment: false
+
+# Includes - don't reorder (fragile legacy codebase)
+SortIncludes: Never
+
+# Alignment
+AlignConsecutiveMacros: true
+AlignConsecutiveAssignments: false
+AlignConsecutiveDeclarations: false
+AlignTrailingComments: true
+AlignEscapedNewlines: Left
+
+# Other
+BreakBeforeTernaryOperators: true
+MaxEmptyLinesToKeep: 2
+KeepEmptyLinesAtTheStartOfBlocks: false
+ReflowComments: false
+...
