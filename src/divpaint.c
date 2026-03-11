@@ -13,7 +13,7 @@ void edit_ruler(void);
 void select_color(int n);
 void select_fx(int n, int *efecto);
 void line(int x0, int y0, int x1, int y1, int inc0);
-void analyze_bar(int an, int al);
+void analyze_bar(int w, int h);
 void bezier(int x0, int y0, int x1, int y1, int _x0, int _y0, int _x1, int _y1, int inc0);
 int select_icon(int icono_x, int *iconos);
 void draw_box(int x0, int y0, int x1, int y1);
@@ -36,8 +36,8 @@ void test_sel_mask(void);
 void write_char(int x, int y, byte c);
 void write_char2(int x, int y, byte *si, int font_width, int font_height);
 void line_pixel(int x, int y);
-void circulo_scan2(int x, int y, int an);
-void circulo_scan(int x, int y, int an);
+void circulo_scan2(int x, int y, int w);
+void circulo_scan(int x, int y, int w);
 int editable(int *n);
 void eyedropper(void);
 void move_zoom(void);
@@ -54,8 +54,8 @@ void paint_color_window(byte *p, int c, int d);
 void paint_window_colors2(byte *p, int c, int d, int col);
 void color_up(void);
 void color_down(void);
-void flush_bar(byte *p, int real_an, int x, int y, int an, int al);
-void flush_bar_darkened(byte *p, int real_an, int x, int y, int an, int al);
+void flush_bar(byte *p, int real_w, int x, int y, int w, int h);
+void flush_bar_darkened(byte *p, int real_w, int x, int y, int w, int h);
 
 
 //-----------------------------------------------------------------------------
@@ -65,7 +65,7 @@ void flush_bar_darkened(byte *p, int real_an, int x, int y, int an, int al);
 struct {
   int on;
   byte *ptr;
-  int x, y, an, al;
+  int x, y, w, h;
 } barras[10];
 
 //-----------------------------------------------------------------------------
@@ -113,7 +113,7 @@ int difuminar = 0;
 byte pincel_por_defecto[16] = {16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16};
 
 byte *pincel = &pincel_por_defecto[0];
-int pincel_an = 1, pincel_al = 1;
+int brush_w = 1, brush_h = 1;
 
 int tipo_pincel = 0; // 0-b/w, 1-grayscale
 int num_pincel = 0;
@@ -123,7 +123,7 @@ int num_pincel = 0;
 //-----------------------------------------------------------------------------
 
 byte *textura_color = NULL; // When NULL, draw with solid color
-int textura_an = 2, textura_al = 2;
+int texture_w = 2, texture_h = 2;
 int textura_x = 0, textura_y = 0;
 
 //-----------------------------------------------------------------------------
@@ -137,8 +137,8 @@ void remove_texture(void) {
 }
 
 byte get_color(int x, int y) {
-  return (*(textura_color + (x + textura_x) % textura_an +
-            ((y + textura_y) % textura_al) * textura_an));
+  return (*(textura_color + (x + textura_x) % texture_w +
+            ((y + textura_y) % texture_h) * texture_w));
 }
 
 //-----------------------------------------------------------------------------
@@ -369,7 +369,7 @@ void edit_mode_1(void) {
 void edit_mode_2(void) {
   int s;      // State 0-wait 1st click, 1-wait 2nd click
   int x0, y0; // Starting coordinates
-  int an, al;
+  int w, h;
   int a;
 
   bar[0] = 101 + zoom;
@@ -394,8 +394,8 @@ void edit_mode_2(void) {
     if (key(_D))
       difuminar = 1;
 
-    an = -1;
-    al = -1;
+    w = -1;
+    h = -1;
     back = 0;
     switch (s) {
     case 0:
@@ -416,8 +416,8 @@ void edit_mode_2(void) {
         if (undo_error)
           s = 0;
         else {
-          an = (x0 > coord_x) ? x0 - coord_x : coord_x - x0;
-          al = (y0 > coord_y) ? y0 - coord_y : coord_y - y0;
+          w = (x0 > coord_x) ? x0 - coord_x : coord_x - x0;
+          h = (y0 > coord_y) ? y0 - coord_y : coord_y - y0;
           if (mouse_b & 1) {
             s = 0;
             do {
@@ -449,7 +449,7 @@ void edit_mode_2(void) {
       need_zoom = 1;
     }
 
-    analyze_bar(an + 1, al + 1);
+    analyze_bar(w + 1, h + 1);
     blit_edit();
 
     if (back) {
@@ -474,7 +474,7 @@ void edit_mode_2(void) {
 void edit_mode_3(void) {
   int s;      // State 0-wait 1st click, 1-wait 2nd click, 2-wait 3rd click
   int x0, y0; // Starting coordinates
-  int an, al;
+  int w, h;
   int a;
 
   bar[0] = 101 + zoom;
@@ -499,8 +499,8 @@ void edit_mode_3(void) {
     if (key(_D))
       difuminar = 1;
 
-    an = -1;
-    al = -1;
+    w = -1;
+    h = -1;
     back = 0;
     switch (s) {
     case 0:
@@ -522,8 +522,8 @@ void edit_mode_3(void) {
         if (undo_error)
           s = 0;
         else {
-          an = (x0 > coord_x) ? x0 - coord_x : coord_x - x0;
-          al = (y0 > coord_y) ? y0 - coord_y : coord_y - y0;
+          w = (x0 > coord_x) ? x0 - coord_x : coord_x - x0;
+          h = (y0 > coord_y) ? y0 - coord_y : coord_y - y0;
           if (mouse_b & 1) {
             s = 2;
             x0 = coord_x;
@@ -557,7 +557,7 @@ void edit_mode_3(void) {
       need_zoom = 1;
     }
 
-    analyze_bar(an + 1, al + 1);
+    analyze_bar(w + 1, h + 1);
     blit_edit();
 
     if (back) {
@@ -901,7 +901,7 @@ void select_rect(int n) {
 void edit_mode_6(void) {
   int s;      // State 0-wait 1st click, 1-wait 2nd click
   int x0, y0; // Starting coordinates
-  int an, al;
+  int w, h;
   int a;
 
   bar[0] = 101 + zoom;
@@ -924,8 +924,8 @@ void edit_mode_6(void) {
     select_fx(12, &efecto6);
     select_color(2);
 
-    an = map_width * 2;
-    al = 0;
+    w = map_width * 2;
+    h = 0;
     back = 0;
     switch (s) {
     case 0:
@@ -941,22 +941,22 @@ void edit_mode_6(void) {
     case 1:
       if (mouse_graf >= 10) {
         line_fx = efecto6;
-        an = coord_x - x0;
-        al = coord_y - y0;
+        w = coord_x - x0;
+        h = coord_y - y0;
         if (key(_L_CTRL) || key(_R_CTRL)) {
-          if (abs(an) > abs(al)) {
-            if (al < 0)
-              al = -abs(an);
+          if (abs(w) > abs(h)) {
+            if (h < 0)
+              h = -abs(w);
             else
-              al = abs(an);
+              h = abs(w);
           } else {
-            if (an < 0)
-              an = -abs(al);
+            if (w < 0)
+              w = -abs(h);
             else
-              an = abs(al);
+              w = abs(h);
           }
           undo_error = 0;
-          draw_box(x0, y0, x0 + an, y0 + al);
+          draw_box(x0, y0, x0 + w, y0 + h);
           if (undo_error)
             s = 0;
         } else {
@@ -995,10 +995,10 @@ void edit_mode_6(void) {
 
     select_rect(13);
 
-    if (an == map_width * 2)
+    if (w == map_width * 2)
       analyze_bar(0, 0);
     else
-      analyze_bar(abs(an) + 1, abs(al) + 1);
+      analyze_bar(abs(w) + 1, abs(h) + 1);
     blit_edit();
 
     if (back) {
@@ -1036,7 +1036,7 @@ void select_circle(int n) {
 void edit_mode_7(void) {
   int s;      // State 0-wait 1st click, 1-wait 2nd click
   int x0, y0; // Starting coordinates
-  int an, al;
+  int w, h;
   int a;
 
   bar[0] = 101 + zoom;
@@ -1059,8 +1059,8 @@ void edit_mode_7(void) {
     select_fx(12, &efecto7);
     select_color(2);
 
-    an = map_width * 2;
-    al = 0;
+    w = map_width * 2;
+    h = 0;
     back = 0;
     switch (s) {
     case 0:
@@ -1077,22 +1077,22 @@ void edit_mode_7(void) {
       if (mouse_graf >= 10) {
         line_fx = efecto7;
         if (mode_circle < 2) {
-          an = coord_x - x0;
-          al = coord_y - y0;
+          w = coord_x - x0;
+          h = coord_y - y0;
           if (key(_L_CTRL) || key(_R_CTRL)) {
-            if (abs(an) > abs(al)) {
-              if (al < 0)
-                al = -abs(an);
+            if (abs(w) > abs(h)) {
+              if (h < 0)
+                h = -abs(w);
               else
-                al = abs(an);
+                h = abs(w);
             } else {
-              if (an < 0)
-                an = -abs(al);
+              if (w < 0)
+                w = -abs(h);
               else
-                an = abs(al);
+                w = abs(h);
             }
             undo_error = 0;
-            draw_circle(x0, y0, x0 + an, y0 + al, mode_circle & 1);
+            draw_circle(x0, y0, x0 + w, y0 + h, mode_circle & 1);
             if (undo_error)
               s = 0;
           } else {
@@ -1102,27 +1102,27 @@ void edit_mode_7(void) {
               s = 0;
           }
         } else {
-          an = coord_x - x0;
-          al = coord_y - y0;
+          w = coord_x - x0;
+          h = coord_y - y0;
           if (key(_L_CTRL) || key(_R_CTRL)) {
-            if (abs(an) > abs(al)) {
-              if (al < 0)
-                al = -abs(an);
+            if (abs(w) > abs(h)) {
+              if (h < 0)
+                h = -abs(w);
               else
-                al = abs(an);
+                h = abs(w);
             } else {
-              if (an < 0)
-                an = -abs(al);
+              if (w < 0)
+                w = -abs(h);
               else
-                an = abs(al);
+                w = abs(h);
             }
             undo_error = 0;
-            draw_circle(x0 - an, y0 - an, x0 + an, y0 + an, mode_circle & 1);
+            draw_circle(x0 - w, y0 - w, x0 + w, y0 + w, mode_circle & 1);
             if (undo_error)
               s = 0;
           } else {
             undo_error = 0;
-            draw_circle(x0 - an, y0 - al, x0 + an, y0 + al, mode_circle & 1);
+            draw_circle(x0 - w, y0 - h, x0 + w, y0 + h, mode_circle & 1);
             if (undo_error)
               s = 0;
           }
@@ -1157,10 +1157,10 @@ void edit_mode_7(void) {
 
     select_circle(13);
 
-    if (an == map_width * 2)
+    if (w == map_width * 2)
       analyze_bar(0, 0);
     else
-      analyze_bar(abs(an) + 1, abs(al) + 1);
+      analyze_bar(abs(w) + 1, abs(h) + 1);
     blit_edit();
 
     if (back) {
@@ -1182,22 +1182,22 @@ void edit_mode_7(void) {
 //      Zoom a region, without undo
 //-----------------------------------------------------------------------------
 
-void zoom_region(int x, int y, int an, int al) {
+void zoom_region(int x, int y, int w, int h) {
   if (x < 0) {
-    an += x;
+    w += x;
     x = 0;
   }
   if (y < 0) {
-    al += y;
+    h += y;
     y = 0;
   }
-  if (x + an > map_width) {
-    an = map_width - x;
+  if (x + w > map_width) {
+    w = map_width - x;
   }
-  if (y + al > map_height) {
-    al = map_height - y;
+  if (y + h > map_height) {
+    h = map_height - y;
   }
-  if (an <= 0 || al <= 0)
+  if (w <= 0 || h <= 0)
     return;
 
   // Determine the zoom region to refresh
@@ -1210,8 +1210,8 @@ void zoom_region(int x, int y, int an, int al) {
     need_zoom_y = zoom_win_y + ((y - zoom_y) << zoom);
   else
     need_zoom_y = zoom_win_y + ((y - zoom_y) << zoom);
-  need_zoom_width = an << zoom;
-  need_zoom_height = al << zoom;
+  need_zoom_width = w << zoom;
+  need_zoom_height = h << zoom;
 
   if (need_zoom_x + need_zoom_width <= zoom_win_x || need_zoom_y + need_zoom_height <= zoom_win_y ||
       need_zoom_x >= zoom_win_x + zoom_win_width || need_zoom_y >= zoom_win_y + zoom_win_height) {
@@ -1256,7 +1256,7 @@ void select_spray(int n) {
   }
 }
 
-extern int reloj;
+extern int frame_clock;
 
 void init_rnd(int n, char *clave);
 byte rndb();
@@ -1297,25 +1297,25 @@ void edit_mode_8(void) {
           u = 0;
           ux = coord_x;
           uy = coord_y;
-          save_undo(coord_x - pincel_an / 2 - undo_box, coord_y - pincel_al / 2 - undo_box,
-                    pincel_an + undo_box * 2 + 1, pincel_al + undo_box * 2 + 1);
+          save_undo(coord_x - brush_w / 2 - undo_box, coord_y - brush_h / 2 - undo_box,
+                    brush_w + undo_box * 2 + 1, brush_h + undo_box * 2 + 1);
         } else {
-          zoom_region(coord_x - pincel_an / 2, coord_y - pincel_al / 2, pincel_an * 2 + 1,
-                      pincel_al * 2 + 1);
+          zoom_region(coord_x - brush_w / 2, coord_y - brush_h / 2, brush_w * 2 + 1,
+                      brush_h * 2 + 1);
           u++;
         }
 
-        m = pincel_an * pincel_al * (reloj - clock_spray);
-        clock_spray = reloj;
+        m = brush_w * brush_h * (frame_clock - clock_spray);
+        clock_spray = frame_clock;
 
         if (textura_color == NULL) {
           while (m--) {
             if (rndb() < (8 << modo_spray)) {
-              x = rnd() % pincel_an;
-              y = rnd() % pincel_al;
-              if (pincel[x + y * pincel_an]) {
+              x = rnd() % brush_w;
+              y = rnd() % brush_h;
+              if (pincel[x + y * brush_w]) {
                 line_fx = efecto8;
-                _line_pixel(coord_x + x - pincel_an / 2, coord_y + y - pincel_al / 2);
+                _line_pixel(coord_x + x - brush_w / 2, coord_y + y - brush_h / 2);
               }
             }
           }
@@ -1323,19 +1323,19 @@ void edit_mode_8(void) {
           col = color;
           while (m--) {
             if (rndb() < (8 << modo_spray)) {
-              x = rnd() % pincel_an;
-              y = rnd() % pincel_al;
-              if (pincel[x + y * pincel_an]) {
+              x = rnd() % brush_w;
+              y = rnd() % brush_h;
+              if (pincel[x + y * brush_w]) {
                 line_fx = efecto8;
-                color = get_color(coord_x + x - pincel_an / 2, coord_y + y - pincel_al / 2);
-                _line_pixel(coord_x + x - pincel_an / 2, coord_y + y - pincel_al / 2);
+                color = get_color(coord_x + x - brush_w / 2, coord_y + y - brush_h / 2);
+                _line_pixel(coord_x + x - brush_w / 2, coord_y + y - brush_h / 2);
               }
             }
           }
           color = col;
         }
       } else
-        clock_spray = reloj;
+        clock_spray = frame_clock;
 
     } else
       clock_spray = -1;
@@ -1456,7 +1456,7 @@ void block_bar(int n) {
 }
 
 void edit_mode_10(void) {
-  int an, al;
+  int w, h;
   int x, y, a, b, aa, bb;
   int s; // s: State 0-wait 1st click, 1-wait 2nd click, ...
   int *m;
@@ -1625,32 +1625,32 @@ void edit_mode_10(void) {
 
     if (mode_selection == 0 || mode_selection == 4 || (mode_selection == 3 && s < 2)) {
       if (sel_x1 >= sel_x0)
-        an = sel_x1 - sel_x0 + 1;
+        w = sel_x1 - sel_x0 + 1;
       else
-        an = sel_x0 - sel_x1 + 1;
+        w = sel_x0 - sel_x1 + 1;
       if (sel_y1 >= sel_y0)
-        al = sel_y1 - sel_y0 + 1;
+        h = sel_y1 - sel_y0 + 1;
       else
-        al = sel_y0 - sel_y1 + 1;
+        h = sel_y0 - sel_y1 + 1;
       if (sel_status == 0) {
-        an = 0;
-        al = 0;
+        w = 0;
+        h = 0;
       }
     } else {
       if (sel_mask_x1 >= sel_mask_x0)
-        an = sel_mask_x1 - sel_mask_x0 + 1;
+        w = sel_mask_x1 - sel_mask_x0 + 1;
       else
-        an = sel_mask_x0 - sel_mask_x1 + 1;
+        w = sel_mask_x0 - sel_mask_x1 + 1;
       if (sel_mask_y1 >= sel_mask_y0)
-        al = sel_mask_y1 - sel_mask_y0 + 1;
+        h = sel_mask_y1 - sel_mask_y0 + 1;
       else
-        al = sel_mask_y0 - sel_mask_y1 + 1;
+        h = sel_mask_y0 - sel_mask_y1 + 1;
       if (sel_status == 0) {
-        an = 0;
-        al = 0;
+        w = 0;
+        h = 0;
       }
     }
-    analyze_bar(an, al);
+    analyze_bar(w, h);
 
     blit_edit();
   } while (!exit_requested && !(mouse_b & 2) && !(key(_ESC) && s != 1 && s != 2) &&
@@ -1693,7 +1693,7 @@ void test_previous(void) {
     }
 }
 void test_next(void) {
-  int x, y, an, al;
+  int x, y, w, h;
 
   if (sel_status)
     switch (mode_selection) {
@@ -1725,8 +1725,8 @@ void test_next(void) {
 
   x = need_zoom_x;
   y = need_zoom_y;
-  an = need_zoom_width - need_zoom_x + 1;
-  al = need_zoom_height - need_zoom_y + 1;
+  w = need_zoom_width - need_zoom_x + 1;
+  h = need_zoom_height - need_zoom_y + 1;
 
   if (x < zoom_x)
     need_zoom_x = zoom_win_x - ((zoom_x - x) << zoom);
@@ -1736,8 +1736,8 @@ void test_next(void) {
     need_zoom_y = zoom_win_y + ((y - zoom_y) << zoom);
   else
     need_zoom_y = zoom_win_y + ((y - zoom_y) << zoom);
-  need_zoom_width = an << zoom;
-  need_zoom_height = al << zoom;
+  need_zoom_width = w << zoom;
+  need_zoom_height = h << zoom;
 
   if (need_zoom_x + need_zoom_width <= zoom_win_x || need_zoom_y + need_zoom_height <= zoom_win_y ||
       need_zoom_x >= zoom_win_x + zoom_win_width || need_zoom_y >= zoom_win_y + zoom_win_height) {
@@ -1824,17 +1824,17 @@ void test_sel_mask(void) {
 //-----------------------------------------------------------------------------
 
 void cut_map(void) {
-  int x, y, an, al;
+  int x, y, w, h;
   byte *p;
 
   // 1. Allocate memory for a tmapa struct
   if ((v_map = (struct tmapa *)malloc(sizeof(struct tmapa))) != NULL) {
     box_to_sel_mask();
-    an = sel_mask_x1 - sel_mask_x0 + 1;
-    al = sel_mask_y1 - sel_mask_y0 + 1;
+    w = sel_mask_x1 - sel_mask_x0 + 1;
+    h = sel_mask_y1 - sel_mask_y0 + 1;
 
     // 2. Allocate memory for the map
-    if ((v_map->map = (byte *)malloc(an * al)) != NULL) {
+    if ((v_map->map = (byte *)malloc(w * h)) != NULL) {
       // 2b. Copy the map contents
       p = v_map->map;
       for (y = sel_mask_y0; y <= sel_mask_y1; y++)
@@ -1848,8 +1848,8 @@ void cut_map(void) {
       div_strcpy(v_map->filename, sizeof(v_map->filename), (char *)texts[136]);
       ltoa(next_code++, v_map->filename + strlen(v_map->filename), 10);
       *v_map->path = '\0';
-      v_map->map_width = an;
-      v_map->map_height = al;
+      v_map->map_width = w;
+      v_map->map_height = h;
       for (x = 0; x < 512; x += 2) {
         if (v.mapa->puntos[x] >= sel_mask_x0 && v.mapa->puntos[x] <= sel_mask_x1 &&
             v.mapa->puntos[x + 1] >= sel_mask_y0 && v.mapa->puntos[x + 1] <= sel_mask_y1) {
@@ -2037,14 +2037,14 @@ void sel_mask_lighten(byte color_aclarar) {
 
 void sel_mask_antialias(void) {
   int x, y;
-  int an, al;
+  int w, h;
   byte *p;
   int cx, cy, _c;
 
-  an = sel_mask_x1 - sel_mask_x0 + 1;
-  al = sel_mask_y1 - sel_mask_y0 + 1;
+  w = sel_mask_x1 - sel_mask_x0 + 1;
+  h = sel_mask_y1 - sel_mask_y0 + 1;
   if ((p = (byte *)malloc(map_width * map_height)) != NULL) {
-    if (save_undo(sel_mask_x0, sel_mask_y0, an, al)) {
+    if (save_undo(sel_mask_x0, sel_mask_y0, w, h)) {
       for (y = sel_mask_y0; y <= sel_mask_y1; y++)
         for (x = sel_mask_x0; x <= sel_mask_x1; x++)
           if (is_selection_mask(x, y)) {
@@ -2067,12 +2067,12 @@ void sel_mask_antialias(void) {
               cy = *(ghost + cy + _c);
             cx = *(ghost + cx * 256 + cy);
             _c = *(ghost + _c * 256 + cx);
-            *(p + (x - sel_mask_x0) + (y - sel_mask_y0) * an) = (byte)_c;
+            *(p + (x - sel_mask_x0) + (y - sel_mask_y0) * w) = (byte)_c;
           }
       for (y = sel_mask_y0; y <= sel_mask_y1; y++)
         for (x = sel_mask_x0; x <= sel_mask_x1; x++)
           if (is_selection_mask(x, y)) {
-            *(map + x + y * map_width) = *(p + (x - sel_mask_x0) + (y - sel_mask_y0) * an);
+            *(map + x + y * map_width) = *(p + (x - sel_mask_x0) + (y - sel_mask_y0) * w);
           }
       free(p);
     }
@@ -2857,8 +2857,8 @@ void edit_mode_11(void) {
 // TODO: Known bug -- screen refresh fails when combining undo with backspace during text deletion
 
 int find_font_window(void);
-void GetCharSizeBuffer(int WhatChar, int *ancho, int *alto, char *buffer);
-int ShowCharBuffer(int WhatChar, int cx, int cy, char *ptr, int an, char *buffer);
+void GetCharSizeBuffer(int WhatChar, int *width, int *height, char *buffer);
+int ShowCharBuffer(int WhatChar, int cx, int cy, char *ptr, int w, char *buffer);
 
 int barra_texto = 0; // Prevent background highlight toggle with 'b' key
 
@@ -3360,8 +3360,8 @@ void bezier(int x0, int y0, int x1, int y1, int _x0, int _y0, int _x1, int _y1, 
     }
   } while (n++ < 32);
 
-  if (save_undo(x - pincel_an / 2, y - pincel_al / 2, _x - x + 1 + pincel_an,
-                _y - y + 1 + pincel_al)) {
+  if (save_undo(x - brush_w / 2, y - brush_h / 2, _x - x + 1 + brush_w,
+                _y - y + 1 + brush_h)) {
     if (inc0)
       line_pixel(p[0], p[1]);
     n = 1;
@@ -3402,8 +3402,8 @@ void line0(int x0, int y0, int x1, int y1, int inc0) {
   if (inc0 == -1)
     inc0 = 0;
   else
-    unded = (intptr_t)save_undo(x - pincel_an / 2, y - pincel_al / 2, dx + 1 + pincel_an,
-                                dy + 1 + pincel_al);
+    unded = (intptr_t)save_undo(x - brush_w / 2, y - brush_h / 2, dx + 1 + brush_w,
+                                dy + 1 + brush_h);
 
   if (unded) {
     if (!dx && !dy)
@@ -3512,8 +3512,8 @@ void line(int x0, int y0, int x1, int y1, int inc0) {
   if (inc0 == -1)
     inc0 = 0;
   else
-    unded = (intptr_t)save_undo(x - pincel_an / 2, y - pincel_al / 2, dx + 1 + pincel_an,
-                                dy + 1 + pincel_al);
+    unded = (intptr_t)save_undo(x - brush_w / 2, y - brush_h / 2, dx + 1 + brush_w,
+                                dy + 1 + brush_h);
 
   if (unded) {
     if (!dx && !dy)
@@ -4184,12 +4184,12 @@ void line_pixel(int x, int y) { // Brush
   int xx = 0, yy = 0, _line_fx = line_fx;
   byte *q, *p, col;
 
-  x -= pincel_an / 2;
-  y -= pincel_al / 2;
+  x -= brush_w / 2;
+  y -= brush_h / 2;
 
   if (textura_color == NULL) {
     if (tipo_pincel) {
-      if (x >= 0 && y >= 0 && x + pincel_an <= map_width && y + pincel_al <= map_height &&
+      if (x >= 0 && y >= 0 && x + brush_w <= map_width && y + brush_h <= map_height &&
           !difuminar) {
         q = map + x + y * map_width;
         p = pincel;
@@ -4201,10 +4201,10 @@ void line_pixel(int x, int y) { // Brush
               }
               q++;
               p++;
-            } while (++xx < pincel_an);
+            } while (++xx < brush_w);
             xx = 0;
-            q -= pincel_an - map_width;
-          } while (++yy < pincel_al);
+            q -= brush_w - map_width;
+          } while (++yy < brush_h);
         } else {
           do {
             do {
@@ -4213,23 +4213,23 @@ void line_pixel(int x, int y) { // Brush
               }
               q++;
               p++;
-            } while (++xx < pincel_an);
+            } while (++xx < brush_w);
             xx = 0;
-            q -= pincel_an - map_width;
-          } while (++yy < pincel_al);
+            q -= brush_w - map_width;
+          } while (++yy < brush_h);
         }
       } else {
         do {
           do {
-            if ((line_fx = pincel[xx + yy * pincel_an])) {
+            if ((line_fx = pincel[xx + yy * brush_w])) {
               _line_pixel(x + xx, y + yy);
             }
-          } while (++xx < pincel_an);
+          } while (++xx < brush_w);
           xx = 0;
-        } while (++yy < pincel_al);
+        } while (++yy < brush_h);
       }
     } else {
-      if (x >= 0 && y >= 0 && x + pincel_an <= map_width && y + pincel_al <= map_height &&
+      if (x >= 0 && y >= 0 && x + brush_w <= map_width && y + brush_h <= map_height &&
           !difuminar) {
         q = map + x + y * map_width;
         p = pincel;
@@ -4241,10 +4241,10 @@ void line_pixel(int x, int y) { // Brush
               }
               q++;
               p++;
-            } while (++xx < pincel_an);
+            } while (++xx < brush_w);
             xx = 0;
-            q -= pincel_an - map_width;
-          } while (++yy < pincel_al);
+            q -= brush_w - map_width;
+          } while (++yy < brush_h);
         } else {
           do {
             do {
@@ -4253,26 +4253,26 @@ void line_pixel(int x, int y) { // Brush
               }
               q++;
               p++;
-            } while (++xx < pincel_an);
+            } while (++xx < brush_w);
             xx = 0;
-            q -= pincel_an - map_width;
-          } while (++yy < pincel_al);
+            q -= brush_w - map_width;
+          } while (++yy < brush_h);
         }
       } else {
         do {
           do {
-            if (pincel[xx + yy * pincel_an]) {
+            if (pincel[xx + yy * brush_w]) {
               _line_pixel(x + xx, y + yy);
             }
-          } while (++xx < pincel_an);
+          } while (++xx < brush_w);
           xx = 0;
-        } while (++yy < pincel_al);
+        } while (++yy < brush_h);
       }
     }
   } else {
     col = color;
     if (tipo_pincel) {
-      if (x >= 0 && y >= 0 && x + pincel_an <= map_width && y + pincel_al <= map_height &&
+      if (x >= 0 && y >= 0 && x + brush_w <= map_width && y + brush_h <= map_height &&
           !difuminar) {
         q = map + x + y * map_width;
         p = pincel;
@@ -4285,10 +4285,10 @@ void line_pixel(int x, int y) { // Brush
               }
               q++;
               p++;
-            } while (++xx < pincel_an);
+            } while (++xx < brush_w);
             xx = 0;
-            q -= pincel_an - map_width;
-          } while (++yy < pincel_al);
+            q -= brush_w - map_width;
+          } while (++yy < brush_h);
         } else {
           do {
             do {
@@ -4298,24 +4298,24 @@ void line_pixel(int x, int y) { // Brush
               }
               q++;
               p++;
-            } while (++xx < pincel_an);
+            } while (++xx < brush_w);
             xx = 0;
-            q -= pincel_an - map_width;
-          } while (++yy < pincel_al);
+            q -= brush_w - map_width;
+          } while (++yy < brush_h);
         }
       } else {
         do {
           do {
-            if ((line_fx = pincel[xx + yy * pincel_an])) {
+            if ((line_fx = pincel[xx + yy * brush_w])) {
               color = get_color(x + xx, y + yy);
               _line_pixel(x + xx, y + yy);
             }
-          } while (++xx < pincel_an);
+          } while (++xx < brush_w);
           xx = 0;
-        } while (++yy < pincel_al);
+        } while (++yy < brush_h);
       }
     } else {
-      if (x >= 0 && y >= 0 && x + pincel_an <= map_width && y + pincel_al <= map_height &&
+      if (x >= 0 && y >= 0 && x + brush_w <= map_width && y + brush_h <= map_height &&
           !difuminar) {
         q = map + x + y * map_width;
         p = pincel;
@@ -4328,10 +4328,10 @@ void line_pixel(int x, int y) { // Brush
               }
               q++;
               p++;
-            } while (++xx < pincel_an);
+            } while (++xx < brush_w);
             xx = 0;
-            q -= pincel_an - map_width;
-          } while (++yy < pincel_al);
+            q -= brush_w - map_width;
+          } while (++yy < brush_h);
         } else {
           do {
             do {
@@ -4341,21 +4341,21 @@ void line_pixel(int x, int y) { // Brush
               }
               q++;
               p++;
-            } while (++xx < pincel_an);
+            } while (++xx < brush_w);
             xx = 0;
-            q -= pincel_an - map_width;
-          } while (++yy < pincel_al);
+            q -= brush_w - map_width;
+          } while (++yy < brush_h);
         }
       } else {
         do {
           do {
-            if (pincel[xx + yy * pincel_an]) {
+            if (pincel[xx + yy * brush_w]) {
               color = get_color(x + xx, y + yy);
               _line_pixel(x + xx, y + yy);
             }
-          } while (++xx < pincel_an);
+          } while (++xx < brush_w);
           xx = 0;
-        } while (++yy < pincel_al);
+        } while (++yy < brush_h);
       }
     }
     color = col;
@@ -4390,30 +4390,30 @@ void _line_pixel(int x, int y) { // A single pixel (for line_pixel, spray and wr
 //-----------------------------------------------------------------------------
 
 void draw_box(int x0, int y0, int x1, int y1) {
-  int an, al;
+  int w, h;
 
   if (x0 > x1)
     swap(x0, x1);
-  an = x1 - x0 + 1;
+  w = x1 - x0 + 1;
   if (y0 > y1)
     swap(y0, y1);
-  al = y1 - y0 + 1;
+  h = y1 - y0 + 1;
 
-  if (save_undo(x0 - pincel_an / 2, y0 - pincel_al / 2, an + pincel_an, al + pincel_al)) {
+  if (save_undo(x0 - brush_w / 2, y0 - brush_h / 2, w + brush_w, h + brush_h)) {
     if (mode_rect) {
       do {
-        circulo_scan2(x0, y0++, an);
-      } while (--al);
+        circulo_scan2(x0, y0++, w);
+      } while (--h);
     } else {
-      circulo_scan(x0, y0, an);
-      circulo_scan(x0, y0 + al - 1, an);
-      al -= 2;
+      circulo_scan(x0, y0, w);
+      circulo_scan(x0, y0 + h - 1, w);
+      h -= 2;
       y0++;
-      if (al > 0)
+      if (h > 0)
         do {
           line_pixel(x0, y0);
-          line_pixel(x0 + an - 1, y0++);
-        } while (--al);
+          line_pixel(x0 + w - 1, y0++);
+        } while (--h);
     }
   }
 }
@@ -4425,21 +4425,21 @@ void draw_box(int x0, int y0, int x1, int y1) {
 void draw_circle(int x0, int y0, int x1, int y1, int relleno) {
   int p[2048];   // Points on the circumference
   double cx, rx; // Center and radius of the circumference
-  int an, al;    // Width and height
+  int w, h;    // Width and height
   double y, ymed, nsin;
   int n, xa, xb, ya, yb;
 
   if (x0 > x1)
     swap(x0, x1);
-  an = x1 - x0 + 1;
+  w = x1 - x0 + 1;
   if (y0 > y1)
     swap(y0, y1);
-  al = y1 - y0 + 1;
-  if (al > 1024)
+  h = y1 - y0 + 1;
+  if (h > 1024)
     return;
 
-  if (save_undo(x0 - pincel_an / 2, y0 - pincel_al / 2, an + pincel_an, al + pincel_al)) {
-    rx = (double)(an - 1) / 2.0;
+  if (save_undo(x0 - brush_w / 2, y0 - brush_h / 2, w + brush_w, h + brush_h)) {
+    rx = (double)(w - 1) / 2.0;
     cx = rx + x0 + 0.5;
     y = (double)y0 + 0.5;
     ymed = (double)(y1 + y0 + 1) / 2.0;
@@ -4462,11 +4462,11 @@ void draw_circle(int x0, int y0, int x1, int y1, int relleno) {
     if (n > 4)
       if (p[n - 1] == p[n - 6])
         n -= 4;
-    if (al > 2 && an > 2 && p[0] == p[4] && p[0] + 1 < p[1]) {
+    if (h > 2 && w > 2 && p[0] == p[4] && p[0] + 1 < p[1]) {
       p[0] = p[4] + 1;
       p[1] = p[5] - 1;
     }
-    if (al == 2) {
+    if (h == 2) {
       p[0] = x0;
       p[1] = x1;
       p[4] = x0;
@@ -4517,42 +4517,42 @@ void draw_circle(int x0, int y0, int x1, int y1, int relleno) {
   }
 }
 
-void circulo_scan(int x, int y, int an) {
+void circulo_scan(int x, int y, int w) {
   line_pixel(x, y);
-  line(x, y, x + an - 1, y, -1);
+  line(x, y, x + w - 1, y, -1);
 }
 
-void circulo_scan2(int x, int y, int an) {
+void circulo_scan2(int x, int y, int w) {
   byte *p, col;
   if (textura_color == NULL) {
-    if (y >= 0 && y < map_height && x < map_width && x + an > 0) {
+    if (y >= 0 && y < map_height && x < map_width && x + w > 0) {
       if (x < 0) {
-        an += x;
+        w += x;
         x = 0;
       }
-      if (x + an > map_width) {
-        an = map_width - x;
+      if (x + w > map_width) {
+        w = map_width - x;
       }
       p = map + y * map_width + x;
       do
         pixel(p++);
-      while (--an);
+      while (--w);
     }
   } else {
     col = color;
-    if (y >= 0 && y < map_height && x < map_width && x + an > 0) {
+    if (y >= 0 && y < map_height && x < map_width && x + w > 0) {
       if (x < 0) {
-        an += x;
+        w += x;
         x = 0;
       }
-      if (x + an > map_width) {
-        an = map_width - x;
+      if (x + w > map_width) {
+        w = map_width - x;
       }
       p = map + y * map_width + x;
       do {
         color = get_color(x++, y);
         pixel(p++);
-      } while (--an);
+      } while (--w);
     }
     color = col;
   }
@@ -4601,7 +4601,7 @@ void edit_ruler(void) {
 //      Toolbar for move, copy, rotate, scale, etc.
 //-----------------------------------------------------------------------------
 
-void move_selection(byte *sp, int an, int al) {
+void move_selection(byte *sp, int w, int h) {
   int x, y;
   int _x, _y;
   int _an, _al;
@@ -4617,18 +4617,18 @@ void move_selection(byte *sp, int an, int al) {
   byte num[5];
 
   if (sp == NULL) {
-    an = sel_mask_x1 - sel_mask_x0 + 1;
-    al = sel_mask_y1 - sel_mask_y0 + 1;
-    if ((sp = (byte *)malloc(an * al)) == NULL) {
+    w = sel_mask_x1 - sel_mask_x0 + 1;
+    h = sel_mask_y1 - sel_mask_y0 + 1;
+    if ((sp = (byte *)malloc(w * h)) == NULL) {
       v_text = (char *)texts[45];
       show_dialog(err0);
       return;
     }
-    memset(sp, 0, an * al); // Create the sprite in sp
+    memset(sp, 0, w * h); // Create the sprite in sp
     for (y = sel_mask_y0; y <= sel_mask_y1; y++)
       for (x = sel_mask_x0; x <= sel_mask_x1; x++)
         if (is_selection_mask(x, y))
-          *(sp + x - sel_mask_x0 + (y - sel_mask_y0) * an) = *(map + x + y * map_width);
+          *(sp + x - sel_mask_x0 + (y - sel_mask_y0) * w) = *(map + x + y * map_width);
   }
 
   bar[0] = 101 + zoom;
@@ -4683,14 +4683,14 @@ void move_selection(byte *sp, int an, int al) {
       }
 
       if ((mouse_b & 1) && selected_icon == 4) {
-        invierte_hor(sp, an, al);
+        invierte_hor(sp, w, h);
         do {
           read_mouse();
         } while (mouse_b & 1);
       }
 
       if ((mouse_b & 1) && selected_icon == 5) {
-        invierte_ver(sp, an, al);
+        invierte_ver(sp, w, h);
         do {
           read_mouse();
         } while (mouse_b & 1);
@@ -4798,21 +4798,21 @@ void move_selection(byte *sp, int an, int al) {
 
     if ((_mouse_graf = mouse_graf) >= 10) {
       if (_coord_x >= 0 && _coord_y >= 0 && _coord_x < map_width && _coord_y < map_height) {
-        xg = an / 2;
-        yg = al / 2;
+        xg = w / 2;
+        yg = h / 2;
         if (size == 1 && ang == 0) {
-          if (save_undo(_coord_x - xg, _coord_y - yg, an, al))
-            sp_normal(sp, _coord_x, _coord_y, an, al, xg, yg, block * 2 + ghost);
+          if (save_undo(_coord_x - xg, _coord_y - yg, w, h))
+            sp_normal(sp, _coord_x, _coord_y, w, h, xg, yg, block * 2 + ghost);
           else
             draw_mode = 110;
         } else {
-          _an = an;
-          _al = al;
+          _an = w;
+          _al = h;
           _x = _coord_x;
           _y = _coord_y;
           sp_size(&_x, &_y, &_an, &_al, xg, yg, ang, size);
           if (save_undo(_x, _y, _an, _al))
-            sp_rotated(sp, _coord_x, _coord_y, an, al, xg, yg, block * 2 + ghost, ang, size);
+            sp_rotated(sp, _coord_x, _coord_y, w, h, xg, yg, block * 2 + ghost, ang, size);
           else
             draw_mode = 110;
         }
@@ -5486,18 +5486,18 @@ void draw_help(int n) {
           if (window[m].click_handler == program2) {
             if (window[m].prg == old_prg && window[m].foreground < 2) {
               window[m].state = 1;
-              wgra(window[m].ptr, window[m].an / big2, window[m].al / big2, c_b_low, 2, 2,
-                   window[m].an / big2 - 20, 7);
-              if (text_len(window[m].title) + 3 > window[m].an / big2 - 20) {
-                wwrite_in_box(window[m].ptr, window[m].an / big2, window[m].an / big2 - 19,
-                              window[m].al / big2, 4, 2, 0, window[m].title, c1);
-                wwrite_in_box(window[m].ptr, window[m].an / big2, window[m].an / big2 - 19,
-                              window[m].al / big2, 3, 2, 0, window[m].title, c4);
+              wgra(window[m].ptr, window[m].w / big2, window[m].h / big2, c_b_low, 2, 2,
+                   window[m].w / big2 - 20, 7);
+              if (text_len(window[m].title) + 3 > window[m].w / big2 - 20) {
+                wwrite_in_box(window[m].ptr, window[m].w / big2, window[m].w / big2 - 19,
+                              window[m].h / big2, 4, 2, 0, window[m].title, c1);
+                wwrite_in_box(window[m].ptr, window[m].w / big2, window[m].w / big2 - 19,
+                              window[m].h / big2, 3, 2, 0, window[m].title, c4);
               } else {
-                wwrite(window[m].ptr, window[m].an / big2, window[m].al / big2,
-                       3 + (window[m].an / big2 - 20) / 2, 2, 1, window[m].title, c1);
-                wwrite(window[m].ptr, window[m].an / big2, window[m].al / big2,
-                       2 + (window[m].an / big2 - 20) / 2, 2, 1, window[m].title, c4);
+                wwrite(window[m].ptr, window[m].w / big2, window[m].h / big2,
+                       3 + (window[m].w / big2 - 20) / 2, 2, 1, window[m].title, c1);
+                wwrite(window[m].ptr, window[m].w / big2, window[m].h / big2,
+                       2 + (window[m].w / big2 - 20) / 2, 2, 1, window[m].title, c4);
               }
               v.state = 0;
               break;
@@ -5527,7 +5527,7 @@ void draw_help(int n) {
 //-----------------------------------------------------------------------------
 
 void zoom_map2(void) {
-  int an, al;
+  int w, h;
   int n, m, c, x, y;
   byte *p, *q = screen_buffer;
 
@@ -5537,22 +5537,22 @@ void zoom_map2(void) {
     zoom_win_width = map_width << zoom;
     zoom_win_x = (vga_width - zoom_win_width) / 2;
     q += zoom_win_x;
-    an = map_width;
+    w = map_width;
   } else {
     zoom_win_x = 0;
-    an = vga_width >> zoom;
-    zoom_win_width = an << zoom;
+    w = vga_width >> zoom;
+    zoom_win_width = w << zoom;
   }
 
   if ((map_height << zoom) < vga_height) {
     zoom_win_height = map_height << zoom;
     zoom_win_y = (vga_height - zoom_win_height) / 2;
     q += zoom_win_y * vga_width;
-    al = map_height;
+    h = map_height;
   } else {
     zoom_win_y = 0;
-    al = vga_height >> zoom;
-    zoom_win_height = al << zoom;
+    h = vga_height >> zoom;
+    zoom_win_height = h << zoom;
   }
 
   if (zoom_win_x || zoom_win_y)
@@ -5565,31 +5565,31 @@ void zoom_map2(void) {
 
   switch (zoom) {
   case 0:
-    m = al;
+    m = h;
     do {
-      n = an;
+      n = w;
       do {
         *q++ = *(ghost + *p * 256 +
-                 textura_color[(x + textura_x) % textura_an +
-                               ((y + textura_y) % textura_al) * textura_an]);
+                 textura_color[(x + textura_x) % texture_w +
+                               ((y + textura_y) % texture_h) * texture_w]);
         x++;
         p++;
       } while (--n);
       y++;
-      x -= an;
-      p += map_width - an;
-      q += vga_width - an;
+      x -= w;
+      p += map_width - w;
+      q += vga_width - w;
     } while (--m);
     break;
 
   case 1:
-    m = al;
+    m = h;
     do {
-      n = an;
+      n = w;
       do {
         c = *(ghost + *p * 256 +
-              textura_color[(x + textura_x) % textura_an +
-                            ((y + textura_y) % textura_al) * textura_an]);
+              textura_color[(x + textura_x) % texture_w +
+                            ((y + textura_y) % texture_h) * texture_w]);
         c += c * 256;
         *(word *)q = c;
         *(word *)(q + vga_width) = c;
@@ -5598,20 +5598,20 @@ void zoom_map2(void) {
         p++;
       } while (--n);
       y++;
-      x -= an;
-      p += map_width - an;
-      q += vga_width * 2 - an * 2;
+      x -= w;
+      p += map_width - w;
+      q += vga_width * 2 - w * 2;
     } while (--m);
     break;
 
   case 2:
-    m = al;
+    m = h;
     do {
-      n = an;
+      n = w;
       do {
         c = *(ghost + *p * 256 +
-              textura_color[(x + textura_x) % textura_an +
-                            ((y + textura_y) % textura_al) * textura_an]);
+              textura_color[(x + textura_x) % texture_w +
+                            ((y + textura_y) % texture_h) * texture_w]);
         c += c * 256;
         c += c * 65536;
         *(int *)q = c;
@@ -5626,20 +5626,20 @@ void zoom_map2(void) {
         p++;
       } while (--n);
       y++;
-      x -= an;
-      p += map_width - an;
-      q += vga_width * 4 - an * 4;
+      x -= w;
+      p += map_width - w;
+      q += vga_width * 4 - w * 4;
     } while (--m);
     break;
 
   case 3:
-    m = al;
+    m = h;
     do {
-      n = an;
+      n = w;
       do {
         c = *(ghost + *p * 256 +
-              textura_color[(x + textura_x) % textura_an +
-                            ((y + textura_y) % textura_al) * textura_an]);
+              textura_color[(x + textura_x) % texture_w +
+                            ((y + textura_y) % texture_h) * texture_w]);
         c += c * 256;
         c += c * 65536;
         *(int *)q = c;
@@ -5678,9 +5678,9 @@ void zoom_map2(void) {
         p++;
       } while (--n);
       y++;
-      x -= an;
-      p += map_width - an;
-      q += vga_width * 8 - an * 8;
+      x -= w;
+      p += map_width - w;
+      q += vga_width * 8 - w * 8;
     } while (--m);
     break;
   }
@@ -5708,9 +5708,9 @@ void blit_edit(void) {
         textura_x += mx - mouse_x;
         textura_y += my - mouse_y;
         if (textura_x < 0)
-          textura_x += textura_an;
+          textura_x += texture_w;
         if (textura_y < 0)
-          textura_y += textura_al;
+          textura_y += texture_h;
         zoom_region(0, 0, 32768, 32768);
         zoom_map2();
         blit_mouse();
@@ -5948,7 +5948,7 @@ void select_fx(int n, int *efecto) {
           read_mouse();
           a = mouse_shift_x - ix;
           b = mouse_shift_y - iy;
-          wvolcado(screen_buffer, vga_width, vga_height, p, a, b, c * big2, d * big2, 0);
+          blit_region(screen_buffer, vga_width, vga_height, p, a, b, c * big2, d * big2, 0);
           blit_partial(a, b, c * big2, d * big2);
         }
         wrectangle(p, c, d, c2, 0, 0, c, d);
@@ -5959,7 +5959,7 @@ void select_fx(int n, int *efecto) {
         wbox(p, c, d, c4, 12, 19, *efecto * 4, 4);
       }
 
-      wvolcado(screen_buffer, vga_width, vga_height, p, a, b, c * big2, d * big2, 0);
+      blit_region(screen_buffer, vga_width, vga_height, p, a, b, c * big2, d * big2, 0);
       blit_partial(a, b, c * big2, d * big2);
 
       save_mouse_bg(mouse_background, mouse_shift_x, mouse_shift_y, mouse_graf, 0);
@@ -5980,7 +5980,7 @@ void select_fx(int n, int *efecto) {
     if (!mouse_in(toolbar_x, toolbar_y, toolbar_x + toolbar_width - 1, toolbar_y + 18) ||
         !(mouse_b & 1) || mouse_in(icono_x, toolbar_y + 2, icono_x + 15, toolbar_y + 17)) {
       wput(p, c, d, c - 9, 2, -45);
-      wvolcado(screen_buffer, vga_width, vga_height, p, a, b, c * big2, d * big2, 0);
+      blit_region(screen_buffer, vga_width, vga_height, p, a, b, c * big2, d * big2, 0);
       blit_partial(a, b, c * big2, d * big2);
       save_mouse_bg(mouse_background, mouse_shift_x, mouse_shift_y, mouse_graf, 0);
       put(mouse_shift_x, mouse_shift_y, mouse_graf);
@@ -6105,13 +6105,13 @@ int select_icon(int icono_x, int *iconos) {
           read_mouse();
           a = mouse_shift_x - ix;
           b = mouse_shift_y - iy;
-          wvolcado(screen_buffer, vga_width, vga_height, p, a, b, c * big2, d * big2, 0);
+          blit_region(screen_buffer, vga_width, vga_height, p, a, b, c * big2, d * big2, 0);
           blit_partial(a, b, c * big2, d * big2);
         }
         wrectangle(p, c, d, c2, 0, 0, c, d);
       }
 
-      wvolcado(screen_buffer, vga_width, vga_height, p, a, b, c * big2, d * big2, 0);
+      blit_region(screen_buffer, vga_width, vga_height, p, a, b, c * big2, d * big2, 0);
       blit_partial(a, b, c * big2, d * big2);
 
       save_mouse_bg(mouse_background, mouse_shift_x, mouse_shift_y, mouse_graf, 0);
@@ -6129,7 +6129,7 @@ int select_icon(int icono_x, int *iconos) {
     if (!mouse_in(toolbar_x, toolbar_y, toolbar_x + toolbar_width - 1, toolbar_y + 18) ||
         !(mouse_b & 1) || mouse_in(icono_x, toolbar_y + 2, icono_x + 15, toolbar_y + 17)) {
       wput(p, c, d, c - 9, 2, -45);
-      wvolcado(screen_buffer, vga_width, vga_height, p, a, b, c * big2, d * big2, 0);
+      blit_region(screen_buffer, vga_width, vga_height, p, a, b, c * big2, d * big2, 0);
       blit_partial(a, b, c * big2, d * big2);
       save_mouse_bg(mouse_background, mouse_shift_x, mouse_shift_y, mouse_graf, 0);
       put(mouse_shift_x, mouse_shift_y, mouse_graf);
@@ -6243,7 +6243,7 @@ void select_mask(int n) {
             read_mouse();
             a = mouse_shift_x - ix;
             b = mouse_shift_y - iy;
-            wvolcado(screen_buffer, vga_width, vga_height, p, a, b, c * big2, d * big2, 0);
+            blit_region(screen_buffer, vga_width, vga_height, p, a, b, c * big2, d * big2, 0);
             blit_partial(a, b, c * big2, d * big2);
             save_mouse_bg(mouse_background, mouse_shift_x, mouse_shift_y, mouse_graf, 0);
             put(mouse_shift_x, mouse_shift_y, mouse_graf);
@@ -6297,7 +6297,7 @@ void select_mask(int n) {
       x = 1 + (col % 16) * 8;
       y = 9 + (col / 16) * 8;
       wrectangle(p, c, d, c4, x, y, 9, 9);
-      wvolcado(screen_buffer, vga_width, vga_height, p, a, b, c * big2, d * big2, 0);
+      blit_region(screen_buffer, vga_width, vga_height, p, a, b, c * big2, d * big2, 0);
       blit_partial(a, b, c * big2, d * big2);
       blit_mouse_b();
 
@@ -6317,7 +6317,7 @@ void select_mask(int n) {
       x = 1 + (col % 16) * 8;
       y = 9 + (col / 16) * 8;
       wrectangle(p, c, d, c4, x, y, 9, 9);
-      wvolcado(screen_buffer, vga_width, vga_height, p, a, b, c * big2, d * big2, 0);
+      blit_region(screen_buffer, vga_width, vga_height, p, a, b, c * big2, d * big2, 0);
       blit_partial(a, b, c * big2, d * big2);
       blit_mouse_b();
       do {
@@ -6379,7 +6379,7 @@ void paint_mask_window(byte *p, int c, int d) {
 //-----------------------------------------------------------------------------
 
 #define max_texturas 1000
-#define an_textura   (3 + 1) // 000 - 999
+#define w_textura   (3 + 1) // 000 - 999
 
 #define BRUSH 4
 #define MAPBR 8
@@ -6389,10 +6389,10 @@ extern int t_maximo;
 extern int f_maximo;
 extern int FPG_thumbpos;
 extern byte brush_fpg_path[256];
-extern char m3d_fpgcodesbr[max_texturas * an_textura];
+extern char m3d_fpgcodesbr[max_texturas * w_textura];
 extern struct t_listboxbr ltexturasbr;
 extern struct _thumb_tex {
-  int an, al;         // Width and height of the thumbnail
+  int w, h;         // Width and height of the thumbnail
   int RealAn, RealAl; // Width and height of the texture
   char *ptr;          // ==NULL if the thumbnail has not started loading
   int status;         // 0-Not a valid texture, 1-Loaded
@@ -6410,7 +6410,7 @@ struct t_listboxbr lthumbmapbr = {3 - 2, 11 - 2, NULL, 0, 4, 4, 32, 32};
 int TipoBrowser = 0;
 
 struct _thumb_map {   // Brush map thumbnails
-  int an, al;         // Width and height of the thumbnail
+  int w, h;         // Width and height of the thumbnail
   int RealAn, RealAl; // Width and height of the texture
   char *ptr;          // ==NULL if the thumbnail has not started loading
   int status;         // 0-Not a valid texture, 1-Loaded
@@ -6451,8 +6451,8 @@ int create_mapbr_thumbs(struct t_listboxbr *l) {
   n = m_maximo = 0;
   for (con = 0; con < max_windows; con++) {
     if (window[con].type == 100) {
-      thumb_map[n].an = (int)window[con].mapa->map_width;
-      thumb_map[n].al = (int)window[con].mapa->map_height;
+      thumb_map[n].w = (int)window[con].mapa->map_width;
+      thumb_map[n].h = (int)window[con].mapa->map_height;
       thumb_map[n].ptr = (char *)window[con].mapa->map;
       thumb_map[n].Code = con;
       n++;
@@ -6461,8 +6461,8 @@ int create_mapbr_thumbs(struct t_listboxbr *l) {
   l->total_items = m_maximo = n;
 
   for (con = 0; con < l->total_items; con++) {
-    man = thumb_map[con].RealAn = thumb_map[con].an;
-    mal = thumb_map[con].RealAl = thumb_map[con].al;
+    man = thumb_map[con].RealAn = thumb_map[con].w;
+    mal = thumb_map[con].RealAl = thumb_map[con].h;
     temp = (byte *)thumb_map[con].ptr;
 
     if (man <= 32 * big2 && mal <= 32 * big2) // The graphic is kept as-is
@@ -6481,39 +6481,39 @@ int create_mapbr_thumbs(struct t_listboxbr *l) {
         coefredx = coefredy;
       else
         coefredy = coefredx;
-      thumb_map[con].an = (float)man / coefredx + 0.5;
-      thumb_map[con].al = (float)mal / coefredy + 0.5;
-      thumb_map[con].an &= -2;
-      thumb_map[con].al &= -2;
-      if (thumb_map[con].an < 2)
-        thumb_map[con].an = 2;
-      if (thumb_map[con].al < 2)
-        thumb_map[con].al = 2;
+      thumb_map[con].w = (float)man / coefredx + 0.5;
+      thumb_map[con].h = (float)mal / coefredy + 0.5;
+      thumb_map[con].w &= -2;
+      thumb_map[con].h &= -2;
+      if (thumb_map[con].w < 2)
+        thumb_map[con].w = 2;
+      if (thumb_map[con].h < 2)
+        thumb_map[con].h = 2;
 
-      if (coefredx * (float)(thumb_map[con].an - 1) >= (float)man)
-        coefredx = (float)(man - 1) / (float)(thumb_map[con].an - 1);
-      if (coefredy * (float)(thumb_map[con].al - 1) >= (float)mal)
-        coefredy = (float)(mal - 1) / (float)(thumb_map[con].al - 1);
+      if (coefredx * (float)(thumb_map[con].w - 1) >= (float)man)
+        coefredx = (float)(man - 1) / (float)(thumb_map[con].w - 1);
+      if (coefredy * (float)(thumb_map[con].h - 1) >= (float)mal)
+        coefredy = (float)(mal - 1) / (float)(thumb_map[con].h - 1);
 
-      if ((temp2 = (byte *)malloc(thumb_map[con].an * thumb_map[con].al)) == NULL) {
+      if ((temp2 = (byte *)malloc(thumb_map[con].w * thumb_map[con].h)) == NULL) {
         thumb_map[con].ptr = NULL;
         thumb_map[con].status = 0;
         continue;
       }
 
-      memset(temp2, 0, thumb_map[con].an * thumb_map[con].al);
+      memset(temp2, 0, thumb_map[con].w * thumb_map[con].h);
 
       a = (float)0.0;
-      for (y = 0; y < thumb_map[con].al; y++) {
+      for (y = 0; y < thumb_map[con].h; y++) {
         b = (float)0.0;
-        for (x = 0; x < thumb_map[con].an; x++) {
-          temp2[y * thumb_map[con].an + x] = temp[((memptrsize)a) * man + (memptrsize)b];
+        for (x = 0; x < thumb_map[con].w; x++) {
+          temp2[y * thumb_map[con].w + x] = temp[((memptrsize)a) * man + (memptrsize)b];
           b += coefredx;
         }
         a += coefredy;
       }
 
-      if ((thumb_map[con].ptr = (char *)malloc((thumb_map[con].an * thumb_map[con].al) / 4)) ==
+      if ((thumb_map[con].ptr = (char *)malloc((thumb_map[con].w * thumb_map[con].h) / 4)) ==
           NULL) {
         free(temp2);
         thumb_map[con].ptr = NULL;
@@ -6521,17 +6521,17 @@ int create_mapbr_thumbs(struct t_listboxbr *l) {
         break;
       }
 
-      for (y = 0; y < thumb_map[con].al; y += 2) {
-        for (x = 0; x < thumb_map[con].an; x += 2) {
-          n = *(ghost + temp2[x + y * thumb_map[con].an] * 256 +
-                temp2[x + 1 + y * thumb_map[con].an]);
-          m = *(ghost + temp2[x + (y + 1) * thumb_map[con].an] * 256 +
-                temp2[x + 1 + (y + 1) * thumb_map[con].an]);
-          thumb_map[con].ptr[x / 2 + (y / 2) * (thumb_map[con].an / 2)] = *(ghost + n * 256 + m);
+      for (y = 0; y < thumb_map[con].h; y += 2) {
+        for (x = 0; x < thumb_map[con].w; x += 2) {
+          n = *(ghost + temp2[x + y * thumb_map[con].w] * 256 +
+                temp2[x + 1 + y * thumb_map[con].w]);
+          m = *(ghost + temp2[x + (y + 1) * thumb_map[con].w] * 256 +
+                temp2[x + 1 + (y + 1) * thumb_map[con].w]);
+          thumb_map[con].ptr[x / 2 + (y / 2) * (thumb_map[con].w / 2)] = *(ghost + n * 256 + m);
         }
       }
-      thumb_map[con].an /= 2;
-      thumb_map[con].al /= 2;
+      thumb_map[con].w /= 2;
+      thumb_map[con].h /= 2;
       free(temp2);
     }
     thumb_map[con].status = 1;
@@ -6559,7 +6559,7 @@ void select_color(int n) { // Icon number as parameter
     show_dialog(MapperBrowseFPG0);
 
     num_tex = ltexturasbr.first_visible + ltexturasbr.zone - 10; // Position in browser
-    tex_cod = atoi(m3d_fpgcodesbr + num_tex * an_textura);       // Code at that position
+    tex_cod = atoi(m3d_fpgcodesbr + num_tex * w_textura);       // Code at that position
 
     if (thumb_tex[num_tex].Code == 0 || !v_finished)
       return;
@@ -6584,8 +6584,8 @@ void select_color(int n) { // Icon number as parameter
         num_pincel = num_tex;
         pincel = temp;
         temp = NULL;
-        pincel_an = man;
-        pincel_al = mal;
+        brush_w = man;
+        brush_h = mal;
 
         fseek(FilePaintFPG, 8, SEEK_SET);
         memcpy(pal, dac, 768);
@@ -6613,8 +6613,8 @@ void select_color(int n) { // Icon number as parameter
     if (v_finished) {
       num_tex = thumb_map[ltexturasbr.first_visible + ltexturasbr.zone - 10].Code;
       textura_color = window[num_tex].mapa->map;
-      textura_an = window[num_tex].mapa->map_width;
-      textura_al = window[num_tex].mapa->map_height;
+      texture_w = window[num_tex].mapa->map_width;
+      texture_h = window[num_tex].mapa->map_height;
       textura_x = 0;
       textura_y = 0;
     }
@@ -6669,7 +6669,7 @@ void select_color(int n) { // Icon number as parameter
             read_mouse();
             a = mouse_shift_x - ix;
             b = mouse_shift_y - iy;
-            wvolcado(screen_buffer, vga_width, vga_height, p, a, b, c * big2, d * big2, 0);
+            blit_region(screen_buffer, vga_width, vga_height, p, a, b, c * big2, d * big2, 0);
             blit_partial(a, b, c * big2, d * big2);
             save_mouse_bg(mouse_background, mouse_shift_x, mouse_shift_y, mouse_graf, 0);
             put(mouse_shift_x, mouse_shift_y, mouse_graf);
@@ -6819,7 +6819,7 @@ void select_color(int n) { // Icon number as parameter
         x = 9 + (col % 16) * 8;
         y = 9 + (col / 16) * 8;
         wrectangle(p, c, d, c4, x, y, 9, 9);
-        wvolcado(screen_buffer, vga_width, vga_height, p, a, b, c * big2, d * big2, 0);
+        blit_region(screen_buffer, vga_width, vga_height, p, a, b, c * big2, d * big2, 0);
         blit_partial(a, b, c * big2, d * big2);
       } else if (volcar == 2) {
         volcar = 0;
@@ -6827,7 +6827,7 @@ void select_color(int n) { // Icon number as parameter
         x = 9 + (col % 16) * 8;
         y = 9 + (col / 16) * 8;
         wrectangle(p, c, d, c4, x, y, 9, 9);
-        wvolcado(screen_buffer, vga_width, vga_height, p, a, b, c * big2, d * big2, 0);
+        blit_region(screen_buffer, vga_width, vga_height, p, a, b, c * big2, d * big2, 0);
         blit_partial(a + x * big2, b + y * big2, 9 * big2, 9 * big2);
         blit_partial(a + 138 * big2, b + 10 * big2, 31 * big2, 128 * big2);
       }
@@ -6902,7 +6902,7 @@ void select_color(int n) { // Icon number as parameter
       x = 9 + (col % 16) * 8;
       y = 9 + (col / 16) * 8;
       wrectangle(p, c, d, c4, x, y, 9, 9);
-      wvolcado(screen_buffer, vga_width, vga_height, p, a, b, c * big2, d * big2, 0);
+      blit_region(screen_buffer, vga_width, vga_height, p, a, b, c * big2, d * big2, 0);
       blit_partial(a, b, c * big2, d * big2);
       blit_mouse_b();
       do {
@@ -7524,7 +7524,7 @@ void bar_coords(void) {
 //      Print width and height (lines, boxes, ...) on the toolbar
 //-----------------------------------------------------------------------------
 
-void analyze_bar(int an, int al) {
+void analyze_bar(int w, int h) {
   byte *p;
   byte num[5];
 
@@ -7534,15 +7534,15 @@ void analyze_bar(int an, int al) {
   screen_buffer = toolbar;
   text_color = c4;
   num[4] = 0;
-  num[3] = an % 10 + 48;
-  num[2] = (an / 10) % 10 + 48;
-  num[1] = (an / 100) % 10 + 48;
-  num[0] = (an / 1000) % 10 + 48;
+  num[3] = w % 10 + 48;
+  num[2] = (w / 10) % 10 + 48;
+  num[1] = (w / 100) % 10 + 48;
+  num[0] = (w / 1000) % 10 + 48;
   writetxt(toolbar_width - 22, 3, 0, num);
-  num[3] = al % 10 + 48;
-  num[2] = (al / 10) % 10 + 48;
-  num[1] = (al / 100) % 10 + 48;
-  num[0] = (al / 1000) % 10 + 48;
+  num[3] = h % 10 + 48;
+  num[2] = (h / 10) % 10 + 48;
+  num[1] = (h / 100) % 10 + 48;
+  num[0] = (h / 1000) % 10 + 48;
   writetxt(toolbar_width - 22, 10, 0, num);
   screen_buffer = p;
 }
@@ -7551,7 +7551,7 @@ void analyze_bar(int an, int al) {
 //      Flush the toolbar (based on toolbar_x/y and toolbar_width)
 //-----------------------------------------------------------------------------
 
-int new_bar(int an, int al) {
+int new_bar(int w, int h) {
   int n;
 
   for (n = 0; n < 10; n++) {
@@ -7561,31 +7561,31 @@ int new_bar(int an, int al) {
   if (n == 10)
     return (-1);
 
-  if ((barras[n].ptr = (byte *)malloc(an * big2 * al * big2)) == NULL) {
+  if ((barras[n].ptr = (byte *)malloc(w * big2 * h * big2)) == NULL) {
     v_text = (char *)texts[45];
     show_dialog(err0);
     return (-1);
   }
 
   barras[n].on = 1;
-  barras[n].an = an;
-  barras[n].al = al;
+  barras[n].w = w;
+  barras[n].h = h;
 
-  an *= big2;
-  al *= big2;
+  w *= big2;
+  h *= big2;
   barras[n].x = toolbar_x;
   if (toolbar_y > vga_height / 2 - 9 * big2)
-    barras[n].y = toolbar_y - al - 1;
+    barras[n].y = toolbar_y - h - 1;
   else
     barras[n].y = toolbar_y + 19 * big2 + 1;
-  adjust_box(&barras[n].x, &barras[n].y, &an, &al);
-  an /= big2;
-  al /= big2;
+  adjust_box(&barras[n].x, &barras[n].y, &w, &h);
+  w /= big2;
+  h /= big2;
 
-  wrectangle(barras[n].ptr, an, al, c2, 0, 0, an, al);
-  wbox(barras[n].ptr, an, al, c0, 1, 1, an - 2, al - 2);
-  wgra(barras[n].ptr, an, al, c_b_low, 2, 2, an - 12, 7);
-  wput(barras[n].ptr, an, al, an - 9, 2, 35);
+  wrectangle(barras[n].ptr, w, h, c2, 0, 0, w, h);
+  wbox(barras[n].ptr, w, h, c0, 1, 1, w - 2, h - 2);
+  wgra(barras[n].ptr, w, h, c_b_low, 2, 2, w - 12, 7);
+  wput(barras[n].ptr, w, h, w - 9, 2, 35);
 
   return (0);
 }
@@ -7603,26 +7603,26 @@ void flush_bars(int oscurecidas) {
   for (n = 0; n < 10; n++)
     if (barras[n].on) {
       if (!oscurecidas) {
-        flush_bar(barras[n].ptr, barras[n].an, barras[n].x, barras[n].y, barras[n].an,
-                  barras[n].al);
+        flush_bar(barras[n].ptr, barras[n].w, barras[n].x, barras[n].y, barras[n].w,
+                  barras[n].h);
       } else {
-        flush_bar_darkened(barras[n].ptr, barras[n].an, barras[n].x, barras[n].y, barras[n].an,
-                           barras[n].al);
+        flush_bar_darkened(barras[n].ptr, barras[n].w, barras[n].x, barras[n].y, barras[n].w,
+                           barras[n].h);
       }
     }
 }
 
-void flush_bar(byte *p, int real_an, int x, int y, int an, int al) {
+void flush_bar(byte *p, int real_w, int x, int y, int w, int h) {
   byte *q;
   int salta_x, long_x, resto_x;
   int salta_y, long_y, resto_y;
 
   if (big) {
-    an *= 2;
-    al *= 2;
+    w *= 2;
+    h *= 2;
   }
 
-  blit_partial(x, y, an, al);
+  blit_partial(x, y, w, h);
 
   q = screen_buffer + y * vga_width + x;
 
@@ -7630,48 +7630,48 @@ void flush_bar(byte *p, int real_an, int x, int y, int an, int al) {
     salta_x = -x;
   else
     salta_x = 0;
-  if (x + an > vga_width)
-    resto_x = x + an - vga_width;
+  if (x + w > vga_width)
+    resto_x = x + w - vga_width;
   else
     resto_x = 0;
-  long_x = an - salta_x - resto_x;
+  long_x = w - salta_x - resto_x;
 
-  resto_x += real_an - an;
+  resto_x += real_w - w;
 
   if (y < 0)
     salta_y = -y;
   else
     salta_y = 0;
-  if (y + al > vga_height)
-    resto_y = y + al - vga_height;
+  if (y + h > vga_height)
+    resto_y = y + h - vga_height;
   else
     resto_y = 0;
-  long_y = al - salta_y - resto_y;
+  long_y = h - salta_y - resto_y;
 
   p += vga_width * salta_y + salta_x;
   q += vga_width * salta_y + salta_x;
   resto_x += salta_x;
-  an = long_x;
+  w = long_x;
   do {
     do {
       *q++ = *p++;
-    } while (--an);
-    q += vga_width - (an = long_x);
+    } while (--w);
+    q += vga_width - (w = long_x);
     p += resto_x;
   } while (--long_y);
 }
 
-void flush_bar_darkened(byte *p, int real_an, int x, int y, int an, int al) {
+void flush_bar_darkened(byte *p, int real_w, int x, int y, int w, int h) {
   byte *q;
   int salta_x, long_x, resto_x;
   int salta_y, long_y, resto_y;
 
   if (big) {
-    an *= 2;
-    al *= 2;
+    w *= 2;
+    h *= 2;
   }
 
-  blit_partial(x, y, an, al);
+  blit_partial(x, y, w, h);
 
   q = screen_buffer + y * vga_width + x;
 
@@ -7679,33 +7679,33 @@ void flush_bar_darkened(byte *p, int real_an, int x, int y, int an, int al) {
     salta_x = -x;
   else
     salta_x = 0;
-  if (x + an > vga_width)
-    resto_x = x + an - vga_width;
+  if (x + w > vga_width)
+    resto_x = x + w - vga_width;
   else
     resto_x = 0;
-  long_x = an - salta_x - resto_x;
+  long_x = w - salta_x - resto_x;
 
-  resto_x += real_an - an;
+  resto_x += real_w - w;
 
   if (y < 0)
     salta_y = -y;
   else
     salta_y = 0;
-  if (y + al > vga_height)
-    resto_y = y + al - vga_height;
+  if (y + h > vga_height)
+    resto_y = y + h - vga_height;
   else
     resto_y = 0;
-  long_y = al - salta_y - resto_y;
+  long_y = h - salta_y - resto_y;
 
   p += vga_width * salta_y + salta_x;
   q += vga_width * salta_y + salta_x;
   resto_x += salta_x;
-  an = long_x;
+  w = long_x;
   do {
     do {
       *q++ = *(ghost + c0 * 256 + *p++);
-    } while (--an);
-    q += vga_width - (an = long_x);
+    } while (--w);
+    q += vga_width - (w = long_x);
     p += resto_x;
   } while (--long_y);
 }

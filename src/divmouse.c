@@ -13,7 +13,7 @@ int mouse_in_window = 1;
 int joymx = 0, joymy = 0;
 void read_mouse2(void);
 void libera_drag(void);
-int collides_with(int a, int x, int y, int an, int al);
+int collides_with(int a, int x, int y, int w, int h);
 void sound_init(void);
 void sound_end(void);
 int div_started = 0;
@@ -27,8 +27,8 @@ int mouse_in(int x, int y, int x2, int y2) {
   return (mouse_x >= x && mouse_x <= x2 && mouse_y >= y && mouse_y <= y2);
 }
 
-int wmouse_in(int x, int y, int an, int al) {
-  return (wmouse_x >= x && wmouse_x <= x + an - 1 && wmouse_y >= y && wmouse_y <= y + al - 1);
+int wmouse_in(int x, int y, int w, int h) {
+  return (wmouse_x >= x && wmouse_x <= x + w - 1 && wmouse_y >= y && wmouse_y <= y + h - 1);
 }
 
 //-----------------------------------------------------------------------------
@@ -538,12 +538,12 @@ void read_mouse2(void) {
     if (strcmp((char *)v.title, (char *)texts[35])) {
       for (n = max_windows; n >= 0; n--) {
         if (window[n].type) {
-          if (window[n].x + window[n].an > vga_width)
-            window[n].x = vga_width - window[n].an;
+          if (window[n].x + window[n].w > vga_width)
+            window[n].x = vga_width - window[n].w;
 
 
-          if (window[n].y + window[n].al > vga_height)
-            window[n].y = vga_height - window[n].al;
+          if (window[n].y + window[n].h > vga_height)
+            window[n].y = vga_height - window[n].h;
 
 
           if (window[n].x <= 0)
@@ -554,8 +554,8 @@ void read_mouse2(void) {
 
           //	printf("n=%d\n",n);
 
-          if (collides_with(n, window[n].x, window[n].y, window[n].an, window[n].al))
-            place_window(1, &window[n].x, &window[n].y, window[n].an, window[n].al);
+          if (collides_with(n, window[n].x, window[n].y, window[n].w, window[n].h))
+            place_window(1, &window[n].x, &window[n].y, window[n].w, window[n].h);
         }
       }
     }

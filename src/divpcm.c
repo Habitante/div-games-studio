@@ -46,8 +46,8 @@ byte *SaveSoundMem(pcminfo *mypcminfo);
 int IsWAV(char *FileName);
 int NewSample(pcminfo *mypcminfo); // 1-OK, 0-ERROR
 // Espacio (malloc+lock) en mypcminfo->SoundData para mypcminfo->SoundSize shorts
-void wline(char *ptr, int realan, int an, int al, int x0, int y0, int x1, int y1, char color);
-void linea_pixel(char *ptr, int an, int realan, int al, int x, int y, char color);
+void wline(char *ptr, int realan, int w, int h, int x0, int y0, int x1, int y1, char color);
+void linea_pixel(char *ptr, int w, int realan, int h, int x, int y, char color);
 
 void set_mixer(void);
 int find_pcm_window(void);
@@ -67,7 +67,7 @@ char SoundFile[256];
 int RecDevice[2] = {1, 0};
 int ModButton = 0;
 int ModWindow = -1;
-extern int reloj;
+extern int frame_clock;
 
 void errhlp0(void);
 
@@ -80,22 +80,22 @@ void PCM1(void) {
   float step, position = 0;
   int x, y, y0, y1, p0, p1;
   byte *ptr = v.ptr;
-  int an = v.an, al = v.al;
+  int w = v.w, h = v.h;
   int Ancho, Alto, First = 1, lx, ly;
   pcminfo *mypcminfo;
   short *buffer;
   short muestra;
 
   if (big) {
-    an /= 2;
-    al /= 2;
+    w /= 2;
+    h /= 2;
   }
   mypcminfo = (pcminfo *)v.aux;
 
-  wbox(ptr, an, al, c1, 2, 10, an - 4, al - 12);
-  Ancho = v.an - 4 * big2;
-  Alto = v.al - 12 * big2;
-  ptr += (2 + (10 * v.an)) * big2 + (Alto / 2) * v.an;
+  wbox(ptr, w, h, c1, 2, 10, w - 4, h - 12);
+  Ancho = v.w - 4 * big2;
+  Alto = v.h - 12 * big2;
+  ptr += (2 + (10 * v.w)) * big2 + (Alto / 2) * v.w;
   buffer = mypcminfo->SoundData;
   length = mypcminfo->SoundSize;
 
@@ -110,7 +110,7 @@ void PCM1(void) {
           lx = (int)position;
           ly = y;
         } else {
-          wline((char *)ptr, v.an, Ancho, Alto, lx, ly, (int)position, y, c_g_low);
+          wline((char *)ptr, v.w, Ancho, Alto, lx, ly, (int)position, y, c_g_low);
           lx = (int)position;
           ly = y;
         }
@@ -136,7 +136,7 @@ void PCM1(void) {
 
         y = y0;
         do {
-          ptr[x + y * v.an] = c_g_low;
+          ptr[x + y * v.w] = c_g_low;
         } while (y++ < y1);
       }
     }
@@ -194,8 +194,8 @@ void PCM0(void) {
   pcminfo *mypcminfo;
 
   v.type = 105;
-  v.an = 80;
-  v.al = 50;
+  v.w = 80;
+  v.h = 50;
 
   v.paint_handler = PCM1;
   v.click_handler = PCM2;
@@ -215,25 +215,25 @@ void PCM0(void) {
 
 void MOD1(void) {
   modinfo *mymodinfo = (modinfo *)v.aux;
-  int an = v.an / big2, al = v.al / big2;
+  int w = v.w / big2, h = v.h / big2;
 
   _show_items();
 
-  wbox(v.ptr, an, al, c1, 2, 10, an - 4, al - 12 - 10);
-  wbox(v.ptr, an, al, c2, 2, 39, an - 4, 9);
-  wrectangle(v.ptr, an, al, c0, 1, 38, an - 2, 11);
-  wrectangle(v.ptr, an, al, c0, 1, 38, 21, 11);
+  wbox(v.ptr, w, h, c1, 2, 10, w - 4, h - 12 - 10);
+  wbox(v.ptr, w, h, c2, 2, 39, w - 4, 9);
+  wrectangle(v.ptr, w, h, c0, 1, 38, w - 2, 11);
+  wrectangle(v.ptr, w, h, c0, 1, 38, 21, 11);
 
   if (Mix_PlayingMusic() && mymodinfo->SongCode == SongCode) {
     if (ModButton && ModWindow == v.order)
-      wput(v.ptr, an, al, 2, 39, -214);
+      wput(v.ptr, w, h, 2, 39, -214);
     else
-      wput(v.ptr, an, al, 2, 39, -234);
+      wput(v.ptr, w, h, 2, 39, -234);
   } else {
     if (ModButton && ModWindow == v.order)
-      wput(v.ptr, an, al, 2, 39, -215);
+      wput(v.ptr, w, h, 2, 39, -215);
     else
-      wput(v.ptr, an, al, 2, 39, -235);
+      wput(v.ptr, w, h, 2, 39, -235);
   }
 }
 
@@ -286,8 +286,8 @@ void MOD0(void) {
   modinfo *mymodinfo;
 
   v.type = 107;
-  v.an = 68;
-  v.al = 50;
+  v.w = 68;
+  v.h = 50;
 
   v.paint_handler = MOD1;
   v.click_handler = MOD2;
@@ -320,27 +320,27 @@ int sound_get_song_line(void) {
 
 void mostrar_mod_meters(void) {
   modinfo *mymodinfo = (modinfo *)v.aux;
-  int an = v.an / big2, al = v.al / big2;
+  int w = v.w / big2, h = v.h / big2;
   int x, y, con, canal, ancho_barra;
-  int ini = v.an * v.al - v.an * ((2 + 10) * big2 + 1) + 2 * big2;
+  int ini = v.w * v.h - v.w * ((2 + 10) * big2 + 1) + 2 * big2;
   char cwork[10];
 
   if (mymodinfo->SongCode == SongCode) {
     if (Mix_PlayingMusic()) {
-      wbox(v.ptr, an, al, c1, 2, 10, an - 4, al - 12 - 10);
-      wbox(v.ptr, an, al, c2, 22, 39, an - 4 - 20, 9);
+      wbox(v.ptr, w, h, c1, 2, 10, w - 4, h - 12 - 10);
+      wbox(v.ptr, w, h, c2, 22, 39, w - 4 - 20, 9);
 
-      wwrite(v.ptr, an, al, 29, 40, 2, (byte *)"L ", c1);
-      wwrite(v.ptr, an, al, 28, 40, 2, (byte *)"L ", c4);
+      wwrite(v.ptr, w, h, 29, 40, 2, (byte *)"L ", c1);
+      wwrite(v.ptr, w, h, 28, 40, 2, (byte *)"L ", c4);
       div_snprintf(cwork, sizeof(cwork), "%03d", sound_get_song_line());
-      wwrite(v.ptr, an, al, 42, 40, 2, (byte *)cwork, c3);
+      wwrite(v.ptr, w, h, 42, 40, 2, (byte *)cwork, c3);
 
-      wwrite(v.ptr, an, al, 52, 40, 2, (byte *)"P ", c1);
-      wwrite(v.ptr, an, al, 51, 40, 2, (byte *)"P ", c4);
+      wwrite(v.ptr, w, h, 52, 40, 2, (byte *)"P ", c1);
+      wwrite(v.ptr, w, h, 51, 40, 2, (byte *)"P ", c4);
       div_snprintf(cwork, sizeof(cwork), "%03d", sound_get_song_pos());
-      wwrite(v.ptr, an, al, 64, 40, 2, (byte *)cwork, c3);
+      wwrite(v.ptr, w, h, 64, 40, 2, (byte *)cwork, c3);
 
-      ancho_barra = (v.an - 4 * big2) / SongChannels;
+      ancho_barra = (v.w - 4 * big2) / SongChannels;
 
       for (canal = 0; canal < SongChannels; canal++) {
         x = ancho_barra * canal;
@@ -348,9 +348,9 @@ void mostrar_mod_meters(void) {
 
         for (con = 0; con < y; con++) {
           if (canal & 1)
-            memset(v.ptr + ini + x - con * v.an, c_g_low, ancho_barra);
+            memset(v.ptr + ini + x - con * v.w, c_g_low, ancho_barra);
           else
-            memset(v.ptr + ini + x - con * v.an, c_g, ancho_barra);
+            memset(v.ptr + ini + x - con * v.w, c_g, ancho_barra);
         }
       }
     } else {
@@ -972,14 +972,14 @@ void EditSound0(void) {
   v.type = 1;
   v.title = texts[349];
   v.name = texts[349];
-  v.an = 308;
-  v.al = 151; // 116
+  v.w = 308;
+  v.h = 151; // 116
 
   v.paint_handler = EditSound1;
   v.click_handler = EditSound2;
   v.close_handler = EditSound3;
 
-  window_width = (v.an - 8) * big2;
+  window_width = (v.w - 8) * big2;
   window_height = 64 * big2;
   sel_1 = 0;
   sel_2 = 0;
@@ -994,31 +994,31 @@ void EditSound0(void) {
   NumSND = 0;
 
   pos = 7;
-  _button(501, pos, v.al - 34, 0);
+  _button(501, pos, v.h - 34, 0);
   pos += text_len(texts[501]) + 3;
-  _button(502, pos, v.al - 34, 0);
+  _button(502, pos, v.h - 34, 0);
   pos += text_len(texts[502]) + 3;
-  _button(503, pos, v.al - 34, 0);
+  _button(503, pos, v.h - 34, 0);
   pos += text_len(texts[503]) + 3;
-  _button(504, pos, v.al - 34, 0);
+  _button(504, pos, v.h - 34, 0);
 
   pos += text_len(texts[504]) + 3;
-  pos += v.an - 1 - text_len(texts[506]);
+  pos += v.w - 1 - text_len(texts[506]);
   pos -= text_len(texts[507]) + 3;
   pos -= text_len(texts[508]) + 3;
   pos -= text_len(texts[505]) + 3;
   pos /= 2;
-  _button(505, pos, v.al - 34, 0);
+  _button(505, pos, v.h - 34, 0);
 
-  pos = v.an - 1 - text_len(texts[506]);
-  _button(506, pos, v.al - 34, 0);
+  pos = v.w - 1 - text_len(texts[506]);
+  _button(506, pos, v.h - 34, 0);
   pos -= text_len(texts[507]) + 3;
-  _button(507, pos, v.al - 34, 0);
+  _button(507, pos, v.h - 34, 0);
   pos -= text_len(texts[508]) + 3;
-  _button(508, pos, v.al - 34, 0);
+  _button(508, pos, v.h - 34, 0);
 
-  _button(509, 7, v.al - 14, 0);        // Prueba
-  _button(512, v.an - 8, v.al - 14, 2); // Copiar en window
+  _button(509, 7, v.h - 14, 0);        // Prueba
+  _button(512, v.w - 8, v.h - 14, 2); // Copiar en window
 
   pos = 193 + text_len(texts[555]) + 3; // 241;
 
@@ -1043,8 +1043,8 @@ void EditSound1(void) {
   short *buffer;
   byte *ptr = v.ptr;
   float step, position = 0;
-  int an = v.an / big2, al = v.al / big2;
-  int an_v = window_width / big2, al_v = window_height / big2;
+  int w = v.w / big2, h = v.h / big2;
+  int w_v = window_width / big2, h_v = window_height / big2;
   int length;
   int x, y, y0, y1, p0, p1;
   int Ancho, Alto, First = 1, lx, ly;
@@ -1054,46 +1054,46 @@ void EditSound1(void) {
   _show_items();
 
   // Info del sonido
-  wbox(v.ptr, an, al, c1, 4, 12, 69, 28);
-  wrectangle(v.ptr, an, al, c0, 3, 11, 71, 30);
-  wrectangle(v.ptr, an, al, c0, 3, 21, 71, 11);
-  wwrite(v.ptr, an, al, 39, 13, 1, (byte *)mypcminfo->name, c3);
+  wbox(v.ptr, w, h, c1, 4, 12, 69, 28);
+  wrectangle(v.ptr, w, h, c0, 3, 11, 71, 30);
+  wrectangle(v.ptr, w, h, c0, 3, 21, 71, 11);
+  wwrite(v.ptr, w, h, 39, 13, 1, (byte *)mypcminfo->name, c3);
   itoa(mypcminfo->SoundFreq, cwork, 10);
-  wwrite(v.ptr, an, al, 39, 23, 1, (byte *)cwork, c3);
+  wwrite(v.ptr, w, h, 39, 23, 1, (byte *)cwork, c3);
   div_snprintf(cwork, sizeof(cwork), "%02d bit", mypcminfo->SoundBits);
-  wwrite(v.ptr, an, al, 39, 33, 1, (byte *)cwork, c3);
+  wwrite(v.ptr, w, h, 39, 33, 1, (byte *)cwork, c3);
 
   // Opciones de conversion
 
   // Zona de edicion
-  wrectangle(v.ptr, an, al, c0, 3, 11 + PosY, an_v + 2, al_v + 2);
-  wbox(v.ptr, an, al, c1, 4, 12 + PosY, an_v, al_v);
+  wrectangle(v.ptr, w, h, c0, 3, 11 + PosY, w_v + 2, h_v + 2);
+  wbox(v.ptr, w, h, c1, 4, 12 + PosY, w_v, h_v);
 
-  wrectangle(v.ptr, an, al, c0, 1, 11 + PosY + al_v + 5, an - 2, 19);
+  wrectangle(v.ptr, w, h, c0, 1, 11 + PosY + h_v + 5, w - 2, 19);
 
   if (sel_1 <= sel_2) {
-    //  No pone cajas de 1 de ancho
-    //  wbox(v.ptr, an, al, c3, (sel_1/big2)+4, 12+PosY, (sel_2/big2)-(sel_1/big2)+1, al_v);
+    //  No pone cajas de 1 de width
+    //  wbox(v.ptr, an, al, c3, (sel_1/big2)+4, 12+PosY, (sel_2/big2)-(sel_1/big2)+1, h_v);
 
     p0 = 4 * big2;
     y0 = (12 + PosY) * big2;
     for (x = sel_1 + p0; x < sel_2 + p0 + 1; x++)
       for (y = 0; y < window_height; y++)
-        ptr[x + (y0 + y) * v.an] = c3;
+        ptr[x + (y0 + y) * v.w] = c3;
   } else {
-    //  No pone cajas de 1 de ancho
-    //  wbox(v.ptr, an, al, c3, (sel_2/big2)+4, 12+PosY, (sel_1/big2)-(sel_2/big2)+1, al_v);
+    //  No pone cajas de 1 de width
+    //  wbox(v.ptr, an, al, c3, (sel_2/big2)+4, 12+PosY, (sel_1/big2)-(sel_2/big2)+1, h_v);
 
     p0 = 4 * big2;
     y0 = (12 + PosY) * big2;
     for (x = sel_2 + p0; x < sel_1 + p0 + 1; x++)
       for (y = 0; y < window_height; y++)
-        ptr[x + (y0 + y) * v.an] = c3;
+        ptr[x + (y0 + y) * v.w] = c3;
   }
 
   Ancho = window_width;
   Alto = window_height;
-  ptr += (4 + ((12 + PosY) * v.an)) * big2 + (Alto / 2) * v.an;
+  ptr += (4 + ((12 + PosY) * v.w)) * big2 + (Alto / 2) * v.w;
 #ifdef MIXER
   buffer = (short *)mypcminfo->SI->abuf;
   length = mypcminfo->SI->alen / 2;
@@ -1109,7 +1109,7 @@ void EditSound1(void) {
           lx = (int)position;
           ly = y;
         } else {
-          wline((char *)ptr, v.an, Ancho, Alto, lx, ly, (int)position, y, c_g_low);
+          wline((char *)ptr, v.w, Ancho, Alto, lx, ly, (int)position, y, c_g_low);
           lx = (int)position;
           ly = y;
         }
@@ -1136,7 +1136,7 @@ void EditSound1(void) {
 
         y = y0;
         do {
-          ptr[x + y * v.an] = c_g_low;
+          ptr[x + y * v.w] = c_g_low;
         } while (y++ < y1);
       }
     }
@@ -1144,7 +1144,7 @@ void EditSound1(void) {
 }
 
 void EditSound2(void) {
-  int an_v = window_width / big2, al_v = window_height / big2;
+  int w_v = window_width / big2, h_v = window_height / big2;
   int need_refresh = 0;
 
   _process_items();
@@ -1154,7 +1154,7 @@ void EditSound2(void) {
     need_refresh = 1;
   }
 
-  if (wmouse_in(4, 12 + PosY, an_v, al_v)) {
+  if (wmouse_in(4, 12 + PosY, w_v, h_v)) {
     if (mouse_b & 1) {
       if (!(prev_mouse_buttons & 1))
         sel_1 = mouse_x - v.x - (4 * big2), sel_2 = mouse_x - v.x - (4 * big2);
@@ -1186,8 +1186,8 @@ void RecSound0(void) {
   v.type = 1;
   v.title = texts[560];
   v.name = texts[560];
-  v.an = 200;
-  v.al = 68;
+  v.w = 200;
+  v.h = 68;
 
   v.paint_handler = RecSound1;
   v.click_handler = RecSound2;
@@ -1199,15 +1199,15 @@ void RecSound0(void) {
   DIV_STRCAT(SoundFile, "SAMPLE.WAV");
 
   // Botones Aceptar/Cancelar
-  _button(100, 7, v.al - 14, 0);
-  _button(101, v.an - 8, v.al - 14, 2);
+  _button(100, 7, v.h - 14, 0);
+  _button(101, v.w - 8, v.h - 14, 2);
 
   // Flags MIC/CD
   _flag(561, 3, 20, &RecDevice[0]);
   _flag(562, 3 + 11 + text_len(texts[561]), 20, &RecDevice[1]);
 
   // Boton de seleccion de fichero
-  _button(121, v.an - 12, 17, 0);
+  _button(121, v.w - 12, 17, 0);
 
   v_accept = 0;
 }
@@ -1215,7 +1215,7 @@ void RecSound0(void) {
 void RecSound1(void) {
   printf("TODO - divpcm.cpp RecSound1\n");
 
-  int an = v.an / big2, al = v.al / big2;
+  int w = v.w / big2, h = v.h / big2;
 
   char drive[_MAX_DRIVE + 1];
   char dir[_MAX_DIR + 1];
@@ -1226,21 +1226,21 @@ void RecSound1(void) {
   _show_items();
 
   // Fuente de grabacion
-  wwrite(v.ptr, an, al, 3, 11, 0, texts[565], c3);
+  wwrite(v.ptr, w, h, 3, 11, 0, texts[565], c3);
 
   // Fichero WAV a grabar
-  wwrite(v.ptr, an, al, an - 86, 11, 0, texts[566], c3);
+  wwrite(v.ptr, w, h, w - 86, 11, 0, texts[566], c3);
   _splitpath(SoundFile, drive, dir, fname, ext);
   DIV_STRCPY(cwork, fname);
   DIV_STRCAT(cwork, ext);
-  wbox(v.ptr, an, al, c12, an - 86, 19, 69, 8);
-  wwrite_in_box(v.ptr, an, an - 12, al, an - 85, 20, 0, (byte *)cwork, c4);
+  wbox(v.ptr, w, h, c12, w - 86, 19, 69, 8);
+  wwrite_in_box(v.ptr, w, w - 12, h, w - 85, 20, 0, (byte *)cwork, c4);
 
   // Mensaje de ayuda
-  wbox(v.ptr, an, al, c12, 3, 29, an - 6, 20);
-  wrectangle(v.ptr, an, al, c0, 3, 29, an - 6, 20);
-  wwrite_in_box(v.ptr, an, an - 4, al, an / 2, 31, 1, texts[563], c3);
-  wwrite_in_box(v.ptr, an, an - 4, al, an / 2, 40, 1, texts[564], c3);
+  wbox(v.ptr, w, h, c12, 3, 29, w - 6, 20);
+  wrectangle(v.ptr, w, h, c0, 3, 29, w - 6, 20);
+  wwrite_in_box(v.ptr, w, w - 4, h, w / 2, 31, 1, texts[563], c3);
+  wwrite_in_box(v.ptr, w, w - 4, h, w / 2, 40, 1, texts[564], c3);
 }
 
 void RecSound2(void) {
@@ -2012,7 +2012,7 @@ int NewSample(pcminfo *mypcminfo) {
   return (1);
 }
 
-void wline(char *ptr, int realan, int an, int al, int x0, int y0, int x1, int y1, char color) {
+void wline(char *ptr, int realan, int w, int h, int x0, int y0, int x1, int y1, char color) {
   int dx, dy, a, b, d, x, y;
 
   if (x0 > x1) {
@@ -2031,12 +2031,12 @@ void wline(char *ptr, int realan, int an, int al, int x0, int y0, int x1, int y1
   }
 
   if (!dx && !dy)
-    linea_pixel(ptr, an, realan, al, x0, y0, color);
+    linea_pixel(ptr, w, realan, h, x0, y0, color);
   else {
-    linea_pixel(ptr, an, realan, al, x0, y0, color);
+    linea_pixel(ptr, w, realan, h, x0, y0, color);
     if (dy <= dx) {
       if (x0 > x1) {
-        linea_pixel(ptr, an, realan, al, x1, y1, color);
+        linea_pixel(ptr, w, realan, h, x1, y1, color);
         x0--;
         swap(x0, x1);
         swap(y0, y1);
@@ -2056,7 +2056,7 @@ void wline(char *ptr, int realan, int an, int al, int x0, int y0, int x1, int y1
             x++;
             y++;
           }
-          linea_pixel(ptr, an, realan, al, x, y, color);
+          linea_pixel(ptr, w, realan, h, x, y, color);
         }
       else
         while (x < x1) {
@@ -2068,11 +2068,11 @@ void wline(char *ptr, int realan, int an, int al, int x0, int y0, int x1, int y1
             x++;
             y--;
           }
-          linea_pixel(ptr, an, realan, al, x, y, color);
+          linea_pixel(ptr, w, realan, h, x, y, color);
         }
     } else {
       if (y0 > y1) {
-        linea_pixel(ptr, an, realan, al, x1, y1, color);
+        linea_pixel(ptr, w, realan, h, x1, y1, color);
         y0--;
         swap(x0, x1);
         swap(y0, y1);
@@ -2092,7 +2092,7 @@ void wline(char *ptr, int realan, int an, int al, int x0, int y0, int x1, int y1
             y++;
             x++;
           }
-          linea_pixel(ptr, an, realan, al, x, y, color);
+          linea_pixel(ptr, w, realan, h, x, y, color);
         }
       else
         while (y < y1) {
@@ -2104,14 +2104,14 @@ void wline(char *ptr, int realan, int an, int al, int x0, int y0, int x1, int y1
             y++;
             x--;
           }
-          linea_pixel(ptr, an, realan, al, x, y, color);
+          linea_pixel(ptr, w, realan, h, x, y, color);
         }
     }
   }
 }
 
-void linea_pixel(char *ptr, int an, int realan, int al, int x, int y, char color) {
-  if (x >= 0 && y >= 0 && x < an && y < al) {
+void linea_pixel(char *ptr, int w, int realan, int h, int x, int y, char color) {
+  if (x >= 0 && y >= 0 && x < w && y < h) {
     ptr[x + y * realan] = color;
   }
 }

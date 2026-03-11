@@ -21,11 +21,11 @@ extern int _omx, _omy, omx, omy, oclock;
 extern int incremento;
 
 void MAPtoFPG(struct tmapa *mapa);
-void GetGrafMAP(struct tmapa *mapa, byte *imagen, int x, int y, int ancho, int alto, int cod);
+void GetGrafMAP(struct tmapa *mapa, byte *imagen, int x, int y, int width, int height, int cod);
 void FPGtoMAP(FPG *MiFPG);
 void PutGrafMAP(byte *imagen, byte *mapa, int num);
 void place_map(void);
-int collides_with_map(int n, int x, int y, int an, int al);
+int collides_with_map(int n, int x, int y, int w, int h);
 void close_fpg(char *fpg_path);
 
 void replace_FPG_0(void);
@@ -81,13 +81,13 @@ void FPG2(void) {
     if (MiFPG->thumb_on) {
       MiFPG->lInfoFPG.columns = 3;
       MiFPG->lInfoFPG.lines = 2;
-      MiFPG->lInfoFPG.an = 47;
-      MiFPG->lInfoFPG.al = 26;
+      MiFPG->lInfoFPG.w = 47;
+      MiFPG->lInfoFPG.h = 26;
     } else {
       MiFPG->lInfoFPG.columns = 1;
       MiFPG->lInfoFPG.lines = 6;
-      MiFPG->lInfoFPG.an = 143;
-      MiFPG->lInfoFPG.al = 8;
+      MiFPG->lInfoFPG.w = 143;
+      MiFPG->lInfoFPG.h = 8;
     }
 
     FPG1();
@@ -291,8 +291,8 @@ void FPG0N(void) {
   int n;
 
   v.type = 101; // Droppable
-  v.an = 159;
-  v.al = 72 + 5;
+  v.w = 159;
+  v.h = 72 + 5;
   v.paint_handler = FPG1;
   v.click_handler = FPG2;
   v.close_handler = FPG3;
@@ -315,16 +315,16 @@ void FPG0N(void) {
   v.name = MiFPG->NombreFpg;
   MiFPG->FPGInfo = 0;
 
-  _flag(419, 4, v.al - 10, &MiFPG->thumb_on);
-  _flag(108, (v.an - 5) - (8 * big2 + text_len(texts[108])), v.al - 10, &MiFPG->FPGInfo);
+  _flag(419, 4, v.h - 10, &MiFPG->thumb_on);
+  _flag(108, (v.w - 5) - (8 * big2 + text_len(texts[108])), v.h - 10, &MiFPG->FPGInfo);
 }
 
 void FPG0A(void) {
   FPG *MiFPG;
   int n;
   v.type = 101; // Droppable
-  v.an = 159;
-  v.al = 72 + 5;
+  v.w = 159;
+  v.h = 72 + 5;
   v.paint_handler = FPG1;
   v.click_handler = FPG2;
   v.close_handler = FPG3;
@@ -344,8 +344,8 @@ void FPG0A(void) {
   v.title = MiFPG->NombreFpg;
   v.name = MiFPG->NombreFpg;
 
-  _flag(419, 4, v.al - 10, &MiFPG->thumb_on);
-  _flag(108, (v.an - 5) - (8 * big2 + text_len(texts[108])), v.al - 10, &MiFPG->FPGInfo);
+  _flag(419, 4, v.h - 10, &MiFPG->thumb_on);
+  _flag(108, (v.w - 5) - (8 * big2 + text_len(texts[108])), v.h - 10, &MiFPG->FPGInfo);
 }
 
 int new_file(void) {
@@ -613,14 +613,14 @@ int v2convert;
 char cNamev2convert[128];
 
 void Warning1(void) {
-  int an = v.an / big2, al = v.al / big2;
+  int w = v.w / big2, h = v.h / big2;
   char cWork[70];
 
   _show_items();
-  wwrite(v.ptr, an, al, an / 2, 12, 1, texts[172], c3);
+  wwrite(v.ptr, w, h, w / 2, 12, 1, texts[172], c3);
   div_snprintf(cWork, sizeof(cWork), (char *)texts[173], cNamev2convert);
-  wwrite(v.ptr, an, al, an / 2, 19, 1, (byte *)cWork, c3);
-  wwrite(v.ptr, an, al, an / 2, 30, 1, texts[174], c4);
+  wwrite(v.ptr, w, h, w / 2, 19, 1, (byte *)cWork, c3);
+  wwrite(v.ptr, w, h, w / 2, 30, 1, texts[174], c4);
   v_accept = 0;
 }
 
@@ -641,14 +641,14 @@ void Warning2(void) {
 }
 void Warning0(void) {
   v.type = 1; // Dialog
-  v.an = 200;
-  v.al = 60;
+  v.w = 200;
+  v.h = 60;
   v.title = texts[171];
   v.paint_handler = Warning1;
   v.click_handler = Warning2;
 
-  _button(123, 7, v.al - 14, 0);
-  _button(119, v.an - 8, v.al - 14, 2);
+  _button(123, 7, v.h - 14, 0);
+  _button(119, v.w - 8, v.h - 14, 2);
 }
 
 
@@ -717,21 +717,21 @@ void fpg_edit_code_dialog(void);
 
 void GetCode1(void) {
   char cWork[64];
-  int an = v.an / big2, al = v.al / big2;
+  int w = v.w / big2, h = v.h / big2;
   int x, y, px, py;
 
   _show_items();
 
-  wwrite(v.ptr, an, al, 4, 32, 0, texts[133], c3);
-  wwrite(v.ptr, an, al, 4, 42, 0, texts[134], c3);
+  wwrite(v.ptr, w, h, 4, 32, 0, texts[133], c3);
+  wwrite(v.ptr, w, h, 4, 42, 0, texts[134], c3);
 
   div_snprintf(cWork, sizeof(cWork), "%d", GetCodeAncho);
-  wwrite(v.ptr, an, al, 34, 32, 0, (byte *)cWork, c4);
+  wwrite(v.ptr, w, h, 34, 32, 0, (byte *)cWork, c4);
   div_snprintf(cWork, sizeof(cWork), "%d", GetCodeAlto);
-  wwrite(v.ptr, an, al, 34, 42, 0, (byte *)cWork, c4);
+  wwrite(v.ptr, w, h, 34, 42, 0, (byte *)cWork, c4);
 
-  wwrite(v.ptr, an, al, 64, 32, 0, texts[152], c3);
-  wwrite(v.ptr, an, al, 64, 42, 0, texts[153], c3);
+  wwrite(v.ptr, w, h, 64, 32, 0, texts[152], c3);
+  wwrite(v.ptr, w, h, 64, 42, 0, texts[153], c3);
 
   if (GetCodeP0x == -1) {
     GetCodeP0x = GetCodeAncho / 2;
@@ -739,12 +739,12 @@ void GetCode1(void) {
   }
 
   div_snprintf(cWork, sizeof(cWork), "%d", GetCodeP0x);
-  wwrite(v.ptr, an, al, 108, 32, 0, (byte *)cWork, c4);
+  wwrite(v.ptr, w, h, 108, 32, 0, (byte *)cWork, c4);
   div_snprintf(cWork, sizeof(cWork), "%d", GetCodeP0y);
-  wwrite(v.ptr, an, al, 108, 42, 0, (byte *)cWork, c4);
+  wwrite(v.ptr, w, h, 108, 42, 0, (byte *)cWork, c4);
 
-  wbox(v.ptr, an, al, c1, an - (72 + 4), 12, 72, 46);
-  wrectangle(v.ptr, an, al, c0, an - (72 + 4), 12, 72, 46);
+  wbox(v.ptr, w, h, c1, w - (72 + 4), 12, 72, 46);
+  wrectangle(v.ptr, w, h, c0, w - (72 + 4), 12, 72, 46);
 
   if (GetCodeImagenRed != NULL) {
     px = ((40 * big2) + (GetCodeAnchoRed / 2));
@@ -752,7 +752,7 @@ void GetCode1(void) {
 
     for (y = 0; y < GetCodeAltoRed; y++)
       for (x = 0; x < GetCodeAnchoRed; x++)
-        v.ptr[(py + y) * v.an + ((v.an - px) + x)] = GetCodeImagenRed[y * GetCodeAnchoRed + x];
+        v.ptr[(py + y) * v.w + ((v.w - px) + x)] = GetCodeImagenRed[y * GetCodeAnchoRed + x];
   }
 }
 
@@ -780,19 +780,19 @@ void GetCode3(void) {
 
 void GetCode0(void) {
   v.type = 1; // Dialog
-  v.an = 180 + 25;
-  v.al = 100 - 12;
+  v.w = 180 + 25;
+  v.h = 100 - 12;
   v.title = texts[68];
   v.paint_handler = GetCode1;
   v.click_handler = GetCode2;
   v.close_handler = GetCode3;
 
-  _button(100, 7, v.al - 14, 0);
-  _button(101, v.an - 8, v.al - 14, 2);
+  _button(100, 7, v.h - 14, 0);
+  _button(101, v.w - 8, v.h - 14, 2);
 
   _get(71, 4, 12, 30, (byte *)cCodigo, 5, 1, 999);
   _get(439, 48, 12, 64, (byte *)cFile, 12, 0, 0);
-  _get(72, 4, 52, v.an - 8, (byte *)Descrip, 32, 0, 0);
+  _get(72, 4, 52, v.w - 8, (byte *)Descrip, 32, 0, 0);
 }
 
 void fpg_edit_code_dialog(void) {
@@ -955,7 +955,7 @@ void Show_Taggeds() {
 
       activate();
       call((voidReturnType)v.paint_handler);
-      wvolcado(screen_buffer, vga_width, vga_height, v.ptr, v.x, v.y, v.an, v.al, 0);
+      blit_region(screen_buffer, vga_width, vga_height, v.ptr, v.x, v.y, v.w, v.h, 0);
     }
 }
 
@@ -1051,16 +1051,16 @@ void printlist2(void) {
 
 void printlist0(void) {
   v.type = 1;
-  v.an = 120;
-  v.al = 38 + 10;
+  v.w = 120;
+  v.h = 38 + 10;
   v.title = (byte *)v_title;
   v.paint_handler = printlist1;
   v.click_handler = printlist2;
-  _button(100, 7, v.al - 14, 0);
-  _button(101, v.an - 8, v.al - 14, 2);
+  _button(100, 7, v.h - 14, 0);
+  _button(101, v.w - 8, v.h - 14, 2);
   _flag(448, 4, 12, &f_im);
   _flag(449, 4, 12 + 9, &f_ar);
-  _get(414, 16 + text_len(texts[449]), 12, v.an - 20 - text_len(texts[449]), (byte *)v_text, 15, 0,
+  _get(414, 16 + text_len(texts[449]), 12, v.w - 20 - text_len(texts[449]), (byte *)v_text, 15, 0,
        0);
   v_accept = 0;
 }
@@ -1185,43 +1185,43 @@ void FPG_create_thumbs(void) {
 void FPG_show_thumb(struct t_listboxbr *l, int num) {
   FPG *MiFPG = (FPG *)v.aux;
   byte *ptr = v.ptr;
-  int an = v.an / big2, al = v.al / big2;
+  int w = v.w / big2, h = v.h / big2;
   int px, py, x, y, ly, incy;
   char p[40];
 
   if (num >= l->first_visible && num < l->first_visible + l->lines * l->columns) {
-    px = (l->x + 1 + (l->an + 1) * ((num - l->first_visible) % l->columns)) * big2 +
-         (l->an * big2 - MiFPG->thumb[num].an) / 2;
+    px = (l->x + 1 + (l->w + 1) * ((num - l->first_visible) % l->columns)) * big2 +
+         (l->w * big2 - MiFPG->thumb[num].w) / 2;
 
-    if ((incy = ((l->al - 8) * big2 - MiFPG->thumb[num].al) / 2) < 0)
+    if ((incy = ((l->h - 8) * big2 - MiFPG->thumb[num].h) / 2) < 0)
       incy = 0;
 
-    py = (l->y + 1 + (l->al + 1) * ((num - l->first_visible) / l->columns)) * big2 + incy;
+    py = (l->y + 1 + (l->h + 1) * ((num - l->first_visible) / l->columns)) * big2 + incy;
 
-    ly = (l->y + (l->al + 1) * ((num - l->first_visible) / l->columns) + l->al - 8) * big2;
+    ly = (l->y + (l->h + 1) * ((num - l->first_visible) / l->columns) + l->h - 8) * big2;
 
     if (MiFPG->thumb_on && MiFPG->thumb[num].ptr != NULL && MiFPG->thumb[num].status == 0) {
-      for (y = 0; y < MiFPG->thumb[num].al; y++)
-        for (x = 0; x < MiFPG->thumb[num].an; x++)
+      for (y = 0; y < MiFPG->thumb[num].h; y++)
+        for (x = 0; x < MiFPG->thumb[num].w; x++)
 
           if (py + y > ly) {
             if (!MiFPG->thumb[num].tagged)
-              v.ptr[(py + y) * v.an + (px + x)] =
-                  *(ghost + c0 * 256 + MiFPG->thumb[num].ptr[y * MiFPG->thumb[num].an + x]);
+              v.ptr[(py + y) * v.w + (px + x)] =
+                  *(ghost + c0 * 256 + MiFPG->thumb[num].ptr[y * MiFPG->thumb[num].w + x]);
           } else
-            v.ptr[(py + y) * v.an + (px + x)] = MiFPG->thumb[num].ptr[y * MiFPG->thumb[num].an + x];
+            v.ptr[(py + y) * v.w + (px + x)] = MiFPG->thumb[num].ptr[y * MiFPG->thumb[num].w + x];
     }
 
-    px -= (l->an * big2 - MiFPG->thumb[num].an) / 2;
+    px -= (l->w * big2 - MiFPG->thumb[num].w) / 2;
     py -= incy;
     px /= big2;
     py /= big2;
 
     if (MiFPG->thumb[num].ptr == NULL && MiFPG->thumb[num].status == -1) {
-      wput(ptr, an, al, px + (l->an - 21) / 2, py + 1, 60);
+      wput(ptr, w, h, px + (l->w - 21) / 2, py + 1, 60);
     }
 
-    py += l->al - 1;
+    py += l->h - 1;
     div_strcpy(p, sizeof(p), l->list + l->item_width * num);
     if (MiFPG->thumb_on)
       p[5] = 0;
@@ -1231,12 +1231,12 @@ void FPG_show_thumb(struct t_listboxbr *l, int num) {
     else
       x = c3;
 
-    if (text_len((byte *)p) < l->an - 2 && MiFPG->thumb_on) {
-      wwrite(ptr, an, al, px + l->an / 2 + 1, py, 7, (byte *)p, c0);
-      wwrite(ptr, an, al, px + l->an / 2, py, 7, (byte *)p, x);
+    if (text_len((byte *)p) < l->w - 2 && MiFPG->thumb_on) {
+      wwrite(ptr, w, h, px + l->w / 2 + 1, py, 7, (byte *)p, c0);
+      wwrite(ptr, w, h, px + l->w / 2, py, 7, (byte *)p, x);
     } else {
-      wwrite_in_box(ptr, an, px + l->an - 1, al, px + 2, py, 6, (byte *)p, c0);
-      wwrite_in_box(ptr, an, px + l->an - 1, al, px + 1, py, 6, (byte *)p, x);
+      wwrite_in_box(ptr, w, px + l->w - 1, h, px + 2, py, 6, (byte *)p, c0);
+      wwrite_in_box(ptr, w, px + l->w - 1, h, px + 1, py, 6, (byte *)p, x);
     }
 
     v.redraw = 1;
@@ -1246,37 +1246,37 @@ void FPG_show_thumb(struct t_listboxbr *l, int num) {
 void FPG_paint_listbox_br(struct t_listboxbr *l) {
   FPG *MiFPG = (FPG *)v.aux;
   byte *ptr = v.ptr;
-  int an = v.an / big2, al = v.al / big2;
+  int w = v.w / big2, h = v.h / big2;
   int n, y, x;
 
   color_tag = c_b_low;
 
   for (y = 0; y < l->lines; y++)
     for (x = 0; x < l->columns; x++) {
-      wbox(ptr, an, al, c1, l->x + (x * (l->an + 1)) + 1, l->y + (y * (l->al + 1)) + 1, l->an,
-           l->al - 8);
+      wbox(ptr, w, h, c1, l->x + (x * (l->w + 1)) + 1, l->y + (y * (l->h + 1)) + 1, l->w,
+           l->h - 8);
 
       if (MiFPG->thumb[l->first_visible + y * l->columns + x].tagged)
-        wbox(ptr, an, al, color_tag, l->x + (x * (l->an + 1)) + 1,
-             l->y + (y * (l->al + 1)) + 1 + l->al - 8, l->an, 8);
+        wbox(ptr, w, h, color_tag, l->x + (x * (l->w + 1)) + 1,
+             l->y + (y * (l->h + 1)) + 1 + l->h - 8, l->w, 8);
       else
-        wbox(ptr, an, al, c01, l->x + (x * (l->an + 1)) + 1,
-             l->y + (y * (l->al + 1)) + 1 + l->al - 8, l->an, 8);
+        wbox(ptr, w, h, c01, l->x + (x * (l->w + 1)) + 1,
+             l->y + (y * (l->h + 1)) + 1 + l->h - 8, l->w, 8);
     }
 
-  if (wmouse_in(l->x, l->y, (l->an + 1) * l->columns, (l->al + 1) * l->lines)) { // Calculate zone
-    l->zone = ((mouse_x - v.x) / big2 - l->x) / (l->an + 1) +
-              (((mouse_y - v.y) / big2 - l->y) / (l->al + 1)) * l->columns;
+  if (wmouse_in(l->x, l->y, (l->w + 1) * l->columns, (l->h + 1) * l->lines)) { // Calculate zone
+    l->zone = ((mouse_x - v.x) / big2 - l->x) / (l->w + 1) +
+              (((mouse_y - v.y) / big2 - l->y) / (l->h + 1)) * l->columns;
 
     if (l->zone >= l->total_items - l->first_visible || l->zone >= l->lines * l->columns)
       l->zone = 1;
     else
       l->zone += 10;
-  } else if (wmouse_in(l->x + (l->an + 1) * l->columns, l->y, 9, 9))
+  } else if (wmouse_in(l->x + (l->w + 1) * l->columns, l->y, 9, 9))
     l->zone = 2;
-  else if (wmouse_in(l->x + (l->an + 1) * l->columns, l->y + (l->al + 1) * l->lines - 8, 9, 9))
+  else if (wmouse_in(l->x + (l->w + 1) * l->columns, l->y + (l->h + 1) * l->lines - 8, 9, 9))
     l->zone = 3;
-  else if (wmouse_in(l->x + (l->an + 1) * l->columns, l->y + 9, 9, (l->al + 1) * l->lines - 17))
+  else if (wmouse_in(l->x + (l->w + 1) * l->columns, l->y + 9, 9, (l->h + 1) * l->lines - 17))
     l->zone = 4;
   else
     l->zone = 0;
@@ -1292,32 +1292,32 @@ void FPG_paint_listbox_br(struct t_listboxbr *l) {
 
 void FPG_paint_slider_br(struct t_listboxbr *l) {
   byte *ptr = v.ptr;
-  int an = v.an, al = v.al;
+  int w = v.w, h = v.h;
   if (big) {
-    an /= 2;
-    al /= 2;
+    w /= 2;
+    h /= 2;
   }
 
-  wbox(ptr, an, al, c2, l->x + (l->an + 1) * l->columns + 1, l->y + 9, 7,
-       (l->al + 1) * l->lines - 17);
+  wbox(ptr, w, h, c2, l->x + (l->w + 1) * l->columns + 1, l->y + 9, 7,
+       (l->h + 1) * l->lines - 17);
 
   if (l->slide > l->s0)
-    wbox(ptr, an, al, c0, l->x + (l->an + 1) * l->columns + 1, l->slide - 1, 7, 1);
+    wbox(ptr, w, h, c0, l->x + (l->w + 1) * l->columns + 1, l->slide - 1, 7, 1);
 
   if (l->slide < l->s1)
-    wbox(ptr, an, al, c0, l->x + (l->an + 1) * l->columns + 1, l->slide + 3, 7, 1);
+    wbox(ptr, w, h, c0, l->x + (l->w + 1) * l->columns + 1, l->slide + 3, 7, 1);
 
-  wput(ptr, an, al, l->x + (l->an + 1) * l->columns + 1, l->slide, 43);
+  wput(ptr, w, h, l->x + (l->w + 1) * l->columns + 1, l->slide, 43);
 }
 
 void FPG_create_listbox_br(struct t_listboxbr *l) {
   byte *ptr = v.ptr;
-  int an = v.an / big2, al = v.al / big2;
+  int w = v.w / big2, h = v.h / big2;
   int x, y;
 
   if (!l->created) {
     l->slide = l->s0 = l->y + 9;
-    l->s1 = l->y + (l->al * l->lines + l->lines + 1) - 12;
+    l->s1 = l->y + (l->h * l->lines + l->lines + 1) - 12;
     l->buttons = 0;
     l->created = 1;
     l->zone = 0;
@@ -1327,18 +1327,18 @@ void FPG_create_listbox_br(struct t_listboxbr *l) {
       l->first_visible = 0;
   }
 
-  wbox(ptr, an, al, c1, l->x, l->y, (l->an + 1) * l->columns, (l->al + 1) * l->lines);
+  wbox(ptr, w, h, c1, l->x, l->y, (l->w + 1) * l->columns, (l->h + 1) * l->lines);
 
   for (y = 0; y < l->lines; y++)
     for (x = 0; x < l->columns; x++)
-      wrectangle(ptr, an, al, c0, l->x + (x * (l->an + 1)), l->y + (y * (l->al + 1)), l->an + 2,
-                 l->al + 2);
+      wrectangle(ptr, w, h, c0, l->x + (x * (l->w + 1)), l->y + (y * (l->h + 1)), l->w + 2,
+                 l->h + 2);
 
-  wrectangle(ptr, an, al, c0, l->x + (l->an + 1) * l->columns, l->y, 9, (l->al + 1) * l->lines + 1);
-  wrectangle(ptr, an, al, c0, l->x + (l->an + 1) * l->columns, l->y + 8, 9,
-             (l->al + 1) * l->lines - 15);
-  wput(ptr, an, al, l->x + (l->an + 1) * l->columns + 1, l->y + 1, -39);
-  wput(ptr, an, al, l->x + (l->an + 1) * l->columns + 1, l->y + (l->al + 1) * l->lines - 7, -40);
+  wrectangle(ptr, w, h, c0, l->x + (l->w + 1) * l->columns, l->y, 9, (l->h + 1) * l->lines + 1);
+  wrectangle(ptr, w, h, c0, l->x + (l->w + 1) * l->columns, l->y + 8, 9,
+             (l->h + 1) * l->lines - 15);
+  wput(ptr, w, h, l->x + (l->w + 1) * l->columns + 1, l->y + 1, -39);
+  wput(ptr, w, h, l->x + (l->w + 1) * l->columns + 1, l->y + (l->h + 1) * l->lines - 7, -40);
 
   FPG_paint_listbox_br(l);
   FPG_paint_slider_br(l);
@@ -1347,42 +1347,42 @@ void FPG_create_listbox_br(struct t_listboxbr *l) {
 void FPG_update_listbox_br(struct t_listboxbr *l) {
   FPG *MiFPG = (FPG *)v.aux;
   byte *ptr = v.ptr;
-  int an = v.an / big2, al = v.al / big2;
+  int w = v.w / big2, h = v.h / big2;
   int n, old_zona = l->zone, x, y;
   char p[40];
 
-  if (wmouse_in(l->x, l->y, (l->an + 1) * l->columns, (l->al + 1) * l->lines)) { // Calculate zone
-    l->zone = (wmouse_x - l->x) / (l->an + 1) + ((wmouse_y - l->y) / (l->al + 1)) * l->columns;
+  if (wmouse_in(l->x, l->y, (l->w + 1) * l->columns, (l->h + 1) * l->lines)) { // Calculate zone
+    l->zone = (wmouse_x - l->x) / (l->w + 1) + ((wmouse_y - l->y) / (l->h + 1)) * l->columns;
 
     if (l->zone >= l->total_items - l->first_visible || l->zone >= l->lines * l->columns)
       l->zone = 1;
     else
       l->zone += 10;
 
-  } else if (wmouse_in(l->x + (l->an + 1) * l->columns, l->y, 9, 9))
+  } else if (wmouse_in(l->x + (l->w + 1) * l->columns, l->y, 9, 9))
     l->zone = 2;
 
-  else if (wmouse_in(l->x + (l->an + 1) * l->columns, l->y + (l->al + 1) * l->lines - 8, 9, 9))
+  else if (wmouse_in(l->x + (l->w + 1) * l->columns, l->y + (l->h + 1) * l->lines - 8, 9, 9))
     l->zone = 3;
 
-  else if (wmouse_in(l->x + (l->an + 1) * l->columns, l->y + 9, 9, (l->al + 1) * l->lines - 17))
+  else if (wmouse_in(l->x + (l->w + 1) * l->columns, l->y + 9, 9, (l->h + 1) * l->lines - 17))
     l->zone = 4;
   else
     l->zone = 0;
 
   if (old_zona != l->zone)
     if (old_zona >= 10) { // Unhighlight zone
-      x = l->x + 1 + ((old_zona - 10) % l->columns) * (l->an + 1);
-      y = l->y + l->al + ((old_zona - 10) / l->columns) * (l->al + 1);
+      x = l->x + 1 + ((old_zona - 10) % l->columns) * (l->w + 1);
+      y = l->y + l->h + ((old_zona - 10) / l->columns) * (l->h + 1);
       div_strcpy(p, sizeof(p), l->list + l->item_width * (l->first_visible + old_zona - 10));
 
       if (MiFPG->thumb_on)
         p[5] = 0;
 
-      if (text_len((byte *)p) < l->an - 2 && MiFPG->thumb_on) {
-        wwrite(ptr, an, al, x + l->an / 2, y, 7, (byte *)p, c3);
+      if (text_len((byte *)p) < l->w - 2 && MiFPG->thumb_on) {
+        wwrite(ptr, w, h, x + l->w / 2, y, 7, (byte *)p, c3);
       } else {
-        wwrite_in_box(ptr, an, x + l->an - 1, al, x + 1, y, 6, (byte *)p, c3);
+        wwrite_in_box(ptr, w, x + l->w - 1, h, x + 1, y, 6, (byte *)p, c3);
       }
       v.redraw = 1;
     }
@@ -1404,11 +1404,11 @@ void FPG_update_listbox_br(struct t_listboxbr *l) {
       //---
     }
     //---
-    wput(ptr, an, al, l->x + (l->an + 1) * l->columns + 1, l->y + 1, -41);
+    wput(ptr, w, h, l->x + (l->w + 1) * l->columns + 1, l->y + 1, -41);
     l->buttons |= 1;
     v.redraw = 1;
   } else if (l->buttons & 1) {
-    wput(ptr, an, al, l->x + (l->an + 1) * l->columns + 1, l->y + 1, -39);
+    wput(ptr, w, h, l->x + (l->w + 1) * l->columns + 1, l->y + 1, -39);
     l->buttons ^= 1;
     v.redraw = 1;
   }
@@ -1432,12 +1432,12 @@ void FPG_update_listbox_br(struct t_listboxbr *l) {
       //---
     }
     //---
-    wput(ptr, an, al, l->x + (l->an + 1) * l->columns + 1, l->y + (l->al + 1) * l->lines - 7, -42);
+    wput(ptr, w, h, l->x + (l->w + 1) * l->columns + 1, l->y + (l->h + 1) * l->lines - 7, -42);
 
     l->buttons |= 2;
     v.redraw = 1;
   } else if (l->buttons & 2) {
-    wput(ptr, an, al, l->x + (l->an + 1) * l->columns + 1, l->y + (l->al + 1) * l->lines - 7, -40);
+    wput(ptr, w, h, l->x + (l->w + 1) * l->columns + 1, l->y + (l->h + 1) * l->lines - 7, -40);
     l->buttons ^= 2;
     v.redraw = 1;
   }
@@ -1483,17 +1483,17 @@ void FPG_update_listbox_br(struct t_listboxbr *l) {
 
   if (old_zona != l->zone)
     if (l->zone >= 10) { // Highlight zone
-      x = l->x + 1 + ((l->zone - 10) % l->columns) * (l->an + 1);
-      y = l->y + l->al + ((l->zone - 10) / l->columns) * (l->al + 1);
+      x = l->x + 1 + ((l->zone - 10) % l->columns) * (l->w + 1);
+      y = l->y + l->h + ((l->zone - 10) / l->columns) * (l->h + 1);
       div_strcpy(p, sizeof(p), l->list + l->item_width * (l->first_visible + l->zone - 10));
 
       if (MiFPG->thumb_on)
         p[5] = 0;
 
-      if (text_len((byte *)p) < l->an - 2 && MiFPG->thumb_on) {
-        wwrite(ptr, an, al, x + l->an / 2, y, 7, (byte *)p, c4);
+      if (text_len((byte *)p) < l->w - 2 && MiFPG->thumb_on) {
+        wwrite(ptr, w, h, x + l->w / 2, y, 7, (byte *)p, c4);
       } else {
-        wwrite_in_box(ptr, an, x + l->an - 1, al, x + 1, y, 6, (byte *)p, c4);
+        wwrite_in_box(ptr, w, x + l->w - 1, h, x + 1, y, 6, (byte *)p, c4);
       }
       v.redraw = 1;
     }
@@ -1567,8 +1567,8 @@ void create_thumb_FPG(struct t_listboxbr *l) {
         fseek(f, MiFPG->OffsGrf[MiFPG->DesIndex[num]], SEEK_SET);
         fpg_read_header(&(MiFPG->MiHeadFPG), f);
         fseek(f, MiFPG->MiHeadFPG.nPuntos * 4, SEEK_CUR);
-        MiFPG->thumb[num].an = MiFPG->MiHeadFPG.Ancho;
-        MiFPG->thumb[num].al = MiFPG->MiHeadFPG.Alto;
+        MiFPG->thumb[num].w = MiFPG->MiHeadFPG.Ancho;
+        MiFPG->thumb[num].h = MiFPG->MiHeadFPG.Alto;
         MiFPG->thumb[num].filesize = MiFPG->MiHeadFPG.Ancho * MiFPG->MiHeadFPG.Alto;
 
         if (MiFPG->thumb[num].filesize <= 2048)
@@ -1652,8 +1652,8 @@ void create_thumb_FPG(struct t_listboxbr *l) {
     if (estado == 2 && MiFPG->thumb[num].status == MiFPG->thumb[num].filesize &&
         abs(_omx - mouse_x) + abs(_omy - mouse_y) + mouse_b + ascii == 0) {
       MiFPG->thumb[num].status = 0;
-      man = MiFPG->thumb[num].an;
-      mal = MiFPG->thumb[num].al;
+      man = MiFPG->thumb[num].w;
+      mal = MiFPG->thumb[num].h;
       temp = (byte *)MiFPG->thumb[num].ptr;
 
       // Create the thumbnail
@@ -1666,32 +1666,32 @@ void create_thumb_FPG(struct t_listboxbr *l) {
         else
           coefredx = coefredy;
 
-        MiFPG->thumb[num].an = (float)man / coefredx + 0.5;
-        MiFPG->thumb[num].al = (float)mal / coefredy + 0.5;
-        MiFPG->thumb[num].an &= -2;
-        MiFPG->thumb[num].al &= -2;
+        MiFPG->thumb[num].w = (float)man / coefredx + 0.5;
+        MiFPG->thumb[num].h = (float)mal / coefredy + 0.5;
+        MiFPG->thumb[num].w &= -2;
+        MiFPG->thumb[num].h &= -2;
 
-        if (MiFPG->thumb[num].an < 2)
-          MiFPG->thumb[num].an = 2;
+        if (MiFPG->thumb[num].w < 2)
+          MiFPG->thumb[num].w = 2;
 
-        if (MiFPG->thumb[num].al < 2)
-          MiFPG->thumb[num].al = 2;
+        if (MiFPG->thumb[num].h < 2)
+          MiFPG->thumb[num].h = 2;
 
-        if (coefredx * (float)(MiFPG->thumb[num].an - 1) >= (float)man)
-          coefredx = (float)(man - 1) / (float)(MiFPG->thumb[num].an - 1);
+        if (coefredx * (float)(MiFPG->thumb[num].w - 1) >= (float)man)
+          coefredx = (float)(man - 1) / (float)(MiFPG->thumb[num].w - 1);
 
-        if (coefredy * (float)(MiFPG->thumb[num].al - 1) >= (float)mal)
-          coefredy = (float)(mal - 1) / (float)(MiFPG->thumb[num].al - 1);
+        if (coefredy * (float)(MiFPG->thumb[num].h - 1) >= (float)mal)
+          coefredy = (float)(mal - 1) / (float)(MiFPG->thumb[num].h - 1);
 
-        if ((temp2 = (byte *)malloc(MiFPG->thumb[num].an * MiFPG->thumb[num].al)) != NULL) {
-          memset(temp2, 0, MiFPG->thumb[num].an * MiFPG->thumb[num].al);
+        if ((temp2 = (byte *)malloc(MiFPG->thumb[num].w * MiFPG->thumb[num].h)) != NULL) {
+          memset(temp2, 0, MiFPG->thumb[num].w * MiFPG->thumb[num].h);
           a = (float)0.0;
 
-          for (y = 0; y < MiFPG->thumb[num].al; y++) {
+          for (y = 0; y < MiFPG->thumb[num].h; y++) {
             b = (float)0.0;
 
-            for (x = 0; x < MiFPG->thumb[num].an; x++) {
-              temp2[y * MiFPG->thumb[num].an + x] = temp[((memptrsize)a) * man + (memptrsize)b];
+            for (x = 0; x < MiFPG->thumb[num].w; x++) {
+              temp2[y * MiFPG->thumb[num].w + x] = temp[((memptrsize)a) * man + (memptrsize)b];
               b += coefredx;
             }
             a += coefredy;
@@ -1700,20 +1700,20 @@ void create_thumb_FPG(struct t_listboxbr *l) {
           free(temp);
 
           if ((MiFPG->thumb[num].ptr =
-                   (char *)malloc((MiFPG->thumb[num].an * MiFPG->thumb[num].al) / 4)) != NULL) {
-            for (y = 0; y < MiFPG->thumb[num].al; y += 2) {
-              for (x = 0; x < MiFPG->thumb[num].an; x += 2) {
-                n = *(ghost + temp2[x + y * MiFPG->thumb[num].an] * 256 +
-                      temp2[x + 1 + y * MiFPG->thumb[num].an]);
-                m = *(ghost + temp2[x + (y + 1) * MiFPG->thumb[num].an] * 256 +
-                      temp2[x + 1 + (y + 1) * MiFPG->thumb[num].an]);
-                MiFPG->thumb[num].ptr[x / 2 + (y / 2) * (MiFPG->thumb[num].an / 2)] =
+                   (char *)malloc((MiFPG->thumb[num].w * MiFPG->thumb[num].h) / 4)) != NULL) {
+            for (y = 0; y < MiFPG->thumb[num].h; y += 2) {
+              for (x = 0; x < MiFPG->thumb[num].w; x += 2) {
+                n = *(ghost + temp2[x + y * MiFPG->thumb[num].w] * 256 +
+                      temp2[x + 1 + y * MiFPG->thumb[num].w]);
+                m = *(ghost + temp2[x + (y + 1) * MiFPG->thumb[num].w] * 256 +
+                      temp2[x + 1 + (y + 1) * MiFPG->thumb[num].w]);
+                MiFPG->thumb[num].ptr[x / 2 + (y / 2) * (MiFPG->thumb[num].w / 2)] =
                     *(ghost + n * 256 + m);
               }
             }
 
-            MiFPG->thumb[num].an /= 2;
-            MiFPG->thumb[num].al /= 2;
+            MiFPG->thumb[num].w /= 2;
+            MiFPG->thumb[num].h /= 2;
           } else {
             MiFPG->thumb[num].ptr = NULL;
             MiFPG->thumb[num].status = -1;
@@ -1742,7 +1742,7 @@ void create_thumb_FPG(struct t_listboxbr *l) {
 
 void MAPtoFPG(struct tmapa *mapa) {
   int x, y;
-  int ancho, alto;
+  int width, height;
   int pos;
   int cod = 1;
   byte *imagen;
@@ -1765,28 +1765,28 @@ void MAPtoFPG(struct tmapa *mapa) {
       pos = y * mapa->map_width + x;
 
       if (imagen[pos]) {
-        for (ancho = 0; ancho < mapa->map_width - x; ancho++) {
-          if (!imagen[pos + ancho])
+        for (width = 0; width < mapa->map_width - x; width++) {
+          if (!imagen[pos + width])
             break;
-          imagen[pos + ancho] = 0;
+          imagen[pos + width] = 0;
         }
 
         imagen[pos] = 1;
-        for (alto = 0; alto < mapa->map_height - y; alto++) {
-          if (!imagen[pos + alto * mapa->map_width])
+        for (height = 0; height < mapa->map_height - y; height++) {
+          if (!imagen[pos + height * mapa->map_width])
             break;
 
-          imagen[pos + alto * mapa->map_width] = 0;
+          imagen[pos + height * mapa->map_width] = 0;
         }
 
-        if ((ancho - 2) * (alto - 2) <= 0) {
+        if ((width - 2) * (height - 2) <= 0) {
           free(imagen);
           v_text = (char *)texts[551];
           show_dialog(err0);
           return;
         }
 
-        GetGrafMAP(mapa, imagen, x + 1, y + 1, ancho - 2, alto - 2, cod++);
+        GetGrafMAP(mapa, imagen, x + 1, y + 1, width - 2, height - 2, cod++);
       }
     }
   }
@@ -1794,7 +1794,7 @@ void MAPtoFPG(struct tmapa *mapa) {
   free(imagen);
 }
 
-void GetGrafMAP(struct tmapa *mapa, byte *imagen, int x, int y, int ancho, int alto, int cod) {
+void GetGrafMAP(struct tmapa *mapa, byte *imagen, int x, int y, int width, int height, int cod) {
   FPG *MiFPG = (FPG *)v.aux;
   int pos, index = 0;
   int scan_x, scan_y;
@@ -1802,14 +1802,14 @@ void GetGrafMAP(struct tmapa *mapa, byte *imagen, int x, int y, int ancho, int a
   char str_desc[40];
   char str_file[13];
 
-  if ((buffer = (byte *)malloc(ancho * alto)) == NULL) {
+  if ((buffer = (byte *)malloc(width * height)) == NULL) {
     v_text = (char *)texts[45];
     show_dialog(err0);
     return;
   }
 
-  for (scan_y = 0; scan_y < alto; scan_y++) {
-    for (scan_x = 0; scan_x < ancho; scan_x++) {
+  for (scan_y = 0; scan_y < height; scan_y++) {
+    for (scan_x = 0; scan_x < width; scan_x++) {
       pos = (y + scan_y) * mapa->map_width + x + scan_x;
       buffer[index++] = imagen[pos];
       imagen[pos] = 0;
@@ -1820,7 +1820,7 @@ void GetGrafMAP(struct tmapa *mapa, byte *imagen, int x, int y, int ancho, int a
   }
 
   pos = (y + scan_y) * mapa->map_width + x;
-  memset(&imagen[pos], 0, ancho + 1);
+  memset(&imagen[pos], 0, width + 1);
 
   while (MiFPG->OffsGrf[cod])
     cod++;
@@ -1840,7 +1840,7 @@ void GetGrafMAP(struct tmapa *mapa, byte *imagen, int x, int y, int ancho, int a
   }
   DIV_SPRINTF(str_desc, "%s%d%s%s", texts[499], cod, texts[500], mapa->filename);
 
-  fpg_add(MiFPG, cod, str_desc, str_file, ancho, alto, 0, NULL, (char *)buffer, 0, 0);
+  fpg_add(MiFPG, cod, str_desc, str_file, width, height, 0, NULL, (char *)buffer, 0, 0);
 
   free(buffer);
 }
@@ -1850,7 +1850,7 @@ void GetGrafMAP(struct tmapa *mapa, byte *imagen, int x, int y, int ancho, int a
 //-----------------------------------------------------------------------------
 
 struct {
-  int x, y, an, al;
+  int x, y, w, h;
 } lgraf[1000];
 
 int lnum = 0;
@@ -1880,19 +1880,19 @@ void FPGtoMAP(FPG *MiFPG) {
     fread(&MiHeadFPG.Ancho, 1, 4, fpg);
     fread(&MiHeadFPG.Alto, 1, 4, fpg);
 
-    lgraf[num].an = MiHeadFPG.Ancho + 2;
-    lgraf[num].al = MiHeadFPG.Alto + 2;
+    lgraf[num].w = MiHeadFPG.Ancho + 2;
+    lgraf[num].h = MiHeadFPG.Alto + 2;
 
-    if (lmapan < lgraf[num].an)
-      lmapan = lgraf[num].an;
+    if (lmapan < lgraf[num].w)
+      lmapan = lgraf[num].w;
     num++;
   }
 
   for (lnum = 0; lnum < num; lnum++) {
     place_map();
 
-    if (lmapal < lgraf[lnum].y + lgraf[lnum].al) {
-      lmapal = lgraf[lnum].y + lgraf[lnum].al;
+    if (lmapal < lgraf[lnum].y + lgraf[lnum].h) {
+      lmapal = lgraf[lnum].y + lgraf[lnum].h;
     }
   }
 
@@ -1916,7 +1916,7 @@ void FPGtoMAP(FPG *MiFPG) {
     if (MiHeadFPG.nPuntos != 0)
       fseek(fpg, MiHeadFPG.nPuntos * 4, SEEK_CUR);
 
-    if ((FPGimagen = (byte *)malloc((lgraf[num].an - 2) * (lgraf[num].al - 2))) == NULL) {
+    if ((FPGimagen = (byte *)malloc((lgraf[num].w - 2) * (lgraf[num].h - 2))) == NULL) {
       fclose(fpg);
       free(FPGmap);
       v_text = (char *)texts[45];
@@ -1924,8 +1924,8 @@ void FPGtoMAP(FPG *MiFPG) {
       return;
     }
 
-    if (fread(FPGimagen, 1, (lgraf[num].an - 2) * (lgraf[num].al - 2), fpg) !=
-        (lgraf[num].an - 2) * (lgraf[num].al - 2)) {
+    if (fread(FPGimagen, 1, (lgraf[num].w - 2) * (lgraf[num].h - 2), fpg) !=
+        (lgraf[num].w - 2) * (lgraf[num].h - 2)) {
       fclose(fpg);
       free(FPGmap);
       free(FPGimagen);
@@ -1957,14 +1957,14 @@ void PutGrafMAP(byte *imagen, byte *mapa, int num) {
   int pos_im, pos_ma;
 
   // Top and bottom border lines
-  memset(&mapa[lgraf[num].y * lmapan + lgraf[num].x], c4, lgraf[num].an);
-  memset(&mapa[(lgraf[num].y + lgraf[num].al - 1) * lmapan + lgraf[num].x], c4, lgraf[num].an);
+  memset(&mapa[lgraf[num].y * lmapan + lgraf[num].x], c4, lgraf[num].w);
+  memset(&mapa[(lgraf[num].y + lgraf[num].h - 1) * lmapan + lgraf[num].x], c4, lgraf[num].w);
 
-  for (y = 0; y < lgraf[num].al - 2; y++) {
+  for (y = 0; y < lgraf[num].h - 2; y++) {
     mapa[(y + lgraf[num].y + 1) * lmapan + lgraf[num].x] = c4; // Left column
 
-    for (x = 0; x < lgraf[num].an - 2; x++) {
-      pos_im = y * (lgraf[num].an - 2) + x;
+    for (x = 0; x < lgraf[num].w - 2; x++) {
+      pos_im = y * (lgraf[num].w - 2) + x;
       pos_ma = (y + lgraf[num].y + 1) * lmapan + x + lgraf[num].x + 1;
       mapa[pos_ma] = imagen[pos_im]; // Graphic data
     }
@@ -1989,7 +1989,7 @@ void place_map(void) { // Place graphic lnum
 
   // First create in scan[] a list of possible heights (0 + window bottoms)
   for (n = 0; n < lnum; n++) {
-    y = lgraf[n].y + lgraf[n].al + 1;
+    y = lgraf[n].y + lgraf[n].h + 1;
 
     x = 0;
 
@@ -2013,14 +2013,14 @@ void place_map(void) { // Place graphic lnum
     do {
       x = new_x;
       for (m = 0; m < lnum; m++) {
-        if (collides_with_map(m, x - 1, y - 1, lgraf[lnum].an + 2, lgraf[lnum].al + 2)) {
-          if (lgraf[m].x + lgraf[m].an >= new_x)
-            new_x = lgraf[m].x + lgraf[m].an + 1;
+        if (collides_with_map(m, x - 1, y - 1, lgraf[lnum].w + 2, lgraf[lnum].h + 2)) {
+          if (lgraf[m].x + lgraf[m].w >= new_x)
+            new_x = lgraf[m].x + lgraf[m].w + 1;
         }
       }
-    } while (new_x != x && new_x + lgraf[lnum].an <= lmapan);
+    } while (new_x != x && new_x + lgraf[lnum].w <= lmapan);
 
-    if (new_x + lgraf[lnum].an <= lmapan) {
+    if (new_x + lgraf[lnum].w <= lmapan) {
       lgraf[lnum].x = new_x;
       lgraf[lnum].y = y;
       break;
@@ -2028,9 +2028,9 @@ void place_map(void) { // Place graphic lnum
   }
 }
 
-int collides_with_map(int n, int x, int y, int an, int al) {
-  if (y < lgraf[n].y + lgraf[n].al && y + al > lgraf[n].y && x < lgraf[n].x + lgraf[n].an &&
-      x + an > lgraf[n].x)
+int collides_with_map(int n, int x, int y, int w, int h) {
+  if (y < lgraf[n].y + lgraf[n].h && y + h > lgraf[n].y && x < lgraf[n].x + lgraf[n].w &&
+      x + w > lgraf[n].x)
     return (1);
   else
     return (0);
@@ -2125,11 +2125,11 @@ int select_file(void) {
 //-----------------------------------------------------------------------------
 
 void replace_FPG_1(void) {
-  int an = v.an / big2, al = v.al / big2;
+  int w = v.w / big2, h = v.h / big2;
   _show_items();
 
   if (v_text != NULL)
-    wwrite(v.ptr, an, al, an / 2, 12, 1, (byte *)v_text, c3);
+    wwrite(v.ptr, w, h, w / 2, 12, 1, (byte *)v_text, c3);
 }
 
 void replace_FPG_2(void) {
@@ -2155,29 +2155,29 @@ void replace_FPG_0(void) {
   int x2, x3;
 
   v.type = 1;
-  v.an = text_len(texts[510]) + text_len(texts[511]) + text_len(texts[101]) + 16;
+  v.w = text_len(texts[510]) + text_len(texts[511]) + text_len(texts[101]) + 16;
   x2 = 7 + text_len(texts[510] + 1) + 10;
   x3 = x2 + text_len(texts[511] + 1) + 10;
 
   if (v_title != NULL) {
     v.title = (byte *)v_title;
-    if (text_len((byte *)v_title) + 14 > v.an)
-      v.an = text_len((byte *)v_title) + 14;
+    if (text_len((byte *)v_title) + 14 > v.w)
+      v.w = text_len((byte *)v_title) + 14;
   }
 
   if (v_text != NULL) {
-    v.al = 38;
-    if (text_len((byte *)v_text) + 6 > v.an)
-      v.an = text_len((byte *)v_text) + 6;
+    v.h = 38;
+    if (text_len((byte *)v_text) + 6 > v.w)
+      v.w = text_len((byte *)v_text) + 6;
   } else
-    v.al = 29;
+    v.h = 29;
 
   v.paint_handler = replace_FPG_1;
   v.click_handler = replace_FPG_2;
 
-  _button(510, 7, v.al - 14, 0);  // Replace
-  _button(511, x2, v.al - 14, 0); // Add
-  _button(101, x3, v.al - 14, 0); // Cancel
+  _button(510, 7, v.h - 14, 0);  // Replace
+  _button(511, x2, v.h - 14, 0); // Add
+  _button(101, x3, v.h - 14, 0); // Cancel
 
   v_accept = 3;
 }

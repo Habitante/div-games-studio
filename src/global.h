@@ -90,9 +90,9 @@ void call(const voidReturnType func); // void funcion(void); int n=(int)funcion;
 
 
 #define max_archivos    512 // ------------------------------- File listbox
-#define an_archivo      (255)
+#define w_archivo      (255)
 #define max_directorios 2048
-#define an_directorio   (255)
+#define w_directorio   (255)
 
 
 #define swap(a, b) \
@@ -124,9 +124,9 @@ void update_box(int, int, int, int);
 void update_background(void);
 void flush_window(int);
 void flush_copy(void);
-void place_window(int flag, int *_x, int *_y, int an, int al);
-void on_window_moved(int x, int y, int an, int al);
-void _get(int text_id, int x, int y, int an, byte *buf, int lon_buf, int r0, int r1);
+void place_window(int flag, int *_x, int *_y, int w, int h);
+void on_window_moved(int x, int y, int w, int h);
+void _get(int text_id, int x, int y, int w, byte *buf, int lon_buf, int r0, int r1);
 void _button(int text_id, int x, int y, int centro);
 void _flag(int text_id, int x, int y, int *variable);
 void _show_items();
@@ -135,11 +135,11 @@ void _select_new_item(int n);
 void _reselect_item(void);
 int windows_collide(int a, int b);
 void maximize_window(void);
-void explode(int x, int y, int an, int al);
+void explode(int x, int y, int w, int h);
 void activate(void);
 void DaniDel(char *name);
 
-void window_surface(int an, int al, byte type);
+void window_surface(int w, int h, byte type);
 
 ///////////////////////////////////////////////////////////////////////////////
 //     Functions exported by DIVBASIC (divbasic.c)
@@ -333,7 +333,7 @@ GLOBAL_DATA int SoundError;
 GLOBAL_DATA int CopyDesktop;
 GLOBAL_DATA int compilemode;
 
-int an_setup(void);
+int w_setup(void);
 void Save_Cfgbin();
 void Load_Cfgbin();
 
@@ -362,18 +362,18 @@ void Tap_Setup0(void);
 //      Functions exported by DIVWINDO (divwindo.c)
 ///////////////////////////////////////////////////////////////////////////////
 
-void wgra(byte *dest, int dest_width, int dest_height, byte c, int x, int y, int an, int al);
-void wbox(byte *dest, int dest_width, int dest_height, byte c, int x, int y, int an, int al);
-void wresalta_box(byte *dest, int dest_width, int dest_height, int x, int y, int an, int al);
+void wgra(byte *dest, int dest_width, int dest_height, byte c, int x, int y, int w, int h);
+void wbox(byte *dest, int dest_width, int dest_height, byte c, int x, int y, int w, int h);
+void wresalta_box(byte *dest, int dest_width, int dest_height, int x, int y, int w, int h);
 void wbox_in_box(byte *dest, int dest_pitch, int dest_width, int dest_height, byte c, int x, int y,
-                 int an, int al);
-void wrectangle(byte *dest, int dest_width, int dest_height, byte c, int x, int y, int an, int al);
+                 int w, int h);
+void wrectangle(byte *dest, int dest_width, int dest_height, byte c, int x, int y, int w, int h);
 void wput(byte *dest, int dest_width, int dest_height, int x, int y, int n);
 void wput_in_box(byte *dest, int dest_pitch, int dest_width, int dest_height, int x, int y, int n);
-void wvolcado(byte *dest, int dest_width, int dest_height, byte *p, int x, int y, int an, int al,
+void blit_region(byte *dest, int dest_width, int dest_height, byte *p, int x, int y, int w, int h,
               int salta);
-void wvolcado_oscuro(byte *dest, int dest_width, int dest_height, byte *p, int x, int y, int an,
-                     int al, int salta);
+void blit_region_dark(byte *dest, int dest_width, int dest_height, byte *p, int x, int y, int w,
+                     int h, int salta);
 void wwrite(byte *dest, int dest_width, int dest_height, int x, int y, int centro, byte *ptr,
             byte c);
 void wwrite_in_box(byte *dest, int dest_pitch, int dest_width, int dest_height, int x, int y,
@@ -383,7 +383,7 @@ int char_len(char);
 void boton(int n, int x, int y, int centro, int color);
 int ratonboton(int n, int x, int y, int centro);
 
-void wline(char *ptr, int realan, int an, int al, int x0, int y0, int x1, int y1, char color);
+void wline(char *ptr, int realan, int w, int h, int x0, int y0, int x1, int y1, char color);
 
 ///////////////////////////////////////////////////////////////////////////////
 //      Functions exported by DIVLENGU (divlengu.c)
@@ -662,7 +662,7 @@ GLOBAL_DATA byte *graf_ptr, *graf[256]; // IDE environment graphics
 //GLOBAL_DATA
 struct tgraf_help {
   int offset;
-  int an, al;
+  int w, h;
   int ran, ral;
   byte *ptr;
 };
@@ -683,7 +683,7 @@ GLOBAL_DATA int current_mouse; // Mouse cursor graphic
 
 //GLOBAL_DATA
 struct tipo_undo {                    // Circular undo table
-  int start, end, x, y, an, al, mode; // start refers to *(undo+start)
+  int start, end, x, y, w, h, mode; // start refers to *(undo+start)
   int code;                           // Map identifier for this undo entry
 }; // mode=-1 if entry unused
 
@@ -729,7 +729,7 @@ struct t_item {
     struct {
       byte *text;
       byte *buffer;
-      int x, y, an, lon_buffer;
+      int x, y, w, lon_buffer;
       int r0, r1;
     } get;
     struct {
@@ -753,7 +753,7 @@ struct twindow {
   byte *name;     // Icon name
   byte *title;    // Title bar text
   voidReturnType paint_handler, click_handler, close_handler;
-  int x, y, an, al;              // Window position and dimensions
+  int x, y, w, h;              // Window position and dimensions
   int _x, _y, _an, _al;          // Position saved when minimized
   byte *ptr;                     // Window buffer
   struct tmapa *mapa;            // Pointer to associated map struct
@@ -789,9 +789,9 @@ struct tmapa {
 };
 
 struct tprg {
-  int an, al;               // Width and height in characters of window
+  int w, h;               // Width and height in characters of window
   int old_x, old_y;         // Coordinates before maximizing
-  int old_an, old_al;       // Width and height before maximizing
+  int old_w, old_h;       // Width and height before maximizing
   char path[_MAX_PATH + 1]; // Path of associated file
   char filename[255];       // Associated filename
   byte *buffer;             // Buffer with loaded file
@@ -814,7 +814,7 @@ struct t_listbox {
   char *list;        // List pointer
   int item_width;    // Characters per item
   int visible_items; // Visible item count
-  int an, al;        // Text zone width in pixels
+  int w, h;        // Text zone width in pixels
   int first_visible; // First visible index (from 0)
   int total_items;   // Total item count (0 n/a)
   int s0, s1, slide; // Slide bar start, end, current position
@@ -829,7 +829,7 @@ struct t_listboxbr {
   int item_width; // Characters per item
   int columns;    // Number of columns in browser listbox
   int lines;      // Number of lines
-  int an, al;     // Pixel size of each cell
+  int w, h;     // Pixel size of each cell
 
   int first_visible; // First visible index (from 0)
   int total_items;   // Total item count (0 n/a)
@@ -1021,7 +1021,7 @@ GLOBAL_DATA byte *source_ptr;
 GLOBAL_DATA int source_len;
 GLOBAL_DATA int saved_esp;
 
-void inicializa_compilador(void);
+void init_compiler(void);
 void compile_program(void);
 void finaliza_compilador(void);
 
@@ -1103,7 +1103,7 @@ GLOBAL_DATA struct _gcolor *gradient_config;
 //-----------------------------------------------------------------------------
 
 typedef struct {
-  int an, al; // Width and height of the thumbnail
+  int w, h; // Width and height of the thumbnail
   char *ptr;  // ==NULL if the thumbnail has not started loading
   SDL_Surface *surfaceptr;
   int status;   // -1-Not an image, 0-Loaded, +N-Number of bytes read

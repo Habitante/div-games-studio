@@ -13,20 +13,20 @@ static time_t dtime;
 
 static void Show_Time(void) {
   byte *ptr = v.ptr;
-  int an, al;
+  int w, h;
   char cBuff[3];
   int Dig1, Dig2, Dig3, Dig4;
 
-  if (v.foreground != 2 || v.al > v._al) {
-    an = v.an;
-    al = v.al;
+  if (v.foreground != 2 || v.h > v._al) {
+    w = v.w;
+    h = v.h;
   } else {
-    an = v._an;
-    al = v._al;
+    w = v._an;
+    h = v._al;
   }
   if (big) {
-    an /= 2;
-    al /= 2;
+    w /= 2;
+    h /= 2;
   }
 
   time(&dtime);
@@ -43,44 +43,44 @@ static void Show_Time(void) {
   Dig4 = (cBuff[1] - '0') + 200;
 
   if (ORDig1 != Dig1) {
-    wput(ptr, an, al, 8, 14, Dig1);
+    wput(ptr, w, h, 8, 14, Dig1);
     v.redraw = 1;
     ORDig1 = Dig1;
   }
   if (ORDig2 != Dig2) {
-    wput(ptr, an, al, 15, 14, Dig2);
+    wput(ptr, w, h, 15, 14, Dig2);
     v.redraw = 1;
     ORDig2 = Dig2;
   }
   if (ORDig3 != Dig3) {
-    wput(ptr, an, al, 26, 14, Dig3);
+    wput(ptr, w, h, 26, 14, Dig3);
     v.redraw = 1;
     ORDig3 = Dig3;
   }
   if (ORDig4 != Dig4) {
-    wput(ptr, an, al, 33, 14, Dig4);
+    wput(ptr, w, h, 33, 14, Dig4);
     v.redraw = 1;
     ORDig4 = Dig4;
   }
 
   if (timeinfo->tm_sec % 2) {
-    wbox(ptr, an, al, c4, 23, 17, 1, 1);
-    wbox(ptr, an, al, c4, 23, 19, 1, 1);
+    wbox(ptr, w, h, c4, 23, 17, 1, 1);
+    wbox(ptr, w, h, c4, 23, 19, 1, 1);
   } else {
-    wbox(ptr, an, al, c2, 23, 17, 1, 1);
-    wbox(ptr, an, al, c2, 23, 19, 1, 1);
+    wbox(ptr, w, h, c2, 23, 17, 1, 1);
+    wbox(ptr, w, h, c2, 23, 19, 1, 1);
   }
   v.redraw = 1;
 }
 
 void Clock1(void) {
   byte *ptr = v.ptr;
-  int an = v.an, al = v.al;
+  int w = v.w, h = v.h;
   if (big) {
-    an /= 2;
-    al /= 2;
+    w /= 2;
+    h /= 2;
   }
-  wput(ptr, an, al, 2, 10, 218);
+  wput(ptr, w, h, 2, 10, 218);
   ORDig1 = -1;
   ORDig2 = -1;
   ORDig3 = -1;
@@ -96,8 +96,8 @@ void Clock3(void) {}
 
 void Clock0(void) {
   v.type = 4;
-  v.an = 47;
-  v.al = 30;
+  v.w = 47;
+  v.h = 30;
   v.title = texts[151];
   time(&dtime);
   timeinfo = localtime(&dtime);

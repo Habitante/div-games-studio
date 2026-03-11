@@ -56,8 +56,8 @@ void process_paint(int id, int n); // Id, ciclos
 
 int get_ticks(void);
 
-int tiempo_restore = 0;
-int tiempo_volcado = 0;
+int restore_time = 0;
+int blit_time = 0;
 
 int process_level = 0; // Track call/ret nesting (for debugger step)
 
@@ -441,8 +441,8 @@ void initialization(void) {
     }
   }
 
-  vvga_an = vga_width;
-  vvga_al = vga_height;
+  vvga_w = vga_width;
+  vvga_h = vga_height;
 
 
   setup_video_mode();
@@ -488,19 +488,19 @@ void initialization(void) {
   }
 
   ticks = 0;
-  reloj = 0;
-  ultimo_reloj = 0;
-  freloj = ireloj = 1000.0 / 24.0;
+  frame_clock = 0;
+  last_clock = 0;
+  fractional_clock = clock_interval = 1000.0 / 24.0;
   game_fps = dfps = 24;
-  max_saltos = 0;
+  max_frame_skips = 0;
 #ifdef __EMSCRIPTEN__
-  max_saltos = 0;
+  max_frame_skips = 0;
 #endif
 
 
   joy_timeout = 0;
 
-  nomitidos = 0;
+  num_skipped = 0;
 
 #ifdef DEBUG
   debugger_step = 0;
@@ -508,8 +508,8 @@ void initialization(void) {
   process_stoped = 0;
 #endif
 
-  saltar_volcado = 0;
-  volcados_saltados = 0;
+  skip_blit = 0;
+  blits_skipped = 0;
 
   init_sin_cos(); // Sine and cosine tables for mode-7
 
@@ -622,10 +622,10 @@ void system_font(void) {
   }
   last_c1 = 1;
 
-  f_i[0].ancho = 6;
-  f_i[0].espacio = 3;
-  f_i[0].espaciado = 0;
-  f_i[0].alto = 8;
+  f_i[0].width = 6;
+  f_i[0].spacing = 3;
+  f_i[0].letter_spacing = 0;
+  f_i[0].height = 8;
 }
 
 //-----------------------------------------------------------------------------
@@ -773,7 +773,7 @@ void is_fps(byte f) {}
 // Execute the next process
 //-----------------------------------------------------------------------------
 #ifdef DEBUG
-int oreloj;
+int profile_clock;
 #endif
 
 #ifndef DEBUG
@@ -788,7 +788,7 @@ inline
 
 #ifdef DEBUG
 
-  oreloj = get_ticks();
+  profile_clock = get_ticks();
 
   if (process_stoped) {
     id = ide = process_stoped;
@@ -865,7 +865,7 @@ next_process2:;
 #ifdef DEBUG
 
 void trace_process(void) {
-  oreloj = get_ticks();
+  profile_clock = get_ticks();
 
   ide = 0;
   max = 0x80000000;
@@ -945,7 +945,7 @@ float ffps = 24.0f;
 #ifdef DEBUG
 
 float ffps2 = 0.0f;
-int overall_reloj = 0;
+int overall_clock = 0;
 double game_ticks = 0.0f;
 double game_frames = 0.0f;
 
@@ -958,10 +958,10 @@ double game_frames = 0.0f;
  * flags so every live process is eligible for execution and painting.
  */
 void frame_start(void) {
-  int n, old_reloj;
+  int n, old_clock;
 
 #ifdef DEBUG
-  int oreloj;
+  int profile_clock;
 #endif
 
   ascii = 0;
@@ -1026,7 +1026,7 @@ void frame_start(void) {
   }
 
 #ifdef DEBUG
-  oreloj = get_ticks();
+  profile_clock = get_ticks();
 #endif
 
   // Eliminate dead processes
@@ -1036,33 +1036,33 @@ void frame_start(void) {
       kill_process(ide);
 
 #ifdef DEBUG
-  function_exec(255, get_ticks() - oreloj);
+  function_exec(255, get_ticks() - profile_clock);
 #endif
 
 #ifdef DEBUG
-  oreloj = get_ticks();
+  profile_clock = get_ticks();
 #endif
 
   for (max = 0; max < 10; max++) {
     if (otimer[max] != timer(max)) {
       mtimer[max] = timer(max) * 10;
     }
-    mtimer[max] += (get_reloj() - ultimo_reloj);
+    mtimer[max] += (get_reloj() - last_clock);
     timer(max) = mtimer[max] / 10;
     otimer[max] = timer(max);
   }
 
 
-  if (get_reloj() > ultimo_reloj) {
-    ffps = (ffps * 9.0f + 1000.0f / (float)(get_reloj() - ultimo_reloj)) / 10.0f;
+  if (get_reloj() > last_clock) {
+    ffps = (ffps * 9.0f + 1000.0f / (float)(get_reloj() - last_clock)) / 10.0f;
     fps = (int)(ffps + 0.5f);
   }
 
-  ultimo_reloj = get_reloj();
+  last_clock = get_reloj();
 
 #ifdef DEBUG
-  if (overall_reloj) {
-    game_ticks += (double)(get_ticks() - overall_reloj);
+  if (overall_clock) {
+    game_ticks += (double)(get_ticks() - overall_clock);
     game_frames += 1;
 
     if (ffps2 > 0)
@@ -1070,45 +1070,45 @@ void frame_start(void) {
     else
       ffps2 = (double)4600.0 / (game_ticks / game_frames);
   }
-  function_exec(255, get_ticks() - oreloj);
+  function_exec(255, get_ticks() - profile_clock);
 #endif
 
-  if (get_reloj() > (freloj + ireloj / 3)) { // Allow consuming up to one third of the next frame
-    if (volcados_saltados < max_saltos) {
-      volcados_saltados++;
-      saltar_volcado = 1;
-      freloj += ireloj;
+  if (get_reloj() > (fractional_clock + clock_interval / 3)) { // Allow consuming up to one third of the next frame
+    if (blits_skipped < max_frame_skips) {
+      blits_skipped++;
+      skip_blit = 1;
+      fractional_clock += clock_interval;
     } else {
-      freloj = (float)get_reloj() + ireloj;
-      volcados_saltados = 0;
-      saltar_volcado = 0;
+      fractional_clock = (float)get_reloj() + clock_interval;
+      blits_skipped = 0;
+      skip_blit = 0;
     }
   } else {
     n = 0;
-    old_reloj = get_reloj();
+    old_clock = get_reloj();
 
 #ifndef EMSCRIPTEN
-    if (old_reloj < (int)freloj) {
+    if (old_clock < (int)fractional_clock) {
       do {
 #ifdef WIN32
-        SDL_Delay(((int)freloj - old_reloj) - 1);
+        SDL_Delay(((int)fractional_clock - old_clock) - 1);
 #else
         sched_yield();
 #endif
-      } while (get_reloj() < (int)freloj); // TO keep FPS
+      } while (get_reloj() < (int)fractional_clock); // TO keep FPS
     }
 #else
     do {
       retrace_wait();
-    } while (get_reloj() < (int)freloj);
+    } while (get_reloj() < (int)fractional_clock);
 #endif
-    volcados_saltados = 0;
-    saltar_volcado = 0;
-    freloj += ireloj;
+    blits_skipped = 0;
+    skip_blit = 0;
+    fractional_clock += clock_interval;
   }
 
 #ifdef DEBUG
-  overall_reloj = oreloj = get_ticks();
+  overall_clock = profile_clock = get_ticks();
 #endif
 
   // Mark all proceeses as "not executed"
@@ -1164,7 +1164,7 @@ void frame_start(void) {
   }
 
 #ifdef DEBUG
-  function_exec(255, get_ticks() - oreloj);
+  function_exec(255, get_ticks() - profile_clock);
 #endif
 }
 
@@ -1173,33 +1173,33 @@ void frame_start(void) {
 //-----------------------------------------------------------------------------
 
 void frame_end(void) {
-  int mouse_pintado = 0, textos_pintados = 0, drawings_pintados = 0;
+  int mouse_drawn = 0, texts_drawn = 0, drawings_drawn = 0;
   int mouse_x0 = 0, mouse_x1 = 0, mouse_y0 = 0, mouse_y1 = 0;
-  int n = 0, m7ide, scrollide, otheride, retra = 0;
+  int n = 0, mode7_id, scroll_id, otheride, retrace_pending = 0;
   char buf[255];
 
 #ifdef DEBUG
-  int oreloj;
+  int profile_clock;
 #endif
 
 #ifdef __EMSCRIPTEN__
   div_snprintf(buf, sizeof(buf), "$('#fps').text(\"FPS: %d/%d (max frameskip: %d)\");", fps, dfps,
-               max_saltos);
+               max_frame_skips);
   emscripten_run_script(buf);
 #endif
 
   // If the user modified mouse.x or mouse.y, reposition the mouse accordingly
 
-  if (!saltar_volcado) {
+  if (!skip_blit) {
     // Restore framebuffer regions outside scroll/mode7 areas from the clean backup
 
 #ifdef DEBUG
-    oreloj = get_ticks();
+    profile_clock = get_ticks();
 #endif
 
     if (restore_type == 0 || restore_type == 1) {
-      if (!iscroll[0].on || iscroll[0].x || iscroll[0].y || iscroll[0].an != vga_width ||
-          iscroll[0].al != vga_height) {
+      if (!iscroll[0].on || iscroll[0].x || iscroll[0].y || iscroll[0].w != vga_width ||
+          iscroll[0].h != vga_height) {
         if (background_to_buffer != NULL)
           background_to_buffer();
         else {
@@ -1216,25 +1216,25 @@ void frame_end(void) {
 
 #ifdef DEBUG
     if (debugger_step) {
-      function_exec(253, tiempo_restore);
-      game_ticks -= get_ticks() - oreloj;
-      game_ticks += tiempo_restore;
+      function_exec(253, restore_time);
+      game_ticks -= get_ticks() - profile_clock;
+      game_ticks += restore_time;
     } else {
-      n = get_ticks() - oreloj;
+      n = get_ticks() - profile_clock;
       function_exec(253, n);
 
-      if (!tiempo_restore)
-        tiempo_restore = n;
+      if (!restore_time)
+        restore_time = n;
       else
-        tiempo_restore = (tiempo_restore * 3 + n) / 4;
+        restore_time = (restore_time * 3 + n) / 4;
     }
-    oreloj = get_ticks();
+    profile_clock = get_ticks();
 #endif
 
 #ifdef DEBUG
     if (n) {
-      function_exec(251, get_ticks() - oreloj);
-      oreloj = get_ticks();
+      function_exec(251, get_ticks() - profile_clock);
+      profile_clock = get_ticks();
     }
 #endif
 
@@ -1251,17 +1251,17 @@ void frame_end(void) {
     }
 
 #ifdef DEBUG
-    function_exec(255, get_ticks() - oreloj);
+    function_exec(255, get_ticks() - profile_clock);
 #endif
 
     do {
 #ifdef DEBUG
-      oreloj = get_ticks();
+      profile_clock = get_ticks();
 #endif
 
       ide = 0;
-      m7ide = 0;
-      scrollide = 0;
+      mode7_id = 0;
+      scroll_id = 0;
       otheride = 0;
       max = 0x80000000;
 
@@ -1275,29 +1275,29 @@ void frame_end(void) {
 
       for (n = 0; n < 10; n++) {
         if (im7[n].on && (m7 + n)->z >= max && !im7[n].painted) {
-          m7ide = n + 1;
+          mode7_id = n + 1;
           max = (m7 + n)->z;
         }
       }
 
       for (n = 0; n < 10; n++) {
         if (iscroll[n].on && (scroll + n)->z >= max && !iscroll[n].painted) {
-          scrollide = n + 1;
+          scroll_id = n + 1;
           max = (scroll + n)->z;
         }
       }
 
-      if (text_z >= max && !textos_pintados) {
+      if (text_z >= max && !texts_drawn) {
         max = text_z;
         otheride = 1;
       }
 
-      if (mouse->z >= max && !mouse_pintado) {
+      if (mouse->z >= max && !mouse_drawn) {
         max = mouse->z;
         otheride = 2;
       }
 
-      if (draw_z >= max && !drawings_pintados) {
+      if (draw_z >= max && !drawings_drawn) {
         max = draw_z;
         otheride = 3;
       }
@@ -1315,10 +1315,10 @@ void frame_end(void) {
             memb[nullstring[3] * 4] = 0;
             paint_texts(0);
 #ifdef DEBUG
-            function_exec(250, get_ticks() - oreloj);
+            function_exec(250, get_ticks() - profile_clock);
 #endif
           }
-          textos_pintados = 1;
+          texts_drawn = 1;
         } else if (otheride == 2) {
           readmouse();
           x1s = -1;
@@ -1329,9 +1329,9 @@ void frame_end(void) {
           mouse_x1 = x1s;
           mouse_y0 = y0s;
           mouse_y1 = y1s;
-          mouse_pintado = 1;
+          mouse_drawn = 1;
 #ifdef DEBUG
-          function_exec(255, get_ticks() - oreloj);
+          function_exec(255, get_ticks() - profile_clock);
 #endif
         } else if (otheride == 3) {
           for (n = 0; n < max_drawings; n++)
@@ -1341,31 +1341,31 @@ void frame_end(void) {
           if (n < max_drawings) {
             paint_drawings();
 #ifdef DEBUG
-            function_exec(250, get_ticks() - oreloj);
+            function_exec(250, get_ticks() - profile_clock);
 #endif
           }
-          drawings_pintados = 1;
+          drawings_drawn = 1;
         }
-      } else if (scrollide) {
-        iscroll[snum = scrollide - 1].painted = 1;
+      } else if (scroll_id) {
+        iscroll[snum = scroll_id - 1].painted = 1;
 
         if (iscroll[snum].on == 1)
           scroll_simple();
         else if (iscroll[snum].on == 2)
           scroll_parallax();
-      } else if (m7ide) {
-        paint_m7(m7ide - 1);
-        im7[m7ide - 1].painted = 1;
+      } else if (mode7_id) {
+        paint_m7(mode7_id - 1);
+        im7[mode7_id - 1].painted = 1;
       } else if (ide) {
         if (mem[ide + _Graph] > 0 || mem[ide + _XGraph] > 0) {
           paint_sprite();
 #ifdef DEBUG
-          process_paint(ide, get_ticks() - oreloj);
+          process_paint(ide, get_ticks() - profile_clock);
 #endif
         }
         mem[ide + _Executed] = 1;
       }
-    } while (ide || m7ide || scrollide || otheride);
+    } while (ide || mode7_id || scroll_id || otheride);
 
     if (demo)
       paint_texts(max_texts);
@@ -1379,27 +1379,27 @@ void frame_end(void) {
       update_palette();
       set_dac();
       fading = 1;
-      retra = 1;
+      retrace_pending = 1;
     } else {
       if (activar_paleta) {
         update_palette();
         set_dac();
-        retra = 1;
+        retrace_pending = 1;
         activar_paleta--;
       }
       fading = 0;
     }
 
 #ifdef DEBUG
-    oreloj = get_ticks();
+    profile_clock = get_ticks();
 
     if (debugger_step) {
-      function_exec(254, tiempo_volcado);
-      game_ticks += tiempo_volcado;
+      function_exec(254, blit_time);
+      game_ticks += blit_time;
     } else {
 #endif
 
-      if (!retra && vsync)
+      if (!retrace_pending && vsync)
         retrace_wait();
 
       if (buffer_to_video != NULL) {
@@ -1419,18 +1419,18 @@ void frame_end(void) {
                            mem[n + _y1] - mem[n + _y0] + 1);
           for (n = 0; n < 10; n++) {
             if (im7[n].on)
-              blit_partial(im7[n].x, im7[n].y, im7[n].an, im7[n].al);
+              blit_partial(im7[n].x, im7[n].y, im7[n].w, im7[n].h);
 
             if (iscroll[n].on)
-              blit_partial(iscroll[n].x, iscroll[n].y, iscroll[n].an, iscroll[n].al);
+              blit_partial(iscroll[n].x, iscroll[n].y, iscroll[n].w, iscroll[n].h);
           }
 
           if (mouse_x1 != -1)
             blit_partial(mouse_x0, mouse_y0, mouse_x1 - mouse_x0 + 1, mouse_y1 - mouse_y0 + 1);
 
           for (n = 0; n < max_texts; n++)
-            if (texts[n].font && texts[n].an)
-              blit_partial(texts[n].x0, texts[n].y0, texts[n].an, texts[n].al);
+            if (texts[n].font && texts[n].w)
+              blit_partial(texts[n].x0, texts[n].y0, texts[n].w, texts[n].h);
 
           // Perform a partial blit_screen
 
@@ -1445,27 +1445,27 @@ void frame_end(void) {
                            mem[n + _y1] - mem[n + _y0] + 1);
           for (n = 0; n < 10; n++) {
             if (im7[n].on)
-              blit_partial(im7[n].x, im7[n].y, im7[n].an, im7[n].al);
+              blit_partial(im7[n].x, im7[n].y, im7[n].w, im7[n].h);
 
             if (iscroll[n].on)
-              blit_partial(iscroll[n].x, iscroll[n].y, iscroll[n].an, iscroll[n].al);
+              blit_partial(iscroll[n].x, iscroll[n].y, iscroll[n].w, iscroll[n].h);
           }
           if (mouse_x1 != -1)
             blit_partial(mouse_x0, mouse_y0, mouse_x1 - mouse_x0 + 1, mouse_y1 - mouse_y0 + 1);
           for (n = 0; n < max_texts + 1; n++)
-            if (texts[n].font && texts[n].an)
-              blit_partial(texts[n].x0, texts[n].y0, texts[n].an, texts[n].al);
+            if (texts[n].font && texts[n].w)
+              blit_partial(texts[n].x0, texts[n].y0, texts[n].w, texts[n].h);
         }
       }
 
 #ifdef DEBUG
-      n = get_ticks() - oreloj;
+      n = get_ticks() - profile_clock;
       function_exec(254, n);
 
-      if (!tiempo_volcado)
-        tiempo_volcado = n;
+      if (!blit_time)
+        blit_time = n;
       else
-        tiempo_volcado = (tiempo_volcado * 3 + n) / 4;
+        blit_time = (blit_time * 3 + n) / 4;
     }
 #endif
 
@@ -1695,13 +1695,13 @@ void e(int text_id) {
   if (v_function == -1)
     return;
 
-  while (n < nomitidos) {
+  while (n < num_skipped) {
     if (omitidos[n] == text_id)
       break;
     n++;
   }
 
-  if (ignore_errors || n < nomitidos)
+  if (ignore_errors || n < num_skipped)
     return;
 
   if (v_function >= 0) {
@@ -1812,12 +1812,12 @@ int main(int argc, char *argv[]) {
 
   vga_width = 320;
   vga_height = 200;
-  ireloj = 1000.0 / 24.0; // 24 fps
-  max_saltos = 0;         // 0 skips
+  clock_interval = 1000.0 / 24.0; // 24 fps
+  max_frame_skips = 0;         // 0 skips
 
 #ifdef __EMSCRIPTEN__
 
-  max_saltos = 0;
+  max_frame_skips = 0;
 
 
   f = fopen(HTML_EXE, "rb");

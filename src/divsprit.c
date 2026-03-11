@@ -6,34 +6,34 @@
 #include "global.h"
 
 
-void sp_normal_mask(byte *p, int x, int y, int an, int al, int xg, int yg, int flags);
+void sp_normal_mask(byte *p, int x, int y, int w, int h, int xg, int yg, int flags);
 
-void sp_scan_clipped(byte *p, short n, short m, short o, byte *si, int an, int x0, int y0, int x1,
+void sp_scan_clipped(byte *p, short n, short m, short o, byte *si, int w, int x0, int y0, int x1,
                      int y1, int flags);
 
-void sp_rotated(byte *si, int x, int y, int an, int al, int xg, int yg, int flags, float a,
+void sp_rotated(byte *si, int x, int y, int w, int h, int xg, int yg, int flags, float a,
                 float s);
 
-void sp_scan(byte *p, short n, byte *si, int an, int x0, int y0, int x1, int y1, int flags);
+void sp_scan(byte *p, short n, byte *si, int w, int x0, int y0, int x1, int y1, int flags);
 
-void sp_scanc_mask(byte *p, short n, short m, short o, byte *si, int an, int x0, int y0, int x1,
+void sp_scanc_mask(byte *p, short n, short m, short o, byte *si, int w, int x0, int y0, int x1,
                    int y1, int flags);
 
-void sp_scan_mask(byte *p, short n, byte *si, int an, int x0, int y0, int x1, int y1, int flags);
+void sp_scan_mask(byte *p, short n, byte *si, int w, int x0, int y0, int x1, int y1, int flags);
 
 
 //-----------------------------------------------------------------------------
 //      Graficos sin rotar ni escalar
 //-----------------------------------------------------------------------------
 
-void sp_normal(byte *p, int x, int y, int an, int al, int xg, int yg, int flags) {
+void sp_normal(byte *p, int x, int y, int w, int h, int xg, int yg, int flags) {
   byte *q;
 
   int salta_x, long_x, resto_x;
   int salta_y, long_y, resto_y;
 
   if (mask_on) {
-    sp_normal_mask(p, x, y, an, al, xg, yg, flags);
+    sp_normal_mask(p, x, y, w, h, xg, yg, flags);
     return;
   }
 
@@ -46,26 +46,26 @@ void sp_normal(byte *p, int x, int y, int an, int al, int xg, int yg, int flags)
     salta_x = -x;
   else
     salta_x = 0;
-  if (x + an > map_width)
-    resto_x = x + an - map_width;
+  if (x + w > map_width)
+    resto_x = x + w - map_width;
   else
     resto_x = 0;
-  long_x = an - salta_x - resto_x;
+  long_x = w - salta_x - resto_x;
 
   if (y < 0)
     salta_y = -y;
   else
     salta_y = 0;
-  if (y + al > map_height)
-    resto_y = y + al - map_height;
+  if (y + h > map_height)
+    resto_y = y + h - map_height;
   else
     resto_y = 0;
-  long_y = al - salta_y - resto_y;
+  long_y = h - salta_y - resto_y;
 
-  p += an * salta_y + salta_x;
+  p += w * salta_y + salta_x;
   q += map_width * salta_y + salta_x;
   resto_x += salta_x;
-  an = long_x;
+  w = long_x;
 
   switch (flags) {
   case 0: // None
@@ -75,8 +75,8 @@ void sp_normal(byte *p, int x, int y, int an, int al, int xg, int yg, int flags)
           *q = *p;
         p++;
         q++;
-      } while (--an);
-      q += map_width - (an = long_x);
+      } while (--w);
+      q += map_width - (w = long_x);
       p += resto_x;
     } while (--long_y);
     break;
@@ -88,8 +88,8 @@ void sp_normal(byte *p, int x, int y, int an, int al, int xg, int yg, int flags)
           *q = *(ghost + *q + *p * 256);
         p++;
         q++;
-      } while (--an);
-      q += map_width - (an = long_x);
+      } while (--w);
+      q += map_width - (w = long_x);
       p += resto_x;
     } while (--long_y);
     break;
@@ -100,8 +100,8 @@ void sp_normal(byte *p, int x, int y, int an, int al, int xg, int yg, int flags)
         *q = *p;
         p++;
         q++;
-      } while (--an);
-      q += map_width - (an = long_x);
+      } while (--w);
+      q += map_width - (w = long_x);
       p += resto_x;
     } while (--long_y);
     break;
@@ -112,15 +112,15 @@ void sp_normal(byte *p, int x, int y, int an, int al, int xg, int yg, int flags)
         *q = *(ghost + *q + *p * 256);
         p++;
         q++;
-      } while (--an);
-      q += map_width - (an = long_x);
+      } while (--w);
+      q += map_width - (w = long_x);
       p += resto_x;
     } while (--long_y);
     break;
   }
 }
 
-void sp_normal_mask(byte *p, int x, int y, int an, int al, int xg, int yg, int flags) {
+void sp_normal_mask(byte *p, int x, int y, int w, int h, int xg, int yg, int flags) {
   byte *q;
 
   int salta_x, long_x, resto_x;
@@ -135,26 +135,26 @@ void sp_normal_mask(byte *p, int x, int y, int an, int al, int xg, int yg, int f
     salta_x = -x;
   else
     salta_x = 0;
-  if (x + an > map_width)
-    resto_x = x + an - map_width;
+  if (x + w > map_width)
+    resto_x = x + w - map_width;
   else
     resto_x = 0;
-  long_x = an - salta_x - resto_x;
+  long_x = w - salta_x - resto_x;
 
   if (y < 0)
     salta_y = -y;
   else
     salta_y = 0;
-  if (y + al > map_height)
-    resto_y = y + al - map_height;
+  if (y + h > map_height)
+    resto_y = y + h - map_height;
   else
     resto_y = 0;
-  long_y = al - salta_y - resto_y;
+  long_y = h - salta_y - resto_y;
 
-  p += an * salta_y + salta_x;
+  p += w * salta_y + salta_x;
   q += map_width * salta_y + salta_x;
   resto_x += salta_x;
-  an = long_x;
+  w = long_x;
 
   switch (flags) {
   case 0: // None
@@ -164,8 +164,8 @@ void sp_normal_mask(byte *p, int x, int y, int an, int al, int xg, int yg, int f
           *q = *p;
         p++;
         q++;
-      } while (--an);
-      q += map_width - (an = long_x);
+      } while (--w);
+      q += map_width - (w = long_x);
       p += resto_x;
     } while (--long_y);
     break;
@@ -177,8 +177,8 @@ void sp_normal_mask(byte *p, int x, int y, int an, int al, int xg, int yg, int f
           *q = *(ghost + *q + *p * 256);
         p++;
         q++;
-      } while (--an);
-      q += map_width - (an = long_x);
+      } while (--w);
+      q += map_width - (w = long_x);
       p += resto_x;
     } while (--long_y);
     break;
@@ -190,8 +190,8 @@ void sp_normal_mask(byte *p, int x, int y, int an, int al, int xg, int yg, int f
           *q = *p;
         p++;
         q++;
-      } while (--an);
-      q += map_width - (an = long_x);
+      } while (--w);
+      q += map_width - (w = long_x);
       p += resto_x;
     } while (--long_y);
     break;
@@ -203,8 +203,8 @@ void sp_normal_mask(byte *p, int x, int y, int an, int al, int xg, int yg, int f
           *q = *(ghost + *q + *p * 256);
         p++;
         q++;
-      } while (--an);
-      q += map_width - (an = long_x);
+      } while (--w);
+      q += map_width - (w = long_x);
       p += resto_x;
     } while (--long_y);
     break;
@@ -217,12 +217,12 @@ void sp_normal_mask(byte *p, int x, int y, int an, int al, int xg, int yg, int f
 
 byte *ptrmap;
 
-void sp_rotated(byte *si, int x, int y, int an, int al, int xg, int yg, int flags, float a,
+void sp_rotated(byte *si, int x, int y, int w, int h, int xg, int yg, int flags, float a,
                 float s) {
   float d0, d1, d2, d3;
   float a0, a1, a2, a3;
   int p[24];
-  int h, hmin, hmax; // Altura minima y maxima
+  int scan_y, hmin, hmax; // Altura minima y maxima
   int n, l0 = 0, l1; // Lado 0 y side 1 (indices p[])
 
   int hmax0, hmax1;
@@ -240,19 +240,19 @@ void sp_rotated(byte *si, int x, int y, int an, int al, int xg, int yg, int flag
     a0 = a;
   else
     a0 = a + (float)atan2(-yg, xg);
-  xg = xg + an - 1;
+  xg = xg + w - 1;
   d1 = (float)sqrt(xg * xg + yg * yg) * s;
   if (yg == 0 && xg == 0)
     a1 = a;
   else
     a1 = a + (float)atan2(-yg, xg);
-  yg = yg + al - 1;
+  yg = yg + h - 1;
   d2 = (float)sqrt(xg * xg + yg * yg) * s;
   if (yg == 0 && xg == 0)
     a2 = a;
   else
     a2 = a + (float)atan2(-yg, xg);
-  xg = xg - an + 1;
+  xg = xg - w + 1;
   d3 = (float)sqrt(xg * xg + yg * yg) * s;
   if (yg == 0 && xg == 0)
     a3 = a;
@@ -289,72 +289,72 @@ void sp_rotated(byte *si, int x, int y, int an, int al, int xg, int yg, int flag
   hmax1 = hmin;
   ptrmap = map + hmin * map_width;
 
-  h = hmin;
+  scan_y = hmin;
   do {
-    if (h < hmax) {
-      while (h == hmax0) {
-        if ((hmax0 = p[l0 - 1]) != h) {
+    if (scan_y < hmax) {
+      while (scan_y == hmax0) {
+        if ((hmax0 = p[l0 - 1]) != scan_y) {
           x0.l = p[l0] << 16;
-          ix0 = ((p[l0 - 2] << 16) - x0.l) / (hmax0 - h);
+          ix0 = ((p[l0 - 2] << 16) - x0.l) / (hmax0 - scan_y);
           if (ix0 < 0)
             x0.l += 65535;
           switch (l0 & 6) {
           case 0:
             g0y.l = 0;
-            ig0y = (al << 16) / (hmax0 - h);
+            ig0y = (h << 16) / (hmax0 - scan_y);
             g0x.l = 0;
             ig0x = 0;
             break;
           case 2:
-            g0x.l = ((an - 1) << 16) + 65535;
-            ig0x = (an << 16) / (h - hmax0);
+            g0x.l = ((w - 1) << 16) + 65535;
+            ig0x = (w << 16) / (scan_y - hmax0);
             g0y.l = 0;
             ig0y = 0;
             break;
           case 4:
-            g0y.l = ((al - 1) << 16) + 65535;
-            ig0y = (al << 16) / (h - hmax0);
-            g0x.l = ((an - 1) << 16) + 65535;
+            g0y.l = ((h - 1) << 16) + 65535;
+            ig0y = (h << 16) / (scan_y - hmax0);
+            g0x.l = ((w - 1) << 16) + 65535;
             ig0x = 0;
             break;
           case 6:
             g0x.l = 0;
-            ig0x = (an << 16) / (hmax0 - h);
-            g0y.l = ((al - 1) << 16) + 65535;
+            ig0x = (w << 16) / (hmax0 - scan_y);
+            g0y.l = ((h - 1) << 16) + 65535;
             ig0y = 0;
             break;
           }
         }
         l0 -= 2;
       }
-      while (h == hmax1) {
-        if ((hmax1 = p[l1 + 3]) != h) {
+      while (scan_y == hmax1) {
+        if ((hmax1 = p[l1 + 3]) != scan_y) {
           x1.l = p[l1] << 16;
-          ix1 = ((p[l1 + 2] << 16) - x1.l) / (hmax1 - h);
+          ix1 = ((p[l1 + 2] << 16) - x1.l) / (hmax1 - scan_y);
           if (ix1 < 0)
             x1.l += 65535;
           switch (l1 & 6) {
           case 0:
             g1x.l = 0;
-            ig1x = (an << 16) / (hmax1 - h);
+            ig1x = (w << 16) / (hmax1 - scan_y);
             g1y.l = 0;
             ig1y = 0;
             break;
           case 2:
             g1y.l = 0;
-            ig1y = (al << 16) / (hmax1 - h);
-            g1x.l = ((an - 1) << 16) + 65535;
+            ig1y = (h << 16) / (hmax1 - scan_y);
+            g1x.l = ((w - 1) << 16) + 65535;
             ig1x = 0;
             break;
           case 4:
-            g1x.l = ((an - 1) << 16) + 65535;
-            ig1x = (an << 16) / (h - hmax1);
-            g1y.l = ((al - 1) << 16) + 65535;
+            g1x.l = ((w - 1) << 16) + 65535;
+            ig1x = (w << 16) / (scan_y - hmax1);
+            g1y.l = ((h - 1) << 16) + 65535;
             ig1y = 0;
             break;
           case 6:
-            g1y.l = ((al - 1) << 16) + 65535;
-            ig1y = (al << 16) / (h - hmax1);
+            g1y.l = ((h - 1) << 16) + 65535;
+            ig1y = (h << 16) / (scan_y - hmax1);
             g1x.l = 0;
             ig1x = 0;
             break;
@@ -363,7 +363,7 @@ void sp_rotated(byte *si, int x, int y, int an, int al, int xg, int yg, int flag
         l1 += 2;
       }
     } else {
-      if (h == hmax0) {
+      if (scan_y == hmax0) {
         g0x.l = 0;
         g0y.l = 0;
         ig0x = 0;
@@ -372,18 +372,18 @@ void sp_rotated(byte *si, int x, int y, int an, int al, int xg, int yg, int flag
         ix0 = 0;
         switch (l0 & 6) {
         case 2:
-          g0x.l = ((an - 1) << 16) + 65535;
+          g0x.l = ((w - 1) << 16) + 65535;
           break;
         case 4:
-          g0y.l = ((al - 1) << 16) + 65535;
-          g0x.l = ((an - 1) << 16) + 65535;
+          g0y.l = ((h - 1) << 16) + 65535;
+          g0x.l = ((w - 1) << 16) + 65535;
           break;
         case 6:
-          g0y.l = ((al - 1) << 16) + 65535;
+          g0y.l = ((h - 1) << 16) + 65535;
           break;
         }
       }
-      if (h == hmax1) {
+      if (scan_y == hmax1) {
         g1x.l = 0;
         g1y.l = 0;
         ig1x = 0;
@@ -392,46 +392,46 @@ void sp_rotated(byte *si, int x, int y, int an, int al, int xg, int yg, int flag
         ix1 = 0;
         switch (l1 & 6) {
         case 2:
-          g1x.l = ((an - 1) << 16) + 65535;
+          g1x.l = ((w - 1) << 16) + 65535;
           break;
         case 4:
-          g1x.l = ((an - 1) << 16) + 65535;
-          g1y.l = ((al - 1) << 16) + 65535;
+          g1x.l = ((w - 1) << 16) + 65535;
+          g1y.l = ((h - 1) << 16) + 65535;
           break;
         case 6:
-          g1y.l = ((al - 1) << 16) + 65535;
+          g1y.l = ((h - 1) << 16) + 65535;
           break;
         }
       }
     }
 
-    if (h < map_height && h >= 0 && x0.w[1] < map_width && x1.w[1] >= 0 && x1.w[1] > x0.w[1]) {
+    if (scan_y < map_height && scan_y >= 0 && x0.w[1] < map_width && x1.w[1] >= 0 && x1.w[1] > x0.w[1]) {
       if (!mask_on) {
         if (x0.w[1] < 0)
           if (x1.w[1] >= map_width)
-            sp_scan_clipped(ptrmap, x1.w[1] - x0.w[1], map_width - 1, -x0.w[1], si, an, g0x.l,
+            sp_scan_clipped(ptrmap, x1.w[1] - x0.w[1], map_width - 1, -x0.w[1], si, w, g0x.l,
                             g0y.l, g1x.l, g1y.l, flags);
           else
-            sp_scan_clipped(ptrmap, x1.w[1] - x0.w[1], x1.w[1], -x0.w[1], si, an, g0x.l, g0y.l,
+            sp_scan_clipped(ptrmap, x1.w[1] - x0.w[1], x1.w[1], -x0.w[1], si, w, g0x.l, g0y.l,
                             g1x.l, g1y.l, flags);
         else if (x1.w[1] >= map_width)
-          sp_scan_clipped(ptrmap + x0.w[1], x1.w[1] - x0.w[1], map_width - 1 - x0.w[1], 0, si, an,
+          sp_scan_clipped(ptrmap + x0.w[1], x1.w[1] - x0.w[1], map_width - 1 - x0.w[1], 0, si, w,
                           g0x.l, g0y.l, g1x.l, g1y.l, flags);
         else
-          sp_scan(ptrmap + x0.w[1], x1.w[1] - x0.w[1], si, an, g0x.l, g0y.l, g1x.l, g1y.l, flags);
+          sp_scan(ptrmap + x0.w[1], x1.w[1] - x0.w[1], si, w, g0x.l, g0y.l, g1x.l, g1y.l, flags);
       } else {
         if (x0.w[1] < 0)
           if (x1.w[1] >= map_width)
-            sp_scanc_mask(ptrmap, x1.w[1] - x0.w[1], map_width - 1, -x0.w[1], si, an, g0x.l, g0y.l,
+            sp_scanc_mask(ptrmap, x1.w[1] - x0.w[1], map_width - 1, -x0.w[1], si, w, g0x.l, g0y.l,
                           g1x.l, g1y.l, flags);
           else
-            sp_scanc_mask(ptrmap, x1.w[1] - x0.w[1], x1.w[1], -x0.w[1], si, an, g0x.l, g0y.l, g1x.l,
+            sp_scanc_mask(ptrmap, x1.w[1] - x0.w[1], x1.w[1], -x0.w[1], si, w, g0x.l, g0y.l, g1x.l,
                           g1y.l, flags);
         else if (x1.w[1] >= map_width)
-          sp_scanc_mask(ptrmap + x0.w[1], x1.w[1] - x0.w[1], map_width - 1 - x0.w[1], 0, si, an,
+          sp_scanc_mask(ptrmap + x0.w[1], x1.w[1] - x0.w[1], map_width - 1 - x0.w[1], 0, si, w,
                         g0x.l, g0y.l, g1x.l, g1y.l, flags);
         else
-          sp_scan_mask(ptrmap + x0.w[1], x1.w[1] - x0.w[1], si, an, g0x.l, g0y.l, g1x.l, g1y.l,
+          sp_scan_mask(ptrmap + x0.w[1], x1.w[1] - x0.w[1], si, w, g0x.l, g0y.l, g1x.l, g1y.l,
                        flags);
       }
     }
@@ -445,10 +445,10 @@ void sp_rotated(byte *si, int x, int y, int an, int al, int xg, int yg, int flag
 
     ptrmap += map_width;
 
-  } while (h++ < hmax);
+  } while (scan_y++ < hmax);
 }
 
-void sp_scan_clipped(byte *p, short n, short m, short o, byte *si, int an, int x0, int y0, int x1,
+void sp_scan_clipped(byte *p, short n, short m, short o, byte *si, int w, int x0, int y0, int x1,
                      int y1, int flags) {
   union {
     int l;
@@ -469,7 +469,7 @@ void sp_scan_clipped(byte *p, short n, short m, short o, byte *si, int an, int x
   switch (flags) {
   case 0: // None
     do {
-      if ((c = *(si + x.w[1] + y.w[1] * an))) {
+      if ((c = *(si + x.w[1] + y.w[1] * w))) {
         *p = c;
       }
       p++;
@@ -480,7 +480,7 @@ void sp_scan_clipped(byte *p, short n, short m, short o, byte *si, int an, int x
 
   case 1: // Ghost
     do {
-      if ((c = *(si + x.w[1] + y.w[1] * an))) {
+      if ((c = *(si + x.w[1] + y.w[1] * w))) {
         *p = ghost[(c << 8) + *p];
       }
       p++;
@@ -491,7 +491,7 @@ void sp_scan_clipped(byte *p, short n, short m, short o, byte *si, int an, int x
 
   case 2: // Block
     do {
-      c = *(si + x.w[1] + y.w[1] * an);
+      c = *(si + x.w[1] + y.w[1] * w);
       *p = c;
       p++;
       x.l += x0;
@@ -501,7 +501,7 @@ void sp_scan_clipped(byte *p, short n, short m, short o, byte *si, int an, int x
 
   case 3: // Ghost + Block
     do {
-      c = *(si + x.w[1] + y.w[1] * an);
+      c = *(si + x.w[1] + y.w[1] * w);
       *p = ghost[(c << 8) + *p];
       p++;
       x.l += x0;
@@ -511,7 +511,7 @@ void sp_scan_clipped(byte *p, short n, short m, short o, byte *si, int an, int x
   }
 }
 
-void sp_scan(byte *p, short n, byte *si, int an, int x0, int y0, int x1, int y1, int flags) {
+void sp_scan(byte *p, short n, byte *si, int w, int x0, int y0, int x1, int y1, int flags) {
   union {
     int l;
     short w[2];
@@ -526,7 +526,7 @@ void sp_scan(byte *p, short n, byte *si, int an, int x0, int y0, int x1, int y1,
   switch (flags) {
   case 0: // None
     do {
-      if ((c = *(si + x.w[1] + y.w[1] * an))) {
+      if ((c = *(si + x.w[1] + y.w[1] * w))) {
         *p = c;
       }
       p++;
@@ -537,7 +537,7 @@ void sp_scan(byte *p, short n, byte *si, int an, int x0, int y0, int x1, int y1,
 
   case 1: // Ghost
     do {
-      if ((c = *(si + x.w[1] + y.w[1] * an))) {
+      if ((c = *(si + x.w[1] + y.w[1] * w))) {
         *p = ghost[(c << 8) + *p];
       }
       p++;
@@ -548,7 +548,7 @@ void sp_scan(byte *p, short n, byte *si, int an, int x0, int y0, int x1, int y1,
 
   case 2: // Block
     do {
-      c = *(si + x.w[1] + y.w[1] * an);
+      c = *(si + x.w[1] + y.w[1] * w);
       *p = c;
       p++;
       x.l += x0;
@@ -558,7 +558,7 @@ void sp_scan(byte *p, short n, byte *si, int an, int x0, int y0, int x1, int y1,
 
   case 3: // Ghost + Block
     do {
-      c = *(si + x.w[1] + y.w[1] * an);
+      c = *(si + x.w[1] + y.w[1] * w);
       *p = ghost[(c << 8) + *p];
       p++;
       x.l += x0;
@@ -568,7 +568,7 @@ void sp_scan(byte *p, short n, byte *si, int an, int x0, int y0, int x1, int y1,
   }
 }
 
-void sp_scanc_mask(byte *p, short n, short m, short o, byte *si, int an, int x0, int y0, int x1,
+void sp_scanc_mask(byte *p, short n, short m, short o, byte *si, int w, int x0, int y0, int x1,
                    int y1, int flags) {
   union {
     int l;
@@ -589,7 +589,7 @@ void sp_scanc_mask(byte *p, short n, short m, short o, byte *si, int an, int x0,
   switch (flags) {
   case 0: // None
     do {
-      if ((c = *(si + x.w[1] + y.w[1] * an))) {
+      if ((c = *(si + x.w[1] + y.w[1] * w))) {
         if (!mask[*p])
           *p = c;
       }
@@ -601,7 +601,7 @@ void sp_scanc_mask(byte *p, short n, short m, short o, byte *si, int an, int x0,
 
   case 1: // Ghost
     do {
-      if ((c = *(si + x.w[1] + y.w[1] * an))) {
+      if ((c = *(si + x.w[1] + y.w[1] * w))) {
         if (!mask[*p])
           *p = ghost[(c << 8) + *p];
       }
@@ -613,7 +613,7 @@ void sp_scanc_mask(byte *p, short n, short m, short o, byte *si, int an, int x0,
 
   case 2: // Block
     do {
-      c = *(si + x.w[1] + y.w[1] * an);
+      c = *(si + x.w[1] + y.w[1] * w);
       if (!mask[*p])
         *p = c;
       p++;
@@ -624,7 +624,7 @@ void sp_scanc_mask(byte *p, short n, short m, short o, byte *si, int an, int x0,
 
   case 3: // Ghost + Block
     do {
-      c = *(si + x.w[1] + y.w[1] * an);
+      c = *(si + x.w[1] + y.w[1] * w);
       if (!mask[*p])
         *p = ghost[(c << 8) + *p];
       p++;
@@ -635,7 +635,7 @@ void sp_scanc_mask(byte *p, short n, short m, short o, byte *si, int an, int x0,
   }
 }
 
-void sp_scan_mask(byte *p, short n, byte *si, int an, int x0, int y0, int x1, int y1, int flags) {
+void sp_scan_mask(byte *p, short n, byte *si, int w, int x0, int y0, int x1, int y1, int flags) {
   union {
     int l;
     short w[2];
@@ -650,7 +650,7 @@ void sp_scan_mask(byte *p, short n, byte *si, int an, int x0, int y0, int x1, in
   switch (flags) {
   case 0: // None
     do {
-      if ((c = *(si + x.w[1] + y.w[1] * an))) {
+      if ((c = *(si + x.w[1] + y.w[1] * w))) {
         if (!mask[*p])
           *p = c;
       }
@@ -662,7 +662,7 @@ void sp_scan_mask(byte *p, short n, byte *si, int an, int x0, int y0, int x1, in
 
   case 1: // Ghost
     do {
-      if ((c = *(si + x.w[1] + y.w[1] * an))) {
+      if ((c = *(si + x.w[1] + y.w[1] * w))) {
         if (!mask[*p])
           *p = ghost[(c << 8) + *p];
       }
@@ -674,7 +674,7 @@ void sp_scan_mask(byte *p, short n, byte *si, int an, int x0, int y0, int x1, in
 
   case 2: // Block
     do {
-      c = *(si + x.w[1] + y.w[1] * an);
+      c = *(si + x.w[1] + y.w[1] * w);
       if (!mask[*p])
         *p = c;
       p++;
@@ -685,7 +685,7 @@ void sp_scan_mask(byte *p, short n, byte *si, int an, int x0, int y0, int x1, in
 
   case 3: // Ghost + Block
     do {
-      c = *(si + x.w[1] + y.w[1] * an);
+      c = *(si + x.w[1] + y.w[1] * w);
       if (!mask[*p])
         *p = ghost[(c << 8) + *p];
       p++;
@@ -700,20 +700,20 @@ void sp_scan_mask(byte *p, short n, byte *si, int an, int x0, int y0, int x1, in
 //      Invierte horizontalmente un gráfico
 //-----------------------------------------------------------------------------
 
-void invierte_hor(byte *p, int an, int al) {
+void invierte_hor(byte *p, int w, int h) {
   int x, y;
   byte *q;
 
-  for (y = 0; y < al; y++) {
-    q = p + an - 1;
-    for (x = 0; x < an / 2; x++) {
+  for (y = 0; y < h; y++) {
+    q = p + w - 1;
+    for (x = 0; x < w / 2; x++) {
       *p ^= *q;
       *q ^= *p;
       *p ^= *q;
       p++;
       q--;
     }
-    p += an - an / 2;
+    p += w - w / 2;
   }
 }
 
@@ -721,28 +721,28 @@ void invierte_hor(byte *p, int an, int al) {
 //      Invierte verticalmente un gráfico
 //-----------------------------------------------------------------------------
 
-void invierte_ver(byte *sp, int an, int al) {
+void invierte_ver(byte *sp, int w, int h) {
   int x, y;
   byte *q, *p;
 
-  for (x = 0; x < an; x++) {
+  for (x = 0; x < w; x++) {
     p = sp++;
-    q = p + (al - 1) * an;
-    for (y = 0; y < al / 2; y++) {
+    q = p + (h - 1) * w;
+    for (y = 0; y < h / 2; y++) {
       *p ^= *q;
       *q ^= *p;
       *p ^= *q;
-      p += an;
-      q -= an;
+      p += w;
+      q -= w;
     }
   }
 }
 
 //-----------------------------------------------------------------------------
-//      Devuelve el ancho y alto de un gráfico rotado y/o escalado
+//      Devuelve el width y height de un gráfico rotado y/o escalado
 //-----------------------------------------------------------------------------
 
-void sp_size(int *x, int *y, int *an, int *al, int xg, int yg, float a, float s) {
+void sp_size(int *x, int *y, int *w, int *h, int xg, int yg, float a, float s) {
   float d0, d1, d2, d3;
   float a0, a1, a2, a3;
 
@@ -756,19 +756,19 @@ void sp_size(int *x, int *y, int *an, int *al, int xg, int yg, float a, float s)
     a0 = a;
   else
     a0 = a + (float)atan2(-yg, xg);
-  xg = xg + *an - 1;
+  xg = xg + *w - 1;
   d1 = (float)sqrt(xg * xg + yg * yg) * s;
   if (yg == 0 && xg == 0)
     a1 = a;
   else
     a1 = a + (float)atan2(-yg, xg);
-  yg = yg + *al - 1;
+  yg = yg + *h - 1;
   d2 = (float)sqrt(xg * xg + yg * yg) * s;
   if (yg == 0 && xg == 0)
     a2 = a;
   else
     a2 = a + (float)atan2(-yg, xg);
-  xg = xg - *an + 1;
+  xg = xg - *w + 1;
   d3 = (float)sqrt(xg * xg + yg * yg) * s;
   if (yg == 0 && xg == 0)
     a3 = a;
@@ -807,6 +807,6 @@ void sp_size(int *x, int *y, int *an, int *al, int xg, int yg, float a, float s)
 
   *x = x0;
   *y = y0;
-  *an = x1 - x0 + 1;
-  *al = y1 - y0 + 1;
+  *w = x1 - x0 + 1;
+  *h = y1 - y0 + 1;
 }

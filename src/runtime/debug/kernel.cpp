@@ -56,8 +56,8 @@ case lrng:
 case ljmp:
   ip=mem[ip];
   #ifdef DEBUG
-    if (reloj>max_reloj) {
-      v_function=-2; e(142); max_reloj=max_process_time+reloj;
+    if (frame_clock>max_reloj) {
+      v_function=-2; e(142); max_reloj=max_process_time+frame_clock;
       if (call_to_debug) { process_stoped=id; return; }
     }
   #endif
@@ -65,8 +65,8 @@ case ljmp:
 case ljpf:
   if (pila[sp--]&1) ip++; else ip=mem[ip];
   #ifdef DEBUG
-    if (reloj>max_reloj) {
-      v_function=-2; e(142); max_reloj=max_process_time+reloj;
+    if (frame_clock>max_reloj) {
+      v_function=-2; e(142); max_reloj=max_process_time+frame_clock;
       if (call_to_debug) { process_stoped=id; return; }
     }
   #endif
@@ -79,7 +79,7 @@ case lfun:
   break;
 case lcal:
   #ifdef DEBUG
-  process_exec(id,get_ticks()-oreloj); oreloj=get_ticks();
+  process_exec(id,get_ticks()-profile_clock); profile_clock=get_ticks();
   #endif
   mem[id+_IP]=ip+1; id2=id; if (sp>long_pila) exer(3);
   procesos++; ip=mem[ip]; id=id_start;
@@ -112,7 +112,7 @@ if((id_start+((procesos-2)*iloc_len)) == id_end)
 case lret:
   #ifdef DEBUG
   if (mem[id+_FCount]==0) process_level--;
-  process_exec(id,get_ticks()-oreloj); oreloj=get_ticks();
+  process_exec(id,get_ticks()-profile_clock); profile_clock=get_ticks();
   #endif
   sp=mem[id+_Param]-mem[id+_NumPar];
   pila[sp]=id; id=mem[id+_Caller];
@@ -125,7 +125,7 @@ case lasp:
   break;
 case lfrm:
   #ifdef DEBUG
-  process_exec(id,get_ticks()-oreloj); oreloj=get_ticks();
+  process_exec(id,get_ticks()-profile_clock); profile_clock=get_ticks();
   #endif
   sp=mem[id+_Param]-mem[id+_NumPar];
   mem[id+_IP]=ip;
@@ -210,7 +210,7 @@ case lpar: inicio_privadas+=mem[ip++]; break;
 case lrtf:
   #ifdef DEBUG
   if (mem[id+_FCount]==0) process_level--;
-  process_exec(id,get_ticks()-oreloj); oreloj=get_ticks();
+  process_exec(id,get_ticks()-profile_clock); profile_clock=get_ticks();
   #endif
   bp=pila[sp];
   sp=mem[id+_Param]-mem[id+_NumPar];
@@ -235,7 +235,7 @@ case lclo:
   id=id2; ip=mem[ip]; break;
 case lfrf:
   #ifdef DEBUG
-  process_exec(id,get_ticks()-oreloj); oreloj=get_ticks();
+  process_exec(id,get_ticks()-profile_clock); profile_clock=get_ticks();
   #endif
   if ((mem[id+_Frame]+=pila[sp])>=100) {
     mem[id+_Frame]-=100; mem[id+_Executed]=1;

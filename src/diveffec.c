@@ -228,21 +228,21 @@ int TipoA = 1, TipoB = 0, TipoC = 0;
 int OldTipoA = 1, OldTipoB = 0, OldTipoC = 0;
 
 void Explode1(void) {
-  int an = v.an / big2, al = v.al / big2;
+  int w = v.w / big2, h = v.h / big2;
   int x;
 
   _show_items();
 
   create_gradient_colors(exp_gama, exp_colores);
 
-  wbox(v.ptr, an, al, c0, 2, 31, an - 4, 1);
+  wbox(v.ptr, w, h, c0, 2, 31, w - 4, 1);
 
-  wbox(v.ptr, an, al, c0, 2, 74, an - 4, 1);
+  wbox(v.ptr, w, h, c0, 2, 74, w - 4, 1);
 
-  wwrite(v.ptr, an, al, an - 70, 11, 0, texts[181], c3);
-  wrectangle(v.ptr, an, al, c0, an - 70, 18, 66, 11);
+  wwrite(v.ptr, w, h, w - 70, 11, 0, texts[181], c3);
+  wrectangle(v.ptr, w, h, c0, w - 70, 18, 66, 11);
   for (x = 0; x < 64; x++)
-    wbox(v.ptr, an, al, exp_colores[x * 2], an - 69 + x, 18 + 1, 1, 9);
+    wbox(v.ptr, w, h, exp_colores[x * 2], w - 69 + x, 18 + 1, 1, 9);
 }
 
 void Selcolor0();
@@ -250,7 +250,7 @@ extern int SelColorFont;
 extern int SelColorOk;
 
 void Explode2(void) {
-  int an = v.an / big2; //, al=v.al/big2;
+  int w = v.w / big2; //, al=v.al/big2;
   int need_refresh = 0;
 
   _process_items();
@@ -291,7 +291,7 @@ void Explode2(void) {
   OldTipoA = TipoA;
   OldTipoB = TipoB;
   OldTipoC = TipoC;
-  if (wmouse_in(an - 70, 18, 66, 11) && (mouse_b & 1)) {
+  if (wmouse_in(w - 70, 18, 66, 11) && (mouse_b & 1)) {
     gradient_buf = exp_colores;
     gradient_config = exp_gama;
     show_dialog((voidReturnType)gama0);
@@ -324,14 +324,14 @@ void Explode0(void) {
   v.type = 1;
 
   v.title = texts[300];
-  v.an = 128;
-  v.al = 90 + 5;
+  v.w = 128;
+  v.h = 90 + 5;
   v.paint_handler = (voidReturnType)Explode1;
   v.click_handler = (voidReturnType)Explode2;
   v.close_handler = (voidReturnType)Explode3;
 
-  _button(100, 7, v.al - 14, 0);
-  _button(101, v.an - 8, v.al - 14, 2);
+  _button(100, 7, v.h - 14, 0);
+  _button(101, v.w - 8, v.h - 14, 2);
   TipoA = TipoB = TipoC = OldTipoA = OldTipoB = OldTipoC = 0;
   if (exp_Color0 == -1)
     exp_Color0 = c4;
@@ -442,7 +442,7 @@ void GenExplodes() {
       v.mapa->puntos[n] = -1;
     v.mapa->fpg_code = 0;
     call((voidReturnType)v.paint_handler);
-    wvolcado(screen_buffer, vga_width, vga_height, v.ptr, v.x, v.y, v.an, v.al, 0);
+    blit_region(screen_buffer, vga_width, vga_height, v.ptr, v.x, v.y, v.w, v.h, 0);
 
     advance_points();
     n_frames -= 2;

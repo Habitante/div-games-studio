@@ -39,15 +39,15 @@ void mixer0(void) {
   v.type = 8;
   v.title = texts[421];
   v.name = texts[421];
-  v.an = 59;
-  v.al = 76;
+  v.w = 59;
+  v.h = 76;
 
   v.paint_handler = (voidReturnType)mixer1;
   v.click_handler = (voidReturnType)mixer2;
 }
 
 void mixer1(void) {
-  int an = v.an / big2, al = v.al / big2;
+  int w = v.w / big2, h = v.h / big2;
 
   _show_items();
 
@@ -74,22 +74,22 @@ void mixer1(void) {
   update_listbox(&lvol_cd);
   update_listbox(&lvol_ma);
 
-  wrectangle(v.ptr, an, al, c0, MIX_BAR1 - 4, 56, 17, 17);
-  wrectangle(v.ptr, an, al, c0, MIX_BAR2 - 4, 56, 17, 17);
-  wrectangle(v.ptr, an, al, c0, MIX_BAR3 - 4, 56, 17, 17);
+  wrectangle(v.ptr, w, h, c0, MIX_BAR1 - 4, 56, 17, 17);
+  wrectangle(v.ptr, w, h, c0, MIX_BAR2 - 4, 56, 17, 17);
+  wrectangle(v.ptr, w, h, c0, MIX_BAR3 - 4, 56, 17, 17);
 
   if (Setupfile.mut_fx)
-    wput(v.ptr, an, al, MIX_BAR1 - 3, 57, -225);
+    wput(v.ptr, w, h, MIX_BAR1 - 3, 57, -225);
   else
-    wput(v.ptr, an, al, MIX_BAR1 - 3, 57, -226);
+    wput(v.ptr, w, h, MIX_BAR1 - 3, 57, -226);
   if (Setupfile.mut_cd)
-    wput(v.ptr, an, al, MIX_BAR2 - 3, 57, -227);
+    wput(v.ptr, w, h, MIX_BAR2 - 3, 57, -227);
   else
-    wput(v.ptr, an, al, MIX_BAR2 - 3, 57, -228);
+    wput(v.ptr, w, h, MIX_BAR2 - 3, 57, -228);
   if (Setupfile.mut_ma)
-    wput(v.ptr, an, al, MIX_BAR3 - 3, 57, -229);
+    wput(v.ptr, w, h, MIX_BAR3 - 3, 57, -229);
   else
-    wput(v.ptr, an, al, MIX_BAR3 - 3, 57, -230);
+    wput(v.ptr, w, h, MIX_BAR3 - 3, 57, -230);
 }
 
 void mixer2(void) {

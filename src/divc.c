@@ -1,5 +1,5 @@
 
-// Strings, new: p_string, cglo, cloc, p_*char, l*chr, ...
+// Strings, new: p_string, string_global, string_local, p_*char, l*chr, ...
 // 00 - intermediate code optimization
 // 00 - tables and structs up to 3 dimensions
 // 01 - add global strings
@@ -39,14 +39,14 @@
 // 34 - fixed function return handling (to the caller of the last process)
 // 35 - allow STEP over functions (does a "go here!" to the next statement)
 // 36 - add global bytes and a new, again, data initialization system
-//      (see p_byte, bglo and p_pointerbyte)
+//      (see p_byte, byte_global and p_pointerbyte)
 // 37 - prepare debugger for byte and word support
 // 38 - final debugger changes (in View Data), and Spanish translation.
-// 39 - add local and private bytes (bloc)
+// 39 - add local and private bytes (byte_local)
 // 40 - byte members of structs (global/local and private)
 // 41 - struct initialization handling byte members (frm,ifrm_max)
 // 42 - added word handling instructions to interpreter (???wor)
-// 43 - words same as bytes (wglo wloc *word ???wor)
+// 43 - words same as bytes (word_global word_local *word ???wor)
 // 44 - allow receiving a byte or word as parameter (and redeclaring as private)
 // 45 - colorizer bug (below process ... put ?????????)
 // 46 - show functions in process lists (F5) too (editor and debugger)
@@ -289,7 +289,7 @@ void add_code(int dir, int param, int op);
 #define l_num 5 //Numeric constant
 
 //-----------------------------------------------------------------------------
-//      Syntactic values / tokens (pieza)
+//      Syntactic values / tokens (current_token)
 //-----------------------------------------------------------------------------
 
 #define p_ultima 0x00 //End of file <EOF>
@@ -468,9 +468,9 @@ void add_code(int dir, int param, int op);
 
 #define p_pointerbyte 0xf7
 
-#define p_lit 0xfc //Pointer to literal (txt) in pieza_num
+#define p_lit 0xfc //Pointer to literal (txt) in token_value
 #define p_id  0xfd //or a ptr to vnom (to an object ptr)
-#define p_num 0xfe //Number in pieza_num
+#define p_num 0xfe //Number in token_value
 
 //-----------------------------------------------------------------------------
 
@@ -553,7 +553,7 @@ void add_code(int dir, int param, int op);
 #define lret 27 //              Process self-termination
 #define lasp 28 //              Discard a stacked value
 #define lfrm 29 //              Suspend process execution for this frame
-#define lcbp 30 // num_par      Initialize local parameter pointer
+#define lcbp 30 // num_params      Initialize local parameter pointer
 #define lcpa 31 //              Pop offset, read parameter [offset] and bp++
 #define ltyp 32 // block        Define current process type (collisions)
 #define lpri 33 // offset       Jump to address, and load private vars
@@ -671,7 +671,7 @@ void add_code(int dir, int param, int op);
 //-----------------------------------------------------------------------------
 
 void c_error(word, word);
-void analiza_comandos(word, byte **);
+void analyze_commands(word, byte **);
 void prepare_compilation(void);
 void analyze_ltlex(void);
 void lexer(void);
@@ -724,10 +724,10 @@ FILE *div_open_file(char *file);
 
 //-----------------------------------------------------------------------------
 
-int old_linea; // File position of the token before the last one read
+int old_line; // File position of the token before the last one read
 byte *old_ierror, *old_ierror_end;
 
-// The last token read is at (linea,ierror,ierror_end)
+// The last token read is at (source_line,ierror,ierror_end)
 
 byte *ultima_linea, cero = 0;
 
@@ -735,116 +735,116 @@ byte *ultima_linea, cero = 0;
 
 // Info for EXEC.LIN (position in mem and source of each statement)
 
-int inicio, final;    // Start and end addresses in mem[] of the statement
-int linea1, columna1; // Position where the statement begins in source
-int linea2, columna2; // Position where the statement ends in source
+int start_addr, end_addr;    // Start and end addresses in mem[] of the statement
+int start_line, start_col; // Position where the statement begins in source
+int end_line, end_col; // Position where the statement ends in source
 
-void statement_start(void);  // Set inicio, linea1, columna1
-void statement_end(void);    // Set final, linea2, columna2
+void statement_start(void);  // Set start_addr, start_line, start_col
+void statement_end(void);    // Set end_addr, end_line, end_col
 void record_statement(void); // Write the six variables to file
 
 //-----------------------------------------------------------------------------
 
 // Object table --------------------------------- *iobj = first free object
 
-struct objeto {
+struct object {
   byte type;               // Object type
-  byte usado;              // Whether the object was used before being defined
+  byte used;              // Whether the object was used before being defined
   byte *name;              // Pointer to name, for listing output
   byte *ierror;            // Pointer to source code for determining column if needed
   int line;                // Source line number, for error reporting
   int param;               // Whether this object was declared in parameters
-  struct objeto *anterior; // Previous object with the same name
-  struct objeto *bloque;   // Block for this process (0-global/local N-private)
-  struct objeto *member;   // Which struct it belongs to (0-n/a)
+  struct object *prev; // Previous object with the same name
+  struct object *scope;   // Block for this process (0-global/local N-private)
+  struct object *member;   // Which struct it belongs to (0-n/a)
   union {
     struct { // Constant
-      int valor;
+      int value;
       int literal; // 0-no, 1-yes
     } cons;
     struct { // Global variable
       int offset;
-    } vglo;
+    } var_global;
     struct { // Global table
       int offset;
-      int totalen;          // total number of elements
+      int total_len;          // total number of elements
       int len1, len2, len3; // len2/3==-1 if n/a
-    } tglo, pigl;
+    } table_global, ptr_int_global;
     struct { // Global byte
       int offset;
-      int totalen;          // total number of elements
+      int total_len;          // total number of elements
       int len1, len2, len3; // len2/3==-1 if n/a
-    } bglo, pbgl;
+    } byte_global, ptr_byte_global;
     struct { // Global word
       int offset;
-      int totalen;          // total number of elements
+      int total_len;          // total number of elements
       int len1, len2, len3; // len2/3==-1 if n/a
-    } wglo, pwgl;
+    } word_global, ptr_word_global;
     struct { // Global string
       int offset;
-      int totalen; // total number of elements
-    } cglo, pcgl;
+      int total_len; // total number of elements
+    } string_global, ptr_string_global;
     struct { // Struct
       int offset;
-      int len_item;               // Number of fields
-      int totalitems;             // Total number of records
-      int items1, items2, items3; // -1 if n/a
-    } sglo, sloc;
+      int item_len;               // Number of fields
+      int total_items;             // Total number of records
+      int dim1, dim2, dim3; // -1 if n/a
+    } struct_global, struct_local;
     struct { // Struct pointer
       int offset;
-      struct objeto *ostruct;     // Pointer to struct
-      int totalitems;             // Total number of records
-      int items1, items2, items3; // -1 if n/a
-    } psgl, pslo;
+      struct object *ostruct;     // Pointer to struct
+      int total_items;             // Total number of records
+      int dim1, dim2, dim3; // -1 if n/a
+    } ptr_struct_global, ptr_struct_local;
     struct { // Local variable
       int offset;
-    } vloc;
+    } var_local;
     struct { // Local table
       int offset;
-      int totalen;
+      int total_len;
       int len1, len2, len3;
-    } tloc, pilo;
+    } table_local, ptr_int_local;
     struct { // Local byte
       int offset;
-      int totalen;          // total number of elements
+      int total_len;          // total number of elements
       int len1, len2, len3; // len2/3==-1 if n/a
-    } bloc, pblo;
+    } byte_local, ptr_byte_local;
     struct { // Local word
       int offset;
-      int totalen;          // total number of elements
+      int total_len;          // total number of elements
       int len1, len2, len3; // len2/3==-1 if n/a
-    } wloc, pwlo;
+    } word_local, ptr_word_local;
     struct { // Local string
       int offset;
-      int totalen; // total number of elements
-    } cloc, pclo;
+      int total_len; // total number of elements
+    } string_local, ptr_string_local;
     struct { // Process
-      struct objeto *bloque;
+      struct object *scope;
       int offset;
-      int num_par;
+      int num_params;
     } proc;
     struct { // Internal function
       int code;
-      int num_par;
+      int num_params;
       int ret;      // 0-Int 1-String
       byte par[12]; // 0-Int 1-(Struct_name,name)
     } func;
     struct { // External function
       int code;
-      int num_par;
-    } fext;
+      int num_params;
+    } func_extern;
   };
 } obj[max_obj], *iobj; // ----------------------------------------------------
 
 //-----------------------------------------------------------------------------
 
-byte *vnom = NULL; // Name vector (hash_chain:int, pieza (or iobj):int, asciiz)
+byte *vnom = NULL; // Name vector (hash_chain:int, current_token (or iobj):int, asciiz)
 union {
   byte *b;
   byte **p;
-} ivnom;
+} name_index;
 
-byte *inicio_objetos; // For generating the object table listing
+byte *objects_start; // For generating the object table listing
 
 byte *vhash[256]; // Pointer to the vector of names
 
@@ -853,35 +853,35 @@ byte *vhash[256]; // Pointer to the vector of names
 struct exp_ele {
   byte type; // econs, eoper, erango, ewhoami, ecall
   union {
-    int valor;
+    int value;
     int token;
-    struct objeto *objeto;
+    struct object *object;
   };
 } tabexp[max_exp], *_exp;
 
 struct lex_ele {
-  byte caracter;
+  byte character;
   byte token;
-  struct lex_ele *alternativa;
-  struct lex_ele *siguiente;
+  struct lex_ele *alternative;
+  struct lex_ele *next;
 } lex_simb[max_nodos], *ilex_simb, *lex_case[256];
 
-int pieza, pieza_num;
-struct objeto *o;             // When pieza=p_id, object of type (**o).type
-struct objeto *bloque_actual; // Block currently being analyzed
-struct objeto *bloque_lexico; // 0 until program's private section
+int current_token, token_value;
+struct object *o;             // When current_token=p_id, object of type (**o).type
+struct object *current_scope; // Block currently being analyzed
+struct object *lexical_scope; // 0 until program's private section
 
-struct objeto *member; // !=0 when declaring/accessing a struct member
+struct object *member; // !=0 when declaring/accessing a struct member
 
-int linea, num_nodos, num_obj;
+int source_line, num_nodes, num_objects;
 
-int num_obj_predefinidos;
+int num_predefined;
 
 //-----------------------------------------------------------------------------
 
-int parametros;
+int in_params;
 
-int acceso_remoto; // To disallow id.private
+int cross_process_access; // To disallow id.private
 
 //-----------------------------------------------------------------------------
 
@@ -895,7 +895,7 @@ int itcont;
 
 //-----------------------------------------------------------------------------
 
-int pila[long_pila + max_exp + 64]; // expression evaluation (compilation and execution)
+int eval_stack[long_pila + max_exp + 64]; // expression evaluation (compilation and execution)
 
 int32_t *mem_ory = NULL, *frm = NULL;
 int32_t *mem = NULL, *loc = NULL;
@@ -905,39 +905,39 @@ int itxt, ifrm_max;
 
 byte *imemptr;
 
-int iloc_len; // end of local variables including private ones
+int local_var_len; // end of local variables including private ones
 
 // mem[]        destination memory vector
 // imem         pointer for data and code generation
 // imem_max     end of destination memory (maximum index of mem[])
 // iloc         start in mem[] of local variables (initialized)
-// iloc_len     length of local variables
+// local_var_len     length of local variables
 
 //------------- Expression table insertion, variable access
 
-//vglo           &vglo ptr
-//tglo[_exp]     &tglo <_exp> add rng ptr
+//var_global           &var_global ptr
+//table_global[_exp]     &table_global <_exp> add rng ptr
 
-//vloc           &vloc aid ptr
-//tloc[_exp]      &tloc <_exp> add rng aid ptr
+//var_local           &var_local aid ptr
+//table_local[_exp]      &table_local <_exp> add rng aid ptr
 
-//proc.vloc      &proc ptr &vloc add ptr
-//proc.tloc[_exp] &proc ptr &tloc <_exp> add rng add ptr
+//proc.var_local      &proc ptr &var_local add ptr
+//proc.table_local[_exp] &proc ptr &table_local <_exp> add rng add ptr
 
 //-----------------------------------------------------------------------------
 //      Formatted listing variables
 //-----------------------------------------------------------------------------
 
-int coment = 0;  // 0-Code, 1-Inside comment, 2-Nested, ...
-int convert = 0; // Whether to generate tokens in listing
+int comment_depth = 0;  // 0-Code, 1-Inside comment, 2-Nested, ...
+int emit_tokens = 0; // Whether to generate tokens in listing
 
 //-----------------------------------------------------------------------------
 //      Error information
 //-----------------------------------------------------------------------------
 
-int numero_error = -1;
-int linea_error;
-int columna_error;
+int error_number = -1;
+int error_line;
+int error_col;
 
 int error_27 = 27; // To emit "statement expected"
 
@@ -964,7 +964,7 @@ FILE *lins; // EXEC.INS
 FILE *def; // For the "ltlex.def" analyzer
 byte *_buf;
 
-void inicializa_compilador(void) {
+void init_compiler(void) {
   int n;
   for (n = 0; n < 256; n++)
     if (lower[n] == ' ')
@@ -975,12 +975,12 @@ void inicializa_compilador(void) {
 //      Prepare compilation for a program
 //-----------------------------------------------------------------------------
 
-void mensaje_compilacion(byte *p) {
+void show_compile_message(byte *p) {
   if (compilemode) {
     fprintf(stdout, "%s\n", p);
   } else {
-    wbox(v.ptr, v.an / big2, v.al / big2, c2, 2, 20, v.an / big2 - 4, 7);
-    wwrite(v.ptr, v.an / big2, v.al / big2, 3, 20, 0, p, c3);
+    wbox(v.ptr, v.w / big2, v.h / big2, c2, 2, 20, v.w / big2 - 4, 7);
+    wwrite(v.ptr, v.w / big2, v.h / big2, 3, 20, 0, p, c3);
     flush_window(0);
     flush_copy();
   }
@@ -998,7 +998,7 @@ void mensaje_compilacion(byte *p) {
 void compile(void) {
   int n;
   uLongf m;
-  struct objeto *i;
+  struct object *i;
   byte *q, *p;
   FILE *f;
 
@@ -1006,7 +1006,7 @@ void compile(void) {
 
   free_resources();
 
-  mensaje_compilacion(texts[201]);
+  show_compile_message(texts[201]);
 
   vnom = NULL;
   mem_ory = NULL;
@@ -1019,21 +1019,21 @@ void compile(void) {
 
   itbreak = 0;
   itcont = 0;
-  convert = 0;
-  coment = 0;
+  emit_tokens = 0;
+  comment_depth = 0;
 
   member = NULL;
-  bloque_actual = NULL;
-  bloque_lexico = NULL;
+  current_scope = NULL;
+  lexical_scope = NULL;
 
   delete_code();
 
   memset(obj, 0, sizeof(obj));
   iobj = obj;
-  num_obj = 0;
+  num_objects = 0;
   memset(lex_simb, 0, sizeof(lex_simb));
   ilex_simb = lex_simb;
-  num_nodos = 0;
+  num_nodes = 0;
   memset(vhash, 0, sizeof(vhash));
 
   for (n = 0; n < 256; n++)
@@ -1048,7 +1048,7 @@ void compile(void) {
   if ((vnom = (byte *)malloc(max_obj * long_med_id + 1024)) == NULL)
     c_error(0, 0);
 
-  ivnom.b = vnom;
+  name_index.b = vnom;
 
   analyze_ltlex();
 
@@ -1056,7 +1056,7 @@ void compile(void) {
   lex_case[tab] = (struct lex_ele *)l_spc;
   lex_case[cr] = (struct lex_ele *)l_cr;
 
-  inicio_objetos = ivnom.b;
+  objects_start = name_index.b;
 
   // NOTE: These fopen failures would report "insufficient memory" (error 0),
   // but the actual cause is a file-creation failure, not a memory issue.
@@ -1084,7 +1084,7 @@ void compile(void) {
 
   iloc_max = default_buffer / 2;
   iloc = 0;
-  iloc_len = 0;
+  local_var_len = 0;
   if ((loc = (int *)malloc(iloc_max * sizeof(memptrsize))) == NULL)
     c_error(0, 0);
   memset(loc, 0, iloc_max * sizeof(memptrsize));
@@ -1094,24 +1094,24 @@ void compile(void) {
     c_error(0, 0);
   memset(frm, 0, ifrm_max * sizeof(memptrsize));
 
-  mensaje_compilacion(texts[203]);
+  show_compile_message(texts[203]);
 
   imem = long_header;
 
   preload_objects(); // No literals in the preloaded objects
 
-  mensaje_compilacion(texts[200]);
+  show_compile_message(texts[200]);
 
   source = source_ptr;
   _source = source;
   *(source + source_len) = cr;
   *(source + source_len + 1) = cr;
 
-  convert = 1;
+  emit_tokens = 1;
   ultima_linea = source;
-  acceso_remoto = 0;
-  parametros = 0;
-  linea = 1;
+  cross_process_access = 0;
+  in_params = 0;
+  source_line = 1;
 
   itxt = inicio_textos = imem;
   psintactico(); // To obtain "longitud_textos"
@@ -1119,21 +1119,21 @@ void compile(void) {
 
   test_buffer(&mem, &imem_max, imem);
 
-  num_obj_predefinidos = num_obj;
+  num_predefined = num_objects;
 
-  convert = 1;
+  emit_tokens = 1;
   ultima_linea = source;
   fwrite(&cero, 1, 1, lprg);
-  acceso_remoto = 0;
-  parametros = 0;
-  linea = 1;
+  cross_process_access = 0;
+  in_params = 0;
+  source_line = 1;
 
   parser();
 
   i = obj;
   while (i < iobj) {
-    if (i->usado) {
-      linea = i->line;
+    if (i->used) {
+      source_line = i->line;
       ierror = i->ierror;
       c_error(0, 121);
     }
@@ -1143,12 +1143,12 @@ void compile(void) {
   mem[2] = imem;
   mem[3] = max_process; // Previously long_header, now unused
   mem[4] = 0;           // Previously mem[1]-mem[3] (global data length), now unused
-  mem[5] = iloc_len - iloc;
+  mem[5] = local_var_len - iloc;
   mem[6] = iloc;
   mem[7] = 0;           // Previously imem+iloc (text start), now unused
   mem[8] = imem + iloc; // Number of elements used in mem[]
 
-  mensaje_compilacion(texts[204]);
+  show_compile_message(texts[204]);
 
   save_dbg();
   save_exec_bin();
@@ -1158,7 +1158,7 @@ void compile(void) {
   list_assembler();
 #endif
 
-  mensaje_compilacion(texts[205]);
+  show_compile_message(texts[205]);
 
 #ifdef SHARE
   mem[0] += 1024;
@@ -1297,19 +1297,19 @@ byte *_ie;
 void save_error(word tipo) { // Save an error position (0 .. 3)
   switch (tipo) {
   case 0:
-    _le = linea;
+    _le = source_line;
     _ie = ierror;
     break;
   case 1:
-    _le = old_linea;
+    _le = old_line;
     _ie = old_ierror_end;
     break;
   case 2:
-    _le = old_linea;
+    _le = old_line;
     _ie = old_ierror;
     break;
   case 3:
-    _le = old_linea;
+    _le = old_line;
     _ie = old_ierror_end;
     break;
   }
@@ -1326,27 +1326,27 @@ void c_error(word tipo, word e) {
   int columna = 0;
   byte *_p = NULL, *p = NULL;
 
-  numero_error = e;
+  error_number = e;
 
   switch (tipo) {
   case 0:
-    linea_error = linea;
+    error_line = source_line;
     p = ierror;
     break;
   case 1:
-    linea_error = old_linea;
+    error_line = old_line;
     _p = p = old_ierror_end;
     break;
   case 2:
-    linea_error = old_linea;
+    error_line = old_line;
     p = old_ierror;
     break;
   case 3:
-    linea_error = old_linea;
+    error_line = old_line;
     _p = p = old_ierror_end;
     break;
   case 4:
-    linea_error = _le;
+    error_line = _le;
     _p = p = _ie;
     tipo = _t;
     break;
@@ -1370,7 +1370,7 @@ void c_error(word tipo, word e) {
   } else if (tipo == 3)
     columna++;
 
-  columna_error = columna;
+  error_col = columna;
 
   // _case_sensitive
   memcpy(lower + 129,
@@ -1390,14 +1390,14 @@ void c_error(word tipo, word e) {
 
 void statement_start(void) {
   byte *p = ierror - 1;
-  inicio = imem;
-  linea1 = linea;
-  columna1 = 0;
+  start_addr = imem;
+  start_line = source_line;
+  start_col = 0;
   if (p < _source)
     p = _source;
 
   while (*p != cr && *p != lf && p > _source) {
-    columna1++;
+    start_col++;
     p--;
   }
 }
@@ -1408,30 +1408,30 @@ void statement_start(void) {
 
 void statement_end(void) {
   byte *p = old_ierror_end - 1;
-  final = imem - 1;
-  linea2 = old_linea;
-  columna2 = 0;
+  end_addr = imem - 1;
+  end_line = old_line;
+  end_col = 0;
 
   if (p < _source)
     p = _source;
 
   while (*p != cr && *p != lf && p > _source) {
-    columna2++;
+    end_col++;
     p--;
   }
 }
 
 //-----------------------------------------------------------------------------
-//  Write a record (inicio,final,linea1,...) to EXEC.LIN
+//  Write a record (start_addr,end_addr,start_line,...) to EXEC.LIN
 //-----------------------------------------------------------------------------
 
 void record_statement(void) {
-  fwrite(&inicio, 4, 1, linf);
-  fwrite(&final, 4, 1, linf);
-  fwrite(&linea1, 4, 1, linf);
-  fwrite(&columna1, 4, 1, linf);
-  fwrite(&linea2, 4, 1, linf);
-  fwrite(&columna2, 4, 1, linf);
+  fwrite(&start_addr, 4, 1, linf);
+  fwrite(&end_addr, 4, 1, linf);
+  fwrite(&start_line, 4, 1, linf);
+  fwrite(&start_col, 4, 1, linf);
+  fwrite(&end_line, 4, 1, linf);
+  fwrite(&end_col, 4, 1, linf);
 }
 
 //-----------------------------------------------------------------------------
@@ -1484,7 +1484,7 @@ void analyze_ltlex(void) {
   *(buf + len) = cr;
   *(buf + len + 1) = cr;
 
-  linea = 1;
+  source_line = 1;
   do {
     switch (*buf++) {
     case ' ':
@@ -1494,7 +1494,7 @@ void analyze_ltlex(void) {
       if (*buf == cr)
         cont = 0;
       else {
-        linea++;
+        source_line++;
         buf++;
       }
       break;
@@ -1521,49 +1521,49 @@ void analyze_ltlex(void) {
       if (*buf == cr || *buf == ' ' || *buf == tab)
         break;
       else if (lower[*buf]) { //Analyzes a keyword
-        _ivnom = ivnom.b;
-        *ivnom.p++ = 0;
-        *ivnom.p++ = (byte *)t;
+        _ivnom = name_index.b;
+        *name_index.p++ = 0;
+        *name_index.p++ = (byte *)t;
         h = 0;
-        while ((*ivnom.b = lower[*buf++]))
-          h = ((byte)(h << 1) + (h >> 7)) ^ (*ivnom.b++);
+        while ((*name_index.b = lower[*buf++]))
+          h = ((byte)(h << 1) + (h >> 7)) ^ (*name_index.b++);
         ptr = &vhash[h];
         while (*ptr)
           ptr = (byte **)*ptr;
         *ptr = _ivnom;
 
         buf--;
-        ivnom.b++;
+        name_index.b++;
       } else if (t >= 0x78 && t <= 0x7b) { //Analyzes a literal delimiter
         lex_case[*buf] = (struct lex_ele *)l_lit;
       } else { //Analyzes a new symbol
         if ((e = lex_case[*buf]) == 0) {
-          if (num_nodos++ == max_nodos)
+          if (num_nodes++ == max_nodos)
             c_error(0, 3);
           e = lex_case[*buf] = ilex_simb++;
-          (*e).caracter = *buf++;
+          (*e).character = *buf++;
         } else
           buf++;
         while (*buf != ' ' && *buf != tab && *buf != cr) {
           if (lower[*buf])
             c_error(0, 4);
-          if ((*e).siguiente == 0) {
-            if (num_nodos++ == max_nodos)
+          if ((*e).next == 0) {
+            if (num_nodes++ == max_nodos)
               c_error(0, 3);
             else
-              e = (*e).siguiente = ilex_simb++;
+              e = (*e).next = ilex_simb++;
           } else {
-            e = (*e).siguiente;
-            while ((*e).caracter != *buf && (*e).alternativa)
-              e = (*e).alternativa;
-            if ((*e).caracter != *buf) {
-              if (num_nodos++ == max_nodos)
+            e = (*e).next;
+            while ((*e).character != *buf && (*e).alternative)
+              e = (*e).alternative;
+            if ((*e).character != *buf) {
+              if (num_nodes++ == max_nodos)
                 c_error(0, 3);
               else
-                e = (*e).alternativa = ilex_simb++;
+                e = (*e).alternative = ilex_simb++;
             }
           }
-          (*e).caracter = *buf++;
+          (*e).character = *buf++;
         }
         (*e).token = t;
       }
@@ -1585,8 +1585,8 @@ void analyze_ltlex(void) {
 
 void preload_objects(void) {
   int len, ret, cod;
-  struct objeto *ob;
-  struct objeto *ob2;
+  struct object *ob;
+  struct object *ob2;
 
   if ((def = fopen("system/ltobj.def", "rb")) == NULL)
     c_error(0, 6);
@@ -1599,30 +1599,30 @@ void preload_objects(void) {
   *(source + len) = cr;
   *(source + len + 1) = cr;
 
-  linea = 1;
+  source_line = 1;
   lexer();
 
-  while (pieza != p_ultima)
-    switch (pieza) {
+  while (current_token != p_ultima)
+    switch (current_token) {
     case p_const:
       lexer();
-      if (pieza != p_id)
+      if (current_token != p_id)
         c_error(0, 7);
       ob = o;
       if ((*ob).type != tnone)
         c_error(0, 7);
       (*ob).type = tcons;
       lexer();
-      if (pieza != p_asig)
+      if (current_token != p_asig)
         c_error(0, 7);
       lexer();
-      if (pieza == p_num)
-        (*ob).cons.valor = pieza_num;
-      else if (pieza == p_sub) {
+      if (current_token == p_num)
+        (*ob).cons.value = token_value;
+      else if (current_token == p_sub) {
         lexer();
-        if (pieza != p_num)
+        if (current_token != p_num)
           c_error(0, 7);
-        (*ob).cons.valor = -pieza_num;
+        (*ob).cons.value = -token_value;
       } else
         c_error(0, 7);
       (*ob).cons.literal = 0;
@@ -1630,146 +1630,146 @@ void preload_objects(void) {
       break;
     case p_global:
       lexer();
-      if (pieza == p_id) {
+      if (current_token == p_id) {
         ob = o;
         if ((*ob).type != tnone)
           c_error(0, 7);
         lexer();
-        if (pieza == p_corab) {
+        if (current_token == p_corab) {
           (*ob).type = ttglo;
-          (*ob).tglo.offset = imem;
+          (*ob).table_global.offset = imem;
           lexer();
-          if (pieza != p_num)
+          if (current_token != p_num)
             c_error(0, 7);
-          (*ob).tglo.len1 = len = pieza_num;
-          (*ob).tglo.len2 = -1;
-          (*ob).tglo.len3 = -1;
-          (*ob).tglo.totalen = len + 1;
+          (*ob).table_global.len1 = len = token_value;
+          (*ob).table_global.len2 = -1;
+          (*ob).table_global.len3 = -1;
+          (*ob).table_global.total_len = len + 1;
           do {
             mem[imem++] = 0;
           } while (len--);
           lexer();
-          if (pieza != p_corce)
+          if (current_token != p_corce)
             c_error(0, 7);
           lexer();
         } else {
           (*ob).type = tvglo;
-          (*ob).vglo.offset = imem;
-          if (pieza != p_asig) {
+          (*ob).var_global.offset = imem;
+          if (current_token != p_asig) {
             c_error(0, 7);
           }
           lexer();
-          if (pieza == p_num)
-            mem[imem++] = pieza_num;
-          else if (pieza == p_sub) {
+          if (current_token == p_num)
+            mem[imem++] = token_value;
+          else if (current_token == p_sub) {
             lexer();
-            if (pieza != p_num)
+            if (current_token != p_num)
               c_error(0, 7);
-            mem[imem++] = -pieza_num;
+            mem[imem++] = -token_value;
           } else
             c_error(0, 7);
           lexer();
         }
-      } else if (pieza == p_struct) {
+      } else if (current_token == p_struct) {
         lexer();
-        if (pieza != p_id)
+        if (current_token != p_id)
           c_error(0, 7);
         ob = o;
         if ((*ob).type != tnone)
           c_error(0, 7);
         lexer();
-        if (pieza != p_corab)
+        if (current_token != p_corab)
           c_error(0, 7);
         (*ob).type = tsglo;
-        (*ob).sglo.offset = imem;
+        (*ob).struct_global.offset = imem;
         lexer();
-        if (pieza != p_num)
+        if (current_token != p_num)
           c_error(0, 7);
-        (*ob).sglo.items1 = pieza_num;
-        (*ob).sglo.items2 = (*ob).sglo.items3 = -1;
-        (*ob).sglo.totalitems = pieza_num + 1;
+        (*ob).struct_global.dim1 = token_value;
+        (*ob).struct_global.dim2 = (*ob).struct_global.dim3 = -1;
+        (*ob).struct_global.total_items = token_value + 1;
         lexer();
-        if (pieza != p_corce)
+        if (current_token != p_corce)
           c_error(0, 7);
-        (*ob).sglo.len_item = 0;
+        (*ob).struct_global.item_len = 0;
         member = ob;
         lexer();
-        if (pieza == p_end) {
+        if (current_token == p_end) {
           c_error(0, 7);
         }
         len = 0;
-        while (pieza != p_end) {
-          if (pieza == p_string) {
+        while (current_token != p_end) {
+          if (current_token == p_string) {
             lexer();
-            if (pieza != p_id)
+            if (current_token != p_id)
               c_error(0, 7);
             if ((*o).type != tnone)
               c_error(0, 7);
             ob2 = o;
             lexer();
             (*ob2).type = tcglo;
-            (*ob2).cglo.offset = len + 1;
-            if (pieza != p_corab) {
+            (*ob2).string_global.offset = len + 1;
+            if (current_token != p_corab) {
               c_error(0, 7);
             }
             lexer();
-            if (((*ob2).cglo.totalen = constant()) < 0) {
+            if (((*ob2).string_global.total_len = constant()) < 0) {
               c_error(0, 7);
             }
-            if ((*ob2).cglo.totalen > 0xFFFFF) {
+            if ((*ob2).string_global.total_len > 0xFFFFF) {
               c_error(0, 7);
             }
-            if (pieza != p_corce) {
+            if (current_token != p_corce) {
               c_error(0, 7);
             }
             lexer();
 
-            mem[imem] = 0xDAD00000 | (*ob2).cglo.totalen;
-            len += 1 + ((*ob2).cglo.totalen + 5) / 4;
+            mem[imem] = 0xDAD00000 | (*ob2).string_global.total_len;
+            len += 1 + ((*ob2).string_global.total_len + 5) / 4;
             mem[imem + 1] = 0;
-            imem += 1 + ((*ob2).cglo.totalen + 5) / 4;
-            (*ob).sglo.len_item += 1 + ((*ob2).cglo.totalen + 5) / 4;
+            imem += 1 + ((*ob2).string_global.total_len + 5) / 4;
+            (*ob).struct_global.item_len += 1 + ((*ob2).string_global.total_len + 5) / 4;
 
           } else {
-            if (pieza != p_id)
+            if (current_token != p_id)
               c_error(0, 7);
             if ((*o).type != tnone)
               c_error(0, 7);
             ob2 = o;
             lexer();
-            if (pieza == p_corab) {
+            if (current_token == p_corab) {
               (*ob2).type = ttglo;
-              (*ob2).tglo.offset = len;
+              (*ob2).table_global.offset = len;
               lexer();
-              if (pieza != p_num)
+              if (current_token != p_num)
                 c_error(0, 7);
-              (*ob2).tglo.len1 = pieza_num;
-              (*ob2).tglo.len2 = -1;
-              (*ob2).tglo.len3 = -1;
-              (*ob2).tglo.totalen = pieza_num + 1;
-              len += pieza_num + 1;
-              memset(&mem[imem], 0, (pieza_num + 1) * 4);
-              imem += pieza_num + 1;
-              (*ob).sglo.len_item += pieza_num + 1;
+              (*ob2).table_global.len1 = token_value;
+              (*ob2).table_global.len2 = -1;
+              (*ob2).table_global.len3 = -1;
+              (*ob2).table_global.total_len = token_value + 1;
+              len += token_value + 1;
+              memset(&mem[imem], 0, (token_value + 1) * 4);
+              imem += token_value + 1;
+              (*ob).struct_global.item_len += token_value + 1;
               lexer();
-              if (pieza != p_corce)
+              if (current_token != p_corce)
                 c_error(0, 7);
               lexer();
             } else {
               (*ob2).type = tvglo;
-              (*ob2).vglo.offset = len++;
+              (*ob2).var_global.offset = len++;
               mem[imem++] = 0;
-              (*ob).sglo.len_item++;
+              (*ob).struct_global.item_len++;
             }
           }
         }
         member = NULL;
         lexer();
 
-        if ((*ob).sglo.totalitems > 1) {
-          len = ((*ob).sglo.totalitems - 1) * (*ob).sglo.len_item - 1;
+        if ((*ob).struct_global.total_items > 1) {
+          len = ((*ob).struct_global.total_items - 1) * (*ob).struct_global.item_len - 1;
           do {
-            mem[imem] = mem[imem - (*ob).sglo.len_item];
+            mem[imem] = mem[imem - (*ob).struct_global.item_len];
             imem++;
           } while (len--);
         }
@@ -1779,73 +1779,73 @@ void preload_objects(void) {
       break;
     case p_local:
       lexer();
-      if (pieza == p_id) {
+      if (current_token == p_id) {
         ob = o;
         if ((*ob).type != tnone)
           c_error(0, 7);
         (*ob).type = tvloc;
-        (*ob).vloc.offset = iloc;
+        (*ob).var_local.offset = iloc;
         lexer();
-        if (pieza != p_asig)
+        if (current_token != p_asig)
           c_error(0, 7);
         lexer();
-        if (pieza == p_num)
-          loc[iloc++] = pieza_num;
-        else if (pieza == p_sub) {
+        if (current_token == p_num)
+          loc[iloc++] = token_value;
+        else if (current_token == p_sub) {
           lexer();
-          if (pieza != p_num)
+          if (current_token != p_num)
             c_error(0, 7);
-          loc[iloc++] = -pieza_num;
+          loc[iloc++] = -token_value;
         } else
           c_error(0, 7);
         lexer();
-      } else if (pieza == p_struct) {
+      } else if (current_token == p_struct) {
         lexer();
-        if (pieza != p_id)
+        if (current_token != p_id)
           c_error(0, 7);
         ob = o;
         if ((*ob).type != tnone)
           c_error(0, 7);
         lexer();
-        if (pieza != p_corab)
+        if (current_token != p_corab)
           c_error(0, 7);
         (*ob).type = tsloc;
-        (*ob).sloc.offset = iloc;
+        (*ob).struct_local.offset = iloc;
         lexer();
-        if (pieza != p_num)
+        if (current_token != p_num)
           c_error(0, 7);
-        (*ob).sloc.items1 = pieza_num;
-        (*ob).sloc.items2 = (*ob).sloc.items3 = -1;
-        (*ob).sloc.totalitems = pieza_num + 1;
+        (*ob).struct_local.dim1 = token_value;
+        (*ob).struct_local.dim2 = (*ob).struct_local.dim3 = -1;
+        (*ob).struct_local.total_items = token_value + 1;
         lexer();
-        if (pieza != p_corce)
+        if (current_token != p_corce)
           c_error(0, 7);
-        (*ob).sloc.len_item = 0;
+        (*ob).struct_local.item_len = 0;
         member = ob;
         lexer();
-        if (pieza == p_end)
+        if (current_token == p_end)
           c_error(0, 7);
 
         len = 0;
 
-        while (pieza != p_end) {
-          if (pieza != p_id)
+        while (current_token != p_end) {
+          if (current_token != p_id)
             c_error(0, 7);
           if ((*o).type != tnone)
             c_error(0, 7);
           (*o).type = tvloc;
-          (*o).vloc.offset = len;
-          (*ob).sloc.len_item++;
+          (*o).var_local.offset = len;
+          (*ob).struct_local.item_len++;
           lexer();
-          if (pieza == p_asig) {
+          if (current_token == p_asig) {
             lexer();
-            if (pieza == p_num)
-              loc[iloc + len] = pieza_num;
-            else if (pieza == p_sub) {
+            if (current_token == p_num)
+              loc[iloc + len] = token_value;
+            else if (current_token == p_sub) {
               lexer();
-              if (pieza != p_num)
+              if (current_token != p_num)
                 c_error(0, 7);
-              loc[iloc + len] = -pieza_num;
+              loc[iloc + len] = -token_value;
             } else
               c_error(0, 7);
             lexer();
@@ -1854,7 +1854,7 @@ void preload_objects(void) {
           len++;
         }
 
-        iloc += (*ob).sloc.totalitems * (*ob).sloc.len_item;
+        iloc += (*ob).struct_local.total_items * (*ob).struct_local.item_len;
 
         member = NULL;
         lexer();
@@ -1864,39 +1864,39 @@ void preload_objects(void) {
 
     case p_function: // function 0 int signal(0,0) // ....
       lexer();
-      if (pieza != p_num)
+      if (current_token != p_num)
         c_error(0, 7);
-      cod = pieza_num;
+      cod = token_value;
       lexer();
-      if (pieza == p_int)
+      if (current_token == p_int)
         ret = 0;
-      else if (pieza == p_string)
+      else if (current_token == p_string)
         ret = 1;
       else
         c_error(0, 7);
       lexer();
-      if (pieza != p_id)
+      if (current_token != p_id)
         c_error(0, 7);
       ob = o;
       if ((*ob).type != tnone)
         c_error(0, 7);
       (*ob).type = tfunc;
       lexer();
-      if (pieza != p_abrir)
+      if (current_token != p_abrir)
         c_error(0, 7);
       lexer();
       len = 0;
-      while (pieza != p_cerrar) {
-        if (pieza != p_num)
+      while (current_token != p_cerrar) {
+        if (current_token != p_num)
           c_error(0, 7);
-        (*ob).func.par[len++] = pieza_num;
+        (*ob).func.par[len++] = token_value;
         lexer();
-        if (pieza == p_coma)
+        if (current_token == p_coma)
           lexer();
       }
       (*ob).func.code = cod;
       (*ob).func.ret = ret;
-      (*ob).func.num_par = len;
+      (*ob).func.num_params = len;
       lexer();
       break;
 
@@ -1916,29 +1916,29 @@ void preload_objects(void) {
 //-----------------------------------------------------------------------------
 
 int next_pieza;
-int next_linea;
+int next_line;
 byte *next_source;
 
-byte *next_lexico(byte *_source, int coment, int linea) { // Never generates errors
+byte *next_lexico(byte *_source, int comment_depth, int source_line) { // Never generates errors
 
   byte **ptr, *_ivnom, h;
   struct lex_ele *e;
 
-  if (!coment && linea) {
-    old_linea = linea;
+  if (!comment_depth && source_line) {
+    old_line = source_line;
     old_ierror = ierror;
     old_ierror_end = ierror_end;
   }
 
 lex_scan:
 
-  if (linea)
+  if (source_line)
     ierror = _source;
   next_source = _source;
 
   switch ((uintptr_t)lex_case[*_source]) {
   case l_err:
-    if (coment) {
+    if (comment_depth) {
       _source++;
       goto lex_scan;
     }
@@ -1946,13 +1946,13 @@ lex_scan:
     break;
 
   case l_cr:
-    if (linea) {
-      if (convert) {
+    if (source_line) {
+      if (emit_tokens) {
         fwrite(ultima_linea, 1, _source - ultima_linea, lprg);
         fwrite(&cero, 1, 1, lprg);
       }
 
-      linea++;
+      source_line++;
       if ((*++_source) == lf) {
         _source++;
         ultima_linea = _source;
@@ -1971,23 +1971,23 @@ lex_scan:
     }
 
   case l_id:
-    if (coment) {
+    if (comment_depth) {
       _source++;
       goto lex_scan;
     }
-    _ivnom = ivnom.b;
-    *ivnom.p++ = 0;
-    *ivnom.p++ = 0;
+    _ivnom = name_index.b;
+    *name_index.p++ = 0;
+    *name_index.p++ = 0;
     h = 0;
-    while ((*ivnom.b = lower[*_source++]))
-      h = ((byte)(h << 1) + (h >> 7)) ^ (*ivnom.b++);
-    ivnom.b++;
+    while ((*name_index.b = lower[*_source++]))
+      h = ((byte)(h << 1) + (h >> 7)) ^ (*name_index.b++);
+    name_index.b++;
     _source--;
     ptr = &vhash[h];
     while (*ptr != NULL && strcmp((char *)(ptr + 2), (char *)_ivnom + ptr8))
       ptr = (byte **)*ptr;
     if (!strcmp((char *)(ptr + 2), (char *)_ivnom + ptr8)) { // id found
-      ivnom.b = _ivnom;                                      // remove it from vnom
+      name_index.b = _ivnom;                                      // remove it from vnom
       next_pieza = (intptr_t)*(ptr + 1);
       if (next_pieza < 256 && next_pieza >= 0) { // reserved word (token)
         if (next_pieza == p_rem) {
@@ -1999,7 +1999,7 @@ lex_scan:
         next_pieza = p_id;
       }
     } else {
-      ivnom.b = _ivnom;  // remove it from vnom
+      name_index.b = _ivnom;  // remove it from vnom
       next_pieza = p_id; // new id
     }
     break;
@@ -2009,7 +2009,7 @@ lex_scan:
     goto lex_scan;
 
   case l_lit:
-    if (coment) {
+    if (comment_depth) {
       _source++;
       goto lex_scan;
     }
@@ -2017,7 +2017,7 @@ lex_scan:
     break;
 
   case l_num:
-    if (coment) {
+    if (comment_depth) {
       _source++;
       goto lex_scan;
     }
@@ -2029,17 +2029,17 @@ lex_scan:
     next_pieza = (*e).token;
     _ivnom = _source;
 
-    while ((e = (*e).siguiente)) {
-      while (*_source != (*e).caracter && (*e).alternativa)
-        e = (*e).alternativa;
-      if (*_source++ == (*e).caracter && (*e).token) {
+    while ((e = (*e).next)) {
+      while (*_source != (*e).character && (*e).alternative)
+        e = (*e).alternative;
+      if (*_source++ == (*e).character && (*e).token) {
         next_pieza = (*e).token;
         _ivnom = _source;
       }
     }
     _source = _ivnom;
 
-    if (next_pieza == p_rem && !coment) {
+    if (next_pieza == p_rem && !comment_depth) {
       while (*_source != cr) {
         _source++;
       }
@@ -2047,17 +2047,17 @@ lex_scan:
     }
 
     if (next_pieza == p_ini_rem) {
-      coment++;
+      comment_depth++;
       do {
-        _source = next_lexico(_source, coment, linea);
-        linea = next_linea;
+        _source = next_lexico(_source, comment_depth, source_line);
+        source_line = next_line;
       } while (next_pieza != p_end_rem);
-      coment--;
+      comment_depth--;
       goto lex_scan;
     }
     break;
   }
-  next_linea = linea;
+  next_line = source_line;
   return (_source);
 }
 
@@ -2070,12 +2070,12 @@ int IsWAV(char *FileName);
 int en_fopen = 0;
 
 /* Lexer: reads the next token from the source buffer.
- * Sets global 'pieza' to the token type, 'pieza_num' for numeric/literal
+ * Sets global 'current_token' to the token type, 'token_value' for numeric/literal
  * values, and 'o' for identifier objects. Also handles hash-table lookup
  * and insertion of new identifiers into the symbol table.
  */
 void lexer(void) {
-  struct objeto **ptr_o;
+  struct object **ptr_o;
   byte **ptr, *_ivnom, h, *_source = source;
   struct lex_ele *e;
   char cwork[66];
@@ -2089,8 +2089,8 @@ void lexer(void) {
 
   int n;
 
-  if (!coment) {
-    old_linea = linea;
+  if (!comment_depth) {
+    old_line = source_line;
     old_ierror = ierror;
     old_ierror_end = ierror_end;
   }
@@ -2100,8 +2100,8 @@ lex_scan:
   switch ((uintptr_t)lex_case[*_source]) { // Pointer to a lex_ele or l_???
 
   case l_err:
-    if (coment) {
-      pieza = p_rem;
+    if (comment_depth) {
+      current_token = p_rem;
       _source++;
     } else
       c_error(0, 10);
@@ -2109,35 +2109,35 @@ lex_scan:
 
   case l_cr:
 
-    if (convert) {
+    if (emit_tokens) {
       fwrite(ultima_linea, 1, _source - ultima_linea, lprg);
       fwrite(&cero, 1, 1, lprg);
     }
 
-    linea++;
+    source_line++;
     if ((*++_source) == lf) {
       _source++;
       ultima_linea = _source;
       goto lex_scan;
     }
-    pieza = p_ultima;
+    current_token = p_ultima;
     break; // eof
 
   case l_id:
-    if (coment) {
-      pieza = p_rem;
+    if (comment_depth) {
+      current_token = p_rem;
       _source++;
       break;
     }
-    _ivnom = ivnom.b;
-    *ivnom.p++ = 0;
-    *ivnom.p++ = 0;
+    _ivnom = name_index.b;
+    *name_index.p++ = 0;
+    *name_index.p++ = 0;
     h = 0;
-    while ((*ivnom.b = lower[*_source++]))
-      h = ((byte)(h << 1) + (h >> 7)) ^ (*ivnom.b++);
-    ivnom.b++;
+    while ((*name_index.b = lower[*_source++]))
+      h = ((byte)(h << 1) + (h >> 7)) ^ (*name_index.b++);
+    name_index.b++;
     _source--;
-    if (ivnom.b - vnom > max_obj * long_med_id)
+    if (name_index.b - vnom > max_obj * long_med_id)
       c_error(0, 100);
 
     ptr = &vhash[h];
@@ -2146,54 +2146,54 @@ lex_scan:
     }
 
     if (!strcmp((char *)(ptr + 2), (char *)_ivnom + ptr8)) { // id found
-      ivnom.b = _ivnom;                                      // remove it from vnom
-      pieza = (intptr_t)*(ptr + 1);
-      if (pieza < 256 && pieza >= 0) { // reserved word (t	oken)
+      name_index.b = _ivnom;                                      // remove it from vnom
+      current_token = (intptr_t)*(ptr + 1);
+      if (current_token < 256 && current_token >= 0) { // reserved word (t	oken)
 
-        if (pieza == p_rem) {
+        if (current_token == p_rem) {
           while (*_source != cr)
             _source++;
           goto lex_scan;
         }
 
       } else { // object (existing id)
-        ptr_o = (struct objeto **)(ptr + 1);
+        ptr_o = (struct object **)(ptr + 1);
         o = *ptr_o;
-        pieza = p_id;
+        current_token = p_id;
         while (o != NULL &&
-               (((*o).bloque && bloque_lexico != (*o).bloque) || ((*o).member != member)))
-          o = (*o).anterior;
+               (((*o).scope && lexical_scope != (*o).scope) || ((*o).member != member)))
+          o = (*o).prev;
         if (o == NULL) { // Not found
           o = iobj++;
-          (*o).anterior = *ptr_o;
+          (*o).prev = *ptr_o;
           *ptr_o = o;
           (*o).name = (byte *)(ptr_o + 1);
           (*o).member = member;
           (*o).param = 0;
-          if (parametros)
-            (*o).bloque = bloque_actual;
+          if (in_params)
+            (*o).scope = current_scope;
 #ifndef SHARE
-          if (num_obj++ == max_obj)
+          if (num_objects++ == max_obj)
             c_error(0, 102);
 #else
-          if (num_obj++ == max_obj)
+          if (num_objects++ == max_obj)
             c_error(0, 101);
 #endif
         } else {
           if ((*o).type == tcons)
-            pieza_num = (*o).cons.valor;
+            token_value = (*o).cons.value;
         }
       }
     } else {
       *ptr = _ivnom;
-      ptr_o = (struct objeto **)(_ivnom + ptr4);
+      ptr_o = (struct object **)(_ivnom + ptr4);
       *ptr_o = o = iobj++;
-      pieza = p_id; // new id
+      current_token = p_id; // new id
       (*o).name = (byte *)_ivnom + ptr8;
       (*o).member = member;
-      if (parametros)
-        (*o).bloque = bloque_actual;
-      if (num_obj++ == max_obj)
+      if (in_params)
+        (*o).scope = current_scope;
+      if (num_objects++ == max_obj)
         c_error(0, 102);
     }
     break;
@@ -2203,14 +2203,14 @@ lex_scan:
     goto lex_scan;
 
   case l_lit:
-    if (coment) {
-      pieza = p_rem;
+    if (comment_depth) {
+      current_token = p_rem;
       _source++;
       break;
     }
-    pieza = p_lit;
+    current_token = p_lit;
     h = *_source;
-    _ivnom = ivnom.b; // Literal between two h delimiters
+    _ivnom = name_index.b; // Literal between two h delimiters
     do {
       if (*++_source == cr)
         c_error(0, 11);
@@ -2226,8 +2226,8 @@ lex_scan:
 
     next_lexico(_source, 0, 0);
     while (next_pieza == p_lit) {
-      next_lexico(_source, 0, linea);
-      linea = next_linea;
+      next_lexico(_source, 0, source_line);
+      source_line = next_line;
       _source = next_source;
       h = *_source;
       _ivnom--;
@@ -2246,12 +2246,12 @@ lex_scan:
       next_lexico(_source, 0, 0);
     }
 
-    n = (strlen((char *)ivnom.b) + ptr4) / 4;
-    memcpy(&mem_ory[itxt], ivnom.b, strlen((char *)ivnom.b) + 1);
+    n = (strlen((char *)name_index.b) + ptr4) / 4;
+    memcpy(&mem_ory[itxt], name_index.b, strlen((char *)name_index.b) + 1);
 
-    if (ivnom.b[0] != '.' && (ivnom.b[0] != '/' && ivnom.b[1] != 0) &&
-        strcmp("/", (char *)ivnom.b) && (f = div_open_file((char *)ivnom.b)) != NULL) {
-      fprintf(stdout, "FOUND FILE: [%s] [%s] [%s]\n", (char *)ivnom.b, full, (char *)&tipo[8]);
+    if (name_index.b[0] != '.' && (name_index.b[0] != '/' && name_index.b[1] != 0) &&
+        strcmp("/", (char *)name_index.b) && (f = div_open_file((char *)name_index.b)) != NULL) {
+      fprintf(stdout, "FOUND FILE: [%s] [%s] [%s]\n", (char *)name_index.b, full, (char *)&tipo[8]);
 
       empaquetable = 0;
 
@@ -2299,31 +2299,31 @@ lex_scan:
       fflush(lins);
     }
 
-    pieza_num = itxt;
+    token_value = itxt;
     itxt += n;
     break;
 
   case l_num:
-    if (coment) {
-      pieza = p_rem;
+    if (comment_depth) {
+      current_token = p_rem;
       _source++;
       break;
     }
 
-    pieza = p_num;
-    pieza_num = 0;
+    current_token = p_num;
+    token_value = 0;
     if (*_source == '0' && lower[*(_source + 1)] == 'x') {
       _source += 2;
       while ((uintptr_t)lex_case[*_source] == l_num ||
              (lower[*_source] >= 'a' && lower[*_source] <= 'f')) {
         if ((uintptr_t)lex_case[*_source] == l_num)
-          pieza_num = pieza_num * 16 + *_source++ - 0x30;
+          token_value = token_value * 16 + *_source++ - 0x30;
         else
-          pieza_num = pieza_num * 16 + lower[*_source++] - 'a' + 10;
+          token_value = token_value * 16 + lower[*_source++] - 'a' + 10;
       }
     } else
       do {
-        pieza_num = pieza_num * 10 + *_source++ - 0x30;
+        token_value = token_value * 10 + *_source++ - 0x30;
       } while ((uintptr_t)lex_case[*_source] == l_num);
     break;
 
@@ -2331,35 +2331,35 @@ lex_scan:
 
     e = lex_case[*_source++];
     _ivnom = _source;
-    pieza = (*e).token;
-    while ((e = (*e).siguiente)) {
-      while (*_source != (*e).caracter && (*e).alternativa)
-        e = (*e).alternativa;
-      if (*_source++ == (*e).caracter && (*e).token) {
-        pieza = (*e).token;
+    current_token = (*e).token;
+    while ((e = (*e).next)) {
+      while (*_source != (*e).character && (*e).alternative)
+        e = (*e).alternative;
+      if (*_source++ == (*e).character && (*e).token) {
+        current_token = (*e).token;
         _ivnom = _source;
       }
     }
     _source = _ivnom;
 
-    if (pieza == p_rem && !coment) {
+    if (current_token == p_rem && !comment_depth) {
       while (*_source != cr)
         _source++;
       goto lex_scan;
     }
-    if (pieza == p_ini_rem) {
-      coment++;
+    if (current_token == p_ini_rem) {
+      comment_depth++;
       do {
         source = _source;
         lexer();
         _source = source;
-      } while (pieza != p_end_rem);
-      coment--;
+      } while (current_token != p_end_rem);
+      comment_depth--;
       goto lex_scan;
     }
 
-    if (pieza == p_ultima) {
-      if (coment)
+    if (current_token == p_ultima) {
+      if (comment_depth)
         c_error(0, 55);
       else
         c_error(0, 12);
@@ -2378,53 +2378,53 @@ lex_scan:
 void skip_semicolons(void) {
   do {
     lexer();
-  } while (pieza == p_ptocoma);
+  } while (current_token == p_ptocoma);
 }
 
 //-----------------------------------------------------------------------------
 //      Pointer declaration analysis (int, word or byte)
 //-----------------------------------------------------------------------------
 
-struct objeto *analiza_pointer(int tipo, int offset) {
-  struct objeto *ob;
+struct object *analyze_pointer(int tipo, int offset) {
+  struct object *ob;
   int len1, len2, len3;
 
-  if (pieza != p_id)
+  if (current_token != p_id)
     c_error(1, 148);
   ob = o;
   if ((*ob).type != tnone) {
-    if (parametros == -1 && (*ob).param == 1 && (*ob).bloque == bloque_actual) {
+    if (in_params == -1 && (*ob).param == 1 && (*ob).scope == current_scope) {
       if ((*ob).type == tipo) { // Redeclaring a pointer parameter as private
         save_error(0);
         lexer();
         len1 = -1;
         len2 = -1;
         len3 = -1;
-        if (pieza == p_corab) {
+        if (current_token == p_corab) {
           lexer();
           if ((len1 = constant()) < 0)
             c_error(4, 35);
-          if (pieza == p_coma) {
+          if (current_token == p_coma) {
             lexer();
             if ((len2 = constant()) < 0)
               c_error(4, 35);
-            if (pieza == p_coma) {
+            if (current_token == p_coma) {
               lexer();
               if ((len3 = constant()) < 0)
                 c_error(4, 35);
             }
           }
-          if (pieza != p_corce) {
+          if (current_token != p_corce) {
             c_error(3, 26);
           }
           lexer();
         }
-        if (len1 != (*ob).pilo.len1 || len2 != (*ob).pilo.len2 || len3 != (*ob).pilo.len3)
+        if (len1 != (*ob).ptr_int_local.len1 || len2 != (*ob).ptr_int_local.len2 || len3 != (*ob).ptr_int_local.len3)
           c_error(4, 141);
-        else if (pieza == p_asig)
+        else if (current_token == p_asig)
           c_error(0, 54);
         else {
-          while (pieza == p_ptocoma || pieza == p_coma)
+          while (current_token == p_ptocoma || current_token == p_coma)
             lexer();
           (*ob).param++; // Prevent re-declaring it again
           return (NULL);
@@ -2435,84 +2435,84 @@ struct objeto *analiza_pointer(int tipo, int offset) {
       c_error(0, 117);
   } else
     lexer();
-  if (parametros == -1)
-    (*ob).bloque = bloque_actual;
-  (*ob).pilo.len1 = -1;
-  (*ob).pilo.len2 = -1;
-  (*ob).pilo.len3 = -1;
-  if (pieza == p_corab) {
+  if (in_params == -1)
+    (*ob).scope = current_scope;
+  (*ob).ptr_int_local.len1 = -1;
+  (*ob).ptr_int_local.len2 = -1;
+  (*ob).ptr_int_local.len3 = -1;
+  if (current_token == p_corab) {
     lexer();
-    if (((*ob).pilo.len1 = constant()) < 0)
+    if (((*ob).ptr_int_local.len1 = constant()) < 0)
       c_error(4, 35);
-    if (pieza == p_coma) {
+    if (current_token == p_coma) {
       lexer();
-      if (((*ob).pilo.len2 = constant()) < 0)
+      if (((*ob).ptr_int_local.len2 = constant()) < 0)
         c_error(4, 35);
-      if (pieza == p_coma) {
+      if (current_token == p_coma) {
         lexer();
-        if (((*ob).pilo.len3 = constant()) < 0)
+        if (((*ob).ptr_int_local.len3 = constant()) < 0)
           c_error(4, 35);
       }
     }
-    if (pieza != p_corce) {
+    if (current_token != p_corce) {
       c_error(3, 26);
     }
     lexer();
   }
-  (*ob).pilo.totalen = 0;
-  if ((*ob).pilo.len1 > -1)
-    (*ob).pilo.totalen = (*ob).pilo.len1 + 1;
-  if ((*ob).pilo.len2 > -1)
-    (*ob).pilo.totalen *= (*ob).pilo.len2 + 1;
-  if ((*ob).pilo.len3 > -1)
-    (*ob).pilo.totalen *= (*ob).pilo.len3 + 1;
+  (*ob).ptr_int_local.total_len = 0;
+  if ((*ob).ptr_int_local.len1 > -1)
+    (*ob).ptr_int_local.total_len = (*ob).ptr_int_local.len1 + 1;
+  if ((*ob).ptr_int_local.len2 > -1)
+    (*ob).ptr_int_local.total_len *= (*ob).ptr_int_local.len2 + 1;
+  if ((*ob).ptr_int_local.len3 > -1)
+    (*ob).ptr_int_local.total_len *= (*ob).ptr_int_local.len3 + 1;
 
   (*ob).type = tipo;
-  (*ob).pilo.offset = offset;
+  (*ob).ptr_int_local.offset = offset;
 
   return (ob);
 }
 
 //-----------------------------------------------------------------------------
 
-int analyze_pointer_struct(int tipo, int offset, struct objeto *estructura) {
-  struct objeto *ob;
-  int items1, items2, items3;
+int analyze_pointer_struct(int tipo, int offset, struct object *estructura) {
+  struct object *ob;
+  int dim1, dim2, dim3;
 
-  if (pieza != p_id)
+  if (current_token != p_id)
     c_error(1, 148);
   ob = o;
   if ((*ob).type != tnone) {
-    if (parametros == -1 && (*ob).param == 1 && (*ob).bloque == bloque_actual) {
+    if (in_params == -1 && (*ob).param == 1 && (*ob).scope == current_scope) {
       if ((*ob).type == tipo) { // Redeclaring a pointer parameter as private
         save_error(0);
         lexer();
-        items1 = -1;
-        items2 = -1;
-        items3 = -1;
-        if (pieza == p_corab) {
+        dim1 = -1;
+        dim2 = -1;
+        dim3 = -1;
+        if (current_token == p_corab) {
           lexer();
-          if ((items1 = constant()) < 0)
+          if ((dim1 = constant()) < 0)
             c_error(4, 35);
-          if (pieza == p_coma) {
+          if (current_token == p_coma) {
             lexer();
-            if ((items2 = constant()) < 0)
+            if ((dim2 = constant()) < 0)
               c_error(4, 35);
-            if (pieza == p_coma) {
+            if (current_token == p_coma) {
               lexer();
-              if ((items3 = constant()) < 0)
+              if ((dim3 = constant()) < 0)
                 c_error(4, 35);
             }
           }
-          if (pieza != p_corce) {
+          if (current_token != p_corce) {
             c_error(3, 26);
           }
           lexer();
         }
-        if (items1 != (*ob).psgl.items1 || items2 != (*ob).psgl.items2 ||
-            items3 != (*ob).psgl.items3)
+        if (dim1 != (*ob).ptr_struct_global.dim1 || dim2 != (*ob).ptr_struct_global.dim2 ||
+            dim3 != (*ob).ptr_struct_global.dim3)
           c_error(4, 141);
-        else if (pieza == p_asig)
+        else if (current_token == p_asig)
           c_error(0, 54);
         else {
           (*ob).param++;
@@ -2524,41 +2524,41 @@ int analyze_pointer_struct(int tipo, int offset, struct objeto *estructura) {
       c_error(0, 117);
   } else
     lexer();
-  if (parametros == -1)
-    (*ob).bloque = bloque_actual;
-  (*ob).psgl.items1 = -1;
-  (*ob).psgl.items2 = -1;
-  (*ob).psgl.items3 = -1;
-  if (pieza == p_corab) {
+  if (in_params == -1)
+    (*ob).scope = current_scope;
+  (*ob).ptr_struct_global.dim1 = -1;
+  (*ob).ptr_struct_global.dim2 = -1;
+  (*ob).ptr_struct_global.dim3 = -1;
+  if (current_token == p_corab) {
     lexer();
-    if (((*ob).psgl.items1 = constant()) < 0)
+    if (((*ob).ptr_struct_global.dim1 = constant()) < 0)
       c_error(4, 35);
-    if (pieza == p_coma) {
+    if (current_token == p_coma) {
       lexer();
-      if (((*ob).psgl.items2 = constant()) < 0)
+      if (((*ob).ptr_struct_global.dim2 = constant()) < 0)
         c_error(4, 35);
-      if (pieza == p_coma) {
+      if (current_token == p_coma) {
         lexer();
-        if (((*ob).psgl.items3 = constant()) < 0)
+        if (((*ob).ptr_struct_global.dim3 = constant()) < 0)
           c_error(4, 35);
       }
     }
-    if (pieza != p_corce) {
+    if (current_token != p_corce) {
       c_error(3, 26);
     }
     lexer();
   }
-  (*ob).psgl.totalitems = 0;
-  if ((*ob).psgl.items1 > -1)
-    (*ob).psgl.totalitems = (*ob).psgl.items1 + 1;
-  if ((*ob).psgl.items2 > -1)
-    (*ob).psgl.totalitems *= (*ob).psgl.items2 + 1;
-  if ((*ob).psgl.items3 > -1)
-    (*ob).psgl.totalitems *= (*ob).psgl.items3 + 1;
+  (*ob).ptr_struct_global.total_items = 0;
+  if ((*ob).ptr_struct_global.dim1 > -1)
+    (*ob).ptr_struct_global.total_items = (*ob).ptr_struct_global.dim1 + 1;
+  if ((*ob).ptr_struct_global.dim2 > -1)
+    (*ob).ptr_struct_global.total_items *= (*ob).ptr_struct_global.dim2 + 1;
+  if ((*ob).ptr_struct_global.dim3 > -1)
+    (*ob).ptr_struct_global.total_items *= (*ob).ptr_struct_global.dim3 + 1;
 
   (*ob).type = tipo;               // tpsgl or tpslo
-  (*ob).psgl.offset = offset;      // pointer offset
-  (*ob).psgl.ostruct = estructura; // original struct
+  (*ob).ptr_struct_global.offset = offset;      // pointer offset
+  (*ob).ptr_struct_global.ostruct = estructura; // original struct
 
   return (1);
 }
@@ -2569,25 +2569,25 @@ int analyze_pointer_struct(int tipo, int offset, struct objeto *estructura) {
 
 int analyze_struct(int offstruct) { // after " struct id [ <const> ] " // id==member
   int len = 0, dup, i, _itxt, _imem;
-  struct objeto *ob;
-  struct objeto *old_member, *member2;
+  struct object *ob;
+  struct object *old_member, *member2;
   byte *oimemptr;
 
-  while (pieza == p_ptocoma)
+  while (current_token == p_ptocoma)
     lexer();
 
-  while (pieza != p_end) {
-    if (pieza == p_struct) { // Struct member ---
+  while (current_token != p_end) {
+    if (current_token == p_struct) { // Struct member ---
 
       lexer();
 
-      if (pieza == p_pointer) { // Defining a struct pointer
+      if (current_token == p_pointer) { // Defining a struct pointer
 
         old_member = member;
         member = NULL;
         lexer();
         member = old_member;
-        if (pieza != p_id) {
+        if (current_token != p_id) {
           c_error(1, 110);
         }
         ob = o;
@@ -2600,27 +2600,27 @@ int analyze_struct(int offstruct) { // after " struct id [ <const> ] " // id==me
 puntero_a_struct:
         analyze_pointer_struct(tpsgl, len, ob);
         test_buffer(&mem, &imem_max, offstruct + len);
-        if (pieza == p_asig) {
+        if (current_token == p_asig) {
           lexer();
           mem[offstruct + len] = constant();
         }
         len += 1;
 
-        if (pieza == p_coma) {
+        if (current_token == p_coma) {
           lexer();
-          if (pieza == p_pointer)
+          if (current_token == p_pointer)
             lexer();
           goto puntero_a_struct;
         } else {
           if (!free_sintax)
-            if (pieza != p_ptocoma)
+            if (current_token != p_ptocoma)
               c_error(3, 137);
-          while (pieza == p_ptocoma || pieza == p_coma)
+          while (current_token == p_ptocoma || current_token == p_coma)
             lexer();
         }
 
       } else {
-        if (pieza != p_id)
+        if (current_token != p_id)
           c_error(1, 110);
         ob = o;
         old_member = member;
@@ -2630,236 +2630,236 @@ puntero_a_struct:
           c_error(2, 22);
 
         (*ob).type = tsglo;
-        (*ob).sglo.offset = len;
-        if (pieza == p_corab) {
+        (*ob).struct_global.offset = len;
+        if (current_token == p_corab) {
           member2 = member;
           member = NULL;
           lexer();
-          if (((*ob).sglo.items1 = constant()) < 0)
+          if (((*ob).struct_global.dim1 = constant()) < 0)
             c_error(4, 123);
-          if (pieza == p_coma) {
+          if (current_token == p_coma) {
             lexer();
-            if (((*ob).sglo.items2 = constant()) < 0)
+            if (((*ob).struct_global.dim2 = constant()) < 0)
               c_error(4, 123);
-            if (pieza == p_coma) {
+            if (current_token == p_coma) {
               lexer();
-              if (((*ob).sglo.items3 = constant()) < 0)
+              if (((*ob).struct_global.dim3 = constant()) < 0)
                 c_error(4, 123);
             } else
-              (*ob).sglo.items3 = -1;
+              (*ob).struct_global.dim3 = -1;
           } else {
-            (*ob).sglo.items2 = -1;
-            (*ob).sglo.items3 = -1;
+            (*ob).struct_global.dim2 = -1;
+            (*ob).struct_global.dim3 = -1;
           }
           member = member2;
-          (*ob).sglo.totalitems = (*ob).sglo.items1 + 1;
-          if ((*ob).sglo.items2 > -1)
-            (*ob).sglo.totalitems *= (*ob).sglo.items2 + 1;
-          if ((*ob).sglo.items3 > -1)
-            (*ob).sglo.totalitems *= (*ob).sglo.items3 + 1;
-          if (pieza != p_corce) {
+          (*ob).struct_global.total_items = (*ob).struct_global.dim1 + 1;
+          if ((*ob).struct_global.dim2 > -1)
+            (*ob).struct_global.total_items *= (*ob).struct_global.dim2 + 1;
+          if ((*ob).struct_global.dim3 > -1)
+            (*ob).struct_global.total_items *= (*ob).struct_global.dim3 + 1;
+          if (current_token != p_corce) {
             c_error(3, 26);
           }
           lexer();
         } else {
-          (*ob).sglo.totalitems = 1;
-          (*ob).sglo.items1 = 0;
-          (*ob).sglo.items2 = -1;
-          (*ob).sglo.items3 = -1;
+          (*ob).struct_global.total_items = 1;
+          (*ob).struct_global.dim1 = 0;
+          (*ob).struct_global.dim2 = -1;
+          (*ob).struct_global.dim3 = -1;
         }
-        if (((*ob).sglo.len_item = analyze_struct(offstruct + len)) == 0)
+        if (((*ob).struct_global.item_len = analyze_struct(offstruct + len)) == 0)
           c_error(0, 57);
         i = offstruct + len;
-        dup = (*ob).sglo.totalitems + 1;
+        dup = (*ob).struct_global.total_items + 1;
         if (dup > 1) {
-          test_buffer(&mem, &imem_max, i + (*ob).sglo.len_item * (*ob).sglo.totalitems);
-          test_buffer(&frm, &ifrm_max, i + (*ob).sglo.len_item * (*ob).sglo.totalitems);
+          test_buffer(&mem, &imem_max, i + (*ob).struct_global.item_len * (*ob).struct_global.total_items);
+          test_buffer(&frm, &ifrm_max, i + (*ob).struct_global.item_len * (*ob).struct_global.total_items);
           while (--dup) {
             if (i != offstruct + len) {
-              memcpy(&mem[i], &mem[offstruct + len], (*ob).sglo.len_item << 2);
-              memcpy(&frm[i], &frm[offstruct + len], (*ob).sglo.len_item << 2);
+              memcpy(&mem[i], &mem[offstruct + len], (*ob).struct_global.item_len << 2);
+              memcpy(&frm[i], &frm[offstruct + len], (*ob).struct_global.item_len << 2);
             }
-            i += (*ob).sglo.len_item;
+            i += (*ob).struct_global.item_len;
           }
         }
-        len += (*ob).sglo.len_item * (*ob).sglo.totalitems;
+        len += (*ob).struct_global.item_len * (*ob).struct_global.total_items;
         member = old_member;
         lexer();
-        while (pieza == p_ptocoma)
+        while (current_token == p_ptocoma)
           lexer();
       }
-    } else if (pieza == p_string) { // String member
+    } else if (current_token == p_string) { // String member
 
       lexer();
 
-      if (pieza == p_pointer) { // Byte pointer member
+      if (current_token == p_pointer) { // Byte pointer member
 
         lexer();
 puntero1:
-        ob = analiza_pointer(tpcgl, len);
+        ob = analyze_pointer(tpcgl, len);
         test_buffer(&mem, &imem_max, offstruct + len);
-        if (pieza == p_asig) {
+        if (current_token == p_asig) {
           lexer();
           mem[offstruct + len] = constant();
         }
         len += 1;
 
-        if (pieza == p_coma) {
+        if (current_token == p_coma) {
           lexer();
-          if (pieza == p_pointer)
+          if (current_token == p_pointer)
             lexer();
           goto puntero1;
         }
 
       } else {
-        if (pieza != p_id)
+        if (current_token != p_id)
           c_error(1, 125);
         ob = o;
         if ((*ob).type != tnone)
           c_error(0, 114);
         lexer();
         (*ob).type = tcglo;
-        (*ob).cglo.offset = len + 1;
-        if (pieza == p_corab) {
+        (*ob).string_global.offset = len + 1;
+        if (current_token == p_corab) {
           lexer();
-          if (pieza == p_corce) {
+          if (current_token == p_corce) {
             lexer();
-            (*ob).cglo.totalen = 255;
+            (*ob).string_global.total_len = 255;
           } else {
-            if (((*ob).cglo.totalen = constant()) < 0)
+            if (((*ob).string_global.total_len = constant()) < 0)
               c_error(4, 127);
-            if ((*ob).cglo.totalen > 0xFFFFF)
+            if ((*ob).string_global.total_len > 0xFFFFF)
               c_error(4, 135);
-            if (pieza != p_corce)
+            if (current_token != p_corce)
               c_error(3, 26);
             lexer();
           }
         } else
-          (*ob).cglo.totalen = 255;
+          (*ob).string_global.total_len = 255;
 
         test_buffer(&frm, &ifrm_max, offstruct + len);
         frm[offstruct + len] = 0xDAD00000;
 
-        if (pieza == p_asig) {
+        if (current_token == p_asig) {
           save_error(1);
           _itxt = itxt;
           lexer();
-          if (pieza != p_lit && !(pieza == p_id && (*o).type == tcons && (*o).cons.literal))
+          if (current_token != p_lit && !(current_token == p_id && (*o).type == tcons && (*o).cons.literal))
             c_error(3, 128);
-          if (strlen((char *)&mem[pieza_num]) > (*ob).cglo.totalen + 1)
+          if (strlen((char *)&mem[token_value]) > (*ob).string_global.total_len + 1)
             c_error(4, 129);
           test_buffer(&mem, &imem_max, offstruct + len);
-          mem[offstruct + len] = 0xDAD00000 | (*ob).cglo.totalen;
-          memmove((char *)&mem[offstruct + len + 1], (char *)&mem[pieza_num],
-                  strlen((char *)&mem[pieza_num]) + 1);
-          len += 1 + ((*ob).cglo.totalen + 5) / 4;
+          mem[offstruct + len] = 0xDAD00000 | (*ob).string_global.total_len;
+          memmove((char *)&mem[offstruct + len + 1], (char *)&mem[token_value],
+                  strlen((char *)&mem[token_value]) + 1);
+          len += 1 + ((*ob).string_global.total_len + 5) / 4;
           itxt = _itxt; // Remove the string from the text segment
           lexer();
         } else {
           test_buffer(&mem, &imem_max, offstruct + len);
-          mem[offstruct + len] = 0xDAD00000 | (*ob).cglo.totalen;
-          len += 1 + ((*ob).cglo.totalen + 5) / 4;
+          mem[offstruct + len] = 0xDAD00000 | (*ob).string_global.total_len;
+          len += 1 + ((*ob).string_global.total_len + 5) / 4;
         }
       }
 
-      if (pieza == p_coma)
-        pieza = p_string;
+      if (current_token == p_coma)
+        current_token = p_string;
       else {
         if (!free_sintax)
-          if (pieza != p_ptocoma)
+          if (current_token != p_ptocoma)
             c_error(3, 137);
-        while (pieza == p_ptocoma || pieza == p_coma)
+        while (current_token == p_ptocoma || current_token == p_coma)
           lexer();
       }
 
-    } else if (pieza == p_byte) { // Byte member ---
+    } else if (current_token == p_byte) { // Byte member ---
 
       lexer();
 
-      if (pieza == p_pointer) { // Byte pointer member
+      if (current_token == p_pointer) { // Byte pointer member
 
         lexer();
 puntero2:
-        ob = analiza_pointer(tpbgl, len);
+        ob = analyze_pointer(tpbgl, len);
         test_buffer(&mem, &imem_max, offstruct + len);
-        if (pieza == p_asig) {
+        if (current_token == p_asig) {
           lexer();
           mem[offstruct + len] = constant();
         }
         len += 1;
 
-        if (pieza == p_coma) {
+        if (current_token == p_coma) {
           lexer();
-          if (pieza == p_pointer)
+          if (current_token == p_pointer)
             lexer();
           goto puntero2;
         }
 
       } else {
-        if (pieza != p_id)
+        if (current_token != p_id)
           c_error(1, 142);
         ob = o;
         if ((*ob).type != tnone)
           c_error(0, 114);
         lexer();
         (*ob).type = tbglo;
-        (*ob).bglo.offset = len;
-        if (pieza == p_corab) {
+        (*ob).byte_global.offset = len;
+        if (current_token == p_corab) {
           lexer();
-          if (((*ob).bglo.len1 = constant()) < 0)
+          if (((*ob).byte_global.len1 = constant()) < 0)
             c_error(4, 35);
-          if (pieza == p_coma) {
+          if (current_token == p_coma) {
             lexer();
-            if (((*ob).bglo.len2 = constant()) < 0)
+            if (((*ob).byte_global.len2 = constant()) < 0)
               c_error(4, 35);
-            if (pieza == p_coma) {
+            if (current_token == p_coma) {
               lexer();
-              if (((*ob).bglo.len3 = constant()) < 0)
+              if (((*ob).byte_global.len3 = constant()) < 0)
                 c_error(4, 35);
             } else
-              (*ob).bglo.len3 = -1;
+              (*ob).byte_global.len3 = -1;
           } else {
-            (*ob).bglo.len2 = -1;
-            (*ob).bglo.len3 = -1;
+            (*ob).byte_global.len2 = -1;
+            (*ob).byte_global.len3 = -1;
           }
-          (*ob).bglo.totalen = (*ob).bglo.len1 + 1;
-          if ((*ob).bglo.len2 > -1)
-            (*ob).bglo.totalen *= (*ob).bglo.len2 + 1;
-          if ((*ob).bglo.len3 > -1)
-            (*ob).bglo.totalen *= (*ob).bglo.len3 + 1;
-          if (pieza != p_corce) {
+          (*ob).byte_global.total_len = (*ob).byte_global.len1 + 1;
+          if ((*ob).byte_global.len2 > -1)
+            (*ob).byte_global.total_len *= (*ob).byte_global.len2 + 1;
+          if ((*ob).byte_global.len3 > -1)
+            (*ob).byte_global.total_len *= (*ob).byte_global.len3 + 1;
+          if (current_token != p_corce) {
             c_error(3, 26);
           }
           lexer();
-          test_buffer(&mem, &imem_max, offstruct + len + ((*ob).bglo.totalen + 3) / 4);
+          test_buffer(&mem, &imem_max, offstruct + len + ((*ob).byte_global.total_len + 3) / 4);
 
-          test_buffer(&frm, &ifrm_max, offstruct + len + ((*ob).bglo.totalen + 3) / 4);
-          memset(&frm[offstruct + len], 2, (*ob).bglo.totalen);
+          test_buffer(&frm, &ifrm_max, offstruct + len + ((*ob).byte_global.total_len + 3) / 4);
+          memset(&frm[offstruct + len], 2, (*ob).byte_global.total_len);
 
-          if (pieza == p_asig) {
+          if (current_token == p_asig) {
             _imem = imem;
             imem = offstruct + len;
             save_error(1);
             lexer();
             oimemptr = (byte *)&mem[imem];
             tglo_init(2);
-            if (imemptr - oimemptr > (*ob).bglo.totalen)
+            if (imemptr - oimemptr > (*ob).byte_global.total_len)
               c_error(4, 33);
             imem = _imem;
           }
-          (*ob).bglo.totalen = ((*ob).bglo.totalen + 3) / 4;
+          (*ob).byte_global.total_len = ((*ob).byte_global.total_len + 3) / 4;
         } else {
           (*ob).type = tbglo;
-          (*ob).bglo.offset = len;
-          (*ob).bglo.len1 = 0;
-          (*ob).bglo.len2 = -1;
-          (*ob).bglo.len3 = -1;
-          (*ob).bglo.totalen = 1; // 1 int
+          (*ob).byte_global.offset = len;
+          (*ob).byte_global.len1 = 0;
+          (*ob).byte_global.len2 = -1;
+          (*ob).byte_global.len3 = -1;
+          (*ob).byte_global.total_len = 1; // 1 int
 
           test_buffer(&frm, &ifrm_max, offstruct + len);
           frm[offstruct + len] = 2;
 
-          if (pieza == p_asig) {
+          if (current_token == p_asig) {
             save_error(1);
             lexer();
             test_buffer(&mem, &imem_max, offstruct + len);
@@ -2868,106 +2868,106 @@ puntero2:
               c_error(4, 143);
           }
         }
-        len += (*ob).bglo.totalen;
+        len += (*ob).byte_global.total_len;
       }
 
-      if (pieza == p_coma)
-        pieza = p_byte;
+      if (current_token == p_coma)
+        current_token = p_byte;
       else {
         if (!free_sintax)
-          if (pieza != p_ptocoma)
+          if (current_token != p_ptocoma)
             c_error(3, 137);
-        while (pieza == p_ptocoma || pieza == p_coma)
+        while (current_token == p_ptocoma || current_token == p_coma)
           lexer();
       }
 
-    } else if (pieza == p_word) { // Word member ---
+    } else if (current_token == p_word) { // Word member ---
 
       lexer();
 
-      if (pieza == p_pointer) { // Word pointer member
+      if (current_token == p_pointer) { // Word pointer member
 
         lexer();
 puntero3:
-        ob = analiza_pointer(tpwgl, len);
+        ob = analyze_pointer(tpwgl, len);
         test_buffer(&mem, &imem_max, offstruct + len);
-        if (pieza == p_asig) {
+        if (current_token == p_asig) {
           lexer();
           mem[offstruct + len] = constant();
         }
         len += 1;
-        if (pieza == p_coma) {
+        if (current_token == p_coma) {
           lexer();
-          if (pieza == p_pointer)
+          if (current_token == p_pointer)
             lexer();
           goto puntero3;
         }
 
       } else {
-        if (pieza != p_id)
+        if (current_token != p_id)
           c_error(1, 145);
         ob = o;
         if ((*ob).type != tnone)
           c_error(0, 114);
         lexer();
         (*ob).type = twglo;
-        (*ob).wglo.offset = len;
-        if (pieza == p_corab) {
+        (*ob).word_global.offset = len;
+        if (current_token == p_corab) {
           lexer();
-          if (((*ob).wglo.len1 = constant()) < 0)
+          if (((*ob).word_global.len1 = constant()) < 0)
             c_error(4, 35);
-          if (pieza == p_coma) {
+          if (current_token == p_coma) {
             lexer();
-            if (((*ob).wglo.len2 = constant()) < 0)
+            if (((*ob).word_global.len2 = constant()) < 0)
               c_error(4, 35);
-            if (pieza == p_coma) {
+            if (current_token == p_coma) {
               lexer();
-              if (((*ob).wglo.len3 = constant()) < 0)
+              if (((*ob).word_global.len3 = constant()) < 0)
                 c_error(4, 35);
             } else
-              (*ob).wglo.len3 = -1;
+              (*ob).word_global.len3 = -1;
           } else {
-            (*ob).wglo.len2 = -1;
-            (*ob).wglo.len3 = -1;
+            (*ob).word_global.len2 = -1;
+            (*ob).word_global.len3 = -1;
           }
-          (*ob).wglo.totalen = (*ob).wglo.len1 + 1;
-          if ((*ob).wglo.len2 > -1)
-            (*ob).wglo.totalen *= (*ob).wglo.len2 + 1;
-          if ((*ob).wglo.len3 > -1)
-            (*ob).wglo.totalen *= (*ob).wglo.len3 + 1;
-          if (pieza != p_corce) {
+          (*ob).word_global.total_len = (*ob).word_global.len1 + 1;
+          if ((*ob).word_global.len2 > -1)
+            (*ob).word_global.total_len *= (*ob).word_global.len2 + 1;
+          if ((*ob).word_global.len3 > -1)
+            (*ob).word_global.total_len *= (*ob).word_global.len3 + 1;
+          if (current_token != p_corce) {
             c_error(3, 26);
           }
           lexer();
-          test_buffer(&mem, &imem_max, offstruct + len + ((*ob).wglo.totalen + 1) / 2);
+          test_buffer(&mem, &imem_max, offstruct + len + ((*ob).word_global.total_len + 1) / 2);
 
-          test_buffer(&frm, &ifrm_max, offstruct + len + ((*ob).wglo.totalen + 1) / 2);
-          memset(&frm[offstruct + len], 1, (*ob).wglo.totalen * 2);
+          test_buffer(&frm, &ifrm_max, offstruct + len + ((*ob).word_global.total_len + 1) / 2);
+          memset(&frm[offstruct + len], 1, (*ob).word_global.total_len * 2);
 
-          if (pieza == p_asig) {
+          if (current_token == p_asig) {
             _imem = imem;
             imem = offstruct + len;
             save_error(1);
             lexer();
             oimemptr = (byte *)&mem[imem];
             tglo_init(1);
-            if (imemptr - oimemptr > (*ob).wglo.totalen * 2)
+            if (imemptr - oimemptr > (*ob).word_global.total_len * 2)
               c_error(4, 33);
             imem = _imem;
           }
-          (*ob).wglo.totalen = ((*ob).wglo.totalen + 1) / 2;
+          (*ob).word_global.total_len = ((*ob).word_global.total_len + 1) / 2;
         } else {
           (*ob).type = twglo;
-          (*ob).wglo.offset = len;
-          (*ob).wglo.len1 = 0;
-          (*ob).wglo.len2 = -1;
-          (*ob).wglo.len3 = -1;
-          (*ob).wglo.totalen = 1; // 1 int
+          (*ob).word_global.offset = len;
+          (*ob).word_global.len1 = 0;
+          (*ob).word_global.len2 = -1;
+          (*ob).word_global.len3 = -1;
+          (*ob).word_global.total_len = 1; // 1 int
 
           test_buffer(&frm, &ifrm_max, offstruct + len);
           frm[offstruct + len] = 1;
 
-          if (pieza == p_asig) {
+          if (current_token == p_asig) {
             save_error(1);
             lexer();
             test_buffer(&mem, &imem_max, offstruct + len);
@@ -2976,40 +2976,40 @@ puntero3:
               c_error(4, 144);
           }
         }
-        len += (*ob).wglo.totalen;
+        len += (*ob).word_global.total_len;
       }
 
-      if (pieza == p_coma)
-        pieza = p_word;
+      if (current_token == p_coma)
+        current_token = p_word;
       else {
         if (!free_sintax)
-          if (pieza != p_ptocoma)
+          if (current_token != p_ptocoma)
             c_error(3, 137);
-        while (pieza == p_ptocoma || pieza == p_coma)
+        while (current_token == p_ptocoma || current_token == p_coma)
           lexer();
       }
 
-    } else if (pieza == p_int || pieza == p_id || pieza == p_pointer) {
-      if (pieza == p_int) {
+    } else if (current_token == p_int || current_token == p_id || current_token == p_pointer) {
+      if (current_token == p_int) {
         lexer();
-        if (pieza != p_id && pieza != p_pointer)
+        if (current_token != p_id && current_token != p_pointer)
           c_error(1, 149);
       }
 
-      if (pieza == p_pointer) { // Int pointer member
+      if (current_token == p_pointer) { // Int pointer member
 
         lexer();
 puntero4:
-        ob = analiza_pointer(tpigl, len);
+        ob = analyze_pointer(tpigl, len);
         test_buffer(&mem, &imem_max, offstruct + len);
-        if (pieza == p_asig) {
+        if (current_token == p_asig) {
           lexer();
           mem[offstruct + len] = constant();
         }
         len += 1;
-        if (pieza == p_coma) {
+        if (current_token == p_coma) {
           lexer();
-          if (pieza == p_pointer)
+          if (current_token == p_pointer)
             lexer();
           goto puntero4;
         }
@@ -3019,55 +3019,55 @@ puntero4:
         if ((*ob).type != tnone)
           c_error(0, 114);
         lexer();
-        if (pieza == p_corab) {
+        if (current_token == p_corab) {
           lexer(); // Table member ---
           (*ob).type = ttglo;
-          (*ob).tglo.offset = len;
-          if (((*ob).tglo.len1 = constant()) < 0)
+          (*ob).table_global.offset = len;
+          if (((*ob).table_global.len1 = constant()) < 0)
             c_error(4, 35);
-          if (pieza == p_coma) {
+          if (current_token == p_coma) {
             lexer();
-            if (((*ob).tglo.len2 = constant()) < 0)
+            if (((*ob).table_global.len2 = constant()) < 0)
               c_error(4, 35);
-            if (pieza == p_coma) {
+            if (current_token == p_coma) {
               lexer();
-              if (((*ob).tglo.len3 = constant()) < 0)
+              if (((*ob).table_global.len3 = constant()) < 0)
                 c_error(4, 35);
             } else
-              (*ob).tglo.len3 = -1;
+              (*ob).table_global.len3 = -1;
           } else {
-            (*ob).tglo.len2 = -1;
-            (*ob).tglo.len3 = -1;
+            (*ob).table_global.len2 = -1;
+            (*ob).table_global.len3 = -1;
           }
-          (*ob).tglo.totalen = (*ob).tglo.len1 + 1;
-          if ((*ob).tglo.len2 > -1)
-            (*ob).tglo.totalen *= (*ob).tglo.len2 + 1;
-          if ((*ob).tglo.len3 > -1)
-            (*ob).tglo.totalen *= (*ob).tglo.len3 + 1;
-          if (pieza != p_corce) {
+          (*ob).table_global.total_len = (*ob).table_global.len1 + 1;
+          if ((*ob).table_global.len2 > -1)
+            (*ob).table_global.total_len *= (*ob).table_global.len2 + 1;
+          if ((*ob).table_global.len3 > -1)
+            (*ob).table_global.total_len *= (*ob).table_global.len3 + 1;
+          if (current_token != p_corce) {
             c_error(3, 26);
           }
           lexer();
 
-          test_buffer(&mem, &imem_max, offstruct + len + (*ob).tglo.totalen);
-          if (pieza == p_asig) {
+          test_buffer(&mem, &imem_max, offstruct + len + (*ob).table_global.total_len);
+          if (current_token == p_asig) {
             _imem = imem;
             imem = offstruct + len;
             save_error(1);
             lexer();
             tglo_init(0);
-            if (imem - (offstruct + len) > (*ob).tglo.totalen)
+            if (imem - (offstruct + len) > (*ob).table_global.total_len)
               c_error(4, 33);
             imem = _imem;
           }
-          len += (*ob).tglo.totalen;
+          len += (*ob).table_global.total_len;
 
         } else { // Variable member ---
 
           (*ob).type = tvglo;
-          (*ob).vglo.offset = len;
+          (*ob).var_global.offset = len;
           test_buffer(&mem, &imem_max, offstruct + len);
-          if (pieza == p_asig) {
+          if (current_token == p_asig) {
             lexer();
             mem[offstruct + len] = constant();
           }
@@ -3075,9 +3075,9 @@ puntero4:
         }
       }
       if (!free_sintax)
-        if (pieza != p_ptocoma && pieza != p_coma)
+        if (current_token != p_ptocoma && current_token != p_coma)
           c_error(3, 66);
-      while (pieza == p_ptocoma || pieza == p_coma)
+      while (current_token == p_ptocoma || current_token == p_coma)
         lexer();
     } else
       c_error(0, 58);
@@ -3089,25 +3089,25 @@ puntero4:
 
 int analyze_struct_local(int offstruct) { // after " struct id [ <const> ] " // id==member
   int len = 0, dup, i, _itxt, _iloc;
-  struct objeto *ob;
-  struct objeto *old_member, *member2;
+  struct object *ob;
+  struct object *old_member, *member2;
   byte *oimemptr;
 
-  while (pieza == p_ptocoma)
+  while (current_token == p_ptocoma)
     lexer();
 
-  while (pieza != p_end) {
-    if (pieza == p_struct) { // Struct member ---
+  while (current_token != p_end) {
+    if (current_token == p_struct) { // Struct member ---
 
       lexer();
 
-      if (pieza == p_pointer) { // Defining a struct pointer
+      if (current_token == p_pointer) { // Defining a struct pointer
 
         old_member = member;
         member = NULL;
         lexer();
         member = old_member;
-        if (pieza != p_id) {
+        if (current_token != p_id) {
           c_error(1, 110);
         }
         ob = o;
@@ -3120,27 +3120,27 @@ int analyze_struct_local(int offstruct) { // after " struct id [ <const> ] " // 
 puntero_a_struct:
         analyze_pointer_struct(tpslo, len, ob);
         test_buffer(&loc, &iloc_max, offstruct + len);
-        if (pieza == p_asig) {
+        if (current_token == p_asig) {
           lexer();
           loc[offstruct + len] = constant();
         }
         len += 1;
 
-        if (pieza == p_coma) {
+        if (current_token == p_coma) {
           lexer();
-          if (pieza == p_pointer)
+          if (current_token == p_pointer)
             lexer();
           goto puntero_a_struct;
         } else {
           if (!free_sintax)
-            if (pieza != p_ptocoma)
+            if (current_token != p_ptocoma)
               c_error(3, 137);
-          while (pieza == p_ptocoma || pieza == p_coma)
+          while (current_token == p_ptocoma || current_token == p_coma)
             lexer();
         }
 
       } else {
-        if (pieza != p_id)
+        if (current_token != p_id)
           c_error(1, 110);
         ob = o;
 
@@ -3151,234 +3151,234 @@ puntero_a_struct:
           c_error(2, 22);
 
         (*ob).type = tsloc;
-        (*ob).sloc.offset = len;
-        if (pieza == p_corab) {
+        (*ob).struct_local.offset = len;
+        if (current_token == p_corab) {
           member2 = member;
           member = NULL;
           lexer();
-          if (((*ob).sloc.items1 = constant()) < 0)
+          if (((*ob).struct_local.dim1 = constant()) < 0)
             c_error(4, 123);
-          if (pieza == p_coma) {
+          if (current_token == p_coma) {
             lexer();
-            if (((*ob).sloc.items2 = constant()) < 0)
+            if (((*ob).struct_local.dim2 = constant()) < 0)
               c_error(4, 123);
-            if (pieza == p_coma) {
+            if (current_token == p_coma) {
               lexer();
-              if (((*ob).sloc.items3 = constant()) < 0)
+              if (((*ob).struct_local.dim3 = constant()) < 0)
                 c_error(4, 123);
             } else
-              (*ob).sloc.items3 = -1;
+              (*ob).struct_local.dim3 = -1;
           } else {
-            (*ob).sloc.items2 = -1;
-            (*ob).sloc.items3 = -1;
+            (*ob).struct_local.dim2 = -1;
+            (*ob).struct_local.dim3 = -1;
           }
           member = member2;
-          (*ob).sloc.totalitems = (*ob).sloc.items1 + 1;
-          if ((*ob).sloc.items2 > -1)
-            (*ob).sloc.totalitems *= (*ob).sloc.items2 + 1;
-          if ((*ob).sloc.items3 > -1)
-            (*ob).sloc.totalitems *= (*ob).sloc.items3 + 1;
-          if (pieza != p_corce) {
+          (*ob).struct_local.total_items = (*ob).struct_local.dim1 + 1;
+          if ((*ob).struct_local.dim2 > -1)
+            (*ob).struct_local.total_items *= (*ob).struct_local.dim2 + 1;
+          if ((*ob).struct_local.dim3 > -1)
+            (*ob).struct_local.total_items *= (*ob).struct_local.dim3 + 1;
+          if (current_token != p_corce) {
             c_error(3, 26);
           }
           lexer();
         } else {
-          (*ob).sloc.totalitems = 1;
-          (*ob).sloc.items1 = 0;
-          (*ob).sloc.items2 = -1;
-          (*ob).sloc.items3 = -1;
+          (*ob).struct_local.total_items = 1;
+          (*ob).struct_local.dim1 = 0;
+          (*ob).struct_local.dim2 = -1;
+          (*ob).struct_local.dim3 = -1;
         }
-        if (((*ob).sloc.len_item = analyze_struct_local(offstruct + len)) == 0)
+        if (((*ob).struct_local.item_len = analyze_struct_local(offstruct + len)) == 0)
           c_error(0, 57);
         i = offstruct + len;
-        dup = (*ob).sloc.totalitems + 1;
+        dup = (*ob).struct_local.total_items + 1;
         if (dup > 1) {
-          test_buffer(&loc, &iloc_max, i + (*ob).sloc.len_item * (*ob).sloc.totalitems);
-          test_buffer(&frm, &ifrm_max, i + (*ob).sloc.len_item * (*ob).sloc.totalitems);
+          test_buffer(&loc, &iloc_max, i + (*ob).struct_local.item_len * (*ob).struct_local.total_items);
+          test_buffer(&frm, &ifrm_max, i + (*ob).struct_local.item_len * (*ob).struct_local.total_items);
           while (--dup) {
-            memcpy(&loc[i], &loc[offstruct + len], (*ob).sloc.len_item << 2);
-            memcpy(&frm[i], &frm[offstruct + len], (*ob).sloc.len_item << 2);
-            i += (*ob).sloc.len_item;
+            memcpy(&loc[i], &loc[offstruct + len], (*ob).struct_local.item_len << 2);
+            memcpy(&frm[i], &frm[offstruct + len], (*ob).struct_local.item_len << 2);
+            i += (*ob).struct_local.item_len;
           }
         }
-        len += (*ob).sloc.len_item * (*ob).sloc.totalitems;
+        len += (*ob).struct_local.item_len * (*ob).struct_local.total_items;
         member = old_member;
         lexer();
-        while (pieza == p_ptocoma)
+        while (current_token == p_ptocoma)
           lexer();
       }
 
-    } else if (pieza == p_string) { // String member
+    } else if (current_token == p_string) { // String member
 
       lexer();
 
-      if (pieza == p_pointer) { // Byte pointer member
+      if (current_token == p_pointer) { // Byte pointer member
 
         lexer();
 puntero1:
-        ob = analiza_pointer(tpclo, len);
+        ob = analyze_pointer(tpclo, len);
         test_buffer(&loc, &iloc_max, offstruct + len);
-        if (pieza == p_asig) {
+        if (current_token == p_asig) {
           lexer();
           loc[offstruct + len] = constant();
         }
         len += 1;
-        if (pieza == p_coma) {
+        if (current_token == p_coma) {
           lexer();
-          if (pieza == p_pointer)
+          if (current_token == p_pointer)
             lexer();
           goto puntero1;
         }
 
       } else {
-        if (pieza != p_id)
+        if (current_token != p_id)
           c_error(1, 125);
         ob = o;
         if ((*ob).type != tnone)
           c_error(0, 114);
         lexer();
         (*ob).type = tcloc;
-        (*ob).cloc.offset = len + 1;
-        if (pieza == p_corab) {
+        (*ob).string_local.offset = len + 1;
+        if (current_token == p_corab) {
           lexer();
-          if (pieza == p_corce) {
+          if (current_token == p_corce) {
             lexer();
-            (*ob).cloc.totalen = 255;
+            (*ob).string_local.total_len = 255;
           } else {
-            if (((*ob).cloc.totalen = constant()) < 0)
+            if (((*ob).string_local.total_len = constant()) < 0)
               c_error(4, 127);
-            if ((*ob).cloc.totalen > 0xFFFFF)
+            if ((*ob).string_local.total_len > 0xFFFFF)
               c_error(4, 135);
-            if (pieza != p_corce)
+            if (current_token != p_corce)
               c_error(3, 26);
             lexer();
           }
         } else
-          (*ob).cloc.totalen = 255;
+          (*ob).string_local.total_len = 255;
 
         test_buffer(&frm, &ifrm_max, offstruct + len);
         frm[offstruct + len] = 0xDAD00000;
 
-        if (pieza == p_asig) {
+        if (current_token == p_asig) {
           save_error(1);
           _itxt = itxt;
           lexer();
-          if (pieza != p_lit && !(pieza == p_id && (*o).type == tcons && (*o).cons.literal))
+          if (current_token != p_lit && !(current_token == p_id && (*o).type == tcons && (*o).cons.literal))
             c_error(3, 128);
-          if (strlen((char *)&mem[pieza_num]) > (*ob).cloc.totalen + 1)
+          if (strlen((char *)&mem[token_value]) > (*ob).string_local.total_len + 1)
             c_error(4, 129);
           test_buffer(&loc, &iloc_max, offstruct + len);
-          loc[offstruct + len] = 0xDAD00000 | (*ob).cloc.totalen;
-          div_strcpy((char *)&loc[offstruct + len + 1], (*ob).cloc.totalen + 1,
-                     (char *)&mem[pieza_num]);
-          len += 1 + ((*ob).cloc.totalen + 5) / 4;
+          loc[offstruct + len] = 0xDAD00000 | (*ob).string_local.total_len;
+          div_strcpy((char *)&loc[offstruct + len + 1], (*ob).string_local.total_len + 1,
+                     (char *)&mem[token_value]);
+          len += 1 + ((*ob).string_local.total_len + 5) / 4;
           itxt = _itxt; // Remove the string from the text segment
           lexer();
         } else {
           test_buffer(&loc, &iloc_max, offstruct + len);
-          loc[offstruct + len] = 0xDAD00000 | (*ob).cloc.totalen;
-          len += 1 + ((*ob).cloc.totalen + 5) / 4;
+          loc[offstruct + len] = 0xDAD00000 | (*ob).string_local.total_len;
+          len += 1 + ((*ob).string_local.total_len + 5) / 4;
         }
       }
 
-      if (pieza == p_coma)
-        pieza = p_string;
+      if (current_token == p_coma)
+        current_token = p_string;
       else {
         if (!free_sintax)
-          if (pieza != p_ptocoma)
+          if (current_token != p_ptocoma)
             c_error(3, 137);
-        while (pieza == p_ptocoma || pieza == p_coma)
+        while (current_token == p_ptocoma || current_token == p_coma)
           lexer();
       }
 
-    } else if (pieza == p_byte) { // Byte member ---
+    } else if (current_token == p_byte) { // Byte member ---
 
       lexer();
 
-      if (pieza == p_pointer) { // Byte pointer member
+      if (current_token == p_pointer) { // Byte pointer member
 
         lexer();
 puntero2:
-        ob = analiza_pointer(tpblo, len);
+        ob = analyze_pointer(tpblo, len);
         test_buffer(&loc, &iloc_max, offstruct + len);
-        if (pieza == p_asig) {
+        if (current_token == p_asig) {
           lexer();
           loc[offstruct + len] = constant();
         }
         len += 1;
-        if (pieza == p_coma) {
+        if (current_token == p_coma) {
           lexer();
-          if (pieza == p_pointer)
+          if (current_token == p_pointer)
             lexer();
           goto puntero2;
         }
 
       } else {
-        if (pieza != p_id)
+        if (current_token != p_id)
           c_error(1, 142);
         ob = o;
         if ((*ob).type != tnone)
           c_error(0, 114);
         lexer();
         (*ob).type = tbloc;
-        (*ob).bloc.offset = len;
-        if (pieza == p_corab) {
+        (*ob).byte_local.offset = len;
+        if (current_token == p_corab) {
           lexer();
-          if (((*ob).bloc.len1 = constant()) < 0)
+          if (((*ob).byte_local.len1 = constant()) < 0)
             c_error(4, 35);
-          if (pieza == p_coma) {
+          if (current_token == p_coma) {
             lexer();
-            if (((*ob).bloc.len2 = constant()) < 0)
+            if (((*ob).byte_local.len2 = constant()) < 0)
               c_error(4, 35);
-            if (pieza == p_coma) {
+            if (current_token == p_coma) {
               lexer();
-              if (((*ob).bloc.len3 = constant()) < 0)
+              if (((*ob).byte_local.len3 = constant()) < 0)
                 c_error(4, 35);
             } else
-              (*ob).bloc.len3 = -1;
+              (*ob).byte_local.len3 = -1;
           } else {
-            (*ob).bloc.len2 = -1;
-            (*ob).bloc.len3 = -1;
+            (*ob).byte_local.len2 = -1;
+            (*ob).byte_local.len3 = -1;
           }
-          (*ob).bloc.totalen = (*ob).bloc.len1 + 1;
-          if ((*ob).bloc.len2 > -1)
-            (*ob).bloc.totalen *= (*ob).bloc.len2 + 1;
-          if ((*ob).bloc.len3 > -1)
-            (*ob).bloc.totalen *= (*ob).bloc.len3 + 1;
-          if (pieza != p_corce) {
+          (*ob).byte_local.total_len = (*ob).byte_local.len1 + 1;
+          if ((*ob).byte_local.len2 > -1)
+            (*ob).byte_local.total_len *= (*ob).byte_local.len2 + 1;
+          if ((*ob).byte_local.len3 > -1)
+            (*ob).byte_local.total_len *= (*ob).byte_local.len3 + 1;
+          if (current_token != p_corce) {
             c_error(3, 26);
           }
           lexer();
 
-          test_buffer(&loc, &iloc_max, offstruct + len + ((*ob).bloc.totalen + 3) / 4);
+          test_buffer(&loc, &iloc_max, offstruct + len + ((*ob).byte_local.total_len + 3) / 4);
 
-          test_buffer(&frm, &ifrm_max, offstruct + len + ((*ob).bloc.totalen + 3) / 4);
-          memset(&frm[offstruct + len], 2, (*ob).bloc.totalen);
+          test_buffer(&frm, &ifrm_max, offstruct + len + ((*ob).byte_local.total_len + 3) / 4);
+          memset(&frm[offstruct + len], 2, (*ob).byte_local.total_len);
 
-          if (pieza == p_asig) {
+          if (current_token == p_asig) {
             _iloc = iloc;
             iloc = offstruct + len;
             save_error(1);
             lexer();
             oimemptr = (byte *)&loc[iloc];
             tloc_init(2);
-            if (imemptr - oimemptr > (*ob).bloc.totalen)
+            if (imemptr - oimemptr > (*ob).byte_local.total_len)
               c_error(4, 33);
             iloc = _iloc;
           }
-          (*ob).bloc.totalen = ((*ob).bloc.totalen + 3) / 4;
+          (*ob).byte_local.total_len = ((*ob).byte_local.total_len + 3) / 4;
         } else {
           (*ob).type = tbloc;
-          (*ob).bloc.offset = len;
-          (*ob).bloc.len1 = 0;
-          (*ob).bloc.len2 = -1;
-          (*ob).bloc.len3 = -1;
-          (*ob).bloc.totalen = 1; // 1 int
+          (*ob).byte_local.offset = len;
+          (*ob).byte_local.len1 = 0;
+          (*ob).byte_local.len2 = -1;
+          (*ob).byte_local.len3 = -1;
+          (*ob).byte_local.total_len = 1; // 1 int
 
           test_buffer(&frm, &ifrm_max, offstruct + len);
           frm[offstruct + len] = 2;
 
-          if (pieza == p_asig) {
+          if (current_token == p_asig) {
             save_error(1);
             lexer();
             test_buffer(&loc, &iloc_max, offstruct + len);
@@ -3387,107 +3387,107 @@ puntero2:
               c_error(4, 143);
           }
         }
-        len += (*ob).bloc.totalen;
+        len += (*ob).byte_local.total_len;
       }
 
-      if (pieza == p_coma)
-        pieza = p_byte;
+      if (current_token == p_coma)
+        current_token = p_byte;
       else {
         if (!free_sintax)
-          if (pieza != p_ptocoma)
+          if (current_token != p_ptocoma)
             c_error(3, 137);
-        while (pieza == p_ptocoma || pieza == p_coma)
+        while (current_token == p_ptocoma || current_token == p_coma)
           lexer();
       }
 
-    } else if (pieza == p_word) { // Word member ---
+    } else if (current_token == p_word) { // Word member ---
 
       lexer();
 
-      if (pieza == p_pointer) { // Word pointer member
+      if (current_token == p_pointer) { // Word pointer member
 
         lexer();
 puntero3:
-        ob = analiza_pointer(tpwlo, len);
+        ob = analyze_pointer(tpwlo, len);
         test_buffer(&loc, &iloc_max, offstruct + len);
-        if (pieza == p_asig) {
+        if (current_token == p_asig) {
           lexer();
           loc[offstruct + len] = constant();
         }
         len += 1;
-        if (pieza == p_coma) {
+        if (current_token == p_coma) {
           lexer();
-          if (pieza == p_pointer)
+          if (current_token == p_pointer)
             lexer();
           goto puntero3;
         }
 
       } else {
-        if (pieza != p_id)
+        if (current_token != p_id)
           c_error(1, 145);
         ob = o;
         if ((*ob).type != tnone)
           c_error(0, 114);
         lexer();
         (*ob).type = twloc;
-        (*ob).wloc.offset = len;
-        if (pieza == p_corab) {
+        (*ob).word_local.offset = len;
+        if (current_token == p_corab) {
           lexer();
-          if (((*ob).wloc.len1 = constant()) < 0)
+          if (((*ob).word_local.len1 = constant()) < 0)
             c_error(4, 35);
-          if (pieza == p_coma) {
+          if (current_token == p_coma) {
             lexer();
-            if (((*ob).wloc.len2 = constant()) < 0)
+            if (((*ob).word_local.len2 = constant()) < 0)
               c_error(4, 35);
-            if (pieza == p_coma) {
+            if (current_token == p_coma) {
               lexer();
-              if (((*ob).wloc.len3 = constant()) < 0)
+              if (((*ob).word_local.len3 = constant()) < 0)
                 c_error(4, 35);
             } else
-              (*ob).wloc.len3 = -1;
+              (*ob).word_local.len3 = -1;
           } else {
-            (*ob).wloc.len2 = -1;
-            (*ob).wloc.len3 = -1;
+            (*ob).word_local.len2 = -1;
+            (*ob).word_local.len3 = -1;
           }
-          (*ob).wloc.totalen = (*ob).wloc.len1 + 1;
-          if ((*ob).wloc.len2 > -1)
-            (*ob).wloc.totalen *= (*ob).wloc.len2 + 1;
-          if ((*ob).wloc.len3 > -1)
-            (*ob).wloc.totalen *= (*ob).wloc.len3 + 1;
-          if (pieza != p_corce) {
+          (*ob).word_local.total_len = (*ob).word_local.len1 + 1;
+          if ((*ob).word_local.len2 > -1)
+            (*ob).word_local.total_len *= (*ob).word_local.len2 + 1;
+          if ((*ob).word_local.len3 > -1)
+            (*ob).word_local.total_len *= (*ob).word_local.len3 + 1;
+          if (current_token != p_corce) {
             c_error(3, 26);
           }
           lexer();
 
-          test_buffer(&loc, &iloc_max, offstruct + len + ((*ob).wloc.totalen + 1) / 2);
+          test_buffer(&loc, &iloc_max, offstruct + len + ((*ob).word_local.total_len + 1) / 2);
 
-          test_buffer(&frm, &ifrm_max, offstruct + len + ((*ob).wloc.totalen + 1) / 2);
-          memset(&frm[offstruct + len], 1, (*ob).wloc.totalen * 2);
+          test_buffer(&frm, &ifrm_max, offstruct + len + ((*ob).word_local.total_len + 1) / 2);
+          memset(&frm[offstruct + len], 1, (*ob).word_local.total_len * 2);
 
-          if (pieza == p_asig) {
+          if (current_token == p_asig) {
             _iloc = iloc;
             iloc = offstruct + len;
             save_error(1);
             lexer();
             oimemptr = (byte *)&loc[iloc];
             tloc_init(1);
-            if (imemptr - oimemptr > (*ob).wloc.totalen * 2)
+            if (imemptr - oimemptr > (*ob).word_local.total_len * 2)
               c_error(4, 33);
             iloc = _iloc;
           }
-          (*ob).wloc.totalen = ((*ob).wloc.totalen + 1) / 2;
+          (*ob).word_local.total_len = ((*ob).word_local.total_len + 1) / 2;
         } else {
           (*ob).type = twloc;
-          (*ob).wloc.offset = len;
-          (*ob).wloc.len1 = 0;
-          (*ob).wloc.len2 = -1;
-          (*ob).wloc.len3 = -1;
-          (*ob).wloc.totalen = 1; // 1 int
+          (*ob).word_local.offset = len;
+          (*ob).word_local.len1 = 0;
+          (*ob).word_local.len2 = -1;
+          (*ob).word_local.len3 = -1;
+          (*ob).word_local.total_len = 1; // 1 int
 
           test_buffer(&frm, &ifrm_max, offstruct + len);
           frm[offstruct + len] = 1;
 
-          if (pieza == p_asig) {
+          if (current_token == p_asig) {
             save_error(1);
             lexer();
             test_buffer(&loc, &iloc_max, offstruct + len);
@@ -3496,40 +3496,40 @@ puntero3:
               c_error(4, 144);
           }
         }
-        len += (*ob).wloc.totalen;
+        len += (*ob).word_local.total_len;
       }
 
-      if (pieza == p_coma)
-        pieza = p_word;
+      if (current_token == p_coma)
+        current_token = p_word;
       else {
         if (!free_sintax)
-          if (pieza != p_ptocoma)
+          if (current_token != p_ptocoma)
             c_error(3, 137);
-        while (pieza == p_ptocoma || pieza == p_coma)
+        while (current_token == p_ptocoma || current_token == p_coma)
           lexer();
       }
 
-    } else if (pieza == p_int || pieza == p_id || pieza == p_pointer) {
-      if (pieza == p_int) {
+    } else if (current_token == p_int || current_token == p_id || current_token == p_pointer) {
+      if (current_token == p_int) {
         lexer();
-        if (pieza != p_id && pieza != p_pointer)
+        if (current_token != p_id && current_token != p_pointer)
           c_error(1, 149);
       }
 
-      if (pieza == p_pointer) { // Int pointer member
+      if (current_token == p_pointer) { // Int pointer member
 
         lexer();
 puntero4:
-        ob = analiza_pointer(tpilo, len);
+        ob = analyze_pointer(tpilo, len);
         test_buffer(&loc, &iloc_max, offstruct + len);
-        if (pieza == p_asig) {
+        if (current_token == p_asig) {
           lexer();
           loc[offstruct + len] = constant();
         }
         len += 1;
-        if (pieza == p_coma) {
+        if (current_token == p_coma) {
           lexer();
-          if (pieza == p_pointer)
+          if (current_token == p_pointer)
             lexer();
           goto puntero4;
         }
@@ -3539,55 +3539,55 @@ puntero4:
         if ((*ob).type != tnone)
           c_error(0, 114);
         lexer();
-        if (pieza == p_corab) {
+        if (current_token == p_corab) {
           lexer(); // Table member ---
           (*ob).type = ttloc;
-          (*ob).tloc.offset = len;
-          if (((*ob).tloc.len1 = constant()) < 0)
+          (*ob).table_local.offset = len;
+          if (((*ob).table_local.len1 = constant()) < 0)
             c_error(4, 35);
-          if (pieza == p_coma) {
+          if (current_token == p_coma) {
             lexer();
-            if (((*ob).tloc.len2 = constant()) < 0)
+            if (((*ob).table_local.len2 = constant()) < 0)
               c_error(4, 35);
-            if (pieza == p_coma) {
+            if (current_token == p_coma) {
               lexer();
-              if (((*ob).tloc.len3 = constant()) < 0)
+              if (((*ob).table_local.len3 = constant()) < 0)
                 c_error(4, 35);
             } else
-              (*ob).tloc.len3 = -1;
+              (*ob).table_local.len3 = -1;
           } else {
-            (*ob).tloc.len2 = -1;
-            (*ob).tloc.len3 = -1;
+            (*ob).table_local.len2 = -1;
+            (*ob).table_local.len3 = -1;
           }
-          (*ob).tloc.totalen = (*ob).tloc.len1 + 1;
-          if ((*ob).tloc.len2 > -1)
-            (*ob).tloc.totalen *= (*ob).tloc.len2 + 1;
-          if ((*ob).tloc.len3 > -1)
-            (*ob).tloc.totalen *= (*ob).tloc.len3 + 1;
-          if (pieza != p_corce) {
+          (*ob).table_local.total_len = (*ob).table_local.len1 + 1;
+          if ((*ob).table_local.len2 > -1)
+            (*ob).table_local.total_len *= (*ob).table_local.len2 + 1;
+          if ((*ob).table_local.len3 > -1)
+            (*ob).table_local.total_len *= (*ob).table_local.len3 + 1;
+          if (current_token != p_corce) {
             c_error(3, 26);
           }
           lexer();
 
-          test_buffer(&loc, &iloc_max, offstruct + len + (*ob).tloc.totalen);
-          if (pieza == p_asig) {
+          test_buffer(&loc, &iloc_max, offstruct + len + (*ob).table_local.total_len);
+          if (current_token == p_asig) {
             _iloc = iloc;
             iloc = offstruct + len;
             save_error(1);
             lexer();
             tloc_init(0);
-            if (iloc - (offstruct + len) > (*ob).tloc.totalen)
+            if (iloc - (offstruct + len) > (*ob).table_local.total_len)
               c_error(4, 33);
             iloc = _iloc;
           }
-          len += (*ob).tloc.totalen;
+          len += (*ob).table_local.total_len;
 
         } else { // Variable member ---
 
           (*ob).type = tvloc;
-          (*ob).vloc.offset = len;
+          (*ob).var_local.offset = len;
           test_buffer(&loc, &iloc_max, offstruct + len);
-          if (pieza == p_asig) {
+          if (current_token == p_asig) {
             lexer();
             loc[offstruct + len] = constant();
           }
@@ -3595,13 +3595,13 @@ puntero4:
         }
       }
       if (!free_sintax)
-        if (pieza != p_ptocoma && pieza != p_coma)
+        if (current_token != p_ptocoma && current_token != p_coma)
           c_error(3, 66);
-      while (pieza == p_ptocoma || pieza == p_coma)
+      while (current_token == p_ptocoma || current_token == p_coma)
         lexer();
     } else
       c_error(0, 58);
-    (*ob).bloque = bloque_lexico;
+    (*ob).scope = lexical_scope;
   }
   return (len);
 }
@@ -3610,25 +3610,25 @@ puntero4:
 
 int analyze_struct_private(int offstruct) { // after " struct id [ <const> ] " // id=member
   int len = 0, dup, i, _itxt, _imem;
-  struct objeto *ob;
-  struct objeto *old_member, *member2;
+  struct object *ob;
+  struct object *old_member, *member2;
   byte *oimemptr;
 
-  while (pieza == p_ptocoma)
+  while (current_token == p_ptocoma)
     lexer();
 
-  while (pieza != p_end) {
-    if (pieza == p_struct) { // Struct member ---
+  while (current_token != p_end) {
+    if (current_token == p_struct) { // Struct member ---
 
       lexer();
 
-      if (pieza == p_pointer) { // Defining a struct pointer
+      if (current_token == p_pointer) { // Defining a struct pointer
 
         old_member = member;
         member = NULL;
         lexer();
         member = old_member;
-        if (pieza != p_id) {
+        if (current_token != p_id) {
           c_error(1, 110);
         }
         ob = o;
@@ -3641,27 +3641,27 @@ int analyze_struct_private(int offstruct) { // after " struct id [ <const> ] " /
 puntero_a_struct:
         analyze_pointer_struct(tpslo, len, ob);
         test_buffer(&mem, &imem_max, offstruct + len);
-        if (pieza == p_asig) {
+        if (current_token == p_asig) {
           lexer();
           mem[offstruct + len] = constant();
         }
         len += 1;
 
-        if (pieza == p_coma) {
+        if (current_token == p_coma) {
           lexer();
-          if (pieza == p_pointer)
+          if (current_token == p_pointer)
             lexer();
           goto puntero_a_struct;
         } else {
           if (!free_sintax)
-            if (pieza != p_ptocoma)
+            if (current_token != p_ptocoma)
               c_error(3, 137);
-          while (pieza == p_ptocoma || pieza == p_coma)
+          while (current_token == p_ptocoma || current_token == p_coma)
             lexer();
         }
 
       } else {
-        if (pieza != p_id)
+        if (current_token != p_id)
           c_error(1, 110);
         ob = o;
 
@@ -3672,233 +3672,233 @@ puntero_a_struct:
           c_error(2, 22);
 
         (*ob).type = tsloc;
-        (*ob).sloc.offset = len;
-        if (pieza == p_corab) {
+        (*ob).struct_local.offset = len;
+        if (current_token == p_corab) {
           member2 = member;
           member = NULL;
           lexer();
-          if (((*ob).sloc.items1 = constant()) < 0)
+          if (((*ob).struct_local.dim1 = constant()) < 0)
             c_error(4, 123);
-          if (pieza == p_coma) {
+          if (current_token == p_coma) {
             lexer();
-            if (((*ob).sloc.items2 = constant()) < 0)
+            if (((*ob).struct_local.dim2 = constant()) < 0)
               c_error(4, 123);
-            if (pieza == p_coma) {
+            if (current_token == p_coma) {
               lexer();
-              if (((*ob).sloc.items3 = constant()) < 0)
+              if (((*ob).struct_local.dim3 = constant()) < 0)
                 c_error(4, 123);
             } else
-              (*ob).sloc.items3 = -1;
+              (*ob).struct_local.dim3 = -1;
           } else {
-            (*ob).sloc.items2 = -1;
-            (*ob).sloc.items3 = -1;
+            (*ob).struct_local.dim2 = -1;
+            (*ob).struct_local.dim3 = -1;
           }
           member = member2;
-          (*ob).sloc.totalitems = (*ob).sloc.items1 + 1;
-          if ((*ob).sloc.items2 > -1)
-            (*ob).sloc.totalitems *= (*ob).sloc.items2 + 1;
-          if ((*ob).sloc.items3 > -1)
-            (*ob).sloc.totalitems *= (*ob).sloc.items3 + 1;
-          if (pieza != p_corce) {
+          (*ob).struct_local.total_items = (*ob).struct_local.dim1 + 1;
+          if ((*ob).struct_local.dim2 > -1)
+            (*ob).struct_local.total_items *= (*ob).struct_local.dim2 + 1;
+          if ((*ob).struct_local.dim3 > -1)
+            (*ob).struct_local.total_items *= (*ob).struct_local.dim3 + 1;
+          if (current_token != p_corce) {
             c_error(3, 26);
           }
           lexer();
         } else {
-          (*ob).sloc.totalitems = 1;
-          (*ob).sloc.items1 = 0;
-          (*ob).sloc.items2 = -1;
-          (*ob).sloc.items3 = -1;
+          (*ob).struct_local.total_items = 1;
+          (*ob).struct_local.dim1 = 0;
+          (*ob).struct_local.dim2 = -1;
+          (*ob).struct_local.dim3 = -1;
         }
-        if (((*ob).sloc.len_item = analyze_struct_private(offstruct + len)) == 0)
+        if (((*ob).struct_local.item_len = analyze_struct_private(offstruct + len)) == 0)
           c_error(0, 57);
         i = offstruct + len;
-        dup = (*ob).sloc.totalitems + 1;
+        dup = (*ob).struct_local.total_items + 1;
         if (dup > 1) {
-          test_buffer(&mem, &imem_max, i + (*ob).sloc.len_item * (*ob).sloc.totalitems);
-          test_buffer(&frm, &ifrm_max, i + (*ob).sloc.len_item * (*ob).sloc.totalitems);
+          test_buffer(&mem, &imem_max, i + (*ob).struct_local.item_len * (*ob).struct_local.total_items);
+          test_buffer(&frm, &ifrm_max, i + (*ob).struct_local.item_len * (*ob).struct_local.total_items);
           while (--dup) {
-            memcpy(&mem[i], &mem[offstruct + len], (*ob).sloc.len_item << 2);
-            memcpy(&frm[i], &frm[offstruct + len], (*ob).sloc.len_item << 2);
-            i += (*ob).sloc.len_item;
+            memcpy(&mem[i], &mem[offstruct + len], (*ob).struct_local.item_len << 2);
+            memcpy(&frm[i], &frm[offstruct + len], (*ob).struct_local.item_len << 2);
+            i += (*ob).struct_local.item_len;
           }
         }
-        len += (*ob).sloc.len_item * (*ob).sloc.totalitems;
+        len += (*ob).struct_local.item_len * (*ob).struct_local.total_items;
         member = old_member;
         lexer();
-        while (pieza == p_ptocoma)
+        while (current_token == p_ptocoma)
           lexer();
       }
 
-    } else if (pieza == p_string) { // String member
+    } else if (current_token == p_string) { // String member
 
       lexer();
 
-      if (pieza == p_pointer) { // Byte pointer member
+      if (current_token == p_pointer) { // Byte pointer member
 
         lexer();
 puntero1:
-        ob = analiza_pointer(tpclo, len);
+        ob = analyze_pointer(tpclo, len);
         test_buffer(&mem, &imem_max, offstruct + len);
-        if (pieza == p_asig) {
+        if (current_token == p_asig) {
           lexer();
           mem[offstruct + len] = constant();
         }
         len += 1;
-        if (pieza == p_coma) {
+        if (current_token == p_coma) {
           lexer();
-          if (pieza == p_pointer)
+          if (current_token == p_pointer)
             lexer();
           goto puntero1;
         }
 
       } else {
-        if (pieza != p_id)
+        if (current_token != p_id)
           c_error(1, 125);
         ob = o;
         if ((*ob).type != tnone)
           c_error(0, 114);
         lexer();
         (*ob).type = tcloc;
-        (*ob).cloc.offset = len + 1;
-        if (pieza == p_corab) {
+        (*ob).string_local.offset = len + 1;
+        if (current_token == p_corab) {
           lexer();
-          if (pieza == p_corce) {
+          if (current_token == p_corce) {
             lexer();
-            (*ob).cloc.totalen = 255;
+            (*ob).string_local.total_len = 255;
           } else {
-            if (((*ob).cloc.totalen = constant()) < 0)
+            if (((*ob).string_local.total_len = constant()) < 0)
               c_error(4, 127);
-            if ((*ob).cloc.totalen > 0xFFFFF)
+            if ((*ob).string_local.total_len > 0xFFFFF)
               c_error(4, 135);
-            if (pieza != p_corce)
+            if (current_token != p_corce)
               c_error(3, 26);
             lexer();
           }
         } else
-          (*ob).cloc.totalen = 255;
+          (*ob).string_local.total_len = 255;
 
         test_buffer(&frm, &ifrm_max, offstruct + len);
         frm[offstruct + len] = 0xDAD00000;
 
-        if (pieza == p_asig) {
+        if (current_token == p_asig) {
           save_error(1);
           _itxt = itxt;
           lexer();
-          if (pieza != p_lit && !(pieza == p_id && (*o).type == tcons && (*o).cons.literal))
+          if (current_token != p_lit && !(current_token == p_id && (*o).type == tcons && (*o).cons.literal))
             c_error(3, 128);
-          if (strlen((char *)&mem[pieza_num]) > (*ob).cloc.totalen + 1)
+          if (strlen((char *)&mem[token_value]) > (*ob).string_local.total_len + 1)
             c_error(4, 129);
           test_buffer(&mem, &imem_max, offstruct + len);
-          mem[offstruct + len] = 0xDAD00000 | (*ob).cloc.totalen;
-          memmove((char *)&mem[offstruct + len + 1], (char *)&mem[pieza_num],
-                  strlen((char *)&mem[pieza_num]) + 1);
-          len += 1 + ((*ob).cloc.totalen + 5) / 4;
+          mem[offstruct + len] = 0xDAD00000 | (*ob).string_local.total_len;
+          memmove((char *)&mem[offstruct + len + 1], (char *)&mem[token_value],
+                  strlen((char *)&mem[token_value]) + 1);
+          len += 1 + ((*ob).string_local.total_len + 5) / 4;
           itxt = _itxt; // Remove the string from the text segment
           lexer();
         } else {
           test_buffer(&mem, &imem_max, offstruct + len);
-          mem[offstruct + len] = 0xDAD00000 | (*ob).cloc.totalen;
-          len += 1 + ((*ob).cloc.totalen + 5) / 4;
+          mem[offstruct + len] = 0xDAD00000 | (*ob).string_local.total_len;
+          len += 1 + ((*ob).string_local.total_len + 5) / 4;
         }
       }
 
-      if (pieza == p_coma)
-        pieza = p_string;
+      if (current_token == p_coma)
+        current_token = p_string;
       else {
         if (!free_sintax)
-          if (pieza != p_ptocoma)
+          if (current_token != p_ptocoma)
             c_error(3, 137);
-        while (pieza == p_ptocoma || pieza == p_coma)
+        while (current_token == p_ptocoma || current_token == p_coma)
           lexer();
       }
 
-    } else if (pieza == p_byte) { // Byte member ---
+    } else if (current_token == p_byte) { // Byte member ---
 
       lexer();
 
-      if (pieza == p_pointer) { // Byte pointer member
+      if (current_token == p_pointer) { // Byte pointer member
 
         lexer();
 puntero2:
-        ob = analiza_pointer(tpblo, len);
+        ob = analyze_pointer(tpblo, len);
         test_buffer(&mem, &imem_max, offstruct + len);
-        if (pieza == p_asig) {
+        if (current_token == p_asig) {
           lexer();
           mem[offstruct + len] = constant();
         }
         len += 1;
-        if (pieza == p_coma) {
+        if (current_token == p_coma) {
           lexer();
-          if (pieza == p_pointer)
+          if (current_token == p_pointer)
             lexer();
           goto puntero2;
         }
 
       } else {
-        if (pieza != p_id)
+        if (current_token != p_id)
           c_error(1, 142);
         ob = o;
         if ((*ob).type != tnone)
           c_error(0, 114);
         lexer();
         (*ob).type = tbloc;
-        (*ob).bloc.offset = len;
-        if (pieza == p_corab) {
+        (*ob).byte_local.offset = len;
+        if (current_token == p_corab) {
           lexer();
-          if (((*ob).bloc.len1 = constant()) < 0)
+          if (((*ob).byte_local.len1 = constant()) < 0)
             c_error(4, 35);
-          if (pieza == p_coma) {
+          if (current_token == p_coma) {
             lexer();
-            if (((*ob).bloc.len2 = constant()) < 0)
+            if (((*ob).byte_local.len2 = constant()) < 0)
               c_error(4, 35);
-            if (pieza == p_coma) {
+            if (current_token == p_coma) {
               lexer();
-              if (((*ob).bloc.len3 = constant()) < 0)
+              if (((*ob).byte_local.len3 = constant()) < 0)
                 c_error(4, 35);
             } else
-              (*ob).bloc.len3 = -1;
+              (*ob).byte_local.len3 = -1;
           } else {
-            (*ob).bloc.len2 = -1;
-            (*ob).bloc.len3 = -1;
+            (*ob).byte_local.len2 = -1;
+            (*ob).byte_local.len3 = -1;
           }
-          (*ob).bloc.totalen = (*ob).bloc.len1 + 1;
-          if ((*ob).bloc.len2 > -1)
-            (*ob).bloc.totalen *= (*ob).bloc.len2 + 1;
-          if ((*ob).bloc.len3 > -1)
-            (*ob).bloc.totalen *= (*ob).bloc.len3 + 1;
-          if (pieza != p_corce) {
+          (*ob).byte_local.total_len = (*ob).byte_local.len1 + 1;
+          if ((*ob).byte_local.len2 > -1)
+            (*ob).byte_local.total_len *= (*ob).byte_local.len2 + 1;
+          if ((*ob).byte_local.len3 > -1)
+            (*ob).byte_local.total_len *= (*ob).byte_local.len3 + 1;
+          if (current_token != p_corce) {
             c_error(3, 26);
           }
           lexer();
-          test_buffer(&mem, &imem_max, offstruct + len + ((*ob).bloc.totalen + 3) / 4);
+          test_buffer(&mem, &imem_max, offstruct + len + ((*ob).byte_local.total_len + 3) / 4);
 
-          test_buffer(&frm, &ifrm_max, offstruct + len + ((*ob).bloc.totalen + 3) / 4);
-          memset(&frm[offstruct + len], 2, (*ob).bloc.totalen);
+          test_buffer(&frm, &ifrm_max, offstruct + len + ((*ob).byte_local.total_len + 3) / 4);
+          memset(&frm[offstruct + len], 2, (*ob).byte_local.total_len);
 
-          if (pieza == p_asig) {
+          if (current_token == p_asig) {
             _imem = imem;
             imem = offstruct + len;
             save_error(1);
             lexer();
             oimemptr = (byte *)&mem[imem];
             tglo_init(2);
-            if (imemptr - oimemptr > (*ob).bloc.totalen)
+            if (imemptr - oimemptr > (*ob).byte_local.total_len)
               c_error(4, 33);
             imem = _imem;
           }
-          (*ob).bloc.totalen = ((*ob).bloc.totalen + 3) / 4;
+          (*ob).byte_local.total_len = ((*ob).byte_local.total_len + 3) / 4;
         } else {
           (*ob).type = tbloc;
-          (*ob).bloc.offset = len;
-          (*ob).bloc.len1 = 0;
-          (*ob).bloc.len2 = -1;
-          (*ob).bloc.len3 = -1;
-          (*ob).bloc.totalen = 1; // 1 int
+          (*ob).byte_local.offset = len;
+          (*ob).byte_local.len1 = 0;
+          (*ob).byte_local.len2 = -1;
+          (*ob).byte_local.len3 = -1;
+          (*ob).byte_local.total_len = 1; // 1 int
 
           test_buffer(&frm, &ifrm_max, offstruct + len);
           frm[offstruct + len] = 2;
 
-          if (pieza == p_asig) {
+          if (current_token == p_asig) {
             save_error(1);
             lexer();
             test_buffer(&mem, &imem_max, offstruct + len);
@@ -3907,106 +3907,106 @@ puntero2:
               c_error(4, 143);
           }
         }
-        len += (*ob).bloc.totalen;
+        len += (*ob).byte_local.total_len;
       }
 
-      if (pieza == p_coma)
-        pieza = p_byte;
+      if (current_token == p_coma)
+        current_token = p_byte;
       else {
         if (!free_sintax)
-          if (pieza != p_ptocoma)
+          if (current_token != p_ptocoma)
             c_error(3, 137);
-        while (pieza == p_ptocoma || pieza == p_coma)
+        while (current_token == p_ptocoma || current_token == p_coma)
           lexer();
       }
 
-    } else if (pieza == p_word) { // Word member ---
+    } else if (current_token == p_word) { // Word member ---
 
       lexer();
 
-      if (pieza == p_pointer) { // Word pointer member
+      if (current_token == p_pointer) { // Word pointer member
 
         lexer();
 puntero3:
-        ob = analiza_pointer(tpwlo, len);
+        ob = analyze_pointer(tpwlo, len);
         test_buffer(&mem, &imem_max, offstruct + len);
-        if (pieza == p_asig) {
+        if (current_token == p_asig) {
           lexer();
           mem[offstruct + len] = constant();
         }
         len += 1;
-        if (pieza == p_coma) {
+        if (current_token == p_coma) {
           lexer();
-          if (pieza == p_pointer)
+          if (current_token == p_pointer)
             lexer();
           goto puntero3;
         }
 
       } else {
-        if (pieza != p_id)
+        if (current_token != p_id)
           c_error(1, 145);
         ob = o;
         if ((*ob).type != tnone)
           c_error(0, 114);
         lexer();
         (*ob).type = twloc;
-        (*ob).wloc.offset = len;
-        if (pieza == p_corab) {
+        (*ob).word_local.offset = len;
+        if (current_token == p_corab) {
           lexer();
-          if (((*ob).wloc.len1 = constant()) < 0)
+          if (((*ob).word_local.len1 = constant()) < 0)
             c_error(4, 35);
-          if (pieza == p_coma) {
+          if (current_token == p_coma) {
             lexer();
-            if (((*ob).wloc.len2 = constant()) < 0)
+            if (((*ob).word_local.len2 = constant()) < 0)
               c_error(4, 35);
-            if (pieza == p_coma) {
+            if (current_token == p_coma) {
               lexer();
-              if (((*ob).wloc.len3 = constant()) < 0)
+              if (((*ob).word_local.len3 = constant()) < 0)
                 c_error(4, 35);
             } else
-              (*ob).wloc.len3 = -1;
+              (*ob).word_local.len3 = -1;
           } else {
-            (*ob).wloc.len2 = -1;
-            (*ob).wloc.len3 = -1;
+            (*ob).word_local.len2 = -1;
+            (*ob).word_local.len3 = -1;
           }
-          (*ob).wloc.totalen = (*ob).wloc.len1 + 1;
-          if ((*ob).wloc.len2 > -1)
-            (*ob).wloc.totalen *= (*ob).wloc.len2 + 1;
-          if ((*ob).wloc.len3 > -1)
-            (*ob).wloc.totalen *= (*ob).wloc.len3 + 1;
-          if (pieza != p_corce) {
+          (*ob).word_local.total_len = (*ob).word_local.len1 + 1;
+          if ((*ob).word_local.len2 > -1)
+            (*ob).word_local.total_len *= (*ob).word_local.len2 + 1;
+          if ((*ob).word_local.len3 > -1)
+            (*ob).word_local.total_len *= (*ob).word_local.len3 + 1;
+          if (current_token != p_corce) {
             c_error(3, 26);
           }
           lexer();
-          test_buffer(&mem, &imem_max, offstruct + len + ((*ob).wloc.totalen + 1) / 2);
+          test_buffer(&mem, &imem_max, offstruct + len + ((*ob).word_local.total_len + 1) / 2);
 
-          test_buffer(&frm, &ifrm_max, offstruct + len + ((*ob).wloc.totalen + 1) / 2);
-          memset(&frm[offstruct + len], 1, (*ob).wloc.totalen * 2);
+          test_buffer(&frm, &ifrm_max, offstruct + len + ((*ob).word_local.total_len + 1) / 2);
+          memset(&frm[offstruct + len], 1, (*ob).word_local.total_len * 2);
 
-          if (pieza == p_asig) {
+          if (current_token == p_asig) {
             _imem = imem;
             imem = offstruct + len;
             save_error(1);
             lexer();
             oimemptr = (byte *)&mem[imem];
             tglo_init(1);
-            if (imemptr - oimemptr > (*ob).wloc.totalen * 2)
+            if (imemptr - oimemptr > (*ob).word_local.total_len * 2)
               c_error(4, 33);
             imem = _imem;
           }
-          (*ob).wloc.totalen = ((*ob).wloc.totalen + 1) / 2;
+          (*ob).word_local.total_len = ((*ob).word_local.total_len + 1) / 2;
         } else {
           (*ob).type = twloc;
-          (*ob).wloc.offset = len;
-          (*ob).wloc.len1 = 0;
-          (*ob).wloc.len2 = -1;
-          (*ob).wloc.len3 = -1;
-          (*ob).wloc.totalen = 1; // 1 int
+          (*ob).word_local.offset = len;
+          (*ob).word_local.len1 = 0;
+          (*ob).word_local.len2 = -1;
+          (*ob).word_local.len3 = -1;
+          (*ob).word_local.total_len = 1; // 1 int
 
           test_buffer(&frm, &ifrm_max, offstruct + len);
           frm[offstruct + len] = 1;
 
-          if (pieza == p_asig) {
+          if (current_token == p_asig) {
             save_error(1);
             lexer();
             test_buffer(&mem, &imem_max, offstruct + len);
@@ -4015,40 +4015,40 @@ puntero3:
               c_error(4, 144);
           }
         }
-        len += (*ob).wloc.totalen;
+        len += (*ob).word_local.total_len;
       }
 
-      if (pieza == p_coma)
-        pieza = p_word;
+      if (current_token == p_coma)
+        current_token = p_word;
       else {
         if (!free_sintax)
-          if (pieza != p_ptocoma)
+          if (current_token != p_ptocoma)
             c_error(3, 137);
-        while (pieza == p_ptocoma || pieza == p_coma)
+        while (current_token == p_ptocoma || current_token == p_coma)
           lexer();
       }
 
-    } else if (pieza == p_int || pieza == p_id || pieza == p_pointer) {
-      if (pieza == p_int) {
+    } else if (current_token == p_int || current_token == p_id || current_token == p_pointer) {
+      if (current_token == p_int) {
         lexer();
-        if (pieza != p_id && pieza != p_pointer)
+        if (current_token != p_id && current_token != p_pointer)
           c_error(1, 149);
       }
 
-      if (pieza == p_pointer) { // Int pointer member
+      if (current_token == p_pointer) { // Int pointer member
 
         lexer();
 puntero4:
-        ob = analiza_pointer(tpilo, len);
+        ob = analyze_pointer(tpilo, len);
         test_buffer(&mem, &imem_max, offstruct + len);
-        if (pieza == p_asig) {
+        if (current_token == p_asig) {
           lexer();
           mem[offstruct + len] = constant();
         }
         len += 1;
-        if (pieza == p_coma) {
+        if (current_token == p_coma) {
           lexer();
-          if (pieza == p_pointer)
+          if (current_token == p_pointer)
             lexer();
           goto puntero4;
         }
@@ -4058,56 +4058,56 @@ puntero4:
         if ((*ob).type != tnone)
           c_error(0, 114);
         lexer();
-        if (pieza == p_corab) {
+        if (current_token == p_corab) {
           lexer(); // Table member ---
           (*ob).type = ttloc;
-          (*ob).tloc.offset = len;
-          if (((*ob).tloc.len1 = constant()) < 0)
+          (*ob).table_local.offset = len;
+          if (((*ob).table_local.len1 = constant()) < 0)
             c_error(4, 35);
-          if (pieza == p_coma) {
+          if (current_token == p_coma) {
             lexer();
-            if (((*ob).tloc.len2 = constant()) < 0)
+            if (((*ob).table_local.len2 = constant()) < 0)
               c_error(4, 35);
-            if (pieza == p_coma) {
+            if (current_token == p_coma) {
               lexer();
-              if (((*ob).tloc.len3 = constant()) < 0)
+              if (((*ob).table_local.len3 = constant()) < 0)
                 c_error(4, 35);
             } else
-              (*ob).tloc.len3 = -1;
+              (*ob).table_local.len3 = -1;
           } else {
-            (*ob).tloc.len2 = -1;
-            (*ob).tloc.len3 = -1;
+            (*ob).table_local.len2 = -1;
+            (*ob).table_local.len3 = -1;
           }
-          (*ob).tloc.totalen = (*ob).tloc.len1 + 1;
-          if ((*ob).tloc.len2 > -1)
-            (*ob).tloc.totalen *= (*ob).tloc.len2 + 1;
-          if ((*ob).tloc.len3 > -1)
-            (*ob).tloc.totalen *= (*ob).tloc.len3 + 1;
-          if (pieza != p_corce) {
+          (*ob).table_local.total_len = (*ob).table_local.len1 + 1;
+          if ((*ob).table_local.len2 > -1)
+            (*ob).table_local.total_len *= (*ob).table_local.len2 + 1;
+          if ((*ob).table_local.len3 > -1)
+            (*ob).table_local.total_len *= (*ob).table_local.len3 + 1;
+          if (current_token != p_corce) {
             c_error(3, 26);
           }
           lexer();
 
-          test_buffer(&mem, &imem_max, offstruct + len + (*ob).tloc.totalen);
-          if (pieza == p_asig) {
+          test_buffer(&mem, &imem_max, offstruct + len + (*ob).table_local.total_len);
+          if (current_token == p_asig) {
             _imem = imem;
             imem = offstruct + len;
             save_error(1);
             lexer();
             tglo_init(0);
-            if (imem - (offstruct + len) > (*ob).tloc.totalen)
+            if (imem - (offstruct + len) > (*ob).table_local.total_len)
               c_error(4, 33);
             imem = _imem;
           }
-          len += (*ob).tloc.totalen;
+          len += (*ob).table_local.total_len;
 
         } else { // Variable member ---
 
           (*ob).type = tvloc;
-          (*ob).vloc.offset = len;
+          (*ob).var_local.offset = len;
 
           test_buffer(&mem, &imem_max, offstruct + len);
-          if (pieza == p_asig) {
+          if (current_token == p_asig) {
             lexer();
             mem[offstruct + len] = constant();
           }
@@ -4116,14 +4116,14 @@ puntero4:
       }
 
       if (!free_sintax)
-        if (pieza != p_ptocoma && pieza != p_coma)
+        if (current_token != p_ptocoma && current_token != p_coma)
           c_error(3, 66);
-      while (pieza == p_ptocoma || pieza == p_coma)
+      while (current_token == p_ptocoma || current_token == p_coma)
         lexer();
 
     } else
       c_error(0, 58);
-    (*ob).bloque = bloque_lexico;
+    (*ob).scope = lexical_scope;
   }
   return (len);
 }
@@ -4132,8 +4132,8 @@ puntero4:
 //---------------------------------------------------------------------------
 
 void parser(void) {
-  struct objeto *ob, *member2;
-  int _imem, _imem_old, num_par = 0, n;
+  struct object *ob, *member2;
+  int _imem, _imem_old, num_params = 0, n;
   byte *old_source, *nombre_dll, *oimemptr, *nombre_include;
   int _itxt, dup;
   char cWork[256];
@@ -4159,20 +4159,20 @@ void parser(void) {
   hacer_strfix = 1;
   optimizar = 1;
 
-  if (pieza == p_compiler_options) {
+  if (current_token == p_compiler_options) {
     lexer();
     do {
-      if (pieza == p_ptocoma) {
+      if (current_token == p_ptocoma) {
         lexer();
         break;
       }
-      if (pieza == p_coma)
+      if (current_token == p_coma)
         lexer();
-      if (pieza == p_id && (*o).type == tcons) {
-        switch ((*o).cons.valor) {
+      if (current_token == p_id && (*o).type == tcons) {
+        switch ((*o).cons.value) {
         case 0: // _max_process
           lexer();
-          if (pieza != p_asig)
+          if (current_token != p_asig)
             c_error(3, 139);
           lexer();
           max_process = constant();
@@ -4236,7 +4236,7 @@ void parser(void) {
         }
       } else {
         if (!free_sintax) {
-          if (pieza == p_program)
+          if (current_token == p_program)
             c_error(3, 66);
           else
             c_error(0, 138);
@@ -4253,10 +4253,10 @@ void parser(void) {
   //---------------------------------------------------------------------------
 
   save_error(0);
-  if (pieza != p_program && pieza != p_setup_program)
+  if (current_token != p_program && current_token != p_setup_program)
     c_error(4, 20);
 
-  if (pieza == p_setup_program) {
+  if (current_token == p_setup_program) {
     program_type = 1;
     div_strcpy((char *)cWork, sizeof(cWork), "install/setup.ins");
   } else
@@ -4266,30 +4266,30 @@ void parser(void) {
 
   statement_start();
   lexer();
-  if (pieza != p_id)
+  if (current_token != p_id)
     c_error(1, 21);
   ob = o;
   if ((*ob).type != tnone)
     c_error(0, 115);
   (*ob).type = tproc;
-  (*ob).proc.bloque = bloque_actual = ob;
+  (*ob).proc.scope = current_scope = ob;
   (*ob).proc.offset = 0;
-  (*ob).proc.num_par = 0;
+  (*ob).proc.num_params = 0;
   lexer();
   if (!free_sintax)
-    if (pieza != p_ptocoma)
+    if (current_token != p_ptocoma)
       c_error(3, 66);
-  while (pieza == p_ptocoma || pieza == p_coma)
+  while (current_token == p_ptocoma || current_token == p_coma)
     lexer();
   statement_end();
 
-  while (pieza == p_include) {
+  while (current_token == p_include) {
     statement_start();
     lexer();
-    if (pieza != p_lit && !(pieza == p_id && (*o).type == tcons && (*o).cons.literal))
+    if (current_token != p_lit && !(current_token == p_id && (*o).type == tcons && (*o).cons.literal))
       c_error(1, 62);
     old_source = source;
-    nombre_include = (byte *)&mem[pieza_num];
+    nombre_include = (byte *)&mem[token_value];
 
 
     //
@@ -4297,9 +4297,9 @@ void parser(void) {
     source = old_source;
     lexer();
     if (!free_sintax)
-      if (pieza != p_ptocoma)
+      if (current_token != p_ptocoma)
         c_error(3, 66);
-    while (pieza == p_ptocoma || pieza == p_coma)
+    while (current_token == p_ptocoma || current_token == p_coma)
       lexer();
     statement_end();
   }
@@ -4309,26 +4309,26 @@ void parser(void) {
   // [ p_const {;} { p_id p_asig <exp> {; | ,} } ]
   //---------------------------------------------------------------------------
 
-  if (pieza == p_const) {
+  if (current_token == p_const) {
     skip_semicolons();
-    while (pieza == p_id) {
+    while (current_token == p_id) {
       ob = o;
       if ((*ob).type != tnone && (*ob).type != tcons)
         c_error(0, 116);
       (*ob).type = tcons;
       lexer();
-      if (pieza != p_asig)
+      if (current_token != p_asig)
         c_error(3, 119);
       lexer();
-      if (pieza == p_lit || (pieza == p_id && (*o).type == tcons && (*o).cons.literal))
+      if (current_token == p_lit || (current_token == p_id && (*o).type == tcons && (*o).cons.literal))
         (*ob).cons.literal = 1;
       else
         (*ob).cons.literal = 0;
-      (*ob).cons.valor = constant();
+      (*ob).cons.value = constant();
       if (!free_sintax)
-        if (pieza != p_ptocoma && pieza != p_coma)
+        if (current_token != p_ptocoma && current_token != p_coma)
           c_error(3, 66);
-      while (pieza == p_ptocoma || pieza == p_coma)
+      while (current_token == p_ptocoma || current_token == p_coma)
         lexer();
     }
   }
@@ -4345,18 +4345,18 @@ void parser(void) {
   //            [ p_coma <init>]
   //---------------------------------------------------------------------------
 
-  if (pieza == p_global) {
+  if (current_token == p_global) {
     skip_semicolons();
-    while (pieza == p_id || pieza == p_int || pieza == p_pointer || pieza == p_struct ||
-           pieza == p_string || pieza == p_byte || pieza == p_word) {
-      if (pieza == p_struct) { // Struct global
+    while (current_token == p_id || current_token == p_int || current_token == p_pointer || current_token == p_struct ||
+           current_token == p_string || current_token == p_byte || current_token == p_word) {
+      if (current_token == p_struct) { // Struct global
 
         lexer();
 
-        if (pieza == p_pointer) { // Defining a struct pointer
+        if (current_token == p_pointer) { // Defining a struct pointer
 
           lexer();
-          if (pieza != p_id)
+          if (current_token != p_id)
             c_error(1, 110);
           ob = o;
           if ((*ob).type == tnone)
@@ -4366,27 +4366,27 @@ void parser(void) {
           lexer();
 puntero_a_struct:
           analyze_pointer_struct(tpsgl, imem, ob);
-          if (pieza == p_asig) {
+          if (current_token == p_asig) {
             lexer();
             mem[imem] = constant();
           }
           test_buffer(&mem, &imem_max, imem++);
 
-          if (pieza == p_coma) {
+          if (current_token == p_coma) {
             lexer();
-            if (pieza == p_pointer)
+            if (current_token == p_pointer)
               lexer();
             goto puntero_a_struct;
           } else {
             if (!free_sintax)
-              if (pieza != p_ptocoma)
+              if (current_token != p_ptocoma)
                 c_error(3, 137);
-            while (pieza == p_ptocoma || pieza == p_coma)
+            while (current_token == p_ptocoma || current_token == p_coma)
               lexer();
           }
 
         } else {
-          if (pieza != p_id)
+          if (current_token != p_id)
             c_error(1, 110);
           ob = o;
           member = ob;
@@ -4396,98 +4396,98 @@ puntero_a_struct:
             c_error(2, 22);
 
           (*ob).type = tsglo;
-          (*ob).sglo.offset = _imem = imem;
-          if (pieza == p_corab) {
+          (*ob).struct_global.offset = _imem = imem;
+          if (current_token == p_corab) {
             member2 = member;
             member = NULL;
             lexer();
-            if (((*ob).sglo.items1 = constant()) < 0)
+            if (((*ob).struct_global.dim1 = constant()) < 0)
               c_error(4, 123);
-            if (pieza == p_coma) {
+            if (current_token == p_coma) {
               lexer();
-              if (((*ob).sglo.items2 = constant()) < 0)
+              if (((*ob).struct_global.dim2 = constant()) < 0)
                 c_error(4, 123);
-              if (pieza == p_coma) {
+              if (current_token == p_coma) {
                 lexer();
-                if (((*ob).sglo.items3 = constant()) < 0)
+                if (((*ob).struct_global.dim3 = constant()) < 0)
                   c_error(4, 123);
               } else
-                (*ob).sglo.items3 = -1;
+                (*ob).struct_global.dim3 = -1;
             } else {
-              (*ob).sglo.items2 = -1;
-              (*ob).sglo.items3 = -1;
+              (*ob).struct_global.dim2 = -1;
+              (*ob).struct_global.dim3 = -1;
             }
             member = member2;
-            (*ob).sglo.totalitems = (*ob).sglo.items1 + 1;
-            if ((*ob).sglo.items2 > -1)
-              (*ob).sglo.totalitems *= (*ob).sglo.items2 + 1;
-            if ((*ob).sglo.items3 > -1)
-              (*ob).sglo.totalitems *= (*ob).sglo.items3 + 1;
-            if (pieza != p_corce) {
+            (*ob).struct_global.total_items = (*ob).struct_global.dim1 + 1;
+            if ((*ob).struct_global.dim2 > -1)
+              (*ob).struct_global.total_items *= (*ob).struct_global.dim2 + 1;
+            if ((*ob).struct_global.dim3 > -1)
+              (*ob).struct_global.total_items *= (*ob).struct_global.dim3 + 1;
+            if (current_token != p_corce) {
               c_error(3, 26);
             }
             lexer();
           } else {
-            (*ob).sglo.totalitems = 1;
-            (*ob).sglo.items1 = 0;
-            (*ob).sglo.items2 = -1;
-            (*ob).sglo.items3 = -1;
+            (*ob).struct_global.total_items = 1;
+            (*ob).struct_global.dim1 = 0;
+            (*ob).struct_global.dim2 = -1;
+            (*ob).struct_global.dim3 = -1;
           }
-          if (((*ob).sglo.len_item = analyze_struct(_imem)) == 0)
+          if (((*ob).struct_global.item_len = analyze_struct(_imem)) == 0)
             c_error(0, 57);
           member = NULL;
           lexer();
-          imem = (*ob).sglo.offset;
-          dup = (*ob).sglo.totalitems + 1;
+          imem = (*ob).struct_global.offset;
+          dup = (*ob).struct_global.total_items + 1;
           if (dup > 1) {
-            test_buffer(&mem, &imem_max, imem + (*ob).sglo.len_item * (*ob).sglo.totalitems);
-            test_buffer(&frm, &ifrm_max, imem + (*ob).sglo.len_item * (*ob).sglo.totalitems);
+            test_buffer(&mem, &imem_max, imem + (*ob).struct_global.item_len * (*ob).struct_global.total_items);
+            test_buffer(&frm, &ifrm_max, imem + (*ob).struct_global.item_len * (*ob).struct_global.total_items);
             while (--dup) {
               if (imem != _imem) {
-                memcpy(&mem[imem], &mem[_imem], (*ob).sglo.len_item << 2);
-                memcpy(&frm[imem], &frm[_imem], (*ob).sglo.len_item << 2);
+                memcpy(&mem[imem], &mem[_imem], (*ob).struct_global.item_len << 2);
+                memcpy(&frm[imem], &frm[_imem], (*ob).struct_global.item_len << 2);
               }
-              imem += (*ob).sglo.len_item;
+              imem += (*ob).struct_global.item_len;
             }
           }
           imem = _imem;
-          if (pieza == p_asig) {
+          if (current_token == p_asig) {
             save_error(1);
             lexer();
             tglo_init(0);
-            if (imem - _imem - 1 >= (*ob).sglo.len_item * (*ob).sglo.totalitems)
+            if (imem - _imem - 1 >= (*ob).struct_global.item_len * (*ob).struct_global.total_items)
               c_error(4, 120);
           }
-          while (pieza == p_ptocoma)
+          while (current_token == p_ptocoma)
             lexer();
 
-          imem = _imem + (*ob).sglo.len_item * (*ob).sglo.totalitems;
+          imem = _imem + (*ob).struct_global.item_len * (*ob).struct_global.total_items;
           test_buffer(&mem, &imem_max, imem);
         }
 
-      } else if (pieza == p_string) { // Global string
+      } else if (current_token == p_string) { // Global string
 
         lexer();
 
-        if (pieza == p_pointer) { // Byte pointer
+        if (current_token == p_pointer) { // Byte pointer
 
           lexer();
 puntero1:
-          ob = analiza_pointer(tpcgl, imem);
-          if (pieza == p_asig) {
+          ob = analyze_pointer(tpcgl, imem);
+          if (current_token == p_asig) {
             lexer();
             mem[imem] = constant();
           }
           test_buffer(&mem, &imem_max, ++imem);
-          if (pieza == p_coma) {
+          if (current_token == p_coma) {
             lexer();
-            if (pieza == p_pointer)
+            if (current_token == p_pointer)
               lexer();
             goto puntero1;
           }
 
         } else {
-          if (pieza != p_id)
+          if (current_token != p_id)
             c_error(1, 125);
           ob = o;
           if ((*ob).type != tnone)
@@ -4495,142 +4495,142 @@ puntero1:
           lexer();
           (*ob).type = tcglo;
           _imem = imem;
-          (*ob).cglo.offset = _imem + 1;
-          if (pieza == p_corab) {
+          (*ob).string_global.offset = _imem + 1;
+          if (current_token == p_corab) {
             lexer();
-            if (pieza == p_corce) {
+            if (current_token == p_corce) {
               lexer();
-              (*ob).cglo.totalen = 255;
+              (*ob).string_global.total_len = 255;
             } else {
-              if (((*ob).cglo.totalen = constant()) < 0)
+              if (((*ob).string_global.total_len = constant()) < 0)
                 c_error(4, 127);
-              if ((*ob).cglo.totalen > 0xFFFFF)
+              if ((*ob).string_global.total_len > 0xFFFFF)
                 c_error(4, 135);
-              if (pieza != p_corce)
+              if (current_token != p_corce)
                 c_error(3, 26);
               lexer();
             }
           } else
-            (*ob).cglo.totalen = 255;
-          if (pieza == p_asig) {
+            (*ob).string_global.total_len = 255;
+          if (current_token == p_asig) {
             save_error(1);
             _itxt = itxt;
             lexer();
-            if (pieza != p_lit && !(pieza == p_id && (*o).type == tcons && (*o).cons.literal))
+            if (current_token != p_lit && !(current_token == p_id && (*o).type == tcons && (*o).cons.literal))
               c_error(3, 128);
-            if (strlen((char *)&mem[pieza_num]) > (*ob).cglo.totalen + 1)
+            if (strlen((char *)&mem[token_value]) > (*ob).string_global.total_len + 1)
               c_error(4, 129);
-            imem = _imem + 1 + ((*ob).cglo.totalen + 5) / 4; // e.g. c[32] -> c[0]..c[32],NUL
+            imem = _imem + 1 + ((*ob).string_global.total_len + 5) / 4; // e.g. c[32] -> c[0]..c[32],NUL
             test_buffer(&mem, &imem_max, imem);
-            memmove((char *)&mem[_imem + 1], (char *)&mem[pieza_num],
-                    strlen((char *)&mem[pieza_num]) + 1);
+            memmove((char *)&mem[_imem + 1], (char *)&mem[token_value],
+                    strlen((char *)&mem[token_value]) + 1);
             itxt = _itxt; // Remove the string from the text segment
             lexer();
           } else {
-            imem = _imem + 1 + ((*ob).cglo.totalen + 5) / 4;
+            imem = _imem + 1 + ((*ob).string_global.total_len + 5) / 4;
             test_buffer(&mem, &imem_max, imem);
           }
-          mem[_imem] = 0xDAD00000 | (*ob).cglo.totalen;
+          mem[_imem] = 0xDAD00000 | (*ob).string_global.total_len;
         }
 
-        if (pieza == p_coma)
-          pieza = p_string;
+        if (current_token == p_coma)
+          current_token = p_string;
         else {
           if (!free_sintax)
-            if (pieza != p_ptocoma)
+            if (current_token != p_ptocoma)
               c_error(3, 137);
-          while (pieza == p_ptocoma || pieza == p_coma)
+          while (current_token == p_ptocoma || current_token == p_coma)
             lexer();
         }
 
-      } else if (pieza == p_byte) { // Global byte array
+      } else if (current_token == p_byte) { // Global byte array
 
         lexer();
 
-        if (pieza == p_pointer) { // Byte pointer
+        if (current_token == p_pointer) { // Byte pointer
 
           lexer();
 puntero2:
-          ob = analiza_pointer(tpbgl, imem);
-          if (pieza == p_asig) {
+          ob = analyze_pointer(tpbgl, imem);
+          if (current_token == p_asig) {
             lexer();
             mem[imem] = constant();
           }
           test_buffer(&mem, &imem_max, ++imem);
-          if (pieza == p_coma) {
+          if (current_token == p_coma) {
             lexer();
-            if (pieza == p_pointer)
+            if (current_token == p_pointer)
               lexer();
             goto puntero2;
           }
 
         } else {
-          if (pieza != p_id)
+          if (current_token != p_id)
             c_error(1, 142);
           ob = o;
           if ((*ob).type != tnone)
             c_error(0, 117);
           lexer();
           (*ob).type = tbglo;
-          (*ob).bglo.offset = _imem = imem;
-          if (pieza == p_corab) {
+          (*ob).byte_global.offset = _imem = imem;
+          if (current_token == p_corab) {
             lexer();
-            if (pieza == p_corce) {
+            if (current_token == p_corce) {
               lexer();
-              if (pieza != p_asig)
+              if (current_token != p_asig)
                 c_error(3, 23);
               lexer();
               oimemptr = (byte *)&mem[imem];
               tglo_init(2);
-              (*ob).bglo.len1 = imemptr - oimemptr - 1;
-              (*ob).bglo.len2 = -1;
-              (*ob).bglo.len3 = -1;
-              (*ob).bglo.totalen = ((*ob).bglo.len1 + 4) / 4;
+              (*ob).byte_global.len1 = imemptr - oimemptr - 1;
+              (*ob).byte_global.len2 = -1;
+              (*ob).byte_global.len3 = -1;
+              (*ob).byte_global.total_len = ((*ob).byte_global.len1 + 4) / 4;
             } else {
-              if (((*ob).bglo.len1 = constant()) < 0)
+              if (((*ob).byte_global.len1 = constant()) < 0)
                 c_error(4, 35);
-              if (pieza == p_coma) {
+              if (current_token == p_coma) {
                 lexer();
-                if (((*ob).bglo.len2 = constant()) < 0)
+                if (((*ob).byte_global.len2 = constant()) < 0)
                   c_error(4, 35);
-                if (pieza == p_coma) {
+                if (current_token == p_coma) {
                   lexer();
-                  if (((*ob).bglo.len3 = constant()) < 0)
+                  if (((*ob).byte_global.len3 = constant()) < 0)
                     c_error(4, 35);
                 } else
-                  (*ob).bglo.len3 = -1;
+                  (*ob).byte_global.len3 = -1;
               } else {
-                (*ob).bglo.len2 = -1;
-                (*ob).bglo.len3 = -1;
+                (*ob).byte_global.len2 = -1;
+                (*ob).byte_global.len3 = -1;
               }
 
-              (*ob).bglo.totalen = (*ob).bglo.len1 + 1;
-              if ((*ob).bglo.len2 > -1)
-                (*ob).bglo.totalen *= (*ob).bglo.len2 + 1;
-              if ((*ob).bglo.len3 > -1)
-                (*ob).bglo.totalen *= (*ob).bglo.len3 + 1;
-              if (pieza != p_corce) {
+              (*ob).byte_global.total_len = (*ob).byte_global.len1 + 1;
+              if ((*ob).byte_global.len2 > -1)
+                (*ob).byte_global.total_len *= (*ob).byte_global.len2 + 1;
+              if ((*ob).byte_global.len3 > -1)
+                (*ob).byte_global.total_len *= (*ob).byte_global.len3 + 1;
+              if (current_token != p_corce) {
                 c_error(3, 26);
               }
               lexer();
-              if (pieza == p_asig) {
+              if (current_token == p_asig) {
                 save_error(1);
                 lexer();
                 oimemptr = (byte *)&mem[imem];
                 tglo_init(2);
-                if (imemptr - oimemptr > (*ob).bglo.totalen)
+                if (imemptr - oimemptr > (*ob).byte_global.total_len)
                   c_error(4, 33);
               }
-              (*ob).bglo.totalen = ((*ob).bglo.totalen + 3) / 4;
+              (*ob).byte_global.total_len = ((*ob).byte_global.total_len + 3) / 4;
             }
           } else { // Global byte
             (*ob).type = tbglo;
-            (*ob).bglo.offset = imem;
-            (*ob).bglo.len1 = 0;
-            (*ob).bglo.len2 = -1;
-            (*ob).bglo.len3 = -1;
-            (*ob).bglo.totalen = 1; // 1 int
-            if (pieza == p_asig) {
+            (*ob).byte_global.offset = imem;
+            (*ob).byte_global.len1 = 0;
+            (*ob).byte_global.len2 = -1;
+            (*ob).byte_global.len3 = -1;
+            (*ob).byte_global.total_len = 1; // 1 int
+            if (current_token == p_asig) {
               save_error(1);
               lexer();
               mem[imem] = constant();
@@ -4638,108 +4638,108 @@ puntero2:
                 c_error(4, 143);
             }
           }
-          imem = _imem + (*ob).bglo.totalen;
+          imem = _imem + (*ob).byte_global.total_len;
           test_buffer(&mem, &imem_max, imem);
         }
 
-        if (pieza == p_coma)
-          pieza = p_byte;
+        if (current_token == p_coma)
+          current_token = p_byte;
         else {
           if (!free_sintax)
-            if (pieza != p_ptocoma)
+            if (current_token != p_ptocoma)
               c_error(3, 137);
-          while (pieza == p_ptocoma || pieza == p_coma)
+          while (current_token == p_ptocoma || current_token == p_coma)
             lexer();
         }
 
-      } else if (pieza == p_word) { // Global word array
+      } else if (current_token == p_word) { // Global word array
 
         lexer();
 
-        if (pieza == p_pointer) { // Word pointer
+        if (current_token == p_pointer) { // Word pointer
 
           lexer();
 puntero3:
-          ob = analiza_pointer(tpwgl, imem);
-          if (pieza == p_asig) {
+          ob = analyze_pointer(tpwgl, imem);
+          if (current_token == p_asig) {
             lexer();
             mem[imem] = constant();
           }
           test_buffer(&mem, &imem_max, ++imem);
-          if (pieza == p_coma) {
+          if (current_token == p_coma) {
             lexer();
-            if (pieza == p_pointer)
+            if (current_token == p_pointer)
               lexer();
             goto puntero3;
           }
 
         } else {
-          if (pieza != p_id)
+          if (current_token != p_id)
             c_error(1, 145);
           ob = o;
           if ((*ob).type != tnone)
             c_error(0, 117);
           lexer();
           (*ob).type = twglo;
-          (*ob).wglo.offset = _imem = imem;
-          if (pieza == p_corab) {
+          (*ob).word_global.offset = _imem = imem;
+          if (current_token == p_corab) {
             lexer();
-            if (pieza == p_corce) {
+            if (current_token == p_corce) {
               lexer();
-              if (pieza != p_asig)
+              if (current_token != p_asig)
                 c_error(3, 23);
               lexer();
               oimemptr = (byte *)&mem[imem];
               tglo_init(1);
-              (*ob).wglo.len1 = (imemptr - oimemptr) / 2 - 1;
-              (*ob).wglo.len2 = -1;
-              (*ob).wglo.len3 = -1;
-              (*ob).wglo.totalen = ((*ob).wglo.len1 + 2) / 2;
+              (*ob).word_global.len1 = (imemptr - oimemptr) / 2 - 1;
+              (*ob).word_global.len2 = -1;
+              (*ob).word_global.len3 = -1;
+              (*ob).word_global.total_len = ((*ob).word_global.len1 + 2) / 2;
             } else {
-              if (((*ob).wglo.len1 = constant()) < 0)
+              if (((*ob).word_global.len1 = constant()) < 0)
                 c_error(4, 35);
-              if (pieza == p_coma) {
+              if (current_token == p_coma) {
                 lexer();
-                if (((*ob).wglo.len2 = constant()) < 0)
+                if (((*ob).word_global.len2 = constant()) < 0)
                   c_error(4, 35);
-                if (pieza == p_coma) {
+                if (current_token == p_coma) {
                   lexer();
-                  if (((*ob).wglo.len3 = constant()) < 0)
+                  if (((*ob).word_global.len3 = constant()) < 0)
                     c_error(4, 35);
                 } else
-                  (*ob).wglo.len3 = -1;
+                  (*ob).word_global.len3 = -1;
               } else {
-                (*ob).wglo.len2 = -1;
-                (*ob).wglo.len3 = -1;
+                (*ob).word_global.len2 = -1;
+                (*ob).word_global.len3 = -1;
               }
 
-              (*ob).wglo.totalen = (*ob).wglo.len1 + 1;
-              if ((*ob).wglo.len2 > -1)
-                (*ob).wglo.totalen *= (*ob).wglo.len2 + 1;
-              if ((*ob).wglo.len3 > -1)
-                (*ob).wglo.totalen *= (*ob).wglo.len3 + 1;
-              if (pieza != p_corce) {
+              (*ob).word_global.total_len = (*ob).word_global.len1 + 1;
+              if ((*ob).word_global.len2 > -1)
+                (*ob).word_global.total_len *= (*ob).word_global.len2 + 1;
+              if ((*ob).word_global.len3 > -1)
+                (*ob).word_global.total_len *= (*ob).word_global.len3 + 1;
+              if (current_token != p_corce) {
                 c_error(3, 26);
               }
               lexer();
-              if (pieza == p_asig) {
+              if (current_token == p_asig) {
                 save_error(1);
                 lexer();
                 oimemptr = (byte *)&mem[imem];
                 tglo_init(1);
-                if (imemptr - oimemptr > (*ob).wglo.totalen * 2)
+                if (imemptr - oimemptr > (*ob).word_global.total_len * 2)
                   c_error(4, 33);
               }
-              (*ob).wglo.totalen = ((*ob).wglo.totalen + 1) / 2;
+              (*ob).word_global.total_len = ((*ob).word_global.total_len + 1) / 2;
             }
           } else { // Global word
             (*ob).type = twglo;
-            (*ob).wglo.offset = imem;
-            (*ob).wglo.len1 = 0;
-            (*ob).wglo.len2 = -1;
-            (*ob).wglo.len3 = -1;
-            (*ob).wglo.totalen = 1; // 1 int
-            if (pieza == p_asig) {
+            (*ob).word_global.offset = imem;
+            (*ob).word_global.len1 = 0;
+            (*ob).word_global.len2 = -1;
+            (*ob).word_global.len3 = -1;
+            (*ob).word_global.total_len = 1; // 1 int
+            if (current_token == p_asig) {
               save_error(1);
               lexer();
               mem[imem] = constant();
@@ -4747,40 +4747,40 @@ puntero3:
                 c_error(4, 144);
             }
           }
-          imem = _imem + (*ob).wglo.totalen;
+          imem = _imem + (*ob).word_global.total_len;
           test_buffer(&mem, &imem_max, imem);
         }
 
-        if (pieza == p_coma)
-          pieza = p_word;
+        if (current_token == p_coma)
+          current_token = p_word;
         else {
           if (!free_sintax)
-            if (pieza != p_ptocoma)
+            if (current_token != p_ptocoma)
               c_error(3, 137);
-          while (pieza == p_ptocoma || pieza == p_coma)
+          while (current_token == p_ptocoma || current_token == p_coma)
             lexer();
         }
 
-      } else if (pieza == p_int || pieza == p_id || pieza == p_pointer) {
-        if (pieza == p_int) {
+      } else if (current_token == p_int || current_token == p_id || current_token == p_pointer) {
+        if (current_token == p_int) {
           lexer();
-          if (pieza != p_id && pieza != p_pointer)
+          if (current_token != p_id && current_token != p_pointer)
             c_error(1, 149);
         }
 
-        if (pieza == p_pointer) { // Int pointer
+        if (current_token == p_pointer) { // Int pointer
 
           lexer();
 puntero4:
-          ob = analiza_pointer(tpigl, imem);
-          if (pieza == p_asig) {
+          ob = analyze_pointer(tpigl, imem);
+          if (current_token == p_asig) {
             lexer();
             mem[imem] = constant();
           }
           test_buffer(&mem, &imem_max, ++imem);
-          if (pieza == p_coma) {
+          if (current_token == p_coma) {
             lexer();
-            if (pieza == p_pointer)
+            if (current_token == p_pointer)
               lexer();
             goto puntero4;
           }
@@ -4790,62 +4790,62 @@ puntero4:
           if ((*ob).type != tnone)
             c_error(0, 117);
           lexer();
-          if (pieza == p_corab) { // Global table
+          if (current_token == p_corab) { // Global table
             lexer();
             (*ob).type = ttglo;
-            (*ob).tglo.offset = _imem = imem;
-            if (pieza == p_corce) {
+            (*ob).table_global.offset = _imem = imem;
+            if (current_token == p_corce) {
               lexer();
-              if (pieza != p_asig)
+              if (current_token != p_asig)
                 c_error(3, 23);
               lexer();
               tglo_init(3);
-              (*ob).tglo.len1 = imem - _imem - 1;
-              (*ob).tglo.len2 = -1;
-              (*ob).tglo.len3 = -1;
-              (*ob).tglo.totalen = imem - _imem;
+              (*ob).table_global.len1 = imem - _imem - 1;
+              (*ob).table_global.len2 = -1;
+              (*ob).table_global.len3 = -1;
+              (*ob).table_global.total_len = imem - _imem;
             } else {
-              if (((*ob).tglo.len1 = constant()) < 0)
+              if (((*ob).table_global.len1 = constant()) < 0)
                 c_error(4, 35);
-              if (pieza == p_coma) {
+              if (current_token == p_coma) {
                 lexer();
-                if (((*ob).tglo.len2 = constant()) < 0)
+                if (((*ob).table_global.len2 = constant()) < 0)
                   c_error(4, 35);
-                if (pieza == p_coma) {
+                if (current_token == p_coma) {
                   lexer();
-                  if (((*ob).tglo.len3 = constant()) < 0)
+                  if (((*ob).table_global.len3 = constant()) < 0)
                     c_error(4, 35);
                 } else
-                  (*ob).tglo.len3 = -1;
+                  (*ob).table_global.len3 = -1;
               } else {
-                (*ob).tglo.len2 = -1;
-                (*ob).tglo.len3 = -1;
+                (*ob).table_global.len2 = -1;
+                (*ob).table_global.len3 = -1;
               }
-              (*ob).tglo.totalen = (*ob).tglo.len1 + 1;
-              if ((*ob).tglo.len2 > -1)
-                (*ob).tglo.totalen *= (*ob).tglo.len2 + 1;
-              if ((*ob).tglo.len3 > -1)
-                (*ob).tglo.totalen *= (*ob).tglo.len3 + 1;
-              if (pieza != p_corce) {
+              (*ob).table_global.total_len = (*ob).table_global.len1 + 1;
+              if ((*ob).table_global.len2 > -1)
+                (*ob).table_global.total_len *= (*ob).table_global.len2 + 1;
+              if ((*ob).table_global.len3 > -1)
+                (*ob).table_global.total_len *= (*ob).table_global.len3 + 1;
+              if (current_token != p_corce) {
                 c_error(3, 26);
               }
               lexer();
-              if (pieza == p_asig) {
+              if (current_token == p_asig) {
                 save_error(1);
                 lexer();
                 tglo_init(3);
-                if (imem - _imem > (*ob).tglo.totalen)
+                if (imem - _imem > (*ob).table_global.total_len)
                   c_error(4, 33);
               }
             }
-            imem = _imem + (*ob).tglo.totalen;
+            imem = _imem + (*ob).table_global.total_len;
             test_buffer(&mem, &imem_max, imem);
 
           } else { // Global variable
 
             (*ob).type = tvglo;
-            (*ob).vglo.offset = imem;
-            if (pieza == p_asig) {
+            (*ob).var_global.offset = imem;
+            if (current_token == p_asig) {
               lexer();
               mem[imem] = constant();
             }
@@ -4853,9 +4853,9 @@ puntero4:
           }
         }
         if (!free_sintax)
-          if (pieza != p_ptocoma && pieza != p_coma)
+          if (current_token != p_ptocoma && current_token != p_coma)
             c_error(3, 66);
-        while (pieza == p_ptocoma || pieza == p_coma)
+        while (current_token == p_ptocoma || current_token == p_coma)
           lexer();
       }
     }
@@ -4870,17 +4870,17 @@ puntero4:
   //                       | <exp> p_corce [ p_asig <init> ] ) {;}
   //---------------------------------------------------------------------------
 
-  if (pieza == p_local) {
+  if (current_token == p_local) {
     skip_semicolons();
-    while (pieza == p_id || pieza == p_int || pieza == p_pointer || pieza == p_struct ||
-           pieza == p_string || pieza == p_byte || pieza == p_word) {
-      if (pieza == p_struct) {
+    while (current_token == p_id || current_token == p_int || current_token == p_pointer || current_token == p_struct ||
+           current_token == p_string || current_token == p_byte || current_token == p_word) {
+      if (current_token == p_struct) {
         lexer();
 
-        if (pieza == p_pointer) { // Defining a struct pointer
+        if (current_token == p_pointer) { // Defining a struct pointer
 
           lexer();
-          if (pieza != p_id)
+          if (current_token != p_id)
             c_error(1, 110);
           ob = o;
           if ((*ob).type == tnone)
@@ -4890,27 +4890,27 @@ puntero4:
           lexer();
 puntero_a_struct_local:
           analyze_pointer_struct(tpslo, iloc, ob);
-          if (pieza == p_asig) {
+          if (current_token == p_asig) {
             lexer();
             loc[iloc] = constant();
           }
           test_buffer(&loc, &iloc_max, iloc++);
 
-          if (pieza == p_coma) {
+          if (current_token == p_coma) {
             lexer();
-            if (pieza == p_pointer)
+            if (current_token == p_pointer)
               lexer();
             goto puntero_a_struct_local;
           } else {
             if (!free_sintax)
-              if (pieza != p_ptocoma)
+              if (current_token != p_ptocoma)
                 c_error(3, 137);
-            while (pieza == p_ptocoma || pieza == p_coma)
+            while (current_token == p_ptocoma || current_token == p_coma)
               lexer();
           }
 
         } else {
-          if (pieza != p_id)
+          if (current_token != p_id)
             c_error(1, 110);
           ob = o;
           member = ob;
@@ -4920,95 +4920,95 @@ puntero_a_struct_local:
             c_error(2, 22);
 
           (*ob).type = tsloc;
-          (*ob).sloc.offset = _imem = iloc;
-          if (pieza == p_corab) {
+          (*ob).struct_local.offset = _imem = iloc;
+          if (current_token == p_corab) {
             member2 = member;
             member = NULL;
             lexer();
-            if (((*ob).sloc.items1 = constant()) < 0)
+            if (((*ob).struct_local.dim1 = constant()) < 0)
               c_error(4, 123);
-            if (pieza == p_coma) {
+            if (current_token == p_coma) {
               lexer();
-              if (((*ob).sloc.items2 = constant()) < 0)
+              if (((*ob).struct_local.dim2 = constant()) < 0)
                 c_error(4, 123);
-              if (pieza == p_coma) {
+              if (current_token == p_coma) {
                 lexer();
-                if (((*ob).sloc.items3 = constant()) < 0)
+                if (((*ob).struct_local.dim3 = constant()) < 0)
                   c_error(4, 123);
               } else
-                (*ob).sloc.items3 = -1;
+                (*ob).struct_local.dim3 = -1;
             } else {
-              (*ob).sloc.items2 = -1;
-              (*ob).sloc.items3 = -1;
+              (*ob).struct_local.dim2 = -1;
+              (*ob).struct_local.dim3 = -1;
             }
             member = member2;
-            (*ob).sloc.totalitems = (*ob).sloc.items1 + 1;
-            if ((*ob).sloc.items2 > -1)
-              (*ob).sloc.totalitems *= (*ob).sloc.items2 + 1;
-            if ((*ob).sloc.items3 > -1)
-              (*ob).sloc.totalitems *= (*ob).sloc.items3 + 1;
-            if (pieza != p_corce) {
+            (*ob).struct_local.total_items = (*ob).struct_local.dim1 + 1;
+            if ((*ob).struct_local.dim2 > -1)
+              (*ob).struct_local.total_items *= (*ob).struct_local.dim2 + 1;
+            if ((*ob).struct_local.dim3 > -1)
+              (*ob).struct_local.total_items *= (*ob).struct_local.dim3 + 1;
+            if (current_token != p_corce) {
               c_error(3, 26);
             }
             lexer();
           } else {
-            (*ob).sloc.totalitems = 1;
-            (*ob).sloc.items1 = 0;
-            (*ob).sloc.items2 = -1;
-            (*ob).sloc.items3 = -1;
+            (*ob).struct_local.total_items = 1;
+            (*ob).struct_local.dim1 = 0;
+            (*ob).struct_local.dim2 = -1;
+            (*ob).struct_local.dim3 = -1;
           }
-          if (((*ob).sloc.len_item = analyze_struct_local(_imem)) == 0)
+          if (((*ob).struct_local.item_len = analyze_struct_local(_imem)) == 0)
             c_error(0, 57);
           member = NULL;
           lexer();
-          iloc = (*ob).sloc.offset;
-          dup = (*ob).sloc.totalitems + 1;
+          iloc = (*ob).struct_local.offset;
+          dup = (*ob).struct_local.total_items + 1;
           if (dup > 1) {
-            test_buffer(&loc, &iloc_max, iloc + (*ob).sloc.len_item * (*ob).sloc.totalitems);
-            test_buffer(&frm, &ifrm_max, imem + (*ob).sloc.len_item * (*ob).sloc.totalitems);
+            test_buffer(&loc, &iloc_max, iloc + (*ob).struct_local.item_len * (*ob).struct_local.total_items);
+            test_buffer(&frm, &ifrm_max, imem + (*ob).struct_local.item_len * (*ob).struct_local.total_items);
             while (--dup) {
-              memcpy(&loc[iloc], &loc[_imem], (*ob).sloc.len_item << 2);
-              memcpy(&frm[iloc], &frm[_imem], (*ob).sloc.len_item << 2);
-              iloc += (*ob).sloc.len_item;
+              memcpy(&loc[iloc], &loc[_imem], (*ob).struct_local.item_len << 2);
+              memcpy(&frm[iloc], &frm[_imem], (*ob).struct_local.item_len << 2);
+              iloc += (*ob).struct_local.item_len;
             }
           }
           iloc = _imem;
-          if (pieza == p_asig) {
+          if (current_token == p_asig) {
             save_error(1);
             lexer();
             tloc_init(0);
-            if (iloc - _imem - 1 >= (*ob).sloc.len_item * (*ob).sloc.totalitems)
+            if (iloc - _imem - 1 >= (*ob).struct_local.item_len * (*ob).struct_local.total_items)
               c_error(4, 120);
           }
-          while (pieza == p_ptocoma)
+          while (current_token == p_ptocoma)
             lexer();
-          iloc = _imem + (*ob).sloc.len_item * (*ob).sloc.totalitems;
+          iloc = _imem + (*ob).struct_local.item_len * (*ob).struct_local.total_items;
           test_buffer(&loc, &iloc_max, iloc);
         }
 
-      } else if (pieza == p_string) { // Local string
+      } else if (current_token == p_string) { // Local string
 
         lexer();
 
-        if (pieza == p_pointer) { // Byte pointer
+        if (current_token == p_pointer) { // Byte pointer
 
           lexer();
 puntero5:
-          ob = analiza_pointer(tpclo, iloc);
-          if (pieza == p_asig) {
+          ob = analyze_pointer(tpclo, iloc);
+          if (current_token == p_asig) {
             lexer();
             loc[iloc] = constant();
           }
           test_buffer(&loc, &iloc_max, ++iloc);
-          if (pieza == p_coma) {
+          if (current_token == p_coma) {
             lexer();
-            if (pieza == p_pointer)
+            if (current_token == p_pointer)
               lexer();
             goto puntero5;
           }
 
         } else {
-          if (pieza != p_id)
+          if (current_token != p_id)
             c_error(1, 125);
           ob = o;
           if ((*ob).type != tnone)
@@ -5016,141 +5016,141 @@ puntero5:
           lexer();
           (*ob).type = tcloc;
           _imem = iloc;
-          (*ob).cloc.offset = _imem + 1;
-          if (pieza == p_corab) {
+          (*ob).string_local.offset = _imem + 1;
+          if (current_token == p_corab) {
             lexer();
-            if (pieza == p_corce) {
+            if (current_token == p_corce) {
               lexer();
-              (*ob).cloc.totalen = 255;
+              (*ob).string_local.total_len = 255;
             } else {
-              if (((*ob).cloc.totalen = constant()) < 0)
+              if (((*ob).string_local.total_len = constant()) < 0)
                 c_error(4, 127);
-              if ((*ob).cloc.totalen > 0xFFFFF)
+              if ((*ob).string_local.total_len > 0xFFFFF)
                 c_error(4, 135);
-              if (pieza != p_corce)
+              if (current_token != p_corce)
                 c_error(3, 26);
               lexer();
             }
           } else
-            (*ob).cloc.totalen = 255;
-          if (pieza == p_asig) {
+            (*ob).string_local.total_len = 255;
+          if (current_token == p_asig) {
             save_error(1);
             _itxt = itxt;
             lexer();
-            if (pieza != p_lit && !(pieza == p_id && (*o).type == tcons && (*o).cons.literal))
+            if (current_token != p_lit && !(current_token == p_id && (*o).type == tcons && (*o).cons.literal))
               c_error(3, 128);
-            if (strlen((char *)&mem[pieza_num]) > (*ob).cloc.totalen + 1)
+            if (strlen((char *)&mem[token_value]) > (*ob).string_local.total_len + 1)
               c_error(4, 129);
-            iloc = _imem + 1 + ((*ob).cloc.totalen + 5) / 4; // e.g. c[32] -> c[0]..c[32],NUL
+            iloc = _imem + 1 + ((*ob).string_local.total_len + 5) / 4; // e.g. c[32] -> c[0]..c[32],NUL
             test_buffer(&loc, &iloc_max, iloc);
-            div_strcpy((char *)&loc[_imem + 1], (*ob).cloc.totalen + 1, (char *)&mem[pieza_num]);
+            div_strcpy((char *)&loc[_imem + 1], (*ob).string_local.total_len + 1, (char *)&mem[token_value]);
             itxt = _itxt; // Remove the string from the text segment
             lexer();
           } else {
-            iloc = _imem + 1 + ((*ob).cloc.totalen + 5) / 4;
+            iloc = _imem + 1 + ((*ob).string_local.total_len + 5) / 4;
             test_buffer(&loc, &iloc_max, iloc);
           }
-          loc[_imem] = 0xDAD00000 | (*ob).cloc.totalen;
+          loc[_imem] = 0xDAD00000 | (*ob).string_local.total_len;
         }
 
-        if (pieza == p_coma)
-          pieza = p_string;
+        if (current_token == p_coma)
+          current_token = p_string;
         else {
           if (!free_sintax)
-            if (pieza != p_ptocoma)
+            if (current_token != p_ptocoma)
               c_error(3, 137);
-          while (pieza == p_ptocoma || pieza == p_coma)
+          while (current_token == p_ptocoma || current_token == p_coma)
             lexer();
         }
 
-      } else if (pieza == p_byte) { // Local byte array
+      } else if (current_token == p_byte) { // Local byte array
 
         lexer();
 
-        if (pieza == p_pointer) { // Byte pointer
+        if (current_token == p_pointer) { // Byte pointer
 
           lexer();
 puntero6:
-          ob = analiza_pointer(tpblo, iloc);
-          if (pieza == p_asig) {
+          ob = analyze_pointer(tpblo, iloc);
+          if (current_token == p_asig) {
             lexer();
             loc[iloc] = constant();
           }
           test_buffer(&loc, &iloc_max, ++iloc);
-          if (pieza == p_coma) {
+          if (current_token == p_coma) {
             lexer();
-            if (pieza == p_pointer)
+            if (current_token == p_pointer)
               lexer();
             goto puntero6;
           }
 
         } else {
-          if (pieza != p_id)
+          if (current_token != p_id)
             c_error(1, 142);
           ob = o;
           if ((*ob).type != tnone)
             c_error(0, 117);
           lexer();
           (*ob).type = tbloc;
-          (*ob).bloc.offset = _imem = iloc;
-          if (pieza == p_corab) {
+          (*ob).byte_local.offset = _imem = iloc;
+          if (current_token == p_corab) {
             lexer();
-            if (pieza == p_corce) {
+            if (current_token == p_corce) {
               lexer();
-              if (pieza != p_asig)
+              if (current_token != p_asig)
                 c_error(3, 23);
               lexer();
               oimemptr = (byte *)&loc[iloc];
               tloc_init(2);
-              (*ob).bloc.len1 = imemptr - oimemptr - 1;
-              (*ob).bloc.len2 = -1;
-              (*ob).bloc.len3 = -1;
-              (*ob).bloc.totalen = ((*ob).bloc.len1 + 4) / 4;
+              (*ob).byte_local.len1 = imemptr - oimemptr - 1;
+              (*ob).byte_local.len2 = -1;
+              (*ob).byte_local.len3 = -1;
+              (*ob).byte_local.total_len = ((*ob).byte_local.len1 + 4) / 4;
             } else {
-              if (((*ob).bloc.len1 = constant()) < 0)
+              if (((*ob).byte_local.len1 = constant()) < 0)
                 c_error(4, 35);
-              if (pieza == p_coma) {
+              if (current_token == p_coma) {
                 lexer();
-                if (((*ob).bloc.len2 = constant()) < 0)
+                if (((*ob).byte_local.len2 = constant()) < 0)
                   c_error(4, 35);
-                if (pieza == p_coma) {
+                if (current_token == p_coma) {
                   lexer();
-                  if (((*ob).bloc.len3 = constant()) < 0)
+                  if (((*ob).byte_local.len3 = constant()) < 0)
                     c_error(4, 35);
                 } else
-                  (*ob).bloc.len3 = -1;
+                  (*ob).byte_local.len3 = -1;
               } else {
-                (*ob).bloc.len2 = -1;
-                (*ob).bloc.len3 = -1;
+                (*ob).byte_local.len2 = -1;
+                (*ob).byte_local.len3 = -1;
               }
 
-              (*ob).bloc.totalen = (*ob).bloc.len1 + 1;
-              if ((*ob).bloc.len2 > -1)
-                (*ob).bloc.totalen *= (*ob).bloc.len2 + 1;
-              if ((*ob).bloc.len3 > -1)
-                (*ob).bloc.totalen *= (*ob).bloc.len3 + 1;
-              if (pieza != p_corce) {
+              (*ob).byte_local.total_len = (*ob).byte_local.len1 + 1;
+              if ((*ob).byte_local.len2 > -1)
+                (*ob).byte_local.total_len *= (*ob).byte_local.len2 + 1;
+              if ((*ob).byte_local.len3 > -1)
+                (*ob).byte_local.total_len *= (*ob).byte_local.len3 + 1;
+              if (current_token != p_corce) {
                 c_error(3, 26);
               }
               lexer();
-              if (pieza == p_asig) {
+              if (current_token == p_asig) {
                 save_error(1);
                 lexer();
                 oimemptr = (byte *)&loc[iloc];
                 tloc_init(2);
-                if (imemptr - oimemptr > (*ob).bloc.totalen)
+                if (imemptr - oimemptr > (*ob).byte_local.total_len)
                   c_error(4, 33);
               }
-              (*ob).bloc.totalen = ((*ob).bloc.totalen + 3) / 4;
+              (*ob).byte_local.total_len = ((*ob).byte_local.total_len + 3) / 4;
             }
           } else { // Byte local
             (*ob).type = tbloc;
-            (*ob).bloc.offset = iloc;
-            (*ob).bloc.len1 = 0;
-            (*ob).bloc.len2 = -1;
-            (*ob).bloc.len3 = -1;
-            (*ob).bloc.totalen = 1; // 1 int
-            if (pieza == p_asig) {
+            (*ob).byte_local.offset = iloc;
+            (*ob).byte_local.len1 = 0;
+            (*ob).byte_local.len2 = -1;
+            (*ob).byte_local.len3 = -1;
+            (*ob).byte_local.total_len = 1; // 1 int
+            if (current_token == p_asig) {
               save_error(1);
               lexer();
               loc[iloc] = constant();
@@ -5158,108 +5158,108 @@ puntero6:
                 c_error(4, 143);
             }
           }
-          iloc = _imem + (*ob).bloc.totalen;
+          iloc = _imem + (*ob).byte_local.total_len;
           test_buffer(&loc, &iloc_max, iloc);
         }
 
-        if (pieza == p_coma)
-          pieza = p_byte;
+        if (current_token == p_coma)
+          current_token = p_byte;
         else {
           if (!free_sintax)
-            if (pieza != p_ptocoma)
+            if (current_token != p_ptocoma)
               c_error(3, 137);
-          while (pieza == p_ptocoma || pieza == p_coma)
+          while (current_token == p_ptocoma || current_token == p_coma)
             lexer();
         }
 
-      } else if (pieza == p_word) { // Local word array
+      } else if (current_token == p_word) { // Local word array
 
         lexer();
 
-        if (pieza == p_pointer) { // Word pointer
+        if (current_token == p_pointer) { // Word pointer
 
           lexer();
 puntero7:
-          ob = analiza_pointer(tpwlo, iloc);
-          if (pieza == p_asig) {
+          ob = analyze_pointer(tpwlo, iloc);
+          if (current_token == p_asig) {
             lexer();
             loc[iloc] = constant();
           }
           test_buffer(&loc, &iloc_max, ++iloc);
-          if (pieza == p_coma) {
+          if (current_token == p_coma) {
             lexer();
-            if (pieza == p_pointer)
+            if (current_token == p_pointer)
               lexer();
             goto puntero7;
           }
 
         } else {
-          if (pieza != p_id)
+          if (current_token != p_id)
             c_error(1, 145);
           ob = o;
           if ((*ob).type != tnone)
             c_error(0, 117);
           lexer();
           (*ob).type = twloc;
-          (*ob).wloc.offset = _imem = iloc;
-          if (pieza == p_corab) {
+          (*ob).word_local.offset = _imem = iloc;
+          if (current_token == p_corab) {
             lexer();
-            if (pieza == p_corce) {
+            if (current_token == p_corce) {
               lexer();
-              if (pieza != p_asig)
+              if (current_token != p_asig)
                 c_error(3, 23);
               lexer();
               oimemptr = (byte *)&loc[iloc];
               tloc_init(1);
-              (*ob).wloc.len1 = (imemptr - oimemptr) / 2 - 1;
-              (*ob).wloc.len2 = -1;
-              (*ob).wloc.len3 = -1;
-              (*ob).wloc.totalen = ((*ob).wloc.len1 + 2) / 2;
+              (*ob).word_local.len1 = (imemptr - oimemptr) / 2 - 1;
+              (*ob).word_local.len2 = -1;
+              (*ob).word_local.len3 = -1;
+              (*ob).word_local.total_len = ((*ob).word_local.len1 + 2) / 2;
             } else {
-              if (((*ob).wloc.len1 = constant()) < 0)
+              if (((*ob).word_local.len1 = constant()) < 0)
                 c_error(4, 35);
-              if (pieza == p_coma) {
+              if (current_token == p_coma) {
                 lexer();
-                if (((*ob).wloc.len2 = constant()) < 0)
+                if (((*ob).word_local.len2 = constant()) < 0)
                   c_error(4, 35);
-                if (pieza == p_coma) {
+                if (current_token == p_coma) {
                   lexer();
-                  if (((*ob).wloc.len3 = constant()) < 0)
+                  if (((*ob).word_local.len3 = constant()) < 0)
                     c_error(4, 35);
                 } else
-                  (*ob).wloc.len3 = -1;
+                  (*ob).word_local.len3 = -1;
               } else {
-                (*ob).wloc.len2 = -1;
-                (*ob).wloc.len3 = -1;
+                (*ob).word_local.len2 = -1;
+                (*ob).word_local.len3 = -1;
               }
 
-              (*ob).wloc.totalen = (*ob).wloc.len1 + 1;
-              if ((*ob).wloc.len2 > -1)
-                (*ob).wloc.totalen *= (*ob).wloc.len2 + 1;
-              if ((*ob).wloc.len3 > -1)
-                (*ob).wloc.totalen *= (*ob).wloc.len3 + 1;
-              if (pieza != p_corce) {
+              (*ob).word_local.total_len = (*ob).word_local.len1 + 1;
+              if ((*ob).word_local.len2 > -1)
+                (*ob).word_local.total_len *= (*ob).word_local.len2 + 1;
+              if ((*ob).word_local.len3 > -1)
+                (*ob).word_local.total_len *= (*ob).word_local.len3 + 1;
+              if (current_token != p_corce) {
                 c_error(3, 26);
               }
               lexer();
-              if (pieza == p_asig) {
+              if (current_token == p_asig) {
                 save_error(1);
                 lexer();
                 oimemptr = (byte *)&loc[iloc];
                 tloc_init(1);
-                if (imemptr - oimemptr > (*ob).wloc.totalen * 2)
+                if (imemptr - oimemptr > (*ob).word_local.total_len * 2)
                   c_error(4, 33);
               }
-              (*ob).wloc.totalen = ((*ob).wloc.totalen + 1) / 2;
+              (*ob).word_local.total_len = ((*ob).word_local.total_len + 1) / 2;
             }
           } else { // Word local
             (*ob).type = twloc;
-            (*ob).wloc.offset = iloc;
-            (*ob).wloc.len1 = 0;
-            (*ob).wloc.len2 = -1;
-            (*ob).wloc.len3 = -1;
-            (*ob).wloc.totalen = 1; // 1 int
-            if (pieza == p_asig) {
+            (*ob).word_local.offset = iloc;
+            (*ob).word_local.len1 = 0;
+            (*ob).word_local.len2 = -1;
+            (*ob).word_local.len3 = -1;
+            (*ob).word_local.total_len = 1; // 1 int
+            if (current_token == p_asig) {
               save_error(1);
               lexer();
               loc[iloc] = constant();
@@ -5267,40 +5267,40 @@ puntero7:
                 c_error(4, 144);
             }
           }
-          iloc = _imem + (*ob).wloc.totalen;
+          iloc = _imem + (*ob).word_local.total_len;
           test_buffer(&loc, &iloc_max, iloc);
         }
 
-        if (pieza == p_coma)
-          pieza = p_word;
+        if (current_token == p_coma)
+          current_token = p_word;
         else {
           if (!free_sintax)
-            if (pieza != p_ptocoma)
+            if (current_token != p_ptocoma)
               c_error(3, 137);
-          while (pieza == p_ptocoma || pieza == p_coma)
+          while (current_token == p_ptocoma || current_token == p_coma)
             lexer();
         }
 
-      } else if (pieza == p_int || pieza == p_id || pieza == p_pointer) {
-        if (pieza == p_int) {
+      } else if (current_token == p_int || current_token == p_id || current_token == p_pointer) {
+        if (current_token == p_int) {
           lexer();
-          if (pieza != p_id && pieza != p_pointer)
+          if (current_token != p_id && current_token != p_pointer)
             c_error(1, 149);
         }
 
-        if (pieza == p_pointer) { // Int pointer member
+        if (current_token == p_pointer) { // Int pointer member
 
           lexer();
 puntero8:
-          ob = analiza_pointer(tpilo, iloc);
-          if (pieza == p_asig) {
+          ob = analyze_pointer(tpilo, iloc);
+          if (current_token == p_asig) {
             lexer();
             loc[iloc] = constant();
           }
           test_buffer(&loc, &iloc_max, ++iloc);
-          if (pieza == p_coma) {
+          if (current_token == p_coma) {
             lexer();
-            if (pieza == p_pointer)
+            if (current_token == p_pointer)
               lexer();
             goto puntero8;
           }
@@ -5310,62 +5310,62 @@ puntero8:
           if ((*ob).type != tnone)
             c_error(0, 117);
           lexer();
-          if (pieza == p_corab) { // Local table
+          if (current_token == p_corab) { // Local table
             lexer();
             (*ob).type = ttloc;
-            (*ob).tloc.offset = _imem = iloc;
-            if (pieza == p_corce) {
+            (*ob).table_local.offset = _imem = iloc;
+            if (current_token == p_corce) {
               lexer();
-              if (pieza != p_asig)
+              if (current_token != p_asig)
                 c_error(3, 23);
               lexer();
               tloc_init(3);
-              (*ob).tloc.len1 = iloc - _imem - 1;
-              (*ob).tloc.len2 = -1;
-              (*ob).tloc.len3 = -1;
-              (*ob).tloc.totalen = iloc - _imem;
+              (*ob).table_local.len1 = iloc - _imem - 1;
+              (*ob).table_local.len2 = -1;
+              (*ob).table_local.len3 = -1;
+              (*ob).table_local.total_len = iloc - _imem;
             } else {
-              if (((*ob).tloc.len1 = constant()) < 0)
+              if (((*ob).table_local.len1 = constant()) < 0)
                 c_error(4, 35);
-              if (pieza == p_coma) {
+              if (current_token == p_coma) {
                 lexer();
-                if (((*ob).tloc.len2 = constant()) < 0)
+                if (((*ob).table_local.len2 = constant()) < 0)
                   c_error(4, 35);
-                if (pieza == p_coma) {
+                if (current_token == p_coma) {
                   lexer();
-                  if (((*ob).tloc.len3 = constant()) < 0)
+                  if (((*ob).table_local.len3 = constant()) < 0)
                     c_error(4, 35);
                 } else
-                  (*ob).tloc.len3 = -1;
+                  (*ob).table_local.len3 = -1;
               } else {
-                (*ob).tloc.len2 = -1;
-                (*ob).tloc.len3 = -1;
+                (*ob).table_local.len2 = -1;
+                (*ob).table_local.len3 = -1;
               }
-              (*ob).tloc.totalen = (*ob).tloc.len1 + 1;
-              if ((*ob).tloc.len2 > -1)
-                (*ob).tloc.totalen *= (*ob).tloc.len2 + 1;
-              if ((*ob).tloc.len3 > -1)
-                (*ob).tloc.totalen *= (*ob).tloc.len3 + 1;
-              if (pieza != p_corce) {
+              (*ob).table_local.total_len = (*ob).table_local.len1 + 1;
+              if ((*ob).table_local.len2 > -1)
+                (*ob).table_local.total_len *= (*ob).table_local.len2 + 1;
+              if ((*ob).table_local.len3 > -1)
+                (*ob).table_local.total_len *= (*ob).table_local.len3 + 1;
+              if (current_token != p_corce) {
                 c_error(3, 26);
               }
               lexer();
-              if (pieza == p_asig) {
+              if (current_token == p_asig) {
                 save_error(1);
                 lexer();
                 tloc_init(3);
-                if (iloc - _imem > (*ob).tloc.totalen)
+                if (iloc - _imem > (*ob).table_local.total_len)
                   c_error(4, 33);
               }
             }
-            iloc = _imem + (*ob).tloc.totalen;
+            iloc = _imem + (*ob).table_local.total_len;
             test_buffer(&loc, &iloc_max, iloc);
 
           } else { // Variable local
 
             (*ob).type = tvloc;
-            (*ob).vloc.offset = iloc;
-            if (pieza == p_asig) {
+            (*ob).var_local.offset = iloc;
+            if (current_token == p_asig) {
               lexer();
               loc[iloc] = constant();
             }
@@ -5373,9 +5373,9 @@ puntero8:
           }
         }
         if (!free_sintax)
-          if (pieza != p_ptocoma && pieza != p_coma)
+          if (current_token != p_ptocoma && current_token != p_coma)
             c_error(3, 66);
-        while (pieza == p_ptocoma || pieza == p_coma)
+        while (current_token == p_ptocoma || current_token == p_coma)
           lexer();
       }
     }
@@ -5389,40 +5389,40 @@ puntero8:
 
   mem[0] = program_type;
   mem[1] = imem;
-  iloc_len = iloc;
+  local_var_len = iloc;
 
-  g2(ltyp, (intptr_t)bloque_actual);
+  g2(ltyp, (intptr_t)current_scope);
   g2(lcbp, 0);
-  if (pieza == p_import)
+  if (current_token == p_import)
     c_error(0, 147); // Warn DIV 1 users
   // The first FRAME and PRIVATE variable loading are executed
   // together in the BEGIN of the main program.
 
-  final = imem;
+  end_addr = imem;
 
-  parametros = -1;
-  bloque_lexico = bloque_actual;
+  in_params = -1;
+  lexical_scope = current_scope;
   n = iloc;
   analyze_private();
-  if (iloc > iloc_len) {
-    iloc_len = iloc;
+  if (iloc > local_var_len) {
+    local_var_len = iloc;
   }
   iloc = n;
-  parametros = 0;
+  in_params = 0;
 
   g1(lfrm);
 
-  if (pieza != p_begin)
+  if (current_token != p_begin)
     c_error(0, 29);
   statement_start();
-  inicio = final;
+  start_addr = end_addr;
   lexer();
   statement_end();
   record_statement();
 
   statement();
 
-  if (pieza != p_end) {
+  if (current_token != p_end) {
     c_error(0, 40);
   }
   statement_start();
@@ -5438,18 +5438,18 @@ puntero8:
   //---------------------------------------------------------------------------
 
   save_error(0);
-  while (pieza == p_process || pieza == p_function) {
-    n = pieza;
+  while (current_token == p_process || current_token == p_function) {
+    n = current_token;
     statement_start();
     lexer();
-    if (pieza != p_id) {
+    if (current_token != p_id) {
       c_error(1, 111);
     }
     ob = o;
     lexer();
-    if ((*ob).type == tproc && (*ob).usado) {
-      num_par = (*ob).proc.num_par;
-      bloque_lexico = bloque_actual = ob;
+    if ((*ob).type == tproc && (*ob).used) {
+      num_params = (*ob).proc.num_params;
+      lexical_scope = current_scope = ob;
       _imem = (*ob).proc.offset;
       while (_imem) {
         _imem_old = mem[_imem];
@@ -5457,42 +5457,42 @@ puntero8:
         _imem = _imem_old;
       }
     } else if ((*ob).type == tnone) {
-      (*ob).usado = 0;
+      (*ob).used = 0;
       (*ob).type = tproc;
-      (*ob).proc.bloque = bloque_lexico = bloque_actual = ob;
+      (*ob).proc.scope = lexical_scope = current_scope = ob;
     } else
       c_error(2, 118);
     (*ob).proc.offset = imem;
-    (*ob).proc.num_par = 0;
+    (*ob).proc.num_params = 0;
 
-    g2(ltyp, (intptr_t)bloque_actual);
+    g2(ltyp, (intptr_t)current_scope);
     if (n == p_function)
       g1(lnop);
     g2(lcbp, 0);
     _imem = imem - 1;
-    if (pieza != p_abrir)
+    if (current_token != p_abrir)
       c_error(3, 36);
 
-    parametros = 1;
+    in_params = 1;
     n = iloc;
     lexer();
 
-    while (pieza != p_cerrar) {
-      (*ob).proc.num_par++;
+    while (current_token != p_cerrar) {
+      (*ob).proc.num_params++;
       expression_cpa();
-      if (pieza != p_cerrar) {
-        if (pieza != p_coma)
+      if (current_token != p_cerrar) {
+        if (current_token != p_coma)
           c_error(3, 25);
         else {
           lexer();
-          if (pieza == p_cerrar)
+          if (current_token == p_cerrar)
             c_error(3, 45);
         }
       }
     }
-    if ((*ob).usado) {
-      if (num_par == (*ob).proc.num_par)
-        (*ob).usado = 0;
+    if ((*ob).used) {
+      if (num_params == (*ob).proc.num_params)
+        (*ob).used = 0;
       else
         c_error(0, 46);
     }
@@ -5500,30 +5500,30 @@ puntero8:
     skip_semicolons();
     statement_end();
 
-    if (parametros > 1) {
-      g2(lpar, parametros - 1);
+    if (in_params > 1) {
+      g2(lpar, in_params - 1);
     }
 
-    parametros = -1; // Allow parameters to be redeclared as PRIVATE
+    in_params = -1; // Allow parameters to be redeclared as PRIVATE
 
-    num_par = mem[_imem] = (*ob).proc.num_par;
+    num_params = mem[_imem] = (*ob).proc.num_params;
 
     analyze_private();
-    parametros = 0;
+    in_params = 0;
 
-    if (iloc > iloc_len) {
-      iloc_len = iloc;
+    if (iloc > local_var_len) {
+      local_var_len = iloc;
     }
     iloc = n;
 
-    if (pieza != p_begin) {
+    if (current_token != p_begin) {
       c_error(0, 29);
     }
     lexer();
-    final = imem - 1;
+    end_addr = imem - 1;
     record_statement();
     statement();
-    if (pieza != p_end) {
+    if (current_token != p_end) {
       c_error(0, 40);
     }
     statement_start();
@@ -5535,7 +5535,7 @@ puntero8:
     save_error(0);
   }
 
-  if (pieza != p_ultima)
+  if (current_token != p_ultima)
     c_error(4, 52);
 }
 
@@ -5548,25 +5548,25 @@ puntero8:
 //          one (i.e., a sibling process).
 
 void analyze_private(void) {
-  struct objeto *ob = NULL, *member2;
+  struct object *ob = NULL, *member2;
   int _imem, _imem_old, _itxt, dup;
   byte *oimemptr;
 
-  if (pieza == p_private) {
+  if (current_token == p_private) {
     skip_semicolons();
 
     g2(lpri, 0);
     _imem_old = imem - 1;
 
-    while (pieza == p_id || pieza == p_int || pieza == p_pointer || pieza == p_struct ||
-           pieza == p_string || pieza == p_byte || pieza == p_word) {
-      if (pieza == p_struct) {
+    while (current_token == p_id || current_token == p_int || current_token == p_pointer || current_token == p_struct ||
+           current_token == p_string || current_token == p_byte || current_token == p_word) {
+      if (current_token == p_struct) {
         lexer();
 
-        if (pieza == p_pointer) { // Defining a struct pointer
+        if (current_token == p_pointer) { // Defining a struct pointer
 
           lexer();
-          if (pieza != p_id)
+          if (current_token != p_id)
             c_error(1, 110);
           ob = o;
           if ((*ob).type == tnone)
@@ -5577,28 +5577,28 @@ void analyze_private(void) {
 puntero_a_struct:
           if (analyze_pointer_struct(tpslo, iloc, ob) == 1) {
             iloc++;
-            if (pieza == p_asig) {
+            if (current_token == p_asig) {
               lexer();
               mem[imem] = constant();
             }
             test_buffer(&mem, &imem_max, ++imem);
           }
 
-          if (pieza == p_coma) {
+          if (current_token == p_coma) {
             lexer();
-            if (pieza == p_pointer)
+            if (current_token == p_pointer)
               lexer();
             goto puntero_a_struct;
           } else {
             if (!free_sintax)
-              if (pieza != p_ptocoma)
+              if (current_token != p_ptocoma)
                 c_error(3, 137);
-            while (pieza == p_ptocoma || pieza == p_coma)
+            while (current_token == p_ptocoma || current_token == p_coma)
               lexer();
           }
 
         } else {
-          if (pieza != p_id)
+          if (current_token != p_id)
             c_error(1, 110);
           ob = o;
           member = ob;
@@ -5608,133 +5608,133 @@ puntero_a_struct:
             c_error(2, 22);
 
           (*ob).type = tsloc;
-          (*ob).sloc.offset = _imem = imem;
-          if (pieza == p_corab) {
+          (*ob).struct_local.offset = _imem = imem;
+          if (current_token == p_corab) {
             member2 = member;
             member = NULL;
             lexer();
-            if (((*ob).sloc.items1 = constant()) < 0)
+            if (((*ob).struct_local.dim1 = constant()) < 0)
               c_error(4, 123);
-            if (pieza == p_coma) {
+            if (current_token == p_coma) {
               lexer();
-              if (((*ob).sloc.items2 = constant()) < 0)
+              if (((*ob).struct_local.dim2 = constant()) < 0)
                 c_error(4, 123);
-              if (pieza == p_coma) {
+              if (current_token == p_coma) {
                 lexer();
-                if (((*ob).sloc.items3 = constant()) < 0)
+                if (((*ob).struct_local.dim3 = constant()) < 0)
                   c_error(4, 123);
               } else
-                (*ob).sloc.items3 = -1;
+                (*ob).struct_local.dim3 = -1;
             } else {
-              (*ob).sloc.items2 = -1;
-              (*ob).sloc.items3 = -1;
+              (*ob).struct_local.dim2 = -1;
+              (*ob).struct_local.dim3 = -1;
             }
             member = member2;
-            (*ob).sloc.totalitems = (*ob).sloc.items1 + 1;
-            if ((*ob).sloc.items2 > -1)
-              (*ob).sloc.totalitems *= (*ob).sloc.items2 + 1;
-            if ((*ob).sloc.items3 > -1)
-              (*ob).sloc.totalitems *= (*ob).sloc.items3 + 1;
-            if (pieza != p_corce) {
+            (*ob).struct_local.total_items = (*ob).struct_local.dim1 + 1;
+            if ((*ob).struct_local.dim2 > -1)
+              (*ob).struct_local.total_items *= (*ob).struct_local.dim2 + 1;
+            if ((*ob).struct_local.dim3 > -1)
+              (*ob).struct_local.total_items *= (*ob).struct_local.dim3 + 1;
+            if (current_token != p_corce) {
               c_error(3, 26);
             }
             lexer();
           } else {
-            (*ob).sloc.totalitems = 1;
-            (*ob).sloc.items1 = 0;
-            (*ob).sloc.items2 = -1;
-            (*ob).sloc.items3 = -1;
+            (*ob).struct_local.total_items = 1;
+            (*ob).struct_local.dim1 = 0;
+            (*ob).struct_local.dim2 = -1;
+            (*ob).struct_local.dim3 = -1;
           }
-          if (((*ob).sloc.len_item = analyze_struct_private(_imem)) == 0)
+          if (((*ob).struct_local.item_len = analyze_struct_private(_imem)) == 0)
             c_error(0, 57);
 
           member = NULL;
           lexer();
 
-          imem = (*ob).sloc.offset;
-          dup = (*ob).sloc.totalitems + 1;
+          imem = (*ob).struct_local.offset;
+          dup = (*ob).struct_local.total_items + 1;
           if (dup > 1) {
-            test_buffer(&mem, &imem_max, imem + (*ob).sloc.len_item * (*ob).sloc.totalitems);
-            test_buffer(&frm, &ifrm_max, imem + (*ob).sloc.len_item * (*ob).sloc.totalitems);
+            test_buffer(&mem, &imem_max, imem + (*ob).struct_local.item_len * (*ob).struct_local.total_items);
+            test_buffer(&frm, &ifrm_max, imem + (*ob).struct_local.item_len * (*ob).struct_local.total_items);
             while (--dup) {
               if (imem != _imem) {
-                memcpy(&mem[imem], &mem[_imem], (*ob).sloc.len_item << 2);
-                memcpy(&frm[imem], &frm[_imem], (*ob).sloc.len_item << 2);
+                memcpy(&mem[imem], &mem[_imem], (*ob).struct_local.item_len << 2);
+                memcpy(&frm[imem], &frm[_imem], (*ob).struct_local.item_len << 2);
               }
-              imem += (*ob).sloc.len_item;
+              imem += (*ob).struct_local.item_len;
             }
           }
           imem = _imem;
 
-          if (pieza == p_asig) {
+          if (current_token == p_asig) {
             save_error(1);
             lexer();
             tglo_init(0);
-            if (imem - _imem - 1 >= (*ob).sloc.len_item * (*ob).sloc.totalitems)
+            if (imem - _imem - 1 >= (*ob).struct_local.item_len * (*ob).struct_local.total_items)
               c_error(4, 120);
           }
-          while (pieza == p_ptocoma)
+          while (current_token == p_ptocoma)
             lexer();
 
-          imem = _imem + (*ob).sloc.len_item * (*ob).sloc.totalitems;
-          (*ob).sloc.offset = iloc;
-          iloc += (*ob).sloc.len_item * (*ob).sloc.totalitems;
+          imem = _imem + (*ob).struct_local.item_len * (*ob).struct_local.total_items;
+          (*ob).struct_local.offset = iloc;
+          iloc += (*ob).struct_local.item_len * (*ob).struct_local.total_items;
           test_buffer(&mem, &imem_max, imem);
         }
 
-      } else if (pieza == p_string) { // Private string
+      } else if (current_token == p_string) { // Private string
 
         lexer();
 
-        if (pieza == p_pointer) { // Byte pointer
+        if (current_token == p_pointer) { // Byte pointer
 
           lexer();
 puntero1:
-          ob = analiza_pointer(tpclo, iloc);
+          ob = analyze_pointer(tpclo, iloc);
           if (ob == NULL)
             continue;
           else
             iloc++;
-          if (pieza == p_asig) {
+          if (current_token == p_asig) {
             lexer();
             mem[imem] = constant();
           }
           test_buffer(&mem, &imem_max, ++imem);
-          if (pieza == p_coma) {
+          if (current_token == p_coma) {
             lexer();
-            if (pieza == p_pointer)
+            if (current_token == p_pointer)
               lexer();
             goto puntero1;
           }
 
         } else {
-          if (pieza != p_id)
+          if (current_token != p_id)
             c_error(1, 125);
           ob = o;
           if ((*ob).type != tnone) { // Check if a parameter is redeclared ...
-            if (parametros == -1 && (*ob).param == 1 && (*ob).bloque == bloque_actual) {
+            if (in_params == -1 && (*ob).param == 1 && (*ob).scope == current_scope) {
               if ((*ob).type == tcloc) { // String parameter redeclared
                 save_error(0);
                 lexer();
-                if (pieza == p_corab) {
+                if (current_token == p_corab) {
                   lexer();
-                  if (pieza == p_corce) {
+                  if (current_token == p_corce) {
                     lexer();
                     dup = 255;
                   } else {
                     dup = constant();
-                    if (pieza != p_corce)
+                    if (current_token != p_corce)
                       c_error(3, 26);
                     lexer();
                   }
                 } else
                   dup = 255;
-                if (dup != (*ob).cloc.totalen)
+                if (dup != (*ob).string_local.total_len)
                   c_error(4, 141);
-                else if (pieza == p_asig)
+                else if (current_token == p_asig)
                   c_error(0, 54);
                 else {
-                  while (pieza == p_ptocoma || pieza == p_coma)
+                  while (current_token == p_ptocoma || current_token == p_coma)
                     lexer();
                   (*ob).param++;
                   continue;
@@ -5748,94 +5748,94 @@ puntero1:
 
           (*ob).type = tcloc;
           _imem = imem;
-          if (pieza == p_corab) {
+          if (current_token == p_corab) {
             lexer();
-            if (pieza == p_corce) {
+            if (current_token == p_corce) {
               lexer();
-              (*ob).cloc.totalen = 255;
+              (*ob).string_local.total_len = 255;
             } else {
-              if (((*ob).cloc.totalen = constant()) < 0)
+              if (((*ob).string_local.total_len = constant()) < 0)
                 c_error(4, 127);
-              if ((*ob).cloc.totalen > 0xFFFFF)
+              if ((*ob).string_local.total_len > 0xFFFFF)
                 c_error(4, 135);
-              if (pieza != p_corce)
+              if (current_token != p_corce)
                 c_error(3, 26);
               lexer();
             }
           } else
-            (*ob).cloc.totalen = 255;
-          if (pieza == p_asig) {
+            (*ob).string_local.total_len = 255;
+          if (current_token == p_asig) {
             save_error(1);
             _itxt = itxt;
             lexer();
-            if (pieza != p_lit && !(pieza == p_id && (*o).type == tcons && (*o).cons.literal))
+            if (current_token != p_lit && !(current_token == p_id && (*o).type == tcons && (*o).cons.literal))
               c_error(3, 128);
-            if (strlen((char *)&mem[pieza_num]) > (*ob).cloc.totalen + 1)
+            if (strlen((char *)&mem[token_value]) > (*ob).string_local.total_len + 1)
               c_error(4, 129);
-            imem = _imem + 1 + ((*ob).cloc.totalen + 5) / 4; // e.g. c[32] -> c[0]..c[32],NUL
+            imem = _imem + 1 + ((*ob).string_local.total_len + 5) / 4; // e.g. c[32] -> c[0]..c[32],NUL
             test_buffer(&mem, &imem_max, imem);
-            memmove((char *)&mem[_imem + 1], (char *)&mem[pieza_num],
-                    strlen((char *)&mem[pieza_num]) + 1);
+            memmove((char *)&mem[_imem + 1], (char *)&mem[token_value],
+                    strlen((char *)&mem[token_value]) + 1);
             itxt = _itxt; // Remove the string from the text segment
             lexer();
           } else {
-            imem = _imem + 1 + ((*ob).cloc.totalen + 5) / 4;
+            imem = _imem + 1 + ((*ob).string_local.total_len + 5) / 4;
             test_buffer(&mem, &imem_max, imem);
           }
-          mem[_imem] = 0xDAD00000 | (*ob).cloc.totalen;
-          (*ob).cloc.offset = iloc + 1;
-          iloc += 1 + ((*ob).cloc.totalen + 5) / 4;
+          mem[_imem] = 0xDAD00000 | (*ob).string_local.total_len;
+          (*ob).string_local.offset = iloc + 1;
+          iloc += 1 + ((*ob).string_local.total_len + 5) / 4;
         }
 
-        if (pieza == p_coma)
-          pieza = p_string;
+        if (current_token == p_coma)
+          current_token = p_string;
         else {
           if (!free_sintax)
-            if (pieza != p_ptocoma)
+            if (current_token != p_ptocoma)
               c_error(3, 137);
-          while (pieza == p_ptocoma || pieza == p_coma)
+          while (current_token == p_ptocoma || current_token == p_coma)
             lexer();
         }
 
-      } else if (pieza == p_byte) { // Private byte array
+      } else if (current_token == p_byte) { // Private byte array
 
         lexer();
 
-        if (pieza == p_pointer) { // Byte pointer
+        if (current_token == p_pointer) { // Byte pointer
 
           lexer();
 puntero2:
-          ob = analiza_pointer(tpblo, iloc);
+          ob = analyze_pointer(tpblo, iloc);
           if (ob == NULL)
             continue;
           else
             iloc++;
-          if (pieza == p_asig) {
+          if (current_token == p_asig) {
             lexer();
             mem[imem] = constant();
           }
           test_buffer(&mem, &imem_max, ++imem);
-          if (pieza == p_coma) {
+          if (current_token == p_coma) {
             lexer();
-            if (pieza == p_pointer)
+            if (current_token == p_pointer)
               lexer();
             goto puntero2;
           }
 
         } else {
-          if (pieza != p_id)
+          if (current_token != p_id)
             c_error(1, 142);
           ob = o;
           if ((*ob).type != tnone) {
-            if (parametros == -1 && (*ob).param == 1 && (*ob).bloque == bloque_actual) {
+            if (in_params == -1 && (*ob).param == 1 && (*ob).scope == current_scope) {
               if ((*ob).type == tbloc) { // Byte parameter redeclared
                 lexer();
-                if (pieza == p_corab)
+                if (current_token == p_corab)
                   c_error(2, 53);
-                else if (pieza == p_asig)
+                else if (current_token == p_asig)
                   c_error(0, 54);
                 else {
-                  while (pieza == p_ptocoma || pieza == p_coma) {
+                  while (current_token == p_ptocoma || current_token == p_coma) {
                     lexer();
                   }
                   (*ob).param++;
@@ -5850,64 +5850,64 @@ puntero2:
 
           (*ob).type = tbloc;
           _imem = imem;
-          if (pieza == p_corab) {
+          if (current_token == p_corab) {
             lexer();
-            if (pieza == p_corce) {
+            if (current_token == p_corce) {
               lexer();
-              if (pieza != p_asig)
+              if (current_token != p_asig)
                 c_error(3, 23);
               lexer();
               oimemptr = (byte *)&mem[imem];
               tglo_init(2);
-              (*ob).bloc.len1 = imemptr - oimemptr - 1;
-              (*ob).bloc.len2 = -1;
-              (*ob).bloc.len3 = -1;
-              (*ob).bloc.totalen = ((*ob).bloc.len1 + 4) / 4;
+              (*ob).byte_local.len1 = imemptr - oimemptr - 1;
+              (*ob).byte_local.len2 = -1;
+              (*ob).byte_local.len3 = -1;
+              (*ob).byte_local.total_len = ((*ob).byte_local.len1 + 4) / 4;
             } else {
-              if (((*ob).bloc.len1 = constant()) < 0)
+              if (((*ob).byte_local.len1 = constant()) < 0)
                 c_error(4, 35);
-              if (pieza == p_coma) {
+              if (current_token == p_coma) {
                 lexer();
-                if (((*ob).bloc.len2 = constant()) < 0)
+                if (((*ob).byte_local.len2 = constant()) < 0)
                   c_error(4, 35);
-                if (pieza == p_coma) {
+                if (current_token == p_coma) {
                   lexer();
-                  if (((*ob).bloc.len3 = constant()) < 0)
+                  if (((*ob).byte_local.len3 = constant()) < 0)
                     c_error(4, 35);
                 } else
-                  (*ob).bloc.len3 = -1;
+                  (*ob).byte_local.len3 = -1;
               } else {
-                (*ob).bloc.len2 = -1;
-                (*ob).bloc.len3 = -1;
+                (*ob).byte_local.len2 = -1;
+                (*ob).byte_local.len3 = -1;
               }
 
-              (*ob).bloc.totalen = (*ob).bloc.len1 + 1;
-              if ((*ob).bloc.len2 > -1)
-                (*ob).bloc.totalen *= (*ob).bloc.len2 + 1;
-              if ((*ob).bloc.len3 > -1)
-                (*ob).bloc.totalen *= (*ob).bloc.len3 + 1;
-              if (pieza != p_corce) {
+              (*ob).byte_local.total_len = (*ob).byte_local.len1 + 1;
+              if ((*ob).byte_local.len2 > -1)
+                (*ob).byte_local.total_len *= (*ob).byte_local.len2 + 1;
+              if ((*ob).byte_local.len3 > -1)
+                (*ob).byte_local.total_len *= (*ob).byte_local.len3 + 1;
+              if (current_token != p_corce) {
                 c_error(3, 26);
               }
               lexer();
-              if (pieza == p_asig) {
+              if (current_token == p_asig) {
                 save_error(1);
                 lexer();
                 oimemptr = (byte *)&mem[imem];
                 tglo_init(2);
-                if (imemptr - oimemptr > (*ob).bloc.totalen)
+                if (imemptr - oimemptr > (*ob).byte_local.total_len)
                   c_error(4, 33);
               }
-              (*ob).bloc.totalen = ((*ob).bloc.totalen + 3) / 4;
+              (*ob).byte_local.total_len = ((*ob).byte_local.total_len + 3) / 4;
             }
           } else { // Private byte
             (*ob).type = tbloc;
-            (*ob).bloc.offset = imem;
-            (*ob).bloc.len1 = 0;
-            (*ob).bloc.len2 = -1;
-            (*ob).bloc.len3 = -1;
-            (*ob).bloc.totalen = 1; // 1 int
-            if (pieza == p_asig) {
+            (*ob).byte_local.offset = imem;
+            (*ob).byte_local.len1 = 0;
+            (*ob).byte_local.len2 = -1;
+            (*ob).byte_local.len3 = -1;
+            (*ob).byte_local.total_len = 1; // 1 int
+            if (current_token == p_asig) {
               save_error(1);
               lexer();
               mem[imem] = constant();
@@ -5915,61 +5915,61 @@ puntero2:
                 c_error(4, 143);
             }
           }
-          imem = _imem + (*ob).bloc.totalen;
+          imem = _imem + (*ob).byte_local.total_len;
           test_buffer(&mem, &imem_max, imem);
-          (*ob).bloc.offset = iloc;
-          iloc += (*ob).bloc.totalen;
+          (*ob).byte_local.offset = iloc;
+          iloc += (*ob).byte_local.total_len;
         }
 
-        if (pieza == p_coma)
-          pieza = p_byte;
+        if (current_token == p_coma)
+          current_token = p_byte;
         else {
           if (!free_sintax)
-            if (pieza != p_ptocoma)
+            if (current_token != p_ptocoma)
               c_error(3, 137);
-          while (pieza == p_ptocoma || pieza == p_coma)
+          while (current_token == p_ptocoma || current_token == p_coma)
             lexer();
         }
 
-      } else if (pieza == p_word) { // Private word array
+      } else if (current_token == p_word) { // Private word array
 
         lexer();
 
-        if (pieza == p_pointer) { // Word pointer
+        if (current_token == p_pointer) { // Word pointer
 
           lexer();
 puntero3:
-          ob = analiza_pointer(tpwlo, iloc);
+          ob = analyze_pointer(tpwlo, iloc);
           if (ob == NULL)
             continue;
           else
             iloc++;
-          if (pieza == p_asig) {
+          if (current_token == p_asig) {
             lexer();
             mem[imem] = constant();
           }
           test_buffer(&mem, &imem_max, ++imem);
-          if (pieza == p_coma) {
+          if (current_token == p_coma) {
             lexer();
-            if (pieza == p_pointer)
+            if (current_token == p_pointer)
               lexer();
             goto puntero3;
           }
 
         } else {
-          if (pieza != p_id)
+          if (current_token != p_id)
             c_error(1, 145);
           ob = o;
           if ((*ob).type != tnone) {
-            if (parametros == -1 && (*ob).param == 1 && (*ob).bloque == bloque_actual) {
+            if (in_params == -1 && (*ob).param == 1 && (*ob).scope == current_scope) {
               if ((*ob).type == twloc) { // Word parameter redeclared
                 lexer();
-                if (pieza == p_corab)
+                if (current_token == p_corab)
                   c_error(2, 53);
-                else if (pieza == p_asig)
+                else if (current_token == p_asig)
                   c_error(0, 54);
                 else {
-                  while (pieza == p_ptocoma || pieza == p_coma) {
+                  while (current_token == p_ptocoma || current_token == p_coma) {
                     lexer();
                   }
                   (*ob).param++;
@@ -5984,64 +5984,64 @@ puntero3:
 
           (*ob).type = twloc;
           _imem = imem;
-          if (pieza == p_corab) {
+          if (current_token == p_corab) {
             lexer();
-            if (pieza == p_corce) {
+            if (current_token == p_corce) {
               lexer();
-              if (pieza != p_asig)
+              if (current_token != p_asig)
                 c_error(3, 23);
               lexer();
               oimemptr = (byte *)&mem[imem];
               tglo_init(1);
-              (*ob).wloc.len1 = (imemptr - oimemptr) / 2 - 1;
-              (*ob).wloc.len2 = -1;
-              (*ob).wloc.len3 = -1;
-              (*ob).wloc.totalen = ((*ob).wloc.len1 + 2) / 2;
+              (*ob).word_local.len1 = (imemptr - oimemptr) / 2 - 1;
+              (*ob).word_local.len2 = -1;
+              (*ob).word_local.len3 = -1;
+              (*ob).word_local.total_len = ((*ob).word_local.len1 + 2) / 2;
             } else {
-              if (((*ob).wloc.len1 = constant()) < 0)
+              if (((*ob).word_local.len1 = constant()) < 0)
                 c_error(4, 35);
-              if (pieza == p_coma) {
+              if (current_token == p_coma) {
                 lexer();
-                if (((*ob).wloc.len2 = constant()) < 0)
+                if (((*ob).word_local.len2 = constant()) < 0)
                   c_error(4, 35);
-                if (pieza == p_coma) {
+                if (current_token == p_coma) {
                   lexer();
-                  if (((*ob).wloc.len3 = constant()) < 0)
+                  if (((*ob).word_local.len3 = constant()) < 0)
                     c_error(4, 35);
                 } else
-                  (*ob).wloc.len3 = -1;
+                  (*ob).word_local.len3 = -1;
               } else {
-                (*ob).wloc.len2 = -1;
-                (*ob).wloc.len3 = -1;
+                (*ob).word_local.len2 = -1;
+                (*ob).word_local.len3 = -1;
               }
 
-              (*ob).wloc.totalen = (*ob).wloc.len1 + 1;
-              if ((*ob).wloc.len2 > -1)
-                (*ob).wloc.totalen *= (*ob).wloc.len2 + 1;
-              if ((*ob).wloc.len3 > -1)
-                (*ob).wloc.totalen *= (*ob).wloc.len3 + 1;
-              if (pieza != p_corce) {
+              (*ob).word_local.total_len = (*ob).word_local.len1 + 1;
+              if ((*ob).word_local.len2 > -1)
+                (*ob).word_local.total_len *= (*ob).word_local.len2 + 1;
+              if ((*ob).word_local.len3 > -1)
+                (*ob).word_local.total_len *= (*ob).word_local.len3 + 1;
+              if (current_token != p_corce) {
                 c_error(3, 26);
               }
               lexer();
-              if (pieza == p_asig) {
+              if (current_token == p_asig) {
                 save_error(1);
                 lexer();
                 oimemptr = (byte *)&mem[imem];
                 tglo_init(1);
-                if (imemptr - oimemptr > (*ob).wloc.totalen * 2)
+                if (imemptr - oimemptr > (*ob).word_local.total_len * 2)
                   c_error(4, 33);
               }
-              (*ob).wloc.totalen = ((*ob).wloc.totalen + 1) / 2;
+              (*ob).word_local.total_len = ((*ob).word_local.total_len + 1) / 2;
             }
           } else { // Private word
             (*ob).type = twloc;
-            (*ob).wloc.offset = imem;
-            (*ob).wloc.len1 = 0;
-            (*ob).wloc.len2 = -1;
-            (*ob).wloc.len3 = -1;
-            (*ob).wloc.totalen = 1; // 1 int
-            if (pieza == p_asig) {
+            (*ob).word_local.offset = imem;
+            (*ob).word_local.len1 = 0;
+            (*ob).word_local.len2 = -1;
+            (*ob).word_local.len3 = -1;
+            (*ob).word_local.total_len = 1; // 1 int
+            if (current_token == p_asig) {
               save_error(1);
               lexer();
               mem[imem] = constant();
@@ -6049,46 +6049,46 @@ puntero3:
                 c_error(4, 144);
             }
           }
-          imem = _imem + (*ob).wloc.totalen;
+          imem = _imem + (*ob).word_local.total_len;
           test_buffer(&mem, &imem_max, imem);
-          (*ob).wloc.offset = iloc;
-          iloc += (*ob).wloc.totalen;
+          (*ob).word_local.offset = iloc;
+          iloc += (*ob).word_local.total_len;
         }
 
-        if (pieza == p_coma)
-          pieza = p_word;
+        if (current_token == p_coma)
+          current_token = p_word;
         else {
           if (!free_sintax)
-            if (pieza != p_ptocoma)
+            if (current_token != p_ptocoma)
               c_error(3, 137);
-          while (pieza == p_ptocoma || pieza == p_coma)
+          while (current_token == p_ptocoma || current_token == p_coma)
             lexer();
         }
 
-      } else if (pieza == p_int || pieza == p_id || pieza == p_pointer) {
-        if (pieza == p_int) {
+      } else if (current_token == p_int || current_token == p_id || current_token == p_pointer) {
+        if (current_token == p_int) {
           lexer();
-          if (pieza != p_id && pieza != p_pointer)
+          if (current_token != p_id && current_token != p_pointer)
             c_error(1, 149);
         }
 
-        if (pieza == p_pointer) { // Int pointer member
+        if (current_token == p_pointer) { // Int pointer member
 
           lexer();
 puntero4:
-          ob = analiza_pointer(tpilo, iloc);
+          ob = analyze_pointer(tpilo, iloc);
           if (ob == NULL)
             continue;
           else
             iloc++;
-          if (pieza == p_asig) {
+          if (current_token == p_asig) {
             lexer();
             mem[imem] = constant();
           }
           test_buffer(&mem, &imem_max, ++imem);
-          if (pieza == p_coma) {
+          if (current_token == p_coma) {
             lexer();
-            if (pieza == p_pointer)
+            if (current_token == p_pointer)
               lexer();
             goto puntero4;
           }
@@ -6098,15 +6098,15 @@ puntero4:
 
           ob = o;
           if ((*ob).type != tnone) {
-            if (parametros == -1 && (*ob).param == 1 && (*ob).bloque == bloque_actual) {
+            if (in_params == -1 && (*ob).param == 1 && (*ob).scope == current_scope) {
               if ((*ob).type == tvloc) { // Local variable redeclared
                 lexer();
-                if (pieza == p_corab)
+                if (current_token == p_corab)
                   c_error(2, 53);
-                else if (pieza == p_asig)
+                else if (current_token == p_asig)
                   c_error(0, 54);
                 else {
-                  while (pieza == p_ptocoma || pieza == p_coma) {
+                  while (current_token == p_ptocoma || current_token == p_coma) {
                     lexer();
                   }
                   (*ob).param++;
@@ -6119,64 +6119,64 @@ puntero4:
           } else
             lexer();
 
-          if (pieza == p_corab) { // Private table
+          if (current_token == p_corab) { // Private table
             lexer();
             (*ob).type = ttloc;
             _imem = imem;
-            if (pieza == p_corce) {
+            if (current_token == p_corce) {
               lexer();
-              if (pieza != p_asig)
+              if (current_token != p_asig)
                 c_error(3, 23);
               lexer();
               tglo_init(3);
-              (*ob).tloc.len1 = imem - _imem - 1;
-              (*ob).tloc.len2 = -1;
-              (*ob).tloc.len3 = -1;
-              (*ob).tloc.totalen = imem - _imem;
+              (*ob).table_local.len1 = imem - _imem - 1;
+              (*ob).table_local.len2 = -1;
+              (*ob).table_local.len3 = -1;
+              (*ob).table_local.total_len = imem - _imem;
             } else {
-              if (((*ob).tloc.len1 = constant()) < 0)
+              if (((*ob).table_local.len1 = constant()) < 0)
                 c_error(4, 35);
-              if (pieza == p_coma) {
+              if (current_token == p_coma) {
                 lexer();
-                if (((*ob).tloc.len2 = constant()) < 0)
+                if (((*ob).table_local.len2 = constant()) < 0)
                   c_error(4, 35);
-                if (pieza == p_coma) {
+                if (current_token == p_coma) {
                   lexer();
-                  if (((*ob).tloc.len3 = constant()) < 0)
+                  if (((*ob).table_local.len3 = constant()) < 0)
                     c_error(4, 35);
                 } else
-                  (*ob).tloc.len3 = -1;
+                  (*ob).table_local.len3 = -1;
               } else {
-                (*ob).tloc.len2 = -1;
-                (*ob).tloc.len3 = -1;
+                (*ob).table_local.len2 = -1;
+                (*ob).table_local.len3 = -1;
               }
-              (*ob).tloc.totalen = (*ob).tloc.len1 + 1;
-              if ((*ob).tloc.len2 > -1)
-                (*ob).tloc.totalen *= (*ob).tloc.len2 + 1;
-              if ((*ob).tloc.len3 > -1)
-                (*ob).tloc.totalen *= (*ob).tloc.len3 + 1;
-              if (pieza != p_corce) {
+              (*ob).table_local.total_len = (*ob).table_local.len1 + 1;
+              if ((*ob).table_local.len2 > -1)
+                (*ob).table_local.total_len *= (*ob).table_local.len2 + 1;
+              if ((*ob).table_local.len3 > -1)
+                (*ob).table_local.total_len *= (*ob).table_local.len3 + 1;
+              if (current_token != p_corce) {
                 c_error(3, 26);
               }
               lexer();
-              if (pieza == p_asig) {
+              if (current_token == p_asig) {
                 save_error(1);
                 lexer();
                 tglo_init(3);
-                if (imem - _imem > (*ob).tloc.totalen)
+                if (imem - _imem > (*ob).table_local.total_len)
                   c_error(4, 33);
               }
             }
-            imem = _imem + (*ob).tloc.totalen;
+            imem = _imem + (*ob).table_local.total_len;
             test_buffer(&mem, &imem_max, imem);
-            (*ob).tloc.offset = iloc;
-            iloc += (*ob).tloc.totalen;
+            (*ob).table_local.offset = iloc;
+            iloc += (*ob).table_local.total_len;
 
           } else { // Private variable
 
             (*ob).type = tvloc;
-            (*ob).vloc.offset = iloc++;
-            if (pieza == p_asig) {
+            (*ob).var_local.offset = iloc++;
+            if (current_token == p_asig) {
               lexer();
               mem[imem] = constant();
             }
@@ -6184,12 +6184,12 @@ puntero4:
           }
         }
         if (!free_sintax)
-          if (pieza != p_ptocoma && pieza != p_coma)
+          if (current_token != p_ptocoma && current_token != p_coma)
             c_error(3, 66);
-        while (pieza == p_ptocoma || pieza == p_coma)
+        while (current_token == p_ptocoma || current_token == p_coma)
           lexer();
       }
-      (*ob).bloque = bloque_actual;
+      (*ob).scope = current_scope;
     }
 
     mem[_imem_old] = imem;
@@ -6212,7 +6212,7 @@ void tglo_init(memptrsize tipo) { // Type: 0-Int or mixed (struct), 1-Word, 2-By
   imemptr = (byte *)&mem[imem];
   tglo_init2(tipo);
   if (!free_sintax)
-    if (pieza != p_ptocoma)
+    if (current_token != p_ptocoma)
       c_error(3, 66);
 }
 
@@ -6240,7 +6240,7 @@ void tloc_init(int tipo) {
   swap(imem_max, iloc_max);
 
   if (!free_sintax)
-    if (pieza != p_ptocoma)
+    if (current_token != p_ptocoma)
       c_error(3, 66);
 }
 
@@ -6255,13 +6255,13 @@ void tloc_init(int tipo) {
 
 
 void tglo_init2(int tipo) {
-  int valor, dup, _imem, len, n;
+  int value, dup, _imem, len, n;
   byte *oimemptr;
 
   while (1) {
     // Check if data initialization ends
 
-    if (pieza == p_cerrar || pieza == p_ptocoma) {
+    if (current_token == p_cerrar || current_token == p_ptocoma) {
       if (*(imemptr - (memptrsize)mem + (memptrsize)frm) == 1 || tipo == 1) {
         imemptr += 2;
         imem = ((memptrsize)imemptr - (memptrsize)mem + 3) / 4;
@@ -6281,7 +6281,7 @@ void tglo_init2(int tipo) {
 
     // A lone comma, like "3,,4", advances one position (and defines a 0)
 
-    if (pieza == p_coma) {
+    if (current_token == p_coma) {
       if (*(imemptr - (memptrsize)mem + (memptrsize)frm) == 1 || tipo == 1) {
         (*(word *)imemptr) = 0;
         imemptr += 2;
@@ -6301,21 +6301,21 @@ void tglo_init2(int tipo) {
       continue;
     }
 
-    if (pieza == p_abrir) { // Dup x 1
+    if (current_token == p_abrir) { // Dup x 1
 
       dup = 1;
 
-    } else if (pieza == p_dup) { // Dup x 2
+    } else if (current_token == p_dup) { // Dup x 2
 
       dup = 2;
       lexer();
-      if (pieza != p_abrir)
+      if (current_token != p_abrir)
         c_error(3, 36);
 
-    } else if (pieza == p_lit || (pieza == p_id && (*o).type == tcons && (*o).cons.literal)) {
-      valor = pieza_num;
+    } else if (current_token == p_lit || (current_token == p_id && (*o).type == tcons && (*o).cons.literal)) {
+      value = token_value;
       lexer();
-      if (pieza == p_abrir || pieza == p_dup)
+      if (current_token == p_abrir || current_token == p_dup)
         c_error(2, 38);
 
       // Store a literal in a string-type field
@@ -6323,13 +6323,13 @@ void tglo_init2(int tipo) {
       if ((((memptrsize)imemptr - (memptrsize)mem) % 4) == 0) {
         imem = ((memptrsize)imemptr - (memptrsize)mem + 3) / 4;
         if (frm[imem] == 0xdad00000) {
-          if (strlen((char *)&mem_ory[valor]) > (mem[imem] & 0xFFFFF) + 1)
+          if (strlen((char *)&mem_ory[value]) > (mem[imem] & 0xFFFFF) + 1)
             c_error(2, 129);
           _imem = imem;
           imem += 1 + ((mem[imem] & 0xFFFFF) + 5) / 4;
           imemptr = (byte *)&mem[imem];
-          div_strcpy((char *)&mem[_imem + 1], (mem[_imem] & 0xFFFFF) + 2, (char *)&mem_ory[valor]);
-          if (pieza != p_coma)
+          div_strcpy((char *)&mem[_imem + 1], (mem[_imem] & 0xFFFFF) + 2, (char *)&mem_ory[value]);
+          if (current_token != p_coma)
             return;
           lexer();
           continue;
@@ -6342,12 +6342,12 @@ void tglo_init2(int tipo) {
           tipo == 1) { // A string in words (short pointer)
 
         imemptr = (byte *)(((memptrsize)imemptr + 1) & -2); // Align to even
-        *((word *)imemptr) = valor;
+        *((word *)imemptr) = value;
         imemptr += 2;
         imem = ((memptrsize)imemptr - (memptrsize)mem + 3) / 4;
         if (*(imemptr - (memptrsize)mem + (memptrsize)frm) != 1 && tipo != 1)
           imemptr = (byte *)&mem[imem];
-        if (pieza != p_coma)
+        if (current_token != p_coma)
           return;
         lexer();
         continue;
@@ -6359,14 +6359,14 @@ void tglo_init2(int tipo) {
         while (*(oimemptr - (memptrsize)mem + (memptrsize)frm) == 2)
           oimemptr++;
         if (tipo == 0)
-          if (strlen((char *)&mem_ory[valor]) > (memptrsize)(oimemptr - imemptr))
+          if (strlen((char *)&mem_ory[value]) > (memptrsize)(oimemptr - imemptr))
             c_error(2, 33);
-        div_strcpy((char *)imemptr, (memptrsize)(oimemptr - imemptr) + 1, (char *)&mem_ory[valor]);
+        div_strcpy((char *)imemptr, (memptrsize)(oimemptr - imemptr) + 1, (char *)&mem_ory[value]);
         imemptr += strlen((char *)imemptr);
         imem = ((memptrsize)imemptr - (memptrsize)mem + 3) / 4;
         if (*(imemptr - (memptrsize)mem + (memptrsize)frm) != 2 && tipo != 2)
           imemptr = (byte *)&mem[imem];
-        if (pieza != p_coma)
+        if (current_token != p_coma)
           return;
         lexer();
         continue;
@@ -6374,18 +6374,18 @@ void tglo_init2(int tipo) {
       } else { // A string in an int (long pointer, as in DIV 1)
 
         imem = ((memptrsize)imemptr - (memptrsize)mem + 3) / 4;
-        mem[imem++] = valor;
+        mem[imem++] = value;
         imemptr = (byte *)&mem[imem];
-        if (pieza != p_coma)
+        if (current_token != p_coma)
           return;
         lexer();
         continue;
       }
 
     } else {
-      valor = constant();
-      if (pieza != p_abrir) {
-        if (pieza != p_dup) {
+      value = constant();
+      if (current_token != p_abrir) {
+        if (current_token != p_dup) {
           if ((((memptrsize)imemptr - (memptrsize)mem) % 4) == 0) {
             imem = ((memptrsize)imemptr - (memptrsize)mem + 3) / 4;
             if (frm[imem] == 0xdad00000)
@@ -6396,15 +6396,15 @@ void tglo_init2(int tipo) {
 
           if (*(imemptr - (memptrsize)mem + (memptrsize)frm) == 1 || tipo == 1) { // Into a word
 
-            if (valor < 0 || valor > 65535)
+            if (value < 0 || value > 65535)
               c_error(2, 144);
             imemptr = (byte *)(((memptrsize)imemptr + 1) & -2); // Align to even
-            *((word *)imemptr) = valor;
+            *((word *)imemptr) = value;
             imemptr += 2;
             imem = ((memptrsize)imemptr - (memptrsize)mem + 3) / 4;
             if (*(imemptr - (memptrsize)mem + (memptrsize)frm) != 1 && tipo != 1)
               imemptr = (byte *)&mem[imem];
-            if (pieza != p_coma)
+            if (current_token != p_coma)
               return;
             lexer();
             continue;
@@ -6412,13 +6412,13 @@ void tglo_init2(int tipo) {
           } else if (*(imemptr - (memptrsize)mem + (memptrsize)frm) == 2 ||
                      tipo == 2) { // Into a byte
 
-            if (valor < 0 || valor > 255)
+            if (value < 0 || value > 255)
               c_error(2, 143);
-            *imemptr++ = valor;
+            *imemptr++ = value;
             imem = ((memptrsize)imemptr - (memptrsize)mem + 3) / 4;
             if (*(imemptr - (memptrsize)mem + (memptrsize)frm) != 2 && tipo != 2)
               imemptr = (byte *)&mem[imem];
-            if (pieza != p_coma)
+            if (current_token != p_coma)
               return;
             lexer();
             continue;
@@ -6426,22 +6426,22 @@ void tglo_init2(int tipo) {
           } else { // Into an int (the default in DIV 1)
 
             imem = ((memptrsize)imemptr - (memptrsize)mem + 3) / 4;
-            mem[imem++] = valor;
+            mem[imem++] = value;
             imemptr = (byte *)&mem[imem];
-            if (pieza != p_coma)
+            if (current_token != p_coma)
               return;
             lexer();
             continue;
           }
 
         } else {
-          dup = valor;
+          dup = value;
           lexer();
-          if (pieza != p_abrir)
+          if (current_token != p_abrir)
             c_error(3, 36);
         }
       } else
-        dup = valor;
+        dup = value;
     }
 
     // Duplicate a sequence of values
@@ -6454,7 +6454,7 @@ void tglo_init2(int tipo) {
 
     oimemptr = imemptr;
     tglo_init2(tipo);
-    if (pieza != p_cerrar)
+    if (current_token != p_cerrar)
       c_error(3, 25);
 
     // And duplicate it the specified number of times
@@ -6496,7 +6496,7 @@ void tglo_init2(int tipo) {
     }
 
     lexer();
-    if (pieza != p_coma) {
+    if (current_token != p_coma) {
       imem = ((memptrsize)imemptr - (memptrsize)mem + 3) / 4;
       return;
     }
@@ -6512,17 +6512,17 @@ void statement() {
   int im1, im2, im3, im4;
   int dir, from, to, step;
 
-  while (pieza >= p_return) {
+  while (current_token >= p_return) {
     test_buffer(&mem, &imem_max, imem);
-    switch (pieza) {
+    switch (current_token) {
     case p_return:
       statement_start();
       lexer();
-      if (pieza == p_abrir) {
+      if (current_token == p_abrir) {
         lexer();
-        if (pieza != p_cerrar) {
+        if (current_token != p_cerrar) {
           expression();
-          if (pieza != p_cerrar)
+          if (current_token != p_cerrar)
             c_error(3, 25);
           g1(lrtf);
         } else {
@@ -6533,9 +6533,9 @@ void statement() {
         g1(lret);
       }
       if (!free_sintax)
-        if (pieza != p_ptocoma)
+        if (current_token != p_ptocoma)
           c_error(3, 66);
-      while (pieza == p_ptocoma || pieza == p_coma)
+      while (current_token == p_ptocoma || current_token == p_coma)
         lexer();
       statement_end();
       record_statement();
@@ -6544,22 +6544,22 @@ void statement() {
       statement_start();
       lexer();
       if (!free_sintax)
-        if (pieza != p_abrir)
+        if (current_token != p_abrir)
           c_error(3, 36);
-      if (pieza == p_abrir)
+      if (current_token == p_abrir)
         lexer();
       condition();
       if (!free_sintax)
-        if (pieza != p_cerrar)
+        if (current_token != p_cerrar)
           c_error(3, 25);
-      if (pieza == p_cerrar)
+      if (current_token == p_cerrar)
         lexer();
       g2(ljpf, 0);
       im1 = imem - 1;
       statement_end();
       record_statement();
       statement();
-      if (pieza == p_else) {
+      if (current_token == p_else) {
         statement_start();
         lexer();
         g2(ljmp, 0);
@@ -6570,7 +6570,7 @@ void statement() {
         statement();
       }
       mem[im1] = imem;
-      if (pieza != p_end)
+      if (current_token != p_end)
         c_error(0, 40);
       lexer();
       break;
@@ -6580,7 +6580,7 @@ void statement() {
       lexer();
       im1 = imem;
       statement();
-      if (pieza != p_end)
+      if (current_token != p_end)
         c_error(0, 40);
       statement_start();
       lexer();
@@ -6599,22 +6599,22 @@ void statement() {
       im1 = imem;
       lexer();
       if (!free_sintax)
-        if (pieza != p_abrir)
+        if (current_token != p_abrir)
           c_error(3, 36);
-      if (pieza == p_abrir)
+      if (current_token == p_abrir)
         lexer();
       condition();
       if (!free_sintax)
-        if (pieza != p_cerrar)
+        if (current_token != p_cerrar)
           c_error(3, 25);
-      if (pieza == p_cerrar)
+      if (current_token == p_cerrar)
         lexer();
       g2(ljpf, 0);
       im2 = imem - 1;
       statement_end();
       record_statement();
       statement();
-      if (pieza != p_end) {
+      if (current_token != p_end) {
         c_error(0, 40);
       }
       statement_start();
@@ -6634,20 +6634,20 @@ void statement() {
       lexer();
       im1 = imem;
       statement();
-      if (pieza != p_until)
+      if (current_token != p_until)
         c_error(0, 42);
       statement_start();
       lexer();
       if (!free_sintax)
-        if (pieza != p_abrir)
+        if (current_token != p_abrir)
           c_error(3, 36);
-      if (pieza == p_abrir)
+      if (current_token == p_abrir)
         lexer();
       condition();
       if (!free_sintax)
-        if (pieza != p_cerrar)
+        if (current_token != p_cerrar)
           c_error(3, 25);
-      if (pieza == p_cerrar)
+      if (current_token == p_cerrar)
         lexer();
       g2(ljpf, im1);
       while (tbreak[--itbreak] != 0)
@@ -6662,33 +6662,33 @@ void statement() {
       tbreak[itbreak++] = 0;
       tcont[itcont++] = 0;
       lexer();
-      if (pieza != p_id)
+      if (current_token != p_id)
         c_error(0, 67);
 
       if ((*o).type == tvglo) {
-        dir = (*o).vglo.offset;
+        dir = (*o).var_global.offset;
         g2(lcar, dir);
-      } else if ((*o).type == tvloc && (!(*o).bloque || (*o).bloque == bloque_actual)) {
-        dir = -(*o).vloc.offset;
+      } else if ((*o).type == tvloc && (!(*o).scope || (*o).scope == current_scope)) {
+        dir = -(*o).var_local.offset;
         g2(lcar, -dir);
         g1(laid);
       } else
         c_error(0, 67);
 
       lexer();
-      if (pieza != p_asig) {
+      if (current_token != p_asig) {
         c_error(3, 68);
       }
       lexer();
       from = constant();
-      if (pieza != p_to) {
+      if (current_token != p_to) {
         c_error(1, 69);
       }
       lexer();
       to = constant();
       if (from == to)
         c_error(4, 71);
-      if (pieza == p_step) {
+      if (current_token == p_step) {
         lexer();
         step = constant();
         if (from < to && step <= 0)
@@ -6725,14 +6725,14 @@ void statement() {
       statement_end();
       record_statement();
       if (!free_sintax) {
-        if (pieza != p_ptocoma)
+        if (current_token != p_ptocoma)
           c_error(3, 66);
       }
-      while (pieza == p_ptocoma || pieza == p_coma)
+      while (current_token == p_ptocoma || current_token == p_coma)
         lexer();
 
       statement();
-      if (pieza != p_end) {
+      if (current_token != p_end) {
         c_error(0, 40);
       }
       statement_start();
@@ -6766,31 +6766,31 @@ void statement() {
       tbreak[itbreak++] = 0;
       tcont[itcont++] = 0;
       lexer();
-      if (pieza != p_abrir) {
+      if (current_token != p_abrir) {
         c_error(3, 36);
       }
       lexer();
-      if (pieza != p_ptocoma) {
+      if (current_token != p_ptocoma) {
         expression();
         g1(lasp);
-        while (pieza == p_coma) {
+        while (current_token == p_coma) {
           lexer();
           expression();
           g1(lasp);
         }
       }
       im1 = imem;
-      if (pieza != p_ptocoma) {
+      if (current_token != p_ptocoma) {
         c_error(3, 47);
       }
       lexer();
-      if (pieza == p_ptocoma) {
+      if (current_token == p_ptocoma) {
         g2(lcar, 1);
       } else
         expression();
       g2(ljpf, 0);
       im2 = imem - 1;
-      while (pieza == p_coma) {
+      while (current_token == p_coma) {
         lexer();
         expression();
         g2(ljpf, im2);
@@ -6798,21 +6798,21 @@ void statement() {
       }
       g2(ljmp, 0);
       im3 = imem - 1;
-      if (pieza != p_ptocoma) {
+      if (current_token != p_ptocoma) {
         c_error(3, 47);
       }
       lexer();
-      if (pieza != p_cerrar) {
+      if (current_token != p_cerrar) {
         expression();
         g1(lasp);
-        while (pieza == p_coma) {
+        while (current_token == p_coma) {
           lexer();
           expression();
           g1(lasp);
         }
       }
       g2(ljmp, im1);
-      if (pieza != p_cerrar) {
+      if (current_token != p_cerrar) {
         c_error(3, 25);
       }
       lexer();
@@ -6820,7 +6820,7 @@ void statement() {
       record_statement();
       mem[im3++] = imem;
       statement();
-      if (pieza != p_end) {
+      if (current_token != p_end) {
         c_error(0, 40);
       }
       statement_start();
@@ -6842,33 +6842,33 @@ void statement() {
       statement_start();
       lexer();
       if (!free_sintax)
-        if (pieza != p_abrir)
+        if (current_token != p_abrir)
           c_error(3, 36);
-      if (pieza == p_abrir)
+      if (current_token == p_abrir)
         lexer();
       condition();
       if (!free_sintax)
-        if (pieza != p_cerrar)
+        if (current_token != p_cerrar)
           c_error(3, 25);
-      if (pieza == p_cerrar)
+      if (current_token == p_cerrar)
         lexer();
-      while (pieza == p_ptocoma) {
+      while (current_token == p_ptocoma) {
         lexer();
       }
       statement_end();
       record_statement();
       im1 = 0;
       im2 = 0;
-      while (pieza != p_end) {
+      while (current_token != p_end) {
         statement_start();
-        if (pieza == p_case) {
+        if (current_token == p_case) {
           im3 = 0;
           do {
             lexer();
             if (im1)
               mem[im1] = imem;
             expression();
-            if (pieza != p_rango) {
+            if (current_token != p_rango) {
               g2(lcse, 0);
               im1 = imem - 1;
             } else {
@@ -6878,12 +6878,12 @@ void statement() {
               im1 = imem - 1;
             }
 
-            if (pieza == p_coma) {
+            if (current_token == p_coma) {
               g2(ljmp, im3);
               im3 = imem - 1;
             }
 
-          } while (pieza == p_coma);
+          } while (current_token == p_coma);
 
           while (im3) {
             im4 = mem[im3];
@@ -6891,7 +6891,7 @@ void statement() {
             im3 = im4;
           }
 
-        } else if (pieza == p_default) {
+        } else if (current_token == p_default) {
           lexer();
           if (im1) {
             mem[im1] = imem;
@@ -6900,16 +6900,16 @@ void statement() {
         } else
           c_error(0, 50);
         if (!free_sintax) {
-          if (pieza != p_ptocoma)
+          if (current_token != p_ptocoma)
             c_error(3, 65);
         }
-        while (pieza == p_ptocoma || pieza == p_coma)
+        while (current_token == p_ptocoma || current_token == p_coma)
           lexer();
         g1(lasp);
         statement_end();
         record_statement();
         statement();
-        if (pieza != p_end) {
+        if (current_token != p_end) {
           c_error(0, 51);
         }
         statement_start();
@@ -6936,11 +6936,11 @@ void statement() {
     case p_frame:
       statement_start();
       lexer();
-      if (pieza == p_abrir) {
+      if (current_token == p_abrir) {
         lexer();
-        if (pieza != p_cerrar) {
+        if (current_token != p_cerrar) {
           expression();
-          if (pieza != p_cerrar)
+          if (current_token != p_cerrar)
             c_error(3, 25);
           g1(lfrf);
         } else {
@@ -6951,9 +6951,9 @@ void statement() {
         g1(lfrm);
       }
       if (!free_sintax)
-        if (pieza != p_ptocoma)
+        if (current_token != p_ptocoma)
           c_error(3, 66);
-      while (pieza == p_ptocoma || pieza == p_coma)
+      while (current_token == p_ptocoma || current_token == p_coma)
         lexer();
       statement_end();
       record_statement();
@@ -6963,9 +6963,9 @@ void statement() {
       g1(ldbg);
       lexer();
       if (!free_sintax)
-        if (pieza != p_ptocoma)
+        if (current_token != p_ptocoma)
           c_error(3, 66);
-      while (pieza == p_ptocoma || pieza == p_coma)
+      while (current_token == p_ptocoma || current_token == p_coma)
         lexer();
       statement_end();
       record_statement();
@@ -6977,10 +6977,10 @@ void statement() {
       }
       lexer();
       if (!free_sintax) {
-        if (pieza != p_ptocoma)
+        if (current_token != p_ptocoma)
           c_error(3, 66);
       }
-      while (pieza == p_ptocoma || pieza == p_coma)
+      while (current_token == p_ptocoma || current_token == p_coma)
         lexer();
       g2(ljmp, 0);
       tbreak[itbreak++] = imem - 1;
@@ -6994,10 +6994,10 @@ void statement() {
       }
       lexer();
       if (!free_sintax) {
-        if (pieza != p_ptocoma)
+        if (current_token != p_ptocoma)
           c_error(3, 66);
       }
-      while (pieza == p_ptocoma || pieza == p_coma)
+      while (current_token == p_ptocoma || current_token == p_coma)
         lexer();
       g2(ljmp, 0);
       tcont[itcont++] = imem - 1;
@@ -7012,7 +7012,7 @@ void statement() {
       statement_end();
       record_statement();
       statement();
-      if (pieza != p_end) {
+      if (current_token != p_end) {
         c_error(0, 40);
       }
       lexer();
@@ -7099,9 +7099,9 @@ void statement() {
         c_error(4, 64);
       }
       if (!free_sintax)
-        if (pieza != p_ptocoma)
+        if (current_token != p_ptocoma)
           c_error(3, 66);
-      while (pieza == p_ptocoma || pieza == p_coma)
+      while (current_token == p_ptocoma || current_token == p_coma)
         lexer();
       g1(lasp);
       statement_end();
@@ -7129,14 +7129,14 @@ void condition(void) {
 
   _exp = tabexp;
   save_error(0);
-  _linea = linea;
+  _linea = source_line;
   _ierror = ierror;
   con00(0);
-  swap(linea, _linea);
+  swap(source_line, _linea);
   __ierror = ierror;
   ierror = _ierror;
   generate_expression();
-  linea = _linea;
+  source_line = _linea;
   ierror = __ierror;
 }
 
@@ -7151,7 +7151,7 @@ void con0() { // Right-to-left associativity operators <-
   int p;
 
   con1();
-  if ((p = pieza) == p_asig || (p >= p_add_asig && p <= p_shl_asig)) {
+  if ((p = current_token) == p_asig || (p >= p_add_asig && p <= p_shl_asig)) {
     c_error(0, 140);
   }
 }
@@ -7159,7 +7159,7 @@ void con0() { // Right-to-left associativity operators <-
 void con1() { // Left-to-right associativity operators ->
   int p;
   con2();
-  while ((p = pieza) >= p_or && p <= p_andofs) {
+  while ((p = current_token) >= p_or && p <= p_andofs) {
     if (p >= p_xorptr)
       p -= p_xorptr - p_xor; // Convert xorptr,andofs to xor,and
     lexer();
@@ -7174,7 +7174,7 @@ void con2() {
   int p, tf;
   exp3();
   if (simple_conditions) {
-    p = pieza;
+    p = current_token;
     while ((p >= p_igu && p <= p_mai) || p == p_asig) {
       tf = tipo_factor;
       if (p == p_asig)
@@ -7190,10 +7190,10 @@ void con2() {
         (*_exp++).token = p;
       }
       tipo_factor = 0;
-      p = pieza;
+      p = current_token;
     }
   } else {
-    while ((p = pieza) >= p_igu && p <= p_mai) {
+    while ((p = current_token) >= p_igu && p <= p_mai) {
       tf = tipo_factor;
       lexer();
       exp3();
@@ -7225,14 +7225,14 @@ void expression(void) {
 
   _exp = tabexp;
   save_error(0);
-  _linea = linea;
+  _linea = source_line;
   _ierror = ierror;
   exp00(0);
-  swap(linea, _linea);
+  swap(source_line, _linea);
   __ierror = ierror;
   ierror = _ierror;
   generate_expression();
-  linea = _linea;
+  source_line = _linea;
   ierror = __ierror;
 }
 
@@ -7242,10 +7242,10 @@ void expression_cpa(void) {
 
   _exp = tabexp;
   save_error(0);
-  _linea = linea;
+  _linea = source_line;
   _ierror = ierror;
   exp00(0);
-  swap(linea, _linea);
+  swap(source_line, _linea);
   __ierror = ierror;
   ierror = _ierror;
   if ((*(_exp - 1)).type == eoper && (*(_exp - 1)).token == p_pointer) {
@@ -7275,42 +7275,42 @@ void expression_cpa(void) {
     g1(lcpastr);
   } else
     c_error(4, 44);
-  linea = _linea;
+  source_line = _linea;
   ierror = __ierror;
 }
 
 void generate_expression(void) {
   struct exp_ele *e = tabexp;
-  struct objeto *ob;
+  struct object *ob;
 
   do {
     switch ((*e).type) {
     case econs:
-      g2(lcar, (*e).valor);
+      g2(lcar, (*e).value);
       break;
     case estring:
-      g2(lcar, (*e).valor);
+      g2(lcar, (*e).value);
       break;
     case erango:
-      g2(lrng, (*e).valor);
+      g2(lrng, (*e).value);
       break;
     case ewhoami:
       g1(lcid);
       break;
     case ecall:
-      ob = (*e).objeto;
+      ob = (*e).object;
       g2(lcal, (*ob).proc.offset);
-      if ((*ob).usado) {
+      if ((*ob).used) {
         (*ob).proc.offset = imem - 1;
       }
       break;
     case efunc:
-      ob = (*e).objeto;
+      ob = (*e).object;
       g2(lfun, (*ob).func.code);
       break;
     case efext:
-      ob = (*e).objeto;
-      g2(lext, (*ob).fext.code);
+      ob = (*e).object;
+      g2(lext, (*ob).func_extern.code);
       break;
     case echeck:
       g1(lchk);
@@ -7592,100 +7592,100 @@ int constant(void) {
 
   save_error(0);
 
-  _linea = linea;
+  _linea = source_line;
   _ierror = ierror;
   exp00(0);
-  swap(linea, _linea);
+  swap(source_line, _linea);
   __ierror = ierror;
   ierror = _ierror;
 
   do
     switch ((*e).type) {
     case econs:
-      pila[++i] = (*e).valor;
+      eval_stack[++i] = (*e).value;
       break;
     case estring:
-      pila[++i] = (*e).valor;
+      eval_stack[++i] = (*e).value;
       break;
 
     case eoper:
       switch ((*e).token) {
       case p_or:
-        pila[i - 1] |= pila[i];
+        eval_stack[i - 1] |= eval_stack[i];
         i--;
         break;
       case p_xor:
-        pila[i - 1] ^= pila[i];
+        eval_stack[i - 1] ^= eval_stack[i];
         i--;
         break;
       case p_and:
-        pila[i - 1] &= pila[i];
+        eval_stack[i - 1] &= eval_stack[i];
         i--;
         break;
       case p_igu:
-        pila[i - 1] = pila[i - 1] == pila[i];
+        eval_stack[i - 1] = eval_stack[i - 1] == eval_stack[i];
         i--;
         break;
       case p_dis:
-        pila[i - 1] = pila[i - 1] != pila[i];
+        eval_stack[i - 1] = eval_stack[i - 1] != eval_stack[i];
         i--;
         break;
       case p_may:
-        pila[i - 1] = pila[i - 1] > pila[i];
+        eval_stack[i - 1] = eval_stack[i - 1] > eval_stack[i];
         i--;
         break;
       case p_men:
-        pila[i - 1] = pila[i - 1] < pila[i];
+        eval_stack[i - 1] = eval_stack[i - 1] < eval_stack[i];
         i--;
         break;
       case p_mei:
-        pila[i - 1] = pila[i - 1] <= pila[i];
+        eval_stack[i - 1] = eval_stack[i - 1] <= eval_stack[i];
         i--;
         break;
       case p_mai:
-        pila[i - 1] = pila[i - 1] >= pila[i];
+        eval_stack[i - 1] = eval_stack[i - 1] >= eval_stack[i];
         i--;
         break;
       case p_add:
-        pila[i - 1] += pila[i];
+        eval_stack[i - 1] += eval_stack[i];
         i--;
         break;
       case p_sub:
-        pila[i - 1] -= pila[i];
+        eval_stack[i - 1] -= eval_stack[i];
         i--;
         break;
       case p_mul:
-        pila[i - 1] *= pila[i];
+        eval_stack[i - 1] *= eval_stack[i];
         i--;
         break;
       case p_div:
-        if (pila[i] == 0)
+        if (eval_stack[i] == 0)
           c_error(4, 34);
-        pila[i - 1] /= pila[i];
+        eval_stack[i - 1] /= eval_stack[i];
         i--;
         break;
       case p_mod:
-        if (pila[i] == 0)
+        if (eval_stack[i] == 0)
           c_error(4, 34);
-        pila[i - 1] %= pila[i];
+        eval_stack[i - 1] %= eval_stack[i];
         i--;
         break;
       case p_neg:
-        pila[i] = -pila[i];
+        eval_stack[i] = -eval_stack[i];
         break;
 
         // I think pointers (and ranges, consequently) were removed because of FROM,
         // since it caused confusion to treat a variable as a constant ...
 
       case p_not:
-        pila[i] ^= -1;
+        eval_stack[i] ^= -1;
         break;
       case p_shr:
-        pila[i - 1] >>= pila[i];
+        eval_stack[i - 1] >>= eval_stack[i];
         i--;
         break;
       case p_shl:
-        pila[i - 1] <<= pila[i];
+        eval_stack[i - 1] <<= eval_stack[i];
         i--;
         break;
       default:
@@ -7697,9 +7697,9 @@ int constant(void) {
     }
   while (++e != _exp);
 
-  linea = _linea;
+  source_line = _linea;
   ierror = __ierror;
-  return (pila[i]);
+  return (eval_stack[i]);
 }
 
 //-----------------------------------------------------------------------------
@@ -7717,7 +7717,7 @@ void exp0() { // Right-to-left associativity operators <-
   int p;
 
   exp1();
-  if ((p = pieza) == p_asig || (p >= p_add_asig && p <= p_shl_asig)) {
+  if ((p = current_token) == p_asig || (p >= p_add_asig && p <= p_shl_asig)) {
     if ((*(_exp - 1)).type == eoper && (*(_exp - 1)).token == p_pointer) {
       _exp--;
       lexer();
@@ -7794,7 +7794,7 @@ void exp0() { // Right-to-left associativity operators <-
 void exp1() { // Left-to-right associativity operators ->
   int p;
   div_exp2();
-  while ((p = pieza) >= p_or && p <= p_andofs) {
+  while ((p = current_token) >= p_or && p <= p_andofs) {
     if (p >= p_xorptr)
       p -= p_xorptr - p_xor; // Convert xorptr,andofs to xor,and
     lexer();
@@ -7808,7 +7808,7 @@ void exp1() { // Left-to-right associativity operators ->
 void div_exp2() {
   int p, tf;
   exp3();
-  while ((p = pieza) >= p_igu && p <= p_mai) {
+  while ((p = current_token) >= p_igu && p <= p_mai) {
     tf = tipo_factor;
     lexer();
     exp3();
@@ -7829,7 +7829,7 @@ void div_exp2() {
 void exp3() {
   int p;
   exp4();
-  while ((p = pieza) >= p_shr && p <= p_shl) {
+  while ((p = current_token) >= p_shr && p <= p_shl) {
     lexer();
     exp4();
     (*_exp).type = eoper;
@@ -7841,7 +7841,7 @@ void exp3() {
 void exp4() {
   int p, tf;
   exp5();
-  while ((p = pieza) >= p_suma && p <= p_sub && (p <= p_resta || p >= p_add)) {
+  while ((p = current_token) >= p_suma && p <= p_sub && (p <= p_resta || p >= p_add)) {
     tf = tipo_factor;
     if (p <= p_resta)
       p += p_add - p_suma; // Convert suma,resta to add,sub
@@ -7874,7 +7874,7 @@ void exp4() {
 void exp5() {
   int p;
   unary();
-  while ((p = pieza) >= p_mul && p <= p_multi) {
+  while ((p = current_token) >= p_mul && p <= p_multi) {
     if (p == p_multi)
       p = p_mul; // Convert multi to mul
     lexer();
@@ -7888,11 +7888,11 @@ void exp5() {
 void unary() {
   int p;
 
-  while ((p = pieza) == p_add) {
+  while ((p = current_token) == p_add) {
     lexer();
   }
   if ((p >= p_xorptr && p <= p_mul) || (p == p_inc || p == p_dec)) {
-    if (parametros > 0 && p == p_pointer) {
+    if (in_params > 0 && p == p_pointer) {
       factor();
       return;
     }
@@ -7911,12 +7911,12 @@ void unary() {
       else if ((*(_exp - 1)).type == eoper && (*(_exp - 1)).token == p_pointerchar) {
         c_error(4, 132); // &string[<exp>] ???
       } else if ((*(_exp - 1)).type == eoper && (*(_exp - 1)).token == p_pointerbyte) {
-        if ((*(_exp - 2)).type == econs && (*(_exp - 2)).valor == 0)
+        if ((*(_exp - 2)).type == econs && (*(_exp - 2)).value == 0)
           _exp -= 2;
         else
           c_error(4, 132); // &bytes[<exp>] ???
       } else if ((*(_exp - 1)).type == eoper && (*(_exp - 1)).token == p_pointerword) {
-        if ((*(_exp - 2)).type == econs && (*(_exp - 2)).valor == 0)
+        if ((*(_exp - 2)).type == econs && (*(_exp - 2)).value == 0)
           _exp -= 2;
         else
           c_error(4, 132); // &words[<exp>] ???
@@ -7945,9 +7945,9 @@ void unary() {
         _exp--;
         (*_exp).type = econs;
         if (p == p_inc)
-          (*_exp++).valor = -1;
+          (*_exp++).value = -1;
         else
-          (*_exp++).valor = 1;
+          (*_exp++).value = 1;
         (*_exp).type = eoper;
         (*_exp++).token = p_strsub;
         (*_exp).type = eoper;
@@ -7980,14 +7980,14 @@ void exp6() { // Operator for accessing other processes' local variables or tabl
   struct exp_ele *e;
 
   factor();
-  while (pieza == p_punto) {
+  while (current_token == p_punto) {
     if (comprueba_id)
       (*_exp++).type = echeck;
     e = _exp + 1;
-    acceso_remoto = 1;
+    cross_process_access = 1;
     lexer();
     factor();
-    acceso_remoto = 0;
+    cross_process_access = 0;
 
     // WARNING: p_punto (dot-access) MUST be the SECOND element that factor()
     // pushes into the expression. The code below replaces it with p_add.
@@ -8003,19 +8003,19 @@ void exp6() { // Operator for accessing other processes' local variables or tabl
 int struct_pointer; // p_pointer / p_pointerchar / p_string / p_pointerbyte / p_pointerword
 
 void factor(void) {
-  struct objeto *ob;
-  struct objeto *obs;
+  struct object *ob;
+  struct object *obs;
   int p, offset, _imem;
   struct exp_ele *e;
 
   tipo_factor = 0;
 
-  switch (pieza) { // factor analysis
+  switch (current_token) { // factor analysis
 
   case p_abrir:
     lexer();
     exp00(tipo_expresion);
-    if (pieza != p_cerrar) {
+    if (current_token != p_cerrar) {
       c_error(3, 25);
     }
     lexer();
@@ -8024,7 +8024,7 @@ void factor(void) {
   case p_corab:
     lexer();
     exp00(0);
-    if (pieza != p_corce)
+    if (current_token != p_corce)
       c_error(3, 26);
     (*_exp).type = eoper;
     (*_exp++).token = p_pointer;
@@ -8038,7 +8038,7 @@ void factor(void) {
 
   case p_num:
     (*_exp).type = econs;
-    (*_exp++).valor = pieza_num;
+    (*_exp++).value = token_value;
     lexer();
     break;
 
@@ -8046,10 +8046,10 @@ void factor(void) {
     tipo_factor = 2;
     if (tipo_expresion == 1) {
       (*_exp).type = econs;
-      (*_exp++).valor = (byte)mem[pieza_num];
+      (*_exp++).value = (byte)mem[token_value];
     } else {
       (*_exp).type = estring;
-      (*_exp++).valor = pieza_num;
+      (*_exp++).value = token_value;
       if (tipo_expresion == -1) {
         (*_exp).type = eoper;
         (*_exp++).token = p_strlen;
@@ -8060,24 +8060,24 @@ void factor(void) {
 
   case p_type:
     lexer();
-    if (pieza != p_id)
+    if (current_token != p_id)
       c_error(0, 112);
     switch ((*o).type) {
     case tnone:
-      (*o).line = linea;
+      (*o).line = source_line;
       (*o).ierror = ierror;
       (*_exp).type = econs;
-      (*_exp++).valor = (memptrsize)o;
-      (*o).usado = 1;
+      (*_exp++).value = (memptrsize)o;
+      (*o).used = 1;
       break;
     case tproc:
       (*_exp).type = econs;
-      (*_exp++).valor = (memptrsize)o;
+      (*_exp++).value = (memptrsize)o;
       break;
     case tsglo:
-      if ((*o).sglo.offset == long_header) { // type mouse ≡ 0
+      if ((*o).struct_global.offset == long_header) { // type mouse ≡ 0
         (*_exp).type = econs;
-        (*_exp++).valor = 0;
+        (*_exp++).value = 0;
         break;
       }
       /* fall through */
@@ -8090,21 +8090,21 @@ void factor(void) {
   case p_sizeof:
 
     lexer();
-    if (pieza != p_abrir)
+    if (current_token != p_abrir)
       c_error(3, 36);
     lexer();
-    if (pieza != p_id)
+    if (current_token != p_id)
       c_error(3, 113);
     ;
     (*_exp).type = econs;
     switch ((*o).type) {
     case tsglo:
     case tsloc:
-      (*_exp++).valor = (*o).sglo.len_item * (*o).sglo.totalitems;
+      (*_exp++).value = (*o).struct_global.item_len * (*o).struct_global.total_items;
       break;
     case tpsgl:
     case tpslo:
-      (*_exp++).valor = (*((*o).psgl.ostruct)).sglo.len_item * (*o).sglo.totalitems;
+      (*_exp++).value = (*((*o).ptr_struct_global.ostruct)).struct_global.item_len * (*o).struct_global.total_items;
       break;
     case ttglo:
     case ttloc:
@@ -8112,37 +8112,37 @@ void factor(void) {
     case tbloc:
     case twglo:
     case twloc:
-      (*_exp++).valor = (*o).tglo.totalen;
+      (*_exp++).value = (*o).table_global.total_len;
       break;
     case tcglo:
     case tcloc:
-      (*_exp++).valor = ((*o).cglo.totalen + 5) / 4;
+      (*_exp++).value = ((*o).string_global.total_len + 5) / 4;
       break;
     case tvglo:
     case tvloc:
-      (*_exp++).valor = 1;
+      (*_exp++).value = 1;
       break;
     default:
       c_error(0, 61);
     }
     lexer();
-    if (pieza != p_cerrar)
+    if (current_token != p_cerrar)
       c_error(3, 25);
     lexer();
     break;
 
   case p_struct: // Check for struct pointer parameter declaration
-    if (parametros <= 0) {
+    if (in_params <= 0) {
       if (error_27 == 27)
         c_error(1, 27);
       else
         c_error(0, error_27);
     } else {
       lexer();
-      if (pieza != p_pointer)
+      if (current_token != p_pointer)
         c_error(0, 151); // Pointer can't be defined this way
       lexer();
-      if (pieza != p_id)
+      if (current_token != p_id)
         c_error(1, 110);
       obs = o;
       if ((*obs).type == tnone)
@@ -8152,12 +8152,12 @@ void factor(void) {
       lexer();
       ob = o;
       analyze_pointer_struct(tpslo, iloc++, obs);
-      (*ob).line = linea;
+      (*ob).line = source_line;
       (*ob).ierror = ierror;
       (*ob).param = 1;
-      parametros++;
+      in_params++;
       (*_exp).type = econs;
-      (*_exp++).valor = (*ob).pslo.offset;
+      (*_exp++).value = (*ob).ptr_struct_local.offset;
       (*_exp).type = eoper;
       (*_exp++).token = p_punto;
       (*_exp).type = eoper;
@@ -8166,71 +8166,71 @@ void factor(void) {
     break;
 
   case p_string: // Check for string parameter declaration
-    if (parametros <= 0) {
+    if (in_params <= 0) {
       if (error_27 == 27)
         c_error(1, 27);
       else
         c_error(0, error_27);
     } else {
       lexer();
-      if (pieza == p_pointer) { // Receives a pointer to string
+      if (current_token == p_pointer) { // Receives a pointer to string
         lexer();
-        ob = analiza_pointer(tpclo, iloc++);
-        (*ob).line = linea;
+        ob = analyze_pointer(tpclo, iloc++);
+        (*ob).line = source_line;
         (*ob).ierror = ierror;
         (*ob).param = 1;
-        parametros++;
+        in_params++;
         (*_exp).type = econs;
-        (*_exp++).valor = (*ob).pclo.offset;
+        (*_exp++).value = (*ob).ptr_string_local.offset;
         (*_exp).type = eoper;
         (*_exp++).token = p_punto;
         (*_exp).type = eoper;
         (*_exp++).token = p_pointer;
         break;
       }
-      if (pieza != p_id)
+      if (current_token != p_id)
         c_error(1, 125);
       ob = o;
       if ((*ob).type != tnone)
         c_error(0, 126);
-      (*ob).line = linea;
+      (*ob).line = source_line;
       (*ob).ierror = ierror;
       (*ob).param = 1;
       (*ob).type = tcloc;
       lexer();
-      if (pieza == p_corab) {
+      if (current_token == p_corab) {
         lexer();
-        if (pieza == p_corce) {
+        if (current_token == p_corce) {
           lexer();
-          (*ob).cloc.totalen = 255;
+          (*ob).string_local.total_len = 255;
         } else {
           e = _exp;
-          if (((*ob).cloc.totalen = constant()) < 0)
+          if (((*ob).string_local.total_len = constant()) < 0)
             c_error(4, 127);
-          if ((*ob).cloc.totalen > 0xFFFFF)
+          if ((*ob).string_local.total_len > 0xFFFFF)
             c_error(4, 135);
-          if (pieza != p_corce)
+          if (current_token != p_corce)
             c_error(3, 26);
           lexer();
           _exp = e;
         }
       } else
-        (*ob).cloc.totalen = 255;
-      if (parametros > 1) {
-        g2(lpar, parametros - 1);
+        (*ob).string_local.total_len = 255;
+      if (in_params > 1) {
+        g2(lpar, in_params - 1);
       }
-      parametros = 1;
+      in_params = 1;
       g2(lpri, 0);
       _imem = imem;
-      imem += 1 + ((*ob).cloc.totalen + 5) / 4;
+      imem += 1 + ((*ob).string_local.total_len + 5) / 4;
       test_buffer(&mem, &imem_max, imem);
-      mem[_imem] = 0xDAD00000 | (*ob).cloc.totalen;
-      memset(&mem[imem + 1], 0, (((*ob).cloc.totalen + 5) & -5));
-      (*ob).cloc.offset = iloc + 1;
-      iloc += 1 + ((*ob).cloc.totalen + 5) / 4;
+      mem[_imem] = 0xDAD00000 | (*ob).string_local.total_len;
+      memset(&mem[imem + 1], 0, (((*ob).string_local.total_len + 5) & -5));
+      (*ob).string_local.offset = iloc + 1;
+      iloc += 1 + ((*ob).string_local.total_len + 5) / 4;
       mem[_imem - 1] = imem; // pri
       (*_exp).type = estring;
-      (*_exp++).valor = (*ob).cloc.offset;
+      (*_exp++).value = (*ob).string_local.offset;
       (*_exp).type = eoper;
       (*_exp++).token = p_punto;
       (*_exp).type = eoper;
@@ -8239,104 +8239,104 @@ void factor(void) {
     break;
 
   case p_byte: // Check for byte parameter declaration
-    if (parametros <= 0) {
+    if (in_params <= 0) {
       if (error_27 == 27)
         c_error(1, 27);
       else
         c_error(0, error_27);
     } else {
       lexer();
-      if (pieza == p_pointer) {
+      if (current_token == p_pointer) {
         lexer();
-        ob = analiza_pointer(tpblo, iloc++);
-        (*ob).line = linea;
+        ob = analyze_pointer(tpblo, iloc++);
+        (*ob).line = source_line;
         (*ob).ierror = ierror;
         (*ob).param = 1;
-        parametros++;
+        in_params++;
         (*_exp).type = econs;
-        (*_exp++).valor = (*ob).pblo.offset;
+        (*_exp++).value = (*ob).ptr_byte_local.offset;
         (*_exp).type = eoper;
         (*_exp++).token = p_punto;
         (*_exp).type = eoper;
         (*_exp++).token = p_pointer;
         break;
       }
-      if (pieza != p_id)
+      if (current_token != p_id)
         c_error(1, 142);
       ob = o;
       if ((*ob).type != tnone)
         c_error(0, 126);
-      (*ob).line = linea;
+      (*ob).line = source_line;
       (*ob).ierror = ierror;
       (*ob).param = 1;
       (*ob).type = tbloc;
       lexer();
-      if (pieza == p_corab)
+      if (current_token == p_corab)
         c_error(2, 146);
-      parametros++;
-      (*ob).bloc.offset = iloc++;
-      (*ob).bloc.len1 = 0;
-      (*ob).bloc.len2 = -1;
-      (*ob).bloc.len3 = -1;
-      (*ob).bloc.totalen = 1;
+      in_params++;
+      (*ob).byte_local.offset = iloc++;
+      (*ob).byte_local.len1 = 0;
+      (*ob).byte_local.len2 = -1;
+      (*ob).byte_local.len3 = -1;
+      (*ob).byte_local.total_len = 1;
       (*_exp).type = econs;
-      (*_exp++).valor = (*ob).bloc.offset;
+      (*_exp++).value = (*ob).byte_local.offset;
       (*_exp).type = eoper;
       (*_exp++).token = p_punto;
       (*_exp).type = econs;
-      (*_exp++).valor = 0;
+      (*_exp++).value = 0;
       (*_exp).type = eoper;
       (*_exp++).token = p_pointerbyte;
     }
     break;
 
   case p_word: // Check for word parameter declaration
-    if (parametros <= 0) {
+    if (in_params <= 0) {
       if (error_27 == 27)
         c_error(1, 27);
       else
         c_error(0, error_27);
     } else {
       lexer();
-      if (pieza == p_pointer) {
+      if (current_token == p_pointer) {
         lexer();
-        ob = analiza_pointer(tpwlo, iloc++);
-        (*ob).line = linea;
+        ob = analyze_pointer(tpwlo, iloc++);
+        (*ob).line = source_line;
         (*ob).ierror = ierror;
         (*ob).param = 1;
-        parametros++;
+        in_params++;
         (*_exp).type = econs;
-        (*_exp++).valor = (*ob).pwlo.offset;
+        (*_exp++).value = (*ob).ptr_word_local.offset;
         (*_exp).type = eoper;
         (*_exp++).token = p_punto;
         (*_exp).type = eoper;
         (*_exp++).token = p_pointer;
         break;
       }
-      if (pieza != p_id)
+      if (current_token != p_id)
         c_error(1, 145);
       ob = o;
       if ((*ob).type != tnone)
         c_error(0, 126);
-      (*ob).line = linea;
+      (*ob).line = source_line;
       (*ob).ierror = ierror;
       (*ob).param = 1;
       (*ob).type = twloc;
       lexer();
-      if (pieza == p_corab)
+      if (current_token == p_corab)
         c_error(2, 146);
-      parametros++;
-      (*ob).wloc.offset = iloc++;
-      (*ob).wloc.len1 = 0;
-      (*ob).wloc.len2 = -1;
-      (*ob).wloc.len3 = -1;
-      (*ob).wloc.totalen = 1;
+      in_params++;
+      (*ob).word_local.offset = iloc++;
+      (*ob).word_local.len1 = 0;
+      (*ob).word_local.len2 = -1;
+      (*ob).word_local.len3 = -1;
+      (*ob).word_local.total_len = 1;
       (*_exp).type = econs;
-      (*_exp++).valor = (*ob).wloc.offset;
+      (*_exp++).value = (*ob).word_local.offset;
       (*_exp).type = eoper;
       (*_exp++).token = p_punto;
       (*_exp).type = econs;
-      (*_exp++).valor = 0;
+      (*_exp++).value = 0;
       (*_exp).type = eoper;
       (*_exp++).token = p_pointerword;
     }
@@ -8345,36 +8345,36 @@ void factor(void) {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
   case p_int: // Check for int parameter declaration
-    if (parametros <= 0) {
+    if (in_params <= 0) {
       if (error_27 == 27)
         c_error(1, 27);
       else
         c_error(0, error_27);
     } else {
       lexer();
-      if (pieza == p_pointer) {
+      if (current_token == p_pointer) {
       case p_pointer: // Pointer-to-int parameter declaration
 #pragma GCC diagnostic pop
-        if (parametros <= 0) {
+        if (in_params <= 0) {
           if (error_27 == 27)
             c_error(1, 27);
           else
             c_error(0, error_27);
         }
-        parametros++;
+        in_params++;
         lexer();
-        ob = analiza_pointer(tpilo, iloc++);
-        (*ob).line = linea;
+        ob = analyze_pointer(tpilo, iloc++);
+        (*ob).line = source_line;
         (*ob).ierror = ierror;
         (*ob).param = 1;
         (*_exp).type = econs;
-        (*_exp++).valor = (*ob).pilo.offset;
+        (*_exp++).value = (*ob).ptr_int_local.offset;
         (*_exp).type = eoper;
         (*_exp++).token = p_punto;
         (*_exp).type = eoper;
         (*_exp++).token = p_pointer;
         break;
-      } else if (pieza != p_id)
+      } else if (current_token != p_id)
         c_error(1, 149);
     }
 
@@ -8382,19 +8382,19 @@ void factor(void) {
     switch ((*o).type) {
     case tnone:
       ob = o;
-      (*ob).line = linea;
+      (*ob).line = source_line;
       (*ob).ierror = ierror;
       lexer();
-      if (pieza != p_abrir) {
-        if (parametros > 0) {
-          if (pieza == p_corab)
+      if (current_token != p_abrir) {
+        if (in_params > 0) {
+          if (current_token == p_corab)
             c_error(2, 146);
-          parametros++;
+          in_params++;
           (*ob).type = tvloc;
-          (*ob).vloc.offset = iloc++;
+          (*ob).var_local.offset = iloc++;
           (*ob).param = 1;
           (*_exp).type = econs;
-          (*_exp++).valor = (*ob).vloc.offset;
+          (*_exp++).value = (*ob).var_local.offset;
           (*_exp).type = eoper;
           (*_exp++).token = p_punto;
           (*_exp).type = eoper;
@@ -8403,27 +8403,27 @@ void factor(void) {
         } else
           c_error(2, 28);
       }
-      (*ob).usado = 1;
+      (*ob).used = 1;
       (*ob).type = tproc;
-      (*ob).proc.bloque = ob;
+      (*ob).proc.scope = ob;
       (*ob).proc.offset = 0;
-      (*ob).proc.num_par = 0;
+      (*ob).proc.num_params = 0;
       lexer();
-      while (pieza != p_cerrar) {
-        (*ob).proc.num_par++;
+      while (current_token != p_cerrar) {
+        (*ob).proc.num_params++;
         exp00(0);
-        if (pieza != p_cerrar) {
-          if (pieza != p_coma)
+        if (current_token != p_cerrar) {
+          if (current_token != p_coma)
             c_error(3, 25);
           else {
             lexer();
-            if (pieza == p_cerrar)
+            if (current_token == p_cerrar)
               c_error(3, 45);
           }
         }
       }
       (*_exp).type = ecall;
-      (*_exp++).objeto = ob;
+      (*_exp++).object = ob;
       lexer();
       break;
 
@@ -8432,26 +8432,26 @@ void factor(void) {
         tipo_factor = 2;
         if (tipo_expresion == 1) {
           (*_exp).type = econs;
-          (*_exp++).valor = (byte)mem[pieza_num];
+          (*_exp++).value = (byte)mem[token_value];
         } else if (tipo_expresion == -1) {
           (*_exp).type = econs;
-          (*_exp++).valor = pieza_num;
+          (*_exp++).value = token_value;
           (*_exp).type = eoper;
           (*_exp++).token = p_strlen;
         } else {
           (*_exp).type = econs;
-          (*_exp++).valor = (*o).cons.valor;
+          (*_exp++).value = (*o).cons.value;
         }
       } else {
         (*_exp).type = econs;
-        (*_exp++).valor = (*o).cons.valor;
+        (*_exp++).value = (*o).cons.value;
       }
       lexer();
       break;
 
     case tvglo:
       (*_exp).type = econs;
-      (*_exp++).valor = (*o).vglo.offset;
+      (*_exp++).value = (*o).var_global.offset;
       (*_exp).type = eoper;
       (*_exp++).token = p_pointer;
       lexer();
@@ -8461,11 +8461,11 @@ void factor(void) {
     case ttglo:
     case tpigl:
       ob = o;
-      offset = (*ob).tglo.offset;
+      offset = (*ob).table_global.offset;
       lexer();
       (*_exp).type = econs;
-      (*_exp++).valor = offset;
-      if (pieza == p_corab) {
+      (*_exp++).value = offset;
+      if (current_token == p_corab) {
         if ((*ob).type == tpigl) {
           (*_exp).type = eoper;
           (*_exp++).token = p_pointer;
@@ -8474,44 +8474,44 @@ void factor(void) {
         }
         lexer();
         exp00(0);
-        if ((*ob).tglo.len1 > -1)
+        if ((*ob).table_global.len1 > -1)
           if (comprueba_rango) {
             (*_exp).type = erango;
-            (*_exp++).valor = (*ob).tglo.len1;
+            (*_exp++).value = (*ob).table_global.len1;
           }
-        if ((*ob).tglo.len2 > -1) {
-          if (pieza != p_coma)
+        if ((*ob).table_global.len2 > -1) {
+          if (current_token != p_coma)
             c_error(3, 130);
           lexer();
           exp00(0);
           if (comprueba_rango) {
             (*_exp).type = erango;
-            (*_exp++).valor = (*ob).tglo.len2;
+            (*_exp++).value = (*ob).table_global.len2;
           }
-          if ((*ob).tglo.len3 > -1) {
-            if (pieza != p_coma)
+          if ((*ob).table_global.len3 > -1) {
+            if (current_token != p_coma)
               c_error(3, 130);
             lexer();
             exp00(0);
             if (comprueba_rango) {
               (*_exp).type = erango;
-              (*_exp++).valor = (*ob).tglo.len3;
+              (*_exp++).value = (*ob).table_global.len3;
             }
             (*_exp).type = econs;
-            (*_exp++).valor = (*ob).tglo.len2 + 1;
+            (*_exp++).value = (*ob).table_global.len2 + 1;
             (*_exp).type = eoper;
             (*_exp++).token = p_mul;
             (*_exp).type = eoper;
             (*_exp++).token = p_add;
           }
           (*_exp).type = econs;
-          (*_exp++).valor = (*ob).tglo.len1 + 1;
+          (*_exp++).value = (*ob).table_global.len1 + 1;
           (*_exp).type = eoper;
           (*_exp++).token = p_mul;
           (*_exp).type = eoper;
           (*_exp++).token = p_add;
         }
-        if (pieza != p_corce)
+        if (current_token != p_corce)
           c_error(3, 26);
         lexer();
         (*_exp).type = eoper;
@@ -8525,64 +8525,64 @@ void factor(void) {
     case tpbgl:
     case tpcgl:
       ob = o;
-      offset = (*ob).bglo.offset;
+      offset = (*ob).byte_global.offset;
       lexer();
       (*_exp).type = econs;
-      (*_exp++).valor = offset;
+      (*_exp++).value = offset;
       if ((*ob).type == tpbgl || (*ob).type == tpcgl) {
         (*_exp).type = eoper;
         (*_exp++).token = p_pointer;
-        if (pieza != p_corab)
+        if (current_token != p_corab)
           break;
         if (comprueba_null)
           (*_exp++).type = enull;
       }
-      if (pieza == p_corab) {
+      if (current_token == p_corab) {
         lexer();
         exp00(0);
-        if ((*ob).bglo.len1 > -1)
+        if ((*ob).byte_global.len1 > -1)
           if (comprueba_rango) {
             (*_exp).type = erango;
-            (*_exp++).valor = (*ob).bglo.len1;
+            (*_exp++).value = (*ob).byte_global.len1;
           }
-        if ((*ob).bglo.len2 > -1) {
-          if (pieza != p_coma)
+        if ((*ob).byte_global.len2 > -1) {
+          if (current_token != p_coma)
             c_error(3, 130);
           lexer();
           exp00(0);
           if (comprueba_rango) {
             (*_exp).type = erango;
-            (*_exp++).valor = (*ob).bglo.len2;
+            (*_exp++).value = (*ob).byte_global.len2;
           }
-          if ((*ob).bglo.len3 > -1) {
-            if (pieza != p_coma)
+          if ((*ob).byte_global.len3 > -1) {
+            if (current_token != p_coma)
               c_error(3, 130);
             lexer();
             exp00(0);
             if (comprueba_rango) {
               (*_exp).type = erango;
-              (*_exp++).valor = (*ob).bglo.len3;
+              (*_exp++).value = (*ob).byte_global.len3;
             }
             (*_exp).type = econs;
-            (*_exp++).valor = (*ob).bglo.len2 + 1;
+            (*_exp++).value = (*ob).byte_global.len2 + 1;
             (*_exp).type = eoper;
             (*_exp++).token = p_mul;
             (*_exp).type = eoper;
             (*_exp++).token = p_add;
           }
           (*_exp).type = econs;
-          (*_exp++).valor = (*ob).bglo.len1 + 1;
+          (*_exp++).value = (*ob).byte_global.len1 + 1;
           (*_exp).type = eoper;
           (*_exp++).token = p_mul;
           (*_exp).type = eoper;
           (*_exp++).token = p_add;
         }
-        if (pieza != p_corce)
+        if (current_token != p_corce)
           c_error(3, 26);
         lexer();
       } else { // mi_byte ≡ mi_byte[0]
         (*_exp).type = econs;
-        (*_exp++).valor = 0;
+        (*_exp++).value = 0;
       }
       (*_exp).type = eoper;
       (*_exp++).token = p_pointerbyte;
@@ -8591,64 +8591,64 @@ void factor(void) {
     case twglo:
     case tpwgl:
       ob = o;
-      offset = (*ob).wglo.offset;
+      offset = (*ob).word_global.offset;
       lexer();
       (*_exp).type = econs;
-      (*_exp++).valor = offset;
+      (*_exp++).value = offset;
       if ((*ob).type == tpwgl) {
         (*_exp).type = eoper;
         (*_exp++).token = p_pointer;
-        if (pieza != p_corab)
+        if (current_token != p_corab)
           break;
         if (comprueba_null)
           (*_exp++).type = enull;
       }
-      if (pieza == p_corab) {
+      if (current_token == p_corab) {
         lexer();
         exp00(0);
-        if ((*ob).wglo.len1 > -1)
+        if ((*ob).word_global.len1 > -1)
           if (comprueba_rango) {
             (*_exp).type = erango;
-            (*_exp++).valor = (*ob).wglo.len1;
+            (*_exp++).value = (*ob).word_global.len1;
           }
-        if ((*ob).wglo.len2 > -1) {
-          if (pieza != p_coma)
+        if ((*ob).word_global.len2 > -1) {
+          if (current_token != p_coma)
             c_error(3, 130);
           lexer();
           exp00(0);
           if (comprueba_rango) {
             (*_exp).type = erango;
-            (*_exp++).valor = (*ob).wglo.len2;
+            (*_exp++).value = (*ob).word_global.len2;
           }
-          if ((*ob).wglo.len3 > -1) {
-            if (pieza != p_coma)
+          if ((*ob).word_global.len3 > -1) {
+            if (current_token != p_coma)
               c_error(3, 130);
             lexer();
             exp00(0);
             if (comprueba_rango) {
               (*_exp).type = erango;
-              (*_exp++).valor = (*ob).wglo.len3;
+              (*_exp++).value = (*ob).word_global.len3;
             }
             (*_exp).type = econs;
-            (*_exp++).valor = (*ob).wglo.len2 + 1;
+            (*_exp++).value = (*ob).word_global.len2 + 1;
             (*_exp).type = eoper;
             (*_exp++).token = p_mul;
             (*_exp).type = eoper;
             (*_exp++).token = p_add;
           }
           (*_exp).type = econs;
-          (*_exp++).valor = (*ob).wglo.len1 + 1;
+          (*_exp++).value = (*ob).word_global.len1 + 1;
           (*_exp).type = eoper;
           (*_exp++).token = p_mul;
           (*_exp).type = eoper;
           (*_exp++).token = p_add;
         }
-        if (pieza != p_corce)
+        if (current_token != p_corce)
           c_error(3, 26);
         lexer();
       } else { // mi_byte ≡ mi_byte[0]
         (*_exp).type = econs;
-        (*_exp++).valor = 0;
+        (*_exp++).value = 0;
       }
       (*_exp).type = eoper;
       (*_exp++).token = p_pointerword;
@@ -8656,18 +8656,18 @@ void factor(void) {
 
     case tcglo:
       ob = o;
-      offset = (*ob).cglo.offset;
+      offset = (*ob).string_global.offset;
       lexer();
       (*_exp).type = estring;
-      (*_exp++).valor = offset;
-      if (pieza == p_corab) {
+      (*_exp++).value = offset;
+      if (current_token == p_corab) {
         lexer();
         exp00(0);
         if (comprueba_rango) {
           (*_exp).type = erango;
-          (*_exp++).valor = (*ob).cglo.totalen;
+          (*_exp++).value = (*ob).string_global.total_len;
         }
-        if (pieza != p_corce)
+        if (current_token != p_corce)
           c_error(3, 26);
         lexer();
         (*_exp).type = eoper;
@@ -8676,7 +8676,7 @@ void factor(void) {
         tipo_factor = 2;
         if (tipo_expresion == 1) {
           (*_exp).type = econs;
-          (*_exp++).valor = 0;
+          (*_exp++).value = 0;
           (*_exp).type = eoper;
           (*_exp++).token = p_pointerchar;
         } else {
@@ -8695,75 +8695,75 @@ void factor(void) {
       ob = o;
       lexer();
       (*_exp).type = econs;
-      (*_exp++).valor = (*ob).sglo.offset;
+      (*_exp++).value = (*ob).struct_global.offset;
       if ((*ob).type == tpsgl) {
         (*_exp).type = eoper;
         (*_exp++).token = p_pointer;
-        if (pieza != p_corab && pieza != p_punto)
+        if (current_token != p_corab && current_token != p_punto)
           break;
         if (comprueba_null)
           (*_exp++).type = enull;
       }
-      if (pieza == p_corab) {
+      if (current_token == p_corab) {
         lexer();
         exp00(0);
-        if ((*ob).sglo.items1 > -1)
+        if ((*ob).struct_global.dim1 > -1)
           if (comprueba_rango) {
             (*_exp).type = erango;
-            (*_exp++).valor = (*ob).sglo.items1;
+            (*_exp++).value = (*ob).struct_global.dim1;
           }
-        if ((*ob).sglo.items2 > -1) {
-          if (pieza != p_coma)
+        if ((*ob).struct_global.dim2 > -1) {
+          if (current_token != p_coma)
             c_error(3, 131);
           lexer();
           exp00(0);
           if (comprueba_rango) {
             (*_exp).type = erango;
-            (*_exp++).valor = (*ob).sglo.items2;
+            (*_exp++).value = (*ob).struct_global.dim2;
           }
-          if ((*ob).sglo.items3 > -1) {
-            if (pieza != p_coma)
+          if ((*ob).struct_global.dim3 > -1) {
+            if (current_token != p_coma)
               c_error(3, 131);
             lexer();
             exp00(0);
             if (comprueba_rango) {
               (*_exp).type = erango;
-              (*_exp++).valor = (*ob).sglo.items3;
+              (*_exp++).value = (*ob).struct_global.dim3;
             }
             (*_exp).type = econs;
-            (*_exp++).valor = (*ob).sglo.items2 + 1;
+            (*_exp++).value = (*ob).struct_global.dim2 + 1;
             (*_exp).type = eoper;
             (*_exp++).token = p_mul;
             (*_exp).type = eoper;
             (*_exp++).token = p_add;
           }
           (*_exp).type = econs;
-          (*_exp++).valor = (*ob).sglo.items1 + 1;
+          (*_exp++).value = (*ob).struct_global.dim1 + 1;
           (*_exp).type = eoper;
           (*_exp++).token = p_mul;
           (*_exp).type = eoper;
           (*_exp++).token = p_add;
         }
-        if (pieza != p_corce) {
+        if (current_token != p_corce) {
           c_error(3, 26);
         }
         lexer();
         if ((*ob).type == tpsgl) {
           (*_exp).type = econs;
-          (*_exp++).valor = (*((*ob).psgl.ostruct)).sglo.len_item;
+          (*_exp++).value = (*((*ob).ptr_struct_global.ostruct)).struct_global.item_len;
         } else {
           (*_exp).type = econs;
-          (*_exp++).valor = (*ob).sglo.len_item;
+          (*_exp++).value = (*ob).struct_global.item_len;
         }
         (*_exp).type = eoper;
         (*_exp++).token = p_mul;
         (*_exp).type = eoper;
         (*_exp++).token = p_add;
       }
-      if (pieza == p_punto) {
+      if (current_token == p_punto) {
         struct_pointer = p_pointer;
         if ((*ob).type == tpsgl)
-          member = (*ob).psgl.ostruct;
+          member = (*ob).ptr_struct_global.ostruct;
         else
           member = ob;
         lexer();
@@ -8777,10 +8777,10 @@ void factor(void) {
       break;
 
     case tvloc:
-      if (acceso_remoto && (*o).bloque)
+      if (cross_process_access && (*o).scope)
         c_error(0, 56);
       (*_exp).type = econs;
-      (*_exp++).valor = (*o).vloc.offset;
+      (*_exp++).value = (*o).var_local.offset;
       (*_exp).type = eoper;
       (*_exp++).token = p_punto;
       (*_exp).type = eoper;
@@ -8790,63 +8790,63 @@ void factor(void) {
 
     case ttloc:
     case tpilo:
-      if (acceso_remoto && (*o).bloque)
+      if (cross_process_access && (*o).scope)
         c_error(0, 56);
       ob = o;
-      offset = (*ob).tloc.offset;
+      offset = (*ob).table_local.offset;
       lexer();
       (*_exp).type = econs;
-      (*_exp++).valor = offset;
+      (*_exp++).value = offset;
       (*_exp).type = eoper;
       (*_exp++).token = p_punto;
-      if (pieza == p_corab) {
+      if (current_token == p_corab) {
         if ((*ob).type == tpilo) {
           (*_exp).type = eoper;
           (*_exp++).token = p_pointer;
           if (comprueba_null)
             (*_exp++).type = enull;
         }
-        acceso_remoto = 0;
+        cross_process_access = 0;
         lexer();
         exp00(0);
-        if ((*ob).tloc.len1 > -1)
+        if ((*ob).table_local.len1 > -1)
           if (comprueba_rango) {
             (*_exp).type = erango;
-            (*_exp++).valor = (*ob).tloc.len1;
+            (*_exp++).value = (*ob).table_local.len1;
           }
-        if ((*ob).tloc.len2 > -1) {
-          if (pieza != p_coma)
+        if ((*ob).table_local.len2 > -1) {
+          if (current_token != p_coma)
             c_error(3, 130);
           lexer();
           exp00(0);
           if (comprueba_rango) {
             (*_exp).type = erango;
-            (*_exp++).valor = (*ob).tloc.len2;
+            (*_exp++).value = (*ob).table_local.len2;
           }
-          if ((*ob).tloc.len3 > -1) {
-            if (pieza != p_coma)
+          if ((*ob).table_local.len3 > -1) {
+            if (current_token != p_coma)
               c_error(3, 130);
             lexer();
             exp00(0);
             if (comprueba_rango) {
               (*_exp).type = erango;
-              (*_exp++).valor = (*ob).tloc.len3;
+              (*_exp++).value = (*ob).table_local.len3;
             }
             (*_exp).type = econs;
-            (*_exp++).valor = (*ob).tloc.len2 + 1;
+            (*_exp++).value = (*ob).table_local.len2 + 1;
             (*_exp).type = eoper;
             (*_exp++).token = p_mul;
             (*_exp).type = eoper;
             (*_exp++).token = p_add;
           }
           (*_exp).type = econs;
-          (*_exp++).valor = (*ob).tloc.len1 + 1;
+          (*_exp++).value = (*ob).table_local.len1 + 1;
           (*_exp).type = eoper;
           (*_exp++).token = p_mul;
           (*_exp).type = eoper;
           (*_exp++).token = p_add;
         }
-        if (pieza != p_corce)
+        if (current_token != p_corce)
           c_error(3, 26);
         lexer();
         (*_exp).type = eoper;
@@ -8859,70 +8859,70 @@ void factor(void) {
     case tbloc:
     case tpblo:
     case tpclo:
-      if (acceso_remoto && (*o).bloque)
+      if (cross_process_access && (*o).scope)
         c_error(0, 56);
       ob = o;
-      offset = (*ob).bloc.offset;
+      offset = (*ob).byte_local.offset;
       lexer();
       (*_exp).type = econs;
-      (*_exp++).valor = offset;
+      (*_exp++).value = offset;
       (*_exp).type = eoper;
       (*_exp++).token = p_punto;
       if ((*ob).type == tpblo || (*ob).type == tpclo) {
         (*_exp).type = eoper;
         (*_exp++).token = p_pointer;
-        if (pieza != p_corab)
+        if (current_token != p_corab)
           break;
         if (comprueba_null)
           (*_exp++).type = enull;
       }
-      if (pieza == p_corab) {
-        acceso_remoto = 0;
+      if (current_token == p_corab) {
+        cross_process_access = 0;
         lexer();
         exp00(0);
-        if ((*ob).bloc.len1 > -1)
+        if ((*ob).byte_local.len1 > -1)
           if (comprueba_rango) {
             (*_exp).type = erango;
-            (*_exp++).valor = (*ob).bloc.len1;
+            (*_exp++).value = (*ob).byte_local.len1;
           }
-        if ((*ob).bloc.len2 > -1) {
-          if (pieza != p_coma)
+        if ((*ob).byte_local.len2 > -1) {
+          if (current_token != p_coma)
             c_error(3, 130);
           lexer();
           exp00(0);
           if (comprueba_rango) {
             (*_exp).type = erango;
-            (*_exp++).valor = (*ob).bloc.len2;
+            (*_exp++).value = (*ob).byte_local.len2;
           }
-          if ((*ob).bloc.len3 > -1) {
-            if (pieza != p_coma)
+          if ((*ob).byte_local.len3 > -1) {
+            if (current_token != p_coma)
               c_error(3, 130);
             lexer();
             exp00(0);
             if (comprueba_rango) {
               (*_exp).type = erango;
-              (*_exp++).valor = (*ob).bloc.len3;
+              (*_exp++).value = (*ob).byte_local.len3;
             }
             (*_exp).type = econs;
-            (*_exp++).valor = (*ob).bloc.len2 + 1;
+            (*_exp++).value = (*ob).byte_local.len2 + 1;
             (*_exp).type = eoper;
             (*_exp++).token = p_mul;
             (*_exp).type = eoper;
             (*_exp++).token = p_add;
           }
           (*_exp).type = econs;
-          (*_exp++).valor = (*ob).bloc.len1 + 1;
+          (*_exp++).value = (*ob).byte_local.len1 + 1;
           (*_exp).type = eoper;
           (*_exp++).token = p_mul;
           (*_exp).type = eoper;
           (*_exp++).token = p_add;
         }
-        if (pieza != p_corce)
+        if (current_token != p_corce)
           c_error(3, 26);
         lexer();
       } else { // mi_byte ≡ mi_byte[0]
         (*_exp).type = econs;
-        (*_exp++).valor = 0;
+        (*_exp++).value = 0;
       }
       (*_exp).type = eoper;
       (*_exp++).token = p_pointerbyte;
@@ -8930,94 +8930,94 @@ void factor(void) {
 
     case twloc:
     case tpwlo:
-      if (acceso_remoto && (*o).bloque)
+      if (cross_process_access && (*o).scope)
         c_error(0, 56);
       ob = o;
-      offset = (*ob).wloc.offset;
+      offset = (*ob).word_local.offset;
       lexer();
       (*_exp).type = econs;
-      (*_exp++).valor = offset;
+      (*_exp++).value = offset;
       (*_exp).type = eoper;
       (*_exp++).token = p_punto;
       if ((*ob).type == tpwlo) {
         (*_exp).type = eoper;
         (*_exp++).token = p_pointer;
-        if (pieza != p_corab)
+        if (current_token != p_corab)
           break;
         if (comprueba_null)
           (*_exp++).type = enull;
       }
-      if (pieza == p_corab) {
-        acceso_remoto = 0;
+      if (current_token == p_corab) {
+        cross_process_access = 0;
         lexer();
         exp00(0);
-        if ((*ob).wloc.len1 > -1)
+        if ((*ob).word_local.len1 > -1)
           if (comprueba_rango) {
             (*_exp).type = erango;
-            (*_exp++).valor = (*ob).wloc.len1;
+            (*_exp++).value = (*ob).word_local.len1;
           }
-        if ((*ob).wloc.len2 > -1) {
-          if (pieza != p_coma)
+        if ((*ob).word_local.len2 > -1) {
+          if (current_token != p_coma)
             c_error(3, 130);
           lexer();
           exp00(0);
           if (comprueba_rango) {
             (*_exp).type = erango;
-            (*_exp++).valor = (*ob).wloc.len2;
+            (*_exp++).value = (*ob).word_local.len2;
           }
-          if ((*ob).wloc.len3 > -1) {
-            if (pieza != p_coma)
+          if ((*ob).word_local.len3 > -1) {
+            if (current_token != p_coma)
               c_error(3, 130);
             lexer();
             exp00(0);
             if (comprueba_rango) {
               (*_exp).type = erango;
-              (*_exp++).valor = (*ob).wloc.len3;
+              (*_exp++).value = (*ob).word_local.len3;
             }
             (*_exp).type = econs;
-            (*_exp++).valor = (*ob).wloc.len2 + 1;
+            (*_exp++).value = (*ob).word_local.len2 + 1;
             (*_exp).type = eoper;
             (*_exp++).token = p_mul;
             (*_exp).type = eoper;
             (*_exp++).token = p_add;
           }
           (*_exp).type = econs;
-          (*_exp++).valor = (*ob).wloc.len1 + 1;
+          (*_exp++).value = (*ob).word_local.len1 + 1;
           (*_exp).type = eoper;
           (*_exp++).token = p_mul;
           (*_exp).type = eoper;
           (*_exp++).token = p_add;
         }
-        if (pieza != p_corce)
+        if (current_token != p_corce)
           c_error(3, 26);
         lexer();
       } else { // mi_byte ≡ mi_byte[0]
         (*_exp).type = econs;
-        (*_exp++).valor = 0;
+        (*_exp++).value = 0;
       }
       (*_exp).type = eoper;
       (*_exp++).token = p_pointerword;
       break;
 
     case tcloc:
-      if (acceso_remoto && (*o).bloque)
+      if (cross_process_access && (*o).scope)
         c_error(0, 56);
       ob = o;
-      offset = (*ob).cloc.offset;
+      offset = (*ob).string_local.offset;
       lexer();
       (*_exp).type = estring;
-      (*_exp++).valor = offset;
+      (*_exp++).value = offset;
       (*_exp).type = eoper;
       (*_exp++).token = p_punto;
-      if (pieza == p_corab) {
-        acceso_remoto = 0;
+      if (current_token == p_corab) {
+        cross_process_access = 0;
         lexer();
         exp00(0);
         if (comprueba_rango) {
           (*_exp).type = erango;
-          (*_exp++).valor = (*ob).cloc.totalen;
+          (*_exp++).value = (*ob).string_local.total_len;
         }
-        if (pieza != p_corce)
+        if (current_token != p_corce)
           c_error(3, 26);
         lexer();
         (*_exp).type = eoper;
@@ -9026,7 +9026,7 @@ void factor(void) {
         tipo_factor = 2;
         if (tipo_expresion == 1) {
           (*_exp).type = econs;
-          (*_exp++).valor = 0;
+          (*_exp++).value = 0;
           (*_exp).type = eoper;
           (*_exp++).token = p_pointerchar;
         } else {
@@ -9042,83 +9042,83 @@ void factor(void) {
 
     case tsloc:
     case tpslo:
-      if (acceso_remoto && (*o).bloque)
+      if (cross_process_access && (*o).scope)
         c_error(0, 56);
       ob = o;
       lexer();
       (*_exp).type = econs;
-      (*_exp++).valor = (*ob).sloc.offset;
+      (*_exp++).value = (*ob).struct_local.offset;
       (*_exp).type = eoper;
       (*_exp++).token = p_punto;
       if ((*ob).type == tpslo) {
         (*_exp).type = eoper;
         (*_exp++).token = p_pointer;
-        if (pieza != p_corab && pieza != p_punto)
+        if (current_token != p_corab && current_token != p_punto)
           break;
         if (comprueba_null)
           (*_exp++).type = enull;
       }
-      if (pieza == p_corab) {
-        acceso_remoto = 0;
+      if (current_token == p_corab) {
+        cross_process_access = 0;
         lexer();
         exp00(0);
-        if ((*ob).sloc.items1 > -1)
+        if ((*ob).struct_local.dim1 > -1)
           if (comprueba_rango) {
             (*_exp).type = erango;
-            (*_exp++).valor = (*ob).sloc.items1;
+            (*_exp++).value = (*ob).struct_local.dim1;
           }
-        if ((*ob).sloc.items2 > -1) {
-          if (pieza != p_coma)
+        if ((*ob).struct_local.dim2 > -1) {
+          if (current_token != p_coma)
             c_error(3, 131);
           lexer();
           exp00(0);
           if (comprueba_rango) {
             (*_exp).type = erango;
-            (*_exp++).valor = (*ob).sloc.items2;
+            (*_exp++).value = (*ob).struct_local.dim2;
           }
-          if ((*ob).sloc.items3 > -1) {
-            if (pieza != p_coma)
+          if ((*ob).struct_local.dim3 > -1) {
+            if (current_token != p_coma)
               c_error(3, 131);
             lexer();
             exp00(0);
             if (comprueba_rango) {
               (*_exp).type = erango;
-              (*_exp++).valor = (*ob).sloc.items3;
+              (*_exp++).value = (*ob).struct_local.dim3;
             }
             (*_exp).type = econs;
-            (*_exp++).valor = (*ob).sloc.items2 + 1;
+            (*_exp++).value = (*ob).struct_local.dim2 + 1;
             (*_exp).type = eoper;
             (*_exp++).token = p_mul;
             (*_exp).type = eoper;
             (*_exp++).token = p_add;
           }
           (*_exp).type = econs;
-          (*_exp++).valor = (*ob).sloc.items1 + 1;
+          (*_exp++).value = (*ob).struct_local.dim1 + 1;
           (*_exp).type = eoper;
           (*_exp++).token = p_mul;
           (*_exp).type = eoper;
           (*_exp++).token = p_add;
         }
-        if (pieza != p_corce) {
+        if (current_token != p_corce) {
           c_error(3, 26);
         }
         lexer();
         if ((*ob).type == tpslo) {
           (*_exp).type = econs;
-          (*_exp++).valor = (*((*ob).pslo.ostruct)).sloc.len_item;
+          (*_exp++).value = (*((*ob).ptr_struct_local.ostruct)).struct_local.item_len;
         } else {
           (*_exp).type = econs;
-          (*_exp++).valor = (*ob).sloc.len_item;
+          (*_exp++).value = (*ob).struct_local.item_len;
         }
         (*_exp).type = eoper;
         (*_exp++).token = p_mul;
         (*_exp).type = eoper;
         (*_exp++).token = p_add;
       }
-      if (pieza == p_punto) {
+      if (current_token == p_punto) {
         struct_pointer = p_pointer;
         if ((*ob).type == tpslo)
-          member = (*ob).psgl.ostruct;
+          member = (*ob).ptr_struct_global.ostruct;
         else
           member = ob;
         lexer();
@@ -9134,34 +9134,34 @@ void factor(void) {
     case tproc:
       ob = o;
       lexer();
-      if (pieza != p_abrir)
+      if (current_token != p_abrir)
         c_error(3, 36);
       lexer();
       p = 0;
-      while (pieza != p_cerrar) { // p≡num_par
+      while (current_token != p_cerrar) { // p≡num_params
         p++;
         exp00(0);
-        if (pieza != p_cerrar) {
-          if (pieza != p_coma)
+        if (current_token != p_cerrar) {
+          if (current_token != p_coma)
             c_error(3, 25);
           else {
             lexer();
-            if (pieza == p_cerrar)
+            if (current_token == p_cerrar)
               c_error(3, 45);
           }
         }
       }
-      if (p != (*ob).proc.num_par)
+      if (p != (*ob).proc.num_params)
         c_error(1, 46);
       (*_exp).type = ecall;
-      (*_exp++).objeto = ob;
+      (*_exp++).object = ob;
       lexer();
       break;
 
     case tfunc:
       ob = o;
       lexer();
-      if (pieza != p_abrir)
+      if (current_token != p_abrir)
         c_error(3, 36);
 
       if ((*ob).func.code == 122) { // fopen("..."
@@ -9172,71 +9172,71 @@ void factor(void) {
         lexer();
 
       p = 0;
-      while (pieza != p_cerrar) { // p≡num_par
+      while (current_token != p_cerrar) { // p≡num_params
 
         if ((*ob).func.par[p] == 1) { // Type 1 parameter (struct,field)
 
           // RECEIVES: struct_name,field_name
-          // GENERATES: struct_offset,len_item,totalen,field_offset,field_type
+          // GENERATES: struct_offset,item_len,total_len,field_offset,field_type
 
-          if (pieza != p_id)
+          if (current_token != p_id)
             c_error(0, 152);
           if ((*o).member != NULL)
             c_error(0, 152);
           if ((*o).type == tsglo) {
             (*_exp).type = econs;
-            (*_exp++).valor = (*o).sglo.offset;
+            (*_exp++).value = (*o).struct_global.offset;
           } else if ((*o).type == tsloc) {
             (*_exp).type = econs;
-            (*_exp++).valor = (*o).sloc.offset;
+            (*_exp++).value = (*o).struct_local.offset;
             (*_exp).type = eoper;
             (*_exp++).token = p_punto;
           } else
             c_error(0, 152);
           (*_exp).type = econs;
-          (*_exp++).valor = (*o).sglo.len_item;
+          (*_exp++).value = (*o).struct_global.item_len;
           (*_exp).type = econs;
-          (*_exp++).valor = (*o).sglo.totalitems;
+          (*_exp++).value = (*o).struct_global.total_items;
           obs = o;
           lexer();
-          if (pieza != p_coma)
+          if (current_token != p_coma)
             c_error(0, 46);
           member = obs;
           lexer();
           member = NULL;
-          if (pieza != p_id)
+          if (current_token != p_id)
             c_error(0, 153);
           if ((*o).member != obs)
             c_error(0, 153);
           (*_exp).type = econs;
-          (*_exp++).valor = (*o).vglo.offset;
+          (*_exp++).value = (*o).var_global.offset;
           (*_exp).type = econs;
           if ((*o).type == tcglo || (*o).type == tcloc)
-            (*_exp++).valor = 1;
+            (*_exp++).value = 1;
           else if ((*o).type == tpcgl || (*o).type == tpclo)
-            (*_exp++).valor = 2;
+            (*_exp++).value = 2;
           else
-            (*_exp++).valor = 0;
+            (*_exp++).value = 0;
           lexer();
         } else { // Type 0 parameter (generic)
           exp00(0);
         }
         p++;
 
-        if (pieza != p_cerrar) {
-          if (pieza != p_coma)
+        if (current_token != p_cerrar) {
+          if (current_token != p_coma)
             c_error(3, 25);
           else {
             lexer();
-            if (pieza == p_cerrar)
+            if (current_token == p_cerrar)
               c_error(3, 45);
           }
         }
       }
-      if (p != (*ob).func.num_par)
+      if (p != (*ob).func.num_params)
         c_error(1, 46);
       (*_exp).type = efunc;
-      (*_exp++).objeto = ob;
+      (*_exp++).object = ob;
       if ((*ob).func.ret == 1)
         tipo_factor = 2;
       lexer();
@@ -9245,27 +9245,27 @@ void factor(void) {
     case tfext:
       ob = o;
       lexer();
-      if (pieza != p_abrir)
+      if (current_token != p_abrir)
         c_error(3, 36);
       lexer();
       p = 0;
-      while (pieza != p_cerrar) { // p≡num_par
+      while (current_token != p_cerrar) { // p≡num_params
         p++;
         exp00(0);
-        if (pieza != p_cerrar) {
-          if (pieza != p_coma)
+        if (current_token != p_cerrar) {
+          if (current_token != p_coma)
             c_error(3, 25);
           else {
             lexer();
-            if (pieza == p_cerrar)
+            if (current_token == p_cerrar)
               c_error(3, 45);
           }
         }
       }
-      if (p != (*ob).fext.num_par)
+      if (p != (*ob).func_extern.num_params)
         c_error(1, 46);
       (*_exp).type = efext;
-      (*_exp++).objeto = ob;
+      (*_exp++).object = ob;
       lexer();
       break;
 
@@ -9286,42 +9286,42 @@ void factor(void) {
     break;
   }
 
-  if (pieza == p_inc || pieza == p_dec) {
+  if (current_token == p_inc || current_token == p_dec) {
     if ((*(_exp - 1)).type == eoper && (*(_exp - 1)).token == p_pointer) {
       _exp--;
       (*_exp).type = eoper;
-      if (pieza == p_inc)
+      if (current_token == p_inc)
         (*_exp++).token = p_suma;
       else
         (*_exp++).token = p_resta;
     } else if ((*(_exp - 1)).type == eoper && (*(_exp - 1)).token == p_pointerchar) {
       _exp--;
       (*_exp).type = eoper;
-      if (pieza == p_inc)
+      if (current_token == p_inc)
         (*_exp++).token = p_sumachar;
       else
         (*_exp++).token = p_restachar;
     } else if ((*(_exp - 1)).type == eoper && (*(_exp - 1)).token == p_pointerbyte) {
       _exp--;
       (*_exp).type = eoper;
-      if (pieza == p_inc)
+      if (current_token == p_inc)
         (*_exp++).token = p_sumachar;
       else
         (*_exp++).token = p_restachar;
     } else if ((*(_exp - 1)).type == eoper && (*(_exp - 1)).token == p_pointerword) {
       _exp--;
       (*_exp).type = eoper;
-      if (pieza == p_inc)
+      if (current_token == p_inc)
         (*_exp++).token = p_sumaword;
       else
         (*_exp++).token = p_restaword;
     } else if ((*(_exp - 1)).type == eoper && (*(_exp - 1)).token == p_string) {
       _exp--;
       (*_exp).type = econs;
-      if (pieza == p_inc)
-        (*_exp++).valor = -1;
+      if (current_token == p_inc)
+        (*_exp++).value = -1;
       else
-        (*_exp++).valor = 1;
+        (*_exp++).value = 1;
       (*_exp).type = eoper;
       (*_exp++).token = p_strsub;
       (*_exp).type = eoper;
@@ -9333,14 +9333,14 @@ void factor(void) {
 }
 
 void factor_struct(void) {
-  struct objeto *ob;
+  struct object *ob;
 
-  if (pieza != p_id)
+  if (current_token != p_id)
     c_error(3, 58);
   switch ((*o).type) {
   case tvglo:
     (*_exp).type = econs;
-    (*_exp++).valor = (*o).vglo.offset;
+    (*_exp++).value = (*o).var_global.offset;
     (*_exp).type = eoper;
     (*_exp++).token = p_add;
     member = NULL;
@@ -9350,13 +9350,13 @@ void factor_struct(void) {
   case ttglo:
   case tpigl:
     (*_exp).type = econs;
-    (*_exp++).valor = (*o).tglo.offset;
+    (*_exp++).value = (*o).table_global.offset;
     ob = o;
     (*_exp).type = eoper;
     (*_exp++).token = p_add;
     member = NULL;
     lexer();
-    if (pieza == p_corab) {
+    if (current_token == p_corab) {
       if ((*ob).type == tpigl) {
         (*_exp).type = eoper;
         (*_exp++).token = p_pointer;
@@ -9365,44 +9365,44 @@ void factor_struct(void) {
       }
       lexer();
       exp00(0);
-      if ((*ob).tglo.len1 > -1)
+      if ((*ob).table_global.len1 > -1)
         if (comprueba_rango) {
           (*_exp).type = erango;
-          (*_exp++).valor = (*ob).tglo.len1;
+          (*_exp++).value = (*ob).table_global.len1;
         }
-      if ((*ob).tglo.len2 > -1) {
-        if (pieza != p_coma)
+      if ((*ob).table_global.len2 > -1) {
+        if (current_token != p_coma)
           c_error(3, 130);
         lexer();
         exp00(0);
         if (comprueba_rango) {
           (*_exp).type = erango;
-          (*_exp++).valor = (*ob).tglo.len2;
+          (*_exp++).value = (*ob).table_global.len2;
         }
-        if ((*ob).tglo.len3 > -1) {
-          if (pieza != p_coma)
+        if ((*ob).table_global.len3 > -1) {
+          if (current_token != p_coma)
             c_error(3, 130);
           lexer();
           exp00(0);
           if (comprueba_rango) {
             (*_exp).type = erango;
-            (*_exp++).valor = (*ob).tglo.len3;
+            (*_exp++).value = (*ob).table_global.len3;
           }
           (*_exp).type = econs;
-          (*_exp++).valor = (*ob).tglo.len2 + 1;
+          (*_exp++).value = (*ob).table_global.len2 + 1;
           (*_exp).type = eoper;
           (*_exp++).token = p_mul;
           (*_exp).type = eoper;
           (*_exp++).token = p_add;
         }
         (*_exp).type = econs;
-        (*_exp++).valor = (*ob).tglo.len1 + 1;
+        (*_exp++).value = (*ob).table_global.len1 + 1;
         (*_exp).type = eoper;
         (*_exp++).token = p_mul;
         (*_exp).type = eoper;
         (*_exp++).token = p_add;
       }
-      if (pieza != p_corce) {
+      if (current_token != p_corce) {
         c_error(3, 26);
       }
       lexer();
@@ -9415,67 +9415,67 @@ void factor_struct(void) {
   case tpbgl:
   case tpcgl:
     (*_exp).type = econs;
-    (*_exp++).valor = (*o).bglo.offset;
+    (*_exp++).value = (*o).byte_global.offset;
     ob = o;
     (*_exp).type = eoper;
     (*_exp++).token = p_add;
     member = NULL;
     lexer();
     if ((*ob).type == tpbgl || (*ob).type == tpcgl) {
-      if (pieza != p_corab)
+      if (current_token != p_corab)
         break;
       (*_exp).type = eoper;
       (*_exp++).token = p_pointer;
       if (comprueba_null)
         (*_exp++).type = enull;
     }
-    if (pieza == p_corab) {
+    if (current_token == p_corab) {
       lexer();
       exp00(0);
-      if ((*ob).bglo.len1 > -1)
+      if ((*ob).byte_global.len1 > -1)
         if (comprueba_rango) {
           (*_exp).type = erango;
-          (*_exp++).valor = (*ob).bglo.len1;
+          (*_exp++).value = (*ob).byte_global.len1;
         }
-      if ((*ob).bglo.len2 > -1) {
-        if (pieza != p_coma)
+      if ((*ob).byte_global.len2 > -1) {
+        if (current_token != p_coma)
           c_error(3, 130);
         lexer();
         exp00(0);
         if (comprueba_rango) {
           (*_exp).type = erango;
-          (*_exp++).valor = (*ob).bglo.len2;
+          (*_exp++).value = (*ob).byte_global.len2;
         }
-        if ((*ob).bglo.len3 > -1) {
-          if (pieza != p_coma)
+        if ((*ob).byte_global.len3 > -1) {
+          if (current_token != p_coma)
             c_error(3, 130);
           lexer();
           exp00(0);
           if (comprueba_rango) {
             (*_exp).type = erango;
-            (*_exp++).valor = (*ob).bglo.len3;
+            (*_exp++).value = (*ob).byte_global.len3;
           }
           (*_exp).type = econs;
-          (*_exp++).valor = (*ob).bglo.len2 + 1;
+          (*_exp++).value = (*ob).byte_global.len2 + 1;
           (*_exp).type = eoper;
           (*_exp++).token = p_mul;
           (*_exp).type = eoper;
           (*_exp++).token = p_add;
         }
         (*_exp).type = econs;
-        (*_exp++).valor = (*ob).bglo.len1 + 1;
+        (*_exp++).value = (*ob).byte_global.len1 + 1;
         (*_exp).type = eoper;
         (*_exp++).token = p_mul;
         (*_exp).type = eoper;
         (*_exp++).token = p_add;
       }
-      if (pieza != p_corce) {
+      if (current_token != p_corce) {
         c_error(3, 26);
       }
       lexer();
     } else { // mi_byte ≡ mi_byte[0]
       (*_exp).type = econs;
-      (*_exp++).valor = 0;
+      (*_exp++).value = 0;
     }
     struct_pointer = p_pointerbyte;
     break;
@@ -9483,87 +9483,87 @@ void factor_struct(void) {
   case twglo:
   case tpwgl:
     (*_exp).type = econs;
-    (*_exp++).valor = (*o).wglo.offset;
+    (*_exp++).value = (*o).word_global.offset;
     ob = o;
     (*_exp).type = eoper;
     (*_exp++).token = p_add;
     member = NULL;
     lexer();
     if ((*ob).type == tpwgl) {
-      if (pieza != p_corab)
+      if (current_token != p_corab)
         break;
       (*_exp).type = eoper;
       (*_exp++).token = p_pointer;
       if (comprueba_null)
         (*_exp++).type = enull;
     }
-    if (pieza == p_corab) {
+    if (current_token == p_corab) {
       lexer();
       exp00(0);
-      if ((*ob).wglo.len1 > -1)
+      if ((*ob).word_global.len1 > -1)
         if (comprueba_rango) {
           (*_exp).type = erango;
-          (*_exp++).valor = (*ob).wglo.len1;
+          (*_exp++).value = (*ob).word_global.len1;
         }
-      if ((*ob).wglo.len2 > -1) {
-        if (pieza != p_coma)
+      if ((*ob).word_global.len2 > -1) {
+        if (current_token != p_coma)
           c_error(3, 130);
         lexer();
         exp00(0);
         if (comprueba_rango) {
           (*_exp).type = erango;
-          (*_exp++).valor = (*ob).wglo.len2;
+          (*_exp++).value = (*ob).word_global.len2;
         }
-        if ((*ob).wglo.len3 > -1) {
-          if (pieza != p_coma)
+        if ((*ob).word_global.len3 > -1) {
+          if (current_token != p_coma)
             c_error(3, 130);
           lexer();
           exp00(0);
           if (comprueba_rango) {
             (*_exp).type = erango;
-            (*_exp++).valor = (*ob).wglo.len3;
+            (*_exp++).value = (*ob).word_global.len3;
           }
           (*_exp).type = econs;
-          (*_exp++).valor = (*ob).wglo.len2 + 1;
+          (*_exp++).value = (*ob).word_global.len2 + 1;
           (*_exp).type = eoper;
           (*_exp++).token = p_mul;
           (*_exp).type = eoper;
           (*_exp++).token = p_add;
         }
         (*_exp).type = econs;
-        (*_exp++).valor = (*ob).wglo.len1 + 1;
+        (*_exp++).value = (*ob).word_global.len1 + 1;
         (*_exp).type = eoper;
         (*_exp++).token = p_mul;
         (*_exp).type = eoper;
         (*_exp++).token = p_add;
       }
-      if (pieza != p_corce) {
+      if (current_token != p_corce) {
         c_error(3, 26);
       }
       lexer();
     } else { // mi_byte ≡ mi_byte[0]
       (*_exp).type = econs;
-      (*_exp++).valor = 0;
+      (*_exp++).value = 0;
     }
     struct_pointer = p_pointerword;
     break;
 
   case tcglo:
     (*_exp).type = estring;
-    (*_exp++).valor = (*o).cglo.offset;
+    (*_exp++).value = (*o).string_global.offset;
     ob = o;
     (*_exp).type = eoper;
     (*_exp++).token = p_add;
     member = NULL;
     lexer();
-    if (pieza == p_corab) {
+    if (current_token == p_corab) {
       lexer();
       exp00(0);
       if (comprueba_rango) {
         (*_exp).type = erango;
-        (*_exp++).valor = (*ob).cglo.totalen;
+        (*_exp++).value = (*ob).string_global.total_len;
       }
-      if (pieza != p_corce)
+      if (current_token != p_corce)
         c_error(3, 26);
       lexer();
       struct_pointer = p_pointerchar;
@@ -9571,7 +9571,7 @@ void factor_struct(void) {
       tipo_factor = 2;
       if (tipo_expresion == 1) {
         (*_exp).type = econs;
-        (*_exp++).valor = 0;
+        (*_exp++).value = 0;
         struct_pointer = p_pointerchar;
       } else {
         if (tipo_expresion == -1) {
@@ -9586,79 +9586,79 @@ void factor_struct(void) {
   case tsglo:
   case tpsgl:
     (*_exp).type = econs;
-    (*_exp++).valor = (*o).sglo.offset;
+    (*_exp++).value = (*o).struct_global.offset;
     ob = o;
     (*_exp).type = eoper;
     (*_exp++).token = p_add;
     member = NULL;
     lexer();
     if ((*ob).type == tpsgl) {
-      if (pieza != p_corab && pieza != p_punto)
+      if (current_token != p_corab && current_token != p_punto)
         break;
       (*_exp).type = eoper;
       (*_exp++).token = p_pointer;
       if (comprueba_null)
         (*_exp++).type = enull;
     }
-    if (pieza == p_corab) {
+    if (current_token == p_corab) {
       lexer();
       exp00(0);
-      if ((*ob).sglo.items1 > -1)
+      if ((*ob).struct_global.dim1 > -1)
         if (comprueba_rango) {
           (*_exp).type = erango;
-          (*_exp++).valor = (*ob).sglo.items1;
+          (*_exp++).value = (*ob).struct_global.dim1;
         }
-      if ((*ob).sglo.items2 > -1) {
-        if (pieza != p_coma)
+      if ((*ob).struct_global.dim2 > -1) {
+        if (current_token != p_coma)
           c_error(3, 131);
         lexer();
         exp00(0);
         if (comprueba_rango) {
           (*_exp).type = erango;
-          (*_exp++).valor = (*ob).sglo.items2;
+          (*_exp++).value = (*ob).struct_global.dim2;
         }
-        if ((*ob).sglo.items3 > -1) {
-          if (pieza != p_coma)
+        if ((*ob).struct_global.dim3 > -1) {
+          if (current_token != p_coma)
             c_error(3, 131);
           lexer();
           exp00(0);
           if (comprueba_rango) {
             (*_exp).type = erango;
-            (*_exp++).valor = (*ob).sglo.items3;
+            (*_exp++).value = (*ob).struct_global.dim3;
           }
           (*_exp).type = econs;
-          (*_exp++).valor = (*ob).sglo.items2 + 1;
+          (*_exp++).value = (*ob).struct_global.dim2 + 1;
           (*_exp).type = eoper;
           (*_exp++).token = p_mul;
           (*_exp).type = eoper;
           (*_exp++).token = p_add;
         }
         (*_exp).type = econs;
-        (*_exp++).valor = (*ob).sglo.items1 + 1;
+        (*_exp++).value = (*ob).struct_global.dim1 + 1;
         (*_exp).type = eoper;
         (*_exp++).token = p_mul;
         (*_exp).type = eoper;
         (*_exp++).token = p_add;
       }
-      if (pieza != p_corce) {
+      if (current_token != p_corce) {
         c_error(3, 26);
       }
       lexer();
       if ((*ob).type == tpsgl) {
         (*_exp).type = econs;
-        (*_exp++).valor = (*((*ob).psgl.ostruct)).sglo.len_item;
+        (*_exp++).value = (*((*ob).ptr_struct_global.ostruct)).struct_global.item_len;
       } else {
         (*_exp).type = econs;
-        (*_exp++).valor = (*ob).sglo.len_item;
+        (*_exp++).value = (*ob).struct_global.item_len;
       }
       (*_exp).type = eoper;
       (*_exp++).token = p_mul;
       (*_exp).type = eoper;
       (*_exp++).token = p_add;
     }
-    if (pieza == p_punto) {
+    if (current_token == p_punto) {
       if ((*ob).type == tpsgl)
-        member = (*ob).psgl.ostruct;
+        member = (*ob).ptr_struct_global.ostruct;
       else
         member = ob;
       lexer();
@@ -9668,7 +9668,7 @@ void factor_struct(void) {
 
   case tvloc:
     (*_exp).type = econs;
-    (*_exp++).valor = (*o).vloc.offset;
+    (*_exp++).value = (*o).var_local.offset;
     (*_exp).type = eoper;
     (*_exp++).token = p_add;
     member = NULL;
@@ -9678,13 +9678,13 @@ void factor_struct(void) {
   case ttloc:
   case tpilo:
     (*_exp).type = econs;
-    (*_exp++).valor = (*o).tloc.offset;
+    (*_exp++).value = (*o).table_local.offset;
     ob = o;
     (*_exp).type = eoper;
     (*_exp++).token = p_add;
     member = NULL;
     lexer();
-    if (pieza == p_corab) {
+    if (current_token == p_corab) {
       if ((*ob).type == tpilo) {
         (*_exp).type = eoper;
         (*_exp++).token = p_pointer;
@@ -9693,44 +9693,44 @@ void factor_struct(void) {
       }
       lexer();
       exp00(0);
-      if ((*ob).tloc.len1 > -1)
+      if ((*ob).table_local.len1 > -1)
         if (comprueba_rango) {
           (*_exp).type = erango;
-          (*_exp++).valor = (*ob).tloc.len1;
+          (*_exp++).value = (*ob).table_local.len1;
         }
-      if ((*ob).tloc.len2 > -1) {
-        if (pieza != p_coma)
+      if ((*ob).table_local.len2 > -1) {
+        if (current_token != p_coma)
           c_error(3, 130);
         lexer();
         exp00(0);
         if (comprueba_rango) {
           (*_exp).type = erango;
-          (*_exp++).valor = (*ob).tloc.len2;
+          (*_exp++).value = (*ob).table_local.len2;
         }
-        if ((*ob).tloc.len3 > -1) {
-          if (pieza != p_coma)
+        if ((*ob).table_local.len3 > -1) {
+          if (current_token != p_coma)
             c_error(3, 130);
           lexer();
           exp00(0);
           if (comprueba_rango) {
             (*_exp).type = erango;
-            (*_exp++).valor = (*ob).tloc.len3;
+            (*_exp++).value = (*ob).table_local.len3;
           }
           (*_exp).type = econs;
-          (*_exp++).valor = (*ob).tloc.len2 + 1;
+          (*_exp++).value = (*ob).table_local.len2 + 1;
           (*_exp).type = eoper;
           (*_exp++).token = p_mul;
           (*_exp).type = eoper;
           (*_exp++).token = p_add;
         }
         (*_exp).type = econs;
-        (*_exp++).valor = (*ob).tloc.len1 + 1;
+        (*_exp++).value = (*ob).table_local.len1 + 1;
         (*_exp).type = eoper;
         (*_exp++).token = p_mul;
         (*_exp).type = eoper;
         (*_exp++).token = p_add;
       }
-      if (pieza != p_corce) {
+      if (current_token != p_corce) {
         c_error(3, 26);
       }
       lexer();
@@ -9743,67 +9743,67 @@ void factor_struct(void) {
   case tpblo:
   case tpclo:
     (*_exp).type = econs;
-    (*_exp++).valor = (*o).bloc.offset;
+    (*_exp++).value = (*o).byte_local.offset;
     ob = o;
     (*_exp).type = eoper;
     (*_exp++).token = p_add;
     member = NULL;
     lexer();
     if ((*ob).type == tpblo || (*ob).type == tpcgl) {
-      if (pieza != p_corab)
+      if (current_token != p_corab)
         break;
       (*_exp).type = eoper;
       (*_exp++).token = p_pointer;
       if (comprueba_null)
         (*_exp++).type = enull;
     }
-    if (pieza == p_corab) {
+    if (current_token == p_corab) {
       lexer();
       exp00(0);
-      if ((*ob).bloc.len1 > -1)
+      if ((*ob).byte_local.len1 > -1)
         if (comprueba_rango) {
           (*_exp).type = erango;
-          (*_exp++).valor = (*ob).bloc.len1;
+          (*_exp++).value = (*ob).byte_local.len1;
         }
-      if ((*ob).bloc.len2 > -1) {
-        if (pieza != p_coma)
+      if ((*ob).byte_local.len2 > -1) {
+        if (current_token != p_coma)
           c_error(3, 130);
         lexer();
         exp00(0);
         if (comprueba_rango) {
           (*_exp).type = erango;
-          (*_exp++).valor = (*ob).bloc.len2;
+          (*_exp++).value = (*ob).byte_local.len2;
         }
-        if ((*ob).bloc.len3 > -1) {
-          if (pieza != p_coma)
+        if ((*ob).byte_local.len3 > -1) {
+          if (current_token != p_coma)
             c_error(3, 130);
           lexer();
           exp00(0);
           if (comprueba_rango) {
             (*_exp).type = erango;
-            (*_exp++).valor = (*ob).bloc.len3;
+            (*_exp++).value = (*ob).byte_local.len3;
           }
           (*_exp).type = econs;
-          (*_exp++).valor = (*ob).bloc.len2 + 1;
+          (*_exp++).value = (*ob).byte_local.len2 + 1;
           (*_exp).type = eoper;
           (*_exp++).token = p_mul;
           (*_exp).type = eoper;
           (*_exp++).token = p_add;
         }
         (*_exp).type = econs;
-        (*_exp++).valor = (*ob).bloc.len1 + 1;
+        (*_exp++).value = (*ob).byte_local.len1 + 1;
         (*_exp).type = eoper;
         (*_exp++).token = p_mul;
         (*_exp).type = eoper;
         (*_exp++).token = p_add;
       }
-      if (pieza != p_corce) {
+      if (current_token != p_corce) {
         c_error(3, 26);
       }
       lexer();
     } else { // mi_byte ≡ mi_byte[0]
       (*_exp).type = econs;
-      (*_exp++).valor = 0;
+      (*_exp++).value = 0;
     }
     struct_pointer = p_pointerbyte;
     break;
@@ -9811,87 +9811,87 @@ void factor_struct(void) {
   case twloc:
   case tpwlo:
     (*_exp).type = econs;
-    (*_exp++).valor = (*o).wloc.offset;
+    (*_exp++).value = (*o).word_local.offset;
     ob = o;
     (*_exp).type = eoper;
     (*_exp++).token = p_add;
     member = NULL;
     lexer();
     if ((*ob).type == tpwlo) {
-      if (pieza != p_corab)
+      if (current_token != p_corab)
         break;
       (*_exp).type = eoper;
       (*_exp++).token = p_pointer;
       if (comprueba_null)
         (*_exp++).type = enull;
     }
-    if (pieza == p_corab) {
+    if (current_token == p_corab) {
       lexer();
       exp00(0);
-      if ((*ob).wloc.len1 > -1)
+      if ((*ob).word_local.len1 > -1)
         if (comprueba_rango) {
           (*_exp).type = erango;
-          (*_exp++).valor = (*ob).wloc.len1;
+          (*_exp++).value = (*ob).word_local.len1;
         }
-      if ((*ob).wloc.len2 > -1) {
-        if (pieza != p_coma)
+      if ((*ob).word_local.len2 > -1) {
+        if (current_token != p_coma)
           c_error(3, 130);
         lexer();
         exp00(0);
         if (comprueba_rango) {
           (*_exp).type = erango;
-          (*_exp++).valor = (*ob).wloc.len2;
+          (*_exp++).value = (*ob).word_local.len2;
         }
-        if ((*ob).wloc.len3 > -1) {
-          if (pieza != p_coma)
+        if ((*ob).word_local.len3 > -1) {
+          if (current_token != p_coma)
             c_error(3, 130);
           lexer();
           exp00(0);
           if (comprueba_rango) {
             (*_exp).type = erango;
-            (*_exp++).valor = (*ob).wloc.len3;
+            (*_exp++).value = (*ob).word_local.len3;
           }
           (*_exp).type = econs;
-          (*_exp++).valor = (*ob).wloc.len2 + 1;
+          (*_exp++).value = (*ob).word_local.len2 + 1;
           (*_exp).type = eoper;
           (*_exp++).token = p_mul;
           (*_exp).type = eoper;
           (*_exp++).token = p_add;
         }
         (*_exp).type = econs;
-        (*_exp++).valor = (*ob).wloc.len1 + 1;
+        (*_exp++).value = (*ob).word_local.len1 + 1;
         (*_exp).type = eoper;
         (*_exp++).token = p_mul;
         (*_exp).type = eoper;
         (*_exp++).token = p_add;
       }
-      if (pieza != p_corce) {
+      if (current_token != p_corce) {
         c_error(3, 26);
       }
       lexer();
     } else { // mi_byte ≡ mi_byte[0]
       (*_exp).type = econs;
-      (*_exp++).valor = 0;
+      (*_exp++).value = 0;
     }
     struct_pointer = p_pointerword;
     break;
 
   case tcloc:
     (*_exp).type = estring;
-    (*_exp++).valor = (*o).cloc.offset;
+    (*_exp++).value = (*o).string_local.offset;
     ob = o;
     (*_exp).type = eoper;
     (*_exp++).token = p_add;
     member = NULL;
     lexer();
-    if (pieza == p_corab) {
+    if (current_token == p_corab) {
       lexer();
       exp00(0);
       if (comprueba_rango) {
         (*_exp).type = erango;
-        (*_exp++).valor = (*ob).cloc.totalen;
+        (*_exp++).value = (*ob).string_local.total_len;
       }
-      if (pieza != p_corce)
+      if (current_token != p_corce)
         c_error(3, 26);
       lexer();
       struct_pointer = p_pointerchar;
@@ -9899,7 +9899,7 @@ void factor_struct(void) {
       tipo_factor = 2;
       if (tipo_expresion == 1) {
         (*_exp).type = econs;
-        (*_exp++).valor = 0;
+        (*_exp++).value = 0;
         struct_pointer = p_pointerchar;
       } else {
         if (tipo_expresion == -1) {
@@ -9914,79 +9914,79 @@ void factor_struct(void) {
   case tsloc:
   case tpslo:
     (*_exp).type = econs;
-    (*_exp++).valor = (*o).sloc.offset;
+    (*_exp++).value = (*o).struct_local.offset;
     ob = o;
     (*_exp).type = eoper;
     (*_exp++).token = p_add;
     member = NULL;
     lexer();
     if ((*ob).type == tpslo) {
-      if (pieza != p_corab && pieza != p_punto)
+      if (current_token != p_corab && current_token != p_punto)
         break;
       (*_exp).type = eoper;
       (*_exp++).token = p_pointer;
       if (comprueba_null)
         (*_exp++).type = enull;
     }
-    if (pieza == p_corab) {
+    if (current_token == p_corab) {
       lexer();
       exp00(0);
-      if ((*ob).sloc.items1 > -1)
+      if ((*ob).struct_local.dim1 > -1)
         if (comprueba_rango) {
           (*_exp).type = erango;
-          (*_exp++).valor = (*ob).sloc.items1;
+          (*_exp++).value = (*ob).struct_local.dim1;
         }
-      if ((*ob).sloc.items2 > -1) {
-        if (pieza != p_coma)
+      if ((*ob).struct_local.dim2 > -1) {
+        if (current_token != p_coma)
           c_error(3, 131);
         lexer();
         exp00(0);
         if (comprueba_rango) {
           (*_exp).type = erango;
-          (*_exp++).valor = (*ob).sloc.items2;
+          (*_exp++).value = (*ob).struct_local.dim2;
         }
-        if ((*ob).sloc.items3 > -1) {
-          if (pieza != p_coma)
+        if ((*ob).struct_local.dim3 > -1) {
+          if (current_token != p_coma)
             c_error(3, 131);
           lexer();
           exp00(0);
           if (comprueba_rango) {
             (*_exp).type = erango;
-            (*_exp++).valor = (*ob).sloc.items3;
+            (*_exp++).value = (*ob).struct_local.dim3;
           }
           (*_exp).type = econs;
-          (*_exp++).valor = (*ob).sloc.items2 + 1;
+          (*_exp++).value = (*ob).struct_local.dim2 + 1;
           (*_exp).type = eoper;
           (*_exp++).token = p_mul;
           (*_exp).type = eoper;
           (*_exp++).token = p_add;
         }
         (*_exp).type = econs;
-        (*_exp++).valor = (*ob).sloc.items1 + 1;
+        (*_exp++).value = (*ob).struct_local.dim1 + 1;
         (*_exp).type = eoper;
         (*_exp++).token = p_mul;
         (*_exp).type = eoper;
         (*_exp++).token = p_add;
       }
-      if (pieza != p_corce) {
+      if (current_token != p_corce) {
         c_error(3, 26);
       }
       lexer();
       if ((*ob).type == tpslo) {
         (*_exp).type = econs;
-        (*_exp++).valor = (*((*ob).pslo.ostruct)).sloc.len_item;
+        (*_exp++).value = (*((*ob).ptr_struct_local.ostruct)).struct_local.item_len;
       } else {
         (*_exp).type = econs;
-        (*_exp++).valor = (*ob).sloc.len_item;
+        (*_exp++).value = (*ob).struct_local.item_len;
       }
       (*_exp).type = eoper;
       (*_exp++).token = p_mul;
       (*_exp).type = eoper;
       (*_exp++).token = p_add;
     }
-    if (pieza == p_punto) {
+    if (current_token == p_punto) {
       if ((*ob).type == tpslo)
-        member = (*ob).pslo.ostruct;
+        member = (*ob).ptr_struct_local.ostruct;
       else
         member = ob;
       lexer();
@@ -10018,30 +10018,30 @@ void list_objects(void) {
     fprintf(sta, "[%u]: %u\n", n, mem[n]);
   fprintf(sta, "\n");
 
-  for (n = 0; n < num_obj; n++) {
+  for (n = 0; n < num_objects; n++) {
     switch (obj[n].type) {
     case tnone:
       fprintf(sta, "%5u\ttnone: %s", n, obj[n].name);
-      if (obj[n].usado)
-        fprintf(sta, " (*) usado\n");
+      if (obj[n].used)
+        fprintf(sta, " (*) used\n");
       else
         fprintf(sta, "\n");
       break;
     case tcons:
       fprintf(sta, "%5u\ttcons: %s", n, obj[n].name);
-      if (obj[n].usado)
-        fprintf(sta, " (*) usado\n");
+      if (obj[n].used)
+        fprintf(sta, " (*) used\n");
       else
         fprintf(sta, "\n");
-      fprintf(sta, "\tvalor=%u\n", obj[n].cons.valor);
+      fprintf(sta, "\tvalor=%u\n", obj[n].cons.value);
       break;
     case tvglo:
       fprintf(sta, "%5u\ttvglo: %s", n, obj[n].name);
-      if (obj[n].usado)
-        fprintf(sta, " (*) usado\n");
+      if (obj[n].used)
+        fprintf(sta, " (*) used\n");
       else
         fprintf(sta, "\n");
-      fprintf(sta, "\toffset=%u\n", o = obj[n].vglo.offset);
+      fprintf(sta, "\toffset=%u\n", o = obj[n].var_global.offset);
       if (obj[n].member)
         fprintf(sta, "\tmember of %s\n", (*obj[n].member).name);
       else
@@ -10049,15 +10049,15 @@ void list_objects(void) {
       break;
     case ttglo:
       fprintf(sta, "%5u\tttglo: %s", n, obj[n].name);
-      if (obj[n].usado)
-        fprintf(sta, " (*) usado\n");
+      if (obj[n].used)
+        fprintf(sta, " (*) used\n");
       else
         fprintf(sta, "\n");
-      fprintf(sta, "\toffset=%u\n", o = obj[n].tglo.offset);
-      fprintf(sta, "\tlen1=%u\n", obj[n].tglo.len1);
-      fprintf(sta, "\tlen2=%u\n", obj[n].tglo.len2);
-      fprintf(sta, "\tlen3=%u\n", obj[n].tglo.len3);
-      fprintf(sta, "\ttotalen=%u\n", obj[n].tglo.totalen);
+      fprintf(sta, "\toffset=%u\n", o = obj[n].table_global.offset);
+      fprintf(sta, "\tlen1=%u\n", obj[n].table_global.len1);
+      fprintf(sta, "\tlen2=%u\n", obj[n].table_global.len2);
+      fprintf(sta, "\tlen3=%u\n", obj[n].table_global.len3);
+      fprintf(sta, "\ttotalen=%u\n", obj[n].table_global.total_len);
       if (obj[n].member)
         fprintf(sta, "\tmember of %s\n", (*obj[n].member).name);
       break;
@@ -10066,55 +10066,55 @@ void list_objects(void) {
     case tpcgl:
     case tpigl:
       fprintf(sta, "%5u\ttp?gl: %s", n, obj[n].name);
-      if (obj[n].usado)
-        fprintf(sta, " (*) usado\n");
+      if (obj[n].used)
+        fprintf(sta, " (*) used\n");
       else
         fprintf(sta, "\n");
-      fprintf(sta, "\toffset=%u\n", o = obj[n].tglo.offset);
-      fprintf(sta, "\tlen1=%u\n", obj[n].tglo.len1);
-      fprintf(sta, "\tlen2=%u\n", obj[n].tglo.len2);
-      fprintf(sta, "\tlen3=%u\n", obj[n].tglo.len3);
-      fprintf(sta, "\ttotalen=%u\n", obj[n].tglo.totalen);
+      fprintf(sta, "\toffset=%u\n", o = obj[n].table_global.offset);
+      fprintf(sta, "\tlen1=%u\n", obj[n].table_global.len1);
+      fprintf(sta, "\tlen2=%u\n", obj[n].table_global.len2);
+      fprintf(sta, "\tlen3=%u\n", obj[n].table_global.len3);
+      fprintf(sta, "\ttotalen=%u\n", obj[n].table_global.total_len);
       if (obj[n].member)
         fprintf(sta, "\tmember of %s\n", (*obj[n].member).name);
       break;
     case tsglo:
       fprintf(sta, "%5u\ttsglo: %s", n, obj[n].name);
-      if (obj[n].usado)
-        fprintf(sta, " (*) usado\n");
+      if (obj[n].used)
+        fprintf(sta, " (*) used\n");
       else
         fprintf(sta, "\n");
-      fprintf(sta, "\toffset=%u\n", o = obj[n].sglo.offset);
-      fprintf(sta, "\titems1=%u\n", obj[n].sglo.items1);
-      fprintf(sta, "\titems2=%u\n", obj[n].sglo.items2);
-      fprintf(sta, "\titems3=%u\n", obj[n].sglo.items3);
-      fprintf(sta, "\ttotalitems=%u\n", l = obj[n].sglo.totalitems);
-      fprintf(sta, "\tlen_item=%u\n", obj[n].sglo.len_item);
+      fprintf(sta, "\toffset=%u\n", o = obj[n].struct_global.offset);
+      fprintf(sta, "\titems1=%u\n", obj[n].struct_global.dim1);
+      fprintf(sta, "\titems2=%u\n", obj[n].struct_global.dim2);
+      fprintf(sta, "\titems3=%u\n", obj[n].struct_global.dim3);
+      fprintf(sta, "\ttotalitems=%u\n", l = obj[n].struct_global.total_items);
+      fprintf(sta, "\tlen_item=%u\n", obj[n].struct_global.item_len);
       if (obj[n].member)
         fprintf(sta, "\tmember of %s\n", (*obj[n].member).name);
       break;
     case tpsgl:
       fprintf(sta, "%5u\ttpsgl: %s", n, obj[n].name);
-      if (obj[n].usado)
-        fprintf(sta, " (*) usado\n");
+      if (obj[n].used)
+        fprintf(sta, " (*) used\n");
       else
         fprintf(sta, "\n");
-      fprintf(sta, "\toffset=%u\n", o = obj[n].sglo.offset);
-      fprintf(sta, "\titems1=%u\n", obj[n].sglo.items1);
-      fprintf(sta, "\titems2=%u\n", obj[n].sglo.items2);
-      fprintf(sta, "\titems3=%u\n", obj[n].sglo.items3);
-      fprintf(sta, "\ttotalitems=%u\n", l = obj[n].sglo.totalitems);
-      fprintf(sta, "\tlen_item=%u\n", obj[n].sglo.len_item);
+      fprintf(sta, "\toffset=%u\n", o = obj[n].struct_global.offset);
+      fprintf(sta, "\titems1=%u\n", obj[n].struct_global.dim1);
+      fprintf(sta, "\titems2=%u\n", obj[n].struct_global.dim2);
+      fprintf(sta, "\titems3=%u\n", obj[n].struct_global.dim3);
+      fprintf(sta, "\ttotalitems=%u\n", l = obj[n].struct_global.total_items);
+      fprintf(sta, "\tlen_item=%u\n", obj[n].struct_global.item_len);
       if (obj[n].member)
         fprintf(sta, "\tmember of %s\n", (*obj[n].member).name);
       break;
     case tvloc:
       fprintf(sta, "%5u\ttvloc: %s", n, obj[n].name);
-      if (obj[n].usado)
-        fprintf(sta, " (*) usado\n");
+      if (obj[n].used)
+        fprintf(sta, " (*) used\n");
       else
         fprintf(sta, "\n");
-      fprintf(sta, "\toffset=%u\n", o = obj[n].vloc.offset);
+      fprintf(sta, "\toffset=%u\n", o = obj[n].var_local.offset);
       if (obj[n].member)
         fprintf(sta, "\tmember of %s\n", (*obj[n].member).name);
       else
@@ -10122,15 +10122,15 @@ void list_objects(void) {
       break;
     case ttloc:
       fprintf(sta, "%5u\tttloc: %s", n, obj[n].name);
-      if (obj[n].usado)
-        fprintf(sta, " (*) usado\n");
+      if (obj[n].used)
+        fprintf(sta, " (*) used\n");
       else
         fprintf(sta, "\n");
-      fprintf(sta, "\toffset=%u\n", o = obj[n].tloc.offset);
-      fprintf(sta, "\tlen1=%u\n", obj[n].tloc.len1);
-      fprintf(sta, "\tlen2=%u\n", obj[n].tloc.len2);
-      fprintf(sta, "\tlen3=%u\n", obj[n].tloc.len3);
-      fprintf(sta, "\ttotalen=%u\n", obj[n].tloc.totalen);
+      fprintf(sta, "\toffset=%u\n", o = obj[n].table_local.offset);
+      fprintf(sta, "\tlen1=%u\n", obj[n].table_local.len1);
+      fprintf(sta, "\tlen2=%u\n", obj[n].table_local.len2);
+      fprintf(sta, "\tlen3=%u\n", obj[n].table_local.len3);
+      fprintf(sta, "\ttotalen=%u\n", obj[n].table_local.total_len);
       if (obj[n].member)
         fprintf(sta, "\tmember of %s\n", (*obj[n].member).name);
       break;
@@ -10139,134 +10139,134 @@ void list_objects(void) {
     case tpclo:
     case tpilo:
       fprintf(sta, "%5u\ttp?lo: %s", n, obj[n].name);
-      if (obj[n].usado)
-        fprintf(sta, " (*) usado\n");
+      if (obj[n].used)
+        fprintf(sta, " (*) used\n");
       else
         fprintf(sta, "\n");
-      fprintf(sta, "\toffset=%u\n", o = obj[n].tloc.offset);
-      fprintf(sta, "\tlen1=%u\n", obj[n].tloc.len1);
-      fprintf(sta, "\tlen2=%u\n", obj[n].tloc.len2);
-      fprintf(sta, "\tlen3=%u\n", obj[n].tloc.len3);
-      fprintf(sta, "\ttotalen=%u\n", obj[n].tloc.totalen);
+      fprintf(sta, "\toffset=%u\n", o = obj[n].table_local.offset);
+      fprintf(sta, "\tlen1=%u\n", obj[n].table_local.len1);
+      fprintf(sta, "\tlen2=%u\n", obj[n].table_local.len2);
+      fprintf(sta, "\tlen3=%u\n", obj[n].table_local.len3);
+      fprintf(sta, "\ttotalen=%u\n", obj[n].table_local.total_len);
       if (obj[n].member)
         fprintf(sta, "\tmember of %s\n", (*obj[n].member).name);
       break;
     case tsloc:
       fprintf(sta, "%5u\ttsloc: %s", n, obj[n].name);
-      if (obj[n].usado)
-        fprintf(sta, " (*) usado\n");
+      if (obj[n].used)
+        fprintf(sta, " (*) used\n");
       else
         fprintf(sta, "\n");
-      fprintf(sta, "\toffset=%u\n", o = obj[n].sloc.offset);
-      fprintf(sta, "\titems1=%u\n", obj[n].sloc.items1);
-      fprintf(sta, "\titems2=%u\n", obj[n].sloc.items2);
-      fprintf(sta, "\titems3=%u\n", obj[n].sloc.items3);
-      fprintf(sta, "\ttotalitems=%u\n", l = obj[n].sloc.totalitems);
-      fprintf(sta, "\tlen_item=%u\n", obj[n].sloc.len_item);
+      fprintf(sta, "\toffset=%u\n", o = obj[n].struct_local.offset);
+      fprintf(sta, "\titems1=%u\n", obj[n].struct_local.dim1);
+      fprintf(sta, "\titems2=%u\n", obj[n].struct_local.dim2);
+      fprintf(sta, "\titems3=%u\n", obj[n].struct_local.dim3);
+      fprintf(sta, "\ttotalitems=%u\n", l = obj[n].struct_local.total_items);
+      fprintf(sta, "\tlen_item=%u\n", obj[n].struct_local.item_len);
       if (obj[n].member)
         fprintf(sta, "\tmember of %s\n", (*obj[n].member).name);
       break;
     case tpslo:
       fprintf(sta, "%5u\ttpslo: %s", n, obj[n].name);
-      if (obj[n].usado)
-        fprintf(sta, " (*) usado\n");
+      if (obj[n].used)
+        fprintf(sta, " (*) used\n");
       else
         fprintf(sta, "\n");
-      fprintf(sta, "\toffset=%u\n", o = obj[n].sloc.offset);
-      fprintf(sta, "\titems1=%u\n", obj[n].sloc.items1);
-      fprintf(sta, "\titems2=%u\n", obj[n].sloc.items2);
-      fprintf(sta, "\titems3=%u\n", obj[n].sloc.items3);
-      fprintf(sta, "\ttotalitems=%u\n", l = obj[n].sloc.totalitems);
-      fprintf(sta, "\tlen_item=%u\n", obj[n].sloc.len_item);
+      fprintf(sta, "\toffset=%u\n", o = obj[n].struct_local.offset);
+      fprintf(sta, "\titems1=%u\n", obj[n].struct_local.dim1);
+      fprintf(sta, "\titems2=%u\n", obj[n].struct_local.dim2);
+      fprintf(sta, "\titems3=%u\n", obj[n].struct_local.dim3);
+      fprintf(sta, "\ttotalitems=%u\n", l = obj[n].struct_local.total_items);
+      fprintf(sta, "\tlen_item=%u\n", obj[n].struct_local.item_len);
       if (obj[n].member)
         fprintf(sta, "\tmember of %s\n", (*obj[n].member).name);
       break;
     case tproc:
       fprintf(sta, "%5u\ttproc: %s", n, obj[n].name);
-      if (obj[n].usado)
-        fprintf(sta, " (*) usado\n");
+      if (obj[n].used)
+        fprintf(sta, " (*) used\n");
       else
         fprintf(sta, "\n");
-      fprintf(sta, "\ttipo=%u\n", (memptrsize)(obj[n].proc.bloque));
+      fprintf(sta, "\ttipo=%u\n", (memptrsize)(obj[n].proc.scope));
       fprintf(sta, "\toffset=%u\n", obj[n].proc.offset);
-      fprintf(sta, "\tnum_par=%u\n", obj[n].proc.num_par);
+      fprintf(sta, "\tnum_par=%u\n", obj[n].proc.num_params);
       break;
     case tfunc:
       fprintf(sta, "%5u\ttfunc: %s", n, obj[n].name);
-      if (obj[n].usado)
-        fprintf(sta, " (*) usado\n");
+      if (obj[n].used)
+        fprintf(sta, " (*) used\n");
       else
         fprintf(sta, "\n");
       fprintf(sta, "\tcode=%u\n", obj[n].func.code);
-      fprintf(sta, "\tnum_par=%u\n", obj[n].func.num_par);
+      fprintf(sta, "\tnum_par=%u\n", obj[n].func.num_params);
       break;
     case tfext:
       fprintf(sta, "%5u\ttfext: %s", n, obj[n].name);
-      if (obj[n].usado)
-        fprintf(sta, " (*) usado\n");
+      if (obj[n].used)
+        fprintf(sta, " (*) used\n");
       else
         fprintf(sta, "\n");
-      fprintf(sta, "\tcode=%u\n", obj[n].fext.code);
-      fprintf(sta, "\tnum_par=%u\n", obj[n].fext.num_par);
+      fprintf(sta, "\tcode=%u\n", obj[n].func_extern.code);
+      fprintf(sta, "\tnum_par=%u\n", obj[n].func_extern.num_params);
       break;
     case tbglo:
       fprintf(sta, "%5u\ttbglo: %s", n, obj[n].name);
-      if (obj[n].usado)
-        fprintf(sta, " (*) usado\n");
+      if (obj[n].used)
+        fprintf(sta, " (*) used\n");
       else
         fprintf(sta, "\n");
-      fprintf(sta, "\toffset=%u\n", o = obj[n].bglo.offset);
-      fprintf(sta, "\tlen1=%u\n", obj[n].bglo.len1);
-      fprintf(sta, "\tlen2=%u\n", obj[n].bglo.len2);
-      fprintf(sta, "\tlen3=%u\n", obj[n].bglo.len3);
-      fprintf(sta, "\ttotalen=%u\n", obj[n].bglo.totalen);
+      fprintf(sta, "\toffset=%u\n", o = obj[n].byte_global.offset);
+      fprintf(sta, "\tlen1=%u\n", obj[n].byte_global.len1);
+      fprintf(sta, "\tlen2=%u\n", obj[n].byte_global.len2);
+      fprintf(sta, "\tlen3=%u\n", obj[n].byte_global.len3);
+      fprintf(sta, "\ttotalen=%u\n", obj[n].byte_global.total_len);
       if (obj[n].member)
         fprintf(sta, "\tmember of %s\n", (*obj[n].member).name);
       break;
     case tbloc:
       fprintf(sta, "%5u\ttbloc: %s", n, obj[n].name);
-      if (obj[n].usado)
-        fprintf(sta, " (*) usado\n");
+      if (obj[n].used)
+        fprintf(sta, " (*) used\n");
       else
         fprintf(sta, "\n");
-      fprintf(sta, "\toffset=%u\n", o = obj[n].bglo.offset);
-      fprintf(sta, "\tlen1=%u\n", obj[n].bglo.len1);
-      fprintf(sta, "\tlen2=%u\n", obj[n].bglo.len2);
-      fprintf(sta, "\tlen3=%u\n", obj[n].bglo.len3);
-      fprintf(sta, "\ttotalen=%u\n", obj[n].bglo.totalen);
+      fprintf(sta, "\toffset=%u\n", o = obj[n].byte_global.offset);
+      fprintf(sta, "\tlen1=%u\n", obj[n].byte_global.len1);
+      fprintf(sta, "\tlen2=%u\n", obj[n].byte_global.len2);
+      fprintf(sta, "\tlen3=%u\n", obj[n].byte_global.len3);
+      fprintf(sta, "\ttotalen=%u\n", obj[n].byte_global.total_len);
       if (obj[n].member)
         fprintf(sta, "\tmember of %s\n", (*obj[n].member).name);
       break;
     case twglo:
       fprintf(sta, "%5u\ttwglo: %s", n, obj[n].name);
-      if (obj[n].usado)
-        fprintf(sta, " (*) usado\n");
+      if (obj[n].used)
+        fprintf(sta, " (*) used\n");
       else
         fprintf(sta, "\n");
-      fprintf(sta, "\toffset=%u\n", o = obj[n].bglo.offset);
-      fprintf(sta, "\tlen1=%u\n", obj[n].bglo.len1);
-      fprintf(sta, "\tlen2=%u\n", obj[n].bglo.len2);
-      fprintf(sta, "\tlen3=%u\n", obj[n].bglo.len3);
-      fprintf(sta, "\ttotalen=%u\n", obj[n].bglo.totalen);
+      fprintf(sta, "\toffset=%u\n", o = obj[n].byte_global.offset);
+      fprintf(sta, "\tlen1=%u\n", obj[n].byte_global.len1);
+      fprintf(sta, "\tlen2=%u\n", obj[n].byte_global.len2);
+      fprintf(sta, "\tlen3=%u\n", obj[n].byte_global.len3);
+      fprintf(sta, "\ttotalen=%u\n", obj[n].byte_global.total_len);
       if (obj[n].member)
         fprintf(sta, "\tmember of %s\n", (*obj[n].member).name);
       break;
     case twloc:
       fprintf(sta, "%5u\ttwloc: %s", n, obj[n].name);
-      if (obj[n].usado)
-        fprintf(sta, " (*) usado\n");
+      if (obj[n].used)
+        fprintf(sta, " (*) used\n");
       else
         fprintf(sta, "\n");
-      fprintf(sta, "\toffset=%u\n", o = obj[n].bglo.offset);
-      fprintf(sta, "\tlen1=%u\n", obj[n].bglo.len1);
-      fprintf(sta, "\tlen2=%u\n", obj[n].bglo.len2);
-      fprintf(sta, "\tlen3=%u\n", obj[n].bglo.len3);
-      fprintf(sta, "\ttotalen=%u\n", obj[n].bglo.totalen);
+      fprintf(sta, "\toffset=%u\n", o = obj[n].byte_global.offset);
+      fprintf(sta, "\tlen1=%u\n", obj[n].byte_global.len1);
+      fprintf(sta, "\tlen2=%u\n", obj[n].byte_global.len2);
+      fprintf(sta, "\tlen3=%u\n", obj[n].byte_global.len3);
+      fprintf(sta, "\ttotalen=%u\n", obj[n].byte_global.total_len);
       if (obj[n].member)
         fprintf(sta, "\tmember of %s\n", (*obj[n].member).name);
       break;
     }
-    fprintf(sta, "\tbloque(%u), anterior(%u)\n", obj[n].bloque, obj[n].anterior);
+    fprintf(sta, "\tbloque(%u), prev(%u)\n", obj[n].scope, obj[n].prev);
     fprintf(sta, "\n");
   }
 
@@ -10279,7 +10279,7 @@ void list_objects(void) {
 //      Write the debugging info file
 //-----------------------------------------------------------------------------
 
-// NOTE: items1,items2,items3 (or len1,len2,len3 for tables) are not saved yet
+// NOTE: dim1,dim2,dim3 (or len1,len2,len3 for tables) are not saved yet
 
 void save_dbg(void) {
   FILE *sta;
@@ -10288,38 +10288,38 @@ void save_dbg(void) {
   struct {
     int type;
     int name;
-    int bloque;
+    int scope;
     int miembro;
     int v0, v1, v2, v3, v4, v5;
   } ob;
 
   sta = fopen("system/exec.dbg", "wb");
 
-  fwrite(&num_obj, 4, 1, sta);
-  fwrite(&num_obj_predefinidos, 4, 1, sta);
+  fwrite(&num_objects, 4, 1, sta);
+  fwrite(&num_predefined, 4, 1, sta);
   n = (memptrsize)&obj[0];
   fwrite(&n, 4, 1, sta);
-  n = sizeof(struct objeto);
+  n = sizeof(struct object);
   fwrite(&n, 4, 1, sta);
 
-  for (n = 0; n < num_obj; n++) {
+  for (n = 0; n < num_objects; n++) {
     ob.type = (memptrsize)obj[n].type;
     ob.name = (memptrsize)obj[n].name - (memptrsize)vnom;
-    ob.bloque = (memptrsize)obj[n].bloque;
+    ob.scope = (memptrsize)obj[n].scope;
     ob.miembro = (memptrsize)obj[n].member;
-    ob.v0 = (memptrsize)obj[n].sglo.offset;
-    ob.v1 = (memptrsize)obj[n].sglo.len_item;
-    ob.v2 = (memptrsize)obj[n].sglo.totalitems;
-    ob.v3 = (memptrsize)obj[n].sglo.items1;
-    ob.v4 = (memptrsize)obj[n].sglo.items2;
-    ob.v5 = (memptrsize)obj[n].sglo.items3;
+    ob.v0 = (memptrsize)obj[n].struct_global.offset;
+    ob.v1 = (memptrsize)obj[n].struct_global.item_len;
+    ob.v2 = (memptrsize)obj[n].struct_global.total_items;
+    ob.v3 = (memptrsize)obj[n].struct_global.dim1;
+    ob.v4 = (memptrsize)obj[n].struct_global.dim2;
+    ob.v5 = (memptrsize)obj[n].struct_global.dim3;
     if (obj[n].type == tpsgl || obj[n].type == tpslo)
-      ob.v1 = (ob.v1 - (memptrsize)&obj[0]) / sizeof(struct objeto);
-    // WARNING: Do not add objects after this point -- &obj[0] and sizeof(struct objeto) are used above as base address and stride.
+      ob.v1 = (ob.v1 - (memptrsize)&obj[0]) / sizeof(struct object);
+    // WARNING: Do not add objects after this point -- &obj[0] and sizeof(struct object) are used above as base address and stride.
     fwrite(&ob, sizeof(ob), 1, sta);
   }
 
-  n = (memptrsize)ivnom.b - (memptrsize)vnom;
+  n = (memptrsize)name_index.b - (memptrsize)vnom;
   fwrite(&n, 4, 1, sta);
 
   fwrite(vnom, 1, n, sta);
@@ -10948,8 +10948,8 @@ int compilado = 0;
 
 void compile_pass1(void) {
   _show_items();
-  wwrite(v.ptr, v.an / big2, v.al / big2, 3, 12, 0, texts[206], c3);
-  wwrite(v.ptr, v.an / big2, v.al / big2, 6 + text_len(texts[206]), 12, 0,
+  wwrite(v.ptr, v.w / big2, v.h / big2, 3, 12, 0, texts[206], c3);
+  wwrite(v.ptr, v.w / big2, v.h / big2, 6 + text_len(texts[206]), 12, 0,
          window[v_window + 1].title, c4);
 }
 
@@ -10965,13 +10965,13 @@ void compile_pass2(void) {
   if (compilado == 0) {
     compilado = 1;
     mouse_graf = 3;
-    numero_error = -1;
+    error_number = -1;
     comp();
-    if (numero_error >= 0) {
-      get_error(500 + numero_error);
-      mensaje_compilacion(cerror);
+    if (error_number >= 0) {
+      get_error(500 + error_number);
+      show_compile_message(cerror);
     } else {
-      mensaje_compilacion(texts[202]);
+      show_compile_message(texts[202]);
       if (run_mode)
         end_dialog = 1;
     }
@@ -10989,8 +10989,8 @@ void compile_pass2(void) {
 
 void compile_pass0(void) {
   v.type = 1;
-  v.an = 300;
-  v.al = 46;
+  v.w = 300;
+  v.h = 46;
   switch (run_mode) {
   case 0:
     v.title = texts[200];
@@ -11007,8 +11007,8 @@ void compile_pass0(void) {
   }
   v.paint_handler = compile_pass1;
   v.click_handler = compile_pass2;
-  _button(100, 7, v.al - 14, 0);
-  _button(125, v.an - 8, v.al - 14, 2);
+  _button(100, 7, v.h - 14, 0);
+  _button(125, v.w - 8, v.h - 14, 2);
   compilado = 0;
   v_help = 0;
 }
@@ -11319,8 +11319,8 @@ void plexico(void) {
   byte **ptr, *_ivnom, h, *_source = source;
   struct lex_ele *e;
 
-  if (!coment) {
-    old_linea = linea;
+  if (!comment_depth) {
+    old_line = source_line;
     old_ierror = ierror;
     old_ierror_end = ierror_end;
   }
@@ -11330,57 +11330,57 @@ lex_scan:
   switch ((uintptr_t)lex_case[*_source]) { // Pointer to a lex_ele or l_???
 
   case l_err:
-    if (coment) {
-      pieza = p_rem;
+    if (comment_depth) {
+      current_token = p_rem;
       _source++;
     } else
       c_error(0, 10);
     break;
 
   case l_cr:
-    linea++;
+    source_line++;
     if ((*++_source) == lf) {
       _source++;
       ultima_linea = _source;
       goto lex_scan;
     }
-    pieza = p_ultima;
+    current_token = p_ultima;
     break; // eof
 
   case l_id:
-    if (coment) {
-      pieza = p_rem;
+    if (comment_depth) {
+      current_token = p_rem;
       _source++;
       break;
     }
-    _ivnom = ivnom.b;
-    *ivnom.p++ = 0;
-    *ivnom.p++ = 0;
+    _ivnom = name_index.b;
+    *name_index.p++ = 0;
+    *name_index.p++ = 0;
     h = 0;
-    while ((*ivnom.b = lower[*_source++]))
-      h = ((byte)(h << 1) + (h >> 7)) ^ (*ivnom.b++);
-    ivnom.b++;
+    while ((*name_index.b = lower[*_source++]))
+      h = ((byte)(h << 1) + (h >> 7)) ^ (*name_index.b++);
+    name_index.b++;
     _source--;
-    if (ivnom.b - vnom > max_obj * long_med_id)
+    if (name_index.b - vnom > max_obj * long_med_id)
       c_error(0, 100);
     ptr = &vhash[h];
     while (*ptr && strcmp((char *)(ptr + 2), (char *)(_ivnom + ptr8)))
       ptr = (byte **)*ptr;
     if (!strcmp((char *)(ptr + 2), (char *)_ivnom + ptr8)) { // id found
-      ivnom.b = _ivnom;                                      // remove it from vnom
-      pieza = (intptr_t)*(ptr + 1);
-      if (pieza < 256 && pieza >= 0) { // reserved word (token)
-        if (pieza == p_rem) {
+      name_index.b = _ivnom;                                      // remove it from vnom
+      current_token = (intptr_t)*(ptr + 1);
+      if (current_token < 256 && current_token >= 0) { // reserved word (token)
+        if (current_token == p_rem) {
           while (*_source != cr)
             _source++;
           goto lex_scan;
         }
       } else { // object (existing id)
-        pieza = p_id;
+        current_token = p_id;
       }
     } else {
-      ivnom.b = _ivnom; // remove it from vnom
-      pieza = p_id;     // new id
+      name_index.b = _ivnom; // remove it from vnom
+      current_token = p_id;     // new id
     }
     break;
 
@@ -11389,14 +11389,14 @@ lex_scan:
     goto lex_scan;
 
   case l_lit:
-    if (coment) {
-      pieza = p_rem;
+    if (comment_depth) {
+      current_token = p_rem;
       _source++;
       break;
     }
-    pieza = p_lit;
+    current_token = p_lit;
     h = *_source;
-    _ivnom = ivnom.b; // Literal between two h delimiters
+    _ivnom = name_index.b; // Literal between two h delimiters
     do {
       if (*++_source == cr)
         c_error(0, 11);
@@ -11409,66 +11409,66 @@ lex_scan:
         *_ivnom = *_source;
     } while (*_ivnom++);
     _source++;
-    longitud_textos += (strlen((char *)ivnom.b) + ptr4) / 4;
-    ivnom.b = _ivnom; // remove it from vnom
+    longitud_textos += (strlen((char *)name_index.b) + ptr4) / 4;
+    name_index.b = _ivnom; // remove it from vnom
     break;
 
   case l_num:
-    if (coment) {
-      pieza = p_rem;
+    if (comment_depth) {
+      current_token = p_rem;
       _source++;
       break;
     }
-    pieza = p_num;
-    pieza_num = 0;
+    current_token = p_num;
+    token_value = 0;
     if (*_source == '0' && lower[*(_source + 1)] == 'x') {
       _source += 2;
       while ((uintptr_t)lex_case[*_source] == l_num ||
              (lower[*_source] >= 'a' && lower[*_source] <= 'f')) {
         if ((uintptr_t)lex_case[*_source] == l_num)
-          pieza_num = pieza_num * 16 + *_source++ - 0x30;
+          token_value = token_value * 16 + *_source++ - 0x30;
         else
-          pieza_num = pieza_num * 16 + lower[*_source++] - 'a' + 10;
+          token_value = token_value * 16 + lower[*_source++] - 'a' + 10;
       }
     } else
       do {
-        pieza_num = pieza_num * 10 + *_source++ - 0x30;
+        token_value = token_value * 10 + *_source++ - 0x30;
       } while ((uintptr_t)lex_case[*_source] == l_num);
     break;
 
   default: // pointer to a lex_ele
     e = lex_case[*_source++];
     _ivnom = _source;
-    pieza = (*e).token;
-    while ((e = (*e).siguiente)) {
-      while (*_source != (*e).caracter && (*e).alternativa)
-        e = (*e).alternativa;
-      if (*_source++ == (*e).caracter && (*e).token) {
-        pieza = (*e).token;
+    current_token = (*e).token;
+    while ((e = (*e).next)) {
+      while (*_source != (*e).character && (*e).alternative)
+        e = (*e).alternative;
+      if (*_source++ == (*e).character && (*e).token) {
+        current_token = (*e).token;
         _ivnom = _source;
       }
     }
     _source = _ivnom;
 
-    if (pieza == p_rem && !coment) {
+    if (current_token == p_rem && !comment_depth) {
       while (*_source != cr)
         _source++;
       goto lex_scan;
     }
 
-    if (pieza == p_ini_rem) {
-      coment++;
+    if (current_token == p_ini_rem) {
+      comment_depth++;
       do {
         source = _source;
         plexico();
         _source = source;
-      } while (pieza != p_end_rem);
-      coment--;
+      } while (current_token != p_end_rem);
+      comment_depth--;
       goto lex_scan;
     }
 
-    if (pieza == p_ultima) {
-      if (coment)
+    if (current_token == p_ultima) {
+      if (comment_depth)
         c_error(0, 55);
       else
         c_error(0, 12);
@@ -11480,16 +11480,16 @@ lex_scan:
 }
 
 void psintactico(void) {
-  byte *_ivnom = ivnom.b;
+  byte *_ivnom = name_index.b;
 
   longitud_textos = 0;
 
   do {
     plexico();
-  } while (pieza != p_ultima);
+  } while (current_token != p_ultima);
 
-  ivnom.b = _ivnom;
+  name_index.b = _ivnom;
   source = source_ptr;
   _source = source;
-  coment = 0;
+  comment_depth = 0;
 }

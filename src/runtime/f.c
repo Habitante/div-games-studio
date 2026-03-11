@@ -19,7 +19,7 @@ void load_pal(void);
 int is_PCX(byte *buffer);
 void adapt_palette(byte *ptr, int len, byte *pal, byte *xlat);
 void put_screen(void);
-void texn2(byte *dest, int vga_width, byte *p, int x, int y, byte an, int al);
+void texn2(byte *dest, int vga_width, byte *p, int x, int y, byte w, int h);
 void get_token(void);
 void expres0(void);
 void expres1(void);
@@ -59,7 +59,7 @@ int get_ticks(void);
 void function_exec(int, int);
 
 extern int omitidos[128];
-extern int nomitidos;
+extern int num_skipped;
 
 //----------------------------------------------------------------------------
 //  Fix for the /oneatx /fp5 bug in i.cpp
@@ -69,10 +69,10 @@ static int n_reloj = 0, o_reloj = 0;
 
 int get_reloj(void) {
   n_reloj = OSDEP_GetTicks();
-  reloj += (n_reloj - o_reloj);
+  frame_clock += (n_reloj - o_reloj);
   o_reloj = n_reloj;
 
-  return reloj;
+  return frame_clock;
 }
 
 //----------------------------------------------------------------------------
@@ -734,7 +734,7 @@ void descomprime_PCX(byte *buffer, byte *mapa) {
 }
 
 void load_map(void) {
-  int ancho, alto, npuntos, m;
+  int width, height, npuntos, m;
   byte *ptr, *buffer;
   pcx_header header;
 
@@ -799,16 +799,16 @@ mapfuera:
       paleta_cargada = 1;
     }
 
-    ancho = *(word *)(ptr + 8);
-    alto = *(word *)(ptr + 10);
+    width = *(word *)(ptr + 8);
+    height = *(word *)(ptr + 10);
     npuntos = *(word *)(ptr + 1392);
 
-    adapt_palette(ptr + 1394 + npuntos * 4, ancho * alto, ptr + 48, NULL);
+    adapt_palette(ptr + 1394 + npuntos * 4, width * height, ptr + 48, NULL);
 
     ptr = ptr + 1394 - 64;
 
-    *((int *)ptr + 13) = ancho;
-    *((int *)ptr + 14) = alto;
+    *((int *)ptr + 13) = width;
+    *((int *)ptr + 14) = height;
     *((int *)ptr + 15) = npuntos;
 
     while (g[0].grf[next_map_code]) {
@@ -820,27 +820,27 @@ mapfuera:
 
   } else if (is_PCX(ptr)) {
     memcpy((byte *)&header, ptr, sizeof(pcx_header));
-    ancho = header.xmax - header.xmin + 1;
-    alto = header.ymax - header.ymin + 1;
+    width = header.xmax - header.xmin + 1;
+    height = header.ymax - header.ymin + 1;
     npuntos = 0;
 
-    if ((!ancho && !alto) || ancho < 0 || alto < 0) {
+    if ((!width && !height) || width < 0 || height < 0) {
       e(144);
       free(ptr);
       return;
     }
 
-    buffer = (byte *)malloc(1394 + ancho * alto);
+    buffer = (byte *)malloc(1394 + width * height);
     descomprime_PCX(ptr, &buffer[1394]);
 
-    adapt_palette(buffer + 1394, ancho * alto, pcxdac, NULL);
+    adapt_palette(buffer + 1394, width * height, pcxdac, NULL);
 
     free(ptr);
 
     buffer = buffer + 1394 - 64;
 
-    *((int *)buffer + 13) = ancho;
-    *((int *)buffer + 14) = alto;
+    *((int *)buffer + 13) = width;
+    *((int *)buffer + 14) = height;
     *((int *)buffer + 15) = npuntos;
 
     while (g[0].grf[next_map_code]) {
@@ -856,7 +856,7 @@ mapfuera:
     return;
   }
 
-  max_reloj += get_reloj() - old_reloj;
+  max_reloj += get_reloj() - old_clock;
 }
 
 //----------------------------------------------------------------------------
@@ -865,19 +865,19 @@ mapfuera:
 //----------------------------------------------------------------------------
 
 void new_map(void) {
-  int ancho, alto, cx, cy, color;
+  int width, height, cx, cy, color;
   byte *ptr;
 
   color = pila[sp--];
   cy = pila[sp--];
   cx = pila[sp--];
-  alto = pila[sp--];
-  ancho = pila[sp];
+  height = pila[sp--];
+  width = pila[sp];
   pila[sp] = 0;
 
   // Check width/height/color bounds ...
 
-  if (ancho < 1 || alto < 1 || ancho > 32768 || alto > 32768) {
+  if (width < 1 || height < 1 || width > 32768 || height > 32768) {
     e(153);
     return;
   }
@@ -885,19 +885,19 @@ void new_map(void) {
     e(154);
     return;
   }
-  if (cx < 0 || cy < 0 || cx >= ancho || cy >= alto) {
+  if (cx < 0 || cy < 0 || cx >= width || cy >= height) {
     e(155);
     return;
   }
 
-  if ((ptr = (byte *)malloc(1330 + 64 + 4 + ancho * alto)) != NULL) {
+  if ((ptr = (byte *)malloc(1330 + 64 + 4 + width * height)) != NULL) {
     ptr += 1330; // fix load_map/unload_map
-    *((int *)ptr + 13) = ancho;
-    *((int *)ptr + 14) = alto;
+    *((int *)ptr + 13) = width;
+    *((int *)ptr + 14) = height;
     *((int *)ptr + 15) = 1; // Define one control point (the center)
     *((word *)ptr + 32) = cx;
     *((word *)ptr + 33) = cy;
-    memset(ptr + 4 + 64, color, ancho * alto);
+    memset(ptr + 4 + 64, color, width * height);
 
     while (g[0].grf[next_map_code]) {
       if (next_map_code++ == 1999)
@@ -1101,7 +1101,7 @@ fpgfuera:
   printf("fpg search ended, %p: ptr: %p\n", (void *)((byte *)g[num].fpg + file_len), (void *)ptr);
 #endif
   pila[sp] = num;
-  max_reloj += get_reloj() - old_reloj;
+  max_reloj += get_reloj() - old_clock;
 }
 
 //----------------------------------------------------------------------------
@@ -1137,14 +1137,14 @@ void start_scroll(void) {
   if (reg >= 0 && reg < max_region) {
     iscroll[snum].x = region[reg].x0;
     iscroll[snum].y = region[reg].y0;
-    iscroll[snum].an = region[reg].x1 - region[reg].x0;
-    iscroll[snum].al = region[reg].y1 - region[reg].y0;
+    iscroll[snum].w = region[reg].x1 - region[reg].x0;
+    iscroll[snum].h = region[reg].y1 - region[reg].y0;
   } else {
     e(108);
     return;
   }
 
-  if (iscroll[snum].an == 0 || iscroll[snum].al == 0) {
+  if (iscroll[snum].w == 0 || iscroll[snum].h == 0) {
     e(146);
     return;
   }
@@ -1185,12 +1185,12 @@ void start_scroll(void) {
   else
     s = 2; // Scroll type: normal(1) or parallax(2)
 
-  iscroll[snum].map1_an = ptr1[13];
-  iscroll[snum].map1_al = ptr1[14];
+  iscroll[snum].map1_w = ptr1[13];
+  iscroll[snum].map1_h = ptr1[14];
   iscroll[snum].map1 = (byte *)ptr1 + 64 + ptr1[15] * 4;
-  if (iscroll[snum].an > iscroll[snum].map1_an)
+  if (iscroll[snum].w > iscroll[snum].map1_w)
     iscroll[snum].map_flags |= 1;
-  if (iscroll[snum].al > iscroll[snum].map1_al)
+  if (iscroll[snum].h > iscroll[snum].map1_h)
     iscroll[snum].map_flags |= 2;
   if (ptr1[15] == 0) {
     iscroll[snum].map1_x = 0;
@@ -1199,27 +1199,27 @@ void start_scroll(void) {
     iscroll[snum].map1_x = *((word *)ptr1 + 32);
     iscroll[snum].map1_y = *((word *)ptr1 + 33);
   }
-  if ((iscroll[snum]._sscr1 = (byte *)malloc(iscroll[snum].an * (iscroll[snum].al + 1))) == NULL) {
+  if ((iscroll[snum]._sscr1 = (byte *)malloc(iscroll[snum].w * (iscroll[snum].h + 1))) == NULL) {
     e(100);
     return;
   }
-  if ((iscroll[snum].fast = (tfast *)malloc(iscroll[snum].al * sizeof(tfast))) == NULL) {
+  if ((iscroll[snum].fast = (tfast *)malloc(iscroll[snum].h * sizeof(tfast))) == NULL) {
     e(100);
     return;
   }
   iscroll[snum].sscr1 = iscroll[snum]._sscr1;
-  iscroll[snum].block1 = iscroll[snum].al;
+  iscroll[snum].block1 = iscroll[snum].h;
   iscroll[snum].on = s;
   set_scroll(0, iscroll[snum].map1_x, iscroll[snum].map1_y);
   iscroll[snum].on = 0; // If any error (malloc) occurs, there will be no scroll
 
   if (s == 2) {
-    iscroll[snum].map2_an = ptr2[13];
-    iscroll[snum].map2_al = ptr2[14];
+    iscroll[snum].map2_w = ptr2[13];
+    iscroll[snum].map2_h = ptr2[14];
     iscroll[snum].map2 = (byte *)ptr2 + 64 + ptr2[15] * 4;
-    if (iscroll[snum].an > iscroll[snum].map2_an)
+    if (iscroll[snum].w > iscroll[snum].map2_w)
       iscroll[snum].map_flags |= 4;
-    if (iscroll[snum].al > iscroll[snum].map2_al)
+    if (iscroll[snum].h > iscroll[snum].map2_h)
       iscroll[snum].map_flags |= 8;
     if (ptr2[15] == 0) {
       iscroll[snum].map2_x = 0;
@@ -1228,7 +1228,7 @@ void start_scroll(void) {
       iscroll[snum].map2_x = *((word *)ptr2 + 32);
       iscroll[snum].map2_y = *((word *)ptr2 + 33);
     }
-    if ((iscroll[snum]._sscr2 = (byte *)malloc(iscroll[snum].an * (iscroll[snum].al + 1))) ==
+    if ((iscroll[snum]._sscr2 = (byte *)malloc(iscroll[snum].w * (iscroll[snum].h + 1))) ==
         NULL) {
       free(iscroll[snum]._sscr1);
       free(iscroll[snum].fast);
@@ -1236,7 +1236,7 @@ void start_scroll(void) {
       return;
     }
     iscroll[snum].sscr2 = iscroll[snum]._sscr2;
-    iscroll[snum].block2 = iscroll[snum].al;
+    iscroll[snum].block2 = iscroll[snum].h;
     iscroll[snum].on = 2;
     set_scroll(1, iscroll[snum].map2_x, iscroll[snum].map2_y);
   }
@@ -1473,7 +1473,7 @@ void unload_fnt(void) {
 
 void load_fnt(void) {
   byte *ptr;
-  int n, an, al, nan, ifonts, m;
+  int n, w, h, nan, ifonts, m;
 
   for (ifonts = 1; ifonts < max_fonts; ifonts++)
     if (!fonts[ifonts])
@@ -1533,18 +1533,18 @@ fntfuera:
 
   if (process_fnt != NULL)
     process_fnt((char *)ptr, file_len);
-  an = 0;
-  al = 0;
+  w = 0;
+  h = 0;
   nan = 0;
   fnt = (TABLAFNT *)((byte *)ptr + 1356);
   for (n = 0; n < 256; n++) {
-    if (fnt[n].ancho) {
-      an += fnt[n].ancho;
+    if (fnt[n].width) {
+      w += fnt[n].width;
       nan++;
     }
-    if (fnt[n].alto) {
-      if (fnt[n].alto + fnt[n].incY > al)
-        al = fnt[n].alto + fnt[n].incY;
+    if (fnt[n].height) {
+      if (fnt[n].height + fnt[n].incY > h)
+        h = fnt[n].height + fnt[n].incY;
     }
   }
 
@@ -1564,10 +1564,10 @@ fntfuera:
   f_i[ifonts].fonpal = m;
   f_i[ifonts].syspal = m;
 
-  f_i[ifonts].ancho = an / nan;
-  f_i[ifonts].espacio = (an / nan) / 2;
-  f_i[ifonts].espaciado = 0;
-  f_i[ifonts].alto = al;
+  f_i[ifonts].width = w / nan;
+  f_i[ifonts].spacing = (w / nan) / 2;
+  f_i[ifonts].letter_spacing = 0;
+  f_i[ifonts].height = h;
   pila[sp] = ifonts;
 
   if (adaptar_paleta) {
@@ -1576,7 +1576,7 @@ fntfuera:
     f_i[ifonts].syspal = palcrc;
   }
 
-  max_reloj += get_reloj() - old_reloj;
+  max_reloj += get_reloj() - old_clock;
 }
 
 //----------------------------------------------------------------------------
@@ -1863,28 +1863,28 @@ void rand_seed(void) {
 //----------------------------------------------------------------------------
 
 void define_region(void) {
-  int n, x, y, an, al;
+  int n, x, y, w, h;
 
-  al = pila[sp--];
-  an = pila[sp--];
+  h = pila[sp--];
+  w = pila[sp--];
   y = pila[sp--];
   x = pila[sp--];
 
   n = pila[sp];
 
   if (x < 0) {
-    an += x;
+    w += x;
     x = 0;
   }
   if (y < 0) {
-    al += y;
+    h += y;
     y = 0;
   }
-  if (x + an > vga_width)
-    an = vga_width - x;
-  if (y + al > vga_height)
-    al = vga_height - y;
-  if (an < 0 || al < 0) {
+  if (x + w > vga_width)
+    w = vga_width - x;
+  if (y + h > vga_height)
+    h = vga_height - y;
+  if (w < 0 || h < 0) {
     e(120);
     return;
   }
@@ -1892,8 +1892,8 @@ void define_region(void) {
   if (n >= 0 && n < max_region) {
     region[n].x0 = x;
     region[n].y0 = y;
-    region[n].x1 = x + an;
-    region[n].y1 = y + al;
+    region[n].x1 = x + w;
+    region[n].y1 = y + h;
     pila[sp] = 1;
   } else {
     pila[sp] = 0;
@@ -2019,13 +2019,13 @@ void map_put(void) {
 
 void map_block_copy(void) {
   int file, grafd, xd, yd;
-  int graf, x, y, an, al;
+  int graf, x, y, w, h;
   int *ptrd, *ptr;
   byte *_saved_buffer = screen_buffer, *si;
   int _saved_width = vga_width, _saved_height = vga_height;
 
-  al = pila[sp--];
-  an = pila[sp--];
+  h = pila[sp--];
+  w = pila[sp--];
   y = pila[sp--];
   x = pila[sp--];
   graf = pila[sp--];
@@ -2069,12 +2069,12 @@ void map_block_copy(void) {
         clipy0 = yd;
       else
         clipy0 = 0;
-      if (xd + an < vga_width)
-        clipx1 = xd + an;
+      if (xd + w < vga_width)
+        clipx1 = xd + w;
       else
         clipx1 = vga_width;
-      if (yd + al < vga_height)
-        clipy1 = yd + al;
+      if (yd + h < vga_height)
+        clipy1 = yd + h;
       else
         clipy1 = vga_height;
 
@@ -2085,18 +2085,18 @@ void map_block_copy(void) {
       if (clipx0 >= clipx1 || clipy0 >= clipy1)
         goto no;
 
-      an = ptr[13];
-      al = ptr[14];
+      w = ptr[13];
+      h = ptr[14];
       si = (byte *)ptr + 64 + ptr[15] * 4;
       x = xd - x;
       y = yd - y;
 
-      if (x >= clipx0 && x + an <= clipx1 && y >= clipy0 &&
-          y + al <= clipy1) // Draw sprite unclipped
-        sp_normal(si, x, y, an, al, 0);
-      else if (x < clipx1 && y < clipy1 && x + an > clipx0 &&
-               y + al > clipy0) // Draw sprite clipped
-        sp_clipped(si, x, y, an, al, 0);
+      if (x >= clipx0 && x + w <= clipx1 && y >= clipy0 &&
+          y + h <= clipy1) // Draw sprite unclipped
+        sp_normal(si, x, y, w, h, 0);
+      else if (x < clipx1 && y < clipy1 && x + w > clipx0 &&
+               y + h > clipy0) // Draw sprite clipped
+        sp_clipped(si, x, y, w, h, 0);
 
 no:
       screen_buffer = _saved_buffer;
@@ -2115,7 +2115,7 @@ no:
 
 void screen_copy(void) {
   int reg, file, graf;
-  int an, al, divand, ald;
+  int w, h, divand, ald;
   int *ptr;
   int xr, ixr, yr, iyr;
   byte *old_si, *si, *di;
@@ -2129,8 +2129,8 @@ void screen_copy(void) {
   reg = pila[sp];
 
   if (reg >= 0 && reg < max_region) {
-    an = region[reg].x1 - region[reg].x0;
-    al = region[reg].y1 - region[reg].y0;
+    w = region[reg].x1 - region[reg].x0;
+    h = region[reg].y1 - region[reg].y0;
   } else {
     e(108);
     return;
@@ -2166,16 +2166,16 @@ void screen_copy(void) {
     divand = ptr[13] - xr;
   if (yr + ald > ptr[14])
     ald = ptr[14] - yr;
-  if (divand <= 0 || ald <= 0 || an <= 0 || al <= 0)
+  if (divand <= 0 || ald <= 0 || w <= 0 || h <= 0)
     return;
 
   di = (byte *)ptr + 64 + ptr[15] * 4 + xr + yr * ptr[13];
   old_si = screen_buffer + region[reg].x0 + region[reg].y0 * vga_width;
 
-  ixr = (float)(an * 256) / (float)divand;
-  iyr = (float)(al * 256) / (float)ald;
+  ixr = (float)(w * 256) / (float)divand;
+  iyr = (float)(h * 256) / (float)ald;
 
-  an = divand;
+  w = divand;
   yr = 0;
 
   do {
@@ -2185,9 +2185,9 @@ void screen_copy(void) {
       *di = *(si + (xr >> 8));
       di++;
       xr += ixr;
-    } while (--an);
+    } while (--w);
     yr += iyr;
-    di += ptr[13] - (an = divand);
+    di += ptr[13] - (w = divand);
   } while (--ald);
 }
 
@@ -2490,7 +2490,7 @@ void save(void) {
   if (lon != llon) //*unit_size)
     e(124);
 
-  max_reloj += get_reloj() - old_reloj;
+  max_reloj += get_reloj() - old_clock;
 }
 
 void _save(void) {
@@ -2518,7 +2518,7 @@ void _save(void) {
 
   if (llon != lon)
     e(124);
-  max_reloj += get_reloj() - old_reloj;
+  max_reloj += get_reloj() - old_clock;
 }
 
 
@@ -2553,7 +2553,7 @@ void load(void) {
         return;
       }
       memcpy(&mem[offset], packptr, lon);
-      max_reloj += get_reloj() - old_reloj;
+      max_reloj += get_reloj() - old_clock;
       return;
     }
 
@@ -2582,7 +2582,7 @@ void load(void) {
     e(127);
   }
   fclose(es);
-  max_reloj += get_reloj() - old_reloj;
+  max_reloj += get_reloj() - old_clock;
 }
 
 //----------------------------------------------------------------------------
@@ -2611,8 +2611,8 @@ void set_mode(void) {
   }
 
 
-  vvga_an = vga_width;
-  vvga_al = vga_height;
+  vvga_w = vga_width;
+  vvga_h = vga_height;
 
 
   dacout_r = 64;
@@ -2746,7 +2746,7 @@ pcmfuera:
 
   free(ptr);
 
-  max_reloj += get_reloj() - old_reloj;
+  max_reloj += get_reloj() - old_clock;
 }
 
 //----------------------------------------------------------------------------
@@ -2887,7 +2887,7 @@ songfuera:
 
   free(ptr);
 
-  max_reloj += get_reloj() - old_reloj;
+  max_reloj += get_reloj() - old_clock;
 }
 
 //----------------------------------------------------------------------------
@@ -2961,17 +2961,17 @@ void is_playing_song(void) {
 void mainloop(void);
 
 void set_fps(void) {
-  max_saltos = pila[sp--];
-  if (max_saltos < 0)
-    max_saltos = 0;
-  if (max_saltos > 10)
-    max_saltos = 10;
+  max_frame_skips = pila[sp--];
+  if (max_frame_skips < 0)
+    max_frame_skips = 0;
+  if (max_frame_skips > 10)
+    max_frame_skips = 10;
   if (pila[sp] < 4)
     pila[sp] = 4;
   if (pila[sp] > 999)
     pila[sp] = 999;
   dfps = pila[sp];
-  ireloj = 1000.0 / (double)pila[sp];
+  clock_interval = 1000.0 / (double)pila[sp];
 }
 
 //----------------------------------------------------------------------------
@@ -3133,14 +3133,14 @@ void start_mode7(void) {
   if (reg >= 0 && reg < max_region) {
     im7[n].x = region[reg].x0;
     im7[n].y = region[reg].y0;
-    im7[n].an = region[reg].x1 - region[reg].x0;
-    im7[n].al = region[reg].y1 - region[reg].y0;
+    im7[n].w = region[reg].x1 - region[reg].x0;
+    im7[n].h = region[reg].y1 - region[reg].y0;
   } else {
     e(108);
     return;
   }
 
-  if (im7[n].an == 0 || im7[n].al == 0) {
+  if (im7[n].w == 0 || im7[n].h == 0) {
     e(146);
     return;
   }
@@ -3181,12 +3181,12 @@ void start_mode7(void) {
   im7[n].map = (byte *)ptr1 + 64 + ptr1[15] * 4;
 
   if (ptr2 != NULL) {
-    im7[n].ext_an = ptr2[13];
-    im7[n].ext_al = ptr2[14];
+    im7[n].ext_w = ptr2[13];
+    im7[n].ext_h = ptr2[14];
   } else
-    im7[n].ext_an = 0;
+    im7[n].ext_w = 0;
 
-  switch (im7[n].ext_an) {
+  switch (im7[n].ext_w) {
   case 1:
   case 2:
   case 4:
@@ -3203,10 +3203,10 @@ void start_mode7(void) {
   case 8192:
     break;
   default:
-    im7[n].ext_an = 0;
+    im7[n].ext_w = 0;
   }
 
-  switch (im7[n].ext_al) {
+  switch (im7[n].ext_h) {
   case 1:
   case 2:
   case 4:
@@ -3223,10 +3223,10 @@ void start_mode7(void) {
   case 8192:
     break;
   default:
-    im7[n].ext_al = 0;
+    im7[n].ext_h = 0;
   }
 
-  if (im7[n].ext_an && im7[n].ext_al)
+  if (im7[n].ext_w && im7[n].ext_h)
     im7[n].ext = (byte *)ptr2 + 64 + ptr2[15] * 4;
   else
     im7[n].ext = NULL;
@@ -3445,7 +3445,7 @@ void roll_palette(void) {
 //----------------------------------------------------------------------------
 
 void get_real_point(void) {
-  int x, y, an, al, xg, yg;
+  int x, y, w, h, xg, yg;
   int n, dx, dy, px, py;
   int *ptr;
   float ang, dis;
@@ -3488,8 +3488,8 @@ void get_real_point(void) {
       y /= mem[id + _Resolution];
     }
 
-    an = ptr[13];
-    al = ptr[14];
+    w = ptr[13];
+    h = ptr[14];
 
     if (ptr[15] == 0 || *((word *)ptr + 32) == 65535) {
       xg = ptr[13] / 2;
@@ -4056,7 +4056,7 @@ void sort(void) {
         qsort(&mem[offset], numreg, size * 4, sort4);
       break;
     }
-  max_reloj += get_reloj() - old_reloj;
+  max_reloj += get_reloj() - old_clock;
 }
 
 //----------------------------------------------------------------------------
@@ -4242,7 +4242,7 @@ void _fread(void) {
       memset(&memb[offset * 4 + n], 0, lon * unit_size - n);
     pila[sp] = 1;
   }
-  max_reloj += get_reloj() - old_reloj;
+  max_reloj += get_reloj() - old_clock;
 }
 
 //----------------------------------------------------------------------------
@@ -4279,7 +4279,7 @@ void _fwrite(void) {
     e(124);
   } else
     pila[sp] = 1;
-  max_reloj += get_reloj() - old_reloj;
+  max_reloj += get_reloj() - old_clock;
 }
 
 //----------------------------------------------------------------------------
@@ -4609,14 +4609,14 @@ void memory_free(void) {
 void ignore_error(void) {
   int n;
   n = 0;
-  while (n < nomitidos) {
+  while (n < num_skipped) {
     if (omitidos[n] == pila[sp])
       break;
     n++;
   }
-  if (n >= nomitidos && nomitidos < 127) {
-    omitidos[nomitidos++] = pila[sp];
-  } else if (nomitidos == 127)
+  if (n >= num_skipped && num_skipped < 127) {
+    omitidos[num_skipped++] = pila[sp];
+  } else if (num_skipped == 127)
     e(168);
   pila[sp] = 0;
 }
@@ -4833,13 +4833,13 @@ void move_draw(void) {
 //      Save_map/pcx(file,graph,"filename.pcx") 1-Success 0-Error
 //----------------------------------------------------------------------------
 
-int save_PCX(byte *mapa, int an, int al, FILE *f);
-int save_MAP(byte *mapa, int an, int al, FILE *f);
+int save_PCX(byte *mapa, int w, int h, FILE *f);
+int save_MAP(byte *mapa, int w, int h, FILE *f);
 
 void save_mapcx(int tipo) {
   int file, graph;
   int *ptr;
-  int an, al;
+  int w, h;
   byte *buffer;
   char cwork[256];
   FILE *f;
@@ -4870,8 +4870,8 @@ void save_mapcx(int tipo) {
     return;
   }
 
-  an = ptr[13];
-  al = ptr[14];
+  w = ptr[13];
+  h = ptr[14];
   buffer = (byte *)ptr + 64 + ptr[15] * 4;
 
   if ((f = open_save_file((byte *)cwork)) == NULL) {
@@ -4879,13 +4879,13 @@ void save_mapcx(int tipo) {
     return;
   }
   if (tipo) {
-    if (save_PCX(buffer, an, al, f)) {
+    if (save_PCX(buffer, w, h, f)) {
       fclose(f);
       e(100);
       return;
     }
   } else {
-    if (save_MAP(buffer, an, al, f)) {
+    if (save_MAP(buffer, w, h, f)) {
       fclose(f);
       e(100);
       return;
@@ -4894,7 +4894,7 @@ void save_mapcx(int tipo) {
   fclose(f);
   pila[sp] = 1;
 
-  max_reloj += get_reloj() - old_reloj;
+  max_reloj += get_reloj() - old_clock;
 }
 
 //----------------------------------------------------------------------------
@@ -4904,7 +4904,7 @@ void save_mapcx(int tipo) {
 
 void write_in_map(void) {
   int centro, texts;
-  int cx, cy, an, al;
+  int cx, cy, w, h;
   int fuente;
 
   byte *ptr, *ptr2;
@@ -4932,16 +4932,16 @@ void write_in_map(void) {
   ptr = (byte *)&mem[texts];
 
   fnt = (TABLAFNT *)((byte *)fonts[fuente] + 1356);
-  al = f_i[fuente].alto;
+  h = f_i[fuente].height;
 
   ptr2 = ptr;
-  an = 0;
+  w = 0;
   while (*ptr2) {
-    if (fnt[*ptr2].ancho == 0) {
-      an += f_i[fuente].espacio;
+    if (fnt[*ptr2].width == 0) {
+      w += f_i[fuente].spacing;
       ptr2++;
     } else
-      an += fnt[*ptr2++].ancho;
+      w += fnt[*ptr2++].width;
   }
 
   cx = 0;
@@ -4951,45 +4951,45 @@ void write_in_map(void) {
   case 0:
     break;
   case 1:
-    cx = (an >> 1);
+    cx = (w >> 1);
     break;
   case 2:
-    cx = an - 1;
+    cx = w - 1;
     break;
   case 3:
-    cy = (al >> 1);
+    cy = (h >> 1);
     break;
   case 4:
-    cx = (an >> 1);
-    cy = (al >> 1);
+    cx = (w >> 1);
+    cy = (h >> 1);
     break;
   case 5:
-    cx = an - 1;
-    cy = (al >> 1);
+    cx = w - 1;
+    cy = (h >> 1);
     break;
   case 6:
-    cy = al - 1;
+    cy = h - 1;
     break;
   case 7:
-    cx = (an >> 1);
-    cy = al - 1;
+    cx = (w >> 1);
+    cy = h - 1;
     break;
   case 8:
-    cx = an - 1;
-    cy = al - 1;
+    cx = w - 1;
+    cy = h - 1;
     break;
   }
 
   ptr2 = ptr;
 
-  if ((ptr = (byte *)malloc(1330 + 64 + 4 + an * al)) != NULL) {
+  if ((ptr = (byte *)malloc(1330 + 64 + 4 + w * h)) != NULL) {
     ptr += 1330; // fix load_map/unload_map
-    *((int *)ptr + 13) = an;
-    *((int *)ptr + 14) = al;
+    *((int *)ptr + 13) = w;
+    *((int *)ptr + 14) = h;
     *((int *)ptr + 15) = 1; // Define one control point (the center)
     *((word *)ptr + 32) = cx;
     *((word *)ptr + 33) = cy;
-    memset(ptr + 4 + 64, 0, an * al);
+    memset(ptr + 4 + 64, 0, w * h);
 
     while (g[0].grf[next_map_code]) {
       if (next_map_code++ == 1999)
@@ -5003,22 +5003,22 @@ void write_in_map(void) {
 
   cx = 0; // Draw the text (ptr2) into ptr+68 (an*al)
 
-  while (*ptr2 && cx + fnt[*ptr2].ancho <= an) {
-    if (fnt[*ptr2].ancho == 0) {
-      cx += f_i[fuente].espacio;
+  while (*ptr2 && cx + fnt[*ptr2].width <= w) {
+    if (fnt[*ptr2].width == 0) {
+      cx += f_i[fuente].spacing;
       ptr2++;
     } else {
-      texn2(ptr + 68, an, fonts[fuente] + fnt[*ptr2].offset, cx, fnt[*ptr2].incY, fnt[*ptr2].ancho,
-            fnt[*ptr2].alto);
-      cx = cx + fnt[*ptr2].ancho;
+      texn2(ptr + 68, w, fonts[fuente] + fnt[*ptr2].offset, cx, fnt[*ptr2].incY, fnt[*ptr2].width,
+            fnt[*ptr2].height);
+      cx = cx + fnt[*ptr2].width;
       ptr2++;
     }
   }
 }
 
-void texn2(byte *dest, int vga_width, byte *p, int x, int y, byte an, int al) {
+void texn2(byte *dest, int vga_width, byte *p, int x, int y, byte w, int h) {
   byte *q = dest + y * vga_width + x;
-  int ancho = an;
+  int width = w;
 
   do {
     do {
@@ -5027,9 +5027,9 @@ void texn2(byte *dest, int vga_width, byte *p, int x, int y, byte an, int al) {
       }
       p++;
       q++;
-    } while (--an);
-    q += vga_width - (an = ancho);
-  } while (--al);
+    } while (--w);
+    q += vga_width - (w = width);
+  } while (--h);
 }
 
 //----------------------------------------------------------------------------
@@ -5590,7 +5590,7 @@ void encode_file(int encode) {
     rc = _dos_findnext(&ft);
   }
 
-  max_reloj += get_reloj() - old_reloj;
+  max_reloj += get_reloj() - old_clock;
 }
 
 void _encrypt(int encode, char *fichero, char *clave) {
@@ -5738,7 +5738,7 @@ void _compress(int encode) {
     rc = _dos_findnext(&ft);
   }
 
-  max_reloj += get_reloj() - old_reloj;
+  max_reloj += get_reloj() - old_clock;
 }
 
 void _compress_file(int encode, char *fichero) {
@@ -5934,7 +5934,7 @@ void function(void) {
   int oticks = get_ticks();
 #endif
 
-  old_reloj = get_reloj();
+  old_clock = get_reloj();
 
   switch (v_function = (byte)mem[ip++]) {
   case 0:

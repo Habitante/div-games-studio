@@ -926,7 +926,7 @@ byte *t64 = NULL;
 
 void pal_refresh(int no_tocar_mapas, int guardar_original) {
   byte *ptr, *ptrend;
-  int an, al, x, sum;
+  int w, h, x, sum;
   int n, m;
   FPG *MiFPG;
   byte pal[768];
@@ -1073,43 +1073,43 @@ void pal_refresh(int no_tocar_mapas, int guardar_original) {
       wup(n);
       ptr = v.ptr;
       if (window[n].foreground == 2) {
-        swap(v.an, v._an);
-        swap(v.al, v._al);
+        swap(v.w, v._an);
+        swap(v.h, v._al);
       }
-      an = v.an;
-      al = v.al;
-      memset(ptr, c0, an * al);
+      w = v.w;
+      h = v.h;
+      memset(ptr, c0, w * h);
       if (big) {
-        an /= 2;
-        al /= 2;
+        w /= 2;
+        h /= 2;
       }
-      wrectangle(ptr, an, al, c2, 0, 0, an, al);
-      wput(ptr, an, al, an - 9, 2, 35);
-      wput(ptr, an, al, an - 17, 2, 37);
+      wrectangle(ptr, w, h, c2, 0, 0, w, h);
+      wput(ptr, w, h, w - 9, 2, 35);
+      wput(ptr, w, h, w - 17, 2, 37);
 
       if (v.type >= 100 && !v.state) {
-        wgra(v.ptr, an, al, c1, 2, 2, an - 20, 7);
-        if (text_len(v.title) + 3 > an - 20) {
-          wwrite_in_box(v.ptr, an, an - 19, al, 4, 2, 0, v.title, c0);
-          wwrite_in_box(v.ptr, an, an - 19, al, 3, 2, 0, v.title, c2);
+        wgra(v.ptr, w, h, c1, 2, 2, w - 20, 7);
+        if (text_len(v.title) + 3 > w - 20) {
+          wwrite_in_box(v.ptr, w, w - 19, h, 4, 2, 0, v.title, c0);
+          wwrite_in_box(v.ptr, w, w - 19, h, 3, 2, 0, v.title, c2);
         } else {
-          wwrite(v.ptr, an, al, 2 + (an - 20) / 2, 3, 1, v.title, c0);
-          wwrite(v.ptr, an, al, 2 + (an - 20) / 2, 2, 1, v.title, c2);
+          wwrite(v.ptr, w, h, 2 + (w - 20) / 2, 3, 1, v.title, c0);
+          wwrite(v.ptr, w, h, 2 + (w - 20) / 2, 2, 1, v.title, c2);
         }
       } else {
-        wgra(ptr, an, al, c_b_low, 2, 2, an - 20, 7);
-        if (text_len(v.title) + 3 > an - 20) {
-          wwrite_in_box(ptr, an, an - 19, al, 4, 2, 0, v.title, c1);
-          wwrite_in_box(ptr, an, an - 19, al, 3, 2, 0, v.title, c4);
+        wgra(ptr, w, h, c_b_low, 2, 2, w - 20, 7);
+        if (text_len(v.title) + 3 > w - 20) {
+          wwrite_in_box(ptr, w, w - 19, h, 4, 2, 0, v.title, c1);
+          wwrite_in_box(ptr, w, w - 19, h, 3, 2, 0, v.title, c4);
         } else {
-          wwrite(ptr, an, al, 3 + (an - 20) / 2, 2, 1, v.title, c1);
-          wwrite(ptr, an, al, 2 + (an - 20) / 2, 2, 1, v.title, c4);
+          wwrite(ptr, w, h, 3 + (w - 20) / 2, 2, 1, v.title, c1);
+          wwrite(ptr, w, h, 2 + (w - 20) / 2, 2, 1, v.title, c4);
         }
       }
       call((voidReturnType)v.paint_handler);
       if (v.foreground == 2) {
-        swap(v.an, v._an);
-        swap(v.al, v._al);
+        swap(v.w, v._an);
+        swap(v.h, v._al);
       }
       wdown(n);
     }
@@ -1178,58 +1178,58 @@ int ordenacion = 0;
 
 void ordena1(void) {
   int x, y;
-  int an = v.an / big2, al = v.al / big2;
+  int w = v.w / big2, h = v.h / big2;
 
   _show_items();
 
-  wbox(v.ptr, an, al, c0, 3, 11, 65 * 2 + 1, 65 * 2 + 1);
+  wbox(v.ptr, w, h, c0, 3, 11, 65 * 2 + 1, 65 * 2 + 1);
 
-  wbox(v.ptr, an, al, c2, 2 + 66, 10, 1, 65 * 2 + 3);
-  wbox(v.ptr, an, al, c2, 2, 10 + 66, 65 * 2 + 3, 1);
+  wbox(v.ptr, w, h, c2, 2 + 66, 10, 1, 65 * 2 + 3);
+  wbox(v.ptr, w, h, c2, 2, 10 + 66, 65 * 2 + 3, 1);
 
   ord_paleta0();
   for (y = 0; y < 16; y++)
     for (x = 0; x < 16; x++)
-      wbox(v.ptr, an, al, paleta[x + y * 16], 4 + x * 4, 12 + y * 4, 3, 3);
+      wbox(v.ptr, w, h, paleta[x + y * 16], 4 + x * 4, 12 + y * 4, 3, 3);
 
   ord_paleta1();
   for (y = 0; y < 16; y++)
     for (x = 0; x < 16; x++)
-      wbox(v.ptr, an, al, paleta[x + y * 16], 66 + 4 + x * 4, 12 + y * 4, 3, 3);
+      wbox(v.ptr, w, h, paleta[x + y * 16], 66 + 4 + x * 4, 12 + y * 4, 3, 3);
 
   ord_paleta2();
   for (y = 0; y < 16; y++)
     for (x = 0; x < 16; x++)
-      wbox(v.ptr, an, al, paleta[x + y * 16], 4 + x * 4, 66 + 12 + y * 4, 3, 3);
+      wbox(v.ptr, w, h, paleta[x + y * 16], 4 + x * 4, 66 + 12 + y * 4, 3, 3);
 
   ord_paleta3();
   for (y = 0; y < 16; y++)
     for (x = 0; x < 16; x++)
-      wbox(v.ptr, an, al, paleta[x + y * 16], 66 + 4 + x * 4, 66 + 12 + y * 4, 3, 3);
+      wbox(v.ptr, w, h, paleta[x + y * 16], 66 + 4 + x * 4, 66 + 12 + y * 4, 3, 3);
 
   switch (ordenacion) {
   case 0:
     ord_paleta0();
-    wrectangle(v.ptr, an, al, c4, 2, 10, 67, 67);
+    wrectangle(v.ptr, w, h, c4, 2, 10, 67, 67);
     break;
   case 1:
     ord_paleta1();
-    wrectangle(v.ptr, an, al, c4, 2 + 66, 10, 67, 67);
+    wrectangle(v.ptr, w, h, c4, 2 + 66, 10, 67, 67);
     break;
   case 2:
     ord_paleta2();
-    wrectangle(v.ptr, an, al, c4, 2, 10 + 66, 67, 67);
+    wrectangle(v.ptr, w, h, c4, 2, 10 + 66, 67, 67);
     break;
   case 3:
     ord_paleta3();
-    wrectangle(v.ptr, an, al, c4, 2 + 66, 10 + 66, 67, 67);
+    wrectangle(v.ptr, w, h, c4, 2 + 66, 10 + 66, 67, 67);
     break;
   }
 }
 
 void ordena2(void) {
   int ord;
-  int an = v.an / big2, al = v.al / big2;
+  int w = v.w / big2, h = v.h / big2;
 
   _process_items();
 
@@ -1243,24 +1243,24 @@ void ordena2(void) {
 
     if (ord != ordenacion) {
       v.redraw = 1;
-      wrectangle(v.ptr, an, al, c2, 2, 10, 65 * 2 + 3, 65 * 2 + 3);
-      wbox(v.ptr, an, al, c2, 2 + 66, 10, 1, 65 * 2 + 3);
-      wbox(v.ptr, an, al, c2, 2, 10 + 66, 65 * 2 + 3, 1);
+      wrectangle(v.ptr, w, h, c2, 2, 10, 65 * 2 + 3, 65 * 2 + 3);
+      wbox(v.ptr, w, h, c2, 2 + 66, 10, 1, 65 * 2 + 3);
+      wbox(v.ptr, w, h, c2, 2, 10 + 66, 65 * 2 + 3, 1);
       switch (ord) {
       case 0:
-        wrectangle(v.ptr, an, al, c4, 2, 10, 67, 67);
+        wrectangle(v.ptr, w, h, c4, 2, 10, 67, 67);
         ord_paleta0();
         break;
       case 1:
-        wrectangle(v.ptr, an, al, c4, 2 + 66, 10, 67, 67);
+        wrectangle(v.ptr, w, h, c4, 2 + 66, 10, 67, 67);
         ord_paleta1();
         break;
       case 2:
-        wrectangle(v.ptr, an, al, c4, 2, 10 + 66, 67, 67);
+        wrectangle(v.ptr, w, h, c4, 2, 10 + 66, 67, 67);
         ord_paleta2();
         break;
       case 3:
-        wrectangle(v.ptr, an, al, c4, 2 + 66, 10 + 66, 67, 67);
+        wrectangle(v.ptr, w, h, c4, 2 + 66, 10 + 66, 67, 67);
         ord_paleta3();
         break;
       }
@@ -1282,12 +1282,12 @@ void ordena2(void) {
 void ordena0(void) {
   v.type = 1; // Dialog
   v.state = 0;
-  v.an = 65 * 2 + 7;
-  v.al = 65 * 2 + 31;
+  v.w = 65 * 2 + 7;
+  v.h = 65 * 2 + 31;
   v.title = texts[140];
 
-  _button(100, 7, v.al - 14, 0);
-  _button(101, v.an - 8, v.al - 14, 2);
+  _button(100, 7, v.h - 14, 0);
+  _button(101, v.w - 8, v.h - 14, 2);
 
   v.paint_handler = ordena1;
   v.click_handler = ordena2;
@@ -1730,7 +1730,7 @@ extern SDL_Surface *vga;
 
 void prepare_wallpaper(void) {
   FILE *f;
-  int x, lon, tap_an, tap_al;
+  int x, lon, tap_w, tap_h;
   byte *p, *q;
   byte *temp, *temp2;
   byte pal[768];
@@ -1759,8 +1759,8 @@ void prepare_wallpaper(void) {
   }
   fclose(f);
 
-  tap_an = map_width;
-  tap_al = map_height;
+  tap_w = map_width;
+  tap_h = map_height;
   if (fmt_is_map(temp2))
     x = 1;
   else if (fmt_is_pcx(temp2))
@@ -1771,21 +1771,21 @@ void prepare_wallpaper(void) {
     x = 4;
   else
     x = 0;
-  swap(map_width, tap_an);
-  swap(map_height, tap_al);
+  swap(map_width, tap_w);
+  swap(map_height, tap_h);
 
   if (!x) {
     free(temp2);
     return;
   }
 
-  if ((temp = (byte *)malloc(tap_an * tap_al + tap_an)) == NULL) {
+  if ((temp = (byte *)malloc(tap_w * tap_h + tap_w)) == NULL) {
     free(temp2);
     return;
   }
 
-  swap(map_width, tap_an);
-  swap(map_height, tap_al);
+  swap(map_width, tap_w);
+  swap(map_height, tap_h);
 
   memcpy(old_dac4, dac4, 768);
   memcpy(old_dac, dac, 768);
@@ -1806,8 +1806,8 @@ void prepare_wallpaper(void) {
     fmt_load_jpg(temp2, temp, 0, lon);
     break;
   }
-  swap(map_width, tap_an);
-  swap(map_height, tap_al);
+  swap(map_width, tap_w);
+  swap(map_height, tap_h);
   cargar_paleta = n;
 
   free(temp2);
@@ -1818,7 +1818,7 @@ void prepare_wallpaper(void) {
     for (x = 0, p = pal; x < 256; x++, p += 3)
       cwallpaper[x] = fast_find_color(*p, *(p + 1), *(p + 2));
     p = temp;
-    q = p + tap_an * tap_al;
+    q = p + tap_w * tap_h;
     do
       *p = cwallpaper[*p];
     while (++p < q); // Remap to the current palette
@@ -1826,7 +1826,7 @@ void prepare_wallpaper(void) {
     for (x = 0, p = pal; x < 256; x++, p += 3)
       cwallpaper[x] = wallpaper_gradient[(*p + *(p + 1) + *(p + 2)) * 2 / 3];
     p = temp;
-    q = p + tap_an * tap_al;
+    q = p + tap_w * tap_h;
     do
       *p = cwallpaper[*p];
     while (++p < q);
@@ -1834,15 +1834,15 @@ void prepare_wallpaper(void) {
 
   if (Setupfile.Desktop_Tile) {
     wallpaper_map = wallpaper = temp;
-    wallpaper_width = tap_an;
-    wallpaper_height = tap_al;
+    wallpaper_width = tap_w;
+    wallpaper_height = tap_h;
   } else {
     if ((p = (byte *)malloc(vga_width * vga_height)) == NULL) {
       free(temp);
       wallpaper = NULL;
       return;
     }
-    rescalar(temp, tap_an, tap_al, p, vga_width, vga_height);
+    rescalar(temp, tap_w, tap_h, p, vga_width, vga_height);
     free(temp);
     wallpaper_width = vga_width;
     wallpaper_height = vga_height;
@@ -1887,44 +1887,44 @@ int wDegradar = 0, wIntercambiar = 0, wCopiar = 0;
 
 void pal_interpolate1(void) {
   int x, y;
-  int an = v.an / big2, al = v.al / big2;
+  int w = v.w / big2, h = v.h / big2;
   char cWork[20];
 
   _show_items();
 
-  wbox(v.ptr, an, al, c0, 2, 10, 128, 128);
+  wbox(v.ptr, w, h, c0, 2, 10, 128, 128);
 
-  wwrite(v.ptr, an, al, 147, 11, 0, texts[141], c3);
+  wwrite(v.ptr, w, h, 147, 11, 0, texts[141], c3);
   div_snprintf(cWork, sizeof(cWork), "%03d", SelColor);
-  wwrite(v.ptr, an, al, 145, 11, 2, (byte *)cWork, c3);
+  wwrite(v.ptr, w, h, 145, 11, 2, (byte *)cWork, c3);
 
-  wwrite(v.ptr, an, al, 147, 19, 0, texts[142], c3);
+  wwrite(v.ptr, w, h, 147, 19, 0, texts[142], c3);
   div_snprintf(cWork, sizeof(cWork), " %02X", SelColor);
-  wwrite(v.ptr, an, al, 145, 19, 2, (byte *)cWork, c3);
+  wwrite(v.ptr, w, h, 145, 19, 2, (byte *)cWork, c3);
 
-  wwrite(v.ptr, an, al, 147, 63 - 21, 0, texts[143], c3);
+  wwrite(v.ptr, w, h, 147, 63 - 21, 0, texts[143], c3);
   div_snprintf(cWork, sizeof(cWork), "%02d", dac[SelColor * 3]);
-  wwrite(v.ptr, an, al, 140, 63 - 21, 2, (byte *)cWork, c3);
+  wwrite(v.ptr, w, h, 140, 63 - 21, 2, (byte *)cWork, c3);
 
-  wwrite(v.ptr, an, al, 147, 63 - 14, 0, texts[144], c3);
+  wwrite(v.ptr, w, h, 147, 63 - 14, 0, texts[144], c3);
   div_snprintf(cWork, sizeof(cWork), "%02d", dac[SelColor * 3 + 1]);
-  wwrite(v.ptr, an, al, 140, 63 - 14, 2, (byte *)cWork, c3);
+  wwrite(v.ptr, w, h, 140, 63 - 14, 2, (byte *)cWork, c3);
 
-  wwrite(v.ptr, an, al, 147, 63 - 7, 0, texts[145], c3);
+  wwrite(v.ptr, w, h, 147, 63 - 7, 0, texts[145], c3);
   div_snprintf(cWork, sizeof(cWork), "%02d", dac[SelColor * 3 + 2]);
-  wwrite(v.ptr, an, al, 140, 63 - 7, 2, (byte *)cWork, c3);
+  wwrite(v.ptr, w, h, 140, 63 - 7, 2, (byte *)cWork, c3);
 
-  wbox(v.ptr, an, al, c0, 132, 26, 31, 42 - 27);
-  wbox(v.ptr, an, al, SelColor, 133, 27, 29, 42 - 29);
+  wbox(v.ptr, w, h, c0, 132, 26, 31, 42 - 27);
+  wbox(v.ptr, w, h, SelColor, 133, 27, 29, 42 - 29);
   for (y = 0; y < 16; y++)
     for (x = 0; x < 16; x++)
-      wbox(v.ptr, an, al, (y * 16 + x), x * 8 + 2, y * 8 + 10, 7, 7);
+      wbox(v.ptr, w, h, (y * 16 + x), x * 8 + 2, y * 8 + 10, 7, 7);
 
-  wrectangle(v.ptr, an, al, c4, (SelColor % 16) * 8 + 1, (SelColor / 16) * 8 + 9, 9, 9);
+  wrectangle(v.ptr, w, h, c4, (SelColor % 16) * 8 + 1, (SelColor / 16) * 8 + 9, 9, 9);
   if (dac[SelColor * 3] * dac[SelColor * 3 + 1] * dac[SelColor * 3 + 2] < (32 * 32 * 32))
-    wbox(v.ptr, an, al, c4, (SelColor % 16) * 8 + 4, (SelColor / 16) * 8 + 12, 3, 3);
+    wbox(v.ptr, w, h, c4, (SelColor % 16) * 8 + 4, (SelColor / 16) * 8 + 12, 3, 3);
   else
-    wbox(v.ptr, an, al, c0, (SelColor % 16) * 8 + 4, (SelColor / 16) * 8 + 12, 3, 3);
+    wbox(v.ptr, w, h, c0, (SelColor % 16) * 8 + 4, (SelColor / 16) * 8 + 12, 3, 3);
 
   lRed.created = 0;
   lRed.total_items = 72;
@@ -1957,7 +1957,7 @@ void pal_interpolate2(void) {
   byte bWork;
   float fR, fG, fB, fIR, fIG, fIB;
   byte cIni, cFin;
-  int an = v.an / big2, al = v.al / big2;
+  int w = v.w / big2, h = v.h / big2;
 
   _process_items();
   v_pause = 1;
@@ -1970,31 +1970,31 @@ void pal_interpolate2(void) {
   if ((wmouse_y > 10) && (wmouse_y < 138) && (wmouse_x > 2) && (wmouse_x < 130)) {
     cColor = ((wmouse_y - 10) / 8) * 16 + ((wmouse_x - 2) / 8);
     if (cColor != OldColor) {
-      wrectangle(v.ptr, an, al, c0, (OldColor % 16) * 8 + 1, (OldColor / 16) * 8 + 9, 9, 9);
-      wbox(v.ptr, an, al, cColor, 133, 27, 29, 42 - 29);
+      wrectangle(v.ptr, w, h, c0, (OldColor % 16) * 8 + 1, (OldColor / 16) * 8 + 9, 9, 9);
+      wbox(v.ptr, w, h, cColor, 133, 27, 29, 42 - 29);
 
-      wbox(v.ptr, an, al, c2, 130, 11, 29, 15);
+      wbox(v.ptr, w, h, c2, 130, 11, 29, 15);
 
-      wwrite(v.ptr, an, al, 147, 11, 0, texts[141], c3);
+      wwrite(v.ptr, w, h, 147, 11, 0, texts[141], c3);
       div_snprintf(cWork, sizeof(cWork), "%03d", cColor);
-      wwrite(v.ptr, an, al, 145, 11, 2, (byte *)cWork, c3);
-      wwrite(v.ptr, an, al, 147, 19, 0, texts[142], c3);
+      wwrite(v.ptr, w, h, 145, 11, 2, (byte *)cWork, c3);
+      wwrite(v.ptr, w, h, 147, 19, 0, texts[142], c3);
       div_snprintf(cWork, sizeof(cWork), " %02X", cColor);
-      wwrite(v.ptr, an, al, 145, 19, 2, (byte *)cWork, c3);
+      wwrite(v.ptr, w, h, 145, 19, 2, (byte *)cWork, c3);
 
-      wbox(v.ptr, an, al, c2, 130, 63 - 21, 25, 20);
-      wwrite(v.ptr, an, al, 147, 63 - 21, 0, texts[143], c3);
+      wbox(v.ptr, w, h, c2, 130, 63 - 21, 25, 20);
+      wwrite(v.ptr, w, h, 147, 63 - 21, 0, texts[143], c3);
       div_snprintf(cWork, sizeof(cWork), "%02d", dac[cColor * 3]);
-      wwrite(v.ptr, an, al, 140, 63 - 21, 2, (byte *)cWork, c3);
-      wwrite(v.ptr, an, al, 147, 63 - 14, 0, texts[144], c3);
+      wwrite(v.ptr, w, h, 140, 63 - 21, 2, (byte *)cWork, c3);
+      wwrite(v.ptr, w, h, 147, 63 - 14, 0, texts[144], c3);
       div_snprintf(cWork, sizeof(cWork), "%02d", dac[cColor * 3 + 1]);
-      wwrite(v.ptr, an, al, 140, 63 - 14, 2, (byte *)cWork, c3);
-      wwrite(v.ptr, an, al, 147, 63 - 7, 0, texts[145], c3);
+      wwrite(v.ptr, w, h, 140, 63 - 14, 2, (byte *)cWork, c3);
+      wwrite(v.ptr, w, h, 147, 63 - 7, 0, texts[145], c3);
       div_snprintf(cWork, sizeof(cWork), "%02d", dac[cColor * 3 + 2]);
-      wwrite(v.ptr, an, al, 140, 63 - 7, 2, (byte *)cWork, c3);
+      wwrite(v.ptr, w, h, 140, 63 - 7, 2, (byte *)cWork, c3);
       ax = ((wmouse_x - 2) / 8);
       ay = ((wmouse_y - 10) / 8);
-      wrectangle(v.ptr, an, al, c4, (cColor % 16) * 8 + 1, (cColor / 16) * 8 + 9, 9, 9);
+      wrectangle(v.ptr, w, h, c4, (cColor % 16) * 8 + 1, (cColor / 16) * 8 + 9, 9, 9);
       lRed.first_visible = 63 - dac[cColor * 3];
       lGre.first_visible = 63 - dac[cColor * 3 + 1];
       lBlu.first_visible = 63 - dac[cColor * 3 + 2];
@@ -2036,8 +2036,8 @@ void pal_interpolate2(void) {
 
         find_colors();
         refresh_dialog();
-        wrectangle(v.ptr, an, al, c0, (SelColor % 16) * 8 + 1, (SelColor / 16) * 8 + 9, 9, 9);
-        wrectangle(v.ptr, an, al, c4, (cColor % 16) * 8 + 1, (cColor / 16) * 8 + 9, 9, 9);
+        wrectangle(v.ptr, w, h, c0, (SelColor % 16) * 8 + 1, (SelColor / 16) * 8 + 9, 9, 9);
+        wrectangle(v.ptr, w, h, c4, (cColor % 16) * 8 + 1, (cColor / 16) * 8 + 9, 9, 9);
         set_dac(dac);
         break;
       case 2:
@@ -2047,8 +2047,8 @@ void pal_interpolate2(void) {
         dac[cColor * 3 + 2] = dac[SelColor * 3 + 2];
         find_colors();
         refresh_dialog();
-        wrectangle(v.ptr, an, al, c0, (SelColor % 16) * 8 + 1, (SelColor / 16) * 8 + 9, 9, 9);
-        wrectangle(v.ptr, an, al, c4, (cColor % 16) * 8 + 1, (cColor / 16) * 8 + 9, 9, 9);
+        wrectangle(v.ptr, w, h, c0, (SelColor % 16) * 8 + 1, (SelColor / 16) * 8 + 9, 9, 9);
+        wrectangle(v.ptr, w, h, c4, (cColor % 16) * 8 + 1, (cColor / 16) * 8 + 9, 9, 9);
         set_dac(dac);
         break;
       case 3:
@@ -2064,17 +2064,17 @@ void pal_interpolate2(void) {
         dac[cColor * 3 + 2] = bWork;
         find_colors();
         refresh_dialog();
-        wrectangle(v.ptr, an, al, c0, (SelColor % 16) * 8 + 1, (SelColor / 16) * 8 + 9, 9, 9);
-        wrectangle(v.ptr, an, al, c4, (cColor % 16) * 8 + 1, (cColor / 16) * 8 + 9, 9, 9);
+        wrectangle(v.ptr, w, h, c0, (SelColor % 16) * 8 + 1, (SelColor / 16) * 8 + 9, 9, 9);
+        wrectangle(v.ptr, w, h, c4, (cColor % 16) * 8 + 1, (cColor / 16) * 8 + 9, 9, 9);
         set_dac(dac);
         break;
       }
-      wbox(v.ptr, an, al, SelColor, (SelColor % 16) * 8 + 4, (SelColor / 16) * 8 + 12, 3, 3);
+      wbox(v.ptr, w, h, SelColor, (SelColor % 16) * 8 + 4, (SelColor / 16) * 8 + 12, 3, 3);
       SelColor = cColor;
       if (dac[SelColor * 3] * dac[SelColor * 3 + 1] * dac[SelColor * 3 + 2] < (32 * 32 * 32))
-        wbox(v.ptr, an, al, c4, (SelColor % 16) * 8 + 4, (SelColor / 16) * 8 + 12, 3, 3);
+        wbox(v.ptr, w, h, c4, (SelColor % 16) * 8 + 4, (SelColor / 16) * 8 + 12, 3, 3);
       else
-        wbox(v.ptr, an, al, c0, (SelColor % 16) * 8 + 4, (SelColor / 16) * 8 + 12, 3, 3);
+        wbox(v.ptr, w, h, c0, (SelColor % 16) * 8 + 4, (SelColor / 16) * 8 + 12, 3, 3);
       if (Accion) {
         Degradar = 0;
         Copiar = 0;
@@ -2086,33 +2086,33 @@ void pal_interpolate2(void) {
     }
   } else {
     if (OldColor != SelColor) {
-      wrectangle(v.ptr, an, al, c0, (OldColor % 16) * 8 + 1, (OldColor / 16) * 8 + 9, 9, 9);
-      wrectangle(v.ptr, an, al, c4, (SelColor % 16) * 8 + 1, (SelColor / 16) * 8 + 9, 9, 9);
-      wbox(v.ptr, an, al, SelColor, 133, 27, 29, 42 - 29);
+      wrectangle(v.ptr, w, h, c0, (OldColor % 16) * 8 + 1, (OldColor / 16) * 8 + 9, 9, 9);
+      wrectangle(v.ptr, w, h, c4, (SelColor % 16) * 8 + 1, (SelColor / 16) * 8 + 9, 9, 9);
+      wbox(v.ptr, w, h, SelColor, 133, 27, 29, 42 - 29);
       OldColor = SelColor;
 
-      wbox(v.ptr, an, al, c2, 130, 11, 29, 15);
-      wwrite(v.ptr, an, al, 147, 11, 0, texts[141], c3);
+      wbox(v.ptr, w, h, c2, 130, 11, 29, 15);
+      wwrite(v.ptr, w, h, 147, 11, 0, texts[141], c3);
       div_snprintf(cWork, sizeof(cWork), "%03d", SelColor);
-      wwrite(v.ptr, an, al, 145, 11, 2, (byte *)cWork, c3);
-      wwrite(v.ptr, an, al, 147, 19, 0, texts[142], c3);
+      wwrite(v.ptr, w, h, 145, 11, 2, (byte *)cWork, c3);
+      wwrite(v.ptr, w, h, 147, 19, 0, texts[142], c3);
       div_snprintf(cWork, sizeof(cWork), " %02X", SelColor);
-      wwrite(v.ptr, an, al, 145, 19, 2, (byte *)cWork, c3);
-      wbox(v.ptr, an, al, c2, 130, 63 - 21, 25, 20);
+      wwrite(v.ptr, w, h, 145, 19, 2, (byte *)cWork, c3);
+      wbox(v.ptr, w, h, c2, 130, 63 - 21, 25, 20);
 
-      wwrite(v.ptr, an, al, 147, 63 - 21, 0, texts[143], c3);
+      wwrite(v.ptr, w, h, 147, 63 - 21, 0, texts[143], c3);
       div_snprintf(cWork, sizeof(cWork), "%02d", dac[SelColor * 3]);
-      wwrite(v.ptr, an, al, 140, 63 - 21, 2, (byte *)cWork, c3);
-      wwrite(v.ptr, an, al, 147, 63 - 14, 0, texts[144], c3);
+      wwrite(v.ptr, w, h, 140, 63 - 21, 2, (byte *)cWork, c3);
+      wwrite(v.ptr, w, h, 147, 63 - 14, 0, texts[144], c3);
       div_snprintf(cWork, sizeof(cWork), "%02d", dac[SelColor * 3 + 1]);
-      wwrite(v.ptr, an, al, 140, 63 - 14, 2, (byte *)cWork, c3);
-      wwrite(v.ptr, an, al, 147, 63 - 7, 0, texts[145], c3);
+      wwrite(v.ptr, w, h, 140, 63 - 14, 2, (byte *)cWork, c3);
+      wwrite(v.ptr, w, h, 147, 63 - 7, 0, texts[145], c3);
       div_snprintf(cWork, sizeof(cWork), "%02d", dac[SelColor * 3 + 2]);
-      wwrite(v.ptr, an, al, 140, 63 - 7, 2, (byte *)cWork, c3);
+      wwrite(v.ptr, w, h, 140, 63 - 7, 2, (byte *)cWork, c3);
       lRed.first_visible = 63 - dac[SelColor * 3];
       lGre.first_visible = 63 - dac[SelColor * 3 + 1];
       lBlu.first_visible = 63 - dac[SelColor * 3 + 2];
-      wbox(v.ptr, an, al, SelColor, 133, 27, 29, 42 - 29);
+      wbox(v.ptr, w, h, SelColor, 133, 27, 29, 42 - 29);
       v.redraw = 1;
     }
   }
@@ -2247,19 +2247,19 @@ void pal_interpolate2(void) {
     Accion = 0;
     call((voidReturnType)v.paint_handler);
 
-    boton(4, an / 2, al - 13, 1, c0);
+    boton(4, w / 2, h - 13, 1, c0);
 
     //Refresh values and scrollbars
-    wbox(v.ptr, an, al, c2, 130, 63 - 21, 25, 20);
-    wwrite(v.ptr, an, al, 147, 63 - 21, 0, texts[143], c3);
+    wbox(v.ptr, w, h, c2, 130, 63 - 21, 25, 20);
+    wwrite(v.ptr, w, h, 147, 63 - 21, 0, texts[143], c3);
     div_snprintf(cWork, sizeof(cWork), "%02d", dac[SelColor * 3]);
-    wwrite(v.ptr, an, al, 140, 63 - 21, 2, (byte *)cWork, c3);
-    wwrite(v.ptr, an, al, 147, 63 - 14, 0, texts[144], c3);
+    wwrite(v.ptr, w, h, 140, 63 - 21, 2, (byte *)cWork, c3);
+    wwrite(v.ptr, w, h, 147, 63 - 14, 0, texts[144], c3);
     div_snprintf(cWork, sizeof(cWork), "%02d", dac[SelColor * 3 + 1]);
-    wwrite(v.ptr, an, al, 140, 63 - 14, 2, (byte *)cWork, c3);
-    wwrite(v.ptr, an, al, 147, 63 - 7, 0, texts[145], c3);
+    wwrite(v.ptr, w, h, 140, 63 - 14, 2, (byte *)cWork, c3);
+    wwrite(v.ptr, w, h, 147, 63 - 7, 0, texts[145], c3);
     div_snprintf(cWork, sizeof(cWork), "%02d", dac[SelColor * 3 + 2]);
-    wwrite(v.ptr, an, al, 140, 63 - 7, 2, (byte *)cWork, c3);
+    wwrite(v.ptr, w, h, 140, 63 - 7, 2, (byte *)cWork, c3);
     lRed.first_visible = 63 - dac[SelColor * 3];
     lGre.first_visible = 63 - dac[SelColor * 3 + 1];
     lBlu.first_visible = 63 - dac[SelColor * 3 + 2];
@@ -2274,19 +2274,19 @@ void pal_interpolate2(void) {
 
 void pal_interpolate0(void) {
   v.type = 1; // Dialog
-  v.an = 220 - 46 - 7;
-  v.al = 163 + 24 - 16;
+  v.w = 220 - 46 - 7;
+  v.h = 163 + 24 - 16;
   v.title = texts[138];
   v.paint_handler = pal_interpolate1;
   v.click_handler = pal_interpolate2;
 
-  _button(100, 7, v.al - 14, 0);
-  _button(101, v.an - 8, v.al - 14, 2);
-  _button(104, v.an / 2, v.al - 14, 1);
+  _button(100, 7, v.h - 14, 0);
+  _button(101, v.w - 8, v.h - 14, 2);
+  _button(104, v.w / 2, v.h - 14, 1);
 
   _flag(105, 4, 143, &Degradar);
-  _flag(106, v.an / 2 - (8 * big2 + text_len(texts[106])) / 2, 143, &Intercambiar);
-  _flag(107, (v.an - 5) - (8 * big2 + text_len(texts[107])), 143, &Copiar);
+  _flag(106, v.w / 2 - (8 * big2 + text_len(texts[106])) / 2, 143, &Intercambiar);
+  _flag(107, (v.w - 5) - (8 * big2 + text_len(texts[107])), 143, &Copiar);
 }
 
 //-----------------------------------------------------------------------------

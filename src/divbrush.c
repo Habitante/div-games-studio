@@ -30,8 +30,8 @@ typedef struct {
   int tam;
   char descrip[32];
   char filename[12];
-  int ancho;
-  int alto;
+  int width;
+  int height;
   int puntos;
 } FPG_info;
 
@@ -81,16 +81,16 @@ int altura_techo = 2048;
 int altura_suelo = 1024;
 
 #define max_texturas 1000
-#define an_textura   (3 + 1) // 000 - 999
-char m3d_fpgcodesbr[max_texturas * an_textura];
-char textura[max_texturas * an_textura];
-char fondo[max_texturas * an_textura];
+#define w_textura   (3 + 1) // 000 - 999
+char m3d_fpgcodesbr[max_texturas * w_textura];
+char textura[max_texturas * w_textura];
+char fondo[max_texturas * w_textura];
 int t_maximo;
 int f_maximo;
-struct t_listboxbr ltexturasbr = {3 - 2, 11 - 2, m3d_fpgcodesbr, an_textura, 4, 4, 32, 32};
+struct t_listboxbr ltexturasbr = {3 - 2, 11 - 2, m3d_fpgcodesbr, w_textura, 4, 4, 32, 32};
 
 struct _thumb_tex {
-  int an, al;
+  int w, h;
   int RealAn, RealAl;
   char *ptr;
   int status;
@@ -117,7 +117,7 @@ float zoom_level;
 extern int num_pincel;
 extern int TipoBrowser;
 extern struct _thumb_map {
-  int an, al;
+  int w, h;
   int RealAn, RealAl;
   char *ptr;
   int status;
@@ -163,8 +163,8 @@ void M3D_create_thumbs(struct t_listboxbr *l, int prog) {
   thumb_tex[0].ptr = NULL;
   thumb_tex[0].status = 0;
   thumb_tex[0].Code = 0;
-  div_strcpy(&textura[0], an_textura, "000");
-  div_strcpy(&fondo[0], an_textura, "000");
+  div_strcpy(&textura[0], w_textura, "000");
+  div_strcpy(&fondo[0], w_textura, "000");
   t_maximo = f_maximo = 1;
 
   div_snprintf(cadenas[0], sizeof(cadenas[0]), "%d", scroll_x);
@@ -260,31 +260,31 @@ void M3D_create_thumbs(struct t_listboxbr *l, int prog) {
       }
     }
     fseek(FPG_F, sizeof(FPG_points) * FPG_D.info.puntos, SEEK_CUR);
-    FPG_progress.pos += (64 + 4 * FPG_D.info.puntos + FPG_D.info.ancho * FPG_D.info.alto);
+    FPG_progress.pos += (64 + 4 * FPG_D.info.puntos + FPG_D.info.width * FPG_D.info.height);
     if (prog)
       Progress((char *)texts[93], FPG_progress.pos, FPG_progress.total);
 
     thumb_tex[n].Cuad = 0;
     for (con = 0; con < 11; con++) {
-      if (FPG_D.info.ancho == tex_sop[con] && FPG_D.info.alto == tex_sop[con]) {
+      if (FPG_D.info.width == tex_sop[con] && FPG_D.info.height == tex_sop[con]) {
         thumb_tex[n].Cuad = 1;
       }
     }
 
-    thumb_tex[n].an = FPG_D.info.ancho;
-    thumb_tex[n].al = FPG_D.info.alto;
+    thumb_tex[n].w = FPG_D.info.width;
+    thumb_tex[n].h = FPG_D.info.height;
     thumb_tex[n].Code = FPG_D.info.cod;
 
     DIV_SPRINTF(cwork, "%03d", FPG_D.info.cod);
     if (thumb_tex[n].Cuad) {
-      div_strcpy(textura + t_maximo * an_textura, an_textura, cwork);
+      div_strcpy(textura + t_maximo * w_textura, w_textura, cwork);
       t_maximo++;
     }
-    div_strcpy(fondo + n * an_textura, an_textura, cwork);
+    div_strcpy(fondo + n * w_textura, w_textura, cwork);
 
     thumb_tex[n].FilePos = ftell(FPG_F);
 
-    if ((FPG_D.imagen = (byte *)malloc(FPG_D.info.ancho * FPG_D.info.alto)) == NULL) {
+    if ((FPG_D.imagen = (byte *)malloc(FPG_D.info.width * FPG_D.info.height)) == NULL) {
       for (n = 0; n < max_texturas; n++) {
         if (thumb_tex[n].ptr != NULL) {
           free(thumb_tex[n].ptr);
@@ -299,8 +299,8 @@ void M3D_create_thumbs(struct t_listboxbr *l, int prog) {
       return;
     }
 
-    if (fread(FPG_D.imagen, 1, FPG_D.info.ancho * FPG_D.info.alto, FPG_F) !=
-        FPG_D.info.ancho * FPG_D.info.alto) {
+    if (fread(FPG_D.imagen, 1, FPG_D.info.width * FPG_D.info.height, FPG_F) !=
+        FPG_D.info.width * FPG_D.info.height) {
       for (n = 0; n < max_texturas; n++) {
         if (thumb_tex[n].ptr != NULL) {
           free(thumb_tex[n].ptr);
@@ -326,39 +326,39 @@ void M3D_create_thumbs(struct t_listboxbr *l, int prog) {
   // In paint mode, start from index 0 (no empty texture slot)
   for (con = 0; con < l->total_items; con++) {
     for (;;) {
-      man = thumb_tex[con].RealAn = thumb_tex[con].an;
-      mal = thumb_tex[con].RealAl = thumb_tex[con].al;
+      man = thumb_tex[con].RealAn = thumb_tex[con].w;
+      mal = thumb_tex[con].RealAl = thumb_tex[con].h;
       temp = (byte *)thumb_tex[con].ptr;
 
       if (man <= 32 * big2 && mal <= 32 * big2) {
-        for (n = thumb_tex[con].an * thumb_tex[con].al - 1; n >= 0; n--) {
+        for (n = thumb_tex[con].w * thumb_tex[con].h - 1; n >= 0; n--) {
           temp[n] = FPG_xlat[temp[n]];
         }
       } else {
         coefredx = man / ((float)32 * 2 * (float)big2);
         coefredy = mal / ((float)32 * 2 * (float)big2);
-        thumb_tex[con].an = (float)man / coefredx + 0.5;
-        thumb_tex[con].al = (float)mal / coefredy + 0.5;
-        thumb_tex[con].an &= -2;
-        thumb_tex[con].al &= -2;
-        if (thumb_tex[con].an < 2)
-          thumb_tex[con].an = 2;
-        if (thumb_tex[con].al < 2)
-          thumb_tex[con].al = 2;
+        thumb_tex[con].w = (float)man / coefredx + 0.5;
+        thumb_tex[con].h = (float)mal / coefredy + 0.5;
+        thumb_tex[con].w &= -2;
+        thumb_tex[con].h &= -2;
+        if (thumb_tex[con].w < 2)
+          thumb_tex[con].w = 2;
+        if (thumb_tex[con].h < 2)
+          thumb_tex[con].h = 2;
 
-        if ((temp2 = (byte *)malloc(thumb_tex[con].an * thumb_tex[con].al)) == NULL) {
+        if ((temp2 = (byte *)malloc(thumb_tex[con].w * thumb_tex[con].h)) == NULL) {
           free(thumb_tex[con].ptr);
           thumb_tex[con].ptr = NULL;
           thumb_tex[con].status = 0;
           break;
         }
 
-        memset(temp2, 0, thumb_tex[con].an * thumb_tex[con].al);
+        memset(temp2, 0, thumb_tex[con].w * thumb_tex[con].h);
         a = (float)0.0;
-        for (y = 0; y < thumb_tex[con].al; y++) {
+        for (y = 0; y < thumb_tex[con].h; y++) {
           b = (float)0.0;
-          for (x = 0; x < thumb_tex[con].an; x++) {
-            temp2[y * thumb_tex[con].an + x] = temp[((int)a) * man + (int)b];
+          for (x = 0; x < thumb_tex[con].w; x++) {
+            temp2[y * thumb_tex[con].w + x] = temp[((int)a) * man + (int)b];
             b += coefredx;
           }
           a += coefredy;
@@ -366,28 +366,28 @@ void M3D_create_thumbs(struct t_listboxbr *l, int prog) {
 
         free(thumb_tex[con].ptr);
 
-        for (n = thumb_tex[con].an * thumb_tex[con].al - 1; n >= 0; n--) {
+        for (n = thumb_tex[con].w * thumb_tex[con].h - 1; n >= 0; n--) {
           temp2[n] = FPG_xlat[temp2[n]];
         }
 
-        if ((thumb_tex[con].ptr = (char *)malloc((thumb_tex[con].an * thumb_tex[con].al) / 4)) ==
+        if ((thumb_tex[con].ptr = (char *)malloc((thumb_tex[con].w * thumb_tex[con].h) / 4)) ==
             NULL) {
           free(temp2);
           thumb_tex[con].ptr = NULL;
           thumb_tex[con].status = 0;
           break;
         }
-        for (y = 0; y < thumb_tex[con].al; y += 2) {
-          for (x = 0; x < thumb_tex[con].an; x += 2) {
-            n = *(ghost + temp2[x + y * thumb_tex[con].an] * 256 +
-                  temp2[x + 1 + y * thumb_tex[con].an]);
-            m = *(ghost + temp2[x + (y + 1) * thumb_tex[con].an] * 256 +
-                  temp2[x + 1 + (y + 1) * thumb_tex[con].an]);
-            thumb_tex[con].ptr[x / 2 + (y / 2) * (thumb_tex[con].an / 2)] = *(ghost + n * 256 + m);
+        for (y = 0; y < thumb_tex[con].h; y += 2) {
+          for (x = 0; x < thumb_tex[con].w; x += 2) {
+            n = *(ghost + temp2[x + y * thumb_tex[con].w] * 256 +
+                  temp2[x + 1 + y * thumb_tex[con].w]);
+            m = *(ghost + temp2[x + (y + 1) * thumb_tex[con].w] * 256 +
+                  temp2[x + 1 + (y + 1) * thumb_tex[con].w]);
+            thumb_tex[con].ptr[x / 2 + (y / 2) * (thumb_tex[con].w / 2)] = *(ghost + n * 256 + m);
           }
         }
-        thumb_tex[con].an /= 2;
-        thumb_tex[con].al /= 2;
+        thumb_tex[con].w /= 2;
+        thumb_tex[con].h /= 2;
         free(temp2);
       }
       thumb_tex[con].status = 1;
@@ -404,8 +404,8 @@ void M3D_create_thumbs(struct t_listboxbr *l, int prog) {
   }
 
   qsort(thumb_tex, l->total_items, sizeof(struct _thumb_tex), cmpcode);
-  qsort(textura, t_maximo, an_textura, strcmpsort);
-  qsort(fondo, l->total_items, an_textura, strcmpsort);
+  qsort(textura, t_maximo, w_textura, strcmpsort);
+  qsort(fondo, l->total_items, w_textura, strcmpsort);
 }
 
 //-----------------------------------------------------------------------------
@@ -416,7 +416,7 @@ void M3D_create_thumbs(struct t_listboxbr *l, int prog) {
 
 void M3D_show_thumb(struct t_listboxbr *l, int num) {
   byte *ptr = v.ptr, c;
-  int an = v.an / big2, al = v.al / big2;
+  int w = v.w / big2, h = v.h / big2;
   int px, py, x, y, ly, incy;
   int num_tex;
   char *p;
@@ -431,7 +431,7 @@ void M3D_show_thumb(struct t_listboxbr *l, int num) {
     if (TipoBrowser == MAPBR) {
       num_tex = num;
     } else {
-      num_tex = atoi(m3d_fpgcodesbr + num * an_textura);
+      num_tex = atoi(m3d_fpgcodesbr + num * w_textura);
       if (num_tex) {
         for (x = 0; x < max_texturas; x++) {
           if (thumb_tmp[x].Code == num_tex) {
@@ -442,65 +442,65 @@ void M3D_show_thumb(struct t_listboxbr *l, int num) {
       }
     }
 
-    px = (l->x + 1 + (l->an + 1) * ((num - l->first_visible) % l->columns)) * big2 +
-         (l->an * big2 - thumb_tmp[num_tex].an) / 2;
-    if ((incy = ((l->al - 8) * big2 - thumb_tmp[num_tex].al) / 2) < 0)
+    px = (l->x + 1 + (l->w + 1) * ((num - l->first_visible) % l->columns)) * big2 +
+         (l->w * big2 - thumb_tmp[num_tex].w) / 2;
+    if ((incy = ((l->h - 8) * big2 - thumb_tmp[num_tex].h) / 2) < 0)
       incy = 0;
-    py = (l->y + 1 + (l->al + 1) * ((num - l->first_visible) / l->columns)) * big2 + incy;
+    py = (l->y + 1 + (l->h + 1) * ((num - l->first_visible) / l->columns)) * big2 + incy;
 
-    ly = (l->y + (l->al + 1) * ((num - l->first_visible) / l->columns) + l->al - 8) * big2;
+    ly = (l->y + (l->h + 1) * ((num - l->first_visible) / l->columns) + l->h - 8) * big2;
 
-    wbox(ptr, an, al, c01, (px - (l->an * big2 - thumb_tmp[num_tex].an) / 2) / big2,
-         (py - incy) / big2 + l->al - 8, l->an, 8);
+    wbox(ptr, w, h, c01, (px - (l->w * big2 - thumb_tmp[num_tex].w) / 2) / big2,
+         (py - incy) / big2 + l->h - 8, l->w, 8);
 
     if (thumb_tmp[num_tex].ptr != NULL && thumb_tmp[num_tex].status) {
       if (TipoBrowser == 4 /*BRUSH*/)
-        for (y = 0; y < thumb_tmp[num_tex].al; y++) {
-          for (x = 0; x < thumb_tmp[num_tex].an; x++) {
+        for (y = 0; y < thumb_tmp[num_tex].h; y++) {
+          for (x = 0; x < thumb_tmp[num_tex].w; x++) {
             if (py + y > ly)
-              c = *(ghost + c0 * 256 + thumb_tmp[num_tex].ptr[y * thumb_tmp[num_tex].an + x]);
+              c = *(ghost + c0 * 256 + thumb_tmp[num_tex].ptr[y * thumb_tmp[num_tex].w + x]);
             else
-              c = thumb_tmp[num_tex].ptr[y * thumb_tmp[num_tex].an + x];
+              c = thumb_tmp[num_tex].ptr[y * thumb_tmp[num_tex].w + x];
             if (c)
-              v.ptr[(py + y) * v.an + (px + x)] = c;
+              v.ptr[(py + y) * v.w + (px + x)] = c;
           }
         }
       else
-        for (y = 0; y < thumb_tmp[num_tex].al; y++) {
-          for (x = 0; x < thumb_tmp[num_tex].an; x++) {
+        for (y = 0; y < thumb_tmp[num_tex].h; y++) {
+          for (x = 0; x < thumb_tmp[num_tex].w; x++) {
             if (py + y > ly)
-              v.ptr[(py + y) * v.an + (px + x)] =
-                  *(ghost + c0 * 256 + thumb_tmp[num_tex].ptr[y * thumb_tmp[num_tex].an + x]);
+              v.ptr[(py + y) * v.w + (px + x)] =
+                  *(ghost + c0 * 256 + thumb_tmp[num_tex].ptr[y * thumb_tmp[num_tex].w + x]);
             else
-              v.ptr[(py + y) * v.an + (px + x)] =
-                  thumb_tmp[num_tex].ptr[y * thumb_tmp[num_tex].an + x];
+              v.ptr[(py + y) * v.w + (px + x)] =
+                  thumb_tmp[num_tex].ptr[y * thumb_tmp[num_tex].w + x];
           }
         }
     }
 
-    px -= (l->an * big2 - thumb_tmp[num_tex].an) / 2;
+    px -= (l->w * big2 - thumb_tmp[num_tex].w) / 2;
     py -= incy;
     px /= big2;
     py /= big2;
 
     if (thumb_tmp[num_tex].ptr == NULL && !thumb_tmp[num_tex].status && num != 0) {
-      wput(ptr, an, al, px + (l->an - 21) / 2, py + 1, 60);
+      wput(ptr, w, h, px + (l->w - 21) / 2, py + 1, 60);
     }
 
     if (TipoBrowser != MAPBR) {
       if (draw_mode < 100 && num_tex == num_pincel) {
-        wbox(ptr, an, al, c_b_low, px, py + l->al - 8, l->an, 8);
+        wbox(ptr, w, h, c_b_low, px, py + l->h - 8, l->w, 8);
       }
 
-      py += l->al - 1;
+      py += l->h - 1;
       p = l->list + l->item_width * num;
 
       if (l->zone - 10 == num - l->first_visible)
         x = c4;
       else
         x = c3;
-      wwrite(ptr, an, al, px + l->an / 2 + 1, py, 7, (byte *)p, c0);
-      wwrite(ptr, an, al, px + l->an / 2, py, 7, (byte *)p, x);
+      wwrite(ptr, w, h, px + l->w / 2 + 1, py, 7, (byte *)p, c0);
+      wwrite(ptr, w, h, px + l->w / 2, py, 7, (byte *)p, x);
     }
 
     v.redraw = 1;
@@ -513,12 +513,12 @@ void M3D_show_thumb(struct t_listboxbr *l, int num) {
 
 void M3D_create_listboxbr(struct t_listboxbr *l) {
   byte *ptr = v.ptr;
-  int an = v.an / big2, al = v.al / big2;
+  int w = v.w / big2, h = v.h / big2;
   int x, y;
 
   if (!l->created) {
     l->slide = l->s0 = l->y + 9;
-    l->s1 = l->y + (l->al * l->lines + l->lines + 1) - 12;
+    l->s1 = l->y + (l->h * l->lines + l->lines + 1) - 12;
     l->buttons = 0;
     l->created = 1;
     l->zone = 0;
@@ -528,18 +528,18 @@ void M3D_create_listboxbr(struct t_listboxbr *l) {
     }
   }
 
-  wbox(ptr, an, al, c1, l->x, l->y, (l->an + 1) * l->columns, (l->al + 1) * l->lines);
+  wbox(ptr, w, h, c1, l->x, l->y, (l->w + 1) * l->columns, (l->h + 1) * l->lines);
 
   for (y = 0; y < l->lines; y++)
     for (x = 0; x < l->columns; x++)
-      wrectangle(ptr, an, al, c0, l->x + (x * (l->an + 1)), l->y + (y * (l->al + 1)), l->an + 2,
-                 l->al + 2);
+      wrectangle(ptr, w, h, c0, l->x + (x * (l->w + 1)), l->y + (y * (l->h + 1)), l->w + 2,
+                 l->h + 2);
 
-  wrectangle(ptr, an, al, c0, l->x + (l->an + 1) * l->columns, l->y, 9, (l->al + 1) * l->lines + 1);
-  wrectangle(ptr, an, al, c0, l->x + (l->an + 1) * l->columns, l->y + 8, 9,
-             (l->al + 1) * l->lines - 15);
-  wput(ptr, an, al, l->x + (l->an + 1) * l->columns + 1, l->y + 1, -39);
-  wput(ptr, an, al, l->x + (l->an + 1) * l->columns + 1, l->y + (l->al + 1) * l->lines - 7, -40);
+  wrectangle(ptr, w, h, c0, l->x + (l->w + 1) * l->columns, l->y, 9, (l->h + 1) * l->lines + 1);
+  wrectangle(ptr, w, h, c0, l->x + (l->w + 1) * l->columns, l->y + 8, 9,
+             (l->h + 1) * l->lines - 15);
+  wput(ptr, w, h, l->x + (l->w + 1) * l->columns + 1, l->y + 1, -39);
+  wput(ptr, w, h, l->x + (l->w + 1) * l->columns + 1, l->y + (l->h + 1) * l->lines - 7, -40);
 
   M3D_paint_listboxbr(l);
   paint_slider_br(l);
@@ -551,20 +551,20 @@ void M3D_create_listboxbr(struct t_listboxbr *l) {
 
 void M3D_update_listboxbr(struct t_listboxbr *l) {
   byte *ptr = v.ptr, *p;
-  int an = v.an / big2, al = v.al / big2;
+  int w = v.w / big2, h = v.h / big2;
   int n, old_zona = l->zone, x, y;
 
-  if (wmouse_in(l->x, l->y, (l->an + 1) * l->columns, (l->al + 1) * l->lines)) {
-    l->zone = (wmouse_x - l->x) / (l->an + 1) + ((wmouse_y - l->y) / (l->al + 1)) * l->columns;
+  if (wmouse_in(l->x, l->y, (l->w + 1) * l->columns, (l->h + 1) * l->lines)) {
+    l->zone = (wmouse_x - l->x) / (l->w + 1) + ((wmouse_y - l->y) / (l->h + 1)) * l->columns;
     if (l->zone >= l->total_items - l->first_visible || l->zone >= l->lines * l->columns)
       l->zone = 1;
     else
       l->zone += 10;
-  } else if (wmouse_in(l->x + (l->an + 1) * l->columns, l->y, 9, 9))
+  } else if (wmouse_in(l->x + (l->w + 1) * l->columns, l->y, 9, 9))
     l->zone = 2;
-  else if (wmouse_in(l->x + (l->an + 1) * l->columns, l->y + (l->al + 1) * l->lines - 8, 9, 9))
+  else if (wmouse_in(l->x + (l->w + 1) * l->columns, l->y + (l->h + 1) * l->lines - 8, 9, 9))
     l->zone = 3;
-  else if (wmouse_in(l->x + (l->an + 1) * l->columns, l->y + 9, 9, (l->al + 1) * l->lines - 17))
+  else if (wmouse_in(l->x + (l->w + 1) * l->columns, l->y + 9, 9, (l->h + 1) * l->lines - 17))
     l->zone = 4;
   else
     l->zone = 0;
@@ -572,10 +572,10 @@ void M3D_update_listboxbr(struct t_listboxbr *l) {
   if (TipoBrowser != MAPBR) {
     if (old_zona != l->zone)
       if (old_zona >= 10) {
-        x = l->x + 1 + ((old_zona - 10) % l->columns) * (l->an + 1);
-        y = l->y + l->al + ((old_zona - 10) / l->columns) * (l->al + 1);
+        x = l->x + 1 + ((old_zona - 10) % l->columns) * (l->w + 1);
+        y = l->y + l->h + ((old_zona - 10) / l->columns) * (l->h + 1);
         p = (byte *)l->list + l->item_width * (l->first_visible + old_zona - 10);
-        wwrite(ptr, an, al, x + l->an / 2, y, 7, p, c3);
+        wwrite(ptr, w, h, x + l->w / 2, y, 7, p, c3);
         v.redraw = 1;
       }
   }
@@ -592,11 +592,11 @@ void M3D_update_listboxbr(struct t_listboxbr *l) {
       M3D_paint_listboxbr(l);
       v.redraw = 1;
     }
-    wput(ptr, an, al, l->x + (l->an + 1) * l->columns + 1, l->y + 1, -41);
+    wput(ptr, w, h, l->x + (l->w + 1) * l->columns + 1, l->y + 1, -41);
     l->buttons |= 1;
     v.redraw = 1;
   } else if (l->buttons & 1) {
-    wput(ptr, an, al, l->x + (l->an + 1) * l->columns + 1, l->y + 1, -39);
+    wput(ptr, w, h, l->x + (l->w + 1) * l->columns + 1, l->y + 1, -39);
     l->buttons ^= 1;
     v.redraw = 1;
   }
@@ -614,11 +614,11 @@ void M3D_update_listboxbr(struct t_listboxbr *l) {
       M3D_paint_listboxbr(l);
       v.redraw = 1;
     }
-    wput(ptr, an, al, l->x + (l->an + 1) * l->columns + 1, l->y + (l->al + 1) * l->lines - 7, -42);
+    wput(ptr, w, h, l->x + (l->w + 1) * l->columns + 1, l->y + (l->h + 1) * l->lines - 7, -42);
     l->buttons |= 2;
     v.redraw = 1;
   } else if (l->buttons & 2) {
-    wput(ptr, an, al, l->x + (l->an + 1) * l->columns + 1, l->y + (l->al + 1) * l->lines - 7, -40);
+    wput(ptr, w, h, l->x + (l->w + 1) * l->columns + 1, l->y + (l->h + 1) * l->lines - 7, -40);
     l->buttons ^= 2;
     v.redraw = 1;
   }
@@ -662,10 +662,10 @@ void M3D_update_listboxbr(struct t_listboxbr *l) {
   if (TipoBrowser != MAPBR) {
     if (old_zona != l->zone)
       if (l->zone >= 10) {
-        x = l->x + 1 + ((l->zone - 10) % l->columns) * (l->an + 1);
-        y = l->y + l->al + ((l->zone - 10) / l->columns) * (l->al + 1);
+        x = l->x + 1 + ((l->zone - 10) % l->columns) * (l->w + 1);
+        y = l->y + l->h + ((l->zone - 10) / l->columns) * (l->h + 1);
         p = (byte *)l->list + l->item_width * (l->first_visible + l->zone - 10);
-        wwrite(ptr, an, al, x + l->an / 2, y, 7, p, c4);
+        wwrite(ptr, w, h, x + l->w / 2, y, 7, p, c4);
         v.redraw = 1;
       }
   }
@@ -689,29 +689,29 @@ void M3D_update_listboxbr(struct t_listboxbr *l) {
 
 void M3D_paint_listboxbr(struct t_listboxbr *l) {
   byte *ptr = v.ptr;
-  int an = v.an / big2, al = v.al / big2;
+  int w = v.w / big2, h = v.h / big2;
   int n, y, x;
 
   for (y = 0; y < l->lines; y++)
     for (x = 0; x < l->columns; x++) {
-      wbox(ptr, an, al, c1, l->x + (x * (l->an + 1)) + 1, l->y + (y * (l->al + 1)) + 1, l->an,
-           l->al - 8);
-      wbox(ptr, an, al, c01, l->x + (x * (l->an + 1)) + 1, l->y + (y * (l->al + 1)) + 1 + l->al - 8,
-           l->an, 8);
+      wbox(ptr, w, h, c1, l->x + (x * (l->w + 1)) + 1, l->y + (y * (l->h + 1)) + 1, l->w,
+           l->h - 8);
+      wbox(ptr, w, h, c01, l->x + (x * (l->w + 1)) + 1, l->y + (y * (l->h + 1)) + 1 + l->h - 8,
+           l->w, 8);
     }
 
-  if (wmouse_in(l->x, l->y, (l->an + 1) * l->columns, (l->al + 1) * l->lines)) {
-    l->zone = ((mouse_x - v.x) / big2 - l->x) / (l->an + 1) +
-              (((mouse_y - v.y) / big2 - l->y) / (l->al + 1)) * l->columns;
+  if (wmouse_in(l->x, l->y, (l->w + 1) * l->columns, (l->h + 1) * l->lines)) {
+    l->zone = ((mouse_x - v.x) / big2 - l->x) / (l->w + 1) +
+              (((mouse_y - v.y) / big2 - l->y) / (l->h + 1)) * l->columns;
     if (l->zone >= l->total_items - l->first_visible || l->zone >= l->lines * l->columns)
       l->zone = 1;
     else
       l->zone += 10;
-  } else if (wmouse_in(l->x + (l->an + 1) * l->columns, l->y, 9, 9))
+  } else if (wmouse_in(l->x + (l->w + 1) * l->columns, l->y, 9, 9))
     l->zone = 2;
-  else if (wmouse_in(l->x + (l->an + 1) * l->columns, l->y + (l->al + 1) * l->lines - 8, 9, 9))
+  else if (wmouse_in(l->x + (l->w + 1) * l->columns, l->y + (l->h + 1) * l->lines - 8, 9, 9))
     l->zone = 3;
-  else if (wmouse_in(l->x + (l->an + 1) * l->columns, l->y + 9, 9, (l->al + 1) * l->lines - 17))
+  else if (wmouse_in(l->x + (l->w + 1) * l->columns, l->y + 9, 9, (l->h + 1) * l->lines - 17))
     l->zone = 4;
   else
     l->zone = 0;
@@ -734,8 +734,8 @@ extern struct t_listboxbr lthumbmapbr;
 
 void MapperBrowseFPG0(void) {
   v.type = 1;
-  v.an = 147 - 4;
-  v.al = 147 - 4;
+  v.w = 147 - 4;
+  v.h = 147 - 4;
   if (TipoTex > 3) {
     if (TipoBrowser == BRUSH) {
       v.title = texts[572];
@@ -758,15 +758,15 @@ void MapperBrowseFPG0(void) {
       memcpy(&ltexturasbr, &lthumbmapbr, sizeof(ltexturasbr));
       ltexturasbr.total_items = m_maximo;
     } else {
-      memcpy(m3d_fpgcodesbr, fondo, max_texturas * an_textura);
+      memcpy(m3d_fpgcodesbr, fondo, max_texturas * w_textura);
       ltexturasbr.total_items = f_maximo;
     }
   } else {
     if (TipoTex == FONDO) {
-      memcpy(m3d_fpgcodesbr, fondo, max_texturas * an_textura);
+      memcpy(m3d_fpgcodesbr, fondo, max_texturas * w_textura);
       ltexturasbr.total_items = f_maximo;
     } else {
-      memcpy(m3d_fpgcodesbr, textura, max_texturas * an_textura);
+      memcpy(m3d_fpgcodesbr, textura, max_texturas * w_textura);
       ltexturasbr.total_items = t_maximo;
     }
   }
@@ -775,8 +775,8 @@ void MapperBrowseFPG0(void) {
 
   ltexturasbr.created = 0;
   ltexturasbr.columns = 4;
-  ltexturasbr.an = 32;
-  ltexturasbr.al = 32;
+  ltexturasbr.w = 32;
+  ltexturasbr.h = 32;
   ltexturasbr.lines = 4;
 
   v_finished = 0;

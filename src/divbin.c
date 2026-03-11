@@ -13,14 +13,14 @@ void FPG_update_listbox_br(struct t_listboxbr *l);
 
 // Trash pain handerl
 void Bin1(void) {
-  int an = v.an, al = v.al;
+  int w = v.w, h = v.h;
   byte *ptr = v.ptr;
   if (big) {
-    an /= 2;
-    al /= 2;
+    w /= 2;
+    h /= 2;
   }
 
-  wput(ptr, an, al, 2, 10, -219);
+  wput(ptr, w, h, 2, 10, -219);
 }
 
 // Trash click handler (handles mouse-up event for drag)
@@ -81,8 +81,8 @@ void Bin2(void) {
 
 void Bin0(void) {
   v.type = 5;
-  v.an = 27;
-  v.al = 34;
+  v.w = 27;
+  v.h = 34;
   v.paint_handler = Bin1;
   v.click_handler = Bin2;
   v.title = (byte *)"";

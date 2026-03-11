@@ -62,22 +62,22 @@ Mix_Chunk *smp = NULL;
 };*/
 
 
-extern char archivo[max_archivos * an_archivo];
+extern char archivo[max_archivos * w_archivo];
 //[?*max_archivos]
-struct t_listboxbr larchivosbr = {77, 27, archivo, an_archivo, 4, 4, 51, 31};
+struct t_listboxbr larchivosbr = {77, 27, archivo, w_archivo, 4, 4, 51, 31};
 
-extern char directorio[max_directorios * an_directorio];
-struct t_listbox ldirectoriosbr = {3, 27, directorio, an_directorio, 10, 65};
+extern char directorio[max_directorios * w_directorio];
+struct t_listbox ldirectoriosbr = {3, 27, directorio, w_directorio, 10, 65};
 
 #define max_unidades 26
-#define an_unidad    (4 + 1)
-extern char unidad[max_unidades * an_unidad];
-struct t_listbox lunidadesbr = {3, 121, unidad, an_unidad, 4, 28};
+#define w_unidad    (4 + 1)
+extern char unidad[max_unidades * w_unidad];
+struct t_listbox lunidadesbr = {3, 121, unidad, w_unidad, 4, 28};
 
 #define max_ext 26
-#define an_ext  (5 + 1)
-extern char ext[max_ext * an_ext];
-struct t_listbox lextbr = {40, 121, ext, an_ext, 4, 28};
+#define w_ext  (5 + 1)
+extern char ext[max_ext * w_ext];
+struct t_listbox lextbr = {40, 121, ext, w_ext, 4, 28};
 
 #define ancho_br 297
 #define alto_br  180
@@ -141,18 +141,18 @@ void load_letter(uint8_t letra);
 int wbox_ancho;
 
 void print_path_br(void) {
-  int an = v.an / big2, al = v.al / big2;
+  int w = v.w / big2, h = v.h / big2;
 
   if (v_thumb == 7)
-    wbox_ancho = an - 4 - 12 - text_len(texts[419]) - 12 - text_len(texts[567]);
+    wbox_ancho = w - 4 - 12 - text_len(texts[419]) - 12 - text_len(texts[567]);
   else if (v_type == 16)
-    wbox_ancho = an - 4 - 12 - text_len(texts[567]);
+    wbox_ancho = w - 4 - 12 - text_len(texts[567]);
   else if (v_thumb)
-    wbox_ancho = an - 4 - 12 - text_len(texts[419]);
+    wbox_ancho = w - 4 - 12 - text_len(texts[419]);
   else
-    wbox_ancho = an - 6;
+    wbox_ancho = w - 6;
 
-  wbox(v.ptr, an, al, c12, 3, 11, wbox_ancho, 8);
+  wbox(v.ptr, w, h, c12, 3, 11, wbox_ancho, 8);
 
   div_strcpy(full, sizeof(full), tipo[v_type].path);
   if (tipo[v_type].path[strlen(tipo[v_type].path) - 1] != '/') {
@@ -160,8 +160,8 @@ void print_path_br(void) {
   }
   div_strcat(full, sizeof(full), file_mask);
 
-  wwrite_in_box(v.ptr, an, wbox_ancho + 2, al, 5, 12, 0, (byte *)full, c1);
-  wwrite_in_box(v.ptr, an, wbox_ancho + 2, al, 4, 12, 0, (byte *)full, c3);
+  wwrite_in_box(v.ptr, w, wbox_ancho + 2, h, 5, 12, 0, (byte *)full, c1);
+  wwrite_in_box(v.ptr, w, wbox_ancho + 2, h, 4, 12, 0, (byte *)full, c3);
 }
 
 //-----------------------------------------------------------------------------
@@ -391,9 +391,9 @@ void create_thumb_MAP(struct t_listboxbr *l) {
 
           if (man <= 51 * big2 && mal <= 31 * big2) { // Graphic fits as-is
 
-            thumb[num].an = man;
-            thumb[num].al = mal;
-            for (n = thumb[num].an * thumb[num].al - 1; n >= 0; n--) {
+            thumb[num].w = man;
+            thumb[num].h = mal;
+            for (n = thumb[num].w * thumb[num].h - 1; n >= 0; n--) {
               temp[n] = xlat[temp[n]];
             }
             thumb[num].ptr = (char *)temp;
@@ -406,27 +406,27 @@ void create_thumb_MAP(struct t_listboxbr *l) {
               coefredy = coefredx;
             else
               coefredx = coefredy;
-            thumb[num].an = (float)man / coefredx + 0.5;
-            thumb[num].al = (float)mal / coefredy + 0.5;
-            thumb[num].an &= -2;
-            thumb[num].al &= -2;
-            if (thumb[num].an < 2)
-              thumb[num].an = 2;
-            if (thumb[num].al < 2)
-              thumb[num].al = 2;
+            thumb[num].w = (float)man / coefredx + 0.5;
+            thumb[num].h = (float)mal / coefredy + 0.5;
+            thumb[num].w &= -2;
+            thumb[num].h &= -2;
+            if (thumb[num].w < 2)
+              thumb[num].w = 2;
+            if (thumb[num].h < 2)
+              thumb[num].h = 2;
 
-            if (coefredx * (float)(thumb[num].an - 1) >= (float)man)
-              coefredx = (float)(man - 1) / (float)(thumb[num].an - 1);
-            if (coefredy * (float)(thumb[num].al - 1) >= (float)mal)
-              coefredy = (float)(mal - 1) / (float)(thumb[num].al - 1);
+            if (coefredx * (float)(thumb[num].w - 1) >= (float)man)
+              coefredx = (float)(man - 1) / (float)(thumb[num].w - 1);
+            if (coefredy * (float)(thumb[num].h - 1) >= (float)mal)
+              coefredy = (float)(mal - 1) / (float)(thumb[num].h - 1);
 
-            if ((temp2 = (byte *)malloc(thumb[num].an * thumb[num].al)) != NULL) {
-              memset(temp2, 0, thumb[num].an * thumb[num].al);
+            if ((temp2 = (byte *)malloc(thumb[num].w * thumb[num].h)) != NULL) {
+              memset(temp2, 0, thumb[num].w * thumb[num].h);
               a = (float)0.0;
-              for (y = 0; y < thumb[num].al; y++) {
+              for (y = 0; y < thumb[num].h; y++) {
                 b = (float)0.0;
-                for (x = 0; x < thumb[num].an; x++) {
-                  temp2[y * thumb[num].an + x] = temp[((memptrsize)a) * man + (memptrsize)b];
+                for (x = 0; x < thumb[num].w; x++) {
+                  temp2[y * thumb[num].w + x] = temp[((memptrsize)a) * man + (memptrsize)b];
                   b += coefredx;
                 }
                 a += coefredy;
@@ -434,25 +434,25 @@ void create_thumb_MAP(struct t_listboxbr *l) {
 
               // Apply the xlat[] table to the thumbnail
 
-              for (n = thumb[num].an * thumb[num].al - 1; n >= 0; n--) {
+              for (n = thumb[num].w * thumb[num].h - 1; n >= 0; n--) {
                 temp2[n] = xlat[temp2[n]];
               }
 
-              if ((thumb[num].ptr = (char *)malloc((thumb[num].an * thumb[num].al) / 4)) != NULL) {
-                memset(thumb[num].ptr, 0, (thumb[num].an * thumb[num].al) / 4);
+              if ((thumb[num].ptr = (char *)malloc((thumb[num].w * thumb[num].h) / 4)) != NULL) {
+                memset(thumb[num].ptr, 0, (thumb[num].w * thumb[num].h) / 4);
 
-                for (y = 0; y < thumb[num].al; y += 2) {
-                  for (x = 0; x < thumb[num].an; x += 2) {
-                    n = *(ghost + temp2[x + y * thumb[num].an] * 256 +
-                          temp2[x + 1 + y * thumb[num].an]);
-                    m = *(ghost + temp2[x + (y + 1) * thumb[num].an] * 256 +
-                          temp2[x + 1 + (y + 1) * thumb[num].an]);
-                    thumb[num].ptr[x / 2 + (y / 2) * (thumb[num].an / 2)] = *(ghost + n * 256 + m);
+                for (y = 0; y < thumb[num].h; y += 2) {
+                  for (x = 0; x < thumb[num].w; x += 2) {
+                    n = *(ghost + temp2[x + y * thumb[num].w] * 256 +
+                          temp2[x + 1 + y * thumb[num].w]);
+                    m = *(ghost + temp2[x + (y + 1) * thumb[num].w] * 256 +
+                          temp2[x + 1 + (y + 1) * thumb[num].w]);
+                    thumb[num].ptr[x / 2 + (y / 2) * (thumb[num].w / 2)] = *(ghost + n * 256 + m);
                   }
                 }
 
-                thumb[num].an /= 2;
-                thumb[num].al /= 2;
+                thumb[num].w /= 2;
+                thumb[num].h /= 2;
 
               } else {
                 thumb[num].ptr = NULL;
@@ -579,29 +579,29 @@ void create_thumb_PAL(struct t_listboxbr *l) {
       xlat[n] = fast_find_color(pal[n * 3], pal[n * 3 + 1], pal[n * 3 + 2]);
 
     // Create the palette thumbnail
-    thumb[num].an = 32 * big2;
-    thumb[num].al = 16 * big2;
-    if ((thumb[num].ptr = (char *)malloc((thumb[num].an * thumb[num].al))) == NULL) {
+    thumb[num].w = 32 * big2;
+    thumb[num].h = 16 * big2;
+    if ((thumb[num].ptr = (char *)malloc((thumb[num].w * thumb[num].h))) == NULL) {
       estado = 0;
       thumb[num].status = -1;
       return;
     }
-    memset(thumb[num].ptr, 0, (thumb[num].an * thumb[num].al));
+    memset(thumb[num].ptr, 0, (thumb[num].w * thumb[num].h));
 
-    for (y = 0; y < thumb[num].al; y += big2) {
-      for (x = 0; x < thumb[num].an; x += big2 * 2) {
+    for (y = 0; y < thumb[num].h; y += big2) {
+      for (x = 0; x < thumb[num].w; x += big2 * 2) {
         if (big) {
-          thumb[num].ptr[y * thumb[num].an + x] = xlat[y * 8 + x / 4];
-          thumb[num].ptr[y * thumb[num].an + x + 1] = xlat[y * 8 + x / 4];
-          thumb[num].ptr[(y + 1) * thumb[num].an + x] = xlat[y * 8 + x / 4];
-          thumb[num].ptr[(y + 1) * thumb[num].an + x + 1] = xlat[y * 8 + x / 4];
-          thumb[num].ptr[y * thumb[num].an + x + 2] = xlat[y * 8 + x / 4];
-          thumb[num].ptr[y * thumb[num].an + x + 3] = xlat[y * 8 + x / 4];
-          thumb[num].ptr[(y + 1) * thumb[num].an + x + 2] = xlat[y * 8 + x / 4];
-          thumb[num].ptr[(y + 1) * thumb[num].an + x + 3] = xlat[y * 8 + x / 4];
+          thumb[num].ptr[y * thumb[num].w + x] = xlat[y * 8 + x / 4];
+          thumb[num].ptr[y * thumb[num].w + x + 1] = xlat[y * 8 + x / 4];
+          thumb[num].ptr[(y + 1) * thumb[num].w + x] = xlat[y * 8 + x / 4];
+          thumb[num].ptr[(y + 1) * thumb[num].w + x + 1] = xlat[y * 8 + x / 4];
+          thumb[num].ptr[y * thumb[num].w + x + 2] = xlat[y * 8 + x / 4];
+          thumb[num].ptr[y * thumb[num].w + x + 3] = xlat[y * 8 + x / 4];
+          thumb[num].ptr[(y + 1) * thumb[num].w + x + 2] = xlat[y * 8 + x / 4];
+          thumb[num].ptr[(y + 1) * thumb[num].w + x + 3] = xlat[y * 8 + x / 4];
         } else {
-          thumb[num].ptr[y * thumb[num].an + x] = xlat[y * 16 + x / 2];
-          thumb[num].ptr[y * thumb[num].an + x + 1] = xlat[y * 16 + x / 2];
+          thumb[num].ptr[y * thumb[num].w + x] = xlat[y * 16 + x / 2];
+          thumb[num].ptr[y * thumb[num].w + x + 1] = xlat[y * 16 + x / 2];
         }
       }
     }
@@ -837,47 +837,47 @@ void create_thumb_FNT(struct t_listboxbr *l) {
           coefredy = coefredx;
         else
           coefredx = coefredy;
-        thumb[num].an = (float)TamaX / coefredx + 0.5;
-        thumb[num].al = (float)TamaY / coefredy + 0.5;
-        thumb[num].an &= -2;
-        thumb[num].al &= -2;
-        if (thumb[num].an < 2)
-          thumb[num].an = 2;
-        if (thumb[num].al < 2)
-          thumb[num].al = 2;
+        thumb[num].w = (float)TamaX / coefredx + 0.5;
+        thumb[num].h = (float)TamaY / coefredy + 0.5;
+        thumb[num].w &= -2;
+        thumb[num].h &= -2;
+        if (thumb[num].w < 2)
+          thumb[num].w = 2;
+        if (thumb[num].h < 2)
+          thumb[num].h = 2;
 
-        if (coefredx * (float)(thumb[num].an - 1) >= (float)TamaX)
-          coefredx = (float)(TamaX - 1) / (float)(thumb[num].an - 1);
-        if (coefredy * (float)(thumb[num].al - 1) >= (float)TamaY)
-          coefredy = (float)(TamaY - 1) / (float)(thumb[num].al - 1);
+        if (coefredx * (float)(thumb[num].w - 1) >= (float)TamaX)
+          coefredx = (float)(TamaX - 1) / (float)(thumb[num].w - 1);
+        if (coefredy * (float)(thumb[num].h - 1) >= (float)TamaY)
+          coefredy = (float)(TamaY - 1) / (float)(thumb[num].h - 1);
 
-        if ((temp2 = (byte *)malloc(thumb[num].an * thumb[num].al)) != NULL) {
-          memset(temp2, 0, thumb[num].an * thumb[num].al);
+        if ((temp2 = (byte *)malloc(thumb[num].w * thumb[num].h)) != NULL) {
+          memset(temp2, 0, thumb[num].w * thumb[num].h);
 
           a = (float)0.0;
-          for (y = 0; y < thumb[num].al; y++) {
+          for (y = 0; y < thumb[num].h; y++) {
             b = (float)0.0;
-            for (x = 0; x < thumb[num].an; x++) {
-              temp2[y * thumb[num].an + x] = temp[((memptrsize)a) * TamaX + (memptrsize)b];
+            for (x = 0; x < thumb[num].w; x++) {
+              temp2[y * thumb[num].w + x] = temp[((memptrsize)a) * TamaX + (memptrsize)b];
               b += coefredx;
             }
             a += coefredy;
           }
 
-          if ((thumb[num].ptr = (char *)malloc((thumb[num].an * thumb[num].al) / 4)) != NULL) {
-            memset(thumb[num].ptr, 0, (thumb[num].an * thumb[num].al) / 4);
+          if ((thumb[num].ptr = (char *)malloc((thumb[num].w * thumb[num].h) / 4)) != NULL) {
+            memset(thumb[num].ptr, 0, (thumb[num].w * thumb[num].h) / 4);
 
-            for (y = 0; y < thumb[num].al; y += 2) {
-              for (x = 0; x < thumb[num].an; x += 2) {
-                n = *(ghost + temp2[x + y * thumb[num].an] * 256 +
-                      temp2[x + 1 + y * thumb[num].an]);
-                m = *(ghost + temp2[x + (y + 1) * thumb[num].an] * 256 +
-                      temp2[x + 1 + (y + 1) * thumb[num].an]);
-                thumb[num].ptr[x / 2 + (y / 2) * (thumb[num].an / 2)] = *(ghost + n * 256 + m);
+            for (y = 0; y < thumb[num].h; y += 2) {
+              for (x = 0; x < thumb[num].w; x += 2) {
+                n = *(ghost + temp2[x + y * thumb[num].w] * 256 +
+                      temp2[x + 1 + y * thumb[num].w]);
+                m = *(ghost + temp2[x + (y + 1) * thumb[num].w] * 256 +
+                      temp2[x + 1 + (y + 1) * thumb[num].w]);
+                thumb[num].ptr[x / 2 + (y / 2) * (thumb[num].w / 2)] = *(ghost + n * 256 + m);
               }
             }
-            thumb[num].an /= 2;
-            thumb[num].al /= 2;
+            thumb[num].w /= 2;
+            thumb[num].h /= 2;
           } else {
             thumb[num].status = -1;
           }
@@ -889,8 +889,8 @@ void create_thumb_FNT(struct t_listboxbr *l) {
         free(temp);
       } else {
         thumb[num].ptr = (char *)temp;
-        thumb[num].an = TamaX;
-        thumb[num].al = TamaY;
+        thumb[num].w = TamaX;
+        thumb[num].h = TamaY;
       }
     }
   }
@@ -905,7 +905,7 @@ void create_thumb_FNT(struct t_listboxbr *l) {
 }
 
 void create_thumb_IFS(struct t_listboxbr *l) {
-  int estado = 0, n, pos, ancho, alto, x, y, xini;
+  int estado = 0, n, pos, width, height, x, y, xini;
   char *str;
   char filename[255];
 
@@ -947,15 +947,15 @@ void create_thumb_IFS(struct t_listboxbr *l) {
     str = (char *)texts[246];
 
     pos = 0;
-    ancho = 0;
-    alto = 0;
+    width = 0;
+    height = 0;
 
     while (pos < strlen(str)) {
       load_letter(str[pos++]);
       if (map_width) {
-        ancho += map_width + 1;
-        if (map_height > alto)
-          alto = map_height;
+        width += map_width + 1;
+        if (map_height > height)
+          height = map_height;
       }
       if (map != NULL) {
         free(map);
@@ -963,19 +963,19 @@ void create_thumb_IFS(struct t_listboxbr *l) {
       }
     }
 
-    if (ancho > 101 * big2)
-      ancho = 101 * big2;
-    if ((thumb[num].ptr = (char *)malloc(ancho * alto)) == NULL) {
+    if (width > 101 * big2)
+      width = 101 * big2;
+    if ((thumb[num].ptr = (char *)malloc(width * height)) == NULL) {
       thumb[num].status = -1;
       fclose(fifs);
       return;
     }
-    memset(thumb[num].ptr, 0, ancho * alto);
+    memset(thumb[num].ptr, 0, width * height);
 
-    thumb[num].an = ancho;
-    thumb[num].al = alto;
+    thumb[num].w = width;
+    thumb[num].h = height;
 
-    memset(thumb[num].ptr, c1, ancho * alto);
+    memset(thumb[num].ptr, c1, width * height);
 
     pos = 0;
     xini = 0;
@@ -985,7 +985,7 @@ void create_thumb_IFS(struct t_listboxbr *l) {
         for (y = 0; y < map_height; y++) {
           for (x = 0; x < map_width; x++) {
             if ((xini + x) < 101 * big2)
-              thumb[num].ptr[x + xini + y * ancho] = map[x + y * map_width];
+              thumb[num].ptr[x + xini + y * width] = map[x + y * map_width];
           }
         }
         xini += map_width + 1;
@@ -1251,8 +1251,8 @@ void create_thumb_PCM(struct t_listboxbr *l) {
 
       // End of conversion
 
-      thumb[num].an = 51 * big2;
-      thumb[num].al = 24 * big2;
+      thumb[num].w = 51 * big2;
+      thumb[num].h = 24 * big2;
       if ((temp = (char *)malloc(thumb[num].filesize)) == NULL) {
         free(thumb[num].ptr);
         thumb[num].ptr = NULL;
@@ -1262,24 +1262,24 @@ void create_thumb_PCM(struct t_listboxbr *l) {
       memcpy(temp, thumb[num].ptr, thumb[num].filesize);
       free(thumb[num].ptr);
 
-      if ((thumb[num].ptr = (char *)malloc(thumb[num].an * thumb[num].al)) == NULL) {
+      if ((thumb[num].ptr = (char *)malloc(thumb[num].w * thumb[num].h)) == NULL) {
         free(temp);
         thumb[num].status = -1;
         return;
       }
-      memset(thumb[num].ptr, c1, thumb[num].an * thumb[num].al);
+      memset(thumb[num].ptr, c1, thumb[num].w * thumb[num].h);
 
       if (thumb[num].filesize > 1) {
-        if (thumb[num].filesize < 3 * thumb[num].an) {
-          step = (float)thumb[num].an / (float)(thumb[num].filesize - 1);
+        if (thumb[num].filesize < 3 * thumb[num].w) {
+          step = (float)thumb[num].w / (float)(thumb[num].filesize - 1);
           for (x = 0; x < thumb[num].filesize; x++) {
-            y = (temp[x] * thumb[num].al / 256);
+            y = (temp[x] * thumb[num].h / 256);
             if (First) {
               First = 0;
               lx = (memptrsize)position;
               ly = y;
             } else {
-              wline(thumb[num].ptr, thumb[num].an, thumb[num].an, thumb[num].al, lx, ly,
+              wline(thumb[num].ptr, thumb[num].w, thumb[num].w, thumb[num].h, lx, ly,
                     (memptrsize)position, y, c_g_low);
               lx = (memptrsize)position;
               ly = y;
@@ -1287,17 +1287,17 @@ void create_thumb_PCM(struct t_listboxbr *l) {
             position += step;
           }
         } else {
-          step = (float)thumb[num].filesize / (float)thumb[num].an;
+          step = (float)thumb[num].filesize / (float)thumb[num].w;
           //printf("Drawing ...\n");
-          for (x = 0; x < thumb[num].an; x++) {
+          for (x = 0; x < thumb[num].w; x++) {
             p0 = (memptrsize)position;
             position += step;
             p1 = (memptrsize)position;
 
-            y0 = y1 = temp[p0] * thumb[num].al / 256;
+            y0 = y1 = temp[p0] * thumb[num].h / 256;
 
             do {
-              y = temp[p0] * thumb[num].al / 256;
+              y = temp[p0] * thumb[num].h / 256;
               if (y < y0)
                 y0 = y;
               else if (y > y1)
@@ -1307,7 +1307,7 @@ void create_thumb_PCM(struct t_listboxbr *l) {
 
             y = y0;
             do {
-              thumb[num].ptr[x + y * thumb[num].an] = c_g_low;
+              thumb[num].ptr[x + y * thumb[num].w] = c_g_low;
             } while (y++ < y1);
           }
         }
@@ -1385,52 +1385,52 @@ void load_letter(uint8_t letra) {
 
 void show_thumb(struct t_listboxbr *l, int num) {
   byte *ptr = v.ptr;
-  int an = v.an / big2, al = v.al / big2;
+  int w = v.w / big2, h = v.h / big2;
   int px, py, x, y, ly, incy;
   char *p;
 
   if (num >= l->first_visible && num < l->first_visible + l->lines * l->columns) {
-    px = (l->x + 1 + (l->an + 1) * ((num - l->first_visible) % l->columns)) * big2 +
-         (l->an * big2 - thumb[num].an) / 2;
-    if ((incy = ((l->al - 8) * big2 - thumb[num].al) / 2) < 0)
+    px = (l->x + 1 + (l->w + 1) * ((num - l->first_visible) % l->columns)) * big2 +
+         (l->w * big2 - thumb[num].w) / 2;
+    if ((incy = ((l->h - 8) * big2 - thumb[num].h) / 2) < 0)
       incy = 0;
-    py = (l->y + 1 + (l->al + 1) * ((num - l->first_visible) / l->columns)) * big2 + incy;
+    py = (l->y + 1 + (l->h + 1) * ((num - l->first_visible) / l->columns)) * big2 + incy;
 
-    ly = (l->y + (l->al + 1) * ((num - l->first_visible) / l->columns) + l->al - 8) * big2;
+    ly = (l->y + (l->h + 1) * ((num - l->first_visible) / l->columns) + l->h - 8) * big2;
 
     if (thumb[num].ptr != NULL && thumb[num].status == 0) {
-      for (y = 0; y < thumb[num].al; y++)
-        for (x = 0; x < thumb[num].an; x++)
+      for (y = 0; y < thumb[num].h; y++)
+        for (x = 0; x < thumb[num].w; x++)
           if (py + y > ly) {
             if (!thumb[num].tagged)
-              v.ptr[(py + y) * v.an + (px + x)] =
-                  *(ghost + c0 * 256 + thumb[num].ptr[y * thumb[num].an + x]);
+              v.ptr[(py + y) * v.w + (px + x)] =
+                  *(ghost + c0 * 256 + thumb[num].ptr[y * thumb[num].w + x]);
           } else
-            v.ptr[(py + y) * v.an + (px + x)] = thumb[num].ptr[y * thumb[num].an + x];
+            v.ptr[(py + y) * v.w + (px + x)] = thumb[num].ptr[y * thumb[num].w + x];
     }
 
-    px -= (l->an * big2 - thumb[num].an) / 2;
+    px -= (l->w * big2 - thumb[num].w) / 2;
     py -= incy;
     px /= big2;
     py /= big2;
 
     if (thumb[num].ptr == NULL && thumb[num].status == -1) {
-      wput(ptr, an, al, px + (l->an - 21) / 2, py + 1, 60);
+      wput(ptr, w, h, px + (l->w - 21) / 2, py + 1, 60);
     }
 
-    py += l->al - 1;
+    py += l->h - 1;
     p = l->list + l->item_width * num;
 
     if (l->zone - 10 == num - l->first_visible)
       x = c4;
     else
       x = c3;
-    if (text_len((byte *)p) < l->an - 2 && opc_img[v_thumb]) {
-      wwrite(ptr, an, al, px + l->an / 2 + 1, py, 7, (byte *)p, c0);
-      wwrite(ptr, an, al, px + l->an / 2, py, 7, (byte *)p, x);
+    if (text_len((byte *)p) < l->w - 2 && opc_img[v_thumb]) {
+      wwrite(ptr, w, h, px + l->w / 2 + 1, py, 7, (byte *)p, c0);
+      wwrite(ptr, w, h, px + l->w / 2, py, 7, (byte *)p, x);
     } else {
-      wwrite_in_box(ptr, an, px + l->an - 1, al, px + 2, py, 6, (byte *)p, c0);
-      wwrite_in_box(ptr, an, px + l->an - 1, al, px + 1, py, 6, (byte *)p, x);
+      wwrite_in_box(ptr, w, px + l->w - 1, h, px + 2, py, 6, (byte *)p, c0);
+      wwrite_in_box(ptr, w, px + l->w - 1, h, px + 1, py, 6, (byte *)p, x);
     }
 
     v.redraw = 1;
@@ -1470,13 +1470,13 @@ void browser0(void) {
   }
 
   if (v_thumb == 0) {
-    v.an = ancho_br - 1;
-    v.al = alto_br - 1;
+    v.w = ancho_br - 1;
+    v.h = alto_br - 1;
     lextbr.y = 119;
     lunidadesbr.y = 119;
   } else {
-    v.an = ancho_br;
-    v.al = alto_br;
+    v.w = ancho_br;
+    v.h = alto_br;
     lextbr.y = 121;
     lunidadesbr.y = 121;
   }
@@ -1500,11 +1500,11 @@ void browser0(void) {
   while ((x = tipo[v_type].ext[n++])) {
     m = 0;
     while (x && x != ' ') {
-      ext[an_ext * lextbr.total_items + m++] = x;
+      ext[w_ext * lextbr.total_items + m++] = x;
       if ((x = tipo[v_type].ext[n]))
         n++;
     }
-    ext[an_ext * (lextbr.total_items++) + m] = 0;
+    ext[w_ext * (lextbr.total_items++) + m] = 0;
   }
 
   if (v_type == 14)
@@ -1513,21 +1513,21 @@ void browser0(void) {
     v_type = 7;
 
   if (tipo[v_type].default_choice >= 0 && tipo[v_type].default_choice < lextbr.total_items)
-    div_strcpy(input, sizeof(input), &ext[an_ext * tipo[v_type].default_choice]);
+    div_strcpy(input, sizeof(input), &ext[w_ext * tipo[v_type].default_choice]);
   else
     div_strcpy(input, sizeof(input), &ext[0]);
 
   DIV_STRCPY(file_mask, input);
   v_finished = 0;
 
-  _get(126, 4, v.al - 21, v.an - (24 + text_len(texts[100]) + text_len(texts[101])), (byte *)input,
+  _get(126, 4, v.h - 21, v.w - (24 + text_len(texts[100]) + text_len(texts[101])), (byte *)input,
        512, 0, 0);
 
-  _button(100, v.an - 12 - text_len(texts[101]), v.al - 14, 2);
-  _button(101, v.an - 8, v.al - 14, 2);
+  _button(100, v.w - 12 - text_len(texts[101]), v.h - 14, 2);
+  _button(101, v.w - 8, v.h - 14, 2);
 
   if (v_thumb)
-    _flag(419, v.an - 12 - text_len(texts[419]), 12, &opc_img[v_thumb]);
+    _flag(419, v.w - 12 - text_len(texts[419]), 12, &opc_img[v_thumb]);
 
   _dos_setdrive(toupper(*tipo[v_type].path) - 'A' + 1, &n);
   chdir(tipo[v_type].path);
@@ -1546,19 +1546,19 @@ void browser0(void) {
 
   n = 0;
   while (drives[n]) { // Create the drive list <X:>
-    *(unidad + an_unidad * n) = '<';
-    *(unidad + an_unidad * n + 1) = drives[n];
-    *(unidad + an_unidad * n + 2) = ':';
-    *(unidad + an_unidad * n + 3) = '>';
-    *(unidad + an_unidad * n + 4) = 0;
+    *(unidad + w_unidad * n) = '<';
+    *(unidad + w_unidad * n + 1) = drives[n];
+    *(unidad + w_unidad * n + 2) = ':';
+    *(unidad + w_unidad * n + 3) = '>';
+    *(unidad + w_unidad * n + 4) = 0;
     n++;
   }
   lunidadesbr.total_items = n;
 
   if (v_thumb == 7)
-    _flag(567, v.an - 12 - text_len(texts[419]) - 12 - text_len(texts[567]), 12, &opc_pru);
+    _flag(567, v.w - 12 - text_len(texts[419]) - 12 - text_len(texts[567]), 12, &opc_pru);
   else if (v_type == 16)
-    _flag(567, v.an - 12 - text_len(texts[567]), 12, &opc_pru);
+    _flag(567, v.w - 12 - text_len(texts[567]), 12, &opc_pru);
 
   if (opc_img[v_thumb]) {
     switch (v_thumb) // 2-MAP, 3-PAL, 5-FNT, 6-IFS, 7-PCM
@@ -1566,20 +1566,20 @@ void browser0(void) {
     case 5:
     case 6:
       larchivosbr.columns = 2;
-      larchivosbr.an = 103;
+      larchivosbr.w = 103;
       break;
     default:
       larchivosbr.columns = 4;
-      larchivosbr.an = 51;
+      larchivosbr.w = 51;
       break;
     }
     larchivosbr.lines = 4;
-    larchivosbr.al = 31;
+    larchivosbr.h = 31;
   } else {
     larchivosbr.columns = 3;
-    larchivosbr.an = 68;
+    larchivosbr.w = 68;
     larchivosbr.lines = 14;
-    larchivosbr.al = 8;
+    larchivosbr.h = 8;
   }
 
   if (v_thumb == 7 && !SoundActive)
@@ -1587,20 +1587,20 @@ void browser0(void) {
 }
 
 void browser1(void) {
-  int an = v.an / big2, al = v.al / big2;
+  int w = v.w / big2, h = v.h / big2;
 
   _show_items();
   print_path_br();
 
-  wwrite(v.ptr, an, al, 77, 20, 0, texts[127], c3); // Files
-  wwrite(v.ptr, an, al, 3, 20, 0, texts[128], c3);
+  wwrite(v.ptr, w, h, 77, 20, 0, texts[127], c3); // Files
+  wwrite(v.ptr, w, h, 3, 20, 0, texts[128], c3);
 
   if (v_thumb) {
-    wwrite(v.ptr, an, al, 3, 113, 0, texts[129], c3);
-    wwrite(v.ptr, an, al, 40, 113, 0, texts[130], c3);
+    wwrite(v.ptr, w, h, 3, 113, 0, texts[129], c3);
+    wwrite(v.ptr, w, h, 40, 113, 0, texts[130], c3);
   } else {
-    wwrite(v.ptr, an, al, 3, 111, 0, texts[129], c3);
-    wwrite(v.ptr, an, al, 40, 111, 0, texts[130], c3);
+    wwrite(v.ptr, w, h, 3, 111, 0, texts[129], c3);
+    wwrite(v.ptr, w, h, 40, 111, 0, texts[130], c3);
   }
 
   create_listbox_br(&larchivosbr);
@@ -1640,30 +1640,30 @@ void browser2(void) {
       case 5:
       case 6:
         larchivosbr.columns = 2;
-        larchivosbr.an = 103;
+        larchivosbr.w = 103;
         break;
       default:
         larchivosbr.columns = 4;
-        larchivosbr.an = 51;
+        larchivosbr.w = 51;
         break;
       }
       larchivosbr.lines = 4;
-      larchivosbr.al = 31;
+      larchivosbr.h = 31;
       larchivosbr.first_visible = 0;
       larchivosbr.slide = larchivosbr.s0;
       larchivosbr.s1 =
-          larchivosbr.y + (larchivosbr.al * larchivosbr.lines + larchivosbr.lines + 1) - 12;
+          larchivosbr.y + (larchivosbr.h * larchivosbr.lines + larchivosbr.lines + 1) - 12;
       browser1();
       v.redraw = 1;
     } else {
       larchivosbr.columns = 3;
-      larchivosbr.an = 68;
+      larchivosbr.w = 68;
       larchivosbr.lines = 14;
-      larchivosbr.al = 8;
+      larchivosbr.h = 8;
       larchivosbr.first_visible = 0;
       larchivosbr.slide = larchivosbr.s0;
       larchivosbr.s1 =
-          larchivosbr.y + (larchivosbr.al * larchivosbr.lines + larchivosbr.lines + 1) - 12;
+          larchivosbr.y + (larchivosbr.h * larchivosbr.lines + larchivosbr.lines + 1) - 12;
       for (n = 0; n < max_archivos; n++) {
         if (thumb[n].ptr != NULL) {
           free(thumb[n].ptr);
@@ -1750,7 +1750,7 @@ void browser2(void) {
       browser1();
       v.redraw = 1;
       div_strcpy(full, sizeof(full),
-                 archivo + (larchivosbr.zone - 10 + larchivosbr.first_visible) * an_archivo);
+                 archivo + (larchivosbr.zone - 10 + larchivosbr.first_visible) * w_archivo);
 
       // TODO: Handle CTRL and SHIFT modifier keys
       if (strcmp(input, full) || ((v_thumb == 7 || v_type == 16) && opc_pru)) {
@@ -1765,7 +1765,7 @@ void browser2(void) {
             if (tipo[v_type].path[strlen(tipo[v_type].path) - 1] != '/')
               div_strcat(full, sizeof(full), "/");
             div_strcat(full, sizeof(full),
-                       archivo + (larchivosbr.zone - 10 + larchivosbr.first_visible) * an_archivo);
+                       archivo + (larchivosbr.zone - 10 + larchivosbr.first_visible) * w_archivo);
 
             Mix_HaltChannel(-1);
             if (smp != NULL)
@@ -1802,7 +1802,7 @@ void browser2(void) {
         div_strcat(tipo[v_type].path, sizeof(tipo[v_type].path), "/");
       div_strcat(tipo[v_type].path, sizeof(tipo[v_type].path),
                  directorio +
-                     (ldirectoriosbr.zone - 10 + ldirectoriosbr.first_visible) * an_directorio);
+                     (ldirectoriosbr.zone - 10 + ldirectoriosbr.first_visible) * w_directorio);
       chdir(tipo[v_type].path);
       getcwd(tipo[v_type].path, PATH_MAX + 1);
       print_path_br();
@@ -1835,7 +1835,7 @@ void browser2(void) {
     } else if (lextbr.zone >= 10) {
       v.redraw = 1;
       tipo[v_type].default_choice = lextbr.zone - 10 + lextbr.first_visible;
-      div_strcpy(input, sizeof(input), ext + (lextbr.zone - 10 + lextbr.first_visible) * an_ext);
+      div_strcpy(input, sizeof(input), ext + (lextbr.zone - 10 + lextbr.first_visible) * w_ext);
       DIV_STRCPY(file_mask, input);
       tipo[v_type].first_visible = 0;
       print_path_br();
@@ -1897,23 +1897,23 @@ void open_dir_br(void) {
   n = 0;
   m = _dos_findfirst(file_mask, _A_NORMAL, &fileinfo);
   while (m == 0 && n < max_archivos) {
-    div_strcpy(archivo + n++ * an_archivo, an_archivo, fileinfo.name);
+    div_strcpy(archivo + n++ * w_archivo, w_archivo, fileinfo.name);
     m = _dos_findnext(&fileinfo);
   }
   larchivosbr.total_items = n;
-  qsort(archivo, larchivosbr.total_items, (size_t)an_archivo,
+  qsort(archivo, larchivosbr.total_items, (size_t)w_archivo,
         (int (*)(const void *, const void *))strcmp);
 
   n = 0;
   m = _dos_findfirst("*.*", _A_SUBDIR, &fileinfo);
   while (m == 0 && n < max_directorios) {
     if (strcmp(fileinfo.name, ".") && (fileinfo.attrib & 16)) {
-      div_strcpy(directorio + n++ * an_directorio, an_directorio, fileinfo.name);
+      div_strcpy(directorio + n++ * w_directorio, w_directorio, fileinfo.name);
     }
     m = _dos_findnext(&fileinfo);
   }
   ldirectoriosbr.total_items = n;
-  qsort(directorio, ldirectoriosbr.total_items, an_directorio,
+  qsort(directorio, ldirectoriosbr.total_items, w_directorio,
         (int (*)(const void *, const void *))strcmp);
 
   for (n = 0; n < max_archivos; n++) {
@@ -1934,35 +1934,35 @@ void open_dir_br(void) {
 
 void paint_listbox_br(struct t_listboxbr *l) {
   byte *ptr = v.ptr;
-  int an = v.an / big2, al = v.al / big2;
+  int w = v.w / big2, h = v.h / big2;
   int n, y, x;
 
   color_tag = c_b_low;
 
   for (y = 0; y < l->lines; y++)
     for (x = 0; x < l->columns; x++) {
-      wbox(ptr, an, al, c1, l->x + (x * (l->an + 1)) + 1, l->y + (y * (l->al + 1)) + 1, l->an,
-           l->al - 8);
+      wbox(ptr, w, h, c1, l->x + (x * (l->w + 1)) + 1, l->y + (y * (l->h + 1)) + 1, l->w,
+           l->h - 8);
       if (thumb[l->first_visible + y * l->columns + x].tagged)
-        wbox(ptr, an, al, color_tag, l->x + (x * (l->an + 1)) + 1,
-             l->y + (y * (l->al + 1)) + 1 + l->al - 8, l->an, 8);
+        wbox(ptr, w, h, color_tag, l->x + (x * (l->w + 1)) + 1,
+             l->y + (y * (l->h + 1)) + 1 + l->h - 8, l->w, 8);
       else
-        wbox(ptr, an, al, c01, l->x + (x * (l->an + 1)) + 1,
-             l->y + (y * (l->al + 1)) + 1 + l->al - 8, l->an, 8);
+        wbox(ptr, w, h, c01, l->x + (x * (l->w + 1)) + 1,
+             l->y + (y * (l->h + 1)) + 1 + l->h - 8, l->w, 8);
     }
 
-  if (wmouse_in(l->x, l->y, (l->an + 1) * l->columns, (l->al + 1) * l->lines)) { // Calculate zone
-    l->zone = ((mouse_x - v.x) / big2 - l->x) / (l->an + 1) +
-              (((mouse_y - v.y) / big2 - l->y) / (l->al + 1)) * l->columns;
+  if (wmouse_in(l->x, l->y, (l->w + 1) * l->columns, (l->h + 1) * l->lines)) { // Calculate zone
+    l->zone = ((mouse_x - v.x) / big2 - l->x) / (l->w + 1) +
+              (((mouse_y - v.y) / big2 - l->y) / (l->h + 1)) * l->columns;
     if (l->zone >= l->total_items - l->first_visible || l->zone >= l->lines * l->columns)
       l->zone = 1;
     else
       l->zone += 10;
-  } else if (wmouse_in(l->x + (l->an + 1) * l->columns, l->y, 9, 9))
+  } else if (wmouse_in(l->x + (l->w + 1) * l->columns, l->y, 9, 9))
     l->zone = 2;
-  else if (wmouse_in(l->x + (l->an + 1) * l->columns, l->y + (l->al + 1) * l->lines - 8, 9, 9))
+  else if (wmouse_in(l->x + (l->w + 1) * l->columns, l->y + (l->h + 1) * l->lines - 8, 9, 9))
     l->zone = 3;
-  else if (wmouse_in(l->x + (l->an + 1) * l->columns, l->y + 9, 9, (l->al + 1) * l->lines - 17))
+  else if (wmouse_in(l->x + (l->w + 1) * l->columns, l->y + 9, 9, (l->h + 1) * l->lines - 17))
     l->zone = 4;
   else
     l->zone = 0;
@@ -1976,29 +1976,29 @@ void paint_listbox_br(struct t_listboxbr *l) {
 
 void paint_slider_br(struct t_listboxbr *l) {
   byte *ptr = v.ptr;
-  int an = v.an, al = v.al;
+  int w = v.w, h = v.h;
   if (big) {
-    an /= 2;
-    al /= 2;
+    w /= 2;
+    h /= 2;
   }
 
-  wbox(ptr, an, al, c2, l->x + (l->an + 1) * l->columns + 1, l->y + 9, 7,
-       (l->al + 1) * l->lines - 17);
+  wbox(ptr, w, h, c2, l->x + (l->w + 1) * l->columns + 1, l->y + 9, 7,
+       (l->h + 1) * l->lines - 17);
   if (l->slide > l->s0)
-    wbox(ptr, an, al, c0, l->x + (l->an + 1) * l->columns + 1, l->slide - 1, 7, 1);
+    wbox(ptr, w, h, c0, l->x + (l->w + 1) * l->columns + 1, l->slide - 1, 7, 1);
   if (l->slide < l->s1)
-    wbox(ptr, an, al, c0, l->x + (l->an + 1) * l->columns + 1, l->slide + 3, 7, 1);
-  wput(ptr, an, al, l->x + (l->an + 1) * l->columns + 1, l->slide, 43);
+    wbox(ptr, w, h, c0, l->x + (l->w + 1) * l->columns + 1, l->slide + 3, 7, 1);
+  wput(ptr, w, h, l->x + (l->w + 1) * l->columns + 1, l->slide, 43);
 }
 
 void create_listbox_br(struct t_listboxbr *l) {
   byte *ptr = v.ptr;
-  int an = v.an / big2, al = v.al / big2;
+  int w = v.w / big2, h = v.h / big2;
   int x, y;
 
   if (!l->created) {
     l->slide = l->s0 = l->y + 9;
-    l->s1 = l->y + (l->al * l->lines + l->lines + 1) - 12;
+    l->s1 = l->y + (l->h * l->lines + l->lines + 1) - 12;
     l->buttons = 0;
     l->created = 1;
     l->zone = 0;
@@ -2011,18 +2011,18 @@ void create_listbox_br(struct t_listboxbr *l) {
       l->first_visible = 0;
   }
 
-  wbox(ptr, an, al, c1, l->x, l->y, (l->an + 1) * l->columns, (l->al + 1) * l->lines);
+  wbox(ptr, w, h, c1, l->x, l->y, (l->w + 1) * l->columns, (l->h + 1) * l->lines);
 
   for (y = 0; y < l->lines; y++)
     for (x = 0; x < l->columns; x++)
-      wrectangle(ptr, an, al, c0, l->x + (x * (l->an + 1)), l->y + (y * (l->al + 1)), l->an + 2,
-                 l->al + 2);
+      wrectangle(ptr, w, h, c0, l->x + (x * (l->w + 1)), l->y + (y * (l->h + 1)), l->w + 2,
+                 l->h + 2);
 
-  wrectangle(ptr, an, al, c0, l->x + (l->an + 1) * l->columns, l->y, 9, (l->al + 1) * l->lines + 1);
-  wrectangle(ptr, an, al, c0, l->x + (l->an + 1) * l->columns, l->y + 8, 9,
-             (l->al + 1) * l->lines - 15);
-  wput(ptr, an, al, l->x + (l->an + 1) * l->columns + 1, l->y + 1, -39);
-  wput(ptr, an, al, l->x + (l->an + 1) * l->columns + 1, l->y + (l->al + 1) * l->lines - 7, -40);
+  wrectangle(ptr, w, h, c0, l->x + (l->w + 1) * l->columns, l->y, 9, (l->h + 1) * l->lines + 1);
+  wrectangle(ptr, w, h, c0, l->x + (l->w + 1) * l->columns, l->y + 8, 9,
+             (l->h + 1) * l->lines - 15);
+  wput(ptr, w, h, l->x + (l->w + 1) * l->columns + 1, l->y + 1, -39);
+  wput(ptr, w, h, l->x + (l->w + 1) * l->columns + 1, l->y + (l->h + 1) * l->lines - 7, -40);
 
   paint_listbox_br(l);
   paint_slider_br(l);
@@ -2034,33 +2034,33 @@ void create_listbox_br(struct t_listboxbr *l) {
 
 void update_listbox_br(struct t_listboxbr *l) {
   byte *ptr = v.ptr, *p;
-  int an = v.an / big2, al = v.al / big2;
+  int w = v.w / big2, h = v.h / big2;
   int n, old_zona = l->zone, x, y;
 
-  if (wmouse_in(l->x, l->y, (l->an + 1) * l->columns, (l->al + 1) * l->lines)) { // Calculate zone
-    l->zone = (wmouse_x - l->x) / (l->an + 1) + ((wmouse_y - l->y) / (l->al + 1)) * l->columns;
+  if (wmouse_in(l->x, l->y, (l->w + 1) * l->columns, (l->h + 1) * l->lines)) { // Calculate zone
+    l->zone = (wmouse_x - l->x) / (l->w + 1) + ((wmouse_y - l->y) / (l->h + 1)) * l->columns;
     if (l->zone >= l->total_items - l->first_visible || l->zone >= l->lines * l->columns)
       l->zone = 1;
     else
       l->zone += 10;
-  } else if (wmouse_in(l->x + (l->an + 1) * l->columns, l->y, 9, 9))
+  } else if (wmouse_in(l->x + (l->w + 1) * l->columns, l->y, 9, 9))
     l->zone = 2;
-  else if (wmouse_in(l->x + (l->an + 1) * l->columns, l->y + (l->al + 1) * l->lines - 8, 9, 9))
+  else if (wmouse_in(l->x + (l->w + 1) * l->columns, l->y + (l->h + 1) * l->lines - 8, 9, 9))
     l->zone = 3;
-  else if (wmouse_in(l->x + (l->an + 1) * l->columns, l->y + 9, 9, (l->al + 1) * l->lines - 17))
+  else if (wmouse_in(l->x + (l->w + 1) * l->columns, l->y + 9, 9, (l->h + 1) * l->lines - 17))
     l->zone = 4;
   else
     l->zone = 0;
 
   if (old_zona != l->zone)
     if (old_zona >= 10) { // Unhighlight zone
-      x = l->x + 1 + ((old_zona - 10) % l->columns) * (l->an + 1);
-      y = l->y + l->al + ((old_zona - 10) / l->columns) * (l->al + 1);
+      x = l->x + 1 + ((old_zona - 10) % l->columns) * (l->w + 1);
+      y = l->y + l->h + ((old_zona - 10) / l->columns) * (l->h + 1);
       p = (byte *)l->list + l->item_width * (l->first_visible + old_zona - 10);
-      if (text_len(p) < l->an - 2 && opc_img[v_thumb]) {
-        wwrite(ptr, an, al, x + l->an / 2, y, 7, p, c3);
+      if (text_len(p) < l->w - 2 && opc_img[v_thumb]) {
+        wwrite(ptr, w, h, x + l->w / 2, y, 7, p, c3);
       } else {
-        wwrite_in_box(ptr, an, x + l->an - 1, al, x + 1, y, 6, p, c3);
+        wwrite_in_box(ptr, w, x + l->w - 1, h, x + 1, y, 6, p, c3);
       }
       v.redraw = 1;
     }
@@ -2077,11 +2077,11 @@ void update_listbox_br(struct t_listboxbr *l) {
       paint_listbox_br(l);
       v.redraw = 1;
     }
-    wput(ptr, an, al, l->x + (l->an + 1) * l->columns + 1, l->y + 1, -41);
+    wput(ptr, w, h, l->x + (l->w + 1) * l->columns + 1, l->y + 1, -41);
     l->buttons |= 1;
     v.redraw = 1;
   } else if (l->buttons & 1) {
-    wput(ptr, an, al, l->x + (l->an + 1) * l->columns + 1, l->y + 1, -39);
+    wput(ptr, w, h, l->x + (l->w + 1) * l->columns + 1, l->y + 1, -39);
     l->buttons ^= 1;
     v.redraw = 1;
   }
@@ -2099,11 +2099,11 @@ void update_listbox_br(struct t_listboxbr *l) {
       paint_listbox_br(l);
       v.redraw = 1;
     }
-    wput(ptr, an, al, l->x + (l->an + 1) * l->columns + 1, l->y + (l->al + 1) * l->lines - 7, -42);
+    wput(ptr, w, h, l->x + (l->w + 1) * l->columns + 1, l->y + (l->h + 1) * l->lines - 7, -42);
     l->buttons |= 2;
     v.redraw = 1;
   } else if (l->buttons & 2) {
-    wput(ptr, an, al, l->x + (l->an + 1) * l->columns + 1, l->y + (l->al + 1) * l->lines - 7, -40);
+    wput(ptr, w, h, l->x + (l->w + 1) * l->columns + 1, l->y + (l->h + 1) * l->lines - 7, -40);
     l->buttons ^= 2;
     v.redraw = 1;
   }
@@ -2146,13 +2146,13 @@ void update_listbox_br(struct t_listboxbr *l) {
 
   if (old_zona != l->zone)
     if (l->zone >= 10) { // Highlight zone
-      x = l->x + 1 + ((l->zone - 10) % l->columns) * (l->an + 1);
-      y = l->y + l->al + ((l->zone - 10) / l->columns) * (l->al + 1);
+      x = l->x + 1 + ((l->zone - 10) % l->columns) * (l->w + 1);
+      y = l->y + l->h + ((l->zone - 10) / l->columns) * (l->h + 1);
       p = (byte *)l->list + l->item_width * (l->first_visible + l->zone - 10);
-      if (text_len(p) < l->an - 2 && opc_img[v_thumb]) {
-        wwrite(ptr, an, al, x + l->an / 2, y, 7, p, c4);
+      if (text_len(p) < l->w - 2 && opc_img[v_thumb]) {
+        wwrite(ptr, w, h, x + l->w / 2, y, 7, p, c4);
       } else {
-        wwrite_in_box(ptr, an, x + l->an - 1, al, x + 1, y, 6, p, c4);
+        wwrite_in_box(ptr, w, x + l->w - 1, h, x + 1, y, 6, p, c4);
       }
       v.redraw = 1;
     }

@@ -30,9 +30,9 @@ word *siguientes;  // Linked list of cells
 #define sig(x)  (*(siguientes + (x)))
 
 byte *map;  // Pointer to the hardness map (bytes, 0 = free)
-int an, al; // Width and height of the map
+int w, h; // Width and height of the map
 
-#define m(x, y) (*(map + (x) + ((y) * an)))
+#define m(x, y) (*(map + (x) + ((y) * w)))
 
 word cx, cy, c;     // Cell currently being explored (x, y and index)
 int ax, ay, bx, by; // Start and end cells
@@ -120,22 +120,22 @@ void path_find(void) {
 
   // Get pointer to the map, width and height
 
-  an = ptr[13];
-  al = ptr[14];
+  w = ptr[13];
+  h = ptr[14];
   map = (byte *)ptr + 64 + ptr[15] * 4;
 
-  if (an < 1 || al < 1 || an > max_map_size || al > max_map_size) {
+  if (w < 1 || h < 1 || w > max_map_size || h > max_map_size) {
     e(152);
     return;
   }
 
   // Check coordinate bounds (if outside the map, return 0)
 
-  if (x < 0 || y < 0 || x >= an * tile || y >= al * tile)
+  if (x < 0 || y < 0 || x >= w * tile || y >= h * tile)
     return;
   ax = mem[id + _X];
   ay = mem[id + _Y];
-  if (ax < 0 || ay < 0 || ax >= an * tile || ay >= al * tile)
+  if (ax < 0 || ay < 0 || ax >= w * tile || ay >= h * tile)
     return;
 
   // Calculate start and end cells: m(ax,ay) and m(bx,by)
@@ -157,45 +157,45 @@ void path_find(void) {
         if (!x && by)
           if (!m(bx, by - 1))
             x = 2;
-        if (!x && bx < an - 1)
+        if (!x && bx < w - 1)
           if (!m(bx + 1, by))
             x = 3;
-        if (!x && by < al - 1)
+        if (!x && by < h - 1)
           if (!m(bx, by + 1))
             x = 4;
       } else {
         if (bx)
           if (!m(bx - 1, by))
             x = 1;
-        if (!x && by < al - 1)
+        if (!x && by < h - 1)
           if (!m(bx, by + 1))
             x = 4;
         if (!x && by)
           if (!m(bx, by - 1))
             x = 2;
-        if (!x && bx < an - 1)
+        if (!x && bx < w - 1)
           if (!m(bx + 1, by))
             x = 3;
       }
     } else {
       if (ay < by) {
-        if (bx < an - 1)
+        if (bx < w - 1)
           if (!m(bx + 1, by))
             x = 3;
         if (!x && by)
           if (!m(bx, by - 1))
             x = 2;
-        if (!x && by < al - 1)
+        if (!x && by < h - 1)
           if (!m(bx, by + 1))
             x = 4;
         if (!x && bx)
           if (!m(bx - 1, by))
             x = 1;
       } else {
-        if (bx < an - 1)
+        if (bx < w - 1)
           if (!m(bx + 1, by))
             x = 3;
-        if (!x && by < al - 1)
+        if (!x && by < h - 1)
           if (!m(bx, by + 1))
             x = 4;
         if (!x && bx)
@@ -322,7 +322,7 @@ void expand(void) { // Fast version
       if (!dis(c - 1))
         add(cx - 1, cy, c - 1, 10);
     }
-  if (cx < an - 1)
+  if (cx < w - 1)
     if (!m(cx + 1, cy)) {
       n |= 2;
       if (!dis(c + 1))
@@ -334,7 +334,7 @@ void expand(void) { // Fast version
       if (!dis(c - max_map_size))
         add(cx, cy - 1, c - max_map_size, 10);
     }
-  if (cy < al - 1)
+  if (cy < h - 1)
     if (!m(cx, cy + 1)) {
       n |= 8;
       if (!dis(c + max_map_size))
@@ -372,7 +372,7 @@ void expand2(void) { // Exact version
       if (!dis(c - 1))
         add2(c - 1, 10);
     }
-  if (cx < an - 1)
+  if (cx < w - 1)
     if (!m(cx + 1, cy)) {
       n |= 2;
       if (!dis(c + 1))
@@ -384,7 +384,7 @@ void expand2(void) { // Exact version
       if (!dis(c - max_map_size))
         add2(c - max_map_size, 10);
     }
-  if (cy < al - 1)
+  if (cy < h - 1)
     if (!m(cx, cy + 1)) {
       n |= 8;
       if (!dis(c + max_map_size))
@@ -531,7 +531,7 @@ int calculate_vertices(int *ptr, int max_ver, int x0, int y0, int x1, int y1) {
                 newdir = 1;
               }
             }
-          if (xx < an - 1)
+          if (xx < w - 1)
             if (dis(cas + 1)) {
               dir |= 2;
               if (dis(cas + 1) <= d) {
@@ -547,7 +547,7 @@ int calculate_vertices(int *ptr, int max_ver, int x0, int y0, int x1, int y1) {
                 newdir = 3;
               }
             }
-          if (yy < al - 1)
+          if (yy < h - 1)
             if (dis(cas + max_map_size)) {
               dir |= 8;
               if (dis(cas + max_map_size) <= d) {
@@ -665,7 +665,7 @@ int calculate_vertices(int *ptr, int max_ver, int x0, int y0, int x1, int y1) {
               newdir = 1;
             }
           }
-        if (bx < an - 1)
+        if (bx < w - 1)
           if (dis(cas + 1)) {
             dir |= 2;
             if (dis(cas + 1) <= d) {
@@ -681,7 +681,7 @@ int calculate_vertices(int *ptr, int max_ver, int x0, int y0, int x1, int y1) {
               newdir = 3;
             }
           }
-        if (by < al - 1)
+        if (by < h - 1)
           if (dis(cas + max_map_size)) {
             dir |= 8;
             if (dis(cas + max_map_size) <= d) {
@@ -960,21 +960,21 @@ void path_line(void) {
 
   // Get pointer to the map, width and height
 
-  an = ptr[13];
-  al = ptr[14];
+  w = ptr[13];
+  h = ptr[14];
   map = (byte *)ptr + 64 + ptr[15] * 4;
-  if (an < 1 || al < 1 || an > max_map_size || al > max_map_size) {
+  if (w < 1 || h < 1 || w > max_map_size || h > max_map_size) {
     e(152);
     return;
   }
 
   // Check coordinate bounds (if outside the map, return 0)
 
-  if (x < 0 || y < 0 || x >= an * tile || y >= al * tile)
+  if (x < 0 || y < 0 || x >= w * tile || y >= h * tile)
     return;
   ax = mem[id + _X];
   ay = mem[id + _Y];
-  if (ax < 0 || ay < 0 || ax >= an * tile || ay >= al * tile)
+  if (ax < 0 || ay < 0 || ax >= w * tile || ay >= h * tile)
     return;
 
   // Determine if there is a clear path from (ax,ay) to (x,y)
@@ -1030,15 +1030,15 @@ void path_free(void) {
 
   // Get pointer to the map, width and height
 
-  an = ptr[13];
-  al = ptr[14];
+  w = ptr[13];
+  h = ptr[14];
   map = (byte *)ptr + 64 + ptr[15] * 4;
-  if (an < 1 || al < 1 || an > max_map_size || al > max_map_size) {
+  if (w < 1 || h < 1 || w > max_map_size || h > max_map_size) {
     e(152);
     return;
   }
   // Check coordinate bounds (if outside the map, return 0)
-  if (x < 0 || y < 0 || x >= an * tile || y >= al * tile)
+  if (x < 0 || y < 0 || x >= w * tile || y >= h * tile)
     return;
 
   // Determine if the destination cell is free

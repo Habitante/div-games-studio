@@ -53,7 +53,7 @@ struct clex_ele {
 
 int cnum_nodos; // Number of nodes used in clex_simb
 
-int iscoment; // Whether inside a comment
+int in_comment; // Whether inside a comment
 int numrem;   // Nesting level of /* and */
 
 byte *cvnom = NULL; // Name vector (hash_chain:int, token (or iobj):int, asciiz)
@@ -64,9 +64,9 @@ union {
 
 byte *cvhash[256]; // Pointers into the name vector
 
-int cpieza;
+int color_token;
 
-byte *csource;
+byte *color_source;
 
 int incluye_nombres;
 
@@ -121,30 +121,30 @@ void end_lexcolor() {
 }
 
 //-----------------------------------------------------------------------------
-//      Lexer (reads the next token from *csource)
+//      Lexer (reads the next token from *color_source)
 //-----------------------------------------------------------------------------
 
 void color_lex(void) {
-  byte **ptr, *_ivnom, h, *_source = csource;
+  byte **ptr, *_ivnom, h, *_source = color_source;
   struct clex_ele *e;
   int n;
 
   switch ((uintptr_t)clex_case[*_source]) { // Pointer to a clex_ele or l_???
 
   case l_err:
-    cpieza = p_rem;
+    color_token = p_rem;
     _source++;
     break;
 
   case l_cr:
     if ((*++_source) == lf)
       _source++;
-    cpieza = p_ultima;
+    color_token = p_ultima;
     break; // NOTE: EOL/EOF handling inherited from DIV Professional
 
   case l_id:
-    if (iscoment > 0) {
-      cpieza = p_rem;
+    if (in_comment > 0) {
+      color_token = p_rem;
       _source++;
       break;
     }
@@ -158,7 +158,7 @@ void color_lex(void) {
     _source--;
     if (icvnom.b - cvnom > max_obj * long_med_id) {
       icvnom.b = _ivnom;
-      cpieza = p_id;
+      color_token = p_id;
       break;
     }
     ptr = &cvhash[h];
@@ -166,15 +166,15 @@ void color_lex(void) {
       ptr = (byte **)*ptr;
     if (!strcmp((char *)(ptr + 2), (char *)_ivnom + ptr8)) { // id found
       icvnom.b = _ivnom;                                     // remove it from cvnom
-      cpieza = (intptr_t)*(ptr + 1);
-      if (cpieza < 256 && cpieza >= 0) { // reserved word (token)
-        if (cpieza == p_rem) {
+      color_token = (intptr_t)*(ptr + 1);
+      if (color_token < 256 && color_token >= 0) { // reserved word (token)
+        if (color_token == p_rem) {
           while (*_source != cr && *_source)
             _source++;
         } else
-          cpieza = p_res;
+          color_token = p_res;
       } else { // object (previous id)
-        cpieza = p_pre;
+        color_token = p_pre;
       }
     } else { // new id
       if (incluye_nombres) {
@@ -182,22 +182,22 @@ void color_lex(void) {
       } else {
         icvnom.b = _ivnom; // remove it from cvnom
       }
-      cpieza = p_id;
+      color_token = p_id;
     }
     break;
 
   case l_spc:
     while ((*++_source) == ' ') {}
-    cpieza = p_spc;
+    color_token = p_spc;
     break;
 
   case l_lit:
-    if (iscoment > 0) {
-      cpieza = p_rem;
+    if (in_comment > 0) {
+      color_token = p_rem;
       _source++;
       break;
     }
-    cpieza = p_lit;
+    color_token = p_lit;
     h = *_source;
     _ivnom = icvnom.b; // Literal delimited by h
     do {
@@ -217,12 +217,12 @@ void color_lex(void) {
     break;
 
   case l_num:
-    if (iscoment > 0) {
-      cpieza = p_rem;
+    if (in_comment > 0) {
+      color_token = p_rem;
       _source++;
       break;
     }
-    cpieza = p_num;
+    color_token = p_num;
     if (*_source == '0' && lower[*(_source + 1)] == 'x') {
       _source += 2;
       while ((uintptr_t)clex_case[*_source] == l_num ||
@@ -239,36 +239,36 @@ void color_lex(void) {
 
     e = clex_case[*_source++];
     _ivnom = _source;
-    cpieza = (*e).token;
+    color_token = (*e).token;
     while ((e = (*e).siguiente)) {
       while (*_source != (*e).caracter && (*e).alternativa)
         e = (*e).alternativa;
       if (*_source++ == (*e).caracter && (*e).token) {
-        cpieza = (*e).token;
+        color_token = (*e).token;
         _ivnom = _source;
       }
     }
     _source = _ivnom;
 
-    if (cpieza == p_rem && iscoment <= 0) {
+    if (color_token == p_rem && in_comment <= 0) {
       while (*_source != cr && *_source)
         _source++;
-    } else if (cpieza == p_ini_rem) {
-      cpieza = p_rem;
-      iscoment++;
+    } else if (color_token == p_ini_rem) {
+      color_token = p_rem;
+      in_comment++;
       numrem++;
-    } else if (cpieza == p_end_rem) {
-      cpieza = p_rem;
-      iscoment--;
+    } else if (color_token == p_end_rem) {
+      color_token = p_rem;
+      in_comment--;
       numrem--;
-    } else if (iscoment > 0)
-      cpieza = p_rem;
+    } else if (in_comment > 0)
+      color_token = p_rem;
     else
-      cpieza = p_sym;
+      color_token = p_sym;
 
     break;
   }
-  csource = _source;
+  color_source = _source;
 }
 
 //-----------------------------------------------------------------------------
@@ -285,7 +285,7 @@ void col_analyze_ltlex(void) {
   int len;
   struct clex_ele *e;
 
-  int t = 0; //token (cpieza)
+  int t = 0; //token (color_token)
   byte h;    //hash (for id)
   byte *_ivnom;
   byte **ptr;
@@ -419,10 +419,10 @@ void col_analyze_ltobj(void) {
   *(buf + len + 1) = cr;
 
   incluye_nombres = 1;
-  csource = buf;
+  color_source = buf;
   do {
     color_lex();
-  } while (csource < buf + len);
+  } while (color_source < buf + len);
   incluye_nombres = 0;
 
   free(_cbuf);

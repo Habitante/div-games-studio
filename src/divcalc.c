@@ -431,23 +431,23 @@ double get_num(void) { // Lee el número que hay en *expression (double en hex o
 //-----------------------------------------------------------------------------
 
 void calc1(void) {
-  int an = v.an / big2, al = v.al / big2;
+  int w = v.w / big2, h = v.h / big2;
 
   pcalc = (struct _calc *)v.aux;
 
   get = pcalc->cget;
   _show_items();
   get = get_buffer;
-  wbox(v.ptr, an, al, c12, 3, 11, an - 6 - 22 - 26, 8);
-  wrectangle(v.ptr, an, al, c1, 3, 11, an - 6 - 22 - 26, 8);
-  wwrite(v.ptr, an, al, 4, 12, 0, (byte *)pcalc->cresult, c3);
+  wbox(v.ptr, w, h, c12, 3, 11, w - 6 - 22 - 26, 8);
+  wrectangle(v.ptr, w, h, c1, 3, 11, w - 6 - 22 - 26, 8);
+  wwrite(v.ptr, w, h, 4, 12, 0, (byte *)pcalc->cresult, c3);
 }
 
 byte oldchex = 0;
 byte oldcint = 0;
 
 void calc2(void) {
-  int an = v.an / big2, al = v.al / big2;
+  int w = v.w / big2, h = v.h / big2;
 
   pcalc = (struct _calc *)v.aux;
 
@@ -498,8 +498,8 @@ void calc2(void) {
         div_snprintf(pcalc->cresult, sizeof(pcalc->cresult), "%g", tnumero);
     } else
       div_strcpy(pcalc->cresult, sizeof(pcalc->cresult), (char *)texts[417]);
-    wbox(v.ptr, an, al, c12, 4, 12, an - 8 - 22 - 26, 6);
-    wwrite(v.ptr, an, al, 4, 12, 0, (byte *)pcalc->cresult, c3);
+    wbox(v.ptr, w, h, c12, 4, 12, w - 8 - 22 - 26, 6);
+    wwrite(v.ptr, w, h, 4, 12, 0, (byte *)pcalc->cresult, c3);
     v.redraw = 1;
   }
 }
@@ -510,8 +510,8 @@ void calc3(void) {
 
 void calc0(void) {
   v.type = 102;
-  v.an = 120;
-  v.al = 34;
+  v.w = 120;
+  v.h = 34;
   v.title = texts[413];
   v.name = texts[413];
   v.paint_handler = calc1;
@@ -529,9 +529,9 @@ void calc0(void) {
 
   v.aux = (byte *)pcalc;
 
-  _get(414, 4, 13, v.an - 8, (byte *)pcalc->ctext, 256, 0, 0);
-  _flag(416, v.an - 23 - 26, 12, &pcalc->chex);
-  _flag(415, v.an - 23, 12, &pcalc->cint);
+  _get(414, 4, 13, v.w - 8, (byte *)pcalc->ctext, 256, 0, 0);
+  _flag(416, v.w - 23 - 26, 12, &pcalc->chex);
+  _flag(415, v.w - 23, 12, &pcalc->cint);
 }
 
 void calculadora(void) {

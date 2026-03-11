@@ -32,8 +32,8 @@ typedef struct _IFSHEADER {
 
 // ESTRUCTURA PARA EL FICHERO DE SALIDA (FNT)
 typedef struct _TABLAFNT {
-  int ancho;
-  int alto;
+  int width;
+  int height;
   int incY;
   int offset;
 } TABLAFNT;
@@ -74,10 +74,10 @@ typedef struct _IFS {
 extern char *bodyTexBuffer, *outTexBuffer, *shadowTexBuffer;
 extern IFS ifs;
 int Jorge_Crea_el_font(int GenCode);
-int ShowChar(int WhatChar, int cx, int cy, char *ptr, int an);
-int ShowCharBuffer(int WhatChar, int cx, int cy, char *ptr, int an, char *buffer);
-void GetCharSize(int WhatChar, int *ancho, int *alto);
-void GetCharSizeBuffer(int WhatChar, int *ancho, int *alto, char *buffer);
+int ShowChar(int WhatChar, int cx, int cy, char *ptr, int w);
+int ShowCharBuffer(int WhatChar, int cx, int cy, char *ptr, int w, char *buffer);
+void GetCharSize(int WhatChar, int *width, int *height);
+void GetCharSizeBuffer(int WhatChar, int *width, int *height, char *buffer);
 void ConvertFntToPal(char *Buffer);
 int Progress(char *titulo, int current, int total);
 #endif

@@ -130,14 +130,30 @@ changes. Static/file-scope globals may need to become shared or passed as parame
 module prefixes across 25 files. All 18 snake_case collisions resolved.
 Modules: `sound_` (18), `fli_` (16), `fpg_` (12), `pal_` (10), `fmt_` (20).
 
-Still remaining — file-local variables and function parameters have plenty of
-Spanish and cryptic single-letter names. Priority files (largest, most-read):
+**2C-4b (done):** File-local variables, struct fields, and parameters renamed
+across 45 files (~9,160 lines). Three batches:
 
-- [ ] divc.c / lexer / parser — the compiler is the most complex code
-- [ ] divedit.c — code editor, frequently modified
-- [ ] runtime/i.c — the VM interpreter, needs to be crystal clear
-- [ ] divpaint.c — paint editor, large and complex
-- [ ] divhandl.c — dialog/window manager
+- **Compiler (divc.c + d.c):** 68 rename mappings, ~4,560 replacements.
+  `struct objeto`→`object`, 23 union members decoded (`vglo`→`var_global`,
+  `pigl`→`ptr_int_global`, `sloc`→`struct_local`, etc.), `pieza`→`current_token`
+  (905 hits), `bloque_actual`→`current_scope`, `pila`→`eval_stack`, lex_ele
+  fields, error vars, 4 function renames.
+- **Editor (divedit.c + divcolor.c):** 27 renames, ~715 replacements.
+  `papelera`→`clipboard`, `kbloque`→`block_state`, `modo_cursor`→`cursor_mode`,
+  `cpieza`→`color_token`, `volcado_saltado`→`skip_full_blit`.
+- **Runtime + cross-file (44 files):** `reloj`→`frame_clock` (11 files),
+  `wvolcado`→`blit_region` (10 files), `ancho`→`width`/`alto`→`height` (19 files),
+  `an`→`w`/`al`→`h` (targeted regex to preserve English comments),
+  `espacio`→`spacing`, `espaciado`→`letter_spacing`, `nomitidos`→`num_skipped`,
+  `retra`→`retrace_pending`, `mouse_pintado`→`mouse_drawn`.
+
+Still remaining — mostly deeper locals in large files:
+
+- [x] divc.c — compiler structs, state vars, union members ✓
+- [x] divedit.c — clipboard, selection, cursor state ✓
+- [x] runtime/i.c — timing, blit, rendering vars ✓
+- [ ] divpaint.c — paint editor locals
+- [ ] divhandl.c — dialog/window manager locals
 
 ### 2C-5. Documentation pass
 

@@ -148,7 +148,7 @@ short CargaLetra(short letra) {
 
 
 short escalar() {
-  float ancho = Ancho, alto = Alto, ancho2, alto2;
+  float width = Ancho, height = Alto, ancho2, alto2;
   float factX, factY, x, y, f;
   float x1, x2, y1, y2;
   float porcien, acum;
@@ -157,9 +157,9 @@ short escalar() {
   short cx = 0, cy = 0, flag = 0;
   char *ptr = Buffer, *p;
 
-  ancho2 = (float)ancho * ifs.tamX / sizeIFS; // ancho real en relación
+  ancho2 = (float)width * ifs.tamX / sizeIFS; // width real en relación
                                               // al tamaño original
-  alto2 = (float)alto * ifs.tamY / sizeIFS;
+  alto2 = (float)height * ifs.tamY / sizeIFS;
 
   if (ifs.tamX == sizeIFS && ifs.tamY == sizeIFS) // no hace falta escalar
   {
@@ -167,8 +167,8 @@ short escalar() {
     return (0);
   }
 
-  factX = ancho / ancho2;
-  factY = alto / alto2;
+  factX = width / ancho2;
+  factY = height / alto2;
 
   if (factX >= 2.0 || factY >= 2.0) // escalar por medias
   {
@@ -206,8 +206,8 @@ short escalar() {
     memset(Buffer2, 0, (altoreal + 3) * (anchoreal + 3));
     ptr = Buffer2;
 
-    for (iy = 0; iy < alto; iy += factY) {
-      for (ix = 0; ix < ancho; ix += factX) {
+    for (iy = 0; iy < height; iy += factY) {
+      for (ix = 0; ix < width; ix += factX) {
         pixel = 0;
         for (iyy = iy; iyy < iy + (int)factY; iyy++)
           for (ixx = ix; ixx < ix + (int)factX; ixx++)
@@ -225,10 +225,10 @@ short escalar() {
       ptrLetra = Buffer2;
       return (0);
     }
-    ancho = anchoreal;
-    alto = altoreal;
-    factX = (float)ancho / ancho2;
-    factY = (float)alto / alto2;
+    width = anchoreal;
+    height = altoreal;
+    factX = (float)width / ancho2;
+    factY = (float)height / alto2;
   }
 
   anchoreal = (int)ancho2;
@@ -242,8 +242,8 @@ short escalar() {
   memset(Buffer3, 0, (anchoreal + 3) * (altoreal + 3));
   cx = 0;
   cy = 0;
-  for (y = 0.5; y <= alto + 0.9; y += factY) {
-    for (x = 0.5; x <= ancho + 0.9; x += factX) {
+  for (y = 0.5; y <= height + 0.9; y += factY) {
+    for (x = 0.5; x <= width + 0.9; x += factX) {
       ix = x;
       x1 = ix + 0.5;
       if (x - ix >= 0.5) {
@@ -263,22 +263,22 @@ short escalar() {
         y1 = iy - 0.5;
         y2 = iy + 0.5;
       }
-      p = ptr + (int)y1 * (int)ancho + (int)x1;
+      p = ptr + (int)y1 * (int)width + (int)x1;
 
       porcien = 2 - ((x - x1) * (x - x1) + (y - y1) * (y - y1));
       acum = porcien;
       pixel = *p * porcien;
-      p += (int)ancho;
+      p += (int)width;
 
       porcien = 2 - ((x - x1) * (x - x1) + (y - y2) * (y - y2));
       acum += porcien;
       pixel += *p * porcien;
-      p -= (int)ancho - 1;
+      p -= (int)width - 1;
 
       porcien = 2 - ((x - x2) * (x - x2) + (y - y1) * (y - y1));
       acum += porcien;
       pixel += *p * porcien;
-      p += (int)ancho;
+      p += (int)width;
 
       porcien = 2 - ((x - x2) * (x - x2) + (y - y2) * (y - y2));
       acum += porcien;
@@ -791,7 +791,7 @@ int Jorge_Crea_el_font(int GenCode) {
   for (x = 0, error = 0; x < 256 && !error; x++) {
     Progress((char *)texts[217], x, 256);
 
-    tablaFNT[x].ancho = tablaFNT[x].alto = 0;
+    tablaFNT[x].width = tablaFNT[x].height = 0;
     tablaFNT[x].offset = 0;
     if (ifs.tabla[x]) {
       anchoreal = 0;
@@ -845,16 +845,16 @@ int Jorge_Crea_el_font(int GenCode) {
         }
 
         if (anchoreal <= 0 || incY >= altoreal) {
-          tablaFNT[x].ancho = 0;
-          tablaFNT[x].alto = 0;
+          tablaFNT[x].width = 0;
+          tablaFNT[x].height = 0;
           tablaFNT[x].incY = 0;
           tablaFNT[x].offset = 0;
         } else {
-          tablaFNT[x].ancho = anchoreal;
-          tablaFNT[x].alto = altoreal - incY;
+          tablaFNT[x].width = anchoreal;
+          tablaFNT[x].height = altoreal - incY;
           tablaFNT[x].incY = incY;
           tablaFNT[x].offset = ftell(fichFNT);
-          if (fwrite(ptrLetra + incY * anchoreal, tablaFNT[x].ancho * tablaFNT[x].alto, 1,
+          if (fwrite(ptrLetra + incY * anchoreal, tablaFNT[x].width * tablaFNT[x].height, 1,
                      fichFNT) < 1)
             error = 1;
         }
@@ -876,10 +876,10 @@ int Jorge_Crea_el_font(int GenCode) {
   return (0);
 }
 
-void GetCharSize(int WhatChar, int *ancho, int *alto) {
+void GetCharSize(int WhatChar, int *width, int *height) {
   FILE *fichFnt;
-  *ancho = 4;
-  *alto = 1;
+  *width = 4;
+  *height = 1;
 
   if ((fichFnt = fopen("PREVIEW.FNT", "rb")) == NULL)
     return;
@@ -888,24 +888,24 @@ void GetCharSize(int WhatChar, int *ancho, int *alto) {
     fclose(fichFnt);
     return;
   }
-  *alto = tablaFNT[WhatChar].incY + tablaFNT[WhatChar].alto;
+  *height = tablaFNT[WhatChar].incY + tablaFNT[WhatChar].height;
   if (WhatChar == 32)
-    *ancho = tablaFNT[WhatChar].ancho / 2;
+    *width = tablaFNT[WhatChar].width / 2;
   else
-    *ancho = tablaFNT[WhatChar].ancho + 1;
+    *width = tablaFNT[WhatChar].width + 1;
   fclose(fichFnt);
   return;
 }
-void GetCharSizeBuffer(int WhatChar, int *ancho, int *alto, char *buffer) {
-  *ancho = 4;
-  *alto = 1;
+void GetCharSizeBuffer(int WhatChar, int *width, int *height, char *buffer) {
+  *width = 4;
+  *height = 1;
 
   memcpy(tablaFNT, buffer + 8 + 768 + sizeof(gradients) + 4, sizeof(tablaFNT));
-  *alto = tablaFNT[WhatChar].incY + tablaFNT[WhatChar].alto;
-  *ancho = tablaFNT[WhatChar].ancho + 1;
+  *height = tablaFNT[WhatChar].incY + tablaFNT[WhatChar].height;
+  *width = tablaFNT[WhatChar].width + 1;
   return;
 }
-int ShowChar(int WhatChar, int cx, int cy, char *ptr, int an) {
+int ShowChar(int WhatChar, int cx, int cy, char *ptr, int w) {
   int y, iy;
   FILE *fichFnt;
   char *rawBuffer;
@@ -916,79 +916,79 @@ int ShowChar(int WhatChar, int cx, int cy, char *ptr, int an) {
     fclose(fichFnt);
     return 4;
   }
-  if (tablaFNT[WhatChar].ancho && tablaFNT[WhatChar].alto) {
-    rawBuffer = (char *)malloc(tablaFNT[WhatChar].ancho * tablaFNT[WhatChar].alto);
+  if (tablaFNT[WhatChar].width && tablaFNT[WhatChar].height) {
+    rawBuffer = (char *)malloc(tablaFNT[WhatChar].width * tablaFNT[WhatChar].height);
     if (rawBuffer == NULL) {
       fclose(fichFnt);
       if (WhatChar == 32)
-        return (tablaFNT[WhatChar].ancho / 2);
+        return (tablaFNT[WhatChar].width / 2);
       else
-        return (tablaFNT[WhatChar].ancho + 1);
+        return (tablaFNT[WhatChar].width + 1);
     }
     if (fseek(fichFnt, tablaFNT[WhatChar].offset, SEEK_SET)) {
       free(rawBuffer);
       fclose(fichFnt);
       if (WhatChar == 32)
-        return (tablaFNT[WhatChar].ancho / 2);
+        return (tablaFNT[WhatChar].width / 2);
       else
-        return (tablaFNT[WhatChar].ancho + 1);
+        return (tablaFNT[WhatChar].width + 1);
     }
-    if (fread(rawBuffer, tablaFNT[WhatChar].ancho * tablaFNT[WhatChar].alto, 1, fichFnt) < 1) {
+    if (fread(rawBuffer, tablaFNT[WhatChar].width * tablaFNT[WhatChar].height, 1, fichFnt) < 1) {
       free(rawBuffer);
       fclose(fichFnt);
       if (WhatChar == 32)
-        return (tablaFNT[WhatChar].ancho / 2);
+        return (tablaFNT[WhatChar].width / 2);
       else
-        return (tablaFNT[WhatChar].ancho + 1);
+        return (tablaFNT[WhatChar].width + 1);
     }
     iy = tablaFNT[WhatChar].incY;
-    for (y = 0; y < tablaFNT[WhatChar].alto; y++)
-      memcpy(ptr + ((cy + iy) * an + cx) + y * an, rawBuffer + y * tablaFNT[WhatChar].ancho,
-             tablaFNT[WhatChar].ancho);
+    for (y = 0; y < tablaFNT[WhatChar].height; y++)
+      memcpy(ptr + ((cy + iy) * w + cx) + y * w, rawBuffer + y * tablaFNT[WhatChar].width,
+             tablaFNT[WhatChar].width);
 
     fclose(fichFnt);
     free(rawBuffer);
     if (WhatChar == 32)
-      return (tablaFNT[WhatChar].ancho / 2);
+      return (tablaFNT[WhatChar].width / 2);
     else
-      return (tablaFNT[WhatChar].ancho + 1);
+      return (tablaFNT[WhatChar].width + 1);
   } else
     fclose(fichFnt);
   if (WhatChar == 32)
-    return (tablaFNT[WhatChar].ancho / 2);
+    return (tablaFNT[WhatChar].width / 2);
   else
-    return (tablaFNT[WhatChar].ancho + 1);
+    return (tablaFNT[WhatChar].width + 1);
 }
 
-int ShowCharBuffer(int WhatChar, int cx, int cy, char *ptr, int an, char *buffer) {
+int ShowCharBuffer(int WhatChar, int cx, int cy, char *ptr, int w, char *buffer) {
   int y, iy, x, c;
   char *rawBuffer;
   memcpy(tablaFNT, buffer + 8 + 768 + sizeof(gradients) + 4, sizeof(tablaFNT));
-  if (tablaFNT[WhatChar].ancho && tablaFNT[WhatChar].alto) {
-    rawBuffer = (char *)malloc(tablaFNT[WhatChar].ancho * tablaFNT[WhatChar].alto);
+  if (tablaFNT[WhatChar].width && tablaFNT[WhatChar].height) {
+    rawBuffer = (char *)malloc(tablaFNT[WhatChar].width * tablaFNT[WhatChar].height);
     if (rawBuffer == NULL) {
       if (WhatChar == 32)
-        return (tablaFNT[WhatChar].ancho / 2);
+        return (tablaFNT[WhatChar].width / 2);
       else
-        return (tablaFNT[WhatChar].ancho + 1);
+        return (tablaFNT[WhatChar].width + 1);
     }
     memcpy(rawBuffer, buffer + tablaFNT[WhatChar].offset,
-           tablaFNT[WhatChar].ancho && tablaFNT[WhatChar].alto);
+           tablaFNT[WhatChar].width && tablaFNT[WhatChar].height);
     iy = tablaFNT[WhatChar].incY;
-    for (y = 0; y < tablaFNT[WhatChar].alto; y++) {
-      for (x = 0; x < tablaFNT[WhatChar].ancho; x++) {
-        if ((c = rawBuffer[y * tablaFNT[WhatChar].ancho + x])) {
-          ptr[(cy + iy) * an + cx + x + y * an] = c;
+    for (y = 0; y < tablaFNT[WhatChar].height; y++) {
+      for (x = 0; x < tablaFNT[WhatChar].width; x++) {
+        if ((c = rawBuffer[y * tablaFNT[WhatChar].width + x])) {
+          ptr[(cy + iy) * w + cx + x + y * w] = c;
         }
       }
     }
     free(rawBuffer);
     if (WhatChar == 32)
-      return (tablaFNT[WhatChar].ancho / 2);
+      return (tablaFNT[WhatChar].width / 2);
     else
-      return (tablaFNT[WhatChar].ancho + 1);
+      return (tablaFNT[WhatChar].width + 1);
   }
-  return (tablaFNT[WhatChar].ancho + 1);
+  return (tablaFNT[WhatChar].width + 1);
 }
 
 void ConvertFntToPal(char *buffer) {
@@ -1011,11 +1011,11 @@ void ConvertFntToPal(char *buffer) {
   memcpy(tablaFNT, buffer + 8 + 768 + sizeof(gradients) + 4, sizeof(tablaFNT));
 
   for (x = 0; x < 256; x++) {
-    if (tablaFNT[x].ancho && tablaFNT[x].alto)
-      for (a = 0; a < tablaFNT[x].alto; a++)
-        for (b = 0; b < tablaFNT[x].ancho; b++) {
-          acum = *(buffer + tablaFNT[x].offset + a * tablaFNT[x].ancho + b);
-          *(buffer + tablaFNT[x].offset + a * tablaFNT[x].ancho + b) = xlat[acum];
+    if (tablaFNT[x].width && tablaFNT[x].height)
+      for (a = 0; a < tablaFNT[x].height; a++)
+        for (b = 0; b < tablaFNT[x].width; b++) {
+          acum = *(buffer + tablaFNT[x].offset + a * tablaFNT[x].width + b);
+          *(buffer + tablaFNT[x].offset + a * tablaFNT[x].width + b) = xlat[acum];
         }
   }
   memcpy(buffer + 8, dac, 768);

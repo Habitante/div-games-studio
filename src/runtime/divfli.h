@@ -6,8 +6,8 @@
 /*************************************************************************/
 /* Entradas: nombre del fli/flc                                          */
 /*           Buffer donde se muestra el fli                              */
-/*           Buffer_anc ancho del buffer donde se muestra el fli         */
-/*           Buffer_alt alto del buffer donde se muestra el fli          */
+/*           Buffer_anc width del buffer donde se muestra el fli         */
+/*           Buffer_alt height del buffer donde se muestra el fli          */
 /*           cx coordenada x del buffer donde se muestra el fli          */
 /*           cy coordenada y del buffer donde se muestra el fli          */
 /*************************************************************************/

@@ -25,7 +25,7 @@ void blit_full_modex(byte *p);
 void blit_partial_svga(byte *p);
 void blit_partial_320x200(byte *p);
 void blit_partial_modex(byte *p);
-int save_PCX(byte *mapa, int an, int al, FILE *f);
+int save_PCX(byte *mapa, int w, int h, FILE *f);
 void create_ghost_vc(int m);
 void create_ghost_slow(void);
 
@@ -437,7 +437,7 @@ struct pcx_struct {
   int clength;
 };
 
-int save_PCX(byte *mapa, int an, int al, FILE *f) {
+int save_PCX(byte *mapa, int w, int h, FILE *f) {
   byte p[768];
   int x;
   byte *cbuffer;
@@ -455,26 +455,26 @@ int save_PCX(byte *mapa, int an, int al, FILE *f) {
   pcx.header.bits_per_pixel = 8;
   pcx.header.xmin = 0;
   pcx.header.ymin = 0;
-  pcx.header.xmax = an - 1;
-  pcx.header.ymax = al - 1;
-  pcx.header.hres = an;
-  pcx.header.vres = al;
+  pcx.header.xmax = w - 1;
+  pcx.header.ymax = h - 1;
+  pcx.header.hres = w;
+  pcx.header.vres = h;
   pcx.header.color_planes = 1;
-  pcx.header.bytes_per_line = an;
+  pcx.header.bytes_per_line = w;
   pcx.header.palette_type = 0;
-  pcx.header.Hresol = an;
-  pcx.header.Vresol = al;
+  pcx.header.Hresol = w;
+  pcx.header.Vresol = h;
 
-  if ((cbuffer = (unsigned char *)malloc(an * al * 2)) == NULL)
+  if ((cbuffer = (unsigned char *)malloc(w * h * 2)) == NULL)
     return (1);
 
   ActPixel = mapa[ptr];
-  while (ptr < an * al) {
-    while ((mapa[ptr] == ActPixel) && (ptr < an * al)) {
+  while (ptr < w * h) {
+    while ((mapa[ptr] == ActPixel) && (ptr < w * h)) {
       cntPixel++;
       Desborde++;
       ptr++;
-      if (Desborde == an) {
+      if (Desborde == w) {
         Desborde = 0;
         break;
       }
@@ -503,14 +503,14 @@ int save_PCX(byte *mapa, int an, int al, FILE *f) {
   return (0);
 }
 
-int save_MAP(byte *mapa, int an, int al, FILE *f) {
+int save_MAP(byte *mapa, int w, int h, FILE *f) {
   int y;
   char cwork[32] = "";
   char gradients[576];
 
   fwrite("map\x1a\x0d\x0a\x00\x00", 8, 1, f); // +000 Header and version
-  fwrite(&an, 2, 1, f);                       // +008 Width
-  fwrite(&al, 2, 1, f);                       // +010 Height
+  fwrite(&w, 2, 1, f);                       // +008 Width
+  fwrite(&h, 2, 1, f);                       // +010 Height
   y = 1;
   fwrite(&y, 4, 1, f); // +012 Code
 
@@ -528,7 +528,7 @@ int save_MAP(byte *mapa, int an, int al, FILE *f) {
 
   y = 0;
   fwrite(&y, 2, 1, f); // +1392 Number of control points
-  fwrite(mapa, an * al, 1, f);
+  fwrite(mapa, w * h, 1, f);
   return (0);
 }
 
@@ -643,33 +643,33 @@ void init_flush(void) {
   full_redraw = 0;
 }
 
-void blit_partial(int x, int y, int an, int al) {
+void blit_partial(int x, int y, int w, int h) {
   int ymax, xmax, n, d1, d2, x2;
 
-  if (an == vga_width && al == vga_height && x == 0 && y == 0) {
+  if (w == vga_width && h == vga_height && x == 0 && y == 0) {
     full_redraw = 1;
     return;
   }
 
-  if (an > 0 && al > 0 && x < vga_width && y < vga_height) {
+  if (w > 0 && h > 0 && x < vga_width && y < vga_height) {
     if (x < 0) {
-      an += x;
+      w += x;
       x = 0;
     }
     if (y < 0) {
-      al += y;
+      h += y;
       y = 0;
     }
-    if (x + an > vga_width) {
-      an = vga_width - x;
+    if (x + w > vga_width) {
+      w = vga_width - x;
     }
-    if (y + al > vga_height) {
-      al = vga_height - y;
+    if (y + h > vga_height) {
+      h = vga_height - y;
     }
-    if (an <= 0 || al <= 0)
+    if (w <= 0 || h <= 0)
       return;
-    xmax = x + an - 1;
-    ymax = y + al - 1;
+    xmax = x + w - 1;
+    ymax = y + h - 1;
 
     if (!modovesa) {
       switch (vga_width * 1000 + vga_height) {
@@ -680,7 +680,7 @@ void blit_partial(int x, int y, int an, int al) {
       case 376282: // Mode-X modes
         x >>= 2;
         xmax >>= 2;
-        an = xmax - x + 1;
+        w = xmax - x + 1;
         break;
       }
     }
@@ -689,64 +689,64 @@ void blit_partial(int x, int y, int an, int al) {
       n = y * 4;
       if (scan[n + 1] == 0) { // Case 1: scanline was empty ...
         scan[n] = x;
-        scan[n + 1] = an;
+        scan[n + 1] = w;
       } else if (scan[n + 3] == 0) { // Case 2: one segment already defined ...
-        if (x > scan[n] + scan[n + 1] || x + an < scan[n]) { // ... gap in between
+        if (x > scan[n] + scan[n + 1] || x + w < scan[n]) { // ... gap in between
           if (x > scan[n]) {
             scan[n + 2] = x;
-            scan[n + 3] = an;
+            scan[n + 3] = w;
           } else {
             scan[n + 2] = scan[n];
             scan[n + 3] = scan[n + 1];
             scan[n] = x;
-            scan[n + 1] = an;
+            scan[n + 1] = w;
           }
         } else { // ... no gap, extend the first segment
           if (x < (x2 = scan[n]))
             scan[n] = x;
-          if (x + an > x2 + scan[n + 1])
-            scan[n + 1] = x + an - scan[n];
+          if (x + w > x2 + scan[n + 1])
+            scan[n + 1] = x + w - scan[n];
           else
             scan[n + 1] = x2 + scan[n + 1] - scan[n];
         }
       } else { // Case 3: two segments already defined ...
-        if (x <= scan[n] + scan[n + 1] && x + an >= scan[n + 2]) {
+        if (x <= scan[n] + scan[n + 1] && x + w >= scan[n + 2]) {
           // Case 3.1: fills the gap -> merges into a single segment
           if (x < scan[n])
             scan[n] = x;
-          if (x + an > scan[n + 2] + scan[n + 3])
-            scan[n + 1] = x + an - scan[n];
+          if (x + w > scan[n + 2] + scan[n + 3])
+            scan[n + 1] = x + w - scan[n];
           else
             scan[n + 1] = scan[n + 2] + scan[n + 3] - scan[n];
           scan[n + 2] = 0;
           scan[n + 3] = 0;
         } else {
-          if (x > scan[n] + scan[n + 1] || x + an < scan[n]) {           // No overlap with 1st
-            if (x > scan[n + 2] + scan[n + 3] || x + an < scan[n + 2]) { // No overlap with 2nd
+          if (x > scan[n] + scan[n + 1] || x + w < scan[n]) {           // No overlap with 1st
+            if (x > scan[n + 2] + scan[n + 3] || x + w < scan[n + 2]) { // No overlap with 2nd
               // Case 3.4: no overlap with either, calculate distance
               // to both and merge with the nearest
-              if (x + an < scan[n])
-                d1 = scan[n] - (x + an);
+              if (x + w < scan[n])
+                d1 = scan[n] - (x + w);
               else
                 d1 = x - (scan[n] + scan[n + 1]);
-              if (x + an < scan[n + 2])
-                d2 = scan[n + 2] - (x + an);
+              if (x + w < scan[n + 2])
+                d2 = scan[n + 2] - (x + w);
               else
                 d2 = x - (scan[n + 2] + scan[n + 3]);
               if (d1 <= d2) {
                 // Case 3.4.1: merge with the first segment
                 if (x < (x2 = scan[n]))
                   scan[n] = x;
-                if (x + an > x2 + scan[n + 1])
-                  scan[n + 1] = x + an - scan[n];
+                if (x + w > x2 + scan[n + 1])
+                  scan[n + 1] = x + w - scan[n];
                 else
                   scan[n + 1] = x2 + scan[n + 1] - scan[n];
               } else {
                 // Case 3.4.2: merge with the second segment
                 if (x < (x2 = scan[n + 2]))
                   scan[n + 2] = x;
-                if (x + an > x2 + scan[n + 3])
-                  scan[n + 3] = x + an - scan[n + 2];
+                if (x + w > x2 + scan[n + 3])
+                  scan[n + 3] = x + w - scan[n + 2];
                 else
                   scan[n + 3] = x2 + scan[n + 3] - scan[n + 2];
               }
@@ -754,8 +754,8 @@ void blit_partial(int x, int y, int an, int al) {
               // Case 3.3: overlaps with the 2nd segment, merge them
               if (x < (x2 = scan[n + 2]))
                 scan[n + 2] = x;
-              if (x + an > x2 + scan[n + 3])
-                scan[n + 3] = x + an - scan[n + 2];
+              if (x + w > x2 + scan[n + 3])
+                scan[n + 3] = x + w - scan[n + 2];
               else
                 scan[n + 3] = x2 + scan[n + 3] - scan[n + 2];
             }
@@ -763,8 +763,8 @@ void blit_partial(int x, int y, int an, int al) {
             // Case 3.2: overlaps with the 1st segment, merge them
             if (x < (x2 = scan[n]))
               scan[n] = x;
-            if (x + an > x2 + scan[n + 1])
-              scan[n + 1] = x + an - scan[n];
+            if (x + w > x2 + scan[n + 1])
+              scan[n + 1] = x + w - scan[n];
             else
               scan[n + 1] = x2 + scan[n + 1] - scan[n];
           }

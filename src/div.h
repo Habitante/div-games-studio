@@ -124,11 +124,11 @@ typedef struct _FPGBODY {
   int len;
   char desc[32];
   char namefile[12];
-  int ancho;
-  int alto;
+  int width;
+  int height;
   int npuntos;
   //        short    *puntos;//2*npuntos
-  //        char     *graph; //ancho*alto
+  //        char     *graph; //width*height
 } FPGBODY;
 
 // FNT DESCRIPTION
@@ -139,8 +139,8 @@ typedef struct _FNTHEADER {
 } FNTHEADER;
 
 typedef struct _FNTBODY {
-  int ancho;
-  int alto;
+  int width;
+  int height;
   int incY;
   int offset;
 } FNTBODY;

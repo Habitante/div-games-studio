@@ -29,14 +29,14 @@ int IsFullScreen(SDL_Surface *surface) {
   return OSDEP_IsFullScreen();
 }
 
-static int windowed_an = 0, windowed_al = 0;
+static int windowed_w = 0, windowed_h = 0;
 
 void SDL_ToggleFS(SDL_Surface *surface) {
   if (IsFullScreen(surface)) {
     // Going windowed — restore saved windowed size
-    if (windowed_an >= 640 && windowed_al >= 480) {
-      vga_width = windowed_an;
-      vga_height = windowed_al;
+    if (windowed_w >= 640 && windowed_h >= 480) {
+      vga_width = windowed_w;
+      vga_height = windowed_h;
     } else {
       // Fallback: use setup values or sensible default
       vga_width = (VS_WIDTH >= 640) ? VS_WIDTH : 640;
@@ -45,8 +45,8 @@ void SDL_ToggleFS(SDL_Surface *surface) {
     fsmode = 0;
   } else {
     // Going fullscreen — save current windowed size
-    windowed_an = vga_width;
-    windowed_al = vga_height;
+    windowed_w = vga_width;
+    windowed_h = vga_height;
     fsmode = 1;
   }
 
@@ -413,33 +413,33 @@ void init_flush(void) {
   full_redraw = 0;
 }
 
-void blit_partial(int x, int y, int an, int al) {
+void blit_partial(int x, int y, int w, int h) {
   int ymax = 0, xmax = 0, n = 0, d1 = 0, d2 = 0, x2 = 0;
 
-  if (an == vga_width && al == vga_height && x == 0 && y == 0) {
+  if (w == vga_width && h == vga_height && x == 0 && y == 0) {
     full_redraw = 1;
     return;
   }
 
-  if (an > 0 && al > 0 && x < vga_width && y < vga_height) {
+  if (w > 0 && h > 0 && x < vga_width && y < vga_height) {
     if (x < 0) {
-      an += x;
+      w += x;
       x = 0;
     }
     if (y < 0) {
-      al += y;
+      h += y;
       y = 0;
     }
-    if (x + an > vga_width) {
-      an = vga_width - x;
+    if (x + w > vga_width) {
+      w = vga_width - x;
     }
-    if (y + al > vga_height) {
-      al = vga_height - y;
+    if (y + h > vga_height) {
+      h = vga_height - y;
     }
-    if (an <= 0 || al <= 0)
+    if (w <= 0 || h <= 0)
       return;
-    xmax = x + an - 1;
-    ymax = y + al - 1;
+    xmax = x + w - 1;
+    ymax = y + h - 1;
 
     if (!modovesa) {
       switch (vga_width * 1000 + vga_height) {
@@ -450,7 +450,7 @@ void blit_partial(int x, int y, int an, int al) {
       case 376282: // Modos X
         x >>= 2;
         xmax >>= 2;
-        an = xmax - x + 1;
+        w = xmax - x + 1;
         break;
       }
     }
@@ -459,64 +459,64 @@ void blit_partial(int x, int y, int an, int al) {
       n = y * 4;
       if (scan[n + 1] == 0) { // Caso 1, el scan estaba vacío ...
         scan[n] = x;
-        scan[n + 1] = an;
+        scan[n + 1] = w;
       } else if (scan[n + 3] == 0) {                         // Caso 2, ya hay un scan definido ...
-        if (x > scan[n] + scan[n + 1] || x + an < scan[n]) { // ... hueco entre medias
+        if (x > scan[n] + scan[n + 1] || x + w < scan[n]) { // ... hueco entre medias
           if (x > scan[n]) {
             scan[n + 2] = x;
-            scan[n + 3] = an;
+            scan[n + 3] = w;
           } else {
             scan[n + 2] = scan[n];
             scan[n + 3] = scan[n + 1];
             scan[n] = x;
-            scan[n + 1] = an;
+            scan[n + 1] = w;
           }
         } else { // ... no hay hueco, amplia el primer scan
           if (x < (x2 = scan[n]))
             scan[n] = x;
-          if (x + an > x2 + scan[n + 1])
-            scan[n + 1] = x + an - scan[n];
+          if (x + w > x2 + scan[n + 1])
+            scan[n + 1] = x + w - scan[n];
           else
             scan[n + 1] = x2 + scan[n + 1] - scan[n];
         }
       } else { // Caso 3, hay 2 scanes definidos ...
-        if (x <= scan[n] + scan[n + 1] && x + an >= scan[n + 2]) {
+        if (x <= scan[n] + scan[n + 1] && x + w >= scan[n + 2]) {
           // Caso 3.1, se tapa el hueco anterior -> queda un solo scan
           if (x < scan[n])
             scan[n] = x;
-          if (x + an > scan[n + 2] + scan[n + 3])
-            scan[n + 1] = x + an - scan[n];
+          if (x + w > scan[n + 2] + scan[n + 3])
+            scan[n + 1] = x + w - scan[n];
           else
             scan[n + 1] = scan[n + 2] + scan[n + 3] - scan[n];
           scan[n + 2] = 0;
           scan[n + 3] = 0;
         } else {
-          if (x > scan[n] + scan[n + 1] || x + an < scan[n]) {           // No choca con 1º
-            if (x > scan[n + 2] + scan[n + 3] || x + an < scan[n + 2]) { // No choca con 2º
-              // Caso 3.4, el nuevo no colisiona con ninguno, se calcula el espacio
+          if (x > scan[n] + scan[n + 1] || x + w < scan[n]) {           // No choca con 1º
+            if (x > scan[n + 2] + scan[n + 3] || x + w < scan[n + 2]) { // No choca con 2º
+              // Caso 3.4, el nuevo no colisiona con ninguno, se calcula el spacing
               // hasta ambos, y se fusiona con el más cercano
-              if (x + an < scan[n])
-                d1 = scan[n] - (x + an);
+              if (x + w < scan[n])
+                d1 = scan[n] - (x + w);
               else
                 d1 = x - (scan[n] + scan[n + 1]);
-              if (x + an < scan[n + 2])
-                d2 = scan[n + 2] - (x + an);
+              if (x + w < scan[n + 2])
+                d2 = scan[n + 2] - (x + w);
               else
                 d2 = x - (scan[n + 2] + scan[n + 3]);
               if (d1 <= d2) {
                 // Caso 3.4.1 se fusiona con el primero
                 if (x < (x2 = scan[n]))
                   scan[n] = x;
-                if (x + an > x2 + scan[n + 1])
-                  scan[n + 1] = x + an - scan[n];
+                if (x + w > x2 + scan[n + 1])
+                  scan[n + 1] = x + w - scan[n];
                 else
                   scan[n + 1] = x2 + scan[n + 1] - scan[n];
               } else {
                 // Caso 3.4.2 se fusiona con el segundo
                 if (x < (x2 = scan[n + 2]))
                   scan[n + 2] = x;
-                if (x + an > x2 + scan[n + 3])
-                  scan[n + 3] = x + an - scan[n + 2];
+                if (x + w > x2 + scan[n + 3])
+                  scan[n + 3] = x + w - scan[n + 2];
                 else
                   scan[n + 3] = x2 + scan[n + 3] - scan[n + 2];
               }
@@ -524,8 +524,8 @@ void blit_partial(int x, int y, int an, int al) {
               // Caso 3.3, el nuevo colisiona con el 2º, se fusionan
               if (x < (x2 = scan[n + 2]))
                 scan[n + 2] = x;
-              if (x + an > x2 + scan[n + 3])
-                scan[n + 3] = x + an - scan[n + 2];
+              if (x + w > x2 + scan[n + 3])
+                scan[n + 3] = x + w - scan[n + 2];
               else
                 scan[n + 3] = x2 + scan[n + 3] - scan[n + 2];
             }
@@ -533,8 +533,8 @@ void blit_partial(int x, int y, int an, int al) {
             // Caso 3.2, el nuevo colisiona con el 1º, se fusionan
             if (x < (x2 = scan[n]))
               scan[n] = x;
-            if (x + an > x2 + scan[n + 1])
-              scan[n + 1] = x + an - scan[n];
+            if (x + w > x2 + scan[n + 1])
+              scan[n + 1] = x + w - scan[n];
             else
               scan[n + 1] = x2 + scan[n + 1] - scan[n];
           }

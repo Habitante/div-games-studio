@@ -10,12 +10,12 @@ void draw_help(int); // Drawing support
 
 void draw_selection_box(int _x0, int _y0, int _x1, int _y1);
 void draw_selection_mask(void);
-void fill_inter(int an, int al);
-void blit_interpolated(int an);
+void fill_inter(int w, int h);
+void blit_interpolated(int w);
 void fill_scan(word x, word y);
 void fill_draw(void);
-void copy_block(byte *d, byte *s, int an, int al);
-void xchg_block(byte *d, byte *s, int an, int al);
+void copy_block(byte *d, byte *s, int w, int h);
+void xchg_block(byte *d, byte *s, int w, int h);
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -23,7 +23,7 @@ void xchg_block(byte *d, byte *s, int an, int al);
 ///////////////////////////////////////////////////////////////////////////////
 
 word *m0, *m1;
-word an_original;
+word w_original;
 
 extern int num_punto;
 
@@ -47,8 +47,8 @@ void box(byte c, int x0, int y0, int x1, int y1) {
 //      Draw a rectangle
 ///////////////////////////////////////////////////////////////////////////////
 
-void rectangle(byte c, int x, int y, int an, int al) {
-  wrectangle(screen_buffer, vga_width, vga_height, c, x, y, an, al);
+void rectangle(byte c, int x, int y, int w, int h) {
+  wrectangle(screen_buffer, vga_width, vga_height, c, x, y, w, h);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -57,12 +57,12 @@ void rectangle(byte c, int x, int y, int an, int al) {
 
 void save_mouse_bg(byte *p, int x, int y, int n, int flag) {
   byte *q;
-  int an, al;
+  int w, h;
   int salta_x, long_x, resto_x;
   int salta_y, long_y, resto_y;
 
-  al = *((word *)(graf[n] + 2));
-  an = *((word *)graf[n]);
+  h = *((word *)(graf[n] + 2));
+  w = *((word *)graf[n]);
 
   x -= *((word *)(graf[n] + 4));
   y -= *((word *)(graf[n] + 6));
@@ -71,7 +71,7 @@ void save_mouse_bg(byte *p, int x, int y, int n, int flag) {
   if ((x > vga_width) | (y > vga_height))
     return;
 
-  blit_partial(x, y, an, al);
+  blit_partial(x, y, w, h);
 
   q = screen_buffer + y * vga_width + x;
 
@@ -79,26 +79,26 @@ void save_mouse_bg(byte *p, int x, int y, int n, int flag) {
     salta_x = -x;
   else
     salta_x = 0;
-  if (x + an > vga_width)
-    resto_x = x + an - vga_width;
+  if (x + w > vga_width)
+    resto_x = x + w - vga_width;
   else
     resto_x = 0;
-  long_x = an - salta_x - resto_x;
+  long_x = w - salta_x - resto_x;
 
   if (y < 0)
     salta_y = -y;
   else
     salta_y = 0;
-  if (y + al > vga_height)
-    resto_y = y + al - vga_height;
+  if (y + h > vga_height)
+    resto_y = y + h - vga_height;
   else
     resto_y = 0;
-  long_y = al - salta_y - resto_y;
+  long_y = h - salta_y - resto_y;
 
-  p += an * salta_y + salta_x;
+  p += w * salta_y + salta_x;
   q += vga_width * salta_y + salta_x;
   resto_x += salta_x;
-  an = long_x;
+  w = long_x;
   do {
     do {
       if (flag)
@@ -107,8 +107,8 @@ void save_mouse_bg(byte *p, int x, int y, int n, int flag) {
         *p = *q;
       p++;
       q++;
-    } while (--an);
-    q += vga_width - (an = long_x);
+    } while (--w);
+    q += vga_width - (w = long_x);
     p += resto_x;
   } while (--long_y);
 }
@@ -122,20 +122,20 @@ void put(int x, int y, int n) {
 }
 
 void put_bw(int x, int y, int n) { // Puts a contrasting graphic (mouse edition )
-  int al, an;
+  int h, w;
   byte *p, *q;
   int salta_x, long_x, resto_x;
   int salta_y, long_y, resto_y;
 
   p = graf[n] + 8;
 
-  al = *((word *)(graf[n] + 2));
-  an = *((word *)graf[n]);
+  h = *((word *)(graf[n] + 2));
+  w = *((word *)graf[n]);
 
   x -= *((word *)(graf[n] + 4));
   y -= *((word *)(graf[n] + 6));
 
-  if (x >= vga_width || y >= vga_height || x + an <= 0 || y + al <= 0)
+  if (x >= vga_width || y >= vga_height || x + w <= 0 || y + h <= 0)
     return;
 
   q = screen_buffer + y * vga_width + x;
@@ -144,46 +144,46 @@ void put_bw(int x, int y, int n) { // Puts a contrasting graphic (mouse edition 
     salta_x = -x;
   else
     salta_x = 0;
-  if (x + an > vga_width)
-    resto_x = x + an - vga_width;
+  if (x + w > vga_width)
+    resto_x = x + w - vga_width;
   else
     resto_x = 0;
-  long_x = an - salta_x - resto_x;
+  long_x = w - salta_x - resto_x;
 
   if (y < 0)
     salta_y = -y;
   else
     salta_y = 0;
-  if (y + al > vga_height)
-    resto_y = y + al - vga_height;
+  if (y + h > vga_height)
+    resto_y = y + h - vga_height;
   else
     resto_y = 0;
-  long_y = al - salta_y - resto_y;
+  long_y = h - salta_y - resto_y;
 
-  p += an * salta_y + salta_x;
+  p += w * salta_y + salta_x;
   q += vga_width * salta_y + salta_x;
   resto_x += salta_x;
-  an = long_x;
+  w = long_x;
 
-  al = (int)c0 * 3;
-  salta_x = dac[al] + dac[al + 1] + dac[al + 2];
-  al = (int)c4 * 3;
-  salta_x += dac[al] + dac[al + 1] + dac[al + 2];
+  h = (int)c0 * 3;
+  salta_x = dac[h] + dac[h + 1] + dac[h + 2];
+  h = (int)c4 * 3;
+  salta_x += dac[h] + dac[h + 1] + dac[h + 2];
   salta_x /= 2;
 
   do {
     do {
       if (*p) {
-        al = (int)(*q) * 3;
-        if (dac[al] + dac[al + 1] + dac[al + 2] > salta_x)
+        h = (int)(*q) * 3;
+        if (dac[h] + dac[h + 1] + dac[h + 2] > salta_x)
           *q = c0;
         else
           *q = c4;
       }
       p++;
       q++;
-    } while (--an);
-    q += vga_width - (an = long_x);
+    } while (--w);
+    q += vga_width - (w = long_x);
     p += resto_x;
   } while (--long_y);
 }
@@ -219,38 +219,38 @@ void memxchg(byte *d, byte *s, int n) {
 ///////////////////////////////////////////////////////////////////////////////
 
 static int zoom_region = 0;
-int zoom_an, zoom_al;
+int zoom_w, zoom_h;
 byte *zoom_p, *zoom_q;
 
-void draw_edit_background(int x, int y, int an, int al) {
+void draw_edit_background(int x, int y, int w, int h) {
   int _x0, _y0, _x1, _y1;
   int _zoom_x, _zoom_y;
   int _zoom_win_x, _zoom_win_y, _zoom_win_width, _zoom_win_height;
   int _big = big;
 
   if (x < 0) {
-    an += x;
+    w += x;
     x = 0;
   }
   if (y < 0) {
-    al += y;
+    h += y;
     y = 0;
   }
-  if (x + an > vga_width)
-    an = vga_width - x;
-  if (y + al > vga_height)
-    al = vga_height - y;
-  if (an <= 0 || al <= 0)
+  if (x + w > vga_width)
+    w = vga_width - x;
+  if (y + h > vga_height)
+    h = vga_height - y;
+  if (w <= 0 || h <= 0)
     return;
 
-  blit_partial(x, y, an, al);
+  blit_partial(x, y, w, h);
 
   // TODO: Improve update_box() for better window background repaint
 
   if (zoom_win_x || zoom_win_y)
-    if (x < zoom_win_x || y < zoom_win_y || x + an > zoom_win_x + zoom_win_width ||
-        y + al > zoom_win_y + zoom_win_height)
-      update_box(x, y, an, al);
+    if (x < zoom_win_x || y < zoom_win_y || x + w > zoom_win_x + zoom_win_width ||
+        y + h > zoom_win_y + zoom_win_height)
+      update_box(x, y, w, h);
 
   if (_big) {
     big = 0;
@@ -258,28 +258,28 @@ void draw_edit_background(int x, int y, int an, int al) {
   }
 
   if (zoom_win_y) {
-    wbox_in_box(screen_buffer + y * vga_width + x, vga_width, an, al, c2, zoom_win_x - 2 - x,
+    wbox_in_box(screen_buffer + y * vga_width + x, vga_width, w, h, c2, zoom_win_x - 2 - x,
                 zoom_win_y - 2 - y, zoom_win_width + 4, 1);
-    wbox_in_box(screen_buffer + y * vga_width + x, vga_width, an, al, c0, zoom_win_x - 1 - x,
+    wbox_in_box(screen_buffer + y * vga_width + x, vga_width, w, h, c0, zoom_win_x - 1 - x,
                 zoom_win_y - 1 - y, zoom_win_width + 2, 1);
   }
   if (zoom_win_y + zoom_win_height < vga_height) {
-    wbox_in_box(screen_buffer + y * vga_width + x, vga_width, an, al, c2, zoom_win_x - 2 - x,
+    wbox_in_box(screen_buffer + y * vga_width + x, vga_width, w, h, c2, zoom_win_x - 2 - x,
                 zoom_win_y + zoom_win_height + 1 - y, zoom_win_width + 4, 1);
-    wbox_in_box(screen_buffer + y * vga_width + x, vga_width, an, al, c0, zoom_win_x - 1 - x,
+    wbox_in_box(screen_buffer + y * vga_width + x, vga_width, w, h, c0, zoom_win_x - 1 - x,
                 zoom_win_y + zoom_win_height - y, zoom_win_width + 2, 1);
   }
 
   if (zoom_win_x) {
-    wbox_in_box(screen_buffer + y * vga_width + x, vga_width, an, al, c2, zoom_win_x - 2 - x,
+    wbox_in_box(screen_buffer + y * vga_width + x, vga_width, w, h, c2, zoom_win_x - 2 - x,
                 zoom_win_y - 1 - y, 1, zoom_win_height + 2);
-    wbox_in_box(screen_buffer + y * vga_width + x, vga_width, an, al, c0, zoom_win_x - 1 - x,
+    wbox_in_box(screen_buffer + y * vga_width + x, vga_width, w, h, c0, zoom_win_x - 1 - x,
                 zoom_win_y - y, 1, zoom_win_height);
   }
   if (zoom_win_x + zoom_win_width < vga_width) {
-    wbox_in_box(screen_buffer + y * vga_width + x, vga_width, an, al, c2,
+    wbox_in_box(screen_buffer + y * vga_width + x, vga_width, w, h, c2,
                 zoom_win_x + zoom_win_width + 1 - x, zoom_win_y - 1 - y, 1, zoom_win_height + 2);
-    wbox_in_box(screen_buffer + y * vga_width + x, vga_width, an, al, c0,
+    wbox_in_box(screen_buffer + y * vga_width + x, vga_width, w, h, c0,
                 zoom_win_x + zoom_win_width - x, zoom_win_y - y, 1, zoom_win_height);
   }
 
@@ -294,8 +294,8 @@ void draw_edit_background(int x, int y, int an, int al) {
 
   _x0 = (x > zoom_win_x) ? x : zoom_win_x;
   _y0 = (y > zoom_win_y) ? y : zoom_win_y;
-  _x1 = (x + an < zoom_win_x + zoom_win_width) ? x + an - 1 : zoom_win_x + zoom_win_width - 1;
-  _y1 = (y + al < zoom_win_y + zoom_win_height) ? y + al - 1 : zoom_win_y + zoom_win_height - 1;
+  _x1 = (x + w < zoom_win_x + zoom_win_width) ? x + w - 1 : zoom_win_x + zoom_win_width - 1;
+  _y1 = (y + h < zoom_win_y + zoom_win_height) ? y + h - 1 : zoom_win_y + zoom_win_height - 1;
 
   if (_x1 < _x0 || _y1 < _y0)
     return;
@@ -310,8 +310,8 @@ void draw_edit_background(int x, int y, int an, int al) {
   zoom_p = map + _y0 * map_width + _x0;
   zoom_q = screen_buffer + (zoom_win_y + ((_y0 - zoom_y) << zoom)) * vga_width + zoom_win_x +
            ((_x0 - zoom_x) << zoom);
-  zoom_an = _x1 - _x0 + 1;
-  zoom_al = _y1 - _y0 + 1;
+  zoom_w = _x1 - _x0 + 1;
+  zoom_h = _y1 - _y0 + 1;
 
   _zoom_x = zoom_x;
   _zoom_y = zoom_y;
@@ -341,7 +341,7 @@ void draw_edit_background(int x, int y, int an, int al) {
 //      Zoom, blit map(map_width*map_height) to framebuffer according to zoom,zoom_x/y
 //-----------------------------------------------------------------------------
 
-int an, al;
+int w, h;
 
 void zoom_map(void) {
   int32_t n, m, c;
@@ -356,22 +356,22 @@ void zoom_map(void) {
       zoom_win_width = map_width << zoom;
       zoom_win_x = (vga_width - zoom_win_width) / 2;
       q += zoom_win_x;
-      an = map_width;
+      w = map_width;
     } else {
       zoom_win_x = 0;
-      an = vga_width >> zoom;
-      zoom_win_width = an << zoom;
+      w = vga_width >> zoom;
+      zoom_win_width = w << zoom;
     }
 
     if ((map_height << zoom) < vga_height) {
       zoom_win_height = map_height << zoom;
       zoom_win_y = (vga_height - zoom_win_height) / 2;
       q += zoom_win_y * vga_width;
-      al = map_height;
+      h = map_height;
     } else {
       zoom_win_y = 0;
-      al = vga_height >> zoom;
-      zoom_win_height = al << zoom;
+      h = vga_height >> zoom;
+      zoom_win_height = h << zoom;
     }
 
     if (!zoom_background) {
@@ -413,24 +413,24 @@ void zoom_map(void) {
   } else {
     p = zoom_p;
     q = zoom_q;
-    an = zoom_an;
-    al = zoom_al;
+    w = zoom_w;
+    h = zoom_h;
   }
 
   switch (zoom) {
   case 0:
-    m = al;
+    m = h;
     do {
-      memcpy(q, p, an);
+      memcpy(q, p, w);
       p += map_width;
       q += vga_width;
     } while (--m);
     break;
 
   case 1:
-    m = al;
+    m = h;
     do {
-      n = an;
+      n = w;
       do {
         c = *p;
         c += c * 256;
@@ -439,15 +439,15 @@ void zoom_map(void) {
         p++;
         q += 2;
       } while (--n);
-      p += map_width - an;
-      q += vga_width * 2 - an * 2;
+      p += map_width - w;
+      q += vga_width * 2 - w * 2;
     } while (--m);
     break;
 
   case 2:
-    m = al;
+    m = h;
     do {
-      n = an;
+      n = w;
       do {
         c = *p;
         c += c * 256;
@@ -462,15 +462,15 @@ void zoom_map(void) {
         q -= vga_width * 3 - 4;
         p++;
       } while (--n);
-      p += map_width - an;
-      q += vga_width * 4 - an * 4;
+      p += map_width - w;
+      q += vga_width * 4 - w * 4;
     } while (--m);
     break;
 
   case 3:
-    m = al;
+    m = h;
     do {
-      n = an;
+      n = w;
       do {
         c = *p;
         c += c * 256;
@@ -509,8 +509,8 @@ void zoom_map(void) {
         q -= vga_width * 7 - 8;
         p++;
       } while (--n);
-      p += map_width - an;
-      q += vga_width * 8 - an * 8;
+      p += map_width - w;
+      q += vga_width * 8 - w * 8;
     } while (--m);
     break;
   }
@@ -559,13 +559,13 @@ void zoom_map(void) {
 //-----------------------------------------------------------------------------
 
 void interpolation_mode(void) {
-  int an, al;
+  int w, h;
 
-  an = sel_mask_x1 - sel_mask_x0 + 1 + 4;
-  al = sel_mask_y1 - sel_mask_y0 + 1 + 4;
+  w = sel_mask_x1 - sel_mask_x0 + 1 + 4;
+  h = sel_mask_y1 - sel_mask_y0 + 1 + 4;
 
-  if ((m0 = (word *)malloc(an * al * 2)) != NULL) {
-    if ((m1 = (word *)malloc(an * al * 2)) != NULL) {
+  if ((m0 = (word *)malloc(w * h * 2)) != NULL) {
+    if ((m1 = (word *)malloc(w * h * 2)) != NULL) {
       make_nearest_gradient();
 
       bar[0] = 101 + zoom;
@@ -576,8 +576,8 @@ void interpolation_mode(void) {
       put_bar(10, 2, 118);
       need_zoom = 1;
 
-      memset(m0, 0, an * al * 2);
-      memset(m1, 0, an * al * 2);
+      memset(m0, 0, w * h * 2);
+      memset(m1, 0, w * h * 2);
 
       do {
         draw_help(1295);
@@ -586,23 +586,23 @@ void interpolation_mode(void) {
         test_mouse();
 
         if (((mouse_b & 1) && selected_icon == 2)) {
-          fill_inter(an, al);
+          fill_inter(w, h);
           need_zoom = 1;
         } else if ((mouse_b & 1) && selected_icon == 1) {
-          fill_inter(an, al);
+          fill_inter(w, h);
           need_zoom = 1;
           do {
             read_mouse();
           } while (mouse_b & 1);
         }
 
-        blit_interpolated(an);
+        blit_interpolated(w);
 
         blit_edit();
       } while (!(mouse_b & 2) && !key(_ESC) && draw_mode < 100 &&
                !(mouse_b && mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18)));
 
-      blit_interpolated(an);
+      blit_interpolated(w);
 
       if (key(_ESC) ||
           (mouse_b && mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18))) {
@@ -630,7 +630,7 @@ void interpolation_mode(void) {
 //      Interpolation
 //-----------------------------------------------------------------------------
 
-void fill_inter(int an, int al) { // Fill a region with averaged values
+void fill_inter(int w, int h) { // Fill a region with averaged values
 
   int x, y;
   word *si, *di, n0, n1, n2, n3;
@@ -638,14 +638,14 @@ void fill_inter(int an, int al) { // Fill a region with averaged values
 
   // 1 - Shift m0 one pixel down-right
 
-  for (y = al - 1; y > 0; y--)
-    for (x = an - 1; x > 0; x--)
-      *(m0 + y * an + x) = *(m0 + (y - 1) * an + x - 1);
-  for (x = 0; x < an; x++) {
+  for (y = h - 1; y > 0; y--)
+    for (x = w - 1; x > 0; x--)
+      *(m0 + y * w + x) = *(m0 + (y - 1) * w + x - 1);
+  for (x = 0; x < w; x++) {
     *(m0 + x) = 0;
   }
-  for (y = 0; y < al; y++) {
-    *(m0 + y * an) = 0;
+  for (y = 0; y < h; y++) {
+    *(m0 + y * w) = 0;
   }
 
   // 2 - Refresh in m0 the border pixels surrounding the region
@@ -655,11 +655,11 @@ void fill_inter(int an, int al) { // Fill a region with averaged values
       for (x = sel_mask_x0 - 1; x <= sel_mask_x1 + 1; x++)
         if (x >= 0 && x < map_width) {
           if (is_near_selection_mask(x, y)) {
-            n = *(original + (y - sel_mask_y0 + 1) * (an_original) + (x - sel_mask_x0 + 1));
+            n = *(original + (y - sel_mask_y0 + 1) * (w_original) + (x - sel_mask_x0 + 1));
             n = (dac[n * 3] + dac[n * 3 + 1] + dac[n * 3 + 2]) * 256 + 256;
-            *(m0 + (y - sel_mask_y0 + 2) * an + (x - sel_mask_x0 + 2)) = n;
+            *(m0 + (y - sel_mask_y0 + 2) * w + (x - sel_mask_x0 + 2)) = n;
           } else if (!is_selection_mask(x, y)) {
-            *(m0 + (y - sel_mask_y0 + 2) * an + (x - sel_mask_x0 + 2)) = 0;
+            *(m0 + (y - sel_mask_y0 + 2) * w + (x - sel_mask_x0 + 2)) = 0;
           }
         }
 
@@ -668,44 +668,44 @@ void fill_inter(int an, int al) { // Fill a region with averaged values
   si = m0;
   di = m1;
 
-  for (y = 0; y < al - 1; y++) {
-    for (x = 0; x < an - 1; x++) {
+  for (y = 0; y < h - 1; y++) {
+    for (x = 0; x < w - 1; x++) {
       if ((n0 = *si)) // Store in *(di) the average of the four *(si+?)
         if ((n1 = *(si + 1)))
-          if ((n2 = *(si + an)))
-            if ((n3 = *(si + an + 1)))
+          if ((n2 = *(si + w)))
+            if ((n3 = *(si + w + 1)))
               *di = (n0 + n1 + n2 + n3) >> 2;
             else
               *di = (n0 + n1 + n2) / 3;
-          else if ((n3 = *(si + an + 1)))
+          else if ((n3 = *(si + w + 1)))
             *di = (n0 + n1 + n3) / 3;
           else
             *di = (n0 + n1) >> 1;
-        else if ((n2 = *(si + an)))
-          if ((n3 = *(si + an + 1)))
+        else if ((n2 = *(si + w)))
+          if ((n3 = *(si + w + 1)))
             *di = (n0 + n2 + n3) / 3;
           else
             *di = (n0 + n2) >> 1;
-        else if ((n3 = *(si + an + 1)))
+        else if ((n3 = *(si + w + 1)))
           *di = (n0 + n3) >> 1;
         else
           *di = n0;
       else if ((n1 = *(si + 1)))
-        if ((n2 = *(si + an)))
-          if ((n3 = *(si + an + 1)))
+        if ((n2 = *(si + w)))
+          if ((n3 = *(si + w + 1)))
             *di = (n1 + n2 + n3) / 3;
           else
             *di = (n1 + n2) >> 1;
-        else if ((n3 = *(si + an + 1)))
+        else if ((n3 = *(si + w + 1)))
           *di = (n1 + n3) >> 1;
         else
           *di = n1;
-      else if ((n2 = *(si + an)))
-        if ((n3 = *(si + an + 1)))
+      else if ((n2 = *(si + w)))
+        if ((n3 = *(si + w + 1)))
           *di = (n2 + n3) >> 1;
         else
           *di = n2;
-      else if ((n3 = *(si + an + 1)))
+      else if ((n3 = *(si + w + 1)))
         *di = n3;
       else
         *di = 0;
@@ -721,44 +721,44 @@ void fill_inter(int an, int al) { // Fill a region with averaged values
   si = m1;
   di = m0;
 
-  for (y = 0; y < al - 1; y++) {
-    for (x = 0; x < an - 1; x++) {
+  for (y = 0; y < h - 1; y++) {
+    for (x = 0; x < w - 1; x++) {
       if ((n0 = *si)) // Store in *(di) the average of the four *(si+?)
         if ((n1 = *(si + 1)))
-          if ((n2 = *(si + an)))
-            if ((n3 = *(si + an + 1)))
+          if ((n2 = *(si + w)))
+            if ((n3 = *(si + w + 1)))
               *di = (n0 + n1 + n2 + n3) >> 2;
             else
               *di = (n0 + n1 + n2) / 3;
-          else if ((n3 = *(si + an + 1)))
+          else if ((n3 = *(si + w + 1)))
             *di = (n0 + n1 + n3) / 3;
           else
             *di = (n0 + n1) >> 1;
-        else if ((n2 = *(si + an)))
-          if ((n3 = *(si + an + 1)))
+        else if ((n2 = *(si + w)))
+          if ((n3 = *(si + w + 1)))
             *di = (n0 + n2 + n3) / 3;
           else
             *di = (n0 + n2) >> 1;
-        else if ((n3 = *(si + an + 1)))
+        else if ((n3 = *(si + w + 1)))
           *di = (n0 + n3) >> 1;
         else
           *di = n0;
       else if ((n1 = *(si + 1)))
-        if ((n2 = *(si + an)))
-          if ((n3 = *(si + an + 1)))
+        if ((n2 = *(si + w)))
+          if ((n3 = *(si + w + 1)))
             *di = (n1 + n2 + n3) / 3;
           else
             *di = (n1 + n2) >> 1;
-        else if ((n3 = *(si + an + 1)))
+        else if ((n3 = *(si + w + 1)))
           *di = (n1 + n3) >> 1;
         else
           *di = n1;
-      else if ((n2 = *(si + an)))
-        if ((n3 = *(si + an + 1)))
+      else if ((n2 = *(si + w)))
+        if ((n3 = *(si + w + 1)))
           *di = (n2 + n3) >> 1;
         else
           *di = n2;
-      else if ((n3 = *(si + an + 1)))
+      else if ((n3 = *(si + w + 1)))
         *di = n3;
       else
         *di = 0;
@@ -839,12 +839,12 @@ void fill(word x, word y) {
         d = sel_mask_y1;
       c = c - a + 1;
       d = d - b + 1;
-      an_original = c;
+      w_original = c;
       if ((original = (byte *)save_undo(a, b, c, d)) != NULL) {
         if (!sel_mask_x0)
           original--;
         if (!sel_mask_y0)
-          original -= an_original;
+          original -= w_original;
         interpolation_mode();
       }
     } else {
@@ -994,14 +994,14 @@ void fill_draw(void) {
 //      Blit the interpolated region
 //-----------------------------------------------------------------------------
 
-void blit_interpolated(int an) { // Blit the interpolated region to screen
+void blit_interpolated(int w) { // Blit the interpolated region to screen
 
   int x, y, n;
 
   for (y = sel_mask_y0; y <= sel_mask_y1; y++)
     for (x = sel_mask_x0; x <= sel_mask_x1; x++)
       if (is_selection_mask(x, y)) {
-        n = *(m0 + (y - sel_mask_y0 + 1) * an + (x - sel_mask_x0 + 1));
+        n = *(m0 + (y - sel_mask_y0 + 1) * w + (x - sel_mask_x0 + 1));
         if (n > 256)
           n -= 256;
         else
@@ -1442,25 +1442,25 @@ int is_near_selection_mask(int x, int y) {
 //      UNDO - Save the region affected by an action, before performing it
 //-----------------------------------------------------------------------------
 
-byte *save_undo(int x, int y, int an, int al) {
+byte *save_undo(int x, int y, int w, int h) {
   int a, start, end; // Start and end of the saved block (in undo[])
   byte *ret = 0;
 
   if (x < 0) {
-    an += x;
+    w += x;
     x = 0;
   }
   if (y < 0) {
-    al += y;
+    h += y;
     y = 0;
   }
-  if (x + an > map_width) {
-    an = map_width - x;
+  if (x + w > map_width) {
+    w = map_width - x;
   }
-  if (y + al > map_height) {
-    al = map_height - y;
+  if (y + h > map_height) {
+    h = map_height - y;
   }
-  if (an <= 0 || al <= 0)
+  if (w <= 0 || h <= 0)
     return ((byte *)-1);
 
   // Determine the zoom region to refresh
@@ -1473,8 +1473,8 @@ byte *save_undo(int x, int y, int an, int al) {
     need_zoom_y = zoom_win_y + ((y - zoom_y) << zoom);
   else
     need_zoom_y = zoom_win_y + ((y - zoom_y) << zoom);
-  need_zoom_width = an << zoom;
-  need_zoom_height = al << zoom;
+  need_zoom_width = w << zoom;
+  need_zoom_height = h << zoom;
 
   if (need_zoom_x + need_zoom_width <= zoom_win_x || need_zoom_y + need_zoom_height <= zoom_win_y ||
       need_zoom_x >= zoom_win_x + zoom_win_width || need_zoom_y >= zoom_win_y + zoom_win_height) {
@@ -1506,19 +1506,19 @@ byte *save_undo(int x, int y, int an, int al) {
   if (undo_table[a].mode != -1)
     start = undo_table[a].end;
 
-  if (start + an * al > undo_memory)
+  if (start + w * h > undo_memory)
     start = 0;
 
   // If an action exceeds undo_memory, don't save it.
 
-  if ((end = start + an * al) <= undo_memory) {
+  if ((end = start + w * h) <= undo_memory) {
     undo_table[undo_index].start = start;
     undo_table[undo_index].end = end;
 
     undo_table[undo_index].x = x;
     undo_table[undo_index].y = y;
-    undo_table[undo_index].an = an;
-    undo_table[undo_index].al = al;
+    undo_table[undo_index].w = w;
+    undo_table[undo_index].h = h;
 
     undo_table[undo_index].mode = draw_mode;
 
@@ -1532,7 +1532,7 @@ byte *save_undo(int x, int y, int an, int al) {
 
     // Save the region that will be affected by the action.
 
-    copy_block(undo + start, map + x + y * map_width, an, al);
+    copy_block(undo + start, map + x + y * map_width, w, h);
 
     undo_table[undo_index].code = current_map_code;
 
@@ -1559,7 +1559,7 @@ byte *save_undo(int x, int y, int an, int al) {
 //-----------------------------------------------------------------------------
 
 int undo_back(void) {
-  int x, y, an, al;
+  int x, y, w, h;
   int a;
 
   if (undo_index)
@@ -1573,10 +1573,10 @@ int undo_back(void) {
 
     x = undo_table[a].x;
     y = undo_table[a].y;
-    an = undo_table[a].an;
-    al = undo_table[a].al;
+    w = undo_table[a].w;
+    h = undo_table[a].h;
 
-    xchg_block(undo + undo_table[a].start, map + x + y * map_width, an, al);
+    xchg_block(undo + undo_table[a].start, map + x + y * map_width, w, h);
 
     // Determine the zoom region to refresh
 
@@ -1588,8 +1588,8 @@ int undo_back(void) {
       need_zoom_y = zoom_win_y + ((y - zoom_y) << zoom);
     else
       need_zoom_y = zoom_win_y + ((y - zoom_y) << zoom);
-    need_zoom_width = an << zoom;
-    need_zoom_height = al << zoom;
+    need_zoom_width = w << zoom;
+    need_zoom_height = h << zoom;
 
     if (need_zoom_x + need_zoom_width <= zoom_win_x ||
         need_zoom_y + need_zoom_height <= zoom_win_y ||
@@ -1622,17 +1622,17 @@ int undo_back(void) {
 //-----------------------------------------------------------------------------
 
 void undo_next(void) {
-  int x, y, an, al;
+  int x, y, w, h;
 
   if (undo_table[undo_index].mode != -1 && undo_table[undo_index].code == current_map_code) {
     retrace_wait();
 
     x = undo_table[undo_index].x;
     y = undo_table[undo_index].y;
-    an = undo_table[undo_index].an;
-    al = undo_table[undo_index].al;
+    w = undo_table[undo_index].w;
+    h = undo_table[undo_index].h;
 
-    xchg_block(undo + undo_table[undo_index].start, map + x + y * map_width, an, al);
+    xchg_block(undo + undo_table[undo_index].start, map + x + y * map_width, w, h);
 
     // Determine the zoom region to refresh
 
@@ -1644,8 +1644,8 @@ void undo_next(void) {
       need_zoom_y = zoom_win_y + ((y - zoom_y) << zoom);
     else
       need_zoom_y = zoom_win_y + ((y - zoom_y) << zoom);
-    need_zoom_width = an << zoom;
-    need_zoom_height = al << zoom;
+    need_zoom_width = w << zoom;
+    need_zoom_height = h << zoom;
 
     if (need_zoom_x + need_zoom_width <= zoom_win_x ||
         need_zoom_y + need_zoom_height <= zoom_win_y ||
@@ -1677,22 +1677,22 @@ void undo_next(void) {
 //      Copy a block from the map to memory
 //-----------------------------------------------------------------------------
 
-void copy_block(byte *d, byte *s, int an, int al) {
+void copy_block(byte *d, byte *s, int w, int h) {
   do {
-    memcpy(d, s, an);
-    d += an;
+    memcpy(d, s, w);
+    d += w;
     s += map_width;
-  } while (--al);
+  } while (--h);
 }
 
 //-----------------------------------------------------------------------------
 //      Swap a block between the map and memory
 //-----------------------------------------------------------------------------
 
-void xchg_block(byte *d, byte *s, int an, int al) {
+void xchg_block(byte *d, byte *s, int w, int h) {
   do {
-    memxchg(d, s, an);
-    d += an;
+    memxchg(d, s, w);
+    d += w;
     s += map_width;
-  } while (--al);
+  } while (--h);
 }

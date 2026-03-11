@@ -83,13 +83,13 @@ void fpg_create(FPG *Fpg, char *Name) {
   if (Fpg->thumb_on) {
     Fpg->lInfoFPG.columns = 3;
     Fpg->lInfoFPG.lines = 2;
-    Fpg->lInfoFPG.an = 47;
-    Fpg->lInfoFPG.al = 26;
+    Fpg->lInfoFPG.w = 47;
+    Fpg->lInfoFPG.h = 26;
   } else {
     Fpg->lInfoFPG.columns = 1;
     Fpg->lInfoFPG.lines = 6;
-    Fpg->lInfoFPG.an = 143;
-    Fpg->lInfoFPG.al = 8;
+    Fpg->lInfoFPG.w = 143;
+    Fpg->lInfoFPG.h = 8;
   }
 
   Fpg->lInfoFPG.x = 3;
@@ -146,13 +146,13 @@ int fpg_open(FPG *Fpg, char *Name) {
   if (Fpg->thumb_on) {
     Fpg->lInfoFPG.columns = 3;
     Fpg->lInfoFPG.lines = 2;
-    Fpg->lInfoFPG.an = 47;
-    Fpg->lInfoFPG.al = 26;
+    Fpg->lInfoFPG.w = 47;
+    Fpg->lInfoFPG.h = 26;
   } else {
     Fpg->lInfoFPG.columns = 1;
     Fpg->lInfoFPG.lines = 6;
-    Fpg->lInfoFPG.an = 143;
-    Fpg->lInfoFPG.al = 8;
+    Fpg->lInfoFPG.w = 143;
+    Fpg->lInfoFPG.h = 8;
   }
 
   Fpg->lInfoFPG.x = 3;
@@ -401,7 +401,7 @@ int fpg_remap_to_pal(FPG *Fpg) {
 #define BUFFERCOPYLEN 4096
 void close_fpg(char *fpg_path);
 void fpg_save(int n) {
-  int an = window[n].an / big2, al = window[n].al / big2;
+  int w = window[n].w / big2, h = window[n].h / big2;
   FPG *Fpg = (FPG *)window[n].aux;
   FILE *FileOrg, *FileDest;
   int Lengt;
@@ -449,13 +449,13 @@ void fpg_save(int n) {
   div_strcpy((char *)Fpg->ActualFile, sizeof(Fpg->ActualFile), full);
   div_strcpy((char *)Fpg->NombreFpg, sizeof(Fpg->NombreFpg), input);
 
-  wgra(window[n].ptr, an, al, c_b_low, 2, 2, an - 20, 7);
-  if (text_len(window[n].title) + 3 > an - 20) {
-    wwrite_in_box(window[n].ptr, an, an - 19, al, 4, 2, 0, window[n].title, c1);
-    wwrite_in_box(window[n].ptr, an, an - 19, al, 3, 2, 0, window[n].title, c4);
+  wgra(window[n].ptr, w, h, c_b_low, 2, 2, w - 20, 7);
+  if (text_len(window[n].title) + 3 > w - 20) {
+    wwrite_in_box(window[n].ptr, w, w - 19, h, 4, 2, 0, window[n].title, c1);
+    wwrite_in_box(window[n].ptr, w, w - 19, h, 3, 2, 0, window[n].title, c4);
   } else {
-    wwrite(window[n].ptr, an, al, 3 + (an - 20) / 2, 2, 1, window[n].title, c1);
-    wwrite(window[n].ptr, an, al, 2 + (an - 20) / 2, 2, 1, window[n].title, c4);
+    wwrite(window[n].ptr, w, h, 3 + (w - 20) / 2, 2, 1, window[n].title, c1);
+    wwrite(window[n].ptr, w, h, 2 + (w - 20) / 2, 2, 1, window[n].title, c4);
   }
   flush_window(n);
 

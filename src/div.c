@@ -50,16 +50,16 @@ void minimize_window(void);
 void move_window(void);
 int determine_prg2(void);
 int determine_calc(void);
-void update_dialogs(int x, int y, int an, int al);
-int collides_with(int a, int x, int y, int an, int al);
-void extrude(int x, int y, int an, int al, int x2, int y2, int an2, int al2);
+void update_dialogs(int x, int y, int w, int h);
+int collides_with(int a, int x, int y, int w, int h);
+void extrude(int x, int y, int w, int h, int x2, int y2, int w2, int h2);
 void deactivate(void);
-void implode(int x, int y, int an, int al);
+void implode(int x, int y, int w, int h);
 void move_window_complete(void);
-void restore_wallpaper(int x, int y, int an, int al);
-void find_best_position(int *_x, int *_y, int an, int al);
-int calculate_collision(int x, int y, int an, int al);
-int calculate_overlap(int a, int x, int y, int an, int al);
+void restore_wallpaper(int x, int y, int w, int h);
+void find_best_position(int *_x, int *_y, int w, int h);
+int calculate_collision(int x, int y, int w, int h);
+int calculate_overlap(int a, int x, int y, int w, int h);
 void check_oldpif(void);
 void default_gradients(void);
 void determine_units(void);
@@ -106,7 +106,7 @@ int show_items_called = 0;
 int test_video = 0;
 int restore_button = 0;
 
-extern int numero_error;
+extern int error_number;
 extern byte *div_index;
 extern byte *index_end;
 
@@ -147,27 +147,27 @@ char exe_name[128];
 int exe_cola[2];
 
 void demo1(void) {
-  int an = v.an / big2, al = v.al / big2;
+  int w = v.w / big2, h = v.h / big2;
   char cwork[128];
 
   _show_items();
-  wwrite(v.ptr, an, al, an / 2, 12, 1, texts[393], c3);
-  wwrite(v.ptr, an, al, an / 2, 12 + 8, 1, texts[394], c3);
-  wwrite(v.ptr, an, al, an / 2, 12 + 16, 1, texts[395], c3);
+  wwrite(v.ptr, w, h, w / 2, 12, 1, texts[393], c3);
+  wwrite(v.ptr, w, h, w / 2, 12 + 8, 1, texts[394], c3);
+  wwrite(v.ptr, w, h, w / 2, 12 + 16, 1, texts[395], c3);
 
   div_snprintf(cwork, sizeof(cwork), "[ %s %d/31 ]", texts[396], exe_cola[1] - 0xF31725AB);
 
-  wrectangle(v.ptr, an, al, c1, 3, 12 + 27, an - 6, 16);
-  wbox(v.ptr, an, al, average_color(c_b_low, c0), 4, 12 + 28, an - 8, 14);
+  wrectangle(v.ptr, w, h, c1, 3, 12 + 27, w - 6, 16);
+  wbox(v.ptr, w, h, average_color(c_b_low, c0), 4, 12 + 28, w - 8, 14);
 
   if (exe_cola[1] - 0xF31725AB > 31) {
-    wbox(v.ptr, an, al, c_r_low, 4, 12 + 28, an - 8, 14);
+    wbox(v.ptr, w, h, c_r_low, 4, 12 + 28, w - 8, 14);
   } else {
-    wbox(v.ptr, an, al, c_b_low, 4, 12 + 28, ((exe_cola[1] - 0xF31725AB) * (an - 8)) / 31, 14);
+    wbox(v.ptr, w, h, c_b_low, 4, 12 + 28, ((exe_cola[1] - 0xF31725AB) * (w - 8)) / 31, 14);
   }
 
-  wwrite(v.ptr, an, al, an / 2 + 1, 12 + 32, 1, cwork, c0);
-  wwrite(v.ptr, an, al, an / 2, 12 + 32, 1, cwork, c4);
+  wwrite(v.ptr, w, h, w / 2 + 1, 12 + 32, 1, cwork, c0);
+  wwrite(v.ptr, w, h, w / 2, 12 + 32, 1, cwork, c4);
 }
 
 void demo2(void) {
@@ -188,8 +188,8 @@ void demo3(void) {
 void demo0(void) {
   beta_status = v.type = 1;
   v.title = texts[392];
-  v.an = 160;
-  v.al = 76;
+  v.w = 160;
+  v.h = 76;
   v_accept = 0;
 
   v.paint_handler = demo1;
@@ -197,10 +197,10 @@ void demo0(void) {
   v.close_handler = demo3;
 
   if (exe_cola[1] - 0xF31725AB > 31) {
-    _button(100, v.an / 2, v.al - 14, 1);
+    _button(100, v.w / 2, v.h - 14, 1);
   } else {
-    _button(100, v.an - 8, v.al - 14, 2);
-    _button(125, 7, v.al - 14, 0);
+    _button(100, v.w - 8, v.h - 14, 2);
+    _button(125, 7, v.h - 14, 0);
   }
 }
 
@@ -270,15 +270,15 @@ void coder(byte *ptr, int len, char *clave);
 void betatest0(void) {
   beta_status = v.type = 1;
   v.title = texts[399];
-  v.an = 160;
-  v.al = 38 + 16;
+  v.w = 160;
+  v.h = 38 + 16;
 
   div_strcpy(betaname, sizeof(betaname), "");
-  _get(460, 4, 12, v.an - 8, (uint8_t *)betaname, 127, 0, 0);
+  _get(460, 4, 12, v.w - 8, (uint8_t *)betaname, 127, 0, 0);
 
   v.paint_handler = betatest1;
   v.click_handler = betatest2;
-  _button(100, v.an / 2, v.al - 14, 1);
+  _button(100, v.w / 2, v.h - 14, 1);
 }
 
 // 1 - beta.nfo
@@ -366,7 +366,7 @@ void print_init_flags(int flags) {
 
 void get_error(int n);
 extern uint8_t cerror[128];
-void mensaje_compilacion(byte *p);
+void show_compile_message(byte *p);
 extern int compilado;
 
 int main(int argc, char *argv[]) {
@@ -487,11 +487,11 @@ int main(int argc, char *argv[]) {
   initialize_texts((uint8_t *)"system/lenguaje.div");
 
   if (compilemode == 1) {
-    inicializa_compilador();
+    init_compiler();
 
     compilado = 1;
     mouse_graf = 3;
-    numero_error = -1;
+    error_number = -1;
 
     if (argc < 3) {
       fprintf(stdout, "DIV Games Studio Compiler V2.02 - http://www.div-arena.co.uk\n");
@@ -510,11 +510,11 @@ int main(int argc, char *argv[]) {
         fprintf(stdout, "Loaded %zu bytes\n", fread(prgbuf, 1, source_len, f));
         source_ptr = prgbuf;
         comp();
-        if (numero_error >= 0) {
-          get_error(500 + numero_error);
-          mensaje_compilacion(cerror);
+        if (error_number >= 0) {
+          get_error(500 + error_number);
+          show_compile_message(cerror);
         } else {
-          mensaje_compilacion(texts[202]);
+          show_compile_message(texts[202]);
         }
         free(prgbuf);
         prgbuf = NULL;
@@ -785,9 +785,9 @@ void init_environment() {
 // 6 - graf_p.div / graf_g.div not found
 
 void interr1(void) {
-  int an = v.an / big2, al = v.al / big2;
+  int w = v.w / big2, h = v.h / big2;
   _show_items();
-  wwrite(v.ptr, an, al, an / 2, 12, 1, (uint8_t *)v_text, c3);
+  wwrite(v.ptr, w, h, w / 2, 12, 1, (uint8_t *)v_text, c3);
 }
 
 void interr2(void) {
@@ -799,7 +799,7 @@ void interr2(void) {
 void interr0(void) {
   v.type = 1;
   v.title = texts[367];
-  v.al = 38;
+  v.h = 38;
   switch (error_code) {
   case 1:
     v_text = (char *)texts[368];
@@ -820,12 +820,12 @@ void interr0(void) {
     v_text = (char *)texts[373];
     break;
   }
-  v.an = text_len((byte *)v_text) + 8;
-  if (v.an < 120)
-    v.an = 120;
+  v.w = text_len((byte *)v_text) + 8;
+  if (v.w < 120)
+    v.w = 120;
   v.paint_handler = interr1;
   v.click_handler = interr2;
-  _button(100, v.an / 2, v.al - 14, 1);
+  _button(100, v.w / 2, v.h - 14, 1);
 }
 
 //-----------------------------------------------------------------------------
@@ -834,11 +834,11 @@ void interr0(void) {
 
 void intmsg1(void) {
   char cWork[256];
-  int an = v.an / big2, al = v.al / big2;
+  int w = v.w / big2, h = v.h / big2;
   _show_items();
-  wwrite(v.ptr, an, al, an / 2, 12, 1, (byte *)v_text, c3);
+  wwrite(v.ptr, w, h, w / 2, 12, 1, (byte *)v_text, c3);
   div_snprintf(cWork, sizeof(cWork), (char *)texts[374], v_mode);
-  wwrite(v.ptr, an, al, an / 2, 12 + 8, 1, (byte *)cWork, c3);
+  wwrite(v.ptr, w, h, w / 2, 12 + 8, 1, (byte *)cWork, c3);
 }
 
 void intmsg2(void) {
@@ -850,13 +850,13 @@ void intmsg2(void) {
 void intmsg0(void) {
   v.type = 1;
   v.title = texts[375];
-  v.an = text_len((byte *)v_text) + 8;
-  if (v.an < 120)
-    v.an = 120;
-  v.al = 38 + 8;
+  v.w = text_len((byte *)v_text) + 8;
+  if (v.w < 120)
+    v.w = 120;
+  v.h = 38 + 8;
   v.paint_handler = intmsg1;
   v.click_handler = intmsg2;
-  _button(100, v.an / 2, v.al - 14, 1);
+  _button(100, v.w / 2, v.h - 14, 1);
 }
 
 //-----------------------------------------------------------------------------
@@ -873,8 +873,8 @@ int IntIncr  = 65536;
 
 byte rndb(void);
 
-int old_reloj, loop_count = 0;
-extern int reloj; // clock
+int old_clock, loop_count = 0;
+extern int frame_clock; // clock
 
 ///////////////////////////////////////////////////////////////////////////////
 //      Environment
@@ -898,8 +898,8 @@ void mainloop(void) {
   n = 0;
 
   while (n < max_windows &&
-         !(window[n].type > 0 && mouse_in(window[n].x, window[n].y, window[n].x + window[n].an - 1,
-                                          window[n].y + window[n].al - 1)))
+         !(window[n].type > 0 && mouse_in(window[n].x, window[n].y, window[n].x + window[n].w - 1,
+                                          window[n].y + window[n].h - 1)))
     n++;
 
   if (n < max_windows && dragging == 4 && window[n].order == drag_source)
@@ -954,7 +954,7 @@ void mainloop(void) {
           v.mapa->fpg_code = 0;
 
         call((voidReturnType)v.paint_handler);
-        wvolcado(screen_buffer, vga_width, vga_height, v.ptr, v.x, v.y, v.an, v.al, 0);
+        blit_region(screen_buffer, vga_width, vga_height, v.ptr, v.x, v.y, v.w, v.h, 0);
 
       } else
         MustCreate = 1;
@@ -970,8 +970,8 @@ void mainloop(void) {
   if (dragging != 4) {
     if (n == 0)
       if (v.foreground == 1)
-        if (!mouse_in(v.x + 2 * big2, v.y + 10 * big2, v.x + v.an - 2 * big2,
-                      v.y + v.al - 2 * big2))
+        if (!mouse_in(v.x + 2 * big2, v.y + 10 * big2, v.x + v.w - 2 * big2,
+                      v.y + v.h - 2 * big2))
           n--;
 
     if (n != oldn && oldn == 0) {
@@ -1008,10 +1008,10 @@ void mainloop(void) {
       break;
     case 1:
       if (mouse_in(window[n].x + 2 * big2, window[n].y + 2 * big2,
-                   window[n].x + window[n].an - 2 * big2, window[n].y + 9 * big2))
-        if (mouse_x <= window[n].x + window[n].an - 18 * big2)
+                   window[n].x + window[n].w - 2 * big2, window[n].y + 9 * big2))
+        if (mouse_x <= window[n].x + window[n].w - 18 * big2)
           mouse_graf = 2;
-        else if (mouse_x <= window[n].x + window[n].an - 10 * big2)
+        else if (mouse_x <= window[n].x + window[n].w - 10 * big2)
           mouse_graf = 4;
         else
           mouse_graf = 5;
@@ -1117,7 +1117,7 @@ void mainloop(void) {
   //-------------------------------------------------------------------------
 
   if (n == 0 && v.foreground == 1) {
-    if (mouse_in(v.x + 2 * big2, v.y + 10 * big2, v.x + v.an - 2 * big2, v.y + v.al - 2 * big2)) {
+    if (mouse_in(v.x + 2 * big2, v.y + 10 * big2, v.x + v.w - 2 * big2, v.y + v.h - 2 * big2)) {
       llamar = 1; // Call its click_handler
 
       if (v.type == 100 && dragging != 4) {
@@ -1188,9 +1188,9 @@ void mainloop(void) {
       if (mouse_graf == 5) {
         if (mouse_b & 1) {
           if (big)
-            wput(v.ptr, v.an / 2, v.al / 2, v.an / 2 - 9, 2, -45);
+            wput(v.ptr, v.w / 2, v.h / 2, v.w / 2 - 9, 2, -45);
           else
-            wput(v.ptr, v.an, v.al, v.an - 9, 2, -45);
+            wput(v.ptr, v.w, v.h, v.w - 9, 2, -45);
 
           flush_window(0);
         }
@@ -1198,17 +1198,17 @@ void mainloop(void) {
         if (!(mouse_b & 1) && (prev_mouse_buttons & 1)) {
           if (v.click_handler == menu_principal2) {
             if (big)
-              wput(v.ptr, v.an / 2, v.al / 2, v.an / 2 - 9, 2, -45);
+              wput(v.ptr, v.w / 2, v.h / 2, v.w / 2 - 9, 2, -45);
             else
-              wput(v.ptr, v.an, v.al, v.an - 9, 2, -45);
+              wput(v.ptr, v.w, v.h, v.w - 9, 2, -45);
 
             flush_window(0);
             flush_copy();
 
             if (big)
-              wput(v.ptr, v.an / 2, v.al / 2, v.an / 2 - 9, 2, -35);
+              wput(v.ptr, v.w / 2, v.h / 2, v.w / 2 - 9, 2, -35);
             else
-              wput(v.ptr, v.an, v.al, v.an - 9, 2, -35);
+              wput(v.ptr, v.w, v.h, v.w - 9, 2, -35);
 
             do {
               read_mouse();
@@ -1222,17 +1222,17 @@ void mainloop(void) {
               exit_requested = 1;
           } else if (v.type >= 100) {
             if (big)
-              wput(v.ptr, v.an / 2, v.al / 2, v.an / 2 - 9, 2, -45);
+              wput(v.ptr, v.w / 2, v.h / 2, v.w / 2 - 9, 2, -45);
             else
-              wput(v.ptr, v.an, v.al, v.an - 9, 2, -45);
+              wput(v.ptr, v.w, v.h, v.w - 9, 2, -45);
 
             flush_window(0);
             flush_copy();
 
             if (big)
-              wput(v.ptr, v.an / 2, v.al / 2, v.an / 2 - 9, 2, -35);
+              wput(v.ptr, v.w / 2, v.h / 2, v.w / 2 - 9, 2, -35);
             else
-              wput(v.ptr, v.an, v.al, v.an - 9, 2, -35);
+              wput(v.ptr, v.w, v.h, v.w - 9, 2, -35);
 
             do {
               read_mouse();
@@ -1269,7 +1269,7 @@ void mainloop(void) {
 
       if (mouse_graf == 4) {
         if (mouse_b & 1) {
-          wput(v.ptr, v.an / big2, v.al / big2, v.an / big2 - 17, 2, -47);
+          wput(v.ptr, v.w / big2, v.h / big2, v.w / big2 - 17, 2, -47);
           flush_window(0);
         }
 
@@ -1317,7 +1317,7 @@ fin_bucle_entorno:
 
   for (m = 0; m < max_windows; m++) {
     if (m == 0 &&
-        mouse_in(v.x + 2 * big2, v.y + 10 * big2, v.x + v.an - 2 * big2, v.y + v.al - 2 * big2) &&
+        mouse_in(v.x + 2 * big2, v.y + 10 * big2, v.x + v.w - 2 * big2, v.y + v.h - 2 * big2) &&
         window[m].type != 107)
       continue;
 
@@ -1496,10 +1496,10 @@ fin_bucle_entorno:
         run_mode = 0;
         compile_program();
 
-        if (numero_error != -1) {
+        if (error_number != -1) {
           goto_error();
           if (v_help)
-            help(500 + numero_error);
+            help(500 + error_number);
         } else if (v_help)
           help(599);
         break;
@@ -1522,11 +1522,11 @@ fin_bucle_entorno:
 
         compile_program();
 
-        if (numero_error != -1) {
+        if (error_number != -1) {
           goto_error();
 
           if (v_help)
-            help(500 + numero_error);
+            help(500 + error_number);
 
           break;
         }
@@ -1622,8 +1622,8 @@ fin_bucle_entorno:
     determine_prg2();
 
     if (v_window != -1) {
-      if (numero_error != -1 && window[v_window].prg == eprg) {
-        help(500 + numero_error);
+      if (error_number != -1 && window[v_window].prg == eprg) {
+        help(500 + error_number);
       } else {
         n = window[v_window].prg->column - 1;
         p = window[v_window].prg->l;
@@ -1695,7 +1695,7 @@ fin_bucle_entorno:
   flush_copy();
 
   if (restore_button == 1) {
-    wput(v.ptr, v.an / big2, v.al / big2, v.an / big2 - 17, 2, -37);
+    wput(v.ptr, v.w / big2, v.h / big2, v.w / big2 - 17, 2, -37);
     flush_window(0);
   } else if (restore_button == 2) {
     if (big) {
@@ -1707,9 +1707,9 @@ fin_bucle_entorno:
     }
   } else if (restore_button == 3) {
     if (big)
-      wput(v.ptr, v.an / 2, v.al / 2, v.an / 2 - 9, 2, -35);
+      wput(v.ptr, v.w / 2, v.h / 2, v.w / 2 - 9, 2, -35);
     else
-      wput(v.ptr, v.an, v.al, v.an - 9, 2, -35);
+      wput(v.ptr, v.w, v.h, v.w - 9, 2, -35);
 
     flush_window(0);
   }
@@ -1766,7 +1766,7 @@ void dialog_loop(void) {
   // Find the window the mouse is over (n); n=max_windows if none
   //-------------------------------------------------------------------------
 
-  if (mouse_in(v.x, v.y, v.x + v.an - 1, v.y + v.al - 1))
+  if (mouse_in(v.x, v.y, v.x + v.w - 1, v.y + v.h - 1))
     n = 0;
   else
     n = max_windows;
@@ -1777,7 +1777,7 @@ void dialog_loop(void) {
   //-------------------------------------------------------------------------
 
   if (n == 0) // If we're now on the toolbar, also repaint the window
-    if (!mouse_in(v.x + 2 * big2, v.y + 10 * big2, v.x + v.an - 2 * big2, v.y + v.al - 2 * big2))
+    if (!mouse_in(v.x + 2 * big2, v.y + 10 * big2, v.x + v.w - 2 * big2, v.y + v.h - 2 * big2))
       n--;
 
   if (n != oldn && oldn == 0)
@@ -1813,8 +1813,8 @@ void dialog_loop(void) {
 
   if (n == max_windows)
     mouse_graf = 1;
-  else if (mouse_in(v.x + 2 * big2, v.y + 2 * big2, v.x + v.an - 2 * big2, v.y + 9 * big2))
-    if (mouse_x <= v.x + v.an - 10 * big2)
+  else if (mouse_in(v.x + 2 * big2, v.y + 2 * big2, v.x + v.w - 2 * big2, v.y + 9 * big2))
+    if (mouse_x <= v.x + v.w - 10 * big2)
       mouse_graf = 2;
     else
       mouse_graf = 5;
@@ -1826,7 +1826,7 @@ void dialog_loop(void) {
   //-------------------------------------------------------------------------
 
   if (n == 0)
-    if (mouse_in(v.x + 2 * big2, v.y + 10 * big2, v.x + v.an - 2 * big2, v.y + v.al - 2 * big2)) {
+    if (mouse_in(v.x + 2 * big2, v.y + 10 * big2, v.x + v.w - 2 * big2, v.y + v.h - 2 * big2)) {
       dialogo_invocado = 1;
       wmouse_x = mouse_x - v.x;
       wmouse_y = mouse_y - v.y;
@@ -1856,9 +1856,9 @@ void dialog_loop(void) {
       if (mouse_graf == 5) {
         if (mouse_b & 1) {
           if (big)
-            wput(v.ptr, v.an / 2, v.al / 2, v.an / 2 - 9, 2, -45);
+            wput(v.ptr, v.w / 2, v.h / 2, v.w / 2 - 9, 2, -45);
           else
-            wput(v.ptr, v.an, v.al, v.an - 9, 2, -45);
+            wput(v.ptr, v.w, v.h, v.w - 9, 2, -45);
 
           volcados_parciales = 1;
           flush_window(0);
@@ -1930,9 +1930,9 @@ void dialog_loop(void) {
 
   if (restore_button == 3) {
     if (big)
-      wput(v.ptr, v.an / 2, v.al / 2, v.an / 2 - 9, 2, -35);
+      wput(v.ptr, v.w / 2, v.h / 2, v.w / 2 - 9, 2, -35);
     else
-      wput(v.ptr, v.an, v.al, v.an - 9, 2, -35);
+      wput(v.ptr, v.w, v.h, v.w - 9, 2, -35);
     flush_window(0);
   }
 
@@ -1964,17 +1964,17 @@ void modal_loop(void) {
 //      (... to its current position v.x/y/an/al)
 //-----------------------------------------------------------------------------
 
-void on_window_moved(int x, int y, int an, int al) {
+void on_window_moved(int x, int y, int w, int h) {
   int n, m;
 
   n = v.type;
   v.type = 0;
   if (draw_mode < 100) {
-    draw_edit_background(x, y, an, al);
+    draw_edit_background(x, y, w, h);
     flush_bars(0);
-    update_dialogs(x, y, an, al);
+    update_dialogs(x, y, w, h);
   } else
-    update_box(x, y, an, al);
+    update_box(x, y, w, h);
   v.type = n;
 
   if (v.type != 1) {
@@ -1983,7 +1983,7 @@ void on_window_moved(int x, int y, int an, int al) {
 
         // If a dimmed window was previously covered ...
 
-        if (collides_with(n, x, y, an, al)) {
+        if (collides_with(n, x, y, w, h)) {
           window[n].foreground = 1;
 
           // If it's covered by other windows (foreground or background) ...
@@ -2019,7 +2019,7 @@ void on_window_moved(int x, int y, int an, int al) {
 //-----------------------------------------------------------------------------
 
 void maximize_window(void) {
-  int x, y, an, al, n, m;
+  int x, y, w, h, n, m;
 
   if (big) {
     wput(screen_buffer, -vga_width, vga_height, v.x, v.y, -48);
@@ -2032,13 +2032,13 @@ void maximize_window(void) {
 
   x = v.x;
   y = v.y;
-  an = v.an;
-  al = v.al;
+  w = v.w;
+  h = v.h;
 
   v.x = v._x;
   v.y = v._y;
-  v.an = v._an;
-  v.al = v._al;
+  v.w = v._an;
+  v.h = v._al;
 
   m = 0;
   for (n = 1; n < max_windows; n++)
@@ -2046,19 +2046,19 @@ void maximize_window(void) {
       if (windows_collide(0, n))
         m++;
   if (m)
-    place_window(v.side * 2 + 1, &v.x, &v.y, v.an, v.al);
+    place_window(v.side * 2 + 1, &v.x, &v.y, v.w, v.h);
 
   v._x = x;
   v._y = y;
-  v._an = an;
-  v._al = al;
+  v._an = w;
+  v._al = h;
   v.foreground = 1;
 
   do {
     read_mouse();
   } while (mouse_b & 1);
 
-  on_window_moved(x, y, an, al);
+  on_window_moved(x, y, w, h);
 
   if (v.type >= 100) {
     activate();
@@ -2071,27 +2071,27 @@ void maximize_window(void) {
 //-----------------------------------------------------------------------------
 
 void minimize_window(void) {
-  int x, y, an, al, n, m;
+  int x, y, w, h, n, m;
 
-  wput(v.ptr, v.an / big2, v.al / big2, v.an / big2 - 17, 2, -47);
+  wput(v.ptr, v.w / big2, v.h / big2, v.w / big2 - 17, 2, -47);
   flush_window(0);
   if (primera_vez != 1)
     flush_copy();
-  wput(v.ptr, v.an / big2, v.al / big2, v.an / big2 - 17, 2, -37);
+  wput(v.ptr, v.w / big2, v.h / big2, v.w / big2 - 17, 2, -37);
   if (v.type >= 100)
     deactivate();
 
   x = v.x;
   y = v.y;
-  an = v.an;
-  al = v.al;
+  w = v.w;
+  h = v.h;
 
-  v.an = (7 + 1 + text_len(v.name) + 1) * big2;
-  v.al = 7 * big2;
+  v.w = (7 + 1 + text_len(v.name) + 1) * big2;
+  v.h = 7 * big2;
 
-  if (v.an != v._an || v.al != v._al) { // If this is the first minimize
+  if (v.w != v._an || v.h != v._al) { // If this is the first minimize
                                         // (or the name changed ...)
-    place_window(v.side * 2 + 0, &v.x, &v.y, v.an, v.al);
+    place_window(v.side * 2 + 0, &v.x, &v.y, v.w, v.h);
   } else {
     v.x = v._x;
     v.y = v._y;
@@ -2101,20 +2101,20 @@ void minimize_window(void) {
         if (windows_collide(0, n))
           m++;
     if (m)
-      place_window(v.side * 2 + 0, &v.x, &v.y, v.an, v.al);
+      place_window(v.side * 2 + 0, &v.x, &v.y, v.w, v.h);
   }
 
   v._x = x;
   v._y = y;
-  v._an = an;
-  v._al = al;
+  v._an = w;
+  v._al = h;
   v.foreground = 2;
 
   do {
     read_mouse();
   } while (mouse_b & 1);
 
-  on_window_moved(x, y, an, al);
+  on_window_moved(x, y, w, h);
 }
 
 //-----------------------------------------------------------------------------
@@ -2122,7 +2122,7 @@ void minimize_window(void) {
 //-----------------------------------------------------------------------------
 
 void close_window(void) {
-  int x = 0, y = 0, an = 0, al = 0, n = 0, m = 0;
+  int x = 0, y = 0, w = 0, h = 0, n = 0, m = 0;
 
   if (v.type == 102 && window_closing == 1) {
     window_closing = 2;
@@ -2131,18 +2131,18 @@ void close_window(void) {
 
   if (exploding_windows) {
     v.exploding = 1;
-    implode(x, y, an, al);
+    implode(x, y, w, h);
     v.exploding = 0;
   }
 
   call((voidReturnType)v.close_handler);
   if (!cierra_rapido) {
     if (big)
-      wput(v.ptr, v.an / 2, v.al / 2, v.an / 2 - 9, 2, -45);
+      wput(v.ptr, v.w / 2, v.h / 2, v.w / 2 - 9, 2, -45);
     else
-      wput(v.ptr, v.an, v.al, v.an - 9, 2, -45);
+      wput(v.ptr, v.w, v.h, v.w - 9, 2, -45);
     flush_window(0);
-    blit_partial(v.x, v.y, v.an, v.al);
+    blit_partial(v.x, v.y, v.w, v.h);
     flush_copy();
   }
 
@@ -2157,18 +2157,18 @@ void close_window(void) {
         if ((window[m].prg == old_prg || window[m].aux == (byte *)old_prg) &&
             window[m].foreground < 2) {
           window[m].state = 1;
-          wgra(window[m].ptr, window[m].an / big2, window[m].al / big2, c_b_low, 2, 2,
-               window[m].an / big2 - 20, 7);
-          if (text_len(window[m].title) + 3 > window[m].an / big2 - 20) {
-            wwrite_in_box(window[m].ptr, window[m].an / big2, window[m].an / big2 - 19,
-                          window[m].al / big2, 4, 2, 0, window[m].title, c1);
-            wwrite_in_box(window[m].ptr, window[m].an / big2, window[m].an / big2 - 19,
-                          window[m].al / big2, 3, 2, 0, window[m].title, c4);
+          wgra(window[m].ptr, window[m].w / big2, window[m].h / big2, c_b_low, 2, 2,
+               window[m].w / big2 - 20, 7);
+          if (text_len(window[m].title) + 3 > window[m].w / big2 - 20) {
+            wwrite_in_box(window[m].ptr, window[m].w / big2, window[m].w / big2 - 19,
+                          window[m].h / big2, 4, 2, 0, window[m].title, c1);
+            wwrite_in_box(window[m].ptr, window[m].w / big2, window[m].w / big2 - 19,
+                          window[m].h / big2, 3, 2, 0, window[m].title, c4);
           } else {
-            wwrite(window[m].ptr, window[m].an / big2, window[m].al / big2,
-                   3 + (window[m].an / big2 - 20) / 2, 2, 1, window[m].title, c1);
-            wwrite(window[m].ptr, window[m].an / big2, window[m].al / big2,
-                   2 + (window[m].an / big2 - 20) / 2, 2, 1, window[m].title, c4);
+            wwrite(window[m].ptr, window[m].w / big2, window[m].h / big2,
+                   3 + (window[m].w / big2 - 20) / 2, 2, 1, window[m].title, c1);
+            wwrite(window[m].ptr, window[m].w / big2, window[m].h / big2,
+                   2 + (window[m].w / big2 - 20) / 2, 2, 1, window[m].title, c4);
           }
           flush_window(m);
           v.state = 0;
@@ -2183,18 +2183,18 @@ void close_window(void) {
     for (m = 1; m < max_windows; m++)
       if (window[m].type == v.type && window[m].foreground < 2) {
         window[m].state = 1;
-        wgra(window[m].ptr, window[m].an / big2, window[m].al / big2, c_b_low, 2, 2,
-             window[m].an / big2 - 20, 7);
-        if (text_len(window[m].title) + 3 > window[m].an / big2 - 20) {
-          wwrite_in_box(window[m].ptr, window[m].an / big2, window[m].an / big2 - 19,
-                        window[m].al / big2, 4, 2, 0, window[m].title, c1);
-          wwrite_in_box(window[m].ptr, window[m].an / big2, window[m].an / big2 - 19,
-                        window[m].al / big2, 3, 2, 0, window[m].title, c4);
+        wgra(window[m].ptr, window[m].w / big2, window[m].h / big2, c_b_low, 2, 2,
+             window[m].w / big2 - 20, 7);
+        if (text_len(window[m].title) + 3 > window[m].w / big2 - 20) {
+          wwrite_in_box(window[m].ptr, window[m].w / big2, window[m].w / big2 - 19,
+                        window[m].h / big2, 4, 2, 0, window[m].title, c1);
+          wwrite_in_box(window[m].ptr, window[m].w / big2, window[m].w / big2 - 19,
+                        window[m].h / big2, 3, 2, 0, window[m].title, c4);
         } else {
-          wwrite(window[m].ptr, window[m].an / big2, window[m].al / big2,
-                 3 + (window[m].an / big2 - 20) / 2, 2, 1, window[m].title, c1);
-          wwrite(window[m].ptr, window[m].an / big2, window[m].al / big2,
-                 2 + (window[m].an / big2 - 20) / 2, 2, 1, window[m].title, c4);
+          wwrite(window[m].ptr, window[m].w / big2, window[m].h / big2,
+                 3 + (window[m].w / big2 - 20) / 2, 2, 1, window[m].title, c1);
+          wwrite(window[m].ptr, window[m].w / big2, window[m].h / big2,
+                 2 + (window[m].w / big2 - 20) / 2, 2, 1, window[m].title, c4);
         }
         flush_window(m);
         break;
@@ -2205,15 +2205,15 @@ void close_window(void) {
 
   x = v.x;
   y = v.y;
-  an = v.an;
-  al = v.al;
+  w = v.w;
+  h = v.h;
   divdelete(0);
   if (draw_mode < 100) {
-    draw_edit_background(x, y, an, al);
+    draw_edit_background(x, y, w, h);
     flush_bars(0);
-    update_dialogs(x, y, an, al);
+    update_dialogs(x, y, w, h);
   } else
-    update_box(x, y, an, al);
+    update_box(x, y, w, h);
 
   if (n == 1 || n == 7) {             // Dialogs bring hidden[] windows to foreground on close
     if (v.type == 1 || v.type == 7) { // Dialog over dialog: only show the last one
@@ -2228,7 +2228,7 @@ void close_window(void) {
   } else
     for (n = 0; n < max_windows; n++)
       if (window[n].type && window[n].foreground == 0)
-        if (collides_with(n, x, y, an, al)) {
+        if (collides_with(n, x, y, w, h)) {
           window[n].foreground = 1;
           for (m = 0; m < max_windows; m++)
             if (m != n && window[m].type &&
@@ -2257,7 +2257,7 @@ void close_window(void) {
 //-----------------------------------------------------------------------------
 
 void move_window(void) {
-  int ix, iy, oldx, oldy, an, al, b, x, y;
+  int ix, iy, oldx, oldy, w, h, b, x, y;
 
   if (move_full_window) {
     move_window_complete();
@@ -2265,8 +2265,8 @@ void move_window(void) {
   }
 
   mouse_graf = 2;
-  an = v.an;
-  al = v.al;
+  w = v.w;
+  h = v.h;
   oldx = v.x;
   oldy = v.y;
   ix = mouse_x - oldx;
@@ -2278,25 +2278,25 @@ void move_window(void) {
     x = mouse_x - ix;
     y = mouse_y - iy;
 
-    wrectangle(screen_buffer, vga_width, vga_height, c4, x, y, an, al);
-    blit_partial(x, y, an, 1);
-    blit_partial(x, y, 1, al);
-    blit_partial(x, y + al - 1, an, 1);
-    blit_partial(x + an - 1, y, 1, al);
+    wrectangle(screen_buffer, vga_width, vga_height, c4, x, y, w, h);
+    blit_partial(x, y, w, 1);
+    blit_partial(x, y, 1, h);
+    blit_partial(x, y + h - 1, w, 1);
+    blit_partial(x + w - 1, y, 1, h);
     flush_copy();
 
     if (draw_mode < 100) {
       if (b)
         big = 1;
-      draw_edit_background(x, y, an, al);
+      draw_edit_background(x, y, w, h);
       flush_bars(0);
-      update_dialogs(x, y, an, al);
+      update_dialogs(x, y, w, h);
       big = 0;
     } else {
-      update_box(x, y, an, 1);
-      update_box(x, y, 1, al);
-      update_box(x, y + al - 1, an, 1);
-      update_box(x + an - 1, y, 1, al);
+      update_box(x, y, w, 1);
+      update_box(x, y, 1, h);
+      update_box(x, y + h - 1, w, 1);
+      update_box(x + w - 1, y, 1, h);
     }
 
   } while (mouse_b & 1);
@@ -2305,7 +2305,7 @@ void move_window(void) {
   if (x != oldx || y != oldy) {
     v.x = x;
     v.y = y;
-    on_window_moved(oldx, oldy, an, al);
+    on_window_moved(oldx, oldy, w, h);
     full_redraw = 1;
     flush_copy();
   }
@@ -2320,22 +2320,22 @@ void move_window(void) {
     if (*system_clock < double_click + 10 && *system_clock > double_click &&
         abs(double_click_x - mouse_x) < 8 && abs(double_click_y - mouse_y) < 8) {
       if (v.foreground == 2)
-        place_window(v.side * 2 + 0, &v.x, &v.y, v.an, v.al);
+        place_window(v.side * 2 + 0, &v.x, &v.y, v.w, v.h);
       else
-        place_window(v.side * 2 + 1, &v.x, &v.y, v.an, v.al);
+        place_window(v.side * 2 + 1, &v.x, &v.y, v.w, v.h);
       if (v.x == oldx && v.y == oldy) {
         v.side ^= 1;
         if (v.foreground == 2)
-          place_window(v.side * 2 + 0, &v.x, &v.y, v.an, v.al);
+          place_window(v.side * 2 + 0, &v.x, &v.y, v.w, v.h);
         else
-          place_window(v.side * 2 + 1, &v.x, &v.y, v.an, v.al);
+          place_window(v.side * 2 + 1, &v.x, &v.y, v.w, v.h);
         if (v.x == oldx && v.y == oldy)
           v.side ^= 1;
       }
       if (v.x != oldx || v.y != oldy) {
         if (exploding_windows)
-          extrude(oldx, oldy, v.an, v.al, v.x, v.y, v.an, v.al);
-        on_window_moved(oldx, oldy, v.an, v.al);
+          extrude(oldx, oldy, v.w, v.h, v.x, v.y, v.w, v.h);
+        on_window_moved(oldx, oldy, v.w, v.h);
         x++;
       }
     } else {
@@ -2351,18 +2351,18 @@ void move_window(void) {
 
 void move_window_complete(void) {
   int ix, iy, oldx, oldy;
-  int x, y, an, al;
+  int x, y, w, h;
 
   mouse_graf = 2;
-  an = v.an;
-  al = v.al;
+  w = v.w;
+  h = v.h;
   oldx = v.x;
   oldy = v.y;
   ix = mouse_x - oldx;
   iy = mouse_y - oldy;
 
   if (v.foreground == 1)
-    wrectangle(v.ptr, an / big2, al / big2, c4, 0, 0, an / big2, al / big2);
+    wrectangle(v.ptr, w / big2, h / big2, c4, 0, 0, w / big2, h / big2);
 
   if (v.foreground == 2)
     window_move_pending = 1;
@@ -2372,7 +2372,7 @@ void move_window_complete(void) {
     y = v.y;
     v.x = mouse_x - ix;
     v.y = mouse_y - iy;
-    on_window_moved(x, y, an, al);
+    on_window_moved(x, y, w, h);
     flush_copy();
   } while (mouse_b & 1);
 
@@ -2382,7 +2382,7 @@ void move_window_complete(void) {
   }
 
   if (v.foreground == 1)
-    wrectangle(v.ptr, an / big2, al / big2, c2, 0, 0, an / big2, al / big2);
+    wrectangle(v.ptr, w / big2, h / big2, c2, 0, 0, w / big2, h / big2);
 
   //---------------------------------------------------------------------------
   // Check if you pressed double-click to auto deploy window
@@ -2394,22 +2394,22 @@ void move_window_complete(void) {
     if (*system_clock < double_click + 10 && *system_clock > double_click &&
         abs(double_click_x - mouse_x) < 8 && abs(double_click_y - mouse_y) < 8) {
       if (v.foreground == 2)
-        place_window(v.side * 2 + 0, &v.x, &v.y, v.an, v.al);
+        place_window(v.side * 2 + 0, &v.x, &v.y, v.w, v.h);
       else
-        place_window(v.side * 2 + 1, &v.x, &v.y, v.an, v.al);
+        place_window(v.side * 2 + 1, &v.x, &v.y, v.w, v.h);
       if (v.x == oldx && v.y == oldy) {
         v.side ^= 1;
         if (v.foreground == 2)
-          place_window(v.side * 2 + 0, &v.x, &v.y, v.an, v.al);
+          place_window(v.side * 2 + 0, &v.x, &v.y, v.w, v.h);
         else
-          place_window(v.side * 2 + 1, &v.x, &v.y, v.an, v.al);
+          place_window(v.side * 2 + 1, &v.x, &v.y, v.w, v.h);
         if (v.x == oldx && v.y == oldy)
           v.side ^= 1;
       }
       if (v.x != oldx || v.y != oldy) {
         if (exploding_windows)
-          extrude(oldx, oldy, v.an, v.al, v.x, v.y, v.an, v.al);
-        on_window_moved(oldx, oldy, v.an, v.al);
+          extrude(oldx, oldy, v.w, v.h, v.x, v.y, v.w, v.h);
+        on_window_moved(oldx, oldy, v.w, v.h);
         x++;
       }
     } else {
@@ -2427,7 +2427,7 @@ void move_window_complete(void) {
 //      updates a screen box (region)
 //-----------------------------------------------------------------------------
 
-void update_box(int x, int y, int an, int al) {
+void update_box(int x, int y, int w, int h) {
   int n = 0;
   byte *_ptr = NULL;
   int _x = 0, _y = 0, _an = 0, _al = 0;
@@ -2449,41 +2449,41 @@ void update_box(int x, int y, int an, int al) {
 
 
   if (x < 0) {
-    an += x;
+    w += x;
     x = 0;
   }
   if (y < 0) {
-    al += y;
+    h += y;
     y = 0;
   }
-  if (x + an > vga_width)
-    an = vga_width - x;
-  if (y + al > vga_height)
-    al = vga_height - y;
-  if (an <= 0 || al <= 0)
+  if (x + w > vga_width)
+    w = vga_width - x;
+  if (y + h > vga_height)
+    h = vga_height - y;
+  if (w <= 0 || h <= 0)
     return;
 
-  restore_wallpaper(x, y, an, al);
+  restore_wallpaper(x, y, w, h);
 
-  if (y < vga_height && y + al > vga_height - 8 * big2 && x < vga_width &&
-      x + an >= vga_width - (text_len(div_version) + 2) * big2) {
-    wwrite_in_box(screen_buffer + y * vga_width + x, vga_width, an, al, vga_width - 1 - x,
+  if (y < vga_height && y + h > vga_height - 8 * big2 && x < vga_width &&
+      x + w >= vga_width - (text_len(div_version) + 2) * big2) {
+    wwrite_in_box(screen_buffer + y * vga_width + x, vga_width, w, h, vga_width - 1 - x,
                   vga_height - 1 - y, 18, div_version, c0);
-    wwrite_in_box(screen_buffer + y * vga_width + x, vga_width, an, al, vga_width - 2 - x,
+    wwrite_in_box(screen_buffer + y * vga_width + x, vga_width, w, h, vga_width - 2 - x,
                   vga_height - 1 - y, 18, div_version, c2);
   }
 
   for (n = max_windows - 1; n >= 0; n--)
     if (window[n].type)
-      if (collides_with(n, x, y, an, al)) {
+      if (collides_with(n, x, y, w, h)) {
         if (window[n].foreground < 2) {
           _ptr = window[n].ptr;
           salta_x = 0;
           salta_y = 0;
           _x = window[n].x;
           _y = window[n].y;
-          _an = window[n].an;
-          _al = window[n].al;
+          _an = window[n].w;
+          _al = window[n].h;
 
           if (y > _y) {
             salta_y += y - _y;
@@ -2491,9 +2491,9 @@ void update_box(int x, int y, int an, int al) {
             _y = y;
             _al -= salta_y;
           }
-          if (y + al < _y + _al) {
-            salta_y += _y + _al - y - al;
-            _al -= _y + _al - y - al;
+          if (y + h < _y + _al) {
+            salta_y += _y + _al - y - h;
+            _al -= _y + _al - y - h;
           }
           if (x > _x) {
             salta_x += x - _x;
@@ -2501,16 +2501,16 @@ void update_box(int x, int y, int an, int al) {
             _x = x;
             _an -= salta_x;
           }
-          if (x + an < _x + _an) {
-            salta_x += _x + _an - x - an;
-            _an -= _x + _an - x - an;
+          if (x + w < _x + _an) {
+            salta_x += _x + _an - x - w;
+            _an -= _x + _an - x - w;
           }
 
           if (_an > 0 && _al > 0) {
             if (window[n].foreground == 1)
-              wvolcado(screen_buffer, vga_width, vga_height, _ptr, _x, _y, _an, _al, salta_x);
+              blit_region(screen_buffer, vga_width, vga_height, _ptr, _x, _y, _an, _al, salta_x);
             else
-              wvolcado_oscuro(screen_buffer, vga_width, vga_height, _ptr, _x, _y, _an, _al,
+              blit_region_dark(screen_buffer, vga_width, vga_height, _ptr, _x, _y, _an, _al,
                               salta_x);
           }
 
@@ -2518,62 +2518,62 @@ void update_box(int x, int y, int an, int al) {
           if (n == 0 && window_move_pending) {
             if (big) {
               big = 0;
-              wrectangle(screen_buffer, vga_width, vga_height, c4, v.x + 16, v.y, v.an - 16, v.al);
+              wrectangle(screen_buffer, vga_width, vga_height, c4, v.x + 16, v.y, v.w - 16, v.h);
               big = 1;
             } else
-              wrectangle(screen_buffer, vga_width, vga_height, c4, v.x + 8, v.y, v.an - 8, v.al);
+              wrectangle(screen_buffer, vga_width, vga_height, c4, v.x + 8, v.y, v.w - 8, v.h);
           } else {
-            wwrite_in_box(screen_buffer + y * vga_width + x, vga_width, an, al,
+            wwrite_in_box(screen_buffer + y * vga_width + x, vga_width, w, h,
                           window[n].x + 9 * big2 - x, window[n].y - y, 10, window[n].name, c0);
-            wwrite_in_box(screen_buffer + y * vga_width + x, vga_width, an, al,
+            wwrite_in_box(screen_buffer + y * vga_width + x, vga_width, w, h,
                           window[n].x + 8 * big2 - x, window[n].y - y, 10, window[n].name, c4);
           }
 
           if (x < window[n].x + 7 * big2) {
             if (big) {
-              wput_in_box(screen_buffer + y * vga_width + x, vga_width, -an, al, window[n].x - x,
+              wput_in_box(screen_buffer + y * vga_width + x, vga_width, -w, h, window[n].x - x,
                           window[n].y - y, 38);
             } else
-              wput_in_box(screen_buffer + y * vga_width + x, vga_width, an, al, window[n].x - x,
+              wput_in_box(screen_buffer + y * vga_width + x, vga_width, w, h, window[n].x - x,
                           window[n].y - y, 38);
           }
         }
       }
-  blit_partial(x, y, an, al);
+  blit_partial(x, y, w, h);
 }
 
-void update_dialogs(int x, int y, int an, int al) {
+void update_dialogs(int x, int y, int w, int h) {
   int n;
   byte *_ptr;
   int _x, _y, _an, _al;
   int salta_x, salta_y;
 
   if (x < 0) {
-    an += x;
+    w += x;
     x = 0;
   }
   if (y < 0) {
-    al += y;
+    h += y;
     y = 0;
   }
-  if (x + an > vga_width)
-    an = vga_width - x;
-  if (y + al > vga_height)
-    al = vga_height - y;
-  if (an <= 0 || al <= 0)
+  if (x + w > vga_width)
+    w = vga_width - x;
+  if (y + h > vga_height)
+    h = vga_height - y;
+  if (w <= 0 || h <= 0)
     return;
 
   for (n = max_windows - 1; n >= 0; n--)
     if (window[n].type == 1)
-      if (collides_with(n, x, y, an, al))
+      if (collides_with(n, x, y, w, h))
         if (window[n].foreground < 2) {
           _ptr = window[n].ptr;
           salta_x = 0;
           salta_y = 0;
           _x = window[n].x;
           _y = window[n].y;
-          _an = window[n].an;
-          _al = window[n].al;
+          _an = window[n].w;
+          _al = window[n].h;
 
           if (y > _y) {
             salta_y += y - _y;
@@ -2581,9 +2581,9 @@ void update_dialogs(int x, int y, int an, int al) {
             _y = y;
             _al -= salta_y;
           }
-          if (y + al < _y + _al) {
-            salta_y += _y + _al - y - al;
-            _al -= _y + _al - y - al;
+          if (y + h < _y + _al) {
+            salta_y += _y + _al - y - h;
+            _al -= _y + _al - y - h;
           }
           if (x > _x) {
             salta_x += x - _x;
@@ -2591,16 +2591,16 @@ void update_dialogs(int x, int y, int an, int al) {
             _x = x;
             _an -= salta_x;
           }
-          if (x + an < _x + _an) {
-            salta_x += _x + _an - x - an;
-            _an -= _x + _an - x - an;
+          if (x + w < _x + _an) {
+            salta_x += _x + _an - x - w;
+            _an -= _x + _an - x - w;
           }
 
           if (_an > 0 && _al > 0) {
             if (window[n].foreground == 1)
-              wvolcado(screen_buffer, vga_width, vga_height, _ptr, _x, _y, _an, _al, salta_x);
+              blit_region(screen_buffer, vga_width, vga_height, _ptr, _x, _y, _an, _al, salta_x);
             else
-              wvolcado_oscuro(screen_buffer, vga_width, vga_height, _ptr, _x, _y, _an, _al,
+              blit_region_dark(screen_buffer, vga_width, vga_height, _ptr, _x, _y, _an, _al,
                               salta_x);
           }
         }
@@ -2610,43 +2610,43 @@ void update_dialogs(int x, int y, int an, int al) {
 //      Update a screen region, from a given window upward
 //-----------------------------------------------------------------------------
 
-void update_box2(int vent, int x, int y, int an, int al) {
+void update_box2(int vent, int x, int y, int w, int h) {
   int n;
   byte *_ptr;
   int _x, _y, _an, _al;
   int salta_x, salta_y;
 
   if (window[vent].foreground == 2) {
-    update_box(x, y, an, al);
+    update_box(x, y, w, h);
     return;
   }
 
   if (x < 0) {
-    an += x;
+    w += x;
     x = 0;
   }
   if (y < 0) {
-    al += y;
+    h += y;
     y = 0;
   }
-  if (x + an > vga_width)
-    an = vga_width - x;
-  if (y + al > vga_height)
-    al = vga_height - y;
-  if (an <= 0 || al <= 0)
+  if (x + w > vga_width)
+    w = vga_width - x;
+  if (y + h > vga_height)
+    h = vga_height - y;
+  if (w <= 0 || h <= 0)
     return;
 
   for (n = vent; n >= 0; n--)
     if (window[n].type)
-      if (collides_with(n, x, y, an, al)) {
+      if (collides_with(n, x, y, w, h)) {
         if (window[n].foreground < 2) {
           _ptr = window[n].ptr;
           salta_x = 0;
           salta_y = 0;
           _x = window[n].x;
           _y = window[n].y;
-          _an = window[n].an;
-          _al = window[n].al;
+          _an = window[n].w;
+          _al = window[n].h;
 
           if (y > _y) {
             salta_y += y - _y;
@@ -2654,9 +2654,9 @@ void update_box2(int vent, int x, int y, int an, int al) {
             _y = y;
             _al -= salta_y;
           }
-          if (y + al < _y + _al) {
-            salta_y += _y + _al - y - al;
-            _al -= _y + _al - y - al;
+          if (y + h < _y + _al) {
+            salta_y += _y + _al - y - h;
+            _al -= _y + _al - y - h;
           }
           if (x > _x) {
             salta_x += x - _x;
@@ -2664,16 +2664,16 @@ void update_box2(int vent, int x, int y, int an, int al) {
             _x = x;
             _an -= salta_x;
           }
-          if (x + an < _x + _an) {
-            salta_x += _x + _an - x - an;
-            _an -= _x + _an - x - an;
+          if (x + w < _x + _an) {
+            salta_x += _x + _an - x - w;
+            _an -= _x + _an - x - w;
           }
 
           if (_an > 0 && _al > 0) {
             if (window[n].foreground == 1)
-              wvolcado(screen_buffer, vga_width, vga_height, _ptr, _x, _y, _an, _al, salta_x);
+              blit_region(screen_buffer, vga_width, vga_height, _ptr, _x, _y, _an, _al, salta_x);
             else
-              wvolcado_oscuro(screen_buffer, vga_width, vga_height, _ptr, _x, _y, _an, _al,
+              blit_region_dark(screen_buffer, vga_width, vga_height, _ptr, _x, _y, _an, _al,
                               salta_x);
           }
 
@@ -2681,29 +2681,29 @@ void update_box2(int vent, int x, int y, int an, int al) {
           if (n == 0 && window_move_pending) {
             if (big) {
               big = 0;
-              wrectangle(screen_buffer, vga_width, vga_height, c4, v.x + 16, v.y, v.an - 16, v.al);
+              wrectangle(screen_buffer, vga_width, vga_height, c4, v.x + 16, v.y, v.w - 16, v.h);
               big = 1;
             } else
-              wrectangle(screen_buffer, vga_width, vga_height, c4, v.x + 8, v.y, v.an - 8, v.al);
+              wrectangle(screen_buffer, vga_width, vga_height, c4, v.x + 8, v.y, v.w - 8, v.h);
           } else {
-            wwrite_in_box(screen_buffer + y * vga_width + x, vga_width, an, al,
+            wwrite_in_box(screen_buffer + y * vga_width + x, vga_width, w, h,
                           window[n].x + 9 * big2 - x, window[n].y - y, 10, window[n].name, c0);
-            wwrite_in_box(screen_buffer + y * vga_width + x, vga_width, an, al,
+            wwrite_in_box(screen_buffer + y * vga_width + x, vga_width, w, h,
                           window[n].x + 8 * big2 - x, window[n].y - y, 10, window[n].name, c4);
           }
 
           if (x < window[n].x + 7 * big2) {
             if (big) {
-              wput_in_box(screen_buffer + y * vga_width + x, vga_width, -an, al, window[n].x - x,
+              wput_in_box(screen_buffer + y * vga_width + x, vga_width, -w, h, window[n].x - x,
                           window[n].y - y, 38);
             } else
-              wput_in_box(screen_buffer + y * vga_width + x, vga_width, an, al, window[n].x - x,
+              wput_in_box(screen_buffer + y * vga_width + x, vga_width, w, h, window[n].x - x,
                           window[n].y - y, 38);
           }
         }
       }
 
-  blit_partial(x, y, an, al);
+  blit_partial(x, y, w, h);
 }
 
 //-----------------------------------------------------------------------------
@@ -2763,7 +2763,7 @@ void update_background(void) {
 //      Resets the bacground (wallpaper) in a given area
 //-----------------------------------------------------------------------------
 
-void restore_wallpaper(int x, int y, int an, int al) {
+void restore_wallpaper(int x, int y, int w, int h) {
   byte *p;
   byte *t;
   int n, _an;
@@ -2772,16 +2772,16 @@ void restore_wallpaper(int x, int y, int an, int al) {
     y = 0;
   if (x < 0)
     x = 0;
-  if (y + al > vga_height)
-    al = vga_height - y;
-  if (x + an > vga_width)
-    an = vga_width - x;
+  if (y + h > vga_height)
+    h = vga_height - y;
+  if (x + w > vga_width)
+    w = vga_width - x;
 
-  if (an > 0 && al > 0) {
+  if (w > 0 && h > 0) {
     p = screen_buffer + y * vga_width + x;
     if (wallpaper != NULL) {
       t = wallpaper_map + (y % wallpaper_height) * wallpaper_width;
-      _an = an;
+      _an = w;
       do {
         n = x;
         do {
@@ -2790,13 +2790,13 @@ void restore_wallpaper(int x, int y, int an, int al) {
           *p = *(t + n);
           p++;
           n++;
-        } while (--an);
-        an = _an;
-        p += vga_width - an;
+        } while (--w);
+        w = _an;
+        p += vga_width - w;
         t += wallpaper_width;
         if (t == wallpaper_map + wallpaper_width * wallpaper_height)
           t = wallpaper_map;
-      } while (--al);
+      } while (--h);
       /*
       t=wallpaper+(y&127)*128;
       _an=an;
@@ -2811,9 +2811,9 @@ void restore_wallpaper(int x, int y, int an, int al) {
       */
     } else {
       do {
-        memset(p, c1, an);
+        memset(p, c1, w);
         p += vga_width;
-      } while (--al);
+      } while (--h);
     }
   }
 }
@@ -2823,7 +2823,7 @@ void restore_wallpaper(int x, int y, int an, int al) {
 //-----------------------------------------------------------------------------
 
 void flush_window(int m) {
-  int x, y, an, al, n;
+  int x, y, w, h, n;
   byte *_ptr;
   int _x, _y, _an, _al;
   int salta_x, salta_y;
@@ -2836,15 +2836,15 @@ void flush_window(int m) {
   if (volcados_parciales) {
     if (window[m].type == 102 && window[m].redraw == 1 && window[m].prg != NULL) {
       window[m].redraw = 0;
-      update_box2(m, window[m].x + 2 * big2, window[m].y + 10 * big2, window[m].an - 20, 7 * big2);
+      update_box2(m, window[m].x + 2 * big2, window[m].y + 10 * big2, window[m].w - 20, 7 * big2);
       update_box2(m, window[m].x + 2 * big2,
                   window[m].y + 18 * big2 +
                       (window[m].prg->line - window[m].prg->first_line) * font_height,
-                  window[m].an - 12, font_height);
+                  window[m].w - 12, font_height);
       if (window[m].prg->prev_line != window[m].prg->line - window[m].prg->first_line)
         update_box2(m, window[m].x + 2 * big2,
                     window[m].y + 18 * big2 + window[m].prg->prev_line * font_height,
-                    window[m].an - 12, font_height);
+                    window[m].w - 12, font_height);
       return;
     }
     // MapperCreator2 check removed (MODE8/3D map editor deleted)
@@ -2853,30 +2853,30 @@ void flush_window(int m) {
 
   x = window[m].x;
   y = window[m].y;
-  an = window[m].an;
-  al = window[m].al;
+  w = window[m].w;
+  h = window[m].h;
 
   if (window[m].foreground == 2) {
-    update_box(x, y, an, al);
+    update_box(x, y, w, h);
     return;
   }
 
   if (x < 0) {
-    an += x;
+    w += x;
     x = 0;
   }
   if (y < 0) {
-    al += y;
+    h += y;
     y = 0;
   }
-  if (x + an > vga_width)
-    an = vga_width - x;
-  if (y + al > vga_height)
-    al = vga_height - y;
+  if (x + w > vga_width)
+    w = vga_width - x;
+  if (y + h > vga_height)
+    h = vga_height - y;
 
   for (n = m; n >= 0; n--)
     if (window[n].type)
-      if (collides_with(n, x, y, an, al)) {
+      if (collides_with(n, x, y, w, h)) {
         if (window[n].foreground < 2) {
           _ptr = window[n].ptr;
           if (_ptr == NULL)
@@ -2886,8 +2886,8 @@ void flush_window(int m) {
           salta_y = 0;
           _x = window[n].x;
           _y = window[n].y;
-          _an = window[n].an;
-          _al = window[n].al;
+          _an = window[n].w;
+          _al = window[n].h;
 
           if (y > _y) {
             salta_y += y - _y;
@@ -2895,9 +2895,9 @@ void flush_window(int m) {
             _y = y;
             _al -= salta_y;
           }
-          if (y + al < _y + _al) {
-            salta_y += _y + _al - y - al;
-            _al -= _y + _al - y - al;
+          if (y + h < _y + _al) {
+            salta_y += _y + _al - y - h;
+            _al -= _y + _al - y - h;
           }
           if (x > _x) {
             salta_x += x - _x;
@@ -2905,31 +2905,31 @@ void flush_window(int m) {
             _x = x;
             _an -= salta_x;
           }
-          if (x + an < _x + _an) {
-            salta_x += _x + _an - x - an;
-            _an -= _x + _an - x - an;
+          if (x + w < _x + _an) {
+            salta_x += _x + _an - x - w;
+            _an -= _x + _an - x - w;
           }
 
           if (_an > 0 && _al > 0) {
             if (window[n].foreground == 1) {
-              wvolcado(screen_buffer, vga_width, vga_height, _ptr, _x, _y, _an, _al, salta_x);
+              blit_region(screen_buffer, vga_width, vga_height, _ptr, _x, _y, _an, _al, salta_x);
             } else {
-              wvolcado_oscuro(screen_buffer, vga_width, vga_height, _ptr, _x, _y, _an, _al,
+              blit_region_dark(screen_buffer, vga_width, vga_height, _ptr, _x, _y, _an, _al,
                               salta_x);
             }
           }
         } else {
-          wwrite_in_box(screen_buffer + y * vga_width + x, vga_width, an, al,
+          wwrite_in_box(screen_buffer + y * vga_width + x, vga_width, w, h,
                         window[n].x + 9 * big2 - x, window[n].y - y, 10, window[n].name, c0);
-          wwrite_in_box(screen_buffer + y * vga_width + x, vga_width, an, al,
+          wwrite_in_box(screen_buffer + y * vga_width + x, vga_width, w, h,
                         window[n].x + 8 * big2 - x, window[n].y - y, 10, window[n].name, c4);
 
           if (x < window[n].x + 7 * big2) {
             if (big) {
-              wput_in_box(screen_buffer + y * vga_width + x, vga_width, -an, al, window[n].x - x,
+              wput_in_box(screen_buffer + y * vga_width + x, vga_width, -w, h, window[n].x - x,
                           window[n].y - y, 38);
             } else
-              wput_in_box(screen_buffer + y * vga_width + x, vga_width, an, al, window[n].x - x,
+              wput_in_box(screen_buffer + y * vga_width + x, vga_width, w, h, window[n].x - x,
                           window[n].y - y, 38);
           }
         }
@@ -2937,10 +2937,10 @@ void flush_window(int m) {
 
   trc.x = window[n].x;
   trc.y = window[n].y;
-  trc.w = window[n].an;
-  trc.h = window[n].al;
+  trc.w = window[n].w;
+  trc.h = window[n].h;
 
-  blit_partial(x, y, an, al);
+  blit_partial(x, y, w, h);
 }
 
 //-----------------------------------------------------------------------------
@@ -2948,7 +2948,7 @@ void flush_window(int m) {
 //      (flag=0: icon, flag=1: window)
 //-----------------------------------------------------------------------------
 
-void place_window(int flag, int *_x, int *_y, int an, int al) {
+void place_window(int flag, int *_x, int *_y, int w, int h) {
   int n, m, x, y, new_x, old_y = *_y;
   int scanes, scan[max_windows];
 
@@ -2959,14 +2959,14 @@ void place_window(int flag, int *_x, int *_y, int an, int al) {
     scan[0] = 0;
   } else {
     *_y = -1;
-    scan[0] = vga_height - al;
+    scan[0] = vga_height - h;
   }
   scanes = 1;
 
   for (n = 1; n < max_windows; n++)
     if (window[n].type) {
       if (flag & 1) {
-        if ((y = window[n].y + window[n].al + 1) < vga_height) {
+        if ((y = window[n].y + window[n].h + 1) < vga_height) {
           x = 0;
           do {
             x++;
@@ -2980,7 +2980,7 @@ void place_window(int flag, int *_x, int *_y, int an, int al) {
           }
         }
       } else {
-        if ((y = window[n].y - al - 1) >= 0) {
+        if ((y = window[n].y - h - 1) >= 0) {
           x = 0;
           do {
             x++;
@@ -3001,13 +3001,13 @@ void place_window(int flag, int *_x, int *_y, int an, int al) {
   if (flag & 2) {
     for (n = 0; n < scanes; n++) {
       y = scan[n];
-      new_x = vga_width - an;
+      new_x = vga_width - w;
       do {
         x = new_x;
         for (m = 1; m < max_windows; m++)
-          if (window[m].type && collides_with(m, x - 1, y - 1, an + 2, al + 2))
-            if (new_x >= window[m].x - an)
-              new_x = window[m].x - an - 1;
+          if (window[m].type && collides_with(m, x - 1, y - 1, w + 2, h + 2))
+            if (new_x >= window[m].x - w)
+              new_x = window[m].x - w - 1;
       } while (new_x != x && new_x >= 0);
       if (new_x >= 0) {
         *_x = new_x;
@@ -3022,11 +3022,11 @@ void place_window(int flag, int *_x, int *_y, int an, int al) {
       do {
         x = new_x;
         for (m = 1; m < max_windows; m++)
-          if (window[m].type && collides_with(m, x - 1, y - 1, an + 2, al + 2))
-            if (window[m].x + window[m].an >= new_x)
-              new_x = window[m].x + window[m].an + 1;
-      } while (new_x != x && new_x + an <= vga_width);
-      if (new_x + an <= vga_width) {
+          if (window[m].type && collides_with(m, x - 1, y - 1, w + 2, h + 2))
+            if (window[m].x + window[m].w >= new_x)
+              new_x = window[m].x + window[m].w + 1;
+      } while (new_x != x && new_x + w <= vga_width);
+      if (new_x + w <= vga_width) {
         *_x = new_x;
         *_y = y;
         break;
@@ -3037,8 +3037,8 @@ void place_window(int flag, int *_x, int *_y, int an, int al) {
   // Third, if the algorithm failed, place the window at ...
 
   if (flag & 1) {
-    if (*_y + al > vga_height)
-      find_best_position(_x, _y, an, al);
+    if (*_y + h > vga_height)
+      find_best_position(_x, _y, w, h);
   } else {
     if (*_y < 0)
       *_y = old_y;
@@ -3052,15 +3052,15 @@ void place_window(int flag, int *_x, int *_y, int an, int al) {
 #define pasos_x 16
 #define pasos_y 10
 
-void find_best_position(int *_x, int *_y, int an, int al) {
+void find_best_position(int *_x, int *_y, int w, int h) {
   unsigned int c, colision = -1;
   int a, b, x, y;
 
   for (a = 0; a <= pasos_x; a++) {
-    x = (float)((vga_width - an) * a) / (float)pasos_x;
+    x = (float)((vga_width - w) * a) / (float)pasos_x;
     for (b = 0; b <= pasos_y; b++) {
-      y = (float)((vga_height - al) * b) / (float)pasos_y;
-      c = calculate_collision(x, y, an, al);
+      y = (float)((vga_height - h) * b) / (float)pasos_y;
+      c = calculate_collision(x, y, w, h);
       if (c < colision) {
         colision = c;
         *_x = x;
@@ -3070,12 +3070,12 @@ void find_best_position(int *_x, int *_y, int an, int al) {
   }
 }
 
-int calculate_collision(int x, int y, int an, int al) {
+int calculate_collision(int x, int y, int w, int h) {
   int n, c, colision = 0;
 
   for (n = 1; n < max_windows; n++) {
     if (window[n].type) {
-      if ((c = calculate_overlap(n, x, y, an, al))) {
+      if ((c = calculate_overlap(n, x, y, w, h))) {
         if (window[n].foreground)
           colision += vga_width * vga_height + c;
         else
@@ -3086,13 +3086,13 @@ int calculate_collision(int x, int y, int an, int al) {
   return (colision);
 }
 
-int calculate_overlap(int a, int x, int y, int an, int al) {
+int calculate_overlap(int a, int x, int y, int w, int h) {
   int n, m, _an = 0, _al = 0;
 
-  if (y < window[a].y + window[a].al && y + al > window[a].y) {
-    if (x < window[a].x + window[a].an && x + an > window[a].x) {
-      n = y + al;
-      m = window[a].y + window[a].al;
+  if (y < window[a].y + window[a].h && y + h > window[a].y) {
+    if (x < window[a].x + window[a].w && x + w > window[a].x) {
+      n = y + h;
+      m = window[a].y + window[a].h;
       if (n < m)
         m = n;
       if (window[a].y > y)
@@ -3101,8 +3101,8 @@ int calculate_overlap(int a, int x, int y, int an, int al) {
         n = y;
       _an = m - n + 1;
 
-      n = x + an;
-      m = window[a].x + window[a].an;
+      n = x + w;
+      m = window[a].x + window[a].w;
       if (n < m)
         m = n;
       if (window[a].x > x)
@@ -3122,17 +3122,17 @@ int calculate_overlap(int a, int x, int y, int an, int al) {
 //-----------------------------------------------------------------------------
 
 int windows_collide(int a, int b) {
-  if (window[b].y < window[a].y + window[a].al && window[b].y + window[b].al > window[a].y &&
-      window[b].x < window[a].x + window[a].an && window[b].x + window[b].an > window[a].x)
+  if (window[b].y < window[a].y + window[a].h && window[b].y + window[b].h > window[a].y &&
+      window[b].x < window[a].x + window[a].w && window[b].x + window[b].w > window[a].x)
 
     return (1);
   else
     return (0);
 }
 
-int collides_with(int a, int x, int y, int an, int al) {
-  if (y < window[a].y + window[a].al && y + al > window[a].y && x < window[a].x + window[a].an &&
-      x + an > window[a].x)
+int collides_with(int a, int x, int y, int w, int h) {
+  if (y < window[a].y + window[a].h && y + h > window[a].y && x < window[a].x + window[a].w &&
+      x + w > window[a].x)
 
     return (1);
   else
@@ -3161,7 +3161,7 @@ void flush_copy(void) {
   }
 }
 
-void window_surface(int an, int al, byte type) {}
+void window_surface(int w, int h, byte type) {}
 
 
 //-----------------------------------------------------------------------------
@@ -3170,7 +3170,7 @@ void window_surface(int an, int al, byte type) {}
 
 void new_window(voidReturnType init_handler) {
   byte *ptr;
-  int n, m, om, x, y, an, al;
+  int n, m, om, x, y, w, h;
   int vtipo;
   uint32_t colorkey = 0;
   v.exploding = 0;
@@ -3222,8 +3222,8 @@ void new_window(voidReturnType init_handler) {
     v.close_handler = dummy_handler;
     v.x = 0;
     v.y = 0;
-    v.an = vga_width;
-    v.al = vga_height;
+    v.w = vga_width;
+    v.h = vga_height;
     v._an = 0;
     v._al = 0;
     v.state = 0;
@@ -3237,27 +3237,27 @@ void new_window(voidReturnType init_handler) {
     call(init_handler);
 
     if (big) {
-      if (v.an > 0) {
-        v.an = v.an * 2;
-        v.al = v.al * 2;
+      if (v.w > 0) {
+        v.w = v.w * 2;
+        v.h = v.h * 2;
       } else
-        v.an = -v.an;
+        v.w = -v.w;
     }
 
-    an = v.an;
-    al = v.al;
+    w = v.w;
+    h = v.h;
 
     //---------------------------------------------------------------------------
     // Window placement algorithm ...
     //---------------------------------------------------------------------------
 
     if (primera_vez == 2) { // The help window (first time)
-      y = x = vga_width / 2 - an / 2;
+      y = x = vga_width / 2 - w / 2;
     } else if (v.type == 1 || v.type == 7) { // Dialogs are centered
-      x = vga_width / 2 - an / 2;
-      y = vga_height / 2 - al / 2;
+      x = vga_width / 2 - w / 2;
+      y = vga_height / 2 - h / 2;
     } else
-      place_window(v.side * 2 + 1, &x, &y, an, al);
+      place_window(v.side * 2 + 1, &x, &y, w, h);
 
     v.x = x;
     v.y = y;
@@ -3271,18 +3271,18 @@ void new_window(voidReturnType init_handler) {
       for (m = 1; m < max_windows; m++)
         if (window[m].type == v.type && window[m].state) {
           window[m].state = 0;
-          wgra(window[m].ptr, window[m].an / big2, window[m].al / big2, c1, 2, 2,
-               window[m].an / big2 - 20, 7);
-          if (text_len(window[m].title) + 3 > window[m].an / big2 - 20) {
-            wwrite_in_box(window[m].ptr, window[m].an / big2, window[m].an / big2 - 19,
-                          window[m].al / big2, 4, 2, 0, window[m].title, c0);
-            wwrite_in_box(window[m].ptr, window[m].an / big2, window[m].an / big2 - 19,
-                          window[m].al / big2, 3, 2, 0, window[m].title, c2);
+          wgra(window[m].ptr, window[m].w / big2, window[m].h / big2, c1, 2, 2,
+               window[m].w / big2 - 20, 7);
+          if (text_len(window[m].title) + 3 > window[m].w / big2 - 20) {
+            wwrite_in_box(window[m].ptr, window[m].w / big2, window[m].w / big2 - 19,
+                          window[m].h / big2, 4, 2, 0, window[m].title, c0);
+            wwrite_in_box(window[m].ptr, window[m].w / big2, window[m].w / big2 - 19,
+                          window[m].h / big2, 3, 2, 0, window[m].title, c2);
           } else {
-            wwrite(window[m].ptr, window[m].an / big2, window[m].al / big2,
-                   2 + (window[m].an / big2 - 20) / 2, 3, 1, window[m].title, c0);
-            wwrite(window[m].ptr, window[m].an / big2, window[m].al / big2,
-                   2 + (window[m].an / big2 - 20) / 2, 2, 1, window[m].title, c2);
+            wwrite(window[m].ptr, window[m].w / big2, window[m].h / big2,
+                   2 + (window[m].w / big2 - 20) / 2, 3, 1, window[m].title, c0);
+            wwrite(window[m].ptr, window[m].w / big2, window[m].h / big2,
+                   2 + (window[m].w / big2 - 20) / 2, 2, 1, window[m].title, c2);
           }
 
           if (v.type == 102 && (window[m].prg != NULL || window[m].click_handler == calc2) &&
@@ -3313,12 +3313,12 @@ void new_window(voidReturnType init_handler) {
     }
 
     if (!n)
-      ptr = (byte *)malloc(an * al);
+      ptr = (byte *)malloc(w * h);
     else
       ptr = NULL;
 
     if (ptr != NULL) { // Window buffer, freed in close_window
-      window_surface(an, al, 0);
+      window_surface(w, h, 0);
 
       //---------------------------------------------------------------------------
       // Send appropriate windows to the background
@@ -3375,50 +3375,50 @@ void new_window(voidReturnType init_handler) {
 
       v.ptr = ptr;
 
-      memset(ptr, c0, an * al);
+      memset(ptr, c0, w * h);
       if (big) {
-        an /= 2;
-        al /= 2;
+        w /= 2;
+        h /= 2;
       }
 
-      wrectangle(ptr, an, al, c2, 0, 0, an, al);
-      wput(ptr, an, al, an - 9, 2, 35);
+      wrectangle(ptr, w, h, c2, 0, 0, w, h);
+      wput(ptr, w, h, w - 9, 2, 35);
 
       if (v.type == 1) { // Dialogs can't be minimized
-        wgra(ptr, an, al, c_b_low, 2, 2, an - 12, 7);
-        if (text_len(v.title) + 3 > an - 12) {
-          wwrite_in_box(ptr, an, an - 11, al, 4, 2, 0, v.title, c1);
-          wwrite_in_box(ptr, an, an - 11, al, 3, 2, 0, v.title, c4);
+        wgra(ptr, w, h, c_b_low, 2, 2, w - 12, 7);
+        if (text_len(v.title) + 3 > w - 12) {
+          wwrite_in_box(ptr, w, w - 11, h, 4, 2, 0, v.title, c1);
+          wwrite_in_box(ptr, w, w - 11, h, 3, 2, 0, v.title, c4);
         } else {
-          wwrite(ptr, an, al, 3 + (an - 12) / 2, 2, 1, v.title, c1);
-          wwrite(ptr, an, al, 2 + (an - 12) / 2, 2, 1, v.title, c4);
+          wwrite(ptr, w, h, 3 + (w - 12) / 2, 2, 1, v.title, c1);
+          wwrite(ptr, w, h, 2 + (w - 12) / 2, 2, 1, v.title, c4);
         }
       } else if (v.type == 7) { // Progress bar
-        wgra(ptr, an, al, c_b_low, 2, 2, an - 4, 7);
-        if (text_len(v.title) + 3 > an - 4) {
-          wwrite_in_box(ptr, an, an - 3, al, 4, 2, 0, v.title, c1);
-          wwrite_in_box(ptr, an, an - 3, al, 3, 2, 0, v.title, c4);
+        wgra(ptr, w, h, c_b_low, 2, 2, w - 4, 7);
+        if (text_len(v.title) + 3 > w - 4) {
+          wwrite_in_box(ptr, w, w - 3, h, 4, 2, 0, v.title, c1);
+          wwrite_in_box(ptr, w, w - 3, h, 3, 2, 0, v.title, c4);
         } else {
-          wwrite(ptr, an, al, 3 + (an - 4) / 2, 2, 1, v.title, c1);
-          wwrite(ptr, an, al, 2 + (an - 4) / 2, 2, 1, v.title, c4);
+          wwrite(ptr, w, h, 3 + (w - 4) / 2, 2, 1, v.title, c1);
+          wwrite(ptr, w, h, 2 + (w - 4) / 2, 2, 1, v.title, c4);
         }
       } else {
-        wput(ptr, an, al, an - 17, 2, 37);
-        wgra(ptr, an, al, c_b_low, 2, 2, an - 20, 7);
-        if (text_len(v.title) + 3 > an - 20) {
-          wwrite_in_box(ptr, an, an - 19, al, 4, 2, 0, v.title, c1);
-          wwrite_in_box(ptr, an, an - 19, al, 3, 2, 0, v.title, c4);
+        wput(ptr, w, h, w - 17, 2, 37);
+        wgra(ptr, w, h, c_b_low, 2, 2, w - 20, 7);
+        if (text_len(v.title) + 3 > w - 20) {
+          wwrite_in_box(ptr, w, w - 19, h, 4, 2, 0, v.title, c1);
+          wwrite_in_box(ptr, w, w - 19, h, 3, 2, 0, v.title, c4);
         } else {
-          wwrite(ptr, an, al, 3 + (an - 20) / 2, 2, 1, v.title, c1);
-          wwrite(ptr, an, al, 2 + (an - 20) / 2, 2, 1, v.title, c4);
+          wwrite(ptr, w, h, 3 + (w - 20) / 2, 2, 1, v.title, c1);
+          wwrite(ptr, w, h, 2 + (w - 20) / 2, 2, 1, v.title, c4);
         }
       }
 
       call((voidReturnType)v.paint_handler);
 
       if (big) {
-        an *= 2;
-        al *= 2;
+        w *= 2;
+        h *= 2;
       }
 
       if (primera_vez != 1) {
@@ -3427,11 +3427,11 @@ void new_window(voidReturnType init_handler) {
         } while ((mouse_b & 1) || key(_ESC));
         if (exploding_windows) {
           v.exploding = 1;
-          explode(x, y, an, al);
+          explode(x, y, w, h);
           v.exploding = 0;
         }
-        wvolcado(screen_buffer, vga_width, vga_height, ptr, x, y, an, al, 0);
-        blit_partial(x, y, an, al);
+        blit_region(screen_buffer, vga_width, vga_height, ptr, x, y, w, h, 0);
+        blit_partial(x, y, w, h);
       }
 
       //---------------------------------------------------------------------------
@@ -3458,12 +3458,12 @@ void new_window(voidReturnType init_handler) {
         } else { // When the requested menu is already in the foreground, highlight it
           divdelete(0);
           move(0, n - 1);
-          wrectangle(v.ptr, v.an / big2, v.al / big2, c4, 0, 0, v.an / big2, v.al / big2);
+          wrectangle(v.ptr, v.w / big2, v.h / big2, c4, 0, 0, v.w / big2, v.h / big2);
           init_flush();
           flush_window(0);
           retrace_wait();
           flush_copy();
-          wrectangle(v.ptr, v.an / big2, v.al / big2, c2, 0, 0, v.an / big2, v.al / big2);
+          wrectangle(v.ptr, v.w / big2, v.h / big2, c2, 0, 0, v.w / big2, v.h / big2);
           v.redraw = 1;
           retrace_wait();
           retrace_wait();
@@ -3483,7 +3483,7 @@ void new_window(voidReturnType init_handler) {
 
 void init_flush(void);
 
-void explode(int x, int y, int an, int al) {
+void explode(int x, int y, int w, int h) {
   int n = 0, tipo = v.type, b = big;
   int xx, yy, aan, aal;
   v.type = 0;
@@ -3491,17 +3491,17 @@ void explode(int x, int y, int an, int al) {
   if (draw_mode < 100) {
     if (b)
       big = 1;
-    draw_edit_background(x, y, an, al);
+    draw_edit_background(x, y, w, h);
     flush_bars(0);
-    update_dialogs(x, y, an, al);
+    update_dialogs(x, y, w, h);
     big = 0;
   } else
-    update_box(x, y, an, al);
+    update_box(x, y, w, h);
   while (++n < 10) {
-    aan = (an * n) / 10;
-    aal = (al * n) / 10;
-    xx = x + an / 2 - aan / 2;
-    yy = y + al / 2 - aal / 2;
+    aan = (w * n) / 10;
+    aal = (h * n) / 10;
+    xx = x + w / 2 - aan / 2;
+    yy = y + h / 2 - aal / 2;
     wrectangle(screen_buffer, vga_width, vga_height, c4, xx, yy, aan, aal);
     blit_partial(xx, yy, aan, 1);
     blit_partial(xx, yy, 1, aal);
@@ -3528,19 +3528,19 @@ void explode(int x, int y, int an, int al) {
   big = b;
 }
 
-void implode(int x, int y, int an, int al) {
+void implode(int x, int y, int w, int h) {
   int n = 9, b = big;
   int xx = 0, yy = 0, aan = 0, aal = 0;
   big = 0;
   do {
-    aan = (an * n) / 10;
+    aan = (w * n) / 10;
     if (!aan)
       aan = 1;
-    aal = (al * n) / 10;
+    aal = (h * n) / 10;
     if (!aal)
       aal = 1;
-    xx = x + an / 2 - aan / 2;
-    yy = y + al / 2 - aal / 2;
+    xx = x + w / 2 - aan / 2;
+    yy = y + h / 2 - aal / 2;
     wrectangle(screen_buffer, vga_width, vga_height, c4, xx, yy, aan, aal);
     blit_partial(xx, yy, aan, 1);
     blit_partial(xx, yy, 1, aal);
@@ -3566,7 +3566,7 @@ void implode(int x, int y, int an, int al) {
   big = b;
 }
 
-void extrude(int x, int y, int an, int al, int x2, int y2, int an2, int al2) {
+void extrude(int x, int y, int w, int h, int x2, int y2, int w2, int h2) {
   int n = 9, tipo = v.type, b = big;
   int xx, yy, aan, aal;
   v.type = 0;
@@ -3574,15 +3574,15 @@ void extrude(int x, int y, int an, int al, int x2, int y2, int an2, int al2) {
   if (draw_mode < 100) {
     if (b)
       big = 1;
-    draw_edit_background(x, y, an, al);
+    draw_edit_background(x, y, w, h);
     flush_bars(0);
-    update_dialogs(x, y, an, al);
+    update_dialogs(x, y, w, h);
     big = 0;
   } else
-    update_box(x, y, an, al);
+    update_box(x, y, w, h);
   do {
-    aan = (an * n + an2 * (10 - n)) / 10;
-    aal = (al * n + al2 * (10 - n)) / 10;
+    aan = (w * n + w2 * (10 - n)) / 10;
+    aal = (h * n + h2 * (10 - n)) / 10;
     xx = (x * n + x2 * (10 - n)) / 10;
     yy = (y * n + y2 * (10 - n)) / 10;
     wrectangle(screen_buffer, vga_width, vga_height, c4, xx, yy, aan, aal);
@@ -3623,7 +3623,7 @@ void extrude(int x, int y, int an, int al, int x2, int y2, int an2, int al2) {
 void show_dialog(voidReturnType init_handler) {
   int vtipo, _get_pos;
   byte *ptr;
-  int n, m, x, y, an, al;
+  int n, m, x, y, w, h;
   uint32_t colorkey = 0;
 
   if (!window[max_windows - 1].type) {
@@ -3658,8 +3658,8 @@ void show_dialog(voidReturnType init_handler) {
     v.close_handler = dummy_handler;
     v.x = 0;
     v.y = 0;
-    v.an = vga_width;
-    v.al = vga_height;
+    v.w = vga_width;
+    v.h = vga_height;
     v._an = 0;
     v._al = 0;
     v.state = 0;
@@ -3673,29 +3673,29 @@ void show_dialog(voidReturnType init_handler) {
     call((voidReturnType)init_handler);
 
     if (big) {
-      if (v.an > 0) {
-        v.an = v.an * 2;
-        v.al = v.al * 2;
+      if (v.w > 0) {
+        v.w = v.w * 2;
+        v.h = v.h * 2;
       } else
-        v.an = -v.an;
+        v.w = -v.w;
     }
 
-    an = v.an;
-    al = v.al;
-    x = vga_width / 2 - an / 2;
-    y = vga_height / 2 - al / 2;
+    w = v.w;
+    h = v.h;
+    x = vga_width / 2 - w / 2;
+    y = vga_height / 2 - h / 2;
     v.x = x;
     v.y = y;
 
     if (v.click_handler == err2)
       ptr = error_window;
     else
-      ptr = (byte *)malloc(an * al);
+      ptr = (byte *)malloc(w * h);
 
     if (ptr != NULL) { // Window buffer, freed in close_window
-      memset(ptr, 0, an * al);
+      memset(ptr, 0, w * h);
 
-      window_surface(an, al, 1);
+      window_surface(w, h, 1);
 
       //---------------------------------------------------------------------------
       // Send appropriate windows to the background
@@ -3728,33 +3728,33 @@ void show_dialog(voidReturnType init_handler) {
 
       v.ptr = ptr;
 
-      memset(ptr, c0, an * al);
+      memset(ptr, c0, w * h);
       if (big) {
-        an /= 2;
-        al /= 2;
+        w /= 2;
+        h /= 2;
       }
 
-      wrectangle(ptr, an, al, c2, 0, 0, an, al);
+      wrectangle(ptr, w, h, c2, 0, 0, w, h);
 
-      wput(ptr, an, al, an - 9, 2, 35);
+      wput(ptr, w, h, w - 9, 2, 35);
       if (!strcmp((char *)v.title, (char *)texts[41]) ||
           !strcmp((char *)v.title, (char *)texts[367]))
-        wgra(ptr, an, al, c_r_low, 2, 2, an - 12, 7);
+        wgra(ptr, w, h, c_r_low, 2, 2, w - 12, 7);
       else
-        wgra(ptr, an, al, c_b_low, 2, 2, an - 12, 7);
-      if (text_len(v.title) + 3 > an - 12) {
-        wwrite_in_box(ptr, an, an - 11, al, 4, 2, 0, v.title, c1);
-        wwrite_in_box(ptr, an, an - 11, al, 3, 2, 0, v.title, c4);
+        wgra(ptr, w, h, c_b_low, 2, 2, w - 12, 7);
+      if (text_len(v.title) + 3 > w - 12) {
+        wwrite_in_box(ptr, w, w - 11, h, 4, 2, 0, v.title, c1);
+        wwrite_in_box(ptr, w, w - 11, h, 3, 2, 0, v.title, c4);
       } else {
-        wwrite(ptr, an, al, 3 + (an - 12) / 2, 2, 1, v.title, c1);
-        wwrite(ptr, an, al, 2 + (an - 12) / 2, 2, 1, v.title, c4);
+        wwrite(ptr, w, h, 3 + (w - 12) / 2, 2, 1, v.title, c1);
+        wwrite(ptr, w, h, 2 + (w - 12) / 2, 2, 1, v.title, c4);
       }
 
       call((voidReturnType)v.paint_handler);
 
       if (big) {
-        an *= 2;
-        al *= 2;
+        w *= 2;
+        h *= 2;
       }
 
       do {
@@ -3763,11 +3763,11 @@ void show_dialog(voidReturnType init_handler) {
 
       if (exploding_windows) {
         v.exploding = 1;
-        explode(x, y, an, al);
+        explode(x, y, w, h);
         v.exploding = 0;
       }
-      wvolcado(screen_buffer, vga_width, vga_height, ptr, x, y, an, al, 0);
-      blit_partial(x, y, an, al);
+      blit_region(screen_buffer, vga_width, vga_height, ptr, x, y, w, h, 0);
+      blit_partial(x, y, w, h);
       do {
         read_mouse();
       } while (mouse_b & 1);
@@ -3787,24 +3787,24 @@ void show_dialog(voidReturnType init_handler) {
 
 void refresh_dialog(void) {
   byte *ptr = v.ptr;
-  int an = v.an, al = v.al;
-  memset(ptr, c0, an * al);
+  int w = v.w, h = v.h;
+  memset(ptr, c0, w * h);
   if (big) {
-    an /= 2;
-    al /= 2;
+    w /= 2;
+    h /= 2;
   }
-  wrectangle(ptr, an, al, c2, 0, 0, an, al);
-  wput(ptr, an, al, an - 9, 2, 35);
+  wrectangle(ptr, w, h, c2, 0, 0, w, h);
+  wput(ptr, w, h, w - 9, 2, 35);
   if (!strcmp((char *)v.title, (char *)texts[41]))
-    wgra(ptr, an, al, c_r_low, 2, 2, an - 12, 7);
+    wgra(ptr, w, h, c_r_low, 2, 2, w - 12, 7);
   else
-    wgra(ptr, an, al, c_b_low, 2, 2, an - 12, 7);
-  if (text_len(v.title) + 3 > an - 12) {
-    wwrite_in_box(ptr, an, an - 11, al, 4, 2, 0, v.title, c1);
-    wwrite_in_box(ptr, an, an - 11, al, 3, 2, 0, v.title, c4);
+    wgra(ptr, w, h, c_b_low, 2, 2, w - 12, 7);
+  if (text_len(v.title) + 3 > w - 12) {
+    wwrite_in_box(ptr, w, w - 11, h, 4, 2, 0, v.title, c1);
+    wwrite_in_box(ptr, w, w - 11, h, 3, 2, 0, v.title, c4);
   } else {
-    wwrite(ptr, an, al, 3 + (an - 12) / 2, 2, 1, v.title, c1);
-    wwrite(ptr, an, al, 2 + (an - 12) / 2, 2, 1, v.title, c4);
+    wwrite(ptr, w, h, 3 + (w - 12) / 2, 2, 1, v.title, c1);
+    wwrite(ptr, w, h, 2 + (w - 12) / 2, 2, 1, v.title, c4);
   }
 
   call((voidReturnType)v.paint_handler);
@@ -4019,8 +4019,8 @@ void initialization(void) {
       ptr2 += 1352;
 
       while (ptr2 < ptr + n && *((int *)ptr2) < 384) {
-        graf_help[*(int *)ptr2].an = *(int *)(ptr2 + 52);
-        graf_help[*(int *)ptr2].al = *(int *)(ptr2 + 56);
+        graf_help[*(int *)ptr2].w = *(int *)(ptr2 + 52);
+        graf_help[*(int *)ptr2].h = *(int *)(ptr2 + 56);
         graf_help[*(int *)ptr2].offset = (ptr2 - ptr) + 64 + 4 * (*(int *)(ptr2 + 60));
         ptr2 += *(int *)(ptr2 + 52) * *(int *)(ptr2 + 56) + 64 + 4 * (*(int *)(ptr2 + 60));
       }
@@ -4087,7 +4087,7 @@ void initialization(void) {
 
   determine_units();
 
-  inicializa_compilador(); // *** Compiler *** spaces in lower[] set to 00
+  init_compiler(); // *** Compiler *** spaces in lower[] set to 00
   init_lexcolor();
 
   if (!interpreting) {
@@ -4327,13 +4327,13 @@ void _button(int t, int x, int y, int c) {
   v.items++;
 }
 
-void _get(int t, int x, int y, int an, byte *buffer, int lon_buffer, int r0, int r1) {
+void _get(int t, int x, int y, int w, byte *buffer, int lon_buffer, int r0, int r1) {
   v.item[v.items].type = 2;
   v.item[v.items].state = 0;
   v.item[v.items].get.text = texts[t];
   v.item[v.items].get.x = x;
   v.item[v.items].get.y = y;
-  v.item[v.items].get.an = an;
+  v.item[v.items].get.w = w;
   v.item[v.items].get.buffer = buffer;
   v.item[v.items].get.lon_buffer = lon_buffer;
   v.item[v.items].get.r0 = r0;
@@ -4360,7 +4360,7 @@ void _flag(int t, int x, int y, int *valor) {
 void _show_items(void) {
   int n = 0;
   show_items_called = 1;
-  wbox(v.ptr, v.an / big2, v.al / big2, c2, 2, 10, v.an / big2 - 4, v.al / big2 - 12);
+  wbox(v.ptr, v.w / big2, v.h / big2, c2, 2, 10, v.w / big2 - 4, v.h / big2 - 12);
   while (n < v.items) {
     switch (abs(v.item[n].type)) {
     case 1:
@@ -4380,7 +4380,7 @@ void _show_items(void) {
 }
 
 void show_button(struct t_item *i) {
-  wwrite(v.ptr, v.an / big2, v.al / big2, i->button.x, i->button.y, i->button.center,
+  wwrite(v.ptr, v.w / big2, v.h / big2, i->button.x, i->button.y, i->button.center,
          i->button.text, c3);
   if (&v.item[v.selected_item] == i)
     select_button(i, 1);
@@ -4388,54 +4388,54 @@ void show_button(struct t_item *i) {
 
 void select_button(struct t_item *i, int activo) {
   int x = i->button.x, y = i->button.y;
-  int an, al;
-  an = text_len(i->button.text + 1);
-  al = 7;
+  int w, h;
+  w = text_len(i->button.text + 1);
+  h = 7;
   switch (i->button.center) {
   case 0:
     break;
   case 1:
-    x = x - (an >> 1);
+    x = x - (w >> 1);
     break;
   case 2:
-    x = x - an + 1;
+    x = x - w + 1;
     break;
   case 3:
-    y = y - (al >> 1);
+    y = y - (h >> 1);
     break;
   case 4:
-    x = x - (an >> 1);
-    y = y - (al >> 1);
+    x = x - (w >> 1);
+    y = y - (h >> 1);
     break;
   case 5:
-    x = x - an + 1;
-    y = y - (al >> 1);
+    x = x - w + 1;
+    y = y - (h >> 1);
     break;
   case 6:
-    y = y - al + 1;
+    y = y - h + 1;
     break;
   case 7:
-    x = x - (an >> 1);
-    y = y - al + 1;
+    x = x - (w >> 1);
+    y = y - h + 1;
     break;
   case 8:
-    x = x - an + 1;
-    y = y - al + 1;
+    x = x - w + 1;
+    y = y - h + 1;
     break;
   }
   if (activo) {
-    wrectangle(v.ptr, v.an / big2, v.al / big2, c12, x - 4, y - 4, an + 8, al + 8);
+    wrectangle(v.ptr, v.w / big2, v.h / big2, c12, x - 4, y - 4, w + 8, h + 8);
   } else {
-    wrectangle(v.ptr, v.an / big2, v.al / big2, c2, x - 4, y - 4, an + 8, al + 8);
+    wrectangle(v.ptr, v.w / big2, v.h / big2, c2, x - 4, y - 4, w + 8, h + 8);
   }
 }
 
 void show_get(struct t_item *i) {
-  wbox(v.ptr, v.an / big2, v.al / big2, c1, i->get.x, i->get.y + 8, i->get.an, 9);
-  wwrite_in_box(v.ptr, v.an / big2, i->get.an - 1 + i->get.x, v.al / big2, i->get.x + 1,
+  wbox(v.ptr, v.w / big2, v.h / big2, c1, i->get.x, i->get.y + 8, i->get.w, 9);
+  wwrite_in_box(v.ptr, v.w / big2, i->get.w - 1 + i->get.x, v.h / big2, i->get.x + 1,
                 i->get.y + 9, 0, i->get.buffer, c3);
-  wwrite(v.ptr, v.an / big2, v.al / big2, i->get.x + 1, i->get.y, 0, i->get.text, c12);
-  wwrite(v.ptr, v.an / big2, v.al / big2, i->get.x, i->get.y, 0, i->get.text, c3);
+  wwrite(v.ptr, v.w / big2, v.h / big2, i->get.x + 1, i->get.y, 0, i->get.text, c12);
+  wwrite(v.ptr, v.w / big2, v.h / big2, i->get.x, i->get.y, 0, i->get.text, c3);
   if (&v.item[v.selected_item] == i) {
     if (i->state & 2)
       select_get(i, 0, 0);
@@ -4447,7 +4447,7 @@ void select_get(struct t_item *i, int activo, int ocultar_error) {
   char cWork[128];
   int n;
   if (activo) {
-    wrectangle(v.ptr, v.an / big2, v.al / big2, c12, i->get.x - 1, i->get.y + 7, i->get.an + 2, 11);
+    wrectangle(v.ptr, v.w / big2, v.h / big2, c12, i->get.x - 1, i->get.y + 7, i->get.w + 2, 11);
     if (i->state & 2) {
       div_strcpy((char *)get, long_line, (char *)i->get.buffer);
       get_pos = strlen(get);
@@ -4473,10 +4473,10 @@ void select_get(struct t_item *i, int activo, int ocultar_error) {
     i->state &= 1;
 
     if (!superget) {
-      wbox(v.ptr, v.an / big2, v.al / big2, c1, i->get.x, i->get.y + 8, i->get.an, 9);
-      wwrite_in_box(v.ptr, v.an / big2, i->get.an - 1 + i->get.x, v.al / big2, i->get.x + 1,
+      wbox(v.ptr, v.w / big2, v.h / big2, c1, i->get.x, i->get.y + 8, i->get.w, 9);
+      wwrite_in_box(v.ptr, v.w / big2, i->get.w - 1 + i->get.x, v.h / big2, i->get.x + 1,
                     i->get.y + 9, 0, i->get.buffer, c3);
-      wrectangle(v.ptr, v.an / big2, v.al / big2, c2, i->get.x - 1, i->get.y + 7, i->get.an + 2,
+      wrectangle(v.ptr, v.w / big2, v.h / big2, c2, i->get.x - 1, i->get.y + 7, i->get.w + 2,
                  11);
     }
 
@@ -4488,11 +4488,11 @@ void select_get(struct t_item *i, int activo, int ocultar_error) {
 
 void show_flag(struct t_item *i) {
   if (*i->flag.valor)
-    wput(v.ptr, v.an / big2, v.al / big2, i->flag.x, i->flag.y, -59);
+    wput(v.ptr, v.w / big2, v.h / big2, i->flag.x, i->flag.y, -59);
   else
-    wput(v.ptr, v.an / big2, v.al / big2, i->flag.x, i->flag.y, 58);
-  wwrite(v.ptr, v.an / big2, v.al / big2, i->flag.x + 9, i->flag.y, 0, i->flag.text, c12);
-  wwrite(v.ptr, v.an / big2, v.al / big2, i->flag.x + 8, i->flag.y, 0, i->flag.text, c3);
+    wput(v.ptr, v.w / big2, v.h / big2, i->flag.x, i->flag.y, 58);
+  wwrite(v.ptr, v.w / big2, v.h / big2, i->flag.x + 9, i->flag.y, 0, i->flag.text, c12);
+  wwrite(v.ptr, v.w / big2, v.h / big2, i->flag.x + 8, i->flag.y, 0, i->flag.text, c3);
 }
 
 //-----------------------------------------------------------------------------
@@ -4621,42 +4621,42 @@ void _reselect_item(void) {
 
 int button_status(int n) {
   int x = v.item[n].button.x, y = v.item[n].button.y;
-  int an, al, e = 0;
-  an = text_len(v.item[n].button.text + 1);
-  al = 7;
+  int w, h, e = 0;
+  w = text_len(v.item[n].button.text + 1);
+  h = 7;
   switch (v.item[n].button.center) {
   case 0:
     break;
   case 1:
-    x = x - (an >> 1);
+    x = x - (w >> 1);
     break;
   case 2:
-    x = x - an + 1;
+    x = x - w + 1;
     break;
   case 3:
-    y = y - (al >> 1);
+    y = y - (h >> 1);
     break;
   case 4:
-    x = x - (an >> 1);
-    y = y - (al >> 1);
+    x = x - (w >> 1);
+    y = y - (h >> 1);
     break;
   case 5:
-    x = x - an + 1;
-    y = y - (al >> 1);
+    x = x - w + 1;
+    y = y - (h >> 1);
     break;
   case 6:
-    y = y - al + 1;
+    y = y - h + 1;
     break;
   case 7:
-    x = x - (an >> 1);
-    y = y - al + 1;
+    x = x - (w >> 1);
+    y = y - h + 1;
     break;
   case 8:
-    x = x - an + 1;
-    y = y - al + 1;
+    x = x - w + 1;
+    y = y - h + 1;
     break;
   }
-  if (wmouse_in(x - 3, y - 3, an + 6, al + 6))
+  if (wmouse_in(x - 3, y - 3, w + 6, h + 6))
     e = 1;
   if (e && (mouse_b & 1))
     e = 2;
@@ -4673,23 +4673,23 @@ void process_button(int n, int e) {
   }
   switch (e) {
   case 0:
-    wwrite(v.ptr, v.an / big2, v.al / big2, v.item[n].button.x, v.item[n].button.y,
+    wwrite(v.ptr, v.w / big2, v.h / big2, v.item[n].button.x, v.item[n].button.y,
            v.item[n].button.center, v.item[n].button.text, c3);
     break;
   case 1:
     if (v.item[n].state == 2)
       v.active_item = n;
-    wwrite(v.ptr, v.an / big2, v.al / big2, v.item[n].button.x, v.item[n].button.y,
+    wwrite(v.ptr, v.w / big2, v.h / big2, v.item[n].button.x, v.item[n].button.y,
            v.item[n].button.center, v.item[n].button.text, c4);
     break;
     break;
   case 2:
     _select_new_item(n);
-    wwrite(v.ptr, v.an / big2, v.al / big2, v.item[n].button.x, v.item[n].button.y,
+    wwrite(v.ptr, v.w / big2, v.h / big2, v.item[n].button.x, v.item[n].button.y,
            v.item[n].button.center, v.item[n].button.text, c0);
     break;
   case 3:
-    wwrite(v.ptr, v.an / big2, v.al / big2, v.item[n].button.x, v.item[n].button.y,
+    wwrite(v.ptr, v.w / big2, v.h / big2, v.item[n].button.x, v.item[n].button.y,
            v.item[n].button.center, v.item[n].button.text, c0);
     break;
   }
@@ -4701,13 +4701,13 @@ int get_status(int n) {
   int x = v.item[n].state;
   if (strcmp((char *)v.item[n].get.text, "")) {
     if (wmouse_in(v.item[n].get.x, v.item[n].get.y, // bit 0 "hilite"
-                  v.item[n].get.an, 18))
+                  v.item[n].get.w, 18))
       x |= 1;
     else
       x &= 2;
   } else {
     if (wmouse_in(v.item[n].get.x, v.item[n].get.y + 8, // bit 0 "hilite"
-                  v.item[n].get.an, 10))
+                  v.item[n].get.w, 10))
       x |= 1;
     else
       x &= 2;
@@ -4761,12 +4761,12 @@ void process_get(int n, int e) {
   switch (v.item[n].state) {
   case 2:
   case 0:
-    wwrite(v.ptr, v.an / big2, v.al / big2, v.item[n].get.x, v.item[n].get.y, 0, v.item[n].get.text,
+    wwrite(v.ptr, v.w / big2, v.h / big2, v.item[n].get.x, v.item[n].get.y, 0, v.item[n].get.text,
            c3);
     break;
   case 3:
   case 1:
-    wwrite(v.ptr, v.an / big2, v.al / big2, v.item[n].get.x, v.item[n].get.y, 0, v.item[n].get.text,
+    wwrite(v.ptr, v.w / big2, v.h / big2, v.item[n].get.x, v.item[n].get.y, 0, v.item[n].get.text,
            c4);
     break;
   }
@@ -4789,22 +4789,22 @@ void process_flag(int n, int e) {
     v.active_item = n;
   switch (e) {
   case 0:
-    wwrite(v.ptr, v.an / big2, v.al / big2, v.item[n].flag.x + 8, v.item[n].flag.y, 0,
+    wwrite(v.ptr, v.w / big2, v.h / big2, v.item[n].flag.x + 8, v.item[n].flag.y, 0,
            v.item[n].flag.text, c3);
     break;
   case 1:
-    wwrite(v.ptr, v.an / big2, v.al / big2, v.item[n].flag.x + 8, v.item[n].flag.y, 0,
+    wwrite(v.ptr, v.w / big2, v.h / big2, v.item[n].flag.x + 8, v.item[n].flag.y, 0,
            v.item[n].flag.text, c4);
     break;
   case 2:
-    wwrite(v.ptr, v.an / big2, v.al / big2, v.item[n].flag.x + 8, v.item[n].flag.y, 0,
+    wwrite(v.ptr, v.w / big2, v.h / big2, v.item[n].flag.x + 8, v.item[n].flag.y, 0,
            v.item[n].flag.text, c4);
     if (v.item[n].state == 1) {
       v.active_item = n;
       if ((*v.item[n].flag.valor = !*v.item[n].flag.valor))
-        wput(v.ptr, v.an / big2, v.al / big2, v.item[n].flag.x, v.item[n].flag.y, -59);
+        wput(v.ptr, v.w / big2, v.h / big2, v.item[n].flag.x, v.item[n].flag.y, -59);
       else
-        wput(v.ptr, v.an / big2, v.al / big2, v.item[n].flag.x, v.item[n].flag.y, 58);
+        wput(v.ptr, v.w / big2, v.h / big2, v.item[n].flag.x, v.item[n].flag.y, 58);
     }
     break;
   }
@@ -4902,20 +4902,20 @@ void get_input(int n) {
     div_strcat(cwork, sizeof(cwork), " ");
     div_strcat(cwork, sizeof(cwork), get + get_pos);
 
-    if (l > v.item[n].get.an - 8) {
-      scroll = l - (v.item[n].get.an - 8);
+    if (l > v.item[n].get.w - 8) {
+      scroll = l - (v.item[n].get.w - 8);
     } else
       scroll = 0;
 
-    wbox(v.ptr, v.an / big2, v.al / big2, c0, v.item[n].get.x, v.item[n].get.y + 8,
-         v.item[n].get.an, 9);
-    wwrite_in_box(v.ptr + (v.item[n].get.x + 1) * big2, v.an / big2, v.item[n].get.an - 2,
-                  v.al / big2, 0 - scroll, v.item[n].get.y + 9, 0, (byte *)cwork, c4);
+    wbox(v.ptr, v.w / big2, v.h / big2, c0, v.item[n].get.x, v.item[n].get.y + 8,
+         v.item[n].get.w, 9);
+    wwrite_in_box(v.ptr + (v.item[n].get.x + 1) * big2, v.w / big2, v.item[n].get.w - 2,
+                  v.h / big2, 0 - scroll, v.item[n].get.y + 9, 0, (byte *)cwork, c4);
 
     if (*system_clock & 4) {
       x = l + 1;
-      wbox_in_box(v.ptr + (v.item[n].get.x + 1) * big2, v.an / big2, v.item[n].get.an - 2,
-                  v.al / big2, c3, x - scroll, v.item[n].get.y + 9, 2, 7);
+      wbox_in_box(v.ptr + (v.item[n].get.x + 1) * big2, v.w / big2, v.item[n].get.w - 2,
+                  v.h / big2, c3, x - scroll, v.item[n].get.y + 9, 2, 7);
     }
   }
   get_cursor = (*system_clock & 4);
@@ -4927,37 +4927,37 @@ void get_input(int n) {
 
 void deactivate(void) { // Minimize: deactivate
   int m;
-  int an = v.an, al = v.al;
+  int w = v.w, h = v.h;
   if (big) {
-    an /= 2;
-    al /= 2;
+    w /= 2;
+    h /= 2;
   }
 
   if (v.state) {
     v.state = 0;
-    wgra(v.ptr, an, al, c1, 2, 2, an - 20, 7);
-    if (text_len(v.title) + 3 > an - 20) {
-      wwrite_in_box(v.ptr, an, an - 19, al, 4, 2, 0, v.title, c0);
-      wwrite_in_box(v.ptr, an, an - 19, al, 3, 2, 0, v.title, c2);
+    wgra(v.ptr, w, h, c1, 2, 2, w - 20, 7);
+    if (text_len(v.title) + 3 > w - 20) {
+      wwrite_in_box(v.ptr, w, w - 19, h, 4, 2, 0, v.title, c0);
+      wwrite_in_box(v.ptr, w, w - 19, h, 3, 2, 0, v.title, c2);
     } else {
-      wwrite(v.ptr, an, al, 2 + (an - 20) / 2, 3, 1, v.title, c0);
-      wwrite(v.ptr, an, al, 2 + (an - 20) / 2, 2, 1, v.title, c2);
+      wwrite(v.ptr, w, h, 2 + (w - 20) / 2, 3, 1, v.title, c0);
+      wwrite(v.ptr, w, h, 2 + (w - 20) / 2, 2, 1, v.title, c2);
     }
     for (m = 1; m < max_windows; m++)
       if (window[m].type == v.type && window[m].foreground < 2) {
         window[m].state = 1;
-        wgra(window[m].ptr, window[m].an / big2, window[m].al / big2, c_b_low, 2, 2,
-             window[m].an / big2 - 20, 7);
-        if (text_len(window[m].title) + 3 > window[m].an / big2 - 20) {
-          wwrite_in_box(window[m].ptr, window[m].an / big2, window[m].an / big2 - 19,
-                        window[m].al / big2, 4, 2, 0, window[m].title, c1);
-          wwrite_in_box(window[m].ptr, window[m].an / big2, window[m].an / big2 - 19,
-                        window[m].al / big2, 3, 2, 0, window[m].title, c4);
+        wgra(window[m].ptr, window[m].w / big2, window[m].h / big2, c_b_low, 2, 2,
+             window[m].w / big2 - 20, 7);
+        if (text_len(window[m].title) + 3 > window[m].w / big2 - 20) {
+          wwrite_in_box(window[m].ptr, window[m].w / big2, window[m].w / big2 - 19,
+                        window[m].h / big2, 4, 2, 0, window[m].title, c1);
+          wwrite_in_box(window[m].ptr, window[m].w / big2, window[m].w / big2 - 19,
+                        window[m].h / big2, 3, 2, 0, window[m].title, c4);
         } else {
-          wwrite(window[m].ptr, window[m].an / big2, window[m].al / big2,
-                 3 + (window[m].an / big2 - 20) / 2, 2, 1, window[m].title, c1);
-          wwrite(window[m].ptr, window[m].an / big2, window[m].al / big2,
-                 2 + (window[m].an / big2 - 20) / 2, 2, 1, window[m].title, c4);
+          wwrite(window[m].ptr, window[m].w / big2, window[m].h / big2,
+                 3 + (window[m].w / big2 - 20) / 2, 2, 1, window[m].title, c1);
+          wwrite(window[m].ptr, window[m].w / big2, window[m].h / big2,
+                 2 + (window[m].w / big2 - 20) / 2, 2, 1, window[m].title, c4);
         }
         flush_window(m);
         break;
@@ -4972,36 +4972,36 @@ void deactivate(void) { // Minimize: deactivate
  */
 void activate(void) {
   int m;
-  int an = v.an, al = v.al;
+  int w = v.w, h = v.h;
   if (big) {
-    an /= 2;
-    al /= 2;
+    w /= 2;
+    h /= 2;
   }
 
   v.state = 1;
-  wgra(v.ptr, an, al, c_b_low, 2, 2, an - 20, 7);
-  if (text_len(v.title) + 3 > an - 20) {
-    wwrite_in_box(v.ptr, an, an - 19, al, 4, 2, 0, v.title, c1);
-    wwrite_in_box(v.ptr, an, an - 19, al, 3, 2, 0, v.title, c4);
+  wgra(v.ptr, w, h, c_b_low, 2, 2, w - 20, 7);
+  if (text_len(v.title) + 3 > w - 20) {
+    wwrite_in_box(v.ptr, w, w - 19, h, 4, 2, 0, v.title, c1);
+    wwrite_in_box(v.ptr, w, w - 19, h, 3, 2, 0, v.title, c4);
   } else {
-    wwrite(v.ptr, an, al, 3 + (an - 20) / 2, 2, 1, v.title, c1);
-    wwrite(v.ptr, an, al, 2 + (an - 20) / 2, 2, 1, v.title, c4);
+    wwrite(v.ptr, w, h, 3 + (w - 20) / 2, 2, 1, v.title, c1);
+    wwrite(v.ptr, w, h, 2 + (w - 20) / 2, 2, 1, v.title, c4);
   }
   for (m = 1; m < max_windows; m++)
     if (window[m].type == v.type && window[m].state) {
       window[m].state = 0;
-      wgra(window[m].ptr, window[m].an / big2, window[m].al / big2, c1, 2, 2,
-           window[m].an / big2 - 20, 7);
-      if (text_len(window[m].title) + 3 > window[m].an / big2 - 20) {
-        wwrite_in_box(window[m].ptr, window[m].an / big2, window[m].an / big2 - 19,
-                      window[m].al / big2, 4, 2, 0, window[m].title, c0);
-        wwrite_in_box(window[m].ptr, window[m].an / big2, window[m].an / big2 - 19,
-                      window[m].al / big2, 3, 2, 0, window[m].title, c2);
+      wgra(window[m].ptr, window[m].w / big2, window[m].h / big2, c1, 2, 2,
+           window[m].w / big2 - 20, 7);
+      if (text_len(window[m].title) + 3 > window[m].w / big2 - 20) {
+        wwrite_in_box(window[m].ptr, window[m].w / big2, window[m].w / big2 - 19,
+                      window[m].h / big2, 4, 2, 0, window[m].title, c0);
+        wwrite_in_box(window[m].ptr, window[m].w / big2, window[m].w / big2 - 19,
+                      window[m].h / big2, 3, 2, 0, window[m].title, c2);
       } else {
-        wwrite(window[m].ptr, window[m].an / big2, window[m].al / big2,
-               2 + (window[m].an / big2 - 20) / 2, 3, 1, window[m].title, c0);
-        wwrite(window[m].ptr, window[m].an / big2, window[m].al / big2,
-               2 + (window[m].an / big2 - 20) / 2, 2, 1, window[m].title, c2);
+        wwrite(window[m].ptr, window[m].w / big2, window[m].h / big2,
+               2 + (window[m].w / big2 - 20) / 2, 3, 1, window[m].title, c0);
+        wwrite(window[m].ptr, window[m].w / big2, window[m].h / big2,
+               2 + (window[m].w / big2 - 20) / 2, 2, 1, window[m].title, c2);
       }
       if (v.type == 102 && window[m].type == 102) { // Erase cursor
         wup(m);

@@ -636,7 +636,7 @@ void fmt_load_bmp(byte *buffer, byte *mapa, int vent) {
   byte bEOF = 0; // 1 if end of file reached.
   byte *pSrc, *pSrcLine, *pDest;
   byte *AuxPtr;
-  int x, y, fixmap_an, rgb_color, num_colors;
+  int x, y, fixmap_w, rgb_color, num_colors;
   byte rgb_red, rgb_green, rgb_blue, RunLength, pixel;
   byte *old_muestra;
 
@@ -670,9 +670,9 @@ void fmt_load_bmp(byte *buffer, byte *mapa, int vent) {
   pSrc = buffer + FileHeader.bfOffBits;
   pSrcLine = buffer + FileHeader.bfOffBits;
 
-  fixmap_an = map_width;
+  fixmap_w = map_width;
   if (map_width % 4)
-    fixmap_an += 4 - (map_width % 4);
+    fixmap_w += 4 - (map_width % 4);
 
   pDest = mapa;
 
@@ -721,7 +721,7 @@ void fmt_load_bmp(byte *buffer, byte *mapa, int vent) {
       }
     } else {
       for (y = 0; y < map_height; y++) {
-        memcpy(mapa + y * map_width, pSrc + ((map_height - 1) - y) * fixmap_an, map_width);
+        memcpy(mapa + y * map_width, pSrc + ((map_height - 1) - y) * fixmap_w, map_width);
       }
     }
     y = 0;
@@ -791,12 +791,12 @@ void fmt_load_bmp(byte *buffer, byte *mapa, int vent) {
         }
       }
     } else {
-      fixmap_an /= 2;
+      fixmap_w /= 2;
       if (map_width & 1)
-        fixmap_an += 2;
+        fixmap_w += 2;
       for (y = 0; y < map_height; y++) {
-        for (x = 0; x < fixmap_an; x++) {
-          pixel = pSrc[((map_height - 1) - y) * fixmap_an + x];
+        for (x = 0; x < fixmap_w; x++) {
+          pixel = pSrc[((map_height - 1) - y) * fixmap_w + x];
           mapa[y * map_width + x * 2] = (pixel >> 4);
           mapa[y * map_width + x * 2 + 1] = (pixel & 0x0F);
         }
@@ -831,9 +831,9 @@ void fmt_load_bmp(byte *buffer, byte *mapa, int vent) {
       }
 
       // Convert from 24 to 8 bpp
-      fixmap_an = ((map_width * 3) / 4) * 4;
-      if (fixmap_an != map_width * 3)
-        fixmap_an += 4;
+      fixmap_w = ((map_width * 3) / 4) * 4;
+      if (fixmap_w != map_width * 3)
+        fixmap_w += 4;
       for (y = 0; y < map_height; y++) { // For each line...
         pDest = &mapa[map_width * map_height - map_width * (y + 1)];
         pSrc = pSrcLine;
@@ -845,7 +845,7 @@ void fmt_load_bmp(byte *buffer, byte *mapa, int vent) {
           pDest++;
           pSrc += 3;
         }
-        pSrcLine += fixmap_an;
+        pSrcLine += fixmap_w;
       }
 
       // Store coefficients in dac4 (values 0 to 63)
@@ -861,9 +861,9 @@ void fmt_load_bmp(byte *buffer, byte *mapa, int vent) {
 
       // Convert from 24 to 8 bpp
       AuxPtr = pSrc;
-      fixmap_an = ((map_width * 3) / 4) * 4;
-      if (fixmap_an != map_width * 3)
-        fixmap_an += 4;
+      fixmap_w = ((map_width * 3) / 4) * 4;
+      if (fixmap_w != map_width * 3)
+        fixmap_w += 4;
       for (y = 0; y < map_height; y++) { // For each line...
         pSrc = pSrcLine;
         for (x = 0; x < map_width; x++) { // For each pixel...
@@ -874,16 +874,16 @@ void fmt_load_bmp(byte *buffer, byte *mapa, int vent) {
               1;
           pSrc += 3;
         }
-        pSrcLine += fixmap_an;
+        pSrcLine += fixmap_w;
       }
       pSrc = pSrcLine = AuxPtr;
 
       crear_paleta();
 
       // Convert from 24 to 8 bpp
-      fixmap_an = ((map_width * 3) / 4) * 4;
-      if (fixmap_an != map_width * 3)
-        fixmap_an += 4;
+      fixmap_w = ((map_width * 3) / 4) * 4;
+      if (fixmap_w != map_width * 3)
+        fixmap_w += 4;
       for (y = 0; y < map_height; y++) { // For each line...
         pDest = &mapa[map_width * map_height - map_width * (y + 1)];
         pSrc = pSrcLine;
@@ -896,7 +896,7 @@ void fmt_load_bmp(byte *buffer, byte *mapa, int vent) {
           pDest++;
           pSrc += 3;
         }
-        pSrcLine += fixmap_an;
+        pSrcLine += fixmap_w;
       }
 
       free(muestra);
@@ -920,11 +920,11 @@ int fmt_save_bmp(byte *mapa, FILE *f) {
   int x, y = 0;
 
   byte pad[4] = {0, 0, 0, 0};
-  int pad_an = map_width + 4 - (map_width % 4);
+  int pad_w = map_width + 4 - (map_width % 4);
 
   //BITMAPFILEHEADER
   FileHeader.bfType = 0x4D42;
-  FileHeader.bfSize = 1078 + pad_an * map_height;
+  FileHeader.bfSize = 1078 + pad_w * map_height;
   FileHeader.bfReserved1 = 0;
   FileHeader.bfReserved2 = 0;
   FileHeader.bfOffBits = 1078;
@@ -940,7 +940,7 @@ int fmt_save_bmp(byte *mapa, FILE *f) {
   InfoHeader.biPlanes = 1;
   InfoHeader.biBitCount = 8;
   InfoHeader.biCompression = 0;
-  InfoHeader.biSizeImage = pad_an * map_height;
+  InfoHeader.biSizeImage = pad_w * map_height;
   InfoHeader.biXPelsPerMeter = 0;
   InfoHeader.biYPelsPerMeter = 0;
   InfoHeader.biClrUsed = 0;
@@ -965,8 +965,8 @@ int fmt_save_bmp(byte *mapa, FILE *f) {
   fwrite(&Bmpdac, 1024, 1, f);
   for (x = 0; x < map_height; x++) {
     fwrite(mapa + ((map_height - 1) - x) * map_width, 1, map_width, f);
-    if (pad_an != map_width)
-      fwrite(pad, 1, pad_an - map_width, f);
+    if (pad_w != map_width)
+      fwrite(pad, 1, pad_w - map_width, f);
   }
   return (1);
 }

@@ -71,63 +71,63 @@ int spacelen;
 
 void pal_show_text() {
   byte *ptr = v.ptr;
-  int an = v.an, al = v.al, x, y, tal = 24, tan = 41;
+  int w = v.w, h = v.h, x, y, tal = 24, tan = 41;
   if (big) {
     tan *= 2;
     tal *= 2;
   }
   for (y = 0; y < tal; y++)
     for (x = 0; x < tan; x++)
-      ptr[(y * an + x) + ((big ? 86 * 2 : 86) * an + (big ? 64 * 2 : 64))] = Text1[y * tan + x];
+      ptr[(y * w + x) + ((big ? 86 * 2 : 86) * w + (big ? 64 * 2 : 64))] = Text1[y * tan + x];
   for (y = 0; y < tal; y++)
     for (x = 0; x < tan; x++)
-      ptr[(y * an + x) + ((big ? 86 * 2 : 86) * an + (big ? 124 * 2 : 124))] = Text2[y * tan + x];
+      ptr[(y * w + x) + ((big ? 86 * 2 : 86) * w + (big ? 124 * 2 : 124))] = Text2[y * tan + x];
   for (y = 0; y < tal; y++)
     for (x = 0; x < tan; x++)
-      ptr[(y * an + x) + ((big ? 86 * 2 : 86) * an + (big ? 4 * 2 : 4))] = Text3[y * tan + x];
-  wrectangle(ptr, an / big2, al / big2, c0, 4, 86, 41, 24);
-  wrectangle(ptr, an / big2, al / big2, c0, 64, 86, 41, 24);
-  wrectangle(ptr, an / big2, al / big2, c0, 124, 86, 41, 24);
+      ptr[(y * w + x) + ((big ? 86 * 2 : 86) * w + (big ? 4 * 2 : 4))] = Text3[y * tan + x];
+  wrectangle(ptr, w / big2, h / big2, c0, 4, 86, 41, 24);
+  wrectangle(ptr, w / big2, h / big2, c0, 64, 86, 41, 24);
+  wrectangle(ptr, w / big2, h / big2, c0, 124, 86, 41, 24);
   v.redraw = 1;
 }
 
 void Fonts1(void) {
-  int an = v.an / big2, al = v.al / big2;
+  int w = v.w / big2, h = v.h / big2;
   char cWork[10];
   _show_items();
 
   create_listbox(&lfontsizes);
 
-  wbox(v.ptr, an, al, c0, 2, 49, an - 4, 1);    // Upper horizontal line
-  wbox(v.ptr, an, al, c0, 54, 49, 1, 92 - 20);  // Left vertical line
-  wbox(v.ptr, an, al, c0, 114, 49, 1, 92 - 20); // Right vertical line
-  wbox(v.ptr, an, al, c0, 18 + 67, 10, 1, 39);  // Upper-middle vertical line
+  wbox(v.ptr, w, h, c0, 2, 49, w - 4, 1);    // Upper horizontal line
+  wbox(v.ptr, w, h, c0, 54, 49, 1, 92 - 20);  // Left vertical line
+  wbox(v.ptr, w, h, c0, 114, 49, 1, 92 - 20); // Right vertical line
+  wbox(v.ptr, w, h, c0, 18 + 67, 10, 1, 39);  // Upper-middle vertical line
 
-  wbox(v.ptr, an, al, c2, 24 - 8, 61 - 1, 16, 8); // Dark border for Outline
-  wbox(v.ptr, an, al, c2, 84 - 8, 61 - 1, 16, 8); // Dark border for shadow X
-  wbox(v.ptr, an, al, c2, 84 - 8, 75 - 1, 16, 8); // Dark border for shadow Y
+  wbox(v.ptr, w, h, c2, 24 - 8, 61 - 1, 16, 8); // Dark border for Outline
+  wbox(v.ptr, w, h, c2, 84 - 8, 61 - 1, 16, 8); // Dark border for shadow X
+  wbox(v.ptr, w, h, c2, 84 - 8, 75 - 1, 16, 8); // Dark border for shadow Y
 
-  wwrite(v.ptr, an, al, 4 + 60 + 20, 51, 1, texts[86], c3);
-  wwrite(v.ptr, an, al, 24 + 60, 61, 1, (byte *)itoa(OutLine, cWork, 10), c3);
-  wput(v.ptr, an, al, 20 + 60, 75, 220 + OutLineDir);
+  wwrite(v.ptr, w, h, 4 + 60 + 20, 51, 1, texts[86], c3);
+  wwrite(v.ptr, w, h, 24 + 60, 61, 1, (byte *)itoa(OutLine, cWork, 10), c3);
+  wput(v.ptr, w, h, 20 + 60, 75, 220 + OutLineDir);
 
-  wwrite(v.ptr, an, al, 64 + 60 + 20, 51, 1, texts[87], c3);
-  wwrite(v.ptr, an, al, 84 + 60, 61, 1, (byte *)itoa(Somx, cWork, 10), c3);
-  wwrite(v.ptr, an, al, 84 + 60, 75, 1, (byte *)itoa(Somy, cWork, 10), c3);
+  wwrite(v.ptr, w, h, 64 + 60 + 20, 51, 1, texts[87], c3);
+  wwrite(v.ptr, w, h, 84 + 60, 61, 1, (byte *)itoa(Somx, cWork, 10), c3);
+  wwrite(v.ptr, w, h, 84 + 60, 75, 1, (byte *)itoa(Somy, cWork, 10), c3);
 
-  wwrite(v.ptr, an, al, 124 - 120 + 20, 51, 1, texts[91], c3);
+  wwrite(v.ptr, w, h, 124 - 120 + 20, 51, 1, texts[91], c3);
 
-  wwrite(v.ptr, an, al, 4, 12, 0, texts[84], c3);
-  wbox(v.ptr, an, al, c2, 4, 19, 66, 8); // Dark border for Font
-  wwrite(v.ptr, an, al, 4, 19, 0, (byte *)FontName, c4);
-  wwrite(v.ptr, an, al, 4, 31, 0, texts[85], c3);
-  wbox(v.ptr, an, al, c2, 4, 38, 66, 8); // Dark border for Face
-  wwrite(v.ptr, an, al, 4, 38, 0, (byte *)FaceName, c4);
+  wwrite(v.ptr, w, h, 4, 12, 0, texts[84], c3);
+  wbox(v.ptr, w, h, c2, 4, 19, 66, 8); // Dark border for Font
+  wwrite(v.ptr, w, h, 4, 19, 0, (byte *)FontName, c4);
+  wwrite(v.ptr, w, h, 4, 31, 0, texts[85], c3);
+  wbox(v.ptr, w, h, c2, 4, 38, 66, 8); // Dark border for Face
+  wwrite(v.ptr, w, h, 4, 38, 0, (byte *)FaceName, c4);
 
   pal_show_text();
 
-  wbox(v.ptr, an, al, c0, 2, al - 38 - 3, an - 4, 1); // Lower horizontal line
-  wbox(v.ptr, an, al, c0, 2, al - 20, an - 4, 1);     // Lower horizontal line
+  wbox(v.ptr, w, h, c0, 2, h - 38 - 3, w - 4, 1); // Lower horizontal line
+  wbox(v.ptr, w, h, c0, 2, h - 20, w - 4, 1);     // Lower horizontal line
 }
 
 void close_old_fnt(void) {
@@ -142,7 +142,7 @@ void close_old_fnt(void) {
 }
 
 void Fonts2(void) {
-  int an = v.an / big2, al = v.al / big2, x, y, tal = 24, tan = 41;
+  int w = v.w / big2, h = v.h / big2, x, y, tal = 24, tan = 41;
   float px, py;
   char cWork[10];
   if (big) {
@@ -176,55 +176,55 @@ void Fonts2(void) {
   case 4:
     if (--OutLine < 0)
       OutLine = 0;
-    wbox(v.ptr, an, al, c2, 24 - 7 + 60, 61 - 1, 14, 8);
-    wwrite(v.ptr, an, al, 24 + 60, 61, 1, (byte *)itoa(OutLine, cWork, 10), c3);
+    wbox(v.ptr, w, h, c2, 24 - 7 + 60, 61 - 1, 14, 8);
+    wwrite(v.ptr, w, h, 24 + 60, 61, 1, (byte *)itoa(OutLine, cWork, 10), c3);
     v.redraw = 1;
     break;
   case 5:
     if (++OutLine > 99)
       OutLine = 99;
-    wbox(v.ptr, an, al, c2, 24 - 7 + 60, 61 - 1, 14, 8);
-    wwrite(v.ptr, an, al, 24 + 60, 61, 1, (byte *)itoa(OutLine, cWork, 10), c3);
+    wbox(v.ptr, w, h, c2, 24 - 7 + 60, 61 - 1, 14, 8);
+    wwrite(v.ptr, w, h, 24 + 60, 61, 1, (byte *)itoa(OutLine, cWork, 10), c3);
     v.redraw = 1;
     break;
   case 6:
     if (--OutLineDir < 0)
       OutLineDir = 4;
-    wput(v.ptr, an, al, 80, 75, 220 + OutLineDir);
+    wput(v.ptr, w, h, 80, 75, 220 + OutLineDir);
     v.redraw = 1;
     break;
   case 7:
     if (++OutLineDir > 4)
       OutLineDir = 0;
-    wput(v.ptr, an, al, 80, 75, 220 + OutLineDir);
+    wput(v.ptr, w, h, 80, 75, 220 + OutLineDir);
     v.redraw = 1;
     break;
   case 8:
     if (--Somx < -99)
       Somx = -99;
-    wbox(v.ptr, an, al, c2, 84 - 7 + 60, 61 - 1, 14, 8);
-    wwrite(v.ptr, an, al, 84 + 60, 61, 1, (byte *)itoa(Somx, cWork, 10), c3);
+    wbox(v.ptr, w, h, c2, 84 - 7 + 60, 61 - 1, 14, 8);
+    wwrite(v.ptr, w, h, 84 + 60, 61, 1, (byte *)itoa(Somx, cWork, 10), c3);
     v.redraw = 1;
     break;
   case 9:
     if (++Somx > 99)
       Somx = 99;
-    wbox(v.ptr, an, al, c2, 84 - 7 + 60, 61 - 1, 14, 8);
-    wwrite(v.ptr, an, al, 84 + 60, 61, 1, (byte *)itoa(Somx, cWork, 10), c3);
+    wbox(v.ptr, w, h, c2, 84 - 7 + 60, 61 - 1, 14, 8);
+    wwrite(v.ptr, w, h, 84 + 60, 61, 1, (byte *)itoa(Somx, cWork, 10), c3);
     v.redraw = 1;
     break;
   case 10:
     if (--Somy < -99)
       Somy = -99;
-    wbox(v.ptr, an, al, c2, 84 - 7 + 60, 75 - 1, 14, 8);
-    wwrite(v.ptr, an, al, 84 + 60, 75, 1, (byte *)itoa(Somy, cWork, 10), c3);
+    wbox(v.ptr, w, h, c2, 84 - 7 + 60, 75 - 1, 14, 8);
+    wwrite(v.ptr, w, h, 84 + 60, 75, 1, (byte *)itoa(Somy, cWork, 10), c3);
     v.redraw = 1;
     break;
   case 11:
     if (++Somy > 99)
       Somy = 99;
-    wbox(v.ptr, an, al, c2, 84 - 7 + 60, 75 - 1, 14, 8);
-    wwrite(v.ptr, an, al, 84 + 60, 75, 1, (byte *)itoa(Somy, cWork, 10), c3);
+    wbox(v.ptr, w, h, c2, 84 - 7 + 60, 75 - 1, 14, 8);
+    wwrite(v.ptr, w, h, 84 + 60, 75, 1, (byte *)itoa(Somy, cWork, 10), c3);
     v.redraw = 1;
     break;
   case 13:
@@ -450,8 +450,8 @@ void Fonts0(void) {
     tal *= 2;
   }
   v.type = 102;
-  v.an = 169;
-  v.al = 179 - 17;
+  v.w = 169;
+  v.h = 179 - 17;
   v.paint_handler = Fonts1;
   v.click_handler = Fonts2;
   v.close_handler = Fonts3;
@@ -548,11 +548,11 @@ void Fonts0(void) {
   _button(111, 67 + 60, 75, 0); //10
   _button(110, 97 + 60, 75, 0); //11
 
-  _get(80, 4, v.al - (39), v.an - 16 - text_len(texts[113] + 1), (byte *)TestString, 21, 0, 0);
-  _button(113, v.an - 8, v.al - 14 - 18, 2); //14
+  _get(80, 4, v.h - (39), v.w - 16 - text_len(texts[113] + 1), (byte *)TestString, 21, 0, 0);
+  _button(113, v.w - 8, v.h - 14 - 18, 2); //14
 
-  _button(120, 7, v.al - 14, 0);        //13
-  _button(119, v.an - 8, v.al - 14, 2); //12
+  _button(120, 7, v.h - 14, 0);        //13
+  _button(119, v.w - 8, v.h - 14, 2); //12
 
   _flag(112, 64, 112, &Mosaico1);
   _flag(112, 124, 112, &Mosaico2);
@@ -671,7 +671,7 @@ int CreateFont(int GenCode) {
 }
 
 void GetFont() {
-  int an = v.an / big2, al = v.al / big2;
+  int w = v.w / big2, h = v.h / big2;
 
   v_mode = 1;
   v_type = 5;
@@ -695,8 +695,8 @@ void GetFont() {
     if (!IS_PATH_SEP(FontPathName[strlen(FontPathName) - 1]))
       DIV_STRCAT(FontPathName, "/");
     DIV_STRCAT(FontPathName, input);
-    wbox(v.ptr, an, al, c2, 4, 19, 66, 8); // Dark border for Font
-    wwrite(v.ptr, an, al, 4, 19, 0, (byte *)FontName, c4);
+    wbox(v.ptr, w, h, c2, 4, 19, 66, 8); // Dark border for Font
+    wwrite(v.ptr, w, h, 4, 19, 0, (byte *)FontName, c4);
     v.redraw = 1;
   }
 }
@@ -709,7 +709,7 @@ extern t_thumb thumb[max_archivos];
 extern int num_taggeds;
 
 void GetIfs() {
-  int an = v.an / big2, al = v.al / big2;
+  int w = v.w / big2, h = v.h / big2;
   int num;
   FILE *f;
 
@@ -748,8 +748,8 @@ void GetIfs() {
           DIV_STRCAT(FacePathName, input);
         }
       }
-      wbox(v.ptr, an, al, c2, 4, 38, 66, 8); // Dark border for Face
-      wwrite(v.ptr, an, al, 4, 38, 0, (byte *)FaceName, c4);
+      wbox(v.ptr, w, h, c2, 4, 38, 66, 8); // Dark border for Face
+      wwrite(v.ptr, w, h, 4, 38, 0, (byte *)FaceName, c4);
       v.redraw = 1;
     }
   }
@@ -762,25 +762,25 @@ byte PrevColor;
 
 void Selcolor1(void) {
   int x, y;
-  int an = v.an / big2, al = v.al / big2;
+  int w = v.w / big2, h = v.h / big2;
 
   SelColorOk = 0;
   _show_items();
-  wbox(v.ptr, an, al, c0, 2, 10, 128, 128);
+  wbox(v.ptr, w, h, c0, 2, 10, 128, 128);
   for (y = 0; y < 16; y++)
     for (x = 0; x < 16; x++)
-      wbox(v.ptr, an, al, (y * 16 + x), x * 8 + 2, y * 8 + 10, 7, 7);
-  wrectangle(v.ptr, an, al, c4, (SelColorFont % 16) * 8 + 1, (SelColorFont / 16) * 8 + 9, 9, 9);
+      wbox(v.ptr, w, h, (y * 16 + x), x * 8 + 2, y * 8 + 10, 7, 7);
+  wrectangle(v.ptr, w, h, c4, (SelColorFont % 16) * 8 + 1, (SelColorFont / 16) * 8 + 9, 9, 9);
   if (dac[SelColorFont * 3] * dac[SelColorFont * 3 + 1] * dac[SelColorFont * 3 + 2] <
       (32 * 32 * 32))
-    wbox(v.ptr, an, al, c4, (SelColorFont % 16) * 8 + 4, (SelColorFont / 16) * 8 + 12, 3, 3);
+    wbox(v.ptr, w, h, c4, (SelColorFont % 16) * 8 + 4, (SelColorFont / 16) * 8 + 12, 3, 3);
   else
-    wbox(v.ptr, an, al, c0, (SelColorFont % 16) * 8 + 4, (SelColorFont / 16) * 8 + 12, 3, 3);
+    wbox(v.ptr, w, h, c0, (SelColorFont % 16) * 8 + 4, (SelColorFont / 16) * 8 + 12, 3, 3);
   PrevColor = OldColor = SelColorFont;
 }
 
 void Selcolor2(void) {
-  int an = v.an / big2, al = v.al / big2;
+  int w = v.w / big2, h = v.h / big2;
   byte cColor;
 
   _process_items();
@@ -798,27 +798,27 @@ void Selcolor2(void) {
   if ((wmouse_y > 10) && (wmouse_y < 138) && (wmouse_x > 2) && (wmouse_x < 130)) {
     cColor = ((wmouse_y - 10) / 8) * 16 + ((wmouse_x - 2) / 8);
     if (cColor != OldColor) {
-      wrectangle(v.ptr, an, al, c0, (OldColor % 16) * 8 + 1, (OldColor / 16) * 8 + 9, 9, 9);
-      wrectangle(v.ptr, an, al, c4, (cColor % 16) * 8 + 1, (cColor / 16) * 8 + 9, 9, 9);
+      wrectangle(v.ptr, w, h, c0, (OldColor % 16) * 8 + 1, (OldColor / 16) * 8 + 9, 9, 9);
+      wrectangle(v.ptr, w, h, c4, (cColor % 16) * 8 + 1, (cColor / 16) * 8 + 9, 9, 9);
       v.redraw = 1;
       OldColor = cColor;
     }
     if (mouse_b) {
       if (SelColorFont != cColor) {
-        wbox(v.ptr, an, al, SelColorFont, (SelColorFont % 16) * 8 + 4, (SelColorFont / 16) * 8 + 12,
+        wbox(v.ptr, w, h, SelColorFont, (SelColorFont % 16) * 8 + 4, (SelColorFont / 16) * 8 + 12,
              3, 3);
         SelColorFont = cColor;
         if (dac[SelColorFont * 3] + dac[SelColorFont * 3 + 1] + dac[SelColorFont * 3 + 2] <
             (32 + 32 + 32))
-          wbox(v.ptr, an, al, c4, (SelColorFont % 16) * 8 + 4, (SelColorFont / 16) * 8 + 12, 3, 3);
+          wbox(v.ptr, w, h, c4, (SelColorFont % 16) * 8 + 4, (SelColorFont / 16) * 8 + 12, 3, 3);
         else
-          wbox(v.ptr, an, al, c0, (SelColorFont % 16) * 8 + 4, (SelColorFont / 16) * 8 + 12, 3, 3);
+          wbox(v.ptr, w, h, c0, (SelColorFont % 16) * 8 + 4, (SelColorFont / 16) * 8 + 12, 3, 3);
         v.redraw = 1;
       }
     }
   } else {
-    wrectangle(v.ptr, an, al, c0, (OldColor % 16) * 8 + 1, (OldColor / 16) * 8 + 9, 9, 9);
-    wrectangle(v.ptr, an, al, c4, (SelColorFont % 16) * 8 + 1, (SelColorFont / 16) * 8 + 9, 9, 9);
+    wrectangle(v.ptr, w, h, c0, (OldColor % 16) * 8 + 1, (OldColor / 16) * 8 + 9, 9, 9);
+    wrectangle(v.ptr, w, h, c4, (SelColorFont % 16) * 8 + 1, (SelColorFont / 16) * 8 + 9, 9, 9);
     OldColor = SelColorFont;
     v.redraw = 1;
   }
@@ -831,20 +831,20 @@ void Selcolor3(void) {
 
 void Selcolor0(void) {
   v.type = 1; // Dialog
-  v.an = 131;
-  v.al = 157;
+  v.w = 131;
+  v.h = 157;
   v.title = texts[78];
   v.paint_handler = Selcolor1;
   v.click_handler = Selcolor2;
   v.close_handler = Selcolor3;
-  _button(100, 7, v.al - 14, 0);
-  _button(101, v.an - 8, v.al - 14, 2);
+  _button(100, 7, v.h - 14, 0);
+  _button(101, v.w - 8, v.h - 14, 2);
 }
 
 int TamaY = 0, TamaX = 0;
 
 void Preview1() {
-  int can = v.an, cal = v.al;
+  int can = v.w, cal = v.h;
   byte *ptr = v.ptr;
   int init = 0, x, y, len;
   int bancho, balto;
@@ -938,20 +938,20 @@ void Preview0() {
     TX = TamaX;
     TY = TamaY;
   }
-  v.an = TX + 6;
-  if (v.an < 60)
-    v.an = 60;
-  if (v.an > 320)
-    v.an = 320;
-  v.al = TY + 32;
-  if (v.al < 32)
-    v.al = 32;
-  if (v.al > 200)
-    v.al = 200;
+  v.w = TX + 6;
+  if (v.w < 60)
+    v.w = 60;
+  if (v.w > 320)
+    v.w = 320;
+  v.h = TY + 32;
+  if (v.h < 32)
+    v.h = 32;
+  if (v.h > 200)
+    v.h = 200;
   v.paint_handler = Preview1;
   v.click_handler = Preview2;
   v.title = texts[80];
-  _button(100, v.an / 2, v.al - 14, 1);
+  _button(100, v.w / 2, v.h - 14, 1);
 }
 
 void Preview() {
@@ -1001,7 +1001,7 @@ void Preview_2() {
 int GenFontbotones[5] = {1, 1, 1, 1, 0};
 int GenFontLe = 0;
 void GenFont1(void) {
-  int an = v.an / big2, al = v.al / big2;
+  int w = v.w / big2, h = v.h / big2;
   char cWork[4];
 
   _show_items();
@@ -1010,31 +1010,31 @@ void GenFont1(void) {
   FntAncho = atoi(cFntAncho);
   FntAlto = atoi(cFntAlto);
 
-  wwrite(v.ptr, an, al, 4, 12, 0, texts[84], c3);
-  wwrite(v.ptr, an, al, 4, 20, 0, (byte *)FontName, c4);
+  wwrite(v.ptr, w, h, 4, 12, 0, texts[84], c3);
+  wwrite(v.ptr, w, h, 4, 20, 0, (byte *)FontName, c4);
 
-  wwrite(v.ptr, an, al, 4, 36, 0, texts[133], c3);
+  wwrite(v.ptr, w, h, 4, 36, 0, texts[133], c3);
   DIV_SPRINTF(cWork, "%03d", FntAncho);
-  wwrite(v.ptr, an, al, 45, 36, 0, (byte *)cWork, c4);
+  wwrite(v.ptr, w, h, 45, 36, 0, (byte *)cWork, c4);
 
-  wwrite(v.ptr, an, al, 4, 44, 0, texts[134], c3);
+  wwrite(v.ptr, w, h, 4, 44, 0, texts[134], c3);
   DIV_SPRINTF(cWork, "%03d", FntAlto);
-  wwrite(v.ptr, an, al, 45, 44, 0, (byte *)cWork, c4);
+  wwrite(v.ptr, w, h, 45, 44, 0, (byte *)cWork, c4);
 
-  wwrite(v.ptr, an, al, 4, 60, 0, texts[86], c3);
+  wwrite(v.ptr, w, h, 4, 60, 0, texts[86], c3);
   if (OutLine)
-    wwrite(v.ptr, an, al, 45, 60, 0, texts[88], c4);
+    wwrite(v.ptr, w, h, 45, 60, 0, texts[88], c4);
   else
-    wwrite(v.ptr, an, al, 45, 60, 0, texts[89], c4);
+    wwrite(v.ptr, w, h, 45, 60, 0, texts[89], c4);
 
-  wwrite(v.ptr, an, al, 4, 68, 0, texts[87], c3);
+  wwrite(v.ptr, w, h, 4, 68, 0, texts[87], c3);
   if (Somx || Somy)
-    wwrite(v.ptr, an, al, 45, 68, 0, texts[88], c4);
+    wwrite(v.ptr, w, h, 45, 68, 0, texts[88], c4);
   else
-    wwrite(v.ptr, an, al, 45, 68, 0, texts[89], c4);
-  wrectangle(v.ptr, an, al, c0, an - 68, 10, 1, al - 30); //28
+    wwrite(v.ptr, w, h, 45, 68, 0, texts[89], c4);
+  wrectangle(v.ptr, w, h, c0, w - 68, 10, 1, h - 30); //28
 
-  wrectangle(v.ptr, an, al, c0, 2, al - 20, an - 4, 1);
+  wrectangle(v.ptr, w, h, c0, 2, h - 20, w - 4, 1);
 }
 int GenFontRet = 0;
 void GenFont2(void) {
@@ -1067,8 +1067,8 @@ void GenFont3(void) {
 }
 void GenFont0(void) {
   v.type = 1; // Dialog
-  v.an = 169 - 26;
-  v.al = 103;
+  v.w = 169 - 26;
+  v.h = 103;
   v.title = texts[852];
   v.paint_handler = GenFont1;
   v.click_handler = GenFont2;
@@ -1079,12 +1079,12 @@ void GenFont0(void) {
   _flag(116, 82, 43, &GenFontbotones[2]);
   _flag(117, 82, 57, &GenFontbotones[3]);
   _flag(118, 82, 71, &GenFontbotones[4]);
-  _button(100, 7, v.al - 14, 0);
-  _button(101, v.an - 8, v.al - 14, 2);
+  _button(100, 7, v.h - 14, 0);
+  _button(101, v.w - 8, v.h - 14, 2);
   GenFontRet = 0;
 }
 void Preview21() {
-  int can = v.an, cal = v.al;
+  int can = v.w, cal = v.h;
   byte *ptr = v.ptr;
   int init, x, y, len;
   int bancho, balto;
@@ -1182,20 +1182,20 @@ void Preview20() {
     TX = TamaX;
     TY = TamaY;
   }
-  v.an = TX + 6;
-  if (v.an < 60)
-    v.an = 60;
-  if (v.an > 320)
-    v.an = 320;
-  v.al = TY + 32;
-  if (v.al < 32)
-    v.al = 32;
-  if (v.al > 200)
-    v.al = 200;
+  v.w = TX + 6;
+  if (v.w < 60)
+    v.w = 60;
+  if (v.w > 320)
+    v.w = 320;
+  v.h = TY + 32;
+  if (v.h < 32)
+    v.h = 32;
+  if (v.h > 200)
+    v.h = 200;
   v.paint_handler = Preview21;
   v.click_handler = Preview22;
   v.title = texts[98];
-  _button(100, v.an / 2, v.al - 14, 1);
+  _button(100, v.w / 2, v.h - 14, 1);
 }
 /////////////////////////////////////////////////////////////////////////////
 
@@ -1247,9 +1247,9 @@ void create_test_text(char *s, char flags) {
 }
 
 void ShowFont1(void) {
-  int an = v.an / big2, al = v.al / big2;
+  int w = v.w / big2, h = v.h / big2;
   int ancho_w = 101, alto_w = 22;
-  int ancho, alto, pos;
+  int width, height, pos;
   char cWork[32];
 
   int n, m, init, x, y, len;
@@ -1258,9 +1258,9 @@ void ShowFont1(void) {
   char CopiaMiTabladeLetras[256];
   float coefredy, coefredx, a, b;
 
-  wbox(v.ptr, an, al, c2, 2, 10, an - 4, al - 12);
-  wbox(v.ptr, an, al, c1, 2, 10, ancho_w, alto_w);
-  wbox(v.ptr, an, al, c0, 2, 32, ancho_w, 1);
+  wbox(v.ptr, w, h, c2, 2, 10, w - 4, h - 12);
+  wbox(v.ptr, w, h, c1, 2, 10, ancho_w, alto_w);
+  wbox(v.ptr, w, h, c0, 2, 32, ancho_w, 1);
 
   DIV_STRCPY(cWork, "");
   if (v.aux[1352 + RES_FOR_NAME] & NUM)
@@ -1274,7 +1274,7 @@ void ShowFont1(void) {
   if (v.aux[1352 + RES_FOR_NAME] & EXT)
     DIV_STRCAT(cWork, (char *)texts[170]);
 
-  wwrite(v.ptr, an, al, an / 2 + 2, 34, 1, (byte *)cWork, c4);
+  wwrite(v.ptr, w, h, w / 2 + 2, 34, 1, (byte *)cWork, c4);
 
   memcpy(CopiaMiTabladeLetras, MiTabladeLetras, 256);
 
@@ -1340,49 +1340,49 @@ void ShowFont1(void) {
       coefredy = coefredx;
     else
       coefredx = coefredy;
-    ancho = (float)TamaX / coefredx + 0.5;
-    alto = (float)TamaY / coefredy + 0.5;
+    width = (float)TamaX / coefredx + 0.5;
+    height = (float)TamaY / coefredy + 0.5;
 
-    ancho *= 2;
-    alto *= 2;
+    width *= 2;
+    height *= 2;
     coefredx /= 2;
     coefredy /= 2;
 
-    if ((temp2 = (byte *)malloc(ancho * alto)) == NULL) {
+    if ((temp2 = (byte *)malloc(width * height)) == NULL) {
       free(temp);
       return;
     }
 
     a = coefredy / 2.0;
-    for (y = 0; y < alto; y++) {
+    for (y = 0; y < height; y++) {
       b = coefredx / 2.0;
-      for (x = 0; x < ancho; x++) {
-        temp2[y * ancho + x] = temp[((memptrsize)a) * TamaX + (memptrsize)b];
+      for (x = 0; x < width; x++) {
+        temp2[y * width + x] = temp[((memptrsize)a) * TamaX + (memptrsize)b];
         b += coefredx;
       }
       a += coefredy;
     }
 
-    pos = ((big2 * 2) + (big2 * 10) * v.an) + ((ancho_w * big2) - (ancho / 2)) / 2 +
-          (((alto_w * big2) - (alto / 2)) / 2) * v.an;
+    pos = ((big2 * 2) + (big2 * 10) * v.w) + ((ancho_w * big2) - (width / 2)) / 2 +
+          (((alto_w * big2) - (height / 2)) / 2) * v.w;
 
-    for (y = 0; y < alto; y += 2) {
-      for (x = 0; x < ancho; x += 2) {
-        n = *(ghost + temp2[x + y * ancho] * 256 + temp2[x + 1 + y * ancho]);
-        m = *(ghost + temp2[x + (y + 1) * ancho] * 256 + temp2[x + 1 + (y + 1) * ancho]);
-        v.ptr[x / 2 + (y / 2) * v.an + pos] = *(ghost + n * 256 + m);
+    for (y = 0; y < height; y += 2) {
+      for (x = 0; x < width; x += 2) {
+        n = *(ghost + temp2[x + y * width] * 256 + temp2[x + 1 + y * width]);
+        m = *(ghost + temp2[x + (y + 1) * width] * 256 + temp2[x + 1 + (y + 1) * width]);
+        v.ptr[x / 2 + (y / 2) * v.w + pos] = *(ghost + n * 256 + m);
       }
     }
     free(temp2);
   } else {
-    ancho = TamaX;
-    alto = TamaY;
-    pos = ((big2 * 2) + (big2 * 10) * v.an) + ((ancho_w * big2) - ancho) / 2 +
-          (((alto_w * big2) - alto) / 2) * v.an;
+    width = TamaX;
+    height = TamaY;
+    pos = ((big2 * 2) + (big2 * 10) * v.w) + ((ancho_w * big2) - width) / 2 +
+          (((alto_w * big2) - height) / 2) * v.w;
 
-    for (y = 0; y < alto; y++) {
-      for (x = 0; x < ancho; x++) {
-        v.ptr[y * v.an + x + pos] = temp[y * ancho + x];
+    for (y = 0; y < height; y++) {
+      for (x = 0; x < width; x++) {
+        v.ptr[y * v.w + x + pos] = temp[y * width + x];
       }
     }
   }
@@ -1406,8 +1406,8 @@ void ShowFont0(void) {
   FILE *file;
   int Length;
   v.type = 104;
-  v.an = 105;
-  v.al = 44;
+  v.w = 105;
+  v.h = 44;
 
   v.paint_handler = ShowFont1;
   v.click_handler = ShowFont2;
@@ -1567,17 +1567,17 @@ void GetText2(void) {
 }
 void GetText0(void) {
   v.type = 1;
-  v.an = 220 + 6;
-  v.al = 64 - 14;
+  v.w = 220 + 6;
+  v.h = 64 - 14;
   v.title = texts[855] + 1;
   v.name = texts[855] + 1;
 
   v.paint_handler = GetText1;
   v.click_handler = GetText2;
   DIV_STRCPY(cCharsToPrint, "");
-  _get(161, 4, 12, v.an - 8, (byte *)cCharsToPrint, 128, 0, 0);
-  _button(100, 7, v.al - 14, 0);
-  _button(101, v.an - 8, v.al - 14, 2);
+  _get(161, 4, 12, v.w - 8, (byte *)cCharsToPrint, 128, 0, 0);
+  _button(100, 7, v.h - 14, 0);
+  _button(101, v.w - 8, v.h - 14, 2);
   v_accept = 0;
 }
 
@@ -1661,7 +1661,7 @@ void CreateText() {
   // 7 - Call the paint handler to refresh the window and blit it
 
   call((voidReturnType)v.paint_handler);
-  wvolcado(screen_buffer, vga_width, vga_height, v.ptr, v.x, v.y, v.an, v.al, 0);
+  blit_region(screen_buffer, vga_width, vga_height, v.ptr, v.x, v.y, v.w, v.h, 0);
 }
 
 int Save_Font_session(FILE *file, int n) {
@@ -1724,8 +1724,8 @@ void Load_Font_session(FILE *file) {
     tal *= 2;
   }
   v.type = 102;
-  v.an = 169;
-  v.al = 179 - 17;
+  v.w = 169;
+  v.h = 179 - 17;
   v.paint_handler = Fonts1;
   v.click_handler = Fonts2;
   v.close_handler = Fonts3;
@@ -1875,11 +1875,11 @@ void Load_Font_session(FILE *file) {
   _button(111, 67 + 60, 75, 0); //10
   _button(110, 97 + 60, 75, 0); //11
 
-  _get(80, 4, v.al - (39), v.an - 16 - text_len(texts[113] + 1), (byte *)TestString, 21, 0, 0);
-  _button(113, v.an - 8, v.al - 14 - 18, 2); //14
+  _get(80, 4, v.h - (39), v.w - 16 - text_len(texts[113] + 1), (byte *)TestString, 21, 0, 0);
+  _button(113, v.w - 8, v.h - 14 - 18, 2); //14
 
-  _button(120, 7, v.al - 14, 0);        //13
-  _button(119, v.an - 8, v.al - 14, 2); //12
+  _button(120, 7, v.h - 14, 0);        //13
+  _button(119, v.w - 8, v.h - 14, 2); //12
 
   _flag(112, 64, 112, &Mosaico1);
   _flag(112, 124, 112, &Mosaico2);

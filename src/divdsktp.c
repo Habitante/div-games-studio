@@ -40,7 +40,7 @@ void calc0(void);
 extern int helpidx[4096];            // For each term {offset,length}
 extern int help_item;                // Which term help is requested for
 extern int help_len;                 // Length of help_buffer
-extern int help_an, help_al;         // Width and height of the help window
+extern int help_w, help_h;         // Width and height of the help window
 extern int help_l, help_lines;       // Current line, and total lines
 extern byte help_title[128];         // Title of the term
 extern byte *help_buffer, *h_buffer; // Buffer to hold help content, auxiliary
@@ -166,7 +166,7 @@ void DownLoad_Desktop() {
             iWork = 2;
             n = fwrite(&iWork, 1, 4, desktop);
             n = fwrite(&help_item, 1, 4, desktop);
-            n = fwrite(&help_al, 1, 4, desktop);
+            n = fwrite(&help_h, 1, 4, desktop);
             n = fwrite(&help_l, 1, 4, desktop);
           }
         }
@@ -351,7 +351,7 @@ int UpLoad_Desktop() {
       memcpy((char *)v.mapa->puntos, (char *)maux.puntos, 512 * 2);
       // Graphic data
       call((voidReturnType)v.paint_handler);
-      wvolcado(screen_buffer, vga_width, vga_height, v.ptr, v.x, v.y, v.an, v.al, 0);
+      blit_region(screen_buffer, vga_width, vga_height, v.ptr, v.x, v.y, v.w, v.h, 0);
       if (!interpreting)
         update_box(0, 0, vga_width, vga_height);
       break;
@@ -366,7 +366,7 @@ int UpLoad_Desktop() {
         if (v_aux != NULL) {
           memcpy(v_aux, &faux, sizeof(FPG));
           create_saved_window(FPG0A, window_aux.x, window_aux.y);
-          wvolcado(screen_buffer, vga_width, vga_height, v.ptr, v.x, v.y, v.an, v.al, 0);
+          blit_region(screen_buffer, vga_width, vga_height, v.ptr, v.x, v.y, v.w, v.h, 0);
           if (!interpreting)
             update_box(0, 0, vga_width, vga_height);
         }
@@ -387,7 +387,7 @@ int UpLoad_Desktop() {
 
           create_saved_window(carga_programa0, window_aux.x, window_aux.y);
 
-          wvolcado(screen_buffer, vga_width, vga_height, v.ptr, v.x, v.y, v.an, v.al, 0);
+          blit_region(screen_buffer, vga_width, vga_height, v.ptr, v.x, v.y, v.w, v.h, 0);
           if (!interpreting)
             update_box(0, 0, vga_width, vga_height);
         }
@@ -452,7 +452,7 @@ int UpLoad_Desktop() {
       if ((f = fopen(Load_FontPathName, "rb")) != NULL) {
         fclose(f);
         create_saved_window(ShowFont0, window_aux.x, window_aux.y);
-        wvolcado(screen_buffer, vga_width, vga_height, v.ptr, v.x, v.y, v.an, v.al, 0);
+        blit_region(screen_buffer, vga_width, vga_height, v.ptr, v.x, v.y, v.w, v.h, 0);
         if (!interpreting)
           update_box(0, 0, vga_width, vga_height);
       }
@@ -484,7 +484,7 @@ int UpLoad_Desktop() {
 
 int create_saved_window(voidReturnType init_handler, int nx, int ny) {
   byte *ptr;
-  int n, m, x, y, an, al;
+  int n, m, x, y, w, h;
   int vtipo;
 
   uint32_t colorkey = 0;
@@ -506,8 +506,8 @@ int create_saved_window(voidReturnType init_handler, int nx, int ny) {
     v.close_handler = dummy_handler;
     v.x = 0;
     v.y = 0;
-    v.an = vga_width;
-    v.al = vga_height;
+    v.w = vga_width;
+    v.h = vga_height;
     v._an = 0;
     v._al = 0;
     v.state = 0;
@@ -520,15 +520,15 @@ int create_saved_window(voidReturnType init_handler, int nx, int ny) {
     call((voidReturnType)init_handler);
 
     if (big) {
-      if (v.an > 0) {
-        v.an = v.an * 2;
-        v.al = v.al * 2;
+      if (v.w > 0) {
+        v.w = v.w * 2;
+        v.h = v.h * 2;
       } else
-        v.an = -v.an;
+        v.w = -v.w;
     }
 
-    an = v.an;
-    al = v.al;
+    w = v.w;
+    h = v.h;
 
     //---------------------------------------------------------------------------
     // Window placement algorithm ...
@@ -538,7 +538,7 @@ int create_saved_window(voidReturnType init_handler, int nx, int ny) {
       x = nx;
       y = ny;
     } else
-      place_window(v.side * 2 + 1, &x, &y, an, al);
+      place_window(v.side * 2 + 1, &x, &y, w, h);
 
     v.x = x;
     v.y = y;
@@ -553,18 +553,18 @@ int create_saved_window(voidReturnType init_handler, int nx, int ny) {
         for (m = 1; m < max_windows; m++)
           if (window[m].type == v.type && window[m].state) {
             window[m].state = 0;
-            wgra(window[m].ptr, window[m].an / big2, window[m].al / big2, c1, 2, 2,
-                 window[m].an / big2 - 20, 7);
-            if (text_len(window[m].title) + 3 > window[m].an / big2 - 20) {
-              wwrite_in_box(window[m].ptr, window[m].an / big2, window[m].an / big2 - 19,
-                            window[m].al / big2, 4, 2, 0, window[m].title, c0);
-              wwrite_in_box(window[m].ptr, window[m].an / big2, window[m].an / big2 - 19,
-                            window[m].al / big2, 3, 2, 0, window[m].title, c2);
+            wgra(window[m].ptr, window[m].w / big2, window[m].h / big2, c1, 2, 2,
+                 window[m].w / big2 - 20, 7);
+            if (text_len(window[m].title) + 3 > window[m].w / big2 - 20) {
+              wwrite_in_box(window[m].ptr, window[m].w / big2, window[m].w / big2 - 19,
+                            window[m].h / big2, 4, 2, 0, window[m].title, c0);
+              wwrite_in_box(window[m].ptr, window[m].w / big2, window[m].w / big2 - 19,
+                            window[m].h / big2, 3, 2, 0, window[m].title, c2);
             } else {
-              wwrite(window[m].ptr, window[m].an / big2, window[m].al / big2,
-                     2 + (window[m].an / big2 - 20) / 2, 3, 1, window[m].title, c0);
-              wwrite(window[m].ptr, window[m].an / big2, window[m].al / big2,
-                     2 + (window[m].an / big2 - 20) / 2, 2, 1, window[m].title, c2);
+              wwrite(window[m].ptr, window[m].w / big2, window[m].h / big2,
+                     2 + (window[m].w / big2 - 20) / 2, 3, 1, window[m].title, c0);
+              wwrite(window[m].ptr, window[m].w / big2, window[m].h / big2,
+                     2 + (window[m].w / big2 - 20) / 2, 2, 1, window[m].title, c2);
             }
             vtipo = v.type;
             v.type = 0;
@@ -578,7 +578,7 @@ int create_saved_window(voidReturnType init_handler, int nx, int ny) {
     //---------------------------------------------------------------------------
     // Check that if it's a menu it hasn't already been created
     //---------------------------------------------------------------------------
-    if ((ptr = (byte *)malloc(an * al)) != NULL) { // Window buffer, freed in close_window
+    if ((ptr = (byte *)malloc(w * h)) != NULL) { // Window buffer, freed in close_window
 
       //---------------------------------------------------------------------------
       // Send overlapping windows to background as needed
@@ -587,8 +587,8 @@ int create_saved_window(voidReturnType init_handler, int nx, int ny) {
       v.type = 0;
 
       if (!VidModeChanged) {
-        swap(v.an, window_aux.an);
-        swap(v.al, window_aux.al);
+        swap(v.w, window_aux.w);
+        swap(v.h, window_aux.h);
         for (n = 1; n < max_windows; n++) {
           if (window[n].type && window[n].foreground == 1) {
             if (windows_collide(0, n)) {
@@ -597,8 +597,8 @@ int create_saved_window(voidReturnType init_handler, int nx, int ny) {
             }
           }
         }
-        swap(v.an, window_aux.an);
-        swap(v.al, window_aux.al);
+        swap(v.w, window_aux.w);
+        swap(v.h, window_aux.h);
       } else {
         for (n = 1; n < max_windows; n++) {
           if (window[n].type && window[n].foreground == 1) {
@@ -617,25 +617,25 @@ int create_saved_window(voidReturnType init_handler, int nx, int ny) {
 
       v.ptr = ptr;
 
-      window_surface(an, al, 0);
+      window_surface(w, h, 0);
 
-      memset(ptr, c0, an * al);
+      memset(ptr, c0, w * h);
       if (big) {
-        an /= 2;
-        al /= 2;
+        w /= 2;
+        h /= 2;
       }
 
-      wrectangle(ptr, an, al, c2, 0, 0, an, al);
+      wrectangle(ptr, w, h, c2, 0, 0, w, h);
 
-      wput(ptr, an, al, an - 9, 2, 35);
-      wput(ptr, an, al, an - 17, 2, 37);
-      wgra(ptr, an, al, c_b_low, 2, 2, an - 20, 7);
-      if (text_len(v.title) + 3 > an - 20) {
-        wwrite_in_box(ptr, an, an - 19, al, 4, 2, 0, v.title, c1);
-        wwrite_in_box(ptr, an, an - 19, al, 3, 2, 0, v.title, c4);
+      wput(ptr, w, h, w - 9, 2, 35);
+      wput(ptr, w, h, w - 17, 2, 37);
+      wgra(ptr, w, h, c_b_low, 2, 2, w - 20, 7);
+      if (text_len(v.title) + 3 > w - 20) {
+        wwrite_in_box(ptr, w, w - 19, h, 4, 2, 0, v.title, c1);
+        wwrite_in_box(ptr, w, w - 19, h, 3, 2, 0, v.title, c4);
       } else {
-        wwrite(ptr, an, al, 3 + (an - 20) / 2, 2, 1, v.title, c1);
-        wwrite(ptr, an, al, 2 + (an - 20) / 2, 2, 1, v.title, c4);
+        wwrite(ptr, w, h, 3 + (w - 20) / 2, 2, 1, v.title, c1);
+        wwrite(ptr, w, h, 2 + (w - 20) / 2, 2, 1, v.title, c4);
       }
 
       call((voidReturnType)v.paint_handler);
@@ -643,8 +643,8 @@ int create_saved_window(voidReturnType init_handler, int nx, int ny) {
       if (!VidModeChanged) {
         v.foreground = window_aux.foreground;
         v.state = window_aux.state;
-        v.an = window_aux.an;
-        v.al = window_aux.al;
+        v.w = window_aux.w;
+        v.h = window_aux.h;
         v._x = window_aux._x;
         v._y = window_aux._y;
         v._an = window_aux._an;
@@ -652,42 +652,42 @@ int create_saved_window(voidReturnType init_handler, int nx, int ny) {
       }
 
       if (v.type >= 100 && v.state == 0) {
-        wgra(v.ptr, an, al, c1, 2, 2, an - 20, 7);
-        if (text_len(v.title) + 3 > an - 20) {
-          wwrite_in_box(v.ptr, an, an - 19, al, 4, 2, 0, v.title, c0);
-          wwrite_in_box(v.ptr, an, an - 19, al, 3, 2, 0, v.title, c2);
+        wgra(v.ptr, w, h, c1, 2, 2, w - 20, 7);
+        if (text_len(v.title) + 3 > w - 20) {
+          wwrite_in_box(v.ptr, w, w - 19, h, 4, 2, 0, v.title, c0);
+          wwrite_in_box(v.ptr, w, w - 19, h, 3, 2, 0, v.title, c2);
         } else {
-          wwrite(v.ptr, an, al, 2 + (an - 20) / 2, 3, 1, v.title, c0);
-          wwrite(v.ptr, an, al, 2 + (an - 20) / 2, 2, 1, v.title, c2);
+          wwrite(v.ptr, w, h, 2 + (w - 20) / 2, 3, 1, v.title, c0);
+          wwrite(v.ptr, w, h, 2 + (w - 20) / 2, 2, 1, v.title, c2);
         }
       }
 
       if (big) {
-        an *= 2;
-        al *= 2;
+        w *= 2;
+        h *= 2;
       }
 
       if (!interpreting && exploding_windows) {
         if (v.foreground == 2) {
           v.exploding = 1;
-          explode(v.x, v.y, v.an, v.al);
+          explode(v.x, v.y, v.w, v.h);
           v.exploding = 0;
         } else {
           v.exploding = 1;
-          explode(x, y, an, al);
+          explode(x, y, w, h);
           v.exploding = 0;
         }
       }
 
       if (v.foreground != 2) {
         if (v.foreground == 1)
-          wvolcado(screen_buffer, vga_width, vga_height, ptr, x, y, an, al, 0);
+          blit_region(screen_buffer, vga_width, vga_height, ptr, x, y, w, h, 0);
         else
-          wvolcado_oscuro(screen_buffer, vga_width, vga_height, ptr, x, y, an, al, 0);
-        blit_partial(x, y, an, al);
+          blit_region_dark(screen_buffer, vga_width, vga_height, ptr, x, y, w, h, 0);
+        blit_partial(x, y, w, h);
       } else {
         flush_window(0);
-        blit_partial(v.x, v.y, v.an, v.al);
+        blit_partial(v.x, v.y, v.w, v.h);
       }
 
       //---------------------------------------------------------------------------
@@ -751,32 +751,32 @@ void carga_programa0(void) {
 
   v.prg = v_prg;
 
-  if (v.prg->an < 4 * big2)
-    v.prg->an = 4 * big2;
-  if (v.prg->al < 2 * big2)
-    v.prg->al = 2 * big2;
+  if (v.prg->w < 4 * big2)
+    v.prg->w = 4 * big2;
+  if (v.prg->h < 2 * big2)
+    v.prg->h = 2 * big2;
 
-  v.an = (4 + 8) * big2 + editor_font_width * v_prg->an;
-  v.al = (12 + 16) * big2 + editor_font_height * v_prg->al;
+  v.w = (4 + 8) * big2 + editor_font_width * v_prg->w;
+  v.h = (12 + 16) * big2 + editor_font_height * v_prg->h;
 
-  if (v.an > vga_width) {
-    v.prg->an = (vga_width - 12 * big2) / editor_font_width; // Calculate maximized size (in chars)
-    v.an = (4 + 8) * big2 + editor_font_width * v.prg->an;
-    window_aux.an = v.an;
+  if (v.w > vga_width) {
+    v.prg->w = (vga_width - 12 * big2) / editor_font_width; // Calculate maximized size (in chars)
+    v.w = (4 + 8) * big2 + editor_font_width * v.prg->w;
+    window_aux.w = v.w;
   }
 
-  if (v.al > vga_height) {
-    v.prg->al = (vga_height - 28 * big2) / editor_font_height;
-    v.al = (12 + 16) * big2 + editor_font_height * v.prg->al;
-    window_aux.al = v.al;
+  if (v.h > vga_height) {
+    v.prg->h = (vga_height - 28 * big2) / editor_font_height;
+    v.h = (12 + 16) * big2 + editor_font_height * v.prg->h;
+    window_aux.h = v.h;
   }
 
   if (big) {
-    if (v.an & 1)
-      v.an++;
-    if (v.al & 1)
-      v.al++;
-    v.an = -v.an; // Negative signals that the window should not be doubled
+    if (v.w & 1)
+      v.w++;
+    if (v.h & 1)
+      v.h++;
+    v.w = -v.w; // Negative signals that the window should not be doubled
   }
 
   v.title = (byte *)v_prg->filename;
@@ -828,18 +828,18 @@ void carga_help(int n, int helpal, int helpline, int x1, int x2) {
             p++;
           *p = 0;
           div_strcpy((char *)help_title, sizeof(help_title), (char *)h_buffer);
-          help_an = (vga_width - 12 * big2 - 1) / font_width;
-          if (help_an > 120)
-            help_an = 120;
-          help_al = (vga_height / 2 - 12 * big2 - 1) / font_height;
-          help_al = helpal;
+          help_w = (vga_width - 12 * big2 - 1) / font_width;
+          if (help_w > 120)
+            help_w = 120;
+          help_h = (vga_height / 2 - 12 * big2 - 1) / font_height;
+          help_h = helpal;
 
           help_l = 0;
           tabula_help(p + 1, help_buffer, helpidx[n * 2 + 1] - (p + 1 - h_buffer));
           create_saved_window(help0, x1, x2);
 
           for (n = 0; n < helpline; n++) {
-            if (help_l + help_al < help_lines) {
+            if (help_l + help_h < help_lines) {
               while (*(help_line++))
                 ;
               help_l++;
@@ -847,14 +847,14 @@ void carga_help(int n, int helpal, int helpline, int x1, int x2) {
           }
 
           if (v.foreground == 2) {
-            swap(v.an, v._an);
-            swap(v.al, v._al);
+            swap(v.w, v._an);
+            swap(v.h, v._al);
           }
           vuelca_help();
           barra_vertical();
           if (v.foreground == 2) {
-            swap(v.an, v._an);
-            swap(v.al, v._al);
+            swap(v.w, v._an);
+            swap(v.h, v._al);
           }
 
           flush_window(0);

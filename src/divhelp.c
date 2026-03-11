@@ -12,7 +12,7 @@ extern int primera_vez;
 int helpidx[4096];        // Per topic: {offset, length}
 int help_item;            // Which topic help is requested for
 int help_len;             // Length of help_buffer
-int help_an, help_al;     // Width and height of the help window
+int help_w, help_h;     // Width and height of the help window
 int help_l, help_lines;   // Current line, and total lines
 byte help_title[128];     // Topic title
 byte *help_buffer = NULL; // Buffer holding the help content
@@ -34,9 +34,9 @@ void help_xref(int n, int linea);
 void Print_Help(void);
 void resize_help(void);
 int dtoi(int m);
-void arregla_linea(byte *end, int chars, int help_an);
-void put_chr(byte *ptr, int an, byte c, byte color);
-void put_image_line(int n, int linea, byte *di, int v_an);
+void arregla_linea(byte *end, int chars, int help_w);
+void put_chr(byte *ptr, int w, byte c, byte color);
+void put_image_line(int n, int linea, byte *di, int v_w);
 
 
 //-----------------------------------------------------------------------------
@@ -142,20 +142,20 @@ void make_helpidx(void) {
 int forced_helpslider = 0;
 
 int get_helpslide_y(void) {
-  return (18 + (help_l * (v.al / big2 - 21 - 18)) / (help_lines - help_al));
+  return (18 + (help_l * (v.h / big2 - 21 - 18)) / (help_lines - help_h));
 }
 
 void barra_vertical(void) {
   byte *ptr = v.ptr;
   int min, max, slider;
-  int an = v.an / big2, al = v.al / big2;
+  int w = v.w / big2, h = v.h / big2;
 
-  wbox(ptr, an, al, c2, an - 9, 18, 7, al - 36); // Gray slider background
+  wbox(ptr, w, h, c2, w - 9, 18, 7, h - 36); // Gray slider background
 
   min = 18;
-  max = al - 21;
+  max = h - 21;
 
-  if (help_lines > help_al) {
+  if (help_lines > help_h) {
     slider = get_helpslide_y();
     if (slider > max)
       slider = max;
@@ -167,31 +167,31 @@ void barra_vertical(void) {
     forced_helpslider = 0;
   }
 
-  wbox(ptr, an, al, c0, an - 9, slider - 1, 7, 1);
-  wbox(ptr, an, al, c0, an - 9, slider + 3, 7, 1);
-  wput(ptr, an, al, an - 9, slider, 43);
+  wbox(ptr, w, h, c0, w - 9, slider - 1, 7, 1);
+  wbox(ptr, w, h, c0, w - 9, slider + 3, 7, 1);
+  wput(ptr, w, h, w - 9, slider, 43);
 }
 
 void help1(void) {
   byte *ptr = v.ptr;
-  int an = v.an / big2, al = v.al / big2;
+  int w = v.w / big2, h = v.h / big2;
 
   _show_items();
 
-  wbox(ptr, an, al, c0, an - 10, 10, 9, al - 12); // Black slider background
+  wbox(ptr, w, h, c0, w - 10, 10, 9, h - 12); // Black slider background
 
-  wput(ptr, an, al, an - 9, 10, 39);      // Up
-  wput(ptr, an, al, an - 9, al - 17, 40); // Down
-  wput(ptr, an, al, an - 9, al - 9, 34);  // Resize
+  wput(ptr, w, h, w - 9, 10, 39);      // Up
+  wput(ptr, w, h, w - 9, h - 17, 40); // Down
+  wput(ptr, w, h, w - 9, h - 9, 34);  // Resize
   barra_vertical();
 
-  wbox(ptr, an, al, c0, 2, 10 + 15, an - 12, 1);
+  wbox(ptr, w, h, c0, 2, 10 + 15, w - 12, 1);
 
   vuelca_help();
 }
 
 void help2(void) {
-  int an = v.an / big2, al = v.al / big2;
+  int w = v.w / big2, h = v.h / big2;
   int n, mx, my, f2_back, max, min;
   byte *p, *si, *di, c;
   static int old_estado;
@@ -235,21 +235,21 @@ void help2(void) {
       }
     }
 
-    if (wmouse_in(an - 9, 10, 9, al - 20)) { // Vertical slider
+    if (wmouse_in(w - 9, 10, 9, h - 20)) { // Vertical slider
       if (wmouse_y < 18)
         mouse_graf = 7;
-      else if (wmouse_y >= al - 17)
+      else if (wmouse_y >= h - 17)
         mouse_graf = 9;
       else
         mouse_graf = 13;
-    } else if (wmouse_in(an - 9, al - 9, 9, 9)) { // Resize
+    } else if (wmouse_in(w - 9, h - 9, 9, 9)) { // Resize
       mouse_graf = 12;
     }
 
     if (scan_code == 72 || (mouse_graf == 7 && (mouse_b & 1) && wmouse_x != -1)) {
       if (scan_code != 72) {
         if (!(v.buttons & 2)) {
-          wput(v.ptr, an, al, an - 9, 10, -41);
+          wput(v.ptr, w, h, w - 9, 10, -41);
           v.buttons |= 2;
         } else {
           retrace_wait();
@@ -266,12 +266,12 @@ void help2(void) {
       }
       vuelca_help();
     } else if (v.buttons & 2) {
-      wput(v.ptr, an, al, an - 9, 10, -39);
+      wput(v.ptr, w, h, w - 9, 10, -39);
       v.buttons ^= 2;
       v.redraw++;
     }
     if (scan_code == 73 || (mouse_b & 8 && wmouse_x != -1)) {
-      for (n = 0; n < (mouse_b & 8 ? 3 : help_al); n++) {
+      for (n = 0; n < (mouse_b & 8 ? 3 : help_h); n++) {
         if (help_line != help_buffer + 1) {
           help_line--;
           while (*(--help_line))
@@ -287,7 +287,7 @@ void help2(void) {
     if (scan_code == 80 || (mouse_graf == 9 && (mouse_b & 1) && wmouse_x != -1)) {
       if (scan_code != 80) {
         if (!(v.buttons & 4)) {
-          wput(v.ptr, an, al, an - 9, al - 17, -42);
+          wput(v.ptr, w, h, w - 9, h - 17, -42);
           v.buttons |= 4;
         } else {
           retrace_wait();
@@ -295,21 +295,21 @@ void help2(void) {
         }
       }
       v.redraw++;
-      if (help_l + help_al < help_lines) {
+      if (help_l + help_h < help_lines) {
         while (*(help_line++))
           ;
         help_l++;
       }
       vuelca_help();
     } else if (v.buttons & 4) {
-      wput(v.ptr, an, al, an - 9, al - 17, -40);
+      wput(v.ptr, w, h, w - 9, h - 17, -40);
       v.buttons ^= 4;
       v.redraw++;
     }
 
     if (scan_code == 81 || (mouse_b & 4 && wmouse_x != -1)) {
-      for (n = 0; n < (mouse_b & 4 ? 3 : help_al); n++) {
-        if (help_l + help_al < help_lines) {
+      for (n = 0; n < (mouse_b & 4 ? 3 : help_h); n++) {
+        if (help_l + help_h < help_lines) {
           while (*(help_line++))
             ;
           help_l++;
@@ -321,15 +321,15 @@ void help2(void) {
 
     if (mouse_graf == 13 && (mouse_b & 1) && wmouse_x != -1) {
       min = 18;
-      max = al - 21;
+      max = h - 21;
       forced_helpslider = wmouse_y - 1;
       if (forced_helpslider < min)
         forced_helpslider = min;
       else if (forced_helpslider > max)
         forced_helpslider = max;
-      n = ((help_lines - help_al) * (forced_helpslider - min)) / (max - min);
-      if (n >= help_lines - help_al)
-        n = help_lines - help_al - 1;
+      n = ((help_lines - help_h) * (forced_helpslider - min)) / (max - min);
+      if (n >= help_lines - help_h)
+        n = help_lines - help_h - 1;
       if (n < 0)
         n = 0;
       while (help_l > n) {
@@ -342,7 +342,7 @@ void help2(void) {
         }
       }
       while (help_l < n) {
-        if (help_l + help_al < help_lines) {
+        if (help_l + help_h < help_lines) {
           while (*(help_line++))
             ;
           help_l++;
@@ -494,8 +494,8 @@ void help2(void) {
 
     if (!help_paint_active) {
       if (key(_ESC) && !key(_L_CTRL)) {
-        if (mouse_in(v.x + 2 * big2, v.y + 10 * big2, v.x + v.an - 2 * big2,
-                     v.y + v.al - 2 * big2)) {
+        if (mouse_in(v.x + 2 * big2, v.y + 10 * big2, v.x + v.w - 2 * big2,
+                     v.y + v.h - 2 * big2)) {
           close_window();
         } else
           window_closing = 2;
@@ -522,15 +522,15 @@ void help0(void) { // help_item indicates which topic help is requested for
 
   v.type = 102;
 
-  v.an = (4 + 8) * big2 + font_width * help_an;
-  v.al = (12 + 16) * big2 + font_height * help_al;
+  v.w = (4 + 8) * big2 + font_width * help_w;
+  v.h = (12 + 16) * big2 + font_height * help_h;
 
   if (big) {
-    if (v.an & 1)
-      v.an++;
-    if (v.al & 1)
-      v.al++;
-    v.an = -v.an; // Indicate that the window should not be doubled
+    if (v.w & 1)
+      v.w++;
+    if (v.h & 1)
+      v.h++;
+    v.w = -v.w; // Indicate that the window should not be doubled
   }
 
   v.title = help_title;
@@ -551,7 +551,7 @@ void help0(void) { // help_item indicates which topic help is requested for
   _button(492, x, 14, 0);
   x += text_len(texts[492]) + 2 + 6;
   _button(494, x, 14, 0);
-  _button(493, abs(v.an) / big2 - 15, 14, 2);
+  _button(493, abs(v.w) / big2 - 15, 14, 2);
 }
 
 //-----------------------------------------------------------------------------
@@ -562,62 +562,62 @@ void resize_help(void) {
   int _mx = mouse_x, _my = mouse_y; // Initial mouse coordinates
   int my;                           // Snapped mouse coordinates at each moment
   int _al;                          // Original height in chars
-  int old_al;                       // Previous height
+  int old_h;                       // Previous height
   byte *new_block;
-  int an = v.an / big2, al = v.al / big2;
+  int w = v.w / big2, h = v.h / big2;
 
-  _al = help_al;
+  _al = help_h;
 
-  wput(v.ptr, an, al, an - 9, al - 9, -44);
+  wput(v.ptr, w, h, w - 9, h - 9, -44);
   flush_window(0);
 
   do {
     read_mouse();
     my = _my + ((mouse_y - _my) / font_height) * font_height;
 
-    old_al = help_al;
-    help_al = _al + (mouse_y - _my) / font_height;
-    if (help_al < 4 * big2) {
-      help_al = 4 * big2;
-      my = _my + (help_al - _al) * font_height;
+    old_h = help_h;
+    help_h = _al + (mouse_y - _my) / font_height;
+    if (help_h < 4 * big2) {
+      help_h = 4 * big2;
+      my = _my + (help_h - _al) * font_height;
     }
-    if (help_al > 50) {
-      help_al = 50;
-      my = _my + (help_al - _al) * font_height;
+    if (help_h > 50) {
+      help_h = 50;
+      my = _my + (help_h - _al) * font_height;
     }
 
-    al = v.al;
+    h = v.h;
 
-    v.al = (12 + 16) * big2 + font_height * help_al;
+    v.h = (12 + 16) * big2 + font_height * help_h;
 
     if (big) {
-      if (v.al & 1)
-        v.al++;
+      if (v.h & 1)
+        v.h++;
     }
 
-    if ((new_block = (byte *)realloc(v.ptr, v.an * v.al)) != NULL) {
-      window_surface(v.an, v.al, 0);
+    if ((new_block = (byte *)realloc(v.ptr, v.w * v.h)) != NULL) {
+      window_surface(v.w, v.h, 0);
 
       if (draw_mode < 100) {
-        draw_edit_background(v.x, v.y, v.an > an ? v.an : an, v.al > al ? v.al : al);
+        draw_edit_background(v.x, v.y, v.w > w ? v.w : w, v.h > h ? v.h : h);
         flush_bars(1);
       }
 
       v.ptr = new_block;
       repaint_window();
-      wput(v.ptr, v.an / big2, v.al / big2, v.an / big2 - 9, v.al / big2 - 9, -44);
-      on_window_moved(v.x, v.y, an, al);
+      wput(v.ptr, v.w / big2, v.h / big2, v.w / big2 - 9, v.h / big2 - 9, -44);
+      on_window_moved(v.x, v.y, w, h);
 
       if (draw_mode >= 100) {
-        update_box(v.x, v.y, v.an > an ? v.an : an, v.al > al ? v.al : al);
+        update_box(v.x, v.y, v.w > w ? v.w : w, v.h > h ? v.h : h);
       }
 
     } else {
-      help_al = old_al;
-      v.al = al;
+      help_h = old_h;
+      v.h = h;
     }
 
-    al = v.al / big2;
+    h = v.h / big2;
 
     save_mouse_bg(mouse_background, _mx, my, mouse_graf, 0);
     put(_mx, my, mouse_graf);
@@ -626,7 +626,7 @@ void resize_help(void) {
 
   } while (mouse_b & 1);
 
-  wput(v.ptr, an, al, an - 9, al - 9, -34);
+  wput(v.ptr, w, h, w - 9, h - 9, -34);
   v.redraw = 2;
 }
 
@@ -761,13 +761,13 @@ void help(int n) {
             p++;
           *p = 0;
           div_strcpy((char *)help_title, sizeof(help_title), (char *)h_buffer);
-          help_an = (vga_width - 12 * big2 - 1) / font_width;
-          if (help_an > 120)
-            help_an = 120;
-          help_al = (vga_height / 2 - (12 + 16) * big2 - 1) / font_height;
+          help_w = (vga_width - 12 * big2 - 1) / font_width;
+          if (help_w > 120)
+            help_w = 120;
+          help_h = (vga_height / 2 - (12 + 16) * big2 - 1) / font_height;
           help_l = 0;
           if (primera_vez)
-            help_al += 5;
+            help_h += 5;
           tabula_help(p + 1, help_buffer, helpidx[n * 2 + 1] - (p + 1 - h_buffer));
           new_window(help0);
         }
@@ -786,15 +786,15 @@ void help_paint0(void) { // help_item indicates which topic help is requested fo
 
   v.type = 1;
 
-  v.an = (4 + 8) * big2 + font_width * help_an;
-  v.al = (12 + 16) * big2 + font_height * help_al;
+  v.w = (4 + 8) * big2 + font_width * help_w;
+  v.h = (12 + 16) * big2 + font_height * help_h;
 
   if (big) {
-    if (v.an & 1)
-      v.an++;
-    if (v.al & 1)
-      v.al++;
-    v.an = -v.an; // Indicate that the window should not be doubled
+    if (v.w & 1)
+      v.w++;
+    if (v.h & 1)
+      v.h++;
+    v.w = -v.w; // Indicate that the window should not be doubled
   }
 
   v.title = help_title;
@@ -817,7 +817,7 @@ void help_paint0(void) { // help_item indicates which topic help is requested fo
   _button(492, x, 14, 0);
   x += text_len(texts[492]) + 2 + 6;
   _button(494, x, 14, 0);
-  _button(493, abs(v.an) / big2 - 15, 14, 2);
+  _button(493, abs(v.w) / big2 - 15, 14, 2);
 }
 
 void help_paint(memptrsize n) {
@@ -854,10 +854,10 @@ void help_paint(memptrsize n) {
             p++;
           *p = 0;
           div_strcpy((char *)help_title, sizeof(help_title), (char *)h_buffer);
-          help_an = (vga_width - 12 * big2 - 1) / font_width;
-          if (help_an > 120)
-            help_an = 120;
-          help_al = (vga_height / 2 - (12 + 16) * big2 - 1) / font_height;
+          help_w = (vga_width - 12 * big2 - 1) / font_width;
+          if (help_w > 120)
+            help_w = 120;
+          help_h = (vga_height / 2 - (12 + 16) * big2 - 1) / font_height;
           help_l = 0;
           tabula_help(p + 1, help_buffer, helpidx[n * 2 + 1] - (p + 1 - h_buffer));
           help_paint_active = 1;
@@ -875,7 +875,7 @@ void help_paint(memptrsize n) {
 
 char cerror[128];
 
-extern int linea_error;
+extern int error_line;
 
 void get_error(int n) {
   FILE *f;
@@ -898,7 +898,7 @@ void get_error(int n) {
   if (n == 502 || n == 503 || n == 504 || n == 507) {
     /* Fix overlapping sprintf: cerror is both dest and arg */
     char tmp[sizeof(cerror)];
-    DIV_SPRINTF(tmp, "%s (%d).", cerror, linea_error);
+    DIV_SPRINTF(tmp, "%s (%d).", cerror, error_line);
     DIV_STRCPY(cerror, tmp);
   }
 }
@@ -967,7 +967,7 @@ void help_xref(int n, int linea) {
 }
 
 //-----------------------------------------------------------------------------
-//      Format help text for a given width (help_an)
+//      Format help text for a given width (help_w)
 //-----------------------------------------------------------------------------
 
 // graf[n] pointer to width,height,x0,x1,graphic... (width..x1 are word)
@@ -975,17 +975,17 @@ void help_xref(int n, int linea) {
 int ejemplo = 0; // An example follows
 int imagen = 0;  // Image code
 int imagen_y;    // Current line of the image
-int imagen_al;   // Image height in chars
-int imagen_an;   // Image width in chars
+int image_h;   // Image height in chars
+int image_w;   // Image width in chars
 int tipo_imagen; // 0-left, 1-center, 2-right
-int restaurar_help_an = 0;
+int restore_help_w = 0;
 
 byte *continua_imagen(byte *di) {
   int n = 0;
 
-  if (restaurar_help_an) {
-    restaurar_help_an = 0;
-    help_an += imagen_an;
+  if (restore_help_w) {
+    restore_help_w = 0;
+    help_w += image_w;
   }
   if (ejemplo)
     *di++ = 6;
@@ -998,18 +998,18 @@ byte *continua_imagen(byte *di) {
       n = 0;
       break;
     case 1:
-      n = help_an / 2;
+      n = help_w / 2;
       break;
     case 2:
-      n = help_an;
+      n = help_w;
       break;
     }
     n += imagen_y++ * 100;
     *(int *)di = itod(n);
     di += 4;
-    if (imagen_y == imagen_al) {
+    if (imagen_y == image_h) {
       imagen = 0;
-      restaurar_help_an = 1;
+      restore_help_w = 1;
     }
   }
   return (di);
@@ -1159,9 +1159,9 @@ ini_tabulador:
               ultimo_cr = 1;
               chars = 0;
             }
-            if (restaurar_help_an) {
-              restaurar_help_an = 0;
-              help_an += imagen_an;
+            if (restore_help_w) {
+              restore_help_w = 0;
+              help_w += image_w;
             }
             *di++ = 4;
             *di++ = 0;
@@ -1192,9 +1192,9 @@ ini_tabulador:
               ultimo_cr = 1;
               chars = 0;
             }
-            if (restaurar_help_an) {
-              restaurar_help_an = 0;
-              help_an += imagen_an;
+            if (restore_help_w) {
+              restore_help_w = 0;
+              help_w += image_w;
             }
             imagen = 0;
             si++;
@@ -1213,36 +1213,36 @@ ini_tabulador:
             si++;
             if (imagen < 384 && graf_help[imagen].offset) {
               if ((f = fopen("help/help.fig", "rb")) != NULL) {
-                if ((ptr = (byte *)malloc(graf_help[imagen].an * graf_help[imagen].al)) != NULL) {
+                if ((ptr = (byte *)malloc(graf_help[imagen].w * graf_help[imagen].h)) != NULL) {
                   fseek(f, graf_help[imagen].offset, SEEK_SET);
-                  fread(ptr, graf_help[imagen].an, graf_help[imagen].al, f);
+                  fread(ptr, graf_help[imagen].w, graf_help[imagen].h, f);
                   fclose(f);
-                  for (x = graf_help[imagen].an * graf_help[imagen].al - 1; x >= 0; x--) {
+                  for (x = graf_help[imagen].w * graf_help[imagen].h - 1; x >= 0; x--) {
                     ptr[x] = help_xlat[ptr[x]];
                   }
 
-                  if (vga_width < 640 && graf_help[imagen].an > 300) {
-                    for (y = 0; y < graf_help[imagen].al - 1; y += 2) {
-                      for (x = 0; x < graf_help[imagen].an - 1; x += 2) {
-                        ptr[(y / 2) * (graf_help[imagen].an / 2) + x / 2] =
-                            *(ghost + ptr[y * graf_help[imagen].an + x] * 256 +
-                              ptr[(y + 1) * graf_help[imagen].an + x + 1]);
+                  if (vga_width < 640 && graf_help[imagen].w > 300) {
+                    for (y = 0; y < graf_help[imagen].h - 1; y += 2) {
+                      for (x = 0; x < graf_help[imagen].w - 1; x += 2) {
+                        ptr[(y / 2) * (graf_help[imagen].w / 2) + x / 2] =
+                            *(ghost + ptr[y * graf_help[imagen].w + x] * 256 +
+                              ptr[(y + 1) * graf_help[imagen].w + x + 1]);
                       }
                     }
-                    graf_help[imagen].ran = graf_help[imagen].an / 2;
-                    graf_help[imagen].ral = graf_help[imagen].al / 2;
+                    graf_help[imagen].ran = graf_help[imagen].w / 2;
+                    graf_help[imagen].ral = graf_help[imagen].h / 2;
                   } else {
-                    graf_help[imagen].ran = graf_help[imagen].an;
-                    graf_help[imagen].ral = graf_help[imagen].al;
+                    graf_help[imagen].ran = graf_help[imagen].w;
+                    graf_help[imagen].ral = graf_help[imagen].h;
                   }
 
                   graf_help[imagen].ptr = ptr;
                   loaded[n_loaded++] = imagen;
                   imagen_y = 0;
-                  imagen_al = (graf_help[imagen].ral + font_height - 1) / font_height;
-                  imagen_an = (graf_help[imagen].ran + font_width - 1) / font_width;
-                  help_an -= imagen_an;
-                  if (help_an <= 20)
+                  image_h = (graf_help[imagen].ral + font_height - 1) / font_height;
+                  image_w = (graf_help[imagen].ran + font_width - 1) / font_width;
+                  help_w -= image_w;
+                  if (help_w <= 20)
                     tipo_imagen = 1;
 
                   do {
@@ -1321,9 +1321,9 @@ ini_tabulador:
 
         chars++;
 
-        if (!ejemplo && chars == help_an + 1) {
+        if (!ejemplo && chars == help_w + 1) {
           chars2 = chars;
-          help_an2 = help_an; // Fix the line that was truncated
+          help_an2 = help_w; // Fix the line that was truncated
 
           nchars = chars = 0;
           *di = c;
@@ -1359,9 +1359,9 @@ ini_tabulador:
               di = continua_imagen(di);
               di = old_di2 + 9;
             } else {
-              if (restaurar_help_an) {
-                restaurar_help_an = 0;
-                help_an += imagen_an;
+              if (restore_help_w) {
+                restore_help_w = 0;
+                help_w += image_w;
               }
               *di++ = 0;
               help_lines++;
@@ -1377,9 +1377,9 @@ ini_tabulador:
               *di = 1;
               di = old_di2 + 11;
             } else {
-              if (restaurar_help_an) {
-                restaurar_help_an = 0;
-                help_an += imagen_an;
+              if (restore_help_w) {
+                restore_help_w = 0;
+                help_w += image_w;
               }
               memmove(di + 3, di + 1, nchars);
               *di++ = 2;
@@ -1399,9 +1399,9 @@ ini_tabulador:
               *(int *)di = itod(-estado);
               di = old_di2 + 15;
             } else {
-              if (restaurar_help_an) {
-                restaurar_help_an = 0;
-                help_an += imagen_an;
+              if (restore_help_w) {
+                restore_help_w = 0;
+                help_w += image_w;
               }
               memmove(di + 7, di + 1, nchars);
               *di++ = 2;
@@ -1449,9 +1449,9 @@ ini_tabulador:
     }
   }
 
-  if (restaurar_help_an) {
-    help_an += imagen_an;
-    restaurar_help_an = 0;
+  if (restore_help_w) {
+    help_w += image_w;
+    restore_help_w = 0;
   }
   help_line = help_buffer + 1;
   help_end = di;
@@ -1462,7 +1462,7 @@ ini_tabulador:
 //      Justify a line (generate correct spacing)
 //-----------------------------------------------------------------------------
 
-void arregla_linea(byte *end, int chars, int help_an) {
+void arregla_linea(byte *end, int chars, int help_w) {
   byte *ini, *i, *_i;
   int espacios, error, chesp;
   float nuevo_esp, espacio_acum;
@@ -1494,7 +1494,7 @@ void arregla_linea(byte *end, int chars, int help_an) {
   }
 
   if (espacios) {
-    error = (help_an + 1 - chars) * font_width;
+    error = (help_w + 1 - chars) * font_width;
     if (error) {
       nuevo_esp = (float)font_width + (float)error / (float)espacios;
       if (nuevo_esp > font_width + 25)
@@ -1529,16 +1529,16 @@ void arregla_linea(byte *end, int chars, int help_an) {
 
 void vuelca_help(void) {
   byte *si, *di, *old_di;
-  int al, n, ch;
+  int h, n, ch;
   byte color = c0, color2 = average_color(c0, c_b_low);
 
-  wbox(v.ptr, v.an / big2, v.al / big2, c12, 2, 10 + 16, v.an / big2 - 12, v.al / big2 - 12 - 16);
+  wbox(v.ptr, v.w / big2, v.h / big2, c12, 2, 10 + 16, v.w / big2 - 12, v.h / big2 - 12 - 16);
 
-  di = v.ptr + (v.an * (10 + 16) + 2) * big2; // Blit the text window
+  di = v.ptr + (v.w * (10 + 16) + 2) * big2; // Blit the text window
   si = help_line;
-  al = help_al;
+  h = help_h;
 
-  while (al-- && si < help_end) {
+  while (h-- && si < help_end) {
     old_di = di;
     while (*si) {
       if (*si < 7)
@@ -1555,15 +1555,15 @@ void vuelca_help(void) {
           break;
         case 4:
           color = c0;
-          n = help_an;
+          n = help_w;
           while (n--) {
-            put_chr(di, v.an, '*', color);
+            put_chr(di, v.w, '*', color);
             di += font_width;
           }
           break;
         case 5:
           n = dtoi(*(int *)(si + 5));
-          put_image_line(dtoi(*(int *)(si + 1)), n / 100, old_di + (n % 100) * font_width, v.an);
+          put_image_line(dtoi(*(int *)(si + 1)), n / 100, old_di + (n % 100) * font_width, v.w);
           if (n % 100 == 0) {
             n = dtoi(*(int *)(si + 1));
             di = old_di + ((graf_help[n].ran + font_width - 1) / font_width) * font_width;
@@ -1574,8 +1574,8 @@ void vuelca_help(void) {
           di += font_width * 2;
           si++;
           ch = 0;
-          while (*si && ch++ < help_an - 2) {
-            put_chr(di, v.an, *si, color2);
+          while (*si && ch++ < help_w - 2) {
+            put_chr(di, v.w, *si, color2);
             di += font_width;
             si++;
           }
@@ -1586,13 +1586,13 @@ void vuelca_help(void) {
       else if (*si < 32) {
         di += *si - 6 + font_width;
       } else {
-        put_chr(di, v.an, *si, color);
+        put_chr(di, v.w, *si, color);
         di += font_width;
       }
       si++;
     }
     si++;
-    di = old_di + v.an * font_height;
+    di = old_di + v.w * font_height;
   }
 }
 
@@ -1600,35 +1600,35 @@ void vuelca_help(void) {
 //      Render a single line of an image
 //-----------------------------------------------------------------------------
 
-void put_image_line(int n, int linea, byte *di, int v_an) {
-  int an, al, _an, c;
+void put_image_line(int n, int linea, byte *di, int v_w) {
+  int w, h, _an, c;
   byte *si;
 
   if (!graf_help[n].offset)
     return;
 
   _an = graf_help[n].ran;
-  al = graf_help[n].ral - linea * font_height;
-  if (al > font_height)
-    al = font_height;
+  h = graf_help[n].ral - linea * font_height;
+  if (h > font_height)
+    h = font_height;
   si = graf_help[n].ptr + linea * font_height * _an;
 
   do {
-    an = _an;
+    w = _an;
     do {
       if ((c = *si++))
         *di = c;
       di++;
-    } while (--an);
-    di += v_an - _an;
-  } while (--al);
+    } while (--w);
+    di += v_w - _an;
+  } while (--h);
 }
 
 //-----------------------------------------------------------------------------
 //      Render a single character
 //-----------------------------------------------------------------------------
 
-void put_chr(byte *ptr, int an, byte c, byte color) {
+void put_chr(byte *ptr, int w, byte c, byte color) {
   int n, m;
   byte *si;
 
@@ -1642,7 +1642,7 @@ void put_chr(byte *ptr, int an, byte c, byte color) {
       si++;
       ptr++;
     } while (--m);
-    ptr += an - font_width;
+    ptr += w - font_width;
   } while (--n);
 }
 

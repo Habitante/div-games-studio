@@ -111,7 +111,7 @@ byte *imagen_install = NULL;
 
 void Setup1() {
   byte *ptr = v.ptr;
-  int an = v.an / big2, al = v.al / big2;
+  int w = v.w / big2, h = v.h / big2;
   int x, y;
 
   if (segundo_font) {
@@ -125,39 +125,39 @@ void Setup1() {
 
   _show_items();
 
-  wwrite(ptr, an, al, 4, 32, 0, texts[521], c3);
-  wwrite(ptr, an, al, 4, 32 + 19, 0, texts[522], c3);
-  wwrite(ptr, an, al, 4, 32 + 48, 0, texts[523], c3);
+  wwrite(ptr, w, h, 4, 32, 0, texts[521], c3);
+  wwrite(ptr, w, h, 4, 32 + 19, 0, texts[522], c3);
+  wwrite(ptr, w, h, 4, 32 + 48, 0, texts[523], c3);
 
-  wbox(ptr, an, al, c12, 4, 40, 100, 8);
-  wbox(ptr, an, al, c12, 4, 40 + 19, 100, 8);
-  wbox(ptr, an, al, c12, 4, 40 + 48, 100, 8);
+  wbox(ptr, w, h, c12, 4, 40, 100, 8);
+  wbox(ptr, w, h, c12, 4, 40 + 19, 100, 8);
+  wbox(ptr, w, h, c12, 4, 40 + 48, 100, 8);
 
-  wwrite(ptr, an, al, 5, 41, 0, (byte *)ifile1name, c3);
-  wwrite(ptr, an, al, 5, 41 + 19, 0, (byte *)ifile2name, c3);
-  wwrite(ptr, an, al, 5, 41 + 48, 0, (byte *)ifile3name, c3);
+  wwrite(ptr, w, h, 5, 41, 0, (byte *)ifile1name, c3);
+  wwrite(ptr, w, h, 5, 41 + 19, 0, (byte *)ifile2name, c3);
+  wwrite(ptr, w, h, 5, 41 + 48, 0, (byte *)ifile3name, c3);
 
   if (!segundo_font) {
     for (y = (32 + 48) * big2; y < (32 + 48 + 19) * big2; y++) {
       for (x = 4 * big2; x < (120) * big2; x++) {
-        ptr[y * v.an + x] = *(ghost + (int)c2 * 256 + ptr[y * v.an + x]);
+        ptr[y * v.w + x] = *(ghost + (int)c2 * 256 + ptr[y * v.w + x]);
       }
     }
   }
 
-  wbox(ptr, an, al, c0, 2, 29, an - 4, 1);
-  wbox(ptr, an, al, c0, 2, 60 + 19 * 3, an - 4, 1);
-  wbox(ptr, an, al, c0, 2, al - 20, an - 4, 1);
+  wbox(ptr, w, h, c0, 2, 29, w - 4, 1);
+  wbox(ptr, w, h, c0, 2, 60 + 19 * 3, w - 4, 1);
+  wbox(ptr, w, h, c0, 2, h - 20, w - 4, 1);
 
-  wrectangle(ptr, an, al, c0, 140, 29, 144, 89);
+  wrectangle(ptr, w, h, c0, 140, 29, 144, 89);
 
   if (imagen_install != NULL) {
     for (y = 0; y < 87 * big2; y++)
       for (x = 0; x < 142 * big2; x++) {
-        ptr[141 * big2 + x + (30 * big2 + y) * v.an] = imagen_install[x + y * 142 * big2];
+        ptr[141 * big2 + x + (30 * big2 + y) * v.w] = imagen_install[x + y * 142 * big2];
       }
   } else {
-    wbox(ptr, an, al, c1, 141, 30, 142, 87);
+    wbox(ptr, w, h, c1, 141, 30, 142, 87);
   }
 }
 
@@ -327,8 +327,8 @@ void Setup0() {
 
   v_accept = 0;
   v.type = 1;
-  v.an = 310;
-  v.al = 125 + 16 + 19 + 20;
+  v.w = 310;
+  v.h = 125 + 16 + 19 + 20;
   v.title = texts[236];
 
   v.paint_handler = Setup1;
@@ -399,8 +399,8 @@ void Setup0() {
 
   y = 64 + 19 * 3;
 
-  _button(100, 7, v.al - 14, 0);
-  _button(101, v.an - 8, v.al - 14, 2);
+  _button(100, 7, v.h - 14, 0);
+  _button(101, v.w - 8, v.h - 14, 2);
 
   _button(121, 109, 38, 0);
   _button(121, 109, 38 + 19, 0);
@@ -412,15 +412,15 @@ void Setup0() {
   _flag(539, 4, 32 + 39, &segundo_font);
 
   _flag(517, 4, 12, &empaquetar);
-  _flag(518, v.an / 2, 12, &pentium);
+  _flag(518, v.w / 2, 12, &pentium);
   _flag(239, 4, 20, &include_setup);
-  _flag(240, v.an / 2, 20, &create_dir);
+  _flag(240, v.w / 2, 20, &create_dir);
 
   _get(224, 4, y + 19 * 0, 6 * 16, (byte *)AppName, 127, 0, 0);
-  _get(226, 6 * 16 + 8, y + 19 * 0, (v.an - 4) - (6 * 16 + 8), (byte *)Copy_Right, 127, 0, 0);
+  _get(226, 6 * 16 + 8, y + 19 * 0, (v.w - 4) - (6 * 16 + 8), (byte *)Copy_Right, 127, 0, 0);
 
   _get(227, 4, y + 19 * 1, 6 * 16, (byte *)Unid, 127, 0, 0);
-  _get(228, 6 * 16 + 8, y + 19 * 1, (v.an - 4) - (6 * 16 + 8), (byte *)DefDir, 127, 0, 0);
+  _get(228, 6 * 16 + 8, y + 19 * 1, (v.w - 4) - (6 * 16 + 8), (byte *)DefDir, 127, 0, 0);
 }
 
 //-----------------------------------------------------------------------------
@@ -439,7 +439,7 @@ void create_install_image(char *file, int errores) {
 
   float coefredy, coefredx, a, b;
   byte *temp2;
-  int x, y, n, m, an, al;
+  int x, y, n, m, w, h;
   int fl = 0;
 
   imagen_install = NULL;
@@ -581,9 +581,9 @@ int is_point(int *ptr, int n) {
 
 void Setupm1() {
   byte *ptr = v.ptr;
-  int an = v.an / big2, al = v.al / big2;
+  int w = v.w / big2, h = v.h / big2;
   _show_items();
-  wwrite(ptr, an, al, v.an / 2 - 16, 12 + 11 + 19 + 9, 0, (byte *)"#", c3);
+  wwrite(ptr, w, h, v.w / 2 - 16, 12 + 11 + 19 + 9, 0, (byte *)"#", c3);
 }
 
 void Setupm2() {
@@ -608,21 +608,21 @@ void Setupm0() {
   int y;
 
   v.type = 1;
-  v.an = 310;
-  v.al = 12 + 9 + 19 * 4;
+  v.w = 310;
+  v.h = 12 + 9 + 19 * 4;
   v.title = texts[526];
   v.paint_handler = Setupm1;
   v.click_handler = Setupm2;
 
   y = 12;
-  _button(100, v.an - 8, v.al - 14, 2);
-  _get(225, 4, y + 19 * 0, v.an - 8, (byte *)THelp1, 127, 0, 0);
+  _button(100, v.w - 8, v.h - 14, 2);
+  _get(225, 4, y + 19 * 0, v.w - 8, (byte *)THelp1, 127, 0, 0);
   y += 11;
-  _get(414, 4, y + 19 * 0, v.an - 8, (byte *)THelp2, 127, 0, 0);
-  _get(520, 4, y + 19 * 1, (v.an - 16) / 2 - 16, (byte *)TDisk1, 127, 0, 0);
-  _get(414, v.an / 2 - 8, y + 19 * 1, v.an / 2 + 4, (byte *)TDisk2, 127, 0, 0);
-  _get(229, 4, y + 19 * 2, v.an - 8, (byte *)MsgExe, 127, 0, 0);
-  _button(538, 7, v.al - 14, 0);
+  _get(414, 4, y + 19 * 0, v.w - 8, (byte *)THelp2, 127, 0, 0);
+  _get(520, 4, y + 19 * 1, (v.w - 16) / 2 - 16, (byte *)TDisk1, 127, 0, 0);
+  _get(414, v.w / 2 - 8, y + 19 * 1, v.w / 2 + 4, (byte *)TDisk2, 127, 0, 0);
+  _get(229, 4, y + 19 * 2, v.w - 8, (byte *)MsgExe, 127, 0, 0);
+  _button(538, 7, v.h - 14, 0);
 }
 
 //-----------------------------------------------------------------------------
@@ -659,24 +659,24 @@ void Setupe0() {
   int y;
 
   v.type = 1;
-  v.an = 310;
-  v.al = 12 + 9 + 99 + 8;
+  v.w = 310;
+  v.h = 12 + 9 + 99 + 8;
   v.title = texts[537];
   v.paint_handler = Setupe1;
   v.click_handler = Setupe2;
 
   y = 4;
-  _button(100, v.an - 8, v.al - 14, 2);
-  _get(414, 4, y + 11 * 0, v.an - 8, (byte *)Ierr0, 127, 0, 0);
-  _get(414, 4, y + 11 * 1, v.an - 8, (byte *)Ierr1, 127, 0, 0);
-  _get(414, 4, y + 11 * 2, v.an - 8, (byte *)Ierr2, 127, 0, 0);
-  _get(414, 4, y + 11 * 3, v.an - 8, (byte *)Ierr3, 127, 0, 0);
-  _get(414, 4, y + 11 * 4, v.an - 8, (byte *)Ierr4, 127, 0, 0);
-  _get(414, 4, y + 11 * 5, v.an - 8, (byte *)Ierr5, 127, 0, 0);
-  _get(414, 4, y + 11 * 6, v.an - 8, (byte *)Ierr6, 127, 0, 0);
-  _get(414, 4, y + 11 * 7, v.an - 8, (byte *)Ierr7, 127, 0, 0);
-  _get(414, 4, y + 11 * 8, v.an - 8, (byte *)Ierr8, 127, 0, 0);
-  _button(538, 7, v.al - 14, 0);
+  _button(100, v.w - 8, v.h - 14, 2);
+  _get(414, 4, y + 11 * 0, v.w - 8, (byte *)Ierr0, 127, 0, 0);
+  _get(414, 4, y + 11 * 1, v.w - 8, (byte *)Ierr1, 127, 0, 0);
+  _get(414, 4, y + 11 * 2, v.w - 8, (byte *)Ierr2, 127, 0, 0);
+  _get(414, 4, y + 11 * 3, v.w - 8, (byte *)Ierr3, 127, 0, 0);
+  _get(414, 4, y + 11 * 4, v.w - 8, (byte *)Ierr4, 127, 0, 0);
+  _get(414, 4, y + 11 * 5, v.w - 8, (byte *)Ierr5, 127, 0, 0);
+  _get(414, 4, y + 11 * 6, v.w - 8, (byte *)Ierr6, 127, 0, 0);
+  _get(414, 4, y + 11 * 7, v.w - 8, (byte *)Ierr7, 127, 0, 0);
+  _get(414, 4, y + 11 * 8, v.w - 8, (byte *)Ierr8, 127, 0, 0);
+  _button(538, 7, v.h - 14, 0);
 }
 
 

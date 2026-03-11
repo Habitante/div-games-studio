@@ -14,8 +14,8 @@ void function_exec(int id, int n);
 int line_fx, color;
 
 void line(int x0, int y0, int x1, int y1);
-void draw_box(int x, int y, int an, int al);
-void draw_filled_box(int x, int y, int an, int al);
+void draw_box(int x, int y, int w, int h);
+void draw_filled_box(int x, int y, int w, int h);
 void draw_circle(int relleno, int x0, int y0, int x1, int y1);
 void line_pixel(int x, int y);
 
@@ -25,14 +25,14 @@ void line_pixel(int x, int y);
 //----------------------------------------------------------------------------
 void move_scroll(int plano, int x, int y);
 void save_region(void);
-void sp_scan_clipped(byte *p, short n, short m, short o, byte *si, int an, int x0, int y0, int x1,
+void sp_scan_clipped(byte *p, short n, short m, short o, byte *si, int w, int x0, int y0, int x1,
                      int y1);
-void sp_scan_clipped_ghost(byte *p, short n, short m, short o, byte *si, int an, int x0, int y0,
+void sp_scan_clipped_ghost(byte *p, short n, short m, short o, byte *si, int w, int x0, int y0,
                            int x1, int y1);
-void sp_scan(byte *p, short n, byte *si, int an, int x0, int y0, int x1, int y1);
-void sp_scan_ghost(byte *p, short n, byte *si, int an, int x0, int y0, int x1, int y1);
-void text_clipped(byte *p, int x, int y, byte an, int al);
-void text_normal(byte *p, int x, int y, byte an, int al);
+void sp_scan(byte *p, short n, byte *si, int w, int x0, int y0, int x1, int y1);
+void sp_scan_ghost(byte *p, short n, byte *si, int w, int x0, int y0, int x1, int y1);
+void text_clipped(byte *p, int x, int y, byte w, int h);
+void text_normal(byte *p, int x, int y, byte w, int h);
 void paint_mode7(int n, int camara_x, int camara_y, int camara_z, int angulo);
 void paint_sprite_m7(int n, int ide, int x, int y, int size, int ang);
 
@@ -81,7 +81,7 @@ static unsigned int mul_16(long a, long b) {
 
 void paint_scroll_sprites(void) {
 #ifdef DEBUG
-  int oreloj;
+  int profile_clock;
 #endif
   int old_ide = ide, max;
 
@@ -92,7 +92,7 @@ void paint_scroll_sprites(void) {
     mem[ide + _Painted] = 0;
   do {
 #ifdef DEBUG
-    oreloj = get_ticks();
+    profile_clock = get_ticks();
 #endif
     ide = 0;
     max = 0x80000000;
@@ -107,7 +107,7 @@ void paint_scroll_sprites(void) {
       paint_sprite();
       mem[ide + _Painted] = 1;
 #ifdef DEBUG
-      process_paint(ide, get_ticks() - oreloj);
+      process_paint(ide, get_ticks() - profile_clock);
 #endif
     }
   } while (ide);
@@ -144,8 +144,8 @@ void update_scroll(int back) {
         if (y >= region[r].y1)
           iy = y - (region[r].y1 - 1);
       } else { // No lock region1 defined, center camera on target
-        ix -= iscroll[snum].an / 2;
-        iy -= iscroll[snum].al / 2;
+        ix -= iscroll[snum].w / 2;
+        iy -= iscroll[snum].h / 2;
         ix -= iscroll[snum].map1_x;
         iy -= iscroll[snum].map1_y;
       }
@@ -208,7 +208,7 @@ void update_scroll(int back) {
 void scroll_simple(void) {
   int n, b;
 #ifdef DEBUG
-  int oreloj = get_ticks();
+  int profile_clock = get_ticks();
 #endif
   byte *di, *si;
 
@@ -218,16 +218,16 @@ void scroll_simple(void) {
   b = iscroll[snum].block1;
   di = screen_buffer + iscroll[snum].x + iscroll[snum].y * vga_width;
 
-  for (n = 0; n < iscroll[snum].al; n++) {
-    memcpy(di, si, iscroll[snum].an);
+  for (n = 0; n < iscroll[snum].h; n++) {
+    memcpy(di, si, iscroll[snum].w);
     di += vga_width;
     if (--b == 0)
-      si -= iscroll[snum].an * (iscroll[snum].al - 1);
+      si -= iscroll[snum].w * (iscroll[snum].h - 1);
     else
-      si += iscroll[snum].an;
+      si += iscroll[snum].w;
   }
 #ifdef DEBUG
-  function_exec(252, get_ticks() - oreloj);
+  function_exec(252, get_ticks() - profile_clock);
 #endif
   paint_scroll_sprites();
 }
@@ -237,9 +237,9 @@ void scroll_simple(void) {
 //----------------------------------------------------------------------------
 
 void scroll_parallax(void) {
-  int n, an, b1, b2;
+  int n, w, b1, b2;
 #ifdef DEBUG
-  int oreloj = get_ticks();
+  int profile_clock = get_ticks();
 #endif
   int nt, scan;
   byte *di, *si1, *si2;
@@ -255,9 +255,9 @@ void scroll_parallax(void) {
 
   scan = iscroll[snum].iscan;
 
-  for (n = 0; n < iscroll[snum].al; n++) {
+  for (n = 0; n < iscroll[snum].h; n++) {
     if (fast[scan].nt >= max_inc) {
-      an = iscroll[snum].an;
+      w = iscroll[snum].w;
       do {
         if (*si1)
           *di = *si1;
@@ -266,7 +266,7 @@ void scroll_parallax(void) {
         di++;
         si1++;
         si2++;
-      } while (--an);
+      } while (--w);
     } else {
       nt = 0;
       do {
@@ -282,16 +282,16 @@ void scroll_parallax(void) {
         }
       } while (nt++ < fast[scan].nt);
     }
-    if (++scan == iscroll[snum].al)
+    if (++scan == iscroll[snum].h)
       scan = 0;
-    di += vga_width - iscroll[snum].an;
+    di += vga_width - iscroll[snum].w;
     if (--b1 == 0)
-      si1 -= iscroll[snum].an * iscroll[snum].al;
+      si1 -= iscroll[snum].w * iscroll[snum].h;
     if (--b2 == 0)
-      si2 -= iscroll[snum].an * iscroll[snum].al;
+      si2 -= iscroll[snum].w * iscroll[snum].h;
   }
 #ifdef DEBUG
-  function_exec(252, get_ticks() - oreloj);
+  function_exec(252, get_ticks() - profile_clock);
 #endif
   paint_scroll_sprites();
 }
@@ -301,7 +301,7 @@ void scroll_parallax(void) {
 //----------------------------------------------------------------------------
 
 void set_scroll(int plano, int x, int y) {
-  int an, al, iscan;
+  int w, h, iscan;
   int _nx, nx, ny;
   byte *di, *si, *_si;
   int kk, nt, esdato;
@@ -314,57 +314,57 @@ void set_scroll(int plano, int x, int y) {
 
   if (plano == 0) {
     di = iscroll[snum].sscr1 = iscroll[snum]._sscr1;
-    iscroll[snum].block1 = iscroll[snum].al;
+    iscroll[snum].block1 = iscroll[snum].h;
     if (!(iscroll[snum].map_flags & 1)) {
       if (x < 0)
         x = 0;
-      else if (x + iscroll[snum].an >= iscroll[snum].map1_an)
-        x = iscroll[snum].map1_an - iscroll[snum].an;
+      else if (x + iscroll[snum].w >= iscroll[snum].map1_w)
+        x = iscroll[snum].map1_w - iscroll[snum].w;
     }
     if (!(iscroll[snum].map_flags & 2)) {
       if (y < 0)
         y = 0;
-      else if (y + iscroll[snum].al >= iscroll[snum].map1_al)
-        y = iscroll[snum].map1_al - iscroll[snum].al;
+      else if (y + iscroll[snum].h >= iscroll[snum].map1_h)
+        y = iscroll[snum].map1_h - iscroll[snum].h;
     }
     iscroll[snum].map1_x = x;
     iscroll[snum].map1_y = y;
-    an = iscroll[snum].map1_an;
-    al = iscroll[snum].map1_al;
+    w = iscroll[snum].map1_w;
+    h = iscroll[snum].map1_h;
     si = iscroll[snum].map1;
   } else {
     di = iscroll[snum].sscr2 = iscroll[snum]._sscr2;
-    iscroll[snum].block2 = iscroll[snum].al;
+    iscroll[snum].block2 = iscroll[snum].h;
     if (!(iscroll[snum].map_flags & 4)) {
       if (x < 0)
         x = 0;
-      else if (x + iscroll[snum].an >= iscroll[snum].map2_an)
-        x = iscroll[snum].map2_an - iscroll[snum].an;
+      else if (x + iscroll[snum].w >= iscroll[snum].map2_w)
+        x = iscroll[snum].map2_w - iscroll[snum].w;
     }
     if (!(iscroll[snum].map_flags & 8)) {
       if (y < 0)
         y = 0;
-      else if (y + iscroll[snum].al >= iscroll[snum].map2_al)
-        y = iscroll[snum].map2_al - iscroll[snum].al;
+      else if (y + iscroll[snum].h >= iscroll[snum].map2_h)
+        y = iscroll[snum].map2_h - iscroll[snum].h;
     }
     iscroll[snum].map2_x = x;
     iscroll[snum].map2_y = y;
-    an = iscroll[snum].map2_an;
-    al = iscroll[snum].map2_al;
+    w = iscroll[snum].map2_w;
+    h = iscroll[snum].map2_h;
     si = iscroll[snum].map2;
   }
 
   if (x < 0)
-    x = (an - 1) - ((-x - 1) % an);
+    x = (w - 1) - ((-x - 1) % w);
   else
-    x = x % an;
+    x = x % w;
 
   if (y < 0)
-    y = (al - 1) - ((-y - 1) % al);
+    y = (h - 1) - ((-y - 1) % h);
   else
-    y = y % al;
+    y = y % h;
 
-  si += y * an + x;
+  si += y * w + x;
 
   // Copy map region (si,x,y,an,al) into scroll buffer (di,iscroll[snum].an/al)
 
@@ -379,14 +379,14 @@ void set_scroll(int plano, int x, int y) {
 
   if (iscroll[snum].on == 2 && plano == 0) {
     fast = iscroll[snum].fast;
-    ny = al - y;
-    _nx = an - x;
-    y = iscroll[snum].al;
+    ny = h - y;
+    _nx = w - x;
+    y = iscroll[snum].h;
     iscan = 0;
     do {
       _si = si;
       nx = _nx;
-      x = iscroll[snum].an;
+      x = iscroll[snum].w;
       nt = 0; // number of segments
       fast[iscan].inc[0] = 0;
       esdato = 0;
@@ -414,39 +414,39 @@ void set_scroll(int plano, int x, int y) {
         }
         *di++ = kk;
         if (--nx == 0) {
-          si -= an;
-          nx = an;
+          si -= w;
+          nx = w;
         }
       } while (--x);
       fast[iscan].nt = nt;
       iscan++;
-      si = _si + an;
+      si = _si + w;
       if (--ny == 0) {
-        si -= an * al;
-        ny = al;
+        si -= w * h;
+        ny = h;
       }
     } while (--y);
     iscroll[snum].iscan = 0;
   } else {
-    ny = al - y;
-    _nx = an - x;
-    y = iscroll[snum].al;
+    ny = h - y;
+    _nx = w - x;
+    y = iscroll[snum].h;
     do {
       _si = si;
       nx = _nx;
-      x = iscroll[snum].an;
+      x = iscroll[snum].w;
       do {
         kk = *si++;
         *di++ = kk;
         if (--nx == 0) {
-          si -= an;
-          nx = an;
+          si -= w;
+          nx = w;
         }
       } while (--x);
-      si = _si + an;
+      si = _si + w;
       if (--ny == 0) {
-        si -= an * al;
-        ny = al;
+        si -= w * h;
+        ny = h;
       }
     } while (--y);
   }
@@ -464,18 +464,18 @@ void set_scroll(int plano, int x, int y) {
 void process_scan(int n) { // Fully reprocess a scanline
   int in;                  // index into fast[in].{nt,inc[]}
   byte *si;
-  int resta, an;
+  int resta, w;
   int nt = 0, esdato = 0;
 
-  if ((in = iscroll[snum].iscan + n) >= iscroll[snum].al)
-    in -= iscroll[snum].al;
+  if ((in = iscroll[snum].iscan + n) >= iscroll[snum].h)
+    in -= iscroll[snum].h;
   if (n >= iscroll[snum].block1)
-    n -= iscroll[snum].al;
-  si = iscroll[snum].sscr1 + n * iscroll[snum].an;
+    n -= iscroll[snum].h;
+  si = iscroll[snum].sscr1 + n * iscroll[snum].w;
   fast = iscroll[snum].fast;
 
-  an = iscroll[snum].an;
-  resta = iscroll[snum].map1_an;
+  w = iscroll[snum].w;
+  resta = iscroll[snum].map1_w;
   fast[in].inc[0] = 0;
   do {
     if (*si++) {
@@ -500,10 +500,10 @@ void process_scan(int n) { // Fully reprocess a scanline
       }
     }
     if (--resta == 0) {
-      si -= iscroll[snum].map1_an;
-      resta = iscroll[snum].map1_an;
+      si -= iscroll[snum].map1_w;
+      resta = iscroll[snum].map1_w;
     }
-  } while (--an);
+  } while (--w);
   fast[in].nt = nt;
 }
 
@@ -516,9 +516,9 @@ void process_scan_right(void) {
   byte *si;
 
   block = iscroll[snum].block1;
-  si = iscroll[snum].sscr1 + iscroll[snum].an - 1; // End of the first scanline
+  si = iscroll[snum].sscr1 + iscroll[snum].w - 1; // End of the first scanline
   in = iscroll[snum].iscan;
-  n = iscroll[snum].al;
+  n = iscroll[snum].h;
   fast = iscroll[snum].fast;
 
   do {
@@ -535,7 +535,7 @@ void process_scan_right(void) {
         memmove(&fast[in].inc[0], &fast[in].inc[2], (max_inc - 2) * 2);
 
         if (fast[in].nt < max_inc && fast[in].nt + 2 >= max_inc) {
-          process_scan(iscroll[snum].al - n);
+          process_scan(iscroll[snum].h - n);
           goto cont_loop;
         }
       }
@@ -564,11 +564,11 @@ void process_scan_right(void) {
 cont_loop:
 
     if (!--block)
-      si -= iscroll[snum].an * (iscroll[snum].al - 1);
+      si -= iscroll[snum].w * (iscroll[snum].h - 1);
     else
-      si += iscroll[snum].an;
+      si += iscroll[snum].w;
 
-    if (++in == iscroll[snum].al)
+    if (++in == iscroll[snum].h)
       in = 0;
 
   } while (--n);
@@ -583,9 +583,9 @@ void process_scan_left(void) {
   byte *si;
 
   block = iscroll[snum].block1;
-  si = iscroll[snum].sscr1 + iscroll[snum].an - 1; // End of the first scanline
+  si = iscroll[snum].sscr1 + iscroll[snum].w - 1; // End of the first scanline
   in = iscroll[snum].iscan;
-  n = iscroll[snum].al;
+  n = iscroll[snum].h;
   fast = iscroll[snum].fast;
 
   do {
@@ -598,14 +598,14 @@ void process_scan_left(void) {
       if (fast[in].nt & 1) { // If the line ended with foreground ...
         if (!*si) {          // ... and now ends with background
           if (--fast[in].nt == max_inc - 1) {
-            process_scan(iscroll[snum].al - n);
+            process_scan(iscroll[snum].h - n);
             goto cont_loop;
           }
         }
       } else {     // If the line ended with background ...
         if (*si) { // ... and now ends with foreground
           if (--fast[in].nt == max_inc - 1) {
-            process_scan(iscroll[snum].al - n);
+            process_scan(iscroll[snum].h - n);
             goto cont_loop;
           }
         }
@@ -614,7 +614,7 @@ void process_scan_left(void) {
 
     // 2. Add the pixel on the left ...
 
-    if (*(si - iscroll[snum].an + 1)) { // If incoming pixel is foreground
+    if (*(si - iscroll[snum].w + 1)) { // If incoming pixel is foreground
       if (!fast[in].inc[0]) {           // If the segment begins with foreground
         fast[in].inc[1]++;
       } else { // If it begins with background
@@ -632,11 +632,11 @@ void process_scan_left(void) {
 cont_loop:
 
     if (!--block)
-      si -= iscroll[snum].an * (iscroll[snum].al - 1);
+      si -= iscroll[snum].w * (iscroll[snum].h - 1);
     else
-      si += iscroll[snum].an;
+      si += iscroll[snum].w;
 
-    if (++in == iscroll[snum].al)
+    if (++in == iscroll[snum].h)
       in = 0;
 
   } while (--n);
@@ -646,13 +646,13 @@ cont_loop:
 //      Move_scroll(snum,plano,ix,iy)
 //----------------------------------------------------------------------------
 
-byte *scroll_right(byte *_buf, byte *buf, int *block, byte *map, int an, int al, int x, int y);
+byte *scroll_right(byte *_buf, byte *buf, int *block, byte *map, int w, int h, int x, int y);
 
-byte *scroll_left(byte *_buf, byte *buf, int *block, byte *map, int an, int al, int x, int y);
+byte *scroll_left(byte *_buf, byte *buf, int *block, byte *map, int w, int h, int x, int y);
 
-byte *scroll_down(byte *_buf, byte *buf, int *block, byte *map, int an, int al, int x, int y);
+byte *scroll_down(byte *_buf, byte *buf, int *block, byte *map, int w, int h, int x, int y);
 
-byte *scroll_up(byte *_buf, byte *buf, int *block, byte *map, int an, int al, int x, int y);
+byte *scroll_up(byte *_buf, byte *buf, int *block, byte *map, int w, int h, int x, int y);
 
 void move_scroll(int plano, int x, int y) {
   int ix, iy;
@@ -671,14 +671,14 @@ void move_scroll(int plano, int x, int y) {
     if (!(iscroll[snum].map_flags & 1)) {
       if (x < 0)
         x = 0;
-      else if (x + iscroll[snum].an >= iscroll[snum].map1_an)
-        x = iscroll[snum].map1_an - iscroll[snum].an;
+      else if (x + iscroll[snum].w >= iscroll[snum].map1_w)
+        x = iscroll[snum].map1_w - iscroll[snum].w;
     }
     if (!(iscroll[snum].map_flags & 2)) {
       if (y < 0)
         y = 0;
-      else if (y + iscroll[snum].al >= iscroll[snum].map1_al)
-        y = iscroll[snum].map1_al - iscroll[snum].al;
+      else if (y + iscroll[snum].h >= iscroll[snum].map1_h)
+        y = iscroll[snum].map1_h - iscroll[snum].h;
     }
   } else {
     ix = iscroll[snum].map2_x;
@@ -688,14 +688,14 @@ void move_scroll(int plano, int x, int y) {
     if (!(iscroll[snum].map_flags & 4)) {
       if (x < 0)
         x = 0;
-      else if (x + iscroll[snum].an >= iscroll[snum].map2_an)
-        x = iscroll[snum].map2_an - iscroll[snum].an;
+      else if (x + iscroll[snum].w >= iscroll[snum].map2_w)
+        x = iscroll[snum].map2_w - iscroll[snum].w;
     }
     if (!(iscroll[snum].map_flags & 8)) {
       if (y < 0)
         y = 0;
-      else if (y + iscroll[snum].al >= iscroll[snum].map2_al)
-        y = iscroll[snum].map2_al - iscroll[snum].al;
+      else if (y + iscroll[snum].h >= iscroll[snum].map2_h)
+        y = iscroll[snum].map2_h - iscroll[snum].h;
     }
   }
 
@@ -703,7 +703,7 @@ void move_scroll(int plano, int x, int y) {
   iy = y - iy;
 
   /////////////////////////////////////////////////////////////////////
-  if (abs(ix) > iscroll[snum].an / 2 || abs(iy) > iscroll[snum].al / 2) {
+  if (abs(ix) > iscroll[snum].w / 2 || abs(iy) > iscroll[snum].h / 2) {
     if (plano == 0) {
       ix += iscroll[snum].map1_x;
       iy += iscroll[snum].map1_y;
@@ -732,14 +732,14 @@ void move_scroll(int plano, int x, int y) {
       if (plano == 0) {
         iscroll[snum].sscr1 =
             scroll_right(iscroll[snum]._sscr1, iscroll[snum].sscr1, &iscroll[snum].block1,
-                         iscroll[snum].map1, iscroll[snum].map1_an, iscroll[snum].map1_al, x++, y);
+                         iscroll[snum].map1, iscroll[snum].map1_w, iscroll[snum].map1_h, x++, y);
         if (iscroll[snum].on == 2) {
           process_scan_right(); // New pixel enters from the right (exits left)
         }
       } else {
         iscroll[snum].sscr2 =
             scroll_right(iscroll[snum]._sscr2, iscroll[snum].sscr2, &iscroll[snum].block2,
-                         iscroll[snum].map2, iscroll[snum].map2_an, iscroll[snum].map2_al, x++, y);
+                         iscroll[snum].map2, iscroll[snum].map2_w, iscroll[snum].map2_h, x++, y);
       }
     } while (--ix);
 
@@ -748,14 +748,14 @@ void move_scroll(int plano, int x, int y) {
       if (plano == 0) {
         iscroll[snum].sscr1 =
             scroll_left(iscroll[snum]._sscr1, iscroll[snum].sscr1, &iscroll[snum].block1,
-                        iscroll[snum].map1, iscroll[snum].map1_an, iscroll[snum].map1_al, x--, y);
+                        iscroll[snum].map1, iscroll[snum].map1_w, iscroll[snum].map1_h, x--, y);
         if (iscroll[snum].on == 2) {
           process_scan_left(); // New pixel enters from the left (exits right)
         }
       } else {
         iscroll[snum].sscr2 =
             scroll_left(iscroll[snum]._sscr2, iscroll[snum].sscr2, &iscroll[snum].block2,
-                        iscroll[snum].map2, iscroll[snum].map2_an, iscroll[snum].map2_al, x--, y);
+                        iscroll[snum].map2, iscroll[snum].map2_w, iscroll[snum].map2_h, x--, y);
       }
     } while (++ix);
 
@@ -764,16 +764,16 @@ void move_scroll(int plano, int x, int y) {
       if (plano == 0) {
         iscroll[snum].sscr1 =
             scroll_down(iscroll[snum]._sscr1, iscroll[snum].sscr1, &iscroll[snum].block1,
-                        iscroll[snum].map1, iscroll[snum].map1_an, iscroll[snum].map1_al, x, y++);
+                        iscroll[snum].map1, iscroll[snum].map1_w, iscroll[snum].map1_h, x, y++);
         if (iscroll[snum].on == 2) {
-          if (++iscroll[snum].iscan == iscroll[snum].al)
+          if (++iscroll[snum].iscan == iscroll[snum].h)
             iscroll[snum].iscan = 0;
-          process_scan(iscroll[snum].al - 1);
+          process_scan(iscroll[snum].h - 1);
         }
       } else {
         iscroll[snum].sscr2 =
             scroll_down(iscroll[snum]._sscr2, iscroll[snum].sscr2, &iscroll[snum].block2,
-                        iscroll[snum].map2, iscroll[snum].map2_an, iscroll[snum].map2_al, x, y++);
+                        iscroll[snum].map2, iscroll[snum].map2_w, iscroll[snum].map2_h, x, y++);
       }
     } while (--iy);
 
@@ -782,16 +782,16 @@ void move_scroll(int plano, int x, int y) {
       if (plano == 0) {
         iscroll[snum].sscr1 =
             scroll_up(iscroll[snum]._sscr1, iscroll[snum].sscr1, &iscroll[snum].block1,
-                      iscroll[snum].map1, iscroll[snum].map1_an, iscroll[snum].map1_al, x, y--);
+                      iscroll[snum].map1, iscroll[snum].map1_w, iscroll[snum].map1_h, x, y--);
         if (iscroll[snum].on == 2) {
           if (iscroll[snum].iscan-- == 0)
-            iscroll[snum].iscan = iscroll[snum].al - 1;
+            iscroll[snum].iscan = iscroll[snum].h - 1;
           process_scan(0);
         }
       } else {
         iscroll[snum].sscr2 =
             scroll_up(iscroll[snum]._sscr2, iscroll[snum].sscr2, &iscroll[snum].block2,
-                      iscroll[snum].map2, iscroll[snum].map2_an, iscroll[snum].map2_al, x, y--);
+                      iscroll[snum].map2, iscroll[snum].map2_w, iscroll[snum].map2_h, x, y--);
       }
     } while (++iy);
 
@@ -808,7 +808,7 @@ void move_scroll(int plano, int x, int y) {
 // Single-direction scroll functions
 //----------------------------------------------------------------------------
 
-byte *scroll_right(byte *_buf, byte *buf, int *block, byte *map, int an, int al, int x, int y) {
+byte *scroll_right(byte *_buf, byte *buf, int *block, byte *map, int w, int h, int x, int y) {
   // Scroll window buffer (_buf, iscroll[snum].an, iscroll[snum].al(+1))
   // Number of scanlines in the first block (*block)
   // Pointer to current scroll start (buf)
@@ -817,77 +817,77 @@ byte *scroll_right(byte *_buf, byte *buf, int *block, byte *map, int an, int al,
   int n, m, b;
   byte *ret;
 
-  x += iscroll[snum].an;
+  x += iscroll[snum].w;
 
   if (x < 0)
-    x = (an - 1) - ((-x - 1) % an);
+    x = (w - 1) - ((-x - 1) % w);
   else
-    x = x % an;
+    x = x % w;
   if (y < 0)
-    y = (al - 1) - ((-y - 1) % al);
+    y = (h - 1) - ((-y - 1) % h);
   else
-    y = y % al;
+    y = y % h;
 
-  m = al - y;
-  map += y * an + x; // First pixel in the map
+  m = h - y;
+  map += y * w + x; // First pixel in the map
 
   buf++;
-  if (buf == _buf + iscroll[snum].an * iscroll[snum].al) {
-    memcpy(_buf, _buf + iscroll[snum].an * iscroll[snum].al, iscroll[snum].an);
+  if (buf == _buf + iscroll[snum].w * iscroll[snum].h) {
+    memcpy(_buf, _buf + iscroll[snum].w * iscroll[snum].h, iscroll[snum].w);
     buf = _buf;
-    *block = iscroll[snum].al;
-  } else if (((int)(buf - _buf) % iscroll[snum].an) == 0) {
-    memcpy(_buf, _buf + iscroll[snum].an * iscroll[snum].al, iscroll[snum].an);
+    *block = iscroll[snum].h;
+  } else if (((int)(buf - _buf) % iscroll[snum].w) == 0) {
+    memcpy(_buf, _buf + iscroll[snum].w * iscroll[snum].h, iscroll[snum].w);
     (*block)--;
   }
 
   ret = buf;
 
-  buf += iscroll[snum].an - 1;
+  buf += iscroll[snum].w - 1;
   b = *block;
 
-  n = iscroll[snum].al;
+  n = iscroll[snum].h;
   do {
     *buf = *map;
     if (--b == 0)
-      buf -= iscroll[snum].an * (iscroll[snum].al - 1);
+      buf -= iscroll[snum].w * (iscroll[snum].h - 1);
     else
-      buf += iscroll[snum].an;
+      buf += iscroll[snum].w;
     if (--m == 0) {
-      map -= an * (al - 1);
-      m = al;
+      map -= w * (h - 1);
+      m = h;
     } else
-      map += an;
+      map += w;
   } while (--n);
 
   return (ret);
 }
 
-byte *scroll_left(byte *_buf, byte *buf, int *block, byte *map, int an, int al, int x, int y) {
+byte *scroll_left(byte *_buf, byte *buf, int *block, byte *map, int w, int h, int x, int y) {
   int n, m, b;
   byte *ret;
 
   x--;
 
   if (x < 0)
-    x = (an - 1) - ((-x - 1) % an);
+    x = (w - 1) - ((-x - 1) % w);
   else
-    x = x % an;
+    x = x % w;
   if (y < 0)
-    y = (al - 1) - ((-y - 1) % al);
+    y = (h - 1) - ((-y - 1) % h);
   else
-    y = y % al;
+    y = y % h;
 
-  m = al - y;
-  map += y * an + x; // First pixel in the map
+  m = h - y;
+  map += y * w + x; // First pixel in the map
 
   if (buf == _buf) {
-    memcpy(_buf + iscroll[snum].an * iscroll[snum].al, _buf, iscroll[snum].an);
-    buf = _buf + iscroll[snum].an * iscroll[snum].al - 1;
+    memcpy(_buf + iscroll[snum].w * iscroll[snum].h, _buf, iscroll[snum].w);
+    buf = _buf + iscroll[snum].w * iscroll[snum].h - 1;
     *block = 1;
-  } else if (((int)(buf - _buf) % iscroll[snum].an) == 0) {
+  } else if (((int)(buf - _buf) % iscroll[snum].w) == 0) {
     buf--;
-    memcpy(_buf + iscroll[snum].an * iscroll[snum].al, _buf, iscroll[snum].an);
+    memcpy(_buf + iscroll[snum].w * iscroll[snum].h, _buf, iscroll[snum].w);
     (*block)++;
   } else
     buf--;
@@ -896,60 +896,60 @@ byte *scroll_left(byte *_buf, byte *buf, int *block, byte *map, int an, int al, 
 
   b = *block;
 
-  n = iscroll[snum].al;
+  n = iscroll[snum].h;
   do {
     *buf = *map;
     if (--b == 0)
-      buf -= iscroll[snum].an * (iscroll[snum].al - 1);
+      buf -= iscroll[snum].w * (iscroll[snum].h - 1);
     else
-      buf += iscroll[snum].an;
+      buf += iscroll[snum].w;
     if (--m == 0) {
-      map -= an * (al - 1);
-      m = al;
+      map -= w * (h - 1);
+      m = h;
     } else
-      map += an;
+      map += w;
   } while (--n);
 
   return (ret);
 }
 
-byte *scroll_down(byte *_buf, byte *buf, int *block, byte *map, int an, int al, int x, int y) {
+byte *scroll_down(byte *_buf, byte *buf, int *block, byte *map, int w, int h, int x, int y) {
   int n, m;
   byte *ret;
 
-  y += iscroll[snum].al;
+  y += iscroll[snum].h;
 
   if (x < 0)
-    x = (an - 1) - ((-x - 1) % an);
+    x = (w - 1) - ((-x - 1) % w);
   else
-    x = x % an;
+    x = x % w;
   if (y < 0)
-    y = (al - 1) - ((-y - 1) % al);
+    y = (h - 1) - ((-y - 1) % h);
   else
-    y = y % al;
+    y = y % h;
 
-  m = an - x;
-  map += y * an + x; // First pixel in the map
+  m = w - x;
+  map += y * w + x; // First pixel in the map
 
-  buf += iscroll[snum].an;
-  if (buf >= _buf + iscroll[snum].an * iscroll[snum].al) {
-    buf -= iscroll[snum].an * iscroll[snum].al;
-    *block = iscroll[snum].al;
+  buf += iscroll[snum].w;
+  if (buf >= _buf + iscroll[snum].w * iscroll[snum].h) {
+    buf -= iscroll[snum].w * iscroll[snum].h;
+    *block = iscroll[snum].h;
   } else
     (*block)--;
 
   ret = buf;
 
-  buf += (iscroll[snum].al - 1) * iscroll[snum].an;
-  if (buf >= _buf + iscroll[snum].an * iscroll[snum].al)
-    buf -= iscroll[snum].an * iscroll[snum].al;
+  buf += (iscroll[snum].h - 1) * iscroll[snum].w;
+  if (buf >= _buf + iscroll[snum].w * iscroll[snum].h)
+    buf -= iscroll[snum].w * iscroll[snum].h;
 
-  n = iscroll[snum].an;
+  n = iscroll[snum].w;
   do {
     *buf++ = *map;
     if (--m == 0) {
-      map -= an - 1;
-      m = an;
+      map -= w - 1;
+      m = w;
     } else
       map++;
   } while (--n);
@@ -957,39 +957,39 @@ byte *scroll_down(byte *_buf, byte *buf, int *block, byte *map, int an, int al, 
   return (ret);
 }
 
-byte *scroll_up(byte *_buf, byte *buf, int *block, byte *map, int an, int al, int x, int y) {
+byte *scroll_up(byte *_buf, byte *buf, int *block, byte *map, int w, int h, int x, int y) {
   int n, m;
   byte *ret;
 
   y--;
 
   if (x < 0)
-    x = (an - 1) - ((-x - 1) % an);
+    x = (w - 1) - ((-x - 1) % w);
   else
-    x = x % an;
+    x = x % w;
   if (y < 0)
-    y = (al - 1) - ((-y - 1) % al);
+    y = (h - 1) - ((-y - 1) % h);
   else
-    y = y % al;
+    y = y % h;
 
-  m = an - x;
-  map += y * an + x; // First pixel in the map
+  m = w - x;
+  map += y * w + x; // First pixel in the map
 
-  buf -= iscroll[snum].an;
+  buf -= iscroll[snum].w;
   if (buf < _buf) {
-    buf += iscroll[snum].an * iscroll[snum].al;
+    buf += iscroll[snum].w * iscroll[snum].h;
     *block = 1;
   } else
     (*block)++;
 
   ret = buf;
 
-  n = iscroll[snum].an;
+  n = iscroll[snum].w;
   do {
     *buf++ = *map;
     if (--m == 0) {
-      map -= an - 1;
-      m = an;
+      map -= w - 1;
+      m = w;
     } else
       map++;
   } while (--n);
@@ -1005,7 +1005,7 @@ void put_sprite(int file, int graph, int x, int y, int angle, int size, int flag
                 byte *cop, int copan, int copal) {
   int *ptr;
   byte *si;
-  int an, al; // Graphic width and height on screen
+  int w, h; // Graphic width and height on screen
   int xg, yg;
   byte *_saved_buffer = screen_buffer;
   int _saved_width = vga_width, _saved_height = vga_height;
@@ -1060,8 +1060,8 @@ void put_sprite(int file, int graph, int x, int y, int angle, int size, int flag
     vga_width = copan;
     vga_height = copal;
 
-    an = ptr[13];
-    al = ptr[14];
+    w = ptr[13];
+    h = ptr[14];
     si = (byte *)ptr + 64 + ptr[15] * 4;
 
     if (ptr[15] == 0 || *((word *)ptr + 32) == 65535) {
@@ -1073,27 +1073,27 @@ void put_sprite(int file, int graph, int x, int y, int angle, int size, int flag
     }
 
     if (angle) {
-      sp_rotated(si, x, y, an, al, xg, yg, angle, size, flags);
+      sp_rotated(si, x, y, w, h, xg, yg, angle, size, flags);
     } else if (size != 100) {
-      sp_scaled(si, x, y, an, al, xg, yg, size, flags);
+      sp_scaled(si, x, y, w, h, xg, yg, size, flags);
     } else {
       if (flags & 1) {
-        xg = an - 1 - xg;
+        xg = w - 1 - xg;
       }
       x -= xg;
       if (flags & 2) {
-        yg = al - 1 - yg;
+        yg = h - 1 - yg;
       }
       y -= yg;
-      if (x >= clipx0 && x + an <= clipx1 && y >= clipy0 &&
-          y + al <= clipy1) // Fully visible sprite
-        sp_normal(si, x, y, an, al, flags);
-      else if (x < clipx1 && y < clipy1 && x + an > clipx0 && y + al > clipy0) // Clipped sprite
-        sp_clipped(si, x, y, an, al, flags);
+      if (x >= clipx0 && x + w <= clipx1 && y >= clipy0 &&
+          y + h <= clipy1) // Fully visible sprite
+        sp_normal(si, x, y, w, h, flags);
+      else if (x < clipx1 && y < clipy1 && x + w > clipx0 && y + h > clipy0) // Clipped sprite
+        sp_clipped(si, x, y, w, h, flags);
       x0s = x;
-      x1s = x + an - 1;
+      x1s = x + w - 1;
       y0s = y;
-      y1s = y + al - 1;
+      y1s = y + h - 1;
     }
 
     screen_buffer = _saved_buffer;
@@ -1117,7 +1117,7 @@ void paint_sprite(void) { // Render a sprite (if visible), using mem[ide+ ... ]
 
   int *ptr;
   byte *si;
-  int x, y, an, al; // Graphic width and height on screen
+  int x, y, w, h; // Graphic width and height on screen
   int xg, yg;
   int n, m;
 
@@ -1153,9 +1153,9 @@ void paint_sprite(void) { // Render a sprite (if visible), using mem[ide+ ... ]
 
   if (mem[ide + _Ctype] == 1 && iscroll[snum].on > 0) {
     clipx0 = iscroll[snum].x;
-    clipx1 = iscroll[snum].x + iscroll[snum].an;
+    clipx1 = iscroll[snum].x + iscroll[snum].w;
     clipy0 = iscroll[snum].y;
-    clipy1 = iscroll[snum].y + iscroll[snum].al;
+    clipy1 = iscroll[snum].y + iscroll[snum].h;
   } else if (x < 0 || x >= max_region) {
     clipx0 = 0;
     clipx1 = vga_width;
@@ -1181,8 +1181,8 @@ void paint_sprite(void) { // Render a sprite (if visible), using mem[ide+ ... ]
       y += iscroll[snum].y - iscroll[snum].map1_y;
     }
 
-    an = ptr[13];
-    al = ptr[14];
+    w = ptr[13];
+    h = ptr[14];
     si = (byte *)ptr + 64 + ptr[15] * 4;
 
     if (ptr[15] == 0 || *((word *)ptr + 32) == 65535) {
@@ -1194,31 +1194,31 @@ void paint_sprite(void) { // Render a sprite (if visible), using mem[ide+ ... ]
     }
 
     if (putsprite != NULL) {
-      putsprite(si, x, y, an, al, xg, yg, mem[ide + _Angle], mem[ide + _Size], mem[ide + _Flags]);
+      putsprite(si, x, y, w, h, xg, yg, mem[ide + _Angle], mem[ide + _Size], mem[ide + _Flags]);
     } else if (mem[ide + _Angle] && mem[ide + _XGraph] <= 0) {
-      sp_rotated(si, x, y, an, al, xg, yg, mem[ide + _Angle], mem[ide + _Size], mem[ide + _Flags]);
+      sp_rotated(si, x, y, w, h, xg, yg, mem[ide + _Angle], mem[ide + _Size], mem[ide + _Flags]);
       save_region();
     } else if (mem[ide + _Size] != 100) {
-      sp_scaled(si, x, y, an, al, xg, yg, mem[ide + _Size], mem[ide + _Flags]);
+      sp_scaled(si, x, y, w, h, xg, yg, mem[ide + _Size], mem[ide + _Flags]);
       save_region();
     } else {
       if (mem[ide + _Flags] & 1) {
-        xg = an - 1 - xg;
+        xg = w - 1 - xg;
       }
       x -= xg;
       if (mem[ide + _Flags] & 2) {
-        yg = al - 1 - yg;
+        yg = h - 1 - yg;
       }
       y -= yg;
-      if (x >= clipx0 && x + an <= clipx1 && y >= clipy0 &&
-          y + al <= clipy1) // Fully visible sprite
-        sp_normal(si, x, y, an, al, mem[ide + _Flags]);
-      else if (x < clipx1 && y < clipy1 && x + an > clipx0 && y + al > clipy0) // Clipped sprite
-        sp_clipped(si, x, y, an, al, mem[ide + _Flags]);
+      if (x >= clipx0 && x + w <= clipx1 && y >= clipy0 &&
+          y + h <= clipy1) // Fully visible sprite
+        sp_normal(si, x, y, w, h, mem[ide + _Flags]);
+      else if (x < clipx1 && y < clipy1 && x + w > clipx0 && y + h > clipy0) // Clipped sprite
+        sp_clipped(si, x, y, w, h, mem[ide + _Flags]);
       x0s = x;
-      x1s = x + an - 1;
+      x1s = x + w - 1;
       y0s = y;
-      y1s = y + al - 1;
+      y1s = y + h - 1;
       save_region();
     }
   }
@@ -1251,9 +1251,9 @@ void save_region(void) {
 // Sprite - [mirrored] [ghost]
 //----------------------------------------------------------------------------
 
-void sp_normal(byte *p, int x, int y, int an, int al, int flags) {
+void sp_normal(byte *p, int x, int y, int w, int h, int flags) {
   byte *q = screen_buffer + y * vga_width + x;
-  int ancho = an;
+  int width = w;
 
   switch (flags & 7) {
   case 0: //--
@@ -1264,12 +1264,12 @@ void sp_normal(byte *p, int x, int y, int an, int al, int flags) {
         }
         p++;
         q++;
-      } while (--an);
-      q += vga_width - (an = ancho);
-    } while (--al);
+      } while (--w);
+      q += vga_width - (w = width);
+    } while (--h);
     break;
   case 1: //h-
-    p += an - 1;
+    p += w - 1;
     do {
       do {
         if (*p) {
@@ -1277,13 +1277,13 @@ void sp_normal(byte *p, int x, int y, int an, int al, int flags) {
         }
         p--;
         q++;
-      } while (--an);
-      q += vga_width - (an = ancho);
-      p += an * 2;
-    } while (--al);
+      } while (--w);
+      q += vga_width - (w = width);
+      p += w * 2;
+    } while (--h);
     break;
   case 2: //-v
-    p += (al - 1) * an;
+    p += (h - 1) * w;
     do {
       do {
         if (*p) {
@@ -1291,13 +1291,13 @@ void sp_normal(byte *p, int x, int y, int an, int al, int flags) {
         }
         p++;
         q++;
-      } while (--an);
-      q += vga_width - (an = ancho);
-      p -= an * 2;
-    } while (--al);
+      } while (--w);
+      q += vga_width - (w = width);
+      p -= w * 2;
+    } while (--h);
     break;
   case 3: //hv
-    p += al * an - 1;
+    p += h * w - 1;
     do {
       do {
         if (*p) {
@@ -1305,9 +1305,9 @@ void sp_normal(byte *p, int x, int y, int an, int al, int flags) {
         }
         p--;
         q++;
-      } while (--an);
-      q += vga_width - (an = ancho);
-    } while (--al);
+      } while (--w);
+      q += vga_width - (w = width);
+    } while (--h);
     break;
   case 4: //-- Ghost
     do {
@@ -1315,44 +1315,44 @@ void sp_normal(byte *p, int x, int y, int an, int al, int flags) {
         *q = ghost[(*p << 8) + *q];
         p++;
         q++;
-      } while (--an);
-      q += vga_width - (an = ancho);
-    } while (--al);
+      } while (--w);
+      q += vga_width - (w = width);
+    } while (--h);
     break;
   case 5: //h- Ghost
-    p += an - 1;
+    p += w - 1;
     do {
       do {
         *q = ghost[(*p << 8) + *q];
         p--;
         q++;
-      } while (--an);
-      q += vga_width - (an = ancho);
-      p += an * 2;
-    } while (--al);
+      } while (--w);
+      q += vga_width - (w = width);
+      p += w * 2;
+    } while (--h);
     break;
   case 6: //-v Ghost
-    p += (al - 1) * an;
+    p += (h - 1) * w;
     do {
       do {
         *q = ghost[(*p << 8) + *q];
         p++;
         q++;
-      } while (--an);
-      q += vga_width - (an = ancho);
-      p -= an * 2;
-    } while (--al);
+      } while (--w);
+      q += vga_width - (w = width);
+      p -= w * 2;
+    } while (--h);
     break;
   case 7: //hv Ghost
-    p += al * an - 1;
+    p += h * w - 1;
     do {
       do {
         *q = ghost[(*p << 8) + *q];
         p--;
         q++;
-      } while (--an);
-      q += vga_width - (an = ancho);
-    } while (--al);
+      } while (--w);
+      q += vga_width - (w = width);
+    } while (--h);
     break;
   }
 }
@@ -1361,7 +1361,7 @@ void sp_normal(byte *p, int x, int y, int an, int al, int flags) {
 // Sprite - clipped [mirrored] [ghost]
 //----------------------------------------------------------------------------
 
-void sp_clipped(byte *p, int x, int y, int an, int al, int flags) {
+void sp_clipped(byte *p, int x, int y, int w, int h, int flags) {
   byte *q = screen_buffer + y * vga_width + x;
   int salta_x, long_x, resto_x;
   int salta_y, long_y, resto_y;
@@ -1370,28 +1370,28 @@ void sp_clipped(byte *p, int x, int y, int an, int al, int flags) {
     salta_x = clipx0 - x;
   else
     salta_x = 0;
-  if (x + an > clipx1)
-    resto_x = x + an - clipx1;
+  if (x + w > clipx1)
+    resto_x = x + w - clipx1;
   else
     resto_x = 0;
-  long_x = an - salta_x - resto_x;
+  long_x = w - salta_x - resto_x;
 
   if (y < clipy0)
     salta_y = clipy0 - y;
   else
     salta_y = 0;
-  if (y + al > clipy1)
-    resto_y = y + al - clipy1;
+  if (y + h > clipy1)
+    resto_y = y + h - clipy1;
   else
     resto_y = 0;
-  long_y = al - salta_y - resto_y;
+  long_y = h - salta_y - resto_y;
 
   switch (flags & 7) {
   case 0: //--
-    p += an * salta_y + salta_x;
+    p += w * salta_y + salta_x;
     q += vga_width * salta_y + salta_x;
     resto_x += salta_x;
-    an = long_x;
+    w = long_x;
     do {
       do {
         if (*p) {
@@ -1399,13 +1399,13 @@ void sp_clipped(byte *p, int x, int y, int an, int al, int flags) {
         }
         p++;
         q++;
-      } while (--an);
-      q += vga_width - (an = long_x);
+      } while (--w);
+      q += vga_width - (w = long_x);
       p += resto_x;
     } while (--long_y);
     break;
   case 1: //h-
-    p += an * salta_y + an - 1 - salta_x;
+    p += w * salta_y + w - 1 - salta_x;
     q += vga_width * salta_y + salta_x;
     resto_x += salta_x;
     salta_x = long_x;
@@ -1418,11 +1418,11 @@ void sp_clipped(byte *p, int x, int y, int an, int al, int flags) {
         q++;
       } while (--salta_x);
       q += vga_width - (salta_x = long_x);
-      p += an + long_x;
+      p += w + long_x;
     } while (--long_y);
     break;
   case 2: //-v
-    p += (al - 1) * an - an * salta_y + salta_x;
+    p += (h - 1) * w - w * salta_y + salta_x;
     q += vga_width * salta_y + salta_x;
     resto_x += salta_x;
     salta_x = long_x;
@@ -1435,11 +1435,11 @@ void sp_clipped(byte *p, int x, int y, int an, int al, int flags) {
         q++;
       } while (--salta_x);
       q += vga_width - (salta_x = long_x);
-      p += resto_x - an * 2;
+      p += resto_x - w * 2;
     } while (--long_y);
     break;
   case 3: //hv
-    p += al * an - 1 - an * salta_y - salta_x;
+    p += h * w - 1 - w * salta_y - salta_x;
     q += vga_width * salta_y + salta_x;
     resto_x += salta_x;
     salta_x = long_x;
@@ -1456,22 +1456,22 @@ void sp_clipped(byte *p, int x, int y, int an, int al, int flags) {
     } while (--long_y);
     break;
   case 4: //-- Ghost
-    p += an * salta_y + salta_x;
+    p += w * salta_y + salta_x;
     q += vga_width * salta_y + salta_x;
     resto_x += salta_x;
-    an = long_x;
+    w = long_x;
     do {
       do {
         *q = ghost[(*p << 8) + *q];
         p++;
         q++;
-      } while (--an);
-      q += vga_width - (an = long_x);
+      } while (--w);
+      q += vga_width - (w = long_x);
       p += resto_x;
     } while (--long_y);
     break;
   case 5: //h- Ghost
-    p += an * salta_y + an - 1 - salta_x;
+    p += w * salta_y + w - 1 - salta_x;
     q += vga_width * salta_y + salta_x;
     resto_x += salta_x;
     salta_x = long_x;
@@ -1482,11 +1482,11 @@ void sp_clipped(byte *p, int x, int y, int an, int al, int flags) {
         q++;
       } while (--salta_x);
       q += vga_width - (salta_x = long_x);
-      p += an + long_x;
+      p += w + long_x;
     } while (--long_y);
     break;
   case 6: //-v Ghost
-    p += (al - 1) * an - an * salta_y + salta_x;
+    p += (h - 1) * w - w * salta_y + salta_x;
     q += vga_width * salta_y + salta_x;
     resto_x += salta_x;
     salta_x = long_x;
@@ -1497,11 +1497,11 @@ void sp_clipped(byte *p, int x, int y, int an, int al, int flags) {
         q++;
       } while (--salta_x);
       q += vga_width - (salta_x = long_x);
-      p += resto_x - an * 2;
+      p += resto_x - w * 2;
     } while (--long_y);
     break;
   case 7: //hv Ghost
-    p += al * an - 1 - an * salta_y - salta_x;
+    p += h * w - 1 - w * salta_y - salta_x;
     q += vga_width * salta_y + salta_x;
     resto_x += salta_x;
     salta_x = long_x;
@@ -1522,28 +1522,28 @@ void sp_clipped(byte *p, int x, int y, int an, int al, int flags) {
 // Sprite - scaled [clipped] [mirrored] [ghost]
 //----------------------------------------------------------------------------
 
-void sp_scaled(byte *old_si, int x, int y, int an, int al, int xg, int yg, int size, int flags) {
+void sp_scaled(byte *old_si, int x, int y, int w, int h, int xg, int yg, int size, int flags) {
   int salta_x, long_x, resto_x; // In screen coordinates
   int salta_y, long_y, resto_y;
-  int xr, ixr, yr, iyr, old_xr, old_an;
+  int xr, ixr, yr, iyr, old_xr, old_w;
   byte *si, *di, c;
 
   if (flags & 1)
-    x0s = x - ((an - 1 - xg) * size) / 100;
+    x0s = x - ((w - 1 - xg) * size) / 100;
   else
     x0s = x - (xg * size) / 100;
   if (flags & 2)
-    y0s = y - ((al - 1 - yg) * size) / 100;
+    y0s = y - ((h - 1 - yg) * size) / 100;
   else
     y0s = y - (yg * size) / 100;
-  x1s = x0s + (an * size) / 100 - 1;
-  y1s = y0s + (al * size) / 100 - 1;
+  x1s = x0s + (w * size) / 100 - 1;
+  y1s = y0s + (h * size) / 100 - 1;
 
   if (x1s < x0s || y1s < y0s)
     return;
 
-  ixr = (float)(an * 256) / (float)(x1s - x0s + 1);
-  iyr = (float)(al * 256) / (float)(y1s - y0s + 1);
+  ixr = (float)(w * 256) / (float)(x1s - x0s + 1);
+  iyr = (float)(h * 256) / (float)(y1s - y0s + 1);
 
   if (x1s < clipx0 || y1s < clipy0 || x0s >= clipx1 || y0s >= clipy1)
     return;
@@ -1558,7 +1558,7 @@ void sp_scaled(byte *old_si, int x, int y, int an, int al, int xg, int yg, int s
     resto_x = x1s - clipx1 + 1;
   else
     resto_x = 0;
-  long_x = (an * size) / 100 - salta_x - resto_x;
+  long_x = (w * size) / 100 - salta_x - resto_x;
 
   if (y0s < clipy0)
     salta_y = clipy0 - y0s;
@@ -1568,49 +1568,49 @@ void sp_scaled(byte *old_si, int x, int y, int an, int al, int xg, int yg, int s
     resto_y = y1s - clipy1 + 1;
   else
     resto_y = 0;
-  long_y = (al * size) / 100 - salta_y - resto_y;
+  long_y = (h * size) / 100 - salta_y - resto_y;
 
   if (flags & 1) {
-    xr = an * 256 - salta_x * ixr - 1;
+    xr = w * 256 - salta_x * ixr - 1;
     ixr = -ixr;
   } else
     xr = salta_x * ixr;
   if (flags & 2) {
-    yr = al * 256 - salta_y * iyr - 1;
+    yr = h * 256 - salta_y * iyr - 1;
     iyr = -iyr;
   } else
     yr = salta_y * iyr;
 
   old_xr = xr;
-  old_an = an;
+  old_w = w;
   di += vga_width * salta_y + salta_x;
-  an = long_x;
+  w = long_x;
 
   if (flags & 4)
     do {
-      si = old_si + (yr >> 8) * old_an;
+      si = old_si + (yr >> 8) * old_w;
       do {
         c = *(si + (xr >> 8));
         *di = ghost[(c << 8) + *di];
         di++;
         xr += ixr;
-      } while (--an);
+      } while (--w);
       yr += iyr;
       xr = old_xr;
-      di += vga_width - (an = long_x);
+      di += vga_width - (w = long_x);
     } while (--long_y);
   else
     do {
-      si = old_si + (yr >> 8) * old_an;
+      si = old_si + (yr >> 8) * old_w;
       do {
         if ((c = *(si + (xr >> 8))))
           *di = c;
         di++;
         xr += ixr;
-      } while (--an);
+      } while (--w);
       yr += iyr;
       xr = old_xr;
-      di += vga_width - (an = long_x);
+      di += vga_width - (w = long_x);
     } while (--long_y);
 }
 
@@ -1618,13 +1618,13 @@ void sp_scaled(byte *old_si, int x, int y, int an, int al, int xg, int yg, int s
 // Sprite - rotated [scaled] [clipped] [mirrored] [ghost]
 //----------------------------------------------------------------------------
 
-void sp_rotated(byte *si, int x, int y, int an, int al, int xg, int yg, int ang, int size,
+void sp_rotated(byte *si, int x, int y, int w, int h, int xg, int yg, int ang, int size,
                 int flags) {
   float d0, d1, d2, d3;
   float a0, a1, a2, a3;
   float a, s;
   int p[24];
-  int h, hmin, hmax; // Minimum and maximum height
+  int scan_y, hmin, hmax; // Minimum and maximum height
   int n, l0 = 0, l1; // Side 0 and side 1 (indices into p[])
 
   int hmax0, hmax1;
@@ -1645,19 +1645,19 @@ void sp_rotated(byte *si, int x, int y, int an, int al, int xg, int yg, int ang,
     a0 = a;
   else
     a0 = a + (float)atan2(-yg, xg);
-  xg = xg + an - 1;
+  xg = xg + w - 1;
   d1 = (float)sqrt(xg * xg + yg * yg) * s;
   if (yg == 0 && xg == 0)
     a1 = a;
   else
     a1 = a + (float)atan2(-yg, xg);
-  yg = yg + al - 1;
+  yg = yg + h - 1;
   d2 = (float)sqrt(xg * xg + yg * yg) * s;
   if (yg == 0 && xg == 0)
     a2 = a;
   else
     a2 = a + (float)atan2(-yg, xg);
-  xg = xg - an + 1;
+  xg = xg - w + 1;
   d3 = (float)sqrt(xg * xg + yg * yg) * s;
   if (yg == 0 && xg == 0)
     a3 = a;
@@ -1714,72 +1714,72 @@ void sp_rotated(byte *si, int x, int y, int an, int al, int xg, int yg, int ang,
   hmax0 = hmax1 = hmin;
   ptrcopia = screen_buffer + hmin * vga_width;
 
-  h = hmin;
+  scan_y = hmin;
   do {
-    if (h < hmax) {
-      while (h == hmax0) {
-        if ((hmax0 = p[l0 - 1]) != h) {
+    if (scan_y < hmax) {
+      while (scan_y == hmax0) {
+        if ((hmax0 = p[l0 - 1]) != scan_y) {
           x0.l = p[l0] << 16;
-          ix0 = ((p[l0 - 2] << 16) - x0.l) / (hmax0 - h);
+          ix0 = ((p[l0 - 2] << 16) - x0.l) / (hmax0 - scan_y);
           if (ix0 < 0)
             x0.l += 65535;
           switch (l0 & 6) {
           case 0:
             g0y.l = 0;
-            ig0y = (al << 16) / (hmax0 - h);
+            ig0y = (h << 16) / (hmax0 - scan_y);
             g0x.l = 0;
             ig0x = 0;
             break;
           case 2:
-            g0x.l = ((an - 1) << 16) + 65535;
-            ig0x = (an << 16) / (h - hmax0);
+            g0x.l = ((w - 1) << 16) + 65535;
+            ig0x = (w << 16) / (scan_y - hmax0);
             g0y.l = 0;
             ig0y = 0;
             break;
           case 4:
-            g0y.l = ((al - 1) << 16) + 65535;
-            ig0y = (al << 16) / (h - hmax0);
-            g0x.l = ((an - 1) << 16) + 65535;
+            g0y.l = ((h - 1) << 16) + 65535;
+            ig0y = (h << 16) / (scan_y - hmax0);
+            g0x.l = ((w - 1) << 16) + 65535;
             ig0x = 0;
             break;
           case 6:
             g0x.l = 0;
-            ig0x = (an << 16) / (hmax0 - h);
-            g0y.l = ((al - 1) << 16) + 65535;
+            ig0x = (w << 16) / (hmax0 - scan_y);
+            g0y.l = ((h - 1) << 16) + 65535;
             ig0y = 0;
             break;
           }
         }
         l0 -= 2;
       }
-      while (h == hmax1) {
-        if ((hmax1 = p[l1 + 3]) != h) {
+      while (scan_y == hmax1) {
+        if ((hmax1 = p[l1 + 3]) != scan_y) {
           x1.l = p[l1] << 16;
-          ix1 = ((p[l1 + 2] << 16) - x1.l) / (hmax1 - h);
+          ix1 = ((p[l1 + 2] << 16) - x1.l) / (hmax1 - scan_y);
           if (ix1 < 0)
             x1.l += 65535;
           switch (l1 & 6) {
           case 0:
             g1x.l = 0;
-            ig1x = (an << 16) / (hmax1 - h);
+            ig1x = (w << 16) / (hmax1 - scan_y);
             g1y.l = 0;
             ig1y = 0;
             break;
           case 2:
             g1y.l = 0;
-            ig1y = (al << 16) / (hmax1 - h);
-            g1x.l = ((an - 1) << 16) + 65535;
+            ig1y = (h << 16) / (hmax1 - scan_y);
+            g1x.l = ((w - 1) << 16) + 65535;
             ig1x = 0;
             break;
           case 4:
-            g1x.l = ((an - 1) << 16) + 65535;
-            ig1x = (an << 16) / (h - hmax1);
-            g1y.l = ((al - 1) << 16) + 65535;
+            g1x.l = ((w - 1) << 16) + 65535;
+            ig1x = (w << 16) / (scan_y - hmax1);
+            g1y.l = ((h - 1) << 16) + 65535;
             ig1y = 0;
             break;
           case 6:
-            g1y.l = ((al - 1) << 16) + 65535;
-            ig1y = (al << 16) / (h - hmax1);
+            g1y.l = ((h - 1) << 16) + 65535;
+            ig1y = (h << 16) / (scan_y - hmax1);
             g1x.l = 0;
             ig1x = 0;
             break;
@@ -1788,7 +1788,7 @@ void sp_rotated(byte *si, int x, int y, int an, int al, int xg, int yg, int ang,
         l1 += 2;
       }
     } else {
-      if (h == hmax0) {
+      if (scan_y == hmax0) {
         g0x.l = 0;
         g0y.l = 0;
         ig0x = 0;
@@ -1797,18 +1797,18 @@ void sp_rotated(byte *si, int x, int y, int an, int al, int xg, int yg, int ang,
         ix0 = 0;
         switch (l0 & 6) {
         case 2:
-          g0x.l = ((an - 1) << 16) + 65535;
+          g0x.l = ((w - 1) << 16) + 65535;
           break;
         case 4:
-          g0y.l = ((al - 1) << 16) + 65535;
-          g0x.l = ((an - 1) << 16) + 65535;
+          g0y.l = ((h - 1) << 16) + 65535;
+          g0x.l = ((w - 1) << 16) + 65535;
           break;
         case 6:
-          g0y.l = ((al - 1) << 16) + 65535;
+          g0y.l = ((h - 1) << 16) + 65535;
           break;
         }
       }
-      if (h == hmax1) {
+      if (scan_y == hmax1) {
         g1x.l = 0;
         g1y.l = 0;
         ig1x = 0;
@@ -1817,14 +1817,14 @@ void sp_rotated(byte *si, int x, int y, int an, int al, int xg, int yg, int ang,
         ix1 = 0;
         switch (l1 & 6) {
         case 2:
-          g1x.l = ((an - 1) << 16) + 65535;
+          g1x.l = ((w - 1) << 16) + 65535;
           break;
         case 4:
-          g1x.l = ((an - 1) << 16) + 65535;
-          g1y.l = ((al - 1) << 16) + 65535;
+          g1x.l = ((w - 1) << 16) + 65535;
+          g1y.l = ((h - 1) << 16) + 65535;
           break;
         case 6:
-          g1y.l = ((al - 1) << 16) + 65535;
+          g1y.l = ((h - 1) << 16) + 65535;
           break;
         }
       }
@@ -1842,35 +1842,35 @@ void sp_rotated(byte *si, int x, int y, int an, int al, int xg, int yg, int ang,
       g1y.l = kk;
     }
 
-    if (h < clipy1 && h >= clipy0 && x0.w[1] < clipx1 && x1.w[1] >= clipx0 && x1.w[1] > x0.w[1]) {
+    if (scan_y < clipy1 && scan_y >= clipy0 && x0.w[1] < clipx1 && x1.w[1] >= clipx0 && x1.w[1] > x0.w[1]) {
       if (x0.w[1] < clipx0) {
         if (x1.w[1] >= clipx1) {
           if (flags & 4)
             sp_scan_clipped_ghost(ptrcopia + clipx0, x1.w[1] - x0.w[1], clipx1 - clipx0 - 1,
-                                  clipx0 - x0.w[1], si, an, g0x.l, g0y.l, g1x.l, g1y.l);
+                                  clipx0 - x0.w[1], si, w, g0x.l, g0y.l, g1x.l, g1y.l);
           else
             sp_scan_clipped(ptrcopia + clipx0, x1.w[1] - x0.w[1], clipx1 - clipx0 - 1,
-                            clipx0 - x0.w[1], si, an, g0x.l, g0y.l, g1x.l, g1y.l);
+                            clipx0 - x0.w[1], si, w, g0x.l, g0y.l, g1x.l, g1y.l);
         } else {
           if (flags & 4)
             sp_scan_clipped_ghost(ptrcopia + clipx0, x1.w[1] - x0.w[1], x1.w[1] - clipx0,
-                                  clipx0 - x0.w[1], si, an, g0x.l, g0y.l, g1x.l, g1y.l);
+                                  clipx0 - x0.w[1], si, w, g0x.l, g0y.l, g1x.l, g1y.l);
           else
             sp_scan_clipped(ptrcopia + clipx0, x1.w[1] - x0.w[1], x1.w[1] - clipx0,
-                            clipx0 - x0.w[1], si, an, g0x.l, g0y.l, g1x.l, g1y.l);
+                            clipx0 - x0.w[1], si, w, g0x.l, g0y.l, g1x.l, g1y.l);
         }
       } else if (x1.w[1] >= clipx1) {
         if (flags & 4)
           sp_scan_clipped_ghost(ptrcopia + x0.w[1], x1.w[1] - x0.w[1], clipx1 - 1 - x0.w[1], 0, si,
-                                an, g0x.l, g0y.l, g1x.l, g1y.l);
+                                w, g0x.l, g0y.l, g1x.l, g1y.l);
         else
-          sp_scan_clipped(ptrcopia + x0.w[1], x1.w[1] - x0.w[1], clipx1 - 1 - x0.w[1], 0, si, an,
+          sp_scan_clipped(ptrcopia + x0.w[1], x1.w[1] - x0.w[1], clipx1 - 1 - x0.w[1], 0, si, w,
                           g0x.l, g0y.l, g1x.l, g1y.l);
       } else {
         if (flags & 4)
-          sp_scan_ghost(ptrcopia + x0.w[1], x1.w[1] - x0.w[1], si, an, g0x.l, g0y.l, g1x.l, g1y.l);
+          sp_scan_ghost(ptrcopia + x0.w[1], x1.w[1] - x0.w[1], si, w, g0x.l, g0y.l, g1x.l, g1y.l);
         else
-          sp_scan(ptrcopia + x0.w[1], x1.w[1] - x0.w[1], si, an, g0x.l, g0y.l, g1x.l, g1y.l);
+          sp_scan(ptrcopia + x0.w[1], x1.w[1] - x0.w[1], si, w, g0x.l, g0y.l, g1x.l, g1y.l);
       }
     }
 
@@ -1895,14 +1895,14 @@ void sp_rotated(byte *si, int x, int y, int an, int al, int xg, int yg, int ang,
 
     ptrcopia += vga_width;
 
-  } while (h++ < hmax);
+  } while (scan_y++ < hmax);
 }
 
 //----------------------------------------------------------------------------
 // Render a rotated and scaled sprite scanline, with clipping
 //----------------------------------------------------------------------------
 
-void sp_scan_clipped(byte *p, short n, short m, short o, byte *si, int an, int x0, int y0, int x1,
+void sp_scan_clipped(byte *p, short n, short m, short o, byte *si, int w, int x0, int y0, int x1,
                      int y1) {
   union {
     int32_t l;
@@ -1921,7 +1921,7 @@ void sp_scan_clipped(byte *p, short n, short m, short o, byte *si, int an, int x
   }
 
   do {
-    if ((c = *(si + x.w[1] + y.w[1] * an))) {
+    if ((c = *(si + x.w[1] + y.w[1] * w))) {
       *p = c;
     }
     p++;
@@ -1930,7 +1930,7 @@ void sp_scan_clipped(byte *p, short n, short m, short o, byte *si, int an, int x
   } while (m--);
 }
 
-void sp_scan_clipped_ghost(byte *p, short n, short m, short o, byte *si, int an, int x0, int y0,
+void sp_scan_clipped_ghost(byte *p, short n, short m, short o, byte *si, int w, int x0, int y0,
                            int x1, int y1) {
   union {
     int32_t l;
@@ -1949,7 +1949,7 @@ void sp_scan_clipped_ghost(byte *p, short n, short m, short o, byte *si, int an,
   }
 
   do {
-    c = *(si + x.w[1] + y.w[1] * an);
+    c = *(si + x.w[1] + y.w[1] * w);
     *p = ghost[(c << 8) + *p];
     p++;
     x.l += x0;
@@ -1961,7 +1961,7 @@ void sp_scan_clipped_ghost(byte *p, short n, short m, short o, byte *si, int an,
 // Render a rotated and scaled sprite scanline, without clipping
 //----------------------------------------------------------------------------
 
-void sp_scan(byte *p, short n, byte *si, int an, int x0, int y0, int x1, int y1) {
+void sp_scan(byte *p, short n, byte *si, int w, int x0, int y0, int x1, int y1) {
   union {
     int32_t l;
     int16_t w[2];
@@ -1974,7 +1974,7 @@ void sp_scan(byte *p, short n, byte *si, int an, int x0, int y0, int x1, int y1)
   y0 = (y1 - y0) / n;
 
   do {
-    if ((c = *(si + x.w[1] + y.w[1] * an))) {
+    if ((c = *(si + x.w[1] + y.w[1] * w))) {
       *p = c;
     }
     p++;
@@ -1983,7 +1983,7 @@ void sp_scan(byte *p, short n, byte *si, int an, int x0, int y0, int x1, int y1)
   } while (n--);
 }
 
-void sp_scan_ghost(byte *p, short n, byte *si, int an, int x0, int y0, int x1, int y1) {
+void sp_scan_ghost(byte *p, short n, byte *si, int w, int x0, int y0, int x1, int y1) {
   union {
     int32_t l;
     int16_t w[2];
@@ -1996,7 +1996,7 @@ void sp_scan_ghost(byte *p, short n, byte *si, int an, int x0, int y0, int x1, i
   y0 = (y1 - y0) / n;
 
   do {
-    c = *(si + x.w[1] + y.w[1] * an);
+    c = *(si + x.w[1] + y.w[1] * w);
     *p = ghost[(c << 8) + *p];
     p++;
     x.l += x0;
@@ -2009,24 +2009,24 @@ void sp_scan_ghost(byte *p, short n, byte *si, int an, int x0, int y0, int x1, i
 //----------------------------------------------------------------------------
 
 void paint_drawings(void) {
-  int x, y, an, al;
+  int x, y, w, h;
   int n = 0;
 
   do
     if (drawing[n].type) {
       if (drawing[n].x0 < drawing[n].x1) {
         x = drawing[n].x0;
-        an = drawing[n].x1 - x + 1;
+        w = drawing[n].x1 - x + 1;
       } else {
         x = drawing[n].x1;
-        an = drawing[n].x0 - x + 1;
+        w = drawing[n].x0 - x + 1;
       }
       if (drawing[n].y0 < drawing[n].y1) {
         y = drawing[n].y0;
-        al = drawing[n].y1 - y + 1;
+        h = drawing[n].y1 - y + 1;
       } else {
         y = drawing[n].y1;
-        al = drawing[n].y0 - y + 1;
+        h = drawing[n].y0 - y + 1;
       }
 
       clipx0 = region[drawing[n].region].x0;
@@ -2034,11 +2034,11 @@ void paint_drawings(void) {
       clipx1 = region[drawing[n].region].x1;
       clipy1 = region[drawing[n].region].y1;
 
-      if (x + an <= clipx0)
+      if (x + w <= clipx0)
         continue;
       if (x >= clipx1)
         continue;
-      if (y + al <= clipy0)
+      if (y + h <= clipy0)
         continue;
       if (y >= clipy1)
         continue;
@@ -2051,16 +2051,16 @@ void paint_drawings(void) {
         line(drawing[n].x0, drawing[n].y0, drawing[n].x1, drawing[n].y1);
         break;
       case 2:
-        draw_box(x, y, an, al);
+        draw_box(x, y, w, h);
         break;
       case 3:
-        draw_filled_box(x, y, an, al);
+        draw_filled_box(x, y, w, h);
         break;
       case 4:
-        draw_circle(0, x, y, x + an - 1, y + al - 1);
+        draw_circle(0, x, y, x + w - 1, y + h - 1);
         break;
       case 5:
-        draw_circle(1, x, y, x + an - 1, y + al - 1);
+        draw_circle(1, x, y, x + w - 1, y + h - 1);
         break;
       }
     }
@@ -2071,23 +2071,23 @@ void paint_drawings(void) {
 //      Draw a rectangle using mode_rect, line_fx, and color
 //-----------------------------------------------------------------------------
 
-void draw_box(int x, int y, int an, int al) {
-  line(x, y, x + an - 1, y);
-  line(x, y + al - 1, x + an - 1, y + al - 1);
-  al -= 2;
+void draw_box(int x, int y, int w, int h) {
+  line(x, y, x + w - 1, y);
+  line(x, y + h - 1, x + w - 1, y + h - 1);
+  h -= 2;
   y++;
-  if (al > 0)
+  if (h > 0)
     do {
       line_pixel(x, y);
-      line_pixel(x + an - 1, y++);
-    } while (--al);
+      line_pixel(x + w - 1, y++);
+    } while (--h);
 }
 
-void draw_filled_box(int x, int y, int an, int al) {
+void draw_filled_box(int x, int y, int w, int h) {
   do {
-    line(x, y, x + an - 1, y);
+    line(x, y, x + w - 1, y);
     y++;
-  } while (--al);
+  } while (--h);
 }
 
 //-----------------------------------------------------------------------------
@@ -2097,16 +2097,16 @@ void draw_filled_box(int x, int y, int an, int al) {
 void draw_circle(int relleno, int x0, int y0, int x1, int y1) {
   int p[2048];   // Points on the circumference
   double cx, rx; // Center and radius of the circle
-  int an, al;    // Width and height
+  int w, h;    // Width and height
   double y, ymed, nsin;
   int n, xa, xb, ya, yb;
 
-  an = x1 - x0 + 1;
-  al = y1 - y0 + 1;
-  if (al > 1024)
+  w = x1 - x0 + 1;
+  h = y1 - y0 + 1;
+  if (h > 1024)
     return;
 
-  rx = (double)(an - 1) / 2.0;
+  rx = (double)(w - 1) / 2.0;
   cx = rx + x0 + 0.5;
   y = (double)y0 + 0.5;
   ymed = (double)(y1 + y0 + 1) / 2.0;
@@ -2129,11 +2129,11 @@ void draw_circle(int relleno, int x0, int y0, int x1, int y1) {
   if (n > 4)
     if (p[n - 1] == p[n - 6])
       n -= 4;
-  if (al > 2 && an > 2 && p[0] == p[4] && p[0] + 1 < p[1]) {
+  if (h > 2 && w > 2 && p[0] == p[4] && p[0] + 1 < p[1]) {
     p[0] = p[4] + 1;
     p[1] = p[5] - 1;
   }
-  if (al == 2) {
+  if (h == 2) {
     p[0] = x0;
     p[1] = x1;
     p[4] = x0;
@@ -2607,39 +2607,39 @@ void line_pixel(int x, int y) {
 //----------------------------------------------------------------------------
 
 void text_out(char *ptr, int x, int y) {
-  int an, al;
+  int w, h;
   byte *ptr2;
 
   ptr2 = (byte *)ptr;
-  an = 0;
+  w = 0;
   while (*ptr2) {
-    if (fnt[*ptr2].ancho == 0) {
-      an += f_i[0].espacio;
+    if (fnt[*ptr2].width == 0) {
+      w += f_i[0].spacing;
       ptr2++;
     } else {
-      an += fnt[*ptr2++].ancho;
+      w += fnt[*ptr2++].width;
     }
   }
 
   fnt = (TABLAFNT *)((byte *)fonts[0] + 1356);
 
-  al = f_i[0].alto;
-  while (*ptr && x + fnt[*ptr].ancho <= 0)
-    if (fnt[*ptr].ancho == 0) {
-      x += f_i[0].espacio;
+  h = f_i[0].height;
+  while (*ptr && x + fnt[*ptr].width <= 0)
+    if (fnt[*ptr].width == 0) {
+      x += f_i[0].spacing;
       ptr++;
     } else {
-      x = x + fnt[*ptr].ancho;
+      x = x + fnt[*ptr].width;
       ptr++;
     }
   while (*ptr && x < vga_width)
-    if (fnt[*ptr].ancho == 0) {
-      x += f_i[0].espacio;
+    if (fnt[*ptr].width == 0) {
+      x += f_i[0].spacing;
       ptr++;
     } else {
-      text_clipped(fonts[0] + fnt[*ptr].offset, x, y + fnt[*ptr].incY, fnt[*ptr].ancho,
-                   fnt[*ptr].alto);
-      x = x + fnt[*ptr].ancho;
+      text_clipped(fonts[0] + fnt[*ptr].offset, x, y + fnt[*ptr].incY, fnt[*ptr].width,
+                   fnt[*ptr].height);
+      x = x + fnt[*ptr].width;
       ptr++;
     }
 }
@@ -2648,7 +2648,7 @@ void checkpal_font(int ifonts);
 
 void paint_texts(int n) { // E: texts[]
 
-  int x, y, an, al;
+  int x, y, w, h;
   int fuente;
 
   byte *ptr = NULL, *ptr2;
@@ -2657,7 +2657,7 @@ void paint_texts(int n) { // E: texts[]
   do
     if (texts[n].font) {
       if (n == max_texts) {
-        if (reloj & 64)
+        if (frame_clock & 64)
           break;
         else
           ptr = text[91];
@@ -2676,7 +2676,7 @@ void paint_texts(int n) { // E: texts[]
           break;
         }
 
-      texts[n].an = 0; // Initialize the blit region for this text
+      texts[n].w = 0; // Initialize the blit region for this text
 
       x = texts[n].x; // X of first character
       y = texts[n].y; // Y
@@ -2694,120 +2694,120 @@ void paint_texts(int n) { // E: texts[]
 
       fnt = (TABLAFNT *)((byte *)texts[n].font + 1356);
 
-      al = f_i[fuente].alto;
+      h = f_i[fuente].height;
 
       ptr2 = ptr;
-      an = 0;
+      w = 0;
       while (*ptr2) {
-        if (fnt[*ptr2].ancho == 0) {
-          an += f_i[fuente].espacio;
+        if (fnt[*ptr2].width == 0) {
+          w += f_i[fuente].spacing;
           ptr2++;
         } else
-          an += fnt[*ptr2++].ancho;
+          w += fnt[*ptr2++].width;
       }
 
       switch (texts[n].centro) {
       case 0:
         break;
       case 1:
-        x = x - (an >> 1);
+        x = x - (w >> 1);
         break;
       case 2:
-        x = x - an;
+        x = x - w;
         break;
       case 3:
-        y = y - (al >> 1);
+        y = y - (h >> 1);
         break;
       case 4:
-        x = x - (an >> 1);
-        y = y - (al >> 1);
+        x = x - (w >> 1);
+        y = y - (h >> 1);
         break;
       case 5:
-        x = x - an;
-        y = y - (al >> 1);
+        x = x - w;
+        y = y - (h >> 1);
         break;
       case 6:
-        y = y - al;
+        y = y - h;
         break;
       case 7:
-        x = x - (an >> 1);
-        y = y - al;
+        x = x - (w >> 1);
+        y = y - h;
         break;
       case 8:
-        x = x - an;
-        y = y - al;
+        x = x - w;
+        y = y - h;
         break;
       }
 
-      if (y < vga_height && y + al > 0) {
+      if (y < vga_height && y + h > 0) {
         texts[n].x0 = x;
         texts[n].y0 = y;
-        texts[n].an = an;
-        texts[n].al = al;
+        texts[n].w = w;
+        texts[n].h = h;
 
-        if (y >= 0 && y + al <= vga_height) { // Text fits entirely (y coordinate)
+        if (y >= 0 && y + h <= vga_height) { // Text fits entirely (y coordinate)
 
-          while (*ptr && x + fnt[*ptr].ancho <= 0) {
-            if (fnt[*ptr].ancho == 0) {
-              x += f_i[fuente].espacio;
+          while (*ptr && x + fnt[*ptr].width <= 0) {
+            if (fnt[*ptr].width == 0) {
+              x += f_i[fuente].spacing;
               ptr++;
             } else {
-              x = x + fnt[*ptr].ancho;
+              x = x + fnt[*ptr].width;
               ptr++;
             }
           }
 
           if (*ptr && x < 0) {
-            if (fnt[*ptr].ancho == 0) {
-              x += f_i[fuente].espacio;
+            if (fnt[*ptr].width == 0) {
+              x += f_i[fuente].spacing;
               ptr++;
             } else {
-              text_clipped(texts[n].font + fnt[*ptr].offset, x, y + fnt[*ptr].incY, fnt[*ptr].ancho,
-                           fnt[*ptr].alto);
-              x = x + fnt[*ptr].ancho;
+              text_clipped(texts[n].font + fnt[*ptr].offset, x, y + fnt[*ptr].incY, fnt[*ptr].width,
+                           fnt[*ptr].height);
+              x = x + fnt[*ptr].width;
               ptr++;
             }
           }
 
-          while (*ptr && x + fnt[*ptr].ancho <= vga_width) {
-            if (fnt[*ptr].ancho == 0) {
-              x += f_i[fuente].espacio;
+          while (*ptr && x + fnt[*ptr].width <= vga_width) {
+            if (fnt[*ptr].width == 0) {
+              x += f_i[fuente].spacing;
               ptr++;
             } else {
-              text_normal(texts[n].font + fnt[*ptr].offset, x, y + fnt[*ptr].incY, fnt[*ptr].ancho,
-                          fnt[*ptr].alto);
-              x = x + fnt[*ptr].ancho;
+              text_normal(texts[n].font + fnt[*ptr].offset, x, y + fnt[*ptr].incY, fnt[*ptr].width,
+                          fnt[*ptr].height);
+              x = x + fnt[*ptr].width;
               ptr++;
             }
           }
 
           if (*ptr && x < vga_width) {
-            if (fnt[*ptr].ancho == 0) {
-              x += f_i[fuente].espacio;
+            if (fnt[*ptr].width == 0) {
+              x += f_i[fuente].spacing;
               ptr++;
             } else
-              text_clipped(texts[n].font + fnt[*ptr].offset, x, y + fnt[*ptr].incY, fnt[*ptr].ancho,
-                           fnt[*ptr].alto);
+              text_clipped(texts[n].font + fnt[*ptr].offset, x, y + fnt[*ptr].incY, fnt[*ptr].width,
+                           fnt[*ptr].height);
           }
 
         } else {
-          while (*ptr && x + fnt[*ptr].ancho <= 0)
-            if (fnt[*ptr].ancho == 0) {
-              x += f_i[fuente].espacio;
+          while (*ptr && x + fnt[*ptr].width <= 0)
+            if (fnt[*ptr].width == 0) {
+              x += f_i[fuente].spacing;
               ptr++;
             } else {
-              x = x + fnt[*ptr].ancho;
+              x = x + fnt[*ptr].width;
               ptr++;
             }
 
           while (*ptr && x < vga_width)
-            if (fnt[*ptr].ancho == 0) {
-              x += f_i[fuente].espacio;
+            if (fnt[*ptr].width == 0) {
+              x += f_i[fuente].spacing;
               ptr++;
             } else {
-              text_clipped(texts[n].font + fnt[*ptr].offset, x, y + fnt[*ptr].incY, fnt[*ptr].ancho,
-                           fnt[*ptr].alto);
-              x = x + fnt[*ptr].ancho;
+              text_clipped(texts[n].font + fnt[*ptr].offset, x, y + fnt[*ptr].incY, fnt[*ptr].width,
+                           fnt[*ptr].height);
+              x = x + fnt[*ptr].width;
               ptr++;
             }
         }
@@ -2816,9 +2816,9 @@ void paint_texts(int n) { // E: texts[]
   while (++n < max_texts);
 }
 
-void text_normal(byte *p, int x, int y, byte an, int al) {
+void text_normal(byte *p, int x, int y, byte w, int h) {
   byte *q = screen_buffer + y * vga_width + x;
-  int ancho = an;
+  int width = w;
 
   do {
     do {
@@ -2827,12 +2827,12 @@ void text_normal(byte *p, int x, int y, byte an, int al) {
       }
       p++;
       q++;
-    } while (--an);
-    q += vga_width - (an = ancho);
-  } while (--al);
+    } while (--w);
+    q += vga_width - (w = width);
+  } while (--h);
 }
 
-void text_clipped(byte *p, int x, int y, byte an, int al) {
+void text_clipped(byte *p, int x, int y, byte w, int h) {
   byte *q = screen_buffer + y * vga_width + x;
   int salta_x, long_x, resto_x;
   int salta_y, long_y, resto_y;
@@ -2841,11 +2841,11 @@ void text_clipped(byte *p, int x, int y, byte an, int al) {
     salta_x = -x;
   else
     salta_x = 0;
-  if (x + an > vga_width)
-    resto_x = x + an - vga_width;
+  if (x + w > vga_width)
+    resto_x = x + w - vga_width;
   else
     resto_x = 0;
-  long_x = an - salta_x - resto_x;
+  long_x = w - salta_x - resto_x;
 
   if (long_x <= 0)
     return;
@@ -2854,19 +2854,19 @@ void text_clipped(byte *p, int x, int y, byte an, int al) {
     salta_y = -y;
   else
     salta_y = 0;
-  if (y + al > vga_height)
-    resto_y = y + al - vga_height;
+  if (y + h > vga_height)
+    resto_y = y + h - vga_height;
   else
     resto_y = 0;
-  long_y = al - salta_y - resto_y;
+  long_y = h - salta_y - resto_y;
 
   if (long_y <= 0)
     return;
 
-  p += an * salta_y + salta_x;
+  p += w * salta_y + salta_x;
   q += vga_width * salta_y + salta_x;
   resto_x += salta_x;
-  an = long_x;
+  w = long_x;
   do {
     do {
       if (*p) {
@@ -2874,8 +2874,8 @@ void text_clipped(byte *p, int x, int y, byte an, int al) {
       }
       p++;
       q++;
-    } while (--an);
-    q += vga_width - (an = long_x);
+    } while (--w);
+    q += vga_width - (w = long_x);
     p += resto_x;
   } while (--long_y);
 }
@@ -2889,7 +2889,7 @@ void paint_sprites_m7(int n, int cx, int cy, float ang);
 void paint_m7(int n) {
   int x, y;
 #ifdef DEBUG
-  int oreloj = get_ticks();
+  int profile_clock = get_ticks();
 #endif
   int id = (m7 + n)->camera;
   int height = (m7 + n)->height;
@@ -2922,7 +2922,7 @@ void paint_m7(int n) {
     post_process_m7();
 
 #ifdef DEBUG
-  function_exec(251, get_ticks() - oreloj);
+  function_exec(251, get_ticks() - profile_clock);
 #endif
 
   paint_sprites_m7(n, x, -y, (float)((float)mem[id + _Angle] / radian));
@@ -2935,14 +2935,14 @@ void paint_m7(int n) {
 void paint_sprites_m7(int n, int cx, int cy, float ang) { // Takes the camera position
   int factor;
 #ifdef DEBUG
-  int oreloj;
+  int profile_clock;
 #endif
   int cx2 = cx / 4096, cy2 = cy / 4096, dx, dy;
   int ide, id, max, distmax, old_z = 0;
   int altura, h, anchura, porcen;
   float a;
 
-  factor = (((m7 + n)->focus * im7[n].an * 16) / 320);
+  factor = (((m7 + n)->focus * im7[n].w * 16) / 320);
 
   // Pre-calculate _Dist1 and _Dist2 for each mode-7 object
 
@@ -2975,7 +2975,7 @@ void paint_sprites_m7(int n, int cx, int cy, float ang) { // Takes the camera po
 
   do {
 #ifdef DEBUG
-    oreloj = get_ticks();
+    profile_clock = get_ticks();
 #endif
     ide = 0;
     max = 0x80000000;
@@ -2995,13 +2995,13 @@ void paint_sprites_m7(int n, int cx, int cy, float ang) { // Takes the camera po
 
         h = (m7 + n)->height - mem[ide + _Height];
         altura = (h * (max - factor)) / (max);                // en pix/4
-        altura = im7[n].y + im7[n].al / 2 + (h - altura) / 4; // en pix
-        altura += (m7 + n)->horizon - im7[n].al / 2;
+        altura = im7[n].y + im7[n].h / 2 + (h - altura) / 4; // en pix
+        altura += (m7 + n)->horizon - im7[n].h / 2;
 
         h += 1000;
         porcen = (h * (max - factor)) / (max);                // en pix/4
-        porcen = im7[n].y + im7[n].al / 2 + (h - porcen) / 4; // en pix
-        porcen += (m7 + n)->horizon - im7[n].al / 2 - altura;
+        porcen = im7[n].y + im7[n].h / 2 + (h - porcen) / 4; // en pix
+        porcen += (m7 + n)->horizon - im7[n].h / 2 - altura;
 
         porcen = mem[ide + _Size] * porcen / 1000;
 
@@ -3017,7 +3017,7 @@ void paint_sprites_m7(int n, int cx, int cy, float ang) { // Takes the camera po
 
         paint_sprite_m7(n, ide, anchura, altura, porcen, h);
 #ifdef DEBUG
-        process_paint(ide, get_ticks() - oreloj);
+        process_paint(ide, get_ticks() - profile_clock);
 #endif
 
         // *** Debug: white pixel at the object's base ***
@@ -3038,7 +3038,7 @@ void paint_sprites_m7(int n, int cx, int cy, float ang) { // Takes the camera po
 void paint_sprite_m7(int n, int ide, int x, int y, int size, int ang) {
   int *ptr;
   byte *si;
-  int an, al; // Graphic width and height on screen
+  int w, h; // Graphic width and height on screen
   int xg, yg;
   int m, p;
 
@@ -3068,13 +3068,13 @@ void paint_sprite_m7(int n, int ide, int x, int y, int size, int ang) {
     return;
 
   clipx0 = im7[n].x;
-  clipx1 = im7[n].x + im7[n].an;
+  clipx1 = im7[n].x + im7[n].w;
   clipy0 = im7[n].y;
-  clipy1 = im7[n].y + im7[n].al;
+  clipy1 = im7[n].y + im7[n].h;
 
   if ((ptr = g[mem[ide + _File]].grf[mem[ide + _Graph]]) != NULL) {
-    an = ptr[13];
-    al = ptr[14];                        // Graphic width and height
+    w = ptr[13];
+    h = ptr[14];                        // Graphic width and height
     si = (byte *)ptr + 64 + ptr[15] * 4; // Start of graphic data
 
     if (ptr[15] == 0 || *((word *)ptr + 32) == 65535) {
@@ -3085,7 +3085,7 @@ void paint_sprite_m7(int n, int ide, int x, int y, int size, int ang) {
       yg = *((word *)ptr + 33);
     }
 
-    sp_scaled(si, x, y, an, al, xg, yg, size, mem[ide + _Flags]);
+    sp_scaled(si, x, y, w, h, xg, yg, size, mem[ide + _Flags]);
   }
 }
 
@@ -3111,9 +3111,9 @@ void paint_mode7(int n, int camara_x, int camara_y, int camara_z, int angulo) {
   int y, u, du, vv, dv, pos_x, pos_y;
   int ancho_m, alto_m, ancho_e, alto_e;
   int proyeccion_y, sint, cost;
-  int mediox_modo7 = im7[n].an >> 1;
+  int mediox_modo7 = im7[n].w >> 1;
   int mediox_modo7_16;
-  int distancia = ((im7[n].an * (m7 + n)->focus) / 320) << 16;
+  int distancia = ((im7[n].w * (m7 + n)->focus) / 320) << 16;
   int divisor;
   byte *di = screen_buffer + im7[n].y * vga_width + im7[n].x, *di_end, color = (m7 + n)->color;
 
@@ -3121,22 +3121,22 @@ void paint_mode7(int n, int camara_x, int camara_y, int camara_z, int angulo) {
 
   ancho_m = im7[n].map_width - 1;
   alto_m = im7[n].map_height - 1;
-  ancho_e = im7[n].ext_an - 1;
-  alto_e = im7[n].ext_al - 1;
+  ancho_e = im7[n].ext_w - 1;
+  alto_e = im7[n].ext_h - 1;
 
   if (!camara_y)
     return;
 
-  for (y = 0; y < im7[n].al; y++, di += vga_width - im7[n].an) {
+  for (y = 0; y < im7[n].h; y++, di += vga_width - im7[n].w) {
     divisor = (m7 + n)->horizon - y - 1;
     if (camara_y > 0) {
       if (divisor >= 0) {
-        di += im7[n].an;
+        di += im7[n].w;
         continue;
       }
     } else {
       if (divisor <= 0) {
-        di += im7[n].an;
+        di += im7[n].w;
         continue;
       }
     }
@@ -3153,14 +3153,14 @@ void paint_mode7(int n, int camara_x, int camara_y, int camara_z, int angulo) {
     vv = -vv;
     dv = -dv;
 
-    di_end = di + im7[n].an;
+    di_end = di + im7[n].w;
 
     if (im7[n].ext != NULL)
       do {
         pos_x = u >> 16;
         pos_y = vv >> 16;
         if (pos_x > ancho_m || pos_x < 0 || pos_y > alto_m || pos_y < 0) {
-          *di = *(im7[n].ext + (pos_y & alto_e) * im7[n].ext_an + (pos_x & ancho_e));
+          *di = *(im7[n].ext + (pos_y & alto_e) * im7[n].ext_w + (pos_x & ancho_e));
         } else {
           *di = *(im7[n].map + pos_y * im7[n].map_width + pos_x);
         }

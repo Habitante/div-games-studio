@@ -13,7 +13,7 @@
 #define alto_ga  60
 #define gama_x   4
 #define gama_y   12
-#define gama_an  130
+#define gama_w  130
 
 //-----------------------------------------------------------------------------
 //  Estructura para guardar el estado de los colores de control de la gama
@@ -174,8 +174,8 @@ void gama0(void) {
   v.type = 1;
 
   v.title = texts[420];
-  v.an = ancho_ga;
-  v.al = alto_ga;
+  v.w = ancho_ga;
+  v.h = alto_ga;
 
   v.paint_handler = (voidReturnType)gama1;
   v.click_handler = (voidReturnType)gama2;
@@ -203,14 +203,14 @@ void gama0(void) {
 
   // Botones Aceptar/Cancelar
 
-  _button(100, 7, v.al - 14, 0);
-  _button(101, v.an - 8, v.al - 14, 2);
+  _button(100, 7, v.h - 14, 0);
+  _button(101, v.w - 8, v.h - 14, 2);
 
   v_accept = 0;
 }
 
 void gama1(void) {
-  int an = v.an / big2, al = v.al / big2;
+  int w = v.w / big2, h = v.h / big2;
   int con;
 
   _show_items();
@@ -221,20 +221,20 @@ void gama1(void) {
 
   for (con = 0; con < 9; con++) {
     if (gradient_config[con].selec)
-      wput(v.ptr, an, al, button_coords[con].x, button_coords[con].y, -44);
+      wput(v.ptr, w, h, button_coords[con].x, button_coords[con].y, -44);
     else
-      wput(v.ptr, an, al, button_coords[con].x, button_coords[con].y, -34);
+      wput(v.ptr, w, h, button_coords[con].x, button_coords[con].y, -34);
 
-    wrectangle(v.ptr, an, al, c0, button_coords[con].x - 4, button_coords[con].y - 15, 14, 14);
-    wbox(v.ptr, an, al, gradient_config[con].color, button_coords[con].x - 4 + 1,
+    wrectangle(v.ptr, w, h, c0, button_coords[con].x - 4, button_coords[con].y - 15, 14, 14);
+    wbox(v.ptr, w, h, gradient_config[con].color, button_coords[con].x - 4 + 1,
          button_coords[con].y - 15 + 1, 12, 12);
   }
 
   // Mostrar gama
 
-  wrectangle(v.ptr, an, al, c0, gama_x, gama_y, gama_an, 4);
+  wrectangle(v.ptr, w, h, c0, gama_x, gama_y, gama_w, 4);
   for (con = 0; con < 128; con++) {
-    wbox(v.ptr, an, al, gradient_buf[con], gama_x + con + 1, gama_y + 1, 1, 2);
+    wbox(v.ptr, w, h, gradient_buf[con], gama_x + con + 1, gama_y + 1, 1, 2);
   }
 }
 

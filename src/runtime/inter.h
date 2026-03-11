@@ -112,11 +112,11 @@ void scroll_parallax(void);
 void put_sprite(int file, int graph, int x, int y, int size, int angle, int flags, int reg, byte *,
                 int, int);
 void paint_sprite(void);
-void sp_normal(byte *p, int x, int y, int an, int al, int flags);
-void sp_clipped(byte *p, int x, int y, int an, int al, int flags);
+void sp_normal(byte *p, int x, int y, int w, int h, int flags);
+void sp_clipped(byte *p, int x, int y, int w, int h, int flags);
 void sp_scaled(byte *, int, int, int, int, int, int, int, int);
 void sp_rotated(byte *, int, int, int, int, int, int, int, int, int);
-void sp_scan(byte *p, short n, byte *si, int an, int x0, int y0, int x1, int y1);
+void sp_scan(byte *p, short n, byte *si, int w, int x0, int y0, int x1, int y1);
 void paint_texts(int n);
 void paint_drawings(void);
 void init_sin_cos(void);
@@ -547,7 +547,7 @@ GLOBAL FILE *tabfiles[32]; // Table of open handles (0 = free)
 
 GLOBAL int vga_width, vga_height; // Physical screen dimensions
 GLOBAL int vwidth, vheight;       // Screen window dimensions
-GLOBAL int vvga_an, vvga_al;      // Physical screen dimensions (legacy)
+GLOBAL int vvga_w, vvga_h;      // Physical screen dimensions (legacy)
 
 GLOBAL byte fsmode;
 
@@ -642,17 +642,17 @@ GLOBAL int clipx0, clipx1, clipy0, clipy1; // Clipping region
 //-----------------------------------------------------------------------------
 
 typedef struct _TABLAFNT {
-  int ancho;
-  int alto;
+  int width;
+  int height;
   int incY;
   int offset;
 } TABLAFNT;
 
 typedef struct _fnt_info {
-  int ancho;     // Average font width
-  int espacio;   // Space character width in pixels
-  int espaciado; // Inter-character spacing (in addition to glyph width)
-  int alto;      // Maximum font height
+  int width;     // Average font width
+  int spacing;   // Space character width in pixels
+  int letter_spacing; // Inter-character spacing (in addition to glyph width)
+  int height;      // Maximum font height
   int fonpal;    // CRC of its palette
   int syspal;    // CRC of the palette it is adapted to
   int len;       // FNT file length
@@ -681,7 +681,7 @@ typedef struct _t_texto {
   int centro; // Alignment type: 0=left, 1=centered, ...
   int region; // Clipping region
   int x0, y0; // Region occupied by the text
-  int an, al; // For partial screen blits
+  int w, h; // For partial screen blits
 } t_text;
 
 GLOBAL t_text texts[max_texts + 1];
@@ -719,10 +719,10 @@ GLOBAL int full_redraw; // Whether the entire VGA copy has been modified
 
 struct _im7 {
   int on, painted;
-  int x, y, an, al;
+  int x, y, w, h;
   byte *map, *ext;
   int map_width, map_height;
-  int ext_an, ext_al;
+  int ext_w, ext_h;
 };
 
 GLOBAL struct _im7 im7[10];
@@ -740,11 +740,11 @@ typedef struct _tfast { // Increment table for the foreground plane
 
 struct _iscroll { // x10
   int on, painted;
-  int x, y, an, al;
+  int x, y, w, h;
   byte *_sscr1, *sscr1;
   byte *_sscr2, *sscr2;
   byte *map1, *map2;
-  int map1_an, map1_al, map2_an, map2_al;
+  int map1_w, map1_h, map2_w, map2_h;
   int map_flags;
   int map1_x, map1_y, map2_x, map2_y;
   int block1, block2;
@@ -789,25 +789,25 @@ GLOBAL byte last_c1; // Last system font color (in loaded palette)
 // Frame limiter
 ///////////////////////////////////////////////////////////////////////////////
 
-GLOBAL int reloj; // Speed limiter (framerate)
+GLOBAL int frame_clock; // Speed limiter (framerate)
 GLOBAL int ticks;
 
-GLOBAL int old_reloj; // For time (timing) functions
-GLOBAL int ultimo_reloj;
-GLOBAL double freloj, ireloj;
+GLOBAL int old_clock; // For time (timing) functions
+GLOBAL int last_clock;
+GLOBAL double fractional_clock, clock_interval;
 GLOBAL int game_fps;
 
-GLOBAL int max_saltos; // Ma number of skipped frames
+GLOBAL int max_frame_skips; // Ma number of skipped frames
 GLOBAL int dfps;
 GLOBAL SDL_Joystick *divjoy;
-GLOBAL int saltar_volcado, volcados_saltados;
+GLOBAL int skip_blit, blits_skipped;
 
 //////////////////////////////////////////////////////////////////////////////
 // Collision detection buffer
 //////////////////////////////////////////////////////////////////////////////
 
 GLOBAL byte *buffer;             // Collision Buffer
-GLOBAL int buffer_an, buffer_al; // Width & Height of buffer
+GLOBAL int buffer_w, buffer_h; // Width & Height of buffer
 
 //////////////////////////////////////////////////////////////////////////////
 // FPG Graphic files format
@@ -864,7 +864,7 @@ typedef struct _t_item {
     struct {
       byte *text;
       byte *buffer;
-      int x, y, an, lon_buffer;
+      int x, y, w, lon_buffer;
       int r0, r1;
     } get;
     struct {
@@ -880,7 +880,7 @@ typedef struct _twindow {
   int foreground; // 1-yes 0-no (darkened)
   byte *title;    // Title bar text
   voidReturnType paint_handler, click_handler, close_handler;
-  int x, y, an, al; // Window position and dimensions
+  int x, y, w, h; // Window position and dimensions
   byte *ptr;        // Window buffer
   int state;
   int redraw;             // Needs-redraw flag
@@ -897,7 +897,7 @@ struct t_listbox {
   char *list;        // List pointer
   int item_width;    // Characters per item
   int visible_items; // Visible item count
-  int an, al;        // Text zone width in pixels
+  int w, h;        // Text zone width in pixels
   int first_visible; // First visible index (from 0)
   int total_items;   // Total item count (0 n/a)
   int s0, s1, slide; // Slide bar start, end, current position
@@ -1015,7 +1015,7 @@ GLOBAL void (*post_process_buffer)();
 
 GLOBAL void (*post_process)();
 
-GLOBAL void (*putsprite)(byte *si, int x, int y, int an, int al, int xg, int yg, int ang, int size,
+GLOBAL void (*putsprite)(byte *si, int x, int y, int w, int h, int xg, int yg, int ang, int size,
                          int flags);
 
 GLOBAL void (*ss_init)();
@@ -1077,6 +1077,6 @@ GLOBAL int demo;
 void e(int text_id);
 
 GLOBAL int omitidos[128];
-GLOBAL int nomitidos;
+GLOBAL int num_skipped;
 
 extern char *fname[];
