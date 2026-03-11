@@ -47,12 +47,12 @@ struct _gcolor exp_gama[9];
 //-----------------------------------------------------------------------------
 
 int cx, cy;
-int ExpGama;
+int exp_gamma;
 
 struct tp {   // Structure for explosion points
   int x, y;   // Point coordinates
-  int radio;  // Effective radius of the point
-  int fuerza; // Central force of the point
+  int radius;  // Effective radius of the point
+  int force; // Central force of the point
   int xr, yr; // Coord. * 10000
   int ix, iy; // Increments
 };
@@ -73,9 +73,9 @@ int n_exp;          // 1..8
 int n_frames;       // 1..n
 int _n_frames = 6;  // 1..n
 int paso_frame;
-int tipo_exp = 1;
+int exp_type = 1;
 int per_points;
-char *Buff_exp;
+char *exp_buffer;
 
 //-----------------------------------------------------------------------------
 //	Create the point array
@@ -108,11 +108,11 @@ void create_points(void) {
       else
         ry = exp_alto - e[m].p[n].y;
       if (rx < ry)
-        e[m].p[n].radio = rx * 10000;
+        e[m].p[n].radius = rx * 10000;
       else
-        e[m].p[n].radio = ry * 10000;
+        e[m].p[n].radius = ry * 10000;
 
-      e[m].p[n].fuerza = e[m].p[n].radio + rnd() % (e[m].p[n].radio) * 4;
+      e[m].p[n].force = e[m].p[n].radius + rnd() % (e[m].p[n].radius) * 4;
     }
   }
 }
@@ -129,9 +129,9 @@ void advance_points(void) {
       e[m].p[n].yr += (e[m].p[n].iy * paso_frame) / 10000;
       e[m].p[n].x = e[m].p[n].xr / 10000;
       e[m].p[n].y = e[m].p[n].yr / 10000;
-      if (e[m].p[n].fuerza > e[m].p[n].radio)
-        e[m].p[n].fuerza = (int)((float)e[m].p[n].fuerza * (float)0.86); //0.98
-      e[m].p[n].radio -= paso_frame;
+      if (e[m].p[n].force > e[m].p[n].radius)
+        e[m].p[n].force = (int)((float)e[m].p[n].force * (float)0.86); //0.98
+      e[m].p[n].radius -= paso_frame;
     }
   }
 }
@@ -159,16 +159,16 @@ int paint_explosion(void) {
         for (n = 0; n < n_pun; n++) {
           dx = abs(x - e[m].p[n].x);
           dy = abs(y - e[m].p[n].y);
-          if ((dx < e[m].p[n].radio / 10000) && (dy < e[m].p[n].radio / 10000)) {
+          if ((dx < e[m].p[n].radius / 10000) && (dy < e[m].p[n].radius / 10000)) {
             dist = sqrt(dx * dx + dy * dy);
-            if (dist < e[m].p[n].radio / 10000)
-              exp_Color += (((e[m].p[n].radio / 10000) - dist) * (e[m].p[n].fuerza / 10000)) /
-                           (e[m].p[n].radio / 10000);
+            if (dist < e[m].p[n].radius / 10000)
+              exp_Color += (((e[m].p[n].radius / 10000) - dist) * (e[m].p[n].force / 10000)) /
+                           (e[m].p[n].radius / 10000);
           }
         }
         if (exp_Color > 255)
           exp_Color = 255;
-        switch (tipo_exp) {
+        switch (exp_type) {
         case 0:
         case 3:
           exp_Coloracum += exp_Color;
@@ -182,10 +182,10 @@ int paint_explosion(void) {
           break;
         }
       }
-      switch (tipo_exp) {
+      switch (exp_type) {
       case 0:
       case 3:
-        Buff_exp[y * exp_ancho + x] = exp_Coloracum / n_exp;
+        exp_buffer[y * exp_ancho + x] = exp_Coloracum / n_exp;
         break;
       case 1:
       case 2:
@@ -193,7 +193,7 @@ int paint_explosion(void) {
           exp_Coloracum = 255;
         if (exp_Coloracum < 0)
           exp_Coloracum = 0;
-        Buff_exp[y * exp_ancho + x] = exp_Coloracum;
+        exp_buffer[y * exp_ancho + x] = exp_Coloracum;
         break;
       }
     }
@@ -202,32 +202,32 @@ int paint_explosion(void) {
   for (n = 0; n < (exp_ancho * exp_alto) * per_points / 100; n++) {
     x = (rnd() % (exp_ancho - 2)) + 1;
     y = (rnd() % (exp_alto - 2)) + 1;
-    if (Buff_exp[y * exp_ancho + x] > DEEP * 2)
-      Buff_exp[y * exp_ancho + x] -= DEEP * 2;
+    if (exp_buffer[y * exp_ancho + x] > DEEP * 2)
+      exp_buffer[y * exp_ancho + x] -= DEEP * 2;
 
-    if (Buff_exp[y * exp_ancho + x - 1] > DEEP)
-      Buff_exp[y * exp_ancho + x - 1] -= DEEP;
+    if (exp_buffer[y * exp_ancho + x - 1] > DEEP)
+      exp_buffer[y * exp_ancho + x - 1] -= DEEP;
 
-    if (Buff_exp[y * exp_ancho + x + 1] > DEEP)
-      Buff_exp[y * exp_ancho + x + 1] -= DEEP;
+    if (exp_buffer[y * exp_ancho + x + 1] > DEEP)
+      exp_buffer[y * exp_ancho + x + 1] -= DEEP;
 
-    if (Buff_exp[(y - 1) * exp_ancho + x] > DEEP)
-      Buff_exp[(y - 1) * exp_ancho + x] -= DEEP;
-    if (Buff_exp[(y + 1) * exp_ancho + x] > DEEP)
-      Buff_exp[(y + 1) * exp_ancho + x] -= DEEP;
+    if (exp_buffer[(y - 1) * exp_ancho + x] > DEEP)
+      exp_buffer[(y - 1) * exp_ancho + x] -= DEEP;
+    if (exp_buffer[(y + 1) * exp_ancho + x] > DEEP)
+      exp_buffer[(y + 1) * exp_ancho + x] -= DEEP;
   }
   return (0);
 }
 
-char cFrames[4];
+char frame_count_str[4];
 char cexp_ancho[5];
 char cexp_alto[5];
 char cper_points[5];
 int exp_Color0 = -1, exp_Color1 = -1, exp_Color2 = -1;
-int TipoA = 1, TipoB = 0, TipoC = 0;
-int OldTipoA = 1, OldTipoB = 0, OldTipoC = 0;
+int type_a = 1, type_b = 0, type_c = 0;
+int old_type_a = 1, old_type_b = 0, old_type_c = 0;
 
-void Explode1(void) {
+void explode_dialog1(void) {
   int w = v.w / big2, h = v.h / big2;
   int x;
 
@@ -246,11 +246,11 @@ void Explode1(void) {
 }
 
 void Selcolor0();
-extern int SelColorFont;
-extern int SelColorOk;
+extern int sel_color_font;
+extern int sel_color_ok;
 
-void Explode2(void) {
-  int w = v.w / big2; //, al=v.al/big2;
+void explode_dialog2(void) {
+  int w = v.w / big2;
   int need_refresh = 0;
 
   _process_items();
@@ -264,33 +264,33 @@ void Explode2(void) {
     v_accept = 0;
     break;
   }
-  if (!(TipoA + TipoB + TipoC)) {
-    TipoA = OldTipoA;
-    TipoB = OldTipoB;
-    TipoC = OldTipoC;
+  if (!(type_a + type_b + type_c)) {
+    type_a = old_type_a;
+    type_b = old_type_b;
+    type_c = old_type_c;
     need_refresh = 1;
   }
-  if (TipoA != OldTipoA) {
-    TipoA = 1;
-    TipoB = TipoC = 0;
-    OldTipoB = OldTipoC = 0;
+  if (type_a != old_type_a) {
+    type_a = 1;
+    type_b = type_c = 0;
+    old_type_b = old_type_c = 0;
     need_refresh = 1;
   }
-  if (TipoB != OldTipoB) {
-    TipoB = 1;
-    TipoA = TipoC = 0;
-    OldTipoA = OldTipoC = 0;
+  if (type_b != old_type_b) {
+    type_b = 1;
+    type_a = type_c = 0;
+    old_type_a = old_type_c = 0;
     need_refresh = 1;
   }
-  if (TipoC != OldTipoC) {
-    TipoC = 1;
-    TipoA = TipoB = 0;
-    OldTipoA = OldTipoB = 0;
+  if (type_c != old_type_c) {
+    type_c = 1;
+    type_a = type_b = 0;
+    old_type_a = old_type_b = 0;
     need_refresh = 1;
   }
-  OldTipoA = TipoA;
-  OldTipoB = TipoB;
-  OldTipoC = TipoC;
+  old_type_a = type_a;
+  old_type_b = type_b;
+  old_type_c = type_c;
   if (wmouse_in(w - 70, 18, 66, 11) && (mouse_b & 1)) {
     gradient_buf = exp_colores;
     gradient_config = exp_gama;
@@ -304,54 +304,54 @@ void Explode2(void) {
   }
 }
 
-void Explode3(void) {
+void explode_dialog3(void) {
   if (!v_accept)
     return;
 
-  _n_frames = n_frames = atoi(cFrames);
+  _n_frames = n_frames = atoi(frame_count_str);
   exp_ancho = atoi(cexp_ancho);
   exp_alto = atoi(cexp_alto);
   per_points = atoi(cper_points);
-  if (TipoA)
-    tipo_exp = 0;
-  if (TipoB)
-    tipo_exp = 1;
-  if (TipoC)
-    tipo_exp = 2;
+  if (type_a)
+    exp_type = 0;
+  if (type_b)
+    exp_type = 1;
+  if (type_c)
+    exp_type = 2;
 }
 
-void Explode0(void) {
+void explode_dialog0(void) {
   v.type = 1;
 
   v.title = texts[300];
   v.w = 128;
   v.h = 90 + 5;
-  v.paint_handler = (voidReturnType)Explode1;
-  v.click_handler = (voidReturnType)Explode2;
-  v.close_handler = (voidReturnType)Explode3;
+  v.paint_handler = (voidReturnType)explode_dialog1;
+  v.click_handler = (voidReturnType)explode_dialog2;
+  v.close_handler = (voidReturnType)explode_dialog3;
 
   _button(100, 7, v.h - 14, 0);
   _button(101, v.w - 8, v.h - 14, 2);
-  TipoA = TipoB = TipoC = OldTipoA = OldTipoB = OldTipoC = 0;
+  type_a = type_b = type_c = old_type_a = old_type_b = old_type_c = 0;
   if (exp_Color0 == -1)
     exp_Color0 = c4;
   if (exp_Color1 == -1)
     exp_Color1 = c2;
   if (exp_Color2 == -1)
     exp_Color2 = c0;
-  switch (tipo_exp) {
+  switch (exp_type) {
   case 0:
-    TipoA = OldTipoA = 1;
+    type_a = old_type_a = 1;
     break;
   case 1:
-    TipoB = OldTipoB = 1;
+    type_b = old_type_b = 1;
     break;
   case 2:
-    TipoC = OldTipoC = 1;
+    type_c = old_type_c = 1;
     break;
   }
 
-  DIV_SPRINTF(cFrames, "%d", n_frames);
+  DIV_SPRINTF(frame_count_str, "%d", n_frames);
   DIV_SPRINTF(cexp_ancho, "%d", exp_ancho);
   DIV_SPRINTF(cexp_alto, "%d", exp_alto);
   DIV_SPRINTF(cper_points, "%d", per_points);
@@ -359,32 +359,32 @@ void Explode0(void) {
   _get(133, 4, 11, 21, (byte *)cexp_ancho, 5, 8, 2000);
   _get(134, 69 - 36, 11, 21, (byte *)cexp_alto, 5, 8, 2000);
 
-  _flag(301, 4, 16 + 19, &TipoA);
-  _flag(302, 4, 16 + 34, &TipoB);
-  _flag(303, 4, 16 + 48, &TipoC);
+  _flag(301, 4, 16 + 19, &type_a);
+  _flag(302, 4, 16 + 34, &type_b);
+  _flag(303, 4, 16 + 48, &type_c);
 
-  _get(304, 69 - 24 + 30, 16 + 19, 21, (byte *)cFrames, 3, 1, 48);
+  _get(304, 69 - 24 + 30, 16 + 19, 21, (byte *)frame_count_str, 3, 1, 48);
   _get(305, 69 - 24 + 30, 16 + 38, 21, (byte *)cper_points, 3, 0, 100);
 
   v_accept = 0;
 }
 
-void GenExplodes() {
+void gen_explodes() {
   int ExpDac[256];
   int n = 0, nf, y;
   int x;
   n_frames = _n_frames;
   create_dac4();
 
-  show_dialog((voidReturnType)Explode0);
+  show_dialog((voidReturnType)explode_dialog0);
   if (!v_accept)
     return;
   for (x = 0; x < 256; x++)
     ExpDac[x] = exp_colores[x / 2];
   init_rnd(*system_clock, NULL);
-  Buff_exp = (char *)malloc(exp_ancho * exp_alto);
+  exp_buffer = (char *)malloc(exp_ancho * exp_alto);
   n_pun = 32;
-  switch (tipo_exp) {
+  switch (exp_type) {
   case 0:
     n_exp = 4;
     break;
@@ -419,7 +419,7 @@ void GenExplodes() {
       break;
 
     for (x = 0; x < map_width * map_height; x++)
-      v.mapa->map[x] = ExpDac[Buff_exp[x]];
+      v.mapa->map[x] = ExpDac[exp_buffer[x]];
 
     v.mapa->zoom_cx = v.mapa->map_width / 2;
     v.mapa->zoom_cy = v.mapa->map_height / 2;
@@ -448,5 +448,5 @@ void GenExplodes() {
     n_frames -= 2;
   } while (n_frames);
 
-  free(Buff_exp);
+  free(exp_buffer);
 }

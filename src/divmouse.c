@@ -299,7 +299,7 @@ int soundstopped = 0;
 
 #include <SDL2/SDL_events.h>
 
-void PrintEvent(const SDL_Event *event) {
+void print_event(const SDL_Event *event) {
   if (event->type == SDL_WINDOWEVENT) {
     switch (event->window.event) {
     case SDL_WINDOWEVENT_SHOWN:
@@ -378,7 +378,7 @@ void read_mouse2(void) {
   int n = 0;
 
   while (SDL_PollEvent(&event)) {
-    PrintEvent(&event);
+    print_event(&event);
 
     // Text input — only set ascii, not scan_code.
     // scan_code is set by SDL_KEYDOWN via OSDEP_key[] (DOS scan codes).

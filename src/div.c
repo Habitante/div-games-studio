@@ -613,7 +613,7 @@ int main(int argc, char *argv[]) {
   finalize_texts();
 
 #ifdef GRABADORA
-  EndGrabador();
+  end_recorder();
 #endif
 
 
@@ -866,8 +866,8 @@ void intmsg0(void) {
 /*
 typedef void (__interrupt __far *TIRQHandler)(void);
 extern void __far __interrupt __loadds Irq0Handler(void);
-extern void SetIRQVector(int n, TIRQHandler vec);
-extern TIRQHandler GetIRQVector(int n);
+extern void set_irq_vector(int n, TIRQHandler vec);
+extern TIRQHandler get_irq_vector(int n);
 int IntIncr  = 65536;
 */
 
@@ -3844,7 +3844,7 @@ void initialization(void) {
 		big2=big+1;
 	}
 */
-  kbdInit();
+  kbd_init();
 
 
   if (!interpreting) {
@@ -4164,7 +4164,7 @@ void finalization(void) {
 
   end_lexcolor();
 
-  kbdReset();
+  kbd_reset();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

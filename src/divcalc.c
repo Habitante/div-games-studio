@@ -37,7 +37,7 @@ int superget = 0;
 
 //-----------------------------------------------------------------------------
 //    Evaluador de expresiones (se le pasa el puntero en `expression')
-//    Si todo fue bien, devuelve token=p_num y tnumero=n
+//    Si todo fue bien, devuelve token=p_num y token_number=n
 //-----------------------------------------------------------------------------
 
 
@@ -64,126 +64,126 @@ enum tokens {
 };
 
 int token;               // Del tipo enumerado anterior
-double tnumero;          // Cuando token==p_num
+double token_number;          // Cuando token==p_num
 static char *expression; // Puntero a la expresión asciiz
 
 struct { // Para contener la expression analizada
   int token;
-  double numero;
-} expres[64];
+  double number;
+} expressions[64];
 
-int iexpres; // Número de elementos introducidos en expres[]
+int num_expressions; // Número de elementos introducidos en expressions[]
 
 double do_evaluate(void);
 
 void do_calculate(void) {
-  double evaluacion;
+  double result;
   token = p_inicio;        // No hay ningun token inicialmente
-  iexpres = 0;             // Inicializa el contador de expresiones
+  num_expressions = 0;             // Inicializa el contador de expresiones
   get_token();             // Obtiene el primer token
   expres0();               // Se analiza la expression
   if (token == p_ultimo) { // Se analizó con éxito la expression
-    evaluacion = do_evaluate();
+    result = do_evaluate();
     if (token != p_error) { // Se evaluó con éxito
       token = p_num;
-      tnumero = evaluacion;
+      token_number = result;
     }
   } else
     token = p_error;
 }
 
 double do_evaluate(void) {
-  double pila[64];
+  double calc_stack[64];
   int sp = 0, n = 0;
 
   do {
-    switch (expres[n].token) {
+    switch (expressions[n].token) {
     case p_num:
-      pila[++sp] = expres[n].numero;
+      calc_stack[++sp] = expressions[n].number;
       break;
     case p_or:
-      pila[sp - 1] = (double)((memptrsize)pila[sp - 1] | (memptrsize)pila[sp]);
+      calc_stack[sp - 1] = (double)((memptrsize)calc_stack[sp - 1] | (memptrsize)calc_stack[sp]);
       sp--;
       break;
     case p_xor:
-      pila[sp - 1] = (double)((memptrsize)pila[sp - 1] ^ (memptrsize)pila[sp]);
+      calc_stack[sp - 1] = (double)((memptrsize)calc_stack[sp - 1] ^ (memptrsize)calc_stack[sp]);
       sp--;
       break;
     case p_and:
-      pila[sp - 1] = (double)((memptrsize)pila[sp - 1] & (memptrsize)pila[sp]);
+      calc_stack[sp - 1] = (double)((memptrsize)calc_stack[sp - 1] & (memptrsize)calc_stack[sp]);
       sp--;
       break;
     case p_add:
-      pila[sp - 1] += pila[sp];
+      calc_stack[sp - 1] += calc_stack[sp];
       sp--;
       break;
     case p_sub:
-      pila[sp - 1] -= pila[sp];
+      calc_stack[sp - 1] -= calc_stack[sp];
       sp--;
       break;
     case p_mul:
-      pila[sp - 1] *= pila[sp];
+      calc_stack[sp - 1] *= calc_stack[sp];
       sp--;
       break;
     case p_div:
-      if (pila[sp] == 0.0) {
+      if (calc_stack[sp] == 0.0) {
         token = p_error;
-        n = iexpres;
+        n = num_expressions;
       } else {
-        pila[sp - 1] /= pila[sp];
+        calc_stack[sp - 1] /= calc_stack[sp];
         sp--;
       }
       break;
     case p_mod:
-      if ((memptrsize)pila[sp] == 0) {
+      if ((memptrsize)calc_stack[sp] == 0) {
         token = p_error;
-        n = iexpres;
+        n = num_expressions;
       } else {
-        pila[sp - 1] = (double)((memptrsize)pila[sp - 1] % (memptrsize)pila[sp]);
+        calc_stack[sp - 1] = (double)((memptrsize)calc_stack[sp - 1] % (memptrsize)calc_stack[sp]);
         sp--;
       }
       break;
     case p_neg:
-      pila[sp] = -pila[sp];
+      calc_stack[sp] = -calc_stack[sp];
       break;
     case p_not:
-      pila[sp] = (double)((memptrsize)pila[sp] ^ -1);
+      calc_stack[sp] = (double)((memptrsize)calc_stack[sp] ^ -1);
       break;
     case p_shr:
-      pila[sp - 1] = (double)((memptrsize)pila[sp - 1] >> (memptrsize)pila[sp]);
+      calc_stack[sp - 1] = (double)((memptrsize)calc_stack[sp - 1] >> (memptrsize)calc_stack[sp]);
       sp--;
       break;
     case p_shl:
-      pila[sp - 1] = (double)((memptrsize)pila[sp - 1] << (memptrsize)pila[sp]);
+      calc_stack[sp - 1] = (double)((memptrsize)calc_stack[sp - 1] << (memptrsize)calc_stack[sp]);
       sp--;
       break;
     case p_sqrt:
-      if (pila[sp] < 0) {
+      if (calc_stack[sp] < 0) {
         token = p_error;
-        n = iexpres;
+        n = num_expressions;
       } else {
-        if (pila[sp] < 2147483648)
-          pila[sp] = sqrt(pila[sp]);
+        if (calc_stack[sp] < 2147483648)
+          calc_stack[sp] = sqrt(calc_stack[sp]);
         else {
           token = p_error;
-          n = iexpres;
+          n = num_expressions;
         }
       }
       break;
 
     default:
       token = p_error;
-      n = iexpres;
+      n = num_expressions;
       break;
     }
     if (pcalc->cint)
-      pila[sp] = (double)((memptrsize)pila[sp]);
-  } while (++n < iexpres);
+      calc_stack[sp] = (double)((memptrsize)calc_stack[sp]);
+  } while (++n < num_expressions);
 
   if (sp != 1)
     token = p_error;
 
-  return (pila[sp]);
+  return (calc_stack[sp]);
 }
 
 void expres0() { // xor or and
@@ -192,8 +192,8 @@ void expres0() { // xor or and
   while ((p = token) >= p_xor && p <= p_and) {
     get_token();
     expres1();
-    expres[iexpres].token = p;
-    iexpres++;
+    expressions[num_expressions].token = p;
+    num_expressions++;
   }
 }
 
@@ -203,8 +203,8 @@ void expres1() { // << >>
   while ((p = token) >= p_shl && p <= p_shr) {
     get_token();
     expres2();
-    expres[iexpres].token = p;
-    iexpres++;
+    expressions[num_expressions].token = p;
+    num_expressions++;
   }
 }
 
@@ -214,8 +214,8 @@ void expres2() { // + -
   while ((p = token) >= p_add && p <= p_sub) {
     get_token();
     expres3();
-    expres[iexpres].token = p;
-    iexpres++;
+    expressions[num_expressions].token = p;
+    num_expressions++;
   }
 }
 
@@ -225,8 +225,8 @@ void expres3() { // * / %
   while ((p = token) >= p_mul && p <= p_mod) {
     get_token();
     expres4();
-    expres[iexpres].token = p;
-    iexpres++;
+    expressions[num_expressions].token = p;
+    num_expressions++;
   }
 }
 
@@ -242,8 +242,8 @@ void expres4() { // signo !
       p = p_neg;
     get_token();
     expres4();
-    expres[iexpres].token = p;
-    iexpres++;
+    expressions[num_expressions].token = p;
+    num_expressions++;
   } else
     expres5();
 }
@@ -260,12 +260,12 @@ void expres5() {
   } else if (token == p_sqrt) {
     get_token();
     expres5();
-    expres[iexpres].token = p_sqrt;
-    iexpres++;
+    expressions[num_expressions].token = p_sqrt;
+    num_expressions++;
   } else if (token == p_num) {
-    expres[iexpres].token = p_num;
-    expres[iexpres].numero = tnumero;
-    iexpres++;
+    expressions[num_expressions].token = p_num;
+    expressions[num_expressions].number = token_number;
+    num_expressions++;
     get_token();
   } else {
     token = p_error;
@@ -299,7 +299,7 @@ reget_token:
     case '.':
       token = p_num;
       expression--;
-      tnumero = get_num();
+      token_number = get_num();
       break;
     case '(':
       token = p_abrir;
@@ -374,7 +374,7 @@ reget_token:
           token = p_sqrt;
         else if (!strcmp(cwork, "pi")) {
           token = p_num;
-          tnumero = 3.14159265359;
+          token_number = 3.14159265359;
         } else
           token = p_error;
       } else {
@@ -491,11 +491,11 @@ void calc2(void) {
     if (token == p_num) {
       if (pcalc->chex)
         div_snprintf(pcalc->cresult, sizeof(pcalc->cresult), "0x%x",
-                     (unsigned int)(memptrsize)tnumero);
+                     (unsigned int)(memptrsize)token_number);
       else if (pcalc->cint)
-        div_snprintf(pcalc->cresult, sizeof(pcalc->cresult), "%d", (int)(memptrsize)tnumero);
+        div_snprintf(pcalc->cresult, sizeof(pcalc->cresult), "%d", (int)(memptrsize)token_number);
       else
-        div_snprintf(pcalc->cresult, sizeof(pcalc->cresult), "%g", tnumero);
+        div_snprintf(pcalc->cresult, sizeof(pcalc->cresult), "%g", token_number);
     } else
       div_strcpy(pcalc->cresult, sizeof(pcalc->cresult), (char *)texts[417]);
     wbox(v.ptr, w, h, c12, 4, 12, w - 8 - 22 - 26, 6);

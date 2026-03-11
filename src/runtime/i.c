@@ -1542,7 +1542,7 @@ void finalization(void) {
 
   reset_video_mode();
 
-  kbdReset();
+  kbd_reset();
 
 #ifdef DEBUG
   if (text_font != NULL) {
@@ -1664,7 +1664,7 @@ void exer(int e) {
 
   reset_video_mode();
 
-  kbdReset();
+  kbd_reset();
 
 #if defined(DOS) || defined(WIN32)
   _dos_setdrive((int)toupper(*divpath) - 'A' + 1, &divnum);
@@ -1711,7 +1711,7 @@ void e(int text_id) {
   }
   reset_video_mode();
 
-  kbdReset();
+  kbd_reset();
 
 #if defined(DOS) || defined(WIN32)
   _dos_setdrive((int)toupper(*divpath) - 'A' + 1, &divnum);
@@ -1960,7 +1960,7 @@ int main(int argc, char *argv[]) {
     dump(len - div1stubsize);
 #endif
 
-    kbdInit();
+    kbd_init();
 
 
     interprete();
@@ -2068,7 +2068,7 @@ int main(int argc, char *argv[]) {
             exit(26);
           }
 
-          kbdInit();
+          kbd_init();
 #ifdef DEBUG
           printf("Looking for joysticks\n");
 #endif

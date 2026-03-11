@@ -43,7 +43,7 @@ void __far __interrupt __loadds IrqHandler(void) {}
 // Obtains the address of an IRQ handler.
 //-----------------------------------------------------------------------------
 
-TIRQHandler GetIRQVector(int n) {
+TIRQHandler get_irq_vector(int n) {
   return NULL;
 }
 
@@ -51,13 +51,13 @@ TIRQHandler GetIRQVector(int n) {
 // Sets the address of an IRQ handler.
 //-----------------------------------------------------------------------------
 
-void SetIRQVector(int n, TIRQHandler vec) {}
+void set_irq_vector(int n, TIRQHandler vec) {}
 
 //-----------------------------------------------------------------------------
 // Function to initialize the handler.
 //-----------------------------------------------------------------------------
 
-void kbdInit(void) {
+void kbd_init(void) {
   OSDEP_keyInit();
 }
 
@@ -65,7 +65,7 @@ void kbdInit(void) {
 // Function to uninitialize the handler.
 //-----------------------------------------------------------------------------
 
-void kbdReset(void) {}
+void kbd_reset(void) {}
 
 //-----------------------------------------------------------------------------
 //      Wait for a key, update variables (ascii, scan_code and shift_status)
@@ -103,7 +103,7 @@ void checkmod(OSDEPMod mod) {
 
 #include <SDL2/SDL_events.h>
 
-void PrintEvent(const SDL_Event *event) {
+void print_event(const SDL_Event *event) {
   if (event->type == SDL_WINDOWEVENT) {
     switch (event->window.event) {
     case SDL_WINDOWEVENT_SHOWN:
@@ -172,7 +172,7 @@ void poll_keyboard(void) {
   }
   while (SDL_PollEvent(&event)) {
     // check keys
-    PrintEvent(&event);
+    print_event(&event);
 
     /* If a quit event has been sent */
     if (event.type == SDL_QUIT)

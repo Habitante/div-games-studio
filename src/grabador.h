@@ -6,7 +6,7 @@
 #define SET_PALET  4
 #define MOUSE_KEY  5
 
-void RegScreen(unsigned char *NewScreen);
-void EndGrabador();
-void WriteDac(unsigned char *dac);
-void WriteMouseKey(char bMouseKey);
+void record_screen(unsigned char *NewScreen);
+void end_recorder();
+void write_dac(unsigned char *dac);
+void write_mouse_key(char bMouseKey);

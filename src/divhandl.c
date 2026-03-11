@@ -795,7 +795,7 @@ casi_no_tiene_nombre:
       break;
 
     case 10:
-      GenExplodes();
+      gen_explodes();
       break;
     }
   }
