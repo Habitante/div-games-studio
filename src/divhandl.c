@@ -56,13 +56,13 @@ void SaveSound(pcminfo *mypcminfo, char *dst);
 void PasteNewSounds(void);
 
 void fusionar_paletas(void);
-int cargadac_MAP(char *name);
-int cargadac_PCX(char *name);
-int cargadac_BMP(char *name);
-int cargadac_JPG(char *name);
-int cargadac_FNT(char *name);
-int cargadac_FPG(char *name);
-int cargadac_PAL(char *name);
+int fmt_load_dac_map(char *name);
+int fmt_load_dac_pcx(char *name);
+int fmt_load_dac_bmp(char *name);
+int fmt_load_dac_jpg(char *name);
+int fmt_load_dac_fnt(char *name);
+int fmt_load_dac_fpg(char *name);
+int fmt_load_dac_pal(char *name);
 void crear_paleta(void);
 
 extern byte apply_palette[768];
@@ -595,13 +595,13 @@ void menu_paletas2(void) {
   if ((prev_mouse_buttons & 1) && !(mouse_b & 1)) {
     switch (v.state) {
     case 1:
-      LoadPal();
+      pal_load();
       break;
     case 2:
-      SaveAsPal();
+      pal_save_as();
       break;
     case 3:
-      EditPal();
+      pal_edit();
       break;
     case 4:
       sort_palette();
@@ -1017,7 +1017,7 @@ void menu_graficos2(void) {
             mouse_graf = 3;
             flush_copy();
             mouse_graf = 1;
-            SaveFPG(n);
+            fpg_save(n);
           }
         }
       }
@@ -3306,13 +3306,13 @@ void open_map(void) {
       div_strcat(full, sizeof(full), input);
 
       cargar_paleta = 1;
-      div_try |= cargadac_PCX(full);
+      div_try |= fmt_load_dac_pcx(full);
       if (!div_try)
-        div_try |= cargadac_BMP(full);
+        div_try |= fmt_load_dac_bmp(full);
       if (!div_try)
-        div_try |= cargadac_MAP(full);
+        div_try |= fmt_load_dac_map(full);
       if (!div_try)
-        div_try |= cargadac_JPG(full);
+        div_try |= fmt_load_dac_jpg(full);
       cargar_paleta = 0;
 
       if (div_try) {
@@ -3381,13 +3381,13 @@ void open_map(void) {
     case 2: // Merge palettes
       memcpy(dac4, pal, 768);
       fusionar_paletas();
-      RefPalAndDlg(0, 1);
+      pal_refresh(0, 1);
       break;
     case 3: // Activate the new palette
       if (muestra == NULL)
         memcpy(pal, original_palette, 768);
       memcpy(dac4, pal, 768);
-      RefPalAndDlg(0, 1);
+      pal_refresh(0, 1);
       break;
     }
   }
@@ -3408,13 +3408,13 @@ void open_map(void) {
         if ((buffer = (byte *)malloc(n)) != NULL) {
           fseek(f, 0, SEEK_SET);
           if (fread(buffer, 1, n, f) == n) {
-            if (is_MAP(buffer))
+            if (fmt_is_map(buffer))
               tipomapa = 1;
-            else if (is_PCX(buffer))
+            else if (fmt_is_pcx(buffer))
               tipomapa = 2;
-            else if (is_BMP(buffer))
+            else if (fmt_is_bmp(buffer))
               tipomapa = 3;
-            else if (is_JPG(buffer, n))
+            else if (fmt_is_jpg(buffer, n))
               tipomapa = 4;
             else
               tipomapa = 0;
@@ -3432,16 +3432,16 @@ void open_map(void) {
                   x = 1;
                   switch (tipomapa) {
                   case 1:
-                    descomprime_MAP(buffer, v_map->map, 1);
+                    fmt_load_map(buffer, v_map->map, 1);
                     break;
                   case 2:
-                    descomprime_PCX(buffer, v_map->map, 1);
+                    fmt_load_pcx(buffer, v_map->map, 1);
                     break;
                   case 3:
-                    descomprime_BMP(buffer, v_map->map, 1);
+                    fmt_load_bmp(buffer, v_map->map, 1);
                     break;
                   case 4:
-                    x = descomprime_JPG(buffer, v_map->map, 1, n);
+                    x = fmt_load_jpg(buffer, v_map->map, 1, n);
                     break;
                   }
 
@@ -3455,8 +3455,8 @@ void open_map(void) {
                     continue;
                   }
 
-                  // NOTE: descomprime_MAP/PCX/BMP return void, so errors cannot be checked here.
-                  // Only descomprime_JPG returns a status (already handled above).
+                  // NOTE: fmt_load_map/PCX/BMP return void, so errors cannot be checked here.
+                  // Only fmt_load_jpg returns a status (already handled above).
 
                   ExternUseBufferMap = (char *)v_map->map;
 
@@ -3568,13 +3568,13 @@ void save_map(void) {
 
       switch (tipomapa) {
       case 0:
-        e = save_MAP(map, f);
+        e = fmt_save_map(map, f);
         break;
       case 1:
-        e = save_PCX(map, f);
+        e = fmt_save_pcx(map, f);
         break;
       case 2:
-        e = graba_BMP(map, f);
+        e = fmt_save_bmp(map, f);
         break;
       }
       if (e == 2) {

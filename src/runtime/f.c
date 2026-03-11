@@ -2742,7 +2742,7 @@ pcmfuera:
     }
   }
 
-  pila[sp] = LoadSound(ptr, file_len, loop);
+  pila[sp] = sound_load(ptr, file_len, loop);
 
   free(ptr);
 
@@ -2754,7 +2754,7 @@ pcmfuera:
 //----------------------------------------------------------------------------
 
 void unload_pcm(void) {
-  UnloadSound(pila[sp]);
+  sound_unload(pila[sp]);
 }
 
 //----------------------------------------------------------------------------
@@ -2773,7 +2773,7 @@ void _sound(void) {
     fre = 8;
   if (fre) {
 #ifdef MIXER
-    pila[sp] = DivPlaySound(pila[sp], vol, fre) + 1;
+    pila[sp] = sound_play(pila[sp], vol, fre) + 1;
 //	printf("New sound on channel %d\n",pila[sp]);
 #else
     pila[sp] = 0;
@@ -2793,9 +2793,9 @@ void stop_sound(void) {
   int x;
   if (pila[sp] == -1) {
     for (x = 0; x < CHANNELS; x++)
-      StopSound(x);
+      sound_stop(x);
   } else {
-    StopSound(pila[sp] - 1);
+    sound_stop(pila[sp] - 1);
   }
 #endif
   pila[sp] = 0;
@@ -2815,7 +2815,7 @@ void change_sound(void) {
     vol = 511;
   if (fre < 8)
     fre = 8;
-  ChangeSound(pila[sp] - 1, vol, fre);
+  sound_change(pila[sp] - 1, vol, fre);
 }
 
 //----------------------------------------------------------------------------
@@ -2834,7 +2834,7 @@ void change_channel(void) {
     pan = 0;
   else if (pan > 255)
     pan = 255;
-  ChangeChannel(pila[sp] - 1, vol, pan);
+  sound_change_channel(pila[sp] - 1, vol, pan);
 }
 
 //----------------------------------------------------------------------------
@@ -2883,7 +2883,7 @@ songfuera:
       }
     }
   }
-  pila[sp] = LoadSong(ptr, file_len, loop);
+  pila[sp] = sound_load_song(ptr, file_len, loop);
 
   free(ptr);
 
@@ -2895,7 +2895,7 @@ songfuera:
 //----------------------------------------------------------------------------
 
 void unload_song(void) {
-  UnloadSong(pila[sp]);
+  sound_unload_song(pila[sp]);
 }
 
 //----------------------------------------------------------------------------
@@ -2903,7 +2903,7 @@ void unload_song(void) {
 //----------------------------------------------------------------------------
 
 void song(void) {
-  PlaySong(pila[sp]);
+  sound_play_song(pila[sp]);
 }
 
 //----------------------------------------------------------------------------
@@ -2911,7 +2911,7 @@ void song(void) {
 //----------------------------------------------------------------------------
 
 void stop_song(void) {
-  StopSong();
+  sound_stop_song();
   pila[++sp] = 0;
 }
 
@@ -2920,7 +2920,7 @@ void stop_song(void) {
 //----------------------------------------------------------------------------
 
 void set_song_pos(void) {
-  SetSongPos(pila[sp]);
+  sound_set_song_pos(pila[sp]);
 }
 
 //----------------------------------------------------------------------------
@@ -2928,7 +2928,7 @@ void set_song_pos(void) {
 //----------------------------------------------------------------------------
 
 void get_song_pos(void) {
-  pila[++sp] = GetSongPos();
+  pila[++sp] = sound_get_song_pos();
 }
 
 //----------------------------------------------------------------------------
@@ -2936,7 +2936,7 @@ void get_song_pos(void) {
 //----------------------------------------------------------------------------
 
 void get_song_line(void) {
-  pila[++sp] = GetSongLine();
+  pila[++sp] = sound_get_song_line();
 }
 
 //----------------------------------------------------------------------------
@@ -2944,7 +2944,7 @@ void get_song_line(void) {
 //----------------------------------------------------------------------------
 
 void is_playing_sound(void) {
-  pila[sp] = IsPlayingSound(pila[sp] - 1);
+  pila[sp] = sound_is_playing(pila[sp] - 1);
 }
 
 //----------------------------------------------------------------------------
@@ -2952,7 +2952,7 @@ void is_playing_sound(void) {
 //----------------------------------------------------------------------------
 
 void is_playing_song(void) {
-  pila[++sp] = IsPlayingSong();
+  pila[++sp] = sound_is_playing_song();
 }
 
 //----------------------------------------------------------------------------
@@ -2989,7 +2989,7 @@ void start_fli(void) {
     e(147);
   } else {
     fclose(es);
-    pila[sp] = StartFLI(full, (char *)back_buffer, vga_width, vga_height, x, y);
+    pila[sp] = fli_start(full, (char *)back_buffer, vga_width, vga_height, x, y);
     if (pila[sp] == 0)
       e(130);
   }
@@ -3003,7 +3003,7 @@ void start_fli(void) {
 //----------------------------------------------------------------------------
 
 void frame_fli(void) {
-  pila[++sp] = Nextframe();
+  pila[++sp] = fli_next_frame();
 }
 
 //----------------------------------------------------------------------------
@@ -3012,7 +3012,7 @@ void frame_fli(void) {
 
 void end_fli(void) {
 #ifdef USE_FLI
-  EndFli();
+  fli_end();
 #endif
   pila[++sp] = 0;
 }
@@ -3023,7 +3023,7 @@ void end_fli(void) {
 
 void reset_fli(void) {
 #ifdef USE_FLI
-  ResetFli();
+  fli_reset();
 #endif
   pila[++sp] = 0;
 }
@@ -3044,8 +3044,8 @@ void _system(void) {
   if (system(NULL)) {
     if (!strcmp(strupr((char *)&mem[pila[sp]]), "COMMAND.COM")) {
       getcwd(cwork, 256);
-      EndSound();
-      InitSound();
+      sound_end();
+      sound_init();
       set_mixer();
       _dos_setdrive((int)toupper(*cwork) - 'A' + 1, &n);
       chdir(cwork);
@@ -3692,7 +3692,7 @@ void convert_palette(void) {
 //----------------------------------------------------------------------------
 
 void reset_sound(void) {
-  ResetSound();
+  sound_reset();
   pila[++sp] = 0;
 }
 

@@ -14,8 +14,8 @@ int joymx = 0, joymy = 0;
 void read_mouse2(void);
 void libera_drag(void);
 int collides_with(int a, int x, int y, int an, int al);
-void InitSound(void);
-void EndSound(void);
+void sound_init(void);
+void sound_end(void);
 int div_started = 0;
 
 
@@ -325,7 +325,7 @@ void PrintEvent(const SDL_Event *event) {
         vga_height = event->window.data2;
         vwidth = vga_width;
         vheight = vga_height;
-        EndSound();
+        sound_end();
         soundstopped = 1;
       }
       break;
@@ -562,7 +562,7 @@ void read_mouse2(void) {
     update_box(0, 0, vga_width, vga_height);
     //		full_redraw=1;
     blit_screen(screen_buffer);
-    InitSound();
+    sound_init();
     soundstopped = 0;
   }
 }

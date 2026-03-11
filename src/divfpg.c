@@ -133,7 +133,7 @@ void FPG2(void) {
         x = -1;
       }
     }
-    Anadir_FPG(MiFPG, COD, (char *)tDescrip, (char *)window[1].mapa->filename,
+    fpg_add(MiFPG, COD, (char *)tDescrip, (char *)window[1].mapa->filename,
                window[1].mapa->map_width, window[1].mapa->map_height, nPuntos,
                (char *)window[1].mapa->puntos, (char *)window[1].mapa->map, 0, 1);
 
@@ -157,11 +157,11 @@ void FPG2(void) {
       return;
     }
     fseek(fpg, MiFPG->OffsGrf[Elemento], SEEK_SET);
-    ReadHeadImageAndPoints(&MiFPG->MiHeadFPG, fpg);
+    fpg_read_image_header(&MiFPG->MiHeadFPG, fpg);
     fclose(fpg);
 
     if (FPGimagen) {
-      Anadir_FPG(MiFPG, MiFPG->MiHeadFPG.COD, (char *)MiFPG->MiHeadFPG.Descrip,
+      fpg_add(MiFPG, MiFPG->MiHeadFPG.COD, (char *)MiFPG->MiHeadFPG.Descrip,
                  (char *)MiFPG->MiHeadFPG.Filename, MiFPG->MiHeadFPG.Ancho, MiFPG->MiHeadFPG.Alto,
                  MiFPG->MiHeadFPG.nPuntos, (char *)FPGpuntos, FPGimagen, 1, 1);
     }
@@ -203,7 +203,7 @@ void FPG2(void) {
       return;
     }
     fseek(fpg, MiFPG->OffsGrf[Elemento], SEEK_SET);
-    ReadHead(&MiFPG->MiHeadFPG, fpg);
+    fpg_read_header(&MiFPG->MiHeadFPG, fpg);
 
     map_width = MiFPG->MiHeadFPG.Ancho;
     map_height = MiFPG->MiHeadFPG.Alto;
@@ -308,7 +308,7 @@ void FPG0N(void) {
 
   MiFPG->lInfoFPG.created = 0;
   MiFPG->thumb_on = 0;
-  Crear_FPG(MiFPG, full);
+  fpg_create(MiFPG, full);
   // Safe copy: NombreFpg is 13 bytes, truncate to fit FPG header
   div_strcpy((char *)MiFPG->NombreFpg, sizeof(MiFPG->NombreFpg), input);
   v.title = MiFPG->NombreFpg;
@@ -338,7 +338,7 @@ void FPG0A(void) {
   }
 
   MiFPG->LastUsed = 1;
-  Abrir_FPG(MiFPG, full);
+  fpg_open(MiFPG, full);
   // Safe copy: NombreFpg is 13 bytes, truncate to fit FPG header
   div_strcpy((char *)MiFPG->NombreFpg, sizeof(MiFPG->NombreFpg), input);
   v.title = MiFPG->NombreFpg;
@@ -538,12 +538,12 @@ void open_file(void) {
     case 2: // Merge palettes
       memcpy(dac4, pal, 768);
       fusionar_paletas();
-      RefPalAndDlg(0, 1);
+      pal_refresh(0, 1);
       break;
 
     case 3: // Apply new palette
       memcpy(dac4, pal, 768);
-      RefPalAndDlg(0, 1);
+      pal_refresh(0, 1);
       break;
     }
   }
@@ -693,7 +693,7 @@ int RemapAllFiles(int vent) {
     show_dialog(aceptar0);
 
     if (v_accept) {
-      RemapAllFileToPal(MiFPG);
+      fpg_remap_to_pal(MiFPG);
     } else {
       move(0, vent);
       close_window();
@@ -713,7 +713,7 @@ extern short GetCodeP0y;
 char *GetCodeImagenRed;
 int GetCodeAnchoRed;
 int GetCodeAltoRed;
-void InitGetCode(void);
+void fpg_edit_code_dialog(void);
 
 void GetCode1(void) {
   char cWork[64];
@@ -795,7 +795,7 @@ void GetCode0(void) {
   _get(72, 4, 52, v.an - 8, (byte *)Descrip, 32, 0, 0);
 }
 
-void InitGetCode(void) {
+void fpg_edit_code_dialog(void) {
   int n, m;
   int man, mal;
   byte *temp, *temp2;
@@ -906,7 +906,7 @@ void Show_Taggeds() {
 
       fseek(fpg, MiFPG->OffsGrf[Elemento], SEEK_SET);
 
-      ReadHead(&MiFPG->MiHeadFPG, fpg);
+      fpg_read_header(&MiFPG->MiHeadFPG, fpg);
 
       map_width = MiFPG->MiHeadFPG.Ancho;
       map_height = MiFPG->MiHeadFPG.Alto;
@@ -959,7 +959,7 @@ void Show_Taggeds() {
     }
 }
 
-int Borrar_muchos_FPG(FPG *Fpg, int taggeds, int *array_del);
+int fpg_delete_many(FPG *Fpg, int taggeds, int *array_del);
 
 void Delete_Taggeds() {
   FPG *MiFPG;
@@ -993,7 +993,7 @@ void Delete_Taggeds() {
       array_del[taggeds++] = MiFPG->DesIndex[n];
     }
 
-  Borrar_muchos_FPG(MiFPG, taggeds, array_del);
+  fpg_delete_many(MiFPG, taggeds, array_del);
 
   free(array_del);
 
@@ -1565,7 +1565,7 @@ void create_thumb_FPG(struct t_listboxbr *l) {
 
       if ((f = fopen((char *)MiFPG->ActualFile, "rb")) != NULL) {
         fseek(f, MiFPG->OffsGrf[MiFPG->DesIndex[num]], SEEK_SET);
-        ReadHead(&(MiFPG->MiHeadFPG), f);
+        fpg_read_header(&(MiFPG->MiHeadFPG), f);
         fseek(f, MiFPG->MiHeadFPG.nPuntos * 4, SEEK_CUR);
         MiFPG->thumb[num].an = MiFPG->MiHeadFPG.Ancho;
         MiFPG->thumb[num].al = MiFPG->MiHeadFPG.Alto;
@@ -1612,7 +1612,7 @@ void create_thumb_FPG(struct t_listboxbr *l) {
 
       if ((f = fopen((char *)MiFPG->ActualFile, "rb")) != NULL) {
         fseek(f, MiFPG->OffsGrf[MiFPG->DesIndex[num]], SEEK_SET);
-        ReadHead(&(MiFPG->MiHeadFPG), f);
+        fpg_read_header(&(MiFPG->MiHeadFPG), f);
         fseek(f, MiFPG->MiHeadFPG.nPuntos * 4, SEEK_CUR);
         fseek(f, MiFPG->thumb[num].status, SEEK_CUR);
 
@@ -1840,7 +1840,7 @@ void GetGrafMAP(struct tmapa *mapa, byte *imagen, int x, int y, int ancho, int a
   }
   DIV_SPRINTF(str_desc, "%s%d%s%s", texts[499], cod, texts[500], mapa->filename);
 
-  Anadir_FPG(MiFPG, cod, str_desc, str_file, ancho, alto, 0, NULL, (char *)buffer, 0, 0);
+  fpg_add(MiFPG, cod, str_desc, str_file, ancho, alto, 0, NULL, (char *)buffer, 0, 0);
 
   free(buffer);
 }

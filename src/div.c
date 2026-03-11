@@ -4118,7 +4118,7 @@ void initialization(void) {
   full_redraw = 1;
   blit_screen(screen_buffer);
 
-  InitSound();
+  sound_init();
   if (SoundActive)
     set_init_mixer();
 }

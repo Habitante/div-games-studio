@@ -198,7 +198,7 @@ void Get_Tapiz() {
           n = len;
 
         if (fread(cwork, 1, n, f) == n) {
-          if (is_MAP((byte *)cwork) || is_PCX((byte *)cwork) || is_BMP((byte *)cwork)) {
+          if (fmt_is_map((byte *)cwork) || fmt_is_pcx((byte *)cwork) || fmt_is_bmp((byte *)cwork)) {
             DIV_STRCPY(Tap_name, input);
             DIV_STRCPY(Tap_pathname, full);
 
@@ -207,7 +207,7 @@ void Get_Tapiz() {
               fseek(f, 0, SEEK_SET);
 
               if (fread(ptr, 1, len, f) == len) {
-                if (is_JPG(ptr, len)) {
+                if (fmt_is_jpg(ptr, len)) {
                   DIV_STRCPY(Tap_name, input);
                   DIV_STRCPY(Tap_pathname, full);
 
@@ -1242,13 +1242,13 @@ void prepare_wallpaper_temp(void) {
 
   tap_an = map_width;
   tap_al = map_height;
-  if (is_MAP(x_wallpaper))
+  if (fmt_is_map(x_wallpaper))
     x = 1;
-  else if (is_PCX(x_wallpaper))
+  else if (fmt_is_pcx(x_wallpaper))
     x = 2;
-  else if (is_BMP(x_wallpaper))
+  else if (fmt_is_bmp(x_wallpaper))
     x = 3;
-  else if (is_JPG(x_wallpaper, lon))
+  else if (fmt_is_jpg(x_wallpaper, lon))
     x = 4;
   else
     x = 0;
@@ -1278,16 +1278,16 @@ void prepare_wallpaper_temp(void) {
   n = 1;
   switch (x) {
   case 1:
-    descomprime_MAP(x_wallpaper, temp, 0);
+    fmt_load_map(x_wallpaper, temp, 0);
     break;
   case 2:
-    descomprime_PCX(x_wallpaper, temp, 0);
+    fmt_load_pcx(x_wallpaper, temp, 0);
     break;
   case 3:
-    descomprime_BMP(x_wallpaper, temp, 0);
+    fmt_load_bmp(x_wallpaper, temp, 0);
     break;
   case 4:
-    n = descomprime_JPG(x_wallpaper, temp, 0, lon);
+    n = fmt_load_jpg(x_wallpaper, temp, 0, lon);
     break;
   }
   swap(map_width, tap_an);

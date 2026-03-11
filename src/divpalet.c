@@ -20,13 +20,13 @@ void rescalar(byte *si, int sian, int sial, byte *di, int dian, int dial);
 
 extern int exp_Color0, exp_Color1, exp_Color2;
 
-int cargadac_MAP(char *name);
-int cargadac_PCX(char *name);
-int cargadac_BMP(char *name);
-int cargadac_JPG(char *name);
-int cargadac_FNT(char *name);
-int cargadac_FPG(char *name);
-int cargadac_PAL(char *name);
+int fmt_load_dac_map(char *name);
+int fmt_load_dac_pcx(char *name);
+int fmt_load_dac_bmp(char *name);
+int fmt_load_dac_jpg(char *name);
+int fmt_load_dac_fnt(char *name);
+int fmt_load_dac_fpg(char *name);
+int fmt_load_dac_pal(char *name);
 
 //-----------------------------------------------------------------------------
 //      Module global variables
@@ -736,7 +736,7 @@ extern byte apply_palette[768];
 extern int num_colores;
 void crear_paleta(void);
 
-void LoadPal() {
+void pal_load() {
   int div_try = 0;
   int num, n;
   FILE *f;
@@ -779,13 +779,13 @@ void LoadPal() {
         } else {
           div_strcpy(PalName, sizeof(PalName), full);
 
-          div_try |= cargadac_FPG(PalName);
-          div_try |= cargadac_FNT(PalName);
-          div_try |= cargadac_PCX(PalName);
-          div_try |= cargadac_BMP(PalName);
-          div_try |= cargadac_MAP(PalName);
-          div_try |= cargadac_PAL(PalName);
-          div_try |= cargadac_JPG(PalName);
+          div_try |= fmt_load_dac_fpg(PalName);
+          div_try |= fmt_load_dac_fnt(PalName);
+          div_try |= fmt_load_dac_pcx(PalName);
+          div_try |= fmt_load_dac_bmp(PalName);
+          div_try |= fmt_load_dac_map(PalName);
+          div_try |= fmt_load_dac_pal(PalName);
+          div_try |= fmt_load_dac_jpg(PalName);
 
           if (div_try) {
             if (hay_mapas()) {
@@ -795,9 +795,9 @@ void LoadPal() {
             } else
               v_accept = 1;
             if (v_accept)
-              RefPalAndDlg(0, 1);
+              pal_refresh(0, 1);
             else
-              RefPalAndDlg(1, 1);
+              pal_refresh(1, 1);
           } else {
             v_text = (char *)texts[46];
             show_dialog(err0);
@@ -826,13 +826,13 @@ void LoadPal() {
 
         div_strcpy(PalName, sizeof(PalName), full);
 
-        div_try |= cargadac_FPG(PalName);
-        div_try |= cargadac_FNT(PalName);
-        div_try |= cargadac_PCX(PalName);
-        div_try |= cargadac_BMP(PalName);
-        div_try |= cargadac_MAP(PalName);
-        div_try |= cargadac_PAL(PalName);
-        div_try |= cargadac_JPG(PalName);
+        div_try |= fmt_load_dac_fpg(PalName);
+        div_try |= fmt_load_dac_fnt(PalName);
+        div_try |= fmt_load_dac_pcx(PalName);
+        div_try |= fmt_load_dac_bmp(PalName);
+        div_try |= fmt_load_dac_map(PalName);
+        div_try |= fmt_load_dac_pal(PalName);
+        div_try |= fmt_load_dac_jpg(PalName);
 
         if (div_try)
           for (n = 0; n < 256; n++) {
@@ -853,13 +853,13 @@ void LoadPal() {
     } else
       v_accept = 1;
     if (v_accept)
-      RefPalAndDlg(0, 1);
+      pal_refresh(0, 1);
     else
-      RefPalAndDlg(1, 1);
+      pal_refresh(1, 1);
   }
 }
 
-void Guarda_Pal() {
+void pal_save() {
   int x;
   FILE *f;
   div_strcpy(full, sizeof(full), tipo[v_type].path);
@@ -880,7 +880,7 @@ void Guarda_Pal() {
 }
 
 
-void SaveAsPal() {
+void pal_save_as() {
   v_mode = 1;
   v_type = 10;
   v_text = (char *)texts[778];
@@ -891,9 +891,9 @@ void SaveAsPal() {
       v_text = input;
       show_dialog(aceptar0);
       if (v_accept)
-        Guarda_Pal();
+        pal_save();
     } else {
-      Guarda_Pal();
+      pal_save();
     }
   }
 }
@@ -901,7 +901,7 @@ void SaveAsPal() {
 //-----------------------------------------------------------------------------
 //      Refresh the entire environment after a palette change
 //-----------------------------------------------------------------------------
-void ReloadFont(int window, struct twindow *vntn);
+void pal_reload_font(int window, struct twindow *vntn);
 
 extern int Text1Anc;
 extern int Text1Alt;
@@ -919,12 +919,12 @@ extern char *Text01;
 extern char *Text02;
 extern char *Text03;
 
-void ShowText(void);
+void pal_show_text(void);
 void create_title_bar(void);
 
 byte *t64 = NULL;
 
-void RefPalAndDlg(int no_tocar_mapas, int guardar_original) {
+void pal_refresh(int no_tocar_mapas, int guardar_original) {
   byte *ptr, *ptrend;
   int an, al, x, sum;
   int n, m;
@@ -1065,7 +1065,7 @@ void RefPalAndDlg(int no_tocar_mapas, int guardar_original) {
 
   for (n = 1; n < max_windows; n++) {
     if (window[n].type == 104)
-      ReloadFont(n, (struct twindow *)&window[n].type);
+      pal_reload_font(n, (struct twindow *)&window[n].type);
   }
 
   for (n = 0; n < max_windows; n++)
@@ -1304,7 +1304,7 @@ void sort_palette(void) {
       dac4[n * 3 + 1] = dac[paleta[n] * 3 + 1];
       dac4[n * 3 + 2] = dac[paleta[n] * 3 + 2];
     }
-    RefPalAndDlg(0, 0);
+    pal_refresh(0, 0);
   }
 }
 
@@ -1376,13 +1376,13 @@ void merge_palette(void) {
       div_strcat(full, sizeof(full), input);
       div_strcpy(PalName, sizeof(PalName), full);
 
-      div_try |= cargadac_FPG(PalName);
-      div_try |= cargadac_FNT(PalName);
-      div_try |= cargadac_PCX(PalName);
-      div_try |= cargadac_BMP(PalName);
-      div_try |= cargadac_MAP(PalName);
-      div_try |= cargadac_PAL(PalName);
-      div_try |= cargadac_JPG(PalName);
+      div_try |= fmt_load_dac_fpg(PalName);
+      div_try |= fmt_load_dac_fnt(PalName);
+      div_try |= fmt_load_dac_pcx(PalName);
+      div_try |= fmt_load_dac_bmp(PalName);
+      div_try |= fmt_load_dac_map(PalName);
+      div_try |= fmt_load_dac_pal(PalName);
+      div_try |= fmt_load_dac_jpg(PalName);
 
       if (!div_try) {
         v_text = (char *)texts[46];
@@ -1395,7 +1395,7 @@ void merge_palette(void) {
 
       fusionar_paletas();
 
-      RefPalAndDlg(0, 1);
+      pal_refresh(0, 1);
     }
   }
   create_dac4();
@@ -1761,13 +1761,13 @@ void prepare_wallpaper(void) {
 
   tap_an = map_width;
   tap_al = map_height;
-  if (is_MAP(temp2))
+  if (fmt_is_map(temp2))
     x = 1;
-  else if (is_PCX(temp2))
+  else if (fmt_is_pcx(temp2))
     x = 2;
-  else if (is_BMP(temp2))
+  else if (fmt_is_bmp(temp2))
     x = 3;
-  else if (is_JPG(temp2, lon))
+  else if (fmt_is_jpg(temp2, lon))
     x = 4;
   else
     x = 0;
@@ -1794,16 +1794,16 @@ void prepare_wallpaper(void) {
   cargar_paleta = 1;
   switch (x) {
   case 1:
-    descomprime_MAP(temp2, temp, 0);
+    fmt_load_map(temp2, temp, 0);
     break;
   case 2:
-    descomprime_PCX(temp2, temp, 0);
+    fmt_load_pcx(temp2, temp, 0);
     break;
   case 3:
-    descomprime_BMP(temp2, temp, 0);
+    fmt_load_bmp(temp2, temp, 0);
     break;
   case 4:
-    descomprime_JPG(temp2, temp, 0, lon);
+    fmt_load_jpg(temp2, temp, 0, lon);
     break;
   }
   swap(map_width, tap_an);
@@ -1885,7 +1885,7 @@ byte Retorno = 0;
 int Degradar = 0, Intercambiar = 0, Copiar = 0;
 int wDegradar = 0, wIntercambiar = 0, wCopiar = 0;
 
-void InterPal1(void) {
+void pal_interpolate1(void) {
   int x, y;
   int an = v.an / big2, al = v.al / big2;
   char cWork[20];
@@ -1946,7 +1946,7 @@ void InterPal1(void) {
   update_listbox(&lGre);
 }
 
-void InterPal2(void) {
+void pal_interpolate2(void) {
   int n = 0;
   static int ax = 2, ay = 10;
   byte cColor, Tocado = 0, Dentro = 0;
@@ -2272,13 +2272,13 @@ void InterPal2(void) {
   wCopiar = Copiar;
 }
 
-void InterPal0(void) {
+void pal_interpolate0(void) {
   v.type = 1; // Dialog
   v.an = 220 - 46 - 7;
   v.al = 163 + 24 - 16;
   v.title = texts[138];
-  v.paint_handler = InterPal1;
-  v.click_handler = InterPal2;
+  v.paint_handler = pal_interpolate1;
+  v.click_handler = pal_interpolate2;
 
   _button(100, 7, v.al - 14, 0);
   _button(101, v.an - 8, v.al - 14, 2);
@@ -2293,13 +2293,13 @@ void InterPal0(void) {
 //	Palette menu functions
 //-----------------------------------------------------------------------------
 
-void EditPal() {
+void pal_edit() {
   int n;
   byte DacAux[768];
   Retorno = 0;
   memcpy(DacAux, dac, 768);
   memcpy(paleta, dac, 768);
-  show_dialog(InterPal0);
+  show_dialog(pal_interpolate0);
   if (!Retorno) {
     memcpy(dac, DacAux, 768);
     find_colors();
@@ -2318,9 +2318,9 @@ void EditPal() {
       memcpy(dac4, dac, 768);
       memcpy(dac, DacAux, 768);
       if (v_accept)
-        RefPalAndDlg(0, 1);
+        pal_refresh(0, 1);
       else
-        RefPalAndDlg(1, 1);
+        pal_refresh(1, 1);
     }
   }
 }

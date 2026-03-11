@@ -4,7 +4,7 @@
 #include "fpgfile.hpp"
 #include "div_string.h"
 
-void InitGetCode(void);
+void fpg_edit_code_dialog(void);
 extern int RetValue;
 extern char cCodigo[5];
 extern char cFile[13];
@@ -24,7 +24,7 @@ short GetCodeP0y;
 #define ancho_br 155
 #define alto_br  72
 
-void ReadHeadImageAndPoints(HeadFPG *MiHeadFPG, FILE *fpg) {
+void fpg_read_image_header(HeadFPG *MiHeadFPG, FILE *fpg) {
   fread(&MiHeadFPG->COD, 1, 4, fpg);
   fread(&MiHeadFPG->LONG, 1, 4, fpg);
   memset(MiHeadFPG->Descrip, 0, 33);
@@ -55,7 +55,7 @@ void ReadHeadImageAndPoints(HeadFPG *MiHeadFPG, FILE *fpg) {
   fread(FPGimagen, MiHeadFPG->Ancho * MiHeadFPG->Alto, 1, fpg);
 }
 
-void Crear_FPG(FPG *Fpg, char *Name) {
+void fpg_create(FPG *Fpg, char *Name) {
   int x;
   FILE *fpg;
   if ((fpg = fopen(Name, "wb")) == NULL)
@@ -99,7 +99,7 @@ void Crear_FPG(FPG *Fpg, char *Name) {
   Fpg->lInfoFPG.item_width = 38 + 2;
 }
 
-int Abrir_FPG(FPG *Fpg, char *Name) {
+int fpg_open(FPG *Fpg, char *Name) {
   int x;
   FILE *fpg;
   HeadFPG kkhead;
@@ -132,7 +132,7 @@ int Abrir_FPG(FPG *Fpg, char *Name) {
   NewDacLoaded = 1;
   fread((byte *)gradients, 1, sizeof(gradients), fpg);
 
-  while (ReadHead(&kkhead, fpg)) {
+  while (fpg_read_header(&kkhead, fpg)) {
     Fpg->OffsGrf[kkhead.COD] = ftell(fpg) - FPG_HEAD;
     Fpg->DesIndex[Fpg->nIndex] = kkhead.COD;
     div_snprintf((char *)Fpg->CodDes[Fpg->nIndex++], sizeof(Fpg->CodDes[0]), "%c %03d %s", 255,
@@ -140,7 +140,7 @@ int Abrir_FPG(FPG *Fpg, char *Name) {
     fseek(fpg, Fpg->OffsGrf[kkhead.COD] + kkhead.LONG, SEEK_SET);
   }
 
-  Sort(Fpg);
+  fpg_sort(Fpg);
   fclose(fpg);
 
   if (Fpg->thumb_on) {
@@ -164,7 +164,7 @@ int Abrir_FPG(FPG *Fpg, char *Name) {
   return 1;
 }
 
-void Sort(FPG *Fpg) {
+void fpg_sort(FPG *Fpg) {
   int iWork, i, j;
   char cWork[38];
   for (i = 0; i < Fpg->nIndex; i++) {
@@ -182,7 +182,7 @@ void Sort(FPG *Fpg) {
   }
 }
 
-int ReadHead(HeadFPG *MiHeadFPG, FILE *fpg) {
+int fpg_read_header(HeadFPG *MiHeadFPG, FILE *fpg) {
   fread(&MiHeadFPG->COD, 1, 4, fpg);
   fread(&MiHeadFPG->LONG, 1, 4, fpg);
   memset(MiHeadFPG->Descrip, 0, 33);
@@ -195,7 +195,7 @@ int ReadHead(HeadFPG *MiHeadFPG, FILE *fpg) {
   return 0;
 }
 
-void WriteHead(HeadFPG *MiHeadFPG, short *puntos, char *imagen, FILE *fpg) {
+void fpg_write_header(HeadFPG *MiHeadFPG, short *puntos, char *imagen, FILE *fpg) {
   fwrite(&MiHeadFPG->COD, 1, 4, fpg);
   fwrite(&MiHeadFPG->LONG, 1, 4, fpg);
   fwrite(MiHeadFPG->Descrip, 1, 32, fpg);
@@ -208,7 +208,7 @@ void WriteHead(HeadFPG *MiHeadFPG, short *puntos, char *imagen, FILE *fpg) {
   fwrite(imagen, MiHeadFPG->Ancho * MiHeadFPG->Alto, 1, fpg);
 }
 
-int Anadir_FPG(FPG *Fpg, int COD, char *tDescrip, char *tFilename, int Ancho, int Alto, int nPuntos,
+int fpg_add(FPG *Fpg, int COD, char *tDescrip, char *tFilename, int Ancho, int Alto, int nPuntos,
                char *Puntos, char *Imagen, int BorrarAntiguo, int get_info) {
   int LONG, OLDCOD = COD, First = 1, n;
   FILE *fpg;
@@ -231,7 +231,7 @@ int Anadir_FPG(FPG *Fpg, int COD, char *tDescrip, char *tFilename, int Ancho, in
       GetCodeP0y = -1;
     }
     if (get_info)
-      InitGetCode();
+      fpg_edit_code_dialog();
     else
       RetValue = 1;
     COD = atoi(cCodigo);
@@ -247,10 +247,10 @@ int Anadir_FPG(FPG *Fpg, int COD, char *tDescrip, char *tFilename, int Ancho, in
   }
 
   if (BorrarAntiguo)
-    Borrar_FPG(Fpg, OLDCOD); // Delete the old one
+    fpg_delete(Fpg, OLDCOD); // Delete the old one
 
   if (Fpg->OffsGrf[COD] != 0)
-    Borrar_FPG(Fpg, COD); // If overwriting an existing one
+    fpg_delete(Fpg, COD); // If overwriting an existing one
 
   if ((fpg = fopen((char *)Fpg->ActualFile, "ab")) == NULL) {
     v_text = (char *)texts[43];
@@ -288,7 +288,7 @@ int Anadir_FPG(FPG *Fpg, int COD, char *tDescrip, char *tFilename, int Ancho, in
   fclose(fpg);
 
   // Re-read file information
-  if (!Abrir_FPG(Fpg, (char *)Fpg->ActualFile)) {
+  if (!fpg_open(Fpg, (char *)Fpg->ActualFile)) {
     v_text = (char *)texts[43];
     show_dialog(err0);
     return 0;
@@ -317,7 +317,7 @@ int Anadir_FPG(FPG *Fpg, int COD, char *tDescrip, char *tFilename, int Ancho, in
   return 1;
 }
 
-int RemapAllFileToPal(FPG *Fpg) {
+int fpg_remap_to_pal(FPG *Fpg) {
   struct tipo_regla CopiaReglas[16];
   HeadFPG MiOtraHeadFPG;
   char ActualPath[_MAX_PATH + 14];
@@ -357,7 +357,7 @@ int RemapAllFileToPal(FPG *Fpg) {
   fwrite(dac, 768, 1, Oldfpg);
   fread(CopiaReglas, 1, sizeof(CopiaReglas), fpg);
   fwrite(CopiaReglas, sizeof(CopiaReglas), 1, Oldfpg);
-  while (ReadHead(&MiOtraHeadFPG, fpg)) {
+  while (fpg_read_header(&MiOtraHeadFPG, fpg)) {
     OtraImagen = (char *)malloc(MiOtraHeadFPG.Ancho * MiOtraHeadFPG.Alto);
     if (OtraImagen == NULL) {
       fclose(fpg);
@@ -383,7 +383,7 @@ int RemapAllFileToPal(FPG *Fpg) {
     for (y = 0; y < MiOtraHeadFPG.Ancho * MiOtraHeadFPG.Alto; y++)
       OtraImagen[y] = MiTabla[OtraImagen[y]];
 
-    WriteHead(&MiOtraHeadFPG, OtrosPuntos, OtraImagen, Oldfpg);
+    fpg_write_header(&MiOtraHeadFPG, OtrosPuntos, OtraImagen, Oldfpg);
 
     free(OtraImagen);
     if (MiOtraHeadFPG.nPuntos != 0)
@@ -393,14 +393,14 @@ int RemapAllFileToPal(FPG *Fpg) {
   fclose(fpg);
   DaniDel((char *)Fpg->ActualFile);
   rename(ActualPath, (char *)Fpg->ActualFile);
-  if (!Abrir_FPG(Fpg, (char *)Fpg->ActualFile))
+  if (!fpg_open(Fpg, (char *)Fpg->ActualFile))
     return 0;
   NewDacLoaded = 0;
   return 1;
 }
 #define BUFFERCOPYLEN 4096
 void close_fpg(char *fpg_path);
-void SaveFPG(int n) {
+void fpg_save(int n) {
   int an = window[n].an / big2, al = window[n].al / big2;
   FPG *Fpg = (FPG *)window[n].aux;
   FILE *FileOrg, *FileDest;
@@ -464,7 +464,7 @@ void SaveFPG(int n) {
   free(Buffer);
 }
 
-int Borrar_FPG(FPG *Fpg,
+int fpg_delete(FPG *Fpg,
                int COD) // Trash, overwrite existing entry, or when changing a graphic's code
 {
   struct tipo_regla CopiaReglas[16];
@@ -522,7 +522,7 @@ int Borrar_FPG(FPG *Fpg,
   fread(CopiaReglas, 1, sizeof(CopiaReglas), fpg);
   fwrite(CopiaReglas, sizeof(CopiaReglas), 1, Oldfpg);
 
-  while (ReadHead(&MiOtraHeadFPG, fpg)) {
+  while (fpg_read_header(&MiOtraHeadFPG, fpg)) {
     Progress((char *)texts[436], ftell(fpg), len);
 
     OtraImagen = (char *)malloc(MiOtraHeadFPG.Ancho * MiOtraHeadFPG.Alto);
@@ -553,7 +553,7 @@ int Borrar_FPG(FPG *Fpg,
     // *************************
 
     if (MiOtraHeadFPG.COD != COD) {
-      WriteHead(&MiOtraHeadFPG, OtrosPuntos, OtraImagen, Oldfpg);
+      fpg_write_header(&MiOtraHeadFPG, OtrosPuntos, OtraImagen, Oldfpg);
     }
 
     // *************************
@@ -575,13 +575,13 @@ int Borrar_FPG(FPG *Fpg,
 
   rename(ActualPath, (char *)Fpg->ActualFile);
 
-  if (!Abrir_FPG(Fpg, (char *)Fpg->ActualFile)) {
+  if (!fpg_open(Fpg, (char *)Fpg->ActualFile)) {
     return 0;
   }
   return 1;
 }
 
-int Borrar_muchos_FPG(FPG *Fpg, int taggeds, int *array_del) {
+int fpg_delete_many(FPG *Fpg, int taggeds, int *array_del) {
   struct tipo_regla CopiaReglas[16];
   HeadFPG MiOtraHeadFPG;
   char ActualPath[_MAX_PATH + 14];
@@ -621,7 +621,7 @@ int Borrar_muchos_FPG(FPG *Fpg, int taggeds, int *array_del) {
   fread(CopiaReglas, 1, sizeof(CopiaReglas), fpg);
   fwrite(CopiaReglas, sizeof(CopiaReglas), 1, Oldfpg);
 
-  while (ReadHead(&MiOtraHeadFPG, fpg)) {
+  while (fpg_read_header(&MiOtraHeadFPG, fpg)) {
     Progress((char *)texts[436], ftell(fpg), len);
 
     OtraImagen = (char *)malloc(MiOtraHeadFPG.Ancho * MiOtraHeadFPG.Alto);
@@ -659,7 +659,7 @@ int Borrar_muchos_FPG(FPG *Fpg, int taggeds, int *array_del) {
     }
 
     if (y == taggeds) {
-      WriteHead(&MiOtraHeadFPG, OtrosPuntos, OtraImagen, Oldfpg);
+      fpg_write_header(&MiOtraHeadFPG, OtrosPuntos, OtraImagen, Oldfpg);
     } else {
       n = 0;
       while (1) {
@@ -691,7 +691,7 @@ int Borrar_muchos_FPG(FPG *Fpg, int taggeds, int *array_del) {
   DaniDel((char *)Fpg->ActualFile);
   rename(ActualPath, (char *)Fpg->ActualFile);
 
-  if (!Abrir_FPG(Fpg, (char *)Fpg->ActualFile))
+  if (!fpg_open(Fpg, (char *)Fpg->ActualFile))
     return 0;
   return 1;
 }

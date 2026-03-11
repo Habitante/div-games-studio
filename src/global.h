@@ -246,10 +246,10 @@ void calculate_gradient(int);
 
 // Editing palette
 
-void EditPal();
-void LoadPal();
-void SaveAsPal();
-void RefPalAndDlg(int, int);
+void pal_edit();
+void pal_load();
+void pal_save_as();
+void pal_refresh(int, int);
 void sort_palette();      // sort palette
 void merge_palette();     // merge palette
 void prepare_wallpaper(); // background wallpaper setup (???)
@@ -493,17 +493,17 @@ int Progress(char *titulo, int current, int total);
 //      Functions exported by DIVFORMA (divforma.c)
 ///////////////////////////////////////////////////////////////////////////////
 
-int is_MAP(byte *buffer);
-void descomprime_MAP(byte *buffer, byte *mapa, int);
-int save_MAP(byte *mapa, FILE *f);
-int is_PCX(byte *buffer);
-void descomprime_PCX(byte *buffer, byte *mapa, int);
-int save_PCX(byte *mapa, FILE *f);
-int is_BMP(byte *buffer);
-void descomprime_BMP(byte *buffer, byte *mapa, int);
-int is_JPG(byte *buffer, int img_filesize);
-int descomprime_JPG(byte *buffer, byte *mapa, int vent, int img_filesize);
-int graba_BMP(byte *mapa, FILE *f);
+int fmt_is_map(byte *buffer);
+void fmt_load_map(byte *buffer, byte *mapa, int);
+int fmt_save_map(byte *mapa, FILE *f);
+int fmt_is_pcx(byte *buffer);
+void fmt_load_pcx(byte *buffer, byte *mapa, int);
+int fmt_save_pcx(byte *mapa, FILE *f);
+int fmt_is_bmp(byte *buffer);
+void fmt_load_bmp(byte *buffer, byte *mapa, int);
+int fmt_is_jpg(byte *buffer, int img_filesize);
+int fmt_load_jpg(byte *buffer, byte *mapa, int vent, int img_filesize);
+int fmt_save_bmp(byte *mapa, FILE *f);
 
 ///////////////////////////////////////////////////////////////////////////////
 //      Functions exported by DIVEDIT (divedit.c)
@@ -928,7 +928,7 @@ void flush_buffer(void);
 int new_file(void);
 void open_file();
 int RemapAllFiles(int vent);
-void SaveFPG(int n);
+void fpg_save(int n);
 void Delete_Taggeds();
 void Show_Taggeds();
 

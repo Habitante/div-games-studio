@@ -307,7 +307,7 @@ void snapshot(byte *p) {
   f = fopen(cwork, "wb");
   map_width = vga_width;
   map_height = vga_height;
-  save_PCX(p, f);
+  fmt_save_pcx(p, f);
   map_width = man;
   map_height = mal;
   fclose(f);

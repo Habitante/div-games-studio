@@ -53,17 +53,17 @@ struct {
   byte ok;
 } flc;
 
-void ReadU16(uint16_t *tmp1, uint8_t *tmp2) {
+void fli_read_u16(uint16_t *tmp1, uint8_t *tmp2) {
   *tmp1 = ((Uint8) * (tmp2 + 1) << 8) + (Uint8) * (tmp2);
 }
 
-void ReadU32(uint32_t *tmp1, uint8_t *tmp2) {
+void fli_read_u32(uint32_t *tmp1, uint8_t *tmp2) {
   *tmp1 = (((((((Uint8) * (tmp2 + 3) << 8) + ((Uint8) * (tmp2 + 2))) << 8) + ((Uint8) * (tmp2 + 1)))
             << 8) +
            (Uint8) * (tmp2));
 }
 
-void FlcReadFile(Uint32 size) {
+void fli_read_file(Uint32 size) {
   if (size > flc.membufSize) {
     if (!(flc.pMembuf = (byte *)realloc(flc.pMembuf, size + 1))) {
       printf("Realloc failed: %d\n", size);
@@ -75,7 +75,7 @@ void FlcReadFile(Uint32 size) {
     printf("Can't read flx file");
     exit(1);
   }
-} /* FlcReadFile */
+} /* fli_read_file */
 
 #ifdef DIV1
 extern FILE *div_open_file(byte *file);
@@ -83,7 +83,7 @@ extern FILE *div_open_file(byte *file);
 extern FILE *div_open_file(char *file);
 #endif
 
-int FlcCheckHeader(char *filename) {
+int fli_check_header(char *filename) {
 #ifdef DIV1
   if ((flc.file = div_open_file((byte *)filename)) == NULL)
 #else
@@ -93,15 +93,15 @@ int FlcCheckHeader(char *filename) {
     return (1);
 
 
-  FlcReadFile(128);
+  fli_read_file(128);
 
-  ReadU32(&flc.HeaderSize, flc.pMembuf);
-  ReadU16(&flc.HeaderCheck, flc.pMembuf + 4);
-  ReadU16(&flc.HeaderFrames, flc.pMembuf + 6);
-  ReadU16(&flc.HeaderWidth, flc.pMembuf + 8);
-  ReadU16(&flc.HeaderHeight, flc.pMembuf + 10);
-  ReadU16(&flc.HeaderDepth, flc.pMembuf + 12);
-  ReadU16(&flc.HeaderSpeed, flc.pMembuf + 16);
+  fli_read_u32(&flc.HeaderSize, flc.pMembuf);
+  fli_read_u16(&flc.HeaderCheck, flc.pMembuf + 4);
+  fli_read_u16(&flc.HeaderFrames, flc.pMembuf + 6);
+  fli_read_u16(&flc.HeaderWidth, flc.pMembuf + 8);
+  fli_read_u16(&flc.HeaderHeight, flc.pMembuf + 10);
+  fli_read_u16(&flc.HeaderDepth, flc.pMembuf + 12);
+  fli_read_u16(&flc.HeaderSpeed, flc.pMembuf + 16);
 
 
   if ((flc.HeaderCheck == 0x0AF12) || (flc.HeaderCheck == 0x0AF11)) {
@@ -114,21 +114,21 @@ int FlcCheckHeader(char *filename) {
     return (0);
   }
   return (1);
-} /* FlcCheckHeader */
+} /* fli_check_header */
 
-void FlcInitFirstFrame() {
+void fli_init_first_frame() {
   flc.FrameSize = 16;
   flc.FrameCount = 0;
   if (fseek(flc.file, 128, SEEK_SET)) {
     printf("Fseek read failed\n");
     exit(1);
   };
-  FlcReadFile(flc.FrameSize);
-} /* FlcInitFirstFrame */
+  fli_read_file(flc.FrameSize);
+} /* fli_init_first_frame */
 
 extern OSDEP_Surface *vga;
 
-int StartFLI(char *flinombre, char *Buffer, int Buff_anc, int Buff_alt, int cx, int cy) {
+int fli_start(char *flinombre, char *Buffer, int Buff_anc, int Buff_alt, int cx, int cy) {
   char nombre[strlen(flinombre) + 10];
   flc.pMembuf = NULL;
   flc.membufSize = 0;
@@ -137,17 +137,17 @@ int StartFLI(char *flinombre, char *Buffer, int Buff_anc, int Buff_alt, int cx, 
 
   div_strcpy(nombre, sizeof(nombre), flinombre);
 
-  if (FlcCheckHeader(nombre)) {
+  if (fli_check_header(nombre)) {
     printf("Wrong header\n");
     return 0;
   }
   printf("Loaded %s\n", nombre);
-  FlcInitFirstFrame();
+  fli_init_first_frame();
   printf("Frames: %d\n", flc.HeaderFrames);
   return flc.HeaderFrames;
 }
 
-void COLORS256() {
+void fli_colors_256() {
   Uint8 *pSrc;
   Uint16 NumColorPackets;
   Uint16 NumColors;
@@ -155,7 +155,7 @@ void COLORS256() {
   int i;
 
   pSrc = flc.pChunk + 6;
-  ReadU16(&NumColorPackets, pSrc);
+  fli_read_u16(&NumColorPackets, pSrc);
   pSrc += 2;
   while (NumColorPackets--) {
     NumColorsSkip = *(pSrc++);
@@ -171,9 +171,9 @@ void COLORS256() {
     }
     OSDEP_SetPalette(flc.mainscreen, flc.colors, NumColorsSkip, i);
   }
-} /* COLORS256 */
+} /* fli_colors_256 */
 
-void SS2() {
+void fli_ss2() {
   Uint8 *pSrc, *pDst, *pTmpDst;
   Sint8 CountData;
   Uint8 ColumSkip, Fill1, Fill2;
@@ -181,10 +181,10 @@ void SS2() {
 
   pSrc = flc.pChunk + 6;
   pDst = flc.buffer; //mainscreen;//->pixels;
-  ReadU16(&Lines, pSrc);
+  fli_read_u16(&Lines, pSrc);
   pSrc += 2;
   while (Lines--) {
-    ReadU16(&Count, pSrc);
+    fli_read_u16(&Count, pSrc);
     pSrc += 2;
 
     while (Count & 0xc000) {
@@ -201,7 +201,7 @@ void SS2() {
         printf("Last pixel not implemented");
 #endif
       }
-      ReadU16(&Count, pSrc);
+      fli_read_u16(&Count, pSrc);
       pSrc += 2;
     }
 
@@ -231,16 +231,16 @@ void SS2() {
       pDst += vga_width; //=flc.mainscreen->pitch;
     }
   }
-} /* SS2 */
+} /* fli_ss2 */
 
-void DECODE_COLOR() {
+void fli_decode_color() {
   Uint8 *pSrc;
   Uint16 NumColors, NumColorPackets;
   Uint8 NumColorsSkip;
   int i;
 
   pSrc = flc.pChunk + 6;
-  ReadU16(&NumColorPackets, pSrc);
+  fli_read_u16(&NumColorPackets, pSrc);
   pSrc += 2;
   while (NumColorPackets--) {
     NumColorsSkip = *(pSrc++);
@@ -256,10 +256,10 @@ void DECODE_COLOR() {
     }
     OSDEP_SetPalette(flc.mainscreen, flc.colors, NumColorsSkip, i);
   }
-} /* DECODE_COLOR  */
+} /* fli_decode_color  */
 
 
-void DECODE_COPY() {
+void fli_decode_copy() {
   Uint8 *pSrc, *pDst;
   int Lines = flc.screen_h;
   pSrc = flc.pChunk + 6;
@@ -269,9 +269,9 @@ void DECODE_COPY() {
     pSrc += flc.screen_w;
     pDst += vga_width; //flc.mainscreen->pitch;
   }
-} /* DECODE_COPY */
+} /* fli_decode_copy */
 
-void _BLACK() {
+void fli_black() {
   Uint8 *pDst;
   int Lines = flc.screen_h;
   pDst = flc.buffer; //mainscreen->pixels;
@@ -281,7 +281,7 @@ void _BLACK() {
   }
 } /* BLACK */
 
-void DECODE_BRUN() {
+void fli_decode_brun() {
   Uint8 *pSrc, *pDst, *pTmpDst, Fill;
   Sint8 CountData;
   int HeightCount, PacketsCount;
@@ -310,10 +310,10 @@ void DECODE_BRUN() {
     }
     pDst += vga_width; //flc.mainscreen->pitch;
   }
-} /* DECODE_BRUN */
+} /* fli_decode_brun */
 
 
-void DECODE_LC() {
+void fli_decode_lc() {
   Uint8 *pSrc, *pDst, *pTmpDst;
   Sint8 CountData;
   Uint8 CountSkip;
@@ -324,10 +324,10 @@ void DECODE_LC() {
   pSrc = flc.pChunk + 6;
   pDst = flc.buffer; //mainscreen->pixels;
 
-  ReadU16(&tmp, pSrc);
+  fli_read_u16(&tmp, pSrc);
   pSrc += 2;
   pDst += vga_width; //tmp*flc.mainscreen->pitch;
-  ReadU16(&Lines, pSrc);
+  fli_read_u16(&Lines, pSrc);
   pSrc += 2;
   while (Lines--) {
     pTmpDst = pDst;
@@ -352,14 +352,14 @@ void DECODE_LC() {
     }
     pDst += vga_width; //flc.mainscreen->pitch;
   }
-} /* DECODE_LC */
+} /* fli_decode_lc */
 
 
-int FlcCheckFrame() {
+int fli_check_frame() {
   flc.pFrame = flc.pMembuf + flc.FrameSize - 16;
-  ReadU32(&flc.FrameSize, flc.pFrame + 0);
-  ReadU16(&flc.FrameCheck, flc.pFrame + 4);
-  ReadU16(&flc.FrameChunks, flc.pFrame + 6);
+  fli_read_u32(&flc.FrameSize, flc.pFrame + 0);
+  fli_read_u16(&flc.FrameCheck, flc.pFrame + 4);
+  fli_read_u16(&flc.FrameChunks, flc.pFrame + 6);
 
 
   flc.pFrame += 16;
@@ -375,41 +375,41 @@ int FlcCheckFrame() {
   }
 
   return (1);
-} /* FlcCheckFrame */
+} /* fli_check_frame */
 
 
 extern SDL_Surface *vga;
 
-void FlcDoOneFrame() {
+void fli_do_one_frame() {
   int ChunkCount;
   ChunkCount = flc.FrameChunks;
   flc.pChunk = flc.pMembuf;
   while (ChunkCount--) {
-    ReadU32(&flc.ChunkSize, flc.pChunk + 0);
-    ReadU16(&flc.ChunkType, flc.pChunk + 4);
+    fli_read_u32(&flc.ChunkSize, flc.pChunk + 0);
+    fli_read_u16(&flc.ChunkType, flc.pChunk + 4);
 
 
     switch (flc.ChunkType) {
     case 4:
-      COLORS256();
+      fli_colors_256();
       break;
     case 7:
-      SS2();
+      fli_ss2();
       break;
     case 11:
-      DECODE_COLOR();
+      fli_decode_color();
       break;
     case 12:
-      DECODE_LC();
+      fli_decode_lc();
       break;
     case 13:
-      _BLACK();
+      fli_black();
       break;
     case 15:
-      DECODE_BRUN();
+      fli_decode_brun();
       break;
     case 16:
-      DECODE_COPY();
+      fli_decode_copy();
       break;
     case 18:
 #ifdef DEBUG
@@ -422,14 +422,14 @@ void FlcDoOneFrame() {
 
     flc.pChunk += flc.ChunkSize;
   }
-} /* FlcDoOneFrame */
-int Nextframe() {
+} /* fli_do_one_frame */
+int fli_next_frame() {
   flc.FrameCount++;
 
   if (flc.FrameCount > flc.HeaderFrames)
     return 0;
 
-  if (FlcCheckFrame()) {
+  if (fli_check_frame()) {
     if (flc.FrameCount <= flc.HeaderFrames) {
       printf("Frame failure -- corrupt file?\n");
       return 0;
@@ -437,10 +437,10 @@ int Nextframe() {
       return 0;
     }
   }
-  FlcReadFile(flc.FrameSize);
+  fli_read_file(flc.FrameSize);
 
   if (flc.FrameCheck != 0x0f100) {
-    FlcDoOneFrame();
+    fli_do_one_frame();
     /* TODO: Track which rectangles have really changed */
     OSDEP_UpdateRect(flc.mainscreen, 0, 0, 0, 0);
   }
@@ -448,7 +448,7 @@ int Nextframe() {
   return (flc.FrameCount);
 }
 
-void EndFli() {
+void fli_end() {
   if (flc.file != NULL)
     fclose(flc.file);
   if (flc.pMembuf != NULL) {
@@ -460,7 +460,7 @@ void EndFli() {
   flc.file = NULL;
 }
 
-void ResetFli() {}
+void fli_reset() {}
 
 int quit_warning;
 

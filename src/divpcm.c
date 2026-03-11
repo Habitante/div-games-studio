@@ -15,8 +15,8 @@
 int FilePos = 0;
 
 void FreeMOD(void);
-int GetSongPos(void);
-int GetSongLine(void);
+int sound_get_song_pos(void);
+int sound_get_song_line(void);
 void mostrar_mod_meters(void);
 void OpenSound(void);
 void OpenSoundFile(void);
@@ -26,7 +26,7 @@ void SaveDesktopSound(pcminfo *mypcminfo, FILE *f);
 void CloseSound(char *snd_path);
 void OpenSong(void);
 void OpenDesktopSong(void);
-void PlaySong(char *pathname);
+void sound_play_song(char *pathname);
 void EditSound0(void);
 void EditSound1(void);
 void EditSound2(void);
@@ -258,7 +258,7 @@ void MOD2(void) {
         Mix_FreeMusic(mymodinfo->music);
       } else {
         FreeMOD();
-        PlaySong(mymodinfo->pathname);
+        sound_play_song(mymodinfo->pathname);
       }
 #endif
     }
@@ -310,11 +310,11 @@ void FreeMOD(void) {
 }
 int songpos;
 int songline;
-int GetSongPos(void) {
+int sound_get_song_pos(void) {
   return songpos;
 }
 
-int GetSongLine(void) {
+int sound_get_song_line(void) {
   return songline;
 }
 
@@ -332,12 +332,12 @@ void mostrar_mod_meters(void) {
 
       wwrite(v.ptr, an, al, 29, 40, 2, (byte *)"L ", c1);
       wwrite(v.ptr, an, al, 28, 40, 2, (byte *)"L ", c4);
-      div_snprintf(cwork, sizeof(cwork), "%03d", GetSongLine());
+      div_snprintf(cwork, sizeof(cwork), "%03d", sound_get_song_line());
       wwrite(v.ptr, an, al, 42, 40, 2, (byte *)cwork, c3);
 
       wwrite(v.ptr, an, al, 52, 40, 2, (byte *)"P ", c1);
       wwrite(v.ptr, an, al, 51, 40, 2, (byte *)"P ", c4);
-      div_snprintf(cwork, sizeof(cwork), "%03d", GetSongPos());
+      div_snprintf(cwork, sizeof(cwork), "%03d", sound_get_song_pos());
       wwrite(v.ptr, an, al, 64, 40, 2, (byte *)cwork, c3);
 
       ancho_barra = (v.an - 4 * big2) / SongChannels;
@@ -899,8 +899,8 @@ void noEffect(void *udata, Uint8 *stream, int len) {
   }
 }
 
-void PlaySong(char *pathname) {
-  printf("TODO - divpcm.cpp PlaySong\n");
+void sound_play_song(char *pathname) {
+  printf("TODO - divpcm.cpp sound_play_song\n");
 #ifdef MIXER
   Mix_Music *music;
   modinfo *mymodinfo = (modinfo *)v.aux;

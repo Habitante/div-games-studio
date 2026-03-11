@@ -101,7 +101,7 @@ typedef struct tagRGBQUAD {
 //      MAP format
 //-----------------------------------------------------------------------------
 
-int is_MAP(byte *buffer) {
+int fmt_is_map(byte *buffer) {
   if (!strcmp((char *)buffer, "map\x1a\x0d\x0a")) {
     map_width = *(word *)(buffer + 8);
     map_height = *(word *)(buffer + 10);
@@ -110,7 +110,7 @@ int is_MAP(byte *buffer) {
     return (0);
 }
 
-void descomprime_MAP(byte *buffer, byte *mapa, int vent) {
+void fmt_load_map(byte *buffer, byte *mapa, int vent) {
   short npuntos;
   if (vent) {
     memcpy(&fpg_code, buffer + 12, 4);
@@ -129,7 +129,7 @@ void descomprime_MAP(byte *buffer, byte *mapa, int vent) {
   memcpy(mapa, buffer + 1394 + (npuntos * 4), map_width * map_height);
 }
 
-int save_MAP(byte *mapa, FILE *f) {
+int fmt_save_map(byte *mapa, FILE *f) {
   word x, npuntos = 0;
   int y;
   int i;
@@ -211,7 +211,7 @@ struct pcx_struct {
 //      Functions
 //-----------------------------------------------------------------------------
 
-int is_PCX(byte *buffer) {
+int fmt_is_pcx(byte *buffer) {
   int loes = 0;
 
   if (buffer[2] == 1) {
@@ -232,11 +232,11 @@ extern byte apply_palette[768];
 extern int num_colores;
 void crear_paleta(void);
 void browser2(void);
-byte *descomprime_rle(byte *buffer, unsigned int bytes_line, unsigned int last_byte, byte *pDest);
+byte *fmt_decode_rle(byte *buffer, unsigned int bytes_line, unsigned int last_byte, byte *pDest);
 
 int cargar_paleta = 0;
 
-void descomprime_PCX(byte *buffer, byte *mapa, int vent) {
+void fmt_load_pcx(byte *buffer, byte *mapa, int vent) {
   unsigned int con;
   unsigned int pixel = 0, pixel_line = 0;
   unsigned int last_byte, bytes_line;
@@ -468,7 +468,7 @@ void descomprime_PCX(byte *buffer, byte *mapa, int vent) {
   }
 }
 
-int save_PCX(byte *mapa, FILE *f) {
+int fmt_save_pcx(byte *mapa, FILE *f) {
   byte p[768];
   int x;
   byte *cbuffer;
@@ -541,7 +541,7 @@ int save_PCX(byte *mapa, FILE *f) {
 //  Optimized RLE decompression routine
 //-----------------------------------------------------------------------------
 
-byte *descomprime_rle(byte *buffer, unsigned int bytes_line, unsigned int last_byte, byte *pDest) {
+byte *fmt_decode_rle(byte *buffer, unsigned int bytes_line, unsigned int last_byte, byte *pDest) {
   unsigned int con;
   unsigned int pixel = 0, pixel_line = 0;
   char ch, rep;
@@ -604,7 +604,7 @@ typedef struct tagBITMAPINFOHEADER {
 } BITMAPINFOHEADER;
 #endif
 
-int is_BMP(byte *buffer) {
+int fmt_is_bmp(byte *buffer) {
   BITMAPFILEHEADER FileHeader;
   BITMAPINFOHEADER InfoHeader;
   byte *CopiaBuffer;
@@ -628,7 +628,7 @@ int is_BMP(byte *buffer) {
   return (1);
 }
 
-void descomprime_BMP(byte *buffer, byte *mapa, int vent) {
+void fmt_load_bmp(byte *buffer, byte *mapa, int vent) {
   BITMAPFILEHEADER FileHeader;
   BITMAPINFOHEADER InfoHeader;
   RGBQUAD Bmpdac[256];
@@ -913,7 +913,7 @@ void descomprime_BMP(byte *buffer, byte *mapa, int vent) {
   }
 }
 
-int graba_BMP(byte *mapa, FILE *f) {
+int fmt_save_bmp(byte *mapa, FILE *f) {
   BITMAPFILEHEADER FileHeader;
   BITMAPINFOHEADER InfoHeader;
   RGBQUAD Bmpdac[256];
@@ -975,7 +975,7 @@ int graba_BMP(byte *mapa, FILE *f) {
 //      JPG format
 //-----------------------------------------------------------------------------
 
-int is_JPG(byte *buffer, int img_filesize) {
+int fmt_is_jpg(byte *buffer, int img_filesize) {
   return 0;
 
 #ifdef JPGLIB
@@ -1003,7 +1003,7 @@ int is_JPG(byte *buffer, int img_filesize) {
 #endif
 }
 
-int descomprime_JPG(byte *buffer, byte *mapa, int vent, int img_filesize) {
+int fmt_load_jpg(byte *buffer, byte *mapa, int vent, int img_filesize) {
 #ifdef JPGLIB
   struct jpeg_decompress_struct cinfo;
   struct jpeg_error_mgr my_err_mgr;
@@ -1090,7 +1090,7 @@ int descomprime_JPG(byte *buffer, byte *mapa, int vent, int img_filesize) {
 // Remove from dac4 the colors not used in the map
 // WARNING: Caller must save and restore 'original_palette' before/after calling this function
 
-void quitar_colores(byte *buffer, int len) {
+void fmt_strip_unused_colors(byte *buffer, int len) {
   byte pal[256], *fin;
   int n;
 
@@ -1110,7 +1110,7 @@ void quitar_colores(byte *buffer, int len) {
   }
 }
 
-int cargadac_FNT(char *name) {
+int fmt_load_dac_fnt(char *name) {
   FILE *file;
   char par[8];
 
@@ -1131,7 +1131,7 @@ int cargadac_FNT(char *name) {
   return (1);
 }
 
-int cargadac_FPG(char *name) {
+int fmt_load_dac_fpg(char *name) {
   FILE *file;
   char par[8];
 
@@ -1152,7 +1152,7 @@ int cargadac_FPG(char *name) {
   return (1);
 }
 
-int cargadac_PAL(char *name) {
+int fmt_load_dac_pal(char *name) {
   FILE *file;
   char par[8];
 
@@ -1180,7 +1180,7 @@ int cargadac_PAL(char *name) {
   return (1);
 }
 
-int cargadac_MAP(char *name) {
+int fmt_load_dac_map(char *name) {
   FILE *file;
   char par[16];
   byte *buffer, *temp;
@@ -1224,11 +1224,11 @@ int cargadac_MAP(char *name) {
 
     swap(man, map_width);
     swap(mal, map_height);
-    descomprime_MAP(buffer, temp, 0);
+    fmt_load_map(buffer, temp, 0);
 
     memcpy(original_palette, dac4, 768);
 
-    quitar_colores(temp, map_width * map_height);
+    fmt_strip_unused_colors(temp, map_width * map_height);
 
     swap(man, map_width);
     swap(mal, map_height);
@@ -1244,7 +1244,7 @@ int cargadac_MAP(char *name) {
   return (1);
 }
 
-int cargadac_PCX(char *name) {
+int fmt_load_dac_pcx(char *name) {
   FILE *file;
   int x, n;
   int man, mal;
@@ -1298,12 +1298,12 @@ int cargadac_PCX(char *name) {
     swap(man, map_width);
     swap(mal, map_height);
     cargar_paleta = 1;
-    descomprime_PCX(buffer, temp, 0);
+    fmt_load_pcx(buffer, temp, 0);
 
     memcpy(original_palette, dac4, 768);
 
     if (header.color_planes == 1)
-      quitar_colores(temp, map_width * map_height);
+      fmt_strip_unused_colors(temp, map_width * map_height);
 
     cargar_paleta = 0;
     swap(man, map_width);
@@ -1326,7 +1326,7 @@ int cargadac_PCX(char *name) {
   return (1);
 }
 
-int cargadac_BMP(char *name) {
+int fmt_load_dac_bmp(char *name) {
   FILE *file;
   BITMAPFILEHEADER FileHeader;
   BITMAPINFOHEADER InfoHeader;
@@ -1401,12 +1401,12 @@ int cargadac_BMP(char *name) {
     swap(man, map_width);
     swap(mal, map_height);
     cargar_paleta = 1;
-    descomprime_BMP(buffer, temp, 0);
+    fmt_load_bmp(buffer, temp, 0);
 
     memcpy(original_palette, dac4, 768);
 
     if (InfoHeader.biBitCount == 8)
-      quitar_colores(temp, map_width * map_height);
+      fmt_strip_unused_colors(temp, map_width * map_height);
 
     cargar_paleta = 0;
     swap(man, map_width);
@@ -1428,7 +1428,7 @@ int cargadac_BMP(char *name) {
   return (1);
 }
 
-int cargadac_JPG(char *name) {
+int fmt_load_dac_jpg(char *name) {
 #ifdef JPGLIB
   struct jpeg_decompress_struct cinfo;
   struct jpeg_error_mgr my_err_mgr;

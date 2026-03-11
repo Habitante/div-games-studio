@@ -50,24 +50,24 @@ extern tCancion cancion[128];
 extern int *NewSound;
 extern int ChannelCon;
 
-void InitSound(void);
-void ResetSound(void);
-int LoadSound(char *ptr, long Len, int Loop);
-int UnloadSound(int NumSonido);
-int DivPlaySound(int NumSonido, int Volumen, int Frec);
-int StopSound(int NumChannel);
-int ChangeSound(int NumChannel, int Volumen, int Frec);
-int ChangeChannel(int NumChannel, int Volumen, int Panning);
-int IsPlayingSound(int NumChannel);
-int LoadSong(char *ptr, int Len, int Loop);
-int PlaySong(int NumSong);
-void StopSong(void);
-void UnloadSong(int NumSong);
-void SetSongPos(int SongPat);
-int GetSongPos(void);
-int GetSongLine(void);
-int IsPlayingSong(void);
-void EndSound(void);
+void sound_init(void);
+void sound_reset(void);
+int sound_load(char *ptr, long Len, int Loop);
+int sound_unload(int NumSonido);
+int sound_play(int NumSonido, int Volumen, int Frec);
+int sound_stop(int NumChannel);
+int sound_change(int NumChannel, int Volumen, int Frec);
+int sound_change_channel(int NumChannel, int Volumen, int Panning);
+int sound_is_playing(int NumChannel);
+int sound_load_song(char *ptr, int Len, int Loop);
+int sound_play_song(int NumSong);
+void sound_stop_song(void);
+void sound_unload_song(int NumSong);
+void sound_set_song_pos(int SongPat);
+int sound_get_song_pos(void);
+int sound_get_song_line(void);
+int sound_is_playing_song(void);
+void sound_end(void);
 
 // For in-memory pcm to wav conversion
 typedef struct _HeadDC {

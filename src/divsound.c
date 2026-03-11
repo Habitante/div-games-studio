@@ -9,7 +9,7 @@ extern int safe;
 
 int SoundActive = 0;
 
-void InitSound(void) {
+void sound_init(void) {
   SDL_InitSubSystem(SDL_INIT_AUDIO);
 #ifdef MIXER
 
@@ -28,7 +28,7 @@ void InitSound(void) {
 #endif
 }
 
-void EndSound(void) {
+void sound_end(void) {
 #ifdef MIXER
   Mix_CloseAudio();
 #endif

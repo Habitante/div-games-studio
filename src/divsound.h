@@ -1,5 +1,5 @@
 
 extern int SoundActive;
 
-void InitSound(void);
-void EndSound(void);
+void sound_init(void);
+void sound_end(void);

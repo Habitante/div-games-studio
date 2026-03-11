@@ -115,13 +115,13 @@ void browser1(void);
 void browser2(void);
 void browser3(void);
 
-int cargadac_MAP(char *name);
-int cargadac_PCX(char *name);
-int cargadac_BMP(char *name);
-int cargadac_JPG(char *name);
-int cargadac_FNT(char *name);
-int cargadac_FPG(char *name);
-int cargadac_PAL(char *name);
+int fmt_load_dac_map(char *name);
+int fmt_load_dac_pcx(char *name);
+int fmt_load_dac_bmp(char *name);
+int fmt_load_dac_jpg(char *name);
+int fmt_load_dac_fnt(char *name);
+int fmt_load_dac_fpg(char *name);
+int fmt_load_dac_pal(char *name);
 
 extern int SongType;
 extern int SongCode;
@@ -342,13 +342,13 @@ void create_thumb_MAP(struct t_listboxbr *l) {
 
       man = map_width;
       mal = map_height;
-      if (is_MAP((byte *)thumb[num].ptr))
+      if (fmt_is_map((byte *)thumb[num].ptr))
         tipomapa = 1;
-      else if (is_PCX((byte *)thumb[num].ptr))
+      else if (fmt_is_pcx((byte *)thumb[num].ptr))
         tipomapa = 2;
-      else if (is_BMP((byte *)thumb[num].ptr))
+      else if (fmt_is_bmp((byte *)thumb[num].ptr))
         tipomapa = 3;
-      else if (is_JPG((byte *)thumb[num].ptr, thumb[num].filesize))
+      else if (fmt_is_jpg((byte *)thumb[num].ptr, thumb[num].filesize))
         tipomapa = 4;
       else
         tipomapa = 0;
@@ -363,16 +363,16 @@ void create_thumb_MAP(struct t_listboxbr *l) {
           n = 1;
           switch (tipomapa) {
           case 1:
-            descomprime_MAP((byte *)thumb[num].ptr, temp, 0);
+            fmt_load_map((byte *)thumb[num].ptr, temp, 0);
             break;
           case 2:
-            descomprime_PCX((byte *)thumb[num].ptr, temp, 0);
+            fmt_load_pcx((byte *)thumb[num].ptr, temp, 0);
             break;
           case 3:
-            descomprime_BMP((byte *)thumb[num].ptr, temp, 0);
+            fmt_load_bmp((byte *)thumb[num].ptr, temp, 0);
             break;
           case 4:
-            n = descomprime_JPG((byte *)thumb[num].ptr, temp, 0, thumb[num].filesize);
+            n = fmt_load_jpg((byte *)thumb[num].ptr, temp, 0, thumb[num].filesize);
             break;
           }
           swap(man, map_width);
@@ -545,25 +545,25 @@ void create_thumb_PAL(struct t_listboxbr *l) {
     }
     switch (tipo) {
     case 1:
-      tipo = cargadac_FPG(l->list + l->item_width * num);
+      tipo = fmt_load_dac_fpg(l->list + l->item_width * num);
       break;
     case 2:
-      tipo = cargadac_FNT(l->list + l->item_width * num);
+      tipo = fmt_load_dac_fnt(l->list + l->item_width * num);
       break;
     case 3:
-      tipo = cargadac_PCX(l->list + l->item_width * num);
+      tipo = fmt_load_dac_pcx(l->list + l->item_width * num);
       break;
     case 4:
-      tipo = cargadac_BMP(l->list + l->item_width * num);
+      tipo = fmt_load_dac_bmp(l->list + l->item_width * num);
       break;
     case 5:
-      tipo = cargadac_MAP(l->list + l->item_width * num);
+      tipo = fmt_load_dac_map(l->list + l->item_width * num);
       break;
     case 6:
-      tipo = cargadac_PAL(l->list + l->item_width * num);
+      tipo = fmt_load_dac_pal(l->list + l->item_width * num);
       break;
     case 7:
-      tipo = cargadac_JPG(l->list + l->item_width * num);
+      tipo = fmt_load_dac_jpg(l->list + l->item_width * num);
       break;
     }
     if (!tipo) {

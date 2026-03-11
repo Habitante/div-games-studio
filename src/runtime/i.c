@@ -547,7 +547,7 @@ void initialization(void) {
     cancion[n].ptr = NULL;
   }
 
-  InitSound();
+  sound_init();
 #ifdef JUDAS
   if (judascfg_device != DEV_NOSOUND)
     set_init_mixer();
@@ -1582,7 +1582,7 @@ void finalization(void) {
 
   // Stop sounds
   for (snum = 0; snum < 128; snum++) {
-    UnloadSound(snum);
+    sound_unload(snum);
   }
 
   // Free ghost table

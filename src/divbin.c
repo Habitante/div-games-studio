@@ -49,7 +49,7 @@ void Bin2(void) {
       if (v_accept) {
         my_window = v;
         MiMemoFPG = (FPG *)window[1].aux;
-        Borrar_FPG(MiMemoFPG, window[1].mapa->fpg_code);
+        fpg_delete(MiMemoFPG, window[1].mapa->fpg_code);
         v = window[1];
 
         //if (MiMemoFPG->lInfoFPG.first_visible+MiMemoFPG->lInfoFPG.lines*MiMemoFPG->lInfoFPG.columns>MiMemoFPG->lInfoFPG.total_items

@@ -28,18 +28,18 @@ typedef struct _FPG{
 		byte version;
 }FPG;
 
-        void Sort(FPG *Fpg);
-        int ReadHead(HeadFPG *MiHeadFPG,FILE *fpg);
-        void WriteHead(HeadFPG *MiHeadFPG,short *puntos,char *imagen,FILE *fpg);
+        void fpg_sort(FPG *Fpg);
+        int fpg_read_header(HeadFPG *MiHeadFPG,FILE *fpg);
+        void fpg_write_header(HeadFPG *MiHeadFPG,short *puntos,char *imagen,FILE *fpg);
         void CreateListBox(FPG *Fpg);
 
-        void Crear_FPG(FPG *Fpg,char *Name);
-        int Abrir_FPG(FPG *Fpg,char *Name);
-        int Anadir_FPG(FPG *Fpg,int COD,char *tDescrip,char *tFilename,int Ancho,int Alto,int nPuntos,char *Puntos,char *Imagen,int BorrarAntiguo, int get_info);
-        int Borrar_FPG(FPG *Fpg,int COD);
-        void ReadHeadImageAndPoints(HeadFPG *MiHeadFPG,FILE *fpg);
+        void fpg_create(FPG *Fpg,char *Name);
+        int fpg_open(FPG *Fpg,char *Name);
+        int fpg_add(FPG *Fpg,int COD,char *tDescrip,char *tFilename,int Ancho,int Alto,int nPuntos,char *Puntos,char *Imagen,int BorrarAntiguo, int get_info);
+        int fpg_delete(FPG *Fpg,int COD);
+        void fpg_read_image_header(HeadFPG *MiHeadFPG,FILE *fpg);
         int RemapAllFile(FPG *Fpg);
-        int RemapAllFileToPal(FPG *Fpg);
+        int fpg_remap_to_pal(FPG *Fpg);
 
         void FPG_create_thumbs         (void);
         void FPG_show_thumb        (struct t_listboxbr * l, int num);

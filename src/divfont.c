@@ -69,7 +69,7 @@ char *FntAux;
 
 int spacelen;
 
-void ShowText() {
+void pal_show_text() {
   byte *ptr = v.ptr;
   int an = v.an, al = v.al, x, y, tal = 24, tan = 41;
   if (big) {
@@ -124,7 +124,7 @@ void Fonts1(void) {
   wbox(v.ptr, an, al, c2, 4, 38, 66, 8); // Dark border for Face
   wwrite(v.ptr, an, al, 4, 38, 0, (byte *)FaceName, c4);
 
-  ShowText();
+  pal_show_text();
 
   wbox(v.ptr, an, al, c0, 2, al - 38 - 3, an - 4, 1); // Lower horizontal line
   wbox(v.ptr, an, al, c0, 2, al - 20, an - 4, 1);     // Lower horizontal line
@@ -274,7 +274,7 @@ void Fonts2(void) {
         memset(Text1, Text1Col, tan * tal + tan);
         Text1Anc = 1;
         Text1Alt = 1;
-        ShowText();
+        pal_show_text();
         wmouse_x = -1;
         if (Text01 != NULL) {
           free(Text01);
@@ -292,7 +292,7 @@ void Fonts2(void) {
         memset(Text2, Text2Col, tan * tal + tan);
         Text2Anc = 1;
         Text2Alt = 1;
-        ShowText();
+        pal_show_text();
         wmouse_x = -1;
         if (Text02 != NULL) {
           free(Text02);
@@ -310,7 +310,7 @@ void Fonts2(void) {
         memset(Text3, Text3Col, tan * tal + tan);
         Text3Anc = 1;
         Text3Alt = 1;
-        ShowText();
+        pal_show_text();
         wmouse_x = -1;
         if (Text03 != NULL) {
           free(Text03);
@@ -352,7 +352,7 @@ void Fonts2(void) {
             y++;
           }
         }
-        ShowText();
+        pal_show_text();
       }
       if ((wmouse_x > 124) && (wmouse_x < 124 + 41)) {
         if (Text2Col == 0)
@@ -381,7 +381,7 @@ void Fonts2(void) {
             y++;
           }
         }
-        ShowText();
+        pal_show_text();
       }
       if ((wmouse_x > 4) && (wmouse_x < 4 + 41)) {
         if (Text3Col == 0)
@@ -410,7 +410,7 @@ void Fonts2(void) {
             y++;
           }
         }
-        ShowText();
+        pal_show_text();
       }
     }
     free_drag = 1;
@@ -1440,7 +1440,7 @@ void ShowFont0(void) {
   v.name = v.aux;
 }
 
-void ReloadFont(int vn, struct twindow *vntn) {
+void pal_reload_font(int vn, struct twindow *vntn) {
   FILE *file;
   int Length;
   vn = vn;

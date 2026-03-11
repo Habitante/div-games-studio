@@ -37,7 +37,7 @@ void print_init_flags(int flags) {
 }
 
 static int initted = 0;
-void InitSound(void) {
+void sound_init(void) {
 #ifdef MIXER
   if (initted)
     return;
@@ -77,9 +77,9 @@ void InitSound(void) {
   MusicChannels = 0;
 }
 
-void ResetSound(void) {}
+void sound_reset(void) {}
 
-int LoadSound(char *ptr, long Len, int Loop) {
+int sound_load(char *ptr, long Len, int Loop) {
   HeadDC MyHeadDC;
 
 #ifdef MIXER
@@ -152,7 +152,7 @@ int LoadSound(char *ptr, long Len, int Loop) {
   return -1;
 }
 
-int UnloadSound(int NumSonido) {
+int sound_unload(int NumSonido) {
 #ifdef MIXER
   if (sonido[NumSonido].sound) {
     Mix_FreeChunk(sonido[NumSonido].sound);
@@ -206,7 +206,7 @@ void freqEffect(int chan, void *stream, int len, void *udata) {
         i = len / 2;
         pos = len / 2 + s->sound->alen / 2;
         break;
-        //        StopSound(chan);
+        //        sound_stop(chan);
       }
     }
     samples[i++] = input[(int)x];
@@ -221,7 +221,7 @@ void freqEffect(int chan, void *stream, int len, void *udata) {
       for (; i < len / 2; i++) {
         samples[i] = 0;
       }
-      StopSound(chan);
+      sound_stop(chan);
       return;
     }
   }
@@ -238,7 +238,7 @@ void channelDone(int channel) {
   // Done!
 }
 
-int DivPlaySound(int NumSonido, int Volumen, int Frec) // Vol y Frec (0..256)
+int sound_play(int NumSonido, int Volumen, int Frec) // Vol y Frec (0..256)
 {
   int con = 0;
   int loop = -1;
@@ -274,7 +274,7 @@ int DivPlaySound(int NumSonido, int Volumen, int Frec) // Vol y Frec (0..256)
   return (con);
 }
 
-int StopSound(int NumChannel) {
+int sound_stop(int NumChannel) {
   if (NumChannel == -2)
     NumChannel = -1;
 
@@ -290,7 +290,7 @@ int StopSound(int NumChannel) {
   return (1);
 }
 
-int ChangeSound(int NumChannel, int Volumen, int Frec) {
+int sound_change(int NumChannel, int Volumen, int Frec) {
 #ifdef MIXER
   channels[NumChannel].freq = Frec;
   Mix_Volume(NumChannel, Volumen / 2);
@@ -299,7 +299,7 @@ int ChangeSound(int NumChannel, int Volumen, int Frec) {
   return (1);
 }
 
-int ChangeChannel(int NumChannel, int Volumen, int Panning) {
+int sound_change_channel(int NumChannel, int Volumen, int Panning) {
   // Set the volume
 #ifdef MIXER
   Mix_Volume(NumChannel, Volumen / 2);
@@ -310,7 +310,7 @@ int ChangeChannel(int NumChannel, int Volumen, int Panning) {
   return (1);
 }
 
-int IsPlayingSound(int NumChannel) {
+int sound_is_playing(int NumChannel) {
 #ifdef MIXER
   return Mix_Playing(NumChannel);
 #endif
@@ -319,7 +319,7 @@ int IsPlayingSound(int NumChannel) {
 }
 
 #ifdef DIV2
-int LoadSong(char *ptr, int Len, int Loop) {
+int sound_load_song(char *ptr, int Len, int Loop) {
 #ifdef MIXER
   int con = 0;
 
@@ -355,11 +355,11 @@ int LoadSong(char *ptr, int Len, int Loop) {
   return -1;
 }
 
-int PlaySong(int NumSong) {
+int sound_play_song(int NumSong) {
   if (NumSong > 127 || !cancion[NumSong].ptr)
     return (-1);
 
-  StopSong();
+  sound_stop_song();
 
 #ifdef MIXER
   if (cancion[NumSong].music) {
@@ -370,7 +370,7 @@ int PlaySong(int NumSong) {
   return (1);
 }
 
-void StopSong(void) {
+void sound_stop_song(void) {
 #ifdef MIXER
   Mix_HaltMusic();
 #endif
@@ -378,7 +378,7 @@ void StopSong(void) {
   MusicChannels = 0;
 }
 
-void UnloadSong(int NumSong) {
+void sound_unload_song(int NumSong) {
   if (NumSong > 127 || !cancion[NumSong].ptr)
     return;
 #ifdef MIXER
@@ -393,21 +393,21 @@ void UnloadSong(int NumSong) {
   cancion[NumSong].loop = 0;
 }
 
-void SetSongPos(int SongPat) {
+void sound_set_song_pos(int SongPat) {
 #ifdef MIXER
   Mix_SetMusicPosition((double)SongPat);
 #endif
 }
 
-int GetSongPos(void) {
+int sound_get_song_pos(void) {
   return -1;
 }
 
-int GetSongLine(void) {
+int sound_get_song_line(void) {
   return -1;
 }
 
-int IsPlayingSong(void) {
+int sound_is_playing_song(void) {
 #ifdef MIXER
   return (Mix_PlayingMusic());
 #endif
@@ -415,4 +415,4 @@ int IsPlayingSong(void) {
 
 #endif
 
-void EndSound(void) {}
+void sound_end(void) {}
