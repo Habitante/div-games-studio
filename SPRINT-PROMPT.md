@@ -34,12 +34,12 @@ confirm zero warnings. Current baseline: **0 warnings** (Sprint A completed 2026
 
 **All naming + comment sprints complete:** Sprint D (single-letter globals), Sprint F (331
 function renames), Sprint G (~131 global + struct field renames), Sprint H (~3,170 Spanish
-comments → English across 34 files). The codebase is now predominantly English.
+comments → English across 34 files), Sprint J (~1,729 occ of copia/ventana/texto renamed).
+The codebase is now predominantly English.
 
 **Next priorities:**
 - Sprint E: Convert unsafe strcpy/sprintf/strcat to safe helpers (top 6 files, ~770 calls)
 - Sprint I: Split the 3 monster files (divc.c, div.c, divpaint.c) along natural boundaries
-- Sprint J: Rename deferred high-occurrence globals (copia, ventana, texto)
 
 ---
 
@@ -175,23 +175,29 @@ architecture docs.
 
 ---
 
-### Sprint J: Rename deferred high-occurrence globals
+### Sprint J: Rename deferred high-occurrence globals ✅ DONE (2026-03-11)
 
-**Goal:** Rename the 3 Spanish globals deferred from Sprint G due to their high
-occurrence counts and entanglement with function parameters.
+Completed: 3 deferred renames across 39 files, ~4,034 line changes.
 
-| Global | Occurrences | Challenge |
-|--------|-------------|-----------|
-| `copia` → `screen_copy` | 375 across 22 files | Also used as parameter name in divwindo.c functions (`byte *copia`) — need to rename params too, plus `an_copia`/`al_copia` |
-| `ventana` → `windows` | 619 across 26 files | The window array. `#define v ventana[0]` must update too. Pervasive. |
-| `texto` → `texts` | 905 across 37 files | UI string array. Also used as struct field in `t_item.button.texto` etc. |
+**Batch 1 — `copia` → `screen_buffer` (360 occ, 21 files):**
+- Global + surface: `screen_buffer`, `screen_buffer_surface`
+- Runtime: `screen_buffer_debug`, `back_buffer` (was copia2)
+- Function params: `byte*dest`, `dest_width`, `dest_height`, `dest_pitch`
+- Locals: `_saved_buffer`, `_saved_width`, `_saved_height`
+- Collision avoided: `screen_copy()` function already existed → used `screen_buffer`
 
-**Rules:**
-- For `copia`: also rename `copia_surface`→`screen_copy_surface`, and the function
-  parameter `byte *copia` in divwindo.c to `byte *dest` (it's a destination buffer)
-- For `ventana`: update `#define v ventana[0]` → `#define v windows[0]`
-- For `texto`: rename struct fields `t_item.button.texto` etc. too
-- Each rename is one batch — build after each
+**Batch 2 — `ventana` → `window` (489 occ, 21 files):**
+- Array + type: `window[]`, `twindow`, `#define v window[0]`
+- Related: `window_aux`, `window_closing`, `skip_window_render`,
+  `create_saved_window`, `paint_window_colors2`, `my_window`
+- Struct field: `lado` → `side`
+- Collision avoided: `move_window()` function → variable named `window_move_pending`
+
+**Batch 3 — `texto` → `texts` (880 occ, 37 files):**
+- Arrays: `texts[]` (IDE + runtime), type: `t_text`, const: `max_texts`
+- Struct fields: `.text` (button/get/flag), params: `int text_id`
+- Runtime: `max_system_texts`, `lang_buffer`, `lang_buffer_end`
+- Function: `create_test_text`
 
 ---
 

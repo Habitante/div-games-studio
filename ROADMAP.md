@@ -248,8 +248,9 @@ No behavioral changes — pure cleanup.
 - [x] Rename all Spanish function names to English — Sprint F (2026-03-10, 331 renames)
 - [x] Rename ~98 Spanish-named global variables to English — Sprint G (2026-03-10, 44 files)
 - [x] Rename ~33 Spanish struct field names across 8 structs — Sprint G (2026-03-10)
-- [ ] Rename remaining high-occurrence Spanish globals: `copia` (375), `ventana` (619),
-      `texto` (905) — deferred from Sprint G (need special handling)
+- [x] Rename remaining high-occurrence Spanish globals — Sprint J (2026-03-11, 39 files):
+      `copia`→`screen_buffer` (360 occ), `ventana`→`window` (489 occ), `texto`→`texts` (880 occ)
+      Plus ~25 related identifiers (struct types, fields, function params, locals)
 - [x] Translate ~3,170 Spanish comment lines across 34 files — Sprint H (2026-03-10)
 - [ ] Rename cryptic locals in the hottest paths (divc.c, divedit.c, runtime/i.c)
 
