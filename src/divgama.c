@@ -177,9 +177,9 @@ void gama0(void) {
   v.w = ancho_ga;
   v.h = alto_ga;
 
-  v.paint_handler = (voidReturnType)gama1;
-  v.click_handler = (voidReturnType)gama2;
-  v.close_handler = (voidReturnType)gama3;
+  v.paint_handler = (void_return_type_t)gama1;
+  v.click_handler = (void_return_type_t)gama2;
+  v.close_handler = (void_return_type_t)gama3;
 
   for (con = 0; con < 9; con++) {
     button_coords[con].y = 33;
@@ -257,10 +257,10 @@ void gama2(void) {
     for (con = 0; con < 9; con++) {
       if (wmouse_in(button_coords[con].x, button_coords[con].y, 7, 7)) {
         gradient_config[con].selec = !gradient_config[con].selec;
-        call((voidReturnType)v.paint_handler);
+        call((void_return_type_t)v.paint_handler);
         v.redraw = 1;
       } else if (wmouse_in(button_coords[con].x - 3, button_coords[con].y - 15, 14, 14)) {
-        show_dialog((voidReturnType)Selcolor0);
+        show_dialog((void_return_type_t)Selcolor0);
         if (sel_color_ok) {
           gradient_config[con].selec = 1;
           gradient_config[con].color = sel_color_font;
@@ -270,7 +270,7 @@ void gama2(void) {
         }
       }
     }
-    call((voidReturnType)v.paint_handler);
+    call((void_return_type_t)v.paint_handler);
     v.redraw = 1;
   }
 }

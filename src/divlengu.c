@@ -8,7 +8,7 @@
 byte *lang_buffer;
 byte *lang_buffer_end;
 
-int numero = 0; // Número de texts
+int text_count = 0; // Number of texts
 byte *p, *q;    // Punteros de lectura y escritura respectivamente.
 
 
@@ -16,7 +16,7 @@ byte *p, *q;    // Punteros de lectura y escritura respectivamente.
 //   Prototypes for this file
 ///////////////////////////////////////////////////////////////////////////////
 void analyze_texts(void);
-void coder(byte *ptr, int len, char *clave);
+void coder(byte *ptr, int len, char *key);
 void analyze_number(void);
 void analyze_text(void);
 void analyze_comment(void);
@@ -26,13 +26,13 @@ void analyze_comment(void);
 //      Inicializa el sistema de lang_buffer
 //-----------------------------------------------------------------------------
 
-void initialize_texts(byte *fichero) {
+void initialize_texts(byte *filename) {
   FILE *f;
   int n;
 
   memset(texts, 0, max_texts * 4);
 
-  if ((f = fopen((char *)fichero, "rb")) != NULL) {
+  if ((f = fopen((char *)filename, "rb")) != NULL) {
     fseek(f, 0, SEEK_END);
     n = ftell(f);
     if ((lang_buffer = (byte *)malloc(n)) != NULL) {
@@ -70,13 +70,13 @@ void analyze_texts(void) {
 }
 
 void analyze_number(void) {
-  numero = 0;
+  text_count = 0;
   do {
-    numero = numero * 10 + *p - '0';
+    text_count = text_count * 10 + *p - '0';
     p++;
   } while (*p >= '0' && *p <= '9' && p < lang_buffer_end);
-  if (numero >= max_texts)
-    numero = 0;
+  if (text_count >= max_texts)
+    text_count = 0;
 }
 
 void analyze_comment(void) {
@@ -85,9 +85,9 @@ void analyze_comment(void) {
 }
 
 void analyze_text(void) {
-  texts[numero] = q;
+  texts[text_count] = q;
   p++;
-  numero++;
+  text_count++;
   while (*p != '"' && p < lang_buffer_end && *p != '\r' && *p != '\n') {
     if (*p == '\\') {
       p++;
@@ -145,15 +145,15 @@ int rnd2(int min, int max) {
   return ((rnd() % (max - min + 1)) + min);
 }
 
-void init_rnd(int n, char *clave) {
+void init_rnd(int n, char *key) {
   register int a;
   for (a = 0; a < 32; a++)
     seed.d[a] = n;
-  if (clave != NULL) {
+  if (key != NULL) {
     for (a = 0; a < 127; a++) {
-      if (!clave[a])
+      if (!key[a])
         break;
-      seed.b[a] ^= clave[a];
+      seed.b[a] ^= key[a];
     }
   }
   seed.b[127] &= 127;
@@ -165,10 +165,10 @@ void init_rnd(int n, char *clave) {
 //  Función de encriptación/desencriptación
 //-----------------------------------------------------------------------------
 
-void coder(byte *ptr, int len, char *clave) {
+void coder(byte *ptr, int len, char *key) {
   int n;
 
-  init_rnd(len, clave);
+  init_rnd(len, key);
   for (n = 0; n < len; n++) {
     ptr[n] ^= rndb();
   }

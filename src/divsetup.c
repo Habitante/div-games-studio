@@ -100,7 +100,7 @@ void vid_setup2(void) {
   stoldnot_big = stnot_big;
 
   if (need_refresh) {
-    call((voidReturnType)v.paint_handler);
+    call((void_return_type_t)v.paint_handler);
     v.redraw = 1;
   }
 }
@@ -114,7 +114,7 @@ void vid_setup3(void) {
       VS_HEIGHT = stvga_h;
       v_title = (char *)texts[385];
       v_text = (char *)texts[386];
-      //    show_dialog((voidReturnType)info0);
+      //    show_dialog((void_return_type_t)info0);
       exit_requested = 1; // Direct exit without asking
       return_mode = 2;
     }
@@ -128,9 +128,9 @@ void vid_setup0(void) {
   v.title = texts[881] + 1;
   v.w = 126 + 24 + 30;
   v.h = 66 + 26;
-  v.paint_handler = (voidReturnType)vid_setup1;
-  v.click_handler = (voidReturnType)vid_setup2;
-  v.close_handler = (voidReturnType)vid_setup3;
+  v.paint_handler = (void_return_type_t)vid_setup1;
+  v.click_handler = (void_return_type_t)vid_setup2;
+  v.close_handler = (void_return_type_t)vid_setup3;
 
   stnot_big = !VS_BIG;
   stbig = VS_BIG;
@@ -176,7 +176,7 @@ void get_wallpaper() {
   v_mode = 1;
   v_type = 9;
   v_text = (char *)texts[182];
-  show_dialog((voidReturnType)browser0);
+  show_dialog((void_return_type_t)browser0);
 
   div_strcpy(full, _MAX_PATH + 1, tipo[v_type].path);
 
@@ -213,37 +213,37 @@ void get_wallpaper() {
 
                 } else {
                   v_text = (char *)texts[46];
-                  show_dialog((voidReturnType)err0);
+                  show_dialog((void_return_type_t)err0);
                 }
 
               } else {
                 v_text = (char *)texts[44];
-                show_dialog((voidReturnType)err0);
+                show_dialog((void_return_type_t)err0);
               }
 
               free(ptr);
 
             } else {
               v_text = (char *)texts[45];
-              show_dialog((voidReturnType)err0);
+              show_dialog((void_return_type_t)err0);
             }
           }
 
         } else {
           v_text = (char *)texts[44];
-          show_dialog((voidReturnType)err0);
+          show_dialog((void_return_type_t)err0);
         }
 
         fclose(f);
 
       } else {
         v_text = (char *)texts[44];
-        show_dialog((voidReturnType)err0);
+        show_dialog((void_return_type_t)err0);
       }
 
     } else {
       v_text = (char *)texts[43];
-      show_dialog((voidReturnType)err0);
+      show_dialog((void_return_type_t)err0);
     }
   }
 }
@@ -302,12 +302,12 @@ void wallpaper_setup2(void) {
   if (wmouse_in(w - 38, 24 + 8, 34, 7) && (mouse_b & 1)) {
     gradient_buf = wallpaper_gradient;
     gradient_config = Setupfile.gradient_config;
-    show_dialog((voidReturnType)gama0);
+    show_dialog((void_return_type_t)gama0);
     if (v_accept)
       need_refresh = 1;
   }
   if (need_refresh) {
-    call((voidReturnType)v.paint_handler);
+    call((void_return_type_t)v.paint_handler);
     v.redraw = 1;
   }
 }
@@ -339,9 +339,9 @@ void wallpaper_setup0(void) {
   wallpaper_tile = Setupfile.Desktop_Tile;
   wallpaper_gamma = Setupfile.Desktop_Gama;
 
-  v.paint_handler = (voidReturnType)wallpaper_setup1;
-  v.click_handler = (voidReturnType)wallpaper_setup2;
-  v.close_handler = (voidReturnType)wallpaper_setup3;
+  v.paint_handler = (void_return_type_t)wallpaper_setup1;
+  v.click_handler = (void_return_type_t)wallpaper_setup2;
+  v.close_handler = (void_return_type_t)wallpaper_setup3;
 
   _button(100, 7, v.h - 14, 0);
   _button(101, v.w - 8, v.h - 14, 2);
@@ -479,8 +479,8 @@ void mem_info0(void) {
   v.title = texts[199];
   v.w = 168;
   v.h = 88;
-  v.paint_handler = (voidReturnType)mem_info1;
-  v.click_handler = (voidReturnType)mem_info2;
+  v.paint_handler = (void_return_type_t)mem_info1;
+  v.click_handler = (void_return_type_t)mem_info2;
 
   _button(100, v.w / 2, v.h - 14, 1);
 }
@@ -776,7 +776,7 @@ void cfg_setup2(void) {
 
   if ((mouse_b & 1) && zone >= 1 && zone <= 12) {
     sel_color_font = color_cfg[zone - 1];
-    show_dialog((voidReturnType)Selcolor0);
+    show_dialog((void_return_type_t)Selcolor0);
     if (sel_color_ok) {
       color_cfg[zone - 1] = sel_color_font;
       Cfg_colors();
@@ -814,9 +814,9 @@ void config_setup0(void) {
   v.title = texts[883];
   v.w = 192;
   v.h = 200;
-  v.paint_handler = (voidReturnType)cfg_setup1;
-  v.click_handler = (voidReturnType)cfg_setup2;
-  v.close_handler = (voidReturnType)cfg_setup3;
+  v.paint_handler = (void_return_type_t)cfg_setup1;
+  v.click_handler = (void_return_type_t)cfg_setup2;
+  v.close_handler = (void_return_type_t)cfg_setup3;
 
   _button(100, 7, v.h - 14, 0);
   _button(101, v.w - 8, v.h - 14, 2);
@@ -852,7 +852,7 @@ void config_setup0(void) {
   v_accept = 0;
 }
 
-void create_saved_window(voidReturnType init_handler, int nx, int ny);
+void create_saved_window(void_return_type_t init_handler, int nx, int ny);
 extern struct twindow window_aux;
 void test_cursor(void);
 void resize_program(void);
@@ -869,7 +869,7 @@ void config_setup_end(void) {
   int i;
 
   for (i = 0, n = 0; n < max_windows; n++) {
-    if (window[n].click_handler == (voidReturnType)program2)
+    if (window[n].click_handler == (void_return_type_t)program2)
       i++;
   }
 
@@ -1012,7 +1012,7 @@ void config_setup_end(void) {
 
     if (old_editor_font != editor_font) {
       for (n = 0; n < max_windows; n++)
-        if (window[n].click_handler == (voidReturnType)help2) {
+        if (window[n].click_handler == (void_return_type_t)help2) {
           move(0, n);
           close_window();
           help_item++;
@@ -1024,10 +1024,10 @@ void config_setup_end(void) {
       do {
         found = 0;
         for (n = max_windows - 1; n >= 0; n--)
-          if (window[n].click_handler == (voidReturnType)program2) {
+          if (window[n].click_handler == (void_return_type_t)program2) {
             memcpy(&vp[i].type, &window[n].type, sizeof(struct twindow));
             i++;
-            window[n].close_handler = (voidReturnType)dummy_handler;
+            window[n].close_handler = (void_return_type_t)dummy_handler;
             move(0, n);
             close_window();
             found = 1;
@@ -1076,7 +1076,7 @@ void config_setup_end(void) {
           }
         }
 
-        call((voidReturnType)v.paint_handler);
+        call((void_return_type_t)v.paint_handler);
 
         if (v.foreground == 2) {
           swap(v.w, v._an);
@@ -1093,7 +1093,7 @@ void config_setup_end(void) {
         memcpy(&window_aux.type, &vp[n].type, sizeof(struct twindow));
         v_prg = window_aux.prg;
         vid_mode_changed = 33;
-        create_saved_window((voidReturnType)resize_program, window_aux.x, window_aux.y);
+        create_saved_window((void_return_type_t)resize_program, window_aux.x, window_aux.y);
       }
       if (help_item)
         help(help_item - 1);
@@ -1140,9 +1140,9 @@ void resize_program(void) {
 
   v.title = (byte *)v_prg->filename;
   v.name = (byte *)v_prg->filename;
-  v.paint_handler = (voidReturnType)program1;
-  v.click_handler = (voidReturnType)program2;
-  v.close_handler = (voidReturnType)program3;
+  v.paint_handler = (void_return_type_t)program1;
+  v.click_handler = (void_return_type_t)program2;
+  v.close_handler = (void_return_type_t)program3;
   v.redraw = 2;
   test_cursor();
 }
@@ -1298,7 +1298,7 @@ void prepare_wallpaper_temp(void) {
     free(temp);
     x_wallpaper_map = x_wallpaper = NULL;
     v_text = (char *)texts[44];
-    show_dialog((voidReturnType)err0);
+    show_dialog((void_return_type_t)err0);
     return;
   }
 

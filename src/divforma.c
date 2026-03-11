@@ -268,7 +268,7 @@ void fmt_load_pcx(byte *buffer, byte *mapa, int vent) {
   if (header.color_planes == 3) {
     if ((pDest = (byte *)malloc((map_width + 1) * (map_height + 1) * 3)) == NULL) {
       v_text = (char *)texts[45];
-      show_dialog((voidReturnType)err0);
+      show_dialog((void_return_type_t)err0);
       return;
     }
     memset(pDest, 0, (map_width + 1) * (map_height + 1) * 3);
@@ -278,7 +278,7 @@ void fmt_load_pcx(byte *buffer, byte *mapa, int vent) {
   else if (header.color_planes == 4) {
     if ((pDest = (byte *)malloc(last_byte)) == NULL) {
       v_text = (char *)texts[45];
-      show_dialog((voidReturnType)err0);
+      show_dialog((void_return_type_t)err0);
       return;
     }
     memset(pDest, 0, last_byte);
@@ -372,7 +372,7 @@ void fmt_load_pcx(byte *buffer, byte *mapa, int vent) {
     old_sample = sample;
     sample = (byte *)malloc(32768);
 
-    if ((v.click_handler == (voidReturnType)browser2 && !load_palette) || sample == NULL) {
+    if ((v.click_handler == (void_return_type_t)browser2 && !load_palette) || sample == NULL) {
       if (sample != NULL)
         free(sample);
       sample = old_sample;
@@ -499,7 +499,7 @@ int fmt_save_pcx(byte *mapa, FILE *f) {
   if ((cbuffer = (unsigned char *)malloc(map_width * map_height * 2)) == NULL) {
     // Memory allocation error.
     v_text = (char *)texts[45];
-    show_dialog((voidReturnType)err0);
+    show_dialog((void_return_type_t)err0);
     return (1);
   }
   ActPixel = mapa[ptr];
@@ -818,7 +818,7 @@ void fmt_load_bmp(byte *buffer, byte *mapa, int vent) {
     old_sample = sample;
     sample = (byte *)malloc(32768);
 
-    if ((v.click_handler == (voidReturnType)browser2 && !load_palette) || sample == NULL) {
+    if ((v.click_handler == (void_return_type_t)browser2 && !load_palette) || sample == NULL) {
       if (sample != NULL)
         free(sample);
       sample = old_sample;
@@ -1025,7 +1025,7 @@ int fmt_load_jpg(byte *buffer, byte *mapa, int vent, int img_filesize) {
   jpeg_mem_src(&cinfo, buffer, img_filesize);
   jpeg_read_header(&cinfo, TRUE);
   cinfo.quantize_colors = TRUE;
-  if (v.click_handler == (voidReturnType)browser2) {
+  if (v.click_handler == (void_return_type_t)browser2) {
     cinfo.dither_mode = JDITHER_NONE;
     cinfo.two_pass_quantize = FALSE;
   } else {
@@ -1117,7 +1117,7 @@ int fmt_load_dac_fnt(char *name) {
   file = fopen(name, "rb");
   if (file == NULL) {
     v_text = (char *)texts[44];
-    show_dialog((voidReturnType)err0);
+    show_dialog((void_return_type_t)err0);
     return (0);
   }
   fread(par, 1, 8, file);
@@ -1138,7 +1138,7 @@ int fmt_load_dac_fpg(char *name) {
   file = fopen(name, "rb");
   if (file == NULL) {
     v_text = (char *)texts[44];
-    show_dialog((voidReturnType)err0);
+    show_dialog((void_return_type_t)err0);
     return (0);
   }
   fread(par, 1, 8, file);
@@ -1159,7 +1159,7 @@ int fmt_load_dac_pal(char *name) {
   file = fopen(name, "rb");
   if (file == NULL) {
     v_text = (char *)texts[44];
-    show_dialog((voidReturnType)err0);
+    show_dialog((void_return_type_t)err0);
     return (0);
   }
   fread(par, 1, 8, file);
@@ -1189,7 +1189,7 @@ int fmt_load_dac_map(char *name) {
   file = fopen(name, "rb");
   if (file == NULL) {
     v_text = (char *)texts[44];
-    show_dialog((voidReturnType)err0);
+    show_dialog((void_return_type_t)err0);
     return (0);
   }
   fread(par, 1, 16, file);
@@ -1255,7 +1255,7 @@ int fmt_load_dac_pcx(char *name) {
   file = fopen(name, "rb");
   if (file == NULL) {
     v_text = (char *)texts[44];
-    show_dialog((voidReturnType)err0);
+    show_dialog((void_return_type_t)err0);
     return (0);
   }
   if (fread((byte *)&header, 1, sizeof(pcx_header), file) != sizeof(pcx_header)) {
@@ -1340,7 +1340,7 @@ int fmt_load_dac_bmp(char *name) {
   file = fopen(name, "rb");
   if (file == NULL) {
     v_text = (char *)texts[44];
-    show_dialog((voidReturnType)err0);
+    show_dialog((void_return_type_t)err0);
     free(CopiaBuffer);
     return (0);
   }
@@ -1454,7 +1454,7 @@ int fmt_load_dac_jpg(char *name) {
   file = fopen(name, "rb");
   if (file == NULL) {
     v_text = (char *)texts[44];
-    show_dialog((voidReturnType)err0);
+    show_dialog((void_return_type_t)err0);
     return (0);
   }
 
@@ -1463,7 +1463,7 @@ int fmt_load_dac_jpg(char *name) {
   fseek(file, 0, SEEK_SET);
   if ((buffer = (byte *)malloc(img_filesize)) == NULL) {
     v_text = (char *)texts[45];
-    show_dialog((voidReturnType)err0);
+    show_dialog((void_return_type_t)err0);
     fclose(file);
     return (0);
   }
@@ -1474,7 +1474,7 @@ int fmt_load_dac_jpg(char *name) {
   jpeg_mem_src(&cinfo, buffer, img_filesize);
   jpeg_read_header(&cinfo, TRUE);
   cinfo.quantize_colors = TRUE;
-  if (v.click_handler == (voidReturnType)browser2) {
+  if (v.click_handler == (void_return_type_t)browser2) {
     cinfo.dither_mode = JDITHER_NONE;
     cinfo.two_pass_quantize = TRUE;
   } else {

@@ -546,7 +546,7 @@ void menu_edicion2(void) {
         wmouse_x = -1;
         wmouse_y = -1;
         mouse_b = 0;
-        call((voidReturnType)v.click_handler);
+        call((void_return_type_t)v.click_handler);
         if (v.redraw) {
           flush_window(0);
           v.redraw = 0;
@@ -790,7 +790,7 @@ casi_no_tiene_nombre:
           v.foreground = 1;
         }
         mouse_b = 1;
-        call((voidReturnType)v.click_handler);
+        call((void_return_type_t)v.click_handler);
       }
       break;
 
@@ -1451,7 +1451,7 @@ void menu_sonidos2(void) {
     switch (v.state) {
     case 1:
 
-      if (!SoundActive) {
+      if (!sound_active) {
         if (SoundError) {
           v_text = (char *)texts[549];
           show_dialog(errhlp0);
@@ -1464,7 +1464,7 @@ void menu_sonidos2(void) {
             help(2009);
         }
         return;
-      } else if (!SoundActive) {
+      } else if (!sound_active) {
         v_text = (char *)texts[575];
         show_dialog(err0);
         return;
@@ -1557,7 +1557,7 @@ no_tiene_nombre_sonido:
 
         show_dialog(EditSound0);
         move(0, n);
-        call((voidReturnType)v.paint_handler);
+        call((void_return_type_t)v.paint_handler);
         v.redraw = 1;
         PasteNewSounds();
       }
@@ -1568,7 +1568,7 @@ no_tiene_nombre_sonido:
       break;
 
     case 8:
-      if (!SoundActive) {
+      if (!sound_active) {
         if (SoundError) {
           v_text = (char *)texts[549];
           show_dialog(errhlp0);
@@ -2736,7 +2736,7 @@ void palette_action2(void) {
   }
 
   if (need_refresh) {
-    call((voidReturnType)v.paint_handler);
+    call((void_return_type_t)v.paint_handler);
     v.redraw = 1;
   }
 }
@@ -3149,7 +3149,7 @@ void analyze_input(void) {
   } else
     div_strcpy(input, sizeof(input), file_mask);
 
-  call((voidReturnType)v.paint_handler);
+  call((void_return_type_t)v.paint_handler);
   v.redraw = 1;
 }
 
@@ -3205,7 +3205,7 @@ void new_map2(void) {
       map_sizes[n * 9 + strlen(&map_sizes[n * 9])] = 'x';
       itoa(map_width, width_str, 10);
       itoa(map_height, height_str, 10);
-      call((voidReturnType)v.paint_handler);
+      call((void_return_type_t)v.paint_handler);
       update_listbox(&map_sizes_list);
       _select_new_item(2);
       v.redraw = 1;
@@ -3845,7 +3845,7 @@ void reduce_half() {
   for (n = 0; n < 512; n++)
     v.mapa->points[n] = -1;
   v.mapa->fpg_code = 0;
-  call((voidReturnType)v.paint_handler);
+  call((void_return_type_t)v.paint_handler);
   blit_region(screen_buffer, vga_width, vga_height, v.ptr, v.x, v.y, v.w, v.h, 0);
 }
 
@@ -3989,7 +3989,7 @@ void map_search() {
     return;
   }
 
-  call((voidReturnType)v.paint_handler);
+  call((void_return_type_t)v.paint_handler);
   blit_region(screen_buffer, vga_width, vga_height, v.ptr, v.x, v.y, v.w, v.h, 0);
 }
 
@@ -4303,7 +4303,7 @@ void apply_resize(struct tmapa *MiMap, int map_w, int map_h) {
   for (n = 0; n < 512; n++)
     v.mapa->points[n] = -1;
   v.mapa->fpg_code = 0;
-  call((voidReturnType)v.paint_handler);
+  call((void_return_type_t)v.paint_handler);
   blit_region(screen_buffer, vga_width, vga_height, v.ptr, v.x, v.y, v.w, v.h, 0);
 
   if (!grayscale)

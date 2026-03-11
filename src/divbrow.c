@@ -1582,7 +1582,7 @@ void browser0(void) {
     file_list_br.h = 8;
   }
 
-  if (v_thumb == 7 && !SoundActive)
+  if (v_thumb == 7 && !sound_active)
     opc_pru = 0;
 }
 
@@ -1851,7 +1851,7 @@ void browser2(void) {
     end_dialog = 1;
 
   if (need_refresh) {
-    call((voidReturnType)v.paint_handler);
+    call((void_return_type_t)v.paint_handler);
     v.redraw = 1;
   }
 }

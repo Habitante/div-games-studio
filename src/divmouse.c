@@ -208,7 +208,7 @@ void read_mouse(void) {
           wmouse_x = -1;
           wmouse_y = -1;
           mouse_b &= ~1;
-          call((voidReturnType)v.click_handler);
+          call((void_return_type_t)v.click_handler);
           drag_source = v.order;
           mouse_b |= 1;
           mouse_graf = drag_graphic;
@@ -251,7 +251,7 @@ void libera_drag(void) {
 
     wmouse_x = -1;
     wmouse_y = -1;
-    call((voidReturnType)v.paint_handler);
+    call((void_return_type_t)v.paint_handler);
 
     if (n) {
       wdown(n);

@@ -60,14 +60,14 @@ extern UWORD CD;
 extern UWORD MASTER;
 extern UWORD VOC;
 
-void SetMasterVolume  (UWORD volumen); // de 0 a 15
-void SetVocVolume     (UWORD volumen); // de 0 a 15
-void SetCDVolume      (UWORD volumen); // de 0 a 15
-void InitMixer        (UWORD card, UWORD address, UWORD master, UWORD voc, UWORD cd);
-void MIX_Reset        (void);
-void MIX_SetInput     (byte opt);
-void MIX_GetVolume    (byte reg, byte *left, byte *right);
-void MIX_SetVolume    (byte reg, byte left, byte right);
+void set_master_volume  (UWORD volumen); // 0 to 15
+void set_voc_volume     (UWORD volumen); // 0 to 15
+void set_cd_volume      (UWORD volumen); // 0 to 15
+void init_mixer         (UWORD card, UWORD address, UWORD master, UWORD voc, UWORD cd);
+void mix_reset          (void);
+void mix_set_input      (byte opt);
+void mix_get_volume     (byte reg, byte *left, byte *right);
+void mix_set_volume     (byte reg, byte left, byte right);
 void set_mixer        (void);
 void set_init_mixer   (void);
 

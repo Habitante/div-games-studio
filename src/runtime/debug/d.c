@@ -533,7 +533,7 @@ void init_colors(void) {
 
 void dummy_handler(void) {}
 
-void show_dialog(voidReturnType init_handler) {
+void show_dialog(void_return_type_t init_handler) {
   byte *ptr;
   int x, y, w, h;
   int vtipo;

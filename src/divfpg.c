@@ -140,7 +140,7 @@ void fpg_dialog2(void) {
     for (n = 0; n < 1000; n++)
       MiFPG->thumb[n].tagged = 0;
 
-    call((voidReturnType)v.paint_handler);
+    call((void_return_type_t)v.paint_handler);
 
     v.redraw = 1;
     free_drag = 1;
@@ -954,7 +954,7 @@ void show_tagged() {
       v.mapa->zoom_y = y;
 
       activate();
-      call((voidReturnType)v.paint_handler);
+      call((void_return_type_t)v.paint_handler);
       blit_region(screen_buffer, vga_width, vga_height, v.ptr, v.x, v.y, v.w, v.h, 0);
     }
 }
@@ -1010,7 +1010,7 @@ void delete_tagged() {
   wmouse_x = -1;
   wmouse_y = -1;
   FPG_update_listbox_br(&MiFPG->lInfoFPG);
-  call((voidReturnType)v.paint_handler);
+  call((void_return_type_t)v.paint_handler);
   wdown(vent);
   flush_window(vent);
 }
@@ -1948,7 +1948,7 @@ void fpg_to_map(FPG *MiFPG) {
     free(FPGmap);
     return;
   }
-  call((voidReturnType)v.paint_handler);
+  call((void_return_type_t)v.paint_handler);
   v.redraw = 1;
 }
 

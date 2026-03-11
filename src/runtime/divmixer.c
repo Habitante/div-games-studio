@@ -1,21 +1,21 @@
 #include "inter.h"
 #include "divmixer.hpp"
 
-void SetMasterVolume(UWORD volumen) {}
+void set_master_volume(UWORD volumen) {}
 
-void SetVocVolume(UWORD volumen) {}
+void set_voc_volume(UWORD volumen) {}
 
-void SetCDVolume(UWORD volumen) {}
+void set_cd_volume(UWORD volumen) {}
 
-void InitMixer(UWORD card, UWORD address, UWORD master, UWORD voc, UWORD cd) {}
+void init_mixer(UWORD card, UWORD address, UWORD master, UWORD voc, UWORD cd) {}
 
-void MIX_Reset(void) {}
+void mix_reset(void) {}
 
-void MIX_SetInput(byte opt) {}
+void mix_set_input(byte opt) {}
 
-void MIX_GetVolume(byte reg, byte *left, byte *right) {}
+void mix_get_volume(byte reg, byte *left, byte *right) {}
 
-void MIX_SetVolume(byte reg, byte left, byte right) {}
+void mix_set_volume(byte reg, byte left, byte right) {}
 
 void set_mixer(void) {}
 

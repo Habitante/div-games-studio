@@ -168,7 +168,7 @@ void Fonts2(void) {
         DIV_STRCPY(cFntAncho, "16");
         FntAncho = 16;
       }
-      call((voidReturnType)v.paint_handler);
+      call((void_return_type_t)v.paint_handler);
       v.redraw = 1;
     }
     break;
@@ -421,7 +421,7 @@ void Fonts2(void) {
     FntAncho = FntAlto = fontTamanos[(lfontsizes.zone - 10) + lfontsizes.first_visible];
     DIV_SPRINTF(cFntAlto, "%d", FntAlto);
     DIV_SPRINTF(cFntAncho, "%d", FntAncho);
-    call((voidReturnType)v.paint_handler);
+    call((void_return_type_t)v.paint_handler);
     v.redraw = 1;
   }
 }
@@ -1660,7 +1660,7 @@ void create_text() {
 
   // 7 - Call the paint handler to refresh the window and blit it
 
-  call((voidReturnType)v.paint_handler);
+  call((void_return_type_t)v.paint_handler);
   blit_region(screen_buffer, vga_width, vga_height, v.ptr, v.x, v.y, v.w, v.h, 0);
 }
 

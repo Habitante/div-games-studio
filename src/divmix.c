@@ -42,8 +42,8 @@ void mixer0(void) {
   v.w = 59;
   v.h = 76;
 
-  v.paint_handler = (voidReturnType)mixer1;
-  v.click_handler = (voidReturnType)mixer2;
+  v.paint_handler = (void_return_type_t)mixer1;
+  v.click_handler = (void_return_type_t)mixer2;
 }
 
 void mixer1(void) {
@@ -150,7 +150,7 @@ void mixer2(void) {
     lvol_cd.first_visible = 15 - Setupfile.vol_cd;
     lvol_ma.first_visible = 15 - Setupfile.vol_ma;
     set_mixer();
-    call((voidReturnType)v.paint_handler);
+    call((void_return_type_t)v.paint_handler);
     v.redraw = 1;
   }
 }

@@ -1106,7 +1106,7 @@ void pal_refresh(int no_tocar_mapas, int guardar_original) {
           wwrite(ptr, w, h, 2 + (w - 20) / 2, 2, 1, v.title, c4);
         }
       }
-      call((voidReturnType)v.paint_handler);
+      call((void_return_type_t)v.paint_handler);
       if (v.foreground == 2) {
         swap(v.w, v._an);
         swap(v.h, v._al);
@@ -2080,7 +2080,7 @@ void pal_interpolate2(void) {
         Copiar = 0;
         Intercambiar = 0;
         Accion = 0;
-        call((voidReturnType)v.paint_handler);
+        call((void_return_type_t)v.paint_handler);
       }
       v.redraw = 1;
     }
@@ -2186,7 +2186,7 @@ void pal_interpolate2(void) {
       Copiar = 0;
       Intercambiar = 0;
       Accion = 0;
-      call((voidReturnType)v.paint_handler);
+      call((void_return_type_t)v.paint_handler);
       lRed.first_visible = 63 - dac[SelColor * 3];
       lGre.first_visible = 63 - dac[SelColor * 3 + 1];
       lBlu.first_visible = 63 - dac[SelColor * 3 + 2];
@@ -2202,7 +2202,7 @@ void pal_interpolate2(void) {
       Intercambiar = 0;
     if (wCopiar)
       Copiar = 0;
-    call((voidReturnType)v.paint_handler);
+    call((void_return_type_t)v.paint_handler);
     Accion = 1;
   } else if (!Degradar && Accion == 1)
     Accion = 0;
@@ -2211,7 +2211,7 @@ void pal_interpolate2(void) {
       Degradar = 0;
     if (wCopiar)
       Copiar = 0;
-    call((voidReturnType)v.paint_handler);
+    call((void_return_type_t)v.paint_handler);
     Accion = 2;
   } else if (!Intercambiar && Accion == 2)
     Accion = 0;
@@ -2222,7 +2222,7 @@ void pal_interpolate2(void) {
     if (wIntercambiar)
       Intercambiar = 0;
     Accion = 3;
-    call((voidReturnType)v.paint_handler);
+    call((void_return_type_t)v.paint_handler);
   } else if (!Copiar && Accion == 3)
     Accion = 0;
 
@@ -2245,7 +2245,7 @@ void pal_interpolate2(void) {
     Copiar = 0;
     Intercambiar = 0;
     Accion = 0;
-    call((voidReturnType)v.paint_handler);
+    call((void_return_type_t)v.paint_handler);
 
     boton(4, w / 2, h - 13, 1, c0);
 

@@ -7,7 +7,7 @@
 int frame_clock = 0;
 extern int safe;
 
-int SoundActive = 0;
+int sound_active = 0;
 
 void sound_init(void) {
   SDL_InitSubSystem(SDL_INIT_AUDIO);
@@ -22,7 +22,7 @@ void sound_init(void) {
   if (Mix_OpenAudio(audio_rate, audio_format, audio_channels, audio_buffers) != 0) {
     fprintf(stderr, "Unable to initialize audio: %s\n", Mix_GetError());
   } else {
-    SoundActive = 1;
+    sound_active = 1;
   }
 
 #endif

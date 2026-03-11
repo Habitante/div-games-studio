@@ -151,7 +151,7 @@ void PCM2(void) {
   pcminfo *mypcminfo = (pcminfo *)v.aux;
 
   if (mouse_b & 1) {
-    if (!SoundActive) {
+    if (!sound_active) {
       if (SoundError) {
         v_text = (char *)texts[549];
         show_dialog(errhlp0);
@@ -610,7 +610,7 @@ void open_sound_file(void) // Open the file SoundPathName
 #endif
   new_window(PCM0);
 }
-int create_saved_window(voidReturnType init_handler, int nx, int ny);
+int create_saved_window(void_return_type_t init_handler, int nx, int ny);
 //void create_saved_window(int init_handler,int nx,int ny);
 extern struct twindow window_aux;
 
@@ -1740,11 +1740,11 @@ void RecordSound(void) {
 
 
   if (RecDevice[0]) {
-    MIX_SetInput(MIX_IN_MICRO | MIX_NO_FILT);
-    MIX_SetVolume(MIX_MICRO_VOL, 5, 5);
-    SetCDVolume(0);
+    mix_set_input(MIX_IN_MICRO | MIX_NO_FILT);
+    mix_set_volume(MIX_MICRO_VOL, 5, 5);
+    set_cd_volume(0);
   } else {
-    MIX_SetInput(MIX_IN_CD | MIX_NO_FILT);
+    mix_set_input(MIX_IN_CD | MIX_NO_FILT);
   }
 
   PollRecord();

@@ -3700,9 +3700,9 @@ void reset_sound(void) {
 //      Set_volume()
 //----------------------------------------------------------------------------
 
-void SetMasterVolume(word);
-void SetVocVolume(word);
-void SetCDVolume(word);
+void set_master_volume(word);
+void set_voc_volume(word);
+void set_cd_volume(word);
 
 void set_volume(void) {
   if (setup->master < 0)
@@ -3717,9 +3717,9 @@ void set_volume(void) {
     setup->cd_audio = 0;
   if (setup->cd_audio > 15)
     setup->cd_audio = 15;
-  SetMasterVolume(setup->master);
-  SetVocVolume(setup->sound_fx);
-  SetCDVolume(setup->cd_audio);
+  set_master_volume(setup->master);
+  set_voc_volume(setup->sound_fx);
+  set_cd_volume(setup->cd_audio);
   pila[++sp] = 0;
 }
 

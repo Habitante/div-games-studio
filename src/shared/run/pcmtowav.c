@@ -13,7 +13,7 @@
 #define byte unsigned char
 #define word unsigned short
 
-int SaveWAV(byte *byte_ptr, int length, FILE *f);
+int save_wav(byte *byte_ptr, int length, FILE *f);
 int _IsWAV(FILE *FileName);
 
 //-----------------------------------------------------------------------------
@@ -40,7 +40,7 @@ int pcm2wav(FILE *in, long inlen, FILE *out, long outlen) {
     return 3;
   }
 
-  if (!SaveWAV(ptr, inlen, out)) {
+  if (!save_wav(ptr, inlen, out)) {
     printf("...Error\n");
     free(ptr);
     return 2;
@@ -53,17 +53,17 @@ int pcm2wav(FILE *in, long inlen, FILE *out, long outlen) {
 }
 
 typedef struct _HeadDC {
-  unsigned int dwUnknow;
-  unsigned short wFormatTag;
-  unsigned short wChannels;
-  unsigned int dwSamplePerSec;
-  unsigned int dwAvgBytesPerSec;
-  unsigned short wBlockAlign;
-  unsigned short wBits;
-} HeadDC;
+  unsigned int unknown;
+  unsigned short format_tag;
+  unsigned short channels;
+  unsigned int samples_per_sec;
+  unsigned int avg_bytes_per_sec;
+  unsigned short block_align;
+  unsigned short bits;
+} wav_header_t;
 
-int SaveWAV(byte *byte_ptr, int length, FILE *dstfile) {
-  HeadDC MyHeadDC;
+int save_wav(byte *byte_ptr, int length, FILE *dstfile) {
+  wav_header_t MyHeadDC;
   //int    con;
   //float  paso,pos;
 
@@ -87,15 +87,15 @@ int SaveWAV(byte *byte_ptr, int length, FILE *dstfile) {
   fputc('t', dstfile);
   fputc(' ', dstfile);
 
-  MyHeadDC.dwUnknow = 16;
-  MyHeadDC.wFormatTag = 1;
-  MyHeadDC.wChannels = 1;
-  MyHeadDC.dwSamplePerSec = 11025;
-  MyHeadDC.dwAvgBytesPerSec = 11025;
-  MyHeadDC.wBlockAlign = 1;
-  MyHeadDC.wBits = 8;
+  MyHeadDC.unknown = 16;
+  MyHeadDC.format_tag = 1;
+  MyHeadDC.channels = 1;
+  MyHeadDC.samples_per_sec = 11025;
+  MyHeadDC.avg_bytes_per_sec = 11025;
+  MyHeadDC.block_align = 1;
+  MyHeadDC.bits = 8;
 
-  if (fwrite(&MyHeadDC, 1, sizeof(HeadDC), dstfile) != sizeof(HeadDC)) {
+  if (fwrite(&MyHeadDC, 1, sizeof(wav_header_t), dstfile) != sizeof(wav_header_t)) {
     return (0);
   }
 

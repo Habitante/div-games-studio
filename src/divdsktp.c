@@ -6,7 +6,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-int create_saved_window(voidReturnType init_handler, int nx, int ny);
+int create_saved_window(void_return_type_t init_handler, int nx, int ny);
 int load_new_map(int nx, int ny, char *name, byte *bitmap);
 void carga_programa0(void);
 void carga_Fonts0(void);
@@ -350,7 +350,7 @@ int upload_desktop() {
       memcpy((char *)v.mapa->description, (char *)maux.description, 32);
       memcpy((char *)v.mapa->points, (char *)maux.points, 512 * 2);
       // Graphic data
-      call((voidReturnType)v.paint_handler);
+      call((void_return_type_t)v.paint_handler);
       blit_region(screen_buffer, vga_width, vga_height, v.ptr, v.x, v.y, v.w, v.h, 0);
       if (!interpreting)
         update_box(0, 0, vga_width, vga_height);
@@ -482,7 +482,7 @@ int upload_desktop() {
 //      Load new window (1 on Error)
 //-----------------------------------------------------------------------------
 
-int create_saved_window(voidReturnType init_handler, int nx, int ny) {
+int create_saved_window(void_return_type_t init_handler, int nx, int ny) {
   byte *ptr;
   int n, m, x, y, w, h;
   int vtipo;
@@ -517,7 +517,7 @@ int create_saved_window(voidReturnType init_handler, int nx, int ny) {
     v.selected_item = -1;
     v.prg = NULL;
 
-    call((voidReturnType)init_handler);
+    call((void_return_type_t)init_handler);
 
     if (big) {
       if (v.w > 0) {
@@ -638,7 +638,7 @@ int create_saved_window(voidReturnType init_handler, int nx, int ny) {
         wwrite(ptr, w, h, 2 + (w - 20) / 2, 2, 1, v.title, c4);
       }
 
-      call((voidReturnType)v.paint_handler);
+      call((void_return_type_t)v.paint_handler);
 
       if (!vid_mode_changed) {
         v.foreground = window_aux.foreground;

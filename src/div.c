@@ -953,7 +953,7 @@ void mainloop(void) {
         } else
           v.mapa->fpg_code = 0;
 
-        call((voidReturnType)v.paint_handler);
+        call((void_return_type_t)v.paint_handler);
         blit_region(screen_buffer, vga_width, vga_height, v.ptr, v.x, v.y, v.w, v.h, 0);
 
       } else
@@ -980,7 +980,7 @@ void mainloop(void) {
         wmouse_y = -1;
         m = mouse_b;
         mouse_b = 0;
-        call((voidReturnType)v.click_handler);
+        call((void_return_type_t)v.click_handler);
         mouse_b = m;
 
         if (v.redraw) {
@@ -1093,7 +1093,7 @@ void mainloop(void) {
       wmouse_y /= 2;
     }
 
-    call((voidReturnType)v.click_handler);
+    call((void_return_type_t)v.click_handler);
 
     for (m = 1; m < max_windows; m++)
       if (window[m].type && window[m].foreground == 1)
@@ -1159,7 +1159,7 @@ void mainloop(void) {
           wmouse_y /= 2;
         }
 
-        call((voidReturnType)v.click_handler);
+        call((void_return_type_t)v.click_handler);
         volcados_parciales = 1;
         if (v.redraw) {
           flush_window(0);
@@ -1342,7 +1342,7 @@ fin_bucle_entorno:
         break;
 
       default:
-        call((voidReturnType)v.click_handler);
+        call((void_return_type_t)v.click_handler);
         break;
       }
 
@@ -1437,7 +1437,7 @@ fin_bucle_entorno:
         wmouse_x = -1;
         wmouse_y = -1;
         mouse_b = 0;
-        call((voidReturnType)v.click_handler);
+        call((void_return_type_t)v.click_handler);
 
         if (v.redraw) {
           flush_window(0);
@@ -1578,15 +1578,15 @@ fin_bucle_entorno:
   if (rndb() > 200) {
     switch (beta_status) {
     case 1:
-      call((voidReturnType)betatest4);
+      call((void_return_type_t)betatest4);
       break;
 
     case 2:
-      call((voidReturnType)betatest5);
+      call((void_return_type_t)betatest5);
       break;
 
     case 3:
-      call((voidReturnType)betatest6);
+      call((void_return_type_t)betatest6);
       break;
 
     case 5:
@@ -1788,7 +1788,7 @@ void dialog_loop(void) {
       m = mouse_b;
       mouse_b = 0;
 
-      call((voidReturnType)v.click_handler);
+      call((void_return_type_t)v.click_handler);
       mouse_b = m;
 
       volcados_parciales = 1;
@@ -1836,7 +1836,7 @@ void dialog_loop(void) {
         wmouse_y /= 2;
       }
 
-      call((voidReturnType)v.click_handler);
+      call((void_return_type_t)v.click_handler);
       volcados_parciales = 1;
 
       if (v.redraw) {
@@ -1888,7 +1888,7 @@ void dialog_loop(void) {
     wmouse_y = -1;
     m = mouse_b;
     mouse_b = 0;
-    call((voidReturnType)v.click_handler);
+    call((void_return_type_t)v.click_handler);
     mouse_b = m;
     volcados_parciales = 1;
     if (v.redraw) {
@@ -2135,7 +2135,7 @@ void close_window(void) {
     v.exploding = 0;
   }
 
-  call((voidReturnType)v.close_handler);
+  call((void_return_type_t)v.close_handler);
   if (!quick_close) {
     if (big)
       wput(v.ptr, v.w / 2, v.h / 2, v.w / 2 - 9, 2, -45);
@@ -3168,7 +3168,7 @@ void window_surface(int w, int h, byte type) {}
 //      Create a new window
 //-----------------------------------------------------------------------------
 
-void new_window(voidReturnType init_handler) {
+void new_window(void_return_type_t init_handler) {
   byte *ptr;
   int n, m, om, x, y, w, h;
   int vtipo;
@@ -3197,7 +3197,7 @@ void new_window(voidReturnType init_handler) {
       om = prev_mouse_buttons;
       mouse_b = 0;
       prev_mouse_buttons = 0;
-      call((voidReturnType)v.click_handler);
+      call((void_return_type_t)v.click_handler);
       mouse_b = m;
       prev_mouse_buttons = om;
       if (v.redraw) {
@@ -3288,7 +3288,7 @@ void new_window(voidReturnType init_handler) {
           if (v.type == 102 && (window[m].prg != NULL || window[m].click_handler == calc2) &&
               window[m].type == 102) { // Erase cursor
             wup(m);
-            call((voidReturnType)v.paint_handler);
+            call((void_return_type_t)v.paint_handler);
             wdown(m);
           }
           vtipo = v.type;
@@ -3352,7 +3352,7 @@ void new_window(voidReturnType init_handler) {
                 om = prev_mouse_buttons;
                 mouse_b = 0;
                 prev_mouse_buttons = 0;
-                call((voidReturnType)v.click_handler);
+                call((void_return_type_t)v.click_handler);
                 mouse_b = m;
                 prev_mouse_buttons = om;
                 v.foreground = 0;
@@ -3414,7 +3414,7 @@ void new_window(voidReturnType init_handler) {
         }
       }
 
-      call((voidReturnType)v.paint_handler);
+      call((void_return_type_t)v.paint_handler);
 
       if (big) {
         w *= 2;
@@ -3620,7 +3620,7 @@ void extrude(int x, int y, int w, int h, int x2, int y2, int w2, int h2) {
 //-----------------------------------------------------------------------------
 
 
-void show_dialog(voidReturnType init_handler) {
+void show_dialog(void_return_type_t init_handler) {
   int vtipo, _get_pos;
   byte *ptr;
   int n, m, x, y, w, h;
@@ -3634,7 +3634,7 @@ void show_dialog(voidReturnType init_handler) {
       wmouse_y = -1;
       m = mouse_b;
       mouse_b = 0;
-      call((voidReturnType)v.click_handler);
+      call((void_return_type_t)v.click_handler);
       mouse_b = m;
       if (v.redraw) {
         flush_window(0);
@@ -3670,7 +3670,7 @@ void show_dialog(voidReturnType init_handler) {
     v.prg = NULL;
     v.aux = NULL;
 
-    call((voidReturnType)init_handler);
+    call((void_return_type_t)init_handler);
 
     if (big) {
       if (v.w > 0) {
@@ -3750,7 +3750,7 @@ void show_dialog(voidReturnType init_handler) {
         wwrite(ptr, w, h, 2 + (w - 12) / 2, 2, 1, v.title, c4);
       }
 
-      call((voidReturnType)v.paint_handler);
+      call((void_return_type_t)v.paint_handler);
 
       if (big) {
         w *= 2;
@@ -3807,7 +3807,7 @@ void refresh_dialog(void) {
     wwrite(ptr, w, h, 2 + (w - 12) / 2, 2, 1, v.title, c4);
   }
 
-  call((voidReturnType)v.paint_handler);
+  call((void_return_type_t)v.paint_handler);
 }
 
 //-----------------------------------------------------------------------------
@@ -4119,7 +4119,7 @@ void initialization(void) {
   blit_screen(screen_buffer);
 
   sound_init();
-  if (SoundActive)
+  if (sound_active)
     set_init_mixer();
 }
 
@@ -4963,7 +4963,7 @@ void deactivate(void) { // Minimize: deactivate
         break;
       }
     if (v.type == 102)
-      call((voidReturnType)v.paint_handler); // Erase cursor
+      call((void_return_type_t)v.paint_handler); // Erase cursor
   }
 }
 
@@ -5005,7 +5005,7 @@ void activate(void) {
       }
       if (v.type == 102 && window[m].type == 102) { // Erase cursor
         wup(m);
-        call((voidReturnType)v.paint_handler);
+        call((void_return_type_t)v.paint_handler);
         wdown(m);
       }
       flush_window(m);

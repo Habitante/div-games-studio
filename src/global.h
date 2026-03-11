@@ -31,8 +31,8 @@
 #endif
 
 
-typedef void (*voidReturnType)(void);
-void call(const voidReturnType func); // void funcion(void); int n=(int)funcion; call(n);
+typedef void (*void_return_type_t)(void);
+void call(const void_return_type_t func); // void funcion(void); int n=(int)funcion; call(n);
 
 
 #include <stdlib.h>
@@ -116,8 +116,8 @@ void call(const voidReturnType func); // void funcion(void); int n=(int)funcion;
 void _fwrite(char *, byte *, int);
 void _ffwrite(byte *Buffer, unsigned int Len, FILE *file);
 void error(int);
-void new_window(voidReturnType);
-void show_dialog(voidReturnType);
+void new_window(void_return_type_t);
+void show_dialog(void_return_type_t);
 void refresh_dialog(void);
 void close_window(void);
 void update_box(int, int, int, int);
@@ -752,7 +752,7 @@ struct twindow {
   int foreground; // 0-No, 1-Yes, 2-Minimized
   byte *name;     // Icon name
   byte *title;    // Title bar text
-  voidReturnType paint_handler, click_handler, close_handler;
+  void_return_type_t paint_handler, click_handler, close_handler;
   int x, y, w, h;              // Window position and dimensions
   int _x, _y, _an, _al;          // Position saved when minimized
   byte *ptr;                     // Window buffer

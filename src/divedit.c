@@ -2827,7 +2827,7 @@ void repaint_window(void) {
     }
   }
 
-  call((voidReturnType)v.paint_handler);
+  call((void_return_type_t)v.paint_handler);
 }
 
 //-----------------------------------------------------------------------------

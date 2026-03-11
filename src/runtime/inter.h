@@ -35,8 +35,8 @@
 #include <time.h>
 #include "osdep.h"
 
-typedef void (*voidReturnType)(void);
-void call(const voidReturnType func); // void funcion(void); int n=(int)funcion; call(n);
+typedef void (*void_return_type_t)(void);
+void call(const void_return_type_t func); // void funcion(void); int n=(int)funcion; call(n);
 
 
 #include <math.h>
@@ -879,7 +879,7 @@ typedef struct _twindow {
   int type;       // 0-n/a, 1-dialog
   int foreground; // 1-yes 0-no (darkened)
   byte *title;    // Title bar text
-  voidReturnType paint_handler, click_handler, close_handler;
+  void_return_type_t paint_handler, click_handler, close_handler;
   int x, y, w, h; // Window position and dimensions
   byte *ptr;        // Window buffer
   int state;

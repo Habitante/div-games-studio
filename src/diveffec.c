@@ -294,12 +294,12 @@ void explode_dialog2(void) {
   if (wmouse_in(w - 70, 18, 66, 11) && (mouse_b & 1)) {
     gradient_buf = exp_colores;
     gradient_config = exp_gama;
-    show_dialog((voidReturnType)gama0);
+    show_dialog((void_return_type_t)gama0);
     if (v_accept)
       need_refresh = 1;
   }
   if (need_refresh) {
-    call((voidReturnType)v.paint_handler);
+    call((void_return_type_t)v.paint_handler);
     v.redraw = 1;
   }
 }
@@ -326,9 +326,9 @@ void explode_dialog0(void) {
   v.title = texts[300];
   v.w = 128;
   v.h = 90 + 5;
-  v.paint_handler = (voidReturnType)explode_dialog1;
-  v.click_handler = (voidReturnType)explode_dialog2;
-  v.close_handler = (voidReturnType)explode_dialog3;
+  v.paint_handler = (void_return_type_t)explode_dialog1;
+  v.click_handler = (void_return_type_t)explode_dialog2;
+  v.close_handler = (void_return_type_t)explode_dialog3;
 
   _button(100, 7, v.h - 14, 0);
   _button(101, v.w - 8, v.h - 14, 2);
@@ -376,7 +376,7 @@ void gen_explodes() {
   n_frames = _n_frames;
   create_dac4();
 
-  show_dialog((voidReturnType)explode_dialog0);
+  show_dialog((void_return_type_t)explode_dialog0);
   if (!v_accept)
     return;
   for (x = 0; x < 256; x++)
@@ -441,7 +441,7 @@ void gen_explodes() {
     for (n = 0; n < 512; n++)
       v.mapa->points[n] = -1;
     v.mapa->fpg_code = 0;
-    call((voidReturnType)v.paint_handler);
+    call((void_return_type_t)v.paint_handler);
     blit_region(screen_buffer, vga_width, vga_height, v.ptr, v.x, v.y, v.w, v.h, 0);
 
     advance_points();

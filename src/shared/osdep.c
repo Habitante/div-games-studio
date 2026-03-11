@@ -79,7 +79,7 @@ char *itoa(long n, char *buf, int len) {
   return buf;
 }
 
-void call(const voidReturnType func) {
+void call(const void_return_type_t func) {
   func();
 }
 

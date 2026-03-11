@@ -1,26 +1,26 @@
 #include "global.h"
 #include "divmixer.hpp"
 
-void SetMasterVolume(UWORD volumen) {}
+void set_master_volume(UWORD volumen) {}
 
-void SetVocVolume(UWORD volumen) {}
+void set_voc_volume(UWORD volumen) {}
 
-void SetCDVolume(UWORD volumen) {}
+void set_cd_volume(UWORD volumen) {}
 
-void InitMixer(UWORD card, UWORD address, UWORD master, UWORD voc, UWORD cd) {
+void init_mixer(UWORD card, UWORD address, UWORD master, UWORD voc, UWORD cd) {
   voc = (master < voc) ? master : voc;
   cd = (master < cd) ? master : cd;
   cd = Mix_VolumeMusic(cd * 8);
   voc = Mix_Volume(-1, voc * 8);
 }
 
-void MIX_Reset(void) {}
+void mix_reset(void) {}
 
-void MIX_SetInput(byte opt) {}
+void mix_set_input(byte opt) {}
 
-void MIX_GetVolume(byte reg, byte *left, byte *right) {}
+void mix_get_volume(byte reg, byte *left, byte *right) {}
 
-void MIX_SetVolume(byte reg, byte left, byte right) {}
+void mix_set_volume(byte reg, byte left, byte right) {}
 
 void set_mixer(void) {
   int fx, cd, ma;
@@ -34,7 +34,7 @@ void set_mixer(void) {
   ma = Setupfile.vol_ma;
   if (Setupfile.mut_ma)
     ma = 0;
-  InitMixer(0, 0, ma, fx, cd);
+  init_mixer(0, 0, ma, fx, cd);
 }
 
 void set_init_mixer(void) {
@@ -49,5 +49,5 @@ void set_init_mixer(void) {
   ma = Setupfile.vol_ma;
   if (Setupfile.mut_ma)
     ma = 0;
-  InitMixer(0, 0, ma, fx, cd);
+  init_mixer(0, 0, ma, fx, cd);
 }

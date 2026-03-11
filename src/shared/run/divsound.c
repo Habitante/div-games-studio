@@ -15,7 +15,7 @@ int SongInst[128];
 
 int Freq_original[CHANNELS];
 
-int SoundActive = 1;
+int sound_active = 1;
 void print_init_flags(int flags) {
 #ifdef MIXER
 

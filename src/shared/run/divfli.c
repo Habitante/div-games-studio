@@ -9,12 +9,12 @@ static void Error_Reporter(char *msg);
 static void Palette_Update(TFUByte (*palette)[256][3]);
 
 TFAnimation *animation = NULL;
-char *CBuffer;
-int CBuff_alt, TFOffset;
-int CBuff_anc;
+char *c_buffer;
+int c_buff_height, tf_offset;
+int c_buff_width;
 TFUByte *TFframe, (*TFpalette)[256][3];
 TFAnimationInfo info;
-char TFNombre[256];
+char tf_filename[256];
 
 int fli_palette_update = 0;
 
@@ -128,20 +128,20 @@ void fli_init_first_frame() {
 
 extern OSDEP_Surface *vga;
 
-int fli_start(char *flinombre, char *Buffer, int Buff_anc, int Buff_alt, int cx, int cy) {
-  char nombre[strlen(flinombre) + 10];
+int fli_start(char *fli_filename, char *Buffer, int buf_width, int buf_height, int cx, int cy) {
+  char filename[strlen(fli_filename) + 10];
   flc.pMembuf = NULL;
   flc.membufSize = 0;
   flc.mainscreen = vga; //Buffer;
   flc.buffer = (byte *)Buffer;
 
-  div_strcpy(nombre, sizeof(nombre), flinombre);
+  div_strcpy(filename, sizeof(filename), fli_filename);
 
-  if (fli_check_header(nombre)) {
+  if (fli_check_header(filename)) {
     printf("Wrong header\n");
     return 0;
   }
-  printf("Loaded %s\n", nombre);
+  printf("Loaded %s\n", filename);
   fli_init_first_frame();
   printf("Frames: %d\n", flc.HeaderFrames);
   return flc.HeaderFrames;
