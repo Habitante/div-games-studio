@@ -656,7 +656,7 @@ void wwrite(byte *dest, int dest_width, int dest_height, int x, int y, int centr
 
 extern SDL_Surface *vga;
 
-extern struct t_listboxbr larchivosbr;
+extern struct t_listboxbr file_list_br;
 
 void wwrite_in_box(byte *dest, int dest_pitch, int dest_width, int dest_height, int x, int y,
                    int centro, byte *ptr, byte c) {

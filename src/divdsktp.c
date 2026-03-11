@@ -290,7 +290,7 @@ int UpLoad_Desktop() {
         update_box(0, 0, vga_width, vga_height);
       break;
     case 3:
-      create_saved_window(paleta0, window_aux.x, window_aux.y);
+      create_saved_window(palette0, window_aux.x, window_aux.y);
       if (!interpreting)
         update_box(0, 0, vga_width, vga_height);
       break;
@@ -399,7 +399,7 @@ int UpLoad_Desktop() {
         if (dtime < getFileCreationTime(&pathtmp[0])) {
           v_title = v_prg->filename;
           v_text = "File on disk is newer, reload?";
-          show_dialog(aceptar0);
+          show_dialog(accept0);
 
           if (v_accept) {
             div_strcpy(tipo[0].path, sizeof(tipo[0].path), v_prg->path);
@@ -451,7 +451,7 @@ int UpLoad_Desktop() {
 
       if ((f = fopen(Load_FontPathName, "rb")) != NULL) {
         fclose(f);
-        create_saved_window(ShowFont0, window_aux.x, window_aux.y);
+        create_saved_window(show_font0, window_aux.x, window_aux.y);
         blit_region(screen_buffer, vga_width, vga_height, v.ptr, v.x, v.y, v.w, v.h, 0);
         if (!interpreting)
           update_box(0, 0, vga_width, vga_height);
@@ -730,7 +730,7 @@ int nuevo_mapa_carga(int nx, int ny, char *nombre, byte *mapilla) {
     v_map->description[0] = 0;
     for (n = 0; n < 512; n++)
       v_map->points[n] = -1;
-    create_saved_window(mapa0, nx, ny);
+    create_saved_window(map_view0, nx, ny);
 
     return (0);
 

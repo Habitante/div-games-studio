@@ -27,7 +27,7 @@ extern char user1[];
 extern char user2[];
 
 extern int help_item;
-extern int cierra_rapido;
+extern int quick_close;
 extern int skip_window_render;
 
 extern int SelColorFont;
@@ -474,7 +474,7 @@ void MemInfo2(void) {
     end_dialog = 1;
 }
 
-void MemInfo0(void) {
+void mem_info0(void) {
   v.type = 1;
   v.title = texts[199];
   v.w = 168;
@@ -809,7 +809,7 @@ void Cfg_Setup3(void) {
   }
 }
 
-void Cfg_Setup0(void) {
+void config_setup0(void) {
   v.type = 1;
   v.title = texts[883];
   v.w = 192;
@@ -860,7 +860,7 @@ extern int VidModeChanged;
 
 void create_title_bar(void);
 
-void Cfg_Setup_end(void) {
+void config_setup_end(void) {
   int n, ew, found;
   byte *ptr;
   int w, h;
@@ -1006,7 +1006,7 @@ void Cfg_Setup_end(void) {
     colors_rgb[35] = dac[c_lit * 3 + 2];
 
     skip_window_render = 1;
-    cierra_rapido = 1;
+    quick_close = 1;
     ew = exploding_windows;
     exploding_windows = 0;
 
@@ -1100,7 +1100,7 @@ void Cfg_Setup_end(void) {
     }
 
     skip_window_render = 0;
-    cierra_rapido = 0;
+    quick_close = 0;
     exploding_windows = ew;
 
     update_box(0, 0, vga_width, vga_height);

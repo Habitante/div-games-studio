@@ -153,7 +153,7 @@ Still remaining — mostly deeper locals in large files:
 - [x] divedit.c — clipboard, selection, cursor state ✓
 - [x] runtime/i.c — timing, blit, rendering vars ✓
 - [x] divpaint.c — paint editor locals + cross-file struct fields ✓
-- [ ] divhandl.c — dialog/window manager locals
+- [x] divhandl.c — dialog/window manager locals + cross-file functions ✓
 
 ### 2C-5. Documentation pass
 

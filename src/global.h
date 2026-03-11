@@ -137,7 +137,7 @@ int windows_collide(int a, int b);
 void maximize_window(void);
 void explode(int x, int y, int w, int h);
 void activate(void);
-void DaniDel(char *name);
+void delete_file(char *name);
 
 void window_surface(int w, int h, byte type);
 
@@ -410,8 +410,8 @@ void PRJ0();
 void PRJ1();
 void PRJ2();
 void PRJ3();
-void ShowFont0(void);
-void ShowFont1(void);
+void show_font0(void);
+void show_font1(void);
 
 ///////////////////////////////////////////////////////////////////////////////
 //      Main handler, exported by DIVHANDLE (divhandl.c)
@@ -449,24 +449,24 @@ void menu_edicion1(void);
 void menu_edicion2(void);
 // menu_mapas3D declarations removed (MODE8/3D map editor deleted)
 
-void nuevo_mapa0(void);
-void nuevo_mapa1(void);
-void nuevo_mapa2(void);
-void nuevo_mapa3(void);
-void mapa0(void);
-void mapa1(void);
-void mapa2(void);
-void mapa3(void);
-void paleta0(void);
-void paleta1(void);
+void new_map0(void);
+void new_map1(void);
+void new_map2(void);
+void new_map3(void);
+void map_view0(void);
+void map_view1(void);
+void map_view2(void);
+void map_view3(void);
+void palette0(void);
+void palette1(void);
 void copyright0(void);
 void copyright1(void);
 void copyright2(void);
 void copyright3(void);
-void aceptar0(void);
-void aceptar1(void);
-void aceptar2(void);
-void aceptar3(void);
+void accept0(void);
+void accept1(void);
+void accept2(void);
+void accept3(void);
 void error0(void);
 void error1(void);
 void error2(void);
@@ -483,11 +483,11 @@ void MapperWarning1(void);
 void MapperWarning2(void);
 // MapperVisor declarations removed (MODE8/3D map editor deleted)
 
-int new_map(byte *mapilla);
+int new_map(byte *pre_buffer);
 void nuevo_mapa3D(void);
 void RenderToMed();
-void Reducex2();
-int Progress(char *titulo, int current, int total);
+void reduce_half();
+int show_progress(char *title, int current, int total);
 
 ///////////////////////////////////////////////////////////////////////////////
 //      Functions exported by DIVFORMA (divforma.c)
@@ -936,7 +936,7 @@ void Show_Taggeds();
 //      Functions and structures exported by the trash can
 //-----------------------------------------------------------------------------
 
-void muestra_papelera(); // Show trash can
+void show_trash(); // Show trash can
 
 //-----------------------------------------------------------------------------
 //      Functions and structures exported by the (sound) recorder

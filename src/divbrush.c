@@ -87,7 +87,7 @@ char textura[max_texturas * w_textura];
 char fondo[max_texturas * w_textura];
 int t_maximo;
 int f_maximo;
-struct t_listboxbr ltexturasbr = {3 - 2, 11 - 2, m3d_fpgcodesbr, w_textura, 4, 4, 32, 32};
+struct t_listboxbr texture_list_br = {3 - 2, 11 - 2, m3d_fpgcodesbr, w_textura, 4, 4, 32, 32};
 
 struct _thumb_tex {
   int w, h;
@@ -106,7 +106,7 @@ struct {
   int total;
 } FPG_progress;
 
-int TipoTex;
+int texture_type;
 
 struct t_listboxbr copia_br;
 
@@ -115,7 +115,7 @@ int t_pulsada = 1;
 float zoom_level;
 
 extern int brush_index;
-extern int TipoBrowser;
+extern int browser_type;
 extern struct _thumb_map {
   int w, h;
   int real_width, real_height;
@@ -157,7 +157,7 @@ void M3D_create_thumbs(struct t_listboxbr *l, int prog) {
   if (brush_fpg_path[0] == 0)
     return;
 
-  if (TipoTex > 3)
+  if (texture_type > 3)
     FPG_thumbpos = 0;
 
   thumb_tex[0].ptr = NULL;
@@ -253,7 +253,7 @@ void M3D_create_thumbs(struct t_listboxbr *l, int prog) {
       } else {
         fclose(FPG_F);
         if (prog)
-          Progress((char *)texts[93], FPG_progress.total, FPG_progress.total);
+          show_progress((char *)texts[93], FPG_progress.total, FPG_progress.total);
         v_text = (char *)texts[44];
         show_dialog(err0);
         return;
@@ -262,7 +262,7 @@ void M3D_create_thumbs(struct t_listboxbr *l, int prog) {
     fseek(FPG_F, sizeof(FPG_points) * FPG_D.info.points, SEEK_CUR);
     FPG_progress.pos += (64 + 4 * FPG_D.info.points + FPG_D.info.width * FPG_D.info.height);
     if (prog)
-      Progress((char *)texts[93], FPG_progress.pos, FPG_progress.total);
+      show_progress((char *)texts[93], FPG_progress.pos, FPG_progress.total);
 
     thumb_tex[n].is_square = 0;
     for (con = 0; con < 11; con++) {
@@ -293,7 +293,7 @@ void M3D_create_thumbs(struct t_listboxbr *l, int prog) {
       }
       fclose(FPG_F);
       if (prog)
-        Progress((char *)texts[93], FPG_progress.total, FPG_progress.total);
+        show_progress((char *)texts[93], FPG_progress.total, FPG_progress.total);
       v_text = (char *)texts[45];
       show_dialog(err0);
       return;
@@ -310,7 +310,7 @@ void M3D_create_thumbs(struct t_listboxbr *l, int prog) {
       fclose(FPG_F);
       free(FPG_D.imagen);
       if (prog)
-        Progress((char *)texts[93], FPG_progress.total, FPG_progress.total);
+        show_progress((char *)texts[93], FPG_progress.total, FPG_progress.total);
       v_text = (char *)texts[44];
       show_dialog(err0);
       return;
@@ -393,14 +393,14 @@ void M3D_create_thumbs(struct t_listboxbr *l, int prog) {
       thumb_tex[con].status = 1;
       FPG_progress.pos += (FPG_progress.total - FPG_progress.pos) / (l->total_items - con);
       if (prog)
-        Progress((char *)texts[93], FPG_progress.pos, FPG_progress.total);
+        show_progress((char *)texts[93], FPG_progress.pos, FPG_progress.total);
       break;
     }
   }
 
   if (FPG_progress.pos < FPG_progress.total) {
     if (prog)
-      Progress((char *)texts[93], FPG_progress.total, FPG_progress.total);
+      show_progress((char *)texts[93], FPG_progress.total, FPG_progress.total);
   }
 
   qsort(thumb_tex, l->total_items, sizeof(struct _thumb_tex), cmpcode);
@@ -422,13 +422,13 @@ void M3D_show_thumb(struct t_listboxbr *l, int num) {
   char *p;
   struct _thumb_tex thumb_tmp[max_texturas];
 
-  if (TipoBrowser == MAPBR)
+  if (browser_type == MAPBR)
     memcpy(&thumb_tmp, &thumb_map, sizeof(struct _thumb_map) * max_windows);
   else
     memcpy(&thumb_tmp, &thumb_tex, sizeof(struct _thumb_tex) * max_texturas);
 
   if (num >= l->first_visible && num < l->first_visible + l->lines * l->columns) {
-    if (TipoBrowser == MAPBR) {
+    if (browser_type == MAPBR) {
       num_tex = num;
     } else {
       num_tex = atoi(m3d_fpgcodesbr + num * w_textura);
@@ -454,7 +454,7 @@ void M3D_show_thumb(struct t_listboxbr *l, int num) {
          (py - incy) / big2 + l->h - 8, l->w, 8);
 
     if (thumb_tmp[num_tex].ptr != NULL && thumb_tmp[num_tex].status) {
-      if (TipoBrowser == 4 /*BRUSH*/)
+      if (browser_type == 4 /*BRUSH*/)
         for (y = 0; y < thumb_tmp[num_tex].h; y++) {
           for (x = 0; x < thumb_tmp[num_tex].w; x++) {
             if (py + y > ly)
@@ -487,7 +487,7 @@ void M3D_show_thumb(struct t_listboxbr *l, int num) {
       wput(ptr, w, h, px + (l->w - 21) / 2, py + 1, 60);
     }
 
-    if (TipoBrowser != MAPBR) {
+    if (browser_type != MAPBR) {
       if (draw_mode < 100 && num_tex == brush_index) {
         wbox(ptr, w, h, c_b_low, px, py + l->h - 8, l->w, 8);
       }
@@ -569,7 +569,7 @@ void M3D_update_listboxbr(struct t_listboxbr *l) {
   else
     l->zone = 0;
 
-  if (TipoBrowser != MAPBR) {
+  if (browser_type != MAPBR) {
     if (old_zona != l->zone)
       if (old_zona >= 10) {
         x = l->x + 1 + ((old_zona - 10) % l->columns) * (l->w + 1);
@@ -659,7 +659,7 @@ void M3D_update_listboxbr(struct t_listboxbr *l) {
     }
   }
 
-  if (TipoBrowser != MAPBR) {
+  if (browser_type != MAPBR) {
     if (old_zona != l->zone)
       if (l->zone >= 10) {
         x = l->x + 1 + ((l->zone - 10) % l->columns) * (l->w + 1);
@@ -728,7 +728,7 @@ void M3D_paint_listboxbr(struct t_listboxbr *l) {
 //-----------------------------------------------------------------------------
 
 extern int m_maximo;
-extern struct t_listboxbr lthumbmapbr;
+extern struct t_listboxbr thumbmap_list_br;
 
 #define BRUSH 4
 
@@ -736,8 +736,8 @@ void MapperBrowseFPG0(void) {
   v.type = 1;
   v.w = 147 - 4;
   v.h = 147 - 4;
-  if (TipoTex > 3) {
-    if (TipoBrowser == BRUSH) {
+  if (texture_type > 3) {
+    if (browser_type == BRUSH) {
       v.title = texts[572];
       v.name = texts[572];
     } else {
@@ -753,31 +753,31 @@ void MapperBrowseFPG0(void) {
   v.click_handler = MapperBrowseFPG2;
 
   if (draw_mode < 100) {
-    if (TipoBrowser == MAPBR) {
-      memcpy(&copia_br, &ltexturasbr, sizeof(ltexturasbr));
-      memcpy(&ltexturasbr, &lthumbmapbr, sizeof(ltexturasbr));
-      ltexturasbr.total_items = m_maximo;
+    if (browser_type == MAPBR) {
+      memcpy(&copia_br, &texture_list_br, sizeof(texture_list_br));
+      memcpy(&texture_list_br, &thumbmap_list_br, sizeof(texture_list_br));
+      texture_list_br.total_items = m_maximo;
     } else {
       memcpy(m3d_fpgcodesbr, fondo, max_texturas * w_textura);
-      ltexturasbr.total_items = f_maximo;
+      texture_list_br.total_items = f_maximo;
     }
   } else {
-    if (TipoTex == FONDO) {
+    if (texture_type == FONDO) {
       memcpy(m3d_fpgcodesbr, fondo, max_texturas * w_textura);
-      ltexturasbr.total_items = f_maximo;
+      texture_list_br.total_items = f_maximo;
     } else {
       memcpy(m3d_fpgcodesbr, textura, max_texturas * w_textura);
-      ltexturasbr.total_items = t_maximo;
+      texture_list_br.total_items = t_maximo;
     }
   }
 
   num = 0;
 
-  ltexturasbr.created = 0;
-  ltexturasbr.columns = 4;
-  ltexturasbr.w = 32;
-  ltexturasbr.h = 32;
-  ltexturasbr.lines = 4;
+  texture_list_br.created = 0;
+  texture_list_br.columns = 4;
+  texture_list_br.w = 32;
+  texture_list_br.h = 32;
+  texture_list_br.lines = 4;
 
   v_finished = 0;
   t_pulsada = 1;
@@ -786,7 +786,7 @@ void MapperBrowseFPG0(void) {
 void MapperBrowseFPG1(void) {
   _show_items();
 
-  M3D_create_listboxbr(&ltexturasbr);
+  M3D_create_listboxbr(&texture_list_br);
 }
 
 void MapperBrowseFPG2(void) {
@@ -797,16 +797,16 @@ void MapperBrowseFPG2(void) {
 
   _process_items();
 
-  M3D_update_listboxbr(&ltexturasbr);
+  M3D_update_listboxbr(&texture_list_br);
 
   if ((mouse_b & 1) && !(prev_mouse_buttons & 1)) {
-    if (ltexturasbr.zone >= 10) {
+    if (texture_list_br.zone >= 10) {
       // Paint mode only (draw_mode<100) - 3D map mode removed
-      if (TipoBrowser == BRUSH) {
+      if (browser_type == BRUSH) {
         old_pincel = brush_index;
-        brush_index = ltexturasbr.first_visible + ltexturasbr.zone - 10;
-        M3D_show_thumb(&ltexturasbr, old_pincel);
-        M3D_show_thumb(&ltexturasbr, brush_index);
+        brush_index = texture_list_br.first_visible + texture_list_br.zone - 10;
+        M3D_show_thumb(&texture_list_br, old_pincel);
+        M3D_show_thumb(&texture_list_br, brush_index);
         brush_index = old_pincel;
       }
       FPG_thumbpos = 0;
@@ -816,10 +816,10 @@ void MapperBrowseFPG2(void) {
   }
 
   if (!t_pulsada) {
-    if (TipoBrowser == BRUSH) {
+    if (browser_type == BRUSH) {
       if (key(_T))
         end_dialog = 1;
-    } else if (TipoBrowser == MAPBR) {
+    } else if (browser_type == MAPBR) {
       if (key(_U))
         end_dialog = 1;
     }

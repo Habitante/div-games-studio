@@ -12,7 +12,7 @@ static int r, g, b;
 
 void create_ghost_vc(int m);
 void create_ghost_slow(void);
-void fusionar_paletas(void);
+void merge_palettes(void);
 void rescalar(byte *si, int sian, int sial, byte *di, int dian, int dial);
 
 
@@ -714,7 +714,7 @@ void calculate_gradient(int n) {
   }
 }
 
-int hay_mapas(void) {
+int has_maps(void) {
   int m, n = -1;
   for (m = 0; m < max_windows; m++)
     if (window[m].type == 100) {
@@ -727,14 +727,14 @@ int hay_mapas(void) {
 char PalName[_MAX_PATH + 1] = "";
 
 #define max_archivos 512 // ------------------------------- File listbox
-extern struct t_listboxbr larchivosbr;
+extern struct t_listboxbr file_list_br;
 extern t_thumb thumb[max_archivos];
 extern int num_taggeds;
 
-extern byte *muestra;
+extern byte *sample;
 extern byte apply_palette[768];
 extern int num_colores;
-void crear_paleta(void);
+void create_palette(void);
 
 void pal_load() {
   int div_try = 0;
@@ -758,16 +758,16 @@ void pal_load() {
       v_exists = 1;
     } else
       v_exists = 0;
-    div_strcpy(larchivosbr.list, larchivosbr.item_width, input);
-    larchivosbr.total_items = 1;
+    div_strcpy(file_list_br.list, file_list_br.item_width, input);
+    file_list_br.total_items = 1;
     thumb[0].tagged = 1;
     num_taggeds = 1;
   }
 
   if (num_taggeds == 1)
-    for (num = 0; num < larchivosbr.total_items; num++) {
+    for (num = 0; num < file_list_br.total_items; num++) {
       if (thumb[num].tagged) {
-        div_strcpy(input, sizeof(input), larchivosbr.list + larchivosbr.item_width * num);
+        div_strcpy(input, sizeof(input), file_list_br.list + file_list_br.item_width * num);
         div_strcpy(full, sizeof(full), tipo[v_type].path);
         if (full[strlen(full) - 1] != '/')
           div_strcat(full, sizeof(full), "/");
@@ -788,10 +788,10 @@ void pal_load() {
           div_try |= fmt_load_dac_jpg(PalName);
 
           if (div_try) {
-            if (hay_mapas()) {
+            if (has_maps()) {
               v_title = (char *)texts[53];
               v_text = (char *)texts[321];
-              show_dialog(aceptar0);
+              show_dialog(accept0);
             } else
               v_accept = 1;
             if (v_accept)
@@ -808,17 +808,17 @@ void pal_load() {
       }
     }
   else {
-    muestra = (byte *)malloc(32768);
-    if (muestra == NULL) {
+    sample = (byte *)malloc(32768);
+    if (sample == NULL) {
       v_text = (char *)texts[45];
       show_dialog(err0);
       return;
     }
-    memset(muestra, 0, 32768);
+    memset(sample, 0, 32768);
 
-    for (num = 0; num < larchivosbr.total_items; num++) {
+    for (num = 0; num < file_list_br.total_items; num++) {
       if (thumb[num].tagged) {
-        div_strcpy(input, sizeof(input), larchivosbr.list + larchivosbr.item_width * num);
+        div_strcpy(input, sizeof(input), file_list_br.list + file_list_br.item_width * num);
         div_strcpy(full, sizeof(full), tipo[v_type].path);
         if (full[strlen(full) - 1] != '/')
           div_strcat(full, sizeof(full), "/");
@@ -836,20 +836,20 @@ void pal_load() {
 
         if (div_try)
           for (n = 0; n < 256; n++) {
-            muestra[((dac4[n * 3 + 0] & 0xFE) << 9) | ((dac4[n * 3 + 1] & 0xFE) << 4) |
+            sample[((dac4[n * 3 + 0] & 0xFE) << 9) | ((dac4[n * 3 + 1] & 0xFE) << 4) |
                     (dac4[n * 3 + 2] >> 1)] = 1;
           }
       }
     }
 
-    crear_paleta();
+    create_palette();
     memcpy(&dac4[0], &apply_palette[0], 768);
-    free(muestra);
+    free(sample);
 
-    if (hay_mapas()) {
+    if (has_maps()) {
       v_title = (char *)texts[53];
       v_text = (char *)texts[321];
-      show_dialog(aceptar0);
+      show_dialog(accept0);
     } else
       v_accept = 1;
     if (v_accept)
@@ -889,7 +889,7 @@ void pal_save_as() {
     if (v_exists) {
       v_title = (char *)texts[139];
       v_text = input;
-      show_dialog(aceptar0);
+      show_dialog(accept0);
       if (v_accept)
         pal_save();
     } else {
@@ -1393,7 +1393,7 @@ void merge_palette(void) {
       mouse_graf = 3;
       blit_screen(screen_buffer);
 
-      fusionar_paletas();
+      merge_palettes();
 
       pal_refresh(0, 1);
     }
@@ -1403,7 +1403,7 @@ void merge_palette(void) {
 
 // Takes two palettes (one in dac, one in dac4) and returns the merged result in dac4
 
-void fusionar_paletas(void) {
+void merge_palettes(void) {
   byte pal[2048]; // Two palettes in R,G,B,sum(RGB) format
   word paleta[512];
   int dist[512];
@@ -1513,19 +1513,19 @@ void fusionar_paletas(void) {
 //-----------------------------------------------------------------------------
 //  Create a palette from a color sample
 //
-//  Input: muestra[]
+//  Input: sample[]
 //      Pointer to an RGB table (32x32x32 bytes) with values
 //      0 or 1 (whether that color is present in the sample or not)
 //
-//  Output: apply_palette[] muestra[]
+//  Output: apply_palette[] sample[]
 //      The resulting palette; in the original table, values of 1 have been
 //      replaced with the corresponding palette color index
 //-----------------------------------------------------------------------------
 
-byte *muestra; // 32768
+byte *sample; // 32768
 byte apply_palette[768];
 int num_colores;
-extern int cargar_paleta;
+extern int load_palette;
 
 word new_find_ord(byte *dac) {
   int dmin, dif, r2, g2, b2;
@@ -1570,7 +1570,7 @@ word new_find_ord(byte *dac) {
   return ((color - dac) / 4);
 }
 
-void crear_paleta(void) {
+void create_palette(void) {
   byte *pal; // Color list in R,G,B,sum(RGB) format
   word *paleta;
   int *dist;
@@ -1583,13 +1583,13 @@ void crear_paleta(void) {
   if ((pal = (byte *)malloc(32768 * 4)) == NULL)
     return;
 
-  muestra[0] = 1;                        // Black is always included
-  muestra[(31 * 32 + 31) * 32 + 31] = 1; // White is always included
+  sample[0] = 1;                        // Black is always included
+  sample[(31 * 32 + 31) * 32 + 31] = 1; // White is always included
 
   for (num_colores = 0, n = 0, rr = 0; rr < 32; rr++)
     for (gg = 0; gg < 32; gg++)
       for (bb = 0; bb < 32; bb++, n++) {
-        if (muestra[n]) {
+        if (sample[n]) {
           pal[num_colores * 4] = rr;
           pal[num_colores * 4 + 1] = gg;
           pal[num_colores * 4 + 2] = bb;
@@ -1616,9 +1616,9 @@ void crear_paleta(void) {
   paleta[0] = 0;
   n = 1;
   do {
-    if (!cargar_paleta)
+    if (!load_palette)
       if ((n & 127) == 0)
-        Progress((char *)texts[497], n * 2, num_colores * 4 - 256);
+        show_progress((char *)texts[497], n * 2, num_colores * 4 - 256);
     c = new_find_ord(pal);
     r = pal[c * 4];
     g = pal[c * 4 + 1];
@@ -1648,9 +1648,9 @@ void crear_paleta(void) {
 
   c = num_colores - 1;
   while (c > 255) {
-    if (!cargar_paleta)
+    if (!load_palette)
       if ((c & 127) == 0)
-        Progress((char *)texts[497], num_colores * 2 + num_colores - c, num_colores * 4 - 256);
+        show_progress((char *)texts[497], num_colores * 2 + num_colores - c, num_colores * 4 - 256);
 
     min = 64 * 64 * 64;
     for (n = 0; n < c; n++) { // Find the minimum distance
@@ -1701,11 +1701,11 @@ void crear_paleta(void) {
   for (n = 0, c = 0, rr = 0; rr < 32; rr++)
     for (gg = 0; gg < 32; gg++)
       for (bb = 0; bb < 32; bb++, n++)
-        if (muestra[n]) {
-          if (!cargar_paleta)
+        if (sample[n]) {
+          if (!load_palette)
             if (((c++) & 127) == 0)
-              Progress((char *)texts[497], num_colores * 3 - 256 + c, num_colores * 4 - 256);
-          muestra[n] = find_color(rr, gg, bb);
+              show_progress((char *)texts[497], num_colores * 3 - 256 + c, num_colores * 4 - 256);
+          sample[n] = find_color(rr, gg, bb);
         }
 
   create_dac4();
@@ -1714,8 +1714,8 @@ void crear_paleta(void) {
     if ((col = apply_palette[n]))
       apply_palette[n] = col * 2 + 1;
 
-  if (!cargar_paleta)
-    Progress((char *)texts[497], num_colores * 4 - 256, num_colores * 4 - 256);
+  if (!load_palette)
+    show_progress((char *)texts[497], num_colores * 4 - 256, num_colores * 4 - 256);
 }
 
 
@@ -1790,8 +1790,8 @@ void prepare_wallpaper(void) {
   memcpy(old_dac4, dac4, 768);
   memcpy(old_dac, dac, 768);
 
-  n = cargar_paleta;
-  cargar_paleta = 1;
+  n = load_palette;
+  load_palette = 1;
   switch (x) {
   case 1:
     fmt_load_map(temp2, temp, 0);
@@ -1808,7 +1808,7 @@ void prepare_wallpaper(void) {
   }
   swap(map_width, tap_w);
   swap(map_height, tap_h);
-  cargar_paleta = n;
+  load_palette = n;
 
   free(temp2);
   memcpy(pal, dac4, 768);
@@ -2309,10 +2309,10 @@ void pal_edit() {
       if (DacAux[n] != dac[n])
         break;
     if (n < 768) {
-      if (hay_mapas()) {
+      if (has_maps()) {
         v_title = (char *)texts[53];
         v_text = (char *)texts[321];
-        show_dialog(aceptar0);
+        show_dialog(accept0);
       } else
         v_accept = 1;
       memcpy(dac4, dac, 768);

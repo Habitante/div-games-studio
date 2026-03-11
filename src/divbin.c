@@ -44,7 +44,7 @@ void Bin2(void) {
     case 101: // Item dragged from FPG to bin. Remove from FPG
       v_title = (char *)texts[60];
       v_text = window[1].mapa->description;
-      show_dialog(aceptar0);
+      show_dialog(accept0);
 
       if (v_accept) {
         my_window = v;
@@ -89,6 +89,6 @@ void Bin0(void) {
   v.name = texts[350];
 }
 
-void muestra_papelera() {
+void show_trash() {
   new_window(Bin0);
 }

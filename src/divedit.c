@@ -3339,7 +3339,7 @@ void remove_spaces(void) {
 //-----------------------------------------------------------------------------
 
 #define max_archivos 512 // ------------------------------- File listbox
-extern struct t_listboxbr larchivosbr;
+extern struct t_listboxbr file_list_br;
 extern t_thumb thumb[max_archivos];
 extern int num_taggeds;
 
@@ -3363,15 +3363,15 @@ void open_program(void) {
       v_exists = 1;
     } else
       v_exists = 0;
-    div_strcpy(larchivosbr.list, larchivosbr.item_width, input);
-    larchivosbr.total_items = 1;
+    div_strcpy(file_list_br.list, file_list_br.item_width, input);
+    file_list_br.total_items = 1;
     thumb[0].tagged = 1;
     num_taggeds = 1;
   }
 
-  for (num = 0; num < larchivosbr.total_items; num++) {
+  for (num = 0; num < file_list_br.total_items; num++) {
     if (thumb[num].tagged) {
-      div_strcpy(input, sizeof(input), larchivosbr.list + larchivosbr.item_width * num);
+      div_strcpy(input, sizeof(input), file_list_br.list + file_list_br.item_width * num);
       div_strcpy(full, sizeof(full), tipo[v_type].path);
       if (full[strlen(full) - 1] != '/')
         div_strcat(full, sizeof(full), "/");
@@ -4541,7 +4541,7 @@ void printprogram0(void) {
   v_accept = 0;
 }
 
-void Print_Program(void) {
+void print_program(void) {
   byte *buf;
   int lon, n;
 
@@ -4576,7 +4576,7 @@ void Print_Program(void) {
 
     if (lon > 0) {
       for (n = 0; n < lon; n += 32) {
-        Progress((char *)texts[437], n, lon);
+        show_progress((char *)texts[437], n, lon);
         if (n + 32 <= lon)
           fwrite(buf + n, 1, 32, stdprn);
         else
@@ -4584,7 +4584,7 @@ void Print_Program(void) {
       }
 
       fwrite("\xd\xa\f", 1, 3, stdprn);
-      Progress((char *)texts[437], lon, lon);
+      show_progress((char *)texts[437], lon, lon);
     }
   }
 }

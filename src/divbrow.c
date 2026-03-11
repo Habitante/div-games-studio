@@ -62,17 +62,17 @@ Mix_Chunk *smp = NULL;
 };*/
 
 
-extern char archivo[max_archivos * w_archivo];
+extern char files_buf[max_archivos * w_archivo];
 //[?*max_archivos]
-struct t_listboxbr larchivosbr = {77, 27, archivo, w_archivo, 4, 4, 51, 31};
+struct t_listboxbr file_list_br = {77, 27, files_buf, w_archivo, 4, 4, 51, 31};
 
-extern char directorio[max_directorios * w_directorio];
-struct t_listbox ldirectoriosbr = {3, 27, directorio, w_directorio, 10, 65};
+extern char dirs_buf[max_directorios * w_directorio];
+struct t_listbox dir_list_br = {3, 27, dirs_buf, w_directorio, 10, 65};
 
-#define max_unidades 26
-#define w_unidad    (4 + 1)
-extern char unidad[max_unidades * w_unidad];
-struct t_listbox lunidadesbr = {3, 121, unidad, w_unidad, 4, 28};
+#define MAX_DRIVES 26
+#define DRIVE_WIDTH    (4 + 1)
+extern char drives_buf[MAX_DRIVES * DRIVE_WIDTH];
+struct t_listbox lunidadesbr = {3, 121, drives_buf, DRIVE_WIDTH, 4, 28};
 
 #define max_ext 26
 #define w_ext  (5 + 1)
@@ -177,27 +177,27 @@ void create_thumbs(void) {
       switch (v_thumb) // 2-MAP, 3-PAL, 5-FNT, 6-IFS, 7-PCM
       {
       case 2:
-        create_thumb_MAP(&larchivosbr);
+        create_thumb_MAP(&file_list_br);
         break;
       case 3:
-        create_thumb_PAL(&larchivosbr);
+        create_thumb_PAL(&file_list_br);
         break;
       case 5:
-        create_thumb_FNT(&larchivosbr);
+        create_thumb_FNT(&file_list_br);
         break;
       case 6:
-        create_thumb_IFS(&larchivosbr);
+        create_thumb_IFS(&file_list_br);
         break;
       case 7:
-        create_thumb_PCM(&larchivosbr);
+        create_thumb_PCM(&file_list_br);
         break;
       }
       if (num > -1) {
         if (thumb[num].ptr != NULL && thumb[num].status == 0) {
-          show_thumb(&larchivosbr, num);
+          show_thumb(&file_list_br, num);
           break;
         } else if (thumb[num].ptr == NULL && thumb[num].status == -1) {
-          show_thumb(&larchivosbr, num);
+          show_thumb(&file_list_br, num);
           break; // NOTE: Break added to prevent flickering (at cost of some speed)
         } else
           break;
@@ -1539,18 +1539,18 @@ void browser0(void) {
   if (v_mode == 2)
     div_strcpy(input, sizeof(input), input2);
 
-  larchivosbr.created = 0;
-  ldirectoriosbr.created = 0;
+  file_list_br.created = 0;
+  dir_list_br.created = 0;
   lunidadesbr.created = 0;
   lextbr.created = 0;
 
   n = 0;
   while (drives[n]) { // Create the drive list <X:>
-    *(unidad + w_unidad * n) = '<';
-    *(unidad + w_unidad * n + 1) = drives[n];
-    *(unidad + w_unidad * n + 2) = ':';
-    *(unidad + w_unidad * n + 3) = '>';
-    *(unidad + w_unidad * n + 4) = 0;
+    *(drives_buf + DRIVE_WIDTH * n) = '<';
+    *(drives_buf + DRIVE_WIDTH * n + 1) = drives[n];
+    *(drives_buf + DRIVE_WIDTH * n + 2) = ':';
+    *(drives_buf + DRIVE_WIDTH * n + 3) = '>';
+    *(drives_buf + DRIVE_WIDTH * n + 4) = 0;
     n++;
   }
   lunidadesbr.total_items = n;
@@ -1565,21 +1565,21 @@ void browser0(void) {
     {
     case 5:
     case 6:
-      larchivosbr.columns = 2;
-      larchivosbr.w = 103;
+      file_list_br.columns = 2;
+      file_list_br.w = 103;
       break;
     default:
-      larchivosbr.columns = 4;
-      larchivosbr.w = 51;
+      file_list_br.columns = 4;
+      file_list_br.w = 51;
       break;
     }
-    larchivosbr.lines = 4;
-    larchivosbr.h = 31;
+    file_list_br.lines = 4;
+    file_list_br.h = 31;
   } else {
-    larchivosbr.columns = 3;
-    larchivosbr.w = 68;
-    larchivosbr.lines = 14;
-    larchivosbr.h = 8;
+    file_list_br.columns = 3;
+    file_list_br.w = 68;
+    file_list_br.lines = 14;
+    file_list_br.h = 8;
   }
 
   if (v_thumb == 7 && !SoundActive)
@@ -1603,8 +1603,8 @@ void browser1(void) {
     wwrite(v.ptr, w, h, 40, 111, 0, texts[130], c3);
   }
 
-  create_listbox_br(&larchivosbr);
-  create_listbox(&ldirectoriosbr);
+  create_listbox_br(&file_list_br);
+  create_listbox(&dir_list_br);
   create_listbox(&lunidadesbr);
   create_listbox(&lextbr);
 }
@@ -1639,31 +1639,31 @@ void browser2(void) {
       switch (v_thumb) {
       case 5:
       case 6:
-        larchivosbr.columns = 2;
-        larchivosbr.w = 103;
+        file_list_br.columns = 2;
+        file_list_br.w = 103;
         break;
       default:
-        larchivosbr.columns = 4;
-        larchivosbr.w = 51;
+        file_list_br.columns = 4;
+        file_list_br.w = 51;
         break;
       }
-      larchivosbr.lines = 4;
-      larchivosbr.h = 31;
-      larchivosbr.first_visible = 0;
-      larchivosbr.slide = larchivosbr.s0;
-      larchivosbr.s1 =
-          larchivosbr.y + (larchivosbr.h * larchivosbr.lines + larchivosbr.lines + 1) - 12;
+      file_list_br.lines = 4;
+      file_list_br.h = 31;
+      file_list_br.first_visible = 0;
+      file_list_br.slide = file_list_br.s0;
+      file_list_br.s1 =
+          file_list_br.y + (file_list_br.h * file_list_br.lines + file_list_br.lines + 1) - 12;
       browser1();
       v.redraw = 1;
     } else {
-      larchivosbr.columns = 3;
-      larchivosbr.w = 68;
-      larchivosbr.lines = 14;
-      larchivosbr.h = 8;
-      larchivosbr.first_visible = 0;
-      larchivosbr.slide = larchivosbr.s0;
-      larchivosbr.s1 =
-          larchivosbr.y + (larchivosbr.h * larchivosbr.lines + larchivosbr.lines + 1) - 12;
+      file_list_br.columns = 3;
+      file_list_br.w = 68;
+      file_list_br.lines = 14;
+      file_list_br.h = 8;
+      file_list_br.first_visible = 0;
+      file_list_br.slide = file_list_br.s0;
+      file_list_br.s1 =
+          file_list_br.y + (file_list_br.h * file_list_br.lines + file_list_br.lines + 1) - 12;
       for (n = 0; n < max_archivos; n++) {
         if (thumb[n].ptr != NULL) {
           free(thumb[n].ptr);
@@ -1676,13 +1676,13 @@ void browser2(void) {
     }
   }
 
-  update_listbox_br(&larchivosbr);
-  update_listbox(&ldirectoriosbr);
+  update_listbox_br(&file_list_br);
+  update_listbox(&dir_list_br);
   update_listbox(&lunidadesbr);
   update_listbox(&lextbr);
 
   if (v.item[0].state >= 2 && num_taggeds > 0) {
-    for (num = 0; num < larchivosbr.total_items; num++)
+    for (num = 0; num < file_list_br.total_items; num++)
       thumb[num].tagged = 0;
     num_taggeds = 0;
     need_refresh = 1;
@@ -1703,14 +1703,14 @@ void browser2(void) {
   }
 
   if ((mouse_b & 1) && !(prev_mouse_buttons & 1)) {
-    if (larchivosbr.zone >= 10) {
+    if (file_list_br.zone >= 10) {
       if (v_type != 6 && !v_mode) {
         if (shift_status & 3) // SHIFT
         {
-          for (num = 0; num < larchivosbr.total_items; num++)
+          for (num = 0; num < file_list_br.total_items; num++)
             thumb[num].tagged = 0;
           num_taggeds = 0;
-          selected = larchivosbr.zone - 10 + larchivosbr.first_visible;
+          selected = file_list_br.zone - 10 + file_list_br.first_visible;
           if (selected > ini_tagged)
             pos1 = ini_tagged, pos2 = selected;
           else
@@ -1721,7 +1721,7 @@ void browser2(void) {
           }
         } else if (shift_status & 4) // CTRL
         {
-          selected = larchivosbr.zone - 10 + larchivosbr.first_visible;
+          selected = file_list_br.zone - 10 + file_list_br.first_visible;
           ini_tagged = selected;
           if (thumb[selected].tagged) {
             thumb[selected].tagged = 0;
@@ -1731,17 +1731,17 @@ void browser2(void) {
             num_taggeds++;
           }
         } else {
-          for (num = 0; num < larchivosbr.total_items; num++)
+          for (num = 0; num < file_list_br.total_items; num++)
             thumb[num].tagged = 0;
-          selected = larchivosbr.zone - 10 + larchivosbr.first_visible;
+          selected = file_list_br.zone - 10 + file_list_br.first_visible;
           thumb[selected].tagged = 1;
           num_taggeds = 1;
           ini_tagged = selected;
         }
       } else {
-        for (num = 0; num < larchivosbr.total_items; num++)
+        for (num = 0; num < file_list_br.total_items; num++)
           thumb[num].tagged = 0;
-        selected = larchivosbr.zone - 10 + larchivosbr.first_visible;
+        selected = file_list_br.zone - 10 + file_list_br.first_visible;
         thumb[selected].tagged = 1;
         num_taggeds = 1;
         ini_tagged = selected;
@@ -1750,7 +1750,7 @@ void browser2(void) {
       browser1();
       v.redraw = 1;
       div_strcpy(full, sizeof(full),
-                 archivo + (larchivosbr.zone - 10 + larchivosbr.first_visible) * w_archivo);
+                 files_buf + (file_list_br.zone - 10 + file_list_br.first_visible) * w_archivo);
 
       // TODO: Handle CTRL and SHIFT modifier keys
       if (strcmp(input, full) || ((v_thumb == 7 || v_type == 16) && opc_pru)) {
@@ -1765,7 +1765,7 @@ void browser2(void) {
             if (tipo[v_type].path[strlen(tipo[v_type].path) - 1] != '/')
               div_strcat(full, sizeof(full), "/");
             div_strcat(full, sizeof(full),
-                       archivo + (larchivosbr.zone - 10 + larchivosbr.first_visible) * w_archivo);
+                       files_buf + (file_list_br.zone - 10 + file_list_br.first_visible) * w_archivo);
 
             Mix_HaltChannel(-1);
             if (smp != NULL)
@@ -1796,36 +1796,36 @@ void browser2(void) {
 #endif
       }
 
-    } else if (ldirectoriosbr.zone >= 10) {
+    } else if (dir_list_br.zone >= 10) {
       v.redraw = 1;
       if (tipo[v_type].path[strlen(tipo[v_type].path) - 1] != '/')
         div_strcat(tipo[v_type].path, sizeof(tipo[v_type].path), "/");
       div_strcat(tipo[v_type].path, sizeof(tipo[v_type].path),
-                 directorio +
-                     (ldirectoriosbr.zone - 10 + ldirectoriosbr.first_visible) * w_directorio);
+                 dirs_buf +
+                     (dir_list_br.zone - 10 + dir_list_br.first_visible) * w_directorio);
       chdir(tipo[v_type].path);
       getcwd(tipo[v_type].path, PATH_MAX + 1);
       print_path_br();
-      larchivosbr.created = 0;
-      ldirectoriosbr.created = 0;
+      file_list_br.created = 0;
+      dir_list_br.created = 0;
       tipo[v_type].first_visible = 0;
       open_dir_br();
 
-      create_listbox_br(&larchivosbr);
-      create_listbox(&ldirectoriosbr);
+      create_listbox_br(&file_list_br);
+      create_listbox(&dir_list_br);
     } else if (lunidadesbr.zone >= 10) {
       _dos_setdrive(drives[lunidadesbr.zone - 10 + lunidadesbr.first_visible] - 'A' + 1, &n);
       getcwd(tipo[v_type].path, PATH_MAX + 1);
       if (tipo[v_type].path[0] == drives[lunidadesbr.zone - 10 + lunidadesbr.first_visible]) {
         print_path_br();
         v.redraw = 1;
-        larchivosbr.created = 0;
-        ldirectoriosbr.created = 0;
+        file_list_br.created = 0;
+        dir_list_br.created = 0;
         tipo[v_type].first_visible = 0;
         open_dir_br();
 
-        create_listbox_br(&larchivosbr);
-        create_listbox(&ldirectoriosbr);
+        create_listbox_br(&file_list_br);
+        create_listbox(&dir_list_br);
       } else {
         _dos_setdrive(tipo[v_type].path[0] - 'A' + 1, &n);
         v_text = (char *)texts[42];
@@ -1839,7 +1839,7 @@ void browser2(void) {
       DIV_STRCPY(file_mask, input);
       tipo[v_type].first_visible = 0;
       print_path_br();
-      larchivosbr.created = 0;
+      file_list_br.created = 0;
       open_dir_br();
 
       browser1();
@@ -1865,7 +1865,7 @@ void browser3(void) {
 
   _dos_setdrive(toupper(*tipo[1].path) - 'A' + 1, &n);
   chdir(tipo[1].path);
-  tipo[v_type].first_visible = larchivosbr.first_visible;
+  tipo[v_type].first_visible = file_list_br.first_visible;
 
   for (n = 0; n < max_archivos; n++)
     if (thumb[n].ptr != NULL) {
@@ -1897,23 +1897,23 @@ void open_dir_br(void) {
   n = 0;
   m = _dos_findfirst(file_mask, _A_NORMAL, &fileinfo);
   while (m == 0 && n < max_archivos) {
-    div_strcpy(archivo + n++ * w_archivo, w_archivo, fileinfo.name);
+    div_strcpy(files_buf + n++ * w_archivo, w_archivo, fileinfo.name);
     m = _dos_findnext(&fileinfo);
   }
-  larchivosbr.total_items = n;
-  qsort(archivo, larchivosbr.total_items, (size_t)w_archivo,
+  file_list_br.total_items = n;
+  qsort(files_buf, file_list_br.total_items, (size_t)w_archivo,
         (int (*)(const void *, const void *))strcmp);
 
   n = 0;
   m = _dos_findfirst("*.*", _A_SUBDIR, &fileinfo);
   while (m == 0 && n < max_directorios) {
     if (strcmp(fileinfo.name, ".") && (fileinfo.attrib & 16)) {
-      div_strcpy(directorio + n++ * w_directorio, w_directorio, fileinfo.name);
+      div_strcpy(dirs_buf + n++ * w_directorio, w_directorio, fileinfo.name);
     }
     m = _dos_findnext(&fileinfo);
   }
-  ldirectoriosbr.total_items = n;
-  qsort(directorio, ldirectoriosbr.total_items, w_directorio,
+  dir_list_br.total_items = n;
+  qsort(dirs_buf, dir_list_br.total_items, w_directorio,
         (int (*)(const void *, const void *))strcmp);
 
   for (n = 0; n < max_archivos; n++) {
@@ -2002,7 +2002,7 @@ void create_listbox_br(struct t_listboxbr *l) {
     l->buttons = 0;
     l->created = 1;
     l->zone = 0;
-    if (l == &larchivosbr) {
+    if (l == &file_list_br) {
       l->first_visible = tipo[v_type].first_visible;
       if ((l->first_visible + (l->lines - 1) * l->columns) >= l->total_items) {
         l->first_visible = 0;

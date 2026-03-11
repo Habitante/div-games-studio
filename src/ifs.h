@@ -79,5 +79,5 @@ int ShowCharBuffer(int WhatChar, int cx, int cy, char *ptr, int w, char *buffer)
 void GetCharSize(int WhatChar, int *width, int *height);
 void GetCharSizeBuffer(int WhatChar, int *width, int *height, char *buffer);
 void ConvertFntToPal(char *Buffer);
-int Progress(char *titulo, int current, int total);
+int show_progress(char *titulo, int current, int total);
 #endif

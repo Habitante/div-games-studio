@@ -75,7 +75,7 @@ struct {
 #define COLOR_RULER_X     96 // Color gradient start position on the edit screen
 #define max_int 65536
 
-extern int cierra_rapido;
+extern int quick_close;
 int determine_help(void);
 extern int help_paint_active;
 
@@ -6384,13 +6384,13 @@ void paint_mask_window(byte *p, int c, int d) {
 #define BRUSH 4
 #define MAPBR 8
 
-extern int TipoTex;
+extern int texture_type;
 extern int t_maximo;
 extern int f_maximo;
 extern int FPG_thumbpos;
 extern byte brush_fpg_path[256];
 extern char m3d_fpgcodesbr[max_texturas * w_textura];
-extern struct t_listboxbr ltexturasbr;
+extern struct t_listboxbr texture_list_br;
 extern struct _thumb_tex {
   int w, h;         // Width and height of the thumbnail
   int real_width, real_height; // Width and height of the texture
@@ -6406,8 +6406,8 @@ extern FILE *FilePaintFPG;
 extern struct t_listboxbr copia_br;
 
 int m_maximo = 0;
-struct t_listboxbr lthumbmapbr = {3 - 2, 11 - 2, NULL, 0, 4, 4, 32, 32};
-int TipoBrowser = 0;
+struct t_listboxbr thumbmap_list_br = {3 - 2, 11 - 2, NULL, 0, 4, 4, 32, 32};
+int browser_type = 0;
 
 struct _thumb_map {   // Brush map thumbnails
   int w, h;         // Width and height of the thumbnail
@@ -6552,13 +6552,13 @@ void select_color(int n) { // Icon number as parameter
   byte *temp;
   int man, mal;
 
-  if ((TipoTex & 4) && ((key(_T) && hotkey) || (mouse_in(toolbar_x + 56 + n * 16, toolbar_y + 11,
+  if ((texture_type & 4) && ((key(_T) && hotkey) || (mouse_in(toolbar_x + 56 + n * 16, toolbar_y + 11,
                                                          toolbar_x + 62 + n * 16, toolbar_y + 17) &&
                                                 (mouse_b & 1)))) {
-    TipoBrowser = BRUSH;
+    browser_type = BRUSH;
     show_dialog(MapperBrowseFPG0);
 
-    num_tex = ltexturasbr.first_visible + ltexturasbr.zone - 10; // Position in browser
+    num_tex = texture_list_br.first_visible + texture_list_br.zone - 10; // Position in browser
     tex_cod = atoi(m3d_fpgcodesbr + num_tex * w_textura);       // Code at that position
 
     if (thumb_tex[num_tex].Code == 0 || !v_finished)
@@ -6604,21 +6604,21 @@ void select_color(int n) { // Icon number as parameter
     }
   }
 
-  if ((TipoTex & 8) &&
+  if ((texture_type & 8) &&
       ((key(_U) && hotkey) || (mouse_in(toolbar_x + 56 - 8 + n * 16, toolbar_y + 11,
                                         toolbar_x + 62 - 8 + n * 16, toolbar_y + 17) &&
                                (mouse_b & 1)))) {
-    TipoBrowser = MAPBR;
+    browser_type = MAPBR;
     show_dialog(MapperBrowseFPG0);
     if (v_finished) {
-      num_tex = thumb_map[ltexturasbr.first_visible + ltexturasbr.zone - 10].Code;
+      num_tex = thumb_map[texture_list_br.first_visible + texture_list_br.zone - 10].Code;
       texture_color = window[num_tex].mapa->map;
       texture_w = window[num_tex].mapa->map_width;
       texture_h = window[num_tex].mapa->map_height;
       texture_x = 0;
       texture_y = 0;
     }
-    memcpy(&ltexturasbr, &copia_br, sizeof(ltexturasbr));
+    memcpy(&texture_list_br, &copia_br, sizeof(texture_list_br));
     draw_ruler();
   }
 
@@ -7026,7 +7026,7 @@ void change_map(int forward) {
       thumb_map[n].ptr = NULL;
     }
   }
-  create_mapbr_thumbs(&lthumbmapbr);
+  create_mapbr_thumbs(&thumbmap_list_br);
 
   map = v.mapa->map;
   current_map_code = v.mapa->code;

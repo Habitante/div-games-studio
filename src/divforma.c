@@ -227,14 +227,14 @@ int fmt_is_pcx(byte *buffer) {
   return (loes);
 }
 
-extern byte *muestra;
+extern byte *sample;
 extern byte apply_palette[768];
 extern int num_colores;
-void crear_paleta(void);
+void create_palette(void);
 void browser2(void);
 byte *fmt_decode_rle(byte *buffer, unsigned int bytes_line, unsigned int last_byte, byte *pDest);
 
-int cargar_paleta = 0;
+int load_palette = 0;
 
 void fmt_load_pcx(byte *buffer, byte *mapa, int vent) {
   unsigned int con;
@@ -248,7 +248,7 @@ void fmt_load_pcx(byte *buffer, byte *mapa, int vent) {
   byte color16;
   int con16;
   RGBQUAD Pcxdac[256];
-  byte *old_muestra;
+  byte *old_sample;
 
   memcpy((byte *)&header, buffer, sizeof(pcx_header));
   buffer += 128; // Start of image data
@@ -369,13 +369,13 @@ void fmt_load_pcx(byte *buffer, byte *mapa, int vent) {
       dac4[con] /= 4;
   } else // If it's 24bpp.
   {
-    old_muestra = muestra;
-    muestra = (byte *)malloc(32768);
+    old_sample = sample;
+    sample = (byte *)malloc(32768);
 
-    if ((v.click_handler == (voidReturnType)browser2 && !cargar_paleta) || muestra == NULL) {
-      if (muestra != NULL)
-        free(muestra);
-      muestra = old_muestra;
+    if ((v.click_handler == (voidReturnType)browser2 && !load_palette) || sample == NULL) {
+      if (sample != NULL)
+        free(sample);
+      sample = old_sample;
 
       // Create the 3-3-2 palette
       for (rgb_color = 0; rgb_color < 256; rgb_color++) {
@@ -411,7 +411,7 @@ void fmt_load_pcx(byte *buffer, byte *mapa, int vent) {
       }
 
     } else {
-      memset(muestra, 0, 32768);
+      memset(sample, 0, 32768);
 
       // Convert from 24 to 8 bpp
       pDest = mapa;
@@ -423,7 +423,7 @@ void fmt_load_pcx(byte *buffer, byte *mapa, int vent) {
           rgb_red = *(pSrc);
           rgb_green = *(pSrc + header.bytes_per_line);
           rgb_blue = *(pSrc + header.bytes_per_line * 2);
-          muestra[((rgb_red & 0xF8) << 7) | ((rgb_green & 0xF8) << 2) | ((rgb_blue & 0xF8) >> 3)] =
+          sample[((rgb_red & 0xF8) << 7) | ((rgb_green & 0xF8) << 2) | ((rgb_blue & 0xF8) >> 3)] =
               1;
           pDest++;
           pSrc++;
@@ -433,7 +433,7 @@ void fmt_load_pcx(byte *buffer, byte *mapa, int vent) {
 
       pSrc = AuxPtr;
 
-      crear_paleta();
+      create_palette();
 
       // Convert from 24 to 8 bpp
       pDest = mapa;
@@ -445,7 +445,7 @@ void fmt_load_pcx(byte *buffer, byte *mapa, int vent) {
           rgb_red = *(pSrc);
           rgb_green = *(pSrc + header.bytes_per_line);
           rgb_blue = *(pSrc + header.bytes_per_line * 2);
-          *pDest = muestra[((rgb_red & 0xF8) << 7) | ((rgb_green & 0xF8) << 2) |
+          *pDest = sample[((rgb_red & 0xF8) << 7) | ((rgb_green & 0xF8) << 2) |
                            ((rgb_blue & 0xF8) >> 3)];
           pDest++;
           pSrc++;
@@ -453,9 +453,9 @@ void fmt_load_pcx(byte *buffer, byte *mapa, int vent) {
         pSrcLine += header.bytes_per_line * 3;
       }
 
-      free(muestra);
+      free(sample);
       free(pSrc = AuxPtr);
-      muestra = old_muestra;
+      sample = old_sample;
 
       memcpy(&dac4[0], &apply_palette[0], 768);
     }
@@ -638,7 +638,7 @@ void fmt_load_bmp(byte *buffer, byte *mapa, int vent) {
   byte *AuxPtr;
   int x, y, fixmap_w, rgb_color, num_colors;
   byte rgb_red, rgb_green, rgb_blue, RunLength, pixel;
-  byte *old_muestra;
+  byte *old_sample;
 
   FileHeader.bfType = *((unsigned short *)buffer);
   FileHeader.bfSize = *((unsigned int *)(buffer + 2));
@@ -815,13 +815,13 @@ void fmt_load_bmp(byte *buffer, byte *mapa, int vent) {
       dac4[y++] = 0, dac4[y++] = 0, dac4[y++] = 0;
   } else if (InfoHeader.biBitCount == 24) // 24 bpp BMP
   {
-    old_muestra = muestra;
-    muestra = (byte *)malloc(32768);
+    old_sample = sample;
+    sample = (byte *)malloc(32768);
 
-    if ((v.click_handler == (voidReturnType)browser2 && !cargar_paleta) || muestra == NULL) {
-      if (muestra != NULL)
-        free(muestra);
-      muestra = old_muestra;
+    if ((v.click_handler == (voidReturnType)browser2 && !load_palette) || sample == NULL) {
+      if (sample != NULL)
+        free(sample);
+      sample = old_sample;
 
       // Create the 3-3-2 palette
       for (rgb_color = 0; rgb_color < 256; rgb_color++) {
@@ -857,7 +857,7 @@ void fmt_load_bmp(byte *buffer, byte *mapa, int vent) {
       }
 
     } else {
-      memset(muestra, 0, 32768);
+      memset(sample, 0, 32768);
 
       // Convert from 24 to 8 bpp
       AuxPtr = pSrc;
@@ -870,7 +870,7 @@ void fmt_load_bmp(byte *buffer, byte *mapa, int vent) {
           rgb_red = ((RGBQUAD *)pSrc)->rgbRed;
           rgb_green = ((RGBQUAD *)pSrc)->rgbGreen;
           rgb_blue = ((RGBQUAD *)pSrc)->rgbBlue;
-          muestra[((rgb_red & 0xF8) << 7) | ((rgb_green & 0xF8) << 2) | ((rgb_blue & 0xF8) >> 3)] =
+          sample[((rgb_red & 0xF8) << 7) | ((rgb_green & 0xF8) << 2) | ((rgb_blue & 0xF8) >> 3)] =
               1;
           pSrc += 3;
         }
@@ -878,7 +878,7 @@ void fmt_load_bmp(byte *buffer, byte *mapa, int vent) {
       }
       pSrc = pSrcLine = AuxPtr;
 
-      crear_paleta();
+      create_palette();
 
       // Convert from 24 to 8 bpp
       fixmap_w = ((map_width * 3) / 4) * 4;
@@ -891,7 +891,7 @@ void fmt_load_bmp(byte *buffer, byte *mapa, int vent) {
           rgb_red = ((RGBQUAD *)pSrc)->rgbRed;
           rgb_green = ((RGBQUAD *)pSrc)->rgbGreen;
           rgb_blue = ((RGBQUAD *)pSrc)->rgbBlue;
-          *pDest = muestra[((rgb_red & 0xF8) << 7) | ((rgb_green & 0xF8) << 2) |
+          *pDest = sample[((rgb_red & 0xF8) << 7) | ((rgb_green & 0xF8) << 2) |
                            ((rgb_blue & 0xF8) >> 3)];
           pDest++;
           pSrc += 3;
@@ -899,8 +899,8 @@ void fmt_load_bmp(byte *buffer, byte *mapa, int vent) {
         pSrcLine += fixmap_w;
       }
 
-      free(muestra);
-      muestra = old_muestra;
+      free(sample);
+      sample = old_sample;
       memcpy(&dac4[0], &apply_palette[0], 768);
     }
   }
@@ -1198,7 +1198,7 @@ int fmt_load_dac_map(char *name) {
     return (0);
   }
 
-  if (cargar_paleta) {
+  if (load_palette) {
     man = *(word *)(par + 8);
     mal = *(word *)(par + 10);
     fseek(file, 0, SEEK_END);
@@ -1268,7 +1268,7 @@ int fmt_load_dac_pcx(char *name) {
     return (0);
   }
 
-  if (header.bits_per_pixel == 8 && header.color_planes == 1 && !cargar_paleta) {
+  if (header.bits_per_pixel == 8 && header.color_planes == 1 && !load_palette) {
     fseek(file, 0, SEEK_END);
     fseek(file, ftell(file) - 768, SEEK_SET);
     fread(dac4, 768, 1, file);
@@ -1297,7 +1297,7 @@ int fmt_load_dac_pcx(char *name) {
 
     swap(man, map_width);
     swap(mal, map_height);
-    cargar_paleta = 1;
+    load_palette = 1;
     fmt_load_pcx(buffer, temp, 0);
 
     memcpy(original_palette, dac4, 768);
@@ -1305,7 +1305,7 @@ int fmt_load_dac_pcx(char *name) {
     if (header.color_planes == 1)
       fmt_strip_unused_colors(temp, map_width * map_height);
 
-    cargar_paleta = 0;
+    load_palette = 0;
     swap(man, map_width);
     swap(mal, map_height);
     free(buffer);
@@ -1359,7 +1359,7 @@ int fmt_load_dac_bmp(char *name) {
     fclose(file);
     return (0);
   }
-  if (InfoHeader.biBitCount == 8 && !cargar_paleta) {
+  if (InfoHeader.biBitCount == 8 && !load_palette) {
     if (InfoHeader.biClrUsed)
       memcpy(Bmpdac, buffer, 4 * InfoHeader.biClrUsed);
     else
@@ -1376,7 +1376,7 @@ int fmt_load_dac_bmp(char *name) {
   free(CopiaBuffer);
   CopiaBuffer = NULL;
   buffer = NULL;
-  if (!((InfoHeader.biBitCount == 8 && !cargar_paleta) || InfoHeader.biBitCount == 4)) {
+  if (!((InfoHeader.biBitCount == 8 && !load_palette) || InfoHeader.biBitCount == 4)) {
     free(CopiaBuffer);
     man = InfoHeader.biWidth;
     mal = InfoHeader.biHeight;
@@ -1400,7 +1400,7 @@ int fmt_load_dac_bmp(char *name) {
 
     swap(man, map_width);
     swap(mal, map_height);
-    cargar_paleta = 1;
+    load_palette = 1;
     fmt_load_bmp(buffer, temp, 0);
 
     memcpy(original_palette, dac4, 768);
@@ -1408,7 +1408,7 @@ int fmt_load_dac_bmp(char *name) {
     if (InfoHeader.biBitCount == 8)
       fmt_strip_unused_colors(temp, map_width * map_height);
 
-    cargar_paleta = 0;
+    load_palette = 0;
     swap(man, map_width);
     swap(mal, map_height);
     free(buffer);

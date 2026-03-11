@@ -1,10 +1,10 @@
 
-// NOTE: The main text rendering function is CreateText()
+// NOTE: The main text rendering function is create_text()
 // ShowFont is the font window (font loaded in memory), GetText is the "input text" dialog
-// When calling CreateText(), v.aux of ShowFont points to:
+// When calling create_text(), v.aux of ShowFont points to:
 //   v.aux -> filename, v.aux+14 -> path, v.aux+RES_FOR_NAME -> FNT file data
-// FntAux is NOT set to v.aux+RES_FOR_NAME before calling CreateText (FntAux already points to the file)
-// The string is passed to CreateText via cCharsToPrint[128]
+// font_aux is NOT set to v.aux+RES_FOR_NAME before calling create_text (font_aux already points to the file)
+// The string is passed to create_text via cCharsToPrint[128]
 
 #include "global.h"
 #include "div_string.h"
@@ -13,7 +13,7 @@
 void Selcolor0(void);
 void GenFont0(void);
 int font_generated = 0;
-void GetText0(void);
+void get_text0(void);
 void create_test_text(char *s, char flags);
 
 
@@ -65,7 +65,7 @@ char cCharsToPrint[128];
 
 int SelColorFont;
 int SelColorOk;
-char *FntAux;
+char *font_aux;
 
 int spacelen;
 
@@ -254,7 +254,7 @@ void Fonts2(void) {
           break;
         }
       }
-      new_window(ShowFont0);
+      new_window(show_font0);
     }
     v.redraw = 1;
     break;
@@ -686,7 +686,7 @@ void GetFont() {
     if (v_exists) {
       v_title = (char *)texts[75];
       v_text = (char *)texts[76];
-      show_dialog(aceptar0);
+      show_dialog(accept0);
       if (!v_accept)
         return;
     }
@@ -704,7 +704,7 @@ void GetFont() {
 //-----------------------------------------------------------------------------
 
 #define max_archivos 512 // ------------------------------- File listbox
-extern struct t_listboxbr larchivosbr;
+extern struct t_listboxbr file_list_br;
 extern t_thumb thumb[max_archivos];
 extern int num_taggeds;
 
@@ -732,15 +732,15 @@ void GetIfs() {
           v_exists = 1;
         } else
           v_exists = 0;
-        div_strcpy(larchivosbr.list, larchivosbr.item_width, input);
-        larchivosbr.total_items = 1;
+        div_strcpy(file_list_br.list, file_list_br.item_width, input);
+        file_list_br.total_items = 1;
         thumb[0].tagged = 1;
         num_taggeds = 1;
       }
 
-      for (num = 0; num < larchivosbr.total_items; num++) {
+      for (num = 0; num < file_list_br.total_items; num++) {
         if (thumb[num].tagged) {
-          DIV_STRCPY(input, larchivosbr.list + larchivosbr.item_width * num);
+          DIV_STRCPY(input, file_list_br.list + file_list_br.item_width * num);
           DIV_STRCPY(FaceName, input);
           DIV_STRCPY(FacePathName, tipo[v_type].path);
           if (!IS_PATH_SEP(FacePathName[strlen(FacePathName) - 1]))
@@ -973,7 +973,7 @@ void Preview() {
   if (!CreateFont(255))
     return;
   show_dialog(Preview0);
-  DaniDel("PREVIEW.FNT");
+  delete_file("PREVIEW.FNT");
 
   memcpy(MiTabladeLetras, CopiaMiTabladeLetras, 256);
   DIV_STRCPY(FontPathName, CopiaFontName);
@@ -1100,7 +1100,7 @@ void Preview21() {
 
   init = 0;
   for (x = 0; x < strlen(TestString2); x++) {
-    len = ShowCharBuffer(TestString2[x], init, 0, MyBuffer, TamaX, FntAux);
+    len = ShowCharBuffer(TestString2[x], init, 0, MyBuffer, TamaX, font_aux);
     if (len <= 1)
       len = 0;
     init += len;
@@ -1148,7 +1148,7 @@ void Preview20() {
   spacelen = 0;
   cnt = 0;
   for (x = 0; x < 255; x += 2) {
-    GetCharSizeBuffer(x, &fan, &fal, FntAux);
+    GetCharSizeBuffer(x, &fan, &fal, font_aux);
     if (fan > 1) {
       cnt++;
       spacelen += fan;
@@ -1162,7 +1162,7 @@ void Preview20() {
     spacelen = 1;
 
   for (x = 0; x < strlen(TestString2); x++) {
-    GetCharSizeBuffer(TestString2[x], &fan, &fal, FntAux);
+    GetCharSizeBuffer(TestString2[x], &fan, &fal, font_aux);
     if (fan <= 1)
       fan = 0;
     TamaX += fan;
@@ -1246,7 +1246,7 @@ void create_test_text(char *s, char flags) {
   }
 }
 
-void ShowFont1(void) {
+void show_font1(void) {
   int w = v.w / big2, h = v.h / big2;
   int ancho_w = 101, alto_w = 22;
   int width, height, pos;
@@ -1393,7 +1393,7 @@ void ShowFont1(void) {
 void ShowFont2(void) {
   if (!(mouse_b & 1) && (prev_mouse_buttons & 1) && wmouse_x != -1) {
     prev_mouse_buttons = 0;
-    FntAux = (char *)v.aux + RES_FOR_NAME;
+    font_aux = (char *)v.aux + RES_FOR_NAME;
     Preview_2();
   }
 }
@@ -1402,14 +1402,14 @@ void ShowFont3(void) {
   free(v.aux);
 }
 
-void ShowFont0(void) {
+void show_font0(void) {
   FILE *file;
   int Length;
   v.type = 104;
   v.w = 105;
   v.h = 44;
 
-  v.paint_handler = ShowFont1;
+  v.paint_handler = show_font1;
   v.click_handler = ShowFont2;
   v.close_handler = ShowFont3;
   file = fopen(Load_FontPathName, "rb");
@@ -1471,7 +1471,7 @@ void pal_reload_font(int vn, struct twindow *vntn) {
 }
 
 #define max_archivos 512 // ------------------------------- File listbox
-extern struct t_listboxbr larchivosbr;
+extern struct t_listboxbr file_list_br;
 extern t_thumb thumb[max_archivos];
 extern int num_taggeds;
 
@@ -1502,15 +1502,15 @@ void OpenFont(void) {
       v_exists = 1;
     } else
       v_exists = 0;
-    div_strcpy(larchivosbr.list, larchivosbr.item_width, input);
-    larchivosbr.total_items = 1;
+    div_strcpy(file_list_br.list, file_list_br.item_width, input);
+    file_list_br.total_items = 1;
     thumb[0].tagged = 1;
     num_taggeds = 1;
   }
 
-  for (num = 0; num < larchivosbr.total_items; num++) {
+  for (num = 0; num < file_list_br.total_items; num++) {
     if (thumb[num].tagged) {
-      DIV_STRCPY(input, larchivosbr.list + larchivosbr.item_width * num);
+      DIV_STRCPY(input, file_list_br.list + file_list_br.item_width * num);
       DIV_STRCPY(full, tipo[v_type].path);
       if (full[strlen(full) - 1] != '/')
         DIV_STRCAT(full, "/");
@@ -1526,7 +1526,7 @@ void OpenFont(void) {
             } else {
               div_strcpy(Load_FontName, sizeof(Load_FontName), input);
               DIV_STRCPY(Load_FontPathName, full);
-              new_window(ShowFont0);
+              new_window(show_font0);
             }
           } else {
             v_text = (char *)texts[46];
@@ -1546,7 +1546,7 @@ void OpenFont(void) {
 }
 
 /////////////////////////////////////////////////////////////////////////////
-void CreateText();
+void create_text();
 
 void GetText1(void) {
   _show_items();
@@ -1565,7 +1565,7 @@ void GetText2(void) {
     break;
   }
 }
-void GetText0(void) {
+void get_text0(void) {
   v.type = 1;
   v.w = 220 + 6;
   v.h = 64 - 14;
@@ -1581,7 +1581,7 @@ void GetText0(void) {
   v_accept = 0;
 }
 
-void CreateText() {
+void create_text() {
   int n, y, x, TamaX = 0, TamaY = 0, fan, _fal = 0, fal, init, cnt;
 
   // 1 - Determine the space width
@@ -1592,7 +1592,7 @@ void CreateText() {
   spacelen = 0;
   cnt = 0;
   for (x = 0; x < 255; x += 2) {
-    GetCharSizeBuffer(x, &fan, &fal, FntAux);
+    GetCharSizeBuffer(x, &fan, &fal, font_aux);
     if (fan != 1) {
       cnt++;
       spacelen += fan;
@@ -1605,7 +1605,7 @@ void CreateText() {
   // 2 - Calculate the text dimensions in TamaX x TamaY
 
   for (x = 0; x < strlen(cCharsToPrint); x++) {
-    GetCharSizeBuffer(cCharsToPrint[x], &fan, &fal, FntAux);
+    GetCharSizeBuffer(cCharsToPrint[x], &fan, &fal, font_aux);
     if (fan == 1)
       fan = spacelen;
     TamaX += fan;
@@ -1627,7 +1627,7 @@ void CreateText() {
 
   init = 0;
   for (x = 0; x < strlen(cCharsToPrint); x++)
-    if ((cnt = ShowCharBuffer(cCharsToPrint[x], init, 0, (char *)v.mapa->map, TamaX, FntAux)) != 1)
+    if ((cnt = ShowCharBuffer(cCharsToPrint[x], init, 0, (char *)v.mapa->map, TamaX, font_aux)) != 1)
       init += cnt;
     else
       init += spacelen;

@@ -25,15 +25,41 @@ void save_map(void);
 void map_search(void);
 void print_fontmap(void);
 void generate_character(byte *di, int w, int h, int inc, char *si);
-void AplieX(struct tmapa *MiMap, int man, int mal);
+void apply_resize(struct tmapa *MiMap, int map_w, int map_h);
 
+// Dialog handler forward declarations (init/paint/click/close callbacks)
+void map_view0(void);
+void map_view1(void);
+void map_view2(void);
+void map_view3(void);
+void palette0(void);
+void palette1(void);
+void user_info0(void);
+void user_info1(void);
+void user_info2(void);
+void user_info3(void);
+void accept0(void);
+void accept1(void);
+void accept2(void);
+void palette_action0(void);
+void new_map0(void);
+void new_map1(void);
+void new_map2(void);
+void resize0(void);
+void resize1(void);
+void resize2(void);
+void resize3(void);
+void progress0(void);
+void progress1(void);
+void progress2(void);
+int show_progress(char *title, int current, int total);
 
 //-----------------------------------------------------------------------------
 //      Module variables
 //-----------------------------------------------------------------------------
 
-byte AuxPal[768];
-int status_nuevo;
+byte aux_palette[768];
+int new_status;
 
 void _completo(void);
 void text_cursor(void);
@@ -48,14 +74,14 @@ extern void browser3(void);
 
 void errhlp0(void);
 
-void DaniDel(char *name);
+void delete_file(char *name);
 void about0(void);
 void map_save(void);
 
-void SaveSound(pcminfo *mypcminfo, char *dst);
+void save_sound(pcminfo *mypcminfo, char *dst);
 void PasteNewSounds(void);
 
-void fusionar_paletas(void);
+void merge_palettes(void);
 int fmt_load_dac_map(char *name);
 int fmt_load_dac_pcx(char *name);
 int fmt_load_dac_bmp(char *name);
@@ -63,10 +89,10 @@ int fmt_load_dac_jpg(char *name);
 int fmt_load_dac_fnt(char *name);
 int fmt_load_dac_fpg(char *name);
 int fmt_load_dac_pal(char *name);
-void crear_paleta(void);
+void create_palette(void);
 
 extern byte apply_palette[768];
-extern byte *muestra;
+extern byte *sample;
 
 //-----------------------------------------------------------------------------
 //      Minimum handler function of type (????)
@@ -140,7 +166,7 @@ void menu_principal3(void) {
 //      Programs Menu
 //-----------------------------------------------------------------------------
 
-void Print_Program(void);
+void print_program(void);
 
 void menu_programas0(void) {
   create_menu(900);
@@ -175,7 +201,7 @@ void menu_programas2(void) {
         else {
           v_title = (char *)texts[187];
           v_text = input;
-          show_dialog(aceptar0);
+          show_dialog(accept0);
         }
         if (v_accept) {
           program0_new();
@@ -205,7 +231,7 @@ void menu_programas2(void) {
       if ((n = find_program_window())) {
         v_title = (char *)texts[188];
         v_text = (char *)window[n].title;
-        show_dialog(aceptar0);
+        show_dialog(accept0);
         if (v_accept) {
           move(0, n);
           close_window();
@@ -240,7 +266,7 @@ void menu_programas2(void) {
           if (v_exists) {
             v_title = (char *)texts[187];
             v_text = input;
-            show_dialog(aceptar0);
+            show_dialog(accept0);
           } else
             v_accept = 1;
           if (v_accept) {
@@ -317,7 +343,7 @@ void menu_programas2(void) {
         source_len = window[n].prg->file_len;
         v_window = n;
         run_mode = 2;
-        DaniDel("system/exec.ins");
+        delete_file("system/exec.ins");
         div_strcpy(tipo[8].path, sizeof(tipo[8].path), window[n].prg->path);
         compile_program();
         if (error_number != -1) {
@@ -329,7 +355,7 @@ void menu_programas2(void) {
           if (f != NULL) {
             fclose(f);
             crear_instalacion();
-            DaniDel("install.div");
+            delete_file("install.div");
           } else {
             v_text = (char *)texts[238];
             show_dialog(err0);
@@ -341,7 +367,7 @@ void menu_programas2(void) {
     case 11:
       if ((n = find_program_window())) {
         v_window = n;
-        Print_Program();
+        print_program();
       }
       break;
     }
@@ -610,7 +636,7 @@ void menu_paletas2(void) {
       merge_palette();
       break;
     case 6:
-      new_window(paleta0);
+      new_window(palette0);
       break;
     }
   }
@@ -647,7 +673,7 @@ void menu_mapas2(void) {
 
     switch (v.state) {
     case 1: // New map ...
-      show_dialog(nuevo_mapa0);
+      show_dialog(new_map0);
       if (v_finished) {
         mouse_graf = 3;
         flush_copy();
@@ -677,7 +703,7 @@ void menu_mapas2(void) {
       if ((n = find_and_load_map())) {
         v_title = (char *)texts[50];
         v_text = (char *)window[n].title;
-        show_dialog(aceptar0);
+        show_dialog(accept0);
         if (v_accept) {
           move(0, n);
           close_window();
@@ -688,7 +714,7 @@ void menu_mapas2(void) {
     case 4: // Close all maps (maximized)
       v_title = (char *)texts[334];
       v_text = (char *)texts[335];
-      show_dialog(aceptar0);
+      show_dialog(accept0);
       if (v_accept) {
         for (n = 0; n < max_windows; n++)
           if (window[n].type == 100 && window[n].foreground != 2) {
@@ -728,7 +754,7 @@ casi_no_tiene_nombre:
           if (v_exists) {
             v_title = (char *)texts[52];
             v_text = input;
-            show_dialog(aceptar0);
+            show_dialog(accept0);
           } else
             v_accept = 1;
           if (v_accept) {
@@ -742,7 +768,7 @@ casi_no_tiene_nombre:
       break;
 
     case 7: // Rescale the map
-      Reducex2();
+      reduce_half();
       break;
 
     case 8: // Create search map
@@ -779,7 +805,7 @@ casi_no_tiene_nombre:
 //      3D Maps Menu
 //-----------------------------------------------------------------------------
 
-void actualiza_titulo(void) {
+void update_title(void) {
   int w = v.w, h = v.h;
   if (big) {
     w /= 2;
@@ -916,7 +942,7 @@ int find_and_load_map(void) {
   return (n);
 }
 
-// determina_mapa3d removed (MODE8/3D map editor deleted)
+// determina_map_view3d removed (MODE8/3D map editor deleted)
 
 int find_program_window(void) {
   int m, n = 0;
@@ -934,9 +960,9 @@ int find_program_window(void) {
 //      Graphic Menu (FPG Files)
 //-----------------------------------------------------------------------------
 
-void Print_List(void);
-void FPGtoMAP(FPG *MiFPG);
-void MAPtoFPG(struct tmapa *mapa);
+void print_list(void);
+void fpg_to_map(FPG *MiFPG);
+void map_to_fpg(struct tmapa *mapa);
 
 void menu_graficos0(void) {
   create_menu(825);
@@ -977,7 +1003,7 @@ void menu_graficos2(void) {
       if ((n = find_fpg_window())) {
         v_title = (char *)texts[81];
         v_text = (char *)window[n].title;
-        show_dialog(aceptar0);
+        show_dialog(accept0);
         if (v_accept) {
           free(window[n].aux);
           move(0, n);
@@ -1007,7 +1033,7 @@ void menu_graficos2(void) {
             } else {
               v_title = (char *)texts[82];
               v_text = input;
-              show_dialog(aceptar0);
+              show_dialog(accept0);
             }
 
           } else {
@@ -1032,18 +1058,18 @@ void menu_graficos2(void) {
       break;
 
     case 7:
-      Print_List();
+      print_list();
       break;
 
     case 8:
       if ((n = find_fpg_window())) {
-        FPGtoMAP((FPG *)(window[n].aux));
+        fpg_to_map((FPG *)(window[n].aux));
       }
       break;
 
     case 9:
       if ((n = find_map_window())) {
-        MAPtoFPG(window[n].mapa);
+        map_to_fpg(window[n].mapa);
       }
       break;
     }
@@ -1064,9 +1090,9 @@ void menu_fuentes1(void) {
   paint_menu(850);
 }
 
-extern char *FntAux;
-void GetText0(void);
-void CreateText(void);
+extern char *font_aux;
+void get_text0(void);
+void create_text(void);
 void generate_fontmap(void);
 
 void menu_fuentes2(void) {
@@ -1103,16 +1129,16 @@ void menu_fuentes2(void) {
 
     case 4:
       if ((n = find_font_window())) {
-        FntAux = (char *)(window[n].aux + RES_FOR_NAME);
-        show_dialog(GetText0);
+        font_aux = (char *)(window[n].aux + RES_FOR_NAME);
+        show_dialog(get_text0);
         if (v_accept)
-          CreateText();
+          create_text();
       }
       break;
 
     case 5:
       if ((n = find_font_window())) {
-        FntAux = (char *)(window[n].aux + RES_FOR_NAME);
+        font_aux = (char *)(window[n].aux + RES_FOR_NAME);
         generate_fontmap();
       }
       break;
@@ -1129,8 +1155,8 @@ void menu_fuentes2(void) {
 //      Functions for generate_fontmap() / print_fontmap()
 //-----------------------------------------------------------------------------
 
-#define mapa(x, y) (*(map + (y) * map_width + (x)))
-void ShowFont0(void);
+#define MAP_PIXEL(x, y) (*(map + (y) * map_width + (x)))
+void show_font0(void);
 
 extern char Load_FontPathName[256];
 extern char Load_FontName[14];
@@ -1158,7 +1184,7 @@ void print_fontmap(void) {
   if (v_exists) {
     v_title = (char *)texts[75];
     v_text = (char *)texts[76];
-    show_dialog(aceptar0);
+    show_dialog(accept0);
     if (!v_accept)
       return;
   }
@@ -1189,13 +1215,13 @@ void print_fontmap(void) {
 
   for (x = 1; x < map_width - 1; x++) {
     for (y = 1; y < map_height - 1; y++) {
-      if (mapa(x - 1, y - 1) == color && mapa(x - 1, y) == color && mapa(x, y - 1) == color &&
-          mapa(x, y) != color) {
+      if (MAP_PIXEL(x - 1, y - 1) == color && MAP_PIXEL(x - 1, y) == color && MAP_PIXEL(x, y - 1) == color &&
+          MAP_PIXEL(x, y) != color) {
         x0 = x;
         y0 = y;
       }
-      if (mapa(x, y) != color && mapa(x + 1, y + 1) == color && mapa(x + 1, y) == color &&
-          mapa(x, y + 1) == color) {
+      if (MAP_PIXEL(x, y) != color && MAP_PIXEL(x + 1, y + 1) == color && MAP_PIXEL(x + 1, y) == color &&
+          MAP_PIXEL(x, y + 1) == color) {
         if (x == x0 && y == y0) {
           *p++ = 0;
           *p++ = 0;
@@ -1208,7 +1234,7 @@ void print_fontmap(void) {
           *p++ = di - buffer;
           for (; y0 <= y; y0++)
             for (_x0 = x0; _x0 <= x; _x0++)
-              *di++ = mapa(_x0, y0);
+              *di++ = MAP_PIXEL(_x0, y0);
         }
         if (chars++ == 256)
           goto end_bucle;
@@ -1275,13 +1301,13 @@ end_bucle:
 
   div_strcpy(Load_FontName, sizeof(Load_FontName), FontName);
   div_strcpy(Load_FontPathName, sizeof(Load_FontPathName), FontPathName);
-  new_window(ShowFont0);
+  new_window(show_font0);
 }
 
 //-----------------------------------------------------------------------------
 
 void generate_fontmap(void) {
-  int *p = (int *)(FntAux + 1356), n, x;
+  int *p = (int *)(font_aux + 1356), n, x;
   char col[256], *ptr, *FntEnd = NULL;
   int dist, mincolor, mindist, r, g, b;
 
@@ -1295,7 +1321,7 @@ void generate_fontmap(void) {
       map_width += *(p + n * 4) + 1;
       if (map_height < 2 + *(p + n * 4 + 1) + *(p + n * 4 + 2))
         map_height = 2 + *(p + n * 4 + 1) + *(p + n * 4 + 2);
-      FntEnd = FntAux + *(p + n * 4 + 3) + *(p + n * 4) * *(p + n * 4 + 1);
+      FntEnd = font_aux + *(p + n * 4 + 3) + *(p + n * 4) * *(p + n * 4 + 1);
     }
   }
 
@@ -1363,13 +1389,13 @@ void generate_fontmap(void) {
     memset(v_map->map, mincolor, map_width * map_height);
     for (x = 1, n = 0; n < 256; n++) {
       generate_character(v_map->map + map_width + x, *(p + n * 4), *(p + n * 4 + 1),
-                         *(p + n * 4 + 2), FntAux + *(p + n * 4 + 3));
+                         *(p + n * 4 + 2), font_aux + *(p + n * 4 + 3));
       if (*(p + n * 4) == 0 || *(p + n * 4 + 1) == 0)
         x += 2;
       else
         x += *(p + n * 4) + 1;
     }
-    new_window(mapa0);
+    new_window(map_view0);
   }
 }
 
@@ -1394,9 +1420,9 @@ void generate_character(byte *di, int w, int h, int inc, char *si) {
 //      Sound Menu
 //-----------------------------------------------------------------------------
 
-void OpenSound(void);
-void OpenSong(void);
-void OpenSoundFile(void);
+void open_sound(void);
+void open_song(void);
+void open_sound_file(void);
 
 void menu_sonidos0(void) {
   create_menu(925);
@@ -1409,8 +1435,8 @@ void menu_sonidos1(void) {
 }
 
 void mixer0(void);
-void RecSound0(void);
-void editar_sonido(void);
+void rec_sound0(void);
+void edit_sound(void);
 
 void menu_sonidos2(void) {
   pcminfo *mypcminfo;
@@ -1444,18 +1470,18 @@ void menu_sonidos2(void) {
         return;
       }
 
-      show_dialog(RecSound0);
+      show_dialog(rec_sound0);
       break;
 
     case 2:
-      OpenSound();
+      open_sound();
       break;
 
     case 3:
       if ((n = find_pcm_window())) {
         v_title = (char *)texts[338];
         v_text = (char *)window[n].title;
-        show_dialog(aceptar0);
+        show_dialog(accept0);
         if (v_accept) {
           move(0, n);
           close_window();
@@ -1473,7 +1499,7 @@ void menu_sonidos2(void) {
         mypcminfo = (pcminfo *)window[n].aux;
         div_strcpy(full, sizeof(full), mypcminfo->pathname);
         div_strcpy(input, sizeof(input), mypcminfo->name);
-        SaveSound(mypcminfo, full);
+        save_sound(mypcminfo, full);
         wup(n);
         repaint_window();
         wdown(n);
@@ -1492,7 +1518,7 @@ no_tiene_nombre_sonido:
           if (v_exists) {
             v_title = (char *)texts[340];
             v_text = input;
-            show_dialog(aceptar0);
+            show_dialog(accept0);
           } else
             v_accept = 1;
           if (v_accept) {
@@ -1506,12 +1532,12 @@ no_tiene_nombre_sonido:
             div_strcat(full, sizeof(full), input);
 
             if (strchr(input, ' ') == NULL) {
-              SaveSound(mypcminfo, full);
+              save_sound(mypcminfo, full);
               div_strcpy(mypcminfo->pathname, sizeof(mypcminfo->pathname), full);
               div_strcpy(mypcminfo->name, sizeof(mypcminfo->name), input);
               move(0, n);
               close_window();
-              OpenSoundFile();
+              open_sound_file();
             } else {
               v_text = (char *)texts[47];
               show_dialog(err0);
@@ -1557,14 +1583,14 @@ no_tiene_nombre_sonido:
         return;
       }
 
-      OpenSong();
+      open_song();
       break;
 
     case 9:
       if ((n = find_mod_window())) {
         v_title = (char *)texts[513];
         v_text = (char *)window[n].title;
-        show_dialog(aceptar0);
+        show_dialog(accept0);
         if (v_accept) {
           move(0, n);
           close_window();
@@ -1580,7 +1606,7 @@ no_tiene_nombre_sonido:
 //      System Menu
 //-----------------------------------------------------------------------------
 
-void MemInfo0(void);
+void mem_info0(void);
 
 void menu_sistema0(void) {
   create_menu(875);
@@ -1592,10 +1618,10 @@ void menu_sistema1(void) {
   paint_menu(875);
 }
 
-void Cfg_Setup0(void);
-void Cfg_Setup_end(void);
+void config_setup0(void);
+void config_setup_end(void);
 void shell(void);
-void calculadora(void);
+void calculator(void);
 
 void menu_sistema2(void) {
   update_menu(875, 1, 0);
@@ -1605,10 +1631,10 @@ void menu_sistema2(void) {
       show_clock();
       break;
     case 2:
-      muestra_papelera();
+      show_trash();
       break;
     case 3:
-      calculadora();
+      calculator();
       break;
     case 4:
       show_dialog(Vid_Setup0);
@@ -1617,11 +1643,11 @@ void menu_sistema2(void) {
       show_dialog(Tap_Setup0);
       break;
     case 6:
-      show_dialog(Cfg_Setup0);
-      Cfg_Setup_end();
+      show_dialog(config_setup0);
+      config_setup_end();
       break;
     case 7:
-      show_dialog(MemInfo0);
+      show_dialog(mem_info0);
       break;
     case 8:
       show_dialog(about0);
@@ -1629,7 +1655,7 @@ void menu_sistema2(void) {
     case 9:
       v_title = (char *)texts[40];
       v_text = NULL;
-      show_dialog(aceptar0);
+      show_dialog(accept0);
       if (v_accept) {
         exit_requested = 1;
       }
@@ -1819,7 +1845,7 @@ void update_menu(int menu, int min, int max) {
 
 void blit_mouse(void);
 
-void mapa0(void) {
+void map_view0(void) {
   int x, y;
   int max;
 
@@ -1875,56 +1901,56 @@ void mapa0(void) {
   v.mapa->zoom_x = x;
   v.mapa->zoom_y = y;
 
-  v.paint_handler = mapa1;
-  v.click_handler = mapa2;
-  v.close_handler = mapa3;
+  v.paint_handler = map_view1;
+  v.click_handler = map_view2;
+  v.close_handler = map_view3;
 }
 
-void mapa1(void) {
+void map_view1(void) {
   byte *si, *di;
   int w, h;
-  int x, y, x2, y2, ansi, andi;
-  int maxan, maxal;
+  int x, y, x2, y2, src_stride, dst_stride;
+  int max_w, max_h;
 
-  andi = v.w;
-  di = v.ptr + andi * 10 * big2 + 2 * big2;
+  dst_stride = v.w;
+  di = v.ptr + dst_stride * 10 * big2 + 2 * big2;
 
   if (v.mapa->map_width < 48 * big2)
     di += (24 * big2 - v.mapa->map_width / 2) / 2;
   if (v.mapa->map_height < 16 * big2)
-    di += ((8 * big2 - v.mapa->map_height / 2) / 2) * andi;
+    di += ((8 * big2 - v.mapa->map_height / 2) / 2) * dst_stride;
 
-  ansi = v.mapa->map_width;
+  src_stride = v.mapa->map_width;
   si = v.mapa->map;
 
-  maxan = v.w - 4 * big2;
-  maxal = v.h - 12 * big2;
+  max_w = v.w - 4 * big2;
+  max_h = v.h - 12 * big2;
 
-  if ((w = v.mapa->map_width / 2) > maxan) {
-    w = maxan;
-    x = (v.mapa->zoom_cx - maxan);
+  if ((w = v.mapa->map_width / 2) > max_w) {
+    w = max_w;
+    x = (v.mapa->zoom_cx - max_w);
     if (x < 0)
       x = 0;
-    else if (x + maxan * 2 > v.mapa->map_width)
-      x = v.mapa->map_width - maxan * 2;
+    else if (x + max_w * 2 > v.mapa->map_width)
+      x = v.mapa->map_width - max_w * 2;
     si += x;
   }
 
-  if ((h = v.mapa->map_height / 2) > maxal) {
-    h = maxal;
-    y = (v.mapa->zoom_cy - maxal);
+  if ((h = v.mapa->map_height / 2) > max_h) {
+    h = max_h;
+    y = (v.mapa->zoom_cy - max_h);
     if (y < 0)
       y = 0;
-    else if (y + maxal * 2 > v.mapa->map_height)
-      y = v.mapa->map_height - maxal * 2;
-    si += y * ansi;
+    else if (y + max_h * 2 > v.mapa->map_height)
+      y = v.mapa->map_height - max_h * 2;
+    si += y * src_stride;
   }
 
   if (w && h)
     for (y = 0, y2 = 0; y < h; y++, y2 += 2)
       for (x = 0, x2 = 0; x < w; x++, x2 += 2)
-        *(di + andi * y + x) = *(ghost + *(ghost + *(word *)(si + ansi * y2 + x2)) * 256 +
-                                 *(ghost + *(word *)(si + ansi * (y2 + 1) + x2)));
+        *(di + dst_stride * y + x) = *(ghost + *(ghost + *(word *)(si + src_stride * y2 + x2)) * 256 +
+                                 *(ghost + *(word *)(si + src_stride * (y2 + 1) + x2)));
   else {
     if (!w) {
       w++;
@@ -1934,7 +1960,7 @@ void mapa1(void) {
     }
     for (y = 0, y2 = 0; y < h; y++, y2 += 2)
       for (x = 0, x2 = 0; x < w; x++, x2 += 2)
-        *(di + andi * y + x) = *(si + ansi * y2 + x2);
+        *(di + dst_stride * y + x) = *(si + src_stride * y2 + x2);
   }
 }
 
@@ -1966,11 +1992,11 @@ extern int back;
 #define BRUSH 4
 #define MAPBR 8
 
-extern int TipoTex;
-extern int TipoBrowser;
+extern int texture_type;
+extern int browser_type;
 extern byte brush_fpg_path[256];
-extern struct t_listboxbr ltexturasbr;
-extern struct t_listboxbr lthumbmapbr;
+extern struct t_listboxbr texture_list_br;
+extern struct t_listboxbr thumbmap_list_br;
 
 extern struct _thumb_tex {
   int w, h;         // Width and height of the thumbnail
@@ -2000,7 +2026,7 @@ extern byte *texture_color;
 
 FILE *FilePaintFPG;
 
-void mapa2(void) {
+void map_view2(void) {
   int old_draw_mode = 0, n, _undo_index;
   int w = v.w, h = v.h;
   int sp_w, sp_h, ew;
@@ -2119,19 +2145,19 @@ void mapa2(void) {
 
     texture_color = NULL;
 
-    TipoTex = 0;
+    texture_type = 0;
     if ((FilePaintFPG = fopen(full, "rb")) != NULL) // NOTE !!! Could provide message here
     {
       div_strcpy((char *)brush_fpg_path, sizeof(brush_fpg_path), full);
       draw_mode -= 100;
-      M3D_create_thumbs(&ltexturasbr, 0);
+      M3D_create_thumbs(&texture_list_br, 0);
       draw_mode += 100;
-      TipoTex |= BRUSH; // Thumbnail type BRUSH
+      texture_type |= BRUSH; // Thumbnail type BRUSH
     }
 
     v.type = 100;
-    if (create_mapbr_thumbs(&lthumbmapbr)) {
-      TipoTex |= MAPBR; // Thumbnail type MAPBR
+    if (create_mapbr_thumbs(&thumbmap_list_br)) {
+      texture_type |= MAPBR; // Thumbnail type MAPBR
     }
     v.type = 0;
 
@@ -2210,11 +2236,11 @@ void mapa2(void) {
     selection_mask = NULL;
 
     exploding_windows = ew;
-    if (TipoTex & BRUSH)
+    if (texture_type & BRUSH)
       fclose(FilePaintFPG);
     FreePaintThumbs();
-    TipoTex = 0;
-    TipoBrowser = 0;
+    texture_type = 0;
+    browser_type = 0;
 
     if (draw_mode < 90)
       draw_mode += 100;
@@ -2252,7 +2278,7 @@ void mapa2(void) {
       wwrite(v.ptr, w, h, 2 + (w - 20) / 2, 2, 1, v.title, c4);
     }
 
-    mapa1();
+    map_view1();
     update_box(0, 0, vga_width, vga_height);
     if (undo_index != _undo_index)
       v.mapa->saved = 0;
@@ -2260,12 +2286,12 @@ void mapa2(void) {
     n = 0;
     while (n < num_windows_to_create) {
       v_map = windows_to_create[n++];
-      new_window(mapa0);
+      new_window(map_view0);
     }
   }
 }
 
-void mapa3(void) {
+void map_view3(void) {
   free(v.mapa->map);
   free(v.mapa);
 }
@@ -2274,18 +2300,18 @@ void mapa3(void) {
 //      Palette window
 ///////////////////////////////////////////////////////////////////////////////
 
-#define pixelxcolor 4
+#define PIXELS_PER_COLOR 4
 
-void paleta0(void) {
+void palette0(void) {
   v.type = 3; // Palette
-  v.w = 16 * pixelxcolor + 3;
-  v.h = 16 * pixelxcolor + 11;
+  v.w = 16 * PIXELS_PER_COLOR + 3;
+  v.h = 16 * PIXELS_PER_COLOR + 11;
   v.title = texts[51];
   v.name = texts[51];
-  v.paint_handler = paleta1;
+  v.paint_handler = palette1;
 }
 
-void paleta1(void) {
+void palette1(void) {
   int x, y;
   int w = v.w, h = v.h;
   if (big) {
@@ -2294,8 +2320,8 @@ void paleta1(void) {
   }
   for (y = 0; y < 16; y++)
     for (x = 0; x < 16; x++)
-      wbox(v.ptr, w, h, x + y * 16, 2 + x * pixelxcolor, 10 + y * pixelxcolor, pixelxcolor - 1,
-           pixelxcolor - 1);
+      wbox(v.ptr, w, h, x + y * 16, 2 + x * PIXELS_PER_COLOR, 10 + y * PIXELS_PER_COLOR, PIXELS_PER_COLOR - 1,
+           PIXELS_PER_COLOR - 1);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2305,7 +2331,7 @@ void paleta1(void) {
 char user1[128] = "";
 char user2[128] = "";
 
-void usuario1(void) {
+void user_info1(void) {
   int w = v.w / big2, h = v.h / big2;
 
   _show_items();
@@ -2317,7 +2343,7 @@ void usuario1(void) {
   wwrite(v.ptr, w, h, 90, 12 + 38 + 11, 0, texts[484], c4);
 }
 
-void usuario2(void) {
+void user_info2(void) {
   _process_items();
   if (v.active_item == 0) {
     if (strlen(user1) && strlen(user2)) {
@@ -2333,7 +2359,7 @@ void usuario2(void) {
   }
 }
 
-void usuario3(void) {
+void user_info3(void) {
   FILE *f;
 
   if (strlen(user1) || strlen(user2)) {
@@ -2345,15 +2371,15 @@ void usuario3(void) {
   }
 }
 
-void usuario0(void) {
+void user_info0(void) {
   v.type = 1;
   v.title = texts[485];
   v.w = 160 + 86;
   v.h = 10 + 47 + 31;
 
-  v.paint_handler = usuario1;
-  v.click_handler = usuario2;
-  v.close_handler = usuario3;
+  v.paint_handler = user_info1;
+  v.click_handler = user_info2;
+  v.close_handler = user_info3;
 
   _button(100, v.w - 8, v.h - 14, 2);
 
@@ -2365,7 +2391,7 @@ void usuario0(void) {
 //      Copyright Dialog Box
 ///////////////////////////////////////////////////////////////////////////////
 
-extern int nueva_sesion;
+extern int new_session;
 
 void copyright0(void) {
   v.type = 1;
@@ -2418,7 +2444,7 @@ void copyright2(void) {
   if (v.active_item == 0)
     end_dialog = 1;
   if (v.active_item == 1) {
-    nueva_sesion = 1;
+    new_session = 1;
     end_dialog = 1;
   }
 }
@@ -2539,7 +2565,7 @@ void test0(void) {
 //      OK / Cancel Dialog with or without title text
 //-----------------------------------------------------------------------------
 
-void aceptar0(void) {
+void accept0(void) {
   v.type = 1;
   v.w = text_len(texts[100]) + text_len(texts[101]) + 24;
   if (v_title != NULL) {
@@ -2553,21 +2579,21 @@ void aceptar0(void) {
       v.w = text_len((byte *)v_text) + 6;
   } else
     v.h = 29;
-  v.paint_handler = aceptar1;
-  v.click_handler = aceptar2;
+  v.paint_handler = accept1;
+  v.click_handler = accept2;
   _button(100, 7, v.h - 14, 0);
   _button(101, v.w - 8, v.h - 14, 2);
   v_accept = 0;
 }
 
-void aceptar1(void) {
+void accept1(void) {
   int w = v.w / big2, h = v.h / big2;
   _show_items();
   if (v_text != NULL)
     wwrite(v.ptr, w, h, w / 2, 12, 1, (byte *)v_text, c3);
 }
 
-void aceptar2(void) {
+void accept2(void) {
   _process_items();
   switch (v.active_item) {
   case 0:
@@ -2584,32 +2610,32 @@ void aceptar2(void) {
 //      Dialog box for handling palette when opening with v_title and/or v_text
 //-----------------------------------------------------------------------------
 
-void TratarPaleta1(void);
-void TratarPaleta2(void);
-void TratarPaleta3(void);
-int OpcPal[3];
-byte paltratar[768];
+void palette_action1(void);
+void palette_action2(void);
+void palette_action3(void);
+int palette_option[3];
+byte work_palette[768];
 
-void TratarPaleta0(void) {
+void palette_action0(void) {
   v.type = 1;
   v.w = 160;
   v.h = 59 + 77;
 
   v.title = (byte *)(v_title = (char *)texts[568]);
 
-  v.paint_handler = TratarPaleta1;
-  v.click_handler = TratarPaleta2;
-  v.close_handler = TratarPaleta3;
+  v.paint_handler = palette_action1;
+  v.click_handler = palette_action2;
+  v.close_handler = palette_action3;
 
-  OpcPal[0] = 1;
-  OpcPal[1] = 0;
-  OpcPal[2] = 0;
+  palette_option[0] = 1;
+  palette_option[1] = 0;
+  palette_option[2] = 0;
 
   _button(100, 7, v.h - 14, 0);
   _button(101, v.w - 8, v.h - 14, 2);
-  _flag(569, 4, 12 + 77, &OpcPal[0]);
-  _flag(570, 4, 22 + 77, &OpcPal[1]);
-  _flag(571, 4, 32 + 77, &OpcPal[2]);
+  _flag(569, 4, 12 + 77, &palette_option[0]);
+  _flag(570, 4, 22 + 77, &palette_option[1]);
+  _flag(571, 4, 32 + 77, &palette_option[2]);
 
   v_accept = 0;
 }
@@ -2617,7 +2643,7 @@ void TratarPaleta0(void) {
 byte fast_find_color(byte fr, byte fg, byte fb);
 byte find_color(byte r, byte g, byte b);
 
-void TratarPaleta1(void) {
+void palette_action1(void) {
   int w = v.w / big2, h = v.h / big2;
   int xx = 91, x, y;
   byte c;
@@ -2631,14 +2657,14 @@ void TratarPaleta1(void) {
   wbox(v.ptr, w, h, c1, 5, 13, 63, 9);
   wbox(v.ptr, w, h, c1, xx + 1, 13, 63, 9);
 
-  if (OpcPal[1]) {
+  if (palette_option[1]) {
     wrectangle(v.ptr, w, h, c0, 4, 12, w - 8, 11);
     wbox(v.ptr, w, h, c12, 5, 13, w - 10, 9);
     wwrite(v.ptr, w, h, w / 2 + 1, 14, 1, (byte *)"+", c0);
     wwrite(v.ptr, w, h, w / 2, 14, 1, (byte *)"+", c4);
   }
 
-  if (OpcPal[0] || OpcPal[1]) {
+  if (palette_option[0] || palette_option[1]) {
     wbox(v.ptr, w, h, c12, 5, 13, 63, 9);
     wwrite(v.ptr, w, h, 4 + 33, 14, 1, texts[576], c0);
     c = c4;
@@ -2646,7 +2672,7 @@ void TratarPaleta1(void) {
     c = c3;
   wwrite(v.ptr, w, h, 4 + 32, 14, 1, texts[576], c);
 
-  if (OpcPal[1] || OpcPal[2]) {
+  if (palette_option[1] || palette_option[2]) {
     wbox(v.ptr, w, h, c12, xx + 1, 13, 63, 9);
     wwrite(v.ptr, w, h, xx + 33, 14, 1, texts[577], c0);
     c = c4;
@@ -2660,8 +2686,8 @@ void TratarPaleta1(void) {
   for (y = 0; y < 16; y++) {
     for (x = 0; x < 16; x++) {
       wbox(v.ptr, w, h, x + y * 16, 5 + x * 4, 23 + y * 4, 3, 3);
-      c = fast_find_color(paltratar[(x + y * 16) * 3 + 0], paltratar[(x + y * 16) * 3 + 1],
-                          paltratar[(x + y * 16) * 3 + 2]);
+      c = fast_find_color(work_palette[(x + y * 16) * 3 + 0], work_palette[(x + y * 16) * 3 + 1],
+                          work_palette[(x + y * 16) * 3 + 2]);
       wbox(v.ptr, w, h, c, xx + 1 + x * 4, 23 + y * 4, 3, 3);
     }
   }
@@ -2669,7 +2695,7 @@ void TratarPaleta1(void) {
   memcpy(dac4, d4, 768);
 }
 
-void TratarPaleta2(void) {
+void palette_action2(void) {
   int need_refresh = 0;
 
   _process_items();
@@ -2690,21 +2716,21 @@ void TratarPaleta2(void) {
     end_dialog = 1;
     break;
   case 2:
-    OpcPal[0] = 1;
-    OpcPal[1] = 0;
-    OpcPal[2] = 0;
+    palette_option[0] = 1;
+    palette_option[1] = 0;
+    palette_option[2] = 0;
     need_refresh = 1;
     break;
   case 3:
-    OpcPal[0] = 0;
-    OpcPal[1] = 1;
-    OpcPal[2] = 0;
+    palette_option[0] = 0;
+    palette_option[1] = 1;
+    palette_option[2] = 0;
     need_refresh = 1;
     break;
   case 4:
-    OpcPal[0] = 0;
-    OpcPal[1] = 0;
-    OpcPal[2] = 1;
+    palette_option[0] = 0;
+    palette_option[1] = 0;
+    palette_option[2] = 1;
     need_refresh = 1;
     break;
   }
@@ -2714,10 +2740,10 @@ void TratarPaleta2(void) {
     v.redraw = 1;
   }
 }
-void TratarPaleta3(void) {
-  if (v_accept && OpcPal[1])
+void palette_action3(void) {
+  if (v_accept && palette_option[1])
     v_accept = 2;
-  if (v_accept && OpcPal[2])
+  if (v_accept && palette_option[2])
     v_accept = 3;
 }
 
@@ -2725,21 +2751,21 @@ void TratarPaleta3(void) {
 //      Lists for the file open window
 //-----------------------------------------------------------------------------
 
-char archivo[max_archivos * w_archivo];
-struct t_listbox larchivos = {3, 49, archivo, w_archivo, 12, 64};
+char files_buf[max_archivos * w_archivo];
+struct t_listbox file_list = {3, 49, files_buf, w_archivo, 12, 64};
 
-char directorio[max_directorios * w_directorio];
-struct t_listbox ldirectorios = {80, 49, directorio, w_directorio, 10, 64};
+char dirs_buf[max_directorios * w_directorio];
+struct t_listbox dir_list = {80, 49, dirs_buf, w_directorio, 10, 64};
 
-#define max_unidades 26
-#define w_unidad    (4 + 1)
-char unidad[max_unidades * w_unidad];
-struct t_listbox lunidades = {157, 49, unidad, w_unidad, 4, 28};
+#define MAX_DRIVES 26
+#define DRIVE_WIDTH    (4 + 1)
+char drives_buf[MAX_DRIVES * DRIVE_WIDTH];
+struct t_listbox drive_list = {157, 49, drives_buf, DRIVE_WIDTH, 4, 28};
 
-#define max_ext 26
-#define w_ext  (5 + 1)
-char ext[max_ext * w_ext];
-struct t_listbox lext = {157, 97, ext, w_ext, 4, 28};
+#define MAX_EXTENSIONS 26
+#define EXT_WIDTH  (5 + 1)
+char ext[MAX_EXTENSIONS * EXT_WIDTH];
+struct t_listbox ext_list = {157, 97, ext, EXT_WIDTH, 4, 28};
 
 ///////////////////////////////////////////////////////////////////////////////
 //      Draw listbox and slider elements
@@ -2830,7 +2856,7 @@ void create_listbox(struct t_listbox *l) {
     l->buttons = 0;
     l->created = 1;
     l->zone = 0;
-    if (l == &larchivos) {
+    if (l == &file_list) {
       l->first_visible = tipo[v_type].first_visible;
       if ((l->first_visible + l->visible_items) > l->total_items) {
         l->first_visible = 0;
@@ -2988,8 +3014,8 @@ void update_listbox(struct t_listbox *l) {
 void create_listbox_br(struct t_listboxbr *l);
 void print_path_br(void);
 void open_dir_br(void);
-extern struct t_listboxbr larchivosbr;
-extern struct t_listbox ldirectoriosbr;
+extern struct t_listboxbr file_list_br;
+extern struct t_listbox dir_list_br;
 extern t_thumb thumb[max_archivos];
 extern int num_taggeds;
 
@@ -3111,12 +3137,12 @@ void analyze_input(void) {
         getcwd(tipo[v_type].path, PATH_MAX + 1);
         print_path_br();
 
-        larchivos.created = 0;
-        ldirectorios.created = 0;
+        file_list.created = 0;
+        dir_list.created = 0;
         tipo[v_type].first_visible = 0;
         open_dir_br();
-        create_listbox(&larchivos);
-        create_listbox(&ldirectorios);
+        create_listbox(&file_list);
+        create_listbox(&dir_list);
       } else
         _dos_setdrive(tipo[v_type].path[0] - 'A' + 1, &n);
     }
@@ -3131,56 +3157,56 @@ void analyze_input(void) {
 //      New map dialog
 //-----------------------------------------------------------------------------
 
-#define y_nm 67
-char mapsizes[9 * 9] =
+#define DIALOG_Y_OFFSET 67
+char map_sizes[9 * 9] =
     "320x200\0 320x240\0 360x240\0 360x360\0 376x282\0 640x400\0 640x480\0 800x600\0 1024x768";
-struct t_listbox lmapsizes = {64, 19, mapsizes, 9, 5, 50};
-char mancho[8], malto[8];
+struct t_listbox map_sizes_list = {64, 19, map_sizes, 9, 5, 50};
+char width_str[8], height_str[8];
 
-void nuevo_mapa0(void) {
+void new_map0(void) {
   v.type = 1;
   v.title = texts[132];
   v.w = 126;
-  v.h = 14 + y_nm;
-  v.paint_handler = nuevo_mapa1;
-  v.click_handler = nuevo_mapa2;
-  lmapsizes.created = 0;
-  lmapsizes.total_items = 9;
+  v.h = 14 + DIALOG_Y_OFFSET;
+  v.paint_handler = new_map1;
+  v.click_handler = new_map2;
+  map_sizes_list.created = 0;
+  map_sizes_list.total_items = 9;
   map_width = vga_width;
   map_height = vga_height;
-  itoa(map_width, mancho, 10);
-  itoa(map_height, malto, 10);
-  _get(133, 4, 12, v.w - 72, (byte *)mancho, 8, 1, 32767);
-  _get(134, 4, 34, v.w - 72, (byte *)malto, 8, 1, 32767);
-  _button(100, 7, y_nm, 0);
-  _button(101, v.w - 8, y_nm, 2);
+  itoa(map_width, width_str, 10);
+  itoa(map_height, height_str, 10);
+  _get(133, 4, 12, v.w - 72, (byte *)width_str, 8, 1, 32767);
+  _get(134, 4, 34, v.w - 72, (byte *)height_str, 8, 1, 32767);
+  _button(100, 7, DIALOG_Y_OFFSET, 0);
+  _button(101, v.w - 8, DIALOG_Y_OFFSET, 2);
   v_finished = 0;
 }
 
-void nuevo_mapa1(void) {
+void new_map1(void) {
   int w = v.w / big2, h = v.h / big2;
   _show_items();
   wwrite(v.ptr, w, h, 64, 12, 0, texts[135], c3);
-  create_listbox(&lmapsizes);
+  create_listbox(&map_sizes_list);
 }
 
-void nuevo_mapa2(void) {
+void new_map2(void) {
   int n;
 
   _process_items();
-  update_listbox(&lmapsizes);
+  update_listbox(&map_sizes_list);
 
   if ((mouse_b & 1) && !(prev_mouse_buttons & 1)) {
-    if (lmapsizes.zone >= 10) {
-      n = lmapsizes.zone - 10 + lmapsizes.first_visible;
-      *strchr(&mapsizes[n * 9], 'x') = 0;
-      map_width = atoi(&mapsizes[n * 9]);
-      map_height = atoi(&mapsizes[n * 9 + strlen(&mapsizes[n * 9]) + 1]);
-      mapsizes[n * 9 + strlen(&mapsizes[n * 9])] = 'x';
-      itoa(map_width, mancho, 10);
-      itoa(map_height, malto, 10);
+    if (map_sizes_list.zone >= 10) {
+      n = map_sizes_list.zone - 10 + map_sizes_list.first_visible;
+      *strchr(&map_sizes[n * 9], 'x') = 0;
+      map_width = atoi(&map_sizes[n * 9]);
+      map_height = atoi(&map_sizes[n * 9 + strlen(&map_sizes[n * 9]) + 1]);
+      map_sizes[n * 9 + strlen(&map_sizes[n * 9])] = 'x';
+      itoa(map_width, width_str, 10);
+      itoa(map_height, height_str, 10);
       call((voidReturnType)v.paint_handler);
-      update_listbox(&lmapsizes);
+      update_listbox(&map_sizes_list);
       _select_new_item(2);
       v.redraw = 1;
     }
@@ -3189,10 +3215,10 @@ void nuevo_mapa2(void) {
   switch (v.active_item) {
   case 2:
     end_dialog = 1;
-    if (atoi(mancho) > 0 && atoi(mancho) < 32768)
-      map_width = atol(mancho);
-    if (atoi(malto) > 0 && atoi(malto) < 32768)
-      map_height = atol(malto);
+    if (atoi(width_str) > 0 && atoi(width_str) < 32768)
+      map_width = atol(width_str);
+    if (atoi(height_str) > 0 && atoi(height_str) < 32768)
+      map_height = atol(height_str);
     v_finished = 1;
     break;
   case 3:
@@ -3205,20 +3231,20 @@ void nuevo_mapa2(void) {
 //      Create a new map (return 1 on error)
 ///////////////////////////////////////////////////////////////////////////////
 
-int new_map(byte *mapilla) {
+int new_map(byte *pre_buffer) {
   int n;
 
   // 1. Allocate memory for the tmapa struct
   if ((v_map = (struct tmapa *)malloc(sizeof(struct tmapa))) != NULL) {
     // 2. Allocate memory for the map
 
-    if (mapilla != NULL)
-      v_map->map = mapilla;
+    if (pre_buffer != NULL)
+      v_map->map = pre_buffer;
     else
       v_map->map = (byte *)malloc(map_width * map_height);
 
     if (v_map->map != NULL) {
-      if (mapilla == NULL) {
+      if (pre_buffer == NULL) {
         // 2b. Clear the map to zero
         memset(v_map->map, 0, map_width * map_height);
       }
@@ -3235,7 +3261,7 @@ int new_map(byte *mapilla) {
       for (n = 0; n < 512; n++)
         v_map->points[n] = -1;
       if (MustCreate)
-        new_window(mapa0);
+        new_window(map_view0);
 
       return (0);
 
@@ -3257,8 +3283,8 @@ int new_map(byte *mapilla) {
 //     Open a map disc content
 //-----------------------------------------------------------------------------
 
-int hay_mapas(void);
-extern int cargar_paleta;
+int has_maps(void);
+extern int load_palette;
 
 void open_map(void) {
   FILE *f;
@@ -3284,28 +3310,28 @@ void open_map(void) {
       v_exists = 1;
     } else
       v_exists = 0;
-    div_strcpy(larchivosbr.list, larchivosbr.item_width, input);
-    larchivosbr.total_items = 1;
+    div_strcpy(file_list_br.list, file_list_br.item_width, input);
+    file_list_br.total_items = 1;
     thumb[0].tagged = 1;
     num_taggeds = 1;
   }
 
   n = 0; // Number of distinct palettes
-  muestra = NULL;
+  sample = NULL;
   memcpy(pal, dac, 768);
   memcpy(palorg, original_palette, 768);
   memset(original_palette, 0, 768);
 
-  for (num = 0; num < larchivosbr.total_items; num++) {
+  for (num = 0; num < file_list_br.total_items; num++) {
     if (thumb[num].tagged) {
       div_try = 0;
-      div_strcpy(input, sizeof(input), larchivosbr.list + larchivosbr.item_width * num);
+      div_strcpy(input, sizeof(input), file_list_br.list + file_list_br.item_width * num);
       div_strcpy(full, sizeof(full), tipo[v_type].path);
       if (full[strlen(full) - 1] != '/')
         div_strcat(full, sizeof(full), "/");
       div_strcat(full, sizeof(full), input);
 
-      cargar_paleta = 1;
+      load_palette = 1;
       div_try |= fmt_load_dac_pcx(full);
       if (!div_try)
         div_try |= fmt_load_dac_bmp(full);
@@ -3313,7 +3339,7 @@ void open_map(void) {
         div_try |= fmt_load_dac_map(full);
       if (!div_try)
         div_try |= fmt_load_dac_jpg(full);
-      cargar_paleta = 0;
+      load_palette = 0;
 
       if (div_try) {
         if (n++ == 0) {
@@ -3325,18 +3351,18 @@ void open_map(void) {
             sum += abs((int)pal[x] - (int)dac4[x]);
           } while (++x < 768);
           if (sum) {
-            if (muestra == NULL) {
-              muestra = (byte *)malloc(32768);
-              if (muestra == NULL)
+            if (sample == NULL) {
+              sample = (byte *)malloc(32768);
+              if (sample == NULL)
                 continue;
-              memset(muestra, 0, 32768);
+              memset(sample, 0, 32768);
               for (x = 0; x < 256; x++) {
-                muestra[((pal[x * 3 + 0] & 0xFE) << 9) | ((pal[x * 3 + 1] & 0xFE) << 4) |
+                sample[((pal[x * 3 + 0] & 0xFE) << 9) | ((pal[x * 3 + 1] & 0xFE) << 4) |
                         (pal[x * 3 + 2] >> 1)] = 1;
               }
             }
             for (x = 0; x < 256; x++) {
-              muestra[((dac4[x * 3 + 0] & 0xFE) << 9) | ((dac4[x * 3 + 1] & 0xFE) << 4) |
+              sample[((dac4[x * 3 + 0] & 0xFE) << 9) | ((dac4[x * 3 + 1] & 0xFE) << 4) |
                       (dac4[x * 3 + 2] >> 1)] = 1;
             }
           }
@@ -3345,9 +3371,9 @@ void open_map(void) {
     }
   }
 
-  if (muestra != NULL) {
-    crear_paleta();
-    free(muestra);
+  if (sample != NULL) {
+    create_palette();
+    free(sample);
     memcpy(pal, apply_palette, 768);
   }
 
@@ -3358,7 +3384,7 @@ void open_map(void) {
   do {
     sum += abs((int)pal[x] - (int)dac[x]);
   } while (++x < 768);
-  memcpy(paltratar, pal, 768);
+  memcpy(work_palette, pal, 768);
 
   if (sum && n == 1) {
     x = 0;
@@ -3366,11 +3392,11 @@ void open_map(void) {
     do {
       sum += abs((int)original_palette[x] - (int)dac[x]);
     } while (++x < 768);
-    memcpy(paltratar, original_palette, 768);
+    memcpy(work_palette, original_palette, 768);
   }
 
   if (sum) {
-    show_dialog(TratarPaleta0); // Load palette?
+    show_dialog(palette_action0); // Load palette?
 
     switch (v_accept) {
     case 0: // Cancel (don't load)
@@ -3380,11 +3406,11 @@ void open_map(void) {
       break;
     case 2: // Merge palettes
       memcpy(dac4, pal, 768);
-      fusionar_paletas();
+      merge_palettes();
       pal_refresh(0, 1);
       break;
     case 3: // Activate the new palette
-      if (muestra == NULL)
+      if (sample == NULL)
         memcpy(pal, original_palette, 768);
       memcpy(dac4, pal, 768);
       pal_refresh(0, 1);
@@ -3394,9 +3420,9 @@ void open_map(void) {
   memcpy(original_palette, palorg, 768);
 
 
-  for (num = 0; num < larchivosbr.total_items; num++) {
+  for (num = 0; num < file_list_br.total_items; num++) {
     if (thumb[num].tagged) {
-      div_strcpy(input, sizeof(input), larchivosbr.list + larchivosbr.item_width * num);
+      div_strcpy(input, sizeof(input), file_list_br.list + file_list_br.item_width * num);
       div_strcpy(full, sizeof(full), tipo[v_type].path);
       if (full[strlen(full) - 1] != '/')
         div_strcat(full, sizeof(full), "/");
@@ -3492,7 +3518,7 @@ void open_map(void) {
                   v_map->map_width = map_width;
                   v_map->map_height = map_height;
 
-                  new_window(mapa0);
+                  new_window(map_view0);
 
                 } else {
                   v_text = (char *)texts[45];
@@ -3526,7 +3552,7 @@ void open_map(void) {
   create_dac4();
 }
 
-// abrir_mapa3d removed (MODE8/3D map editor deleted)
+// abrir_map_view3d removed (MODE8/3D map editor deleted)
 
 //-----------------------------------------------------------------------------
 //      Save a map
@@ -3619,12 +3645,12 @@ void save_map(void) {
 //      Create a new downscaled map by rendering and optionally convert to grayscale
 //      Used to create a hardness map
 //-----------------------------------------------------------------------------
-char cAncho[5];
-char cAlto[5];
-int Gris = 0;
-int Porcentajes = 0;
+char width_input[5];
+char height_input[5];
+int grayscale = 0;
+int percentages = 0;
 
-void Tamnio1() {
+void resize1() {
   int w = v.w / big2, h = v.h / big2, n;
   char cWork[5];
   n = find_and_load_map();
@@ -3640,7 +3666,7 @@ void Tamnio1() {
   wwrite(v.ptr, w, h, 4, 39, 0, (byte *)cWork, c3);
   v_accept = 0;
 }
-void Tamnio2() {
+void resize2() {
   _process_items();
   switch (v.active_item) {
   case 4:
@@ -3653,42 +3679,42 @@ void Tamnio2() {
     break;
   }
 }
-void Tamnio3() {
-  map_width = atoi(cAncho);
-  map_height = atoi(cAlto);
+void resize3() {
+  map_width = atoi(width_input);
+  map_height = atoi(height_input);
 }
 
-void Tamnio0() {
+void resize0() {
   v.type = 1; // Window type 1 = dialog
 
   v.title = texts[63];
   v.w = 126 + 50;
   v.h = 49 + 18;
-  v.paint_handler = Tamnio1;
-  v.click_handler = Tamnio2;
-  v.close_handler = Tamnio3;
+  v.paint_handler = resize1;
+  v.click_handler = resize2;
+  v.close_handler = resize3;
 
-  div_snprintf(cAncho, sizeof(cAncho), "%d", map_width);
-  div_snprintf(cAlto, sizeof(cAlto), "%d", map_height);
+  div_snprintf(width_input, sizeof(width_input), "%d", map_width);
+  div_snprintf(height_input, sizeof(height_input), "%d", map_height);
 
-  _get(133, 42, 11, 30, (byte *)cAncho, 5, 1, 9999);
-  _get(134, 42, 30, 30, (byte *)cAlto, 5, 1, 9999);
-  Porcentajes = 0;
-  Gris = 0;
-  _flag(95, 90, 19, &Porcentajes);
-  _flag(96, 90, 38, &Gris);
+  _get(133, 42, 11, 30, (byte *)width_input, 5, 1, 9999);
+  _get(134, 42, 30, 30, (byte *)height_input, 5, 1, 9999);
+  percentages = 0;
+  grayscale = 0;
+  _flag(95, 90, 19, &percentages);
+  _flag(96, 90, 38, &grayscale);
   _button(100, 7, v.h - 14, 0);
   _button(101, v.w - 8, v.h - 14, 2);
 }
 
-void Reducex2() {
-  char *bufferaux;
-  int n, p1, p2, p3, p4, man, mal, c;
+void reduce_half() {
+  char *temp_buffer;
+  int n, p1, p2, p3, p4, map_w, map_h, c;
   float x, y;
   struct tmapa *MiMap;
   float incx, incy;
   int fx, fy;
-  char Tabla[190];
+  char lut[190];
   int Colors[9], min_dist, i, dist;
   n = find_and_load_map();
   if (!n)
@@ -3698,25 +3724,25 @@ void Reducex2() {
   if ((MiMap->map_width < 2) || (MiMap->map_height < 2))
     return;
 
-  man = MiMap->map_width;
-  mal = MiMap->map_height;
+  map_w = MiMap->map_width;
+  map_h = MiMap->map_height;
 
-  show_dialog(Tamnio0);
+  show_dialog(resize0);
   if (!v_accept)
     return;
 
-  if (Porcentajes) {
-    map_width = (map_width * man) / 100;
-    map_height = (map_height * mal) / 100;
+  if (percentages) {
+    map_width = (map_width * map_w) / 100;
+    map_height = (map_height * map_h) / 100;
   }
 
-  if (map_width > man || map_height > mal) {
-    AplieX(MiMap, man, mal);
+  if (map_width > map_w || map_height > map_h) {
+    apply_resize(MiMap, map_w, map_h);
     return;
   }
 
   // Generate grayscale table
-  if (Gris) {
+  if (grayscale) {
     Colors[0] = c0;
     Colors[2] = c1;
     Colors[4] = c2;
@@ -3737,65 +3763,65 @@ void Reducex2() {
         else
           dist = n - dist;
         if (dist < min_dist) {
-          Tabla[n] = c / 3;
+          lut[n] = c / 3;
           min_dist = dist;
         }
       }
     }
   }
   // End grayscale table
-  incy = (float)mal / (float)map_height;
-  incx = (float)man / (float)map_width;
-  bufferaux = (char *)malloc(map_width * map_height);
+  incy = (float)map_h / (float)map_height;
+  incx = (float)map_w / (float)map_width;
+  temp_buffer = (char *)malloc(map_width * map_height);
 
-  if (bufferaux == NULL) { // Added by Dani ...
+  if (temp_buffer == NULL) { // Added by Dani ...
     v_text = (char *)texts[45];
     show_dialog(err0);
     return;
   }
   y = (float)0;
   for (fy = 0; fy < map_height; fy++) {
-    Progress((char *)texts[92], fy, map_height);
+    show_progress((char *)texts[92], fy, map_height);
     x = (float)0;
     for (fx = 0; fx < map_width; fx++) {
       if (fx == (map_width - 1)) {
-        p1 = MiMap->map[(memptrsize)y * man + (memptrsize)x - 1];
-        p2 = MiMap->map[(memptrsize)y * man + (memptrsize)x];
+        p1 = MiMap->map[(memptrsize)y * map_w + (memptrsize)x - 1];
+        p2 = MiMap->map[(memptrsize)y * map_w + (memptrsize)x];
       } else {
-        p1 = MiMap->map[(memptrsize)y * man + (memptrsize)x];
-        p2 = MiMap->map[(memptrsize)y * man + (memptrsize)x + 1];
+        p1 = MiMap->map[(memptrsize)y * map_w + (memptrsize)x];
+        p2 = MiMap->map[(memptrsize)y * map_w + (memptrsize)x + 1];
       }
 
       p1 = ghost[p1 + p2 * 256];
 
       if (fy == (map_height - 1)) {
-        p3 = MiMap->map[(memptrsize)y * man + (memptrsize)x - man - 1];
-        p4 = MiMap->map[(memptrsize)y * man + (memptrsize)x - man];
+        p3 = MiMap->map[(memptrsize)y * map_w + (memptrsize)x - map_w - 1];
+        p4 = MiMap->map[(memptrsize)y * map_w + (memptrsize)x - map_w];
       } else {
-        p3 = MiMap->map[(memptrsize)y * man + (memptrsize)x + man];
-        p4 = MiMap->map[(memptrsize)y * man + (memptrsize)x + man + 1];
+        p3 = MiMap->map[(memptrsize)y * map_w + (memptrsize)x + map_w];
+        p4 = MiMap->map[(memptrsize)y * map_w + (memptrsize)x + map_w + 1];
       }
 
       p3 = ghost[p3 + p4 * 256];
       p1 = ghost[p1 + p3 * 256];
 
-      // Gris=1: Convert the image to grayscale
+      // grayscale=1: Convert the image to grayscale
 
-      if (Gris) {
+      if (grayscale) {
         p1 = dac[p1 * 3] + dac[p1 * 3 + 1] + dac[p1 * 3 + 1];
-        bufferaux[fy * map_width + fx] = Tabla[p1];
+        temp_buffer[fy * map_width + fx] = lut[p1];
       } else
-        bufferaux[fy * map_width + fx] = p1;
+        temp_buffer[fy * map_width + fx] = p1;
       x += incx;
     }
     y += incy;
   }
-  Progress((char *)texts[92], map_height, map_height);
+  show_progress((char *)texts[92], map_height, map_height);
 
-  if (new_map((byte *)bufferaux)) {
+  if (new_map((byte *)temp_buffer)) {
     v_text = (char *)texts[45];
     show_dialog(err0);
-    free(bufferaux);
+    free(temp_buffer);
     return;
   }
 
@@ -3828,11 +3854,11 @@ void Reducex2() {
 //      Used to create a hardness map
 //-----------------------------------------------------------------------------
 
-char ctiletext[32];
-char ctile[5];
+char tile_label[32];
+char tile_str[5];
 
-char ccolor[5];
-int minimos = 0;
+char color_str[5];
+int minimums = 0;
 int mintile, maxtile;
 int itile, icolor;
 
@@ -3855,8 +3881,8 @@ void map_search2() {
 }
 
 void map_search3() {
-  itile = atoi(ctile);
-  icolor = atoi(ccolor);
+  itile = atoi(tile_str);
+  icolor = atoi(color_str);
 }
 
 void map_search0() {
@@ -3868,16 +3894,16 @@ void map_search0() {
   v.click_handler = map_search2;
   v.close_handler = map_search3;
 
-  div_snprintf(ctile, sizeof(ctile), "%d", mintile);
-  div_snprintf(ccolor, sizeof(ccolor), "%d", color);
+  div_snprintf(tile_str, sizeof(tile_str), "%d", mintile);
+  div_snprintf(color_str, sizeof(color_str), "%d", color);
 
-  DIV_SPRINTF(ctiletext, "%s [%d..%d]", texts[401], mintile, maxtile);
-  texts[546] = (byte *)&ctiletext[0];
+  DIV_SPRINTF(tile_label, "%s [%d..%d]", texts[401], mintile, maxtile);
+  texts[546] = (byte *)&tile_label[0];
 
-  _get(546, 4, 11, 64 + 40, (byte *)ctile, 5, mintile, maxtile);
-  _get(402, 4, 30, 64 + 40, (byte *)ccolor, 5, 0, 255);
+  _get(546, 4, 11, 64 + 40, (byte *)tile_str, 5, mintile, maxtile);
+  _get(402, 4, 30, 64 + 40, (byte *)color_str, 5, 0, 255);
 
-  _flag(403, 4, 49, &minimos);
+  _flag(403, 4, 49, &minimums);
 
   _button(100, 7, v.h - 14, 0);
   _button(101, v.w - 8, v.h - 14, 2);
@@ -3886,27 +3912,27 @@ void map_search0() {
 #define max_map_size 254 // 128
 
 void map_search() {
-  int man, mal;
+  int map_w, map_h;
   int c, n, m, x, y;
   byte *ma;
 
   if (!find_and_load_map())
     return;
 
-  man = map_width;
-  mal = map_height;
-  ma = map; // Original map ma(man,mal)
+  map_w = map_width;
+  map_h = map_height;
+  ma = map; // Original map ma(map_w,map_h)
 
-  if (man > mal) { // Get the tile size limits
-    mintile = (man + max_map_size - 1) / max_map_size;
-    if (mal < 256)
-      maxtile = mal;
+  if (map_w > map_h) { // Get the tile size limits
+    mintile = (map_w + max_map_size - 1) / max_map_size;
+    if (map_h < 256)
+      maxtile = map_h;
     else
       maxtile = 256;
   } else {
-    mintile = (mal + max_map_size - 1) / max_map_size;
-    if (man < 256)
-      maxtile = man;
+    mintile = (map_h + max_map_size - 1) / max_map_size;
+    if (map_w < 256)
+      maxtile = map_w;
     else
       maxtile = 256;
   }
@@ -3935,18 +3961,18 @@ void map_search() {
   }
 
   for (y = 0; y < map_height * itile; y += itile) {
-    Progress((char *)texts[404], y, map_height * itile);
+    show_progress((char *)texts[404], y, map_height * itile);
     for (x = 0; x < map_width * itile; x += itile) {
       c = 0; // 0/c4
       for (n = 0; n < itile; n++) {
         for (m = 0; m < itile; m++) {
-          if (x + m < man && y + n < mal) {
-            if (*(ma + x + m + (y + n) * man) == icolor)
+          if (x + m < map_w && y + n < map_h) {
+            if (*(ma + x + m + (y + n) * map_w) == icolor)
               c++;
           }
         }
       }
-      if (minimos) {
+      if (minimums) {
         if (c < (itile * itile) / 5)
           c = 0;
         else
@@ -3956,7 +3982,7 @@ void map_search() {
       *(map + (x / itile) + (y / itile) * map_width) = c;
     }
   }
-  Progress((char *)texts[404], map_height * itile, map_height * itile);
+  show_progress((char *)texts[404], map_height * itile, map_height * itile);
 
   if (new_map(map)) {
     free(map);
@@ -3971,12 +3997,12 @@ void map_search() {
 // Progress indicator for an operation
 //-----------------------------------------------------------------------------
 
-int ProgressInit = 0;
-int ProgressTotal;
-int ProgressCurrent;
-char *ProgressTitle;
+int progress_init = 0;
+int progress_total;
+int progress_current;
+char *progress_title;
 
-void Progress1() {
+void progress1() {
   int w = v.w, h = v.h;
   byte *ptr = v.ptr;
   char cwork[5];
@@ -3988,13 +4014,13 @@ void Progress1() {
 
   wbox(ptr, w, h, c1, 4, 12, w - 8, h - 16);
 
-  wbox(ptr, w, h, c_r_low, 4, 12, ProgressCurrent * (w - 8) / ProgressTotal, h - 16);
+  wbox(ptr, w, h, c_r_low, 4, 12, progress_current * (w - 8) / progress_total, h - 16);
   wrectangle(ptr, w, h, c0, 4, 12, w - 8, h - 16);
-  div_snprintf((char *)cwork, sizeof(cwork), "%d%c", ProgressCurrent * 100 / ProgressTotal, '%');
+  div_snprintf((char *)cwork, sizeof(cwork), "%d%c", progress_current * 100 / progress_total, '%');
   wwrite(ptr, w, h, 4 + (w - 8) / 2, (14 + (h - 16) / 2) - 2, 4, (byte *)cwork, c3);
 }
 
-void Progress2() {
+void progress2() {
   int w = v.w, h = v.h;
   byte *ptr = v.ptr;
   char cwork[5];
@@ -4006,43 +4032,43 @@ void Progress2() {
 
   wbox(ptr, w, h, c1, 4, 12, w - 8, h - 16);
 
-  wbox(ptr, w, h, c_r_low, 4, 12, ProgressCurrent * (w - 8) / ProgressTotal, h - 16);
+  wbox(ptr, w, h, c_r_low, 4, 12, progress_current * (w - 8) / progress_total, h - 16);
   wrectangle(ptr, w, h, c0, 4, 12, w - 8, h - 16);
-  div_snprintf(cwork, sizeof(cwork), "%d%c", ProgressCurrent * 100 / ProgressTotal, '%');
+  div_snprintf(cwork, sizeof(cwork), "%d%c", progress_current * 100 / progress_total, '%');
   wwrite(ptr, w, h, 4 + (w - 8) / 2, (14 + (h - 16) / 2) - 2, 4, (byte *)cwork, c3);
 }
-void Progress0() {
+void progress0() {
   v.type = 7;
   v.w = 100;
   v.h = 28;
-  v.paint_handler = Progress1;
-  v.click_handler = Progress2;
-  v.title = (byte *)ProgressTitle;
-  v.name = (byte *)ProgressTitle;
+  v.paint_handler = progress1;
+  v.click_handler = progress2;
+  v.title = (byte *)progress_title;
+  v.name = (byte *)progress_title;
 }
 
-int Progress(char *titulo, int current, int total) {
-  if (!ProgressInit) { // Initialize the progress window
+int show_progress(char *title, int current, int total) {
+  if (!progress_init) { // Initialize the progress window
     mouse_graf = 3;
     flush_copy();
-    ProgressInit = 1;
-    ProgressCurrent = current;
-    ProgressTitle = titulo;
-    ProgressTotal = total;
-    new_window(Progress0);
+    progress_init = 1;
+    progress_current = current;
+    progress_title = title;
+    progress_total = total;
+    new_window(progress0);
     flush_window(0);
     flush_copy();
   } else {
-    ProgressCurrent = current;
-    if (ProgressCurrent >= ProgressTotal) { // Finalize the progress window
+    progress_current = current;
+    if (progress_current >= progress_total) { // Finalize the progress window
       mouse_graf = 1;
-      ProgressInit = 0;
+      progress_init = 0;
       close_window();
       flush_copy();
       return 0;
     } else { // Progress window update loop
       v = window[0];
-      Progress2();
+      progress2();
       flush_window(0);
       flush_copy();
     }
@@ -4052,9 +4078,9 @@ int Progress(char *titulo, int current, int total) {
 
 //-----------------------------------------------------------------------------
 
-void AplieX(struct tmapa *MiMap, int man, int mal) {
-  char *bufferaux;
-  char DacAux[768];
+void apply_resize(struct tmapa *MiMap, int map_w, int map_h) {
+  char *temp_buffer;
+  char saved_dac[768];
   int n, p1, p2, p3, p4;
   int x, y, z, t, x0, y0, ant, min, max;
   float incx, incy;
@@ -4063,11 +4089,11 @@ void AplieX(struct tmapa *MiMap, int man, int mal) {
   int r, b, g, c, regen = 0;
   FILE *rgb_tab = NULL;
   char *rgb_table = NULL;
-  char Tabla[190];
+  char lut[190];
   int Colors[9], min_dist, i, dist;
 
   // Generate grayscale table
-  if (Gris) {
+  if (grayscale) {
     Colors[0] = c0;
     Colors[2] = c1;
     Colors[4] = c2;
@@ -4088,7 +4114,7 @@ void AplieX(struct tmapa *MiMap, int man, int mal) {
         else
           dist = n - dist;
         if (dist < min_dist) {
-          Tabla[n] = c / 3;
+          lut[n] = c / 3;
           min_dist = dist;
         }
       }
@@ -4107,13 +4133,13 @@ void AplieX(struct tmapa *MiMap, int man, int mal) {
     if ((rgb_tab = fopen("RGB_TAB.TMP", "rb")) == NULL)
       regen = 1;
     else {
-      fread(DacAux, 1, 768, rgb_tab);
+      fread(saved_dac, 1, 768, rgb_tab);
       for (x = 0; x < 768; x++)
-        regen += abs(dac[x] - DacAux[x]);
+        regen += abs(dac[x] - saved_dac[x]);
     }
     if (regen) {
       for (x = 0; x < 32; x++) {
-        Progress((char *)texts[93], x, 32);
+        show_progress((char *)texts[93], x, 32);
         for (y = 0; y < 32; y++)
           for (z = 0; z < 32; z++) {
             min = 32 * 32 * 32;
@@ -4130,7 +4156,7 @@ void AplieX(struct tmapa *MiMap, int man, int mal) {
             rgb_table[x * 1024 + y * 32 + z] = ant;
           }
       }
-      Progress((char *)texts[93], 32, 32);
+      show_progress((char *)texts[93], 32, 32);
       if (rgb_tab)
         fclose(rgb_tab);
       rgb_tab = fopen("RGB_TAB.TMP", "wb");
@@ -4144,19 +4170,19 @@ void AplieX(struct tmapa *MiMap, int man, int mal) {
   }
   // End RGB lookup table
 
-  incy = (float)(mal - 1) / (float)map_height;
-  incx = (float)(man - 1) / (float)map_width;
-  bufferaux = (char *)malloc(map_width * map_height);
-  if (bufferaux == NULL) {
+  incy = (float)(map_h - 1) / (float)map_height;
+  incx = (float)(map_w - 1) / (float)map_width;
+  temp_buffer = (char *)malloc(map_width * map_height);
+  if (temp_buffer == NULL) {
     v_text = (char *)texts[45];
     show_dialog(err0);
-    if (!Gris)
+    if (!grayscale)
       free(rgb_table);
     return;
   }
   fy = (float)0.5;
   for (y = 0; y < map_height; y++) {
-    Progress((char *)texts[92], y, map_height);
+    show_progress((char *)texts[92], y, map_height);
 
     y0 = (memptrsize)fy;
     cy = ((float)y0 + (float)0.5);
@@ -4183,7 +4209,7 @@ void AplieX(struct tmapa *MiMap, int man, int mal) {
       else
         pp1 += (ry - fy);
       pp1 = (2.0 - pp1) / 2.0;
-      p1 = MiMap->map[(memptrsize)ry * man + (memptrsize)rx];
+      p1 = MiMap->map[(memptrsize)ry * map_w + (memptrsize)rx];
       r = dac[p1 * 3] * pp1;
       g = dac[p1 * 3 + 1] * pp1;
       b = dac[p1 * 3 + 2] * pp1;
@@ -4197,7 +4223,7 @@ void AplieX(struct tmapa *MiMap, int man, int mal) {
       else
         pp2 += (ry - fy);
       pp2 = (2.0 - pp2) / 2.0;
-      p2 = MiMap->map[(memptrsize)ry * man + (memptrsize)(rx + 1.0)];
+      p2 = MiMap->map[(memptrsize)ry * map_w + (memptrsize)(rx + 1.0)];
       r += dac[p2 * 3] * pp2;
       g += dac[p2 * 3 + 1] * pp2;
       b += dac[p2 * 3 + 2] * pp2;
@@ -4211,7 +4237,7 @@ void AplieX(struct tmapa *MiMap, int man, int mal) {
       else
         pp3 += ((ry + 1.0) - fy);
       pp3 = (2.0 - pp3) / 2.0;
-      p3 = MiMap->map[(memptrsize)(ry + 1.0) * man + (memptrsize)rx];
+      p3 = MiMap->map[(memptrsize)(ry + 1.0) * map_w + (memptrsize)rx];
       r += dac[p3 * 3] * pp3;
       g += dac[p3 * 3 + 1] * pp3;
       b += dac[p3 * 3 + 2] * pp3;
@@ -4225,7 +4251,7 @@ void AplieX(struct tmapa *MiMap, int man, int mal) {
       else
         pp4 += ((ry + 1.0) - fy);
       pp4 = (2.0 - pp4) / 2.0;
-      p4 = MiMap->map[(memptrsize)(ry + 1.0) * man + (memptrsize)(rx + 1.0)];
+      p4 = MiMap->map[(memptrsize)(ry + 1.0) * map_w + (memptrsize)(rx + 1.0)];
       r += dac[p4 * 3] * pp4;
       g += dac[p4 * 3 + 1] * pp4;
       b += dac[p4 * 3 + 2] * pp4;
@@ -4234,25 +4260,25 @@ void AplieX(struct tmapa *MiMap, int man, int mal) {
       g /= (pp1 + pp2 + pp3 + pp4);
       b /= (pp1 + pp2 + pp3 + pp4);
 
-      if (Gris) {
+      if (grayscale) {
         if (r + g + b > 189)
-          bufferaux[y * map_width + x] = Tabla[189];
+          temp_buffer[y * map_width + x] = lut[189];
         else
-          bufferaux[y * map_width + x] = Tabla[r + g + b];
+          temp_buffer[y * map_width + x] = lut[r + g + b];
       } else
-        bufferaux[y * map_width + x] = rgb_table[(r >> 1) * 1024 + (g >> 1) * 32 + (b >> 1)];
+        temp_buffer[y * map_width + x] = rgb_table[(r >> 1) * 1024 + (g >> 1) * 32 + (b >> 1)];
 
       fx += incx;
     }
     fy += incy;
   }
-  Progress((char *)texts[92], map_height, map_height);
+  show_progress((char *)texts[92], map_height, map_height);
 
-  if (new_map((byte *)bufferaux)) {
+  if (new_map((byte *)temp_buffer)) {
     v_text = (char *)texts[45];
     show_dialog(err0);
-    free(bufferaux);
-    if (!Gris)
+    free(temp_buffer);
+    if (!grayscale)
       free(rgb_table);
     return;
   }
@@ -4280,7 +4306,7 @@ void AplieX(struct tmapa *MiMap, int man, int mal) {
   call((voidReturnType)v.paint_handler);
   blit_region(screen_buffer, vga_width, vga_height, v.ptr, v.x, v.y, v.w, v.h, 0);
 
-  if (!Gris)
+  if (!grayscale)
     free(rgb_table);
 }
 

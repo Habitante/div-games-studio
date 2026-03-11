@@ -338,7 +338,7 @@ int fpg_remap_to_pal(FPG *Fpg) {
     else
       ActualPath[x] = 0;
   div_strcat(ActualPath, sizeof(ActualPath), "_DIV_.FPG");
-  DaniDel(ActualPath);
+  delete_file(ActualPath);
 
   if ((fpg = fopen((char *)Fpg->ActualFile, "rb")) == NULL)
     return 0;
@@ -391,7 +391,7 @@ int fpg_remap_to_pal(FPG *Fpg) {
   }
   fclose(Oldfpg);
   fclose(fpg);
-  DaniDel((char *)Fpg->ActualFile);
+  delete_file((char *)Fpg->ActualFile);
   rename(ActualPath, (char *)Fpg->ActualFile);
   if (!fpg_open(Fpg, (char *)Fpg->ActualFile))
     return 0;
@@ -487,7 +487,7 @@ int fpg_delete(FPG *Fpg,
     else
       ActualPath[x] = 0;
   div_strcat(ActualPath, sizeof(ActualPath), "_DIV_.FPG");
-  DaniDel(ActualPath);
+  delete_file(ActualPath);
 
   if ((fpg = fopen((char *)Fpg->ActualFile, "rb")) == NULL)
     return 0;
@@ -512,7 +512,7 @@ int fpg_delete(FPG *Fpg,
   fseek(fpg, 0, SEEK_END);
   len = ftell(fpg);
   fseek(fpg, 0, SEEK_SET);
-  Progress((char *)texts[436], 0, len);
+  show_progress((char *)texts[436], 0, len);
 
   // Copy graphic header
   fread(tmp, 8, 1, fpg);
@@ -523,11 +523,11 @@ int fpg_delete(FPG *Fpg,
   fwrite(CopiaReglas, sizeof(CopiaReglas), 1, Oldfpg);
 
   while (fpg_read_header(&MiOtraHeadFPG, fpg)) {
-    Progress((char *)texts[436], ftell(fpg), len);
+    show_progress((char *)texts[436], ftell(fpg), len);
 
     OtraImagen = (char *)malloc(MiOtraHeadFPG.Ancho * MiOtraHeadFPG.Alto);
     if (OtraImagen == NULL) {
-      Progress((char *)texts[436], len, len);
+      show_progress((char *)texts[436], len, len);
       fclose(fpg);
       fclose(Oldfpg);
       v_text = (char *)texts[45];
@@ -538,7 +538,7 @@ int fpg_delete(FPG *Fpg,
     if (MiOtraHeadFPG.num_points != 0) {
       other_points = (short *)malloc(MiOtraHeadFPG.num_points * 4);
       if (other_points == NULL) {
-        Progress((char *)texts[436], len, len);
+        show_progress((char *)texts[436], len, len);
         fclose(fpg);
         fclose(Oldfpg);
         free(OtraImagen);
@@ -566,9 +566,9 @@ int fpg_delete(FPG *Fpg,
   fclose(Oldfpg);
   fclose(fpg);
 
-  Progress((char *)texts[436], len, len);
+  show_progress((char *)texts[436], len, len);
 
-  DaniDel((char *)Fpg->ActualFile);
+  delete_file((char *)Fpg->ActualFile);
 
   debugprintf("MOVE %s to %s\n", ActualPath, (char *)Fpg->ActualFile);
 
@@ -599,7 +599,7 @@ int fpg_delete_many(FPG *Fpg, int taggeds, int *array_del) {
     else
       ActualPath[x] = 0;
   div_strcat(ActualPath, sizeof(ActualPath), "_DIV_.FPG");
-  DaniDel(ActualPath);
+  delete_file(ActualPath);
 
   if ((fpg = fopen((char *)Fpg->ActualFile, "rb")) == NULL)
     return 0;
@@ -612,7 +612,7 @@ int fpg_delete_many(FPG *Fpg, int taggeds, int *array_del) {
   fseek(fpg, 0, SEEK_END);
   len = ftell(fpg);
   fseek(fpg, 0, SEEK_SET);
-  Progress((char *)texts[436], 0, len);
+  show_progress((char *)texts[436], 0, len);
 
   fread(tmp, 8, 1, fpg); // Copy graphic header
   fwrite(tmp, 8, 1, Oldfpg);
@@ -622,12 +622,12 @@ int fpg_delete_many(FPG *Fpg, int taggeds, int *array_del) {
   fwrite(CopiaReglas, sizeof(CopiaReglas), 1, Oldfpg);
 
   while (fpg_read_header(&MiOtraHeadFPG, fpg)) {
-    Progress((char *)texts[436], ftell(fpg), len);
+    show_progress((char *)texts[436], ftell(fpg), len);
 
     OtraImagen = (char *)malloc(MiOtraHeadFPG.Ancho * MiOtraHeadFPG.Alto);
 
     if (OtraImagen == NULL) {
-      Progress((char *)texts[436], len, len);
+      show_progress((char *)texts[436], len, len);
       fclose(fpg);
       fclose(Oldfpg);
       v_text = (char *)texts[45];
@@ -638,7 +638,7 @@ int fpg_delete_many(FPG *Fpg, int taggeds, int *array_del) {
     if (MiOtraHeadFPG.num_points != 0) { // Check memory
       other_points = (short *)malloc(MiOtraHeadFPG.num_points * 4);
       if (other_points == NULL) {
-        Progress((char *)texts[436], len, len);
+        show_progress((char *)texts[436], len, len);
         fclose(fpg);
         fclose(Oldfpg);
         free(OtraImagen);
@@ -686,9 +686,9 @@ int fpg_delete_many(FPG *Fpg, int taggeds, int *array_del) {
   fclose(Oldfpg);
   fclose(fpg);
 
-  Progress((char *)texts[436], len, len);
+  show_progress((char *)texts[436], len, len);
 
-  DaniDel((char *)Fpg->ActualFile);
+  delete_file((char *)Fpg->ActualFile);
   rename(ActualPath, (char *)Fpg->ActualFile);
 
   if (!fpg_open(Fpg, (char *)Fpg->ActualFile))

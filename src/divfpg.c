@@ -20,9 +20,9 @@ extern int NewDacLoaded;
 extern int _omx, _omy, omx, omy, oclock;
 extern int incremento;
 
-void MAPtoFPG(struct tmapa *mapa);
+void map_to_fpg(struct tmapa *mapa);
 void GetGrafMAP(struct tmapa *mapa, byte *imagen, int x, int y, int width, int height, int cod);
-void FPGtoMAP(FPG *MiFPG);
+void fpg_to_map(FPG *MiFPG);
 void PutGrafMAP(byte *imagen, byte *mapa, int num);
 void place_map(void);
 int collides_with_map(int n, int x, int y, int w, int h);
@@ -39,7 +39,7 @@ void FPG1(void) {
   FPG_create_listbox_br(&MiFPG->lInfoFPG);
 }
 
-int hay_mapas(void);
+int has_maps(void);
 
 void load_thumbs(void) {
   FPG *MiFPG = (FPG *)v.aux;
@@ -368,7 +368,7 @@ int new_file(void) {
     } else {
       v_title = (char *)texts[82];
       v_text = input;
-      show_dialog(aceptar0);
+      show_dialog(accept0);
     }
     if (v_accept) {
       v_aux = (byte *)malloc(sizeof(FPG));
@@ -391,17 +391,17 @@ int new_file(void) {
 }
 
 #define max_archivos 512 // ------------------------------- File listbox
-extern struct t_listboxbr larchivosbr;
+extern struct t_listboxbr file_list_br;
 extern t_thumb thumb[max_archivos];
 extern int num_taggeds;
 
-void crear_paleta(void);
-void fusionar_paletas(void);
-void TratarPaleta0(void);
-extern byte paltratar[768];
+void create_palette(void);
+void merge_palettes(void);
+void palette_action0(void);
+extern byte work_palette[768];
 
 extern byte apply_palette[768];
-extern byte *muestra;
+extern byte *sample;
 
 void open_file(void) {
   FPG *MiFPG;
@@ -434,8 +434,8 @@ void open_file(void) {
     } else
       v_exists = 0;
 
-    div_strcpy(larchivosbr.list, larchivosbr.item_width, input);
-    larchivosbr.total_items = 1;
+    div_strcpy(file_list_br.list, file_list_br.item_width, input);
+    file_list_br.total_items = 1;
     thumb[0].tagged = 1;
     num_taggeds = 1;
   }
@@ -444,12 +444,12 @@ void open_file(void) {
   // *** Juanjo *** //
 
   n = 0; // Number of distinct palettes
-  muestra = NULL;
+  sample = NULL;
   memcpy(pal, dac, 768);
 
-  for (num = 0; num < larchivosbr.total_items; num++) {
+  for (num = 0; num < file_list_br.total_items; num++) {
     if (thumb[num].tagged) {
-      div_strcpy(input, sizeof(input), larchivosbr.list + larchivosbr.item_width * num);
+      div_strcpy(input, sizeof(input), file_list_br.list + file_list_br.item_width * num);
       div_strcpy(full, sizeof(full), tipo[v_type].path);
 
       if (full[strlen(full) - 1] != '/')
@@ -486,22 +486,22 @@ void open_file(void) {
         } while (++x < 768);
 
         if (sum) {
-          if (muestra == NULL) {
-            muestra = (byte *)malloc(32768);
+          if (sample == NULL) {
+            sample = (byte *)malloc(32768);
 
-            if (muestra == NULL)
+            if (sample == NULL)
               continue;
 
-            memset(muestra, 0, 32768);
+            memset(sample, 0, 32768);
 
             for (x = 0; x < 256; x++) {
-              muestra[((pal[x * 3 + 0] & 0xFE) << 9) | ((pal[x * 3 + 1] & 0xFE) << 4) |
+              sample[((pal[x * 3 + 0] & 0xFE) << 9) | ((pal[x * 3 + 1] & 0xFE) << 4) |
                       (pal[x * 3 + 2] >> 1)] = 1;
             }
           }
 
           for (x = 0; x < 256; x++) {
-            muestra[((dac4[x * 3 + 0] & 0xFE) << 9) | ((dac4[x * 3 + 1] & 0xFE) << 4) |
+            sample[((dac4[x * 3 + 0] & 0xFE) << 9) | ((dac4[x * 3 + 1] & 0xFE) << 4) |
                     (dac4[x * 3 + 2] >> 1)] = 1;
           }
         }
@@ -509,9 +509,9 @@ void open_file(void) {
     }
   }
 
-  if (muestra != NULL) {
-    crear_paleta();
-    free(muestra);
+  if (sample != NULL) {
+    create_palette();
+    free(sample);
     memcpy(pal, apply_palette, 768);
   }
 
@@ -524,8 +524,8 @@ void open_file(void) {
   } while (++x < 768);
 
   if (sum) {
-    memcpy(paltratar, pal, 768);
-    show_dialog(TratarPaleta0); // Load palette?
+    memcpy(work_palette, pal, 768);
+    show_dialog(palette_action0); // Load palette?
 
     switch (v_accept) {
     case 0: // Cancel (don't load)
@@ -537,7 +537,7 @@ void open_file(void) {
 
     case 2: // Merge palettes
       memcpy(dac4, pal, 768);
-      fusionar_paletas();
+      merge_palettes();
       pal_refresh(0, 1);
       break;
 
@@ -551,9 +551,9 @@ void open_file(void) {
   // *** Juanjo *** //
   ////////////////////
 
-  for (num = 0; num < larchivosbr.total_items; num++) {
+  for (num = 0; num < file_list_br.total_items; num++) {
     if (thumb[num].tagged) {
-      div_strcpy(input, sizeof(input), larchivosbr.list + larchivosbr.item_width * num);
+      div_strcpy(input, sizeof(input), file_list_br.list + file_list_br.item_width * num);
       div_strcpy(full, sizeof(full), tipo[v_type].path);
 
       if (full[strlen(full) - 1] != '/')
@@ -690,7 +690,7 @@ int RemapAllFiles(int vent) {
     v_title = (char *)texts[344];
     v_text = (char *)texts[345];
 
-    show_dialog(aceptar0);
+    show_dialog(accept0);
 
     if (v_accept) {
       fpg_remap_to_pal(MiFPG);
@@ -1065,7 +1065,7 @@ void printlist0(void) {
   v_accept = 0;
 }
 
-void Print_List(void) {
+void print_list(void) {
   FPG *MiFPG;
   HeadFPG cab;
   FILE *f = NULL, *g;
@@ -1104,7 +1104,7 @@ void Print_List(void) {
           strupr(cwork);
           v_title = (char *)texts[450];
           v_text = cwork;
-          show_dialog(aceptar0);
+          show_dialog(accept0);
 
           if (!v_accept)
             return;
@@ -1129,7 +1129,7 @@ void Print_List(void) {
 
       for (n = 0; n < 1000; n++) {
         if (MiFPG->OffsGrf[n]) {
-          Progress((char *)texts[437], ++_num, num);
+          show_progress((char *)texts[437], ++_num, num);
           fseek(g, MiFPG->OffsGrf[n], SEEK_SET);
           fread(&cab, 1, sizeof(cab), g);
           memset(cwork2, 0, 13);
@@ -1740,7 +1740,7 @@ void create_thumb_FPG(struct t_listboxbr *l) {
 //  Functions for importing maps into FPG
 //-----------------------------------------------------------------------------
 
-void MAPtoFPG(struct tmapa *mapa) {
+void map_to_fpg(struct tmapa *mapa) {
   int x, y;
   int width, height;
   int pos;
@@ -1856,7 +1856,7 @@ struct {
 int lnum = 0;
 int lmapan, lmapal;
 
-void FPGtoMAP(FPG *MiFPG) {
+void fpg_to_map(FPG *MiFPG) {
   int num;
   FILE *fpg;
   HeadFPG MiHeadFPG;

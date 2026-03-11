@@ -144,12 +144,12 @@ int paint_explosion(void) {
   int m, x, y, dx, dy, n;
   int dist, exp_Color, exp_Coloracum;
 
-  Progress((char *)texts[434], 0, exp_alto);
+  show_progress((char *)texts[434], 0, exp_alto);
   for (y = 0; y < exp_alto; y++) {
-    Progress((char *)texts[434], y, exp_alto);
+    show_progress((char *)texts[434], y, exp_alto);
     poll_keyboard();
     if (key(_ESC)) {
-      Progress((char *)texts[434], exp_alto, exp_alto);
+      show_progress((char *)texts[434], exp_alto, exp_alto);
       return (1);
     }
     for (x = 0; x < exp_ancho; x++) {
@@ -198,7 +198,7 @@ int paint_explosion(void) {
       }
     }
   }
-  Progress((char *)texts[434], exp_alto, exp_alto);
+  show_progress((char *)texts[434], exp_alto, exp_alto);
   for (n = 0; n < (exp_ancho * exp_alto) * per_points / 100; n++) {
     x = (rnd() % (exp_ancho - 2)) + 1;
     y = (rnd() % (exp_alto - 2)) + 1;

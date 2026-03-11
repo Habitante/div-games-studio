@@ -1,6 +1,6 @@
 
 //-----------------------------------------------------------------------------
-//      Módulo que contiene el código de la calculadora
+//      Módulo que contiene el código de la calculator
 //-----------------------------------------------------------------------------
 
 #include "global.h"
@@ -17,7 +17,7 @@ void expres2(void);
 void expres3(void);
 void expres4(void);
 void expres5(void);
-void calculadora(void);
+void calculator(void);
 
 //-----------------------------------------------------------------------------
 //      Variables del módulo
@@ -427,7 +427,7 @@ double get_num(void) { // Lee el número que hay en *expression (double en hex o
 }
 
 //-----------------------------------------------------------------------------
-//      Cuadro de diálogo para la calculadora
+//      Cuadro de diálogo para la calculator
 //-----------------------------------------------------------------------------
 
 void calc1(void) {
@@ -534,7 +534,7 @@ void calc0(void) {
   _flag(415, v.w - 23, 12, &pcalc->cint);
 }
 
-void calculadora(void) {
+void calculator(void) {
   pcalc = (struct _calc *)malloc(sizeof(struct _calc));
   if (pcalc != NULL) {
     new_window(calc0);

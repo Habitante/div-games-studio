@@ -1886,7 +1886,7 @@ void Print_Help(void) {
         strupr(cwork);
         v_title = (char *)texts[450];
         v_text = cwork;
-        show_dialog(aceptar0);
+        show_dialog(accept0);
         if (!v_accept)
           return;
       }
@@ -1929,13 +1929,13 @@ void Print_Help(void) {
           p = print_buffer;
 
           while (p < help_end) {
-            Progress((char *)texts[437], p - print_buffer, help_end - print_buffer);
+            show_progress((char *)texts[437], p - print_buffer, help_end - print_buffer);
             fwrite(p, 1, strlen((char *)p), g);
             fwrite("\xd\xa", 1, 2, g);
             p += strlen((char *)p) + 1;
           }
 
-          Progress((char *)texts[437], help_end - print_buffer, help_end - print_buffer);
+          show_progress((char *)texts[437], help_end - print_buffer, help_end - print_buffer);
 
           help_end = _help_end;
         }

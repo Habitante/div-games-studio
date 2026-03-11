@@ -18,20 +18,20 @@ void FreeMOD(void);
 int sound_get_song_pos(void);
 int sound_get_song_line(void);
 void mostrar_mod_meters(void);
-void OpenSound(void);
-void OpenSoundFile(void);
+void open_sound(void);
+void open_sound_file(void);
 void OpenDesktopSound(FILE *f);
-void SaveSound(pcminfo *mypcminfo, char *dst);
+void save_sound(pcminfo *mypcminfo, char *dst);
 void SaveDesktopSound(pcminfo *mypcminfo, FILE *f);
 void CloseSound(char *snd_path);
-void OpenSong(void);
+void open_song(void);
 void OpenDesktopSong(void);
 void sound_play_song(char *pathname);
 void EditSound0(void);
 void EditSound1(void);
 void EditSound2(void);
 void EditSound3(void);
-void RecSound0(void);
+void rec_sound0(void);
 void RecSound1(void);
 void RecSound2(void);
 void RecSound3(void);
@@ -84,7 +84,7 @@ void PCM1(void) {
   int Ancho, Alto, First = 1, lx, ly;
   pcminfo *mypcminfo;
   short *buffer;
-  short muestra;
+  short sample;
 
   if (big) {
     w /= 2;
@@ -103,7 +103,7 @@ void PCM1(void) {
     if (length < 3 * Ancho) {
       step = (float)Ancho / (float)(length - 1);
       for (x = 0; x < length; x++) {
-        muestra = buffer[x], y = (muestra * Alto / 65536);
+        sample = buffer[x], y = (sample * Alto / 65536);
 
         if (First) {
           First = 0;
@@ -123,10 +123,10 @@ void PCM1(void) {
         position += step;
         p1 = (memptrsize)position;
 
-        muestra = buffer[p0], y0 = y1 = (muestra * Alto / 65536);
+        sample = buffer[p0], y0 = y1 = (sample * Alto / 65536);
 
         do {
-          muestra = buffer[p0], y = (muestra * Alto / 65536);
+          sample = buffer[p0], y = (sample * Alto / 65536);
           if (y < y0)
             y0 = y;
           else if (y > y1)
@@ -372,7 +372,7 @@ void mostrar_mod_meters(void) {
 //-----------------------------------------------------------------------------
 
 #define max_archivos 512 // ------------------------------- Listbox de archivos
-extern struct t_listboxbr larchivosbr;
+extern struct t_listboxbr file_list_br;
 extern t_thumb thumb[max_archivos];
 extern int num_taggeds;
 
@@ -460,7 +460,7 @@ Mix_Chunk *DIVMIX_LoadPCM(char *path) {
 }
 #endif
 
-void OpenSound(void) {
+void open_sound(void) {
   pcminfo *mypcminfo;
   Uint32 wav_length;
   Uint8 *wav_buffer;
@@ -491,15 +491,15 @@ void OpenSound(void) {
       v_exists = 1;
     } else
       v_exists = 0;
-    div_strcpy(larchivosbr.list, larchivosbr.item_width, input);
-    larchivosbr.total_items = 1;
+    div_strcpy(file_list_br.list, file_list_br.item_width, input);
+    file_list_br.total_items = 1;
     thumb[0].tagged = 1;
     num_taggeds = 1;
   }
 
-  for (num = 0; num < larchivosbr.total_items; num++) {
+  for (num = 0; num < file_list_br.total_items; num++) {
     if (thumb[num].tagged) {
-      div_strcpy(input, sizeof(input), larchivosbr.list + larchivosbr.item_width * num);
+      div_strcpy(input, sizeof(input), file_list_br.list + file_list_br.item_width * num);
       div_strcpy(full, sizeof(full), tipo[v_type].path);
       if (full[strlen(full) - 1] != '/')
         div_strcat(full, sizeof(full), "/");
@@ -556,9 +556,9 @@ void OpenSound(void) {
   }
 }
 
-void OpenSoundFile(void) // Open the file SoundPathName
+void open_sound_file(void) // Open the file SoundPathName
 {
-  fprintf(stdout, "TODO - divpcm.cpp OpenSoundFile\n");
+  fprintf(stdout, "TODO - divpcm.cpp open_sound_file\n");
 
   pcminfo *mypcminfo;
 #ifdef MIXER
@@ -656,8 +656,8 @@ void OpenDesktopSound(FILE *f) {
   create_saved_window(PCM0, window_aux.x, window_aux.y);
 }
 
-void SaveSound(pcminfo *mypcminfo, char *dst) {
-  printf("TODO - divpcm.cpp SaveSound\n");
+void save_sound(pcminfo *mypcminfo, char *dst) {
+  printf("TODO - divpcm.cpp save_sound\n");
   FILE *dstfile;
   HeadDC MyHeadDC;
   int length;
@@ -690,7 +690,7 @@ void SaveSound(pcminfo *mypcminfo, char *dst) {
     length += 36;
     if (fwrite(&length, 1, 4, dstfile) != 4) {
       fclose(dstfile);
-      DaniDel(dst);
+      delete_file(dst);
       v_text = (char *)texts[47];
       show_dialog(err0);
       return;
@@ -716,7 +716,7 @@ void SaveSound(pcminfo *mypcminfo, char *dst) {
 
     if (fwrite(&MyHeadDC, 1, sizeof(HeadDC), dstfile) != sizeof(HeadDC)) {
       fclose(dstfile);
-      DaniDel(dst);
+      delete_file(dst);
       v_text = (char *)texts[47];
       show_dialog(err0);
       return;
@@ -729,7 +729,7 @@ void SaveSound(pcminfo *mypcminfo, char *dst) {
 
     if (fwrite(&length, 1, 4, dstfile) != 4) {
       fclose(dstfile);
-      DaniDel(dst);
+      delete_file(dst);
       v_text = (char *)texts[47];
       show_dialog(err0);
       return;
@@ -737,7 +737,7 @@ void SaveSound(pcminfo *mypcminfo, char *dst) {
     if (mypcminfo->SoundBits == 8) {
       if ((byte_ptr = (byte *)malloc(length)) == NULL) {
         fclose(dstfile);
-        DaniDel(dst);
+        delete_file(dst);
         v_text = (char *)texts[45];
         show_dialog(err0);
         return;
@@ -751,7 +751,7 @@ void SaveSound(pcminfo *mypcminfo, char *dst) {
     length = (int)(pos + 0.5);
     if ((byte_ptr = (byte *)malloc(length)) == NULL) {
       fclose(dstfile);
-      DaniDel(dst);
+      delete_file(dst);
       v_text = (char *)texts[45];
       show_dialog(err0);
       return;
@@ -767,7 +767,7 @@ void SaveSound(pcminfo *mypcminfo, char *dst) {
     fclose(dstfile);
     if (byte_ptr != (byte *)mypcminfo->SoundData)
       free(byte_ptr);
-    DaniDel(dst);
+    delete_file(dst);
     v_text = (char *)texts[47];
     show_dialog(err0);
     return;
@@ -807,7 +807,7 @@ void CloseSound(char *snd_path) {
 //  Funciones de canciones
 //-----------------------------------------------------------------------------
 
-void OpenSong(void) {
+void open_song(void) {
   int num;
   modinfo *mymodinfo;
   FILE *f;
@@ -829,15 +829,15 @@ void OpenSong(void) {
       v_exists = 1;
     } else
       v_exists = 0;
-    div_strcpy(larchivosbr.list, larchivosbr.item_width, input);
-    larchivosbr.total_items = 1;
+    div_strcpy(file_list_br.list, file_list_br.item_width, input);
+    file_list_br.total_items = 1;
     thumb[0].tagged = 1;
     num_taggeds = 1;
   }
 
-  for (num = 0; num < larchivosbr.total_items; num++) {
+  for (num = 0; num < file_list_br.total_items; num++) {
     if (thumb[num].tagged) {
-      div_strcpy(input, sizeof(input), larchivosbr.list + larchivosbr.item_width * num);
+      div_strcpy(input, sizeof(input), file_list_br.list + file_list_br.item_width * num);
       div_strcpy(full, sizeof(full), tipo[v_type].path);
       if (full[strlen(full) - 1] != '/')
         div_strcat(full, sizeof(full), "/");
@@ -1048,7 +1048,7 @@ void EditSound1(void) {
   int length;
   int x, y, y0, y1, p0, p1;
   int Ancho, Alto, First = 1, lx, ly;
-  short muestra;
+  short sample;
   char cwork[16];
 
   _show_items();
@@ -1102,7 +1102,7 @@ void EditSound1(void) {
     if (length < 3 * Ancho) {
       step = (float)Ancho / (float)(length - 1);
       for (x = 0; x < length; x++) {
-        muestra = buffer[x], y = (muestra * Alto / 65536);
+        sample = buffer[x], y = (sample * Alto / 65536);
 
         if (First) {
           First = 0;
@@ -1122,11 +1122,11 @@ void EditSound1(void) {
         position += step;
         p1 = (memptrsize)position;
 
-        muestra = buffer[p0];
-        y0 = y1 = (muestra * Alto / 65536);
+        sample = buffer[p0];
+        y0 = y1 = (sample * Alto / 65536);
 
         do {
-          muestra = buffer[p0], y = (muestra * Alto / 65536);
+          sample = buffer[p0], y = (sample * Alto / 65536);
           if (y < y0)
             y0 = y;
           else if (y > y1)
@@ -1182,7 +1182,7 @@ void EditSound3(void) {
 //  Grabador de sonidos
 //-----------------------------------------------------------------------------
 
-void RecSound0(void) {
+void rec_sound0(void) {
   v.type = 1;
   v.title = texts[560];
   v.name = texts[560];
@@ -1279,7 +1279,7 @@ void RecSound2(void) {
       if (v_exists) {
         v_title = (char *)texts[340];
         v_text = input;
-        show_dialog(aceptar0);
+        show_dialog(accept0);
       } else
         v_accept = 1;
       if (v_accept) {
@@ -1684,7 +1684,7 @@ void RecordSound(void) {
   length += 36;
   if (fwrite(&length, 1, 4, f) != 4) {
     fclose(f);
-    DaniDel(SoundFile);
+    delete_file(SoundFile);
     v_text = (char *)texts[47];
     show_dialog(err0);
     return;
@@ -1717,7 +1717,7 @@ void RecordSound(void) {
 
   if (fwrite(&MyHeadDC, 1, sizeof(HeadDC), f) != sizeof(HeadDC)) {
     fclose(f);
-    DaniDel(SoundFile);
+    delete_file(SoundFile);
     v_text = (char *)texts[47];
     show_dialog(err0);
     return;
@@ -1730,7 +1730,7 @@ void RecordSound(void) {
 
   if (fwrite(&length, 1, 4, f) != 4) {
     fclose(f);
-    DaniDel(SoundFile);
+    delete_file(SoundFile);
     v_text = (char *)texts[47];
     show_dialog(err0);
     return;
@@ -1788,17 +1788,17 @@ int JudasProgressRead(int handle, void *buffer, int size) {
     pasos = 1, resto = 0;
   for (con = 0; con < pasos; con++) {
     if (read(handle, &byte_ptr[con * 4096], 4096) != 4096) {
-      Progress((char *)texts[559], pasos, pasos);
+      show_progress((char *)texts[559], pasos, pasos);
       return (0);
     }
-    Progress((char *)texts[559], con, pasos);
+    show_progress((char *)texts[559], con, pasos);
   }
   if (resto) {
     if (read(handle, &byte_ptr[con * 4096], resto) != resto) {
-      Progress((char *)texts[559], pasos, pasos);
+      show_progress((char *)texts[559], pasos, pasos);
       return (0);
     }
-    Progress((char *)texts[559], pasos, pasos);
+    show_progress((char *)texts[559], pasos, pasos);
   }
   return (1);
 }

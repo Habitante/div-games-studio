@@ -717,7 +717,7 @@ void create_zip(char *dWork) {
 
   pack("system/" RUNTIME, "system/EXEC.EXE", "foo.zip", out);
 
-  DaniDel("foo.zip");
+  delete_file("foo.zip");
 
 #ifdef WIN32
 
@@ -1015,7 +1015,7 @@ void crear_instalacion(void) {
     ins = __ins = _ins;
 
     for (n = 0; n < dirhead.nfiles; n++) {
-      Progress(cWork, n, dirhead.nfiles);
+      show_progress(cWork, n, dirhead.nfiles);
 
       while (*ins == '+') {
         chr = (byte *)ins;
@@ -1051,7 +1051,7 @@ void crear_instalacion(void) {
       fclose(fin);
 
       if (hdir[n].len1 == -1) {
-        Progress(cWork, dirhead.nfiles, dirhead.nfiles);
+        show_progress(cWork, dirhead.nfiles, dirhead.nfiles);
         v_text = (char *)texts[357];
         show_dialog(err0);
         free(hdir);
@@ -1085,7 +1085,7 @@ void crear_instalacion(void) {
 
     free(hdir);
 
-    Progress(cWork, dirhead.nfiles, dirhead.nfiles);
+    show_progress(cWork, dirhead.nfiles, dirhead.nfiles);
   }
 
   create_zip(full);
@@ -1166,7 +1166,7 @@ void crear_instalacion(void) {
   ins=_ins;
 
   for(x=0;x<nfiles;x++) {
-    Progress((char *)texts[219],x*100,nfiles*100);
+    show_progress((char *)texts[219],x*100,nfiles*100);
     if (x==0) {
       fin=fopen("system/EXEC.EXE","rb");
       div_strcpy(MiHeaderSetup[x].name,sizeof(MiHeaderSetup[x].name),ExeGen);
@@ -1193,7 +1193,7 @@ void crear_instalacion(void) {
     }
 
     if (fin==NULL) {
-      Progress((char *)texts[219],nfiles*100,nfiles*100);
+      show_progress((char *)texts[219],nfiles*100,nfiles*100);
       v_text=(char *)texts[231]; show_dialog(err0);
       fclose(fout); free(_ins); free(MiHeaderSetup);
       return;
@@ -1210,7 +1210,7 @@ void crear_instalacion(void) {
     }
 
     if (MiHeaderSetup[x].len1==-1) {
-      Progress((char *)texts[219],nfiles*100,nfiles*100);
+      show_progress((char *)texts[219],nfiles*100,nfiles*100);
       v_text=(char *)texts[357]; show_dialog(err0);
       fclose(fin); fclose(fout); free(_ins); free(MiHeaderSetup);
       return;
@@ -1231,12 +1231,12 @@ void crear_instalacion(void) {
 
   free(MiHeaderSetup);
 
-  Progress((char *)texts[219],nfiles*100,nfiles*100); // INSTALL.DIV already created
+  show_progress((char *)texts[219],nfiles*100,nfiles*100); // INSTALL.DIV already created
 
   div_strcpy(cWork,sizeof(cWork),tipo[1].path); // Delete the PACKFILE.DAT
   div_strcat(cWork,sizeof(cWork),"/");
   div_strcat(cWork,sizeof(cWork),"install/PACKFILE.DAT");
-  DaniDel(cWork);
+  delete_file(cWork);
 
   // *** Write INSTALL.EXE with the informational trailer
 
@@ -1249,10 +1249,10 @@ void crear_instalacion(void) {
 
   if(!FileCopyICE(cWork,dWork,0,237)) { v_text=(char *)texts[231]; show_dialog(err0); return; }
 
-  Progress((char *)texts[543],0,100);
+  show_progress((char *)texts[543],0,100);
 
   if((fout=fopen(cWork,"ab"))==NULL) {
-    Progress((char *)texts[543],100,100); v_text=(char *)texts[231]; show_dialog(err0); return;
+    show_progress((char *)texts[543],100,100); v_text=(char *)texts[231]; show_dialog(err0); return;
   }
 
   fwrite(AppName,1,strlen(AppName)+1,fout); n=strlen(AppName)+1;
@@ -1280,11 +1280,11 @@ void crear_instalacion(void) {
   fwrite(&include_setup,1,4,fout); n+=4;
   fwrite(&segundo_font,1,4,fout); n+=4;
 
-  Progress((char *)texts[543],25,100);
+  show_progress((char *)texts[543],25,100);
 
   if ((fin=fopen(ifile1,"rb"))==NULL) {
     fclose(fout);
-    Progress((char *)texts[543],100,100);
+    show_progress((char *)texts[543],100,100);
     v_text=(char *)texts[231]; show_dialog(err0); return;
   }
 
@@ -1294,16 +1294,16 @@ void crear_instalacion(void) {
 
   if (m==-1) {
     fclose(fout);
-    Progress((char *)texts[543],100,100);
+    show_progress((char *)texts[543],100,100);
     v_text=(char *)texts[231]; show_dialog(err0); return;
   } else n+=m;
 
   size[0]=m; size[1]=x;
-  Progress((char *)texts[543],75,100);
+  show_progress((char *)texts[543],75,100);
 
   if ((fin=fopen(ifile2,"rb"))==NULL) {
     fclose(fout);
-    Progress((char *)texts[543],100,100);
+    show_progress((char *)texts[543],100,100);
     v_text=(char *)texts[231]; show_dialog(err0); return;
   }
 
@@ -1313,17 +1313,17 @@ void crear_instalacion(void) {
 
   if (m==-1) {
     fclose(fout);
-    Progress((char *)texts[543],100,100);
+    show_progress((char *)texts[543],100,100);
     v_text=(char *)texts[231]; show_dialog(err0); return;
   } else n+=m;
 
   size[2]=m; size[3]=x;
-  Progress((char *)texts[543],85,100);
+  show_progress((char *)texts[543],85,100);
 
   if (segundo_font) {
     if ((fin=fopen(ifile3,"rb"))==NULL) {
       fclose(fout);
-      Progress((char *)texts[543],100,100);
+      show_progress((char *)texts[543],100,100);
       v_text=(char *)texts[231]; show_dialog(err0); return;
     }
 
@@ -1333,7 +1333,7 @@ void crear_instalacion(void) {
 
     if (m==-1) {
       fclose(fout);
-      Progress((char *)texts[543],100,100);
+      show_progress((char *)texts[543],100,100);
       v_text=(char *)texts[231]; show_dialog(err0); return;
     } else n+=m;
 
@@ -1350,7 +1350,7 @@ void crear_instalacion(void) {
   n+=4; fwrite(&n,1,4,fout);
   fclose(fout);
 
-  Progress((char *)texts[543],100,100);
+  show_progress((char *)texts[543],100,100);
 
   // *** Write PackName.001, .002, ... from INSTALL.DIV
 
@@ -1363,7 +1363,7 @@ void crear_instalacion(void) {
 
   if(!FileCopyICE(cWork,dWork,1,234)) { v_text=(char *)texts[231]; show_dialog(err0); return; }
 
-  DaniDel(cWork);              // Delete the INSTALL.DIV
+  delete_file(cWork);              // Delete the INSTALL.DIV
 
 #endif
 
@@ -1476,7 +1476,7 @@ int FileCopyICE(char *org, char *dest, int vols, int _texto) { // Returns 0 -Err
   fseek(fin, 0, SEEK_SET);
 
   while (len) {
-    Progress((char *)texts[_texto], tlen - len, tlen);
+    show_progress((char *)texts[_texto], tlen - len, tlen);
 
     if (NewVolume) {
       if (curvol != 0 && NewVolume < 2) {
@@ -1486,7 +1486,7 @@ int FileCopyICE(char *org, char *dest, int vols, int _texto) { // Returns 0 -Err
         }
         v_title = (char *)texts[233]; // Disk full.
         v_text = (char *)texts[232];  // Please, insert a new disk.
-        show_dialog(aceptar0);
+        show_dialog(accept0);
         if (!v_accept) {
           retval = 0;
           break;
@@ -1501,7 +1501,7 @@ int FileCopyICE(char *org, char *dest, int vols, int _texto) { // Returns 0 -Err
         if (vols) {
           v_title = (char *)texts[362];
           v_text = (char *)texts[232];
-          show_dialog(aceptar0);
+          show_dialog(accept0);
           if (v_accept) {
             NewVolume = 2;
             continue;
@@ -1521,7 +1521,7 @@ int FileCopyICE(char *org, char *dest, int vols, int _texto) { // Returns 0 -Err
       if (fout == NULL) { // Protected floppy(!?)
         v_title = (char *)texts[363];
         v_text = (char *)texts[364];
-        show_dialog(aceptar0);
+        show_dialog(accept0);
         if (v_accept) {
           NewVolume = 2;
           continue;
@@ -1595,7 +1595,7 @@ int FileCopyICE(char *org, char *dest, int vols, int _texto) { // Returns 0 -Err
     fclose(fin);
   if (fout)
     fclose(fout);
-  Progress((char *)texts[_texto], tlen, tlen);
+  show_progress((char *)texts[_texto], tlen, tlen);
   free(buffer);
   return (retval);
 }

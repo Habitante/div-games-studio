@@ -94,7 +94,7 @@ char *get;
 int get_cursor, get_pos; // Clock and cursor position in get fields
 
 int window_closing = 0, window_move_pending = 0;
-int cierra_rapido = 0;
+int quick_close = 0;
 int skip_window_render = 0;
 
 byte lower[256] = "                                   #$           0123456789      "
@@ -437,9 +437,9 @@ int main(int argc, char *argv[]) {
 
   if (argc > 2 && (!strcmp(argv[2], "/safe") || !strcmp(argv[2], "/SAFE"))) {
     safe = 33;
-    DaniDel("sound.cfg");
-    DaniDel("system/setup.bin");
-    DaniDel("system/session.dtf");
+    delete_file("sound.cfg");
+    delete_file("system/setup.bin");
+    delete_file("system/session.dtf");
   } else {
     if ((f = fopen("system/setup.bin", "rb")) != NULL) {
       fclose(f);
@@ -690,11 +690,11 @@ void create_title_bar(void) {
 //-----------------------------------------------------------------------------
 
 int error_code;
-int nueva_sesion = 0;
+int new_session = 0;
 void errhlp0(void);
 void interr0(void);
 void intmsg0(void);
-void usuario0(void);
+void user_info0(void);
 extern char user1[];
 extern char user2[];
 
@@ -715,7 +715,7 @@ void init_environment() {
 
   if (!interpreting) {
     if (!strlen(user1) || !strlen(user2)) {
-      show_dialog(usuario0);
+      show_dialog(user_info0);
     } else {
       show_dialog(copyright0);
     }
@@ -723,7 +723,7 @@ void init_environment() {
 
   // If the DIV.DTF file doesn't exist or safe mode is requested
 
-  if (CopyDesktop && !nueva_sesion && !primera_vez)
+  if (CopyDesktop && !new_session && !primera_vez)
     UpLoad_Desktop();
 
   if (!primera_vez) {
@@ -756,9 +756,9 @@ void init_environment() {
     }
   }
 
-  DaniDel("*.swp");
+  delete_file("*.swp");
   _chdir("system");
-  DaniDel("exec.*");
+  delete_file("exec.*");
   _chdir("..");
 
   if (primera_vez) {
@@ -914,7 +914,7 @@ void mainloop(void) {
     free_drag = 0;
     v_title = (char *)texts[57];
     v_text = NULL;
-    show_dialog(aceptar0);
+    show_dialog(accept0);
 
     if (v_accept) {
       if (v.type == 101)
@@ -923,7 +923,7 @@ void mainloop(void) {
       if (!new_map(NULL)) {
         if (MustCreate == 0) {
           memcpy(v_map->filename, v.mapa->filename, 13);
-          new_window(mapa0);
+          new_window(map_view0);
           MustCreate = 1;
         }
 
@@ -1216,7 +1216,7 @@ void mainloop(void) {
 
             v_title = (char *)texts[40];
             v_text = NULL;
-            show_dialog(aceptar0);
+            show_dialog(accept0);
 
             if (v_accept)
               exit_requested = 1;
@@ -1251,7 +1251,7 @@ void mainloop(void) {
             }
 
             if (v.type == 100 || (v.type == 102 && v.prg != NULL))
-              show_dialog(aceptar0);
+              show_dialog(accept0);
             else
               v_accept = 1;
 
@@ -1679,7 +1679,7 @@ fin_bucle_entorno:
   if ((shift_status & 8) && scan_code == 45) { // Alt-X Exit
     v_title = (char *)texts[40];
     v_text = NULL;
-    show_dialog(aceptar0);
+    show_dialog(accept0);
 
     if (v_accept)
       exit_requested = 1;
@@ -2136,7 +2136,7 @@ void close_window(void) {
   }
 
   call((voidReturnType)v.close_handler);
-  if (!cierra_rapido) {
+  if (!quick_close) {
     if (big)
       wput(v.ptr, v.w / 2, v.h / 2, v.w / 2 - 9, 2, -45);
     else
@@ -5419,9 +5419,9 @@ void wdown(int a) {
     ivaux = 3;
 }
 
-void DaniDel(char *name) {
+void delete_file(char *name) {
 #ifdef WIN32
-  debugprintf("DaniDel %s\n", name);
+  debugprintf("delete_file %s\n", name);
   remove(name);
   return;
 #endif
