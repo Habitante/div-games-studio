@@ -37,14 +37,14 @@ The IDE provides a full desktop environment (yes, inside the program) with:
 
 ## Codebase overview
 
-~109,000 lines of C across 82 source files and 44 headers. The code dates back to
-the mid-90s and carries all the hallmarks of that era: single-letter variable names,
-Spanish comments and identifiers, 8-bit palette rendering, `int`-sized pointer
-arithmetic, and lots of global state. It was originally built for 16/32-bit DOS with
-DJGPP and has been progressively adapted for modern platforms through an OS-dependency
-abstraction layer. A significant cleanup (Phase 0) removed ~35K lines of dead code
-including MODE8/VPE 3D, the DLL plugin system, CD-ROM support, and other legacy
-subsystems.
+~87,000 lines of C across ~50 source files and ~40 headers. The code dates back to
+the mid-90s and carries hallmarks of that era: 8-bit palette rendering, `int`-sized
+pointer arithmetic, and lots of global state. It was originally built for 16/32-bit
+DOS with DJGPP and has been progressively adapted for modern platforms through an
+OS-dependency abstraction layer. Major cleanup phases have removed ~45K lines of dead
+code, translated Spanish identifiers to English, added safe string helpers, removed
+legacy subsystems (MODE8/VPE 3D, DLL plugins, CD-ROM, Judas sound library, DOS-only
+code paths), and documented the architecture.
 
 ```
 src/
@@ -64,6 +64,7 @@ src/
   divhandl.c         Window/dialog handler
   divbrush.c         Brush/texture thumbnail browser (paint editor)
   global.h           Master header — types, externs, the lot
+  div_string.h       Safe string helpers (bounded copy/cat/printf)
 
   runtime/
     i.c              DIV2 bytecode interpreter (the VM)
@@ -71,6 +72,7 @@ src/
     f.c              Runtime built-in functions
     divmixer.c       Runtime sound
     divlengu.c       Runtime language/text strings
+    debug/d.c        Debugger runtime
 
   runner/
     r.c              Launcher — starts the IDE, chains to debugger
@@ -78,7 +80,6 @@ src/
   shared/
     osdep/
       osd_sdl2.c/.h  SDL2 OS-dependency layer (display, input, audio)
-      osd_sdl12.c/.h SDL 1.2 OS-dependency layer (legacy)
     run/              Shared runtime support (keyboard, mouse, sound, FLI)
     lib/sdlgfx/       Bundled SDL_gfx framerate limiter
     lib/zip/           Zip archive support

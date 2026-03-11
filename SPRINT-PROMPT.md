@@ -1,107 +1,66 @@
-# DIV Games Studio — Modernization Sprint
+# DIV Games Studio — Agent Working Guide
 
-You are working on DIV Games Studio, a 1990s DOS game-creation IDE ported to SDL2.
-~85K lines of C, originally written in Spanish by Daniel Navarro at Hammer Technologies.
-The codebase compiles and runs on Windows (32-bit MinGW). All 4 targets build clean.
+How to work on this codebase safely and effectively. Read this before starting
+any sprint or task.
 
-## Before you start
+## Context loading
 
-Read these files to understand the codebase (use Agent/Explore for parallel reads):
+Read these files first (use Agent/Explore for parallel reads):
 
-1. `ROADMAP.md` — project vision, completed phases, what's next
+1. `ROADMAP.md` — project vision, completed work, current priorities
 2. `docs/architecture-overview.md` — IDE startup, main loop, OSDEP layer, file formats
 3. `docs/compiler-pipeline.md` — DIV compiler: lexer, parser, 127-opcode bytecode
 4. `docs/vm-and-runtime.md` — stack VM, process scheduling, rendering pipeline
-5. `docs/archive/glossary-spanish-english.md` — ~150 Spanish identifiers translated to English
-6. `src/global.h` — all 180+ globals, type aliases, macros
-7. `src/div_string.h` — safe string helpers already available
+5. `docs/archive/glossary-spanish-english.md` — Spanish→English identifier translations
+6. `src/global.h` — all globals, type aliases, macros
+7. `src/div_string.h` — safe string helpers
 
 ## Build & verify
 
 ```bash
 export PATH="/c/msys64/mingw32/bin:/c/msys64/usr/bin:$PATH"
 cd /c/Src/div/build
-cmake -G "MinGW Makefiles" -DTARGETOS=WINDOWS-NATIVE -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -Wno-dev ..
+cmake -G "MinGW Makefiles" -DTARGETOS=WINDOWS-NATIVE \
+  -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -Wno-dev ..
 mingw32-make -j$(nproc)
 ```
 
-All 4 targets must build: `d`, `div`, `divrun`, `divdbg`. After any change, rebuild and
-confirm zero warnings. Current baseline: **0 warnings** (Sprint A completed 2026-03-10).
+All 4 targets must build: `d`, `div`, `divrun`, `divdbg`.
+After ANY change, rebuild and confirm **zero warnings**.
 
----
+## Hard constraints
 
-## Current state and next priorities
+1. **Must compile.** All 4 targets. Zero warnings.
+2. **No behavioral changes** during cleanup/rename sprints. If you find a bug,
+   note it separately — don't "fix" it during a rename.
+3. **Project-wide consistency.** No half-renamed identifiers. If you rename
+   `crear_menu` to `create_menu`, every reference in the entire codebase changes.
+4. **32-bit only.** `sizeof(int) == sizeof(void*)`. No 64-bit assumptions.
+5. **UTF-8 source files.** Use `\xNN` for high-byte string/char literals.
+6. **No unnecessary new files.** Prefer editing existing files unless splitting
+   a large file or reorganizing source structure.
+7. **Commit after each sprint** with a descriptive message.
 
-**All translation + safety sprints complete:** Sprint A (warnings), B (OJO markers),
-C (function comments), D (single-letter globals), E (unsafe strings — 1,030 calls),
-F (331 function renames), G (~131 global/struct renames), H (~3,170 comment translations),
-J (copia/ventana/texto renames).
+## Safe string helpers (from Sprint E)
 
-**Next: Phase 2B modernization** — see `plans/cozy-fluttering-sun.md` or discuss with Daniel.
-Priorities: dead code removal (135 #ifdef blocks), source reorganization into modules,
-file renaming, monster file splitting (divc.c, div.c, divpaint.c).
-
----
-
-## Completed sprints (reference)
-
-| Sprint | Date | What | Scale |
-|--------|------|------|-------|
-| A | 2026-03-10 | 626 LOW warnings → 0 | 35 files |
-| B | 2026-03-10 | 47 OJO markers → 0 | 6 code fixes, ~22 WARNING/NOTE, ~12 TODO |
-| C | 2026-03-10 | 22 key functions documented | English comment blocks |
-| D | 2026-03-10 | 7 single-letter globals removed | 11 files |
-| E | 2026-03-11 | ~1,030 unsafe string calls → safe helpers | 31 files, 2 overflows found |
-| F | 2026-03-10 | 331 Spanish function names → English | 39+ files |
-| G | 2026-03-10 | ~131 globals + struct fields → English | 44 files, ~6,900 lines |
-| H | 2026-03-10 | ~3,170 Spanish comments → English | 34 files |
-| J | 2026-03-11 | 3 high-frequency globals renamed | 39 files, ~4,034 lines |
-
-## Safe string helpers reference (from Sprint E)
-
-**Helpers** (in `src/div_string.h`):
+In `src/div_string.h`:
 - `div_strcpy(dst, sizeof(dst), src)` — bounded copy
 - `div_strcat(dst, sizeof(dst), src)` — bounded concatenation
 - `div_snprintf(dst, sizeof(dst), fmt, ...)` — bounded format
-- `DIV_STRCPY`/`DIV_STRCAT`/`DIV_SPRINTF` — macro versions using sizeof automatically
+- `DIV_STRCPY`/`DIV_STRCAT`/`DIV_SPRINTF` — macros using sizeof automatically
 
-**Rules for future string work:**
-- Use `sizeof(dst)` when dst is a stack array
-- For heap-allocated or pointer-passed buffers, find the allocation size
-- For overlapping buffers, use `memmove()` instead
-- Don't change behavior — just add bounds checking
+Rules: use `sizeof(dst)` for stack arrays. Find allocation size for heap buffers.
+Use `memmove()` for overlapping buffers.
 
----
+## Coding standards
 
-### Sprint I: Split monster files
-
-**Goal:** Split the 3 largest files along natural boundaries identified in the
-architecture docs.
-
-| File | Lines | Proposed split |
-|------|-------|----------------|
-| `divc.c` | 7,823 | `divc_lexer.c` + `divc_parser.c` + `divc_codegen.c` |
-| `divpaint.c` | 4,969 | `divpaint.c` + `divpaint_tools.c` + `divpaint_select.c` |
-| `div.c` | 4,940 | `div.c` + `div_desktop.c` + `div_dialogs.c` |
-
-**Rules:**
-- Extract functions into new files, add forward declarations in headers
-- Update CMakeLists.txt to compile the new files
-- No behavioral changes — pure structural refactoring
-- Static/file-scope globals may need to become shared or passed as parameters
-
----
-
-### Future work (lower priority)
-
-- Rename cryptic locals in hottest paths (divc.c, divedit.c, runtime/i.c)
-- Unify byte types: pick `uint8_t` everywhere, stop mixing `byte`/`char`/`uchar` (warning, some code might rely on having some signed or unsigned bytes)
-- Fix or remove commented-out `free()` in runtime stack management (i.c:778)
-- Audit `PrintEvent` pattern for similar `#ifdef`-body bugs
-- Re-enable `test_video` startup dialog
-- DPI-aware rendering (`SDL_WINDOW_ALLOW_HIGHDPI`)
-
----
+- `.clang-format` and `.editorconfig` define the project style
+- Apply formatting incrementally via `git clang-format` on changed lines,
+  not whole-codebase reformats
+- Watch for name collisions when renaming — two different Spanish names might
+  map to the same English name
+- When in doubt about the intent of code, consult the original MSDOS source
+  in `original_msdos_source/` for comparison
 
 ## Agent team methodology
 
@@ -113,25 +72,23 @@ Agent 2: File B (read → modify → build-verify)
 Agent 3: File C (read → modify → build-verify)
 ```
 
-**Independence rule:** Two agents can work in parallel ONLY if they modify different
-files. If a rename touches multiple files (Sprint D, F, G), it must be done sequentially
-or by a single agent.
+**Independence rule:** Two agents can work in parallel ONLY if they modify
+different files. Cross-file renames must be done sequentially or by one agent.
 
-**Context loading:** Each agent should read:
-- The target file
-- `docs/archive/glossary-spanish-english.md` (for translations)
-- `src/global.h` (for type/macro context)
-- Any header the target file includes
+**Context loading per agent:** Each agent should read the target file, the
+glossary, `global.h`, and any headers the target file includes.
 
-## Hard constraints (never violate these)
+## Sprint cleanup protocol
 
-1. **Must compile.** All 4 targets. Zero warnings (baseline is 0 as of Sprint A).
-2. **No behavioral changes.** If a function is buggy, file it separately — don't fix it
-   during a rename/cleanup sprint.
-3. **Project-wide consistency.** No half-renamed identifiers. If you rename `crear_menu`
-   to `create_menu`, every single reference in the entire codebase must change.
-4. **32-bit only.** `sizeof(int) == sizeof(void*)`. Don't introduce 64-bit assumptions.
-5. **UTF-8 source files.** All source files are UTF-8. Use `\xNN` for high bytes in
-   string/char literals (lookup tables, font data).
-6. **No new files** unless splitting a large file (Sprint I).
-7. **Commit after each sprint** with a descriptive message.
+**Every sprint must update project docs as part of its deliverables:**
+
+1. **MEMORY.md** — Update the "Current state" section with what changed
+2. **ROADMAP.md** — Check off completed items, update line counts if significant,
+   add any new items discovered during the sprint
+3. **README.md** — Update if the sprint changed source layout, file names,
+   build process, or anything user-facing
+4. **docs/*.md** — Update architecture/compiler/runtime docs if affected
+5. **SPRINT-PROMPT.md** — Update if constraints, methodology, or tooling changed
+
+This ensures future sessions start with accurate, up-to-date documentation
+instead of having to re-discover the project state.
