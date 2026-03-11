@@ -24,7 +24,7 @@ void __far __interrupt __loadds IrqHandler(void) {}
 // Function to initialize the handler.
 //-----------------------------------------------------------------------------
 
-void kbdInit(void) {
+void kbd_init(void) {
   // call osdep keyboard init
   OSDEP_keyInit();
 }
@@ -33,7 +33,7 @@ void kbdInit(void) {
 // Function to uninitialize the handler.
 //-----------------------------------------------------------------------------
 
-void kbdReset(void) {
+void kbd_reset(void) {
   // nothing to do
 }
 

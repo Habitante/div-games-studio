@@ -769,7 +769,7 @@ casi_no_tiene_nombre:
       break;
 
     case 10:
-      GenExplodes();
+      gen_explodes();
       break;
     }
   }
@@ -1595,7 +1595,7 @@ void menu_sistema1(void) {
 void Cfg_Setup0(void);
 void Cfg_Setup_end(void);
 void shell(void);
-void calculadora(void);
+void calculator(void);
 
 void menu_sistema2(void) {
   update_menu(875, 1, 0);
@@ -1608,7 +1608,7 @@ void menu_sistema2(void) {
       muestra_papelera();
       break;
     case 3:
-      calculadora();
+      calculator();
       break;
     case 4:
       show_dialog(Vid_Setup0);

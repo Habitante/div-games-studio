@@ -3394,7 +3394,7 @@ void _exit_dos(void) {
   FILE *f;
 #endif
   reset_video_mode();
-  kbdReset();
+  kbd_reset();
 
 #ifdef DEBUG
   if ((f = fopen("system/exec.err", "wb")) != NULL) {
@@ -5038,7 +5038,7 @@ void texn2(byte *dest, int vga_width, byte *p, int x, int y, byte an, int al) {
 
 //-----------------------------------------------------------------------------
 //    Expression evaluator (pointer passed in `expression')
-//    If successful, returns token=p_num and tnumero=n
+//    If successful, returns token=p_num and token_number=n
 //-----------------------------------------------------------------------------
 
 enum tokens {
@@ -5064,29 +5064,29 @@ enum tokens {
 };
 
 int token;        // From the enum above
-double tnumero;   // When token==p_num
+double token_number;   // When token==p_num
 char *expression; // Pointer to the ASCIIZ expression
 
 struct { // Holds the parsed expression
   int token;
-  double numero;
-} expres[64];
+  double number;
+} expressions[64];
 
-int iexpres; // Number of elements stored in expres[]
+int num_expressions; // Number of elements stored in expressions[]
 
 double do_evaluate(void);
 
 void do_calculate(void) {
-  double evaluacion;
+  double result;
   token = p_inicio;        // No token initially
-  iexpres = 0;             // Initialize expression counter
+  num_expressions = 0;             // Initialize expression counter
   get_token();             // Get the first token
   expres0();               // Parse the expression
   if (token == p_ultimo) { // Expression parsed successfully
-    evaluacion = do_evaluate();
+    result = do_evaluate();
     if (token != p_error) { // Evaluated successfully
       token = p_num;
-      tnumero = evaluacion;
+      token_number = result;
     }
   } else
     token = p_error;
@@ -5097,9 +5097,9 @@ double do_evaluate(void) {
   int sp = 0, n = 0;
 
   do {
-    switch (expres[n].token) {
+    switch (expressions[n].token) {
     case p_num:
-      pila[++sp] = expres[n].numero;
+      pila[++sp] = expressions[n].number;
       break;
     case p_or:
       pila[sp - 1] = (double)((int)pila[sp - 1] | (int)pila[sp]);
@@ -5128,7 +5128,7 @@ double do_evaluate(void) {
     case p_div:
       if (pila[sp] == 0.0) {
         token = p_error;
-        n = iexpres;
+        n = num_expressions;
       } else {
         pila[sp - 1] /= pila[sp];
         sp--;
@@ -5137,7 +5137,7 @@ double do_evaluate(void) {
     case p_mod:
       if ((int)pila[sp] == 0) {
         token = p_error;
-        n = iexpres;
+        n = num_expressions;
       } else {
         pila[sp - 1] = (double)((int)pila[sp - 1] % (int)pila[sp]);
         sp--;
@@ -5160,23 +5160,23 @@ double do_evaluate(void) {
     case p_sqrt:
       if (pila[sp] < 0) {
         token = p_error;
-        n = iexpres;
+        n = num_expressions;
       } else {
         if (pila[sp] < 2147483648)
           pila[sp] = sqrt(pila[sp]);
         else {
           token = p_error;
-          n = iexpres;
+          n = num_expressions;
         }
       }
       break;
 
     default:
       token = p_error;
-      n = iexpres;
+      n = num_expressions;
       break;
     }
-  } while (++n < iexpres);
+  } while (++n < num_expressions);
 
   if (sp != 1)
     token = p_error;
@@ -5190,8 +5190,8 @@ void expres0() { // xor or and
   while ((p = token) >= p_xor && p <= p_and) {
     get_token();
     expres1();
-    expres[iexpres].token = p;
-    iexpres++;
+    expressions[num_expressions].token = p;
+    num_expressions++;
   }
 }
 
@@ -5201,8 +5201,8 @@ void expres1() { // << >>
   while ((p = token) >= p_shl && p <= p_shr) {
     get_token();
     expres2();
-    expres[iexpres].token = p;
-    iexpres++;
+    expressions[num_expressions].token = p;
+    num_expressions++;
   }
 }
 
@@ -5212,8 +5212,8 @@ void expres2() { // + -
   while ((p = token) >= p_add && p <= p_sub) {
     get_token();
     expres3();
-    expres[iexpres].token = p;
-    iexpres++;
+    expressions[num_expressions].token = p;
+    num_expressions++;
   }
 }
 
@@ -5223,8 +5223,8 @@ void expres3() { // * / %
   while ((p = token) >= p_mul && p <= p_mod) {
     get_token();
     expres4();
-    expres[iexpres].token = p;
-    iexpres++;
+    expressions[num_expressions].token = p;
+    num_expressions++;
   }
 }
 
@@ -5240,8 +5240,8 @@ void expres4() { // sign !
       p = p_neg;
     get_token();
     expres4();
-    expres[iexpres].token = p;
-    iexpres++;
+    expressions[num_expressions].token = p;
+    num_expressions++;
   } else
     expres5();
 }
@@ -5258,12 +5258,12 @@ void expres5() {
   } else if (token == p_sqrt) {
     get_token();
     expres5();
-    expres[iexpres].token = p_sqrt;
-    iexpres++;
+    expressions[num_expressions].token = p_sqrt;
+    num_expressions++;
   } else if (token == p_num) {
-    expres[iexpres].token = p_num;
-    expres[iexpres].numero = tnumero;
-    iexpres++;
+    expressions[num_expressions].token = p_num;
+    expressions[num_expressions].number = token_number;
+    num_expressions++;
     get_token();
   } else {
     token = p_error;
@@ -5297,7 +5297,7 @@ reget_token:
     case '.':
       token = p_num;
       expression--;
-      tnumero = get_num();
+      token_number = get_num();
       break;
     case '(':
       token = p_abrir;
@@ -5372,7 +5372,7 @@ reget_token:
           token = p_sqrt;
         else if (!strcmp(cwork, "pi")) {
           token = p_num;
-          tnumero = 3.14159265359;
+          token_number = 3.14159265359;
         } else
           token = p_error;
       } else {
@@ -5428,7 +5428,7 @@ void calculate(void) {
   expression = (char *)&mem[pila[sp]];
   do_calculate();
   if (token == p_num)
-    pila[sp] = (int)tnumero;
+    pila[sp] = (int)token_number;
   else
     pila[sp] = 0;
 }

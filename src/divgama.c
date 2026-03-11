@@ -40,8 +40,8 @@ void gama3(void);
 //  Variables y funciones externas
 //-----------------------------------------------------------------------------
 
-extern int SelColorFont;
-extern int SelColorOk;
+extern int sel_color_font;
+extern int sel_color_ok;
 void Selcolor0(void);
 
 //-----------------------------------------------------------------------------
@@ -261,12 +261,12 @@ void gama2(void) {
         v.redraw = 1;
       } else if (wmouse_in(button_coords[con].x - 3, button_coords[con].y - 15, 14, 14)) {
         show_dialog((voidReturnType)Selcolor0);
-        if (SelColorOk) {
+        if (sel_color_ok) {
           gradient_config[con].selec = 1;
-          gradient_config[con].color = SelColorFont;
-          gradient_config[con].r = dac[SelColorFont * 3];
-          gradient_config[con].g = dac[SelColorFont * 3 + 1];
-          gradient_config[con].b = dac[SelColorFont * 3 + 2];
+          gradient_config[con].color = sel_color_font;
+          gradient_config[con].r = dac[sel_color_font * 3];
+          gradient_config[con].g = dac[sel_color_font * 3 + 1];
+          gradient_config[con].b = dac[sel_color_font * 3 + 2];
         }
       }
     }

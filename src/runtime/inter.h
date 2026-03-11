@@ -962,8 +962,8 @@ GLOBAL byte kbdFLAGS[128];
 
 #define key(x) kbdFLAGS[x]
 
-void kbdInit(void);
-void kbdReset(void);
+void kbd_init(void);
+void kbd_reset(void);
 void poll_keyboard(void);
 void flush_buffer(void);
 

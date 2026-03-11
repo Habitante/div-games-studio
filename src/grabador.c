@@ -2,21 +2,21 @@
 #include "grabador.h"
 #include "global.h"
 
-byte *MiCopia;
-byte DacCopia[768];
-FILE *FileGrb;
+byte *frame_copy;
+byte dac_copy[768];
+FILE *grb_file;
 char CHUNK;
-int InitGrabador = 0;
+int init_recorder = 0;
 
-int MiraDiferencias(byte *NewScreen) {
+int check_differences(byte *NewScreen) {
   int x, Dif = 0;
   for (x = 0; x < 64000; x++)
-    if ((MiCopia[x] ^= NewScreen[x]))
+    if ((frame_copy[x] ^= NewScreen[x]))
       Dif = 1;
   return (Dif);
 }
 
-char *CmpOFF(char *Buffer, int *LengtOff) {
+char *compress_off(char *Buffer, int *LengtOff) {
   int x, rep, LastOff, cnt = 0;
   byte *cbuffer = (byte *)malloc(*LengtOff * 2);
 
@@ -40,7 +40,7 @@ char *CmpOFF(char *Buffer, int *LengtOff) {
   return ((char *)cbuffer);
 }
 
-char *CmpRLE(char *pVideoMem, int *LengtOff) {
+char *compress_rle(char *pVideoMem, int *LengtOff) {
   char ActPixel;
   char cntPixel = 0;
   int ptr = 0, cptr = 0;
@@ -69,73 +69,73 @@ char *CmpRLE(char *pVideoMem, int *LengtOff) {
   return ((char *)cbuffer);
 }
 
-void ComprimeFrameySalva() {
+void compress_and_save_frame() {
   byte *BuffOff;
   byte *BuffRLE;
   int LengtOff = 64000, LengtRLE = 64000;
 
-  BuffOff = (byte *)CmpOFF((char *)MiCopia, &LengtOff);
-  BuffRLE = (byte *)CmpRLE((char *)MiCopia, &LengtRLE);
+  BuffOff = (byte *)compress_off((char *)frame_copy, &LengtOff);
+  BuffRLE = (byte *)compress_rle((char *)frame_copy, &LengtRLE);
 
   if (LengtOff < LengtRLE) {
     CHUNK = INIT_FRAME;
-    fwrite(&CHUNK, 1, 1, FileGrb);
+    fwrite(&CHUNK, 1, 1, grb_file);
     CHUNK = CMP_OFF;
-    fwrite(&CHUNK, 1, 1, FileGrb);
-    fwrite(&LengtOff, 1, 4, FileGrb);
-    _ffwrite(BuffOff, LengtOff, FileGrb);
+    fwrite(&CHUNK, 1, 1, grb_file);
+    fwrite(&LengtOff, 1, 4, grb_file);
+    _ffwrite(BuffOff, LengtOff, grb_file);
   } else {
     CHUNK = INIT_FRAME;
-    fwrite(&CHUNK, 1, 1, FileGrb);
+    fwrite(&CHUNK, 1, 1, grb_file);
     CHUNK = CMP_RLE;
-    fwrite(&CHUNK, 1, 1, FileGrb);
-    fwrite(&LengtRLE, 1, 4, FileGrb);
-    _ffwrite(BuffRLE, LengtRLE, FileGrb);
+    fwrite(&CHUNK, 1, 1, grb_file);
+    fwrite(&LengtRLE, 1, 4, grb_file);
+    _ffwrite(BuffRLE, LengtRLE, grb_file);
   }
   free(BuffOff);
   free(BuffRLE);
 }
 
-void RegScreen(unsigned char *NewScreen) {
-  if (!InitGrabador) {
-    InitGrabador = 1;
-    MiCopia = (byte *)malloc(64004);
-    memset(MiCopia, 0, 64004);
-    FileGrb = fopen("GRABADOR.SSN", "wb");
-    WriteDac(dac);
-    memcpy(MiCopia, NewScreen, 64000);
-    ComprimeFrameySalva();
+void record_screen(unsigned char *NewScreen) {
+  if (!init_recorder) {
+    init_recorder = 1;
+    frame_copy = (byte *)malloc(64004);
+    memset(frame_copy, 0, 64004);
+    grb_file = fopen("GRABADOR.SSN", "wb");
+    write_dac(dac);
+    memcpy(frame_copy, NewScreen, 64000);
+    compress_and_save_frame();
   } else {
-    if (MiraDiferencias(NewScreen))
-      ComprimeFrameySalva();
-    memcpy(MiCopia, NewScreen, 64000);
+    if (check_differences(NewScreen))
+      compress_and_save_frame();
+    memcpy(frame_copy, NewScreen, 64000);
   }
 }
 
-void EndGrabador() {
+void end_recorder() {
   CHUNK = END_ANIM;
-  fwrite(&CHUNK, 1, 1, FileGrb);
-  fclose(FileGrb);
-  free(MiCopia);
+  fwrite(&CHUNK, 1, 1, grb_file);
+  fclose(grb_file);
+  free(frame_copy);
 }
 
-void WriteDac(byte *dac) {
+void write_dac(byte *dac) {
   int x;
-  if (InitGrabador)
+  if (init_recorder)
     for (x = 0; x < 768; x++)
-      if (DacCopia[x] != dac[x]) {
+      if (dac_copy[x] != dac[x]) {
         CHUNK = SET_PALET;
-        fwrite(&CHUNK, 1, 1, FileGrb);
-        fwrite(dac, 768, 1, FileGrb);
-        memcpy(DacCopia, dac, 768);
+        fwrite(&CHUNK, 1, 1, grb_file);
+        fwrite(dac, 768, 1, grb_file);
+        memcpy(dac_copy, dac, 768);
         return;
       }
 }
 
-void WriteMouseKey(char bMouseKey) {
-  if (InitGrabador) {
+void write_mouse_key(char bMouseKey) {
+  if (init_recorder) {
     CHUNK = MOUSE_KEY;
-    fwrite(&CHUNK, 1, 1, FileGrb);
-    fwrite(&bMouseKey, 1, 1, FileGrb);
+    fwrite(&CHUNK, 1, 1, grb_file);
+    fwrite(&bMouseKey, 1, 1, grb_file);
   }
 }

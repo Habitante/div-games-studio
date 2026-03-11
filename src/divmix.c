@@ -26,10 +26,10 @@ void mixer2(void);
 //  Variables
 //-----------------------------------------------------------------------------
 
-char DummyArrayForFakingPurposesUsedInMixer[21 * 1];
-struct t_listbox lvol_fx = {MIX_BAR1, 11, DummyArrayForFakingPurposesUsedInMixer, 1, 5, 1};
-struct t_listbox lvol_cd = {MIX_BAR2, 11, DummyArrayForFakingPurposesUsedInMixer, 1, 5, 1};
-struct t_listbox lvol_ma = {MIX_BAR3, 11, DummyArrayForFakingPurposesUsedInMixer, 1, 5, 1};
+char dummy_mixer_array[21 * 1];
+struct t_listbox lvol_fx = {MIX_BAR1, 11, dummy_mixer_array, 1, 5, 1};
+struct t_listbox lvol_cd = {MIX_BAR2, 11, dummy_mixer_array, 1, 5, 1};
+struct t_listbox lvol_ma = {MIX_BAR3, 11, dummy_mixer_array, 1, 5, 1};
 
 //-----------------------------------------------------------------------------
 //  Mixer window

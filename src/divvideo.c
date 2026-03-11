@@ -25,14 +25,14 @@ void blit_sdl(byte *p);
 
 SDL_Surface *vga;
 
-int IsFullScreen(SDL_Surface *surface) {
+int is_fullscreen(SDL_Surface *surface) {
   return OSDEP_IsFullScreen();
 }
 
 static int windowed_an = 0, windowed_al = 0;
 
-void SDL_ToggleFS(SDL_Surface *surface) {
-  if (IsFullScreen(surface)) {
+void toggle_fullscreen(SDL_Surface *surface) {
+  if (is_fullscreen(surface)) {
     // Going windowed — restore saved windowed size
     if (windowed_an >= 640 && windowed_al >= 480) {
       vga_width = windowed_an;
@@ -93,8 +93,8 @@ void set_dac(byte *_dac) {
 //      Set Video Mode (vga_width y vga_height se definen en shared.h)
 //-----------------------------------------------------------------------------
 
-int LinealMode;
-int modovesa;
+int lineal_mode;
+int vesa_mode;
 
 
 SDL_Surface *copy_surface(SDL_Surface *source) {
@@ -132,7 +132,7 @@ void setup_video_mode(void) {
   else
     vga = OSDEP_SetVideoMode(vga_width, vga_height, CDEPTH, 1);
 
-  modovesa = 1;
+  vesa_mode = 1;
 
   set_dac(dac);
 }
@@ -146,8 +146,8 @@ void setup_modex(int m) {
 //-----------------------------------------------------------------------------
 
 void reset_video_mode(void) {
-  if (IsFullScreen(vga))
-    SDL_ToggleFS(vga);
+  if (is_fullscreen(vga))
+    toggle_fullscreen(vga);
 }
 
 //-----------------------------------------------------------------------------
@@ -232,7 +232,7 @@ void blit_screen(byte *p) {
 
 
   if (full_redraw) {
-    if (modovesa)
+    if (vesa_mode)
       blit_sdl(p);
     else
       switch (vga_width * 1000 + vga_height) {
@@ -256,7 +256,7 @@ void blit_screen(byte *p) {
         break;
       }
   } else {
-    if (modovesa)
+    if (vesa_mode)
       volcadosdlp(p);
     else
       switch (vga_width * 1000 + vga_height) {
@@ -284,7 +284,7 @@ void blit_screen(byte *p) {
   {
     static uint32_t fs_cooldown = 0;
     if (shift_status & 8 && key(_ENTER) && SDL_GetTicks() - fs_cooldown > 500) {
-      SDL_ToggleFS(vga);
+      toggle_fullscreen(vga);
       fs_cooldown = SDL_GetTicks();
     }
   }
@@ -331,7 +331,7 @@ void blit_partial_svga(byte *p) {
   int y = 0, page, old_page = -1751, point, t1, t2, n;
   char *q = (char *)vga->pixels;
 
-  if (LinealMode) {
+  if (lineal_mode) {
     while (y < vga_height) {
       n = y * 4;
       if (scan[n + 1])
@@ -378,7 +378,7 @@ void blit_full_svga(byte *p) {
   int cnt = vga_width * vga_height;
   int tpv = 0, ActPge = 0;
 
-  if (LinealMode)
+  if (lineal_mode)
     memcpy(vga, p, cnt);
   else
     while (cnt > 0) {
@@ -441,7 +441,7 @@ void blit_partial(int x, int y, int an, int al) {
     xmax = x + an - 1;
     ymax = y + al - 1;
 
-    if (!modovesa) {
+    if (!vesa_mode) {
       switch (vga_width * 1000 + vga_height) {
       case 320240:
       case 320400:

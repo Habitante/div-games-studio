@@ -32,12 +32,12 @@ void create_ghost_slow(void);
 // Check if SDL is already loaded
 
 #ifndef __EMSCRIPTEN__
-int IsFullScreen(SDL_Surface *surface) {
+int is_fullscreen(SDL_Surface *surface) {
   return OSDEP_IsFullScreen(); // Return false if surface is windowed
 }
 
-int SDL_ToggleFS(SDL_Surface *surface) {
-  if (IsFullScreen(surface))
+int toggle_fullscreen(SDL_Surface *surface) {
+  if (is_fullscreen(surface))
     fsmode = 0;
   else
     fsmode = 1;
@@ -92,7 +92,7 @@ extern int fli_palette_update;
 // Function to set the palette
 //----------------------------------------------------------------------------
 
-byte color_oscuro;
+byte dark_color;
 
 void update_palette(void) {
   word n;
@@ -165,7 +165,7 @@ void update_palette(void) {
     n++;
   } while (n < 768);
 
-  color_oscuro = 0;
+  dark_color = 0;
 
   if (process_active_palette != NULL)
     process_active_palette();
@@ -219,8 +219,8 @@ void fade_wait(void) {
 //      Set Video Mode (vga_width and vga_height are defined in shared.h)
 //-----------------------------------------------------------------------------
 
-int LinealMode;
-int modovesa;
+int lineal_mode;
+int vesa_mode;
 
 extern float m_x, m_y;
 
@@ -267,7 +267,7 @@ void setup_video_mode(void) {
 #endif
   OSDEP_SetCaption("DIVDX 3.01", "");
 
-  modovesa = 1;
+  vesa_mode = 1;
 
   m_x = (float)vga_width / 2.0;
   m_y = (float)vga_height / 2.0;
@@ -297,8 +297,8 @@ void setup_modex(int m) {}
 void reset_video_mode(void) {
 // Emscripten has its own fullscreen controls
 #ifndef __EMSCRIPTEN__
-  if (IsFullScreen(vga))
-    SDL_ToggleFS(vga);
+  if (is_fullscreen(vga))
+    toggle_fullscreen(vga);
 #endif
 }
 
@@ -373,7 +373,7 @@ void blit_screen(byte *p) {
   {
     static uint32_t fs_cooldown = 0;
     if (shift_status & 8 && key(_ENTER) && SDL_GetTicks() - fs_cooldown > 500) {
-      SDL_ToggleFS(vga);
+      toggle_fullscreen(vga);
       fs_cooldown = SDL_GetTicks();
     }
   }
@@ -572,7 +572,7 @@ void blit_partial_320x200(byte *p) {
   byte *q = (byte *)vga->pixels;
 
 #ifdef GRABADORA
-  RegScreen(p);
+  record_screen(p);
 #endif
 
   while (y < vga_height) {
@@ -589,7 +589,7 @@ void blit_partial_320x200(byte *p) {
 
 void blit_full_320x200(byte *p) {
 #ifdef GRABADORA
-  RegScreen(p);
+  record_screen(p);
 #endif
   memcpy(vga, p, vga_width * vga_height);
 }
@@ -671,7 +671,7 @@ void blit_partial(int x, int y, int an, int al) {
     xmax = x + an - 1;
     ymax = y + al - 1;
 
-    if (!modovesa) {
+    if (!vesa_mode) {
       switch (vga_width * 1000 + vga_height) {
       case 320240:
       case 320400:

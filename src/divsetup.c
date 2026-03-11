@@ -30,8 +30,8 @@ extern int help_item;
 extern int cierra_rapido;
 extern int skip_window_render;
 
-extern int SelColorFont;
-extern int SelColorOk;
+extern int sel_color_font;
+extern int sel_color_ok;
 void Selcolor0(void);
 
 void gama0(void);
@@ -775,10 +775,10 @@ void Cfg_Setup2(void) {
   }
 
   if ((mouse_b & 1) && zona >= 1 && zona <= 12) {
-    SelColorFont = color_cfg[zona - 1];
+    sel_color_font = color_cfg[zona - 1];
     show_dialog((voidReturnType)Selcolor0);
-    if (SelColorOk) {
-      color_cfg[zona - 1] = SelColorFont;
+    if (sel_color_ok) {
+      color_cfg[zona - 1] = sel_color_font;
       Cfg_colors();
       v.redraw = 1;
     }

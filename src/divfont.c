@@ -63,8 +63,8 @@ int Mosaico1 = 0, Mosaico2 = 0, Mosaico3 = 0;
 char MiTabladeLetras[256];
 char cCharsToPrint[128];
 
-int SelColorFont;
-int SelColorOk;
+int sel_color_font;
+int sel_color_ok;
 char *FntAux;
 
 int spacelen;
@@ -267,10 +267,10 @@ void Fonts2(void) {
   if ((wmouse_y > 86) && (wmouse_y < 86 + 24) && (mouse_b)) {
     if ((wmouse_x > 64) && (wmouse_x < 64 + 41)) {
       _reselect_item();
-      SelColorFont = Text1Col;
+      sel_color_font = Text1Col;
       show_dialog(Selcolor0);
-      if (SelColorOk) {
-        Text1Col = SelColorFont;
+      if (sel_color_ok) {
+        Text1Col = sel_color_font;
         memset(Text1, Text1Col, tan * tal + tan);
         Text1Anc = 1;
         Text1Alt = 1;
@@ -285,10 +285,10 @@ void Fonts2(void) {
     }
     if ((wmouse_x > 124) && (wmouse_x < 124 + 41)) {
       _reselect_item();
-      SelColorFont = Text2Col;
+      sel_color_font = Text2Col;
       show_dialog(Selcolor0);
-      if (SelColorOk) {
-        Text2Col = SelColorFont;
+      if (sel_color_ok) {
+        Text2Col = sel_color_font;
         memset(Text2, Text2Col, tan * tal + tan);
         Text2Anc = 1;
         Text2Alt = 1;
@@ -303,10 +303,10 @@ void Fonts2(void) {
     }
     if ((wmouse_x > 4) && (wmouse_x < 4 + 41)) {
       _reselect_item();
-      SelColorFont = Text3Col;
+      sel_color_font = Text3Col;
       show_dialog(Selcolor0);
-      if (SelColorOk) {
-        Text3Col = SelColorFont;
+      if (sel_color_ok) {
+        Text3Col = sel_color_font;
         memset(Text3, Text3Col, tan * tal + tan);
         Text3Anc = 1;
         Text3Alt = 1;
@@ -764,19 +764,19 @@ void Selcolor1(void) {
   int x, y;
   int an = v.an / big2, al = v.al / big2;
 
-  SelColorOk = 0;
+  sel_color_ok = 0;
   _show_items();
   wbox(v.ptr, an, al, c0, 2, 10, 128, 128);
   for (y = 0; y < 16; y++)
     for (x = 0; x < 16; x++)
       wbox(v.ptr, an, al, (y * 16 + x), x * 8 + 2, y * 8 + 10, 7, 7);
-  wrectangle(v.ptr, an, al, c4, (SelColorFont % 16) * 8 + 1, (SelColorFont / 16) * 8 + 9, 9, 9);
-  if (dac[SelColorFont * 3] * dac[SelColorFont * 3 + 1] * dac[SelColorFont * 3 + 2] <
+  wrectangle(v.ptr, an, al, c4, (sel_color_font % 16) * 8 + 1, (sel_color_font / 16) * 8 + 9, 9, 9);
+  if (dac[sel_color_font * 3] * dac[sel_color_font * 3 + 1] * dac[sel_color_font * 3 + 2] <
       (32 * 32 * 32))
-    wbox(v.ptr, an, al, c4, (SelColorFont % 16) * 8 + 4, (SelColorFont / 16) * 8 + 12, 3, 3);
+    wbox(v.ptr, an, al, c4, (sel_color_font % 16) * 8 + 4, (sel_color_font / 16) * 8 + 12, 3, 3);
   else
-    wbox(v.ptr, an, al, c0, (SelColorFont % 16) * 8 + 4, (SelColorFont / 16) * 8 + 12, 3, 3);
-  PrevColor = OldColor = SelColorFont;
+    wbox(v.ptr, an, al, c0, (sel_color_font % 16) * 8 + 4, (sel_color_font / 16) * 8 + 12, 3, 3);
+  PrevColor = OldColor = sel_color_font;
 }
 
 void Selcolor2(void) {
@@ -787,11 +787,11 @@ void Selcolor2(void) {
   switch (v.active_item) {
   case 0:
     end_dialog = 1;
-    SelColorOk = 1;
+    sel_color_ok = 1;
     break;
   case 1:
     end_dialog = 1;
-    SelColorOk = 0;
+    sel_color_ok = 0;
     break;
   }
 
@@ -804,29 +804,29 @@ void Selcolor2(void) {
       OldColor = cColor;
     }
     if (mouse_b) {
-      if (SelColorFont != cColor) {
-        wbox(v.ptr, an, al, SelColorFont, (SelColorFont % 16) * 8 + 4, (SelColorFont / 16) * 8 + 12,
+      if (sel_color_font != cColor) {
+        wbox(v.ptr, an, al, sel_color_font, (sel_color_font % 16) * 8 + 4, (sel_color_font / 16) * 8 + 12,
              3, 3);
-        SelColorFont = cColor;
-        if (dac[SelColorFont * 3] + dac[SelColorFont * 3 + 1] + dac[SelColorFont * 3 + 2] <
+        sel_color_font = cColor;
+        if (dac[sel_color_font * 3] + dac[sel_color_font * 3 + 1] + dac[sel_color_font * 3 + 2] <
             (32 + 32 + 32))
-          wbox(v.ptr, an, al, c4, (SelColorFont % 16) * 8 + 4, (SelColorFont / 16) * 8 + 12, 3, 3);
+          wbox(v.ptr, an, al, c4, (sel_color_font % 16) * 8 + 4, (sel_color_font / 16) * 8 + 12, 3, 3);
         else
-          wbox(v.ptr, an, al, c0, (SelColorFont % 16) * 8 + 4, (SelColorFont / 16) * 8 + 12, 3, 3);
+          wbox(v.ptr, an, al, c0, (sel_color_font % 16) * 8 + 4, (sel_color_font / 16) * 8 + 12, 3, 3);
         v.redraw = 1;
       }
     }
   } else {
     wrectangle(v.ptr, an, al, c0, (OldColor % 16) * 8 + 1, (OldColor / 16) * 8 + 9, 9, 9);
-    wrectangle(v.ptr, an, al, c4, (SelColorFont % 16) * 8 + 1, (SelColorFont / 16) * 8 + 9, 9, 9);
-    OldColor = SelColorFont;
+    wrectangle(v.ptr, an, al, c4, (sel_color_font % 16) * 8 + 1, (sel_color_font / 16) * 8 + 9, 9, 9);
+    OldColor = sel_color_font;
     v.redraw = 1;
   }
 }
 
 void Selcolor3(void) {
-  if (!SelColorOk)
-    SelColorFont = PrevColor;
+  if (!sel_color_ok)
+    sel_color_font = PrevColor;
 }
 
 void Selcolor0(void) {

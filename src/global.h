@@ -535,7 +535,7 @@ void memcpyb(byte *, byte *, int);
 //      Functions exported by DIVEFFECT (diveffect.c)
 ///////////////////////////////////////////////////////////////////////////////
 
-void GenExplodes();
+void gen_explodes();
 
 ///////////////////////////////////////////////////////////////////////////////
 //      Global variables shared between several modules
@@ -916,8 +916,8 @@ GLOBAL_DATA byte kbdFLAGS[128];
 
 #define key(x) kbdFLAGS[x]
 
-void kbdInit(void);
-void kbdReset(void);
+void kbd_init(void);
+void kbd_reset(void);
 void poll_keyboard(void);
 void flush_buffer(void);
 
