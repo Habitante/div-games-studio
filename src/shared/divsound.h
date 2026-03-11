@@ -33,7 +33,7 @@ typedef struct _sonido {
   Mix_Chunk *sound;
   char loop;
 #endif
-} tSonido;
+} sound_t;
 
 typedef struct _cancion {
   char *ptr;
@@ -43,10 +43,10 @@ typedef struct _cancion {
   Mix_Music *music;
   SDL_RWops *rw;
 #endif
-} tCancion;
+} song_t;
 
-extern tSonido sonido[128];
-extern tCancion cancion[128];
+extern sound_t sounds[128];
+extern song_t songs[128];
 extern int *NewSound;
 extern int ChannelCon;
 

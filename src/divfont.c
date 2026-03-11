@@ -659,10 +659,10 @@ int CreateFont(int GenCode) {
       ifs.oscuros[x] = _c0;
   }
 
-  bodyTexBuffer = Text03;
-  shadowTexBuffer = Text02;
-  outTexBuffer = Text01;
-  if (Jorge_Crea_el_font(GenCode)) {
+  body_tex_buffer = Text03;
+  shadow_tex_buffer = Text02;
+  out_tex_buffer = Text01;
+  if (jorge_create_font(GenCode)) {
     v_text = (char *)texts[45];
     show_dialog(err0);
     return 0;
@@ -859,7 +859,7 @@ void Preview1() {
   memset(MyBuffer, c2, TamaX * TamaY);
   init = 0;
   for (x = 0; x < strlen(TestString); x++) {
-    len = ShowChar(TestString[x], init, 0, MyBuffer, TamaX);
+    len = show_char(TestString[x], init, 0, MyBuffer, TamaX);
     if (len <= 1)
       len = spacelen;
     init += len;
@@ -906,7 +906,7 @@ void Preview0() {
   spacelen = 0;
   cnt = 0;
   for (x = 0; x < 255; x += 2) {
-    GetCharSize(x, &fan, &fal);
+    get_char_size(x, &fan, &fal);
     if (fan > 1) {
       cnt++;
       spacelen += fan;
@@ -920,7 +920,7 @@ void Preview0() {
     spacelen = 1;
 
   for (x = 0; x < strlen(TestString); x++) {
-    GetCharSize(TestString[x], &fan, &fal);
+    get_char_size(TestString[x], &fan, &fal);
     if (fan <= 1)
       fan = spacelen;
     TamaX += fan;
@@ -1100,7 +1100,7 @@ void Preview21() {
 
   init = 0;
   for (x = 0; x < strlen(TestString2); x++) {
-    len = ShowCharBuffer(TestString2[x], init, 0, MyBuffer, TamaX, font_aux);
+    len = show_char_buffer(TestString2[x], init, 0, MyBuffer, TamaX, font_aux);
     if (len <= 1)
       len = 0;
     init += len;
@@ -1148,7 +1148,7 @@ void Preview20() {
   spacelen = 0;
   cnt = 0;
   for (x = 0; x < 255; x += 2) {
-    GetCharSizeBuffer(x, &fan, &fal, font_aux);
+    get_char_size_buffer(x, &fan, &fal, font_aux);
     if (fan > 1) {
       cnt++;
       spacelen += fan;
@@ -1162,7 +1162,7 @@ void Preview20() {
     spacelen = 1;
 
   for (x = 0; x < strlen(TestString2); x++) {
-    GetCharSizeBuffer(TestString2[x], &fan, &fal, font_aux);
+    get_char_size_buffer(TestString2[x], &fan, &fal, font_aux);
     if (fan <= 1)
       fan = 0;
     TamaX += fan;
@@ -1290,7 +1290,7 @@ void show_font1(void) {
   spacelen = 0;
   cnt = 0;
   for (x = 0; x < 255; x += 2) {
-    GetCharSizeBuffer(x, &fan, &fal, (char *)&v.aux[RES_FOR_NAME]);
+    get_char_size_buffer(x, &fan, &fal, (char *)&v.aux[RES_FOR_NAME]);
     if (fan > 1) {
       cnt++;
       spacelen += fan;
@@ -1304,7 +1304,7 @@ void show_font1(void) {
     spacelen = 1;
 
   for (x = 0; x < strlen(TestString2); x++) {
-    GetCharSizeBuffer(TestString2[x], &fan, &fal, (char *)&v.aux[RES_FOR_NAME]);
+    get_char_size_buffer(TestString2[x], &fan, &fal, (char *)&v.aux[RES_FOR_NAME]);
     if (fan <= 1)
       fan = 0;
     TamaX += fan;
@@ -1326,7 +1326,7 @@ void show_font1(void) {
   init = 0;
   for (x = 0; x < strlen(TestString2); x++) {
     len =
-        ShowCharBuffer(TestString2[x], init, 0, (char *)temp, TamaX, (char *)&v.aux[RES_FOR_NAME]);
+        show_char_buffer(TestString2[x], init, 0, (char *)temp, TamaX, (char *)&v.aux[RES_FOR_NAME]);
     if (len <= 1)
       len = 0;
     init += len;
@@ -1434,7 +1434,7 @@ void show_font0(void) {
   memcpy(v.aux, Load_FontName, strlen(Load_FontName));
   memcpy(v.aux + 14, Load_FontPathName, strlen(Load_FontPathName)); //Full path
   fread(v.aux + RES_FOR_NAME, Length, 1, file);
-  ConvertFntToPal((char *)v.aux + RES_FOR_NAME);
+  convert_fnt_to_pal((char *)v.aux + RES_FOR_NAME);
   fclose(file);
   v.title = v.aux;
   v.name = v.aux;
@@ -1466,7 +1466,7 @@ void pal_reload_font(int vn, struct twindow *vntn) {
   memcpy(vntn->aux, Load_FontName, strlen(Load_FontName));
   memcpy(vntn->aux + 14, Load_FontPathName, strlen(Load_FontPathName)); //Full path
   fread(vntn->aux + RES_FOR_NAME, Length, 1, file);
-  ConvertFntToPal((char *)vntn->aux + RES_FOR_NAME);
+  convert_fnt_to_pal((char *)vntn->aux + RES_FOR_NAME);
   fclose(file);
 }
 
@@ -1592,7 +1592,7 @@ void create_text() {
   spacelen = 0;
   cnt = 0;
   for (x = 0; x < 255; x += 2) {
-    GetCharSizeBuffer(x, &fan, &fal, font_aux);
+    get_char_size_buffer(x, &fan, &fal, font_aux);
     if (fan != 1) {
       cnt++;
       spacelen += fan;
@@ -1605,7 +1605,7 @@ void create_text() {
   // 2 - Calculate the text dimensions in TamaX x TamaY
 
   for (x = 0; x < strlen(cCharsToPrint); x++) {
-    GetCharSizeBuffer(cCharsToPrint[x], &fan, &fal, font_aux);
+    get_char_size_buffer(cCharsToPrint[x], &fan, &fal, font_aux);
     if (fan == 1)
       fan = spacelen;
     TamaX += fan;
@@ -1623,11 +1623,11 @@ void create_text() {
   if (new_map(NULL))
     return;
 
-  // 4 - Use ShowCharBuffer() to render the text into the map
+  // 4 - Use show_char_buffer() to render the text into the map
 
   init = 0;
   for (x = 0; x < strlen(cCharsToPrint); x++)
-    if ((cnt = ShowCharBuffer(cCharsToPrint[x], init, 0, (char *)v.mapa->map, TamaX, font_aux)) != 1)
+    if ((cnt = show_char_buffer(cCharsToPrint[x], init, 0, (char *)v.mapa->map, TamaX, font_aux)) != 1)
       init += cnt;
     else
       init += spacelen;

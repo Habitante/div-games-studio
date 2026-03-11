@@ -2857,8 +2857,8 @@ void edit_mode_11(void) {
 // TODO: Known bug -- screen refresh fails when combining undo with backspace during text deletion
 
 int find_font_window(void);
-void GetCharSizeBuffer(int WhatChar, int *width, int *height, char *buffer);
-int ShowCharBuffer(int WhatChar, int cx, int cy, char *ptr, int w, char *buffer);
+void get_char_size_buffer(int WhatChar, int *width, int *height, char *buffer);
+int show_char_buffer(int WhatChar, int cx, int cy, char *ptr, int w, char *buffer);
 
 int text_bar_active = 0; // Prevent background highlight toggle with 'b' key
 
@@ -2893,7 +2893,7 @@ void edit_mode_12(void) {
     spacelen = 0;
     cnt = 0;
     for (x = 0; x < 255; x++) {
-      GetCharSizeBuffer(x, &char_w, &char_h, (char *)font);
+      get_char_size_buffer(x, &char_w, &char_h, (char *)font);
       if (char_w != 1) {
         cnt++;
         spacelen += char_w;
@@ -2906,7 +2906,7 @@ void edit_mode_12(void) {
     max_char_w = 0;
     max_char_h = 0;
     for (x = 0; x < 255; x++) {
-      GetCharSizeBuffer(x, &char_w, &char_h, (char *)font);
+      get_char_size_buffer(x, &char_w, &char_h, (char *)font);
       if (char_w == 1)
         char_w = spacelen;
       if (max_char_w < char_w)
@@ -3021,7 +3021,7 @@ void edit_mode_12(void) {
             }
           }
         } else if (ascii && scan_code != 15 && scan_code != 1 && text_len < 256) {
-          GetCharSizeBuffer(ascii, &char_w, &char_h, (char *)font);
+          get_char_size_buffer(ascii, &char_w, &char_h, (char *)font);
           if (char_w == 1) {
             if (save_undo(sel_x0, sel_y1, 1, 1)) {
               test_previous();
@@ -3033,7 +3033,7 @@ void edit_mode_12(void) {
             memset(buffer, 0, max_char_w * max_char_h);
             if (save_undo(sel_x0, sel_y0, char_w, max_char_h)) {
               test_previous(); // To counteract the effect of save_undo()
-              ShowCharBuffer(ascii, 0, 0, (char *)buffer, max_char_w, (char *)font);
+              show_char_buffer(ascii, 0, 0, (char *)buffer, max_char_w, (char *)font);
               line_fx = text_tool_effect;
               write_char2(sel_x0, sel_y0, buffer, max_char_w, max_char_h);
               sel_x0 += char_w;
@@ -6385,9 +6385,9 @@ void paint_mask_window(byte *p, int c, int d) {
 #define MAPBR 8
 
 extern int texture_type;
-extern int t_maximo;
-extern int f_maximo;
-extern int FPG_thumbpos;
+extern int tex_count;
+extern int bg_count;
+extern int fpg_thumb_pos;
 extern byte brush_fpg_path[256];
 extern char m3d_fpgcodesbr[max_texturas * w_textura];
 extern struct t_listboxbr texture_list_br;
@@ -6401,7 +6401,7 @@ extern struct _thumb_tex {
   int is_square;
 } thumb_tex[max_texturas];
 
-extern FILE *FilePaintFPG;
+extern FILE *file_paint_fpg;
 
 extern struct t_listboxbr copia_br;
 
@@ -6419,7 +6419,7 @@ struct _thumb_map {   // Brush map thumbnails
   int is_square;
 } thumb_map[max_windows];
 
-void MapperBrowseFPG0(void);
+void mapper_browse_fpg0(void);
 
 void FreePaintThumbs(void) {
   int n;
@@ -6446,7 +6446,7 @@ int create_mapbr_thumbs(struct t_listboxbr *l) {
   float coefredy, coefredx, a, b;
   int x, y;
 
-  FPG_thumbpos = 0;
+  fpg_thumb_pos = 0;
 
   n = m_maximo = 0;
   for (con = 0; con < max_windows; con++) {
@@ -6556,7 +6556,7 @@ void select_color(int n) { // Icon number as parameter
                                                          toolbar_x + 62 + n * 16, toolbar_y + 17) &&
                                                 (mouse_b & 1)))) {
     browser_type = BRUSH;
-    show_dialog(MapperBrowseFPG0);
+    show_dialog(mapper_browse_fpg0);
 
     num_tex = texture_list_br.first_visible + texture_list_br.zone - 10; // Position in browser
     tex_cod = atoi(m3d_fpgcodesbr + num_tex * w_textura);       // Code at that position
@@ -6571,9 +6571,9 @@ void select_color(int n) { // Icon number as parameter
       v_text = (char *)texts[45];
       show_dialog(err0);
     } else {
-      fseek(FilePaintFPG, thumb_tex[num_tex].FilePos, SEEK_SET);
+      fseek(file_paint_fpg, thumb_tex[num_tex].FilePos, SEEK_SET);
 
-      if (fread(temp, 1, man * mal, FilePaintFPG) != man * mal) {
+      if (fread(temp, 1, man * mal, file_paint_fpg) != man * mal) {
         free(temp);
         v_text = (char *)texts[44];
         show_dialog(err0);
@@ -6587,9 +6587,9 @@ void select_color(int n) { // Icon number as parameter
         brush_w = man;
         brush_h = mal;
 
-        fseek(FilePaintFPG, 8, SEEK_SET);
+        fseek(file_paint_fpg, 8, SEEK_SET);
         memcpy(pal, dac, 768);
-        fread(pal, 1, 768, FilePaintFPG);
+        fread(pal, 1, 768, file_paint_fpg);
 
         // Brush in {brush, man x mal, pal}
 
@@ -6609,7 +6609,7 @@ void select_color(int n) { // Icon number as parameter
                                         toolbar_x + 62 - 8 + n * 16, toolbar_y + 17) &&
                                (mouse_b & 1)))) {
     browser_type = MAPBR;
-    show_dialog(MapperBrowseFPG0);
+    show_dialog(mapper_browse_fpg0);
     if (v_finished) {
       num_tex = thumb_map[texture_list_br.first_visible + texture_list_br.zone - 10].Code;
       texture_color = window[num_tex].mapa->map;

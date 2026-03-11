@@ -1,8 +1,8 @@
 #include "inter.h"
 #include "divsound.h"
 
-tSonido sonido[128];
-tCancion cancion[128];
+sound_t sounds[128];
+song_t songs[128];
 tChannels channels[64];
 
 int SongType = 0;
@@ -96,7 +96,7 @@ int sound_load(char *ptr, long Len, int Loop) {
   byte res = 0;
   int32_t iLen = (int32_t)Len + 36;
 
-  while (con < 128 && sonido[con].smp != 0)
+  while (con < 128 && sounds[con].smp != 0)
     con++;
 
   if (con == 128)
@@ -142,9 +142,9 @@ int sound_load(char *ptr, long Len, int Loop) {
     }
   }
   // all ok. save our data to free() later
-  sonido[con].smp = 1;
-  sonido[con].sound = sound;
-  sonido[con].loop = Loop;
+  sounds[con].smp = 1;
+  sounds[con].sound = sound;
+  sounds[con].loop = Loop;
 
   return con;
 #endif
@@ -154,10 +154,10 @@ int sound_load(char *ptr, long Len, int Loop) {
 
 int sound_unload(int NumSonido) {
 #ifdef MIXER
-  if (sonido[NumSonido].sound) {
-    Mix_FreeChunk(sonido[NumSonido].sound);
-    sonido[NumSonido].smp = 0;
-    sonido[NumSonido].sound = NULL;
+  if (sounds[NumSonido].sound) {
+    Mix_FreeChunk(sounds[NumSonido].sound);
+    sounds[NumSonido].smp = 0;
+    sounds[NumSonido].sound = NULL;
   }
 #endif
   return (1);
@@ -171,7 +171,7 @@ void doneEffect(int chan, void *data) {
 // make a passthru processor function that alters the stream size
 void freqEffect(int chan, void *stream, int len, void *udata) {
   float x = 0;
-  tSonido *s = &sonido[channels[chan].num];
+  sound_t *s = &sounds[channels[chan].num];
   int pos = channels[chan].pos;
 
   if (!Mix_Playing(chan))
@@ -246,7 +246,7 @@ int sound_play(int NumSonido, int Volumen, int Frec) // Vol y Frec (0..256)
 
   // always play as loop, let the freqEffect manage stop_sound when loop is zero
   // this permits slow playing sound to run for the correct length.
-  con = Mix_PlayChannel(-1, sonido[NumSonido].sound, loop);
+  con = Mix_PlayChannel(-1, sounds[NumSonido].sound, loop);
 
 
   // if unable to play, return
@@ -333,22 +333,22 @@ int sound_load_song(char *ptr, int Len, int Loop) {
   Mix_FreeMusic(music);
   SDL_FreeRW(rw);
 
-  while (con < 128 && cancion[con].ptr != NULL)
+  while (con < 128 && songs[con].ptr != NULL)
     con++;
   if (con == 128)
     return (-1);
 
-  if ((cancion[con].ptr = (char *)malloc(Len)) == NULL)
+  if ((songs[con].ptr = (char *)malloc(Len)) == NULL)
     return (-1);
 
-  memcpy(cancion[con].ptr, ptr, Len);
-  cancion[con].loop = Loop;
+  memcpy(songs[con].ptr, ptr, Len);
+  songs[con].loop = Loop;
 
-  rw = SDL_RWFromMem(cancion[con].ptr, Len);
+  rw = SDL_RWFromMem(songs[con].ptr, Len);
   music = Mix_LoadMUS_RW(rw, 0);
 
-  cancion[con].music = music;
-  cancion[con].rw = rw;
+  songs[con].music = music;
+  songs[con].rw = rw;
 
   return (con);
 #endif
@@ -356,14 +356,14 @@ int sound_load_song(char *ptr, int Len, int Loop) {
 }
 
 int sound_play_song(int NumSong) {
-  if (NumSong > 127 || !cancion[NumSong].ptr)
+  if (NumSong > 127 || !songs[NumSong].ptr)
     return (-1);
 
   sound_stop_song();
 
 #ifdef MIXER
-  if (cancion[NumSong].music) {
-    Mix_PlayMusic(cancion[NumSong].music, cancion[NumSong].loop ? -1 : 0);
+  if (songs[NumSong].music) {
+    Mix_PlayMusic(songs[NumSong].music, songs[NumSong].loop ? -1 : 0);
   }
 #endif
 
@@ -379,18 +379,18 @@ void sound_stop_song(void) {
 }
 
 void sound_unload_song(int NumSong) {
-  if (NumSong > 127 || !cancion[NumSong].ptr)
+  if (NumSong > 127 || !songs[NumSong].ptr)
     return;
 #ifdef MIXER
-  Mix_FreeMusic(cancion[NumSong].music);
-  free(cancion[NumSong].ptr);
-  SDL_FreeRW(cancion[NumSong].rw);
+  Mix_FreeMusic(songs[NumSong].music);
+  free(songs[NumSong].ptr);
+  SDL_FreeRW(songs[NumSong].rw);
 
-  cancion[NumSong].music = NULL;
-  cancion[NumSong].rw = NULL;
+  songs[NumSong].music = NULL;
+  songs[NumSong].rw = NULL;
 #endif
-  cancion[NumSong].ptr = NULL;
-  cancion[NumSong].loop = 0;
+  songs[NumSong].ptr = NULL;
+  songs[NumSong].loop = 0;
 }
 
 void sound_set_song_pos(int SongPat) {

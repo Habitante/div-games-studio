@@ -5,21 +5,21 @@
 #include "div_string.h"
 
 void fpg_edit_code_dialog(void);
-extern int RetValue;
-extern char cCodigo[5];
-extern char cFile[13];
-extern char Descrip[33];
-char *FPGimagen = NULL;
+extern int ret_value;
+extern char code_str[5];
+extern char file_str[13];
+extern char description[33];
+char *fpg_image = NULL;
 short *fpg_points = NULL;
 
 char newdac[768];
-int NewDacLoaded = 0;
+int new_dac_loaded = 0;
 
-int GetCodeAncho;
-int GetCodeAlto;
-char *GetCodeImagen;
-short GetCodeP0x;
-short GetCodeP0y;
+int get_code_width;
+int get_code_height;
+char *get_code_image;
+short get_code_p0x;
+short get_code_p0y;
 
 #define ancho_br 155
 #define alto_br  72
@@ -34,8 +34,8 @@ void fpg_read_image_header(HeadFPG *MiHeadFPG, FILE *fpg) {
   fread(&MiHeadFPG->Alto, 1, 4, fpg);
   fread(&MiHeadFPG->num_points, 1, 4, fpg);
 
-  FPGimagen = (char *)malloc(MiHeadFPG->Ancho * MiHeadFPG->Alto);
-  if (FPGimagen == NULL) {
+  fpg_image = (char *)malloc(MiHeadFPG->Ancho * MiHeadFPG->Alto);
+  if (fpg_image == NULL) {
     v_text = (char *)texts[45];
     show_dialog(err0);
     return;
@@ -43,8 +43,8 @@ void fpg_read_image_header(HeadFPG *MiHeadFPG, FILE *fpg) {
   if (MiHeadFPG->num_points != 0) {
     fpg_points = (short *)malloc(MiHeadFPG->num_points * 4);
     if (fpg_points == NULL) {
-      free(FPGimagen);
-      FPGimagen = NULL;
+      free(fpg_image);
+      fpg_image = NULL;
       v_text = (char *)texts[45];
       show_dialog(err0);
       return;
@@ -52,7 +52,7 @@ void fpg_read_image_header(HeadFPG *MiHeadFPG, FILE *fpg) {
     fread(fpg_points, MiHeadFPG->num_points * 2, 2, fpg);
   } else
     fpg_points = NULL;
-  fread(FPGimagen, MiHeadFPG->Ancho * MiHeadFPG->Alto, 1, fpg);
+  fread(fpg_image, MiHeadFPG->Ancho * MiHeadFPG->Alto, 1, fpg);
 }
 
 void fpg_create(FPG *Fpg, char *Name) {
@@ -129,7 +129,7 @@ int fpg_open(FPG *Fpg, char *Name) {
   div_strcpy((char *)Fpg->ActualFile, sizeof(Fpg->ActualFile), Name);
   fread(newdac, 768, 1, fpg);
   memcpy(dac4, newdac, 768);
-  NewDacLoaded = 1;
+  new_dac_loaded = 1;
   fread((byte *)gradients, 1, sizeof(gradients), fpg);
 
   while (fpg_read_header(&kkhead, fpg)) {
@@ -208,45 +208,45 @@ void fpg_write_header(HeadFPG *MiHeadFPG, short *points, char *imagen, FILE *fpg
   fwrite(imagen, MiHeadFPG->Ancho * MiHeadFPG->Alto, 1, fpg);
 }
 
-int fpg_add(FPG *Fpg, int COD, char *tDescrip, char *tFilename, int Ancho, int Alto, int num_points,
-               char *points, char *Imagen, int BorrarAntiguo, int get_info) {
+int fpg_add(FPG *Fpg, int COD, char *desc, char *filename, int Ancho, int Alto, int num_points,
+               char *points, char *Imagen, int delete_old, int get_info) {
   int LONG, OLDCOD = COD, First = 1, n;
   FILE *fpg;
 
   while ((COD == 0) || First) {
     First = 0;
-    div_snprintf(cCodigo, sizeof(cCodigo), "%d", COD);
-    memcpy(Descrip, tDescrip, 32);
-    memcpy(cFile, tFilename, 12);
-    cFile[12] = (char)0;
-    RetValue = 0;
-    GetCodeAncho = Ancho;
-    GetCodeAlto = Alto;
-    GetCodeImagen = Imagen;
+    div_snprintf(code_str, sizeof(code_str), "%d", COD);
+    memcpy(description, desc, 32);
+    memcpy(file_str, filename, 12);
+    file_str[12] = (char)0;
+    ret_value = 0;
+    get_code_width = Ancho;
+    get_code_height = Alto;
+    get_code_image = Imagen;
     if (num_points != 0) {
-      GetCodeP0x = *((short *)points);
-      GetCodeP0y = *((short *)(points + 2));
+      get_code_p0x = *((short *)points);
+      get_code_p0y = *((short *)(points + 2));
     } else {
-      GetCodeP0x = -1;
-      GetCodeP0y = -1;
+      get_code_p0x = -1;
+      get_code_p0y = -1;
     }
     if (get_info)
       fpg_edit_code_dialog();
     else
-      RetValue = 1;
-    COD = atoi(cCodigo);
+      ret_value = 1;
+    COD = atoi(code_str);
     Fpg->LastUsed = COD;
-    div_snprintf(cCodigo, sizeof(cCodigo), "%d", COD);
+    div_snprintf(code_str, sizeof(code_str), "%d", COD);
 
     //**********************************************!!!!!!!!!!!!!!!!!!!!!!!
-    //                memcpy(Descrip,Descrip,32);
+    //                memcpy(description,description,32);
     //**********************************************!!!!!!!!!!!!!!!!!!!!!!!
 
-    if (!RetValue)
+    if (!ret_value)
       return 1;
   }
 
-  if (BorrarAntiguo)
+  if (delete_old)
     fpg_delete(Fpg, OLDCOD); // Delete the old one
 
   if (Fpg->OffsGrf[COD] != 0)
@@ -277,8 +277,8 @@ int fpg_add(FPG *Fpg, int COD, char *tDescrip, char *tFilename, int Ancho, int A
   LONG = FPG_HEAD + (num_points * 4) + Ancho * Alto;
   fwrite(&COD, 1, 4, fpg);
   fwrite(&LONG, 1, 4, fpg);
-  fwrite(Descrip, 1, 32, fpg);
-  fwrite(cFile, 1, 12, fpg);
+  fwrite(description, 1, 32, fpg);
+  fwrite(file_str, 1, 12, fpg);
   fwrite(&Ancho, 1, 4, fpg);
   fwrite(&Alto, 1, 4, fpg);
   fwrite(&num_points, 1, 4, fpg);
@@ -319,16 +319,16 @@ int fpg_add(FPG *Fpg, int COD, char *tDescrip, char *tFilename, int Ancho, int A
 
 int fpg_remap_to_pal(FPG *Fpg) {
   struct tipo_regla CopiaReglas[16];
-  HeadFPG MiOtraHeadFPG;
+  HeadFPG other_header;
   char ActualPath[_MAX_PATH + 14];
-  char *OtraImagen;
+  char *other_image;
   short *other_points = NULL;
   byte tmp[768];
   int x;
   FILE *fpg;
   FILE *Oldfpg;
   int y;
-  byte MiTabla[256];
+  byte color_lut[256];
 
   // Temporary file name
   div_strcpy(ActualPath, sizeof(ActualPath), (char *)Fpg->ActualFile);
@@ -353,13 +353,13 @@ int fpg_remap_to_pal(FPG *Fpg) {
   fread(tmp, 768, 1, fpg);
   create_dac4();
   for (x = 0; x < 256; x++)
-    MiTabla[x] = find_color(tmp[x * 3], tmp[x * 3 + 1], tmp[x * 3 + 2]);
+    color_lut[x] = find_color(tmp[x * 3], tmp[x * 3 + 1], tmp[x * 3 + 2]);
   fwrite(dac, 768, 1, Oldfpg);
   fread(CopiaReglas, 1, sizeof(CopiaReglas), fpg);
   fwrite(CopiaReglas, sizeof(CopiaReglas), 1, Oldfpg);
-  while (fpg_read_header(&MiOtraHeadFPG, fpg)) {
-    OtraImagen = (char *)malloc(MiOtraHeadFPG.Ancho * MiOtraHeadFPG.Alto);
-    if (OtraImagen == NULL) {
+  while (fpg_read_header(&other_header, fpg)) {
+    other_image = (char *)malloc(other_header.Ancho * other_header.Alto);
+    if (other_image == NULL) {
       fclose(fpg);
       fclose(Oldfpg);
       v_text = (char *)texts[45];
@@ -367,26 +367,26 @@ int fpg_remap_to_pal(FPG *Fpg) {
       return 0;
     }
     // Check memory
-    if (MiOtraHeadFPG.num_points != 0) {
-      other_points = (short *)malloc(MiOtraHeadFPG.num_points * 4);
+    if (other_header.num_points != 0) {
+      other_points = (short *)malloc(other_header.num_points * 4);
       if (other_points == NULL) {
         fclose(fpg);
         fclose(Oldfpg);
-        free(OtraImagen);
+        free(other_image);
         v_text = (char *)texts[45];
         show_dialog(err0);
         return 0;
       }
-      fread(other_points, MiOtraHeadFPG.num_points * 2, 2, fpg);
+      fread(other_points, other_header.num_points * 2, 2, fpg);
     }
-    fread(OtraImagen, MiOtraHeadFPG.Ancho * MiOtraHeadFPG.Alto, 1, fpg);
-    for (y = 0; y < MiOtraHeadFPG.Ancho * MiOtraHeadFPG.Alto; y++)
-      OtraImagen[y] = MiTabla[OtraImagen[y]];
+    fread(other_image, other_header.Ancho * other_header.Alto, 1, fpg);
+    for (y = 0; y < other_header.Ancho * other_header.Alto; y++)
+      other_image[y] = color_lut[other_image[y]];
 
-    fpg_write_header(&MiOtraHeadFPG, other_points, OtraImagen, Oldfpg);
+    fpg_write_header(&other_header, other_points, other_image, Oldfpg);
 
-    free(OtraImagen);
-    if (MiOtraHeadFPG.num_points != 0)
+    free(other_image);
+    if (other_header.num_points != 0)
       free(other_points);
   }
   fclose(Oldfpg);
@@ -395,7 +395,7 @@ int fpg_remap_to_pal(FPG *Fpg) {
   rename(ActualPath, (char *)Fpg->ActualFile);
   if (!fpg_open(Fpg, (char *)Fpg->ActualFile))
     return 0;
-  NewDacLoaded = 0;
+  new_dac_loaded = 0;
   return 1;
 }
 #define BUFFERCOPYLEN 4096
@@ -468,9 +468,9 @@ int fpg_delete(FPG *Fpg,
                int COD) // Trash, overwrite existing entry, or when changing a graphic's code
 {
   struct tipo_regla CopiaReglas[16];
-  HeadFPG MiOtraHeadFPG;
+  HeadFPG other_header;
   char ActualPath[_MAX_PATH + 14];
-  char *OtraImagen;
+  char *other_image;
   short *other_points = NULL;
   byte tmp[768];
   int x, len, n;
@@ -522,11 +522,11 @@ int fpg_delete(FPG *Fpg,
   fread(CopiaReglas, 1, sizeof(CopiaReglas), fpg);
   fwrite(CopiaReglas, sizeof(CopiaReglas), 1, Oldfpg);
 
-  while (fpg_read_header(&MiOtraHeadFPG, fpg)) {
+  while (fpg_read_header(&other_header, fpg)) {
     show_progress((char *)texts[436], ftell(fpg), len);
 
-    OtraImagen = (char *)malloc(MiOtraHeadFPG.Ancho * MiOtraHeadFPG.Alto);
-    if (OtraImagen == NULL) {
+    other_image = (char *)malloc(other_header.Ancho * other_header.Alto);
+    if (other_image == NULL) {
       show_progress((char *)texts[436], len, len);
       fclose(fpg);
       fclose(Oldfpg);
@@ -535,32 +535,32 @@ int fpg_delete(FPG *Fpg,
       return 0;
     }
     // Check memory
-    if (MiOtraHeadFPG.num_points != 0) {
-      other_points = (short *)malloc(MiOtraHeadFPG.num_points * 4);
+    if (other_header.num_points != 0) {
+      other_points = (short *)malloc(other_header.num_points * 4);
       if (other_points == NULL) {
         show_progress((char *)texts[436], len, len);
         fclose(fpg);
         fclose(Oldfpg);
-        free(OtraImagen);
+        free(other_image);
         v_text = (char *)texts[45];
         show_dialog(err0);
         return 0;
       }
-      fread(other_points, MiOtraHeadFPG.num_points * 2, 2, fpg);
+      fread(other_points, other_header.num_points * 2, 2, fpg);
     }
-    fread(OtraImagen, MiOtraHeadFPG.Ancho * MiOtraHeadFPG.Alto, 1, fpg);
+    fread(other_image, other_header.Ancho * other_header.Alto, 1, fpg);
 
     // *************************
 
-    if (MiOtraHeadFPG.COD != COD) {
-      fpg_write_header(&MiOtraHeadFPG, other_points, OtraImagen, Oldfpg);
+    if (other_header.COD != COD) {
+      fpg_write_header(&other_header, other_points, other_image, Oldfpg);
     }
 
     // *************************
 
-    free(OtraImagen);
+    free(other_image);
 
-    if (MiOtraHeadFPG.num_points != 0)
+    if (other_header.num_points != 0)
       free(other_points);
   }
   fclose(Oldfpg);
@@ -583,9 +583,9 @@ int fpg_delete(FPG *Fpg,
 
 int fpg_delete_many(FPG *Fpg, int taggeds, int *array_del) {
   struct tipo_regla CopiaReglas[16];
-  HeadFPG MiOtraHeadFPG;
+  HeadFPG other_header;
   char ActualPath[_MAX_PATH + 14];
-  char *OtraImagen;
+  char *other_image;
   short *other_points = NULL;
   byte tmp[768];
   int x, y, len, n;
@@ -621,12 +621,12 @@ int fpg_delete_many(FPG *Fpg, int taggeds, int *array_del) {
   fread(CopiaReglas, 1, sizeof(CopiaReglas), fpg);
   fwrite(CopiaReglas, sizeof(CopiaReglas), 1, Oldfpg);
 
-  while (fpg_read_header(&MiOtraHeadFPG, fpg)) {
+  while (fpg_read_header(&other_header, fpg)) {
     show_progress((char *)texts[436], ftell(fpg), len);
 
-    OtraImagen = (char *)malloc(MiOtraHeadFPG.Ancho * MiOtraHeadFPG.Alto);
+    other_image = (char *)malloc(other_header.Ancho * other_header.Alto);
 
-    if (OtraImagen == NULL) {
+    if (other_image == NULL) {
       show_progress((char *)texts[436], len, len);
       fclose(fpg);
       fclose(Oldfpg);
@@ -635,35 +635,35 @@ int fpg_delete_many(FPG *Fpg, int taggeds, int *array_del) {
       return 0;
     }
 
-    if (MiOtraHeadFPG.num_points != 0) { // Check memory
-      other_points = (short *)malloc(MiOtraHeadFPG.num_points * 4);
+    if (other_header.num_points != 0) { // Check memory
+      other_points = (short *)malloc(other_header.num_points * 4);
       if (other_points == NULL) {
         show_progress((char *)texts[436], len, len);
         fclose(fpg);
         fclose(Oldfpg);
-        free(OtraImagen);
+        free(other_image);
         v_text = (char *)texts[45];
         show_dialog(err0);
         return 0;
       }
-      fread(other_points, MiOtraHeadFPG.num_points * 2, 2, fpg);
+      fread(other_points, other_header.num_points * 2, 2, fpg);
     }
 
-    fread(OtraImagen, MiOtraHeadFPG.Ancho * MiOtraHeadFPG.Alto, 1, fpg);
+    fread(other_image, other_header.Ancho * other_header.Alto, 1, fpg);
 
     // *************************
 
     for (y = 0; y < taggeds; y++) {
-      if (array_del[y] == MiOtraHeadFPG.COD)
+      if (array_del[y] == other_header.COD)
         break;
     }
 
     if (y == taggeds) {
-      fpg_write_header(&MiOtraHeadFPG, other_points, OtraImagen, Oldfpg);
+      fpg_write_header(&other_header, other_points, other_image, Oldfpg);
     } else {
       n = 0;
       while (1) {
-        if (Fpg->DesIndex[n] == MiOtraHeadFPG.COD || Fpg->DesIndex[n] == 0)
+        if (Fpg->DesIndex[n] == other_header.COD || Fpg->DesIndex[n] == 0)
           break;
         n++;
       }
@@ -677,9 +677,9 @@ int fpg_delete_many(FPG *Fpg, int taggeds, int *array_del) {
 
     // *************************
 
-    free(OtraImagen);
+    free(other_image);
 
-    if (MiOtraHeadFPG.num_points != 0)
+    if (other_header.num_points != 0)
       free(other_points);
   }
 

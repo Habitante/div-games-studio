@@ -27,7 +27,7 @@ typedef struct {
 
 typedef struct {
   int cod;
-  int tam;
+  int size;
   char descrip[32];
   char filename[12];
   int width;
@@ -43,7 +43,7 @@ typedef struct {
 typedef struct {
   FPG_info info;
   FPG_points *points;
-  byte *imagen;
+  byte *image;
 } FPG_data;
 
 //-----------------------------------------------------------------------------
@@ -53,8 +53,8 @@ typedef struct {
 void paint_slider_br(struct t_listboxbr *l);
 
 // Forward declarations for this file
-void MapperBrowseFPG1(void);
-void MapperBrowseFPG2(void);
+void mapper_browse_fpg1(void);
+void mapper_browse_fpg2(void);
 void M3D_paint_listboxbr(struct t_listboxbr *l);
 void M3D_show_thumb(struct t_listboxbr *l, int num);
 void M3D_create_listboxbr(struct t_listboxbr *l);
@@ -69,24 +69,24 @@ byte brush_fpg_path[256];
 int tex_sop[11] = {2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048};
 
 int scroll_x, scroll_y;
-int num_bandera = 0;
+int flag_num = 0;
 
 byte FPG_pal[768];
 byte FPG_xlat[256];
-int FPG_thumbpos;
+int fpg_thumb_pos;
 
-char cadenas[5][10];
+char strings[5][10];
 
-int altura_techo = 2048;
-int altura_suelo = 1024;
+int ceiling_height = 2048;
+int floor_height = 1024;
 
 #define max_texturas 1000
 #define w_textura   (3 + 1) // 000 - 999
 char m3d_fpgcodesbr[max_texturas * w_textura];
-char textura[max_texturas * w_textura];
-char fondo[max_texturas * w_textura];
-int t_maximo;
-int f_maximo;
+char texture_names[max_texturas * w_textura];
+char background_names[max_texturas * w_textura];
+int tex_count;
+int bg_count;
 struct t_listboxbr texture_list_br = {3 - 2, 11 - 2, m3d_fpgcodesbr, w_textura, 4, 4, 32, 32};
 
 struct _thumb_tex {
@@ -158,20 +158,20 @@ void M3D_create_thumbs(struct t_listboxbr *l, int prog) {
     return;
 
   if (texture_type > 3)
-    FPG_thumbpos = 0;
+    fpg_thumb_pos = 0;
 
   thumb_tex[0].ptr = NULL;
   thumb_tex[0].status = 0;
   thumb_tex[0].Code = 0;
-  div_strcpy(&textura[0], w_textura, "000");
-  div_strcpy(&fondo[0], w_textura, "000");
-  t_maximo = f_maximo = 1;
+  div_strcpy(&texture_names[0], w_textura, "000");
+  div_strcpy(&background_names[0], w_textura, "000");
+  tex_count = bg_count = 1;
 
-  div_snprintf(cadenas[0], sizeof(cadenas[0]), "%d", scroll_x);
-  div_snprintf(cadenas[1], sizeof(cadenas[1]), "%d", scroll_y);
-  div_snprintf(cadenas[2], sizeof(cadenas[2]), "%d", num_bandera);
-  div_snprintf(cadenas[3], sizeof(cadenas[3]), "%d", altura_techo);
-  div_snprintf(cadenas[4], sizeof(cadenas[4]), "%d", altura_suelo);
+  div_snprintf(strings[0], sizeof(strings[0]), "%d", scroll_x);
+  div_snprintf(strings[1], sizeof(strings[1]), "%d", scroll_y);
+  div_snprintf(strings[2], sizeof(strings[2]), "%d", flag_num);
+  div_snprintf(strings[3], sizeof(strings[3]), "%d", ceiling_height);
+  div_snprintf(strings[4], sizeof(strings[4]), "%d", floor_height);
 
   // Free existing thumbnails
   for (n = 0; n < max_texturas; n++) {
@@ -244,11 +244,11 @@ void M3D_create_thumbs(struct t_listboxbr *l, int prog) {
   }
 
   // In paint mode, start from index 0 (no empty texture slot)
-  n = t_maximo = f_maximo = 0;
+  n = tex_count = bg_count = 0;
   for (;;) {
     if (fread(&(FPG_D.info), 1, sizeof(FPG_info), FPG_F) != sizeof(FPG_info)) {
       if (feof(FPG_F)) {
-        l->total_items = f_maximo = n;
+        l->total_items = bg_count = n;
         break;
       } else {
         fclose(FPG_F);
@@ -277,14 +277,14 @@ void M3D_create_thumbs(struct t_listboxbr *l, int prog) {
 
     DIV_SPRINTF(cwork, "%03d", FPG_D.info.cod);
     if (thumb_tex[n].is_square) {
-      div_strcpy(textura + t_maximo * w_textura, w_textura, cwork);
-      t_maximo++;
+      div_strcpy(texture_names + tex_count * w_textura, w_textura, cwork);
+      tex_count++;
     }
-    div_strcpy(fondo + n * w_textura, w_textura, cwork);
+    div_strcpy(background_names + n * w_textura, w_textura, cwork);
 
     thumb_tex[n].FilePos = ftell(FPG_F);
 
-    if ((FPG_D.imagen = (byte *)malloc(FPG_D.info.width * FPG_D.info.height)) == NULL) {
+    if ((FPG_D.image = (byte *)malloc(FPG_D.info.width * FPG_D.info.height)) == NULL) {
       for (n = 0; n < max_texturas; n++) {
         if (thumb_tex[n].ptr != NULL) {
           free(thumb_tex[n].ptr);
@@ -299,7 +299,7 @@ void M3D_create_thumbs(struct t_listboxbr *l, int prog) {
       return;
     }
 
-    if (fread(FPG_D.imagen, 1, FPG_D.info.width * FPG_D.info.height, FPG_F) !=
+    if (fread(FPG_D.image, 1, FPG_D.info.width * FPG_D.info.height, FPG_F) !=
         FPG_D.info.width * FPG_D.info.height) {
       for (n = 0; n < max_texturas; n++) {
         if (thumb_tex[n].ptr != NULL) {
@@ -308,7 +308,7 @@ void M3D_create_thumbs(struct t_listboxbr *l, int prog) {
         }
       }
       fclose(FPG_F);
-      free(FPG_D.imagen);
+      free(FPG_D.image);
       if (prog)
         show_progress((char *)texts[93], FPG_progress.total, FPG_progress.total);
       v_text = (char *)texts[44];
@@ -316,7 +316,7 @@ void M3D_create_thumbs(struct t_listboxbr *l, int prog) {
       return;
     }
 
-    thumb_tex[n].ptr = (char *)FPG_D.imagen;
+    thumb_tex[n].ptr = (char *)FPG_D.image;
 
     n++;
   }
@@ -404,8 +404,8 @@ void M3D_create_thumbs(struct t_listboxbr *l, int prog) {
   }
 
   qsort(thumb_tex, l->total_items, sizeof(struct _thumb_tex), cmpcode);
-  qsort(textura, t_maximo, w_textura, strcmpsort);
-  qsort(fondo, l->total_items, w_textura, strcmpsort);
+  qsort(texture_names, tex_count, w_textura, strcmpsort);
+  qsort(background_names, l->total_items, w_textura, strcmpsort);
 }
 
 //-----------------------------------------------------------------------------
@@ -522,7 +522,7 @@ void M3D_create_listboxbr(struct t_listboxbr *l) {
     l->buttons = 0;
     l->created = 1;
     l->zone = 0;
-    l->first_visible = FPG_thumbpos;
+    l->first_visible = fpg_thumb_pos;
     if ((l->first_visible + (l->lines - 1) * l->columns) >= l->total_items) {
       l->first_visible = 0;
     }
@@ -732,7 +732,7 @@ extern struct t_listboxbr thumbmap_list_br;
 
 #define BRUSH 4
 
-void MapperBrowseFPG0(void) {
+void mapper_browse_fpg0(void) {
   v.type = 1;
   v.w = 147 - 4;
   v.h = 147 - 4;
@@ -749,8 +749,8 @@ void MapperBrowseFPG0(void) {
     v.name = texts[433];
   }
 
-  v.paint_handler = MapperBrowseFPG1;
-  v.click_handler = MapperBrowseFPG2;
+  v.paint_handler = mapper_browse_fpg1;
+  v.click_handler = mapper_browse_fpg2;
 
   if (draw_mode < 100) {
     if (browser_type == MAPBR) {
@@ -758,16 +758,16 @@ void MapperBrowseFPG0(void) {
       memcpy(&texture_list_br, &thumbmap_list_br, sizeof(texture_list_br));
       texture_list_br.total_items = m_maximo;
     } else {
-      memcpy(m3d_fpgcodesbr, fondo, max_texturas * w_textura);
-      texture_list_br.total_items = f_maximo;
+      memcpy(m3d_fpgcodesbr, background_names, max_texturas * w_textura);
+      texture_list_br.total_items = bg_count;
     }
   } else {
     if (texture_type == FONDO) {
-      memcpy(m3d_fpgcodesbr, fondo, max_texturas * w_textura);
-      texture_list_br.total_items = f_maximo;
+      memcpy(m3d_fpgcodesbr, background_names, max_texturas * w_textura);
+      texture_list_br.total_items = bg_count;
     } else {
-      memcpy(m3d_fpgcodesbr, textura, max_texturas * w_textura);
-      texture_list_br.total_items = t_maximo;
+      memcpy(m3d_fpgcodesbr, texture_names, max_texturas * w_textura);
+      texture_list_br.total_items = tex_count;
     }
   }
 
@@ -783,13 +783,13 @@ void MapperBrowseFPG0(void) {
   t_pulsada = 1;
 }
 
-void MapperBrowseFPG1(void) {
+void mapper_browse_fpg1(void) {
   _show_items();
 
   M3D_create_listboxbr(&texture_list_br);
 }
 
-void MapperBrowseFPG2(void) {
+void mapper_browse_fpg2(void) {
   int old_pincel;
 
   if (!key(_T) && !key(_U))
@@ -809,7 +809,7 @@ void MapperBrowseFPG2(void) {
         M3D_show_thumb(&texture_list_br, brush_index);
         brush_index = old_pincel;
       }
-      FPG_thumbpos = 0;
+      fpg_thumb_pos = 0;
       v_finished = 1;
       end_dialog = 1;
     }
@@ -826,4 +826,4 @@ void MapperBrowseFPG2(void) {
   }
 }
 
-void MapperBrowseFPG3(void) {}
+void mapper_browse_fpg3(void) {}

@@ -604,7 +604,7 @@ int main(int argc, char *argv[]) {
 
   if (auto_save_session || return_mode != 0)
     if (return_mode != 3)
-      DownLoad_Desktop(); // If the test didn't fail
+      download_desktop(); // If the test didn't fail
 
   Save_Cfgbin();
 
@@ -724,7 +724,7 @@ void init_environment() {
   // If the DIV.DTF file doesn't exist or safe mode is requested
 
   if (CopyDesktop && !new_session && !primera_vez)
-    UpLoad_Desktop();
+    upload_desktop();
 
   if (!primera_vez) {
     for (n = 0; n < max_windows; n++)
@@ -4036,7 +4036,7 @@ void initialization(void) {
   } // *** Load edited objects ***
 
   if (auto_save_session || interpreting)
-    CopyDesktop = Can_UpLoad_Desktop();
+    CopyDesktop = can_upload_desktop();
 
   if (!CopyDesktop) { // Load common palette
     if (!interpreting) {
@@ -5017,7 +5017,7 @@ void activate(void) {
 //  Load and save setup.bin
 //-----------------------------------------------------------------------------
 
-extern int modo_anterior;
+extern int previous_mode;
 
 ////////////////////////////////////////////////////////////////////////////
 // Save the configuration file                                            //
@@ -5032,10 +5032,10 @@ void Save_Cfgbin() {
   Setupfile.fullscreen = fsmode;
 
   if (return_mode == 3) {
-    Setupfile.Vid_modeBig = (modo_anterior & 0x8000000) >> 31;
-    modo_anterior -= (modo_anterior & 0x80000000);
-    Setupfile.Vid_modeAncho = modo_anterior / 10000;
-    Setupfile.Vid_modeAlto = modo_anterior % 10000;
+    Setupfile.Vid_modeBig = (previous_mode & 0x8000000) >> 31;
+    previous_mode -= (previous_mode & 0x80000000);
+    Setupfile.Vid_modeAncho = previous_mode / 10000;
+    Setupfile.Vid_modeAlto = previous_mode % 10000;
   }
 
   // Undo system

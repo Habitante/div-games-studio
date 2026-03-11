@@ -30,7 +30,7 @@ TABLAFNT tablaFNT[256];
 TABLAIFS tablaIFS[256];
 IFS ifs;
 
-char *bodyTexBuffer, *outTexBuffer, *shadowTexBuffer;
+char *body_tex_buffer, *out_tex_buffer, *shadow_tex_buffer;
 
 char *ptrLetra, *ptrBody, *ptrOutline, *ptrShadow;
 char *Buffer = NULL, *Buffer2 = NULL, *Buffer3 = NULL;
@@ -108,7 +108,7 @@ short CargaLetra(short letra) {
   char rtbyte, error = 0;
   short pixels;
 
-  offset = tablaIFS[letra].desp;
+  offset = tablaIFS[letra].offset;
   if (fseek(fichIFS, offset, SEEK_SET))
     error = 1;
   if (fread(&Alto, 2, 1, fichIFS) < 1)
@@ -549,12 +549,12 @@ void texturarBody() {
     for (y = 0, yy = 0; yy < altoBody - incY; y += factY, yy++)
       for (x = 0, xx = 0; xx < anchoBody; x += factX, xx++, ptr++)
         if (*ptr)
-          *ptr = bodyTexBuffer[(int)y * ifs.bodyTexAncho + (int)x];
+          *ptr = body_tex_buffer[(int)y * ifs.bodyTexAncho + (int)x];
   } else // textura en tile
     for (yy = 0, iy = 0; yy < altoBody - incY; yy++) {
       for (xx = 0, ix = 0; xx < anchoBody; xx++, ptr++) {
         if (*ptr)
-          *ptr = bodyTexBuffer[iy * ifs.bodyTexAncho + ix];
+          *ptr = body_tex_buffer[iy * ifs.bodyTexAncho + ix];
         if (++ix >= ifs.bodyTexAncho)
           ix = 0;
       }
@@ -593,7 +593,7 @@ void texturarOutline() {
     for (y = 0, fy = 0; y < altoOutline - incY; y++, fy += factY)
       for (x = 0, fx = 0; x < anchoOutline; x++, fx += factX, ptr++)
         if (*ptr) {
-          color = outTexBuffer[(int)fy * ifs.outTexAncho + (int)fx];
+          color = out_tex_buffer[(int)fy * ifs.outTexAncho + (int)fx];
           if (*ptr < 128)
             *ptr = ifs.oscuros[color];
           else if (*ptr > 128)
@@ -607,7 +607,7 @@ void texturarOutline() {
     {
       for (x = 0, ix = 0; x < anchoOutline; x++, ptr++) {
         if (*ptr) {
-          color = outTexBuffer[iy * ifs.outTexAncho + ix];
+          color = out_tex_buffer[iy * ifs.outTexAncho + ix];
           if (*ptr < 128)
             *ptr = ifs.oscuros[color];
           else if (*ptr > 128)
@@ -643,7 +643,7 @@ void texturarSombra() {
     for (y = 0, fy = 0; y < altoOutline - incY; y++, fy += factY) {
       for (x = 0, fx = 0; x < anchoOutline; x++, fx += factX, ptr++)
         if (*ptr)
-          *ptr = shadowTexBuffer[(int)fy * ifs.shadowTexAncho + (int)fx];
+          *ptr = shadow_tex_buffer[(int)fy * ifs.shadowTexAncho + (int)fx];
       ptr += absSombraX;
     }
   } else
@@ -651,7 +651,7 @@ void texturarSombra() {
     {
       for (x = 0, ix = 0; x < anchoOutline; x++, ptr++) {
         if (*ptr)
-          *ptr = shadowTexBuffer[iy * ifs.shadowTexAncho + ix];
+          *ptr = shadow_tex_buffer[iy * ifs.shadowTexAncho + ix];
         if (++ix >= ifs.shadowTexAncho)
           ix = 0;
       }
@@ -759,7 +759,7 @@ void unirSombraConResto() {
   }
 }
 
-int Jorge_Crea_el_font(int GenCode) {
+int jorge_create_font(int GenCode) {
   char error = 0, stop;
   short x, ret;
   short j;
@@ -876,7 +876,7 @@ int Jorge_Crea_el_font(int GenCode) {
   return (0);
 }
 
-void GetCharSize(int WhatChar, int *width, int *height) {
+void get_char_size(int WhatChar, int *width, int *height) {
   FILE *fichFnt;
   *width = 4;
   *height = 1;
@@ -896,7 +896,7 @@ void GetCharSize(int WhatChar, int *width, int *height) {
   fclose(fichFnt);
   return;
 }
-void GetCharSizeBuffer(int WhatChar, int *width, int *height, char *buffer) {
+void get_char_size_buffer(int WhatChar, int *width, int *height, char *buffer) {
   *width = 4;
   *height = 1;
 
@@ -905,7 +905,7 @@ void GetCharSizeBuffer(int WhatChar, int *width, int *height, char *buffer) {
   *width = tablaFNT[WhatChar].width + 1;
   return;
 }
-int ShowChar(int WhatChar, int cx, int cy, char *ptr, int w) {
+int show_char(int WhatChar, int cx, int cy, char *ptr, int w) {
   int y, iy;
   FILE *fichFnt;
   char *rawBuffer;
@@ -960,7 +960,7 @@ int ShowChar(int WhatChar, int cx, int cy, char *ptr, int w) {
     return (tablaFNT[WhatChar].width + 1);
 }
 
-int ShowCharBuffer(int WhatChar, int cx, int cy, char *ptr, int w, char *buffer) {
+int show_char_buffer(int WhatChar, int cx, int cy, char *ptr, int w, char *buffer) {
   int y, iy, x, c;
   char *rawBuffer;
   memcpy(tablaFNT, buffer + 8 + 768 + sizeof(gradients) + 4, sizeof(tablaFNT));
@@ -991,7 +991,7 @@ int ShowCharBuffer(int WhatChar, int cx, int cy, char *ptr, int w, char *buffer)
   return (tablaFNT[WhatChar].width + 1);
 }
 
-void ConvertFntToPal(char *buffer) {
+void convert_fnt_to_pal(char *buffer) {
   char DacFnt[768];
   int acum = 0, x, a, b;
   byte xlat[256];

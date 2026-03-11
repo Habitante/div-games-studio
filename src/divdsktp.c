@@ -7,7 +7,7 @@
 #include <sys/types.h>
 
 int create_saved_window(voidReturnType init_handler, int nx, int ny);
-int nuevo_mapa_carga(int nx, int ny, char *nombre, byte *mapilla);
+int load_new_map(int nx, int ny, char *name, byte *bitmap);
 void carga_programa0(void);
 void carga_Fonts0(void);
 void carga_help(int n, int helpal, int helpline, int x1, int x2);
@@ -19,7 +19,7 @@ void OpenDesktopSong(void);
 
 int CDinit(void);
 int get_cd_error(void);
-extern short CDPlaying;
+extern short cd_playing;
 
 // M3D_info removed (MODE8/3D map editor deleted)
 
@@ -60,14 +60,14 @@ FILE *desktop;
 
 char pathtmp[1024];
 
-int getFileCreationTime(char *path) {
+int get_file_creation_time(char *path) {
   struct stat attr;
   stat(path, &attr);
   return (int)attr.st_mtime;
 }
 
 
-void DownLoad_Desktop() {
+void download_desktop() {
   int iWork, x, numvent = 0, n;
   int man, mal;
   pcminfo *mypcminfo;
@@ -197,14 +197,14 @@ void DownLoad_Desktop() {
   fclose(desktop);
 }
 
-int VidModeChanged = 0;
+int vid_mode_changed = 0;
 
-int modo_anterior;
+int previous_mode;
 
-int Can_UpLoad_Desktop() {
+int can_upload_desktop() {
   char cWork[8];
   int iWork;
-  VidModeChanged = 0;
+  vid_mode_changed = 0;
   desktop = fopen("system/session.dtf", "rb");
   if (desktop == NULL)
     return (0);
@@ -214,8 +214,8 @@ int Can_UpLoad_Desktop() {
   fread(&iWork, 1, 4, desktop);
   if (iWork !=
       Setupfile.Vid_modeAlto + Setupfile.Vid_modeAncho * 10000 + (Setupfile.Vid_modeBig << 31)) {
-    modo_anterior = iWork;
-    VidModeChanged = 1;
+    previous_mode = iWork;
+    vid_mode_changed = 1;
   }
   // Skip the window counter
   fread(cWork, 4, 1, desktop);
@@ -233,11 +233,11 @@ FPG faux;
 struct tprg paux;
 char *baux;
 
-int UpLoad_Desktop() {
+int upload_desktop() {
   int iWork, iWork2, iWork3, x, numvent;
   FILE *f;
 
-  int dtime = getFileCreationTime("system/session.dtf");
+  int dtime = get_file_creation_time("system/session.dtf");
 
   desktop = fopen("system/session.dtf", "rb");
   if (desktop == NULL)
@@ -330,7 +330,7 @@ int UpLoad_Desktop() {
       fread(baux, maux.map_width, maux.map_height, desktop);
       map_width = maux.map_width;
       map_height = maux.map_height;
-      if (nuevo_mapa_carga(window_aux.x, window_aux.y, maux.filename, (byte *)baux)) {
+      if (load_new_map(window_aux.x, window_aux.y, maux.filename, (byte *)baux)) {
         free(baux);
         if (!interpreting)
           update_box(0, 0, vga_width, vga_height);
@@ -365,7 +365,7 @@ int UpLoad_Desktop() {
         v_aux = (byte *)malloc(sizeof(FPG));
         if (v_aux != NULL) {
           memcpy(v_aux, &faux, sizeof(FPG));
-          create_saved_window(FPG0A, window_aux.x, window_aux.y);
+          create_saved_window(fpg_dialog0_add, window_aux.x, window_aux.y);
           blit_region(screen_buffer, vga_width, vga_height, v.ptr, v.x, v.y, v.w, v.h, 0);
           if (!interpreting)
             update_box(0, 0, vga_width, vga_height);
@@ -396,7 +396,7 @@ int UpLoad_Desktop() {
         div_strcat(pathtmp, sizeof(pathtmp), "/");
         div_strcat(pathtmp, sizeof(pathtmp), v_prg->filename);
 
-        if (dtime < getFileCreationTime(&pathtmp[0])) {
+        if (dtime < get_file_creation_time(&pathtmp[0])) {
           v_title = v_prg->filename;
           v_text = "File on disk is newer, reload?";
           show_dialog(accept0);
@@ -534,7 +534,7 @@ int create_saved_window(voidReturnType init_handler, int nx, int ny) {
     // Window placement algorithm ...
     //---------------------------------------------------------------------------
 
-    if (!VidModeChanged) {
+    if (!vid_mode_changed) {
       x = nx;
       y = ny;
     } else
@@ -547,7 +547,7 @@ int create_saved_window(voidReturnType init_handler, int nx, int ny) {
     // If it's a map, check that no other is already active
     //---------------------------------------------------------------------------
 
-    if (VidModeChanged) {
+    if (vid_mode_changed) {
       if (v.type >= 100 && window_aux.foreground != 2) {
         v.state = 1; // Activate it
         for (m = 1; m < max_windows; m++)
@@ -586,7 +586,7 @@ int create_saved_window(voidReturnType init_handler, int nx, int ny) {
       vtipo = v.type;
       v.type = 0;
 
-      if (!VidModeChanged) {
+      if (!vid_mode_changed) {
         swap(v.w, window_aux.w);
         swap(v.h, window_aux.h);
         for (n = 1; n < max_windows; n++) {
@@ -640,7 +640,7 @@ int create_saved_window(voidReturnType init_handler, int nx, int ny) {
 
       call((voidReturnType)v.paint_handler);
 
-      if (!VidModeChanged) {
+      if (!vid_mode_changed) {
         v.foreground = window_aux.foreground;
         v.state = window_aux.state;
         v.w = window_aux.w;
@@ -710,7 +710,7 @@ int create_saved_window(voidReturnType init_handler, int nx, int ny) {
 //      Load a new map (1 on Error)
 //-----------------------------------------------------------------------------
 
-int nuevo_mapa_carga(int nx, int ny, char *nombre, byte *mapilla) {
+int load_new_map(int nx, int ny, char *name, byte *bitmap) {
   int n;
 
   //1. Allocate memory for a tmapa struct
@@ -718,10 +718,10 @@ int nuevo_mapa_carga(int nx, int ny, char *nombre, byte *mapilla) {
     memset(v_map, 0, sizeof(struct tmapa));
 
     // 2. Set the map pointer
-    v_map->map = mapilla;
+    v_map->map = bitmap;
 
     //4. Set the remaining variables
-    memcpy((char *)v_map->filename, (char *)nombre, 255);
+    memcpy((char *)v_map->filename, (char *)name, 255);
     *v_map->path = '\0';
     v_map->map_width = map_width;
     v_map->map_height = map_height;

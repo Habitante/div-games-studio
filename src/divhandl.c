@@ -1050,11 +1050,11 @@ void menu_graficos2(void) {
       break;
 
     case 5:
-      Show_Taggeds();
+      show_tagged();
       break;
 
     case 6:
-      Delete_Taggeds();
+      delete_tagged();
       break;
 
     case 7:
@@ -1637,10 +1637,10 @@ void menu_sistema2(void) {
       calculator();
       break;
     case 4:
-      show_dialog(Vid_Setup0);
+      show_dialog(vid_setup0);
       break;
     case 5:
-      show_dialog(Tap_Setup0);
+      show_dialog(wallpaper_setup0);
       break;
     case 6:
       show_dialog(config_setup0);
@@ -2024,7 +2024,7 @@ void FreePaintThumbs(void);
 
 extern byte *texture_color;
 
-FILE *FilePaintFPG;
+FILE *file_paint_fpg;
 
 void map_view2(void) {
   int old_draw_mode = 0, n, _undo_index;
@@ -2146,7 +2146,7 @@ void map_view2(void) {
     texture_color = NULL;
 
     texture_type = 0;
-    if ((FilePaintFPG = fopen(full, "rb")) != NULL) // NOTE !!! Could provide message here
+    if ((file_paint_fpg = fopen(full, "rb")) != NULL) // NOTE !!! Could provide message here
     {
       div_strcpy((char *)brush_fpg_path, sizeof(brush_fpg_path), full);
       draw_mode -= 100;
@@ -2237,7 +2237,7 @@ void map_view2(void) {
 
     exploding_windows = ew;
     if (texture_type & BRUSH)
-      fclose(FilePaintFPG);
+      fclose(file_paint_fpg);
     FreePaintThumbs();
     texture_type = 0;
     browser_type = 0;

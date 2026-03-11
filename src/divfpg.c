@@ -5,25 +5,25 @@
 int select_file(void);
 
 
-HeadFPG HeadFPGArrastre;
-int RetValue = 0;
-char cCodigo[5];
-char cFile[13];
-char Descrip[33];
-extern char *FPGimagen;
+HeadFPG drag_fpg_header;
+int ret_value = 0;
+char code_str[5];
+char file_str[13];
+char description[33];
+extern char *fpg_image;
 extern short *fpg_points;
 
 extern char newdac[768];
-extern int NewDacLoaded;
+extern int new_dac_loaded;
 
 #define incremento_maximo 65536
 extern int _omx, _omy, omx, omy, oclock;
 extern int incremento;
 
 void map_to_fpg(struct tmapa *mapa);
-void GetGrafMAP(struct tmapa *mapa, byte *imagen, int x, int y, int width, int height, int cod);
+void get_map_graphic(struct tmapa *mapa, byte *imagen, int x, int y, int width, int height, int cod);
 void fpg_to_map(FPG *MiFPG);
-void PutGrafMAP(byte *imagen, byte *mapa, int num);
+void put_map_graphic(byte *imagen, byte *mapa, int num);
 void place_map(void);
 int collides_with_map(int n, int x, int y, int w, int h);
 void close_fpg(char *fpg_path);
@@ -32,7 +32,7 @@ void replace_FPG_0(void);
 void replace_FPG_1(void);
 void replace_FPG_2(void);
 
-void FPG1(void) {
+void fpg_dialog1(void) {
   FPG *MiFPG = (FPG *)v.aux;
   _show_items();
 
@@ -50,17 +50,17 @@ void load_thumbs(void) {
   FPG_update_listbox_br(&MiFPG->lInfoFPG);
 }
 
-void FPG2(void) {
+void fpg_dialog2(void) {
   int x, y, n;
   int COD, num_points, Elemento;
   FPG *MiFPG = (FPG *)v.aux;
   FILE *fpg;
-  char tDescrip[32];
+  char desc[32];
 
-  if (NewDacLoaded) { // The FPG has a new palette
+  if (new_dac_loaded) { // The FPG has a new palette
     v.redraw = 0;
-    NewDacLoaded = 0;
-    RemapAllFiles(0);
+    new_dac_loaded = 0;
+    remap_all_files(0);
     return;
   }
 
@@ -90,13 +90,13 @@ void FPG2(void) {
       MiFPG->lInfoFPG.h = 8;
     }
 
-    FPG1();
+    fpg_dialog1();
     v.redraw = 1;
 
     break;
 
   case 1:
-    FPG1();
+    fpg_dialog1();
     v.redraw = 1;
     break;
   }
@@ -107,9 +107,9 @@ void FPG2(void) {
 
     if (window[1].mapa->fpg_code) {
       COD = window[1].mapa->fpg_code;
-      memcpy(tDescrip, window[1].mapa->description, 32);
+      memcpy(desc, window[1].mapa->description, 32);
     } else {
-      memcpy(tDescrip, window[1].title, 32);
+      memcpy(desc, window[1].title, 32);
       COD = MiFPG->LastUsed;
 
       while (MiFPG->OffsGrf[COD]) {
@@ -133,7 +133,7 @@ void FPG2(void) {
         x = -1;
       }
     }
-    fpg_add(MiFPG, COD, (char *)tDescrip, (char *)window[1].mapa->filename,
+    fpg_add(MiFPG, COD, (char *)desc, (char *)window[1].mapa->filename,
                window[1].mapa->map_width, window[1].mapa->map_height, num_points,
                (char *)window[1].mapa->points, (char *)window[1].mapa->map, 0, 1);
 
@@ -160,14 +160,14 @@ void FPG2(void) {
     fpg_read_image_header(&MiFPG->MiHeadFPG, fpg);
     fclose(fpg);
 
-    if (FPGimagen) {
+    if (fpg_image) {
       fpg_add(MiFPG, MiFPG->MiHeadFPG.COD, (char *)MiFPG->MiHeadFPG.Descrip,
                  (char *)MiFPG->MiHeadFPG.Filename, MiFPG->MiHeadFPG.Ancho, MiFPG->MiHeadFPG.Alto,
-                 MiFPG->MiHeadFPG.num_points, (char *)fpg_points, FPGimagen, 1, 1);
+                 MiFPG->MiHeadFPG.num_points, (char *)fpg_points, fpg_image, 1, 1);
     }
 
-    if (FPGimagen)
-      free(FPGimagen);
+    if (fpg_image)
+      free(fpg_image);
     if (fpg_points)
       free(fpg_points);
     v.redraw = 1;
@@ -272,7 +272,7 @@ void FPG2(void) {
   v_pause = 0;
 }
 
-void FPG3(void) {
+void fpg_dialog3(void) {
   FPG *MiFPG = (FPG *)v.aux;
   int n;
 
@@ -286,16 +286,16 @@ void FPG3(void) {
 
 extern byte color_tag;
 
-void FPG0N(void) {
+void fpg_dialog0_new(void) {
   FPG *MiFPG;
   int n;
 
   v.type = 101; // Droppable
   v.w = 159;
   v.h = 72 + 5;
-  v.paint_handler = FPG1;
-  v.click_handler = FPG2;
-  v.close_handler = FPG3;
+  v.paint_handler = fpg_dialog1;
+  v.click_handler = fpg_dialog2;
+  v.close_handler = fpg_dialog3;
 
   v.aux = v_aux;
   MiFPG = (FPG *)v.aux;
@@ -319,15 +319,15 @@ void FPG0N(void) {
   _flag(108, (v.w - 5) - (8 * big2 + text_len(texts[108])), v.h - 10, &MiFPG->FPGInfo);
 }
 
-void FPG0A(void) {
+void fpg_dialog0_add(void) {
   FPG *MiFPG;
   int n;
   v.type = 101; // Droppable
   v.w = 159;
   v.h = 72 + 5;
-  v.paint_handler = FPG1;
-  v.click_handler = FPG2;
-  v.close_handler = FPG3;
+  v.paint_handler = fpg_dialog1;
+  v.click_handler = fpg_dialog2;
+  v.close_handler = fpg_dialog3;
 
   v.aux = v_aux;
   MiFPG = (FPG *)v.aux;
@@ -381,7 +381,7 @@ int new_file(void) {
 
       close_fpg(full);
       memset(v_aux, 0, sizeof(FPG));
-      new_window(FPG0N);
+      new_window(fpg_dialog0_new);
     } else
       return 0;
 
@@ -579,7 +579,7 @@ void open_file(void) {
             MiFPG->lInfoFPG.created = 0;
             close_fpg(full);
             memset(v_aux, 0, sizeof(FPG));
-            new_window(FPG0A);
+            new_window(fpg_dialog0_add);
           } else {
             v_text = (char *)texts[46];
             show_dialog(err0);
@@ -612,7 +612,7 @@ void _ffwrite(byte *Buffer, unsigned int Len, FILE *file) {
 int v2convert;
 char cNamev2convert[128];
 
-void Warning1(void) {
+void fpg_warning1(void) {
   int w = v.w / big2, h = v.h / big2;
   char cWork[70];
 
@@ -624,7 +624,7 @@ void Warning1(void) {
   v_accept = 0;
 }
 
-void Warning2(void) {
+void fpg_warning2(void) {
   _process_items();
 
   switch (v.active_item) {
@@ -639,22 +639,22 @@ void Warning2(void) {
     break;
   }
 }
-void Warning0(void) {
+void fpg_warning0(void) {
   v.type = 1; // Dialog
   v.w = 200;
   v.h = 60;
   v.title = texts[171];
-  v.paint_handler = Warning1;
-  v.click_handler = Warning2;
+  v.paint_handler = fpg_warning1;
+  v.click_handler = fpg_warning2;
 
   _button(123, 7, v.h - 14, 0);
   _button(119, v.w - 8, v.h - 14, 2);
 }
 
 
-extern byte AuxPal[768];
+extern byte aux_pal[768];
 
-int RemapAllFiles(int vent) {
+int remap_all_files(int vent) {
   // Ask whether to remap the FPG palette or close it
 
   FPG *MiFPG = (FPG *)window[vent].aux;
@@ -678,7 +678,7 @@ int RemapAllFiles(int vent) {
   }
 
   div_strcpy(cNamev2convert, sizeof(cNamev2convert), (char *)window[vent].title);
-  show_dialog(Warning0);
+  show_dialog(fpg_warning0);
 
   switch (v_accept) {
   case 0:
@@ -705,17 +705,17 @@ int RemapAllFiles(int vent) {
 }
 
 // Graphic code dialog
-extern int GetCodeAncho;
-extern int GetCodeAlto;
-extern char *GetCodeImagen;
-extern short GetCodeP0x;
-extern short GetCodeP0y;
-char *GetCodeImagenRed;
-int GetCodeAnchoRed;
-int GetCodeAltoRed;
+extern int get_code_width;
+extern int get_code_height;
+extern char *get_code_image;
+extern short get_code_p0x;
+extern short get_code_p0y;
+char *get_code_image_red;
+int get_code_width_red;
+int get_code_height_red;
 void fpg_edit_code_dialog(void);
 
-void GetCode1(void) {
+void get_code1(void) {
   char cWork[64];
   int w = v.w / big2, h = v.h / big2;
   int x, y, px, py;
@@ -725,43 +725,43 @@ void GetCode1(void) {
   wwrite(v.ptr, w, h, 4, 32, 0, texts[133], c3);
   wwrite(v.ptr, w, h, 4, 42, 0, texts[134], c3);
 
-  div_snprintf(cWork, sizeof(cWork), "%d", GetCodeAncho);
+  div_snprintf(cWork, sizeof(cWork), "%d", get_code_width);
   wwrite(v.ptr, w, h, 34, 32, 0, (byte *)cWork, c4);
-  div_snprintf(cWork, sizeof(cWork), "%d", GetCodeAlto);
+  div_snprintf(cWork, sizeof(cWork), "%d", get_code_height);
   wwrite(v.ptr, w, h, 34, 42, 0, (byte *)cWork, c4);
 
   wwrite(v.ptr, w, h, 64, 32, 0, texts[152], c3);
   wwrite(v.ptr, w, h, 64, 42, 0, texts[153], c3);
 
-  if (GetCodeP0x == -1) {
-    GetCodeP0x = GetCodeAncho / 2;
-    GetCodeP0y = GetCodeAlto / 2;
+  if (get_code_p0x == -1) {
+    get_code_p0x = get_code_width / 2;
+    get_code_p0y = get_code_height / 2;
   }
 
-  div_snprintf(cWork, sizeof(cWork), "%d", GetCodeP0x);
+  div_snprintf(cWork, sizeof(cWork), "%d", get_code_p0x);
   wwrite(v.ptr, w, h, 108, 32, 0, (byte *)cWork, c4);
-  div_snprintf(cWork, sizeof(cWork), "%d", GetCodeP0y);
+  div_snprintf(cWork, sizeof(cWork), "%d", get_code_p0y);
   wwrite(v.ptr, w, h, 108, 42, 0, (byte *)cWork, c4);
 
   wbox(v.ptr, w, h, c1, w - (72 + 4), 12, 72, 46);
   wrectangle(v.ptr, w, h, c0, w - (72 + 4), 12, 72, 46);
 
-  if (GetCodeImagenRed != NULL) {
-    px = ((40 * big2) + (GetCodeAnchoRed / 2));
-    py = ((35 * big2) - (GetCodeAltoRed / 2));
+  if (get_code_image_red != NULL) {
+    px = ((40 * big2) + (get_code_width_red / 2));
+    py = ((35 * big2) - (get_code_height_red / 2));
 
-    for (y = 0; y < GetCodeAltoRed; y++)
-      for (x = 0; x < GetCodeAnchoRed; x++)
-        v.ptr[(py + y) * v.w + ((v.w - px) + x)] = GetCodeImagenRed[y * GetCodeAnchoRed + x];
+    for (y = 0; y < get_code_height_red; y++)
+      for (x = 0; x < get_code_width_red; x++)
+        v.ptr[(py + y) * v.w + ((v.w - px) + x)] = get_code_image_red[y * get_code_width_red + x];
   }
 }
 
-void GetCode2(void) {
+void get_code2(void) {
   _process_items();
   switch (v.active_item) {
   case 0:
-    if (atoi(cCodigo) != 0) {
-      RetValue = 1;
+    if (atoi(code_str) != 0) {
+      ret_value = 1;
       end_dialog = 1;
       v.redraw = 1;
     }
@@ -774,25 +774,25 @@ void GetCode2(void) {
   }
 }
 
-void GetCode3(void) {
-  free(GetCodeImagenRed);
+void get_code3(void) {
+  free(get_code_image_red);
 }
 
-void GetCode0(void) {
+void get_code0(void) {
   v.type = 1; // Dialog
   v.w = 180 + 25;
   v.h = 100 - 12;
   v.title = texts[68];
-  v.paint_handler = GetCode1;
-  v.click_handler = GetCode2;
-  v.close_handler = GetCode3;
+  v.paint_handler = get_code1;
+  v.click_handler = get_code2;
+  v.close_handler = get_code3;
 
   _button(100, 7, v.h - 14, 0);
   _button(101, v.w - 8, v.h - 14, 2);
 
-  _get(71, 4, 12, 30, (byte *)cCodigo, 5, 1, 999);
-  _get(439, 48, 12, 64, (byte *)cFile, 12, 0, 0);
-  _get(72, 4, 52, v.w - 8, (byte *)Descrip, 32, 0, 0);
+  _get(71, 4, 12, 30, (byte *)code_str, 5, 1, 999);
+  _get(439, 48, 12, 64, (byte *)file_str, 12, 0, 0);
+  _get(72, 4, 52, v.w - 8, (byte *)description, 32, 0, 0);
 }
 
 void fpg_edit_code_dialog(void) {
@@ -802,15 +802,15 @@ void fpg_edit_code_dialog(void) {
   float coefredy, coefredx, a, b;
   int x, y;
 
-  if (atoi(cCodigo) == 0)
-    div_strcpy(cCodigo, sizeof(cCodigo), "1");
+  if (atoi(code_str) == 0)
+    div_strcpy(code_str, sizeof(code_str), "1");
 
   // Create the thumbnail
 
-  if (GetCodeAncho > 70 * big2 || GetCodeAlto > 44 * big2) {
-    man = GetCodeAncho;
-    mal = GetCodeAlto;
-    temp = (byte *)GetCodeImagen;
+  if (get_code_width > 70 * big2 || get_code_height > 44 * big2) {
+    man = get_code_width;
+    mal = get_code_height;
+    temp = (byte *)get_code_image;
 
     coefredx = (float)man / (float)(70 * 2 * big2);
     coefredy = (float)mal / (float)(44 * 2 * big2);
@@ -820,71 +820,71 @@ void fpg_edit_code_dialog(void) {
     else
       coefredx = coefredy;
 
-    GetCodeAnchoRed = (float)man / coefredx + 0.5;
-    GetCodeAltoRed = (float)mal / coefredy + 0.5;
-    GetCodeAnchoRed &= -2;
-    GetCodeAltoRed &= -2;
+    get_code_width_red = (float)man / coefredx + 0.5;
+    get_code_height_red = (float)mal / coefredy + 0.5;
+    get_code_width_red &= -2;
+    get_code_height_red &= -2;
 
-    if (GetCodeAnchoRed < 2)
-      GetCodeAnchoRed = 2;
+    if (get_code_width_red < 2)
+      get_code_width_red = 2;
 
-    if (GetCodeAltoRed < 2)
-      GetCodeAltoRed = 2;
+    if (get_code_height_red < 2)
+      get_code_height_red = 2;
 
-    if (coefredx * (float)(GetCodeAnchoRed - 1) >= (float)man)
-      coefredx = (float)(man - 1) / (float)(GetCodeAnchoRed - 1);
+    if (coefredx * (float)(get_code_width_red - 1) >= (float)man)
+      coefredx = (float)(man - 1) / (float)(get_code_width_red - 1);
 
-    if (coefredy * (float)(GetCodeAltoRed - 1) >= (float)mal)
-      coefredy = (float)(mal - 1) / (float)(GetCodeAltoRed - 1);
+    if (coefredy * (float)(get_code_height_red - 1) >= (float)mal)
+      coefredy = (float)(mal - 1) / (float)(get_code_height_red - 1);
 
-    if ((temp2 = (byte *)malloc(GetCodeAnchoRed * GetCodeAltoRed)) != NULL) {
-      memset(temp2, 0, GetCodeAnchoRed * GetCodeAltoRed);
+    if ((temp2 = (byte *)malloc(get_code_width_red * get_code_height_red)) != NULL) {
+      memset(temp2, 0, get_code_width_red * get_code_height_red);
       a = (float)0.0;
 
-      for (y = 0; y < GetCodeAltoRed; y++) {
+      for (y = 0; y < get_code_height_red; y++) {
         b = (float)0.0;
-        for (x = 0; x < GetCodeAnchoRed; x++) {
-          temp2[y * GetCodeAnchoRed + x] = temp[((memptrsize)a) * man + (memptrsize)b];
+        for (x = 0; x < get_code_width_red; x++) {
+          temp2[y * get_code_width_red + x] = temp[((memptrsize)a) * man + (memptrsize)b];
           b += coefredx;
         }
         a += coefredy;
       }
 
-      if ((GetCodeImagenRed = (char *)malloc((GetCodeAnchoRed * GetCodeAltoRed) / 4)) != NULL) {
-        for (y = 0; y < GetCodeAltoRed; y += 2) {
-          for (x = 0; x < GetCodeAnchoRed; x += 2) {
-            n = *(ghost + temp2[x + y * GetCodeAnchoRed] * 256 +
-                  temp2[x + 1 + y * GetCodeAnchoRed]);
-            m = *(ghost + temp2[x + (y + 1) * GetCodeAnchoRed] * 256 +
-                  temp2[x + 1 + (y + 1) * GetCodeAnchoRed]);
-            GetCodeImagenRed[x / 2 + (y / 2) * (GetCodeAnchoRed / 2)] = *(ghost + n * 256 + m);
+      if ((get_code_image_red = (char *)malloc((get_code_width_red * get_code_height_red) / 4)) != NULL) {
+        for (y = 0; y < get_code_height_red; y += 2) {
+          for (x = 0; x < get_code_width_red; x += 2) {
+            n = *(ghost + temp2[x + y * get_code_width_red] * 256 +
+                  temp2[x + 1 + y * get_code_width_red]);
+            m = *(ghost + temp2[x + (y + 1) * get_code_width_red] * 256 +
+                  temp2[x + 1 + (y + 1) * get_code_width_red]);
+            get_code_image_red[x / 2 + (y / 2) * (get_code_width_red / 2)] = *(ghost + n * 256 + m);
           }
         }
 
-        GetCodeAnchoRed /= 2;
-        GetCodeAltoRed /= 2;
+        get_code_width_red /= 2;
+        get_code_height_red /= 2;
       } else {
-        GetCodeImagenRed = NULL;
+        get_code_image_red = NULL;
       }
       free(temp2);
     } else {
-      GetCodeImagenRed = NULL;
+      get_code_image_red = NULL;
     }
   } else {
-    GetCodeAnchoRed = GetCodeAncho;
-    GetCodeAltoRed = GetCodeAlto;
+    get_code_width_red = get_code_width;
+    get_code_height_red = get_code_height;
 
-    if ((GetCodeImagenRed = (char *)malloc(GetCodeAnchoRed * GetCodeAltoRed)) != NULL) {
-      memcpy(GetCodeImagenRed, GetCodeImagen, GetCodeAnchoRed * GetCodeAltoRed);
+    if ((get_code_image_red = (char *)malloc(get_code_width_red * get_code_height_red)) != NULL) {
+      memcpy(get_code_image_red, get_code_image, get_code_width_red * get_code_height_red);
     }
   }
 
-  show_dialog(GetCode0);
+  show_dialog(get_code0);
 }
 
 int find_fpg_window();
 
-void Show_Taggeds() {
+void show_tagged() {
   FPG *MiFPG;
   int a, x, y, Elemento, n;
   FILE *fpg;
@@ -961,7 +961,7 @@ void Show_Taggeds() {
 
 int fpg_delete_many(FPG *Fpg, int taggeds, int *array_del);
 
-void Delete_Taggeds() {
+void delete_tagged() {
   FPG *MiFPG;
   int taggeds = 0, n, vent;
   int *array_del;
@@ -1786,7 +1786,7 @@ void map_to_fpg(struct tmapa *mapa) {
           return;
         }
 
-        GetGrafMAP(mapa, imagen, x + 1, y + 1, width - 2, height - 2, cod++);
+        get_map_graphic(mapa, imagen, x + 1, y + 1, width - 2, height - 2, cod++);
       }
     }
   }
@@ -1794,7 +1794,7 @@ void map_to_fpg(struct tmapa *mapa) {
   free(imagen);
 }
 
-void GetGrafMAP(struct tmapa *mapa, byte *imagen, int x, int y, int width, int height, int cod) {
+void get_map_graphic(struct tmapa *mapa, byte *imagen, int x, int y, int width, int height, int cod) {
   FPG *MiFPG = (FPG *)v.aux;
   int pos, index = 0;
   int scan_x, scan_y;
@@ -1860,7 +1860,7 @@ void fpg_to_map(FPG *MiFPG) {
   int num;
   FILE *fpg;
   HeadFPG MiHeadFPG;
-  byte *FPGimagen;
+  byte *fpg_image;
   byte *FPGmap;
 
   lmapan = vga_width;
@@ -1916,7 +1916,7 @@ void fpg_to_map(FPG *MiFPG) {
     if (MiHeadFPG.num_points != 0)
       fseek(fpg, MiHeadFPG.num_points * 4, SEEK_CUR);
 
-    if ((FPGimagen = (byte *)malloc((lgraf[num].w - 2) * (lgraf[num].h - 2))) == NULL) {
+    if ((fpg_image = (byte *)malloc((lgraf[num].w - 2) * (lgraf[num].h - 2))) == NULL) {
       fclose(fpg);
       free(FPGmap);
       v_text = (char *)texts[45];
@@ -1924,18 +1924,18 @@ void fpg_to_map(FPG *MiFPG) {
       return;
     }
 
-    if (fread(FPGimagen, 1, (lgraf[num].w - 2) * (lgraf[num].h - 2), fpg) !=
+    if (fread(fpg_image, 1, (lgraf[num].w - 2) * (lgraf[num].h - 2), fpg) !=
         (lgraf[num].w - 2) * (lgraf[num].h - 2)) {
       fclose(fpg);
       free(FPGmap);
-      free(FPGimagen);
+      free(fpg_image);
       v_text = (char *)texts[44];
       show_dialog(err0);
       return;
     }
 
-    PutGrafMAP(FPGimagen, FPGmap, num);
-    free(FPGimagen);
+    put_map_graphic(fpg_image, FPGmap, num);
+    free(fpg_image);
     num++;
   }
 
@@ -1952,7 +1952,7 @@ void fpg_to_map(FPG *MiFPG) {
   v.redraw = 1;
 }
 
-void PutGrafMAP(byte *imagen, byte *mapa, int num) {
+void put_map_graphic(byte *imagen, byte *mapa, int num) {
   int x, y;
   int pos_im, pos_ma;
 
@@ -2095,7 +2095,7 @@ int select_file(void) {
       }
       close_fpg(full);
       memset(v_aux, 0, sizeof(FPG));
-      new_window(FPG0N);
+      new_window(fpg_dialog0_new);
     } else if (v_accept == 2) {
       v_aux = (byte *)malloc(sizeof(FPG));
 
@@ -2111,7 +2111,7 @@ int select_file(void) {
       MiFPG->lInfoFPG.created = 0;
       close_fpg(full);
       memset(v_aux, 0, sizeof(FPG));
-      new_window(FPG0A);
+      new_window(fpg_dialog0_add);
     } else
       return 0;
 

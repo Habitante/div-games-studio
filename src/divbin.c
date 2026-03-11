@@ -4,8 +4,8 @@
 
 // TRASHCAN Handler
 
-extern HeadFPG HeadFPGArrastre;
-void FPG2();
+extern HeadFPG drag_fpg_header;
+void fpg_dialog2();
 
 void FPG_paint_listbox_br(struct t_listboxbr *l);
 void FPG_update_listbox_br(struct t_listboxbr *l);

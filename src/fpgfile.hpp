@@ -35,7 +35,7 @@ typedef struct _FPG{
 
         void fpg_create(FPG *Fpg,char *Name);
         int fpg_open(FPG *Fpg,char *Name);
-        int fpg_add(FPG *Fpg,int COD,char *tDescrip,char *tFilename,int Ancho,int Alto,int num_points,char *points,char *Imagen,int BorrarAntiguo, int get_info);
+        int fpg_add(FPG *Fpg,int COD,char *desc,char *filename,int Ancho,int Alto,int num_points,char *points,char *Imagen,int delete_old, int get_info);
         int fpg_delete(FPG *Fpg,int COD);
         void fpg_read_image_header(HeadFPG *MiHeadFPG,FILE *fpg);
         int RemapAllFile(FPG *Fpg);

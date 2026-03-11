@@ -1053,7 +1053,7 @@ void EditSound1(void) {
 
   _show_items();
 
-  // Info del sonido
+  // Info del sounds
   wbox(v.ptr, w, h, c1, 4, 12, 69, 28);
   wrectangle(v.ptr, w, h, c0, 3, 11, 71, 30);
   wrectangle(v.ptr, w, h, c0, 3, 21, 71, 11);
@@ -1510,7 +1510,7 @@ void ModifySound(int option) {
     Mix_PlayChannel(-1, mypcminfo->SI, 0);
 
     return;
-  case 9: // Pega el sonido en el escritorio
+  case 9: // Pega el sounds en el escritorio
     CopyNewSound(mypcminfo, ini, fin);
     return;
   case 10: // Convertir a 8 bit

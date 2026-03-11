@@ -4568,23 +4568,23 @@ function 139 int ignore_error(0)                   // Ignore a runtime error (nu
 */
 
 typedef struct _meminfo {
-  unsigned Bloque_mas_grande_disponible;             // Largest available block
-  unsigned Maximo_de_paginas_desbloqueadas;          // Max unlocked pages
-  unsigned Pagina_bloqueable_mas_grande;             // Largest lockable page
-  unsigned Espacio_de_direccionamiento_lineal;       // Linear address space
-  unsigned Numero_de_paginas_libres_disponibles;     // Number of free pages available
-  unsigned Numero_de_paginas_fisicas_libres;         // Number of free physical pages
-  unsigned Total_de_paginas_fisicas;                 // Total physical pages
-  unsigned Espacio_de_direccionamiento_lineal_libre; // Free linear address space
-  unsigned Tamano_del_fichero_de_paginas;            // Page file size
+  unsigned largest_available_block;             // Largest available block
+  unsigned max_unlocked_pages;          // Max unlocked pages
+  unsigned largest_lockable_page;             // Largest lockable page
+  unsigned linear_address_space;       // Linear address space
+  unsigned free_pages_available;     // Number of free pages available
+  unsigned free_physical_pages;         // Number of free physical pages
+  unsigned total_physical_pages;                 // Total physical pages
+  unsigned free_linear_space; // Free linear address space
+  unsigned page_file_size;            // Page file size
   unsigned reservado[3];                             // Reserved
 } meminfo;
 
-int Mem_GetHeapFree() {
+int mem_get_heap_free() {
   return 65535;
 }
 
-void GetFreeMem(meminfo *Meminfo) {}
+void get_free_mem(meminfo *Meminfo) {}
 
 //----------------------------------------------------------------------------
 //      disk_free(drive)

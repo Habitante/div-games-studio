@@ -128,7 +128,7 @@ extern int SongCode;
 extern int last_mod_clean;
 void FreeMOD(void);
 int IsWAV(char *FileName);
-int Mem_GetHeapFree(void);
+int mem_get_heap_free(void);
 
 TABLAIFS tifs[256];
 FILE *fifs;
@@ -776,7 +776,7 @@ void create_thumb_FNT(struct t_listboxbr *l) {
       spacelen = 0;
       cnt = 0;
       for (x = 0; x < 255; x += 2) {
-        GetCharSizeBuffer(x, &fan, &fal, thumb[num].ptr);
+        get_char_size_buffer(x, &fan, &fal, thumb[num].ptr);
         if (fan > 1) {
           cnt++;
           spacelen += fan;
@@ -790,7 +790,7 @@ void create_thumb_FNT(struct t_listboxbr *l) {
         spacelen = 1;
 
       for (x = 0; x < strlen(TestString2); x++) {
-        GetCharSizeBuffer(TestString2[x], &fan, &fal, thumb[num].ptr);
+        get_char_size_buffer(TestString2[x], &fan, &fal, thumb[num].ptr);
         if (fan <= 1)
           fan = 0;
         TamaX += fan;
@@ -815,7 +815,7 @@ void create_thumb_FNT(struct t_listboxbr *l) {
 
       init = 0;
       for (x = 0; x < strlen(TestString2); x++) {
-        len = ShowCharBuffer(TestString2[x], init, 0, (char *)temp, TamaX, thumb[num].ptr);
+        len = show_char_buffer(TestString2[x], init, 0, (char *)temp, TamaX, thumb[num].ptr);
         if (len <= 1)
           len = 0;
         init += len;
@@ -1332,7 +1332,7 @@ void load_letter(uint8_t letra) {
   short pixels, despY;
 
   map_width = map_height = 0;
-  offset = tifs[letra].desp;
+  offset = tifs[letra].offset;
   if (fseek(fifs, offset, SEEK_SET))
     error = 1;
   if (fread(&map_height, 2, 1, fifs) < 1)

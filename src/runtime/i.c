@@ -543,8 +543,8 @@ void initialization(void) {
   memset(tabfiles, 0, 32 * 4);
 
   for (n = 0; n < 128; n++) {
-    sonido[n].smp = 0;
-    cancion[n].ptr = NULL;
+    sounds[n].smp = 0;
+    songs[n].ptr = NULL;
   }
 
   sound_init();

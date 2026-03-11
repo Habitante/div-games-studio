@@ -1155,7 +1155,7 @@ void pal_refresh(int no_tocar_mapas, int guardar_original) {
 
   for (n = 1; n < max_windows; n++) {
     if (window[n].type == 101) {
-      if (RemapAllFiles(n))
+      if (remap_all_files(n))
         n--;
     }
   }

@@ -44,7 +44,7 @@ char vgasizes[32 * 16];
 
 struct t_listbox lvgasizes = {64 + 24, 22, vgasizes, 16, 6, 80};
 
-void Vid_Setup1(void) {
+void vid_setup1(void) {
   char cWork[10];
   _show_items();
   create_listbox(&lvgasizes);
@@ -59,7 +59,7 @@ void Vid_Setup1(void) {
   wwrite(v.ptr, v.w / big2, v.h / big2, 4 + 30, 22, 0, (byte *)cWork, c4);
 }
 
-void Vid_Setup2(void) {
+void vid_setup2(void) {
   int need_refresh = 0;
   _process_items();
   update_listbox(&lvgasizes);
@@ -106,7 +106,7 @@ void Vid_Setup2(void) {
 }
 extern int soundstopped;
 
-void Vid_Setup3(void) {
+void vid_setup3(void) {
   if (v_accept)
     if (VS_WIDTH != stvga_w || VS_HEIGHT != stvga_h || VS_BIG != stbig) {
       VS_BIG = stbig;
@@ -120,7 +120,7 @@ void Vid_Setup3(void) {
     }
 }
 
-void Vid_Setup0(void) {
+void vid_setup0(void) {
   int n;
 
   v.type = 1;
@@ -128,9 +128,9 @@ void Vid_Setup0(void) {
   v.title = texts[881] + 1;
   v.w = 126 + 24 + 30;
   v.h = 66 + 26;
-  v.paint_handler = (voidReturnType)Vid_Setup1;
-  v.click_handler = (voidReturnType)Vid_Setup2;
-  v.close_handler = (voidReturnType)Vid_Setup3;
+  v.paint_handler = (voidReturnType)vid_setup1;
+  v.click_handler = (voidReturnType)vid_setup2;
+  v.close_handler = (voidReturnType)vid_setup3;
 
   stnot_big = !VS_BIG;
   stbig = VS_BIG;
@@ -161,13 +161,13 @@ void Vid_Setup0(void) {
 //  Background wallpaper selection
 //-----------------------------------------------------------------------------
 
-char Tap_name[_MAX_PATH];
-char Tap_pathname[_MAX_PATH];
-int Tap_mosaico;
-int Tap_gama;
+char wallpaper_name[_MAX_PATH];
+char wallpaper_path[_MAX_PATH];
+int wallpaper_tile;
+int wallpaper_gamma;
 struct _gcolor gama_vieja[9];
 
-void Get_Tapiz() {
+void get_wallpaper() {
   int len, n;
   char cwork[1024];
   byte *ptr = NULL;
@@ -199,8 +199,8 @@ void Get_Tapiz() {
 
         if (fread(cwork, 1, n, f) == n) {
           if (fmt_is_map((byte *)cwork) || fmt_is_pcx((byte *)cwork) || fmt_is_bmp((byte *)cwork)) {
-            DIV_STRCPY(Tap_name, input);
-            DIV_STRCPY(Tap_pathname, full);
+            DIV_STRCPY(wallpaper_name, input);
+            DIV_STRCPY(wallpaper_path, full);
 
           } else {
             if ((ptr = (byte *)malloc(len)) != NULL) {
@@ -208,8 +208,8 @@ void Get_Tapiz() {
 
               if (fread(ptr, 1, len, f) == len) {
                 if (fmt_is_jpg(ptr, len)) {
-                  DIV_STRCPY(Tap_name, input);
-                  DIV_STRCPY(Tap_pathname, full);
+                  DIV_STRCPY(wallpaper_name, input);
+                  DIV_STRCPY(wallpaper_path, full);
 
                 } else {
                   v_text = (char *)texts[46];
@@ -248,14 +248,14 @@ void Get_Tapiz() {
   }
 }
 
-void Tap_Setup1(void) {
+void wallpaper_setup1(void) {
   int w = v.w / big2, h = v.h / big2;
   int x;
 
   _show_items();
-  for (x = strlen(Tap_pathname) - 1; x >= 0; x--)
-    if (IS_PATH_SEP(Tap_pathname[x]) || x == 0) {
-      DIV_STRCPY(Tap_name, &Tap_pathname[x + 1]);
+  for (x = strlen(wallpaper_path) - 1; x >= 0; x--)
+    if (IS_PATH_SEP(wallpaper_path[x]) || x == 0) {
+      DIV_STRCPY(wallpaper_name, &wallpaper_path[x + 1]);
       x = -1;
     }
 
@@ -264,14 +264,14 @@ void Tap_Setup1(void) {
 
   wbox(v.ptr, w, h, c12, 4, 20, w - 21, 8);
   wwrite(v.ptr, w, h, 4, 12, 0, texts[178], c3);
-  wwrite(v.ptr, w, h, 5, 21, 0, (byte *)Tap_name, c4);
+  wwrite(v.ptr, w, h, 5, 21, 0, (byte *)wallpaper_name, c4);
 
   wrectangle(v.ptr, w, h, c0, w - 38, 24 + 8, 34, 7);
   for (x = 0; x < 32; x++)
     wbox(v.ptr, w, h, wallpaper_gradient[x * 4], w - 37 + x, 24 + 9, 1, 5);
 }
 
-void Tap_Setup2(void) {
+void wallpaper_setup2(void) {
   int w = v.w / big2, h = v.h / big2;
   int need_refresh = 0;
 
@@ -286,9 +286,9 @@ void Tap_Setup2(void) {
     v_accept = 0;
     break;
   case 2:
-    Get_Tapiz();
+    get_wallpaper();
     wbox(v.ptr, w, h, c3, 4, 20, w - 15, 8);
-    wwrite(v.ptr, w, h, 4, 20, 0, (byte *)Tap_name, c4);
+    wwrite(v.ptr, w, h, 4, 20, 0, (byte *)wallpaper_name, c4);
     need_refresh = 1;
     break;
   case 3:
@@ -312,12 +312,12 @@ void Tap_Setup2(void) {
   }
 }
 
-void Tap_Setup3(void) {
+void wallpaper_setup3(void) {
   if (v_accept) {
-    Setupfile.Desktop_Tile = Tap_mosaico;
-    div_strcpy(Setupfile.Desktop_Image, sizeof(Setupfile.Desktop_Image), Tap_pathname);
+    Setupfile.Desktop_Tile = wallpaper_tile;
+    div_strcpy(Setupfile.Desktop_Image, sizeof(Setupfile.Desktop_Image), wallpaper_path);
 
-    Setupfile.Desktop_Gama = Tap_gama;
+    Setupfile.Desktop_Gama = wallpaper_gamma;
 
     prepare_wallpaper();
     update_box(0, 0, vga_width, vga_height);
@@ -327,7 +327,7 @@ void Tap_Setup3(void) {
   }
 }
 
-void Tap_Setup0(void) {
+void wallpaper_setup0(void) {
   int w, h;
 
   v.type = 1;
@@ -335,20 +335,20 @@ void Tap_Setup0(void) {
   v.w = 138;
   v.h = 150;
   w = v.w / big2, h = v.h / big2;
-  DIV_STRCPY(Tap_pathname, Setupfile.Desktop_Image);
-  Tap_mosaico = Setupfile.Desktop_Tile;
-  Tap_gama = Setupfile.Desktop_Gama;
+  DIV_STRCPY(wallpaper_path, Setupfile.Desktop_Image);
+  wallpaper_tile = Setupfile.Desktop_Tile;
+  wallpaper_gamma = Setupfile.Desktop_Gama;
 
-  v.paint_handler = (voidReturnType)Tap_Setup1;
-  v.click_handler = (voidReturnType)Tap_Setup2;
-  v.close_handler = (voidReturnType)Tap_Setup3;
+  v.paint_handler = (voidReturnType)wallpaper_setup1;
+  v.click_handler = (voidReturnType)wallpaper_setup2;
+  v.close_handler = (voidReturnType)wallpaper_setup3;
 
   _button(100, 7, v.h - 14, 0);
   _button(101, v.w - 8, v.h - 14, 2);
   _button(121, v.w - 12, 18, 0);
 
-  _flag(179, 4, 24 + 8, &Tap_mosaico);
-  _flag(181, v.w - 49 - text_len(texts[181]), 24 + 8, &Tap_gama);
+  _flag(179, 4, 24 + 8, &wallpaper_tile);
+  _flag(181, v.w - 49 - text_len(texts[181]), 24 + 8, &wallpaper_gamma);
 
   memcpy(gama_vieja, Setupfile.gradient_config, sizeof(gama_vieja));
 
@@ -356,38 +356,38 @@ void Tap_Setup0(void) {
 }
 
 typedef struct _meminfo {
-  unsigned long Bloque_mas_grande_disponible;        // Largest block available
-  unsigned Maximo_de_paginas_desbloqueadas;          // Maximum unlocked pages
-  unsigned Pagina_bloqueable_mas_grande;             // Largest lockable page
-  unsigned Espacio_de_direccionamiento_lineal;       // Linear address space
-  unsigned Numero_de_paginas_libres_disponibles;     // Number of free pages available
-  unsigned Numero_de_paginas_fisicas_libres;         // Number of free physical pages
-  unsigned Total_de_paginas_fisicas;                 // Total physical pages
-  unsigned Espacio_de_direccionamiento_lineal_libre; // Free linear address space
-  unsigned Tamano_del_fichero_de_paginas;            // Page file size
+  unsigned long largest_available_block;        // Largest block available
+  unsigned max_unlocked_pages;          // Maximum unlocked pages
+  unsigned largest_lockable_page;             // Largest lockable page
+  unsigned linear_address_space;       // Linear address space
+  unsigned free_pages_available;     // Number of free pages available
+  unsigned free_physical_pages;         // Number of free physical pages
+  unsigned total_physical_pages;                 // Total physical pages
+  unsigned free_linear_space; // Free linear address space
+  unsigned page_file_size;            // Page file size
   unsigned reserved[3];
 } meminfo;
 
 
-int Mem_GetHeapFree() {
+int mem_get_heap_free() {
   return 0;
 }
 #ifdef WIN32
 #include <windows.h>
 #endif
 
-void GetFreeMem(meminfo *Meminfo) {
+void get_free_mem(meminfo *Meminfo) {
 #ifdef WIN32
   MEMORYSTATUSEX status;
   status.dwLength = sizeof(status);
   GlobalMemoryStatusEx(&status);
-  Meminfo->Bloque_mas_grande_disponible = status.ullAvailPhys;
+  Meminfo->largest_available_block = status.ullAvailPhys;
   return;
 #else
   FILE *mem = fopen("/proc/meminfo", "r");
 
   if (mem == NULL) {
-    Meminfo->Bloque_mas_grande_disponible = -1;
+    Meminfo->largest_available_block = -1;
     return;
   }
   char line[256];
@@ -395,7 +395,7 @@ void GetFreeMem(meminfo *Meminfo) {
     int64_t ram;
     if (sscanf(line, "MemFree: %ds kB", &ram) == 1) {
       fclose(mem);
-      Meminfo->Bloque_mas_grande_disponible = ram * 1024;
+      Meminfo->largest_available_block = ram * 1024;
       return;
     }
   }
@@ -403,14 +403,14 @@ void GetFreeMem(meminfo *Meminfo) {
   // If we got here, then we couldn't find the proper line in the meminfo file:
   // do something appropriate like return an error code, throw an exception, etc.
   fclose(mem);
-  Meminfo->Bloque_mas_grande_disponible = -1;
+  Meminfo->largest_available_block = -1;
   return;
 #endif
 }
 
-void MemInfo1(void) {
+void mem_info1(void) {
   char cWork[256];
-  meminfo Mi_meminfo;
+  meminfo my_meminfo;
   char sizes[][3] = {"KB", "MB", "GB", "TB", "PB"};
   byte csize = 0;
   int mem, x, nuvent = 0, meminmaps = 0;
@@ -430,7 +430,7 @@ void MemInfo1(void) {
   wwrite_in_box(v.ptr + 2, w, w - 4, h, (w - 4) / 2 + 1, 32, 1, (byte *)user2, c0);
   wwrite_in_box(v.ptr + 2, w, w - 4, h, (w - 4) / 2, 32, 1, (byte *)user2, c3);
 
-  GetFreeMem(&Mi_meminfo);
+  get_free_mem(&my_meminfo);
   for (x = 0; x < max_windows; x++) {
     if (window[x].type)
       nuvent++;
@@ -438,10 +438,10 @@ void MemInfo1(void) {
       meminmaps += window[x].mapa->map_width * window[x].mapa->map_height;
     }
   }
-  if ((mem = Mem_GetHeapFree()) == -1)
+  if ((mem = mem_get_heap_free()) == -1)
     DIV_STRCPY(cWork, (char *)texts[193]);
   else {
-    mem = (Mi_meminfo.Bloque_mas_grande_disponible + mem) / 1024;
+    mem = (my_meminfo.largest_available_block + mem) / 1024;
     fmem = mem;
     fprintf(stdout, "Memory free: %d\n", mem);
     while (fmem > 1024) {
@@ -468,7 +468,7 @@ void MemInfo1(void) {
   wwrite(v.ptr, w, h, w / 2, 60, 1, (byte *)cWork, c4);
 }
 
-void MemInfo2(void) {
+void mem_info2(void) {
   _process_items();
   if (v.active_item == 0)
     end_dialog = 1;
@@ -479,8 +479,8 @@ void mem_info0(void) {
   v.title = texts[199];
   v.w = 168;
   v.h = 88;
-  v.paint_handler = (voidReturnType)MemInfo1;
-  v.click_handler = (voidReturnType)MemInfo2;
+  v.paint_handler = (voidReturnType)mem_info1;
+  v.click_handler = (voidReturnType)mem_info2;
 
   _button(100, v.w / 2, v.h - 14, 1);
 }
@@ -511,7 +511,7 @@ void Cfg_colors(void) {
   wbox(v.ptr, w, h, color_cfg[11], 53 + 25, 45 + 20, 7, 7);
 }
 
-void Cfg_Setup1(void) {
+void cfg_setup1(void) {
   int w = v.w / big2, h = v.h / big2;
   int inc = 31;
   _show_items();
@@ -654,57 +654,57 @@ void cfg_show_mouse(void) {
   wput(v.ptr, w, h, slider, 56 + 30 + inc, 55);
 }
 
-void Cfg_Setup2(void) {
+void cfg_setup2(void) {
   int w = v.w / big2, h = v.h / big2;
-  int zona = 0;
+  int zone = 0;
   int inc = 31;
 
   _process_items();
 
   if (wmouse_in(12, 21, 9, 9))
-    zona = 1;
+    zone = 1;
   if (wmouse_in(52 + 25, 21, 9, 9))
-    zona = 2;
+    zone = 2;
   if (wmouse_in(92 + 34, 21, 9, 9))
-    zona = 3;
+    zone = 3;
 
   if (wmouse_in(12, 44, 9, 9))
-    zona = 4;
+    zone = 4;
   if (wmouse_in(52 + 25, 44, 9, 9))
-    zona = 5;
+    zone = 5;
   if (wmouse_in(92 + 34, 44, 9, 9))
-    zona = 6;
+    zone = 6;
   if (wmouse_in(12, 44 + 10, 9, 9))
-    zona = 7;
+    zone = 7;
   if (wmouse_in(52 + 25, 44 + 10, 9, 9))
-    zona = 8;
+    zone = 8;
   if (wmouse_in(92 + 34, 44 + 10, 9, 9))
-    zona = 9;
+    zone = 9;
   if (wmouse_in(12, 44 + 20, 9, 9))
-    zona = 11;
+    zone = 11;
   if (wmouse_in(52 + 25, 44 + 20, 9, 9))
-    zona = 12;
+    zone = 12;
 
   if (wmouse_in(52 + 50, 55 + 30, 9, 9))
-    zona = 13; //7
+    zone = 13; //7
   if (wmouse_in(92 + 50, 55 + 30, 9, 9))
-    zona = 14; //8
+    zone = 14; //8
   if (wmouse_in(91 + 30, 68 + 30, 10, 10))
-    zona = 15; //9
+    zone = 15; //9
 
   if (wmouse_in(52 + 50, 55 + 30 + inc, 9, 9))
-    zona = 16;
+    zone = 16;
   if (wmouse_in(92 + 50, 55 + 30 + inc, 9, 9))
-    zona = 17;
+    zone = 17;
 
-  if ((zona >= 1 && zona <= 12) || zona == 15)
+  if ((zone >= 1 && zone <= 12) || zone == 15)
     mouse_graf = 2;
-  if (zona == 13)
+  if (zone == 13)
     mouse_graf = 10;
-  if (zona == 14)
+  if (zone == 14)
     mouse_graf = 11;
 
-  if (zona == 13 && (mouse_b & 1) && wmouse_x != -1) {
+  if (zone == 13 && (mouse_b & 1) && wmouse_x != -1) {
     if (!(v.buttons & 1)) {
       wput(v.ptr, w, h, 53 + 50, 56 + 30, -53);
       v.buttons ^= 1;
@@ -720,7 +720,7 @@ void Cfg_Setup2(void) {
     }
   }
 
-  if (zona == 14 && (mouse_b & 1) && wmouse_x != -1) {
+  if (zone == 14 && (mouse_b & 1) && wmouse_x != -1) {
     if (!(v.buttons & 2)) {
       wput(v.ptr, w, h, 93 + 50, 56 + 30, -54);
       v.buttons ^= 2;
@@ -736,7 +736,7 @@ void Cfg_Setup2(void) {
     }
   }
 
-  if (zona == 16 && (mouse_b & 1) && wmouse_x != -1) {
+  if (zone == 16 && (mouse_b & 1) && wmouse_x != -1) {
     if (!(v.buttons & 4)) {
       wput(v.ptr, w, h, 53 + 50, 56 + 30 + inc, -53);
       v.buttons ^= 4;
@@ -752,7 +752,7 @@ void Cfg_Setup2(void) {
     }
   }
 
-  if (zona == 17 && (mouse_b & 1) && wmouse_x != -1) {
+  if (zone == 17 && (mouse_b & 1) && wmouse_x != -1) {
     if (!(v.buttons & 8)) {
       wput(v.ptr, w, h, 93 + 50, 56 + 30 + inc, -54);
       v.buttons ^= 8;
@@ -768,17 +768,17 @@ void Cfg_Setup2(void) {
     }
   }
 
-  if (!(mouse_b & 1) && (prev_mouse_buttons & 1) && zona == 15) {
+  if (!(mouse_b & 1) && (prev_mouse_buttons & 1) && zone == 15) {
     paint_cursor = (paint_cursor + 1) % 3;
     cfg_show_cursor();
     v.redraw = 1;
   }
 
-  if ((mouse_b & 1) && zona >= 1 && zona <= 12) {
-    sel_color_font = color_cfg[zona - 1];
+  if ((mouse_b & 1) && zone >= 1 && zone <= 12) {
+    sel_color_font = color_cfg[zone - 1];
     show_dialog((voidReturnType)Selcolor0);
     if (sel_color_ok) {
-      color_cfg[zona - 1] = sel_color_font;
+      color_cfg[zone - 1] = sel_color_font;
       Cfg_colors();
       v.redraw = 1;
     }
@@ -796,7 +796,7 @@ void Cfg_Setup2(void) {
   }
 }
 
-void Cfg_Setup3(void) {
+void cfg_setup3(void) {
   if (!v_accept) {
     exploding_windows = setup_switches[0];
     move_full_window = setup_switches[1];
@@ -814,9 +814,9 @@ void config_setup0(void) {
   v.title = texts[883];
   v.w = 192;
   v.h = 200;
-  v.paint_handler = (voidReturnType)Cfg_Setup1;
-  v.click_handler = (voidReturnType)Cfg_Setup2;
-  v.close_handler = (voidReturnType)Cfg_Setup3;
+  v.paint_handler = (voidReturnType)cfg_setup1;
+  v.click_handler = (voidReturnType)cfg_setup2;
+  v.close_handler = (voidReturnType)cfg_setup3;
 
   _button(100, 7, v.h - 14, 0);
   _button(101, v.w - 8, v.h - 14, 2);
@@ -856,7 +856,7 @@ void create_saved_window(voidReturnType init_handler, int nx, int ny);
 extern struct twindow window_aux;
 void test_cursor(void);
 void resize_program(void);
-extern int VidModeChanged;
+extern int vid_mode_changed;
 
 void create_title_bar(void);
 
@@ -1092,7 +1092,7 @@ void config_setup_end(void) {
       for (n = 0; n < i; n++) {
         memcpy(&window_aux.type, &vp[n].type, sizeof(struct twindow));
         v_prg = window_aux.prg;
-        VidModeChanged = 33;
+        vid_mode_changed = 33;
         create_saved_window((voidReturnType)resize_program, window_aux.x, window_aux.y);
       }
       if (help_item)
@@ -1219,7 +1219,7 @@ void prepare_wallpaper_temp(void) {
   // TODO: Support tiling/rescaling and loading a user-specified map file
   // instead of always using "wallpaper.map"
 
-  if ((f = fopen(Tap_pathname, "rb")) == NULL)
+  if ((f = fopen(wallpaper_path, "rb")) == NULL)
     return;
   fseek(f, 0, SEEK_END);
   lon = ftell(f);
@@ -1305,7 +1305,7 @@ void prepare_wallpaper_temp(void) {
   memcpy(pal, dac4, 768);
   create_dac4();
 
-  if (!Tap_gama) {
+  if (!wallpaper_gamma) {
     for (x = 0, p = pal; x < 256; x++, p += 3)
       x_cwallpaper[x] = fast_find_color(*p, *(p + 1), *(p + 2));
     p = temp;
@@ -1329,7 +1329,7 @@ void prepare_wallpaper_temp(void) {
     return;
   }
 
-  if (Tap_mosaico) {
+  if (wallpaper_tile) {
     x_wallpaper_width = vga_width;
     x_wallpaper_height = vga_height;
     x_wallpaper_map = x_wallpaper = p;

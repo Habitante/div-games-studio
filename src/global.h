@@ -353,10 +353,10 @@ GLOBAL_DATA int VS_MODE;
 GLOBAL_DATA int VS_WIDTH;
 GLOBAL_DATA int VS_HEIGHT;
 GLOBAL_DATA int VS_BIG;
-void Vid_Setup0();
+void vid_setup0();
 
 // Wallpaper configuration
-void Tap_Setup0(void);
+void wallpaper_setup0(void);
 
 ///////////////////////////////////////////////////////////////////////////////
 //      Functions exported by DIVWINDO (divwindo.c)
@@ -404,8 +404,8 @@ void Clock0(void);
 void Clock1(void);
 void Bin0(void);
 void Bin1(void);
-void FPG0A(void);
-void FPG1(void);
+void fpg_dialog0_add(void);
+void fpg_dialog1(void);
 void PRJ0();
 void PRJ1();
 void PRJ2();
@@ -927,10 +927,10 @@ void flush_buffer(void);
 
 int new_file(void);
 void open_file();
-int RemapAllFiles(int vent);
+int remap_all_files(int vent);
 void fpg_save(int n);
-void Delete_Taggeds();
-void Show_Taggeds();
+void delete_tagged();
+void show_tagged();
 
 //-----------------------------------------------------------------------------
 //      Functions and structures exported by the trash can
@@ -1006,10 +1006,10 @@ extern byte *modinfo_aux;
 //      Functions and structures exported by DIVDSKTP
 //-----------------------------------------------------------------------------
 
-int Can_UpLoad_Desktop();
-int UpLoad_Desktop();
-void DownLoad_Desktop();
-void New_DownLoad_Desktop();
+int can_upload_desktop();
+int upload_desktop();
+void download_desktop();
+void new_download_desktop();
 
 //-----------------------------------------------------------------------------
 //      Compiler functions
