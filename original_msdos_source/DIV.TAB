@@ -1,0 +1,2372 @@
+þ Objetos de  - DIV Versi¢n 0c88b
+
+[1]: 1602
+[2]: 1688
+[3]: 0
+[4]: 0
+[5]: 0
+[6]: 44
+[7]: 0
+[8]: 1732
+
+    0	tcons: m320x200
+	valor=320200
+	bloque(0), anterior(0)
+
+    1	tcons: m320x240
+	valor=320240
+	bloque(0), anterior(0)
+
+    2	tcons: m320x400
+	valor=320400
+	bloque(0), anterior(0)
+
+    3	tcons: m360x240
+	valor=360240
+	bloque(0), anterior(0)
+
+    4	tcons: m360x360
+	valor=360360
+	bloque(0), anterior(0)
+
+    5	tcons: m376x282
+	valor=376282
+	bloque(0), anterior(0)
+
+    6	tcons: m640x400
+	valor=640400
+	bloque(0), anterior(0)
+
+    7	tcons: m640x480
+	valor=640480
+	bloque(0), anterior(0)
+
+    8	tcons: m800x600
+	valor=800600
+	bloque(0), anterior(0)
+
+    9	tcons: m1024x768
+	valor=1024768
+	bloque(0), anterior(0)
+
+   10	tcons: true
+	valor=1
+	bloque(0), anterior(0)
+
+   11	tcons: false
+	valor=0
+	bloque(0), anterior(0)
+
+   12	tcons: min_int
+	valor=2147483648
+	bloque(0), anterior(0)
+
+   13	tcons: max_int
+	valor=2147483647
+	bloque(0), anterior(0)
+
+   14	tcons: pi
+	valor=180000
+	bloque(0), anterior(0)
+
+   15	tcons: s_kill
+	valor=0
+	bloque(0), anterior(0)
+
+   16	tcons: s_wakeup
+	valor=1
+	bloque(0), anterior(0)
+
+   17	tcons: s_sleep
+	valor=2
+	bloque(0), anterior(0)
+
+   18	tcons: s_freeze
+	valor=3
+	bloque(0), anterior(0)
+
+   19	tcons: s_kill_tree
+	valor=100
+	bloque(0), anterior(0)
+
+   20	tcons: s_wakeup_tree
+	valor=101
+	bloque(0), anterior(0)
+
+   21	tcons: s_sleep_tree
+	valor=102
+	bloque(0), anterior(0)
+
+   22	tcons: s_freeze_tree
+	valor=103
+	bloque(0), anterior(0)
+
+   23	tcons: all_text
+	valor=0
+	bloque(0), anterior(0)
+
+   24	tcons: all_drawing
+	valor=4294967295
+	bloque(0), anterior(0)
+
+   25	tcons: all_sound
+	valor=4294967295
+	bloque(0), anterior(0)
+
+   26	tcons: g_wide
+	valor=0
+	bloque(0), anterior(0)
+
+   27	tcons: g_height
+	valor=1
+	bloque(0), anterior(0)
+
+   28	tcons: g_x_center
+	valor=2
+	bloque(0), anterior(0)
+
+   29	tcons: g_y_center
+	valor=3
+	bloque(0), anterior(0)
+
+   30	tcons: c_screen
+	valor=0
+	bloque(0), anterior(0)
+
+   31	tcons: c_scroll
+	valor=1
+	bloque(0), anterior(0)
+
+   32	tcons: c_m7
+	valor=2
+	bloque(0), anterior(0)
+
+   33	tcons: c_m8
+	valor=3
+	bloque(0), anterior(0)
+
+   34	tcons: partial_dump
+	valor=0
+	bloque(0), anterior(0)
+
+   35	tcons: complete_dump
+	valor=1
+	bloque(0), anterior(0)
+
+   36	tcons: no_restore
+	valor=4294967295
+	bloque(0), anterior(0)
+
+   37	tcons: partial_restore
+	valor=0
+	bloque(0), anterior(0)
+
+   38	tcons: complete_restore
+	valor=1
+	bloque(0), anterior(0)
+
+   39	tcons: c_0
+	valor=1
+	bloque(0), anterior(0)
+
+   40	tcons: c_1
+	valor=2
+	bloque(0), anterior(0)
+
+   41	tcons: c_2
+	valor=4
+	bloque(0), anterior(0)
+
+   42	tcons: c_3
+	valor=8
+	bloque(0), anterior(0)
+
+   43	tcons: c_4
+	valor=16
+	bloque(0), anterior(0)
+
+   44	tcons: c_5
+	valor=32
+	bloque(0), anterior(0)
+
+   45	tcons: c_6
+	valor=64
+	bloque(0), anterior(0)
+
+   46	tcons: c_7
+	valor=128
+	bloque(0), anterior(0)
+
+   47	tcons: c_8
+	valor=256
+	bloque(0), anterior(0)
+
+   48	tcons: c_9
+	valor=512
+	bloque(0), anterior(0)
+
+   49	tcons: _max_process
+	valor=0
+	bloque(0), anterior(0)
+
+   50	tcons: _extended_conditions
+	valor=1
+	bloque(0), anterior(0)
+
+   51	tcons: _simple_conditions
+	valor=2
+	bloque(0), anterior(0)
+
+   52	tcons: _case_sensitive
+	valor=3
+	bloque(0), anterior(0)
+
+   53	tcons: _ignore_errors
+	valor=4
+	bloque(0), anterior(0)
+
+   54	tcons: _free_sintax
+	valor=5
+	bloque(0), anterior(0)
+
+   55	tcons: _no_check
+	valor=6
+	bloque(0), anterior(0)
+
+   56	tcons: _no_strfix
+	valor=7
+	bloque(0), anterior(0)
+
+   57	tcons: _no_optimization
+	valor=8
+	bloque(0), anterior(0)
+
+   58	tcons: _no_range_check
+	valor=9
+	bloque(0), anterior(0)
+
+   59	tcons: _no_id_check
+	valor=10
+	bloque(0), anterior(0)
+
+   60	tcons: _no_null_check
+	valor=11
+	bloque(0), anterior(0)
+
+   61	tcons: seek_set
+	valor=0
+	bloque(0), anterior(0)
+
+   62	tcons: seek_cur
+	valor=1
+	bloque(0), anterior(0)
+
+   63	tcons: seek_end
+	valor=2
+	bloque(0), anterior(0)
+
+   64	tcons: _hidden
+	valor=2
+	bloque(0), anterior(0)
+
+   65	tcons: _system
+	valor=4
+	bloque(0), anterior(0)
+
+   66	tcons: _volid
+	valor=8
+	bloque(0), anterior(0)
+
+   67	tcons: _subdir
+	valor=16
+	bloque(0), anterior(0)
+
+   68	tcons: fast_mixer
+	valor=1
+	bloque(0), anterior(0)
+
+   69	tcons: quality_mixer
+	valor=2
+	bloque(0), anterior(0)
+
+   70	tcons: sound_bits_8
+	valor=8
+	bloque(0), anterior(0)
+
+   71	tcons: sound_bits_16
+	valor=16
+	bloque(0), anterior(0)
+
+   72	tcons: _esc
+	valor=1
+	bloque(0), anterior(0)
+
+   73	tcons: _f1
+	valor=59
+	bloque(0), anterior(0)
+
+   74	tcons: _f2
+	valor=60
+	bloque(0), anterior(0)
+
+   75	tcons: _f3
+	valor=61
+	bloque(0), anterior(0)
+
+   76	tcons: _f4
+	valor=62
+	bloque(0), anterior(0)
+
+   77	tcons: _f5
+	valor=63
+	bloque(0), anterior(0)
+
+   78	tcons: _f6
+	valor=64
+	bloque(0), anterior(0)
+
+   79	tcons: _f7
+	valor=65
+	bloque(0), anterior(0)
+
+   80	tcons: _f8
+	valor=66
+	bloque(0), anterior(0)
+
+   81	tcons: _f9
+	valor=67
+	bloque(0), anterior(0)
+
+   82	tcons: _f10
+	valor=68
+	bloque(0), anterior(0)
+
+   83	tcons: _f11
+	valor=87
+	bloque(0), anterior(0)
+
+   84	tcons: _f12
+	valor=88
+	bloque(0), anterior(0)
+
+   85	tcons: _prn_scr
+	valor=55
+	bloque(0), anterior(0)
+
+   86	tcons: _scroll_lock
+	valor=70
+	bloque(0), anterior(0)
+
+   87	tcons: _wave
+	valor=41
+	bloque(0), anterior(0)
+
+   88	tcons: _1
+	valor=2
+	bloque(0), anterior(0)
+
+   89	tcons: _2
+	valor=3
+	bloque(0), anterior(0)
+
+   90	tcons: _3
+	valor=4
+	bloque(0), anterior(0)
+
+   91	tcons: _4
+	valor=5
+	bloque(0), anterior(0)
+
+   92	tcons: _5
+	valor=6
+	bloque(0), anterior(0)
+
+   93	tcons: _6
+	valor=7
+	bloque(0), anterior(0)
+
+   94	tcons: _7
+	valor=8
+	bloque(0), anterior(0)
+
+   95	tcons: _8
+	valor=9
+	bloque(0), anterior(0)
+
+   96	tcons: _9
+	valor=10
+	bloque(0), anterior(0)
+
+   97	tcons: _0
+	valor=11
+	bloque(0), anterior(0)
+
+   98	tcons: _minus
+	valor=12
+	bloque(0), anterior(0)
+
+   99	tcons: _plus
+	valor=13
+	bloque(0), anterior(0)
+
+  100	tcons: _backspace
+	valor=14
+	bloque(0), anterior(0)
+
+  101	tcons: _tab
+	valor=15
+	bloque(0), anterior(0)
+
+  102	tcons: _q
+	valor=16
+	bloque(0), anterior(0)
+
+  103	tcons: _w
+	valor=17
+	bloque(0), anterior(0)
+
+  104	tcons: _e
+	valor=18
+	bloque(0), anterior(0)
+
+  105	tcons: _r
+	valor=19
+	bloque(0), anterior(0)
+
+  106	tcons: _t
+	valor=20
+	bloque(0), anterior(0)
+
+  107	tcons: _y
+	valor=21
+	bloque(0), anterior(0)
+
+  108	tcons: _u
+	valor=22
+	bloque(0), anterior(0)
+
+  109	tcons: _i
+	valor=23
+	bloque(0), anterior(0)
+
+  110	tcons: _o
+	valor=24
+	bloque(0), anterior(0)
+
+  111	tcons: _p
+	valor=25
+	bloque(0), anterior(0)
+
+  112	tcons: _l_brachet
+	valor=26
+	bloque(0), anterior(0)
+
+  113	tcons: _r_brachet
+	valor=27
+	bloque(0), anterior(0)
+
+  114	tcons: _enter
+	valor=28
+	bloque(0), anterior(0)
+
+  115	tcons: _caps_lock
+	valor=58
+	bloque(0), anterior(0)
+
+  116	tcons: _a
+	valor=30
+	bloque(0), anterior(0)
+
+  117	tcons: _s
+	valor=31
+	bloque(0), anterior(0)
+
+  118	tcons: _d
+	valor=32
+	bloque(0), anterior(0)
+
+  119	tcons: _f
+	valor=33
+	bloque(0), anterior(0)
+
+  120	tcons: _g
+	valor=34
+	bloque(0), anterior(0)
+
+  121	tcons: _h
+	valor=35
+	bloque(0), anterior(0)
+
+  122	tcons: _j
+	valor=36
+	bloque(0), anterior(0)
+
+  123	tcons: _k
+	valor=37
+	bloque(0), anterior(0)
+
+  124	tcons: _l
+	valor=38
+	bloque(0), anterior(0)
+
+  125	tcons: _semicolon
+	valor=39
+	bloque(0), anterior(0)
+
+  126	tcons: _apostrophe
+	valor=40
+	bloque(0), anterior(0)
+
+  127	tcons: _backslash
+	valor=43
+	bloque(0), anterior(0)
+
+  128	tcons: _l_shift
+	valor=42
+	bloque(0), anterior(0)
+
+  129	tcons: _z
+	valor=44
+	bloque(0), anterior(0)
+
+  130	tcons: _x
+	valor=45
+	bloque(0), anterior(0)
+
+  131	tcons: _c
+	valor=46
+	bloque(0), anterior(0)
+
+  132	tcons: _v
+	valor=47
+	bloque(0), anterior(0)
+
+  133	tcons: _b
+	valor=48
+	bloque(0), anterior(0)
+
+  134	tcons: _n
+	valor=49
+	bloque(0), anterior(0)
+
+  135	tcons: _m
+	valor=50
+	bloque(0), anterior(0)
+
+  136	tcons: _comma
+	valor=51
+	bloque(0), anterior(0)
+
+  137	tcons: _point
+	valor=51
+	bloque(0), anterior(0)
+
+  138	tcons: _slash
+	valor=51
+	bloque(0), anterior(0)
+
+  139	tcons: _r_shift
+	valor=54
+	bloque(0), anterior(0)
+
+  140	tcons: _control
+	valor=29
+	bloque(0), anterior(0)
+
+  141	tcons: _alt
+	valor=56
+	bloque(0), anterior(0)
+
+  142	tcons: _space
+	valor=57
+	bloque(0), anterior(0)
+
+  143	tcons: _ins
+	valor=82
+	bloque(0), anterior(0)
+
+  144	tcons: _home
+	valor=71
+	bloque(0), anterior(0)
+
+  145	tcons: _pgup
+	valor=73
+	bloque(0), anterior(0)
+
+  146	tcons: _del
+	valor=83
+	bloque(0), anterior(0)
+
+  147	tcons: _end
+	valor=79
+	bloque(0), anterior(0)
+
+  148	tcons: _pgdn
+	valor=81
+	bloque(0), anterior(0)
+
+  149	tcons: _up
+	valor=72
+	bloque(0), anterior(0)
+
+  150	tcons: _down
+	valor=80
+	bloque(0), anterior(0)
+
+  151	tcons: _left
+	valor=75
+	bloque(0), anterior(0)
+
+  152	tcons: _right
+	valor=77
+	bloque(0), anterior(0)
+
+  153	tcons: _num_lock
+	valor=69
+	bloque(0), anterior(0)
+
+  154	tcons: _c_backslash
+	valor=53
+	bloque(0), anterior(0)
+
+  155	tcons: _c_asterisk
+	valor=55
+	bloque(0), anterior(0)
+
+  156	tcons: _c_minus
+	valor=74
+	bloque(0), anterior(0)
+
+  157	tcons: _c_home
+	valor=71
+	bloque(0), anterior(0)
+
+  158	tcons: _c_up
+	valor=72
+	bloque(0), anterior(0)
+
+  159	tcons: _c_pgup
+	valor=73
+	bloque(0), anterior(0)
+
+  160	tcons: _c_left
+	valor=75
+	bloque(0), anterior(0)
+
+  161	tcons: _c_center
+	valor=76
+	bloque(0), anterior(0)
+
+  162	tcons: _c_right
+	valor=77
+	bloque(0), anterior(0)
+
+  163	tcons: _c_end
+	valor=79
+	bloque(0), anterior(0)
+
+  164	tcons: _c_down
+	valor=80
+	bloque(0), anterior(0)
+
+  165	tcons: _c_pgdn
+	valor=81
+	bloque(0), anterior(0)
+
+  166	tcons: _c_ins
+	valor=82
+	bloque(0), anterior(0)
+
+  167	tcons: _c_del
+	valor=83
+	bloque(0), anterior(0)
+
+  168	tcons: _c_plus
+	valor=78
+	bloque(0), anterior(0)
+
+  169	tcons: _c_enter
+	valor=28
+	bloque(0), anterior(0)
+
+  170	tsglo: mouse
+	offset=9
+	items1=0
+	items2=4294967295
+	items3=4294967295
+	totalitems=1
+	len_item=14
+	bloque(0), anterior(0)
+
+  171	tvglo: x
+	offset=0
+	member of mouse
+	bloque(0), anterior(0)
+
+  172	tvglo: y
+	offset=1
+	member of mouse
+	bloque(0), anterior(0)
+
+  173	tvglo: z
+	offset=2
+	member of mouse
+	bloque(0), anterior(0)
+
+  174	tvglo: file
+	offset=3
+	member of mouse
+	bloque(0), anterior(0)
+
+  175	tvglo: graph
+	offset=4
+	member of mouse
+	bloque(0), anterior(0)
+
+  176	tvglo: angle
+	offset=5
+	member of mouse
+	bloque(0), anterior(0)
+
+  177	tvglo: size
+	offset=6
+	member of mouse
+	bloque(0), anterior(0)
+
+  178	tvglo: flags
+	offset=7
+	member of mouse
+	bloque(0), anterior(0)
+
+  179	tvglo: region
+	offset=8
+	member of mouse
+	bloque(0), anterior(0)
+
+  180	tvglo: left
+	offset=9
+	member of mouse
+	bloque(0), anterior(0)
+
+  181	tvglo: middle
+	offset=10
+	member of mouse
+	bloque(0), anterior(0)
+
+  182	tvglo: right
+	offset=11
+	member of mouse
+	bloque(0), anterior(0)
+
+  183	tvglo: cursor
+	offset=12
+	member of mouse
+	bloque(0), anterior(0)
+
+  184	tvglo: speed
+	offset=13
+	member of mouse
+	bloque(0), anterior(0)
+
+  185	tsglo: scroll
+	offset=23
+	items1=9
+	items2=4294967295
+	items3=4294967295
+	totalitems=10
+	len_item=10
+	bloque(0), anterior(0)
+
+  186	tvglo: z
+	offset=0
+	member of scroll
+	bloque(0), anterior(2206901192)
+
+  187	tvglo: camera
+	offset=1
+	member of scroll
+	bloque(0), anterior(0)
+
+  188	tvglo: ratio
+	offset=2
+	member of scroll
+	bloque(0), anterior(0)
+
+  189	tvglo: speed
+	offset=3
+	member of scroll
+	bloque(0), anterior(2206901808)
+
+  190	tvglo: region1
+	offset=4
+	member of scroll
+	bloque(0), anterior(0)
+
+  191	tvglo: region2
+	offset=5
+	member of scroll
+	bloque(0), anterior(0)
+
+  192	tvglo: x0
+	offset=6
+	member of scroll
+	bloque(0), anterior(0)
+
+  193	tvglo: y0
+	offset=7
+	member of scroll
+	bloque(0), anterior(0)
+
+  194	tvglo: x1
+	offset=8
+	member of scroll
+	bloque(0), anterior(0)
+
+  195	tvglo: y1
+	offset=9
+	member of scroll
+	bloque(0), anterior(0)
+
+  196	tsglo: m7
+	offset=123
+	items1=9
+	items2=4294967295
+	items3=4294967295
+	totalitems=10
+	len_item=7
+	bloque(0), anterior(0)
+
+  197	tvglo: z
+	offset=0
+	member of m7
+	bloque(0), anterior(2206901920)
+
+  198	tvglo: camera
+	offset=1
+	member of m7
+	bloque(0), anterior(2206901976)
+
+  199	tvglo: height
+	offset=2
+	member of m7
+	bloque(0), anterior(0)
+
+  200	tvglo: distance
+	offset=3
+	member of m7
+	bloque(0), anterior(0)
+
+  201	tvglo: horizon
+	offset=4
+	member of m7
+	bloque(0), anterior(0)
+
+  202	tvglo: focus
+	offset=5
+	member of m7
+	bloque(0), anterior(0)
+
+  203	tvglo: color
+	offset=6
+	member of m7
+	bloque(0), anterior(0)
+
+  204	tsglo: joy
+	offset=193
+	items1=0
+	items2=4294967295
+	items3=4294967295
+	totalitems=1
+	len_item=8
+	bloque(0), anterior(0)
+
+  205	tvglo: button1
+	offset=0
+	member of joy
+	bloque(0), anterior(0)
+
+  206	tvglo: button2
+	offset=1
+	member of joy
+	bloque(0), anterior(0)
+
+  207	tvglo: button3
+	offset=2
+	member of joy
+	bloque(0), anterior(0)
+
+  208	tvglo: button4
+	offset=3
+	member of joy
+	bloque(0), anterior(0)
+
+  209	tvglo: left
+	offset=4
+	member of joy
+	bloque(0), anterior(2206901584)
+
+  210	tvglo: right
+	offset=5
+	member of joy
+	bloque(0), anterior(2206901696)
+
+  211	tvglo: up
+	offset=6
+	member of joy
+	bloque(0), anterior(0)
+
+  212	tvglo: down
+	offset=7
+	member of joy
+	bloque(0), anterior(0)
+
+  213	tsglo: setup
+	offset=201
+	items1=0
+	items2=4294967295
+	items3=4294967295
+	totalitems=1
+	len_item=11
+	bloque(0), anterior(0)
+
+  214	tvglo: card
+	offset=0
+	member of setup
+	bloque(0), anterior(0)
+
+  215	tvglo: port
+	offset=1
+	member of setup
+	bloque(0), anterior(0)
+
+  216	tvglo: irq
+	offset=2
+	member of setup
+	bloque(0), anterior(0)
+
+  217	tvglo: dma
+	offset=3
+	member of setup
+	bloque(0), anterior(0)
+
+  218	tvglo: dma2
+	offset=4
+	member of setup
+	bloque(0), anterior(0)
+
+  219	tvglo: master
+	offset=5
+	member of setup
+	bloque(0), anterior(0)
+
+  220	tvglo: sound_fx
+	offset=6
+	member of setup
+	bloque(0), anterior(0)
+
+  221	tvglo: cd_audio
+	offset=7
+	member of setup
+	bloque(0), anterior(0)
+
+  222	tvglo: mixer
+	offset=8
+	member of setup
+	bloque(0), anterior(0)
+
+  223	tvglo: rate
+	offset=9
+	member of setup
+	bloque(0), anterior(0)
+
+  224	tvglo: bits
+	offset=10
+	member of setup
+	bloque(0), anterior(0)
+
+  225	tsglo: net
+	offset=212
+	items1=0
+	items2=4294967295
+	items3=4294967295
+	totalitems=1
+	len_item=9
+	bloque(0), anterior(0)
+
+  226	tvglo: device
+	offset=0
+	member of net
+	bloque(0), anterior(0)
+
+  227	tvglo: com
+	offset=1
+	member of net
+	bloque(0), anterior(0)
+
+  228	tvglo: speed
+	offset=2
+	member of net
+	bloque(0), anterior(2206902088)
+
+  229	tvglo: number
+	offset=3
+	member of net
+	bloque(0), anterior(0)
+
+  230	tvglo: init
+	offset=4
+	member of net
+	bloque(0), anterior(0)
+
+  231	tvglo: mode
+	offset=5
+	member of net
+	bloque(0), anterior(0)
+
+  232	tvglo: server
+	offset=6
+	member of net
+	bloque(0), anterior(0)
+
+  233	tvglo: max_players
+	offset=7
+	member of net
+	bloque(0), anterior(0)
+
+  234	tvglo: num_players
+	offset=8
+	member of net
+	bloque(0), anterior(0)
+
+  235	tsglo: m8
+	offset=221
+	items1=9
+	items2=4294967295
+	items3=4294967295
+	totalitems=10
+	len_item=4
+	bloque(0), anterior(0)
+
+  236	tvglo: z
+	offset=0
+	member of m8
+	bloque(0), anterior(2206902536)
+
+  237	tvglo: camera
+	offset=1
+	member of m8
+	bloque(0), anterior(2206902592)
+
+  238	tvglo: height
+	offset=2
+	member of m8
+	bloque(0), anterior(2206902648)
+
+  239	tvglo: angle
+	offset=3
+	member of m8
+	bloque(0), anterior(2206901360)
+
+  240	tsglo: dirinfo
+	offset=261
+	items1=0
+	items2=4294967295
+	items3=4294967295
+	totalitems=1
+	len_item=1026
+	bloque(0), anterior(0)
+
+  241	tvglo: files
+	offset=0
+	member of dirinfo
+	bloque(0), anterior(0)
+
+  242	ttglo: name
+	offset=1
+	len1=1024
+	len2=4294967295
+	len3=4294967295
+	totalen=1025
+	member of dirinfo
+	bloque(0), anterior(0)
+
+  243	tsglo: fileinfo
+	offset=1287
+	items1=0
+	items2=4294967295
+	items3=4294967295
+	totalitems=1
+	len_item=146
+	bloque(0), anterior(0)
+
+	bloque(0), anterior(0)
+
+  245	tvglo: drive
+	offset=65
+	member of fileinfo
+	bloque(0), anterior(0)
+
+	bloque(0), anterior(0)
+
+	bloque(0), anterior(2206905056)
+
+	bloque(0), anterior(0)
+
+  249	tvglo: size
+	offset=138
+	member of fileinfo
+	bloque(0), anterior(2206901416)
+
+  250	tvglo: day
+	offset=139
+	member of fileinfo
+	bloque(0), anterior(0)
+
+  251	tvglo: month
+	offset=140
+	member of fileinfo
+	bloque(0), anterior(0)
+
+  252	tvglo: year
+	offset=141
+	member of fileinfo
+	bloque(0), anterior(0)
+
+  253	tvglo: hour
+	offset=142
+	member of fileinfo
+	bloque(0), anterior(0)
+
+  254	tvglo: min
+	offset=143
+	member of fileinfo
+	bloque(0), anterior(0)
+
+  255	tvglo: sec
+	offset=144
+	member of fileinfo
+	bloque(0), anterior(0)
+
+  256	tvglo: attrib
+	offset=145
+	member of fileinfo
+	bloque(0), anterior(0)
+
+  257	tsglo: video_modes
+	offset=1433
+	items1=31
+	items2=4294967295
+	items3=4294967295
+	totalitems=32
+	len_item=3
+	bloque(0), anterior(0)
+
+  258	tvglo: ancho
+	offset=0
+	member of video_modes
+	bloque(0), anterior(0)
+
+  259	tvglo: alto
+	offset=1
+	member of video_modes
+	bloque(0), anterior(0)
+
+  260	tvglo: modo
+	offset=2
+	member of video_modes
+	bloque(0), anterior(0)
+
+  261	ttglo: timer
+	offset=1529
+	len1=9
+	len2=4294967295
+	len3=4294967295
+	totalen=10
+	bloque(0), anterior(0)
+
+  262	tvglo: text_z
+	offset=1539
+	valor=4294967040
+	bloque(0), anterior(0)
+
+  263	tvglo: fading
+	offset=1540
+	valor=0
+	bloque(0), anterior(0)
+
+  264	tvglo: shift_status
+	offset=1541
+	valor=0
+	bloque(0), anterior(0)
+
+  265	tvglo: ascii
+	offset=1542
+	valor=0
+	bloque(0), anterior(0)
+
+  266	tvglo: scan_code
+	offset=1543
+	valor=0
+	bloque(0), anterior(0)
+
+  267	tvglo: joy_filter
+	offset=1544
+	valor=10
+	bloque(0), anterior(0)
+
+  268	tvglo: joy_status
+	offset=1545
+	valor=1
+	bloque(0), anterior(0)
+
+  269	tvglo: restore_type
+	offset=1546
+	valor=1
+	bloque(0), anterior(0)
+
+  270	tvglo: dump_type
+	offset=1547
+	valor=1
+	bloque(0), anterior(0)
+
+  271	tvglo: max_process_time
+	offset=1548
+	valor=500
+	bloque(0), anterior(0)
+
+  272	tvglo: fps
+	offset=1549
+	valor=0
+	bloque(0), anterior(0)
+
+  273	tvglo: argc
+	offset=1550
+	valor=0
+	bloque(0), anterior(0)
+
+  274	ttglo: argv
+	offset=1551
+	len1=9
+	len2=4294967295
+	len3=4294967295
+	totalen=10
+	bloque(0), anterior(0)
+
+  275	ttglo: channel
+	offset=1561
+	len1=31
+	len2=4294967295
+	len3=4294967295
+	totalen=32
+	bloque(0), anterior(0)
+
+  276	tvglo: vsync
+	offset=1593
+	valor=0
+	bloque(0), anterior(0)
+
+  277	tvglo: draw_z
+	offset=1594
+	valor=4294967041
+	bloque(0), anterior(0)
+
+  278	tvglo: num_video_modes
+	offset=1595
+	valor=0
+	bloque(0), anterior(0)
+
+  279	tsloc: reserved
+	offset=0
+	items1=0
+	items2=4294967295
+	items3=4294967295
+	totalitems=1
+	len_item=20
+	bloque(0), anterior(0)
+
+  280	tvloc: process_id
+	offset=0
+	member of reserved
+	bloque(0), anterior(0)
+
+  281	tvloc: id_scan
+	offset=1
+	member of reserved
+	bloque(0), anterior(0)
+
+  282	tvloc: process_type
+	offset=2
+	member of reserved
+	bloque(0), anterior(0)
+
+  283	tvloc: type_scan
+	offset=3
+	member of reserved
+	bloque(0), anterior(0)
+
+  284	tvloc: status
+	offset=4
+	member of reserved
+	bloque(0), anterior(0)
+
+  285	tvloc: parameters
+	offset=5
+	member of reserved
+	bloque(0), anterior(0)
+
+  286	tvloc: param_offset
+	offset=6
+	member of reserved
+	bloque(0), anterior(0)
+
+  287	tvloc: program_index
+	offset=7
+	member of reserved
+	bloque(0), anterior(0)
+
+  288	tvloc: stack_pointer
+	offset=8
+	member of reserved
+	bloque(0), anterior(0)
+
+  289	tvloc: is_executed
+	offset=9
+	member of reserved
+	bloque(0), anterior(0)
+
+  290	tvloc: is_painted
+	offset=10
+	member of reserved
+	bloque(0), anterior(0)
+
+  291	tvloc: m8_object
+	offset=11
+	member of reserved
+	bloque(0), anterior(0)
+
+  292	tvloc: old_ctype
+	offset=12
+	member of reserved
+	bloque(0), anterior(0)
+
+  293	tvloc: frame_percent
+	offset=13
+	member of reserved
+	bloque(0), anterior(0)
+
+  294	tvloc: box_x0
+	offset=14
+	member of reserved
+	bloque(0), anterior(0)
+
+  295	tvloc: box_y0
+	offset=15
+	member of reserved
+	bloque(0), anterior(0)
+
+  296	tvloc: box_x1
+	offset=16
+	member of reserved
+	bloque(0), anterior(0)
+
+  297	tvloc: box_y1
+	offset=17
+	member of reserved
+	bloque(0), anterior(0)
+
+  298	tvloc: f_count
+	offset=18
+	member of reserved
+	bloque(0), anterior(0)
+
+  299	tvloc: caller_id
+	offset=19
+	member of reserved
+	bloque(0), anterior(0)
+
+  300	tvloc: father
+	offset=20
+	valor=0
+	bloque(0), anterior(0)
+
+  301	tvloc: son
+	offset=21
+	valor=0
+	bloque(0), anterior(0)
+
+  302	tvloc: smallbro
+	offset=22
+	valor=0
+	bloque(0), anterior(0)
+
+  303	tvloc: bigbro
+	offset=23
+	valor=0
+	bloque(0), anterior(0)
+
+  304	tvloc: priority
+	offset=24
+	valor=0
+	bloque(0), anterior(0)
+
+  305	tvloc: ctype
+	offset=25
+	valor=0
+	bloque(0), anterior(0)
+
+  306	tvloc: x
+	offset=26
+	valor=0
+	bloque(0), anterior(2206901080)
+
+  307	tvloc: y
+	offset=27
+	valor=0
+	bloque(0), anterior(2206901136)
+
+  308	tvloc: z
+	offset=28
+	valor=0
+	bloque(0), anterior(2206904720)
+
+  309	tvloc: graph
+	offset=29
+	valor=0
+	bloque(0), anterior(2206901304)
+
+  310	tvloc: flags
+	offset=30
+	valor=0
+	bloque(0), anterior(2206901472)
+
+  311	tvloc: size
+	offset=31
+	valor=100
+	bloque(0), anterior(2206905448)
+
+  312	tvloc: angle
+	offset=32
+	valor=0
+	bloque(0), anterior(2206904888)
+
+  313	tvloc: region
+	offset=33
+	valor=0
+	bloque(0), anterior(2206901528)
+
+  314	tvloc: file
+	offset=34
+	valor=0
+	bloque(0), anterior(2206901248)
+
+  315	tvloc: xgraph
+	offset=35
+	valor=0
+	bloque(0), anterior(0)
+
+  316	tvloc: height
+	offset=36
+	valor=1
+	bloque(0), anterior(2206904832)
+
+  317	tvloc: cnumber
+	offset=37
+	valor=0
+	bloque(0), anterior(0)
+
+  318	tvloc: resolution
+	offset=38
+	valor=0
+	bloque(0), anterior(0)
+
+  319	tvloc: radius
+	offset=39
+	valor=0
+	bloque(0), anterior(0)
+
+  320	tvloc: m8_wall
+	offset=40
+	valor=4294967295
+	bloque(0), anterior(0)
+
+  321	tvloc: m8_sector
+	offset=41
+	valor=4294967295
+	bloque(0), anterior(0)
+
+  322	tvloc: m8_nextsector
+	offset=42
+	valor=4294967295
+	bloque(0), anterior(0)
+
+  323	tvloc: m8_step
+	offset=43
+	valor=32
+	bloque(0), anterior(0)
+
+  324	tfunc: signal
+	codigo=0
+	num_par=2
+	bloque(0), anterior(0)
+
+  325	tfunc: key
+	codigo=1
+	num_par=1
+	bloque(0), anterior(0)
+
+  326	tfunc: load_pal
+	codigo=2
+	num_par=1
+	bloque(0), anterior(0)
+
+  327	tfunc: load_fpg
+	codigo=3
+	num_par=1
+	bloque(0), anterior(0)
+
+  328	tfunc: start_scroll
+	codigo=4
+	num_par=6
+	bloque(0), anterior(0)
+
+  329	tfunc: stop_scroll
+	codigo=5
+	num_par=1
+	bloque(0), anterior(0)
+
+  330	tfunc: out_region
+	codigo=6
+	num_par=2
+	bloque(0), anterior(0)
+
+  331	tfunc: graphic_info
+	codigo=7
+	num_par=3
+	bloque(0), anterior(0)
+
+  332	tfunc: collision
+	codigo=8
+	num_par=1
+	bloque(0), anterior(0)
+
+  333	tfunc: get_id
+	codigo=9
+	num_par=1
+	bloque(0), anterior(0)
+
+  334	tfunc: get_distx
+	codigo=10
+	num_par=2
+	bloque(0), anterior(0)
+
+  335	tfunc: get_disty
+	codigo=11
+	num_par=2
+	bloque(0), anterior(0)
+
+  336	tfunc: get_angle
+	codigo=12
+	num_par=1
+	bloque(0), anterior(0)
+
+  337	tfunc: get_dist
+	codigo=13
+	num_par=1
+	bloque(0), anterior(0)
+
+  338	tfunc: fade
+	codigo=14
+	num_par=4
+	bloque(0), anterior(0)
+
+  339	tfunc: load_fnt
+	codigo=15
+	num_par=1
+	bloque(0), anterior(0)
+
+  340	tfunc: write
+	codigo=16
+	num_par=5
+	bloque(0), anterior(0)
+
+  341	tfunc: write_int
+	codigo=17
+	num_par=5
+	bloque(0), anterior(0)
+
+  342	tfunc: delete_text
+	codigo=18
+	num_par=1
+	bloque(0), anterior(0)
+
+  343	tfunc: move_text
+	codigo=19
+	num_par=3
+	bloque(0), anterior(0)
+
+  344	tfunc: unload_fpg
+	codigo=20
+	num_par=1
+	bloque(0), anterior(0)
+
+  345	tfunc: rand
+	codigo=21
+	num_par=2
+	bloque(0), anterior(0)
+
+  346	tfunc: define_region
+	codigo=22
+	num_par=5
+	bloque(0), anterior(0)
+
+  347	tfunc: xput
+	codigo=23
+	num_par=8
+	bloque(0), anterior(0)
+
+  348	tfunc: put
+	codigo=24
+	num_par=4
+	bloque(0), anterior(0)
+
+  349	tfunc: put_screen
+	codigo=25
+	num_par=2
+	bloque(0), anterior(0)
+
+  350	tfunc: map_xput
+	codigo=26
+	num_par=8
+	bloque(0), anterior(0)
+
+  351	tfunc: map_put
+	codigo=27
+	num_par=5
+	bloque(0), anterior(0)
+
+  352	tfunc: put_pixel
+	codigo=28
+	num_par=3
+	bloque(0), anterior(0)
+
+  353	tfunc: get_pixel
+	codigo=29
+	num_par=2
+	bloque(0), anterior(0)
+
+  354	tfunc: map_put_pixel
+	codigo=30
+	num_par=5
+	bloque(0), anterior(0)
+
+  355	tfunc: map_get_pixel
+	codigo=31
+	num_par=4
+	bloque(0), anterior(0)
+
+  356	tfunc: get_point
+	codigo=32
+	num_par=5
+	bloque(0), anterior(0)
+
+  357	tfunc: clear_screen
+	codigo=33
+	num_par=0
+	bloque(0), anterior(0)
+
+  358	tfunc: save
+	codigo=34
+	num_par=3
+	bloque(0), anterior(0)
+
+  359	tfunc: load
+	codigo=35
+	num_par=2
+	bloque(0), anterior(0)
+
+  360	tfunc: set_mode
+	codigo=36
+	num_par=1
+	bloque(0), anterior(0)
+
+  361	tfunc: load_pcm
+	codigo=37
+	num_par=2
+	bloque(0), anterior(0)
+
+  362	tfunc: unload_pcm
+	codigo=38
+	num_par=1
+	bloque(0), anterior(0)
+
+  363	tfunc: sound
+	codigo=39
+	num_par=3
+	bloque(0), anterior(0)
+
+  364	tfunc: stop_sound
+	codigo=40
+	num_par=1
+	bloque(0), anterior(0)
+
+  365	tfunc: change_sound
+	codigo=41
+	num_par=3
+	bloque(0), anterior(0)
+
+  366	tfunc: set_fps
+	codigo=42
+	num_par=2
+	bloque(0), anterior(0)
+
+  367	tfunc: start_fli
+	codigo=43
+	num_par=3
+	bloque(0), anterior(0)
+
+  368	tfunc: frame_fli
+	codigo=44
+	num_par=0
+	bloque(0), anterior(0)
+
+  369	tfunc: end_fli
+	codigo=45
+	num_par=0
+	bloque(0), anterior(0)
+
+  370	tfunc: reset_fli
+	codigo=46
+	num_par=0
+	bloque(0), anterior(0)
+
+  371	tfunc: system
+	codigo=47
+	num_par=1
+	bloque(0), anterior(0)
+
+  372	tfunc: refresh_scroll
+	codigo=48
+	num_par=1
+	bloque(0), anterior(0)
+
+  373	tfunc: fget_dist
+	codigo=49
+	num_par=4
+	bloque(0), anterior(0)
+
+  374	tfunc: fget_angle
+	codigo=50
+	num_par=4
+	bloque(0), anterior(0)
+
+  375	tfunc: play_cd
+	codigo=51
+	num_par=2
+	bloque(0), anterior(0)
+
+  376	tfunc: stop_cd
+	codigo=52
+	num_par=0
+	bloque(0), anterior(0)
+
+  377	tfunc: is_playing_cd
+	codigo=53
+	num_par=0
+	bloque(0), anterior(0)
+
+  378	tfunc: start_mode7
+	codigo=54
+	num_par=6
+	bloque(0), anterior(0)
+
+  379	tfunc: stop_mode7
+	codigo=55
+	num_par=1
+	bloque(0), anterior(0)
+
+  380	tfunc: advance
+	codigo=56
+	num_par=1
+	bloque(0), anterior(0)
+
+  381	tfunc: abs
+	codigo=57
+	num_par=1
+	bloque(0), anterior(0)
+
+  382	tfunc: fade_on
+	codigo=58
+	num_par=0
+	bloque(0), anterior(0)
+
+  383	tfunc: fade_off
+	codigo=59
+	num_par=0
+	bloque(0), anterior(0)
+
+  384	tfunc: rand_seed
+	codigo=60
+	num_par=1
+	bloque(0), anterior(0)
+
+  385	tfunc: sqrt
+	codigo=61
+	num_par=1
+	bloque(0), anterior(0)
+
+  386	tfunc: pow
+	codigo=62
+	num_par=2
+	bloque(0), anterior(0)
+
+  387	tfunc: map_block_copy
+	codigo=63
+	num_par=9
+	bloque(0), anterior(0)
+
+  388	tfunc: move_scroll
+	codigo=64
+	num_par=1
+	bloque(0), anterior(0)
+
+  389	tfunc: near_angle
+	codigo=65
+	num_par=3
+	bloque(0), anterior(0)
+
+  390	tfunc: let_me_alone
+	codigo=66
+	num_par=0
+	bloque(0), anterior(0)
+
+  391	tfunc: exit
+	codigo=67
+	num_par=2
+	bloque(0), anterior(0)
+
+  392	tfunc: roll_palette
+	codigo=68
+	num_par=3
+	bloque(0), anterior(0)
+
+  393	tfunc: get_real_point
+	codigo=69
+	num_par=3
+	bloque(0), anterior(0)
+
+  394	tfunc: get_joy_button
+	codigo=70
+	num_par=1
+	bloque(0), anterior(0)
+
+  395	tfunc: get_joy_position
+	codigo=71
+	num_par=1
+	bloque(0), anterior(0)
+
+  396	tfunc: convert_palette
+	codigo=72
+	num_par=3
+	bloque(0), anterior(0)
+
+  397	tfunc: load_map
+	codigo=73
+	num_par=1
+	bloque(0), anterior(0)
+
+  398	tfunc: reset_sound
+	codigo=74
+	num_par=0
+	bloque(0), anterior(0)
+
+  399	tfunc: unload_map
+	codigo=75
+	num_par=1
+	bloque(0), anterior(0)
+
+  400	tfunc: unload_fnt
+	codigo=76
+	num_par=1
+	bloque(0), anterior(0)
+
+  401	tfunc: set_volume
+	codigo=77
+	num_par=0
+	bloque(0), anterior(0)
+
+  402	tfunc: unload_wav
+	codigo=38
+	num_par=1
+	bloque(0), anterior(0)
+
+  403	tfunc: load_wav
+	codigo=37
+	num_par=2
+	bloque(0), anterior(0)
+
+  404	tfunc: load_pcx
+	codigo=73
+	num_par=1
+	bloque(0), anterior(0)
+
+  405	tfunc: unload_pcx
+	codigo=75
+	num_par=1
+	bloque(0), anterior(0)
+
+  406	tfunc: set_color
+	codigo=78
+	num_par=4
+	bloque(0), anterior(0)
+
+  407	tfunc: net_join_game
+	codigo=79
+	num_par=3
+	bloque(0), anterior(0)
+
+  408	tfunc: net_get_games
+	codigo=80
+	num_par=0
+	bloque(0), anterior(0)
+
+  409	tfunc: stop_mode8
+	codigo=81
+	num_par=1
+	bloque(0), anterior(0)
+
+  410	tfunc: xadvance
+	codigo=82
+	num_par=2
+	bloque(0), anterior(0)
+
+  411	tfunc: char
+	codigo=83
+	num_par=1
+	bloque(0), anterior(0)
+
+  412	tfunc: path_find
+	codigo=84
+	num_par=8
+	bloque(0), anterior(0)
+
+  413	tfunc: path_line
+	codigo=85
+	num_par=5
+	bloque(0), anterior(0)
+
+  414	tfunc: path_free
+	codigo=86
+	num_par=5
+	bloque(0), anterior(0)
+
+  415	tfunc: new_map
+	codigo=87
+	num_par=5
+	bloque(0), anterior(0)
+
+  416	tfunc: load_wld
+	codigo=88
+	num_par=2
+	bloque(0), anterior(0)
+
+  417	tfunc: start_mode8
+	codigo=89
+	num_par=3
+	bloque(0), anterior(0)
+
+  418	tfunc: go_to_flag
+	codigo=90
+	num_par=1
+	bloque(0), anterior(0)
+
+  419	tfunc: set_sector_height
+	codigo=91
+	num_par=3
+	bloque(0), anterior(0)
+
+  420	tfunc: get_sector_height
+	codigo=92
+	num_par=3
+	bloque(0), anterior(0)
+
+  421	tfunc: set_point_m8
+	codigo=93
+	num_par=3
+	bloque(0), anterior(0)
+
+  422	tfunc: get_point_m8
+	codigo=94
+	num_par=3
+	bloque(0), anterior(0)
+
+  423	tfunc: set_fog
+	codigo=95
+	num_par=2
+	bloque(0), anterior(0)
+
+  424	tfunc: set_sector_texture
+	codigo=96
+	num_par=4
+	bloque(0), anterior(0)
+
+  425	tfunc: get_sector_texture
+	codigo=97
+	num_par=4
+	bloque(0), anterior(0)
+
+  426	tfunc: set_wall_texture
+	codigo=98
+	num_par=3
+	bloque(0), anterior(0)
+
+  427	tfunc: get_wall_texture
+	codigo=99
+	num_par=3
+	bloque(0), anterior(0)
+
+  428	tfunc: set_env_color
+	codigo=100
+	num_par=3
+	bloque(0), anterior(0)
+
+  429	tfunc: strcpy
+	codigo=101
+	num_par=2
+	bloque(0), anterior(0)
+
+  430	tfunc: strcat
+	codigo=102
+	num_par=2
+	bloque(0), anterior(0)
+
+  431	tfunc: strlen
+	codigo=103
+	num_par=1
+	bloque(0), anterior(0)
+
+  432	tfunc: strcmp
+	codigo=104
+	num_par=2
+	bloque(0), anterior(0)
+
+  433	tfunc: strchr
+	codigo=105
+	num_par=2
+	bloque(0), anterior(0)
+
+  434	tfunc: strstr
+	codigo=106
+	num_par=2
+	bloque(0), anterior(0)
+
+  435	tfunc: strset
+	codigo=107
+	num_par=2
+	bloque(0), anterior(0)
+
+  436	tfunc: upper
+	codigo=108
+	num_par=1
+	bloque(0), anterior(0)
+
+  437	tfunc: lower
+	codigo=109
+	num_par=1
+	bloque(0), anterior(0)
+
+  438	tfunc: strdel
+	codigo=110
+	num_par=3
+	bloque(0), anterior(0)
+
+  439	tfunc: screen_copy
+	codigo=111
+	num_par=7
+	bloque(0), anterior(0)
+
+  440	tfunc: qsort
+	codigo=112
+	num_par=2
+	bloque(0), anterior(0)
+
+  441	tfunc: load_song
+	codigo=113
+	num_par=2
+	bloque(0), anterior(0)
+
+  442	tfunc: unload_song
+	codigo=114
+	num_par=1
+	bloque(0), anterior(0)
+
+  443	tfunc: song
+	codigo=115
+	num_par=1
+	bloque(0), anterior(0)
+
+  444	tfunc: stop_song
+	codigo=116
+	num_par=0
+	bloque(0), anterior(0)
+
+  445	tfunc: set_song_pos
+	codigo=117
+	num_par=1
+	bloque(0), anterior(0)
+
+  446	tfunc: get_song_pos
+	codigo=118
+	num_par=0
+	bloque(0), anterior(0)
+
+  447	tfunc: get_song_line
+	codigo=119
+	num_par=0
+	bloque(0), anterior(0)
+
+  448	tfunc: is_playing_sound
+	codigo=120
+	num_par=1
+	bloque(0), anterior(0)
+
+  449	tfunc: is_playing_song
+	codigo=121
+	num_par=0
+	bloque(0), anterior(0)
+
+  450	tfunc: fopen
+	codigo=122
+	num_par=2
+	bloque(0), anterior(0)
+
+  451	tfunc: fclose
+	codigo=123
+	num_par=1
+	bloque(0), anterior(0)
+
+  452	tfunc: fread
+	codigo=124
+	num_par=3
+	bloque(0), anterior(0)
+
+  453	tfunc: fwrite
+	codigo=125
+	num_par=3
+	bloque(0), anterior(0)
+
+  454	tfunc: fseek
+	codigo=126
+	num_par=3
+	bloque(0), anterior(0)
+
+  455	tfunc: ftell
+	codigo=127
+	num_par=1
+	bloque(0), anterior(0)
+
+  456	tfunc: filelength
+	codigo=128
+	num_par=1
+	bloque(0), anterior(0)
+
+  457	tfunc: flush
+	codigo=129
+	num_par=0
+	bloque(0), anterior(0)
+
+  458	tfunc: get_dirinfo
+	codigo=130
+	num_par=2
+	bloque(0), anterior(0)
+
+  459	tfunc: get_fileinfo
+	codigo=131
+	num_par=1
+	bloque(0), anterior(0)
+
+  460	tfunc: getdrive
+	codigo=132
+	num_par=0
+	bloque(0), anterior(0)
+
+  461	tfunc: setdrive
+	codigo=133
+	num_par=1
+	bloque(0), anterior(0)
+
+  462	tfunc: chdir
+	codigo=134
+	num_par=1
+	bloque(0), anterior(0)
+
+  463	tfunc: mkdir
+	codigo=135
+	num_par=1
+	bloque(0), anterior(0)
+
+  464	tfunc: remove
+	codigo=136
+	num_par=1
+	bloque(0), anterior(0)
+
+  465	tfunc: disk_free
+	codigo=137
+	num_par=1
+	bloque(0), anterior(0)
+
+  466	tfunc: memory_free
+	codigo=138
+	num_par=0
+	bloque(0), anterior(0)
+
+  467	tfunc: ignore_error
+	codigo=139
+	num_par=1
+	bloque(0), anterior(0)
+
+  468	tfunc: save_pcx
+	codigo=140
+	num_par=3
+	bloque(0), anterior(0)
+
+  469	tfunc: sin
+	codigo=141
+	num_par=1
+	bloque(0), anterior(0)
+
+  470	tfunc: cos
+	codigo=142
+	num_par=1
+	bloque(0), anterior(0)
+
+  471	tfunc: tan
+	codigo=143
+	num_par=1
+	bloque(0), anterior(0)
+
+  472	tfunc: asin
+	codigo=144
+	num_par=1
+	bloque(0), anterior(0)
+
+  473	tfunc: acos
+	codigo=145
+	num_par=1
+	bloque(0), anterior(0)
+
+  474	tfunc: atan
+	codigo=146
+	num_par=1
+	bloque(0), anterior(0)
+
+  475	tfunc: atan2
+	codigo=147
+	num_par=2
+	bloque(0), anterior(0)
+
+  476	tfunc: draw
+	codigo=148
+	num_par=8
+	bloque(0), anterior(0)
+
+  477	tfunc: delete_draw
+	codigo=149
+	num_par=1
+	bloque(0), anterior(0)
+
+  478	tfunc: move_draw
+	codigo=150
+	num_par=7
+	bloque(0), anterior(0)
+
+  479	tfunc: save_map
+	codigo=151
+	num_par=3
+	bloque(0), anterior(0)
+
+  480	tfunc: write_map
+	codigo=152
+	num_par=3
+	bloque(0), anterior(0)
+
+  481	tfunc: calculate
+	codigo=153
+	num_par=1
+	bloque(0), anterior(0)
+
+  482	tfunc: itoa
+	codigo=154
+	num_par=1
+	bloque(0), anterior(0)
+
+  483	tfunc: change_channel
+	codigo=155
+	num_par=3
+	bloque(0), anterior(0)
+
+  484	tfunc: malloc
+	codigo=156
+	num_par=1
+	bloque(0), anterior(0)
+
+  485	tfunc: free
+	codigo=157
+	num_par=1
+	bloque(0), anterior(0)
+
+  486	tfunc: encode
+	codigo=158
+	num_par=3
+	bloque(0), anterior(0)
+
+  487	tfunc: encode_file
+	codigo=159
+	num_par=2
+	bloque(0), anterior(0)
+
+  488	tfunc: decode_file
+	codigo=160
+	num_par=2
+	bloque(0), anterior(0)
+
+  489	tfunc: compress_file
+	codigo=161
+	num_par=1
+	bloque(0), anterior(0)
+
+  490	tfunc: uncompress_file
+	codigo=162
+	num_par=1
+	bloque(0), anterior(0)
+
+  491	tfunc: find_color
+	codigo=163
+	num_par=3
+	bloque(0), anterior(0)
+
+  492	tfunc: load_screen
+	codigo=164
+	num_par=1
+	bloque(0), anterior(0)
+
+  493	tfunc: force_pal
+	codigo=165
+	num_par=1
+	bloque(0), anterior(0)
+
+  494	tproc: ejemplo_screen_copy
+	tipo=2206919168
+	offset=0
+	num_par=0
+	bloque(0), anterior(0)
+
+  495	tvglo: angulo
+	offset=1600
+	valor=0
+	bloque(0), anterior(0)
+
+  496	tvglo: angulo2
+	offset=1601
+	valor=0
+	bloque(0), anterior(0)
+

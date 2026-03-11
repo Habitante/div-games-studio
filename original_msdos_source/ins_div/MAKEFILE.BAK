@@ -1,0 +1,10 @@
+
+i.exe: i.obj divlengu.obj
+  wlink system pmode option stack=32k debug all name i.exe file i.obj, divlengu.obj lib svga.lib, pmode.lib
+
+i.obj: i.cpp
+  wcc386 /oneatx /wx /zp4 /3r /fpc /mf /bt=dos i.cpp
+
+divlengu.obj: divlengu.cpp
+  wcc386 /oneatx /wx /zp4 /3r /fpc /mf /bt=dos divlengu.cpp
+

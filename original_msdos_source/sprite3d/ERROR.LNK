@@ -1,0 +1,137 @@
+WATCOM Linker Version 10.5
+Copyright by WATCOM International Corp. 1985, 1995. All rights reserved.
+WATCOM is a trademark of WATCOM International Corp.
+loading object files
+searching libraries
+Warning(1028): __CHK is an undefined reference
+Warning(1028): fopen_ is an undefined reference
+Warning(1028): printf_ is an undefined reference
+Warning(1028): exit_ is an undefined reference
+Warning(1028): fread_ is an undefined reference
+Warning(1028): strcmp_ is an undefined reference
+Warning(1028): fclose_ is an undefined reference
+Warning(1028): strupr_ is an undefined reference
+Warning(1028): sprintf_ is an undefined reference
+Warning(1028): ftell_ is an undefined reference
+Warning(1028): fseek_ is an undefined reference
+Warning(1028): strcat_ is an undefined reference
+Warning(1028): malloc_ is an undefined reference
+Warning(1028): free_ is an undefined reference
+Warning(1028): memcpy_ is an undefined reference
+Warning(1028): _fltused_ is an undefined reference
+Warning(1028): __8087 is an undefined reference
+Warning(1028): strcpy_ is an undefined reference
+Warning(1028): qsort_ is an undefined reference
+Warning(1028): memset_ is an undefined reference
+Warning(1028): stricmp_ is an undefined reference
+Warning(1028): __chipbug is an undefined reference
+Warning(1028): __fptan_chk is an undefined reference
+Warning(1028): __fpatan_wrap is an undefined reference
+Warning(1028): __hook387 is an undefined reference
+Warning(1028): __unhook387 is an undefined reference
+Warning(1028): __8087cw is an undefined reference
+Warning(1028): __Extender is an undefined reference
+Warning(1028): __X32VM is an undefined reference
+Warning(1028): __D16Infoseg is an undefined reference
+Warning(1028): __x386_zero_base_selector is an undefined reference
+Warning(1028): __GDAptr is an undefined reference
+Warning(1028): __HugeValue is an undefined reference
+Warning(1028): __GETDS is an undefined reference
+Warning(1028): ___FPE_handler is an undefined reference
+Warning(1028): __get_std_stream_ is an undefined reference
+Warning(1028): fputs_ is an undefined reference
+Warning(1028): fputc_ is an undefined reference
+Warning(1028): __set_EDOM_ is an undefined reference
+Warning(1028): __set_ERANGE_ is an undefined reference
+creating map file
+Warning(1014): stack segment not found
+Warning(1023): no starting address found, using 0001:00000000
+creating a DOS/4G executable
+file RESOURCE.obj(C:\USR\DANI\SPRITE3D\RESOURCE.CPP): undefined symbol __CHK
+file RESOURCE.obj(C:\USR\DANI\SPRITE3D\RESOURCE.CPP): undefined symbol fopen_
+file RESOURCE.obj(C:\USR\DANI\SPRITE3D\RESOURCE.CPP): undefined symbol printf_
+file RESOURCE.obj(C:\USR\DANI\SPRITE3D\RESOURCE.CPP): undefined symbol exit_
+file RESOURCE.obj(C:\USR\DANI\SPRITE3D\RESOURCE.CPP): undefined symbol fread_
+file RESOURCE.obj(C:\USR\DANI\SPRITE3D\RESOURCE.CPP): undefined symbol strcmp_
+file RESOURCE.obj(C:\USR\DANI\SPRITE3D\RESOURCE.CPP): undefined symbol fclose_
+file RESOURCE.obj(C:\USR\DANI\SPRITE3D\RESOURCE.CPP): undefined symbol strupr_
+file RESOURCE.obj(C:\USR\DANI\SPRITE3D\RESOURCE.CPP): undefined symbol sprintf_
+file RESOURCE.obj(C:\USR\DANI\SPRITE3D\RESOURCE.CPP): undefined symbol ftell_
+file RESOURCE.obj(C:\USR\DANI\SPRITE3D\RESOURCE.CPP): undefined symbol fseek_
+file COMPLEX.obj(C:\USR\DANI\SPRITE3D\COMPLEX.CPP): undefined symbol __CHK
+file COMPLEX.obj(C:\USR\DANI\SPRITE3D\COMPLEX.CPP): undefined symbol fopen_
+file COMPLEX.obj(C:\USR\DANI\SPRITE3D\COMPLEX.CPP): undefined symbol printf_
+file COMPLEX.obj(C:\USR\DANI\SPRITE3D\COMPLEX.CPP): undefined symbol exit_
+file COMPLEX.obj(C:\USR\DANI\SPRITE3D\COMPLEX.CPP): undefined symbol fread_
+file COMPLEX.obj(C:\USR\DANI\SPRITE3D\COMPLEX.CPP): undefined symbol strcmp_
+file COMPLEX.obj(C:\USR\DANI\SPRITE3D\COMPLEX.CPP): undefined symbol strcat_
+file COMPLEX.obj(C:\USR\DANI\SPRITE3D\COMPLEX.CPP): undefined symbol malloc_
+file COMPLEX.obj(C:\USR\DANI\SPRITE3D\COMPLEX.CPP): undefined symbol fclose_
+file COMPLEX.obj(C:\USR\DANI\SPRITE3D\COMPLEX.CPP): undefined symbol free_
+file COMPLEX.obj(C:\USR\DANI\SPRITE3D\COMPLEX.CPP): undefined symbol memcpy_
+file COMPLEX.obj(C:\USR\DANI\SPRITE3D\COMPLEX.CPP): undefined symbol _fltused_
+file COMPLEX.obj(C:\USR\DANI\SPRITE3D\COMPLEX.CPP): undefined symbol __8087
+file SPRITE3D.obj(C:\USR\LUISFER\SPRITE3D\sprite3d.CPP): undefined symbol __CHK
+file SPRITE3D.obj(C:\USR\LUISFER\SPRITE3D\sprite3d.CPP): undefined symbol strcmp_
+file SPRITE3D.obj(C:\USR\LUISFER\SPRITE3D\sprite3d.CPP): undefined symbol strcpy_
+file SPRITE3D.obj(C:\USR\LUISFER\SPRITE3D\sprite3d.CPP): undefined symbol _fltused_
+file SPRITE3D.obj(C:\USR\LUISFER\SPRITE3D\sprite3d.CPP): undefined symbol __8087
+file LLRENDER.obj(C:\USR\LUISFER\SPRITE3D\LLRENDER.CPP): undefined symbol __CHK
+file LLRENDER.obj(C:\USR\LUISFER\SPRITE3D\LLRENDER.CPP): undefined symbol qsort_
+file LLRENDER.obj(C:\USR\LUISFER\SPRITE3D\LLRENDER.CPP): undefined symbol memcpy_
+file LLRENDER.obj(C:\USR\LUISFER\SPRITE3D\LLRENDER.CPP): undefined symbol _fltused_
+file LLRENDER.obj(C:\USR\LUISFER\SPRITE3D\LLRENDER.CPP): undefined symbol __8087
+file GLOBAL.obj(C:\USR\LUISFER\SPRITE3D\GLOBAL.CPP): undefined symbol __CHK
+file GLOBAL.obj(C:\USR\LUISFER\SPRITE3D\GLOBAL.CPP): undefined symbol printf_
+file GLOBAL.obj(C:\USR\LUISFER\SPRITE3D\GLOBAL.CPP): undefined symbol malloc_
+file GLOBAL.obj(C:\USR\LUISFER\SPRITE3D\GLOBAL.CPP): undefined symbol free_
+file GLOBAL.obj(C:\USR\LUISFER\SPRITE3D\GLOBAL.CPP): undefined symbol _fltused_
+file GLOBAL.obj(C:\USR\LUISFER\SPRITE3D\GLOBAL.CPP): undefined symbol __8087
+file FILEANIM.obj(C:\USR\LUISFER\SPRITE3D\FILEANIM.CPP): undefined symbol __CHK
+file FILEANIM.obj(C:\USR\LUISFER\SPRITE3D\FILEANIM.CPP): undefined symbol fopen_
+file FILEANIM.obj(C:\USR\LUISFER\SPRITE3D\FILEANIM.CPP): undefined symbol exit_
+file FILEANIM.obj(C:\USR\LUISFER\SPRITE3D\FILEANIM.CPP): undefined symbol fread_
+file FILEANIM.obj(C:\USR\LUISFER\SPRITE3D\FILEANIM.CPP): undefined symbol strcmp_
+file FILEANIM.obj(C:\USR\LUISFER\SPRITE3D\FILEANIM.CPP): undefined symbol fclose_
+file ANIMATED.obj(C:\USR\LUISFER\SPRITE3D\ANIMATED.CPP): undefined symbol __CHK
+file ANIMATED.obj(C:\USR\LUISFER\SPRITE3D\ANIMATED.CPP): undefined symbol exit_
+file HLRENDER.obj(C:\USR\LUISFER\SPRITE3D\HLRENDER.CPP): undefined symbol __CHK
+file HLRENDER.obj(C:\USR\LUISFER\SPRITE3D\HLRENDER.CPP): undefined symbol exit_
+file HLRENDER.obj(C:\USR\LUISFER\SPRITE3D\HLRENDER.CPP): undefined symbol memcpy_
+file HLRENDER.obj(C:\USR\LUISFER\SPRITE3D\HLRENDER.CPP): undefined symbol _fltused_
+file HLRENDER.obj(C:\USR\LUISFER\SPRITE3D\HLRENDER.CPP): undefined symbol __8087
+file VISOR.obj(C:\USR\LUISFER\SPRITE3D\VISOR.CPP): undefined symbol __CHK
+file VISOR.obj(C:\USR\LUISFER\SPRITE3D\VISOR.CPP): undefined symbol memset_
+file VISOR.obj(C:\USR\LUISFER\SPRITE3D\VISOR.CPP): undefined symbol stricmp_
+file VISOR.obj(C:\USR\LUISFER\SPRITE3D\VISOR.CPP): undefined symbol memcpy_
+file VISOR.obj(C:\USR\LUISFER\SPRITE3D\VISOR.CPP): undefined symbol _fltused_
+file VISOR.obj(C:\USR\LUISFER\SPRITE3D\VISOR.CPP): undefined symbol __8087
+file math387r.lib(trig387): undefined symbol __chipbug
+file math387r.lib(trig387): undefined symbol __8087
+file math387r.lib(trig387): undefined symbol __fptan_chk
+file math387r.lib(atan387): undefined symbol __chipbug
+file math387r.lib(atan387): undefined symbol __8087
+file math387r.lib(atan387): undefined symbol __fpatan_wrap
+file math387r.lib(sqrt387): undefined symbol __8087
+file math387r.lib(fchop): undefined symbol __8087
+file math387r.lib(asin387): undefined symbol __8087
+file math387r.lib(math87e): undefined symbol __8087
+file math387r.lib(dosinite): undefined symbol __hook387
+file math387r.lib(dosinite): undefined symbol __unhook387
+file math387r.lib(dosinite): undefined symbol __8087
+file math387r.lib(dosinite): undefined symbol __8087cw
+file math387r.lib(dosinite): undefined symbol __Extender
+file math387r.lib(dosinite): undefined symbol __X32VM
+file math387r.lib(dosinite): undefined symbol __D16Infoseg
+file math387r.lib(dosinite): undefined symbol __x386_zero_base_selector
+file math387r.lib(dosinite): undefined symbol __GDAptr
+file math387r.lib(math2err): undefined symbol __HugeValue
+file math387r.lib(math2err): undefined symbol __8087
+file emu387.lib(emu387): undefined symbol __GETDS
+file emu387.lib(emu387): undefined symbol ___FPE_handler
+file math387r.lib(_matherr): undefined symbol __get_std_stream_
+file math387r.lib(_matherr): undefined symbol fputs_
+file math387r.lib(_matherr): undefined symbol fputc_
+file math387r.lib(_matherr): undefined symbol __set_EDOM_
+file math387r.lib(_matherr): undefined symbol __set_ERANGE_
+file math387r.lib(_matherr): undefined symbol __8087

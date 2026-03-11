@@ -1,0 +1,15 @@
+system dos4g
+debug all
+option stack=64k
+option map
+name r.exe
+file RESOURCE.obj
+file T.obj
+file COMPLEX.obj
+file SPRITE3D.obj
+file LLRENDER.obj
+file GLOBAL.obj
+file FILEANIM.obj
+file ANIMATED.obj
+file HLRENDER.obj
+file VISOR.obj

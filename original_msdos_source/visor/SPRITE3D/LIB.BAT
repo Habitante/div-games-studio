@@ -1,0 +1,4 @@
+del visor.lib
+wlib visor.lib +RESOURCE.OBJ +T.OBJ +VISOR.OBJ
+wlib visor.lib +COMPLEX.OBJ +SPRITE3D.OBJ +LLRENDER.OBJ
+wlib visor.lib +GLOBAL.OBJ +FILEANIM.OBJ +ANIMATED.OBJ +HLRENDER.OBJ

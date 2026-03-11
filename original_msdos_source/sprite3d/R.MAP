@@ -1,0 +1,440 @@
+WATCOM Linker Version 10.5
+Copyright by WATCOM International Corp. 1985, 1995. All rights reserved.
+Created on:       99/04/21 10:47:28
+Executable Image: r.exe
+creating a DOS/4G executable
+Warning(1028): __CHK is an undefined reference
+Warning(1028): fopen_ is an undefined reference
+Warning(1028): printf_ is an undefined reference
+Warning(1028): exit_ is an undefined reference
+Warning(1028): fread_ is an undefined reference
+Warning(1028): strcmp_ is an undefined reference
+Warning(1028): fclose_ is an undefined reference
+Warning(1028): strupr_ is an undefined reference
+Warning(1028): sprintf_ is an undefined reference
+Warning(1028): ftell_ is an undefined reference
+Warning(1028): fseek_ is an undefined reference
+Warning(1028): strcat_ is an undefined reference
+Warning(1028): malloc_ is an undefined reference
+Warning(1028): free_ is an undefined reference
+Warning(1028): memcpy_ is an undefined reference
+Warning(1028): _fltused_ is an undefined reference
+Warning(1028): __8087 is an undefined reference
+Warning(1028): strcpy_ is an undefined reference
+Warning(1028): qsort_ is an undefined reference
+Warning(1028): memset_ is an undefined reference
+Warning(1028): stricmp_ is an undefined reference
+Warning(1028): __chipbug is an undefined reference
+Warning(1028): __fptan_chk is an undefined reference
+Warning(1028): __fpatan_wrap is an undefined reference
+Warning(1028): __hook387 is an undefined reference
+Warning(1028): __unhook387 is an undefined reference
+Warning(1028): __8087cw is an undefined reference
+Warning(1028): __Extender is an undefined reference
+Warning(1028): __X32VM is an undefined reference
+Warning(1028): __D16Infoseg is an undefined reference
+Warning(1028): __x386_zero_base_selector is an undefined reference
+Warning(1028): __GDAptr is an undefined reference
+Warning(1028): __HugeValue is an undefined reference
+Warning(1028): __GETDS is an undefined reference
+Warning(1028): ___FPE_handler is an undefined reference
+Warning(1028): __get_std_stream_ is an undefined reference
+Warning(1028): fputs_ is an undefined reference
+Warning(1028): fputc_ is an undefined reference
+Warning(1028): __set_EDOM_ is an undefined reference
+Warning(1028): __set_ERANGE_ is an undefined reference
+
+
+                        +------------+
+                        |   Groups   |
+                        +------------+
+
+Group                           Address              Size
+=====                           =======              ====
+
+DGROUP                          0002:00000000        000071f8
+
+
+
+                        +--------------+
+                        |   Segments   |
+                        +--------------+
+
+Segment                Class          Group          Address         Size
+=======                =====          =====          =======         ====
+
+_TEXT                  CODE                          0001:00000000   0000e8cc
+CONST                  DATA           DGROUP         0002:00000000   00000404
+CONST2                 DATA           DGROUP         0002:00000404   0000001c
+_DATA                  DATA           DGROUP         0002:00000420   000001f8
+XIB                    DATA           DGROUP         0002:00000618   00000000
+XI                     DATA           DGROUP         0002:00000618   00000006
+XIE                    DATA           DGROUP         0002:0000061e   00000000
+YIB                    DATA           DGROUP         0002:0000061e   00000000
+YI                     DATA           DGROUP         0002:0000061e   00000006
+YIE                    DATA           DGROUP         0002:00000624   00000000
+_BSS                   BSS            DGROUP         0002:00000624   00006bd4
+
+
+                        +----------------+
+                        |   Memory Map   |
+                        +----------------+
+
+* = unreferenced symbol
++ = symbol only referenced locally
+
+Address        Symbol
+=======        ======
+
+Module: RESOURCE.obj(C:\USR\DANI\SPRITE3D\RESOURCE.CPP)
+0001:00000000* resource_create_
+0001:000000fc* resource_destroy_
+0001:00000135* resource_Exist_
+0001:000001a2* resource_GetPackedLen_
+0001:0000024d* resource_fTellPacked_
+0001:00000282* resource_fSeekPacked_
+0001:000002b7* resource_GetFilePtrPacked_
+0001:00000375+ resource_GetPacked_
+0001:0000047f* resource_GetGraphPacked_
+Module: T.obj(T.ASM)
+0001:000004bc* my_call_
+0001:000004be  nucleo8_8_
+0001:00000a4c  mask_nucleo8_256_
+0001:0000063e  nucleo8_64_
+0001:00000944  mask_nucleo8_64_
+0001:000007b8  mask_nucleo8_8_
+0002:00000428* _clock1
+0002:0000042c* _clock2
+0001:0000073e  nucleo8_256_
+0001:000008c0  mask_nucleo8_32_
+0001:000006be  nucleo8_128_
+0001:000005be  nucleo8_32_
+0001:0000083c  mask_nucleo8_16_
+0002:00000430  _direccion_textura
+0001:000009c8  mask_nucleo8_128_
+0001:0000053e  nucleo8_16_
+Module: COMPLEX.obj(C:\USR\DANI\SPRITE3D\COMPLEX.CPP)
+0001:00000aca  complex_create_
+0001:00001839  complex_destroy_
+0001:00001a57  complex_update_
+0001:00001b1e+ complex_sort_
+0001:00001c08+ complex_draw_
+0001:00001e95  complex_sortdraw_
+0001:00001ec9  complex_setposition_
+0001:00001f11  complex_setrotation_
+0001:00001f5a+ complex_transform_
+0001:000020ee  complex_setmaptype_
+0001:000021d2* complex_setcolor_
+0001:0000225a* complex_setambientlight_
+0001:000022b6+ complex_makefacenormals_
+0001:00002571* complex_look_
+0002:00000624+ _vd
+0002:00000628+ _vo
+Module: SPRITE3D.obj(C:\USR\LUISFER\SPRITE3D\sprite3d.CPP)
+0001:0000261a  sprite3d_create_
+0001:00002739  sprite3d_setposition_
+0001:00002781  sprite3d_setrotation_
+0001:000027ca  sprite3d_look_
+0001:00002873  sprite3d_angulosvision_
+0001:0000293d+ sprite3d_transform_
+0001:00002aa3* sprite3d_SeekIfTextureLoad_
+0001:00002b44  sprite3d_CreateTexture_
+0001:00002df1  sprite3d_DestroyTexture_
+Module: LLRENDER.obj(C:\USR\LUISFER\SPRITE3D\LLRENDER.CPP)
+0002:0000062c+ _intensidad
+0002:00000630+ _alfa
+0002:00000634+ _mb
+0002:00000638+ _dunoz_der
+0002:0000063c+ _nucleo_texturas
+0002:00000640+ _uz_der
+0002:00000644+ _vz_der
+0002:00000648+ _unoz_der
+0002:0000064c+ _destino
+0002:00000650+ _vz_izq
+0002:00000654+ _uz_izq
+0002:00000658+ _mg
+0002:0000065c+ _duz_der
+0002:00000660+ _mr
+0002:00000664+ _dvz_der
+0002:00000668+ _dunoz_izq
+0002:0000066c+ _b_izq
+0002:00000670+ _db_izq
+0002:00000674+ _x_izq
+0002:00000678+ _du_izq
+0002:0000067c+ _dbdx
+0002:00000680+ _drdx
+0002:00000684+ _dvz_izq
+0002:00000688+ _dv_izq
+0002:0000068c+ _v_izq
+0002:00000690+ _g_izq
+0002:00000694+ _dgdx
+0002:00000698+ _dx_der
+0002:0000069c+ _dg_izq
+0002:000006a0+ _dx_izq
+0002:000006a4+ _dintensidaddx
+0002:000006a8+ _unoz_izq
+0002:000006ac+ _altura_seccion_izquierda
+0002:000006b0+ _dintensidad_izq
+0002:000006b4+ _x_der
+0002:000006b8+ _u_izq
+0002:000006bc+ _duz_izq
+0002:000006c0+ _intensidad_izq
+0002:000006c4+ _r_izq
+0002:000006c8+ _dr_izq
+0002:000006cc+ _altura_seccion_derecha
+0002:000006d0  _complex_x_fin
+0002:000006d4  _complex_x_ini
+0002:000006d8  _complex_y_ini
+0002:000006dc+ _fu
+0002:000006e0+ _fv
+0002:000006e4+ _seccion_derecha
+0002:000006e8+ _tabla_rgba
+0002:000006ec+ _inversa
+0002:000006f0  _complex_y_fin
+0002:000006f4+ _u_1
+0002:000006f8+ _u_0
+0002:000006fc+ _v_1
+0002:00000700+ _seccion_izquierda
+0002:00000704+ _v_0
+0001:00002e61+ ajuste_flotante_
+0001:00002ea9+ ajuste_entero_
+0001:00002ee0  llrender_create_
+0001:0000307e  llrender_destroy_
+0001:000030bb+ compara_
+0001:00003112  llrender_render_
+0001:000031c1+ llrender_pintar_triangulo_
+0001:0000366c+ llrender_Cara_Oculta_
+0001:000036fb+ llrender_clipping_3d_near_
+0001:0000402e+ llrender_clipping_3d_left_
+0001:00004ad1+ llrender_clipping_3d_right_
+0001:00005547+ llrender_clipping_3d_up_
+0001:00005f48+ llrender_clipping_3d_down_
+0001:000068ef+ llrender_Pinta_Triangulo_
+0002:000004b4+ _num_llrenders
+0002:000004b8+ _LMax
+0002:000004bc+ _LMin
+0002:00000708+ _color_b
+Module: GLOBAL.obj(C:\USR\LUISFER\SPRITE3D\GLOBAL.CPP)
+0001:00008f36  IniMath_
+0001:00008ff5  MatMult_
+0001:000090ed  normalize_
+0001:00009162* producto_escalar_
+0001:000091b3* GetAngs_
+0001:0000926f* MatShow_
+0001:000092fe  lf_malloc_
+0001:00009397  lf_free_
+0001:00009458  lf_free_all_
+0002:000004c0  _num_mallocs
+0002:000004c4+ _mem_mallocs
+0002:0000070c+ _tabla_mem_mallocs
+0002:0000270c  _ERRORSTR
+0002:0000280c  _Identity
+0002:0000284c+ _tabla_mallocs
+0002:0000484c+ _red
+0002:00004850+ _green
+0002:00004854+ _blue
+Module: FILEANIM.obj(C:\USR\LUISFER\SPRITE3D\FILEANIM.CPP)
+0001:000094c9  fileanim_create_
+0001:0000962e  fileanim_destroy_
+0001:00009668+ fileanim_getanim_
+Module: ANIMATED.obj(C:\USR\LUISFER\SPRITE3D\ANIMATED.CPP)
+0001:000096c7  animated_create_
+0001:0000975f  animated_destroy_
+0001:0000978e  animated_setanim_
+Module: HLRENDER.obj(C:\USR\LUISFER\SPRITE3D\HLRENDER.CPP)
+0001:000097e1  hlrender_create_
+0001:000098b3  hlrender_destroy_
+0001:000098e4+ hlrender_transformar_
+0001:00009ebd+ hlrender_transformar_sombra_
+0001:0000a1ad+ hlrender_rotar_
+0001:0000a2c9* hlrender_rotar_normales_
+0001:0000a377* hlrender_transformar_centro_
+0001:0000a3b3  hlrender_addobject_
+0001:0000a435  hlrender_deleteobject_
+0001:0000a4e1* hlrender_modifyobject_
+0001:0000a51c+ hlrender_sort_
+0001:0000a637  hlrender_transformobjects_
+0001:0000a6d0* hlrender_transdrawobjects_
+0001:0000a7c9  hlrender_drawobject_
+0001:0000a816* hlrender_drawobjects_
+0001:0000a8fe+ hlrender_setcamera_
+0001:0000a9e0  hlrender_setlight_
+0001:0000aa57* hlrender_setmovelight_
+Module: VISOR.obj(C:\USR\LUISFER\SPRITE3D\VISOR.CPP)
+0001:0000aaa1* visor_init_
+0001:0000ad85* visor_loop_
+0001:0000af50+ visor_end_
+0001:0000afd3+ reescalar_sprite3d_
+0002:000004c8  _ERROR
+0002:000004cc+ _sbuffer
+0002:000004d0+ _my_buffer
+0002:000004d4+ _lib_3d
+0002:000004d8+ _lib_3d_ancho
+0002:000004dc+ _lib_3d_alto
+0002:000004e0+ _lib_3d_buffer
+0002:00004858+ _camara
+0002:00004cc8+ _animado
+0002:00005170+ _world_camara
+0002:000071d0  _puntero_dac
+0002:000071d4  _puntero_textura
+0002:000071d8+ _resource_camara
+0002:000071e4+ _fichero_animaciones
+Module: C:\WATCOM\lib386\math387r.lib(trig387)
+0001:0000b13b  sin_
+0001:0000b12f  cos_
+0001:0000b15c  tan_
+0001:0000b0f0* IF@COS
+0001:0000b0f0* IF@DCOS
+0001:0000b0fa* IF@SIN
+0001:0000b0fa* IF@DSIN
+0001:0000b147* IF@TAN
+0001:0000b147* IF@DTAN
+Module: C:\WATCOM\lib386\math387r.lib(atan387)
+0001:0000b192* atan_
+0001:0000b19e  atan2_
+0001:0000b168* IF@ATAN
+0001:0000b168* IF@DATAN
+0001:0000b17d* IF@ATAN2
+0001:0000b17d  IF@DATAN2
+Module: C:\WATCOM\lib386\math387r.lib(sqrt387)
+0001:0000b1ae  sqrt_
+0001:0000b1de* IF@SQRT
+0001:0000b1de* IF@DSQRT
+0001:0000b1e0  __@DSQRT
+Module: C:\WATCOM\lib386\dos\emu387.lib(386inite)
+0001:0000b21b* __fini_387_emulator
+0001:0000b216  __init_387_emulator
+Module: C:\WATCOM\lib386\math387r.lib(fchop)
+0001:0000b220  __CHP
+Module: C:\WATCOM\lib386\math387r.lib(asin387)
+0001:0000b259  asin_
+0001:0000b23e* IF@DASIN
+0001:0000b23e* IF@ASIN
+Module: C:\WATCOM\lib386\math387r.lib(math87e)
+0001:0000b265  __math87_err_
+Module: C:\WATCOM\lib386\math387r.lib(dosinite)
+0001:0000b2e0  __sys_init_387_emulator
+0001:0000b465  __sys_fini_387_emulator
+Module: C:\WATCOM\lib386\math387r.lib(math2err)
+0001:0000b53b  __math1err_
+0001:0000b545+ __math2err_
+Module: C:\WATCOM\lib386\dos\emu387.lib(emu387)
+0001:0000b9bc* __int7_X32VM
+0001:0000ba08  __int7
+0001:0000b998  __int7_pl3
+Module: C:\WATCOM\lib386\math387r.lib(_matherr)
+0001:0000e846* _set_matherr_
+0001:0000e84c+ __rterrmsg_
+0001:0000e894  _matherr_
+0002:00000614+ __RWD_matherr
+Module: C:\WATCOM\lib386\math387r.lib(__mtherr)
+0001:0000e8c4  __matherr
+Module: C:\WATCOM\lib386\math387r.lib(matherr)
+0001:0000e8c9+ matherr_
+Warning(1014): stack segment not found
+Warning(1023): no starting address found, using 0001:00000000
+
+
+                        +---------------------------+
+                        |   Unresolved References   |
+                        +---------------------------+
+
+Undefined Symbol                Referenced by
+================                =============
+
+__CHK                           RESOURCE.obj(C:\USR\DANI\SPRITE3D\RESOURCE.CPP)
+fopen_                          RESOURCE.obj(C:\USR\DANI\SPRITE3D\RESOURCE.CPP)
+printf_                         RESOURCE.obj(C:\USR\DANI\SPRITE3D\RESOURCE.CPP)
+exit_                           RESOURCE.obj(C:\USR\DANI\SPRITE3D\RESOURCE.CPP)
+fread_                          RESOURCE.obj(C:\USR\DANI\SPRITE3D\RESOURCE.CPP)
+strcmp_                         RESOURCE.obj(C:\USR\DANI\SPRITE3D\RESOURCE.CPP)
+fclose_                         RESOURCE.obj(C:\USR\DANI\SPRITE3D\RESOURCE.CPP)
+strupr_                         RESOURCE.obj(C:\USR\DANI\SPRITE3D\RESOURCE.CPP)
+sprintf_                        RESOURCE.obj(C:\USR\DANI\SPRITE3D\RESOURCE.CPP)
+ftell_                          RESOURCE.obj(C:\USR\DANI\SPRITE3D\RESOURCE.CPP)
+fseek_                          RESOURCE.obj(C:\USR\DANI\SPRITE3D\RESOURCE.CPP)
+__CHK                           COMPLEX.obj(C:\USR\DANI\SPRITE3D\COMPLEX.CPP)
+fopen_                          COMPLEX.obj(C:\USR\DANI\SPRITE3D\COMPLEX.CPP)
+printf_                         COMPLEX.obj(C:\USR\DANI\SPRITE3D\COMPLEX.CPP)
+exit_                           COMPLEX.obj(C:\USR\DANI\SPRITE3D\COMPLEX.CPP)
+fread_                          COMPLEX.obj(C:\USR\DANI\SPRITE3D\COMPLEX.CPP)
+strcmp_                         COMPLEX.obj(C:\USR\DANI\SPRITE3D\COMPLEX.CPP)
+strcat_                         COMPLEX.obj(C:\USR\DANI\SPRITE3D\COMPLEX.CPP)
+malloc_                         COMPLEX.obj(C:\USR\DANI\SPRITE3D\COMPLEX.CPP)
+fclose_                         COMPLEX.obj(C:\USR\DANI\SPRITE3D\COMPLEX.CPP)
+free_                           COMPLEX.obj(C:\USR\DANI\SPRITE3D\COMPLEX.CPP)
+memcpy_                         COMPLEX.obj(C:\USR\DANI\SPRITE3D\COMPLEX.CPP)
+_fltused_                       COMPLEX.obj(C:\USR\DANI\SPRITE3D\COMPLEX.CPP)
+__8087                          COMPLEX.obj(C:\USR\DANI\SPRITE3D\COMPLEX.CPP)
+__CHK                           SPRITE3D.obj(C:\USR\LUISFER\SPRITE3D\sprite3d.CPP)
+strcmp_                         SPRITE3D.obj(C:\USR\LUISFER\SPRITE3D\sprite3d.CPP)
+strcpy_                         SPRITE3D.obj(C:\USR\LUISFER\SPRITE3D\sprite3d.CPP)
+_fltused_                       SPRITE3D.obj(C:\USR\LUISFER\SPRITE3D\sprite3d.CPP)
+__8087                          SPRITE3D.obj(C:\USR\LUISFER\SPRITE3D\sprite3d.CPP)
+__CHK                           LLRENDER.obj(C:\USR\LUISFER\SPRITE3D\LLRENDER.CPP)
+qsort_                          LLRENDER.obj(C:\USR\LUISFER\SPRITE3D\LLRENDER.CPP)
+memcpy_                         LLRENDER.obj(C:\USR\LUISFER\SPRITE3D\LLRENDER.CPP)
+_fltused_                       LLRENDER.obj(C:\USR\LUISFER\SPRITE3D\LLRENDER.CPP)
+__8087                          LLRENDER.obj(C:\USR\LUISFER\SPRITE3D\LLRENDER.CPP)
+__CHK                           GLOBAL.obj(C:\USR\LUISFER\SPRITE3D\GLOBAL.CPP)
+printf_                         GLOBAL.obj(C:\USR\LUISFER\SPRITE3D\GLOBAL.CPP)
+malloc_                         GLOBAL.obj(C:\USR\LUISFER\SPRITE3D\GLOBAL.CPP)
+free_                           GLOBAL.obj(C:\USR\LUISFER\SPRITE3D\GLOBAL.CPP)
+_fltused_                       GLOBAL.obj(C:\USR\LUISFER\SPRITE3D\GLOBAL.CPP)
+__8087                          GLOBAL.obj(C:\USR\LUISFER\SPRITE3D\GLOBAL.CPP)
+__CHK                           FILEANIM.obj(C:\USR\LUISFER\SPRITE3D\FILEANIM.CPP)
+fopen_                          FILEANIM.obj(C:\USR\LUISFER\SPRITE3D\FILEANIM.CPP)
+exit_                           FILEANIM.obj(C:\USR\LUISFER\SPRITE3D\FILEANIM.CPP)
+fread_                          FILEANIM.obj(C:\USR\LUISFER\SPRITE3D\FILEANIM.CPP)
+strcmp_                         FILEANIM.obj(C:\USR\LUISFER\SPRITE3D\FILEANIM.CPP)
+fclose_                         FILEANIM.obj(C:\USR\LUISFER\SPRITE3D\FILEANIM.CPP)
+__CHK                           ANIMATED.obj(C:\USR\LUISFER\SPRITE3D\ANIMATED.CPP)
+exit_                           ANIMATED.obj(C:\USR\LUISFER\SPRITE3D\ANIMATED.CPP)
+__CHK                           HLRENDER.obj(C:\USR\LUISFER\SPRITE3D\HLRENDER.CPP)
+exit_                           HLRENDER.obj(C:\USR\LUISFER\SPRITE3D\HLRENDER.CPP)
+memcpy_                         HLRENDER.obj(C:\USR\LUISFER\SPRITE3D\HLRENDER.CPP)
+_fltused_                       HLRENDER.obj(C:\USR\LUISFER\SPRITE3D\HLRENDER.CPP)
+__8087                          HLRENDER.obj(C:\USR\LUISFER\SPRITE3D\HLRENDER.CPP)
+__CHK                           VISOR.obj(C:\USR\LUISFER\SPRITE3D\VISOR.CPP)
+memset_                         VISOR.obj(C:\USR\LUISFER\SPRITE3D\VISOR.CPP)
+stricmp_                        VISOR.obj(C:\USR\LUISFER\SPRITE3D\VISOR.CPP)
+memcpy_                         VISOR.obj(C:\USR\LUISFER\SPRITE3D\VISOR.CPP)
+_fltused_                       VISOR.obj(C:\USR\LUISFER\SPRITE3D\VISOR.CPP)
+__8087                          VISOR.obj(C:\USR\LUISFER\SPRITE3D\VISOR.CPP)
+__chipbug                       math387r.lib(trig387)
+__8087                          math387r.lib(trig387)
+__fptan_chk                     math387r.lib(trig387)
+__chipbug                       math387r.lib(atan387)
+__8087                          math387r.lib(atan387)
+__fpatan_wrap                   math387r.lib(atan387)
+__8087                          math387r.lib(sqrt387)
+__8087                          math387r.lib(fchop)
+__8087                          math387r.lib(asin387)
+__8087                          math387r.lib(math87e)
+__hook387                       math387r.lib(dosinite)
+__unhook387                     math387r.lib(dosinite)
+__8087                          math387r.lib(dosinite)
+__8087cw                        math387r.lib(dosinite)
+__Extender                      math387r.lib(dosinite)
+__X32VM                         math387r.lib(dosinite)
+__D16Infoseg                    math387r.lib(dosinite)
+__x386_zero_base_selector       math387r.lib(dosinite)
+__GDAptr                        math387r.lib(dosinite)
+__HugeValue                     math387r.lib(math2err)
+__8087                          math387r.lib(math2err)
+__GETDS                         emu387.lib(emu387)
+___FPE_handler                  emu387.lib(emu387)
+__get_std_stream_               math387r.lib(_matherr)
+fputs_                          math387r.lib(_matherr)
+fputc_                          math387r.lib(_matherr)
+__set_EDOM_                     math387r.lib(_matherr)
+__set_ERANGE_                   math387r.lib(_matherr)
+__8087                          math387r.lib(_matherr)
+
+
+                        +--------------------+
+                        |   Libraries Used   |
+                        +--------------------+
+
+C:\WATCOM\lib386\math387r.lib
+C:\WATCOM\lib386\dos\emu387.lib

@@ -1,0 +1,45 @@
+þ C¢digo EML de  - DIV Versi¢n 0c88b
+
+ 1602	typ 2206919168
+ 1604	cbp 0
+ 1606	frm
+ 1607	car 1596
+ 1609	funasp 3
+ 1611	car4 1 0 0 320
+ 1616	car 200
+ 1618	funasp 22
+ 1620	caraid 29
+ 1622	carasiasp 2
+ 1624	caraid 26
+ 1626	carasiasp 160
+ 1628	caraid 27
+ 1630	carasiasp 100
+ 1632	car2 0 29
+ 1635	aidptr
+ 1636	caraidptr 26
+ 1638	caraidptr 27
+ 1640	funasp 24
+ 1642	car4 1 0 2 0
+ 1647	car3 0 320 200
+ 1651	funasp 111
+ 1653	car2 1600 1000
+ 1656	ada
+ 1657	asp
+ 1658	car2 1601 1971
+ 1661	ada
+ 1662	asp
+ 1663	caraid 32
+ 1665	carptr 1600
+ 1667	car 25000
+ 1669	fun 10
+ 1671	asiasp
+ 1672	caraid 31
+ 1674	car2 95 1601
+ 1677	ptr
+ 1678	car 30
+ 1680	fun 11
+ 1682	add
+ 1683	asiasp
+ 1684	frm
+ 1685	jmp 1642
+ 1687	ret

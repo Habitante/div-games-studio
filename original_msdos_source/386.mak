@@ -1,0 +1,154 @@
+#컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+#       Fichero de compilaci줻 de DIV
+#컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+
+d.exe: div.obj divpaint.obj divbasic.obj divpalet.obj divkeybo.obj divsprit.obj
+d.exe: divvideo.obj divmouse.obj divsetup.obj divwindo.obj divlengu.obj
+d.exe: divbrow.obj divgama.obj divhandl.obj divforma.obj divasm.obj divcdrom.obj
+d.exe: divbin.obj grabador.obj fpgfile.obj divfont.obj ifs.obj divpcm.obj
+d.exe: divedit.obj divdsktp.obj divc.obj divhelp.obj diveffec.obj divinsta.obj
+d.exe: divdll1.obj divdll2.obj divcolor.obj divcalc.obj divfpg.obj cdrom.obj
+d.exe: divmix.obj divspr.obj divmap3d.obj divsb.obj vesa.obj det_vesa.obj
+d.exe: divsound.obj divmixer.obj timer.obj divtimer.obj
+
+  wlink @d.lnk
+
+div.obj: div.cpp
+  wcc386 /oneatx /wx /zp4 /fpc /mf /bt=dos /3r div.cpp
+
+divkeybo.obj: divkeybo.cpp
+  wcc386 /oneatx /wx /zp4 /fpc /mf /bt=dos /3r divkeybo.cpp
+
+divpaint.obj: divpaint.cpp
+  wcc386 /oneatx /wx /zp4 /fpc /mf /bt=dos /3r divpaint.cpp
+
+divbasic.obj: divbasic.cpp
+  wcc386 /oneatx /wx /zp4 /fpc /mf /bt=dos /3r divbasic.cpp
+
+divpalet.obj: divpalet.cpp
+  wcc386 /oneatx /wx /zp4 /fpc /mf /bt=dos /3r divpalet.cpp
+
+divsprit.obj: divsprit.cpp
+  wcc386 /oneatx /wx /zp4 /fpc /mf /bt=dos /3r divsprit.cpp
+
+divvideo.obj: divvideo.cpp
+  wcc386 /oneatx /wx /zp4 /fpc /mf /bt=dos /3r divvideo.cpp
+
+divmouse.obj: divmouse.cpp
+  wcc386 /oneatx /wx /zp4 /fpc /mf /bt=dos /3r divmouse.cpp
+
+divsetup.obj: divsetup.cpp
+  wcc386 /oneatx /wx /zp4 /fpc /mf /bt=dos /3r divsetup.cpp
+
+divwindo.obj: divwindo.cpp
+  wcc386 /oneatx /wx /zp4 /fpc /mf /bt=dos /3r divwindo.cpp
+
+divlengu.obj: divlengu.cpp
+  wcc386 /oneatx /wx /zp4 /fpc /mf /bt=dos /3r divlengu.cpp
+
+divbrow.obj: divbrow.cpp
+  wcc386 /oneatx /wx /zp4 /fpc /mf /bt=dos /3r divbrow.cpp
+
+divgama.obj: divgama.cpp
+  wcc386 /oneatx /wx /zp4 /fpc /mf /bt=dos /3r divgama.cpp
+
+divhandl.obj: divhandl.cpp
+  wcc386 /oneatx /wx /zp4 /fpc /mf /bt=dos /3r divhandl.cpp
+
+divforma.obj: divforma.cpp
+  wcc386 /oneatx /wx /zp4 /fpc /mf /bt=dos /3r divforma.cpp
+
+#divasm.obj: divasm.cpp
+#  wcc386 /oneatx /wx /zp4 /fpc /mf /bt=dos /3r divasm.cpp
+
+divasm.obj: divasm.asm
+  wasm divasm.asm
+
+divcdrom.obj: divcdrom.cpp
+  wcc386 /oneatx /wx /zp4 /fpc /mf /bt=dos /3r divcdrom.cpp
+
+cdrom.obj: cdrom.cpp  cdrom.h
+  wcc386 /oneatx /wx /fpc /mf /bt=dos /3r cdrom.cpp
+
+divfpg.obj: divfpg.cpp  fpgfile.hpp
+  wcc386 /oneatx /wx /zp4 /fpc /mf /bt=dos /3r divfpg.cpp
+
+divbin.obj: divbin.cpp
+  wcc386 /oneatx /wx /zp4 /fpc /mf /bt=dos /3r divbin.cpp
+
+grabador.obj: grabador.cpp
+  wcc386 /oneatx /wx /zp4 /fpc /mf /bt=dos /3r grabador.cpp
+
+fpgfile.obj: fpgfile.cpp  fpgfile.hpp
+  wcc386 /oneatx /wx /zp4 /fpc /mf /bt=dos /3r fpgfile.cpp
+
+divedit.obj: divedit.cpp
+  wcc386 /oneatx /wx /zp4 /fpc /mf /bt=dos /3r divedit.cpp
+
+divfont.obj: divfont.cpp
+  wcc386 /oneatx /wx /zp4 /fpc /mf /bt=dos /3r divfont.cpp
+
+ifs.obj: ifs.cpp
+  wcc386 /oneatx /wx /fpc /mf /bt=dos /3r ifs.cpp
+
+divpcm.obj: divpcm.cpp
+  wcc386 /oneatx /wx /zp4 /fpc /mf /bt=dos /3r divpcm.cpp
+
+divdsktp.obj: divdsktp.cpp
+  wcc386 /oneatx /wx /zp4 /fpc /mf /bt=dos /3r divdsktp.cpp
+
+divc.obj: divc.cpp
+  wcc386 /oneatx /wx /zp4 /fpc /mf /bt=dos /3r divc.cpp
+
+divhelp.obj: divhelp.cpp
+  wcc386 /oneatx /wx /zp4 /fpc /mf /bt=dos /3r divhelp.cpp
+
+diveffec.obj: diveffec.cpp
+  wcc386 /oneatx /wx /zp4 /fpc /mf /bt=dos /3r diveffec.cpp
+
+divinsta.obj: divinsta.cpp
+  wcc386 /oneatx /wx /zp4 /fpc /mf /bt=dos /3r divinsta.cpp
+
+divdll1.obj: divdll1.c
+  wcc386 /oneatx /wx /zp4 /fpc /mf /bt=dos /3r divdll1.c
+
+divdll2.obj: divdll2.c
+  wcc386 /oneatx /wx /zp4 /fpc /mf /bt=dos /3r divdll2.c
+
+divcolor.obj: divcolor.cpp
+  wcc386 /oneatx /wx /zp4 /fpc /mf /bt=dos /3r divcolor.cpp
+
+divcalc.obj: divcalc.cpp
+  wcc386 /oneatx /wx /zp4 /fpc /mf /bt=dos /3r divcalc.cpp
+
+divmix.obj: divmix.cpp
+  wcc386 /oneatx /wx /zp4 /fpc /mf /bt=dos /3r divmix.cpp
+
+divspr.obj: divspr.cpp
+  wcc386 /oneatx /wx /zp4 /fpc /mf /bt=dos /3r divspr.cpp
+
+divmap3d.obj: divmap3d.cpp
+  wcc386 /oneatx /wx /zp4 /fpc /mf /bt=dos /3r divmap3d.cpp
+
+divsb.obj: divsb.cpp
+  wcc386 /oneatx /wx /zp4 /fpc /mf /bt=dos /3r divsb.cpp
+
+vesa.obj: vesa.asm
+  a vesa.asm /ml /m2 /w2 /z /zn
+
+det_vesa.obj: det_vesa.cpp
+  wcc386 /oneatx /wx /zp4 /fpc /mf /bt=dos /3r det_vesa.cpp
+# wcc386 det_vesa.cpp /mf /oneatx /w3 /d__WC32__
+
+divsound.obj: divsound.cpp
+  wcc386 /oneatx /wx /zp4 /fpc /mf /bt=dos /3r divsound.cpp
+
+divmixer.obj: divmixer.cpp
+  wcc386 /oneatx /wx /zp4 /fpc /mf /bt=dos /3r divmixer.cpp
+
+timer.obj: timer.asm
+        a /m /ml timer.asm
+
+divtimer.obj: divtimer.cpp
+  wcc386 /oneatx /wx /zp4 /fpc /mf /bt=dos /3r divtimer.cpp
+

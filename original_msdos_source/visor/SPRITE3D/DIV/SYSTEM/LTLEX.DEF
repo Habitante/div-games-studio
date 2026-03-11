@@ -1,0 +1,136 @@
+;ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+;       Definiciones de tokens
+;ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+;       Si se declaran dos o m s s¡mbolos con el mismo identificador, solo se
+;       reconocer  el primero (sean tokens u objetos de la tabla)
+;       Limitaci¢n, no mezclar s¡mbolos con car cteres de identificador en un
+;       solo token (los car cteres de ident. son los que est n en lower[]).
+;       Est n libres para ser redefinidos los c¢digos de token &01..&77 (hex)
+;ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+&01program              ;Program
+&02const                ;Const
+&03global               ;Global
+&04local                ;Local
+&05begin                ;Begin
+&06end                  ;End
+&07process              ;Process
+&08private              ;Private
+&09struct               ;Struct
+&0Aimport               ;Import
+&0Bsetup_program        ;Setup_program
+
+&10until                ;Until
+&11else                 ;Else
+
+&18return               ;Return
+
+&19from                 ;From
+&1Ato                   ;To
+&1Bstep                 ;Step
+
+&20if                   ;If
+
+&21loop                 ;Loop
+&22while                ;While
+&23repeat               ;Repeat
+&24for                  ;For
+
+&25switch               ;Switch
+&26case                 ;Case
+&27default              ;Default
+
+&28frame                ;Frame
+
+&29break                ;Break
+&2Acontinue             ;Continue
+
+&2Bclone                ;Clone
+
+&2Cdebug                ;Debug
+
+&30; &30:               ;Separador de sentencias
+&31,                    ;Separador de expresiones
+
+&32[                    ;Indirecci¢n, inicio
+&33]                    ;Indirecci¢n, final
+
+&38= &38:=              ;Asignaci¢n
+
+&3Cdup                  ;Dup
+
+&40(                    ;Par‚ntesis, apertura
+&41)                    ;Par‚ntesis, cierre
+
+;&44add                 ;Suma exclusivamente binaria, pasa a + en tab_exp
+;&45sub                 ;Resta exclusivamente binaria, pasa a -
+
+&46>>                   ;Rotaci¢n a la derecha
+&47<<                   ;Rotaci¢n a la izquierda
+
+&48or &48|| &48|        ;Or l¢gico
+&49xor &49^^            ;Xor l¢gico
+&4Aand &4A&&            ;And l¢gico
+
+&4B^                    ;Pointer (unario) o bien xor l¢gico (binario)
+&4C&                    ;Offset (unario) o bien and l¢gico (binario)
+
+&4Eneg                  ;Signo menos unario
+&4Fpointer              ;Operador de indirecci¢n, unario
+
+&50offset               ;Desplazamiento unaria
+&51! &51not             ;Negaci¢n l¢gica unaria
+                                                                               §
+&52+                    ;Suma binaria, usado como unario es ignorado
+&53-                    ;Resta binaria, usado como unario equivale a neg
+
+&54*                    ;Multiplicaci¢n, usado como unario equivale a pointer
+&55/ ;&55div            ;Divisi¢n entera, cociente
+&56% &56mod             ;M¢dulo, resto de divisi¢n entera
+;&57mul                 ;Multiplicaci¢n exclusivamente binaria, pasa a *
+
+&58++                   ;Incremento
+&59--                   ;Decremento
+
+&5B== &5B_eq            ;Igual, operador binario de comparaci¢n
+&5C<> &5C!= &5C_ne      ;Diferente
+
+&5D> &5D_gt             ;Mayor
+&5E< &5E_lt             ;Menor
+&5F<= &5F=< &5F_le      ;Menor o igual
+&60>= &60=> &60_ge      ;Mayor o igual
+
+&66sizeof               ;Funci¢n sizeof() interna, devuelve longitud
+
+&67type                 ;Operando que significa el c¢digo del proceso ejecutado
+
+&68id &68whoami         ;Operando que significa el c¢digo del proceso ejecutado
+
+&69. &69->              ;Operador de acceso a variables ajenas (ej.: nave.x)
+
+&6A..                   ;Especificador de rango (dentro de un case)
+
+&6B+=                   ;Asignaciones operativas (abreviaturas de C)
+&6C-=
+&6D*=
+&6E/=
+&6F%=
+&70&=
+&71|=
+&72^=
+&73>>=
+&74<<=
+
+;ÄÄÄ C¢digos de token especiales o reservados ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+&00                    ;&00 p_£ltima (Fin de fichero)
+&78' &79"               ;&78..&7B delimitadores de literales (interno an.lex.)
+                        ;&7C reservado                                     (")
+&7D/*                   ;&7D Inicio de un comentario de varias l¡neas
+&7E*/                   ;&7D Fin de un comentario de varias l¡neas
+&7F//                   ;&7F Inicio de un comentario de una l¡nea          (")
+                        ;&80..&FC (reservados)                             (")
+                        ;&FD identificador
+                        ;&FE constante entera
+
+;ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ

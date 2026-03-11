@@ -1,0 +1,5 @@
+        system pmode
+        debug all
+        option stack=40k
+        name c.exe
+        file c.obj

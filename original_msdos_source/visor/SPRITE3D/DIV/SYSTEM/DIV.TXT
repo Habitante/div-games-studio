@@ -1,0 +1,638 @@
+
+             ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+                 DIV Games Studio - Versi¢n de demostraci¢n.
+                     (C) 1997/98 Hammer Technologies.
+             ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+­Bienvenido a DIV!
+
+Este documento muestra los conceptos b sicos para introducirte en el manejo
+de DIV Games Studio. Si tiene prisa m s vale que vuelva en otra ocasi¢n...
+
+Si quieres £nicamente ejecutar los juegos ejemplo (y si los has instalado
+en el disco duro) puedes pulsar F4 para cargarlos y despu‚s F10 para
+ejecutarlos. Los programas disponibles en esta demostraci¢n son los
+siguientes:
+
+ MALVADO.PRG  - Juego de plataformas (requiere 8 Mb de RAM)
+ FOSTIATO.PRG - Juego de lucha (requiere 12 Mb de RAM)
+ TUTOR1.PRG y TUTOR2.PRG - Dos peque¤os programas ejemplo.
+
+Podr s jugar a los dos juegos aunque no tengas la RAM necesaria, pero en ese
+caso se ralentizar  considerablemente su ejecuci¢n. Las instrucciones para
+estos juegos se muestran al final de este documento.
+
+Importante: Puede siempre salir de un programa pulsando ALT+X, con lo que
+retornar  al entorno de vantanas inmediatamente.
+
+             ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+Esta es una ventana de texto, similar a otros editores de texto (como Edit).
+Las ventanas de texto se utilizan normalmente para crear los programas,
+puedes desplazarte por el texto con las teclas usuales: Cursores, Av.P g, ...
+
+             ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+¨Que es DIV Games Studio?
+
+Se podr¡a decir que es un entorno gr fico que integra un nuevo lenguaje de
+programaci¢n para videojuegos junto a otras utilidades como un programa de
+dibujo, herramientas para crear fuentes de letras, paletas, etc.
+
+El lenguaje de programaci¢n ha sido dise¤ado en exclusiva para la creaci¢n
+de juegos y, como podr s observar, permite obtener muy buenos resultados con
+programas muy cortos y sencillos.
+
+No es necesario que usted sepa programar para poder utilizarlo, DIV se ha
+dise¤ado para que se pueda aprender a programar con ‚l. Es simplemente
+cuesti¢n de perderle el miedo a la palabra "programar" ...
+
+Esta versi¢n de demostraci¢n contiene un completo sistema de ayuda integrado,
+que puede ser invocado pulsando la tecla F1 (puede probarlo, sin miedo). En
+esta ayuda encontrar  toda la informaci¢n necesaria para el manejo del
+programa.
+
+             ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+Conceptos b sicos.
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+En esta primera secci¢n se muestra, muy r pidamente, la funcionalidad b sica
+del entorno de ventanas y muchos de los t‚rminos que m s adelante se
+utilizar n para describir otras funciones m s avanzadas. Se recomienda su
+lectura incluso si usted es un usuario experto en el manejo de otros entornos
+gr ficos.
+
+Al entrar en DIV Games Studio aparecer  siempre un cuadro de di logo
+informativo; a partir de este momento el programa se podr  manejar
+b sicamente con el cursor del rat¢n.
+
+Se debe pulsar sobre el bot¢n de Aceptar situando el puntero del rat¢n sobre
+‚l y pulsando el bot¢n izquierdo. Siempre que aparezca un cuadro de di logo
+se pueden utilizar las siguientes teclas :
+
+ESC - Para anular o cancelar el di logo.
+TAB - Para elegir el control seleccionado.
+Enter - Para activar el control seleccionado.
+
+Movimiento de ventanas.
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+Los cuadros de di logo, como el resto de ventanas, pueden desplazarse hacia
+cualquier posici¢n de pantalla si se pulsa sobre la barra de t¡tulo con el
+rat¢n y se arrastra hasta la nueva posici¢n.
+
+Cuando se crea una nueva ventana, el sistema la colocar  en la zona de
+pantalla en la que menos informaci¢n considere que oculta, es decir, en el
+lugar donde menos moleste. Una excepci¢n a esto son los cuadros de di logo
+que siempre aparecer n centrados en pantalla, ya que requieren la atenci¢n
+directa del usuario.
+
+Para pedir al sistema que coloque una ventana autom ticamente, se debe
+realizar una doble pulsaci¢n con el bot¢n izquierdo del rat¢n sobre la barra
+de t¡tulo de la ventana. Si el sistema encuentra una posici¢n mejor para la
+ventana, la desplazar  hasta ella.
+
+Tipos de ventanas.
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+Se pueden clasificar las ventanas seg£n varios criterios; dependiendo de su
+estado se pueden dividir en:
+
+Primer plano: Son todas aquellas ventanas que muestran la barra de t¡tulo y
+un contenido informativo y que est n iluminadas (las ventanas que no est‚n
+tapadas total o parcialmente por otras). Sobre estas ventanas es sobre las
+£nicas que se pueden realizar acciones, no obstante, a£n cabe dividirlas en:
+
+  Ventanas activas: Son las que tienen, normalmente, si no se cambia
+  la configuraci¢n de colores, la barra de t¡tulo iluminada, en letras
+  blancas sobre fondo azul.
+
+  Ventanas inactivas: Este tipo de ventanas tienen la barra de t¡tulo
+  oscurecida, en letras negras sobre fondo gris oscuro. Para activar una
+  de estas ventanas bastar  con pulsar sobre ellas.
+
+Segundo plano: Son ventanas id‚nticas a las de primer plano, salvo que
+est n oscurecidas; esto es debido a que est n, al menos parcialmente,
+tapadas por otras ventanas. Con estas ventanas no se podr  interaccionar
+hasta que no se pasen a primer plano pulsando con el rat¢n sobre ellas. Las
+ventanas en segundo plano tambi‚n pueden estar activas o inactivas (seg£n
+el color de su barra de t¡tulo, ahora oscurecido).
+
+  Iconos: Los iconos son las ventanas que se ha minimizado, es decir, que se
+  han reducido temporalmente. Los iconos no muestran ning£n dibujo,
+  £nicamente un bot¢n con un signo m s seguido del t¡tulo de la ventana.
+
+Las ventanas se pueden, asimismo, clasificar seg£n su funci¢n, realiz ndose
+las siguientes agrupaciones:
+
+Cuadros de di logo: Se caracterizan por aparecer centrados en pantalla, por
+no poder minimizarse (convertirse en un icono), y pasar el resto de las
+ventanas a segundo plano (aunque no est‚n tapadas). Hay tres tipos de
+cuadros de di logo.
+
+  Ventanas informativas: Son cuadros como el que aparece al entrar en
+  DIV Games Studio, con un £nico bot¢n de aceptar que se utiliza para
+  continuar la ejecuci¢n una vez le¡do el mensaje.
+
+  Di logos interactivos: stos son los cuadros que se utilizan para
+  solicitar informaci¢n al usuario; existe una gran variedad de ellos, por
+  lo que ya se ir n viendo en las respectivas opciones. Suelen tener, al
+  menos, dos botones, uno de aceptar y otro de cancelar para anular la
+  acci¢n.
+
+  Cuadros de error: Son id‚nticos a las ventanas informativas, salvo
+  que la barra de t¡tulo aparece en blanco sobre rojo e informan de alg£n
+  problema que se haya producido.
+
+Ventanas convencionales: Estas ventanas £nicamente dejan en segundo
+plano a las ventanas a las que tapen; pueden minimizarse en cualquier
+momento y aparecer en cualquier posici¢n de la pantalla. A continuaci¢n, se
+muestran los principales tipos de ventanas.
+
+  Men£s de opciones: Los men£s son una lista de opciones que
+  llaman a otros men£s, ventanas o di logos al pulsar sobre ellas. Todos
+  los men£s parten del men£ principal. Algunos men£s tienen ciertas
+  opciones desactivadas (se muestra un puntero con un s¡mbolo
+  prohibido al situar el rat¢n sobre ellas); esto es debido a que dichas
+  opciones interact£an con un tipo de ventanas en concreto, y no hay
+  ninguna ventana de dicho tipo activa (se debe crear antes o cargar
+  una). En el sistema de ayuda se muestran pr cticamente la totalidad de
+  herramientas accedidas mediante los men£s de opciones.
+
+  Programas: En estas ventanas es donde se crean los programas y son
+  ventanas de edici¢n de texto. Para editar un programa debe estar su
+  ventana activada (s¢lo uno de los programas cargados puede estar
+  activado). La edici¢n de texto es muy similar a otros editores de texto
+  (soporta el est ndar EDIT entre ellos). Se puede ver un resumen de
+  los comandos de edici¢n disponibles en el ap‚ndice D. Estas ventanas
+  se controlan desde el men£ de programas y el men£ de edici¢n, y para
+  pedir ayuda en un programa sobre una palabra del lenguaje hay que
+  situar el cursor parpadeante de edici¢n (y no el puntero del rat¢n) sobre
+  la misma y, despu‚s, pulsar la tecla F1. Estas ventanas pueden
+  cambiarse de tama¤o pulsando en el bot¢n inferior derecho de las
+  mismas y arrastrando con el rat¢n.
+
+  Mapas o gr ficos: Estas ventanas son las que contienen un mapa
+  (bitmap) o gr fico (un dibujo de los empleados en un juego) y se
+  controlan por medio del men£ de mapas. Pueden cargarse de un
+  archivo MAP (formato propio), importarse de un archivo PCX o BMP, o
+  bien, grabarse en cualquiera de estos formatos. Para editar los gr ficos
+  se debe realizar una doble pulsaci¢n del bot¢n izquierdo del rat¢n
+  sobre estas ventanas entrando, de este modo, en el editor gr fico
+  (descrito en el la ayuda). Estos gr ficos pueden arrastrarse hasta el
+  tapiz (para hacer una copia), hasta otro gr fico (para insertarlos), hasta
+  un fichero de gr ficos (para incluirlos) o hasta la papelera (para
+  borrarlos (*)). Se pueden manejar mapas de cualquier tama¤o, con el
+  £nico l¡mite de la memoria disponible.
+
+  Ficheros de gr ficos: Estas ventanas se corresponden siempre con
+  un fichero FPG en el disco. Son librer¡as o colecciones de gr ficos
+  utilizadas en los juegos; su utilidad reside en no tener que cargar en un
+  juego una gran cantidad de mapas por separado. Tienen dos modos
+  b sicos de funcionamiento, activados mediante dos casillas en su parte
+  inferior. El primer modo es Marcar/Arrastrar y es el utilizado para
+  marcar y desmarcar una serie de gr ficos sobre los que se quiere
+  realizar una operaci¢n, o bien para arrastrar gr ficos hacia fuera del
+  fichero (hacia el tapiz, otros ficheros, mapas o la papelera). El segundo
+  es Info, y consiste en el modo en el que se pueden editar los c¢digos
+  de los gr ficos y sus descripciones o, simplemente, visualizar su
+  contenido. Los ficheros de gr ficos se controlan mediante el men£ de
+  ficheros.
+
+  Fuentes de letras: Las fuentes o tipos de letra son unas ventanas
+  peque¤as que representan una tipograf¡a concreta. Se debe pulsar
+  sobre ellas para ver una muestra del fuente. Se corresponden con
+  archivos FNT (formato propio) y son controladas por el men£ de
+  fuentes, desde el cual se puede acceder al generador de fuentes que
+  es la herramienta utilizada para crear nuevas fuentes de letras. Las
+  fuentes de letras se utilizan dentro del programa de dibujo y en los
+  juegos para escribir textos.
+
+  Efectos de sonido: Representan en pantalla un archivo PCM (pulse
+  code modulation) con un efecto de sonido. Se controlan mediante el
+  men£ de sonidos y pueden importarse de archivos WAV. En esta
+  versi¢n del programa no hay posibilidad de editar los efectos
+  de sonido desde el entorno, aunque se puede encontrar una librer¡a de
+  casi 1000 efectos de sonido ya preparados para su utilizaci¢n en los
+  juegos. Para escuchar un efecto de sonido se debe tener una tarjeta
+  de sonido compatible con las familias Sound Blaster o Gravis
+  Ultrasound correctamente configurada y pulsar sobre una de estas
+  ventanas.
+
+  Ventanas de ayuda: Se controlan principalmente con el cursor del
+  rat¢n, pudiendo utilizar tambi‚n los cursores, las teclas de avance y
+  retroceso p gina y la tecla Backspace para volver a la p gina
+  anterior (es la tecla de borrar que est  sobre Enter o Retorno). En las
+  ventanas de ayuda se muestra texto en tres colores: en negro el texto
+  principal, en gris claro los textos resaltados (negrita) y en blanco los
+  textos que hacen referencia a otras p ginas de ayuda. Se debe pulsar
+  sobre estas referencias para acceder a dichas p ginas. En las
+  ventanas de ayuda tambi‚n se muestran ejemplos que se pueden
+  extraer pulsando sobre ellos, ejecutar con la tecla F10 y abortar
+  pulsando ALT+X.
+
+(*) La ventana de la papelera se debe activar primero a partir del men£ de
+sistema, con la opci¢n correspondiente del mismo.
+
+Controles b sicos de las ventanas.
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+A continuaci¢n se van a describir los principales controles utilizados en
+las ventanas, que son:
+
+Bot¢n de minimizar. Es el primer bot¢n de la barra de t¡tulo de las ventanas
+convencionales, los cuadros de di logo carecen de ‚l. Se utiliza para
+minimizar las ventanas, es decir, para convertirlas en un icono. Las
+ventanas se minimizan cuando se necesita espacio libre para trabajar en el
+escritorio, si bien una alternativa a cerrarlas pero sin perder la
+informaci¢n que contienen.
+
+Bot¢n de maximizar. Este bot¢n est  presente £nicamente en los iconos y es
+el utilizado para maximizar las ventanas, recuperar la ventana completa a
+partir de su icono. Las ventanas recuperar n su posici¢n original, a no ser
+que en dicha posici¢n tapen a otra ventana y haya espacio libre para ellas
+en otra zona del escritorio. Los iconos pueden moverse a cualquier posici¢n
+de pantalla pulsando sobre su nombre y arrastrando. Con una doble pulsaci¢n
+sobre el nombre del icono se pedir  al sistema que busque la mejor posici¢n
+del escritorio para dicho icono.
+
+Bot¢n para cerrar. Es el bot¢n utilizado para cerrar las ventanas, es decir,
+para eliminarlas. Este bot¢n est  presente en todas las ventanas y cuadros
+de di logo, excepto en los iconos, que deben maximizarse para que se puedan
+cerrar. Seg£n el tipo de ventana que se cierre se pedir  confirmaci¢n antes;
+esto suceder  en ventanas que contengan informaci¢n que pueda perderse. En
+otras ventanas, como los men£s, no se pedir  esta confirmaci¢n ya que pueden
+volver a crearse en cualquier momento.
+
+Bot¢n de ampliar. El bot¢n de ampliar aparece en las ventanas de programas y
+es el utilizado para ajustar el tama¤o de la ventana al m ximo posible. Se
+debe volver a pulsar el mismo bot¢n en la ventana ampliada para devolverla a
+su tama¤o original. Esta acci¢n se puede realizar igualmente pulsando las
+teclas Control+Z, en este caso, si hubiera varias ventanas de programa, se
+ampliar¡a (o reducir¡a) la que estuviera activa de todas ellas. Para activar
+una ventana basta con pulsar con el rat¢n sobre ella.
+
+Bot¢n de reescalado. Este bot¢n liso aparece en las ventanas de programas y
+en las de ayuda. Se utiliza para variar manualmente el tama¤o de la ventana.
+Se debe pulsar con el bot¢n izquierdo del rat¢n en ‚l y, sin soltarlo, mover
+el rat¢n hasta que la ventana alcance el tama¤o deseado. Las ventanas de
+ayuda £nicamente pueden reescalarse verticalmente (a¤adir o quitar l¡neas,
+pero no columnas). Las ventanas de programas no superar n el l¡mite de 80
+columnas por 50 l¡neas en ning£n caso.
+
+Barra de desplazamiento. Estas barras est n siempre asociadas a una ventana
+de visualizaci¢n, como puede ser una lista de elementos, e indican la
+posibilidad de desplazar el contenido de la ventana. En sus extremos se
+encuentran dos botones direccionales utilizados para desplazar poco a poco
+la lista de elementos. Un indicador rectangular m¢vil situado entre ambos
+botones muestra qu‚ parte de la lista se est  visualizando. Pulsando sobre
+la barra se desplazar  la lista r pidamente hasta situarse el indicador en
+la posici¢n seleccionada.
+
+Bot¢n de texto. Estos botones aparecen en los cuadros de di logo; su funci¢n
+depende del texto inscrito en el bot¢n. Los m s comunes son los botones de
+Aceptar, para validar la acci¢n del cuadro de di logo, y los de Cancelar,
+para anular la acci¢n de dicho cuadro. En muchas ocasiones este £ltimo bot¢n
+equivaldr  al bot¢n de cerrar el cuadro descrito con anterioridad, situado
+en su esquina superior derecha. Para ver la funci¢n de un bot¢n de texto
+concreto se debe acceder a la explicaci¢n de su cuadro de di logo. La
+mayor¡a de ellos est n descritos en la ayuda. Se puede seleccionar cualquier
+bot¢n de texto con una o varias pulsaciones de la tecla TAB, y activarlo con
+la tecla Enter (el bot¢n se mostrar  con un borde oscuro cuando est‚
+seleccionado).
+
+Casilla. Las casillas son opciones del programa que pueden ser activadas o
+desactivadas; el texto contiguo a la casilla hace referencia a la opci¢n o
+caracter¡stica del programa cuyo estado se puede establecer. Dicha
+caracter¡stica estar  activada cuando dentro de la casilla aparezca un punto
+de color negro. Para activar o desactivar estas opciones £nicamente se tiene
+que pulsar con el rat¢n sobre la casilla o el texto, no habiendo posibilidad
+de modificar una casilla mediante comandos de teclado.
+
+Cuadro de texto. Son los cuadros utilizados para solicitar cualquier
+informaci¢n num‚rica o alfab‚tica, pero tambi‚n pueden ser seleccionados con
+la tecla TAB. Una vez seleccionados se mostrar  un borde oscuro en el cuadro
+y podr  comenzarse a escribir directamente, o bien pulsar la tecla Enter para
+pasar a modo edici¢n. Una vez en editado el texto, la tecla Enter validar 
+el nuevo texto, mientras que la tecla ESC anular  la edici¢n, recuperando el
+cuadro de texto su contenido anterior. Se puede editar un cuadro pulsando
+con el rat¢n sobre ‚l; la primera pulsaci¢n activar  el cuadro manteniendo
+el texto anterior, y una segunda pulsaci¢n lo borrar .
+
+             ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+Sistema de men£s.
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+El sistema de men£s es un conjunto de ventanas con opciones que parten de la
+ventana denominada Men£ principal; una vez activado un men£ permanecer  en
+pantalla hasta que sea cerrado o minimizado. Cualquier men£ puede volver a
+crearse a partir del principal cuando se vuelva a necesitar.
+
+Cuando se hace referencia a una opci¢n cualquiera se indica el nombre del
+men£ y la opci¢n separados por una barra invertida. Por ejemplo, la opci¢n
+Programas \ Nuevo... se refiere a la primera opci¢n del men£ de programas
+que sirve para crear un nuevo programa.
+
+Algunas opciones de men£s tienen atajos de teclado, combinaciones de teclas
+que permiten realizar la acci¢n directamente, incluso sin haber abierto el
+men£ correspondiente. En estos casos se indica siempre la combinaci¢n de
+teclas en el propio men£, a continuaci¢n del texto de la opci¢n.
+
+Para salir del entorno se debe pulsar ALT+X apareciendo, a continuaci¢n, un
+cuadro de confirmaci¢n. Existe una combinaci¢n r pida para salir del entorno
+directamente sin tener que dar una confirmaci¢n; ‚sta es ESC+Control. Los
+usuarios de Windows deben tener cuidado al pulsar esta combinaci¢n en este
+orden; primero, pulsar la tecla ESC y, sin soltarla, pulsar la tecla
+Control, ya que si se pulsa esta combinaci¢n al rev‚s (Control+ESC) se
+invocar  al men£ de inicio del sistema Windows.
+
+El contenido del escritorio de DIV Games Studio ser  restaurado en la
+pr¢xima ejecuci¢n tal y como se dej¢ al salir, por lo que nunca se perder 
+informaci¢n por salir del entorno.
+
+A continuaci¢n se muestra un resumen de las funciones de los men£s
+principales a los que se accede a partir del principal. Se recuerda que en
+la ayuda se indican las funciones de estos men£s en detalle.
+
+Programas.
+ÄÄÄÄÄÄÄÄÄÄ
+
+Es el men£ desde el cual se pueden cargar programas, ejecutarlos,
+trazarlos, o crear programas nuevos. Los programas se muestran en ventanas
+de edici¢n. A partir de este men£ se accede al de Edici¢n, que muestra los
+comandos b sicos de edici¢n de texto (cortar, pegar, b£squedas,
+sustituciones, etc).
+
+Paletas.
+ÄÄÄÄÄÄÄÄ
+
+La paleta de colores es el conjunto de 256 colores utilizado por el juego;
+desde este men£ se pueden cargar paletas (de m£ltiples formatos de
+archivos), grabar, editar (para crear nuevas paletas), ordenar, fusionar,
+etc. Todos los gr ficos utilizados en un juego simult neamente (en la misma
+pantalla o fase) deben haberse creado con la misma paleta de colores. Cuando
+en el escritorio hay un gr fico y se pretende cargar otro con una paleta
+diferente el sistema obligar  a adaptar uno de ellos a la paleta del otro.
+En la ayuda se ofrece una explicaci¢n m s detallada sobre el uso de las
+paletas de colores.
+
+Mapas.
+ÄÄÄÄÄÄ
+
+Los mapas o gr ficos son la base de los juegos; este men£ permite trabajar
+con archivos MAP, PCX o BMP, para crear tanto los gr ficos de personajes
+como los decorados de los juegos. Se pueden cargar gr ficos de estos
+ficheros o grabarlos, editarlos, copiarlos, etc. Para editar los gr ficos se
+puede utilizar la opci¢n Editar mapa o realizar una doble pulsaci¢n con el
+bot¢n del rat¢n. Desde este men£ se accede tambi‚n al generador de
+explosiones.
+
+Ficheros.
+ÄÄÄÄÄÄÄÄÄ
+
+Los ficheros FPG son archivos que contienen librer¡as o colecciones
+completas de gr ficos; se utilizan en los juegos para cargar muchos gr ficos
+de golpe, para meter gr ficos en un fichero se deben arrastrar las ventanas
+de los mapas a la ventana del fichero. Este men£ da acceso a las opciones
+b sicas de ficheros.
+
+Fuentes.
+ÄÄÄÄÄÄÄÄ
+
+Las fuentes de letra (o tipos de letra) hacen referencia a los archivos FNT,
+que contienen juegos de caracteres, preparados para ser utilizados en los
+juegos. Este men£ permite realizar las opciones b sicas con estos archivos,
+entre ellas, acceder al generador de fuentes utilizado para crear nuevas
+fuentes de letras. Las £ltimas opciones de este men£ permiten exportar
+fuentes de letras a mapas gr ficos para retocarlos manualmente en el editor
+gr fico y, despu‚s, volverlos a importar hacia un archivo de fuente.
+
+Sonidos.
+ÄÄÄÄÄÄÄÄ
+
+Este men£ permite cargar efectos de sonido de archivos PCM y escucharlos,
+para localizar de esta forma los efectos apropiados para un juego, dentro de
+la librer¡a de sonidos de DIV Games Studio. Tambi‚n se pueden importar
+estos efectos a partir de archivos WAV, el est ndar de Windows.
+
+Sistema.
+ÄÄÄÄÄÄÄÄ
+
+El men£ de sistema da acceso a las herramientas gen‚ricas del entorno y a
+las opciones de configuraci¢n. Desde este men£ se pueden definir los
+colores, las fuentes y el modo de v¡deo utilizado por el entorno.
+
+             ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+Ejecuci¢n de los ejemplos.
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+En £ltima secci¢n se explicar  c¢mo ejecutar los juegos ejemplo de DIV Games
+Studio y las instrucciones para ellos, algo as¡ como su manual de
+instrucciones.
+
+Estos juegos son simples ejemplos por lo que, aunque se trata de juegos
+completos, la mayor¡a son muy sencillos o muy cortos. El motivo es que se ha
+pretendido mostrar las t‚cnicas que emplean y c¢mo se realizan los
+programas, ofreciendo, por ello, un bot¢n de muestra y no enormes listados
+en los que el lector se pierda. No obstante, hemos hecho todos estos juegos
+con mucha ilusi¢n, por lo que esperamos que los encuentre divertidos (a
+nosotros nos gustan mucho... ).
+
+Para ejecutar cualquiera de los ejemplos se debe, primero, cargar el
+programa con la opci¢n Programas \ Abrir programa..., con lo que aparecer 
+una ventana con el listado del programa cargado.
+
+Se anima al lector a investigar de esta forma, examinando los programas e
+intentando realizar alg£n cambio en ellos. sta es, sin duda, una de las
+mejores formas de aprender; al situarse sobre cualquier palabra reservada,
+constante, variable, funci¢n, etc., del lenguaje se puede pulsar la tecla F1
+para ver una p gina de ayuda sobre dicho objeto. Si no aparece la ayuda
+sobre el objeto (sino que aparece el ¡ndice general), es porque ‚ste no es
+un nombre propio del lenguaje DIV, sino que se trata de alguna constante,
+variable o proceso exclusivo del juego (los procesos son una especie de
+funciones que rigen el comportamiento de los gr ficos, o 'sprites', en los
+juegos).
+
+Se recomienda comenzar con alg£n juego sencillo como, por ejemplo, los
+tutoriales que, aunque no son t‚cnicamente avanzados ni gr ficamente
+espectacular, son de los m s f ciles de comprender. M s adelante, se podr 
+pasar a otros un poco m s complejos.
+
+Los textos que comienzan con el s¡mbolo // (doble barra) son comentarios
+explicativos, no forman parte del programa, sino que £nicamente consisten en
+notas aclaratorias sobre el funcionamiento del programa. Estos comentarios
+suelen ser vitales para poder comprender el funcionamiento de los programas,
+ya que se pueden colocar comentarios de este tipo en cualquier punto del
+programa.
+
+Para irse a uno de los procesos del programa (uno de los bloques que tienen
+los programas para controlar un gr fico o sprite del juego) se debe pulsar
+la tecla F5 y seleccionar el nombre del proceso en cuesti¢n con el rat¢n.
+
+Para ejecutar uno de los juegos cargados, se debe pulsar con el rat¢n sobre
+su ventana y despu‚s la tecla F10 (esta acci¢n tambi‚n se puede realizar con
+la opci¢n Programas \ Ejecutar).
+
+La tecla de Pausa se podr  utilizar en todos los juegos para detener su
+ejecuci¢n moment neamente.
+
+Todos los programas pueden abortarse en cualquier punto, independientemente
+de su programaci¢n, si se pulsa la combinaci¢n de teclas ALT+X.
+
+Las mentes m s inquietas pueden curiosear en los juegos pulsando la tecla
+F12 (desde el propio juego, estando ‚ste en ejecuci¢n), que permite acceder
+al trazador de programas, que es una utilidad dise¤ada para ejecutar paso a
+paso los juegos. Pudiendo observar todos los procesos y modificar sus
+variables (si se da con la variable apropiada, se pueden cambiar todos los
+par metros del juego, el n£mero de fase, las vidas, ...), por supuesto, no
+se ofrece ning£n tipo de garant¡a a estas alturas sobre los resultados
+obtenidos con ello.
+
+­A jugar!...
+
+             ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+THE CASTLE OF DOCTOR MALVADO
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+El protagonista de esta colorista aventura plataformera es Jack (Pepe para
+los amigos), un zagal regordete que, por alg£n motivo, est  muy cabreado
+con el perverso Doctor Malvado. Tiene que llegar hasta ‚l a trav‚s de
+m£ltiples obst culos y bellos parajes para destruirle y, de esta forma,
+saciar su sed de venganza.
+
+El juego se divide en tres fases. En la primera de ellas deber  atravesar un
+bosque y adentrarse en el castillo para, finalmente, enfrentarse con el
+a£n-m s-gordo-todav¡a hijo del Doctor. Despu‚s, deber  realizar una
+impresionante escalada por una de las torres del castillo sorteando ara¤as,
+calabazas embrujadas y dem s seres espeluznantes. Y, por £ltimo, enfrentare
+con Malvado y encontrar la retorcida forma de vencerle, bien sea jugando
+muchas veces o estudiando el listado del programa para ver lo que hace.
+
+Se cuenta con dos vidas extra para llegar hasta el final, que resultan a
+todas luces insuficientes, por lo que se podr n recoger nuevas vidas por
+el camino recolectando diez monedas de las muchas que hay dispersas por el
+mapeado.
+
+Si el lector es un aficionado a los juegos de plataformas, ‚ste le resultar 
+un reto divertido y particularmente dif¡cil, y, si por el contrario, no le
+gustan, le crispar  los nervios con total seguridad.
+
+Se puede jugar con joystick o con las siguientes teclas:
+
+Izquierda y derecha:    Desplazar a Jack hacia ambos lados.
+Espacio o Control:      Saltar.
+ESC:                    Abortar la partida o salir del juego.
+
+El protagonista puede subirse a muchos objetos en el mapeado, por ejemplo, a
+las setas del principio, con paciencia y tino. Se puede matar a los enemigos
+£nicamente si se salta sobre ellos, al igual que al hijo del Doctor, pero al
+mism¡simo Doctor Malvado ...
+
+             ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+FOSTIATOR
+ÄÄÄÄÄÄÄÄÄ
+
+Es el £ltimo combate, el definitivo, entre los mejores superguerreros
+bi¢nicos o de carne y hueso (alguno con m s hueso que carne). Este es un
+juego de lucha cl sico muy sencillo, pero no por ello menos divertido, y con
+algunos tintes 'gore' (generoso a la hora de representar la sangre).
+Implementa combates a tres asaltos entre dos guerreros, a seleccionar entre
+los siguientes cuatro:
+
+Alien: Un guerrero del a¤o 612 A.C. que, por consiguiente, est  ya algo
+oxidado. Resucit¢ en el a¤o 1992 con la intenci¢n de participar en las
+Olimpiadas, pero no le dejaron y ahora est  de muy mala leche. Su fuerza es
+medio-baja, pero su habilidad se basa en el manejo de una zarpa, entre
+Eduardo Manostijeras y el bueno de Freddy, que pondr¡a los pelos de punta
+hasta a los t¡os de Casper.
+
+Bishop: Es el chico bueno, un guerrero bi¢nico con abundantes implantes de
+alta tecnolog¡a. M s guapo que el Ken de la Barbie, participa en el torneo
+con el £nico fin de curtir su rostro. Su fuerza es medio-alta y su fuerte
+el yunque que lleva implantado en su mano, preparado para curtirle el rostro
+al resto de combatientes.
+
+Ripley: Es la £nica chica participante y, por lo tanto, tiene un cociente
+intelectual muy superior al resto de luchadores. Antes fue la mejor gimnasta
+del planeta, claro que tambi‚n fue camarera (por dos meses), dio clases a
+ni¤os, program¢ videojuegos, etc. Es la de menos fuerza f¡sica, pero uno de
+los huesos m s duros de roer, gracias al excelente manejo del, ahora
+afilado, bast¢n de R .
+
+Nostromo: Es uno de esos inmortales que todav¡a no se ha enfrentado a
+Christopher Lambert. Inmortal s¡, pero se le puede dejar K.O. como al resto.
+Rudo de modales, basa toda su estrategia en los golpes que es capaz de
+propinar con su hacha de doble filo. Gracias a ser el de m s fuerza puede
+que tenga algo que hacer con el resto.
+
+En la pantalla de selecci¢n de opciones se deben establecer las
+caracter¡sticas del combate, utilizando los cursores para seleccionar las
+opciones y la tecla Enter para activarlas. De arriba a abajo se pueden
+establecer las siguientes opciones:
+
+Control de jugadores. Se puede seleccionar qui‚n controla al primer jugador
+y qui‚n al segundo, de esta forma se puede seleccionar desde una
+demostraci¢n (ordenador contra ordenador) hasta un juego para dos jugadores.
+
+Nivel de dificultad. Se pueden establecer tres niveles de juego. Es posible
+ganar en el de m xima dificultad a cualquiera de los luchadores, por
+supuesto.
+
+Nivel de sangre. Se puede omitir la sangre, con lo que el juego pierde casi
+toda la gracia, o fijarla a uno de estos dos niveles: normal (que ya exagera
+un rato) o excesiva (...).
+
+Primer y segundo combatiente. Se puede seleccionar a cualquiera de los
+anteriormente descritos como primer y segundo jugador. Es posible seleccionar
+al mismo como primero y segundo vi‚ndose, en este caso, el primero en
+colores, mientras que el segundo se ver  en blanco y negro (y en rojo de vez
+en cuando).
+
+Escenario de juego. Se puede elegir entre tres escenarios para el combate:
+el castillo, la cueva o el desierto (por dar algo de variedad a los
+combates).
+
+Las teclas de juego se muestran en la opci¢n del control de los jugadores
+(la primera); con estas teclas se puede avanzar, retroceder, saltar y
+agacharse, disponiendo adem s de una tecla de golpe que, en funci¢n de la
+acci¢n realizada, propinar  uno u otro.
+
+Golpe parado.       Pu¤etazo (o golpe b sico).
+Avanzar y golpe.    Patada corta y r pida.
+Retroceso y golpe.  Super-patada giratoria.
+Salto y golpe.      Patada en el aire.
+Golpe agachado.     Pu¤etazo agachado (un golpe bajo).
+
+Se pueden realizar m s golpes diferentes ... si se programan primero.
+
+Estrategia de juego
+
+En este juego no todo consiste en golpear y golpear, se debe tener en cuenta
+que cada vez que se realiza un golpe de los anteriores ‚ste pierde
+efectividad, tanto si lo recibe el contrario como si queda en el aire. La
+defensa es tan importante como el ataque, por lo que se deben utilizar todos
+los golpes para aprovechar bien a un luchador, y no se debe repetir el mismo
+golpe muchas veces (pues, en ese caso, al final ya no le har  pr cticamente
+da¤o al contrario). Es decir, que conviene dar al contrario cada vez que se
+realiza un golpe ya que, en caso contrario, nuestro luchador se cansar 
+in£tilmente y se convertir  en carne de ca¤¢n.
+
+El modo f cil quiz  sea demasiado f cil, pero ganar en el modo dif¡cil es un
+reto bastante m s interesante ... y, por supuesto, las partidas a dos
+jugadores.
+
+             ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+Esperamos que disfrutes "cacharreando" con DIV, y te recordamos que en
+Diciembre del 97 sale a la venta, en todo el territorio nacional, la
+versi¢n completa por 4995 pesetas (una verdadera ganga).
+
+Te recordamos igualmente que la versi¢n completa incluye un magn¡fico libro
+sobre DIV, m s de 16 juegos completos con sus fuentes, m s de 1000 efectos
+de sonido, miles de gr ficos preparados para crear tus juegos, much¡simos
+m s tipos de letra, etc.

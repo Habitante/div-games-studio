@@ -1,0 +1,427 @@
+//ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+//      Pre-Carga de la tabla de objetos
+//ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+//ÄÄÄ Constantes ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+const m320x200=320200   // Identificadores de los diferentes modos de v¡deo
+const m320x240=320240
+const m320x400=320400
+const m360x240=360240
+const m360x360=360360
+const m376x282=376282
+const m640x400=640400
+const m640x480=640480
+const m800x600=800600
+const m1024x768=1024768
+
+const true=1            // Constante que vale TRUE (todas las impares)
+const false=0           // Constante que vale FALSE (todas las pares)
+
+const pi=180000         // PI en coma fija (grados * 1000, radianes * 57295.77951)
+
+const s_kill=0          // Se¤al de matar un proceso
+const s_wakeup=1        // Se¤al de despertar un proceso
+const s_sleep=2         // Se¤al de dormir un proceso (ejecuci¢n/visualizaci¢n)
+const s_freeze=3        // Se¤al de congelar un proceso (solo ejecuci¢n)
+
+const s_kill_tree=100   // Se¤ales enviadas a un proceso
+const s_wakeup_tree=101 // que afectan igualmente a toda
+const s_sleep_tree=102  // su descendencia.
+const s_freeze_tree=103 //
+
+const all_text=0        // Identificador de texto gen‚rico
+const all_sound=-1      // Identificador de texto gen‚rico
+
+const g_wide=0          // Ancho
+const g_height=1        // Alto
+const g_x_center=2      // X centro
+const g_y_center=3      // Y centro
+
+const c_screen=0        // Tipo de coordenada de pantalla
+const c_scroll=1        // Tipo de coordenada de scroll
+const c_m7=2            // Tipo de coordenada de m7
+const c_m8=3            // Tipo de coordenada de m8
+
+const partial_dump=0    // Volcado parcial (dump_type)
+const complete_dump=1    // Volcado completo (dump_type)
+
+const no_restore=-1      // No restaurar el fondo (restore_type)
+const partial_restore=0  // Restauraci¢n de fondo parcial
+const complete_restore=1 // Restauraci¢n de fondo completa
+
+const c_0=1             // Indicadores de un plano de scroll/m7 (para cnumber)
+const c_1=2
+const c_2=4
+const c_3=8
+const c_4=16
+const c_5=32
+const c_6=64
+const c_7=128
+const c_8=256
+const c_9=512
+
+//ÄÄÄ Scan codes ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+// Nota: Estos c¢digos se deben corresponder con el fichero HELP.PRG
+
+const _esc=1
+const _f1=59
+const _f2=60
+const _f3=61
+const _f4=62
+const _f5=63
+const _f6=64
+const _f7=65
+const _f8=66
+const _f9=67
+const _f10=68
+const _f11=87
+const _f12=88
+const _prn_scr=55
+const _scroll_lock=70
+
+const _wave=41
+const _1=2
+const _2=3
+const _3=4
+const _4=5
+const _5=6
+const _6=7
+const _7=8
+const _8=9
+const _9=10
+const _0=11
+const _minus=12
+const _plus=13
+
+const _backspace=14
+const _tab=15
+const _q=16
+const _w=17
+const _e=18
+const _r=19
+const _t=20
+const _y=21
+const _u=22
+const _i=23
+const _o=24
+const _p=25
+const _l_brachet=26
+const _r_brachet=27
+const _enter=28
+
+const _caps_lock=58
+const _a=30
+const _s=31
+const _d=32
+const _f=33
+const _g=34
+const _h=35
+const _j=36
+const _k=37
+const _l=38
+const _semicolon=39
+const _apostrophe=40
+const _backslash=43
+
+const _l_shift=42
+const _z=44
+const _x=45
+const _c=46
+const _v=47
+const _b=48
+const _n=49
+const _m=50
+const _comma=51
+const _point=51
+const _slash=51
+const _r_shift=54
+
+const _control=29
+const _alt=56
+const _space=57
+
+const _ins=82
+const _home=71
+const _pgup=73
+const _del=83
+const _end=79
+const _pgdn=81
+
+const _up=72
+const _down=80
+const _left=75
+const _right=77
+
+const _num_lock=69
+const _c_backslash=53
+const _c_asterisk=55
+const _c_minus=74
+const _c_home=71
+const _c_up=72
+const _c_pgup=73
+const _c_left=75
+const _c_center=76
+const _c_right=77
+const _c_end=79
+const _c_down=80
+const _c_pgdn=81
+const _c_ins=82
+const _c_del=83
+const _c_plus=78
+const _c_enter=28
+
+//ÄÄÄ Variables globales ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+global struct mouse[0]
+        x               // Coordenada X del rat¢n
+        y               // Coordenada Y del rat¢n
+        z               // Prioridad de impresi¢n del gr fico
+        file            // Fichero que contiene el gr fico
+        graph           // Gr fico asignado al rat¢n
+        angle           // Angulo del puntero
+        size            // Tama¤o en porcentaje
+        flags           // Flags del rat¢n
+        region          // Region de corte
+        left            // Bot¢n izquierdo del rat¢n
+        middle          // Bot¢n central del rat¢n
+        right           // Bot¢n derecho del rat¢n
+end
+
+global struct scroll[9]
+        z               // Prioridad de impresi¢n
+        camera          // Id del proceso al que sigue el scroll (p.def 0-n/a)
+        ratio           // Background speed ratio (p.def 200, la mitad del primero)
+        speed           // Velocidad m xima del scroll (primer plano) (p.def 0-Sin l¡mite)
+        region1         // Region de bloqueo del scroll (p.def -1)
+        region2         // Region exterior del scroll (sin velocidad m xima, p.def -1)
+        x0              // Coordenadas del primer plano de scroll
+        y0              // (esquina superior izquierda de la ventana)
+        x1              // Coordenadas del segundo plano
+        y1              // (plano del fondo, si hay)
+end
+
+global struct m7[9]
+        z               // Prioridad de impresi¢n
+        camera          // Id del proceso al que sigue la c mara
+        height          // Altura de la c mara
+        distance        // Distancia de la c mara al proceso seguido
+        horizon         // Altura del horizonte
+        focus           // Focal para la c mara (0..512)
+        color           // Color para el exterior del modo-7
+end
+
+global struct joy[0]
+        button1
+        button2
+        button3
+        button4
+        left
+        right
+        up
+        down
+end
+
+global struct setup[0]
+        card
+        port
+        irq
+        dma
+        dma2
+        master
+        sound_fx
+        cd_audio
+end
+
+global struct net[0]
+        dispositivo     // 1-IPX, 2-Serie, 3-Modem
+        com             // 1..4 (serie y modem)
+        velocidad       // Hasta 115000 (serie y modem)
+        telefono        // Numero de telefono (modem) ej. net.telefono="913040622"
+        cadena_inicio   // Cadena de inicio del modem. ej. net.cadena_inicio="ATZ"
+        tonos           // 0-1 segun sea pulsos o tonos (modem)
+        servidor        // Indica si es servidor (no tocar)
+        num_players     // Numero maximo de jugadores (2..16)
+end
+
+global struct m8[9]
+        z               // Prioridad de impresi¢n
+        camera          // Id del proceso al que sigue la c mara
+        height          // Altura de la c mara respecto al proceso
+        angle           // Angulo de subida - bajada de la camara (-128,128)
+end
+
+global timer[9]         // 10 Contadores de mil‚simas para el usuario
+
+global text_z=-256      // Prioridad de impresi¢n de los textos
+
+global fading=0         // Indica si se est  realizando un fade
+
+global shift_status=0   // Actual shift status
+global ascii=0          // Ascii code of last key pressed
+global scan_code=0      // Scan code of last key pressed
+
+global joy_filter=10    // Filtro aplicado al joystick (0..100%)
+global joy_status=1     // Estado del joystick (0-off, 1-on, 2-forced)
+
+global restore_type=1   // -1 No restaura, 0 Parcialmente, 1 Por completo
+global dump_type=1      // 0 Volcado parcial, 1 Volcado completo
+
+global max_process_time=500 // Maximo tiempo de ejecuci¢n para un proceso
+
+global fps=0            // N£mero de frames por segundo
+
+//ÄÄÄ Variables locales ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+local struct reserved[0]
+        process_id     // Identificador del proceso
+        id_scan        // Para scanear procesos (colisiones)
+        process_type   // Tipo de proceso
+        type_scan      // Para scanear procesos por tipo
+        status         // Estado actual de este proceso
+        param_offset   // Puntero a los par metros pasados
+        program_index  // Contador de programa para este proceso
+        is_executed    // Indica si el proceso ya ha sido ejecutado
+        is_painted     // Indica si el proceso ya ha sido pintado
+        distance_1     // Distancia 1 del proceso (reservado modo 7)
+        distance_2     // Distancia 2 del proceso (idem)
+        frame_percent  // Porcentaje de frame recorrido
+        box_x0         // Caja ocupada por el sprite cada
+        box_y0         // vez que se pinta para realizar
+        box_x1         // volcado y restauraci¢n de fondo
+        box_y1         // parcial (dump_type==partial_dump)
+end
+
+local father=0          // Identificador del padre
+local son=0             // Identificador del £ltimo hijo
+local smallbro=0        // Identificador del hermano menor
+local bigbro=0          // Identificador del hermano mayor
+local priority=0        // Prioridad de proceso (a mayor se procesa antes)
+local ctype=0           // Tipo de coordenada
+local x=0               // Coordenada X
+local y=0               // Coordenada Y
+local z=0               // Prioridad de impresi¢n del gr fico
+local graph=0           // C¢digo del gr fico para este proceso
+local flags=0           // +1 iversi¢n horiz., +2 inversion vert., +4 Ghost
+local size=100          // Tama¤o del proceso (en tanto por ciento)
+local angle=0           // Angulo del proceso
+local region=0          // Regi¢n de clipping para este proceso
+local file=0            // Fichero del que tomar los gr ficos
+local xgraph=0          // Puntero a tabla: n§graficos, graf_angulo_0, ...
+local height=1          // Altura de los procesos en el modo-7 (pix/4)
+local cnumber=0         // N§ de scroll o m7 en el que est  (0 en todos, o bien: +1 en el 0, +2 en el 1, +4 en el 2, ...)
+local resolution=0      // Resoluci¢n de las coordenadas x,y (0,10,100,...)
+
+local radius=0          // Radio del objeto en m8 (2...)
+local m8_object=-1      // Objeto dentro del mundo m8 (No tocar)
+local old_ctype=0       // Antiguo Ctype (No tocar)
+local m8_wall=-1        // Pared de modo 8 con la que colisiona
+local m8_sector=-1      // Sector de modo 8 en el que se encuentra
+local m8_nextsector=-1  // Sector de modo 8 que se encuentra al otro lado de la pared con la que colisiona
+local m8_step=32        // Lo que puede subir automaticamente en modo 8 al chocar con una pared (altura escalon)
+
+//ÄÄÄ Funciones gen‚ricas ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+// process <FUNCION> = c¢digo de dicha funci¢n, n£mero de par metros
+
+process signal=0,2              // Envia una se¤al a un proceso (id,se¤al)
+process key=1,1                 // Devuelve el estado de una tecla (scan_code)
+process load_pal=2,1            // Carga una paleta de color ("fichero.pal")
+process load_fpg=3,1            // Carga un fichero con gr ficos ("fichero.fpg")
+process start_scroll=4,6        // Crea una ventana de scroll (n,file,graf1,graf2,region,flags=0)
+process stop_scroll=5,1         // Elimina los planos de scroll que haya activos (n)
+process out_region=6,2          // Indica si un proceso est  fuera de una region (id,regi¢n)
+process graphic_info=7,3        // Devuelve informaci¢n de un gr fico (file,graph,info)
+process collision=8,1           // Devuelve el id del proceso "tipo" colisionante (tipo)
+process get_id=9,1              // Devuelve el primer id de un "tipo" determinado (tipo)
+process get_distx=10,2          // Devuelve distancia x de (angulo, distancia)
+process get_disty=11,2          // Devuelve distancia y de (angulo, distancia)
+process get_angle=12,1          // Devuelve el angulo hacia otro proceso (id)
+process get_dist=13,1           // Devuelve la distancia a otro proceso (id)
+process fade=14,4               // Fade de pantalla (%r,%g,%b,speed(1-lento .. 10-r pido))
+process load_fnt=15,1           // Carga un set de car cteres (256 colores, ancho var.) ("fichero.fnt")
+process write=16,5              // Escribe un texto (font,x,y,centro,texto)
+process write_int=17,5          // Escribe un numero (font,x,y,centro,&variable)
+process delete_text=18,1        // Borra un texto con su (id), o todos si (all_text)
+process move_text=19,3          // Indica nuevas coordenadas para un texto (t,x,y)
+process unload_fpg=20,1         // Descarga de memoria un fichero fpg (c¢digo_fpg)
+process rand=21,2               // Devuelve un n£mero aleatorio (min,max) ambos incluidos
+process define_region=22,5      // Define una regi¢n de pantalla (n(1..max_region),x,y,an,al)
+process xput=23,8               // Pinta un gr fico en pantalla (file,graf,x,y)
+process put=24,4                // Pinta un gr fico en pantalla (file,graf,x,y)
+process put_screen=25,2         // Carga una pantalla (file,graf)
+process map_xput=26,8           // Pone un gr fico en otro (file,graf_destino,graf,x,y,angle,size,flags)
+process map_put=27,5            // Pone un gr fico en otro (file,graf_destino,graf,x,y)
+process put_pixel=28,3          // Pone un pixel en copia (x,y,color)
+process get_pixel=29,2          // Lee un pixel de copia (x,y)
+process map_put_pixel=30,5      // Pone un pixel en un gr fico (file,graf,x,y,color)
+process map_get_pixel=31,4      // Lee un pixel de un gr fico (file,graf,x,y)
+process get_point=32,5          // Lee un punto de control de un gr fico (file,graf,n,&x,&y)
+process clear_screen=33,0       // Borra el fondo de la pantalla
+process save=34,3               // Graba un bloque de datos a disco ("fichero",direccion,long)
+process load=35,2               // Carga un bloque de datos de disco ("fichero",direccion)
+process set_mode=36,1           // Pone un nuevo modo de v¡deo, por defecto 320x200 (modo)
+process load_pcm=37,2           // Carga un sonido ("sonido.pcm",loop) devuelve id_sonido
+process unload_pcm=38,1         // Descarga un sonido (id_sonido)
+process sound=39,3              // Toca un pcm (id_sonido,volumen(0..100),frecuencia(ñ11000)) devuelve id_canal
+process stop_sound=40,1         // Para un sonido (id_canal)
+process change_sound=41,3       // Modifica un sonido (id_canal,volumen,frecuencia)
+process set_fps=42,2            // Define el n§ de imagenes por segundo (n§ 1..100, max_saltos 0..N)
+process start_fli=43,3          // Abre un fli (fichero,x,y) devuelve el n§ de frames
+process frame_fli=44,0          // Muestra siguiente frame, devuelve 0 si termin¢ el fli
+process end_fli=45,0            // Finaliza el fli y descarga los buffers
+process reset_fli=46,0          // Reinicia el fli
+process system=47,1             // Invoca un comando DOS o a otro programa ("comando")
+process refresh_scroll=48,1     // Refresca un scroll (tras modificar el mapa) (n)
+process fget_dist=49,4          // Devuelve la distancia de A hasta B (Ax,Ay,Bx,By)
+process fget_angle=50,4         // Devuelve el angulo de A hasta B (Ax,Ay,Bx,By)
+process play_cd=51,2            // Toca una pista de audio (pista,0:solo pista 1:a partir de ella)
+process stop_cd=52,0            // Para el cd
+process is_playing_cd=53,0      // Dice si se est  escuchando una canci¢n (para implementar el loop)
+process start_mode7=54,6        // Crea una ventana de m7 (n£mero 0..9,file,graf1,graf2,region,horizonte)
+process stop_mode7=55,1         // Elimina la ventana de m7 (n£mero 0..9)
+process advance=56,1            // Avanza el proceso "n" en su angle (n)
+process abs=57,1                // Devuelve el valor absoluto de un entero (n)
+process fade_on=58,0            // Enciende la pantalla, sin espera ()
+process fade_off=59,0           // Apaga la pantalla, while fading end ()
+process rand_seed=60,1          // Establece la semilla del rand (semilla)
+process sqrt=61,1               // Devuelve la raiz de un n£mero entero (n)
+process pow=62,2                // Devuelve n elevado a m (n,m)
+process map_block_copy=63,9     // Copia una region de un mapa a otro (file,graf_dest,x_dest,y_dest,graf,x,y,an,al)
+process move_scroll=64,1        // Mueve autom tica o manualmente un scroll (snum)
+process near_angle=65,3         // Acerca un  ngulo a otro en un incremento (angle1,angle2,angle_inc)
+process let_me_alone=66,0       // Mata a todos los procesos menos el actual ()
+process exit=67,2               // Termina el juego, mata todos los procesos ("Texto",error_level)
+process roll_palette=68,3       // Rota una gama de colores (col_inicial,num_col,inc)
+process get_real_point=69,3     // Donde esta un punto de control del proceso actual (n,&x,&y)
+process get_joy_button=70,1     // Estado de un boton del joystick (boton 0..3)
+process get_joy_position=71,1   // Estado de un eje del joystick (eje 0..3)
+process convert_palette=72,3    // Transforma la paleta de un gr fico (file,graf,&new_palette)
+process load_map=73,1           // Carga un mapa (asignado a file 0, graph>=1000)
+process reset_sound=74,0        // Reinicializa el sistema de sonido (struct setup)
+process unload_map=75,1         // Descarga de memoria un mapa
+process unload_fnt=76,1         // Descarga de memoria un set de car cteres
+process set_volume=77,0         // Fija el volumen (segun setup)
+
+process set_color=78,4          // Define un color de la paleta (color,r,g,b)
+process net_join_game=79,3      // Se une a una partida de red o la crea si no existe ("nombre",&estructura_datos,longitud_estructura_datos)
+process net_get_games=80,0      // Devuelve las partidas activas para este juego ()
+process stop_mode8=81,1         // Para una ventana de modo 8 (num_ventana)
+process x_advance=82,2          // Avanza (angulo,distancia)
+//process *********=83,0          //  ***  Hay que borrarla, ya no existe
+process path_find=84,8          // Busca el camino entre dos puntos (modo,file,code,tilesize,x,y,offset,sizeof)
+process path_line=85,5          // Determina si puede ir en linea recta (file,code,tilesize,x,y)
+process path_free=86,5          // Determina si un punto est  libre (file,code,tilesize,x,y)
+process new_map=87,5            // Crea un nuevo mapa (ancho,alto,centro_x,centro_y,color)
+process load_wld=88,2           // Carga un mapa de modo 8("nombre_fichero",numero_fpg)
+process start_mode8=89,3        // Inicializa el modo 8 (ide_camera,num_mode8,num_region)
+process go_to_flag=90,1         // Posiciona un objeto m8 en una bandera (bandera)
+process set_sector_height=91,3  // Modifica las alturas de una zona de modo 8 (sector,suelo,techo)
+process get_sector_height=92,3  // Devuelve las alturas de una zona de modo 8 (sector,&suelo,&techo)
+process set_point_m8=93,3       // Modifica las coordenadas de un punto de m8 (punto,x,y)
+process get_point_m8=94,3       // Devuelve las coordenadas de un punto de m8 (punto,&x,&y)
+process set_fog=95,4            // Modifica la tabla de fog de m8 (%,r(0..100),g,b)
+process set_sector_texture=96,3 // Modifica las texturas de una zona de m8 (sector,suelo,techo)
+process get_sector_texture=97,3 // Devuelve las texturas de una zona de m8 (sector,&suelo,&techo)
+process set_wall_texture=98,2   // Modifica las texturas de una pared de m8 (pared,textura)
+process get_wall_texture=99,2   // Devuelve las texturas de una pared de m8 (pared,&textura)

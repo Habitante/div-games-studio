@@ -1,0 +1,3 @@
+sprite3d.CPP(146): Warning! W202: Symbol 'buffer' has been defined, but not referenced
+sprite3d.CPP(149): Warning! W202: Symbol 'aux' has been defined, but not referenced
+sprite3d.CPP(224): Warning! W202: Symbol 'x' has been defined, but not referenced

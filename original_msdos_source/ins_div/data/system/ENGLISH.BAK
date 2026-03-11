@@ -1,0 +1,130 @@
+
+# ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+# Textos y datos del instalador de DIV Games Studio 2
+# ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+# El texto 001 se debe definir como "SHARE" o "REG", en funci¢n de la versi¢n
+# (Al definirse como "SHARE" aparecer  el sello "DEMO Version ..." en pantalla)
+
+001 "SHARE"
+
+# ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+# En el siguiente fichero es donde busca los gr ficos
+
+002 "DATA\\INSTALL.FPG"
+
+# Fuentes de letras utilizadas en el instalador
+
+003 "DATA\\INSTALL1.FNT"
+004 "DATA\\INSTALL2.FNT"
+005 "DATA\\INSTALL3.FNT"
+
+# ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+# Errores cr¡ticos de ejecuci¢n (fuerzan un exit)
+
+010 "Installation error, "
+011 "install.exe is damaged."
+012 "packed file corrupt."
+013 "packed file not found."
+014 "VESA driver not found."
+015 "can't read DATA\\ files."
+016 "not enought memory."
+017 "no target drive found."
+018 "mouse driver not found."
+019 "can't read DATA\\FILES.INI"
+
+# ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+# Errores no cr¡ticos (en ventana)
+
+020 "Not enough space on drive."
+021 "Select another drive with more free space. Or an installation with less items."
+
+022 "Interrupted installation."
+023 "Unsuccesful program installation. If you desire to install the program, press INSTALL again."
+
+024 "Not a valid directory."
+025 "The specified directory could not be created. Change the name of the directory, and press INSTALL again."
+
+026 "Error on file reading."
+027 "Error on %s. Press ACCEPT to continue."
+
+028 "Error on file writting."
+029 "Unsuccesful program installation. If you desire to install the program, press INSTALL again."
+
+030 "Installation accomplished."
+031 "Press over the ACCEPT button to end the installation process."
+
+032 "Installation accomplished."
+033 "%s error(s) were detected. Press over the ACCEPT button to end the installation."
+
+# ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+# Mensaje final
+
+034 "Succesful installation, enter:\n    D.EXE ÄÙ\nto execute DIV Games Studio 2."
+
+# ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+# Instrucci¢n para cargar el driver de rat¢n
+
+035 "DATA\\SYSTEM\\MOUSE.COM >NUL"
+
+# Comunicaci¢n con el instalador de Windows
+
+036 "C:\\PATHINFO.INI"
+037 "C:\\PATHINFO.DAT"
+038 "null\n"
+
+# Nombre de las capturas del instalador
+
+039 "SNAP%04d.PCX"
+
+# Lista de ficheros
+
+040 "DATA\\FILES.INI"
+
+# Directorio principal y secundario del arbol de archivos
+
+041 "DATA\\"
+042 "DATA2\\"
+
+# Archivos a borrar (textos 50 .. 59)
+
+050 "SYSTEM\\SESSION.DTF"
+051 "SYSTEM\\SETUP.BIN"
+052 "DIV.PIF"
+053 "D.PIF"
+
+# Archivo en el que se guardan las rutas de windows
+
+060 "SYSTEM\\PATHINFO.INI"
+
+# Datos referentes a la preparaci¢n de accesos para windows
+
+061 "D.EXE"
+062 "SYSTEM\\DIV2A.ICO"
+063 "SYSTEM\\DIV2B.ICO"
+064 "SYSTEM\\DIV2C.ICO"
+065 "SYSTEM\\DIV2D.ICO"
+066 "SYSTEM\\DIV2E.ICO"
+067 "SYSTEM\\DIV2.PIF"
+068 "/SAFE"
+069 "SYSTEM\\DIV2SAFE.PIF"
+070 "SYSTEM\\DOS4GW.EXE"
+071 "SYSTEM\\SESSION.DIV INSTALL\\SETUP.OVL"
+072 "SYSTEM\\SOUNDCFG.PIF"
+
+# Datos del enlace a borrar
+
+073 "%s\\DIVGAM~1.PIF"
+074 "DIV"
+075 ".ICO"
+
+# Directorio por defecto para la instalaci¢n del programa
+
+076 "DIV2"
+
+# ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ

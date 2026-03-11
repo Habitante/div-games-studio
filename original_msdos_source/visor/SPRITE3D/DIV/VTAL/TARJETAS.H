@@ -1,0 +1,7 @@
+#include "GUS.H"
+#include "GUSMAX.H"
+#include "SB_1_5.H"
+#include "SB_2_0.H"
+#include "SB_PRO.H"
+#include "SB_16.H"
+#include "SB_AWE.H"
