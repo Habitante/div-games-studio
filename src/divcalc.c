@@ -333,7 +333,7 @@ void calc2(void) {
       if (pcalc->chex) sprintf(pcalc->cresult,"0x%x",(unsigned int)(memptrsize)tnumero);
       else if (pcalc->cint) sprintf(pcalc->cresult,"%d",(int)(memptrsize)tnumero);
       else sprintf(pcalc->cresult,"%g",tnumero);
-    } else strcpy(pcalc->cresult,(char *)texto[417]);
+    } else strcpy(pcalc->cresult,(char *)texts[417]);
     wbox(v.ptr,an,al,c12,4,12,an-8-22-26,6);
     wwrite(v.ptr,an,al,4,12,0,(byte *)pcalc->cresult,c3);
     v.redraw=1;
@@ -348,8 +348,8 @@ void calc0(void) {
   v.type=102;
   v.an=120;
   v.al=34;
-  v.title=texto[413];
-  v.name=texto[413];
+  v.title=texts[413];
+  v.name=texts[413];
   v.paint_handler=calc1;
   v.click_handler=calc2;
   v.close_handler=calc3;

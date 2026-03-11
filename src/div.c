@@ -100,9 +100,9 @@ char get_buffer[long_line]; // Shared buffer (except for calculator)
 char * get;
 int get_cursor,get_pos;     // Clock and cursor position in get fields
 
-int fin_ventana=0,mover_ventana=0;
+int window_closing=0,window_move_pending=0;
 int cierra_rapido=0;
-int no_volcar_ventanas=0;
+int skip_window_render=0;
 
 byte lower[256]=
   "                                   #$           0123456789      "
@@ -155,11 +155,11 @@ void demo1(void) {
   char cwork[128];
 
   _show_items();
-  wwrite(v.ptr,an,al,an/2,12,1,texto[393],c3);
-  wwrite(v.ptr,an,al,an/2,12+8,1,texto[394],c3);
-  wwrite(v.ptr,an,al,an/2,12+16,1,texto[395],c3);
+  wwrite(v.ptr,an,al,an/2,12,1,texts[393],c3);
+  wwrite(v.ptr,an,al,an/2,12+8,1,texts[394],c3);
+  wwrite(v.ptr,an,al,an/2,12+16,1,texts[395],c3);
 
-  sprintf(cwork,"[ %s %d/31 ]",texto[396],exe_cola[1]-0xF31725AB);
+  sprintf(cwork,"[ %s %d/31 ]",texts[396],exe_cola[1]-0xF31725AB);
 
   wrectangle(v.ptr,an,al,c1,3,12+27,an-6,16);
   wbox(v.ptr,an,al,average_color(c_b_low,c0),4,12+28,an-8,14);
@@ -187,7 +187,7 @@ void demo3(void) {
 void demo0(void) {
 
   beta_status=v.type=1;
-  v.title=texto[392];
+  v.title=texts[392];
   v.an=160;
   v.al=76;
   v_accept=0;
@@ -267,7 +267,7 @@ void coder(byte * ptr, int len, char * clave);
 void betatest0(void) {
 
   beta_status=v.type=1;
-  v.title=texto[399];
+  v.title=texts[399];
   v.an=160;
   v.al=38+16;
 
@@ -304,7 +304,7 @@ void betatest5(void) {
 
   strcpy(full,"beta");
   for (n=0;n<strlen(betaname);n++) if (lower[betaname[n]]) betaname[n]=lower[betaname[n]];
-  strcat(full,(char *)texto[398]);
+  strcat(full,(char *)texts[398]);
   coder((byte *)realname,realen,full);
   *strchr(realname,(char)13)=0;
 
@@ -526,7 +526,7 @@ int main(int argc, char * argv[]) {
 					get_error(500+numero_error);
 					mensaje_compilacion(cerror);
 				} else {
-					mensaje_compilacion(texto[202]);
+					mensaje_compilacion(texts[202]);
 				}
 				free(prgbuf);
 				prgbuf=NULL;
@@ -558,7 +558,7 @@ int main(int argc, char * argv[]) {
 #endif
 
 #ifndef __EMSCRIPTEN__
-	OSDEP_SetCaption((char *)texto[34], "" );
+	OSDEP_SetCaption((char *)texts[34], "" );
 	SDL_ShowCursor( SDL_FALSE );
 #else
 	OSDEP_SetCaption( "DIV2015 - Javascript HTML5", "" );
@@ -571,9 +571,9 @@ int main(int argc, char * argv[]) {
 	strcpy(full,"Be");
 	strcat(full,"ta");
 
-	if (strstr((char *)texto[34],(char *)full)==NULL && strstr((char *)texto[35],(char *)full)==NULL) {
+	if (strstr((char *)texts[34],(char *)full)==NULL && strstr((char *)texts[35],(char *)full)==NULL) {
 		strupr(full);
-		if (strstr((char *)texto[34],(char *)full)==NULL && strstr((char *)texto[35],(char *)full)==NULL) {
+		if (strstr((char *)texts[34],(char *)full)==NULL && strstr((char *)texts[35],(char *)full)==NULL) {
 		  beta_status=4;
 		}
 	}
@@ -582,10 +582,10 @@ int main(int argc, char * argv[]) {
 #ifdef DOS
 		_setvideomode(_TEXTC80);
 		_setbkcolor(1); _settextcolor(15);
-		_outtext(texto[1]);
+		_outtext(texts[1]);
 #endif
 		textcolor(BRIGHT, WHITE, RED);	
-		printf("%s",texto[1]);
+		printf("%s",texts[1]);
 		textcolor(TXTRESET, WHITE, BLACK);	
 		printf("\n");
 	}
@@ -715,7 +715,7 @@ void init_environment() {
   }
 
 	update_box(0,0,vga_width,vga_height);
-    full_redraw=1; blit_screen(copia);
+    full_redraw=1; blit_screen(screen_buffer);
     
   if(!interpreting) {
     if (!strlen(user1) || !strlen(user2)) {
@@ -731,7 +731,7 @@ void init_environment() {
  
   if (!primera_vez) {
     for (n=0;n<max_windows;n++)
-      if (ventana[n].click_handler==menu_principal2) break;
+      if (window[n].click_handler==menu_principal2) break;
     if (n==max_windows) new_window(menu_principal0);
   }
 
@@ -744,7 +744,7 @@ void init_environment() {
       if (error_code) show_dialog(interr0);
       else {
         fread(&v_mode,1,4,f);
-        strcpy(cWork,(char *)texto[366]);
+        strcpy(cWork,(char *)texts[366]);
         fread(cWork+strlen(cWork),1,256-strlen(cWork),f);
         cWork[255]=0; if (strlen(cWork)<255) strcat(cWork,"\"");
         v_text=cWork; show_dialog(intmsg0);
@@ -791,14 +791,14 @@ void interr2(void) {
 }
 
 void interr0(void) {
-  v.type=1; v.title=texto[367]; v.al=38;
+  v.type=1; v.title=texts[367]; v.al=38;
   switch(error_code) {
-    case 1: v_text=(char *)texto[368]; break;
-    case 2: v_text=(char *)texto[369]; break;
-    case 3: v_text=(char *)texto[370]; break;
-    case 4: v_text=(char *)texto[371]; break;
-    case 5: v_text=(char *)texto[372]; break;
-    case 6: v_text=(char *)texto[373]; break;
+    case 1: v_text=(char *)texts[368]; break;
+    case 2: v_text=(char *)texts[369]; break;
+    case 3: v_text=(char *)texts[370]; break;
+    case 4: v_text=(char *)texts[371]; break;
+    case 5: v_text=(char *)texts[372]; break;
+    case 6: v_text=(char *)texts[373]; break;
   } v.an=text_len((byte *)v_text)+8; if (v.an<120) v.an=120;
   v.paint_handler=interr1;
   v.click_handler=interr2;
@@ -814,7 +814,7 @@ void intmsg1(void) {
   int an=v.an/big2,al=v.al/big2;
   _show_items();
   wwrite(v.ptr,an,al,an/2,12,1,(byte *)v_text,c3);
-  sprintf(cWork,(char *)texto[374],v_mode);
+  sprintf(cWork,(char *)texts[374],v_mode);
   wwrite(v.ptr,an,al,an/2,12+8,1,(byte *)cWork,c3);
 }
 
@@ -824,7 +824,7 @@ void intmsg2(void) {
 }
 
 void intmsg0(void) {
-  v.type=1; v.title=texto[375];
+  v.type=1; v.title=texts[375];
   v.an=text_len((byte *)v_text)+8;
   if (v.an<120) v.an=120;
   v.al=38+8;
@@ -872,21 +872,21 @@ void mainloop(void) {
 
 	n=0; 
 	
-	while(n<max_windows && !(ventana[n].type>0 && mouse_in(ventana[n].x,ventana[n].y,
-	  ventana[n].x+ventana[n].an-1,ventana[n].y+ventana[n].al-1))) 
+	while(n<max_windows && !(window[n].type>0 && mouse_in(window[n].x,window[n].y,
+	  window[n].x+window[n].an-1,window[n].y+window[n].al-1))) 
 		n++;
 
-	if (n<max_windows && dragging==4 && ventana[n].order==drag_source)
+	if (n<max_windows && dragging==4 && window[n].order==drag_source)
 		dragging=5;
 
 	//-------------------------------------------------------------------------
 	//  Drag onto the wallpaper
 	//-------------------------------------------------------------------------
 
-	if (dragging==4 && (n==max_windows || ventana[n].type==2)) {
+	if (dragging==4 && (n==max_windows || window[n].type==2)) {
 		dragging=5; 
 		free_drag=0;
-		v_title=(char *)texto[57]; 
+		v_title=(char *)texts[57]; 
 		v_text=NULL;
 		show_dialog(aceptar0);
 
@@ -903,7 +903,7 @@ void mainloop(void) {
 					  MustCreate=1;
 				}
 
-				v_map=ventana[1].mapa;
+				v_map=window[1].mapa;
 				memcpy(v.mapa->map,v_map->map,map_width*map_height);
 				v.mapa->zoom=v_map->zoom;
 				v.mapa->zoom_x=v_map->zoom_x;
@@ -930,7 +930,7 @@ void mainloop(void) {
 				v.mapa->fpg_code=0;
 
 			call((voidReturnType )v.paint_handler);
-			wvolcado(copia,vga_width,vga_height,v.ptr,v.x,v.y,v.an,v.al,0);
+			wvolcado(screen_buffer,vga_width,vga_height,v.ptr,v.x,v.y,v.an,v.al,0);
 
 			} else MustCreate=1;
 
@@ -978,15 +978,15 @@ void mainloop(void) {
 	if (n>=max_windows || n<0) {
 		mouse_graf=1;
 	} else { 
-		switch(ventana[n].foreground) {
+		switch(window[n].foreground) {
 			case 0:
 				mouse_graf=7; 
 				break;
 			case 1:
-				if (mouse_in(ventana[n].x+2*big2,ventana[n].y+2*big2,ventana[n].x+ventana[n].an-2*big2,ventana[n].y+9*big2))
-					if (mouse_x<=ventana[n].x+ventana[n].an-18*big2) 
+				if (mouse_in(window[n].x+2*big2,window[n].y+2*big2,window[n].x+window[n].an-2*big2,window[n].y+9*big2))
+					if (mouse_x<=window[n].x+window[n].an-18*big2) 
 						mouse_graf=2;
-					else if (mouse_x<=ventana[n].x+ventana[n].an-10*big2) 
+					else if (mouse_x<=window[n].x+window[n].an-10*big2) 
 						mouse_graf=4;
 					else 
 						mouse_graf=5;
@@ -994,7 +994,7 @@ void mainloop(void) {
 					mouse_graf=1; 
 				break;
 			case 2:
-				if (mouse_x>=ventana[n].x+7*big2) 
+				if (mouse_x>=window[n].x+7*big2) 
 					mouse_graf=2; 
 				else 
 					mouse_graf=6; 
@@ -1010,15 +1010,15 @@ void mainloop(void) {
 
 		// Bring window to position 0 if it's in the foreground or clicked
 
-		if (ventana[n].foreground==1 || (mouse_b&1)) {
+		if (window[n].foreground==1 || (mouse_b&1)) {
 			move(0,n); n=0;
 		}
 
 		if (n==0 && v.foreground!=1) { // Clicked icon or background window
 			for (m=1;m<max_windows;m++) {
-				if (ventana[m].type && ventana[m].foreground==1) {
+				if (window[m].type && window[m].foreground==1) {
 					if (windows_collide(0,m)) {
-						ventana[m].foreground=0; 
+						window[m].foreground=0; 
 						flush_window(m);
 					}
 				}
@@ -1050,7 +1050,7 @@ void mainloop(void) {
 	//  Drop something onto a background window
 	//-------------------------------------------------------------------------
 
-	if (n<max_windows && ventana[n].foreground==0 && dragging==4 && v.type>=100 && ventana[n].type!=2) {
+	if (n<max_windows && window[n].foreground==0 && dragging==4 && v.type>=100 && window[n].type!=2) {
 		move(0,n); n=0;
 
 		if (v.type==100) 
@@ -1068,9 +1068,9 @@ void mainloop(void) {
 		call((voidReturnType )v.click_handler);
 
 		for (m=1;m<max_windows;m++) 
-			if (ventana[m].type && ventana[m].foreground==1)
+			if (window[m].type && window[m].foreground==1)
 				if (windows_collide(0,m)) {
-					ventana[m].foreground=0; 
+					window[m].foreground=0; 
 					flush_window(m);
 				}
 
@@ -1184,7 +1184,7 @@ void mainloop(void) {
 							read_mouse(); 
 						} while (mouse_b&1);
 
-						v_title=(char *)texto[40]; 
+						v_title=(char *)texts[40]; 
 						v_text=NULL; 
 						show_dialog(aceptar0);
 
@@ -1211,12 +1211,12 @@ void mainloop(void) {
 
 						switch(v.type) {
 							case 100: 
-								v_title=(char *)texto[50]; 
+								v_title=(char *)texts[50]; 
 								v_text=(char *)v.title; 
 							break;
 
 							case 102: 
-								v_title=(char *)texto[188]; 
+								v_title=(char *)texts[188]; 
 								v_text=(char *)v.title; 
 							break;
 						}
@@ -1265,10 +1265,10 @@ void mainloop(void) {
 		} else {
 			if (mouse_b&1) {
 				if (big) {
-					wput(copia,-vga_width,vga_height,v.x,v.y,-48);
+					wput(screen_buffer,-vga_width,vga_height,v.x,v.y,-48);
 					blit_partial(v.x,v.y,14,14);
 				} else {
-					wput(copia,vga_width,vga_height,v.x,v.y,-48);
+					wput(screen_buffer,vga_width,vga_height,v.x,v.y,-48);
 					blit_partial(v.x,v.y,7,7);
 				}
 			}
@@ -1289,19 +1289,19 @@ void mainloop(void) {
 	for (m=0;m<max_windows;m++) {
 		if ( m==0 &&
 			mouse_in(v.x+2*big2,v.y+10*big2,v.x+v.an-2*big2,v.y+v.al-2*big2) &&
-			ventana[m].type!=107 ) 
+			window[m].type!=107 ) 
 			continue;
 			
-		if (ventana[m].type==4 ||
-			(ventana[m].type==101 && ventana[m].foreground!=2) ||
-			(ventana[m].type==107 && ventana[m].foreground!=2) ||
-			(ventana[m].type==102 && ventana[m].state && ventana[m].foreground!=2)) {
+		if (window[m].type==4 ||
+			(window[m].type==101 && window[m].foreground!=2) ||
+			(window[m].type==107 && window[m].foreground!=2) ||
+			(window[m].type==102 && window[m].state && window[m].foreground!=2)) {
 
 			if (m) {
 				wup(m);
 			}
 
-			fin_ventana=1; 
+			window_closing=1; 
 			wmouse_x=-1; 
 			wmouse_y=-1;
 
@@ -1324,17 +1324,17 @@ void mainloop(void) {
 				wdown(m);
 			}
 
-			if (fin_ventana==2) { // Close the window(m)
+			if (window_closing==2) { // Close the window(m)
 				move(0,m);
 				close_window();
-			} else if (ventana[m].redraw) {
+			} else if (window[m].redraw) {
 				volcados_parciales=1;
 				flush_window(m); 
-				ventana[m].redraw=0;
+				window[m].redraw=0;
 				volcados_parciales=0;
 			} 
 			
-			fin_ventana=0;
+			window_closing=0;
 		}
 	}
 
@@ -1343,7 +1343,7 @@ void mainloop(void) {
 	///////////////////////////////////////////////////////////////////////////
 
 	for (m=0;m<max_windows;m++)
-		if (ventana[m].type==102 && ventana[m].state && ventana[m].prg!=NULL) 
+		if (window[m].type==102 && window[m].state && window[m].prg!=NULL) 
 			break;
 
 	if (m<max_windows && beta_status==4) { // If a PRG ...
@@ -1422,9 +1422,9 @@ void mainloop(void) {
 
 				if (v.foreground==0) {
 					for (m=1;m<max_windows;m++) 
-						if (ventana[m].type && ventana[m].foreground==1)
+						if (window[m].type && window[m].foreground==1)
 							if (windows_collide(0,m)) { 
-								ventana[m].foreground=0; 
+								window[m].foreground=0; 
 								flush_window(m); 
 							}
 
@@ -1571,12 +1571,12 @@ void mainloop(void) {
 	if (scan_code==62) { // F4 Open PRG
 		v_type=8; 
 		v_mode=0; 
-		v_text=(char *)texto[346];
+		v_text=(char *)texts[346];
 		show_dialog(browser0);
 
 		if (v_finished) {
 			if (!v_exists) {
-				v_text=(char *)texto[43]; 
+				v_text=(char *)texts[43]; 
 				show_dialog(err0);
 			} else {
 				mouse_graf=3; flush_copy(); mouse_graf=1;
@@ -1589,11 +1589,11 @@ void mainloop(void) {
 		determine_prg2();
 
 		if (v_window!=-1) {
-			if(numero_error!=-1 && ventana[v_window].prg==eprg) {
+			if(numero_error!=-1 && window[v_window].prg==eprg) {
 				help(500+numero_error);
 			} else {
-				n=ventana[v_window].prg->column-1;
-				p=ventana[v_window].prg->l;
+				n=window[v_window].prg->column-1;
+				p=window[v_window].prg->l;
 				
 				if (n<=strlen(p)) {
 					if (!lower[p[n]] && n) 
@@ -1645,7 +1645,7 @@ void mainloop(void) {
 	}
 
 	if ((shift_status&8) && scan_code==45) { // Alt-X Exit
-		v_title=(char *)texto[40]; 
+		v_title=(char *)texts[40]; 
 		v_text=NULL; 
 		show_dialog(aceptar0);
 		
@@ -1667,10 +1667,10 @@ void mainloop(void) {
 		flush_window(0);
 	} else if (restore_button==2) {
 		if (big) {
-			wput(copia,-vga_width,vga_height,v.x,v.y,-38);
+			wput(screen_buffer,-vga_width,vga_height,v.x,v.y,-38);
 			blit_partial(v.x,v.y,14,14);
 		} else {
-			wput(copia,vga_width,vga_height,v.x,v.y,-38);
+			wput(screen_buffer,vga_width,vga_height,v.x,v.y,-38);
 			blit_partial(v.x,v.y,7,7);
 		}
 	} else if (restore_button==3) {
@@ -1969,30 +1969,30 @@ void on_window_moved(int x,int y,int an,int al) {
   if (v.type!=1) {
 
     for (n=1;n<max_windows;n++)
-      if (ventana[n].type && ventana[n].foreground==0)
+      if (window[n].type && window[n].foreground==0)
 
         // If a dimmed window was previously covered ...
 
         if (collides_with(n,x,y,an,al)) {
-          ventana[n].foreground=1;
+          window[n].foreground=1;
 
           // If it's covered by other windows (foreground or background) ...
 
           for (m=1;m<max_windows;m++)
-            if (m!=n && ventana[m].type && (ventana[m].foreground==1 || (ventana[m].foreground!=1 && m<n)))
-              if (windows_collide(n,m)) ventana[n].foreground=0;
+            if (m!=n && window[m].type && (window[m].foreground==1 || (window[m].foreground!=1 && m<n)))
+              if (windows_collide(n,m)) window[n].foreground=0;
 
           // If we uncovered said window, bring it to the foreground
 
-          if (ventana[n].foreground==1) {
+          if (window[n].foreground==1) {
             if (n!=1) {
               move(1,n);
             } flush_window(1);
           }
         }
 
-    for (n=1;n<max_windows;n++) if (ventana[n].type && ventana[n].foreground==1)
-      if (windows_collide(0,n)) {ventana[n].foreground=0; flush_window(n);}
+    for (n=1;n<max_windows;n++) if (window[n].type && window[n].foreground==1)
+      if (windows_collide(0,n)) {window[n].foreground=0; flush_window(n);}
 
   } flush_window(0);
 }
@@ -2006,10 +2006,10 @@ void maximize_window(void) {
   int x,y,an,al,n,m;
 
   if (big) {
-    wput(copia,-vga_width,vga_height,v.x,v.y,-48);
+    wput(screen_buffer,-vga_width,vga_height,v.x,v.y,-48);
     blit_partial(v.x,v.y,14,14);
   } else {
-    wput(copia,vga_width,vga_height,v.x,v.y,-48);
+    wput(screen_buffer,vga_width,vga_height,v.x,v.y,-48);
     blit_partial(v.x,v.y,7,7);
   }
   flush_copy();
@@ -2021,8 +2021,8 @@ void maximize_window(void) {
   v.an=v._an; v.al=v._al;
 
   m=0; for (n=1;n<max_windows;n++)
-    if (ventana[n].type && ventana[n].foreground==1) if (windows_collide(0,n)) m++;
-  if (m) place_window(v.lado*2+1,&v.x,&v.y,v.an,v.al);
+    if (window[n].type && window[n].foreground==1) if (windows_collide(0,n)) m++;
+  if (m) place_window(v.side*2+1,&v.x,&v.y,v.an,v.al);
 
   v._x=x; v._y=y;
   v._an=an; v._al=al;
@@ -2057,13 +2057,13 @@ void minimize_window(void) {
 
   if (v.an!=v._an || v.al!=v._al) { // If this is the first minimize
                                     // (or the name changed ...)
-    place_window(v.lado*2+0,&v.x,&v.y,v.an,v.al);
+    place_window(v.side*2+0,&v.x,&v.y,v.an,v.al);
   } else {
     v.x=v._x; v.y=v._y;
     m=0; for (n=1;n<max_windows;n++)
-      if (ventana[n].type && ventana[n].foreground==2)
+      if (window[n].type && window[n].foreground==2)
         if (windows_collide(0,n)) m++;
-    if (m) place_window(v.lado*2+0,&v.x,&v.y,v.an,v.al);
+    if (m) place_window(v.side*2+0,&v.x,&v.y,v.an,v.al);
   }
 
   v._x=x; v._y=y;
@@ -2083,7 +2083,7 @@ void minimize_window(void) {
 void close_window(void) {
   int x=0,y=0,an=0,al=0,n=0,m=0;
 
-  if (v.type==102 && fin_ventana==1) { fin_ventana=2; return; }
+  if (v.type==102 && window_closing==1) { window_closing=2; return; }
   
   if (exploding_windows) {
 	  v.exploding=1;
@@ -2107,16 +2107,16 @@ void close_window(void) {
   
   if (v.click_handler==help2 && old_prg!=NULL) {
     for (m=1;m<max_windows;m++) {
-      if (ventana[m].click_handler==program2 || ventana[m].click_handler==calc2) {
-        if ((ventana[m].prg==old_prg || ventana[m].aux==(byte*)old_prg) && ventana[m].foreground<2) {
-          ventana[m].state=1;
-          wgra(ventana[m].ptr,ventana[m].an/big2,ventana[m].al/big2,c_b_low,2,2,ventana[m].an/big2-20,7);
-          if (text_len(ventana[m].title)+3>ventana[m].an/big2-20) {
-            wwrite_in_box(ventana[m].ptr,ventana[m].an/big2,ventana[m].an/big2-19,ventana[m].al/big2,4,2,0,ventana[m].title,c1);
-            wwrite_in_box(ventana[m].ptr,ventana[m].an/big2,ventana[m].an/big2-19,ventana[m].al/big2,3,2,0,ventana[m].title,c4);
+      if (window[m].click_handler==program2 || window[m].click_handler==calc2) {
+        if ((window[m].prg==old_prg || window[m].aux==(byte*)old_prg) && window[m].foreground<2) {
+          window[m].state=1;
+          wgra(window[m].ptr,window[m].an/big2,window[m].al/big2,c_b_low,2,2,window[m].an/big2-20,7);
+          if (text_len(window[m].title)+3>window[m].an/big2-20) {
+            wwrite_in_box(window[m].ptr,window[m].an/big2,window[m].an/big2-19,window[m].al/big2,4,2,0,window[m].title,c1);
+            wwrite_in_box(window[m].ptr,window[m].an/big2,window[m].an/big2-19,window[m].al/big2,3,2,0,window[m].title,c4);
           } else {
-            wwrite(ventana[m].ptr,ventana[m].an/big2,ventana[m].al/big2,3+(ventana[m].an/big2-20)/2,2,1,ventana[m].title,c1);
-            wwrite(ventana[m].ptr,ventana[m].an/big2,ventana[m].al/big2,2+(ventana[m].an/big2-20)/2,2,1,ventana[m].title,c4);
+            wwrite(window[m].ptr,window[m].an/big2,window[m].al/big2,3+(window[m].an/big2-20)/2,2,1,window[m].title,c1);
+            wwrite(window[m].ptr,window[m].an/big2,window[m].al/big2,2+(window[m].an/big2-20)/2,2,1,window[m].title,c4);
           }
           flush_window(m); v.state=0; break;
         }
@@ -2125,15 +2125,15 @@ void close_window(void) {
   }
 
   if (v.type>=100 && v.state) { // Maps auto-deactivate on close
-    for (m=1;m<max_windows;m++) if (ventana[m].type==v.type && ventana[m].foreground<2) {
-      ventana[m].state=1;
-      wgra(ventana[m].ptr,ventana[m].an/big2,ventana[m].al/big2,c_b_low,2,2,ventana[m].an/big2-20,7);
-      if (text_len(ventana[m].title)+3>ventana[m].an/big2-20) {
-        wwrite_in_box(ventana[m].ptr,ventana[m].an/big2,ventana[m].an/big2-19,ventana[m].al/big2,4,2,0,ventana[m].title,c1);
-        wwrite_in_box(ventana[m].ptr,ventana[m].an/big2,ventana[m].an/big2-19,ventana[m].al/big2,3,2,0,ventana[m].title,c4);
+    for (m=1;m<max_windows;m++) if (window[m].type==v.type && window[m].foreground<2) {
+      window[m].state=1;
+      wgra(window[m].ptr,window[m].an/big2,window[m].al/big2,c_b_low,2,2,window[m].an/big2-20,7);
+      if (text_len(window[m].title)+3>window[m].an/big2-20) {
+        wwrite_in_box(window[m].ptr,window[m].an/big2,window[m].an/big2-19,window[m].al/big2,4,2,0,window[m].title,c1);
+        wwrite_in_box(window[m].ptr,window[m].an/big2,window[m].an/big2-19,window[m].al/big2,3,2,0,window[m].title,c4);
       } else {
-        wwrite(ventana[m].ptr,ventana[m].an/big2,ventana[m].al/big2,3+(ventana[m].an/big2-20)/2,2,1,ventana[m].title,c1);
-        wwrite(ventana[m].ptr,ventana[m].an/big2,ventana[m].al/big2,2+(ventana[m].an/big2-20)/2,2,1,ventana[m].title,c4);
+        wwrite(window[m].ptr,window[m].an/big2,window[m].al/big2,3+(window[m].an/big2-20)/2,2,1,window[m].title,c1);
+        wwrite(window[m].ptr,window[m].an/big2,window[m].al/big2,2+(window[m].an/big2-20)/2,2,1,window[m].title,c4);
       }
       flush_window(m); break;
     }
@@ -2153,17 +2153,17 @@ void close_window(void) {
     if (v.type==1 || v.type==7) { // Dialog over dialog: only show the last one
       v.foreground=1; flush_window(0);
     } else if (draw_mode>=100) for (n=0;n<max_windows;n++) if (hidden[n]) {
-      ventana[n].foreground=1;
+      window[n].foreground=1;
       flush_window(n);
     }
   } else for (n=0;n<max_windows;n++)
-    if (ventana[n].type && ventana[n].foreground==0)
+    if (window[n].type && window[n].foreground==0)
       if (collides_with(n,x,y,an,al)) {
-        ventana[n].foreground=1;
+        window[n].foreground=1;
         for (m=0;m<max_windows;m++)
-          if (m!=n && ventana[m].type && (ventana[m].foreground==1 || (ventana[m].foreground==2 && m<n)))
-            if (windows_collide(n,m)) ventana[n].foreground=0;
-        if (ventana[n].foreground==1) {
+          if (m!=n && window[m].type && (window[m].foreground==1 || (window[m].foreground==2 && m<n)))
+            if (windows_collide(n,m)) window[n].foreground=0;
+        if (window[n].foreground==1) {
           if (n!=0) {
             move(0,n);
           } flush_window(0);
@@ -2194,7 +2194,7 @@ void move_window(void) {
   do {
     x=mouse_x-ix; y=mouse_y-iy;
 
-    wrectangle(copia,vga_width,vga_height,c4,x,y,an,al);
+    wrectangle(screen_buffer,vga_width,vga_height,c4,x,y,an,al);
     blit_partial(x,y,an,1);
     blit_partial(x,y,1,al);
     blit_partial(x,y+al-1,an,1);
@@ -2233,13 +2233,13 @@ void move_window(void) {
   if (oldx==v.x && oldy==v.y) {
     if (*system_clock<double_click+10 && *system_clock>double_click
         && abs(double_click_x-mouse_x)<8 && abs(double_click_y-mouse_y)<8) {
-      if (v.foreground==2) place_window(v.lado*2+0,&v.x,&v.y,v.an,v.al);
-      else place_window(v.lado*2+1,&v.x,&v.y,v.an,v.al);
+      if (v.foreground==2) place_window(v.side*2+0,&v.x,&v.y,v.an,v.al);
+      else place_window(v.side*2+1,&v.x,&v.y,v.an,v.al);
       if (v.x==oldx && v.y==oldy) {
-        v.lado^=1;
-        if (v.foreground==2) place_window(v.lado*2+0,&v.x,&v.y,v.an,v.al);
-        else place_window(v.lado*2+1,&v.x,&v.y,v.an,v.al);
-        if (v.x==oldx && v.y==oldy) v.lado^=1;
+        v.side^=1;
+        if (v.foreground==2) place_window(v.side*2+0,&v.x,&v.y,v.an,v.al);
+        else place_window(v.side*2+1,&v.x,&v.y,v.an,v.al);
+        if (v.x==oldx && v.y==oldy) v.side^=1;
       }
       if (v.x!=oldx || v.y!=oldy) {
         if (exploding_windows) extrude(oldx,oldy,v.an,v.al,v.x,v.y,v.an,v.al);
@@ -2265,7 +2265,7 @@ void move_window_complete(void) {
 
   if (v.foreground==1) wrectangle(v.ptr,an/big2,al/big2,c4,0,0,an/big2,al/big2);
 
-  if (v.foreground==2) mover_ventana=1;
+  if (v.foreground==2) window_move_pending=1;
 
 #ifndef __EMSCRIPTEN__
   do {
@@ -2275,8 +2275,8 @@ void move_window_complete(void) {
   } while(mouse_b&1);
 #endif
 
-  if (mover_ventana) {
-    mover_ventana=0;
+  if (window_move_pending) {
+    window_move_pending=0;
     flush_window(0);
   }
 
@@ -2292,13 +2292,13 @@ void move_window_complete(void) {
     if (*system_clock<double_click+10 && *system_clock>double_click
       && abs(double_click_x-mouse_x)<8 && abs(double_click_y-mouse_y)<8) {
       if (v.foreground==2)
-        place_window(v.lado*2+0,&v.x,&v.y,v.an,v.al);
-      else place_window(v.lado*2+1,&v.x,&v.y,v.an,v.al);
+        place_window(v.side*2+0,&v.x,&v.y,v.an,v.al);
+      else place_window(v.side*2+1,&v.x,&v.y,v.an,v.al);
       if (v.x==oldx && v.y==oldy) {
-        v.lado^=1;
-        if (v.foreground==2) place_window(v.lado*2+0,&v.x,&v.y,v.an,v.al);
-        else place_window(v.lado*2+1,&v.x,&v.y,v.an,v.al);
-        if (v.x==oldx && v.y==oldy) v.lado^=1;
+        v.side^=1;
+        if (v.foreground==2) place_window(v.side*2+0,&v.x,&v.y,v.an,v.al);
+        else place_window(v.side*2+1,&v.x,&v.y,v.an,v.al);
+        if (v.x==oldx && v.y==oldy) v.side^=1;
       }
       if (v.x!=oldx || v.y!=oldy) {
         if (exploding_windows) extrude(oldx,oldy,v.an,v.al,v.x,v.y,v.an,v.al);
@@ -2333,7 +2333,7 @@ strcat(divver, GIT_SHA1);
 div_version = (byte *)divver;
 
 #else
-div_version=texto[safe];
+div_version=texts[safe];
 #endif
 
 
@@ -2346,20 +2346,20 @@ div_version=texto[safe];
   restore_wallpaper(x,y,an,al);
 
   if (y<vga_height && y+al>vga_height-8*big2 && x<vga_width && x+an>=vga_width-(text_len(div_version)+2)*big2) {
-    wwrite_in_box(copia+y*vga_width+x,vga_width,an,al,vga_width-1-x,vga_height-1-y,18,div_version,c0);
-    wwrite_in_box(copia+y*vga_width+x,vga_width,an,al,vga_width-2-x,vga_height-1-y,18,div_version,c2);
+    wwrite_in_box(screen_buffer+y*vga_width+x,vga_width,an,al,vga_width-1-x,vga_height-1-y,18,div_version,c0);
+    wwrite_in_box(screen_buffer+y*vga_width+x,vga_width,an,al,vga_width-2-x,vga_height-1-y,18,div_version,c2);
   }
 
-  for (n=max_windows-1;n>=0;n--) if (ventana[n].type) if (collides_with(n,x,y,an,al)) {
+  for (n=max_windows-1;n>=0;n--) if (window[n].type) if (collides_with(n,x,y,an,al)) {
 	  
 
 	  
-  if (ventana[n].foreground<2) {
+  if (window[n].foreground<2) {
 
-    _ptr=ventana[n].ptr;
+    _ptr=window[n].ptr;
     salta_x=0; salta_y=0;
-    _x=ventana[n].x; _y=ventana[n].y;
-    _an=ventana[n].an; _al=ventana[n].al;
+    _x=window[n].x; _y=window[n].y;
+    _an=window[n].an; _al=window[n].al;
 
     if (y>_y) { salta_y+=y-_y; _ptr+=_an*salta_y; _y=y; _al-=salta_y; }
     if (y+al<_y+_al) { salta_y+=_y+_al-y-al; _al-=_y+_al-y-al; }
@@ -2367,26 +2367,26 @@ div_version=texto[safe];
     if (x+an<_x+_an) { salta_x+=_x+_an-x-an; _an-=_x+_an-x-an;  }
 
     if (_an>0 && _al>0) {
-      if (ventana[n].foreground==1)
-    		wvolcado(copia,vga_width,vga_height,_ptr,_x,_y,_an,_al,salta_x);
-      else wvolcado_oscuro(copia,vga_width,vga_height,_ptr,_x,_y,_an,_al,salta_x);
+      if (window[n].foreground==1)
+    		wvolcado(screen_buffer,vga_width,vga_height,_ptr,_x,_y,_an,_al,salta_x);
+      else wvolcado_oscuro(screen_buffer,vga_width,vga_height,_ptr,_x,_y,_an,_al,salta_x);
     }
 
   } else {
 
-    if (n==0 && mover_ventana) {
+    if (n==0 && window_move_pending) {
       if (big) {
-        big=0; wrectangle(copia,vga_width,vga_height,c4,v.x+16,v.y,v.an-16,v.al); big=1;
-      } else wrectangle(copia,vga_width,vga_height,c4,v.x+8,v.y,v.an-8,v.al);
+        big=0; wrectangle(screen_buffer,vga_width,vga_height,c4,v.x+16,v.y,v.an-16,v.al); big=1;
+      } else wrectangle(screen_buffer,vga_width,vga_height,c4,v.x+8,v.y,v.an-8,v.al);
     } else {
-      wwrite_in_box(copia+y*vga_width+x,vga_width,an,al,ventana[n].x+9*big2-x,ventana[n].y-y,10,ventana[n].name,c0);
-      wwrite_in_box(copia+y*vga_width+x,vga_width,an,al,ventana[n].x+8*big2-x,ventana[n].y-y,10,ventana[n].name,c4);
+      wwrite_in_box(screen_buffer+y*vga_width+x,vga_width,an,al,window[n].x+9*big2-x,window[n].y-y,10,window[n].name,c0);
+      wwrite_in_box(screen_buffer+y*vga_width+x,vga_width,an,al,window[n].x+8*big2-x,window[n].y-y,10,window[n].name,c4);
     }
 
-    if (x<ventana[n].x+7*big2) {
+    if (x<window[n].x+7*big2) {
       if (big) {
-        wput_in_box(copia+y*vga_width+x,vga_width,-an,al,ventana[n].x-x,ventana[n].y-y,38);
-      } else wput_in_box(copia+y*vga_width+x,vga_width,an,al,ventana[n].x-x,ventana[n].y-y,38);
+        wput_in_box(screen_buffer+y*vga_width+x,vga_width,-an,al,window[n].x-x,window[n].y-y,38);
+      } else wput_in_box(screen_buffer+y*vga_width+x,vga_width,an,al,window[n].x-x,window[n].y-y,38);
     }
 
       }
@@ -2407,13 +2407,13 @@ void update_dialogs(int x, int y, int an, int al) {
   if (y+al>vga_height) al=vga_height-y;
   if (an<=0 || al<=0) return;
 
-  for (n=max_windows-1;n>=0;n--) if (ventana[n].type==1) if (collides_with(n,x,y,an,al))
-  if (ventana[n].foreground<2) {
+  for (n=max_windows-1;n>=0;n--) if (window[n].type==1) if (collides_with(n,x,y,an,al))
+  if (window[n].foreground<2) {
 
-    _ptr=ventana[n].ptr;
+    _ptr=window[n].ptr;
     salta_x=0; salta_y=0;
-    _x=ventana[n].x; _y=ventana[n].y;
-    _an=ventana[n].an; _al=ventana[n].al;
+    _x=window[n].x; _y=window[n].y;
+    _an=window[n].an; _al=window[n].al;
 
     if (y>_y) { salta_y+=y-_y; _ptr+=_an*salta_y; _y=y; _al-=salta_y; }
     if (y+al<_y+_al) { salta_y+=_y+_al-y-al; _al-=_y+_al-y-al; }
@@ -2421,9 +2421,9 @@ void update_dialogs(int x, int y, int an, int al) {
     if (x+an<_x+_an) { salta_x+=_x+_an-x-an; _an-=_x+_an-x-an;  }
 
     if (_an>0 && _al>0) {
-      if (ventana[n].foreground==1)
-   		 	wvolcado(copia,vga_width,vga_height,_ptr,_x,_y,_an,_al,salta_x);
-      else wvolcado_oscuro(copia,vga_width,vga_height,_ptr,_x,_y,_an,_al,salta_x);
+      if (window[n].foreground==1)
+   		 	wvolcado(screen_buffer,vga_width,vga_height,_ptr,_x,_y,_an,_al,salta_x);
+      else wvolcado_oscuro(screen_buffer,vga_width,vga_height,_ptr,_x,_y,_an,_al,salta_x);
     }
 
   }
@@ -2440,7 +2440,7 @@ void update_box2(int vent, int x, int y, int an, int al) {
   int _x,_y,_an,_al;
   int salta_x,salta_y;
 
-  if (ventana[vent].foreground==2) { update_box(x,y,an,al); return; }
+  if (window[vent].foreground==2) { update_box(x,y,an,al); return; }
 
   if (x<0) { an+=x; x=0; }
   if (y<0) { al+=y; y=0; }
@@ -2448,13 +2448,13 @@ void update_box2(int vent, int x, int y, int an, int al) {
   if (y+al>vga_height) al=vga_height-y;
   if (an<=0 || al<=0) return;
 
-  for (n=vent;n>=0;n--) if (ventana[n].type) if (collides_with(n,x,y,an,al)) {
-  if (ventana[n].foreground<2) {
+  for (n=vent;n>=0;n--) if (window[n].type) if (collides_with(n,x,y,an,al)) {
+  if (window[n].foreground<2) {
 
-    _ptr=ventana[n].ptr;
+    _ptr=window[n].ptr;
     salta_x=0; salta_y=0;
-    _x=ventana[n].x; _y=ventana[n].y;
-    _an=ventana[n].an; _al=ventana[n].al;
+    _x=window[n].x; _y=window[n].y;
+    _an=window[n].an; _al=window[n].al;
 
     if (y>_y) { salta_y+=y-_y; _ptr+=_an*salta_y; _y=y; _al-=salta_y; }
     if (y+al<_y+_al) { salta_y+=_y+_al-y-al; _al-=_y+_al-y-al; }
@@ -2462,26 +2462,26 @@ void update_box2(int vent, int x, int y, int an, int al) {
     if (x+an<_x+_an) { salta_x+=_x+_an-x-an; _an-=_x+_an-x-an;  }
 
     if (_an>0 && _al>0) {
-      if (ventana[n].foreground==1)
-    		wvolcado(copia,vga_width,vga_height,_ptr,_x,_y,_an,_al,salta_x);
-      else wvolcado_oscuro(copia,vga_width,vga_height,_ptr,_x,_y,_an,_al,salta_x);
+      if (window[n].foreground==1)
+    		wvolcado(screen_buffer,vga_width,vga_height,_ptr,_x,_y,_an,_al,salta_x);
+      else wvolcado_oscuro(screen_buffer,vga_width,vga_height,_ptr,_x,_y,_an,_al,salta_x);
     }
 
   } else {
 
-    if (n==0 && mover_ventana) {
+    if (n==0 && window_move_pending) {
       if (big) {
-        big=0; wrectangle(copia,vga_width,vga_height,c4,v.x+16,v.y,v.an-16,v.al); big=1;
-      } else wrectangle(copia,vga_width,vga_height,c4,v.x+8,v.y,v.an-8,v.al);
+        big=0; wrectangle(screen_buffer,vga_width,vga_height,c4,v.x+16,v.y,v.an-16,v.al); big=1;
+      } else wrectangle(screen_buffer,vga_width,vga_height,c4,v.x+8,v.y,v.an-8,v.al);
     } else {
-      wwrite_in_box(copia+y*vga_width+x,vga_width,an,al,ventana[n].x+9*big2-x,ventana[n].y-y,10,ventana[n].name,c0);
-      wwrite_in_box(copia+y*vga_width+x,vga_width,an,al,ventana[n].x+8*big2-x,ventana[n].y-y,10,ventana[n].name,c4);
+      wwrite_in_box(screen_buffer+y*vga_width+x,vga_width,an,al,window[n].x+9*big2-x,window[n].y-y,10,window[n].name,c0);
+      wwrite_in_box(screen_buffer+y*vga_width+x,vga_width,an,al,window[n].x+8*big2-x,window[n].y-y,10,window[n].name,c4);
     }
 
-    if (x<ventana[n].x+7*big2) {
+    if (x<window[n].x+7*big2) {
     	if (big) {
-        	wput_in_box(copia+y*vga_width+x,vga_width,-an,al,ventana[n].x-x,ventana[n].y-y,38);
-      } else wput_in_box(copia+y*vga_width+x,vga_width,an,al,ventana[n].x-x,ventana[n].y-y,38);
+        	wput_in_box(screen_buffer+y*vga_width+x,vga_width,-an,al,window[n].x-x,window[n].y-y,38);
+      } else wput_in_box(screen_buffer+y*vga_width+x,vga_width,an,al,window[n].x-x,window[n].y-y,38);
     }
 
 		}
@@ -2514,15 +2514,15 @@ void update_background(void) {
 
   if (_big) { big=0; big2=1; }
 
-  wbox(copia,vga_width,vga_height,c2,zoom_win_x-2,zoom_win_y-2,zoom_win_width+4,1);
-  wbox(copia,vga_width,vga_height,c2,zoom_win_x-2,zoom_win_y+zoom_win_height+1,zoom_win_width+4,1);
-  wbox(copia,vga_width,vga_height,c2,zoom_win_x-2,zoom_win_y-1,1,zoom_win_height+2);
-  wbox(copia,vga_width,vga_height,c2,zoom_win_x+zoom_win_width+1,zoom_win_y-1,1,zoom_win_height+2);
+  wbox(screen_buffer,vga_width,vga_height,c2,zoom_win_x-2,zoom_win_y-2,zoom_win_width+4,1);
+  wbox(screen_buffer,vga_width,vga_height,c2,zoom_win_x-2,zoom_win_y+zoom_win_height+1,zoom_win_width+4,1);
+  wbox(screen_buffer,vga_width,vga_height,c2,zoom_win_x-2,zoom_win_y-1,1,zoom_win_height+2);
+  wbox(screen_buffer,vga_width,vga_height,c2,zoom_win_x+zoom_win_width+1,zoom_win_y-1,1,zoom_win_height+2);
 
-  wbox(copia,vga_width,vga_height,c0,zoom_win_x-1,zoom_win_y-1,zoom_win_width+2,1);
-  wbox(copia,vga_width,vga_height,c0,zoom_win_x-1,zoom_win_y+zoom_win_height,zoom_win_width+2,1);
-  wbox(copia,vga_width,vga_height,c0,zoom_win_x-1,zoom_win_y,1,zoom_win_height);
-  wbox(copia,vga_width,vga_height,c0,zoom_win_x+zoom_win_width,zoom_win_y,1,zoom_win_height);
+  wbox(screen_buffer,vga_width,vga_height,c0,zoom_win_x-1,zoom_win_y-1,zoom_win_width+2,1);
+  wbox(screen_buffer,vga_width,vga_height,c0,zoom_win_x-1,zoom_win_y+zoom_win_height,zoom_win_width+2,1);
+  wbox(screen_buffer,vga_width,vga_height,c0,zoom_win_x-1,zoom_win_y,1,zoom_win_height);
+  wbox(screen_buffer,vga_width,vga_height,c0,zoom_win_x+zoom_win_width,zoom_win_y,1,zoom_win_height);
 
   if (_big) { big=1; big2=2; }
 
@@ -2543,7 +2543,7 @@ void restore_wallpaper(int x,int y,int an,int al) {
   if (x+an>vga_width) an=vga_width-x;
 
   if (an>0 && al>0) {
-    p=copia+y*vga_width+x;
+    p=screen_buffer+y*vga_width+x;
     if (wallpaper!=NULL) {
       t=wallpaper_map+(y%wallpaper_height)*wallpaper_width;
       _an=an;
@@ -2592,40 +2592,40 @@ void flush_window(int m) {
 
 SDL_Rect trc;
 
-  if (no_volcar_ventanas) return;
+  if (skip_window_render) return;
 
   if (volcados_parciales) {
-    if (ventana[m].type==102 && ventana[m].redraw==1 && ventana[m].prg!=NULL) {
-      ventana[m].redraw=0;
-      update_box2(m,ventana[m].x+2*big2,ventana[m].y+10*big2,ventana[m].an-20,7*big2);
-      update_box2(m,ventana[m].x+2*big2,ventana[m].y+18*big2+(ventana[m].prg->line-ventana[m].prg->first_line)*font_height,ventana[m].an-12,font_height);
-      if (ventana[m].prg->prev_line!=ventana[m].prg->line-ventana[m].prg->first_line)
-        update_box2(m,ventana[m].x+2*big2,ventana[m].y+18*big2+ventana[m].prg->prev_line*font_height,ventana[m].an-12,font_height);
+    if (window[m].type==102 && window[m].redraw==1 && window[m].prg!=NULL) {
+      window[m].redraw=0;
+      update_box2(m,window[m].x+2*big2,window[m].y+10*big2,window[m].an-20,7*big2);
+      update_box2(m,window[m].x+2*big2,window[m].y+18*big2+(window[m].prg->line-window[m].prg->first_line)*font_height,window[m].an-12,font_height);
+      if (window[m].prg->prev_line!=window[m].prg->line-window[m].prg->first_line)
+        update_box2(m,window[m].x+2*big2,window[m].y+18*big2+window[m].prg->prev_line*font_height,window[m].an-12,font_height);
       return;
     }
     // MapperCreator2 check removed (MODE8/3D map editor deleted)
-  } ventana[m].redraw=0;
+  } window[m].redraw=0;
 
-  x=ventana[m].x; y=ventana[m].y;
-  an=ventana[m].an; al=ventana[m].al;
+  x=window[m].x; y=window[m].y;
+  an=window[m].an; al=window[m].al;
 
-  if (ventana[m].foreground==2) { update_box(x,y,an,al); return; }
+  if (window[m].foreground==2) { update_box(x,y,an,al); return; }
 
   if (x<0) { an+=x; x=0; }
   if (y<0) { al+=y; y=0; }
   if (x+an>vga_width) an=vga_width-x;
   if (y+al>vga_height) al=vga_height-y;
 
-  for (n=m;n>=0;n--) if (ventana[n].type) if (collides_with(n,x,y,an,al)) {
-  if (ventana[n].foreground<2) {
+  for (n=m;n>=0;n--) if (window[n].type) if (collides_with(n,x,y,an,al)) {
+  if (window[n].foreground<2) {
 
-    _ptr=ventana[n].ptr;
+    _ptr=window[n].ptr;
 if(_ptr==NULL)
 		return;
 		
     salta_x=0; salta_y=0;
-    _x=ventana[n].x; _y=ventana[n].y;
-    _an=ventana[n].an; _al=ventana[n].al;
+    _x=window[n].x; _y=window[n].y;
+    _an=window[n].an; _al=window[n].al;
 
     if (y>_y) { salta_y+=y-_y; _ptr+=_an*salta_y; _y=y; _al-=salta_y; }
     if (y+al<_y+_al) { salta_y+=_y+_al-y-al; _al-=_y+_al-y-al; }
@@ -2633,31 +2633,31 @@ if(_ptr==NULL)
     if (x+an<_x+_an) { salta_x+=_x+_an-x-an; _an-=_x+_an-x-an;  }
 
     if (_an>0 && _al>0) {
-		if (ventana[n].foreground==1) {
-   		 	wvolcado(copia,vga_width,vga_height,_ptr,_x,_y,_an,_al,salta_x);
+		if (window[n].foreground==1) {
+   		 	wvolcado(screen_buffer,vga_width,vga_height,_ptr,_x,_y,_an,_al,salta_x);
 		}
      else {
-		wvolcado_oscuro(copia,vga_width,vga_height,_ptr,_x,_y,_an,_al,salta_x);
+		wvolcado_oscuro(screen_buffer,vga_width,vga_height,_ptr,_x,_y,_an,_al,salta_x);
 	}
 	}
   } else {
 
-    wwrite_in_box(copia+y*vga_width+x,vga_width,an,al,ventana[n].x+9*big2-x,ventana[n].y-y,10,ventana[n].name,c0);
-    wwrite_in_box(copia+y*vga_width+x,vga_width,an,al,ventana[n].x+8*big2-x,ventana[n].y-y,10,ventana[n].name,c4);
+    wwrite_in_box(screen_buffer+y*vga_width+x,vga_width,an,al,window[n].x+9*big2-x,window[n].y-y,10,window[n].name,c0);
+    wwrite_in_box(screen_buffer+y*vga_width+x,vga_width,an,al,window[n].x+8*big2-x,window[n].y-y,10,window[n].name,c4);
 
-    if (x<ventana[n].x+7*big2) {
+    if (x<window[n].x+7*big2) {
     	if (big) {
-      		wput_in_box(copia+y*vga_width+x,vga_width,-an,al,ventana[n].x-x,ventana[n].y-y,38);
-      } else wput_in_box(copia+y*vga_width+x,vga_width,an,al,ventana[n].x-x,ventana[n].y-y,38);
+      		wput_in_box(screen_buffer+y*vga_width+x,vga_width,-an,al,window[n].x-x,window[n].y-y,38);
+      } else wput_in_box(screen_buffer+y*vga_width+x,vga_width,an,al,window[n].x-x,window[n].y-y,38);
     }
 
   }
   }
 
-	trc.x=ventana[n].x;
-	trc.y=ventana[n].y;
-	trc.w=ventana[n].an;
-	trc.h=ventana[n].al;
+	trc.x=window[n].x;
+	trc.y=window[n].y;
+	trc.w=window[n].an;
+	trc.h=window[n].al;
 
 	blit_partial(x,y,an,al);
 
@@ -2681,8 +2681,8 @@ void place_window(int flag,int*_x,int*_y,int an,int al) {
     *_y=-1; scan[0]=vga_height-al;
   } scanes=1;
 
-  for (n=1;n<max_windows;n++) if (ventana[n].type) { if (flag&1) {
-    if ((y=ventana[n].y+ventana[n].al+1)<vga_height) {
+  for (n=1;n<max_windows;n++) if (window[n].type) { if (flag&1) {
+    if ((y=window[n].y+window[n].al+1)<vga_height) {
       x=0; do { x++; } while (x<scanes && y>scan[x]);
       if (x==scanes) scan[scanes++]=y;
       else if (y!=scan[x]) {
@@ -2691,7 +2691,7 @@ void place_window(int flag,int*_x,int*_y,int an,int al) {
       }
     }
   		} else {
-    if ((y=ventana[n].y-al-1)>=0) {
+    if ((y=window[n].y-al-1)>=0) {
       x=0; do { x++; } while (x<scanes && y<scan[x]);
       if (x==scanes) scan[scanes++]=y;
       else if (y!=scan[x]) {
@@ -2708,8 +2708,8 @@ void place_window(int flag,int*_x,int*_y,int an,int al) {
       y=scan[n]; new_x=vga_width-an;
       do { x=new_x;
         for (m=1;m<max_windows;m++)
-          if (ventana[m].type && collides_with(m,x-1,y-1,an+2,al+2))
-            if (new_x>=ventana[m].x-an) new_x=ventana[m].x-an-1;
+          if (window[m].type && collides_with(m,x-1,y-1,an+2,al+2))
+            if (new_x>=window[m].x-an) new_x=window[m].x-an-1;
       } while (new_x!=x && new_x>=0);
       if (new_x>=0) { *_x=new_x; *_y=y; break; }
     }
@@ -2718,8 +2718,8 @@ void place_window(int flag,int*_x,int*_y,int an,int al) {
       y=scan[n]; new_x=0;
       do { x=new_x;
         for (m=1;m<max_windows;m++)
-          if (ventana[m].type && collides_with(m,x-1,y-1,an+2,al+2))
-            if (ventana[m].x+ventana[m].an>=new_x) new_x=ventana[m].x+ventana[m].an+1;
+          if (window[m].type && collides_with(m,x-1,y-1,an+2,al+2))
+            if (window[m].x+window[m].an>=new_x) new_x=window[m].x+window[m].an+1;
       } while (new_x!=x && new_x+an<=vga_width);
       if (new_x+an<=vga_width) { *_x=new_x; *_y=y; break; }
     }
@@ -2759,9 +2759,9 @@ int calculate_collision(int x,int y,int an,int al) {
   int n,c,colision=0;
 
   for (n=1;n<max_windows;n++) {
-    if (ventana[n].type) {
+    if (window[n].type) {
       if ((c=calculate_overlap(n,x,y,an,al))) {
-        if (ventana[n].foreground) colision+=vga_width*vga_height+c;
+        if (window[n].foreground) colision+=vga_width*vga_height+c;
         else colision+=vga_width*vga_height/4+c;
       }
     }
@@ -2772,17 +2772,17 @@ int calculate_overlap(int a, int x, int y, int an, int al) {
 
   int n,m,_an=0,_al=0;
 
-  if (y<ventana[a].y+ventana[a].al && y+al>ventana[a].y) {
-    if (x<ventana[a].x+ventana[a].an && x+an>ventana[a].x) {
+  if (y<window[a].y+window[a].al && y+al>window[a].y) {
+    if (x<window[a].x+window[a].an && x+an>window[a].x) {
 
-      n=y+al; m=ventana[a].y+ventana[a].al;
+      n=y+al; m=window[a].y+window[a].al;
       if (n<m) m=n;
-      if (ventana[a].y>y) n=ventana[a].y; else n=y;
+      if (window[a].y>y) n=window[a].y; else n=y;
       _an=m-n+1;
 
-      n=x+an; m=ventana[a].x+ventana[a].an;
+      n=x+an; m=window[a].x+window[a].an;
       if (n<m) m=n;
-      if (ventana[a].x>x) n=ventana[a].x; else n=x;
+      if (window[a].x>x) n=window[a].x; else n=x;
       _al=m-n+1;
 
       return(_an*_al);
@@ -2796,20 +2796,20 @@ int calculate_overlap(int a, int x, int y, int an, int al) {
 
 int windows_collide(int a,int b) {
 
-  if (ventana[b].y<ventana[a].y+ventana[a].al &&
-      ventana[b].y+ventana[b].al>ventana[a].y &&
-      ventana[b].x<ventana[a].x+ventana[a].an &&
-      ventana[b].x+ventana[b].an>ventana[a].x)
+  if (window[b].y<window[a].y+window[a].al &&
+      window[b].y+window[b].al>window[a].y &&
+      window[b].x<window[a].x+window[a].an &&
+      window[b].x+window[b].an>window[a].x)
 
     return(1); else return(0);
 }
 
 int collides_with(int a, int x, int y, int an, int al) {
 
-  if (y<ventana[a].y+ventana[a].al &&
-      y+al>ventana[a].y &&
-      x<ventana[a].x+ventana[a].an &&
-      x+an>ventana[a].x)
+  if (y<window[a].y+window[a].al &&
+      y+al>window[a].y &&
+      x<window[a].x+window[a].an &&
+      x+an>window[a].x)
 
     return(1); else return(0);
 }
@@ -2826,12 +2826,12 @@ void flush_copy(void) {
   if (draw_mode<100) {
     save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,0);
     put(mouse_shift_x,mouse_shift_y,mouse_graf);
-    blit_screen(copia);
+    blit_screen(screen_buffer);
     save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,1);
   } else {
     save_mouse_bg(mouse_background,mouse_x,mouse_y,mouse_graf,0);
     put(mouse_x,mouse_y,mouse_graf);
-    blit_screen(copia);
+    blit_screen(screen_buffer);
     save_mouse_bg(mouse_background,mouse_x,mouse_y,mouse_graf,1);
   }
 }
@@ -2865,7 +2865,7 @@ void new_window(voidReturnType init_handler) {
 		amask = 0xff000000;
 	#endif
 
-  if (!ventana[max_windows-1].type) {
+  if (!window[max_windows-1].type) {
 
     if (v.type) {
       wmouse_x=-1; wmouse_y=-1;
@@ -2917,7 +2917,7 @@ void new_window(voidReturnType init_handler) {
       y=x=vga_width/2-an/2;
     } else if (v.type==1 || v.type==7) { // Dialogs are centered
       x=vga_width/2-an/2; y=vga_height/2-al/2;
-    } else place_window(v.lado*2+1,&x,&y,an,al);
+    } else place_window(v.side*2+1,&x,&y,an,al);
 
     v.x=x; v.y=y;
 
@@ -2927,18 +2927,18 @@ void new_window(voidReturnType init_handler) {
 
     if (v.type>=100) {
       v.state=1; // Activate it
-      for (m=1;m<max_windows;m++) if (ventana[m].type==v.type && ventana[m].state) {
-        ventana[m].state=0;
-        wgra(ventana[m].ptr,ventana[m].an/big2,ventana[m].al/big2,c1,2,2,ventana[m].an/big2-20,7);
-        if (text_len(ventana[m].title)+3>ventana[m].an/big2-20) {
-          wwrite_in_box(ventana[m].ptr,ventana[m].an/big2,ventana[m].an/big2-19,ventana[m].al/big2,4,2,0,ventana[m].title,c0);
-          wwrite_in_box(ventana[m].ptr,ventana[m].an/big2,ventana[m].an/big2-19,ventana[m].al/big2,3,2,0,ventana[m].title,c2);
+      for (m=1;m<max_windows;m++) if (window[m].type==v.type && window[m].state) {
+        window[m].state=0;
+        wgra(window[m].ptr,window[m].an/big2,window[m].al/big2,c1,2,2,window[m].an/big2-20,7);
+        if (text_len(window[m].title)+3>window[m].an/big2-20) {
+          wwrite_in_box(window[m].ptr,window[m].an/big2,window[m].an/big2-19,window[m].al/big2,4,2,0,window[m].title,c0);
+          wwrite_in_box(window[m].ptr,window[m].an/big2,window[m].an/big2-19,window[m].al/big2,3,2,0,window[m].title,c2);
         } else {
-          wwrite(ventana[m].ptr,ventana[m].an/big2,ventana[m].al/big2,2+(ventana[m].an/big2-20)/2,3,1,ventana[m].title,c0);
-          wwrite(ventana[m].ptr,ventana[m].an/big2,ventana[m].al/big2,2+(ventana[m].an/big2-20)/2,2,1,ventana[m].title,c2);
+          wwrite(window[m].ptr,window[m].an/big2,window[m].al/big2,2+(window[m].an/big2-20)/2,3,1,window[m].title,c0);
+          wwrite(window[m].ptr,window[m].an/big2,window[m].al/big2,2+(window[m].an/big2-20)/2,2,1,window[m].title,c2);
         }
 
-        if (v.type==102 && (ventana[m].prg!=NULL || ventana[m].click_handler==calc2) && ventana[m].type==102) { // Erase cursor
+        if (v.type==102 && (window[m].prg!=NULL || window[m].click_handler==calc2) && window[m].type==102) { // Erase cursor
           wup(m);
           call((voidReturnType )v.paint_handler);
           wdown(m);
@@ -2954,8 +2954,8 @@ void new_window(voidReturnType init_handler) {
 
     n=0; if (v.type==2 || v.type==3 || v.type==4 || v.type==5 || v.type==8) {
       for (m=1;m<max_windows;m++)
-        if (ventana[m].type==2 || ventana[m].type==3 || ventana[m].type==4 || ventana[m].type==5 || ventana[m].type==8)
-          if (ventana[m].click_handler==v.click_handler) n=m;
+        if (window[m].type==2 || window[m].type==3 || window[m].type==4 || window[m].type==5 || window[m].type==8)
+          if (window[m].click_handler==v.click_handler) n=m;
     }
 
     if (!n) ptr=(byte *)malloc(an*al); else ptr=NULL;
@@ -2969,16 +2969,16 @@ void new_window(voidReturnType init_handler) {
 
       if (v.type==1 || v.type==7) { // Dialogs/progress bars hide all windows
         vtipo=v.type; v.type=0;
-        if (ventana[1].type==1 || ventana[1].type==7) { // Dialog over dialog
-          ventana[1].foreground=0; flush_window(1);
+        if (window[1].type==1 || window[1].type==7) { // Dialog over dialog
+          window[1].foreground=0; flush_window(1);
         } else for (n=1;n<max_windows;n++)
-          if (ventana[n].type && ventana[n].foreground==1) {
-            hidden[n-1]=1; ventana[n].foreground=0; flush_window(n);
+          if (window[n].type && window[n].foreground==1) {
+            hidden[n-1]=1; window[n].foreground=0; flush_window(n);
           } else hidden[n-1]=0;
       } else {
         vtipo=v.type; v.type=0;
         for (n=1;n<max_windows;n++) {
-          if (ventana[n].type && ventana[n].foreground==1) {
+          if (window[n].type && window[n].foreground==1) {
             if (windows_collide(0,n)) {
               if (n==1) {
                 wup(1);
@@ -2988,7 +2988,7 @@ void new_window(voidReturnType init_handler) {
                 mouse_b=m; prev_mouse_buttons=om;
                 v.foreground=0; flush_window(0); v.redraw=0;
                 wdown(1);
-              } else { ventana[n].foreground=0; flush_window(n); }
+              } else { window[n].foreground=0; flush_window(n); }
             }
           }
         }
@@ -3046,7 +3046,7 @@ void new_window(voidReturnType init_handler) {
 			explode(x,y,an,al);
 			v.exploding=0;
 		}		
-        wvolcado(copia,vga_width,vga_height,ptr,x,y,an,al,0);
+        wvolcado(screen_buffer,vga_width,vga_height,ptr,x,y,an,al,0);
         blit_partial(x,y,an,al);
       }
 
@@ -3055,16 +3055,16 @@ void new_window(voidReturnType init_handler) {
     //---------------------------------------------------------------------------
 
     } else {
-      if (n && ventana[n].foreground==2) {
+      if (n && window[n].foreground==2) {
         divdelete(0);
         move(0,n-1);
         maximize_window();
       } else if (n) {
-        if (ventana[n].foreground==0) {
+        if (window[n].foreground==0) {
           divdelete(0);
           move(0,n-1);
-          for (m=1;m<max_windows;m++) if (ventana[m].type && ventana[m].foreground==1)
-            if (windows_collide(0,m)) { ventana[m].foreground=0; flush_window(m); }
+          for (m=1;m<max_windows;m++) if (window[m].type && window[m].foreground==1)
+            if (windows_collide(0,m)) { window[m].foreground=0; flush_window(m); }
           v.foreground=1; flush_window(0);
         } else { // When the requested menu is already in the foreground, highlight it
           divdelete(0);
@@ -3104,7 +3104,7 @@ void explode(int x,int y,int an,int al) {
   while (++n<10) {
     aan=(an*n)/10; aal=(al*n)/10;
     xx=x+an/2-aan/2; yy=y+al/2-aal/2;
-    wrectangle(copia,vga_width,vga_height,c4,xx,yy,aan,aal);
+    wrectangle(screen_buffer,vga_width,vga_height,c4,xx,yy,aan,aal);
     blit_partial(xx,yy,aan,1);
     blit_partial(xx,yy,1,aal);
     blit_partial(xx,yy+aal-1,aan,1);
@@ -3135,7 +3135,7 @@ void implode(int x,int y,int an,int al) {
     aan=(an*n)/10; if (!aan) aan=1;
     aal=(al*n)/10; if (!aal) aal=1;
     xx=x+an/2-aan/2; yy=y+al/2-aal/2;
-    wrectangle(copia,vga_width,vga_height,c4,xx,yy,aan,aal);
+    wrectangle(screen_buffer,vga_width,vga_height,c4,xx,yy,aan,aal);
     blit_partial(xx,yy,aan,1);
     blit_partial(xx,yy,1,aal);
     blit_partial(xx,yy+aal-1,aan,1);
@@ -3174,7 +3174,7 @@ void extrude(int x,int y,int an,int al,int x2,int y2,int an2,int al2) {
     aal=(al*n+al2*(10-n))/10;
     xx=(x*n+x2*(10-n))/10;
     yy=(y*n+y2*(10-n))/10;
-    wrectangle(copia,vga_width,vga_height,c4,xx,yy,aan,aal);
+    wrectangle(screen_buffer,vga_width,vga_height,c4,xx,yy,aan,aal);
     blit_partial(xx,yy,aan,1);
     blit_partial(xx,yy,1,aal);
     blit_partial(xx,yy+aal-1,aan,1);
@@ -3211,7 +3211,7 @@ void show_dialog(voidReturnType init_handler) {
   int n,m,x,y,an,al;
 uint32_t colorkey=0;
 
-  if (!ventana[max_windows-1].type) {
+  if (!window[max_windows-1].type) {
 
     _get_pos=get_pos;
 
@@ -3271,12 +3271,12 @@ uint32_t colorkey=0;
       vtipo=v.type; v.type=0; // Megabug workaround
 
       if (draw_mode>=100) {
-        if (ventana[1].type==1 || ventana[1].type==7) { // Dialog over dialog
-          ventana[1].foreground=0; flush_window(1);
+        if (window[1].type==1 || window[1].type==7) { // Dialog over dialog
+          window[1].foreground=0; flush_window(1);
         } else {
           for (n=1;n<max_windows;n++) {
-            if (ventana[n].type && ventana[n].foreground==1) {
-              hidden[n-1]=1; ventana[n].foreground=0; flush_window(n);
+            if (window[n].type && window[n].foreground==1) {
+              hidden[n-1]=1; window[n].foreground=0; flush_window(n);
             } else hidden[n-1]=0;
           }
         }
@@ -3295,7 +3295,7 @@ uint32_t colorkey=0;
       wrectangle(ptr,an,al,c2,0,0,an,al);
 
       wput(ptr,an,al,an-9,2,35);
-      if (!strcmp((char *)v.title,(char *)texto[41]) || !strcmp((char *)v.title,(char *)texto[367]))
+      if (!strcmp((char *)v.title,(char *)texts[41]) || !strcmp((char *)v.title,(char *)texts[367]))
         wgra(ptr,an,al,c_r_low,2,2,an-12,7);
       else wgra(ptr,an,al,c_b_low,2,2,an-12,7);
       if (text_len(v.title)+3>an-12) {
@@ -3317,7 +3317,7 @@ uint32_t colorkey=0;
 		  explode(x,y,an,al);
 			v.exploding=0;
 		}
-      wvolcado(copia,vga_width,vga_height,ptr,x,y,an,al,0);
+      wvolcado(screen_buffer,vga_width,vga_height,ptr,x,y,an,al,0);
       blit_partial(x,y,an,al);
       do { read_mouse(); } while(mouse_b&1);
       modal_loop();
@@ -3341,7 +3341,7 @@ void refresh_dialog(void)
 	memset(ptr,c0,an*al); if (big) { an/=2; al/=2; }
       wrectangle(ptr,an,al,c2,0,0,an,al);
       wput(ptr,an,al,an-9,2,35);
-      if (!strcmp((char *)v.title,(char *)texto[41])) wgra(ptr,an,al,c_r_low,2,2,an-12,7);
+      if (!strcmp((char *)v.title,(char *)texts[41])) wgra(ptr,an,al,c_r_low,2,2,an-12,7);
       else wgra(ptr,an,al,c_b_low,2,2,an-12,7);
       if (text_len(v.title)+3>an-12) {
         wwrite_in_box(ptr,an,an-11,al,4,2,0,v.title,c1);
@@ -3406,19 +3406,19 @@ void initialization(void) {
 	load_index();   // *** Load the hypertext glossary ***
 
 	if(!interpreting) {
-		printf("%s",(char *)texto[6]); // *** Init graphics buffers ***
+		printf("%s",(char *)texts[6]); // *** Init graphics buffers ***
 	}
 
 	undo=(byte*)malloc(undo_memory);
 	undo_table=(struct tipo_undo *)malloc(sizeof(struct tipo_undo)*max_undos);
 
 	for(n=0;n<max_windows;n++) {
-		ventana[n].type=0;
-		ventana[n].lado=0;
+		window[n].type=0;
+		window[n].side=0;
 	}
 
 	mouse_background=(byte*)malloc(1024*big2);
-	copia=(byte*)malloc(vga_width*vga_height+6)+6;
+	screen_buffer=(byte*)malloc(vga_width*vga_height+6)+6;
 	dac=(byte*)malloc(768);
 	dac4=(byte*)malloc(768);
 	color_lookup=(byte*)malloc(16384);
@@ -3429,7 +3429,7 @@ void initialization(void) {
 	fill_dac=(byte*)malloc(256);
 	error_window=(byte*)malloc(640*38*2);
 
-	if (mouse_background==NULL || copia==NULL || dac==NULL || dac4==NULL ||
+	if (mouse_background==NULL || screen_buffer==NULL || dac==NULL || dac4==NULL ||
 			color_lookup==NULL || ghost==NULL || toolbar==NULL || undo==NULL || undo_table==NULL ||
 			fill_dac==NULL || error_window==NULL)
 		error(0);
@@ -3615,19 +3615,19 @@ fclose(f);
 
   }
 
-  if (!interpreting) { printf("%s",(char *)texto[10]); } // *** Load edited objects ***
+  if (!interpreting) { printf("%s",(char *)texts[10]); } // *** Load edited objects ***
 
   if (auto_save_session || interpreting) CopyDesktop=Can_UpLoad_Desktop();
 
   if(!CopyDesktop) { // Load common palette
-    if (!interpreting) { cprintf("%s",(char *)texto[11]); } // *** Palette calculations ***
+    if (!interpreting) { cprintf("%s",(char *)texts[11]); } // *** Palette calculations ***
     memcpy(dac,system_dac,768);
     init_ghost();
     create_ghost(1);
   }
 
-  if (!interpreting) { printf("%s",(char *)texto[12]); } // *** Miscellaneous ***
-  find_colors(); memset(copia,c0,vga_width*vga_height);
+  if (!interpreting) { printf("%s",(char *)texts[12]); } // *** Miscellaneous ***
+  find_colors(); memset(screen_buffer,c0,vga_width*vga_height);
   zoom=0; zoom_x=0; zoom_y=0; zoom_cx=vga_width/2; zoom_cy=vga_height/2; zoom_move=c3;
   toolbar_x=8*big2; toolbar_y=vga_height-27*big2; gradient=0; current_mouse=21; sel_status=0;
   undo_index=0; for (a=0;a<max_undos;a++) undo_table[a].mode=-1;
@@ -3645,7 +3645,7 @@ fclose(f);
   inicializa_compilador(); // *** Compiler *** spaces in lower[] set to 00
   init_lexcolor();
 
-  if (!interpreting) { printf("%s",(char *)texto[13]); }
+  if (!interpreting) { printf("%s",(char *)texts[13]); }
 
   create_gradient_colors(Setupfile.gradient_config,wallpaper_gradient);
 
@@ -3666,7 +3666,7 @@ fclose(f);
   //read_mouse();
   prepare_wallpaper();
   full_redraw=1;
-  blit_screen(copia);
+  blit_screen(screen_buffer);
 
   InitSound();
   if(SoundActive) set_init_mixer();
@@ -3704,7 +3704,7 @@ void finalization(void) {
   free(color_lookup);
   free(dac4);
   free(dac);
-  free(copia-6);
+  free(screen_buffer-6);
   free(mouse_background);
   free(undo_table);
 
@@ -3834,7 +3834,7 @@ void _fwrite(char * s, byte * buf, int n) {
 void error(int n) {
 	debugprintf("WHOOPS!\n");
     finalization();
-    printf((char *)texto[14],n);
+    printf((char *)texts[14],n);
     printf("\n");
     exit(0);
 }
@@ -3916,7 +3916,7 @@ void DebugFile(char *Cadena,char *Nombre) {
 void _button(int t,int x,int y,int c) {
   v.item[v.items].type=1;
   v.item[v.items].state=0;
-  v.item[v.items].button.texto=texto[t];
+  v.item[v.items].button.text=texts[t];
   v.item[v.items].button.x=x;
   v.item[v.items].button.y=y;
   v.item[v.items].button.center=c;
@@ -3927,7 +3927,7 @@ void _button(int t,int x,int y,int c) {
 void _get(int t,int x,int y,int an,byte *buffer,int lon_buffer,int r0,int r1) {
   v.item[v.items].type=2;
   v.item[v.items].state=0;
-  v.item[v.items].get.texto=texto[t];
+  v.item[v.items].get.text=texts[t];
   v.item[v.items].get.x=x;
   v.item[v.items].get.y=y;
   v.item[v.items].get.an=an;
@@ -3942,7 +3942,7 @@ void _get(int t,int x,int y,int an,byte *buffer,int lon_buffer,int r0,int r1) {
 void _flag(int t,int x,int y,int *valor) {
   v.item[v.items].type=3;
   v.item[v.items].state=0;
-  v.item[v.items].flag.texto=texto[t];
+  v.item[v.items].flag.text=texts[t];
   v.item[v.items].flag.x=x;
   v.item[v.items].flag.y=y;
   v.item[v.items].flag.valor=valor;
@@ -3968,14 +3968,14 @@ void _show_items(void) {
 }
 
 void show_button(struct t_item * i) {
-  wwrite(v.ptr,v.an/big2,v.al/big2,i->button.x,i->button.y,i->button.center,i->button.texto,c3);
+  wwrite(v.ptr,v.an/big2,v.al/big2,i->button.x,i->button.y,i->button.center,i->button.text,c3);
   if (&v.item[v.selected_item]==i) select_button(i,1);
 }
 
 void select_button(struct t_item * i,int activo) {
   int x=i->button.x,y=i->button.y;
   int an,al;
-  an=text_len(i->button.texto+1); al=7;
+  an=text_len(i->button.text+1); al=7;
   switch (i->button.center) {
     case 0: break;
     case 1: x=x-(an>>1); break;
@@ -3996,8 +3996,8 @@ void select_button(struct t_item * i,int activo) {
 void show_get(struct t_item * i) {
   wbox(v.ptr,v.an/big2,v.al/big2,c1,i->get.x,i->get.y+8,i->get.an,9);
   wwrite_in_box(v.ptr,v.an/big2,i->get.an-1+i->get.x,v.al/big2,i->get.x+1,i->get.y+9,0,i->get.buffer,c3);
-  wwrite(v.ptr,v.an/big2,v.al/big2,i->get.x+1,i->get.y,0,i->get.texto,c12);
-  wwrite(v.ptr,v.an/big2,v.al/big2,i->get.x,i->get.y,0,i->get.texto,c3);
+  wwrite(v.ptr,v.an/big2,v.al/big2,i->get.x+1,i->get.y,0,i->get.text,c12);
+  wwrite(v.ptr,v.an/big2,v.al/big2,i->get.x,i->get.y,0,i->get.text,c3);
   if (&v.item[v.selected_item]==i) {
     if (i->state&2) select_get(i,0,0);
     select_get(i,1,0);
@@ -4018,7 +4018,7 @@ void select_get(struct t_item * i,int activo,int ocultar_error) {
     if (i->state&2) { if (*get) { if (i->get.r0==i->get.r1) strcpy((char *)i->get.buffer,get); else {
       if (atoi(get)>=i->get.r0 && atoi(get)<=i->get.r1) itoa(atoi(get),(char *)i->get.buffer,10);
       else if (!ocultar_error && !show_items_called) {
-        sprintf(cWork,"%s [%d..%d].",texto[49],i->get.r0,i->get.r1);
+        sprintf(cWork,"%s [%d..%d].",texts[49],i->get.r0,i->get.r1);
         v_text=cWork; show_dialog(err0);
       }
     } } }
@@ -4039,8 +4039,8 @@ void show_flag(struct t_item * i) {
   if (*i->flag.valor)
     wput(v.ptr,v.an/big2,v.al/big2,i->flag.x,i->flag.y,-59);
   else wput(v.ptr,v.an/big2,v.al/big2,i->flag.x,i->flag.y,58);
-  wwrite(v.ptr,v.an/big2,v.al/big2,i->flag.x+9,i->flag.y,0,i->flag.texto,c12);
-  wwrite(v.ptr,v.an/big2,v.al/big2,i->flag.x+8,i->flag.y,0,i->flag.texto,c3);
+  wwrite(v.ptr,v.an/big2,v.al/big2,i->flag.x+9,i->flag.y,0,i->flag.text,c12);
+  wwrite(v.ptr,v.an/big2,v.al/big2,i->flag.x+8,i->flag.y,0,i->flag.text,c3);
 }
 
 //-----------------------------------------------------------------------------
@@ -4138,7 +4138,7 @@ void _reselect_item(void) {
 int button_status(int n) {
   int x=v.item[n].button.x,y=v.item[n].button.y;
   int an,al,e=0;
-  an=text_len(v.item[n].button.texto+1); al=7;
+  an=text_len(v.item[n].button.text+1); al=7;
   switch (v.item[n].button.center) {
     case 0: break;
     case 1: x=x-(an>>1); break;
@@ -4161,24 +4161,24 @@ void process_button(int n,int e) {
   switch(e) {
     case 0:
       wwrite(v.ptr,v.an/big2,v.al/big2,v.item[n].button.x,v.item[n].button.y,
-      v.item[n].button.center,v.item[n].button.texto,c3); break;
+      v.item[n].button.center,v.item[n].button.text,c3); break;
     case 1:
       if (v.item[n].state==2) v.active_item=n;
       wwrite(v.ptr,v.an/big2,v.al/big2,v.item[n].button.x,v.item[n].button.y,
-      v.item[n].button.center,v.item[n].button.texto,c4); break;
+      v.item[n].button.center,v.item[n].button.text,c4); break;
       break;
     case 2: _select_new_item(n);
       wwrite(v.ptr,v.an/big2,v.al/big2,v.item[n].button.x,v.item[n].button.y,
-      v.item[n].button.center,v.item[n].button.texto,c0); break;
+      v.item[n].button.center,v.item[n].button.text,c0); break;
     case 3:
       wwrite(v.ptr,v.an/big2,v.al/big2,v.item[n].button.x,v.item[n].button.y,
-      v.item[n].button.center,v.item[n].button.texto,c0); break;
+      v.item[n].button.center,v.item[n].button.text,c0); break;
   } v.item[n].state=e; v.redraw=1;
 }
 
 int get_status(int n) {
   int x=v.item[n].state;
-  if (strcmp((char *)v.item[n].get.texto, "")) {
+  if (strcmp((char *)v.item[n].get.text, "")) {
     if (wmouse_in(v.item[n].get.x,v.item[n].get.y, // bit 0 "hilite"
       v.item[n].get.an,18)) x|=1; else x&=2;
   } else {
@@ -4224,10 +4224,10 @@ void process_get(int n,int e) {
 
   switch(v.item[n].state) {
     case 2: case 0:
-      wwrite(v.ptr,v.an/big2,v.al/big2,v.item[n].get.x,v.item[n].get.y,0,v.item[n].get.texto,c3);
+      wwrite(v.ptr,v.an/big2,v.al/big2,v.item[n].get.x,v.item[n].get.y,0,v.item[n].get.text,c3);
       break;
     case 3: case 1:
-      wwrite(v.ptr,v.an/big2,v.al/big2,v.item[n].get.x,v.item[n].get.y,0,v.item[n].get.texto,c4);
+      wwrite(v.ptr,v.an/big2,v.al/big2,v.item[n].get.x,v.item[n].get.y,0,v.item[n].get.text,c4);
       break;
   }
 
@@ -4237,7 +4237,7 @@ void process_get(int n,int e) {
 int flag_status(int n) {
   int x=0;
   if (wmouse_in(v.item[n].flag.x,v.item[n].flag.y,
-    text_len(v.item[n].flag.texto)+10,8)) x=1;
+    text_len(v.item[n].flag.text)+10,8)) x=1;
   if (x&&(mouse_b&1)) x=2;
   return(x);
 }
@@ -4247,11 +4247,11 @@ void process_flag(int n,int e) {
   if (v.item[n].state==3 && e!=3) v.active_item=n;
   switch(e) {
     case 0: wwrite(v.ptr,v.an/big2,v.al/big2,v.item[n].flag.x+8,v.item[n].flag.y,0,
-      v.item[n].flag.texto,c3); break;
+      v.item[n].flag.text,c3); break;
     case 1: wwrite(v.ptr,v.an/big2,v.al/big2,v.item[n].flag.x+8,v.item[n].flag.y,0,
-      v.item[n].flag.texto,c4); break;
+      v.item[n].flag.text,c4); break;
     case 2: wwrite(v.ptr,v.an/big2,v.al/big2,v.item[n].flag.x+8,v.item[n].flag.y,0,
-      v.item[n].flag.texto,c4);
+      v.item[n].flag.text,c4);
       if (v.item[n].state==1) {
         v.active_item=n;
         if ((*v.item[n].flag.valor=!*v.item[n].flag.valor))
@@ -4361,15 +4361,15 @@ void deactivate(void) { // Minimize: deactivate
       wwrite(v.ptr,an,al,2+(an-20)/2,3,1,v.title,c0);
       wwrite(v.ptr,an,al,2+(an-20)/2,2,1,v.title,c2);
     }
-    for (m=1;m<max_windows;m++) if (ventana[m].type==v.type && ventana[m].foreground<2) {
-      ventana[m].state=1;
-      wgra(ventana[m].ptr,ventana[m].an/big2,ventana[m].al/big2,c_b_low,2,2,ventana[m].an/big2-20,7);
-      if (text_len(ventana[m].title)+3>ventana[m].an/big2-20) {
-        wwrite_in_box(ventana[m].ptr,ventana[m].an/big2,ventana[m].an/big2-19,ventana[m].al/big2,4,2,0,ventana[m].title,c1);
-        wwrite_in_box(ventana[m].ptr,ventana[m].an/big2,ventana[m].an/big2-19,ventana[m].al/big2,3,2,0,ventana[m].title,c4);
+    for (m=1;m<max_windows;m++) if (window[m].type==v.type && window[m].foreground<2) {
+      window[m].state=1;
+      wgra(window[m].ptr,window[m].an/big2,window[m].al/big2,c_b_low,2,2,window[m].an/big2-20,7);
+      if (text_len(window[m].title)+3>window[m].an/big2-20) {
+        wwrite_in_box(window[m].ptr,window[m].an/big2,window[m].an/big2-19,window[m].al/big2,4,2,0,window[m].title,c1);
+        wwrite_in_box(window[m].ptr,window[m].an/big2,window[m].an/big2-19,window[m].al/big2,3,2,0,window[m].title,c4);
       } else {
-        wwrite(ventana[m].ptr,ventana[m].an/big2,ventana[m].al/big2,3+(ventana[m].an/big2-20)/2,2,1,ventana[m].title,c1);
-        wwrite(ventana[m].ptr,ventana[m].an/big2,ventana[m].al/big2,2+(ventana[m].an/big2-20)/2,2,1,ventana[m].title,c4);
+        wwrite(window[m].ptr,window[m].an/big2,window[m].al/big2,3+(window[m].an/big2-20)/2,2,1,window[m].title,c1);
+        wwrite(window[m].ptr,window[m].an/big2,window[m].al/big2,2+(window[m].an/big2-20)/2,2,1,window[m].title,c4);
       }
       flush_window(m); break;
     }
@@ -4393,17 +4393,17 @@ void activate(void) {
     wwrite(v.ptr,an,al,3+(an-20)/2,2,1,v.title,c1);
     wwrite(v.ptr,an,al,2+(an-20)/2,2,1,v.title,c4);
   }
-  for (m=1;m<max_windows;m++) if (ventana[m].type==v.type && ventana[m].state) {
-    ventana[m].state=0;
-    wgra(ventana[m].ptr,ventana[m].an/big2,ventana[m].al/big2,c1,2,2,ventana[m].an/big2-20,7);
-    if (text_len(ventana[m].title)+3>ventana[m].an/big2-20) {
-      wwrite_in_box(ventana[m].ptr,ventana[m].an/big2,ventana[m].an/big2-19,ventana[m].al/big2,4,2,0,ventana[m].title,c0);
-      wwrite_in_box(ventana[m].ptr,ventana[m].an/big2,ventana[m].an/big2-19,ventana[m].al/big2,3,2,0,ventana[m].title,c2);
+  for (m=1;m<max_windows;m++) if (window[m].type==v.type && window[m].state) {
+    window[m].state=0;
+    wgra(window[m].ptr,window[m].an/big2,window[m].al/big2,c1,2,2,window[m].an/big2-20,7);
+    if (text_len(window[m].title)+3>window[m].an/big2-20) {
+      wwrite_in_box(window[m].ptr,window[m].an/big2,window[m].an/big2-19,window[m].al/big2,4,2,0,window[m].title,c0);
+      wwrite_in_box(window[m].ptr,window[m].an/big2,window[m].an/big2-19,window[m].al/big2,3,2,0,window[m].title,c2);
     } else {
-      wwrite(ventana[m].ptr,ventana[m].an/big2,ventana[m].al/big2,2+(ventana[m].an/big2-20)/2,3,1,ventana[m].title,c0);
-      wwrite(ventana[m].ptr,ventana[m].an/big2,ventana[m].al/big2,2+(ventana[m].an/big2-20)/2,2,1,ventana[m].title,c2);
+      wwrite(window[m].ptr,window[m].an/big2,window[m].al/big2,2+(window[m].an/big2-20)/2,3,1,window[m].title,c0);
+      wwrite(window[m].ptr,window[m].an/big2,window[m].al/big2,2+(window[m].an/big2-20)/2,2,1,window[m].title,c2);
     }
-    if (v.type==102 && ventana[m].type==102) { // Erase cursor
+    if (v.type==102 && window[m].type==102) { // Erase cursor
       wup(m);
       call((voidReturnType )v.paint_handler);
       wdown(m);
@@ -4552,7 +4552,7 @@ void Load_Cfgbin() {
   file=fopen("system/setup.bin","rb");
   if(file==NULL) {
     if (primera_vez) {
-      strcpy(Setupfile.Desktop_Image,(char *)texto[487]); // Wallpaper info
+      strcpy(Setupfile.Desktop_Image,(char *)texts[487]); // Wallpaper info
       Setupfile.Desktop_Gama=1;
       Setupfile.Desktop_Tile=0;
       for (n=0;n<8;n++) Setupfile.gradient_config[n].selec=0;
@@ -4712,7 +4712,7 @@ void check_mouse(void) {
     inregs.w.ax = 0;
     int386 (0x33, &inregs, &outregs);
     if (outregs.w.ax!=0xffff) {
-      printf(texto[376]);
+      printf(texts[376]);
       exit(0);
     }
   }
@@ -4729,7 +4729,7 @@ int determine_prg2(void) {
   int m,n=-1;
 
   for (m=0;m<max_windows;m++) {
-    if (ventana[m].type==102 && ventana[m].state && ventana[m].prg!=NULL) {
+    if (window[m].type==102 && window[m].state && window[m].prg!=NULL) {
       n=m; break;
     }
   } return(v_window=n);
@@ -4739,7 +4739,7 @@ int determine_calc(void) {
   int m,n=-1;
 
   for (m=0;m<max_windows;m++) {
-    if (ventana[m].click_handler==calc2 && ventana[m].state) { n=m; break; }
+    if (window[m].click_handler==calc2 && window[m].state) { n=m; break; }
   } return(v_window=n);
 }
 
@@ -4747,7 +4747,7 @@ int determine_calc(void) {
 //  Window movement
 ///////////////////////////////////////////////////////////////////////////////
 
-struct tventana vaux[4];
+struct twindow vaux[4];
 int ivaux=0;
 
 void copy(int a,int b) {
@@ -4756,11 +4756,11 @@ void copy(int a,int b) {
 	return;
 	
   if (a==-1) {
-    memcpy(&vaux[ivaux].type,&ventana[b].type,sizeof(struct tventana));
+    memcpy(&vaux[ivaux].type,&window[b].type,sizeof(struct twindow));
   } else if (b==-1) {
-    memcpy(&ventana[a].type,&vaux[ivaux].type,sizeof(struct tventana));
+    memcpy(&window[a].type,&vaux[ivaux].type,sizeof(struct twindow));
   } else {
-    memcpy(&ventana[a].type,&ventana[b].type,sizeof(struct tventana));
+    memcpy(&window[a].type,&window[b].type,sizeof(struct twindow));
   }
   
 }
@@ -4770,27 +4770,27 @@ void xchg(int a,int b) { copy(-1,a); copy(a,b); copy(b,-1); }
 void move(int a,int b) {
   if (a<b) {
     copy(-1,b);
-    memmove(&ventana[a+1].type,&ventana[a].type,sizeof(struct tventana)*(b-a));
+    memmove(&window[a+1].type,&window[a].type,sizeof(struct twindow)*(b-a));
     copy(a,-1);
   } else if (b<a) {
     copy(-1,b);
-    memmove(&ventana[b].type,&ventana[b+1].type,sizeof(struct tventana)*(a-b));
+    memmove(&window[b].type,&window[b+1].type,sizeof(struct twindow)*(a-b));
     copy(a,-1);
   }
 }
 
 void divdelete(int a) {
-  memmove(&ventana[a].type,&ventana[a+1].type,sizeof(struct tventana)*(max_windows-1-a));
-  ventana[max_windows-1].type=0;
+  memmove(&window[a].type,&window[a+1].type,sizeof(struct twindow)*(max_windows-1-a));
+  window[max_windows-1].type=0;
 }
 
 void addwindow(void) {
-  memmove(&ventana[1].type,&v.type,sizeof(struct tventana)*(max_windows-1));
+  memmove(&window[1].type,&v.type,sizeof(struct twindow)*(max_windows-1));
 }
 
 void wup(int a) {
   if (++ivaux==4) ivaux=0;
-  copy(-1,0); copy(0,a); ventana[a].type=0;
+  copy(-1,0); copy(0,a); window[a].type=0;
 }
 
 void wdown(int a) {

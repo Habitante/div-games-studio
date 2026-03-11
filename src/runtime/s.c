@@ -201,7 +201,7 @@ void scroll_simple(void) {
   update_scroll(0);
 
   si=iscroll[snum].sscr1; b=iscroll[snum].block1;
-  di=copia+iscroll[snum].x+iscroll[snum].y*vga_width;
+  di=screen_buffer+iscroll[snum].x+iscroll[snum].y*vga_width;
 
   for (n=0;n<iscroll[snum].al;n++) {
     memcpy(di,si,iscroll[snum].an);
@@ -230,7 +230,7 @@ void scroll_parallax(void) {
 
   si1=iscroll[snum].sscr1; si2=iscroll[snum].sscr2;
   b1=iscroll[snum].block1; b2=iscroll[snum].block2;
-  di=copia+iscroll[snum].x+iscroll[snum].y*vga_width;
+  di=screen_buffer+iscroll[snum].x+iscroll[snum].y*vga_width;
   fast=iscroll[snum].fast;
 
   scan=iscroll[snum].iscan;
@@ -808,8 +808,8 @@ void put_sprite(int file,int graph,int x,int y,int angle,int size,int flags,int 
   byte * si;
   int an,al; // Graphic width and height on screen
   int xg,yg;
-  byte * _copia=copia;
-  int _vga_an=vga_width,_vga_al=vga_height;
+  byte * _saved_buffer=screen_buffer;
+  int _saved_width=vga_width,_saved_height=vga_height;
 
   if (file>max_fpgs || file<0) { e(109); return; }
   if (file) max_grf=1000; else max_grf=2000;
@@ -830,7 +830,7 @@ void put_sprite(int file,int graph,int x,int y,int angle,int size,int flags,int 
 
   if ((ptr=g[file].grf[graph])!=NULL) {
 
-    copia=cop; vga_width=copan; vga_height=copal;
+    screen_buffer=cop; vga_width=copan; vga_height=copal;
 
     an=ptr[13]; al=ptr[14];
     si=(byte*)ptr+64+ptr[15]*4;
@@ -852,7 +852,7 @@ void put_sprite(int file,int graph,int x,int y,int angle,int size,int flags,int 
       x0s=x; x1s=x+an-1; y0s=y; y1s=y+al-1;
     }
 
-    copia=_copia; vga_width=_vga_an; vga_height=_vga_al;
+    screen_buffer=_saved_buffer; vga_width=_saved_width; vga_height=_saved_height;
 
   } else e(121);
 }
@@ -952,7 +952,7 @@ void save_region(void) {
 
 void sp_normal(byte * p, int x, int y, int an, int al, int flags) {
 
-  byte *q=copia+y*vga_width+x;
+  byte *q=screen_buffer+y*vga_width+x;
   int ancho=an;
 
   switch (flags&7) {
@@ -1027,7 +1027,7 @@ void sp_normal(byte * p, int x, int y, int an, int al, int flags) {
 
 void sp_clipped(byte * p, int x, int y, int an, int al, int flags) {
 
-  byte *q=copia+y*vga_width+x;
+  byte *q=screen_buffer+y*vga_width+x;
   int salta_x, long_x, resto_x;
   int salta_y, long_y, resto_y;
 
@@ -1139,7 +1139,7 @@ void sp_scaled(byte * old_si, int x, int y, int an, int al, int xg, int yg,
 
   if (x1s<clipx0 || y1s<clipy0 || x0s>=clipx1 || y0s>=clipy1) return;
 
-  di=copia+y0s*vga_width+x0s;
+  di=screen_buffer+y0s*vga_width+x0s;
 
   if (x0s<clipx0) salta_x=clipx0-x0s; else salta_x=0;
   if (x1s>=clipx1) resto_x=x1s-clipx1+1; else resto_x=0;
@@ -1239,7 +1239,7 @@ void sp_rotated(byte * si, int x, int y, int an, int al, int xg, int yg,
     n+=2;
   } while (n<16); y0s=hmin; y1s=hmax;
 
-  l1=l0; hmax0=hmax1=hmin; ptrcopia=copia+hmin*vga_width;
+  l1=l0; hmax0=hmax1=hmin; ptrcopia=screen_buffer+hmin*vga_width;
 
   h=hmin; do {
 
@@ -1588,7 +1588,7 @@ void line_pixel(int x, int y) {
 
   if (x>=clipx0 && y>=clipy0 && x<clipx1 && y<clipy1) {
 
-    p=copia+x+y*vga_width;
+    p=screen_buffer+x+y*vga_width;
 
     switch(line_fx) {
 
@@ -1742,7 +1742,7 @@ byte * ptr2;
 
 void checkpal_font(int ifonts);
 
-void paint_texts(int n) { // E: texto[]
+void paint_texts(int n) { // E: texts[]
 
   int x,y,an,al;
   int fuente;
@@ -1750,33 +1750,33 @@ void paint_texts(int n) { // E: texto[]
   byte * ptr=NULL,* ptr2;
   byte numero[32];
 
-  do if (texto[n].font) {
+  do if (texts[n].font) {
 
-    if (n==max_textos) {
+    if (n==max_texts) {
       if (reloj&64) break;
       else ptr=text[91];
-    } else switch (texto[n].type) {
-      case 0: ptr=(byte*)&mem[texto[n].ptr]; break;
-      case 1: if (mem[texto[n].ptr]<0) {
+    } else switch (texts[n].type) {
+      case 0: ptr=(byte*)&mem[texts[n].ptr]; break;
+      case 1: if (mem[texts[n].ptr]<0) {
           numero[0]='-';
-          ltoa(-mem[texto[n].ptr],(char*)numero+1,10);
-        } else ltoa(mem[texto[n].ptr],(char*)numero,10);
+          ltoa(-mem[texts[n].ptr],(char*)numero+1,10);
+        } else ltoa(mem[texts[n].ptr],(char*)numero,10);
         ptr=numero; break;
     }
 
-    texto[n].an=0; // Initialize the blit region for this text
+    texts[n].an=0; // Initialize the blit region for this text
 
-    x=texto[n].x;                     // X of first character
-    y=texto[n].y;                     // Y
+    x=texts[n].x;                     // X of first character
+    y=texts[n].y;                     // Y
 
     fuente=0; while (fuente<max_fonts) {
-      if (texto[n].font==fonts[fuente]) break;
+      if (texts[n].font==fonts[fuente]) break;
       fuente++;
     } if (fuente==max_fonts) continue;
 
     checkpal_font(fuente);
 
-    fnt=(TABLAFNT*)((byte*)texto[n].font+1356);
+    fnt=(TABLAFNT*)((byte*)texts[n].font+1356);
 
     al=f_i[fuente].alto;
 
@@ -1786,7 +1786,7 @@ void paint_texts(int n) { // E: texto[]
       } else an+=fnt[*ptr2++].ancho;
     }
 
-    switch (texto[n].centro) {
+    switch (texts[n].centro) {
       case 0: break;
       case 1: x=x-(an>>1); break;
       case 2: x=x-an; break;
@@ -1800,7 +1800,7 @@ void paint_texts(int n) { // E: texto[]
 
     if (y<vga_height && y+al>0) {
 
-      texto[n].x0=x; texto[n].y0=y; texto[n].an=an; texto[n].al=al;
+      texts[n].x0=x; texts[n].y0=y; texts[n].an=an; texts[n].al=al;
 
       if (y>=0 && y+al<=vga_height) { // Text fits entirely (y coordinate)
 
@@ -1815,19 +1815,19 @@ void paint_texts(int n) { // E: texto[]
 	if (*ptr && x<0) {
           if (fnt[*ptr].ancho==0) { x+=f_i[fuente].espacio; ptr++;
           } else {
-            text_clipped(texto[n].font+fnt[*ptr].offset,x,y+fnt[*ptr].incY,fnt[*ptr].ancho,fnt[*ptr].alto);
+            text_clipped(texts[n].font+fnt[*ptr].offset,x,y+fnt[*ptr].incY,fnt[*ptr].ancho,fnt[*ptr].alto);
             x=x+fnt[*ptr].ancho; ptr++; }
         }
 
 	while (*ptr && x+fnt[*ptr].ancho<=vga_width) {
           if (fnt[*ptr].ancho==0) { x+=f_i[fuente].espacio; ptr++; } else {
-          text_normal(texto[n].font+fnt[*ptr].offset,x,y+fnt[*ptr].incY,fnt[*ptr].ancho,fnt[*ptr].alto);
+          text_normal(texts[n].font+fnt[*ptr].offset,x,y+fnt[*ptr].incY,fnt[*ptr].ancho,fnt[*ptr].alto);
           x=x+fnt[*ptr].ancho; ptr++;
         } }
 
         if (*ptr && x<vga_width) {
           if (fnt[*ptr].ancho==0) { x+=f_i[fuente].espacio; ptr++; } else
-          text_clipped(texto[n].font+fnt[*ptr].offset,x,y+fnt[*ptr].incY,fnt[*ptr].ancho,fnt[*ptr].alto);
+          text_clipped(texts[n].font+fnt[*ptr].offset,x,y+fnt[*ptr].incY,fnt[*ptr].ancho,fnt[*ptr].alto);
         }
 
       } else {
@@ -1838,18 +1838,18 @@ void paint_texts(int n) { // E: texto[]
 
 	while (*ptr && x<vga_width)
           if (fnt[*ptr].ancho==0) { x+=f_i[fuente].espacio; ptr++; } else {
-          text_clipped(texto[n].font+fnt[*ptr].offset,x,y+fnt[*ptr].incY,fnt[*ptr].ancho,fnt[*ptr].alto);
+          text_clipped(texts[n].font+fnt[*ptr].offset,x,y+fnt[*ptr].incY,fnt[*ptr].ancho,fnt[*ptr].alto);
           x=x+fnt[*ptr].ancho; ptr++;
         }
 
       }
     }
-  } while (++n<max_textos);
+  } while (++n<max_texts);
 }
 
 void text_normal(byte * p, int x, int y, byte an, int al) {
 
-  byte *q=copia+y*vga_width+x;
+  byte *q=screen_buffer+y*vga_width+x;
   int ancho=an;
 
   do {
@@ -1862,7 +1862,7 @@ void text_normal(byte * p, int x, int y, byte an, int al) {
 
 void text_clipped(byte * p, int x, int y, byte an, int al) {
 
-  byte *q=copia+y*vga_width+x;
+  byte *q=screen_buffer+y*vga_width+x;
   int salta_x, long_x, resto_x;
   int salta_y, long_y, resto_y;
 
@@ -2017,7 +2017,7 @@ void paint_sprites_m7(int n,int cx,int cy,float ang) { // Takes the camera posit
 
         // *** Debug: white pixel at the object's base ***
         // if (altura<vga_height && altura>=0 && anchura<vga_width && anchura>=0) {
-        //   *(copia+altura*vga_width+anchura)=127;
+        //   *(screen_buffer+altura*vga_width+anchura)=127;
         // }
 
       } mem[ide+_Painted]=1;
@@ -2097,7 +2097,7 @@ void paint_mode7(int n,int camara_x, int camara_y, int camara_z, int angulo) {
   int mediox_modo7_16;
   int distancia=((im7[n].an*(m7+n)->focus)/320)<<16;
   int divisor;
-  byte *di=copia+im7[n].y*vga_width+im7[n].x,*di_end,color=(m7+n)->color;
+  byte *di=screen_buffer+im7[n].y*vga_width+im7[n].x,*di_end,color=(m7+n)->color;
 
   mediox_modo7_16=mediox_modo7<<16;
 

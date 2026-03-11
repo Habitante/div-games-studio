@@ -89,7 +89,7 @@ typedef struct tagRGBQUAD
 
 // NOTE: Any function that needs extra memory can use malloc. If
 // the allocation fails, show an error dialog:
-//   v_text = texto[45]; show_dialog(err0);
+//   v_text = texts[45]; show_dialog(err0);
 
 // NOTE 2: The only format whose decompress function returns a value is JPG.
 
@@ -140,22 +140,22 @@ int save_MAP (byte * mapa, FILE * f) {
 	fwrite("map\x1a\x0d\x0a\x00\x00",8,1,f);      // +000 Header and version
 	x=map_width; fwrite(&x,2,1,f);                   // +008 Width
 	x=map_height; fwrite(&x,2,1,f);                   // +010 Height
-	y=ventana[v_window].mapa->fpg_code; fwrite(&y,4,1,f);// +012 Code
+	y=window[v_window].mapa->fpg_code; fwrite(&y,4,1,f);// +012 Code
 
-	fwrite(ventana[v_window].mapa->description,32,1,f);// +016 Description
+	fwrite(window[v_window].mapa->description,32,1,f);// +016 Description
 	fwrite(dac,768,1,f);                          // +048 Palette
 	fwrite(gradients,1,sizeof(gradients),f);            // +816 Color gradients
 
 	npuntos=0;
 
 	for(i=511;i>=0;i-=2)
-		if(ventana[v_window].mapa->puntos[i]!=-1) {
+		if(window[v_window].mapa->puntos[i]!=-1) {
 				npuntos=(i+1)/2;
 				i=-1;
 		}
 
 	fwrite(&npuntos,2,1,f);                     // +1392 Number of control points
-	fwrite(&ventana[v_window].mapa->puntos,npuntos,4,f);
+	fwrite(&window[v_window].mapa->puntos,npuntos,4,f);
 
 	y=map_width*map_height;
 
@@ -268,7 +268,7 @@ void descomprime_PCX(byte *buffer, byte *mapa, int vent)
   {
     if ((pDest=(byte *)malloc((map_width+1)*(map_height+1)*3))==NULL)
     {
-      v_text=(char *)texto[45];
+      v_text=(char *)texts[45];
       show_dialog((voidReturnType)err0);
       return;
     }
@@ -280,7 +280,7 @@ void descomprime_PCX(byte *buffer, byte *mapa, int vent)
   {
     if ((pDest=(byte *)malloc(last_byte))==NULL)
     {
-      v_text=(char *)texto[45];
+      v_text=(char *)texts[45];
       show_dialog((voidReturnType)err0);
       return;
     }
@@ -504,7 +504,7 @@ int save_PCX(byte *mapa,FILE *f) {
         if ((cbuffer=(unsigned char *)malloc(map_width*map_height*2))==NULL)
         {
                 // Memory allocation error.
-                v_text=(char *)texto[45]; show_dialog((voidReturnType)err0);
+                v_text=(char *)texts[45]; show_dialog((voidReturnType)err0);
                 return(1);
         }
         ActPixel=mapa[ptr];
@@ -1151,7 +1151,7 @@ int cargadac_FNT(char *name)
   file=fopen(name,"rb");
   if(file==NULL)
   {
-    v_text=(char *)texto[44];
+    v_text=(char *)texts[44];
     show_dialog((voidReturnType)err0);
     return(0);
   }
@@ -1175,7 +1175,7 @@ int cargadac_FPG(char *name)
   file=fopen(name,"rb");
   if(file==NULL)
   {
-    v_text=(char *)texto[44];
+    v_text=(char *)texts[44];
     show_dialog((voidReturnType)err0);
     return(0);
   }
@@ -1199,7 +1199,7 @@ int cargadac_PAL(char *name)
   file=fopen(name,"rb");
   if(file==NULL)
   {
-    v_text=(char *)texto[44];
+    v_text=(char *)texts[44];
     show_dialog((voidReturnType)err0);
     return(0);
   }
@@ -1235,7 +1235,7 @@ int cargadac_MAP(char *name)
   file=fopen(name,"rb");
   if(file==NULL)
   {
-    v_text=(char *)texto[44];
+    v_text=(char *)texts[44];
     show_dialog((voidReturnType)err0);
     return(0);
   }
@@ -1302,7 +1302,7 @@ int cargadac_PCX(char *name)
   file=fopen(name,"rb");
   if(file==NULL)
   {
-    v_text=(char *)texto[44];
+    v_text=(char *)texts[44];
     show_dialog((voidReturnType)err0);
     return(0);
   }
@@ -1391,7 +1391,7 @@ int cargadac_BMP(char *name)
   file=fopen(name,"rb");
   if(file==NULL)
   {
-    v_text=(char *)texto[44]; show_dialog((voidReturnType)err0);
+    v_text=(char *)texts[44]; show_dialog((voidReturnType)err0);
     free(CopiaBuffer);
     return(0);
   }
@@ -1502,7 +1502,7 @@ int cargadac_JPG(char *name)
   file=fopen(name,"rb");
   if(file==NULL)
   {
-    v_text=(char *)texto[44];
+    v_text=(char *)texts[44];
     show_dialog((voidReturnType)err0);
     return(0);
   }
@@ -1512,7 +1512,7 @@ int cargadac_JPG(char *name)
   fseek(file,0,SEEK_SET);
   if ((buffer=(byte *)malloc(img_filesize))==NULL)
   {
-    v_text=(char *)texto[45]; show_dialog((voidReturnType)err0);
+    v_text=(char *)texts[45]; show_dialog((voidReturnType)err0);
     fclose(file);
     return(0);
   }

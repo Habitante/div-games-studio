@@ -14,7 +14,7 @@ void Selcolor0(void);
 void GenFont0(void);
 int font_generated=0;
 void GetText0(void);
-void crear_texto_prueba(char * s, char flags);
+void create_test_text(char * s, char flags);
 
 
 
@@ -107,20 +107,20 @@ char cWork[10];
         wbox(v.ptr,an,al,c2,84-8,61-1,16,8); // Dark border for shadow X
         wbox(v.ptr,an,al,c2,84-8,75-1,16,8); // Dark border for shadow Y
 
-        wwrite(v.ptr,an,al,4+60+20,51,1,texto[86],c3);
+        wwrite(v.ptr,an,al,4+60+20,51,1,texts[86],c3);
         wwrite(v.ptr,an,al,24+60,61,1,(byte *)itoa(OutLine,cWork,10),c3);
         wput(v.ptr,an,al,20+60,75,220+OutLineDir);
 
-        wwrite(v.ptr,an,al,64+60+20,51,1,texto[87],c3);
+        wwrite(v.ptr,an,al,64+60+20,51,1,texts[87],c3);
         wwrite(v.ptr,an,al,84+60,61,1,(byte *)itoa(Somx,cWork,10),c3);
         wwrite(v.ptr,an,al,84+60,75,1,(byte *)itoa(Somy,cWork,10),c3);
 
-        wwrite(v.ptr,an,al,124-120+20,51,1,texto[91],c3);
+        wwrite(v.ptr,an,al,124-120+20,51,1,texts[91],c3);
 
-        wwrite(v.ptr,an,al,4,12,0,texto[84],c3);
+        wwrite(v.ptr,an,al,4,12,0,texts[84],c3);
         wbox(v.ptr,an,al,c2,4,19,66,8); // Dark border for Font
         wwrite(v.ptr,an,al,4,19,0,(byte *)FontName,c4);
-        wwrite(v.ptr,an,al,4,31,0,texto[85],c3);
+        wwrite(v.ptr,an,al,4,31,0,texts[85],c3);
         wbox(v.ptr,an,al,c2,4,38,66,8); // Dark border for Face
         wwrite(v.ptr,an,al,4,38,0,(byte *)FaceName,c4);
 
@@ -133,7 +133,7 @@ char cWork[10];
 void close_old_fnt(void) {
   int m;
 
-  for (m=1;m<max_windows;m++) if (ventana[m].type==104 && !strcmp(FontName,(char *)ventana[m].aux)) {
+  for (m=1;m<max_windows;m++) if (window[m].type==104 && !strcmp(FontName,(char *)window[m].aux)) {
     move(0,m);
     close_window();
     break;
@@ -219,12 +219,12 @@ char cWork[10];
                         v.redraw=1;
                         break;
                 case 13:
-                        if (!strcmp(FaceName,"")) { v_text=(char *)texto[263]; show_dialog(err0); break; }
+                        if (!strcmp(FaceName,"")) { v_text=(char *)texts[263]; show_dialog(err0); break; }
                         Preview();
                         v.redraw=1;
                         break;
                 case 14:
-                        if (!strcmp(FaceName,"")) { v_text=(char *)texto[263]; show_dialog(err0); break; }
+                        if (!strcmp(FaceName,"")) { v_text=(char *)texts[263]; show_dialog(err0); break; }
                         font_generated=0;
                         show_dialog(GenFont0);
                         if (font_generated) {
@@ -311,25 +311,25 @@ char cWork[10];
                                 Text1Col=1;
                         if(Text01!=NULL)
                                 free(Text01);
-                        Text01=(char *)malloc(ventana[1].mapa->map_width*ventana[1].mapa->map_height);
+                        Text01=(char *)malloc(window[1].mapa->map_width*window[1].mapa->map_height);
                         if(Text01==NULL)
                         {
-                                v_text=(char *)texto[45]; show_dialog(err0);
+                                v_text=(char *)texts[45]; show_dialog(err0);
                                 Text1Anc=1;
                                 Text1Alt=1;
                         }
                         else
                         {
-                                Text1Anc=ventana[1].mapa->map_width;
-                                Text1Alt=ventana[1].mapa->map_height;
-                                memcpy(Text01,ventana[1].mapa->map,Text1Anc*Text1Alt);
+                                Text1Anc=window[1].mapa->map_width;
+                                Text1Alt=window[1].mapa->map_height;
+                                memcpy(Text01,window[1].mapa->map,Text1Anc*Text1Alt);
                                 x=0;
                                 y=0;
-                                for(py=0;py<ventana[1].mapa->map_height;py+=ventana[1].mapa->map_height/(float)tal)
+                                for(py=0;py<window[1].mapa->map_height;py+=window[1].mapa->map_height/(float)tal)
                                 {
                                         x=0;
-                                        for(px=0;px<ventana[1].mapa->map_width;px+=ventana[1].mapa->map_width/(float)tan)
-                                                Text1[y*tan+x++]=ventana[1].mapa->map[ (memptrsize)py*ventana[1].mapa->map_width+(memptrsize)px];
+                                        for(px=0;px<window[1].mapa->map_width;px+=window[1].mapa->map_width/(float)tan)
+                                                Text1[y*tan+x++]=window[1].mapa->map[ (memptrsize)py*window[1].mapa->map_width+(memptrsize)px];
                                         y++;
                                 }
                         }
@@ -341,24 +341,24 @@ char cWork[10];
                                 Text2Col=1;
                         if(Text02!=NULL)
                                 free(Text02);
-                        Text02=(char *)malloc(ventana[1].mapa->map_width*ventana[1].mapa->map_height);
+                        Text02=(char *)malloc(window[1].mapa->map_width*window[1].mapa->map_height);
                         if(Text02==NULL)
                         {
-                                v_text=(char *)texto[45]; show_dialog(err0);
+                                v_text=(char *)texts[45]; show_dialog(err0);
                                 Text2Anc=1;
                                 Text2Alt=1;
                         }
                         else
                         {
-                                Text2Anc=ventana[1].mapa->map_width;
-                                Text2Alt=ventana[1].mapa->map_height;
-                                memcpy(Text02,ventana[1].mapa->map,Text2Anc*Text2Alt);
+                                Text2Anc=window[1].mapa->map_width;
+                                Text2Alt=window[1].mapa->map_height;
+                                memcpy(Text02,window[1].mapa->map,Text2Anc*Text2Alt);
                                 x=0;y=0;
-                                for(py=0;py<ventana[1].mapa->map_height;py+=ventana[1].mapa->map_height/(float)tal)
+                                for(py=0;py<window[1].mapa->map_height;py+=window[1].mapa->map_height/(float)tal)
                                 {
                                         x=0;
-                                        for(px=0;px<ventana[1].mapa->map_width;px+=ventana[1].mapa->map_width/(float)tan)
-                                                Text2[y*tan+x++]=ventana[1].mapa->map[(memptrsize)py*ventana[1].mapa->map_width+(memptrsize)px];
+                                        for(px=0;px<window[1].mapa->map_width;px+=window[1].mapa->map_width/(float)tan)
+                                                Text2[y*tan+x++]=window[1].mapa->map[(memptrsize)py*window[1].mapa->map_width+(memptrsize)px];
                                         y++;
                                 }
                         }
@@ -370,24 +370,24 @@ char cWork[10];
                                 Text3Col=1;
                         if(Text03!=NULL)
                                 free(Text03);
-                        Text03=(char *)malloc(ventana[1].mapa->map_width*ventana[1].mapa->map_height);
+                        Text03=(char *)malloc(window[1].mapa->map_width*window[1].mapa->map_height);
                         if(Text03==NULL)
                         {
-                                v_text=(char *)texto[45]; show_dialog(err0);
+                                v_text=(char *)texts[45]; show_dialog(err0);
                                 Text3Anc=1;
                                 Text3Alt=1;
                         }
                         else
                         {
-                                Text3Anc=ventana[1].mapa->map_width;
-                                Text3Alt=ventana[1].mapa->map_height;
-                                memcpy(Text03,ventana[1].mapa->map,Text3Anc*Text3Alt);
+                                Text3Anc=window[1].mapa->map_width;
+                                Text3Alt=window[1].mapa->map_height;
+                                memcpy(Text03,window[1].mapa->map,Text3Anc*Text3Alt);
                                 x=0;y=0;
-                                for(py=0;py<ventana[1].mapa->map_height;py+=ventana[1].mapa->map_height/(float)tal)
+                                for(py=0;py<window[1].mapa->map_height;py+=window[1].mapa->map_height/(float)tal)
                                 {
                                         x=0;
-                                        for(px=0;px<ventana[1].mapa->map_width;px+=ventana[1].mapa->map_width/(float)tan)
-                                                Text3[y*tan+x++]=ventana[1].mapa->map[(memptrsize)py*ventana[1].mapa->map_width+(memptrsize)px];
+                                        for(px=0;px<window[1].mapa->map_width;px+=window[1].mapa->map_width/(float)tan)
+                                                Text3[y*tan+x++]=window[1].mapa->map[(memptrsize)py*window[1].mapa->map_width+(memptrsize)px];
                                         y++;
                                 }
                         }
@@ -427,7 +427,7 @@ void Fonts0(void) {
   FILE *f;
 
         memset(TestString,0,21);
-        memcpy(TestString,texto[73],20);
+        memcpy(TestString,texts[73],20);
         if (big) {tan*=2;tal*=2; }
         v.type=102;
         v.an=169;
@@ -435,8 +435,8 @@ void Fonts0(void) {
         v.paint_handler=Fonts1;
         v.click_handler=Fonts2;
         v.close_handler=Fonts3;
-        v.title=texto[83];
-        v.name=texto[83];
+        v.title=texts[83];
+        v.name=texts[83];
         lfontsizes.created=0;
         lfontsizes.total_items=8;
 
@@ -446,7 +446,7 @@ void Fonts0(void) {
         Text1=(char *)malloc(tan*tal*10);
         if(Text1==NULL)
         {
-                v_text=(char *)texto[45]; show_dialog(err0);
+                v_text=(char *)texts[45]; show_dialog(err0);
                 return;
         }
         memset(Text1,Text1Col,tan*tal*10);
@@ -458,7 +458,7 @@ void Fonts0(void) {
         if(Text2==NULL)
         {
                 free(Text1);
-                v_text=(char *)texto[45]; show_dialog(err0);
+                v_text=(char *)texts[45]; show_dialog(err0);
                 return;
         }
         memset(Text2,Text2Col,tan*tal*10);
@@ -471,7 +471,7 @@ void Fonts0(void) {
         {
                 free(Text1);
                 free(Text2);
-                v_text=(char *)texto[45]; show_dialog(err0);
+                v_text=(char *)texts[45]; show_dialog(err0);
                 return;
         }
         memset(Text3,Text3Col,tan*tal*10);
@@ -485,7 +485,7 @@ void Fonts0(void) {
         Mosaico2=0;
         Mosaico3=0;
 
-        strcpy(FontName,(char *)texto[90]);
+        strcpy(FontName,(char *)texts[90]);
         strcpy(FontPathName,tipo[5].path);
         strcat(FontPathName,"/");
         strcat(FontPathName,FontName);
@@ -526,7 +526,7 @@ void Fonts0(void) {
         _button(111,67+60,75,0);//10
         _button(110,97+60,75,0);//11
 
-        _get(80,4,v.al-(39),v.an-16-text_len(texto[113]+1),(byte *)TestString,21,0,0);
+        _get(80,4,v.al-(39),v.an-16-text_len(texts[113]+1),(byte *)TestString,21,0,0);
         _button(113,v.an-8,v.al-14-18,2);//14
 
         _button(120,7,v.al-14,0);//13
@@ -553,7 +553,7 @@ FILE *file;
         file=fopen(FacePathName,"rb");
         if(file==NULL)
         {
-                v_text=(char *)texto[45]; show_dialog(err0);
+                v_text=(char *)texts[45]; show_dialog(err0);
                 return 0;
         } else fclose(file);
         if(GenCode!=255)
@@ -642,7 +642,7 @@ FILE *file;
         outTexBuffer   =Text01;
         if(Jorge_Crea_el_font(GenCode))
         {
-                v_text=(char *)texto[45];
+                v_text=(char *)texts[45];
                 show_dialog(err0);
                 return 0;
         }
@@ -660,14 +660,14 @@ int an=v.an/big2,al=v.al/big2;
         strcat(FontPathName,"/");
         strcat(FontPathName,FontName);
 
-        v_text=(char *)texto[264];
+        v_text=(char *)texts[264];
         show_dialog(browser0);
         if (v_finished)
         {
                 if (v_exists)
                 {
-                        v_title=(char *)texto[75];
-                        v_text=(char *)texto[76];
+                        v_title=(char *)texts[75];
+                        v_text=(char *)texts[76];
                         show_dialog(aceptar0);
                         if(!v_accept)
                                 return;
@@ -696,13 +696,13 @@ int  num;
 FILE *f;
 
         v_mode=0; v_type=6;
-        v_text=(char *)texto[77];
+        v_text=(char *)texts[77];
         show_dialog(browser0);
         if (v_finished)
         {
                 if (!v_exists)
                 {
-                        v_text=(char *)texto[43];
+                        v_text=(char *)texts[43];
                         show_dialog(err0);
                 }
                 else
@@ -825,7 +825,7 @@ void Selcolor0(void)
         v.type=1; // Dialog
         v.an=131;
         v.al=157;
-        v.title=texto[78];
+        v.title=texts[78];
         v.paint_handler=Selcolor1;
         v.click_handler=Selcolor2;
         v.close_handler=Selcolor3;
@@ -847,7 +847,7 @@ char *MyBuffer,*BuffAux;
         BuffAux=MyBuffer=(char *)malloc(TamaX*TamaY);
         if(MyBuffer==NULL)
         {
-                v_text=(char *)texto[45]; show_dialog(err0);
+                v_text=(char *)texts[45]; show_dialog(err0);
                 return;
         }
         memset(MyBuffer,c2,TamaX*TamaY);
@@ -932,7 +932,7 @@ void Preview0()
                 v.al=200;
         v.paint_handler=Preview1;
         v.click_handler=Preview2;
-        v.title=texto[80];
+        v.title=texts[80];
         _button(100,v.an/2,v.al-14,1);
 }
 
@@ -971,7 +971,7 @@ char CopiaMiTabladeLetras[256];
         strcpy(CopiaFontName,FontPathName);
         memcpy(CopiaMiTabladeLetras,MiTabladeLetras,256);
 
-        crear_texto_prueba(TestString2,v.aux[1352+RES_FOR_NAME]);
+        create_test_text(TestString2,v.aux[1352+RES_FOR_NAME]);
 
         memset(MiTabladeLetras,0,256);
         for(x=0;x<strlen(TestString2);x++)
@@ -995,28 +995,28 @@ char cWork[4];
         FntAncho=atoi(cFntAncho);
         FntAlto=atoi(cFntAlto);
 
-        wwrite(v.ptr,an,al,4,12,0,texto[84],c3);
+        wwrite(v.ptr,an,al,4,12,0,texts[84],c3);
         wwrite(v.ptr,an,al,4,20,0,(byte *)FontName,c4);
 
-        wwrite(v.ptr,an,al,4,36,0,texto[133],c3);
+        wwrite(v.ptr,an,al,4,36,0,texts[133],c3);
         sprintf(cWork,"%03d",FntAncho);
         wwrite(v.ptr,an,al,45,36,0,(byte *)cWork,c4);
 
-        wwrite(v.ptr,an,al,4,44,0,texto[134],c3);
+        wwrite(v.ptr,an,al,4,44,0,texts[134],c3);
         sprintf(cWork,"%03d",FntAlto);
         wwrite(v.ptr,an,al,45,44,0,(byte *)cWork,c4);
 
-        wwrite(v.ptr,an,al,4,60,0,texto[86],c3);
+        wwrite(v.ptr,an,al,4,60,0,texts[86],c3);
         if(OutLine)
-                wwrite(v.ptr,an,al,45,60,0,texto[88],c4);
+                wwrite(v.ptr,an,al,45,60,0,texts[88],c4);
         else
-                wwrite(v.ptr,an,al,45,60,0,texto[89],c4);
+                wwrite(v.ptr,an,al,45,60,0,texts[89],c4);
 
-        wwrite(v.ptr,an,al,4,68,0,texto[87],c3);
+        wwrite(v.ptr,an,al,4,68,0,texts[87],c3);
         if(Somx || Somy)
-                wwrite(v.ptr,an,al,45,68,0,texto[88],c4);
+                wwrite(v.ptr,an,al,45,68,0,texts[88],c4);
         else
-                wwrite(v.ptr,an,al,45,68,0,texto[89],c4);
+                wwrite(v.ptr,an,al,45,68,0,texts[89],c4);
         wrectangle(v.ptr,an,al,c0,an-68,10,1,al-30); //28
 
         wrectangle(v.ptr,an,al,c0,2,al-20,an-4,1);
@@ -1060,7 +1060,7 @@ void GenFont0(void)
         v.type=1; // Dialog
         v.an=169-26;
         v.al=103;
-        v.title=texto[852];
+        v.title=texts[852];
         v.paint_handler=GenFont1;
         v.click_handler=GenFont2;
         v.close_handler=GenFont3;
@@ -1085,7 +1085,7 @@ char *MyBuffer,*BuffAux;
         BuffAux=MyBuffer=(char *)malloc(TamaX*TamaY);
         if(MyBuffer==NULL)
         {
-                v_text=(char *)texto[45]; show_dialog(err0);
+                v_text=(char *)texts[45]; show_dialog(err0);
                 return;
         }
         memset(MyBuffer,c2,TamaX*TamaY);
@@ -1172,14 +1172,14 @@ void Preview20()
                 v.al=200;
         v.paint_handler=Preview21;
         v.click_handler=Preview22;
-        v.title=texto[98];
+        v.title=texts[98];
         _button(100,v.an/2,v.al-14,1);
 }
 /////////////////////////////////////////////////////////////////////////////
 
 char pletras[5*8+1]="01234567ABCDEFGHabcdefgh!?$*/+()\xa5\xa4\x87\xa0\x82\xa1\xa2\xa3";
 
-void crear_texto_prueba(char * s, char flags) {
+void create_test_text(char * s, char flags) {
   int numbits=0;
   int numchar=0,x;
 
@@ -1227,17 +1227,17 @@ void ShowFont1(void)
   wbox(v.ptr, an, al, c0, 2, 32, ancho_w, 1);
 
   strcpy(cWork,"");
-  if(v.aux[1352+RES_FOR_NAME]&NUM) strcat(cWork,(char *)texto[166]);
-  if(v.aux[1352+RES_FOR_NAME]&MAY) strcat(cWork,(char *)texto[167]);
-  if(v.aux[1352+RES_FOR_NAME]&MIN) strcat(cWork,(char *)texto[168]);
-  if(v.aux[1352+RES_FOR_NAME]&SIM) strcat(cWork,(char *)texto[169]);
-  if(v.aux[1352+RES_FOR_NAME]&EXT) strcat(cWork,(char *)texto[170]);
+  if(v.aux[1352+RES_FOR_NAME]&NUM) strcat(cWork,(char *)texts[166]);
+  if(v.aux[1352+RES_FOR_NAME]&MAY) strcat(cWork,(char *)texts[167]);
+  if(v.aux[1352+RES_FOR_NAME]&MIN) strcat(cWork,(char *)texts[168]);
+  if(v.aux[1352+RES_FOR_NAME]&SIM) strcat(cWork,(char *)texts[169]);
+  if(v.aux[1352+RES_FOR_NAME]&EXT) strcat(cWork,(char *)texts[170]);
 
   wwrite(v.ptr,an,al,an/2+2,34,1,(byte *)cWork,c4);
 
   memcpy(CopiaMiTabladeLetras,MiTabladeLetras,256);
 
-  crear_texto_prueba(TestString2,v.aux[1352+RES_FOR_NAME]);
+  create_test_text(TestString2,v.aux[1352+RES_FOR_NAME]);
 
   memset(MiTabladeLetras,0,256);
   for(x=0;x<strlen(TestString2);x++) MiTabladeLetras[TestString2[x]]=1;
@@ -1371,7 +1371,7 @@ int Length;
         file=fopen(Load_FontPathName,"rb");
         if(file==NULL)
         {
-                v_text=(char *)texto[43]; show_dialog(err0);
+                v_text=(char *)texts[43]; show_dialog(err0);
                 return;
         }
         fseek(file,0,SEEK_END);
@@ -1380,7 +1380,7 @@ int Length;
         v.aux=(byte *)malloc(Length+RES_FOR_NAME);
         if(v.aux==NULL)
         {
-                v_text=(char *)texto[45]; show_dialog(err0);
+                v_text=(char *)texts[45]; show_dialog(err0);
                 return;
         }
 
@@ -1396,7 +1396,7 @@ int Length;
         v.name=v.aux;
 }
 
-void ReloadFont(int vn, struct tventana *vntn)
+void ReloadFont(int vn, struct twindow *vntn)
 {
 FILE *file;
 int Length;
@@ -1407,7 +1407,7 @@ int Length;
         file=fopen(Load_FontPathName,"rb");
         if(file==NULL)
         {
-                v_text=(char *)texto[43]; show_dialog(err0);
+                v_text=(char *)texts[43]; show_dialog(err0);
                 return;
         }
         fseek(file,0,SEEK_END);
@@ -1416,7 +1416,7 @@ int Length;
         vntn->aux=(byte *)malloc(Length+RES_FOR_NAME);
         if(vntn->aux==NULL)
         {
-                v_text=(char *)texto[45];
+                v_text=(char *)texts[45];
                 show_dialog(err0);
                 return;
         }
@@ -1444,7 +1444,7 @@ void OpenFont(void) {
   strcat(Load_FontPathName,"/");
   strcat(Load_FontPathName,Load_FontName);
 
-  v_text=(char *)texto[74];
+  v_text=(char *)texts[74];
   show_dialog(browser0);
   if (!v_finished) return;
 
@@ -1476,16 +1476,16 @@ void OpenFont(void) {
           fclose(f);
           if (!strcmp(cwork,"fnt\x1a\x0d\x0a")) {
             if (!v_exists) {
-              v_text=(char *)texto[43];
+              v_text=(char *)texts[43];
               show_dialog(err0);
             } else {
               div_strcpy(Load_FontName, sizeof(Load_FontName), input);
               DIV_STRCPY(Load_FontPathName,full);
               new_window(ShowFont0);
             }
-          } else { v_text=(char *)texto[46]; show_dialog(err0); }
-        } else { fclose(f); v_text=(char *)texto[44]; show_dialog(err0); }
-      } else { v_text=(char *)texto[44]; show_dialog(err0); }
+          } else { v_text=(char *)texts[46]; show_dialog(err0); }
+        } else { fclose(f); v_text=(char *)texts[44]; show_dialog(err0); }
+      } else { v_text=(char *)texts[44]; show_dialog(err0); }
     }
   }
 }
@@ -1519,8 +1519,8 @@ void GetText0(void)
         v.type=1;
         v.an=220+6;
         v.al=64-14;
-        v.title=texto[855]+1;
-        v.name=texto[855]+1;
+        v.title=texts[855]+1;
+        v.name=texts[855]+1;
 
         v.paint_handler=GetText1;
         v.click_handler=GetText2;
@@ -1612,7 +1612,7 @@ int n,y,x,TamaX=0,TamaY=0,fan,_fal=0,fal,init,cnt;
         // 7 - Call the paint handler to refresh the window and blit it
 
         call((voidReturnType )v.paint_handler);
-        wvolcado(copia,vga_width,vga_height,v.ptr,v.x,v.y,v.an,v.al,0);
+        wvolcado(screen_buffer,vga_width,vga_height,v.ptr,v.x,v.y,v.an,v.al,0);
 }
 
 int Save_Font_session(FILE *file,int n)
@@ -1680,8 +1680,8 @@ int x,y;
         v.paint_handler=Fonts1;
         v.click_handler=Fonts2;
         v.close_handler=Fonts3;
-        v.title=texto[83];
-        v.name=texto[83];
+        v.title=texts[83];
+        v.name=texts[83];
         lfontsizes.created=0;
         lfontsizes.total_items=8;
 
@@ -1693,14 +1693,14 @@ int x,y;
         Text1=(char *)malloc(tan*tal*10);
         if(Text1==NULL)
         {
-                v_text=(char *)texto[45]; show_dialog(err0);
+                v_text=(char *)texts[45]; show_dialog(err0);
                 return;
         }
         Text01=(char *)malloc(Text1Anc*Text1Alt);
         if(Text01==NULL)
         {
                 free(Text01);
-                v_text=(char *)texto[45]; show_dialog(err0);
+                v_text=(char *)texts[45]; show_dialog(err0);
                 return;
         }
         fread(Text01,Text1Anc*Text1Alt,1,file);
@@ -1726,7 +1726,7 @@ int x,y;
         Text2=(char *)malloc(tan*tal*10);
         if(Text2==NULL)
         {
-                v_text=(char *)texto[45]; show_dialog(err0);
+                v_text=(char *)texts[45]; show_dialog(err0);
                 free(Text1);
                 free(Text01);
                 return;
@@ -1734,7 +1734,7 @@ int x,y;
         Text02=(char *)malloc(Text2Anc*Text2Alt);
         if(Text02==NULL)
         {
-                v_text=(char *)texto[45]; show_dialog(err0);
+                v_text=(char *)texts[45]; show_dialog(err0);
                 free(Text1);
                 free(Text01);
                 free(Text2);
@@ -1762,7 +1762,7 @@ int x,y;
         Text3=(char *)malloc(tan*tal*10);
         if(Text3==NULL)
         {
-                v_text=(char *)texto[45]; show_dialog(err0);
+                v_text=(char *)texts[45]; show_dialog(err0);
                 free(Text1);
                 free(Text01);
                 free(Text2);
@@ -1772,7 +1772,7 @@ int x,y;
         Text03=(char *)malloc(Text3Anc*Text3Alt);
         if(Text03==NULL)
         {
-                v_text=(char *)texto[45]; show_dialog(err0);
+                v_text=(char *)texts[45]; show_dialog(err0);
                 free(Text1);
                 free(Text01);
                 free(Text2);
@@ -1832,7 +1832,7 @@ int x,y;
         _button(111,67+60,75,0);//10
         _button(110,97+60,75,0);//11
 
-        _get(80,4,v.al-(39),v.an-16-text_len(texto[113]+1),(byte *)TestString,21,0,0);
+        _get(80,4,v.al-(39),v.an-16-text_len(texts[113]+1),(byte *)TestString,21,0,0);
         _button(113,v.an-8,v.al-14-18,2);//14
 
         _button(120,7,v.al-14,0);//13

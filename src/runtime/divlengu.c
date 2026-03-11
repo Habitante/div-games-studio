@@ -1,14 +1,14 @@
 
 //-----------------------------------------------------------------------------
-//      Módulo para la gestión de textos (lenguaje.div) y de encriptación
+//      Módulo para la gestión de lang_buffer (lenguaje.div) y de encriptación
 //-----------------------------------------------------------------------------
 
 #include "inter.h"
 
-byte * textos;
-byte * fin_textos;
+byte * lang_buffer;
+byte * lang_buffer_end;
 
-int numero=0; // Número de texto
+int numero=0; // Número de texts
 byte *p_lengu,*q_lengu; // Punteros de lectura y escritura respectivamente.
 
 
@@ -23,7 +23,7 @@ void analyze_comment(void);
 
 
 //-----------------------------------------------------------------------------
-//      Inicializa el sistema de textos
+//      Inicializa el sistema de lang_buffer
 //-----------------------------------------------------------------------------
 
 void initialize_texts(byte * fichero) {
@@ -31,17 +31,17 @@ void initialize_texts(byte * fichero) {
   FILE * f;
   int n;
 
-  memset(text,0,max_textos_sistema*4);
+  memset(text,0,max_system_texts*4);
 
 #ifdef DEBUG
 
   if ((f=fopen((char *)fichero,"rb"))!=NULL) {
     fseek(f,0,SEEK_END); n=ftell(f);
-    if ((textos=(byte *)malloc(n))!=NULL) {
+    if ((lang_buffer=(byte *)malloc(n))!=NULL) {
       fseek(f,0,SEEK_SET);
-      n=fread(textos,1,n,f);
+      n=fread(lang_buffer,1,n,f);
       fclose(f);
-      fin_textos=textos+n;
+      lang_buffer_end=lang_buffer+n;
       analyze_texts();
     } else fclose(f);
   }
@@ -52,10 +52,10 @@ void initialize_texts(byte * fichero) {
     fseek(f,-4,SEEK_END);
     fread(&n,4,1,f);
     fseek(f,-4-n,SEEK_END);
-    if ((textos=(byte *)malloc(n+1))!=NULL) {
-      n=fread(textos,1,n,f);
+    if ((lang_buffer=(byte *)malloc(n+1))!=NULL) {
+      n=fread(lang_buffer,1,n,f);
       fclose(f);
-      fin_textos=textos+n;
+      lang_buffer_end=lang_buffer+n;
       analyze_texts();
     } else fclose(f);
   } 
@@ -65,19 +65,19 @@ void initialize_texts(byte * fichero) {
 }
 
 //-----------------------------------------------------------------------------
-//      Función de análisis de los textos
+//      Función de análisis de los lang_buffer
 //-----------------------------------------------------------------------------
 
 void analyze_texts(void) {
 
-  q_lengu=p_lengu=textos;
+  q_lengu=p_lengu=lang_buffer;
 
   if (!strcmp((char *)p_lengu,"Zk!")) {
     p_lengu+=4;
-    coder(p_lengu,fin_textos-textos-4,"lave");
+    coder(p_lengu,lang_buffer_end-lang_buffer-4,"lave");
   }
 
-  while(p_lengu<fin_textos)
+  while(p_lengu<lang_buffer_end)
     if (*p_lengu>='0' && *p_lengu<='9') analyze_number();
     else if (*p_lengu=='"') analyze_text();
     else if (*p_lengu=='#') analyze_comment();
@@ -88,19 +88,19 @@ void analyze_number(void) {
 
   numero=0; do {
     numero=numero*10+*p_lengu-'0'; p_lengu++;
-  } while (*p_lengu>='0' && *p_lengu<='9' && p_lengu<fin_textos);
-  if (numero>=max_textos_sistema) numero=0;
+  } while (*p_lengu>='0' && *p_lengu<='9' && p_lengu<lang_buffer_end);
+  if (numero>=max_system_texts) numero=0;
 }
 
 void analyze_comment(void) {
 
-  while (*p_lengu!='\n' && *p_lengu!='\r' && p_lengu<fin_textos) p_lengu++;
+  while (*p_lengu!='\n' && *p_lengu!='\r' && p_lengu<lang_buffer_end) p_lengu++;
 }
 
 void analyze_text(void) {
 
   text[numero]=q_lengu; p_lengu++; numero++;
-  while (*p_lengu!='"' && p_lengu<fin_textos && *p_lengu!='\r' && *p_lengu!='\n') {
+  while (*p_lengu!='"' && p_lengu<lang_buffer_end && *p_lengu!='\r' && *p_lengu!='\n') {
     if (*p_lengu=='\\') { p_lengu++;
       if (*p_lengu=='n') {
         *q_lengu++=13; *q_lengu++=10; p_lengu++;
@@ -112,12 +112,12 @@ void analyze_text(void) {
 }
 
 //-----------------------------------------------------------------------------
-//      Finaliza el sistema de textos
+//      Finaliza el sistema de lang_buffer
 //-----------------------------------------------------------------------------
 
 void finalize_texts(void) {
 
-  free(textos);
+  free(lang_buffer);
 }
 
 //----------------------------------------------------------------------------

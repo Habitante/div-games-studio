@@ -105,11 +105,11 @@ void FPG2(void)
 	if((dragging==4)) { // Released
 		dragging=5; free_drag=0;
 		
-		if(ventana[1].mapa->fpg_code) {
-			COD=ventana[1].mapa->fpg_code;
-			memcpy(tDescrip,ventana[1].mapa->description,32);
+		if(window[1].mapa->fpg_code) {
+			COD=window[1].mapa->fpg_code;
+			memcpy(tDescrip,window[1].mapa->description,32);
 		} else {
-			memcpy(tDescrip,ventana[1].title,32);
+			memcpy(tDescrip,window[1].title,32);
 			COD=MiFPG->LastUsed;
 			
 			while(MiFPG->OffsGrf[COD]) {
@@ -128,14 +128,14 @@ void FPG2(void)
 		}
 		nPuntos=0;
 		for(x=511;x>=0;x-=2) {
-			if(ventana[1].mapa->puntos[x]!=-1) {
+			if(window[1].mapa->puntos[x]!=-1) {
 				nPuntos=(x+1)/2;
 				x=-1;
 			}
 		}
-			Anadir_FPG(MiFPG,COD,(char *)tDescrip,(char *)ventana[1].mapa->filename,
-					ventana[1].mapa->map_width,ventana[1].mapa->map_height,
-					nPuntos,(char *)ventana[1].mapa->puntos,(char *)ventana[1].mapa->map,0,1);
+			Anadir_FPG(MiFPG,COD,(char *)tDescrip,(char *)window[1].mapa->filename,
+					window[1].mapa->map_width,window[1].mapa->map_height,
+					nPuntos,(char *)window[1].mapa->puntos,(char *)window[1].mapa->map,0,1);
 
 			for(n=0; n<1000; n++) 
 				MiFPG->thumb[n].tagged=0;
@@ -152,7 +152,7 @@ void FPG2(void)
 
 		if((fpg=fopen((char *)MiFPG->ActualFile,"rb"))==NULL) {
 			// Error: file not found
-			v_text=(char *)texto[43];
+			v_text=(char *)texts[43];
 			show_dialog(err0);
 			return;
 		}
@@ -214,7 +214,7 @@ void FPG2(void)
 
 		if(v.mapa==NULL) {
 			fclose(fpg);
-			v_text=(char *)texto[45]; show_dialog(err0);
+			v_text=(char *)texts[45]; show_dialog(err0);
 			return;
 		}
 		v.mapa->map=(byte *)malloc(map_width*map_height);
@@ -222,7 +222,7 @@ void FPG2(void)
 		if(v.mapa->map==NULL) {
 			fclose(fpg);
 			free(v.mapa);
-			v_text=(char *)texto[45]; show_dialog(err0);
+			v_text=(char *)texts[45]; show_dialog(err0);
 			return;
 		}
 
@@ -317,7 +317,7 @@ void FPG0N(void) {
 	MiFPG->FPGInfo=0;
 
 	_flag(419,4,v.al-10,&MiFPG->thumb_on);
-	_flag(108,(v.an-5)-(8*big2+text_len(texto[108])),v.al-10,&MiFPG->FPGInfo);
+	_flag(108,(v.an-5)-(8*big2+text_len(texts[108])),v.al-10,&MiFPG->FPGInfo);
 }
 
 void FPG0A(void) {
@@ -347,14 +347,14 @@ void FPG0A(void) {
 	v.name=MiFPG->NombreFpg;
 
 	_flag(419,4,v.al-10,&MiFPG->thumb_on);
-	_flag(108,(v.an-5)-(8*big2+text_len(texto[108])),v.al-10,&MiFPG->FPGInfo);
+	_flag(108,(v.an-5)-(8*big2+text_len(texts[108])),v.al-10,&MiFPG->FPGInfo);
 }
 
 int new_file(void) {
 	v_accept=0;
 	v_mode=1;
 	v_type=4;
-	v_text=(char *)texto[69];
+	v_text=(char *)texts[69];
 	show_dialog(browser0);
 
 	strcpy(full,tipo[v_type].path);
@@ -371,7 +371,7 @@ int new_file(void) {
 		}
 		else
 		{
-			v_title=(char *)texto[82];
+			v_title=(char *)texts[82];
 			v_text=input;
 			show_dialog(aceptar0);
 		}
@@ -381,7 +381,7 @@ int new_file(void) {
 
 			if(v_aux==NULL)
 			{
-				v_text=(char *)texto[45]; show_dialog(err0);
+				v_text=(char *)texts[45]; show_dialog(err0);
 				return 0;
 			}
 
@@ -420,7 +420,7 @@ void open_file(void) {
 	byte pal[768];
 
 	v_mode=0; v_type=4;
-	v_text=(char *)texto[70];
+	v_text=(char *)texts[70];
 	show_dialog(browser0);
 	if (!v_finished) return;
 
@@ -463,7 +463,7 @@ void open_file(void) {
 			strcat(full, input);
 
 			if((f=fopen(full,"rb"))==NULL) {
-				v_text=(char *)texto[44];
+				v_text=(char *)texts[44];
 				show_dialog(err0);
 				continue;
 			}
@@ -472,7 +472,7 @@ void open_file(void) {
 
 			if (strcmp(cwork,"fpg\x1a\x0d\x0a")) {
 				fclose(f);
-				v_text=(char *)texto[46];
+				v_text=(char *)texts[46];
 				show_dialog(err0);
 				continue;
 			}
@@ -572,7 +572,7 @@ void open_file(void) {
 					if (!strcmp(cwork,"fpg\x1a\x0d\x0a")) {
 						v_aux=(byte *)malloc(sizeof(FPG));
 						if(v_aux==NULL) {
-							v_text=(char *)texto[45];
+							v_text=(char *)texts[45];
 							show_dialog(err0);
 							continue;
 						}
@@ -585,16 +585,16 @@ void open_file(void) {
 						memset(v_aux, 0, sizeof(FPG));
 						new_window(FPG0A);
 					} else { 
-						v_text=(char *)texto[46];
+						v_text=(char *)texts[46];
 						show_dialog(err0); 
 					}
 				} else { 
 					fclose(f); 
-					v_text=(char *)texto[44]; 
+					v_text=(char *)texts[44]; 
 					show_dialog(err0); 
 				}
 			} else { 
-				v_text=(char *)texto[44]; 
+				v_text=(char *)texts[44]; 
 				show_dialog(err0); 
 			}
 		}
@@ -622,10 +622,10 @@ void Warning1(void) {
 	char cWork[70];
 
 	_show_items();
-	wwrite(v.ptr,an,al,an/2,12,1,texto[172],c3);
-	sprintf(cWork,(char *)texto[173],cNamev2convert);
+	wwrite(v.ptr,an,al,an/2,12,1,texts[172],c3);
+	sprintf(cWork,(char *)texts[173],cNamev2convert);
 	wwrite(v.ptr,an,al,an/2,19,1,(byte *)cWork,c3);
-	wwrite(v.ptr,an,al,an/2,30,1,texto[174],c4);
+	wwrite(v.ptr,an,al,an/2,30,1,texts[174],c4);
 	v_accept=0;
 }
 
@@ -646,7 +646,7 @@ void Warning0(void) {
 	v.type=1; // Dialog
 	v.an=200;
 	v.al=60;
-	v.title=texto[171];
+	v.title=texts[171];
 	v.paint_handler=Warning1;
 	v.click_handler=Warning2;
 
@@ -661,7 +661,7 @@ int RemapAllFiles(int vent) {
 
 	// Ask whether to remap the FPG palette or close it
 
-	FPG *MiFPG=(FPG *)ventana[vent].aux;
+	FPG *MiFPG=(FPG *)window[vent].aux;
 	byte p[768]; // to compare file palette with DAC
 	FILE * f;
 	int sum,x;
@@ -680,7 +680,7 @@ int RemapAllFiles(int vent) {
 			return(0);
 	}
 
-	strcpy(cNamev2convert,(char *)ventana[vent].title);
+	strcpy(cNamev2convert,(char *)window[vent].title);
 	show_dialog(Warning0);
 
 	switch(v_accept) {
@@ -690,8 +690,8 @@ int RemapAllFiles(int vent) {
 		break;
 		
 		case 1:
-			v_title=(char *)texto[344];
-			v_text=(char *)texto[345];
+			v_title=(char *)texts[344];
+			v_text=(char *)texts[345];
 			
 			show_dialog(aceptar0);
 			
@@ -724,16 +724,16 @@ void GetCode1(void) {
 	
 	_show_items();
 	
-	wwrite(v.ptr,an,al,4,32,0,texto[133],c3);
-	wwrite(v.ptr,an,al,4,42,0,texto[134],c3);
+	wwrite(v.ptr,an,al,4,32,0,texts[133],c3);
+	wwrite(v.ptr,an,al,4,42,0,texts[134],c3);
 
 	sprintf(cWork,"%d",GetCodeAncho);
 	wwrite(v.ptr,an,al,34,32,0,(byte *)cWork,c4);
 	sprintf(cWork,"%d",GetCodeAlto);
 	wwrite(v.ptr,an,al,34,42,0,(byte *)cWork,c4);
 
-	wwrite(v.ptr,an,al,64,32,0,texto[152],c3);
-	wwrite(v.ptr,an,al,64,42,0,texto[153],c3);
+	wwrite(v.ptr,an,al,64,32,0,texts[152],c3);
+	wwrite(v.ptr,an,al,64,42,0,texts[153],c3);
 
 	if(GetCodeP0x==-1) {
 		GetCodeP0x=GetCodeAncho/2;
@@ -786,7 +786,7 @@ void GetCode0(void) {
 	v.type=1; // Dialog
 	v.an=180+25;
 	v.al=100-12;
-	v.title=texto[68];
+	v.title=texts[68];
 	v.paint_handler=GetCode1;
 	v.click_handler=GetCode2;
 	v.close_handler=GetCode3;
@@ -896,7 +896,7 @@ void Show_Taggeds()
 	if (!(n=find_fpg_window()))
 		return;
 	
-	MiFPG=(FPG *)ventana[n].aux;
+	MiFPG=(FPG *)window[n].aux;
 
 	for(a=0;a<MiFPG->nIndex;a++)
 
@@ -961,7 +961,7 @@ void Show_Taggeds()
 
 		activate();
 		call((voidReturnType )v.paint_handler);
-		wvolcado(copia,vga_width,vga_height,v.ptr,v.x,v.y,v.an,v.al,0);
+		wvolcado(screen_buffer,vga_width,vga_height,v.ptr,v.x,v.y,v.an,v.al,0);
 	}
 }
 
@@ -976,7 +976,7 @@ void Delete_Taggeds() {
 	if (!(vent=find_fpg_window()))
 		return;
 
-	MiFPG=(FPG *)ventana[vent].aux;
+	MiFPG=(FPG *)window[vent].aux;
 
 	for(n=0;n<MiFPG->nIndex;n++)
 		if(MiFPG->CodDes[n][0]==175)
@@ -1048,7 +1048,7 @@ void printlist0(void) {
 	_button(101,v.an-8,v.al-14,2);
 	_flag(448,4,12,&f_im);
 	_flag(449,4,12+9,&f_ar);
-	_get(414,16+text_len(texto[449]),12,v.an-20-text_len(texto[449]),(byte *)v_text,15,0,0);
+	_get(414,16+text_len(texts[449]),12,v.an-20-text_len(texts[449]),(byte *)v_text,15,0,0);
 	v_accept=0;
 }
 
@@ -1065,16 +1065,16 @@ void Print_List(void) {
 		return;
 
 	if (!strlen(n_ar))
-		strcpy(n_ar,(char *)texto[451]);
+		strcpy(n_ar,(char *)texts[451]);
 
 	v_text=n_ar;
-	v_title=(char *)texto[438];
+	v_title=(char *)texts[438];
 
 	show_dialog(printlist0);
 
 	if (v_accept) {
 
-		MiFPG=(FPG *)ventana[vent].aux;
+		MiFPG=(FPG *)window[vent].aux;
 
 		for(n=0;n<1000;n++)
 			if (MiFPG->OffsGrf[n])
@@ -1089,7 +1089,7 @@ void Print_List(void) {
 					fclose(f);
 					sprintf(cwork,"%s\\%s",tipo[1].path,n_ar);
 					strupr(cwork);
-					v_title=(char *)texto[450];
+					v_title=(char *)texts[450];
 					v_text=cwork;
 					show_dialog(aceptar0);
 					
@@ -1100,7 +1100,7 @@ void Print_List(void) {
 				f=fopen(n_ar,"wb");
 
 				if (f==NULL) { 
-						v_text=(char *)texto[47];
+						v_text=(char *)texts[47];
 						show_dialog(err0); 
 						return; 
 				}
@@ -1116,7 +1116,7 @@ void Print_List(void) {
 
 			for(n=0;n<1000;n++) {
 				if (MiFPG->OffsGrf[n]) {
-					Progress((char *)texto[437],++_num,num);
+					Progress((char *)texts[437],++_num,num);
 					fseek(g,MiFPG->OffsGrf[n],SEEK_SET);
 					fread(&cab,1,sizeof(cab),g);
 					memset(cwork2,0,13);
@@ -1685,7 +1685,7 @@ void MAPtoFPG(struct tmapa * mapa) {
 	byte *imagen;
 
 	if((imagen=(byte *)malloc(mapa->map_width*mapa->map_height))==NULL) {
-		v_text=(char *)texto[45];
+		v_text=(char *)texts[45];
 		show_dialog(err0);
 		return;
 	}
@@ -1719,7 +1719,7 @@ void MAPtoFPG(struct tmapa * mapa) {
 				
 				if((ancho-2)*(alto-2) <= 0) {
 					free(imagen);
-					v_text=(char *)texto[551];
+					v_text=(char *)texts[551];
 					show_dialog(err0);
 					return;
 				}
@@ -1741,7 +1741,7 @@ void GetGrafMAP(struct tmapa *mapa, byte *imagen, int x, int y, int ancho, int a
 	char str_file[13];
 
 	if((buffer=(byte *)malloc(ancho*alto))==NULL) {
-		v_text=(char *)texto[45];
+		v_text=(char *)texts[45];
 		show_dialog(err0);
 		return;
 	}
@@ -1777,7 +1777,7 @@ void GetGrafMAP(struct tmapa *mapa, byte *imagen, int x, int y, int ancho, int a
 		DIV_SPRINTF(tmp, "%s%d.MAP", strupr(str_file), cod);
 		DIV_STRCPY(str_file, tmp);
 	}
-	DIV_SPRINTF(str_desc, "%s%d%s%s", texto[499], cod, texto[500], mapa->filename);
+	DIV_SPRINTF(str_desc, "%s%d%s%s", texts[499], cod, texts[500], mapa->filename);
 
 	Anadir_FPG(MiFPG, cod, str_desc, str_file, ancho, alto, 0, NULL, (char *)buffer, 0, 0);
 
@@ -1806,7 +1806,7 @@ void FPGtoMAP(FPG *MiFPG) {
 	lmapal=vga_height;
 
 	if((fpg=fopen((char *)MiFPG->ActualFile,"rb"))==NULL) {
-		v_text=(char *)texto[43];
+		v_text=(char *)texts[43];
 		show_dialog(err0);
 		return;
 	}
@@ -1837,7 +1837,7 @@ void FPGtoMAP(FPG *MiFPG) {
 
 	if((FPGmap=(byte *)malloc(lmapan*lmapal))==NULL) {
 		fclose(fpg);
-		v_text=(char *)texto[45];
+		v_text=(char *)texts[45];
 		show_dialog(err0);
 		return;
 	}
@@ -1858,7 +1858,7 @@ void FPGtoMAP(FPG *MiFPG) {
 		if((FPGimagen=(byte *)malloc((lgraf[num].an-2)*(lgraf[num].al-2)))==NULL) {
 			fclose(fpg);
 			free(FPGmap);
-			v_text=(char *)texto[45];
+			v_text=(char *)texts[45];
 			show_dialog(err0);
 			return;
 		}
@@ -1867,7 +1867,7 @@ void FPGtoMAP(FPG *MiFPG) {
 			fclose(fpg);
 			free(FPGmap);
 			free(FPGimagen);
-			v_text=(char *)texto[44];
+			v_text=(char *)texts[44];
 			show_dialog(err0);
 			return;
 		}
@@ -1983,8 +1983,8 @@ void close_fpg(char *fpg_path) {
 
   for(m=0;m<max_windows;m++)
   {
-    MiFPG = (FPG *)ventana[m].aux;
-    if(ventana[m].type==101)
+    MiFPG = (FPG *)window[m].aux;
+    if(window[m].type==101)
     {
       if(!strcmp(fpg_path, (char *)MiFPG->ActualFile))
       {
@@ -2006,7 +2006,7 @@ int select_file(void) {
 	v_accept=0;
 	v_mode=0;
 	v_type=4;
-	v_text=(char *)texto[69];
+	v_text=(char *)texts[69];
 	show_dialog(browser0);
 
 	strcpy(full,tipo[v_type].path);
@@ -2020,7 +2020,7 @@ int select_file(void) {
 		if (!v_exists) {
 			v_accept=1;
 		} else {
-			v_title=(char *)texto[82];
+			v_title=(char *)texts[82];
 			v_text=input;
 			show_dialog(replace_FPG_0);
 		}
@@ -2029,7 +2029,7 @@ int select_file(void) {
 			v_aux=(byte *)malloc(sizeof(FPG));
 
 			if(v_aux==NULL) {
-				v_text=(char *)texto[45]; show_dialog(err0);
+				v_text=(char *)texts[45]; show_dialog(err0);
 				return 0;
 			}
 			close_fpg(full);
@@ -2039,7 +2039,7 @@ int select_file(void) {
 			v_aux=(byte *)malloc(sizeof(FPG));
 
 			if(v_aux==NULL) {
-				v_text=(char *)texto[45]; show_dialog(err0);
+				v_text=(char *)texts[45]; show_dialog(err0);
 				return 0;
 			}
 
@@ -2084,9 +2084,9 @@ void replace_FPG_0(void) {
 	int x2,x3;
 
 	v.type=1;
-	v.an=text_len(texto[510])+text_len(texto[511])+text_len(texto[101])+16;
-	x2= 7+text_len(texto[510]+1)+10;
-	x3=x2+text_len(texto[511]+1)+10;
+	v.an=text_len(texts[510])+text_len(texts[511])+text_len(texts[101])+16;
+	x2= 7+text_len(texts[510]+1)+10;
+	x3=x2+text_len(texts[511]+1)+10;
 
 	if (v_title!=NULL) { 
 		v.title=(byte *)v_title;

@@ -30,32 +30,32 @@ void Bin1(void)
 void Bin2(void)
 {
 	FPG *MiMemoFPG;
-	struct tventana MiVentana;
+	struct twindow my_window;
 
 	if(dragging==4) {
 		
 		dragging=5; 
 		free_drag=0;
 		
-		switch(ventana[1].type) {
+		switch(window[1].type) {
 
 			case 100: // Map dragged to bin from desktop (alias for close map)
-				MiVentana=v;
-				v=ventana[1];
-				ventana[1]=MiVentana;
+				my_window=v;
+				v=window[1];
+				window[1]=my_window;
 				close_window();
 			break;
 
 			case 101: // Item dragged from FPG to bin. Remove from FPG
-				v_title=(char *)texto[60];
-				v_text=ventana[1].mapa->description;
+				v_title=(char *)texts[60];
+				v_text=window[1].mapa->description;
 				show_dialog(aceptar0);
 
 				if(v_accept) {
-					MiVentana=v;
-					MiMemoFPG=(FPG *)ventana[1].aux;
-					Borrar_FPG(MiMemoFPG,ventana[1].mapa->fpg_code);
-					v=ventana[1];
+					my_window=v;
+					MiMemoFPG=(FPG *)window[1].aux;
+					Borrar_FPG(MiMemoFPG,window[1].mapa->fpg_code);
+					v=window[1];
 
 					//if (MiMemoFPG->lInfoFPG.first_visible+MiMemoFPG->lInfoFPG.lines*MiMemoFPG->lInfoFPG.columns>MiMemoFPG->lInfoFPG.total_items
 					//    && MiMemoFPG->lInfoFPG.first_visible) MiMemoFPG->lInfoFPG.first_visible--;
@@ -71,7 +71,7 @@ void Bin2(void)
 					FPG_update_listbox_br(&MiMemoFPG->lInfoFPG);
 
 					v.redraw=1;
-					v=MiVentana;
+					v=my_window;
 				}
 			break;
 		} 
@@ -89,7 +89,7 @@ void Bin0(void)
 	v.paint_handler=Bin1;
 	v.click_handler=Bin2;
 	v.title=(byte *)"";
-	v.name=texto[350];
+	v.name=texts[350];
 }
 
 void muestra_papelera()

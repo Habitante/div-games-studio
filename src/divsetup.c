@@ -28,7 +28,7 @@ extern char user2[];
 
 extern int help_item;
 extern int cierra_rapido;
-extern int no_volcar_ventanas;
+extern int skip_window_render;
 
 extern int SelColorFont;
 extern int SelColorOk;
@@ -53,8 +53,8 @@ char cWork[10];
   wwrite_in_box(v.ptr,v.an/big2,v.an/big2-3,v.al/big2,5   ,12,0,(byte *)vga_marker,c1);
   wwrite_in_box(v.ptr,v.an/big2,v.an/big2-3,v.al/big2,4   ,12,0,(byte *)vga_marker,c3);
 
-  wwrite(v.ptr,v.an/big2,v.al/big2,5   ,22,0,texto[177],c1);
-  wwrite(v.ptr,v.an/big2,v.al/big2,4   ,22,0,texto[177],c3);
+  wwrite(v.ptr,v.an/big2,v.al/big2,5   ,22,0,texts[177],c1);
+  wwrite(v.ptr,v.an/big2,v.al/big2,4   ,22,0,texts[177],c3);
   wwrite(v.ptr,v.an/big2,v.al/big2,5+30,22,0,(byte *)cWork,c1);
   wwrite(v.ptr,v.an/big2,v.al/big2,4+30,22,0,(byte *)cWork,c4);
 }
@@ -113,8 +113,8 @@ void Vid_Setup3(void) {
     VS_BIG  =stbig;
     VS_WIDTH=stvga_an;
     VS_HEIGHT =stvga_al;
-	v_title=(char *)texto[385];
-    v_text =(char *)texto[386];
+	v_title=(char *)texts[385];
+    v_text =(char *)texts[386];
 //    show_dialog((voidReturnType)info0);
     exit_requested=1; // Direct exit without asking
     return_mode=2;
@@ -127,7 +127,7 @@ void Vid_Setup0(void) {
 
   v.type=1;
 
-  v.title=texto[881]+1;
+  v.title=texts[881]+1;
   v.an=126+24+30;
   v.al=66+26;
   v.paint_handler=(voidReturnType)Vid_Setup1;
@@ -175,7 +175,7 @@ void Get_Tapiz() {
 	FILE *f;
 
 	v_mode=1; v_type=9;
-	v_text=(char *)texto[182];
+	v_text=(char *)texts[182];
 	show_dialog((voidReturnType)browser0);
 
 	strcpy(full,tipo[v_type].path);
@@ -219,38 +219,38 @@ void Get_Tapiz() {
 								DIV_STRCPY(Tap_pathname,full);
 
 							} else { 
-								v_text=(char *)texto[46]; 
+								v_text=(char *)texts[46]; 
 								show_dialog((voidReturnType)err0); 
 							}
 
 						} else { 
-							v_text=(char *)texto[44]; 
+							v_text=(char *)texts[44]; 
 							show_dialog((voidReturnType)err0); 
 						}
 
 						free(ptr);
 
 					} else { 
-						v_text=(char *)texto[45]; 
+						v_text=(char *)texts[45]; 
 						show_dialog((voidReturnType)err0); 
 					}
 
 				}
 
 			} else { 
-				v_text=(char *)texto[44]; 
+				v_text=(char *)texts[44]; 
 				show_dialog((voidReturnType)err0); 
 			}
 
 			fclose(f);
 
 			} else { 
-				v_text=(char *)texto[44]; 
+				v_text=(char *)texts[44]; 
 				show_dialog((voidReturnType)err0); 
 			}
 
 		} else { 
-			v_text=(char *)texto[43]; 
+			v_text=(char *)texts[43]; 
 			show_dialog((voidReturnType)err0); 
 		}
 	}
@@ -270,7 +270,7 @@ void Tap_Setup1(void) {
   wallpaper_thumb();
 
   wbox(v.ptr,an,al,c12,4,20,an-21,8);
-  wwrite(v.ptr,an,al,4,12,0,texto[178],c3);
+  wwrite(v.ptr,an,al,4,12,0,texts[178],c3);
   wwrite(v.ptr,an,al,5,21,0,(byte *)Tap_name,c4);
 
   wrectangle(v.ptr,an,al,c0,an-38,24+8,34,7);
@@ -331,7 +331,7 @@ void Tap_Setup0(void)
   int an,al;
 
   v.type=1;
-  v.title=texto[882];
+  v.title=texts[882];
   v.an=138;
   v.al=150;
   an=v.an/big2,al=v.al/big2;
@@ -348,7 +348,7 @@ void Tap_Setup0(void)
   _button(121,v.an-12, 18,      0);
 
   _flag(179, 4,                            24+8, &Tap_mosaico);
-  _flag(181, v.an-49-text_len(texto[181]), 24+8, &Tap_gama);
+  _flag(181, v.an-49-text_len(texts[181]), 24+8, &Tap_gama);
 
   memcpy(gama_vieja,Setupfile.gradient_config,sizeof(gama_vieja));
 
@@ -424,8 +424,8 @@ void MemInfo1(void) {
 
   _show_items();
 
-  wwrite(v.ptr,an,al,an/2+1,12,1,texto[463],c1);
-  wwrite(v.ptr,an,al,an/2,12,1,texto[463],c4);
+  wwrite(v.ptr,an,al,an/2+1,12,1,texts[463],c1);
+  wwrite(v.ptr,an,al,an/2,12,1,texts[463],c4);
 
   wrectangle(v.ptr,an,al,c0,1,21,an-2,20);
   wbox(v.ptr,an,al,c1,2,22,an-4,18);
@@ -438,13 +438,13 @@ void MemInfo1(void) {
   GetFreeMem(&Mi_meminfo);
   for(x=0;x<max_windows;x++)
   {
-    if(ventana[x].type) nuvent++;
-    if(ventana[x].type==100)
+    if(window[x].type) nuvent++;
+    if(window[x].type==100)
     {
-      meminmaps+=ventana[x].mapa->map_width*ventana[x].mapa->map_height;
+      meminmaps+=window[x].mapa->map_width*window[x].mapa->map_height;
     }
   }
-  if((mem=Mem_GetHeapFree())==-1) strcpy(cWork,(char *)texto[193]);
+  if((mem=Mem_GetHeapFree())==-1) strcpy(cWork,(char *)texts[193]);
   else {
     mem=(Mi_meminfo.Bloque_mas_grande_disponible+mem)/1024;
     fmem = mem;
@@ -455,18 +455,18 @@ void MemInfo1(void) {
 	}
 	fprintf(stdout,"Memory free: %d (%f)\n",mem, fmem);
 
-   sprintf(cWork,(char *)texto[195],fmem,sizes[csize]);
+   sprintf(cWork,(char *)texts[195],fmem,sizes[csize]);
   }
   wwrite(v.ptr,an,al,an/2+1,44,1,(byte *)cWork,c1);
   wwrite(v.ptr,an,al,an/2,44,1,(byte *)cWork,c4);
 
   mem=meminmaps/1024;
-  if(mem/1000) sprintf(cWork,(char *)texto[196],mem/1000,mem%1000,"KB");
-  else         sprintf(cWork,(char *)texto[197],mem%1000,"KB");
+  if(mem/1000) sprintf(cWork,(char *)texts[196],mem/1000,mem%1000,"KB");
+  else         sprintf(cWork,(char *)texts[197],mem%1000,"KB");
   wwrite(v.ptr,an,al,an/2+1,52,1,(byte *)cWork,c1);
   wwrite(v.ptr,an,al,an/2,52,1,(byte *)cWork,c4);
 
-  sprintf(cWork,(char *)texto[198],nuvent*100/max_windows,'%');
+  sprintf(cWork,(char *)texts[198],nuvent*100/max_windows,'%');
   wwrite(v.ptr,an,al,an/2+1,60,1,(byte *)cWork,c1);
   wwrite(v.ptr,an,al,an/2,60,1,(byte *)cWork,c4);
 }
@@ -478,7 +478,7 @@ void MemInfo2(void) {
 
 void MemInfo0(void) {
   v.type=1;
-  v.title=texto[199];
+  v.title=texts[199];
   v.an=168;
   v.al=88;
   v.paint_handler=(voidReturnType)MemInfo1;
@@ -518,39 +518,39 @@ void Cfg_Setup1(void) {
   int inc=31;
   _show_items();
 
-  wwrite(v.ptr,an,al,5,12,0,texto[322],c1);
-  wwrite(v.ptr,an,al,4,12,0,texto[322],c3);
+  wwrite(v.ptr,an,al,5,12,0,texts[322],c1);
+  wwrite(v.ptr,an,al,4,12,0,texts[322],c3);
   wrectangle(v.ptr,an,al,c0,12,21,9,9);
-  wwrite(v.ptr,an,al,23,22,0,texto[323],c3);
+  wwrite(v.ptr,an,al,23,22,0,texts[323],c3);
   wrectangle(v.ptr,an,al,c0,52+25,21,9,9);
-  wwrite(v.ptr,an,al,63+25,22,0,texto[324],c3);
+  wwrite(v.ptr,an,al,63+25,22,0,texts[324],c3);
   wrectangle(v.ptr,an,al,c0,92+34,21,9,9);
-  wwrite(v.ptr,an,al,103+34,22,0,texto[325],c3);
+  wwrite(v.ptr,an,al,103+34,22,0,texts[325],c3);
 
   wbox(v.ptr,an,al,c0,2,32,an-4,1);
 
-  wwrite(v.ptr,an,al,5,35,0,texto[326],c1);
-  wwrite(v.ptr,an,al,4,35,0,texto[326],c3);
+  wwrite(v.ptr,an,al,5,35,0,texts[326],c1);
+  wwrite(v.ptr,an,al,4,35,0,texts[326],c3);
   wrectangle(v.ptr,an,al,c0,12,44,9,9);
-  wwrite(v.ptr,an,al,23,45,0,texto[323],c3);
+  wwrite(v.ptr,an,al,23,45,0,texts[323],c3);
   wrectangle(v.ptr,an,al,c0,52+25,44,9,9);
-  wwrite(v.ptr,an,al,63+25,45,0,texto[324],c3);
+  wwrite(v.ptr,an,al,63+25,45,0,texts[324],c3);
   wrectangle(v.ptr,an,al,c0,92+34,44,9,9);
-  wwrite(v.ptr,an,al,103+34,45,0,texto[327],c3);
+  wwrite(v.ptr,an,al,103+34,45,0,texts[327],c3);
 
   wrectangle(v.ptr,an,al,c0,12,44+10,9,9);
-  wwrite(v.ptr,an,al,23,45+10,0,texto[405],c3);
+  wwrite(v.ptr,an,al,23,45+10,0,texts[405],c3);
   wrectangle(v.ptr,an,al,c0,52+25,44+10,9,9);
-  wwrite(v.ptr,an,al,63+25,45+10,0,texto[406],c3);
+  wwrite(v.ptr,an,al,63+25,45+10,0,texts[406],c3);
   wrectangle(v.ptr,an,al,c0,92+34,44+10,9,9);
-  wwrite(v.ptr,an,al,103+34,45+10,0,texto[407],c3);
+  wwrite(v.ptr,an,al,103+34,45+10,0,texts[407],c3);
 
   wrectangle(v.ptr,an,al,c0,12,44+20,9,9);
-  wwrite(v.ptr,an,al,23,45+20,0,texto[409],c3);
+  wwrite(v.ptr,an,al,23,45+20,0,texts[409],c3);
   wrectangle(v.ptr,an,al,c0,52+25,44+20,9,9);
-  wwrite(v.ptr,an,al,63+25,45+20,0,texto[410],c3);
+  wwrite(v.ptr,an,al,63+25,45+20,0,texts[410],c3);
 
-  wwrite(v.ptr,an,al,22+48,56+30,0,texto[328],c3);
+  wwrite(v.ptr,an,al,22+48,56+30,0,texts[328],c3);
   wrectangle(v.ptr,an,al,c0,52+50,55+30,9,9);
   wrectangle(v.ptr,an,al,c0,60+50,55+30,33,9);
   wrectangle(v.ptr,an,al,c0,92+50,55+30,9,9);
@@ -562,17 +562,17 @@ void Cfg_Setup1(void) {
   wrectangle(v.ptr,an,al,c0,92+50,55+30+inc,9,9);
   wput(v.ptr,an,al,53+50,56+30+inc,-51);
   wput(v.ptr,an,al,93+50,56+30+inc,-52);
-  wwrite(v.ptr,an,al,101+18+50,56+30+inc,1,texto[544],c3);
+  wwrite(v.ptr,an,al,101+18+50,56+30+inc,1,texts[544],c3);
 
   wbox(v.ptr,an,al,c0,2,66+30,an-4,1);
 
-  wwrite(v.ptr,an,al,5,69+30,0,texto[329],c1);
-  wwrite(v.ptr,an,al,4,69+30,0,texto[329],c3);
+  wwrite(v.ptr,an,al,5,69+30,0,texts[329],c1);
+  wwrite(v.ptr,an,al,4,69+30,0,texts[329],c3);
 
   wbox(v.ptr,an,al,c0,2,97+30,an-4,1);
 
-  wwrite(v.ptr,an,al,5,100+30,0,texto[333],c1);
-  wwrite(v.ptr,an,al,4,100+30,0,texto[333],c3);
+  wwrite(v.ptr,an,al,5,100+30,0,texts[333],c1);
+  wwrite(v.ptr,an,al,4,100+30,0,texts[333],c3);
 
   Cfg_colors();
   cfg_show_font();
@@ -583,7 +583,7 @@ void Cfg_Setup1(void) {
 void cfg_show_cursor(void) {
   int an=v.an/big2,al=v.al/big2;
 
-  wwrite(v.ptr,an,al,103+30,70+30,0,texto[327],c3);
+  wwrite(v.ptr,an,al,103+30,70+30,0,texts[327],c3);
   wrectangle(v.ptr,an,al,c0,91+30,68+30,10,10);
   wbox(v.ptr,an,al,c1,92+30,69+30,8,8);
   if (big) {
@@ -735,7 +735,7 @@ void Cfg_Setup3(void) {
 
 void Cfg_Setup0(void) {
   v.type=1;
-  v.title=texto[883];
+  v.title=texts[883];
   v.an=192;
   v.al=200;
   v.paint_handler=(voidReturnType)Cfg_Setup1;
@@ -768,8 +768,8 @@ void Cfg_Setup0(void) {
   v_accept=0;
 }
 
-void nueva_ventana_carga(voidReturnType init_handler,int nx,int ny);
-extern struct tventana ventana_aux;
+void create_saved_window(voidReturnType init_handler,int nx,int ny);
+extern struct twindow window_aux;
 void test_cursor(void);
 void resize_program(void);
 extern int VidModeChanged;
@@ -781,11 +781,11 @@ void Cfg_Setup_end(void) {
   byte * ptr;
   int an,al;
   FILE * f=NULL;
-  struct tventana vp[24];
+  struct twindow vp[24];
   int i;
 
   for (i=0,n=0;n<max_windows;n++) {
-    if (ventana[n].click_handler==(voidReturnType)program2) i++;
+    if (window[n].click_handler==(voidReturnType)program2) i++;
   }
 
   if (i>24 || !v_accept) editor_font=old_editor_font;
@@ -854,18 +854,18 @@ void Cfg_Setup_end(void) {
     colors_rgb[30]=dac[c_num*3]; colors_rgb[31]=dac[c_num*3+1]; colors_rgb[32]=dac[c_num*3+2];
     colors_rgb[33]=dac[c_lit*3]; colors_rgb[34]=dac[c_lit*3+1]; colors_rgb[35]=dac[c_lit*3+2];
 
-    no_volcar_ventanas=1; cierra_rapido=1;
+    skip_window_render=1; cierra_rapido=1;
     ew=exploding_windows; exploding_windows=0;
 
     if (old_editor_font!=editor_font) {
-      for (n=0;n<max_windows;n++) if (ventana[n].click_handler==(voidReturnType)help2) {
+      for (n=0;n<max_windows;n++) if (window[n].click_handler==(voidReturnType)help2) {
         move(0,n); close_window(); help_item++; break;
       } if (n==max_windows) help_item=0;
       i=0; do {
         found=0;
-        for (n=max_windows-1;n>=0;n--) if (ventana[n].click_handler==(voidReturnType)program2) {
-          memcpy(&vp[i].type,&ventana[n].type,sizeof(struct tventana)); i++;
-          ventana[n].close_handler=(voidReturnType)dummy_handler;
+        for (n=max_windows-1;n>=0;n--) if (window[n].click_handler==(voidReturnType)program2) {
+          memcpy(&vp[i].type,&window[n].type,sizeof(struct twindow)); i++;
+          window[n].close_handler=(voidReturnType)dummy_handler;
           move(0,n); close_window();
           found=1; break;
         }
@@ -874,7 +874,7 @@ void Cfg_Setup_end(void) {
 
     create_title_bar();
 
-    for (n=0;n<max_windows;n++) if (ventana[n].type) {
+    for (n=0;n<max_windows;n++) if (window[n].type) {
       xchg(0,n);
 
       if (v.foreground==2) {
@@ -920,16 +920,16 @@ void Cfg_Setup_end(void) {
 
     if (old_editor_font!=editor_font) {
       for (n=0;n<i;n++) {
-        memcpy(&ventana_aux.type,&vp[n].type,sizeof(struct tventana));
-        v_prg=ventana_aux.prg; VidModeChanged=33;
-        nueva_ventana_carga((voidReturnType)resize_program,ventana_aux.x,ventana_aux.y);
+        memcpy(&window_aux.type,&vp[n].type,sizeof(struct twindow));
+        v_prg=window_aux.prg; VidModeChanged=33;
+        create_saved_window((voidReturnType)resize_program,window_aux.x,window_aux.y);
       }
       if (help_item) help(help_item-1);
     }
 
-    no_volcar_ventanas=0; cierra_rapido=0; exploding_windows=ew;
+    skip_window_render=0; cierra_rapido=0; exploding_windows=ew;
 
-    update_box(0,0,vga_width,vga_height); blit_screen(copia);
+    update_box(0,0,vga_width,vga_height); blit_screen(screen_buffer);
   }
 }
 
@@ -944,12 +944,12 @@ void resize_program(void) {
   if (v.an>vga_width) {
     v.prg->an=(vga_width-12*big2)/font_width; // Calculate maximized size (in chars)
     v.an=(4+8)*big2+font_width*v.prg->an;
-    ventana_aux.an=v.an;
+    window_aux.an=v.an;
   }
   if (v.al>vga_height) {
     v.prg->al=(vga_height-28*big2)/font_height;
     v.al=(12+16)*big2+font_height*v.prg->al;
-    ventana_aux.al=v.al;
+    window_aux.al=v.al;
   }
   if (big) {
     if (v.an&1) { v.an++; } if (v.al&1) { v.al++; } v.an=-v.an;
@@ -1087,7 +1087,7 @@ void prepare_wallpaper_temp(void) {
   if(!n) {
     free(temp);
     x_wallpaper_map=x_wallpaper=NULL;
-    v_text=(char *)texto[44]; show_dialog((voidReturnType)err0);
+    v_text=(char *)texts[44]; show_dialog((voidReturnType)err0);
     return;
   }
 

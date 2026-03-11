@@ -159,7 +159,7 @@ void gama0(void)
 
   v.type=1;
 
-  v.title=texto[420];
+  v.title=texts[420];
   v.an=ancho_ga;
   v.al=alto_ga;
 

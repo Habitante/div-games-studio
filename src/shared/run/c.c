@@ -418,17 +418,17 @@ void put_collision(byte * buffer, int * ptr, int x, int y, int xg, int yg, int a
 
   byte * si;
   int an,al; // Graphic screen dimensions
-  byte * _copia;
-  int _vga_an,_vga_al;
+  byte * _saved_buffer;
+  int _saved_width,_saved_height;
   int ix,iy;
 
   an=ptr[13]; al=ptr[14]; si=(byte*)ptr+64+ptr[15]*4;
 
   ix=clipx0; iy=clipy0;
 
-  _copia=copia; copia=buffer;
-  _vga_an=vga_width; vga_width=buffer_an;
-  _vga_al=vga_height; vga_height=buffer_al;
+  _saved_buffer=screen_buffer; screen_buffer=buffer;
+  _saved_width=vga_width; vga_width=buffer_an;
+  _saved_height=vga_height; vga_height=buffer_al;
   clipx0=0; clipx1-=ix-1;
   clipy0=0; clipy1-=iy-1;
 
@@ -447,9 +447,9 @@ void put_collision(byte * buffer, int * ptr, int x, int y, int xg, int yg, int a
       sp_clipped(si,x,y,an,al,flags);
   }
 
-  copia=_copia;
-  vga_width=_vga_an;
-  vga_height=_vga_al;
+  screen_buffer=_saved_buffer;
+  vga_width=_saved_width;
+  vga_height=_saved_height;
   clipx0=ix; clipx1+=ix-1;
   clipy0=iy; clipy1+=iy-1;
 }
@@ -476,7 +476,7 @@ void sp_rotated_p(byte * si, int an, int al, int flags) {
     n+=2;
   } while (n<16);
 
-  l1=l0; hmax0=hmin; hmax1=hmin; ptrcopia=copia+hmin*vga_width;
+  l1=l0; hmax0=hmin; hmax1=hmin; ptrcopia=screen_buffer+hmin*vga_width;
 
   h=hmin; do {
 
@@ -567,17 +567,17 @@ void test_collision(byte * buffer, int * ptr, int x, int y, int xg, int yg, int 
 
   byte * si;
   int an,al; // Graphic screen dimensions
-  byte * _copia;
-  int _vga_an,_vga_al;
+  byte * _saved_buffer;
+  int _saved_width,_saved_height;
   int ix,iy;
 
   an=ptr[13]; al=ptr[14]; si=(byte*)ptr+64+ptr[15]*4;
 
   ix=clipx0; iy=clipy0;
 
-  _copia=copia; copia=buffer;
-  _vga_an=vga_width; vga_width=buffer_an;
-  _vga_al=vga_height; vga_height=buffer_al;
+  _saved_buffer=screen_buffer; screen_buffer=buffer;
+  _saved_width=vga_width; vga_width=buffer_an;
+  _saved_height=vga_height; vga_height=buffer_al;
   clipx0=0; clipx1-=ix-1;
   clipy0=0; clipy1-=iy-1;
 
@@ -596,9 +596,9 @@ void test_collision(byte * buffer, int * ptr, int x, int y, int xg, int yg, int 
       test_clipped(si,x,y,an,al,flags);
   }
 
-  copia=_copia;
-  vga_width=_vga_an;
-  vga_height=_vga_al;
+  screen_buffer=_saved_buffer;
+  vga_width=_saved_width;
+  vga_height=_saved_height;
   clipx0=ix; clipx1+=ix-1;
   clipy0=iy; clipy1+=iy-1;
 }
@@ -609,7 +609,7 @@ void test_collision(byte * buffer, int * ptr, int x, int y, int xg, int yg, int 
 
 void test_normal(byte * p, int x, int y, int an, int al, int flags) {
 
-  byte *q=copia+y*vga_width+x;
+  byte *q=screen_buffer+y*vga_width+x;
   int ancho=an;
 
   switch (flags&3) {
@@ -657,7 +657,7 @@ void test_normal(byte * p, int x, int y, int an, int al, int flags) {
 
 void test_clipped(byte * p, int x, int y, int an, int al, int flags) {
 
-  byte *q=copia+y*vga_width+x;
+  byte *q=screen_buffer+y*vga_width+x;
   int salta_x, long_x, resto_x;
   int salta_y, long_y, resto_y;
 
@@ -738,7 +738,7 @@ void test_scaled(byte * old_si, int x, int y, int an, int al, int xg, int yg,
 
   if (x1<clipx0 || y1<clipy0 || x0>=clipx1 || y0>=clipy1) return;
 
-  di=copia+y0*vga_width+x0;
+  di=screen_buffer+y0*vga_width+x0;
 
   if (x0<clipx0) salta_x=clipx0-x0; else salta_x=0;
   if (x1>=clipx1) resto_x=x1-clipx1+1; else resto_x=0;
@@ -787,7 +787,7 @@ void test_rotated(byte * si, int an, int al, int flags) {
     n+=2;
   } while (n<16);
 
-  l1=l0; hmax0=hmin; hmax1=hmin; ptrcopia=copia+hmin*vga_width;
+  l1=l0; hmax0=hmin; hmax1=hmin; ptrcopia=screen_buffer+hmin*vga_width;
 
   h=hmin; do {
 

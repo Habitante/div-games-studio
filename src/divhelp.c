@@ -6,7 +6,7 @@
 #include "global.h"
 #include "div_string.h"
 
-extern int fin_ventana;
+extern int window_closing;
 extern int primera_vez;
 
 int helpidx[4096];              // Per topic: {offset, length}
@@ -315,7 +315,7 @@ void help2(void) {
 					memset(v_prg,0,sizeof(struct tprg));
 					
                   v_prg->buffer_len=16384;
-                  strcpy(v_prg->filename,(char *)texto[220]);
+                  strcpy(v_prg->filename,(char *)texts[220]);
                   strcpy(v_prg->path,(char *)tipo[1].path);
                   v_prg->file_len=di-p;
                   v_prg->buffer=p;
@@ -367,7 +367,7 @@ void help2(void) {
       if (key(_ESC) && !key(_L_CTRL)) {
         if (mouse_in(v.x+2*big2,v.y+10*big2,v.x+v.an-2*big2,v.y+v.al-2*big2)) {
           close_window();
-        } else fin_ventana=2;
+        } else window_closing=2;
       }
     }
 
@@ -408,15 +408,15 @@ void help0(void) { // help_item indicates which topic help is requested for
   v.close_handler=help3;
 
   _button(488,6,14,0);
-  x=6+text_len(texto[488])+2;
+  x=6+text_len(texts[488])+2;
   _button(489,x,14,0);
-  x+=text_len(texto[489])+2+6;
+  x+=text_len(texts[489])+2+6;
   _button(490,x,14,0);
-  x+=text_len(texto[490])+2;
+  x+=text_len(texts[490])+2;
   _button(491,x,14,0);
-  x+=text_len(texto[491])+2;
+  x+=text_len(texts[491])+2;
   _button(492,x,14,0);
-  x+=text_len(texto[492])+2+6;
+  x+=text_len(texts[492])+2+6;
   _button(494,x,14,0);
   _button(493,abs(v.an)/big2-15,14,2);
 }
@@ -481,7 +481,7 @@ void resize_help(void) {
 
     save_mouse_bg(mouse_background,_mx,my,mouse_graf,0);
     put(_mx,my,mouse_graf);
-    blit_screen(copia);
+    blit_screen(screen_buffer);
     save_mouse_bg(mouse_background,_mx,my,mouse_graf,1);
 
   } while (mouse_b&1);
@@ -518,7 +518,7 @@ int determine_help(void) {
   int m,n=-1;
 
   for (m=0;m<max_windows;m++) {
-    if (ventana[m].type==102 && ventana[m].click_handler==help2) {
+    if (window[m].type==102 && window[m].click_handler==help2) {
       n=m; break;
     }
   } return(n);
@@ -534,11 +534,11 @@ void help(int n){
   determine_prg2();
 
   if (v_window!=-1) {
-    old_prg=ventana[v_window].prg;
+    old_prg=window[v_window].prg;
   } else {
     determine_calc();
     if (v_window!=-1) {
-      old_prg=(struct tprg*)ventana[v_window].aux;
+      old_prg=(struct tprg*)window[v_window].aux;
     }
   }
 
@@ -548,8 +548,8 @@ void help(int n){
     if (v.foreground==2) maximize_window();
 
     if (m && v.foreground==0) { // If it was in the background
-      for (m=1;m<max_windows;m++) if (ventana[m].type && ventana[m].foreground==1)
-        if (windows_collide(0,m)) {ventana[m].foreground=0; flush_window(m);}
+      for (m=1;m<max_windows;m++) if (window[m].type && window[m].foreground==1)
+        if (windows_collide(0,m)) {window[m].foreground=0; flush_window(m);}
       v.foreground=1;
     }
 
@@ -629,15 +629,15 @@ void help_paint0(void) { // help_item indicates which topic help is requested fo
   v.state=1;
 
   _button(488,6,14,0);
-  x=6+text_len(texto[488])+2;
+  x=6+text_len(texts[488])+2;
   _button(489,x,14,0);
-  x+=text_len(texto[489])+2+6;
+  x+=text_len(texts[489])+2+6;
   _button(490,x,14,0);
-  x+=text_len(texto[490])+2;
+  x+=text_len(texts[490])+2;
   _button(491,x,14,0);
-  x+=text_len(texto[491])+2;
+  x+=text_len(texts[491])+2;
   _button(492,x,14,0);
-  x+=text_len(texto[492])+2+6;
+  x+=text_len(texts[492])+2+6;
   _button(494,x,14,0);
   _button(493,abs(v.an)/big2-15,14,2);
 }
@@ -692,7 +692,7 @@ extern int linea_error;
 void get_error(int n) {
   FILE * f;
   byte * p;
-  DIV_SPRINTF(cerror,"%s",(char *)texto[381]); p=(byte *)cerror+strlen((char *)cerror);
+  DIV_SPRINTF(cerror,"%s",(char *)texts[381]); p=(byte *)cerror+strlen((char *)cerror);
 
   if (helpidx[n*2] && helpidx[n*2+1]) {
     if((f=fopen("help/help.div","rb"))!=NULL) {
@@ -961,7 +961,7 @@ void tabula_help(byte *si,byte *di,int lon) {
               while (*si>='0' && *si<='9') {
                 tex*=10; tex+=*si-'0'; si++;
               } si++;
-              if (*texto[tex]=='-') strcpy((char *)di,(char *)texto[tex]+1); else strcpy((char *)di,(char *)texto[tex]);
+              if (*texts[tex]=='-') strcpy((char *)di,(char *)texts[tex]+1); else strcpy((char *)di,(char *)texts[tex]);
               di+=strlen((char *)di);
               continue;
 
@@ -1315,7 +1315,7 @@ void tabula_help2(byte *si,byte *di,int lon) {
               while (*si>='0' && *si<='9') {
                 n*=10; n+=*si-'0'; si++;
               } si++;
-              if (*texto[n]=='-') strcpy((char *)di,(char *)texto[n]+1); else strcpy((char *)di,(char *)texto[n]);
+              if (*texts[n]=='-') strcpy((char *)di,(char *)texts[n]+1); else strcpy((char *)di,(char *)texts[n]);
               di+=strlen((char *)di);
               continue;
 
@@ -1367,10 +1367,10 @@ void Print_Help(void) {
   unsigned u;
   FILE * f, * g;
 
-  if (!strlen(h_ar)) strcpy(h_ar,(char *)texto[495]);
+  if (!strlen(h_ar)) strcpy(h_ar,(char *)texts[495]);
 
   v_text=h_ar;
-  v_title=(char *)texto[496];
+  v_title=(char *)texts[496];
   show_dialog(printlist0);
 
   if (v_accept) {
@@ -1383,13 +1383,13 @@ void Print_Help(void) {
         fclose(g);
         sprintf(cwork,"%s/%s",tipo[1].path,h_ar);
         strupr(cwork);
-        v_title=(char *)texto[450];
+        v_title=(char *)texts[450];
         v_text=cwork;
         show_dialog(aceptar0);
         if (!v_accept) return;
       }
       g=fopen(h_ar,"wb");
-      if (g==NULL) { v_text=(char *)texto[47]; show_dialog(err0); return; }
+      if (g==NULL) { v_text=(char *)texts[47]; show_dialog(err0); return; }
     } else g=stdprn;
 
     if((f=fopen("help/help.div","rb"))!=NULL) {
@@ -1413,13 +1413,13 @@ void Print_Help(void) {
           p=print_buffer;
 
           while (p<help_end) {
-            Progress((char *)texto[437],p-print_buffer,help_end-print_buffer);
+            Progress((char *)texts[437],p-print_buffer,help_end-print_buffer);
             fwrite(p,1,strlen((char *)p),g);
             fwrite("\xd\xa",1,2,g);
             p+=strlen((char *)p)+1;
           }
 
-          Progress((char *)texto[437],help_end-print_buffer,help_end-print_buffer);
+          Progress((char *)texts[437],help_end-print_buffer,help_end-print_buffer);
 
           help_end=_help_end;
         }

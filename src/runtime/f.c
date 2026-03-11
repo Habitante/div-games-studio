@@ -19,7 +19,7 @@ void load_pal(void);
 int is_PCX(byte *buffer);
 void adapt_palette(byte * ptr, int len, byte * pal, byte * xlat);
 void put_screen(void);
-void texn2(byte * copia, int vga_width, byte * p, int x, int y, byte an, int al);
+void texn2(byte * dest, int vga_width, byte * p, int x, int y, byte an, int al);
 void get_token(void);
 void expres0(void);
 void expres1(void);
@@ -1329,22 +1329,22 @@ void __write(void) {
   if (f<0 || f>=max_fonts) { e(116); f=0; }
   if (fonts[f]==0) { e(116); f=0; }
   x=1;
-  while (texto[x].font!=NULL) {
+  while (texts[x].font!=NULL) {
     x++;
-    if (x==max_textos) break;
-    if ( pila[sp-1]==texto[x].centro &&
-         pila[sp-2]==texto[x].y      &&
-         pila[sp-3]==texto[x].x      ) break;
+    if (x==max_texts) break;
+    if ( pila[sp-1]==texts[x].centro &&
+         pila[sp-2]==texts[x].y      &&
+         pila[sp-3]==texts[x].x      ) break;
   }
 
-  if (x<max_textos) {
-    texto[x].type=0;
-    texto[x].ptr=pila[sp--];
+  if (x<max_texts) {
+    texts[x].type=0;
+    texts[x].ptr=pila[sp--];
     if (pila[sp]<0 || pila[sp]>8) { e(117); pila[sp]=0; }
-    texto[x].centro=pila[sp--];
-    texto[x].y=pila[sp--];
-    texto[x].x=pila[sp--];
-    texto[x].font=(byte*)fonts[f];
+    texts[x].centro=pila[sp--];
+    texts[x].y=pila[sp--];
+    texts[x].x=pila[sp--];
+    texts[x].font=(byte*)fonts[f];
     pila[sp]=x;
   } else { sp-=4; pila[sp]=0; e(118); }
 }
@@ -1358,21 +1358,21 @@ void write_int(void) {
   if (f<0 || f>=max_fonts) { e(116); f=0; }
   if (fonts[f]==0) { e(116); f=0; }
   x=1;
-  while (texto[x].font) {
+  while (texts[x].font) {
     x++;
-    if (x==max_textos) break;
-    if ( pila[sp-1]==texto[x].centro &&
-         pila[sp-2]==texto[x].y      &&
-         pila[sp-3]==texto[x].x      ) break;
+    if (x==max_texts) break;
+    if ( pila[sp-1]==texts[x].centro &&
+         pila[sp-2]==texts[x].y      &&
+         pila[sp-3]==texts[x].x      ) break;
   }
-  if (x<max_textos) {
-    texto[x].type=1;
-    texto[x].ptr=pila[sp--];
+  if (x<max_texts) {
+    texts[x].type=1;
+    texts[x].ptr=pila[sp--];
     if (pila[sp]<0 || pila[sp]>8) { e(117); pila[sp]=0; }
-    texto[x].centro=pila[sp--];
-    texto[x].y=pila[sp--];
-    texto[x].x=pila[sp--];
-    texto[x].font=(byte*)fonts[f];
+    texts[x].centro=pila[sp--];
+    texts[x].y=pila[sp--];
+    texts[x].x=pila[sp--];
+    texts[x].font=(byte*)fonts[f];
     pila[sp]=x;
   } else { sp-=4; pila[sp]=0; e(118); }
 }
@@ -1382,9 +1382,9 @@ void write_int(void) {
 //----------------------------------------------------------------------------
 
 void delete_text(void) {
-  x=pila[sp]; if (x<max_textos && x>0) texto[x].font=0;
+  x=pila[sp]; if (x<max_texts && x>0) texts[x].font=0;
   else if (x==0) {
-    x=1; do texto[x++].font=0; while (x<max_textos);
+    x=1; do texts[x++].font=0; while (x<max_texts);
   } else e(119);
 }
 
@@ -1393,8 +1393,8 @@ void delete_text(void) {
 //----------------------------------------------------------------------------
 
 void move_text(void) {
-  x=pila[sp-2]; if (x<max_textos && x>0) {
-    texto[x].x=pila[sp-1]; texto[x].y=pila[sp];
+  x=pila[sp-2]; if (x<max_texts && x>0) {
+    texts[x].x=pila[sp-1]; texts[x].y=pila[sp];
   } else e(119); sp-=2;
 }
 
@@ -1490,7 +1490,7 @@ void _xput(void) {
   y=pila[sp--]; x=pila[sp--];
   graf=pila[sp--]; file=pila[sp];
 
-  put_sprite(file,graf,x,y,angle,size,flags,reg,copia2,vga_width,vga_height);
+  put_sprite(file,graf,x,y,angle,size,flags,reg,back_buffer,vga_width,vga_height);
 
 }
 
@@ -1504,7 +1504,7 @@ void _put(void) {
   y=pila[sp--]; x=pila[sp--];
   graf=pila[sp--]; file=pila[sp];
 
-  put_sprite(file,graf,x,y,0,100,0,0,copia2,vga_width,vga_height);
+  put_sprite(file,graf,x,y,0,100,0,0,back_buffer,vga_width,vga_height);
 
 }
 
@@ -1561,8 +1561,8 @@ void map_block_copy(void) {
   int file,grafd,xd,yd;
   int graf,x,y,an,al;
   int * ptrd,* ptr;
-  byte * _copia=copia, * si;
-  int _vga_an=vga_width,_vga_al=vga_height;
+  byte * _saved_buffer=screen_buffer, * si;
+  int _saved_width=vga_width,_saved_height=vga_height;
 
   al=pila[sp--]; an=pila[sp--];
   y=pila[sp--]; x=pila[sp--]; graf=pila[sp--];
@@ -1579,7 +1579,7 @@ void map_block_copy(void) {
     if ((ptr=g[file].grf[graf])!=NULL) {
 
       vga_width=ptrd[13]; vga_height=ptrd[14];
-      copia=(byte*)ptrd+64+ptrd[15]*4;
+      screen_buffer=(byte*)ptrd+64+ptrd[15]*4;
 
       if (xd>0) clipx0=xd; else clipx0=0;
       if (yd>0) clipy0=yd; else clipy0=0;
@@ -1599,7 +1599,7 @@ void map_block_copy(void) {
       else if (x<clipx1 && y<clipy1 && x+an>clipx0 && y+al>clipy0) // Draw sprite clipped
         sp_clipped(si,x,y,an,al,0);
 
-      no: copia=_copia; vga_width=_vga_an; vga_height=_vga_al;
+      no: screen_buffer=_saved_buffer; vga_width=_saved_width; vga_height=_saved_height;
     } else e(121);
   } else e(121);
 
@@ -1640,7 +1640,7 @@ void screen_copy(void) {
   if (divand<=0 || ald<=0 || an<=0 || al<=0) return;
 
   di=(byte*)ptr+64+ptr[15]*4+xr+yr*ptr[13];
-  old_si=copia+region[reg].x0+region[reg].y0*vga_width;
+  old_si=screen_buffer+region[reg].x0+region[reg].y0*vga_width;
 
   ixr=(float)(an*256)/(float)divand;
   iyr=(float)(al*256)/(float)ald;
@@ -1692,8 +1692,8 @@ void put_screen(void) {
   if (ptr[15]==0 || *((word*)ptr+32)==65535) { xg=ptr[13]/2; yg=ptr[14]/2;
   } else { xg=*((word*)ptr+32); yg=*((word*)ptr+33); }
 
-  memset(copia2,0,vga_width*vga_height);
-  put_sprite(file,graf,xg,yg,0,100,0,0,copia2,vga_width,vga_height);
+  memset(back_buffer,0,vga_width*vga_height);
+  put_sprite(file,graf,xg,yg,0,100,0,0,back_buffer,vga_width,vga_height);
 
 }
 
@@ -1706,7 +1706,7 @@ void put_pixel(void) {
 
   color=pila[sp--]; y=pila[sp--]; x=pila[sp];
   if (x>=0 && y>=0 && x<vga_width && y<vga_height) {
-    *(copia2+x+y*vga_width)=color;
+    *(back_buffer+x+y*vga_width)=color;
   }
 }
 
@@ -1719,7 +1719,7 @@ void get_pixel(void) {
 
   y=pila[sp--]; x=pila[sp];
   if (x>=0 && y>=0 && x<vga_width && y<vga_height) {
-    pila[sp]=(int)(*(copia2+x+y*vga_width));
+    pila[sp]=(int)(*(back_buffer+x+y*vga_width));
   } else pila[sp]=0;
 }
 
@@ -1798,7 +1798,7 @@ void get_point(void) {
 //----------------------------------------------------------------------------
 
 void clear_screen(void) {
-  memset(copia2,0,vga_width*vga_height);
+  memset(back_buffer,0,vga_width*vga_height);
   pila[++sp]=0;
 }
 
@@ -1974,32 +1974,32 @@ vvga_al = vga_height;
   dacout_r=64; dacout_g=64; dacout_b=64; dacout_speed=8;
   fade_wait();
 
-  if(copia!=NULL) {
-	free(copia); 
-	copia=NULL;
+  if(screen_buffer!=NULL) {
+	free(screen_buffer); 
+	screen_buffer=NULL;
   }
 
-  if(copia2!=NULL) {
-	free(copia2);
-	copia2=NULL;
+  if(back_buffer!=NULL) {
+	free(back_buffer);
+	back_buffer=NULL;
   }
 
 #ifdef DEBUG
-  if(copia_debug!=NULL) {
-	free(copia_debug);
-	copia_debug=NULL;
+  if(screen_buffer_debug!=NULL) {
+	free(screen_buffer_debug);
+	screen_buffer_debug=NULL;
   }
 #endif
 
-  if((copia=(byte *) malloc(vga_width*vga_height))==NULL) exer(1);
-  memset(copia,0,vga_width*vga_height);
+  if((screen_buffer=(byte *) malloc(vga_width*vga_height))==NULL) exer(1);
+  memset(screen_buffer,0,vga_width*vga_height);
 
-  if((copia2=(byte *) malloc(vga_width*vga_height))==NULL) exer(1);
-  memset(copia2,0,vga_width*vga_height);
+  if((back_buffer=(byte *) malloc(vga_width*vga_height))==NULL) exer(1);
+  memset(back_buffer,0,vga_width*vga_height);
 
   #ifdef DEBUG
-  if((copia_debug=(byte *) malloc(vga_width*vga_height))==NULL) exer(1);
-  memset(copia_debug,0,vga_width*vga_height);
+  if((screen_buffer_debug=(byte *) malloc(vga_width*vga_height))==NULL) exer(1);
+  memset(screen_buffer_debug,0,vga_width*vga_height);
   #endif
 
   if (set_video_mode!=NULL) {
@@ -2268,7 +2268,7 @@ void start_fli(void) {
     pila[sp]=0; e(147);
   } else {
     fclose(es);
-    pila[sp]=StartFLI(full,(char *)copia2,vga_width,vga_height,x,y);
+    pila[sp]=StartFLI(full,(char *)back_buffer,vga_width,vga_height,x,y);
     if (pila[sp]==0) e(130);
   }
 #endif
@@ -3862,13 +3862,13 @@ void save_mapcx(int tipo) {
 //----------------------------------------------------------------------------
 
 void write_in_map(void) {
-  int centro,texto;
+  int centro,texts;
   int cx,cy,an,al;
   int fuente;
 
   byte * ptr, * ptr2;
 
-  centro=pila[sp--]; texto=pila[sp--]; fuente=pila[sp];
+  centro=pila[sp--]; texts=pila[sp--]; fuente=pila[sp];
 
   if (fuente<0 || fuente>=max_fonts) { e(116); return; }
   if (fonts[fuente]==0) { e(116); return; }
@@ -3877,7 +3877,7 @@ void write_in_map(void) {
 
   checkpal_font(fuente);
 
-  ptr=(byte*)&mem[texto];
+  ptr=(byte*)&mem[texts];
 
   fnt=(TABLAFNT*)((byte*)fonts[fuente]+1356);
   al=f_i[fuente].alto;
@@ -3931,8 +3931,8 @@ void write_in_map(void) {
 
 }
 
-void texn2(byte * copia, int vga_width, byte * p, int x, int y, byte an, int al) {
-  byte *q=copia+y*vga_width+x;
+void texn2(byte * dest, int vga_width, byte * p, int x, int y, byte an, int al) {
+  byte *q=dest+y*vga_width+x;
   int ancho=an;
 
   do {

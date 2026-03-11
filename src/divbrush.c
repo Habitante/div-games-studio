@@ -187,7 +187,7 @@ void M3D_create_thumbs(struct t_listboxbr * l, int prog)
 
   if((FPG_F=fopen((char *)brush_fpg_path,"rb"))==NULL)
   {
-    v_text=(char *)texto[43];
+    v_text=(char *)texts[43];
     show_dialog(err0);
     return;
   }
@@ -199,7 +199,7 @@ void M3D_create_thumbs(struct t_listboxbr * l, int prog)
   if(fread(&FPG_H, 1, sizeof(FPG_header), FPG_F)!=sizeof(FPG_header))
   {
     fclose(FPG_F);
-    v_text=(char *)texto[44];
+    v_text=(char *)texts[44];
     show_dialog(err0);
     return;
   }
@@ -240,15 +240,15 @@ void M3D_create_thumbs(struct t_listboxbr * l, int prog)
       else
       {
         fclose(FPG_F);
-        if (prog) Progress((char *)texto[93], FPG_progress.total, FPG_progress.total);
-        v_text=(char *)texto[44];
+        if (prog) Progress((char *)texts[93], FPG_progress.total, FPG_progress.total);
+        v_text=(char *)texts[44];
         show_dialog(err0);
         return;
       }
     }
     fseek( FPG_F, sizeof(FPG_points)*FPG_D.info.puntos, SEEK_CUR );
     FPG_progress.pos+=(64+4*FPG_D.info.puntos+FPG_D.info.ancho*FPG_D.info.alto);
-    if (prog) Progress((char *)texto[93], FPG_progress.pos, FPG_progress.total);
+    if (prog) Progress((char *)texts[93], FPG_progress.pos, FPG_progress.total);
 
     thumb_tex[n].Cuad=0;
     for(con=0; con<11; con++)
@@ -284,8 +284,8 @@ void M3D_create_thumbs(struct t_listboxbr * l, int prog)
         }
       }
       fclose(FPG_F);
-      if (prog) Progress((char *)texto[93], FPG_progress.total, FPG_progress.total);
-      v_text=(char *)texto[45];
+      if (prog) Progress((char *)texts[93], FPG_progress.total, FPG_progress.total);
+      v_text=(char *)texts[45];
       show_dialog(err0);
       return;
     }
@@ -303,8 +303,8 @@ void M3D_create_thumbs(struct t_listboxbr * l, int prog)
       }
       fclose(FPG_F);
       free(FPG_D.imagen);
-      if (prog) Progress((char *)texto[93], FPG_progress.total, FPG_progress.total);
-      v_text=(char *)texto[44];
+      if (prog) Progress((char *)texts[93], FPG_progress.total, FPG_progress.total);
+      v_text=(char *)texts[44];
       show_dialog(err0);
       return;
     }
@@ -388,14 +388,14 @@ void M3D_create_thumbs(struct t_listboxbr * l, int prog)
       }
       thumb_tex[con].status = 1;
       FPG_progress.pos+=(FPG_progress.total-FPG_progress.pos)/(l->total_items-con);
-      if (prog) Progress((char *)texto[93], FPG_progress.pos, FPG_progress.total);
+      if (prog) Progress((char *)texts[93], FPG_progress.pos, FPG_progress.total);
       break;
     }
   }
 
   if(FPG_progress.pos < FPG_progress.total)
   {
-    if (prog) Progress((char *)texto[93], FPG_progress.total, FPG_progress.total);
+    if (prog) Progress((char *)texts[93], FPG_progress.total, FPG_progress.total);
   }
 
   qsort(thumb_tex,l->total_items,sizeof(struct _thumb_tex),cmpcode);
@@ -665,15 +665,15 @@ void MapperBrowseFPG0(void)
   v.al   = 147-4;
   if (TipoTex>3) {
     if(TipoBrowser==BRUSH) {
-      v.title = texto[572];
-      v.name = texto[572];
+      v.title = texts[572];
+      v.name = texts[572];
     } else {
-      v.title = texto[573];
-      v.name = texto[573];
+      v.title = texts[573];
+      v.name = texts[573];
     }
   } else {
-    v.title = texto[433];
-    v.name = texto[433];
+    v.title = texts[433];
+    v.name = texts[433];
   }
 
   v.paint_handler=MapperBrowseFPG1;

@@ -509,7 +509,7 @@ void calculate_gradient(int n) {
 int hay_mapas(void) {
   int m,n=-1;
   for (m=0;m<max_windows;m++)
-  if (ventana[m].type==100) { n=m; break; }
+  if (window[m].type==100) { n=m; break; }
   return(n+1);
 }
 
@@ -532,7 +532,7 @@ void LoadPal() {
 
   v_mode=0;
   v_type=3;
-  v_text=(char *)texto[777];
+  v_text=(char *)texts[777];
   show_dialog(browser0);
   if (!v_finished) return;
 
@@ -560,7 +560,7 @@ void LoadPal() {
       strcat(full, input);
 
       if (!v_exists) {
-        v_text=(char *)texto[43];
+        v_text=(char *)texts[43];
         show_dialog(err0);
       } else {
         strcpy(PalName,full);
@@ -575,13 +575,13 @@ void LoadPal() {
 
         if(div_try) {
           if (hay_mapas()) {
-            v_title=(char *)texto[53];
-            v_text=(char *)texto[321];
+            v_title=(char *)texts[53];
+            v_text=(char *)texts[321];
             show_dialog(aceptar0);
           } else v_accept=1;
           if(v_accept) RefPalAndDlg(0,1); else RefPalAndDlg(1,1);
         } else {
-          v_text=(char*)texto[46];
+          v_text=(char*)texts[46];
           show_dialog(err0);
           return;
         }
@@ -592,7 +592,7 @@ void LoadPal() {
 
     muestra=(byte*)malloc(32768);
     if (muestra==NULL) {
-      v_text=(char *)texto[45];
+      v_text=(char *)texts[45];
       show_dialog(err0);
       return;
     }
@@ -628,8 +628,8 @@ void LoadPal() {
     free(muestra);
 
     if (hay_mapas()) {
-      v_title=(char *)texto[53];
-      v_text=(char *)texto[321];
+      v_title=(char *)texts[53];
+      v_text=(char *)texts[321];
       show_dialog(aceptar0);
     } else v_accept=1;
     if(v_accept) RefPalAndDlg(0,1); else RefPalAndDlg(1,1);
@@ -655,7 +655,7 @@ FILE *f;
         }
         else
         {
-                v_text=(char *)texto[47];
+                v_text=(char *)texts[47];
                 show_dialog(err0);
         }
 }
@@ -665,13 +665,13 @@ void SaveAsPal()
 {
         v_mode=1;
         v_type=10;
-        v_text=(char *)texto[778];
+        v_text=(char *)texts[778];
 	show_dialog(browser0);
         if (v_finished)
         {
                 if (v_exists)
                 {
-                        v_title=(char *)texto[139];
+                        v_title=(char *)texts[139];
                         v_text=input;
                         show_dialog(aceptar0);
                         if (v_accept)
@@ -687,7 +687,7 @@ void SaveAsPal()
 //-----------------------------------------------------------------------------
 //      Refresh the entire environment after a palette change
 //-----------------------------------------------------------------------------
-void ReloadFont(int ventana, struct tventana *vntn);
+void ReloadFont(int window, struct twindow *vntn);
 
 extern int   Text1Anc;
 extern int   Text1Alt;
@@ -727,8 +727,8 @@ void RefPalAndDlg(int no_tocar_mapas,int guardar_original)
 
   // ************** Free FPG thumbnails
 
-  for (m=0;m<max_windows;m++) if (ventana[m].type==101) {
-    MiFPG=(FPG *)ventana[m].aux;
+  for (m=0;m<max_windows;m++) if (window[m].type==101) {
+    MiFPG=(FPG *)window[m].aux;
 
     // Free FPG thumbnails
     for(n=0; n<1000; n++)
@@ -751,9 +751,9 @@ void RefPalAndDlg(int no_tocar_mapas,int guardar_original)
 
   if (!no_tocar_mapas) {
     for (n=1;n<max_windows;n++) {
-      if (ventana[n].type==100) {
-        ptr=ventana[n].mapa->map;
-        sum=ventana[n].mapa->map_width*ventana[n].mapa->map_height;
+      if (window[n].type==100) {
+        ptr=window[n].mapa->map;
+        sum=window[n].mapa->map_width*window[n].mapa->map_height;
         x=0; do { *ptr=xlat[*ptr]; ptr++; } while(++x<sum);
       }
     }
@@ -768,7 +768,7 @@ void RefPalAndDlg(int no_tocar_mapas,int guardar_original)
   }
 
   for (n=0;n<max_windows;n++) {
-    if (ventana[n].type==102 && !strcmp((char *)ventana[n].name,(char *)texto[83])) {
+    if (window[n].type==102 && !strcmp((char *)window[n].name,(char *)texts[83])) {
       Text1Col=xlat[Text1Col];
       Text2Col=xlat[Text2Col];
       Text3Col=xlat[Text3Col];
@@ -802,14 +802,14 @@ void RefPalAndDlg(int no_tocar_mapas,int guardar_original)
 
   for (n=1;n<max_windows;n++)
   {
-        if (ventana[n].type==104)
-                ReloadFont(n, (struct tventana *)&ventana[n].type);
+        if (window[n].type==104)
+                ReloadFont(n, (struct twindow *)&window[n].type);
   }
 
-  for (n=0;n<max_windows;n++) if (ventana[n].type) {
+  for (n=0;n<max_windows;n++) if (window[n].type) {
     wup(n);
     ptr=v.ptr;
-    if (ventana[n].foreground==2) { swap(v.an,v._an); swap(v.al,v._al); }
+    if (window[n].foreground==2) { swap(v.an,v._an); swap(v.al,v._al); }
     an=v.an; al=v.al; memset(ptr,c0,an*al); if (big) { an/=2; al/=2; }
     wrectangle(ptr,an,al,c2,0,0,an,al);
     wput(ptr,an,al,an-9,2,35);
@@ -860,7 +860,7 @@ void RefPalAndDlg(int no_tocar_mapas,int guardar_original)
 
   update_box(0,0,vga_width,vga_height);
 
-  blit_screen(copia);
+  blit_screen(screen_buffer);
 
         for (n=60;n>=0;n-=4)
         {
@@ -877,7 +877,7 @@ void RefPalAndDlg(int no_tocar_mapas,int guardar_original)
   if (guardar_original) memcpy(original_palette,dac,768);
 
   for (n=1;n<max_windows;n++) {
-    if (ventana[n].type==101) {
+    if (window[n].type==101) {
       if (RemapAllFiles(n)) n--;
     }
   }
@@ -980,7 +980,7 @@ void ordena0(void){
   v.state=0;
   v.an=65*2+7;
   v.al=65*2+31;
-  v.title=texto[140];
+  v.title=texts[140];
 
   _button(100,7,v.al-14,0);
   _button(101,v.an-8,v.al-14,2);
@@ -1035,11 +1035,11 @@ word find_ord2(byte * dac) {
 void merge_palette(void){
   int div_try=0;
 
-  v_mode=0; v_type=3; v_text=(char *)texto[781]; show_dialog(browser0);
+  v_mode=0; v_type=3; v_text=(char *)texts[781]; show_dialog(browser0);
 
   if (v_finished) {
     if (!v_exists) {
-      v_text=(char *)texto[43]; show_dialog(err0);
+      v_text=(char *)texts[43]; show_dialog(err0);
     } else {
       strcpy(full,tipo[v_type].path);
       if (full[strlen(full)-1]!='/') strcat(full,"/");
@@ -1054,9 +1054,9 @@ void merge_palette(void){
       div_try|=cargadac_PAL(PalName);
       div_try|=cargadac_JPG(PalName);
 
-      if(!div_try) { v_text=(char *)texto[46]; show_dialog(err0); return; }
+      if(!div_try) { v_text=(char *)texts[46]; show_dialog(err0); return; }
 
-      mouse_graf=3; blit_screen(copia);
+      mouse_graf=3; blit_screen(screen_buffer);
 
       fusionar_paletas();
 
@@ -1227,7 +1227,7 @@ void crear_paleta(void){
 
   r=0; g=0; b=0; pal[0]+=128; paleta[0]=0;
   n=1; do {
-    if (!cargar_paleta) if ((n&127)==0) Progress((char *)texto[497],n*2,num_colores*4-256);
+    if (!cargar_paleta) if ((n&127)==0) Progress((char *)texts[497],n*2,num_colores*4-256);
     c=new_find_ord(pal);
     r=pal[c*4]; g=pal[c*4+1]; b=pal[c*4+2];
     pal[c*4]+=128; paleta[n]=c;
@@ -1251,7 +1251,7 @@ void crear_paleta(void){
 
   c=num_colores-1; while (c>255) {
 
-    if (!cargar_paleta) if ((c&127)==0) Progress((char *)texto[497],num_colores*2+num_colores-c,num_colores*4-256);
+    if (!cargar_paleta) if ((c&127)==0) Progress((char *)texts[497],num_colores*2+num_colores-c,num_colores*4-256);
 
     min=64*64*64;
     for (n=0;n<c;n++) { // Find the minimum distance
@@ -1295,7 +1295,7 @@ void crear_paleta(void){
 
   for (n=0,c=0,rr=0;rr<32;rr++) for (gg=0;gg<32;gg++) for (bb=0;bb<32;bb++,n++)
     if (muestra[n]) {
-      if (!cargar_paleta) if (((c++)&127)==0) Progress((char *)texto[497],num_colores*3-256+c,num_colores*4-256);
+      if (!cargar_paleta) if (((c++)&127)==0) Progress((char *)texts[497],num_colores*3-256+c,num_colores*4-256);
       muestra[n]=find_color(rr,gg,bb);
     }
 
@@ -1303,7 +1303,7 @@ void crear_paleta(void){
 
   for (n=0;n<768;n++) if ((col=apply_palette[n])) apply_palette[n]=col*2+1;
 
-  if (!cargar_paleta) Progress((char *)texto[497],num_colores*4-256,num_colores*4-256);
+  if (!cargar_paleta) Progress((char *)texts[497],num_colores*4-256,num_colores*4-256);
 
 }
 
@@ -1433,23 +1433,23 @@ char cWork[20];
 
         wbox(v.ptr,an,al,c0,2,10,128,128);
 
-        wwrite(v.ptr,an,al,147,11,0,texto[141],c3);
+        wwrite(v.ptr,an,al,147,11,0,texts[141],c3);
         sprintf(cWork,"%03d",SelColor);
         wwrite(v.ptr,an,al,145,11,2,(byte *)cWork,c3);
 
-        wwrite(v.ptr,an,al,147,19,0,texto[142],c3);
+        wwrite(v.ptr,an,al,147,19,0,texts[142],c3);
         sprintf(cWork," %02X",SelColor);
         wwrite(v.ptr,an,al,145,19,2,(byte *)cWork,c3);
 
-        wwrite(v.ptr,an,al,147,63-21,0,texto[143],c3);
+        wwrite(v.ptr,an,al,147,63-21,0,texts[143],c3);
         sprintf(cWork,"%02d",dac[SelColor*3]);
         wwrite(v.ptr,an,al,140,63-21,2,(byte *)cWork,c3);
 
-        wwrite(v.ptr,an,al,147,63-14,0,texto[144],c3);
+        wwrite(v.ptr,an,al,147,63-14,0,texts[144],c3);
         sprintf(cWork,"%02d",dac[SelColor*3+1]);
         wwrite(v.ptr,an,al,140,63-14,2,(byte *)cWork,c3);
 
-        wwrite(v.ptr,an,al,147,63-7,0,texto[145],c3);
+        wwrite(v.ptr,an,al,147,63-7,0,texts[145],c3);
         sprintf(cWork,"%02d",dac[SelColor*3+2]);
         wwrite(v.ptr,an,al,140,63-7,2,(byte *)cWork,c3);
 
@@ -1518,21 +1518,21 @@ int an=v.an/big2,al=v.al/big2;
 
                         wbox(v.ptr,an,al,c2,130,11,29,15);
 
-                        wwrite(v.ptr,an,al,147,11,0,texto[141],c3);
+                        wwrite(v.ptr,an,al,147,11,0,texts[141],c3);
                         sprintf(cWork,"%03d",cColor);
                         wwrite(v.ptr,an,al,145,11,2,(byte *)cWork,c3);
-                        wwrite(v.ptr,an,al,147,19,0,texto[142],c3);
+                        wwrite(v.ptr,an,al,147,19,0,texts[142],c3);
                         sprintf(cWork," %02X",cColor);
                         wwrite(v.ptr,an,al,145,19,2,(byte *)cWork,c3);
 
                         wbox(v.ptr,an,al,c2,130,63-21,25,20);
-                        wwrite(v.ptr,an,al,147,63-21,0,texto[143],c3);
+                        wwrite(v.ptr,an,al,147,63-21,0,texts[143],c3);
                         sprintf(cWork,"%02d",dac[cColor*3]);
                         wwrite(v.ptr,an,al,140,63-21,2,(byte *)cWork,c3);
-                        wwrite(v.ptr,an,al,147,63-14,0,texto[144],c3);
+                        wwrite(v.ptr,an,al,147,63-14,0,texts[144],c3);
                         sprintf(cWork,"%02d",dac[cColor*3+1]);
                         wwrite(v.ptr,an,al,140,63-14,2,(byte *)cWork,c3);
-                        wwrite(v.ptr,an,al,147,63-7,0,texto[145],c3);
+                        wwrite(v.ptr,an,al,147,63-7,0,texts[145],c3);
                         sprintf(cWork,"%02d",dac[cColor*3+2]);
                         wwrite(v.ptr,an,al,140,63-7,2,(byte *)cWork,c3);
                         ax=((wmouse_x-2)/8);
@@ -1636,21 +1636,21 @@ int an=v.an/big2,al=v.al/big2;
                         OldColor=SelColor;
 
                         wbox(v.ptr,an,al,c2,130,11,29,15);
-                        wwrite(v.ptr,an,al,147,11,0,texto[141],c3);
+                        wwrite(v.ptr,an,al,147,11,0,texts[141],c3);
                         sprintf(cWork,"%03d",SelColor);
                         wwrite(v.ptr,an,al,145,11,2,(byte *)cWork,c3);
-                        wwrite(v.ptr,an,al,147,19,0,texto[142],c3);
+                        wwrite(v.ptr,an,al,147,19,0,texts[142],c3);
                         sprintf(cWork," %02X",SelColor);
                         wwrite(v.ptr,an,al,145,19,2,(byte *)cWork,c3);
                         wbox(v.ptr,an,al,c2,130,63-21,25,20);
 
-                        wwrite(v.ptr,an,al,147,63-21,0,texto[143],c3);
+                        wwrite(v.ptr,an,al,147,63-21,0,texts[143],c3);
                         sprintf(cWork,"%02d",dac[SelColor*3]);
                         wwrite(v.ptr,an,al,140,63-21,2,(byte *)cWork,c3);
-                        wwrite(v.ptr,an,al,147,63-14,0,texto[144],c3);
+                        wwrite(v.ptr,an,al,147,63-14,0,texts[144],c3);
                         sprintf(cWork,"%02d",dac[SelColor*3+1]);
                         wwrite(v.ptr,an,al,140,63-14,2,(byte *)cWork,c3);
-                        wwrite(v.ptr,an,al,147,63-7,0,texto[145],c3);
+                        wwrite(v.ptr,an,al,147,63-7,0,texts[145],c3);
                         sprintf(cWork,"%02d",dac[SelColor*3+2]);
                         wwrite(v.ptr,an,al,140,63-7,2,(byte *)cWork,c3);
                         lRed.first_visible=63-dac[SelColor*3];
@@ -1797,13 +1797,13 @@ int an=v.an/big2,al=v.al/big2;
 
                                 //Refresh values and scrollbars
                                 wbox(v.ptr,an,al,c2,130,63-21,25,20);
-                                wwrite(v.ptr,an,al,147,63-21,0,texto[143],c3);
+                                wwrite(v.ptr,an,al,147,63-21,0,texts[143],c3);
                                 sprintf(cWork,"%02d",dac[SelColor*3]);
                                 wwrite(v.ptr,an,al,140,63-21,2,(byte *)cWork,c3);
-                                wwrite(v.ptr,an,al,147,63-14,0,texto[144],c3);
+                                wwrite(v.ptr,an,al,147,63-14,0,texts[144],c3);
                                 sprintf(cWork,"%02d",dac[SelColor*3+1]);
                                 wwrite(v.ptr,an,al,140,63-14,2,(byte *)cWork,c3);
-                                wwrite(v.ptr,an,al,147,63-7,0,texto[145],c3);
+                                wwrite(v.ptr,an,al,147,63-7,0,texts[145],c3);
                                 sprintf(cWork,"%02d",dac[SelColor*3+2]);
                                 wwrite(v.ptr,an,al,140,63-7,2,(byte *)cWork,c3);
                                 lRed.first_visible=63-dac[SelColor*3];
@@ -1823,7 +1823,7 @@ void InterPal0(void)
         v.type=1; // Dialog
         v.an=220-46-7;
         v.al=163+24-16;
-        v.title=texto[138];
+        v.title=texts[138];
         v.paint_handler=InterPal1;
         v.click_handler=InterPal2;
 
@@ -1832,8 +1832,8 @@ void InterPal0(void)
         _button(104,v.an/2,v.al-14,1);
 
         _flag(105,4,143,&Degradar);
-        _flag(106,v.an/2-(8*big2+text_len(texto[106]))/2,143,&Intercambiar);
-        _flag(107,(v.an-5)-(8*big2+text_len(texto[107])),143,&Copiar);
+        _flag(106,v.an/2-(8*big2+text_len(texts[106]))/2,143,&Intercambiar);
+        _flag(107,(v.an-5)-(8*big2+text_len(texts[107])),143,&Copiar);
 }
 
 //-----------------------------------------------------------------------------
@@ -1859,8 +1859,8 @@ byte DacAux[768];
                 for (n=0;n<768;n++) if (DacAux[n]!=dac[n]) break;
                 if (n<768) {
                   if (hay_mapas()) {
-                    v_title=(char *)texto[53];
-                    v_text=(char *)texto[321];
+                    v_title=(char *)texts[53];
+                    v_text=(char *)texts[321];
                     show_dialog(aceptar0);
                   } else v_accept=1;
                   memcpy(dac4,dac,768);

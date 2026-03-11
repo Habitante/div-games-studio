@@ -332,12 +332,12 @@ SDL_ShowCursor(SDL_DISABLE);
   m_y=(float)vga_height/2.0;
 
   if (demo) {
-    texto[max_textos].type=0;
-    texto[max_textos].centro=4;
-    texto[max_textos].y=vga_height/2;
-    texto[max_textos].x=vga_width/2;
-    texto[max_textos].font=(byte*)fonts[0];
-  } else texto[max_textos].font=0;
+    texts[max_texts].type=0;
+    texts[max_texts].centro=4;
+    texts[max_texts].y=vga_height/2;
+    texts[max_texts].x=vga_width/2;
+    texts[max_texts].font=(byte*)fonts[0];
+  } else texts[max_texts].font=0;
 
 #ifndef DEBUG
 if(splashtime>0)

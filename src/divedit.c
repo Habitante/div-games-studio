@@ -401,7 +401,7 @@ void editor() {
 
   if (edited!=v.prg) { // If we were editing a different one ...
     for (n=0;n<max_windows;n++)
-      if (ventana[n].type==102 && ventana[n].prg!=NULL && ventana[n].prg==edited) break;
+      if (window[n].type==102 && window[n].prg!=NULL && window[n].prg==edited) break;
     if (n<max_windows) {
       wup(n);
       write_line(); read_line(); if (kbloque==1) f_mark();
@@ -933,7 +933,7 @@ void f_mark(void) {
       }
     } else {
       for (n=0;n<max_windows;n++)
-        if (ventana[n].type==102 && ventana[n].prg==kprg && kprg!=NULL) break;
+        if (window[n].type==102 && window[n].prg==kprg && kprg!=NULL) break;
       if (n<max_windows) {
         wup(n);
         f_unmark(); v.redraw=2; _completo();
@@ -957,7 +957,7 @@ void f_unmark(void) {
   int n;
   if (kbloque && kprg!=v.prg) {
     for (n=0;n<max_windows;n++)
-      if (ventana[n].type==102 && ventana[n].prg==kprg && kprg!=NULL) break;
+      if (window[n].type==102 && window[n].prg==kprg && kprg!=NULL) break;
     if (n<max_windows) {
       wup(n);
       f_unmark(); v.redraw=2; _completo();
@@ -974,7 +974,7 @@ void f_cut_block(int borrar) {
   t_p=0; // Clipboard type -> chars by default
   if (kbloque && kprg!=v.prg) {
     for (n=0;n<max_windows;n++)
-      if (ventana[n].type==102 && ventana[n].prg==kprg && kprg!=NULL) break;
+      if (window[n].type==102 && window[n].prg==kprg && kprg!=NULL) break;
     if (n<max_windows) {
       wup(n);
       f_cut(borrar); v.redraw=2; _completo();
@@ -1902,7 +1902,7 @@ void resize(void) {
 
     save_mouse_bg(mouse_background,mx,my,mouse_graf,0);
     put(mx,my,mouse_graf);
-    blit_screen(copia);
+    blit_screen(screen_buffer);
     save_mouse_bg(mouse_background,mx,my,mouse_graf,1);
 
   } while (mouse_b&1);
@@ -2517,13 +2517,13 @@ void open_program(void) {
 
                 new_window(program0);
 
-              } else { free(v_prg); free(buffer); v_text=(char *)texto[46]; show_dialog(err0); }
-            } else { free(v_prg); free(buffer); v_text=(char *)texto[44]; show_dialog(err0); }
-          } else { free(buffer); v_text=(char *)texto[45]; show_dialog(err0); }
-        } else { v_text=(char *)texto[45]; show_dialog(err0); }
+              } else { free(v_prg); free(buffer); v_text=(char *)texts[46]; show_dialog(err0); }
+            } else { free(v_prg); free(buffer); v_text=(char *)texts[44]; show_dialog(err0); }
+          } else { free(buffer); v_text=(char *)texts[45]; show_dialog(err0); }
+        } else { v_text=(char *)texts[45]; show_dialog(err0); }
         fclose(f);
       } else {
-        if (v_finished!=-1) { v_text=(char *)texto[44]; show_dialog(err0); }
+        if (v_finished!=-1) { v_text=(char *)texts[44]; show_dialog(err0); }
         v_finished=0;
       }
     }
@@ -2595,8 +2595,8 @@ void program0_new(void) {
         f_enter();
         
 
-      } else { free(buffer); v_text=(char *)texto[45]; show_dialog(err0); }
-    } else { v_text=(char *)texto[45]; show_dialog(err0); }
+      } else { free(buffer); v_text=(char *)texts[45]; show_dialog(err0); }
+    } else { v_text=(char *)texts[45]; show_dialog(err0); }
   }
 }
 
@@ -2618,7 +2618,7 @@ void save_program(void) {
     fclose(f);
     if (written != (size_t)v.prg->file_len) {
       remove(full); // Delete partial file
-      v_text=(char *)texto[47]; show_dialog(err0);
+      v_text=(char *)texts[47]; show_dialog(err0);
       return;
     }
 
@@ -2636,7 +2636,7 @@ void save_program(void) {
 
     if (!strcmp(input,"help.div")) make_helpidx();
     if (!strcmp(input,"help.idx")) load_index();
-  } else { v_text=(char *)texto[47]; show_dialog(err0); }
+  } else { v_text=(char *)texts[47]; show_dialog(err0); }
 }
 
 //-----------------------------------------------------------------------------
@@ -2670,7 +2670,7 @@ char buscar[32]={0};
 int may_min=0,completa=0;
 
 void find_text0(void) {
-  v.type=1; v.title=texto[160];
+  v.type=1; v.title=texts[160];
   v.an=126; v.al=14+y_bt;
   v.paint_handler=find_text1;
   v.click_handler=find_text2;
@@ -2724,7 +2724,7 @@ void find_text(void) {
 
   if (!encontrado) { // Restore variables and show info dialog
     memcpy(v.prg,&mi_prg,sizeof(struct tprg));
-    v_title=(char *)texto[347]; v_text=(char *)texto[189]; show_dialog(info0);
+    v_title=(char *)texts[347]; v_text=(char *)texts[189]; show_dialog(info0);
   } else {
     n=strlen(buscar); while (n--) f_right();
     n=strlen(buscar); while (n--) f_left();
@@ -2751,7 +2751,7 @@ void replace_text0(void) {
 
   v.type=1;
 
-  v.title=texto[165];
+  v.title=texts[165];
   v.an=126; v.al=14+y_st;
   v.paint_handler=replace_text1;
   v.click_handler=replace_text2;
@@ -2856,11 +2856,11 @@ void replace2(void) {
 
 void replace0(void) {
   int x2,x3,x4;
-  x2=7+text_len(texto[102]+1)+10;
-  x3=x2+text_len(texto[103]+1)+10;
-  x4=x3+text_len(texto[124]+1)+10;
-  v.type=1; v.title=texto[190];
-  v.an=x4+text_len(texto[101]+1)+7; v.al=29;
+  x2=7+text_len(texts[102]+1)+10;
+  x3=x2+text_len(texts[103]+1)+10;
+  x4=x3+text_len(texts[124]+1)+10;
+  v.type=1; v.title=texts[190];
+  v.an=x4+text_len(texts[101]+1)+7; v.al=29;
   v.paint_handler=sustituir1;
   v.click_handler=replace2;
   _button(102,7,v.al-14,0);
@@ -2883,10 +2883,10 @@ void replacements1(void) {
 void replacements2(void) { _process_items(); if (!v.active_item) end_dialog=1; }
 
 void replacements0(void) {
-  v.type=1; v.title=texto[191];
+  v.type=1; v.title=texts[191];
   itoa(num_cambios,sus,10);
-  strcat(sus,(char *)texto[192]);
-  v.an=text_len(texto[191])+28; v.al=38;
+  strcat(sus,(char *)texts[192]);
+  v.an=text_len(texts[191])+28; v.al=38;
   v.paint_handler=replacements1;
   v.click_handler=replacements2;
   _button(100,v.an/2,v.al-14,1);
@@ -2956,12 +2956,12 @@ void open_program_for_fernando(char *nombre,char *path) {
 
             new_window(program0);
 
-          } else { free(v_prg); free(buffer); v_text=(char *)texto[46]; show_dialog(err0); }
-        } else { free(v_prg); free(buffer); v_text=(char *)texto[44]; show_dialog(err0); }
-      } else { free(buffer); v_text=(char *)texto[45]; show_dialog(err0); }
-    } else { v_text=(char *)texto[45]; show_dialog(err0); }
+          } else { free(v_prg); free(buffer); v_text=(char *)texts[46]; show_dialog(err0); }
+        } else { free(v_prg); free(buffer); v_text=(char *)texts[44]; show_dialog(err0); }
+      } else { free(buffer); v_text=(char *)texts[45]; show_dialog(err0); }
+    } else { v_text=(char *)texts[45]; show_dialog(err0); }
     fclose(f);
-  } else { v_text=(char *)texto[44]; show_dialog(err0); }
+  } else { v_text=(char *)texts[44]; show_dialog(err0); }
 }
 
 //-----------------------------------------------------------------------------
@@ -3024,9 +3024,9 @@ void create_process_list(char * buffer, int file_len) {
 
   // If the cursor is on a process name in the program, select it
 
-  if (buffer==(char *)ventana[1].prg->buffer) {
-    n=ventana[1].prg->column-1;
-    p=(byte *)ventana[1].prg->l;
+  if (buffer==(char *)window[1].prg->buffer) {
+    n=window[1].prg->column-1;
+    p=(byte *)window[1].prg->l;
     if (n<=strlen((char *)p)) {
       if (!lower[p[n]] && n) n--;
       if (lower[p[n]]) {
@@ -3066,7 +3066,7 @@ void paint_process_list(void) {
 
   wbox(ptr,an,al,c1,4,20,128+132-10,121); // Process listbox bounds
 
-  end=ventana[1].prg->buffer+ventana[1].prg->file_len;
+  end=window[1].prg->buffer+window[1].prg->file_len;
 
   for (m=lp_ini;m<lp_ini+15 && m<lp_num;m++) {
     if (m==lp_select) {
@@ -3101,8 +3101,8 @@ void process_list1(void) {
   int an=v.an/big2,al=v.al/big2;
   _show_items();
 
-  wwrite(ptr,an,al,5,11,0,texto[379],c1);
-  wwrite(ptr,an,al,4,11,0,texto[379],c3);
+  wwrite(ptr,an,al,5,11,0,texts[379],c1);
+  wwrite(ptr,an,al,4,11,0,texts[379],c3);
 
   wrectangle(ptr,an,al,c0,3,19,128+132,123); // Process listbox bounds
   wrectangle(ptr,an,al,c0,122+132,19,9,123);
@@ -3111,7 +3111,7 @@ void process_list1(void) {
   wput(ptr,an,al,123+132,20,-39); // Up / down button (pressed 41,42)
   wput(ptr,an,al,123+132,174-40,-40);
 
-  create_process_list((char *)ventana[1].prg->buffer,ventana[1].prg->file_len);
+  create_process_list((char *)window[1].prg->buffer,window[1].prg->file_len);
   paint_process_list();
 }
 
@@ -3197,14 +3197,14 @@ void process_list2(void) {
     case 0: if (lp_num) v_accept=1; end_dialog=1; break;
     case 1: end_dialog=1; break;
     case 2:
-      create_process_list((char *)ventana[1].prg->buffer,ventana[1].prg->file_len);
+      create_process_list((char *)window[1].prg->buffer,window[1].prg->file_len);
       paint_process_list();
       v.redraw=1; break;
   }
 }
 
 void process_list0(void) {
-  v.type=1; v.title=texto[380];
+  v.type=1; v.title=texts[380];
 
   v.an=166+100; v.al=161;
   v.paint_handler=process_list1;
@@ -3212,7 +3212,7 @@ void process_list0(void) {
 
   _button(100,7,v.al-14,0);
   _button(101,v.an-8,v.al-14,2);
-  _flag(337,v.an-text_len(texto[337])-12,11,&lp_sort);
+  _flag(337,v.an-text_len(texts[337])-12,11,&lp_sort);
   v_accept=0;
 }
 
@@ -3224,7 +3224,7 @@ void goto_error(void) {
   int m,n=0;
 
   for (m=0;m<max_windows;m++) {
-    if (ventana[m].type==102 && ventana[m].state && ventana[m].prg!=NULL) {
+    if (window[m].type==102 && window[m].state && window[m].prg!=NULL) {
       n=m; break;
     }
   }
@@ -3232,8 +3232,8 @@ void goto_error(void) {
   if (n) move(0,n); // If not window[0], bring to foreground
 
   if (v.foreground!=1) { // If not in foreground, bring it there
-    for (m=1;m<max_windows;m++) if (ventana[m].type && ventana[m].foreground==1)
-      if (windows_collide(0,m)) {ventana[m].foreground=0; flush_window(m); }
+    for (m=1;m<max_windows;m++) if (window[m].type && window[m].foreground==1)
+      if (windows_collide(0,m)) {window[m].foreground=0; flush_window(m); }
   }
 
   if (numero_error<10) { linea_error=1; columna_error=1; }
@@ -3299,7 +3299,7 @@ void printprogram0(void) {
   v.type=1;
   v.an=120;
   v.al=38+10;
-  v.title=texto[453];
+  v.title=texts[453];
   v.paint_handler=printprogram1;
   v.click_handler=printprogram2;
   _button(100,7,v.al-14,0);
@@ -3324,7 +3324,7 @@ void Print_Program(void) {
     if (fp_bl) { // Print the selected block
 
       if (!kbloque) {
-        v_text=(char *)texto[452];
+        v_text=(char *)texts[452];
         show_dialog(err0);
         return;
       }
@@ -3346,13 +3346,13 @@ void Print_Program(void) {
 
     if (lon>0) {
       for (n=0;n<lon;n+=32) {
-        Progress((char *)texto[437],n,lon);
+        Progress((char *)texts[437],n,lon);
         if (n+32<=lon) fwrite(buf+n,1,32,stdprn);
         else fwrite(buf+n,1,lon-n,stdprn);
       }
 
       fwrite("\xd\xa\f",1,3,stdprn);
-      Progress((char *)texto[437],lon,lon);
+      Progress((char *)texts[437],lon,lon);
     }
 
   }

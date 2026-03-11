@@ -32,14 +32,14 @@ struct t_listbox lvol_cd={MIX_BAR2,11,DummyArrayForFakingPurposesUsedInMixer,1,5
 struct t_listbox lvol_ma={MIX_BAR3,11,DummyArrayForFakingPurposesUsedInMixer,1,5,1};
 
 //-----------------------------------------------------------------------------
-//  Ventana del mixer
+//  Mixer window
 //-----------------------------------------------------------------------------
 
 void mixer0(void)
 {
   v.type   = 8;
-  v.title = texto[421];
-  v.name = texto[421];
+  v.title = texts[421];
+  v.name = texts[421];
   v.an     =  59;
   v.al     =  76;
 

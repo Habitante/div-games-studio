@@ -687,7 +687,7 @@ int Jorge_Crea_el_font(int GenCode)
     for (x=0, error=0; x<256 && !error; x++)
     {
 
-        Progress((char *)texto[217],x,256);
+        Progress((char *)texts[217],x,256);
 
         tablaFNT[x].ancho=tablaFNT[x].alto=0;
         tablaFNT[x].offset=0;
@@ -707,7 +707,7 @@ int Jorge_Crea_el_font(int GenCode)
              {
                 if ((ret=escalar()))
                 {
-                    Progress((char *)texto[217],256,256);
+                    Progress((char *)texts[217],256,256);
                     CloseAndFreeAll();
                     return (ret);
                 }
@@ -724,7 +724,7 @@ int Jorge_Crea_el_font(int GenCode)
                 {
                     if ((ret=PintaOutline()))
                     {
-                        Progress((char *)texto[217],256,256);
+                        Progress((char *)texts[217],256,256);
                         CloseAndFreeAll();
                         return (ret);
                     }
@@ -741,7 +741,7 @@ int Jorge_Crea_el_font(int GenCode)
                 {
                     if ((ret=PintaSombra()))
                     {
-                        Progress((char *)texto[217],256,256);
+                        Progress((char *)texts[217],256,256);
                         CloseAndFreeAll();
                         return (ret);
                     }
@@ -769,7 +769,7 @@ int Jorge_Crea_el_font(int GenCode)
 
     if (error)
     {
-        Progress((char *)texto[217],256,256);
+        Progress((char *)texts[217],256,256);
         CloseAndFreeAll();
         return (IFS_WRITE_ERROR);
     }
@@ -777,7 +777,7 @@ int Jorge_Crea_el_font(int GenCode)
     fseek(fichFNT,8+768+sizeof(gradients)+4,SEEK_SET);
     fwrite(&tablaFNT,sizeof(tablaFNT),1,fichFNT);
 
-    Progress((char *)texto[217],256,256);
+    Progress((char *)texts[217],256,256);
     CloseAndFreeAll();
     return(0);
 }

@@ -220,7 +220,7 @@ extern int      rand(int rang_low,int rang_hi);
 extern int      int386( int, union REGS *, union REGS * );
 extern int	int386x( int, union REGS *, union REGS *, struct SREGS * );
 
-void text_out(char *texto,int x,int y);
+void text_out(char *texts,int x,int y);
 
 /************************************************************************/
 /* Div exported funcs.                                                  */

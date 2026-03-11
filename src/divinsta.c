@@ -126,9 +126,9 @@ void Setup1() {
 
   _show_items();
 
-  wwrite(ptr,an,al,4,32,0,texto[521],c3);
-  wwrite(ptr,an,al,4,32+19,0,texto[522],c3);
-  wwrite(ptr,an,al,4,32+48,0,texto[523],c3);
+  wwrite(ptr,an,al,4,32,0,texts[521],c3);
+  wwrite(ptr,an,al,4,32+19,0,texts[522],c3);
+  wwrite(ptr,an,al,4,32+48,0,texts[523],c3);
 
   wbox(ptr,an,al,c12,4,40,100,8);
   wbox(ptr,an,al,c12,4,40+19,100,8);
@@ -177,7 +177,7 @@ void Setup2() {
       if (tipo[4].path[strlen(tipo[4].path)-1]!='/') strcat(tipo[4].path,"/");
       strcat(tipo[4].path,"INSTALL");
       v_mode=1; v_type=4;
-      v_text=(char *)texto[524];
+      v_text=(char *)texts[524];
       show_dialog(browser0);
 
       strcpy(full,tipo[4].path);
@@ -190,7 +190,7 @@ void Setup2() {
           fread(cwork,1,8,f);
           fclose(f);
           if (strcmp(cwork,"fpg\x1a\x0d\x0a")) {
-            v_text=(char *)texto[46]; show_dialog(err0);
+            v_text=(char *)texts[46]; show_dialog(err0);
           } else {
             ptrimg=imagen_install;
             create_install_image(full,1);
@@ -210,7 +210,7 @@ void Setup2() {
       if (tipo[5].path[strlen(tipo[5].path)-1]!='/') strcat(tipo[5].path,"/");
       strcat(tipo[5].path,"INSTALL");
       v_mode=1; v_type=5;
-      v_text=(char *)texto[525];
+      v_text=(char *)texts[525];
       show_dialog(browser0);
 
       strcpy(full,tipo[5].path);
@@ -223,7 +223,7 @@ void Setup2() {
           fread(cwork,1,8,f);
           fclose(f);
           if (strcmp(cwork,"fnt\x1a\x0d\x0a")) {
-            v_text=(char *)texto[46]; show_dialog(err0);
+            v_text=(char *)texts[46]; show_dialog(err0);
           } else {
             DIV_STRCPY(ifile2,full);
             div_strcpy(ifile2name, sizeof(ifile2name), input);
@@ -238,7 +238,7 @@ void Setup2() {
       if (tipo[5].path[strlen(tipo[5].path)-1]!='/') strcat(tipo[5].path,"/");
       strcat(tipo[5].path,"INSTALL");
       v_mode=1; v_type=5;
-      v_text=(char *)texto[525];
+      v_text=(char *)texts[525];
       show_dialog(browser0);
 
       strcpy(full,tipo[v_type].path);
@@ -251,7 +251,7 @@ void Setup2() {
           fread(cwork,1,8,f);
           fclose(f);
           if (strcmp(cwork,"fnt\x1a\x0d\x0a")) {
-            v_text=(char *)texto[46]; show_dialog(err0);
+            v_text=(char *)texts[46]; show_dialog(err0);
           } else {
             DIV_STRCPY(ifile3,full);
             div_strcpy(ifile3name, sizeof(ifile3name), input);
@@ -305,19 +305,19 @@ void Setup0() {
   v.type=1;
   v.an=310;
   v.al=125+16+19+20;
-  v.title=texto[236];
+  v.title=texts[236];
 
   v.paint_handler=Setup1;
   v.click_handler=Setup2;
   v.close_handler=Setup3;
 
-  strcpy(ExeGen,(char *)ventana[v_window+1].title);
+  strcpy(ExeGen,(char *)window[v_window+1].title);
   if ((chr=strchr(ExeGen,'.'))!=NULL) *chr=0;
   strupr(ExeGen);
 
   if (strcmp(PackName,ExeGen)) {
     strcpy(PackName,ExeGen);
-    strcpy(Copy_Right,(char *)texto[352]);
+    strcpy(Copy_Right,(char *)texts[352]);
 #ifdef NOTYET
     t=time(NULL); _ctime(&t,tbuf); tbuf[24]=' ';
 #else
@@ -327,7 +327,7 @@ strcpy(tbuf,"                    2015 ");
     if (strlen(user2)+strlen(Copy_Right)<=127) strcat(Copy_Right,user2);
     strcpy(Unid,(char *)&tipo[8]);//"/tmp/");// :/TMP");
     //Unid[0]=toupper(tipo[1].path[0]);
-    strcpy(DefDir,(char *)texto[353]);
+    strcpy(DefDir,(char *)texts[353]);
     strcat(DefDir,ExeGen);
     strcpy(AppName,ExeGen);
     strcpy(dirhead.pack,ExeGen);
@@ -355,20 +355,20 @@ strcpy(tbuf,"                    2015 ");
     fread(Ierr8,1,128,f);
     fclose(f);
   } else {
-    strcpy(MsgExe,(char *)texto[354]);
-    strcpy(THelp1,(char *)texto[351]);
-    strcpy(THelp2,(char *)texto[355]);
-    strcpy(TDisk1,(char *)texto[515]);
-    strcpy(TDisk2,(char *)texto[516]);
-    strcpy(Ierr0,(char *)texto[528]);
-    strcpy(Ierr1,(char *)texto[529]);
-    strcpy(Ierr2,(char *)texto[530]);
-    strcpy(Ierr3,(char *)texto[531]);
-    strcpy(Ierr4,(char *)texto[532]);
-    strcpy(Ierr5,(char *)texto[533]);
-    strcpy(Ierr6,(char *)texto[534]);
-    strcpy(Ierr7,(char *)texto[535]);
-    strcpy(Ierr8,(char *)texto[536]);
+    strcpy(MsgExe,(char *)texts[354]);
+    strcpy(THelp1,(char *)texts[351]);
+    strcpy(THelp2,(char *)texts[355]);
+    strcpy(TDisk1,(char *)texts[515]);
+    strcpy(TDisk2,(char *)texts[516]);
+    strcpy(Ierr0,(char *)texts[528]);
+    strcpy(Ierr1,(char *)texts[529]);
+    strcpy(Ierr2,(char *)texts[530]);
+    strcpy(Ierr3,(char *)texts[531]);
+    strcpy(Ierr4,(char *)texts[532]);
+    strcpy(Ierr5,(char *)texts[533]);
+    strcpy(Ierr6,(char *)texts[534]);
+    strcpy(Ierr7,(char *)texts[535]);
+    strcpy(Ierr8,(char *)texts[536]);
   }
 
   y=64+19*3;
@@ -444,19 +444,19 @@ void create_install_image(char * file, int errores) {
 
       strcpy(cwork,"");
 
-      if (!lst[1]) sprintf(cwork,(char *)texto[540],1);
+      if (!lst[1]) sprintf(cwork,(char *)texts[540],1);
       if ((ptr=(int32_t*)lst[2])) {
-        if (ptr[13]!=640 || ptr[14]!=480) sprintf(cwork,(char *)texto[541],2);
+        if (ptr[13]!=640 || ptr[14]!=480) sprintf(cwork,(char *)texts[541],2);
       }
-      if (!(ptr=(int32_t*)lst[3])) sprintf(cwork,(char *)texto[540],3);
-      if (ptr[13]!=640 || ptr[14]!=480) sprintf(cwork,(char *)texto[541],3);
-      if (!is_point(ptr,1)) sprintf(cwork,(char *)texto[542],1,3);
-      if (!lst[4] && !lst[5]) sprintf(cwork,(char *)texto[540],4);
-      if (!lst[13]) sprintf(cwork,(char *)texto[540],13);
-      if (!lst[14]) sprintf(cwork,(char *)texto[540],14);
-      if (!lst[15]) sprintf(cwork,(char *)texto[540],15);
-      if (!lst[16]) sprintf(cwork,(char *)texto[540],16);
-      if (!lst[17]) sprintf(cwork,(char *)texto[540],17);
+      if (!(ptr=(int32_t*)lst[3])) sprintf(cwork,(char *)texts[540],3);
+      if (ptr[13]!=640 || ptr[14]!=480) sprintf(cwork,(char *)texts[541],3);
+      if (!is_point(ptr,1)) sprintf(cwork,(char *)texts[542],1,3);
+      if (!lst[4] && !lst[5]) sprintf(cwork,(char *)texts[540],4);
+      if (!lst[13]) sprintf(cwork,(char *)texts[540],13);
+      if (!lst[14]) sprintf(cwork,(char *)texts[540],14);
+      if (!lst[15]) sprintf(cwork,(char *)texts[540],15);
+      if (!lst[16]) sprintf(cwork,(char *)texts[540],16);
+      if (!lst[17]) sprintf(cwork,(char *)texts[540],17);
 
       if (strlen(cwork)) {
         if (errores) {
@@ -546,11 +546,11 @@ void Setupm2() {
   switch(v.active_item) {
     case 0: end_dialog=1; break;
     case 6:
-      strcpy(MsgExe,(char *)texto[354]);
-      strcpy(THelp1,(char *)texto[351]);
-      strcpy(THelp2,(char *)texto[355]);
-      strcpy(TDisk1,(char *)texto[515]);
-      strcpy(TDisk2,(char *)texto[516]);
+      strcpy(MsgExe,(char *)texts[354]);
+      strcpy(THelp1,(char *)texts[351]);
+      strcpy(THelp2,(char *)texts[355]);
+      strcpy(TDisk1,(char *)texts[515]);
+      strcpy(TDisk2,(char *)texts[516]);
       call(v.paint_handler);
       v.redraw=1;
       break;
@@ -563,7 +563,7 @@ void Setupm0() {
   v.type=1;
   v.an=310;
   v.al=12+9+19*4;
-  v.title=texto[526];
+  v.title=texts[526];
   v.paint_handler=Setupm1;
   v.click_handler=Setupm2;
 
@@ -590,15 +590,15 @@ void Setupe2() {
   switch(v.active_item) {
     case 0: end_dialog=1; break;
     case 10:
-      strcpy(Ierr0,(char *)texto[528]);
-      strcpy(Ierr1,(char *)texto[529]);
-      strcpy(Ierr2,(char *)texto[530]);
-      strcpy(Ierr3,(char *)texto[531]);
-      strcpy(Ierr4,(char *)texto[532]);
-      strcpy(Ierr5,(char *)texto[533]);
-      strcpy(Ierr6,(char *)texto[534]);
-      strcpy(Ierr7,(char *)texto[535]);
-      strcpy(Ierr8,(char *)texto[536]);
+      strcpy(Ierr0,(char *)texts[528]);
+      strcpy(Ierr1,(char *)texts[529]);
+      strcpy(Ierr2,(char *)texts[530]);
+      strcpy(Ierr3,(char *)texts[531]);
+      strcpy(Ierr4,(char *)texts[532]);
+      strcpy(Ierr5,(char *)texts[533]);
+      strcpy(Ierr6,(char *)texts[534]);
+      strcpy(Ierr7,(char *)texts[535]);
+      strcpy(Ierr8,(char *)texts[536]);
       call(v.paint_handler);
       v.redraw=1;
       break;
@@ -611,7 +611,7 @@ void Setupe0() {
   v.type=1;
   v.an=310;
   v.al=12+9+99+8;
-  v.title=texto[537];
+  v.title=texts[537];
   v.paint_handler=Setupe1;
   v.click_handler=Setupe2;
 
@@ -744,7 +744,7 @@ void crear_instalacion(void) {
   _dos_setdrive((int)drive[0]-'A'+1,&_drive);
   _dos_getdrive(&_drive);
   if (_drive!=(word)drive[0]-'A'+1) {
-    v_text=texto[356]; show_dialog((int)err0); return;
+    v_text=texts[356]; show_dialog((int)err0); return;
   }
 #endif
 
@@ -761,7 +761,7 @@ strcpy(cWork,full);
   // *** Default directory
 
   if (strlen(DefDir)==0) {
-    strcpy(DefDir,(char *)ventana[v_window].title);
+    strcpy(DefDir,(char *)window[v_window].title);
     if ((chr=(byte *)strchr(DefDir,'.'))!=NULL) *chr=0;
   }
 
@@ -779,7 +779,7 @@ strcpy(cWork,full);
 
   if (!include_setup) x=0;
   if ((__ins=_ins=ins=(char *) malloc(n+x+32))==NULL) {
-    v_text=(char *)texto[357]; show_dialog(err0);
+    v_text=(char *)texts[357]; show_dialog(err0);
     fclose(fin); return;
   } 
 
@@ -797,7 +797,7 @@ strcpy(cWork,full);
   // *** Eliminate duplicate files
   
   if ((MiHeaderSetup=(HeaderSetup *)malloc(nfiles*sizeof(HeaderSetup)))==NULL) {
-    v_text=(char *)texto[357]; show_dialog(err0);
+    v_text=(char *)texts[357]; show_dialog(err0);
     free(_ins); return; }
 
   dirhead.nfiles=0; // Files that go into the PACKFILE
@@ -870,7 +870,7 @@ strcpy(cWork,full);
 
     // 0. Define the basic packfile header values
 
-    strcpy(cWork,(char *)texto[498]);
+    strcpy(cWork,(char *)texts[498]);
     strcat(cWork,dirhead.pack);
 
     memcpy(dirhead.head,"dat\x1a\x0d\x0a\x00\x00",8);
@@ -902,7 +902,7 @@ strcpy(cWork,full);
     // 2. Open the file ("INSTALL/PACKFILE.DAT","wb")
 
     if ((fout=fopen("install/PACKFILE.DAT","wb"))==NULL) {
-      v_text=(char *)texto[358]; show_dialog(err0);
+      v_text=(char *)texts[358]; show_dialog(err0);
       free(_ins); return;
     }
 
@@ -913,7 +913,7 @@ strcpy(cWork,full);
     // 4. Allocate memory for the directory (hdir[])
 
     if ((hdir=(struct tdir *)malloc(dirhead.nfiles*sizeof(struct tdir)))==NULL) {
-      v_text=(char *)texto[357]; show_dialog(err0);
+      v_text=(char *)texts[357]; show_dialog(err0);
       fclose(fout); free(_ins); return;
     }
 
@@ -935,7 +935,7 @@ strcpy(cWork,full);
 
       fprintf(stdout,"PACKING FILE: %s\n",ins);
       if ((fin=fopen(ins,"rb"))==NULL) {
-        v_text=(char *)texto[231]; show_dialog(err0);
+        v_text=(char *)texts[231]; show_dialog(err0);
         free(hdir); fclose(fout); free(_ins); return;
       }
 
@@ -957,7 +957,7 @@ strcpy(cWork,full);
 
       if (hdir[n].len1==-1) {
         Progress(cWork,dirhead.nfiles,dirhead.nfiles);
-        v_text=(char *)texto[357]; show_dialog(err0);
+        v_text=(char *)texts[357]; show_dialog(err0);
         free(hdir); fclose(fout); free(_ins); return;
       }
 
@@ -999,7 +999,7 @@ strcpy(cWork,full);
    // Create INSTALL\DIV32RUN.DLL from (INSTALL\DIV32RUN.INS/386 + SYSTEM\LENGUAJE.INT)
 
   if ((fout=fopen("install/DIV32RUN.DLL","wb"))==NULL) {
-    v_text=(char *)texto[358]; show_dialog(err0);
+    v_text=(char *)texts[358]; show_dialog(err0);
     free(_ins); return;
   }
 
@@ -1007,7 +1007,7 @@ strcpy(cWork,full);
   else         fin=fopen("install/div32run.386","rb");
 
   if (fin==NULL) {
-    v_text=(char *)texto[231]; show_dialog(err0);
+    v_text=(char *)texts[231]; show_dialog(err0);
     fclose(fout); free(_ins); return;
   }
 
@@ -1016,14 +1016,14 @@ strcpy(cWork,full);
   fseek(fin,0,SEEK_SET);
 
   if (copy_file(fin,fout,(unsigned long)x,0)==-1) {
-    v_text=(char *)texto[358]; show_dialog(err0);
+    v_text=(char *)texts[358]; show_dialog(err0);
     fclose(fout); fclose(fin); free(_ins); return;
   }
 
   fclose(fin);
 
   if ((fin=fopen("system/lenguaje.int","rb"))==NULL) {
-    v_text=(char *)texto[231]; show_dialog(err0);
+    v_text=(char *)texts[231]; show_dialog(err0);
     fclose(fout); free(_ins); return;
   }
 
@@ -1032,14 +1032,14 @@ strcpy(cWork,full);
   fseek(fin,0,SEEK_SET);
 
   if (copy_file(fin,fout,(unsigned long)x,0)==-1) {
-    v_text=(char *)texto[358]; show_dialog(err0);
+    v_text=(char *)texts[358]; show_dialog(err0);
     fclose(fout); fclose(fin); free(_ins); return;
   }
 
   fclose(fin);
 
   if (fwrite(&x,4,1,fout)!=1) {
-    v_text=(char *)texto[358]; show_dialog(err0);
+    v_text=(char *)texts[358]; show_dialog(err0);
     fclose(fout); free(_ins); return;
   }
 
@@ -1050,14 +1050,14 @@ strcpy(cWork,full);
   // *** Create install.div (original packed file)
 
   if ((fout=fopen("install/INSTALL.DIV","wb"))==NULL) {
-	v_text=(char *)texto[358]; show_dialog(err0);
+	v_text=(char *)texts[358]; show_dialog(err0);
     free(_ins); return;
   }
 
   fwrite(&nfiles,sizeof(int),1,fout);
 
   if ((MiHeaderSetup=(HeaderSetup *)malloc(nfiles*sizeof(HeaderSetup)))==NULL) {
-    v_text=(char *)texto[357]; show_dialog(err0);
+    v_text=(char *)texts[357]; show_dialog(err0);
     fclose(fout); free(_ins); return;
   } fwrite(MiHeaderSetup,sizeof(HeaderSetup),nfiles,fout);
 
@@ -1066,7 +1066,7 @@ strcpy(cWork,full);
   ins=_ins;
 
   for(x=0;x<nfiles;x++) {
-    Progress((char *)texto[219],x*100,nfiles*100);
+    Progress((char *)texts[219],x*100,nfiles*100);
     if (x==0) {
       fin=fopen("system/EXEC.EXE","rb");
       strcpy(MiHeaderSetup[x].name,ExeGen);
@@ -1093,8 +1093,8 @@ strcpy(cWork,full);
     }
 
     if (fin==NULL) {
-      Progress((char *)texto[219],nfiles*100,nfiles*100);
-      v_text=(char *)texto[231]; show_dialog(err0);
+      Progress((char *)texts[219],nfiles*100,nfiles*100);
+      v_text=(char *)texts[231]; show_dialog(err0);
       fclose(fout); free(_ins); free(MiHeaderSetup);
       return;
     }
@@ -1110,8 +1110,8 @@ strcpy(cWork,full);
     }
 
     if (MiHeaderSetup[x].len1==-1) {
-      Progress((char *)texto[219],nfiles*100,nfiles*100);
-      v_text=(char *)texto[357]; show_dialog(err0);
+      Progress((char *)texts[219],nfiles*100,nfiles*100);
+      v_text=(char *)texts[357]; show_dialog(err0);
       fclose(fin); fclose(fout); free(_ins); free(MiHeaderSetup);
       return;
     }
@@ -1131,7 +1131,7 @@ strcpy(cWork,full);
 
   free(MiHeaderSetup);
 
-  Progress((char *)texto[219],nfiles*100,nfiles*100); // INSTALL.DIV already created
+  Progress((char *)texts[219],nfiles*100,nfiles*100); // INSTALL.DIV already created
 
   strcpy(cWork,tipo[1].path); // Delete the PACKFILE.DAT
   strcat(cWork,"/");
@@ -1147,12 +1147,12 @@ strcpy(cWork,full);
   strcpy(dWork,full);
   strcat(dWork,"INSTALL.EXE");
 
-  if(!FileCopyICE(cWork,dWork,0,237)) { v_text=(char *)texto[231]; show_dialog(err0); return; }
+  if(!FileCopyICE(cWork,dWork,0,237)) { v_text=(char *)texts[231]; show_dialog(err0); return; }
 
-  Progress((char *)texto[543],0,100);
+  Progress((char *)texts[543],0,100);
 
   if((fout=fopen(cWork,"ab"))==NULL) {
-    Progress((char *)texto[543],100,100); v_text=(char *)texto[231]; show_dialog(err0); return;
+    Progress((char *)texts[543],100,100); v_text=(char *)texts[231]; show_dialog(err0); return;
   }
 
   fwrite(AppName,1,strlen(AppName)+1,fout); n=strlen(AppName)+1;
@@ -1180,12 +1180,12 @@ strcpy(cWork,full);
   fwrite(&include_setup,1,4,fout); n+=4;
   fwrite(&segundo_font,1,4,fout); n+=4;
 
-  Progress((char *)texto[543],25,100);
+  Progress((char *)texts[543],25,100);
 
   if ((fin=fopen(ifile1,"rb"))==NULL) {
     fclose(fout);
-    Progress((char *)texto[543],100,100);
-    v_text=(char *)texto[231]; show_dialog(err0); return;
+    Progress((char *)texts[543],100,100);
+    v_text=(char *)texts[231]; show_dialog(err0); return;
   }
 
   fseek(fin,0,SEEK_END); x=ftell(fin); fseek(fin,0,SEEK_SET);
@@ -1194,17 +1194,17 @@ strcpy(cWork,full);
 
   if (m==-1) {
     fclose(fout);
-    Progress((char *)texto[543],100,100);
-    v_text=(char *)texto[231]; show_dialog(err0); return;
+    Progress((char *)texts[543],100,100);
+    v_text=(char *)texts[231]; show_dialog(err0); return;
   } else n+=m;
 
   size[0]=m; size[1]=x;
-  Progress((char *)texto[543],75,100);
+  Progress((char *)texts[543],75,100);
 
   if ((fin=fopen(ifile2,"rb"))==NULL) {
     fclose(fout);
-    Progress((char *)texto[543],100,100);
-    v_text=(char *)texto[231]; show_dialog(err0); return;
+    Progress((char *)texts[543],100,100);
+    v_text=(char *)texts[231]; show_dialog(err0); return;
   }
 
   fseek(fin,0,SEEK_END); x=ftell(fin); fseek(fin,0,SEEK_SET);
@@ -1213,18 +1213,18 @@ strcpy(cWork,full);
 
   if (m==-1) {
     fclose(fout);
-    Progress((char *)texto[543],100,100);
-    v_text=(char *)texto[231]; show_dialog(err0); return;
+    Progress((char *)texts[543],100,100);
+    v_text=(char *)texts[231]; show_dialog(err0); return;
   } else n+=m;
 
   size[2]=m; size[3]=x;
-  Progress((char *)texto[543],85,100);
+  Progress((char *)texts[543],85,100);
 
   if (segundo_font) {
     if ((fin=fopen(ifile3,"rb"))==NULL) {
       fclose(fout);
-      Progress((char *)texto[543],100,100);
-      v_text=(char *)texto[231]; show_dialog(err0); return;
+      Progress((char *)texts[543],100,100);
+      v_text=(char *)texts[231]; show_dialog(err0); return;
     }
 
     fseek(fin,0,SEEK_END); x=ftell(fin); fseek(fin,0,SEEK_SET);
@@ -1233,8 +1233,8 @@ strcpy(cWork,full);
 
     if (m==-1) {
       fclose(fout);
-      Progress((char *)texto[543],100,100);
-      v_text=(char *)texto[231]; show_dialog(err0); return;
+      Progress((char *)texts[543],100,100);
+      v_text=(char *)texts[231]; show_dialog(err0); return;
     } else n+=m;
 
     size[4]=m; size[5]=x;
@@ -1250,7 +1250,7 @@ strcpy(cWork,full);
   n+=4; fwrite(&n,1,4,fout);
   fclose(fout);
 
-  Progress((char *)texto[543],100,100);
+  Progress((char *)texts[543],100,100);
 
   // *** Write PackName.001, .002, ... from INSTALL.DIV
 
@@ -1261,18 +1261,18 @@ strcpy(cWork,full);
   strcpy(dWork,full);
   strcat(dWork,PackName);
 
-  if(!FileCopyICE(cWork,dWork,1,234)) { v_text=(char *)texto[231]; show_dialog(err0); return; }
+  if(!FileCopyICE(cWork,dWork,1,234)) { v_text=(char *)texts[231]; show_dialog(err0); return; }
 
   DaniDel(cWork);              // Delete the INSTALL.DIV
 
 #endif
 
-  v_title=(char *)texto[359];        // Dialog indicating installation is complete
-  strcpy(cWork,(char *)texto[360]);
+  v_title=(char *)texts[359];        // Dialog indicating installation is complete
+  strcpy(cWork,(char *)texts[360]);
   strupr(full);
   strcat(cWork,full);
   cWork[strlen(cWork)-1]=0;
-  strcat(cWork,(char *)texto[361]);
+  strcat(cWork,(char *)texts[361]);
   v_text=cWork;
   show_dialog(info0);
 
@@ -1361,14 +1361,14 @@ int FileCopyICE(char *org,char *dest,int vols,int _texto) { // Returns 0 -Error 
   fseek(fin,0,SEEK_SET);
 
   while(len) {
-    Progress((char *)texto[_texto],tlen-len,tlen);
+    Progress((char *)texts[_texto],tlen-len,tlen);
 
     if (NewVolume) {
 
       if(curvol!=0 && NewVolume<2) {
         if (!is_disk) { retval=0; break; }
-        v_title=(char *)texto[233]; // Disk full.
-        v_text=(char *)texto[232];  // Please, insert a new disk.
+        v_title=(char *)texts[233]; // Disk full.
+        v_text=(char *)texts[232];  // Please, insert a new disk.
         show_dialog(aceptar0);
         if (!v_accept) { retval=0; break; }
       }
@@ -1379,8 +1379,8 @@ int FileCopyICE(char *org,char *dest,int vols,int _texto) { // Returns 0 -Error 
       
       if(totfree<=1024) { // Disk Full
         if (vols) {
-          v_title=(char *)texto[362];
-          v_text=(char *)texto[232];
+          v_title=(char *)texts[362];
+          v_text=(char *)texts[232];
           show_dialog(aceptar0);
           if (v_accept) { NewVolume=2; continue; }
         } retval=0; break;
@@ -1393,8 +1393,8 @@ int FileCopyICE(char *org,char *dest,int vols,int _texto) { // Returns 0 -Error 
       } else fout=fopen(dest,"wb");
 
       if(fout==NULL) { // Protected floppy(!?)
-        v_title=(char *)texto[363];
-        v_text=(char *)texto[364];
+        v_title=(char *)texts[363];
+        v_text=(char *)texts[364];
         show_dialog(aceptar0);
         if (v_accept) { NewVolume=2; continue; }
         retval=0; break;
@@ -1446,7 +1446,7 @@ int FileCopyICE(char *org,char *dest,int vols,int _texto) { // Returns 0 -Error 
   
   if(fin) fclose(fin);
   if(fout) fclose(fout);
-  Progress((char *)texto[_texto],tlen,tlen);
+  Progress((char *)texts[_texto],tlen,tlen);
   free(buffer);
   return(retval);
 }

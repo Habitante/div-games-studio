@@ -72,7 +72,7 @@
 // 65 - validate_address() function in DEBUG to prevent page faults where possible
 // 66 - fixed countless problems with pointers, the debugger, and everything else ...
 // 67 - make int/byte/word/string pointer p1,p2; define two pointers
-// 68 - screen_copy function to copy a screen region to a graphic region
+// 68 - screen_buffer function to copy a screen region to a graphic region
 // 69 - argc/argv like in C, with program parameters
 // 70 - new function loading system, defining return type and parameter types
 //      (and removed previously special-cased string function exceptions)
@@ -1004,7 +1004,7 @@ void compile(void) {
 
 free_resources();
 
-  mensaje_compilacion(texto[201]);
+  mensaje_compilacion(texts[201]);
 
   vnom=NULL; mem_ory=NULL;
   mem=NULL; loc=NULL; frm=NULL;
@@ -1067,13 +1067,13 @@ free_resources();
   if ((frm=(int*)malloc(ifrm_max*sizeof(memptrsize)))==NULL) c_error(0,0);
   memset(frm,0,ifrm_max*sizeof(memptrsize));
 
-  mensaje_compilacion(texto[203]);
+  mensaje_compilacion(texts[203]);
 
   imem=long_header;
 
   preload_objects(); // No literals in the preloaded objects
 
-  mensaje_compilacion(texto[200]);
+  mensaje_compilacion(texts[200]);
 
   source=source_ptr; _source=source;
   *(source+source_len)=cr; *(source+source_len+1)=cr;
@@ -1108,7 +1108,7 @@ free_resources();
   mem[7]=0; // Previously imem+iloc (text start), now unused
   mem[8]=imem+iloc; // Number of elements used in mem[]
 
-  mensaje_compilacion(texto[204]);
+  mensaje_compilacion(texts[204]);
 
   save_dbg();
   save_exec_bin();
@@ -1118,7 +1118,7 @@ free_resources();
   list_assembler();
   #endif
 
-  mensaje_compilacion(texto[205]);
+  mensaje_compilacion(texts[205]);
 
   #ifdef SHARE
   mem[0]+=1024;
@@ -7421,8 +7421,8 @@ int compilado=0;
 
 void compile_pass1(void) {
   _show_items();
-  wwrite(v.ptr,v.an/big2,v.al/big2,3,12,0,texto[206],c3);
-  wwrite(v.ptr,v.an/big2,v.al/big2,6+text_len(texto[206]),12,0,ventana[v_window+1].title,c4);
+  wwrite(v.ptr,v.an/big2,v.al/big2,3,12,0,texts[206],c3);
+  wwrite(v.ptr,v.an/big2,v.al/big2,6+text_len(texts[206]),12,0,window[v_window+1].title,c4);
 }
 
 extern uint8_t cerror[128];
@@ -7441,7 +7441,7 @@ void compile_pass2(void) {
         get_error(500+numero_error);
       mensaje_compilacion(cerror);
     } else {
-      mensaje_compilacion(texto[202]);
+      mensaje_compilacion(texts[202]);
       if (run_mode) end_dialog=1;
     }
     mouse_graf=1; v.redraw=1;
@@ -7454,10 +7454,10 @@ void compile_pass2(void) {
 void compile_pass0(void) {
   v.type=1; v.an=300; v.al=46;
   switch (run_mode) {
-    case 0: v.title=texto[200]; break;
-    case 1: v.title=texto[235]; break;
-    case 2: v.title=texto[236]; break;
-    case 3: v.title=texto[241]; break;
+    case 0: v.title=texts[200]; break;
+    case 1: v.title=texts[235]; break;
+    case 2: v.title=texts[236]; break;
+    case 3: v.title=texts[241]; break;
   }
   v.paint_handler=compile_pass1;
   v.click_handler=compile_pass2;

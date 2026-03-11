@@ -111,7 +111,7 @@ void paint_slider_br(struct t_listboxbr * l);
 void create_listbox_br(struct t_listboxbr * l);
 void update_listbox_br(struct t_listboxbr * l);
 
-void crear_texto_prueba(char *,char);
+void create_test_text(char *,char);
 
 void browser1(void);
 void browser2(void);
@@ -146,11 +146,11 @@ void print_path_br(void) {
   int an=v.an/big2,al=v.al/big2;
 
   if(v_thumb==7)
-    wbox_ancho=an-4-12-text_len(texto[419])-12-text_len(texto[567]);
+    wbox_ancho=an-4-12-text_len(texts[419])-12-text_len(texts[567]);
   else if(v_type==16)
-    wbox_ancho=an-4-12-text_len(texto[567]);
+    wbox_ancho=an-4-12-text_len(texts[567]);
   else if(v_thumb)
-    wbox_ancho=an-4-12-text_len(texto[419]);
+    wbox_ancho=an-4-12-text_len(texts[419]);
   else
     wbox_ancho=an-6;
 
@@ -699,7 +699,7 @@ void create_thumb_FNT(struct t_listboxbr * l)
 
       memcpy(CopiaMiTabladeLetras,MiTabladeLetras,256);
 
-      crear_texto_prueba(TestString2,thumb[num].ptr[1352]);
+      create_test_text(TestString2,thumb[num].ptr[1352]);
 
       memset(MiTabladeLetras,0,256);
       for(x=0;x<strlen(TestString2);x++) MiTabladeLetras[TestString2[x]]=1;
@@ -874,7 +874,7 @@ void create_thumb_IFS(struct t_listboxbr * l)
     fseek(fifs,n,SEEK_SET);
     fread(tifs,sizeof(TABLAIFS),256,fifs);
 
-    str=(char *)texto[246];
+    str=(char *)texts[246];
 
     pos=0; ancho=0; alto=0;
 
@@ -1460,12 +1460,12 @@ void browser0(void) {
   DIV_STRCPY(file_mask,input);
   v_finished=0;
 
-  _get(126,4,v.al-21,v.an-(24+text_len(texto[100])+text_len(texto[101])),(byte *)input,512,0,0);
+  _get(126,4,v.al-21,v.an-(24+text_len(texts[100])+text_len(texts[101])),(byte *)input,512,0,0);
 
-  _button(100,v.an-12-text_len(texto[101]),v.al-14,2);
+  _button(100,v.an-12-text_len(texts[101]),v.al-14,2);
   _button(101,v.an-8,v.al-14,2);
 
-  if (v_thumb) _flag(419,v.an-12-text_len(texto[419]),12,&opc_img[v_thumb]);
+  if (v_thumb) _flag(419,v.an-12-text_len(texts[419]),12,&opc_img[v_thumb]);
 
   _dos_setdrive(toupper(*tipo[v_type].path)-'A'+1,&n);
   chdir(tipo[v_type].path);
@@ -1485,9 +1485,9 @@ void browser0(void) {
   } lunidadesbr.total_items=n;
 
   if(v_thumb==7)
-    _flag(567,v.an-12-text_len(texto[419])-12-text_len(texto[567]),12,&opc_pru);
+    _flag(567,v.an-12-text_len(texts[419])-12-text_len(texts[567]),12,&opc_pru);
   else if(v_type==16)
-    _flag(567,v.an-12-text_len(texto[567]),12,&opc_pru);
+    _flag(567,v.an-12-text_len(texts[567]),12,&opc_pru);
 
   if (opc_img[v_thumb])
   {
@@ -1523,15 +1523,15 @@ void browser1(void) {
 
   _show_items(); print_path_br();
 
-  wwrite(v.ptr,an,al,77, 20,0,texto[127],c3); // Files
-  wwrite(v.ptr,an,al, 3, 20,0,texto[128],c3);
+  wwrite(v.ptr,an,al,77, 20,0,texts[127],c3); // Files
+  wwrite(v.ptr,an,al, 3, 20,0,texts[128],c3);
 
   if(v_thumb) {
-    wwrite(v.ptr,an,al, 3,113,0,texto[129],c3);
-    wwrite(v.ptr,an,al,40,113,0,texto[130],c3);
+    wwrite(v.ptr,an,al, 3,113,0,texts[129],c3);
+    wwrite(v.ptr,an,al,40,113,0,texts[130],c3);
   } else {
-    wwrite(v.ptr,an,al, 3,111,0,texto[129],c3);
-    wwrite(v.ptr,an,al,40,111,0,texto[130],c3);
+    wwrite(v.ptr,an,al, 3,111,0,texts[129],c3);
+    wwrite(v.ptr,an,al,40,111,0,texts[130],c3);
   }
 
   create_listbox_br(&larchivosbr);
@@ -1698,9 +1698,9 @@ void browser2(void) {
 #ifdef NOTYET
           if ( judascfg_device == DEV_NOSOUND) {
             if ( SoundError ) {
-              v_text=texto[549]; show_dialog(err0);
+              v_text=texts[549]; show_dialog(err0);
             } else {
-              v_text=texto[548]; show_dialog(err0);
+              v_text=texts[548]; show_dialog(err0);
             } return;
           } else 
 #else
@@ -1796,7 +1796,7 @@ void browser2(void) {
         create_listbox(&ldirectoriosbr);
       } else {
         _dos_setdrive(tipo[v_type].path[0]-'A'+1,&n);
-        v_text=(char *)texto[42]; show_dialog(err0); return;
+        v_text=(char *)texts[42]; show_dialog(err0); return;
       }
     } else if (lextbr.zone>=10) { v.redraw=1;
       tipo[v_type].default_choice=lextbr.zone-10+lextbr.first_visible;

@@ -100,7 +100,7 @@ void call(const voidReturnType func); // void funcion(void); int n=(int)funcion;
 #define swap(a,b) {(a)^=(b);(b)^=(a);(a)^=(b);}
 
 #define max_windows 96          // maximum No. of open windows
-#define max_textos 2048         // max No. allowed texts (lenguaje.div)
+#define max_texts 2048         // max No. allowed texts (lenguaje.div)
 
 #define long_line       1024    // Maximum line length in the editor
 
@@ -123,9 +123,9 @@ void flush_window(int);
 void flush_copy(void);
 void place_window(int flag,int*_x,int*_y,int an,int al);
 void on_window_moved(int x,int y,int an,int al);
-void _get(int texto,int x,int y,int an,byte * buf,int lon_buf,int r0,int r1);
-void _button(int texto,int x,int y,int centro);
-void _flag(int texto,int x,int y,int * variable);
+void _get(int text_id,int x,int y,int an,byte * buf,int lon_buf,int r0,int r1);
+void _button(int text_id,int x,int y,int centro);
+void _flag(int text_id,int x,int y,int * variable);
 void _show_items();
 void _process_items();
 void _select_new_item(int n);
@@ -359,17 +359,17 @@ void Tap_Setup0(void);
 //      Functions exported by DIVWINDO (divwindo.c)
 ///////////////////////////////////////////////////////////////////////////////
 
-void wgra(byte*copia,int an_copia,int al_copia,byte c,int x,int y,int an,int al);
-void wbox(byte*copia,int an_copia,int al_copia,byte c,int x,int y,int an,int al);
-void wresalta_box(byte*copia,int an_copia,int al_copia,int x,int y,int an,int al);
-void wbox_in_box(byte*copia,int an_real_copia,int an_copia,int al_copia,byte c,int x,int y,int an,int al);
-void wrectangle(byte*copia,int an_copia,int al_copia,byte c,int x,int y,int an,int al);
-void wput(byte*copia,int an_copia,int al_copia,int x,int y,int n);
-void wput_in_box(byte*copia,int an_real_copia,int an_copia,int al_copia,int x,int y,int n);
-void wvolcado(byte*copia,int an_copia,int al_copia,byte *p,int x,int y,int an,int al,int salta);
-void wvolcado_oscuro(byte*copia,int an_copia,int al_copia,byte *p,int x,int y,int an,int al,int salta);
-void wwrite(byte*copia,int an_copia,int al_copia,int x,int y,int centro,byte * ptr,byte c);
-void wwrite_in_box(byte*copia,int an_real_copia,int an_copia,int al_copia,int x,int y,int centro,byte * ptr,byte c);
+void wgra(byte*dest,int dest_width,int dest_height,byte c,int x,int y,int an,int al);
+void wbox(byte*dest,int dest_width,int dest_height,byte c,int x,int y,int an,int al);
+void wresalta_box(byte*dest,int dest_width,int dest_height,int x,int y,int an,int al);
+void wbox_in_box(byte*dest,int dest_pitch,int dest_width,int dest_height,byte c,int x,int y,int an,int al);
+void wrectangle(byte*dest,int dest_width,int dest_height,byte c,int x,int y,int an,int al);
+void wput(byte*dest,int dest_width,int dest_height,int x,int y,int n);
+void wput_in_box(byte*dest,int dest_pitch,int dest_width,int dest_height,int x,int y,int n);
+void wvolcado(byte*dest,int dest_width,int dest_height,byte *p,int x,int y,int an,int al,int salta);
+void wvolcado_oscuro(byte*dest,int dest_width,int dest_height,byte *p,int x,int y,int an,int al,int salta);
+void wwrite(byte*dest,int dest_width,int dest_height,int x,int y,int centro,byte * ptr,byte c);
+void wwrite_in_box(byte*dest,int dest_pitch,int dest_width,int dest_height,int x,int y,int centro,byte * ptr,byte c);
 int text_len(byte*ptr);
 int char_len(char);
 void boton(int n,int x,int y,int centro,int color);
@@ -524,9 +524,9 @@ GLOBAL_DATA byte * color_lookup; // Squared differences table for palette color 
 
 GLOBAL_DATA int * system_clock, cclock, mclock;
 
-GLOBAL_DATA byte * copia; // Virtual screen copy (IDE framebuffer)
+GLOBAL_DATA byte * screen_buffer; // Virtual screen copy (IDE framebuffer)
 
-GLOBAL_DATA SDL_Surface *copia_surface;
+GLOBAL_DATA SDL_Surface *screen_buffer_surface;
 GLOBAL_DATA	SDL_Surface *tempsurface;
 GLOBAL_DATA SDL_Surface *mouse_surface;
 GLOBAL_DATA SDL_Surface *wallpaper_surface; // background
@@ -643,7 +643,7 @@ GLOBAL_DATA int selected_icon; // (toolbar) -1 if none selected, 0-zoom, ...
 
 GLOBAL_DATA int full_redraw; // Whether the entire VGA screen copy has been modified
 
-GLOBAL_DATA byte * texto[max_textos]; // Output text strings, in translatable format
+GLOBAL_DATA byte * texts[max_texts]; // Output text strings, in translatable format
 
 GLOBAL_DATA int wmouse_x,wmouse_y; // Mouse position within a window
 
@@ -655,17 +655,17 @@ struct t_item {
   int state;           // Item state (mouse hover, pressed, etc.)
   union {
     struct {
-      byte * texto;
+      byte * text;
       int x,y,center;
     } button;
     struct {
-      byte * texto;
+      byte * text;
       byte * buffer;
       int x,y,an,lon_buffer;
       int r0,r1;
     } get;
     struct {
-      byte * texto;
+      byte * text;
       int * valor;
       int x,y;
     } flag;
@@ -673,7 +673,7 @@ struct t_item {
 };
 
 //GLOBAL_DATA 
-struct tventana {
+struct twindow {
   int type;                             // 0-none, 1-show_dialog, 2-menu, 3-palette
                                         // 4-timer, 5-trash, 7-progress_bar
                                         // 8-mixer
@@ -698,13 +698,13 @@ struct tventana {
   int items;                            // Number of defined items
   int active_item;                      // Which item triggered an action
   int selected_item;                    // Currently selected item (for keyboard)
-  int lado;                             // 0 Right, 1 Left (auto-place on double-click)
+  int side;                             // 0 Right, 1 Left (auto-place on double-click)
   int exploding;
 	
 };
 
-GLOBAL_DATA struct tventana ventana[max_windows];
-#define v ventana[0]
+GLOBAL_DATA struct twindow window[max_windows];
+#define v window[0]
 
 //GLOBAL_DATA 
 struct tmapa {

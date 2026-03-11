@@ -38,7 +38,7 @@ void ReadHeadImageAndPoints(HeadFPG *MiHeadFPG,FILE *fpg)
         FPGimagen=(char *)malloc(MiHeadFPG->Ancho*MiHeadFPG->Alto);
         if(FPGimagen==NULL)
         {
-                v_text=(char *)texto[45]; show_dialog(err0);
+                v_text=(char *)texts[45]; show_dialog(err0);
                 return;
         }
         if(MiHeadFPG->nPuntos!=0)
@@ -48,7 +48,7 @@ void ReadHeadImageAndPoints(HeadFPG *MiHeadFPG,FILE *fpg)
                 {
                         free(FPGimagen);
                         FPGimagen=NULL;
-                        v_text=(char *)texto[45]; show_dialog(err0);
+                        v_text=(char *)texts[45]; show_dialog(err0);
                         return;
                 }
                 fread(FPGpuntos,MiHeadFPG->nPuntos*2,2,fpg);
@@ -260,7 +260,7 @@ FILE *fpg;
 
         if((fpg=fopen((char *)Fpg->ActualFile,"ab"))==NULL)
         {
-                v_text=(char *)texto[43];
+                v_text=(char *)texts[43];
                 show_dialog(err0);
                 return 0;
         }
@@ -296,7 +296,7 @@ FILE *fpg;
         // Re-read file information
         if(!Abrir_FPG(Fpg,(char *)Fpg->ActualFile))
         {
-                v_text=(char *)texto[43];
+                v_text=(char *)texts[43];
                 show_dialog(err0);
                 return 0;
         }
@@ -370,7 +370,7 @@ byte MiTabla[256];
                 {
                         fclose(fpg);
                         fclose(Oldfpg);
-                        v_text=(char *)texto[45]; show_dialog(err0);
+                        v_text=(char *)texts[45]; show_dialog(err0);
                         return 0;
                 }
                 // Check memory
@@ -382,7 +382,7 @@ byte MiTabla[256];
                                 fclose(fpg);
                                 fclose(Oldfpg);
                                 free(OtraImagen);
-                                v_text=(char *)texto[45]; show_dialog(err0);
+                                v_text=(char *)texts[45]; show_dialog(err0);
                                 return 0;
                         }
                         fread(OtrosPuntos,MiOtraHeadFPG.nPuntos*2,2,fpg);
@@ -410,15 +410,15 @@ return 1;
 void close_fpg(char *fpg_path);
 void SaveFPG(int n)
 {
-int an=ventana[n].an/big2,al=ventana[n].al/big2;
-FPG *Fpg=(FPG *)ventana[n].aux;
+int an=window[n].an/big2,al=window[n].al/big2;
+FPG *Fpg=(FPG *)window[n].aux;
 FILE *FileOrg,*FileDest;
 int Lengt;
 char *Buffer;
         Buffer=(char *)malloc(BUFFERCOPYLEN);
         if(Buffer==NULL)
         {
-                v_text=(char *)texto[45]; show_dialog(err0);
+                v_text=(char *)texts[45]; show_dialog(err0);
                 return;
         }
         strcpy(full,tipo[4].path);
@@ -463,13 +463,13 @@ char *Buffer;
         strcpy((char *)Fpg->ActualFile,full);
         div_strcpy((char *)Fpg->NombreFpg, sizeof(Fpg->NombreFpg), input);
 
-        wgra(ventana[n].ptr,an,al,c_b_low,2,2,an-20,7);
-        if (text_len(ventana[n].title)+3>an-20) {
-          wwrite_in_box(ventana[n].ptr,an,an-19,al,4,2,0,ventana[n].title,c1);
-          wwrite_in_box(ventana[n].ptr,an,an-19,al,3,2,0,ventana[n].title,c4);
+        wgra(window[n].ptr,an,al,c_b_low,2,2,an-20,7);
+        if (text_len(window[n].title)+3>an-20) {
+          wwrite_in_box(window[n].ptr,an,an-19,al,4,2,0,window[n].title,c1);
+          wwrite_in_box(window[n].ptr,an,an-19,al,3,2,0,window[n].title,c4);
         } else {
-          wwrite(ventana[n].ptr,an,al,3+(an-20)/2,2,1,ventana[n].title,c1);
-          wwrite(ventana[n].ptr,an,al,2+(an-20)/2,2,1,ventana[n].title,c4);
+          wwrite(window[n].ptr,an,al,3+(an-20)/2,2,1,window[n].title,c1);
+          wwrite(window[n].ptr,an,al,2+(an-20)/2,2,1,window[n].title,c4);
         } flush_window(n);
 
         fclose(FileOrg);
@@ -523,7 +523,7 @@ debugprintf("found COD at index: %d\n",n);
         fseek(fpg,0,SEEK_END);
         len=ftell(fpg);
         fseek(fpg,0,SEEK_SET);
-        Progress((char *)texto[436],0,len);
+        Progress((char *)texts[436],0,len);
 
         // Copy graphic header
         fread(tmp,8,1,fpg);
@@ -535,15 +535,15 @@ debugprintf("found COD at index: %d\n",n);
 
         while(ReadHead(&MiOtraHeadFPG,fpg))
         {
-                Progress((char *)texto[436],ftell(fpg),len);
+                Progress((char *)texts[436],ftell(fpg),len);
 
                 OtraImagen=(char *)malloc(MiOtraHeadFPG.Ancho*MiOtraHeadFPG.Alto);
                 if(OtraImagen==NULL)
                 {
-                        Progress((char *)texto[436],len,len);
+                        Progress((char *)texts[436],len,len);
                         fclose(fpg);
                         fclose(Oldfpg);
-                        v_text=(char *)texto[45]; show_dialog(err0);
+                        v_text=(char *)texts[45]; show_dialog(err0);
                         return 0;
                 }
                 // Check memory
@@ -552,11 +552,11 @@ debugprintf("found COD at index: %d\n",n);
                         OtrosPuntos=(short *)malloc(MiOtraHeadFPG.nPuntos*4);
                         if(OtrosPuntos==NULL)
                         {
-                                Progress((char *)texto[436],len,len);
+                                Progress((char *)texts[436],len,len);
                                 fclose(fpg);
                                 fclose(Oldfpg);
                                 free(OtraImagen);
-                                v_text=(char *)texto[45]; show_dialog(err0);
+                                v_text=(char *)texts[45]; show_dialog(err0);
                                 return 0;
                         }
                         fread(OtrosPuntos,MiOtraHeadFPG.nPuntos*2,2,fpg);
@@ -580,7 +580,7 @@ debugprintf("found COD at index: %d\n",n);
         fclose(Oldfpg);
         fclose(fpg);
 
-        Progress((char *)texto[436],len,len);
+        Progress((char *)texts[436],len,len);
 
         DaniDel((char *)Fpg->ActualFile);
         
@@ -624,7 +624,7 @@ int Borrar_muchos_FPG(FPG *Fpg,int taggeds,int *array_del) {
   fseek(fpg,0,SEEK_END);
   len=ftell(fpg);
   fseek(fpg,0,SEEK_SET);
-  Progress((char *)texto[436],0,len);
+  Progress((char *)texts[436],0,len);
 
   fread(tmp,8,1,fpg); // Copy graphic header
   fwrite(tmp,8,1,Oldfpg);
@@ -635,26 +635,26 @@ int Borrar_muchos_FPG(FPG *Fpg,int taggeds,int *array_del) {
 
   while(ReadHead(&MiOtraHeadFPG,fpg)) {
 
-    Progress((char *)texto[436],ftell(fpg),len);
+    Progress((char *)texts[436],ftell(fpg),len);
 
     OtraImagen=(char *)malloc(MiOtraHeadFPG.Ancho*MiOtraHeadFPG.Alto);
 
     if(OtraImagen==NULL) {
-      Progress((char *)texto[436],len,len);
+      Progress((char *)texts[436],len,len);
       fclose(fpg);
       fclose(Oldfpg);
-      v_text=(char *)texto[45]; show_dialog(err0);
+      v_text=(char *)texts[45]; show_dialog(err0);
       return 0;
     }
 
     if(MiOtraHeadFPG.nPuntos!=0) { // Check memory
       OtrosPuntos=(short *)malloc(MiOtraHeadFPG.nPuntos*4);
       if(OtrosPuntos==NULL) {
-        Progress((char *)texto[436],len,len);
+        Progress((char *)texts[436],len,len);
         fclose(fpg);
         fclose(Oldfpg);
         free(OtraImagen);
-        v_text=(char *)texto[45]; show_dialog(err0);
+        v_text=(char *)texts[45]; show_dialog(err0);
         return 0;
       } fread(OtrosPuntos,MiOtraHeadFPG.nPuntos*2,2,fpg);
     }
@@ -696,7 +696,7 @@ int Borrar_muchos_FPG(FPG *Fpg,int taggeds,int *array_del) {
   fclose(Oldfpg);
   fclose(fpg);
 
-  Progress((char *)texto[436],len,len);
+  Progress((char *)texts[436],len,len);
 
   DaniDel((char *)Fpg->ActualFile);
   rename(ActualPath,(char *)Fpg->ActualFile);

@@ -32,7 +32,7 @@ extern int num_punto;
 ///////////////////////////////////////////////////////////////////////////////
 
 void writetxt(int x,int y,int centro,byte * ptr) {
-  wwrite(copia,vga_width/big2,vga_height,x,y,centro,ptr,text_color);
+  wwrite(screen_buffer,vga_width/big2,vga_height,x,y,centro,ptr,text_color);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -40,7 +40,7 @@ void writetxt(int x,int y,int centro,byte * ptr) {
 ///////////////////////////////////////////////////////////////////////////////
 
 void box(byte c,int x0,int y0,int x1,int y1) {
-  wbox(copia,vga_width,vga_height,c,x0,y0,x1-x0+1,y1-y0+1);
+  wbox(screen_buffer,vga_width,vga_height,c,x0,y0,x1-x0+1,y1-y0+1);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -48,7 +48,7 @@ void box(byte c,int x0,int y0,int x1,int y1) {
 ///////////////////////////////////////////////////////////////////////////////
 
 void rectangle(byte c,int x,int y,int an,int al) {
-  wrectangle(copia,vga_width,vga_height,c,x,y,an,al);
+  wrectangle(screen_buffer,vga_width,vga_height,c,x,y,an,al);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -73,7 +73,7 @@ void save_mouse_bg(byte * p, int x, int y, int n, int flag) {
 
   blit_partial(x,y,an,al);
 
-  q=copia+y*vga_width+x;
+  q=screen_buffer+y*vga_width+x;
 
   if (x<0) salta_x=-x; else salta_x=0;
   if (x+an>vga_width) resto_x=x+an-vga_width; else resto_x=0;
@@ -98,7 +98,7 @@ void save_mouse_bg(byte * p, int x, int y, int n, int flag) {
 ///////////////////////////////////////////////////////////////////////////////
 
 void put(int x,int y,int n) {
-  wput_in_box(copia,vga_width,vga_width,vga_height,x,y,n);
+  wput_in_box(screen_buffer,vga_width,vga_width,vga_height,x,y,n);
 }
 
 void put_bw(int x,int y,int n) { // Puts a contrasting graphic (mouse edition )
@@ -117,7 +117,7 @@ void put_bw(int x,int y,int n) { // Puts a contrasting graphic (mouse edition )
 
   if (x>=vga_width || y>=vga_height || x+an<=0 || y+al<=0) return;
 
-  q=copia+y*vga_width+x;
+  q=screen_buffer+y*vga_width+x;
 
   if (x<0) salta_x=-x; else salta_x=0;
   if (x+an>vga_width) resto_x=x+an-vga_width; else resto_x=0;
@@ -192,21 +192,21 @@ void draw_edit_background(int x,int y,int an,int al) {
   if (_big) { big=0; big2=1; }
 
   if (zoom_win_y) {
-    wbox_in_box(copia+y*vga_width+x,vga_width,an,al,c2,zoom_win_x-2-x,zoom_win_y-2-y,zoom_win_width+4,1);
-    wbox_in_box(copia+y*vga_width+x,vga_width,an,al,c0,zoom_win_x-1-x,zoom_win_y-1-y,zoom_win_width+2,1);
+    wbox_in_box(screen_buffer+y*vga_width+x,vga_width,an,al,c2,zoom_win_x-2-x,zoom_win_y-2-y,zoom_win_width+4,1);
+    wbox_in_box(screen_buffer+y*vga_width+x,vga_width,an,al,c0,zoom_win_x-1-x,zoom_win_y-1-y,zoom_win_width+2,1);
   }
   if (zoom_win_y+zoom_win_height<vga_height) {
-    wbox_in_box(copia+y*vga_width+x,vga_width,an,al,c2,zoom_win_x-2-x,zoom_win_y+zoom_win_height+1-y,zoom_win_width+4,1);
-    wbox_in_box(copia+y*vga_width+x,vga_width,an,al,c0,zoom_win_x-1-x,zoom_win_y+zoom_win_height-y,zoom_win_width+2,1);
+    wbox_in_box(screen_buffer+y*vga_width+x,vga_width,an,al,c2,zoom_win_x-2-x,zoom_win_y+zoom_win_height+1-y,zoom_win_width+4,1);
+    wbox_in_box(screen_buffer+y*vga_width+x,vga_width,an,al,c0,zoom_win_x-1-x,zoom_win_y+zoom_win_height-y,zoom_win_width+2,1);
   }
 
   if (zoom_win_x) {
-    wbox_in_box(copia+y*vga_width+x,vga_width,an,al,c2,zoom_win_x-2-x,zoom_win_y-1-y,1,zoom_win_height+2);
-    wbox_in_box(copia+y*vga_width+x,vga_width,an,al,c0,zoom_win_x-1-x,zoom_win_y-y,1,zoom_win_height);
+    wbox_in_box(screen_buffer+y*vga_width+x,vga_width,an,al,c2,zoom_win_x-2-x,zoom_win_y-1-y,1,zoom_win_height+2);
+    wbox_in_box(screen_buffer+y*vga_width+x,vga_width,an,al,c0,zoom_win_x-1-x,zoom_win_y-y,1,zoom_win_height);
   }
   if (zoom_win_x+zoom_win_width<vga_width) {
-    wbox_in_box(copia+y*vga_width+x,vga_width,an,al,c2,zoom_win_x+zoom_win_width+1-x,zoom_win_y-1-y,1,zoom_win_height+2);
-    wbox_in_box(copia+y*vga_width+x,vga_width,an,al,c0,zoom_win_x+zoom_win_width-x,zoom_win_y-y,1,zoom_win_height);
+    wbox_in_box(screen_buffer+y*vga_width+x,vga_width,an,al,c2,zoom_win_x+zoom_win_width+1-x,zoom_win_y-1-y,1,zoom_win_height+2);
+    wbox_in_box(screen_buffer+y*vga_width+x,vga_width,an,al,c0,zoom_win_x+zoom_win_width-x,zoom_win_y-y,1,zoom_win_height);
   }
 
   if (_big) { big=1; big2=2; }
@@ -230,7 +230,7 @@ void draw_edit_background(int x,int y,int an,int al) {
   _y1=((_y1-zoom_win_y)>>zoom)+zoom_y;
 
   zoom_p=map+_y0*map_width+_x0;
-  zoom_q=copia+(zoom_win_y+((_y0-zoom_y)<<zoom))*vga_width+zoom_win_x+((_x0-zoom_x)<<zoom);
+  zoom_q=screen_buffer+(zoom_win_y+((_y0-zoom_y)<<zoom))*vga_width+zoom_win_x+((_x0-zoom_x)<<zoom);
   zoom_an=_x1-_x0+1;
   zoom_al=_y1-_y0+1;
 
@@ -259,7 +259,7 @@ void zoom_map(void) {
   if (!zoom_region) {
 
     p=map+zoom_y*map_width+zoom_x;
-    q=copia;
+    q=screen_buffer;
 
     if ((map_width<<zoom)<vga_width) { // This chunk is copied in select_zoom()
       zoom_win_width=map_width<<zoom; zoom_win_x=(vga_width-zoom_win_width)/2; q+=zoom_win_x; an=map_width;
@@ -280,12 +280,12 @@ void zoom_map(void) {
       } else {
         if (_big) { big=0; big2=1; }
         if (zoom_win_y+zoom_win_height<vga_height) {
-          wbox(copia,vga_width,vga_height,c2,zoom_win_x-2,zoom_win_y+zoom_win_height+1,zoom_win_width+4,1);
-          wbox(copia,vga_width,vga_height,c0,zoom_win_x-1,zoom_win_y+zoom_win_height,zoom_win_width+2,1);
+          wbox(screen_buffer,vga_width,vga_height,c2,zoom_win_x-2,zoom_win_y+zoom_win_height+1,zoom_win_width+4,1);
+          wbox(screen_buffer,vga_width,vga_height,c0,zoom_win_x-1,zoom_win_y+zoom_win_height,zoom_win_width+2,1);
           blit_partial(0,zoom_win_y+zoom_win_height,vga_width,2); }
         if (zoom_win_x+zoom_win_width<vga_width) {
-          wbox(copia,vga_width,vga_height,c2,zoom_win_x-2,zoom_win_y-2,zoom_win_width+4,1);
-          wbox(copia,vga_width,vga_height,c0,zoom_win_x-1,zoom_win_y-1,zoom_win_width+2,1);
+          wbox(screen_buffer,vga_width,vga_height,c2,zoom_win_x-2,zoom_win_y-2,zoom_win_width+4,1);
+          wbox(screen_buffer,vga_width,vga_height,c0,zoom_win_x-1,zoom_win_y-1,zoom_win_width+2,1);
           blit_partial(zoom_win_y+zoom_win_width,0,2,vga_height); }
         if (_big) { big=1; big2=2; }
       }
@@ -425,14 +425,14 @@ void interpolation_mode(void) {
 
     if (key(_ESC)||(mouse_b && mouse_in(toolbar_x,toolbar_y+10,toolbar_x+9,toolbar_y+18)))
       { put_bar(2,10,45); flush_bars(0);
-        put(mouse_x,mouse_y,mouse_graf); blit_screen(copia); }
+        put(mouse_x,mouse_y,mouse_graf); blit_screen(screen_buffer); }
 
     free(m1); free(m0);
   } else free(m0);
   }
 
   if (m0==NULL || m1==NULL) {
-    v_text=(char *)texto[45]; show_dialog(err0);
+    v_text=(char *)texts[45]; show_dialog(err0);
   }
 
   draw_mode+=100;
@@ -565,7 +565,7 @@ void fill_select(word x,word y) {
   if ((fss=(word*)malloc(60000))!=NULL) {
     fsp=fss; fsp_max=fss+30000; fill_scan(x,y); free(fss);
   } else {
-    v_text=(char *)texto[45]; show_dialog(err0);
+    v_text=(char *)texts[45]; show_dialog(err0);
   }
   mode_fill=_mode_fill;
 }
@@ -614,7 +614,7 @@ void fill(word x,word y) {
 
     free(fss);
   } else {
-    v_text=(char *)texto[45]; show_dialog(err0);
+    v_text=(char *)texts[45]; show_dialog(err0);
   }
 }
 
@@ -727,13 +727,13 @@ void draw_selection_mask(void) {
   y1=zoom_y+(zoom_win_height>>zoom)-1; if (sel_mask_y1<y1) y1=sel_mask_y1;
 
   // NOTE: Old direct-pointer calculation replaced by the per-zoom switch below
-  // p=copia+(zoom_win_y+((y0-zoom_y)<<zoom))*vga_width+zoom_win_x+((x0-zoom_x)<<zoom);
+  // p=screen_buffer+(zoom_win_y+((y0-zoom_y)<<zoom))*vga_width+zoom_win_x+((x0-zoom_x)<<zoom);
 
   if (x1>=x0 && y1>=y0) switch(zoom) {
 
     case 0: for (y=y0;y<=y1;y++) {
       inc32=y*map_width+x0; _sel_mask=selection_mask+(inc32>>5); inc32&=31;
-      p=copia+(zoom_win_y+y-zoom_y)*vga_width+(zoom_win_x+x0-zoom_x); c=(cclock^y^x0)&1;
+      p=screen_buffer+(zoom_win_y+y-zoom_y)*vga_width+(zoom_win_x+x0-zoom_x); c=(cclock^y^x0)&1;
       for (x=x0;x<=x1;x++,p++,c^=1) {
         if (*_sel_mask) { if ((*_sel_mask)&(1<<inc32)) {
             if (y==0 || x==0 || y==map_height-1 || x==map_width-1)  {
@@ -750,7 +750,7 @@ void draw_selection_mask(void) {
     g04=g0+g4*256; g40=g4+g0*256;
     for (y=y0;y<=y1;y++) {
       inc32=y*map_width+x0; _sel_mask=selection_mask+(inc32>>5); inc32&=31;
-      p=copia+(zoom_win_y+(y-zoom_y)*2)*vga_width+zoom_win_x+(x0-zoom_x)*2;
+      p=screen_buffer+(zoom_win_y+(y-zoom_y)*2)*vga_width+zoom_win_x+(x0-zoom_x)*2;
       for (x=x0;x<=x1;x++,p+=2) {
         if (*_sel_mask) if ((*_sel_mask)&(1<<inc32)) {
           if (y==0 || (y!=0 && !is_selection_mask(x,y-1))) {
@@ -790,7 +790,7 @@ void draw_selection_mask(void) {
 
     case 2: if (cclock&1) { g0=c4; g4=c0; }
     for (y=y0;y<=y1;y++) {
-      p=copia+(zoom_win_y+(y-zoom_y)*4)*vga_width+zoom_win_x+(x0-zoom_x)*4;
+      p=screen_buffer+(zoom_win_y+(y-zoom_y)*4)*vga_width+zoom_win_x+(x0-zoom_x)*4;
       for (x=x0;x<=x1;x++,p+=4) if (is_selection_mask(x,y)) {
         if (y==0 || (y!=0 && !is_selection_mask(x,y-1))) {
           *p=g0; *(p+1)=g4;
@@ -817,7 +817,7 @@ void draw_selection_mask(void) {
 
     case 3: if (cclock&1) { g0=c4; g4=c0; }
     for (y=y0;y<=y1;y++) {
-      p=copia+(zoom_win_y+(y-zoom_y)*8)*vga_width+zoom_win_x+(x0-zoom_x)*8;
+      p=screen_buffer+(zoom_win_y+(y-zoom_y)*8)*vga_width+zoom_win_x+(x0-zoom_x)*8;
       for (x=x0;x<=x1;x++,p+=8) if (is_selection_mask(x,y)) {
         if (y==0 || (y!=0 && !is_selection_mask(x,y-1))) {
           *p=g0; *(p+1)=g4;
@@ -880,7 +880,7 @@ void draw_selection_box(int _x0,int _y0,int _x1,int _y1) {
     if (y0>=zoom_win_y) {
       if (x0<zoom_win_x) { x0=zoom_win_x; } if (x1>=zoom_win_x+zoom_win_width) { x1=zoom_win_x+zoom_win_width-1; }
       n=x1-x0+1;
-      p=copia+vga_width*y0+x0;
+      p=screen_buffer+vga_width*y0+x0;
       if ((y0^cclock)&1) do {
         if ((uintptr_t)p&1) *p=c0; else *p=c4; p++;
       } while (--n);
@@ -892,7 +892,7 @@ void draw_selection_box(int _x0,int _y0,int _x1,int _y1) {
     if (y1<zoom_win_y+zoom_win_height) {
       if (x0<zoom_win_x) { x0=zoom_win_x; } if (x1>=zoom_win_x+zoom_win_width) { x1=zoom_win_x+zoom_win_width-1; }
       n=x1-x0+1;
-      p=copia+vga_width*y1+x0;
+      p=screen_buffer+vga_width*y1+x0;
       if ((y1^cclock)&1) do {
         if ((uintptr_t)p&1) *p=c0; else *p=c4; p++;
       } while (--n);
@@ -907,7 +907,7 @@ void draw_selection_box(int _x0,int _y0,int _x1,int _y1) {
     if (x0>=zoom_win_x) {
       if (y0<zoom_win_y) { y0=zoom_win_y; } if (y1>=zoom_win_y+zoom_win_height) { y1=zoom_win_y+zoom_win_height-1; }
       n=y1-y0+1;
-      p=copia+vga_width*y0+x0;
+      p=screen_buffer+vga_width*y0+x0;
       if ((x0^cclock)&1) do {
         if (y0&1) *p=c0; else *p=c4; p+=vga_width; y0++;
       } while (--n);
@@ -920,7 +920,7 @@ void draw_selection_box(int _x0,int _y0,int _x1,int _y1) {
     if (x1<zoom_win_x+zoom_win_width) {
       if (y0<zoom_win_y) { y0=zoom_win_y; } if (y1>=zoom_win_y+zoom_win_height) { y1=zoom_win_y+zoom_win_height-1; }
       n=y1-y0+1;
-      p=copia+vga_width*y0+x1;
+      p=screen_buffer+vga_width*y0+x1;
       if ((x1^cclock)&1) do {
         if (y0&1) *p=c0; else *p=c4; p+=vga_width; y0++;
       } while (--n);
@@ -1039,8 +1039,8 @@ byte * save_undo(int x, int y, int an, int al) {
   } else {
     draw_edit_background(0,0,vga_width,vga_height);
     flush_bars(1);
-    full_redraw=1; blit_screen(copia);
-    v_text=(char *)texto[320]; show_dialog(err0); undo_error=1;
+    full_redraw=1; blit_screen(screen_buffer);
+    v_text=(char *)texts[320]; show_dialog(err0); undo_error=1;
   }
 
   return(ret);

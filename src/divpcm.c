@@ -160,10 +160,10 @@ void PCM2(void) {
   if(mouse_b&1) {
     if (!SoundActive) {
       if ( SoundError ) {
-        v_text=(char *)texto[549]; show_dialog(errhlp0);
+        v_text=(char *)texts[549]; show_dialog(errhlp0);
         if (v_accept) help(2008);
       } else {
-        v_text=(char *)texto[548]; show_dialog(errhlp0);
+        v_text=(char *)texts[548]; show_dialog(errhlp0);
         if (v_accept) help(2009);
       }
       return;
@@ -490,7 +490,7 @@ Mix_Chunk *SI;
 
   v_mode=0;
   v_type=7;
-  v_text=(char *)texto[341];
+  v_text=(char *)texts[341];
   show_dialog(browser0);
   if(!v_finished) return;
 
@@ -520,14 +520,14 @@ Mix_Chunk *SI;
       DIV_STRCPY(SoundPathName,full);
 
       if (!v_exists) {
-        v_text=(char *)texto[43];
+        v_text=(char *)texts[43];
         show_dialog(err0);
         continue;
       }
 
       if((pcminfo_aux=(byte *)malloc(sizeof(pcminfo)))==NULL)
       {
-        v_text=(char *)texto[45];
+        v_text=(char *)texts[45];
         show_dialog(err0);
         continue;
       }
@@ -546,7 +546,7 @@ Mix_Chunk *SI;
   if(SI==NULL) {
 
 		 free(pcminfo_aux);
-        v_text=(char *)texto[46];
+        v_text=(char *)texts[46];
         show_dialog(err0);
         continue;
    }
@@ -588,7 +588,7 @@ debugprintf("SOundPath %s\n",full);
 
   if((pcminfo_aux=(byte *)malloc(sizeof(pcminfo)))==NULL)
   {
-    v_text=(char *)texto[45];
+    v_text=(char *)texts[45];
     show_dialog(err0);
     return;
   }
@@ -605,7 +605,7 @@ debugprintf("SOundPath %s\n",full);
 
 //     free(pcminfo_aux);
         //if(SI) free(SI);
-      v_text=(char *)texto[46];
+      v_text=(char *)texts[46];
       show_dialog(err0);
       free(mypcminfo);
       return;        
@@ -628,9 +628,9 @@ debugprintf("SOundPath %s\n",full);
   new_window(PCM0);
 
 }
-int nueva_ventana_carga(voidReturnType init_handler,int nx,int ny);
-//void nueva_ventana_carga(int init_handler,int nx,int ny);
-extern struct tventana ventana_aux;
+int create_saved_window(voidReturnType init_handler,int nx,int ny);
+//void create_saved_window(int init_handler,int nx,int ny);
+extern struct twindow window_aux;
 
 void OpenDesktopSound(FILE *f)
 {
@@ -672,7 +672,7 @@ void OpenDesktopSound(FILE *f)
   }
 #endif
 
-  nueva_ventana_carga(PCM0,ventana_aux.x,ventana_aux.y);
+  create_saved_window(PCM0,window_aux.x,window_aux.y);
 }
 
 void SaveSound(pcminfo *mypcminfo, char *dst)
@@ -695,7 +695,7 @@ void SaveSound(pcminfo *mypcminfo, char *dst)
 
   if((dstfile=fopen(dst,"wb"))==NULL)
   {
-    v_text=(char *)texto[43];
+    v_text=(char *)texts[43];
     show_dialog(err0);
     return;
   }
@@ -713,7 +713,7 @@ void SaveSound(pcminfo *mypcminfo, char *dst)
     {
       fclose(dstfile);
       DaniDel(dst);
-      v_text=(char *)texto[47];
+      v_text=(char *)texts[47];
       show_dialog(err0);
       return;
     }
@@ -740,7 +740,7 @@ void SaveSound(pcminfo *mypcminfo, char *dst)
     {
       fclose(dstfile);
       DaniDel(dst);
-      v_text=(char *)texto[47];
+      v_text=(char *)texts[47];
       show_dialog(err0);
       return;
     }
@@ -754,7 +754,7 @@ void SaveSound(pcminfo *mypcminfo, char *dst)
     {
       fclose(dstfile);
       DaniDel(dst);
-      v_text=(char *)texto[47];
+      v_text=(char *)texts[47];
       show_dialog(err0);
       return;
     }
@@ -764,7 +764,7 @@ void SaveSound(pcminfo *mypcminfo, char *dst)
       {
         fclose(dstfile);
         DaniDel(dst);
-        v_text=(char *)texto[45];
+        v_text=(char *)texts[45];
         show_dialog(err0);
         return;
       }
@@ -780,7 +780,7 @@ void SaveSound(pcminfo *mypcminfo, char *dst)
     {
       fclose(dstfile);
       DaniDel(dst);
-      v_text=(char *)texto[45];
+      v_text=(char *)texts[45];
       show_dialog(err0);
       return;
     }
@@ -797,7 +797,7 @@ void SaveSound(pcminfo *mypcminfo, char *dst)
     fclose(dstfile);
     if(byte_ptr != (byte *)mypcminfo->SoundData) free(byte_ptr);
     DaniDel(dst);
-    v_text=(char *)texto[47];
+    v_text=(char *)texts[47];
     show_dialog(err0);
     return;
   }
@@ -825,9 +825,9 @@ void CloseSound(char *snd_path)
 
   for(m=0; m<max_windows; m++)
   {
-    if(ventana[m].type==105)
+    if(window[m].type==105)
     {
-      mypcminfo = (pcminfo *)ventana[m].aux;
+      mypcminfo = (pcminfo *)window[m].aux;
       if(!strcmp(snd_path, mypcminfo->pathname))
       {
         move(0,m);
@@ -849,7 +849,7 @@ void OpenSong(void) {
 
   v_mode=0;
   v_type=16;
-  v_text=(char *)texto[558];
+  v_text=(char *)texts[558];
   show_dialog(browser0);
   if(!v_finished) return;
 
@@ -879,14 +879,14 @@ void OpenSong(void) {
       DIV_STRCPY(SongPathName,full);
 
       if (!v_exists) {
-        v_text=(char *)texto[43];
+        v_text=(char *)texts[43];
         show_dialog(err0);
         continue;
       }
 
       if((modinfo_aux=(byte *)malloc(sizeof(modinfo)))==NULL)
       {
-        v_text=(char *)texto[45];
+        v_text=(char *)texts[45];
         show_dialog(err0);
         continue;
       }
@@ -905,7 +905,7 @@ void OpenDesktopSong(void) {
 
   if((modinfo_aux=(byte *)malloc(sizeof(modinfo)))==NULL)
   {
-    v_text=(char *)texto[45];
+    v_text=(char *)texts[45];
     show_dialog(err0);
     return;
   }
@@ -914,7 +914,7 @@ void OpenDesktopSong(void) {
   memcpy(mymodinfo->name,SongName,14);
   memcpy(mymodinfo->pathname,SongPathName,256);
 
-  nueva_ventana_carga(MOD0,ventana_aux.x,ventana_aux.y);
+  create_saved_window(MOD0,window_aux.x,window_aux.y);
 }
 
 int songposcount=0;
@@ -952,10 +952,10 @@ void PlaySong(char *pathname)
   mymodinfo->music=music;
 
 	if(!music) {
-		v_text=strdup((char *)Mix_GetError());//texto[46];
+		v_text=strdup((char *)Mix_GetError());//texts[46];
     if(strlen(v_text)==0) {
       free(v_text);
-      v_text=strdup((const char *)texto[46]);
+      v_text=strdup((const char *)texts[46]);
     }
 		show_dialog(err0);
     free(v_text);
@@ -981,7 +981,7 @@ void PlaySong(char *pathname)
 //  Editor de sonidos
 //-----------------------------------------------------------------------------
 
-int ancho_ventana, alto_ventana;
+int window_width, window_height;
 int sel_1, sel_2;
 
 typedef struct _CLP {
@@ -1010,8 +1010,8 @@ void EditSound0(void)
   int pos;
 
   v.type       = 1;
-  v.title     = texto[349];
-  v.name     = texto[349];
+  v.title     = texts[349];
+  v.name     = texts[349];
   v.an         = 308;
   v.al         = 151; // 116
 
@@ -1019,8 +1019,8 @@ void EditSound0(void)
   v.click_handler=EditSound2;
   v.close_handler=EditSound3;
 
-  ancho_ventana = (v.an-8)*big2;
-  alto_ventana  = 64*big2;
+  window_width = (v.an-8)*big2;
+  window_height  = 64*big2;
   sel_1         = 0;
   sel_2         = 0;
 
@@ -1035,34 +1035,34 @@ void EditSound0(void)
   NumSND=0;
 
   pos  = 7;                           _button(501,pos,v.al-34,0);
-  pos += text_len(texto[501])+3;      _button(502,pos,v.al-34,0);
-  pos += text_len(texto[502])+3;      _button(503,pos,v.al-34,0);
-  pos += text_len(texto[503])+3;      _button(504,pos,v.al-34,0);
+  pos += text_len(texts[501])+3;      _button(502,pos,v.al-34,0);
+  pos += text_len(texts[502])+3;      _button(503,pos,v.al-34,0);
+  pos += text_len(texts[503])+3;      _button(504,pos,v.al-34,0);
 
-  pos += text_len(texto[504])+3;
-  pos += v.an-1-text_len(texto[506]);
-  pos -= text_len(texto[507])+3;
-  pos -= text_len(texto[508])+3;
-  pos -= text_len(texto[505])+3;
+  pos += text_len(texts[504])+3;
+  pos += v.an-1-text_len(texts[506]);
+  pos -= text_len(texts[507])+3;
+  pos -= text_len(texts[508])+3;
+  pos -= text_len(texts[505])+3;
   pos /=2;                            _button(505,pos,v.al-34,0);
 
-  pos  = v.an-1-text_len(texto[506]); _button(506,pos,v.al-34,0);
-  pos -= text_len(texto[507])+3;      _button(507,pos,v.al-34,0);
-  pos -= text_len(texto[508])+3;      _button(508,pos,v.al-34,0);
+  pos  = v.an-1-text_len(texts[506]); _button(506,pos,v.al-34,0);
+  pos -= text_len(texts[507])+3;      _button(507,pos,v.al-34,0);
+  pos -= text_len(texts[508])+3;      _button(508,pos,v.al-34,0);
 
   _button(509,7,v.al-14,0);      // Prueba
-  _button(512,v.an-8,v.al-14,2); // Copiar en ventana
+  _button(512,v.an-8,v.al-14,2); // Copiar en window
 
-  pos=193 + text_len(texto[555])+3 ; // 241;
+  pos=193 + text_len(texts[555])+3 ; // 241;
 
-  _button(553,pos,     15,0); pos += text_len(texto[553])+3;
+  _button(553,pos,     15,0); pos += text_len(texts[553])+3;
   _button(554,pos,     15,0);
 
   pos  = 193;
 
-  _button(555,pos,     30,0); pos += text_len(texto[555])+3;
-  _button(556,pos,     30,0); pos += text_len(texto[556])+3;
-  _button(557,pos,     30,0); pos += text_len(texto[557])+3;
+  _button(555,pos,     30,0); pos += text_len(texts[555])+3;
+  _button(556,pos,     30,0); pos += text_len(texts[556])+3;
+  _button(557,pos,     30,0); pos += text_len(texts[557])+3;
 
   v_finished=0;
 }
@@ -1074,7 +1074,7 @@ void EditSound1(void)
   byte    *ptr=v.ptr;
   float   step, position=0;
   int     an=v.an/big2, al=v.al/big2;
-  int     an_v=ancho_ventana/big2, al_v=alto_ventana/big2;
+  int     an_v=window_width/big2, al_v=window_height/big2;
   int     length;
   int     x, y, y0, y1, p0, p1;
   int     Ancho, Alto, First=1, lx, ly;
@@ -1108,7 +1108,7 @@ void EditSound1(void)
 
     p0=4*big2; y0=(12+PosY)*big2;
     for(x=sel_1+p0; x<sel_2+p0+1; x++)
-      for(y=0; y<alto_ventana; y++)
+      for(y=0; y<window_height; y++)
         ptr[x+(y0+y)*v.an]=c3;
   }
   else
@@ -1118,12 +1118,12 @@ void EditSound1(void)
 
     p0=4*big2; y0=(12+PosY)*big2;
     for(x=sel_2+p0; x<sel_1+p0+1; x++)
-      for(y=0; y<alto_ventana; y++)
+      for(y=0; y<window_height; y++)
         ptr[x+(y0+y)*v.an]=c3;
   }
 
-  Ancho = ancho_ventana;
-  Alto  = alto_ventana;
+  Ancho = window_width;
+  Alto  = window_height;
   ptr+=(4+((12+PosY)*v.an))*big2+(Alto/2)*v.an;
 #ifdef MIXER
   buffer=(short *)mypcminfo->SI->abuf;
@@ -1181,7 +1181,7 @@ void EditSound1(void)
 
 void EditSound2(void)
 {
-  int an_v=ancho_ventana/big2, al_v=alto_ventana/big2;
+  int an_v=window_width/big2, al_v=window_height/big2;
   int need_refresh=0;
 
   _process_items();
@@ -1202,7 +1202,7 @@ void EditSound2(void)
     }
     if(mouse_b&2)
     {
-      sel_1=0, sel_2=ancho_ventana-1;
+      sel_1=0, sel_2=window_width-1;
       need_refresh=1;
     }
   }
@@ -1229,8 +1229,8 @@ Mix_HaltChannel(-1);
 void RecSound0(void)
 {
   v.type   = 1;
-  v.title = texto[560];
-  v.name = texto[560];
+  v.title = texts[560];
+  v.name = texts[560];
   v.an     = 200;
   v.al     = 68;
 
@@ -1248,7 +1248,7 @@ void RecSound0(void)
 
   // Flags MIC/CD
   _flag(561,                         3, 20, &RecDevice[0]);
-  _flag(562, 3+11+text_len(texto[561]), 20, &RecDevice[1]);
+  _flag(562, 3+11+text_len(texts[561]), 20, &RecDevice[1]);
 
   // Boton de seleccion de fichero
   _button(121, v.an-12, 17, 0);
@@ -1271,10 +1271,10 @@ void RecSound1(void)
   _show_items();
 
   // Fuente de grabacion
-  wwrite(v.ptr,an,al,3,11,0,texto[565],c3);
+  wwrite(v.ptr,an,al,3,11,0,texts[565],c3);
 
   // Fichero WAV a grabar
-  wwrite(v.ptr,an,al,an-86,11,0,texto[566],c3);
+  wwrite(v.ptr,an,al,an-86,11,0,texts[566],c3);
   _splitpath(SoundFile,drive,dir,fname,ext);
   strcpy(cwork, fname); strcat(cwork, ext);
   wbox(v.ptr, an, al, c12, an-86, 19, 69, 8);
@@ -1283,8 +1283,8 @@ void RecSound1(void)
   // Mensaje de ayuda
   wbox(v.ptr, an, al, c12, 3, 29, an-6, 20);
   wrectangle(v.ptr, an, al,  c0, 3, 29, an-6, 20);
-  wwrite_in_box(v.ptr,an,an-4,al,an/2,31,1,texto[563],c3);
-  wwrite_in_box(v.ptr,an,an-4,al,an/2,40,1,texto[564],c3);
+  wwrite_in_box(v.ptr,an,an-4,al,an/2,31,1,texts[563],c3);
+  wwrite_in_box(v.ptr,an,an-4,al,an/2,40,1,texts[564],c3);
 
 }
 
@@ -1313,7 +1313,7 @@ void RecSound2(void)
     case 4: // Seleccion de fichero
       v_mode=1;
       v_type=7;
-      v_text=(char *)texto[339];
+      v_text=(char *)texts[339];
       show_dialog(browser0);
 
       strcpy(full,tipo[v_type].path);
@@ -1323,7 +1323,7 @@ void RecSound2(void)
       if(v_finished)
       {
         if (v_exists) {
-          v_title=(char *)texto[340]; v_text=input;
+          v_title=(char *)texts[340]; v_text=input;
           show_dialog(aceptar0);
         } else v_accept=1;
         if (v_accept) {
@@ -1369,11 +1369,11 @@ void ModifySound(int option)
   if(sel_1<=sel_2) inicio = sel_1, final = sel_2+1;
   else             inicio = sel_2, final = sel_1+1;
 
-  tam_rel = (float)mypcminfo->SoundSize/(float)ancho_ventana;
+  tam_rel = (float)mypcminfo->SoundSize/(float)window_width;
 
   ini = (float)inicio*tam_rel;
   fin = (float)final*tam_rel;
-  if(final==ancho_ventana) fin=mypcminfo->SoundSize;
+  if(final==window_width) fin=mypcminfo->SoundSize;
 
 	Mix_HaltChannel(-1);
 
@@ -1392,7 +1392,7 @@ void ModifySound(int option)
       Clipboard.SoundData=(short *)malloc(Clipboard.SoundSize*2);
       if(Clipboard.SoundData==NULL)
       {
-        v_text=(char *)texto[45];
+        v_text=(char *)texts[45];
         show_dialog(err0);
         return;
       }
@@ -1411,7 +1411,7 @@ void ModifySound(int option)
       Clipboard.SoundData=(short *)malloc(Clipboard.SoundSize*2);
       if(Clipboard.SoundData==NULL)
       {
-        v_text=(char *)texto[45];
+        v_text=(char *)texts[45];
         show_dialog(err0);
         return;
       }
@@ -1429,7 +1429,7 @@ void ModifySound(int option)
         {
           free(Clipboard.SoundData);
           Clipboard.SoundData=NULL;
-          v_text=(char *)texto[45];
+          v_text=(char *)texts[45];
           show_dialog(err0);
           return;
         }
@@ -1445,7 +1445,7 @@ void ModifySound(int option)
           free(pcminfo_bak.SoundData);
           free(Clipboard.SoundData);
           Clipboard.SoundData=NULL;
-          v_text=(char *)texto[45];
+          v_text=(char *)texts[45];
           show_dialog(err0);
           return;
         }
@@ -1458,7 +1458,7 @@ void ModifySound(int option)
           free(pcminfo_bak.SoundData);
           free(Clipboard.SoundData);
           Clipboard.SoundData=NULL;
-          v_text=(char *)texto[45];
+          v_text=(char *)texts[45];
           show_dialog(err0);
           return;
         }
@@ -1494,7 +1494,7 @@ void ModifySound(int option)
         pos_f  = 0;
         if((short_ptr=(short *)malloc(length*2))==NULL)
         {
-          v_text=(char *)texto[45];
+          v_text=(char *)texts[45];
           show_dialog(err0);
           return;
         }
@@ -1507,7 +1507,7 @@ void ModifySound(int option)
 
       if((pcminfo_bak.SoundData=(short *)malloc((mypcminfo->SoundSize+length)*2))==NULL)
       {
-        v_text=(char *)texto[45];
+        v_text=(char *)texts[45];
         show_dialog(err0);
         return;
       }
@@ -1523,7 +1523,7 @@ void ModifySound(int option)
       if( (FileBuffer=SaveSoundMem(&pcminfo_bak))==NULL )
       {
         free(pcminfo_bak.SoundData);
-        v_text=(char *)texto[45];
+        v_text=(char *)texts[45];
         show_dialog(err0);
         return;
       }
@@ -1534,7 +1534,7 @@ void ModifySound(int option)
       if(SI==NULL)
       {
         if(FileBuffer) free(FileBuffer);
-        v_text=(char *)texto[45];
+        v_text=(char *)texts[45];
         show_dialog(err0);
         return;
       }
@@ -1648,7 +1648,7 @@ void ChangeSoundFreq(int freq)
   pos_f  = 0;
   if((short_ptr=(short *)malloc(length*2))==NULL)
   {
-    v_text=(char *)texto[45];
+    v_text=(char *)texts[45];
     show_dialog(err0);
     return;
   }
@@ -1666,7 +1666,7 @@ void ChangeSoundFreq(int freq)
   if( (FileBuffer=SaveSoundMem(&pcminfo_bak))==NULL )
   {
     free(short_ptr);
-    v_text=(char *)texto[45];
+    v_text=(char *)texts[45];
     show_dialog(err0);
     return;
   }
@@ -1681,7 +1681,7 @@ void ChangeSoundFreq(int freq)
     {
       free(FileBuffer);
       free(short_ptr);
-      v_text=(char *)texto[45];
+      v_text=(char *)texts[45];
       show_dialog(err0);
       return;
     }
@@ -1722,7 +1722,7 @@ debugprintf("SoundFile to record: %s\n",SoundFile);
 
   if((f=fopen(SoundFile,"wb"))==NULL)
   {
-    v_text=(char *)texto[43];
+    v_text=(char *)texts[43];
     show_dialog(err0);
     return;
   }
@@ -1737,7 +1737,7 @@ debugprintf("SoundFile to record: %s\n",SoundFile);
   {
     fclose(f);
     DaniDel(SoundFile);
-    v_text=(char *)texto[47];
+    v_text=(char *)texts[47];
     show_dialog(err0);
     return;
   }
@@ -1771,7 +1771,7 @@ debugprintf("SoundFile to record: %s\n",SoundFile);
   {
     fclose(f);
     DaniDel(SoundFile);
-    v_text=(char *)texto[47];
+    v_text=(char *)texts[47];
     show_dialog(err0);
     return;
   }
@@ -1785,7 +1785,7 @@ debugprintf("SoundFile to record: %s\n",SoundFile);
   {
     fclose(f);
     DaniDel(SoundFile);
-    v_text=(char *)texto[47];
+    v_text=(char *)texts[47];
     show_dialog(err0);
     return;
   }
@@ -1840,7 +1840,7 @@ void PollRecord(void)
   int  length;
 
   if((f=fopen(SoundFile,"ab"))==NULL) {
-    v_text=(char *)texto[47];  // TODO: Use a more specific error message for sound recording failure
+    v_text=(char *)texts[47];  // TODO: Use a more specific error message for sound recording failure
     show_dialog(err0);
 #ifdef NOTYET
     spkoff();
@@ -1873,7 +1873,7 @@ void PollRecord(void)
   fclose(f);
   if((f=fopen(SoundFile,"rb+"))==NULL)
   {
-    v_text=(char *)texto[47];  // TODO: Use a more specific error message for sound file reopen failure
+    v_text=(char *)texts[47];  // TODO: Use a more specific error message for sound file reopen failure
     show_dialog(err0);
 #ifdef NOTYET
     spkoff();
@@ -1909,19 +1909,19 @@ int JudasProgressRead(int handle, void *buffer, int size)
   {
     if (read(handle, &byte_ptr[con*4096], 4096) != 4096)
     {
-      Progress((char *)texto[559], pasos, pasos);
+      Progress((char *)texts[559], pasos, pasos);
       return(0);
     }
-    Progress((char *)texto[559], con, pasos);
+    Progress((char *)texts[559], con, pasos);
   }
   if(resto)
   {
     if (read(handle, &byte_ptr[con*4096], resto) != resto)
     {
-      Progress((char *)texto[559], pasos, pasos);
+      Progress((char *)texts[559], pasos, pasos);
       return(0);
     }
-    Progress((char *)texto[559], pasos, pasos);
+    Progress((char *)texts[559], pasos, pasos);
   }
   return(1);
 }
@@ -1940,20 +1940,20 @@ void CopyNewSound(pcminfo *mypcminfo, int ini, int fin)
 
   if(NumSND>99)
   {
-    v_text=(char *)texto[574];
+    v_text=(char *)texts[574];
     show_dialog(err0);
     return;
   }
 
   if((SoundData=(short *)malloc(SoundBytes))==NULL)
   {
-    v_text=(char *)texto[45];
+    v_text=(char *)texts[45];
     show_dialog(err0);
     return;
   }
   memcpy(SoundData, mypcminfo->SoundData+ini, SoundBytes);
 
-  strcpy(DesktopSND[NumSND].name, (char *)texto[137]);
+  strcpy(DesktopSND[NumSND].name, (char *)texts[137]);
   strcat(DesktopSND[NumSND].name, itoa((ConSND), aux, 10));
   DesktopSND[NumSND].SoundFreq=mypcminfo->SoundFreq;
   DesktopSND[NumSND].SoundBits=mypcminfo->SoundBits;
@@ -1973,7 +1973,7 @@ void PasteNewSounds(void)
   {
     if((pcminfo_aux=(byte *)malloc(sizeof(pcminfo)))==NULL)
     {
-      v_text=(char *)texto[45];
+      v_text=(char *)texts[45];
       show_dialog(err0);
       continue;
     }
@@ -1988,7 +1988,7 @@ void PasteNewSounds(void)
     {
       free(DesktopSND[con].SoundData);
       free(pcminfo_aux);
-      v_text=(char *)texto[46];
+      v_text=(char *)texts[46];
       show_dialog(err0);
       continue;
     }
@@ -2004,7 +2004,7 @@ void PasteNewSounds(void)
         free(FileBuffer);
         free(DesktopSND[con].SoundData);
         free(pcminfo_aux);
-        v_text=(char *)texto[46];
+        v_text=(char *)texts[46];
         show_dialog(err0);
         continue;
       }
@@ -2039,7 +2039,7 @@ byte *SaveSoundMem(pcminfo *mypcminfo)
 
   if((FileBuffer=(byte *)malloc(length+44))==NULL)
   {
-    v_text=(char *)texto[45];
+    v_text=(char *)texts[45];
     show_dialog(err0);
     return(NULL);
   }

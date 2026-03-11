@@ -5,7 +5,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-int nueva_ventana_carga(voidReturnType init_handler,int nx,int ny);
+int create_saved_window(voidReturnType init_handler,int nx,int ny);
 int nuevo_mapa_carga(int nx,int ny,char *nombre,byte *mapilla);
 void carga_programa0(void);
 void carga_Fonts0(void);
@@ -86,32 +86,32 @@ modinfo *mymodinfo;
         // Check and save each used window one by one
         for(x=max_windows-1;x>=0;x--)
         {
-                if(ventana[x].type!=0 && ventana[x].title)
+                if(window[x].type!=0 && window[x].title)
                 {
                         numvent++;
-                        n=fwrite(&ventana[x],1,sizeof(struct tventana),desktop);
-                        switch(ventana[x].type)
+                        n=fwrite(&window[x],1,sizeof(struct twindow),desktop);
+                        switch(window[x].type)
                         {
                                 //Window struct
                                 case    2: //menu
                                         iWork=-1;
-                                        if(ventana[x].paint_handler==menu_principal1)
+                                        if(window[x].paint_handler==menu_principal1)
                                                         iWork=0;
-                                        if(ventana[x].paint_handler==menu_programas1)
+                                        if(window[x].paint_handler==menu_programas1)
                                                         iWork=1;
-                                        if(ventana[x].paint_handler==menu_paletas1)
+                                        if(window[x].paint_handler==menu_paletas1)
                                                         iWork=2;
-                                        if(ventana[x].paint_handler==menu_mapas1)
+                                        if(window[x].paint_handler==menu_mapas1)
                                                         iWork=3;
-                                        if(ventana[x].paint_handler==menu_graficos1)
+                                        if(window[x].paint_handler==menu_graficos1)
                                                         iWork=4;
-                                        if(ventana[x].paint_handler==menu_fuentes1)
+                                        if(window[x].paint_handler==menu_fuentes1)
                                                         iWork=5;
-                                        if(ventana[x].paint_handler==menu_sonidos1)
+                                        if(window[x].paint_handler==menu_sonidos1)
                                                         iWork=6;
-                                        if(ventana[x].paint_handler==menu_sistema1)
+                                        if(window[x].paint_handler==menu_sistema1)
                                                         iWork=7;
-                                        if(ventana[x].paint_handler==menu_edicion1)
+                                        if(window[x].paint_handler==menu_edicion1)
                                                         iWork=8;
                                         // menu_mapas3D1 check removed (MODE8/3D map editor deleted)
                                         n=fwrite(&iWork,1,4,desktop);
@@ -120,7 +120,7 @@ modinfo *mymodinfo;
                                 case    3: //palet
                                         break;
                                 case    4: //timer
-                                        if(ventana[x].paint_handler==Clock1)
+                                        if(window[x].paint_handler==Clock1)
                                                 iWork=1;
                                         n=fwrite(&iWork,1,4,desktop);
                                         break;
@@ -130,40 +130,40 @@ modinfo *mymodinfo;
                                         break;
                                 case    100: //map
                                         // tmapa struct
-                                        man=ventana[x].mapa->map_width;
-                                        mal=ventana[x].mapa->map_height;
-                                        n=fwrite(ventana[x].mapa,1,sizeof(struct tmapa),desktop);
+                                        man=window[x].mapa->map_width;
+                                        mal=window[x].mapa->map_height;
+                                        n=fwrite(window[x].mapa,1,sizeof(struct tmapa),desktop);
                                         // Graphic data
-                                        n=fwrite((char *)ventana[x].mapa->map,man*mal,1,desktop);
+                                        n=fwrite((char *)window[x].mapa->map,man*mal,1,desktop);
                                         break;
                                 case    101: //fpg
                                         // FPG struct
-                                        n=fwrite(ventana[x].aux,1,sizeof(FPG),desktop);
+                                        n=fwrite(window[x].aux,1,sizeof(FPG),desktop);
                                         break;
                                 case    102: //prg
-                                        if(ventana[x].prg!=NULL)
+                                        if(window[x].prg!=NULL)
                                         {
                                                 iWork=0;
                                                 n=fwrite(&iWork,1,4,desktop);
-                                                n=fwrite(ventana[x].prg,1,sizeof(struct tprg),desktop);
-                                                n=fwrite(ventana[x].prg->buffer,1,ventana[x].prg->buffer_len,desktop);
-                                                iWork=(uintptr_t)ventana[x].prg->lptr-(uintptr_t)ventana[x].prg->buffer;
+                                                n=fwrite(window[x].prg,1,sizeof(struct tprg),desktop);
+                                                n=fwrite(window[x].prg->buffer,1,window[x].prg->buffer_len,desktop);
+                                                iWork=(uintptr_t)window[x].prg->lptr-(uintptr_t)window[x].prg->buffer;
                                                 n=fwrite(&iWork,1,4,desktop);
-                                                iWork=(uintptr_t)ventana[x].prg->vptr-(uintptr_t)ventana[x].prg->buffer;
+                                                iWork=(uintptr_t)window[x].prg->vptr-(uintptr_t)window[x].prg->buffer;
                                                 n=fwrite(&iWork,1,4,desktop);
                                         }
                                         else
                                         {
-                                                //if(ventana[x].aux!=NULL)
-                                                if (!strcmp((char *)ventana[x].name,(char *)texto[83])) {
+                                                //if(window[x].aux!=NULL)
+                                                if (!strcmp((char *)window[x].name,(char *)texts[83])) {
                                                         iWork=1;
                                                         n=fwrite(&iWork,1,4,desktop);
                                                         iWork=Save_Font_session(desktop,iWork);
-                                                } else if (!strcmp((char *)ventana[x].name,(char *)texto[413])) {
+                                                } else if (!strcmp((char *)window[x].name,(char *)texts[413])) {
                                                   iWork=3;
                                                   n=fwrite(&iWork,1,4,desktop);
-                                                  strcpy(((struct _calc*)(ventana[x].aux))->ctext,((struct _calc*)(ventana[x].aux))->cget);
-                                                  n=fwrite(ventana[x].aux,1,sizeof(struct _calc),desktop);
+                                                  strcpy(((struct _calc*)(window[x].aux))->ctext,((struct _calc*)(window[x].aux))->cget);
+                                                  n=fwrite(window[x].aux,1,sizeof(struct _calc),desktop);
                                                 } else {
                                                         iWork=2;
                                                         n=fwrite(&iWork,1,4,desktop);
@@ -175,23 +175,23 @@ modinfo *mymodinfo;
                                         break;
                                 case    104: //fnt
                                         // Save to file
-                                        n=fwrite(ventana[x].aux,1,14,desktop);
-                                        n=fwrite(ventana[x].aux+14,1,_MAX_PATH-14,desktop);
+                                        n=fwrite(window[x].aux,1,14,desktop);
+                                        n=fwrite(window[x].aux+14,1,_MAX_PATH-14,desktop);
                                         break;
                                  case    105: //pcm
-                                        mypcminfo=(pcminfo *)ventana[x].aux;
+                                        mypcminfo=(pcminfo *)window[x].aux;
                                         SaveDesktopSound(mypcminfo, desktop);
                                         break;
                                  // case 106 (map3d) removed (MODE8/3D map editor deleted)
                                  case    107: //mod
-                                        mymodinfo=(modinfo *)ventana[x].aux;
+                                        mymodinfo=(modinfo *)window[x].aux;
                                         n=fwrite(mymodinfo->name,1,14,desktop);
                                         n=fwrite(mymodinfo->pathname,1,256,desktop);
                                         break;
                         }
                 }
-			if(ventana[x].ptr!=NULL)
-				free(ventana[x].ptr);
+			if(window[x].ptr!=NULL)
+				free(window[x].ptr);
         }
         fseek(desktop,0,SEEK_SET);
         fseek(desktop,8+4,SEEK_SET);
@@ -229,7 +229,7 @@ int iWork;
 return(1);
 }
 
-struct tventana ventana_aux;
+struct twindow window_aux;
 struct tmapa    maux;
 FPG             faux;
 struct tprg     paux;
@@ -254,39 +254,39 @@ int UpLoad_Desktop()
         for(x=0;x<numvent;x++)
         {
                 // Window struct data
-                fread(&ventana_aux,1,sizeof(struct tventana),desktop);
-                switch(ventana_aux.type)
+                fread(&window_aux,1,sizeof(struct twindow),desktop);
+                switch(window_aux.type)
                 {
                         case    2: //menu
                                 fread(&iWork,1,4,desktop);
                                 switch(iWork)
                                 {
                                         case    0:
-                                                nueva_ventana_carga(menu_principal0,ventana_aux.x,ventana_aux.y);
+                                                create_saved_window(menu_principal0,window_aux.x,window_aux.y);
                                                 break;
                                         case    1:
-                                                nueva_ventana_carga(menu_programas0,ventana_aux.x,ventana_aux.y);
+                                                create_saved_window(menu_programas0,window_aux.x,window_aux.y);
                                                 break;
                                         case    2:
-                                                nueva_ventana_carga(menu_paletas0,ventana_aux.x,ventana_aux.y);
+                                                create_saved_window(menu_paletas0,window_aux.x,window_aux.y);
                                                 break;
                                         case    3:
-                                                nueva_ventana_carga(menu_mapas0,ventana_aux.x,ventana_aux.y);
+                                                create_saved_window(menu_mapas0,window_aux.x,window_aux.y);
                                                 break;
                                         case    4:
-                                                nueva_ventana_carga(menu_graficos0,ventana_aux.x,ventana_aux.y);
+                                                create_saved_window(menu_graficos0,window_aux.x,window_aux.y);
                                                 break;
                                         case    5:
-                                                nueva_ventana_carga(menu_fuentes0,ventana_aux.x,ventana_aux.y);
+                                                create_saved_window(menu_fuentes0,window_aux.x,window_aux.y);
                                                 break;
                                         case    6:
-                                                nueva_ventana_carga(menu_sonidos0,ventana_aux.x,ventana_aux.y);
+                                                create_saved_window(menu_sonidos0,window_aux.x,window_aux.y);
                                                 break;
                                         case    7:
-                                                nueva_ventana_carga(menu_sistema0,ventana_aux.x,ventana_aux.y);
+                                                create_saved_window(menu_sistema0,window_aux.x,window_aux.y);
                                                 break;
                                         case    8:
-                                                nueva_ventana_carga(menu_edicion0,ventana_aux.x,ventana_aux.y);
+                                                create_saved_window(menu_edicion0,window_aux.x,window_aux.y);
                                                 break;
                                         // case 9 (menu_mapas3D0) removed (MODE8/3D map editor deleted)
                                         default:
@@ -296,7 +296,7 @@ int UpLoad_Desktop()
                                         update_box(0,0,vga_width,vga_height);
                                 break;
                         case    3:
-                                nueva_ventana_carga(paleta0,ventana_aux.x,ventana_aux.y);
+                                create_saved_window(paleta0,window_aux.x,window_aux.y);
                                 if(!interpreting)
                                         update_box(0,0,vga_width,vga_height);
                                 break;
@@ -307,19 +307,19 @@ int UpLoad_Desktop()
                                         case 0: break; // removed: CD player
                                                 break;
                                         case 1: //Clock
-                                                nueva_ventana_carga(Clock0,ventana_aux.x,ventana_aux.y);
+                                                create_saved_window(Clock0,window_aux.x,window_aux.y);
                                                 break;
                                 }
                                 if(!interpreting)
                                         update_box(0,0,vga_width,vga_height);
                                 break;
                         case    5: //recycle bin
-                                nueva_ventana_carga(Bin0,ventana_aux.x,ventana_aux.y);
+                                create_saved_window(Bin0,window_aux.x,window_aux.y);
                                 if(!interpreting)
                                         update_box(0,0,vga_width,vga_height);
                                 break;
                         case    8: //mixer
-                                nueva_ventana_carga(mixer0,ventana_aux.x,ventana_aux.y);
+                                create_saved_window(mixer0,window_aux.x,window_aux.y);
                                 if(!interpreting)
                                         update_box(0,0,vga_width,vga_height);
                                 break;
@@ -335,7 +335,7 @@ int UpLoad_Desktop()
                                 fread(baux,maux.map_width,maux.map_height,desktop);
                                 map_width=maux.map_width;
                                 map_height=maux.map_height;
-                                if (nuevo_mapa_carga(ventana_aux.x,ventana_aux.y,maux.filename,(byte *)baux)) {
+                                if (nuevo_mapa_carga(window_aux.x,window_aux.y,maux.filename,(byte *)baux)) {
                                   free(baux);
                                   if(!interpreting) update_box(0,0,vga_width,vga_height);
                                   break;
@@ -355,7 +355,7 @@ int UpLoad_Desktop()
                                 memcpy((char *)v.mapa->puntos,(char *)maux.puntos,512*2);
                                 // Graphic data
                                 call((voidReturnType )v.paint_handler);
-                                wvolcado(copia,vga_width,vga_height,v.ptr,v.x,v.y,v.an,v.al,0);
+                                wvolcado(screen_buffer,vga_width,vga_height,v.ptr,v.x,v.y,v.an,v.al,0);
                                 if(!interpreting)
                                         update_box(0,0,vga_width,vga_height);
                                 break;
@@ -369,8 +369,8 @@ int UpLoad_Desktop()
                                   v_aux=(byte *)malloc(sizeof(FPG));
                                   if(v_aux!=NULL) {
                                     memcpy(v_aux,&faux,sizeof(FPG));
-                                    nueva_ventana_carga(FPG0A,ventana_aux.x,ventana_aux.y);
-                                    wvolcado(copia,vga_width,vga_height,v.ptr,v.x,v.y,v.an,v.al,0);
+                                    create_saved_window(FPG0A,window_aux.x,window_aux.y);
+                                    wvolcado(screen_buffer,vga_width,vga_height,v.ptr,v.x,v.y,v.an,v.al,0);
                                     if(!interpreting) update_box(0,0,vga_width,vga_height);
                                   }
                                 }
@@ -390,9 +390,9 @@ int UpLoad_Desktop()
                                                 fread(&iWork,1,4,desktop);
                                                 v_prg->vptr=v_prg->buffer+iWork;
 
-                                                nueva_ventana_carga(carga_programa0,ventana_aux.x,ventana_aux.y);
+                                                create_saved_window(carga_programa0,window_aux.x,window_aux.y);
 
-                                                wvolcado(copia,vga_width,vga_height,v.ptr,v.x,v.y,v.an,v.al,0);
+                                                wvolcado(screen_buffer,vga_width,vga_height,v.ptr,v.x,v.y,v.an,v.al,0);
                                                 if(!interpreting)
                                                         update_box(0,0,vga_width,vga_height);
                                         }                                        
@@ -423,7 +423,7 @@ int UpLoad_Desktop()
                                 else
                                 {
                                         if(iWork==1)
-                                                nueva_ventana_carga(carga_Fonts0,ventana_aux.x,ventana_aux.y);
+                                                create_saved_window(carga_Fonts0,window_aux.x,window_aux.y);
                                         else
                                         {
                                                 if(iWork==2)
@@ -431,7 +431,7 @@ int UpLoad_Desktop()
                                                         fread(&iWork,1,4,desktop);
                                                         fread(&iWork2,1,4,desktop);
                                                         fread(&iWork3,1,4,desktop);
-                                                        carga_help(iWork,iWork2,iWork3,ventana_aux.x,ventana_aux.y);
+                                                        carga_help(iWork,iWork2,iWork3,window_aux.x,window_aux.y);
                                                 }
                                                 else
                                                 {
@@ -440,12 +440,12 @@ int UpLoad_Desktop()
                                                         pcalc=NULL;
                                                         if (readcalc!=NULL) {
                                                           fread(readcalc,1,sizeof(struct _calc),desktop);
-                                                          nueva_ventana_carga(calc0,ventana_aux.x,ventana_aux.y);
+                                                          create_saved_window(calc0,window_aux.x,window_aux.y);
                                                         } else {
                                                           fseek(desktop,sizeof(struct _calc),SEEK_CUR);
                                                         }
                                                   } else {
-                                                        v_text=(char *)texto[45];
+                                                        v_text=(char *)texts[45];
                                                         show_dialog(err0);
                                                   }
                                                 }
@@ -462,8 +462,8 @@ int UpLoad_Desktop()
 								
                                 if ((f=fopen(Load_FontPathName,"rb"))!=NULL) {
                                   fclose(f);
-                                  nueva_ventana_carga(ShowFont0,ventana_aux.x,ventana_aux.y);
-                                  wvolcado(copia,vga_width,vga_height,v.ptr,v.x,v.y,v.an,v.al,0);
+                                  create_saved_window(ShowFont0,window_aux.x,window_aux.y);
+                                  wvolcado(screen_buffer,vga_width,vga_height,v.ptr,v.x,v.y,v.an,v.al,0);
                                   if(!interpreting) update_box(0,0,vga_width,vga_height);
                                 }
                                 break;
@@ -492,7 +492,7 @@ return(1);
 //      Load new window (1 on Error)
 //-----------------------------------------------------------------------------
 
-int nueva_ventana_carga(voidReturnType init_handler,int nx,int ny)
+int create_saved_window(voidReturnType init_handler,int nx,int ny)
 {
 
 	  byte * ptr;
@@ -501,7 +501,7 @@ int nueva_ventana_carga(voidReturnType init_handler,int nx,int ny)
 
 	uint32_t colorkey=0;
 
-  if (!ventana[max_windows-1].type) {
+  if (!window[max_windows-1].type) {
     addwindow();
 
     //---------------------------------------------------------------------------
@@ -539,7 +539,7 @@ int nueva_ventana_carga(voidReturnType init_handler,int nx,int ny)
     // Window placement algorithm ...
     //---------------------------------------------------------------------------
 
-    if(!VidModeChanged) { x=nx; y=ny; } else place_window(v.lado*2+1,&x,&y,an,al);
+    if(!VidModeChanged) { x=nx; y=ny; } else place_window(v.side*2+1,&x,&y,an,al);
 
     v.x=x; v.y=y;
 
@@ -548,17 +548,17 @@ int nueva_ventana_carga(voidReturnType init_handler,int nx,int ny)
     //---------------------------------------------------------------------------
 
     if(VidModeChanged) {
-      if (v.type>=100 && ventana_aux.foreground!=2) {
+      if (v.type>=100 && window_aux.foreground!=2) {
         v.state=1; // Activate it
-        for (m=1;m<max_windows;m++) if (ventana[m].type==v.type && ventana[m].state) {
-          ventana[m].state=0;
-          wgra(ventana[m].ptr,ventana[m].an/big2,ventana[m].al/big2,c1,2,2,ventana[m].an/big2-20,7);
-          if (text_len(ventana[m].title)+3>ventana[m].an/big2-20) {
-            wwrite_in_box(ventana[m].ptr,ventana[m].an/big2,ventana[m].an/big2-19,ventana[m].al/big2,4,2,0,ventana[m].title,c0);
-            wwrite_in_box(ventana[m].ptr,ventana[m].an/big2,ventana[m].an/big2-19,ventana[m].al/big2,3,2,0,ventana[m].title,c2);
+        for (m=1;m<max_windows;m++) if (window[m].type==v.type && window[m].state) {
+          window[m].state=0;
+          wgra(window[m].ptr,window[m].an/big2,window[m].al/big2,c1,2,2,window[m].an/big2-20,7);
+          if (text_len(window[m].title)+3>window[m].an/big2-20) {
+            wwrite_in_box(window[m].ptr,window[m].an/big2,window[m].an/big2-19,window[m].al/big2,4,2,0,window[m].title,c0);
+            wwrite_in_box(window[m].ptr,window[m].an/big2,window[m].an/big2-19,window[m].al/big2,3,2,0,window[m].title,c2);
           } else {
-            wwrite(ventana[m].ptr,ventana[m].an/big2,ventana[m].al/big2,2+(ventana[m].an/big2-20)/2,3,1,ventana[m].title,c0);
-            wwrite(ventana[m].ptr,ventana[m].an/big2,ventana[m].al/big2,2+(ventana[m].an/big2-20)/2,2,1,ventana[m].title,c2);
+            wwrite(window[m].ptr,window[m].an/big2,window[m].al/big2,2+(window[m].an/big2-20)/2,3,1,window[m].title,c0);
+            wwrite(window[m].ptr,window[m].an/big2,window[m].al/big2,2+(window[m].an/big2-20)/2,2,1,window[m].title,c2);
           }
           vtipo=v.type; v.type=0; flush_window(m); v.type=vtipo;
           break;
@@ -577,22 +577,22 @@ int nueva_ventana_carga(voidReturnType init_handler,int nx,int ny)
         vtipo=v.type; v.type=0;
 
         if(!VidModeChanged) {
-          swap(v.an,ventana_aux.an);
-          swap(v.al,ventana_aux.al);
+          swap(v.an,window_aux.an);
+          swap(v.al,window_aux.al);
           for (n=1;n<max_windows;n++) {
-            if (ventana[n].type && ventana[n].foreground==1) {
+            if (window[n].type && window[n].foreground==1) {
               if (windows_collide(0,n)) {
-                ventana[n].foreground=0; flush_window(n);
+                window[n].foreground=0; flush_window(n);
               }
             }
           }
-          swap(v.an,ventana_aux.an);
-          swap(v.al,ventana_aux.al);
+          swap(v.an,window_aux.an);
+          swap(v.al,window_aux.al);
         } else  {
           for (n=1;n<max_windows;n++) {
-            if (ventana[n].type && ventana[n].foreground==1) {
+            if (window[n].type && window[n].foreground==1) {
               if (windows_collide(0,n)) {
-                ventana[n].foreground=0; flush_window(n);
+                window[n].foreground=0; flush_window(n);
               }
             }
           }
@@ -626,14 +626,14 @@ int nueva_ventana_carga(voidReturnType init_handler,int nx,int ny)
       call((voidReturnType )v.paint_handler);
 
       if(!VidModeChanged) {
-        v.foreground=ventana_aux.foreground;
-        v.state=ventana_aux.state;
-        v.an=ventana_aux.an;
-        v.al=ventana_aux.al;
-        v._x=ventana_aux._x;
-        v._y=ventana_aux._y;
-        v._an=ventana_aux._an;
-        v._al=ventana_aux._al;
+        v.foreground=window_aux.foreground;
+        v.state=window_aux.state;
+        v.an=window_aux.an;
+        v.al=window_aux.al;
+        v._x=window_aux._x;
+        v._y=window_aux._y;
+        v._an=window_aux._an;
+        v._al=window_aux._al;
       }
 
       if (v.type>=100 && v.state==0) {
@@ -663,8 +663,8 @@ int nueva_ventana_carga(voidReturnType init_handler,int nx,int ny)
 
       if (v.foreground!=2) {
         if (v.foreground==1)
-          wvolcado(copia,vga_width,vga_height,ptr,x,y,an,al,0);
-        else wvolcado_oscuro(copia,vga_width,vga_height,ptr,x,y,an,al,0);
+          wvolcado(screen_buffer,vga_width,vga_height,ptr,x,y,an,al,0);
+        else wvolcado_oscuro(screen_buffer,vga_width,vga_height,ptr,x,y,an,al,0);
         blit_partial(x,y,an,al);
       } else {
         flush_window(0);
@@ -708,11 +708,11 @@ int nuevo_mapa_carga(int nx,int ny,char *nombre,byte *mapilla)
     v_map->fpg_code=0;
     v_map->description[0]=0;
     for (n=0;n<512;n++) v_map->puntos[n]=-1;
-    nueva_ventana_carga(mapa0,nx,ny);
+    create_saved_window(mapa0,nx,ny);
 
     return(0);
 
-  } else { v_text=(char *)texto[45]; show_dialog(err0); }
+  } else { v_text=(char *)texts[45]; show_dialog(err0); }
 
   return(1);
 }
@@ -737,13 +737,13 @@ void carga_programa0(void)
   if (v.an>vga_width) {
     v.prg->an=(vga_width-12*big2)/editor_font_width; // Calculate maximized size (in chars)
     v.an=(4+8)*big2+editor_font_width*v.prg->an;
-    ventana_aux.an=v.an;
+    window_aux.an=v.an;
   }
 
   if (v.al>vga_height) {
     v.prg->al=(vga_height-28*big2)/editor_font_height;
     v.al=(12+16)*big2+editor_font_height*v.prg->al;
-    ventana_aux.al=v.al;
+    window_aux.al=v.al;
   }
 
   if (big)
@@ -802,7 +802,7 @@ void carga_help(int n,int helpal,int helpline,int x1,int x2)
 
           help_l=0;
           tabula_help(p+1,help_buffer,helpidx[n*2+1]-(p+1-h_buffer));
-          nueva_ventana_carga(help0,x1,x2);
+          create_saved_window(help0,x1,x2);
 
           for (n=0;n<helpline;n++) {
             if (help_l+help_al<help_lines) { while (*(help_line++)); help_l++; }

@@ -239,14 +239,14 @@ void libera_drag(void) {
 	int n;
 	dragging=0;
 	for (n=0;n<max_windows;n++) {
-		if (ventana[n].type && ventana[n].order==drag_source) 
+		if (window[n].type && window[n].order==drag_source) 
 			break;
 	}
 	
-	if (n<max_windows && ventana[n].type==101 && ventana[n].mapa!=NULL) {
-		free(ventana[n].mapa->map);
-		free(ventana[n].mapa);
-		ventana[n].mapa=NULL;
+	if (n<max_windows && window[n].type==101 && window[n].mapa!=NULL) {
+		free(window[n].mapa->map);
+		free(window[n].mapa);
+		window[n].mapa=NULL;
 
 		if (n) {
 			wup(n);
@@ -258,7 +258,7 @@ void libera_drag(void) {
 			wdown(n);
 		}
 
-		if(draw_mode>=100) { flush_window(n); } ventana[n].redraw=0;
+		if(draw_mode>=100) { flush_window(n); } window[n].redraw=0;
 	}
 }
 
@@ -541,9 +541,9 @@ while(SDL_PollEvent(&event) )
 		VS_HEIGHT=vga_height;
 
 
-		if(copia) {
-			free(copia-6);
-			copia=NULL;
+		if(screen_buffer) {
+			free(screen_buffer-6);
+			screen_buffer=NULL;
 		}
 		if(toolbar) {
 			free(toolbar);
@@ -554,33 +554,33 @@ while(SDL_PollEvent(&event) )
 		if (!toolbar) return;
 		toolbar_x=8*big2; toolbar_y=vga_height-27*big2; gradient=0; current_mouse=21; sel_status=0;
 
-		copia=(byte*)malloc(vga_width*vga_height+6)+6;
+		screen_buffer=(byte*)malloc(vga_width*vga_height+6)+6;
 		setup_video_mode();
 		prepare_wallpaper();
 	
-		if(strcmp((char *)v.title, (char *)texto[35])) {
+		if(strcmp((char *)v.title, (char *)texts[35])) {
 
 		for(n=max_windows;n>=0;n--) {
-			if(ventana[n].type) {
+			if(window[n].type) {
 
-				if (ventana[n].x+ventana[n].an>vga_width) 
-					ventana[n].x=vga_width-ventana[n].an;
+				if (window[n].x+window[n].an>vga_width) 
+					window[n].x=vga_width-window[n].an;
 		
 		
-				if (ventana[n].y+ventana[n].al>vga_height) 
-					ventana[n].y=vga_height-ventana[n].al;
+				if (window[n].y+window[n].al>vga_height) 
+					window[n].y=vga_height-window[n].al;
 
 	
-				if(ventana[n].x<=0)
-					ventana[n].y=0;
+				if(window[n].x<=0)
+					window[n].y=0;
 	
-				if(ventana[n].y<=0)
-					ventana[n].y=0;
+				if(window[n].y<=0)
+					window[n].y=0;
 	
 		//	printf("n=%d\n",n);
 
-			if (collides_with(n,ventana[n].x,ventana[n].y,ventana[n].an,ventana[n].al))	
-				place_window(1,&ventana[n].x,&ventana[n].y,ventana[n].an,ventana[n].al);		
+			if (collides_with(n,window[n].x,window[n].y,window[n].an,window[n].al))	
+				place_window(1,&window[n].x,&window[n].y,window[n].an,window[n].al);		
 
 			}
 		}	
@@ -588,7 +588,7 @@ while(SDL_PollEvent(&event) )
 		}
 		update_box(0,0,vga_width,vga_height);
 //		full_redraw=1;
-		blit_screen(copia);
+		blit_screen(screen_buffer);
 		InitSound();
 		soundstopped=0;
 	}

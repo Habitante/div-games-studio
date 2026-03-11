@@ -1,14 +1,14 @@
 
 //-----------------------------------------------------------------------------
-//      Módulo para la gestión de textos (lenguaje.div) y de encriptación
+//      Módulo para la gestión de lang_buffer (lenguaje.div) y de encriptación
 //-----------------------------------------------------------------------------
 
 #include "global.h"
 
-byte * textos;
-byte * fin_textos;
+byte * lang_buffer;
+byte * lang_buffer_end;
 
-int numero=0; // Número de texto
+int numero=0; // Número de texts
 byte *p,*q; // Punteros de lectura y escritura respectivamente.
 
 
@@ -23,7 +23,7 @@ void analyze_comment(void);
 
 
 //-----------------------------------------------------------------------------
-//      Inicializa el sistema de textos
+//      Inicializa el sistema de lang_buffer
 //-----------------------------------------------------------------------------
 
 void initialize_texts(byte * fichero) {
@@ -31,34 +31,34 @@ void initialize_texts(byte * fichero) {
   FILE * f;
   int n;
 
-  memset(texto,0,max_textos*4);
+  memset(texts,0,max_texts*4);
 
   if ((f=fopen((char *)fichero,"rb"))!=NULL) {
     fseek(f,0,SEEK_END); n=ftell(f);
-    if ((textos=(byte *)malloc(n))!=NULL) {
+    if ((lang_buffer=(byte *)malloc(n))!=NULL) {
       fseek(f,0,SEEK_SET);
-      n=fread(textos,1,n,f);
+      n=fread(lang_buffer,1,n,f);
       fclose(f);
-      fin_textos=textos+n;
+      lang_buffer_end=lang_buffer+n;
       analyze_texts();
     } else fclose(f);
   }
 }
 
 //-----------------------------------------------------------------------------
-//      Función de análisis de los textos
+//      Función de análisis de los lang_buffer
 //-----------------------------------------------------------------------------
 
 void analyze_texts(void) {
 
-  q=p=textos;
+  q=p=lang_buffer;
 
   if (!strcmp((char *)p,"Zk!")) {
     p+=4;
-    coder(p,fin_textos-textos-4,"lave");
+    coder(p,lang_buffer_end-lang_buffer-4,"lave");
   }
 
-  while(p<fin_textos)
+  while(p<lang_buffer_end)
     if (*p>='0' && *p<='9') analyze_number();
     else if (*p=='"') analyze_text();
     else if (*p=='#') analyze_comment();
@@ -69,19 +69,19 @@ void analyze_number(void) {
 
   numero=0; do {
     numero=numero*10+*p-'0'; p++;
-  } while (*p>='0' && *p<='9' && p<fin_textos);
-  if (numero>=max_textos) numero=0;
+  } while (*p>='0' && *p<='9' && p<lang_buffer_end);
+  if (numero>=max_texts) numero=0;
 }
 
 void analyze_comment(void) {
 
-  while (*p!='\n' && *p!='\r' && p<fin_textos) p++;
+  while (*p!='\n' && *p!='\r' && p<lang_buffer_end) p++;
 }
 
 void analyze_text(void) {
 
-  texto[numero]=q; p++; numero++;
-  while (*p!='"' && p<fin_textos && *p!='\r' && *p!='\n') {
+  texts[numero]=q; p++; numero++;
+  while (*p!='"' && p<lang_buffer_end && *p!='\r' && *p!='\n') {
     if (*p=='\\') { p++;
       if (*p=='n') {
         *q++=13; *q++=10; p++;
@@ -93,12 +93,12 @@ void analyze_text(void) {
 }
 
 //-----------------------------------------------------------------------------
-//      Finaliza el sistema de textos
+//      Finaliza el sistema de lang_buffer
 //-----------------------------------------------------------------------------
 
 void finalize_texts(void) {
 
-  free(textos);
+  free(lang_buffer);
 }
 
 //----------------------------------------------------------------------------

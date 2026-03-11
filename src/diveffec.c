@@ -137,11 +137,11 @@ int paint_explosion(void) {
   int m,x,y,dx,dy,n;
   int dist,exp_Color,exp_Coloracum;
 
-        Progress((char *)texto[434],0,exp_alto);
+        Progress((char *)texts[434],0,exp_alto);
         for (y=0;y<exp_alto;y++)
         {
-        Progress((char *)texto[434],y,exp_alto);
-        poll_keyboard(); if (key(_ESC)) { Progress((char *)texto[434],exp_alto,exp_alto); return(1); }
+        Progress((char *)texts[434],y,exp_alto);
+        poll_keyboard(); if (key(_ESC)) { Progress((char *)texts[434],exp_alto,exp_alto); return(1); }
                 for (x=0;x<exp_ancho;x++)
                 {
                         exp_Coloracum=0;
@@ -193,7 +193,7 @@ int paint_explosion(void) {
                                 }
                 }
         }
-        Progress((char *)texto[434],exp_alto,exp_alto);
+        Progress((char *)texts[434],exp_alto,exp_alto);
         for (n=0;n<(exp_ancho*exp_alto)*per_points/100;n++)
         {
                 x=(rnd()%(exp_ancho-2))+1;
@@ -235,7 +235,7 @@ void Explode1(void) {
 
   wbox(v.ptr,an,al,c0,2,74,an-4,1);
 
-  wwrite(v.ptr,an,al,an-70,11,0,texto[181],c3);
+  wwrite(v.ptr,an,al,an-70,11,0,texts[181],c3);
   wrectangle(v.ptr,an,al,c0,an-70,18,66,11);
   for (x=0;x<64;x++) wbox(v.ptr,an,al,exp_colores[x*2],an-69+x,18+1,1,9);
 }
@@ -320,7 +320,7 @@ void Explode0(void) {
 
   v.type=1;
 
-  v.title=texto[300];
+  v.title=texts[300];
   v.an=128;
   v.al=90+5;
   v.paint_handler=(voidReturnType)Explode1;
@@ -438,7 +438,7 @@ int x;
         v.mapa->puntos[n]=-1;
     v.mapa->fpg_code=0;
     call((voidReturnType )v.paint_handler);
-    wvolcado(copia,vga_width,vga_height,v.ptr,v.x,v.y,v.an,v.al,0);
+    wvolcado(screen_buffer,vga_width,vga_height,v.ptr,v.x,v.y,v.an,v.al,0);
 
     advance_points();
     n_frames-=2;

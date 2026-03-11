@@ -26,7 +26,7 @@ static void Show_Time(void) {
 
   time(&dtime);
   timeinfo = localtime(&dtime);
-  DIV_SPRINTF(cTimeForIcon, "%s [%02d%c%02d]", texto[151],
+  DIV_SPRINTF(cTimeForIcon, "%s [%02d%c%02d]", texts[151],
           timeinfo->tm_hour, timeinfo->tm_sec % 2 ? ':' : '.', timeinfo->tm_min);
 
   sprintf(cBuff, "%02d", timeinfo->tm_hour);
@@ -72,10 +72,10 @@ void Clock0(void) {
   v.type = 4;
   v.an = 47;
   v.al = 30;
-  v.title = texto[151];
+  v.title = texts[151];
   time(&dtime);
   timeinfo = localtime(&dtime);
-  DIV_SPRINTF(cTimeForIcon, "%s [%02d%c%02d]", texto[151],
+  DIV_SPRINTF(cTimeForIcon, "%s [%02d%c%02d]", texts[151],
           timeinfo->tm_hour, timeinfo->tm_sec % 2 ? ';' : ' ', timeinfo->tm_min);
   v.name = (byte *)cTimeForIcon;
   v.paint_handler = Clock1;

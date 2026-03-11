@@ -546,12 +546,12 @@ GLOBAL byte fsmode;
 
 GLOBAL char prgpath[_MAX_PATH];
 
-GLOBAL byte *copia;     // Virtual screen copy (working framebuffer)
+GLOBAL byte *screen_buffer;     // Virtual screen copy (working framebuffer)
 
-GLOBAL byte *copia2;    // Second copy, sprite background outside scroll
+GLOBAL byte *back_buffer;    // Second copy, sprite background outside scroll
 
 #ifdef DEBUG
-GLOBAL byte *copia_debug;       // Third copy, debug only (dialogs)
+GLOBAL byte *screen_buffer_debug;       // Third copy, debug only (dialogs)
 #endif
 
 GLOBAL byte paleta[768]; // Current program palette
@@ -578,9 +578,9 @@ GLOBAL byte * color_lookup;
 // Output texts, in translatable format
 //-----------------------------------------------------------------------------
 
-#define max_textos_sistema 256         // Max number of allowed texts (lenguaje.div)
+#define max_system_texts 256         // Max number of allowed texts (lenguaje.div)
 
-GLOBAL byte *text[max_textos_sistema];
+GLOBAL byte *text[max_system_texts];
 GLOBAL int  num_error;
 
 //-----------------------------------------------------------------------------
@@ -664,7 +664,7 @@ GLOBAL fnt_info f_i[max_fonts];
 // Text rendering system
 //-----------------------------------------------------------------------------
 
-#define max_textos 256  // Maximum number of texts at runtime
+#define max_texts 256  // Maximum number of texts at runtime
 
 typedef struct _t_texto {
   int type;     // Text type: 0=normal, 1=&variable
@@ -675,9 +675,9 @@ typedef struct _t_texto {
   int region;   // Clipping region
   int x0,y0;    // Region occupied by the text
   int an,al;    // For partial screen blits
-}t_texto;
+}t_text;
 
-GLOBAL t_texto texto[max_textos+1];
+GLOBAL t_text texts[max_texts+1];
 
 //-----------------------------------------------------------------------------
 // Drawing primitives system
@@ -827,7 +827,7 @@ GLOBAL int buffer_an,buffer_al;         // Width & Height of buffer
 //      Include prototypes and variables related to the debugger
 //////////////////////////////////////////////////////////////////////////////
 
-#define v ventana[0]
+#define v window[0]
 #define max_items 24    // Maximum number of items in a window
 #define max_windows 8   // Maximum number of windows
 
@@ -851,24 +851,24 @@ typedef struct _t_item {
   int state;            // Item state (mouse hover, pressed, etc.)
   union {
     struct {
-      byte * texto;
+      byte * text;
       int x,y,center;
     } button;
     struct {
-      byte * texto;
+      byte * text;
       byte * buffer;
       int x,y,an,lon_buffer;
       int r0,r1;
     } get;
     struct {
-      byte * texto;
+      byte * text;
       int * valor;
       int x,y;
     } flag;
   };
 }t_item;
 
-typedef struct _tventana {
+typedef struct _twindow {
   int type;                             // 0-n/a, 1-dialog
   int foreground;                       // 1-yes 0-no (darkened)
   byte * title;                         // Title bar text
@@ -881,9 +881,9 @@ typedef struct _tventana {
   int items;                            // Number of defined items
   int active_item;                      // When an item triggers an effect
   int selected_item;                    // Currently selected item (for keyboard)
-}tventana;
+}twindow;
 
-GLOBAL tventana ventana[max_windows];
+GLOBAL twindow window[max_windows];
 
 struct t_listbox{
   int x,y;              // Listbox position in window
@@ -1015,7 +1015,7 @@ GLOBAL void (*ss_init)();
 GLOBAL void (*ss_frame)();
 GLOBAL void (*ss_end)();
 
-void text_out(char *texto,int x,int y);
+void text_out(char *texts,int x,int y);
 int _random(int min,int max);
 
 GLOBAL int ss_time;
@@ -1067,7 +1067,7 @@ GLOBAL int demo;
 //      Runtime error messages
 //----------------------------------------------------------------------------
 
-void e(int texto);
+void e(int text_id);
 
 GLOBAL int omitidos[128];
 GLOBAL int nomitidos;

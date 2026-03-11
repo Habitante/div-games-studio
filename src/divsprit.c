@@ -177,7 +177,7 @@ void sp_rotated( byte * si, int x, int y, int an, int al, int xg, int yg,
   float a0,a1,a2,a3;
   int p[24];
   int h,hmin,hmax; // Altura minima y maxima
-  int n,l0=0,l1;   // Lado 0 y lado 1 (indices p[])
+  int n,l0=0,l1;   // Lado 0 y side 1 (indices p[])
 
   int hmax0,hmax1;
   union { int l; short w[2]; } x0,x1,g0x={0},g1x={0},g0y={0},g1y={0};

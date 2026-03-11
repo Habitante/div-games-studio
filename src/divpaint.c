@@ -50,7 +50,7 @@ void blit_mouse_a(void);
 void blit_mouse_b(void);
 void paint_mask_window(byte * p,int c,int d);
 void paint_color_window(byte * p,int c,int d);
-void pinta_ventana_colores2(byte * p,int c,int d,int col) ;
+void paint_window_colors2(byte * p,int c,int d,int col) ;
 void color_up(void);
 void color_down(void);
 void flush_bar(byte * p, int real_an, int x, int y, int an, int al) ;
@@ -1044,7 +1044,7 @@ void edit_mode_10(void) {
       	  sel_mask_y1-=sel_mask_y0; sel_mask_y0=y; sel_mask_y1+=y;
           free(m);
         } else {
-          v_text=(char *)texto[45]; show_dialog(err0);
+          v_text=(char *)texts[45]; show_dialog(err0);
         }
       }
     } else switch(mode_selection) {
@@ -1171,7 +1171,7 @@ void cut_map(void) {
         if (is_selection_mask(x,y)) *p++=*(map+y*map_width+x); else *p++=0;
 
       // 4. Set the remaining variables
-      strcpy(v_map->filename,(char *)texto[136]);
+      strcpy(v_map->filename,(char *)texts[136]);
       ltoa(next_code++,v_map->filename+strlen(v_map->filename),10);
       *v_map->path='\0';
       v_map->map_width=an;
@@ -1191,11 +1191,11 @@ void cut_map(void) {
       windows_to_create[num_windows_to_create++]=v_map;
 
     } else {
-      v_text=(char *)texto[45]; show_dialog(err0); free(v_map);
+      v_text=(char *)texts[45]; show_dialog(err0); free(v_map);
     }
 
   } else {
-    v_text=(char *)texto[45]; show_dialog(err0);
+    v_text=(char *)texts[45]; show_dialog(err0);
   }
 }
 
@@ -1355,7 +1355,7 @@ void sel_mask_antialias(void) {
       free(p);
     }
   } else {
-    v_text=(char *)texto[45]; show_dialog(err0);
+    v_text=(char *)texts[45]; show_dialog(err0);
   }
 }
 
@@ -1827,7 +1827,7 @@ void edit_mode_12(void) {
 
     // Pointer to font
 
-    font=ventana[x].aux+RES_FOR_NAME;
+    font=window[x].aux+RES_FOR_NAME;
 
     // Determine spacelen
 
@@ -1851,7 +1851,7 @@ void edit_mode_12(void) {
     if ((buffer=(byte*)malloc(anmax*almax))!=NULL) {
       memset(buffer,0,anmax*almax);
     } else {
-      v_text=(char *)texto[45]; show_dialog(err0);
+      v_text=(char *)texts[45]; show_dialog(err0);
       font=NULL;
     }
 
@@ -2105,10 +2105,10 @@ void edit_mode_13(void) {
       analyze_bar(v.mapa->puntos[num_punto*2],v.mapa->puntos[num_punto*2+1]);
     else {
       wbox(toolbar,vga_width/big2,vga_height,c2,toolbar_width-23,2,21,15);
-      p=copia; copia=toolbar; text_color=c4;
+      p=screen_buffer; screen_buffer=toolbar; text_color=c4;
       writetxt(toolbar_width-22,3,0,(byte *)"????");
       writetxt(toolbar_width-22,10,0,(byte *)"????");
-      copia=p;
+      screen_buffer=p;
     }
 
     wbox(toolbar,vga_width/big2,19,c2,48+2*16,2,15,15);
@@ -2793,7 +2793,7 @@ void move_selection(byte * sp, int an, int al) {
   if (sp==NULL) {
     an=sel_mask_x1-sel_mask_x0+1; al=sel_mask_y1-sel_mask_y0+1;
     if ((sp=(byte*)malloc(an*al))==NULL) {
-      v_text=(char *)texto[45]; show_dialog(err0); return; }
+      v_text=(char *)texts[45]; show_dialog(err0); return; }
     memset(sp,0,an*al); // Create the sprite in sp
     for (y=sel_mask_y0;y<=sel_mask_y1;y++)
       for (x=sel_mask_x0;x<=sel_mask_x1;x++)
@@ -2856,7 +2856,7 @@ void move_selection(byte * sp, int an, int al) {
     move_zoom();
     move_bar();
 
-    if (key(_H)) { blit_screen(copia); do { poll_keyboard(); } while (key(_H)); }
+    if (key(_H)) { blit_screen(screen_buffer); do { poll_keyboard(); } while (key(_H)); }
 
     bar_coords();
 
@@ -2867,9 +2867,9 @@ void move_selection(byte * sp, int an, int al) {
       if (!_x && !_y) ang=0; else ang=atan2(_y,_x);
       xg=ang*57.295779761; if (xg<0) xg+=360;
       wbox(toolbar,vga_width/big2,19,c2,toolbar_width-23,2,21,15);
-      p=copia; copia=toolbar; text_color=c3;
+      p=screen_buffer; screen_buffer=toolbar; text_color=c3;
       num[4]=0; num[3]='\xa7'; num[2]=xg%10+48; num[1]=(xg/10)%10+48;
-      num[0]=(xg/100)%10+48; writetxt(toolbar_width-21,6,0,num); copia=p;
+      num[0]=(xg/100)%10+48; writetxt(toolbar_width-21,6,0,num); screen_buffer=p;
     }
 
     if (s==3 || s==4) {
@@ -2877,9 +2877,9 @@ void move_selection(byte * sp, int an, int al) {
       if ((size=1+(float)_x/100)<0) size=0;
       xg=size*100;
       wbox(toolbar,vga_width/big2,19,c2,toolbar_width-23,2,21,15);
-      p=copia; copia=toolbar; text_color=c3;
+      p=screen_buffer; screen_buffer=toolbar; text_color=c3;
       num[4]=0; num[3]='%'; num[2]=xg%10+48; num[1]=(xg/10)%10+48;
-      num[0]=(xg/100)%10+48; writetxt(toolbar_width-22,6,0,num); copia=p;
+      num[0]=(xg/100)%10+48; writetxt(toolbar_width-22,6,0,num); screen_buffer=p;
     }
 
     if (mouse_in(toolbar_x+48,toolbar_y+2,toolbar_x+toolbar_width-2,toolbar_y+17)) {
@@ -2911,7 +2911,7 @@ void move_selection(byte * sp, int an, int al) {
     flush_bars(0);
     save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,_mouse_graf,0);
     put(mouse_shift_x,mouse_shift_y,_mouse_graf);
-    blit_screen(copia);
+    blit_screen(screen_buffer);
     save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,_mouse_graf,1);
 
     if (mouse_graf>=10) switch(s) {
@@ -2965,7 +2965,7 @@ void move_selection(byte * sp, int an, int al) {
 
   if (key(_ESC)||(mouse_b && mouse_in(toolbar_x,toolbar_y+10,toolbar_x+9,toolbar_y+18)))
     { put_bar(2,10,45); flush_bars(0);
-      put(mouse_x,mouse_y,mouse_graf); blit_screen(copia); }
+      put(mouse_x,mouse_y,mouse_graf); blit_screen(screen_buffer); }
 
   free(sp);
 }
@@ -3029,7 +3029,7 @@ void effects(void) {
 
   if (key(_ESC)||(mouse_b && mouse_in(toolbar_x,toolbar_y+10,toolbar_x+9,toolbar_y+18)))
     { put_bar(2,10,45); flush_bars(0);
-      put(mouse_x,mouse_y,mouse_graf); blit_screen(copia); }
+      put(mouse_x,mouse_y,mouse_graf); blit_screen(screen_buffer); }
 }
 
 //-----------------------------------------------------------------------------
@@ -3038,7 +3038,7 @@ void effects(void) {
 
 void eyedropper(void) {
 
-  byte * _toolbar, * _copia;
+  byte * _toolbar, * _saved_buffer;
   int _bar[16];
   int _toolbar_width;
   int col=color;
@@ -3062,7 +3062,7 @@ void eyedropper(void) {
 
       if (mouse_graf>=10) {
         col=*(map+coord_x+coord_y*map_width);
-        _copia=copia; copia=toolbar;
+        _saved_buffer=screen_buffer; screen_buffer=toolbar;
         wbox(toolbar,vga_width/big2,19,col,64,2,15,15);
         wbox(toolbar,vga_width/big2,19,c2,80,2,31,15);
         text_color=c4;
@@ -3070,12 +3070,12 @@ void eyedropper(void) {
         strcpy((char *)&num[3],"Dec"); writetxt(109,3,2,num);
         num[1]=(col%16>9)?col%16+55:col%16+48; num[0]=(col/16>9)?col/16+55:col/16+48;
         strcpy((char *)&num[2],"Hex"); writetxt(109,10,2,num);
-        copia=_copia;
+        screen_buffer=_saved_buffer;
       } else {
-        _copia=copia; copia=toolbar;
+        _saved_buffer=screen_buffer; screen_buffer=toolbar;
         wbox(toolbar,vga_width/big2,19,c1,64,2,15,15);
         wbox(toolbar,vga_width/big2,19,c2,80,2,31,15);
-        copia=_copia;
+        screen_buffer=_saved_buffer;
       }
 
       blit_edit();
@@ -3084,12 +3084,12 @@ void eyedropper(void) {
 
     if (key(_ESC)||(mouse_b && mouse_in(toolbar_x,toolbar_y+10,toolbar_x+9,toolbar_y+18)))
       { put_bar(2,10,45); flush_bars(0);
-        put(mouse_x,mouse_y,mouse_graf); blit_screen(copia); }
+        put(mouse_x,mouse_y,mouse_graf); blit_screen(screen_buffer); }
 
     memcpy(toolbar,_toolbar,vga_width*19*big2); memcpy(bar,_bar,16*4); toolbar_width=_toolbar_width;
     free(_toolbar);
   } else {
-    v_text=(char *)texto[45]; show_dialog(err0);
+    v_text=(char *)texts[45]; show_dialog(err0);
   }
 
   zoom_background=0; need_zoom=1;
@@ -3163,7 +3163,7 @@ void draw_ruler(void) {
   calculate_gradient(gradient);
   if (highlight_background) { dac[0]=(dac[0]+32)%64; dac[1]=(dac[1]+32)%64; dac[2]=(dac[2]+32)%64; }
 
-  p=copia; copia=toolbar;
+  p=screen_buffer; screen_buffer=toolbar;
 
   switch (gradients[gradient].num_colors) {
     case 8: s0=16; s1=5; break;
@@ -3234,7 +3234,7 @@ void draw_ruler(void) {
   wbox(toolbar,vga_width/big2,19,c3,88+1,2+10,5,1); // 'T'
   wbox(toolbar,vga_width/big2,19,c3,88+3,2+10,1,4);
 
-  copia=p;
+  screen_buffer=p;
 
 }
 
@@ -3280,24 +3280,24 @@ void draw_ruler_selection(byte * p, int c, int d, int x, int y) {
 
   wbox(p,c,d,c2,x+128,y,47,7);
   switch(gradients[gradient].num_colors) {
-    case 8: wwrite(p,c,d,x+128+23,y,1,texto[310],c3); break;
-    case 16: wwrite(p,c,d,x+128+23,y,1,texto[311],c3); break;
-    case 32: wwrite(p,c,d,x+128+23,y,1,texto[312],c3); break;
+    case 8: wwrite(p,c,d,x+128+23,y,1,texts[310],c3); break;
+    case 16: wwrite(p,c,d,x+128+23,y,1,texts[311],c3); break;
+    case 32: wwrite(p,c,d,x+128+23,y,1,texts[312],c3); break;
   }
 
   wbox(p,c,d,c2,x+128+48,y,47,7);
   switch(gradients[gradient].fixed) {
-    case 0: wwrite(p,c,d,x+128+71,y,1,texto[313],c3); break;
-    case 1: wwrite(p,c,d,x+128+71,y,1,texto[314],c3); break;
+    case 0: wwrite(p,c,d,x+128+71,y,1,texts[313],c3); break;
+    case 1: wwrite(p,c,d,x+128+71,y,1,texts[314],c3); break;
   }
 
   wbox(p,c,d,c2,x+128,y+8,95,7);
   switch(gradients[gradient].type) {
-    case 0: wwrite(p,c,d,x+128+48,y+8,1,texto[315],c3); break;
-    case 1: wwrite(p,c,d,x+128+48,y+8,1,texto[316],c3); break;
-    case 2: wwrite(p,c,d,x+128+48,y+8,1,texto[317],c3); break;
-    case 4: wwrite(p,c,d,x+128+48,y+8,1,texto[318],c3); break;
-    case 8: wwrite(p,c,d,x+128+48,y+8,1,texto[319],c3); break;
+    case 0: wwrite(p,c,d,x+128+48,y+8,1,texts[315],c3); break;
+    case 1: wwrite(p,c,d,x+128+48,y+8,1,texts[316],c3); break;
+    case 2: wwrite(p,c,d,x+128+48,y+8,1,texts[317],c3); break;
+    case 4: wwrite(p,c,d,x+128+48,y+8,1,texts[318],c3); break;
+    case 8: wwrite(p,c,d,x+128+48,y+8,1,texts[319],c3); break;
   }
 
 }
@@ -3321,16 +3321,16 @@ void draw_help(int n) {
       move(0,m); call(v.close_handler);
       if (v.click_handler==help2 && old_prg!=NULL) {
         for (m=1;m<max_windows;m++) {
-          if (ventana[m].click_handler==program2) {
-            if (ventana[m].prg==old_prg && ventana[m].foreground<2) {
-              ventana[m].state=1;
-              wgra(ventana[m].ptr,ventana[m].an/big2,ventana[m].al/big2,c_b_low,2,2,ventana[m].an/big2-20,7);
-              if (text_len(ventana[m].title)+3>ventana[m].an/big2-20) {
-                wwrite_in_box(ventana[m].ptr,ventana[m].an/big2,ventana[m].an/big2-19,ventana[m].al/big2,4,2,0,ventana[m].title,c1);
-                wwrite_in_box(ventana[m].ptr,ventana[m].an/big2,ventana[m].an/big2-19,ventana[m].al/big2,3,2,0,ventana[m].title,c4);
+          if (window[m].click_handler==program2) {
+            if (window[m].prg==old_prg && window[m].foreground<2) {
+              window[m].state=1;
+              wgra(window[m].ptr,window[m].an/big2,window[m].al/big2,c_b_low,2,2,window[m].an/big2-20,7);
+              if (text_len(window[m].title)+3>window[m].an/big2-20) {
+                wwrite_in_box(window[m].ptr,window[m].an/big2,window[m].an/big2-19,window[m].al/big2,4,2,0,window[m].title,c1);
+                wwrite_in_box(window[m].ptr,window[m].an/big2,window[m].an/big2-19,window[m].al/big2,3,2,0,window[m].title,c4);
               } else {
-                wwrite(ventana[m].ptr,ventana[m].an/big2,ventana[m].al/big2,3+(ventana[m].an/big2-20)/2,2,1,ventana[m].title,c1);
-                wwrite(ventana[m].ptr,ventana[m].an/big2,ventana[m].al/big2,2+(ventana[m].an/big2-20)/2,2,1,ventana[m].title,c4);
+                wwrite(window[m].ptr,window[m].an/big2,window[m].al/big2,3+(window[m].an/big2-20)/2,2,1,window[m].title,c1);
+                wwrite(window[m].ptr,window[m].an/big2,window[m].al/big2,2+(window[m].an/big2-20)/2,2,1,window[m].title,c4);
               } v.state=0; break;
             }
           }
@@ -3354,7 +3354,7 @@ void draw_help(int n) {
 void zoom_map2(void) {
   int an,al;
   int n,m,c,x,y;
-  byte *p,*q=copia;
+  byte *p,*q=screen_buffer;
 
   p=map+zoom_y*map_width+zoom_x;
 
@@ -3570,7 +3570,7 @@ void select_fx(int n,int * efecto) {
 
     c=88*big2; d=27*big2;
     if ((p=(byte*)malloc(c*d))==NULL) {
-     v_text=(char *)texto[45]; show_dialog(err0); return; }
+     v_text=(char *)texts[45]; show_dialog(err0); return; }
 
     flush_bars(0);
 
@@ -3619,13 +3619,13 @@ void select_fx(int n,int * efecto) {
         while (mouse_b&1) {
           save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,0);
           put(mouse_shift_x,mouse_shift_y,mouse_graf);
-          blit_screen(copia);
+          blit_screen(screen_buffer);
           save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,1);
       	  draw_edit_background(a,b,c*big2,d*big2);
           flush_bars(0);
           read_mouse();
           a=mouse_shift_x-ix; b=mouse_shift_y-iy;
-          wvolcado(copia,vga_width,vga_height,p,a,b,c*big2,d*big2,0);
+          wvolcado(screen_buffer,vga_width,vga_height,p,a,b,c*big2,d*big2,0);
           blit_partial(a,b,c*big2,d*big2);
         } wrectangle(p,c,d,c2,0,0,c,d);
       }
@@ -3635,12 +3635,12 @@ void select_fx(int n,int * efecto) {
         wbox(p,c,d,c4,12,19,*efecto*4,4);
       }
 
-      wvolcado(copia,vga_width,vga_height,p,a,b,c*big2,d*big2,0);
+      wvolcado(screen_buffer,vga_width,vga_height,p,a,b,c*big2,d*big2,0);
       blit_partial(a,b,c*big2,d*big2);
 
       save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,0);
       put(mouse_shift_x,mouse_shift_y,mouse_graf);
-      blit_screen(copia);
+      blit_screen(screen_buffer);
       save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,1);
 
       if (wait==1) {
@@ -3653,10 +3653,10 @@ void select_fx(int n,int * efecto) {
     if (!mouse_in(toolbar_x,toolbar_y,toolbar_x+toolbar_width-1,toolbar_y+18) || !(mouse_b&1)
         || mouse_in(icono_x,toolbar_y+2,icono_x+15,toolbar_y+17)) {
       wput(p,c,d,c-9,2,-45);
-      wvolcado(copia,vga_width,vga_height,p,a,b,c*big2,d*big2,0);
+      wvolcado(screen_buffer,vga_width,vga_height,p,a,b,c*big2,d*big2,0);
       blit_partial(a,b,c*big2,d*big2);
       save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,0);
-      put(mouse_shift_x,mouse_shift_y,mouse_graf); blit_screen(copia);
+      put(mouse_shift_x,mouse_shift_y,mouse_graf); blit_screen(screen_buffer);
       save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,1);
       do { read_mouse(); } while (mouse_b || key(_ESC));
     }
@@ -3664,7 +3664,7 @@ void select_fx(int n,int * efecto) {
     draw_edit_background(a,b,c*big2,d*big2);
     flush_bars(0);
     save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,0);
-    put(mouse_shift_x,mouse_shift_y,mouse_graf); blit_screen(copia);
+    put(mouse_shift_x,mouse_shift_y,mouse_graf); blit_screen(screen_buffer);
     save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,1);
     free(p);
   }
@@ -3709,7 +3709,7 @@ int select_icon(int icono_x,int * iconos) {
     num=*iconos++; col=*iconos++; fil=(num+col-1)/col;
     c=(col*16+3)*big2; d=(fil*16+11)*big2;
     if ((p=(byte*)malloc(c*d))==NULL) {
-      v_text=(char *)texto[45]; show_dialog(err0); return(-1); }
+      v_text=(char *)texts[45]; show_dialog(err0); return(-1); }
 
     flush_bars(0);
 
@@ -3742,23 +3742,23 @@ int select_icon(int icono_x,int * iconos) {
         while (mouse_b&1) {
           save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,0);
           put(mouse_shift_x,mouse_shift_y,mouse_graf);
-          blit_screen(copia);
+          blit_screen(screen_buffer);
           save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,1);
       	  draw_edit_background(a,b,c*big2,d*big2);
           flush_bars(0);
           read_mouse();
           a=mouse_shift_x-ix; b=mouse_shift_y-iy;
-          wvolcado(copia,vga_width,vga_height,p,a,b,c*big2,d*big2,0);
+          wvolcado(screen_buffer,vga_width,vga_height,p,a,b,c*big2,d*big2,0);
           blit_partial(a,b,c*big2,d*big2);
         } wrectangle(p,c,d,c2,0,0,c,d);
       }
 
-      wvolcado(copia,vga_width,vga_height,p,a,b,c*big2,d*big2,0);
+      wvolcado(screen_buffer,vga_width,vga_height,p,a,b,c*big2,d*big2,0);
       blit_partial(a,b,c*big2,d*big2);
 
       save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,0);
       put(mouse_shift_x,mouse_shift_y,mouse_graf);
-      blit_screen(copia);
+      blit_screen(screen_buffer);
       save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,1);
 
     } while (!mouse_b && !key(_ESC));
@@ -3770,10 +3770,10 @@ int select_icon(int icono_x,int * iconos) {
     if (!mouse_in(toolbar_x,toolbar_y,toolbar_x+toolbar_width-1,toolbar_y+18) || !(mouse_b&1)
         || mouse_in(icono_x,toolbar_y+2,icono_x+15,toolbar_y+17)) {
       wput(p,c,d,c-9,2,-45);
-      wvolcado(copia,vga_width,vga_height,p,a,b,c*big2,d*big2,0);
+      wvolcado(screen_buffer,vga_width,vga_height,p,a,b,c*big2,d*big2,0);
       blit_partial(a,b,c*big2,d*big2);
       save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,0);
-      put(mouse_shift_x,mouse_shift_y,mouse_graf); blit_screen(copia);
+      put(mouse_shift_x,mouse_shift_y,mouse_graf); blit_screen(screen_buffer);
       save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,1);
       do { read_mouse(); } while (mouse_b || key(_ESC));
     }
@@ -3781,7 +3781,7 @@ int select_icon(int icono_x,int * iconos) {
     draw_edit_background(a,b,c*big2,d*big2);
     flush_bars(0);
     save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,0);
-    put(mouse_shift_x,mouse_shift_y,mouse_graf); blit_screen(copia);
+    put(mouse_shift_x,mouse_shift_y,mouse_graf); blit_screen(screen_buffer);
     save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,1);
 
     free(p);
@@ -3815,7 +3815,7 @@ void blit_mouse_b(void) {
   if (mouse_graf<10) {
     save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,0);
     put(mouse_shift_x,mouse_shift_y,mouse_graf);
-  } blit_screen(copia);
+  } blit_screen(screen_buffer);
   if (mouse_graf<10) save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,1);
   else save_mouse_bg(mouse_background,moux,mouy,mouse_graf,1);
 }
@@ -3834,7 +3834,7 @@ void select_mask(int n) {
     c=(128+3)*big2; d=(128+11+8)*big2; a=toolbar_x;
     if (toolbar_y>vga_height/2-8) b=toolbar_y-d-1; else b=toolbar_y+19*big2+1;
     if ((p=(byte*)malloc(c*d))==NULL) {
-      v_text=(char *)texto[45]; show_dialog(err0); return; }
+      v_text=(char *)texts[45]; show_dialog(err0); return; }
 
     adjust_box(&a,&b,&c,&d); c/=big2; d/=big2;
     do { read_mouse(); } while (mouse_b || key(_M));
@@ -3855,10 +3855,10 @@ void select_mask(int n) {
           wrectangle(p,c,d,c4,0,0,c,d);
           while (mouse_b&1) {
             read_mouse(); a=mouse_shift_x-ix; b=mouse_shift_y-iy;
-            wvolcado(copia,vga_width,vga_height,p,a,b,c*big2,d*big2,0);
+            wvolcado(screen_buffer,vga_width,vga_height,p,a,b,c*big2,d*big2,0);
             blit_partial(a,b,c*big2,d*big2);
             save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,0);
-            put(mouse_shift_x,mouse_shift_y,mouse_graf); blit_screen(copia);
+            put(mouse_shift_x,mouse_shift_y,mouse_graf); blit_screen(screen_buffer);
             save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,1);
             draw_edit_background(a,b,c*big2,d*big2);
             flush_bars(0);
@@ -3902,7 +3902,7 @@ void select_mask(int n) {
       paint_mask_window(p,c,d);
       x=1+(col%16)*8; y=9+(col/16)*8;
       wrectangle(p,c,d,c4,x,y,9,9);
-      wvolcado(copia,vga_width,vga_height,p,a,b,c*big2,d*big2,0);
+      wvolcado(screen_buffer,vga_width,vga_height,p,a,b,c*big2,d*big2,0);
       blit_partial(a,b,c*big2,d*big2);
       blit_mouse_b();
 
@@ -3918,7 +3918,7 @@ void select_mask(int n) {
         || key(_M) || mouse_in(toolbar_x+48+n*16,toolbar_y+2,toolbar_x+57+n*16,toolbar_y+17)) {
       blit_mouse_a(); wput(p,c,d,c-9,2,-45);
       x=1+(col%16)*8; y=9+(col/16)*8; wrectangle(p,c,d,c4,x,y,9,9);
-      wvolcado(copia,vga_width,vga_height,p,a,b,c*big2,d*big2,0);
+      wvolcado(screen_buffer,vga_width,vga_height,p,a,b,c*big2,d*big2,0);
       blit_partial(a,b,c*big2,d*big2); blit_mouse_b();
       do { read_mouse(); } while (mouse_b || key(_ESC) || key(_M));
     }
@@ -3958,8 +3958,8 @@ void paint_mask_window(byte * p,int c,int d) {
   wbox(p,c,d,c2,2,d-9,c-4,7);
   wbox(p,c,d,c0,c/2,d-9,1,7);
 
-  wwrite(p,c,d,c/4,d-9,1,texto[306],c3);
-  wwrite(p,c,d,c*3/4,d-9,1,texto[307],c3);
+  wwrite(p,c,d,c/4,d-9,1,texts[306],c3);
+  wwrite(p,c,d,c*3/4,d-9,1,texts[307],c3);
 
 }
 
@@ -4045,10 +4045,10 @@ int create_mapbr_thumbs(struct t_listboxbr * l)
 
   n=m_maximo=0;
   for(con=0; con<max_windows; con++) {
-    if(ventana[con].type==100) {
-      thumb_map[n].an   = (int)ventana[con].mapa->map_width;
-      thumb_map[n].al   = (int)ventana[con].mapa->map_height;
-      thumb_map[n].ptr  = (char *)ventana[con].mapa->map;
+    if(window[con].type==100) {
+      thumb_map[n].an   = (int)window[con].mapa->map_width;
+      thumb_map[n].al   = (int)window[con].mapa->map_height;
+      thumb_map[n].ptr  = (char *)window[con].mapa->map;
       thumb_map[n].Code = con;
       n++;
     }
@@ -4160,7 +4160,7 @@ void select_color(int n) { // Icon number as parameter
 
     if((temp=(byte *)malloc(man*mal))==NULL)
     {
-      v_text=(char *)texto[45];
+      v_text=(char *)texts[45];
       show_dialog(err0);
     }
     else
@@ -4170,7 +4170,7 @@ void select_color(int n) { // Icon number as parameter
       if(fread(temp, 1, man*mal, FilePaintFPG) != man*mal)
       {
         free(temp);
-        v_text=(char *)texto[44];
+        v_text=(char *)texts[44];
         show_dialog(err0);
       }
       else
@@ -4202,9 +4202,9 @@ void select_color(int n) { // Icon number as parameter
     show_dialog(MapperBrowseFPG0);
     if(v_finished) {
       num_tex=thumb_map[ltexturasbr.first_visible+ltexturasbr.zone-10].Code;
-      textura_color=ventana[num_tex].mapa->map;
-      textura_an=ventana[num_tex].mapa->map_width;
-      textura_al=ventana[num_tex].mapa->map_height;
+      textura_color=window[num_tex].mapa->map;
+      textura_an=window[num_tex].mapa->map_width;
+      textura_al=window[num_tex].mapa->map_height;
       textura_x=0;
       textura_y=0;
     }
@@ -4217,7 +4217,7 @@ void select_color(int n) { // Icon number as parameter
     c=(128+3+32+64+8)*big2; d=(128+3+18+8)*big2; a=toolbar_x;
     if (toolbar_y>vga_height/2-8) b=toolbar_y-d-1; else b=toolbar_y+19*big2+1;
     if ((p=(byte*)malloc(c*d))==NULL) {
-      v_text=(char *)texto[45]; show_dialog(err0); return; }
+      v_text=(char *)texts[45]; show_dialog(err0); return; }
     adjust_box(&a,&b,&c,&d); c/=big2; d/=big2;
 
     salir=0; volcar=1; _gradient=-1; boton=-1; col=color;
@@ -4238,10 +4238,10 @@ void select_color(int n) { // Icon number as parameter
           wrectangle(p,c,d,c4,0,0,c,d);
           while (mouse_b&1) {
             read_mouse(); a=mouse_shift_x-ix; b=mouse_shift_y-iy;
-            wvolcado(copia,vga_width,vga_height,p,a,b,c*big2,d*big2,0);
+            wvolcado(screen_buffer,vga_width,vga_height,p,a,b,c*big2,d*big2,0);
             blit_partial(a,b,c*big2,d*big2);
             save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,0);
-            put(mouse_shift_x,mouse_shift_y,mouse_graf); blit_screen(copia);
+            put(mouse_shift_x,mouse_shift_y,mouse_graf); blit_screen(screen_buffer);
             save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,1);
             draw_edit_background(a,b,c*big2,d*big2);
             flush_bars(0);
@@ -4330,23 +4330,23 @@ void select_color(int n) { // Icon number as parameter
       if (volcar==1) { volcar=0;
         flush_bars(0);
         paint_color_window(p,c,d);
-        pinta_ventana_colores2(p,c,d,col);
+        paint_window_colors2(p,c,d,col);
         x=9+(col%16)*8; y=9+(col/16)*8;
         wrectangle(p,c,d,c4,x,y,9,9);
-        wvolcado(copia,vga_width,vga_height,p,a,b,c*big2,d*big2,0);
+        wvolcado(screen_buffer,vga_width,vga_height,p,a,b,c*big2,d*big2,0);
         blit_partial(a,b,c*big2,d*big2);
       } else if (volcar==2) { volcar=0;
-        pinta_ventana_colores2(p,c,d,col);
+        paint_window_colors2(p,c,d,col);
         x=9+(col%16)*8; y=9+(col/16)*8;
         wrectangle(p,c,d,c4,x,y,9,9);
-        wvolcado(copia,vga_width,vga_height,p,a,b,c*big2,d*big2,0);
+        wvolcado(screen_buffer,vga_width,vga_height,p,a,b,c*big2,d*big2,0);
         blit_partial(a+x*big2,b+y*big2,9*big2,9*big2);
         blit_partial(a+138*big2,b+10*big2,31*big2,128*big2);
       }
 
       save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,0);
       put(mouse_shift_x,mouse_shift_y,mouse_graf);
-      blit_screen(copia);
+      blit_screen(screen_buffer);
       save_mouse_bg(mouse_background,mouse_shift_x,mouse_shift_y,mouse_graf,1);
 
       x=9+(col%16)*8; y=9+(col/16)*8;
@@ -4390,7 +4390,7 @@ void select_color(int n) { // Icon number as parameter
         || key(_C) || mouse_in(toolbar_x+48+n*16,toolbar_y+2,toolbar_x+57+n*16,toolbar_y+17)) {
       blit_mouse_a(); wput(p,c,d,c-9,2,-45);
       x=9+(col%16)*8; y=9+(col/16)*8; wrectangle(p,c,d,c4,x,y,9,9);
-      wvolcado(copia,vga_width,vga_height,p,a,b,c*big2,d*big2,0);
+      wvolcado(screen_buffer,vga_width,vga_height,p,a,b,c*big2,d*big2,0);
       blit_partial(a,b,c*big2,d*big2); blit_mouse_b();
       do { read_mouse(); } while (mouse_b || key(_ESC) || key(_C));
     }
@@ -4447,16 +4447,16 @@ void change_map(int adelante) {
 
   if (adelante) {
     for (n=1;n<max_windows;n++) {
-      if (ventana[n].type==100 && ventana[n].mapa->map_width==map_width &&
-        ventana[n].mapa->map_height==map_height && ventana[n].foreground!=2) {
+      if (window[n].type==100 && window[n].mapa->map_width==map_width &&
+        window[n].mapa->map_height==map_height && window[n].foreground!=2) {
         copy(old,n);
         old=n;
       }
     }
   } else {
     for (n=max_windows-1;n>0;n--) {
-      if (ventana[n].type==100 && ventana[n].mapa->map_width==map_width &&
-        ventana[n].mapa->map_height==map_height && ventana[n].foreground!=2) {
+      if (window[n].type==100 && window[n].mapa->map_width==map_width &&
+        window[n].mapa->map_height==map_height && window[n].foreground!=2) {
         copy(old,n);
         old=n;
       }
@@ -4567,7 +4567,7 @@ void paint_color_window(byte * p,int c,int d) {
 //	Color window info panel for the selected color
 //-----------------------------------------------------------------------------
 
-void pinta_ventana_colores2(byte * p,int c,int d,int col) {
+void paint_window_colors2(byte * p,int c,int d,int col) {
   byte num[8];
   int x;
 
@@ -4622,7 +4622,7 @@ void move_bar(void) {
       toolbar_x=mouse_shift_x+barx; toolbar_y=mouse_shift_y+bary; bar_coords();
       flush_bars(0);
       put(mouse_x,mouse_y,2);
-      blit_screen(copia);
+      blit_screen(screen_buffer);
     } while (mouse_b&1); zoom_map();
 
     wrectangle(toolbar,vga_width/big2,vga_height,c2,0,0,toolbar_width,19);
@@ -4805,7 +4805,7 @@ void bar_coords(void) {
   byte num[5];
 
   wbox(toolbar,vga_width/big2,vga_height,c2,26,2,21,15);
-  p=copia; copia=toolbar; text_color=zoom_move; num[4]=0;
+  p=screen_buffer; screen_buffer=toolbar; text_color=zoom_move; num[4]=0;
 
   if (coord_x>=0 && coord_x<map_width) {
     num[3]=coord_x%10+48; num[2]=(coord_x/10)%10+48; num[1]=(coord_x/100)%10+48;
@@ -4817,7 +4817,7 @@ void bar_coords(void) {
     num[0]=(coord_y/1000)%10+48; writetxt(27,10,0,num);
   } else writetxt(27,10,0,(byte *)"000?");
 
-  copia=p;
+  screen_buffer=p;
 }
 
 //-----------------------------------------------------------------------------
@@ -4830,12 +4830,12 @@ void analyze_bar(int an, int al) {
 
   wbox(toolbar,vga_width/big2,vga_height,c2,toolbar_width-23,2,21,15);
 
-  p=copia; copia=toolbar; text_color=c4; num[4]=0;
+  p=screen_buffer; screen_buffer=toolbar; text_color=c4; num[4]=0;
   num[3]=an%10+48; num[2]=(an/10)%10+48; num[1]=(an/100)%10+48;
   num[0]=(an/1000)%10+48; writetxt(toolbar_width-22,3,0,num);
   num[3]=al%10+48; num[2]=(al/10)%10+48; num[1]=(al/100)%10+48;
   num[0]=(al/1000)%10+48; writetxt(toolbar_width-22,10,0,num);
-  copia=p;
+  screen_buffer=p;
 }
 
 //-----------------------------------------------------------------------------
@@ -4848,7 +4848,7 @@ int new_bar(int an, int al) {
   for (n=0;n<10;n++) { if (!barras[n].on) break; } if (n==10) return(-1);
 
   if ((barras[n].ptr=(byte*)malloc(an*big2*al*big2))==NULL) {
-    v_text=(char *)texto[45]; show_dialog(err0); return(-1);
+    v_text=(char *)texts[45]; show_dialog(err0); return(-1);
   }
 
   barras[n].on=1; barras[n].an=an; barras[n].al=al;
@@ -4896,7 +4896,7 @@ void flush_bar(byte * p, int real_an, int x, int y, int an, int al) {
 
   blit_partial(x,y,an,al);
 
-  q=copia+y*vga_width+x;
+  q=screen_buffer+y*vga_width+x;
 
   if (x<0) salta_x=-x; else salta_x=0;
   if (x+an>vga_width) resto_x=x+an-vga_width; else resto_x=0;
@@ -4928,7 +4928,7 @@ void flush_bar_darkened(byte * p, int real_an, int x, int y, int an, int al) {
 
   blit_partial(x,y,an,al);
 
-  q=copia+y*vga_width+x;
+  q=screen_buffer+y*vga_width+x;
 
   if (x<0) salta_x=-x; else salta_x=0;
   if (x+an>vga_width) resto_x=x+an-vga_width; else resto_x=0;

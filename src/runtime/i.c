@@ -371,16 +371,16 @@ void initialization (void) {
 
   if (iloc_len&1) { iloc_len++; } if (!(imem&1)) { imem++; }
 
-  if((copia=(byte*)malloc(vga_width*vga_height))==NULL) exer(1);
-  memset(copia,0,vga_width*vga_height);
+  if((screen_buffer=(byte*)malloc(vga_width*vga_height))==NULL) exer(1);
+  memset(screen_buffer,0,vga_width*vga_height);
 
-  if((copia2=(byte*)malloc(vga_width*(vga_height+1)))==NULL) exer(1);
-  memset(copia2,0,vga_width*vga_height);
+  if((back_buffer=(byte*)malloc(vga_width*(vga_height+1)))==NULL) exer(1);
+  memset(back_buffer,0,vga_width*vga_height);
 
   memset(divmalloc, 0, sizeof(divmalloc));
 
   #ifdef DEBUG
-  if((copia_debug=(byte*)malloc(vga_width*vga_height))==NULL) exer(1);
+  if((screen_buffer_debug=(byte*)malloc(vga_width*vga_height))==NULL) exer(1);
   #endif
 
   if((ghost_inicial=(byte*)malloc(65536+512))==NULL) exer(1);
@@ -427,7 +427,7 @@ insert_process(id_start);
   memset(g[0].grf,0,sizeof(int*)*2000); next_map_code=1000;
 
   memset(fonts,0,sizeof(fonts));
-  memset(texto,0,sizeof(texto));
+  memset(texts,0,sizeof(texts));
   memset(drawing,0,sizeof(drawing));
   memset(video_modes, 0, 12*32);
 
@@ -977,13 +977,13 @@ void frame_start(void) {
 				if (buffer_to_video!=NULL) 
 					buffer_to_video(); 
 				else
-					blit_screen((byte*)copia);
+					blit_screen((byte*)screen_buffer);
 			} while (!ss_exit);
 			
 			if (ss_end!=NULL) 
 				ss_end();
 
-			memcpy(copia,copia2,vga_width*vga_height);
+			memcpy(screen_buffer,back_buffer,vga_width*vga_height);
 			blit_partial(0,0,vga_width,vga_height);
 			ss_time_counter=get_reloj()+ss_time;
 		}
@@ -1162,9 +1162,9 @@ void frame_end(void) {
 				background_to_buffer();
 			else {
 				if (old_restore_type==0)
-					restore((byte*)copia,(byte*)copia2);
+					restore((byte*)screen_buffer,(byte*)back_buffer);
 				else
-					memcpy(copia,copia2,vga_width*vga_height);
+					memcpy(screen_buffer,back_buffer,vga_width*vga_height);
 			}
 		}
 	}
@@ -1263,11 +1263,11 @@ void frame_end(void) {
 				if (otheride) {
 					if (otheride==1) {
 
-						for (n=0;n<max_textos;n++)
-							if (texto[n].font) 
+						for (n=0;n<max_texts;n++)
+							if (texts[n].font) 
 								break;
 
-						if (n<max_textos) {
+						if (n<max_texts) {
 							memb[nullstring[0]*4]=0; // The "floating" text is never shown
 							memb[nullstring[1]*4]=0;
 							memb[nullstring[2]*4]=0;
@@ -1281,7 +1281,7 @@ void frame_end(void) {
 						readmouse();
 						x1s=-1;
 						v_function=-1; // No errors (don't show?)
-						put_sprite(mouse->file,mouse->graph,mouse->x,mouse->y,mouse->angle,mouse->size,mouse->flags,mouse->region,copia,vga_width,vga_height);
+						put_sprite(mouse->file,mouse->graph,mouse->x,mouse->y,mouse->angle,mouse->size,mouse->flags,mouse->region,screen_buffer,vga_width,vga_height);
 						mouse_x0=x0s;
 						mouse_x1=x1s;
 						mouse_y0=y0s;
@@ -1349,11 +1349,11 @@ void frame_end(void) {
 				}
 
 
-				for (n=0;n<max_textos;n++)
-					if (texto[n].font)
+				for (n=0;n<max_texts;n++)
+					if (texts[n].font)
 						break;
 
-				if (n<max_textos) {
+				if (n<max_texts) {
 					memb[nullstring[0]*4]=0; // The "floating" null text is never shown
 					memb[nullstring[1]*4]=0;
 					memb[nullstring[2]*4]=0;
@@ -1367,7 +1367,7 @@ void frame_end(void) {
 #endif // NDEFNOTYET
 
 				if (demo)
-					paint_texts(max_textos);
+					paint_texts(max_texts);
 
 				if (post_process_buffer!=NULL)
 					post_process_buffer();
@@ -1406,7 +1406,7 @@ void frame_end(void) {
 					} else {
 
 					  if (old_dump_type) {
-						full_redraw=1; blit_screen((byte*)copia);
+						full_redraw=1; blit_screen((byte*)screen_buffer);
 					  } else {
 
 							full_redraw=0;
@@ -1425,13 +1425,13 @@ void frame_end(void) {
 							if (mouse_x1!=-1)
 								blit_partial(mouse_x0,mouse_y0,mouse_x1-mouse_x0+1,mouse_y1-mouse_y0+1);
 
-							for (n=0;n<max_textos;n++)
-								if (texto[n].font && texto[n].an)
-									blit_partial(texto[n].x0,texto[n].y0,texto[n].an,texto[n].al);
+							for (n=0;n<max_texts;n++)
+								if (texts[n].font && texts[n].an)
+									blit_partial(texts[n].x0,texts[n].y0,texts[n].an,texts[n].al);
 
 							// Perform a partial blit_screen
 
-							blit_screen((byte*)copia);
+							blit_screen((byte*)screen_buffer);
 
 						}
 
@@ -1447,9 +1447,9 @@ void frame_end(void) {
 											blit_partial(iscroll[n].x,iscroll[n].y,iscroll[n].an,iscroll[n].al);
 									}
 							if (mouse_x1!=-1) blit_partial(mouse_x0,mouse_y0,mouse_x1-mouse_x0+1,mouse_y1-mouse_y0+1);
-							for (n=0;n<max_textos+1;n++)
-								if (texto[n].font && texto[n].an)
-									blit_partial(texto[n].x0,texto[n].y0,texto[n].an,texto[n].al);
+							for (n=0;n<max_texts+1;n++)
+								if (texts[n].font && texts[n].an)
+									blit_partial(texts[n].x0,texts[n].y0,texts[n].an,texts[n].al);
 						}
 
 					}
@@ -1556,8 +1556,8 @@ void finalization (void) {
   free(g[0].grf);
 
 // Free screen ram
-  free(copia);
-  free(copia2);
+  free(screen_buffer);
+  free(back_buffer);
 
 // Free div mem
   free(mem);
@@ -1594,7 +1594,7 @@ void finalization (void) {
 #ifdef DEBUG
   // Free debug window
   end_debug();
-  free(copia_debug);
+  free(screen_buffer_debug);
 #endif
 
 #ifdef WIN32
@@ -1669,14 +1669,14 @@ void exer(int e) {
 
 #ifndef DEBUG
 
-void e(int texto) {
+void e(int text_id) {
 	int n=0;
 
 	if (v_function==-1)
 		return;
 
 	while (n<nomitidos) {
-		if (omitidos[n]==texto)
+		if (omitidos[n]==text_id)
 			break;
 		n++;
 	} 
@@ -1685,9 +1685,9 @@ void e(int texto) {
 		return;
 
 	if (v_function>=0) {
-		printf("Error %d (%s) %s\nn",texto,fname[v_function],text[texto]);
+		printf("Error %d (%s) %s\nn",text_id,fname[v_function],text[text_id]);
 	} else {
-		printf("Error %d %s\n\n",texto,text[texto]);
+		printf("Error %d %s\n\n",text_id,text[text_id]);
 	}
 	reset_video_mode();
 
@@ -1733,11 +1733,11 @@ int main(int argc,char * argv[]) {
   uint32_t exestart = 0;
   uint32_t datstart = 0;
 
-	copia=NULL;
-	copia2=NULL;
+	screen_buffer=NULL;
+	back_buffer=NULL;
 
 #ifdef DEBUG
-	copia_debug=NULL;
+	screen_buffer_debug=NULL;
 #endif
 
 #ifndef EMSCRIPTEN	
