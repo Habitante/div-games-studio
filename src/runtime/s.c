@@ -61,28 +61,6 @@ int seno[grados_360+1], coseno[grados_360+1]; //m7
 
 tfast * fast;
 
-#ifdef DOS
-
-//----------------------------------------------------------------------------
-// Multiply two 8.24 fixed-point numbers
-//----------------------------------------------------------------------------
-extern int mul_24(int, int);
-#pragma aux mul_24 =    \
-        "imul edx"      \
-        "shrd eax,edx,24" \
-        parm caller [EDX] [EAX] value [EAX]
-//----------------------------------------------------------------------------
-//  Multiply two 16.16 fixed-point numbers
-//----------------------------------------------------------------------------
-extern int mul_16(int, int);
-#pragma aux mul_16 =    \
-        "imul edx"      \
-        "shrd eax,edx,16" \
-        parm caller [EDX] [EAX] value [EAX]
-
-#endif
-
-
 static int mul_24(int a, int b)
 {
 	uint64_t c = (uint64_t)a*(uint64_t)b;

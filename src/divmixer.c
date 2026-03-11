@@ -1,102 +1,16 @@
 #include "global.h"
 #include "divmixer.hpp"
 
-UWORD SoundCard;
-UWORD BaseAddress;
-UWORD CD;
-UWORD MASTER;
-UWORD VOC;
-
 void SetMasterVolume (UWORD volumen)
 {
-#ifdef NOTYET
-    if (SoundCard==DEV_NOSOUND) return;
-
-    volumen &= 15;
-    MASTER=volumen;
-    switch (SoundCard)
-    {
-        case DEV_SB:
-                    volumen &= ~1;
-                    outp (BaseAddress+SBMIXADDRESS, SBMASTER);
-                    outp (BaseAddress+SBMIXDATA, volumen);
-                    break;
-        case DEV_SBPRO:
-        case DEV_SB16 :
-                    volumen += volumen << 4;
-                    outp (BaseAddress+SBMIXADDRESS, SBPMASTER);
-                    outp (BaseAddress+SBMIXDATA, volumen);
-                    break;
-        case DEV_GUS:
-                    volumen <<=3;
-                    outp(BaseAddress+GUSMIXADDRESS,GUSMASTERL);
-                    outp(BaseAddress+GUSMIXDATA,volumen);
-                    outp(BaseAddress+GUSMIXADDRESS,GUSMASTERR);
-                    outp(BaseAddress+GUSMIXDATA,volumen);
-    }
-#endif
 }
 
 void SetVocVolume (UWORD volumen)
 {
-#ifdef NOTYET
-    if (SoundCard==DEV_NOSOUND) return;
-
-    volumen &= 15;
-    VOC=volumen;
-    switch (SoundCard)
-    {
-        case DEV_SB:
-                    volumen >>= 1;
-                    volumen &= ~1;
-                    outp (BaseAddress+SBMIXADDRESS, SBVOC);
-                    outp (BaseAddress+SBMIXDATA, volumen);
-                    break;
-        case DEV_SBPRO:
-        case DEV_SB16:
-                    volumen += volumen << 4;
-                    outp (BaseAddress+SBMIXADDRESS, SBPVOC);
-                    outp (BaseAddress+SBMIXDATA, volumen);
-                    break;
-        case DEV_GUS:
-                    volumen <<=3;
-                    outp(BaseAddress+GUSMIXADDRESS,GUSVOCL);
-                    outp(BaseAddress+GUSMIXDATA,volumen);
-                    outp(BaseAddress+GUSMIXADDRESS,GUSVOCR);
-                    outp(BaseAddress+GUSMIXDATA,volumen);
-    }
-    
-#endif
 }
 
 void SetCDVolume (UWORD volumen)
 {
-#ifdef NOTYET
-    if (SoundCard==DEV_NOSOUND) return;
-
-    volumen &= 15;
-    CD=volumen;
-    switch (SoundCard)
-    {
-        case DEV_SB:
-                    volumen &= ~1;
-                    outp (BaseAddress+SBMIXADDRESS, SBCD);
-                    outp (BaseAddress+SBMIXDATA, volumen);
-                    break;
-        case DEV_SBPRO:
-        case DEV_SB16:
-                    volumen += volumen << 4;
-                    outp (BaseAddress+SBMIXADDRESS, SBPCD);
-                    outp (BaseAddress+SBMIXDATA, volumen);
-                    break;
-        case DEV_GUS:
-                    volumen <<=3;
-                    outp(BaseAddress+GUSMIXADDRESS,GUSCDL);
-                    outp(BaseAddress+GUSMIXDATA,volumen);
-                    outp(BaseAddress+GUSMIXADDRESS,GUSCDR);
-                    outp(BaseAddress+GUSMIXDATA,volumen);
-    }
-#endif
 }
 
 void InitMixer(UWORD card, UWORD address, UWORD master, UWORD voc, UWORD cd)
@@ -105,61 +19,22 @@ void InitMixer(UWORD card, UWORD address, UWORD master, UWORD voc, UWORD cd)
   cd=(master<cd)?master:cd;
   cd=Mix_VolumeMusic(cd*8);
   voc=Mix_Volume(-1, voc*8);
-
-#ifdef NOTYET
-    if (card > DEV_NOSOUND && card <= DEV_GUS)
-    {
-        SoundCard=card;
-        BaseAddress=address;
-        CD=cd & 15;
-        MASTER=master & 15;
-        VOC=voc & 15;
-
-        SetMasterVolume(MASTER);
-        SetVocVolume(VOC);
-        SetCDVolume(CD);
-    }
-#endif
 }
 
 void MIX_Reset(void)
 {
-#ifdef NOTYET
-  outp(judascfg_port+MIX_ADR_OFF,   0);
-  outp(judascfg_port+MIX_ADR_OFF+1, 0);
-#endif
 }
 
 void MIX_SetInput(byte opt)
 {
-#ifdef NOTYET
-  outp(judascfg_port+MIX_ADR_OFF,   MIX_INPUT);
-  outp(judascfg_port+MIX_ADR_OFF+1, opt);
-#endif
 }
 
 void MIX_GetVolume(byte reg, byte *left, byte *right)
 {
-#ifdef NOTYET
-  byte al;
-
-  outp(judascfg_port+MIX_ADR_OFF, reg);
-  al = inp(judascfg_port+MIX_ADR_OFF+1);
-  *right = al  & 0x0f;
-  *left  = al >> 4;
-#endif
 }
 
 void MIX_SetVolume(byte reg, byte left, byte right)
 {
-#ifdef NOTYET
-  byte al;
-
-  outp(judascfg_port+MIX_ADR_OFF,   reg);
-  al  = left << 4;
-  al |= right;
-  outp(judascfg_port+MIX_ADR_OFF+1, al);
-#endif
 }
 
 void set_mixer(void) {
@@ -179,4 +54,3 @@ void set_init_mixer(void) {
   ma=Setupfile.vol_ma; if(Setupfile.mut_ma) ma=0;
   InitMixer(0, 0, ma, fx, cd);
 }
-

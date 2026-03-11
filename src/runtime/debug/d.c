@@ -1857,49 +1857,17 @@ void readmouse(void);
 
 void dread_mouse(void) {
 	poll_keyboard();
-  short ix,iy;
   int n=0;
-#ifdef DOS
-  union REGS regs;
-
-  memset(&regs,0,sizeof(regs));
-  regs.w.ax=3;
-  int386(0x33,&regs,&regs);
-
-
-  prev_mouse_buttons=mouse_b;
-  mouse_b=regs.w.bx;
-
-  memset(&regs,0,sizeof(regs));
-  regs.w.ax=0xb;
-  int386(0x33,&regs,&regs);
-
-  ix=regs.w.cx;
-  iy=regs.w.dx;
-
-  if (mouse->speed<0) mouse->speed=0;
-  if (mouse->speed>9) mouse->speed=9;
-
-  m_x+=(float)ix/(1.0+((float)mouse->speed/3.0));
-  m_y+=(float)iy/(1.0+((float)mouse->speed/3.0));
-#endif
-
 
   mouse_x=(int)mouse->x;
   mouse_y=(int)mouse->y;
-
 
   if (mouse_x<0) { mouse_x=0; n++; }
   else if (mouse_x>=vga_width) { mouse_x=vga_width-1; n++; }
   if (mouse_y<0) { mouse_y=0; n++; }
   else if (mouse_y>=vga_height) { mouse_y=vga_height-1; n++; }
 
-  fprintf(stdout, "%d %d %d %d\n",mouse_x, vga_width, mouse_y, vga_height);
-
-
   if (n) set_mouse(mouse_x,mouse_y);
-
-
 }
 
 //-----------------------------------------------------------------------------
@@ -4348,16 +4316,7 @@ void reset_tick(void);
 #define IntIncr (unsigned int)(11932/256)
 
 unsigned int get_ticks(void) {
-	return OSDEP_GetTicks();///10;
-#ifdef DOS
-  unsigned int x,xnull;
-
-  xnull=(unsigned char)inp(0x40);           // LSB
-  x=ticks+IntIncr-(unsigned char)inp(0x40); // MSB
-  return(x);
-#else
-return (unsigned int)clock();
-#endif
+	return OSDEP_GetTicks();
 }
 
 void function_exec(int id,int n) { // Number, cycles

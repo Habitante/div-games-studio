@@ -1212,8 +1212,6 @@ void frame_end(void) {
 	function_exec(255,get_ticks()-oreloj);
 #endif
 
-#ifndef NOTYET
-
     do {
 
 #ifdef DEBUG
@@ -1252,7 +1250,7 @@ void frame_end(void) {
 
 				if (mouse->z>=max && !mouse_pintado) {
 					max=mouse->z;
-					otheride=2; 
+					otheride=2;
 				}
 
 				if (draw_z>=max && !drawings_pintados) {
@@ -1264,7 +1262,7 @@ void frame_end(void) {
 					if (otheride==1) {
 
 						for (n=0;n<max_texts;n++)
-							if (texts[n].font) 
+							if (texts[n].font)
 								break;
 
 						if (n<max_texts) {
@@ -1305,10 +1303,10 @@ void frame_end(void) {
 					}
 				} else if (scrollide) {
 					iscroll[snum=scrollide-1].painted=1;
-					
+
 					if (iscroll[snum].on==1)
 						scroll_simple();
-					else if (iscroll[snum].on==2) 
+					else if (iscroll[snum].on==2)
 						scroll_parallax();
 				} else if (m7ide) {
 					paint_m7(m7ide-1);
@@ -1323,48 +1321,6 @@ void frame_end(void) {
 
 				}
 		} while (ide || m7ide || scrollide || otheride);
-
-#else // IFDEFNOTYET
-
-		for (id=id_start; id<=id_end; id+=iloc_len)
-			if ((mem[id+_Status]==2 || mem[id+_Status]==4) && mem[id+_Ctype]==0 &&
-				!mem[id+_Executed]) {
-				ide=id; 
-
-				if (mem[ide+_Graph]>0 || mem[ide+_XGraph]>0) {
-					paint_sprite();
-				}
-			}
-
-
-			for (n=0;n<10;n++)
-				if (iscroll[n].on && !iscroll[n].painted) {
-					scrollide=n+1; 
-					iscroll[snum=scrollide-1].painted=1;
-
-					if (iscroll[snum].on==1) 
-					scroll_simple();
-					else if (iscroll[snum].on==2) 
-					scroll_parallax();
-				}
-
-
-				for (n=0;n<max_texts;n++)
-					if (texts[n].font)
-						break;
-
-				if (n<max_texts) {
-					memb[nullstring[0]*4]=0; // The "floating" null text is never shown
-					memb[nullstring[1]*4]=0;
-					memb[nullstring[2]*4]=0;
-					memb[nullstring[3]*4]=0;
-					paint_texts(0);
-#ifdef DEBUG
-					function_exec(250,get_ticks()-oreloj);
-#endif
-				} 
-				textos_pintados=1;
-#endif // NDEFNOTYET
 
 				if (demo)
 					paint_texts(max_texts);
@@ -1750,9 +1706,6 @@ int main(int argc,char * argv[]) {
   
   getcwd(divpath,PATH_MAX+1);
 
-#ifdef DOS
-  numfiles=flushall();
-#endif
 
 if(true) {
 	f=fopen(argv[0],"rb");
@@ -1794,9 +1747,6 @@ if(true) {
 #endif
   vga_width=argc; // To remove a warning (argc unused?)
 
-#ifdef DOS
-  _harderr(critical_error);
-#endif
 
 
 	vga_width=320; vga_height=200; 
@@ -2207,33 +2157,6 @@ void DebugData(int Val)
 
 void GetFree4kBlocks(void)
 {
-#ifdef DOS
-  FILE *f;
-  unsigned u, DOScount, DPMIcount;
-
-  remove("C:\\DIV\\FREESRC.TXT");
-
-  if( (f=fopen("C:\\DIV\\FREESRC.TXT","a")) != NULL ) {
-    for (DOScount = 0; u = DOSalloc4k (); DOScount ++);
-    for (DPMIcount = 0; u = DPMIalloc4k (); DPMIcount ++);
-
-    fprintf(f, "\n"
-            "Total DOS 4k blocks allocated:   0x%08x (%dk)\n"
-            "Total DPMI 4k blocks allocated:  0x%08x (%dk)\n"
-            "\n"
-            "Total 4k blocks allocated:       0x%08x (%dk)\n",
-            DOScount, DOScount * 4,
-            DPMIcount, DPMIcount * 4,
-            DOScount + DPMIcount, (DOScount + DPMIcount) * 4);
-    fclose(f);
-
-  }
-
-  _dos_setdrive((int)toupper(*divpath)-'A'+1,&divnum);
-  chdir(divpath);
-
-  exit(0);
-#endif
 }
 
 //////////////////////////////////////////////////////////////////////////////

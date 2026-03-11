@@ -72,10 +72,6 @@ void paint_process_segment(void);
 #define lf 10           // newline / linefeed 
 #define tab 9           // tabulation
 
-#ifdef DOS
-extern word * kb_start;
-extern word * kb_end;
-#endif
 extern int ibuf; // A pointer to the queue buffer
 extern int fbuf; // Pointer to queue buffer end
 

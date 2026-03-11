@@ -326,15 +326,11 @@ void OSDEP_keyInit(void) {
 	OSDEP_key[SDLK_KP_MULTIPLY-0x3FFFFD1A]=55;
 	OSDEP_key[SDLK_KP_MINUS-0x3FFFFD1A]=74;
 	OSDEP_key[SDLK_KP_PLUS-0x3FFFFD1A]=78;
+	OSDEP_key[SDLK_KP_5-0x3FFFFD1A]=76;
 	OSDEP_key[SDLK_KP_ENTER-0x3FFFFD1A]=28;
 
 
 //OSDEP_key[SDLK_LSHIFT-0x3FFFFD1A]=43;
-
-#ifdef NOTYET
-//const _wave=41
-	const _c_center=76
-#endif
 
 
 }

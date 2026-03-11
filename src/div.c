@@ -27,11 +27,6 @@
 #include "divsb.h"
 #include "sysdac.h"
 
-#ifdef __EMSCRIPTEN__
-#include <emscripten.h>
-#endif
-
-void mainloop(void);
 void heap_dump(void );
 void DebugFile(char *Cadena,char *Nombre);
 void save_prg_buffer(memptrsize);
@@ -330,43 +325,7 @@ void betatest6(void) {
 int safe;
 
 
-/**
- * Legacy dos memory routines
- **/
 void GetFree4kBlocks(void);
-int DOSalloc4k(void);
-int DPMIalloc4k(void);
-
-#ifdef DOS_VERSION
-
-#pragma aux DOSalloc4k =\
-        "mov bx,0100h",\
-        "mov ax,0100h",\
-        "int 31h",\
-        "mov ecx,0",\
-        "jc short done",\
-        "mov bx,dx",\
-        "mov ax,0006h",\
-        "int 31h",\
-        "shl ecx,16",\
-        "mov cx,dx",\
-        "done:",\
-        modify [ax bx dx] value [ecx];
-
-#pragma aux DPMIalloc4k =\
-        "mov cx,1000h",\
-        "mov bx,0000h",\
-        "mov ax,0501h",\
-        "int 31h",\
-        "mov edx,0",\
-        "jc short done",\
-        "shrd edx,ebx,16",\
-        "mov dx,cx",\
-        "done:",\
-        modify [ax bx cx si di] value [edx];
-
-
-#endif
 
 #ifdef MIXER
 void print_init_flags(int flags)
@@ -557,12 +516,8 @@ int main(int argc, char * argv[]) {
 	}
 #endif
 
-#ifndef __EMSCRIPTEN__
 	OSDEP_SetCaption((char *)texts[34], "" );
 	SDL_ShowCursor( SDL_FALSE );
-#else
-	OSDEP_SetCaption( "DIV2015 - Javascript HTML5", "" );
-#endif
 
 	check_mouse();
 
@@ -579,12 +534,7 @@ int main(int argc, char * argv[]) {
 	}
 
 	if(!interpreting) {
-#ifdef DOS
-		_setvideomode(_TEXTC80);
-		_setbkcolor(1); _settextcolor(15);
-		_outtext(texts[1]);
-#endif
-		textcolor(BRIGHT, WHITE, RED);	
+		textcolor(BRIGHT, WHITE, RED);
 		printf("%s",texts[1]);
 		textcolor(TXTRESET, WHITE, BLACK);	
 		printf("\n");
@@ -612,13 +562,6 @@ int main(int argc, char * argv[]) {
 			}
 		}
 	}
-#endif
-
-#ifdef __EMSCRIPTEN__
-  // void emscripten_set_main_loop(em_callback_func func, int fps, int simulate_infinite_loop);
-	emscripten_cancel_main_loop();
-	emscripten_set_main_loop(mainloop, 0, 0);
-	return 0;
 #endif
 
 	main_loop(); // Environment
@@ -1871,18 +1814,6 @@ void dialog_loop(void) {
 
 	if (end_dialog && !salir_del_dialogo) {
 		close_window(); salir_del_dialogo=1;
-
-#ifdef __EMSCRIPTEN__
-		printf("resuming main loop\n");
-		emscripten_cancel_main_loop();
-		emscripten_set_main_loop(mainloop,0,0);
-
-		end_dialog=0;
-
-		get[0]=0;
-
-		wmouse_x=-1; wmouse_y=-1;
-#endif
     }
 
 	//-------------------------------------------------------------------------
@@ -1927,12 +1858,7 @@ void modal_loop(void) {
 
 	end_dialog=0;
 
-#ifdef __EMSCRIPTEN__
-	// kill main loop and start new one
-	emscripten_cancel_main_loop();
-	emscripten_set_main_loop(dialog_loop,0,0);
-#else
-	do { 
+	do {
 		dialog_loop();
 	}
 	while (!salir_del_dialogo && !exit_requested);
@@ -1945,8 +1871,6 @@ void modal_loop(void) {
 	do {
 		read_mouse();
 	} while((mouse_b) || key(_ESC));
-
-#endif  
 }
 
 //-----------------------------------------------------------------------------
@@ -2267,13 +2191,11 @@ void move_window_complete(void) {
 
   if (v.foreground==2) window_move_pending=1;
 
-#ifndef __EMSCRIPTEN__
   do {
     x=v.x; y=v.y;
     v.x=mouse_x-ix; v.y=mouse_y-iy;
     on_window_moved(x,y,an,al); flush_copy();
   } while(mouse_b&1);
-#endif
 
   if (window_move_pending) {
     window_move_pending=0;
@@ -3371,11 +3293,6 @@ void initialization(void) {
 	int n, a;
 	byte *ptr,*ptr2;
 
-#ifdef __EMSCRIPTEN__
-	int len_=1;
-	int num_=1;
-#endif
-
 	detect_vesa();
 
 	printf("Num modes: %d (%d %d)\n",num_modes,vga_width, vga_height);
@@ -3558,51 +3475,13 @@ mouse_surface = IMG_Load("system/cursor.png");
 	else {
 		fseek(f,0,SEEK_END); 
 		n=ftell(f);
-#ifndef __EMSCRIPTEN__
-#endif
 		if ((ptr2=(byte *)malloc(n))!=NULL) {
 			memset(graf_help,0,sizeof(graf_help));
 			ptr=ptr2; fseek(f,0,SEEK_SET);
-			fread(ptr2,1,n,f); 
-#ifndef __EMSCRIPTEN__
+			fread(ptr2,1,n,f);
 			fclose(f);
-#endif
 			ptr2+=1352;
 
-#ifdef __EMSRIPTEN__
-
-// alloc each graph	
-#ifdef NOTYET
-
-fseek(f,0,SEEK_END); file_len=ftell(es);
-fseek(f,1352,SEEK_SET);
-	
-while(ftell(f)<file_len && len_>0 && num_>0) {
-	int pos = ftell(f);
-	int an = 0;
-	int al = 0;
-	int pts = 0;
-	byte *mptr=NULL;//s&ptr[pos];
-	fread(&num_,4,1,f);
-	fread(&len_,4,1,f);
-	fseek(f,44,SEEK_CUR):
-	fread(&an,4,1,f);
-	fread(&al,4,1,f);
-	fread(&pts,4,1,f);
-	fseek(f,pts*4,SEEK_CUR);
-	
-	pos = ftell(f);
-
-	graf_help[num_].an=an;
-	graf_help[num_].al=al;
-	graf_help[num_].offset=pos;
- 	fseek(es,len,SEEK_CUR);
-}
-#endif
-
-fclose(f);
-
-#else
       while (ptr2<ptr+n && *((int*)ptr2)<384) {
         graf_help[*(int*)ptr2].an=*(int*)(ptr2+52);
         graf_help[*(int*)ptr2].al=*(int*)(ptr2+56);
@@ -3610,7 +3489,6 @@ fclose(f);
         ptr2+=*(int*)(ptr2+52)**(int*)(ptr2+56)+64+4*(*(int*)(ptr2+60));
       } free(ptr);
     } else { fclose(f); error(0); }
-#endif
 
 
   }
@@ -3800,22 +3678,6 @@ DWORD cchBuffer;
 
     return;
 #endif
-#ifdef NOTYET
-  int n,m,uni=0;
-  union REGS r;
-
-  n=1; do {
-    r.h.bl=n; r.w.ax=0x440e; intdos(&r,&r);
-    if (r.w.cflag&INTR_CF)
-      if (r.h.al==0xf) continue;
-      else drives[uni++]='A'+n-1;
-    else if (r.h.al==0) drives[uni++]='A'+n-1;
-    else drives[uni++]='A'+r.h.al-1;
-    if (uni>1) for (m=0;m<uni-1;m++)
-      if (drives[m]==drives[uni-1]) uni--;
-  } while (++n<=26);
-  drives[uni]=0;
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -3860,39 +3722,10 @@ char MemoriaLibre[100];
 int MaxMemUsed=0;
 
 int GetHeapFree(int RetUsed) {
-#ifdef NOTYET
-  struct _heapinfo h_info;
-  int heap_status;
-  int Use =0;
-  int Free=0;
-
-  h_info._pentry = NULL;
-  heap_status = _heapwalk( &h_info );
-  while(heap_status == _HEAPOK ) {
-    if(h_info._useflag == _USEDENTRY) Use+=h_info._size;
-    else Free+=h_info._size;
-    heap_status=_heapwalk(&h_info);
-  }
-  if(RetUsed) return(Use); else return(Free);
-#endif
   return 0;
 }
 
 char *GetMemoryFree() {
-#ifdef NOTYET
-  union  REGS  regs;
-  struct SREGS sregs;
-
-  regs.x.eax=0x0500;
-  memset(&sregs,0,sizeof(sregs));
-  sregs.es  =FP_SEG(&MemInfo);
-  regs.x.edi=FP_OFF(&MemInfo);
-  int386x(0x031,&regs,&regs,&sregs);
-  if(MaxMemUsed<GetHeapFree(1)) MaxMemUsed=GetHeapFree(1);
-  div_snprintf(MemoriaLibre,sizeof(MemoriaLibre),"%u %u %u [%u]",MemInfo.data1,
-          MemInfo.data1+GetHeapFree(0),GetHeapFree(1),MaxMemUsed);
-  return(MemoriaLibre);
-#endif
   return "";
 }
 
@@ -4698,25 +4531,6 @@ void Load_Cfgbin() {
 //-----------------------------------------------------------------------------
 
 void check_mouse(void) {
-#ifdef NOTYET
-  struct SREGS sregs;
-  union REGS inregs, outregs;
-
-  segread(&sregs);
-  inregs.w.ax = 0;
-  int386 (0x33, &inregs, &outregs);
-
-  if (outregs.w.ax!=0xffff) {
-    system("system/mouse.com >nul");
-    segread(&sregs);
-    inregs.w.ax = 0;
-    int386 (0x33, &inregs, &outregs);
-    if (outregs.w.ax!=0xffff) {
-      printf(texts[376]);
-      exit(0);
-    }
-  }
-#endif
 }
 
 
@@ -4836,47 +4650,14 @@ void DaniDel(char *name) {
 
 void DebugInfo(char *Msg)
 {
-#ifdef NOTYET
-  FILE *f;
-  if( (f=fopen("DEBUGDIV.TXT","a")) ) {
-    fprintf(f, "%s\n", Msg);
-    fclose(f);
-  }
 }
 
 void DebugData(int Val)
 {
-  FILE *f;
-  if( (f=fopen("DEBUGDIV.TXT","a")) != NULL ) {
-    fprintf(f, "%d\n", Val);
-    fclose(f);
-  }
 }
 
 void GetFree4kBlocks(void)
 {
-  FILE *f;
-  unsigned u, DOScount, DPMIcount;
-
-  remove("C:/DIV/FREEDIV.TXT");
-
-  if( (f=fopen("C:/DIV/FREEDIV.TXT","a")) != NULL ) {
-    for (DOScount = 0; u = DOSalloc4k (); DOScount ++);
-    for (DPMIcount = 0; u = DPMIalloc4k (); DPMIcount ++);
-
-    fprintf(f, "\n"
-            "Total DOS 4k blocks allocated:   0x%08x (%dk)\n"
-            "Total DPMI 4k blocks allocated:  0x%08x (%dk)\n"
-            "\n"
-            "Total 4k blocks allocated:       0x%08x (%dk)\n",
-            DOScount, DOScount * 4,
-            DPMIcount, DPMIcount * 4,
-            DOScount + DPMIcount, (DOScount + DPMIcount) * 4);
-    fclose(f);
-  }
-
-  exit(0);
-#endif
 }
 
 //-----------------------------------------------------------------------------

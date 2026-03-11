@@ -929,21 +929,6 @@ typedef struct _HeadDC{
   unsigned short wBits;
 } HeadDC;
 
-typedef struct _meminfo{
-        unsigned Bloque_mas_grande_disponible;
-        unsigned Maximo_de_paginas_desbloqueadas;
-        unsigned Pagina_bloqueable_mas_grande;
-        unsigned Espacio_de_direccionamiento_lineal;
-        unsigned Numero_de_paginas_libres_disponibles;
-        unsigned Numero_de_paginas_fisicas_libres;
-        unsigned Total_de_paginas_fisicas;
-        unsigned Espacio_de_direccionamiento_lineal_libre;
-        unsigned Tamano_del_fichero_de_paginas;
-        unsigned reservado[3];
-}meminfo;
-
-void GetFreeMem(meminfo *Meminfo);
-
 void create_thumb_PCM(struct t_listboxbr * l)
 {
   int estado=0,x,y,y0,y1,p0,p1,n;
@@ -951,7 +936,6 @@ void create_thumb_PCM(struct t_listboxbr * l)
   char *temp, *WAV;
   float step,position=0;
   int First=1,lx,ly,pos;
-  meminfo Mi_meminfo;
   int mem;
 
   int    Exit=0;
@@ -999,17 +983,6 @@ void create_thumb_PCM(struct t_listboxbr * l)
     // Start reading a new thumbnail
     if (estado==1)
     {
-#ifdef NOTYET
-      _heapshrink();
-      GetFreeMem(&Mi_meminfo);
-      if((mem=Mem_GetHeapFree())==-1)
-      {
-        estado=0;
-        thumb[num].status=-1;
-        return;
-      }
-#endif
-      mem=(Mi_meminfo.Bloque_mas_grande_disponible+mem-1000000)/2;
       if((f=fopen(l->list+(l->item_width*num),"rb"))==NULL)
       {
         estado=0;
@@ -1695,18 +1668,7 @@ void browser2(void) {
 #ifdef MIXER
 
         if(v_thumb==7 && opc_pru) {
-#ifdef NOTYET
-          if ( judascfg_device == DEV_NOSOUND) {
-            if ( SoundError ) {
-              v_text=texts[549]; show_dialog(err0);
-            } else {
-              v_text=texts[548]; show_dialog(err0);
-            } return;
-          } else 
-#else
-			if(true) 
-#endif
-			{
+          {
             div_strcpy(full,sizeof(full),tipo[v_type].path);
             if (tipo[v_type].path[strlen(tipo[v_type].path)-1]!='/')
               div_strcat(full,sizeof(full),"/");
@@ -1736,31 +1698,7 @@ void browser2(void) {
             }
           }
         } else if(v_type==16 && opc_pru) {
-#ifdef NOTYET
-          div_strcpy(full,sizeof(full),tipo[v_type].path);
-          if (tipo[v_type].path[strlen(tipo[v_type].path)-1]!='/')
-            div_strcat(full,sizeof(full),"/");
-          div_strcat(full,sizeof(full),archivo+(larchivosbr.zone-10+larchivosbr.first_visible)*an_archivo);
-
-          if(judas_channel[0].smp) judas_stopsample(0);
-          if(smp!=NULL) { judas_freesample(smp); smp=NULL; }
-
-          FreeMOD();
-
-          judas_loadxm(full);
-          if(judas_error == JUDAS_OK) { judas_playxm(1); SongType=XM; }
-          else if(judas_error == JUDAS_WRONG_FORMAT)
-          {
-            judas_loads3m(full);
-            if(judas_error == JUDAS_OK) { judas_plays3m(1); SongType=S3M; }
-            else if(judas_error == JUDAS_WRONG_FORMAT)
-            {
-              judas_loadmod(full);
-              if(judas_error == JUDAS_OK) { judas_playmod(1); SongType=MOD; }
-            }
-          }
-          while (mouse_b&1) read_mouse();
-#endif
+          // PORT: MOD/S3M/XM preview not yet implemented for SDL2
         }
       } else {
         if(num_taggeds==1) v_exists=1, v_finished=1;
@@ -1835,18 +1773,11 @@ void browser3(void) {
     free(thumb[n].ptr);
   }
 
-  if(song_playing)
-  {
-    song_playing=0;
-  }
+  Mix_HaltChannel(-1);
+  if(smp != NULL) { Mix_FreeChunk(smp); smp = NULL; }
 
+  if(song_playing) { Mix_HaltMusic(); song_playing=0; }
   if(v_type==16) FreeMOD();
-#ifdef NOTYET
-  if(v_thumb==7) {
-    if(judas_channel[0].smp) judas_stopsample(0);
-    if(smp!=NULL) { judas_freesample(smp); smp=NULL; }
-  }
-#endif
 }
 
 //-----------------------------------------------------------------------------

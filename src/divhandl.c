@@ -2360,18 +2360,14 @@ void analyze_input(void) {
 
   if (_fullpath(full,input,_MAX_PATH)!=NULL) {
     strupr(full); 
-#ifdef DOS
     div_strcpy(input,sizeof(input),file_mask);
-#endif
     _splitpath(full,drive,dir,fname,ext);
     _dos_setdrive(drive[0]-'A'+1,&n);
 //    getcwd(full,PATH_MAX);
     if ( true || (full[0]==drive[0])) {
       if (strlen(dir)>1) if (IS_PATH_SEP(dir[strlen(dir)-1])) dir[strlen(dir)-1]=0;
       if (!strlen(dir) || !chdir(dir)) {
-#ifdef DOS		
         div_strcpy(input,sizeof(input),fname); div_strcat(input,sizeof(input),ext);
-#endif
         if (strlen(input)) {
         // FILE NAME PROCESSING LOGIC
 

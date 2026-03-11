@@ -2322,17 +2322,8 @@ return;
 
   if (system(NULL)) {
     if (!strcmp(strupr((char*)&mem[pila[sp]]),"COMMAND.COM")) {
-#ifdef DOS
-      _setvideomode(_TEXTC80);
-#endif
       getcwd(cwork,256);
       EndSound();
-#ifdef DOS
-      flushall();
-      _heapmin();
-      _heapshrink();
-      system("command.com");
-#endif
       InitSound();
       set_mixer();
       _dos_setdrive((int)toupper(*cwork)-'A'+1,&n);
@@ -2342,11 +2333,6 @@ return;
       readmouse();
       full_redraw=1;
     } else {
-#ifdef DOS
-      flushall();
-      _heapmin();
-      _heapshrink();
-#endif
       system((char*)&mem[pila[sp]]);
     }
   }
@@ -2675,18 +2661,12 @@ void get_real_point(void) {
 #define  TIME_OUT 2000
 
 void get_joy_button(void) {
-#ifndef DOS
 // SDL joypad
 if(divjoy && joy_status) {
 pila[sp]=OSDEP_JoystickGetButton(divjoy,pila[sp]);
 } else {
 pila[sp]=0;
 }
-
-#else
-   if(pila[sp]<0 || pila[sp]>3) { pila[sp]=0; e(134); return; }
-   if(inp(GAME_PORT)&(1<<(4+pila[sp]))) pila[sp]=0; else pila[sp]=1;
-#endif
 }
 
 //----------------------------------------------------------------------------
@@ -2703,40 +2683,7 @@ void get_joy_position(void) {
 
 int joy_position(int eje)
 {
-
-#ifndef DOS
-
-return OSDEP_JoystickGetAxis(divjoy,pila[sp])/100;
-
-
-#else
-
-   unsigned start,finish,result;
-   int i,mask=1<<eje;
-
-   _disable();
-   outp(TIMER_PORT+3,0);
-   start=inp(TIMER_PORT); start+=inp(TIMER_PORT)<<8;
-   outp(GAME_PORT,0);
-   for(i=0;i<TIME_OUT;i++) if((inp(GAME_PORT)&mask)==0) break;
-   if(i==TIME_OUT) { _enable(); joy_timeout++; return(0); } else joy_timeout=0;
-   outp(TIMER_PORT+3,0);
-   finish=inp(TIMER_PORT); finish+=inp(TIMER_PORT)<<8;
-   _enable();
-
-   if(start>=finish) result=start-finish; else result=0xffff-finish+start;
-   for(i=0;i<TIME_OUT/2;i++) if((inp(GAME_PORT)&0x0f)==0) break;
-   result=((result&0x1ff0)>>4)*100;
-
-   if (ej[eje]==-1) ej[eje]=result; else {
-      if (result>0 && result<25600) {
-        if (joy_filter<0) joy_filter=0;
-        else if (joy_filter>100) joy_filter=100;
-        ej[eje]=(result*(100-joy_filter)+ej[eje]*joy_filter)/100;
-      } result=ej[eje];
-   } return(result/100);
-#endif
-
+return OSDEP_JoystickGetAxis(divjoy,eje)/100;
 }
 
 //----------------------------------------------------------------------------
@@ -2746,64 +2693,29 @@ return OSDEP_JoystickGetAxis(divjoy,pila[sp])/100;
 int joy_cx=0,joy_cy=0,joy_x0,joy_x1,joy_y0,joy_y1,init_joy=0;
 
 void read_joy(void) {
-#ifndef DOS
-// do SDL joystick stuff
-
-#else
-  int n,x,y;
-  n=inp(GAME_PORT);
-  if(n&16) joy->button1=0; else joy->button1=1;
-  if(n&32) joy->button2=0; else joy->button2=1;
-  if(n&64) joy->button3=0; else joy->button3=1;
-  if(n&128) joy->button4=0; else joy->button4=1;
-
-  x=joy_position(0); y=joy_position(1);
-
-  if (init_joy<=10) {
-
-      if (x==0 || y==0) return; // Timeouts are not taken into account
-
-      if (init_joy<10) {
-        joy_cx+=x; joy_cy+=y;
-      } else {
-        joy_cx/=10; joy_cy/=10;
-        joy_x0=joy_cx-16; joy_x1=joy_cx+16; joy_y0=joy_cy-16; joy_y1=joy_cy+16;
-      } init_joy++; joy->left=0; joy->right=0; return;
-
-  } else {
-
-    if (x<joy_x0) {
-      joy_x0=x;
-      if (joy_x1<joy_cx+((joy_cx-x)*8)/10) joy_x1=joy_cx+((joy_cx-x)*8)/10;
-    } else if (x>joy_x1) {
-      joy_x1=x;
-      if (joy_x0>joy_cx+((joy_cx-x)*8)/10) joy_x0=joy_cx+((joy_cx-x)*8)/10;
-    }
-    if (y<joy_y0) {
-      joy_y0=y;
-      if (joy_y1<joy_cy+((joy_cy-y)*8)/10) joy_y1=joy_cy+((joy_cy-y)*8)/10;
-    } else if (y>joy_y1) {
-      joy_y1=y;
-      if (joy_y0>joy_cy+((joy_cy-y)*8)/10) joy_y0=joy_cy+((joy_cy-y)*8)/10;
-    }
-
+  if (!divjoy || !joy_status) {
+    joy->button1=0; joy->button2=0; joy->button3=0; joy->button4=0;
+    joy->left=0; joy->right=0; joy->up=0; joy->down=0;
+    return;
   }
 
-  if (x>(joy_x0*2+joy_x1*3)/5) {
-    joy->left=0; joy->right=1;
-  } else if (x<(joy_x0*3+joy_x1*2)/5) {
-    joy->left=1; joy->right=0;
-  } else {
-    joy->left=0; joy->right=0;
-  }
-  if (y>(joy_y0*2+joy_y1*3)/5) {
-    joy->up=0; joy->down=1;
-  } else if (y<(joy_y0*3+joy_y1*2)/5) {
-    joy->up=1; joy->down=0;
-  } else {
-    joy->up=0; joy->down=0;
-  }
-#endif
+  // Read button states
+  joy->button1=OSDEP_JoystickGetButton(divjoy,0) ? 1 : 0;
+  joy->button2=OSDEP_JoystickGetButton(divjoy,1) ? 1 : 0;
+  joy->button3=OSDEP_JoystickGetButton(divjoy,2) ? 1 : 0;
+  joy->button4=OSDEP_JoystickGetButton(divjoy,3) ? 1 : 0;
+
+  // Read axes (-32768..32767) and apply dead zone (~30%)
+  int x=OSDEP_JoystickGetAxis(divjoy,0);
+  int y=OSDEP_JoystickGetAxis(divjoy,1);
+
+  if (x > 9830)       { joy->left=0; joy->right=1; }
+  else if (x < -9830) { joy->left=1; joy->right=0; }
+  else                 { joy->left=0; joy->right=0; }
+
+  if (y > 9830)       { joy->up=0; joy->down=1; }
+  else if (y < -9830) { joy->up=1; joy->down=0; }
+  else                 { joy->up=0; joy->down=0; }
 }
 //----------------------------------------------------------------------------
 //      Convert_palette(file,graph,&apply_palette)
@@ -3455,11 +3367,7 @@ void get_fileinfo(void) {
 //----------------------------------------------------------------------------
 
 void getdrive(void) {
-#ifdef DOS
-  unsigned int drive;
-  _dos_getdrive(&drive);
-  pila[++sp]=drive;
-#endif
+  pila[++sp]=0;
 }
 
 //----------------------------------------------------------------------------
@@ -3573,33 +3481,11 @@ typedef struct _meminfo{
 
 int Mem_GetHeapFree()
 {
-#ifdef DOS
-  struct _heapinfo miheap;
-  int status=0,total=0;
-  miheap._pentry=NULL;
-  _heapmin();
-  for(;;)
-  {
-    status=_heapwalk(&miheap);
-    if(status!=_HEAPOK) break;
-    if(miheap._useflag==_FREEENTRY) total+=miheap._size;
-  }
-  return total;
-#endif
-return 65535;
+  return 65535;
 }
 
 void GetFreeMem(meminfo *Meminfo)
 {
-#ifdef DOS
-  union REGS regs;
-  struct SREGS sregs;
-  regs.x.eax=0x0500;
-  memset( &sregs, 0 , sizeof(sregs) );
-  sregs.es  =FP_SEG(Meminfo);
-  regs.x.edi=FP_OFF(Meminfo);
-  int386x(0x031,&regs,&regs,&sregs);
-#endif
 }
 
 //----------------------------------------------------------------------------
@@ -3607,24 +3493,7 @@ void GetFreeMem(meminfo *Meminfo)
 //----------------------------------------------------------------------------
 
 void disk_free(void) {
-#ifdef DOS
-  long MBfree;
-  union REGS regs;
-  struct diskfree_t structdiskfree;
-
-  regs.w.ax=0x4409;
-  regs.w.bx=pila[sp];
-  int386(0x21, &regs, &regs);           // device information
-  if (!(regs.w.cflag & INTR_CF)) {      // if no error
-    if (!(regs.w.dx & (1<<9))) {        // i/o not allowed
-      structdiskfree.avail_clusters=0;
-      _dos_getdiskfree(pila[sp], &structdiskfree);
-      MBfree=structdiskfree.sectors_per_cluster * structdiskfree.bytes_per_sector;
-      MBfree*=structdiskfree.avail_clusters;
-      pila[sp]=MBfree/1024;
-    } else pila[sp]=0;
-  } else pila[sp]=0;
-#endif
+  pila[sp]=0;
 }
 
 //----------------------------------------------------------------------------
@@ -3632,17 +3501,7 @@ void disk_free(void) {
 //----------------------------------------------------------------------------
 
 void memory_free(void) {
-#ifdef DOS
-  meminfo Mi_meminfo;
-  int mem;
-
-  _heapshrink();
-  GetFreeMem(&Mi_meminfo);
-  mem=Mem_GetHeapFree();
-  pila[++sp]=(Mi_meminfo.Bloque_mas_grande_disponible+mem)/1024;
-#else
-pila[++sp]=0;
-#endif
+  pila[++sp]=0;
 }
 
 //----------------------------------------------------------------------------

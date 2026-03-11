@@ -11,11 +11,6 @@
 #include <unistd.h>
 #endif
 
-// HACK
-byte DmaBuf=0;
-unsigned short dmacount ( void ) { return 0; }
-unsigned char *aligned[2];
-// END HACK
 
 int    FilePos=0;
   
@@ -1217,9 +1212,6 @@ void EditSound2(void)
 void EditSound3(void)
 {
 Mix_HaltChannel(-1);
-#ifdef NOTYET
-  if(judas_channel[0].smp) judas_stopsample(0);
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -1792,15 +1784,6 @@ debugprintf("SoundFile to record: %s\n",SoundFile);
 
   fclose(f);
 
-  DmaBuf=0;
-#ifdef NOTYET
-  judas_uninit();
-  timer_uninit();
-
-  if(!sbinit()) return;
-  MIX_Reset();
-  set_mixer();
-#endif
 
   if(RecDevice[0])
   {
@@ -1813,21 +1796,6 @@ debugprintf("SoundFile to record: %s\n",SoundFile);
     MIX_SetInput(MIX_IN_CD|MIX_NO_FILT);
   }
 
-#ifdef NOTYET
-  if(judascfg_device == DEV_SB16 ) {
-    ra=44100;
-    ca=256UL-(1000000UL/ra);
-    sbsettc(ca);
-  } else {
-    ra=22050;
-    ca=256UL-(1000000UL/ra);
-    sbsettc(ca);
-  }
-
-  spkon();
-  sbrec(65000);
-  dmastatus();
-#endif
   PollRecord();
 
 }
@@ -1842,59 +1810,22 @@ void PollRecord(void)
   if((f=fopen(SoundFile,"ab"))==NULL) {
     v_text=(char *)texts[47];  // TODO: Use a more specific error message for sound recording failure
     show_dialog(err0);
-#ifdef NOTYET
-    spkoff();
-    InitSound();
-    MIX_Reset();
-    set_mixer();
-#endif
     return;
   }
 
   kbdFLAGS[_ESC]=0;
-#ifdef NOTYET
 
-  while(!kbdFLAGS[_ESC])
-  {
-    if(dmastatus())
-    {
-      inp(judascfg_port+0x0E);
-      if(DmaBuf) DmaBuf=0; else DmaBuf=1;
-      sbrec(65000); //Inicializa DMA de nuevo
-      if(DmaBuf) DmaBuf=0; else DmaBuf=1;
-      fwrite(aligned[DmaBuf],1,65000,f);
-      if(DmaBuf) DmaBuf=0; else DmaBuf=1;
-    }
-  }
-#endif
-
-  fwrite(aligned[DmaBuf],1,65000-dmacount(),f);
   length=ftell(f)-44;
   fclose(f);
   if((f=fopen(SoundFile,"rb+"))==NULL)
   {
     v_text=(char *)texts[47];  // TODO: Use a more specific error message for sound file reopen failure
     show_dialog(err0);
-#ifdef NOTYET
-    spkoff();
-    InitSound();
-    MIX_Reset();
-    set_mixer();
-#endif
     return;
   }
   fseek(f, 40, SEEK_SET);
   fwrite(&length,1,4,f);
   fclose(f);
-#ifdef NOTYET
-  while(!dmastatus());
-  inp(judascfg_port+0x0E);
-  spkoff();
-  InitSound();
-  MIX_Reset();
-  set_mixer();
-
-#endif
 }
 
 int JudasProgressRead(int handle, void *buffer, int size)

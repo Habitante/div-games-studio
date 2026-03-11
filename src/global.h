@@ -55,9 +55,8 @@ void call(const voidReturnType func); // void funcion(void); int n=(int)funcion;
 #include "divkeybo.h"
 // divmap3d.hpp removed (MODE8/3D map editor deleted)
 
-  // NOTE: Originally from JUDAS sound library, now uses SDL2_mixer
-#include "judas/judas.h"
-#include "judas/timer.h"
+// JUDAS sound library removed — SDL2_mixer has fully replaced it.
+// judas/ directory deleted; shared/divsound.h provides sound constants for runtime.
 
 //-----------------------------------------------------------------------------
 //      Constants defined at the application level

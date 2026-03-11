@@ -23,11 +23,6 @@ void blit_sdl(byte *p);
 //	Declarations and module-level data
 ///////////////////////////////////////////////////////////////////////////////
 
-#define CRTC_INDEX      0x3d4   //CRT Controller Index
-#define CRTC_OFFSET     0x13    //CRTC offset register index
-#define SC_INDEX        0x3c4   //Sequence Controller Index
-#define MISC_OUTPUT     0x3c2   //Miscellaneous Output register
-
 SDL_Surface *vga;
 
 int IsFullScreen(SDL_Surface *surface)
@@ -66,26 +61,6 @@ void SDL_ToggleFS(SDL_Surface *surface)
 
 static short scan[MAX_YRES*4]; // Por scan [x,an,x,an] se definen hasta 2 segmentos a volcar
 
-struct {
-  byte dot;
-  int crt[20];
-} modox[5]={
-
-  {0xe3,{0x0d06,0x3e07,0x4109,0xea10,0xac11,0xdf12,0x0014,0xe715, //320x240
-   0x0616,0xe317,0}},
-
-  {0xe3,{0x4009,0x0014,0xe317,0}}, //320x400
-
-  {0xe7,{0x6b00,0x5901,0x5a02,0x8e03,0x5e04,0x8a05,0x0d06,0x3e07, //360x240
-   0x4109,0xea10,0xac11,0xdf12,0x2d13,0x0014,0xe715,0x0616,0xe317,0}},
-
-  {0xe7,{0x6b00,0x5901,0x5a02,0x8e03,0x5e04,0x8a05,0x4009,0x8810, //360x360
-   0x8511,0x6712,0x2d13,0x0014,0x6d15,0xba16,0xe317,0}},
-
-  {0xe7,{0x6e00,0x5d01,0x5e02,0x9103,0x6204,0x8f05,0x6206,0xf007, //376x282
-   0x6109,0x310f,0x3710,0x8911,0x3312,0x2f13,0x0014,0x3c15,0x5c16,0xe317,0}}
-};
-
 ///////////////////////////////////////////////////////////////////////////////
 //      Awaits the arrival of the vertical retrace (vsync)
 ///////////////////////////////////////////////////////////////////////////////
@@ -94,12 +69,6 @@ FPSmanager fpsman;
 
 void retrace_wait(void) {
 SDL_framerateDelay(&fpsman);
-
-#ifdef NOTYET
-  while (inp(0x3da)&8);
-  while ((inp(0x3da)&8)==0);
-#endif
-
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -324,30 +293,9 @@ void snapshot(byte *p) {
 //-----------------------------------------------------------------------------
 
 void blit_partial_320x200(byte *p) { // PARTIAL
-#ifdef NOTYET
-  int y=0,n;
-  byte * q=(byte *)vga->pixels;
-
-  #ifdef GRABADORA
-  RegScreen(p);
-  #endif
-
-  while (y<vga_height) {
-    n=y*4;
-    if (scan[n+1]) memcpy(q+scan[n],p+scan[n],scan[n+1]);
-    if (scan[n+3]) memcpy(q+scan[n+2],p+scan[n+2],scan[n+3]);
-    q+=vga_width; p+=vga_width; y++;
-  }
-#endif
 }
 
 void blit_full_320x200(byte *p) { // COMPLETE
-#ifdef NOTYET
-  #ifdef GRABADORA
-  RegScreen(p);
-  #endif
-  memcpy(vga,p,vga_width*vga_height);
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -412,44 +360,9 @@ void blit_full_svga(byte *p) {
 //-----------------------------------------------------------------------------
 
 void blit_partial_modex(byte * p) {
-debugprintf("divvideo.cpp blit_partial_modex\n");
-#ifdef NOTYET
-  int n,m=(vga_width*vga_height)/4,plano=0x100,y;
-  byte * v2, * p2;
-
-  do { v2=vga+m; y=0; p2=p++; outpw(SC_INDEX,2+plano); plano<<=1;
-    while (y<vga_height) {
-      n=y*4;
-      if (scan[n+1]) vgacpy(v2+scan[n],p2+scan[n]*4,scan[n+1]);
-      if (scan[n+3]) vgacpy(v2+scan[n+2],p2+scan[n+2]*4,scan[n+3]);
-      v2+=vga_width/4; p2+=vga_width; y++; }
-  } while (plano<=0x800);
-
-  outpw(SC_INDEX,0xF02); outp(0x3CE,5); outp(0x3CF,(inp(0x3CF)&252)+1);
-  y=0; v2=vga; while (y<vga_height) {
-    n=y*4;
-    if (scan[n+1]) memcpyb(v2+scan[n],v2+scan[n]+m,scan[n+1]);
-    if (scan[n+3]) memcpyb(v2+scan[n+2],v2+scan[n+2]+m,scan[n+3]);
-    v2+=vga_width/4; y++;
-  } outp(0x3CE,5); outp(0x3CF,inp(0x3CF)&252);
-#endif
 }
 
 void blit_full_modex(byte * p) {
-	printf("divvideo.cpp - blit_full_modex\n");
-#ifdef NOTYET
-  int n=(vga_width*vga_height)/4;
-
-  outpw(SC_INDEX,0x102); vgacpy(vga+n,p,n); p++;
-  outpw(SC_INDEX,0x202); vgacpy(vga+n,p,n); p++;
-  outpw(SC_INDEX,0x402); vgacpy(vga+n,p,n); p++;
-  outpw(SC_INDEX,0x802); vgacpy(vga+n,p,n);
-
-  outpw(SC_INDEX,0xF02); outp(0x3CE,5); outp(0x3CF,(inp(0x3CF)&252)+1);
-  memcpyb(vga,vga+n,n); outp(0x3CE,5); outp(0x3CF,inp(0x3CF)&252);
-
-#endif
-
 }
 
 
@@ -458,17 +371,6 @@ void blit_full_modex(byte * p) {
 //-----------------------------------------------------------------------------
 
 void vgacpy(byte * q, byte * p, int n) {
-  int m;
-
-return;
-
-  m=n>>2; while (m--) {
-    *(int*)q=*p+256*(*(p+4)+256*(*(p+8)+256*(*(p+12)))); q+=4; p+=16;
-  }
-
-  n&=3; while (n--) {
-    *q=*p; q++; p+=4;
-  }
 }
 
 //-----------------------------------------------------------------------------

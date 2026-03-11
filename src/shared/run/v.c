@@ -16,11 +16,7 @@
 #define SC_INDEX        0x3c4   //Sequence Controller Index
 #define MISC_OUTPUT     0x3c2   //Miscellaneous Output register
 
-#ifdef DOS
-byte * vga = (byte *) 0xA0000; // Physical screen
-#else
 SDL_Surface *vga=NULL;
-#endif
 
 void snapshot(byte *p);
 void blit_full_svga(byte *p);
@@ -137,12 +133,11 @@ extern int splashtime;
 
 void set_dac (void) {
 #ifndef DEBUG
-	if(splashtime>0)	
+	if(splashtime>0)
 		return;
 #endif
-	if(vga==NULL) 
+	if(vga==NULL)
 		return;
-#ifndef DOS
 
 	SDL_Color colors[512];
 
@@ -157,58 +152,25 @@ void set_dac (void) {
 	if(!OSDEP_SetPalette(vga, colors, 0, 256)) {
 		printf("Failed to set palette :(\n");
 	}
-	
+
 	retrace_wait();
-#else
-  union REGS regs;
-  word n=0;
-  if (fli_palette_update) return;
-  //retrace_wait();
-  outp(0x3c8,0);
-  do {
-    outp(0x3c9,dac[n++]);
-    outp(0x3c9,dac[n++]);
-    outp(0x3c9,dac[n++]);
-  } while (n<768);
-  regs.w.ax=0x1001;
-  regs.h.bh=color_oscuro;
-  int386(0x010,&regs,&regs);
-#endif
 }
 
 void set_dac2 (void) {
-#ifdef DOS
-  int n=0;
-  outp(0x3c8,0);
-  do {
-    outp(0x3c9,dac[n++]);
-    outp(0x3c9,dac[n++]);
-    outp(0x3c9,dac[n++]);
-  } while (n<768);
-#endif
+  set_dac(); // FLI palette update — same as set_dac on SDL
 }
 
 void retrace_wait (void) {
-#ifdef DOS
-  while (inp(0x3da)&8);
-  while ((inp(0x3da)&8)==0);
-#endif
 }
 
 // Blocking fade: advance palette toward target, presenting each step.
 // Replaces DOS spin-wait loops that wrote VGA DAC registers directly.
 void fade_wait(void) {
-#ifdef DOS
-  while (now_dacout_r!=dacout_r || now_dacout_g!=dacout_g || now_dacout_b!=dacout_b) {
-    update_palette(); set_dac();
-  }
-#else
   while (now_dacout_r!=dacout_r || now_dacout_g!=dacout_g || now_dacout_b!=dacout_b) {
     update_palette(); set_dac();
     OSDEP_Flip(vga);
     SDL_Delay(16);
   }
-#endif
   fading=0;
 }
 
@@ -269,65 +231,6 @@ SDL_ShowCursor(SDL_DISABLE);
 	OSDEP_SetCaption( "DIVDX 3.01", "" );
 
 	modovesa=1;
-#ifdef DOS
-  VBESCREEN Screen;
-
-  int mode=0;
-  int error=0,n;
-
-  LinealMode=0;
-  modovesa=0;
-
-  // First check if it's a VESA mode
-
-  for (n=0;n<num_video_modes;n++) {
-    if (vga_width==video_modes[n].width && vga_height==video_modes[n].height) {
-      if (video_modes[n].mode && video_modes[n].mode<256000) { mode=video_modes[n].mode; break; }
-    }
-  }
-
-  if (n<num_video_modes) {
-    modovesa=1;
-    if(vesa_version<0x102) {
-      if (!VBE_setVideoMode(mode)) error=1;
-      else vga=(char *)0x0A0000;
-    } else {
-      if(vesa_version<0x200) {
-        if(!SV_setMode(mode)) error=1;
-        else vga=(char *)0x0A0000;
-      } else {
-       	if (vbeSetMode (vga_width, vga_height, 8, &Screen) == 4) {
-          LinealMode=1;
-          mode|=vbeLinearBuffer;
-          if(!SV_setMode(mode)) {
-            LinealMode=0;
-            mode^=vbeLinearBuffer;
-            if(!SV_setMode(mode)) error=1;
-            else vga=(char *)videoMem;
-          } else vga=(char *)videoMem;
-        } else {
-          LinealMode=1;
-          vga=Screen.adr;
-        }
-      }
-    }
-  } else switch(vga_width*1000+vga_height) {
-    case 320200: _setvideomode(_MRES256COLOR); break;
-    case 320240: setup_modex(0); break;
-    case 320400: setup_modex(1); break;
-    case 360240: setup_modex(2); break;
-    case 360360: setup_modex(3); break;
-    case 376282: setup_modex(4); break;
-    default: error=1; break;
-  }
-
-  // Fallback: on systems without VESA, force 320x200 mode
-  
-  if (error) {
-    modovesa=0;
-    vga_width=320; vga_height=200; _setvideomode(_MRES256COLOR);
-  }
-#endif
 
   m_x=(float)vga_width/2.0;
   m_y=(float)vga_height/2.0;
@@ -348,26 +251,6 @@ if(splashtime>0)
 
 
 void setup_modex(int m) {
-#ifdef DOS
-  int n=0;
-
-  _setvideomode(_MRES256COLOR);
-
-  outpw(SC_INDEX,0x604); //disable chain4 mode
-  outpw(SC_INDEX,0x100);
-  outp(MISC_OUTPUT,modox[m].dot);
-  outpw(SC_INDEX,0x300);
-  outp(CRTC_INDEX,0x11);
-  outpw(CRTC_INDEX+1,inp(CRTC_INDEX+1)&0x7f);
-
-  while (modox[m].crt[n]) outpw(CRTC_INDEX,modox[m].crt[n++]);
-
-  outpw(SC_INDEX,0x0f02);
-  memset(vga,0,65536);
-
-  outp(CRTC_INDEX,CRTC_OFFSET);
-  outp(CRTC_INDEX+1,vga_width/8);
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -380,11 +263,6 @@ void reset_video_mode(void) {
 #ifndef __EMSCRIPTEN__
 	if(IsFullScreen(vga))
 		SDL_ToggleFS(vga);
-#endif
-
-#ifdef DOS
-  SV_restoreMode();
-  _setvideomode(3);
 #endif
 }
 
@@ -465,31 +343,6 @@ if ((shift_status&4) && (shift_status&8) && key(_9)) {
   if (fli_palette_update) retrace_wait();
 
 blit_sdl(p);
-
-#ifdef NOTYET
-
-  if (full_redraw) {
-    if (modovesa) blit_full_svga(p);
-    else switch(vga_width*1000+vga_height) {
-      case 320200: blit_full_320x200(p); break;
-      case 320240: blit_full_modex(p); break;
-      case 320400: blit_full_modex(p); break;
-      case 360240: blit_full_modex(p); break;
-      case 360360: blit_full_modex(p); break;
-      case 376282: blit_full_modex(p); break;
-    }
-  } else {
-    if (modovesa) blit_partial_svga(p);
-    else switch(vga_width*1000+vga_height) {
-      case 320200: blit_partial_320x200(p); break;
-      case 320240: blit_partial_modex(p); break;
-      case 320400: blit_partial_modex(p); break;
-      case 360240: blit_partial_modex(p); break;
-      case 360360: blit_partial_modex(p); break;
-      case 376282: blit_partial_modex(p); break;
-    }
-  }
-#endif
   if (fli_palette_update) { fli_palette_update=0; set_dac2(); }
   init_flush();
 }
@@ -691,68 +544,9 @@ void blit_full_320x200(byte *p) {
 //-----------------------------------------------------------------------------
 
 void blit_partial_svga(byte *p) {
-#ifdef DOS
-  int y=0,page,old_page=-1751,point,t1,t2,n;
-  char *q=vga;
-
-  if(LinealMode) {
-   while (y<vga_height) {
-     n=y*4;
-     if (scan[n+1]) memcpy(q+scan[n],p+scan[n],scan[n+1]);
-     if (scan[n+3]) memcpy(q+scan[n+2],p+scan[n+2],scan[n+3]);
-     q+=vga_width; p+=vga_width; y++;
-   }
-  } else while (y<vga_height) {
-    n=y*4;
-    if (scan[n+1]) {
-      page=(y*vga_width+scan[n])/65536;
-      point=(y*vga_width+scan[n])%65536;
-      if (point+scan[n+1]>65536) {
-        t1=65536-point;
-        t2=scan[n+1]-t1;
-        if (page!=old_page) SV_setBank((signed long)page);
-        memcpy(vga+point,p+scan[n],t1);
-        SV_setBank((signed long)page+1); old_page=page+1;
-        memcpy(vga,p+scan[n]+t1,t2);
-      } else {
-        if (page!=old_page) SV_setBank((signed long)(old_page=page));
-        memcpy(vga+point,p+scan[n],scan[n+1]);
-      }
-    }
-    if (scan[n+3]) {
-      page=(y*vga_width+scan[n+2])/65536;
-      point=(y*vga_width+scan[n+2])%65536;
-      if (point+scan[n+3]>65536) {
-        t1=65536-point;
-        t2=scan[n+3]-t1;
-        if (page!=old_page) SV_setBank((signed long)page);
-        memcpy(vga+point,p+scan[n+2],t1);
-        SV_setBank((signed long)page+1); old_page=page+1;
-        memcpy(vga,p+scan[n+2]+t1,t2);
-      } else {
-        if (page!=old_page) SV_setBank((signed long)(old_page=page));
-        memcpy(vga+point,p+scan[n+2],scan[n+3]);
-      }
-    } p+=vga_width; y++;
-  }
-#endif
-
 }
 
 void blit_full_svga(byte *p) {
-#ifdef DOS
-  int cnt=vga_width*vga_height;
-  int tpv=0,ActPge=0;
-
-  if(LinealMode) memcpy(vga,p,cnt);
-  else while(cnt>0) {
-    SV_setBank((signed long)ActPge++);
-    tpv=cnt>65536?65536:cnt;
-    memcpy(vga,p,tpv);
-    p+=tpv;
-    cnt-=tpv;
-  }
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -760,41 +554,9 @@ void blit_full_svga(byte *p) {
 //-----------------------------------------------------------------------------
 
 void blit_partial_modex(byte * p) {
-#ifdef DOS
-  int n,m=(vga_width*vga_height)/4,plano=0x100,y;
-  byte * v2, * p2;
-
-  do { v2=vga+m; y=0; p2=p++; outpw(SC_INDEX,2+plano); plano<<=1;
-    while (y<vga_height) {
-      n=y*4;
-      if (scan[n+1]) vgacpy(v2+scan[n],p2+scan[n]*4,scan[n+1]);
-      if (scan[n+3]) vgacpy(v2+scan[n+2],p2+scan[n+2]*4,scan[n+3]);
-      v2+=vga_width/4; p2+=vga_width; y++; }
-  } while (plano<=0x800);
-
-  outpw(SC_INDEX,0xF02); outp(0x3CE,5); outp(0x3CF,(inp(0x3CF)&252)+1);
-  y=0; v2=vga; while (y<vga_height) {
-    n=y*4;
-    if (scan[n+1]) memcpyb(v2+scan[n],v2+scan[n]+m,scan[n+1]);
-    if (scan[n+3]) memcpyb(v2+scan[n+2],v2+scan[n+2]+m,scan[n+3]);
-    v2+=vga_width/4; y++;
-  } outp(0x3CE,5); outp(0x3CF,inp(0x3CF)&252);
-
-#endif
 }
 
 void blit_full_modex(byte * p) {
-#ifdef DOS
-  int n=(vga_width*vga_height)/4;
-
-  outpw(SC_INDEX,0x102); vgacpy(vga+n,p,n); p++;
-  outpw(SC_INDEX,0x202); vgacpy(vga+n,p,n); p++;
-  outpw(SC_INDEX,0x402); vgacpy(vga+n,p,n); p++;
-  outpw(SC_INDEX,0x802); vgacpy(vga+n,p,n);
-
-  outpw(SC_INDEX,0xF02); outp(0x3CE,5); outp(0x3CF,(inp(0x3CF)&252)+1);
-  memcpyb(vga,vga+n,n); outp(0x3CE,5); outp(0x3CF,inp(0x3CF)&252);
-#endif
 }
 
 //-----------------------------------------------------------------------------

@@ -318,12 +318,9 @@ void Setup0() {
   if (strcmp(PackName,ExeGen)) {
     div_strcpy(PackName,sizeof(PackName),ExeGen);
     div_strcpy(Copy_Right,sizeof(Copy_Right),(char *)texts[352]);
-#ifdef NOTYET
-    t=time(NULL); _ctime(&t,tbuf); tbuf[24]=' ';
-#else
-div_strcpy(tbuf,sizeof(tbuf),"                    2015 ");
-#endif
-    div_strcat(Copy_Right,sizeof(Copy_Right),&tbuf[20]);
+    { time_t t=time(NULL); struct tm *tm=localtime(&t);
+      snprintf(tbuf,sizeof(tbuf),"%04d ",tm->tm_year+1900); }
+    div_strcat(Copy_Right,sizeof(Copy_Right),tbuf);
     if (strlen(user2)+strlen(Copy_Right)<=127) div_strcat(Copy_Right,sizeof(Copy_Right),user2);
     div_strcpy(Unid,sizeof(Unid),(char *)&tipo[8]);//"/tmp/");// :/TMP");
     //Unid[0]=toupper(tipo[1].path[0]);
@@ -739,23 +736,12 @@ void crear_instalacion(void) {
   if (strlen(fname)||strlen(ext)) { div_strcat(dir,sizeof(dir),fname); div_strcat(dir,sizeof(dir),ext); div_strcat(dir,sizeof(dir),"/"); }
 
   strupr(drive);
-#ifdef NOTYET
-  _dos_getdrive(&my_drive);
-  _dos_setdrive((int)drive[0]-'A'+1,&_drive);
-  _dos_getdrive(&_drive);
-  if (_drive!=(word)drive[0]-'A'+1) {
-    v_text=texts[356]; show_dialog((int)err0); return;
-  }
-#endif
 
   if (_drive<=2) { div_strcpy(dir,sizeof(dir),"/"); is_disk=_drive; } // On a floppy, don't create directories
 
   for(x=1;x<strlen(dir);x++) if(IS_PATH_SEP(dir[x])) { // Create directories ...
 div_strcpy(cWork,sizeof(cWork),full);
 
-#ifdef NOTYET
-    mkdir(cWork);
-#endif
   }
 
   // *** Default directory
@@ -1330,16 +1316,6 @@ int copy_file(FILE * fin, FILE * fout, unsigned long len, int patch) {
 //-----------------------------------------------------------------------------
 
 unsigned int GetFreeUnid(char unidad) {
-#ifdef NOTYET
-  union REGS regs;
-
-  memset(&regs,0,sizeof(regs));
-  regs.h.ah=0x36;
-  regs.h.dl=unidad;
-  intdos(&regs,&regs);
-  if(regs.w.ax==0xFFFF) return 0;
-  return(regs.w.ax*regs.w.bx*regs.w.cx);
-#endif
 	return 65535*64;
 }
 

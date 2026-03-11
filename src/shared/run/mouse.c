@@ -2,6 +2,7 @@
 #include "inter.h"
 
 float m_x=0.0,m_y=0.0;
+static float vx=0.0,vy=0.0;
 extern int mouse_in_window;
 
 //----------------------------------------------------------------------------
@@ -9,36 +10,9 @@ extern int mouse_in_window;
 //----------------------------------------------------------------------------
 
 void mouse_on (void) {
-#ifdef DOS
-  struct SREGS sregs;
-  union REGS inregs, outregs;
-  void (far *function_ptr)();
-
-  segread(&sregs);
-  inregs.w.ax = 0;
-  int386 (0x33, &inregs, &outregs);
-
-  if (outregs.w.ax == 0xffff) {
-    if ((lock_region (&cbd, sizeof(cbd))) &&
-      (lock_region ((void near *) click_handler,
-         (char *) cbc_end - (char near *) click_handler))) {
-      inregs.w.ax = 0xC;
-      inregs.w.cx = 0x1f; //0x0002 + 0x0008;
-      function_ptr = ( void(*)(void) ) click_handler;
-      inregs.x.edx = FP_OFF (function_ptr);
-      sregs.es = FP_SEG (function_ptr);
-      int386x (0x33, &inregs, &outregs, &sregs);
-    }
-  }
-#endif
 }
 
 void mouse_off (void) {
-#ifdef DOS
-  union REGS inregs, outregs;
-  inregs.w.ax = 0;
-  int386 (0x33, &inregs, &outregs);
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -46,30 +20,12 @@ void mouse_off (void) {
 //-----------------------------------------------------------------------------
 
 void mouse_window(void) {
-#ifdef DOS
-  union REGS inregs, outregs;
-  inregs.w.ax = 7;
-  inregs.w.cx = 0; inregs.w.dx = (vga_width*2)-1;
-  int386 (0x33, &inregs, &outregs);
-  inregs.w.ax = 8;
-  inregs.w.cx = 0; inregs.w.dx = vga_height-1;
-  int386 (0x33, &inregs, &outregs);
-#endif
 }
 
 
 
 void check_mouse(void) {
-
-#ifdef DOS
-  struct SREGS sregs;
-  union REGS inregs, outregs;
-
-  segread(&sregs);
-  inregs.w.ax = 0;
-  int386 (0x33, &inregs, &outregs);
-  if (outregs.w.ax!=0xffff) mouse->cursor=1; else mouse->cursor=0;
-#endif
+  mouse->cursor=0; // 0 = mouse present (always true on SDL)
 }
 
 void set_mouse(int x,int y) {
@@ -77,80 +33,14 @@ void set_mouse(int x,int y) {
   m_y=(float)y;
 }
 
-float vx=0.0,vy=0.0,vmax;
 #ifdef DEBUG
 extern int mouse_x,mouse_y;
 #endif
 
 void readmouse(void) {
-  
-  short ix,iy;
-  int keymouse=0,n=0;
+  int n=0;
 
   poll_keyboard();
-#ifdef DOS
-  union REGS regs;
-
-//  poll_keyboard();
-
-  mouse->left=0;
-
-  memset(&regs,0,sizeof(regs));
-  regs.w.ax=3;
-  int386(0x33,&regs,&regs);
-
-  mouse->left=(regs.w.bx&1);
-  mouse->middle=(regs.w.bx&4)/4;
-  mouse->right=(regs.w.bx&2)/2;
-
-  memset(&regs,0,sizeof(regs));
-  regs.w.ax=0xb;
-  int386(0x33,&regs,&regs);
-
-  ix=regs.w.cx;
-  iy=regs.w.dx;
-
-  if (mouse->speed<0) mouse->speed=0;
-  if (mouse->speed>9) mouse->speed=9;
-
-  m_x+=(float)ix/(1.0+((float)mouse->speed/3.0));
-  m_y+=(float)iy/(1.0+((float)mouse->speed/3.0));
-
-  // Keyboard-driven mouse control
-
-  if (mouse->cursor&1) {
-
-    if(key(_ENTER)) mouse->left=1;
-
-    vmax=1.0-(float)mouse->speed/15.0;
-
-    if (key(_LEFT)&&!key(_RIGHT)) { vx-=vmax; keymouse|=1; }
-    if (key(_RIGHT)&&!key(_LEFT)) { vx+=vmax; keymouse|=1; }
-    if (key(_UP)&&!key(_DOWN)) { vy-=vmax; keymouse|=2; }
-    if (key(_DOWN)&&!key(_UP)) { vy+=vmax; keymouse|=2; }
-
-    if (vx || vy) { //keymouse) {
-      if (vx<-vmax*10.0) vx=-vmax*10.0; if (vx>vmax*10.0) vx=vmax*10.0;
-      if (vy<-vmax*10.0) vy=-vmax*10.0; if (vy>vmax*10.0) vy=vmax*10.0;
-      m_x+=vx;
-      m_y+=vy;
-    }
-
-    if (!(keymouse&1)) {
-      if (vx>1.0) vx-=2.0;
-      else if (vx<-1.0) vx+=2.0;
-      else vx=0.0;
-    }
-
-    if (!(keymouse&2)) {
-      if (vy>1.0) vy-=2.0;
-      else if (vy<-1.0) vy+=2.0;
-      else vy=0.0;
-    }
-
-  }
-#endif
-//if(mouse->left) mouse_b=1; else mouse_b=0;
   // When mouse is outside the window, report out-of-bounds
   if (!mouse_in_window) {
     _mouse_x=-1;
@@ -171,6 +61,41 @@ void readmouse(void) {
     mouse->x=_mouse_x;
     mouse->y=_mouse_y;
   }
+
+  // Keyboard-driven mouse cursor (accessibility: arrow keys simulate mouse)
+  if (mouse->cursor&1) {
+    int keymouse=0;
+    float vmax=1.0f-(float)mouse->speed/15.0f;
+    if (vmax<0.1f) vmax=0.1f;
+
+    if(key(_ENTER)) mouse->left=1;
+
+    if (key(_LEFT)&&!key(_RIGHT))  { vx-=vmax; keymouse|=1; }
+    if (key(_RIGHT)&&!key(_LEFT))  { vx+=vmax; keymouse|=1; }
+    if (key(_UP)&&!key(_DOWN))     { vy-=vmax; keymouse|=2; }
+    if (key(_DOWN)&&!key(_UP))     { vy+=vmax; keymouse|=2; }
+
+    if (vx<-vmax*10.0f) vx=-vmax*10.0f;
+    if (vx> vmax*10.0f) vx= vmax*10.0f;
+    if (vy<-vmax*10.0f) vy=-vmax*10.0f;
+    if (vy> vmax*10.0f) vy= vmax*10.0f;
+
+    m_x+=vx; m_y+=vy;
+
+    if (!(keymouse&1)) { if (vx>1.0f) vx-=2.0f; else if (vx<-1.0f) vx+=2.0f; else vx=0.0f; }
+    if (!(keymouse&2)) { if (vy>1.0f) vy-=2.0f; else if (vy<-1.0f) vy+=2.0f; else vy=0.0f; }
+
+    if (m_x<0) m_x=0;
+    if (m_x>=vga_width) m_x=(float)(vga_width-1);
+    if (m_y<0) m_y=0;
+    if (m_y>=vga_height) m_y=(float)(vga_height-1);
+
+    mouse->x=(int)m_x;
+    mouse->y=(int)m_y;
+    _mouse_x=(int)m_x;
+    _mouse_y=(int)m_y;
+  }
+
 #ifdef DEBUG
 			mouse_x = _mouse_x;
 			mouse_y = _mouse_y;
