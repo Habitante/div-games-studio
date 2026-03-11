@@ -385,7 +385,7 @@ int main(int argc, char *argv[]) {
 
   return_mode = 0;
   exit_requested = 0;
-  MustCreate = 1;
+  must_create = 1;
   next_order = 0;
   interpreting = 1;
   safe = 34; // Text in lower right corner
@@ -918,13 +918,13 @@ void mainloop(void) {
 
     if (v_accept) {
       if (v.type == 101)
-        MustCreate = 0;
+        must_create = 0;
 
       if (!new_map(NULL)) {
-        if (MustCreate == 0) {
+        if (must_create == 0) {
           memcpy(v_map->filename, v.mapa->filename, 13);
           new_window(map_view0);
-          MustCreate = 1;
+          must_create = 1;
         }
 
         v_map = window[1].mapa;
@@ -957,7 +957,7 @@ void mainloop(void) {
         blit_region(screen_buffer, vga_width, vga_height, v.ptr, v.x, v.y, v.w, v.h, 0);
 
       } else
-        MustCreate = 1;
+        must_create = 1;
     }
     free_drag = 1;
   }
@@ -3837,10 +3837,10 @@ void initialization(void) {
   }
   /*
 	if (n==num_modes) {
-		VS_WIDTH=vga_width  =Setupfile.Vid_modeAncho=640; // Video mode
-		VS_HEIGHT =vga_height  =Setupfile.Vid_modeAlto=480;
-		VS_BIG  =big     =Setupfile.Vid_modeBig=1;
-		editor_font      =Setupfile.editor_font=3;
+		VS_WIDTH=vga_width  =setup_file.vid_mode_width=640; // Video mode
+		VS_HEIGHT =vga_height  =setup_file.vid_mode_height=480;
+		VS_BIG  =big     =setup_file.vid_mode_big=1;
+		editor_font      =setup_file.editor_font=3;
 		big2=big+1;
 	}
 */
@@ -4094,7 +4094,7 @@ void initialization(void) {
     printf("%s", (char *)texts[13]);
   }
 
-  create_gradient_colors(Setupfile.gradient_config, wallpaper_gradient);
+  create_gradient_colors(setup_file.gradient_config, wallpaper_gradient);
 
   wallpaper = NULL;
 
@@ -5026,55 +5026,55 @@ void Save_Cfgbin() {
   FILE *file;
 
   // Video mode
-  Setupfile.Vid_modeAncho = VS_WIDTH;
-  Setupfile.Vid_modeAlto = VS_HEIGHT;
-  Setupfile.Vid_modeBig = VS_BIG;
-  Setupfile.fullscreen = fsmode;
+  setup_file.vid_mode_width = VS_WIDTH;
+  setup_file.vid_mode_height = VS_HEIGHT;
+  setup_file.vid_mode_big = VS_BIG;
+  setup_file.fullscreen = fsmode;
 
   if (return_mode == 3) {
-    Setupfile.Vid_modeBig = (previous_mode & 0x8000000) >> 31;
+    setup_file.vid_mode_big = (previous_mode & 0x8000000) >> 31;
     previous_mode -= (previous_mode & 0x80000000);
-    Setupfile.Vid_modeAncho = previous_mode / 10000;
-    Setupfile.Vid_modeAlto = previous_mode % 10000;
+    setup_file.vid_mode_width = previous_mode / 10000;
+    setup_file.vid_mode_height = previous_mode % 10000;
   }
 
   // Undo system
-  Setupfile.Max_undo = max_undos;
-  Setupfile.Undo_memory = undo_memory;
-  Setupfile.tab_size = tab_size;
+  setup_file.max_undo = max_undos;
+  setup_file.undo_memory = undo_memory;
+  setup_file.tab_size = tab_size;
 
   // Directory system
 
-  div_strcpy(Setupfile.Dir_cwd, sizeof(Setupfile.Dir_cwd), tipo[0].path);
-  div_strcpy(Setupfile.Dir_map, sizeof(Setupfile.Dir_map), tipo[2].path);
-  div_strcpy(Setupfile.Dir_pal, sizeof(Setupfile.Dir_pal), tipo[3].path);
-  div_strcpy(Setupfile.Dir_fpg, sizeof(Setupfile.Dir_fpg), tipo[4].path);
-  div_strcpy(Setupfile.Dir_fnt, sizeof(Setupfile.Dir_fnt), tipo[5].path);
-  div_strcpy(Setupfile.Dir_ifs, sizeof(Setupfile.Dir_ifs), tipo[6].path);
-  div_strcpy(Setupfile.Dir_pcm, sizeof(Setupfile.Dir_pcm), tipo[7].path);
-  div_strcpy(Setupfile.Dir_prg, sizeof(Setupfile.Dir_prg), tipo[8].path);
-  div_strcpy(Setupfile.Dir_pcms, sizeof(Setupfile.Dir_pcms), tipo[11].path);
-  div_strcpy(Setupfile.Dir_prj, sizeof(Setupfile.Dir_prj), tipo[12].path);
-  div_strcpy(Setupfile.Dir_wld, sizeof(Setupfile.Dir_wld), tipo[15].path);
-  div_strcpy(Setupfile.Dir_mod, sizeof(Setupfile.Dir_mod), tipo[16].path);
+  div_strcpy(setup_file.dir_cwd, sizeof(setup_file.dir_cwd), tipo[0].path);
+  div_strcpy(setup_file.dir_map, sizeof(setup_file.dir_map), tipo[2].path);
+  div_strcpy(setup_file.dir_pal, sizeof(setup_file.dir_pal), tipo[3].path);
+  div_strcpy(setup_file.dir_fpg, sizeof(setup_file.dir_fpg), tipo[4].path);
+  div_strcpy(setup_file.dir_fnt, sizeof(setup_file.dir_fnt), tipo[5].path);
+  div_strcpy(setup_file.dir_ifs, sizeof(setup_file.dir_ifs), tipo[6].path);
+  div_strcpy(setup_file.dir_pcm, sizeof(setup_file.dir_pcm), tipo[7].path);
+  div_strcpy(setup_file.dir_prg, sizeof(setup_file.dir_prg), tipo[8].path);
+  div_strcpy(setup_file.dir_pcms, sizeof(setup_file.dir_pcms), tipo[11].path);
+  div_strcpy(setup_file.dir_prj, sizeof(setup_file.dir_prj), tipo[12].path);
+  div_strcpy(setup_file.dir_wld, sizeof(setup_file.dir_wld), tipo[15].path);
+  div_strcpy(setup_file.dir_mod, sizeof(setup_file.dir_mod), tipo[16].path);
   /*
         // Wallpaper info
-        strcpy(Setupfile.Desktop_Image,desk_file);
-        Setupfile.Desktop_R=desk_r;
-        Setupfile.Desktop_G=desk_g;
-        Setupfile.Desktop_B=desk_b;
-        Setupfile.Desktop_Tile=desk_tile;
+        strcpy(setup_file.desktop_image,desk_file);
+        setup_file.Desktop_R=desk_r;
+        setup_file.Desktop_G=desk_g;
+        setup_file.Desktop_B=desk_b;
+        setup_file.desktop_tile=desk_tile;
 */
-  Setupfile.editor_font = editor_font;
-  Setupfile.paint_cursor = paint_cursor;
-  Setupfile.exploding_windows = exploding_windows;
-  Setupfile.auto_save_session = auto_save_session;
-  Setupfile.move_full_window = move_full_window;
-  Setupfile.colorizer = colorizer;
-  memcpy(&Setupfile.colors_rgb[0], &colors_rgb[0], 12 * 3);
+  setup_file.editor_font = editor_font;
+  setup_file.paint_cursor = paint_cursor;
+  setup_file.exploding_windows = exploding_windows;
+  setup_file.auto_save_session = auto_save_session;
+  setup_file.move_full_window = move_full_window;
+  setup_file.colorizer = colorizer;
+  memcpy(&setup_file.colors_rgb[0], &colors_rgb[0], 12 * 3);
 
   file = fopen("system/setup.bin", "wb");
-  fwrite(&Setupfile, 1, sizeof(Setupfile), file);
+  fwrite(&setup_file, 1, sizeof(setup_file), file);
   fclose(file);
 }
 
@@ -5089,232 +5089,232 @@ void Load_Cfgbin() {
 
   // System Directories
 
-  div_strcpy(Setupfile.Dir_cwd, sizeof(Setupfile.Dir_cwd), tipo[0].path);
+  div_strcpy(setup_file.dir_cwd, sizeof(setup_file.dir_cwd), tipo[0].path);
 
   div_strcpy(cWork, sizeof(cWork), tipo[1].path);
   div_strcat(cWork, sizeof(cWork), "/MAP");
-  div_strcpy(Setupfile.Dir_map, sizeof(Setupfile.Dir_map), cWork);
+  div_strcpy(setup_file.dir_map, sizeof(setup_file.dir_map), cWork);
   div_strcpy(tipo[2].path, sizeof(tipo[2].path), cWork);
   div_strcpy(tipo[9].path, sizeof(tipo[9].path), cWork);
 
   div_strcpy(cWork, sizeof(cWork), tipo[1].path);
   div_strcat(cWork, sizeof(cWork), "/PAL");
-  div_strcpy(Setupfile.Dir_pal, sizeof(Setupfile.Dir_pal), cWork);
+  div_strcpy(setup_file.dir_pal, sizeof(setup_file.dir_pal), cWork);
   div_strcpy(tipo[3].path, sizeof(tipo[3].path), cWork);
   div_strcpy(tipo[10].path, sizeof(tipo[10].path), cWork);
 
   div_strcpy(cWork, sizeof(cWork), tipo[1].path);
   div_strcat(cWork, sizeof(cWork), "/FPG");
-  div_strcpy(Setupfile.Dir_fpg, sizeof(Setupfile.Dir_fpg), cWork);
+  div_strcpy(setup_file.dir_fpg, sizeof(setup_file.dir_fpg), cWork);
   div_strcpy(tipo[4].path, sizeof(tipo[4].path), cWork);
 
   div_strcpy(cWork, sizeof(cWork), tipo[1].path);
   div_strcat(cWork, sizeof(cWork), "/FNT");
-  div_strcpy(Setupfile.Dir_fnt, sizeof(Setupfile.Dir_fnt), cWork);
+  div_strcpy(setup_file.dir_fnt, sizeof(setup_file.dir_fnt), cWork);
   div_strcpy(tipo[5].path, sizeof(tipo[5].path), cWork);
 
   div_strcpy(cWork, sizeof(cWork), tipo[1].path);
   div_strcat(cWork, sizeof(cWork), "/IFS");
-  div_strcpy(Setupfile.Dir_ifs, sizeof(Setupfile.Dir_ifs), cWork);
+  div_strcpy(setup_file.dir_ifs, sizeof(setup_file.dir_ifs), cWork);
   div_strcpy(tipo[6].path, sizeof(tipo[6].path), cWork);
 
   div_strcpy(cWork, sizeof(cWork), tipo[1].path);
   div_strcat(cWork, sizeof(cWork), "/PCM");
-  div_strcpy(Setupfile.Dir_pcm, sizeof(Setupfile.Dir_pcm), cWork);
+  div_strcpy(setup_file.dir_pcm, sizeof(setup_file.dir_pcm), cWork);
   div_strcpy(tipo[7].path, sizeof(tipo[7].path), cWork);
 
   div_strcpy(cWork, sizeof(cWork), tipo[1].path);
   div_strcat(cWork, sizeof(cWork), "/PRG");
-  div_strcpy(Setupfile.Dir_prg, sizeof(Setupfile.Dir_prg), cWork);
+  div_strcpy(setup_file.dir_prg, sizeof(setup_file.dir_prg), cWork);
   div_strcpy(tipo[8].path, sizeof(tipo[8].path), cWork);
 
   div_strcpy(cWork, sizeof(cWork), tipo[1].path);
   div_strcat(cWork, sizeof(cWork), "/PCM");
-  div_strcpy(Setupfile.Dir_pcms, sizeof(Setupfile.Dir_pcms), cWork);
+  div_strcpy(setup_file.dir_pcms, sizeof(setup_file.dir_pcms), cWork);
   div_strcpy(tipo[11].path, sizeof(tipo[11].path), cWork);
 
   div_strcpy(cWork, sizeof(cWork), tipo[1].path);
   div_strcat(cWork, sizeof(cWork), "/PRJ");
-  div_strcpy(Setupfile.Dir_prj, sizeof(Setupfile.Dir_prj), cWork);
+  div_strcpy(setup_file.dir_prj, sizeof(setup_file.dir_prj), cWork);
   div_strcpy(tipo[12].path, sizeof(tipo[12].path), cWork);
 
   div_strcpy(tipo[13].path, sizeof(tipo[13].path), tipo[1].path);
 
   div_strcpy(cWork, sizeof(cWork), tipo[1].path);
   div_strcat(cWork, sizeof(cWork), "/WLD");
-  div_strcpy(Setupfile.Dir_wld, sizeof(Setupfile.Dir_wld), cWork);
+  div_strcpy(setup_file.dir_wld, sizeof(setup_file.dir_wld), cWork);
   div_strcpy(tipo[15].path, sizeof(tipo[15].path), cWork);
 
   div_strcpy(cWork, sizeof(cWork), tipo[1].path);
   div_strcat(cWork, sizeof(cWork), "/MOD");
-  div_strcpy(Setupfile.Dir_mod, sizeof(Setupfile.Dir_mod), cWork);
+  div_strcpy(setup_file.dir_mod, sizeof(setup_file.dir_mod), cWork);
   div_strcpy(tipo[16].path, sizeof(tipo[16].path), cWork);
 
   file = fopen("system/setup.bin", "rb");
   if (file == NULL) {
     if (primera_vez) {
-      div_strcpy(Setupfile.Desktop_Image, sizeof(Setupfile.Desktop_Image),
+      div_strcpy(setup_file.desktop_image, sizeof(setup_file.desktop_image),
                  (char *)texts[487]); // Wallpaper info
-      Setupfile.Desktop_Gama = 1;
-      Setupfile.Desktop_Tile = 0;
+      setup_file.desktop_gamma = 1;
+      setup_file.desktop_tile = 0;
       for (n = 0; n < 8; n++)
-        Setupfile.gradient_config[n].selec = 0;
-      Setupfile.gradient_config[8].selec = 1;
-      Setupfile.gradient_config[8].r = 0;
-      Setupfile.gradient_config[8].g = 0;
-      Setupfile.gradient_config[8].b = 63;
-      Setupfile.Vid_modeAncho = 640; // Video Mode
-      Setupfile.Vid_modeAlto = 480;
-      Setupfile.Vid_modeBig = 1;
-      Setupfile.fullscreen = 0;
+        setup_file.gradient_config[n].selec = 0;
+      setup_file.gradient_config[8].selec = 1;
+      setup_file.gradient_config[8].r = 0;
+      setup_file.gradient_config[8].g = 0;
+      setup_file.gradient_config[8].b = 63;
+      setup_file.vid_mode_width = 640; // Video Mode
+      setup_file.vid_mode_height = 480;
+      setup_file.vid_mode_big = 1;
+      setup_file.fullscreen = 0;
 
-      Setupfile.Max_undo = 1024; // Undo System
-      Setupfile.Undo_memory = 1024 * 1024 + 65536;
-      Setupfile.tab_size = 4;
-      memcpy(&Setupfile.colors_rgb[0],
+      setup_file.max_undo = 1024; // Undo System
+      setup_file.undo_memory = 1024 * 1024 + 65536;
+      setup_file.tab_size = 4;
+      memcpy(&setup_file.colors_rgb[0],
              "\x1c\x1c\x1c\x3d\x3d\x3c\x0\x0\x20\x2\x6\x7\x0\x27\x0\x3d\x3d\x3c\x14\x14"
              "\x14\x3d\x3d\x3c\x0\x0\x2e\x34\x31\x31\x22\x13\x13\x26\x26\x0",
              12 * 3);
-      Setupfile.editor_font = 2;
-      Setupfile.paint_cursor = 0;
-      Setupfile.exploding_windows = 1;
-      Setupfile.auto_save_session = 1;
-      Setupfile.move_full_window = 1;
-      Setupfile.colorizer = 1;
+      setup_file.editor_font = 2;
+      setup_file.paint_cursor = 0;
+      setup_file.exploding_windows = 1;
+      setup_file.auto_save_session = 1;
+      setup_file.move_full_window = 1;
+      setup_file.colorizer = 1;
 
-      Setupfile.vol_fx = 7;
-      Setupfile.vol_cd = 7;
-      Setupfile.vol_ma = 7;
-      Setupfile.mut_fx = 0;
-      Setupfile.mut_cd = 0;
-      Setupfile.mut_ma = 0;
+      setup_file.vol_fx = 7;
+      setup_file.vol_cd = 7;
+      setup_file.vol_ma = 7;
+      setup_file.mut_fx = 0;
+      setup_file.mut_cd = 0;
+      setup_file.mut_ma = 0;
 
-      Setupfile.mouse_ratio = 0;
+      setup_file.mouse_ratio = 0;
 
     } else {
-      div_strcpy(Setupfile.Desktop_Image, sizeof(Setupfile.Desktop_Image), ""); // Wallpaper info
-      Setupfile.Desktop_Gama = 0;
-      Setupfile.Desktop_Tile = 0;
+      div_strcpy(setup_file.desktop_image, sizeof(setup_file.desktop_image), ""); // Wallpaper info
+      setup_file.desktop_gamma = 0;
+      setup_file.desktop_tile = 0;
       for (n = 0; n < 9; n++)
-        Setupfile.gradient_config[n].selec = 0;
-      Setupfile.Vid_modeAncho = 320; // Video Mode
-      Setupfile.Vid_modeAlto = 200;
-      Setupfile.Vid_modeBig = 0;
-      Setupfile.fullscreen = 0;
+        setup_file.gradient_config[n].selec = 0;
+      setup_file.vid_mode_width = 320; // Video Mode
+      setup_file.vid_mode_height = 200;
+      setup_file.vid_mode_big = 0;
+      setup_file.fullscreen = 0;
 
-      Setupfile.Max_undo = 1024; // Undo System
-      Setupfile.Undo_memory = 1024 * 1024 + 65536;
-      Setupfile.tab_size = 4;
-      memcpy(&Setupfile.colors_rgb[0],
+      setup_file.max_undo = 1024; // Undo System
+      setup_file.undo_memory = 1024 * 1024 + 65536;
+      setup_file.tab_size = 4;
+      memcpy(&setup_file.colors_rgb[0],
              "\x1c\x1c\x1c\x3d\x3d\x3c\x0\x0\x20\x2\x6\x7\x0\x27\x0\x3d\x3d\x3c\x14\x14"
              "\x14\x3d\x3d\x3c\x0\x0\x2e\x34\x31\x31\x22\x13\x13\x26\x26\x0",
              12 * 3);
-      Setupfile.editor_font = 0;
-      Setupfile.paint_cursor = 0;
-      Setupfile.exploding_windows = 1;
-      Setupfile.auto_save_session = 1;
-      Setupfile.move_full_window = 1;
-      Setupfile.colorizer = 1;
+      setup_file.editor_font = 0;
+      setup_file.paint_cursor = 0;
+      setup_file.exploding_windows = 1;
+      setup_file.auto_save_session = 1;
+      setup_file.move_full_window = 1;
+      setup_file.colorizer = 1;
 
-      Setupfile.vol_fx = 10;
-      Setupfile.vol_cd = 10;
-      Setupfile.vol_ma = 10;
-      Setupfile.mut_fx = 0;
-      Setupfile.mut_cd = 0;
-      Setupfile.mut_ma = 0;
+      setup_file.vol_fx = 10;
+      setup_file.vol_cd = 10;
+      setup_file.vol_ma = 10;
+      setup_file.mut_fx = 0;
+      setup_file.mut_cd = 0;
+      setup_file.mut_ma = 0;
 
-      Setupfile.mouse_ratio = 0;
+      setup_file.mouse_ratio = 0;
     }
   } else {
-    fread(&Setupfile, 1, sizeof(Setupfile), file);
+    fread(&setup_file, 1, sizeof(setup_file), file);
     fclose(file);
   }
 
-  editor_font = Setupfile.editor_font;
-  paint_cursor = Setupfile.paint_cursor;
-  exploding_windows = Setupfile.exploding_windows;
-  auto_save_session = Setupfile.auto_save_session;
-  move_full_window = Setupfile.move_full_window;
-  colorizer = Setupfile.colorizer;
-  memcpy(&colors_rgb[0], &Setupfile.colors_rgb[0], 12 * 3);
+  editor_font = setup_file.editor_font;
+  paint_cursor = setup_file.paint_cursor;
+  exploding_windows = setup_file.exploding_windows;
+  auto_save_session = setup_file.auto_save_session;
+  move_full_window = setup_file.move_full_window;
+  colorizer = setup_file.colorizer;
+  memcpy(&colors_rgb[0], &setup_file.colors_rgb[0], 12 * 3);
 
-  VS_WIDTH = vga_width = Setupfile.Vid_modeAncho; // Video mode
-  VS_HEIGHT = vga_height = Setupfile.Vid_modeAlto;
-  VS_BIG = big = Setupfile.Vid_modeBig;
-  fsmode = Setupfile.fullscreen;
+  VS_WIDTH = vga_width = setup_file.vid_mode_width; // Video mode
+  VS_HEIGHT = vga_height = setup_file.vid_mode_height;
+  VS_BIG = big = setup_file.vid_mode_big;
+  fsmode = setup_file.fullscreen;
 
   if (test_video && vga_width < 640 && editor_font > 1)
     editor_font = 0;
 
   big2 = big + 1;
 
-  max_undos = Setupfile.Max_undo; // Undo System
-  undo_memory = Setupfile.Undo_memory;
-  tab_size = Setupfile.tab_size;
+  max_undos = setup_file.max_undo; // Undo System
+  undo_memory = setup_file.undo_memory;
+  tab_size = setup_file.tab_size;
 
   // System Directories
 
   if (interpreting)
-    if (chdir(Setupfile.Dir_cwd) != -1)
-      div_strcpy(tipo[0].path, sizeof(tipo[0].path), Setupfile.Dir_cwd);
+    if (chdir(setup_file.dir_cwd) != -1)
+      div_strcpy(tipo[0].path, sizeof(tipo[0].path), setup_file.dir_cwd);
 
-  if (chdir(Setupfile.Dir_map) != -1)
-    div_strcpy(tipo[2].path, sizeof(tipo[2].path), Setupfile.Dir_map);
+  if (chdir(setup_file.dir_map) != -1)
+    div_strcpy(tipo[2].path, sizeof(tipo[2].path), setup_file.dir_map);
   else if (chdir(tipo[2].path) == -1)
     div_strcpy(tipo[2].path, sizeof(tipo[2].path), tipo[1].path);
 
-  if (chdir(Setupfile.Dir_pal) != -1)
-    div_strcpy(tipo[3].path, sizeof(tipo[3].path), Setupfile.Dir_pal);
+  if (chdir(setup_file.dir_pal) != -1)
+    div_strcpy(tipo[3].path, sizeof(tipo[3].path), setup_file.dir_pal);
   else if (chdir(tipo[3].path) == -1)
     div_strcpy(tipo[3].path, sizeof(tipo[3].path), tipo[1].path);
 
-  if (chdir(Setupfile.Dir_fpg) != -1)
-    div_strcpy(tipo[4].path, sizeof(tipo[4].path), Setupfile.Dir_fpg);
+  if (chdir(setup_file.dir_fpg) != -1)
+    div_strcpy(tipo[4].path, sizeof(tipo[4].path), setup_file.dir_fpg);
   else if (chdir(tipo[4].path) == -1)
     div_strcpy(tipo[4].path, sizeof(tipo[4].path), tipo[1].path);
 
-  if (chdir(Setupfile.Dir_fnt) != -1)
-    div_strcpy(tipo[5].path, sizeof(tipo[5].path), Setupfile.Dir_fnt);
+  if (chdir(setup_file.dir_fnt) != -1)
+    div_strcpy(tipo[5].path, sizeof(tipo[5].path), setup_file.dir_fnt);
   else if (chdir(tipo[5].path) == -1)
     div_strcpy(tipo[5].path, sizeof(tipo[5].path), tipo[1].path);
 
-  if (chdir(Setupfile.Dir_ifs) != -1)
-    div_strcpy(tipo[6].path, sizeof(tipo[6].path), Setupfile.Dir_ifs);
+  if (chdir(setup_file.dir_ifs) != -1)
+    div_strcpy(tipo[6].path, sizeof(tipo[6].path), setup_file.dir_ifs);
   else if (chdir(tipo[6].path) == -1)
     div_strcpy(tipo[6].path, sizeof(tipo[6].path), tipo[1].path);
 
-  if (chdir(Setupfile.Dir_pcm) != -1)
-    div_strcpy(tipo[7].path, sizeof(tipo[7].path), Setupfile.Dir_pcm);
+  if (chdir(setup_file.dir_pcm) != -1)
+    div_strcpy(tipo[7].path, sizeof(tipo[7].path), setup_file.dir_pcm);
   else if (chdir(tipo[7].path) == -1)
     div_strcpy(tipo[7].path, sizeof(tipo[7].path), tipo[1].path);
 
-  if (chdir(Setupfile.Dir_prg) != -1)
-    div_strcpy(tipo[8].path, sizeof(tipo[8].path), Setupfile.Dir_prg);
+  if (chdir(setup_file.dir_prg) != -1)
+    div_strcpy(tipo[8].path, sizeof(tipo[8].path), setup_file.dir_prg);
   else if (chdir(tipo[8].path) == -1)
     div_strcpy(tipo[8].path, sizeof(tipo[8].path), tipo[1].path);
 
   div_strcpy(tipo[9].path, sizeof(tipo[9].path), tipo[2].path);
   div_strcpy(tipo[10].path, sizeof(tipo[10].path), tipo[3].path);
 
-  if (chdir(Setupfile.Dir_pcms) != -1)
-    div_strcpy(tipo[11].path, sizeof(tipo[11].path), Setupfile.Dir_pcms);
+  if (chdir(setup_file.dir_pcms) != -1)
+    div_strcpy(tipo[11].path, sizeof(tipo[11].path), setup_file.dir_pcms);
   else if (chdir(tipo[11].path) == -1)
     div_strcpy(tipo[11].path, sizeof(tipo[11].path), tipo[1].path);
 
-  if (chdir(Setupfile.Dir_prj) != -1)
-    div_strcpy(tipo[12].path, sizeof(tipo[12].path), Setupfile.Dir_prj);
+  if (chdir(setup_file.dir_prj) != -1)
+    div_strcpy(tipo[12].path, sizeof(tipo[12].path), setup_file.dir_prj);
   else if (chdir(tipo[12].path) == -1)
     div_strcpy(tipo[12].path, sizeof(tipo[12].path), tipo[1].path);
 
   div_strcpy(tipo[13].path, sizeof(tipo[13].path), tipo[1].path); // Generic
 
-  if (chdir(Setupfile.Dir_wld) != -1)
-    div_strcpy(tipo[15].path, sizeof(tipo[15].path), Setupfile.Dir_wld);
+  if (chdir(setup_file.dir_wld) != -1)
+    div_strcpy(tipo[15].path, sizeof(tipo[15].path), setup_file.dir_wld);
   else if (chdir(tipo[15].path) == -1)
     div_strcpy(tipo[15].path, sizeof(tipo[15].path), tipo[1].path);
 
-  if (chdir(Setupfile.Dir_mod) != -1)
-    div_strcpy(tipo[16].path, sizeof(tipo[16].path), Setupfile.Dir_mod);
+  if (chdir(setup_file.dir_mod) != -1)
+    div_strcpy(tipo[16].path, sizeof(tipo[16].path), setup_file.dir_mod);
   else if (chdir(tipo[16].path) == -1)
     div_strcpy(tipo[16].path, sizeof(tipo[16].path), tipo[1].path);
 

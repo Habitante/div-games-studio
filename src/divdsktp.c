@@ -77,7 +77,7 @@ void download_desktop() {
   desktop = fopen("system/session.dtf", "wb");
   n = fwrite("dtf\x1a\x0d\x0a\x0", 8, 1, desktop);
   // Save the previous resolution
-  iWork = Setupfile.Vid_modeAlto + Setupfile.Vid_modeAncho * 10000 + (Setupfile.Vid_modeBig << 31);
+  iWork = setup_file.vid_mode_height + setup_file.vid_mode_width * 10000 + (setup_file.vid_mode_big << 31);
   n = fwrite(&iWork, 1, 4, desktop);
   // Reserve space for the window count
   n = fwrite(&numvent, 1, 4, desktop);
@@ -213,7 +213,7 @@ int can_upload_desktop() {
   // Check old resolution
   fread(&iWork, 1, 4, desktop);
   if (iWork !=
-      Setupfile.Vid_modeAlto + Setupfile.Vid_modeAncho * 10000 + (Setupfile.Vid_modeBig << 31)) {
+      setup_file.vid_mode_height + setup_file.vid_mode_width * 10000 + (setup_file.vid_mode_big << 31)) {
     previous_mode = iWork;
     vid_mode_changed = 1;
   }

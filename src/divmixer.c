@@ -25,14 +25,14 @@ void mix_set_volume(byte reg, byte left, byte right) {}
 void set_mixer(void) {
   int fx, cd, ma;
 
-  fx = Setupfile.vol_fx;
-  if (Setupfile.mut_fx)
+  fx = setup_file.vol_fx;
+  if (setup_file.mut_fx)
     fx = 0;
-  cd = Setupfile.vol_cd;
-  if (Setupfile.mut_cd)
+  cd = setup_file.vol_cd;
+  if (setup_file.mut_cd)
     cd = 0;
-  ma = Setupfile.vol_ma;
-  if (Setupfile.mut_ma)
+  ma = setup_file.vol_ma;
+  if (setup_file.mut_ma)
     ma = 0;
   init_mixer(0, 0, ma, fx, cd);
 }
@@ -40,14 +40,14 @@ void set_mixer(void) {
 void set_init_mixer(void) {
   int fx, cd, ma;
 
-  fx = Setupfile.vol_fx;
-  if (Setupfile.mut_fx)
+  fx = setup_file.vol_fx;
+  if (setup_file.mut_fx)
     fx = 0;
-  cd = Setupfile.vol_cd;
-  if (Setupfile.mut_cd)
+  cd = setup_file.vol_cd;
+  if (setup_file.mut_cd)
     cd = 0;
-  ma = Setupfile.vol_ma;
-  if (Setupfile.mut_ma)
+  ma = setup_file.vol_ma;
+  if (setup_file.mut_ma)
     ma = 0;
   init_mixer(0, 0, ma, fx, cd);
 }

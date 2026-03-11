@@ -301,7 +301,7 @@ void wallpaper_setup2(void) {
 
   if (wmouse_in(w - 38, 24 + 8, 34, 7) && (mouse_b & 1)) {
     gradient_buf = wallpaper_gradient;
-    gradient_config = Setupfile.gradient_config;
+    gradient_config = setup_file.gradient_config;
     show_dialog((void_return_type_t)gama0);
     if (v_accept)
       need_refresh = 1;
@@ -314,16 +314,16 @@ void wallpaper_setup2(void) {
 
 void wallpaper_setup3(void) {
   if (v_accept) {
-    Setupfile.Desktop_Tile = wallpaper_tile;
-    div_strcpy(Setupfile.Desktop_Image, sizeof(Setupfile.Desktop_Image), wallpaper_path);
+    setup_file.desktop_tile = wallpaper_tile;
+    div_strcpy(setup_file.desktop_image, sizeof(setup_file.desktop_image), wallpaper_path);
 
-    Setupfile.Desktop_Gama = wallpaper_gamma;
+    setup_file.desktop_gamma = wallpaper_gamma;
 
     prepare_wallpaper();
     update_box(0, 0, vga_width, vga_height);
   } else {
-    memcpy(Setupfile.gradient_config, gama_vieja, sizeof(gama_vieja));
-    create_gradient_colors(Setupfile.gradient_config, wallpaper_gradient);
+    memcpy(setup_file.gradient_config, gama_vieja, sizeof(gama_vieja));
+    create_gradient_colors(setup_file.gradient_config, wallpaper_gradient);
   }
 }
 
@@ -335,9 +335,9 @@ void wallpaper_setup0(void) {
   v.w = 138;
   v.h = 150;
   w = v.w / big2, h = v.h / big2;
-  DIV_STRCPY(wallpaper_path, Setupfile.Desktop_Image);
-  wallpaper_tile = Setupfile.Desktop_Tile;
-  wallpaper_gamma = Setupfile.Desktop_Gama;
+  DIV_STRCPY(wallpaper_path, setup_file.desktop_image);
+  wallpaper_tile = setup_file.desktop_tile;
+  wallpaper_gamma = setup_file.desktop_gamma;
 
   v.paint_handler = (void_return_type_t)wallpaper_setup1;
   v.click_handler = (void_return_type_t)wallpaper_setup2;
@@ -350,7 +350,7 @@ void wallpaper_setup0(void) {
   _flag(179, 4, 24 + 8, &wallpaper_tile);
   _flag(181, v.w - 49 - text_len(texts[181]), 24 + 8, &wallpaper_gamma);
 
-  memcpy(gama_vieja, Setupfile.gradient_config, sizeof(gama_vieja));
+  memcpy(gama_vieja, setup_file.gradient_config, sizeof(gama_vieja));
 
   v_accept = 0;
 }
@@ -648,7 +648,7 @@ void cfg_show_mouse(void) {
   wbox(v.ptr, w, h, c2, 61 + 50, 56 + 30 + inc, 31, 7);
   min = 61 + 50;
   max = 89 + 50;
-  slider = min + (Setupfile.mouse_ratio * (max - min)) / 9;
+  slider = min + (setup_file.mouse_ratio * (max - min)) / 9;
   wbox(v.ptr, w, h, c0, slider - 1, 56 + 30 + inc, 1, 7);
   wbox(v.ptr, w, h, c0, slider + 3, 56 + 30 + inc, 1, 7);
   wput(v.ptr, w, h, slider, 56 + 30 + inc, 55);
@@ -746,8 +746,8 @@ void cfg_setup2(void) {
     wput(v.ptr, w, h, 53 + 50, 56 + 30 + inc, -51);
     v.buttons ^= 4;
     v.redraw = 1;
-    if (Setupfile.mouse_ratio > 0) {
-      Setupfile.mouse_ratio--;
+    if (setup_file.mouse_ratio > 0) {
+      setup_file.mouse_ratio--;
       cfg_show_mouse();
     }
   }
@@ -762,8 +762,8 @@ void cfg_setup2(void) {
     wput(v.ptr, w, h, 93 + 50, 56 + 30 + inc, -52);
     v.buttons ^= 8;
     v.redraw = 1;
-    if (Setupfile.mouse_ratio < 9) {
-      Setupfile.mouse_ratio++;
+    if (setup_file.mouse_ratio < 9) {
+      setup_file.mouse_ratio++;
       cfg_show_mouse();
     }
   }

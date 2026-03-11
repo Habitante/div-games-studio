@@ -1129,7 +1129,7 @@ void pal_refresh(int no_tocar_mapas, int guardar_original) {
 
   // Adapt user-defined color gradients to the new palette
 
-  create_gradient_colors(Setupfile.gradient_config, wallpaper_gradient);
+  create_gradient_colors(setup_file.gradient_config, wallpaper_gradient);
 
   // Restore the background wallpaper
   prepare_wallpaper();
@@ -1738,7 +1738,7 @@ void prepare_wallpaper(void) {
   byte old_dac4[768];
   int n;
 
-  if ((f = fopen(Setupfile.Desktop_Image, "rb")) == NULL)
+  if ((f = fopen(setup_file.desktop_image, "rb")) == NULL)
     return;
   fseek(f, 0, SEEK_END);
   lon = ftell(f);
@@ -1814,7 +1814,7 @@ void prepare_wallpaper(void) {
   memcpy(pal, dac4, 768);
   create_dac4();
 
-  if (!Setupfile.Desktop_Gama) { // If the file is displayed in color
+  if (!setup_file.desktop_gamma) { // If the file is displayed in color
     for (x = 0, p = pal; x < 256; x++, p += 3)
       cwallpaper[x] = fast_find_color(*p, *(p + 1), *(p + 2));
     p = temp;
@@ -1832,7 +1832,7 @@ void prepare_wallpaper(void) {
     while (++p < q);
   }
 
-  if (Setupfile.Desktop_Tile) {
+  if (setup_file.desktop_tile) {
     wallpaper_map = wallpaper = temp;
     wallpaper_width = tap_w;
     wallpaper_height = tap_h;

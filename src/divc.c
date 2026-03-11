@@ -10336,9 +10336,9 @@ void save_exec_bin(void) {
 
   sta = fopen("system/exec.bin", "wb");
 
-  fwrite(&Setupfile.vol_fx, 1, 1, sta);
-  fwrite(&Setupfile.vol_cd, 1, 1, sta);
-  fwrite(&Setupfile.vol_ma, 1, 1, sta);
+  fwrite(&setup_file.vol_fx, 1, 1, sta);
+  fwrite(&setup_file.vol_cd, 1, 1, sta);
+  fwrite(&setup_file.vol_ma, 1, 1, sta);
 
   fclose(sta);
 }

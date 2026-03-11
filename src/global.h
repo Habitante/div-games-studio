@@ -267,37 +267,37 @@ struct _gcolor {
 // Structure used to save and load the configuration file
 // SETUP.BIN
 
-typedef struct _SetupFile {
-  char Setup_Header[8];
+typedef struct _setup_file {
+  char setup_header[8];
 
   // Video mode
-  int Vid_mode;
-  int Vid_modeAncho; // Video mode width
-  int Vid_modeAlto;  // Video mode height
-  int Vid_modeBig;   // "Big" video mode
+  int vid_mode;
+  int vid_mode_width; // Video mode width
+  int vid_mode_height;  // Video mode height
+  int vid_mode_big;   // "Big" video mode
 
   // Undo system
-  int Max_undo;
-  int Undo_memory;
+  int max_undo;
+  int undo_memory;
 
   // Directory system
-  char Dir_cwd[_MAX_PATH + 1];
-  char Dir_map[_MAX_PATH + 1];
-  char Dir_pal[_MAX_PATH + 1];
-  char Dir_fpg[_MAX_PATH + 1];
-  char Dir_fnt[_MAX_PATH + 1];
-  char Dir_ifs[_MAX_PATH + 1];
-  char Dir_pcm[_MAX_PATH + 1];
-  char Dir_prg[_MAX_PATH + 1];
-  char Dir_pcms[_MAX_PATH + 1];
-  char Dir_prj[_MAX_PATH + 1];
-  char Dir_wld[_MAX_PATH + 1];
-  char Dir_mod[_MAX_PATH + 1];
+  char dir_cwd[_MAX_PATH + 1];
+  char dir_map[_MAX_PATH + 1];
+  char dir_pal[_MAX_PATH + 1];
+  char dir_fpg[_MAX_PATH + 1];
+  char dir_fnt[_MAX_PATH + 1];
+  char dir_ifs[_MAX_PATH + 1];
+  char dir_pcm[_MAX_PATH + 1];
+  char dir_prg[_MAX_PATH + 1];
+  char dir_pcms[_MAX_PATH + 1];
+  char dir_prj[_MAX_PATH + 1];
+  char dir_wld[_MAX_PATH + 1];
+  char dir_mod[_MAX_PATH + 1];
 
   // Wallpaper info
-  char Desktop_Image[_MAX_PATH + 1];
-  int Desktop_Gama;
-  int Desktop_Tile;
+  char desktop_image[_MAX_PATH + 1];
+  int desktop_gamma;
+  int desktop_tile;
   struct _gcolor gradient_config[9];
 
   char colors_rgb[12 * 3]; // r,g,b [c2,c4,c_b_low,ce1,ce4,c_y]
@@ -315,12 +315,12 @@ typedef struct _SetupFile {
   int mouse_ratio;
   int fullscreen;
 
-} SetupFile;
+} setup_file_t;
 
 GLOBAL_DATA byte fsmode;
 
-GLOBAL_DATA int MustCreate;
-GLOBAL_DATA SetupFile Setupfile;
+GLOBAL_DATA int must_create;
+GLOBAL_DATA setup_file_t setup_file;
 GLOBAL_DATA int next_order;
 GLOBAL_DATA int return_mode;
 

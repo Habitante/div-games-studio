@@ -1325,14 +1325,14 @@ void generate_fontmap(void) {
     }
   }
 
-  MustCreate = 0;
+  must_create = 0;
 
   if (new_map(NULL)) {
-    MustCreate = 1;
+    must_create = 1;
     return;
   }
 
-  MustCreate = 1;
+  must_create = 1;
 
   if (v_map != NULL && v_map->map != NULL) {
     // Warning! Calculate "c4" as a color !=0 !=c4 that is not
@@ -3260,7 +3260,7 @@ int new_map(byte *pre_buffer) {
       v_map->description[0] = 0;
       for (n = 0; n < 512; n++)
         v_map->points[n] = -1;
-      if (MustCreate)
+      if (must_create)
         new_window(map_view0);
 
       return (0);

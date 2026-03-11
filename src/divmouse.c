@@ -430,8 +430,8 @@ void read_mouse2(void) {
     }
     if (event.type == SDL_MOUSEMOTION) {
       if (fsmode == 1) {
-        m_x += event.motion.xrel * (1 + (Setupfile.mouse_ratio / 2));
-        m_y += event.motion.yrel * (1 + (Setupfile.mouse_ratio / 2));
+        m_x += event.motion.xrel * (1 + (setup_file.mouse_ratio / 2));
+        m_y += event.motion.yrel * (1 + (setup_file.mouse_ratio / 2));
       } else {
         m_x = event.motion.x;
         m_y = event.motion.y;
