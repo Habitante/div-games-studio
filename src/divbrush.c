@@ -5,6 +5,7 @@
 //-----------------------------------------------------------------------------
 
 #include "global.h"
+#include "div_string.h"
 
 //-----------------------------------------------------------------------------
 // Constants
@@ -162,15 +163,15 @@ void M3D_create_thumbs(struct t_listboxbr * l, int prog)
   thumb_tex[0].ptr    = NULL;
   thumb_tex[0].status = 0;
   thumb_tex[0].Code   = 0;
-  strcpy(&textura[0], "000");
-  strcpy(&fondo[0], "000");
+  div_strcpy(&textura[0], an_textura, "000");
+  div_strcpy(&fondo[0], an_textura, "000");
   t_maximo=f_maximo=1;
 
-  sprintf(cadenas[0], "%d", scroll_x);
-  sprintf(cadenas[1], "%d", scroll_y);
-  sprintf(cadenas[2], "%d", num_bandera);
-  sprintf(cadenas[3], "%d", altura_techo);
-  sprintf(cadenas[4], "%d", altura_suelo);
+  div_snprintf(cadenas[0], sizeof(cadenas[0]), "%d", scroll_x);
+  div_snprintf(cadenas[1], sizeof(cadenas[1]), "%d", scroll_y);
+  div_snprintf(cadenas[2], sizeof(cadenas[2]), "%d", num_bandera);
+  div_snprintf(cadenas[3], sizeof(cadenas[3]), "%d", altura_techo);
+  div_snprintf(cadenas[4], sizeof(cadenas[4]), "%d", altura_suelo);
 
   // Free existing thumbnails
   for(n=0; n<max_texturas; n++)
@@ -263,13 +264,13 @@ void M3D_create_thumbs(struct t_listboxbr * l, int prog)
     thumb_tex[n].al   = FPG_D.info.alto;
     thumb_tex[n].Code = FPG_D.info.cod;
 
-    sprintf(cwork, "%03d", FPG_D.info.cod);
+    DIV_SPRINTF(cwork, "%03d", FPG_D.info.cod);
     if(thumb_tex[n].Cuad)
     {
-      strcpy(textura+t_maximo*an_textura, cwork);
+      div_strcpy(textura+t_maximo*an_textura, an_textura, cwork);
       t_maximo++;
     }
-    strcpy(fondo+n*an_textura, cwork);
+    div_strcpy(fondo+n*an_textura, an_textura, cwork);
 
     thumb_tex[n].FilePos = ftell(FPG_F);
 

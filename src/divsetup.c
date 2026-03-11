@@ -48,7 +48,7 @@ void Vid_Setup1(void) {
 char cWork[10];
   _show_items();
   create_listbox(&lvgasizes);
-  sprintf(cWork,"%dx%d",stvga_an,stvga_al);
+  DIV_SPRINTF(cWork,"%dx%d",stvga_an,stvga_al);
 
   wwrite_in_box(v.ptr,v.an/big2,v.an/big2-3,v.al/big2,5   ,12,0,(byte *)vga_marker,c1);
   wwrite_in_box(v.ptr,v.an/big2,v.an/big2-3,v.al/big2,4   ,12,0,(byte *)vga_marker,c3);
@@ -178,10 +178,10 @@ void Get_Tapiz() {
 	v_text=(char *)texts[182];
 	show_dialog((voidReturnType)browser0);
 
-	strcpy(full,tipo[v_type].path);
+	div_strcpy(full,_MAX_PATH+1,tipo[v_type].path);
 
-	if (full[strlen(full)-1]!='/') strcat(full,"/");
-		strcat(full,input);
+	if (full[strlen(full)-1]!='/') div_strcat(full,_MAX_PATH+1,"/");
+		div_strcat(full,_MAX_PATH+1,input);
 
 	if (v_finished) {
 
@@ -314,7 +314,7 @@ void Tap_Setup3(void) {
   if(v_accept)
   {
     Setupfile.Desktop_Tile=Tap_mosaico;
-    strcpy(Setupfile.Desktop_Image,Tap_pathname);
+    div_strcpy(Setupfile.Desktop_Image,sizeof(Setupfile.Desktop_Image),Tap_pathname);
 
     Setupfile.Desktop_Gama=Tap_gama;
 
@@ -335,7 +335,7 @@ void Tap_Setup0(void)
   v.an=138;
   v.al=150;
   an=v.an/big2,al=v.al/big2;
-  strcpy(Tap_pathname,Setupfile.Desktop_Image);
+  DIV_STRCPY(Tap_pathname,Setupfile.Desktop_Image);
   Tap_mosaico=Setupfile.Desktop_Tile;
   Tap_gama=Setupfile.Desktop_Gama;
 
@@ -444,7 +444,7 @@ void MemInfo1(void) {
       meminmaps+=window[x].mapa->map_width*window[x].mapa->map_height;
     }
   }
-  if((mem=Mem_GetHeapFree())==-1) strcpy(cWork,(char *)texts[193]);
+  if((mem=Mem_GetHeapFree())==-1) DIV_STRCPY(cWork,(char *)texts[193]);
   else {
     mem=(Mi_meminfo.Bloque_mas_grande_disponible+mem)/1024;
     fmem = mem;
@@ -455,18 +455,18 @@ void MemInfo1(void) {
 	}
 	fprintf(stdout,"Memory free: %d (%f)\n",mem, fmem);
 
-   sprintf(cWork,(char *)texts[195],fmem,sizes[csize]);
+   DIV_SPRINTF(cWork,(char *)texts[195],fmem,sizes[csize]);
   }
   wwrite(v.ptr,an,al,an/2+1,44,1,(byte *)cWork,c1);
   wwrite(v.ptr,an,al,an/2,44,1,(byte *)cWork,c4);
 
   mem=meminmaps/1024;
-  if(mem/1000) sprintf(cWork,(char *)texts[196],mem/1000,mem%1000,"KB");
-  else         sprintf(cWork,(char *)texts[197],mem%1000,"KB");
+  if(mem/1000) DIV_SPRINTF(cWork,(char *)texts[196],mem/1000,mem%1000,"KB");
+  else         DIV_SPRINTF(cWork,(char *)texts[197],mem%1000,"KB");
   wwrite(v.ptr,an,al,an/2+1,52,1,(byte *)cWork,c1);
   wwrite(v.ptr,an,al,an/2,52,1,(byte *)cWork,c4);
 
-  sprintf(cWork,(char *)texts[198],nuvent*100/max_windows,'%');
+  DIV_SPRINTF(cWork,(char *)texts[198],nuvent*100/max_windows,'%');
   wwrite(v.ptr,an,al,an/2+1,60,1,(byte *)cWork,c1);
   wwrite(v.ptr,an,al,an/2,60,1,(byte *)cWork,c4);
 }

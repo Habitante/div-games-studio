@@ -537,9 +537,9 @@ void LoadPal() {
   if (!v_finished) return;
 
   if(!num_taggeds) {
-    strcpy(full,tipo[v_type].path);
-    if (full[strlen(full)-1]!='/') strcat(full,"/");
-    strcat(full, input);
+    div_strcpy(full,sizeof(full),tipo[v_type].path);
+    if (full[strlen(full)-1]!='/') div_strcat(full,sizeof(full),"/");
+    div_strcat(full,sizeof(full), input);
     if ((f=fopen(full,"rb"))!=NULL) {
       fclose(f);
       v_exists=1;
@@ -554,16 +554,16 @@ void LoadPal() {
   {
     if(thumb[num].tagged)
     {
-      strcpy(input,larchivosbr.list+larchivosbr.item_width*num);
-      strcpy(full,tipo[v_type].path);
-      if (full[strlen(full)-1]!='/') strcat(full,"/");
-      strcat(full, input);
+      div_strcpy(input,sizeof(input),larchivosbr.list+larchivosbr.item_width*num);
+      div_strcpy(full,sizeof(full),tipo[v_type].path);
+      if (full[strlen(full)-1]!='/') div_strcat(full,sizeof(full),"/");
+      div_strcat(full,sizeof(full), input);
 
       if (!v_exists) {
         v_text=(char *)texts[43];
         show_dialog(err0);
       } else {
-        strcpy(PalName,full);
+        div_strcpy(PalName,sizeof(PalName),full);
 
         div_try|=cargadac_FPG(PalName);
         div_try|=cargadac_FNT(PalName);
@@ -602,12 +602,12 @@ void LoadPal() {
     {
       if(thumb[num].tagged)
       {
-        strcpy(input,larchivosbr.list+larchivosbr.item_width*num);
-        strcpy(full,tipo[v_type].path);
-        if (full[strlen(full)-1]!='/') strcat(full,"/");
-        strcat(full, input);
+        div_strcpy(input,sizeof(input),larchivosbr.list+larchivosbr.item_width*num);
+        div_strcpy(full,sizeof(full),tipo[v_type].path);
+        if (full[strlen(full)-1]!='/') div_strcat(full,sizeof(full),"/");
+        div_strcat(full,sizeof(full), input);
 
-        strcpy(PalName,full);
+        div_strcpy(PalName,sizeof(PalName),full);
 
         div_try|=cargadac_FPG(PalName);
         div_try|=cargadac_FNT(PalName);
@@ -640,13 +640,13 @@ void Guarda_Pal()
 {
 int x;
 FILE *f;
-        strcpy(full,tipo[v_type].path);
+        div_strcpy(full,sizeof(full),tipo[v_type].path);
         if (full[strlen(full)-1]!='/')
-                strcat(full,"/");
-        strcat(full,input);
+                div_strcat(full,sizeof(full),"/");
+        div_strcat(full,sizeof(full),input);
         if ((f=fopen(full,"wb"))!=NULL)
         {
-                strcpy(PalName,full);
+                div_strcpy(PalName,sizeof(PalName),full);
                 fwrite("pal\x1a\x0d\x0a\x00\x00",8,1,f);
                 fwrite(dac,768,1,f);
                 for(x=0;x<16;x++)
@@ -1041,10 +1041,10 @@ void merge_palette(void){
     if (!v_exists) {
       v_text=(char *)texts[43]; show_dialog(err0);
     } else {
-      strcpy(full,tipo[v_type].path);
-      if (full[strlen(full)-1]!='/') strcat(full,"/");
-      strcat(full,input);
-      strcpy(PalName,full);
+      div_strcpy(full,sizeof(full),tipo[v_type].path);
+      if (full[strlen(full)-1]!='/') div_strcat(full,sizeof(full),"/");
+      div_strcat(full,sizeof(full),input);
+      div_strcpy(PalName,sizeof(PalName),full);
 
       div_try|=cargadac_FPG(PalName);
       div_try|=cargadac_FNT(PalName);
@@ -1434,23 +1434,23 @@ char cWork[20];
         wbox(v.ptr,an,al,c0,2,10,128,128);
 
         wwrite(v.ptr,an,al,147,11,0,texts[141],c3);
-        sprintf(cWork,"%03d",SelColor);
+        div_snprintf(cWork,sizeof(cWork),"%03d",SelColor);
         wwrite(v.ptr,an,al,145,11,2,(byte *)cWork,c3);
 
         wwrite(v.ptr,an,al,147,19,0,texts[142],c3);
-        sprintf(cWork," %02X",SelColor);
+        div_snprintf(cWork,sizeof(cWork)," %02X",SelColor);
         wwrite(v.ptr,an,al,145,19,2,(byte *)cWork,c3);
 
         wwrite(v.ptr,an,al,147,63-21,0,texts[143],c3);
-        sprintf(cWork,"%02d",dac[SelColor*3]);
+        div_snprintf(cWork,sizeof(cWork),"%02d",dac[SelColor*3]);
         wwrite(v.ptr,an,al,140,63-21,2,(byte *)cWork,c3);
 
         wwrite(v.ptr,an,al,147,63-14,0,texts[144],c3);
-        sprintf(cWork,"%02d",dac[SelColor*3+1]);
+        div_snprintf(cWork,sizeof(cWork),"%02d",dac[SelColor*3+1]);
         wwrite(v.ptr,an,al,140,63-14,2,(byte *)cWork,c3);
 
         wwrite(v.ptr,an,al,147,63-7,0,texts[145],c3);
-        sprintf(cWork,"%02d",dac[SelColor*3+2]);
+        div_snprintf(cWork,sizeof(cWork),"%02d",dac[SelColor*3+2]);
         wwrite(v.ptr,an,al,140,63-7,2,(byte *)cWork,c3);
 
         wbox(v.ptr,an,al,c0,132,26,31,42-27);
@@ -1519,21 +1519,21 @@ int an=v.an/big2,al=v.al/big2;
                         wbox(v.ptr,an,al,c2,130,11,29,15);
 
                         wwrite(v.ptr,an,al,147,11,0,texts[141],c3);
-                        sprintf(cWork,"%03d",cColor);
+                        div_snprintf(cWork,sizeof(cWork),"%03d",cColor);
                         wwrite(v.ptr,an,al,145,11,2,(byte *)cWork,c3);
                         wwrite(v.ptr,an,al,147,19,0,texts[142],c3);
-                        sprintf(cWork," %02X",cColor);
+                        div_snprintf(cWork,sizeof(cWork)," %02X",cColor);
                         wwrite(v.ptr,an,al,145,19,2,(byte *)cWork,c3);
 
                         wbox(v.ptr,an,al,c2,130,63-21,25,20);
                         wwrite(v.ptr,an,al,147,63-21,0,texts[143],c3);
-                        sprintf(cWork,"%02d",dac[cColor*3]);
+                        div_snprintf(cWork,sizeof(cWork),"%02d",dac[cColor*3]);
                         wwrite(v.ptr,an,al,140,63-21,2,(byte *)cWork,c3);
                         wwrite(v.ptr,an,al,147,63-14,0,texts[144],c3);
-                        sprintf(cWork,"%02d",dac[cColor*3+1]);
+                        div_snprintf(cWork,sizeof(cWork),"%02d",dac[cColor*3+1]);
                         wwrite(v.ptr,an,al,140,63-14,2,(byte *)cWork,c3);
                         wwrite(v.ptr,an,al,147,63-7,0,texts[145],c3);
-                        sprintf(cWork,"%02d",dac[cColor*3+2]);
+                        div_snprintf(cWork,sizeof(cWork),"%02d",dac[cColor*3+2]);
                         wwrite(v.ptr,an,al,140,63-7,2,(byte *)cWork,c3);
                         ax=((wmouse_x-2)/8);
                         ay=((wmouse_y-10)/8);
@@ -1637,21 +1637,21 @@ int an=v.an/big2,al=v.al/big2;
 
                         wbox(v.ptr,an,al,c2,130,11,29,15);
                         wwrite(v.ptr,an,al,147,11,0,texts[141],c3);
-                        sprintf(cWork,"%03d",SelColor);
+                        div_snprintf(cWork,sizeof(cWork),"%03d",SelColor);
                         wwrite(v.ptr,an,al,145,11,2,(byte *)cWork,c3);
                         wwrite(v.ptr,an,al,147,19,0,texts[142],c3);
-                        sprintf(cWork," %02X",SelColor);
+                        div_snprintf(cWork,sizeof(cWork)," %02X",SelColor);
                         wwrite(v.ptr,an,al,145,19,2,(byte *)cWork,c3);
                         wbox(v.ptr,an,al,c2,130,63-21,25,20);
 
                         wwrite(v.ptr,an,al,147,63-21,0,texts[143],c3);
-                        sprintf(cWork,"%02d",dac[SelColor*3]);
+                        div_snprintf(cWork,sizeof(cWork),"%02d",dac[SelColor*3]);
                         wwrite(v.ptr,an,al,140,63-21,2,(byte *)cWork,c3);
                         wwrite(v.ptr,an,al,147,63-14,0,texts[144],c3);
-                        sprintf(cWork,"%02d",dac[SelColor*3+1]);
+                        div_snprintf(cWork,sizeof(cWork),"%02d",dac[SelColor*3+1]);
                         wwrite(v.ptr,an,al,140,63-14,2,(byte *)cWork,c3);
                         wwrite(v.ptr,an,al,147,63-7,0,texts[145],c3);
-                        sprintf(cWork,"%02d",dac[SelColor*3+2]);
+                        div_snprintf(cWork,sizeof(cWork),"%02d",dac[SelColor*3+2]);
                         wwrite(v.ptr,an,al,140,63-7,2,(byte *)cWork,c3);
                         lRed.first_visible=63-dac[SelColor*3];
                         lGre.first_visible=63-dac[SelColor*3+1];
@@ -1798,13 +1798,13 @@ int an=v.an/big2,al=v.al/big2;
                                 //Refresh values and scrollbars
                                 wbox(v.ptr,an,al,c2,130,63-21,25,20);
                                 wwrite(v.ptr,an,al,147,63-21,0,texts[143],c3);
-                                sprintf(cWork,"%02d",dac[SelColor*3]);
+                                div_snprintf(cWork,sizeof(cWork),"%02d",dac[SelColor*3]);
                                 wwrite(v.ptr,an,al,140,63-21,2,(byte *)cWork,c3);
                                 wwrite(v.ptr,an,al,147,63-14,0,texts[144],c3);
-                                sprintf(cWork,"%02d",dac[SelColor*3+1]);
+                                div_snprintf(cWork,sizeof(cWork),"%02d",dac[SelColor*3+1]);
                                 wwrite(v.ptr,an,al,140,63-14,2,(byte *)cWork,c3);
                                 wwrite(v.ptr,an,al,147,63-7,0,texts[145],c3);
-                                sprintf(cWork,"%02d",dac[SelColor*3+2]);
+                                div_snprintf(cWork,sizeof(cWork),"%02d",dac[SelColor*3+2]);
                                 wwrite(v.ptr,an,al,140,63-7,2,(byte *)cWork,c3);
                                 lRed.first_visible=63-dac[SelColor*3];
                                 lGre.first_visible=63-dac[SelColor*3+1];

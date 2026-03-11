@@ -5,6 +5,7 @@
 
 #include "inter.h"
 #include "madewith.h"
+#include "../../div_string.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 //	Declarations and module-level data
@@ -439,7 +440,7 @@ if ((shift_status&4) && (shift_status&8) && key(_9)) {
 			if(!(framecount%(fps/12)) && framecount>5 && framecount<maxframes) { // && framecount%3==1) {
 				char filename[255];
 				memset(filename,0,255);
-				sprintf(filename,"out%05d.bmp",framecount);
+				div_snprintf(filename,sizeof(filename),"out%05d.bmp",framecount);
 				SDL_SaveBMP(vga, filename);
 			} else {
 				if(framecount>maxframes)
@@ -503,7 +504,7 @@ void snapshot(byte *p) {
   char cwork[128];
 
   do {
-    sprintf(cwork,"SNAP%04d.PCX",n++);
+    div_snprintf(cwork,sizeof(cwork),"SNAP%04d.PCX",n++);
     if ((f=fopen(cwork,"rb"))!=NULL) fclose(f);
   } while (f!=NULL);
 

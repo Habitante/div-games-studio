@@ -25,7 +25,10 @@
 static inline char *div_strcpy(char *dest, size_t dest_size, const char *src) {
     if (dest_size == 0) return dest;
     if (!src) { dest[0] = '\0'; return dest; }
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-truncation"
     strncpy(dest, src, dest_size - 1);
+#pragma GCC diagnostic pop
     dest[dest_size - 1] = '\0';
     return dest;
 }
@@ -36,7 +39,10 @@ static inline char *div_strcat(char *dest, size_t dest_size, const char *src) {
     if (dest_size == 0 || !src) return dest;
     len = strlen(dest);
     if (len < dest_size - 1) {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-truncation"
         strncpy(dest + len, src, dest_size - len - 1);
+#pragma GCC diagnostic pop
         dest[dest_size - 1] = '\0';
     }
     return dest;

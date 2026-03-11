@@ -1,4 +1,5 @@
 #include "global.h"
+#include "div_string.h"
 
 //-----------------------------------------------------------------------------
 //  Detection of available video modes
@@ -43,7 +44,7 @@ void detect_vesa(void) { // Detects available video modes
 		num_modes=i;
 	}
 	
-	sprintf(vga_marker,"SDL Video Driver");
+	div_snprintf(vga_marker,sizeof(vga_marker),"SDL Video Driver");
 
 	qsort((void*)&(modos[0].width),num_modes,sizeof(struct _modos),compare_mode);
 }

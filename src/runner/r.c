@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "../div_string.h"
 
 #ifdef __WIN32
 #include <SDL2/SDL.h>
@@ -75,19 +76,19 @@ printf("[%s]\n",dbg);
 	CFStringGetCString( str, path, FILENAME_MAX, kCFStringEncodingASCII );
 	CFRelease(str);
 	printf("%s\n", path);
-strcat(path,"/Contents/Resources/");
+div_strcat(path,sizeof(path),"/Contents/Resources/");
 chdir(path);
 
 #endif
 
 int a=0;
 char init[255];
-strcpy(init,ide);
-strcat(init," INIT");
+div_strcpy(init,sizeof(init),ide);
+div_strcat(init,sizeof(init)," INIT");
 
 while(a++<argc-1) {
-	strcat(init," ");
-	strcat(init,argv[a]);
+	div_strcat(init,sizeof(init)," ");
+	div_strcat(init,sizeof(init),argv[a]);
 }
 
 

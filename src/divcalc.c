@@ -4,6 +4,7 @@
 //-----------------------------------------------------------------------------
 
 #include "global.h"
+#include "div_string.h"
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -330,10 +331,10 @@ void calc2(void) {
     do_calculate();
 
     if (token==p_num) {
-      if (pcalc->chex) sprintf(pcalc->cresult,"0x%x",(unsigned int)(memptrsize)tnumero);
-      else if (pcalc->cint) sprintf(pcalc->cresult,"%d",(int)(memptrsize)tnumero);
-      else sprintf(pcalc->cresult,"%g",tnumero);
-    } else strcpy(pcalc->cresult,(char *)texts[417]);
+      if (pcalc->chex) div_snprintf(pcalc->cresult,sizeof(pcalc->cresult),"0x%x",(unsigned int)(memptrsize)tnumero);
+      else if (pcalc->cint) div_snprintf(pcalc->cresult,sizeof(pcalc->cresult),"%d",(int)(memptrsize)tnumero);
+      else div_snprintf(pcalc->cresult,sizeof(pcalc->cresult),"%g",tnumero);
+    } else div_strcpy(pcalc->cresult,sizeof(pcalc->cresult),(char *)texts[417]);
     wbox(v.ptr,an,al,c12,4,12,an-8-22-26,6);
     wwrite(v.ptr,an,al,4,12,0,(byte *)pcalc->cresult,c3);
     v.redraw=1;
@@ -357,8 +358,8 @@ void calc0(void) {
   if (pcalc==NULL) pcalc=readcalc; else {
     pcalc->chex=0;
     pcalc->cint=0;
-    strcpy(pcalc->ctext,"");
-    strcpy(pcalc->cresult,"0");
+    div_strcpy(pcalc->ctext,sizeof(pcalc->ctext),"");
+    div_strcpy(pcalc->cresult,sizeof(pcalc->cresult),"0");
   }
 
   v.aux=(byte*)pcalc;

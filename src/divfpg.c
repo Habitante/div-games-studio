@@ -357,11 +357,11 @@ int new_file(void) {
 	v_text=(char *)texts[69];
 	show_dialog(browser0);
 
-	strcpy(full,tipo[v_type].path);
+	div_strcpy(full,sizeof(full),tipo[v_type].path);
 
-	if (full[strlen(full)-1]!='/') strcat(full,"//");
-	
-	strcat(full,input);
+	if (full[strlen(full)-1]!='/') div_strcat(full,sizeof(full),"//");
+
+	div_strcat(full,sizeof(full),input);
 
 	if (v_finished)
 	{
@@ -425,12 +425,12 @@ void open_file(void) {
 	if (!v_finished) return;
 
 	if(!num_taggeds) {
-		strcpy(full,tipo[v_type].path);
+		div_strcpy(full,sizeof(full),tipo[v_type].path);
 
 		if (full[strlen(full)-1]!='/')
-			strcat(full,"/");
+			div_strcat(full,sizeof(full),"/");
 
-		strcat(full, input);
+		div_strcat(full,sizeof(full), input);
 
 		if ((f=fopen(full,"rb"))!=NULL) {
 			fclose(f);
@@ -454,20 +454,20 @@ void open_file(void) {
 	for(num=0; num<larchivosbr.total_items; num++) {
 
 		if(thumb[num].tagged) {
-			strcpy(input,larchivosbr.list+larchivosbr.item_width*num);
-			strcpy(full,tipo[v_type].path);
+			div_strcpy(input,sizeof(input),larchivosbr.list+larchivosbr.item_width*num);
+			div_strcpy(full,sizeof(full),tipo[v_type].path);
 
 			if (full[strlen(full)-1]!='/')
-				strcat(full,"/");
+				div_strcat(full,sizeof(full),"/");
 
-			strcat(full, input);
+			div_strcat(full,sizeof(full), input);
 
 			if((f=fopen(full,"rb"))==NULL) {
 				v_text=(char *)texts[44];
 				show_dialog(err0);
 				continue;
 			}
-			
+
 			fread(cwork,8,1,f);
 
 			if (strcmp(cwork,"fpg\x1a\x0d\x0a")) {
@@ -557,13 +557,13 @@ void open_file(void) {
 	for(num=0; num<larchivosbr.total_items; num++) {
 
 		if(thumb[num].tagged) {
-			strcpy(input,larchivosbr.list+larchivosbr.item_width*num);
-			strcpy(full,tipo[v_type].path);
+			div_strcpy(input,sizeof(input),larchivosbr.list+larchivosbr.item_width*num);
+			div_strcpy(full,sizeof(full),tipo[v_type].path);
 
 			if (full[strlen(full)-1]!='/')
-				strcat(full,"/");
+				div_strcat(full,sizeof(full),"/");
 
-			strcat(full, input);
+			div_strcat(full,sizeof(full), input);
 
 			if ((f=fopen(full,"rb"))!=NULL) { // A file was selected
 				if (fread(cwork,1,8,f)==8) {
@@ -623,7 +623,7 @@ void Warning1(void) {
 
 	_show_items();
 	wwrite(v.ptr,an,al,an/2,12,1,texts[172],c3);
-	sprintf(cWork,(char *)texts[173],cNamev2convert);
+	div_snprintf(cWork,sizeof(cWork),(char *)texts[173],cNamev2convert);
 	wwrite(v.ptr,an,al,an/2,19,1,(byte *)cWork,c3);
 	wwrite(v.ptr,an,al,an/2,30,1,texts[174],c4);
 	v_accept=0;
@@ -680,7 +680,7 @@ int RemapAllFiles(int vent) {
 			return(0);
 	}
 
-	strcpy(cNamev2convert,(char *)window[vent].title);
+	div_strcpy(cNamev2convert,sizeof(cNamev2convert),(char *)window[vent].title);
 	show_dialog(Warning0);
 
 	switch(v_accept) {
@@ -727,9 +727,9 @@ void GetCode1(void) {
 	wwrite(v.ptr,an,al,4,32,0,texts[133],c3);
 	wwrite(v.ptr,an,al,4,42,0,texts[134],c3);
 
-	sprintf(cWork,"%d",GetCodeAncho);
+	div_snprintf(cWork,sizeof(cWork),"%d",GetCodeAncho);
 	wwrite(v.ptr,an,al,34,32,0,(byte *)cWork,c4);
-	sprintf(cWork,"%d",GetCodeAlto);
+	div_snprintf(cWork,sizeof(cWork),"%d",GetCodeAlto);
 	wwrite(v.ptr,an,al,34,42,0,(byte *)cWork,c4);
 
 	wwrite(v.ptr,an,al,64,32,0,texts[152],c3);
@@ -740,9 +740,9 @@ void GetCode1(void) {
 		GetCodeP0y=GetCodeAlto/2;
 	}
 
-	sprintf(cWork,"%d",GetCodeP0x);
+	div_snprintf(cWork,sizeof(cWork),"%d",GetCodeP0x);
 	wwrite(v.ptr,an,al,108,32,0,(byte *)cWork,c4);
-	sprintf(cWork,"%d",GetCodeP0y);
+	div_snprintf(cWork,sizeof(cWork),"%d",GetCodeP0y);
 	wwrite(v.ptr,an,al,108,42,0,(byte *)cWork,c4);
 
 	wbox(v.ptr,an,al,c1,an-(72+4),12,72,46);
@@ -807,7 +807,7 @@ void InitGetCode(void) {
 	int x,y;
 
 	if(atoi(cCodigo)==0)
-		strcpy(cCodigo,"1");
+		div_strcpy(cCodigo,sizeof(cCodigo),"1");
 
 	// Create the thumbnail
 
@@ -1065,7 +1065,7 @@ void Print_List(void) {
 		return;
 
 	if (!strlen(n_ar))
-		strcpy(n_ar,(char *)texts[451]);
+		div_strcpy(n_ar,sizeof(n_ar),(char *)texts[451]);
 
 	v_text=n_ar;
 	v_title=(char *)texts[438];
@@ -1087,7 +1087,7 @@ void Print_List(void) {
 
 				if (f!=NULL) {
 					fclose(f);
-					sprintf(cwork,"%s\\%s",tipo[1].path,n_ar);
+					div_snprintf(cwork,sizeof(cwork),"%s\\%s",tipo[1].path,n_ar);
 					strupr(cwork);
 					v_title=(char *)texts[450];
 					v_text=cwork;
@@ -1121,7 +1121,7 @@ void Print_List(void) {
 					fread(&cab,1,sizeof(cab),g);
 					memset(cwork2,0,13);
 					memcpy(cwork2,cab.Filename,12);
-					sprintf(cwork,"[%03d] %s (%s, %dx%d)",
+					div_snprintf(cwork,sizeof(cwork),"[%03d] %s (%s, %dx%d)",
 					cab.COD,cab.Descrip,cwork2,cab.Ancho,cab.Alto);
 					if (f_ar) {
 						fwrite(cwork,1,strlen(cwork),f);
@@ -1207,7 +1207,7 @@ void FPG_show_thumb(struct t_listboxbr * l, int num) {
 		}
 
 		py+=l->al-1;
-		strcpy(p, l->list+l->item_width*num);
+		div_strcpy(p, sizeof(p), l->list+l->item_width*num);
 		if(MiFPG->thumb_on) p[5]=0;
 
 		if (l->zone-10==num-l->first_visible)
@@ -1350,7 +1350,7 @@ void FPG_update_listbox_br(struct t_listboxbr * l) {
 	if (old_zona!=l->zone) if (old_zona>=10) { // Unhighlight zone
 		x=l->x+1+((old_zona-10)%l->columns)*(l->an+1);
 		y=l->y+l->al+((old_zona-10)/l->columns)*(l->al+1);
-		strcpy(p, l->list+l->item_width*(l->first_visible+old_zona-10));
+		div_strcpy(p, sizeof(p), l->list+l->item_width*(l->first_visible+old_zona-10));
 	
 		if(MiFPG->thumb_on)
 			p[5]=0;
@@ -1451,7 +1451,7 @@ void FPG_update_listbox_br(struct t_listboxbr * l) {
 	if (old_zona!=l->zone) if (l->zone>=10) { // Highlight zone
 		x=l->x+1+((l->zone-10)%l->columns)*(l->an+1);
 		y=l->y+l->al+((l->zone-10)/l->columns)*(l->al+1);
-		strcpy(p, l->list+l->item_width*(l->first_visible+l->zone-10));
+		div_strcpy(p, sizeof(p), l->list+l->item_width*(l->first_visible+l->zone-10));
 
 		if(MiFPG->thumb_on)
 			p[5]=0;
@@ -2009,12 +2009,12 @@ int select_file(void) {
 	v_text=(char *)texts[69];
 	show_dialog(browser0);
 
-	strcpy(full,tipo[v_type].path);
+	div_strcpy(full,sizeof(full),tipo[v_type].path);
 
-	if (full[strlen(full)-1]!='/') 
-		strcat(full,"/");
+	if (full[strlen(full)-1]!='/')
+		div_strcat(full,sizeof(full),"/");
 
-	strcat(full,input);
+	div_strcat(full,sizeof(full),input);
 
 	if (v_finished) {
 		if (!v_exists) {

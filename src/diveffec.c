@@ -3,6 +3,7 @@
 //-----------------------------------------------------------------------------
 
 #include "global.h"
+#include "div_string.h"
 
 //-----------------------------------------------------------------------------
 //      Definitions
@@ -346,10 +347,10 @@ void Explode0(void) {
                 break;
   }
 
-   sprintf(cFrames,"%d",n_frames);
-   sprintf(cexp_ancho,"%d",exp_ancho);
-   sprintf(cexp_alto,"%d",exp_alto);
-   sprintf(cper_points,"%d",per_points);
+   DIV_SPRINTF(cFrames,"%d",n_frames);
+   DIV_SPRINTF(cexp_ancho,"%d",exp_ancho);
+   DIV_SPRINTF(cexp_alto,"%d",exp_alto);
+   DIV_SPRINTF(cper_points,"%d",per_points);
 
   _get(133,4,11,21,(byte *)cexp_ancho,5,8,2000);
   _get(134,69-36,11,21,(byte *)cexp_alto ,5,8,2000);

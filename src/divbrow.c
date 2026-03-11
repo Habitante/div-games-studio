@@ -156,9 +156,9 @@ void print_path_br(void) {
 
   wbox(v.ptr,an,al,c12,3,11,wbox_ancho,8);
 
-  strcpy(full,tipo[v_type].path);
+  div_strcpy(full,sizeof(full),tipo[v_type].path);
   if (tipo[v_type].path[strlen(tipo[v_type].path)-1]!='/') {
-    strcat(full,"/"); } strcat(full,file_mask);
+    div_strcat(full,sizeof(full),"/"); } div_strcat(full,sizeof(full),file_mask);
 
   wwrite_in_box(v.ptr,an,wbox_ancho+2,al,5,12,0,(byte *)full,c1);
   wwrite_in_box(v.ptr,an,wbox_ancho+2,al,4,12,0,(byte *)full,c3);
@@ -235,9 +235,9 @@ void create_thumb_MAP(struct t_listboxbr * l){
 
     if (estado==1) { // Read a new thumbnail
 		char filename[255];
-		strcpy(filename,l->list+(l->item_width*num));
+		div_strcpy(filename,sizeof(filename),l->list+(l->item_width*num));
 		strupr(filename);
-		
+
       if (strchr(l->list+(l->item_width*num),'.')!=NULL &&
 	  strcmp(strchr(filename,'.'),".MAP") &&
           strcmp(strchr(filename,'.'),".PCX") &&
@@ -449,7 +449,7 @@ void create_thumb_PAL(struct t_listboxbr * l)
     } while (num!=l->first_visible);
 
     if (estado==0) { num=-1; return; }
-	strcpy(filename,l->list+(l->item_width*num));
+	div_strcpy(filename,sizeof(filename),l->list+(l->item_width*num));
 	strupr(filename);
     // Start reading a new thumbnail
     if (!strcmp(strchr(filename,'.'),".FPG"))
@@ -591,7 +591,7 @@ void create_thumb_FNT(struct t_listboxbr * l)
     // read a new thumbnail
     if (estado==1)
     {
-		strcpy(filename,l->list+(l->item_width*num));
+		div_strcpy(filename,sizeof(filename),l->list+(l->item_width*num));
 		strupr(filename);
 		printf("%s %s\n",filename,l->list+(l->item_width*num));
 		fflush(stdout);
@@ -854,9 +854,9 @@ void create_thumb_IFS(struct t_listboxbr * l)
     } while (num!=l->first_visible);
 
     if (estado==0) { num=-1; return; }
-	strcpy(filename,l->list+(l->item_width*num));
+	div_strcpy(filename,sizeof(filename),l->list+(l->item_width*num));
 	strupr(filename);
-	
+
     if(strcmp(strchr(filename,'.'),".IFS"))
     {
       thumb[num].status=-1;
@@ -1027,9 +1027,9 @@ void create_thumb_PCM(struct t_listboxbr * l)
         thumb[num].status=-1;
         return;
       }
-      strcpy(filename,l->list+(l->item_width*num));
+      div_strcpy(filename,sizeof(filename),l->list+(l->item_width*num));
       strupr(filename);
-      
+
       if (IsWAV(l->list+(l->item_width*num)));
       else if(!strcmp(strchr(filename,'.'),".PCM") );
       else
@@ -1454,8 +1454,8 @@ void browser0(void) {
   if (v_type==11) v_type=7;
 
   if (tipo[v_type].default_choice>=0 && tipo[v_type].default_choice<lextbr.total_items)
-    strcpy(input,&ext[an_ext*tipo[v_type].default_choice]);
-  else strcpy(input,&ext[0]);
+    div_strcpy(input,sizeof(input),&ext[an_ext*tipo[v_type].default_choice]);
+  else div_strcpy(input,sizeof(input),&ext[0]);
 
   DIV_STRCPY(file_mask,input);
   v_finished=0;
@@ -1473,7 +1473,7 @@ void browser0(void) {
   open_dir_br(); // Create file and directory lists
 
   if (v_mode==1) *input=0;
-  if (v_mode==2) strcpy(input,input2);
+  if (v_mode==2) div_strcpy(input,sizeof(input),input2);
 
   larchivosbr.created=0; ldirectoriosbr.created=0;
   lunidadesbr.created=0; lextbr.created=0;
@@ -1684,12 +1684,12 @@ void browser2(void) {
       }
 
       browser1(); v.redraw=1;
-      strcpy(full,archivo+(larchivosbr.zone-10+larchivosbr.first_visible)*an_archivo);
+      div_strcpy(full,sizeof(full),archivo+(larchivosbr.zone-10+larchivosbr.first_visible)*an_archivo);
 
       // TODO: Handle CTRL and SHIFT modifier keys
       if (strcmp(input,full) || ((v_thumb==7 || v_type==16) && opc_pru))
       {
-        strcpy(input, full);
+        div_strcpy(input,sizeof(input),full);
         browser1();
         v.redraw=1;
 #ifdef MIXER
@@ -1707,10 +1707,10 @@ void browser2(void) {
 			if(true) 
 #endif
 			{
-            strcpy(full,tipo[v_type].path);
+            div_strcpy(full,sizeof(full),tipo[v_type].path);
             if (tipo[v_type].path[strlen(tipo[v_type].path)-1]!='/')
-              strcat(full,"/");
-            strcat(full,archivo+(larchivosbr.zone-10+larchivosbr.first_visible)*an_archivo);
+              div_strcat(full,sizeof(full),"/");
+            div_strcat(full,sizeof(full),archivo+(larchivosbr.zone-10+larchivosbr.first_visible)*an_archivo);
 
 			Mix_HaltChannel(-1);
 			if ( smp !=NULL)
@@ -1737,10 +1737,10 @@ void browser2(void) {
           }
         } else if(v_type==16 && opc_pru) {
 #ifdef NOTYET
-          strcpy(full,tipo[v_type].path);
+          div_strcpy(full,sizeof(full),tipo[v_type].path);
           if (tipo[v_type].path[strlen(tipo[v_type].path)-1]!='/')
-            strcat(full,"/");
-          strcat(full,archivo+(larchivosbr.zone-10+larchivosbr.first_visible)*an_archivo);
+            div_strcat(full,sizeof(full),"/");
+          div_strcat(full,sizeof(full),archivo+(larchivosbr.zone-10+larchivosbr.first_visible)*an_archivo);
 
           if(judas_channel[0].smp) judas_stopsample(0);
           if(smp!=NULL) { judas_freesample(smp); smp=NULL; }
@@ -1769,8 +1769,8 @@ void browser2(void) {
 
     } else if (ldirectoriosbr.zone>=10) { v.redraw=1;
       if (tipo[v_type].path[strlen(tipo[v_type].path)-1]!='/')
-        strcat(tipo[v_type].path,"/");
-      strcat(tipo[v_type].path,directorio+(ldirectoriosbr.zone-10+
+        div_strcat(tipo[v_type].path,sizeof(tipo[v_type].path),"/");
+      div_strcat(tipo[v_type].path,sizeof(tipo[v_type].path),directorio+(ldirectoriosbr.zone-10+
         ldirectoriosbr.first_visible)*an_directorio);
       chdir(tipo[v_type].path);
       getcwd(tipo[v_type].path,PATH_MAX+1);
@@ -1800,7 +1800,7 @@ void browser2(void) {
       }
     } else if (lextbr.zone>=10) { v.redraw=1;
       tipo[v_type].default_choice=lextbr.zone-10+lextbr.first_visible;
-      strcpy(input,ext+(lextbr.zone-10+lextbr.first_visible)*an_ext);
+      div_strcpy(input,sizeof(input),ext+(lextbr.zone-10+lextbr.first_visible)*an_ext);
       DIV_STRCPY(file_mask,input);
       tipo[v_type].first_visible=0;
       print_path_br();
@@ -1859,7 +1859,7 @@ void open_dir_br(void) {
 
   n=0; m=_dos_findfirst(file_mask,_A_NORMAL,&fileinfo);
   while (m==0 && n<max_archivos) {
-    strcpy(archivo+n++*an_archivo,fileinfo.name);
+    div_strcpy(archivo+n++*an_archivo,an_archivo,fileinfo.name);
     m=_dos_findnext(&fileinfo);
   } larchivosbr.total_items=n;
   qsort(archivo,larchivosbr.total_items,(size_t)an_archivo,(int (*)(const void *, const void *))strcmp);
@@ -1867,7 +1867,7 @@ void open_dir_br(void) {
   n=0; m=_dos_findfirst("*.*",_A_SUBDIR,&fileinfo);
   while (m==0 && n<max_directorios) {
     if (strcmp(fileinfo.name,".") && (fileinfo.attrib&16)) {
-      strcpy(directorio+n++*an_directorio,fileinfo.name);
+      div_strcpy(directorio+n++*an_directorio,an_directorio,fileinfo.name);
    }
     m=_dos_findnext(&fileinfo);
   } ldirectoriosbr.total_items=n;

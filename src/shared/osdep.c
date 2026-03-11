@@ -1,4 +1,5 @@
 #include "global.h"
+#include "../div_string.h"
 
 #include "osdep.h"
 #include <ctype.h>
@@ -141,7 +142,7 @@ Filename,char* Extension)
   // strncpy doesnt add a '\0'
   Directory[Last] = '\0';
   // Filename is the part behind the last slahs
-  strcpy(Filename,CopyOfPath -= Rest);
+  div_strcpy(Filename,_MAX_FNAME+1,CopyOfPath -= Rest);
   // get extension if there is any
   char *ext = Extension;
   while(*Filename != '\0')
@@ -229,7 +230,7 @@ int _chdir(const char* Directory)
 
 char *_fullpath(char *_FullPath,const char *_Path,size_t _SizeInBytes) {
 	if (realpath(_Path, _FullPath) == NULL)
-		strcpy(_FullPath, _Path);
+		div_strcpy(_FullPath, _SizeInBytes, _Path);
 	return _FullPath;
 }
 
@@ -246,7 +247,7 @@ struct dirent **namelist=NULL;
 unsigned int _dos_findfirst(char *name, unsigned int attr, struct find_t *result) {
  unsigned int ret =0;
 
-strcpy(findmask,name);
+div_strcpy(findmask,sizeof(findmask),name);
 strlwr(findmask);
 
 if(namelist!=NULL) {
@@ -269,7 +270,7 @@ return (ret);
 							}
 unsigned int _dos_findnext(struct find_t *result) {
 while(++np<nummatch) {
-	strcpy(result->name,namelist[np]->d_name);
+	div_strcpy(result->name,sizeof(result->name),namelist[np]->d_name);
 	result->attrib=0;
 	if(result->name[0]!='.' || ( result->name[0]=='.' &&  result->name[1]=='.')) {
 		if(namelist[np]->d_type == DT_DIR && type == _A_SUBDIR) {
@@ -281,7 +282,7 @@ while(++np<nummatch) {
 				return 0;
 			}
 		} 
-		strcpy(findname, result->name);
+		div_strcpy(findname, sizeof(findname), result->name);
 
 	if (fnmatch(findmask, findname, FNM_PATHNAME | FNM_CASEFOLD)==0){
 		
@@ -311,7 +312,7 @@ void textcolor(int attr, int fg, int bg)
 {	char command[13];
 
 	/* Command is the control command to the terminal */
-	sprintf(command, "%c[%d;%d;%dm", 0x1B, attr, fg + 30, bg + 40);
+	div_snprintf(command, sizeof(command), "%c[%d;%d;%dm", 0x1B, attr, fg + 30, bg + 40);
 	printf("%s", command);
 }
 

@@ -72,7 +72,7 @@ void Crear_FPG(FPG *Fpg,char *Name)
 
 	Fpg->version=0; // 32 bit fpg files
 	
-	strcpy((char *)Fpg->ActualFile,Name);
+	div_strcpy((char *)Fpg->ActualFile,sizeof(Fpg->ActualFile),Name);
 	fwrite("fpg\x1a\x0d\x0a\x00",7,1,fpg);
 
 	fwrite(&Fpg->version,1,1,fpg);
@@ -128,7 +128,7 @@ int Abrir_FPG(FPG *Fpg,char *Name) {
 	}
 
 	Fpg->nIndex=0;
-	strcpy((char *)Fpg->ActualFile,Name);
+	div_strcpy((char *)Fpg->ActualFile,sizeof(Fpg->ActualFile),Name);
 	fread(newdac,768,1,fpg);
 	memcpy(dac4,newdac,768);
 	NewDacLoaded=1;
@@ -137,7 +137,7 @@ int Abrir_FPG(FPG *Fpg,char *Name) {
 	while(ReadHead(&kkhead,fpg)) {
 		Fpg->OffsGrf[kkhead.COD]=ftell(fpg)-FPG_HEAD;
 		Fpg->DesIndex[Fpg->nIndex]=kkhead.COD;
-		sprintf((char *)Fpg->CodDes[Fpg->nIndex++],"%c %03d %s",255,kkhead.COD,kkhead.Descrip);
+		div_snprintf((char *)Fpg->CodDes[Fpg->nIndex++],sizeof(Fpg->CodDes[0]),"%c %03d %s",255,kkhead.COD,kkhead.Descrip);
 		fseek(fpg,Fpg->OffsGrf[kkhead.COD]+kkhead.LONG,SEEK_SET);
 	}
 
@@ -179,9 +179,9 @@ char cWork[38];
                                 Fpg->DesIndex[j]=Fpg->DesIndex[j+1];
                                 Fpg->DesIndex[j+1]=iWork;
 
-                                strcpy(cWork,(char *)Fpg->CodDes[j]);
-                                strcpy((char *)Fpg->CodDes[j],(char *)Fpg->CodDes[j+1]);
-                                strcpy((char *)Fpg->CodDes[j+1],cWork);
+                                div_strcpy(cWork,sizeof(cWork),(char *)Fpg->CodDes[j]);
+                                div_strcpy((char *)Fpg->CodDes[j],sizeof(Fpg->CodDes[j]),(char *)Fpg->CodDes[j+1]);
+                                div_strcpy((char *)Fpg->CodDes[j+1],sizeof(Fpg->CodDes[j+1]),cWork);
                         }
                 }
         }
@@ -223,7 +223,7 @@ FILE *fpg;
         while((COD==0)||First)
         {
                 First=0;
-                sprintf(cCodigo,"%d",COD);
+                div_snprintf(cCodigo,sizeof(cCodigo),"%d",COD);
                 memcpy(Descrip,tDescrip,32);
                 memcpy(cFile,tFilename,12); cFile[12]=(char)0;
                 RetValue=0;
@@ -244,7 +244,7 @@ FILE *fpg;
                 else         RetValue=1;
                 COD=atoi(cCodigo);
                 Fpg->LastUsed=COD;
-                sprintf(cCodigo,"%d",COD);
+                div_snprintf(cCodigo,sizeof(cCodigo),"%d",COD);
 
 //**********************************************!!!!!!!!!!!!!!!!!!!!!!!
 //                memcpy(Descrip,Descrip,32);
@@ -336,13 +336,13 @@ int y;
 byte MiTabla[256];
 
         // Temporary file name
-        strcpy(ActualPath,(char *)Fpg->ActualFile);
+        div_strcpy(ActualPath,sizeof(ActualPath),(char *)Fpg->ActualFile);
         for(x=strlen(ActualPath);x>=0;x--)
                 if(IS_PATH_SEP(ActualPath[x]))
                         x=-1;
                 else
                         ActualPath[x]=0;
-        strcat(ActualPath,"_DIV_.FPG");
+        div_strcat(ActualPath,sizeof(ActualPath),"_DIV_.FPG");
         DaniDel(ActualPath);
 
         if((fpg=fopen((char *)Fpg->ActualFile,"rb"))==NULL)
@@ -421,9 +421,9 @@ char *Buffer;
                 v_text=(char *)texts[45]; show_dialog(err0);
                 return;
         }
-        strcpy(full,tipo[4].path);
-        if (full[strlen(full)-1]!='/') strcat(full,"/");
-        strcat(full,input);
+        div_strcpy(full,sizeof(full),tipo[4].path);
+        if (full[strlen(full)-1]!='/') div_strcat(full,sizeof(full),"/");
+        div_strcat(full,sizeof(full),input);
 
         FileOrg=fopen((char *)Fpg->ActualFile,"rb");
         if(FileOrg==NULL)
@@ -460,7 +460,7 @@ char *Buffer;
 
         close_fpg(full);
 
-        strcpy((char *)Fpg->ActualFile,full);
+        div_strcpy((char *)Fpg->ActualFile,sizeof(Fpg->ActualFile),full);
         div_strcpy((char *)Fpg->NombreFpg, sizeof(Fpg->NombreFpg), input);
 
         wgra(window[n].ptr,an,al,c_b_low,2,2,an-20,7);
@@ -492,13 +492,13 @@ FILE *Oldfpg;
 debugprintf("Deleting map %d\n",COD);
 
         // Temporary file name
-        strcpy(ActualPath,(char *)Fpg->ActualFile);
+        div_strcpy(ActualPath,sizeof(ActualPath),(char *)Fpg->ActualFile);
         for(x=strlen(ActualPath);x>=0;x--)
                 if(IS_PATH_SEP(ActualPath[x]))
                         x=-1;
                 else
                         ActualPath[x]=0;
-        strcat(ActualPath,"_DIV_.FPG");
+        div_strcat(ActualPath,sizeof(ActualPath),"_DIV_.FPG");
         DaniDel(ActualPath);
 
         if((fpg=fopen((char *)Fpg->ActualFile,"rb"))==NULL)
@@ -607,10 +607,10 @@ int Borrar_muchos_FPG(FPG *Fpg,int taggeds,int *array_del) {
   FILE *fpg;
   FILE *Oldfpg;
 
-  strcpy(ActualPath,(char *)Fpg->ActualFile); // Temporary file name
+  div_strcpy(ActualPath,sizeof(ActualPath),(char *)Fpg->ActualFile); // Temporary file name
   for(x=strlen(ActualPath);x>=0;x--)
     if(IS_PATH_SEP(ActualPath[x])) x=-1; else ActualPath[x]=0;
-  strcat(ActualPath,"_DIV_.FPG");
+  div_strcat(ActualPath,sizeof(ActualPath),"_DIV_.FPG");
   DaniDel(ActualPath);
 
   if((fpg=fopen((char *)Fpg->ActualFile,"rb"))==NULL) return 0;

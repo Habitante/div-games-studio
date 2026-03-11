@@ -315,8 +315,8 @@ void help2(void) {
 					memset(v_prg,0,sizeof(struct tprg));
 					
                   v_prg->buffer_len=16384;
-                  strcpy(v_prg->filename,(char *)texts[220]);
-                  strcpy(v_prg->path,(char *)tipo[1].path);
+                  div_strcpy(v_prg->filename,sizeof(v_prg->filename),(char *)texts[220]);
+                  div_strcpy(v_prg->path,sizeof(v_prg->path),(char *)tipo[1].path);
                   v_prg->file_len=di-p;
                   v_prg->buffer=p;
                   v_prg->lptr=p;
@@ -588,7 +588,7 @@ void help(int n){
 
           fread(h_buffer,1,helpidx[n*2+1],f);
           p=h_buffer; while (*p!='}') p++; *p=0;
-          strcpy((char *)help_title,(char *)h_buffer);
+          div_strcpy((char *)help_title,sizeof(help_title),(char *)h_buffer);
           help_an=(vga_width-12*big2-1)/font_width;
           if (help_an>120) help_an=120;
           help_al=(vga_height/2-(12+16)*big2-1)/font_height; help_l=0;
@@ -667,7 +667,7 @@ void help_paint(memptrsize n){
 
           fread(h_buffer,1,helpidx[n*2+1],f);
           p=h_buffer; while (*p!='}') p++; *p=0;
-          strcpy((char *)help_title,(char *)h_buffer);
+          div_strcpy((char *)help_title,sizeof(help_title),(char *)h_buffer);
           help_an=(vga_width-12*big2-1)/font_width;
           if (help_an>120) help_an=120;
           help_al=(vga_height/2-(12+16)*big2-1)/font_height; help_l=0;
@@ -745,7 +745,7 @@ void help_xref(int n,int linea) {
 
           fread(h_buffer,1,helpidx[n*2+1],f);
           p=h_buffer; while (*p!='}') p++; *p=0;
-          strcpy((char *)help_title,(char *)h_buffer);
+          div_strcpy((char *)help_title,sizeof(help_title),(char *)h_buffer);
           help_l=0;
           tabula_help(p+1,help_buffer,helpidx[n*2+1]-(p+1-h_buffer));
           if (linea!=-1) while (linea--) { while (*help_line++); help_l++; }
@@ -961,7 +961,7 @@ void tabula_help(byte *si,byte *di,int lon) {
               while (*si>='0' && *si<='9') {
                 tex*=10; tex+=*si-'0'; si++;
               } si++;
-              if (*texts[tex]=='-') strcpy((char *)di,(char *)texts[tex]+1); else strcpy((char *)di,(char *)texts[tex]);
+              if (*texts[tex]=='-') { memcpy(di,texts[tex]+1,strlen((char *)texts[tex]+1)+1); } else { memcpy(di,texts[tex],strlen((char *)texts[tex])+1); }
               di+=strlen((char *)di);
               continue;
 
@@ -1288,7 +1288,7 @@ void tabula_help2(byte *si,byte *di,int lon) {
             case '/': // Horizontal rule
               si+=2;
               if (!ultimo_cr) { *di++=0; ultimo_cr=1; chars=0; }
-              strcpy((char *)di,"\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4");
+              memcpy(di,"\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4",71);
               di+=strlen((char *)di)+1;
               ultimo_cr=1; chars=0;
               continue;
@@ -1315,7 +1315,7 @@ void tabula_help2(byte *si,byte *di,int lon) {
               while (*si>='0' && *si<='9') {
                 n*=10; n+=*si-'0'; si++;
               } si++;
-              if (*texts[n]=='-') strcpy((char *)di,(char *)texts[n]+1); else strcpy((char *)di,(char *)texts[n]);
+              if (*texts[n]=='-') { memcpy(di,texts[n]+1,strlen((char *)texts[n]+1)+1); } else { memcpy(di,texts[n],strlen((char *)texts[n])+1); }
               di+=strlen((char *)di);
               continue;
 
@@ -1367,7 +1367,7 @@ void Print_Help(void) {
   unsigned u;
   FILE * f, * g;
 
-  if (!strlen(h_ar)) strcpy(h_ar,(char *)texts[495]);
+  if (!strlen(h_ar)) div_strcpy(h_ar,sizeof(h_ar),(char *)texts[495]);
 
   v_text=h_ar;
   v_title=(char *)texts[496];
@@ -1381,7 +1381,7 @@ void Print_Help(void) {
       g=fopen(h_ar,"rb");
       if (g!=NULL) {
         fclose(g);
-        sprintf(cwork,"%s/%s",tipo[1].path,h_ar);
+        DIV_SPRINTF(cwork,"%s/%s",tipo[1].path,h_ar);
         strupr(cwork);
         v_title=(char *)texts[450];
         v_text=cwork;

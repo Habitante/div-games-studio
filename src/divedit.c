@@ -2439,9 +2439,9 @@ void open_program(void) {
   if(!v_finished) return;
 
   if(!num_taggeds) {
-    strcpy(full,tipo[v_type].path);
-    if (full[strlen(full)-1]!='/') strcat(full,"/");
-    strcat(full, input);
+    div_strcpy(full,sizeof(full),tipo[v_type].path);
+    if (full[strlen(full)-1]!='/') div_strcat(full,sizeof(full),"/");
+    div_strcat(full,sizeof(full), input);
     if ((f=fopen(full,"rb"))!=NULL) {
       fclose(f);
       v_exists=1;
@@ -2456,10 +2456,10 @@ void open_program(void) {
   {
     if(thumb[num].tagged)
     {
-      strcpy(input,larchivosbr.list+larchivosbr.item_width*num);
-      strcpy(full,tipo[v_type].path);
-      if (full[strlen(full)-1]!='/') strcat(full,"/");
-      strcat(full, input);
+      div_strcpy(input,sizeof(input),larchivosbr.list+larchivosbr.item_width*num);
+      div_strcpy(full,sizeof(full),tipo[v_type].path);
+      if (full[strlen(full)-1]!='/') div_strcat(full,sizeof(full),"/");
+      div_strcat(full,sizeof(full), input);
 
       if ((f=fopen(full,"rb"))!=NULL) { // A file was selected
         fseek(f,0,SEEK_END); n=ftell(f)+buffer_grow;
@@ -2543,11 +2543,11 @@ void program0_new(void) {
   struct tm * timeinfo;
   time_t dtime;
 
-  strcpy(full,tipo[v_type].path);
-  if (full[strlen(full)-1]!='/') strcat(full,"/");
-  strcat(full,input);
+  div_strcpy(full,sizeof(full),tipo[v_type].path);
+  if (full[strlen(full)-1]!='/') div_strcat(full,sizeof(full),"/");
+  div_strcat(full,sizeof(full),input);
 
-  if (v_finished) { 
+  if (v_finished) {
     f=fopen(full,"wb");
     // insert template
     if(f) {
@@ -2586,11 +2586,11 @@ void program0_new(void) {
         v_prg->num_lines=1;
         new_window(program0);
         // Add the template
-        strcpy((char *)buffer,"PROGRAM yourprg;");
+        div_strcpy((char *)buffer,buffer_grow,"PROGRAM yourprg;");
         read_line();
         f_enter();
             // Add the template
-        strcat((char *)buffer,"BEGIN");
+        div_strcat((char *)buffer,buffer_grow,"BEGIN");
          // Your code here\n\n END");
         f_enter();
         
@@ -2608,9 +2608,9 @@ void save_program(void) {
   int an=v.an/big2,al=v.al/big2;
   FILE *f;
 
-  strcpy(full,tipo[v_type].path);
-  if (full[strlen(full)-1]!='/') strcat(full,"/");
-  strcat(full,input);
+  div_strcpy(full,sizeof(full),tipo[v_type].path);
+  if (full[strlen(full)-1]!='/') div_strcat(full,sizeof(full),"/");
+  div_strcat(full,sizeof(full),input);
   if ((f=fopen(full,"wb"))!=NULL) {
     size_t written;
     write_line();
@@ -2885,7 +2885,7 @@ void replacements2(void) { _process_items(); if (!v.active_item) end_dialog=1; }
 void replacements0(void) {
   v.type=1; v.title=texts[191];
   itoa(num_cambios,sus,10);
-  strcat(sus,(char *)texts[192]);
+  div_strcat(sus,sizeof(sus),(char *)texts[192]);
   v.an=text_len(texts[191])+28; v.al=38;
   v.paint_handler=replacements1;
   v.click_handler=replacements2;
@@ -2899,9 +2899,9 @@ void open_program_for_fernando(char *nombre,char *path) {
   int n,x;
   byte *buffer,*p;
 
-  strcpy(full,path);
-  strcpy(input,nombre);
-  strcpy(wpath,path);
+  div_strcpy(full,sizeof(full),path);
+  div_strcpy(input,sizeof(input),nombre);
+  div_strcpy(wpath,sizeof(wpath),path);
   wpath[strlen(wpath)-strlen(nombre)]=0;
   if ((f=fopen(full,"rb"))!=NULL) { // A file was selected
     fseek(f,0,SEEK_END); n=ftell(f)+buffer_grow;

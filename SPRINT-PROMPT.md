@@ -30,129 +30,26 @@ confirm zero warnings. Current baseline: **0 warnings** (Sprint A completed 2026
 
 ---
 
-## Recommended next session: Sprint E (unsafe strings) or Sprint I (file splitting)
+## Completed sprints (for reference)
 
-**All naming + comment sprints complete:** Sprint D (single-letter globals), Sprint F (331
-function renames), Sprint G (~131 global + struct field renames), Sprint H (~3,170 Spanish
-comments → English across 34 files), Sprint J (~1,729 occ of copia/ventana/texto renamed).
-The codebase is now predominantly English.
-
-**Next priorities:**
-- Sprint E: Convert unsafe strcpy/sprintf/strcat to safe helpers (top 6 files, ~770 calls)
-- Sprint I: Split the 3 monster files (divc.c, div.c, divpaint.c) along natural boundaries
-
----
-
-## Sprint menu — pick one or more
-
-### Sprint A: Fix remaining 626 LOW warnings ✅ DONE (2026-03-10)
-
-Completed: 626→0 warnings across 35 files. All cosmetic (braces, parens, casts).
-No behavioral changes. Build is fully warning-clean.
+- **Sprint A** (2026-03-10): 626 LOW warnings → 0 across 35 files
+- **Sprint B** (2026-03-10): 47 OJO markers → 0 across entire codebase
+- **Sprint C** (2026-03-10): 22 key functions documented with English comments
+- **Sprint D** (2026-03-10): 7 single-letter globals removed from global.h
+- **Sprint E** (2026-03-11): ~1,030 unsafe string calls → safe helpers across 31 files
+  (5 exceptions: 4 in divinsta.c heap ptrs, 1 in 3rd-party zip.c)
+- **Sprint F** (2026-03-10): 331 Spanish function names → English across 39+ files
+- **Sprint G** (2026-03-10): ~131 globals + struct fields renamed, 44 files, ~6,900 lines
+- **Sprint H** (2026-03-10): ~3,170 Spanish comment lines → English across 34 files
+- **Sprint J** (2026-03-11): 3 high-frequency globals renamed, 39 files, ~4,034 lines
+  (copia→screen_buffer, ventana→window, texto→texts)
 
 ---
 
-### Sprint B: Resolve all OJO markers ✅ DONE (2026-03-10)
+## Recommended next session: Sprint I (file splitting)
 
-Completed: 47 OJO markers resolved across the entire codebase (0 remaining).
-6 fixed with code (lenguaje.div check, malloc guards, partial file cleanup),
-~22 converted to English WARNING/NOTE, ~12 to TODO, ~7 removed (obsolete).
-
----
-
-### Sprint C: English comments on top 22 functions ✅ DONE (2026-03-10)
-
-Completed: 22 key functions documented with English comment blocks.
-
----
-
-### Sprint D: Rename the `r,g,b,c,d,a` generic globals ✅ DONE (2026-03-10)
-
-Completed: All 7 single-letter globals removed from global.h (r,g,b,c,d,a + FILE *f).
-11 files changed, zero warnings, all 4 targets build clean.
-
----
-
-### Sprint E: Convert remaining unsafe strings (by file)
-
-**Goal:** Convert strcpy/sprintf/strcat to safe helpers in the highest-density files.
-
-**Top targets by unsafe call count:**
-| File | strcpy | sprintf | strcat | Total |
-|------|--------|---------|--------|-------|
-| divhandl.c | 108 | 8 | 24 | 140 |
-| div.c | 108 | 4 | 20 | 132 |
-| runtime/debug/decompiler.c | 78 | 52 | 17 | 147 |
-| divinsta.c | 78 | 13 | 37 | 128 |
-| runtime/debug/d.c | 57 | 46 | 58 | 161 |
-| divfont.c | 33 | 8 | 23 | 64 |
-
-**Safe helpers** (already in `src/div_string.h`):
-- `div_strcpy(dst, sizeof(dst), src)` — bounded copy
-- `div_strcat(dst, sizeof(dst), src)` — bounded concatenation
-- `div_snprintf(dst, sizeof(dst), fmt, ...)` — bounded format
-
-**Rules:**
-- Use `sizeof(dst)` when dst is a stack array — this is the common case
-- For heap-allocated or pointer-passed buffers, you need to find the allocation size
-- Don't change behavior — just add bounds checking
-- One file per agent, build after each file
-
----
-
-### Sprint F: Rename Spanish functions to English ✅ DONE (2026-03-10)
-
-Completed: 331 function renames across 4 batches (22 files, touching 39+ files total).
-- Batch 1: 5 small files (18 renames)
-- Batch 2: 4 medium files (112 renames)
-- Batch 3: 3 monster files — div.c, divpaint.c, divc.c (105 renames)
-- Batch 4: 10 runtime files (96 renames)
-
----
-
-### Sprint G: Rename Spanish globals + struct fields ✅ DONE (2026-03-10)
-
-Completed: ~131 identifier renames across 8 batches, 44 files, ~6,900 line changes.
-
-**Part 1 — Global variables (~98 renames):**
-- Width/height: `vga_an`→`vga_width`, `map_an`→`map_width`, `font_an`→`font_width`,
-  `tapiz_an`→`wallpaper_width`, `barra_an`→`toolbar_width`, etc.
-- Wallpaper: `tapiz`→`wallpaper`, `mapa_tapiz`→`wallpaper_map`
-- Modes: `modo_caja`→`mode_rect`, `modo`→`draw_mode`, `volcado_completo`→`full_redraw`
-- Control: `salir_del_entorno`→`exit_requested`, `fin_dialogo`→`end_dialog`
-- Palette: `reglas`→`gradients`, `regla`→`gradient`, `cuad`→`color_lookup`
-- Zoom: `zx`→`zoom_win_x`, `hacer_zoom`→`need_zoom`
-- Selection: `mab`→`selection_mask` + all compounds
-- Dialog: all `v_titulo`→`v_title`, `v_texto`→`v_text`, etc.
-- Misc: `ejecutar_programa`→`run_mode`, `barra`→`toolbar`, `mascara`→`file_mask`, etc.
-
-**Part 2 — Struct fields (~33 renames):**
-- `tprg`: `linea`→`line`, `columna`→`column`, `num_lineas`→`num_lines`, etc.
-- `tmapa`: `codigo`→`code`, `Codigo`→`fpg_code`, `descripcion`→`description`
-- `tventana`: `tipo`→`type`, `volcar`→`redraw`, `titulo`→`title`, etc.
-- `t_listbox`: `lista`→`list`, `maximo`→`total_items`, `zona`→`zone`, etc.
-- `tipo_regla`: `numcol`→`num_colors`, `col`→`colors`
-- `tipo_undo`: `modo`→`mode`; `ttipo`: `defecto`→`default_choice`
-
-**Collisions handled:** `gradient` vs `dither_pattern`, `total_items` (not `max_items`),
-`fpg_code` (not `code`). **Kept as-is:** `dac`/`dac4` (VGA DAC term, `palette` collision).
-
-**Deferred (high-occurrence, need special handling):**
-- `copia` (375 occurrences — also used as function parameter name in divwindo.c)
-- `ventana` (619 occurrences across 26 files — the window array)
-- `texto` (905 occurrences across 37 files — UI text array)
-
----
-
-### Sprint H: Translate Spanish comments to English ✅ DONE (2026-03-10)
-
-Completed: ~3,170 Spanish comment lines translated to English across 34 files.
-20+ parallel agents, 3 batches. Top files by translation volume:
-- divc.c (~120 translations across 3 section agents)
-- d.c (217), divedit.c (187), divpaint.c (~100+), f.c (~85)
-- divhandl.c (~70+), div.c (~65), global.h (55), divhelp.c (55)
-- inter.h (~120), ia.c (~50), s.c (~45), divbasic.c (37)
-- Plus 21 smaller files with 1-30 translations each
+The codebase is now predominantly English, warning-clean, and string-safe.
+The main remaining structural issue is the 3 monster files.
 
 ---
 
@@ -175,29 +72,14 @@ architecture docs.
 
 ---
 
-### Sprint J: Rename deferred high-occurrence globals ✅ DONE (2026-03-11)
+### Future work (lower priority)
 
-Completed: 3 deferred renames across 39 files, ~4,034 line changes.
-
-**Batch 1 — `copia` → `screen_buffer` (360 occ, 21 files):**
-- Global + surface: `screen_buffer`, `screen_buffer_surface`
-- Runtime: `screen_buffer_debug`, `back_buffer` (was copia2)
-- Function params: `byte*dest`, `dest_width`, `dest_height`, `dest_pitch`
-- Locals: `_saved_buffer`, `_saved_width`, `_saved_height`
-- Collision avoided: `screen_copy()` function already existed → used `screen_buffer`
-
-**Batch 2 — `ventana` → `window` (489 occ, 21 files):**
-- Array + type: `window[]`, `twindow`, `#define v window[0]`
-- Related: `window_aux`, `window_closing`, `skip_window_render`,
-  `create_saved_window`, `paint_window_colors2`, `my_window`
-- Struct field: `lado` → `side`
-- Collision avoided: `move_window()` function → variable named `window_move_pending`
-
-**Batch 3 — `texto` → `texts` (880 occ, 37 files):**
-- Arrays: `texts[]` (IDE + runtime), type: `t_text`, const: `max_texts`
-- Struct fields: `.text` (button/get/flag), params: `int text_id`
-- Runtime: `max_system_texts`, `lang_buffer`, `lang_buffer_end`
-- Function: `create_test_text`
+- Rename cryptic locals in hottest paths (divc.c, divedit.c, runtime/i.c)
+- Unify byte types: pick `uint8_t` everywhere, stop mixing `byte`/`char`/`uchar`
+- Fix or remove commented-out `free()` in runtime stack management (i.c:778)
+- Audit `PrintEvent` pattern for similar `#ifdef`-body bugs
+- Re-enable `test_video` startup dialog
+- DPI-aware rendering (`SDL_WINDOW_ALLOW_HIGHDPI`)
 
 ---
 

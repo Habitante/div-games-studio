@@ -341,12 +341,12 @@ void mostrar_mod_meters(void)
 
       wwrite(v.ptr, an, al, 29, 40, 2, (byte *)"L ", c1);
       wwrite(v.ptr, an, al, 28, 40, 2, (byte *)"L ", c4);
-      sprintf(cwork,"%03d",GetSongLine());
+      div_snprintf(cwork,sizeof(cwork),"%03d",GetSongLine());
       wwrite(v.ptr, an, al, 42, 40, 2, (byte *)cwork, c3);
 
       wwrite(v.ptr, an, al, 52, 40, 2, (byte *)"P ", c1);
       wwrite(v.ptr, an, al, 51, 40, 2, (byte *)"P ", c4);
-      sprintf(cwork,"%03d",GetSongPos());
+      div_snprintf(cwork,sizeof(cwork),"%03d",GetSongPos());
       wwrite(v.ptr, an, al, 64, 40, 2, (byte *)cwork, c3);
 
       ancho_barra = (v.an-4*big2)/SongChannels;
@@ -495,9 +495,9 @@ Mix_Chunk *SI;
   if(!v_finished) return;
 
   if(!num_taggeds) {
-    strcpy(full,tipo[v_type].path);
-    if (full[strlen(full)-1]!='/') strcat(full,"/");
-    strcat(full, input);
+    div_strcpy(full,sizeof(full),tipo[v_type].path);
+    if (full[strlen(full)-1]!='/') div_strcat(full,sizeof(full),"/");
+    div_strcat(full,sizeof(full), input);
     if ((f=fopen(full,"rb"))!=NULL) {
       fclose(f);
       v_exists=1;
@@ -512,10 +512,10 @@ Mix_Chunk *SI;
   {
     if(thumb[num].tagged)
     {
-      strcpy(input,larchivosbr.list+larchivosbr.item_width*num);
-      strcpy(full,tipo[v_type].path);
-      if (full[strlen(full)-1]!='/') strcat(full,"/");
-      strcat(full, input);
+      div_strcpy(input,sizeof(input),larchivosbr.list+larchivosbr.item_width*num);
+      div_strcpy(full,sizeof(full),tipo[v_type].path);
+      if (full[strlen(full)-1]!='/') div_strcat(full,sizeof(full),"/");
+      div_strcat(full,sizeof(full), input);
       DIV_STRCPY(SoundName,input);
       DIV_STRCPY(SoundPathName,full);
 
@@ -854,9 +854,9 @@ void OpenSong(void) {
   if(!v_finished) return;
 
   if(!num_taggeds) {
-    strcpy(full,tipo[v_type].path);
-    if (full[strlen(full)-1]!='/') strcat(full,"/");
-    strcat(full, input);
+    div_strcpy(full,sizeof(full),tipo[v_type].path);
+    if (full[strlen(full)-1]!='/') div_strcat(full,sizeof(full),"/");
+    div_strcat(full,sizeof(full), input);
     if ((f=fopen(full,"rb"))!=NULL) {
       fclose(f);
       v_exists=1;
@@ -871,10 +871,10 @@ void OpenSong(void) {
   {
     if(thumb[num].tagged)
     {
-      strcpy(input,larchivosbr.list+larchivosbr.item_width*num);
-      strcpy(full,tipo[v_type].path);
-      if (full[strlen(full)-1]!='/') strcat(full,"/");
-      strcat(full, input);
+      div_strcpy(input,sizeof(input),larchivosbr.list+larchivosbr.item_width*num);
+      div_strcpy(full,sizeof(full),tipo[v_type].path);
+      if (full[strlen(full)-1]!='/') div_strcat(full,sizeof(full),"/");
+      div_strcat(full,sizeof(full), input);
       DIV_STRCPY(SongName,input);
       DIV_STRCPY(SongPathName,full);
 
@@ -1090,7 +1090,7 @@ void EditSound1(void)
   wwrite(v.ptr, an, al, 39, 13, 1, (byte *)mypcminfo->name, c3);
   itoa(mypcminfo->SoundFreq, cwork, 10);
   wwrite(v.ptr, an, al, 39, 23, 1, (byte *)cwork, c3);
-  snprintf(cwork, sizeof(cwork), "%02d bit", mypcminfo->SoundBits);
+  div_snprintf(cwork, sizeof(cwork), "%02d bit", mypcminfo->SoundBits);
   wwrite(v.ptr, an, al, 39, 33, 1, (byte *)cwork, c3);
 
   // Opciones de conversion
@@ -1238,9 +1238,9 @@ void RecSound0(void)
   v.click_handler=RecSound2;
   v.close_handler=RecSound3;
 
-  strcpy(SoundFile, tipo[7].path);
-  if (SoundFile[strlen(SoundFile)-1]!='/') strcat(SoundFile, "/");
-  strcat(SoundFile, "SAMPLE.WAV");
+  DIV_STRCPY(SoundFile, tipo[7].path);
+  if (SoundFile[strlen(SoundFile)-1]!='/') DIV_STRCAT(SoundFile, "/");
+  DIV_STRCAT(SoundFile, "SAMPLE.WAV");
 
   // Botones Aceptar/Cancelar
   _button(100,      7, v.al-14, 0);
@@ -1276,7 +1276,7 @@ void RecSound1(void)
   // Fichero WAV a grabar
   wwrite(v.ptr,an,al,an-86,11,0,texts[566],c3);
   _splitpath(SoundFile,drive,dir,fname,ext);
-  strcpy(cwork, fname); strcat(cwork, ext);
+  DIV_STRCPY(cwork, fname); DIV_STRCAT(cwork, ext);
   wbox(v.ptr, an, al, c12, an-86, 19, 69, 8);
   wwrite_in_box(v.ptr,an,an-12,al,an-85,20,0,(byte *)cwork,c4);
 
@@ -1316,9 +1316,9 @@ void RecSound2(void)
       v_text=(char *)texts[339];
       show_dialog(browser0);
 
-      strcpy(full,tipo[v_type].path);
-      if (full[strlen(full)-1]!='/') strcat(full,"/");
-      strcat(full, input);
+      div_strcpy(full,sizeof(full),tipo[v_type].path);
+      if (full[strlen(full)-1]!='/') div_strcat(full,sizeof(full),"/");
+      div_strcat(full,sizeof(full), input);
 
       if(v_finished)
       {
@@ -1327,7 +1327,7 @@ void RecSound2(void)
           show_dialog(aceptar0);
         } else v_accept=1;
         if (v_accept) {
-          strcpy(SoundFile, full);
+          DIV_STRCPY(SoundFile, full);
           need_refresh=1;
         }
         v_accept=0;
@@ -1953,8 +1953,8 @@ void CopyNewSound(pcminfo *mypcminfo, int ini, int fin)
   }
   memcpy(SoundData, mypcminfo->SoundData+ini, SoundBytes);
 
-  strcpy(DesktopSND[NumSND].name, (char *)texts[137]);
-  strcat(DesktopSND[NumSND].name, itoa((ConSND), aux, 10));
+  div_strcpy(DesktopSND[NumSND].name, sizeof(DesktopSND[NumSND].name), (char *)texts[137]);
+  div_strcat(DesktopSND[NumSND].name, sizeof(DesktopSND[NumSND].name), itoa((ConSND), aux, 10));
   DesktopSND[NumSND].SoundFreq=mypcminfo->SoundFreq;
   DesktopSND[NumSND].SoundBits=mypcminfo->SoundBits;
   DesktopSND[NumSND].SoundSize=fin-ini;

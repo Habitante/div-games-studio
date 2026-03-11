@@ -514,7 +514,7 @@ init_rnd(dtime);
   #endif
   #endif
 
-  strcpy(packfile,"");
+  div_strcpy(packfile,sizeof(packfile),"");
   npackfiles=0;
 
   #ifndef DEBUG
@@ -1141,7 +1141,7 @@ void frame_end(void) {
 #endif
 
 #ifdef __EMSCRIPTEN__
-	sprintf (buf, "$('#fps').text(\"FPS: %d/%d (max frameskip: %d)\");", fps,dfps,max_saltos);
+	div_snprintf (buf, sizeof(buf), "$('#fps').text(\"FPS: %d/%d (max frameskip: %d)\");", fps,dfps,max_saltos);
 	emscripten_run_script (buf);
 #endif
 
@@ -2103,10 +2103,10 @@ int is_pak(FILE *f, char *name) {
       if (packdir!=NULL) {
         if (fread(packdir,sizeof(struct _packdir),nfiles,f)==nfiles) {
           for (n=0;n<nfiles;n++) {
-            strcpy(buf,packdir[n].filename);
+            div_strcpy(buf,sizeof(buf),packdir[n].filename);
           }
     
-          strcpy(packfile,name);
+          div_strcpy(packfile,sizeof(packfile),name);
           npackfiles=nfiles;
         }
       }

@@ -3,6 +3,7 @@
 #include <time.h>
 #include "topflc.h"
 #include "inter.h"
+#include "../../div_string.h"
 
 static void Error_Reporter(char *msg);
 static void Palette_Update(TFUByte (*palette)[256][3]);
@@ -133,7 +134,7 @@ int StartFLI(char *flinombre, char *Buffer, int Buff_anc,int Buff_alt,int cx,int
 	flc.mainscreen=vga;//Buffer;
 	flc.buffer=(byte *)Buffer;
 	
-	strcpy(nombre,flinombre);
+	div_strcpy(nombre,sizeof(nombre),flinombre);
 	
 	if(FlcCheckHeader(nombre)) {
 		printf("Wrong header\n");

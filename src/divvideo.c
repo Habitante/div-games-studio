@@ -4,6 +4,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "global.h"
+#include "div_string.h"
 #include "lib/sdlgfx/SDL_framerate.h"
 
 
@@ -307,7 +308,7 @@ void snapshot(byte *p) {
   char cwork[128];
 
   do {
-    sprintf(cwork,"DIV_%04d.PCX",n++);
+    div_snprintf(cwork,sizeof(cwork),"DIV_%04d.PCX",n++);
     if ((f=fopen(cwork,"rb"))!=NULL) fclose(f);
   } while (f!=NULL);
 

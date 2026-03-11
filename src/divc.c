@@ -209,6 +209,7 @@
 //-----------------------------------------------------------------------------
 
 #include "global.h"
+#include "div_string.h"
 
 #ifdef ZLIB
 #include <zlib.h>
@@ -2571,7 +2572,7 @@ int analyze_struct_local(int offstruct) { // after " struct id [ <const> ] " // 
             c_error(4,129);
           test_buffer(&loc,&iloc_max,offstruct+len);
           loc[offstruct+len]=0xDAD00000|(*ob).cloc.totalen;
-          strcpy((char*)&loc[offstruct+len+1],(char*)&mem[pieza_num]);
+          div_strcpy((char*)&loc[offstruct+len+1],(*ob).cloc.totalen+1,(char*)&mem[pieza_num]);
           len+=1+((*ob).cloc.totalen+5)/4;
           itxt=_itxt; // Remove the string from the text segment
           lexer();
@@ -3283,8 +3284,8 @@ void parser (void) {
 
   if (pieza==p_setup_program) {
     program_type=1; 
-    strcpy((char *)cWork,"install/setup.ins");
-  } else strcpy((char *)cWork,"system/exec.ins");
+    div_strcpy((char *)cWork,sizeof(cWork),"install/setup.ins");
+  } else div_strcpy((char *)cWork,sizeof(cWork),"system/exec.ins");
   if ((lins=fopen((char *)cWork,"wb"))==NULL) c_error(0,0);
 
   statement_start(); lexer();
@@ -3825,7 +3826,7 @@ void parser (void) {
               c_error(4,129);
             iloc=_imem+1+((*ob).cloc.totalen+5)/4; // e.g. c[32] -> c[0]..c[32],NUL
             test_buffer(&loc,&iloc_max,iloc);
-            strcpy((char*)&loc[_imem+1],(char*)&mem[pieza_num]);
+            div_strcpy((char*)&loc[_imem+1],(*ob).cloc.totalen+1,(char*)&mem[pieza_num]);
             itxt=_itxt; // Remove the string from the text segment
             lexer();
           } else {
@@ -4718,7 +4719,7 @@ void tglo_init2(int tipo) {
           _imem=imem;
           imem+=1+((mem[imem]&0xFFFFF)+5)/4;
           imemptr=(byte*)&mem[imem];
-          strcpy((char*)&mem[_imem+1],(char*)&mem_ory[valor]);
+          div_strcpy((char*)&mem[_imem+1],(mem[_imem]&0xFFFFF)+2,(char*)&mem_ory[valor]);
           if (pieza!=p_coma) return;
           lexer(); continue;
         }
@@ -4741,7 +4742,7 @@ void tglo_init2(int tipo) {
         oimemptr=imemptr;
         while (*(oimemptr-(memptrsize)mem+(memptrsize)frm)==2) oimemptr++;
         if (tipo==0) if (strlen((char*)&mem_ory[valor])>(memptrsize)(oimemptr-imemptr)) c_error(2,33);
-        strcpy((char *)imemptr,(char*)&mem_ory[valor]);
+        div_strcpy((char *)imemptr,(memptrsize)(oimemptr-imemptr)+1,(char*)&mem_ory[valor]);
         imemptr+=strlen((char *)imemptr);
         imem=((memptrsize)imemptr-(memptrsize)mem+3)/4;
         if (*(imemptr-(memptrsize)mem+(memptrsize)frm)!=2 && tipo!=2) imemptr=(byte*)&mem[imem];
@@ -7265,12 +7266,12 @@ FILE *__fpopen (byte *file, char *mode) {
 	char fprgpath[_MAX_PATH*2];
 	FILE *f;
 
-	strcpy(fprgpath,(char *)&tipo[8]);
-	strcat(fprgpath,"/");
-	strcat(fprgpath,full);
+	div_strcpy(fprgpath,sizeof(fprgpath),(char *)&tipo[8]);
+	div_strcat(fprgpath,sizeof(fprgpath),"/");
+	div_strcat(fprgpath,sizeof(fprgpath),full);
 	
 	if ((f=fopen(fprgpath,mode))) { // prgpath/file
-		strcpy(full, fprgpath);
+		div_strcpy(full,sizeof(full), fprgpath);
 		printf("Found %s in prg dir [%s]\n",file, prgpath);
 		return f;
 	}
@@ -7300,7 +7301,7 @@ FILE * open_multi(char *file, char *mode) {
       ff++;
   }
 
-  strcpy(full,(char*)file); // full filename
+  div_strcpy(full,sizeof(full),(char*)file); // full filename
   if ((f = fpopen((byte *)full)))
     return f;
 
@@ -7314,15 +7315,15 @@ FILE * open_multi(char *file, char *mode) {
   _splitpath(full,drive,dir,fname,ext);
 
   if (strchr(ext,'.')==NULL) {
-    strcpy(full,ext);
+    div_strcpy(full,sizeof(full),ext);
   } else {
-    strcpy(full,strchr(ext,'.')+1);
+    div_strcpy(full,sizeof(full),strchr(ext,'.')+1);
   }
 
     if (strlen(full) && file[0]!='/')
-    strcat(full,"/");
+    div_strcat(full,sizeof(full),"/");
 
-    strcat(full,(char*)file);
+    div_strcat(full,sizeof(full),(char*)file);
 
   if ((f=fopen(full,mode))) // "est\paz\fixero.est"
     return f;
@@ -7338,8 +7339,8 @@ FILE * open_multi(char *file, char *mode) {
   if ((f=fpopen((byte *)full)))
     return f;
     
-  strcpy(full,fname);
-  strcat(full,ext);
+  div_strcpy(full,sizeof(full),fname);
+  div_strcat(full,sizeof(full),ext);
 
   if ((f=fopen(full,mode))) // "fixero.est"
     return f;
@@ -7364,15 +7365,15 @@ FILE * open_multi(char *file, char *mode) {
     return f;
 
   if (strchr(ext,'.')==NULL)
-    strcpy(full,ext); 
-  else 
-    strcpy(full,strchr(ext,'.')+1);
-  
-  if (strlen(full))
-    strcat(full,"/");
+    div_strcpy(full,sizeof(full),ext);
+  else
+    div_strcpy(full,sizeof(full),strchr(ext,'.')+1);
 
-  strcat(full,fname);
-  strcat(full,ext);
+  if (strlen(full))
+    div_strcat(full,sizeof(full),"/");
+
+  div_strcat(full,sizeof(full),fname);
+  div_strcat(full,sizeof(full),ext);
 
   if ((f=fopen(full,mode))) // "est\fixero.est"
     return f;
@@ -7408,7 +7409,7 @@ FILE * div_open_file(char * file) {
   f=open_multi(file,"r");
 
   if(!f)
-  	strcpy(full,"");
+  	div_strcpy(full,sizeof(full),"");
   return(f);
 }
 

@@ -1,6 +1,7 @@
 // OSDEP — SDL2 platform abstraction layer
 
 #include "osd_sdl2.h"
+#include "../../div_string.h"
 
 // key buffer
 uint8_t OSDEP_key[2048];
@@ -36,7 +37,7 @@ uint32_t OSDEP_GetTicks(void) {
 
 // Display
 void OSDEP_SetCaption(char *title, char *icon) {
-	strcpy(windowtitle,title);
+	div_strcpy(windowtitle,sizeof(windowtitle),title);
 	if (OSDEP_window)
 		SDL_SetWindowTitle(OSDEP_window, title);
 }

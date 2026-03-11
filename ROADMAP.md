@@ -137,9 +137,9 @@ Make the compiler tell us what's actually broken. Fix the scariest stuff.
 - [x] `div.c:2949`: `red_panel.png` already fixed to relative path; `v.c` recording path fixed too
 - [x] Audit unsafe `sprintf`/`strcpy` calls — see `reports/unsafe-string-audit.md`.
       Created `src/div_string.h` with safe helpers (div_strcpy, div_strcat, div_snprintf,
-      IS_PATH_SEP). Fixed 38 high-risk `strcpy(dest, input)` buffer overflow sites across
-      12 files, 2 overlapping sprintf (UB), and 15 path separator sites (only checked `/`).
-      ~690 remaining strcpy are low-risk internal string copies.
+      IS_PATH_SEP). Phase 1 fixed 38 high-risk sites + 15 path separators.
+      Sprint E (2026-03-11) converted remaining ~1,030 calls across 31 files.
+      Only 5 exceptions remain (4 unknown-size heap ptrs in divinsta.c, 1 in 3rd-party zip.c).
 - [ ] Audit the `PrintEvent` pattern for similar `#ifdef`-body bugs (divmouse.c:506 was one)
 - [x] Fix window close button — was already working via `SDL_QUIT` → `salir_del_entorno`.
       Fixed inner loops (dialog, paint color/mask pickers) that blocked exit until dismissed.
@@ -259,7 +259,10 @@ No behavioral changes — pure cleanup.
 - [ ] Split `div.c` (4,940 lines) into desktop/dialogs modules — Sprint I
 - [ ] Split `divpaint.c` (4,969 lines) into tools/selection modules — Sprint I
 - [ ] Group related globals into context structs where it simplifies things
-- [ ] Normalize string handling patterns across the codebase — Sprint E
+- [x] Normalize string handling patterns across the codebase — Sprint E (2026-03-11):
+  ~1,030 unsafe strcpy/strcat/sprintf calls converted to safe div_string.h helpers
+  across 31 files. 2 actual buffer overflows found+fixed in divpaint.c.
+  Only 5 exceptions remain: 4 in divinsta.c (heap pointers, unknown size), 1 in zip.c (3rd-party)
 
 ### Systematic modernization (agent-assisted sprints)
 

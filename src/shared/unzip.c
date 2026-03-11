@@ -20,6 +20,7 @@ char exebin[255];
 #include "zlib.h"
 #include "unzip.h"
 #include "osdep.h"
+#include "../div_string.h"
 
 #ifdef __APPLE__
 #include "fmemopen.h"
@@ -117,8 +118,8 @@ while (*ff!=0) {
 
   if (_fullpath(full,(char*)file,_MAX_PATH)==NULL) return(NULL);
     _splitpath(full,drive,dir,fname,ext);
-     strcpy(full,fname);
-      strcat(full,ext);
+     div_strcpy(full,sizeof(full),fname);
+      div_strcat(full,sizeof(full),ext);
 
 //printf("Trying to open data.div/%s\n",full);
 
@@ -130,10 +131,10 @@ printf("zipptr %x, len: %d\n",(unsigned)(uintptr_t)zipptr, len);
 
 return out;
 }
-	if (strchr(ext,'.')==NULL) strcpy(full,ext); else strcpy(full,strchr(ext,'.')+1);
-   if (strlen(full)) strcat(full,"/");
-   strcat(full,fname);
-   strcat(full,ext);
+	if (strchr(ext,'.')==NULL) div_strcpy(full,sizeof(full),ext); else div_strcpy(full,sizeof(full),strchr(ext,'.')+1);
+   if (strlen(full)) div_strcat(full,sizeof(full),"/");
+   div_strcat(full,sizeof(full),fname);
+   div_strcat(full,sizeof(full),ext);
 
 if(!len) {
 	   strlwr(full);

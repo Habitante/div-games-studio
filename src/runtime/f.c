@@ -136,12 +136,12 @@ FILE *__fpopen (byte *file, char *mode) {
 	char fprgpath[_MAX_PATH*2];
 	FILE *f;
 
-	strcpy(fprgpath,prgpath);
-	strcat(fprgpath,"/");
-	strcat(fprgpath,full);
+	div_strcpy(fprgpath,sizeof(fprgpath),prgpath);
+	div_strcat(fprgpath,sizeof(fprgpath),"/");
+	div_strcat(fprgpath,sizeof(fprgpath),full);
 
 	if ((f=fopen(fprgpath,mode))) { // prgpath/file
-    strcpy(full, fprgpath);
+    div_strcpy(full, sizeof(full), fprgpath);
 		return f;
 	}
 
@@ -174,7 +174,7 @@ FILE * open_multi(char *file, char *mode) {
       ff++;
   }
 
-  strcpy(full,(char*)file); // full filename
+  div_strcpy(full,sizeof(full),(char*)file); // full filename
 #ifdef DEBUG
   if ((f = fpopen((byte *)full, mode)))
     return f;
@@ -190,15 +190,15 @@ FILE * open_multi(char *file, char *mode) {
   _splitpath(full,drive,dir,fname,ext);
 
   if (strchr(ext,'.')==NULL) {
-    strcpy(full,ext);
+    div_strcpy(full,sizeof(full),ext);
   } else {
-    strcpy(full,strchr(ext,'.')+1);
+    div_strcpy(full,sizeof(full),strchr(ext,'.')+1);
   }
 
   if (strlen(full) && file[0]!='/')
-    strcat(full,"/");
+    div_strcat(full,sizeof(full),"/");
 
-  strcat(full,(char*)file);
+  div_strcat(full,sizeof(full),(char*)file);
 
   if ((f=fopen(full,mode))) // "est\paz\fixero.est"
     return f;
@@ -218,8 +218,8 @@ FILE * open_multi(char *file, char *mode) {
     return f;
 #endif
     
-  strcpy(full,fname);
-  strcat(full,ext);
+  div_strcpy(full,sizeof(full),fname);
+  div_strcat(full,sizeof(full),ext);
 
   if ((f=fopen(full,mode))) // "fixero.est"
     return f;
@@ -250,15 +250,15 @@ FILE * open_multi(char *file, char *mode) {
 #endif
 
   if (strchr(ext,'.')==NULL)
-    strcpy(full,ext); 
-  else 
-    strcpy(full,strchr(ext,'.')+1);
-  
-  if (strlen(full))
-    strcat(full,"/");
+    div_strcpy(full,sizeof(full),ext);
+  else
+    div_strcpy(full,sizeof(full),strchr(ext,'.')+1);
 
-  strcat(full,fname);
-  strcat(full,ext);
+  if (strlen(full))
+    div_strcat(full,sizeof(full),"/");
+
+  div_strcat(full,sizeof(full),fname);
+  div_strcat(full,sizeof(full),ext);
 
   if ((f=fopen(full,mode))) // "est\fixero.est"
     return f;
@@ -305,7 +305,7 @@ FILE * div_open_file(char * file) {
   f=open_multi(file,"rb");
 
   if(!f)
-  	strcpy(full,"");
+  	div_strcpy(full,sizeof(full),"");
   return(f);
 }
 
@@ -325,8 +325,8 @@ void packfile_del(char * file) {
   if (_fullpath(full,(char*)file,_MAX_PATH)==NULL) return;
   _splitpath(full,drive,dir,fname,ext);
 
-  strcpy(full,fname);
-  strcat(full,ext);
+  div_strcpy(full,sizeof(full),fname);
+  div_strcat(full,sizeof(full),ext);
 
   strupr(full);
 
@@ -336,7 +336,7 @@ void packfile_del(char * file) {
   if (n<npackfiles) { // If the file is in the packfile ...
 
     if ((f=fopen(packfile,"rb+"))!=NULL) {
-      strcpy(packdir[n].filename,"");
+      div_strcpy(packdir[n].filename,sizeof(packdir[n].filename),"");
       fseek(f,24,SEEK_SET);
       fwrite(packdir,sizeof(struct _packdir),npackfiles,f);
       fseek(f,0,SEEK_END);
@@ -369,12 +369,12 @@ while (*ff!=0) {
 	ff++;
 }
 
-  strcpy(full,(char*)file);
+  div_strcpy(full,sizeof(full),(char*)file);
 
   _splitpath(full,drive,dir,fname,ext);
 
-  strcpy(full,fname);
-  strcat(full,ext);
+  div_strcpy(full,sizeof(full),fname);
+  div_strcat(full,sizeof(full),ext);
 
   strupr(full);
 
@@ -1221,8 +1221,8 @@ void load_fnt(void) {
   }
 
   if (strlen((char*)&mem[pila[sp]])<80)
-    strcpy(f_i[ifonts].name,(char*)&mem[pila[sp]]);
-  else strcpy(f_i[ifonts].name,"");
+    div_strcpy(f_i[ifonts].name,sizeof(f_i[ifonts].name),(char*)&mem[pila[sp]]);
+  else div_strcpy(f_i[ifonts].name,sizeof(f_i[ifonts].name),"");
 
   f_i[ifonts].len=file_len;
   f_i[ifonts].fonpal=m;
@@ -3173,11 +3173,11 @@ void _fopen(void) { // Search for the file, as it may have been included in the 
   int n,x;
   FILE *f = NULL;
 
-  strcpy(modo,(char*)&mem[pila[sp--]]);
-  strcpy(full,(char*)&mem[pila[sp]]);
+  div_strcpy(modo,sizeof(modo),(char*)&mem[pila[sp--]]);
+  div_strcpy(full,sizeof(full),(char*)&mem[pila[sp]]);
   for (n=0;n<strlen(modo);n++) if (modo[n]!='r' && modo[n]!='w' && modo[n]!='a' && modo[n]!='+') break;
   if (n<strlen(modo)) { pila[sp]=0; e(166); }
-  strcat(modo,"b");
+  div_strcat(modo,sizeof(modo),"b");
 
   packfile_del(full);
 
@@ -3190,17 +3190,17 @@ void _fopen(void) { // Search for the file, as it may have been included in the 
   if ((f=fopen(full,modo))==NULL) {                     // "paz\fixero.est"
     if (_fullpath(full,(char*)&mem[pila[sp]],_MAX_PATH)==NULL) { pila[sp]=0; return; }
     _splitpath(full,drive,dir,fname,ext);
-    if (strchr(ext,'.')==NULL) strcpy(full,ext); else strcpy(full,strchr(ext,'.')+1);
-    if (strlen(full) && memb[pila[sp]*4]!='/') strcat(full,"/");
-    strcat(full,(char*)&mem[pila[sp]]);
+    if (strchr(ext,'.')==NULL) div_strcpy(full,sizeof(full),ext); else div_strcpy(full,sizeof(full),strchr(ext,'.')+1);
+    if (strlen(full) && memb[pila[sp]*4]!='/') div_strcat(full,sizeof(full),"/");
+    div_strcat(full,sizeof(full),(char*)&mem[pila[sp]]);
     if ((f=fopen(full,modo))==NULL) {                   // "est\paz\fixero.est"
-      strcpy(full,fname);
-      strcat(full,ext);
+      div_strcpy(full,sizeof(full),fname);
+      div_strcat(full,sizeof(full),ext);
       if ((f=fopen(full,modo))==NULL) {                 // "fixero.est"
-        if (strchr(ext,'.')==NULL) strcpy(full,ext); else strcpy(full,strchr(ext,'.')+1);
-        if (strlen(full)) strcat(full,"/");
-        strcat(full,fname);
-        strcat(full,ext);
+        if (strchr(ext,'.')==NULL) div_strcpy(full,sizeof(full),ext); else div_strcpy(full,sizeof(full),strchr(ext,'.')+1);
+        if (strlen(full)) div_strcat(full,sizeof(full),"/");
+        div_strcat(full,sizeof(full),fname);
+        div_strcat(full,sizeof(full),ext);
         f=fopen(full,modo);                             // "est\fixero.est"
 			
       }
@@ -3390,7 +3390,7 @@ void get_dirinfo(void) {
 
   rc=_dos_findfirst((char *)&mem[pila[sp]],flags,&ft);
   while(!rc) {
-    strcpy(&filenames[x*16],ft.name);
+    div_strcpy(&filenames[x*16],16,ft.name);
     dirinfo->name[x]=imem_max+258*5+x*4;
     rc=_dos_findnext(&ft);
     x++;
@@ -3424,7 +3424,7 @@ void get_fileinfo(void) {
 
   if (unit_size<1) unit_size=1;
 
-  strcpy(filename, (char *)&mem[pila[sp]]);
+  div_strcpy(filename, sizeof(filename), (char *)&mem[pila[sp]]);
   pila[sp]=0;
 
   rc=_dos_findfirst(filename, _A_NORMAL|_A_SYSTEM|_A_HIDDEN|_A_SUBDIR, &ft);
@@ -3433,11 +3433,11 @@ void get_fileinfo(void) {
   strupr(full);
   _splitpath(full, drive, dir, fname, ext);
 
-  strcpy(fileinfo->fullpath,full);
+  div_strcpy(fileinfo->fullpath,sizeof(fileinfo->fullpath),full);
   fileinfo->drive  = (int)drive[0] - 64;
-  strcpy(fileinfo->dir,dir);
-  strcpy(fileinfo->name,fname);
-  strcpy(fileinfo->ext,ext);
+  div_strcpy(fileinfo->dir,sizeof(fileinfo->dir),dir);
+  div_strcpy(fileinfo->name,sizeof(fileinfo->name),fname);
+  div_strcpy(fileinfo->ext,sizeof(fileinfo->ext),ext);
   fileinfo->size   = (ft.size+unit_size-1)/unit_size;
   fileinfo->day    = DAY(ft.wr_date);
   fileinfo->month  = MONTH(ft.wr_date);
@@ -3498,7 +3498,7 @@ void _mkdir(void) {
   for(x=0;x<strlen(buffer);x++) {
     if (x>0 && buffer[x-1]==':') continue;
     if(IS_PATH_SEP(buffer[x])) {
-      strcpy(cwork,buffer);
+      div_strcpy(cwork,sizeof(cwork),buffer);
       cwork[x]=0;
       __mkdir(cwork);
     }
@@ -3519,7 +3519,7 @@ void remove_file(void) {
   char cwork2[_MAX_PATH+1];
   char cwork3[_MAX_PATH+1];
 
-  strcpy(cwork2, (char *)&mem[pila[sp]]);
+  div_strcpy(cwork2, sizeof(cwork2), (char *)&mem[pila[sp]]);
   pila[sp]=0;
 
   for(x=strlen(cwork2)-1;; x--) {
@@ -3529,9 +3529,9 @@ void remove_file(void) {
 
   rc=_dos_findfirst((char *)&mem[pila[sp]],_A_NORMAL|_A_SYSTEM|_A_HIDDEN,&ft);
   while(!rc) {
-    strcpy(cwork3,cwork2);
-    strcat(cwork3,ft.name);
-    if (_fullpath(cwork1, cwork3, _MAX_PATH)==NULL) strcpy(cwork1,ft.name);
+    div_strcpy(cwork3,sizeof(cwork3),cwork2);
+    div_strcat(cwork3,sizeof(cwork3),ft.name);
+    if (_fullpath(cwork1, cwork3, _MAX_PATH)==NULL) div_strcpy(cwork1,sizeof(cwork1),ft.name);
     _dos_setfileattr(cwork1,_A_NORMAL);
     remove(cwork1);
     rc=_dos_findnext(&ft);
@@ -3539,9 +3539,9 @@ void remove_file(void) {
 
   rc=_dos_findfirst((char *)&mem[pila[sp]],_A_SUBDIR,&ft);
   while(!rc) {
-    strcpy(cwork3,cwork2);
-    strcat(cwork3,ft.name);
-    if (_fullpath(cwork1, cwork3, _MAX_PATH)==NULL) strcpy(cwork1,ft.name);
+    div_strcpy(cwork3,sizeof(cwork3),cwork2);
+    div_strcat(cwork3,sizeof(cwork3),ft.name);
+    if (_fullpath(cwork1, cwork3, _MAX_PATH)==NULL) div_strcpy(cwork1,sizeof(cwork1),ft.name);
     _dos_setfileattr(cwork1,_A_SUBDIR);
     rmdir(cwork1);
     rc=_dos_findnext(&ft);
@@ -3833,7 +3833,7 @@ void save_mapcx(int tipo) {
   char cwork[256];
   FILE * f;
 
-  strcpy(cwork,(char*)&mem[pila[sp--]]);
+  div_strcpy(cwork,sizeof(cwork),(char*)&mem[pila[sp--]]);
   graph=pila[sp--]; file=pila[sp]; pila[sp]=0;
 
   if (file>max_fpgs || file<0) { e(109); return; }
@@ -4313,7 +4313,7 @@ void encode_file(int encode) {
 
   pila[sp]=1;
 
-  strcpy(cwork2, (char *)name);
+  div_strcpy(cwork2, sizeof(cwork2), (char *)name);
   for(x=strlen(cwork2)-1;; x--) {
     if(x==-1) { cwork2[0]=0; break; }
     if(IS_PATH_SEP(cwork2[x])) { cwork2[x+1]=0; break; }
@@ -4321,9 +4321,9 @@ void encode_file(int encode) {
 
   rc=_dos_findfirst((char *)name,_A_NORMAL,&ft);
   while(!rc) {
-    strcpy(cwork3,cwork2);
-    strcat(cwork3,ft.name);
-    if (_fullpath(cwork1, cwork3, _MAX_PATH)==NULL) strcpy(cwork1,ft.name);
+    div_strcpy(cwork3,sizeof(cwork3),cwork2);
+    div_strcat(cwork3,sizeof(cwork3),ft.name);
+    if (_fullpath(cwork1, cwork3, _MAX_PATH)==NULL) div_strcpy(cwork1,sizeof(cwork1),ft.name);
     _dos_setfileattr(cwork1,_A_NORMAL);
     _encrypt(encode,cwork1,(char *)clave);
     rc=_dos_findnext(&ft);
@@ -4362,7 +4362,7 @@ void _encrypt(int encode, char * fichero, char * clave) {
   for (n=0;n<size;n++) p[n]^=rndb();
 
   _splitpath(fichero,drive,dir,fname,ext);
-  strcpy(ext,"dj!");
+  div_strcpy(ext,sizeof(ext),"dj!");
   _makepath(full,drive,dir,fname,ext);
 
   if (rename(fichero,full)) {
@@ -4415,7 +4415,7 @@ void _compress(int encode) {
 
   pila[sp]=1;
 
-  strcpy(cwork2,(char *) name);
+  div_strcpy(cwork2,sizeof(cwork2),(char *) name);
   for(x=strlen(cwork2)-1;; x--) {
     if(x==-1) { cwork2[0]=0; break; }
     if(IS_PATH_SEP(cwork2[x])) { cwork2[x+1]=0; break; }
@@ -4423,9 +4423,9 @@ void _compress(int encode) {
 
   rc=_dos_findfirst((char *)name,_A_NORMAL,&ft);
   while(!rc) {
-    strcpy(cwork3,cwork2);
-    strcat(cwork3,ft.name);
-    if (_fullpath(cwork1, cwork3, _MAX_PATH)==NULL) strcpy(cwork1,ft.name);
+    div_strcpy(cwork3,sizeof(cwork3),cwork2);
+    div_strcat(cwork3,sizeof(cwork3),ft.name);
+    if (_fullpath(cwork1, cwork3, _MAX_PATH)==NULL) div_strcpy(cwork1,sizeof(cwork1),ft.name);
     _dos_setfileattr(cwork1,_A_NORMAL);
     _compress_file(encode,cwork1);
     rc=_dos_findnext(&ft);
@@ -4492,7 +4492,7 @@ void _compress_file(int encode, char *fichero) {
   free(ptr);
 
   _splitpath(fichero,drive,dir,fname,ext);
-  strcpy(ext,"ZX!");
+  div_strcpy(ext,sizeof(ext),"ZX!");
   _makepath(full,drive,dir,fname,ext);
 
   if (rename(fichero,full)) {

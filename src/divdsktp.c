@@ -1,4 +1,5 @@
 #include "global.h"
+#include "div_string.h"
 #include "fpgfile.hpp"
 
 #include <time.h>
@@ -162,7 +163,7 @@ modinfo *mymodinfo;
                                                 } else if (!strcmp((char *)window[x].name,(char *)texts[413])) {
                                                   iWork=3;
                                                   n=fwrite(&iWork,1,4,desktop);
-                                                  strcpy(((struct _calc*)(window[x].aux))->ctext,((struct _calc*)(window[x].aux))->cget);
+                                                  div_strcpy(((struct _calc*)(window[x].aux))->ctext, sizeof(((struct _calc*)(window[x].aux))->ctext), ((struct _calc*)(window[x].aux))->cget);
                                                   n=fwrite(window[x].aux,1,sizeof(struct _calc),desktop);
                                                 } else {
                                                         iWork=2;
@@ -362,8 +363,8 @@ int UpLoad_Desktop()
                         case    101: //fpg
                                 // FPG struct
                                 fread(&faux,1,sizeof(FPG),desktop);
-                                strcpy(input,(char *)faux.NombreFpg);
-                                strcpy(full,(char *)faux.ActualFile);
+                                div_strcpy(input, sizeof(input), (char *)faux.NombreFpg);
+                                div_strcpy(full, sizeof(full), (char *)faux.ActualFile);
                                 if ((f=fopen(full,"rb"))!=NULL) {
                                   fclose(f);
                                   v_aux=(byte *)malloc(sizeof(FPG));
@@ -397,9 +398,9 @@ int UpLoad_Desktop()
                                                         update_box(0,0,vga_width,vga_height);
                                         }                                        
 										// check if prg on disk is newer than session
-										strcpy(pathtmp,v_prg->path);
-										strcat(pathtmp,"/");
-										strcat(pathtmp,v_prg->filename);
+										div_strcpy(pathtmp, sizeof(pathtmp), v_prg->path);
+										div_strcat(pathtmp, sizeof(pathtmp), "/");
+										div_strcat(pathtmp, sizeof(pathtmp), v_prg->filename);
 
 										if(dtime < getFileCreationTime(&pathtmp[0])) {
 											v_title=v_prg->filename;
@@ -407,8 +408,8 @@ int UpLoad_Desktop()
 											show_dialog(aceptar0);
 
 											if(v_accept) {
-												strcpy(tipo[0].path,v_prg->path);
-												strcpy(input,v_prg->filename);
+												div_strcpy(tipo[0].path, sizeof(tipo[0].path), v_prg->path);
+												div_strcpy(input, sizeof(input), v_prg->filename);
 												
 												// close old prg
 												close_window();
@@ -794,7 +795,7 @@ void carga_help(int n,int helpal,int helpline,int x1,int x2)
           if (i_back==f_back) i_back=(i_back+2)%64;
           fread(h_buffer,1,helpidx[n*2+1],f);
           p=h_buffer; while (*p!='}') p++; *p=0;
-          strcpy((char *)help_title,(char *)h_buffer);
+          div_strcpy((char *)help_title, sizeof(help_title), (char *)h_buffer);
           help_an=(vga_width-12*big2-1)/font_width;
           if (help_an>120) help_an=120;
           help_al=(vga_height/2-12*big2-1)/font_height;

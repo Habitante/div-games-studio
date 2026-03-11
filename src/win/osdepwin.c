@@ -4,6 +4,7 @@
 #include <stdio.h>
 
 #include "global.h"
+#include "../div_string.h"
 
 char *tmpnames[255];
 
@@ -143,7 +144,7 @@ Filename,char* Extension)
   // strncpy doesnt add a '\0'
   Directory[Last] = '\0';
   // Filename is the part behind the last slahs
-  strcpy(Filename,CopyOfPath -= Rest);
+  div_strcpy(Filename,_MAX_FNAME+1,CopyOfPath -= Rest);
   // get extension if there is any
   char *ext = Extension;
   while(*Filename != '\0')
@@ -231,7 +232,7 @@ int _chdir(const char* Directory)
 
 char *_fullpath(char *_FullPath,const char *_Path,size_t _SizeInBytes) {
 	if (realpath(_Path, _FullPath) == NULL)
-		strcpy(_FullPath, _Path);
+		div_strcpy(_FullPath, _SizeInBytes, _Path);
 	return _FullPath;
 }
 #endif
@@ -250,10 +251,10 @@ long hFile;
 unsigned int _dos_findfirst(char *name, unsigned int attr, struct find_t *result) {
 int ret=0;
 
-strcpy(findname,name);
+div_strcpy(findname,sizeof(findname),name);
 type = attr;
 
-strcpy(findmask,name);
+div_strcpy(findmask,sizeof(findmask),name);
 strlwr(findmask);
 
 #if defined(__MINGW64__)
@@ -288,7 +289,7 @@ int n=0;
 
 while((n= _findnext(hFile,&result2))==0) {
 	
-strcpy(result->name,result2.name);
+div_strcpy(result->name,sizeof(result->name),result2.name);
 
 	result->attrib=result2.attrib;
 	result->size = result2.size;
@@ -304,7 +305,7 @@ if((type == _A_NORMAL && result2.attrib!=_A_SUBDIR) ||
 				return 0;
 		}
 	j=0;
-	strcpy(findname, result->name);
+	div_strcpy(findname, sizeof(findname), result->name);
 	strlwr(findname);
 	
 	match = 0;

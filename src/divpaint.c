@@ -4,6 +4,7 @@
 //-----------------------------------------------------------------------------
 
 #include "global.h"
+#include "div_string.h"
 
 void draw_bar(int _an);
 void draw_ruler(void);
@@ -1171,7 +1172,7 @@ void cut_map(void) {
         if (is_selection_mask(x,y)) *p++=*(map+y*map_width+x); else *p++=0;
 
       // 4. Set the remaining variables
-      strcpy(v_map->filename,(char *)texts[136]);
+      div_strcpy(v_map->filename,sizeof(v_map->filename),(char *)texts[136]);
       ltoa(next_code++,v_map->filename+strlen(v_map->filename),10);
       *v_map->path='\0';
       v_map->map_width=an;
@@ -2041,7 +2042,7 @@ void edit_mode_13(void) {
 
   byte * p;
   int m;
-  char num[4];
+  char num[8];
   int m_s=mode_selection;
 
   bar[0]=101+zoom; bar[1]=192; bar[2]=1; bar[3]=193;
@@ -3067,9 +3068,9 @@ void eyedropper(void) {
         wbox(toolbar,vga_width/big2,19,c2,80,2,31,15);
         text_color=c4;
         num[2]=col%10+48; num[1]=(col/10)%10+48; num[0]=(col/100)%10+48;
-        strcpy((char *)&num[3],"Dec"); writetxt(109,3,2,num);
+        div_strcpy((char *)&num[3],sizeof(num)-3,"Dec"); writetxt(109,3,2,num);
         num[1]=(col%16>9)?col%16+55:col%16+48; num[0]=(col/16>9)?col/16+55:col/16+48;
-        strcpy((char *)&num[2],"Hex"); writetxt(109,10,2,num);
+        div_strcpy((char *)&num[2],sizeof(num)-2,"Hex"); writetxt(109,10,2,num);
         screen_buffer=_saved_buffer;
       } else {
         _saved_buffer=screen_buffer; screen_buffer=toolbar;
@@ -4509,7 +4510,7 @@ void color_down(void) {
 void paint_color_window(byte * p,int c,int d) {
 
   int x,y;
-  char num[3];
+  char num[8];
 
   wrectangle(p,c,d,c2,0,0,c,d); // Window
   wbox(p,c,d,c0,1,1,c-2,d-2);
@@ -4576,9 +4577,9 @@ void paint_window_colors2(byte * p,int c,int d,int col) {
 
   wbox(p,c,d,c2,138,10,31,16);
   num[2]=col%10+48; num[1]=(col/10)%10+48; num[0]=(col/100)%10+48;
-  strcpy((char *)&num[3],"Dec"); wwrite(p,c,d,167,11,2,num,c4);
+  div_strcpy((char *)&num[3],sizeof(num)-3,"Dec"); wwrite(p,c,d,167,11,2,num,c4);
   num[1]=(col%16>9)?col%16+55:col%16+48; num[0]=(col/16>9)?col/16+55:col/16+48;
-  strcpy((char *)&num[2],"Hex"); wwrite(p,c,d,167,19,2,num,c4);
+  div_strcpy((char *)&num[2],sizeof(num)-2,"Hex"); wwrite(p,c,d,167,19,2,num,c4);
 
   wbox(p,c,d,c1,140,66+8,7,63);
   if ((x=dac[col*3])) wbox(p,c,d,c_r,140,129-x+8,7,x);
@@ -4589,11 +4590,11 @@ void paint_window_colors2(byte * p,int c,int d,int col) {
 
   wbox(p,c,d,c2,138,41+8,31,23);
   num[1]=dac[col*3]%10+48; num[0]=dac[col*3]/10+48;
-  strcpy((char *)&num[2]," Red"); wwrite(p,c,d,139,42+8,0,num,c3);
+  div_strcpy((char *)&num[2],sizeof(num)-2," Red"); wwrite(p,c,d,139,42+8,0,num,c3);
   num[1]=dac[col*3+1]%10+48; num[0]=dac[col*3+1]/10+48;
-  strcpy((char *)&num[2]," Grn."); wwrite(p,c,d,139,50+8,0,num,c3);
+  div_strcpy((char *)&num[2],sizeof(num)-2," Grn."); wwrite(p,c,d,139,50+8,0,num,c3);
   num[1]=dac[col*3+2]%10+48; num[0]=dac[col*3+2]/10+48;
-  strcpy((char *)&num[2]," Blue"); wwrite(p,c,d,139,58+8,0,num,c3);
+  div_strcpy((char *)&num[2],sizeof(num)-2," Blue"); wwrite(p,c,d,139,58+8,0,num,c3);
 }
 
 //-----------------------------------------------------------------------------

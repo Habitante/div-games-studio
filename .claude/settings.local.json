@@ -36,7 +36,11 @@
       "Bash(git add -A)",
       "Bash(git reset HEAD .claude/settings.local.json)",
       "Bash(mingw32-make clean)",
-      "Bash(wc -l /c/Src/div/src/*.c /c/Src/div/src/*.h /c/Src/div/src/runtime/*.c /c/Src/div/src/runtime/debug/*.c /c/Src/div/src/shared/run/*.c /c/Src/div/src/shared/osdep/*.c /c/Src/div/src/win/*.c)"
+      "Bash(wc -l /c/Src/div/src/*.c /c/Src/div/src/*.h /c/Src/div/src/runtime/*.c /c/Src/div/src/runtime/debug/*.c /c/Src/div/src/shared/run/*.c /c/Src/div/src/shared/osdep/*.c /c/Src/div/src/win/*.c)",
+      "WebSearch",
+      "Bash(xargs -I {} basename {})",
+      "Bash(find . -name '*.c' -exec wc -l {} +)",
+      "Bash(find . -name '*.h' -exec wc -l {} +)"
     ]
   }
 }

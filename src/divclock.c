@@ -29,11 +29,11 @@ static void Show_Time(void) {
   DIV_SPRINTF(cTimeForIcon, "%s [%02d%c%02d]", texts[151],
           timeinfo->tm_hour, timeinfo->tm_sec % 2 ? ':' : '.', timeinfo->tm_min);
 
-  sprintf(cBuff, "%02d", timeinfo->tm_hour);
+  div_snprintf(cBuff, sizeof(cBuff), "%02d", timeinfo->tm_hour);
   Dig1 = (cBuff[0] == '0') ? 10 + 200 : (cBuff[0] - '0') + 200;
   Dig2 = (cBuff[1] - '0') + 200;
 
-  sprintf(cBuff, "%02d", timeinfo->tm_min);
+  div_snprintf(cBuff, sizeof(cBuff), "%02d", timeinfo->tm_min);
   Dig3 = (cBuff[0] - '0') + 200;
   Dig4 = (cBuff[1] - '0') + 200;
 
