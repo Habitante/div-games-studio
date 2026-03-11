@@ -158,8 +158,8 @@ char cWork[10];
                 case 2:
                 case 3:
                         if ((atoi(cFntAlto)<16 || atoi(cFntAncho)<16) && atoi(cFntAlto)!=atoi(cFntAncho)) {
-                          if (atoi(cFntAlto)<16) { strcpy(cFntAlto,"16"); FntAlto=16; }
-                          if (atoi(cFntAncho)<16) { strcpy(cFntAncho,"16"); FntAncho=16; }
+                          if (atoi(cFntAlto)<16) { DIV_STRCPY(cFntAlto,"16"); FntAlto=16; }
+                          if (atoi(cFntAncho)<16) { DIV_STRCPY(cFntAncho,"16"); FntAncho=16; }
                           call((voidReturnType )v.paint_handler);
                           v.redraw=1;
                         } break;
@@ -401,8 +401,8 @@ char cWork[10];
         if((lfontsizes.zone>=10)&&(mouse_b&1))
         {
                 FntAncho=FntAlto=fontTamanos[(lfontsizes.zone-10)+lfontsizes.first_visible];
-                sprintf(cFntAlto,"%d",FntAlto);
-                sprintf(cFntAncho,"%d",FntAncho);
+                DIV_SPRINTF(cFntAlto,"%d",FntAlto);
+                DIV_SPRINTF(cFntAncho,"%d",FntAncho);
                 call((voidReturnType )v.paint_handler);
                 v.redraw=1;
         }
@@ -485,32 +485,32 @@ void Fonts0(void) {
         Mosaico2=0;
         Mosaico3=0;
 
-        strcpy(FontName,(char *)texts[90]);
-        strcpy(FontPathName,tipo[5].path);
-        strcat(FontPathName,"/");
-        strcat(FontPathName,FontName);
+        DIV_STRCPY(FontName,(char *)texts[90]);
+        DIV_STRCPY(FontPathName,tipo[5].path);
+        DIV_STRCAT(FontPathName,"/");
+        DIV_STRCAT(FontPathName,FontName);
 
-        strcpy(FaceName,"NORMAL.IFS");
-        strcpy(FacePathName,tipo[6].path);
-        strcat(FacePathName,"/");
-        strcat(FacePathName,FaceName);
+        DIV_STRCPY(FaceName,"NORMAL.IFS");
+        DIV_STRCPY(FacePathName,tipo[6].path);
+        DIV_STRCAT(FacePathName,"/");
+        DIV_STRCAT(FacePathName,FaceName);
 
         if ((f=fopen(FacePathName,"rb"))!=NULL) fclose(f);
         else {
-          strcpy(tipo[6].path,tipo[1].path);
-          strcat(tipo[6].path,"/IFS");
-          strcpy(FacePathName,tipo[6].path);
-          strcat(FacePathName,"/NORMAL.IFS");
+          div_strcpy(tipo[6].path, sizeof(tipo[6].path), tipo[1].path);
+          div_strcat(tipo[6].path, sizeof(tipo[6].path), "/IFS");
+          DIV_STRCPY(FacePathName,tipo[6].path);
+          DIV_STRCAT(FacePathName,"/NORMAL.IFS");
           if ((f=fopen(FacePathName,"rb"))!=NULL) fclose(f);
           else {
-            strcpy(FaceName,"");
-            strcpy(FacePathName,"");
-            strcpy(tipo[6].path,tipo[1].path);
+            DIV_STRCPY(FaceName,"");
+            DIV_STRCPY(FacePathName,"");
+            div_strcpy(tipo[6].path, sizeof(tipo[6].path), tipo[1].path);
           }
         }
 
-        sprintf(cFntAlto,"%d",FntAlto);
-        sprintf(cFntAncho,"%d",FntAncho);
+        DIV_SPRINTF(cFntAlto,"%d",FntAlto);
+        DIV_SPRINTF(cFntAncho,"%d",FntAncho);
 
         _button(121,74,16,0);//15
         _button(121,74,35,0);//16
@@ -592,8 +592,8 @@ FILE *file;
                         MiTabladeLetras[x]=1;
         }
 
-        strcpy(ifs.ifsName,FacePathName);
-        strcpy(ifs.fntName,FontPathName);
+        div_strcpy(ifs.ifsName, sizeof(ifs.ifsName), FacePathName);
+        div_strcpy(ifs.fntName, sizeof(ifs.fntName), FontPathName);
 
         FntAncho=atoi(cFntAncho);
         FntAlto=atoi(cFntAlto);
@@ -656,9 +656,9 @@ int an=v.an/big2,al=v.al/big2;
         v_mode=1;
         v_type=5;
 
-        strcpy(FontPathName,tipo[v_type].path);
-        strcat(FontPathName,"/");
-        strcat(FontPathName,FontName);
+        DIV_STRCPY(FontPathName,tipo[v_type].path);
+        DIV_STRCAT(FontPathName,"/");
+        DIV_STRCAT(FontPathName,FontName);
 
         v_text=(char *)texts[264];
         show_dialog(browser0);
@@ -674,7 +674,7 @@ int an=v.an/big2,al=v.al/big2;
                 }
                 DIV_STRCPY(FontName,input);
                 DIV_STRCPY(FontPathName,tipo[v_type].path);
-                if (!IS_PATH_SEP(FontPathName[strlen(FontPathName)-1])) strcat(FontPathName,"/");
+                if (!IS_PATH_SEP(FontPathName[strlen(FontPathName)-1])) DIV_STRCAT(FontPathName,"/");
                 DIV_STRCAT(FontPathName,input);
                 wbox(v.ptr,an,al,c2,4,19,66,8); // Dark border for Font
                 wwrite(v.ptr,an,al,4,19,0,(byte *)FontName,c4);
@@ -708,9 +708,9 @@ FILE *f;
                 else
                 {
                         if(!num_taggeds) {
-                          strcpy(full,tipo[v_type].path);
-                          if (full[strlen(full)-1]!='/') strcat(full,"/");
-                          strcat(full, input);
+                          DIV_STRCPY(full,tipo[v_type].path);
+                          if (full[strlen(full)-1]!='/') DIV_STRCAT(full,"/");
+                          DIV_STRCAT(full, input);
                           if ((f=fopen(full,"rb"))!=NULL) {
                             fclose(f);
                             v_exists=1;
@@ -725,10 +725,10 @@ FILE *f;
                         {
                           if(thumb[num].tagged)
                           {
-                            strcpy(input,larchivosbr.list+larchivosbr.item_width*num);
+                            DIV_STRCPY(input,larchivosbr.list+larchivosbr.item_width*num);
                             DIV_STRCPY(FaceName,input);
                             DIV_STRCPY(FacePathName,tipo[v_type].path);
-                            if (!IS_PATH_SEP(FacePathName[strlen(FacePathName)-1])) strcat(FacePathName,"/");
+                            if (!IS_PATH_SEP(FacePathName[strlen(FacePathName)-1])) DIV_STRCAT(FacePathName,"/");
                             DIV_STRCAT(FacePathName,input);
                           }
                         }
@@ -942,13 +942,13 @@ int x;
 char CopiaFontName[256];
 char CopiaMiTabladeLetras[256];
 
-        strcpy(CopiaFontName,FontPathName);
+        DIV_STRCPY(CopiaFontName,FontPathName);
         memcpy(CopiaMiTabladeLetras,MiTabladeLetras,256);
 
         memset(MiTabladeLetras,0,256);
         for(x=0;x<strlen(TestString);x++)
                 MiTabladeLetras[TestString[x]]=1;
-        strcpy(FontPathName,"PREVIEW.FNT");
+        DIV_STRCPY(FontPathName,"PREVIEW.FNT");
 
         FntAncho=atoi(cFntAncho);
         FntAlto=atoi(cFntAlto);
@@ -959,7 +959,7 @@ char CopiaMiTabladeLetras[256];
         DaniDel("PREVIEW.FNT");
 
         memcpy(MiTabladeLetras,CopiaMiTabladeLetras,256);
-        strcpy(FontPathName,CopiaFontName);
+        DIV_STRCPY(FontPathName,CopiaFontName);
 }
 
 void Preview_2()
@@ -968,7 +968,7 @@ int x;
 char CopiaFontName[256];
 char CopiaMiTabladeLetras[256];
 
-        strcpy(CopiaFontName,FontPathName);
+        DIV_STRCPY(CopiaFontName,FontPathName);
         memcpy(CopiaMiTabladeLetras,MiTabladeLetras,256);
 
         create_test_text(TestString2,v.aux[1352+RES_FOR_NAME]);
@@ -979,7 +979,7 @@ char CopiaMiTabladeLetras[256];
         show_dialog(Preview20);
 
         memcpy(MiTabladeLetras,CopiaMiTabladeLetras,256);
-        strcpy(FontPathName,CopiaFontName);
+        DIV_STRCPY(FontPathName,CopiaFontName);
 }
 
 int GenFontbotones[5]={1,1,1,1,0};
@@ -999,11 +999,11 @@ char cWork[4];
         wwrite(v.ptr,an,al,4,20,0,(byte *)FontName,c4);
 
         wwrite(v.ptr,an,al,4,36,0,texts[133],c3);
-        sprintf(cWork,"%03d",FntAncho);
+        DIV_SPRINTF(cWork,"%03d",FntAncho);
         wwrite(v.ptr,an,al,45,36,0,(byte *)cWork,c4);
 
         wwrite(v.ptr,an,al,4,44,0,texts[134],c3);
-        sprintf(cWork,"%03d",FntAlto);
+        DIV_SPRINTF(cWork,"%03d",FntAlto);
         wwrite(v.ptr,an,al,45,44,0,(byte *)cWork,c4);
 
         wwrite(v.ptr,an,al,4,60,0,texts[86],c3);
@@ -1226,12 +1226,12 @@ void ShowFont1(void)
   wbox(v.ptr, an, al, c1, 2, 10, ancho_w, alto_w);
   wbox(v.ptr, an, al, c0, 2, 32, ancho_w, 1);
 
-  strcpy(cWork,"");
-  if(v.aux[1352+RES_FOR_NAME]&NUM) strcat(cWork,(char *)texts[166]);
-  if(v.aux[1352+RES_FOR_NAME]&MAY) strcat(cWork,(char *)texts[167]);
-  if(v.aux[1352+RES_FOR_NAME]&MIN) strcat(cWork,(char *)texts[168]);
-  if(v.aux[1352+RES_FOR_NAME]&SIM) strcat(cWork,(char *)texts[169]);
-  if(v.aux[1352+RES_FOR_NAME]&EXT) strcat(cWork,(char *)texts[170]);
+  DIV_STRCPY(cWork,"");
+  if(v.aux[1352+RES_FOR_NAME]&NUM) DIV_STRCAT(cWork,(char *)texts[166]);
+  if(v.aux[1352+RES_FOR_NAME]&MAY) DIV_STRCAT(cWork,(char *)texts[167]);
+  if(v.aux[1352+RES_FOR_NAME]&MIN) DIV_STRCAT(cWork,(char *)texts[168]);
+  if(v.aux[1352+RES_FOR_NAME]&SIM) DIV_STRCAT(cWork,(char *)texts[169]);
+  if(v.aux[1352+RES_FOR_NAME]&EXT) DIV_STRCAT(cWork,(char *)texts[170]);
 
   wwrite(v.ptr,an,al,an/2+2,34,1,(byte *)cWork,c4);
 
@@ -1401,8 +1401,8 @@ void ReloadFont(int vn, struct twindow *vntn)
 FILE *file;
 int Length;
         vn=vn;
-        strcpy(Load_FontPathName,(char *)vntn->aux+14);
-        strcpy(Load_FontName,(char *)vntn->aux);
+        DIV_STRCPY(Load_FontPathName,(char *)vntn->aux+14);
+        DIV_STRCPY(Load_FontName,(char *)vntn->aux);
         free(vntn->aux);
         file=fopen(Load_FontPathName,"rb");
         if(file==NULL)
@@ -1440,18 +1440,18 @@ void OpenFont(void) {
 
   v_mode=0; v_type=5;
 
-  strcpy(Load_FontPathName,tipo[v_type].path);
-  strcat(Load_FontPathName,"/");
-  strcat(Load_FontPathName,Load_FontName);
+  DIV_STRCPY(Load_FontPathName,tipo[v_type].path);
+  DIV_STRCAT(Load_FontPathName,"/");
+  DIV_STRCAT(Load_FontPathName,Load_FontName);
 
   v_text=(char *)texts[74];
   show_dialog(browser0);
   if (!v_finished) return;
 
   if(!num_taggeds) {
-    strcpy(full,tipo[v_type].path);
-    if (full[strlen(full)-1]!='/') strcat(full,"/");
-    strcat(full, input);
+    DIV_STRCPY(full,tipo[v_type].path);
+    if (full[strlen(full)-1]!='/') DIV_STRCAT(full,"/");
+    DIV_STRCAT(full, input);
     if ((f=fopen(full,"rb"))!=NULL) {
       fclose(f);
       v_exists=1;
@@ -1466,10 +1466,10 @@ void OpenFont(void) {
   {
     if(thumb[num].tagged)
     {
-      strcpy(input,larchivosbr.list+larchivosbr.item_width*num);
-      strcpy(full,tipo[v_type].path);
-      if (full[strlen(full)-1]!='/') strcat(full,"/");
-      strcat(full, input);
+      DIV_STRCPY(input,larchivosbr.list+larchivosbr.item_width*num);
+      DIV_STRCPY(full,tipo[v_type].path);
+      if (full[strlen(full)-1]!='/') DIV_STRCAT(full,"/");
+      DIV_STRCAT(full, input);
 
       if ((f=fopen(full,"rb"))!=NULL) { // A file was selected
         if (fread(cwork,1,8,f)==8) {
@@ -1524,7 +1524,7 @@ void GetText0(void)
 
         v.paint_handler=GetText1;
         v.click_handler=GetText2;
-        strcpy(cCharsToPrint,"");
+        DIV_STRCPY(cCharsToPrint,"");
         _get(161,4,12,v.an-8,(byte *)cCharsToPrint,128,0,0);
         _button(100,7    ,v.al-14,0);
         _button(101,v.an-8,v.al-14,2);
@@ -1815,8 +1815,8 @@ int x,y;
         fread(FaceName,14,1,file);
         fread(FacePathName,256,1,file);
 
-        sprintf(cFntAlto,"%d",FntAlto);
-        sprintf(cFntAncho,"%d",FntAncho);
+        DIV_SPRINTF(cFntAlto,"%d",FntAlto);
+        DIV_SPRINTF(cFntAncho,"%d",FntAncho);
 
         _button(121,74,16,0);
         _button(121,74,35,0);
