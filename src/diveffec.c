@@ -439,7 +439,7 @@ void GenExplodes() {
     v.mapa->zoom_y = y;
 
     for (n = 0; n < 512; n++)
-      v.mapa->puntos[n] = -1;
+      v.mapa->points[n] = -1;
     v.mapa->fpg_code = 0;
     call((voidReturnType)v.paint_handler);
     blit_region(screen_buffer, vga_width, vga_height, v.ptr, v.x, v.y, v.w, v.h, 0);

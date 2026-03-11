@@ -25,7 +25,7 @@ void xchg_block(byte *d, byte *s, int w, int h);
 word *m0, *m1;
 word w_original;
 
-extern int num_punto;
+extern int point_index;
 
 ///////////////////////////////////////////////////////////////////////////////
 //      Functions to print text
@@ -522,12 +522,12 @@ void zoom_map(void) {
     switch (mode_selection) {
     case -1:
       for (n = 0; n < 512; n += 2)
-        if (v.mapa->puntos[n] != -1) {
-          draw_selection_box(v.mapa->puntos[n], v.mapa->puntos[n + 1], v.mapa->puntos[n],
-                             v.mapa->puntos[n + 1]);
-          if (num_punto == n / 2) {
-            draw_selection_box(v.mapa->puntos[n] - 1, v.mapa->puntos[n + 1] - 1,
-                               v.mapa->puntos[n] + 1, v.mapa->puntos[n + 1] + 1);
+        if (v.mapa->points[n] != -1) {
+          draw_selection_box(v.mapa->points[n], v.mapa->points[n + 1], v.mapa->points[n],
+                             v.mapa->points[n + 1]);
+          if (point_index == n / 2) {
+            draw_selection_box(v.mapa->points[n] - 1, v.mapa->points[n + 1] - 1,
+                               v.mapa->points[n] + 1, v.mapa->points[n + 1] + 1);
           }
         }
       break;
@@ -971,13 +971,13 @@ sigue_scan_1:
 //      Draw the fill result
 //-----------------------------------------------------------------------------
 
-extern byte *textura_color;
+extern byte *texture_color;
 byte get_color(int x, int y);
 
 void fill_draw(void) {
   int x, y;
 
-  if (textura_color) {
+  if (texture_color) {
     for (y = sel_mask_y0; y <= sel_mask_y1; y++)
       for (x = sel_mask_x0; x <= sel_mask_x1; x++)
         if (is_selection_mask(x, y))

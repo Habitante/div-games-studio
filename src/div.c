@@ -936,17 +936,17 @@ void mainloop(void) {
         v.mapa->zoom_cy = v_map->zoom_cy;
 
         for (n = 0; n < 512; n++)
-          v.mapa->puntos[n] = v_map->puntos[n];
+          v.mapa->points[n] = v_map->points[n];
 
-        if (v_map->TengoNombre == 1) {
-          v_map->TengoNombre = 0;
+        if (v_map->has_name == 1) {
+          v_map->has_name = 0;
           memcpy(v.mapa->filename, v_map->filename, 13);
           memcpy(v.name, v_map->filename, 13);
           memcpy(v.title, v_map->filename, 13);
           v.mapa->fpg_code = 0;
           memcpy(v.mapa->description, v_map->description, 32);
-        } else if (v_map->TengoNombre == 2) {
-          v.mapa->TengoNombre = 0;
+        } else if (v_map->has_name == 2) {
+          v.mapa->has_name = 0;
           v.mapa->fpg_code = v_map->fpg_code;
           memcpy(v.mapa->description, v_map->description, 32);
           memcpy(v.mapa->filename, v_map->filename, 13);

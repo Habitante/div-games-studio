@@ -336,7 +336,7 @@ int UpLoad_Desktop() {
           update_box(0, 0, vga_width, vga_height);
         break;
       }
-      v.mapa->TengoNombre = maux.TengoNombre;
+      v.mapa->has_name = maux.has_name;
       v.mapa->code = maux.code;
       v.mapa->fpg_code = maux.fpg_code;
       memcpy((char *)v.mapa->path, (char *)maux.path, _MAX_PATH + 1);
@@ -348,7 +348,7 @@ int UpLoad_Desktop() {
       v.mapa->zoom_cy = maux.zoom_cy;
       v.mapa->saved = maux.saved;
       memcpy((char *)v.mapa->description, (char *)maux.description, 32);
-      memcpy((char *)v.mapa->puntos, (char *)maux.puntos, 512 * 2);
+      memcpy((char *)v.mapa->points, (char *)maux.points, 512 * 2);
       // Graphic data
       call((voidReturnType)v.paint_handler);
       blit_region(screen_buffer, vga_width, vga_height, v.ptr, v.x, v.y, v.w, v.h, 0);
@@ -725,11 +725,11 @@ int nuevo_mapa_carga(int nx, int ny, char *nombre, byte *mapilla) {
     *v_map->path = '\0';
     v_map->map_width = map_width;
     v_map->map_height = map_height;
-    v_map->TengoNombre = 0;
+    v_map->has_name = 0;
     v_map->fpg_code = 0;
     v_map->description[0] = 0;
     for (n = 0; n < 512; n++)
-      v_map->puntos[n] = -1;
+      v_map->points[n] = -1;
     create_saved_window(mapa0, nx, ny);
 
     return (0);

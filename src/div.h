@@ -126,8 +126,8 @@ typedef struct _FPGBODY {
   char namefile[12];
   int width;
   int height;
-  int npuntos;
-  //        short    *puntos;//2*npuntos
+  int num_points;
+  //        short    *points;//2*num_points
   //        char     *graph; //width*height
 } FPGBODY;
 

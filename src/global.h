@@ -775,7 +775,7 @@ GLOBAL_DATA struct twindow window[max_windows];
 
 //GLOBAL_DATA
 struct tmapa {
-  char TengoNombre;                           // New window will take the filename
+  char has_name;                               // New window will take the filename
   int code;                                   // Map identifier (for undo)
   int fpg_code;                               // Map code (for the FPG)
   char path[_MAX_PATH + 1];                   // Path of associated file
@@ -785,7 +785,7 @@ struct tmapa {
   int zoom, zoom_x, zoom_y, zoom_cx, zoom_cy; // Edited portion of the map
   byte saved;                                 // Saved to disk flag (yes/no)
   char description[32];                       // Map description string
-  short puntos[512];                          // Up to 256 control points (x,y)
+  short points[512];                          // Up to 256 control points (x,y)
 };
 
 struct tprg {

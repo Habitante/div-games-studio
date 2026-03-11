@@ -152,7 +152,7 @@ Still remaining — mostly deeper locals in large files:
 - [x] divc.c — compiler structs, state vars, union members ✓
 - [x] divedit.c — clipboard, selection, cursor state ✓
 - [x] runtime/i.c — timing, blit, rendering vars ✓
-- [ ] divpaint.c — paint editor locals
+- [x] divpaint.c — paint editor locals + cross-file struct fields ✓
 - [ ] divhandl.c — dialog/window manager locals
 
 ### 2C-5. Documentation pass

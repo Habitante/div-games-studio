@@ -6,18 +6,18 @@
 #include "global.h"
 #include "div_string.h"
 
-void draw_bar(int _an);
+void draw_bar(int bar_width);
 void draw_ruler(void);
 void draw_help(int n);
 void edit_ruler(void);
 void select_color(int n);
-void select_fx(int n, int *efecto);
+void select_fx(int n, int *effect);
 void line(int x0, int y0, int x1, int y1, int inc0);
 void analyze_bar(int w, int h);
 void bezier(int x0, int y0, int x1, int y1, int _x0, int _y0, int _x1, int _y1, int inc0);
-int select_icon(int icono_x, int *iconos);
+int select_icon(int icon_x, int *icons);
 void draw_box(int x0, int y0, int x1, int y1);
-void draw_circle(int x0, int y0, int x1, int y1, int relleno);
+void draw_circle(int x0, int y0, int x1, int y1, int filled);
 void _line_pixel(int x, int y);
 void select_fill(int n);
 void select_box(int n);
@@ -36,15 +36,15 @@ void test_sel_mask(void);
 void write_char(int x, int y, byte c);
 void write_char2(int x, int y, byte *si, int font_width, int font_height);
 void line_pixel(int x, int y);
-void circulo_scan2(int x, int y, int w);
-void circulo_scan(int x, int y, int w);
+void circle_scanline_filled(int x, int y, int w);
+void circle_scanline(int x, int y, int w);
 int editable(int *n);
 void eyedropper(void);
 void move_zoom(void);
 void move_bar(void);
 void bar_coords(void);
 void select_mode(void);
-void change_map(int adelante);
+void change_map(int forward);
 void blit_mouse(void);
 void adjust_box(int *a, int *b, int *c, int *d);
 void blit_mouse_a(void);
@@ -66,13 +66,13 @@ struct {
   int on;
   byte *ptr;
   int x, y, w, h;
-} barras[10];
+} toolbars[10];
 
 //-----------------------------------------------------------------------------
 //      Constants
 //-----------------------------------------------------------------------------
 
-#define _ir     96 // Color gradient start position on the edit screen
+#define COLOR_RULER_X     96 // Color gradient start position on the edit screen
 #define max_int 65536
 
 extern int cierra_rapido;
@@ -87,22 +87,22 @@ int back; // Whether an undo is needed after blit_screen
 
 int zoom_dx, zoom_dy, zoom_sx, zoom_sy;
 int zoom_speed = 4; // higher -> slower, lower -> faster
-int _tab = 0;
+int tab_cycling = 0;
 
 int hotkey = 1; // Whether hotkeys are enabled (disabled during text toolbar input)
 
-int num_punto = 0;
+int point_index = 0;
 
 //-----------------------------------------------------------------------------
 
 int line_fx = 16; // Drawing mode for the line
 
-int efecto1 = 16, efecto2 = 16, efecto3 = 16, efecto4 = 16, efecto5 = 16;
-int efecto6 = 16, efecto7 = 16, efecto8 = 4, efecto12 = 16;
+int pencil_tool_effect = 16, line_tool_effect = 16, box_tool_effect = 16, bezier_tool_effect = 16, polygon_tool_effect = 16;
+int filled_tool_effect = 16, circle_tool_effect = 16, spray_tool_effect = 4, text_tool_effect = 16;
 
-int focos[128]; // Fill seed points (x,y), up to 64 different (-1,?) -> n/a
+int fill_seeds[128]; // Fill seed points (x,y), up to 64 different (-1,?) -> n/a
 
-int difuminar = 0;
+int blur_enabled = 0;
 
 //-----------------------------------------------------------------------------
 //      Brush-related variables
@@ -110,35 +110,35 @@ int difuminar = 0;
 
 // The brush is a bitmap of intensities between 0 (0%) and 16 (100%)
 
-byte pincel_por_defecto[16] = {16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16};
+byte default_brush[16] = {16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16};
 
-byte *pincel = &pincel_por_defecto[0];
+byte *brush = &default_brush[0];
 int brush_w = 1, brush_h = 1;
 
-int tipo_pincel = 0; // 0-b/w, 1-grayscale
-int num_pincel = 0;
+int brush_type = 0; // 0-b/w, 1-grayscale
+int brush_index = 0;
 
 //-----------------------------------------------------------------------------
 //      Texture-related variables
 //-----------------------------------------------------------------------------
 
-byte *textura_color = NULL; // When NULL, draw with solid color
+byte *texture_color = NULL; // When NULL, draw with solid color
 int texture_w = 2, texture_h = 2;
-int textura_x = 0, textura_y = 0;
+int texture_x = 0, texture_y = 0;
 
 //-----------------------------------------------------------------------------
 //      Get color from the texture
 //-----------------------------------------------------------------------------
 
 void remove_texture(void) {
-  if (textura_color != NULL) {
-    textura_color = NULL;
+  if (texture_color != NULL) {
+    texture_color = NULL;
   }
 }
 
 byte get_color(int x, int y) {
-  return (*(textura_color + (x + textura_x) % texture_w +
-            ((y + textura_y) % texture_h) * texture_w));
+  return (*(texture_color + (x + texture_x) % texture_w +
+            ((y + texture_y) % texture_h) * texture_w));
 }
 
 //-----------------------------------------------------------------------------
@@ -317,25 +317,25 @@ void edit_mode_1(void) {
   do {
     draw_help(1295);
     edit_ruler();
-    select_fx(12, &efecto1);
+    select_fx(12, &pencil_tool_effect);
     select_color(2);
 
     a = -1; // Last action performed (this iteration) - undefined
 
     if ((mouse_b & 1) && mouse_graf >= 10) {
       if (key(_D))
-        difuminar = 1;
+        blur_enabled = 1;
 
       if (_b == 0 || coord_x != _x || coord_y != _y) {
         a = 1;
-        line_fx = efecto1;
+        line_fx = pencil_tool_effect;
         if (_a == 1)
           line(_x, _y, coord_x, coord_y, 0);
         else
           line(coord_x, coord_y, coord_x, coord_y, 0);
       }
 
-      difuminar = 0;
+      blur_enabled = 0;
 
     } else
       a = 0;
@@ -388,11 +388,11 @@ void edit_mode_2(void) {
   do {
     draw_help(1295);
     edit_ruler();
-    select_fx(12, &efecto2);
+    select_fx(12, &line_tool_effect);
     select_color(2);
 
     if (key(_D))
-      difuminar = 1;
+      blur_enabled = 1;
 
     w = -1;
     h = -1;
@@ -410,7 +410,7 @@ void edit_mode_2(void) {
       break;
     case 1:
       if (mouse_graf >= 10) {
-        line_fx = efecto2;
+        line_fx = line_tool_effect;
         undo_error = 0;
         line(x0, y0, coord_x, coord_y, 1);
         if (undo_error)
@@ -436,7 +436,7 @@ void edit_mode_2(void) {
       break;
     }
 
-    difuminar = 0;
+    blur_enabled = 0;
 
     if (((mouse_b & 1) && selected_icon == 1) ||
         (scan_code == 14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
@@ -493,11 +493,11 @@ void edit_mode_3(void) {
   do {
     draw_help(1295);
     edit_ruler();
-    select_fx(12, &efecto3);
+    select_fx(12, &box_tool_effect);
     select_color(2);
 
     if (key(_D))
-      difuminar = 1;
+      blur_enabled = 1;
 
     w = -1;
     h = -1;
@@ -516,7 +516,7 @@ void edit_mode_3(void) {
     case 1:
     case 2:
       if (mouse_graf >= 10) {
-        line_fx = efecto3;
+        line_fx = box_tool_effect;
         undo_error = 0;
         line(x0, y0, coord_x, coord_y, s & 1);
         if (undo_error)
@@ -544,7 +544,7 @@ void edit_mode_3(void) {
       break;
     }
 
-    difuminar = 0;
+    blur_enabled = 0;
 
     if (((mouse_b & 1) && selected_icon == 1) ||
         (scan_code == 14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
@@ -602,11 +602,11 @@ void edit_mode_4(void) {
   do {
     draw_help(1295);
     edit_ruler();
-    select_fx(12, &efecto4);
+    select_fx(12, &bezier_tool_effect);
     select_color(2);
 
     if (key(_D))
-      difuminar = 1;
+      blur_enabled = 1;
 
     back = 0;
     switch (s) {
@@ -622,7 +622,7 @@ void edit_mode_4(void) {
       break;
     case 1:
       if (mouse_graf >= 10) {
-        line_fx = efecto4;
+        line_fx = bezier_tool_effect;
         undo_error = 0;
         line(x0, y0, coord_x, coord_y, 1);
         if (undo_error)
@@ -647,7 +647,7 @@ void edit_mode_4(void) {
       break;
     case 2:
       if (mouse_graf >= 10) {
-        line_fx = efecto4;
+        line_fx = bezier_tool_effect;
         undo_error = 0;
         bezier(x0, y0, x1, y1, coord_x, coord_y, coord_x, coord_y, 1);
         if (undo_error)
@@ -672,7 +672,7 @@ void edit_mode_4(void) {
       break;
     case 3:
       if (mouse_graf >= 10) {
-        line_fx = efecto4;
+        line_fx = bezier_tool_effect;
         undo_error = 0;
         bezier(x0, y0, x1, y1, _x0, _y0, coord_x, coord_y, 1);
         if (undo_error)
@@ -696,7 +696,7 @@ void edit_mode_4(void) {
       break;
     }
 
-    difuminar = 0;
+    blur_enabled = 0;
 
     if (((mouse_b & 1) && selected_icon == 1) ||
         (scan_code == 14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
@@ -757,11 +757,11 @@ void edit_mode_5(void) {
   do {
     draw_help(1295);
     edit_ruler();
-    select_fx(12, &efecto5);
+    select_fx(12, &polygon_tool_effect);
     select_color(2);
 
     if (key(_D))
-      difuminar = 1;
+      blur_enabled = 1;
 
     back = 0;
 
@@ -778,7 +778,7 @@ void edit_mode_5(void) {
       break;
     case 1:
       if (mouse_graf >= 10) {
-        line_fx = efecto5;
+        line_fx = polygon_tool_effect;
         undo_error = 0;
         line(x0, y0, coord_x, coord_y, 1);
         if (undo_error)
@@ -820,7 +820,7 @@ void edit_mode_5(void) {
 
         x0 = x1 - (long)((float)cos(ang) * y0);
         y0 = y1 + (long)((float)sin(ang) * y0);
-        line_fx = efecto5;
+        line_fx = polygon_tool_effect;
         undo_error = 0;
         bezier(x1, y1, coord_x, coord_y, x0, y0, coord_x, coord_y, 0);
         if (undo_error)
@@ -851,7 +851,7 @@ void edit_mode_5(void) {
       break;
     }
 
-    difuminar = 0;
+    blur_enabled = 0;
 
     if (((mouse_b & 1) && selected_icon == 1) ||
         (scan_code == 14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
@@ -885,14 +885,14 @@ void edit_mode_5(void) {
 //      Edit screen (rectangles)
 //-----------------------------------------------------------------------------
 
-int iconos_caja[] = {2, 1, 110, 111};
+int box_icons[] = {2, 1, 110, 111};
 
 void select_rect(int n) {
   int r;
-  r = select_icon(toolbar_x + 48 + n * 16, iconos_caja);
+  r = select_icon(toolbar_x + 48 + n * 16, box_icons);
   if (r >= 0) {
     mode_rect = r;
-    bar[13] = iconos_caja[2 + mode_rect];
+    bar[13] = box_icons[2 + mode_rect];
     draw_bar(22);
     draw_ruler();
   }
@@ -911,7 +911,7 @@ void edit_mode_6(void) {
   }
   bar[11] = 166;
   bar[12] = 119;
-  bar[13] = iconos_caja[2 + mode_rect];
+  bar[13] = box_icons[2 + mode_rect];
   bar[14] = 0;
   bar[15] = 0;
   draw_bar(22);
@@ -921,7 +921,7 @@ void edit_mode_6(void) {
   do {
     draw_help(1295);
     edit_ruler();
-    select_fx(12, &efecto6);
+    select_fx(12, &filled_tool_effect);
     select_color(2);
 
     w = map_width * 2;
@@ -940,7 +940,7 @@ void edit_mode_6(void) {
       break;
     case 1:
       if (mouse_graf >= 10) {
-        line_fx = efecto6;
+        line_fx = filled_tool_effect;
         w = coord_x - x0;
         h = coord_y - y0;
         if (key(_L_CTRL) || key(_R_CTRL)) {
@@ -1020,14 +1020,14 @@ void edit_mode_6(void) {
 //      Edit screen (circles)
 //-----------------------------------------------------------------------------
 
-int iconos_circulo[] = {4, 1, 175, 176, 112, 113};
+int circle_icons[] = {4, 1, 175, 176, 112, 113};
 
 void select_circle(int n) {
   int r;
-  r = select_icon(toolbar_x + 48 + n * 16, iconos_circulo);
+  r = select_icon(toolbar_x + 48 + n * 16, circle_icons);
   if (r >= 0) {
     mode_circle = r;
-    bar[13] = iconos_circulo[2 + mode_circle];
+    bar[13] = circle_icons[2 + mode_circle];
     draw_bar(22);
     draw_ruler();
   }
@@ -1046,7 +1046,7 @@ void edit_mode_7(void) {
   }
   bar[11] = 166;
   bar[12] = 119;
-  bar[13] = iconos_circulo[2 + mode_circle];
+  bar[13] = circle_icons[2 + mode_circle];
   bar[14] = 0;
   bar[15] = 0;
   draw_bar(22);
@@ -1056,7 +1056,7 @@ void edit_mode_7(void) {
   do {
     draw_help(1295);
     edit_ruler();
-    select_fx(12, &efecto7);
+    select_fx(12, &circle_tool_effect);
     select_color(2);
 
     w = map_width * 2;
@@ -1075,7 +1075,7 @@ void edit_mode_7(void) {
       break;
     case 1:
       if (mouse_graf >= 10) {
-        line_fx = efecto7;
+        line_fx = circle_tool_effect;
         if (mode_circle < 2) {
           w = coord_x - x0;
           h = coord_y - y0;
@@ -1242,15 +1242,15 @@ void zoom_region(int x, int y, int w, int h) {
 #define undo_spray -1
 #define undo_box   4
 
-int modo_spray = 2, clock_spray;
-int iconos_spray[] = {6, 1, 181, 182, 183, 184, 185, 186};
+int spray_mode = 2, clock_spray;
+int spray_icons[] = {6, 1, 181, 182, 183, 184, 185, 186};
 
 void select_spray(int n) {
   int r;
-  r = select_icon(toolbar_x + 48 + n * 16, iconos_spray);
+  r = select_icon(toolbar_x + 48 + n * 16, spray_icons);
   if (r >= 0) {
-    modo_spray = r;
-    bar[13] = iconos_spray[2 + modo_spray];
+    spray_mode = r;
+    bar[13] = spray_icons[2 + spray_mode];
     draw_bar(0);
     draw_ruler();
   }
@@ -1276,7 +1276,7 @@ void edit_mode_8(void) {
   }
   bar[11] = 166;
   bar[12] = 119;
-  bar[13] = iconos_spray[2 + modo_spray];
+  bar[13] = spray_icons[2 + spray_mode];
   bar[14] = 0;
   draw_bar(0);
   draw_ruler();
@@ -1286,10 +1286,10 @@ void edit_mode_8(void) {
     draw_help(1295);
     edit_ruler();
     select_color(2);
-    select_fx(12, &efecto8);
+    select_fx(12, &spray_tool_effect);
 
     if (key(_D))
-      difuminar = 1;
+      blur_enabled = 1;
 
     if ((mouse_b & 1) && mouse_graf >= 10) {
       if (clock_spray != -1) {
@@ -1308,13 +1308,13 @@ void edit_mode_8(void) {
         m = brush_w * brush_h * (frame_clock - clock_spray);
         clock_spray = frame_clock;
 
-        if (textura_color == NULL) {
+        if (texture_color == NULL) {
           while (m--) {
-            if (rndb() < (8 << modo_spray)) {
+            if (rndb() < (8 << spray_mode)) {
               x = rnd() % brush_w;
               y = rnd() % brush_h;
-              if (pincel[x + y * brush_w]) {
-                line_fx = efecto8;
+              if (brush[x + y * brush_w]) {
+                line_fx = spray_tool_effect;
                 _line_pixel(coord_x + x - brush_w / 2, coord_y + y - brush_h / 2);
               }
             }
@@ -1322,11 +1322,11 @@ void edit_mode_8(void) {
         } else {
           col = color;
           while (m--) {
-            if (rndb() < (8 << modo_spray)) {
+            if (rndb() < (8 << spray_mode)) {
               x = rnd() % brush_w;
               y = rnd() % brush_h;
-              if (pincel[x + y * brush_w]) {
-                line_fx = efecto8;
+              if (brush[x + y * brush_w]) {
+                line_fx = spray_tool_effect;
                 color = get_color(coord_x + x - brush_w / 2, coord_y + y - brush_h / 2);
                 _line_pixel(coord_x + x - brush_w / 2, coord_y + y - brush_h / 2);
               }
@@ -1340,7 +1340,7 @@ void edit_mode_8(void) {
     } else
       clock_spray = -1;
 
-    difuminar = 0;
+    blur_enabled = 0;
 
     if (((mouse_b & 1) && selected_icon == 1) ||
         (scan_code == 14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
@@ -1353,9 +1353,9 @@ void edit_mode_8(void) {
       need_zoom = 1;
     }
 
-    n = modo_spray;
+    n = spray_mode;
     select_spray(13);
-    if (n != modo_spray)
+    if (n != spray_mode)
       u = undo_spray;
 
     blit_edit();
@@ -1368,7 +1368,7 @@ void edit_mode_8(void) {
 //      Edit screen (fills)
 //-----------------------------------------------------------------------------
 
-int iconos_fill[] = {4, 1, 114, 115, 116, 118, 1};
+int fill_icons[] = {4, 1, 114, 115, 116, 118, 1};
 
 void edit_mode_9(void) {
   int a;
@@ -1379,7 +1379,7 @@ void edit_mode_9(void) {
     bar[a] = 1;
   }
   bar[11] = 166;
-  bar[12] = iconos_fill[2 + mode_fill];
+  bar[12] = fill_icons[2 + mode_fill];
   bar[13] = 0;
   draw_bar(0);
   draw_ruler();
@@ -1393,7 +1393,7 @@ void edit_mode_9(void) {
     if ((mouse_b & 1) && !(prev_mouse_buttons & 1) && mouse_graf >= 10) {
       if (!mask[*(map + coord_y * map_width + coord_x)] &&
           (*(map + coord_y * map_width + coord_x) != color || mode_fill == 3 ||
-           textura_color != NULL)) {
+           texture_color != NULL)) {
         fill(coord_x, coord_y);
       }
     }
@@ -1851,16 +1851,16 @@ void cut_map(void) {
       v_map->map_width = w;
       v_map->map_height = h;
       for (x = 0; x < 512; x += 2) {
-        if (v.mapa->puntos[x] >= sel_mask_x0 && v.mapa->puntos[x] <= sel_mask_x1 &&
-            v.mapa->puntos[x + 1] >= sel_mask_y0 && v.mapa->puntos[x + 1] <= sel_mask_y1) {
-          v_map->puntos[x] = v.mapa->puntos[x] - sel_mask_x0;
-          v_map->puntos[x + 1] = v.mapa->puntos[x + 1] - sel_mask_y0;
+        if (v.mapa->points[x] >= sel_mask_x0 && v.mapa->points[x] <= sel_mask_x1 &&
+            v.mapa->points[x + 1] >= sel_mask_y0 && v.mapa->points[x + 1] <= sel_mask_y1) {
+          v_map->points[x] = v.mapa->points[x] - sel_mask_x0;
+          v_map->points[x + 1] = v.mapa->points[x + 1] - sel_mask_y0;
         } else {
-          v_map->puntos[x] = -1;
-          v_map->puntos[x + 1] = -1;
+          v_map->points[x] = -1;
+          v_map->points[x + 1] = -1;
         }
       }
-      v_map->TengoNombre = 0; // No description by default
+      v_map->has_name = 0; // No description by default
       v_map->fpg_code = 0;
       windows_to_create[num_windows_to_create++] = v_map;
 
@@ -1903,7 +1903,7 @@ void sel_mask_delete(void) {
 
   if (save_undo(sel_mask_x0, sel_mask_y0, sel_mask_x1 - sel_mask_x0 + 1,
                 sel_mask_y1 - sel_mask_y0 + 1)) {
-    if (textura_color == NULL) {
+    if (texture_color == NULL) {
       for (y = sel_mask_y0; y <= sel_mask_y1; y++)
         for (x = sel_mask_x0; x <= sel_mask_x1; x++)
           if (is_selection_mask(x, y))
@@ -2419,8 +2419,8 @@ void sel_mask_line(int x0, int y0, int x1, int y1) {
 //      Polygon fill algorithm for selection_mask
 //-----------------------------------------------------------------------------
 
-word poligono[2048]; // Up to 1024 points for polygon selection
-int n_puntos;
+word polygon[2048]; // Up to 1024 points for polygon selection
+int n_points;
 int k1, k2, xmin, trans;
 
 void find_first_x_from(int xi, int y) {
@@ -2429,11 +2429,11 @@ void find_first_x_from(int xi, int y) {
   trans = 0;
   xmin = max_int;
 
-  for (n = 0; n < n_puntos - 1; n++) {
-    x0 = poligono[n * 2];
-    y0 = poligono[n * 2 + 1];
-    x1 = poligono[n * 2 + 2];
-    y1 = poligono[n * 2 + 3];
+  for (n = 0; n < n_points - 1; n++) {
+    x0 = polygon[n * 2];
+    y0 = polygon[n * 2 + 1];
+    x1 = polygon[n * 2 + 2];
+    y1 = polygon[n * 2 + 3];
     if (y0 > y1) {
       swap(x0, x1);
       swap(y0, y1);
@@ -2448,11 +2448,11 @@ void find_first_x_from(int xi, int y) {
   // Got xmin, now count k1 and k2 updating the transition flag
 
   if (xmin != max_int)
-    for (n = 0; n < n_puntos - 1; n++) {
-      x0 = poligono[n * 2];
-      y0 = poligono[n * 2 + 1];
-      x1 = poligono[n * 2 + 2];
-      y1 = poligono[n * 2 + 3];
+    for (n = 0; n < n_points - 1; n++) {
+      x0 = polygon[n * 2];
+      y0 = polygon[n * 2 + 1];
+      x1 = polygon[n * 2 + 2];
+      y1 = polygon[n * 2 + 3];
       if (y0 > y1) {
         swap(x0, x1);
         swap(y0, y1);
@@ -2483,32 +2483,32 @@ void find_first_x_from(int xi, int y) {
 
 void fill_polygon(void) {
   int y0, y1; // Start and end Y coordinates
-  int x0, dentro;
+  int x0, inside;
   int m, n;
 
   y0 = map_height;
   y1 = 0;
 
-  for (n = 1; n < n_puntos * 2; n += 2) {
-    if (poligono[n] < y0)
-      y0 = poligono[n];
-    if (poligono[n] > y1)
-      y1 = poligono[n];
+  for (n = 1; n < n_points * 2; n += 2) {
+    if (polygon[n] < y0)
+      y0 = polygon[n];
+    if (polygon[n] > y1)
+      y1 = polygon[n];
   }
 
   for (n = y0; n <= y1; n++) {
     x0 = -1;
     k1 = 0;
     k2 = 0;
-    dentro = 0;
+    inside = 0;
     do {
       find_first_x_from(x0, n);
       if (xmin != max_int) {
-        if (dentro) {
+        if (inside) {
           for (m = x0 + 1; m <= xmin; m++)
             set_selection_mask(m, n);
         }
-        dentro ^= trans;
+        inside ^= trans;
         x0 = xmin;
       }
     } while (xmin != max_int);
@@ -2526,9 +2526,9 @@ int edit_mode_6_lines(int s) {
   case 0:
     if ((mouse_b & 1) && mouse_graf >= 10) {
       s = 1;
-      n_puntos = 1;
-      poligono[0] = coord_x;
-      poligono[1] = coord_y;
+      n_points = 1;
+      polygon[0] = coord_x;
+      polygon[1] = coord_y;
       memset(selection_mask, 0, ((map_width * map_height + 31) / 32) * 4);
       sel_mask_x0 = sel_mask_x1 = coord_x;
       sel_mask_y0 = sel_mask_y1 = coord_y;
@@ -2540,11 +2540,11 @@ int edit_mode_6_lines(int s) {
 
   case 1:
     sel_status = 1;
-    if ((mouse_b & 1) && mouse_graf >= 10 && n_puntos < 1024 &&
-        (poligono[n_puntos * 2 - 2] != coord_x || poligono[n_puntos * 2 - 1] != coord_y)) {
-      poligono[n_puntos * 2] = coord_x;
-      poligono[n_puntos * 2 + 1] = coord_y;
-      n_puntos++;
+    if ((mouse_b & 1) && mouse_graf >= 10 && n_points < 1024 &&
+        (polygon[n_points * 2 - 2] != coord_x || polygon[n_points * 2 - 1] != coord_y)) {
+      polygon[n_points * 2] = coord_x;
+      polygon[n_points * 2 + 1] = coord_y;
+      n_points++;
       if (coord_x < sel_mask_x0)
         sel_mask_x0 = coord_x;
       else if (coord_x > sel_mask_x1)
@@ -2556,23 +2556,23 @@ int edit_mode_6_lines(int s) {
       sel_mask_line(oldx, oldy, coord_x, coord_y);
       oldx = coord_x;
       oldy = coord_y;
-      if (n_puntos > 3 && oldx >= poligono[0] - 1 && oldx <= poligono[0] + 1 &&
-          oldy >= poligono[1] - 1 && oldy <= poligono[1] + 1) {
-        if (oldx != poligono[0] || oldy != poligono[1]) {
-          poligono[n_puntos * 2] = poligono[0];
-          poligono[n_puntos * 2 + 1] = poligono[1];
-          n_puntos++;
+      if (n_points > 3 && oldx >= polygon[0] - 1 && oldx <= polygon[0] + 1 &&
+          oldy >= polygon[1] - 1 && oldy <= polygon[1] + 1) {
+        if (oldx != polygon[0] || oldy != polygon[1]) {
+          polygon[n_points * 2] = polygon[0];
+          polygon[n_points * 2 + 1] = polygon[1];
+          n_points++;
         }
         fill_polygon();
         s = 2;
         block_bar(1);
       }
     } else if ((mouse_b & 2) || key(_ESC)) {
-      if (n_puntos > 2) {
-        poligono[n_puntos * 2] = poligono[0];
-        poligono[n_puntos * 2 + 1] = poligono[1];
-        n_puntos++;
-        sel_mask_line(oldx, oldy, poligono[0], poligono[1]);
+      if (n_points > 2) {
+        polygon[n_points * 2] = polygon[0];
+        polygon[n_points * 2 + 1] = polygon[1];
+        n_points++;
+        sel_mask_line(oldx, oldy, polygon[0], polygon[1]);
         fill_polygon();
         s = 2;
         block_bar(1);
@@ -2623,9 +2623,9 @@ int edit_mode_6_fill(int s) {
         fill_dac[0] = 0;
       }
       s = 2;
-      memset(focos, -1, 512);
-      focos[0] = coord_x;
-      focos[1] = coord_y;
+      memset(fill_seeds, -1, 512);
+      fill_seeds[0] = coord_x;
+      fill_seeds[1] = coord_y;
       memset(selection_mask, 0, ((map_width * map_height + 31) / 32) * 4);
       sel_mask_x0 = map_width;
       sel_mask_y0 = map_height;
@@ -2648,16 +2648,16 @@ int edit_mode_6_fill(int s) {
       if (mode_selection == 1)
         fill_dac[*(map + coord_y * map_width + coord_x)] = 1;
       n = 0;
-      while (n < 126 && focos[n] >= 0)
+      while (n < 126 && fill_seeds[n] >= 0)
         n += 2;
-      focos[n] = coord_x;
-      focos[n + 1] = coord_y;
+      fill_seeds[n] = coord_x;
+      fill_seeds[n + 1] = coord_y;
       memset(selection_mask, 0, ((map_width * map_height + 31) / 32) * 4);
       for (n = 0; n < 128; n += 2)
-        if (focos[n] >= 0) {
-          if (!is_selection_mask(focos[n], focos[n + 1])) {
-            fill_select(focos[n], focos[n + 1]);
-            if (!is_selection_mask(focos[n], focos[n + 1])) {
+        if (fill_seeds[n] >= 0) {
+          if (!is_selection_mask(fill_seeds[n], fill_seeds[n + 1])) {
+            fill_select(fill_seeds[n], fill_seeds[n + 1]);
+            if (!is_selection_mask(fill_seeds[n], fill_seeds[n + 1])) {
               s = 0;
               sel_status = 0;
               block_bar(0);
@@ -2666,7 +2666,7 @@ int edit_mode_6_fill(int s) {
               } while (mouse_b || key(_ESC));
             }
           } else
-            focos[n] = -1;
+            fill_seeds[n] = -1;
         }
     } else if ((mouse_b & 2) || key(_ESC)) {
       s = 0;
@@ -2860,16 +2860,16 @@ int find_font_window(void);
 void GetCharSizeBuffer(int WhatChar, int *width, int *height, char *buffer);
 int ShowCharBuffer(int WhatChar, int cx, int cy, char *ptr, int w, char *buffer);
 
-int barra_texto = 0; // Prevent background highlight toggle with 'b' key
+int text_bar_active = 0; // Prevent background highlight toggle with 'b' key
 
 void edit_mode_12(void) {
-  int spacelen, cnt, x, fan, fal, anmax, almax;
+  int spacelen, cnt, x, char_w, char_h, max_char_w, max_char_h;
   int ms = mode_selection;
   int a;
   int tx = -256, ty = -256; // Text start position (for enter/newline)
   byte *font, *buffer;
-  int ilon = 0;
-  byte lon[256];
+  int text_len = 0;
+  byte char_widths[256];
 
   mode_selection = 0;
   bar[0] = 101 + zoom;
@@ -2893,32 +2893,32 @@ void edit_mode_12(void) {
     spacelen = 0;
     cnt = 0;
     for (x = 0; x < 255; x++) {
-      GetCharSizeBuffer(x, &fan, &fal, (char *)font);
-      if (fan != 1) {
+      GetCharSizeBuffer(x, &char_w, &char_h, (char *)font);
+      if (char_w != 1) {
         cnt++;
-        spacelen += fan;
+        spacelen += char_w;
       }
     }
     spacelen = (spacelen / cnt) / 2;
 
     // Determine max width and height
 
-    anmax = 0;
-    almax = 0;
+    max_char_w = 0;
+    max_char_h = 0;
     for (x = 0; x < 255; x++) {
-      GetCharSizeBuffer(x, &fan, &fal, (char *)font);
-      if (fan == 1)
-        fan = spacelen;
-      if (anmax < fan)
-        anmax = fan;
-      if (almax < fal)
-        almax = fal;
+      GetCharSizeBuffer(x, &char_w, &char_h, (char *)font);
+      if (char_w == 1)
+        char_w = spacelen;
+      if (max_char_w < char_w)
+        max_char_w = char_w;
+      if (max_char_h < char_h)
+        max_char_h = char_h;
     }
 
     // Allocate memory for the buffer
 
-    if ((buffer = (byte *)malloc(anmax * almax)) != NULL) {
-      memset(buffer, 0, anmax * almax);
+    if ((buffer = (byte *)malloc(max_char_w * max_char_h)) != NULL) {
+      memset(buffer, 0, max_char_w * max_char_h);
     } else {
       v_text = (char *)texts[45];
       show_dialog(err0);
@@ -2928,12 +2928,12 @@ void edit_mode_12(void) {
   } else
     font = NULL; // Will draw with the editor's built-in font
 
-  barra_texto = 1;
+  text_bar_active = 1;
 
   do {
     draw_help(1295);
     edit_ruler();
-    select_fx(12, &efecto12);
+    select_fx(12, &text_tool_effect);
     select_color(2);
 
     test_previous();
@@ -2974,10 +2974,10 @@ void edit_mode_12(void) {
               sel_x1 -= font_width;
             }
           }
-        } else if (ascii && scan_code != 15 && scan_code != 1 && ilon < 256) {
+        } else if (ascii && scan_code != 15 && scan_code != 1 && text_len < 256) {
           if (save_undo(sel_x0, sel_y0, font_width, font_height)) {
             test_previous(); // To counteract the effect of save_undo()
-            line_fx = efecto12;
+            line_fx = text_tool_effect;
             write_char(sel_x0, sel_y0, ascii);
             sel_x0 += font_width;
             sel_x1 += font_width;
@@ -2989,14 +2989,14 @@ void edit_mode_12(void) {
 
       if (mouse_graf >= 10 && (mouse_b & 1)) {
         sel_x0 = coord_x - spacelen / 2;
-        sel_y0 = coord_y - almax / 2;
+        sel_y0 = coord_y - max_char_h / 2;
         sel_x1 = sel_x0 + spacelen - 1;
-        sel_y1 = sel_y0 + almax - 1;
+        sel_y1 = sel_y0 + max_char_h - 1;
         sel_status = 1;
         hotkey = 0;
         tx = sel_x0;
         ty = sel_y0;
-        ilon = 0;
+        text_len = 0;
       } else if (((mouse_b & 2) || key(_ESC)) && sel_status) {
         sel_status = 0;
         hotkey = 1;
@@ -3006,39 +3006,39 @@ void edit_mode_12(void) {
       }
       if (sel_status == 1) {
         if (ascii == 13) {
-          ty += almax;
+          ty += max_char_h;
           sel_x0 = tx;
           sel_y0 = ty;
           sel_x1 = sel_x0 + spacelen - 1;
-          sel_y1 = sel_y0 + almax - 1;
-          ilon = 0;
+          sel_y1 = sel_y0 + max_char_h - 1;
+          text_len = 0;
         } else if (scan_code == 14) {
           if (sel_x0 != tx) {
             if (undo_back()) {
               test_previous();
-              sel_x0 -= lon[--ilon];
-              sel_x1 -= lon[ilon];
+              sel_x0 -= char_widths[--text_len];
+              sel_x1 -= char_widths[text_len];
             }
           }
-        } else if (ascii && scan_code != 15 && scan_code != 1 && ilon < 256) {
-          GetCharSizeBuffer(ascii, &fan, &fal, (char *)font);
-          if (fan == 1) {
+        } else if (ascii && scan_code != 15 && scan_code != 1 && text_len < 256) {
+          GetCharSizeBuffer(ascii, &char_w, &char_h, (char *)font);
+          if (char_w == 1) {
             if (save_undo(sel_x0, sel_y1, 1, 1)) {
               test_previous();
               sel_x0 += spacelen;
               sel_x1 += spacelen;
-              lon[ilon++] = spacelen;
+              char_widths[text_len++] = spacelen;
             }
           } else {
-            memset(buffer, 0, anmax * almax);
-            if (save_undo(sel_x0, sel_y0, fan, almax)) {
+            memset(buffer, 0, max_char_w * max_char_h);
+            if (save_undo(sel_x0, sel_y0, char_w, max_char_h)) {
               test_previous(); // To counteract the effect of save_undo()
-              ShowCharBuffer(ascii, 0, 0, (char *)buffer, anmax, (char *)font);
-              line_fx = efecto12;
-              write_char2(sel_x0, sel_y0, buffer, anmax, almax);
-              sel_x0 += fan;
-              sel_x1 += fan;
-              lon[ilon++] = fan;
+              ShowCharBuffer(ascii, 0, 0, (char *)buffer, max_char_w, (char *)font);
+              line_fx = text_tool_effect;
+              write_char2(sel_x0, sel_y0, buffer, max_char_w, max_char_h);
+              sel_x0 += char_w;
+              sel_x1 += char_w;
+              char_widths[text_len++] = char_w;
             }
           }
         }
@@ -3055,8 +3055,8 @@ void edit_mode_12(void) {
             sel_x0 -= font_width;
             sel_x1 -= font_width;
           } else {
-            sel_x0 -= lon[--ilon];
-            sel_x1 -= lon[ilon];
+            sel_x0 -= char_widths[--text_len];
+            sel_x1 -= char_widths[text_len];
           }
         }
       } else
@@ -3074,7 +3074,7 @@ void edit_mode_12(void) {
   } while (!exit_requested && !(mouse_b & 2) && !(key(_ESC) && hotkey) && draw_mode < 100 &&
            !(mouse_b && mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18)));
 
-  barra_texto = 0;
+  text_bar_active = 0;
 
   hotkey = 1;
   sel_status = 0;
@@ -3092,7 +3092,7 @@ void write_char(int x, int y, byte c) {
   byte *si;
   byte col;
 
-  if (textura_color == NULL) {
+  if (texture_color == NULL) {
     si = font + c * font_width * font_height;
     n = font_height;
     do {
@@ -3130,7 +3130,7 @@ void write_char2(int x, int y, byte *si, int font_width, int font_height) {
   int n, m;
   byte c = color, *g;
 
-  if (textura_color != NULL) {
+  if (texture_color != NULL) {
     n = font_height;
     do {
       m = font_width;
@@ -3207,47 +3207,47 @@ void edit_mode_13(void) {
 
     switch (scan_code) {
     case 0x4A:
-      num_punto--;
+      point_index--;
       break; // -
     case 0x4E:
-      num_punto++;
+      point_index++;
       break; // +
     case 0x49:
-      num_punto -= 10;
+      point_index -= 10;
       break; // PgUp
     case 0x51:
-      num_punto += 10;
+      point_index += 10;
       break; // PgDn
     case 0x47:
-      num_punto = 0;
+      point_index = 0;
       break;   // Home
     case 0x4F: // End
       for (m = 0; m < 512; m += 2)
-        if (v.mapa->puntos[m] != -1)
-          num_punto = m / 2;
+        if (v.mapa->points[m] != -1)
+          point_index = m / 2;
       break;
     }
 
     if (mouse_b & 1)
       switch (selected_icon) {
       case 1:
-        num_punto--;
+        point_index--;
         do {
           read_mouse();
         } while (mouse_b & 1);
         break;
       case 3:
-        num_punto++;
+        point_index++;
         do {
           read_mouse();
         } while (mouse_b & 1);
         break;
       }
 
-    if (num_punto < 0)
-      num_punto = 0;
-    if (num_punto > 255)
-      num_punto = 255;
+    if (point_index < 0)
+      point_index = 0;
+    if (point_index > 255)
+      point_index = 255;
 
     need_zoom_x = map_width;
     need_zoom_y = map_height;
@@ -3255,27 +3255,27 @@ void edit_mode_13(void) {
     need_zoom_height = 0;
 
     for (m = 0; m < 512; m += 2)
-      if (v.mapa->puntos[m] != -1) {
-        sel_x0 = v.mapa->puntos[m] - 1;
-        sel_x1 = v.mapa->puntos[m] + 1;
-        sel_y0 = v.mapa->puntos[m + 1] - 1;
-        sel_y1 = v.mapa->puntos[m + 1] + 1;
+      if (v.mapa->points[m] != -1) {
+        sel_x0 = v.mapa->points[m] - 1;
+        sel_x1 = v.mapa->points[m] + 1;
+        sel_y0 = v.mapa->points[m + 1] - 1;
+        sel_y1 = v.mapa->points[m + 1] + 1;
         test_sel();
       }
 
     if (scan_code == 0x53) { // Delete
-      v.mapa->puntos[num_punto * 2] = -1;
-      v.mapa->puntos[num_punto * 2 + 1] = -1;
+      v.mapa->points[point_index * 2] = -1;
+      v.mapa->points[point_index * 2 + 1] = -1;
     }
 
     if (mouse_graf >= 10 && (mouse_b & 1)) {
-      if ((v.mapa->puntos[num_punto * 2] == coord_x) &
-          (v.mapa->puntos[num_punto * 2 + 1] == coord_y)) {
-        v.mapa->puntos[num_punto * 2] = -1;
-        v.mapa->puntos[num_punto * 2 + 1] = -1;
+      if ((v.mapa->points[point_index * 2] == coord_x) &
+          (v.mapa->points[point_index * 2 + 1] == coord_y)) {
+        v.mapa->points[point_index * 2] = -1;
+        v.mapa->points[point_index * 2 + 1] = -1;
       } else {
-        v.mapa->puntos[num_punto * 2] = coord_x;
-        v.mapa->puntos[num_punto * 2 + 1] = coord_y;
+        v.mapa->points[point_index * 2] = coord_x;
+        v.mapa->points[point_index * 2 + 1] = coord_y;
       }
       do
         read_mouse();
@@ -3290,8 +3290,8 @@ void edit_mode_13(void) {
     sel_status = 1;
     test_next();
 
-    if (v.mapa->puntos[num_punto * 2] != -1)
-      analyze_bar(v.mapa->puntos[num_punto * 2], v.mapa->puntos[num_punto * 2 + 1]);
+    if (v.mapa->points[point_index * 2] != -1)
+      analyze_bar(v.mapa->points[point_index * 2], v.mapa->points[point_index * 2 + 1]);
     else {
       wbox(toolbar, vga_width / big2, vga_height, c2, toolbar_width - 23, 2, 21, 15);
       p = screen_buffer;
@@ -3305,9 +3305,9 @@ void edit_mode_13(void) {
     wbox(toolbar, vga_width / big2, 19, c2, 48 + 2 * 16, 2, 15, 15);
 
     num[3] = 0;
-    num[2] = 48 + num_punto % 10;
-    num[1] = 48 + (num_punto / 10) % 10;
-    num[0] = 48 + (num_punto / 100) % 10;
+    num[2] = 48 + point_index % 10;
+    num[1] = 48 + (point_index / 10) % 10;
+    num[0] = 48 + (point_index / 100) % 10;
 
     wwrite(toolbar, vga_width / big2, 19, 56 + 2 * 16, 6, 1, (byte *)num, c1);
     wwrite(toolbar, vga_width / big2, 19, 55 + 2 * 16, 6, 1, (byte *)num, c4);
@@ -4187,12 +4187,12 @@ void line_pixel(int x, int y) { // Brush
   x -= brush_w / 2;
   y -= brush_h / 2;
 
-  if (textura_color == NULL) {
-    if (tipo_pincel) {
+  if (texture_color == NULL) {
+    if (brush_type) {
       if (x >= 0 && y >= 0 && x + brush_w <= map_width && y + brush_h <= map_height &&
-          !difuminar) {
+          !blur_enabled) {
         q = map + x + y * map_width;
-        p = pincel;
+        p = brush;
         if (mask_on) {
           do {
             do {
@@ -4221,7 +4221,7 @@ void line_pixel(int x, int y) { // Brush
       } else {
         do {
           do {
-            if ((line_fx = pincel[xx + yy * brush_w])) {
+            if ((line_fx = brush[xx + yy * brush_w])) {
               _line_pixel(x + xx, y + yy);
             }
           } while (++xx < brush_w);
@@ -4230,9 +4230,9 @@ void line_pixel(int x, int y) { // Brush
       }
     } else {
       if (x >= 0 && y >= 0 && x + brush_w <= map_width && y + brush_h <= map_height &&
-          !difuminar) {
+          !blur_enabled) {
         q = map + x + y * map_width;
-        p = pincel;
+        p = brush;
         if (mask_on) {
           do {
             do {
@@ -4261,7 +4261,7 @@ void line_pixel(int x, int y) { // Brush
       } else {
         do {
           do {
-            if (pincel[xx + yy * brush_w]) {
+            if (brush[xx + yy * brush_w]) {
               _line_pixel(x + xx, y + yy);
             }
           } while (++xx < brush_w);
@@ -4271,11 +4271,11 @@ void line_pixel(int x, int y) { // Brush
     }
   } else {
     col = color;
-    if (tipo_pincel) {
+    if (brush_type) {
       if (x >= 0 && y >= 0 && x + brush_w <= map_width && y + brush_h <= map_height &&
-          !difuminar) {
+          !blur_enabled) {
         q = map + x + y * map_width;
-        p = pincel;
+        p = brush;
         if (mask_on) {
           do {
             do {
@@ -4306,7 +4306,7 @@ void line_pixel(int x, int y) { // Brush
       } else {
         do {
           do {
-            if ((line_fx = pincel[xx + yy * brush_w])) {
+            if ((line_fx = brush[xx + yy * brush_w])) {
               color = get_color(x + xx, y + yy);
               _line_pixel(x + xx, y + yy);
             }
@@ -4316,9 +4316,9 @@ void line_pixel(int x, int y) { // Brush
       }
     } else {
       if (x >= 0 && y >= 0 && x + brush_w <= map_width && y + brush_h <= map_height &&
-          !difuminar) {
+          !blur_enabled) {
         q = map + x + y * map_width;
-        p = pincel;
+        p = brush;
         if (mask_on) {
           do {
             do {
@@ -4349,7 +4349,7 @@ void line_pixel(int x, int y) { // Brush
       } else {
         do {
           do {
-            if (pincel[xx + yy * brush_w]) {
+            if (brush[xx + yy * brush_w]) {
               color = get_color(x + xx, y + yy);
               _line_pixel(x + xx, y + yy);
             }
@@ -4367,7 +4367,7 @@ void _line_pixel(int x, int y) { // A single pixel (for line_pixel, spray and wr
   byte c1, c2, _color = color;
 
   if (x >= 0 && y >= 0 && x < map_width && y < map_height) {
-    if (difuminar) {
+    if (blur_enabled) {
       if (x < map_width - 1 && x > 0)
         c1 = *(ghost + *(map + x + y * map_width - 1) * 256 + *(map + x + y * map_width + 1));
       else
@@ -4402,11 +4402,11 @@ void draw_box(int x0, int y0, int x1, int y1) {
   if (save_undo(x0 - brush_w / 2, y0 - brush_h / 2, w + brush_w, h + brush_h)) {
     if (mode_rect) {
       do {
-        circulo_scan2(x0, y0++, w);
+        circle_scanline_filled(x0, y0++, w);
       } while (--h);
     } else {
-      circulo_scan(x0, y0, w);
-      circulo_scan(x0, y0 + h - 1, w);
+      circle_scanline(x0, y0, w);
+      circle_scanline(x0, y0 + h - 1, w);
       h -= 2;
       y0++;
       if (h > 0)
@@ -4422,7 +4422,7 @@ void draw_box(int x0, int y0, int x1, int y1) {
 //      Draw a circle, based on mode_circle, line_fx and color
 //-----------------------------------------------------------------------------
 
-void draw_circle(int x0, int y0, int x1, int y1, int relleno) {
+void draw_circle(int x0, int y0, int x1, int y1, int filled) {
   int p[2048];   // Points on the circumference
   double cx, rx; // Center and radius of the circumference
   int w, h;    // Width and height
@@ -4473,15 +4473,15 @@ void draw_circle(int x0, int y0, int x1, int y1, int relleno) {
       p[5] = x1;
     }
 
-    if (relleno) {
+    if (filled) {
       do {
         yb = p[--n];
         ya = p[--n];
         xb = p[--n];
         xa = p[--n];
-        circulo_scan2(xa, ya, xb - xa + 1);
+        circle_scanline_filled(xa, ya, xb - xa + 1);
         if (yb != ya)
-          circulo_scan2(xa, yb, xb - xa + 1);
+          circle_scanline_filled(xa, yb, xb - xa + 1);
       } while (n);
     } else {
       do {
@@ -4500,31 +4500,31 @@ void draw_circle(int x0, int y0, int x1, int y1, int relleno) {
                 line_pixel(xb, yb);
             }
           } else {
-            circulo_scan(xa, ya, p[n - 4] - xa);
-            circulo_scan(p[n - 3] + 1, ya, xb - p[n - 3]);
+            circle_scanline(xa, ya, p[n - 4] - xa);
+            circle_scanline(p[n - 3] + 1, ya, xb - p[n - 3]);
             if (yb != ya) {
-              circulo_scan(xa, yb, p[n - 4] - xa);
-              circulo_scan(p[n - 3] + 1, yb, xb - p[n - 3]);
+              circle_scanline(xa, yb, p[n - 4] - xa);
+              circle_scanline(p[n - 3] + 1, yb, xb - p[n - 3]);
             }
           }
         } else {
-          circulo_scan(xa, ya, xb - xa + 1);
+          circle_scanline(xa, ya, xb - xa + 1);
           if (yb != ya)
-            circulo_scan(xa, yb, xb - xa + 1);
+            circle_scanline(xa, yb, xb - xa + 1);
         }
       } while (n);
     }
   }
 }
 
-void circulo_scan(int x, int y, int w) {
+void circle_scanline(int x, int y, int w) {
   line_pixel(x, y);
   line(x, y, x + w - 1, y, -1);
 }
 
-void circulo_scan2(int x, int y, int w) {
+void circle_scanline_filled(int x, int y, int w) {
   byte *p, col;
-  if (textura_color == NULL) {
+  if (texture_color == NULL) {
     if (y >= 0 && y < map_height && x < map_width && x + w > 0) {
       if (x < 0) {
         w += x;
@@ -4576,7 +4576,7 @@ void edit_ruler(void) {
   }
 
   if ((mouse_b & 1) &&
-      mouse_in(toolbar_x + _ir, toolbar_y, toolbar_x + _ir + 127, toolbar_y + 18)) {
+      mouse_in(toolbar_x + COLOR_RULER_X, toolbar_y, toolbar_x + COLOR_RULER_X + 127, toolbar_y + 18)) {
     if (editable(&n))
       gradients[gradient].colors[n] = color;
     else
@@ -4604,7 +4604,7 @@ void edit_ruler(void) {
 void move_selection(byte *sp, int w, int h) {
   int x, y;
   int _x, _y;
-  int _an, _al;
+  int bar_width, _al;
   int xg, yg;
   byte *p;
   int _coord_x = 0, _coord_y = 0;
@@ -4806,12 +4806,12 @@ void move_selection(byte *sp, int w, int h) {
           else
             draw_mode = 110;
         } else {
-          _an = w;
+          bar_width = w;
           _al = h;
           _x = _coord_x;
           _y = _coord_y;
-          sp_size(&_x, &_y, &_an, &_al, xg, yg, ang, size);
-          if (save_undo(_x, _y, _an, _al))
+          sp_size(&_x, &_y, &bar_width, &_al, xg, yg, ang, size);
+          if (save_undo(_x, _y, bar_width, _al))
             sp_rotated(sp, _coord_x, _coord_y, w, h, xg, yg, block * 2 + ghost, ang, size);
           else
             draw_mode = 110;
@@ -4918,15 +4918,15 @@ void move_selection(byte *sp, int w, int h) {
     select_mode();
 
     if (scan_code == _TAB) {
-      if (!_tab) {
-        _tab = 1;
+      if (!tab_cycling) {
+        tab_cycling = 1;
         if (key(_L_SHIFT) || key(_R_SHIFT))
           change_map(0);
         else
           change_map(1);
       }
     } else
-      _tab = 0;
+      tab_cycling = 0;
 
   } while (!exit_requested && !(mouse_b & 2) && !(key(_ESC) && !s) && draw_mode < 100 &&
            !(mouse_b && mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18)));
@@ -5152,11 +5152,11 @@ int editable(int *n) {
     r = 4;
     break;
   }
-  *n = (mouse_x - toolbar_x - _ir) / r + 1;
+  *n = (mouse_x - toolbar_x - COLOR_RULER_X) / r + 1;
 
   if (!gradients[gradient].fixed) {
-    if (mouse_y >= toolbar_y + 11 && mouse_y <= toolbar_y + 18 && mouse_x >= toolbar_x + _ir &&
-        mouse_x < toolbar_x + _ir + 128) {
+    if (mouse_y >= toolbar_y + 11 && mouse_y <= toolbar_y + 18 && mouse_x >= toolbar_x + COLOR_RULER_X &&
+        mouse_x < toolbar_x + COLOR_RULER_X + 128) {
       switch (gradients[gradient].type) {
       case 0:
         if (*n == 1)
@@ -5294,8 +5294,8 @@ void draw_ruler(void) {
     break;
   }
 
-  for (a = _ir; a < _ir + 128; a += s0) {
-    n = gradients[gradient].colors[(a - _ir) / s0 + 1];
+  for (a = COLOR_RULER_X; a < COLOR_RULER_X + 128; a += s0) {
+    n = gradients[gradient].colors[(a - COLOR_RULER_X) / s0 + 1];
     wbox(toolbar, vga_width / big2, 19, n, a, 2, s0 - 1, 15);
     wbox(toolbar, vga_width / big2, 19, c0, a + s0 - 1, 2, 1, 15);
     if (n == color) {
@@ -5304,14 +5304,14 @@ void draw_ruler(void) {
     }
     if (!gradients[gradient].fixed) {
       if (gradients[gradient].type) {
-        if (((a - _ir) / s0 + 1) % gradients[gradient].type == 0) {
+        if (((a - COLOR_RULER_X) / s0 + 1) % gradients[gradient].type == 0) {
           wbox(toolbar, vga_width / big2, 19, c0, a, 10, s0 - 1, 1);
           wbox(toolbar, vga_width / big2, 19, c2, a, 11, s0 - 1, 6);
           wput(toolbar, vga_width / big2, 19, a + s1, 11, 32);
           wbox(toolbar, vga_width / big2, 19, c0, a - 1, 11, 1, 6);
           wbox(toolbar, vga_width / big2, 19, c0, a + s0 - 1, 11, 1, 6);
         }
-      } else if (a == _ir) {
+      } else if (a == COLOR_RULER_X) {
         wbox(toolbar, vga_width / big2, 19, c0, a, 10, s0 - 1, 1);
         wbox(toolbar, vga_width / big2, 19, c2, a, 11, s0 - 1, 6);
         wput(toolbar, vga_width / big2, 19, a + s1, 11, 32);
@@ -5323,7 +5323,7 @@ void draw_ruler(void) {
 
   wbox(toolbar, vga_width / big2, 19, color, 80, 2, 7, 8); // Color box, triggers select_color()
 
-  if (textura_color == NULL || draw_mode == 0) {
+  if (texture_color == NULL || draw_mode == 0) {
     n = (memptrsize)c1 * 3;
     med = dac[n] + dac[n + 1] + dac[n + 2];
     n = color * 3;
@@ -5570,8 +5570,8 @@ void zoom_map2(void) {
       n = w;
       do {
         *q++ = *(ghost + *p * 256 +
-                 textura_color[(x + textura_x) % texture_w +
-                               ((y + textura_y) % texture_h) * texture_w]);
+                 texture_color[(x + texture_x) % texture_w +
+                               ((y + texture_y) % texture_h) * texture_w]);
         x++;
         p++;
       } while (--n);
@@ -5588,8 +5588,8 @@ void zoom_map2(void) {
       n = w;
       do {
         c = *(ghost + *p * 256 +
-              textura_color[(x + textura_x) % texture_w +
-                            ((y + textura_y) % texture_h) * texture_w]);
+              texture_color[(x + texture_x) % texture_w +
+                            ((y + texture_y) % texture_h) * texture_w]);
         c += c * 256;
         *(word *)q = c;
         *(word *)(q + vga_width) = c;
@@ -5610,8 +5610,8 @@ void zoom_map2(void) {
       n = w;
       do {
         c = *(ghost + *p * 256 +
-              textura_color[(x + textura_x) % texture_w +
-                            ((y + textura_y) % texture_h) * texture_w]);
+              texture_color[(x + texture_x) % texture_w +
+                            ((y + texture_y) % texture_h) * texture_w]);
         c += c * 256;
         c += c * 65536;
         *(int *)q = c;
@@ -5638,8 +5638,8 @@ void zoom_map2(void) {
       n = w;
       do {
         c = *(ghost + *p * 256 +
-              textura_color[(x + textura_x) % texture_w +
-                            ((y + textura_y) % texture_h) * texture_w]);
+              texture_color[(x + texture_x) % texture_w +
+                            ((y + texture_y) % texture_h) * texture_w]);
         c += c * 256;
         c += c * 65536;
         *(int *)q = c;
@@ -5696,7 +5696,7 @@ int b_pulsada;
 void blit_edit(void) {
   int mx, my;
 
-  if (key(_X) && textura_color != NULL) {
+  if (key(_X) && texture_color != NULL) {
     zoom_region(0, 0, 32768, 32768);
     zoom_map2();
     blit_mouse();
@@ -5705,12 +5705,12 @@ void blit_edit(void) {
       my = mouse_y;
       read_mouse();
       if (mx != mouse_x || my != mouse_y) {
-        textura_x += mx - mouse_x;
-        textura_y += my - mouse_y;
-        if (textura_x < 0)
-          textura_x += texture_w;
-        if (textura_y < 0)
-          textura_y += texture_h;
+        texture_x += mx - mouse_x;
+        texture_y += my - mouse_y;
+        if (texture_x < 0)
+          texture_x += texture_w;
+        if (texture_y < 0)
+          texture_y += texture_h;
         zoom_region(0, 0, 32768, 32768);
         zoom_map2();
         blit_mouse();
@@ -5749,17 +5749,17 @@ void blit_edit(void) {
   select_mode();
 
   if (scan_code == _TAB) {
-    if (!_tab) {
-      _tab = 1;
+    if (!tab_cycling) {
+      tab_cycling = 1;
       if (key(_L_SHIFT) || key(_R_SHIFT))
         change_map(0);
       else
         change_map(1);
     }
   } else
-    _tab = 0;
+    tab_cycling = 0;
 
-  if (key(_B) && !(barra_texto && sel_status == 1)) {
+  if (key(_B) && !(text_bar_active && sel_status == 1)) {
     if (!b_pulsada) {
       b_pulsada = 1;
       highlight_background ^= 1;
@@ -5776,7 +5776,7 @@ void blit_edit(void) {
 //      Select another toolbar, from the edit screen
 //-----------------------------------------------------------------------------
 
-int iconos_mode[] = {14, 2, 177, 160, 161, 178, 162, 179, 163, 164, 180, 165, 131, 100, 191, 190};
+int icons_mode[] = {14, 2, 177, 160, 161, 178, 162, 179, 163, 164, 180, 165, 131, 100, 191, 190};
 
 void select_mode(void) {
   int r;
@@ -5842,12 +5842,12 @@ void select_mode(void) {
   }
 
   if (mode_selection == -1)
-    iconos_mode[12] = 131;
+    icons_mode[12] = 131;
   else if (mode_selection < 4)
-    iconos_mode[12] = 131 + mode_selection;
+    icons_mode[12] = 131 + mode_selection;
   else
-    iconos_mode[12] = mode_selection + 167 - 4;
-  r = select_icon(toolbar_x + 10, iconos_mode);
+    icons_mode[12] = mode_selection + 167 - 4;
+  r = select_icon(toolbar_x + 10, icons_mode);
   if (r >= 0)
     draw_mode = r + 100;
 }
@@ -5856,13 +5856,13 @@ void select_mode(void) {
 //      FX selection, from an editing toolbar
 //-----------------------------------------------------------------------------
 
-void select_fx(int n, int *efecto) {
-  int icono_x = toolbar_x + 48 + n * 16;
+void select_fx(int n, int *effect) {
+  int icon_x = toolbar_x + 48 + n * 16;
   int a, b, c, d;
   int ix, iy, wait = 0;
   byte *p;
 
-  if (mouse_in(icono_x, toolbar_y + 2, icono_x + 15, toolbar_y + 17) && (mouse_b & 1)) {
+  if (mouse_in(icon_x, toolbar_y + 2, icon_x + 15, toolbar_y + 17) && (mouse_b & 1)) {
     c = 88 * big2;
     d = 27 * big2;
     if ((p = (byte *)malloc(c * d)) == NULL) {
@@ -5873,7 +5873,7 @@ void select_fx(int n, int *efecto) {
 
     flush_bars(0);
 
-    a = toolbar_x + (icono_x - toolbar_x) * big2 - (c - 16 * big2) / 2;
+    a = toolbar_x + (icon_x - toolbar_x) * big2 - (c - 16 * big2) / 2;
     if (toolbar_y > vga_height / 2 - 9 * big2)
       b = toolbar_y - d - 1;
     else
@@ -5901,23 +5901,23 @@ void select_fx(int n, int *efecto) {
 
       wput(p, c, d, 2, 10, 33);
       wbox(p, c, d, c1, 12, 19, 64, 4);
-      wbox(p, c, d, c4, 12, 19, *efecto * 4, 4);
+      wbox(p, c, d, c4, 12, 19, *effect * 4, 4);
 
       if (mouse_in(a + 2, b + 18, a + 9, b + 25)) {
         mouse_graf = 4;
         if (mouse_b & 1) {
           wput(p, c, d, 2, 18, -47);
           wait = 1;
-          if (*efecto > 1)
-            (*efecto)--;
+          if (*effect > 1)
+            (*effect)--;
         }
       } else if (mouse_in(a + 79, b + 18, a + 86, b + 25)) {
         mouse_graf = 6;
         if (mouse_b & 1) {
           wput(p, c, d, 79, 18, -48);
           wait = 1;
-          if (*efecto < 16)
-            (*efecto)++;
+          if (*effect < 16)
+            (*effect)++;
         }
       } else if (mouse_in(a + 2, b + 10, a + 86, b + 25)) {
         if (mouse_x < a + 12)
@@ -5931,7 +5931,7 @@ void select_fx(int n, int *efecto) {
         wbox(p, c, d, c4, ix, 18, 1, 1);
         wbox(p, c, d, c4, ix, 23, 1, 1);
         if (mouse_b & 1) {
-          *efecto = iy;
+          *effect = iy;
           wait = 2;
         }
       } else if (mouse_in(a + 2, b + 2, a + c - 10, b + 9)) {
@@ -5956,7 +5956,7 @@ void select_fx(int n, int *efecto) {
 
       if (wait) {
         wbox(p, c, d, c1, 12, 19, 64, 4);
-        wbox(p, c, d, c4, 12, 19, *efecto * 4, 4);
+        wbox(p, c, d, c4, 12, 19, *effect * 4, 4);
       }
 
       blit_region(screen_buffer, vga_width, vga_height, p, a, b, c * big2, d * big2, 0);
@@ -5978,7 +5978,7 @@ void select_fx(int n, int *efecto) {
     } while ((!mouse_b || wait) && !key(_ESC));
 
     if (!mouse_in(toolbar_x, toolbar_y, toolbar_x + toolbar_width - 1, toolbar_y + 18) ||
-        !(mouse_b & 1) || mouse_in(icono_x, toolbar_y + 2, icono_x + 15, toolbar_y + 17)) {
+        !(mouse_b & 1) || mouse_in(icon_x, toolbar_y + 2, icon_x + 15, toolbar_y + 17)) {
       wput(p, c, d, c - 9, 2, -45);
       blit_region(screen_buffer, vga_width, vga_height, p, a, b, c * big2, d * big2, 0);
       blit_partial(a, b, c * big2, d * big2);
@@ -6007,10 +6007,10 @@ void select_fx(int n, int *efecto) {
 
 void select_fill(int n) {
   int r;
-  r = select_icon(toolbar_x + 48 + n * 16, iconos_fill);
+  r = select_icon(toolbar_x + 48 + n * 16, fill_icons);
   if (r >= 0) {
     mode_fill = r;
-    bar[n] = iconos_fill[2 + mode_fill];
+    bar[n] = fill_icons[2 + mode_fill];
     put_bar(48 + n * 16, 2, bar[n]);
   }
 }
@@ -6019,11 +6019,11 @@ void select_fill(int n) {
 //      Block selection algorithm, from an editing toolbar
 //-----------------------------------------------------------------------------
 
-int iconos_box[] = {6, 1, 135, 136, 137, 138, 169, 170};
+int icons_box[] = {6, 1, 135, 136, 137, 138, 169, 170};
 
 void select_box(int n) {
   int r;
-  r = select_icon(toolbar_x + 48 + n * 16, iconos_box);
+  r = select_icon(toolbar_x + 48 + n * 16, icons_box);
   if (r >= 0) {
     mode_selection = r;
     block_bar(0);
@@ -6034,15 +6034,15 @@ void select_box(int n) {
 //      Select from any icon list, in an editing toolbar
 //-----------------------------------------------------------------------------
 
-int select_icon(int icono_x, int *iconos) {
+int select_icon(int icon_x, int *icons) {
   int a, b, c, d;
   int num, col, fil;
   int r = -1, ix, iy;
   byte *p;
 
-  if (mouse_in(icono_x, toolbar_y + 2, icono_x + 15, toolbar_y + 17) && (mouse_b & 1)) {
-    num = *iconos++;
-    col = *iconos++;
+  if (mouse_in(icon_x, toolbar_y + 2, icon_x + 15, toolbar_y + 17) && (mouse_b & 1)) {
+    num = *icons++;
+    col = *icons++;
     fil = (num + col - 1) / col;
     c = (col * 16 + 3) * big2;
     d = (fil * 16 + 11) * big2;
@@ -6054,7 +6054,7 @@ int select_icon(int icono_x, int *iconos) {
 
     flush_bars(0);
 
-    a = toolbar_x + (icono_x - toolbar_x) * big2 - (col - 1) * 8 * big2 - 2 * big2;
+    a = toolbar_x + (icon_x - toolbar_x) * big2 - (col - 1) * 8 * big2 - 2 * big2;
     if (toolbar_y > vga_height / 2 - 9 * big2)
       b = toolbar_y - d - 1;
     else
@@ -6081,10 +6081,10 @@ int select_icon(int icono_x, int *iconos) {
 
       r = 0;
       while (r < num) {
-        wput(p, c, d, 2 + (r % col) * 16, 10 + (r / col) * 16, *iconos++);
+        wput(p, c, d, 2 + (r % col) * 16, 10 + (r / col) * 16, *icons++);
         r++;
       }
-      iconos -= num;
+      icons -= num;
 
       if (mouse_in(a + 2, b + 10, a + c - 2, b + d - 2)) {
         r = ((mouse_y - b - 10) / 16) * col + (mouse_x - a - 2) / 16;
@@ -6127,7 +6127,7 @@ int select_icon(int icono_x, int *iconos) {
       r = -1;
 
     if (!mouse_in(toolbar_x, toolbar_y, toolbar_x + toolbar_width - 1, toolbar_y + 18) ||
-        !(mouse_b & 1) || mouse_in(icono_x, toolbar_y + 2, icono_x + 15, toolbar_y + 17)) {
+        !(mouse_b & 1) || mouse_in(icon_x, toolbar_y + 2, icon_x + 15, toolbar_y + 17)) {
       wput(p, c, d, c - 9, 2, -45);
       blit_region(screen_buffer, vga_width, vga_height, p, a, b, c * big2, d * big2, 0);
       blit_partial(a, b, c * big2, d * big2);
@@ -6196,7 +6196,7 @@ void blit_mouse_b(void) {
 void select_mask(int n) {
   int x, y, col, oldcol, ix, iy;
   int a, b, c, d, i;
-  int salir;
+  int done;
   byte *p;
 
   if ((key(_M) && hotkey) ||
@@ -6222,7 +6222,7 @@ void select_mask(int n) {
       read_mouse();
     } while (mouse_b || key(_M));
 
-    salir = 0;
+    done = 0;
     col = color;
 
     do {
@@ -6289,7 +6289,7 @@ void select_mask(int n) {
           mask[*(map + coord_y * map_width + coord_x)] = 1;
           draw_ruler();
         } else
-          salir = 1;
+          done = 1;
       }
 
       blit_mouse_a();
@@ -6306,7 +6306,7 @@ void select_mask(int n) {
       wrectangle(p, c, d, c0, x, y, 9, 9);
       blit_partial(a + x * big2, b + y * big2, 9 * big2, 9 * big2);
 
-    } while (!(mouse_b & 2) && !key(_ESC) && !salir && !key(_M) && !exit_requested &&
+    } while (!(mouse_b & 2) && !key(_ESC) && !done && !key(_M) && !exit_requested &&
              !((mouse_b & 1) && mouse_in(a + c - 9, b + 2, a + c - 2, b + 9)));
 
     if (!mouse_in(toolbar_x, toolbar_y, toolbar_x + toolbar_width - 1, toolbar_y + 18) ||
@@ -6393,12 +6393,12 @@ extern char m3d_fpgcodesbr[max_texturas * w_textura];
 extern struct t_listboxbr ltexturasbr;
 extern struct _thumb_tex {
   int w, h;         // Width and height of the thumbnail
-  int RealAn, RealAl; // Width and height of the texture
+  int real_width, real_height; // Width and height of the texture
   char *ptr;          // ==NULL if the thumbnail has not started loading
   int status;         // 0-Not a valid texture, 1-Loaded
   int FilePos;
   int Code;
-  int Cuad;
+  int is_square;
 } thumb_tex[max_texturas];
 
 extern FILE *FilePaintFPG;
@@ -6411,12 +6411,12 @@ int TipoBrowser = 0;
 
 struct _thumb_map {   // Brush map thumbnails
   int w, h;         // Width and height of the thumbnail
-  int RealAn, RealAl; // Width and height of the texture
+  int real_width, real_height; // Width and height of the texture
   char *ptr;          // ==NULL if the thumbnail has not started loading
   int status;         // 0-Not a valid texture, 1-Loaded
   int FilePos;
   int Code;
-  int Cuad;
+  int is_square;
 } thumb_map[max_windows];
 
 void MapperBrowseFPG0(void);
@@ -6461,8 +6461,8 @@ int create_mapbr_thumbs(struct t_listboxbr *l) {
   l->total_items = m_maximo = n;
 
   for (con = 0; con < l->total_items; con++) {
-    man = thumb_map[con].RealAn = thumb_map[con].w;
-    mal = thumb_map[con].RealAl = thumb_map[con].h;
+    man = thumb_map[con].real_width = thumb_map[con].w;
+    mal = thumb_map[con].real_height = thumb_map[con].h;
     temp = (byte *)thumb_map[con].ptr;
 
     if (man <= 32 * big2 && mal <= 32 * big2) // The graphic is kept as-is
@@ -6543,8 +6543,8 @@ int create_mapbr_thumbs(struct t_listboxbr *l) {
 void select_color(int n) { // Icon number as parameter
   int x, y, col, oldcol, ix, iy;
   int a, b, c, d;
-  int salir, volcar;
-  int _gradient, boton;
+  int done, needs_redraw;
+  int _gradient, button;
   byte reg[33];
   byte pal[768], xchg[256];
   byte *p;
@@ -6564,8 +6564,8 @@ void select_color(int n) { // Icon number as parameter
     if (thumb_tex[num_tex].Code == 0 || !v_finished)
       return;
 
-    man = thumb_tex[num_tex].RealAn;
-    mal = thumb_tex[num_tex].RealAl;
+    man = thumb_tex[num_tex].real_width;
+    mal = thumb_tex[num_tex].real_height;
 
     if ((temp = (byte *)malloc(man * mal)) == NULL) {
       v_text = (char *)texts[45];
@@ -6578,11 +6578,11 @@ void select_color(int n) { // Icon number as parameter
         v_text = (char *)texts[44];
         show_dialog(err0);
       } else {
-        if (pincel != &pincel_por_defecto[0])
-          free(pincel);
-        tipo_pincel = 0;
-        num_pincel = num_tex;
-        pincel = temp;
+        if (brush != &default_brush[0])
+          free(brush);
+        brush_type = 0;
+        brush_index = num_tex;
+        brush = temp;
         temp = NULL;
         brush_w = man;
         brush_h = mal;
@@ -6591,15 +6591,15 @@ void select_color(int n) { // Icon number as parameter
         memcpy(pal, dac, 768);
         fread(pal, 1, 768, FilePaintFPG);
 
-        // Brush in {pincel, man x mal, pal}
+        // Brush in {brush, man x mal, pal}
 
         for (n = 0; n < 256; n++)
           xchg[n] = (pal[n * 3] + pal[n * 3 + 1] + pal[n * 3 + 2] + 3) / 12;
-        tipo_pincel = 0;
+        brush_type = 0;
         for (n = 0; n < man * mal; n++)
-          if ((pincel[n] = xchg[pincel[n]]))
-            if (pincel[n] != 16)
-              tipo_pincel = 1;
+          if ((brush[n] = xchg[brush[n]]))
+            if (brush[n] != 16)
+              brush_type = 1;
       }
     }
   }
@@ -6612,11 +6612,11 @@ void select_color(int n) { // Icon number as parameter
     show_dialog(MapperBrowseFPG0);
     if (v_finished) {
       num_tex = thumb_map[ltexturasbr.first_visible + ltexturasbr.zone - 10].Code;
-      textura_color = window[num_tex].mapa->map;
+      texture_color = window[num_tex].mapa->map;
       texture_w = window[num_tex].mapa->map_width;
       texture_h = window[num_tex].mapa->map_height;
-      textura_x = 0;
-      textura_y = 0;
+      texture_x = 0;
+      texture_y = 0;
     }
     memcpy(&ltexturasbr, &copia_br, sizeof(ltexturasbr));
     draw_ruler();
@@ -6641,10 +6641,10 @@ void select_color(int n) { // Icon number as parameter
     c /= big2;
     d /= big2;
 
-    salir = 0;
-    volcar = 1;
+    done = 0;
+    needs_redraw = 1;
     _gradient = -1;
-    boton = -1;
+    button = -1;
     col = color;
 
     do {
@@ -6679,7 +6679,7 @@ void select_color(int n) { // Icon number as parameter
             flush_bars(0);
           }
           wrectangle(p, c, d, c2, 0, 0, c, d);
-          volcar = 1;
+          needs_redraw = 1;
           test_mouse_box(a, b, c, d);
         }
       }
@@ -6690,16 +6690,16 @@ void select_color(int n) { // Icon number as parameter
           color = col;
           remove_texture();
           draw_ruler();
-          volcar = 1;
-        } else if (col != oldcol && volcar != 1)
-          volcar = 2;
-      } else if (col != oldcol && volcar != 1)
-        volcar = 2;
+          needs_redraw = 1;
+        } else if (col != oldcol && needs_redraw != 1)
+          needs_redraw = 2;
+      } else if (col != oldcol && needs_redraw != 1)
+        needs_redraw = 2;
 
       if ((mouse_b & 1) && mouse_in(a + 170, b + 10, a + 233, b + 128 + 9)) {
         gradient = (mouse_y - b - 10) / 8;
         draw_ruler();
-        volcar = 1;
+        needs_redraw = 1;
       }
 
       if ((mouse_b & 1) && mouse_in(a + 138, b + 140, a + 138 + 95, b + 140 + 15)) {
@@ -6710,9 +6710,9 @@ void select_color(int n) { // Icon number as parameter
         else
           x = 1;
 
-        if (gradient != _gradient || x != boton) {
+        if (gradient != _gradient || x != button) {
           _gradient = gradient;
-          boton = x;
+          button = x;
           switch (gradients[gradient].num_colors) {
           case 32:
             for (x = 0; x <= 32; x++)
@@ -6737,7 +6737,7 @@ void select_color(int n) { // Icon number as parameter
           reg[1] = gradients[gradient].colors[1];
         }
 
-        if (boton == 2) {
+        if (button == 2) {
           switch (gradients[gradient].type) {
           case 0:
             gradients[gradient].type = 1;
@@ -6756,7 +6756,7 @@ void select_color(int n) { // Icon number as parameter
             break;
           }
           gradients[gradient].fixed = 0;
-        } else if (boton == 0) {
+        } else if (button == 0) {
           switch (gradients[gradient].num_colors) {
           case 8:
             gradients[gradient].num_colors = 16;
@@ -6772,7 +6772,7 @@ void select_color(int n) { // Icon number as parameter
         } else
           gradients[gradient].fixed ^= 1;
 
-        if (boton == 0 || boton == 2)
+        if (button == 0 || button == 2)
           switch (gradients[gradient].num_colors) {
           case 8:
             for (x = 2; x <= 8; x++)
@@ -6792,12 +6792,12 @@ void select_color(int n) { // Icon number as parameter
           }
 
         draw_ruler();
-        volcar = 1;
+        needs_redraw = 1;
         do
           read_mouse();
         while (mouse_b & 1);
       } else if (!mouse_in(a + 138, b + 140, a + 138 + 95, b + 140 + 15))
-        boton = -1;
+        button = -1;
 
       if (editable_selection(&x, a + 10, b + 128 + 12))
         mouse_graf = 2;
@@ -6811,8 +6811,8 @@ void select_color(int n) { // Icon number as parameter
 
       // Blit: 0-Nothing (mouse), 1-Color info, 2-Entire window.
 
-      if (volcar == 1) {
-        volcar = 0;
+      if (needs_redraw == 1) {
+        needs_redraw = 0;
         flush_bars(0);
         paint_color_window(p, c, d);
         paint_window_colors2(p, c, d, col);
@@ -6821,8 +6821,8 @@ void select_color(int n) { // Icon number as parameter
         wrectangle(p, c, d, c4, x, y, 9, 9);
         blit_region(screen_buffer, vga_width, vga_height, p, a, b, c * big2, d * big2, 0);
         blit_partial(a, b, c * big2, d * big2);
-      } else if (volcar == 2) {
-        volcar = 0;
+      } else if (needs_redraw == 2) {
+        needs_redraw = 0;
         paint_window_colors2(p, c, d, col);
         x = 9 + (col % 16) * 8;
         y = 9 + (col / 16) * 8;
@@ -6850,12 +6850,12 @@ void select_color(int n) { // Icon number as parameter
           remove_texture();
         }
         draw_ruler();
-        volcar = 1;
+        needs_redraw = 1;
       }
 
       if ((mouse_b & 1) && !mouse_in(a, b, a + c - 1, b + d - 1)) {
         if (mouse_in(toolbar_x, toolbar_y, toolbar_x + toolbar_width - 1, toolbar_y + 18)) {
-          if (mouse_in(toolbar_x + _ir, toolbar_y, toolbar_x + _ir + 127, toolbar_y + 18)) {
+          if (mouse_in(toolbar_x + COLOR_RULER_X, toolbar_y, toolbar_x + COLOR_RULER_X + 127, toolbar_y + 18)) {
             if (editable(&x))
               gradients[gradient].colors[x] = color;
             else {
@@ -6863,10 +6863,10 @@ void select_color(int n) { // Icon number as parameter
               remove_texture();
             }
             draw_ruler();
-            volcar = 1;
-          } else if (mouse_in(toolbar_x + _ir - 8, toolbar_y, toolbar_x + _ir - 1,
+            needs_redraw = 1;
+          } else if (mouse_in(toolbar_x + COLOR_RULER_X - 8, toolbar_y, toolbar_x + COLOR_RULER_X - 1,
                               toolbar_y + 18)) {
-            if (textura_color != NULL) {
+            if (texture_color != NULL) {
               remove_texture();
               if (color != 0) {
                 color_c0 = color;
@@ -6884,14 +6884,14 @@ void select_color(int n) { // Icon number as parameter
             do {
               read_mouse();
             } while (mouse_b);
-            volcar = 1;
+            needs_redraw = 1;
           } else
-            salir = 1;
+            done = 1;
         } else
-          salir = 1;
+          done = 1;
       }
 
-    } while (!(mouse_b & 2) && !key(_ESC) && !salir && !key(_C) && !exit_requested &&
+    } while (!(mouse_b & 2) && !key(_ESC) && !done && !key(_C) && !exit_requested &&
              !((mouse_b & 1) && mouse_in(a + c - 9, b + 2, a + c - 2, b + 9)));
 
     if (!mouse_in(toolbar_x, toolbar_y, toolbar_x + toolbar_width - 1, toolbar_y + 18) ||
@@ -6917,7 +6917,7 @@ void select_color(int n) { // Icon number as parameter
   } else if ((ascii == '0' && hotkey) || (mouse_in(toolbar_x + 56 + n * 16, toolbar_y + 2,
                                                    toolbar_x + 62 + n * 16, toolbar_y + 10) &&
                                           (mouse_b & 1))) {
-    if (textura_color != NULL) {
+    if (texture_color != NULL) {
       remove_texture();
       if (color != 0) {
         color_c0 = color;
@@ -6976,7 +6976,7 @@ void select_color(int n) { // Icon number as parameter
 //  Animation (cycle maps with TAB and shift-TAB)
 //-----------------------------------------------------------------------------
 
-void change_map(int adelante) {
+void change_map(int forward) {
   int n, old = 0;
 
   if (back) {
@@ -7000,7 +7000,7 @@ void change_map(int adelante) {
   call(v.paint_handler);
   copy(-1, 0);
 
-  if (adelante) {
+  if (forward) {
     for (n = 1; n < max_windows; n++) {
       if (window[n].type == 100 && window[n].mapa->map_width == map_width &&
           window[n].mapa->map_height == map_height && window[n].foreground != 2) {
@@ -7240,7 +7240,7 @@ void move_bar(void) {
 //      Detect the zoom icon as the second toolbar icon
 //-----------------------------------------------------------------------------
 
-int iconos_zoom[] = {4, 1, 101, 102, 103, 104};
+int icons_zoom[] = {4, 1, 101, 102, 103, 104};
 
 void select_zoom(void) {
   int r = 0, z = 0;
@@ -7277,7 +7277,7 @@ void select_zoom(void) {
       zoom_cy = coord_y;
     }
   } else {
-    r = select_icon(toolbar_x + 48, iconos_zoom);
+    r = select_icon(toolbar_x + 48, icons_zoom);
     if (r >= 0)
       zoom = r;
   }
@@ -7415,7 +7415,7 @@ void move_zoom(void) {
 //      Draws the toolbar (with fixed sections: 'move','back','mode' and 'coords')
 //-----------------------------------------------------------------------------
 
-void draw_bar(int _an) {
+void draw_bar(int bar_width) {
   int n; // Number of icons
 
   draw_edit_background(toolbar_x - 4, toolbar_y, toolbar_width * big2 + 4, 19 * big2);
@@ -7423,7 +7423,7 @@ void draw_bar(int _an) {
   n = 0;
   while (bar[n])
     n++;
-  toolbar_width = 2 + 8 + 38 + n * 16 + 1 + _an;
+  toolbar_width = 2 + 8 + 38 + n * 16 + 1 + bar_width;
   memset(toolbar, c0, vga_width * 19 * big2);
   wrectangle(toolbar, vga_width / big2, 19, c2, 0, 0, toolbar_width, 19);
   wgra(toolbar, vga_width / big2, 19, c_b_low, 2, 2, 7, 7);
@@ -7555,67 +7555,67 @@ int new_bar(int w, int h) {
   int n;
 
   for (n = 0; n < 10; n++) {
-    if (!barras[n].on)
+    if (!toolbars[n].on)
       break;
   }
   if (n == 10)
     return (-1);
 
-  if ((barras[n].ptr = (byte *)malloc(w * big2 * h * big2)) == NULL) {
+  if ((toolbars[n].ptr = (byte *)malloc(w * big2 * h * big2)) == NULL) {
     v_text = (char *)texts[45];
     show_dialog(err0);
     return (-1);
   }
 
-  barras[n].on = 1;
-  barras[n].w = w;
-  barras[n].h = h;
+  toolbars[n].on = 1;
+  toolbars[n].w = w;
+  toolbars[n].h = h;
 
   w *= big2;
   h *= big2;
-  barras[n].x = toolbar_x;
+  toolbars[n].x = toolbar_x;
   if (toolbar_y > vga_height / 2 - 9 * big2)
-    barras[n].y = toolbar_y - h - 1;
+    toolbars[n].y = toolbar_y - h - 1;
   else
-    barras[n].y = toolbar_y + 19 * big2 + 1;
-  adjust_box(&barras[n].x, &barras[n].y, &w, &h);
+    toolbars[n].y = toolbar_y + 19 * big2 + 1;
+  adjust_box(&toolbars[n].x, &toolbars[n].y, &w, &h);
   w /= big2;
   h /= big2;
 
-  wrectangle(barras[n].ptr, w, h, c2, 0, 0, w, h);
-  wbox(barras[n].ptr, w, h, c0, 1, 1, w - 2, h - 2);
-  wgra(barras[n].ptr, w, h, c_b_low, 2, 2, w - 12, 7);
-  wput(barras[n].ptr, w, h, w - 9, 2, 35);
+  wrectangle(toolbars[n].ptr, w, h, c2, 0, 0, w, h);
+  wbox(toolbars[n].ptr, w, h, c0, 1, 1, w - 2, h - 2);
+  wgra(toolbars[n].ptr, w, h, c_b_low, 2, 2, w - 12, 7);
+  wput(toolbars[n].ptr, w, h, w - 9, 2, 35);
 
   return (0);
 }
 
-void flush_bars(int oscurecidas) {
+void flush_bars(int darkened) {
   int n;
 
   // The main toolbar is treated specially, it is always active
 
-  if (!oscurecidas)
+  if (!darkened)
     flush_bar(toolbar, vga_width, toolbar_x, toolbar_y, toolbar_width, 19);
   else
     flush_bar_darkened(toolbar, vga_width, toolbar_x, toolbar_y, toolbar_width, 19);
 
   for (n = 0; n < 10; n++)
-    if (barras[n].on) {
-      if (!oscurecidas) {
-        flush_bar(barras[n].ptr, barras[n].w, barras[n].x, barras[n].y, barras[n].w,
-                  barras[n].h);
+    if (toolbars[n].on) {
+      if (!darkened) {
+        flush_bar(toolbars[n].ptr, toolbars[n].w, toolbars[n].x, toolbars[n].y, toolbars[n].w,
+                  toolbars[n].h);
       } else {
-        flush_bar_darkened(barras[n].ptr, barras[n].w, barras[n].x, barras[n].y, barras[n].w,
-                           barras[n].h);
+        flush_bar_darkened(toolbars[n].ptr, toolbars[n].w, toolbars[n].x, toolbars[n].y, toolbars[n].w,
+                           toolbars[n].h);
       }
     }
 }
 
 void flush_bar(byte *p, int real_w, int x, int y, int w, int h) {
   byte *q;
-  int salta_x, long_x, resto_x;
-  int salta_y, long_y, resto_y;
+  int skip_x, copy_w, remain_x;
+  int skip_y, copy_h, remain_y;
 
   if (big) {
     w *= 2;
@@ -7627,44 +7627,44 @@ void flush_bar(byte *p, int real_w, int x, int y, int w, int h) {
   q = screen_buffer + y * vga_width + x;
 
   if (x < 0)
-    salta_x = -x;
+    skip_x = -x;
   else
-    salta_x = 0;
+    skip_x = 0;
   if (x + w > vga_width)
-    resto_x = x + w - vga_width;
+    remain_x = x + w - vga_width;
   else
-    resto_x = 0;
-  long_x = w - salta_x - resto_x;
+    remain_x = 0;
+  copy_w = w - skip_x - remain_x;
 
-  resto_x += real_w - w;
+  remain_x += real_w - w;
 
   if (y < 0)
-    salta_y = -y;
+    skip_y = -y;
   else
-    salta_y = 0;
+    skip_y = 0;
   if (y + h > vga_height)
-    resto_y = y + h - vga_height;
+    remain_y = y + h - vga_height;
   else
-    resto_y = 0;
-  long_y = h - salta_y - resto_y;
+    remain_y = 0;
+  copy_h = h - skip_y - remain_y;
 
-  p += vga_width * salta_y + salta_x;
-  q += vga_width * salta_y + salta_x;
-  resto_x += salta_x;
-  w = long_x;
+  p += vga_width * skip_y + skip_x;
+  q += vga_width * skip_y + skip_x;
+  remain_x += skip_x;
+  w = copy_w;
   do {
     do {
       *q++ = *p++;
     } while (--w);
-    q += vga_width - (w = long_x);
-    p += resto_x;
-  } while (--long_y);
+    q += vga_width - (w = copy_w);
+    p += remain_x;
+  } while (--copy_h);
 }
 
 void flush_bar_darkened(byte *p, int real_w, int x, int y, int w, int h) {
   byte *q;
-  int salta_x, long_x, resto_x;
-  int salta_y, long_y, resto_y;
+  int skip_x, copy_w, remain_x;
+  int skip_y, copy_h, remain_y;
 
   if (big) {
     w *= 2;
@@ -7676,38 +7676,38 @@ void flush_bar_darkened(byte *p, int real_w, int x, int y, int w, int h) {
   q = screen_buffer + y * vga_width + x;
 
   if (x < 0)
-    salta_x = -x;
+    skip_x = -x;
   else
-    salta_x = 0;
+    skip_x = 0;
   if (x + w > vga_width)
-    resto_x = x + w - vga_width;
+    remain_x = x + w - vga_width;
   else
-    resto_x = 0;
-  long_x = w - salta_x - resto_x;
+    remain_x = 0;
+  copy_w = w - skip_x - remain_x;
 
-  resto_x += real_w - w;
+  remain_x += real_w - w;
 
   if (y < 0)
-    salta_y = -y;
+    skip_y = -y;
   else
-    salta_y = 0;
+    skip_y = 0;
   if (y + h > vga_height)
-    resto_y = y + h - vga_height;
+    remain_y = y + h - vga_height;
   else
-    resto_y = 0;
-  long_y = h - salta_y - resto_y;
+    remain_y = 0;
+  copy_h = h - skip_y - remain_y;
 
-  p += vga_width * salta_y + salta_x;
-  q += vga_width * salta_y + salta_x;
-  resto_x += salta_x;
-  w = long_x;
+  p += vga_width * skip_y + skip_x;
+  q += vga_width * skip_y + skip_x;
+  remain_x += skip_x;
+  w = copy_w;
   do {
     do {
       *q++ = *(ghost + c0 * 256 + *p++);
     } while (--w);
-    q += vga_width - (w = long_x);
-    p += resto_x;
-  } while (--long_y);
+    q += vga_width - (w = copy_w);
+    p += remain_x;
+  } while (--copy_h);
 }
 
 //-----------------------------------------------------------------------------

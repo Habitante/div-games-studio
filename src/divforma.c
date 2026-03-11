@@ -111,26 +111,26 @@ int fmt_is_map(byte *buffer) {
 }
 
 void fmt_load_map(byte *buffer, byte *mapa, int vent) {
-  short npuntos;
+  short num_points;
   if (vent) {
     memcpy(&fpg_code, buffer + 12, 4);
     memcpy(MapDescription, buffer + 16, 32);
   }
 
   memcpy(dac4, buffer + 48, 768);
-  memcpy(&npuntos, buffer + 1392, 2);
+  memcpy(&num_points, buffer + 1392, 2);
 
   if (vent) {
     memcpy(gradients, buffer + 816, sizeof(gradients));
-    if (npuntos != 0)
-      memcpy(v_map->puntos, buffer + 1394, npuntos * 4);
+    if (num_points != 0)
+      memcpy(v_map->points, buffer + 1394, num_points * 4);
   }
 
-  memcpy(mapa, buffer + 1394 + (npuntos * 4), map_width * map_height);
+  memcpy(mapa, buffer + 1394 + (num_points * 4), map_width * map_height);
 }
 
 int fmt_save_map(byte *mapa, FILE *f) {
-  word x, npuntos = 0;
+  word x, num_points = 0;
   int y;
   int i;
 
@@ -146,16 +146,16 @@ int fmt_save_map(byte *mapa, FILE *f) {
   fwrite(dac, 768, 1, f);                               // +048 Palette
   fwrite(gradients, 1, sizeof(gradients), f);           // +816 Color gradients
 
-  npuntos = 0;
+  num_points = 0;
 
   for (i = 511; i >= 0; i -= 2)
-    if (window[v_window].mapa->puntos[i] != -1) {
-      npuntos = (i + 1) / 2;
+    if (window[v_window].mapa->points[i] != -1) {
+      num_points = (i + 1) / 2;
       i = -1;
     }
 
-  fwrite(&npuntos, 2, 1, f); // +1392 Number of control points
-  fwrite(&window[v_window].mapa->puntos, npuntos, 4, f);
+  fwrite(&num_points, 2, 1, f); // +1392 Number of control points
+  fwrite(&window[v_window].mapa->points, num_points, 4, f);
 
   y = map_width * map_height;
 
@@ -462,7 +462,7 @@ void fmt_load_pcx(byte *buffer, byte *mapa, int vent) {
   }
   if (vent) {
     for (x = 0; x < 512; x++)
-      v_map->puntos[x] = -1;
+      v_map->points[x] = -1;
     fpg_code = 0;
     MapDescription[0] = 0;
   }
@@ -907,7 +907,7 @@ void fmt_load_bmp(byte *buffer, byte *mapa, int vent) {
 
   if (vent) {
     for (x = 0; x < 512; x++)
-      v_map->puntos[x] = -1;
+      v_map->points[x] = -1;
     fpg_code = 0;
     MapDescription[0] = 0;
   }
@@ -1072,7 +1072,7 @@ int fmt_load_jpg(byte *buffer, byte *mapa, int vent, int img_filesize) {
 
   if (vent) {
     for (x = 0; x < 512; x++)
-      v_map->puntos[x] = -1;
+      v_map->points[x] = -1;
     fpg_code = 0;
     MapDescription[0] = 0;
   }

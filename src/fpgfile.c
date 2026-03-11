@@ -10,7 +10,7 @@ extern char cCodigo[5];
 extern char cFile[13];
 extern char Descrip[33];
 char *FPGimagen = NULL;
-short *FPGpuntos = NULL;
+short *fpg_points = NULL;
 
 char newdac[768];
 int NewDacLoaded = 0;
@@ -32,7 +32,7 @@ void fpg_read_image_header(HeadFPG *MiHeadFPG, FILE *fpg) {
   fread(MiHeadFPG->Filename, 1, 12, fpg);
   fread(&MiHeadFPG->Ancho, 1, 4, fpg);
   fread(&MiHeadFPG->Alto, 1, 4, fpg);
-  fread(&MiHeadFPG->nPuntos, 1, 4, fpg);
+  fread(&MiHeadFPG->num_points, 1, 4, fpg);
 
   FPGimagen = (char *)malloc(MiHeadFPG->Ancho * MiHeadFPG->Alto);
   if (FPGimagen == NULL) {
@@ -40,18 +40,18 @@ void fpg_read_image_header(HeadFPG *MiHeadFPG, FILE *fpg) {
     show_dialog(err0);
     return;
   }
-  if (MiHeadFPG->nPuntos != 0) {
-    FPGpuntos = (short *)malloc(MiHeadFPG->nPuntos * 4);
-    if (FPGpuntos == NULL) {
+  if (MiHeadFPG->num_points != 0) {
+    fpg_points = (short *)malloc(MiHeadFPG->num_points * 4);
+    if (fpg_points == NULL) {
       free(FPGimagen);
       FPGimagen = NULL;
       v_text = (char *)texts[45];
       show_dialog(err0);
       return;
     }
-    fread(FPGpuntos, MiHeadFPG->nPuntos * 2, 2, fpg);
+    fread(fpg_points, MiHeadFPG->num_points * 2, 2, fpg);
   } else
-    FPGpuntos = NULL;
+    fpg_points = NULL;
   fread(FPGimagen, MiHeadFPG->Ancho * MiHeadFPG->Alto, 1, fpg);
 }
 
@@ -190,26 +190,26 @@ int fpg_read_header(HeadFPG *MiHeadFPG, FILE *fpg) {
   fread(MiHeadFPG->Filename, 1, 12, fpg);
   fread(&MiHeadFPG->Ancho, 1, 4, fpg);
   fread(&MiHeadFPG->Alto, 1, 4, fpg);
-  if (fread(&MiHeadFPG->nPuntos, 1, 4, fpg) == 4)
+  if (fread(&MiHeadFPG->num_points, 1, 4, fpg) == 4)
     return 1;
   return 0;
 }
 
-void fpg_write_header(HeadFPG *MiHeadFPG, short *puntos, char *imagen, FILE *fpg) {
+void fpg_write_header(HeadFPG *MiHeadFPG, short *points, char *imagen, FILE *fpg) {
   fwrite(&MiHeadFPG->COD, 1, 4, fpg);
   fwrite(&MiHeadFPG->LONG, 1, 4, fpg);
   fwrite(MiHeadFPG->Descrip, 1, 32, fpg);
   fwrite(MiHeadFPG->Filename, 1, 12, fpg);
   fwrite(&MiHeadFPG->Ancho, 1, 4, fpg);
   fwrite(&MiHeadFPG->Alto, 1, 4, fpg);
-  fwrite(&MiHeadFPG->nPuntos, 1, 4, fpg);
-  if (MiHeadFPG->nPuntos != 0)
-    fwrite(puntos, MiHeadFPG->nPuntos * 4, 1, fpg);
+  fwrite(&MiHeadFPG->num_points, 1, 4, fpg);
+  if (MiHeadFPG->num_points != 0)
+    fwrite(points, MiHeadFPG->num_points * 4, 1, fpg);
   fwrite(imagen, MiHeadFPG->Ancho * MiHeadFPG->Alto, 1, fpg);
 }
 
-int fpg_add(FPG *Fpg, int COD, char *tDescrip, char *tFilename, int Ancho, int Alto, int nPuntos,
-               char *Puntos, char *Imagen, int BorrarAntiguo, int get_info) {
+int fpg_add(FPG *Fpg, int COD, char *tDescrip, char *tFilename, int Ancho, int Alto, int num_points,
+               char *points, char *Imagen, int BorrarAntiguo, int get_info) {
   int LONG, OLDCOD = COD, First = 1, n;
   FILE *fpg;
 
@@ -223,9 +223,9 @@ int fpg_add(FPG *Fpg, int COD, char *tDescrip, char *tFilename, int Ancho, int A
     GetCodeAncho = Ancho;
     GetCodeAlto = Alto;
     GetCodeImagen = Imagen;
-    if (nPuntos != 0) {
-      GetCodeP0x = *((short *)Puntos);
-      GetCodeP0y = *((short *)(Puntos + 2));
+    if (num_points != 0) {
+      GetCodeP0x = *((short *)points);
+      GetCodeP0y = *((short *)(points + 2));
     } else {
       GetCodeP0x = -1;
       GetCodeP0y = -1;
@@ -274,16 +274,16 @@ int fpg_add(FPG *Fpg, int COD, char *tDescrip, char *tFilename, int Ancho, int A
 
   fseek(fpg, 0, SEEK_END);
   Fpg->OffsGrf[COD] = ftell(fpg);
-  LONG = FPG_HEAD + (nPuntos * 4) + Ancho * Alto;
+  LONG = FPG_HEAD + (num_points * 4) + Ancho * Alto;
   fwrite(&COD, 1, 4, fpg);
   fwrite(&LONG, 1, 4, fpg);
   fwrite(Descrip, 1, 32, fpg);
   fwrite(cFile, 1, 12, fpg);
   fwrite(&Ancho, 1, 4, fpg);
   fwrite(&Alto, 1, 4, fpg);
-  fwrite(&nPuntos, 1, 4, fpg);
-  if (nPuntos != 0)
-    fwrite(Puntos, nPuntos * 4, 1, fpg);
+  fwrite(&num_points, 1, 4, fpg);
+  if (num_points != 0)
+    fwrite(points, num_points * 4, 1, fpg);
   fwrite((byte *)Imagen, Ancho * Alto, 1, fpg);
   fclose(fpg);
 
@@ -322,7 +322,7 @@ int fpg_remap_to_pal(FPG *Fpg) {
   HeadFPG MiOtraHeadFPG;
   char ActualPath[_MAX_PATH + 14];
   char *OtraImagen;
-  short *OtrosPuntos = NULL;
+  short *other_points = NULL;
   byte tmp[768];
   int x;
   FILE *fpg;
@@ -367,9 +367,9 @@ int fpg_remap_to_pal(FPG *Fpg) {
       return 0;
     }
     // Check memory
-    if (MiOtraHeadFPG.nPuntos != 0) {
-      OtrosPuntos = (short *)malloc(MiOtraHeadFPG.nPuntos * 4);
-      if (OtrosPuntos == NULL) {
+    if (MiOtraHeadFPG.num_points != 0) {
+      other_points = (short *)malloc(MiOtraHeadFPG.num_points * 4);
+      if (other_points == NULL) {
         fclose(fpg);
         fclose(Oldfpg);
         free(OtraImagen);
@@ -377,17 +377,17 @@ int fpg_remap_to_pal(FPG *Fpg) {
         show_dialog(err0);
         return 0;
       }
-      fread(OtrosPuntos, MiOtraHeadFPG.nPuntos * 2, 2, fpg);
+      fread(other_points, MiOtraHeadFPG.num_points * 2, 2, fpg);
     }
     fread(OtraImagen, MiOtraHeadFPG.Ancho * MiOtraHeadFPG.Alto, 1, fpg);
     for (y = 0; y < MiOtraHeadFPG.Ancho * MiOtraHeadFPG.Alto; y++)
       OtraImagen[y] = MiTabla[OtraImagen[y]];
 
-    fpg_write_header(&MiOtraHeadFPG, OtrosPuntos, OtraImagen, Oldfpg);
+    fpg_write_header(&MiOtraHeadFPG, other_points, OtraImagen, Oldfpg);
 
     free(OtraImagen);
-    if (MiOtraHeadFPG.nPuntos != 0)
-      free(OtrosPuntos);
+    if (MiOtraHeadFPG.num_points != 0)
+      free(other_points);
   }
   fclose(Oldfpg);
   fclose(fpg);
@@ -471,7 +471,7 @@ int fpg_delete(FPG *Fpg,
   HeadFPG MiOtraHeadFPG;
   char ActualPath[_MAX_PATH + 14];
   char *OtraImagen;
-  short *OtrosPuntos = NULL;
+  short *other_points = NULL;
   byte tmp[768];
   int x, len, n;
   FILE *fpg;
@@ -535,9 +535,9 @@ int fpg_delete(FPG *Fpg,
       return 0;
     }
     // Check memory
-    if (MiOtraHeadFPG.nPuntos != 0) {
-      OtrosPuntos = (short *)malloc(MiOtraHeadFPG.nPuntos * 4);
-      if (OtrosPuntos == NULL) {
+    if (MiOtraHeadFPG.num_points != 0) {
+      other_points = (short *)malloc(MiOtraHeadFPG.num_points * 4);
+      if (other_points == NULL) {
         Progress((char *)texts[436], len, len);
         fclose(fpg);
         fclose(Oldfpg);
@@ -546,22 +546,22 @@ int fpg_delete(FPG *Fpg,
         show_dialog(err0);
         return 0;
       }
-      fread(OtrosPuntos, MiOtraHeadFPG.nPuntos * 2, 2, fpg);
+      fread(other_points, MiOtraHeadFPG.num_points * 2, 2, fpg);
     }
     fread(OtraImagen, MiOtraHeadFPG.Ancho * MiOtraHeadFPG.Alto, 1, fpg);
 
     // *************************
 
     if (MiOtraHeadFPG.COD != COD) {
-      fpg_write_header(&MiOtraHeadFPG, OtrosPuntos, OtraImagen, Oldfpg);
+      fpg_write_header(&MiOtraHeadFPG, other_points, OtraImagen, Oldfpg);
     }
 
     // *************************
 
     free(OtraImagen);
 
-    if (MiOtraHeadFPG.nPuntos != 0)
-      free(OtrosPuntos);
+    if (MiOtraHeadFPG.num_points != 0)
+      free(other_points);
   }
   fclose(Oldfpg);
   fclose(fpg);
@@ -586,7 +586,7 @@ int fpg_delete_many(FPG *Fpg, int taggeds, int *array_del) {
   HeadFPG MiOtraHeadFPG;
   char ActualPath[_MAX_PATH + 14];
   char *OtraImagen;
-  short *OtrosPuntos = NULL;
+  short *other_points = NULL;
   byte tmp[768];
   int x, y, len, n;
   FILE *fpg;
@@ -635,9 +635,9 @@ int fpg_delete_many(FPG *Fpg, int taggeds, int *array_del) {
       return 0;
     }
 
-    if (MiOtraHeadFPG.nPuntos != 0) { // Check memory
-      OtrosPuntos = (short *)malloc(MiOtraHeadFPG.nPuntos * 4);
-      if (OtrosPuntos == NULL) {
+    if (MiOtraHeadFPG.num_points != 0) { // Check memory
+      other_points = (short *)malloc(MiOtraHeadFPG.num_points * 4);
+      if (other_points == NULL) {
         Progress((char *)texts[436], len, len);
         fclose(fpg);
         fclose(Oldfpg);
@@ -646,7 +646,7 @@ int fpg_delete_many(FPG *Fpg, int taggeds, int *array_del) {
         show_dialog(err0);
         return 0;
       }
-      fread(OtrosPuntos, MiOtraHeadFPG.nPuntos * 2, 2, fpg);
+      fread(other_points, MiOtraHeadFPG.num_points * 2, 2, fpg);
     }
 
     fread(OtraImagen, MiOtraHeadFPG.Ancho * MiOtraHeadFPG.Alto, 1, fpg);
@@ -659,7 +659,7 @@ int fpg_delete_many(FPG *Fpg, int taggeds, int *array_del) {
     }
 
     if (y == taggeds) {
-      fpg_write_header(&MiOtraHeadFPG, OtrosPuntos, OtraImagen, Oldfpg);
+      fpg_write_header(&MiOtraHeadFPG, other_points, OtraImagen, Oldfpg);
     } else {
       n = 0;
       while (1) {
@@ -679,8 +679,8 @@ int fpg_delete_many(FPG *Fpg, int taggeds, int *array_del) {
 
     free(OtraImagen);
 
-    if (MiOtraHeadFPG.nPuntos != 0)
-      free(OtrosPuntos);
+    if (MiOtraHeadFPG.num_points != 0)
+      free(other_points);
   }
 
   fclose(Oldfpg);

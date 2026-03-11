@@ -32,7 +32,7 @@ typedef struct {
   char filename[12];
   int width;
   int height;
-  int puntos;
+  int points;
 } FPG_info;
 
 typedef struct {
@@ -42,7 +42,7 @@ typedef struct {
 
 typedef struct {
   FPG_info info;
-  FPG_points *puntos;
+  FPG_points *points;
   byte *imagen;
 } FPG_data;
 
@@ -91,12 +91,12 @@ struct t_listboxbr ltexturasbr = {3 - 2, 11 - 2, m3d_fpgcodesbr, w_textura, 4, 4
 
 struct _thumb_tex {
   int w, h;
-  int RealAn, RealAl;
+  int real_width, real_height;
   char *ptr;
   int status;
   int FilePos;
   int Code;
-  int Cuad;
+  int is_square;
 } thumb_tex[max_texturas];
 
 extern int _omx, _omy, omx, omy, oclock, num, incremento;
@@ -114,16 +114,16 @@ int t_pulsada = 1;
 
 float zoom_level;
 
-extern int num_pincel;
+extern int brush_index;
 extern int TipoBrowser;
 extern struct _thumb_map {
   int w, h;
-  int RealAn, RealAl;
+  int real_width, real_height;
   char *ptr;
   int status;
   int FilePos;
   int Code;
-  int Cuad;
+  int is_square;
 } thumb_map[];
 
 //-----------------------------------------------------------------------------
@@ -259,15 +259,15 @@ void M3D_create_thumbs(struct t_listboxbr *l, int prog) {
         return;
       }
     }
-    fseek(FPG_F, sizeof(FPG_points) * FPG_D.info.puntos, SEEK_CUR);
-    FPG_progress.pos += (64 + 4 * FPG_D.info.puntos + FPG_D.info.width * FPG_D.info.height);
+    fseek(FPG_F, sizeof(FPG_points) * FPG_D.info.points, SEEK_CUR);
+    FPG_progress.pos += (64 + 4 * FPG_D.info.points + FPG_D.info.width * FPG_D.info.height);
     if (prog)
       Progress((char *)texts[93], FPG_progress.pos, FPG_progress.total);
 
-    thumb_tex[n].Cuad = 0;
+    thumb_tex[n].is_square = 0;
     for (con = 0; con < 11; con++) {
       if (FPG_D.info.width == tex_sop[con] && FPG_D.info.height == tex_sop[con]) {
-        thumb_tex[n].Cuad = 1;
+        thumb_tex[n].is_square = 1;
       }
     }
 
@@ -276,7 +276,7 @@ void M3D_create_thumbs(struct t_listboxbr *l, int prog) {
     thumb_tex[n].Code = FPG_D.info.cod;
 
     DIV_SPRINTF(cwork, "%03d", FPG_D.info.cod);
-    if (thumb_tex[n].Cuad) {
+    if (thumb_tex[n].is_square) {
       div_strcpy(textura + t_maximo * w_textura, w_textura, cwork);
       t_maximo++;
     }
@@ -326,8 +326,8 @@ void M3D_create_thumbs(struct t_listboxbr *l, int prog) {
   // In paint mode, start from index 0 (no empty texture slot)
   for (con = 0; con < l->total_items; con++) {
     for (;;) {
-      man = thumb_tex[con].RealAn = thumb_tex[con].w;
-      mal = thumb_tex[con].RealAl = thumb_tex[con].h;
+      man = thumb_tex[con].real_width = thumb_tex[con].w;
+      mal = thumb_tex[con].real_height = thumb_tex[con].h;
       temp = (byte *)thumb_tex[con].ptr;
 
       if (man <= 32 * big2 && mal <= 32 * big2) {
@@ -488,7 +488,7 @@ void M3D_show_thumb(struct t_listboxbr *l, int num) {
     }
 
     if (TipoBrowser != MAPBR) {
-      if (draw_mode < 100 && num_tex == num_pincel) {
+      if (draw_mode < 100 && num_tex == brush_index) {
         wbox(ptr, w, h, c_b_low, px, py + l->h - 8, l->w, 8);
       }
 
@@ -803,11 +803,11 @@ void MapperBrowseFPG2(void) {
     if (ltexturasbr.zone >= 10) {
       // Paint mode only (draw_mode<100) - 3D map mode removed
       if (TipoBrowser == BRUSH) {
-        old_pincel = num_pincel;
-        num_pincel = ltexturasbr.first_visible + ltexturasbr.zone - 10;
+        old_pincel = brush_index;
+        brush_index = ltexturasbr.first_visible + ltexturasbr.zone - 10;
         M3D_show_thumb(&ltexturasbr, old_pincel);
-        M3D_show_thumb(&ltexturasbr, num_pincel);
-        num_pincel = old_pincel;
+        M3D_show_thumb(&ltexturasbr, brush_index);
+        brush_index = old_pincel;
       }
       FPG_thumbpos = 0;
       v_finished = 1;

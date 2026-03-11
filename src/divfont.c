@@ -1654,7 +1654,7 @@ void CreateText() {
   // 6 - Initialize control points and graphic code
 
   for (n = 0; n < 512; n++)
-    v.mapa->puntos[n] = -1;
+    v.mapa->points[n] = -1;
 
   v.mapa->fpg_code = 0;
 

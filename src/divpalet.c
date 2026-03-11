@@ -32,12 +32,12 @@ int fmt_load_dac_pal(char *name);
 //      Module global variables
 //-----------------------------------------------------------------------------
 
-struct t_tpuntos { // For ghost table creation
+struct t_tpoints { // For ghost table creation
   int r, g, b;
-  struct t_tpuntos *next;
-} tpuntos[256];
+  struct t_tpoints *next;
+} tpoints[256];
 
-struct t_tpuntos *vcubos[512]; // For ghost table creation
+struct t_tpoints *vcubos[512]; // For ghost table creation
 
 byte _r, _g, _b, find_col; // Palette calculations
 
@@ -45,7 +45,7 @@ int find_min; // Nearest color calculation
 
 byte paleta[768];
 
-int num_puntos;
+int num_points;
 
 //-----------------------------------------------------------------------------
 //      Find the environment colors c0..c4 for main_loop
@@ -118,18 +118,18 @@ void init_ghost(void) {
   }
 
   for (n = 0; n < 256; n++) {
-    tpuntos[n].r = *d++ * 4;
-    tpuntos[n].g = *d++ * 4;
-    tpuntos[n].b = *d++ * 4;
-    m = (((int)tpuntos[n].r & 224) << 1) + (((int)tpuntos[n].g & 224) >> 2) +
-        ((int)tpuntos[n].b >> 5);
+    tpoints[n].r = *d++ * 4;
+    tpoints[n].g = *d++ * 4;
+    tpoints[n].b = *d++ * 4;
+    m = (((int)tpoints[n].r & 224) << 1) + (((int)tpoints[n].g & 224) >> 2) +
+        ((int)tpoints[n].b >> 5);
 
     if (vcubos[m] == NULL) {
-      vcubos[m] = &tpuntos[n];
-      tpuntos[n].next = NULL;
+      vcubos[m] = &tpoints[n];
+      tpoints[n].next = NULL;
     } else {
-      tpuntos[n].next = vcubos[m];
-      vcubos[m] = &tpuntos[n];
+      tpoints[n].next = vcubos[m];
+      vcubos[m] = &tpoints[n];
     }
   }
 }
@@ -150,13 +150,13 @@ byte fast_find_color(byte fr, byte fg, byte fb) {
   b3 = (b & 0x3800) >> 11;
   vcubo = r3 + g3 + b3;
   find_min = 65536;
-  num_puntos = 0;
+  num_points = 0;
 
   // Distance cubes sqr(0) --------------------------------------------
 
   create_ghost_vc(vcubo);
 
-  if (num_puntos > 1)
+  if (num_points > 1)
     goto fast_find;
 
   // Distance cubes sqr(1) --------------------------------------------
@@ -174,7 +174,7 @@ byte fast_find_color(byte fr, byte fg, byte fb) {
   if (b3 < 7)
     create_ghost_vc(vcubo + 1);
 
-  if (num_puntos > 2)
+  if (num_points > 2)
     goto fast_find;
 
   // Distance cubes sqr(2) --------------------------------------------
@@ -233,7 +233,7 @@ fast_find:
 //      Ghost table creation function
 //-----------------------------------------------------------------------------
 
-void create_ghost(int puntos) {
+void create_ghost(int points) {
   int n, m, punto = 0;
   int r3, g3, b3, vcubo;
   byte *ptr;
@@ -258,13 +258,13 @@ void create_ghost(int puntos) {
       vcubo = r3 + g3 + b3;
 
       find_min = 65536;
-      num_puntos = 0;
+      num_points = 0;
 
       // Distance cubes sqr(0) --------------------------------------------
 
       create_ghost_vc(vcubo);
 
-      if (num_puntos > 1)
+      if (num_points > 1)
         goto fast_ghost;
 
       // Distance cubes sqr(1) --------------------------------------------
@@ -282,7 +282,7 @@ void create_ghost(int puntos) {
       if (b3 < 7)
         create_ghost_vc(vcubo + 1);
 
-      if (num_puntos > 2)
+      if (num_points > 2)
         goto fast_ghost;
 
       // Distance cubes sqr(2) --------------------------------------------
@@ -337,7 +337,7 @@ fast_ghost:
       *(ghost + n * 256 + m) = find_col;
       *(ghost + m * 256 + n) = find_col;
 
-      if (puntos) {
+      if (points) {
         if ((punto++ & 2047) == 0) {
           cprintf(".");
         }
@@ -348,24 +348,24 @@ fast_ghost:
   do {
     *(ghost + n * 256 + n) = n;
   } while (++n < 256);
-  if (puntos) {
+  if (points) {
     cprintf(".\r\n");
   }
 }
 
 void create_ghost_vc(int m) {
   int dif;
-  struct t_tpuntos *p;
+  struct t_tpoints *p;
 
   if ((p = vcubos[m]) != NULL)
     do {
-      num_puntos++;
+      num_points++;
       dif = *(int *)(color_lookup + r + (*p).r);
       dif += *(int *)(color_lookup + g + (*p).g);
       dif += *(int *)(color_lookup + b + (*p).b);
       if (dif < find_min) {
         find_min = dif;
-        find_col = ((byte *)p - (byte *)tpuntos) / sizeof(struct t_tpuntos);
+        find_col = ((byte *)p - (byte *)tpoints) / sizeof(struct t_tpoints);
       }
     } while ((p = (*p).next) != NULL);
 }

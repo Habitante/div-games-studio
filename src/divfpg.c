@@ -11,7 +11,7 @@ char cCodigo[5];
 char cFile[13];
 char Descrip[33];
 extern char *FPGimagen;
-extern short *FPGpuntos;
+extern short *fpg_points;
 
 extern char newdac[768];
 extern int NewDacLoaded;
@@ -52,7 +52,7 @@ void load_thumbs(void) {
 
 void FPG2(void) {
   int x, y, n;
-  int COD, nPuntos, Elemento;
+  int COD, num_points, Elemento;
   FPG *MiFPG = (FPG *)v.aux;
   FILE *fpg;
   char tDescrip[32];
@@ -126,16 +126,16 @@ void FPG2(void) {
       if (COD > 999)
         COD = 1;
     }
-    nPuntos = 0;
+    num_points = 0;
     for (x = 511; x >= 0; x -= 2) {
-      if (window[1].mapa->puntos[x] != -1) {
-        nPuntos = (x + 1) / 2;
+      if (window[1].mapa->points[x] != -1) {
+        num_points = (x + 1) / 2;
         x = -1;
       }
     }
     fpg_add(MiFPG, COD, (char *)tDescrip, (char *)window[1].mapa->filename,
-               window[1].mapa->map_width, window[1].mapa->map_height, nPuntos,
-               (char *)window[1].mapa->puntos, (char *)window[1].mapa->map, 0, 1);
+               window[1].mapa->map_width, window[1].mapa->map_height, num_points,
+               (char *)window[1].mapa->points, (char *)window[1].mapa->map, 0, 1);
 
     for (n = 0; n < 1000; n++)
       MiFPG->thumb[n].tagged = 0;
@@ -163,13 +163,13 @@ void FPG2(void) {
     if (FPGimagen) {
       fpg_add(MiFPG, MiFPG->MiHeadFPG.COD, (char *)MiFPG->MiHeadFPG.Descrip,
                  (char *)MiFPG->MiHeadFPG.Filename, MiFPG->MiHeadFPG.Ancho, MiFPG->MiHeadFPG.Alto,
-                 MiFPG->MiHeadFPG.nPuntos, (char *)FPGpuntos, FPGimagen, 1, 1);
+                 MiFPG->MiHeadFPG.num_points, (char *)fpg_points, FPGimagen, 1, 1);
     }
 
     if (FPGimagen)
       free(FPGimagen);
-    if (FPGpuntos)
-      free(FPGpuntos);
+    if (fpg_points)
+      free(fpg_points);
     v.redraw = 1;
     return;
   }
@@ -229,16 +229,16 @@ void FPG2(void) {
     v.mapa->map_width = MiFPG->MiHeadFPG.Ancho;
     v.mapa->map_height = MiFPG->MiHeadFPG.Alto;
 
-    v.mapa->TengoNombre = 2;
+    v.mapa->has_name = 2;
     v.mapa->fpg_code = MiFPG->MiHeadFPG.COD;
     memcpy(v.mapa->description, MiFPG->MiHeadFPG.Descrip, 32);
     memset(v.mapa->filename, 0, 13);
     memcpy(v.mapa->filename, MiFPG->MiHeadFPG.Filename, 12);
 
     for (x = 0; x < 512; x++)
-      v.mapa->puntos[x] = -1;
-    if (MiFPG->MiHeadFPG.nPuntos)
-      fread(v.mapa->puntos, MiFPG->MiHeadFPG.nPuntos, 4, fpg);
+      v.mapa->points[x] = -1;
+    if (MiFPG->MiHeadFPG.num_points)
+      fread(v.mapa->points, MiFPG->MiHeadFPG.num_points, 4, fpg);
     fread(v.mapa->map, map_width, map_height, fpg);
     fclose(fpg);
 
@@ -917,17 +917,17 @@ void Show_Taggeds() {
         return;
       }
 
-      v.mapa->TengoNombre = 1;
+      v.mapa->has_name = 1;
       v.mapa->fpg_code = MiFPG->MiHeadFPG.COD;
       memcpy(v.mapa->description, MiFPG->MiHeadFPG.Descrip, 32);
       memset(v.mapa->filename, 0, 13);
       memcpy(v.mapa->filename, MiFPG->MiHeadFPG.Filename, 12);
 
       for (x = 0; x < 512; x++)
-        v.mapa->puntos[x] = -1;
+        v.mapa->points[x] = -1;
 
-      if (MiFPG->MiHeadFPG.nPuntos)
-        fread(v.mapa->puntos, MiFPG->MiHeadFPG.nPuntos, 4, fpg);
+      if (MiFPG->MiHeadFPG.num_points)
+        fread(v.mapa->points, MiFPG->MiHeadFPG.num_points, 4, fpg);
 
       fread(v.mapa->map, map_width, map_height, fpg);
       fclose(fpg);
@@ -1566,7 +1566,7 @@ void create_thumb_FPG(struct t_listboxbr *l) {
       if ((f = fopen((char *)MiFPG->ActualFile, "rb")) != NULL) {
         fseek(f, MiFPG->OffsGrf[MiFPG->DesIndex[num]], SEEK_SET);
         fpg_read_header(&(MiFPG->MiHeadFPG), f);
-        fseek(f, MiFPG->MiHeadFPG.nPuntos * 4, SEEK_CUR);
+        fseek(f, MiFPG->MiHeadFPG.num_points * 4, SEEK_CUR);
         MiFPG->thumb[num].w = MiFPG->MiHeadFPG.Ancho;
         MiFPG->thumb[num].h = MiFPG->MiHeadFPG.Alto;
         MiFPG->thumb[num].filesize = MiFPG->MiHeadFPG.Ancho * MiFPG->MiHeadFPG.Alto;
@@ -1613,7 +1613,7 @@ void create_thumb_FPG(struct t_listboxbr *l) {
       if ((f = fopen((char *)MiFPG->ActualFile, "rb")) != NULL) {
         fseek(f, MiFPG->OffsGrf[MiFPG->DesIndex[num]], SEEK_SET);
         fpg_read_header(&(MiFPG->MiHeadFPG), f);
-        fseek(f, MiFPG->MiHeadFPG.nPuntos * 4, SEEK_CUR);
+        fseek(f, MiFPG->MiHeadFPG.num_points * 4, SEEK_CUR);
         fseek(f, MiFPG->thumb[num].status, SEEK_CUR);
 
         if (MiFPG->thumb[num].filesize - MiFPG->thumb[num].status > incremento) {
@@ -1911,10 +1911,10 @@ void FPGtoMAP(FPG *MiFPG) {
     fseek(fpg, MiFPG->OffsGrf[MiFPG->DesIndex[num]], SEEK_SET);
     fseek(fpg, 60, SEEK_CUR);
 
-    fread(&MiHeadFPG.nPuntos, 1, 4, fpg);
+    fread(&MiHeadFPG.num_points, 1, 4, fpg);
 
-    if (MiHeadFPG.nPuntos != 0)
-      fseek(fpg, MiHeadFPG.nPuntos * 4, SEEK_CUR);
+    if (MiHeadFPG.num_points != 0)
+      fseek(fpg, MiHeadFPG.num_points * 4, SEEK_CUR);
 
     if ((FPGimagen = (byte *)malloc((lgraf[num].w - 2) * (lgraf[num].h - 2))) == NULL) {
       fclose(fpg);

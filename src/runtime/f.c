@@ -734,7 +734,7 @@ void descomprime_PCX(byte *buffer, byte *mapa) {
 }
 
 void load_map(void) {
-  int width, height, npuntos, m;
+  int width, height, num_points, m;
   byte *ptr, *buffer;
   pcx_header header;
 
@@ -801,15 +801,15 @@ mapfuera:
 
     width = *(word *)(ptr + 8);
     height = *(word *)(ptr + 10);
-    npuntos = *(word *)(ptr + 1392);
+    num_points = *(word *)(ptr + 1392);
 
-    adapt_palette(ptr + 1394 + npuntos * 4, width * height, ptr + 48, NULL);
+    adapt_palette(ptr + 1394 + num_points * 4, width * height, ptr + 48, NULL);
 
     ptr = ptr + 1394 - 64;
 
     *((int *)ptr + 13) = width;
     *((int *)ptr + 14) = height;
-    *((int *)ptr + 15) = npuntos;
+    *((int *)ptr + 15) = num_points;
 
     while (g[0].grf[next_map_code]) {
       if (next_map_code++ == 1999)
@@ -822,7 +822,7 @@ mapfuera:
     memcpy((byte *)&header, ptr, sizeof(pcx_header));
     width = header.xmax - header.xmin + 1;
     height = header.ymax - header.ymin + 1;
-    npuntos = 0;
+    num_points = 0;
 
     if ((!width && !height) || width < 0 || height < 0) {
       e(144);
@@ -841,7 +841,7 @@ mapfuera:
 
     *((int *)buffer + 13) = width;
     *((int *)buffer + 14) = height;
-    *((int *)buffer + 15) = npuntos;
+    *((int *)buffer + 15) = num_points;
 
     while (g[0].grf[next_map_code]) {
       if (next_map_code++ == 1999)

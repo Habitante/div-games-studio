@@ -5,7 +5,7 @@ typedef struct _HeadFPG{
         uint8_t Filename[12];
         int  Ancho;
         int  Alto;
-        int  nPuntos;
+        int  num_points;
 }HeadFPG;
 
 #define FPG_HEAD 64
@@ -30,12 +30,12 @@ typedef struct _FPG{
 
         void fpg_sort(FPG *Fpg);
         int fpg_read_header(HeadFPG *MiHeadFPG,FILE *fpg);
-        void fpg_write_header(HeadFPG *MiHeadFPG,short *puntos,char *imagen,FILE *fpg);
+        void fpg_write_header(HeadFPG *MiHeadFPG,short *points,char *imagen,FILE *fpg);
         void CreateListBox(FPG *Fpg);
 
         void fpg_create(FPG *Fpg,char *Name);
         int fpg_open(FPG *Fpg,char *Name);
-        int fpg_add(FPG *Fpg,int COD,char *tDescrip,char *tFilename,int Ancho,int Alto,int nPuntos,char *Puntos,char *Imagen,int BorrarAntiguo, int get_info);
+        int fpg_add(FPG *Fpg,int COD,char *tDescrip,char *tFilename,int Ancho,int Alto,int num_points,char *points,char *Imagen,int BorrarAntiguo, int get_info);
         int fpg_delete(FPG *Fpg,int COD);
         void fpg_read_image_header(HeadFPG *MiHeadFPG,FILE *fpg);
         int RemapAllFile(FPG *Fpg);

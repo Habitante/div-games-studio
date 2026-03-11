@@ -1974,29 +1974,29 @@ extern struct t_listboxbr lthumbmapbr;
 
 extern struct _thumb_tex {
   int w, h;         // Width and height of the thumbnail
-  int RealAn, RealAl; // Width and height of the texture
+  int real_width, real_height; // Width and height of the texture
   char *ptr;          // ==NULL if the thumbnail has not started loading
   int status;         // 0-Not a valid texture, 1-Loaded
   int FilePos;
   int Code;
-  int Cuad;
+  int is_square;
 } thumb_tex[max_texturas];
 
 extern struct _thumb_map {
   int w, h;         // Width and height of the thumbnail
-  int RealAn, RealAl; // Width and height of the texture
+  int real_width, real_height; // Width and height of the texture
   char *ptr;          // ==NULL if the thumbnail has not started loading
   int status;         // 0-Not a valid texture, 1-Loaded
   int FilePos;
   int Code;
-  int Cuad;
+  int is_square;
 } thumb_map[max_windows];
 
 void M3D_create_thumbs(struct t_listboxbr *l, int prog);
 int create_mapbr_thumbs(struct t_listboxbr *l);
 void FreePaintThumbs(void);
 
-extern byte *textura_color;
+extern byte *texture_color;
 
 FILE *FilePaintFPG;
 
@@ -2117,7 +2117,7 @@ void mapa2(void) {
       div_strcat(full, sizeof(full), "/");
     div_strcat(full, sizeof(full), "system/brush.fpg");
 
-    textura_color = NULL;
+    texture_color = NULL;
 
     TipoTex = 0;
     if ((FilePaintFPG = fopen(full, "rb")) != NULL) // NOTE !!! Could provide message here
@@ -3229,11 +3229,11 @@ int new_map(byte *mapilla) {
       *v_map->path = '\0';
       v_map->map_width = map_width;
       v_map->map_height = map_height;
-      v_map->TengoNombre = 0;
+      v_map->has_name = 0;
       v_map->fpg_code = 0;
       v_map->description[0] = 0;
       for (n = 0; n < 512; n++)
-        v_map->puntos[n] = -1;
+        v_map->points[n] = -1;
       if (MustCreate)
         new_window(mapa0);
 
@@ -3424,10 +3424,10 @@ void open_map(void) {
                 memset(v_map, 0, sizeof(struct tmapa));
 
                 if ((v_map->map = (byte *)malloc(map_width * map_height + map_width)) != NULL) {
-                  v_map->TengoNombre = 0; // No description by default
+                  v_map->has_name = 0; // No description by default
 
                   for (x = 0; x < 512; x++)
-                    v_map->puntos[x] = -1;
+                    v_map->points[x] = -1;
 
                   x = 1;
                   switch (tipomapa) {
@@ -3485,10 +3485,10 @@ void open_map(void) {
                   div_strcpy(v_map->filename, sizeof(v_map->filename), input);
                   div_strcpy(v_map->path, sizeof(v_map->path), tipo[v_type].path);
                   memcpy(v_map->description, MapDescription, 32);
-                  v_map->TengoNombre = 0;
+                  v_map->has_name = 0;
                   v_map->fpg_code = fpg_code;
                   if (fpg_code)
-                    v_map->TengoNombre = 1;
+                    v_map->has_name = 1;
                   v_map->map_width = map_width;
                   v_map->map_height = map_height;
 
@@ -3817,7 +3817,7 @@ void Reducex2() {
   v.mapa->zoom_y = fy;
 
   for (n = 0; n < 512; n++)
-    v.mapa->puntos[n] = -1;
+    v.mapa->points[n] = -1;
   v.mapa->fpg_code = 0;
   call((voidReturnType)v.paint_handler);
   blit_region(screen_buffer, vga_width, vga_height, v.ptr, v.x, v.y, v.w, v.h, 0);
@@ -4275,7 +4275,7 @@ void AplieX(struct tmapa *MiMap, int man, int mal) {
   v.mapa->zoom_y = y;
 
   for (n = 0; n < 512; n++)
-    v.mapa->puntos[n] = -1;
+    v.mapa->points[n] = -1;
   v.mapa->fpg_code = 0;
   call((voidReturnType)v.paint_handler);
   blit_region(screen_buffer, vga_width, vga_height, v.ptr, v.x, v.y, v.w, v.h, 0);
