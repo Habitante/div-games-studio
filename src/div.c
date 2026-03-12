@@ -453,11 +453,11 @@ int main(int argc, char *argv[]) {
   file_types[2].ext = "*.* *.MAP *.PCX *.BMP *.JPG *.JPE *.PNG *.GIF *.TGA *.TIF"; // Maps browser
   file_types[3].ext =
       "*.* *.PAL *.FPG *.FNT *.MAP *.BMP *.PCX *.JPG *.PNG *.GIF *.TGA *.TIF"; // Palette Browser
-  file_types[4].ext = "*.FPG *.*";                                                   // FPG FILES
-  file_types[5].ext = "*.FNT *.*";                                                   // FNT FILES
-  file_types[6].ext = "*.IFS *.*";                                                   // IFS Font templates
-  file_types[7].ext = "*.* *.7 *.WAV *.PCM *.MP3 *.OGG *.FLAC";                      // Audio files
-  file_types[8].ext = "*.PRG *.*";                                                   // Program files
+  file_types[4].ext = "*.FPG *.*";                                             // FPG FILES
+  file_types[5].ext = "*.FNT *.*";                                             // FNT FILES
+  file_types[6].ext = "*.IFS *.*";                                             // IFS Font templates
+  file_types[7].ext = "*.* *.7 *.WAV *.PCM *.MP3 *.OGG *.FLAC";                // Audio files
+  file_types[8].ext = "*.PRG *.*";                                             // Program files
 
   file_types[9].ext = "*.* *.JPG *.PNG *.BMP *.TIF"; // wallpaper files
 

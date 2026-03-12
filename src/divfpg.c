@@ -1001,7 +1001,8 @@ void delete_tagged() {
 
   wup(vent);
 
-  while (MiFPG->list_info.first_visible + (MiFPG->list_info.lines - 1) * MiFPG->list_info.columns + 1 >
+  while (MiFPG->list_info.first_visible + (MiFPG->list_info.lines - 1) * MiFPG->list_info.columns +
+             1 >
          MiFPG->list_info.total_items) {
     MiFPG->list_info.first_visible -= MiFPG->list_info.columns;
   }
@@ -1136,8 +1137,8 @@ void print_list(void) {
           fread(&cab, 1, sizeof(cab), g);
           memset(cwork2, 0, 13);
           memcpy(cwork2, cab.Filename, 12);
-          div_snprintf(cwork, sizeof(cwork), "[%03d] %s (%s, %dx%d)", cab.code, cab.description, cwork2,
-                       cab.width, cab.height);
+          div_snprintf(cwork, sizeof(cwork), "[%03d] %s (%s, %dx%d)", cab.code, cab.description,
+                       cwork2, cab.width, cab.height);
           if (f_ar) {
             fwrite(cwork, 1, strlen(cwork), f);
             fwrite("\xd\xa", 1, 2, f);

@@ -550,7 +550,7 @@ GLOBAL_DATA int map_width, map_height; // Dimensions of the edited map
 GLOBAL_DATA int vga_width, vga_height; // Video mode (id vga_width*1000+vga_height, e.g. 320200)
 GLOBAL_DATA int vwidth, vheight;       // Window Screen Size
 
-GLOBAL_DATA int fpg_code;            // Map code
+GLOBAL_DATA int fpg_code;             // Map code
 GLOBAL_DATA char map_description[32]; // Map description
 
 GLOBAL_DATA byte *wallpaper;     // Background graphic for the window main_loop
@@ -753,20 +753,20 @@ struct twindow {
   byte *name;     // Icon name
   byte *title;    // Title bar text
   void_return_type_t paint_handler, click_handler, close_handler;
-  int x, y, w, h;                // Window position and dimensions
+  int x, y, w, h;                 // Window position and dimensions
   int _x, _y, _w_saved, _h_saved; // Position saved when minimized
-  byte *ptr;                     // Window buffer
-  struct tmapa *mapa;            // Pointer to associated map struct
-  struct tprg *prg;              // Pointer to associated program struct
-  int redraw;                    // Needs-redraw flag
-  int state;                     // Button/item state
-  int buttons;                   // Pressed buttons bitmask
-  byte *aux;                     // Auxiliary pointer for miscellaneous data
-  struct t_item item[max_items]; // Buttons, gets, switches, etc.
-  int items;                     // Number of defined items
-  int active_item;               // Which item triggered an action
-  int selected_item;             // Currently selected item (for keyboard)
-  int side;                      // 0 Right, 1 Left (auto-place on double-click)
+  byte *ptr;                      // Window buffer
+  struct tmapa *mapa;             // Pointer to associated map struct
+  struct tprg *prg;               // Pointer to associated program struct
+  int redraw;                     // Needs-redraw flag
+  int state;                      // Button/item state
+  int buttons;                    // Pressed buttons bitmask
+  byte *aux;                      // Auxiliary pointer for miscellaneous data
+  struct t_item item[max_items];  // Buttons, gets, switches, etc.
+  int items;                      // Number of defined items
+  int active_item;                // Which item triggered an action
+  int selected_item;              // Currently selected item (for keyboard)
+  int side;                       // 0 Right, 1 Left (auto-place on double-click)
   int exploding;
 };
 
@@ -865,7 +865,7 @@ GLOBAL_DATA int next_code; // Code for next created map
 GLOBAL_DATA int exit_requested;
 
 //GLOBAL_DATA
-struct file_type_info {             // Information for each file type
+struct file_type_info {    // Information for each file type
   char path[PATH_MAX + 1]; // Default path
   char *ext;               // Extensions e.g.: "*.MAP *.PCX *.*"
   int default_choice;      // Default extension selection
@@ -873,11 +873,11 @@ struct file_type_info {             // Information for each file type
 };
 
 GLOBAL_DATA struct file_type_info file_types[24]; // Paths 0-(current working directory),
-                                   // 1-(path d.exe), 2-MAP, 3-PAL, 4-FPG, 5-FNT,
-                                   // 6-IFS, 7-PCM, 8-PRG, 9-MAP(wallpapers),
-                                   // 10-PAL(?), 11-PCM(save as,?), 12-PRJ,
-                                   // 13-(generic *.*), 14-MAP(save), 15-WLD
-                                   // 16-Music module
+                                                  // 1-(path d.exe), 2-MAP, 3-PAL, 4-FPG, 5-FNT,
+                                                  // 6-IFS, 7-PCM, 8-PRG, 9-MAP(wallpapers),
+                                                  // 10-PAL(?), 11-PCM(save as,?), 12-PRJ,
+                                                  // 13-(generic *.*), 14-MAP(save), 15-WLD
+                                                  // 16-Music module
 
 GLOBAL_DATA char drives[26 + 1];
 

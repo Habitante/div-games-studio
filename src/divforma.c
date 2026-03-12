@@ -446,7 +446,7 @@ void fmt_load_pcx(byte *buffer, byte *mapa, int vent) {
           rgb_green = *(pSrc + header.bytes_per_line);
           rgb_blue = *(pSrc + header.bytes_per_line * 2);
           *pDest = sample[((rgb_red & 0xF8) << 7) | ((rgb_green & 0xF8) << 2) |
-                           ((rgb_blue & 0xF8) >> 3)];
+                          ((rgb_blue & 0xF8) >> 3)];
           pDest++;
           pSrc++;
         }
@@ -892,7 +892,7 @@ void fmt_load_bmp(byte *buffer, byte *mapa, int vent) {
           rgb_green = ((RGBQUAD *)pSrc)->rgbGreen;
           rgb_blue = ((RGBQUAD *)pSrc)->rgbBlue;
           *pDest = sample[((rgb_red & 0xF8) << 7) | ((rgb_green & 0xF8) << 2) |
-                           ((rgb_blue & 0xF8) >> 3)];
+                          ((rgb_blue & 0xF8) >> 3)];
           pDest++;
           pSrc += 3;
         }

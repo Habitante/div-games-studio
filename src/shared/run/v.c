@@ -514,7 +514,7 @@ int save_MAP(byte *mapa, int w, int h, FILE *f) {
   y = 1;
   fwrite(&y, 4, 1, f); // +012 Code
 
-  fwrite(cwork, 32, 1, f);   // +016 Description
+  fwrite(cwork, 32, 1, f);    // +016 Description
   fwrite(palette, 768, 1, f); // +048 Palette
 
   for (y = 0; y < 16; y++) {

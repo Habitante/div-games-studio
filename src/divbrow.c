@@ -1511,7 +1511,8 @@ void browser0(void) {
   if (v_type == 11)
     v_type = 7;
 
-  if (file_types[v_type].default_choice >= 0 && file_types[v_type].default_choice < lextbr.total_items)
+  if (file_types[v_type].default_choice >= 0 &&
+      file_types[v_type].default_choice < lextbr.total_items)
     div_strcpy(input, sizeof(input), &ext[w_ext * file_types[v_type].default_choice]);
   else
     div_strcpy(input, sizeof(input), &ext[0]);

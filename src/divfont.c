@@ -159,7 +159,8 @@ void Fonts2(void) {
     break;
   case 2:
   case 3:
-    if ((atoi(font_height_str) < 16 || atoi(font_width_str) < 16) && atoi(font_height_str) != atoi(font_width_str)) {
+    if ((atoi(font_height_str) < 16 || atoi(font_width_str) < 16) &&
+        atoi(font_height_str) != atoi(font_width_str)) {
       if (atoi(font_height_str) < 16) {
         DIV_STRCPY(font_height_str, "16");
         font_height_gen = 16;
@@ -418,7 +419,8 @@ void Fonts2(void) {
 
   update_listbox(&lfontsizes);
   if ((lfontsizes.zone >= 10) && (mouse_b & 1)) {
-    font_width_gen = font_height_gen = fontTamanos[(lfontsizes.zone - 10) + lfontsizes.first_visible];
+    font_width_gen = font_height_gen =
+        fontTamanos[(lfontsizes.zone - 10) + lfontsizes.first_visible];
     DIV_SPRINTF(font_height_str, "%d", font_height_gen);
     DIV_SPRINTF(font_width_str, "%d", font_width_gen);
     call((void_return_type_t)v.paint_handler);
@@ -534,10 +536,10 @@ void Fonts0(void) {
   DIV_SPRINTF(font_height_str, "%d", font_height_gen);
   DIV_SPRINTF(font_width_str, "%d", font_width_gen);
 
-  _button(121, 74, 16, 0);                              //15
-  _button(121, 74, 35, 0);                              //16
-  _get(133, 88, 11, 19, (byte *)font_width_str, 4, 16, 128); //1
-  _get(134, 88, 30, 19, (byte *)font_height_str, 4, 16, 128);  //2
+  _button(121, 74, 16, 0);                                    //15
+  _button(121, 74, 35, 0);                                    //16
+  _get(133, 88, 11, 19, (byte *)font_width_str, 4, 16, 128);  //1
+  _get(134, 88, 30, 19, (byte *)font_height_str, 4, 16, 128); //2
 
   _button(111, 7 + 60, 61, 0);  //4
   _button(110, 37 + 60, 61, 0); //5

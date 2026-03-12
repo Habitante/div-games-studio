@@ -674,14 +674,14 @@ GLOBAL fnt_info f_i[max_fonts];
 #define max_texts 256 // Maximum number of texts at runtime
 
 typedef struct _t_text_display {
-  int type;   // Text type: 0=normal, 1=&variable
-  byte *font; // Pointer to font (byte h,car[256].an/.dir,data...)
-  int x, y;   // Text coordinates
-  int ptr;    // Text content
+  int type;      // Text type: 0=normal, 1=&variable
+  byte *font;    // Pointer to font (byte h,car[256].an/.dir,data...)
+  int x, y;      // Text coordinates
+  int ptr;       // Text content
   int alignment; // Alignment type: 0=left, 1=centered, ...
-  int region; // Clipping region
-  int x0, y0; // Region occupied by the text
-  int w, h;   // For partial screen blits
+  int region;    // Clipping region
+  int x0, y0;    // Region occupied by the text
+  int w, h;      // For partial screen blits
 } t_text;
 
 GLOBAL t_text texts[max_texts + 1];
@@ -693,12 +693,12 @@ GLOBAL t_text texts[max_texts + 1];
 #define max_drawings 16384 // Maximum number of primitives at runtime
 
 typedef struct _t_drawing {
-  int type;       // Primitive type: 0=n/a, 1=line, ...
-  int color;      // Primitive color
+  int type;    // Primitive type: 0=n/a, 1=line, ...
+  int color;   // Primitive color
   int opacity; // 0=minimum ... 15=opaque
-  int region;     // Clipping region
-  int x0, y0;     // Top-left coordinate of the primitive
-  int x1, y1;     // Bottom-right coordinate of the primitive
+  int region;  // Clipping region
+  int x0, y0;  // Top-left coordinate of the primitive
+  int x1, y1;  // Bottom-right coordinate of the primitive
 } t_drawing;
 
 GLOBAL t_drawing drawing[max_drawings];

@@ -471,7 +471,7 @@ void ord_paleta0(void) {
   create_dac4();
   for (n = 0; n < 256; n++)
     palette[n] = find_color(original_palette[n * 3], original_palette[n * 3 + 1],
-                           original_palette[n * 3 + 2]);
+                            original_palette[n * 3 + 2]);
 }
 
 void ord_paleta1(void) {

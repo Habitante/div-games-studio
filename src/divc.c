@@ -2251,7 +2251,8 @@ lex_scan:
 
     if (name_index.b[0] != '.' && (name_index.b[0] != '/' && name_index.b[1] != 0) &&
         strcmp("/", (char *)name_index.b) && (f = div_open_file((char *)name_index.b)) != NULL) {
-      fprintf(stdout, "FOUND FILE: [%s] [%s] [%s]\n", (char *)name_index.b, full, (char *)&file_types[8]);
+      fprintf(stdout, "FOUND FILE: [%s] [%s] [%s]\n", (char *)name_index.b, full,
+              (char *)&file_types[8]);
 
       empaquetable = 0;
 

@@ -1623,7 +1623,8 @@ fntfuera:
 
     if (f_i[ifonts].fonpal != palcrc) {
       adapt_palette(fonts[ifonts] + 1356 + sizeof(fnt_table_entry) * 256,
-                    f_i[ifonts].len - 1356 - sizeof(fnt_table_entry) * 256, fonts[ifonts] + 8, NULL);
+                    f_i[ifonts].len - 1356 - sizeof(fnt_table_entry) * 256, fonts[ifonts] + 8,
+                    NULL);
     }
 
     f_i[ifonts].syspal = palcrc;
@@ -1685,7 +1686,8 @@ void __write(void) {
     x++;
     if (x == max_texts)
       break;
-    if (pila[sp - 1] == texts[x].alignment && pila[sp - 2] == texts[x].y && pila[sp - 3] == texts[x].x)
+    if (pila[sp - 1] == texts[x].alignment && pila[sp - 2] == texts[x].y &&
+        pila[sp - 3] == texts[x].x)
       break;
   }
 
@@ -1727,7 +1729,8 @@ void write_int(void) {
     x++;
     if (x == max_texts)
       break;
-    if (pila[sp - 1] == texts[x].alignment && pila[sp - 2] == texts[x].y && pila[sp - 3] == texts[x].x)
+    if (pila[sp - 1] == texts[x].alignment && pila[sp - 2] == texts[x].y &&
+        pila[sp - 3] == texts[x].x)
       break;
   }
   if (x < max_texts) {

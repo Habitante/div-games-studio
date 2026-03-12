@@ -3628,7 +3628,8 @@ void save_map(void) {
   }
 
   if (!e) { // Update the path and name of the saved map/window
-    div_strcpy(window[v_window].mapa->path, sizeof(window[v_window].mapa->path), file_types[v_type].path);
+    div_strcpy(window[v_window].mapa->path, sizeof(window[v_window].mapa->path),
+               file_types[v_type].path);
     div_strcpy(window[v_window].mapa->filename, sizeof(window[v_window].mapa->filename), input);
     wgra(window[v_window].ptr, w, h, c_b_low, 2, 2, w - 20, 7);
     if (text_len(window[v_window].title) + 3 > w - 20) {

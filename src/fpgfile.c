@@ -135,8 +135,8 @@ int fpg_open(FPG *Fpg, char *Name) {
   while (fpg_read_header(&kkhead, fpg)) {
     Fpg->grf_offsets[kkhead.code] = ftell(fpg) - FPG_HEAD;
     Fpg->desc_index[Fpg->nIndex] = kkhead.code;
-    div_snprintf((char *)Fpg->code_desc[Fpg->nIndex++], sizeof(Fpg->code_desc[0]), "%c %03d %s", 255,
-                 kkhead.code, kkhead.description);
+    div_snprintf((char *)Fpg->code_desc[Fpg->nIndex++], sizeof(Fpg->code_desc[0]), "%c %03d %s",
+                 255, kkhead.code, kkhead.description);
     fseek(fpg, Fpg->grf_offsets[kkhead.code] + kkhead.length, SEEK_SET);
   }
 
@@ -175,7 +175,8 @@ void fpg_sort(FPG *Fpg) {
         Fpg->desc_index[j + 1] = iWork;
 
         div_strcpy(cWork, sizeof(cWork), (char *)Fpg->code_desc[j]);
-        div_strcpy((char *)Fpg->code_desc[j], sizeof(Fpg->code_desc[j]), (char *)Fpg->code_desc[j + 1]);
+        div_strcpy((char *)Fpg->code_desc[j], sizeof(Fpg->code_desc[j]),
+                   (char *)Fpg->code_desc[j + 1]);
         div_strcpy((char *)Fpg->code_desc[j + 1], sizeof(Fpg->code_desc[j + 1]), cWork);
       }
     }
