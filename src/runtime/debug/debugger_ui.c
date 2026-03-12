@@ -40,7 +40,7 @@ void show_dialog(void_return_type_t init_handler) {
     w = v.w;
     h = v.h;
 
-    if (no_volcar_nada) {
+    if (skip_flush) {
       x = profiler_x;
       y = profiler_y;
     } else {
@@ -291,7 +291,7 @@ void modal_loop(void) {
     // End of the main loop
     //-------------------------------------------------------------------------
 
-    if (!no_volcar_nada) {
+    if (!skip_flush) {
       flush_copy();
     }
 
@@ -349,7 +349,7 @@ void close_window(void) {
     wput(v.ptr, v.w, v.h, v.w - 9, 2, -45);
   flush_window(0);
   blit_partial(v.x, v.y, v.w, v.h);
-  if (!no_volcar_nada) {
+  if (!skip_flush) {
     flush_copy();
   }
   free(v.ptr);
@@ -398,7 +398,7 @@ void move_window(void) {
     update_box(x, y, w, h);
     v.type = 1;
     flush_window(0);
-    if (!no_volcar_nada) {
+    if (!skip_flush) {
       flush_copy();
     }
   } while (mouse_b & 1);
@@ -1193,7 +1193,7 @@ void wtexc(byte *dest, int dest_pitch, int dest_width, int dest_height, byte *p,
 void explode(int x, int y, int w, int h) {
   int n = 0, tipo = v.type, b = big;
   int xx, yy, aan, aal;
-  if (no_volcar_nada)
+  if (skip_flush)
     return;
   v.type = 0;
   big = 0;
@@ -1219,7 +1219,7 @@ void explode(int x, int y, int w, int h) {
 void implode(int x, int y, int w, int h) {
   int n = 9, b = big;
   int xx, yy, aan, aal;
-  if (no_volcar_nada)
+  if (skip_flush)
     return;
   big = 0;
   do {
@@ -1243,7 +1243,7 @@ void implode(int x, int y, int w, int h) {
 void extrude(int x, int y, int w, int h, int x2, int y2, int w2, int h2) {
   int n = 9, tipo = v.type, b = big;
   int xx, yy, aan, aal;
-  if (no_volcar_nada)
+  if (skip_flush)
     return;
   v.type = 0;
   big = 0;

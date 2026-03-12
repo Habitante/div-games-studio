@@ -151,7 +151,7 @@ void pcm2(void) {
 
   if (mouse_b & 1) {
     if (!sound_active) {
-      if (SoundError) {
+      if (sound_error) {
         v_text = (char *)texts[549];
         show_dialog(errhlp0);
         if (v_accept)

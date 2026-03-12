@@ -115,7 +115,7 @@ Token types (selected):
 
 | Token | Hex | Meaning |
 |-------|-----|---------|
-| `p_ultima` | 0x00 | End of file |
+| `p_end_of_file` | 0x00 | End of file |
 | `p_program` | 0x01 | `PROGRAM` keyword |
 | `p_const` | 0x02 | `CONST` section |
 | `p_global` | 0x03 | `GLOBAL` section |

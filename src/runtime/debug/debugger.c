@@ -17,7 +17,7 @@ char combo_error[128]; // buffer for composing compound error messages
 
 extern float m_x, m_y;
 
-int no_volcar_nada = 0;
+int skip_flush = 0;
 int profiler_x, profiler_y;
 
 int show_items_called = 0;
@@ -30,17 +30,17 @@ int line0;    // First line number in the debugger code window
 byte *pline0; // Pointer to the first line in the debugger code window
 
 int mem1, mem2;                       // Bounds of the current statement in the mem[] array
-int line1, columna1, line2, columna2; // Bounds of the current statement
+int line1, col1, line2, col2; // Bounds of the current statement
 
 int line_sel; // Selected line number
 
-int x_inicio = 54; // Initial x offset in the source code window
+int x_start = 54; // Initial x offset in the source code window
 
 //--------------------------------------------------------------------------
 
 int smouse_x, smouse_y, mouse_x = 0, mouse_y = 0, mouse_b;
 
-int reloj_debug;
+int debug_clock;
 int ticks_debug;
 
 //----------------------------------------------------------------------------
@@ -51,7 +51,7 @@ int ids_old = 0, ids_inc;
 byte *source = NULL, *end_source = NULL;
 
 int *dbg_lines = NULL;
-int num_sentencias;
+int num_statements;
 
 //----------------------------------------------------------------------------
 //      Debugger variables
@@ -157,7 +157,7 @@ void init_debug(void) {
       fseek(f, 0, SEEK_SET);
       fread(dbg_lines, 1, n, f);
       fclose(f);
-      num_sentencias = n / (6 * 4);
+      num_statements = n / (6 * 4);
     } else {
       fclose(f);
       exer(1);
@@ -1069,7 +1069,7 @@ void debug(void) {
   smouse_y = mouse->y;
   set_mouse(mouse_x, mouse_y);
 
-  reloj_debug = frame_clock;
+  debug_clock = frame_clock;
   ticks_debug = ticks;
 
   dr = dacout_r;
@@ -1086,7 +1086,7 @@ void debug(void) {
   dacout_g = dg;
   dacout_b = db;
 
-  frame_clock = reloj_debug;
+  frame_clock = debug_clock;
   ticks = ticks_debug;
 
   set_mouse(smouse_x, smouse_y);

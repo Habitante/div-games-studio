@@ -12,7 +12,7 @@ void col_analyze_ltlex(void);
 #define max_obj     768 // Maximum compiler object count
 #define long_med_id 16  // Average identifier length (+4+4+1)
 
-#define max_nodos 128 // Maximum lexer symbol nodes
+#define max_nodes 128 // Maximum lexer symbol nodes
 
 #define cr  13 // Carriage return
 #define lf  10 // Line feed
@@ -25,7 +25,7 @@ void col_analyze_ltlex(void);
 #define l_lit 4 // Literal
 #define l_num 5 // Numeric constant
 
-#define p_ultima 0x00 // End of file <EOF>
+#define p_end_of_file 0x00 // End of file <EOF>
 
 #define p_process 0x07 // Process
 
@@ -49,7 +49,7 @@ struct clex_ele {
   byte token;
   struct clex_ele *alternative;
   struct clex_ele *next;
-} clex_symbols[max_nodos], *iclex_symbols, *clex_case[256];
+} clex_symbols[max_nodes], *iclex_symbols, *clex_case[256];
 
 int cnum_nodos; // Number of nodes used in clex_symbols
 
@@ -139,7 +139,7 @@ void color_lex(void) {
   case l_cr:
     if ((*++_source) == lf)
       _source++;
-    color_token = p_ultima;
+    color_token = p_end_of_file;
     break; // NOTE: EOL/EOF handling inherited from DIV Professional
 
   case l_id:
@@ -356,7 +356,7 @@ void col_analyze_ltlex(void) {
         clex_case[*buf] = (struct clex_ele *)l_lit;
       } else { //Parse a new symbol
         if ((e = clex_case[*buf]) == 0) {
-          if (cnum_nodos++ == max_nodos)
+          if (cnum_nodos++ == max_nodes)
             col_error(0, 3);
           e = clex_case[*buf] = iclex_symbols++;
           (*e).caracter = *buf++;
@@ -366,7 +366,7 @@ void col_analyze_ltlex(void) {
           if (lower[*buf])
             col_error(0, 4);
           if ((*e).next == 0)
-            if (cnum_nodos++ == max_nodos)
+            if (cnum_nodos++ == max_nodes)
               col_error(0, 3);
             else
               e = (*e).next = iclex_symbols++;
@@ -375,7 +375,7 @@ void col_analyze_ltlex(void) {
             while ((*e).caracter != *buf && (*e).alternative)
               e = (*e).alternative;
             if ((*e).caracter != *buf) {
-              if (cnum_nodos++ == max_nodos)
+              if (cnum_nodos++ == max_nodes)
                 col_error(0, 3);
               else
                 e = (*e).alternative = iclex_symbols++;

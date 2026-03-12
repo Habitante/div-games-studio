@@ -244,23 +244,23 @@ FILE *fin, *fout;
 byte *_source = NULL;
 byte *source, *ierror, *ierror_end;
 
-int longitud_textos;
-int inicio_textos;
+int strings_length;
+int strings_start;
 int max_process;
 int ignore_errors;
 int free_sintax;
 int extended_conditions;
 int simple_conditions;
 int check_range;
-int comprueba_id;
-int comprueba_null;
+int check_id;
+int check_null;
 int enable_strfix;
 int optimize;
 
 int old_line;
 byte *old_ierror, *old_ierror_end;
 
-byte *ultima_linea, cero = 0;
+byte *last_line, zero = 0;
 
 int start_addr, end_addr;
 int start_line, start_col;
@@ -275,7 +275,7 @@ byte *objects_start;
 byte *vhash[256];
 
 struct exp_ele tabexp[max_exp], *_exp;
-struct lex_ele lex_simb[max_nodos], *ilex_simb, *lex_case[256];
+struct lex_ele lex_simb[max_nodes], *ilex_simb, *lex_case[256];
 
 int current_token, token_value;
 struct object *o;
@@ -336,7 +336,7 @@ void init_compiler(void) {
 //-----------------------------------------------------------------------------
 
 void show_compile_message(byte *p) {
-  if (compilemode) {
+  if (compile_mode) {
     fprintf(stdout, "%s\n", p);
   } else {
     wbox(v.ptr, v.w / big2, v.h / big2, c2, 2, 20, v.w / big2 - 4, 7);
@@ -464,22 +464,22 @@ void compile(void) {
   *(source + source_len + 1) = cr;
 
   emit_tokens = 1;
-  ultima_linea = source;
+  last_line = source;
   cross_process_access = 0;
   in_params = 0;
   source_line = 1;
 
-  itxt = inicio_textos = imem;
-  psintactico(); // To obtain "longitud_textos"
-  imem += longitud_textos;
+  itxt = strings_start = imem;
+  psintactico(); // To obtain "strings_length"
+  imem += strings_length;
 
   test_buffer(&mem, &imem_max, imem);
 
   num_predefined = num_objects;
 
   emit_tokens = 1;
-  ultima_linea = source;
-  fwrite(&cero, 1, 1, lprg);
+  last_line = source;
+  fwrite(&zero, 1, 1, lprg);
   cross_process_access = 0;
   in_params = 0;
   source_line = 1;
@@ -894,7 +894,7 @@ void analyze_ltlex(void) {
         lex_case[*buf] = (struct lex_ele *)l_lit;
       } else { //Analyzes a new symbol
         if ((e = lex_case[*buf]) == 0) {
-          if (num_nodes++ == max_nodos)
+          if (num_nodes++ == max_nodes)
             c_error(0, 3);
           e = lex_case[*buf] = ilex_simb++;
           (*e).character = *buf++;
@@ -904,7 +904,7 @@ void analyze_ltlex(void) {
           if (lower[*buf])
             c_error(0, 4);
           if ((*e).next == 0) {
-            if (num_nodes++ == max_nodos)
+            if (num_nodes++ == max_nodes)
               c_error(0, 3);
             else
               e = (*e).next = ilex_simb++;
@@ -913,7 +913,7 @@ void analyze_ltlex(void) {
             while ((*e).character != *buf && (*e).alternative)
               e = (*e).alternative;
             if ((*e).character != *buf) {
-              if (num_nodes++ == max_nodos)
+              if (num_nodes++ == max_nodes)
                 c_error(0, 3);
               else
                 e = (*e).alternative = ilex_simb++;
@@ -958,7 +958,7 @@ void preload_objects(void) {
   source_line = 1;
   lexer();
 
-  while (current_token != p_ultima)
+  while (current_token != p_end_of_file)
     switch (current_token) {
     case p_const:
       lexer();
@@ -1304,14 +1304,14 @@ lex_scan:
   case l_cr:
     if (source_line) {
       if (emit_tokens) {
-        fwrite(ultima_linea, 1, _source - ultima_linea, lprg);
-        fwrite(&cero, 1, 1, lprg);
+        fwrite(last_line, 1, _source - last_line, lprg);
+        fwrite(&zero, 1, 1, lprg);
       }
 
       source_line++;
       if ((*++_source) == lf) {
         _source++;
-        ultima_linea = _source;
+        last_line = _source;
         goto lex_scan;
       }
       next_pieza = 0;
@@ -1466,17 +1466,17 @@ lex_scan:
   case l_cr:
 
     if (emit_tokens) {
-      fwrite(ultima_linea, 1, _source - ultima_linea, lprg);
-      fwrite(&cero, 1, 1, lprg);
+      fwrite(last_line, 1, _source - last_line, lprg);
+      fwrite(&zero, 1, 1, lprg);
     }
 
     source_line++;
     if ((*++_source) == lf) {
       _source++;
-      ultima_linea = _source;
+      last_line = _source;
       goto lex_scan;
     }
-    current_token = p_ultima;
+    current_token = p_end_of_file;
     break; // eof
 
   case l_id:
@@ -1715,7 +1715,7 @@ lex_scan:
       goto lex_scan;
     }
 
-    if (current_token == p_ultima) {
+    if (current_token == p_end_of_file) {
       if (comment_depth)
         c_error(0, 55);
       else
@@ -2786,10 +2786,10 @@ lex_scan:
     source_line++;
     if ((*++_source) == lf) {
       _source++;
-      ultima_linea = _source;
+      last_line = _source;
       goto lex_scan;
     }
-    current_token = p_ultima;
+    current_token = p_end_of_file;
     break; // eof
 
   case l_id:
@@ -2854,7 +2854,7 @@ lex_scan:
         *_ivnom = *_source;
     } while (*_ivnom++);
     _source++;
-    longitud_textos += (strlen((char *)name_index.b) + ptr4) / 4;
+    strings_length += (strlen((char *)name_index.b) + ptr4) / 4;
     name_index.b = _ivnom; // remove it from vnom
     break;
 
@@ -2912,7 +2912,7 @@ lex_scan:
       goto lex_scan;
     }
 
-    if (current_token == p_ultima) {
+    if (current_token == p_end_of_file) {
       if (comment_depth)
         c_error(0, 55);
       else
@@ -2927,11 +2927,11 @@ lex_scan:
 void psintactico(void) {
   byte *_ivnom = name_index.b;
 
-  longitud_textos = 0;
+  strings_length = 0;
 
   do {
     plexico();
-  } while (current_token != p_ultima);
+  } while (current_token != p_end_of_file);
 
   name_index.b = _ivnom;
   source = source_ptr;

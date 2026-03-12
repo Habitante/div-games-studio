@@ -479,8 +479,8 @@ void profile2(void) {
 
   _process_items();
 
-  if (no_volcar_nada) {
-    no_volcar_nada = 0;
+  if (skip_flush) {
+    skip_flush = 0;
     return;
   }
 
@@ -640,7 +640,7 @@ void profile2(void) {
   switch (v.active_item) {
   case 0:
 profiler_next_frame:
-    no_volcar_nada = 1;
+    skip_flush = 1;
     profiler_x = v.x;
     profiler_y = v.y;
     end_dialog = 1;

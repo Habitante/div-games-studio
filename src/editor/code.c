@@ -151,7 +151,7 @@ int forced_slider = 0;
 //      Lexical colorizer variables
 //-----------------------------------------------------------------------------
 
-#define p_ultima 0x00  // End of file <EOF>
+#define p_end_of_file 0x00  // End of file <EOF>
 #define p_rem    0x7f  // Single-line comment
 #define p_id     0xfd  // Identifier
 #define p_num    0xfe  // Number
@@ -2025,7 +2025,7 @@ void retreat_vptr(void) {
         v.prg->vptr = p;
         color_token = -1;
         color_source = p;
-        while (color_token != p_ultima)
+        while (color_token != p_end_of_file)
           color_lex();
         _cached_color_source = (char *)v.prg->vptr;
         _cached_in_comment -= (in_comment - _cached_in_comment);
@@ -2038,7 +2038,7 @@ void retreat_vptr(void) {
         v.prg->vptr = p + 2;
         color_token = -1;
         color_source = p + 2;
-        while (color_token != p_ultima)
+        while (color_token != p_end_of_file)
           color_lex();
         _cached_color_source = (char *)v.prg->vptr;
         _cached_in_comment -= (in_comment - _cached_in_comment);
@@ -2132,7 +2132,7 @@ void fill_color_line(void) { // Get the colors for the next line
           colin[i++] = ce4;
         break;
       }
-    } while (color_token != p_ultima);
+    } while (color_token != p_end_of_file);
 }
 
 //-----------------------------------------------------------------------------

@@ -33,7 +33,7 @@ int get_reloj(void);
 
 void deb(void);
 extern int ids_old;
-extern int no_volcar_nada;
+extern int skip_flush;
 
 void readmouse(void);
 

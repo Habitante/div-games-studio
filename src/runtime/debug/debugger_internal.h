@@ -82,7 +82,7 @@ struct variables {
 
 extern char combo_error[128];
 
-extern int no_volcar_nada;
+extern int skip_flush;
 extern int profiler_x, profiler_y;
 
 extern int show_items_called;
@@ -93,13 +93,13 @@ extern int superget;
 extern int line0;
 extern byte *pline0;
 extern int mem1, mem2;
-extern int line1, columna1, line2, columna2;
+extern int line1, col1, line2, col2;
 extern int line_sel;
-extern int x_inicio;
+extern int x_start;
 
 // Mouse state
 extern int smouse_x, smouse_y, mouse_x, mouse_y, mouse_b;
-extern int reloj_debug;
+extern int debug_clock;
 extern int ticks_debug;
 
 // Debug state
@@ -108,7 +108,7 @@ extern int ids_old, ids_inc;
 
 extern byte *source, *end_source;
 extern int *dbg_lines;
-extern int num_sentencias;
+extern int num_statements;
 
 extern clock_t system_clock;
 extern char get[256];

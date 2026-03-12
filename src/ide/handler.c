@@ -1451,7 +1451,7 @@ void menu_sonidos2(void) {
     case 1:
 
       if (!sound_active) {
-        if (SoundError) {
+        if (sound_error) {
           v_text = (char *)texts[549];
           show_dialog(errhlp0);
           if (v_accept)
@@ -1568,7 +1568,7 @@ no_tiene_nombre_sonido:
 
     case 8:
       if (!sound_active) {
-        if (SoundError) {
+        if (sound_error) {
           v_text = (char *)texts[549];
           show_dialog(errhlp0);
           if (v_accept)
@@ -2400,7 +2400,7 @@ void copyright0(void) {
   v.h = 12 + 47 + 31;
   v.paint_handler = copyright1;
   v.click_handler = copyright2;
-  if (CopyDesktop) {
+  if (copy_desktop) {
     _button(456, v.w - 11, v.h - 16, 2);    // Continue
     _button(457, 48 + 48 + 3, v.h - 16, 0); // New session
   } else {

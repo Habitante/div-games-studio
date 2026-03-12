@@ -363,7 +363,7 @@ int main(int argc, char *argv[]) {
   next_order = 0;
   interpreting = 1;
   safe = 34; // Text in lower right corner
-  compilemode = 0;
+  compile_mode = 0;
 
   if (argc > 1 && !strcmp(argv[1], "INIT"))
     interpreting = 0;
@@ -374,7 +374,7 @@ int main(int argc, char *argv[]) {
     test_video = 1;
 
   if (argc > 1 && !strcmp(argv[1], "-c"))
-    compilemode = 1;
+    compile_mode = 1;
 
   getcwd(file_types[0].path, PATH_MAX + 1);
 
@@ -460,7 +460,7 @@ int main(int argc, char *argv[]) {
   }
   initialize_texts((uint8_t *)"system/lenguaje.div");
 
-  if (compilemode == 1) {
+  if (compile_mode == 1) {
     init_compiler();
 
     compilado = 1;
@@ -697,7 +697,7 @@ void init_environment() {
 
   // If the DIV.DTF file doesn't exist or safe mode is requested
 
-  if (CopyDesktop && !new_session && !first_run)
+  if (copy_desktop && !new_session && !first_run)
     upload_desktop();
 
   if (!first_run) {
@@ -1951,9 +1951,9 @@ void initialization(void) {
   } // *** Load edited objects ***
 
   if (auto_save_session || interpreting)
-    CopyDesktop = can_upload_desktop();
+    copy_desktop = can_upload_desktop();
 
-  if (!CopyDesktop) { // Load common palette
+  if (!copy_desktop) { // Load common palette
     if (!interpreting) {
       cprintf("%s", (char *)texts[11]);
     } // *** Palette calculations ***

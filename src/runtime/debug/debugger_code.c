@@ -114,7 +114,7 @@ void debug2(void) {
 
   _process_items();
 
-  if (no_volcar_nada)
+  if (skip_flush)
     goto next_frame;
 
   if (!(shift_status & 15) && ascii == 0) {
@@ -326,7 +326,7 @@ next_frame:
       break;
     }
     if (process_count) {
-      frame_clock = reloj_debug;
+      frame_clock = debug_clock;
       ticks = ticks_debug;
       set_mouse(smouse_x, smouse_y);
       blits_skipped = 0;
@@ -338,7 +338,7 @@ next_frame:
       frame_end();
       frame_start();
       debugger_step = 0;
-      reloj_debug = frame_clock;
+      debug_clock = frame_clock;
       ticks_debug = ticks;
       smouse_x = mouse->x;
       smouse_y = mouse->y;
@@ -366,7 +366,7 @@ next_frame:
       _process_items();
       v.redraw = 1;
       full_redraw = 1;
-      if (no_volcar_nada)
+      if (skip_flush)
         show_dialog(profile0);
     } else
       end_dialog = 1;
@@ -378,7 +378,7 @@ goto_proc:
     //byte * pline0; // Pointer to the first line in the debugger code window
     //int line_sel; // Selected line number
     if (v_accept) {
-      x_inicio = 54;
+      x_start = 54;
       while (line0 > lp1[lp_select]) {
         line0--;
         pline0--;
@@ -489,7 +489,7 @@ trace_proc:
     }
     if (process_count) {
       if (procesos_ejecutados()) {
-        frame_clock = reloj_debug;
+        frame_clock = debug_clock;
         ticks = ticks_debug;
         set_mouse(smouse_x, smouse_y);
         blits_skipped = 0;
@@ -501,7 +501,7 @@ trace_proc:
         frame_end();
         frame_start();
         debugger_step = 0;
-        reloj_debug = frame_clock;
+        debug_clock = frame_clock;
         ticks_debug = ticks;
         smouse_x = mouse->x;
         smouse_y = mouse->y;
@@ -572,7 +572,7 @@ step_proc:
     }
     if (process_count) {
       if (procesos_ejecutados()) {
-        frame_clock = reloj_debug;
+        frame_clock = debug_clock;
         ticks = ticks_debug;
         set_mouse(smouse_x, smouse_y);
         blits_skipped = 0;
@@ -584,7 +584,7 @@ step_proc:
         frame_end();
         frame_start();
         debugger_step = 0;
-        reloj_debug = frame_clock;
+        debug_clock = frame_clock;
         ticks_debug = ticks;
         smouse_x = mouse->x;
         smouse_y = mouse->y;
@@ -632,7 +632,7 @@ exec_proc:
     }
     if (process_count) {
       if (procesos_ejecutados()) {
-        frame_clock = reloj_debug;
+        frame_clock = debug_clock;
         ticks = ticks_debug;
         set_mouse(smouse_x, smouse_y);
         blits_skipped = 0;
@@ -644,7 +644,7 @@ exec_proc:
         frame_end();
         frame_start();
         debugger_step = 0;
-        reloj_debug = frame_clock;
+        debug_clock = frame_clock;
         ticks_debug = ticks;
         smouse_x = mouse->x;
         smouse_y = mouse->y;
@@ -702,23 +702,23 @@ void get_line(int n) { // From an IP address, get the statement position
   int x = 0;
   if (dbg_lines == NULL)
     return;
-  for (x = 0; x < num_sentencias; x++)
+  for (x = 0; x < num_statements; x++)
     if (n >= dbg_lines[x * 6] && n <= dbg_lines[x * 6 + 1])
       break;
-  if (x < num_sentencias) {
+  if (x < num_statements) {
     mem1 = dbg_lines[x * 6];
     mem2 = dbg_lines[x * 6 + 1];
     line1 = dbg_lines[x * 6 + 2] - 1;
-    columna1 = dbg_lines[x * 6 + 3];
+    col1 = dbg_lines[x * 6 + 3];
     line2 = dbg_lines[x * 6 + 4] - 1;
-    columna2 = dbg_lines[x * 6 + 5];
+    col2 = dbg_lines[x * 6 + 5];
   } else {
     mem1 = dbg_lines[0];
     mem2 = dbg_lines[1];
     line1 = dbg_lines[2] - 1;
-    columna1 = dbg_lines[3];
+    col1 = dbg_lines[3];
     line2 = dbg_lines[4] - 1;
-    columna2 = dbg_lines[5];
+    col2 = dbg_lines[5];
   }
 }
 
@@ -726,10 +726,10 @@ int get_ip(int n) { // From a line number, get the IP address of the statement
   int x = 0;
   if (dbg_lines == NULL)
     return (0);
-  for (x = 0; x < num_sentencias; x++)
+  for (x = 0; x < num_statements; x++)
     if (n == dbg_lines[x * 6 + 2] - 1)
       break;
-  if (x < num_sentencias)
+  if (x < num_statements)
     return (dbg_lines[x * 6]);
   else
     return (-1);
@@ -792,61 +792,61 @@ void paint_code(void) { // Paint the source code
         wbox(ptr, w, h, c_r_low, 48 + 5, 148 - 16 - 32 + (l - line0) * 8, w - 52 - 5, 7);
     if (l == line1) {
       wput(ptr, w, h, 48, 148 - 16 - 32 + n * 8, 36);
-      c = *(p + columna1);
-      *(p + columna1) = 0;
-      x = x_inicio - 54;
+      c = *(p + col1);
+      *(p + col1) = 0;
+      x = x_start - 54;
       wwrite_in_box(ptr + 54 * big2, w, w - 59, h, x, 148 - 16 - 32 + n * 8, 0, p, c3);
       if (text_len(p)) {
         x += text_len(p) + 1;
       }
-      *(p + columna1) = c;
+      *(p + col1) = c;
       if (l == line2) {
-        c = *(p + columna2 + 1);
-        *(p + columna2 + 1) = 0;
-        wwrite_in_box(ptr + 54 * big2, w, w - 59, h, x + 1, 148 - 16 - 32 + n * 8, 0, p + columna1,
+        c = *(p + col2 + 1);
+        *(p + col2 + 1) = 0;
+        wwrite_in_box(ptr + 54 * big2, w, w - 59, h, x + 1, 148 - 16 - 32 + n * 8, 0, p + col1,
                       c0);
-        wwrite_in_box(ptr + 54 * big2, w, w - 59, h, x, 148 - 16 - 32 + n * 8, 0, p + columna1, c4);
-        x += text_len(p + columna1) + 1;
-        *(p + columna2 + 1) = c;
-        wwrite_in_box(ptr + 54 * big2, w, w - 59, h, x, 148 - 16 - 32 + n * 8, 0, p + columna2 + 1,
+        wwrite_in_box(ptr + 54 * big2, w, w - 59, h, x, 148 - 16 - 32 + n * 8, 0, p + col1, c4);
+        x += text_len(p + col1) + 1;
+        *(p + col2 + 1) = c;
+        wwrite_in_box(ptr + 54 * big2, w, w - 59, h, x, 148 - 16 - 32 + n * 8, 0, p + col2 + 1,
                       c3);
       } else {
-        wwrite_in_box(ptr + 54 * big2, w, w - 59, h, x + 1, 148 - 16 - 32 + n * 8, 0, p + columna1,
+        wwrite_in_box(ptr + 54 * big2, w, w - 59, h, x + 1, 148 - 16 - 32 + n * 8, 0, p + col1,
                       c0);
-        wwrite_in_box(ptr + 54 * big2, w, w - 59, h, x, 148 - 16 - 32 + n * 8, 0, p + columna1, c4);
+        wwrite_in_box(ptr + 54 * big2, w, w - 59, h, x, 148 - 16 - 32 + n * 8, 0, p + col1, c4);
       }
     } else if (l == line2) {
-      c = *(p + columna2 + 1);
-      *(p + columna2 + 1) = 0;
-      x = x_inicio - 54;
+      c = *(p + col2 + 1);
+      *(p + col2 + 1) = 0;
+      x = x_start - 54;
       wwrite_in_box(ptr + 54 * big2, w, w - 59, h, x + 1, 148 - 16 - 32 + n * 8, 0, p, c0);
       wwrite_in_box(ptr + 54 * big2, w, w - 59, h, x, 148 - 16 - 32 + n * 8, 0, p, c4);
       x += text_len(p) + 1;
-      *(p + columna2 + 1) = c;
-      wwrite_in_box(ptr + 54 * big2, w, w - 59, h, x, 148 - 16 - 32 + n * 8, 0, p + columna2 + 1,
+      *(p + col2 + 1) = c;
+      wwrite_in_box(ptr + 54 * big2, w, w - 59, h, x, 148 - 16 - 32 + n * 8, 0, p + col2 + 1,
                     c3);
     } else if (l > line1 && l < line2) {
-      wwrite_in_box(ptr + 54 * big2, w, w - 59, h, x_inicio - 54 + 1, 148 - 16 - 32 + n * 8, 0, p,
+      wwrite_in_box(ptr + 54 * big2, w, w - 59, h, x_start - 54 + 1, 148 - 16 - 32 + n * 8, 0, p,
                     c0);
-      wwrite_in_box(ptr + 54 * big2, w, w - 59, h, x_inicio - 54, 148 - 16 - 32 + n * 8, 0, p, c4);
+      wwrite_in_box(ptr + 54 * big2, w, w - 59, h, x_start - 54, 148 - 16 - 32 + n * 8, 0, p, c4);
     } else {
-      wwrite_in_box(ptr + 54 * big2, w, w - 59, h, x_inicio - 54, 148 - 16 - 32 + n * 8, 0, p, c3);
+      wwrite_in_box(ptr + 54 * big2, w, w - 59, h, x_start - 54, 148 - 16 - 32 + n * 8, 0, p, c3);
     }
     p += strlen((char *)p) + 1;
   }
 }
 
 void f_home(void) {
-  x_inicio = 54;
+  x_start = 54;
 }
 
 void f_right(void) {
-  x_inicio -= 6;
+  x_start -= 6;
 }
 
 void f_left(void) {
-  if (x_inicio < 54)
-    x_inicio += 6;
+  if (x_start < 54)
+    x_start += 6;
 }
 
 void f_up(void) {

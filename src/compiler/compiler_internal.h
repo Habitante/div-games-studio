@@ -39,7 +39,7 @@
 #define long_med_id 20  // Average identifier length (+4+4+1)
 #endif
 
-#define max_nodos       128  // Maximum number of lexer symbol nodes
+#define max_nodes       128  // Maximum number of lexer symbol nodes
 #define max_exp         512  // Maximum number of elements in an expression
 #define long_header     9    // Header length at program start
 #define EVAL_STACK_SIZE 2048 // Execution stack length
@@ -65,7 +65,7 @@
 //      Syntactic values / tokens (current_token)
 //-----------------------------------------------------------------------------
 
-#define p_ultima 0x00 // End of file <EOF>
+#define p_end_of_file 0x00 // End of file <EOF>
 
 #define p_program 0x01
 #define p_const   0x02
@@ -574,22 +574,22 @@ extern FILE *fin, *fout;
 extern byte *_source;
 extern byte *source, *ierror, *ierror_end;
 
-extern int longitud_textos;
-extern int inicio_textos;
+extern int strings_length;
+extern int strings_start;
 extern int max_process;
 extern int ignore_errors;
 extern int free_sintax;
 extern int extended_conditions;
 extern int simple_conditions;
 extern int check_range;
-extern int comprueba_id;
-extern int comprueba_null;
+extern int check_id;
+extern int check_null;
 extern int enable_strfix;
 extern int optimize;
 
 extern int old_line;
 extern byte *old_ierror, *old_ierror_end;
-extern byte *ultima_linea, cero;
+extern byte *last_line, zero;
 
 extern int start_addr, end_addr;
 extern int start_line, start_col;
@@ -606,7 +606,7 @@ extern byte *objects_start;
 extern byte *vhash[256];
 
 extern struct exp_ele tabexp[max_exp], *_exp;
-extern struct lex_ele lex_simb[max_nodos], *ilex_simb, *lex_case[256];
+extern struct lex_ele lex_simb[max_nodes], *ilex_simb, *lex_case[256];
 
 extern int current_token, token_value;
 extern struct object *o;

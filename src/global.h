@@ -329,9 +329,9 @@ GLOBAL_DATA int max_undos;
 GLOBAL_DATA int undo_memory;
 
 GLOBAL_DATA int interpreting;
-GLOBAL_DATA int SoundError;
-GLOBAL_DATA int CopyDesktop;
-GLOBAL_DATA int compilemode;
+GLOBAL_DATA int sound_error;
+GLOBAL_DATA int copy_desktop;
+GLOBAL_DATA int compile_mode;
 
 int w_setup(void);
 void save_config();

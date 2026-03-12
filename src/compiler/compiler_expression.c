@@ -879,7 +879,7 @@ void exp6() { // Operator for accessing other processes' local variables or tabl
 
   factor();
   while (current_token == p_punto) {
-    if (comprueba_id)
+    if (check_id)
       (*_exp++).type = echeck;
     e = _exp + 1;
     cross_process_access = 1;
@@ -1368,7 +1368,7 @@ void factor(void) {
         if ((*ob).type == tpigl) {
           (*_exp).type = eoper;
           (*_exp++).token = p_pointer;
-          if (comprueba_null)
+          if (check_null)
             (*_exp++).type = enull;
         }
         lexer();
@@ -1433,7 +1433,7 @@ void factor(void) {
         (*_exp++).token = p_pointer;
         if (current_token != p_corab)
           break;
-        if (comprueba_null)
+        if (check_null)
           (*_exp++).type = enull;
       }
       if (current_token == p_corab) {
@@ -1499,7 +1499,7 @@ void factor(void) {
         (*_exp++).token = p_pointer;
         if (current_token != p_corab)
           break;
-        if (comprueba_null)
+        if (check_null)
           (*_exp++).type = enull;
       }
       if (current_token == p_corab) {
@@ -1600,7 +1600,7 @@ void factor(void) {
         (*_exp++).token = p_pointer;
         if (current_token != p_corab && current_token != p_punto)
           break;
-        if (comprueba_null)
+        if (check_null)
           (*_exp++).type = enull;
       }
       if (current_token == p_corab) {
@@ -1702,7 +1702,7 @@ void factor(void) {
         if ((*ob).type == tpilo) {
           (*_exp).type = eoper;
           (*_exp++).token = p_pointer;
-          if (comprueba_null)
+          if (check_null)
             (*_exp++).type = enull;
         }
         cross_process_access = 0;
@@ -1772,7 +1772,7 @@ void factor(void) {
         (*_exp++).token = p_pointer;
         if (current_token != p_corab)
           break;
-        if (comprueba_null)
+        if (check_null)
           (*_exp++).type = enull;
       }
       if (current_token == p_corab) {
@@ -1843,7 +1843,7 @@ void factor(void) {
         (*_exp++).token = p_pointer;
         if (current_token != p_corab)
           break;
-        if (comprueba_null)
+        if (check_null)
           (*_exp++).type = enull;
       }
       if (current_token == p_corab) {
@@ -1954,7 +1954,7 @@ void factor(void) {
         (*_exp++).token = p_pointer;
         if (current_token != p_corab && current_token != p_punto)
           break;
-        if (comprueba_null)
+        if (check_null)
           (*_exp++).type = enull;
       }
       if (current_token == p_corab) {
@@ -2259,7 +2259,7 @@ void factor_struct(void) {
       if ((*ob).type == tpigl) {
         (*_exp).type = eoper;
         (*_exp++).token = p_pointer;
-        if (comprueba_null)
+        if (check_null)
           (*_exp++).type = enull;
       }
       lexer();
@@ -2325,7 +2325,7 @@ void factor_struct(void) {
         break;
       (*_exp).type = eoper;
       (*_exp++).token = p_pointer;
-      if (comprueba_null)
+      if (check_null)
         (*_exp++).type = enull;
     }
     if (current_token == p_corab) {
@@ -2393,7 +2393,7 @@ void factor_struct(void) {
         break;
       (*_exp).type = eoper;
       (*_exp++).token = p_pointer;
-      if (comprueba_null)
+      if (check_null)
         (*_exp++).type = enull;
     }
     if (current_token == p_corab) {
@@ -2496,7 +2496,7 @@ void factor_struct(void) {
         break;
       (*_exp).type = eoper;
       (*_exp++).token = p_pointer;
-      if (comprueba_null)
+      if (check_null)
         (*_exp++).type = enull;
     }
     if (current_token == p_corab) {
@@ -2587,7 +2587,7 @@ void factor_struct(void) {
       if ((*ob).type == tpilo) {
         (*_exp).type = eoper;
         (*_exp++).token = p_pointer;
-        if (comprueba_null)
+        if (check_null)
           (*_exp++).type = enull;
       }
       lexer();
@@ -2653,7 +2653,7 @@ void factor_struct(void) {
         break;
       (*_exp).type = eoper;
       (*_exp++).token = p_pointer;
-      if (comprueba_null)
+      if (check_null)
         (*_exp++).type = enull;
     }
     if (current_token == p_corab) {
@@ -2721,7 +2721,7 @@ void factor_struct(void) {
         break;
       (*_exp).type = eoper;
       (*_exp++).token = p_pointer;
-      if (comprueba_null)
+      if (check_null)
         (*_exp++).type = enull;
     }
     if (current_token == p_corab) {
@@ -2824,7 +2824,7 @@ void factor_struct(void) {
         break;
       (*_exp).type = eoper;
       (*_exp++).token = p_pointer;
-      if (comprueba_null)
+      if (check_null)
         (*_exp++).type = enull;
     }
     if (current_token == p_corab) {

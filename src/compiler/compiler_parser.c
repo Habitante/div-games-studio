@@ -1791,8 +1791,8 @@ void parser(void) {
   extended_conditions = 0;
   simple_conditions = 0;
   check_range = 1;
-  comprueba_id = 1;
-  comprueba_null = 1;
+  check_id = 1;
+  check_null = 1;
   enable_strfix = 1;
   optimize = 1;
 
@@ -1844,8 +1844,8 @@ void parser(void) {
         case 6: // _no_check
           lexer();
           check_range = 0;
-          comprueba_id = 0;
-          comprueba_null = 0;
+          check_id = 0;
+          check_null = 0;
           break;
         case 7: // _no_strfix
           lexer();
@@ -1861,11 +1861,11 @@ void parser(void) {
           break;
         case 10: // _no_id_check
           lexer();
-          comprueba_id = 0;
+          check_id = 0;
           break;
         case 11: // _no_null_check
           lexer();
-          comprueba_null = 0;
+          check_null = 0;
           break;
         default:
           c_error(0, 138);
@@ -3185,7 +3185,7 @@ puntero8:
     save_error(0);
   }
 
-  if (current_token != p_ultima)
+  if (current_token != p_end_of_file)
     c_error(4, 52);
 }
 
