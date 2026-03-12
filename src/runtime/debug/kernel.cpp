@@ -176,7 +176,7 @@ profile_clock = get_ticks();
 #endif
 mem[id + _IP] = ip + 1;
 id2 = id;
-if (sp > long_pila)
+if (sp > EVAL_STACK_SIZE)
   exer(3);
 process_count++;
 ip = mem[ip];

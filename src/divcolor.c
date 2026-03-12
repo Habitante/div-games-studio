@@ -47,11 +47,11 @@ void col_analyze_ltlex(void);
 struct clex_ele {
   byte caracter;
   byte token;
-  struct clex_ele *alternativa;
-  struct clex_ele *siguiente;
-} clex_simb[max_nodos], *iclex_simb, *clex_case[256];
+  struct clex_ele *alternative;
+  struct clex_ele *next;
+} clex_symbols[max_nodos], *iclex_symbols, *clex_case[256];
 
-int cnum_nodos; // Number of nodes used in clex_simb
+int cnum_nodos; // Number of nodes used in clex_symbols
 
 int in_comment; // Whether inside a comment
 int numrem;     // Nesting level of /* and */
@@ -85,8 +85,8 @@ void col_error(int n, int m) {
 
 void init_lexcolor() {
   int n;
-  memset(clex_simb, 0, sizeof(clex_simb));
-  iclex_simb = clex_simb;
+  memset(clex_symbols, 0, sizeof(clex_symbols));
+  iclex_symbols = clex_symbols;
   cnum_nodos = 0;
   memset(cvhash, 0, sizeof(cvhash));
 
@@ -240,9 +240,9 @@ void color_lex(void) {
     e = clex_case[*_source++];
     _ivnom = _source;
     color_token = (*e).token;
-    while ((e = (*e).siguiente)) {
-      while (*_source != (*e).caracter && (*e).alternativa)
-        e = (*e).alternativa;
+    while ((e = (*e).next)) {
+      while (*_source != (*e).caracter && (*e).alternative)
+        e = (*e).alternative;
       if (*_source++ == (*e).caracter && (*e).token) {
         color_token = (*e).token;
         _ivnom = _source;
@@ -358,27 +358,27 @@ void col_analyze_ltlex(void) {
         if ((e = clex_case[*buf]) == 0) {
           if (cnum_nodos++ == max_nodos)
             col_error(0, 3);
-          e = clex_case[*buf] = iclex_simb++;
+          e = clex_case[*buf] = iclex_symbols++;
           (*e).caracter = *buf++;
         } else
           buf++;
         while (*buf != ' ' && *buf != tab && *buf != cr) {
           if (lower[*buf])
             col_error(0, 4);
-          if ((*e).siguiente == 0)
+          if ((*e).next == 0)
             if (cnum_nodos++ == max_nodos)
               col_error(0, 3);
             else
-              e = (*e).siguiente = iclex_simb++;
+              e = (*e).next = iclex_symbols++;
           else {
-            e = (*e).siguiente;
-            while ((*e).caracter != *buf && (*e).alternativa)
-              e = (*e).alternativa;
+            e = (*e).next;
+            while ((*e).caracter != *buf && (*e).alternative)
+              e = (*e).alternative;
             if ((*e).caracter != *buf) {
               if (cnum_nodos++ == max_nodos)
                 col_error(0, 3);
               else
-                e = (*e).alternativa = iclex_simb++;
+                e = (*e).alternative = iclex_symbols++;
             }
           }
           (*e).caracter = *buf++;

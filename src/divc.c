@@ -269,7 +269,7 @@ void add_code(int dir, int param, int op);
 #define max_nodos   128  //Maximum number of lexer symbol nodes
 #define max_exp     512  //Maximum number of elements in an expression
 #define long_header 9    //Header length at program start
-#define long_pila   2048 //Execution stack length
+#define EVAL_STACK_SIZE  2048 //Execution stack length
 
 #define default_buffer    (16384 * 8)
 #define security_distance (4096 * 8)
@@ -895,7 +895,7 @@ int itcont;
 
 //-----------------------------------------------------------------------------
 
-int eval_stack[long_pila + max_exp + 64]; // expression evaluation (compilation and execution)
+int eval_stack[EVAL_STACK_SIZE + max_exp + 64]; // expression evaluation (compilation and execution)
 
 int32_t *mem_ory = NULL, *frm = NULL;
 int32_t *mem = NULL, *loc = NULL;
@@ -1323,7 +1323,7 @@ void save_error(word tipo) { // Save an error position (0 .. 3)
 // 4 - Error saved with save_error(0..3)
 
 void c_error(word tipo, word e) {
-  int columna = 0;
+  int column = 0;
   byte *_p = NULL, *p = NULL;
 
   error_number = e;
@@ -1356,21 +1356,21 @@ void c_error(word tipo, word e) {
     while (--p >= source_ptr) {
       if (*p == cr)
         break;
-      columna++;
+      column++;
     }
     if (p < source_ptr)
-      columna++;
+      column++;
   }
 
   if (tipo == 1) {
     if (*(_p + 1) == ' ' || *(_p + 1) == cr || *(_p + 1) == lf) {
-      columna++;
+      column++;
     }
-    columna++;
+    column++;
   } else if (tipo == 3)
-    columna++;
+    column++;
 
-  error_col = columna;
+  error_col = column;
 
   // _case_sensitive
   memcpy(lower + 129,
@@ -2067,7 +2067,7 @@ lex_scan:
 //-----------------------------------------------------------------------------
 
 int is_wav(char *filename);
-int en_fopen = 0;
+int in_fopen = 0;
 
 /* Lexer: reads the next token from the source buffer.
  * Sets global 'current_token' to the token type, 'token_value' for numeric/literal
@@ -2081,7 +2081,7 @@ void lexer(void) {
   char cwork[66];
   FILE *f;
 
-  int empaquetable;
+  int packable;
   char drive[_MAX_DRIVE + 1];
   char dir[_MAX_DIR + 1];
   char fname[_MAX_FNAME + 1];
@@ -2254,7 +2254,7 @@ lex_scan:
       fprintf(stdout, "FOUND FILE: [%s] [%s] [%s]\n", (char *)name_index.b, full,
               (char *)&file_types[8]);
 
-      empaquetable = 0;
+      packable = 0;
 
       // Determine whether the file is packable ...
 
@@ -2263,38 +2263,38 @@ lex_scan:
 
       if (!stricmp((char *)ext, ".MOD") || !stricmp((char *)ext, ".S3M") ||
           !stricmp((char *)ext, ".XM")) {
-        empaquetable = 1;
+        packable = 1;
       } else if (!stricmp((char *)ext, ".PCM")) {
-        empaquetable = 1;
+        packable = 1;
       } else if (!stricmp((char *)ext, ".PCX")) {
         if (fread(cwork, 1, 66, f) > 0) {
           if (cwork[2] == 1 && cwork[3] == 8 && cwork[65] == 1)
-            empaquetable = 1;
+            packable = 1;
         }
       } else if (fread(cwork, 1, 8, f) > 0) {
         if (!strcmp((char *)cwork, "pal\x1a\x0d\x0a"))
-          empaquetable = 1;
+          packable = 1;
         if (!strcmp((char *)cwork, "map\x1a\x0d\x0a"))
-          empaquetable = 1;
+          packable = 1;
         if (!strcmp((char *)cwork, "fpg\x1a\x0d\x0a"))
-          empaquetable = 1;
+          packable = 1;
         if (!strcmp((char *)cwork, "fnt\x1a\x0d\x0a"))
-          empaquetable = 1;
+          packable = 1;
         if (!strcmp((char *)cwork, "wld\x1a\x0d\x0a"))
-          empaquetable = 1;
+          packable = 1;
         if (!strcmp((char *)cwork, "wld\x1a\x0d\x0a\x01"))
-          empaquetable = 1;
+          packable = 1;
       }
 
       fclose(f);
 
       if (is_wav(full))
-        empaquetable = 1;
+        packable = 1;
 
       // ???
-      empaquetable = 1;
+      packable = 1;
 
-      if (!empaquetable || en_fopen)
+      if (!packable || in_fopen)
         fwrite("+", 1, 1, lins);
       fwrite(full, 1, strlen(full) + 1, lins);
       fflush(lins);
@@ -9196,9 +9196,9 @@ void factor(void) {
         c_error(3, 36);
 
       if ((*ob).func.code == 122) { // fopen("..."
-        en_fopen = 1;
+        in_fopen = 1;
         lexer();
-        en_fopen = 0;
+        in_fopen = 0;
       } else
         lexer();
 

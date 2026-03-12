@@ -2339,7 +2339,7 @@ void _completo(void) {
 //-----------------------------------------------------------------------------
 
 void _parcial(void) {
-  int linea, width;
+  int line, width;
   byte *di, *si, *old_di;
   byte *s, *_kini = NULL;
   int n, _kcol1 = 0;
@@ -2386,7 +2386,7 @@ void _parcial(void) {
   w = v.w / big2;
   h = v.h / big2;
 
-  linea = v.prg->line - v.prg->first_line;
+  line = v.prg->line - v.prg->first_line;
 
   if (block_state && kprg == v.prg) {
     if (block_col1 > linelen(block_start))
@@ -2411,7 +2411,7 @@ void _parcial(void) {
 
   info_bar();
 
-  old_di = di = v.ptr + (v.w * 18 + 2) * big2 + linea * v.w * editor_font_height;
+  old_di = di = v.ptr + (v.w * 18 + 2) * big2 + line * v.w * editor_font_height;
   si = v.prg->lptr;
 
   n = editor_font_height;
@@ -3655,7 +3655,7 @@ int string_found(char *p, char *q, int may_min, int completa) {
 //-----------------------------------------------------------------------------
 
 #define y_bt 50
-char buscar[32] = {0};
+char search_text[32] = {0};
 int may_min = 0, completa = 0;
 
 void find_text0(void) {
@@ -3666,9 +3666,9 @@ void find_text0(void) {
   v.paint_handler = find_text1;
   v.click_handler = find_text2;
 
-  //  strcpy(buscar,"");
+  //  strcpy(search_text,"");
 
-  _get(161, 4, 11, v.w - 8, (byte *)buscar, 32, 0, 0);
+  _get(161, 4, 11, v.w - 8, (byte *)search_text, 32, 0, 0);
   _button(100, 7, y_bt, 0);
   _button(101, v.w - 8, y_bt, 2);
   _flag(163, 4, y_bt - 20, &completa);
@@ -3686,7 +3686,7 @@ void find_text2(void) {
   switch (v.active_item) {
   case 1:
     end_dialog = 1;
-    if (buscar[0])
+    if (search_text[0])
       v_accept = 1;
     break;
   case 2:
@@ -3699,7 +3699,7 @@ void find_text(void) {
   struct tprg mi_prg;
   int encontrado = 0, n;
 
-  if (!buscar[0])
+  if (!search_text[0])
     return;
 
   write_line();
@@ -3719,7 +3719,7 @@ void find_text(void) {
         f_home();
       }
     } else {
-      if (string_found(buscar, &v.prg->l[v.prg->column - 1], may_min, completa))
+      if (string_found(search_text, &v.prg->l[v.prg->column - 1], may_min, completa))
         encontrado = 1;
       else
         f_right();
@@ -3732,10 +3732,10 @@ void find_text(void) {
     v_text = (char *)texts[189];
     show_dialog(info0);
   } else {
-    n = strlen(buscar);
+    n = strlen(search_text);
     while (n--)
       f_right();
-    n = strlen(buscar);
+    n = strlen(search_text);
     while (n--)
       f_left();
   }
@@ -3958,7 +3958,7 @@ void replacements0(void) {
   _button(100, v.w / 2, v.h - 14, 1);
 }
 
-void open_program_for_fernando(char *nombre, char *path) {
+void open_program_external(char *nombre, char *path) {
   char wpath[_MAX_PATH];
   struct tprg *pr;
   FILE *f;
@@ -4082,7 +4082,7 @@ int lp_sort = 0; // Flag indicating whether to sort the list
 void create_process_list(char *buffer, int file_len) {
   byte *p, *end, *q;
   char cwork[512], cwork2[256];
-  int linea = 1, n, m;
+  int line = 1, n, m;
 
   p = (byte *)buffer;
   end = p + file_len;
@@ -4095,7 +4095,7 @@ void create_process_list(char *buffer, int file_len) {
       p++;
     }
     p++;
-    linea++;
+    line++;
     if (p < end) {
       while (*p == ' ' && p < end)
         p++;
@@ -4128,14 +4128,14 @@ void create_process_list(char *buffer, int file_len) {
               if (n < lp_num) {
                 memmove(&lp1[n + 1], &lp1[n], 4 * (511 - n));
                 memmove(&lp2[n + 1], &lp2[n], 4 * (511 - n));
-                lp1[n] = linea;
+                lp1[n] = line;
                 lp2[n] = p;
               } else {
-                lp1[lp_num] = linea;
+                lp1[lp_num] = line;
                 lp2[lp_num] = p;
               }
             } else {
-              lp1[lp_num] = linea;
+              lp1[lp_num] = line;
               lp2[lp_num] = p;
             }
             if (++lp_num == 512)
