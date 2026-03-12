@@ -6473,8 +6473,8 @@ char *fname[] = {
 
     // New functions added for DIV 2.0
 
-    "set_color", "net_join_game", "net_get_games", "", "x_advance", "char", "path_find",
-    "path_line", "path_free", "new_map", "", "", "", "", "", "", "", "", "", "", "", "", "",
+    "set_color", "x_advance", "char", "path_find",
+    "path_line", "path_free", "new_map", 
     "strcpy", "strcat", "strlen", "strcmp", "strchr", "strstr", "strset", "strupr", "strlwr",
     "strdel", "screen_copy", "sort", "load_song", "unload_song", "song", "stop_song",
     "set_song_pos", "get_song_pos", "get_song_line", "is_playing_sound", "is_playing_song", "fopen",

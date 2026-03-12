@@ -25,7 +25,7 @@ The `main()` function performs the following startup sequence:
    filter strings for each file type (MAP, PAL, FPG, FNT, PRG, etc.).
 6. **`initialize_texts("system/lenguaje.div")`** -- Loads the localization strings.
 7. **Joystick + mixer init** -- Opens the first joystick, initializes SDL2_mixer.
-8. **`Load_Cfgbin()`** -- Loads `system/setup.bin` configuration file.
+8. **`load_config()`** -- Loads `system/setup.bin` configuration file.
 9. **`initialization()`** -- Allocates all core buffers (see below).
 10. **`init_environment()`** -- Shows copyright dialog, restores desktop session.
 11. **`main_loop()`** -- Enters the main event loop.
@@ -37,7 +37,7 @@ The `main()` function performs the following startup sequence:
 This function allocates all fundamental IDE resources:
 
 - **Video mode detection** via `detect_vesa()` (sets `vga_width`, `vga_height`, `big`)
-- **Keyboard** via `kbdInit()`
+- **Keyboard** via `kbd_init()`
 - **Help system** via `make_helpidx()` + `load_index()`
 - **Core buffers**:
   - `undo` -- undo history buffer (`undo_memory` bytes)
@@ -136,7 +136,7 @@ keysyms are translated to DOS scan codes via the `OSDEP_key[2048]` lookup table
 ### Shutdown: `finalization()` at line 3682
 
 Frees all buffers allocated in `initialization()`, restores video mode via
-`rvmode()`, calls `end_lexcolor()` and `kbdReset()`.
+`rvmode()`, calls `end_lexcolor()` and `kbd_reset()`.
 
 ---
 

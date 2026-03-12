@@ -548,7 +548,7 @@ int main(int argc, char *argv[]) {
 
   check_mouse();
 
-  Load_Cfgbin();
+  load_config();
 
   div_strcpy(full, sizeof(full), "Be");
   div_strcat(full, sizeof(full), "ta");
@@ -605,7 +605,7 @@ int main(int argc, char *argv[]) {
     if (return_mode != 3)
       download_desktop(); // If the test didn't fail
 
-  Save_Cfgbin();
+  save_config();
 
   finalization();
 
@@ -5019,7 +5019,7 @@ extern int previous_mode;
 ////////////////////////////////////////////////////////////////////////////
 // Save the configuration file                                            //
 ////////////////////////////////////////////////////////////////////////////
-void Save_Cfgbin() {
+void save_config() {
   FILE *file;
 
   // Video mode
@@ -5079,7 +5079,7 @@ void Save_Cfgbin() {
 // Load config file                                                       //
 ////////////////////////////////////////////////////////////////////////////
 
-void Load_Cfgbin() {
+void load_config() {
   int n;
   FILE *file;
   char cWork[_MAX_PATH + 1];

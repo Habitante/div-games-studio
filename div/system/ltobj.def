@@ -1,11 +1,11 @@
 
-//ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 //      Pre-Carga de la tabla de objetos
-//ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-//ÄÄÄ Constantes ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+//ï¿½ï¿½ï¿½ Constantes ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-const m320x200=320200   // Identificadores de los diferentes modos de v¡deo
+const m320x200=320200   // Identificadores de los diferentes modos de vï¿½deo
 const m320x240=320240
 const m320x400=320400
 const m360x240=360240
@@ -24,19 +24,19 @@ const max_int= 2147483647 // Maximo entero
 
 const pi=180000         // PI en coma fija (grados * 1000, radianes * 57295.77951)
 
-const s_kill=0          // Se¤al de matar un proceso
-const s_wakeup=1        // Se¤al de despertar un proceso
-const s_sleep=2         // Se¤al de dormir un proceso (ejecuci¢n/visualizaci¢n)
-const s_freeze=3        // Se¤al de congelar un proceso (solo ejecuci¢n)
+const s_kill=0          // Seï¿½al de matar un proceso
+const s_wakeup=1        // Seï¿½al de despertar un proceso
+const s_sleep=2         // Seï¿½al de dormir un proceso (ejecuciï¿½n/visualizaciï¿½n)
+const s_freeze=3        // Seï¿½al de congelar un proceso (solo ejecuciï¿½n)
 
-const s_kill_tree=100   // Se¤ales enviadas a un proceso
+const s_kill_tree=100   // Seï¿½ales enviadas a un proceso
 const s_wakeup_tree=101 // que afectan igualmente a toda
 const s_sleep_tree=102  // su descendencia.
 const s_freeze_tree=103 //
 
-const all_text=0        // Identificador de texto gen‚rico
-const all_drawing=-1    // Identificador de primitiva gen‚rico
-const all_sound=-1      // Identificador de sonido gen‚rico
+const all_text=0        // Identificador de texto genï¿½rico
+const all_drawing=-1    // Identificador de primitiva genï¿½rico
+const all_sound=-1      // Identificador de sonido genï¿½rico
 
 const g_wide=0          // Ancho
 const g_height=1        // Alto
@@ -52,8 +52,8 @@ const partial_dump=0    // Volcado parcial (dump_type)
 const complete_dump=1   // Volcado completo (dump_type)
 
 const no_restore=-1      // No restaurar el fondo (restore_type)
-const partial_restore=0  // Restauraci¢n de fondo parcial
-const complete_restore=1 // Restauraci¢n de fondo completa
+const partial_restore=0  // Restauraciï¿½n de fondo parcial
+const complete_restore=1 // Restauraciï¿½n de fondo completa
 
 const c_0=1             // Indicadores de un plano de scroll/m7 (para cnumber)
 const c_1=2
@@ -66,7 +66,7 @@ const c_7=128
 const c_8=256
 const c_9=512
 
-const _max_process=0    // Opciones de compilaci¢n
+const _max_process=0    // Opciones de compilaciï¿½n
 const _extended_conditions=1
 const _simple_conditions=2
 const _case_sensitive=3
@@ -96,7 +96,7 @@ const quality_mixer=2
 const sound_bits_8=8
 const sound_bits_16=16
 
-//ÄÄÄ Scan codes ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+//ï¿½ï¿½ï¿½ Scan codes ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 // Note : These codes must match the HELP.DIV file (.1176)
 
@@ -207,32 +207,32 @@ const _c_del=83
 const _c_plus=78
 const _c_enter=28
 
-//ÄÄÄ Variables globales ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+//ï¿½ï¿½ï¿½ Variables globales ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 global struct mouse[0]
-        x               // Coordenada X del rat¢n
-        y               // Coordenada Y del rat¢n
-        z               // Prioridad de impresi¢n del gr fico
-        file            // Fichero que contiene el gr fico
-        graph           // Gr fico asignado al rat¢n
+        x               // Coordenada X del ratï¿½n
+        y               // Coordenada Y del ratï¿½n
+        z               // Prioridad de impresiï¿½n del grï¿½fico
+        file            // Fichero que contiene el grï¿½fico
+        graph           // Grï¿½fico asignado al ratï¿½n
         angle           // Angulo del puntero
-        size            // Tama¤o en porcentaje
-        flags           // Flags del rat¢n
+        size            // Tamaï¿½o en porcentaje
+        flags           // Flags del ratï¿½n
         region          // Region de corte
-        left            // Bot¢n izquierdo del rat¢n
-        middle          // Bot¢n central del rat¢n
-        right           // Bot¢n derecho del rat¢n
-        cursor          // Emulaci¢n con cursores (0/1)
-        speed           // Velocidad del rat¢n (0..9)
+        left            // Botï¿½n izquierdo del ratï¿½n
+        middle          // Botï¿½n central del ratï¿½n
+        right           // Botï¿½n derecho del ratï¿½n
+        cursor          // Emulaciï¿½n con cursores (0/1)
+        speed           // Velocidad del ratï¿½n (0..9)
 end
 
 global struct scroll[9]
-        z               // Prioridad de impresi¢n
+        z               // Prioridad de impresiï¿½n
         camera          // Id del proceso al que sigue el scroll (p.def 0-n/a)
         ratio           // Background speed ratio (p.def 200, la mitad del primero)
-        speed           // Velocidad m xima del scroll (primer plano) (p.def 0-Sin l¡mite)
+        speed           // Velocidad mï¿½xima del scroll (primer plano) (p.def 0-Sin lï¿½mite)
         region1         // Region de bloqueo del scroll (p.def -1)
-        region2         // Region exterior del scroll (sin velocidad m xima, p.def -1)
+        region2         // Region exterior del scroll (sin velocidad mï¿½xima, p.def -1)
         x0              // Coordenadas del primer plano de scroll
         y0              // (esquina superior izquierda de la ventana)
         x1              // Coordenadas del segundo plano
@@ -240,12 +240,12 @@ global struct scroll[9]
 end
 
 global struct m7[9]
-        z               // Prioridad de impresi¢n
-        camera          // Id del proceso al que sigue la c mara
-        height          // Altura de la c mara
-        distance        // Distancia de la c mara al proceso seguido
+        z               // Prioridad de impresiï¿½n
+        camera          // Id del proceso al que sigue la cï¿½mara
+        height          // Altura de la cï¿½mara
+        distance        // Distancia de la cï¿½mara al proceso seguido
         horizon         // Altura del horizonte
-        focus           // Focal para la c mara (0..512)
+        focus           // Focal para la cï¿½mara (0..512)
         color           // Color para el exterior del modo-7
 end
 
@@ -274,25 +274,6 @@ global struct setup[0]
         bits
 end
 
-global struct net[0]
-        device          // 1-IPX, 2-Serie, 3-Modem
-        com             // 1..4 (serie y modem)
-        speed           // Hasta 115000 (serie y modem)
-        number          // Numero de telefono (modem) ej. net.telefono="913040622"
-        init            // Cadena de inicio del modem. ej. net.cadena_inicio="ATZ"
-        mode            // 0-1 segun sea pulsos o tonos (modem)
-        server          // Indica si es servidor (no tocar)
-        max_players     // Numero maximo de jugadores (2..16)
-        num_players     // Numero actual de jugadores (2..16)
-end
-
-global struct m8[9]
-        z               // Prioridad de impresi¢n
-        camera          // Id del proceso al que sigue la c mara
-        height          // Altura de la c mara respecto al proceso
-        angle           // Angulo de subida - bajada de la camara (-128,128)
-end
-
 global struct dirinfo[0]
         files           // Numero de archivos en lista
         name[1024]      // Nombres de los archivos
@@ -304,10 +285,10 @@ global struct fileinfo[0]
         string dir[254] // Directorio
         string name[7]  // Nombre
         string ext[3]   // Extension
-        size            // Tama¤o (en bytes)
+        size            // Tamaï¿½o (en bytes)
         day             // Dia
         month           // Mes
-        year            // A¤o
+        year            // Aï¿½o
         hour            // Hora
         min             // Minuto
         sec             // Segundo
@@ -317,14 +298,14 @@ end
 global struct video_modes[31]
         wide            // Ancho del modo
         height          // Alto del modo
-        mode            // N£mero del modo
+        mode            // Nï¿½mero del modo
 end
 
-global timer[9]         // 10 Contadores de mil‚simas para el usuario
+global timer[9]         // 10 Contadores de milï¿½simas para el usuario
 
-global text_z=-256      // Prioridad de impresi¢n de los textos
+global text_z=-256      // Prioridad de impresiï¿½n de los textos
 
-global fading=0         // Indica si se est  realizando un fade
+global fading=0         // Indica si se estï¿½ realizando un fade
 
 global shift_status=0   // Actual shift status
 global ascii=0          // Ascii code of last key pressed
@@ -336,24 +317,24 @@ global joy_status=1     // Estado del joystick (0-off, 1-on, 2-forced)
 global restore_type=1   // -1 No restaura, 0 Parcialmente, 1 Por completo
 global dump_type=1      // 0 Volcado parcial, 1 Volcado completo
 
-global max_process_time=500 // Maximo tiempo de ejecuci¢n para un proceso
+global max_process_time=500 // Maximo tiempo de ejecuciï¿½n para un proceso
 
-global fps=0            // N£mero de frames por segundo
+global fps=0            // Nï¿½mero de frames por segundo
 
-global argc=0           // N£mero de par metros (m¡nimo 1)
-global argv[9]          // Punteros a los par metros (strings)
+global argc=0           // Nï¿½mero de parï¿½metros (mï¿½nimo 1)
+global argv[9]          // Punteros a los parï¿½metros (strings)
 
-global channel[31]      // Informaci¢n de los canales de sonido (a 1 si se toc¢ un sonido)
+global channel[31]      // Informaciï¿½n de los canales de sonido (a 1 si se tocï¿½ un sonido)
 
 global vsync=0          // Espera al retrazo (1-activa, 0-inactiva)
 
-global draw_z=-255      // Prioridad de impresi¢n de las primitivas de dibujo
+global draw_z=-255      // Prioridad de impresiï¿½n de las primitivas de dibujo
 
-global num_video_modes=0 // N£mero de modos de video en struct video_modes[]
+global num_video_modes=0 // Nï¿½mero de modos de video en struct video_modes[]
 
-global unit_size=4      // Tama¤o m¡nimo de palabra para operaciones de disco
+global unit_size=4      // Tamaï¿½o mï¿½nimo de palabra para operaciones de disco
 
-//ÄÄÄ Variables locales ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+//ï¿½ï¿½ï¿½ Variables locales ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 local struct reserved[0]
         process_id=0    // Identificador del proceso
@@ -361,8 +342,8 @@ local struct reserved[0]
         process_type=0  // Tipo de proceso
         type_scan=0     // Para scanear procesos por tipo
         status=2        // Estado actual de este proceso
-        parameters=0    // N£mero de par metros del proceso
-        param_offset=0  // Puntero a los par metros pasados
+        parameters=0    // Nï¿½mero de parï¿½metros del proceso
+        param_offset=0  // Puntero a los parï¿½metros pasados
         program_index=0 // Contador de programa para este proceso
         stack_pointer=0 // Puntero de  pila del proceso
         is_executed=0   // Indica si el proceso ya ha sido ejecutado
@@ -372,86 +353,80 @@ local struct reserved[0]
         frame_percent=0 // Porcentaje de frame recorrido
         box_x0=0        // Caja ocupada por el sprite cada
         box_y0=0        //  vez que se pinta para realizar
-        box_x1=0        //  volcado y restauraci¢n de fondo
+        box_x1=0        //  volcado y restauraciï¿½n de fondo
         box_y1=0        //  parcial (dump_type==partial_dump)
         f_count=0       // Contador de anidamiento de funcion
-        caller_id=0     // Proceso o funcion llamadora (0 si fu‚ el kernel)
+        caller_id=0     // Proceso o funcion llamadora (0 si fuï¿½ el kernel)
 end
 
 local father=0          // Identificador del padre
-local son=0             // Identificador del £ltimo hijo
+local son=0             // Identificador del ï¿½ltimo hijo
 local smallbro=0        // Identificador del hermano menor
 local bigbro=0          // Identificador del hermano mayor
 local priority=0        // Prioridad de proceso (a mayor se procesa antes)
 local ctype=0           // Tipo de coordenada
 local x=0               // Coordenada X
 local y=0               // Coordenada Y
-local z=0               // Prioridad de impresi¢n del gr fico
-local graph=0           // C¢digo del gr fico para este proceso
-local flags=0           // +1 iversi¢n horiz., +2 inversion vert., +4 Ghost
-local size=100          // Tama¤o del proceso (en tanto por ciento)
+local z=0               // Prioridad de impresiï¿½n del grï¿½fico
+local graph=0           // Cï¿½digo del grï¿½fico para este proceso
+local flags=0           // +1 iversiï¿½n horiz., +2 inversion vert., +4 Ghost
+local size=100          // Tamaï¿½o del proceso (en tanto por ciento)
 local angle=0           // Angulo del proceso
-local region=0          // Regi¢n de clipping para este proceso
-local file=0            // Fichero del que tomar los gr ficos
-local xgraph=0          // Puntero a tabla: n§graficos, graf_angulo_0, ...
+local region=0          // Regiï¿½n de clipping para este proceso
+local file=0            // Fichero del que tomar los grï¿½ficos
+local xgraph=0          // Puntero a tabla: nï¿½graficos, graf_angulo_0, ...
 local height=1          // Altura de los procesos en el modo-7 (pix/4)
-local cnumber=0         // N§ de scroll o m7 en el que est  (0 en todos, o bien: +1 en el 0, +2 en el 1, +4 en el 2, ...)
-local resolution=0      // Resoluci¢n de las coordenadas x,y (0,10,100,...)
+local cnumber=0         // Nï¿½ de scroll o m7 en el que estï¿½ (0 en todos, o bien: +1 en el 0, +2 en el 1, +4 en el 2, ...)
+local resolution=0      // Resoluciï¿½n de las coordenadas x,y (0,10,100,...)
 
-local radius=0          // Radio del objeto en m8 (2...)
-local m8_wall=-1        // Pared de modo 8 con la que colisiona
-local m8_sector=-1      // Sector de modo 8 en el que se encuentra
-local m8_nextsector=-1  // Sector de modo 8 que se encuentra al otro lado de la pared con la que colisiona
-local m8_step=32        // Lo que puede subir automaticamente en modo 8 al chocar con una pared (altura escalon)
+//ï¿½ï¿½ï¿½ Funciones genï¿½ricas ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+// function <nï¿½mero> <retorno> <nombre> (parms...)
 
-//ÄÄÄ Funciones gen‚ricas ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-// function <n£mero> <retorno> <nombre> (parms...)
-
-function 000 int signal(0,0)                       // Envia una se¤al a un proceso (id,se¤al)
+function 000 int signal(0,0)                       // Envia una seï¿½al a un proceso (id,seï¿½al)
 function 001 int key(0)                            // Devuelve el estado de una tecla (scan_code)
 function 002 int load_pal(0)                       // Carga una paleta de color ("fichero.pal")
-function 003 int load_fpg(0)                       // Carga un fichero con gr ficos ("fichero.fpg")
+function 003 int load_fpg(0)                       // Carga un fichero con grï¿½ficos ("fichero.fpg")
 function 004 int start_scroll(0,0,0,0,0,0)         // Crea una ventana de scroll (n,file,graf1,graf2,region,flags=0)
 function 005 int stop_scroll(0)                    // Elimina los planos de scroll que haya activos (n)
-function 006 int out_region(0,0)                   // Indica si un proceso est  fuera de una region (id,regi¢n)
-function 007 int graphic_info(0,0,0)               // Devuelve informaci¢n de un gr fico (file,graph,info)
+function 006 int out_region(0,0)                   // Indica si un proceso estï¿½ fuera de una region (id,regiï¿½n)
+function 007 int graphic_info(0,0,0)               // Devuelve informaciï¿½n de un grï¿½fico (file,graph,info)
 function 008 int collision(0)                      // Devuelve el id del proceso "tipo" colisionante (tipo)
 function 009 int get_id(0)                         // Devuelve el primer id de un "tipo" determinado (tipo)
 function 010 int get_distx(0,0)                    // Devuelve distancia x de (angulo, distancia)
 function 011 int get_disty(0,0)                    // Devuelve distancia y de (angulo, distancia)
 function 012 int get_angle(0)                      // Devuelve el angulo hacia otro proceso (id)
 function 013 int get_dist(0)                       // Devuelve la distancia a otro proceso (id)
-function 014 int fade(0,0,0,0)                     // Fade de pantalla (%r,%g,%b,speed(1-lento .. 10-r pido))
-function 015 int load_fnt(0)                       // Carga un set de car cteres (256 colores, ancho var.) ("fichero.fnt")
+function 014 int fade(0,0,0,0)                     // Fade de pantalla (%r,%g,%b,speed(1-lento .. 10-rï¿½pido))
+function 015 int load_fnt(0)                       // Carga un set de carï¿½cteres (256 colores, ancho var.) ("fichero.fnt")
 function 016 int write(0,0,0,0,0)                  // Escribe un texto (font,x,y,centro,texto)
 function 017 int write_int(0,0,0,0,0)              // Escribe un numero (font,x,y,centro,&variable)
 function 018 int delete_text(0)                    // Borra un texto con su (id), o todos si (all_text)
 function 019 int move_text(0,0,0)                  // Indica nuevas coordenadas para un texto (t,x,y)
-function 020 int unload_fpg(0)                     // Descarga de memoria un fichero fpg (c¢digo_fpg)
-function 021 int rand(0,0)                         // Devuelve un n£mero aleatorio (min,max) ambos incluidos
-function 022 int define_region(0,0,0,0,0)          // Define una regi¢n de pantalla (n(1..max_region),x,y,an,al)
-function 023 int xput(0,0,0,0,0,0,0,0)             // Pinta un gr fico en pantalla (file,graf,x,y)
-function 024 int put(0,0,0,0)                      // Pinta un gr fico en pantalla (file,graf,x,y)
+function 020 int unload_fpg(0)                     // Descarga de memoria un fichero fpg (cï¿½digo_fpg)
+function 021 int rand(0,0)                         // Devuelve un nï¿½mero aleatorio (min,max) ambos incluidos
+function 022 int define_region(0,0,0,0,0)          // Define una regiï¿½n de pantalla (n(1..max_region),x,y,an,al)
+function 023 int xput(0,0,0,0,0,0,0,0)             // Pinta un grï¿½fico en pantalla (file,graf,x,y)
+function 024 int put(0,0,0,0)                      // Pinta un grï¿½fico en pantalla (file,graf,x,y)
 function 025 int put_screen(0,0)                   // Carga una pantalla (file,graf)
-function 026 int map_xput(0,0,0,0,0,0,0,0)         // Pone un gr fico en otro (file,graf_destino,graf,x,y,angle,size,flags)
-function 027 int map_put(0,0,0,0,0)                // Pone un gr fico en otro (file,graf_destino,graf,x,y)
+function 026 int map_xput(0,0,0,0,0,0,0,0)         // Pone un grï¿½fico en otro (file,graf_destino,graf,x,y,angle,size,flags)
+function 027 int map_put(0,0,0,0,0)                // Pone un grï¿½fico en otro (file,graf_destino,graf,x,y)
 function 028 int put_pixel(0,0,0)                  // Pone un pixel en copia (x,y,color)
 function 029 int get_pixel(0,0)                    // Lee un pixel de copia (x,y)
-function 030 int map_put_pixel(0,0,0,0,0)          // Pone un pixel en un gr fico (file,graf,x,y,color)
-function 031 int map_get_pixel(0,0,0,0)            // Lee un pixel de un gr fico (file,graf,x,y)
-function 032 int get_point(0,0,0,0,0)              // Lee un punto de control de un gr fico (file,graf,n,&x,&y)
+function 030 int map_put_pixel(0,0,0,0,0)          // Pone un pixel en un grï¿½fico (file,graf,x,y,color)
+function 031 int map_get_pixel(0,0,0,0)            // Lee un pixel de un grï¿½fico (file,graf,x,y)
+function 032 int get_point(0,0,0,0,0)              // Lee un punto de control de un grï¿½fico (file,graf,n,&x,&y)
 function 033 int clear_screen()                    // Borra el fondo de la pantalla
 function 034 int save(0,0,0)                       // Graba un bloque de datos a disco ("fichero",direccion,long)
 function 035 int load(0,0)                         // Carga un bloque de datos de disco ("fichero",direccion)
-function 036 int set_mode(0)                       // Pone un nuevo modo de v¡deo, por defecto 320x200 (modo)
+function 036 int set_mode(0)                       // Pone un nuevo modo de vï¿½deo, por defecto 320x200 (modo)
 function 037 int load_pcm(0,0)                     // Carga un sonido ("sonido.pcm",loop) devuelve id_sonido
 function 038 int unload_pcm(0)                     // Descarga un sonido (id_sonido)
 function 039 int sound(0,0,0)                      // Toca un pcm (id_sonido,volumen(0..256),frecuencia(0..256)) devuelve id_canal
 function 040 int stop_sound(0)                     // Para un sonido (id_canal)
 function 041 int change_sound(0,0,0)               // Modifica un sonido (id_canal,volumen,frecuencia)
-function 042 int set_fps(0,0)                      // Define el n§ de imagenes por segundo (n§ 1..100, max_saltos 0..N)
-function 043 int start_fli(0,0,0)                  // Abre un fli (fichero,x,y) devuelve el n§ de frames
-function 044 int frame_fli()                       // Muestra siguiente frame, devuelve 0 si termin¢ el fli
+function 042 int set_fps(0,0)                      // Define el nï¿½ de imagenes por segundo (nï¿½ 1..100, max_saltos 0..N)
+function 043 int start_fli(0,0,0)                  // Abre un fli (fichero,x,y) devuelve el nï¿½ de frames
+function 044 int frame_fli()                       // Muestra siguiente frame, devuelve 0 si terminï¿½ el fli
 function 045 int end_fli()                         // Finaliza el fli y descarga los buffers
 function 046 int reset_fli()                       // Reinicia el fli
 function 047 int system(0)                         // Invoca un comando DOS o a otro programa ("comando")
@@ -460,30 +435,30 @@ function 049 int fget_dist(0,0,0,0)                // Devuelve la distancia de A
 function 050 int fget_angle(0,0,0,0)               // Devuelve el angulo de A hasta B (Ax,Ay,Bx,By)
 function 051 int play_cd(0,0)                      // Toca una pista de audio (pista,0:solo pista 1:a partir de ella)
 function 052 int stop_cd()                         // Para el cd
-function 053 int is_playing_cd()                   // Dice si se est  escuchando una canci¢n (para implementar el loop)
-function 054 int start_mode7(0,0,0,0,0,0)          // Crea una ventana de m7 (n£mero 0..9,file,graf1,graf2,region,horizonte)
-function 055 int stop_mode7(0)                     // Elimina la ventana de m7 (n£mero 0..9)
+function 053 int is_playing_cd()                   // Dice si se estï¿½ escuchando una canciï¿½n (para implementar el loop)
+function 054 int start_mode7(0,0,0,0,0,0)          // Crea una ventana de m7 (nï¿½mero 0..9,file,graf1,graf2,region,horizonte)
+function 055 int stop_mode7(0)                     // Elimina la ventana de m7 (nï¿½mero 0..9)
 function 056 int advance(0)                        // Avanza el proceso "n" en su angle (n)
 function 057 int abs(0)                            // Devuelve el valor absoluto de un entero (n)
 function 058 int fade_on()                         // Enciende la pantalla, sin espera ()
 function 059 int fade_off()                        // Apaga la pantalla, while fading end ()
 function 060 int rand_seed(0)                      // Establece la semilla del rand (semilla)
-function 061 int sqrt(0)                           // Devuelve la raiz de un n£mero entero (n)
+function 061 int sqrt(0)                           // Devuelve la raiz de un nï¿½mero entero (n)
 function 062 int pow(0,0)                          // Devuelve n elevado a m (n,m)
 function 063 int map_block_copy(0,0,0,0,0,0,0,0,0) // Copia una region de un mapa a otro (file,graf_dest,x_dest,y_dest,graf,x,y,an,al)
-function 064 int move_scroll(0)                    // Mueve autom tica o manualmente un scroll (snum)
-function 065 int near_angle(0,0,0)                 // Acerca un  ngulo a otro en un incremento (angle1,angle2,angle_inc)
+function 064 int move_scroll(0)                    // Mueve automï¿½tica o manualmente un scroll (snum)
+function 065 int near_angle(0,0,0)                 // Acerca un ï¿½ngulo a otro en un incremento (angle1,angle2,angle_inc)
 function 066 int let_me_alone()                    // Mata a todos los procesos menos el actual ()
 function 067 int exit(0,0)                         // Termina el juego, mata todos los procesos ("Texto",error_level)
 function 068 int roll_palette(0,0,0)               // Rota una gama de colores (col_inicial,num_col,inc)
 function 069 int get_real_point(0,0,0)             // Donde esta un punto de control del proceso actual (n,&x,&y)
 function 070 int get_joy_button(0)                 // Estado de un boton del joystick (boton 0..3)
 function 071 int get_joy_position(0)               // Estado de un eje del joystick (eje 0..3)
-function 072 int convert_palette(0,0,0)            // Transforma la paleta de un gr fico (file,graf,&new_palette)
+function 072 int convert_palette(0,0,0)            // Transforma la paleta de un grï¿½fico (file,graf,&new_palette)
 function 073 int load_map(0)                       // Carga un mapa (asignado a file 0, graph>=1000)
 function 074 int reset_sound()                     // Reinicializa el sistema de sonido (struct setup)
 function 075 int unload_map(0)                     // Descarga de memoria un mapa
-function 076 int unload_fnt(0)                     // Descarga de memoria un set de car cteres
+function 076 int unload_fnt(0)                     // Descarga de memoria un set de carï¿½cteres
 function 077 int set_volume()                      // Fija el volumen (segun setup)
 
 function 038 int unload_sound(0)                     // Descarga un sonido (id_sonido)
@@ -495,42 +470,25 @@ function 073 int load_pcx(0)                       // Carga un mapa (asignado a 
 function 075 int unload_pcx(0)                     // Descarga de memoria un mapa
 
 function 078 int set_color(0,0,0,0)                // Define un color de la paleta (color,r,g,b)
-function 079 int net_join_game(0,0,0)              // Se une a una partida de red o la crea si no existe ("nombre",&estructura_datos,longitud_estructura_datos)
-function 080 int net_get_games()                   // Devuelve las partidas activas para este juego ()
-function 081 int stop_mode8(0)                     // Para una ventana de modo 8 (num_ventana)
 function 082 int xadvance(0,0)                     // Avanza (angulo,distancia)
 function 083 int char(0)                           // Retorna el (primer) caracter contenido en la cadena (string)
 
 function 084 int path_find(0,0,0,0,0,0,0,0)        // Busca el camino entre dos puntos (modo,file,code,tilesize,x,y,offset,sizeof)
 function 085 int path_line(0,0,0,0,0)              // Determina si puede ir en linea recta (file,code,tilesize,x,y)
-function 086 int path_free(0,0,0,0,0)              // Determina si un punto est  libre (file,code,tilesize,x,y)
+function 086 int path_free(0,0,0,0,0)              // Determina si un punto estï¿½ libre (file,code,tilesize,x,y)
 function 087 int new_map(0,0,0,0,0)                // Crea un nuevo mapa (ancho,alto,centro_x,centro_y,color)
-
-function 088 int load_wld(0,0)                     // Carga un mapa de modo 8("nombre_fichero",numero_fpg)
-function 089 int start_mode8(0,0,0)                // Inicializa el modo 8 (ide_camera,num_mode8,num_region)
-function 090 int go_to_flag(0)                     // Posiciona un objeto m8 en una bandera (bandera)
-function 091 int set_sector_height(0,0,0)          // Modifica las alturas de una zona de modo 8 (sector,suelo(-1 sin tocar),techo(-1 sin tocar))
-function 092 int get_sector_height(0,0,0)          // Devuelve las alturas de una zona de modo 8 (sector,&suelo,&techo)
-function 093 int set_point_m8(0,0,0)               // Modifica las coordenadas de un punto de m8 (punto,x,y)
-function 094 int get_point_m8(0,0,0)               // Devuelve las coordenadas de un punto de m8 (punto,&x,&y)
-function 095 int set_fog(0,0)                      // Modifica la tabla de fog de m8 (%inicio(-1 sin tocar),%fin(-1 sin tocar))
-function 096 int set_sector_texture(0,0,0,0)       // Modifica las texturas de una zona de m8 (sector,suelo(-1 sin tocar),techo(-1 sin tocar),fade(-1 sin tocar)(0-15))
-function 097 int get_sector_texture(0,0,0,0)       // Devuelve las texturas de una zona de m8 (sector,&suelo,&techo,&fade)
-function 098 int set_wall_texture(0,0,0)           // Modifica las texturas de una pared de m8 (pared,textura(-1 sin tocar),fade(-1 sin tocar)(0-15))
-function 099 int get_wall_texture(0,0,0)           // Devuelve las texturas de una pared de m8 (pared,&textura,&fade)
-function 100 int set_env_color(0,0,0)              // Devuelve las texturas de una pared de m8 (%r,%g,%b)
 
 function 101 string strcpy(0,0)                    // Funciones de cadenas, copia una a otra
 function 102 string strcat(0,0)                    // Funciones de cadenas, concatena dos cadenas
 function 103 int strlen(0)                         // Funciones de cadenas, devuelve la longitud
 function 104 int strcmp(0,0)                       // Funciones de cadenas, compara dos cadenas
-function 105 int strchr(0,0)                       // Funciones de cadenas, busca uno o varios caracteres (devuelve -1 o el ¡ndice)
-function 106 int strstr(0,0)                       // Funciones de cadenas, busca una cadena en otra (devuelve -1 o el ¡ndice)
+function 105 int strchr(0,0)                       // Funciones de cadenas, busca uno o varios caracteres (devuelve -1 o el ï¿½ndice)
+function 106 int strstr(0,0)                       // Funciones de cadenas, busca una cadena en otra (devuelve -1 o el ï¿½ndice)
 function 107 string strset(0,0)                    // Funciones de cadenas, rellena la cadena con el caracter dado
-function 108 string upper(0)                       // Funciones de cadenas, convierte a may£sculas (cadena o char)
-function 109 string lower(0)                       // Funciones de cadenas, convierte a min£sculas (cadena o char)
-function 110 string strdel(0,0,0)                  // Borra n caracteres del inicio y m del final (string,n,m) tambi‚n admite negativos (a¤ade espacios)
-function 111 int screen_copy(0,0,0,0,0,0,0)        // Pasa una region de pantalla a una region de un gr fico (region,file,graf,x,y,an,al)
+function 108 string upper(0)                       // Funciones de cadenas, convierte a mayï¿½sculas (cadena o char)
+function 109 string lower(0)                       // Funciones de cadenas, convierte a minï¿½sculas (cadena o char)
+function 110 string strdel(0,0,0)                  // Borra n caracteres del inicio y m del final (string,n,m) tambiï¿½n admite negativos (aï¿½ade espacios)
+function 111 int screen_copy(0,0,0,0,0,0,0)        // Pasa una region de pantalla a una region de un grï¿½fico (region,file,graf,x,y,an,al)
 function 112 int qsort(1,0)                        // Ordena una estructura (nombre_struct,campo,modo) (0-ascendente,1-descendente,2-desordenar)
 
 function 113 int load_song(0,0)                    // Carga una cancion ("cancion.XXX",loop) Devuelve su codigo
@@ -540,18 +498,18 @@ function 116 int stop_song()                       // Detiene la cancion que est
 function 117 int set_song_pos(0)                   // Pone la cancion en un pattern determinado
 function 118 int get_song_pos()                    // Devuelve el pattern que se esta tocando
 function 119 int get_song_line()                   // Devuelve la linea que se esta tocando
-function 120 int is_playing_sound(0)               // Dice si se est  tocando un sonido en un canal determinado
-function 121 int is_playing_song()                 // Dice si se est  tocando un modulo de musica (MOD, S3M, XM)
+function 120 int is_playing_sound(0)               // Dice si se estï¿½ tocando un sonido en un canal determinado
+function 121 int is_playing_song()                 // Dice si se estï¿½ tocando un modulo de musica (MOD, S3M, XM)
 
 function 122 int fopen(0,0)                        // Casi como en C (filename,"rwa+") (siempre modo binario)
 function 123 int fclose(0)                         // Casi como en C (handle) pero si handle es 0 hace un fcloseall
-function 124 int fread(0,0,0)                      // Casi como en C (&buffer,longitud(en ints),handle) pero con s¢lo una longitud de ints
+function 124 int fread(0,0,0)                      // Casi como en C (&buffer,longitud(en ints),handle) pero con sï¿½lo una longitud de ints
 function 125 int fwrite(0,0,0)                     // Inversa a fread (&buffer,longitud,handle)
-function 126 int fseek(0,0,0)                      // Id‚ntica a C (handle,posicion,modo) (modo seek_set/cur/end)
-function 127 int ftell(0)                          // Id‚ntica a C (handle)
+function 126 int fseek(0,0,0)                      // Idï¿½ntica a C (handle,posicion,modo) (modo seek_set/cur/end)
+function 127 int ftell(0)                          // Idï¿½ntica a C (handle)
 function 128 int filelength(0)                     // Longitud de un fichero abierto (handle)
-function 129 int flush()                           // Vacia buffers de escritura y devuelve n§ de ficheros abiertos
-function 130 int get_dirinfo(0,0)                  // Lee un directorio ("dir\*.pr?",_hidden+_system+_subdir) en la estructura dirinfo(files,name[]) y devuelve "files" (n£mero)
+function 129 int flush()                           // Vacia buffers de escritura y devuelve nï¿½ de ficheros abiertos
+function 130 int get_dirinfo(0,0)                  // Lee un directorio ("dir\*.pr?",_hidden+_system+_subdir) en la estructura dirinfo(files,name[]) y devuelve "files" (nï¿½mero)
 function 131 string get_fileinfo(0)                // Rellena la estructura fileinfo (fullpath (o cwd), drive, dir, name, ext, size, date, time, attrib) y devuelve puntero a "fullpath" o "cwd"
 function 132 int getdrive()                        // Devuelve la unidad actual (1-A, 2-B, ...)
 function 133 int setdrive(0)                       // Fija la unidad actual (idem)
@@ -561,7 +519,7 @@ function 136 int remove(0)                         // Borra archivos o directori
 
 function 137 int disk_free(0)                      // Espacio disponible en una unidad (en Kbs)
 function 138 int memory_free()                     // Memoria disponible (en Kbs)
-function 139 int ignore_error(0)                   // Ignorar un error de ejecuci¢n (n£mero)
+function 139 int ignore_error(0)                   // Ignorar un error de ejecuciï¿½n (nï¿½mero)
 
 function 140 int save_pcx(0,0,0)                   // Graba un mapa como pcx (file,graf,"archivo.pcx");
 
@@ -586,15 +544,15 @@ function 154 int itoa(0)                           // (int) Devuelve la cadena
 function 155 int change_channel(0,0,0)             // Modifica un canal (id_canal,volumen,panning)
 
 function 156 int malloc(0)                         // Asigna memoria dinamica. Devuelve indice de mem.
-function 157 int free(0)                           // Libera memoria dinamica. Devuelve 0 ¢ 1.
+function 157 int free(0)                           // Libera memoria dinamica. Devuelve 0 ï¿½ 1.
 
-function 158 int encode(0,0,0)                     // encode(offset, size, clave) Devuelve 0 ¢ 1
-function 159 int encode_file(0,0)                  // encode_file("*.*", clave) Devuelve 0 ¢ 1
-function 160 int decode_file(0,0)                  // decode_file("*.*", clave) Devuelve 0 ¢ 1
+function 158 int encode(0,0,0)                     // encode(offset, size, clave) Devuelve 0 ï¿½ 1
+function 159 int encode_file(0,0)                  // encode_file("*.*", clave) Devuelve 0 ï¿½ 1
+function 160 int decode_file(0,0)                  // decode_file("*.*", clave) Devuelve 0 ï¿½ 1
 
-function 161 int compress_file(0)                  // compress_file("*.*") Devuelve 0 ¢ 1
-function 162 int uncompress_file(0)                // uncompress_file("*.*") Devuelve 0 ¢ 1
+function 161 int compress_file(0)                  // compress_file("*.*") Devuelve 0 ï¿½ 1
+function 162 int uncompress_file(0)                // uncompress_file("*.*") Devuelve 0 ï¿½ 1
 
 function 163 int find_color(0,0,0)                 // Define un color de la paleta (r,g,b) de 0..63
 function 164 int load_screen(0)                    // Carga una imagen de fondo (filename)
-function 165 int force_pal(0)                      // Activa una paleta y adapta los archivos cargados despu‚s (filename)
+function 165 int force_pal(0)                      // Activa una paleta y adapta los archivos cargados despuï¿½s (filename)

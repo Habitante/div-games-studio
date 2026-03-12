@@ -176,7 +176,7 @@ These are declared but **never initialized** -- they remain NULL.
 
 1. `main()` at `div.c:389` -- entry point
 2. `OSDEP_Init()` at `div.c:395` -- calls `SDL_Init(SDL_INIT_EVERYTHING)`
-3. `Load_Cfgbin()` at `div.c:560` -- reads `system/setup.bin`, sets `vga_an`, `vga_al`, `fsmode` from saved settings (lines 4591-4594)
+3. `load_config()` at `div.c:560` -- reads `system/setup.bin`, sets `vga_an`, `vga_al`, `fsmode` from saved settings (lines 4591-4594)
 4. `inicializacion()` at `div.c:584`:
    - `detectar_vesa()` at `div.c:3346` -- populates `modos[]` array but `num_modos` stays 0
    - Allocates `copia` buffer (vga_an * vga_al) at line 3387

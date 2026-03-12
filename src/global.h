@@ -334,8 +334,8 @@ GLOBAL_DATA int CopyDesktop;
 GLOBAL_DATA int compilemode;
 
 int w_setup(void);
-void Save_Cfgbin();
-void Load_Cfgbin();
+void save_config();
+void load_config();
 
 GLOBAL_DATA char ce1, ce01, ce2, ce4; // Editor colours
 
