@@ -248,7 +248,7 @@ void menu_programas2(void) {
         flush_copy();
         mouse_graf = 1;
         wup(n);
-        div_strcpy(tipo[v_type].path, sizeof(tipo[v_type].path), v.prg->path);
+        div_strcpy(file_types[v_type].path, sizeof(file_types[v_type].path), v.prg->path);
         div_strcpy(input, sizeof(input), v.prg->filename);
         save_program();
         wdown(n);
@@ -293,7 +293,7 @@ void menu_programas2(void) {
         source_len = window[n].prg->file_len;
         v_window = n;
         run_mode = 0;
-        div_strcpy(tipo[8].path, sizeof(tipo[8].path), window[n].prg->path);
+        div_strcpy(file_types[8].path, sizeof(file_types[8].path), window[n].prg->path);
         compile_program();
         if (error_number != -1) {
           goto_error();
@@ -312,7 +312,7 @@ void menu_programas2(void) {
         flush_copy();
         mouse_graf = 1;
         wup(n);
-        div_strcpy(tipo[v_type].path, sizeof(tipo[v_type].path), v.prg->path);
+        div_strcpy(file_types[v_type].path, sizeof(file_types[v_type].path), v.prg->path);
         div_strcpy(input, sizeof(input), v.prg->filename);
         save_program();
         wdown(n);
@@ -323,7 +323,7 @@ void menu_programas2(void) {
           run_mode = 1;
         else
           run_mode = 3;
-        div_strcpy(tipo[8].path, sizeof(tipo[8].path), window[n].prg->path);
+        div_strcpy(file_types[8].path, sizeof(file_types[8].path), window[n].prg->path);
         compile_program();
         if (error_number != -1) {
           goto_error();
@@ -344,7 +344,7 @@ void menu_programas2(void) {
         v_window = n;
         run_mode = 2;
         delete_file("system/exec.ins");
-        div_strcpy(tipo[8].path, sizeof(tipo[8].path), window[n].prg->path);
+        div_strcpy(file_types[8].path, sizeof(file_types[8].path), window[n].prg->path);
         compile_program();
         if (error_number != -1) {
           goto_error();
@@ -354,7 +354,7 @@ void menu_programas2(void) {
           f = fopen("system/exec.ins", "rb");
           if (f != NULL) {
             fclose(f);
-            crear_instalacion();
+            create_installation();
             delete_file("install.div");
           } else {
             v_text = (char *)texts[238];
@@ -737,7 +737,7 @@ void menu_mapas2(void) {
         mouse_graf = 3;
         flush_copy();
         mouse_graf = 1;
-        div_strcpy(tipo[v_type].path, sizeof(tipo[v_type].path), window[n].mapa->path);
+        div_strcpy(file_types[v_type].path, sizeof(file_types[v_type].path), window[n].mapa->path);
         div_strcpy(input, sizeof(input), window[n].mapa->filename);
         save_map();
       }
@@ -833,7 +833,7 @@ int check_file(void) {
   v_text = (char *)texts[70];
   show_dialog(browser0);
 
-  div_strcpy(full, sizeof(full), tipo[v_type].path);
+  div_strcpy(full, sizeof(full), file_types[v_type].path);
   if (full[strlen(full) - 1] != '/')
     div_strcat(full, sizeof(full), "/");
   div_strcat(full, sizeof(full), input);
@@ -1021,7 +1021,7 @@ void menu_graficos2(void) {
           if (v_exists) {
             // Check that the file is not the same
             Fpg = (FPG *)window[n].aux;
-            div_strcpy(full, sizeof(full), tipo[4].path);
+            div_strcpy(full, sizeof(full), file_types[4].path);
             if (full[strlen(full) - 1] != '/')
               div_strcat(full, sizeof(full), "/");
             div_strcat(full, sizeof(full), input);
@@ -1171,7 +1171,7 @@ void print_fontmap(void) {
   v_mode = 1;
   v_type = 5;
 
-  div_strcpy(FontPathName, sizeof(FontPathName), tipo[v_type].path);
+  div_strcpy(FontPathName, sizeof(FontPathName), file_types[v_type].path);
   div_strcat(FontPathName, sizeof(FontPathName), "/");
   div_strcat(FontPathName, sizeof(FontPathName), FontName);
 
@@ -1190,7 +1190,7 @@ void print_fontmap(void) {
   }
 
   div_strcpy(FontName, sizeof(FontName), input);
-  DIV_STRCPY(FontPathName, tipo[v_type].path);
+  DIV_STRCPY(FontPathName, file_types[v_type].path);
   if (!IS_PATH_SEP(FontPathName[strlen(FontPathName) - 1]))
     div_strcat(FontPathName, sizeof(FontPathName), "/");
   div_strcat(FontPathName, sizeof(FontPathName), input); // * FontPathName full path of the file
@@ -1526,7 +1526,7 @@ no_tiene_nombre_sonido:
             flush_copy();
             mouse_graf = 1;
             mypcminfo = (pcminfo *)window[n].aux;
-            div_strcpy(full, sizeof(full), tipo[v_type].path);
+            div_strcpy(full, sizeof(full), file_types[v_type].path);
             if (full[strlen(full) - 1] != '/')
               div_strcat(full, sizeof(full), "/");
             div_strcat(full, sizeof(full), input);
@@ -2139,7 +2139,7 @@ void map_view2(void) {
       thumb_tex[n].ptr = NULL;
     for (n = 0; n < max_windows; n++)
       thumb_map[n].ptr = NULL;
-    div_strcpy(full, sizeof(full), tipo[1].path);
+    div_strcpy(full, sizeof(full), file_types[1].path);
     if (full[strlen(full) - 1] != '/')
       div_strcat(full, sizeof(full), "/");
     div_strcat(full, sizeof(full), "system/brush.fpg");
@@ -2858,7 +2858,7 @@ void create_listbox(struct t_listbox *l) {
     l->created = 1;
     l->zone = 0;
     if (l == &file_list) {
-      l->first_visible = tipo[v_type].first_visible;
+      l->first_visible = file_types[v_type].first_visible;
       if ((l->first_visible + l->visible_items) > l->total_items) {
         l->first_visible = 0;
       }
@@ -3135,17 +3135,17 @@ void analyze_input(void) {
         } else {
           div_strcpy(input, sizeof(input), file_mask); // Keep the old mask
         }
-        getcwd(tipo[v_type].path, PATH_MAX + 1);
+        getcwd(file_types[v_type].path, PATH_MAX + 1);
         print_path_br();
 
         file_list.created = 0;
         dir_list.created = 0;
-        tipo[v_type].first_visible = 0;
+        file_types[v_type].first_visible = 0;
         open_dir_br();
         create_listbox(&file_list);
         create_listbox(&dir_list);
       } else
-        _dos_setdrive(tipo[v_type].path[0] - 'A' + 1, &n);
+        _dos_setdrive(file_types[v_type].path[0] - 'A' + 1, &n);
     }
   } else
     div_strcpy(input, sizeof(input), file_mask);
@@ -3302,7 +3302,7 @@ void open_map(void) {
     return;
 
   if (!num_taggeds) {
-    div_strcpy(full, sizeof(full), tipo[v_type].path);
+    div_strcpy(full, sizeof(full), file_types[v_type].path);
     if (full[strlen(full) - 1] != '/')
       div_strcat(full, sizeof(full), "/");
     div_strcat(full, sizeof(full), input);
@@ -3327,7 +3327,7 @@ void open_map(void) {
     if (thumb[num].tagged) {
       div_try = 0;
       div_strcpy(input, sizeof(input), file_list_br.list + file_list_br.item_width * num);
-      div_strcpy(full, sizeof(full), tipo[v_type].path);
+      div_strcpy(full, sizeof(full), file_types[v_type].path);
       if (full[strlen(full) - 1] != '/')
         div_strcat(full, sizeof(full), "/");
       div_strcat(full, sizeof(full), input);
@@ -3424,7 +3424,7 @@ void open_map(void) {
   for (num = 0; num < file_list_br.total_items; num++) {
     if (thumb[num].tagged) {
       div_strcpy(input, sizeof(input), file_list_br.list + file_list_br.item_width * num);
-      div_strcpy(full, sizeof(full), tipo[v_type].path);
+      div_strcpy(full, sizeof(full), file_types[v_type].path);
       if (full[strlen(full) - 1] != '/')
         div_strcat(full, sizeof(full), "/");
       div_strcat(full, sizeof(full), input);
@@ -3510,7 +3510,7 @@ void open_map(void) {
                   // Set path\filename, map_width/al and create the new window
 
                   div_strcpy(v_map->filename, sizeof(v_map->filename), input);
-                  div_strcpy(v_map->path, sizeof(v_map->path), tipo[v_type].path);
+                  div_strcpy(v_map->path, sizeof(v_map->path), file_types[v_type].path);
                   memcpy(v_map->description, map_description, 32);
                   v_map->has_name = 0;
                   v_map->fpg_code = fpg_code;
@@ -3558,7 +3558,7 @@ void open_map(void) {
 //-----------------------------------------------------------------------------
 //      Save a map
 //
-// Input: tipo[v_type].path, input
+// Input: file_types[v_type].path, input
 //        map, dac, map_width, map_height
 //        v_window
 //-----------------------------------------------------------------------------
@@ -3575,7 +3575,7 @@ void save_map(void) {
   }
 
 
-  div_strcpy(full, sizeof(full), tipo[v_type].path);
+  div_strcpy(full, sizeof(full), file_types[v_type].path);
   if (full[strlen(full) - 1] != '/')
     div_strcat(full, sizeof(full), "/");
   div_strcat(full, sizeof(full), input);
@@ -3628,7 +3628,7 @@ void save_map(void) {
   }
 
   if (!e) { // Update the path and name of the saved map/window
-    div_strcpy(window[v_window].mapa->path, sizeof(window[v_window].mapa->path), tipo[v_type].path);
+    div_strcpy(window[v_window].mapa->path, sizeof(window[v_window].mapa->path), file_types[v_type].path);
     div_strcpy(window[v_window].mapa->filename, sizeof(window[v_window].mapa->filename), input);
     wgra(window[v_window].ptr, w, h, c_b_low, 2, 2, w - 20, 7);
     if (text_len(window[v_window].title) + 3 > w - 20) {

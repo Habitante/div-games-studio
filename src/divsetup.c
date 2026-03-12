@@ -178,7 +178,7 @@ void get_wallpaper() {
   v_text = (char *)texts[182];
   show_dialog((void_return_type_t)browser0);
 
-  div_strcpy(full, _MAX_PATH + 1, tipo[v_type].path);
+  div_strcpy(full, _MAX_PATH + 1, file_types[v_type].path);
 
   if (full[strlen(full) - 1] != '/')
     div_strcat(full, _MAX_PATH + 1, "/");
@@ -1043,8 +1043,8 @@ void config_setup_end(void) {
         xchg(0, n);
 
         if (v.foreground == 2) {
-          swap(v.w, v._an);
-          swap(v.h, v._al);
+          swap(v.w, v._w_saved);
+          swap(v.h, v._h_saved);
           swap(v.x, v._x);
           swap(v.y, v._y);
         }
@@ -1079,8 +1079,8 @@ void config_setup_end(void) {
         call((void_return_type_t)v.paint_handler);
 
         if (v.foreground == 2) {
-          swap(v.w, v._an);
-          swap(v.h, v._al);
+          swap(v.w, v._w_saved);
+          swap(v.h, v._h_saved);
           swap(v.x, v._x);
           swap(v.y, v._y);
         }

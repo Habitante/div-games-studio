@@ -27,16 +27,16 @@ void expres2(void);
 void expres3(void);
 void expres4(void);
 void expres5(void);
-void _encrypt(int encode, char *fichero, char *clave);
-void _compress_file(int encode, char *fichero);
+void _encrypt(int encode, char *filename, char *clave);
+void _compress_file(int encode, char *filename);
 
 
 extern int max_reloj;
 
-void _object_advance(int ide, int angulo, int velocidad);
+void _object_advance(int ide, int angle, int velocity);
 int joy_position(int eje);
 
-void _object_advance(int ide, int angulo, int velocidad) {
+void _object_advance(int ide, int angle, int velocity) {
   mem[id + _X] += get_distx(mem[id + _Angle], pila[sp]);
   mem[id + _Y] += get_disty(mem[id + _Angle], pila[sp]);
 }
@@ -58,7 +58,7 @@ void stop_mode7(void);
 int get_ticks(void);
 void function_exec(int, int);
 
-extern int omitidos[128];
+extern int skipped[128];
 extern int num_skipped;
 
 //----------------------------------------------------------------------------
@@ -440,11 +440,11 @@ int read_packfile(byte *file) {
 int hacer_fade = 0;
 
 void force_pal(void) {
-  adaptar_paleta = 0;
+  auto_adapt_palette = 0;
   if (pila[sp]) {
     load_pal();
     if (pila[sp])
-      adaptar_paleta = 1;
+      auto_adapt_palette = 1;
   }
 }
 
@@ -452,7 +452,7 @@ void load_pal(void) {
   byte pal[1352];
   int m, offs = 8;
 
-  if (adaptar_paleta) {
+  if (auto_adapt_palette) {
     e(183);
     pila[sp] = 0;
     return;
@@ -540,7 +540,7 @@ palfuera2:
   }
 
   for (m = 0; m < 768; m++)
-    if (pal[m + offs] != paleta[m])
+    if (pal[m + offs] != palette[m])
       break;
   if (m < 768) {
     dr = dacout_r;
@@ -551,11 +551,11 @@ palfuera2:
       fade_off();
       sp--;
     }
-    memcpy(paleta, pal + offs, 768);
+    memcpy(palette, pal + offs, 768);
     apply_palette();
   }
 
-  paleta_cargada = 1;
+  palette_loaded = 1;
   pila[sp] = 1;
 }
 
@@ -569,11 +569,11 @@ void apply_palette(void) {
 
   palcrc = 0;
   for (n = 0; n < 768; n++) {
-    palcrc += (int)paleta[n];
+    palcrc += (int)palette[n];
     palcrc <<= 1;
   }
 
-  memcpy(dac, paleta, 768);
+  memcpy(dac, palette, 768);
   init_ghost();
   create_ghost();
 
@@ -713,9 +713,9 @@ void descomprime_PCX(byte *buffer, byte *mapa) {
     buffer[con] /= 4;
   pcxdac = buffer;
 
-  if (!paleta_cargada) {
+  if (!palette_loaded) {
     for (con = 0; con < 768; con++)
-      if (buffer[con] != paleta[con])
+      if (buffer[con] != palette[con])
         break;
     if (con < 768) {
       dr = dacout_r;
@@ -726,10 +726,10 @@ void descomprime_PCX(byte *buffer, byte *mapa) {
         fade_off();
         sp--;
       }
-      memcpy(paleta, buffer, 768);
+      memcpy(palette, buffer, 768);
       apply_palette();
     }
-    paleta_cargada = 1;
+    palette_loaded = 1;
   }
 }
 
@@ -780,9 +780,9 @@ mapfuera:
     if (process_map != NULL)
       process_map((char *)ptr, file_len);
 
-    if (!paleta_cargada) {
+    if (!palette_loaded) {
       for (m = 0; m < 768; m++)
-        if (ptr[m + 48] != paleta[m])
+        if (ptr[m + 48] != palette[m])
           break;
       if (m < 768) {
         dr = dacout_r;
@@ -793,10 +793,10 @@ mapfuera:
           fade_off();
           sp--;
         }
-        memcpy(paleta, ptr + 48, 768);
+        memcpy(palette, ptr + 48, 768);
         apply_palette();
       }
-      paleta_cargada = 1;
+      palette_loaded = 1;
     }
 
     width = *(word *)(ptr + 8);
@@ -1013,9 +1013,9 @@ fpgfuera:
 
   if (process_fpg != NULL)
     process_fpg((char *)ptr, file_len);
-  if (!paleta_cargada) {
+  if (!palette_loaded) {
     for (m = 0; m < 768; m++)
-      if (ptr[m + 8] != paleta[m])
+      if (ptr[m + 8] != palette[m])
         break;
     if (m < 768) {
       dr = dacout_r;
@@ -1026,10 +1026,10 @@ fpgfuera:
         fade_off();
         sp--;
       }
-      memcpy(paleta, ptr + 8, 768);
+      memcpy(palette, ptr + 8, 768);
       apply_palette();
     }
-    paleta_cargada = 1;
+    palette_loaded = 1;
   }
 
   for (m = 0, n = 0; n < 768; n++) {
@@ -1374,8 +1374,8 @@ void get_id(void) {
 //----------------------------------------------------------------------------
 
 void get_disx(void) {
-  angulo = (float)pila[sp - 1] / radian;
-  pila[sp - 1] = (int)((float)cos(angulo) * pila[sp]);
+  angle = (float)pila[sp - 1] / radian;
+  pila[sp - 1] = (int)((float)cos(angle) * pila[sp]);
   sp--;
 }
 
@@ -1384,8 +1384,8 @@ void get_disx(void) {
 //----------------------------------------------------------------------------
 
 void get_disy(void) {
-  angulo = (float)pila[sp - 1] / radian;
-  pila[sp - 1] = -(int)((float)sin(angulo) * pila[sp]);
+  angle = (float)pila[sp - 1] / radian;
+  pila[sp - 1] = -(int)((float)sin(angle) * pila[sp]);
   sp--;
 }
 
@@ -1569,7 +1569,7 @@ fntfuera:
   f_i[ifonts].height = h;
   pila[sp] = ifonts;
 
-  if (adaptar_paleta) {
+  if (auto_adapt_palette) {
     adapt_palette(fonts[ifonts] + 1356 + sizeof(fnt_table_entry) * 256,
                   f_i[ifonts].len - 1356 - sizeof(fnt_table_entry) * 256, fonts[ifonts] + 8, NULL);
     f_i[ifonts].syspal = palcrc;
@@ -1639,7 +1639,7 @@ void adapt_palette(byte *ptr, int len, byte *pal, byte *xlat) {
   byte _xlat[256];
   byte *endptr;
 
-  if (adaptar_paleta) {
+  if (auto_adapt_palette) {
     if (xlat == NULL) {
       xlat = &_xlat[0];
 
@@ -1685,7 +1685,7 @@ void __write(void) {
     x++;
     if (x == max_texts)
       break;
-    if (pila[sp - 1] == texts[x].centro && pila[sp - 2] == texts[x].y && pila[sp - 3] == texts[x].x)
+    if (pila[sp - 1] == texts[x].alignment && pila[sp - 2] == texts[x].y && pila[sp - 3] == texts[x].x)
       break;
   }
 
@@ -1696,7 +1696,7 @@ void __write(void) {
       e(117);
       pila[sp] = 0;
     }
-    texts[x].centro = pila[sp--];
+    texts[x].alignment = pila[sp--];
     texts[x].y = pila[sp--];
     texts[x].x = pila[sp--];
     texts[x].font = (byte *)fonts[f];
@@ -1727,7 +1727,7 @@ void write_int(void) {
     x++;
     if (x == max_texts)
       break;
-    if (pila[sp - 1] == texts[x].centro && pila[sp - 2] == texts[x].y && pila[sp - 3] == texts[x].x)
+    if (pila[sp - 1] == texts[x].alignment && pila[sp - 2] == texts[x].y && pila[sp - 3] == texts[x].x)
       break;
   }
   if (x < max_texts) {
@@ -1737,7 +1737,7 @@ void write_int(void) {
       e(117);
       pila[sp] = 0;
     }
-    texts[x].centro = pila[sp--];
+    texts[x].alignment = pila[sp--];
     texts[x].y = pila[sp--];
     texts[x].x = pila[sp--];
     texts[x].font = (byte *)fonts[f];
@@ -3430,11 +3430,11 @@ void roll_palette(void) {
     while (color >= n)
       color -= n;
     color += c;
-    memcpy(&pal[color * 3], &paleta[x * 3], 3);
+    memcpy(&pal[color * 3], &palette[x * 3], 3);
   }
-  memcpy(&paleta[c * 3], &pal[c * 3], n * 3);
-  if (!activar_paleta)
-    activar_paleta = 1;
+  memcpy(&palette[c * 3], &pal[c * 3], n * 3);
+  if (!apply_palette_flag)
+    apply_palette_flag = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -3732,12 +3732,12 @@ void set_color(void) {
   r = abs(pila[sp--]) % 64;
   color = abs(pila[sp]) % 256;
 
-  paleta[color * 3] = r;
-  paleta[color * 3 + 1] = g;
-  paleta[color * 3 + 2] = b;
+  palette[color * 3] = r;
+  palette[color * 3 + 1] = g;
+  palette[color * 3 + 2] = b;
 
-  if (!activar_paleta)
-    activar_paleta = 1;
+  if (!apply_palette_flag)
+    apply_palette_flag = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -4607,12 +4607,12 @@ void ignore_error(void) {
   int n;
   n = 0;
   while (n < num_skipped) {
-    if (omitidos[n] == pila[sp])
+    if (skipped[n] == pila[sp])
       break;
     n++;
   }
   if (n >= num_skipped && num_skipped < 127) {
-    omitidos[num_skipped++] = pila[sp];
+    skipped[num_skipped++] = pila[sp];
   } else if (num_skipped == 127)
     e(168);
   pila[sp] = 0;
@@ -4727,7 +4727,7 @@ void draw(void) {
   drawing[x].y0 = pila[sp--];
   drawing[x].x0 = pila[sp--];
   drawing[x].region = pila[sp--];
-  drawing[x].porcentaje = pila[sp--];
+  drawing[x].opacity = pila[sp--];
   drawing[x].color = pila[sp--];
   drawing[x].type = pila[sp];
 
@@ -4739,7 +4739,7 @@ void draw(void) {
     drawing[x].type = 0;
     e(154);
   }
-  if (drawing[x].porcentaje < 0 || drawing[x].porcentaje > 15) {
+  if (drawing[x].opacity < 0 || drawing[x].opacity > 15) {
     drawing[x].type = 0;
     e(174);
   }
@@ -4811,7 +4811,7 @@ void move_draw(void) {
   drawing[draw_id].x1 = pila[sp--];
   drawing[draw_id].y0 = pila[sp--];
   drawing[draw_id].x0 = pila[sp--];
-  drawing[draw_id].porcentaje = pila[sp--];
+  drawing[draw_id].opacity = pila[sp--];
   drawing[draw_id].color = pila[sp--];
   pila[sp] = 0;
 
@@ -4819,7 +4819,7 @@ void move_draw(void) {
     drawing[draw_id].type = 0;
     e(154);
   }
-  if (drawing[draw_id].porcentaje < 0 || drawing[draw_id].porcentaje > 15) {
+  if (drawing[draw_id].opacity < 0 || drawing[draw_id].opacity > 15) {
     drawing[draw_id].type = 0;
     e(174);
   }
@@ -4900,13 +4900,13 @@ void save_mapcx(int tipo) {
 //----------------------------------------------------------------------------
 
 void write_in_map(void) {
-  int centro, texts;
+  int alignment, texts;
   int cx, cy, w, h;
   int fuente;
 
   byte *ptr, *ptr2;
 
-  centro = pila[sp--];
+  alignment = pila[sp--];
   texts = pila[sp--];
   fuente = pila[sp];
 
@@ -4919,7 +4919,7 @@ void write_in_map(void) {
     return;
   }
 
-  if (centro < 0 || centro > 8) {
+  if (alignment < 0 || alignment > 8) {
     e(117);
     return;
   }
@@ -4944,7 +4944,7 @@ void write_in_map(void) {
   cx = 0;
   cy = 0;
 
-  switch (centro) {
+  switch (alignment) {
   case 0:
     break;
   case 1:
@@ -5590,7 +5590,7 @@ void encode_file(int encode) {
   max_reloj += get_reloj() - old_clock;
 }
 
-void _encrypt(int encode, char *fichero, char *clave) {
+void _encrypt(int encode, char *filename, char *clave) {
   char full[_MAX_PATH + 1];
   char drive[_MAX_DRIVE + 1];
   char dir[_MAX_DIR + 1];
@@ -5600,7 +5600,7 @@ void _encrypt(int encode, char *fichero, char *clave) {
   byte *ptr, *p;
   FILE *f;
 
-  if ((f = fopen(fichero, "rb")) != NULL) {
+  if ((f = fopen(filename, "rb")) != NULL) {
     fseek(f, 0, SEEK_END);
     size = ftell(f);
     if ((ptr = (byte *)malloc(size)) != NULL) {
@@ -5644,19 +5644,19 @@ void _encrypt(int encode, char *fichero, char *clave) {
   for (n = 0; n < size; n++)
     p[n] ^= rndb();
 
-  _splitpath(fichero, drive, dir, fname, ext);
+  _splitpath(filename, drive, dir, fname, ext);
   div_strcpy(ext, sizeof(ext), "dj!");
   _makepath(full, drive, dir, fname, ext);
 
-  if (rename(fichero, full)) {
+  if (rename(filename, full)) {
     pila[sp] = 0;
     free(ptr);
     e(105);
     return;
   }
 
-  if ((f = open_save_file((byte *)fichero)) == NULL) {
-    rename(full, fichero);
+  if ((f = open_save_file((byte *)filename)) == NULL) {
+    rename(full, filename);
     free(ptr);
     pila[sp] = 0;
     e(105);
@@ -5666,8 +5666,8 @@ void _encrypt(int encode, char *fichero, char *clave) {
   if (encode) {
     if (fwrite("dj!\x1a\x0d\x0a\xff", 1, 8, f) != 8) {
       fclose(f);
-      remove(fichero);
-      rename(full, fichero);
+      remove(filename);
+      rename(full, filename);
       free(ptr);
       pila[sp] = 0;
       e(105);
@@ -5677,8 +5677,8 @@ void _encrypt(int encode, char *fichero, char *clave) {
 
   if (fwrite(p, 1, size, f) != size) {
     fclose(f);
-    remove(fichero);
-    rename(full, fichero);
+    remove(filename);
+    rename(full, filename);
     free(ptr);
     pila[sp] = 0;
     e(105);
@@ -5738,7 +5738,7 @@ void _compress(int encode) {
   max_reloj += get_reloj() - old_clock;
 }
 
-void _compress_file(int encode, char *fichero) {
+void _compress_file(int encode, char *filename) {
   char full[_MAX_PATH + 1];
   char drive[_MAX_DRIVE + 1];
   char dir[_MAX_DIR + 1];
@@ -5748,7 +5748,7 @@ void _compress_file(int encode, char *fichero) {
   byte *ptr, *ptr_dest;
   FILE *f;
 
-  if ((f = fopen(fichero, "rb")) != NULL) {
+  if ((f = fopen(filename, "rb")) != NULL) {
     fseek(f, 0, SEEK_END);
     size = ftell(f);
     if ((ptr = (byte *)malloc(size)) != NULL) {
@@ -5832,19 +5832,19 @@ void _compress_file(int encode, char *fichero) {
 
   free(ptr);
 
-  _splitpath(fichero, drive, dir, fname, ext);
+  _splitpath(filename, drive, dir, fname, ext);
   div_strcpy(ext, sizeof(ext), "ZX!");
   _makepath(full, drive, dir, fname, ext);
 
-  if (rename(fichero, full)) {
+  if (rename(filename, full)) {
     pila[sp] = 0;
     free(ptr_dest);
     e(105);
     return;
   }
 
-  if ((f = open_save_file((byte *)fichero)) == NULL) {
-    rename(full, fichero);
+  if ((f = open_save_file((byte *)filename)) == NULL) {
+    rename(full, filename);
     free(ptr_dest);
     pila[sp] = 0;
     e(105);
@@ -5854,8 +5854,8 @@ void _compress_file(int encode, char *fichero) {
   if (encode) {
     if (fwrite("zx!\x1a\x0d\x0a\xff", 1, 8, f) != 8) {
       fclose(f);
-      remove(fichero);
-      rename(full, fichero);
+      remove(filename);
+      rename(full, filename);
       free(ptr_dest);
       pila[sp] = 0;
       e(105);
@@ -5863,8 +5863,8 @@ void _compress_file(int encode, char *fichero) {
     }
     if (fwrite(&size, 1, 4, f) != 4) {
       fclose(f);
-      remove(fichero);
-      rename(full, fichero);
+      remove(filename);
+      rename(full, filename);
       free(ptr_dest);
       pila[sp] = 0;
       e(105);
@@ -5874,8 +5874,8 @@ void _compress_file(int encode, char *fichero) {
 
   if (fwrite(ptr_dest, 1, size2, f) != size2) {
     fclose(f);
-    remove(fichero);
-    rename(full, fichero);
+    remove(filename);
+    rename(full, filename);
     free(ptr_dest);
     pila[sp] = 0;
     e(105);

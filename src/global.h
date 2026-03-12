@@ -19,7 +19,7 @@
 //      Global Variables
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifdef DEFINIR_AQUI // Defined here
+#ifdef DEFINE_GLOBALS_HERE // Defined here
 #define GLOBAL_DATA
 #else
 #define GLOBAL_DATA extern
@@ -127,7 +127,7 @@ void flush_copy(void);
 void place_window(int flag, int *_x, int *_y, int w, int h);
 void on_window_moved(int x, int y, int w, int h);
 void _get(int text_id, int x, int y, int w, byte *buf, int lon_buf, int r0, int r1);
-void _button(int text_id, int x, int y, int centro);
+void _button(int text_id, int x, int y, int alignment);
 void _flag(int text_id, int x, int y, int *variable);
 void _show_items();
 void _process_items();
@@ -374,14 +374,14 @@ void blit_region(byte *dest, int dest_width, int dest_height, byte *p, int x, in
                  int salta);
 void blit_region_dark(byte *dest, int dest_width, int dest_height, byte *p, int x, int y, int w,
                       int h, int salta);
-void wwrite(byte *dest, int dest_width, int dest_height, int x, int y, int centro, byte *ptr,
+void wwrite(byte *dest, int dest_width, int dest_height, int x, int y, int alignment, byte *ptr,
             byte c);
 void wwrite_in_box(byte *dest, int dest_pitch, int dest_width, int dest_height, int x, int y,
-                   int centro, byte *ptr, byte c);
+                   int alignment, byte *ptr, byte c);
 int text_len(byte *ptr);
 int char_len(char);
-void boton(int n, int x, int y, int centro, int color);
-int ratonboton(int n, int x, int y, int centro);
+void draw_button(int n, int x, int y, int alignment, int color);
+int mouse_button_hit(int n, int x, int y, int alignment);
 
 void wline(char *ptr, int realan, int w, int h, int x0, int y0, int x1, int y1, char color);
 
@@ -389,14 +389,14 @@ void wline(char *ptr, int realan, int w, int h, int x0, int y0, int x1, int y1, 
 //      Functions exported by DIVLENGU (divlengu.c)
 ///////////////////////////////////////////////////////////////////////////////
 
-void initialize_texts(byte *fichero);
+void initialize_texts(byte *filename);
 void finalize_texts(void);
 
 ///////////////////////////////////////////////////////////////////////////////
 //      Functions exported by DIVCDROM (divcdrom.c)
 ///////////////////////////////////////////////////////////////////////////////
 
-void muestra_cd_player();
+void show_cd_player();
 void show_clock();
 void cdiv0(void);
 void cdiv1(void);
@@ -484,7 +484,7 @@ void mapper_warning2(void);
 // MapperVisor declarations removed (MODE8/3D map editor deleted)
 
 int new_map(byte *pre_buffer);
-void nuevo_mapa3D(void);
+void new_map_3d(void);
 void render_to_med();
 void reduce_half();
 int show_progress(char *title, int current, int total);
@@ -637,7 +637,7 @@ struct callback_data {
 extern struct callback_data cbd;
 
 //GLOBAL_DATA
-struct tipo_regla {
+struct gradient_rule {
   byte num_colors; // 8,16,32
   byte type;       // 0 (linear), 1-2-4-8 (adaptive every n colors)
   byte fixed;      // 0 (No), 1 (Yes)
@@ -645,7 +645,7 @@ struct tipo_regla {
 };
 
 
-GLOBAL_DATA struct tipo_regla gradients[16];
+GLOBAL_DATA struct gradient_rule gradients[16];
 
 GLOBAL_DATA int gradient; // Selected gradient (color range) number
 
@@ -682,12 +682,12 @@ GLOBAL_DATA int char_size;                             // font_width*font_height
 GLOBAL_DATA int current_mouse; // Mouse cursor graphic
 
 //GLOBAL_DATA
-struct tipo_undo {                  // Circular undo table
+struct undo_entry {                 // Circular undo table
   int start, end, x, y, w, h, mode; // start refers to *(undo+start)
   int code;                         // Map identifier for this undo entry
 }; // mode=-1 if entry unused
 
-GLOBAL_DATA struct tipo_undo *undo_table;
+GLOBAL_DATA struct undo_entry *undo_table;
 
 GLOBAL_DATA int undo_index; // Index into undo_table[], first free element
 
@@ -729,12 +729,12 @@ struct t_item {
     struct {
       byte *text;
       byte *buffer;
-      int x, y, w, lon_buffer;
+      int x, y, w, buffer_len;
       int r0, r1;
     } get;
     struct {
       byte *text;
-      int *valor;
+      int *value;
       int x, y;
     } flag;
   };
@@ -754,7 +754,7 @@ struct twindow {
   byte *title;    // Title bar text
   void_return_type_t paint_handler, click_handler, close_handler;
   int x, y, w, h;                // Window position and dimensions
-  int _x, _y, _an, _al;          // Position saved when minimized
+  int _x, _y, _w_saved, _h_saved; // Position saved when minimized
   byte *ptr;                     // Window buffer
   struct tmapa *mapa;            // Pointer to associated map struct
   struct tprg *prg;              // Pointer to associated program struct
@@ -865,14 +865,14 @@ GLOBAL_DATA int next_code; // Code for next created map
 GLOBAL_DATA int exit_requested;
 
 //GLOBAL_DATA
-struct ttipo {             // Information for each file type
+struct file_type_info {             // Information for each file type
   char path[PATH_MAX + 1]; // Default path
   char *ext;               // Extensions e.g.: "*.MAP *.PCX *.*"
   int default_choice;      // Default extension selection
   int first_visible;       // File listbox position in open dialog
 };
 
-GLOBAL_DATA struct ttipo tipo[24]; // Paths 0-(current working directory),
+GLOBAL_DATA struct file_type_info file_types[24]; // Paths 0-(current working directory),
                                    // 1-(path d.exe), 2-MAP, 3-PAL, 4-FPG, 5-FNT,
                                    // 6-IFS, 7-PCM, 8-PRG, 9-MAP(wallpapers),
                                    // 10-PAL(?), 11-PCM(save as,?), 12-PRJ,
@@ -1023,7 +1023,7 @@ GLOBAL_DATA int saved_esp;
 
 void init_compiler(void);
 void compile_program(void);
-void finaliza_compilador(void);
+void finalize_compiler(void);
 
 void compile(void); // Internal compiler functions
 void comp(void);
@@ -1051,7 +1051,7 @@ void tabula_help(byte *si, byte *di, int lon);
 //      Installation
 //-----------------------------------------------------------------------------
 
-void crear_instalacion(void);
+void create_installation(void);
 
 //-----------------------------------------------------------------------------
 //      Exported divedit functions

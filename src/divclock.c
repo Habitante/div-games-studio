@@ -17,12 +17,12 @@ static void Show_Time(void) {
   char cBuff[3];
   int Dig1, Dig2, Dig3, Dig4;
 
-  if (v.foreground != 2 || v.h > v._al) {
+  if (v.foreground != 2 || v.h > v._h_saved) {
     w = v.w;
     h = v.h;
   } else {
-    w = v._an;
-    h = v._al;
+    w = v._w_saved;
+    h = v._h_saved;
   }
   if (big) {
     w /= 2;

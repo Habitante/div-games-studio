@@ -5,7 +5,7 @@
 // Libraries used
 ///////////////////////////////////////////////////////////////////////////////
 
-#define DEFINIR_AQUI
+#define DEFINE_GLOBALS_HERE
 
 #include "inter.h"
 #include "div_string.h"
@@ -21,7 +21,7 @@ void InitHandler(int);
 int DetectBlaster(int *, int *, int *, int *, int *);
 int DetectGUS(int *, int *, int *, int *, int *);
 void system_font(void);
-void interprete(void);
+void interpreter(void);
 void create_color_lookup(void);
 void exec_process(void);
 void finalization(void);
@@ -346,7 +346,7 @@ void initialization(void) {
   iloc = mem[2];              // Start of local variables
   iloc_len = mem[6] + mem[5]; // Length of local (public and private)
   iloc_pub_len = mem[6];      // Length of local public variables
-  inicio_privadas = iloc_pub_len;
+  private_start = iloc_pub_len;
   imem = mem[8]; // End of code, locals, and texts (compiled length)
 
   if (iloc_len & 1) {
@@ -380,7 +380,7 @@ void initialization(void) {
 
   // Create the first two processes: init and main
 
-  procesos = 1;
+  process_count = 1;
   id_init = imem;
   imem += iloc_len;
   id_start = id_end = imem;
@@ -449,7 +449,7 @@ void initialization(void) {
   _mouse_x = mouse->x;
   _mouse_y = mouse->y;
 
-  memset(&paleta[0], 0, 768);
+  memset(&palette[0], 0, 768);
   memset(&dac[0], 0, 768);
   dacout_r = 0;
   dacout_g = 0;
@@ -458,7 +458,7 @@ void initialization(void) {
   now_dacout_r = 64;
   now_dacout_g = 64;
   now_dacout_b = 64;
-  paleta_cargada = 0;
+  palette_loaded = 0;
 
   set_dac();
   dirinfo->files = 0;
@@ -513,10 +513,10 @@ void initialization(void) {
 
   init_sin_cos(); // Sine and cosine tables for mode-7
 
-  memcpy(paleta, system_dac, 768);
+  memcpy(palette, system_dac, 768);
   apply_palette();
 
-  adaptar_paleta = 0; // Until force_pal is called...
+  auto_adapt_palette = 0; // Until force_pal is called...
 
 #ifdef DEBUG
 #ifndef __EMSCRIPTEN__
@@ -538,7 +538,7 @@ void initialization(void) {
   ss_time = 3000;
   ss_time_counter = 0;
   ss_status = 1;
-  activar_paleta = 0;
+  apply_palette_flag = 0;
 
   memset(tabfiles, 0, 32 * 4);
 
@@ -687,11 +687,11 @@ void load_stack(int id) {
     sp = 0;
 }
 
-void update_stack(int id, int valor) {
+void update_stack(int id, int value) {
   int32_t *p;
   if (mem[id + _SP]) {
     p = (int32_t *)(uintptr_t)stack[mem[id + _SP]];
-    p[p[1] - p[0] + 2] = valor;
+    p[p[1] - p[0] + 2] = value;
   }
 }
 
@@ -701,7 +701,7 @@ void update_stack(int id, int valor) {
 
 void mainloop(void) {
 #ifdef EMSCRIPTEN
-  if (!(procesos && !(kbdFLAGS[_ESC] && kbdFLAGS[_L_CTRL]) && !alt_x)) {
+  if (!(process_count && !(kbdFLAGS[_ESC] && kbdFLAGS[_L_CTRL]) && !alt_x)) {
     fprintf(stdout, "Program finished. Ending.\n");
     emscripten_cancel_main_loop();
     finalization();
@@ -751,7 +751,7 @@ void mainloop(void) {
  * until all processes are dead or the user presses Ctrl+Esc / Alt+X.
  * Calls finalization() on exit to free all runtime resources.
  */
-void interprete(void) {
+void interpreter(void) {
   initialization();
 #ifndef DEBUG
 #endif
@@ -759,7 +759,7 @@ void interprete(void) {
 #ifdef __EMSCRIPTEN__
   emscripten_set_main_loop(mainloop, 0, 1);
 #else
-  while (procesos && !(kbdFLAGS[_ESC] && kbdFLAGS[_L_CTRL]) && !alt_x) {
+  while (process_count && !(kbdFLAGS[_ESC] && kbdFLAGS[_L_CTRL]) && !alt_x) {
     mainloop();
   }
   finalization();
@@ -1382,11 +1382,11 @@ void frame_end(void) {
       fading = 1;
       retrace_pending = 1;
     } else {
-      if (activar_paleta) {
+      if (apply_palette_flag) {
         update_palette();
         set_dac();
         retrace_pending = 1;
-        activar_paleta--;
+        apply_palette_flag--;
       }
       fading = 0;
     }
@@ -1485,7 +1485,7 @@ void kill_process(int id) {
 #endif
 
   mem[id + _Status] = 0;
-  procesos--;
+  process_count--;
 
   if ((id2 = mem[id + _Father])) {
     if (mem[id2 + _Son] == id)
@@ -1697,7 +1697,7 @@ void e(int text_id) {
     return;
 
   while (n < num_skipped) {
-    if (omitidos[n] == text_id)
+    if (skipped[n] == text_id)
       break;
     n++;
   }
@@ -1964,7 +1964,7 @@ int main(int argc, char *argv[]) {
     kbd_init();
 
 
-    interprete();
+    interpreter();
   } else {
     fseek(f, stubsize + exestart, SEEK_SET);
     fread(mimem, 4, 10, f);
@@ -2092,7 +2092,7 @@ int main(int argc, char *argv[]) {
           }
 
 
-          interprete();
+          interpreter();
 #ifndef __EMSCRIPTEN__
           _dos_setdrive((int)toupper(*divpath) - 'A' + 1, &divnum);
           chdir(divpath);

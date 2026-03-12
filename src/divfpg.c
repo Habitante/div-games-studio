@@ -356,7 +356,7 @@ int new_file(void) {
   v_text = (char *)texts[69];
   show_dialog(browser0);
 
-  div_strcpy(full, sizeof(full), tipo[v_type].path);
+  div_strcpy(full, sizeof(full), file_types[v_type].path);
 
   if (full[strlen(full) - 1] != '/')
     div_strcat(full, sizeof(full), "//");
@@ -422,7 +422,7 @@ void open_file(void) {
     return;
 
   if (!num_taggeds) {
-    div_strcpy(full, sizeof(full), tipo[v_type].path);
+    div_strcpy(full, sizeof(full), file_types[v_type].path);
 
     if (full[strlen(full) - 1] != '/')
       div_strcat(full, sizeof(full), "/");
@@ -451,7 +451,7 @@ void open_file(void) {
   for (num = 0; num < file_list_br.total_items; num++) {
     if (thumb[num].tagged) {
       div_strcpy(input, sizeof(input), file_list_br.list + file_list_br.item_width * num);
-      div_strcpy(full, sizeof(full), tipo[v_type].path);
+      div_strcpy(full, sizeof(full), file_types[v_type].path);
 
       if (full[strlen(full) - 1] != '/')
         div_strcat(full, sizeof(full), "/");
@@ -555,7 +555,7 @@ void open_file(void) {
   for (num = 0; num < file_list_br.total_items; num++) {
     if (thumb[num].tagged) {
       div_strcpy(input, sizeof(input), file_list_br.list + file_list_br.item_width * num);
-      div_strcpy(full, sizeof(full), tipo[v_type].path);
+      div_strcpy(full, sizeof(full), file_types[v_type].path);
 
       if (full[strlen(full) - 1] != '/')
         div_strcat(full, sizeof(full), "/");
@@ -1096,13 +1096,13 @@ void print_list(void) {
 
     if (num > 0) {
       if (f_ar) {
-        _dos_setdrive(toupper(*tipo[1].path) - 'A' + 1, &u);
-        chdir(tipo[1].path);
+        _dos_setdrive(toupper(*file_types[1].path) - 'A' + 1, &u);
+        chdir(file_types[1].path);
         f = fopen(n_ar, "rb");
 
         if (f != NULL) {
           fclose(f);
-          div_snprintf(cwork, sizeof(cwork), "%s\\%s", tipo[1].path, n_ar);
+          div_snprintf(cwork, sizeof(cwork), "%s\\%s", file_types[1].path, n_ar);
           strupr(cwork);
           v_title = (char *)texts[450];
           v_text = cwork;
@@ -1321,7 +1321,7 @@ void FPG_create_listbox_br(struct t_listboxbr *l) {
     l->buttons = 0;
     l->created = 1;
     l->zone = 0;
-    l->first_visible = tipo[v_type].first_visible;
+    l->first_visible = file_types[v_type].first_visible;
 
     if ((l->first_visible + (l->lines - 1) * l->columns) >= l->total_items)
       l->first_visible = 0;
@@ -2070,7 +2070,7 @@ int select_file(void) {
   v_text = (char *)texts[69];
   show_dialog(browser0);
 
-  div_strcpy(full, sizeof(full), tipo[v_type].path);
+  div_strcpy(full, sizeof(full), file_types[v_type].path);
 
   if (full[strlen(full) - 1] != '/')
     div_strcat(full, sizeof(full), "/");

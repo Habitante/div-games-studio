@@ -27,7 +27,7 @@ int text_len(byte *ptr);
 void wwrite_in_box(byte *dest, int dest_pitch, int dest_width, int dest_height, int x_org,
                    int y_org, int centro_org, byte *ptr, byte c);
 
-void wwrite(byte *dest, int dest_width, int dest_height, int x, int y, int centro, byte *ptr,
+void wwrite(byte *dest, int dest_width, int dest_height, int x, int y, int alignment, byte *ptr,
             byte c);
 
 void dread_mouse(void);
@@ -87,7 +87,7 @@ void paint_var_list(void);
 void paint_segment2(void);
 int get_offset(int m);
 int memo(int dir);
-void visualize(int valor, int object, char *str);
+void visualize(int value, int object, char *str);
 int _get_offset(int m);
 void determine_code(void);
 void f_down(void);
@@ -1452,15 +1452,15 @@ int text_len2(byte *ptr) {
   return (w - 1);
 }
 
-void wwrite(byte *dest, int dest_width, int dest_height, int x, int y, int centro, byte *ptr,
+void wwrite(byte *dest, int dest_width, int dest_height, int x, int y, int alignment, byte *ptr,
             byte c) {
-  wwrite_in_box(dest, dest_width, dest_width, dest_height, x, y, centro, ptr, c);
+  wwrite_in_box(dest, dest_width, dest_width, dest_height, x, y, alignment, ptr, c);
 }
 
 void wwrite_in_box(byte *dest, int dest_pitch, int dest_width, int dest_height, int x_org,
                    int y_org, int centro_org, byte *ptr, byte c) {
   int w, h, boton, multi;
-  int centro = centro_org, x = x_org, y = y_org;
+  int alignment = centro_org, x = x_org, y = y_org;
 
   struct _car {
     byte w;
@@ -1469,15 +1469,15 @@ void wwrite_in_box(byte *dest, int dest_pitch, int dest_width, int dest_height, 
 
   byte *font;
 
-  if (centro & 0xFF00) {
-    w = (centro >> 8);
+  if (alignment & 0xFF00) {
+    w = (alignment >> 8);
     h = 7;
-    centro &= 0xFF;
+    alignment &= 0xFF;
   } else
     w = 0;
 
-  if (centro >= 10) {
-    centro -= 10;
+  if (alignment >= 10) {
+    alignment -= 10;
     multi = 1;
   } else
     multi = 0;
@@ -1509,7 +1509,7 @@ void wwrite_in_box(byte *dest, int dest_pitch, int dest_width, int dest_height, 
 
   font = text_font + 1025;
 
-  switch (centro) {
+  switch (alignment) {
   case 0:
     break;
   case 1:
@@ -1578,7 +1578,7 @@ void wwrite_in_box(byte *dest, int dest_pitch, int dest_width, int dest_height, 
         w--;
     }
     font = text_font + 1025;
-    switch (centro) {
+    switch (alignment) {
     case 0:
       break;
     case 1:
@@ -1939,7 +1939,7 @@ void _button(byte *t, int x, int y, int c) {
   v.items++;
 }
 
-void _get(byte *t, int x, int y, int w, byte *buffer, int lon_buffer, int r0, int r1) {
+void _get(byte *t, int x, int y, int w, byte *buffer, int buffer_len, int r0, int r1) {
   v.item[v.items].type = 2;
   v.item[v.items].state = 0;
   v.item[v.items].get.text = t;
@@ -1947,7 +1947,7 @@ void _get(byte *t, int x, int y, int w, byte *buffer, int lon_buffer, int r0, in
   v.item[v.items].get.y = y;
   v.item[v.items].get.w = w;
   v.item[v.items].get.buffer = buffer;
-  v.item[v.items].get.lon_buffer = lon_buffer;
+  v.item[v.items].get.buffer_len = buffer_len;
   v.item[v.items].get.r0 = r0;
   v.item[v.items].get.r1 = r1;
   if (v.selected_item == -1)
@@ -1955,13 +1955,13 @@ void _get(byte *t, int x, int y, int w, byte *buffer, int lon_buffer, int r0, in
   v.items++;
 }
 
-void _flag(byte *t, int x, int y, int *valor) {
+void _flag(byte *t, int x, int y, int *value) {
   v.item[v.items].type = 3;
   v.item[v.items].state = 0;
   v.item[v.items].flag.text = t;
   v.item[v.items].flag.x = x;
   v.item[v.items].flag.y = y;
-  v.item[v.items].flag.valor = valor;
+  v.item[v.items].flag.value = value;
   v.items++;
 }
 
@@ -2045,7 +2045,7 @@ void select_get(t_item *i, int activo, int ocultar_error) {
     if (i->state & 2) {
       if (*get) {
         if (i->get.r0 == i->get.r1)
-          div_strcpy((char *)i->get.buffer, i->get.lon_buffer, get);
+          div_strcpy((char *)i->get.buffer, i->get.buffer_len, get);
         else {
           if (atoi(get) >= i->get.r0 && atoi(get) <= i->get.r1)
             itoa(atoi(get), (char *)i->get.buffer, 10);
@@ -2076,7 +2076,7 @@ void select_get(t_item *i, int activo, int ocultar_error) {
 }
 
 void show_flag(t_item *i) {
-  if (*i->flag.valor)
+  if (*i->flag.value)
     wput(v.ptr, v.w / big2, v.h / big2, i->flag.x, i->flag.y, -59);
   else
     wput(v.ptr, v.w / big2, v.h / big2, i->flag.x, i->flag.y, 58);
@@ -2171,7 +2171,7 @@ void _process_items(void) {
           ascii = 0;
           if (superget)
             div_strcpy((char *)v.item[v.selected_item].get.buffer,
-                       v.item[v.selected_item].get.lon_buffer, "");
+                       v.item[v.selected_item].get.buffer_len, "");
           div_strcpy(get, sizeof(get), (char *)v.item[v.selected_item].get.buffer);
           get_pos = strlen(get);
           select_get(&v.item[v.selected_item], 0, 1);
@@ -2400,7 +2400,7 @@ void process_flag(int n, int e) {
            v.item[n].flag.text, c4);
     if (v.item[n].state == 1) {
       v.active_item = n;
-      if ((*v.item[n].flag.valor = !*v.item[n].flag.valor))
+      if ((*v.item[n].flag.value = !*v.item[n].flag.value))
         wput(v.ptr, v.w / big2, v.h / big2, v.item[n].flag.x, v.item[n].flag.y, -59);
       else
         wput(v.ptr, v.w / big2, v.h / big2, v.item[n].flag.x, v.item[n].flag.y, 58);
@@ -2433,7 +2433,7 @@ void get_input(int n) {
       get_pos--;
     }
     if (!*get && superget)
-      div_strcpy((char *)v.item[v.selected_item].get.buffer, v.item[v.selected_item].get.lon_buffer,
+      div_strcpy((char *)v.item[v.selected_item].get.buffer, v.item[v.selected_item].get.buffer_len,
                  "");
     v.redraw = 1;
     break;
@@ -2464,13 +2464,13 @@ void get_input(int n) {
         memmove(&get[get_pos], &get[get_pos + 1], strlen(&get[get_pos + 1]) + 1);
         if (!*get && superget)
           div_strcpy((char *)v.item[v.selected_item].get.buffer,
-                     v.item[v.selected_item].get.lon_buffer, "");
+                     v.item[v.selected_item].get.buffer_len, "");
         break;
       default:
         v.redraw = l;
         break;
       }
-    } else if (ascii && char_len(ascii) > 1 && (x = strlen(get)) < v.item[n].get.lon_buffer - 1) {
+    } else if (ascii && char_len(ascii) > 1 && (x = strlen(get)) < v.item[n].get.buffer_len - 1) {
       div_strcpy(cwork, sizeof(cwork), get);
       cwork[get_pos] = ascii;
       cwork[get_pos + 1] = 0;
@@ -2765,12 +2765,12 @@ void _err2(void) {
     end_dialog = 1;
     n = 0;
     while (n < num_skipped) {
-      if (omitidos[n] == num_error)
+      if (skipped[n] == num_error)
         break;
       n++;
     }
     if (n >= num_skipped && num_skipped < 128) {
-      omitidos[num_skipped++] = num_error;
+      skipped[num_skipped++] = num_error;
     }
   }
   if (v.active_item == 2) {
@@ -2821,7 +2821,7 @@ void e(int text_id) {
   te = (char *)text[text_id];
   n = 0;
   while (n < num_skipped) {
-    if (omitidos[n] == num_error)
+    if (skipped[n] == num_error)
       break;
     n++;
   }
@@ -4462,47 +4462,47 @@ show_indice:
 //  Display an object according to its visor[] mode
 //----------------------------------------------------------------------------
 
-void visualize(int valor, int object, char *str) {
+void visualize(int value, int object, char *str) {
   int n;
   div_strcat(str, 512, " = ");
   switch (visor[object]) {
   case 0: // Integer
-    itoa(valor, str + strlen(str), 10);
+    itoa(value, str + strlen(str), 10);
     break;
   case 1: // Boolean
-    if (valor & 1)
+    if (value & 1)
       div_strcat(str, 512, "TRUE");
     else
       div_strcat(str, 512, "FALSE");
     break;
   case 2: // Text
-    if (valor >= 256) {
+    if (value >= 256) {
       div_strcat(str, 512, "\"");
-      if (strlen((char *)&mem[valor]) + strlen(str) < 511) {
-        div_strcat(str, 512, (char *)&mem[valor]);
+      if (strlen((char *)&mem[value]) + strlen(str) < 511) {
+        div_strcat(str, 512, (char *)&mem[value]);
       } else {
         str[strlen(str) + 256] = 0;
-        memcpy(str + strlen(str), (char *)&mem[valor], 256);
+        memcpy(str + strlen(str), (char *)&mem[value], 256);
       }
       div_strcat(str, 512, "\"");
-    } else if (valor >= 0 && valor <= 255) {
-      if (valor == 0)
+    } else if (value >= 0 && value <= 255) {
+      if (value == 0)
         div_strcat(str, 512, "<EOL>");
       else
-        div_snprintf(str + strlen(str), 512 - strlen(str), "\"%c\"", valor);
+        div_snprintf(str + strlen(str), 512 - strlen(str), "\"%c\"", value);
     } else
-      itoa(valor, str + strlen(str), 10);
+      itoa(value, str + strlen(str), 10);
     break;
   case 3: // Process
-    if (valor == id_init) {
+    if (value == id_init) {
       div_strcat(str, 512, "div_main()");
-    } else if (valor) {
+    } else if (value) {
       for (n = 0; n < iids; n++)
-        if (ids[n] == valor)
+        if (ids[n] == value)
           break;
       if (n < iids) {
         for (n = 0; n < num_objects; n++)
-          if (o[n].type == tproc && o[n].v0 == mem[valor + _Bloque])
+          if (o[n].type == tproc && o[n].v0 == mem[value + _Bloque])
             break;
         if (n < num_objects) {
           div_strcat(str, 512, (char *)vnom + o[n].name);
@@ -4512,36 +4512,36 @@ void visualize(int valor, int object, char *str) {
           n = 0;
       } else
         n = 0;
-      itoa(valor, str + strlen(str), 10);
+      itoa(value, str + strlen(str), 10);
       if (n)
         div_strcat(str, 512, ")");
     } else
       div_strcat(str, 512, (char *)text[53]);
     break;
   case 4: // Angle
-    while (valor > pi)
-      valor -= 2 * pi;
-    while (valor < -pi)
-      valor += 2 * pi;
-    div_snprintf(str + strlen(str), 512 - strlen(str), "%.3f\xa7, %.4f rad", (float)valor / 1000.0,
-                 (float)valor / radian);
+    while (value > pi)
+      value -= 2 * pi;
+    while (value < -pi)
+      value += 2 * pi;
+    div_snprintf(str + strlen(str), 512 - strlen(str), "%.3f\xa7, %.4f rad", (float)value / 1000.0,
+                 (float)value / radian);
     break;
   case 5: // Hex
-    div_snprintf(str + strlen(str), 512 - strlen(str), "0x%X", valor);
+    div_snprintf(str + strlen(str), 512 - strlen(str), "0x%X", value);
     break;
   case 6: // Bin
     for (n = 0; n < 32; n++)
-      if (valor & 0x80000000)
+      if (value & 0x80000000)
         break;
       else
-        valor <<= 1;
+        value <<= 1;
     if (n < 32) {
       for (; n < 32; n++) {
-        if (valor & 0x80000000)
+        if (value & 0x80000000)
           div_strcat(str, 512, "1");
         else
           div_strcat(str, 512, "0");
-        valor <<= 1;
+        value <<= 1;
       }
       div_strcat(str, 512, " Bin");
     } else {
@@ -4746,7 +4746,7 @@ word *get_offset_word(int m) {
 
 #define y_bt 34
 char buscar[32];
-int valor;
+int value;
 
 void change1(void) {
   _show_items();
@@ -4792,14 +4792,14 @@ void change0(void) {
   v.click_handler = change2;
 
   if (get_offset(var_select) == 1) {
-    valor = *get_offset_byte(var_select);
+    value = *get_offset_byte(var_select);
   } else if (get_offset(var_select) == 2) {
-    valor = *get_offset_word(var_select);
+    value = *get_offset_word(var_select);
   } else {
-    valor = memo(get_offset(var_select));
+    value = memo(get_offset(var_select));
   }
 
-  itoa(valor, buscar, 10);
+  itoa(value, buscar, 10);
   _get((byte *)text[57], 4, 11, v.w - 8, (byte *)buscar, 32, 0, 0);
   _button(text[7], 7, y_bt, 0);
   _button(text[58], v.w - 8, y_bt, 2);
@@ -4863,7 +4863,7 @@ void debug1(void) {
   wbox(ptr, w, h, c12, 2, 10, w - 4, 144 - 16 - 32 - 10);
 
   _show_items2();
-  itoa(procesos, msg, 10);
+  itoa(process_count, msg, 10);
   div_strcat(msg, sizeof(msg), "/");
   itoa((imem_max - id_start) / iloc_len, msg + strlen(msg), 10);
 
@@ -5174,7 +5174,7 @@ next_frame:
       }
       break;
     }
-    if (procesos) {
+    if (process_count) {
       frame_clock = reloj_debug;
       ticks = ticks_debug;
       set_mouse(smouse_x, smouse_y);
@@ -5336,7 +5336,7 @@ trace_proc:
       }
       break;
     }
-    if (procesos) {
+    if (process_count) {
       if (procesos_ejecutados()) {
         frame_clock = reloj_debug;
         ticks = ticks_debug;
@@ -5419,7 +5419,7 @@ step_proc:
       }
       break;
     }
-    if (procesos) {
+    if (process_count) {
       if (procesos_ejecutados()) {
         frame_clock = reloj_debug;
         ticks = ticks_debug;
@@ -5479,7 +5479,7 @@ exec_proc:
         repaint_window();
       }
     }
-    if (procesos) {
+    if (process_count) {
       if (procesos_ejecutados()) {
         frame_clock = reloj_debug;
         ticks = ticks_debug;

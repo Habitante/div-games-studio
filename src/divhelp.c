@@ -7,7 +7,7 @@
 #include "div_string.h"
 
 extern int window_closing;
-extern int primera_vez;
+extern int first_run;
 
 int helpidx[4096];        // Per topic: {offset, length}
 int help_item;            // Which topic help is requested for
@@ -440,7 +440,7 @@ void help2(void) {
 
                   v_prg->buffer_len = 16384;
                   div_strcpy(v_prg->filename, sizeof(v_prg->filename), (char *)texts[220]);
-                  div_strcpy(v_prg->path, sizeof(v_prg->path), (char *)tipo[1].path);
+                  div_strcpy(v_prg->path, sizeof(v_prg->path), (char *)file_types[1].path);
                   v_prg->file_len = di - p;
                   v_prg->buffer = p;
                   v_prg->lptr = p;
@@ -765,7 +765,7 @@ void help(int n) {
             help_w = 120;
           help_h = (vga_height / 2 - (12 + 16) * big2 - 1) / font_height;
           help_l = 0;
-          if (primera_vez)
+          if (first_run)
             help_h += 5;
           tabula_help(p + 1, help_buffer, helpidx[n * 2 + 1] - (p + 1 - h_buffer));
           new_window(help0);
@@ -1876,12 +1876,12 @@ void Print_Help(void) {
 
   if (v_accept) {
     if (f_ar) {
-      _dos_setdrive(toupper(*tipo[1].path) - 'A' + 1, &u);
-      chdir(tipo[1].path);
+      _dos_setdrive(toupper(*file_types[1].path) - 'A' + 1, &u);
+      chdir(file_types[1].path);
       g = fopen(h_ar, "rb");
       if (g != NULL) {
         fclose(g);
-        DIV_SPRINTF(cwork, "%s/%s", tipo[1].path, h_ar);
+        DIV_SPRINTF(cwork, "%s/%s", file_types[1].path, h_ar);
         strupr(cwork);
         v_title = (char *)texts[450];
         v_text = cwork;

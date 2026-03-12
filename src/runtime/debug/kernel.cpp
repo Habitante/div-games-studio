@@ -82,12 +82,12 @@ case lcal:
   process_exec(id,get_ticks()-profile_clock); profile_clock=get_ticks();
   #endif
   mem[id+_IP]=ip+1; id2=id; if (sp>long_pila) exer(3);
-  procesos++; ip=mem[ip]; id=id_start;
+  process_count++; ip=mem[ip]; id=id_start;
 
-//printf("Processes: %d  id:%d p*len:%d id_end: %d\n",procesos,id_end-id,(id_start)+((procesos-2)*iloc_len),id_end);
+//printf("Processes: %d  id:%d p*len:%d id_end: %d\n",process_count,id_end-id,(id_start)+((process_count-2)*iloc_len),id_end);
 
 
-if((id_start+((procesos-2)*iloc_len)) == id_end)
+if((id_start+((process_count-2)*iloc_len)) == id_end)
 	id=id_end+iloc_len;
 
 
@@ -152,10 +152,10 @@ case lcbp:
   mem[id+_Param]=sp-mem[id+_NumPar]+1;
   break;
 case lcpa: mem[pila[sp--]]=pila[mem[id+_Param]++]; break;
-case ltyp: mem[id+_Bloque]=mem[ip++]; inicio_privadas=mem[6]; break;
+case ltyp: mem[id+_Bloque]=mem[ip++]; private_start=mem[6]; break;
 case lpri:
-  memcpy(&mem[id+inicio_privadas],&mem[ip+1],(mem[ip]-ip-1)<<2);
-  inicio_privadas+=(mem[ip]-ip-1); ip=mem[ip]; break;
+  memcpy(&mem[id+private_start],&mem[ip+1],(mem[ip]-ip-1)<<2);
+  private_start+=(mem[ip]-ip-1); ip=mem[ip]; break;
 case lcse:
   if (pila[sp-1]==pila[sp]) ip++; else ip=mem[ip];
   sp--; break;
@@ -206,7 +206,7 @@ case lora: pila[sp-1]=mem[pila[sp-1]]|=pila[sp]; sp--; break;
 case lxoa: pila[sp-1]=mem[pila[sp-1]]^=pila[sp]; sp--; break;
 case lsra: pila[sp-1]=mem[pila[sp-1]]>>=pila[sp]; sp--; break;
 case lsla: pila[sp-1]=mem[pila[sp-1]]<<=pila[sp]; sp--; break;
-case lpar: inicio_privadas+=mem[ip++]; break;
+case lpar: private_start+=mem[ip++]; break;
 case lrtf:
   #ifdef DEBUG
   if (mem[id+_FCount]==0) process_level--;
@@ -224,7 +224,7 @@ case lrtf:
   ip=mem[id+_IP];
   break;
 case lclo:
-  procesos++; id2=id; id=id_start;
+  process_count++; id2=id; id=id_start;
   while (mem[id+_Status] && id<=id_end) id+=iloc_len;
   if (id>id_end) { if (id>imem_max-iloc_len) exer(2); id_end=id; }
   memcpy(&mem[id],&mem[id2],iloc_len<<2);

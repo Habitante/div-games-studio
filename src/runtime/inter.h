@@ -1,5 +1,5 @@
 
-#ifdef DEFINIR_AQUI
+#ifdef DEFINE_GLOBALS_HERE
 #define GLOBAL
 #else
 #define GLOBAL extern
@@ -155,7 +155,7 @@ void memcpyb(byte *di, byte *si, int n);
 //      Functions exported by DIVLENGU (divlengu.cpp)
 ///////////////////////////////////////////////////////////////////////////////
 
-void initialize_texts(byte *fichero);
+void initialize_texts(byte *filename);
 void finalize_texts(void);
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -357,9 +357,9 @@ struct _setup { // x1
 GLOBAL struct _setup *setup;
 
 struct _net { // x1
-  int dispositivo, com, velocidad;
-  int telefono, cadena_inicio;
-  int tonos, servidor, num_players;
+  int device, com, speed;
+  int phone, init_string;
+  int tones, server, num_players;
   int act_players;
 };
 
@@ -509,7 +509,7 @@ GLOBAL word *memw;
 // Global variables for interpretation - PROCESS VARIABLES
 //-----------------------------------------------------------------------------
 
-GLOBAL int inicio_privadas; // Start of private variables (running process)
+GLOBAL int private_start; // Start of private variables (running process)
 
 GLOBAL int ip; // Program pointer (instruction pointer)
 
@@ -527,7 +527,7 @@ GLOBAL int id_max;
 
 GLOBAL int id_old; // Tracks which process is currently being executed
 
-GLOBAL int procesos; // Number of living processes in the program
+GLOBAL int process_count; // Number of living processes in the program
 
 GLOBAL int ide, id; // Current process being processed
 
@@ -561,11 +561,11 @@ GLOBAL byte *back_buffer; // Second copy, sprite background outside scroll
 GLOBAL byte *screen_buffer_debug; // Third copy, debug only (dialogs)
 #endif
 
-GLOBAL byte paleta[768]; // Current program palette
+GLOBAL byte palette[768]; // Current program palette
 
 GLOBAL int palcrc; // CRC of the current program palette
 
-GLOBAL int adaptar_paleta; // Auto-adapt loaded files to the active palette
+GLOBAL int auto_adapt_palette; // Auto-adapt loaded files to the active palette
 
 GLOBAL byte dac[768]; // Active palette on screen
 
@@ -575,9 +575,9 @@ GLOBAL int dacout_r, dacout_g, dacout_b, dacout_speed; // Fade: amount to subtra
 
 GLOBAL int now_dacout_r, now_dacout_g, now_dacout_b; // Current state of dac[]
 
-GLOBAL int paleta_cargada; // Whether a palette has been loaded
+GLOBAL int palette_loaded; // Whether a palette has been loaded
 
-GLOBAL int activar_paleta; // Whether the palette needs to be applied
+GLOBAL int apply_palette_flag; // Whether the palette needs to be applied
 
 GLOBAL byte *color_lookup;
 
@@ -620,7 +620,7 @@ GLOBAL word *ptr; // General pointer for a runtime malloc
 
 GLOBAL int x, y; // Generic coordinates for use in internal functions
 
-GLOBAL float angulo; // Generic angle for use in internal functions
+GLOBAL float angle; // Generic angle for use in internal functions
 
 //-----------------------------------------------------------------------------
 // Display region system
@@ -673,12 +673,12 @@ GLOBAL fnt_info f_i[max_fonts];
 
 #define max_texts 256 // Maximum number of texts at runtime
 
-typedef struct _t_texto {
+typedef struct _t_text_display {
   int type;   // Text type: 0=normal, 1=&variable
   byte *font; // Pointer to font (byte h,car[256].an/.dir,data...)
   int x, y;   // Text coordinates
   int ptr;    // Text content
-  int centro; // Alignment type: 0=left, 1=centered, ...
+  int alignment; // Alignment type: 0=left, 1=centered, ...
   int region; // Clipping region
   int x0, y0; // Region occupied by the text
   int w, h;   // For partial screen blits
@@ -695,7 +695,7 @@ GLOBAL t_text texts[max_texts + 1];
 typedef struct _t_drawing {
   int type;       // Primitive type: 0=n/a, 1=line, ...
   int color;      // Primitive color
-  int porcentaje; // 0=minimum ... 15=opaque
+  int opacity; // 0=minimum ... 15=opaque
   int region;     // Clipping region
   int x0, y0;     // Top-left coordinate of the primitive
   int x1, y1;     // Bottom-right coordinate of the primitive
@@ -864,12 +864,12 @@ typedef struct _t_item {
     struct {
       byte *text;
       byte *buffer;
-      int x, y, w, lon_buffer;
+      int x, y, w, buffer_len;
       int r0, r1;
     } get;
     struct {
       byte *text;
-      int *valor;
+      int *value;
       int x, y;
     } flag;
   };
@@ -1076,7 +1076,7 @@ GLOBAL int demo;
 
 void e(int text_id);
 
-GLOBAL int omitidos[128];
+GLOBAL int skipped[128];
 GLOBAL int num_skipped;
 
 extern char *fname[];

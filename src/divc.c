@@ -712,11 +712,11 @@ int ignore_errors;
 int free_sintax;
 int extended_conditions;
 int simple_conditions;
-int comprueba_rango;
+int check_range;
 int comprueba_id;
 int comprueba_null;
-int hacer_strfix;
-int optimizar;
+int enable_strfix;
+int optimize;
 
 //-----------------------------------------------------------------------------
 
@@ -1067,7 +1067,7 @@ void compile(void) {
   }
   linf = fopen("system/exec.path", "wb");
   if (linf) {
-    fputs((char *)&tipo[8], linf);
+    fputs((char *)&file_types[8], linf);
     fclose(linf);
   }
   if ((linf = fopen("system/exec.lin", "wb")) == NULL)
@@ -2251,7 +2251,7 @@ lex_scan:
 
     if (name_index.b[0] != '.' && (name_index.b[0] != '/' && name_index.b[1] != 0) &&
         strcmp("/", (char *)name_index.b) && (f = div_open_file((char *)name_index.b)) != NULL) {
-      fprintf(stdout, "FOUND FILE: [%s] [%s] [%s]\n", (char *)name_index.b, full, (char *)&tipo[8]);
+      fprintf(stdout, "FOUND FILE: [%s] [%s] [%s]\n", (char *)name_index.b, full, (char *)&file_types[8]);
 
       empaquetable = 0;
 
@@ -4163,11 +4163,11 @@ void parser(void) {
   free_sintax = 0;
   extended_conditions = 0;
   simple_conditions = 0;
-  comprueba_rango = 1;
+  check_range = 1;
   comprueba_id = 1;
   comprueba_null = 1;
-  hacer_strfix = 1;
-  optimizar = 1;
+  enable_strfix = 1;
+  optimize = 1;
 
   if (current_token == p_compiler_options) {
     lexer();
@@ -4216,21 +4216,21 @@ void parser(void) {
           break;
         case 6: // _no_check
           lexer();
-          comprueba_rango = 0;
+          check_range = 0;
           comprueba_id = 0;
           comprueba_null = 0;
           break;
         case 7: // _no_strfix
           lexer();
-          hacer_strfix = 0;
+          enable_strfix = 0;
           break;
         case 8: // _no_optimization
           lexer();
-          optimizar = 0;
+          optimize = 0;
           break;
         case 9: // _no_range_check
           lexer();
-          comprueba_rango = 0;
+          check_range = 0;
           break;
         case 10: // _no_id_check
           lexer();
@@ -7284,7 +7284,7 @@ void expression_cpa(void) {
   } else if ((*(_exp - 1)).type == eoper && (*(_exp - 1)).token == p_pointerchar) {
     _exp--;
     generate_expression();
-    if (hacer_strfix) {
+    if (enable_strfix) {
       g2(lcar, 0);
       g1(lstrfix);
       g1(lasp);
@@ -7761,7 +7761,7 @@ void exp0() { // Right-to-left associativity operators <-
       _exp--;
       lexer();
       exp00(1); // e.g. string[1]="A";
-      if (hacer_strfix) {
+      if (enable_strfix) {
         (*_exp).type = eoper;
         (*_exp++).token = p_strfix;
       }
@@ -8505,7 +8505,7 @@ void factor(void) {
         lexer();
         exp00(0);
         if ((*ob).table_global.len1 > -1)
-          if (comprueba_rango) {
+          if (check_range) {
             (*_exp).type = erango;
             (*_exp++).value = (*ob).table_global.len1;
           }
@@ -8514,7 +8514,7 @@ void factor(void) {
             c_error(3, 130);
           lexer();
           exp00(0);
-          if (comprueba_rango) {
+          if (check_range) {
             (*_exp).type = erango;
             (*_exp++).value = (*ob).table_global.len2;
           }
@@ -8523,7 +8523,7 @@ void factor(void) {
               c_error(3, 130);
             lexer();
             exp00(0);
-            if (comprueba_rango) {
+            if (check_range) {
               (*_exp).type = erango;
               (*_exp++).value = (*ob).table_global.len3;
             }
@@ -8571,7 +8571,7 @@ void factor(void) {
         lexer();
         exp00(0);
         if ((*ob).byte_global.len1 > -1)
-          if (comprueba_rango) {
+          if (check_range) {
             (*_exp).type = erango;
             (*_exp++).value = (*ob).byte_global.len1;
           }
@@ -8580,7 +8580,7 @@ void factor(void) {
             c_error(3, 130);
           lexer();
           exp00(0);
-          if (comprueba_rango) {
+          if (check_range) {
             (*_exp).type = erango;
             (*_exp++).value = (*ob).byte_global.len2;
           }
@@ -8589,7 +8589,7 @@ void factor(void) {
               c_error(3, 130);
             lexer();
             exp00(0);
-            if (comprueba_rango) {
+            if (check_range) {
               (*_exp).type = erango;
               (*_exp++).value = (*ob).byte_global.len3;
             }
@@ -8637,7 +8637,7 @@ void factor(void) {
         lexer();
         exp00(0);
         if ((*ob).word_global.len1 > -1)
-          if (comprueba_rango) {
+          if (check_range) {
             (*_exp).type = erango;
             (*_exp++).value = (*ob).word_global.len1;
           }
@@ -8646,7 +8646,7 @@ void factor(void) {
             c_error(3, 130);
           lexer();
           exp00(0);
-          if (comprueba_rango) {
+          if (check_range) {
             (*_exp).type = erango;
             (*_exp++).value = (*ob).word_global.len2;
           }
@@ -8655,7 +8655,7 @@ void factor(void) {
               c_error(3, 130);
             lexer();
             exp00(0);
-            if (comprueba_rango) {
+            if (check_range) {
               (*_exp).type = erango;
               (*_exp++).value = (*ob).word_global.len3;
             }
@@ -8693,7 +8693,7 @@ void factor(void) {
       if (current_token == p_corab) {
         lexer();
         exp00(0);
-        if (comprueba_rango) {
+        if (check_range) {
           (*_exp).type = erango;
           (*_exp++).value = (*ob).string_global.total_len;
         }
@@ -8738,7 +8738,7 @@ void factor(void) {
         lexer();
         exp00(0);
         if ((*ob).struct_global.dim1 > -1)
-          if (comprueba_rango) {
+          if (check_range) {
             (*_exp).type = erango;
             (*_exp++).value = (*ob).struct_global.dim1;
           }
@@ -8747,7 +8747,7 @@ void factor(void) {
             c_error(3, 131);
           lexer();
           exp00(0);
-          if (comprueba_rango) {
+          if (check_range) {
             (*_exp).type = erango;
             (*_exp++).value = (*ob).struct_global.dim2;
           }
@@ -8756,7 +8756,7 @@ void factor(void) {
               c_error(3, 131);
             lexer();
             exp00(0);
-            if (comprueba_rango) {
+            if (check_range) {
               (*_exp).type = erango;
               (*_exp++).value = (*ob).struct_global.dim3;
             }
@@ -8840,7 +8840,7 @@ void factor(void) {
         lexer();
         exp00(0);
         if ((*ob).table_local.len1 > -1)
-          if (comprueba_rango) {
+          if (check_range) {
             (*_exp).type = erango;
             (*_exp++).value = (*ob).table_local.len1;
           }
@@ -8849,7 +8849,7 @@ void factor(void) {
             c_error(3, 130);
           lexer();
           exp00(0);
-          if (comprueba_rango) {
+          if (check_range) {
             (*_exp).type = erango;
             (*_exp++).value = (*ob).table_local.len2;
           }
@@ -8858,7 +8858,7 @@ void factor(void) {
               c_error(3, 130);
             lexer();
             exp00(0);
-            if (comprueba_rango) {
+            if (check_range) {
               (*_exp).type = erango;
               (*_exp++).value = (*ob).table_local.len3;
             }
@@ -8911,7 +8911,7 @@ void factor(void) {
         lexer();
         exp00(0);
         if ((*ob).byte_local.len1 > -1)
-          if (comprueba_rango) {
+          if (check_range) {
             (*_exp).type = erango;
             (*_exp++).value = (*ob).byte_local.len1;
           }
@@ -8920,7 +8920,7 @@ void factor(void) {
             c_error(3, 130);
           lexer();
           exp00(0);
-          if (comprueba_rango) {
+          if (check_range) {
             (*_exp).type = erango;
             (*_exp++).value = (*ob).byte_local.len2;
           }
@@ -8929,7 +8929,7 @@ void factor(void) {
               c_error(3, 130);
             lexer();
             exp00(0);
-            if (comprueba_rango) {
+            if (check_range) {
               (*_exp).type = erango;
               (*_exp++).value = (*ob).byte_local.len3;
             }
@@ -8982,7 +8982,7 @@ void factor(void) {
         lexer();
         exp00(0);
         if ((*ob).word_local.len1 > -1)
-          if (comprueba_rango) {
+          if (check_range) {
             (*_exp).type = erango;
             (*_exp++).value = (*ob).word_local.len1;
           }
@@ -8991,7 +8991,7 @@ void factor(void) {
             c_error(3, 130);
           lexer();
           exp00(0);
-          if (comprueba_rango) {
+          if (check_range) {
             (*_exp).type = erango;
             (*_exp++).value = (*ob).word_local.len2;
           }
@@ -9000,7 +9000,7 @@ void factor(void) {
               c_error(3, 130);
             lexer();
             exp00(0);
-            if (comprueba_rango) {
+            if (check_range) {
               (*_exp).type = erango;
               (*_exp++).value = (*ob).word_local.len3;
             }
@@ -9043,7 +9043,7 @@ void factor(void) {
         cross_process_access = 0;
         lexer();
         exp00(0);
-        if (comprueba_rango) {
+        if (check_range) {
           (*_exp).type = erango;
           (*_exp++).value = (*ob).string_local.total_len;
         }
@@ -9093,7 +9093,7 @@ void factor(void) {
         lexer();
         exp00(0);
         if ((*ob).struct_local.dim1 > -1)
-          if (comprueba_rango) {
+          if (check_range) {
             (*_exp).type = erango;
             (*_exp++).value = (*ob).struct_local.dim1;
           }
@@ -9102,7 +9102,7 @@ void factor(void) {
             c_error(3, 131);
           lexer();
           exp00(0);
-          if (comprueba_rango) {
+          if (check_range) {
             (*_exp).type = erango;
             (*_exp++).value = (*ob).struct_local.dim2;
           }
@@ -9111,7 +9111,7 @@ void factor(void) {
               c_error(3, 131);
             lexer();
             exp00(0);
-            if (comprueba_rango) {
+            if (check_range) {
               (*_exp).type = erango;
               (*_exp++).value = (*ob).struct_local.dim3;
             }
@@ -9396,7 +9396,7 @@ void factor_struct(void) {
       lexer();
       exp00(0);
       if ((*ob).table_global.len1 > -1)
-        if (comprueba_rango) {
+        if (check_range) {
           (*_exp).type = erango;
           (*_exp++).value = (*ob).table_global.len1;
         }
@@ -9405,7 +9405,7 @@ void factor_struct(void) {
           c_error(3, 130);
         lexer();
         exp00(0);
-        if (comprueba_rango) {
+        if (check_range) {
           (*_exp).type = erango;
           (*_exp++).value = (*ob).table_global.len2;
         }
@@ -9414,7 +9414,7 @@ void factor_struct(void) {
             c_error(3, 130);
           lexer();
           exp00(0);
-          if (comprueba_rango) {
+          if (check_range) {
             (*_exp).type = erango;
             (*_exp++).value = (*ob).table_global.len3;
           }
@@ -9463,7 +9463,7 @@ void factor_struct(void) {
       lexer();
       exp00(0);
       if ((*ob).byte_global.len1 > -1)
-        if (comprueba_rango) {
+        if (check_range) {
           (*_exp).type = erango;
           (*_exp++).value = (*ob).byte_global.len1;
         }
@@ -9472,7 +9472,7 @@ void factor_struct(void) {
           c_error(3, 130);
         lexer();
         exp00(0);
-        if (comprueba_rango) {
+        if (check_range) {
           (*_exp).type = erango;
           (*_exp++).value = (*ob).byte_global.len2;
         }
@@ -9481,7 +9481,7 @@ void factor_struct(void) {
             c_error(3, 130);
           lexer();
           exp00(0);
-          if (comprueba_rango) {
+          if (check_range) {
             (*_exp).type = erango;
             (*_exp++).value = (*ob).byte_global.len3;
           }
@@ -9531,7 +9531,7 @@ void factor_struct(void) {
       lexer();
       exp00(0);
       if ((*ob).word_global.len1 > -1)
-        if (comprueba_rango) {
+        if (check_range) {
           (*_exp).type = erango;
           (*_exp++).value = (*ob).word_global.len1;
         }
@@ -9540,7 +9540,7 @@ void factor_struct(void) {
           c_error(3, 130);
         lexer();
         exp00(0);
-        if (comprueba_rango) {
+        if (check_range) {
           (*_exp).type = erango;
           (*_exp++).value = (*ob).word_global.len2;
         }
@@ -9549,7 +9549,7 @@ void factor_struct(void) {
             c_error(3, 130);
           lexer();
           exp00(0);
-          if (comprueba_rango) {
+          if (check_range) {
             (*_exp).type = erango;
             (*_exp++).value = (*ob).word_global.len3;
           }
@@ -9589,7 +9589,7 @@ void factor_struct(void) {
     if (current_token == p_corab) {
       lexer();
       exp00(0);
-      if (comprueba_rango) {
+      if (check_range) {
         (*_exp).type = erango;
         (*_exp++).value = (*ob).string_global.total_len;
       }
@@ -9634,7 +9634,7 @@ void factor_struct(void) {
       lexer();
       exp00(0);
       if ((*ob).struct_global.dim1 > -1)
-        if (comprueba_rango) {
+        if (check_range) {
           (*_exp).type = erango;
           (*_exp++).value = (*ob).struct_global.dim1;
         }
@@ -9643,7 +9643,7 @@ void factor_struct(void) {
           c_error(3, 131);
         lexer();
         exp00(0);
-        if (comprueba_rango) {
+        if (check_range) {
           (*_exp).type = erango;
           (*_exp++).value = (*ob).struct_global.dim2;
         }
@@ -9652,7 +9652,7 @@ void factor_struct(void) {
             c_error(3, 131);
           lexer();
           exp00(0);
-          if (comprueba_rango) {
+          if (check_range) {
             (*_exp).type = erango;
             (*_exp++).value = (*ob).struct_global.dim3;
           }
@@ -9724,7 +9724,7 @@ void factor_struct(void) {
       lexer();
       exp00(0);
       if ((*ob).table_local.len1 > -1)
-        if (comprueba_rango) {
+        if (check_range) {
           (*_exp).type = erango;
           (*_exp++).value = (*ob).table_local.len1;
         }
@@ -9733,7 +9733,7 @@ void factor_struct(void) {
           c_error(3, 130);
         lexer();
         exp00(0);
-        if (comprueba_rango) {
+        if (check_range) {
           (*_exp).type = erango;
           (*_exp++).value = (*ob).table_local.len2;
         }
@@ -9742,7 +9742,7 @@ void factor_struct(void) {
             c_error(3, 130);
           lexer();
           exp00(0);
-          if (comprueba_rango) {
+          if (check_range) {
             (*_exp).type = erango;
             (*_exp++).value = (*ob).table_local.len3;
           }
@@ -9791,7 +9791,7 @@ void factor_struct(void) {
       lexer();
       exp00(0);
       if ((*ob).byte_local.len1 > -1)
-        if (comprueba_rango) {
+        if (check_range) {
           (*_exp).type = erango;
           (*_exp++).value = (*ob).byte_local.len1;
         }
@@ -9800,7 +9800,7 @@ void factor_struct(void) {
           c_error(3, 130);
         lexer();
         exp00(0);
-        if (comprueba_rango) {
+        if (check_range) {
           (*_exp).type = erango;
           (*_exp++).value = (*ob).byte_local.len2;
         }
@@ -9809,7 +9809,7 @@ void factor_struct(void) {
             c_error(3, 130);
           lexer();
           exp00(0);
-          if (comprueba_rango) {
+          if (check_range) {
             (*_exp).type = erango;
             (*_exp++).value = (*ob).byte_local.len3;
           }
@@ -9859,7 +9859,7 @@ void factor_struct(void) {
       lexer();
       exp00(0);
       if ((*ob).word_local.len1 > -1)
-        if (comprueba_rango) {
+        if (check_range) {
           (*_exp).type = erango;
           (*_exp++).value = (*ob).word_local.len1;
         }
@@ -9868,7 +9868,7 @@ void factor_struct(void) {
           c_error(3, 130);
         lexer();
         exp00(0);
-        if (comprueba_rango) {
+        if (check_range) {
           (*_exp).type = erango;
           (*_exp++).value = (*ob).word_local.len2;
         }
@@ -9877,7 +9877,7 @@ void factor_struct(void) {
             c_error(3, 130);
           lexer();
           exp00(0);
-          if (comprueba_rango) {
+          if (check_range) {
             (*_exp).type = erango;
             (*_exp++).value = (*ob).word_local.len3;
           }
@@ -9917,7 +9917,7 @@ void factor_struct(void) {
     if (current_token == p_corab) {
       lexer();
       exp00(0);
-      if (comprueba_rango) {
+      if (check_range) {
         (*_exp).type = erango;
         (*_exp++).value = (*ob).string_local.total_len;
       }
@@ -9962,7 +9962,7 @@ void factor_struct(void) {
       lexer();
       exp00(0);
       if ((*ob).struct_local.dim1 > -1)
-        if (comprueba_rango) {
+        if (check_range) {
           (*_exp).type = erango;
           (*_exp++).value = (*ob).struct_local.dim1;
         }
@@ -9971,7 +9971,7 @@ void factor_struct(void) {
           c_error(3, 131);
         lexer();
         exp00(0);
-        if (comprueba_rango) {
+        if (check_range) {
           (*_exp).type = erango;
           (*_exp++).value = (*ob).struct_local.dim2;
         }
@@ -9980,7 +9980,7 @@ void factor_struct(void) {
             c_error(3, 131);
           lexer();
           exp00(0);
-          if (comprueba_rango) {
+          if (check_range) {
             (*_exp).type = erango;
             (*_exp++).value = (*ob).struct_local.dim3;
           }
@@ -10217,7 +10217,7 @@ void list_objects(void) {
         fprintf(sta, " (*) used\n");
       else
         fprintf(sta, "\n");
-      fprintf(sta, "\ttipo=%u\n", (memptrsize)(obj[n].proc.scope));
+      fprintf(sta, "\file_type_info=%u\n", (memptrsize)(obj[n].proc.scope));
       fprintf(sta, "\toffset=%u\n", obj[n].proc.offset);
       fprintf(sta, "\tnum_par=%u\n", obj[n].proc.num_params);
       break;
@@ -10822,7 +10822,7 @@ FILE *__fpopen(byte *file, char *mode) {
   char fprgpath[_MAX_PATH * 2];
   FILE *f;
 
-  div_strcpy(fprgpath, sizeof(fprgpath), (char *)&tipo[8]);
+  div_strcpy(fprgpath, sizeof(fprgpath), (char *)&file_types[8]);
   div_strcat(fprgpath, sizeof(fprgpath), "/");
   div_strcat(fprgpath, sizeof(fprgpath), full);
 
@@ -11072,14 +11072,14 @@ void compile_program(void) {
 //} code[16];   // code[15] always holds the last generated instruction
 
 void g1(int op) {
-  if (optimizar)
+  if (optimize)
     gen(0, op, 0);
   else
     mem[imem++] = op;
 }
 
 void g2(int op, int pa) {
-  if (optimizar)
+  if (optimize)
     gen(1, op, pa);
   else {
     mem[imem++] = op;

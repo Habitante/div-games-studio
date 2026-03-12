@@ -31,8 +31,8 @@ extern int point_index;
 //      Functions to print text
 ///////////////////////////////////////////////////////////////////////////////
 
-void writetxt(int x, int y, int centro, byte *ptr) {
-  wwrite(screen_buffer, vga_width / big2, vga_height, x, y, centro, ptr, text_color);
+void writetxt(int x, int y, int alignment, byte *ptr) {
+  wwrite(screen_buffer, vga_width / big2, vga_height, x, y, alignment, ptr, text_color);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

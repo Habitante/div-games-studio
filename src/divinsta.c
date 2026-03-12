@@ -177,21 +177,21 @@ void install_setup2() {
     end_dialog = 1;
     break;
   case 2:
-    div_strcpy(cwork, sizeof(cwork), tipo[4].path);
-    div_strcpy(tipo[4].path, sizeof(tipo[4].path), tipo[1].path);
-    if (tipo[4].path[strlen(tipo[4].path) - 1] != '/')
-      div_strcat(tipo[4].path, sizeof(tipo[4].path), "/");
-    div_strcat(tipo[4].path, sizeof(tipo[4].path), "INSTALL");
+    div_strcpy(cwork, sizeof(cwork), file_types[4].path);
+    div_strcpy(file_types[4].path, sizeof(file_types[4].path), file_types[1].path);
+    if (file_types[4].path[strlen(file_types[4].path) - 1] != '/')
+      div_strcat(file_types[4].path, sizeof(file_types[4].path), "/");
+    div_strcat(file_types[4].path, sizeof(file_types[4].path), "INSTALL");
     v_mode = 1;
     v_type = 4;
     v_text = (char *)texts[524];
     show_dialog(browser0);
 
-    div_strcpy(full, sizeof(full), tipo[4].path);
+    div_strcpy(full, sizeof(full), file_types[4].path);
     if (full[strlen(full) - 1] != '/')
       div_strcat(full, sizeof(full), "/");
     div_strcat(full, sizeof(full), input);
-    div_strcpy(tipo[4].path, sizeof(tipo[4].path), cwork);
+    div_strcpy(file_types[4].path, sizeof(file_types[4].path), cwork);
 
     if (v_finished)
       if (v_exists) {
@@ -217,21 +217,21 @@ void install_setup2() {
       }
     break;
   case 3:
-    div_strcpy(cwork, sizeof(cwork), tipo[5].path);
-    div_strcpy(tipo[5].path, sizeof(tipo[5].path), tipo[1].path);
-    if (tipo[5].path[strlen(tipo[5].path) - 1] != '/')
-      div_strcat(tipo[5].path, sizeof(tipo[5].path), "/");
-    div_strcat(tipo[5].path, sizeof(tipo[5].path), "INSTALL");
+    div_strcpy(cwork, sizeof(cwork), file_types[5].path);
+    div_strcpy(file_types[5].path, sizeof(file_types[5].path), file_types[1].path);
+    if (file_types[5].path[strlen(file_types[5].path) - 1] != '/')
+      div_strcat(file_types[5].path, sizeof(file_types[5].path), "/");
+    div_strcat(file_types[5].path, sizeof(file_types[5].path), "INSTALL");
     v_mode = 1;
     v_type = 5;
     v_text = (char *)texts[525];
     show_dialog(browser0);
 
-    div_strcpy(full, sizeof(full), tipo[5].path);
+    div_strcpy(full, sizeof(full), file_types[5].path);
     if (full[strlen(full) - 1] != '/')
       div_strcat(full, sizeof(full), "/");
     div_strcat(full, sizeof(full), input);
-    div_strcpy(tipo[5].path, sizeof(tipo[5].path), cwork);
+    div_strcpy(file_types[5].path, sizeof(file_types[5].path), cwork);
 
     if (v_finished)
       if (v_exists) {
@@ -251,21 +251,21 @@ void install_setup2() {
       }
     break;
   case 4:
-    div_strcpy(cwork, sizeof(cwork), tipo[5].path);
-    div_strcpy(tipo[5].path, sizeof(tipo[5].path), tipo[1].path);
-    if (tipo[5].path[strlen(tipo[5].path) - 1] != '/')
-      div_strcat(tipo[5].path, sizeof(tipo[5].path), "/");
-    div_strcat(tipo[5].path, sizeof(tipo[5].path), "INSTALL");
+    div_strcpy(cwork, sizeof(cwork), file_types[5].path);
+    div_strcpy(file_types[5].path, sizeof(file_types[5].path), file_types[1].path);
+    if (file_types[5].path[strlen(file_types[5].path) - 1] != '/')
+      div_strcat(file_types[5].path, sizeof(file_types[5].path), "/");
+    div_strcat(file_types[5].path, sizeof(file_types[5].path), "INSTALL");
     v_mode = 1;
     v_type = 5;
     v_text = (char *)texts[525];
     show_dialog(browser0);
 
-    div_strcpy(full, sizeof(full), tipo[v_type].path);
+    div_strcpy(full, sizeof(full), file_types[v_type].path);
     if (full[strlen(full) - 1] != '/')
       div_strcat(full, sizeof(full), "/");
     div_strcat(full, sizeof(full), input);
-    div_strcpy(tipo[5].path, sizeof(tipo[5].path), cwork);
+    div_strcpy(file_types[5].path, sizeof(file_types[5].path), cwork);
 
     if (v_finished)
       if (v_exists) {
@@ -351,8 +351,8 @@ void install_setup0() {
     div_strcat(copyright_text, sizeof(copyright_text), tbuf);
     if (strlen(user2) + strlen(copyright_text) <= 127)
       div_strcat(copyright_text, sizeof(copyright_text), user2);
-    div_strcpy(drive_letter, sizeof(drive_letter), (char *)&tipo[8]); //"/tmp/");// :/TMP");
-    //drive_letter[0]=toupper(tipo[1].path[0]);
+    div_strcpy(drive_letter, sizeof(drive_letter), (char *)&file_types[8]); //"/tmp/");// :/TMP");
+    //drive_letter[0]=toupper(file_types[1].path[0]);
     div_strcpy(default_dir, sizeof(default_dir), (char *)texts[353]);
     div_strcat(default_dir, sizeof(default_dir), exe_gen);
     div_strcpy(app_name, sizeof(app_name), exe_gen);
@@ -752,7 +752,7 @@ void create_zip(char *dWork) {
 }
 
 
-void crear_instalacion(void) {
+void create_installation(void) {
   FILE *file_in, *fout;
   int x, n, m, topack;
   char cWork[256];
@@ -1233,14 +1233,14 @@ void crear_instalacion(void) {
 
   show_progress((char *)texts[219],nfiles*100,nfiles*100); // INSTALL.DIV already created
 
-  div_strcpy(cWork,sizeof(cWork),tipo[1].path); // Delete the PACKFILE.DAT
+  div_strcpy(cWork,sizeof(cWork),file_types[1].path); // Delete the PACKFILE.DAT
   div_strcat(cWork,sizeof(cWork),"/");
   div_strcat(cWork,sizeof(cWork),"install/PACKFILE.DAT");
   delete_file(cWork);
 
   // *** Write INSTALL.EXE with the informational trailer
 
-  div_strcpy(cWork,sizeof(cWork),tipo[1].path);
+  div_strcpy(cWork,sizeof(cWork),file_types[1].path);
   div_strcat(cWork,sizeof(cWork),"/");
   div_strcat(cWork,sizeof(cWork),"install/install.ovl");
 
@@ -1354,7 +1354,7 @@ void crear_instalacion(void) {
 
   // *** Write pack_name.001, .002, ... from INSTALL.DIV
 
-  div_strcpy(cWork,sizeof(cWork),tipo[1].path);
+  div_strcpy(cWork,sizeof(cWork),file_types[1].path);
   div_strcat(cWork,sizeof(cWork),"/");
   div_strcat(cWork,sizeof(cWork),"install/INSTALL.DIV");
 

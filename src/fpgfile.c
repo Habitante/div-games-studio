@@ -318,7 +318,7 @@ int fpg_add(FPG *Fpg, int COD, char *desc, char *filename, int Ancho, int Alto, 
 }
 
 int fpg_remap_to_pal(FPG *Fpg) {
-  struct tipo_regla CopiaReglas[16];
+  struct gradient_rule CopiaReglas[16];
   HeadFPG other_header;
   char ActualPath[_MAX_PATH + 14];
   char *other_image;
@@ -412,7 +412,7 @@ void fpg_save(int n) {
     show_dialog(err0);
     return;
   }
-  div_strcpy(full, sizeof(full), tipo[4].path);
+  div_strcpy(full, sizeof(full), file_types[4].path);
   if (full[strlen(full) - 1] != '/')
     div_strcat(full, sizeof(full), "/");
   div_strcat(full, sizeof(full), input);
@@ -467,7 +467,7 @@ void fpg_save(int n) {
 int fpg_delete(FPG *Fpg,
                int COD) // Trash, overwrite existing entry, or when changing a graphic's code
 {
-  struct tipo_regla CopiaReglas[16];
+  struct gradient_rule CopiaReglas[16];
   HeadFPG other_header;
   char ActualPath[_MAX_PATH + 14];
   char *other_image;
@@ -582,7 +582,7 @@ int fpg_delete(FPG *Fpg,
 }
 
 int fpg_delete_many(FPG *Fpg, int taggeds, int *array_del) {
-  struct tipo_regla CopiaReglas[16];
+  struct gradient_rule CopiaReglas[16];
   HeadFPG other_header;
   char ActualPath[_MAX_PATH + 14];
   char *other_image;

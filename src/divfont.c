@@ -506,28 +506,28 @@ void Fonts0(void) {
   Mosaico3 = 0;
 
   DIV_STRCPY(FontName, (char *)texts[90]);
-  DIV_STRCPY(FontPathName, tipo[5].path);
+  DIV_STRCPY(FontPathName, file_types[5].path);
   DIV_STRCAT(FontPathName, "/");
   DIV_STRCAT(FontPathName, FontName);
 
   DIV_STRCPY(FaceName, "NORMAL.IFS");
-  DIV_STRCPY(FacePathName, tipo[6].path);
+  DIV_STRCPY(FacePathName, file_types[6].path);
   DIV_STRCAT(FacePathName, "/");
   DIV_STRCAT(FacePathName, FaceName);
 
   if ((f = fopen(FacePathName, "rb")) != NULL)
     fclose(f);
   else {
-    div_strcpy(tipo[6].path, sizeof(tipo[6].path), tipo[1].path);
-    div_strcat(tipo[6].path, sizeof(tipo[6].path), "/IFS");
-    DIV_STRCPY(FacePathName, tipo[6].path);
+    div_strcpy(file_types[6].path, sizeof(file_types[6].path), file_types[1].path);
+    div_strcat(file_types[6].path, sizeof(file_types[6].path), "/IFS");
+    DIV_STRCPY(FacePathName, file_types[6].path);
     DIV_STRCAT(FacePathName, "/NORMAL.IFS");
     if ((f = fopen(FacePathName, "rb")) != NULL)
       fclose(f);
     else {
       DIV_STRCPY(FaceName, "");
       DIV_STRCPY(FacePathName, "");
-      div_strcpy(tipo[6].path, sizeof(tipo[6].path), tipo[1].path);
+      div_strcpy(file_types[6].path, sizeof(file_types[6].path), file_types[1].path);
     }
   }
 
@@ -676,7 +676,7 @@ void get_font() {
   v_mode = 1;
   v_type = 5;
 
-  DIV_STRCPY(FontPathName, tipo[v_type].path);
+  DIV_STRCPY(FontPathName, file_types[v_type].path);
   DIV_STRCAT(FontPathName, "/");
   DIV_STRCAT(FontPathName, FontName);
 
@@ -691,7 +691,7 @@ void get_font() {
         return;
     }
     DIV_STRCPY(FontName, input);
-    DIV_STRCPY(FontPathName, tipo[v_type].path);
+    DIV_STRCPY(FontPathName, file_types[v_type].path);
     if (!IS_PATH_SEP(FontPathName[strlen(FontPathName) - 1]))
       DIV_STRCAT(FontPathName, "/");
     DIV_STRCAT(FontPathName, input);
@@ -723,7 +723,7 @@ void get_ifs() {
       show_dialog(err0);
     } else {
       if (!num_taggeds) {
-        DIV_STRCPY(full, tipo[v_type].path);
+        DIV_STRCPY(full, file_types[v_type].path);
         if (full[strlen(full) - 1] != '/')
           DIV_STRCAT(full, "/");
         DIV_STRCAT(full, input);
@@ -742,7 +742,7 @@ void get_ifs() {
         if (thumb[num].tagged) {
           DIV_STRCPY(input, file_list_br.list + file_list_br.item_width * num);
           DIV_STRCPY(FaceName, input);
-          DIV_STRCPY(FacePathName, tipo[v_type].path);
+          DIV_STRCPY(FacePathName, file_types[v_type].path);
           if (!IS_PATH_SEP(FacePathName[strlen(FacePathName) - 1]))
             DIV_STRCAT(FacePathName, "/");
           DIV_STRCAT(FacePathName, input);
@@ -1485,7 +1485,7 @@ void open_font(void) {
   v_mode = 0;
   v_type = 5;
 
-  DIV_STRCPY(Load_FontPathName, tipo[v_type].path);
+  DIV_STRCPY(Load_FontPathName, file_types[v_type].path);
   DIV_STRCAT(Load_FontPathName, "/");
   DIV_STRCAT(Load_FontPathName, Load_FontName);
 
@@ -1495,7 +1495,7 @@ void open_font(void) {
     return;
 
   if (!num_taggeds) {
-    DIV_STRCPY(full, tipo[v_type].path);
+    DIV_STRCPY(full, file_types[v_type].path);
     if (full[strlen(full) - 1] != '/')
       DIV_STRCAT(full, "/");
     DIV_STRCAT(full, input);
@@ -1513,7 +1513,7 @@ void open_font(void) {
   for (num = 0; num < file_list_br.total_items; num++) {
     if (thumb[num].tagged) {
       DIV_STRCPY(input, file_list_br.list + file_list_br.item_width * num);
-      DIV_STRCPY(full, tipo[v_type].path);
+      DIV_STRCPY(full, file_types[v_type].path);
       if (full[strlen(full) - 1] != '/')
         DIV_STRCAT(full, "/");
       DIV_STRCAT(full, input);

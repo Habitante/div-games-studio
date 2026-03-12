@@ -33,7 +33,7 @@ void sp_scan(byte *p, short n, byte *si, int w, int x0, int y0, int x1, int y1);
 void sp_scan_ghost(byte *p, short n, byte *si, int w, int x0, int y0, int x1, int y1);
 void text_clipped(byte *p, int x, int y, byte w, int h);
 void text_normal(byte *p, int x, int y, byte w, int h);
-void paint_mode7(int n, int camara_x, int camara_y, int camara_z, int angulo);
+void paint_mode7(int n, int camara_x, int camara_y, int camara_z, int angle);
 void paint_sprite_m7(int n, int ide, int x, int y, int size, int ang);
 
 //----------------------------------------------------------------------------
@@ -2042,7 +2042,7 @@ void paint_drawings(void) {
       if (y >= clipy1)
         continue;
 
-      line_fx = drawing[n].porcentaje;
+      line_fx = drawing[n].opacity;
       color = drawing[n].color;
 
       switch (drawing[n].type) {
@@ -2705,7 +2705,7 @@ void paint_texts(int n) { // E: texts[]
           w += fnt[*ptr2++].width;
       }
 
-      switch (texts[n].centro) {
+      switch (texts[n].alignment) {
       case 0:
         break;
       case 1:
@@ -3093,20 +3093,20 @@ void paint_sprite_m7(int n, int ide, int x, int y, int size, int ang) {
 //----------------------------------------------------------------------------
 
 int get_distx(int a, int d) {
-  angulo = (float)a / radian;
-  return ((int)((float)cos(angulo) * d));
+  angle = (float)a / radian;
+  return ((int)((float)cos(angle) * d));
 }
 
 int get_disty(int a, int d) {
-  angulo = (float)a / radian;
-  return (-(int)((float)sin(angulo) * d));
+  angle = (float)a / radian;
+  return (-(int)((float)sin(angle) * d));
 }
 
 //----------------------------------------------------------------------------
 // Render the map in perspective (mode-7 floor)
 //----------------------------------------------------------------------------
 
-void paint_mode7(int n, int camara_x, int camara_y, int camara_z, int angulo) {
+void paint_mode7(int n, int camara_x, int camara_y, int camara_z, int angle) {
   int y, u, du, vv, dv, pos_x, pos_y;
   int ancho_m, alto_m, ancho_e, alto_e;
   int proyeccion_y, sint, cost;
@@ -3141,8 +3141,8 @@ void paint_mode7(int n, int camara_x, int camara_y, int camara_z, int angulo) {
     }
     proyeccion_y = -camara_y / divisor;
 
-    sint = mul_24(seno[angulo], proyeccion_y);
-    cost = mul_24(coseno[angulo], proyeccion_y);
+    sint = mul_24(seno[angle], proyeccion_y);
+    cost = mul_24(coseno[angle], proyeccion_y);
 
     u = camara_x + mul_16(distancia, cost) + mul_16(sint, -mediox_modo7_16);
     du = sint;

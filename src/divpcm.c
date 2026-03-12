@@ -482,7 +482,7 @@ void open_sound(void) {
     return;
 
   if (!num_taggeds) {
-    div_strcpy(full, sizeof(full), tipo[v_type].path);
+    div_strcpy(full, sizeof(full), file_types[v_type].path);
     if (full[strlen(full) - 1] != '/')
       div_strcat(full, sizeof(full), "/");
     div_strcat(full, sizeof(full), input);
@@ -500,7 +500,7 @@ void open_sound(void) {
   for (num = 0; num < file_list_br.total_items; num++) {
     if (thumb[num].tagged) {
       div_strcpy(input, sizeof(input), file_list_br.list + file_list_br.item_width * num);
-      div_strcpy(full, sizeof(full), tipo[v_type].path);
+      div_strcpy(full, sizeof(full), file_types[v_type].path);
       if (full[strlen(full) - 1] != '/')
         div_strcat(full, sizeof(full), "/");
       div_strcat(full, sizeof(full), input);
@@ -820,7 +820,7 @@ void open_song(void) {
     return;
 
   if (!num_taggeds) {
-    div_strcpy(full, sizeof(full), tipo[v_type].path);
+    div_strcpy(full, sizeof(full), file_types[v_type].path);
     if (full[strlen(full) - 1] != '/')
       div_strcat(full, sizeof(full), "/");
     div_strcat(full, sizeof(full), input);
@@ -838,7 +838,7 @@ void open_song(void) {
   for (num = 0; num < file_list_br.total_items; num++) {
     if (thumb[num].tagged) {
       div_strcpy(input, sizeof(input), file_list_br.list + file_list_br.item_width * num);
-      div_strcpy(full, sizeof(full), tipo[v_type].path);
+      div_strcpy(full, sizeof(full), file_types[v_type].path);
       if (full[strlen(full) - 1] != '/')
         div_strcat(full, sizeof(full), "/");
       div_strcat(full, sizeof(full), input);
@@ -1193,7 +1193,7 @@ void rec_sound0(void) {
   v.click_handler = RecSound2;
   v.close_handler = RecSound3;
 
-  DIV_STRCPY(SoundFile, tipo[7].path);
+  DIV_STRCPY(SoundFile, file_types[7].path);
   if (SoundFile[strlen(SoundFile) - 1] != '/')
     DIV_STRCAT(SoundFile, "/");
   DIV_STRCAT(SoundFile, "SAMPLE.WAV");
@@ -1206,7 +1206,7 @@ void rec_sound0(void) {
   _flag(561, 3, 20, &RecDevice[0]);
   _flag(562, 3 + 11 + text_len(texts[561]), 20, &RecDevice[1]);
 
-  // Boton de seleccion de fichero
+  // Boton de seleccion de filename
   _button(121, v.w - 12, 17, 0);
 
   v_accept = 0;
@@ -1264,13 +1264,13 @@ void RecSound2(void) {
     RecDevice[0] = !RecDevice[1];
     need_refresh = 1;
     break;
-  case 4: // Seleccion de fichero
+  case 4: // Seleccion de filename
     v_mode = 1;
     v_type = 7;
     v_text = (char *)texts[339];
     show_dialog(browser0);
 
-    div_strcpy(full, sizeof(full), tipo[v_type].path);
+    div_strcpy(full, sizeof(full), file_types[v_type].path);
     if (full[strlen(full) - 1] != '/')
       div_strcat(full, sizeof(full), "/");
     div_strcat(full, sizeof(full), input);

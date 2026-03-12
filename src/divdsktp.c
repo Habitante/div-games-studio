@@ -403,7 +403,7 @@ int upload_desktop() {
           show_dialog(accept0);
 
           if (v_accept) {
-            div_strcpy(tipo[0].path, sizeof(tipo[0].path), v_prg->path);
+            div_strcpy(file_types[0].path, sizeof(file_types[0].path), v_prg->path);
             div_strcpy(input, sizeof(input), v_prg->filename);
 
             // close old prg
@@ -509,8 +509,8 @@ int create_saved_window(void_return_type_t init_handler, int nx, int ny) {
     v.y = 0;
     v.w = vga_width;
     v.h = vga_height;
-    v._an = 0;
-    v._al = 0;
+    v._w_saved = 0;
+    v._h_saved = 0;
     v.state = 0;
     v.buttons = 0;
     v.redraw = 0;
@@ -648,8 +648,8 @@ int create_saved_window(void_return_type_t init_handler, int nx, int ny) {
         v.h = window_aux.h;
         v._x = window_aux._x;
         v._y = window_aux._y;
-        v._an = window_aux._an;
-        v._al = window_aux._al;
+        v._w_saved = window_aux._w_saved;
+        v._h_saved = window_aux._h_saved;
       }
 
       if (v.type >= 100 && v.state == 0) {
@@ -848,14 +848,14 @@ void carga_help(int n, int helpal, int helpline, int x1, int x2) {
           }
 
           if (v.foreground == 2) {
-            swap(v.w, v._an);
-            swap(v.h, v._al);
+            swap(v.w, v._w_saved);
+            swap(v.h, v._h_saved);
           }
           vuelca_help();
           barra_vertical();
           if (v.foreground == 2) {
-            swap(v.w, v._an);
-            swap(v.h, v._al);
+            swap(v.w, v._w_saved);
+            swap(v.h, v._h_saved);
           }
 
           flush_window(0);

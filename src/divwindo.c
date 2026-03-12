@@ -20,19 +20,19 @@ void wtexn(byte *dest, int dest_pitch, byte *p, int x, int y, byte w, int h, byt
 
 // button
 
-void boton(int n, int x, int y, int centro, int color) {
-  wwrite(v.ptr, v.w / big2, v.h / big2, x, y, centro, texts[100 + n], color);
+void draw_button(int n, int x, int y, int alignment, int color) {
+  wwrite(v.ptr, v.w / big2, v.h / big2, x, y, alignment, texts[100 + n], color);
 }
 
 // Mouse button
-int ratonboton(int n, int x, int y, int centro) {
+int mouse_button_hit(int n, int x, int y, int alignment) {
   int w, h;
   int mx = wmouse_x, my = wmouse_y;
 
   w = text_len(texts[100 + n] + 1);
   h = 7;
 
-  switch (centro) {
+  switch (alignment) {
   case 0:
     break;
 
@@ -649,9 +649,9 @@ int text_len2(byte *ptr) {
   return (w - 1);
 }
 
-void wwrite(byte *dest, int dest_width, int dest_height, int x, int y, int centro, byte *ptr,
+void wwrite(byte *dest, int dest_width, int dest_height, int x, int y, int alignment, byte *ptr,
             byte c) {
-  wwrite_in_box(dest, dest_width, dest_width, dest_height, x, y, centro, ptr, c);
+  wwrite_in_box(dest, dest_width, dest_width, dest_height, x, y, alignment, ptr, c);
 }
 
 extern SDL_Surface *vga;
@@ -659,15 +659,15 @@ extern SDL_Surface *vga;
 extern struct t_listboxbr file_list_br;
 
 void wwrite_in_box(byte *dest, int dest_pitch, int dest_width, int dest_height, int x, int y,
-                   int centro, byte *ptr, byte c) {
+                   int alignment, byte *ptr, byte c) {
   int w, h, boton, multi;
 
   byte *font;
 
   sscar *car;
 
-  if (centro >= 10) {
-    centro -= 10;
+  if (alignment >= 10) {
+    alignment -= 10;
     multi = 1;
   } else
     multi = 0;
@@ -699,7 +699,7 @@ void wwrite_in_box(byte *dest, int dest_pitch, int dest_width, int dest_height, 
 
   font = text_font + 1025;
 
-  switch (centro) {
+  switch (alignment) {
   case 0:
     break;
 

@@ -43,7 +43,7 @@ byte _r, _g, _b, find_col; // Palette calculations
 
 int find_min; // Nearest color calculation
 
-byte paleta[768];
+byte palette[768];
 
 int num_points;
 
@@ -470,7 +470,7 @@ void ord_paleta0(void) {
   int n;
   create_dac4();
   for (n = 0; n < 256; n++)
-    paleta[n] = find_color(original_palette[n * 3], original_palette[n * 3 + 1],
+    palette[n] = find_color(original_palette[n * 3], original_palette[n * 3 + 1],
                            original_palette[n * 3 + 2]);
 }
 
@@ -492,7 +492,7 @@ void ord_paleta1(void) {
   g = pal[c0 * 4 + 1];
   b = pal[c0 * 4 + 2];
   pal[c0 * 4] = 255;
-  paleta[0] = c0;
+  palette[0] = c0;
 
   n = 1;
   do {
@@ -501,7 +501,7 @@ void ord_paleta1(void) {
     g = pal[c * 4 + 1];
     b = pal[c * 4 + 2];
     pal[c * 4] = 255;
-    paleta[n] = c;
+    palette[n] = c;
   } while (++n < 256);
 
   free(pal);
@@ -525,7 +525,7 @@ void ord_paleta2(void) {
   g = pal[c0 * 4 + 1];
   b = pal[c0 * 4 + 2];
   pal[c0 * 4] = 255;
-  paleta[0] = c0;
+  palette[0] = c0;
   _r = r;
   _g = g;
   _b = b;
@@ -540,7 +540,7 @@ void ord_paleta2(void) {
     _g = pal[c * 4 + 1];
     _b = pal[c * 4 + 2];
     pal[c * 4] = 255;
-    paleta[n] = c;
+    palette[n] = c;
   } while (++n < 256);
 
   free(pal);
@@ -564,7 +564,7 @@ void ord_paleta3(void) {
   g = pal[c0 * 4 + 1];
   b = pal[c0 * 4 + 2];
   pal[c0 * 4] = 255;
-  paleta[0] = c0;
+  palette[0] = c0;
 
   n = 1;
   do {
@@ -579,7 +579,7 @@ void ord_paleta3(void) {
     g = pal[c * 4 + 1];
     b = pal[c * 4 + 2];
     pal[c * 4] = 255;
-    paleta[n] = c;
+    palette[n] = c;
   } while (++n < 256);
 
   free(pal);
@@ -749,7 +749,7 @@ void pal_load() {
     return;
 
   if (!num_taggeds) {
-    div_strcpy(full, sizeof(full), tipo[v_type].path);
+    div_strcpy(full, sizeof(full), file_types[v_type].path);
     if (full[strlen(full) - 1] != '/')
       div_strcat(full, sizeof(full), "/");
     div_strcat(full, sizeof(full), input);
@@ -768,7 +768,7 @@ void pal_load() {
     for (num = 0; num < file_list_br.total_items; num++) {
       if (thumb[num].tagged) {
         div_strcpy(input, sizeof(input), file_list_br.list + file_list_br.item_width * num);
-        div_strcpy(full, sizeof(full), tipo[v_type].path);
+        div_strcpy(full, sizeof(full), file_types[v_type].path);
         if (full[strlen(full) - 1] != '/')
           div_strcat(full, sizeof(full), "/");
         div_strcat(full, sizeof(full), input);
@@ -819,7 +819,7 @@ void pal_load() {
     for (num = 0; num < file_list_br.total_items; num++) {
       if (thumb[num].tagged) {
         div_strcpy(input, sizeof(input), file_list_br.list + file_list_br.item_width * num);
-        div_strcpy(full, sizeof(full), tipo[v_type].path);
+        div_strcpy(full, sizeof(full), file_types[v_type].path);
         if (full[strlen(full) - 1] != '/')
           div_strcat(full, sizeof(full), "/");
         div_strcat(full, sizeof(full), input);
@@ -862,7 +862,7 @@ void pal_load() {
 void pal_save() {
   int x;
   FILE *f;
-  div_strcpy(full, sizeof(full), tipo[v_type].path);
+  div_strcpy(full, sizeof(full), file_types[v_type].path);
   if (full[strlen(full) - 1] != '/')
     div_strcat(full, sizeof(full), "/");
   div_strcat(full, sizeof(full), input);
@@ -1073,8 +1073,8 @@ void pal_refresh(int no_tocar_mapas, int guardar_original) {
       wup(n);
       ptr = v.ptr;
       if (window[n].foreground == 2) {
-        swap(v.w, v._an);
-        swap(v.h, v._al);
+        swap(v.w, v._w_saved);
+        swap(v.h, v._h_saved);
       }
       w = v.w;
       h = v.h;
@@ -1108,8 +1108,8 @@ void pal_refresh(int no_tocar_mapas, int guardar_original) {
       }
       call((void_return_type_t)v.paint_handler);
       if (v.foreground == 2) {
-        swap(v.w, v._an);
-        swap(v.h, v._al);
+        swap(v.w, v._w_saved);
+        swap(v.h, v._h_saved);
       }
       wdown(n);
     }
@@ -1190,22 +1190,22 @@ void ordena1(void) {
   ord_paleta0();
   for (y = 0; y < 16; y++)
     for (x = 0; x < 16; x++)
-      wbox(v.ptr, w, h, paleta[x + y * 16], 4 + x * 4, 12 + y * 4, 3, 3);
+      wbox(v.ptr, w, h, palette[x + y * 16], 4 + x * 4, 12 + y * 4, 3, 3);
 
   ord_paleta1();
   for (y = 0; y < 16; y++)
     for (x = 0; x < 16; x++)
-      wbox(v.ptr, w, h, paleta[x + y * 16], 66 + 4 + x * 4, 12 + y * 4, 3, 3);
+      wbox(v.ptr, w, h, palette[x + y * 16], 66 + 4 + x * 4, 12 + y * 4, 3, 3);
 
   ord_paleta2();
   for (y = 0; y < 16; y++)
     for (x = 0; x < 16; x++)
-      wbox(v.ptr, w, h, paleta[x + y * 16], 4 + x * 4, 66 + 12 + y * 4, 3, 3);
+      wbox(v.ptr, w, h, palette[x + y * 16], 4 + x * 4, 66 + 12 + y * 4, 3, 3);
 
   ord_paleta3();
   for (y = 0; y < 16; y++)
     for (x = 0; x < 16; x++)
-      wbox(v.ptr, w, h, paleta[x + y * 16], 66 + 4 + x * 4, 66 + 12 + y * 4, 3, 3);
+      wbox(v.ptr, w, h, palette[x + y * 16], 66 + 4 + x * 4, 66 + 12 + y * 4, 3, 3);
 
   switch (ordenacion) {
   case 0:
@@ -1300,9 +1300,9 @@ void sort_palette(void) {
   show_dialog(ordena0);
   if (v_accept) {
     for (n = 0; n < 256; n++) {
-      dac4[n * 3] = dac[paleta[n] * 3];
-      dac4[n * 3 + 1] = dac[paleta[n] * 3 + 1];
-      dac4[n * 3 + 2] = dac[paleta[n] * 3 + 2];
+      dac4[n * 3] = dac[palette[n] * 3];
+      dac4[n * 3 + 1] = dac[palette[n] * 3 + 1];
+      dac4[n * 3 + 2] = dac[palette[n] * 3 + 2];
     }
     pal_refresh(0, 0);
   }
@@ -1312,7 +1312,7 @@ void sort_palette(void) {
 //      Merge two different palettes
 //-----------------------------------------------------------------------------
 
-// byte paleta[768]
+// byte palette[768]
 
 word find_ord2(byte *dac) {
   int dmin, dif, r2, g2, b2;
@@ -1370,7 +1370,7 @@ void merge_palette(void) {
       v_text = (char *)texts[43];
       show_dialog(err0);
     } else {
-      div_strcpy(full, sizeof(full), tipo[v_type].path);
+      div_strcpy(full, sizeof(full), file_types[v_type].path);
       if (full[strlen(full) - 1] != '/')
         div_strcat(full, sizeof(full), "/");
       div_strcat(full, sizeof(full), input);
@@ -1405,7 +1405,7 @@ void merge_palette(void) {
 
 void merge_palettes(void) {
   byte pal[2048]; // Two palettes in R,G,B,sum(RGB) format
-  word paleta[512];
+  word palette[512];
   int dist[512];
   int n, c, min, cmin = 0;
 
@@ -1430,7 +1430,7 @@ void merge_palettes(void) {
   g = 0;
   b = 0;
   pal[c0 * 4] = 255;
-  paleta[0] = c0;
+  palette[0] = c0;
   n = 1;
   do {
     c = find_ord2(pal);
@@ -1438,7 +1438,7 @@ void merge_palettes(void) {
     g = pal[c * 4 + 1];
     b = pal[c * 4 + 2];
     pal[c * 4] = 255;
-    paleta[n] = c;
+    palette[n] = c;
   } while (++n < 512);
 
   // Restore pal
@@ -1447,14 +1447,14 @@ void merge_palettes(void) {
     pal[n * 4] = pal[n * 4 + 3] - (pal[n * 4 + 1] + pal[n * 4 + 2]);
   }
 
-  // paleta[512] with colors sorted
+  // palette[512] with colors sorted
 
   for (n = 1; n < 511; n++) {
-    dist[n] = *(int *)(color_lookup + pal[paleta[n] * 4] * 256 + pal[paleta[n + 1] * 4] * 4);
+    dist[n] = *(int *)(color_lookup + pal[palette[n] * 4] * 256 + pal[palette[n + 1] * 4] * 4);
     dist[n] +=
-        *(int *)(color_lookup + pal[paleta[n] * 4 + 1] * 256 + pal[paleta[n + 1] * 4 + 1] * 4);
+        *(int *)(color_lookup + pal[palette[n] * 4 + 1] * 256 + pal[palette[n + 1] * 4 + 1] * 4);
     dist[n] +=
-        *(int *)(color_lookup + pal[paleta[n] * 4 + 2] * 256 + pal[paleta[n + 1] * 4 + 2] * 4);
+        *(int *)(color_lookup + pal[palette[n] * 4 + 2] * 256 + pal[palette[n + 1] * 4 + 2] * 4);
   }
 
   // dist[] with distances between all consecutive colors
@@ -1469,44 +1469,44 @@ void merge_palettes(void) {
       }
     }
 
-    // paleta[cmin],paleta[cmin+1] are the colors to merge
+    // palette[cmin],palette[cmin+1] are the colors to merge
 
-    r = (pal[paleta[cmin] * 4] + pal[paleta[cmin + 1] * 4]) / 2;
-    g = (pal[paleta[cmin] * 4 + 1] + pal[paleta[cmin + 1] * 4 + 1]) / 2;
-    b = (pal[paleta[cmin] * 4 + 2] + pal[paleta[cmin + 1] * 4 + 2]) / 2;
+    r = (pal[palette[cmin] * 4] + pal[palette[cmin + 1] * 4]) / 2;
+    g = (pal[palette[cmin] * 4 + 1] + pal[palette[cmin + 1] * 4 + 1]) / 2;
+    b = (pal[palette[cmin] * 4 + 2] + pal[palette[cmin + 1] * 4 + 2]) / 2;
 
-    memmove(&paleta[cmin], &paleta[cmin + 1], sizeof(paleta[0]) * (c - cmin));
+    memmove(&palette[cmin], &palette[cmin + 1], sizeof(palette[0]) * (c - cmin));
     memmove(&dist[cmin], &dist[cmin + 1], sizeof(dist[0]) * (c - cmin));
 
-    pal[paleta[cmin] * 4] = r;
-    pal[paleta[cmin] * 4 + 1] = g;
-    pal[paleta[cmin] * 4 + 2] = b;
+    pal[palette[cmin] * 4] = r;
+    pal[palette[cmin] * 4 + 1] = g;
+    pal[palette[cmin] * 4 + 2] = b;
 
     if (cmin < c - 1) {
       n = cmin;
-      dist[n] = *(int *)(color_lookup + pal[paleta[n] * 4] * 256 + pal[paleta[n + 1] * 4] * 4);
+      dist[n] = *(int *)(color_lookup + pal[palette[n] * 4] * 256 + pal[palette[n + 1] * 4] * 4);
       dist[n] +=
-          *(int *)(color_lookup + pal[paleta[n] * 4 + 1] * 256 + pal[paleta[n + 1] * 4 + 1] * 4);
+          *(int *)(color_lookup + pal[palette[n] * 4 + 1] * 256 + pal[palette[n + 1] * 4 + 1] * 4);
       dist[n] +=
-          *(int *)(color_lookup + pal[paleta[n] * 4 + 2] * 256 + pal[paleta[n + 1] * 4 + 2] * 4);
+          *(int *)(color_lookup + pal[palette[n] * 4 + 2] * 256 + pal[palette[n + 1] * 4 + 2] * 4);
     }
 
     if (cmin > 1) {
       n = cmin - 1;
-      dist[n] = *(int *)(color_lookup + pal[paleta[n] * 4] * 256 + pal[paleta[n + 1] * 4] * 4);
+      dist[n] = *(int *)(color_lookup + pal[palette[n] * 4] * 256 + pal[palette[n + 1] * 4] * 4);
       dist[n] +=
-          *(int *)(color_lookup + pal[paleta[n] * 4 + 1] * 256 + pal[paleta[n + 1] * 4 + 1] * 4);
+          *(int *)(color_lookup + pal[palette[n] * 4 + 1] * 256 + pal[palette[n + 1] * 4 + 1] * 4);
       dist[n] +=
-          *(int *)(color_lookup + pal[paleta[n] * 4 + 2] * 256 + pal[paleta[n + 1] * 4 + 2] * 4);
+          *(int *)(color_lookup + pal[palette[n] * 4 + 2] * 256 + pal[palette[n + 1] * 4 + 2] * 4);
     }
 
     c--;
   }
 
   for (n = 0; n < 256; n++) {
-    dac4[n * 3] = pal[paleta[n] * 4];
-    dac4[n * 3 + 1] = pal[paleta[n] * 4 + 1];
-    dac4[n * 3 + 2] = pal[paleta[n] * 4 + 2];
+    dac4[n * 3] = pal[palette[n] * 4];
+    dac4[n * 3 + 1] = pal[palette[n] * 4 + 1];
+    dac4[n * 3 + 2] = pal[palette[n] * 4 + 2];
   }
 }
 
@@ -1572,7 +1572,7 @@ word new_find_ord(byte *dac) {
 
 void create_palette(void) {
   byte *pal; // Color list in R,G,B,sum(RGB) format
-  word *paleta;
+  word *palette;
   int *dist;
   int rr, gg, bb, n;
   int c, min, cmin = 0;
@@ -1597,12 +1597,12 @@ void create_palette(void) {
         }
       }
 
-  if ((paleta = (word *)malloc(num_colores * 2 + 10)) == NULL) {
+  if ((palette = (word *)malloc(num_colores * 2 + 10)) == NULL) {
     free(pal);
     return;
   }
   if ((dist = (int *)malloc(num_colores * 4 + 10)) == NULL) {
-    free(paleta);
+    free(palette);
     free(pal);
     return;
   }
@@ -1613,7 +1613,7 @@ void create_palette(void) {
   g = 0;
   b = 0;
   pal[0] += 128;
-  paleta[0] = 0;
+  palette[0] = 0;
   n = 1;
   do {
     if (!load_palette)
@@ -1624,7 +1624,7 @@ void create_palette(void) {
     g = pal[c * 4 + 1];
     b = pal[c * 4 + 2];
     pal[c * 4] += 128;
-    paleta[n] = c;
+    palette[n] = c;
   } while (++n < num_colores);
 
   // Restore pal
@@ -1634,14 +1634,14 @@ void create_palette(void) {
       pal[n * 4] -= 128;
   }
 
-  // paleta[num_colores] with colors sorted
+  // palette[num_colores] with colors sorted
 
   for (n = 0; n < num_colores - 1; n++) {
-    dist[n] = *(int *)(color_lookup + pal[paleta[n] * 4] * 256 + pal[paleta[n + 1] * 4] * 4);
+    dist[n] = *(int *)(color_lookup + pal[palette[n] * 4] * 256 + pal[palette[n + 1] * 4] * 4);
     dist[n] +=
-        *(int *)(color_lookup + pal[paleta[n] * 4 + 1] * 256 + pal[paleta[n + 1] * 4 + 1] * 4);
+        *(int *)(color_lookup + pal[palette[n] * 4 + 1] * 256 + pal[palette[n + 1] * 4 + 1] * 4);
     dist[n] +=
-        *(int *)(color_lookup + pal[paleta[n] * 4 + 2] * 256 + pal[paleta[n + 1] * 4 + 2] * 4);
+        *(int *)(color_lookup + pal[palette[n] * 4 + 2] * 256 + pal[palette[n + 1] * 4 + 2] * 4);
   }
 
   // dist[] with distances between all consecutive colors
@@ -1660,29 +1660,29 @@ void create_palette(void) {
       }
     }
 
-    // paleta[cmin+1] is the color to eliminate
+    // palette[cmin+1] is the color to eliminate
 
     if (c - cmin > 0) {
-      memmove(&paleta[cmin + 1], &paleta[cmin + 2], sizeof(word) * (c - cmin));
+      memmove(&palette[cmin + 1], &palette[cmin + 2], sizeof(word) * (c - cmin));
       memmove(&dist[cmin + 1], &dist[cmin + 2], sizeof(int) * (c - cmin));
     }
 
     if (cmin < c - 1) {
       n = cmin;
-      dist[n] = *(int *)(color_lookup + pal[paleta[n] * 4] * 256 + pal[paleta[n + 1] * 4] * 4);
+      dist[n] = *(int *)(color_lookup + pal[palette[n] * 4] * 256 + pal[palette[n + 1] * 4] * 4);
       dist[n] +=
-          *(int *)(color_lookup + pal[paleta[n] * 4 + 1] * 256 + pal[paleta[n + 1] * 4 + 1] * 4);
+          *(int *)(color_lookup + pal[palette[n] * 4 + 1] * 256 + pal[palette[n + 1] * 4 + 1] * 4);
       dist[n] +=
-          *(int *)(color_lookup + pal[paleta[n] * 4 + 2] * 256 + pal[paleta[n + 1] * 4 + 2] * 4);
+          *(int *)(color_lookup + pal[palette[n] * 4 + 2] * 256 + pal[palette[n + 1] * 4 + 2] * 4);
     }
 
     c--;
   }
 
   for (n = 0; n <= c; n++) {
-    apply_palette[n * 3 + 0] = pal[paleta[n] * 4 + 0];
-    apply_palette[n * 3 + 1] = pal[paleta[n] * 4 + 1];
-    apply_palette[n * 3 + 2] = pal[paleta[n] * 4 + 2];
+    apply_palette[n * 3 + 0] = pal[palette[n] * 4 + 0];
+    apply_palette[n * 3 + 1] = pal[palette[n] * 4 + 1];
+    apply_palette[n * 3 + 2] = pal[palette[n] * 4 + 2];
   }
 
   for (; n <= 255; n++) {
@@ -1692,7 +1692,7 @@ void create_palette(void) {
   }
 
   free(dist);
-  free(paleta);
+  free(palette);
   free(pal);
 
   for (n = 0; n < 768; n++)
@@ -2003,7 +2003,7 @@ void pal_interpolate2(void) {
       OldColor = cColor;
     }
     if ((mouse_b) && (cColor != SelColor)) {
-      memcpy(paleta, dac, 768);
+      memcpy(palette, dac, 768);
       switch (Accion) {
       case 1:
         //Gradient fill
@@ -2236,7 +2236,7 @@ void pal_interpolate2(void) {
     break;
   case 2:
     //Undo
-    memcpy(dac, paleta, 768);
+    memcpy(dac, palette, 768);
 
     find_colors();
     refresh_dialog();
@@ -2247,7 +2247,7 @@ void pal_interpolate2(void) {
     Accion = 0;
     call((void_return_type_t)v.paint_handler);
 
-    boton(4, w / 2, h - 13, 1, c0);
+    draw_button(4, w / 2, h - 13, 1, c0);
 
     //Refresh values and scrollbars
     wbox(v.ptr, w, h, c2, 130, 63 - 21, 25, 20);
@@ -2298,7 +2298,7 @@ void pal_edit() {
   byte DacAux[768];
   Retorno = 0;
   memcpy(DacAux, dac, 768);
-  memcpy(paleta, dac, 768);
+  memcpy(palette, dac, 768);
   show_dialog(pal_interpolate0);
   if (!Retorno) {
     memcpy(dac, DacAux, 768);

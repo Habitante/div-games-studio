@@ -136,28 +136,28 @@ void update_palette(void) {
 
   n = 0;
   do {
-    if (now_dacout_r > paleta[n]) {
+    if (now_dacout_r > palette[n]) {
       dac[n] = 0;
     } else {
-      dac[n] = paleta[n] - now_dacout_r;
+      dac[n] = palette[n] - now_dacout_r;
     }
     if (dac[n] > 63) {
       dac[n] = 63;
     }
     n++;
-    if (now_dacout_g > paleta[n]) {
+    if (now_dacout_g > palette[n]) {
       dac[n] = 0;
     } else {
-      dac[n] = paleta[n] - now_dacout_g;
+      dac[n] = palette[n] - now_dacout_g;
     }
     if (dac[n] > 63) {
       dac[n] = 63;
     }
     n++;
-    if (now_dacout_b > paleta[n]) {
+    if (now_dacout_b > palette[n]) {
       dac[n] = 0;
     } else {
-      dac[n] = paleta[n] - now_dacout_b;
+      dac[n] = palette[n] - now_dacout_b;
     }
     if (dac[n] > 63) {
       dac[n] = 63;
@@ -274,7 +274,7 @@ void setup_video_mode(void) {
 
   if (demo) {
     texts[max_texts].type = 0;
-    texts[max_texts].centro = 4;
+    texts[max_texts].alignment = 4;
     texts[max_texts].y = vga_height / 2;
     texts[max_texts].x = vga_width / 2;
     texts[max_texts].font = (byte *)fonts[0];
@@ -497,7 +497,7 @@ int save_PCX(byte *mapa, int w, int h, FILE *f) {
   fwrite(cbuffer, 1, cptr, f);
   fwrite(&Paletilla, 1, 1, f);
   for (x = 0; x < 768; x++)
-    p[x] = paleta[x] * 4;
+    p[x] = palette[x] * 4;
   fwrite(p, 1, 768, f);
   free(cbuffer);
   return (0);
@@ -515,7 +515,7 @@ int save_MAP(byte *mapa, int w, int h, FILE *f) {
   fwrite(&y, 4, 1, f); // +012 Code
 
   fwrite(cwork, 32, 1, f);   // +016 Description
-  fwrite(paleta, 768, 1, f); // +048 Palette
+  fwrite(palette, 768, 1, f); // +048 Palette
 
   for (y = 0; y < 16; y++) {
     gradients[y * 36] = 16;
@@ -781,10 +781,10 @@ void blit_partial(int x, int y, int w, int h) {
 
 void init_ghost(void) {
   int n, m;
-  byte *d = paleta;
+  byte *d = palette;
 
   for (n = 0; n < 768; n++)
-    dac4[n] = paleta[n] * 4;
+    dac4[n] = palette[n] * 4;
 
   for (n = 0; n < 512; n++)
     vcubos[n] = NULL;
@@ -825,11 +825,11 @@ void create_ghost(void) {
 
   n = 255;
   do {
-    ptr = paleta + n * 3;
+    ptr = palette + n * 3;
     _r = *ptr;
     _g = *(ptr + 1);
     _b = *(ptr + 2);
-    ptr = paleta;
+    ptr = palette;
     m = 0;
     do {
       rr = ((int)(*ptr + _r) << 7) & 0x3f00;
@@ -985,11 +985,11 @@ void find_color(byte r, byte g, byte b) { // Find a color (excluding index 0)
   int dmin, dif;
   byte *pal, *endpal, *color = NULL;
 
-  pal = paleta + 3;
-  endpal = paleta + 768;
+  pal = palette + 3;
+  endpal = palette + 768;
   dmin = 65536;
   do {
-    if (((pal - paleta) / 3) == last_c1)
+    if (((pal - palette) / 3) == last_c1)
       pal += 3;
     dif = (int)(r - *pal) * (int)(r - *pal);
     pal++;
@@ -1002,12 +1002,12 @@ void find_color(byte r, byte g, byte b) { // Find a color (excluding index 0)
       color = pal - 3;
     }
   } while (pal < endpal);
-  find_col = (color - paleta) / 3;
+  find_col = (color - palette) / 3;
 }
 
 byte average_color(byte a, byte b) {
-  find_color((paleta[a * 3] + paleta[b * 3]) / 2, (paleta[a * 3 + 1] + paleta[b * 3 + 1]) / 2,
-             (paleta[a * 3 + 2] + paleta[b * 3 + 2]) / 2);
+  find_color((palette[a * 3] + palette[b * 3]) / 2, (palette[a * 3 + 1] + palette[b * 3 + 1]) / 2,
+             (palette[a * 3 + 2] + palette[b * 3 + 2]) / 2);
   return (find_col);
 }
 

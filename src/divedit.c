@@ -2169,11 +2169,11 @@ void _completo(void) {
     in_comment = _cached_in_comment;
   }
 
-  if (v.h < v._al) {
+  if (v.h < v._h_saved) {
     _an = v.w;
     _al = v.h;
-    v.w = v._an;
-    v.h = v._al;
+    v.w = v._w_saved;
+    v.h = v._h_saved;
   }
   w = v.w / big2;
   h = v.h / big2;
@@ -2377,11 +2377,11 @@ void _parcial(void) {
   c_oldline = (char *)v.prg->lptr;
   old_comment_state = numrem;
 
-  if (v.h < v._al) {
+  if (v.h < v._h_saved) {
     _an = v.w;
     _al = v.h;
-    v.w = v._an;
-    v.h = v._al;
+    v.w = v._w_saved;
+    v.h = v._h_saved;
   }
   w = v.w / big2;
   h = v.h / big2;
@@ -3358,7 +3358,7 @@ void open_program(void) {
     return;
 
   if (!num_taggeds) {
-    div_strcpy(full, sizeof(full), tipo[v_type].path);
+    div_strcpy(full, sizeof(full), file_types[v_type].path);
     if (full[strlen(full) - 1] != '/')
       div_strcat(full, sizeof(full), "/");
     div_strcat(full, sizeof(full), input);
@@ -3376,7 +3376,7 @@ void open_program(void) {
   for (num = 0; num < file_list_br.total_items; num++) {
     if (thumb[num].tagged) {
       div_strcpy(input, sizeof(input), file_list_br.list + file_list_br.item_width * num);
-      div_strcpy(full, sizeof(full), tipo[v_type].path);
+      div_strcpy(full, sizeof(full), file_types[v_type].path);
       if (full[strlen(full) - 1] != '/')
         div_strcat(full, sizeof(full), "/");
       div_strcat(full, sizeof(full), input);
@@ -3390,7 +3390,7 @@ void open_program(void) {
           if ((v_prg = (struct tprg *)malloc(sizeof(struct tprg))) != NULL) {
             v_prg->buffer_len = n;
             div_strcpy(v_prg->filename, sizeof(v_prg->filename), input);
-            div_strcpy(v_prg->path, sizeof(v_prg->path), tipo[v_type].path);
+            div_strcpy(v_prg->path, sizeof(v_prg->path), file_types[v_type].path);
             fseek(f, 0, SEEK_SET);
 
             if (fread(buffer, 1, n, f) == n - buffer_grow) {
@@ -3501,7 +3501,7 @@ void program0_new(void) {
   struct tm *timeinfo;
   time_t dtime;
 
-  div_strcpy(full, sizeof(full), tipo[v_type].path);
+  div_strcpy(full, sizeof(full), file_types[v_type].path);
   if (full[strlen(full) - 1] != '/')
     div_strcat(full, sizeof(full), "/");
   div_strcat(full, sizeof(full), input);
@@ -3536,7 +3536,7 @@ void program0_new(void) {
         memset(v_prg, 0, sizeof(struct tprg));
         v_prg->buffer_len = n;
         div_strcpy(v_prg->filename, sizeof(v_prg->filename), input);
-        div_strcpy(v_prg->path, sizeof(v_prg->path), tipo[v_type].path);
+        div_strcpy(v_prg->path, sizeof(v_prg->path), file_types[v_type].path);
         //        n-=buffer_grow;
         n = strlen((char *)buffer);
         v_prg->file_len = n;
@@ -3578,7 +3578,7 @@ void save_program(void) {
   int w = v.w / big2, h = v.h / big2;
   FILE *f;
 
-  div_strcpy(full, sizeof(full), tipo[v_type].path);
+  div_strcpy(full, sizeof(full), file_types[v_type].path);
   if (full[strlen(full) - 1] != '/')
     div_strcat(full, sizeof(full), "/");
   div_strcat(full, sizeof(full), input);
@@ -3594,7 +3594,7 @@ void save_program(void) {
       return;
     }
 
-    div_strcpy(v.prg->path, sizeof(v.prg->path), tipo[v_type].path);
+    div_strcpy(v.prg->path, sizeof(v.prg->path), file_types[v_type].path);
     div_strcpy(v.prg->filename, sizeof(v.prg->filename), input);
 
     wgra(v.ptr, w, h, c_b_low, 2, 2, w - 20, 7);

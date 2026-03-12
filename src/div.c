@@ -13,7 +13,7 @@
 //      DIV Operating System
 ///////////////////////////////////////////////////////////////////////////////
 
-#define DEFINIR_AQUI // DEFINED HERE - see global.h
+#define DEFINE_GLOBALS_HERE // DEFINED HERE - see global.h
 #ifdef WIN32
 #include <windows.h>
 #include <malloc.h>
@@ -112,7 +112,7 @@ extern byte *index_end;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-int primera_vez = 0; // Marks first time DIV runs
+int first_run = 0; // Marks first time DIV runs
 extern int div_started;
 
 #ifdef SHARE
@@ -121,7 +121,7 @@ int mostrar_demo = 1; // The first time, the demo message won't appear
 int mostrar_demo = 0;
 #endif
 
-int volcados_parciales = 0;
+int partial_blits = 0;
 
 ///////////////////////////////////////////////////////////////////////////////
 //      Critical error handler
@@ -402,7 +402,7 @@ int main(int argc, char *argv[]) {
   if (argc > 1 && !strcmp(argv[1], "-c"))
     compilemode = 1;
 
-  getcwd(tipo[0].path, PATH_MAX + 1);
+  getcwd(file_types[0].path, PATH_MAX + 1);
 
   if (argc < 1)
     exit(0);
@@ -433,7 +433,7 @@ int main(int argc, char *argv[]) {
   if (cpu_type == 3)
     chdir("..");
 
-  getcwd(tipo[1].path, PATH_MAX + 1);
+  getcwd(file_types[1].path, PATH_MAX + 1);
 
   if (argc > 2 && (!strcmp(argv[2], "/safe") || !strcmp(argv[2], "/SAFE"))) {
     safe = 33;
@@ -443,37 +443,37 @@ int main(int argc, char *argv[]) {
   } else {
     if ((f = fopen("system/setup.bin", "rb")) != NULL) {
       fclose(f);
-      primera_vez = 0;
+      first_run = 0;
     } else {
-      primera_vez = 1;
+      first_run = 1;
       mostrar_demo = 0;
     }
   }
 
-  tipo[2].ext = "*.* *.MAP *.PCX *.BMP *.JPG *.JPE *.PNG *.GIF *.TGA *.TIF"; // Maps browser
-  tipo[3].ext =
+  file_types[2].ext = "*.* *.MAP *.PCX *.BMP *.JPG *.JPE *.PNG *.GIF *.TGA *.TIF"; // Maps browser
+  file_types[3].ext =
       "*.* *.PAL *.FPG *.FNT *.MAP *.BMP *.PCX *.JPG *.PNG *.GIF *.TGA *.TIF"; // Palette Browser
-  tipo[4].ext = "*.FPG *.*";                                                   // FPG FILES
-  tipo[5].ext = "*.FNT *.*";                                                   // FNT FILES
-  tipo[6].ext = "*.IFS *.*";                                                   // IFS Font templates
-  tipo[7].ext = "*.* *.7 *.WAV *.PCM *.MP3 *.OGG *.FLAC";                      // Audio files
-  tipo[8].ext = "*.PRG *.*";                                                   // Program files
+  file_types[4].ext = "*.FPG *.*";                                                   // FPG FILES
+  file_types[5].ext = "*.FNT *.*";                                                   // FNT FILES
+  file_types[6].ext = "*.IFS *.*";                                                   // IFS Font templates
+  file_types[7].ext = "*.* *.7 *.WAV *.PCM *.MP3 *.OGG *.FLAC";                      // Audio files
+  file_types[8].ext = "*.PRG *.*";                                                   // Program files
 
-  tipo[9].ext = "*.* *.JPG *.PNG *.BMP *.TIF"; // wallpaper files
+  file_types[9].ext = "*.* *.JPG *.PNG *.BMP *.TIF"; // wallpaper files
 
-  tipo[10].ext = "*.PAL";       // Save Palettes
-  tipo[11].ext = "*.WAV *.PCM"; // Save Audio
-  tipo[12].ext = "*.PRJ";       // Save Project
+  file_types[10].ext = "*.PAL";       // Save Palettes
+  file_types[11].ext = "*.WAV *.PCM"; // Save Audio
+  file_types[12].ext = "*.PRJ";       // Save Project
 
-  tipo[13].ext = "*.* *.13"; // unknown
+  file_types[13].ext = "*.* *.13"; // unknown
 
-  tipo[14].ext = "*.MAP *.PCX *.BMP";          // Save image
-  tipo[15].ext = "*.WLD *.*";                  // 3D Map files
-  tipo[16].ext = "*.* *.MOD *.S3M *.XM *.MID"; // Tracker modules
+  file_types[14].ext = "*.MAP *.PCX *.BMP";          // Save image
+  file_types[15].ext = "*.WLD *.*";                  // 3D Map files
+  file_types[16].ext = "*.* *.MOD *.S3M *.XM *.MID"; // Tracker modules
 
   for (n = 0; n < 24; n++) {
-    tipo[n].default_choice = 0;
-    tipo[n].first_visible = 0;
+    file_types[n].default_choice = 0;
+    file_types[n].first_visible = 0;
   }
 
   {
@@ -618,11 +618,11 @@ int main(int argc, char *argv[]) {
 
 
   if (return_mode == 1) {
-    _dos_setdrive((memptrsize)toupper(*tipo[1].path) - 'A' + 1, &n);
-    _chdir(tipo[1].path);
+    _dos_setdrive((memptrsize)toupper(*file_types[1].path) - 'A' + 1, &n);
+    _chdir(file_types[1].path);
   } else {
-    _dos_setdrive((memptrsize)toupper(*tipo[0].path) - 'A' + 1, &n);
-    _chdir(tipo[0].path);
+    _dos_setdrive((memptrsize)toupper(*file_types[0].path) - 'A' + 1, &n);
+    _chdir(file_types[0].path);
   }
   return (return_mode);
 }
@@ -723,10 +723,10 @@ void init_environment() {
 
   // If the DIV.DTF file doesn't exist or safe mode is requested
 
-  if (CopyDesktop && !new_session && !primera_vez)
+  if (CopyDesktop && !new_session && !first_run)
     upload_desktop();
 
-  if (!primera_vez) {
+  if (!first_run) {
     for (n = 0; n < max_windows; n++)
       if (window[n].click_handler == menu_principal2)
         break;
@@ -761,13 +761,13 @@ void init_environment() {
   delete_file("exec.*");
   _chdir("..");
 
-  if (primera_vez) {
+  if (first_run) {
     new_window(menu_principal0);
     minimize_window();
 
-    primera_vez = 2;
+    first_run = 2;
     help(2000);
-    primera_vez = 0;
+    first_run = 0;
   }
 
   flush_buffer();
@@ -1159,12 +1159,12 @@ void mainloop(void) {
         }
 
         call((void_return_type_t)v.click_handler);
-        volcados_parciales = 1;
+        partial_blits = 1;
         if (v.redraw) {
           flush_window(0);
           v.redraw = 0;
         }
-        volcados_parciales = 0;
+        partial_blits = 0;
       }
 
       oldn = 0;
@@ -1353,10 +1353,10 @@ fin_bucle_entorno:
         move(0, m);
         close_window();
       } else if (window[m].redraw) {
-        volcados_parciales = 1;
+        partial_blits = 1;
         flush_window(m);
         window[m].redraw = 0;
-        volcados_parciales = 0;
+        partial_blits = 0;
       }
 
       window_closing = 0;
@@ -1481,7 +1481,7 @@ fin_bucle_entorno:
         flush_copy();
         v_type = 8;
         save_prg_buffer(0);
-        div_strcpy(tipo[8].path, sizeof(tipo[8].path), v.prg->path);
+        div_strcpy(file_types[8].path, sizeof(file_types[8].path), v.prg->path);
         div_strcpy(input, sizeof(input), v.prg->filename);
         save_program();
         break;
@@ -1507,7 +1507,7 @@ fin_bucle_entorno:
       case 7:
         v_type = 8;
         save_prg_buffer(0);
-        div_strcpy(tipo[8].path, sizeof(tipo[8].path), v.prg->path);
+        div_strcpy(file_types[8].path, sizeof(file_types[8].path), v.prg->path);
         div_strcpy(input, sizeof(input), v.prg->filename);
         save_program();
         source_ptr = v.prg->buffer;
@@ -1790,14 +1790,14 @@ void dialog_loop(void) {
       call((void_return_type_t)v.click_handler);
       mouse_b = m;
 
-      volcados_parciales = 1;
+      partial_blits = 1;
 
       if (v.redraw) {
         flush_window(0);
         v.redraw = 0;
       }
 
-      volcados_parciales = 0;
+      partial_blits = 0;
       salir_del_dialogo = 0;
     }
 
@@ -1836,14 +1836,14 @@ void dialog_loop(void) {
       }
 
       call((void_return_type_t)v.click_handler);
-      volcados_parciales = 1;
+      partial_blits = 1;
 
       if (v.redraw) {
         flush_window(0);
         v.redraw = 0;
       }
 
-      volcados_parciales = 0;
+      partial_blits = 0;
       oldn = 0;
       salir_del_dialogo = 0;
 
@@ -1859,9 +1859,9 @@ void dialog_loop(void) {
           else
             wput(v.ptr, v.w, v.h, v.w - 9, 2, -45);
 
-          volcados_parciales = 1;
+          partial_blits = 1;
           flush_window(0);
-          volcados_parciales = 0;
+          partial_blits = 0;
         }
         if (!(mouse_b & 1) && (prev_mouse_buttons & 1)) {
           close_window();
@@ -1889,13 +1889,13 @@ void dialog_loop(void) {
     mouse_b = 0;
     call((void_return_type_t)v.click_handler);
     mouse_b = m;
-    volcados_parciales = 1;
+    partial_blits = 1;
     if (v.redraw) {
       flush_window(0);
       v.redraw = 0;
     }
 
-    volcados_parciales = 0;
+    partial_blits = 0;
     salir_del_dialogo = 0;
   }
 
@@ -2036,8 +2036,8 @@ void maximize_window(void) {
 
   v.x = v._x;
   v.y = v._y;
-  v.w = v._an;
-  v.h = v._al;
+  v.w = v._w_saved;
+  v.h = v._h_saved;
 
   m = 0;
   for (n = 1; n < max_windows; n++)
@@ -2049,8 +2049,8 @@ void maximize_window(void) {
 
   v._x = x;
   v._y = y;
-  v._an = w;
-  v._al = h;
+  v._w_saved = w;
+  v._h_saved = h;
   v.foreground = 1;
 
   do {
@@ -2074,7 +2074,7 @@ void minimize_window(void) {
 
   wput(v.ptr, v.w / big2, v.h / big2, v.w / big2 - 17, 2, -47);
   flush_window(0);
-  if (primera_vez != 1)
+  if (first_run != 1)
     flush_copy();
   wput(v.ptr, v.w / big2, v.h / big2, v.w / big2 - 17, 2, -37);
   if (v.type >= 100)
@@ -2088,8 +2088,8 @@ void minimize_window(void) {
   v.w = (7 + 1 + text_len(v.name) + 1) * big2;
   v.h = 7 * big2;
 
-  if (v.w != v._an || v.h != v._al) { // If this is the first minimize
-                                      // (or the name changed ...)
+  if (v.w != v._w_saved || v.h != v._h_saved) { // If this is the first minimize
+                                                // (or the name changed ...)
     place_window(v.side * 2 + 0, &v.x, &v.y, v.w, v.h);
   } else {
     v.x = v._x;
@@ -2105,8 +2105,8 @@ void minimize_window(void) {
 
   v._x = x;
   v._y = y;
-  v._an = w;
-  v._al = h;
+  v._w_saved = w;
+  v._h_saved = h;
   v.foreground = 2;
 
   do {
@@ -2832,7 +2832,7 @@ void flush_window(int m) {
   if (skip_window_render)
     return;
 
-  if (volcados_parciales) {
+  if (partial_blits) {
     if (window[m].type == 102 && window[m].redraw == 1 && window[m].prg != NULL) {
       window[m].redraw = 0;
       update_box2(m, window[m].x + 2 * big2, window[m].y + 10 * big2, window[m].w - 20, 7 * big2);
@@ -3223,8 +3223,8 @@ void new_window(void_return_type_t init_handler) {
     v.y = 0;
     v.w = vga_width;
     v.h = vga_height;
-    v._an = 0;
-    v._al = 0;
+    v._w_saved = 0;
+    v._h_saved = 0;
     v.state = 0;
     v.buttons = 0;
     v.redraw = 0;
@@ -3250,7 +3250,7 @@ void new_window(void_return_type_t init_handler) {
     // Window placement algorithm ...
     //---------------------------------------------------------------------------
 
-    if (primera_vez == 2) { // The help window (first time)
+    if (first_run == 2) { // The help window (first time)
       y = x = vga_width / 2 - w / 2;
     } else if (v.type == 1 || v.type == 7) { // Dialogs are centered
       x = vga_width / 2 - w / 2;
@@ -3420,7 +3420,7 @@ void new_window(void_return_type_t init_handler) {
         h *= 2;
       }
 
-      if (primera_vez != 1) {
+      if (first_run != 1) {
         do {
           read_mouse();
         } while ((mouse_b & 1) || key(_ESC));
@@ -3589,7 +3589,7 @@ void extrude(int x, int y, int w, int h, int x2, int y2, int w2, int h2) {
     blit_partial(xx, yy, 1, aal);
     blit_partial(xx, yy + aal - 1, aan, 1);
     blit_partial(xx + aan - 1, yy, 1, aal);
-    if (primera_vez != 1)
+    if (first_run != 1)
       flush_copy();
 
     if (draw_mode < 100) {
@@ -3606,7 +3606,7 @@ void extrude(int x, int y, int w, int h, int x2, int y2, int w2, int h2) {
       update_box(xx + aan - 1, yy, 1, aal);
     }
 
-    if (primera_vez != 1)
+    if (first_run != 1)
       retrace_wait();
 
   } while (--n);
@@ -3659,8 +3659,8 @@ void show_dialog(void_return_type_t init_handler) {
     v.y = 0;
     v.w = vga_width;
     v.h = vga_height;
-    v._an = 0;
-    v._al = 0;
+    v._w_saved = 0;
+    v._h_saved = 0;
     v.state = 0;
     v.buttons = 0;
     v.redraw = 0;
@@ -3859,7 +3859,7 @@ void initialization(void) {
   }
 
   undo = (byte *)malloc(undo_memory);
-  undo_table = (struct tipo_undo *)malloc(sizeof(struct tipo_undo) * max_undos);
+  undo_table = (struct undo_entry *)malloc(sizeof(struct undo_entry) * max_undos);
 
   for (n = 0; n < max_windows; n++) {
     window[n].type = 0;
@@ -4326,7 +4326,7 @@ void _button(int t, int x, int y, int c) {
   v.items++;
 }
 
-void _get(int t, int x, int y, int w, byte *buffer, int lon_buffer, int r0, int r1) {
+void _get(int t, int x, int y, int w, byte *buffer, int buffer_len, int r0, int r1) {
   v.item[v.items].type = 2;
   v.item[v.items].state = 0;
   v.item[v.items].get.text = texts[t];
@@ -4334,7 +4334,7 @@ void _get(int t, int x, int y, int w, byte *buffer, int lon_buffer, int r0, int 
   v.item[v.items].get.y = y;
   v.item[v.items].get.w = w;
   v.item[v.items].get.buffer = buffer;
-  v.item[v.items].get.lon_buffer = lon_buffer;
+  v.item[v.items].get.buffer_len = buffer_len;
   v.item[v.items].get.r0 = r0;
   v.item[v.items].get.r1 = r1;
   if (v.selected_item == -1)
@@ -4342,13 +4342,13 @@ void _get(int t, int x, int y, int w, byte *buffer, int lon_buffer, int r0, int 
   v.items++;
 }
 
-void _flag(int t, int x, int y, int *valor) {
+void _flag(int t, int x, int y, int *value) {
   v.item[v.items].type = 3;
   v.item[v.items].state = 0;
   v.item[v.items].flag.text = texts[t];
   v.item[v.items].flag.x = x;
   v.item[v.items].flag.y = y;
-  v.item[v.items].flag.valor = valor;
+  v.item[v.items].flag.value = value;
   v.items++;
 }
 
@@ -4456,7 +4456,7 @@ void select_get(struct t_item *i, int activo, int ocultar_error) {
     if (i->state & 2) {
       if (*get) {
         if (i->get.r0 == i->get.r1)
-          div_strcpy((char *)i->get.buffer, i->get.lon_buffer + 1, get);
+          div_strcpy((char *)i->get.buffer, i->get.buffer_len + 1, get);
         else {
           if (atoi(get) >= i->get.r0 && atoi(get) <= i->get.r1)
             itoa(atoi(get), (char *)i->get.buffer, 10);
@@ -4485,7 +4485,7 @@ void select_get(struct t_item *i, int activo, int ocultar_error) {
 }
 
 void show_flag(struct t_item *i) {
-  if (*i->flag.valor)
+  if (*i->flag.value)
     wput(v.ptr, v.w / big2, v.h / big2, i->flag.x, i->flag.y, -59);
   else
     wput(v.ptr, v.w / big2, v.h / big2, i->flag.x, i->flag.y, 58);
@@ -4522,7 +4522,7 @@ void _process_items(void) {
           ascii = 0;
           if (superget)
             div_strcpy((char *)v.item[v.selected_item].get.buffer,
-                       v.item[v.selected_item].get.lon_buffer + 1, "");
+                       v.item[v.selected_item].get.buffer_len + 1, "");
           div_strcpy((char *)get, long_line, (char *)v.item[v.selected_item].get.buffer);
           get_pos = strlen(get);
           select_get(&v.item[v.selected_item], 0, 1);
@@ -4799,7 +4799,7 @@ void process_flag(int n, int e) {
            v.item[n].flag.text, c4);
     if (v.item[n].state == 1) {
       v.active_item = n;
-      if ((*v.item[n].flag.valor = !*v.item[n].flag.valor))
+      if ((*v.item[n].flag.value = !*v.item[n].flag.value))
         wput(v.ptr, v.w / big2, v.h / big2, v.item[n].flag.x, v.item[n].flag.y, -59);
       else
         wput(v.ptr, v.w / big2, v.h / big2, v.item[n].flag.x, v.item[n].flag.y, 58);
@@ -4835,7 +4835,7 @@ void get_input(int n) {
     }
     if (!*get && superget)
       div_strcpy((char *)v.item[v.selected_item].get.buffer,
-                 v.item[v.selected_item].get.lon_buffer + 1, "");
+                 v.item[v.selected_item].get.buffer_len + 1, "");
     v.redraw = 1;
     break;
   case 13:
@@ -4865,13 +4865,13 @@ void get_input(int n) {
         memmove(&get[get_pos], &get[get_pos + 1], strlen(&get[get_pos + 1]) + 1);
         if (!*get && superget)
           div_strcpy((char *)v.item[v.selected_item].get.buffer,
-                     v.item[v.selected_item].get.lon_buffer + 1, "");
+                     v.item[v.selected_item].get.buffer_len + 1, "");
         break;
       default:
         v.redraw = l;
         break;
       }
-    } else if (ascii && char_len(ascii) > 1 && (x = strlen(get)) < v.item[n].get.lon_buffer - 1) {
+    } else if (ascii && char_len(ascii) > 1 && (x = strlen(get)) < v.item[n].get.buffer_len - 1) {
       // MapperCreator2 digit filter removed (MODE8/3D map editor deleted)
       {
         div_strcpy(cwork, sizeof(cwork), get);
@@ -5043,18 +5043,18 @@ void Save_Cfgbin() {
 
   // Directory system
 
-  div_strcpy(setup_file.dir_cwd, sizeof(setup_file.dir_cwd), tipo[0].path);
-  div_strcpy(setup_file.dir_map, sizeof(setup_file.dir_map), tipo[2].path);
-  div_strcpy(setup_file.dir_pal, sizeof(setup_file.dir_pal), tipo[3].path);
-  div_strcpy(setup_file.dir_fpg, sizeof(setup_file.dir_fpg), tipo[4].path);
-  div_strcpy(setup_file.dir_fnt, sizeof(setup_file.dir_fnt), tipo[5].path);
-  div_strcpy(setup_file.dir_ifs, sizeof(setup_file.dir_ifs), tipo[6].path);
-  div_strcpy(setup_file.dir_pcm, sizeof(setup_file.dir_pcm), tipo[7].path);
-  div_strcpy(setup_file.dir_prg, sizeof(setup_file.dir_prg), tipo[8].path);
-  div_strcpy(setup_file.dir_pcms, sizeof(setup_file.dir_pcms), tipo[11].path);
-  div_strcpy(setup_file.dir_prj, sizeof(setup_file.dir_prj), tipo[12].path);
-  div_strcpy(setup_file.dir_wld, sizeof(setup_file.dir_wld), tipo[15].path);
-  div_strcpy(setup_file.dir_mod, sizeof(setup_file.dir_mod), tipo[16].path);
+  div_strcpy(setup_file.dir_cwd, sizeof(setup_file.dir_cwd), file_types[0].path);
+  div_strcpy(setup_file.dir_map, sizeof(setup_file.dir_map), file_types[2].path);
+  div_strcpy(setup_file.dir_pal, sizeof(setup_file.dir_pal), file_types[3].path);
+  div_strcpy(setup_file.dir_fpg, sizeof(setup_file.dir_fpg), file_types[4].path);
+  div_strcpy(setup_file.dir_fnt, sizeof(setup_file.dir_fnt), file_types[5].path);
+  div_strcpy(setup_file.dir_ifs, sizeof(setup_file.dir_ifs), file_types[6].path);
+  div_strcpy(setup_file.dir_pcm, sizeof(setup_file.dir_pcm), file_types[7].path);
+  div_strcpy(setup_file.dir_prg, sizeof(setup_file.dir_prg), file_types[8].path);
+  div_strcpy(setup_file.dir_pcms, sizeof(setup_file.dir_pcms), file_types[11].path);
+  div_strcpy(setup_file.dir_prj, sizeof(setup_file.dir_prj), file_types[12].path);
+  div_strcpy(setup_file.dir_wld, sizeof(setup_file.dir_wld), file_types[15].path);
+  div_strcpy(setup_file.dir_mod, sizeof(setup_file.dir_mod), file_types[16].path);
   /*
         // Wallpaper info
         strcpy(setup_file.desktop_image,desk_file);
@@ -5087,70 +5087,70 @@ void Load_Cfgbin() {
 
   // System Directories
 
-  div_strcpy(setup_file.dir_cwd, sizeof(setup_file.dir_cwd), tipo[0].path);
+  div_strcpy(setup_file.dir_cwd, sizeof(setup_file.dir_cwd), file_types[0].path);
 
-  div_strcpy(cWork, sizeof(cWork), tipo[1].path);
+  div_strcpy(cWork, sizeof(cWork), file_types[1].path);
   div_strcat(cWork, sizeof(cWork), "/MAP");
   div_strcpy(setup_file.dir_map, sizeof(setup_file.dir_map), cWork);
-  div_strcpy(tipo[2].path, sizeof(tipo[2].path), cWork);
-  div_strcpy(tipo[9].path, sizeof(tipo[9].path), cWork);
+  div_strcpy(file_types[2].path, sizeof(file_types[2].path), cWork);
+  div_strcpy(file_types[9].path, sizeof(file_types[9].path), cWork);
 
-  div_strcpy(cWork, sizeof(cWork), tipo[1].path);
+  div_strcpy(cWork, sizeof(cWork), file_types[1].path);
   div_strcat(cWork, sizeof(cWork), "/PAL");
   div_strcpy(setup_file.dir_pal, sizeof(setup_file.dir_pal), cWork);
-  div_strcpy(tipo[3].path, sizeof(tipo[3].path), cWork);
-  div_strcpy(tipo[10].path, sizeof(tipo[10].path), cWork);
+  div_strcpy(file_types[3].path, sizeof(file_types[3].path), cWork);
+  div_strcpy(file_types[10].path, sizeof(file_types[10].path), cWork);
 
-  div_strcpy(cWork, sizeof(cWork), tipo[1].path);
+  div_strcpy(cWork, sizeof(cWork), file_types[1].path);
   div_strcat(cWork, sizeof(cWork), "/FPG");
   div_strcpy(setup_file.dir_fpg, sizeof(setup_file.dir_fpg), cWork);
-  div_strcpy(tipo[4].path, sizeof(tipo[4].path), cWork);
+  div_strcpy(file_types[4].path, sizeof(file_types[4].path), cWork);
 
-  div_strcpy(cWork, sizeof(cWork), tipo[1].path);
+  div_strcpy(cWork, sizeof(cWork), file_types[1].path);
   div_strcat(cWork, sizeof(cWork), "/FNT");
   div_strcpy(setup_file.dir_fnt, sizeof(setup_file.dir_fnt), cWork);
-  div_strcpy(tipo[5].path, sizeof(tipo[5].path), cWork);
+  div_strcpy(file_types[5].path, sizeof(file_types[5].path), cWork);
 
-  div_strcpy(cWork, sizeof(cWork), tipo[1].path);
+  div_strcpy(cWork, sizeof(cWork), file_types[1].path);
   div_strcat(cWork, sizeof(cWork), "/IFS");
   div_strcpy(setup_file.dir_ifs, sizeof(setup_file.dir_ifs), cWork);
-  div_strcpy(tipo[6].path, sizeof(tipo[6].path), cWork);
+  div_strcpy(file_types[6].path, sizeof(file_types[6].path), cWork);
 
-  div_strcpy(cWork, sizeof(cWork), tipo[1].path);
+  div_strcpy(cWork, sizeof(cWork), file_types[1].path);
   div_strcat(cWork, sizeof(cWork), "/PCM");
   div_strcpy(setup_file.dir_pcm, sizeof(setup_file.dir_pcm), cWork);
-  div_strcpy(tipo[7].path, sizeof(tipo[7].path), cWork);
+  div_strcpy(file_types[7].path, sizeof(file_types[7].path), cWork);
 
-  div_strcpy(cWork, sizeof(cWork), tipo[1].path);
+  div_strcpy(cWork, sizeof(cWork), file_types[1].path);
   div_strcat(cWork, sizeof(cWork), "/PRG");
   div_strcpy(setup_file.dir_prg, sizeof(setup_file.dir_prg), cWork);
-  div_strcpy(tipo[8].path, sizeof(tipo[8].path), cWork);
+  div_strcpy(file_types[8].path, sizeof(file_types[8].path), cWork);
 
-  div_strcpy(cWork, sizeof(cWork), tipo[1].path);
+  div_strcpy(cWork, sizeof(cWork), file_types[1].path);
   div_strcat(cWork, sizeof(cWork), "/PCM");
   div_strcpy(setup_file.dir_pcms, sizeof(setup_file.dir_pcms), cWork);
-  div_strcpy(tipo[11].path, sizeof(tipo[11].path), cWork);
+  div_strcpy(file_types[11].path, sizeof(file_types[11].path), cWork);
 
-  div_strcpy(cWork, sizeof(cWork), tipo[1].path);
+  div_strcpy(cWork, sizeof(cWork), file_types[1].path);
   div_strcat(cWork, sizeof(cWork), "/PRJ");
   div_strcpy(setup_file.dir_prj, sizeof(setup_file.dir_prj), cWork);
-  div_strcpy(tipo[12].path, sizeof(tipo[12].path), cWork);
+  div_strcpy(file_types[12].path, sizeof(file_types[12].path), cWork);
 
-  div_strcpy(tipo[13].path, sizeof(tipo[13].path), tipo[1].path);
+  div_strcpy(file_types[13].path, sizeof(file_types[13].path), file_types[1].path);
 
-  div_strcpy(cWork, sizeof(cWork), tipo[1].path);
+  div_strcpy(cWork, sizeof(cWork), file_types[1].path);
   div_strcat(cWork, sizeof(cWork), "/WLD");
   div_strcpy(setup_file.dir_wld, sizeof(setup_file.dir_wld), cWork);
-  div_strcpy(tipo[15].path, sizeof(tipo[15].path), cWork);
+  div_strcpy(file_types[15].path, sizeof(file_types[15].path), cWork);
 
-  div_strcpy(cWork, sizeof(cWork), tipo[1].path);
+  div_strcpy(cWork, sizeof(cWork), file_types[1].path);
   div_strcat(cWork, sizeof(cWork), "/MOD");
   div_strcpy(setup_file.dir_mod, sizeof(setup_file.dir_mod), cWork);
-  div_strcpy(tipo[16].path, sizeof(tipo[16].path), cWork);
+  div_strcpy(file_types[16].path, sizeof(file_types[16].path), cWork);
 
   file = fopen("system/setup.bin", "rb");
   if (file == NULL) {
-    if (primera_vez) {
+    if (first_run) {
       div_strcpy(setup_file.desktop_image, sizeof(setup_file.desktop_image),
                  (char *)texts[487]); // Wallpaper info
       setup_file.desktop_gamma = 1;
@@ -5254,69 +5254,69 @@ void Load_Cfgbin() {
 
   if (interpreting)
     if (chdir(setup_file.dir_cwd) != -1)
-      div_strcpy(tipo[0].path, sizeof(tipo[0].path), setup_file.dir_cwd);
+      div_strcpy(file_types[0].path, sizeof(file_types[0].path), setup_file.dir_cwd);
 
   if (chdir(setup_file.dir_map) != -1)
-    div_strcpy(tipo[2].path, sizeof(tipo[2].path), setup_file.dir_map);
-  else if (chdir(tipo[2].path) == -1)
-    div_strcpy(tipo[2].path, sizeof(tipo[2].path), tipo[1].path);
+    div_strcpy(file_types[2].path, sizeof(file_types[2].path), setup_file.dir_map);
+  else if (chdir(file_types[2].path) == -1)
+    div_strcpy(file_types[2].path, sizeof(file_types[2].path), file_types[1].path);
 
   if (chdir(setup_file.dir_pal) != -1)
-    div_strcpy(tipo[3].path, sizeof(tipo[3].path), setup_file.dir_pal);
-  else if (chdir(tipo[3].path) == -1)
-    div_strcpy(tipo[3].path, sizeof(tipo[3].path), tipo[1].path);
+    div_strcpy(file_types[3].path, sizeof(file_types[3].path), setup_file.dir_pal);
+  else if (chdir(file_types[3].path) == -1)
+    div_strcpy(file_types[3].path, sizeof(file_types[3].path), file_types[1].path);
 
   if (chdir(setup_file.dir_fpg) != -1)
-    div_strcpy(tipo[4].path, sizeof(tipo[4].path), setup_file.dir_fpg);
-  else if (chdir(tipo[4].path) == -1)
-    div_strcpy(tipo[4].path, sizeof(tipo[4].path), tipo[1].path);
+    div_strcpy(file_types[4].path, sizeof(file_types[4].path), setup_file.dir_fpg);
+  else if (chdir(file_types[4].path) == -1)
+    div_strcpy(file_types[4].path, sizeof(file_types[4].path), file_types[1].path);
 
   if (chdir(setup_file.dir_fnt) != -1)
-    div_strcpy(tipo[5].path, sizeof(tipo[5].path), setup_file.dir_fnt);
-  else if (chdir(tipo[5].path) == -1)
-    div_strcpy(tipo[5].path, sizeof(tipo[5].path), tipo[1].path);
+    div_strcpy(file_types[5].path, sizeof(file_types[5].path), setup_file.dir_fnt);
+  else if (chdir(file_types[5].path) == -1)
+    div_strcpy(file_types[5].path, sizeof(file_types[5].path), file_types[1].path);
 
   if (chdir(setup_file.dir_ifs) != -1)
-    div_strcpy(tipo[6].path, sizeof(tipo[6].path), setup_file.dir_ifs);
-  else if (chdir(tipo[6].path) == -1)
-    div_strcpy(tipo[6].path, sizeof(tipo[6].path), tipo[1].path);
+    div_strcpy(file_types[6].path, sizeof(file_types[6].path), setup_file.dir_ifs);
+  else if (chdir(file_types[6].path) == -1)
+    div_strcpy(file_types[6].path, sizeof(file_types[6].path), file_types[1].path);
 
   if (chdir(setup_file.dir_pcm) != -1)
-    div_strcpy(tipo[7].path, sizeof(tipo[7].path), setup_file.dir_pcm);
-  else if (chdir(tipo[7].path) == -1)
-    div_strcpy(tipo[7].path, sizeof(tipo[7].path), tipo[1].path);
+    div_strcpy(file_types[7].path, sizeof(file_types[7].path), setup_file.dir_pcm);
+  else if (chdir(file_types[7].path) == -1)
+    div_strcpy(file_types[7].path, sizeof(file_types[7].path), file_types[1].path);
 
   if (chdir(setup_file.dir_prg) != -1)
-    div_strcpy(tipo[8].path, sizeof(tipo[8].path), setup_file.dir_prg);
-  else if (chdir(tipo[8].path) == -1)
-    div_strcpy(tipo[8].path, sizeof(tipo[8].path), tipo[1].path);
+    div_strcpy(file_types[8].path, sizeof(file_types[8].path), setup_file.dir_prg);
+  else if (chdir(file_types[8].path) == -1)
+    div_strcpy(file_types[8].path, sizeof(file_types[8].path), file_types[1].path);
 
-  div_strcpy(tipo[9].path, sizeof(tipo[9].path), tipo[2].path);
-  div_strcpy(tipo[10].path, sizeof(tipo[10].path), tipo[3].path);
+  div_strcpy(file_types[9].path, sizeof(file_types[9].path), file_types[2].path);
+  div_strcpy(file_types[10].path, sizeof(file_types[10].path), file_types[3].path);
 
   if (chdir(setup_file.dir_pcms) != -1)
-    div_strcpy(tipo[11].path, sizeof(tipo[11].path), setup_file.dir_pcms);
-  else if (chdir(tipo[11].path) == -1)
-    div_strcpy(tipo[11].path, sizeof(tipo[11].path), tipo[1].path);
+    div_strcpy(file_types[11].path, sizeof(file_types[11].path), setup_file.dir_pcms);
+  else if (chdir(file_types[11].path) == -1)
+    div_strcpy(file_types[11].path, sizeof(file_types[11].path), file_types[1].path);
 
   if (chdir(setup_file.dir_prj) != -1)
-    div_strcpy(tipo[12].path, sizeof(tipo[12].path), setup_file.dir_prj);
-  else if (chdir(tipo[12].path) == -1)
-    div_strcpy(tipo[12].path, sizeof(tipo[12].path), tipo[1].path);
+    div_strcpy(file_types[12].path, sizeof(file_types[12].path), setup_file.dir_prj);
+  else if (chdir(file_types[12].path) == -1)
+    div_strcpy(file_types[12].path, sizeof(file_types[12].path), file_types[1].path);
 
-  div_strcpy(tipo[13].path, sizeof(tipo[13].path), tipo[1].path); // Generic
+  div_strcpy(file_types[13].path, sizeof(file_types[13].path), file_types[1].path); // Generic
 
   if (chdir(setup_file.dir_wld) != -1)
-    div_strcpy(tipo[15].path, sizeof(tipo[15].path), setup_file.dir_wld);
-  else if (chdir(tipo[15].path) == -1)
-    div_strcpy(tipo[15].path, sizeof(tipo[15].path), tipo[1].path);
+    div_strcpy(file_types[15].path, sizeof(file_types[15].path), setup_file.dir_wld);
+  else if (chdir(file_types[15].path) == -1)
+    div_strcpy(file_types[15].path, sizeof(file_types[15].path), file_types[1].path);
 
   if (chdir(setup_file.dir_mod) != -1)
-    div_strcpy(tipo[16].path, sizeof(tipo[16].path), setup_file.dir_mod);
-  else if (chdir(tipo[16].path) == -1)
-    div_strcpy(tipo[16].path, sizeof(tipo[16].path), tipo[1].path);
+    div_strcpy(file_types[16].path, sizeof(file_types[16].path), setup_file.dir_mod);
+  else if (chdir(file_types[16].path) == -1)
+    div_strcpy(file_types[16].path, sizeof(file_types[16].path), file_types[1].path);
 
-  chdir(tipo[1].path);
+  chdir(file_types[1].path);
 }
 
 //-----------------------------------------------------------------------------
