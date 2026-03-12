@@ -25,7 +25,7 @@ void wput(byte *dest, int dest_width, int dest_height, int x, int y, int n);
 void wbox(byte *dest, int dest_width, int dest_height, byte c, int x, int y, int w, int h);
 int text_len(byte *ptr);
 void wwrite_in_box(byte *dest, int dest_pitch, int dest_width, int dest_height, int x_org,
-                   int y_org, int centro_org, byte *ptr, byte c);
+                   int y_org, int alignment_org, byte *ptr, byte c);
 
 void wwrite(byte *dest, int dest_width, int dest_height, int x, int y, int alignment, byte *ptr,
             byte c);
@@ -121,13 +121,13 @@ int superget = 0;
 
 //--------------------------------------------------------------------------
 
-int linea0;    // First line number in the debugger code window
-byte *plinea0; // Pointer to the first line in the debugger code window
+int line0;    // First line number in the debugger code window
+byte *pline0; // Pointer to the first line in the debugger code window
 
 int mem1, mem2;                         // Bounds of the current statement in the mem[] array
-int linea1, columna1, linea2, columna2; // Bounds of the current statement
+int line1, columna1, line2, columna2; // Bounds of the current statement
 
-int linea_sel; // Selected line number
+int line_sel; // Selected line number
 
 int x_inicio = 54; // Initial x offset in the source code window
 
@@ -140,7 +140,7 @@ int ticks_debug;
 
 //----------------------------------------------------------------------------
 
-int boton = 0;
+int button = 0;
 int ids_old = 0, ids_inc;
 
 void exec_process(void);
@@ -207,7 +207,7 @@ int num_objects = 0; // Number of objects in the object table
 
 int num_predefined;
 
-int *usado; // Marks which objects have been included in var[]
+int *used; // Marks which objects have been included in var[]
 int *visor; // Display mode used for each object
 
 struct variables {
@@ -331,7 +331,7 @@ void init_debug(void) {
     exer(1);
   if ((ids = (int *)malloc(sizeof(int) * max_procesos)) == NULL)
     exer(1);
-  if ((usado = (int *)malloc(sizeof(int) * num_objects)) == NULL)
+  if ((used = (int *)malloc(sizeof(int) * num_objects)) == NULL)
     exer(1);
   if ((visor = (int *)malloc(sizeof(int) * num_objects)) == NULL)
     exer(1);
@@ -406,7 +406,7 @@ void end_debug(void) {
   free(mouse_background);
   free(o);
   free(var);
-  free(usado);
+  free(used);
   free(ids);
   free(visor);
   free(source);
@@ -1458,9 +1458,9 @@ void wwrite(byte *dest, int dest_width, int dest_height, int x, int y, int align
 }
 
 void wwrite_in_box(byte *dest, int dest_pitch, int dest_width, int dest_height, int x_org,
-                   int y_org, int centro_org, byte *ptr, byte c) {
-  int w, h, boton, multi;
-  int alignment = centro_org, x = x_org, y = y_org;
+                   int y_org, int alignment_org, byte *ptr, byte c) {
+  int w, h, button, multi;
+  int alignment = alignment_org, x = x_org, y = y_org;
 
   struct _car {
     byte w;
@@ -1483,10 +1483,10 @@ void wwrite_in_box(byte *dest, int dest_pitch, int dest_width, int dest_height, 
     multi = 0;
 
   if (*ptr == '\xd') {
-    boton = 1;
+    button = 1;
     ptr++;
   } else
-    boton = 0;
+    button = 0;
 
   car = (struct _car *)(text_font + 1);
 
@@ -1542,7 +1542,7 @@ void wwrite_in_box(byte *dest, int dest_pitch, int dest_width, int dest_height, 
     break;
   }
 
-  if (boton) {
+  if (button) {
     if (c != c0) {
       wbox(dest, dest_pitch, dest_height, c2, x - 2, y - 2, w + 4, h + 4);
       wrectangle(dest, dest_pitch, dest_height, c0, x - 3, y - 3, w + 6, h + 6);
@@ -1562,7 +1562,7 @@ void wwrite_in_box(byte *dest, int dest_pitch, int dest_width, int dest_height, 
     }
   }
 
-  if (centro_org & 0xFF00) {
+  if (alignment_org & 0xFF00) {
     if (big && !multi) {
       w = text_len(ptr);
       h = 7;
@@ -3411,30 +3411,30 @@ void debug(void) {
 int member;
 
 void create_variable_list(void) {
-  int n, nuevo, incluir;
+  int n, newest, include_flag;
 
-  memset(usado, 0, sizeof(int) * num_objects);
+  memset(used, 0, sizeof(int) * num_objects);
 
   num_var = 0;
 
   // Add variables in alphabetical order to the list var[num_var]
 
   do {
-    nuevo = 0;
+    newest = 0;
     for (n = 0; n < num_objects; n++) { // Find the smallest alphabetically
 
       if (!pre_defined && n < num_predefined)
         continue;
       if (!user_defined && n >= num_predefined)
         continue;
-      if (usado[n])
+      if (used[n])
         continue;
       if (o[n].miembro)
         continue;
 
       switch (o[n].type) {
       case tcons:
-        incluir = show_const;
+        include_flag = show_const;
         break;
       case tcglo:
       case tvglo:
@@ -3447,7 +3447,7 @@ void create_variable_list(void) {
       case tpbgl:
       case tpcgl:
       case tpsgl:
-        incluir = show_global;
+        include_flag = show_global;
         break;
       case tcloc:
       case tvloc:
@@ -3462,29 +3462,29 @@ void create_variable_list(void) {
       case tpslo:
         if (o[n].scope) {
           if (o[n].scope == current_scope)
-            incluir = show_private;
+            include_flag = show_private;
           else
-            incluir = 0;
+            include_flag = 0;
         } else
-          incluir = show_local;
+          include_flag = show_local;
         break;
       default:
-        incluir = 0;
+        include_flag = 0;
         break;
       }
-      if (incluir) {
-        if (!nuevo || (nuevo && strcmp(vnom + o[n].name, vnom + o[nuevo].name) == -1)) {
-          nuevo = n;
+      if (include_flag) {
+        if (!newest || (newest && strcmp(vnom + o[n].name, vnom + o[newest].name) == -1)) {
+          newest = n;
         }
       }
     }
-    if (nuevo) {
-      var[num_var].object = nuevo;
+    if (newest) {
+      var[num_var].object = newest;
       var[num_var].tab = 0;
       var[num_var].miembro = 0;
-      usado[nuevo] = 1;
+      used[newest] = 1;
 
-      switch (o[nuevo].type) {
+      switch (o[newest].type) {
       case tpigl:
       case tpwgl:
       case tpbgl:
@@ -3503,16 +3503,16 @@ void create_variable_list(void) {
       }
       num_var++;
 
-      if (o[nuevo].type == tsglo || o[nuevo].type == tsloc) {
-        member = nuevo + 1;
+      if (o[newest].type == tsglo || o[newest].type == tsloc) {
+        member = newest + 1;
         include_members(num_var, 1, var[num_var - 1].indice);
       }
-      if (o[nuevo].type == tpsgl || o[nuevo].type == tpslo) {
-        member = o[nuevo].v1 + 1;
+      if (o[newest].type == tpsgl || o[newest].type == tpslo) {
+        member = o[newest].v1 + 1;
         include_members(num_var, 1, var[num_var - 1].indice);
       }
     }
-  } while (nuevo);
+  } while (newest);
 }
 
 void exclude_members(int padre, int nivel, int index) {
@@ -3558,7 +3558,7 @@ void include_members(int padre, int nivel, int index) {
       var[num_var].object = member;
     var[num_var].tab = nivel;
     var[num_var].miembro = padre;
-    usado[member] = 1;
+    used[member] = 1;
 
     switch (o[member].type) {
     case tpigl:
@@ -3708,9 +3708,9 @@ void inspect2(void) {
 
   if (wmouse_in(122 + 32 + 64, 19, 9, 9)) {
     if (mouse_b & 1) {
-      if (boton == 0) {
+      if (button == 0) {
         wput(ptr, w, h, 123 + 32 + 64, 20, -41);
-        boton = 1;
+        button = 1;
         if (var_select) {
           if (var_ini == var_select--)
             var_ini--;
@@ -3718,15 +3718,15 @@ void inspect2(void) {
           v.redraw = 1;
         }
       }
-    } else if (boton == 1) {
+    } else if (button == 1) {
       wput(ptr, w, h, 123 + 32 + 64, 20, -39);
-      boton = 0;
+      button = 0;
       v.redraw = 1;
     }
     mouse_graf = 7;
-  } else if (boton == 1) {
+  } else if (button == 1) {
     wput(ptr, w, h, 123 + 32 + 64, 20, -39);
-    boton = 0;
+    button = 0;
     v.redraw = 1;
   }
 
@@ -3746,9 +3746,9 @@ void inspect2(void) {
 
   if (wmouse_in(122 + 32 + 64, 93, 9, 9)) {
     if (mouse_b & 1) {
-      if (boton == 0) {
+      if (button == 0) {
         wput(ptr, w, h, 123 + 32 + 64, 94, -42);
-        boton = 2;
+        button = 2;
         if (var_select + 1 < num_var) {
           if (var_ini + 10 == ++var_select)
             var_ini++;
@@ -3756,15 +3756,15 @@ void inspect2(void) {
           v.redraw = 1;
         }
       }
-    } else if (boton == 2) {
+    } else if (button == 2) {
       wput(ptr, w, h, 123 + 32 + 64, 94, -40);
-      boton = 0;
+      button = 0;
       v.redraw = 1;
     }
     mouse_graf = 9;
-  } else if (boton == 2) {
+  } else if (button == 2) {
     wput(ptr, w, h, 123 + 32 + 64, 94, -40);
-    boton = 0;
+    button = 0;
     v.redraw = 1;
   }
 
@@ -4745,7 +4745,7 @@ word *get_offset_word(int m) {
 //-----------------------------------------------------------------------------
 
 #define y_bt 34
-char buscar[32];
+char search_text[32];
 int value;
 
 void change1(void) {
@@ -4757,23 +4757,23 @@ void change2(void) {
   switch (v.active_item) {
   case 1:
     if (get_offset(var_select) == 1) {
-      if (atoi(buscar) < 0 || atoi(buscar) > 255) {
+      if (atoi(search_text) < 0 || atoi(search_text) > 255) {
         v_text = (char *)text[54];
         show_dialog(err0);
       } else {
-        *get_offset_byte(var_select) = (byte)atoi(buscar);
+        *get_offset_byte(var_select) = (byte)atoi(search_text);
         end_dialog = 1;
       }
     } else if (get_offset(var_select) == 2) {
-      if (atoi(buscar) < 0 || atoi(buscar) > 65535) {
+      if (atoi(search_text) < 0 || atoi(search_text) > 65535) {
         v_text = (char *)text[55];
         show_dialog(err0);
       } else {
-        *get_offset_word(var_select) = (word)atoi(buscar);
+        *get_offset_word(var_select) = (word)atoi(search_text);
         end_dialog = 1;
       }
     } else {
-      mem[get_offset(var_select)] = atoi(buscar);
+      mem[get_offset(var_select)] = atoi(search_text);
       end_dialog = 1;
     }
     break;
@@ -4799,8 +4799,8 @@ void change0(void) {
     value = memo(get_offset(var_select));
   }
 
-  itoa(value, buscar, 10);
-  _get((byte *)text[57], 4, 11, v.w - 8, (byte *)buscar, 32, 0, 0);
+  itoa(value, search_text, 10);
+  _get((byte *)text[57], 4, 11, v.w - 8, (byte *)search_text, 32, 0, 0);
   _button(text[7], 7, y_bt, 0);
   _button(text[58], v.w - 8, y_bt, 2);
 }
@@ -5063,9 +5063,9 @@ void debug2(void) {
 
   if (wmouse_in(122, 19, 9, 9)) {
     if (mouse_b & 1) {
-      if (boton == 0) {
+      if (button == 0) {
         wput(ptr, w, h, 123, 20, -41);
-        boton = 1;
+        button = 1;
         if (ids_select) {
           if (ids_ini == ids_select--)
             ids_ini--;
@@ -5073,15 +5073,15 @@ void debug2(void) {
           v.redraw = 1;
         }
       }
-    } else if (boton == 1) {
+    } else if (button == 1) {
       wput(ptr, w, h, 123, 20, -39);
-      boton = 0;
+      button = 0;
       v.redraw = 1;
     }
     mouse_graf = 7;
-  } else if (boton == 1) {
+  } else if (button == 1) {
     wput(ptr, w, h, 123, 20, -39);
-    boton = 0;
+    button = 0;
     v.redraw = 1;
   }
 
@@ -5101,9 +5101,9 @@ void debug2(void) {
 
   if (wmouse_in(122, 133 - 16 - 32, 9, 9)) {
     if (mouse_b & 1) {
-      if (boton == 0) {
+      if (button == 0) {
         wput(ptr, w, h, 123, 134 - 16 - 32, -42);
-        boton = 2;
+        button = 2;
         if (ids_select + 1 < iids) {
           if (ids_ini + 9 == ++ids_select)
             ids_ini++;
@@ -5111,22 +5111,22 @@ void debug2(void) {
           v.redraw = 1;
         }
       }
-    } else if (boton == 2) {
+    } else if (button == 2) {
       wput(ptr, w, h, 123, 134 - 16 - 32, -40);
-      boton = 0;
+      button = 0;
       v.redraw = 1;
     }
     mouse_graf = 9;
-  } else if (boton == 2) {
+  } else if (button == 2) {
     wput(ptr, w, h, 123, 134 - 16 - 32, -40);
-    boton = 0;
+    button = 0;
     v.redraw = 1;
   }
 
   if ((mouse_b & 1) && wmouse_in(48 + 5, 147 - 16 - 32, w - 52 - 5, 41 + 16 + 32)) {
-    linea_sel = linea0 + (wmouse_y - (147 - 16 - 32)) / 8;
-    if (linea_sel == linea0 + 11)
-      linea_sel = linea0 + 10;
+    line_sel = line0 + (wmouse_y - (147 - 16 - 32)) / 8;
+    if (line_sel == line0 + 11)
+      line_sel = line0 + 10;
     paint_code();
     v.redraw = 1;
   }
@@ -5223,24 +5223,24 @@ next_frame:
   case 1: // Goto
 goto_proc:
     show_dialog(process_list0);
-    //int linea0;     // First line number in the debugger code window
-    //byte * plinea0; // Pointer to the first line in the debugger code window
-    //int linea_sel; // Selected line number
+    //int line0;     // First line number in the debugger code window
+    //byte * pline0; // Pointer to the first line in the debugger code window
+    //int line_sel; // Selected line number
     if (v_accept) {
       x_inicio = 54;
-      while (linea0 > lp1[lp_select]) {
-        linea0--;
-        plinea0--;
+      while (line0 > lp1[lp_select]) {
+        line0--;
+        pline0--;
         do {
-          plinea0--;
-        } while (*plinea0);
-        plinea0++;
+          pline0--;
+        } while (*pline0);
+        pline0++;
       }
-      while (linea0 < lp1[lp_select]) {
-        linea0++;
-        plinea0 += strlen((char *)plinea0) + 1;
+      while (line0 < lp1[lp_select]) {
+        line0++;
+        pline0 += strlen((char *)pline0) + 1;
       }
-      linea_sel = linea0;
+      line_sel = line0;
       paint_code();
       flush_buffer();
       v.redraw = 1;
@@ -5249,7 +5249,7 @@ goto_proc:
   case 2: // Breakpoint
 set_break:
     for (n = 0; n < max_breakpoint; n++)
-      if (breakpoint[n].line == linea_sel)
+      if (breakpoint[n].line == line_sel)
         break;
     if (n < max_breakpoint) { // Deactivate a breakpoint
       breakpoint[n].line = -1;
@@ -5261,8 +5261,8 @@ set_break:
         if (breakpoint[n].line == -1)
           break;
       if (n < max_breakpoint) {
-        if ((m = get_ip(linea_sel)) >= 0) {
-          breakpoint[n].line = linea_sel;
+        if ((m = get_ip(line_sel)) >= 0) {
+          breakpoint[n].line = line_sel;
           breakpoint[n].offset = m;
           breakpoint[n].code = mem[m];
           mem[m] = ldbg;
@@ -5281,8 +5281,8 @@ go_here:
       if (breakpoint[n].line == -1)
         break;
     if (n < max_breakpoint) {
-      if ((m = get_ip(linea_sel)) >= 0) {
-        breakpoint[n].code = linea_sel;
+      if ((m = get_ip(line_sel)) >= 0) {
+        breakpoint[n].code = line_sel;
         do {
           trace_process();
           if (new_mode)
@@ -5557,16 +5557,16 @@ void get_line(int n) { // From an IP address, get the statement position
   if (x < num_sentencias) {
     mem1 = line[x * 6];
     mem2 = line[x * 6 + 1];
-    linea1 = line[x * 6 + 2] - 1;
+    line1 = line[x * 6 + 2] - 1;
     columna1 = line[x * 6 + 3];
-    linea2 = line[x * 6 + 4] - 1;
+    line2 = line[x * 6 + 4] - 1;
     columna2 = line[x * 6 + 5];
   } else {
     mem1 = line[0];
     mem2 = line[1];
-    linea1 = line[2] - 1;
+    line1 = line[2] - 1;
     columna1 = line[3];
-    linea2 = line[4] - 1;
+    line2 = line[4] - 1;
     columna2 = line[5];
   }
 }
@@ -5603,22 +5603,22 @@ void determine_code(void) { // Determine what to show for "ids_next"
   else
     get_line(mem[ids[ids_next] + _IP]); // Get line/column/mem 1/2
 
-  l = linea0 = linea1 - 3;
+  l = line0 = line1 - 3;
   if (l < 0)
-    l = linea0 = 0;
+    l = line0 = 0;
 
-  plinea0 = source + 1;
+  pline0 = source + 1;
   while (l--)
-    plinea0 += strlen((char *)plinea0) + 1;
+    pline0 += strlen((char *)pline0) + 1;
 
-  linea_sel = linea1;
+  line_sel = line1;
 
   paint_code();
 }
 
 void paint_code(void) { // Paint the source code
-  byte *p = plinea0, c;
-  int n, x, l = linea0;
+  byte *p = pline0, c;
+  int n, x, l = line0;
   byte *ptr = v.ptr;
   int w = v.w / big2, h = v.h / big2;
 
@@ -5634,12 +5634,12 @@ void paint_code(void) { // Paint the source code
   for (n = 0; n < 11; n++, l++) {
     if (p >= end_source)
       break;
-    if (l == linea_sel)
-      wbox(ptr, w, h, c0, 48 + 5, 147 - 16 - 32 + (linea_sel - linea0) * 8, w - 52 - 5, 9);
+    if (l == line_sel)
+      wbox(ptr, w, h, c0, 48 + 5, 147 - 16 - 32 + (line_sel - line0) * 8, w - 52 - 5, 9);
     for (x = 0; x < max_breakpoint; x++)
       if (breakpoint[x].line == l)
-        wbox(ptr, w, h, c_r_low, 48 + 5, 148 - 16 - 32 + (l - linea0) * 8, w - 52 - 5, 7);
-    if (l == linea1) {
+        wbox(ptr, w, h, c_r_low, 48 + 5, 148 - 16 - 32 + (l - line0) * 8, w - 52 - 5, 7);
+    if (l == line1) {
       wput(ptr, w, h, 48, 148 - 16 - 32 + n * 8, 36);
       c = *(p + columna1);
       *(p + columna1) = 0;
@@ -5649,7 +5649,7 @@ void paint_code(void) { // Paint the source code
         x += text_len(p) + 1;
       }
       *(p + columna1) = c;
-      if (l == linea2) {
+      if (l == line2) {
         c = *(p + columna2 + 1);
         *(p + columna2 + 1) = 0;
         wwrite_in_box(ptr + 54 * big2, w, w - 59, h, x + 1, 148 - 16 - 32 + n * 8, 0, p + columna1,
@@ -5664,7 +5664,7 @@ void paint_code(void) { // Paint the source code
                       c0);
         wwrite_in_box(ptr + 54 * big2, w, w - 59, h, x, 148 - 16 - 32 + n * 8, 0, p + columna1, c4);
       }
-    } else if (l == linea2) {
+    } else if (l == line2) {
       c = *(p + columna2 + 1);
       *(p + columna2 + 1) = 0;
       x = x_inicio - 54;
@@ -5674,7 +5674,7 @@ void paint_code(void) { // Paint the source code
       *(p + columna2 + 1) = c;
       wwrite_in_box(ptr + 54 * big2, w, w - 59, h, x, 148 - 16 - 32 + n * 8, 0, p + columna2 + 1,
                     c3);
-    } else if (l > linea1 && l < linea2) {
+    } else if (l > line1 && l < line2) {
       wwrite_in_box(ptr + 54 * big2, w, w - 59, h, x_inicio - 54 + 1, 148 - 16 - 32 + n * 8, 0, p,
                     c0);
       wwrite_in_box(ptr + 54 * big2, w, w - 59, h, x_inicio - 54, 148 - 16 - 32 + n * 8, 0, p, c4);
@@ -5699,15 +5699,15 @@ void f_left(void) {
 }
 
 void f_up(void) {
-  if (linea_sel) {
-    linea_sel--;
-    if (linea_sel < linea0) {
-      linea0--;
-      plinea0--;
+  if (line_sel) {
+    line_sel--;
+    if (line_sel < line0) {
+      line0--;
+      pline0--;
       do {
-        plinea0--;
-      } while (*plinea0);
-      plinea0++;
+        pline0--;
+      } while (*pline0);
+      pline0++;
     }
   }
 }
@@ -5716,15 +5716,15 @@ void f_down(void) {
   byte *p;
   int n;
 
-  n = linea_sel - linea0 + 1;
-  p = (byte *)plinea0;
+  n = line_sel - line0 + 1;
+  p = (byte *)pline0;
   while (n-- && p < end_source)
     p += strlen((char *)p) + 1;
   if (p < end_source) {
-    linea_sel++;
-    if (linea_sel == linea0 + 11) {
-      linea0++;
-      plinea0 += strlen((char *)plinea0) + 1;
+    line_sel++;
+    if (line_sel == line0 + 11) {
+      line0++;
+      pline0 += strlen((char *)pline0) + 1;
     }
   }
 }
@@ -5738,7 +5738,7 @@ extern byte strlower[256];
 void create_process_list(void) {
   byte *p, *q;
   char cwork[512];
-  int linea = 0, n;
+  int line = 0, n;
 
   p = source + 1;
   lp_num = 0;
@@ -5750,7 +5750,7 @@ void create_process_list(void) {
       p++;
     }
     p++;
-    linea++;
+    line++;
     if (p < end_source) {
       while (*p == ' ' && p < end_source)
         p++;
@@ -5787,14 +5787,14 @@ void create_process_list(void) {
               if (n < lp_num) {
                 memmove(&lp1[n + 1], &lp1[n], 4 * (511 - n));
                 memmove(&lp2[n + 1], &lp2[n], 4 * (511 - n));
-                lp1[n] = linea;
+                lp1[n] = line;
                 lp2[n] = (char *)p;
               } else {
-                lp1[lp_num] = linea;
+                lp1[lp_num] = line;
                 lp2[lp_num] = (char *)p;
               }
             } else {
-              lp1[lp_num] = linea;
+              lp1[lp_num] = line;
               lp2[lp_num] = (char *)p;
             }
             if (++lp_num == 512)
@@ -5873,7 +5873,7 @@ void process_list1(void) {
   paint_process_list();
 }
 
-int lp_boton;
+int lp_button;
 
 void process_list2(void) {
   int n;
@@ -5934,9 +5934,9 @@ void process_list2(void) {
 
   if (wmouse_in(122 + 32, 19, 9, 9)) {
     if (mouse_b & 1) {
-      if (lp_boton == 0) {
+      if (lp_button == 0) {
         wput(ptr, w, h, 123 + 32, 20, -41);
-        lp_boton = 1;
+        lp_button = 1;
         if (lp_select) {
           if (lp_ini == lp_select--)
             lp_ini--;
@@ -5944,15 +5944,15 @@ void process_list2(void) {
           v.redraw = 1;
         }
       }
-    } else if (lp_boton == 1) {
+    } else if (lp_button == 1) {
       wput(ptr, w, h, 123 + 32, 20, -39);
-      lp_boton = 0;
+      lp_button = 0;
       v.redraw = 1;
     }
     mouse_graf = 7;
-  } else if (lp_boton == 1) {
+  } else if (lp_button == 1) {
     wput(ptr, w, h, 123 + 32, 20, -39);
-    lp_boton = 0;
+    lp_button = 0;
     v.redraw = 1;
   }
 
@@ -5973,9 +5973,9 @@ void process_list2(void) {
 
   if (wmouse_in(122 + 32, 93 + 40, 9, 9)) {
     if (mouse_b & 1) {
-      if (lp_boton == 0) {
+      if (lp_button == 0) {
         wput(ptr, w, h, 123 + 32, 94 + 40, -42);
-        lp_boton = 2;
+        lp_button = 2;
         if (lp_select + 1 < lp_num) {
           if (lp_ini + 15 == ++lp_select)
             lp_ini++;
@@ -5983,15 +5983,15 @@ void process_list2(void) {
           v.redraw = 1;
         }
       }
-    } else if (lp_boton == 2) {
+    } else if (lp_button == 2) {
       wput(ptr, w, h, 123 + 32, 94 + 40, -40);
-      lp_boton = 0;
+      lp_button = 0;
       v.redraw = 1;
     }
     mouse_graf = 9;
-  } else if (lp_boton == 2) {
+  } else if (lp_button == 2) {
     wput(ptr, w, h, 123 + 32, 94 + 40, -40);
-    lp_boton = 0;
+    lp_button = 0;
     v.redraw = 1;
   }
 
@@ -6495,7 +6495,7 @@ void profile1(void) {
   paint_profile_list();
 }
 
-int lp2_boton;
+int lp2_button;
 
 void profile2(void) {
   int n;
@@ -6523,9 +6523,9 @@ void profile2(void) {
 
   if (wmouse_in(w - 12, lpy - 1, 9, 9)) {
     if (mouse_b & 1) {
-      if (lp_boton == 0) {
+      if (lp_button == 0) {
         wput(ptr, w, h, w - 11, lpy, -41);
-        lp_boton = 1;
+        lp_button = 1;
         if (lp_select) {
           if (lp_ini == lp_select--)
             lp_ini--;
@@ -6533,15 +6533,15 @@ void profile2(void) {
           v.redraw = 1;
         }
       }
-    } else if (lp_boton == 1) {
+    } else if (lp_button == 1) {
       wput(ptr, w, h, w - 11, lpy, -39);
-      lp_boton = 0;
+      lp_button = 0;
       v.redraw = 1;
     }
     mouse_graf = 7;
-  } else if (lp_boton == 1) {
+  } else if (lp_button == 1) {
     wput(ptr, w, h, w - 11, lpy, -39);
-    lp_boton = 0;
+    lp_button = 0;
     v.redraw = 1;
   }
 
@@ -6562,9 +6562,9 @@ void profile2(void) {
 
   if (wmouse_in(w - 12, lpy + lpnum * lpal - 9, 9, 9)) {
     if (mouse_b & 1) {
-      if (lp_boton == 0) {
+      if (lp_button == 0) {
         wput(ptr, w, h, w - 11, lpy + lpnum * lpal - 8, -42);
-        lp_boton = 2;
+        lp_button = 2;
         if (lp_select + 1 < lp_num) {
           if (lp_ini + lpnum == ++lp_select)
             lp_ini++;
@@ -6572,15 +6572,15 @@ void profile2(void) {
           v.redraw = 1;
         }
       }
-    } else if (lp_boton == 2) {
+    } else if (lp_button == 2) {
       wput(ptr, w, h, w - 11, lpy + lpnum * lpal - 8, -40);
-      lp_boton = 0;
+      lp_button = 0;
       v.redraw = 1;
     }
     mouse_graf = 9;
-  } else if (lp_boton == 2) {
+  } else if (lp_button == 2) {
     wput(ptr, w, h, w - 11, lpy + lpnum * lpal - 8, -40);
-    lp_boton = 0;
+    lp_button = 0;
     v.redraw = 1;
   }
 
@@ -6599,9 +6599,9 @@ void profile2(void) {
 
   if (wmouse_in(w - lp2esp - 12, lp2y - 1, 9, 9)) {
     if (mouse_b & 1) {
-      if (lp2_boton == 0) {
+      if (lp2_button == 0) {
         wput(ptr, w, h, w - lp2esp - 11, lp2y, -41);
-        lp2_boton = 1;
+        lp2_button = 1;
         if (lp2_select) {
           if (lp2_ini == lp2_select--)
             lp2_ini--;
@@ -6609,15 +6609,15 @@ void profile2(void) {
           v.redraw = 1;
         }
       }
-    } else if (lp2_boton == 1) {
+    } else if (lp2_button == 1) {
       wput(ptr, w, h, w - lp2esp - 11, lp2y, -39);
-      lp2_boton = 0;
+      lp2_button = 0;
       v.redraw = 1;
     }
     mouse_graf = 7;
-  } else if (lp2_boton == 1) {
+  } else if (lp2_button == 1) {
     wput(ptr, w, h, w - lp2esp - 11, lp2y, -39);
-    lp2_boton = 0;
+    lp2_button = 0;
     v.redraw = 1;
   }
 
@@ -6638,9 +6638,9 @@ void profile2(void) {
 
   if (wmouse_in(w - lp2esp - 12, lp2y + lp2num * lp2al - 9, 9, 9)) {
     if (mouse_b & 1) {
-      if (lp2_boton == 0) {
+      if (lp2_button == 0) {
         wput(ptr, w, h, w - lp2esp - 11, lp2y + lp2num * lp2al - 8, -42);
-        lp2_boton = 2;
+        lp2_button = 2;
         if (lp2_select + 1 < lp2_num) {
           if (lp2_ini + lp2num == ++lp2_select)
             lp2_ini++;
@@ -6648,15 +6648,15 @@ void profile2(void) {
           v.redraw = 1;
         }
       }
-    } else if (lp2_boton == 2) {
+    } else if (lp2_button == 2) {
       wput(ptr, w, h, w - lp2esp - 11, lp2y + lp2num * lp2al - 8, -40);
-      lp2_boton = 0;
+      lp2_button = 0;
       v.redraw = 1;
     }
     mouse_graf = 9;
-  } else if (lp2_boton == 2) {
+  } else if (lp2_button == 2) {
     wput(ptr, w, h, w - lp2esp - 11, lp2y + lp2num * lp2al - 8, -40);
-    lp2_boton = 0;
+    lp2_button = 0;
     v.redraw = 1;
   }
 

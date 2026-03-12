@@ -27,7 +27,7 @@ void expres2(void);
 void expres3(void);
 void expres4(void);
 void expres5(void);
-void _encrypt(int encode, char *filename, char *clave);
+void _encrypt(int encode, char *filename, char *key);
 void _compress_file(int encode, char *filename);
 
 
@@ -3974,41 +3974,41 @@ void _strdel(void) { // (string,n,m) delete <n> chars from start and <m> from en
 //----------------------------------------------------------------------------
 
 byte xlat_rnd[256];
-int offset_clave;
+int offset_key;
 
 int sort0(const void *a, const void *b) {
-  return ((*((int *)a + offset_clave)) - (*((int *)b + offset_clave)));
+  return ((*((int *)a + offset_key)) - (*((int *)b + offset_key)));
 }
 
 int sort1(const void *a, const void *b) {
-  return ((*((int *)b + offset_clave)) - (*((int *)a + offset_clave)));
+  return ((*((int *)b + offset_key)) - (*((int *)a + offset_key)));
 }
 
 int sort2(const void *a, const void *b) {
-  return (strcmp((char *)a + offset_clave * 4, (char *)b + offset_clave * 4));
+  return (strcmp((char *)a + offset_key * 4, (char *)b + offset_key * 4));
 }
 
 int sort3(const void *a, const void *b) {
-  return (-strcmp((char *)a + offset_clave * 4, (char *)b + offset_clave * 4));
+  return (-strcmp((char *)a + offset_key * 4, (char *)b + offset_key * 4));
 }
 
 int sort4(const void *a, const void *b) {
   return (
-      strcmp((char *)&mem[*((char *)a + offset_clave)], (char *)&mem[*((char *)b + offset_clave)]));
+      strcmp((char *)&mem[*((char *)a + offset_key)], (char *)&mem[*((char *)b + offset_key)]));
 }
 
 int sort5(const void *a, const void *b) {
-  return (-strcmp((char *)&mem[*((char *)a + offset_clave)],
-                  (char *)&mem[*((char *)b + offset_clave)]));
+  return (-strcmp((char *)&mem[*((char *)a + offset_key)],
+                  (char *)&mem[*((char *)b + offset_key)]));
 }
 
 int unsort00(byte *a, byte *b) {
-  return ((int)(xlat_rnd[*(a + offset_clave * 4)] ^ (xlat_rnd[*(a + 1 + offset_clave * 4)] / 2) ^
-                (xlat_rnd[*(a + 2 + offset_clave * 4)] / 4) ^
-                (xlat_rnd[*(a + 3 + offset_clave * 4)] / 8)) -
-          (int)(xlat_rnd[*(b + offset_clave * 4)] ^ (xlat_rnd[*(b + 1 + offset_clave * 4)] / 2) ^
-                (xlat_rnd[*(b + 2 + offset_clave * 4)] / 4) ^
-                (xlat_rnd[*(b + 3 + offset_clave * 4)] / 8)));
+  return ((int)(xlat_rnd[*(a + offset_key * 4)] ^ (xlat_rnd[*(a + 1 + offset_key * 4)] / 2) ^
+                (xlat_rnd[*(a + 2 + offset_key * 4)] / 4) ^
+                (xlat_rnd[*(a + 3 + offset_key * 4)] / 8)) -
+          (int)(xlat_rnd[*(b + offset_key * 4)] ^ (xlat_rnd[*(b + 1 + offset_key * 4)] / 2) ^
+                (xlat_rnd[*(b + 2 + offset_key * 4)] / 4) ^
+                (xlat_rnd[*(b + 3 + offset_key * 4)] / 8)));
 }
 
 
@@ -4021,12 +4021,12 @@ int strcmpsort(const void *a, const void *b) {
 }
 
 void sort(void) {
-  int tipo_clave;
+  int tipo_key;
   int offset, size, numreg, modo;
 
   modo = pila[sp--];
-  tipo_clave = pila[sp--];
-  offset_clave = pila[sp--];
+  tipo_key = pila[sp--];
+  offset_key = pila[sp--];
   numreg = pila[sp--];
   size = pila[sp--];
   offset = pila[sp];
@@ -4036,7 +4036,7 @@ void sort(void) {
       xlat_rnd[modo] = rnd();
     qsort(&mem[offset], numreg, size * 4, unsort0);
   } else
-    switch (tipo_clave) {
+    switch (tipo_key) {
     case 0:
       if (modo)
         qsort(&mem[offset], numreg, size * 4, sort1);
@@ -4905,19 +4905,19 @@ void save_mapcx(int tipo) {
 void write_in_map(void) {
   int alignment, texts;
   int cx, cy, w, h;
-  int fuente;
+  int font_index;
 
   byte *ptr, *ptr2;
 
   alignment = pila[sp--];
   texts = pila[sp--];
-  fuente = pila[sp];
+  font_index = pila[sp];
 
-  if (fuente < 0 || fuente >= max_fonts) {
+  if (font_index < 0 || font_index >= max_fonts) {
     e(116);
     return;
   }
-  if (fonts[fuente] == 0) {
+  if (fonts[font_index] == 0) {
     e(116);
     return;
   }
@@ -4927,18 +4927,18 @@ void write_in_map(void) {
     return;
   }
 
-  checkpal_font(fuente);
+  checkpal_font(font_index);
 
   ptr = (byte *)&mem[texts];
 
-  fnt = (fnt_table_entry *)((byte *)fonts[fuente] + 1356);
-  h = f_i[fuente].height;
+  fnt = (fnt_table_entry *)((byte *)fonts[font_index] + 1356);
+  h = f_i[font_index].height;
 
   ptr2 = ptr;
   w = 0;
   while (*ptr2) {
     if (fnt[*ptr2].width == 0) {
-      w += f_i[fuente].spacing;
+      w += f_i[font_index].spacing;
       ptr2++;
     } else
       w += fnt[*ptr2++].width;
@@ -5005,10 +5005,10 @@ void write_in_map(void) {
 
   while (*ptr2 && cx + fnt[*ptr2].width <= w) {
     if (fnt[*ptr2].width == 0) {
-      cx += f_i[fuente].spacing;
+      cx += f_i[font_index].spacing;
       ptr2++;
     } else {
-      texn2(ptr + 68, w, fonts[fuente] + fnt[*ptr2].offset, cx, fnt[*ptr2].incY, fnt[*ptr2].width,
+      texn2(ptr + 68, w, fonts[font_index] + fnt[*ptr2].offset, cx, fnt[*ptr2].incY, fnt[*ptr2].width,
             fnt[*ptr2].height);
       cx = cx + fnt[*ptr2].width;
       ptr2++;
@@ -5523,15 +5523,15 @@ void _free(void) {
 //      encode(offset, size, key) Returns 0 - 1
 //----------------------------------------------------------------------------
 
-void init_rnd_coder(int n, char *clave);
+void init_rnd_coder(int n, char *key);
 byte rndb(void);
 
 void encode(void) {
-  int offset, size, clave;
+  int offset, size, key;
   int n;
   byte *ptr;
 
-  clave = pila[sp--];
+  key = pila[sp--];
   size = pila[sp--];
   offset = pila[sp];
 
@@ -5542,7 +5542,7 @@ void encode(void) {
   }
   pila[sp] = 1;
 
-  init_rnd_coder(size + 33, (char *)&mem[clave]);
+  init_rnd_coder(size + 33, (char *)&mem[key]);
   ptr = (byte *)&mem[offset];
   for (n = 0; n < size * 4; n++) {
     ptr[n] ^= rndb();
@@ -5560,9 +5560,9 @@ void encode_file(int encode) {
   char cwork1[_MAX_PATH + 1];
   char cwork2[_MAX_PATH + 1];
   char cwork3[_MAX_PATH + 1];
-  byte *name, *clave;
+  byte *name, *key;
 
-  clave = (byte *)&mem[pila[sp--]];
+  key = (byte *)&mem[pila[sp--]];
   name = (byte *)&mem[pila[sp]];
 
   pila[sp] = 1;
@@ -5586,14 +5586,14 @@ void encode_file(int encode) {
     if (_fullpath(cwork1, cwork3, _MAX_PATH) == NULL)
       div_strcpy(cwork1, sizeof(cwork1), ft.name);
     _dos_setfileattr(cwork1, _A_NORMAL);
-    _encrypt(encode, cwork1, (char *)clave);
+    _encrypt(encode, cwork1, (char *)key);
     rc = _dos_findnext(&ft);
   }
 
   max_reloj += get_reloj() - old_clock;
 }
 
-void _encrypt(int encode, char *filename, char *clave) {
+void _encrypt(int encode, char *filename, char *key) {
   char full[_MAX_PATH + 1];
   char drive[_MAX_DRIVE + 1];
   char dir[_MAX_DIR + 1];
@@ -5643,7 +5643,7 @@ void _encrypt(int encode, char *filename, char *clave) {
     }
   }
 
-  init_rnd_coder(size + 1133, clave);
+  init_rnd_coder(size + 1133, key);
   for (n = 0; n < size; n++)
     p[n] ^= rndb();
 

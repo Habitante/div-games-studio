@@ -16,7 +16,7 @@ int line_fx, color;
 void line(int x0, int y0, int x1, int y1);
 void draw_box(int x, int y, int w, int h);
 void draw_filled_box(int x, int y, int w, int h);
-void draw_circle(int relleno, int x0, int y0, int x1, int y1);
+void draw_circle(int filled, int x0, int y0, int x1, int y1);
 void line_pixel(int x, int y);
 
 
@@ -2093,7 +2093,7 @@ void draw_filled_box(int x, int y, int w, int h) {
 //      Draw a circle (using line_fx and color)
 //-----------------------------------------------------------------------------
 
-void draw_circle(int relleno, int x0, int y0, int x1, int y1) {
+void draw_circle(int filled, int x0, int y0, int x1, int y1) {
   int p[2048];   // Points on the circumference
   double cx, rx; // Center and radius of the circle
   int w, h;      // Width and height
@@ -2139,7 +2139,7 @@ void draw_circle(int relleno, int x0, int y0, int x1, int y1) {
     p[5] = x1;
   }
 
-  if (relleno) {
+  if (filled) {
     do {
       yb = p[--n];
       ya = p[--n];
@@ -2648,10 +2648,10 @@ void checkpal_font(int ifonts);
 void paint_texts(int n) { // E: texts[]
 
   int x, y, w, h;
-  int fuente;
+  int font_index;
 
   byte *ptr = NULL, *ptr2;
-  byte numero[32];
+  byte number_buf[32];
 
   do
     if (texts[n].font) {
@@ -2667,11 +2667,11 @@ void paint_texts(int n) { // E: texts[]
           break;
         case 1:
           if (mem[texts[n].ptr] < 0) {
-            numero[0] = '-';
-            ltoa(-mem[texts[n].ptr], (char *)numero + 1, 10);
+            number_buf[0] = '-';
+            ltoa(-mem[texts[n].ptr], (char *)number_buf + 1, 10);
           } else
-            ltoa(mem[texts[n].ptr], (char *)numero, 10);
-          ptr = numero;
+            ltoa(mem[texts[n].ptr], (char *)number_buf, 10);
+          ptr = number_buf;
           break;
         }
 
@@ -2680,26 +2680,26 @@ void paint_texts(int n) { // E: texts[]
       x = texts[n].x; // X of first character
       y = texts[n].y; // Y
 
-      fuente = 0;
-      while (fuente < max_fonts) {
-        if (texts[n].font == fonts[fuente])
+      font_index = 0;
+      while (font_index < max_fonts) {
+        if (texts[n].font == fonts[font_index])
           break;
-        fuente++;
+        font_index++;
       }
-      if (fuente == max_fonts)
+      if (font_index == max_fonts)
         continue;
 
-      checkpal_font(fuente);
+      checkpal_font(font_index);
 
       fnt = (fnt_table_entry *)((byte *)texts[n].font + 1356);
 
-      h = f_i[fuente].height;
+      h = f_i[font_index].height;
 
       ptr2 = ptr;
       w = 0;
       while (*ptr2) {
         if (fnt[*ptr2].width == 0) {
-          w += f_i[fuente].spacing;
+          w += f_i[font_index].spacing;
           ptr2++;
         } else
           w += fnt[*ptr2++].width;
@@ -2748,7 +2748,7 @@ void paint_texts(int n) { // E: texts[]
 
           while (*ptr && x + fnt[*ptr].width <= 0) {
             if (fnt[*ptr].width == 0) {
-              x += f_i[fuente].spacing;
+              x += f_i[font_index].spacing;
               ptr++;
             } else {
               x = x + fnt[*ptr].width;
@@ -2758,7 +2758,7 @@ void paint_texts(int n) { // E: texts[]
 
           if (*ptr && x < 0) {
             if (fnt[*ptr].width == 0) {
-              x += f_i[fuente].spacing;
+              x += f_i[font_index].spacing;
               ptr++;
             } else {
               text_clipped(texts[n].font + fnt[*ptr].offset, x, y + fnt[*ptr].incY, fnt[*ptr].width,
@@ -2770,7 +2770,7 @@ void paint_texts(int n) { // E: texts[]
 
           while (*ptr && x + fnt[*ptr].width <= vga_width) {
             if (fnt[*ptr].width == 0) {
-              x += f_i[fuente].spacing;
+              x += f_i[font_index].spacing;
               ptr++;
             } else {
               text_normal(texts[n].font + fnt[*ptr].offset, x, y + fnt[*ptr].incY, fnt[*ptr].width,
@@ -2782,7 +2782,7 @@ void paint_texts(int n) { // E: texts[]
 
           if (*ptr && x < vga_width) {
             if (fnt[*ptr].width == 0) {
-              x += f_i[fuente].spacing;
+              x += f_i[font_index].spacing;
               ptr++;
             } else
               text_clipped(texts[n].font + fnt[*ptr].offset, x, y + fnt[*ptr].incY, fnt[*ptr].width,
@@ -2792,7 +2792,7 @@ void paint_texts(int n) { // E: texts[]
         } else {
           while (*ptr && x + fnt[*ptr].width <= 0)
             if (fnt[*ptr].width == 0) {
-              x += f_i[fuente].spacing;
+              x += f_i[font_index].spacing;
               ptr++;
             } else {
               x = x + fnt[*ptr].width;
@@ -2801,7 +2801,7 @@ void paint_texts(int n) { // E: texts[]
 
           while (*ptr && x < vga_width)
             if (fnt[*ptr].width == 0) {
-              x += f_i[fuente].spacing;
+              x += f_i[font_index].spacing;
               ptr++;
             } else {
               text_clipped(texts[n].font + fnt[*ptr].offset, x, y + fnt[*ptr].incY, fnt[*ptr].width,
