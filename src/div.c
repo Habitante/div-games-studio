@@ -28,7 +28,7 @@
 #include "sysdac.h"
 
 void heap_dump(void);
-void debug_file(char *cadena, char *nombre);
+void debug_file(char *string, char *name);
 void save_prg_buffer(memptrsize);
 
 void maximize(void);
@@ -4297,13 +4297,13 @@ char *get_memory_free() {
   return "";
 }
 
-void debug_file(char *cadena, char *nombre) {
+void debug_file(char *string, char *name) {
   FILE *debug;
 
   debug = fopen("DEBUG.TXT", "ab");
-  fwrite(cadena, 1, strlen(cadena), debug);
+  fwrite(string, 1, strlen(string), debug);
   fwrite("(", 1, 1, debug);
-  fwrite(nombre, 1, strlen(nombre), debug);
+  fwrite(name, 1, strlen(name), debug);
   fwrite(") ", 1, 2, debug);
   fwrite(get_memory_free(), 1, strlen(get_memory_free()), debug);
   fwrite(")\n", 1, 2, debug);
@@ -4498,7 +4498,7 @@ void show_flag(struct t_item *i) {
 //-----------------------------------------------------------------------------
 
 void _process_items(void) {
-  int n = 0, estado;
+  int n = 0, state;
   int asc = 0, kesc = 0, est;
 
   v.active_item = -1;
@@ -4542,19 +4542,19 @@ void _process_items(void) {
   while (n < v.items) {
     switch (v.item[n].type) {
     case 1:
-      estado = button_status(n);
-      if (estado != v.item[n].state)
-        process_button(n, estado);
+      state = button_status(n);
+      if (state != v.item[n].state)
+        process_button(n, state);
       break;
     case 2:
-      estado = get_status(n);
-      if (estado != v.item[n].state || estado >= 2)
-        process_get(n, estado);
+      state = get_status(n);
+      if (state != v.item[n].state || state >= 2)
+        process_get(n, state);
       break;
     case 3:
-      estado = flag_status(n);
-      if (estado != v.item[n].state)
-        process_flag(n, estado);
+      state = flag_status(n);
+      if (state != v.item[n].state)
+        process_flag(n, state);
       break;
     }
     n++;

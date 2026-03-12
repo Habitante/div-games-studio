@@ -2752,7 +2752,7 @@ void palette_action3(void) {
 //      Lists for the file open window
 //-----------------------------------------------------------------------------
 
-char files_buf[max_archivos * w_archivo];
+char files_buf[MAX_FILES * w_archivo];
 struct t_listbox file_list = {3, 49, files_buf, w_archivo, 12, 64};
 
 char dirs_buf[max_directorios * w_directorio];
@@ -3017,7 +3017,7 @@ void print_path_br(void);
 void open_dir_br(void);
 extern struct t_listboxbr file_list_br;
 extern struct t_listbox dir_list_br;
-extern t_thumb thumb[max_archivos];
+extern t_thumb thumb[MAX_FILES];
 extern int num_taggeds;
 
 void analyze_input(void) {

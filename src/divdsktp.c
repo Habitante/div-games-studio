@@ -50,9 +50,9 @@ extern int loaded[64], n_loaded;     // Loaded images, up to a maximum of 32
 extern int backto[64];               // Circular queue to store consulted topics {n,line}
 extern int i_back, a_back, f_back;   // Start and end of the circular queue (both 0,2,..62)
 
-void Fonts1(void);
-void Fonts2(void);
-void Fonts3(void);
+void fonts1(void);
+void fonts2(void);
+void fonts3(void);
 
 void Load_Font_session(FILE *file);
 int Save_Font_session(FILE *file, int);

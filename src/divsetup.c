@@ -32,7 +32,7 @@ extern int skip_window_render;
 
 extern int sel_color_font;
 extern int sel_color_ok;
-void Selcolor0(void);
+void selcolor0(void);
 
 void gama0(void);
 
@@ -776,7 +776,7 @@ void cfg_setup2(void) {
 
   if ((mouse_b & 1) && zone >= 1 && zone <= 12) {
     sel_color_font = color_cfg[zone - 1];
-    show_dialog((void_return_type_t)Selcolor0);
+    show_dialog((void_return_type_t)selcolor0);
     if (sel_color_ok) {
       color_cfg[zone - 1] = sel_color_font;
       Cfg_colors();

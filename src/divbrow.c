@@ -62,8 +62,8 @@ Mix_Chunk *smp = NULL;
 };*/
 
 
-extern char files_buf[max_archivos * w_archivo];
-//[?*max_archivos]
+extern char files_buf[MAX_FILES * w_archivo];
+//[?*MAX_FILES]
 struct t_listboxbr file_list_br = {77, 27, files_buf, w_archivo, 4, 4, 51, 31};
 
 extern char dirs_buf[max_directorios * w_directorio];
@@ -86,7 +86,7 @@ struct t_listbox lextbr = {40, 121, ext, w_ext, 4, 28};
 //  Structure to store map thumbnail reductions
 //-----------------------------------------------------------------------------
 
-t_thumb thumb[max_archivos];
+t_thumb thumb[MAX_FILES];
 
 //-----------------------------------------------------------------------------
 //  WAV sound structure
@@ -168,7 +168,7 @@ void print_path_br(void) {
 //  Create thumbnails
 //-----------------------------------------------------------------------------
 
-int _omx, _omy, omx, omy, oclock = 0;
+int old_mouse_x, old_mouse_y, omx, omy, oclock = 0;
 int num;
 
 void create_thumbs(void) {
@@ -220,7 +220,7 @@ void create_thumb_MAP(struct t_listboxbr *l) {
 
   num = -1;
 
-  if ((n = abs(_omx - mouse_x) + abs(_omy - mouse_y) + mouse_b * 10)) {
+  if ((n = abs(old_mouse_x - mouse_x) + abs(old_mouse_y - mouse_y) + mouse_b * 10)) {
     incremento = (float)incremento / ((float)n / 20.0 + 1.0);
     incremento /= 256;
     incremento *= 256;
@@ -337,7 +337,7 @@ void create_thumb_MAP(struct t_listboxbr *l) {
     // Now create the thumbnail if the file is fully loaded
 
     if (state == 2 && thumb[num].status == thumb[num].filesize &&
-        abs(_omx - mouse_x) + abs(_omy - mouse_y) + mouse_b + ascii == 0) {
+        abs(old_mouse_x - mouse_x) + abs(old_mouse_y - mouse_y) + mouse_b + ascii == 0) {
       thumb[num].status = 0;
 
       man = map_width;
@@ -481,8 +481,8 @@ void create_thumb_MAP(struct t_listboxbr *l) {
   }
 
   if (oclock < *system_clock) {
-    _omx = omx;
-    _omy = omy;
+    old_mouse_x = omx;
+    old_mouse_y = omy;
     omx = mouse_x;
     omy = mouse_y;
     oclock = *system_clock;
@@ -497,7 +497,7 @@ void create_thumb_PAL(struct t_listboxbr *l) {
   char filename[255];
   num = -1;
 
-  if ((n = abs(_omx - mouse_x) + abs(_omy - mouse_y) + mouse_b * 10)) {
+  if ((n = abs(old_mouse_x - mouse_x) + abs(old_mouse_y - mouse_y) + mouse_b * 10)) {
     incremento = 0;
   } else if (ascii) {
     incremento = 0;
@@ -609,8 +609,8 @@ void create_thumb_PAL(struct t_listboxbr *l) {
   }
 
   if (oclock < *system_clock) {
-    _omx = omx;
-    _omy = omy;
+    old_mouse_x = omx;
+    old_mouse_y = omy;
     omx = mouse_x;
     omy = mouse_y;
     oclock = *system_clock;
@@ -634,7 +634,7 @@ void create_thumb_FNT(struct t_listboxbr *l) {
   char filename[255];
   num = -1;
 
-  if ((n = abs(_omx - mouse_x) + abs(_omy - mouse_y) + mouse_b * 10)) {
+  if ((n = abs(old_mouse_x - mouse_x) + abs(old_mouse_y - mouse_y) + mouse_b * 10)) {
     incremento = (float)incremento / ((float)n / 20.0 + 1.0);
     incremento /= 256;
     incremento *= 256;
@@ -757,7 +757,7 @@ void create_thumb_FNT(struct t_listboxbr *l) {
 
     // Now create the thumbnail if the file is fully loaded
     if (state == 2 && thumb[num].status == thumb[num].filesize &&
-        abs(_omx - mouse_x) + abs(_omy - mouse_y) + mouse_b + ascii == 0) {
+        abs(old_mouse_x - mouse_x) + abs(old_mouse_y - mouse_y) + mouse_b + ascii == 0) {
       thumb[num].status = 0;
 
       memcpy(pal, &thumb[num].ptr[8], 768);
@@ -895,8 +895,8 @@ void create_thumb_FNT(struct t_listboxbr *l) {
   }
 
   if (oclock < *system_clock) {
-    _omx = omx;
-    _omy = omy;
+    old_mouse_x = omx;
+    old_mouse_y = omy;
     omx = mouse_x;
     omy = mouse_y;
     oclock = *system_clock;
@@ -1029,7 +1029,7 @@ void create_thumb_PCM(struct t_listboxbr *l) {
 
   num = -1;
 
-  if ((n = abs(_omx - mouse_x) + abs(_omy - mouse_y) + mouse_b * 10)) {
+  if ((n = abs(old_mouse_x - mouse_x) + abs(old_mouse_y - mouse_y) + mouse_b * 10)) {
     incremento = (float)incremento / ((float)n / 20.0 + 1.0);
     incremento /= 256;
     incremento *= 256;
@@ -1161,7 +1161,7 @@ void create_thumb_PCM(struct t_listboxbr *l) {
 
     // Now create the thumbnail if the file is fully loaded
     if (state == 2 && thumb[num].status == thumb[num].filesize &&
-        abs(_omx - mouse_x) + abs(_omy - mouse_y) + mouse_b + ascii == 0) {
+        abs(old_mouse_x - mouse_x) + abs(old_mouse_y - mouse_y) + mouse_b + ascii == 0) {
       thumb[num].status = 0;
 
       // Start of conversion
@@ -1316,8 +1316,8 @@ void create_thumb_PCM(struct t_listboxbr *l) {
   }
 
   if (oclock < *system_clock) {
-    _omx = omx;
-    _omy = omy;
+    old_mouse_x = omx;
+    old_mouse_y = omy;
     omx = mouse_x;
     omy = mouse_y;
     oclock = *system_clock;
@@ -1480,7 +1480,7 @@ void browser0(void) {
     lunidadesbr.y = 121;
   }
 
-  for (n = 0; n < max_archivos; n++) {
+  for (n = 0; n < MAX_FILES; n++) {
     thumb[n].ptr = NULL;
   }
 
@@ -1664,7 +1664,7 @@ void browser2(void) {
       file_list_br.slide = file_list_br.s0;
       file_list_br.s1 =
           file_list_br.y + (file_list_br.h * file_list_br.lines + file_list_br.lines + 1) - 12;
-      for (n = 0; n < max_archivos; n++) {
+      for (n = 0; n < MAX_FILES; n++) {
         if (thumb[n].ptr != NULL) {
           free(thumb[n].ptr);
           thumb[n].ptr = NULL;
@@ -1867,7 +1867,7 @@ void browser3(void) {
   chdir(file_types[1].path);
   file_types[v_type].first_visible = file_list_br.first_visible;
 
-  for (n = 0; n < max_archivos; n++)
+  for (n = 0; n < MAX_FILES; n++)
     if (thumb[n].ptr != NULL) {
       free(thumb[n].ptr);
     }
@@ -1896,7 +1896,7 @@ void open_dir_br(void) {
 
   n = 0;
   m = _dos_findfirst(file_mask, _A_NORMAL, &fileinfo);
-  while (m == 0 && n < max_archivos) {
+  while (m == 0 && n < MAX_FILES) {
     div_strcpy(files_buf + n++ * w_archivo, w_archivo, fileinfo.name);
     m = _dos_findnext(&fileinfo);
   }
@@ -1916,7 +1916,7 @@ void open_dir_br(void) {
   qsort(dirs_buf, dir_list_br.total_items, w_directorio,
         (int (*)(const void *, const void *))strcmp);
 
-  for (n = 0; n < max_archivos; n++) {
+  for (n = 0; n < MAX_FILES; n++) {
     if (thumb[n].ptr != NULL) {
       free(thumb[n].ptr);
       thumb[n].ptr = NULL;

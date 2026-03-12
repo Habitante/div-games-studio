@@ -3342,9 +3342,9 @@ void remove_spaces(void) {
 //      Open a program
 //-----------------------------------------------------------------------------
 
-#define max_archivos 512 // ------------------------------- File listbox
+#define MAX_FILES 512 // ------------------------------- File listbox
 extern struct t_listboxbr file_list_br;
-extern t_thumb thumb[max_archivos];
+extern t_thumb thumb[MAX_FILES];
 extern int num_taggeds;
 
 void open_program(void) {

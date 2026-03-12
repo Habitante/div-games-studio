@@ -17,44 +17,44 @@ extern char newdac[768];
 extern int new_dac_loaded;
 
 #define incremento_maximo 65536
-extern int _omx, _omy, omx, omy, oclock;
+extern int old_mouse_x, old_mouse_y, omx, omy, oclock;
 extern int incremento;
 
 void map_to_fpg(struct tmapa *mapa);
 void get_map_graphic(struct tmapa *mapa, byte *imagen, int x, int y, int width, int height,
                      int cod);
-void fpg_to_map(FPG *MiFPG);
+void fpg_to_map(FPG *my_fpg);
 void put_map_graphic(byte *imagen, byte *mapa, int num);
 void place_map(void);
 int collides_with_map(int n, int x, int y, int w, int h);
 void close_fpg(char *fpg_path);
 
-void replace_FPG_0(void);
-void replace_FPG_1(void);
-void replace_FPG_2(void);
+void replace_fpg_0(void);
+void replace_fpg_1(void);
+void replace_fpg_2(void);
 
 void fpg_dialog1(void) {
-  FPG *MiFPG = (FPG *)v.aux;
+  FPG *my_fpg = (FPG *)v.aux;
   _show_items();
 
-  FPG_create_listbox_br(&MiFPG->list_info);
+  FPG_create_listbox_br(&my_fpg->list_info);
 }
 
 int has_maps(void);
 
 void load_thumbs(void) {
-  FPG *MiFPG = (FPG *)v.aux;
+  FPG *my_fpg = (FPG *)v.aux;
 
-  if (MiFPG->thumb_on)
+  if (my_fpg->thumb_on)
     FPG_create_thumbs();
 
-  FPG_update_listbox_br(&MiFPG->list_info);
+  FPG_update_listbox_br(&my_fpg->list_info);
 }
 
 void fpg_dialog2(void) {
   int x, y, n;
   int COD, num_points, Elemento;
-  FPG *MiFPG = (FPG *)v.aux;
+  FPG *my_fpg = (FPG *)v.aux;
   FILE *fpg;
   char desc[32];
 
@@ -65,30 +65,30 @@ void fpg_dialog2(void) {
     return;
   }
 
-  if (MiFPG->thumb_on)
+  if (my_fpg->thumb_on)
     FPG_create_thumbs();
 
   _process_items();
 
   switch (v.active_item) {
   case 0:
-    MiFPG->list_info.x = 3;
-    MiFPG->list_info.y = 11;
-    MiFPG->list_info.list = (char *)MiFPG->code_desc;
-    MiFPG->list_info.total_items = MiFPG->nIndex;
-    MiFPG->list_info.item_width = 38 + 2;
-    MiFPG->list_info.first_visible = 0;
+    my_fpg->list_info.x = 3;
+    my_fpg->list_info.y = 11;
+    my_fpg->list_info.list = (char *)my_fpg->code_desc;
+    my_fpg->list_info.total_items = my_fpg->nIndex;
+    my_fpg->list_info.item_width = 38 + 2;
+    my_fpg->list_info.first_visible = 0;
 
-    if (MiFPG->thumb_on) {
-      MiFPG->list_info.columns = 3;
-      MiFPG->list_info.lines = 2;
-      MiFPG->list_info.w = 47;
-      MiFPG->list_info.h = 26;
+    if (my_fpg->thumb_on) {
+      my_fpg->list_info.columns = 3;
+      my_fpg->list_info.lines = 2;
+      my_fpg->list_info.w = 47;
+      my_fpg->list_info.h = 26;
     } else {
-      MiFPG->list_info.columns = 1;
-      MiFPG->list_info.lines = 6;
-      MiFPG->list_info.w = 143;
-      MiFPG->list_info.h = 8;
+      my_fpg->list_info.columns = 1;
+      my_fpg->list_info.lines = 6;
+      my_fpg->list_info.w = 143;
+      my_fpg->list_info.h = 8;
     }
 
     fpg_dialog1();
@@ -111,16 +111,16 @@ void fpg_dialog2(void) {
       memcpy(desc, window[1].mapa->description, 32);
     } else {
       memcpy(desc, window[1].title, 32);
-      COD = MiFPG->last_used;
+      COD = my_fpg->last_used;
 
-      while (MiFPG->grf_offsets[COD]) {
+      while (my_fpg->grf_offsets[COD]) {
         COD++;
       };
 
       if (COD > 999)
         COD = 1;
 
-      while (MiFPG->grf_offsets[COD]) {
+      while (my_fpg->grf_offsets[COD]) {
         COD++;
       };
 
@@ -134,12 +134,12 @@ void fpg_dialog2(void) {
         x = -1;
       }
     }
-    fpg_add(MiFPG, COD, (char *)desc, (char *)window[1].mapa->filename, window[1].mapa->map_width,
+    fpg_add(my_fpg, COD, (char *)desc, (char *)window[1].mapa->filename, window[1].mapa->map_width,
             window[1].mapa->map_height, num_points, (char *)window[1].mapa->points,
             (char *)window[1].mapa->map, 0, 1);
 
     for (n = 0; n < 1000; n++)
-      MiFPG->thumb[n].tagged = 0;
+      my_fpg->thumb[n].tagged = 0;
 
     call((void_return_type_t)v.paint_handler);
 
@@ -147,24 +147,24 @@ void fpg_dialog2(void) {
     free_drag = 1;
   }
 
-  if ((MiFPG->fpg_info) && (MiFPG->list_info.zone >= 10) && (mouse_b & 1)) {
+  if ((my_fpg->fpg_info) && (my_fpg->list_info.zone >= 10) && (mouse_b & 1)) {
     mouse_b = 0;
-    Elemento = MiFPG->desc_index[(MiFPG->list_info.zone - 10) + MiFPG->list_info.first_visible];
+    Elemento = my_fpg->desc_index[(my_fpg->list_info.zone - 10) + my_fpg->list_info.first_visible];
 
-    if ((fpg = fopen((char *)MiFPG->current_file, "rb")) == NULL) {
+    if ((fpg = fopen((char *)my_fpg->current_file, "rb")) == NULL) {
       // Error: file not found
       v_text = (char *)texts[43];
       show_dialog(err0);
       return;
     }
-    fseek(fpg, MiFPG->grf_offsets[Elemento], SEEK_SET);
-    fpg_read_image_header(&MiFPG->MiHeadFPG, fpg);
+    fseek(fpg, my_fpg->grf_offsets[Elemento], SEEK_SET);
+    fpg_read_image_header(&my_fpg->MiHeadFPG, fpg);
     fclose(fpg);
 
     if (fpg_image) {
-      fpg_add(MiFPG, MiFPG->MiHeadFPG.code, (char *)MiFPG->MiHeadFPG.description,
-              (char *)MiFPG->MiHeadFPG.Filename, MiFPG->MiHeadFPG.width, MiFPG->MiHeadFPG.height,
-              MiFPG->MiHeadFPG.num_points, (char *)fpg_points, fpg_image, 1, 1);
+      fpg_add(my_fpg, my_fpg->MiHeadFPG.code, (char *)my_fpg->MiHeadFPG.description,
+              (char *)my_fpg->MiHeadFPG.Filename, my_fpg->MiHeadFPG.width, my_fpg->MiHeadFPG.height,
+              my_fpg->MiHeadFPG.num_points, (char *)fpg_points, fpg_image, 1, 1);
     }
 
     if (fpg_image)
@@ -175,39 +175,39 @@ void fpg_dialog2(void) {
     return;
   }
 
-  if (dragging == 1 && MiFPG->list_info.zone >= 10 && !MiFPG->fpg_info) {
+  if (dragging == 1 && my_fpg->list_info.zone >= 10 && !my_fpg->fpg_info) {
     drag_graphic = 8;
     dragging = 2;
     return;
   }
 
-  if ((MiFPG->list_info.zone >= 10) && (mouse_b & 1 || prev_mouse_buttons & 1) &&
+  if ((my_fpg->list_info.zone >= 10) && (mouse_b & 1 || prev_mouse_buttons & 1) &&
       (mouse_b != prev_mouse_buttons) && (dragging < 3)) {
-    Elemento = (MiFPG->list_info.zone - 10) + MiFPG->list_info.first_visible;
+    Elemento = (my_fpg->list_info.zone - 10) + my_fpg->list_info.first_visible;
 
-    if (MiFPG->code_desc[Elemento][0] == 255) {
-      MiFPG->code_desc[Elemento][0] = 175;
-      MiFPG->thumb[Elemento].tagged = 1;
+    if (my_fpg->code_desc[Elemento][0] == 255) {
+      my_fpg->code_desc[Elemento][0] = 175;
+      my_fpg->thumb[Elemento].tagged = 1;
     } else {
-      MiFPG->code_desc[Elemento][0] = 255;
-      MiFPG->thumb[Elemento].tagged = 0;
+      my_fpg->code_desc[Elemento][0] = 255;
+      my_fpg->thumb[Elemento].tagged = 0;
     }
-    FPG_create_listbox_br(&MiFPG->list_info);
+    FPG_create_listbox_br(&my_fpg->list_info);
     v.redraw = 1;
   }
 
-  if ((dragging == 3) && (MiFPG->list_info.zone >= 10)) {
-    Elemento = MiFPG->desc_index[(MiFPG->list_info.zone - 10) + MiFPG->list_info.first_visible];
+  if ((dragging == 3) && (my_fpg->list_info.zone >= 10)) {
+    Elemento = my_fpg->desc_index[(my_fpg->list_info.zone - 10) + my_fpg->list_info.first_visible];
 
-    if ((fpg = fopen((char *)MiFPG->current_file, "rb")) == NULL) {
+    if ((fpg = fopen((char *)my_fpg->current_file, "rb")) == NULL) {
       // Error: file not found
       return;
     }
-    fseek(fpg, MiFPG->grf_offsets[Elemento], SEEK_SET);
-    fpg_read_header(&MiFPG->MiHeadFPG, fpg);
+    fseek(fpg, my_fpg->grf_offsets[Elemento], SEEK_SET);
+    fpg_read_header(&my_fpg->MiHeadFPG, fpg);
 
-    map_width = MiFPG->MiHeadFPG.width;
-    map_height = MiFPG->MiHeadFPG.height;
+    map_width = my_fpg->MiHeadFPG.width;
+    map_height = my_fpg->MiHeadFPG.height;
 
     v.mapa = (struct tmapa *)malloc(sizeof(struct tmapa));
 
@@ -227,19 +227,19 @@ void fpg_dialog2(void) {
       return;
     }
 
-    v.mapa->map_width = MiFPG->MiHeadFPG.width;
-    v.mapa->map_height = MiFPG->MiHeadFPG.height;
+    v.mapa->map_width = my_fpg->MiHeadFPG.width;
+    v.mapa->map_height = my_fpg->MiHeadFPG.height;
 
     v.mapa->has_name = 2;
-    v.mapa->fpg_code = MiFPG->MiHeadFPG.code;
-    memcpy(v.mapa->description, MiFPG->MiHeadFPG.description, 32);
+    v.mapa->fpg_code = my_fpg->MiHeadFPG.code;
+    memcpy(v.mapa->description, my_fpg->MiHeadFPG.description, 32);
     memset(v.mapa->filename, 0, 13);
-    memcpy(v.mapa->filename, MiFPG->MiHeadFPG.Filename, 12);
+    memcpy(v.mapa->filename, my_fpg->MiHeadFPG.Filename, 12);
 
     for (x = 0; x < 512; x++)
       v.mapa->points[x] = -1;
-    if (MiFPG->MiHeadFPG.num_points)
-      fread(v.mapa->points, MiFPG->MiHeadFPG.num_points, 4, fpg);
+    if (my_fpg->MiHeadFPG.num_points)
+      fread(v.mapa->points, my_fpg->MiHeadFPG.num_points, 4, fpg);
     fread(v.mapa->map, map_width, map_height, fpg);
     fclose(fpg);
 
@@ -269,18 +269,18 @@ void fpg_dialog2(void) {
     dragging = 0;
 
   v_pause = 1;
-  FPG_update_listbox_br(&MiFPG->list_info);
+  FPG_update_listbox_br(&my_fpg->list_info);
   v_pause = 0;
 }
 
 void fpg_dialog3(void) {
-  FPG *MiFPG = (FPG *)v.aux;
+  FPG *my_fpg = (FPG *)v.aux;
   int n;
 
   // Free FPG thumbnails
   for (n = 0; n < 1000; n++) {
-    if (MiFPG->thumb[n].ptr != NULL)
-      free(MiFPG->thumb[n].ptr);
+    if (my_fpg->thumb[n].ptr != NULL)
+      free(my_fpg->thumb[n].ptr);
   }
   free(v.aux);
 }
@@ -288,7 +288,7 @@ void fpg_dialog3(void) {
 extern byte color_tag;
 
 void fpg_dialog0_new(void) {
-  FPG *MiFPG;
+  FPG *my_fpg;
   int n;
 
   v.type = 101; // Droppable
@@ -299,29 +299,29 @@ void fpg_dialog0_new(void) {
   v.close_handler = fpg_dialog3;
 
   v.aux = v_aux;
-  MiFPG = (FPG *)v.aux;
+  my_fpg = (FPG *)v.aux;
 
   for (n = 0; n < 1000; n++) {
-    MiFPG->thumb[n].ptr = NULL;
-    MiFPG->thumb[n].status = 0;
-    MiFPG->thumb[n].tagged = 0;
+    my_fpg->thumb[n].ptr = NULL;
+    my_fpg->thumb[n].status = 0;
+    my_fpg->thumb[n].tagged = 0;
   }
 
-  MiFPG->list_info.created = 0;
-  MiFPG->thumb_on = 0;
-  fpg_create(MiFPG, full);
+  my_fpg->list_info.created = 0;
+  my_fpg->thumb_on = 0;
+  fpg_create(my_fpg, full);
   // Safe copy: NombreFpg is 13 bytes, truncate to fit FPG header
-  div_strcpy((char *)MiFPG->fpg_name, sizeof(MiFPG->fpg_name), input);
-  v.title = MiFPG->fpg_name;
-  v.name = MiFPG->fpg_name;
-  MiFPG->fpg_info = 0;
+  div_strcpy((char *)my_fpg->fpg_name, sizeof(my_fpg->fpg_name), input);
+  v.title = my_fpg->fpg_name;
+  v.name = my_fpg->fpg_name;
+  my_fpg->fpg_info = 0;
 
-  _flag(419, 4, v.h - 10, &MiFPG->thumb_on);
-  _flag(108, (v.w - 5) - (8 * big2 + text_len(texts[108])), v.h - 10, &MiFPG->fpg_info);
+  _flag(419, 4, v.h - 10, &my_fpg->thumb_on);
+  _flag(108, (v.w - 5) - (8 * big2 + text_len(texts[108])), v.h - 10, &my_fpg->fpg_info);
 }
 
 void fpg_dialog0_add(void) {
-  FPG *MiFPG;
+  FPG *my_fpg;
   int n;
   v.type = 101; // Droppable
   v.w = 159;
@@ -331,22 +331,22 @@ void fpg_dialog0_add(void) {
   v.close_handler = fpg_dialog3;
 
   v.aux = v_aux;
-  MiFPG = (FPG *)v.aux;
+  my_fpg = (FPG *)v.aux;
   for (n = 0; n < 1000; n++) {
-    MiFPG->thumb[n].ptr = NULL;
-    MiFPG->thumb[n].status = 0;
-    MiFPG->thumb[n].tagged = 0;
+    my_fpg->thumb[n].ptr = NULL;
+    my_fpg->thumb[n].status = 0;
+    my_fpg->thumb[n].tagged = 0;
   }
 
-  MiFPG->last_used = 1;
-  fpg_open(MiFPG, full);
+  my_fpg->last_used = 1;
+  fpg_open(my_fpg, full);
   // Safe copy: NombreFpg is 13 bytes, truncate to fit FPG header
-  div_strcpy((char *)MiFPG->fpg_name, sizeof(MiFPG->fpg_name), input);
-  v.title = MiFPG->fpg_name;
-  v.name = MiFPG->fpg_name;
+  div_strcpy((char *)my_fpg->fpg_name, sizeof(my_fpg->fpg_name), input);
+  v.title = my_fpg->fpg_name;
+  v.name = my_fpg->fpg_name;
 
-  _flag(419, 4, v.h - 10, &MiFPG->thumb_on);
-  _flag(108, (v.w - 5) - (8 * big2 + text_len(texts[108])), v.h - 10, &MiFPG->fpg_info);
+  _flag(419, 4, v.h - 10, &my_fpg->thumb_on);
+  _flag(108, (v.w - 5) - (8 * big2 + text_len(texts[108])), v.h - 10, &my_fpg->fpg_info);
 }
 
 int new_file(void) {
@@ -391,9 +391,9 @@ int new_file(void) {
   return 0;
 }
 
-#define max_archivos 512 // ------------------------------- File listbox
+#define MAX_FILES 512 // ------------------------------- File listbox
 extern struct t_listboxbr file_list_br;
-extern t_thumb thumb[max_archivos];
+extern t_thumb thumb[MAX_FILES];
 extern int num_taggeds;
 
 void create_palette(void);
@@ -405,7 +405,7 @@ extern byte apply_palette[768];
 extern byte *sample;
 
 void open_file(void) {
-  FPG *MiFPG;
+  FPG *my_fpg;
   char cwork[8];
   FILE *f;
   int num;
@@ -574,10 +574,10 @@ void open_file(void) {
               continue;
             }
 
-            MiFPG = (FPG *)v_aux;
-            MiFPG->thumb_on = 0;
-            MiFPG->fpg_info = 0;
-            MiFPG->list_info.created = 0;
+            my_fpg = (FPG *)v_aux;
+            my_fpg->thumb_on = 0;
+            my_fpg->fpg_info = 0;
+            my_fpg->list_info.created = 0;
             close_fpg(full);
             memset(v_aux, 0, sizeof(FPG));
             new_window(fpg_dialog0_add);
@@ -658,12 +658,12 @@ extern byte aux_pal[768];
 int remap_all_files(int vent) {
   // Ask whether to remap the FPG palette or close it
 
-  FPG *MiFPG = (FPG *)window[vent].aux;
+  FPG *my_fpg = (FPG *)window[vent].aux;
   byte p[768]; // to compare file palette with DAC
   FILE *f;
   int sum, x;
 
-  if ((f = fopen((char *)MiFPG->current_file, "rb")) != NULL) {
+  if ((f = fopen((char *)my_fpg->current_file, "rb")) != NULL) {
     fseek(f, 8, SEEK_SET);
     fread(p, 1, 768, f);
     fclose(f);
@@ -694,7 +694,7 @@ int remap_all_files(int vent) {
     show_dialog(accept0);
 
     if (v_accept) {
-      fpg_remap_to_pal(MiFPG);
+      fpg_remap_to_pal(my_fpg);
     } else {
       move(0, vent);
       close_window();
@@ -887,31 +887,31 @@ void fpg_edit_code_dialog(void) {
 int find_fpg_window();
 
 void show_tagged() {
-  FPG *MiFPG;
+  FPG *my_fpg;
   int a, x, y, Elemento, n;
   FILE *fpg;
 
   if (!(n = find_fpg_window()))
     return;
 
-  MiFPG = (FPG *)window[n].aux;
+  my_fpg = (FPG *)window[n].aux;
 
-  for (a = 0; a < MiFPG->nIndex; a++)
+  for (a = 0; a < my_fpg->nIndex; a++)
 
-    if (MiFPG->code_desc[a][0] == 175) {
-      Elemento = MiFPG->desc_index[a];
+    if (my_fpg->code_desc[a][0] == 175) {
+      Elemento = my_fpg->desc_index[a];
 
-      if ((fpg = fopen((char *)MiFPG->current_file, "rb")) == NULL) {
+      if ((fpg = fopen((char *)my_fpg->current_file, "rb")) == NULL) {
         // Error: file not found
         return;
       }
 
-      fseek(fpg, MiFPG->grf_offsets[Elemento], SEEK_SET);
+      fseek(fpg, my_fpg->grf_offsets[Elemento], SEEK_SET);
 
-      fpg_read_header(&MiFPG->MiHeadFPG, fpg);
+      fpg_read_header(&my_fpg->MiHeadFPG, fpg);
 
-      map_width = MiFPG->MiHeadFPG.width;
-      map_height = MiFPG->MiHeadFPG.height;
+      map_width = my_fpg->MiHeadFPG.width;
+      map_height = my_fpg->MiHeadFPG.height;
 
       if (new_map(NULL)) {
         // ERROR: Out of memory
@@ -920,16 +920,16 @@ void show_tagged() {
       }
 
       v.mapa->has_name = 1;
-      v.mapa->fpg_code = MiFPG->MiHeadFPG.code;
-      memcpy(v.mapa->description, MiFPG->MiHeadFPG.description, 32);
+      v.mapa->fpg_code = my_fpg->MiHeadFPG.code;
+      memcpy(v.mapa->description, my_fpg->MiHeadFPG.description, 32);
       memset(v.mapa->filename, 0, 13);
-      memcpy(v.mapa->filename, MiFPG->MiHeadFPG.Filename, 12);
+      memcpy(v.mapa->filename, my_fpg->MiHeadFPG.Filename, 12);
 
       for (x = 0; x < 512; x++)
         v.mapa->points[x] = -1;
 
-      if (MiFPG->MiHeadFPG.num_points)
-        fread(v.mapa->points, MiFPG->MiHeadFPG.num_points, 4, fpg);
+      if (my_fpg->MiHeadFPG.num_points)
+        fread(v.mapa->points, my_fpg->MiHeadFPG.num_points, 4, fpg);
 
       fread(v.mapa->map, map_width, map_height, fpg);
       fclose(fpg);
@@ -964,7 +964,7 @@ void show_tagged() {
 int fpg_delete_many(FPG *Fpg, int taggeds, int *array_del);
 
 void delete_tagged() {
-  FPG *MiFPG;
+  FPG *my_fpg;
   int taggeds = 0, n, vent;
   int *array_del;
   FILE *fpg;
@@ -972,16 +972,16 @@ void delete_tagged() {
   if (!(vent = find_fpg_window()))
     return;
 
-  MiFPG = (FPG *)window[vent].aux;
+  my_fpg = (FPG *)window[vent].aux;
 
-  for (n = 0; n < MiFPG->nIndex; n++)
-    if (MiFPG->code_desc[n][0] == 175)
+  for (n = 0; n < my_fpg->nIndex; n++)
+    if (my_fpg->code_desc[n][0] == 175)
       taggeds++;
 
   if ((array_del = (int *)malloc(taggeds * 4)) == NULL)
     return;
 
-  if ((fpg = fopen((char *)MiFPG->current_file, "rb")) == NULL) { // This should never fail
+  if ((fpg = fopen((char *)my_fpg->current_file, "rb")) == NULL) { // This should never fail
     free(array_del);
     return;
   }
@@ -990,29 +990,29 @@ void delete_tagged() {
 
   taggeds = 0;
 
-  for (n = 0; n < MiFPG->nIndex; n++)
-    if (MiFPG->code_desc[n][0] == 175) {
-      array_del[taggeds++] = MiFPG->desc_index[n];
+  for (n = 0; n < my_fpg->nIndex; n++)
+    if (my_fpg->code_desc[n][0] == 175) {
+      array_del[taggeds++] = my_fpg->desc_index[n];
     }
 
-  fpg_delete_many(MiFPG, taggeds, array_del);
+  fpg_delete_many(my_fpg, taggeds, array_del);
 
   free(array_del);
 
   wup(vent);
 
-  while (MiFPG->list_info.first_visible + (MiFPG->list_info.lines - 1) * MiFPG->list_info.columns +
+  while (my_fpg->list_info.first_visible + (my_fpg->list_info.lines - 1) * my_fpg->list_info.columns +
              1 >
-         MiFPG->list_info.total_items) {
-    MiFPG->list_info.first_visible -= MiFPG->list_info.columns;
+         my_fpg->list_info.total_items) {
+    my_fpg->list_info.first_visible -= my_fpg->list_info.columns;
   }
 
-  if (MiFPG->list_info.first_visible < 0)
-    MiFPG->list_info.first_visible = 0;
+  if (my_fpg->list_info.first_visible < 0)
+    my_fpg->list_info.first_visible = 0;
 
   wmouse_x = -1;
   wmouse_y = -1;
-  FPG_update_listbox_br(&MiFPG->list_info);
+  FPG_update_listbox_br(&my_fpg->list_info);
   call((void_return_type_t)v.paint_handler);
   wdown(vent);
   flush_window(vent);
@@ -1069,7 +1069,7 @@ void printlist0(void) {
 }
 
 void print_list(void) {
-  FPG *MiFPG;
+  FPG *my_fpg;
   HeadFPG cab;
   FILE *f = NULL, *g;
   int n, vent;
@@ -1089,10 +1089,10 @@ void print_list(void) {
   show_dialog(printlist0);
 
   if (v_accept) {
-    MiFPG = (FPG *)window[vent].aux;
+    my_fpg = (FPG *)window[vent].aux;
 
     for (n = 0; n < 1000; n++)
-      if (MiFPG->grf_offsets[n])
+      if (my_fpg->grf_offsets[n])
         num++;
 
     if (num > 0) {
@@ -1122,7 +1122,7 @@ void print_list(void) {
         }
       }
 
-      g = fopen((char *)MiFPG->current_file, "rb");
+      g = fopen((char *)my_fpg->current_file, "rb");
       if (g == NULL) { // This should never happen
 
         if (f_ar)
@@ -1131,9 +1131,9 @@ void print_list(void) {
       }
 
       for (n = 0; n < 1000; n++) {
-        if (MiFPG->grf_offsets[n]) {
+        if (my_fpg->grf_offsets[n]) {
           show_progress((char *)texts[437], ++_num, num);
-          fseek(g, MiFPG->grf_offsets[n], SEEK_SET);
+          fseek(g, my_fpg->grf_offsets[n], SEEK_SET);
           fread(&cab, 1, sizeof(cab), g);
           memset(cwork2, 0, 13);
           memcpy(cwork2, cab.Filename, 12);
@@ -1166,17 +1166,17 @@ void print_list(void) {
 extern int num;
 
 void FPG_create_thumbs(void) {
-  FPG *MiFPG = (FPG *)v.aux;
+  FPG *my_fpg = (FPG *)v.aux;
 
-  if (MiFPG->thumb_on) {
+  if (my_fpg->thumb_on) {
     do {
-      create_thumb_FPG(&(MiFPG->list_info));
+      create_thumb_FPG(&(my_fpg->list_info));
       if (num > -1) {
-        if (MiFPG->thumb[num].ptr != NULL && MiFPG->thumb[num].status == 0) {
-          FPG_show_thumb(&(MiFPG->list_info), num);
+        if (my_fpg->thumb[num].ptr != NULL && my_fpg->thumb[num].status == 0) {
+          FPG_show_thumb(&(my_fpg->list_info), num);
           break;
-        } else if (MiFPG->thumb[num].ptr == NULL && MiFPG->thumb[num].status == -1) {
-          FPG_show_thumb(&(MiFPG->list_info), num);
+        } else if (my_fpg->thumb[num].ptr == NULL && my_fpg->thumb[num].status == -1) {
+          FPG_show_thumb(&(my_fpg->list_info), num);
         } else
           break;
       } else
@@ -1186,7 +1186,7 @@ void FPG_create_thumbs(void) {
 }
 
 void FPG_show_thumb(struct t_listboxbr *l, int num) {
-  FPG *MiFPG = (FPG *)v.aux;
+  FPG *my_fpg = (FPG *)v.aux;
   byte *ptr = v.ptr;
   int w = v.w / big2, h = v.h / big2;
   int px, py, x, y, ly, incy;
@@ -1194,39 +1194,39 @@ void FPG_show_thumb(struct t_listboxbr *l, int num) {
 
   if (num >= l->first_visible && num < l->first_visible + l->lines * l->columns) {
     px = (l->x + 1 + (l->w + 1) * ((num - l->first_visible) % l->columns)) * big2 +
-         (l->w * big2 - MiFPG->thumb[num].w) / 2;
+         (l->w * big2 - my_fpg->thumb[num].w) / 2;
 
-    if ((incy = ((l->h - 8) * big2 - MiFPG->thumb[num].h) / 2) < 0)
+    if ((incy = ((l->h - 8) * big2 - my_fpg->thumb[num].h) / 2) < 0)
       incy = 0;
 
     py = (l->y + 1 + (l->h + 1) * ((num - l->first_visible) / l->columns)) * big2 + incy;
 
     ly = (l->y + (l->h + 1) * ((num - l->first_visible) / l->columns) + l->h - 8) * big2;
 
-    if (MiFPG->thumb_on && MiFPG->thumb[num].ptr != NULL && MiFPG->thumb[num].status == 0) {
-      for (y = 0; y < MiFPG->thumb[num].h; y++)
-        for (x = 0; x < MiFPG->thumb[num].w; x++)
+    if (my_fpg->thumb_on && my_fpg->thumb[num].ptr != NULL && my_fpg->thumb[num].status == 0) {
+      for (y = 0; y < my_fpg->thumb[num].h; y++)
+        for (x = 0; x < my_fpg->thumb[num].w; x++)
 
           if (py + y > ly) {
-            if (!MiFPG->thumb[num].tagged)
+            if (!my_fpg->thumb[num].tagged)
               v.ptr[(py + y) * v.w + (px + x)] =
-                  *(ghost + c0 * 256 + MiFPG->thumb[num].ptr[y * MiFPG->thumb[num].w + x]);
+                  *(ghost + c0 * 256 + my_fpg->thumb[num].ptr[y * my_fpg->thumb[num].w + x]);
           } else
-            v.ptr[(py + y) * v.w + (px + x)] = MiFPG->thumb[num].ptr[y * MiFPG->thumb[num].w + x];
+            v.ptr[(py + y) * v.w + (px + x)] = my_fpg->thumb[num].ptr[y * my_fpg->thumb[num].w + x];
     }
 
-    px -= (l->w * big2 - MiFPG->thumb[num].w) / 2;
+    px -= (l->w * big2 - my_fpg->thumb[num].w) / 2;
     py -= incy;
     px /= big2;
     py /= big2;
 
-    if (MiFPG->thumb[num].ptr == NULL && MiFPG->thumb[num].status == -1) {
+    if (my_fpg->thumb[num].ptr == NULL && my_fpg->thumb[num].status == -1) {
       wput(ptr, w, h, px + (l->w - 21) / 2, py + 1, 60);
     }
 
     py += l->h - 1;
     div_strcpy(p, sizeof(p), l->list + l->item_width * num);
-    if (MiFPG->thumb_on)
+    if (my_fpg->thumb_on)
       p[5] = 0;
 
     if (l->zone - 10 == num - l->first_visible)
@@ -1234,7 +1234,7 @@ void FPG_show_thumb(struct t_listboxbr *l, int num) {
     else
       x = c3;
 
-    if (text_len((byte *)p) < l->w - 2 && MiFPG->thumb_on) {
+    if (text_len((byte *)p) < l->w - 2 && my_fpg->thumb_on) {
       wwrite(ptr, w, h, px + l->w / 2 + 1, py, 7, (byte *)p, c0);
       wwrite(ptr, w, h, px + l->w / 2, py, 7, (byte *)p, x);
     } else {
@@ -1247,7 +1247,7 @@ void FPG_show_thumb(struct t_listboxbr *l, int num) {
 }
 
 void FPG_paint_listbox_br(struct t_listboxbr *l) {
-  FPG *MiFPG = (FPG *)v.aux;
+  FPG *my_fpg = (FPG *)v.aux;
   byte *ptr = v.ptr;
   int w = v.w / big2, h = v.h / big2;
   int n, y, x;
@@ -1258,7 +1258,7 @@ void FPG_paint_listbox_br(struct t_listboxbr *l) {
     for (x = 0; x < l->columns; x++) {
       wbox(ptr, w, h, c1, l->x + (x * (l->w + 1)) + 1, l->y + (y * (l->h + 1)) + 1, l->w, l->h - 8);
 
-      if (MiFPG->thumb[l->first_visible + y * l->columns + x].tagged)
+      if (my_fpg->thumb[l->first_visible + y * l->columns + x].tagged)
         wbox(ptr, w, h, color_tag, l->x + (x * (l->w + 1)) + 1,
              l->y + (y * (l->h + 1)) + 1 + l->h - 8, l->w, 8);
       else
@@ -1346,7 +1346,7 @@ void FPG_create_listbox_br(struct t_listboxbr *l) {
 }
 
 void FPG_update_listbox_br(struct t_listboxbr *l) {
-  FPG *MiFPG = (FPG *)v.aux;
+  FPG *my_fpg = (FPG *)v.aux;
   byte *ptr = v.ptr;
   int w = v.w / big2, h = v.h / big2;
   int n, old_zona = l->zone, x, y;
@@ -1377,10 +1377,10 @@ void FPG_update_listbox_br(struct t_listboxbr *l) {
       y = l->y + l->h + ((old_zona - 10) / l->columns) * (l->h + 1);
       div_strcpy(p, sizeof(p), l->list + l->item_width * (l->first_visible + old_zona - 10));
 
-      if (MiFPG->thumb_on)
+      if (my_fpg->thumb_on)
         p[5] = 0;
 
-      if (text_len((byte *)p) < l->w - 2 && MiFPG->thumb_on) {
+      if (text_len((byte *)p) < l->w - 2 && my_fpg->thumb_on) {
         wwrite(ptr, w, h, x + l->w / 2, y, 7, (byte *)p, c3);
       } else {
         wwrite_in_box(ptr, w, x + l->w - 1, h, x + 1, y, 6, (byte *)p, c3);
@@ -1488,10 +1488,10 @@ void FPG_update_listbox_br(struct t_listboxbr *l) {
       y = l->y + l->h + ((l->zone - 10) / l->columns) * (l->h + 1);
       div_strcpy(p, sizeof(p), l->list + l->item_width * (l->first_visible + l->zone - 10));
 
-      if (MiFPG->thumb_on)
+      if (my_fpg->thumb_on)
         p[5] = 0;
 
-      if (text_len((byte *)p) < l->w - 2 && MiFPG->thumb_on) {
+      if (text_len((byte *)p) < l->w - 2 && my_fpg->thumb_on) {
         wwrite(ptr, w, h, x + l->w / 2, y, 7, (byte *)p, c4);
       } else {
         wwrite_in_box(ptr, w, x + l->w - 1, h, x + 1, y, 6, (byte *)p, c4);
@@ -1513,7 +1513,7 @@ void FPG_update_listbox_br(struct t_listboxbr *l) {
 }
 
 void create_thumb_FPG(struct t_listboxbr *l) {
-  FPG *MiFPG = (FPG *)v.aux;
+  FPG *my_fpg = (FPG *)v.aux;
   int estado = 0, n, m;
   int man, mal;
   FILE *f;
@@ -1523,7 +1523,7 @@ void create_thumb_FPG(struct t_listboxbr *l) {
 
   num = -1;
 
-  if ((n = abs(_omx - mouse_x) + abs(_omy - mouse_y) + mouse_b * 10)) {
+  if ((n = abs(old_mouse_x - mouse_x) + abs(old_mouse_y - mouse_y) + mouse_b * 10)) {
     incremento = (float)incremento / ((float)n / 20.0 + 1.0);
     incremento /= 256;
     incremento *= 256;
@@ -1541,13 +1541,13 @@ void create_thumb_FPG(struct t_listboxbr *l) {
     num = l->first_visible;
 
     do {
-      if (MiFPG->thumb[num].ptr == NULL && MiFPG->thumb[num].status > -1) {
+      if (my_fpg->thumb[num].ptr == NULL && my_fpg->thumb[num].status > -1) {
         if (mouse_b == 0)
           estado = 1;
         break;
       }
 
-      if (MiFPG->thumb[num].ptr != NULL && MiFPG->thumb[num].status > 0) {
+      if (my_fpg->thumb[num].ptr != NULL && my_fpg->thumb[num].status > 0) {
         estado = 2;
         break;
       }
@@ -1564,36 +1564,36 @@ void create_thumb_FPG(struct t_listboxbr *l) {
 
     if (estado == 1) { // Start reading a new thumbnail
 
-      if ((f = fopen((char *)MiFPG->current_file, "rb")) != NULL) {
-        fseek(f, MiFPG->grf_offsets[MiFPG->desc_index[num]], SEEK_SET);
-        fpg_read_header(&(MiFPG->MiHeadFPG), f);
-        fseek(f, MiFPG->MiHeadFPG.num_points * 4, SEEK_CUR);
-        MiFPG->thumb[num].w = MiFPG->MiHeadFPG.width;
-        MiFPG->thumb[num].h = MiFPG->MiHeadFPG.height;
-        MiFPG->thumb[num].filesize = MiFPG->MiHeadFPG.width * MiFPG->MiHeadFPG.height;
+      if ((f = fopen((char *)my_fpg->current_file, "rb")) != NULL) {
+        fseek(f, my_fpg->grf_offsets[my_fpg->desc_index[num]], SEEK_SET);
+        fpg_read_header(&(my_fpg->MiHeadFPG), f);
+        fseek(f, my_fpg->MiHeadFPG.num_points * 4, SEEK_CUR);
+        my_fpg->thumb[num].w = my_fpg->MiHeadFPG.width;
+        my_fpg->thumb[num].h = my_fpg->MiHeadFPG.height;
+        my_fpg->thumb[num].filesize = my_fpg->MiHeadFPG.width * my_fpg->MiHeadFPG.height;
 
-        if (MiFPG->thumb[num].filesize <= 2048)
+        if (my_fpg->thumb[num].filesize <= 2048)
           incremento = 2048;
 
-        if ((MiFPG->thumb[num].ptr = (char *)malloc(MiFPG->thumb[num].filesize)) != NULL) {
-          if (MiFPG->thumb[num].filesize > incremento) {
-            if (fread(MiFPG->thumb[num].ptr, 1, incremento, f) == incremento) {
-              MiFPG->thumb[num].status = incremento;
+        if ((my_fpg->thumb[num].ptr = (char *)malloc(my_fpg->thumb[num].filesize)) != NULL) {
+          if (my_fpg->thumb[num].filesize > incremento) {
+            if (fread(my_fpg->thumb[num].ptr, 1, incremento, f) == incremento) {
+              my_fpg->thumb[num].status = incremento;
             } else {
-              free(MiFPG->thumb[num].ptr);
-              MiFPG->thumb[num].ptr = NULL;
+              free(my_fpg->thumb[num].ptr);
+              my_fpg->thumb[num].ptr = NULL;
               estado = 0;
-              MiFPG->thumb[num].status = -1;
+              my_fpg->thumb[num].status = -1;
             }
           } else {
-            if (fread(MiFPG->thumb[num].ptr, 1, MiFPG->thumb[num].filesize, f) ==
-                MiFPG->thumb[num].filesize) {
-              MiFPG->thumb[num].status = MiFPG->thumb[num].filesize;
+            if (fread(my_fpg->thumb[num].ptr, 1, my_fpg->thumb[num].filesize, f) ==
+                my_fpg->thumb[num].filesize) {
+              my_fpg->thumb[num].status = my_fpg->thumb[num].filesize;
             } else {
-              free(MiFPG->thumb[num].ptr);
-              MiFPG->thumb[num].ptr = NULL;
+              free(my_fpg->thumb[num].ptr);
+              my_fpg->thumb[num].ptr = NULL;
               estado = 0;
-              MiFPG->thumb[num].status = -1;
+              my_fpg->thumb[num].status = -1;
             }
           }
 
@@ -1601,61 +1601,61 @@ void create_thumb_FPG(struct t_listboxbr *l) {
         } else {
           fclose(f);
           estado = 0;
-          MiFPG->thumb[num].status = -1;
+          my_fpg->thumb[num].status = -1;
         }
       } else {
         estado = 0;
-        MiFPG->thumb[num].status = -1;
+        my_fpg->thumb[num].status = -1;
       }
       return;
-    } else if (estado == 2 && MiFPG->thumb[num].status !=
-                                  MiFPG->thumb[num].filesize) { // Continue reading a thumbnail
+    } else if (estado == 2 && my_fpg->thumb[num].status !=
+                                  my_fpg->thumb[num].filesize) { // Continue reading a thumbnail
 
-      if ((f = fopen((char *)MiFPG->current_file, "rb")) != NULL) {
-        fseek(f, MiFPG->grf_offsets[MiFPG->desc_index[num]], SEEK_SET);
-        fpg_read_header(&(MiFPG->MiHeadFPG), f);
-        fseek(f, MiFPG->MiHeadFPG.num_points * 4, SEEK_CUR);
-        fseek(f, MiFPG->thumb[num].status, SEEK_CUR);
+      if ((f = fopen((char *)my_fpg->current_file, "rb")) != NULL) {
+        fseek(f, my_fpg->grf_offsets[my_fpg->desc_index[num]], SEEK_SET);
+        fpg_read_header(&(my_fpg->MiHeadFPG), f);
+        fseek(f, my_fpg->MiHeadFPG.num_points * 4, SEEK_CUR);
+        fseek(f, my_fpg->thumb[num].status, SEEK_CUR);
 
-        if (MiFPG->thumb[num].filesize - MiFPG->thumb[num].status > incremento) {
-          if (fread(&(MiFPG->thumb[num].ptr)[MiFPG->thumb[num].status], 1, incremento, f) ==
+        if (my_fpg->thumb[num].filesize - my_fpg->thumb[num].status > incremento) {
+          if (fread(&(my_fpg->thumb[num].ptr)[my_fpg->thumb[num].status], 1, incremento, f) ==
               incremento) {
-            MiFPG->thumb[num].status += incremento;
+            my_fpg->thumb[num].status += incremento;
           } else {
-            free(MiFPG->thumb[num].ptr);
-            MiFPG->thumb[num].ptr = NULL;
+            free(my_fpg->thumb[num].ptr);
+            my_fpg->thumb[num].ptr = NULL;
             estado = 0;
-            MiFPG->thumb[num].status = -1;
+            my_fpg->thumb[num].status = -1;
           }
         } else {
-          if (fread(&(MiFPG->thumb[num].ptr)[MiFPG->thumb[num].status], 1,
-                    MiFPG->thumb[num].filesize - MiFPG->thumb[num].status,
-                    f) == MiFPG->thumb[num].filesize - MiFPG->thumb[num].status) {
-            MiFPG->thumb[num].status = MiFPG->thumb[num].filesize;
+          if (fread(&(my_fpg->thumb[num].ptr)[my_fpg->thumb[num].status], 1,
+                    my_fpg->thumb[num].filesize - my_fpg->thumb[num].status,
+                    f) == my_fpg->thumb[num].filesize - my_fpg->thumb[num].status) {
+            my_fpg->thumb[num].status = my_fpg->thumb[num].filesize;
           } else {
-            free(MiFPG->thumb[num].ptr);
-            MiFPG->thumb[num].ptr = NULL;
+            free(my_fpg->thumb[num].ptr);
+            my_fpg->thumb[num].ptr = NULL;
             estado = 0;
-            MiFPG->thumb[num].status = -1;
+            my_fpg->thumb[num].status = -1;
           }
         }
 
         fclose(f);
       } else {
         estado = 0;
-        MiFPG->thumb[num].status = -1;
+        my_fpg->thumb[num].status = -1;
       }
 
       return;
     }
 
     // Now create the thumbnail if the file is fully loaded
-    if (estado == 2 && MiFPG->thumb[num].status == MiFPG->thumb[num].filesize &&
-        abs(_omx - mouse_x) + abs(_omy - mouse_y) + mouse_b + ascii == 0) {
-      MiFPG->thumb[num].status = 0;
-      man = MiFPG->thumb[num].w;
-      mal = MiFPG->thumb[num].h;
-      temp = (byte *)MiFPG->thumb[num].ptr;
+    if (estado == 2 && my_fpg->thumb[num].status == my_fpg->thumb[num].filesize &&
+        abs(old_mouse_x - mouse_x) + abs(old_mouse_y - mouse_y) + mouse_b + ascii == 0) {
+      my_fpg->thumb[num].status = 0;
+      man = my_fpg->thumb[num].w;
+      mal = my_fpg->thumb[num].h;
+      temp = (byte *)my_fpg->thumb[num].ptr;
 
       // Create the thumbnail
       if (man > 47 * big2 || mal > 26 * big2) {
@@ -1667,32 +1667,32 @@ void create_thumb_FPG(struct t_listboxbr *l) {
         else
           coefredx = coefredy;
 
-        MiFPG->thumb[num].w = (float)man / coefredx + 0.5;
-        MiFPG->thumb[num].h = (float)mal / coefredy + 0.5;
-        MiFPG->thumb[num].w &= -2;
-        MiFPG->thumb[num].h &= -2;
+        my_fpg->thumb[num].w = (float)man / coefredx + 0.5;
+        my_fpg->thumb[num].h = (float)mal / coefredy + 0.5;
+        my_fpg->thumb[num].w &= -2;
+        my_fpg->thumb[num].h &= -2;
 
-        if (MiFPG->thumb[num].w < 2)
-          MiFPG->thumb[num].w = 2;
+        if (my_fpg->thumb[num].w < 2)
+          my_fpg->thumb[num].w = 2;
 
-        if (MiFPG->thumb[num].h < 2)
-          MiFPG->thumb[num].h = 2;
+        if (my_fpg->thumb[num].h < 2)
+          my_fpg->thumb[num].h = 2;
 
-        if (coefredx * (float)(MiFPG->thumb[num].w - 1) >= (float)man)
-          coefredx = (float)(man - 1) / (float)(MiFPG->thumb[num].w - 1);
+        if (coefredx * (float)(my_fpg->thumb[num].w - 1) >= (float)man)
+          coefredx = (float)(man - 1) / (float)(my_fpg->thumb[num].w - 1);
 
-        if (coefredy * (float)(MiFPG->thumb[num].h - 1) >= (float)mal)
-          coefredy = (float)(mal - 1) / (float)(MiFPG->thumb[num].h - 1);
+        if (coefredy * (float)(my_fpg->thumb[num].h - 1) >= (float)mal)
+          coefredy = (float)(mal - 1) / (float)(my_fpg->thumb[num].h - 1);
 
-        if ((temp2 = (byte *)malloc(MiFPG->thumb[num].w * MiFPG->thumb[num].h)) != NULL) {
-          memset(temp2, 0, MiFPG->thumb[num].w * MiFPG->thumb[num].h);
+        if ((temp2 = (byte *)malloc(my_fpg->thumb[num].w * my_fpg->thumb[num].h)) != NULL) {
+          memset(temp2, 0, my_fpg->thumb[num].w * my_fpg->thumb[num].h);
           a = (float)0.0;
 
-          for (y = 0; y < MiFPG->thumb[num].h; y++) {
+          for (y = 0; y < my_fpg->thumb[num].h; y++) {
             b = (float)0.0;
 
-            for (x = 0; x < MiFPG->thumb[num].w; x++) {
-              temp2[y * MiFPG->thumb[num].w + x] = temp[((memptrsize)a) * man + (memptrsize)b];
+            for (x = 0; x < my_fpg->thumb[num].w; x++) {
+              temp2[y * my_fpg->thumb[num].w + x] = temp[((memptrsize)a) * man + (memptrsize)b];
               b += coefredx;
             }
             a += coefredy;
@@ -1700,37 +1700,37 @@ void create_thumb_FPG(struct t_listboxbr *l) {
 
           free(temp);
 
-          if ((MiFPG->thumb[num].ptr =
-                   (char *)malloc((MiFPG->thumb[num].w * MiFPG->thumb[num].h) / 4)) != NULL) {
-            for (y = 0; y < MiFPG->thumb[num].h; y += 2) {
-              for (x = 0; x < MiFPG->thumb[num].w; x += 2) {
-                n = *(ghost + temp2[x + y * MiFPG->thumb[num].w] * 256 +
-                      temp2[x + 1 + y * MiFPG->thumb[num].w]);
-                m = *(ghost + temp2[x + (y + 1) * MiFPG->thumb[num].w] * 256 +
-                      temp2[x + 1 + (y + 1) * MiFPG->thumb[num].w]);
-                MiFPG->thumb[num].ptr[x / 2 + (y / 2) * (MiFPG->thumb[num].w / 2)] =
+          if ((my_fpg->thumb[num].ptr =
+                   (char *)malloc((my_fpg->thumb[num].w * my_fpg->thumb[num].h) / 4)) != NULL) {
+            for (y = 0; y < my_fpg->thumb[num].h; y += 2) {
+              for (x = 0; x < my_fpg->thumb[num].w; x += 2) {
+                n = *(ghost + temp2[x + y * my_fpg->thumb[num].w] * 256 +
+                      temp2[x + 1 + y * my_fpg->thumb[num].w]);
+                m = *(ghost + temp2[x + (y + 1) * my_fpg->thumb[num].w] * 256 +
+                      temp2[x + 1 + (y + 1) * my_fpg->thumb[num].w]);
+                my_fpg->thumb[num].ptr[x / 2 + (y / 2) * (my_fpg->thumb[num].w / 2)] =
                     *(ghost + n * 256 + m);
               }
             }
 
-            MiFPG->thumb[num].w /= 2;
-            MiFPG->thumb[num].h /= 2;
+            my_fpg->thumb[num].w /= 2;
+            my_fpg->thumb[num].h /= 2;
           } else {
-            MiFPG->thumb[num].ptr = NULL;
-            MiFPG->thumb[num].status = -1;
+            my_fpg->thumb[num].ptr = NULL;
+            my_fpg->thumb[num].status = -1;
           }
           free(temp2);
         } else {
-          MiFPG->thumb[num].ptr = NULL;
-          MiFPG->thumb[num].status = -1;
+          my_fpg->thumb[num].ptr = NULL;
+          my_fpg->thumb[num].status = -1;
         }
       }
     }
   }
 
   if (oclock < *system_clock) {
-    _omx = omx;
-    _omy = omy;
+    old_mouse_x = omx;
+    old_mouse_y = omy;
     omx = mouse_x;
     omy = mouse_y;
     oclock = *system_clock;
@@ -1797,7 +1797,7 @@ void map_to_fpg(struct tmapa *mapa) {
 
 void get_map_graphic(struct tmapa *mapa, byte *imagen, int x, int y, int width, int height,
                      int cod) {
-  FPG *MiFPG = (FPG *)v.aux;
+  FPG *my_fpg = (FPG *)v.aux;
   int pos, index = 0;
   int scan_x, scan_y;
   byte *buffer;
@@ -1824,10 +1824,10 @@ void get_map_graphic(struct tmapa *mapa, byte *imagen, int x, int y, int width, 
   pos = (y + scan_y) * mapa->map_width + x;
   memset(&imagen[pos], 0, width + 1);
 
-  while (MiFPG->grf_offsets[cod])
+  while (my_fpg->grf_offsets[cod])
     cod++;
 
-  DIV_STRCPY(str_file, (char *)MiFPG->fpg_name);
+  DIV_STRCPY(str_file, (char *)my_fpg->fpg_name);
 
   if (strchr(str_file, '.'))
     *strchr(str_file, '.') = '\0';
@@ -1842,7 +1842,7 @@ void get_map_graphic(struct tmapa *mapa, byte *imagen, int x, int y, int width, 
   }
   DIV_SPRINTF(str_desc, "%s%d%s%s", texts[499], cod, texts[500], mapa->filename);
 
-  fpg_add(MiFPG, cod, str_desc, str_file, width, height, 0, NULL, (char *)buffer, 0, 0);
+  fpg_add(my_fpg, cod, str_desc, str_file, width, height, 0, NULL, (char *)buffer, 0, 0);
 
   free(buffer);
 }
@@ -1858,25 +1858,25 @@ struct {
 int lnum = 0;
 int lmapan, lmapal;
 
-void fpg_to_map(FPG *MiFPG) {
+void fpg_to_map(FPG *my_fpg) {
   int num;
   FILE *fpg;
   HeadFPG MiHeadFPG;
   byte *fpg_image;
-  byte *FPGmap;
+  byte *fpg_map;
 
   lmapan = vga_width;
   lmapal = vga_height;
 
-  if ((fpg = fopen((char *)MiFPG->current_file, "rb")) == NULL) {
+  if ((fpg = fopen((char *)my_fpg->current_file, "rb")) == NULL) {
     v_text = (char *)texts[43];
     show_dialog(err0);
     return;
   }
 
   num = 0;
-  while (MiFPG->desc_index[num]) {
-    fseek(fpg, MiFPG->grf_offsets[MiFPG->desc_index[num]], SEEK_SET);
+  while (my_fpg->desc_index[num]) {
+    fseek(fpg, my_fpg->grf_offsets[my_fpg->desc_index[num]], SEEK_SET);
     fseek(fpg, 52, SEEK_CUR);
 
     fread(&MiHeadFPG.width, 1, 4, fpg);
@@ -1898,19 +1898,19 @@ void fpg_to_map(FPG *MiFPG) {
     }
   }
 
-  if ((FPGmap = (byte *)malloc(lmapan * lmapal)) == NULL) {
+  if ((fpg_map = (byte *)malloc(lmapan * lmapal)) == NULL) {
     fclose(fpg);
     v_text = (char *)texts[45];
     show_dialog(err0);
     return;
   }
 
-  memset(FPGmap, 0, lmapan * lmapal);
+  memset(fpg_map, 0, lmapan * lmapal);
 
   num = 0;
 
-  while (MiFPG->desc_index[num]) {
-    fseek(fpg, MiFPG->grf_offsets[MiFPG->desc_index[num]], SEEK_SET);
+  while (my_fpg->desc_index[num]) {
+    fseek(fpg, my_fpg->grf_offsets[my_fpg->desc_index[num]], SEEK_SET);
     fseek(fpg, 60, SEEK_CUR);
 
     fread(&MiHeadFPG.num_points, 1, 4, fpg);
@@ -1920,7 +1920,7 @@ void fpg_to_map(FPG *MiFPG) {
 
     if ((fpg_image = (byte *)malloc((lgraf[num].w - 2) * (lgraf[num].h - 2))) == NULL) {
       fclose(fpg);
-      free(FPGmap);
+      free(fpg_map);
       v_text = (char *)texts[45];
       show_dialog(err0);
       return;
@@ -1929,14 +1929,14 @@ void fpg_to_map(FPG *MiFPG) {
     if (fread(fpg_image, 1, (lgraf[num].w - 2) * (lgraf[num].h - 2), fpg) !=
         (lgraf[num].w - 2) * (lgraf[num].h - 2)) {
       fclose(fpg);
-      free(FPGmap);
+      free(fpg_map);
       free(fpg_image);
       v_text = (char *)texts[44];
       show_dialog(err0);
       return;
     }
 
-    put_map_graphic(fpg_image, FPGmap, num);
+    put_map_graphic(fpg_image, fpg_map, num);
     free(fpg_image);
     num++;
   }
@@ -1946,8 +1946,8 @@ void fpg_to_map(FPG *MiFPG) {
   map_width = lmapan;
   map_height = lmapal;
 
-  if (new_map(FPGmap)) {
-    free(FPGmap);
+  if (new_map(fpg_map)) {
+    free(fpg_map);
     return;
   }
   call((void_return_type_t)v.paint_handler);
@@ -2043,13 +2043,13 @@ int collides_with_map(int n, int x, int y, int w, int h) {
 //-----------------------------------------------------------------------------
 
 void close_fpg(char *fpg_path) {
-  FPG *MiFPG;
+  FPG *my_fpg;
   int m;
 
   for (m = 0; m < max_windows; m++) {
-    MiFPG = (FPG *)window[m].aux;
+    my_fpg = (FPG *)window[m].aux;
     if (window[m].type == 101) {
-      if (!strcmp(fpg_path, (char *)MiFPG->current_file)) {
+      if (!strcmp(fpg_path, (char *)my_fpg->current_file)) {
         move(0, m);
         close_window();
         break;
@@ -2063,7 +2063,7 @@ void close_fpg(char *fpg_path) {
 //-----------------------------------------------------------------------------
 
 int select_file(void) {
-  FPG *MiFPG;
+  FPG *my_fpg;
 
   v_accept = 0;
   v_mode = 0;
@@ -2084,7 +2084,7 @@ int select_file(void) {
     } else {
       v_title = (char *)texts[82];
       v_text = input;
-      show_dialog(replace_FPG_0);
+      show_dialog(replace_fpg_0);
     }
 
     if (v_accept == 1) {
@@ -2107,10 +2107,10 @@ int select_file(void) {
         return 0;
       }
 
-      MiFPG = (FPG *)v_aux;
-      MiFPG->thumb_on = 0;
-      MiFPG->fpg_info = 0;
-      MiFPG->list_info.created = 0;
+      my_fpg = (FPG *)v_aux;
+      my_fpg->thumb_on = 0;
+      my_fpg->fpg_info = 0;
+      my_fpg->list_info.created = 0;
       close_fpg(full);
       memset(v_aux, 0, sizeof(FPG));
       new_window(fpg_dialog0_add);
@@ -2126,7 +2126,7 @@ int select_file(void) {
 //      Replace or add to FPG
 //-----------------------------------------------------------------------------
 
-void replace_FPG_1(void) {
+void replace_fpg_1(void) {
   int w = v.w / big2, h = v.h / big2;
   _show_items();
 
@@ -2134,7 +2134,7 @@ void replace_FPG_1(void) {
     wwrite(v.ptr, w, h, w / 2, 12, 1, (byte *)v_text, c3);
 }
 
-void replace_FPG_2(void) {
+void replace_fpg_2(void) {
   _process_items();
 
   switch (v.active_item) {
@@ -2153,7 +2153,7 @@ void replace_FPG_2(void) {
   }
 }
 
-void replace_FPG_0(void) {
+void replace_fpg_0(void) {
   int x2, x3;
 
   v.type = 1;
@@ -2174,8 +2174,8 @@ void replace_FPG_0(void) {
   } else
     v.h = 29;
 
-  v.paint_handler = replace_FPG_1;
-  v.click_handler = replace_FPG_2;
+  v.paint_handler = replace_fpg_1;
+  v.click_handler = replace_fpg_2;
 
   _button(510, 7, v.h - 14, 0);  // Replace
   _button(511, x2, v.h - 14, 0); // Add

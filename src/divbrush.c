@@ -99,7 +99,7 @@ struct _thumb_tex {
   int is_square;
 } thumb_tex[max_texturas];
 
-extern int _omx, _omy, omx, omy, oclock, num, incremento;
+extern int old_mouse_x, old_mouse_y, omx, omy, oclock, num, incremento;
 
 struct {
   int pos;

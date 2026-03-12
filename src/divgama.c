@@ -42,7 +42,7 @@ void gama3(void);
 
 extern int sel_color_font;
 extern int sel_color_ok;
-void Selcolor0(void);
+void selcolor0(void);
 
 //-----------------------------------------------------------------------------
 //  Crea una gama a partir de los colores selecionados
@@ -260,7 +260,7 @@ void gama2(void) {
         call((void_return_type_t)v.paint_handler);
         v.redraw = 1;
       } else if (wmouse_in(button_coords[con].x - 3, button_coords[con].y - 15, 14, 14)) {
-        show_dialog((void_return_type_t)Selcolor0);
+        show_dialog((void_return_type_t)selcolor0);
         if (sel_color_ok) {
           gradient_config[con].selec = 1;
           gradient_config[con].color = sel_color_font;

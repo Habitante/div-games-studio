@@ -660,7 +660,7 @@ extern struct t_listboxbr file_list_br;
 
 void wwrite_in_box(byte *dest, int dest_pitch, int dest_width, int dest_height, int x, int y,
                    int alignment, byte *ptr, byte c) {
-  int w, h, boton, multi;
+  int w, h, button, multi;
 
   byte *font;
 
@@ -673,10 +673,10 @@ void wwrite_in_box(byte *dest, int dest_pitch, int dest_width, int dest_height, 
     multi = 0;
 
   if (*ptr == '\xd') {
-    boton = 1;
+    button = 1;
     ptr++;
   } else
-    boton = 0;
+    button = 0;
 
   car = (sscar *)(text_font + 1);
 
@@ -740,7 +740,7 @@ void wwrite_in_box(byte *dest, int dest_pitch, int dest_width, int dest_height, 
     break;
   }
 
-  if (boton) {
+  if (button) {
     if (c != c0) {
       wbox(dest, dest_pitch, dest_height, c2, x - 2, y - 2, w + 4, h + 4);
       wrectangle(dest, dest_pitch, dest_height, c0, x - 3, y - 3, w + 6, h + 6);

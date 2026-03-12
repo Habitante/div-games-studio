@@ -18,7 +18,7 @@ void rescalar(byte *si, int sian, int sial, byte *di, int dian, int dial);
 
 // Prototypes for palette loading functions from DIVFORMA.CPP
 
-extern int exp_Color0, exp_Color1, exp_Color2;
+extern int exp_color0, exp_color1, exp_color2;
 
 int fmt_load_dac_map(char *name);
 int fmt_load_dac_pcx(char *name);
@@ -724,11 +724,11 @@ int has_maps(void) {
   return (n + 1);
 }
 
-char PalName[_MAX_PATH + 1] = "";
+char pal_name[_MAX_PATH + 1] = "";
 
-#define max_archivos 512 // ------------------------------- File listbox
+#define MAX_FILES 512 // ------------------------------- File listbox
 extern struct t_listboxbr file_list_br;
-extern t_thumb thumb[max_archivos];
+extern t_thumb thumb[MAX_FILES];
 extern int num_taggeds;
 
 extern byte *sample;
@@ -777,15 +777,15 @@ void pal_load() {
           v_text = (char *)texts[43];
           show_dialog(err0);
         } else {
-          div_strcpy(PalName, sizeof(PalName), full);
+          div_strcpy(pal_name, sizeof(pal_name), full);
 
-          div_try |= fmt_load_dac_fpg(PalName);
-          div_try |= fmt_load_dac_fnt(PalName);
-          div_try |= fmt_load_dac_pcx(PalName);
-          div_try |= fmt_load_dac_bmp(PalName);
-          div_try |= fmt_load_dac_map(PalName);
-          div_try |= fmt_load_dac_pal(PalName);
-          div_try |= fmt_load_dac_jpg(PalName);
+          div_try |= fmt_load_dac_fpg(pal_name);
+          div_try |= fmt_load_dac_fnt(pal_name);
+          div_try |= fmt_load_dac_pcx(pal_name);
+          div_try |= fmt_load_dac_bmp(pal_name);
+          div_try |= fmt_load_dac_map(pal_name);
+          div_try |= fmt_load_dac_pal(pal_name);
+          div_try |= fmt_load_dac_jpg(pal_name);
 
           if (div_try) {
             if (has_maps()) {
@@ -824,15 +824,15 @@ void pal_load() {
           div_strcat(full, sizeof(full), "/");
         div_strcat(full, sizeof(full), input);
 
-        div_strcpy(PalName, sizeof(PalName), full);
+        div_strcpy(pal_name, sizeof(pal_name), full);
 
-        div_try |= fmt_load_dac_fpg(PalName);
-        div_try |= fmt_load_dac_fnt(PalName);
-        div_try |= fmt_load_dac_pcx(PalName);
-        div_try |= fmt_load_dac_bmp(PalName);
-        div_try |= fmt_load_dac_map(PalName);
-        div_try |= fmt_load_dac_pal(PalName);
-        div_try |= fmt_load_dac_jpg(PalName);
+        div_try |= fmt_load_dac_fpg(pal_name);
+        div_try |= fmt_load_dac_fnt(pal_name);
+        div_try |= fmt_load_dac_pcx(pal_name);
+        div_try |= fmt_load_dac_bmp(pal_name);
+        div_try |= fmt_load_dac_map(pal_name);
+        div_try |= fmt_load_dac_pal(pal_name);
+        div_try |= fmt_load_dac_jpg(pal_name);
 
         if (div_try)
           for (n = 0; n < 256; n++) {
@@ -867,7 +867,7 @@ void pal_save() {
     div_strcat(full, sizeof(full), "/");
   div_strcat(full, sizeof(full), input);
   if ((f = fopen(full, "wb")) != NULL) {
-    div_strcpy(PalName, sizeof(PalName), full);
+    div_strcpy(pal_name, sizeof(pal_name), full);
     fwrite("pal\x1a\x0d\x0a\x00\x00", 8, 1, f);
     fwrite(dac, 768, 1, f);
     for (x = 0; x < 16; x++)
@@ -915,9 +915,9 @@ extern int text3_w;
 extern int text3_h;
 extern int Text3Col;
 extern char *Text3;
-extern char *Text01;
-extern char *Text02;
-extern char *Text03;
+extern char *text01;
+extern char *text02;
+extern char *text03;
 
 void pal_show_text(void);
 void create_title_bar(void);
@@ -928,7 +928,7 @@ void pal_refresh(int no_tocar_mapas, int guardar_original) {
   byte *ptr, *ptrend;
   int w, h, x, sum;
   int n, m;
-  FPG *MiFPG;
+  FPG *my_fpg;
   byte pal[768];
   byte xlat[768];
   int tal = 24 * big2, tan = 41 * big2;
@@ -952,14 +952,14 @@ void pal_refresh(int no_tocar_mapas, int guardar_original) {
 
   for (m = 0; m < max_windows; m++)
     if (window[m].type == 101) {
-      MiFPG = (FPG *)window[m].aux;
+      my_fpg = (FPG *)window[m].aux;
 
       // Free FPG thumbnails
       for (n = 0; n < 1000; n++) {
-        if (MiFPG->thumb[n].ptr != NULL)
-          free(MiFPG->thumb[n].ptr);
-        MiFPG->thumb[n].ptr = NULL;
-        MiFPG->thumb[n].status = 0;
+        if (my_fpg->thumb[n].ptr != NULL)
+          free(my_fpg->thumb[n].ptr);
+        my_fpg->thumb[n].ptr = NULL;
+        my_fpg->thumb[n].status = 0;
       }
     }
 
@@ -1005,11 +1005,11 @@ void pal_refresh(int no_tocar_mapas, int guardar_original) {
       Text1Col = xlat[Text1Col];
       Text2Col = xlat[Text2Col];
       Text3Col = xlat[Text3Col];
-      if (Text01 == NULL) {
+      if (text01 == NULL) {
         memset(Text1, Text1Col, tan * tal + tan);
       } else {
-        ptr = (byte *)Text01;
-        while (ptr < (byte *)Text01 + text1_w * text1_h) {
+        ptr = (byte *)text01;
+        while (ptr < (byte *)text01 + text1_w * text1_h) {
           *ptr = xlat[*ptr];
           ptr++;
         }
@@ -1019,11 +1019,11 @@ void pal_refresh(int no_tocar_mapas, int guardar_original) {
           ptr++;
         }
       }
-      if (Text02 == NULL) {
+      if (text02 == NULL) {
         memset(Text2, Text2Col, tan * tal + tan);
       } else {
-        ptr = (byte *)Text02;
-        while (ptr < (byte *)Text02 + text2_w * text2_h) {
+        ptr = (byte *)text02;
+        while (ptr < (byte *)text02 + text2_w * text2_h) {
           *ptr = xlat[*ptr];
           ptr++;
         }
@@ -1033,11 +1033,11 @@ void pal_refresh(int no_tocar_mapas, int guardar_original) {
           ptr++;
         }
       }
-      if (Text03 == NULL) {
+      if (text03 == NULL) {
         memset(Text3, Text3Col, tan * tal + tan);
       } else {
-        ptr = (byte *)Text03;
-        while (ptr < (byte *)Text03 + text3_w * text3_h) {
+        ptr = (byte *)text03;
+        while (ptr < (byte *)text03 + text3_w * text3_h) {
           *ptr = xlat[*ptr];
           ptr++;
         }
@@ -1160,9 +1160,9 @@ void pal_refresh(int no_tocar_mapas, int guardar_original) {
     }
   }
 
-  exp_Color0 = -1;
-  exp_Color1 = -1;
-  exp_Color2 = -1;
+  exp_color0 = -1;
+  exp_color1 = -1;
+  exp_color2 = -1;
 
   if (t64 != NULL) {
     free(t64);
@@ -1374,15 +1374,15 @@ void merge_palette(void) {
       if (full[strlen(full) - 1] != '/')
         div_strcat(full, sizeof(full), "/");
       div_strcat(full, sizeof(full), input);
-      div_strcpy(PalName, sizeof(PalName), full);
+      div_strcpy(pal_name, sizeof(pal_name), full);
 
-      div_try |= fmt_load_dac_fpg(PalName);
-      div_try |= fmt_load_dac_fnt(PalName);
-      div_try |= fmt_load_dac_pcx(PalName);
-      div_try |= fmt_load_dac_bmp(PalName);
-      div_try |= fmt_load_dac_map(PalName);
-      div_try |= fmt_load_dac_pal(PalName);
-      div_try |= fmt_load_dac_jpg(PalName);
+      div_try |= fmt_load_dac_fpg(pal_name);
+      div_try |= fmt_load_dac_fnt(pal_name);
+      div_try |= fmt_load_dac_pcx(pal_name);
+      div_try |= fmt_load_dac_bmp(pal_name);
+      div_try |= fmt_load_dac_map(pal_name);
+      div_try |= fmt_load_dac_pal(pal_name);
+      div_try |= fmt_load_dac_jpg(pal_name);
 
       if (!div_try) {
         v_text = (char *)texts[46];
@@ -1875,265 +1875,265 @@ void rescalar(byte *si, int sian, int sial, byte *di, int dian, int dial) {
 //      Palette editing functions
 //-----------------------------------------------------------------------------
 
-char Valores[72 * 1];
-struct t_listbox lRed = {132, 63, Valores, 1, 9, 1};
-struct t_listbox lGre = {132 + 11, 63, Valores, 1, 9, 1};
-struct t_listbox lBlu = {132 + 22, 63, Valores, 1, 9, 1};
+char values[72 * 1];
+struct t_listbox l_red = {132, 63, values, 1, 9, 1};
+struct t_listbox l_green = {132 + 11, 63, values, 1, 9, 1};
+struct t_listbox l_blue = {132 + 22, 63, values, 1, 9, 1};
 
-byte SelColor = 0;
-byte Retorno = 0;
-int Degradar = 0, Intercambiar = 0, Copiar = 0;
-int wDegradar = 0, wIntercambiar = 0, wCopiar = 0;
+byte sel_color = 0;
+byte return_value = 0;
+int gradient_flag = 0, swap_flag = 0, copy_flag = 0;
+int gradient_window = 0, swap_window = 0, copy_window = 0;
 
 void pal_interpolate1(void) {
   int x, y;
   int w = v.w / big2, h = v.h / big2;
-  char cWork[20];
+  char work_buf[20];
 
   _show_items();
 
   wbox(v.ptr, w, h, c0, 2, 10, 128, 128);
 
   wwrite(v.ptr, w, h, 147, 11, 0, texts[141], c3);
-  div_snprintf(cWork, sizeof(cWork), "%03d", SelColor);
-  wwrite(v.ptr, w, h, 145, 11, 2, (byte *)cWork, c3);
+  div_snprintf(work_buf, sizeof(work_buf), "%03d", sel_color);
+  wwrite(v.ptr, w, h, 145, 11, 2, (byte *)work_buf, c3);
 
   wwrite(v.ptr, w, h, 147, 19, 0, texts[142], c3);
-  div_snprintf(cWork, sizeof(cWork), " %02X", SelColor);
-  wwrite(v.ptr, w, h, 145, 19, 2, (byte *)cWork, c3);
+  div_snprintf(work_buf, sizeof(work_buf), " %02X", sel_color);
+  wwrite(v.ptr, w, h, 145, 19, 2, (byte *)work_buf, c3);
 
   wwrite(v.ptr, w, h, 147, 63 - 21, 0, texts[143], c3);
-  div_snprintf(cWork, sizeof(cWork), "%02d", dac[SelColor * 3]);
-  wwrite(v.ptr, w, h, 140, 63 - 21, 2, (byte *)cWork, c3);
+  div_snprintf(work_buf, sizeof(work_buf), "%02d", dac[sel_color * 3]);
+  wwrite(v.ptr, w, h, 140, 63 - 21, 2, (byte *)work_buf, c3);
 
   wwrite(v.ptr, w, h, 147, 63 - 14, 0, texts[144], c3);
-  div_snprintf(cWork, sizeof(cWork), "%02d", dac[SelColor * 3 + 1]);
-  wwrite(v.ptr, w, h, 140, 63 - 14, 2, (byte *)cWork, c3);
+  div_snprintf(work_buf, sizeof(work_buf), "%02d", dac[sel_color * 3 + 1]);
+  wwrite(v.ptr, w, h, 140, 63 - 14, 2, (byte *)work_buf, c3);
 
   wwrite(v.ptr, w, h, 147, 63 - 7, 0, texts[145], c3);
-  div_snprintf(cWork, sizeof(cWork), "%02d", dac[SelColor * 3 + 2]);
-  wwrite(v.ptr, w, h, 140, 63 - 7, 2, (byte *)cWork, c3);
+  div_snprintf(work_buf, sizeof(work_buf), "%02d", dac[sel_color * 3 + 2]);
+  wwrite(v.ptr, w, h, 140, 63 - 7, 2, (byte *)work_buf, c3);
 
   wbox(v.ptr, w, h, c0, 132, 26, 31, 42 - 27);
-  wbox(v.ptr, w, h, SelColor, 133, 27, 29, 42 - 29);
+  wbox(v.ptr, w, h, sel_color, 133, 27, 29, 42 - 29);
   for (y = 0; y < 16; y++)
     for (x = 0; x < 16; x++)
       wbox(v.ptr, w, h, (y * 16 + x), x * 8 + 2, y * 8 + 10, 7, 7);
 
-  wrectangle(v.ptr, w, h, c4, (SelColor % 16) * 8 + 1, (SelColor / 16) * 8 + 9, 9, 9);
-  if (dac[SelColor * 3] * dac[SelColor * 3 + 1] * dac[SelColor * 3 + 2] < (32 * 32 * 32))
-    wbox(v.ptr, w, h, c4, (SelColor % 16) * 8 + 4, (SelColor / 16) * 8 + 12, 3, 3);
+  wrectangle(v.ptr, w, h, c4, (sel_color % 16) * 8 + 1, (sel_color / 16) * 8 + 9, 9, 9);
+  if (dac[sel_color * 3] * dac[sel_color * 3 + 1] * dac[sel_color * 3 + 2] < (32 * 32 * 32))
+    wbox(v.ptr, w, h, c4, (sel_color % 16) * 8 + 4, (sel_color / 16) * 8 + 12, 3, 3);
   else
-    wbox(v.ptr, w, h, c0, (SelColor % 16) * 8 + 4, (SelColor / 16) * 8 + 12, 3, 3);
+    wbox(v.ptr, w, h, c0, (sel_color % 16) * 8 + 4, (sel_color / 16) * 8 + 12, 3, 3);
 
-  lRed.created = 0;
-  lRed.total_items = 72;
-  lBlu.created = 0;
-  lBlu.total_items = 72;
-  lGre.created = 0;
-  lGre.total_items = 72;
+  l_red.created = 0;
+  l_red.total_items = 72;
+  l_blue.created = 0;
+  l_blue.total_items = 72;
+  l_green.created = 0;
+  l_green.total_items = 72;
 
-  create_listbox(&lRed);
-  create_listbox(&lBlu);
-  create_listbox(&lGre);
+  create_listbox(&l_red);
+  create_listbox(&l_blue);
+  create_listbox(&l_green);
 
-  lRed.first_visible = 63 - dac[SelColor * 3];
-  lGre.first_visible = 63 - dac[SelColor * 3 + 1];
-  lBlu.first_visible = 63 - dac[SelColor * 3 + 2];
+  l_red.first_visible = 63 - dac[sel_color * 3];
+  l_green.first_visible = 63 - dac[sel_color * 3 + 1];
+  l_blue.first_visible = 63 - dac[sel_color * 3 + 2];
 
-  update_listbox(&lRed);
-  update_listbox(&lBlu);
-  update_listbox(&lGre);
+  update_listbox(&l_red);
+  update_listbox(&l_blue);
+  update_listbox(&l_green);
 }
 
 void pal_interpolate2(void) {
   int n = 0;
   static int ax = 2, ay = 10;
-  byte cColor, Tocado = 0, Dentro = 0;
-  char cWork[20];
-  static byte Accion = 0;
-  static byte OldColor = 0;
+  byte cur_color, touched = 0, inside = 0;
+  char work_buf[20];
+  static byte action = 0;
+  static byte old_color = 0;
   static byte sRed = 0, sGre = 0, sBlu = 0;
-  byte bWork;
+  byte temp_byte;
   float fR, fG, fB, fIR, fIG, fIB;
-  byte cIni, cFin;
+  byte color_start, color_end;
   int w = v.w / big2, h = v.h / big2;
 
   _process_items();
   v_pause = 1;
-  update_listbox(&lRed);
-  update_listbox(&lBlu);
-  update_listbox(&lGre);
+  update_listbox(&l_red);
+  update_listbox(&l_blue);
+  update_listbox(&l_green);
   v_pause = 1;
-  if (Accion)
+  if (action)
     mouse_graf = 2;
   if ((wmouse_y > 10) && (wmouse_y < 138) && (wmouse_x > 2) && (wmouse_x < 130)) {
-    cColor = ((wmouse_y - 10) / 8) * 16 + ((wmouse_x - 2) / 8);
-    if (cColor != OldColor) {
-      wrectangle(v.ptr, w, h, c0, (OldColor % 16) * 8 + 1, (OldColor / 16) * 8 + 9, 9, 9);
-      wbox(v.ptr, w, h, cColor, 133, 27, 29, 42 - 29);
+    cur_color = ((wmouse_y - 10) / 8) * 16 + ((wmouse_x - 2) / 8);
+    if (cur_color != old_color) {
+      wrectangle(v.ptr, w, h, c0, (old_color % 16) * 8 + 1, (old_color / 16) * 8 + 9, 9, 9);
+      wbox(v.ptr, w, h, cur_color, 133, 27, 29, 42 - 29);
 
       wbox(v.ptr, w, h, c2, 130, 11, 29, 15);
 
       wwrite(v.ptr, w, h, 147, 11, 0, texts[141], c3);
-      div_snprintf(cWork, sizeof(cWork), "%03d", cColor);
-      wwrite(v.ptr, w, h, 145, 11, 2, (byte *)cWork, c3);
+      div_snprintf(work_buf, sizeof(work_buf), "%03d", cur_color);
+      wwrite(v.ptr, w, h, 145, 11, 2, (byte *)work_buf, c3);
       wwrite(v.ptr, w, h, 147, 19, 0, texts[142], c3);
-      div_snprintf(cWork, sizeof(cWork), " %02X", cColor);
-      wwrite(v.ptr, w, h, 145, 19, 2, (byte *)cWork, c3);
+      div_snprintf(work_buf, sizeof(work_buf), " %02X", cur_color);
+      wwrite(v.ptr, w, h, 145, 19, 2, (byte *)work_buf, c3);
 
       wbox(v.ptr, w, h, c2, 130, 63 - 21, 25, 20);
       wwrite(v.ptr, w, h, 147, 63 - 21, 0, texts[143], c3);
-      div_snprintf(cWork, sizeof(cWork), "%02d", dac[cColor * 3]);
-      wwrite(v.ptr, w, h, 140, 63 - 21, 2, (byte *)cWork, c3);
+      div_snprintf(work_buf, sizeof(work_buf), "%02d", dac[cur_color * 3]);
+      wwrite(v.ptr, w, h, 140, 63 - 21, 2, (byte *)work_buf, c3);
       wwrite(v.ptr, w, h, 147, 63 - 14, 0, texts[144], c3);
-      div_snprintf(cWork, sizeof(cWork), "%02d", dac[cColor * 3 + 1]);
-      wwrite(v.ptr, w, h, 140, 63 - 14, 2, (byte *)cWork, c3);
+      div_snprintf(work_buf, sizeof(work_buf), "%02d", dac[cur_color * 3 + 1]);
+      wwrite(v.ptr, w, h, 140, 63 - 14, 2, (byte *)work_buf, c3);
       wwrite(v.ptr, w, h, 147, 63 - 7, 0, texts[145], c3);
-      div_snprintf(cWork, sizeof(cWork), "%02d", dac[cColor * 3 + 2]);
-      wwrite(v.ptr, w, h, 140, 63 - 7, 2, (byte *)cWork, c3);
+      div_snprintf(work_buf, sizeof(work_buf), "%02d", dac[cur_color * 3 + 2]);
+      wwrite(v.ptr, w, h, 140, 63 - 7, 2, (byte *)work_buf, c3);
       ax = ((wmouse_x - 2) / 8);
       ay = ((wmouse_y - 10) / 8);
-      wrectangle(v.ptr, w, h, c4, (cColor % 16) * 8 + 1, (cColor / 16) * 8 + 9, 9, 9);
-      lRed.first_visible = 63 - dac[cColor * 3];
-      lGre.first_visible = 63 - dac[cColor * 3 + 1];
-      lBlu.first_visible = 63 - dac[cColor * 3 + 2];
-      Dentro = 1;
+      wrectangle(v.ptr, w, h, c4, (cur_color % 16) * 8 + 1, (cur_color / 16) * 8 + 9, 9, 9);
+      l_red.first_visible = 63 - dac[cur_color * 3];
+      l_green.first_visible = 63 - dac[cur_color * 3 + 1];
+      l_blue.first_visible = 63 - dac[cur_color * 3 + 2];
+      inside = 1;
       v.redraw = 1;
-      OldColor = cColor;
+      old_color = cur_color;
     }
-    if ((mouse_b) && (cColor != SelColor)) {
+    if ((mouse_b) && (cur_color != sel_color)) {
       memcpy(palette, dac, 768);
-      switch (Accion) {
+      switch (action) {
       case 1:
         //Gradient fill
-        if (SelColor > cColor) {
-          cIni = cColor;
-          cFin = SelColor;
+        if (sel_color > cur_color) {
+          color_start = cur_color;
+          color_end = sel_color;
         } else {
-          cIni = SelColor;
-          cFin = cColor;
+          color_start = sel_color;
+          color_end = cur_color;
         }
-        fR = dac[cIni * 3];
-        fG = dac[cIni * 3 + 1];
-        fB = dac[cIni * 3 + 2];
-        fIR = (dac[cFin * 3] - fR) / (cFin - cIni);
-        fIG = (dac[cFin * 3 + 1] - fG) / (cFin - cIni);
-        fIB = (dac[cFin * 3 + 2] - fB) / (cFin - cIni);
+        fR = dac[color_start * 3];
+        fG = dac[color_start * 3 + 1];
+        fB = dac[color_start * 3 + 2];
+        fIR = (dac[color_end * 3] - fR) / (color_end - color_start);
+        fIG = (dac[color_end * 3 + 1] - fG) / (color_end - color_start);
+        fIB = (dac[color_end * 3 + 2] - fB) / (color_end - color_start);
 
-        for (n = cIni; n < cFin; n++) {
+        for (n = color_start; n < color_end; n++) {
           dac[n * 3] = fR;
           fR += fIR;
         }
-        for (n = cIni; n < cFin; n++) {
+        for (n = color_start; n < color_end; n++) {
           dac[n * 3 + 1] = fG;
           fG += fIG;
         }
-        for (n = cIni; n < cFin; n++) {
+        for (n = color_start; n < color_end; n++) {
           dac[n * 3 + 2] = fB;
           fB += fIB;
         }
 
         find_colors();
         refresh_dialog();
-        wrectangle(v.ptr, w, h, c0, (SelColor % 16) * 8 + 1, (SelColor / 16) * 8 + 9, 9, 9);
-        wrectangle(v.ptr, w, h, c4, (cColor % 16) * 8 + 1, (cColor / 16) * 8 + 9, 9, 9);
+        wrectangle(v.ptr, w, h, c0, (sel_color % 16) * 8 + 1, (sel_color / 16) * 8 + 9, 9, 9);
+        wrectangle(v.ptr, w, h, c4, (cur_color % 16) * 8 + 1, (cur_color / 16) * 8 + 9, 9, 9);
         set_dac(dac);
         break;
       case 2:
         //Copy
-        dac[cColor * 3] = dac[SelColor * 3];
-        dac[cColor * 3 + 1] = dac[SelColor * 3 + 1];
-        dac[cColor * 3 + 2] = dac[SelColor * 3 + 2];
+        dac[cur_color * 3] = dac[sel_color * 3];
+        dac[cur_color * 3 + 1] = dac[sel_color * 3 + 1];
+        dac[cur_color * 3 + 2] = dac[sel_color * 3 + 2];
         find_colors();
         refresh_dialog();
-        wrectangle(v.ptr, w, h, c0, (SelColor % 16) * 8 + 1, (SelColor / 16) * 8 + 9, 9, 9);
-        wrectangle(v.ptr, w, h, c4, (cColor % 16) * 8 + 1, (cColor / 16) * 8 + 9, 9, 9);
+        wrectangle(v.ptr, w, h, c0, (sel_color % 16) * 8 + 1, (sel_color / 16) * 8 + 9, 9, 9);
+        wrectangle(v.ptr, w, h, c4, (cur_color % 16) * 8 + 1, (cur_color / 16) * 8 + 9, 9, 9);
         set_dac(dac);
         break;
       case 3:
         //Swap
-        bWork = dac[SelColor * 3];
-        dac[SelColor * 3] = dac[cColor * 3];
-        dac[cColor * 3] = bWork;
-        bWork = dac[SelColor * 3 + 1];
-        dac[SelColor * 3 + 1] = dac[cColor * 3 + 1];
-        dac[cColor * 3 + 1] = bWork;
-        bWork = dac[SelColor * 3 + 2];
-        dac[SelColor * 3 + 2] = dac[cColor * 3 + 2];
-        dac[cColor * 3 + 2] = bWork;
+        temp_byte = dac[sel_color * 3];
+        dac[sel_color * 3] = dac[cur_color * 3];
+        dac[cur_color * 3] = temp_byte;
+        temp_byte = dac[sel_color * 3 + 1];
+        dac[sel_color * 3 + 1] = dac[cur_color * 3 + 1];
+        dac[cur_color * 3 + 1] = temp_byte;
+        temp_byte = dac[sel_color * 3 + 2];
+        dac[sel_color * 3 + 2] = dac[cur_color * 3 + 2];
+        dac[cur_color * 3 + 2] = temp_byte;
         find_colors();
         refresh_dialog();
-        wrectangle(v.ptr, w, h, c0, (SelColor % 16) * 8 + 1, (SelColor / 16) * 8 + 9, 9, 9);
-        wrectangle(v.ptr, w, h, c4, (cColor % 16) * 8 + 1, (cColor / 16) * 8 + 9, 9, 9);
+        wrectangle(v.ptr, w, h, c0, (sel_color % 16) * 8 + 1, (sel_color / 16) * 8 + 9, 9, 9);
+        wrectangle(v.ptr, w, h, c4, (cur_color % 16) * 8 + 1, (cur_color / 16) * 8 + 9, 9, 9);
         set_dac(dac);
         break;
       }
-      wbox(v.ptr, w, h, SelColor, (SelColor % 16) * 8 + 4, (SelColor / 16) * 8 + 12, 3, 3);
-      SelColor = cColor;
-      if (dac[SelColor * 3] * dac[SelColor * 3 + 1] * dac[SelColor * 3 + 2] < (32 * 32 * 32))
-        wbox(v.ptr, w, h, c4, (SelColor % 16) * 8 + 4, (SelColor / 16) * 8 + 12, 3, 3);
+      wbox(v.ptr, w, h, sel_color, (sel_color % 16) * 8 + 4, (sel_color / 16) * 8 + 12, 3, 3);
+      sel_color = cur_color;
+      if (dac[sel_color * 3] * dac[sel_color * 3 + 1] * dac[sel_color * 3 + 2] < (32 * 32 * 32))
+        wbox(v.ptr, w, h, c4, (sel_color % 16) * 8 + 4, (sel_color / 16) * 8 + 12, 3, 3);
       else
-        wbox(v.ptr, w, h, c0, (SelColor % 16) * 8 + 4, (SelColor / 16) * 8 + 12, 3, 3);
-      if (Accion) {
-        Degradar = 0;
-        Copiar = 0;
-        Intercambiar = 0;
-        Accion = 0;
+        wbox(v.ptr, w, h, c0, (sel_color % 16) * 8 + 4, (sel_color / 16) * 8 + 12, 3, 3);
+      if (action) {
+        gradient_flag = 0;
+        copy_flag = 0;
+        swap_flag = 0;
+        action = 0;
         call((void_return_type_t)v.paint_handler);
       }
       v.redraw = 1;
     }
   } else {
-    if (OldColor != SelColor) {
-      wrectangle(v.ptr, w, h, c0, (OldColor % 16) * 8 + 1, (OldColor / 16) * 8 + 9, 9, 9);
-      wrectangle(v.ptr, w, h, c4, (SelColor % 16) * 8 + 1, (SelColor / 16) * 8 + 9, 9, 9);
-      wbox(v.ptr, w, h, SelColor, 133, 27, 29, 42 - 29);
-      OldColor = SelColor;
+    if (old_color != sel_color) {
+      wrectangle(v.ptr, w, h, c0, (old_color % 16) * 8 + 1, (old_color / 16) * 8 + 9, 9, 9);
+      wrectangle(v.ptr, w, h, c4, (sel_color % 16) * 8 + 1, (sel_color / 16) * 8 + 9, 9, 9);
+      wbox(v.ptr, w, h, sel_color, 133, 27, 29, 42 - 29);
+      old_color = sel_color;
 
       wbox(v.ptr, w, h, c2, 130, 11, 29, 15);
       wwrite(v.ptr, w, h, 147, 11, 0, texts[141], c3);
-      div_snprintf(cWork, sizeof(cWork), "%03d", SelColor);
-      wwrite(v.ptr, w, h, 145, 11, 2, (byte *)cWork, c3);
+      div_snprintf(work_buf, sizeof(work_buf), "%03d", sel_color);
+      wwrite(v.ptr, w, h, 145, 11, 2, (byte *)work_buf, c3);
       wwrite(v.ptr, w, h, 147, 19, 0, texts[142], c3);
-      div_snprintf(cWork, sizeof(cWork), " %02X", SelColor);
-      wwrite(v.ptr, w, h, 145, 19, 2, (byte *)cWork, c3);
+      div_snprintf(work_buf, sizeof(work_buf), " %02X", sel_color);
+      wwrite(v.ptr, w, h, 145, 19, 2, (byte *)work_buf, c3);
       wbox(v.ptr, w, h, c2, 130, 63 - 21, 25, 20);
 
       wwrite(v.ptr, w, h, 147, 63 - 21, 0, texts[143], c3);
-      div_snprintf(cWork, sizeof(cWork), "%02d", dac[SelColor * 3]);
-      wwrite(v.ptr, w, h, 140, 63 - 21, 2, (byte *)cWork, c3);
+      div_snprintf(work_buf, sizeof(work_buf), "%02d", dac[sel_color * 3]);
+      wwrite(v.ptr, w, h, 140, 63 - 21, 2, (byte *)work_buf, c3);
       wwrite(v.ptr, w, h, 147, 63 - 14, 0, texts[144], c3);
-      div_snprintf(cWork, sizeof(cWork), "%02d", dac[SelColor * 3 + 1]);
-      wwrite(v.ptr, w, h, 140, 63 - 14, 2, (byte *)cWork, c3);
+      div_snprintf(work_buf, sizeof(work_buf), "%02d", dac[sel_color * 3 + 1]);
+      wwrite(v.ptr, w, h, 140, 63 - 14, 2, (byte *)work_buf, c3);
       wwrite(v.ptr, w, h, 147, 63 - 7, 0, texts[145], c3);
-      div_snprintf(cWork, sizeof(cWork), "%02d", dac[SelColor * 3 + 2]);
-      wwrite(v.ptr, w, h, 140, 63 - 7, 2, (byte *)cWork, c3);
-      lRed.first_visible = 63 - dac[SelColor * 3];
-      lGre.first_visible = 63 - dac[SelColor * 3 + 1];
-      lBlu.first_visible = 63 - dac[SelColor * 3 + 2];
-      wbox(v.ptr, w, h, SelColor, 133, 27, 29, 42 - 29);
+      div_snprintf(work_buf, sizeof(work_buf), "%02d", dac[sel_color * 3 + 2]);
+      wwrite(v.ptr, w, h, 140, 63 - 7, 2, (byte *)work_buf, c3);
+      l_red.first_visible = 63 - dac[sel_color * 3];
+      l_green.first_visible = 63 - dac[sel_color * 3 + 1];
+      l_blue.first_visible = 63 - dac[sel_color * 3 + 2];
+      wbox(v.ptr, w, h, sel_color, 133, 27, 29, 42 - 29);
       v.redraw = 1;
     }
   }
 
   //Scrollbars
-  if (lRed.zone != sRed) {
-    sRed = lRed.zone;
+  if (l_red.zone != sRed) {
+    sRed = l_red.zone;
     v.redraw = 1;
   }
-  if (lGre.zone != sGre) {
-    sGre = lGre.zone;
+  if (l_green.zone != sGre) {
+    sGre = l_green.zone;
     v.redraw = 1;
   }
-  if (lBlu.zone != sBlu) {
-    sBlu = lBlu.zone;
+  if (l_blue.zone != sBlu) {
+    sBlu = l_blue.zone;
     v.redraw = 1;
   }
 
   if ((prev_mouse_buttons & 1) && !(mouse_b & 1)) {
-    Tocado = 0;
-    switch (lRed.zone) {
+    touched = 0;
+    switch (l_red.zone) {
     case 2:
       do {
         read_mouse();
@@ -2145,11 +2145,11 @@ void pal_interpolate2(void) {
       } while (mouse_b);
       /* fall through */
     case 4:
-      dac[SelColor * 3] = 63 - lRed.first_visible;
-      Tocado = 1;
+      dac[sel_color * 3] = 63 - l_red.first_visible;
+      touched = 1;
       break;
     }
-    switch (lGre.zone) {
+    switch (l_green.zone) {
     case 2:
       do {
         read_mouse();
@@ -2161,11 +2161,11 @@ void pal_interpolate2(void) {
       } while (mouse_b);
       /* fall through */
     case 4:
-      dac[SelColor * 3 + 1] = 63 - lGre.first_visible;
-      Tocado = 1;
+      dac[sel_color * 3 + 1] = 63 - l_green.first_visible;
+      touched = 1;
       break;
     }
-    switch (lBlu.zone) {
+    switch (l_blue.zone) {
     case 2:
       do {
         read_mouse();
@@ -2177,19 +2177,19 @@ void pal_interpolate2(void) {
       } while (mouse_b);
       /* fall through */
     case 4:
-      dac[SelColor * 3 + 2] = 63 - lBlu.first_visible;
-      Tocado = 1;
+      dac[sel_color * 3 + 2] = 63 - l_blue.first_visible;
+      touched = 1;
       break;
     }
-    if (Tocado) {
-      Degradar = 0;
-      Copiar = 0;
-      Intercambiar = 0;
-      Accion = 0;
+    if (touched) {
+      gradient_flag = 0;
+      copy_flag = 0;
+      swap_flag = 0;
+      action = 0;
       call((void_return_type_t)v.paint_handler);
-      lRed.first_visible = 63 - dac[SelColor * 3];
-      lGre.first_visible = 63 - dac[SelColor * 3 + 1];
-      lBlu.first_visible = 63 - dac[SelColor * 3 + 2];
+      l_red.first_visible = 63 - dac[sel_color * 3];
+      l_green.first_visible = 63 - dac[sel_color * 3 + 1];
+      l_blue.first_visible = 63 - dac[sel_color * 3 + 2];
       find_colors();
       refresh_dialog();
       set_dac(dac);
@@ -2197,38 +2197,38 @@ void pal_interpolate2(void) {
     }
   }
 
-  if (Degradar && !wDegradar) {
-    if (wIntercambiar)
-      Intercambiar = 0;
-    if (wCopiar)
-      Copiar = 0;
+  if (gradient_flag && !gradient_window) {
+    if (swap_window)
+      swap_flag = 0;
+    if (copy_window)
+      copy_flag = 0;
     call((void_return_type_t)v.paint_handler);
-    Accion = 1;
-  } else if (!Degradar && Accion == 1)
-    Accion = 0;
-  if (Intercambiar && !wIntercambiar) {
-    if (wDegradar)
-      Degradar = 0;
-    if (wCopiar)
-      Copiar = 0;
+    action = 1;
+  } else if (!gradient_flag && action == 1)
+    action = 0;
+  if (swap_flag && !swap_window) {
+    if (gradient_window)
+      gradient_flag = 0;
+    if (copy_window)
+      copy_flag = 0;
     call((void_return_type_t)v.paint_handler);
-    Accion = 2;
-  } else if (!Intercambiar && Accion == 2)
-    Accion = 0;
+    action = 2;
+  } else if (!swap_flag && action == 2)
+    action = 0;
 
-  if (Copiar && !wCopiar) {
-    if (wDegradar)
-      Degradar = 0;
-    if (wIntercambiar)
-      Intercambiar = 0;
-    Accion = 3;
+  if (copy_flag && !copy_window) {
+    if (gradient_window)
+      gradient_flag = 0;
+    if (swap_window)
+      swap_flag = 0;
+    action = 3;
     call((void_return_type_t)v.paint_handler);
-  } else if (!Copiar && Accion == 3)
-    Accion = 0;
+  } else if (!copy_flag && action == 3)
+    action = 0;
 
   switch (v.active_item) {
   case 0:
-    Retorno = 1;
+    return_value = 1;
     end_dialog = 1;
     break;
   case 1:
@@ -2241,10 +2241,10 @@ void pal_interpolate2(void) {
     find_colors();
     refresh_dialog();
     set_dac(dac);
-    Degradar = 0;
-    Copiar = 0;
-    Intercambiar = 0;
-    Accion = 0;
+    gradient_flag = 0;
+    copy_flag = 0;
+    swap_flag = 0;
+    action = 0;
     call((void_return_type_t)v.paint_handler);
 
     draw_button(4, w / 2, h - 13, 1, c0);
@@ -2252,24 +2252,24 @@ void pal_interpolate2(void) {
     //Refresh values and scrollbars
     wbox(v.ptr, w, h, c2, 130, 63 - 21, 25, 20);
     wwrite(v.ptr, w, h, 147, 63 - 21, 0, texts[143], c3);
-    div_snprintf(cWork, sizeof(cWork), "%02d", dac[SelColor * 3]);
-    wwrite(v.ptr, w, h, 140, 63 - 21, 2, (byte *)cWork, c3);
+    div_snprintf(work_buf, sizeof(work_buf), "%02d", dac[sel_color * 3]);
+    wwrite(v.ptr, w, h, 140, 63 - 21, 2, (byte *)work_buf, c3);
     wwrite(v.ptr, w, h, 147, 63 - 14, 0, texts[144], c3);
-    div_snprintf(cWork, sizeof(cWork), "%02d", dac[SelColor * 3 + 1]);
-    wwrite(v.ptr, w, h, 140, 63 - 14, 2, (byte *)cWork, c3);
+    div_snprintf(work_buf, sizeof(work_buf), "%02d", dac[sel_color * 3 + 1]);
+    wwrite(v.ptr, w, h, 140, 63 - 14, 2, (byte *)work_buf, c3);
     wwrite(v.ptr, w, h, 147, 63 - 7, 0, texts[145], c3);
-    div_snprintf(cWork, sizeof(cWork), "%02d", dac[SelColor * 3 + 2]);
-    wwrite(v.ptr, w, h, 140, 63 - 7, 2, (byte *)cWork, c3);
-    lRed.first_visible = 63 - dac[SelColor * 3];
-    lGre.first_visible = 63 - dac[SelColor * 3 + 1];
-    lBlu.first_visible = 63 - dac[SelColor * 3 + 2];
+    div_snprintf(work_buf, sizeof(work_buf), "%02d", dac[sel_color * 3 + 2]);
+    wwrite(v.ptr, w, h, 140, 63 - 7, 2, (byte *)work_buf, c3);
+    l_red.first_visible = 63 - dac[sel_color * 3];
+    l_green.first_visible = 63 - dac[sel_color * 3 + 1];
+    l_blue.first_visible = 63 - dac[sel_color * 3 + 2];
 
     v.redraw = 1;
     break;
   }
-  wDegradar = Degradar;
-  wIntercambiar = Intercambiar;
-  wCopiar = Copiar;
+  gradient_window = gradient_flag;
+  swap_window = swap_flag;
+  copy_window = copy_flag;
 }
 
 void pal_interpolate0(void) {
@@ -2284,9 +2284,9 @@ void pal_interpolate0(void) {
   _button(101, v.w - 8, v.h - 14, 2);
   _button(104, v.w / 2, v.h - 14, 1);
 
-  _flag(105, 4, 143, &Degradar);
-  _flag(106, v.w / 2 - (8 * big2 + text_len(texts[106])) / 2, 143, &Intercambiar);
-  _flag(107, (v.w - 5) - (8 * big2 + text_len(texts[107])), 143, &Copiar);
+  _flag(105, 4, 143, &gradient_flag);
+  _flag(106, v.w / 2 - (8 * big2 + text_len(texts[106])) / 2, 143, &swap_flag);
+  _flag(107, (v.w - 5) - (8 * big2 + text_len(texts[107])), 143, &copy_flag);
 }
 
 //-----------------------------------------------------------------------------
@@ -2295,18 +2295,18 @@ void pal_interpolate0(void) {
 
 void pal_edit() {
   int n;
-  byte DacAux[768];
-  Retorno = 0;
-  memcpy(DacAux, dac, 768);
+  byte dac_aux[768];
+  return_value = 0;
+  memcpy(dac_aux, dac, 768);
   memcpy(palette, dac, 768);
   show_dialog(pal_interpolate0);
-  if (!Retorno) {
-    memcpy(dac, DacAux, 768);
+  if (!return_value) {
+    memcpy(dac, dac_aux, 768);
     find_colors();
     set_dac(dac);
   } else {
     for (n = 0; n < 768; n++)
-      if (DacAux[n] != dac[n])
+      if (dac_aux[n] != dac[n])
         break;
     if (n < 768) {
       if (has_maps()) {
@@ -2316,7 +2316,7 @@ void pal_edit() {
       } else
         v_accept = 1;
       memcpy(dac4, dac, 768);
-      memcpy(dac, DacAux, 768);
+      memcpy(dac, dac_aux, 768);
       if (v_accept)
         pal_refresh(0, 1);
       else

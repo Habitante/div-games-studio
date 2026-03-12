@@ -223,7 +223,7 @@ char frame_count_str[4];
 char cexp_ancho[5];
 char cexp_alto[5];
 char cper_points[5];
-int exp_Color0 = -1, exp_Color1 = -1, exp_Color2 = -1;
+int exp_color0 = -1, exp_color1 = -1, exp_color2 = -1;
 int type_a = 1, type_b = 0, type_c = 0;
 int old_type_a = 1, old_type_b = 0, old_type_c = 0;
 
@@ -245,7 +245,7 @@ void explode_dialog1(void) {
     wbox(v.ptr, w, h, exp_colores[x * 2], w - 69 + x, 18 + 1, 1, 9);
 }
 
-void Selcolor0();
+void selcolor0();
 extern int sel_color_font;
 extern int sel_color_ok;
 
@@ -333,12 +333,12 @@ void explode_dialog0(void) {
   _button(100, 7, v.h - 14, 0);
   _button(101, v.w - 8, v.h - 14, 2);
   type_a = type_b = type_c = old_type_a = old_type_b = old_type_c = 0;
-  if (exp_Color0 == -1)
-    exp_Color0 = c4;
-  if (exp_Color1 == -1)
-    exp_Color1 = c2;
-  if (exp_Color2 == -1)
-    exp_Color2 = c0;
+  if (exp_color0 == -1)
+    exp_color0 = c4;
+  if (exp_color1 == -1)
+    exp_color1 = c2;
+  if (exp_color2 == -1)
+    exp_color2 = c0;
   switch (exp_type) {
   case 0:
     type_a = old_type_a = 1;

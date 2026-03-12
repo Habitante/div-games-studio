@@ -10,7 +10,7 @@
 #include "div_string.h"
 #include "ifs.h"
 
-void Selcolor0(void);
+void selcolor0(void);
 void GenFont0(void);
 int font_generated = 0;
 void get_text0(void);
@@ -20,11 +20,11 @@ void create_test_text(char *s, char flags);
 char fontsizes[8 * 8] = "8x8\0    10x10\0  12x12\0  14x14\0  16x16\0  32x32\0  64x64\0  128x128";
 int fontTamanos[8] = {8, 10, 12, 14, 16, 32, 64, 128};
 struct t_listbox lfontsizes = {116, 12, fontsizes, 8, 4, 41};
-void Preview();
-void Preview20();
+void preview();
+void preview20();
 void get_font();
 void get_ifs();
-int create_font(int GenCode);
+int create_font(int gen_code);
 
 int text1_w = 1;
 int text1_h = 1;
@@ -38,9 +38,9 @@ int text3_w = 1;
 int text3_h = 1;
 int Text3Col = 0;
 char *Text3;
-char *Text01 = NULL;
-char *Text02 = NULL;
-char *Text03 = NULL;
+char *text01 = NULL;
+char *text02 = NULL;
+char *text03 = NULL;
 char Load_FontPathName[256];
 char Load_FontName[14];
 
@@ -59,7 +59,7 @@ int outline_dir = 0;
 int highlight_dir[5] = {0, 1, 3, 2, 4};
 int shadow_x = 0;
 int shadow_y = 0;
-int Mosaico1 = 0, Mosaico2 = 0, Mosaico3 = 0;
+int mosaic1 = 0, mosaic2 = 0, mosaic3 = 0;
 char char_table[256];
 char cCharsToPrint[128];
 
@@ -91,7 +91,7 @@ void pal_show_text() {
   v.redraw = 1;
 }
 
-void Fonts1(void) {
+void fonts1(void) {
   int w = v.w / big2, h = v.h / big2;
   char cWork[10];
   _show_items();
@@ -141,7 +141,7 @@ void close_old_fnt(void) {
     }
 }
 
-void Fonts2(void) {
+void fonts2(void) {
   int w = v.w / big2, h = v.h / big2, x, y, tal = 24, tan = 41;
   float px, py;
   char cWork[10];
@@ -234,7 +234,7 @@ void Fonts2(void) {
       show_dialog(err0);
       break;
     }
-    Preview();
+    preview();
     v.redraw = 1;
     break;
   case 14:
@@ -269,7 +269,7 @@ void Fonts2(void) {
     if ((wmouse_x > 64) && (wmouse_x < 64 + 41)) {
       _reselect_item();
       sel_color_font = Text1Col;
-      show_dialog(Selcolor0);
+      show_dialog(selcolor0);
       if (sel_color_ok) {
         Text1Col = sel_color_font;
         memset(Text1, Text1Col, tan * tal + tan);
@@ -277,9 +277,9 @@ void Fonts2(void) {
         text1_h = 1;
         pal_show_text();
         wmouse_x = -1;
-        if (Text01 != NULL) {
-          free(Text01);
-          Text01 = NULL;
+        if (text01 != NULL) {
+          free(text01);
+          text01 = NULL;
         }
       }
       return;
@@ -287,7 +287,7 @@ void Fonts2(void) {
     if ((wmouse_x > 124) && (wmouse_x < 124 + 41)) {
       _reselect_item();
       sel_color_font = Text2Col;
-      show_dialog(Selcolor0);
+      show_dialog(selcolor0);
       if (sel_color_ok) {
         Text2Col = sel_color_font;
         memset(Text2, Text2Col, tan * tal + tan);
@@ -295,9 +295,9 @@ void Fonts2(void) {
         text2_h = 1;
         pal_show_text();
         wmouse_x = -1;
-        if (Text02 != NULL) {
-          free(Text02);
-          Text02 = NULL;
+        if (text02 != NULL) {
+          free(text02);
+          text02 = NULL;
         }
       }
       return;
@@ -305,7 +305,7 @@ void Fonts2(void) {
     if ((wmouse_x > 4) && (wmouse_x < 4 + 41)) {
       _reselect_item();
       sel_color_font = Text3Col;
-      show_dialog(Selcolor0);
+      show_dialog(selcolor0);
       if (sel_color_ok) {
         Text3Col = sel_color_font;
         memset(Text3, Text3Col, tan * tal + tan);
@@ -313,9 +313,9 @@ void Fonts2(void) {
         text3_h = 1;
         pal_show_text();
         wmouse_x = -1;
-        if (Text03 != NULL) {
-          free(Text03);
-          Text03 = NULL;
+        if (text03 != NULL) {
+          free(text03);
+          text03 = NULL;
         }
       }
       return;
@@ -329,10 +329,10 @@ void Fonts2(void) {
       if ((wmouse_x > 64) && (wmouse_x < 64 + 41)) {
         if (Text1Col == 0)
           Text1Col = 1;
-        if (Text01 != NULL)
-          free(Text01);
-        Text01 = (char *)malloc(window[1].mapa->map_width * window[1].mapa->map_height);
-        if (Text01 == NULL) {
+        if (text01 != NULL)
+          free(text01);
+        text01 = (char *)malloc(window[1].mapa->map_width * window[1].mapa->map_height);
+        if (text01 == NULL) {
           v_text = (char *)texts[45];
           show_dialog(err0);
           text1_w = 1;
@@ -340,7 +340,7 @@ void Fonts2(void) {
         } else {
           text1_w = window[1].mapa->map_width;
           text1_h = window[1].mapa->map_height;
-          memcpy(Text01, window[1].mapa->map, text1_w * text1_h);
+          memcpy(text01, window[1].mapa->map, text1_w * text1_h);
           x = 0;
           y = 0;
           for (py = 0; py < window[1].mapa->map_height;
@@ -358,10 +358,10 @@ void Fonts2(void) {
       if ((wmouse_x > 124) && (wmouse_x < 124 + 41)) {
         if (Text2Col == 0)
           Text2Col = 1;
-        if (Text02 != NULL)
-          free(Text02);
-        Text02 = (char *)malloc(window[1].mapa->map_width * window[1].mapa->map_height);
-        if (Text02 == NULL) {
+        if (text02 != NULL)
+          free(text02);
+        text02 = (char *)malloc(window[1].mapa->map_width * window[1].mapa->map_height);
+        if (text02 == NULL) {
           v_text = (char *)texts[45];
           show_dialog(err0);
           text2_w = 1;
@@ -369,7 +369,7 @@ void Fonts2(void) {
         } else {
           text2_w = window[1].mapa->map_width;
           text2_h = window[1].mapa->map_height;
-          memcpy(Text02, window[1].mapa->map, text2_w * text2_h);
+          memcpy(text02, window[1].mapa->map, text2_w * text2_h);
           x = 0;
           y = 0;
           for (py = 0; py < window[1].mapa->map_height;
@@ -387,10 +387,10 @@ void Fonts2(void) {
       if ((wmouse_x > 4) && (wmouse_x < 4 + 41)) {
         if (Text3Col == 0)
           Text3Col = 1;
-        if (Text03 != NULL)
-          free(Text03);
-        Text03 = (char *)malloc(window[1].mapa->map_width * window[1].mapa->map_height);
-        if (Text03 == NULL) {
+        if (text03 != NULL)
+          free(text03);
+        text03 = (char *)malloc(window[1].mapa->map_width * window[1].mapa->map_height);
+        if (text03 == NULL) {
           v_text = (char *)texts[45];
           show_dialog(err0);
           text3_w = 1;
@@ -398,7 +398,7 @@ void Fonts2(void) {
         } else {
           text3_w = window[1].mapa->map_width;
           text3_h = window[1].mapa->map_height;
-          memcpy(Text03, window[1].mapa->map, text3_w * text3_h);
+          memcpy(text03, window[1].mapa->map, text3_w * text3_h);
           x = 0;
           y = 0;
           for (py = 0; py < window[1].mapa->map_height;
@@ -428,20 +428,20 @@ void Fonts2(void) {
   }
 }
 int FontsWindowInUse = 0;
-void Fonts3(void) {
+void fonts3(void) {
   FontsWindowInUse = 0;
   if (Text1 != NULL)
-    free(Text01);
+    free(text01);
   if (Text2 != NULL)
-    free(Text02);
+    free(text02);
   if (Text3 != NULL)
-    free(Text03);
+    free(text03);
   free(Text1);
   free(Text2);
   free(Text3);
 }
 
-void Fonts0(void) {
+void fonts0(void) {
   int tal = 24, tan = 41;
   FILE *f;
 
@@ -454,9 +454,9 @@ void Fonts0(void) {
   v.type = 102;
   v.w = 169;
   v.h = 179 - 17;
-  v.paint_handler = Fonts1;
-  v.click_handler = Fonts2;
-  v.close_handler = Fonts3;
+  v.paint_handler = fonts1;
+  v.click_handler = fonts2;
+  v.close_handler = fonts3;
   v.title = texts[83];
   v.name = texts[83];
   lfontsizes.created = 0;
@@ -503,9 +503,9 @@ void Fonts0(void) {
   outline_dir = 0;
   shadow_x = 0;
   shadow_y = 0;
-  Mosaico1 = 0;
-  Mosaico2 = 0;
-  Mosaico3 = 0;
+  mosaic1 = 0;
+  mosaic2 = 0;
+  mosaic3 = 0;
 
   DIV_STRCPY(FontName, (char *)texts[90]);
   DIV_STRCPY(FontPathName, file_types[5].path);
@@ -556,19 +556,19 @@ void Fonts0(void) {
   _button(120, 7, v.h - 14, 0);       //13
   _button(119, v.w - 8, v.h - 14, 2); //12
 
-  _flag(112, 64, 112, &Mosaico1);
-  _flag(112, 124, 112, &Mosaico2);
-  _flag(112, 4, 112, &Mosaico3);
+  _flag(112, 64, 112, &mosaic1);
+  _flag(112, 124, 112, &mosaic2);
+  _flag(112, 4, 112, &mosaic3);
 }
 
 void open_gen_font() {
   if (!FontsWindowInUse) {
     FontsWindowInUse = 1;
-    new_window(Fonts0);
+    new_window(fonts0);
   }
 }
 
-int create_font(int GenCode) {
+int create_font(int gen_code) {
   int x;
   byte _c0;
   FILE *file;
@@ -579,37 +579,37 @@ int create_font(int GenCode) {
     return 0;
   } else
     fclose(file);
-  if (GenCode != 255) {
+  if (gen_code != 255) {
     for (x = 0; x < 256; x++)
       char_table[x] = 0;
 
-    if (GenCode & NUM)
+    if (gen_code & NUM)
       for (x = '0'; x < '9' + 1; x++)
         char_table[x] = 1;
 
-    if (GenCode & MAY)
+    if (gen_code & MAY)
       for (x = 'A'; x < 'Z' + 1; x++)
         char_table[x] = 1;
 
-    if (GenCode & MIN)
+    if (gen_code & MIN)
       for (x = 'a'; x < 'z' + 1; x++)
         char_table[x] = 1;
-    if (GenCode & SIM)
+    if (gen_code & SIM)
       for (x = 32; x < '0'; x++)
         char_table[x] = 1;
-    if (GenCode & SIM)
+    if (gen_code & SIM)
       for (x = '9' + 1; x < 'A'; x++)
         char_table[x] = 1;
-    if (GenCode & SIM)
+    if (gen_code & SIM)
       for (x = 'Z' + 1; x < 'a'; x++)
         char_table[x] = 1;
-    if (GenCode & SIM)
+    if (gen_code & SIM)
       for (x = 'z' + 1; x < 128; x++)
         char_table[x] = 1;
-    if (GenCode & EXT)
+    if (gen_code & EXT)
       for (x = 0; x < 32; x++)
         char_table[x] = 1;
-    if (GenCode & EXT)
+    if (gen_code & EXT)
       for (x = 128; x < 256; x++)
         char_table[x] = 1;
   }
@@ -630,17 +630,17 @@ int create_font(int GenCode) {
   ifs.body_tex_w = text3_w;
   ifs.body_tex_h = text3_h;
   ifs.body_tex_color = Text3Col;
-  ifs.body_tex_mode = !Mosaico3;
+  ifs.body_tex_mode = !mosaic3;
 
   ifs.shadow_tex_w = text2_w;
   ifs.shadow_tex_h = text2_h;
   ifs.shadow_tex_color = Text2Col;
-  ifs.shadow_tex_mode = !Mosaico2;
+  ifs.shadow_tex_mode = !mosaic2;
 
   ifs.outline_tex_w = text1_w;
   ifs.outline_tex_h = text1_h;
   ifs.outline_tex_color = Text1Col;
-  ifs.outline_tex_mode = !Mosaico1;
+  ifs.outline_tex_mode = !mosaic1;
 
   memcpy(ifs.table, char_table, 256);
 
@@ -661,10 +661,10 @@ int create_font(int GenCode) {
       ifs.shadows[x] = _c0;
   }
 
-  body_tex_buffer = Text03;
-  shadow_tex_buffer = Text02;
-  out_tex_buffer = Text01;
-  if (jorge_create_font(GenCode)) {
+  body_tex_buffer = text03;
+  shadow_tex_buffer = text02;
+  out_tex_buffer = text01;
+  if (jorge_create_font(gen_code)) {
     v_text = (char *)texts[45];
     show_dialog(err0);
     return 0;
@@ -705,9 +705,9 @@ void get_font() {
 
 //-----------------------------------------------------------------------------
 
-#define max_archivos 512 // ------------------------------- File listbox
+#define MAX_FILES 512 // ------------------------------- File listbox
 extern struct t_listboxbr file_list_br;
-extern t_thumb thumb[max_archivos];
+extern t_thumb thumb[MAX_FILES];
 extern int num_taggeds;
 
 void get_ifs() {
@@ -759,10 +759,10 @@ void get_ifs() {
 
 //-----------------------------------------------------------------------------
 
-byte OldColor;
+byte font_old_color;
 byte PrevColor;
 
-void Selcolor1(void) {
+void selcolor1(void) {
   int x, y;
   int w = v.w / big2, h = v.h / big2;
 
@@ -778,12 +778,12 @@ void Selcolor1(void) {
     wbox(v.ptr, w, h, c4, (sel_color_font % 16) * 8 + 4, (sel_color_font / 16) * 8 + 12, 3, 3);
   else
     wbox(v.ptr, w, h, c0, (sel_color_font % 16) * 8 + 4, (sel_color_font / 16) * 8 + 12, 3, 3);
-  PrevColor = OldColor = sel_color_font;
+  PrevColor = font_old_color = sel_color_font;
 }
 
-void Selcolor2(void) {
+void selcolor2(void) {
   int w = v.w / big2, h = v.h / big2;
-  byte cColor;
+  byte cur_color;
 
   _process_items();
   switch (v.active_item) {
@@ -798,18 +798,18 @@ void Selcolor2(void) {
   }
 
   if ((wmouse_y > 10) && (wmouse_y < 138) && (wmouse_x > 2) && (wmouse_x < 130)) {
-    cColor = ((wmouse_y - 10) / 8) * 16 + ((wmouse_x - 2) / 8);
-    if (cColor != OldColor) {
-      wrectangle(v.ptr, w, h, c0, (OldColor % 16) * 8 + 1, (OldColor / 16) * 8 + 9, 9, 9);
-      wrectangle(v.ptr, w, h, c4, (cColor % 16) * 8 + 1, (cColor / 16) * 8 + 9, 9, 9);
+    cur_color = ((wmouse_y - 10) / 8) * 16 + ((wmouse_x - 2) / 8);
+    if (cur_color != font_old_color) {
+      wrectangle(v.ptr, w, h, c0, (font_old_color % 16) * 8 + 1, (font_old_color / 16) * 8 + 9, 9, 9);
+      wrectangle(v.ptr, w, h, c4, (cur_color % 16) * 8 + 1, (cur_color / 16) * 8 + 9, 9, 9);
       v.redraw = 1;
-      OldColor = cColor;
+      font_old_color = cur_color;
     }
     if (mouse_b) {
-      if (sel_color_font != cColor) {
+      if (sel_color_font != cur_color) {
         wbox(v.ptr, w, h, sel_color_font, (sel_color_font % 16) * 8 + 4,
              (sel_color_font / 16) * 8 + 12, 3, 3);
-        sel_color_font = cColor;
+        sel_color_font = cur_color;
         if (dac[sel_color_font * 3] + dac[sel_color_font * 3 + 1] + dac[sel_color_font * 3 + 2] <
             (32 + 32 + 32))
           wbox(v.ptr, w, h, c4, (sel_color_font % 16) * 8 + 4, (sel_color_font / 16) * 8 + 12, 3,
@@ -821,33 +821,33 @@ void Selcolor2(void) {
       }
     }
   } else {
-    wrectangle(v.ptr, w, h, c0, (OldColor % 16) * 8 + 1, (OldColor / 16) * 8 + 9, 9, 9);
+    wrectangle(v.ptr, w, h, c0, (font_old_color % 16) * 8 + 1, (font_old_color / 16) * 8 + 9, 9, 9);
     wrectangle(v.ptr, w, h, c4, (sel_color_font % 16) * 8 + 1, (sel_color_font / 16) * 8 + 9, 9, 9);
-    OldColor = sel_color_font;
+    font_old_color = sel_color_font;
     v.redraw = 1;
   }
 }
 
-void Selcolor3(void) {
+void selcolor3(void) {
   if (!sel_color_ok)
     sel_color_font = PrevColor;
 }
 
-void Selcolor0(void) {
+void selcolor0(void) {
   v.type = 1; // Dialog
   v.w = 131;
   v.h = 157;
   v.title = texts[78];
-  v.paint_handler = Selcolor1;
-  v.click_handler = Selcolor2;
-  v.close_handler = Selcolor3;
+  v.paint_handler = selcolor1;
+  v.click_handler = selcolor2;
+  v.close_handler = selcolor3;
   _button(100, 7, v.h - 14, 0);
   _button(101, v.w - 8, v.h - 14, 2);
 }
 
 int text_height = 0, text_width = 0;
 
-void Preview1() {
+void preview1() {
   int can = v.w, cal = v.h;
   byte *ptr = v.ptr;
   int init = 0, x, y, len;
@@ -895,14 +895,14 @@ void Preview1() {
   free(MyBuffer);
 }
 
-void Preview2() {
+void preview2() {
   _process_items();
   if (v.active_item == 0)
     end_dialog = 1;
 }
 
-void Preview0() {
-  int x, fan, _fal = 0, fal, cnt, TX, TY;
+void preview0() {
+  int x, fan, _fal = 0, fal, cnt, text_x, text_y;
 
   text_width = 0;
   text_height = 0;
@@ -936,29 +936,29 @@ void Preview0() {
 
   v.type = 1; // Dialog
   if (big) {
-    TX = text_width / 2;
-    TY = text_height / 2;
+    text_x = text_width / 2;
+    text_y = text_height / 2;
   } else {
-    TX = text_width;
-    TY = text_height;
+    text_x = text_width;
+    text_y = text_height;
   }
-  v.w = TX + 6;
+  v.w = text_x + 6;
   if (v.w < 60)
     v.w = 60;
   if (v.w > 320)
     v.w = 320;
-  v.h = TY + 32;
+  v.h = text_y + 32;
   if (v.h < 32)
     v.h = 32;
   if (v.h > 200)
     v.h = 200;
-  v.paint_handler = Preview1;
-  v.click_handler = Preview2;
+  v.paint_handler = preview1;
+  v.click_handler = preview2;
   v.title = texts[80];
   _button(100, v.w / 2, v.h - 14, 1);
 }
 
-void Preview() {
+void preview() {
   int x;
   char saved_font_path[256];
   char saved_char_table[256];
@@ -976,14 +976,14 @@ void Preview() {
 
   if (!create_font(255))
     return;
-  show_dialog(Preview0);
+  show_dialog(preview0);
   delete_file("PREVIEW.FNT");
 
   memcpy(char_table, saved_char_table, 256);
   DIV_STRCPY(FontPathName, saved_font_path);
 }
 
-void Preview_2() {
+void preview_2() {
   int x;
   char saved_font_path[256];
   char saved_char_table[256];
@@ -996,13 +996,13 @@ void Preview_2() {
   memset(char_table, 0, 256);
   for (x = 0; x < strlen(test_string2); x++)
     char_table[test_string2[x]] = 1;
-  show_dialog(Preview20);
+  show_dialog(preview20);
 
   memcpy(char_table, saved_char_table, 256);
   DIV_STRCPY(FontPathName, saved_font_path);
 }
 
-int GenFontbotones[5] = {1, 1, 1, 1, 0};
+int gen_font_buttons[5] = {1, 1, 1, 1, 0};
 int GenFontLe = 0;
 void GenFont1(void) {
   int w = v.w / big2, h = v.h / big2;
@@ -1054,19 +1054,19 @@ void GenFont2(void) {
   }
 }
 void GenFont3(void) {
-  int GenCode = 0;
+  int gen_code = 0;
   if (GenFontRet) {
-    if (GenFontbotones[0])
-      GenCode += NUM;
-    if (GenFontbotones[1])
-      GenCode += MAY;
-    if (GenFontbotones[2])
-      GenCode += MIN;
-    if (GenFontbotones[3])
-      GenCode += SIM;
-    if (GenFontbotones[4])
-      GenCode += EXT;
-    font_generated = create_font(GenCode);
+    if (gen_font_buttons[0])
+      gen_code += NUM;
+    if (gen_font_buttons[1])
+      gen_code += MAY;
+    if (gen_font_buttons[2])
+      gen_code += MIN;
+    if (gen_font_buttons[3])
+      gen_code += SIM;
+    if (gen_font_buttons[4])
+      gen_code += EXT;
+    font_generated = create_font(gen_code);
   }
 }
 void GenFont0(void) {
@@ -1078,16 +1078,16 @@ void GenFont0(void) {
   v.click_handler = GenFont2;
   v.close_handler = GenFont3;
 
-  _flag(114, 82, 15, &GenFontbotones[0]);
-  _flag(115, 82, 29, &GenFontbotones[1]);
-  _flag(116, 82, 43, &GenFontbotones[2]);
-  _flag(117, 82, 57, &GenFontbotones[3]);
-  _flag(118, 82, 71, &GenFontbotones[4]);
+  _flag(114, 82, 15, &gen_font_buttons[0]);
+  _flag(115, 82, 29, &gen_font_buttons[1]);
+  _flag(116, 82, 43, &gen_font_buttons[2]);
+  _flag(117, 82, 57, &gen_font_buttons[3]);
+  _flag(118, 82, 71, &gen_font_buttons[4]);
   _button(100, 7, v.h - 14, 0);
   _button(101, v.w - 8, v.h - 14, 2);
   GenFontRet = 0;
 }
-void Preview21() {
+void preview21() {
   int can = v.w, cal = v.h;
   byte *ptr = v.ptr;
   int init, x, y, len;
@@ -1137,14 +1137,14 @@ void Preview21() {
 }
 
 
-void Preview22() {
+void preview22() {
   _process_items();
   if (v.active_item == 0)
     end_dialog = 1;
 }
 
-void Preview20() {
-  int x, fan, _fal = 0, fal, cnt, TX, TY;
+void preview20() {
+  int x, fan, _fal = 0, fal, cnt, text_x, text_y;
 
   text_width = 0;
   text_height = 0;
@@ -1180,24 +1180,24 @@ void Preview20() {
   v.type = 1; // Dialog
 
   if (big) {
-    TX = text_width / 2;
-    TY = text_height / 2;
+    text_x = text_width / 2;
+    text_y = text_height / 2;
   } else {
-    TX = text_width;
-    TY = text_height;
+    text_x = text_width;
+    text_y = text_height;
   }
-  v.w = TX + 6;
+  v.w = text_x + 6;
   if (v.w < 60)
     v.w = 60;
   if (v.w > 320)
     v.w = 320;
-  v.h = TY + 32;
+  v.h = text_y + 32;
   if (v.h < 32)
     v.h = 32;
   if (v.h > 200)
     v.h = 200;
-  v.paint_handler = Preview21;
-  v.click_handler = Preview22;
+  v.paint_handler = preview21;
+  v.click_handler = preview22;
   v.title = texts[98];
   _button(100, v.w / 2, v.h - 14, 1);
 }
@@ -1394,28 +1394,28 @@ void show_font1(void) {
   free(temp);
 }
 
-void ShowFont2(void) {
+void show_font2(void) {
   if (!(mouse_b & 1) && (prev_mouse_buttons & 1) && wmouse_x != -1) {
     prev_mouse_buttons = 0;
     font_aux = (char *)v.aux + RES_FOR_NAME;
-    Preview_2();
+    preview_2();
   }
 }
 
-void ShowFont3(void) {
+void show_font3(void) {
   free(v.aux);
 }
 
 void show_font0(void) {
   FILE *file;
-  int Length;
+  int length;
   v.type = 104;
   v.w = 105;
   v.h = 44;
 
   v.paint_handler = show_font1;
-  v.click_handler = ShowFont2;
-  v.close_handler = ShowFont3;
+  v.click_handler = show_font2;
+  v.close_handler = show_font3;
   file = fopen(Load_FontPathName, "rb");
   if (file == NULL) {
     v_text = (char *)texts[43];
@@ -1423,9 +1423,9 @@ void show_font0(void) {
     return;
   }
   fseek(file, 0, SEEK_END);
-  Length = ftell(file);
+  length = ftell(file);
   fseek(file, 0, SEEK_SET);
-  v.aux = (byte *)malloc(Length + RES_FOR_NAME);
+  v.aux = (byte *)malloc(length + RES_FOR_NAME);
   if (v.aux == NULL) {
     v_text = (char *)texts[45];
     show_dialog(err0);
@@ -1437,7 +1437,7 @@ void show_font0(void) {
   memset(v.aux, 0, RES_FOR_NAME);
   memcpy(v.aux, Load_FontName, strlen(Load_FontName));
   memcpy(v.aux + 14, Load_FontPathName, strlen(Load_FontPathName)); //Full path
-  fread(v.aux + RES_FOR_NAME, Length, 1, file);
+  fread(v.aux + RES_FOR_NAME, length, 1, file);
   convert_fnt_to_pal((char *)v.aux + RES_FOR_NAME);
   fclose(file);
   v.title = v.aux;
@@ -1446,7 +1446,7 @@ void show_font0(void) {
 
 void pal_reload_font(int vn, struct twindow *vntn) {
   FILE *file;
-  int Length;
+  int length;
   vn = vn;
   DIV_STRCPY(Load_FontPathName, (char *)vntn->aux + 14);
   DIV_STRCPY(Load_FontName, (char *)vntn->aux);
@@ -1458,9 +1458,9 @@ void pal_reload_font(int vn, struct twindow *vntn) {
     return;
   }
   fseek(file, 0, SEEK_END);
-  Length = ftell(file);
+  length = ftell(file);
   fseek(file, 0, SEEK_SET);
-  vntn->aux = (byte *)malloc(Length + RES_FOR_NAME);
+  vntn->aux = (byte *)malloc(length + RES_FOR_NAME);
   if (vntn->aux == NULL) {
     v_text = (char *)texts[45];
     show_dialog(err0);
@@ -1469,14 +1469,14 @@ void pal_reload_font(int vn, struct twindow *vntn) {
   memset(vntn->aux, 0, RES_FOR_NAME);
   memcpy(vntn->aux, Load_FontName, strlen(Load_FontName));
   memcpy(vntn->aux + 14, Load_FontPathName, strlen(Load_FontPathName)); //Full path
-  fread(vntn->aux + RES_FOR_NAME, Length, 1, file);
+  fread(vntn->aux + RES_FOR_NAME, length, 1, file);
   convert_fnt_to_pal((char *)vntn->aux + RES_FOR_NAME);
   fclose(file);
 }
 
-#define max_archivos 512 // ------------------------------- File listbox
+#define MAX_FILES 512 // ------------------------------- File listbox
 extern struct t_listboxbr file_list_br;
-extern t_thumb thumb[max_archivos];
+extern t_thumb thumb[MAX_FILES];
 extern int num_taggeds;
 
 void open_font(void) {
@@ -1675,23 +1675,23 @@ int Save_Font_session(FILE *file, int n) {
   n += fwrite(&text1_w, 1, 4, file);
   n += fwrite(&text1_h, 1, 4, file);
   n += fwrite(&Text1Col, 1, 4, file);
-  if (!Text01)
-    Text01 = (char *)malloc(text1_w * text1_h);
-  n += fwrite(Text01, 1, text1_w * text1_h, file);
+  if (!text01)
+    text01 = (char *)malloc(text1_w * text1_h);
+  n += fwrite(text01, 1, text1_w * text1_h, file);
 
   n += fwrite(&text2_w, 1, 4, file);
   n += fwrite(&text2_h, 1, 4, file);
   n += fwrite(&Text2Col, 1, 4, file);
-  if (!Text02)
-    Text02 = (char *)malloc(text1_w * text1_h);
-  n += fwrite(Text02, 1, text2_w * text2_h, file);
+  if (!text02)
+    text02 = (char *)malloc(text1_w * text1_h);
+  n += fwrite(text02, 1, text2_w * text2_h, file);
 
   n += fwrite(&text3_w, 1, 4, file);
   n += fwrite(&text3_h, 1, 4, file);
   n += fwrite(&Text3Col, 1, 4, file);
-  if (!Text03)
-    Text03 = (char *)malloc(text1_w * text1_h);
-  n += fwrite(Text03, 1, text3_w * text3_h, file);
+  if (!text03)
+    text03 = (char *)malloc(text1_w * text1_h);
+  n += fwrite(text03, 1, text3_w * text3_h, file);
 
   n += fwrite(&font_height_gen, 1, 4, file);
   n += fwrite(&font_width_gen, 1, 4, file);
@@ -1700,9 +1700,9 @@ int Save_Font_session(FILE *file, int n) {
   n += fwrite(&shadow_x, 1, 4, file);
   n += fwrite(&shadow_y, 1, 4, file);
 
-  n += fwrite(&Mosaico1, 1, 4, file);
-  n += fwrite(&Mosaico2, 1, 4, file);
-  n += fwrite(&Mosaico3, 1, 4, file);
+  n += fwrite(&mosaic1, 1, 4, file);
+  n += fwrite(&mosaic2, 1, 4, file);
+  n += fwrite(&mosaic3, 1, 4, file);
 
   n += fwrite(FontName, 1, 14, file);
   n += fwrite(FontPathName, 1, 256, file);
@@ -1731,9 +1731,9 @@ void Load_Font_session(FILE *file) {
   v.type = 102;
   v.w = 169;
   v.h = 179 - 17;
-  v.paint_handler = Fonts1;
-  v.click_handler = Fonts2;
-  v.close_handler = Fonts3;
+  v.paint_handler = fonts1;
+  v.click_handler = fonts2;
+  v.close_handler = fonts3;
   v.title = texts[83];
   v.name = texts[83];
   lfontsizes.created = 0;
@@ -1750,14 +1750,14 @@ void Load_Font_session(FILE *file) {
     show_dialog(err0);
     return;
   }
-  Text01 = (char *)malloc(text1_w * text1_h);
-  if (Text01 == NULL) {
-    free(Text01);
+  text01 = (char *)malloc(text1_w * text1_h);
+  if (text01 == NULL) {
+    free(text01);
     v_text = (char *)texts[45];
     show_dialog(err0);
     return;
   }
-  fread(Text01, text1_w * text1_h, 1, file);
+  fread(text01, text1_w * text1_h, 1, file);
 
   if (text1_w * text1_h == 1)
     memset(Text1, Text1Col, tan * tal * 10);
@@ -1766,7 +1766,7 @@ void Load_Font_session(FILE *file) {
     for (py = 0; py < text1_h; py += text1_h / (float)tal) {
       x = 0;
       for (px = 0; px < text1_w; px += text1_w / (float)tan)
-        Text1[y * tan + x++] = Text01[(memptrsize)py * text1_w + (memptrsize)px];
+        Text1[y * tan + x++] = text01[(memptrsize)py * text1_w + (memptrsize)px];
       y++;
     }
   }
@@ -1780,19 +1780,19 @@ void Load_Font_session(FILE *file) {
     v_text = (char *)texts[45];
     show_dialog(err0);
     free(Text1);
-    free(Text01);
+    free(text01);
     return;
   }
-  Text02 = (char *)malloc(text2_w * text2_h);
-  if (Text02 == NULL) {
+  text02 = (char *)malloc(text2_w * text2_h);
+  if (text02 == NULL) {
     v_text = (char *)texts[45];
     show_dialog(err0);
     free(Text1);
-    free(Text01);
+    free(text01);
     free(Text2);
     return;
   }
-  fread(Text02, text2_w * text2_h, 1, file);
+  fread(text02, text2_w * text2_h, 1, file);
   if (text2_w * text2_h == 1)
     memset(Text2, Text2Col, tan * tal * 10);
   else {
@@ -1800,7 +1800,7 @@ void Load_Font_session(FILE *file) {
     for (py = 0; py < text2_h; py += text2_h / (float)tal) {
       x = 0;
       for (px = 0; px < text2_w; px += text2_w / (float)tan)
-        Text2[y * tan + x++] = Text02[(memptrsize)py * text2_w + (memptrsize)px];
+        Text2[y * tan + x++] = text02[(memptrsize)py * text2_w + (memptrsize)px];
       y++;
     }
   }
@@ -1814,23 +1814,23 @@ void Load_Font_session(FILE *file) {
     v_text = (char *)texts[45];
     show_dialog(err0);
     free(Text1);
-    free(Text01);
+    free(text01);
     free(Text2);
-    free(Text02);
+    free(text02);
     return;
   }
-  Text03 = (char *)malloc(text3_w * text3_h);
-  if (Text03 == NULL) {
+  text03 = (char *)malloc(text3_w * text3_h);
+  if (text03 == NULL) {
     v_text = (char *)texts[45];
     show_dialog(err0);
     free(Text1);
-    free(Text01);
+    free(text01);
     free(Text2);
-    free(Text02);
+    free(text02);
     free(Text3);
     return;
   }
-  fread(Text03, text3_w * text3_h, 1, file);
+  fread(text03, text3_w * text3_h, 1, file);
   if (text3_w * text3_h == 1)
     memset(Text3, Text3Col, tan * tal * 10);
   else {
@@ -1838,7 +1838,7 @@ void Load_Font_session(FILE *file) {
     for (py = 0; py < text3_h; py += text3_h / (float)tal) {
       x = 0;
       for (px = 0; px < text3_w; px += text3_w / (float)tan)
-        Text3[y * tan + x++] = Text03[(memptrsize)py * text3_w + (memptrsize)px];
+        Text3[y * tan + x++] = text03[(memptrsize)py * text3_w + (memptrsize)px];
       y++;
     }
   }
@@ -1853,9 +1853,9 @@ void Load_Font_session(FILE *file) {
   fread(&shadow_x, 1, 4, file);
   fread(&shadow_y, 1, 4, file);
 
-  fread(&Mosaico1, 1, 4, file);
-  fread(&Mosaico2, 1, 4, file);
-  fread(&Mosaico3, 1, 4, file);
+  fread(&mosaic1, 1, 4, file);
+  fread(&mosaic2, 1, 4, file);
+  fread(&mosaic3, 1, 4, file);
 
   fread(FontName, 14, 1, file);
   fread(FontPathName, 256, 1, file);
@@ -1886,7 +1886,7 @@ void Load_Font_session(FILE *file) {
   _button(120, 7, v.h - 14, 0);       //13
   _button(119, v.w - 8, v.h - 14, 2); //12
 
-  _flag(112, 64, 112, &Mosaico1);
-  _flag(112, 124, 112, &Mosaico2);
-  _flag(112, 4, 112, &Mosaico3);
+  _flag(112, 64, 112, &mosaic1);
+  _flag(112, 124, 112, &mosaic2);
+  _flag(112, 4, 112, &mosaic3);
 }
