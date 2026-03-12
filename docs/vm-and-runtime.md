@@ -57,18 +57,18 @@ stack pointer (`_SP` field). The stack grows upward (increasing `sp`).
 | `bp` | `int` | Base pointer (for parameter passing) |
 | `id` | `int` | Current process ID (offset into `mem[]`) |
 | `ide` | `int` | Process being executed/painted |
-| `procesos` | `int` | Number of living processes |
+| `process_count` | `int` | Number of living processes |
 
 ---
 
 ## 2. Interpreter Loop
 
-### Entry: `interprete()` in `src/runtime/interpreter.c` (line 713)
+### Entry: `interpreter()` in `src/runtime/interpreter.c` (line 754)
 
 ```c
-void interprete(void) {
+void interpreter(void) {
     initialization();
-    while (procesos && !(kbdFLAGS[_ESC] && kbdFLAGS[_L_CTRL]) && !alt_x) {
+    while (process_count && !(kbdFLAGS[_ESC] && kbdFLAGS[_L_CTRL]) && !alt_x) {
         mainloop();
     }
     finalization();
@@ -88,8 +88,8 @@ Each frame:
    - Eliminates dead processes (`_Status == 1`)
    - Updates 10 user timers (`timer(0)` through `timer(9)`)
    - Calculates FPS
-   - Frame timing: waits until `freloj` (next frame time) or allows frame
-     skipping (`max_saltos`)
+   - Frame timing: waits until `fractional_clock` (next frame time) or allows frame
+     skipping (`max_frame_skips`)
    - Marks all processes as not-yet-executed
    - Reads mouse and joystick state
 
@@ -185,7 +185,7 @@ conditions must produce 0 or 1 (the comparison operators do this).
 ```c
 case lcal:
     mem[id+_IP] = ip+1;           // Save caller's IP
-    procesos++;                    // Increment process count
+    process_count++;               // Increment process count
     ip = mem[ip];                  // Jump to process code
     // Find free process slot
     id = id_start;
@@ -358,7 +358,7 @@ Timers are updated every frame in `frame_start()`. They count in centiseconds
 The runtime uses SDL2_mixer for audio:
 - Sound effects loaded as `Mix_Chunk*` via `Mix_LoadWAV_RW()`
 - Music modules loaded via `Mix_LoadMUS()` or `Mix_LoadMUSType_RW()`
-- Raw PCM data stored in `pcminfo.SoundData`, converted to `Mix_Chunk`
+- Raw PCM data stored in `pcminfo.sound_data`, converted to `Mix_Chunk`
   for playback
 - 32 channels available (`channel(0)` through `channel(31)`)
 
@@ -367,14 +367,14 @@ The runtime uses SDL2_mixer for audio:
 ```c
 int get_reloj(void) {
     n_reloj = OSDEP_GetTicks();
-    reloj += (n_reloj - o_reloj);
+    frame_clock += (n_reloj - o_reloj);
     o_reloj = n_reloj;
-    return reloj;
+    return frame_clock;
 }
 ```
 
-Returns milliseconds since start. The `reloj` variable (not yet renamed)
-accumulates time deltas to avoid issues with SDL tick counter wrapping.
+Returns milliseconds since start. The `frame_clock` variable accumulates
+time deltas to avoid issues with SDL tick counter wrapping.
 
 ---
 

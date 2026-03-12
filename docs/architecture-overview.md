@@ -21,7 +21,7 @@ The `main()` function performs the following startup sequence:
    standalone without the GUI and exits.
 4. **Working directory** -- Resolves the executable path, changes to the DIV
    runtime directory (where `system/` lives).
-5. **File type extensions** -- Populates `tipo[0..16].ext` with file browser
+5. **File type extensions** -- Populates `file_types[0..16].ext` with file browser
    filter strings for each file type (MAP, PAL, FPG, FNT, PRG, etc.).
 6. **`initialize_texts("system/lenguaje.div")`** -- Loads the localization strings.
 7. **Joystick + mixer init** -- Opens the first joystick, initializes SDL2_mixer.
@@ -76,7 +76,7 @@ void main_loop(void) {
 
 The actual work is in `mainloop()` (line 857), which runs once per iteration:
 
-1. **`poll_keyboard()`** -- Pumps the SDL event queue, updates `mclock`/`reloj` timestamps.
+1. **`poll_keyboard()`** -- Pumps the SDL event queue, updates `mclock` timestamp.
 2. **Window hit-test** -- Scans `window[0..max_windows-1]` to find which window
    the mouse is over (variable `n`). `n=max_windows` means background.
 3. **Drag-and-drop** -- Handles dragging sprites/maps between windows and the
@@ -97,7 +97,7 @@ The actual work is in `mainloop()` (line 857), which runs once per iteration:
 ### Dialog Loop: `dialog_loop()` at line 1731
 
 Modal dialogs use a secondary event loop (`show_dialog()` calls
-`dialog_loop()` repeatedly until `end_dialog` or `salir_del_dialogo`). This
+`dialog_loop()` repeatedly until `end_dialog`). This
 loop is simpler: it only handles the single dialog window, its title bar, and
 the close button. The dialog is always `window[0]`.
 
@@ -125,7 +125,7 @@ read_mouse() [src/ide/mouse.c:48]
     |-- Updates coord_x/coord_y (map coordinates under cursor)
     v
 poll_keyboard() [src/ide/keyboard.c:127]
-    |-- Updates mclock and reloj from SDL_GetTicks()
+    |-- Updates mclock from SDL_GetTicks()
     |-- (The actual event pumping happens via read_mouse2)
 ```
 
@@ -213,10 +213,9 @@ All drawing operates on a window's `ptr` buffer (an 8-bit pixel array):
 - `wrectangle()` -- Rectangle outline
 - `wwrite()` -- Text rendering using the proportional UI font
 - `wput()` -- Icon/graphic rendering from the `graf[]` array
-- `wvolcado()` -- Blit a sub-image into the window
 - `wline()` -- Line drawing
-- `boton()` -- Draw a text button
-- `ratonboton()` -- Hit-test a text button
+- `draw_button()` -- Draw a text button
+- `mouse_button_hit()` -- Hit-test a text button
 
 ### Dialog System
 
@@ -312,9 +311,9 @@ Rules:
 
 1. Reads the entire file into memory
 2. Calls `analyze_texts()` which walks the buffer character by character
-3. Numbers update `numero` (the current index)
+3. Numbers update `text_count` (the current index)
 4. Quoted strings are decoded in-place, null-terminated, and stored as
-   `texts[numero]` pointers
+   `texts[text_count]` pointers
 
 ### Usage
 

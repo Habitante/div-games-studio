@@ -1,32 +1,32 @@
 # DIV Games Studio - Spanish-English Glossary
 
-The DIV codebase was originally written in Spanish. This glossary maps the most
-important Spanish identifiers and terms to their English meanings, grouped by
-category.
+**Historical reference.** The DIV codebase was originally written in Spanish.
+During Phase 2C (2026-03), all identifiers were renamed to English snake_case.
+This glossary preserves the old-to-new mapping for anyone reading git history,
+the original MSDOS source, or Daniel's LIBRO.DOC handbook.
+
+File paths shown are the **original** names; see `docs/architecture-overview.md`
+for the current source tree layout (reorganized in Phase 2C-2).
 
 ---
 
 ## Video / Display
 
-| Identifier | Type | Defined in | English meaning |
-|---|---|---|---|
-| `vga_an` | `int` | global.h:484 | VGA width ("ancho" = width) |
-| `vga_al` | `int` | global.h:484 | VGA height ("alto" = height) |
-| `copia` | `byte*` | global.h:527 | Virtual screen copy (the working framebuffer) |
-| `tapiz` | `byte*` | global.h:490 | Desktop wallpaper / background texture ("tapiz" = tapestry/wallpaper) |
-| `tapiz_an` | `int` | global.h:516 | Wallpaper width |
-| `tapiz_al` | `int` | global.h:516 | Wallpaper height |
-| `mapa_tapiz` | `byte*` | global.h:491 | Wallpaper bitmap start pointer |
-| `volcado` | function | divvideo.c | Screen dump / blit ("volcar" = to dump/pour) |
-| `volcado_completo` | `int` | global.h:644 | Full-screen redraw flag |
-| `volcado_parcial` | function | divvideo.c | Partial screen blit (dirty rectangle) |
-| `volcados_parciales` | `int` | div.c:131 | Partial updates enabled flag |
-| `volcados_saltados` | `int` | i.c | Skipped frame count |
-| `saltar_volcado` | `int` | i.c | Skip this frame's display update |
-| `retrazo` | function | v.c | VSync wait ("retrazo" = retrace) |
-| `fondo_raton` | `byte*` | global.h:590 | Mouse cursor background save buffer ("fondo" = background, "raton" = mouse) |
-| `fondo_resaltado` | `int` | global.h:509 | Highlighted background flag ("resaltado" = highlighted) |
-| `fondo_edicion` | function | divbasic.c | Drawing editing background |
+| Original | Current name | English meaning |
+|---|---|---|
+| `vga_an` | `vga_width` | VGA width ("ancho" = width) |
+| `vga_al` | `vga_height` | VGA height ("alto" = height) |
+| `copia` | `backup_buffer` | Virtual screen copy (the working framebuffer) |
+| `tapiz` | `wallpaper` | Desktop wallpaper / background texture |
+| `tapiz_an` | `wallpaper_width` | Wallpaper width |
+| `tapiz_al` | `wallpaper_height` | Wallpaper height |
+| `volcado` | `blit_screen()` | Screen dump / blit ("volcar" = to dump/pour) |
+| `volcado_completo` | `full_redraw` | Full-screen redraw flag |
+| `volcado_parcial` | `blit_partial()` | Partial screen blit (dirty rectangle) |
+| `volcados_saltados` | `blits_skipped` | Skipped frame count |
+| `saltar_volcado` | `skip_blit` | Skip this frame's display update |
+| `fondo_raton` | `mouse_background` | Mouse cursor background save buffer |
+| `fondo_edicion` | (removed) | Drawing editing background |
 
 ## Palette / Colors
 
@@ -56,33 +56,25 @@ category.
 
 ## Window / UI System
 
-| Identifier | Type | Defined in | English meaning |
-|---|---|---|---|
-| `ventana[96]` | `tventana` | global.h:706 | Window array ("ventana" = window) |
-| `v` | macro | global.h:707 | `ventana[0]` -- the frontmost window |
-| `primer_plano` | `int` | tventana | Foreground/focus state ("primer plano" = foreground) |
-| `titulo` | `byte*` | tventana | Window title ("titulo" = title) |
-| `nombre` | `byte*` | tventana | Icon name ("nombre" = name) |
-| `volcar` | `int` | tventana | Needs-redraw flag ("volcar" = to dump/blit) |
-| `estado` | `int` | tventana | Window state ("estado" = state) |
-| `orden` | `int` | tventana | Z-order number ("orden" = order) |
-| `botones` | `int` | tventana | Button press state ("botones" = buttons) |
-| `lado` | `int` | tventana | Side: 0=right, 1=left ("lado" = side) |
-| `texto[2048]` | `byte*[]` | global.h:646 | Localized text strings ("texto" = text) |
-| `fin_dialogo` | `int` | global.h:832 | End-dialog flag ("fin" = end) |
-| `fin_ventana` | `int` | div.c:102 | End-window flag |
-| `cierra_ventana` | function | div.c | Close window ("cierra" = closes) |
-| `nueva_ventana` | function | div.c | Open new window ("nueva" = new) |
-| `mueve_ventana` | function | div.c | Move window ("mueve" = moves) |
-| `dialogo` | function | div.c | Open modal dialog ("dialogo" = dialog) |
-| `entorno` | function | div.c | Main environment loop ("entorno" = environment/surroundings) |
-| `entorno_dialogo` | function | div.c | Dialog environment loop |
-| `salir_del_entorno` | `int` | global.h:798 | Exit-environment flag ("salir" = to exit) |
-| `boton` | function | divwindo.c | Draw button ("boton" = button) |
-| `ratonboton` | function | divwindo.c | Mouse button hit-test ("raton" = mouse) |
-| `crear_menu` | function | divhandl.c | Create menu ("crear" = to create) |
-| `pinta_menu` | function | divhandl.c | Draw/paint menu ("pintar" = to paint) |
-| `actualiza_menu` | function | divhandl.c | Update menu ("actualizar" = to update) |
+| Original | Current name | English meaning |
+|---|---|---|
+| `ventana[96]` / `tventana` | `window[96]` / `twindow` | Window array |
+| `v` | `v` (unchanged) | `window[0]` -- the frontmost window |
+| `primer_plano` | `foreground` | Foreground/focus state |
+| `titulo` | `title` | Window title |
+| `nombre` | `name` | Icon name |
+| `volcar` | `redraw` | Needs-redraw flag |
+| `orden` | `order` | Z-order number |
+| `texto[2048]` | `texts[2048]` | Localized text strings |
+| `fin_dialogo` | `end_dialog` | End-dialog flag |
+| `salir_del_entorno` | `exit_requested` | Exit-environment flag |
+| `boton()` | `draw_button()` | Draw button |
+| `ratonboton()` | `mouse_button_hit()` | Mouse button hit-test |
+| `crear_menu()` | `create_menu()` | Create menu |
+| `pinta_menu()` | `paint_menu()` | Draw/paint menu |
+| `actualiza_menu()` | `update_menu()` | Update menu |
+| `entorno()` | `main_loop()` | Main environment loop |
+| `entorno_dialogo()` | `dialog_loop()` | Dialog environment loop |
 
 ## Mouse / Input
 
@@ -131,66 +123,61 @@ category.
 
 ## Compiler
 
-| Identifier | Type | Defined in | English meaning |
-|---|---|---|---|
-| `compilar` | function | divc.c:992 | Compile ("compilar" = to compile) |
-| `lexico` | function | divc.c:1742 | Lexer / tokenizer ("lexico" = lexical) |
-| `sintactico` | function | divc.c:3160 | Parser ("sintactico" = syntactic) |
-| `sentencia` | function | divc.c:4853 | Statement parser ("sentencia" = statement/sentence) |
-| `expresion` | function | divc.c:5265 | Expression parser |
-| `condicion` | function | divc.c | Condition parser |
-| `constante` | function | divc.c | Constant expression evaluator |
-| `pieza` | `int` | divc.c:871 | Current token ("pieza" = piece/token) |
-| `pieza_num` | `int` | divc.c:871 | Numeric value of current token |
-| `linea` | `int` | divc.c:878 | Current line number ("linea" = line) |
-| `objeto` | struct | divc.c:756 | Symbol table entry ("objeto" = object) |
-| `bloque_actual` | `objeto*` | divc.c:873 | Current scope / process ("bloque" = block, "actual" = current) |
-| `bloque_lexico` | `objeto*` | divc.c:874 | Lexical scope block |
-| `miembro` / `member` | `objeto*` | divc.c:876 | Current struct member being parsed |
-| `acceso_remoto` | `int` | divc.c:886 | Remote (cross-process) access flag |
-| `numero_error` | `int` | divc.c:940 | Error number (-1 = no error) |
-| `linea_error` | `int` | divc.c:941 | Error line |
-| `columna_error` | `int` | divc.c:942 | Error column ("columna" = column) |
-| `optimizar` | `int` | divc.c:725 | Optimization enabled flag |
-| `comprueba_rango` | `int` | divc.c:721 | Range checking enabled ("comprobar" = to check, "rango" = range) |
-| `hacer_strfix` | `int` | divc.c:724 | String auto-padding enabled |
-| `inicio_sentencia` | function | divc.c | Mark start of statement ("inicio" = start) |
-| `final_sentencia` | function | divc.c | Mark end of statement ("final" = end) |
-| `grabar_sentencia` | function | divc.c | Record statement debug info ("grabar" = to record/save) |
+All compiler code is now in `src/compiler/compiler.c`.
+
+| Original | Current name | English meaning |
+|---|---|---|
+| `compilar()` | `compile()` | Compile |
+| `lexico()` | `lexer()` | Lexer / tokenizer |
+| `sintactico()` | `parser()` | Parser |
+| `sentencia()` | `statement()` | Statement parser |
+| `expresion()` | `expression()` | Expression parser |
+| `pieza` | `current_token` | Current token ("pieza" = piece) |
+| `pieza_num` | `token_value` | Numeric value of current token |
+| `linea` | `source_line` | Current line number |
+| `objeto` (struct) | `object` | Symbol table entry |
+| `bloque_actual` | `current_scope` | Current scope / process |
+| `bloque_lexico` | `lexical_scope` | Lexical scope block |
+| `miembro` | `member` | Current struct member being parsed |
+| `acceso_remoto` | `cross_process_access` | Remote (cross-process) access flag |
+| `optimizar` | (unchanged) | Optimization enabled flag |
+| `inicio_sentencia()` | `begin_statement()` | Mark start of statement |
+| `final_sentencia()` | `end_statement()` | Mark end of statement |
 
 ## Runtime / VM
 
-| Identifier | Type | Defined in | English meaning |
-|---|---|---|---|
-| `interprete` | function | i.c:709 | Interpreter main function |
-| `nucleo_exec` | function | i.c:806 | Core execution loop ("nucleo" = nucleus/core) |
-| `pila[2624]` | `int[]` | inter.h:493 | Execution stack ("pila" = stack/pile) |
-| `reloj` | `int` | -- | Clock / timer ("reloj" = clock) |
-| `procesos` | `int` | -- | Living process count ("procesos" = processes) |
-| `ejecutar_programa` | `int` | -- | Execute program flag |
-| `ultimo_reloj` | `int` | i.c | Last clock value ("ultimo" = last) |
-| `volcado` | function | v.c | Blit framebuffer to screen |
-| `restaura` / `restore` | function | v.c | Restore background from backup |
-| `pinta_sprite` | function | s.c:864 | Paint/render a process's sprite ("pintar" = to paint) |
-| `pinta_textos` | function | s.c:1739 | Render text objects |
-| `elimina_proceso` | function | i.c | Kill/remove a process ("eliminar" = to eliminate) |
+Runtime code is in `src/runtime/` (interpreter.c, functions.c, render.c).
+
+| Original | Current name | English meaning |
+|---|---|---|
+| `interprete()` | `interpreter()` | Interpreter main function |
+| `nucleo_exec()` | `core_exec()` | Core execution loop ("nucleo" = nucleus/core) |
+| `pila[2624]` | `pila[2624]` (unchanged) | Execution stack ("pila" = stack/pile) |
+| `reloj` | `frame_clock` | Clock / timer ("reloj" = clock) |
+| `procesos` | `process_count` | Living process count |
+| `freloj` | `fractional_clock` | Next frame time target |
+| `max_saltos` | `max_frame_skips` | Maximum frame skips allowed |
+| `volcado()` | `blit_screen()` | Blit framebuffer to screen |
+| `restaura()` | `restore()` | Restore background from backup |
+| `pinta_sprite()` | `paint_sprite()` | Paint/render a process's sprite |
+| `pinta_textos()` | `paint_texts()` | Render text objects |
+| `elimina_proceso()` | `kill_process()` | Kill/remove a process |
 
 ## File I/O / Formats
 
-| Identifier | Type | Defined in | English meaning |
-|---|---|---|---|
-| `fichero` | -- | -- | File ("fichero" = file) |
-| `archivo` | -- | -- | File / archive ("archivo" = file/archive) |
-| `graba_MAP` | function | divforma.c | Save MAP file ("grabar" = to record/save) |
-| `descomprime_MAP` | function | divforma.c | Decompress/load MAP ("descomprimir" = to decompress) |
-| `es_MAP` | function | divforma.c | Is it a MAP file? ("es" = is) |
-| `empaquetable` | `int` | divc.c | Packable (into executable) flag |
-| `cargadac_*` | functions | divpalet.c | Load palette from file ("cargar" = to load) |
-| `abrir` | -- | -- | Open ("abrir" = to open) |
-| `guardar` | -- | -- | Save ("guardar" = to save/keep) |
-| `cerrar` | -- | -- | Close ("cerrar" = to close) |
-| `leer` | -- | -- | Read ("leer" = to read) |
-| `grabar` | -- | -- | Write / record ("grabar" = to record) |
+Format code is in `src/formats/` (image.c, fpg.c).
+
+| Original | Current name | English meaning |
+|---|---|---|
+| `fichero` | -- | File ("fichero" = file) |
+| `archivo` | -- | File / archive ("archivo" = file/archive) |
+| `graba_MAP()` | `save_map()` | Save MAP file |
+| `descomprime_MAP()` | `load_map()` | Decompress/load MAP |
+| `es_MAP()` | `es_MAP()` (unchanged) | Is it a MAP file? ("es" = is) |
+| `tipo[24]` | `file_types[24]` | File type definitions |
+| `abrir` | -- | Open ("abrir" = to open) |
+| `guardar` | -- | Save ("guardar" = to save/keep) |
+| `grabar` | -- | Write / record ("grabar" = to record) |
 
 ## Program Structure
 
@@ -212,53 +199,44 @@ category.
 
 ## Configuration / Setup
 
-| Identifier | Type | Defined in | English meaning |
-|---|---|---|---|
-| `Interpretando` | `int` | global.h:328 | Returning from interpreter (1=yes, came back from running a program) |
-| `siguiente_orden` | `int` | global.h:321 | Next window order number ("siguiente" = next, "orden" = order) |
-| `modo_de_retorno` | `int` | global.h:322 | Return mode: 0=quit, 1=run, 3=test fail ("retorno" = return) |
-| `primera_vez` | `int` | div.c:122 | First time running flag ("primera vez" = first time) |
-| `compilemode` | `int` | global.h:331 | Command-line compiler mode |
-| `CopiaDesktop` | `int` | global.h:330 | Desktop session save/restore enabled |
-| `MustCreate` | `int` | global.h:319 | Must create window flag |
-| `unidades[27]` | `char[]` | global.h:815 | Drive letters ("unidades" = drives/units) |
-| `tipo[24]` | `ttipo` | global.h:808 | File type definitions ("tipo" = type) |
-| `mascara[512]` | `char[]` | global.h:820 | File filter mask ("mascara" = mask) |
+| Original | Current name | English meaning |
+|---|---|---|
+| `Interpretando` | `returning_from_runtime` | Returning from interpreter |
+| `siguiente_orden` | `next_order` | Next window order number |
+| `modo_de_retorno` | `return_mode` | Return mode: 0=quit, 1=run, 3=test fail |
+| `tipo[24]` / `ttipo` | `file_types[24]` / `file_type_info` | File type definitions |
+| `mascara[512]` | `file_filter[512]` | File filter mask |
 
 ## Common Spanish Words in Identifiers
 
-| Spanish | English | Example usage |
+Useful for reading git history, the original MSDOS source, or LIBRO.DOC.
+
+| Spanish | English | Example (original → current) |
 |---|---|---|
-| `an` / `ancho` | width | `vga_an`, `map_an`, `v.an` |
-| `al` / `alto` | height | `vga_al`, `map_al`, `v.al` |
-| `buscar` | to search | `buscar_texto()` |
-| `caja` | box | `modo_caja`, `actualiza_caja()` |
-| `cerrar` | to close | `cierra_ventana()`, `p_cerrar` |
-| `crear` | to create | `crear_menu()`, `crear_ghost()` |
-| `dibujo` | drawing | -- |
-| `entorno` | environment | `entorno()`, `salir_del_entorno` |
-| `fondo` | background | `fondo_raton`, `fondo_edicion()` |
-| `fuente` | font / source | `divfont.c` |
-| `grande` | large | `grande.fon` (large UI font) |
-| `guardar` | to save | `guardar_prg()`, `guardar_mapa()` |
-| `inicializacion` | initialization | `inicializacion()` |
-| `linea` | line | `linea`, `num_lineas` |
-| `mapa` | map / image | `tmapa`, `map_an`, `map_al` |
-| `nuevo` | new | `nueva_ventana()`, `nuevo_mapa()` |
-| `paleta` | palette | `set_paleta()`, `dac` |
-| `pantalla` | screen | -- |
-| `pequeño` | small | `pequeno.fon` (small UI font) |
-| `pieza` | piece / token | `pieza` (compiler token) |
-| `pila` | stack | `pila[]` (execution stack) |
-| `pintar` | to paint | `pinta_sprite()`, `pinta_menu()` |
-| `plano` | plane / layer | `primer_plano` (foreground) |
-| `ratón` | mouse | `fondo_raton`, `read_mouse()` |
-| `reloj` | clock | `reloj`, `system_clock` |
-| `sonido` | sound | `divsound.c` |
-| `tapiz` | wallpaper | `tapiz`, `tapiz_an` |
-| `tecla` | key | `tecla()` (poll keys) |
-| `ventana` | window | `ventana[]`, `tventana` |
-| `volcado` | dump / blit | `volcado()`, `volcado_parcial()` |
+| `an` / `ancho` | width | `vga_an` → `vga_width` |
+| `al` / `alto` | height | `vga_al` → `vga_height` |
+| `bloque` | block / scope | `bloque_actual` → `current_scope` |
+| `buscar` | to search | `buscar_texto()` → (removed) |
+| `caja` | box | `modo_caja` → `box_mode` |
+| `cerrar` | to close | `p_cerrar` (token, unchanged) |
+| `crear` | to create | `crear_menu()` → `create_menu()` |
+| `entorno` | environment | `entorno()` → `main_loop()` |
+| `fondo` | background | `fondo_raton` → `mouse_background` |
+| `fuente` | font / source | `divfont.c` → `editor/font.c` |
+| `guardar` | to save | `guardar_prg()` → `save_program()` |
+| `linea` | line | `linea` → `source_line` (compiler) |
+| `mapa` | map / image | `tmapa` (unchanged struct name) |
+| `paleta` | palette | `paleta` → `palette` |
+| `pieza` | piece / token | `pieza` → `current_token` |
+| `pila` | stack | `pila[]` (unchanged) |
+| `pintar` | to paint | `pinta_sprite()` → `paint_sprite()` |
+| `ratón` | mouse | `read_mouse()` (unchanged) |
+| `reloj` | clock | `reloj` → `frame_clock` |
+| `sonido` | sound | `divsound.c` → `shared/run/sound.c` |
+| `tapiz` | wallpaper | `tapiz` → `wallpaper` |
+| `tecla` | key | `tecla()` → `poll_keyboard()` |
+| `ventana` | window | `ventana[]` → `window[]` |
+| `volcado` | dump / blit | `volcado()` → `blit_screen()` |
 
 ## Process Fields (Local Variables)
 

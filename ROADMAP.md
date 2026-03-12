@@ -153,13 +153,15 @@ Spanish identifiers renamed. 8 parallel agents in 2 waves:
 
 ### 2C-5. Documentation pass ✓
 
-Updated all docs to match the 2C-2 reorganization:
+Updated all docs to match the 2C-2 reorganization and 2C-4 identifier renames:
 
 - [x] README.md — source tree updated with new module layout
-- [x] `docs/architecture-overview.md` — all file paths updated
-- [x] `docs/compiler-pipeline.md` — all file paths updated
-- [x] `docs/vm-and-runtime.md` — all file paths updated
+- [x] `docs/architecture-overview.md` — file paths + identifier names updated
+- [x] `docs/compiler-pipeline.md` — file paths + identifier names updated
+- [x] `docs/vm-and-runtime.md` — file paths + identifier names updated
+- [x] `docs/sdl3-migration-report.md` — file paths + function/struct names updated
 - [x] `docs/snake-case-collision-report.md` — all file paths updated
+- [x] `docs/archive/glossary-spanish-english.md` — restructured with old→new name mapping
 - [x] MEMORY.md — directory layout, function locations, bug references updated
 
 ---

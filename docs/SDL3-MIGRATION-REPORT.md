@@ -26,11 +26,11 @@
 
 | Subsystem | Unique APIs | Call Sites | Key Files |
 |-----------|------------|------------|-----------|
-| SDL core (window/render) | ~40 | ~80 | osd_sdl2.c, v.c, divvideo.c |
-| SDL events/input | ~20 | ~50 | divmouse.c, divkeybo.c (IDE + runtime) |
-| SDL_mixer | ~25 | ~50 | divpcm.c, divsound.c, divbrow.c, divmixer.c |
+| SDL core (window/render) | ~40 | ~80 | osd_sdl2.c, shared/run/video.c, ide/video.c |
+| SDL events/input | ~20 | ~50 | ide/mouse.c, ide/keyboard.c (IDE + runtime) |
+| SDL_mixer | ~25 | ~50 | editor/pcm.c, ide/sound.c, ide/browser.c, ide/mixer.c |
 | SDL joystick | ~10 | ~20 | osd_sdl2.c |
-| SDL_RWops | 3 | ~12 | divpcm.c, divsound.c, v.c |
+| SDL_RWops | 3 | ~12 | editor/pcm.c, ide/sound.c, shared/run/video.c |
 | SDLK_* key constants | 85+ | ~170 | osd_sdl2.c, osd_sdl12.c |
 | SDL_net | 0 | 0 | (removed in Phase 0) |
 
@@ -40,16 +40,16 @@
 |------|------|---------------|
 | `src/shared/osdep/osd_sdl2.c` | SDL2 OS abstraction | Window, renderer, surface, texture, palette, joystick |
 | `src/shared/osdep/osd_sdl12.c` | SDL 1.2 legacy layer | (dead code, would be deleted) |
-| `src/shared/run/v.c` | Runtime rendering | Blit, flip, texture update, splash screen |
-| `src/shared/ide/divvideo.c` | IDE video setup | Surface creation, palette, fullscreen toggle |
-| `src/shared/ide/divmouse.c` | IDE event handler | PollEvent, mouse, keyboard, window events |
-| `src/shared/ide/divkeybo.c` | IDE keyboard (no SDL) | Only SDL_GetTicks |
-| `src/shared/run/divkeybo.c` | Runtime event handler | PollEvent, mouse, keyboard, window events |
-| `src/shared/ide/divpcm.c` | IDE PCM sound editor | Mix_LoadWAV, Mix_PlayChannel, Mix_SetPostMix, RWops |
-| `src/shared/ide/divsound.c` | IDE audio init | Mix_Init, Mix_OpenAudio |
-| `src/shared/run/divsound.c` | Runtime audio | Full mixer: load, play, volume, panning, effects |
-| `src/shared/ide/divbrow.c` | File browser | Sound preview playback |
-| `src/shared/ide/divmixer.c` | IDE mixer UI | Mix_Volume, Mix_VolumeMusic (2 lines) |
+| `src/shared/run/video.c` | Runtime rendering | Blit, flip, texture update, splash screen |
+| `src/ide/video.c` | IDE video setup | Surface creation, palette, fullscreen toggle |
+| `src/ide/mouse.c` | IDE event handler | PollEvent, mouse, keyboard, window events |
+| `src/ide/keyboard.c` | IDE keyboard (no SDL) | Only SDL_GetTicks |
+| `src/shared/run/keyboard.c` | Runtime event handler | PollEvent, mouse, keyboard, window events |
+| `src/editor/pcm.c` | IDE PCM sound editor | Mix_LoadWAV, Mix_PlayChannel, Mix_SetPostMix, RWops |
+| `src/ide/sound.c` | IDE audio init | Mix_Init, Mix_OpenAudio |
+| `src/shared/run/sound.c` | Runtime audio | Full mixer: load, play, volume, panning, effects |
+| `src/ide/browser.c` | File browser | Sound preview playback |
+| `src/ide/mixer.c` | IDE mixer UI | Mix_Volume, Mix_VolumeMusic (2 lines) |
 | `runtime/fli/flxplay.c` | FLI animation player | SDL 1.2 APIs — needs full rewrite |
 | `src/shared/lib/sdlgfx/SDL_framerate.c` | FPS limiter | SDL_GetTicks, SDL_Delay |
 
@@ -81,10 +81,10 @@ SDL3_mixer replaces the channel-based model with an explicit track/audio model:
 // modinfo: Mix_Music *music  →  MIX_Audio *music
 ```
 
-**Runtime structs (divsound.h):**
+**Runtime structs (sound.h):**
 ```c
-// tSonido: Mix_Chunk *sound  →  MIX_Audio *sound
-// tCancion: Mix_Music *music  →  MIX_Audio *music
+// sound_t: Mix_Chunk *sound  →  MIX_Audio *sound
+// song_t: Mix_Music *music  →  MIX_Audio *music
 //           SDL_RWops *rw  →  SDL_IOStream *io (or removed)
 ```
 
@@ -92,7 +92,7 @@ SDL3_mixer replaces the channel-based model with an explicit track/audio model:
 - IDE: `MIX_Mixer *g_mixer`, `MIX_Track *preview_track`, `MIX_Track *music_track`
 - Runtime: `MIX_Mixer *g_mixer`, `MIX_Track *g_tracks[64]`, `MIX_Track *g_music_track`
 
-### 2.3 IDE audio init (divsound.c) — TRIVIAL
+### 2.3 IDE audio init (ide/sound.c) — TRIVIAL
 
 ```c
 // SDL2:  Mix_OpenAudio(44100, AUDIO_S16SYS, 2, 4096);
@@ -100,52 +100,52 @@ SDL3_mixer replaces the channel-based model with an explicit track/audio model:
 //        g_mixer = MIX_CreateMixerDevice(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &spec);
 ```
 
-Also `Mix_Init(flags)` in div.c becomes `MIX_Init()` (no flags).
+Also `Mix_Init(flags)` in ide/main.c becomes `MIX_Init()` (no flags).
 
-### 2.4 IDE PCM sound editor (divpcm.c) — MODERATE, ~40 call sites
+### 2.4 IDE PCM sound editor (editor/pcm.c) — MODERATE, ~40 call sites
 
 This is 2,150 lines and the most audio-intensive file in the IDE.
 
-**Sound loading** (`OpenSound`, `OpenSoundFile`, `OpenDesktopSound`):
+**Sound loading** (`open_sound`, `open_sound_file`, `open_desktop_sound`):
 - Current: `Mix_LoadWAV(path)` or wrap raw PCM in WAV header via `DIVMIX_LoadPCM` + `SDL_RWFromMem` + `Mix_LoadWAV_RW`
 - SDL3: `MIX_LoadAudio(mixer, path, true)` or `MIX_LoadRawAudio(mixer, data, len, &spec)` — **the WAV-wrapping hack is eliminated entirely**
 
 **Opaque `MIX_Audio` — no `abuf`/`alen` access:**
-The editor currently reads/writes `SI->abuf` directly for waveform display and editing (volume, fade, silence, copy/paste). In SDL3_mixer, `MIX_Audio` is opaque. Solution: the code already maintains a separate `SoundData` buffer — make that the authority, rebuild `MIX_Audio` via `MIX_LoadRawAudio()` after each edit. This is cleaner architecture.
+The editor currently reads/writes `SI->abuf` directly for waveform display and editing (volume, fade, silence, copy/paste). In SDL3_mixer, `MIX_Audio` is opaque. Solution: the code already maintains a separate `sound_data` buffer — make that the authority, rebuild `MIX_Audio` via `MIX_LoadRawAudio()` after each edit. This is cleaner architecture.
 
-**Sound playback** (`PCM2`, `ModifySound`):
+**Sound playback** (`pcm2`, `modify_sound`):
 - Current: `Mix_PlayChannel(0, mypcminfo->SI, 0)`
 - SDL3: `MIX_SetTrackAudio(preview_track, mypcminfo->SI); MIX_PlayTrack(preview_track, 0);`
 - IDE only plays one sound at a time for preview → single pre-allocated track suffices.
 
-**Cut/paste** (`ModifySound` lines 1447, 1526):
+**Cut/paste** (`modify_sound` lines 1447, 1526):
 - Current: `Mix_QuickLoad_RAW(FileBuffer, FilePos)` — actually incorrect (passes WAV buffer with offset hack)
-- SDL3: `MIX_LoadRawAudio(mixer, SoundData, SoundSize*2, &spec)` — skip WAV wrapping entirely
+- SDL3: `MIX_LoadRawAudio(mixer, sound_data, sound_size*2, &spec)` — skip WAV wrapping entirely
 
-**`ChangeSoundFreq`**: Resamples PCM, wraps in WAV, loads via `Mix_LoadWAV_RW`. Simplifies to `MIX_LoadRawAudio()`.
+**`change_sound_freq()`**: Resamples PCM, wraps in WAV, loads via `Mix_LoadWAV_RW`. Simplifies to `MIX_LoadRawAudio()`.
 
 **`Mix_SetPostMix` callback** (`noEffect` function, line 918): Used as a song-position counter — increments counters, doesn't look at audio data. Becomes `MIX_SetPostMixCallback(mixer, noEffectSDL3, NULL)`. Trivial.
 
-**Music playback** (`PlaySong`): `Mix_LoadMUS` + `Mix_PlayMusic` → `MIX_LoadAudio` + `MIX_SetTrackAudio` + `MIX_PlayTrack`. Needs dedicated music track.
+**Music playback** (`sound_play_song`): `Mix_LoadMUS` + `Mix_PlayMusic` → `MIX_LoadAudio` + `MIX_SetTrackAudio` + `MIX_PlayTrack`. Needs dedicated music track.
 
-### 2.5 IDE file browser (divbrow.c) — TRIVIAL
+### 2.5 IDE file browser (ide/browser.c) — TRIVIAL
 
 4 lines: `Mix_HaltChannel(-1)` + `Mix_FreeChunk(smp)` + `Mix_LoadWAV(path)` + `Mix_PlayChannel(0, smp, 0)` → stop/destroy/load/set+play with track.
 
-### 2.6 IDE mixer (divmixer.c) — TRIVIAL
+### 2.6 IDE mixer (ide/mixer.c) — TRIVIAL
 
 2 lines: `Mix_VolumeMusic(cd*8)` and `Mix_Volume(-1, voc*8)` → float-based gain calls.
 
-### 2.7 Runtime audio (shared/run/divsound.c) — SIGNIFICANT, ~35 call sites
+### 2.7 Runtime audio (shared/run/sound.c) — SIGNIFICANT, ~35 call sites
 
-**Init** (`InitSound`): Same pattern as IDE — `MIX_Init()` + `MIX_CreateMixerDevice()`. Must pre-create track pool (64 tracks for sounds + 1 for music).
+**Init** (`sound_init`): Same pattern as IDE — `MIX_Init()` + `MIX_CreateMixerDevice()`. Must pre-create track pool (64 tracks for sounds + 1 for music).
 
-**Sound loading** (`LoadSound`): Takes raw memory, wraps in WAV if needed, calls `Mix_LoadWAV_RW`. Simplifies with `MIX_LoadRawAudio` for raw PCM, `MIX_LoadAudio_IO` for WAV/OGG.
+**Sound loading** (`sound_load`): Takes raw memory, wraps in WAV if needed, calls `Mix_LoadWAV_RW`. Simplifies with `MIX_LoadRawAudio` for raw PCM, `MIX_LoadAudio_IO` for WAV/OGG.
 
-**Sound playback** (`DivPlaySound`) — **THE HARDEST PART:**
+**Sound playback** (`sound_play`) — **THE HARDEST PART:**
 ```c
 // Current SDL2 code:
-con = Mix_PlayChannel(-1, sonido[NumSonido].sound, loop);
+con = Mix_PlayChannel(-1, sounds[NumSonido].sound, loop);
 Mix_UnregisterAllEffects(con);
 Mix_RegisterEffect(con, freqEffect, doneEffect, NULL);
 Mix_Volume(con, Volumen/2);
@@ -163,18 +163,18 @@ This is the biggest win of the migration — 60+ lines of buggy callback code re
 Channel allocation changes from auto-allocating (`Mix_PlayChannel(-1, ...)` returns index) to explicit track pool:
 ```c
 int con = find_free_track();  // scan g_tracks[] for idle track
-MIX_SetTrackAudio(g_tracks[con], sonido[NumSonido].sound);
+MIX_SetTrackAudio(g_tracks[con], sounds[NumSonido].sound);
 MIX_SetTrackFrequencyRatio(g_tracks[con], Frec / 256.0f);
 MIX_SetTrackGain(g_tracks[con], Volumen / 256.0f);
 MIX_PlayTrack(g_tracks[con], 0);
 ```
 
-**Volume/panning** (`ChangeSound`, `ChangeChannel`):
+**Volume/panning** (`sound_change`, `sound_change_channel`):
 - `Mix_Volume(ch, vol/2)` → `MIX_SetTrackGain(track, vol/256.0f)`
 - `Mix_SetPanning(ch, 255-pan, pan)` → float stereo gains
 - Frequency: currently sets `channels[ch].freq` for the callback → `MIX_SetTrackFrequencyRatio(track, freq/256.0f)`
 
-**Music** (`LoadSong`, `PlaySong`, `StopSong`, `UnloadSong`): `Mix_LoadMUS_RW` → `MIX_LoadAudio_IO`, `Mix_PlayMusic` → `MIX_SetTrackAudio` + `MIX_PlayTrack` on dedicated music track. Double-load-to-validate pattern can be simplified.
+**Music** (`sound_load_song`, `sound_play_song`, `sound_stop_song`, `sound_unload_song`): `Mix_LoadMUS_RW` → `MIX_LoadAudio_IO`, `Mix_PlayMusic` → `MIX_SetTrackAudio` + `MIX_PlayTrack` on dedicated music track. Double-load-to-validate pattern can be simplified.
 
 ### 2.8 Runtime cleanup (i.c) — TRIVIAL
 
@@ -184,14 +184,14 @@ MIX_PlayTrack(g_tracks[con], 0);
 
 | File | Call Sites | Difficulty | Key Change |
 |------|-----------|------------|-----------|
-| divpcm.c | ~40 | Moderate | SoundData as authority, MIX_LoadRawAudio |
-| shared/run/divsound.c | ~35 | Significant | freqEffect deletion, track pool |
-| divbrow.c | 4 | Trivial | Preview playback |
-| divmixer.c | 2 | Trivial | Volume int→float |
-| divsound.c (IDE) | 4 | Trivial | Init/shutdown |
-| div.c | 3 | Trivial | Mix_Init |
-| runtime/i.c | 2 | Trivial | Shutdown |
-| global.h, divsound.h | — | Trivial | Struct field types |
+| editor/pcm.c | ~40 | Moderate | sound_data as authority, MIX_LoadRawAudio |
+| shared/run/sound.c | ~35 | Significant | freqEffect deletion, track pool |
+| ide/browser.c | 4 | Trivial | Preview playback |
+| ide/mixer.c | 2 | Trivial | Volume int→float |
+| ide/sound.c (IDE) | 4 | Trivial | Init/shutdown |
+| ide/main.c | 3 | Trivial | Mix_Init |
+| runtime/interpreter.c | 2 | Trivial | Shutdown |
+| global.h, sound.h | — | Trivial | Struct field types |
 
 **Estimated effort: 3-5 days** (2-3 coding, 1-2 testing both IDE and runtime).
 
@@ -203,7 +203,7 @@ MIX_PlayTrack(g_tracks[con], 0);
 
 ### 3.1 Current structure
 
-Two files have `PrintEvent()` functions with identical structure (divmouse.c lines 291-358, shared/run/divkeybo.c lines 198-261):
+Two files have `PrintEvent()` functions with identical structure (ide/mouse.c lines 291-358, shared/run/keyboard.c lines 198-261):
 
 ```c
 if (event->type == SDL_WINDOWEVENT) {
@@ -272,7 +272,7 @@ Only `SDL_WINDOWEVENT_RESIZED` has functional (non-logging) behavior. The other 
 | `event.key.keysym.scancode` | `event.key.scancode` |
 | `event.key.state` (SDL_PRESSED/RELEASED) | `event.key.down` (bool) |
 
-~15 references across divmouse.c and shared/run/divkeybo.c.
+~15 references across ide/mouse.c and shared/run/keyboard.c.
 
 ### 3.5 Mouse event type changes
 
@@ -331,7 +331,7 @@ SDL3's `SDL_SetWindowSize()` now fires `SDL_EVENT_WINDOW_RESIZED`, which didn't 
 ```
 `SDL_PIXELFORMAT_RGBA32` auto-selects correct byte order for the platform.
 
-**Site C — Surface clone** (divvideo.c:148):
+**Site C — Surface clone** (ide/video.c:148):
 ```c
 // SDL2:  SDL_CreateRGBSurface(0, src->w, src->h, src->format->BitsPerPixel, masks...);
 // SDL3:  SDL_CreateSurface(src->w, src->h, src->format);  // format is now an enum directly
@@ -346,9 +346,9 @@ In SDL3: `surface->format` is `SDL_PixelFormat` (an enum value like `SDL_PIXELFO
 | SDL2 Expression | SDL3 Replacement | File |
 |----------------|-----------------|------|
 | `surface->format->palette` | `SDL_GetSurfacePalette(surface)` | osd_sdl2.c:172 |
-| `source->format->BitsPerPixel` | `SDL_GetPixelFormatDetails(source->format)->bits_per_pixel` | divvideo.c:149 |
-| `source->format->Rmask` etc. | Not needed — use `source->format` enum directly | divvideo.c:150-151 |
-| `vga->format->BitsPerPixel` | `SDL_GetPixelFormatDetails(vga->format)->bits_per_pixel` | divvideo.c:311 |
+| `source->format->BitsPerPixel` | `SDL_GetPixelFormatDetails(source->format)->bits_per_pixel` | ide/video.c:149 |
+| `source->format->Rmask` etc. | Not needed — use `source->format` enum directly | ide/video.c:150-151 |
+| `vga->format->BitsPerPixel` | `SDL_GetPixelFormatDetails(vga->format)->bits_per_pixel` | ide/video.c:311 |
 
 `surface->pixels`, `->pitch`, `->w`, `->h` — **unchanged**, still directly accessible.
 
@@ -518,7 +518,7 @@ If/when we decide to proceed:
 ### Key risks
 
 1. **32-bit SDL3 packages** — may not exist yet. Must verify before starting.
-2. **SDL3_mixer `MIX_Audio` opacity** — IDE sound editor accesses decoded PCM buffers directly. Requires data flow change (SoundData as authority).
+2. **SDL3_mixer `MIX_Audio` opacity** — IDE sound editor accesses decoded PCM buffers directly. Requires data flow change (sound_data as authority).
 3. **OSDEP_key[] table** — must be rebuilt from scratch for new SDL3 keycode values.
 4. **Resize re-entrancy** — SDL_SetWindowSize now fires RESIZED event, can cause infinite loops.
 5. **SDL_CreateSurfacePalette** — forgetting this = black screen. Easy to miss, hard to debug.

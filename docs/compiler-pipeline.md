@@ -48,7 +48,7 @@ error recovery. The compilation pipeline:
 | `mem[2]` | `imem` -- Total code+data size |
 | `mem[3]` | `max_process` -- Maximum process count (from `compiler_options`) |
 | `mem[4]` | (unused, was global data length) |
-| `mem[5]` | `iloc_len - iloc` -- Private variable section size |
+| `mem[5]` | `local_var_len - iloc` -- Private variable section size |
 | `mem[6]` | `iloc` -- Start of local variable template |
 | `mem[7]` | (unused, was text start) |
 | `mem[8]` | `imem + iloc` -- Total memory elements needed |
@@ -101,8 +101,8 @@ character set for identifiers:
 
 ### Tokenization: `lexer()` at line 1754
 
-The main lexer function. Sets global `pieza` (current token) and `pieza_num`
-(numeric value for numbers/literals). Also tracks `linea`, `ierror`,
+The main lexer function. Sets global `current_token` and `token_value`
+(numeric value for numbers/literals). Also tracks `source_line`, `ierror`,
 `ierror_end` for error reporting.
 
 Token types (selected):
@@ -134,8 +134,8 @@ Token types (selected):
 | `p_suma` | 0x44 | `+` |
 | `p_resta` | 0x45 | `-` |
 | `p_id` | 0xFD | Identifier (object pointer in `o`) |
-| `p_num` | 0xFE | Numeric constant (value in `pieza_num`) |
-| `p_lit` | 0xFC | String literal (offset in `pieza_num`) |
+| `p_num` | 0xFE | Numeric constant (value in `token_value`) |
+| `p_lit` | 0xFC | String literal (offset in `token_value`) |
 
 ### Number Parsing
 
@@ -162,16 +162,16 @@ String literals (delimited by `"`) are:
 ### Object Table: `obj[max_obj]` at line 843
 
 ```c
-struct objeto {
+struct object {
     byte type;              // Object type (tnone, tcons, tvglo, ttglo, ...)
-    byte usado;             // 1 if referenced before definition
+    byte used;              // 1 if referenced before definition
     byte * name;            // Pointer to name string in vnom
     byte * ierror;          // Source position for error reporting
     int line;               // Source line number
     int param;              // 1 if declared as a parameter
-    struct objeto * anterior;  // Previous object with same name (scope chain)
-    struct objeto * bloque;    // Owning process (NULL for global/local scope)
-    struct objeto * member;    // Owning struct (NULL if not a struct member)
+    struct object * prev;      // Previous object with same name (scope chain)
+    struct object * scope;     // Owning process (NULL for global/local scope)
+    struct object * member;    // Owning struct (NULL if not a struct member)
     union { ... };          // Type-specific data (offset, dimensions, etc.)
 };
 ```
@@ -202,16 +202,16 @@ struct objeto {
 ### Scope Resolution
 
 Scope is managed through:
-- **`bloque_actual`** -- Current process being compiled (NULL during
+- **`current_scope`** -- Current process being compiled (NULL during
   global/local sections)
-- **`bloque_lexico`** -- Set to `bloque_actual` when entering private sections
+- **`lexical_scope`** -- Set to `current_scope` when entering private sections
 - **`member`** -- Set to the current struct when parsing struct member definitions
 
 When looking up an identifier:
 1. The hash table (`vhash[]`) finds all objects with that name
-2. The chain of `anterior` pointers links objects with the same name in
+2. The chain of `prev` pointers links objects with the same name in
    different scopes
-3. The lookup walks the chain, matching `bloque` and `member` to find the
+3. The lookup walks the chain, matching `scope` and `member` to find the
    correct scope
 
 ### Predefined Objects: `preload_objects()` at line 1434
