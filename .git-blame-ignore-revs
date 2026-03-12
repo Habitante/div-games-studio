@@ -10,3 +10,6 @@ a1ee4b27d8a7653904b6d3f23a48a038ab68379c
 
 # 2C-4e: Re-apply clang-format after second rename sprint (20 files)
 612ef3170f6026282f59f0ed00c0a3bf4a6e6ed3
+
+# 2C-4f: Re-apply clang-format after locals rename sprint (9 files)
+95fc3027fd3f0128adf2d56a1ea5c17609ac7254
