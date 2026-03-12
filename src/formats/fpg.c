@@ -133,6 +133,15 @@ int fpg_open(FPG *Fpg, char *Name) {
   fread((byte *)gradients, 1, sizeof(gradients), fpg);
 
   while (fpg_read_header(&kkhead, fpg)) {
+    if (kkhead.code < 0 || kkhead.code >= 1000) {
+      debugprintf("FPG: skipping graphic with out-of-range code %d\n", kkhead.code);
+      fseek(fpg, kkhead.length - FPG_HEAD, SEEK_CUR);
+      continue;
+    }
+    if (Fpg->nIndex >= 1000) {
+      debugprintf("FPG: too many graphics (>1000), stopping\n");
+      break;
+    }
     Fpg->grf_offsets[kkhead.code] = ftell(fpg) - FPG_HEAD;
     Fpg->desc_index[Fpg->nIndex] = kkhead.code;
     div_snprintf((char *)Fpg->code_desc[Fpg->nIndex++], sizeof(Fpg->code_desc[0]), "%c %03d %s",

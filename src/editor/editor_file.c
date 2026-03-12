@@ -48,7 +48,7 @@ void open_program(void) {
 
       if ((f = fopen(full, "rb")) != NULL) { // A file was selected
         fseek(f, 0, SEEK_END);
-        n = ftell(f) + buffer_grow;
+        n = ftell(f) + BUFFER_INCREASE;
         if ((buffer = (byte *)malloc(n)) != NULL) {
           memset(buffer, 0, n);
 
@@ -58,15 +58,15 @@ void open_program(void) {
             div_strcpy(v_prg->path, sizeof(v_prg->path), file_types[v_type].path);
             fseek(f, 0, SEEK_SET);
 
-            if (fread(buffer, 1, n, f) == n - buffer_grow) {
-              for (p = buffer; p < buffer + n - buffer_grow; p++) // Reject binary files
+            if (fread(buffer, 1, n, f) == n - BUFFER_INCREASE) {
+              for (p = buffer; p < buffer + n - BUFFER_INCREASE; p++) // Reject binary files
                 if (!*p) {
                   n = 0;
                   break;
                 }
 
               if (n) {
-                n -= buffer_grow;
+                n -= BUFFER_INCREASE;
                 v_prg->file_len = n;
                 v_prg->buffer = buffer;
                 v_prg->num_lines = 1;
@@ -193,7 +193,7 @@ void program0_new(void) {
 
       return;
     }
-    n = buffer_grow;
+    n = BUFFER_INCREASE;
     if ((buffer = (byte *)malloc(n)) != NULL) {
       memset(buffer, 0, n);
       if ((v_prg = (struct tprg *)malloc(sizeof(struct tprg))) != NULL) {
@@ -201,7 +201,7 @@ void program0_new(void) {
         v_prg->buffer_len = n;
         div_strcpy(v_prg->filename, sizeof(v_prg->filename), input);
         div_strcpy(v_prg->path, sizeof(v_prg->path), file_types[v_type].path);
-        //        n-=buffer_grow;
+        //        n-=BUFFER_INCREASE;
         n = strlen((char *)buffer);
         v_prg->file_len = n;
         v_prg->buffer = buffer;
@@ -213,11 +213,11 @@ void program0_new(void) {
         v_prg->num_lines = 1;
         new_window(program0);
         // Add the template
-        div_strcpy((char *)buffer, buffer_grow, "PROGRAM yourprg;");
+        div_strcpy((char *)buffer, BUFFER_INCREASE, "PROGRAM yourprg;");
         read_line();
         f_enter();
         // Add the template
-        div_strcat((char *)buffer, buffer_grow, "BEGIN");
+        div_strcat((char *)buffer, BUFFER_INCREASE, "BEGIN");
         // Your code here\n\n END");
         f_enter();
 
@@ -641,22 +641,22 @@ void open_program_external(char *nombre, char *path) {
   wpath[strlen(wpath) - strlen(nombre)] = 0;
   if ((f = fopen(full, "rb")) != NULL) { // A file was selected
     fseek(f, 0, SEEK_END);
-    n = ftell(f) + buffer_grow;
+    n = ftell(f) + BUFFER_INCREASE;
     if ((buffer = (byte *)malloc(n)) != NULL) {
       if ((v_prg = (struct tprg *)malloc(sizeof(struct tprg))) != NULL) {
         v_prg->buffer_len = n;
         div_strcpy(v_prg->filename, sizeof(v_prg->filename), input);
         div_strcpy(v_prg->path, sizeof(v_prg->path), wpath); //<<<-----------
         fseek(f, 0, SEEK_SET);
-        if (fread(buffer, 1, n, f) == n - buffer_grow) {
-          for (p = buffer; p < buffer + n - buffer_grow; p++)
+        if (fread(buffer, 1, n, f) == n - BUFFER_INCREASE) {
+          for (p = buffer; p < buffer + n - BUFFER_INCREASE; p++)
             if (!*p) {
               n = 0;
               break;
             }
 
           if (n) {
-            n -= buffer_grow;
+            n -= BUFFER_INCREASE;
             v_prg->file_len = n;
             v_prg->buffer = buffer;
             v_prg->num_lines = 1;

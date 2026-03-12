@@ -1,8 +1,8 @@
 #ifndef __DIV_H_
 #define __DIV_H_
 
-#define long_header 36
-#define end_struct  long_header + 12 + 10 * 10 + 10 * 7 + 8 + 8
+#define HEADER_LENGTH 36
+#define end_struct  HEADER_LENGTH + 12 + 10 * 10 + 10 * 7 + 8 + 8
 
 #ifndef NULL
 #define NULL 0
@@ -296,10 +296,10 @@ extern char key[]; // Actual scancodes
 
 #define text_offset mem[7]
 
-#define MOUSE  ((_mouse *)&mem[long_header])
-#define SCROLL ((_scroll *)&mem[long_header + 12])
-#define M7     ((_m7 *)&mem[long_header + 12 + 10 * 10])
-#define JOY    ((_joy *)&mem[long_header + 12 + 10 * 10 + 10 * 7])
-#define SETUP  ((_joy *)&mem[long_header + 12 + 10 * 10 + 10 * 7 + 8])
+#define MOUSE  ((_mouse *)&mem[HEADER_LENGTH])
+#define SCROLL ((_scroll *)&mem[HEADER_LENGTH + 12])
+#define M7     ((_m7 *)&mem[HEADER_LENGTH + 12 + 10 * 10])
+#define JOY    ((_joy *)&mem[HEADER_LENGTH + 12 + 10 * 10 + 10 * 7])
+#define SETUP  ((_joy *)&mem[HEADER_LENGTH + 12 + 10 * 10 + 10 * 7 + 8])
 
 #endif

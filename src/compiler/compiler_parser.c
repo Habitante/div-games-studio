@@ -3035,7 +3035,7 @@ puntero8:
   // Main code
   //---------------------------------------------------------------------------
 
-  // Generate jump to start of code (long_header)
+  // Generate jump to start of code (HEADER_LENGTH)
 
   mem[0] = program_type;
   mem[1] = imem;

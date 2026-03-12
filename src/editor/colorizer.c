@@ -9,10 +9,10 @@ void col_analyze_ltlex(void);
 
 //-----------------------------------------------------------------------------
 
-#define max_obj     768 // Maximum compiler object count
-#define long_med_id 16  // Average identifier length (+4+4+1)
+#define MAX_OBJECTS     768 // Maximum compiler object count
+#define ID_AVG_LENGTH 16  // Average identifier length (+4+4+1)
 
-#define max_nodes 128 // Maximum lexer symbol nodes
+#define MAX_NODES 128 // Maximum lexer symbol nodes
 
 #define cr  13 // Carriage return
 #define lf  10 // Line feed
@@ -49,7 +49,7 @@ struct clex_ele {
   byte token;
   struct clex_ele *alternative;
   struct clex_ele *next;
-} clex_symbols[max_nodes], *iclex_symbols, *clex_case[256];
+} clex_symbols[MAX_NODES], *iclex_symbols, *clex_case[256];
 
 int cnum_nodos; // Number of nodes used in clex_symbols
 
@@ -99,7 +99,7 @@ void init_lexcolor() {
     else
       clex_case[n] = (struct clex_ele *)l_err;
 
-  if ((cvnom = (byte *)malloc(max_obj * long_med_id + 1024)) == NULL)
+  if ((cvnom = (byte *)malloc(MAX_OBJECTS * ID_AVG_LENGTH + 1024)) == NULL)
     col_error(0, 0);
 
   icvnom.b = cvnom;
@@ -156,7 +156,7 @@ void color_lex(void) {
       h = ((byte)(h << 1) + (h >> 7)) ^ (*icvnom.b++);
     icvnom.b++;
     _source--;
-    if (icvnom.b - cvnom > max_obj * long_med_id) {
+    if (icvnom.b - cvnom > MAX_OBJECTS * ID_AVG_LENGTH) {
       icvnom.b = _ivnom;
       color_token = p_id;
       break;
@@ -356,7 +356,7 @@ void col_analyze_ltlex(void) {
         clex_case[*buf] = (struct clex_ele *)l_lit;
       } else { //Parse a new symbol
         if ((e = clex_case[*buf]) == 0) {
-          if (cnum_nodos++ == max_nodes)
+          if (cnum_nodos++ == MAX_NODES)
             col_error(0, 3);
           e = clex_case[*buf] = iclex_symbols++;
           (*e).caracter = *buf++;
@@ -366,7 +366,7 @@ void col_analyze_ltlex(void) {
           if (lower[*buf])
             col_error(0, 4);
           if ((*e).next == 0)
-            if (cnum_nodos++ == max_nodes)
+            if (cnum_nodos++ == MAX_NODES)
               col_error(0, 3);
             else
               e = (*e).next = iclex_symbols++;
@@ -375,7 +375,7 @@ void col_analyze_ltlex(void) {
             while ((*e).caracter != *buf && (*e).alternative)
               e = (*e).alternative;
             if ((*e).caracter != *buf) {
-              if (cnum_nodos++ == max_nodes)
+              if (cnum_nodos++ == MAX_NODES)
                 col_error(0, 3);
               else
                 e = (*e).alternative = iclex_symbols++;

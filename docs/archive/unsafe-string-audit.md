@@ -272,7 +272,7 @@ Actions:
 
 Later, when IDE and tools are hardened:
 
-- Review `sprintf`/`strcpy`/`strcat` that operate on virtual memory (`mem[]`, `pila[]`) in runtime `f.c` and debug/decompiler code.
+- Review `sprintf`/`strcpy`/`strcat` that operate on virtual memory (`mem[]`, `stack[]`) in runtime `f.c` and debug/decompiler code.
 - Replace brittle string-building logic with helpers that take explicit lengths, especially where user scripts can influence content.
 - Consider introducing small struct wrappers for “dynamic strings” in the runtime, rather than hand-rolling pointer arithmetic.
 

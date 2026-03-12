@@ -10,7 +10,7 @@
 //-----------------------------------------------------------------------------
 
 #define max_pun 64 // Maximum number of control points
-#define max_exp 8  // Maximum number of base explosions
+#define MAX_EXP_SIZE 8  // Maximum number of base explosions
 #define DEEP    4
 // #pragma on (check_stack)  /* Watcom-specific, not needed */
 
@@ -60,7 +60,7 @@ struct tp {   // Structure for explosion points
 struct te { // Structure for a base explosion
   struct tp p[max_pun];
   byte *ptr;
-} e[max_exp];
+} e[MAX_EXP_SIZE];
 
 //-----------------------------------------------------------------------------
 //      Parameters for creating the explosion

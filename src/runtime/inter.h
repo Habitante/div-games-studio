@@ -158,7 +158,7 @@ void finalize_texts(void);
 // Constants
 ///////////////////////////////////////////////////////////////////////////////
 
-#define max_exp         512  // Maximum number of elements in an expression
+#define MAX_EXP_SIZE         512  // Maximum number of elements in an expression
 #define EVAL_STACK_SIZE 2048 // Execution stack length
 
 #define swap(a, b) \
@@ -315,7 +315,7 @@ void finalize_texts(void);
 
 //----------------------------------------------------------------------------- // Global variables of the programs //-----------------------------------------------------------------------------
 
-#define long_header 9 // Header length at the start of programs
+#define HEADER_LENGTH 9 // Header length at the start of programs
 
 GLOBAL int imem_max; // Main memory of the target machine
 
@@ -393,7 +393,7 @@ GLOBAL struct _video_modes *video_modes;
 
 // WARNING: end_struct offset must match the initialization in i.c and div.h
 
-#define end_struct long_header + 14 + 10 * 10 + 10 * 7 + 8 + 11 + 1026 + 146 + 32 * 3
+#define end_struct HEADER_LENGTH + 14 + 10 * 10 + 10 * 7 + 8 + 11 + 1026 + 146 + 32 * 3
 
 #define timer(x) mem[end_struct + x]
 
@@ -485,7 +485,7 @@ void read_joy(void);
 //-----------------------------------------------------------------------------
 
 GLOBAL int
-    pila[EVAL_STACK_SIZE + max_exp + 64]; // Expression evaluation (compilation and execution)
+    stack[EVAL_STACK_SIZE + MAX_EXP_SIZE + 64]; // Expression evaluation (compilation and execution)
 
 GLOBAL int *mem, imem, iloc, iloc_pub_len, iloc_len;
 GLOBAL byte *memb;

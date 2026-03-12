@@ -323,26 +323,26 @@ extern int find_status;
 
 #include "sysdac.h"
 time_t dtime;
-memptrsize stack[65535];
+memptrsize stack_pool[65535];
 
 void initialization(void) {
   int n;
 
   for (n = 0; n < 65535; n++)
-    stack[n] = 0;
+    stack_pool[n] = 0;
 
-  mouse = (struct _mouse *)&mem[long_header];
-  scroll = (struct _scroll *)&mem[long_header + 14];
-  m7 = (struct _m7 *)&mem[long_header + 14 + 10 * 10];
-  joy = (struct _joy *)&mem[long_header + 14 + 10 * 10 + 10 * 7];
-  setup = (struct _setup *)&mem[long_header + 14 + 10 * 10 + 10 * 7 + 8];
-  // net = (struct _net *)&mem[long_header + 14 + 10 * 10 + 10 * 7 + 8 + 11];
+  mouse = (struct _mouse *)&mem[HEADER_LENGTH];
+  scroll = (struct _scroll *)&mem[HEADER_LENGTH + 14];
+  m7 = (struct _m7 *)&mem[HEADER_LENGTH + 14 + 10 * 10];
+  joy = (struct _joy *)&mem[HEADER_LENGTH + 14 + 10 * 10 + 10 * 7];
+  setup = (struct _setup *)&mem[HEADER_LENGTH + 14 + 10 * 10 + 10 * 7 + 8];
+  // net = (struct _net *)&mem[HEADER_LENGTH + 14 + 10 * 10 + 10 * 7 + 8 + 11];
   // m8 pointer removed (MODE8 deleted) - memory layout preserved for compatibility
-  dirinfo = (struct _dirinfo *)&mem[long_header + 14 + 10 * 10 + 10 * 7 + 8 + 11 ];
+  dirinfo = (struct _dirinfo *)&mem[HEADER_LENGTH + 14 + 10 * 10 + 10 * 7 + 8 + 11 ];
   fileinfo =
-      (struct _fileinfo *)&mem[long_header + 14 + 10 * 10 + 10 * 7 + 8 + 11 + 1026];
+      (struct _fileinfo *)&mem[HEADER_LENGTH + 14 + 10 * 10 + 10 * 7 + 8 + 11 + 1026];
   video_modes = (struct _video_modes
-                     *)&mem[long_header + 14 + 10 * 10 + 10 * 7 + 8 + 11 + 1026 + 146];
+                     *)&mem[HEADER_LENGTH + 14 + 10 * 10 + 10 * 7 + 8 + 11 + 1026 + 146];
   iloc = mem[2];              // Start of local variables
   iloc_len = mem[6] + mem[5]; // Length of local (public and private)
   iloc_pub_len = mem[6];      // Length of local public variables
@@ -646,20 +646,20 @@ void save_stack(int id, int sp1, int sp2) {
   p = (memptrsize *)malloc((sp2 - sp1 + 3) * sizeof(memptrsize));
   stacks = 0;
   while (stacks < 65535) {
-    if (stack[stacks] > 0)
+    if (stack_pool[stacks] > 0)
       stacks++;
     else
       break;
   }
   printf("using stack: %d\n", stacks);
-  stack[stacks] = (memptrsize)(uintptr_t)p;
+  stack_pool[stacks] = (memptrsize)(uintptr_t)p;
 
   if (p != NULL) {
     mem[id + _SP] = stacks;
     p[0] = sp1;
     p[1] = sp2;
     for (n = 0; n <= sp2 - sp1; n++)
-      p[n + 2] = pila[sp1 + n];
+      p[n + 2] = stack[sp1 + n];
   } else
     mem[id + _SP] = 0;
 }
@@ -667,19 +667,19 @@ void save_stack(int id, int sp1, int sp2) {
 /* Restore a process's saved execution stack from its heap-allocated backup.
  * Called when resuming a process in exec_process(). The backup (created by
  * save_stack) stores [sp_low, sp_high, data...]; this copies data back
- * into pila[], sets sp to sp_high, and frees the backup.
+ * into stack[], sets sp to sp_high, and frees the backup.
  */
 void load_stack(int id) {
   int n;
   int32_t *p;
   if (mem[id + _SP]) {
-    p = (int32_t *)(uintptr_t)stack[mem[id + _SP]];
+    p = (int32_t *)(uintptr_t)stack_pool[mem[id + _SP]];
 
     for (n = 0; n <= p[1] - p[0]; n++)
-      pila[p[0] + n] = p[n + 2];
+      stack[p[0] + n] = p[n + 2];
 
-    //    free(stack[mem[id+_SP]]);
-    stack[mem[id + _SP]] = 0;
+    //    free(stack_pool[mem[id+_SP]]);
+    stack_pool[mem[id + _SP]] = 0;
     mem[id + _SP] = 0;
     sp = p[1];
     free(p);
@@ -690,7 +690,7 @@ void load_stack(int id) {
 void update_stack(int id, int value) {
   int32_t *p;
   if (mem[id + _SP]) {
-    p = (int32_t *)(uintptr_t)stack[mem[id + _SP]];
+    p = (int32_t *)(uintptr_t)stack_pool[mem[id + _SP]];
     p[p[1] - p[0] + 2] = value;
   }
 }

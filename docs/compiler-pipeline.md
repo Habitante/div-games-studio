@@ -20,7 +20,7 @@ Called from `comp()` (also in `compiler.c`), which wraps it in a `setjmp`/`longj
 error recovery. The compilation pipeline:
 
 1. **Reset state** -- Clear object table, lexer tables, hash table, peephole buffer
-2. **Allocate `vnom`** -- Name vector for identifiers (`max_obj * long_med_id` bytes)
+2. **Allocate `vnom`** -- Name vector for identifiers (`MAX_OBJECTS * ID_AVG_LENGTH` bytes)
 3. **`analyze_ltlex()`** -- Load lexer definition from `system/ltlex.def`
 4. **`preload_objects()`** -- Load predefined objects from `system/ltobj.def`
    (built-in constants, globals, locals, structs, functions)
@@ -165,7 +165,7 @@ String literals (delimited by `"`) are:
 
 ## 3. Symbol Table
 
-### Object Table: `obj[max_obj]` in `compiler.c` (struct defined in `compiler_internal.h`)
+### Object Table: `obj[MAX_OBJECTS]` in `compiler.c` (struct defined in `compiler_internal.h`)
 
 ```c
 struct object {
@@ -241,7 +241,7 @@ Loaded from `system/ltobj.def`. This file defines:
 > 2. **Global struct layout** -- The order and size of `global struct` blocks
 >    in `ltobj.def` determines how the compiler lays out global memory. The
 >    runtime's `initialization()` in `interpreter.c` has hardcoded offsets
->    (e.g., `long_header + 14 + 10*10 + ...`) that must match exactly. The
+>    (e.g., `HEADER_LENGTH + 14 + 10*10 + ...`) that must match exactly. The
 >    `end_struct` macro in `inter.h` must equal the total size of all structs.
 >
 > 3. **Local variable layout** -- The `local` declarations and `local struct

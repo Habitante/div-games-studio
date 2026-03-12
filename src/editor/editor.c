@@ -1088,7 +1088,7 @@ void check_memory(int block_len) {
 
   if (v.prg->buffer_len <= v.prg->file_len + block_len + buffer_min) {
     write_line();
-    p = (byte *)realloc(v.prg->buffer, v.prg->file_len + block_len + buffer_grow);
+    p = (byte *)realloc(v.prg->buffer, v.prg->file_len + block_len + BUFFER_INCREASE);
     if (p != NULL) {
       ip = (byte *)p - v.prg->buffer;
       v.prg->buffer += ip;
@@ -1098,7 +1098,7 @@ void check_memory(int block_len) {
         block_start += ip;
         block_end += ip;
       }
-      v.prg->buffer_len = v.prg->file_len + block_len + buffer_grow;
+      v.prg->buffer_len = v.prg->file_len + block_len + BUFFER_INCREASE;
     }
     read_line();
   }

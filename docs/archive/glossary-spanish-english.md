@@ -152,7 +152,7 @@ Runtime code is in `src/runtime/` (interpreter.c, functions.c, render.c).
 |---|---|---|
 | `interprete()` | `interpreter()` | Interpreter main function |
 | `nucleo_exec()` | `core_exec()` | Core execution loop ("nucleo" = nucleus/core) |
-| `pila[2624]` | `pila[2624]` (unchanged) | Execution stack ("pila" = stack/pile) |
+| `pila[2624]` | `stack[2624]` | Execution stack |
 | `reloj` | `frame_clock` | Clock / timer ("reloj" = clock) |
 | `procesos` | `process_count` | Living process count |
 | `freloj` | `fractional_clock` | Next frame time target |
@@ -228,7 +228,7 @@ Useful for reading git history, the original MSDOS source, or LIBRO.DOC.
 | `mapa` | map / image | `tmapa` (unchanged struct name) |
 | `paleta` | palette | `paleta` → `palette` |
 | `pieza` | piece / token | `pieza` → `current_token` |
-| `pila` | stack | `pila[]` (unchanged) |
+| `pila` | stack | `stack[]` |
 | `pintar` | to paint | `pinta_sprite()` → `paint_sprite()` |
 | `ratón` | mouse | `read_mouse()` (unchanged) |
 | `reloj` | clock | `reloj` → `frame_clock` |

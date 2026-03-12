@@ -973,7 +973,7 @@ void factor(void) {
       (*_exp++).value = (memptrsize)o;
       break;
     case tsglo:
-      if ((*o).struct_global.offset == long_header) { // type mouse ≡ 0
+      if ((*o).struct_global.offset == HEADER_LENGTH) { // type mouse ≡ 0
         (*_exp).type = econs;
         (*_exp++).value = 0;
         break;

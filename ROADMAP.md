@@ -102,57 +102,131 @@ build clean.
 
 ---
 
-## Future: Testing Framework
+## Code Review (2026-03-12)
 
-**Deferred until codebase is in better shape.** To be discussed in detail when we
-get there. Some initial thoughts:
+Five-axis automated audit of the entire `src/` tree covering memory safety,
+global state & coupling, magic numbers & limits, error handling, and performance.
+Full findings saved in `docs/code-review-2026-03-12.md`. Key takeaways that
+shaped the roadmap below:
 
-- The main challenge is that everything depends on the full IDE being initialized
-  (global state, SDL, loaded files). True unit testing requires decoupling.
-- Possible starting points: compiler tests (compile known .PRG files, verify
-  bytecode output), file format tests (load/save FPG/MAP/FNT round-trips),
-  runtime function tests (call individual f.c functions with known stack state).
-- A test harness is a prerequisite for autonomous agent improvement loops.
-
----
-
-## Phase 2.5 — SDL2 → SDL3 Migration
-
-Not urgent — SDL2 will be maintained for years. See
-[`docs/sdl3-migration-report.md`](docs/sdl3-migration-report.md) for the full
-analysis (~450 call sites). Pre-requisite: verify 32-bit SDL3 package availability.
+- **3 real bugs** — division-by-zero in release builds, double-free in BMP
+  loader, FPG heap overflow on crafted files
+- **File format parsers trust every byte** — no validation of dimensions,
+  offsets, or array indices read from files. Biggest safety gap in the codebase.
+- **154 globals**, `screen_buffer` written by 4 modules with no ownership, but
+  the coupling doesn't block Phase 4 features — fix only what specific features
+  require
+- **Performance is fine** — O(N^2) process scheduling is irrelevant at typical
+  DIV game scale
 
 ---
 
-## Phase 3 — Minimum Viable Steam Product
+## Phase 3 — Hardening & Bug Fixes
 
-The features needed so a modern developer won't rage-quit in the first 10 minutes.
+The code review found real bugs and safety gaps that should be fixed before
+adding features. Everything here is bounded, testable work — no architecture
+astronautics.
+
+### 3A — Real bugs (immediate, ~1 hour)
+
+- [ ] **Division by zero crashes release builds** — `kernel.inc` checks for
+  zero divisor in debug builds but not release. Add the same guard to the
+  release paths for `ldiv`, `lmod`, `ldia`, `lmoa` (4 opcodes, 4 `if`s)
+- [ ] **Double-free in BMP loader** — `image.c` frees `CopiaBuffer` up to 3
+  times on certain bit depths. Restructure cleanup to single free-on-exit
+- [ ] **FPG index overflow** — `fpg.c` never checks `Fpg->nIndex` against
+  array size. An FPG with >1000 graphics causes heap corruption. Add bounds check
+- [ ] **FPG code field unchecked** — `kkhead.code` from file used as array
+  index into `grf_offsets[1000]` without validation. Reject out-of-range codes
+
+### 3B — File format hardening (~1-2 sessions)
+
+Every image/FPG/MAP parser trusts file headers completely. On Steam, users will
+load files from the internet.
+
+- [ ] **`validate_image_dimensions()` helper** — Check: positive, sane range
+  (e.g. <=16384), and `width * height` doesn't overflow 32-bit int. Call from
+  every loader (BMP, PCX, MAP, FPG, JPEG)
+- [ ] **Check all `fread()` return values** in `formats/image.c` (~12
+  unchecked sites) — return error on partial reads instead of using garbage data
+- [ ] **PCX RLE bounds checking** — RLE decompressor can overflow output buffer
+  with malformed run lengths. Add output pointer bounds check
+- [ ] **FPG palette read validation** — Check for truncated files before
+  reading 768-byte palette
+- [ ] **MAP header validation** — Check width/height/num_points before using
+  as allocation sizes or array indices
+
+### 3C — Runtime & SDL robustness (~1 session)
+
+- [ ] **Check SDL init calls** — `SDL_CreateWindowAndRenderer()`,
+  `SDL_CreateTexture()`, `SDL_CreateRGBSurface()` in `osd_sdl2.c` return NULL
+  on failure but are never checked. Add checks with visible error messages
+- [ ] **Compiler `longjmp` cleanup** — `compiler.c` leaks `mem`, `loc`, `frm`
+  when `comp_exit()` fires via `longjmp`. Free allocated pointers in the error
+  recovery path
+- [ ] **Unchecked `fopen()` in Windows `fmemopen` shim** — `osdepwin.c`
+  crashes if temp directory is full or inaccessible
+- [ ] **Runtime `exit()` without cleanup** — `functions.c` calls `exit()`
+  directly. Should go through proper SDL/temp-file shutdown
+
+---
+
+## Phase 4 — Minimum Viable Steam Product
+
+The features needed so a modern developer won't rage-quit in the first 10
+minutes. Phase 3 hardening ensures the foundation is solid first.
 
 ### Critical UX
-- [ ] **Undo/redo in code editor** — the single most important missing feature
-- [ ] **UI scaling** (2x, 3x, 4x integer scale of internal resolution)
-- [ ] **English UI by default** (verify lenguaje.div translation completeness)
-- [ ] **Project templates** ("Hello World", "Platformer", "Shoot'em Up" skeletons)
-- [ ] **One-click export** (package divrun + bytecode + data → distributable zip)
-- [ ] **Modern gamepad support** (SDL_GameController API, not raw SDL_Joystick)
+
+- [ ] **Undo/redo in code editor** — the single most important missing feature.
+  The paint editor has its own undo system (`undo`/`undo_table` globals); the
+  code editor needs a separate one (operation log in `tprg`, not shared with
+  paint). Not blocked by global state — just needs new code in `editor/`
+- [ ] **UI scaling** (2x, 3x, 4x integer scale of internal resolution) — UI
+  layout uses hardcoded pixel offsets everywhere (+7, +23, x9 for menus).
+  Start with SDL render scaling of the final output (easy), defer internal
+  layout scaling (hard, magic numbers everywhere)
+- [ ] **English UI by default** (verify `lenguaje.div` translation completeness)
+- [ ] **Project templates** ("Hello World", "Platformer", "Shoot'em Up"
+  skeletons)
+- [ ] **One-click export** (package `divrun` + bytecode + data into
+  distributable zip)
+- [ ] **Modern gamepad support** (SDL_GameController API, not raw
+  SDL_Joystick) — joystick code is cleanly isolated in `osd_sdl2.c`
 
 ### Window management
+
 - [ ] Proper fullscreen toggle (Alt+Enter convention)
 - [ ] DPI-aware rendering (SDL_WINDOW_ALLOW_HIGHDPI)
 
 ### Steam integration
+
 - [ ] Steamworks SDK: basic integration (launch, overlay)
 - [ ] Steam Cloud save for user projects
 - [ ] Proper file path system (command-line args or env vars)
 
 ### Distribution
+
 - [ ] Automate DLL bundling in build system
 - [ ] Code-sign executables (Windows SmartScreen)
 - [ ] Clean ~5MB distribution package
 
 ---
 
-## Phase 4 — Community & Polish (post-launch)
+## Phase 5 — SDL2 → SDL3 Migration
+
+Not urgent — SDL2 will be maintained for years. See
+[`docs/sdl3-migration-report.md`](docs/sdl3-migration-report.md) for the full
+analysis (~450 call sites). Pre-requisite: verify 32-bit SDL3 package
+availability.
+
+Biggest win: `MIX_SetTrackFrequencyRatio()` replaces the 60-line hand-written
+`freqEffect` sample-rate converter in `shared/run/sound.c` and eliminates the
+WAV-header-wrapping hacks in the PCM editor.
+
+---
+
+## Phase 6 — Community & Polish (post-launch)
 
 Ship, get feedback, iterate.
 
@@ -163,35 +237,45 @@ Ship, get feedback, iterate.
 
 ---
 
-## Phase 5 — DIV Reborn (aspirational, driven by demand)
+## Phase 7 — DIV Reborn (aspirational, driven by demand)
 
-Deeper modernizations that would make DIV genuinely competitive as a creative tool.
-Only pursue based on community demand after shipping.
-
-### Codebase re-architecture
-- [ ] Module boundaries with defined interfaces (compiler, VM, renderer, editor)
-- [ ] Reduce global state — context structs passed explicitly
-- [ ] Clean header hierarchy — per-module headers, not "global.h everywhere"
-- [ ] Test harness — unit tests for compiler, VM, file format parsers
+Deeper modernizations that would make DIV genuinely competitive as a creative
+tool. Only pursue based on community demand after shipping.
 
 ### Rendering modernization
+
 - [ ] True color (32-bit RGBA) alongside classic 8-bit palette mode
 - [ ] PNG/modern image format import
 - [ ] Alpha blending / per-pixel transparency
 - [ ] Native high-resolution support (resolution-aware UI layout)
 
 ### Language & VM evolution
+
 - [ ] Float/fixed-point type (the most-requested feature across all forks)
 - [ ] Relaxed syntax / quality-of-life improvements
 - [ ] Better string handling, better error messages
 - [ ] Larger address space
 
 ### Editor improvements
+
 - [ ] Syntax-aware autocomplete
 - [ ] Code folding, go-to-definition, brace matching
 - [ ] Dark mode / theme support
 
+### Codebase re-architecture (only if needed for the above)
+
+The code review found 154 globals in `global.h`, `screen_buffer` written by 4
+modules with no ownership, and every `*_internal.h` re-including `global.h`
+anyway. The 80 .c files are subroutines of one program, not modules. This is
+the cost of the 1990s — fix only what specific features require:
+
+- [ ] Renderer abstraction (if true color needs a different pipeline)
+- [ ] Per-editor context structs (if multiple undo systems need isolation)
+- [ ] Module-local headers (if compile times become a problem)
+- [ ] Test harness — compiler, VM, and file format parser tests
+
 ### Export & distribution
+
 - [ ] Web export (Emscripten)
 - [ ] Standalone installer generation for exported games
 

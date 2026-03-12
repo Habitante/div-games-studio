@@ -39,7 +39,7 @@ copied from the local template; the rest is private data initialized by `lpri`.
 ### Execution Stack
 
 ```c
-int pila[long_pila + max_exp + 64];  // 2048 + 512 + 64 = 2624 entries
+int stack[EVAL_STACK_SIZE + MAX_EXP_SIZE + 64];  // 2048 + 512 + 64 = 2624 entries
 ```
 
 The stack is shared across all processes but each process saves/restores its
@@ -53,7 +53,7 @@ stack pointer (`_SP` field). The stack grows upward (increasing `sp`).
 | `memb` | `byte*` | Same memory, byte-addressed (for byte/string ops) |
 | `memw` | `word*` | Same memory, word-addressed |
 | `ip` | `int` | Instruction pointer (index into `mem[]`) |
-| `sp` | `int` | Stack pointer (index into `pila[]`) |
+| `sp` | `int` | Stack pointer (index into `stack[]`) |
 | `bp` | `int` | Base pointer (for parameter passing) |
 | `id` | `int` | Current process ID (offset into `mem[]`) |
 | `ide` | `int` | Process being executed/painted |
@@ -150,32 +150,32 @@ which contains all the `case` handlers. Each case corresponds to an EML opcode.
 
 **Stack operations:**
 ```c
-case lcar: pila[++sp] = mem[ip++]; break;     // Push constant
+case lcar: stack[++sp] = mem[ip++]; break;     // Push constant
 case lasp: sp--; break;                        // Pop/discard
-case lptr: pila[sp] = mem[pila[sp]]; break;   // Dereference
-case laid: pila[sp] += id; break;              // Add process base address
-case lcid: pila[++sp] = id; break;             // Push current process ID
+case lptr: stack[sp] = mem[stack[sp]]; break;   // Dereference
+case laid: stack[sp] += id; break;              // Add process base address
+case lcid: stack[++sp] = id; break;             // Push current process ID
 ```
 
 **Arithmetic:**
 ```c
-case ladd: pila[sp-1] += pila[sp]; sp--; break;
-case lsub: pila[sp-1] -= pila[sp]; sp--; break;
-case lmul: pila[sp-1] *= pila[sp]; sp--; break;
-case ldiv: pila[sp-1] /= pila[sp]; sp--; break;
-case lmod: pila[sp-1] %= pila[sp]; sp--; break;
-case lneg: pila[sp] = -pila[sp]; break;
+case ladd: stack[sp-1] += stack[sp]; sp--; break;
+case lsub: stack[sp-1] -= stack[sp]; sp--; break;
+case lmul: stack[sp-1] *= stack[sp]; sp--; break;
+case ldiv: stack[sp-1] /= stack[sp]; sp--; break;
+case lmod: stack[sp-1] %= stack[sp]; sp--; break;
+case lneg: stack[sp] = -stack[sp]; break;
 ```
 
 **Assignment:**
 ```c
-case lasi: pila[sp-1] = mem[pila[sp-1]] = pila[sp]; sp--; break;
+case lasi: stack[sp-1] = mem[stack[sp-1]] = stack[sp]; sp--; break;
 ```
 
 **Control flow:**
 ```c
 case ljmp: ip = mem[ip]; break;
-case ljpf: if (pila[sp--] & 1) ip++; else ip = mem[ip]; break;
+case ljpf: if (stack[sp--] & 1) ip++; else ip = mem[ip]; break;
 ```
 
 Note: `ljpf` tests bit 0 of the value, not zero/non-zero. This means
@@ -204,13 +204,13 @@ case lfrm:
     sp = mem[id+_Param] - mem[id+_NumPar];  // Reset stack
     mem[id+_IP] = ip;                         // Save IP for next frame
     mem[id+_IdScan] = 0;                      // Reset scan state
-    pila[sp] = id;
+    stack[sp] = id;
     id = mem[id+_Caller];
     if (!(id & 1)) goto next_process1;        // If caller is dead, finish
     ip = mem[id+_IP];                         // Resume caller
     // If this was a FUNCTION, sleep the caller
-    if (mem[pila[sp]+_FCount] > 0) {
-        mem[pila[sp]+_Caller]++;              // Mark caller as sleeping
+    if (mem[stack[sp]+_FCount] > 0) {
+        mem[stack[sp]+_Caller]++;              // Mark caller as sleeping
         mem[id+_Status] = 3;                  // Sleep caller
         goto next_frm;
     }
@@ -224,9 +224,9 @@ process state and returns to the scheduler.
 ```c
 case lret:
     sp = mem[id+_Param] - mem[id+_NumPar];
-    pila[sp] = id;
+    stack[sp] = id;
     id = mem[id+_Caller];
-    kill_process(pila[sp]);        // Kill the current process
+    kill_process(stack[sp]);        // Kill the current process
     if (!(id & 1)) goto next_process1;
     ip = mem[id+_IP];
     break;
@@ -318,7 +318,7 @@ Processes communicate through:
 
 `function()` is called by the `lfun` opcode. It reads `mem[ip-1]` to get the
 function code, then dispatches via a `switch` to the implementation. Functions
-pop their arguments from `pila[]` and push results back.
+pop their arguments from `stack[]` and push results back.
 
 > **Important:** The `case` numbers in this switch, the `fname[]` debug table,
 > and the `function NNN` lines in `div/system/ltobj.def` must all agree. The

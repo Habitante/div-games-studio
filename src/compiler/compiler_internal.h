@@ -32,21 +32,21 @@
 #define version "0c88b" // Compiler version
 
 #ifndef SHARE
-#define max_obj     8192 // Compiler object maximum limit
-#define long_med_id 16   // Average identifier length (+4+4+1)
+#define MAX_OBJECTS     8192 // Compiler object maximum limit
+#define ID_AVG_LENGTH 16   // Average identifier length (+4+4+1)
 #else
-#define max_obj     700 // The shareware version has 626 ...
-#define long_med_id 20  // Average identifier length (+4+4+1)
+#define MAX_OBJECTS     700 // The shareware version has 626 ...
+#define ID_AVG_LENGTH 20  // Average identifier length (+4+4+1)
 #endif
 
-#define max_nodes       128  // Maximum number of lexer symbol nodes
-#define max_exp         512  // Maximum number of elements in an expression
-#define long_header     9    // Header length at program start
+#define MAX_NODES       128  // Maximum number of lexer symbol nodes
+#define MAX_EXP_SIZE         512  // Maximum number of elements in an expression
+#define HEADER_LENGTH     9    // Header length at program start
 #define EVAL_STACK_SIZE 2048 // Execution stack length
 
-#define default_buffer    (16384 * 8)
-#define security_distance (4096 * 8)
-#define buffer_grow       (16384 * 8)
+#define DEFAULT_BUFFER    (16384 * 8)
+#define SAFETY_BUFFER (4096 * 8)
+#define BUFFER_INCREASE       (16384 * 8)
 
 #define cr  13 // Carriage return
 #define lf  10 // Line feed
@@ -595,7 +595,7 @@ extern int start_addr, end_addr;
 extern int start_line, start_col;
 extern int end_line, end_col;
 
-extern struct object obj[max_obj], *iobj;
+extern struct object obj[MAX_OBJECTS], *iobj;
 extern byte *vnom;
 union name_index_u {
   byte *b;
@@ -605,8 +605,8 @@ extern union name_index_u name_index;
 extern byte *objects_start;
 extern byte *vhash[256];
 
-extern struct exp_ele tabexp[max_exp], *_exp;
-extern struct lex_ele lex_simb[max_nodes], *ilex_simb, *lex_case[256];
+extern struct exp_ele tabexp[MAX_EXP_SIZE], *_exp;
+extern struct lex_ele lex_simb[MAX_NODES], *ilex_simb, *lex_case[256];
 
 extern int current_token, token_value;
 extern struct object *o;
@@ -624,7 +624,7 @@ extern int itbreak;
 extern int tcont[max_cont];
 extern int itcont;
 
-extern int eval_stack[EVAL_STACK_SIZE + max_exp + 64];
+extern int eval_stack[EVAL_STACK_SIZE + MAX_EXP_SIZE + 64];
 
 extern int32_t *mem_ory, *frm;
 extern int32_t *mem, *loc;

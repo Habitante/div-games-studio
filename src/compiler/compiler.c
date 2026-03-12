@@ -8,7 +8,7 @@
 // 04 - prepare debugger for string support
 // 05 - add local and private strings
 // 06 - runtime range checking (strings with 0xdad00000 prefix)
-// 07 - long_header=9, instead of 36
+// 07 - HEADER_LENGTH=9, instead of 36
 // 08 - global member strings
 // 09 - local member strings
 // 10 - struct initialization handling member strings
@@ -266,7 +266,7 @@ int start_addr, end_addr;
 int start_line, start_col;
 int end_line, end_col;
 
-struct object obj[max_obj], *iobj;
+struct object obj[MAX_OBJECTS], *iobj;
 
 byte *vnom = NULL;
 union name_index_u name_index;
@@ -274,8 +274,8 @@ union name_index_u name_index;
 byte *objects_start;
 byte *vhash[256];
 
-struct exp_ele tabexp[max_exp], *_exp;
-struct lex_ele lex_simb[max_nodes], *ilex_simb, *lex_case[256];
+struct exp_ele tabexp[MAX_EXP_SIZE], *_exp;
+struct lex_ele lex_simb[MAX_NODES], *ilex_simb, *lex_case[256];
 
 int current_token, token_value;
 struct object *o;
@@ -294,7 +294,7 @@ int itbreak;
 int tcont[max_cont];
 int itcont;
 
-int eval_stack[EVAL_STACK_SIZE + max_exp + 64];
+int eval_stack[EVAL_STACK_SIZE + MAX_EXP_SIZE + 64];
 
 int32_t *mem_ory = NULL, *frm = NULL;
 int32_t *mem = NULL, *loc = NULL;
@@ -401,7 +401,7 @@ void compile(void) {
     else
       lex_case[n] = (struct lex_ele *)l_err;
 
-  if ((vnom = (byte *)malloc(max_obj * long_med_id + 1024)) == NULL)
+  if ((vnom = (byte *)malloc(MAX_OBJECTS * ID_AVG_LENGTH + 1024)) == NULL)
     c_error(0, 0);
 
   name_index.b = vnom;
@@ -432,27 +432,27 @@ void compile(void) {
     c_error(0, 0);
 
 
-  imem_max = default_buffer;
+  imem_max = DEFAULT_BUFFER;
   imem = 0;
   if ((mem_ory = mem = (int *)malloc(imem_max * sizeof(memptrsize))) == NULL)
     c_error(0, 0);
   memset(mem, 0, imem_max * sizeof(memptrsize));
 
-  iloc_max = default_buffer / 2;
+  iloc_max = DEFAULT_BUFFER / 2;
   iloc = 0;
   local_var_len = 0;
   if ((loc = (int *)malloc(iloc_max * sizeof(memptrsize))) == NULL)
     c_error(0, 0);
   memset(loc, 0, iloc_max * sizeof(memptrsize));
 
-  ifrm_max = default_buffer / 2;
+  ifrm_max = DEFAULT_BUFFER / 2;
   if ((frm = (int *)malloc(ifrm_max * sizeof(memptrsize))) == NULL)
     c_error(0, 0);
   memset(frm, 0, ifrm_max * sizeof(memptrsize));
 
   show_compile_message(texts[203]);
 
-  imem = long_header;
+  imem = HEADER_LENGTH;
 
   preload_objects(); // No literals in the preloaded objects
 
@@ -497,7 +497,7 @@ void compile(void) {
   }
 
   mem[2] = imem;
-  mem[3] = max_process; // Previously long_header, now unused
+  mem[3] = max_process; // Previously HEADER_LENGTH, now unused
   mem[4] = 0;           // Previously mem[1]-mem[3] (global data length), now unused
   mem[5] = local_var_len - iloc;
   mem[6] = iloc;
@@ -797,12 +797,12 @@ void record_statement(void) {
 void test_buffer(int **buffer, int *maximo, int n) {
   int max;
 
-  if (n + buffer_grow > 2 * 1000 * 1000)
+  if (n + BUFFER_INCREASE > 2 * 1000 * 1000)
     c_error(0, 0);
 
-  if (n > *maximo - security_distance) {
+  if (n > *maximo - SAFETY_BUFFER) {
     max = *maximo;
-    *maximo = n + buffer_grow;
+    *maximo = n + BUFFER_INCREASE;
     max = *maximo - max;
     if (*buffer == mem) {
       if ((*buffer = mem_ory = (int *)realloc(*buffer, *maximo * sizeof(memptrsize))) == NULL)
@@ -894,7 +894,7 @@ void analyze_ltlex(void) {
         lex_case[*buf] = (struct lex_ele *)l_lit;
       } else { //Analyzes a new symbol
         if ((e = lex_case[*buf]) == 0) {
-          if (num_nodes++ == max_nodes)
+          if (num_nodes++ == MAX_NODES)
             c_error(0, 3);
           e = lex_case[*buf] = ilex_simb++;
           (*e).character = *buf++;
@@ -904,7 +904,7 @@ void analyze_ltlex(void) {
           if (lower[*buf])
             c_error(0, 4);
           if ((*e).next == 0) {
-            if (num_nodes++ == max_nodes)
+            if (num_nodes++ == MAX_NODES)
               c_error(0, 3);
             else
               e = (*e).next = ilex_simb++;
@@ -913,7 +913,7 @@ void analyze_ltlex(void) {
             while ((*e).character != *buf && (*e).alternative)
               e = (*e).alternative;
             if ((*e).character != *buf) {
-              if (num_nodes++ == max_nodes)
+              if (num_nodes++ == MAX_NODES)
                 c_error(0, 3);
               else
                 e = (*e).alternative = ilex_simb++;
@@ -1493,7 +1493,7 @@ lex_scan:
       h = ((byte)(h << 1) + (h >> 7)) ^ (*name_index.b++);
     name_index.b++;
     _source--;
-    if (name_index.b - vnom > max_obj * long_med_id)
+    if (name_index.b - vnom > MAX_OBJECTS * ID_AVG_LENGTH)
       c_error(0, 100);
 
     ptr = &vhash[h];
@@ -1529,10 +1529,10 @@ lex_scan:
           if (in_params)
             (*o).scope = current_scope;
 #ifndef SHARE
-          if (num_objects++ == max_obj)
+          if (num_objects++ == MAX_OBJECTS)
             c_error(0, 102);
 #else
-          if (num_objects++ == max_obj)
+          if (num_objects++ == MAX_OBJECTS)
             c_error(0, 101);
 #endif
         } else {
@@ -1549,7 +1549,7 @@ lex_scan:
       (*o).member = member;
       if (in_params)
         (*o).scope = current_scope;
-      if (num_objects++ == max_obj)
+      if (num_objects++ == MAX_OBJECTS)
         c_error(0, 102);
     }
     break;
@@ -2806,7 +2806,7 @@ lex_scan:
       h = ((byte)(h << 1) + (h >> 7)) ^ (*name_index.b++);
     name_index.b++;
     _source--;
-    if (name_index.b - vnom > max_obj * long_med_id)
+    if (name_index.b - vnom > MAX_OBJECTS * ID_AVG_LENGTH)
       c_error(0, 100);
     ptr = &vhash[h];
     while (*ptr && strcmp((char *)(ptr + 2), (char *)(_ivnom + ptr8)))

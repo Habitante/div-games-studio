@@ -1364,20 +1364,17 @@ int fmt_load_dac_bmp(char *name) {
       memcpy(Bmpdac, buffer, 4 * InfoHeader.biClrUsed);
     else
       memcpy(Bmpdac, buffer, 4 * 256);
-    free(CopiaBuffer);
   } else if (InfoHeader.biBitCount == 4) {
     memset(Bmpdac, 0, 1024);
     if (InfoHeader.biClrUsed)
       memcpy(Bmpdac, buffer, 4 * InfoHeader.biClrUsed);
     else
       memcpy(Bmpdac, buffer, 4 * 16);
-    free(CopiaBuffer);
   }
   free(CopiaBuffer);
   CopiaBuffer = NULL;
   buffer = NULL;
   if (!((InfoHeader.biBitCount == 8 && !load_palette) || InfoHeader.biBitCount == 4)) {
-    free(CopiaBuffer);
     man = InfoHeader.biWidth;
     mal = InfoHeader.biHeight;
     fseek(file, 0, SEEK_END);

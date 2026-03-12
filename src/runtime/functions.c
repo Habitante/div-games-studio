@@ -37,8 +37,8 @@ void _object_advance(int ide, int angle, int velocity);
 int joy_position(int eje);
 
 void _object_advance(int ide, int angle, int velocity) {
-  mem[id + _X] += get_distx(mem[id + _Angle], pila[sp]);
-  mem[id + _Y] += get_disty(mem[id + _Angle], pila[sp]);
+  mem[id + _X] += get_distx(mem[id + _Angle], stack[sp]);
+  mem[id + _Y] += get_disty(mem[id + _Angle], stack[sp]);
 }
 
 // MODE8 function stubs removed (MODE8 deleted)
@@ -81,30 +81,30 @@ int get_reloj(void) {
 
 void _signal(void) {
   int i;
-  bp = pila[sp - 1];
+  bp = stack[sp - 1];
   if ((bp & 1) && bp >= id_init && bp <= id_end && bp == mem[bp]) {
     if (mem[bp + _Status])
-      if (pila[sp] < 100)
-        mem[bp + _Status] = pila[sp--] + 1;
+      if (stack[sp] < 100)
+        mem[bp + _Status] = stack[sp--] + 1;
       else {
-        mem[bp + _Status] = pila[sp--] - 99;
+        mem[bp + _Status] = stack[sp--] - 99;
         if (mem[bp + _Son])
-          signal_tree(mem[bp + _Son], pila[sp + 1] - 99);
+          signal_tree(mem[bp + _Son], stack[sp + 1] - 99);
       }
     else
-      pila[--sp] = 0; // Returns 0 if the process was dead
+      stack[--sp] = 0; // Returns 0 if the process was dead
   } else {
     for (i = id_start; i <= id_end; i += iloc_len)
       if (mem[i + _Status] && mem[i + _Bloque] == bp) {
-        if (pila[sp] < 100)
-          mem[i + _Status] = pila[sp] + 1;
+        if (stack[sp] < 100)
+          mem[i + _Status] = stack[sp] + 1;
         else {
-          mem[i + _Status] = pila[sp] - 99;
+          mem[i + _Status] = stack[sp] - 99;
           if (mem[i + _Son])
-            signal_tree(mem[i + _Son], pila[sp] - 99);
+            signal_tree(mem[i + _Son], stack[sp] - 99);
         }
       }
-    pila[--sp] = 0;
+    stack[--sp] = 0;
   }
 }
 
@@ -122,11 +122,11 @@ void signal_tree(int p, int s) {
 //----------------------------------------------------------------------------
 
 void _key(void) {
-  if (pila[sp] <= 0 || pila[sp] >= 128) {
+  if (stack[sp] <= 0 || stack[sp] >= 128) {
     e(101);
     return;
   }
-  pila[sp] = key(pila[sp]);
+  stack[sp] = key(stack[sp]);
 }
 
 //----------------------------------------------------------------------------
@@ -441,9 +441,9 @@ int hacer_fade = 0;
 
 void force_pal(void) {
   auto_adapt_palette = 0;
-  if (pila[sp]) {
+  if (stack[sp]) {
     load_pal();
-    if (pila[sp])
+    if (stack[sp])
       auto_adapt_palette = 1;
   }
 }
@@ -454,21 +454,21 @@ void load_pal(void) {
 
   if (auto_adapt_palette) {
     e(183);
-    pila[sp] = 0;
+    stack[sp] = 0;
     return;
   }
 
   if (npackfiles) {
-    m = read_packfile((byte *)&mem[pila[sp]]);
+    m = read_packfile((byte *)&mem[stack[sp]]);
     if (m == -1)
       goto palfuera;
     if (m == -2) {
-      pila[sp] = 0;
+      stack[sp] = 0;
       e(100);
       return;
     }
     if (m <= 0) {
-      pila[sp] = 0;
+      stack[sp] = 0;
       e(200);
       return;
     }
@@ -476,8 +476,8 @@ void load_pal(void) {
     free(packptr);
   } else {
 palfuera:
-    if ((es = div_open_file((char *)&mem[pila[sp]])) == NULL) {
-      pila[sp] = 0;
+    if ((es = div_open_file((char *)&mem[stack[sp]])) == NULL) {
+      stack[sp] = 0;
       e(102);
       return;
     } else {
@@ -495,16 +495,16 @@ palfuera:
           if (is_PCX((byte *)pal)) { // Take the PCX palette
 
             if (npackfiles) {
-              m = read_packfile((byte *)&mem[pila[sp]]);
+              m = read_packfile((byte *)&mem[stack[sp]]);
               if (m == -1)
                 goto palfuera2;
               if (m == -2) {
-                pila[sp] = 0;
+                stack[sp] = 0;
                 e(100);
                 return;
               }
               if (m <= 0) {
-                pila[sp] = 0;
+                stack[sp] = 0;
                 e(200);
                 return;
               }
@@ -512,8 +512,8 @@ palfuera:
               free(packptr);
             } else {
 palfuera2:
-              if ((es = div_open_file((char *)&mem[pila[sp]])) == NULL) {
-                pila[sp] = 0;
+              if ((es = div_open_file((char *)&mem[stack[sp]])) == NULL) {
+                stack[sp] = 0;
                 e(102);
                 return;
               } else {
@@ -528,7 +528,7 @@ palfuera2:
             offs = 0;
 
           } else {
-            pila[sp] = 0;
+            stack[sp] = 0;
             e(103);
             return;
           }
@@ -556,7 +556,7 @@ palfuera2:
   }
 
   palette_loaded = 1;
-  pila[sp] = 1;
+  stack[sp] = 1;
 }
 
 void apply_palette(void) {
@@ -615,11 +615,11 @@ void apply_palette(void) {
 //----------------------------------------------------------------------------
 
 void unload_map(void) {
-  if (pila[sp] < 1000 || pila[sp] > 1999)
+  if (stack[sp] < 1000 || stack[sp] > 1999)
     return;
-  if (g[0].grf[pila[sp]] != 0) {
-    free((byte *)(g[0].grf[pila[sp]]) - 1330);
-    g[0].grf[pila[sp]] = 0;
+  if (g[0].grf[stack[sp]] != 0) {
+    free((byte *)(g[0].grf[stack[sp]]) - 1330);
+    g[0].grf[stack[sp]] = 0;
   }
 }
 
@@ -739,16 +739,16 @@ void load_map(void) {
   pcx_header header;
 
   if (npackfiles) {
-    m = read_packfile((byte *)&mem[pila[sp]]);
+    m = read_packfile((byte *)&mem[stack[sp]]);
     if (m == -1)
       goto mapfuera;
     if (m == -2) {
-      pila[sp] = 0;
+      stack[sp] = 0;
       e(100);
       return;
     }
     if (m <= 0) {
-      pila[sp] = 0;
+      stack[sp] = 0;
       e(200);
       return;
     }
@@ -756,8 +756,8 @@ void load_map(void) {
     file_len = m;
   } else {
 mapfuera:
-    if ((es = div_open_file((char *)&mem[pila[sp]])) == NULL) {
-      pila[sp] = 0;
+    if ((es = div_open_file((char *)&mem[stack[sp]])) == NULL) {
+      stack[sp] = 0;
       e(143);
       return;
     } else {
@@ -769,7 +769,7 @@ mapfuera:
         fclose(es);
       } else {
         fclose(es);
-        pila[sp] = 0;
+        stack[sp] = 0;
         e(100);
         return;
       }
@@ -816,7 +816,7 @@ mapfuera:
         next_map_code = 1000;
     }
     g[0].grf[next_map_code] = (int *)ptr;
-    pila[sp] = next_map_code;
+    stack[sp] = next_map_code;
 
   } else if (is_PCX(ptr)) {
     memcpy((byte *)&header, ptr, sizeof(pcx_header));
@@ -848,7 +848,7 @@ mapfuera:
         next_map_code = 1000;
     }
     g[0].grf[next_map_code] = (int *)buffer;
-    pila[sp] = next_map_code;
+    stack[sp] = next_map_code;
 
   } else {
     e(144);
@@ -868,12 +868,12 @@ void new_map(void) {
   int width, height, cx, cy, color;
   byte *ptr;
 
-  color = pila[sp--];
-  cy = pila[sp--];
-  cx = pila[sp--];
-  height = pila[sp--];
-  width = pila[sp];
-  pila[sp] = 0;
+  color = stack[sp--];
+  cy = stack[sp--];
+  cx = stack[sp--];
+  height = stack[sp--];
+  width = stack[sp];
+  stack[sp] = 0;
 
   // Check width/height/color bounds ...
 
@@ -904,7 +904,7 @@ void new_map(void) {
         next_map_code = 1000;
     }
     g[0].grf[next_map_code] = (int *)ptr;
-    pila[sp] = next_map_code;
+    stack[sp] = next_map_code;
 
   } else
     e(100);
@@ -932,13 +932,13 @@ void load_fpg(void) {
     num++;
   }
   if (num == max_fpgs) {
-    pila[sp] = 0;
+    stack[sp] = 0;
     e(104);
     return;
   }
   if (num) {
     if ((lst = (int **)malloc(sizeof(int *) * 1000)) == NULL) {
-      pila[sp] = 0;
+      stack[sp] = 0;
       e(100);
       return;
     }
@@ -947,16 +947,16 @@ void load_fpg(void) {
   memset(lst, 0, sizeof(int *) * 1000);
 
   if (npackfiles) {
-    m = read_packfile((byte *)&mem[pila[sp]]);
+    m = read_packfile((byte *)&mem[stack[sp]]);
     if (m == -1)
       goto fpgfuera;
     if (m == -2) {
-      pila[sp] = 0;
+      stack[sp] = 0;
       e(100);
       return;
     }
     if (m <= 0) {
-      pila[sp] = 0;
+      stack[sp] = 0;
       e(200);
       return;
     }
@@ -967,10 +967,10 @@ void load_fpg(void) {
   } else {
 fpgfuera:
 #ifdef STDOUTLOG
-    printf("fpg wanted is [%s]\n", (char *)&mem[pila[sp]]);
+    printf("fpg wanted is [%s]\n", (char *)&mem[stack[sp]]);
 #endif
-    if ((es = div_open_file((char *)&mem[pila[sp]])) == NULL) {
-      pila[sp] = 0;
+    if ((es = div_open_file((char *)&mem[stack[sp]])) == NULL) {
+      stack[sp] = 0;
       e(105);
       return;
     } else {
@@ -998,7 +998,7 @@ fpgfuera:
 #endif
       } else {
         fclose(es);
-        pila[sp] = 0;
+        stack[sp] = 0;
         e(100);
         return;
       }
@@ -1100,7 +1100,7 @@ fpgfuera:
 #ifdef STDOUTLOG
   printf("fpg search ended, %p: ptr: %p\n", (void *)((byte *)g[num].fpg + file_len), (void *)ptr);
 #endif
-  pila[sp] = num;
+  stack[sp] = num;
   max_reloj += get_reloj() - old_clock;
 }
 
@@ -1114,13 +1114,13 @@ void start_scroll(void) {
   int file, graf1, graf2, reg, s;
   int *ptr1, *ptr2, mf;
 
-  mf = pila[sp--];
-  reg = pila[sp--];
-  graf2 = pila[sp--];
-  graf1 = pila[sp--];
-  file = pila[sp--];
-  snum = pila[sp];
-  pila[sp] = 0;
+  mf = stack[sp--];
+  reg = stack[sp--];
+  graf2 = stack[sp--];
+  graf1 = stack[sp--];
+  file = stack[sp--];
+  snum = stack[sp];
+  stack[sp] = 0;
 
   if (snum < 0 || snum > 9) {
     e(107);
@@ -1130,7 +1130,7 @@ void start_scroll(void) {
   iscroll[snum].map_flags = mf;
 
   if (iscroll[snum].on) {
-    pila[sp] = snum;
+    stack[sp] = snum;
     stop_scroll();
   }
 
@@ -1253,7 +1253,7 @@ void start_scroll(void) {
 //----------------------------------------------------------------------------
 
 void refresh_scroll(void) {
-  snum = pila[sp];
+  snum = stack[sp];
   set_scroll(0, iscroll[snum].map1_x, iscroll[snum].map1_y);
   set_scroll(1, iscroll[snum].map2_x, iscroll[snum].map2_y);
 }
@@ -1265,7 +1265,7 @@ void refresh_scroll(void) {
 void update_scroll(int);
 
 void _move_scroll(void) {
-  snum = pila[sp];
+  snum = stack[sp];
   if (snum < 0 || snum > 9) {
     e(107);
     return;
@@ -1281,7 +1281,7 @@ void _move_scroll(void) {
 //----------------------------------------------------------------------------
 
 void stop_scroll(void) {
-  snum = pila[sp];
+  snum = stack[sp];
 
   if (snum < 0 || snum > 9) {
     e(107);
@@ -1347,25 +1347,25 @@ void kill_invisible(void) {
 void get_id(void) {
   int i, bloque;
 
-  bloque = pila[sp];
+  bloque = stack[sp];
   if (mem[id + _IdScan] == 0 || bloque != -mem[id + _BlScan]) {
     mem[id + _BlScan] = -bloque;
     i = id_init;
   } else if (mem[id + _IdScan] > id_end) {
-    pila[sp] = 0;
+    stack[sp] = 0;
     return;
   } else
     i = mem[id + _IdScan];
   do {
     if (i != id && mem[i + _Bloque] == bloque && (mem[i + _Status] == 2 || mem[i + _Status] == 4)) {
       mem[id + _IdScan] = i + iloc_len;
-      pila[sp] = i;
+      stack[sp] = i;
       return;
     }
     i += iloc_len;
   } while (i <= id_end);
   mem[id + _IdScan] = i;
-  pila[sp] = 0;
+  stack[sp] = 0;
   return;
 }
 
@@ -1374,8 +1374,8 @@ void get_id(void) {
 //----------------------------------------------------------------------------
 
 void get_disx(void) {
-  angle = (float)pila[sp - 1] / radian;
-  pila[sp - 1] = (int)((float)cos(angle) * pila[sp]);
+  angle = (float)stack[sp - 1] / radian;
+  stack[sp - 1] = (int)((float)cos(angle) * stack[sp]);
   sp--;
 }
 
@@ -1384,8 +1384,8 @@ void get_disx(void) {
 //----------------------------------------------------------------------------
 
 void get_disy(void) {
-  angle = (float)pila[sp - 1] / radian;
-  pila[sp - 1] = -(int)((float)sin(angle) * pila[sp]);
+  angle = (float)stack[sp - 1] / radian;
+  stack[sp - 1] = -(int)((float)sin(angle) * stack[sp]);
   sp--;
 }
 
@@ -1394,13 +1394,13 @@ void get_disy(void) {
 //----------------------------------------------------------------------------
 
 void get_angle(void) {
-  bp = pila[sp];
+  bp = stack[sp];
   x = mem[bp + _X] - mem[id + _X];
   y = mem[id + _Y] - mem[bp + _Y];
   if (!x && !y)
-    pila[sp] = 0;
+    stack[sp] = 0;
   else
-    pila[sp] = (float)atan2(y, x) * radian;
+    stack[sp] = (float)atan2(y, x) * radian;
 }
 
 //----------------------------------------------------------------------------
@@ -1409,7 +1409,7 @@ void get_angle(void) {
 
 void get_dist(void) {
   int n = 1;
-  bp = pila[sp];
+  bp = stack[sp];
   x = mem[bp + _X] - mem[id + _X];
   y = mem[id + _Y] - mem[bp + _Y];
   while (abs(x) + abs(y) >= 46000) {
@@ -1417,7 +1417,7 @@ void get_dist(void) {
     x /= 2;
     y /= 2;
   }
-  pila[sp] = sqrt(x * x + y * y) * n;
+  stack[sp] = sqrt(x * x + y * y) * n;
 }
 
 //----------------------------------------------------------------------------
@@ -1426,9 +1426,9 @@ void get_dist(void) {
 
 void fade(void) {
   int r, g, b;
-  r = pila[sp - 3];
-  g = pila[sp - 2];
-  b = pila[sp - 1];
+  r = stack[sp - 3];
+  g = stack[sp - 2];
+  b = stack[sp - 1];
   if (r < 0)
     r = 0;
   else if (r > 200)
@@ -1444,13 +1444,13 @@ void fade(void) {
   dacout_r = 64 - r * 64 / 100;
   dacout_g = 64 - g * 64 / 100;
   dacout_b = 64 - b * 64 / 100;
-  dacout_speed = pila[sp];
+  dacout_speed = stack[sp];
 
   if (now_dacout_r != dacout_r || now_dacout_g != dacout_g || now_dacout_b != dacout_b)
     fading = 1;
 
   sp -= 3;
-  pila[sp] = 0;
+  stack[sp] = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -1458,11 +1458,11 @@ void fade(void) {
 //----------------------------------------------------------------------------
 
 void unload_fnt(void) {
-  if (pila[sp] < 1 || pila[sp] >= max_fonts)
+  if (stack[sp] < 1 || stack[sp] >= max_fonts)
     return;
-  if (fonts[pila[sp]] != NULL) {
-    free(fonts[pila[sp]]);
-    fonts[pila[sp]] = NULL;
+  if (fonts[stack[sp]] != NULL) {
+    free(fonts[stack[sp]]);
+    fonts[stack[sp]] = NULL;
   }
 }
 
@@ -1478,22 +1478,22 @@ void load_fnt(void) {
     if (!fonts[ifonts])
       break;
   if (ifonts == max_fonts) {
-    pila[sp] = 0;
+    stack[sp] = 0;
     e(113);
     return;
   }
 
   if (npackfiles) {
-    m = read_packfile((byte *)&mem[pila[sp]]);
+    m = read_packfile((byte *)&mem[stack[sp]]);
     if (m == -1)
       goto fntfuera;
     if (m == -2) {
-      pila[sp] = 0;
+      stack[sp] = 0;
       e(100);
       return;
     }
     if (m <= 0) {
-      pila[sp] = 0;
+      stack[sp] = 0;
       e(200);
       return;
     }
@@ -1502,8 +1502,8 @@ void load_fnt(void) {
     fonts[ifonts] = ptr;
   } else {
 fntfuera:
-    if ((es = div_open_file((char *)&mem[pila[sp]])) == NULL) {
-      pila[sp] = 0;
+    if ((es = div_open_file((char *)&mem[stack[sp]])) == NULL) {
+      stack[sp] = 0;
       e(114);
       return;
     } else {
@@ -1516,7 +1516,7 @@ fntfuera:
         fclose(es);
       } else {
         fclose(es);
-        pila[sp] = 0;
+        stack[sp] = 0;
         e(118);
         return;
       }
@@ -1554,8 +1554,8 @@ fntfuera:
     m <<= 1;
   }
 
-  if (strlen((char *)&mem[pila[sp]]) < 80)
-    div_strcpy(f_i[ifonts].name, sizeof(f_i[ifonts].name), (char *)&mem[pila[sp]]);
+  if (strlen((char *)&mem[stack[sp]]) < 80)
+    div_strcpy(f_i[ifonts].name, sizeof(f_i[ifonts].name), (char *)&mem[stack[sp]]);
   else
     div_strcpy(f_i[ifonts].name, sizeof(f_i[ifonts].name), "");
 
@@ -1567,7 +1567,7 @@ fntfuera:
   f_i[ifonts].spacing = (w / nan) / 2;
   f_i[ifonts].letter_spacing = 0;
   f_i[ifonts].height = h;
-  pila[sp] = ifonts;
+  stack[sp] = ifonts;
 
   if (auto_adapt_palette) {
     adapt_palette(fonts[ifonts] + 1356 + sizeof(fnt_table_entry) * 256,
@@ -1591,7 +1591,7 @@ void checkpal_font(int ifonts) {
     if (f_i[ifonts].syspal != f_i[ifonts].fonpal) { // Must reload it
 
       if (npackfiles) {
-        file_len = read_packfile((byte *)&mem[pila[sp]]);
+        file_len = read_packfile((byte *)&mem[stack[sp]]);
         if (file_len == -1)
           goto fntfuera;
         if (file_len == -2)
@@ -1604,7 +1604,7 @@ void checkpal_font(int ifonts) {
         free(packptr);
       } else {
 fntfuera:
-        if ((es = div_open_file((char *)&mem[pila[sp]])) == NULL)
+        if ((es = div_open_file((char *)&mem[stack[sp]])) == NULL)
           return;
         else {
           fseek(es, 0, SEEK_END);
@@ -1671,7 +1671,7 @@ void adapt_palette(byte *ptr, int len, byte *pal, byte *xlat) {
 //----------------------------------------------------------------------------
 
 void __write(void) {
-  int f = pila[sp - 4];
+  int f = stack[sp - 4];
 
   if (f < 0 || f >= max_fonts) {
     e(116);
@@ -1686,26 +1686,26 @@ void __write(void) {
     x++;
     if (x == MAX_TEXTS)
       break;
-    if (pila[sp - 1] == texts[x].alignment && pila[sp - 2] == texts[x].y &&
-        pila[sp - 3] == texts[x].x)
+    if (stack[sp - 1] == texts[x].alignment && stack[sp - 2] == texts[x].y &&
+        stack[sp - 3] == texts[x].x)
       break;
   }
 
   if (x < MAX_TEXTS) {
     texts[x].type = 0;
-    texts[x].ptr = pila[sp--];
-    if (pila[sp] < 0 || pila[sp] > 8) {
+    texts[x].ptr = stack[sp--];
+    if (stack[sp] < 0 || stack[sp] > 8) {
       e(117);
-      pila[sp] = 0;
+      stack[sp] = 0;
     }
-    texts[x].alignment = pila[sp--];
-    texts[x].y = pila[sp--];
-    texts[x].x = pila[sp--];
+    texts[x].alignment = stack[sp--];
+    texts[x].y = stack[sp--];
+    texts[x].x = stack[sp--];
     texts[x].font = (byte *)fonts[f];
-    pila[sp] = x;
+    stack[sp] = x;
   } else {
     sp -= 4;
-    pila[sp] = 0;
+    stack[sp] = 0;
     e(118);
   }
 }
@@ -1715,7 +1715,7 @@ void __write(void) {
 //----------------------------------------------------------------------------
 
 void write_int(void) {
-  int f = pila[sp - 4];
+  int f = stack[sp - 4];
   if (f < 0 || f >= max_fonts) {
     e(116);
     f = 0;
@@ -1729,25 +1729,25 @@ void write_int(void) {
     x++;
     if (x == MAX_TEXTS)
       break;
-    if (pila[sp - 1] == texts[x].alignment && pila[sp - 2] == texts[x].y &&
-        pila[sp - 3] == texts[x].x)
+    if (stack[sp - 1] == texts[x].alignment && stack[sp - 2] == texts[x].y &&
+        stack[sp - 3] == texts[x].x)
       break;
   }
   if (x < MAX_TEXTS) {
     texts[x].type = 1;
-    texts[x].ptr = pila[sp--];
-    if (pila[sp] < 0 || pila[sp] > 8) {
+    texts[x].ptr = stack[sp--];
+    if (stack[sp] < 0 || stack[sp] > 8) {
       e(117);
-      pila[sp] = 0;
+      stack[sp] = 0;
     }
-    texts[x].alignment = pila[sp--];
-    texts[x].y = pila[sp--];
-    texts[x].x = pila[sp--];
+    texts[x].alignment = stack[sp--];
+    texts[x].y = stack[sp--];
+    texts[x].x = stack[sp--];
     texts[x].font = (byte *)fonts[f];
-    pila[sp] = x;
+    stack[sp] = x;
   } else {
     sp -= 4;
-    pila[sp] = 0;
+    stack[sp] = 0;
     e(118);
   }
 }
@@ -1757,7 +1757,7 @@ void write_int(void) {
 //----------------------------------------------------------------------------
 
 void delete_text(void) {
-  x = pila[sp];
+  x = stack[sp];
   if (x < MAX_TEXTS && x > 0)
     texts[x].font = 0;
   else if (x == 0) {
@@ -1774,10 +1774,10 @@ void delete_text(void) {
 //----------------------------------------------------------------------------
 
 void move_text(void) {
-  x = pila[sp - 2];
+  x = stack[sp - 2];
   if (x < MAX_TEXTS && x > 0) {
-    texts[x].x = pila[sp - 1];
-    texts[x].y = pila[sp];
+    texts[x].x = stack[sp - 1];
+    texts[x].y = stack[sp];
   } else
     e(119);
   sp -= 2;
@@ -1789,8 +1789,8 @@ void move_text(void) {
 
 void unload_fpg(void) {
   int c;
-  c = pila[sp];
-  pila[sp] = 0;
+  c = stack[sp];
+  stack[sp] = 0;
   if (c < max_fpgs && c >= 0) {
     if (g[c].fpg != 0) {
       free(g[c].fpg);
@@ -1828,9 +1828,9 @@ byte rnd(void) {
 
 void divrandom(void) {
   int min, max;
-  max = pila[sp--];
-  min = pila[sp];
-  pila[sp] = _random(min, max);
+  max = stack[sp--];
+  min = stack[sp];
+  stack[sp] = _random(min, max);
 }
 
 int _random(int min, int max) {
@@ -1857,7 +1857,7 @@ void init_rnd(int n) {
 }
 
 void rand_seed(void) {
-  init_rnd(pila[sp]);
+  init_rnd(stack[sp]);
 }
 
 //----------------------------------------------------------------------------
@@ -1867,12 +1867,12 @@ void rand_seed(void) {
 void define_region(void) {
   int n, x, y, w, h;
 
-  h = pila[sp--];
-  w = pila[sp--];
-  y = pila[sp--];
-  x = pila[sp--];
+  h = stack[sp--];
+  w = stack[sp--];
+  y = stack[sp--];
+  x = stack[sp--];
 
-  n = pila[sp];
+  n = stack[sp];
 
   if (x < 0) {
     w += x;
@@ -1896,9 +1896,9 @@ void define_region(void) {
     region[n].y0 = y;
     region[n].x1 = x + w;
     region[n].y1 = y + h;
-    pila[sp] = 1;
+    stack[sp] = 1;
   } else {
-    pila[sp] = 0;
+    stack[sp] = 0;
     e(108);
   }
 }
@@ -1910,14 +1910,14 @@ void define_region(void) {
 void _xput(void) {
   int file, graf, x, y, angle, size, flags, reg;
 
-  reg = pila[sp--];
-  flags = pila[sp--];
-  size = pila[sp--];
-  angle = pila[sp--];
-  y = pila[sp--];
-  x = pila[sp--];
-  graf = pila[sp--];
-  file = pila[sp];
+  reg = stack[sp--];
+  flags = stack[sp--];
+  size = stack[sp--];
+  angle = stack[sp--];
+  y = stack[sp--];
+  x = stack[sp--];
+  graf = stack[sp--];
+  file = stack[sp];
 
   put_sprite(file, graf, x, y, angle, size, flags, reg, back_buffer, vga_width, vga_height);
 }
@@ -1929,10 +1929,10 @@ void _xput(void) {
 void _put(void) {
   int file, graf, x, y;
 
-  y = pila[sp--];
-  x = pila[sp--];
-  graf = pila[sp--];
-  file = pila[sp];
+  y = stack[sp--];
+  x = stack[sp--];
+  graf = stack[sp--];
+  file = stack[sp];
 
   put_sprite(file, graf, x, y, 0, 100, 0, 0, back_buffer, vga_width, vga_height);
 }
@@ -1945,14 +1945,14 @@ void map_xput(void) {
   int file, graf1, graf2, x, y, angle, size, flags;
   int *ptr;
 
-  flags = pila[sp--];
-  size = pila[sp--];
-  angle = pila[sp--];
-  y = pila[sp--];
-  x = pila[sp--];
-  graf2 = pila[sp--];
-  graf1 = pila[sp--];
-  file = pila[sp];
+  flags = stack[sp--];
+  size = stack[sp--];
+  angle = stack[sp--];
+  y = stack[sp--];
+  x = stack[sp--];
+  graf2 = stack[sp--];
+  graf1 = stack[sp--];
+  file = stack[sp];
 
   if (file > max_fpgs || file < 0) {
     e(109);
@@ -1986,11 +1986,11 @@ void map_put(void) {
   int file, graf1, graf2, x, y;
   int *ptr;
 
-  y = pila[sp--];
-  x = pila[sp--];
-  graf2 = pila[sp--];
-  graf1 = pila[sp--];
-  file = pila[sp];
+  y = stack[sp--];
+  x = stack[sp--];
+  graf2 = stack[sp--];
+  graf1 = stack[sp--];
+  file = stack[sp];
 
   if (file > max_fpgs || file < 0) {
     e(109);
@@ -2026,15 +2026,15 @@ void map_block_copy(void) {
   byte *_saved_buffer = screen_buffer, *si;
   int _saved_width = vga_width, _saved_height = vga_height;
 
-  h = pila[sp--];
-  w = pila[sp--];
-  y = pila[sp--];
-  x = pila[sp--];
-  graf = pila[sp--];
-  yd = pila[sp--];
-  xd = pila[sp--];
-  grafd = pila[sp--];
-  file = pila[sp];
+  h = stack[sp--];
+  w = stack[sp--];
+  y = stack[sp--];
+  x = stack[sp--];
+  graf = stack[sp--];
+  yd = stack[sp--];
+  xd = stack[sp--];
+  grafd = stack[sp--];
+  file = stack[sp];
 
   if (file > max_fpgs || file < 0) {
     e(109);
@@ -2120,13 +2120,13 @@ void screen_copy(void) {
   int xr, ixr, yr, iyr;
   byte *old_si, *si, *di;
 
-  ald = pila[sp--];
-  divand = pila[sp--];
-  yr = pila[sp--];
-  xr = pila[sp--];
-  graf = pila[sp--];
-  file = pila[sp--];
-  reg = pila[sp];
+  ald = stack[sp--];
+  divand = stack[sp--];
+  yr = stack[sp--];
+  xr = stack[sp--];
+  graf = stack[sp--];
+  file = stack[sp--];
+  reg = stack[sp];
 
   if (reg >= 0 && reg < max_region) {
     w = region[reg].x1 - region[reg].x0;
@@ -2197,12 +2197,12 @@ void screen_copy(void) {
 
 void load_screen(void) {
   load_map(); // filename
-  pila[sp + 1] = pila[sp];
-  pila[sp++] = 0;
+  stack[sp + 1] = stack[sp];
+  stack[sp++] = 0;
   put_screen(); // file,graf
   sp++;
   unload_map(); // graf
-  pila[--sp] = 0;
+  stack[--sp] = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -2214,8 +2214,8 @@ void put_screen(void) {
   short xg, yg;
   int *ptr;
 
-  graf = pila[sp--];
-  file = pila[sp];
+  graf = stack[sp--];
+  file = stack[sp];
 
   if (file < 0 || file > max_fpgs) {
     e(109);
@@ -2257,9 +2257,9 @@ void put_screen(void) {
 void put_pixel(void) {
   int x, y, color;
 
-  color = pila[sp--];
-  y = pila[sp--];
-  x = pila[sp];
+  color = stack[sp--];
+  y = stack[sp--];
+  x = stack[sp];
   if (x >= 0 && y >= 0 && x < vga_width && y < vga_height) {
     *(back_buffer + x + y * vga_width) = color;
   }
@@ -2272,12 +2272,12 @@ void put_pixel(void) {
 void get_pixel(void) {
   int x, y;
 
-  y = pila[sp--];
-  x = pila[sp];
+  y = stack[sp--];
+  x = stack[sp];
   if (x >= 0 && y >= 0 && x < vga_width && y < vga_height) {
-    pila[sp] = (int)(*(back_buffer + x + y * vga_width));
+    stack[sp] = (int)(*(back_buffer + x + y * vga_width));
   } else
-    pila[sp] = 0;
+    stack[sp] = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -2289,11 +2289,11 @@ void map_put_pixel(void) {
   int *ptr;
   byte *si;
 
-  color = pila[sp--];
-  y = pila[sp--];
-  x = pila[sp--];
-  graf = pila[sp--];
-  file = pila[sp];
+  color = stack[sp--];
+  y = stack[sp--];
+  x = stack[sp--];
+  graf = stack[sp--];
+  file = stack[sp];
 
   if (file < 0 || file > max_fpgs) {
     e(109);
@@ -2331,10 +2331,10 @@ void map_get_pixel(void) {
   int *ptr;
   byte *si;
 
-  y = pila[sp--];
-  x = pila[sp--];
-  graf = pila[sp--];
-  file = pila[sp];
+  y = stack[sp--];
+  x = stack[sp--];
+  graf = stack[sp--];
+  file = stack[sp];
 
   if (file < 0 || file > max_fpgs) {
     e(109);
@@ -2359,9 +2359,9 @@ void map_get_pixel(void) {
 
   if (x >= 0 && y >= 0 && x < ptr[13] && y < ptr[14]) {
     si = (byte *)ptr + 64 + ptr[15] * 4;
-    pila[sp] = (int)(*(si + x + y * ptr[13]));
+    stack[sp] = (int)(*(si + x + y * ptr[13]));
   } else
-    pila[sp] = 0;
+    stack[sp] = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -2373,12 +2373,12 @@ void get_point(void) {
   int *ptr;
   short *p;
 
-  dy = pila[sp--];
-  dx = pila[sp--];
-  n = pila[sp--];
-  graf = pila[sp--];
-  file = pila[sp];
-  pila[sp] = 0;
+  dy = stack[sp--];
+  dx = stack[sp--];
+  n = stack[sp--];
+  graf = stack[sp--];
+  file = stack[sp];
+  stack[sp] = 0;
 
   if (file < 0 || file > max_fpgs) {
     e(109);
@@ -2414,7 +2414,7 @@ void get_point(void) {
 
 void clear_screen(void) {
   memset(back_buffer, 0, vga_width * vga_height);
-  pila[++sp] = 0;
+  stack[++sp] = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -2467,18 +2467,18 @@ void save(void) {
   if (unit_size < 1)
     unit_size = 1;
 
-  lon = pila[sp--];
-  offset = pila[sp--];
+  lon = stack[sp--];
+  offset = stack[sp--];
   lon = lon * unit_size;
 
   if (!validate_address(offset) || !validate_address(offset + lon)) {
-    pila[sp] = 0;
+    stack[sp] = 0;
     e(122);
     return;
   }
-  es = open_save_file((byte *)&mem[pila[sp]]);
+  es = open_save_file((byte *)&mem[stack[sp]]);
   if (es == NULL) {
-    pila[sp] = 0;
+    stack[sp] = 0;
     e(123);
     return;
   }
@@ -2499,16 +2499,16 @@ void _save(void) {
 
   if (unit_size < 1)
     unit_size = 1;
-  lon = pila[sp--];
-  offset = pila[sp--];
-  if (offset < long_header || offset + lon > imem_max) {
-    pila[sp] = 0;
+  lon = stack[sp--];
+  offset = stack[sp--];
+  if (offset < HEADER_LENGTH || offset + lon > imem_max) {
+    stack[sp] = 0;
     e(122);
     return;
   }
-  es = open_save_file((byte *)&mem[pila[sp]]);
+  es = open_save_file((byte *)&mem[stack[sp]]);
   if (es == NULL) {
-    pila[sp] = 0;
+    stack[sp] = 0;
     // Save failure is silently ignored (file may be on read-only media)
     return;
   }
@@ -2533,22 +2533,22 @@ void load(void) {
   if (unit_size < 1)
     unit_size = 1;
 
-  offset = pila[sp--];
+  offset = stack[sp--];
   if (!validate_address(offset)) {
-    pila[sp] = 0;
+    stack[sp] = 0;
     e(125);
     return;
   }
-  //fprintf(stdout, "loading data from: %s\n",(byte*)&mem[pila[sp]]);
+  //fprintf(stdout, "loading data from: %s\n",(byte*)&mem[stack[sp]]);
 
-  if ((es = div_open_file((char *)&mem[pila[sp]])) == NULL) {
+  if ((es = div_open_file((char *)&mem[stack[sp]])) == NULL) {
     // if not found, check pak
     // this way files override paks
-    lon = read_packfile((byte *)&mem[pila[sp]]);
+    lon = read_packfile((byte *)&mem[stack[sp]]);
 
     if (lon > 0) {
       if (!validate_address(offset + lon)) {
-        pila[sp] = 0;
+        stack[sp] = 0;
         e(125);
         return;
       }
@@ -2557,7 +2557,7 @@ void load(void) {
       return;
     }
 
-    pila[sp] = 0;
+    stack[sp] = 0;
 #ifdef DEBUG
     e(126);
 #endif
@@ -2571,7 +2571,7 @@ void load(void) {
   printf("file len: %ld\n", ftell(es));
   fseek(es, 0, SEEK_SET);
   if (!validate_address(offset + lon)) {
-    pila[sp] = 0;
+    stack[sp] = 0;
     e(125);
     return;
   }
@@ -2597,13 +2597,13 @@ void set_mode(void) {
     new_mode = 1; // Notify the debugger of a video mode change
 #endif
 
-  vga_width = pila[sp] / 1000;
-  vga_height = pila[sp] % 1000;
+  vga_width = stack[sp] / 1000;
+  vga_height = stack[sp] % 1000;
   //	printf("Tring to set mode %dx%d\n",vga_width,vga_height);
 
   // nonsense ?
   for (n = 0; n < num_video_modes; n++) {
-    if (pila[sp] == video_modes[n].mode) {
+    if (stack[sp] == video_modes[n].mode) {
       vga_width = video_modes[n].width;
       vga_height = video_modes[n].height;
       break;
@@ -2664,17 +2664,17 @@ void set_mode(void) {
 
   for (n = 0; n < 10; n++) {
     if (iscroll[n].on) {
-      pila[sp] = n;
+      stack[sp] = n;
       stop_scroll();
       iscroll[n].on = 0;
     }
     if (im7[n].on) {
-      pila[sp] = n;
+      stack[sp] = n;
       stop_mode7();
       iscroll[n].on = 0;
     }
   }
-  pila[sp] = 0;
+  stack[sp] = 0;
 
   region[0].x0 = 0;
   region[0].y0 = 0;
@@ -2702,19 +2702,19 @@ void load_pcm(void) {
   int loop, m;
   char *ptr;
 
-  loop = pila[sp--];
+  loop = stack[sp--];
 
   if (npackfiles) {
-    m = read_packfile((byte *)&mem[pila[sp]]);
+    m = read_packfile((byte *)&mem[stack[sp]]);
     if (m == -1)
       goto pcmfuera;
     if (m == -2) {
-      pila[sp] = 0;
+      stack[sp] = 0;
       e(100);
       return;
     }
     if (m <= 0) {
-      pila[sp] = 0;
+      stack[sp] = 0;
       e(200);
       return;
     }
@@ -2722,8 +2722,8 @@ void load_pcm(void) {
     file_len = m;
   } else {
 pcmfuera:
-    if ((es = div_open_file((char *)&mem[pila[sp]])) == NULL) {
-      pila[sp] = -1;
+    if ((es = div_open_file((char *)&mem[stack[sp]])) == NULL) {
+      stack[sp] = -1;
       e(128);
       return;
     } else {
@@ -2735,14 +2735,14 @@ pcmfuera:
         fclose(es);
       } else {
         fclose(es);
-        pila[sp] = 0;
+        stack[sp] = 0;
         e(100);
         return;
       }
     }
   }
 
-  pila[sp] = sound_load(ptr, file_len, loop);
+  stack[sp] = sound_load(ptr, file_len, loop);
 
   free(ptr);
 
@@ -2754,7 +2754,7 @@ pcmfuera:
 //----------------------------------------------------------------------------
 
 void unload_pcm(void) {
-  sound_unload(pila[sp]);
+  sound_unload(stack[sp]);
 }
 
 //----------------------------------------------------------------------------
@@ -2763,8 +2763,8 @@ void unload_pcm(void) {
 
 void _sound(void) {
   int vol, fre;
-  fre = pila[sp--];
-  vol = pila[sp--];
+  fre = stack[sp--];
+  vol = stack[sp--];
   if (vol < 0)
     vol = 0;
   else if (vol > 511)
@@ -2773,13 +2773,13 @@ void _sound(void) {
     fre = 8;
   if (fre) {
 #ifdef MIXER
-    pila[sp] = sound_play(pila[sp], vol, fre) + 1;
-//	printf("New sound on channel %d\n",pila[sp]);
+    stack[sp] = sound_play(stack[sp], vol, fre) + 1;
+//	printf("New sound on channel %d\n",stack[sp]);
 #else
-    pila[sp] = 0;
+    stack[sp] = 0;
 #endif
   }
-  // if (pila[sp]==-1) e(129);
+  // if (stack[sp]==-1) e(129);
 }
 
 //----------------------------------------------------------------------------
@@ -2791,14 +2791,14 @@ extern int MusicChannels;
 void stop_sound(void) {
 #ifdef MIXER
   int x;
-  if (pila[sp] == -1) {
+  if (stack[sp] == -1) {
     for (x = 0; x < CHANNELS; x++)
       sound_stop(x);
   } else {
-    sound_stop(pila[sp] - 1);
+    sound_stop(stack[sp] - 1);
   }
 #endif
-  pila[sp] = 0;
+  stack[sp] = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -2807,15 +2807,15 @@ void stop_sound(void) {
 
 void change_sound(void) {
   int vol, fre;
-  fre = pila[sp--];
-  vol = pila[sp--];
+  fre = stack[sp--];
+  vol = stack[sp--];
   if (vol < 0)
     vol = 0;
   else if (vol > 511)
     vol = 511;
   if (fre < 8)
     fre = 8;
-  sound_change(pila[sp] - 1, vol, fre);
+  sound_change(stack[sp] - 1, vol, fre);
 }
 
 //----------------------------------------------------------------------------
@@ -2824,8 +2824,8 @@ void change_sound(void) {
 
 void change_channel(void) {
   int vol, pan;
-  pan = pila[sp--];
-  vol = pila[sp--];
+  pan = stack[sp--];
+  vol = stack[sp--];
   if (vol < 0)
     vol = 0;
   else if (vol > 511)
@@ -2834,7 +2834,7 @@ void change_channel(void) {
     pan = 0;
   else if (pan > 255)
     pan = 255;
-  sound_change_channel(pila[sp] - 1, vol, pan);
+  sound_change_channel(stack[sp] - 1, vol, pan);
 }
 
 //----------------------------------------------------------------------------
@@ -2845,18 +2845,18 @@ void load_song(void) {
   int loop, m;
   char *ptr;
 
-  loop = pila[sp--];
+  loop = stack[sp--];
   if (npackfiles) {
-    m = read_packfile((byte *)&mem[pila[sp]]);
+    m = read_packfile((byte *)&mem[stack[sp]]);
     if (m == -1)
       goto songfuera;
     if (m == -2) {
-      pila[sp] = 0;
+      stack[sp] = 0;
       e(100);
       return;
     }
     if (m <= 0) {
-      pila[sp] = 0;
+      stack[sp] = 0;
       e(200);
       return;
     }
@@ -2864,8 +2864,8 @@ void load_song(void) {
     file_len = m;
   } else {
 songfuera:
-    if ((es = div_open_file((char *)&mem[pila[sp]])) == NULL) {
-      pila[sp] = -1;
+    if ((es = div_open_file((char *)&mem[stack[sp]])) == NULL) {
+      stack[sp] = -1;
       e(167);
       return;
     } else {
@@ -2877,13 +2877,13 @@ songfuera:
         fclose(es);
       } else {
         fclose(es);
-        pila[sp] = 0;
+        stack[sp] = 0;
         e(100);
         return;
       }
     }
   }
-  pila[sp] = sound_load_song(ptr, file_len, loop);
+  stack[sp] = sound_load_song(ptr, file_len, loop);
 
   free(ptr);
 
@@ -2895,7 +2895,7 @@ songfuera:
 //----------------------------------------------------------------------------
 
 void unload_song(void) {
-  sound_unload_song(pila[sp]);
+  sound_unload_song(stack[sp]);
 }
 
 //----------------------------------------------------------------------------
@@ -2903,7 +2903,7 @@ void unload_song(void) {
 //----------------------------------------------------------------------------
 
 void song(void) {
-  sound_play_song(pila[sp]);
+  sound_play_song(stack[sp]);
 }
 
 //----------------------------------------------------------------------------
@@ -2912,7 +2912,7 @@ void song(void) {
 
 void stop_song(void) {
   sound_stop_song();
-  pila[++sp] = 0;
+  stack[++sp] = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -2920,7 +2920,7 @@ void stop_song(void) {
 //----------------------------------------------------------------------------
 
 void set_song_pos(void) {
-  sound_set_song_pos(pila[sp]);
+  sound_set_song_pos(stack[sp]);
 }
 
 //----------------------------------------------------------------------------
@@ -2928,7 +2928,7 @@ void set_song_pos(void) {
 //----------------------------------------------------------------------------
 
 void get_song_pos(void) {
-  pila[++sp] = sound_get_song_pos();
+  stack[++sp] = sound_get_song_pos();
 }
 
 //----------------------------------------------------------------------------
@@ -2936,7 +2936,7 @@ void get_song_pos(void) {
 //----------------------------------------------------------------------------
 
 void get_song_line(void) {
-  pila[++sp] = sound_get_song_line();
+  stack[++sp] = sound_get_song_line();
 }
 
 //----------------------------------------------------------------------------
@@ -2944,7 +2944,7 @@ void get_song_line(void) {
 //----------------------------------------------------------------------------
 
 void is_playing_sound(void) {
-  pila[sp] = sound_is_playing(pila[sp] - 1);
+  stack[sp] = sound_is_playing(stack[sp] - 1);
 }
 
 //----------------------------------------------------------------------------
@@ -2952,7 +2952,7 @@ void is_playing_sound(void) {
 //----------------------------------------------------------------------------
 
 void is_playing_song(void) {
-  pila[++sp] = sound_is_playing_song();
+  stack[++sp] = sound_is_playing_song();
 }
 
 //----------------------------------------------------------------------------
@@ -2961,17 +2961,17 @@ void is_playing_song(void) {
 void mainloop(void);
 
 void set_fps(void) {
-  max_frame_skips = pila[sp--];
+  max_frame_skips = stack[sp--];
   if (max_frame_skips < 0)
     max_frame_skips = 0;
   if (max_frame_skips > 10)
     max_frame_skips = 10;
-  if (pila[sp] < 4)
-    pila[sp] = 4;
-  if (pila[sp] > 999)
-    pila[sp] = 999;
-  dfps = pila[sp];
-  clock_interval = 1000.0 / (double)pila[sp];
+  if (stack[sp] < 4)
+    stack[sp] = 4;
+  if (stack[sp] > 999)
+    stack[sp] = 999;
+  dfps = stack[sp];
+  clock_interval = 1000.0 / (double)stack[sp];
 }
 
 //----------------------------------------------------------------------------
@@ -2980,22 +2980,22 @@ void set_fps(void) {
 
 void start_fli(void) {
   int x, y;
-  y = pila[sp--];
-  x = pila[sp--];
+  y = stack[sp--];
+  x = stack[sp--];
 
 #ifdef USE_FLI
-  if ((es = div_open_file((char *)&mem[pila[sp]])) == NULL) {
-    pila[sp] = 0;
+  if ((es = div_open_file((char *)&mem[stack[sp]])) == NULL) {
+    stack[sp] = 0;
     e(147);
   } else {
     fclose(es);
-    pila[sp] = fli_start(full, (char *)back_buffer, vga_width, vga_height, x, y);
-    if (pila[sp] == 0)
+    stack[sp] = fli_start(full, (char *)back_buffer, vga_width, vga_height, x, y);
+    if (stack[sp] == 0)
       e(130);
   }
 #endif
 
-  pila[sp] = 0;
+  stack[sp] = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -3003,7 +3003,7 @@ void start_fli(void) {
 //----------------------------------------------------------------------------
 
 void frame_fli(void) {
-  pila[++sp] = fli_next_frame();
+  stack[++sp] = fli_next_frame();
 }
 
 //----------------------------------------------------------------------------
@@ -3014,7 +3014,7 @@ void end_fli(void) {
 #ifdef USE_FLI
   fli_end();
 #endif
-  pila[++sp] = 0;
+  stack[++sp] = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -3025,7 +3025,7 @@ void reset_fli(void) {
 #ifdef USE_FLI
   fli_reset();
 #endif
-  pila[++sp] = 0;
+  stack[++sp] = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -3042,7 +3042,7 @@ void _system(void) {
   return;
 
   if (system(NULL)) {
-    if (!strcmp(strupr((char *)&mem[pila[sp]]), "COMMAND.COM")) {
+    if (!strcmp(strupr((char *)&mem[stack[sp]]), "COMMAND.COM")) {
       getcwd(cwork, 256);
       sound_end();
       sound_init();
@@ -3055,7 +3055,7 @@ void _system(void) {
       readmouse();
       full_redraw = 1;
     } else {
-      system((char *)&mem[pila[sp]]);
+      system((char *)&mem[stack[sp]]);
     }
   }
 }
@@ -3066,10 +3066,10 @@ void _system(void) {
 
 void fget_dist(void) {
   int x0, y0, x1, y1, n = 1;
-  y1 = pila[sp--];
-  x1 = pila[sp--];
-  y0 = pila[sp--];
-  x0 = pila[sp];
+  y1 = stack[sp--];
+  x1 = stack[sp--];
+  y0 = stack[sp--];
+  x0 = stack[sp];
   x0 = abs(x1 - x0);
   y0 = abs(y1 - y0);
   while (x0 + y0 >= 46000) {
@@ -3077,7 +3077,7 @@ void fget_dist(void) {
     x0 /= 2;
     y0 /= 2;
   }
-  pila[sp] = sqrt(x0 * x0 + y0 * y0) * n;
+  stack[sp] = sqrt(x0 * x0 + y0 * y0) * n;
 }
 
 //----------------------------------------------------------------------------
@@ -3087,16 +3087,16 @@ void fget_dist(void) {
 
 void fget_angle(void) {
   int x0, y0, x1, y1;
-  y1 = pila[sp--];
-  x1 = pila[sp--];
-  y0 = pila[sp--];
-  x0 = pila[sp];
+  y1 = stack[sp--];
+  x1 = stack[sp--];
+  y0 = stack[sp--];
+  x0 = stack[sp];
   x0 = x1 - x0;
   y0 = y0 - y1;
   if (!x0 && !y0)
-    pila[sp] = 0;
+    stack[sp] = 0;
   else
-    pila[sp] = (float)atan2(y0, x0) * radian;
+    stack[sp] = (float)atan2(y0, x0) * radian;
 }
 
 // CD function stubs removed (CDDA deleted)
@@ -3109,13 +3109,13 @@ void start_mode7(void) {
   int n, m, file, graf1, graf2, reg;
   int *ptr1, *ptr2;
 
-  m = pila[sp--];
-  reg = pila[sp--];
-  graf2 = pila[sp--];
-  graf1 = pila[sp--];
-  file = pila[sp--];
-  n = pila[sp];
-  pila[sp] = 0;
+  m = stack[sp--];
+  reg = stack[sp--];
+  graf2 = stack[sp--];
+  graf1 = stack[sp--];
+  file = stack[sp--];
+  n = stack[sp];
+  stack[sp] = 0;
 
   if (n < 0 || n > 9) {
     e(131);
@@ -3126,7 +3126,7 @@ void start_mode7(void) {
   im7[n].ext = NULL;
 
   if (im7[n].on) {
-    pila[sp] = n;
+    stack[sp] = n;
     stop_mode7();
   }
 
@@ -3239,7 +3239,7 @@ void start_mode7(void) {
 //----------------------------------------------------------------------------
 
 void stop_mode7(void) {
-  int n = pila[sp];
+  int n = stack[sp];
 
   if (n < 0 || n > 9) {
     e(131);
@@ -3257,12 +3257,12 @@ void stop_mode7(void) {
 
 void advance(void) {
   if (mem[id + _Ctype] == 3) {
-    _object_advance(id, mem[id + _Angle], pila[sp]);
+    _object_advance(id, mem[id + _Angle], stack[sp]);
   } else {
-    mem[id + _X] += get_distx(mem[id + _Angle], pila[sp]);
-    mem[id + _Y] += get_disty(mem[id + _Angle], pila[sp]);
+    mem[id + _X] += get_distx(mem[id + _Angle], stack[sp]);
+    mem[id + _Y] += get_disty(mem[id + _Angle], stack[sp]);
   }
-  pila[sp] = 0;
+  stack[sp] = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -3270,15 +3270,15 @@ void advance(void) {
 //----------------------------------------------------------------------------
 
 void x_advance(void) {
-  int distancia = pila[sp--];
+  int distancia = stack[sp--];
 
   if (mem[id + _Ctype] == 3) {
-    _object_advance(id, pila[sp], distancia);
+    _object_advance(id, stack[sp], distancia);
   } else {
-    mem[id + _X] += get_distx(pila[sp], distancia);
-    mem[id + _Y] += get_disty(pila[sp], distancia);
+    mem[id + _X] += get_distx(stack[sp], distancia);
+    mem[id + _Y] += get_disty(stack[sp], distancia);
   }
-  pila[sp] = 0;
+  stack[sp] = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -3286,7 +3286,7 @@ void x_advance(void) {
 //----------------------------------------------------------------------------
 
 void _abs(void) {
-  pila[sp] = abs(pila[sp]);
+  stack[sp] = abs(stack[sp]);
 }
 
 //----------------------------------------------------------------------------
@@ -3298,7 +3298,7 @@ void fade_on(void) {
   dacout_g = 0;
   dacout_b = 0;
   dacout_speed = 8;
-  pila[++sp] = 0;
+  stack[++sp] = 0;
   if (now_dacout_r != dacout_r || now_dacout_g != dacout_g || now_dacout_b != dacout_b)
     fading = 1;
 }
@@ -3313,7 +3313,7 @@ void fade_off(void) {
   dacout_b = 64;
   dacout_speed = 8;
   fade_wait();
-  pila[++sp] = 0;
+  stack[++sp] = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -3321,11 +3321,11 @@ void fade_off(void) {
 //----------------------------------------------------------------------------
 
 void _sqrt(void) {
-  int x = abs(pila[sp]);
+  int x = abs(stack[sp]);
   if (x >= 0)
-    pila[sp] = sqrt(x);
+    stack[sp] = sqrt(x);
   else
-    pila[sp] = 999999999;
+    stack[sp] = 999999999;
 }
 
 //----------------------------------------------------------------------------
@@ -3334,17 +3334,17 @@ void _sqrt(void) {
 
 void _pow(void) {
   int n, m;
-  m = pila[sp--];
-  n = pila[sp];
+  m = stack[sp--];
+  n = stack[sp];
   if (m > 1) {
     m--;
     do {
-      pila[sp] *= n;
+      stack[sp] *= n;
     } while (--m);
   } else if (m == 0) {
-    pila[sp] = 1;
+    stack[sp] = 1;
   } else if (m < 0) {
-    pila[sp] = 0;
+    stack[sp] = 0;
   }
 }
 
@@ -3354,9 +3354,9 @@ void _pow(void) {
 
 void near_angle(void) {
   int a1, a2, i;
-  i = abs(pila[sp--]);
-  a2 = pila[sp--];
-  a1 = pila[sp];
+  i = abs(stack[sp--]);
+  a2 = stack[sp--];
+  a1 = stack[sp];
   while (a1 < a2 - pi)
     a1 += 2 * pi;
   while (a1 > a2 + pi)
@@ -3370,7 +3370,7 @@ void near_angle(void) {
     if (a1 < a2)
       a1 = a2;
   }
-  pila[sp] = a1;
+  stack[sp] = a1;
 }
 
 //----------------------------------------------------------------------------
@@ -3382,7 +3382,7 @@ void let_me_alone(void) {
   for (i = id_start; i <= id_end; i += iloc_len)
     if (i != id && mem[i + _Status])
       mem[i + _Status] = 1;
-  pila[++sp] = 0;
+  stack[++sp] = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -3399,18 +3399,18 @@ void _exit_dos(void) {
 #ifdef DEBUG
   if ((f = fopen("system/exec.err", "wb")) != NULL) {
     fwrite("\x0\x0\x0\x0", 4, 1, f);
-    fwrite(&pila[sp], 4, 1, f);
-    fwrite(&mem[pila[sp - 1]], 1, strlen((char *)(&mem[pila[sp - 1]])) + 1, f);
+    fwrite(&stack[sp], 4, 1, f);
+    fwrite(&mem[stack[sp - 1]], 1, strlen((char *)(&mem[stack[sp - 1]])) + 1, f);
     fclose(f);
   }
 #else
-  printf("%s\n", (char *)&mem[pila[sp - 1]]);
+  printf("%s\n", (char *)&mem[stack[sp - 1]]);
 #endif
 
   _dos_setdrive((int)toupper(*divpath) - 'A' + 1, &divnum);
   chdir(divpath);
 
-  exit(pila[sp]);
+  exit(stack[sp]);
 }
 
 //----------------------------------------------------------------------------
@@ -3421,9 +3421,9 @@ void roll_palette(void) {
   int c, n, i, x, color;
   char pal[768];
 
-  i = pila[sp--];
-  n = abs(pila[sp--]);
-  c = abs(pila[sp]) % 256;
+  i = stack[sp--];
+  n = abs(stack[sp--]);
+  c = abs(stack[sp]) % 256;
   if (n + c > 256)
     n = 256 - c;
   for (x = c; x < c + n; x++) {
@@ -3451,9 +3451,9 @@ void get_real_point(void) {
   float ang, dis;
   short *p;
 
-  dy = pila[sp--];
-  dx = pila[sp--];
-  n = pila[sp];
+  dy = stack[sp--];
+  dx = stack[sp--];
+  n = stack[sp];
 
   if (mem[id + _File] > max_fpgs || mem[id + _File] < 0) {
     e(109);
@@ -3564,9 +3564,9 @@ void get_real_point(void) {
 void get_joy_button(void) {
   // SDL joypad
   if (divjoy && joy_status) {
-    pila[sp] = OSDEP_JoystickGetButton(divjoy, pila[sp]);
+    stack[sp] = OSDEP_JoystickGetButton(divjoy, stack[sp]);
   } else {
-    pila[sp] = 0;
+    stack[sp] = 0;
   }
 }
 
@@ -3577,13 +3577,13 @@ void get_joy_button(void) {
 int ej[4] = {-1, -1, -1, -1};
 
 void get_joy_position(void) {
-  if (pila[sp] < 0 || pila[sp] > 3) {
-    pila[sp] = 0;
+  if (stack[sp] < 0 || stack[sp] > 3) {
+    stack[sp] = 0;
     e(134);
     return;
   }
 
-  pila[sp] = joy_position(pila[sp]);
+  stack[sp] = joy_position(stack[sp]);
 }
 
 int joy_position(int eje) {
@@ -3650,9 +3650,9 @@ void convert_palette(void) {
   int *ptr, n;
   byte *si;
 
-  pal_ofs = pila[sp--];
-  graf = pila[sp--];
-  file = pila[sp];
+  pal_ofs = stack[sp--];
+  graf = stack[sp--];
+  file = stack[sp];
 
   if (!validate_address(pal_ofs) || !validate_address(pal_ofs + 256)) {
     e(136);
@@ -3693,7 +3693,7 @@ void convert_palette(void) {
 
 void reset_sound(void) {
   sound_reset();
-  pila[++sp] = 0;
+  stack[++sp] = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -3720,7 +3720,7 @@ void set_volume(void) {
   set_master_volume(setup->master);
   set_voc_volume(setup->sound_fx);
   set_cd_volume(setup->cd_audio);
-  pila[++sp] = 0;
+  stack[++sp] = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -3730,10 +3730,10 @@ void set_volume(void) {
 void set_color(void) {
   int color, r, g, b;
 
-  b = abs(pila[sp--]) % 64;
-  g = abs(pila[sp--]) % 64;
-  r = abs(pila[sp--]) % 64;
-  color = abs(pila[sp]) % 256;
+  b = abs(stack[sp--]) % 64;
+  g = abs(stack[sp--]) % 64;
+  r = abs(stack[sp--]) % 64;
+  color = abs(stack[sp]) % 256;
 
   palette[color * 3] = r;
   palette[color * 3 + 1] = g;
@@ -3750,12 +3750,12 @@ void set_color(void) {
 void _find_color(void) {
   int r, g, b;
 
-  b = abs(pila[sp--]) % 64;
-  g = abs(pila[sp--]) % 64;
-  r = abs(pila[sp]) % 64;
+  b = abs(stack[sp--]) % 64;
+  g = abs(stack[sp--]) % 64;
+  r = abs(stack[sp]) % 64;
 
   find_color(r, g, b);
-  pila[sp] = find_col;
+  stack[sp] = find_col;
 }
 
 //----------------------------------------------------------------------------
@@ -3763,77 +3763,77 @@ void _find_color(void) {
 //----------------------------------------------------------------------------
 
 void _strchar(void) { // char("0") -> 48
-  if ((unsigned)pila[sp] > 255)
-    pila[sp] = (int)memb[pila[sp] * 4];
+  if ((unsigned)stack[sp] > 255)
+    stack[sp] = (int)memb[stack[sp] * 4];
 }
 
 void _strcpy(void) {
-  if ((mem[pila[sp - 1] - 1] & 0xFFF00000) != 0xDAD00000) {
+  if ((mem[stack[sp - 1] - 1] & 0xFFF00000) != 0xDAD00000) {
     sp--;
     e(164);
     return;
   }
-  if ((unsigned)pila[sp] > 255)
-    if ((mem[pila[sp - 1] - 1] & 0xFFFFF) + 1 < strlen((char *)&mem[pila[sp]])) {
+  if ((unsigned)stack[sp] > 255)
+    if ((mem[stack[sp - 1] - 1] & 0xFFFFF) + 1 < strlen((char *)&mem[stack[sp]])) {
       sp--;
       e(140);
       return;
     }
-  if ((unsigned)pila[sp] > 255)
-    memmove((char *)&mem[pila[sp - 1]], (char *)&mem[pila[sp]], strlen((char *)&mem[pila[sp]]) + 1);
+  if ((unsigned)stack[sp] > 255)
+    memmove((char *)&mem[stack[sp - 1]], (char *)&mem[stack[sp]], strlen((char *)&mem[stack[sp]]) + 1);
   else
-    mem[pila[sp - 1]] = pila[sp];
+    mem[stack[sp - 1]] = stack[sp];
   sp--;
 }
 
 void _strcat(void) {
   int n;
-  if ((mem[pila[sp - 1] - 1] & 0xFFF00000) != 0xDAD00000) {
+  if ((mem[stack[sp - 1] - 1] & 0xFFF00000) != 0xDAD00000) {
     sp--;
     e(164);
     return;
   }
-  if ((unsigned)pila[sp] > 255)
-    n = strlen((char *)&mem[pila[sp]]);
+  if ((unsigned)stack[sp] > 255)
+    n = strlen((char *)&mem[stack[sp]]);
   else
     n = 1;
-  if ((mem[pila[sp - 1] - 1] & 0xFFFFF) + 1 < strlen((char *)&mem[pila[sp - 1]]) + n) {
+  if ((mem[stack[sp - 1] - 1] & 0xFFFFF) + 1 < strlen((char *)&mem[stack[sp - 1]]) + n) {
     sp--;
     e(140);
     return;
   }
-  if ((unsigned)pila[sp] > 255) {
-    char *dst = (char *)&mem[pila[sp - 1]];
+  if ((unsigned)stack[sp] > 255) {
+    char *dst = (char *)&mem[stack[sp - 1]];
     int dlen = strlen(dst);
-    memmove(dst + dlen, (char *)&mem[pila[sp]], strlen((char *)&mem[pila[sp]]) + 1);
+    memmove(dst + dlen, (char *)&mem[stack[sp]], strlen((char *)&mem[stack[sp]]) + 1);
   } else {
-    char *dst = (char *)&mem[pila[sp - 1]];
+    char *dst = (char *)&mem[stack[sp - 1]];
     int dlen = strlen(dst);
-    dst[dlen] = (char)pila[sp];
+    dst[dlen] = (char)stack[sp];
     dst[dlen + 1] = 0;
   }
   sp--;
 }
 
 void _strlen(void) {
-  if ((unsigned)pila[sp] > 255)
-    pila[sp] = strlen((char *)&mem[pila[sp]]);
+  if ((unsigned)stack[sp] > 255)
+    stack[sp] = strlen((char *)&mem[stack[sp]]);
   else
-    pila[sp] = 1;
+    stack[sp] = 1;
 }
 
 void _strcmp(void) {
-  if ((unsigned)pila[sp - 1] > 255) {
-    if ((unsigned)pila[sp] > 255) {
-      pila[sp - 1] = strcmp((char *)&mem[pila[sp - 1]], (char *)&mem[pila[sp]]);
+  if ((unsigned)stack[sp - 1] > 255) {
+    if ((unsigned)stack[sp] > 255) {
+      stack[sp - 1] = strcmp((char *)&mem[stack[sp - 1]], (char *)&mem[stack[sp]]);
     } else {
-      pila[sp - 1] = strcmp((char *)&mem[pila[sp - 1]], (char *)&pila[sp]);
+      stack[sp - 1] = strcmp((char *)&mem[stack[sp - 1]], (char *)&stack[sp]);
     }
   } else {
-    if ((unsigned)pila[sp] > 255) {
-      pila[sp - 1] = strcmp((char *)&pila[sp - 1], (char *)&mem[pila[sp]]);
+    if ((unsigned)stack[sp] > 255) {
+      stack[sp - 1] = strcmp((char *)&stack[sp - 1], (char *)&mem[stack[sp]]);
     } else {
-      pila[sp - 1] = strcmp((char *)&pila[sp - 1], (char *)&pila[sp]);
+      stack[sp - 1] = strcmp((char *)&stack[sp - 1], (char *)&stack[sp]);
     }
   }
   sp--;
@@ -3841,42 +3841,42 @@ void _strcmp(void) {
 
 void _strchr(void) { // e.g.: strchr(string,"aeiou") -> -1 Not found, N Position
   char *p;
-  if ((unsigned)pila[sp] > 255)
-    p = strpbrk((char *)&mem[pila[sp - 1]], (char *)&mem[pila[sp]]);
+  if ((unsigned)stack[sp] > 255)
+    p = strpbrk((char *)&mem[stack[sp - 1]], (char *)&mem[stack[sp]]);
   else
-    p = strchr((char *)&mem[pila[sp - 1]], (char)pila[sp]);
+    p = strchr((char *)&mem[stack[sp - 1]], (char)stack[sp]);
   if (p != NULL) {
-    pila[sp - 1] = (int)(p - (char *)&mem[pila[sp - 1]]);
+    stack[sp - 1] = (int)(p - (char *)&mem[stack[sp - 1]]);
   } else
-    pila[sp - 1] = -1;
+    stack[sp - 1] = -1;
   sp--;
 }
 
 void _strstr(void) {
   char *p;
-  if ((unsigned)pila[sp] > 255)
-    p = strstr((char *)&mem[pila[sp - 1]], (char *)&mem[pila[sp]]);
+  if ((unsigned)stack[sp] > 255)
+    p = strstr((char *)&mem[stack[sp - 1]], (char *)&mem[stack[sp]]);
   else
-    p = strchr((char *)&mem[pila[sp - 1]], (char)pila[sp]);
+    p = strchr((char *)&mem[stack[sp - 1]], (char)stack[sp]);
   if (p != NULL) {
-    pila[sp - 1] = (int)(p - (char *)&mem[pila[sp - 1]]);
+    stack[sp - 1] = (int)(p - (char *)&mem[stack[sp - 1]]);
   } else
-    pila[sp - 1] = -1;
+    stack[sp - 1] = -1;
   sp--;
 }
 
 void __strset(void) {
   int n;
-  if ((mem[pila[sp - 1] - 1] & 0xFFF00000) != 0xDAD00000) {
+  if ((mem[stack[sp - 1] - 1] & 0xFFF00000) != 0xDAD00000) {
     sp--;
     e(164);
     return;
   }
-  n = (mem[pila[sp - 1] - 1] & 0xFFFFF) + 1;
-  if ((unsigned)pila[sp] > 255)
-    memset((char *)&mem[pila[sp - 1]], (char)mem[pila[sp]], n);
+  n = (mem[stack[sp - 1] - 1] & 0xFFFFF) + 1;
+  if ((unsigned)stack[sp] > 255)
+    memset((char *)&mem[stack[sp - 1]], (char)mem[stack[sp]], n);
   else
-    memset((char *)&mem[pila[sp - 1]], (char)pila[sp], n);
+    memset((char *)&mem[stack[sp - 1]], (char)stack[sp], n);
   sp--;
 }
 
@@ -3887,15 +3887,15 @@ byte strupper[270] = "                                                          
 
 void __strupr(void) {
   int n;
-  if ((unsigned)pila[sp] > 255) {
-    n = strlen((char *)&mem[pila[sp]]);
+  if ((unsigned)stack[sp] > 255) {
+    n = strlen((char *)&mem[stack[sp]]);
     while (n--) {
-      if (strupper[memb[pila[sp] * 4 + n]] != ' ')
-        memb[pila[sp] * 4 + n] = strupper[memb[pila[sp] * 4 + n]];
+      if (strupper[memb[stack[sp] * 4 + n]] != ' ')
+        memb[stack[sp] * 4 + n] = strupper[memb[stack[sp] * 4 + n]];
     }
   } else {
-    if (strupper[(char)pila[sp]] != ' ')
-      pila[sp] = (int)strupper[(char)pila[sp]];
+    if (strupper[(char)stack[sp]] != ' ')
+      stack[sp] = (int)strupper[(char)stack[sp]];
   }
 }
 
@@ -3906,15 +3906,15 @@ byte strlower[260] = "                                                          
 
 void __strlwr(void) {
   int n;
-  if ((unsigned)pila[sp] > 255) {
-    n = strlen((char *)&mem[pila[sp]]);
+  if ((unsigned)stack[sp] > 255) {
+    n = strlen((char *)&mem[stack[sp]]);
     while (n--) {
-      if (strlower[memb[pila[sp] * 4 + n]] != ' ')
-        memb[pila[sp] * 4 + n] = strlower[memb[pila[sp] * 4 + n]];
+      if (strlower[memb[stack[sp] * 4 + n]] != ' ')
+        memb[stack[sp] * 4 + n] = strlower[memb[stack[sp] * 4 + n]];
     }
   } else {
-    if (strlower[(char)pila[sp]] != ' ')
-      pila[sp] = (int)strlower[(char)pila[sp]];
+    if (strlower[(char)stack[sp]] != ' ')
+      stack[sp] = (int)strlower[(char)stack[sp]];
   }
 }
 
@@ -3947,25 +3947,25 @@ void strdelend(char *s, int n) {
 }
 
 void _strdel(void) { // (string,n,m) delete <n> chars from start and <m> from end
-  int m = pila[sp--];
-  int n = pila[sp--];
+  int m = stack[sp--];
+  int n = stack[sp--];
 
-  if ((mem[pila[sp] - 1] & 0xFFF00000) != 0xDAD00000) {
+  if ((mem[stack[sp] - 1] & 0xFFF00000) != 0xDAD00000) {
     e(164);
     return;
   }
 
-  if ((mem[pila[sp] - 1] & 0xFFFFF) + 1 < strlen((char *)&mem[pila[sp]]) - n - m) {
+  if ((mem[stack[sp] - 1] & 0xFFFFF) + 1 < strlen((char *)&mem[stack[sp]]) - n - m) {
     e(140);
     return;
   }
 
   if (n > m) { // Delete from start first
-    strdelbeg((char *)&mem[pila[sp]], n);
-    strdelend((char *)&mem[pila[sp]], m);
+    strdelbeg((char *)&mem[stack[sp]], n);
+    strdelend((char *)&mem[stack[sp]], m);
   } else { // Delete from end first
-    strdelend((char *)&mem[pila[sp]], m);
-    strdelbeg((char *)&mem[pila[sp]], n);
+    strdelend((char *)&mem[stack[sp]], m);
+    strdelbeg((char *)&mem[stack[sp]], n);
   }
 }
 
@@ -4022,12 +4022,12 @@ void sort(void) {
   int tipo_key;
   int offset, size, numreg, modo;
 
-  modo = pila[sp--];
-  tipo_key = pila[sp--];
-  offset_key = pila[sp--];
-  numreg = pila[sp--];
-  size = pila[sp--];
-  offset = pila[sp];
+  modo = stack[sp--];
+  tipo_key = stack[sp--];
+  offset_key = stack[sp--];
+  numreg = stack[sp--];
+  size = stack[sp--];
+  offset = stack[sp];
 
   if (modo < 0 || modo > 1) {
     for (modo = 0; modo < 256; modo++)
@@ -4097,13 +4097,13 @@ void _fopen(void) { // Search for the file, as it may have been included in the 
   int n, x;
   FILE *f = NULL;
 
-  div_strcpy(modo, sizeof(modo), (char *)&mem[pila[sp--]]);
-  div_strcpy(full, sizeof(full), (char *)&mem[pila[sp]]);
+  div_strcpy(modo, sizeof(modo), (char *)&mem[stack[sp--]]);
+  div_strcpy(full, sizeof(full), (char *)&mem[stack[sp]]);
   for (n = 0; n < strlen(modo); n++)
     if (modo[n] != 'r' && modo[n] != 'w' && modo[n] != 'a' && modo[n] != '+')
       break;
   if (n < strlen(modo)) {
-    pila[sp] = 0;
+    stack[sp] = 0;
     e(166);
   }
   div_strcat(modo, sizeof(modo), "b");
@@ -4117,8 +4117,8 @@ void _fopen(void) { // Search for the file, as it may have been included in the 
 
   if (f == NULL) {
     if ((f = fopen(full, modo)) == NULL) { // "paz\fixero.est"
-      if (_fullpath(full, (char *)&mem[pila[sp]], _MAX_PATH) == NULL) {
-        pila[sp] = 0;
+      if (_fullpath(full, (char *)&mem[stack[sp]], _MAX_PATH) == NULL) {
+        stack[sp] = 0;
         return;
       }
       _splitpath(full, drive, dir, fname, ext);
@@ -4126,9 +4126,9 @@ void _fopen(void) { // Search for the file, as it may have been included in the 
         div_strcpy(full, sizeof(full), ext);
       else
         div_strcpy(full, sizeof(full), strchr(ext, '.') + 1);
-      if (strlen(full) && memb[pila[sp] * 4] != '/')
+      if (strlen(full) && memb[stack[sp] * 4] != '/')
         div_strcat(full, sizeof(full), "/");
-      div_strcat(full, sizeof(full), (char *)&mem[pila[sp]]);
+      div_strcat(full, sizeof(full), (char *)&mem[stack[sp]]);
       if ((f = fopen(full, modo)) == NULL) { // "est\paz\fixero.est"
         div_strcpy(full, sizeof(full), fname);
         div_strcat(full, sizeof(full), ext);
@@ -4153,14 +4153,14 @@ void _fopen(void) { // Search for the file, as it may have been included in the 
         break;
     if (x == 32) {
       fclose(f);
-      pila[sp] = 0;
+      stack[sp] = 0;
       e(169);
     } else {
       tabfiles[x] = f;
-      pila[sp] = x * 2 + 1;
+      stack[sp] = x * 2 + 1;
     }
   } else {
-    pila[sp] = 0;
+    stack[sp] = 0;
     if (errno == EMFILE) {
       e(169);
     }
@@ -4174,31 +4174,31 @@ void _fopen(void) { // Search for the file, as it may have been included in the 
 void _fclose(void) {
   int n;
 
-  if (pila[sp] == 0) {
-    pila[sp] = 0; //fcloseall();
-    if (pila[sp] == EOF)
-      pila[sp] = 0;
+  if (stack[sp] == 0) {
+    stack[sp] = 0; //fcloseall();
+    if (stack[sp] == EOF)
+      stack[sp] = 0;
     memset(tabfiles, 0, 32 * 4);
   } else {
-    if (!(pila[sp] & 1) || pila[sp] < 1 || pila[sp] > 63) {
+    if (!(stack[sp] & 1) || stack[sp] < 1 || stack[sp] > 63) {
 #ifdef DEBUG
       e(170);
 #else
-      pila[sp] = 0;
+      stack[sp] = 0;
 #endif
       return;
     }
-    n = pila[sp] / 2;
+    n = stack[sp] / 2;
     if (tabfiles[n] == 0) {
       e(170);
       return;
     }
-    pila[sp] = fclose((FILE *)(tabfiles[n]));
+    stack[sp] = fclose((FILE *)(tabfiles[n]));
     tabfiles[n] = 0;
-    if (!pila[sp])
-      pila[sp] = 1;
+    if (!stack[sp])
+      stack[sp] = 1;
     else
-      pila[sp] = 0;
+      stack[sp] = 0;
   }
 }
 
@@ -4213,9 +4213,9 @@ void _fread(void) {
   if (unit_size < 1)
     unit_size = 1;
 
-  handle = pila[sp--];
-  lon = pila[sp--];
-  offset = pila[sp];
+  handle = stack[sp--];
+  lon = stack[sp--];
+  offset = stack[sp];
 
   if (!(handle & 1) || handle < 1 || handle > 63) {
     e(170);
@@ -4227,18 +4227,18 @@ void _fread(void) {
   }
   f = (FILE *)tabfiles[handle / 2];
   if (!validate_address(offset) || !validate_address(offset + (lon * unit_size) / 4)) {
-    pila[sp] = 0;
+    stack[sp] = 0;
     e(125);
     return;
   }
   n = fread(&mem[offset], 1, unit_size * lon, f); // Bytes read
   if ((n + unit_size - 1) / unit_size < lon) {
-    pila[sp] = 0;
+    stack[sp] = 0;
     e(127);
   } else {
     if (n / unit_size < lon)
       memset(&memb[offset * 4 + n], 0, lon * unit_size - n);
-    pila[sp] = 1;
+    stack[sp] = 1;
   }
   max_reloj += get_reloj() - old_clock;
 }
@@ -4254,9 +4254,9 @@ void _fwrite(void) {
   if (unit_size < 1)
     unit_size = 1;
 
-  handle = pila[sp--];
-  lon = pila[sp--];
-  offset = pila[sp];
+  handle = stack[sp--];
+  lon = stack[sp--];
+  offset = stack[sp];
 
   if (!(handle & 1) || handle < 1 || handle > 63) {
     e(170);
@@ -4268,15 +4268,15 @@ void _fwrite(void) {
   }
   f = (FILE *)tabfiles[handle / 2];
   if (!validate_address(offset) || !validate_address(offset + (lon * unit_size) / 4)) {
-    pila[sp] = 0;
+    stack[sp] = 0;
     e(122);
     return;
   }
   if (fwrite(&mem[offset], unit_size, lon, f) != lon) {
-    pila[sp] = 0;
+    stack[sp] = 0;
     e(124);
   } else
-    pila[sp] = 1;
+    stack[sp] = 1;
   max_reloj += get_reloj() - old_clock;
 }
 
@@ -4291,9 +4291,9 @@ void _fseek(void) {
   if (unit_size < 1)
     unit_size = 1;
 
-  where = pila[sp--];
-  offset = pila[sp--] * unit_size;
-  handle = pila[sp];
+  where = stack[sp--];
+  offset = stack[sp--] * unit_size;
+  handle = stack[sp];
 
   if (!(handle & 1) || handle < 1 || handle > 63) {
     e(170);
@@ -4306,7 +4306,7 @@ void _fseek(void) {
   f = (FILE *)tabfiles[handle / 2];
 
   fseek(f, offset, where);
-  pila[sp] = 0;
+  stack[sp] = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -4317,15 +4317,15 @@ void _ftell(void) {
   if (unit_size < 1)
     unit_size = 1;
 
-  if (!(pila[sp] & 1) || pila[sp] < 1 || pila[sp] > 63) {
+  if (!(stack[sp] & 1) || stack[sp] < 1 || stack[sp] > 63) {
     e(170);
     return;
   }
-  if (tabfiles[pila[sp] / 2] == 0) {
+  if (tabfiles[stack[sp] / 2] == 0) {
     e(170);
     return;
   }
-  pila[sp] = (int)(ftell((FILE *)tabfiles[pila[sp] / 2]) + unit_size - 1) / unit_size;
+  stack[sp] = (int)(ftell((FILE *)tabfiles[stack[sp] / 2]) + unit_size - 1) / unit_size;
 }
 
 //----------------------------------------------------------------------------
@@ -4338,20 +4338,20 @@ void __filelength(void) {
   if (unit_size < 1)
     unit_size = 1;
 
-  if (!(pila[sp] & 1) || pila[sp] < 1 || pila[sp] > 63) {
+  if (!(stack[sp] & 1) || stack[sp] < 1 || stack[sp] > 63) {
     e(170);
     return;
   }
-  if (tabfiles[pila[sp] / 2] == 0) {
+  if (tabfiles[stack[sp] / 2] == 0) {
     e(170);
     return;
   }
 
-  pos = ftell((FILE *)tabfiles[pila[sp] / 2]);
-  fseek((FILE *)tabfiles[pila[sp] / 2], 0, SEEK_END);
-  len = (ftell((FILE *)tabfiles[pila[sp] / 2]) + unit_size - 1) / unit_size;
-  fseek((FILE *)tabfiles[pila[sp] / 2], pos, SEEK_SET);
-  pila[sp] = len;
+  pos = ftell((FILE *)tabfiles[stack[sp] / 2]);
+  fseek((FILE *)tabfiles[stack[sp] / 2], 0, SEEK_END);
+  len = (ftell((FILE *)tabfiles[stack[sp] / 2]) + unit_size - 1) / unit_size;
+  fseek((FILE *)tabfiles[stack[sp] / 2], pos, SEEK_SET);
+  stack[sp] = len;
 }
 
 //----------------------------------------------------------------------------
@@ -4359,7 +4359,7 @@ void __filelength(void) {
 //----------------------------------------------------------------------------
 
 void flush(void) {
-  pila[++sp] = 0; //flushall()-numfiles;
+  stack[++sp] = 0; //flushall()-numfiles;
 }
 
 //----------------------------------------------------------------------------
@@ -4380,10 +4380,10 @@ void get_dirinfo(void) {
   int x = 0;
   int flags;
 
-  flags = pila[sp--];
+  flags = stack[sp--];
   memset(dirinfo->name, 0, 1025 * 4);
 
-  rc = _dos_findfirst((char *)&mem[pila[sp]], flags, &ft);
+  rc = _dos_findfirst((char *)&mem[stack[sp]], flags, &ft);
   while (!rc) {
     div_strcpy(&filenames[x * 16], 16, ft.name);
     dirinfo->name[x] = imem_max + 258 * 5 + x * 4;
@@ -4393,7 +4393,7 @@ void get_dirinfo(void) {
 
   qsort(filenames, x, 16, strcmpsort);
 
-  dirinfo->files = pila[sp] = x;
+  dirinfo->files = stack[sp] = x;
 }
 
 //----------------------------------------------------------------------------
@@ -4420,8 +4420,8 @@ void get_fileinfo(void) {
   if (unit_size < 1)
     unit_size = 1;
 
-  div_strcpy(filename, sizeof(filename), (char *)&mem[pila[sp]]);
-  pila[sp] = 0;
+  div_strcpy(filename, sizeof(filename), (char *)&mem[stack[sp]]);
+  stack[sp] = 0;
 
   rc = _dos_findfirst(filename, _A_NORMAL | _A_SYSTEM | _A_HIDDEN | _A_SUBDIR, &ft);
   if (rc)
@@ -4445,7 +4445,7 @@ void get_fileinfo(void) {
   fileinfo->sec = SECOND(ft.wr_time);
   fileinfo->attrib = ft.attrib;
 
-  pila[sp] = 1;
+  stack[sp] = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -4453,7 +4453,7 @@ void get_fileinfo(void) {
 //----------------------------------------------------------------------------
 
 void getdrive(void) {
-  pila[++sp] = 0;
+  stack[++sp] = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -4462,8 +4462,8 @@ void getdrive(void) {
 
 void setdrive(void) {
   unsigned int total;
-  _dos_setdrive(pila[sp], &total);
-  pila[sp] = 0;
+  _dos_setdrive(stack[sp], &total);
+  stack[sp] = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -4471,10 +4471,10 @@ void setdrive(void) {
 //----------------------------------------------------------------------------
 
 void div_chdir(void) {
-  if (chdir((char *)&mem[pila[sp]]))
-    pila[sp] = 0;
+  if (chdir((char *)&mem[stack[sp]]))
+    stack[sp] = 0;
   else
-    pila[sp] = 1;
+    stack[sp] = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -4486,7 +4486,7 @@ void _mkdir(void) {
   char cwork[256];
   int x;
 
-  buffer = (char *)&mem[pila[sp]];
+  buffer = (char *)&mem[stack[sp]];
 
   if (strlen(buffer))
     if (IS_PATH_SEP(buffer[strlen(buffer) - 1]))
@@ -4503,7 +4503,7 @@ void _mkdir(void) {
   }
   __mkdir(buffer);
 
-  pila[sp] = 0;
+  stack[sp] = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -4518,8 +4518,8 @@ void remove_file(void) {
   char cwork2[_MAX_PATH + 1];
   char cwork3[_MAX_PATH + 1];
 
-  div_strcpy(cwork2, sizeof(cwork2), (char *)&mem[pila[sp]]);
-  pila[sp] = 0;
+  div_strcpy(cwork2, sizeof(cwork2), (char *)&mem[stack[sp]]);
+  stack[sp] = 0;
 
   for (x = strlen(cwork2) - 1;; x--) {
     if (x == -1) {
@@ -4532,7 +4532,7 @@ void remove_file(void) {
     }
   }
 
-  rc = _dos_findfirst((char *)&mem[pila[sp]], _A_NORMAL | _A_SYSTEM | _A_HIDDEN, &ft);
+  rc = _dos_findfirst((char *)&mem[stack[sp]], _A_NORMAL | _A_SYSTEM | _A_HIDDEN, &ft);
   while (!rc) {
     div_strcpy(cwork3, sizeof(cwork3), cwork2);
     div_strcat(cwork3, sizeof(cwork3), ft.name);
@@ -4543,7 +4543,7 @@ void remove_file(void) {
     rc = _dos_findnext(&ft);
   }
 
-  rc = _dos_findfirst((char *)&mem[pila[sp]], _A_SUBDIR, &ft);
+  rc = _dos_findfirst((char *)&mem[stack[sp]], _A_SUBDIR, &ft);
   while (!rc) {
     div_strcpy(cwork3, sizeof(cwork3), cwork2);
     div_strcat(cwork3, sizeof(cwork3), ft.name);
@@ -4589,7 +4589,7 @@ void get_free_mem(meminfo *Meminfo) {}
 //----------------------------------------------------------------------------
 
 void disk_free(void) {
-  pila[sp] = 0;
+  stack[sp] = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -4597,7 +4597,7 @@ void disk_free(void) {
 //----------------------------------------------------------------------------
 
 void memory_free(void) {
-  pila[++sp] = 0;
+  stack[++sp] = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -4608,15 +4608,15 @@ void ignore_error(void) {
   int n;
   n = 0;
   while (n < num_skipped) {
-    if (skipped[n] == pila[sp])
+    if (skipped[n] == stack[sp])
       break;
     n++;
   }
   if (n >= num_skipped && num_skipped < 127) {
-    skipped[num_skipped++] = pila[sp];
+    skipped[num_skipped++] = stack[sp];
   } else if (num_skipped == 127)
     e(168);
-  pila[sp] = 0;
+  stack[sp] = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -4631,18 +4631,18 @@ void ignore_error(void) {
 #define radian 57295.77951
 
 void _sin(void) {
-  float angle = (float)pila[sp] / radian;
-  pila[sp] = (int)((float)sin(angle) * 1000);
+  float angle = (float)stack[sp] / radian;
+  stack[sp] = (int)((float)sin(angle) * 1000);
 }
 
 void _asin(void) {
-  float seno = (float)pila[sp] / 1000.0;
-  if (pila[sp] < -1000 || pila[sp] > 1000) {
-    pila[sp] = 0;
+  float seno = (float)stack[sp] / 1000.0;
+  if (stack[sp] < -1000 || stack[sp] > 1000) {
+    stack[sp] = 0;
     e(171);
     return;
   }
-  pila[sp] = (int)((float)asin(seno) * radian);
+  stack[sp] = (int)((float)asin(seno) * radian);
 }
 
 //----------------------------------------------------------------------------
@@ -4650,18 +4650,18 @@ void _asin(void) {
 //----------------------------------------------------------------------------
 
 void _cos(void) {
-  float angle = (float)pila[sp] / radian;
-  pila[sp] = (int)((float)cos(angle) * 1000);
+  float angle = (float)stack[sp] / radian;
+  stack[sp] = (int)((float)cos(angle) * 1000);
 }
 
 void _acos(void) {
-  float coseno = (float)pila[sp] / 1000.0;
-  if (pila[sp] < -1000 || pila[sp] > 1000) {
-    pila[sp] = 0;
+  float coseno = (float)stack[sp] / 1000.0;
+  if (stack[sp] < -1000 || stack[sp] > 1000) {
+    stack[sp] = 0;
     e(171);
     return;
   }
-  pila[sp] = (int)((float)acos(coseno) * radian);
+  stack[sp] = (int)((float)acos(coseno) * radian);
 }
 
 //----------------------------------------------------------------------------
@@ -4671,37 +4671,37 @@ void _acos(void) {
 void _tan(void) {
   float angle;
 
-  while (pila[sp] >= 180000)
-    pila[sp] -= 360000;
-  while (pila[sp] <= -180000)
-    pila[sp] += 360000;
+  while (stack[sp] >= 180000)
+    stack[sp] -= 360000;
+  while (stack[sp] <= -180000)
+    stack[sp] += 360000;
 
-  if (pila[sp] == 90000) {
-    pila[sp] = 0x7FFFFFFF;
+  if (stack[sp] == 90000) {
+    stack[sp] = 0x7FFFFFFF;
     return;
   }
-  if (pila[sp] == -90000) {
-    pila[sp] = 0x80000000;
+  if (stack[sp] == -90000) {
+    stack[sp] = 0x80000000;
     return;
   }
 
-  angle = (float)pila[sp] / radian;
-  pila[sp] = (int)((float)tan(angle) * 1000);
+  angle = (float)stack[sp] / radian;
+  stack[sp] = (int)((float)tan(angle) * 1000);
 }
 
 void _atan(void) {
   float tangente;
 
-  tangente = (float)pila[sp] / 1000.0;
-  pila[sp] = (int)((float)atan(tangente) * radian);
+  tangente = (float)stack[sp] / 1000.0;
+  stack[sp] = (int)((float)atan(tangente) * radian);
 }
 
 void _atan2(void) {
   float x, y;
 
-  x = (float)pila[sp--];
-  y = (float)pila[sp];
-  pila[sp] = (int)((float)atan2(y, x) * radian);
+  x = (float)stack[sp--];
+  y = (float)stack[sp];
+  stack[sp] = (int)((float)atan2(y, x) * radian);
 }
 
 //----------------------------------------------------------------------------
@@ -4718,19 +4718,19 @@ void draw(void) {
     x++;
   if (x == max_drawings) {
     sp -= 7;
-    pila[sp] = 0;
+    stack[sp] = 0;
     e(172);
     return;
   }
 
-  drawing[x].y1 = pila[sp--];
-  drawing[x].x1 = pila[sp--];
-  drawing[x].y0 = pila[sp--];
-  drawing[x].x0 = pila[sp--];
-  drawing[x].region = pila[sp--];
-  drawing[x].opacity = pila[sp--];
-  drawing[x].color = pila[sp--];
-  drawing[x].type = pila[sp];
+  drawing[x].y1 = stack[sp--];
+  drawing[x].x1 = stack[sp--];
+  drawing[x].y0 = stack[sp--];
+  drawing[x].x0 = stack[sp--];
+  drawing[x].region = stack[sp--];
+  drawing[x].opacity = stack[sp--];
+  drawing[x].color = stack[sp--];
+  drawing[x].type = stack[sp];
 
   if (drawing[x].type < 1 || drawing[x].type > tipo_mayor) {
     drawing[x].type = 0;
@@ -4750,9 +4750,9 @@ void draw(void) {
   }
 
   if (drawing[x].type)
-    pila[sp] = x * 2 + 1;
+    stack[sp] = x * 2 + 1;
   else
-    pila[sp] = 0;
+    stack[sp] = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -4762,21 +4762,21 @@ void draw(void) {
 void delete_draw(void) {
   int draw_id;
 
-  if ((draw_id = pila[sp]) == -1) {
+  if ((draw_id = stack[sp]) == -1) {
     for (draw_id = 0; draw_id < max_drawings; draw_id++) {
       drawing[draw_id].type = 0;
     }
 
   } else {
     if ((draw_id & 1) == 0 || draw_id < 1 || draw_id > max_drawings * 2 - 1) {
-      pila[sp] = 0;
+      stack[sp] = 0;
       e(175);
       return;
     }
     draw_id /= 2;
 
     if (drawing[draw_id].type == 0) {
-      pila[sp] = 0;
+      stack[sp] = 0;
       e(175);
       return;
     }
@@ -4792,29 +4792,29 @@ void delete_draw(void) {
 void move_draw(void) {
   int draw_id;
 
-  draw_id = pila[sp - 6];
+  draw_id = stack[sp - 6];
 
   if ((draw_id & 1) == 0 || draw_id < 1 || draw_id > max_drawings * 2 - 1) {
     sp -= 6;
-    pila[sp] = 0;
+    stack[sp] = 0;
     e(175);
     return;
   }
   draw_id /= 2;
 
   if (drawing[draw_id].type == 0) {
-    pila[sp] = 0;
+    stack[sp] = 0;
     e(175);
     return;
   }
 
-  drawing[draw_id].y1 = pila[sp--];
-  drawing[draw_id].x1 = pila[sp--];
-  drawing[draw_id].y0 = pila[sp--];
-  drawing[draw_id].x0 = pila[sp--];
-  drawing[draw_id].opacity = pila[sp--];
-  drawing[draw_id].color = pila[sp--];
-  pila[sp] = 0;
+  drawing[draw_id].y1 = stack[sp--];
+  drawing[draw_id].x1 = stack[sp--];
+  drawing[draw_id].y0 = stack[sp--];
+  drawing[draw_id].x0 = stack[sp--];
+  drawing[draw_id].opacity = stack[sp--];
+  drawing[draw_id].color = stack[sp--];
+  stack[sp] = 0;
 
   if (drawing[draw_id].color < 0 || drawing[draw_id].color > 255) {
     drawing[draw_id].type = 0;
@@ -4842,10 +4842,10 @@ void save_mapcx(int tipo) {
   char cwork[256];
   FILE *f;
 
-  div_strcpy(cwork, sizeof(cwork), (char *)&mem[pila[sp--]]);
-  graph = pila[sp--];
-  file = pila[sp];
-  pila[sp] = 0;
+  div_strcpy(cwork, sizeof(cwork), (char *)&mem[stack[sp--]]);
+  graph = stack[sp--];
+  file = stack[sp];
+  stack[sp] = 0;
 
   if (file > max_fpgs || file < 0) {
     e(109);
@@ -4890,7 +4890,7 @@ void save_mapcx(int tipo) {
     }
   }
   fclose(f);
-  pila[sp] = 1;
+  stack[sp] = 1;
 
   max_reloj += get_reloj() - old_clock;
 }
@@ -4907,9 +4907,9 @@ void write_in_map(void) {
 
   byte *ptr, *ptr2;
 
-  alignment = pila[sp--];
-  texts = pila[sp--];
-  font_index = pila[sp];
+  alignment = stack[sp--];
+  texts = stack[sp--];
+  font_index = stack[sp];
 
   if (font_index < 0 || font_index >= max_fonts) {
     e(116);
@@ -4994,7 +4994,7 @@ void write_in_map(void) {
         next_map_code = 1000;
     }
     g[0].grf[next_map_code] = (int *)ptr;
-    pila[sp] = next_map_code;
+    stack[sp] = next_map_code;
 
   } else
     e(100);
@@ -5091,77 +5091,77 @@ void do_calculate(void) {
 }
 
 double do_evaluate(void) {
-  double pila[64];
+  double stack[64];
   int sp = 0, n = 0;
 
   do {
     switch (expressions[n].token) {
     case p_num:
-      pila[++sp] = expressions[n].number;
+      stack[++sp] = expressions[n].number;
       break;
     case p_or:
-      pila[sp - 1] = (double)((int)pila[sp - 1] | (int)pila[sp]);
+      stack[sp - 1] = (double)((int)stack[sp - 1] | (int)stack[sp]);
       sp--;
       break;
     case p_xor:
-      pila[sp - 1] = (double)((int)pila[sp - 1] ^ (int)pila[sp]);
+      stack[sp - 1] = (double)((int)stack[sp - 1] ^ (int)stack[sp]);
       sp--;
       break;
     case p_and:
-      pila[sp - 1] = (double)((int)pila[sp - 1] & (int)pila[sp]);
+      stack[sp - 1] = (double)((int)stack[sp - 1] & (int)stack[sp]);
       sp--;
       break;
     case p_add:
-      pila[sp - 1] += pila[sp];
+      stack[sp - 1] += stack[sp];
       sp--;
       break;
     case p_sub:
-      pila[sp - 1] -= pila[sp];
+      stack[sp - 1] -= stack[sp];
       sp--;
       break;
     case p_mul:
-      pila[sp - 1] *= pila[sp];
+      stack[sp - 1] *= stack[sp];
       sp--;
       break;
     case p_div:
-      if (pila[sp] == 0.0) {
+      if (stack[sp] == 0.0) {
         token = p_error;
         n = num_expressions;
       } else {
-        pila[sp - 1] /= pila[sp];
+        stack[sp - 1] /= stack[sp];
         sp--;
       }
       break;
     case p_mod:
-      if ((int)pila[sp] == 0) {
+      if ((int)stack[sp] == 0) {
         token = p_error;
         n = num_expressions;
       } else {
-        pila[sp - 1] = (double)((int)pila[sp - 1] % (int)pila[sp]);
+        stack[sp - 1] = (double)((int)stack[sp - 1] % (int)stack[sp]);
         sp--;
       }
       break;
     case p_neg:
-      pila[sp] = -pila[sp];
+      stack[sp] = -stack[sp];
       break;
     case p_not:
-      pila[sp] = (double)((int)pila[sp] ^ -1);
+      stack[sp] = (double)((int)stack[sp] ^ -1);
       break;
     case p_shr:
-      pila[sp - 1] = (double)((int)pila[sp - 1] >> (int)pila[sp]);
+      stack[sp - 1] = (double)((int)stack[sp - 1] >> (int)stack[sp]);
       sp--;
       break;
     case p_shl:
-      pila[sp - 1] = (double)((int)pila[sp - 1] << (int)pila[sp]);
+      stack[sp - 1] = (double)((int)stack[sp - 1] << (int)stack[sp]);
       sp--;
       break;
     case p_sqrt:
-      if (pila[sp] < 0) {
+      if (stack[sp] < 0) {
         token = p_error;
         n = num_expressions;
       } else {
-        if (pila[sp] < 2147483648)
-          pila[sp] = sqrt(pila[sp]);
+        if (stack[sp] < 2147483648)
+          stack[sp] = sqrt(stack[sp]);
         else {
           token = p_error;
           n = num_expressions;
@@ -5179,7 +5179,7 @@ double do_evaluate(void) {
   if (sp != 1)
     token = p_error;
 
-  return (pila[sp]);
+  return (stack[sp]);
 }
 
 void expres0() { // xor or and
@@ -5423,12 +5423,12 @@ double get_num(void) { // Read the number at *expression (double in hex or dec)
 }
 
 void calculate(void) {
-  expression = (char *)&mem[pila[sp]];
+  expression = (char *)&mem[stack[sp]];
   do_calculate();
   if (token == p_num)
-    pila[sp] = (int)token_number;
+    stack[sp] = (int)token_number;
   else
-    pila[sp] = 0;
+    stack[sp] = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -5439,8 +5439,8 @@ extern int nullstring[4];
 extern int nstring;
 
 void __itoa(void) {
-  itoa(pila[sp], (char *)&mem[nullstring[nstring]], 10);
-  pila[sp] = nullstring[nstring];
+  itoa(stack[sp], (char *)&mem[nullstring[nstring]], 10);
+  stack[sp] = nullstring[nstring];
   nstring = ((nstring + 1) & 3);
 }
 
@@ -5459,26 +5459,26 @@ void _malloc(void) {
     con++;
 
   if (con == 256) {
-    pila[sp] = 0;
+    stack[sp] = 0;
     e(179);
     return;
   }
 
-  if (pila[sp] < 1) {
-    pila[sp] = 0;
+  if (stack[sp] < 1) {
+    stack[sp] = 0;
     e(181);
     return;
   }
 
-  divmalloc[con].ptr = (byte *)malloc(pila[sp] * 4 + 4 + 3);
+  divmalloc[con].ptr = (byte *)malloc(stack[sp] * 4 + 4 + 3);
 
   if (!divmalloc[con].ptr) {
-    pila[sp] = 0;
+    stack[sp] = 0;
     e(100);
     return;
   }
 
-  memset(divmalloc[con].ptr, 0, pila[sp] * 4 + 4 + 3);
+  memset(divmalloc[con].ptr, 0, stack[sp] * 4 + 4 + 3);
 
   p = (byte *)((((uintptr_t)divmalloc[con].ptr + 3) / 4) * 4);
 
@@ -5487,9 +5487,9 @@ void _malloc(void) {
   if (!(divmalloc[con].imem1 & 1))
     divmalloc[con].imem1++;
 
-  divmalloc[con].imem2 = divmalloc[con].imem1 + pila[sp];
+  divmalloc[con].imem2 = divmalloc[con].imem1 + stack[sp];
 
-  pila[sp] = divmalloc[con].imem1;
+  stack[sp] = divmalloc[con].imem1;
 }
 
 //----------------------------------------------------------------------------
@@ -5499,11 +5499,11 @@ void _malloc(void) {
 void _free(void) {
   int con = 0;
 
-  while (con < 256 && divmalloc[con].imem1 != pila[sp])
+  while (con < 256 && divmalloc[con].imem1 != stack[sp])
     con++;
 
-  if (con == 256 || pila[sp] == 0) {
-    pila[sp] = 0;
+  if (con == 256 || stack[sp] == 0) {
+    stack[sp] = 0;
     e(180);
     return;
   }
@@ -5514,7 +5514,7 @@ void _free(void) {
   divmalloc[con].imem1 = 0;
   divmalloc[con].imem2 = 0;
 
-  pila[sp] = 1;
+  stack[sp] = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -5529,16 +5529,16 @@ void encode(void) {
   int n;
   byte *ptr;
 
-  key = pila[sp--];
-  size = pila[sp--];
-  offset = pila[sp];
+  key = stack[sp--];
+  size = stack[sp--];
+  offset = stack[sp];
 
   if (!validate_address(offset) || !validate_address(offset + size)) {
-    pila[sp] = 0;
+    stack[sp] = 0;
     e(182);
     return;
   }
-  pila[sp] = 1;
+  stack[sp] = 1;
 
   init_rnd_coder(size + 33, (char *)&mem[key]);
   ptr = (byte *)&mem[offset];
@@ -5560,10 +5560,10 @@ void encode_file(int encode) {
   char cwork3[_MAX_PATH + 1];
   byte *name, *key;
 
-  key = (byte *)&mem[pila[sp--]];
-  name = (byte *)&mem[pila[sp]];
+  key = (byte *)&mem[stack[sp--]];
+  name = (byte *)&mem[stack[sp]];
 
-  pila[sp] = 1;
+  stack[sp] = 1;
 
   div_strcpy(cwork2, sizeof(cwork2), (char *)name);
   for (x = strlen(cwork2) - 1;; x--) {
@@ -5611,18 +5611,18 @@ void _encrypt(int encode, char *filename, char *key) {
       } else {
         fclose(f);
         free(ptr);
-        pila[sp] = 0;
+        stack[sp] = 0;
         e(127);
         return;
       }
     } else {
       fclose(f);
-      pila[sp] = 0;
+      stack[sp] = 0;
       e(100);
       return;
     }
   } else {
-    pila[sp] = 0;
+    stack[sp] = 0;
     e(105);
     return;
   }
@@ -5650,7 +5650,7 @@ void _encrypt(int encode, char *filename, char *key) {
   _makepath(full, drive, dir, fname, ext);
 
   if (rename(filename, full)) {
-    pila[sp] = 0;
+    stack[sp] = 0;
     free(ptr);
     e(105);
     return;
@@ -5659,7 +5659,7 @@ void _encrypt(int encode, char *filename, char *key) {
   if ((f = open_save_file((byte *)filename)) == NULL) {
     rename(full, filename);
     free(ptr);
-    pila[sp] = 0;
+    stack[sp] = 0;
     e(105);
     return;
   }
@@ -5670,7 +5670,7 @@ void _encrypt(int encode, char *filename, char *key) {
       remove(filename);
       rename(full, filename);
       free(ptr);
-      pila[sp] = 0;
+      stack[sp] = 0;
       e(105);
       return;
     }
@@ -5681,7 +5681,7 @@ void _encrypt(int encode, char *filename, char *key) {
     remove(filename);
     rename(full, filename);
     free(ptr);
-    pila[sp] = 0;
+    stack[sp] = 0;
     e(105);
     return;
   }
@@ -5709,9 +5709,9 @@ void _compress(int encode) {
   char cwork3[_MAX_PATH + 1];
   byte *name;
 
-  name = (byte *)&mem[pila[sp]];
+  name = (byte *)&mem[stack[sp]];
 
-  pila[sp] = 1;
+  stack[sp] = 1;
 
   div_strcpy(cwork2, sizeof(cwork2), (char *)name);
   for (x = strlen(cwork2) - 1;; x--) {
@@ -5759,18 +5759,18 @@ void _compress_file(int encode, char *filename) {
       } else {
         fclose(f);
         free(ptr);
-        pila[sp] = 0;
+        stack[sp] = 0;
         e(127);
         return;
       }
     } else {
       fclose(f);
-      pila[sp] = 0;
+      stack[sp] = 0;
       e(100);
       return;
     }
   } else {
-    pila[sp] = 0;
+    stack[sp] = 0;
     e(105);
     return;
   }
@@ -5781,7 +5781,7 @@ void _compress_file(int encode, char *filename) {
     size2 = size + size / 100 + 256;
     if ((ptr_dest = (byte *)malloc(size2)) == NULL) {
       free(ptr);
-      pila[sp] = 0;
+      stack[sp] = 0;
       e(100);
       return;
     }
@@ -5793,7 +5793,7 @@ void _compress_file(int encode, char *filename) {
     {
       free(ptr_dest);
       free(ptr);
-      pila[sp] = 0;
+      stack[sp] = 0;
       e(100);
       return;
     }
@@ -5812,7 +5812,7 @@ void _compress_file(int encode, char *filename) {
     size2 = *(int *)(ptr + 8);
     if ((ptr_dest = (byte *)malloc(size2)) == NULL) {
       free(ptr);
-      pila[sp] = 0;
+      stack[sp] = 0;
       e(100);
       return;
     }
@@ -5824,7 +5824,7 @@ void _compress_file(int encode, char *filename) {
     {
       free(ptr_dest);
       free(ptr);
-      pila[sp] = 0;
+      stack[sp] = 0;
       e(100);
       return;
     }
@@ -5838,7 +5838,7 @@ void _compress_file(int encode, char *filename) {
   _makepath(full, drive, dir, fname, ext);
 
   if (rename(filename, full)) {
-    pila[sp] = 0;
+    stack[sp] = 0;
     free(ptr_dest);
     e(105);
     return;
@@ -5847,7 +5847,7 @@ void _compress_file(int encode, char *filename) {
   if ((f = open_save_file((byte *)filename)) == NULL) {
     rename(full, filename);
     free(ptr_dest);
-    pila[sp] = 0;
+    stack[sp] = 0;
     e(105);
     return;
   }
@@ -5858,7 +5858,7 @@ void _compress_file(int encode, char *filename) {
       remove(filename);
       rename(full, filename);
       free(ptr_dest);
-      pila[sp] = 0;
+      stack[sp] = 0;
       e(105);
       return;
     }
@@ -5867,7 +5867,7 @@ void _compress_file(int encode, char *filename) {
       remove(filename);
       rename(full, filename);
       free(ptr_dest);
-      pila[sp] = 0;
+      stack[sp] = 0;
       e(105);
       return;
     }
@@ -5878,7 +5878,7 @@ void _compress_file(int encode, char *filename) {
     remove(filename);
     rename(full, filename);
     free(ptr_dest);
-    pila[sp] = 0;
+    stack[sp] = 0;
     e(105);
     return;
   }
@@ -5925,7 +5925,7 @@ extern int f_time[256]; // Time consumed by each function
 /* Built-in function dispatcher: called by the 'lfun' opcode. Reads the
  * function code from mem[ip], then dispatches via a large switch to the
  * corresponding runtime function (signal, collision, load_fpg, sound, etc.).
- * Arguments are popped from pila[] by each handler; results pushed back.
+ * Arguments are popped from stack[] by each handler; results pushed back.
  */
 void function(void) {
 #ifdef DEBUG
@@ -6092,10 +6092,10 @@ void function(void) {
     sp--;
     break; // play_cd removed (CDDA deleted)
   case 52:
-    pila[++sp] = 0;
+    stack[++sp] = 0;
     break; // stop_cd removed (CDDA deleted)
   case 53:
-    pila[++sp] = 0;
+    stack[++sp] = 0;
     break; // is_playing_cd removed (CDDA deleted)
   case 54:
     start_mode7();

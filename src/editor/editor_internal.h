@@ -16,7 +16,7 @@
 //      Constants
 //-----------------------------------------------------------------------------
 
-#define buffer_grow 16384 // Edit buffer growth increment
+#define BUFFER_INCREASE 16384 // Edit buffer growth increment
 #define buffer_min  2048  // Minimum margin space
 
 #define cr  13 // Carriage return

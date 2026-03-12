@@ -20,7 +20,7 @@ static inline void array_strcpy(char *dst, size_t dst_size, const char *src) {
 
 #define STACK_SIZE 128
 
-extern int stack[STACK_SIZE];
+int dstack[STACK_SIZE];
 byte stp[STACK_SIZE];
 char cstack[STACK_SIZE][512];
 
@@ -462,7 +462,7 @@ void dump(int size) {
       // load val to stack
     case lcar:
       fprintf(sta, "%5u\tcar %d", i, mem[i + 1]);
-      stack[sp] = mem[i + 1];
+      dstack[sp] = mem[i + 1];
       div_snprintf(cstack[sp], sizeof(cstack[sp]), "%d%c", mem[i + 1], 0);
       div_strcpy(cmd, sizeof(cmd), cstack[sp]);
       stp[sp] = 0;    // not a pointer
@@ -551,19 +551,19 @@ void dump(int size) {
       break;
     case ladd:
       fprintf(sta, "%5u\tadd", i);
-      fprintf(prg, "// ladd %d[%d]+%d[%d] %d %d\n", stack[sp - 2], stp[sp - 2], stack[sp - 1],
+      fprintf(prg, "// ladd %d[%d]+%d[%d] %d %d\n", dstack[sp - 2], stp[sp - 2], dstack[sp - 1],
               stp[sp - 1], sp, i);
       SAFE_SPRINTF(cstack[sp], "(%s+%s)", cstack[sp - 2], cstack[sp - 1]);
-      stack[sp - 2] += stack[sp - 1];
+      dstack[sp - 2] += dstack[sp - 1];
       div_strcpy(cmd, sizeof(cmd), cstack[sp]);
       array_strcpy(cstack[sp - 2], sizeof(cstack[sp - 2]), cstack[sp]);
       sp--;
       break;
     case lsub:
       fprintf(sta, "%5u\tsub", i);
-      //stack[sp-2]-=stack[sp-1];
+      //dstack[sp-2]-=dstack[sp-1];
       SAFE_SPRINTF(cstack[sp], "(%s-%s)", cstack[sp - 2], cstack[sp - 1]);
-      stack[sp - 2] -= stack[sp - 1];
+      dstack[sp - 2] -= dstack[sp - 1];
       array_strcpy(cstack[sp - 2], sizeof(cstack[sp - 2]), cstack[sp]);
       div_strcpy(cmd, sizeof(cmd), cstack[sp - 2]);
 
@@ -593,7 +593,7 @@ void dump(int size) {
     case lneg:
       fprintf(sta, "%5u\tneg", i);
       SAFE_SPRINTF(cstack[sp], "-%s", cstack[sp - 1]);
-      stack[sp - 1] = -stack[sp - 1];
+      dstack[sp - 1] = -dstack[sp - 1];
       div_strcpy(cmd, sizeof(cmd), cstack[sp]);
       array_strcpy(cstack[sp - 1], sizeof(cstack[sp - 1]), cstack[sp]);
 
@@ -602,10 +602,10 @@ void dump(int size) {
     case lptr:
       fprintf(sta, "%5u\tptr", i);
       //
-      fprintf(prg, "// lptr %s %d %d\n", cstack[sp - 1], stack[sp - 1], i);
+      fprintf(prg, "// lptr %s %d %d\n", cstack[sp - 1], dstack[sp - 1], i);
       // get var names
       localvar = locvar[sp - 1];
-      getvarname(stack[sp - 1], name);
+      getvarname(dstack[sp - 1], name);
       div_snprintf(cstack[sp - 1], sizeof(cstack[sp - 1]), "%s", name);
       div_strcpy(cmd, sizeof(cmd), cstack[sp - 1]);
       stp[sp - 1] = 1;
@@ -616,13 +616,13 @@ void dump(int size) {
     case laid:
       fprintf(sta, "%5u\taid", i);
       localvar = locvar[sp - 1];
-      getvarname(stack[sp - 1], cstack[sp - 1]);
-      fprintf(prg, "// %s %d %d %d\n", cstack[sp - 1], stack[sp - 1], i, localvar);
+      getvarname(dstack[sp - 1], cstack[sp - 1]);
+      fprintf(prg, "// %s %d %d %d\n", cstack[sp - 1], dstack[sp - 1], i, localvar);
 
       break;
     case lcid:
       fprintf(sta, "%5u\tcid", i);
-      stack[sp] = 0;
+      dstack[sp] = 0;
       div_strcpy(cstack[sp], sizeof(cstack[sp]), "id");
       div_strcpy(cmd, sizeof(cmd), cstack[sp]);
       stp[sp] = 1;
@@ -684,7 +684,7 @@ void dump(int size) {
 
         div_snprintf(cmd, sizeof(cmd), "signal(%s,", cstack[sp - 2]);
 
-        switch (stack[sp - 1]) {
+        switch (dstack[sp - 1]) {
         case 0:
           div_strcat(cmd, sizeof(cmd), "s_kill");
           break;
@@ -719,12 +719,12 @@ void dump(int size) {
         break;
 
       case 1:
-        div_snprintf(cmd, sizeof(cmd), "key(%s)", keys[stack[sp - 1]]);
+        div_snprintf(cmd, sizeof(cmd), "key(%s)", keys[dstack[sp - 1]]);
         div_strcpy(cstack[sp - 1], sizeof(cstack[sp - 1]), cmd);
         break;
 
       case 2: // load_pal
-        div_snprintf(cmd, sizeof(cmd), "load_pal(\"%s\")", (byte *)&mem[mem[7] + stack[sp - 1]]);
+        div_snprintf(cmd, sizeof(cmd), "load_pal(\"%s\")", (byte *)&mem[mem[7] + dstack[sp - 1]]);
         div_strcpy(cstack[sp - 1], sizeof(cstack[sp - 1]), cmd);
 
         break;
@@ -734,7 +734,7 @@ void dump(int size) {
           div_snprintf(cmd, sizeof(cmd), "load_fpg(%s)", cstack[sp - 1]);
           div_strcpy(cstack[sp - 1], sizeof(cstack[sp - 1]), cmd);
         } else {
-          div_snprintf(cmd, sizeof(cmd), "load_fpg(\"%s\")", (byte *)&mem[mem[7] + stack[sp - 1]]);
+          div_snprintf(cmd, sizeof(cmd), "load_fpg(\"%s\")", (byte *)&mem[mem[7] + dstack[sp - 1]]);
           div_strcpy(cstack[sp - 1], sizeof(cstack[sp - 1]), cmd);
         }
         break;
@@ -774,29 +774,29 @@ void dump(int size) {
         break;
 
       case 15:
-        div_snprintf(cmd, sizeof(cmd), "load_fnt(\"%s\")", (byte *)&mem[mem[7] + stack[sp - 1]]);
+        div_snprintf(cmd, sizeof(cmd), "load_fnt(\"%s\")", (byte *)&mem[mem[7] + dstack[sp - 1]]);
         div_strcpy(cstack[sp - 1], sizeof(cstack[sp - 1]), cmd);
         break;
 
       case 16: // write (5)
-        div_snprintf(cmd, sizeof(cmd), "write(%d,%d,%d,%d,\"%s\")", stack[sp - 5], stack[sp - 4],
-                     stack[sp - 3], stack[sp - 2], (byte *)&mem[mem[7] + stack[sp - 1]]);
+        div_snprintf(cmd, sizeof(cmd), "write(%d,%d,%d,%d,\"%s\")", dstack[sp - 5], dstack[sp - 4],
+                     dstack[sp - 3], dstack[sp - 2], (byte *)&mem[mem[7] + dstack[sp - 1]]);
         sp -= 4;
         div_strcpy(cstack[sp - 1], sizeof(cstack[sp - 1]), cmd);
         break;
 
       case 17:
-        div_snprintf(cmd, sizeof(cmd), "write_int(%d,%d,%d,%d,&var%d)", stack[sp - 5],
-                     stack[sp - 4], stack[sp - 3], stack[sp - 2], stack[sp - 1]);
+        div_snprintf(cmd, sizeof(cmd), "write_int(%d,%d,%d,%d,&var%d)", dstack[sp - 5],
+                     dstack[sp - 4], dstack[sp - 3], dstack[sp - 2], dstack[sp - 1]);
         sp -= 4;
         div_strcpy(cstack[sp - 1], sizeof(cstack[sp - 1]), cmd);
         break;
 
       case 18:
-        if (stack[sp - 1] == 0)
+        if (dstack[sp - 1] == 0)
           div_snprintf(cmd, sizeof(cmd), "delete_text(all_text)");
         else
-          div_snprintf(cmd, sizeof(cmd), "delete_text(%d)", stack[sp - 1]);
+          div_snprintf(cmd, sizeof(cmd), "delete_text(%d)", dstack[sp - 1]);
 
         div_strcpy(cstack[sp - 1], sizeof(cstack[sp - 1]), cmd);
 
@@ -807,28 +807,28 @@ void dump(int size) {
         break;
 
       case 21: // rand (2)
-        div_snprintf(cmd, sizeof(cmd), "rand(%d,%d)", stack[sp - 2], stack[sp - 1]);
+        div_snprintf(cmd, sizeof(cmd), "rand(%d,%d)", dstack[sp - 2], dstack[sp - 1]);
         sp--;
         div_strcpy(cstack[sp - 1], sizeof(cstack[sp - 1]), cmd);
         break;
 
       case 22: // define region (5)
-        div_snprintf(cmd, sizeof(cmd), "define_region(%d,%d,%d,%d,%d)", stack[sp - 5],
-                     stack[sp - 4], stack[sp - 3], stack[sp - 2], stack[sp - 1]);
+        div_snprintf(cmd, sizeof(cmd), "define_region(%d,%d,%d,%d,%d)", dstack[sp - 5],
+                     dstack[sp - 4], dstack[sp - 3], dstack[sp - 2], dstack[sp - 1]);
         sp -= 4;
         div_strcpy(cstack[sp - 1], sizeof(cstack[sp - 1]), cmd);
         break;
 
       case 24: // put (4)
-        div_snprintf(cmd, sizeof(cmd), "put(%d,%d,%d,%d)", stack[sp - 4], stack[sp - 3],
-                     stack[sp - 2], stack[sp - 1]);
+        div_snprintf(cmd, sizeof(cmd), "put(%d,%d,%d,%d)", dstack[sp - 4], dstack[sp - 3],
+                     dstack[sp - 2], dstack[sp - 1]);
         sp -= 3;
         div_strcpy(cstack[sp - 1], sizeof(cstack[sp - 1]), cmd);
         break;
 
 
       case 25:
-        div_snprintf(cmd, sizeof(cmd), "put_screen(%d,%d)", stack[sp - 2], stack[sp - 1]);
+        div_snprintf(cmd, sizeof(cmd), "put_screen(%d,%d)", dstack[sp - 2], dstack[sp - 1]);
         sp--;
         div_strcpy(cstack[sp - 1], sizeof(cstack[sp - 1]), cmd);
         break;
@@ -854,19 +854,19 @@ void dump(int size) {
 
       case 35: //load
         div_snprintf(cmd, sizeof(cmd), "load(\"%s\",offset var%d)",
-                     (byte *)&mem[mem[7] + stack[sp - 2]], stack[sp - 1]);
+                     (byte *)&mem[mem[7] + dstack[sp - 2]], dstack[sp - 1]);
         sp--;
         div_strcpy(cstack[sp - 1], sizeof(cstack[sp - 1]), cmd);
         break;
 
       case 36:
-        div_snprintf(cmd, sizeof(cmd), "set_mode(%d)", stack[sp - 1]);
+        div_snprintf(cmd, sizeof(cmd), "set_mode(%d)", dstack[sp - 1]);
         div_strcpy(cstack[sp - 1], sizeof(cstack[sp - 1]), cmd);
         break;
 
       case 37: // load_pcm (2)
-        div_snprintf(cmd, sizeof(cmd), "load_pcm(\"%s\",%d)", (byte *)&mem[mem[7] + stack[sp - 2]],
-                     stack[sp - 1]);
+        div_snprintf(cmd, sizeof(cmd), "load_pcm(\"%s\",%d)", (byte *)&mem[mem[7] + dstack[sp - 2]],
+                     dstack[sp - 1]);
         sp--;
         div_strcpy(cstack[sp - 1], sizeof(cstack[sp - 1]), cmd);
         break;
@@ -880,12 +880,12 @@ void dump(int size) {
         break;
 
       case 40: // stop_sound (1)
-        div_snprintf(cmd, sizeof(cmd), "stop_sound(%d)", stack[sp - 1]);
+        div_snprintf(cmd, sizeof(cmd), "stop_sound(%d)", dstack[sp - 1]);
         div_strcpy(cstack[sp - 1], sizeof(cstack[sp - 1]), cmd);
         break;
 
       case 42: // set_fps (2)
-        div_snprintf(cmd, sizeof(cmd), "set_fps(%d,%d)", stack[sp - 2], stack[sp - 1]);
+        div_snprintf(cmd, sizeof(cmd), "set_fps(%d,%d)", dstack[sp - 2], dstack[sp - 1]);
         sp--;
         div_strcpy(cstack[sp - 1], sizeof(cstack[sp - 1]), cmd);
         break;
@@ -899,13 +899,13 @@ void dump(int size) {
         break;
 
       case 56: // advance (1)
-        div_snprintf(cmd, sizeof(cmd), "advance(%d)", stack[sp - 1]);
+        div_snprintf(cmd, sizeof(cmd), "advance(%d)", dstack[sp - 1]);
         div_strcpy(cstack[sp - 1], sizeof(cstack[sp - 1]), cmd);
         //sp;
         break;
 
       case 57: // abs(); (1)
-        div_snprintf(cmd, sizeof(cmd), "abs(%d)", stack[sp - 1]);
+        div_snprintf(cmd, sizeof(cmd), "abs(%d)", dstack[sp - 1]);
         div_strcpy(cstack[sp - 1], sizeof(cstack[sp - 1]), cmd);
         break;
 
@@ -922,8 +922,8 @@ void dump(int size) {
         break;
 
       case 67: // exit (2)
-        div_snprintf(cmd, sizeof(cmd), "exit(\"%s\",%d)", (byte *)&mem[mem[7] + stack[sp - 2]],
-                     stack[sp - 1]);
+        div_snprintf(cmd, sizeof(cmd), "exit(\"%s\",%d)", (byte *)&mem[mem[7] + dstack[sp - 2]],
+                     dstack[sp - 1]);
         sp--;
         div_strcpy(cstack[sp - 1], sizeof(cstack[sp - 1]), cmd);
         break;
@@ -991,7 +991,7 @@ void dump(int size) {
       if (args > 0) {
         args--;
         localvar = locvar[0];
-        getvarname(stack[0], name);
+        getvarname(dstack[0], name);
         fprintf(prg, "%s ", name);
         if (args == 0)
           fprintf(prg, ");\n\n");
@@ -1046,7 +1046,7 @@ void dump(int size) {
     case lpti:
       fprintf(sta, "%5u\tpti", i);
       localvar = locvar[0];
-      getvarname(stack[0], cmd);
+      getvarname(dstack[0], cmd);
       div_strcat(cmd, sizeof(cmd), "++");
       break;
     case ldpt:
@@ -1056,14 +1056,14 @@ void dump(int size) {
     case lptd:
       fprintf(sta, "%5u\tptd", i);
       localvar = locvar[0];
-      getvarname(stack[0], cmd);
+      getvarname(dstack[0], cmd);
       div_strcat(cmd, sizeof(cmd), "++");
       break;
 
     case lada:
       fprintf(sta, "%5u\tada", i);
       localvar = locvar[sp - 2];
-      getvarname(stack[sp - 2], cstack[sp - 2]);
+      getvarname(dstack[sp - 2], cstack[sp - 2]);
       div_snprintf(cmd, sizeof(cmd), "%s+=%s", cstack[sp - 2], cstack[sp - 1]);
       fprintf(prg, "// %s %i\n", cmd, i);
       sp--;
@@ -1071,7 +1071,7 @@ void dump(int size) {
     case lsua:
       fprintf(sta, "%5u\tsua", i);
       localvar = locvar[sp - 2];
-      getvarname(stack[sp - 2], name);
+      getvarname(dstack[sp - 2], name);
       div_snprintf(cmd, sizeof(cmd), "%s-=%s", name, cstack[sp - 1]);
       break;
     case lmua:
@@ -1123,7 +1123,7 @@ void dump(int size) {
       break;
     case lchk:
       fprintf(sta, "%5u\tchk", i);
-      fprintf(prg, "// offset %d %s %d %s %s\n", mem[i + 2], cstack[sp - 1], stack[sp - 1],
+      fprintf(prg, "// offset %d %s %d %s %s\n", mem[i + 2], cstack[sp - 1], dstack[sp - 1],
               condstack[con - 1], cmd);
       getvarname(mem[i + 2], name);
       div_strcat(cstack[sp - 1], sizeof(cstack[sp - 1]), ".");

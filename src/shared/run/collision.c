@@ -6,7 +6,7 @@
 //----------------------------------------------------------------------------
 // Headers
 //----------------------------------------------------------------------------
-int check_collisions(int i, int bloque, int scroll);
+int check_collisions(int i, int block, int scroll);
 void test_collision(byte *buffer, int *ptr, int x, int y, int xg, int yg, int angle, int size,
                     int flags);
 void sp_rotated_p(byte *si, int w, int h, int flags);
@@ -22,7 +22,7 @@ void test_scan(byte *p, short n, byte *si, int w, int x0, int y0, int x1, int y1
 // Module-level variables
 //----------------------------------------------------------------------------
 
-int colisiona;
+int does_collide;
 int p[24];
 
 //----------------------------------------------------------------------------
@@ -34,9 +34,9 @@ void out_region(void) {
   int xg, yg, xg1, yg1, x, y, w, h;
   int *ptr, n, m;
 
-  reg = pila[sp--];
-  id = pila[sp];
-  pila[sp] = 1; // Default: not in the region
+  reg = stack[sp--];
+  id = stack[sp];
+  stack[sp] = 1; // Default: not in the region
 
   if (mem[id + _Ctype] == 2) {
     e(137);
@@ -155,7 +155,7 @@ void out_region(void) {
 
         if (xg < region[reg].x1 && yg < region[reg].y1 && xg1 > region[reg].x0 &&
             yg1 > region[reg].y0) {
-          pila[sp] = 0;
+          stack[sp] = 0;
           return;
         } // It is in the region
       }
@@ -163,7 +163,7 @@ void out_region(void) {
   } else if (mem[id + _Ctype] == 0) {
     if (x < region[reg].x1 && y < region[reg].y1 && x + w > region[reg].x0 &&
         y + h > region[reg].y0)
-      pila[sp] = 0; // It is in the region
+      stack[sp] = 0; // It is in the region
   }
 }
 
@@ -176,10 +176,10 @@ void graphic_info(void) {
   int xg, yg;
   int *ptr;
 
-  info = pila[sp--];
-  graph = pila[sp--];
-  file = pila[sp];
-  pila[sp] = 0;
+  info = stack[sp--];
+  graph = stack[sp--];
+  file = stack[sp];
+  stack[sp] = 0;
 
   if (file < 0 || file > max_fpgs) {
     e(109);
@@ -210,18 +210,18 @@ void graphic_info(void) {
     yg = *((word *)ptr + 33);
   }
 
-  switch (pila[sp + 2]) {
+  switch (stack[sp + 2]) {
   case 0:
-    pila[sp] = ptr[13];
+    stack[sp] = ptr[13];
     break; //g_width (original)
   case 1:
-    pila[sp] = ptr[14];
+    stack[sp] = ptr[14];
     break; //g_height (original)
   case 2:
-    pila[sp] = xg;
+    stack[sp] = xg;
     break; //g_x_center
   case 3:
-    pila[sp] = yg;
+    stack[sp] = yg;
     break; //g_y_center
   default:
     e(138);
@@ -237,25 +237,25 @@ void graphic_info(void) {
 // the first scroll they belong to, even if visible on multiple scrolls.
 
 void collision(void) {
-  int i, bloque; // Iterates processes from _IdScan onwards; if _IdScan=0 from start
+  int i, block; // Iterates processes from _IdScan onwards; if _IdScan=0 from start
   int file, graph, angle;
   int x, y, n, m; // Current process coordinates
   int64_t xg, yg; // Center of gravity of the current process graphic
   int *ptr;
 
-  bloque = pila[sp];
-  pila[sp] = 0; // Default: no collision
+  block = stack[sp];
+  stack[sp] = 0; // Default: no collision
 
   if (mem[id + _Ctype] == 2) {
     e(139);
     return;
   }
 
-  if (mem[id + _IdScan] == 0 || bloque != mem[id + _BlScan]) {
-    mem[id + _BlScan] = bloque;
+  if (mem[id + _IdScan] == 0 || block != mem[id + _BlScan]) {
+    mem[id + _BlScan] = block;
     i = id_start;
   } else if (mem[id + _IdScan] > id_end) {
-    pila[sp] = 0;
+    stack[sp] = 0;
     return;
   } else
     i = mem[id + _IdScan];
@@ -368,11 +368,11 @@ void collision(void) {
         clipx1 += xg;
         clipy0 += yg;
         clipy1 += yg;
-        pila[sp] = check_collisions(i, bloque, n);
+        stack[sp] = check_collisions(i, block, n);
         break;
       }
   } else
-    pila[sp] = check_collisions(i, bloque, -1);
+    stack[sp] = check_collisions(i, block, -1);
 
   free(buffer);
 }
@@ -381,14 +381,14 @@ void collision(void) {
 // Check collisions of sprite id (in buffer) against the rest (i..id_end)
 //----------------------------------------------------------------------------
 
-int check_collisions(int i, int bloque, int scroll) {
+int check_collisions(int i, int block, int scroll) {
   int file, graph, angle;
   int *ptr, n = 0, m, j;
   int x, y, dist = 0;
   int xx, yy, w, h;
   short xg, yg, xxg, yyg;
 
-  if (bloque == 0) { // collision(type mouse)
+  if (block == 0) { // collision(type mouse)
     if (mouse->x >= clipx0 && mouse->x <= clipx1 && mouse->y >= clipy0 && mouse->y <= clipy1) {
       if (*(buffer + buffer_w * (mouse->y - clipy0) + (mouse->x - clipx0)))
         return (id);
@@ -399,7 +399,7 @@ int check_collisions(int i, int bloque, int scroll) {
   }
 
   for (; i <= id_end; i += iloc_len) {
-    if (i != id && mem[i + _Bloque] == bloque && (mem[i + _Status] == 2 || mem[i + _Status] == 4) &&
+    if (i != id && mem[i + _Bloque] == block && (mem[i + _Status] == 2 || mem[i + _Status] == 4) &&
         mem[i + _Ctype] < 2) {
       if (mem[i + _Ctype] == 1) { // If scroll sprite, determine which scroll (n)
         if (scroll < 0) {         // Screen vs scroll collision - first active
@@ -473,7 +473,7 @@ int check_collisions(int i, int bloque, int scroll) {
         yg = *((word *)ptr + 33);
       }
 
-      colisiona = 0;
+      does_collide = 0;
 
       if (angle) {
         // Safety distance
@@ -497,7 +497,7 @@ int check_collisions(int i, int bloque, int scroll) {
 
           if (clipx1 >= xx && clipx0 <= w)
             if (clipy1 >= yy && clipy0 < h)
-              colisiona = 1;
+              does_collide = 1;
         }
 
       } else if (mem[i + _Size] != 100) {
@@ -509,7 +509,7 @@ int check_collisions(int i, int bloque, int scroll) {
 
         if (clipx1 >= xx && clipx0 <= w)
           if (clipy1 >= yy && clipy0 < h)
-            colisiona = 1;
+            does_collide = 1;
 
       } else {
         w = ptr[13];
@@ -526,13 +526,13 @@ int check_collisions(int i, int bloque, int scroll) {
         yy = y - yyg;
         if (clipx1 >= xx && clipx0 < xx + w)
           if (clipy1 >= yy && clipy0 < yy + h)
-            colisiona = 1;
+            does_collide = 1;
       }
 
-      if (colisiona == 1) {
-        colisiona = 0;
+      if (does_collide == 1) {
+        does_collide = 0;
         test_collision(buffer, ptr, x, y, xg, yg, angle, mem[i + _Size], mem[i + _Flags]);
-        if (colisiona) {
+        if (does_collide) {
           mem[id + _IdScan] = i + iloc_len;
           return (i);
         }
@@ -996,7 +996,7 @@ void test_normal(byte *p, int x, int y, int w, int h, int flags) {
     do {
       do {
         if (*p && *q) {
-          colisiona = 1;
+          does_collide = 1;
           return;
         }
         p++;
@@ -1010,7 +1010,7 @@ void test_normal(byte *p, int x, int y, int w, int h, int flags) {
     do {
       do {
         if (*p && *q) {
-          colisiona = 1;
+          does_collide = 1;
           return;
         }
         p--;
@@ -1025,7 +1025,7 @@ void test_normal(byte *p, int x, int y, int w, int h, int flags) {
     do {
       do {
         if (*p && *q) {
-          colisiona = 1;
+          does_collide = 1;
           return;
         }
         p++;
@@ -1040,7 +1040,7 @@ void test_normal(byte *p, int x, int y, int w, int h, int flags) {
     do {
       do {
         if (*p && *q) {
-          colisiona = 1;
+          does_collide = 1;
           return;
         }
         p--;
@@ -1090,7 +1090,7 @@ void test_clipped(byte *p, int x, int y, int w, int h, int flags) {
     do {
       do {
         if (*p && *q) {
-          colisiona = 1;
+          does_collide = 1;
           return;
         }
         p++;
@@ -1108,7 +1108,7 @@ void test_clipped(byte *p, int x, int y, int w, int h, int flags) {
     do {
       do {
         if (*p && *q) {
-          colisiona = 1;
+          does_collide = 1;
           return;
         }
         p--;
@@ -1126,7 +1126,7 @@ void test_clipped(byte *p, int x, int y, int w, int h, int flags) {
     do {
       do {
         if (*p && *q) {
-          colisiona = 1;
+          does_collide = 1;
           return;
         }
         p++;
@@ -1144,7 +1144,7 @@ void test_clipped(byte *p, int x, int y, int w, int h, int flags) {
     do {
       do {
         if (*p && *q) {
-          colisiona = 1;
+          does_collide = 1;
           return;
         }
         p--;
@@ -1230,7 +1230,7 @@ void test_scaled(byte *old_si, int x, int y, int w, int h, int xg, int yg, int s
     si = old_si + (yr >> 8) * old_w;
     do {
       if (*(si + (xr >> 8)) && *di) {
-        colisiona = 1;
+        does_collide = 1;
         return;
       }
       di++;
@@ -1466,7 +1466,7 @@ void test_scanc(byte *p, short n, short m, short o, byte *si, int w, int x0, int
 
   do {
     if (*p && *(si + x.w[1] + y.w[1] * w)) {
-      colisiona = 1;
+      does_collide = 1;
       return;
     }
     p++;
@@ -1488,7 +1488,7 @@ void test_scan(byte *p, short n, byte *si, int w, int x0, int y0, int x1, int y1
 
   do {
     if (*p && *(si + x.w[1] + y.w[1] * w)) {
-      colisiona = 1;
+      does_collide = 1;
       return;
     }
     p++;

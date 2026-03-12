@@ -63,16 +63,16 @@ void path_find(void) {
 
   //----------------------------------------------------------------------------
 
-  size = pila[sp--];
-  offset = pila[sp--];
-  y = pila[sp--];
-  x = pila[sp--];
-  tile = pila[sp--];
-  code = pila[sp--];
-  file = pila[sp--];
-  modo = pila[sp];
+  size = stack[sp--];
+  offset = stack[sp--];
+  y = stack[sp--];
+  x = stack[sp--];
+  tile = stack[sp--];
+  code = stack[sp--];
+  file = stack[sp--];
+  modo = stack[sp];
 
-  pila[sp] = 0; // Default return value, until proven otherwise
+  stack[sp] = 0; // Default return value, until proven otherwise
 
   // Check offset and size bounds ...
 #ifdef DIV2
@@ -82,7 +82,7 @@ void path_find(void) {
   }
 #else
 
-  if (offset < long_header || offset + size > imem_max) {
+  if (offset < HEADER_LENGTH || offset + size > imem_max) {
     e(e122);
     return;
   }
@@ -241,7 +241,7 @@ void path_find(void) {
       return;
     mem[offset] = x;
     mem[offset + 1] = y; // Go directly to (x,y)
-    pila[sp] = 1;
+    stack[sp] = 1;
     return;
   }
 
@@ -302,7 +302,7 @@ void path_find(void) {
 
   // Path found, now extract the vertices into the table passed as parameter
 
-  pila[sp] = calculate_vertices(&mem[offset], size / 2, mem[id + _X], mem[id + _Y], x, y);
+  stack[sp] = calculate_vertices(&mem[offset], size / 2, mem[id + _X], mem[id + _Y], x, y);
 
   m(ax, ay) = cas_inicial;
 }
@@ -922,13 +922,13 @@ void path_line(void) {
   int file, code, x, y;
   int *ptr;
 
-  y = pila[sp--];
-  x = pila[sp--];
-  tile = pila[sp--];
-  code = pila[sp--];
-  file = pila[sp];
+  y = stack[sp--];
+  x = stack[sp--];
+  tile = stack[sp--];
+  code = stack[sp--];
+  file = stack[sp];
 
-  pila[sp] = 0; // Default return value, until proven otherwise
+  stack[sp] = 0; // Default return value, until proven otherwise
 
   if (tile < 1 || tile > 256) {
     e(151);
@@ -981,7 +981,7 @@ void path_line(void) {
 
   can_go(ax, ay, x, y);
   if (!choque_linea)
-    pila[sp] = 1;
+    stack[sp] = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -992,13 +992,13 @@ void path_free(void) {
   int file, code, x, y;
   int *ptr;
 
-  y = pila[sp--];
-  x = pila[sp--];
-  tile = pila[sp--];
-  code = pila[sp--];
-  file = pila[sp];
+  y = stack[sp--];
+  x = stack[sp--];
+  tile = stack[sp--];
+  code = stack[sp--];
+  file = stack[sp];
 
-  pila[sp] = 0; // Default return value, until proven otherwise
+  stack[sp] = 0; // Default return value, until proven otherwise
 
   if (tile < 1 || tile > 256) {
     e(151);
@@ -1044,7 +1044,7 @@ void path_free(void) {
   // Determine if the destination cell is free
 
   if (!m(x / tile, y / tile))
-    pila[sp] = 1;
+    stack[sp] = 1;
 }
 
 //----------------------------------------------------------------------------
