@@ -53,7 +53,10 @@ src/
 
   ide/               IDE shell (24 files)
     main.c           Main entry point, desktop environment, menus
-    handler.c        Window/dialog handler and event dispatch
+    handler.c        Menu infrastructure + 9 top-level menus
+    handler_dialogs.c Dialog boxes, listbox UI, file browser, progress bar
+    handler_map.c    Map viewer, open/save/new map, resize, search
+    handler_fonts.c  Font map generation
     desktop.c        Desktop and window initialization
     window.c         Window primitives (buttons, text, boxes)
     mouse.c          Mouse input + SDL event handling

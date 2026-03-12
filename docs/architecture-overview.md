@@ -244,7 +244,7 @@ index.
 
 ## 4. Menu System
 
-### Menu Creation: `create_menu()` in `src/ide/handler.c`
+### Menu Creation: `create_menu()` in `src/ide/handler.c` (menu infrastructure)
 
 Menus are built from consecutive entries in the `texts[]` array:
 
@@ -277,10 +277,14 @@ Highlights the item under the mouse cursor and executes actions on click.
 
 ### Main Menu Bar
 
-The main menu is created by `menu_principal0()`. Each top-level menu
+The main menu is created by `menu_main0()`. Each top-level menu
 (Programs, Maps, Graphics, Fonts, Sounds, System, etc.) has its own trio of
 handler functions: `menu_X0()` (create), `menu_X1()` (paint), `menu_X2()`
-(click). These are all in `src/ide/handler.c`.
+(click). The menu infrastructure and 9 top-level menus are in
+`src/ide/handler.c`, with dialog boxes and file browser in
+`src/ide/handler_dialogs.c`, map viewer/operations in
+`src/ide/handler_map.c`, and font map generation in
+`src/ide/handler_fonts.c`.
 
 ---
 

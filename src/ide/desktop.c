@@ -95,25 +95,25 @@ void download_desktop() {
       //Window struct
       case 2: //menu
         iWork = -1;
-        if (window[x].paint_handler == menu_principal1)
+        if (window[x].paint_handler == menu_main1)
           iWork = 0;
-        if (window[x].paint_handler == menu_programas1)
+        if (window[x].paint_handler == menu_programs1)
           iWork = 1;
-        if (window[x].paint_handler == menu_paletas1)
+        if (window[x].paint_handler == menu_palettes1)
           iWork = 2;
-        if (window[x].paint_handler == menu_mapas1)
+        if (window[x].paint_handler == menu_maps1)
           iWork = 3;
-        if (window[x].paint_handler == menu_graficos1)
+        if (window[x].paint_handler == menu_graphics1)
           iWork = 4;
-        if (window[x].paint_handler == menu_fuentes1)
+        if (window[x].paint_handler == menu_fonts1)
           iWork = 5;
-        if (window[x].paint_handler == menu_sonidos1)
+        if (window[x].paint_handler == menu_sounds1)
           iWork = 6;
-        if (window[x].paint_handler == menu_sistema1)
+        if (window[x].paint_handler == menu_system1)
           iWork = 7;
-        if (window[x].paint_handler == menu_edicion1)
+        if (window[x].paint_handler == menu_edit1)
           iWork = 8;
-        // menu_mapas3D1 check removed (MODE8/3D map editor deleted)
+        // menu_maps3D1 check removed (MODE8/3D map editor deleted)
         n = fwrite(&iWork, 1, 4, desktop);
 
         break;
@@ -257,33 +257,33 @@ int upload_desktop() {
       fread(&iWork, 1, 4, desktop);
       switch (iWork) {
       case 0:
-        create_saved_window(menu_principal0, window_aux.x, window_aux.y);
+        create_saved_window(menu_main0, window_aux.x, window_aux.y);
         break;
       case 1:
-        create_saved_window(menu_programas0, window_aux.x, window_aux.y);
+        create_saved_window(menu_programs0, window_aux.x, window_aux.y);
         break;
       case 2:
-        create_saved_window(menu_paletas0, window_aux.x, window_aux.y);
+        create_saved_window(menu_palettes0, window_aux.x, window_aux.y);
         break;
       case 3:
-        create_saved_window(menu_mapas0, window_aux.x, window_aux.y);
+        create_saved_window(menu_maps0, window_aux.x, window_aux.y);
         break;
       case 4:
-        create_saved_window(menu_graficos0, window_aux.x, window_aux.y);
+        create_saved_window(menu_graphics0, window_aux.x, window_aux.y);
         break;
       case 5:
-        create_saved_window(menu_fuentes0, window_aux.x, window_aux.y);
+        create_saved_window(menu_fonts0, window_aux.x, window_aux.y);
         break;
       case 6:
-        create_saved_window(menu_sonidos0, window_aux.x, window_aux.y);
+        create_saved_window(menu_sounds0, window_aux.x, window_aux.y);
         break;
       case 7:
-        create_saved_window(menu_sistema0, window_aux.x, window_aux.y);
+        create_saved_window(menu_system0, window_aux.x, window_aux.y);
         break;
       case 8:
-        create_saved_window(menu_edicion0, window_aux.x, window_aux.y);
+        create_saved_window(menu_edit0, window_aux.x, window_aux.y);
         break;
-      // case 9 (menu_mapas3D0) removed (MODE8/3D map editor deleted)
+      // case 9 (menu_maps3D0) removed (MODE8/3D map editor deleted)
       default:
         break;
       }

@@ -702,10 +702,10 @@ void init_environment() {
 
   if (!first_run) {
     for (n = 0; n < MAX_WINDOWS; n++)
-      if (window[n].click_handler == menu_principal2)
+      if (window[n].click_handler == menu_main2)
         break;
     if (n == MAX_WINDOWS)
-      new_window(menu_principal0);
+      new_window(menu_main0);
   }
 
   //  if (test_video) show_dialog(test0);
@@ -736,7 +736,7 @@ void init_environment() {
   _chdir("..");
 
   if (first_run) {
-    new_window(menu_principal0);
+    new_window(menu_main0);
     minimize_window();
 
     first_run = 2;
@@ -1169,7 +1169,7 @@ void mainloop(void) {
         }
 
         if (!(mouse_b & 1) && (prev_mouse_buttons & 1)) {
-          if (v.click_handler == menu_principal2) {
+          if (v.click_handler == menu_main2) {
             if (big)
               wput(v.ptr, v.w / 2, v.h / 2, v.w / 2 - 9, 2, -45);
             else

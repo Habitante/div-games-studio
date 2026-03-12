@@ -396,7 +396,6 @@ void finalize_texts(void);
 //      Functions exported by DIVCDROM (divcdrom.c)
 ///////////////////////////////////////////////////////////////////////////////
 
-void show_cd_player();
 void show_clock();
 void cdiv0(void);
 void cdiv1(void);
@@ -414,40 +413,40 @@ void show_font0(void);
 void show_font1(void);
 
 ///////////////////////////////////////////////////////////////////////////////
-//      Main handler, exported by DIVHANDLE (divhandl.c)
+//      Main handler, exported by handler.c
 ///////////////////////////////////////////////////////////////////////////////
 
 void dummy_handler(void);
 
-void menu_principal0(void);
-void menu_principal1(void);
-void menu_principal2(void);
-void menu_principal3(void);
-void menu_programas0(void);
-void menu_programas1(void);
-void menu_programas2(void);
-void menu_paletas0(void);
-void menu_paletas1(void);
-void menu_paletas2(void);
-void menu_mapas0(void);
-void menu_mapas1(void);
-void menu_mapas2(void);
-void menu_graficos0(void);
-void menu_graficos1(void);
-void menu_graficos2(void);
-void menu_fuentes0(void);
-void menu_fuentes1(void);
-void menu_fuentes2(void);
-void menu_sonidos0(void);
-void menu_sonidos1(void);
-void menu_sonidos2(void);
-void menu_sistema0(void);
-void menu_sistema1(void);
-void menu_sistema2(void);
-void menu_edicion0(void);
-void menu_edicion1(void);
-void menu_edicion2(void);
-// menu_mapas3D declarations removed (MODE8/3D map editor deleted)
+void menu_main0(void);
+void menu_main1(void);
+void menu_main2(void);
+void menu_main3(void);
+void menu_programs0(void);
+void menu_programs1(void);
+void menu_programs2(void);
+void menu_palettes0(void);
+void menu_palettes1(void);
+void menu_palettes2(void);
+void menu_maps0(void);
+void menu_maps1(void);
+void menu_maps2(void);
+void menu_graphics0(void);
+void menu_graphics1(void);
+void menu_graphics2(void);
+void menu_fonts0(void);
+void menu_fonts1(void);
+void menu_fonts2(void);
+void menu_sounds0(void);
+void menu_sounds1(void);
+void menu_sounds2(void);
+void menu_system0(void);
+void menu_system1(void);
+void menu_system2(void);
+void menu_edit0(void);
+void menu_edit1(void);
+void menu_edit2(void);
+// menu_maps3D declarations removed (MODE8/3D map editor deleted)
 
 void new_map0(void);
 void new_map1(void);

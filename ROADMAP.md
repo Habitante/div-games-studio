@@ -96,7 +96,8 @@ files expanded (i.c → interpreter.c, etc.). `.hpp` files normalized to `.h`.
 
 ```
 src/
-  ide/          main.c, handler.c, desktop.c, window.c, mouse.c, keyboard.c,
+  ide/          main.c, handler.c, handler_dialogs.c, handler_map.c,
+                handler_fonts.c, desktop.c, window.c, mouse.c, keyboard.c,
                 video.c, graphics.c, effects.c, browser.c, help.c, setup.c,
                 gamma.c, language.c, installer.c, packer.c, trash.c, clock.c,
                 mixer_ui.c, mixer.c, sound.c, vesa.c, sprite.c, recorder.c
@@ -128,7 +129,7 @@ Large files that are hard to navigate or maintain effectively:
 | `ide/main.c` | ~5,500 | `main_internal.h` (110) + `main.c` (2,742) + `main_desktop.c` (1,754) + `main_dialogs.c` (1,005) | ✓ |
 | `runtime/debug/debugger.c` | ~6,700 | `debugger_internal.h` (311) + `debugger.c` (1,093) + `debugger_ui.c` (2,167) + `debugger_inspect.c` (1,444) + `debugger_code.c` (881) + `debugger_proclist.c` (296) + `debugger_profile.c` (689) | ✓ |
 | `editor/code.c` | ~4,600 | `editor_internal.h` (191) + `editor.c` (1,122) + `editor_edit.c` (916) + `editor_render.c` (1,170) + `editor_file.c` (1,264) | ✓ |
-| `ide/handler.c` | ~4,400 | By feature: menus, dialogs, map ops, map viewer, palette, fonts | TODO |
+| `ide/handler.c` | ~4,400 | `handler_internal.h` (89) + `handler.c` (1,501) + `handler_dialogs.c` (994) + `handler_map.c` (1,564) + `handler_fonts.c` (272) | ✓ |
 
 `runtime/functions.c` (~6,400 lines) reviewed and kept as-is — flat list of
 150+ independent VM API implementations, already well-sectioned with comments.
@@ -138,6 +139,15 @@ The lexer (~500 lines) stayed in compiler.c rather than getting its own file.
 `statement()` went into the parser file (it parses control flow). The "codegen"
 file became `compiler_expression.c` since this is a single-pass compiler —
 expression parsing and code generation are interleaved.
+
+**handler.c split notes:** Split into menu infrastructure, dialogs, map operations,
+and font generation. All 9 Spanish menu function names were renamed to English:
+`menu_principal` -> `menu_main`, `menu_programas` -> `menu_programs`,
+`menu_edicion` -> `menu_edit`, `menu_paletas` -> `menu_palettes`,
+`menu_mapas` -> `menu_maps`, `menu_graficos` -> `menu_graphics`,
+`menu_fuentes` -> `menu_fonts`, `menu_sonidos` -> `menu_sounds`,
+`menu_sistema` -> `menu_system`. Renames propagated to `global.h`, `desktop.c`,
+and `main.c`.
 
 Rules: extract functions, add forward declarations, update CMake. No behavioral
 changes. Static/file-scope globals may need to become shared or passed as parameters.
