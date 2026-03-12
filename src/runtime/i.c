@@ -605,7 +605,7 @@ void system_font(void) {
     }
   }
 
-  n = 1356 + sizeof(TABLAFNT) * 256 + 12288;
+  n = 1356 + sizeof(fnt_table_entry) * 256 + 12288;
 
   if ((fonts[0] = (byte *)malloc(n)) == NULL)
     exer(1);
@@ -618,7 +618,7 @@ void system_font(void) {
     *ptr++ = 6;
     *ptr++ = 8;
     *ptr++ = 0;
-    *ptr++ = 1356 + sizeof(TABLAFNT) * 256 + n * 48;
+    *ptr++ = 1356 + sizeof(fnt_table_entry) * 256 + n * 48;
   }
   last_c1 = 1;
 

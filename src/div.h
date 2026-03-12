@@ -133,10 +133,10 @@ typedef struct _FPGBODY {
 
 // FNT DESCRIPTION
 
-typedef struct _FNTHEADER {
+typedef struct _fnt_header_t {
   char id[7];
   char eof;
-} FNTHEADER;
+} fnt_header_t;
 
 typedef struct _FNTBODY {
   int width;

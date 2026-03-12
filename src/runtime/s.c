@@ -2620,7 +2620,7 @@ void text_out(char *ptr, int x, int y) {
     }
   }
 
-  fnt = (TABLAFNT *)((byte *)fonts[0] + 1356);
+  fnt = (fnt_table_entry *)((byte *)fonts[0] + 1356);
 
   h = f_i[0].height;
   while (*ptr && x + fnt[*ptr].width <= 0)
@@ -2691,7 +2691,7 @@ void paint_texts(int n) { // E: texts[]
 
       checkpal_font(fuente);
 
-      fnt = (TABLAFNT *)((byte *)texts[n].font + 1356);
+      fnt = (fnt_table_entry *)((byte *)texts[n].font + 1356);
 
       h = f_i[fuente].height;
 

@@ -946,8 +946,8 @@ void show_trash(); // Show trash can
 //      Functions and structures exported by the font generator
 //-----------------------------------------------------------------------------
 
-void OpenGenFont();
-void OpenFont();
+void open_gen_font();
+void open_font();
 
 
 // divbrow.c

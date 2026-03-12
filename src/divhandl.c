@@ -1113,11 +1113,11 @@ void menu_fuentes2(void) {
   if ((prev_mouse_buttons & 1) && !(mouse_b & 1)) {
     switch (v.state) {
     case 1:
-      OpenGenFont();
+      open_gen_font();
       break;
 
     case 2:
-      OpenFont();
+      open_font();
       break;
 
     case 3:

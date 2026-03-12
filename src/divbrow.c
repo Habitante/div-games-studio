@@ -130,7 +130,7 @@ void free_mod(void);
 int is_wav(char *FileName);
 int mem_get_heap_free(void);
 
-TABLAIFS tifs[256];
+ifs_table_entry tifs[256];
 FILE *fifs;
 void load_letter(uint8_t letra);
 
@@ -619,8 +619,8 @@ void create_thumb_PAL(struct t_listboxbr *l) {
 
 extern int TamaY, TamaX;
 extern int spacelen;
-extern char TestString2[21];
-extern char MiTabladeLetras[256];
+extern char test_string2[21];
+extern char char_table[256];
 
 void create_thumb_FNT(struct t_listboxbr *l) {
   int estado = 0, n, m, init, x, y, len;
@@ -628,7 +628,7 @@ void create_thumb_FNT(struct t_listboxbr *l) {
   byte *temp, *temp2;
   byte pal[768];
   byte xlat[256];
-  char CopiaMiTabladeLetras[256];
+  char saved_char_table[256];
   float coefredy, coefredx, a, b;
   FILE *f;
   char filename[255];
@@ -762,13 +762,13 @@ void create_thumb_FNT(struct t_listboxbr *l) {
 
       memcpy(pal, &thumb[num].ptr[8], 768);
 
-      memcpy(CopiaMiTabladeLetras, MiTabladeLetras, 256);
+      memcpy(saved_char_table, char_table, 256);
 
-      create_test_text(TestString2, thumb[num].ptr[1352]);
+      create_test_text(test_string2, thumb[num].ptr[1352]);
 
-      memset(MiTabladeLetras, 0, 256);
-      for (x = 0; x < strlen(TestString2); x++)
-        MiTabladeLetras[TestString2[x]] = 1;
+      memset(char_table, 0, 256);
+      for (x = 0; x < strlen(test_string2); x++)
+        char_table[test_string2[x]] = 1;
 
       TamaX = 0;
       TamaY = 0;
@@ -789,8 +789,8 @@ void create_thumb_FNT(struct t_listboxbr *l) {
       else
         spacelen = 1;
 
-      for (x = 0; x < strlen(TestString2); x++) {
-        get_char_size_buffer(TestString2[x], &fan, &fal, thumb[num].ptr);
+      for (x = 0; x < strlen(test_string2); x++) {
+        get_char_size_buffer(test_string2[x], &fan, &fal, thumb[num].ptr);
         if (fan <= 1)
           fan = 0;
         TamaX += fan;
@@ -802,7 +802,7 @@ void create_thumb_FNT(struct t_listboxbr *l) {
       if (TamaY == 0)
         TamaY = _fal;
 
-      memcpy(MiTabladeLetras, CopiaMiTabladeLetras, 256);
+      memcpy(char_table, saved_char_table, 256);
 
       if ((temp = (byte *)malloc(TamaX * TamaY)) == NULL) {
         free(thumb[num].ptr);
@@ -814,8 +814,8 @@ void create_thumb_FNT(struct t_listboxbr *l) {
       memset(temp, 0, TamaX * TamaY);
 
       init = 0;
-      for (x = 0; x < strlen(TestString2); x++) {
-        len = show_char_buffer(TestString2[x], init, 0, (char *)temp, TamaX, thumb[num].ptr);
+      for (x = 0; x < strlen(test_string2); x++) {
+        len = show_char_buffer(test_string2[x], init, 0, (char *)temp, TamaX, thumb[num].ptr);
         if (len <= 1)
           len = 0;
         init += len;
@@ -941,7 +941,7 @@ void create_thumb_IFS(struct t_listboxbr *l) {
     fseek(fifs, 4, SEEK_SET);
     fread(&n, 1, 4, fifs);
     fseek(fifs, n, SEEK_SET);
-    fread(tifs, sizeof(TABLAIFS), 256, fifs);
+    fread(tifs, sizeof(ifs_table_entry), 256, fifs);
 
     str = (char *)texts[246];
 

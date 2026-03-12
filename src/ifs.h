@@ -15,59 +15,59 @@
 #define EXT 16
 
 
-// ESTRUCTURAS PARA EL FICHERO DE ENTRADA (IFS)
-typedef struct _TABLAIFS {
+// Structures for the input file (IFS)
+typedef struct _ifs_table_entry {
   int32_t offset;
   int32_t size;
-} TABLAIFS;
+} ifs_table_entry;
 
-typedef struct _IFSHEADER {
+typedef struct _ifs_header_t {
   uint8_t id[4];
   uint32_t offset8;
   uint32_t offset10;
   uint32_t offset12;
   uint32_t offset14;
   uint32_t offset128;
-} IFSHEADER;
+} ifs_header_t;
 
-// ESTRUCTURA PARA EL FICHERO DE SALIDA (FNT)
-typedef struct _TABLAFNT {
+// Structure for the output file (FNT)
+typedef struct _fnt_table_entry {
   int width;
   int height;
   int incY;
   int offset;
-} TABLAFNT;
+} fnt_table_entry;
 
-typedef struct _FNTHEADER {
+typedef struct _fnt_header_t {
   char id[7];
   char eof;
-} FNTHEADER;
+} fnt_header_t;
 
-// PARAMETROS NECESARIOS
+// Required parameters
 typedef struct _IFS {
   char ifsName[256];
   char fntName[256];
-  char tamX;
-  char tamY;
+  char size_x;
+  char size_y;
   char outline;
-  char brillo; // (0-4) Sin, Arr-Izq, Abj-drcha, Arr-dcha, Abj-izq.
-  short sombraX;
-  short sombraY;
-  unsigned short bodyTexAncho; // textura de la letra
-  unsigned short bodyTexAlto;
-  char bodyTexColor;
-  char bodyTexModo;
-  unsigned short shadowTexAncho; // textura de la Sombra
-  unsigned short shadowTexAlto;
-  char shadowTexColor;
-  char shadowTexModo;
-  unsigned short outTexAncho; // textura del Outline
-  unsigned short outTexAlto;
-  char outTexColor;
-  char outTexModo;
-  char tabla[256];   // para indicar que letras se generan
-  char claros[256];  // correspondencias para los brillos
-  char oscuros[256]; // correspondencias para los brillos
+  char brightness; // (0-4) None, Up-Left, Down-Right, Up-Right, Down-Left
+  short shadow_x;
+  short shadow_y;
+  unsigned short body_tex_w; // body letter texture
+  unsigned short body_tex_h;
+  char body_tex_color;
+  char body_tex_mode;
+  unsigned short shadow_tex_w; // shadow texture
+  unsigned short shadow_tex_h;
+  char shadow_tex_color;
+  char shadow_tex_mode;
+  unsigned short outline_tex_w; // outline texture
+  unsigned short outline_tex_h;
+  char outline_tex_color;
+  char outline_tex_mode;
+  char table[256];      // which characters to generate
+  char highlights[256]; // color mappings for highlights
+  char shadows[256];    // color mappings for shadows
 
 } IFS;
 

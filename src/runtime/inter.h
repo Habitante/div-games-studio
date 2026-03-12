@@ -641,12 +641,12 @@ GLOBAL int clipx0, clipx1, clipy0, clipy1; // Clipping region
 // Font system (*.FNT files generated with DIV)
 //-----------------------------------------------------------------------------
 
-typedef struct _TABLAFNT {
+typedef struct _fnt_table_entry {
   int width;
   int height;
   int incY;
   int offset;
-} TABLAFNT;
+} fnt_table_entry;
 
 typedef struct _fnt_info {
   int width;          // Average font width
@@ -663,7 +663,7 @@ typedef struct _fnt_info {
 
 GLOBAL byte *fonts[max_fonts]; // Fonts loaded at runtime (0=not loaded)
 
-GLOBAL TABLAFNT *fnt;
+GLOBAL fnt_table_entry *fnt;
 
 GLOBAL fnt_info f_i[max_fonts];
 

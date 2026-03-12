@@ -903,16 +903,16 @@ void pal_save_as() {
 //-----------------------------------------------------------------------------
 void pal_reload_font(int window, struct twindow *vntn);
 
-extern int Text1Anc;
-extern int Text1Alt;
+extern int text1_w;
+extern int text1_h;
 extern int Text1Col;
 extern char *Text1;
-extern int Text2Anc;
-extern int Text2Alt;
+extern int text2_w;
+extern int text2_h;
 extern int Text2Col;
 extern char *Text2;
-extern int Text3Anc;
-extern int Text3Alt;
+extern int text3_w;
+extern int text3_h;
 extern int Text3Col;
 extern char *Text3;
 extern char *Text01;
@@ -1009,7 +1009,7 @@ void pal_refresh(int no_tocar_mapas, int guardar_original) {
         memset(Text1, Text1Col, tan * tal + tan);
       } else {
         ptr = (byte *)Text01;
-        while (ptr < (byte *)Text01 + Text1Anc * Text1Alt) {
+        while (ptr < (byte *)Text01 + text1_w * text1_h) {
           *ptr = xlat[*ptr];
           ptr++;
         }
@@ -1023,7 +1023,7 @@ void pal_refresh(int no_tocar_mapas, int guardar_original) {
         memset(Text2, Text2Col, tan * tal + tan);
       } else {
         ptr = (byte *)Text02;
-        while (ptr < (byte *)Text02 + Text2Anc * Text2Alt) {
+        while (ptr < (byte *)Text02 + text2_w * text2_h) {
           *ptr = xlat[*ptr];
           ptr++;
         }
@@ -1037,7 +1037,7 @@ void pal_refresh(int no_tocar_mapas, int guardar_original) {
         memset(Text3, Text3Col, tan * tal + tan);
       } else {
         ptr = (byte *)Text03;
-        while (ptr < (byte *)Text03 + Text3Anc * Text3Alt) {
+        while (ptr < (byte *)Text03 + text3_w * text3_h) {
           *ptr = xlat[*ptr];
           ptr++;
         }

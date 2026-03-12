@@ -24,10 +24,10 @@ char OEM2ANSI[256] = {
     245, 213, 181, 254, 222, 218, 219, 217, 253, 221, 175, 180, 173, 177, 95,  190, 182, 167, 247,
     184, 176, 168, 183, 185, 179, 178, 95,  32};
 
-FNTHEADER FNTheader = {"DIVFNT", 0x1A};
-IFSHEADER IFSheader;
-TABLAFNT tablaFNT[256];
-TABLAIFS tablaIFS[256];
+fnt_header_t FNTheader = {"DIVFNT", 0x1A};
+ifs_header_t IFSheader;
+fnt_table_entry tablaFNT[256];
+ifs_table_entry tablaIFS[256];
 IFS ifs;
 
 char *body_tex_buffer, *out_tex_buffer, *shadow_tex_buffer;
@@ -40,7 +40,7 @@ short despY, Alto, Ancho, sizeIFS, incY;
 unsigned short anchoreal, altoreal, anchoBody, altoBody, anchoOutline, altoOutline;
 
 
-void CloseAndFreeAll() {
+void close_and_free_all() {
   if (fichIFS != NULL) {
     fclose(fichIFS);
     fichIFS = NULL;
@@ -70,19 +70,19 @@ short initStruct() {
     return (IFS_FORMAT_ERROR);
   if (strcmp((char *)IFSheader.id, "IFS"))
     return (IFS_FORMAT_ERROR);
-  if (ifs.tamX < 8 || ifs.tamX > 128 || ifs.tamY < 8 || ifs.tamY > 128)
+  if (ifs.size_x < 8 || ifs.size_x > 128 || ifs.size_y < 8 || ifs.size_y > 128)
     return (IFS_PARAM_ERROR);
 
-  if (ifs.tamX == 8 && ifs.tamY == 8) {
+  if (ifs.size_x == 8 && ifs.size_y == 8) {
     posicion = IFSheader.offset8;
     sizeIFS = 8;
-  } else if (ifs.tamX <= 10 && ifs.tamY <= 10) {
+  } else if (ifs.size_x <= 10 && ifs.size_y <= 10) {
     posicion = IFSheader.offset10;
     sizeIFS = 10;
-  } else if (ifs.tamX <= 12 && ifs.tamY <= 12) {
+  } else if (ifs.size_x <= 12 && ifs.size_y <= 12) {
     posicion = IFSheader.offset12;
     sizeIFS = 12;
-  } else if (ifs.tamX <= 14 && ifs.tamY <= 14) {
+  } else if (ifs.size_x <= 14 && ifs.size_y <= 14) {
     posicion = IFSheader.offset14;
     sizeIFS = 14;
   } else {
@@ -95,14 +95,14 @@ short initStruct() {
   if (fread(&tablaIFS, sizeof(tablaIFS), 1, fichIFS) < 1)
     return (IFS_FORMAT_ERROR);
 
-  if (ifs.brillo > 4)
-    ifs.brillo = 0;
+  if (ifs.brightness > 4)
+    ifs.brightness = 0;
 
   return (0);
 }
 
 
-short CargaLetra(short letra) {
+short load_char(short letra) {
   long offset;
   short x, y, j, t;
   char rtbyte, error = 0;
@@ -157,11 +157,11 @@ short escalar() {
   short cx = 0, cy = 0, flag = 0;
   char *ptr = Buffer, *p;
 
-  ancho2 = (float)width * ifs.tamX / sizeIFS; // width real en relación
+  ancho2 = (float)width * ifs.size_x / sizeIFS; // width real en relación
                                               // al tamaño original
-  alto2 = (float)height * ifs.tamY / sizeIFS;
+  alto2 = (float)height * ifs.size_y / sizeIFS;
 
-  if (ifs.tamX == sizeIFS && ifs.tamY == sizeIFS) // no hace falta escalar
+  if (ifs.size_x == sizeIFS && ifs.size_y == sizeIFS) // no hace falta escalar
   {
     ptrLetra = Buffer;
     return (0);
@@ -295,7 +295,7 @@ short escalar() {
 }
 
 
-short PintaOutline() {
+short paint_outline() {
   short x, y, i, cont, cont2;
   short anchoTotal = anchoBody + 4 + ifs.outline * 2;
   short altoTotal = altoBody + 4 + ifs.outline * 2;
@@ -317,7 +317,7 @@ short PintaOutline() {
     ptr += anchoBody;
   }
 
-  switch (ifs.brillo) {
+  switch (ifs.brightness) {
   case 1:
   case 3:
     blanco = 192;
@@ -351,9 +351,9 @@ short PintaOutline() {
             cont += 8;
           if (cont) {
             *ptr = 254 - i;
-            if (!ifs.brillo)
+            if (!ifs.brightness)
               *ptr2 = 128;
-            else if (ifs.brillo == 1 || ifs.brillo == 2)
+            else if (ifs.brightness == 1 || ifs.brightness == 2)
               switch (cont) {
               case 2:
                 if (*(ptr - 1 - anchoTotal) >= 255 - i) {
@@ -417,7 +417,7 @@ short PintaOutline() {
                 }
                 break;
               }
-            else if (ifs.brillo == 3 || ifs.brillo == 4)
+            else if (ifs.brightness == 3 || ifs.brightness == 4)
               switch (cont) {
               case 1:
               case 8:
@@ -487,10 +487,10 @@ short PintaOutline() {
 }
 
 
-short PintaSombra() {
+short paint_shadow() {
   char *ptr, *ptr2;
   short x, y;
-  short absSombraX = abs(ifs.sombraX), absSombraY = abs(ifs.sombraY);
+  short absSombraX = abs(ifs.shadow_x), absSombraY = abs(ifs.shadow_y);
 
   shadowBuffer =
       (char *)realloc(shadowBuffer, (anchoreal + absSombraX + 1) * (altoreal + absSombraY + 1));
@@ -498,11 +498,11 @@ short PintaSombra() {
     return (IFS_MEM_ERROR);
   memset(shadowBuffer, 0, (anchoreal + absSombraX + 1) * (altoreal + absSombraY + 1));
 
-  if (ifs.sombraY > 0) {
+  if (ifs.shadow_y > 0) {
     ptr2 = shadowBuffer + absSombraY * (anchoreal + absSombraX);
   } else
     ptr2 = shadowBuffer;
-  if (ifs.sombraX > 0)
+  if (ifs.shadow_x > 0)
     ptr2 += absSombraX;
 
   ptrShadow = ptr2;
@@ -511,7 +511,7 @@ short PintaSombra() {
   for (y = 0; y < altoOutline; y++) {
     for (x = 0; x < anchoOutline; x++, ptr++, ptr2++)
       if (*ptr)
-        *ptr2 = ifs.shadowTexColor;
+        *ptr2 = ifs.shadow_tex_color;
     ptr2 += absSombraX;
   }
 
@@ -527,38 +527,38 @@ void texturarBody() {
   short ix, iy, xx, yy;
   float factX, factY, x, y;
 
-  if (!ifs.bodyTexAncho || !ifs.bodyTexAlto)
+  if (!ifs.body_tex_w || !ifs.body_tex_h)
     return;
 
   ptr = ptrBody + incY * anchoBody;
 
-  if (ifs.bodyTexAncho == 1 && ifs.bodyTexAlto == 1) // textura=1 color
+  if (ifs.body_tex_w == 1 && ifs.body_tex_h == 1) // textura=1 color
   {
     for (iy = 0; iy < altoBody - incY; iy++)
       for (ix = 0; ix < anchoBody; ix++, ptr++)
         if (*ptr)
-          *ptr = ifs.bodyTexColor;
+          *ptr = ifs.body_tex_color;
     return;
   }
 
-  if (ifs.bodyTexModo == 1) // escalar textura
+  if (ifs.body_tex_mode == 1) // escalar textura
   {
-    factX = (float)ifs.bodyTexAncho / anchoBody;
-    factY = (float)ifs.bodyTexAlto / (altoBody - incY);
+    factX = (float)ifs.body_tex_w / anchoBody;
+    factY = (float)ifs.body_tex_h / (altoBody - incY);
 
     for (y = 0, yy = 0; yy < altoBody - incY; y += factY, yy++)
       for (x = 0, xx = 0; xx < anchoBody; x += factX, xx++, ptr++)
         if (*ptr)
-          *ptr = body_tex_buffer[(int)y * ifs.bodyTexAncho + (int)x];
+          *ptr = body_tex_buffer[(int)y * ifs.body_tex_w + (int)x];
   } else // textura en tile
     for (yy = 0, iy = 0; yy < altoBody - incY; yy++) {
       for (xx = 0, ix = 0; xx < anchoBody; xx++, ptr++) {
         if (*ptr)
-          *ptr = body_tex_buffer[iy * ifs.bodyTexAncho + ix];
-        if (++ix >= ifs.bodyTexAncho)
+          *ptr = body_tex_buffer[iy * ifs.body_tex_w + ix];
+        if (++ix >= ifs.body_tex_w)
           ix = 0;
       }
-      if (++iy >= ifs.bodyTexAlto)
+      if (++iy >= ifs.body_tex_h)
         iy = 0;
     }
 }
@@ -571,33 +571,33 @@ void texturarOutline() {
 
   ptr = ptrOutline + incY * anchoOutline;
 
-  if (ifs.outTexAncho < 2 && ifs.outTexAlto < 2) {
+  if (ifs.outline_tex_w < 2 && ifs.outline_tex_h < 2) {
     for (y = 0; y < altoOutline - incY; y++)
       for (x = 0; x < anchoOutline; x++, ptr++)
         if (*ptr) {
           if (*ptr < 128)
-            *ptr = ifs.oscuros[ifs.outTexColor];
+            *ptr = ifs.shadows[ifs.outline_tex_color];
           else if (*ptr > 128)
-            *ptr = ifs.claros[ifs.outTexColor];
+            *ptr = ifs.highlights[ifs.outline_tex_color];
           else
-            *ptr = ifs.outTexColor;
+            *ptr = ifs.outline_tex_color;
         }
     return;
   }
 
-  if (ifs.outTexModo == 1) // escalar textura
+  if (ifs.outline_tex_mode == 1) // escalar textura
   {
-    factX = (float)ifs.outTexAncho / anchoOutline;
-    factY = (float)ifs.outTexAlto / (altoOutline - incY);
+    factX = (float)ifs.outline_tex_w / anchoOutline;
+    factY = (float)ifs.outline_tex_h / (altoOutline - incY);
 
     for (y = 0, fy = 0; y < altoOutline - incY; y++, fy += factY)
       for (x = 0, fx = 0; x < anchoOutline; x++, fx += factX, ptr++)
         if (*ptr) {
-          color = out_tex_buffer[(int)fy * ifs.outTexAncho + (int)fx];
+          color = out_tex_buffer[(int)fy * ifs.outline_tex_w + (int)fx];
           if (*ptr < 128)
-            *ptr = ifs.oscuros[color];
+            *ptr = ifs.shadows[color];
           else if (*ptr > 128)
-            *ptr = ifs.claros[color];
+            *ptr = ifs.highlights[color];
           else
             *ptr = color;
         }
@@ -607,18 +607,18 @@ void texturarOutline() {
     {
       for (x = 0, ix = 0; x < anchoOutline; x++, ptr++) {
         if (*ptr) {
-          color = out_tex_buffer[iy * ifs.outTexAncho + ix];
+          color = out_tex_buffer[iy * ifs.outline_tex_w + ix];
           if (*ptr < 128)
-            *ptr = ifs.oscuros[color];
+            *ptr = ifs.shadows[color];
           else if (*ptr > 128)
-            *ptr = ifs.claros[color];
+            *ptr = ifs.highlights[color];
           else
             *ptr = color;
         }
-        if (++ix >= ifs.outTexAncho)
+        if (++ix >= ifs.outline_tex_w)
           ix = 0;
       }
-      if (++iy >= ifs.outTexAlto)
+      if (++iy >= ifs.outline_tex_h)
         iy = 0;
     }
 }
@@ -628,22 +628,22 @@ void texturarSombra() {
   char *ptr;
   short x, y, ix, iy;
   float factX, factY, fx, fy;
-  short absSombraX = abs(ifs.sombraX);
+  short absSombraX = abs(ifs.shadow_x);
 
-  if (ifs.shadowTexAncho < 2 && ifs.shadowTexAlto < 2)
+  if (ifs.shadow_tex_w < 2 && ifs.shadow_tex_h < 2)
     return;
 
   ptr = ptrShadow + incY * (anchoOutline + absSombraX);
 
-  if (ifs.shadowTexModo == 1) // escalar textura
+  if (ifs.shadow_tex_mode == 1) // escalar textura
   {
-    factX = (float)ifs.shadowTexAncho / anchoOutline;
-    factY = (float)ifs.shadowTexAlto / (altoOutline - incY);
+    factX = (float)ifs.shadow_tex_w / anchoOutline;
+    factY = (float)ifs.shadow_tex_h / (altoOutline - incY);
 
     for (y = 0, fy = 0; y < altoOutline - incY; y++, fy += factY) {
       for (x = 0, fx = 0; x < anchoOutline; x++, fx += factX, ptr++)
         if (*ptr)
-          *ptr = shadow_tex_buffer[(int)fy * ifs.shadowTexAncho + (int)fx];
+          *ptr = shadow_tex_buffer[(int)fy * ifs.shadow_tex_w + (int)fx];
       ptr += absSombraX;
     }
   } else
@@ -651,11 +651,11 @@ void texturarSombra() {
     {
       for (x = 0, ix = 0; x < anchoOutline; x++, ptr++) {
         if (*ptr)
-          *ptr = shadow_tex_buffer[iy * ifs.shadowTexAncho + ix];
-        if (++ix >= ifs.shadowTexAncho)
+          *ptr = shadow_tex_buffer[iy * ifs.shadow_tex_w + ix];
+        if (++ix >= ifs.shadow_tex_w)
           ix = 0;
       }
-      if (++iy >= ifs.shadowTexAlto)
+      if (++iy >= ifs.shadow_tex_h)
         iy = 0;
       ptr += absSombraX;
     }
@@ -740,15 +740,15 @@ void unirOutlineConBody(void) { // Le añade el body al outline
 void unirSombraConResto() {
   char *ptr, *ptr2;
   short x, y;
-  short absSombraX = abs(ifs.sombraX), absSombraY = abs(ifs.sombraY);
+  short absSombraX = abs(ifs.shadow_x), absSombraY = abs(ifs.shadow_y);
 
   ptr = ptrOutline;
 
-  if (ifs.sombraY < 0) {
+  if (ifs.shadow_y < 0) {
     ptr2 = shadowBuffer + absSombraY * anchoreal;
   } else
     ptr2 = shadowBuffer;
-  if (ifs.sombraX < 0)
+  if (ifs.shadow_x < 0)
     ptr2 += absSombraX;
 
   for (y = 0; y < altoOutline; y++) {
@@ -770,13 +770,13 @@ int jorge_create_font(int GenCode) {
   outBuffer = NULL;
   shadowBuffer = NULL;
   if ((ret = initStruct())) {
-    CloseAndFreeAll();
+    close_and_free_all();
     return (ret);
   }
 
 
   if ((fichFNT = fopen(ifs.fntName, "wb")) == NULL) {
-    CloseAndFreeAll();
+    close_and_free_all();
     return (IFS_OPEN_ERROR);
   }
   fwrite("fnt\x1a\x0d\x0a\x00\x00", 8, 1, fichFNT);
@@ -793,19 +793,19 @@ int jorge_create_font(int GenCode) {
 
     tablaFNT[x].width = tablaFNT[x].height = 0;
     tablaFNT[x].offset = 0;
-    if (ifs.tabla[x]) {
+    if (ifs.table[x]) {
       anchoreal = 0;
       altoreal = 0;
       incY = 0;
       if (x != 0) {
-        if ((ret = CargaLetra(x))) {
-          CloseAndFreeAll();
+        if ((ret = load_char(x))) {
+          close_and_free_all();
           return (ret);
         }
         if (Alto && Ancho) {
           if ((ret = escalar())) {
             show_progress((char *)texts[217], 256, 256);
-            CloseAndFreeAll();
+            close_and_free_all();
             return (ret);
           }
           ptrOutline = ptrBody = ptrLetra;
@@ -819,9 +819,9 @@ int jorge_create_font(int GenCode) {
                 stop = 1;
           incY--;
           if (ifs.outline) {
-            if ((ret = PintaOutline())) {
+            if ((ret = paint_outline())) {
               show_progress((char *)texts[217], 256, 256);
-              CloseAndFreeAll();
+              close_and_free_all();
               return (ret);
             }
             ptrOutline = ptrLetra;
@@ -833,10 +833,10 @@ int jorge_create_font(int GenCode) {
           } else {
             texturarBody();
           }
-          if (ifs.sombraX || ifs.sombraY) {
-            if ((ret = PintaSombra())) {
+          if (ifs.shadow_x || ifs.shadow_y) {
+            if ((ret = paint_shadow())) {
               show_progress((char *)texts[217], 256, 256);
-              CloseAndFreeAll();
+              close_and_free_all();
               return (ret);
             }
             texturarSombra();
@@ -864,7 +864,7 @@ int jorge_create_font(int GenCode) {
 
   if (error) {
     show_progress((char *)texts[217], 256, 256);
-    CloseAndFreeAll();
+    close_and_free_all();
     return (IFS_WRITE_ERROR);
   }
 
@@ -872,7 +872,7 @@ int jorge_create_font(int GenCode) {
   fwrite(&tablaFNT, sizeof(tablaFNT), 1, fichFNT);
 
   show_progress((char *)texts[217], 256, 256);
-  CloseAndFreeAll();
+  close_and_free_all();
   return (0);
 }
 

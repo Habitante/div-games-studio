@@ -581,7 +581,7 @@ void apply_palette(void) {
   c0 = find_col;
   find_color(63, 63, 63);
   c1 = find_col;
-  p = fonts[0] + 1356 + sizeof(TABLAFNT) * 256;
+  p = fonts[0] + 1356 + sizeof(fnt_table_entry) * 256;
 
   for (n = 0; n < 12288; n++) {
     if (*p == last_c1) {
@@ -1535,7 +1535,7 @@ fntfuera:
   w = 0;
   h = 0;
   nan = 0;
-  fnt = (TABLAFNT *)((byte *)ptr + 1356);
+  fnt = (fnt_table_entry *)((byte *)ptr + 1356);
   for (n = 0; n < 256; n++) {
     if (fnt[n].width) {
       w += fnt[n].width;
@@ -1570,8 +1570,8 @@ fntfuera:
   pila[sp] = ifonts;
 
   if (adaptar_paleta) {
-    adapt_palette(fonts[ifonts] + 1356 + sizeof(TABLAFNT) * 256,
-                  f_i[ifonts].len - 1356 - sizeof(TABLAFNT) * 256, fonts[ifonts] + 8, NULL);
+    adapt_palette(fonts[ifonts] + 1356 + sizeof(fnt_table_entry) * 256,
+                  f_i[ifonts].len - 1356 - sizeof(fnt_table_entry) * 256, fonts[ifonts] + 8, NULL);
     f_i[ifonts].syspal = palcrc;
   }
 
@@ -1622,8 +1622,8 @@ fntfuera:
     }
 
     if (f_i[ifonts].fonpal != palcrc) {
-      adapt_palette(fonts[ifonts] + 1356 + sizeof(TABLAFNT) * 256,
-                    f_i[ifonts].len - 1356 - sizeof(TABLAFNT) * 256, fonts[ifonts] + 8, NULL);
+      adapt_palette(fonts[ifonts] + 1356 + sizeof(fnt_table_entry) * 256,
+                    f_i[ifonts].len - 1356 - sizeof(fnt_table_entry) * 256, fonts[ifonts] + 8, NULL);
     }
 
     f_i[ifonts].syspal = palcrc;
@@ -4928,7 +4928,7 @@ void write_in_map(void) {
 
   ptr = (byte *)&mem[texts];
 
-  fnt = (TABLAFNT *)((byte *)fonts[fuente] + 1356);
+  fnt = (fnt_table_entry *)((byte *)fonts[fuente] + 1356);
   h = f_i[fuente].height;
 
   ptr2 = ptr;
