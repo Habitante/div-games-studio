@@ -4,3 +4,6 @@
 
 # 2C-1: Apply clang-format to 82 project source files
 0e4d9fd114248c7a9e86478502898dc603afec83
+
+# 2C-4: Re-apply clang-format after rename sprints (35 files)
+a1ee4b27d8a7653904b6d3f23a48a038ab68379c
