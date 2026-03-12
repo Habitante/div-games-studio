@@ -336,7 +336,7 @@ void initialization(void) {
   m7 = (struct _m7 *)&mem[long_header + 14 + 10 * 10];
   joy = (struct _joy *)&mem[long_header + 14 + 10 * 10 + 10 * 7];
   setup = (struct _setup *)&mem[long_header + 14 + 10 * 10 + 10 * 7 + 8];
-  net = (struct _net *)&mem[long_header + 14 + 10 * 10 + 10 * 7 + 8 + 11];
+  // net = (struct _net *)&mem[long_header + 14 + 10 * 10 + 10 * 7 + 8 + 11];
   // m8 pointer removed (MODE8 deleted) - memory layout preserved for compatibility
   dirinfo = (struct _dirinfo *)&mem[long_header + 14 + 10 * 10 + 10 * 7 + 8 + 11 + 9 + 10 * 4];
   fileinfo =

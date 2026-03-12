@@ -433,9 +433,6 @@ function 047 int system(0)                         // Invoca un comando DOS o a 
 function 048 int refresh_scroll(0)                 // Refresca un scroll (tras modificar el mapa) (n)
 function 049 int fget_dist(0,0,0,0)                // Devuelve la distancia de A hasta B (Ax,Ay,Bx,By)
 function 050 int fget_angle(0,0,0,0)               // Devuelve el angulo de A hasta B (Ax,Ay,Bx,By)
-function 051 int play_cd(0,0)                      // Toca una pista de audio (pista,0:solo pista 1:a partir de ella)
-function 052 int stop_cd()                         // Para el cd
-function 053 int is_playing_cd()                   // Dice si se est� escuchando una canci�n (para implementar el loop)
 function 054 int start_mode7(0,0,0,0,0,0)          // Crea una ventana de m7 (n�mero 0..9,file,graf1,graf2,region,horizonte)
 function 055 int stop_mode7(0)                     // Elimina la ventana de m7 (n�mero 0..9)
 function 056 int advance(0)                        // Avanza el proceso "n" en su angle (n)

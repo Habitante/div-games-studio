@@ -352,17 +352,6 @@ struct _setup { // x1
 
 GLOBAL struct _setup *setup;
 
-struct _net { // x1
-  int device, com, speed;
-  int phone, init_string;
-  int tones, server, num_players;
-  int act_players;
-};
-
-GLOBAL struct _net *net;
-
-// struct _m8 removed (MODE8 deleted)
-
 struct _dirinfo { // x1
   int files;
   int name[1025];

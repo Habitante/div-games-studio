@@ -6172,280 +6172,219 @@ void function(void) {
   case 78:
     set_color();
     break;
-  case 79:
-    sp -= 2;
-    pila[sp] = 0;
-    break;
-  case 80:
-    pila[++sp] = 0;
-    break;
-  case 81:
-    pila[sp] = 0;
-    break; // stop_mode8 removed (MODE8 deleted)
 
-  case 82:
+  case 79:
     x_advance();
     break;
-  case 83:
+  case 80:
     _strchar();
     break;
-  case 84:
+  case 81:
     path_find();
     break;
-  case 85:
+  case 82:
     path_line();
     break;
-  case 86:
+  case 83:
     path_free();
     break;
-  case 87:
+  case 84:
     new_map();
     break;
-  case 88:
-    sp--;
-    pila[sp] = 0;
-    break; // load_wld removed (MODE8 deleted)
-  case 89:
-    sp -= 2;
-    pila[sp] = 0;
-    break; // start_mode8 removed (MODE8 deleted)
-  case 90:
-    pila[sp] = 0;
-    break; // go_to_flag removed (MODE8 deleted)
-  case 91:
-    sp -= 2;
-    pila[sp] = 0;
-    break; // set_sector_height removed (MODE8 deleted)
-  case 92:
-    sp -= 2;
-    pila[sp] = 0;
-    break; // get_sector_height removed (MODE8 deleted)
-  case 93:
-    sp -= 2;
-    pila[sp] = 0;
-    break; // set_point_m8 removed (MODE8 deleted)
-  case 94:
-    sp -= 2;
-    pila[sp] = 0;
-    break; // get_point_m8 removed (MODE8 deleted)
-  case 95:
-    sp--;
-    pila[sp] = 0;
-    break; // set_fog removed (MODE8 deleted)
-  case 96:
-    sp -= 3;
-    pila[sp] = 0;
-    break; // set_sector_texture removed (MODE8 deleted)
-  case 97:
-    sp -= 3;
-    pila[sp] = 0;
-    break; // get_sector_texture removed (MODE8 deleted)
-  case 98:
-    sp -= 2;
-    pila[sp] = 0;
-    break; // set_wall_texture removed (MODE8 deleted)
-  case 99:
-    sp -= 2;
-    pila[sp] = 0;
-    break; // get_wall_texture removed (MODE8 deleted)
-  case 100:
-    sp -= 2;
-    pila[sp] = 0;
-    break; // set_env_color removed (MODE8 deleted)
-
-  case 101:
+****
+  case 85:
     _strcpy();
     break;
-  case 102:
+  case 86:
     _strcat();
     break;
-  case 103:
+  case 87:
     _strlen();
     break;
-  case 104:
+  case 88:
     _strcmp();
     break;
-  case 105:
+  case 89:
     _strchr();
     break;
-  case 106:
+  case 90:
     _strstr();
     break;
-  case 107:
+  case 91:
     __strset();
     break;
-  case 108:
+  case 92:
     __strupr();
     break;
-  case 109:
+  case 93:
     __strlwr();
     break;
-  case 110:
+  case 94:
     _strdel();
     break;
-  case 111:
+  case 95:
     screen_copy();
     break;
-  case 112:
+  case 96:
     sort();
     break;
-  case 113:
+  case 97:
     load_song();
     break;
-  case 114:
+  case 98:
     unload_song();
     break;
-  case 115:
+  case 99:
     song();
     break;
-  case 116:
+  case 100:
     stop_song();
     break;
-  case 117:
+  case 101:
     set_song_pos();
     break;
-  case 118:
+  case 102:
     get_song_pos();
     break;
-  case 119:
+  case 103:
     get_song_line();
     break;
-  case 120:
+  case 104:
     is_playing_sound();
     break;
-  case 121:
+  case 105:
     is_playing_song();
     break;
-  case 122:
+  case 106:
     _fopen();
     break;
-  case 123:
+  case 107:
     _fclose();
     break;
-  case 124:
+  case 108:
     _fread();
     break;
-  case 125:
+  case 109:
     _fwrite();
     break;
-  case 126:
+  case 110:
     _fseek();
     break;
-  case 127:
+  case 111:
     _ftell();
     break;
-  case 128:
+  case 112:
     __filelength();
     break;
-  case 129:
+  case 113:
     flush();
     break;
-  case 130:
+  case 114:
     get_dirinfo();
     break;
-  case 131:
+  case 115:
     get_fileinfo();
     break;
-  case 132:
+  case 116:
     getdrive();
     break;
-  case 133:
+  case 117:
     setdrive();
     break;
-  case 134:
+  case 118:
     div_chdir();
     break;
-  case 135:
+  case 119:
     _mkdir();
     break;
-  case 136:
+  case 120:
     remove_file();
     break;
-  case 137:
+  case 121:
     disk_free();
     break;
-  case 138:
+  case 122:
     memory_free();
     break;
-  case 139:
+  case 123:
     ignore_error();
     break;
-  case 140:
+  case 124:
     save_mapcx(1);
     break;
-  case 141:
+  case 125:
     _sin();
     break;
-  case 142:
+  case 126:
     _cos();
     break;
-  case 143:
+  case 127:
     _tan();
     break;
-  case 144:
+  case 128:
     _asin();
     break;
-  case 145:
+  case 129:
     _acos();
     break;
-  case 146:
+  case 130:
     _atan();
     break;
-  case 147:
+  case 131:
     _atan2();
     break;
-  case 148:
+  case 132:
     draw();
     break;
-  case 149:
+  case 133:
     delete_draw();
     break;
-  case 150:
+  case 134:
     move_draw();
     break;
-  case 151:
+  case 135:
     save_mapcx(0);
     break;
-  case 152:
+  case 136:
     write_in_map();
     break;
-  case 153:
+  case 137:
     calculate();
     break;
-  case 154:
+  case 138:
     __itoa();
     break;
-  case 155:
+  case 139:
     change_channel();
     break;
-  case 156:
+  case 140:
     _malloc();
     break;
-  case 157:
+  case 141:
     _free();
     break;
-  case 158:
+  case 142:
     encode();
     break;
-  case 159:
+  case 143:
     encode_file(1);
     break;
-  case 160:
+  case 144:
     encode_file(0);
     break;
-  case 161:
+  case 145:
     _compress(1);
     break;
-  case 162:
+  case 146:
     _compress(0);
     break;
-  case 163:
+  case 147:
     _find_color();
     break;
-  case 164:
+  case 148:
     load_screen();
     break;
-  case 165:
+  case 149:
     force_pal();
     break;
   }
@@ -6465,8 +6404,9 @@ char *fname[] = {
     "define_region", "xput", "put", "put_screen", "map_xput", "map_put", "put_pixel", "get_pixel",
     "map_put_pixel", "map_get_pixel", "get_point", "clear_screen", "save", "load", "set_mode",
     "load_pcm/wav", "unload_pcm/wav", "sound", "stop_sound", "change_sound", "set_fps", "start_fli",
-    "frame_fli", "end_fli", "reset_fli", "system", "refresh_scroll", "fget_dist", "fget_angle", "",
-    "", "", "start_mode7", "stop_mode7", "advance", "abs", "fade_on", "fade_off", "rand_seed",
+    "frame_fli", "end_fli", "reset_fli", "system", "refresh_scroll", "fget_dist", "fget_angle", 
+    "", "", "", // Removed CD Music functions
+    "start_mode7", "stop_mode7", "advance", "abs", "fade_on", "fade_off", "rand_seed",
     "sqrt", "pow", "map_block_copy", "move_scroll", "near_angle", "let_me_alone", "exit",
     "roll_palette", "get_real_point", "get_joy_button", "get_joy_position", "convert_palette",
     "load_map/pcx", "reset_sound", "unload_map/pcx", "unload_fnt", "set_volume",
