@@ -4,6 +4,7 @@
 //-----------------------------------------------------------------------------
 
 #include "global.h"
+#include <limits.h>
 
 
 #ifdef __cplusplus
@@ -98,6 +99,22 @@ typedef struct tagRGBQUAD {
 // Tambi n have to be put in divsetup.cpp and divpalet.cpp (preparing Skin)
 
 //-----------------------------------------------------------------------------
+//      Dimension validation helper
+//-----------------------------------------------------------------------------
+
+#define MAX_IMAGE_DIM 16384
+
+int validate_image_dimensions(int width, int height) {
+  if (width <= 0 || height <= 0)
+    return 0;
+  if (width > MAX_IMAGE_DIM || height > MAX_IMAGE_DIM)
+    return 0;
+  if (height != 0 && width > INT_MAX / height)
+    return 0;
+  return 1;
+}
+
+//-----------------------------------------------------------------------------
 //      MAP format
 //-----------------------------------------------------------------------------
 
@@ -105,6 +122,8 @@ int fmt_is_map(byte *buffer) {
   if (!strcmp((char *)buffer, "map\x1a\x0d\x0a")) {
     map_width = *(word *)(buffer + 8);
     map_height = *(word *)(buffer + 10);
+    if (!validate_image_dimensions(map_width, map_height))
+      return 0;
     return (1);
   } else
     return (0);
@@ -119,6 +138,11 @@ void fmt_load_map(byte *buffer, byte *mapa, int vent) {
 
   memcpy(dac4, buffer + 48, 768);
   memcpy(&num_points, buffer + 1392, 2);
+
+  if (num_points < 0)
+    num_points = 0;
+  if (num_points > 256)
+    num_points = 256;
 
   if (vent) {
     memcpy(gradients, buffer + 816, sizeof(gradients));
@@ -224,6 +248,8 @@ int fmt_is_pcx(byte *buffer) {
   map_width = *(word *)(buffer + 8) - *(word *)(buffer + 4) + 1;
   map_height = *(word *)(buffer + 10) - *(word *)(buffer + 6) + 1;
 
+  if (loes && !validate_image_dimensions(map_width, map_height))
+    return 0;
   return (loes);
 }
 
@@ -256,7 +282,11 @@ void fmt_load_pcx(byte *buffer, byte *mapa, int vent) {
   map_width = header.xmax - header.xmin + 1;
   map_height = header.ymax - header.ymin + 1;
 
-  if ((!map_width && !map_height) || map_width < 0 || map_height < 0)
+  if (!validate_image_dimensions(map_width, map_height))
+    return;
+
+  // Validate bytes_per_line from PCX header — must be positive and sane
+  if (header.bytes_per_line <= 0 || header.bytes_per_line > map_width * 4)
     return;
 
   memset(mapa, 0, map_width * map_height);
@@ -625,6 +655,8 @@ int fmt_is_bmp(byte *buffer) {
   map_width = InfoHeader.biWidth;
   map_height = InfoHeader.biHeight;
 
+  if (!validate_image_dimensions(map_width, map_height))
+    return 0;
   return (1);
 }
 
@@ -651,7 +683,7 @@ void fmt_load_bmp(byte *buffer, byte *mapa, int vent) {
   map_width = InfoHeader.biWidth;
   map_height = InfoHeader.biHeight;
 
-  if ((!map_width && !map_height) || map_width < 0 || map_height < 0)
+  if (!validate_image_dimensions(map_width, map_height))
     return;
 
   pSrc = buffer + 54;
@@ -997,6 +1029,8 @@ int fmt_is_jpg(byte *buffer, int img_filesize) {
   map_height = cinfo.output_height;
   jpeg_destroy_decompress(&cinfo);
 
+  if (!validate_image_dimensions(map_width, map_height))
+    return 0;
   return (1);
 #else
   return (0);
@@ -1037,7 +1071,7 @@ int fmt_load_jpg(byte *buffer, byte *mapa, int vent, int img_filesize) {
   map_width = cinfo.output_width;
   map_height = cinfo.output_height;
 
-  if ((!map_width && !map_height) || map_width < 0 || map_height < 0) {
+  if (!validate_image_dimensions(map_width, map_height)) {
     jpeg_destroy_decompress(&cinfo);
     return (0);
   }
@@ -1344,7 +1378,11 @@ int fmt_load_dac_bmp(char *name) {
     free(CopiaBuffer);
     return (0);
   }
-  fread(CopiaBuffer, 14 + 40 + 1024, 1, file);
+  if (fread(CopiaBuffer, 14 + 40 + 1024, 1, file) != 1) {
+    free(CopiaBuffer);
+    fclose(file);
+    return (0);
+  }
 
   FileHeader.bfType = *((unsigned short *)CopiaBuffer);
   FileHeader.bfSize = *((unsigned int *)(CopiaBuffer + 2));

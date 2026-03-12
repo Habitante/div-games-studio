@@ -25,14 +25,33 @@ short get_code_p0y;
 #define alto_br  72
 
 void fpg_read_image_header(HeadFPG *MiHeadFPG, FILE *fpg) {
-  fread(&MiHeadFPG->code, 1, 4, fpg);
-  fread(&MiHeadFPG->length, 1, 4, fpg);
+  if (fread(&MiHeadFPG->code, 1, 4, fpg) != 4 ||
+      fread(&MiHeadFPG->length, 1, 4, fpg) != 4) {
+    fpg_image = NULL;
+    fpg_points = NULL;
+    return;
+  }
   memset(MiHeadFPG->description, 0, 33);
   fread(MiHeadFPG->description, 1, 32, fpg);
   fread(MiHeadFPG->Filename, 1, 12, fpg);
-  fread(&MiHeadFPG->width, 1, 4, fpg);
-  fread(&MiHeadFPG->height, 1, 4, fpg);
-  fread(&MiHeadFPG->num_points, 1, 4, fpg);
+  if (fread(&MiHeadFPG->width, 1, 4, fpg) != 4 ||
+      fread(&MiHeadFPG->height, 1, 4, fpg) != 4 ||
+      fread(&MiHeadFPG->num_points, 1, 4, fpg) != 4) {
+    fpg_image = NULL;
+    fpg_points = NULL;
+    return;
+  }
+
+  if (!validate_image_dimensions(MiHeadFPG->width, MiHeadFPG->height)) {
+    fpg_image = NULL;
+    fpg_points = NULL;
+    return;
+  }
+  if (MiHeadFPG->num_points < 0 || MiHeadFPG->num_points > 256) {
+    fpg_image = NULL;
+    fpg_points = NULL;
+    return;
+  }
 
   fpg_image = (char *)malloc(MiHeadFPG->width * MiHeadFPG->height);
   if (fpg_image == NULL) {
@@ -127,7 +146,10 @@ int fpg_open(FPG *Fpg, char *Name) {
 
   Fpg->nIndex = 0;
   div_strcpy((char *)Fpg->current_file, sizeof(Fpg->current_file), Name);
-  fread(newdac, 768, 1, fpg);
+  if (fread(newdac, 768, 1, fpg) != 1) {
+    fclose(fpg);
+    return 0;
+  }
   memcpy(dac4, newdac, 768);
   new_dac_loaded = 1;
   fread((byte *)gradients, 1, sizeof(gradients), fpg);
@@ -193,16 +215,17 @@ void fpg_sort(FPG *Fpg) {
 }
 
 int fpg_read_header(HeadFPG *MiHeadFPG, FILE *fpg) {
-  fread(&MiHeadFPG->code, 1, 4, fpg);
-  fread(&MiHeadFPG->length, 1, 4, fpg);
+  if (fread(&MiHeadFPG->code, 1, 4, fpg) != 4 ||
+      fread(&MiHeadFPG->length, 1, 4, fpg) != 4)
+    return 0;
   memset(MiHeadFPG->description, 0, 33);
   fread(MiHeadFPG->description, 1, 32, fpg);
   fread(MiHeadFPG->Filename, 1, 12, fpg);
-  fread(&MiHeadFPG->width, 1, 4, fpg);
-  fread(&MiHeadFPG->height, 1, 4, fpg);
-  if (fread(&MiHeadFPG->num_points, 1, 4, fpg) == 4)
-    return 1;
-  return 0;
+  if (fread(&MiHeadFPG->width, 1, 4, fpg) != 4 ||
+      fread(&MiHeadFPG->height, 1, 4, fpg) != 4 ||
+      fread(&MiHeadFPG->num_points, 1, 4, fpg) != 4)
+    return 0;
+  return 1;
 }
 
 void fpg_write_header(HeadFPG *MiHeadFPG, short *points, char *imagen, FILE *fpg) {
@@ -368,6 +391,12 @@ int fpg_remap_to_pal(FPG *Fpg) {
   fread(CopiaReglas, 1, sizeof(CopiaReglas), fpg);
   fwrite(CopiaReglas, sizeof(CopiaReglas), 1, Oldfpg);
   while (fpg_read_header(&other_header, fpg)) {
+    if (!validate_image_dimensions(other_header.width, other_header.height) ||
+        other_header.num_points < 0 || other_header.num_points > 256) {
+      fclose(fpg);
+      fclose(Oldfpg);
+      return 0;
+    }
     other_image = (char *)malloc(other_header.width * other_header.height);
     if (other_image == NULL) {
       fclose(fpg);
@@ -535,6 +564,13 @@ int fpg_delete(FPG *Fpg,
   while (fpg_read_header(&other_header, fpg)) {
     show_progress((char *)texts[436], ftell(fpg), len);
 
+    if (!validate_image_dimensions(other_header.width, other_header.height) ||
+        other_header.num_points < 0 || other_header.num_points > 256) {
+      show_progress((char *)texts[436], len, len);
+      fclose(fpg);
+      fclose(Oldfpg);
+      return 0;
+    }
     other_image = (char *)malloc(other_header.width * other_header.height);
     if (other_image == NULL) {
       show_progress((char *)texts[436], len, len);
@@ -634,6 +670,13 @@ int fpg_delete_many(FPG *Fpg, int taggeds, int *array_del) {
   while (fpg_read_header(&other_header, fpg)) {
     show_progress((char *)texts[436], ftell(fpg), len);
 
+    if (!validate_image_dimensions(other_header.width, other_header.height) ||
+        other_header.num_points < 0 || other_header.num_points > 256) {
+      show_progress((char *)texts[436], len, len);
+      fclose(fpg);
+      fclose(Oldfpg);
+      return 0;
+    }
     other_image = (char *)malloc(other_header.width * other_header.height);
 
     if (other_image == NULL) {

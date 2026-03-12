@@ -492,6 +492,8 @@ int show_progress(char *title, int current, int total);
 //      Functions exported by DIVFORMA (divforma.c)
 ///////////////////////////////////////////////////////////////////////////////
 
+int validate_image_dimensions(int width, int height);
+
 int fmt_is_map(byte *buffer);
 void fmt_load_map(byte *buffer, byte *mapa, int);
 int fmt_save_map(byte *mapa, FILE *f);

@@ -127,34 +127,32 @@ The code review found real bugs and safety gaps that should be fixed before
 adding features. Everything here is bounded, testable work — no architecture
 astronautics.
 
-### 3A — Real bugs (immediate, ~1 hour)
+### 3A — Real bugs (immediate) ✓
 
-- [ ] **Division by zero crashes release builds** — `kernel.inc` checks for
-  zero divisor in debug builds but not release. Add the same guard to the
-  release paths for `ldiv`, `lmod`, `ldia`, `lmoa` (4 opcodes, 4 `if`s)
-- [ ] **Double-free in BMP loader** — `image.c` frees `CopiaBuffer` up to 3
-  times on certain bit depths. Restructure cleanup to single free-on-exit
-- [ ] **FPG index overflow** — `fpg.c` never checks `Fpg->nIndex` against
-  array size. An FPG with >1000 graphics causes heap corruption. Add bounds check
-- [ ] **FPG code field unchecked** — `kkhead.code` from file used as array
-  index into `grf_offsets[1000]` without validation. Reject out-of-range codes
+- [x] **Division by zero crashes release builds** — Zero-divisor guards on
+  `ldiv`, `lmod`, `ldia`, `lmoa` made unconditional (work in release builds)
+- [x] **Double-free in BMP loader** — `CopiaBuffer` freed once with NULL
+  assignment, no more multiple-free paths
+- [x] **FPG index overflow** — `nIndex >= 1000` bounds check added, stops
+  loading when limit reached
+- [x] **FPG code field unchecked** — `kkhead.code` validated against `[0, 1000)`
+  before use as array index, out-of-range codes skipped
 
-### 3B — File format hardening (~1-2 sessions)
+### 3B — File format hardening ✓
 
-Every image/FPG/MAP parser trusts file headers completely. On Steam, users will
-load files from the internet.
-
-- [ ] **`validate_image_dimensions()` helper** — Check: positive, sane range
-  (e.g. <=16384), and `width * height` doesn't overflow 32-bit int. Call from
-  every loader (BMP, PCX, MAP, FPG, JPEG)
-- [ ] **Check all `fread()` return values** in `formats/image.c` (~12
-  unchecked sites) — return error on partial reads instead of using garbage data
-- [ ] **PCX RLE bounds checking** — RLE decompressor can overflow output buffer
-  with malformed run lengths. Add output pointer bounds check
-- [ ] **FPG palette read validation** — Check for truncated files before
-  reading 768-byte palette
-- [ ] **MAP header validation** — Check width/height/num_points before using
-  as allocation sizes or array indices
+- [x] **`validate_image_dimensions()` helper** — Checks positive, <=16384,
+  and no 32-bit overflow. Called from all `fmt_is_*` and `fmt_load_*` functions,
+  plus FPG reader functions
+- [x] **Dangerous `fread()` return checks** — Checked returns on dimension/
+  palette reads in `fpg_read_header`, `fpg_read_image_header`, `fpg_open`,
+  and `fmt_load_dac_bmp` (fields that control allocations or array indices)
+- [x] **PCX RLE bounds checking** — `bytes_per_line` validated against
+  `map_width` before RLE decode to prevent buffer overrun
+- [x] **FPG palette read validation** — `fpg_open` checks 768-byte palette
+  fread return, closes file on truncation
+- [x] **MAP/FPG num_points validation** — Clamped to [0, 256] in
+  `fmt_load_map`; rejected in `fpg_read_image_header`, `fpg_remap_to_pal`,
+  `fpg_delete`, `fpg_delete_many`
 
 ### 3C — Runtime & SDL robustness (~1 session)
 
