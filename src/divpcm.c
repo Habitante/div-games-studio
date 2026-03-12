@@ -27,9 +27,9 @@ void close_sound(char *snd_path);
 void open_song(void);
 void open_desktop_song(void);
 void sound_play_song(char *pathname);
-void EditSound0(void);
-void EditSound1(void);
-void EditSound2(void);
+void edit_sound0(void);
+void edit_sound1(void);
+void edit_sound2(void);
 void EditSound3(void);
 void rec_sound0(void);
 void RecSound1(void);
@@ -43,7 +43,7 @@ int judas_progress_read(int handle, void *buffer, int size);
 void copy_new_sound(pcminfo *mypcminfo, int ini, int fin);
 void paste_new_sounds(void);
 byte *save_sound_mem(pcminfo *mypcminfo);
-int is_wav(char *FileName);
+int is_wav(char *filename);
 int new_sample(pcminfo *mypcminfo); // 1-OK, 0-ERROR
 // Allocate (malloc+lock) in mypcminfo->sound_data for mypcminfo->sound_size shorts
 void wline(char *ptr, int realan, int w, int h, int x0, int y0, int x1, int y1, char color);
@@ -75,7 +75,7 @@ void errhlp0(void);
 //  Sounds Window
 //-----------------------------------------------------------------------------
 
-void PCM1(void) {
+void pcm1(void) {
   int length;
   float step, position = 0;
   int x, y, y0, y1, p0, p1;
@@ -147,7 +147,7 @@ extern int ns, chn;
 extern int bload;
 int sound_window;
 
-void PCM2(void) {
+void pcm2(void) {
   pcminfo *mypcminfo = (pcminfo *)v.aux;
 
   if (mouse_b & 1) {
@@ -190,15 +190,15 @@ void PCM3(void) {
   free(v.aux);
 }
 
-void PCM0(void) {
+void pcm0(void) {
   pcminfo *mypcminfo;
 
   v.type = 105;
   v.w = 80;
   v.h = 50;
 
-  v.paint_handler = PCM1;
-  v.click_handler = PCM2;
+  v.paint_handler = pcm1;
+  v.click_handler = pcm2;
   v.close_handler = PCM3;
 
   v.aux = pcminfo_aux;
@@ -551,7 +551,7 @@ void open_sound(void) {
 
       mypcminfo->si = si;
 #endif
-      new_window(PCM0);
+      new_window(pcm0);
     }
   }
 }
@@ -608,7 +608,7 @@ void open_sound_file(void) // Open the file sound_path_name
   mypcminfo->si = si;
 
 #endif
-  new_window(PCM0);
+  new_window(pcm0);
 }
 int create_saved_window(void_return_type_t init_handler, int nx, int ny);
 //void create_saved_window(int init_handler,int nx,int ny);
@@ -653,7 +653,7 @@ void open_desktop_sound(FILE *f) {
   }
 #endif
 
-  create_saved_window(PCM0, window_aux.x, window_aux.y);
+  create_saved_window(pcm0, window_aux.x, window_aux.y);
 }
 
 void save_sound(pcminfo *mypcminfo, char *dst) {
@@ -966,7 +966,7 @@ int ConSND = 1; // Contador de sonidos pegados durante toda la sesion
 CLP Clipboard = {0, 0, NULL};
 int PosY = 31;
 
-void EditSound0(void) {
+void edit_sound0(void) {
   int pos;
 
   v.type = 1;
@@ -975,8 +975,8 @@ void EditSound0(void) {
   v.w = 308;
   v.h = 151; // 116
 
-  v.paint_handler = EditSound1;
-  v.click_handler = EditSound2;
+  v.paint_handler = edit_sound1;
+  v.click_handler = edit_sound2;
   v.close_handler = EditSound3;
 
   window_width = (v.w - 8) * big2;
@@ -1038,7 +1038,7 @@ void EditSound0(void) {
   v_finished = 0;
 }
 
-void EditSound1(void) {
+void edit_sound1(void) {
   pcminfo *mypcminfo = (pcminfo *)pcminfo_aux;
   short *buffer;
   byte *ptr = v.ptr;
@@ -1143,7 +1143,7 @@ void EditSound1(void) {
   } // length>1
 }
 
-void EditSound2(void) {
+void edit_sound2(void) {
   int w_v = window_width / big2, h_v = window_height / big2;
   int need_refresh = 0;
 
@@ -1895,7 +1895,7 @@ void paste_new_sounds(void) {
     free(FileBuffer);
     free(DesktopSND[con].sound_data);
 
-    new_window(PCM0);
+    new_window(pcm0);
   }
 }
 
@@ -1973,11 +1973,11 @@ byte *save_sound_mem(pcminfo *mypcminfo) {
   return (FileBuffer);
 }
 
-int is_wav(char *FileName) {
+int is_wav(char *filename) {
   FILE *f;
   int ok = 1;
 
-  if ((f = fopen(FileName, "rb")) == NULL)
+  if ((f = fopen(filename, "rb")) == NULL)
     return (0);
 
   if (fgetc(f) != 'R')

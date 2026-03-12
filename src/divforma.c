@@ -114,7 +114,7 @@ void fmt_load_map(byte *buffer, byte *mapa, int vent) {
   short num_points;
   if (vent) {
     memcpy(&fpg_code, buffer + 12, 4);
-    memcpy(MapDescription, buffer + 16, 32);
+    memcpy(map_description, buffer + 16, 32);
   }
 
   memcpy(dac4, buffer + 48, 768);
@@ -464,7 +464,7 @@ void fmt_load_pcx(byte *buffer, byte *mapa, int vent) {
     for (x = 0; x < 512; x++)
       v_map->points[x] = -1;
     fpg_code = 0;
-    MapDescription[0] = 0;
+    map_description[0] = 0;
   }
 }
 
@@ -909,7 +909,7 @@ void fmt_load_bmp(byte *buffer, byte *mapa, int vent) {
     for (x = 0; x < 512; x++)
       v_map->points[x] = -1;
     fpg_code = 0;
-    MapDescription[0] = 0;
+    map_description[0] = 0;
   }
 }
 
@@ -1074,7 +1074,7 @@ int fmt_load_jpg(byte *buffer, byte *mapa, int vent, int img_filesize) {
     for (x = 0; x < 512; x++)
       v_map->points[x] = -1;
     fpg_code = 0;
-    MapDescription[0] = 0;
+    map_description[0] = 0;
   }
 
   return (1);

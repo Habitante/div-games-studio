@@ -25,16 +25,16 @@ short get_code_p0y;
 #define alto_br  72
 
 void fpg_read_image_header(HeadFPG *MiHeadFPG, FILE *fpg) {
-  fread(&MiHeadFPG->COD, 1, 4, fpg);
-  fread(&MiHeadFPG->LONG, 1, 4, fpg);
-  memset(MiHeadFPG->Descrip, 0, 33);
-  fread(MiHeadFPG->Descrip, 1, 32, fpg);
+  fread(&MiHeadFPG->code, 1, 4, fpg);
+  fread(&MiHeadFPG->length, 1, 4, fpg);
+  memset(MiHeadFPG->description, 0, 33);
+  fread(MiHeadFPG->description, 1, 32, fpg);
   fread(MiHeadFPG->Filename, 1, 12, fpg);
-  fread(&MiHeadFPG->Ancho, 1, 4, fpg);
-  fread(&MiHeadFPG->Alto, 1, 4, fpg);
+  fread(&MiHeadFPG->width, 1, 4, fpg);
+  fread(&MiHeadFPG->height, 1, 4, fpg);
   fread(&MiHeadFPG->num_points, 1, 4, fpg);
 
-  fpg_image = (char *)malloc(MiHeadFPG->Ancho * MiHeadFPG->Alto);
+  fpg_image = (char *)malloc(MiHeadFPG->width * MiHeadFPG->height);
   if (fpg_image == NULL) {
     v_text = (char *)texts[45];
     show_dialog(err0);
@@ -52,7 +52,7 @@ void fpg_read_image_header(HeadFPG *MiHeadFPG, FILE *fpg) {
     fread(fpg_points, MiHeadFPG->num_points * 2, 2, fpg);
   } else
     fpg_points = NULL;
-  fread(fpg_image, MiHeadFPG->Ancho * MiHeadFPG->Alto, 1, fpg);
+  fread(fpg_image, MiHeadFPG->width * MiHeadFPG->height, 1, fpg);
 }
 
 void fpg_create(FPG *Fpg, char *Name) {
@@ -61,16 +61,16 @@ void fpg_create(FPG *Fpg, char *Name) {
   if ((fpg = fopen(Name, "wb")) == NULL)
     return;
   for (x = 0; x < 1000; x++) {
-    Fpg->OffsGrf[x] = 0;
-    Fpg->DesIndex[x] = 0;
+    Fpg->grf_offsets[x] = 0;
+    Fpg->desc_index[x] = 0;
   }
 
   Fpg->nIndex = 0;
-  Fpg->LastUsed = 0;
+  Fpg->last_used = 0;
 
   Fpg->version = 0; // 32 bit fpg files
 
-  div_strcpy((char *)Fpg->ActualFile, sizeof(Fpg->ActualFile), Name);
+  div_strcpy((char *)Fpg->current_file, sizeof(Fpg->current_file), Name);
   fwrite("fpg\x1a\x0d\x0a\x00", 7, 1, fpg);
 
   fwrite(&Fpg->version, 1, 1, fpg);
@@ -81,22 +81,22 @@ void fpg_create(FPG *Fpg, char *Name) {
   fclose(fpg);
 
   if (Fpg->thumb_on) {
-    Fpg->lInfoFPG.columns = 3;
-    Fpg->lInfoFPG.lines = 2;
-    Fpg->lInfoFPG.w = 47;
-    Fpg->lInfoFPG.h = 26;
+    Fpg->list_info.columns = 3;
+    Fpg->list_info.lines = 2;
+    Fpg->list_info.w = 47;
+    Fpg->list_info.h = 26;
   } else {
-    Fpg->lInfoFPG.columns = 1;
-    Fpg->lInfoFPG.lines = 6;
-    Fpg->lInfoFPG.w = 143;
-    Fpg->lInfoFPG.h = 8;
+    Fpg->list_info.columns = 1;
+    Fpg->list_info.lines = 6;
+    Fpg->list_info.w = 143;
+    Fpg->list_info.h = 8;
   }
 
-  Fpg->lInfoFPG.x = 3;
-  Fpg->lInfoFPG.y = 11;
-  Fpg->lInfoFPG.list = (char *)Fpg->CodDes;
-  Fpg->lInfoFPG.total_items = Fpg->nIndex;
-  Fpg->lInfoFPG.item_width = 38 + 2;
+  Fpg->list_info.x = 3;
+  Fpg->list_info.y = 11;
+  Fpg->list_info.list = (char *)Fpg->code_desc;
+  Fpg->list_info.total_items = Fpg->nIndex;
+  Fpg->list_info.item_width = 38 + 2;
 }
 
 int fpg_open(FPG *Fpg, char *Name) {
@@ -121,45 +121,45 @@ int fpg_open(FPG *Fpg, char *Name) {
   printf("FPG version: %d\n", Fpg->version);
 #endif
   for (x = 0; x < 1000; x++) {
-    Fpg->OffsGrf[x] = 0;
-    Fpg->DesIndex[x] = 0;
+    Fpg->grf_offsets[x] = 0;
+    Fpg->desc_index[x] = 0;
   }
 
   Fpg->nIndex = 0;
-  div_strcpy((char *)Fpg->ActualFile, sizeof(Fpg->ActualFile), Name);
+  div_strcpy((char *)Fpg->current_file, sizeof(Fpg->current_file), Name);
   fread(newdac, 768, 1, fpg);
   memcpy(dac4, newdac, 768);
   new_dac_loaded = 1;
   fread((byte *)gradients, 1, sizeof(gradients), fpg);
 
   while (fpg_read_header(&kkhead, fpg)) {
-    Fpg->OffsGrf[kkhead.COD] = ftell(fpg) - FPG_HEAD;
-    Fpg->DesIndex[Fpg->nIndex] = kkhead.COD;
-    div_snprintf((char *)Fpg->CodDes[Fpg->nIndex++], sizeof(Fpg->CodDes[0]), "%c %03d %s", 255,
-                 kkhead.COD, kkhead.Descrip);
-    fseek(fpg, Fpg->OffsGrf[kkhead.COD] + kkhead.LONG, SEEK_SET);
+    Fpg->grf_offsets[kkhead.code] = ftell(fpg) - FPG_HEAD;
+    Fpg->desc_index[Fpg->nIndex] = kkhead.code;
+    div_snprintf((char *)Fpg->code_desc[Fpg->nIndex++], sizeof(Fpg->code_desc[0]), "%c %03d %s", 255,
+                 kkhead.code, kkhead.description);
+    fseek(fpg, Fpg->grf_offsets[kkhead.code] + kkhead.length, SEEK_SET);
   }
 
   fpg_sort(Fpg);
   fclose(fpg);
 
   if (Fpg->thumb_on) {
-    Fpg->lInfoFPG.columns = 3;
-    Fpg->lInfoFPG.lines = 2;
-    Fpg->lInfoFPG.w = 47;
-    Fpg->lInfoFPG.h = 26;
+    Fpg->list_info.columns = 3;
+    Fpg->list_info.lines = 2;
+    Fpg->list_info.w = 47;
+    Fpg->list_info.h = 26;
   } else {
-    Fpg->lInfoFPG.columns = 1;
-    Fpg->lInfoFPG.lines = 6;
-    Fpg->lInfoFPG.w = 143;
-    Fpg->lInfoFPG.h = 8;
+    Fpg->list_info.columns = 1;
+    Fpg->list_info.lines = 6;
+    Fpg->list_info.w = 143;
+    Fpg->list_info.h = 8;
   }
 
-  Fpg->lInfoFPG.x = 3;
-  Fpg->lInfoFPG.y = 11;
-  Fpg->lInfoFPG.list = (char *)Fpg->CodDes;
-  Fpg->lInfoFPG.total_items = Fpg->nIndex;
-  Fpg->lInfoFPG.item_width = 38 + 2;
+  Fpg->list_info.x = 3;
+  Fpg->list_info.y = 11;
+  Fpg->list_info.list = (char *)Fpg->code_desc;
+  Fpg->list_info.total_items = Fpg->nIndex;
+  Fpg->list_info.item_width = 38 + 2;
 
   return 1;
 }
@@ -169,43 +169,43 @@ void fpg_sort(FPG *Fpg) {
   char cWork[38];
   for (i = 0; i < Fpg->nIndex; i++) {
     for (j = 0; j < Fpg->nIndex - 1; j++) {
-      if (Fpg->DesIndex[j] > Fpg->DesIndex[j + 1]) {
-        iWork = Fpg->DesIndex[j];
-        Fpg->DesIndex[j] = Fpg->DesIndex[j + 1];
-        Fpg->DesIndex[j + 1] = iWork;
+      if (Fpg->desc_index[j] > Fpg->desc_index[j + 1]) {
+        iWork = Fpg->desc_index[j];
+        Fpg->desc_index[j] = Fpg->desc_index[j + 1];
+        Fpg->desc_index[j + 1] = iWork;
 
-        div_strcpy(cWork, sizeof(cWork), (char *)Fpg->CodDes[j]);
-        div_strcpy((char *)Fpg->CodDes[j], sizeof(Fpg->CodDes[j]), (char *)Fpg->CodDes[j + 1]);
-        div_strcpy((char *)Fpg->CodDes[j + 1], sizeof(Fpg->CodDes[j + 1]), cWork);
+        div_strcpy(cWork, sizeof(cWork), (char *)Fpg->code_desc[j]);
+        div_strcpy((char *)Fpg->code_desc[j], sizeof(Fpg->code_desc[j]), (char *)Fpg->code_desc[j + 1]);
+        div_strcpy((char *)Fpg->code_desc[j + 1], sizeof(Fpg->code_desc[j + 1]), cWork);
       }
     }
   }
 }
 
 int fpg_read_header(HeadFPG *MiHeadFPG, FILE *fpg) {
-  fread(&MiHeadFPG->COD, 1, 4, fpg);
-  fread(&MiHeadFPG->LONG, 1, 4, fpg);
-  memset(MiHeadFPG->Descrip, 0, 33);
-  fread(MiHeadFPG->Descrip, 1, 32, fpg);
+  fread(&MiHeadFPG->code, 1, 4, fpg);
+  fread(&MiHeadFPG->length, 1, 4, fpg);
+  memset(MiHeadFPG->description, 0, 33);
+  fread(MiHeadFPG->description, 1, 32, fpg);
   fread(MiHeadFPG->Filename, 1, 12, fpg);
-  fread(&MiHeadFPG->Ancho, 1, 4, fpg);
-  fread(&MiHeadFPG->Alto, 1, 4, fpg);
+  fread(&MiHeadFPG->width, 1, 4, fpg);
+  fread(&MiHeadFPG->height, 1, 4, fpg);
   if (fread(&MiHeadFPG->num_points, 1, 4, fpg) == 4)
     return 1;
   return 0;
 }
 
 void fpg_write_header(HeadFPG *MiHeadFPG, short *points, char *imagen, FILE *fpg) {
-  fwrite(&MiHeadFPG->COD, 1, 4, fpg);
-  fwrite(&MiHeadFPG->LONG, 1, 4, fpg);
-  fwrite(MiHeadFPG->Descrip, 1, 32, fpg);
+  fwrite(&MiHeadFPG->code, 1, 4, fpg);
+  fwrite(&MiHeadFPG->length, 1, 4, fpg);
+  fwrite(MiHeadFPG->description, 1, 32, fpg);
   fwrite(MiHeadFPG->Filename, 1, 12, fpg);
-  fwrite(&MiHeadFPG->Ancho, 1, 4, fpg);
-  fwrite(&MiHeadFPG->Alto, 1, 4, fpg);
+  fwrite(&MiHeadFPG->width, 1, 4, fpg);
+  fwrite(&MiHeadFPG->height, 1, 4, fpg);
   fwrite(&MiHeadFPG->num_points, 1, 4, fpg);
   if (MiHeadFPG->num_points != 0)
     fwrite(points, MiHeadFPG->num_points * 4, 1, fpg);
-  fwrite(imagen, MiHeadFPG->Ancho * MiHeadFPG->Alto, 1, fpg);
+  fwrite(imagen, MiHeadFPG->width * MiHeadFPG->height, 1, fpg);
 }
 
 int fpg_add(FPG *Fpg, int COD, char *desc, char *filename, int Ancho, int Alto, int num_points,
@@ -235,7 +235,7 @@ int fpg_add(FPG *Fpg, int COD, char *desc, char *filename, int Ancho, int Alto, 
     else
       ret_value = 1;
     COD = atoi(code_str);
-    Fpg->LastUsed = COD;
+    Fpg->last_used = COD;
     div_snprintf(code_str, sizeof(code_str), "%d", COD);
 
     //**********************************************!!!!!!!!!!!!!!!!!!!!!!!
@@ -249,10 +249,10 @@ int fpg_add(FPG *Fpg, int COD, char *desc, char *filename, int Ancho, int Alto, 
   if (delete_old)
     fpg_delete(Fpg, OLDCOD); // Delete the old one
 
-  if (Fpg->OffsGrf[COD] != 0)
+  if (Fpg->grf_offsets[COD] != 0)
     fpg_delete(Fpg, COD); // If overwriting an existing one
 
-  if ((fpg = fopen((char *)Fpg->ActualFile, "ab")) == NULL) {
+  if ((fpg = fopen((char *)Fpg->current_file, "ab")) == NULL) {
     v_text = (char *)texts[43];
     show_dialog(err0);
     return 0;
@@ -262,7 +262,7 @@ int fpg_add(FPG *Fpg, int COD, char *desc, char *filename, int Ancho, int Alto, 
 
   n = 0;
   while (1) {
-    if (Fpg->DesIndex[n] > COD || Fpg->DesIndex[n] == 0)
+    if (Fpg->desc_index[n] > COD || Fpg->desc_index[n] == 0)
       break;
     n++;
   }
@@ -273,7 +273,7 @@ int fpg_add(FPG *Fpg, int COD, char *desc, char *filename, int Ancho, int Alto, 
   Fpg->thumb[n].status = 0;
 
   fseek(fpg, 0, SEEK_END);
-  Fpg->OffsGrf[COD] = ftell(fpg);
+  Fpg->grf_offsets[COD] = ftell(fpg);
   LONG = FPG_HEAD + (num_points * 4) + Ancho * Alto;
   fwrite(&COD, 1, 4, fpg);
   fwrite(&LONG, 1, 4, fpg);
@@ -288,7 +288,7 @@ int fpg_add(FPG *Fpg, int COD, char *desc, char *filename, int Ancho, int Alto, 
   fclose(fpg);
 
   // Re-read file information
-  if (!fpg_open(Fpg, (char *)Fpg->ActualFile)) {
+  if (!fpg_open(Fpg, (char *)Fpg->current_file)) {
     v_text = (char *)texts[43];
     show_dialog(err0);
     return 0;
@@ -296,20 +296,20 @@ int fpg_add(FPG *Fpg, int COD, char *desc, char *filename, int Ancho, int Alto, 
 
   //*******************************************************
 
-  while (Fpg->lInfoFPG.first_visible + (Fpg->lInfoFPG.lines - 1) * Fpg->lInfoFPG.columns + 1 >
-         Fpg->lInfoFPG.total_items) {
-    Fpg->lInfoFPG.first_visible -= Fpg->lInfoFPG.columns;
+  while (Fpg->list_info.first_visible + (Fpg->list_info.lines - 1) * Fpg->list_info.columns + 1 >
+         Fpg->list_info.total_items) {
+    Fpg->list_info.first_visible -= Fpg->list_info.columns;
   }
 
-  if (Fpg->lInfoFPG.first_visible < 0)
-    Fpg->lInfoFPG.first_visible = 0;
+  if (Fpg->list_info.first_visible < 0)
+    Fpg->list_info.first_visible = 0;
 
   wmouse_x = -1;
   wmouse_y = -1;
-  FPG_update_listbox_br(&Fpg->lInfoFPG);
+  FPG_update_listbox_br(&Fpg->list_info);
   call(v.paint_handler);
 
-  //        paint_listbox(&Fpg->lInfoFPG);
+  //        paint_listbox(&Fpg->list_info);
 
   //*******************************************************
   v.redraw = 1;
@@ -331,7 +331,7 @@ int fpg_remap_to_pal(FPG *Fpg) {
   byte color_lut[256];
 
   // Temporary file name
-  div_strcpy(ActualPath, sizeof(ActualPath), (char *)Fpg->ActualFile);
+  div_strcpy(ActualPath, sizeof(ActualPath), (char *)Fpg->current_file);
   for (x = strlen(ActualPath); x >= 0; x--)
     if (IS_PATH_SEP(ActualPath[x]))
       x = -1;
@@ -340,7 +340,7 @@ int fpg_remap_to_pal(FPG *Fpg) {
   div_strcat(ActualPath, sizeof(ActualPath), "_DIV_.FPG");
   delete_file(ActualPath);
 
-  if ((fpg = fopen((char *)Fpg->ActualFile, "rb")) == NULL)
+  if ((fpg = fopen((char *)Fpg->current_file, "rb")) == NULL)
     return 0;
   if ((Oldfpg = fopen((char *)ActualPath, "wb")) == NULL) {
     fclose(fpg);
@@ -358,7 +358,7 @@ int fpg_remap_to_pal(FPG *Fpg) {
   fread(CopiaReglas, 1, sizeof(CopiaReglas), fpg);
   fwrite(CopiaReglas, sizeof(CopiaReglas), 1, Oldfpg);
   while (fpg_read_header(&other_header, fpg)) {
-    other_image = (char *)malloc(other_header.Ancho * other_header.Alto);
+    other_image = (char *)malloc(other_header.width * other_header.height);
     if (other_image == NULL) {
       fclose(fpg);
       fclose(Oldfpg);
@@ -379,8 +379,8 @@ int fpg_remap_to_pal(FPG *Fpg) {
       }
       fread(other_points, other_header.num_points * 2, 2, fpg);
     }
-    fread(other_image, other_header.Ancho * other_header.Alto, 1, fpg);
-    for (y = 0; y < other_header.Ancho * other_header.Alto; y++)
+    fread(other_image, other_header.width * other_header.height, 1, fpg);
+    for (y = 0; y < other_header.width * other_header.height; y++)
       other_image[y] = color_lut[other_image[y]];
 
     fpg_write_header(&other_header, other_points, other_image, Oldfpg);
@@ -391,9 +391,9 @@ int fpg_remap_to_pal(FPG *Fpg) {
   }
   fclose(Oldfpg);
   fclose(fpg);
-  delete_file((char *)Fpg->ActualFile);
-  rename(ActualPath, (char *)Fpg->ActualFile);
-  if (!fpg_open(Fpg, (char *)Fpg->ActualFile))
+  delete_file((char *)Fpg->current_file);
+  rename(ActualPath, (char *)Fpg->current_file);
+  if (!fpg_open(Fpg, (char *)Fpg->current_file))
     return 0;
   new_dac_loaded = 0;
   return 1;
@@ -417,7 +417,7 @@ void fpg_save(int n) {
     div_strcat(full, sizeof(full), "/");
   div_strcat(full, sizeof(full), input);
 
-  FileOrg = fopen((char *)Fpg->ActualFile, "rb");
+  FileOrg = fopen((char *)Fpg->current_file, "rb");
   if (FileOrg == NULL) {
     free(Buffer);
     return;
@@ -446,8 +446,8 @@ void fpg_save(int n) {
 
   close_fpg(full);
 
-  div_strcpy((char *)Fpg->ActualFile, sizeof(Fpg->ActualFile), full);
-  div_strcpy((char *)Fpg->NombreFpg, sizeof(Fpg->NombreFpg), input);
+  div_strcpy((char *)Fpg->current_file, sizeof(Fpg->current_file), full);
+  div_strcpy((char *)Fpg->fpg_name, sizeof(Fpg->fpg_name), input);
 
   wgra(window[n].ptr, w, h, c_b_low, 2, 2, w - 20, 7);
   if (text_len(window[n].title) + 3 > w - 20) {
@@ -480,7 +480,7 @@ int fpg_delete(FPG *Fpg,
   debugprintf("Deleting map %d\n", COD);
 
   // Temporary file name
-  div_strcpy(ActualPath, sizeof(ActualPath), (char *)Fpg->ActualFile);
+  div_strcpy(ActualPath, sizeof(ActualPath), (char *)Fpg->current_file);
   for (x = strlen(ActualPath); x >= 0; x--)
     if (IS_PATH_SEP(ActualPath[x]))
       x = -1;
@@ -489,7 +489,7 @@ int fpg_delete(FPG *Fpg,
   div_strcat(ActualPath, sizeof(ActualPath), "_DIV_.FPG");
   delete_file(ActualPath);
 
-  if ((fpg = fopen((char *)Fpg->ActualFile, "rb")) == NULL)
+  if ((fpg = fopen((char *)Fpg->current_file, "rb")) == NULL)
     return 0;
   if ((Oldfpg = fopen(ActualPath, "wb")) == NULL) {
     fclose(fpg);
@@ -498,7 +498,7 @@ int fpg_delete(FPG *Fpg,
 
   n = 0;
   while (1) {
-    if (Fpg->DesIndex[n] == COD || Fpg->DesIndex[n] == 0)
+    if (Fpg->desc_index[n] == COD || Fpg->desc_index[n] == 0)
       break;
     n++;
   }
@@ -525,7 +525,7 @@ int fpg_delete(FPG *Fpg,
   while (fpg_read_header(&other_header, fpg)) {
     show_progress((char *)texts[436], ftell(fpg), len);
 
-    other_image = (char *)malloc(other_header.Ancho * other_header.Alto);
+    other_image = (char *)malloc(other_header.width * other_header.height);
     if (other_image == NULL) {
       show_progress((char *)texts[436], len, len);
       fclose(fpg);
@@ -548,11 +548,11 @@ int fpg_delete(FPG *Fpg,
       }
       fread(other_points, other_header.num_points * 2, 2, fpg);
     }
-    fread(other_image, other_header.Ancho * other_header.Alto, 1, fpg);
+    fread(other_image, other_header.width * other_header.height, 1, fpg);
 
     // *************************
 
-    if (other_header.COD != COD) {
+    if (other_header.code != COD) {
       fpg_write_header(&other_header, other_points, other_image, Oldfpg);
     }
 
@@ -568,14 +568,14 @@ int fpg_delete(FPG *Fpg,
 
   show_progress((char *)texts[436], len, len);
 
-  delete_file((char *)Fpg->ActualFile);
+  delete_file((char *)Fpg->current_file);
 
-  debugprintf("MOVE %s to %s\n", ActualPath, (char *)Fpg->ActualFile);
+  debugprintf("MOVE %s to %s\n", ActualPath, (char *)Fpg->current_file);
 
 
-  rename(ActualPath, (char *)Fpg->ActualFile);
+  rename(ActualPath, (char *)Fpg->current_file);
 
-  if (!fpg_open(Fpg, (char *)Fpg->ActualFile)) {
+  if (!fpg_open(Fpg, (char *)Fpg->current_file)) {
     return 0;
   }
   return 1;
@@ -592,7 +592,7 @@ int fpg_delete_many(FPG *Fpg, int taggeds, int *array_del) {
   FILE *fpg;
   FILE *Oldfpg;
 
-  div_strcpy(ActualPath, sizeof(ActualPath), (char *)Fpg->ActualFile); // Temporary file name
+  div_strcpy(ActualPath, sizeof(ActualPath), (char *)Fpg->current_file); // Temporary file name
   for (x = strlen(ActualPath); x >= 0; x--)
     if (IS_PATH_SEP(ActualPath[x]))
       x = -1;
@@ -601,7 +601,7 @@ int fpg_delete_many(FPG *Fpg, int taggeds, int *array_del) {
   div_strcat(ActualPath, sizeof(ActualPath), "_DIV_.FPG");
   delete_file(ActualPath);
 
-  if ((fpg = fopen((char *)Fpg->ActualFile, "rb")) == NULL)
+  if ((fpg = fopen((char *)Fpg->current_file, "rb")) == NULL)
     return 0;
   if ((Oldfpg = fopen(ActualPath, "wb")) == NULL) {
     fclose(fpg);
@@ -624,7 +624,7 @@ int fpg_delete_many(FPG *Fpg, int taggeds, int *array_del) {
   while (fpg_read_header(&other_header, fpg)) {
     show_progress((char *)texts[436], ftell(fpg), len);
 
-    other_image = (char *)malloc(other_header.Ancho * other_header.Alto);
+    other_image = (char *)malloc(other_header.width * other_header.height);
 
     if (other_image == NULL) {
       show_progress((char *)texts[436], len, len);
@@ -649,12 +649,12 @@ int fpg_delete_many(FPG *Fpg, int taggeds, int *array_del) {
       fread(other_points, other_header.num_points * 2, 2, fpg);
     }
 
-    fread(other_image, other_header.Ancho * other_header.Alto, 1, fpg);
+    fread(other_image, other_header.width * other_header.height, 1, fpg);
 
     // *************************
 
     for (y = 0; y < taggeds; y++) {
-      if (array_del[y] == other_header.COD)
+      if (array_del[y] == other_header.code)
         break;
     }
 
@@ -663,7 +663,7 @@ int fpg_delete_many(FPG *Fpg, int taggeds, int *array_del) {
     } else {
       n = 0;
       while (1) {
-        if (Fpg->DesIndex[n] == other_header.COD || Fpg->DesIndex[n] == 0)
+        if (Fpg->desc_index[n] == other_header.code || Fpg->desc_index[n] == 0)
           break;
         n++;
       }
@@ -672,7 +672,7 @@ int fpg_delete_many(FPG *Fpg, int taggeds, int *array_del) {
         free(Fpg->thumb[n].ptr);
       memmove(&(Fpg->thumb[n]), &(Fpg->thumb[n + 1]), sizeof(t_thumb) * (999 - n));
 
-      memmove(&(Fpg->DesIndex[n]), &(Fpg->DesIndex[n + 1]), sizeof(int) * (999 - n));
+      memmove(&(Fpg->desc_index[n]), &(Fpg->desc_index[n + 1]), sizeof(int) * (999 - n));
     }
 
     // *************************
@@ -688,10 +688,10 @@ int fpg_delete_many(FPG *Fpg, int taggeds, int *array_del) {
 
   show_progress((char *)texts[436], len, len);
 
-  delete_file((char *)Fpg->ActualFile);
-  rename(ActualPath, (char *)Fpg->ActualFile);
+  delete_file((char *)Fpg->current_file);
+  rename(ActualPath, (char *)Fpg->current_file);
 
-  if (!fpg_open(Fpg, (char *)Fpg->ActualFile))
+  if (!fpg_open(Fpg, (char *)Fpg->current_file))
     return 0;
   return 1;
 }

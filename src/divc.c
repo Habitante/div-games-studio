@@ -2066,7 +2066,7 @@ lex_scan:
 //      Lexer (reads a new token from *source)
 //-----------------------------------------------------------------------------
 
-int is_wav(char *FileName);
+int is_wav(char *filename);
 int en_fopen = 0;
 
 /* Lexer: reads the next token from the source buffer.

@@ -1026,7 +1026,7 @@ void menu_graficos2(void) {
               div_strcat(full, sizeof(full), "/");
             div_strcat(full, sizeof(full), input);
 
-            if (!strcmp(full, (char *)Fpg->ActualFile)) {
+            if (!strcmp(full, (char *)Fpg->current_file)) {
               v_text = (char *)texts[418];
               show_dialog(err0);
               v_accept = 0;
@@ -1555,7 +1555,7 @@ no_tiene_nombre_sonido:
 
         //          judas_stopsample(0);
 
-        show_dialog(EditSound0);
+        show_dialog(edit_sound0);
         move(0, n);
         call((void_return_type_t)v.paint_handler);
         v.redraw = 1;
@@ -2021,7 +2021,7 @@ extern struct _thumb_map {
 
 void M3D_create_thumbs(struct t_listboxbr *l, int prog);
 int create_mapbr_thumbs(struct t_listboxbr *l);
-void FreePaintThumbs(void);
+void free_paint_thumbs(void);
 
 extern byte *texture_color;
 
@@ -2239,7 +2239,7 @@ void map_view2(void) {
     exploding_windows = ew;
     if (texture_type & BRUSH)
       fclose(file_paint_fpg);
-    FreePaintThumbs();
+    free_paint_thumbs();
     texture_type = 0;
     browser_type = 0;
 
@@ -3485,7 +3485,7 @@ void open_map(void) {
                   // NOTE: fmt_load_map/PCX/BMP return void, so errors cannot be checked here.
                   // Only fmt_load_jpg returns a status (already handled above).
 
-                  ExternUseBufferMap = (char *)v_map->map;
+                  extern_use_buffer_map = (char *)v_map->map;
 
                   x = 0;
                   sum = 0;
@@ -3511,7 +3511,7 @@ void open_map(void) {
 
                   div_strcpy(v_map->filename, sizeof(v_map->filename), input);
                   div_strcpy(v_map->path, sizeof(v_map->path), tipo[v_type].path);
-                  memcpy(v_map->description, MapDescription, 32);
+                  memcpy(v_map->description, map_description, 32);
                   v_map->has_name = 0;
                   v_map->fpg_code = fpg_code;
                   if (fpg_code)

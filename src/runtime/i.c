@@ -2218,18 +2218,18 @@ void find_packfile(void) {
 //  Dumps information to a file
 //////////////////////////////////////////////////////////////////////////////
 
-void DebugInfo(char *Msg) {
+void debug_info(char *msg) {
   FILE *f;
   if ((f = fopen("DEBUGSRC.TXT", "a")) != NULL) {
-    fprintf(f, "%s\n", Msg);
+    fprintf(f, "%s\n", msg);
     fclose(f);
   }
 }
 
-void DebugData(int Val) {
+void debug_data(int val) {
   FILE *f;
   if ((f = fopen("DEBUGSRC.TXT", "a")) != NULL) {
-    fprintf(f, "%d\n", Val);
+    fprintf(f, "%d\n", val);
     fclose(f);
   }
 }

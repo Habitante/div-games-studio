@@ -12,7 +12,7 @@ void FPG_update_listbox_br(struct t_listboxbr *l);
 
 
 // Trash pain handerl
-void Bin1(void) {
+void bin1(void) {
   int w = v.w, h = v.h;
   byte *ptr = v.ptr;
   if (big) {
@@ -52,21 +52,21 @@ void Bin2(void) {
         fpg_delete(MiMemoFPG, window[1].mapa->fpg_code);
         v = window[1];
 
-        //if (MiMemoFPG->lInfoFPG.first_visible+MiMemoFPG->lInfoFPG.lines*MiMemoFPG->lInfoFPG.columns>MiMemoFPG->lInfoFPG.total_items
-        //    && MiMemoFPG->lInfoFPG.first_visible) MiMemoFPG->lInfoFPG.first_visible--;
+        //if (MiMemoFPG->list_info.first_visible+MiMemoFPG->list_info.lines*MiMemoFPG->list_info.columns>MiMemoFPG->list_info.total_items
+        //    && MiMemoFPG->list_info.first_visible) MiMemoFPG->list_info.first_visible--;
 
-        while (MiMemoFPG->lInfoFPG.first_visible +
-                   (MiMemoFPG->lInfoFPG.lines - 1) * MiMemoFPG->lInfoFPG.columns + 1 >
-               MiMemoFPG->lInfoFPG.total_items) {
-          MiMemoFPG->lInfoFPG.first_visible -= MiMemoFPG->lInfoFPG.columns;
+        while (MiMemoFPG->list_info.first_visible +
+                   (MiMemoFPG->list_info.lines - 1) * MiMemoFPG->list_info.columns + 1 >
+               MiMemoFPG->list_info.total_items) {
+          MiMemoFPG->list_info.first_visible -= MiMemoFPG->list_info.columns;
         }
 
-        if (MiMemoFPG->lInfoFPG.first_visible < 0)
-          MiMemoFPG->lInfoFPG.first_visible = 0;
+        if (MiMemoFPG->list_info.first_visible < 0)
+          MiMemoFPG->list_info.first_visible = 0;
 
-        // FPG_paint_listbox_br(&MiMemoFPG->lInfoFPG);
+        // FPG_paint_listbox_br(&MiMemoFPG->list_info);
 
-        FPG_update_listbox_br(&MiMemoFPG->lInfoFPG);
+        FPG_update_listbox_br(&MiMemoFPG->list_info);
 
         v.redraw = 1;
         v = my_window;
@@ -79,16 +79,16 @@ void Bin2(void) {
 
 // setup bin
 
-void Bin0(void) {
+void bin0(void) {
   v.type = 5;
   v.w = 27;
   v.h = 34;
-  v.paint_handler = Bin1;
+  v.paint_handler = bin1;
   v.click_handler = Bin2;
   v.title = (byte *)"";
   v.name = texts[350];
 }
 
 void show_trash() {
-  new_window(Bin0);
+  new_window(bin0);
 }

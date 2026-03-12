@@ -6421,7 +6421,7 @@ struct _thumb_map {            // Brush map thumbnails
 
 void mapper_browse_fpg0(void);
 
-void FreePaintThumbs(void) {
+void free_paint_thumbs(void) {
   int n;
 
   for (n = 0; n < max_texturas; n++) {

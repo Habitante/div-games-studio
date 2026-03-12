@@ -1450,7 +1450,7 @@ int copy_file(FILE *file_in, FILE *fout, unsigned long len, int patch) {
 // Copy the installation destination disk
 //-----------------------------------------------------------------------------
 
-unsigned int GetFreeUnid(char unidad) {
+unsigned int get_free_drive(char unidad) {
   return 65535 * 64;
 }
 
@@ -1495,7 +1495,7 @@ int file_copy_ice(char *org, char *dest, int vols, int _texto) { // Returns 0 -E
 
       NewVolume = 0;
 
-      totfree = GetFreeUnid((dest[0] - 'A') + 1);
+      totfree = get_free_drive((dest[0] - 'A') + 1);
 
       if (totfree <= 1024) { // Disk Full
         if (vols) {

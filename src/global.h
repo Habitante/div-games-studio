@@ -398,18 +398,18 @@ void finalize_texts(void);
 
 void muestra_cd_player();
 void show_clock();
-void CDiv0(void);
-void CDiv1(void);
-void Clock0(void);
-void Clock1(void);
-void Bin0(void);
-void Bin1(void);
+void cdiv0(void);
+void cdiv1(void);
+void clock0(void);
+void clock1(void);
+void bin0(void);
+void bin1(void);
 void fpg_dialog0_add(void);
 void fpg_dialog1(void);
-void PRJ0();
-void PRJ1();
-void PRJ2();
-void PRJ3();
+void prj0();
+void prj1();
+void prj2();
+void prj3();
 void show_font0(void);
 void show_font1(void);
 
@@ -478,14 +478,14 @@ void err3(void);
 void info0(void);
 void browser0(void);
 void browser2(void);
-void MapperWarning0(void);
-void MapperWarning1(void);
-void MapperWarning2(void);
+void mapper_warning0(void);
+void mapper_warning1(void);
+void mapper_warning2(void);
 // MapperVisor declarations removed (MODE8/3D map editor deleted)
 
 int new_map(byte *pre_buffer);
 void nuevo_mapa3D(void);
-void RenderToMed();
+void render_to_med();
 void reduce_half();
 int show_progress(char *title, int current, int total);
 
@@ -551,7 +551,7 @@ GLOBAL_DATA int vga_width, vga_height; // Video mode (id vga_width*1000+vga_heig
 GLOBAL_DATA int vwidth, vheight;       // Window Screen Size
 
 GLOBAL_DATA int fpg_code;            // Map code
-GLOBAL_DATA char MapDescription[32]; // Map description
+GLOBAL_DATA char map_description[32]; // Map description
 
 GLOBAL_DATA byte *wallpaper;     // Background graphic for the window main_loop
 GLOBAL_DATA byte *wallpaper_map; // Start of bitmap data (wallpaper_width,wallpaper_height)
@@ -988,13 +988,13 @@ typedef struct _modinfo {
 #endif
 } modinfo;
 
-GLOBAL_DATA char *ExternUseBufferMap;
-void PCM0(void);
-void PCM1(void);
-void PCM2(void);
-void EditSound0(void);
-void EditSound1(void);
-void EditSound2(void);
+GLOBAL_DATA char *extern_use_buffer_map;
+void pcm0(void);
+void pcm1(void);
+void pcm2(void);
+void edit_sound0(void);
+void edit_sound1(void);
+void edit_sound2(void);
 extern char sound_name[255];
 extern char sound_path_name[256];
 extern char song_name[255];
@@ -1141,8 +1141,8 @@ GLOBAL_DATA int cpu_type; // 3 (386) or 5 (Pentium)
 //  Dumps debug information to a file
 //////////////////////////////////////////////////////////////////////////////
 
-void DebugInfo(char *Msg);
-void DebugData(int Val);
+void debug_info(char *msg);
+void debug_data(int val);
 
 //////////////////////////////////////////////////////////////////////////////
 

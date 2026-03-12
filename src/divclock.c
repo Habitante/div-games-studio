@@ -73,7 +73,7 @@ static void Show_Time(void) {
   v.redraw = 1;
 }
 
-void Clock1(void) {
+void clock1(void) {
   byte *ptr = v.ptr;
   int w = v.w, h = v.h;
   if (big) {
@@ -94,7 +94,7 @@ void Clock2(void) {
 
 void Clock3(void) {}
 
-void Clock0(void) {
+void clock0(void) {
   v.type = 4;
   v.w = 47;
   v.h = 30;
@@ -104,7 +104,7 @@ void Clock0(void) {
   DIV_SPRINTF(cTimeForIcon, "%s [%02d%c%02d]", texts[151], timeinfo->tm_hour,
               timeinfo->tm_sec % 2 ? ';' : ' ', timeinfo->tm_min);
   v.name = (byte *)cTimeForIcon;
-  v.paint_handler = Clock1;
+  v.paint_handler = clock1;
   v.click_handler = Clock2;
   v.close_handler = Clock3;
   ORDig1 = -1;
@@ -114,5 +114,5 @@ void Clock0(void) {
 }
 
 void show_clock(void) {
-  new_window(Clock0);
+  new_window(clock0);
 }

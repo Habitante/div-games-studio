@@ -127,7 +127,7 @@ extern int SongType;
 extern int song_code;
 extern int last_mod_clean;
 void free_mod(void);
-int is_wav(char *FileName);
+int is_wav(char *filename);
 int mem_get_heap_free(void);
 
 ifs_table_entry tifs[256];

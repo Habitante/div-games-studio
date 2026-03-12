@@ -28,7 +28,7 @@
 #include "sysdac.h"
 
 void heap_dump(void);
-void DebugFile(char *Cadena, char *Nombre);
+void debug_file(char *cadena, char *nombre);
 void save_prg_buffer(memptrsize);
 
 void maximize(void);
@@ -4289,25 +4289,25 @@ char MemoriaLibre[100];
 
 int MaxMemUsed = 0;
 
-int GetHeapFree(int RetUsed) {
+int get_heap_free(int ret_used) {
   return 0;
 }
 
-char *GetMemoryFree() {
+char *get_memory_free() {
   return "";
 }
 
-void DebugFile(char *Cadena, char *Nombre) {
-  FILE *Debug;
+void debug_file(char *cadena, char *nombre) {
+  FILE *debug;
 
-  Debug = fopen("DEBUG.TXT", "ab");
-  fwrite(Cadena, 1, strlen(Cadena), Debug);
-  fwrite("(", 1, 1, Debug);
-  fwrite(Nombre, 1, strlen(Nombre), Debug);
-  fwrite(") ", 1, 2, Debug);
-  fwrite(GetMemoryFree(), 1, strlen(GetMemoryFree()), Debug);
-  fwrite(")\n", 1, 2, Debug);
-  fclose(Debug);
+  debug = fopen("DEBUG.TXT", "ab");
+  fwrite(cadena, 1, strlen(cadena), debug);
+  fwrite("(", 1, 1, debug);
+  fwrite(nombre, 1, strlen(nombre), debug);
+  fwrite(") ", 1, 2, debug);
+  fwrite(get_memory_free(), 1, strlen(get_memory_free()), debug);
+  fwrite(")\n", 1, 2, debug);
+  fclose(debug);
 }
 
 //-----------------------------------------------------------------------------
@@ -5459,9 +5459,9 @@ void delete_file(char *name) {
 //  Dumps information in a file
 //////////////////////////////////////////////////////////////////////////////
 
-void DebugInfo(char *Msg) {}
+void debug_info(char *msg) {}
 
-void DebugData(int Val) {}
+void debug_data(int val) {}
 
 void GetFree4kBlocks(void) {}
 

@@ -1,10 +1,10 @@
 typedef struct _HeadFPG{
-        int COD;
-        int LONG;
-        uint8_t Descrip[32];
+        int code;
+        int length;
+        uint8_t description[32];
         uint8_t Filename[12];
-        int  Ancho;
-        int  Alto;
+        int  width;
+        int  height;
         int  num_points;
 }HeadFPG;
 
@@ -14,15 +14,15 @@ typedef struct _FPG{
         FILE    *fpg;
         FILE    *Oldfpg;
         HeadFPG MiHeadFPG;
-        uint8_t    ActualFile[_MAX_PATH+14];
+        uint8_t    current_file[_MAX_PATH+14];
         int     nIndex;
-        int     LastUsed;
-        int     DesIndex[1000];
-        uint8_t    CodDes[1000][40];
-        int     OffsGrf[1000];
-        byte    NombreFpg[13];
-        struct  t_listboxbr lInfoFPG;
-        int     FPGInfo;
+        int     last_used;
+        int     desc_index[1000];
+        uint8_t    code_desc[1000][40];
+        int     grf_offsets[1000];
+        byte    fpg_name[13];
+        struct  t_listboxbr list_info;
+        int     fpg_info;
         int     thumb_on;
         t_thumb thumb[1000];
 		byte version;
@@ -31,14 +31,14 @@ typedef struct _FPG{
         void fpg_sort(FPG *Fpg);
         int fpg_read_header(HeadFPG *MiHeadFPG,FILE *fpg);
         void fpg_write_header(HeadFPG *MiHeadFPG,short *points,char *imagen,FILE *fpg);
-        void CreateListBox(FPG *Fpg);
+        void fpg_create_listbox(FPG *Fpg);
 
         void fpg_create(FPG *Fpg,char *Name);
         int fpg_open(FPG *Fpg,char *Name);
         int fpg_add(FPG *Fpg,int COD,char *desc,char *filename,int Ancho,int Alto,int num_points,char *points,char *Imagen,int delete_old, int get_info);
         int fpg_delete(FPG *Fpg,int COD);
         void fpg_read_image_header(HeadFPG *MiHeadFPG,FILE *fpg);
-        int RemapAllFile(FPG *Fpg);
+        int remap_all_file(FPG *Fpg);
         int fpg_remap_to_pal(FPG *Fpg);
 
         void FPG_create_thumbs         (void);

@@ -1063,8 +1063,8 @@ void detect_vesa(void);
 //  Dump information to a file
 //----------------------------------------------------------------------------
 
-void DebugInfo(char *Msg);
-void DebugData(int Val);
+void debug_info(char *msg);
+void debug_data(int val);
 
 //----------------------------------------------------------------------------
 

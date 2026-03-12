@@ -120,7 +120,7 @@ void download_desktop() {
       case 3: //palet
         break;
       case 4: //timer
-        if (window[x].paint_handler == Clock1)
+        if (window[x].paint_handler == clock1)
           iWork = 1;
         n = fwrite(&iWork, 1, 4, desktop);
         break;
@@ -302,14 +302,14 @@ int upload_desktop() {
         break; // removed: CD player
         break;
       case 1: //Clock
-        create_saved_window(Clock0, window_aux.x, window_aux.y);
+        create_saved_window(clock0, window_aux.x, window_aux.y);
         break;
       }
       if (!interpreting)
         update_box(0, 0, vga_width, vga_height);
       break;
     case 5: //recycle bin
-      create_saved_window(Bin0, window_aux.x, window_aux.y);
+      create_saved_window(bin0, window_aux.x, window_aux.y);
       if (!interpreting)
         update_box(0, 0, vga_width, vga_height);
       break;
@@ -359,8 +359,8 @@ int upload_desktop() {
     case 101: //fpg
       // FPG struct
       fread(&faux, 1, sizeof(FPG), desktop);
-      div_strcpy(input, sizeof(input), (char *)faux.NombreFpg);
-      div_strcpy(full, sizeof(full), (char *)faux.ActualFile);
+      div_strcpy(input, sizeof(input), (char *)faux.fpg_name);
+      div_strcpy(full, sizeof(full), (char *)faux.current_file);
       if ((f = fopen(full, "rb")) != NULL) {
         fclose(f);
         v_aux = (byte *)malloc(sizeof(FPG));
