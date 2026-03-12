@@ -5,7 +5,7 @@
 
 #include "global.h"
 #include "div_string.h"
-#include "newfuncs.h"
+#include "imgload.h"
 
 
 void cfg_show_font(void);

@@ -1,5 +1,5 @@
 #include "inter.h"
-#include "divmixer.hpp"
+#include "mixer.h"
 
 void set_master_volume(UWORD volumen) {}
 

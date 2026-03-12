@@ -52,7 +52,7 @@ void call(const void_return_type_t func); // void funcion(void); int n=(int)func
 #include <math.h>
 #include <signal.h>
 
-#include "divkeybo.h"
+#include "keyboard.h"
 // divmap3d.hpp removed (MODE8/3D map editor deleted)
 
 // JUDAS sound library removed — SDL2_mixer has fully replaced it.
@@ -526,11 +526,6 @@ void find_text(void);
 void replace_text(void);
 void repaint_window(void);
 
-///////////////////////////////////////////////////////////////////////////////
-//      Functions exported by DIVASM (divasm.c)
-///////////////////////////////////////////////////////////////////////////////
-
-void memcpyb(byte *, byte *, int);
 ///////////////////////////////////////////////////////////////////////////////
 //      Functions exported by DIVEFFECT (diveffect.c)
 ///////////////////////////////////////////////////////////////////////////////

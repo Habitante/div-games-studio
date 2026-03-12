@@ -8,7 +8,7 @@ and file format support.
 
 ## 1. IDE Main Loop and Event Dispatch
 
-### Entry Point: `main()` in `src/div.c` (line 389)
+### Entry Point: `main()` in `src/ide/main.c` (line 389)
 
 The `main()` function performs the following startup sequence:
 
@@ -107,7 +107,7 @@ the close button. The dialog is always `window[0]`.
 SDL_PollEvent()
     |
     v
-read_mouse2() [src/divmouse.c:376]
+read_mouse2() [src/ide/mouse.c:376]
     |-- SDL_TEXTINPUT     --> ascii
     |-- SDL_MOUSEWHEEL    --> m_b bits 2,3
     |-- SDL_MOUSEMOTION   --> m_x, m_y
@@ -117,14 +117,14 @@ read_mouse2() [src/divmouse.c:376]
     |-- SDL_WINDOWEVENT   --> resize, focus, enter/leave, close
     |-- SDL_QUIT          --> exit_requested = 1
     v
-read_mouse() [src/divmouse.c:48]
+read_mouse() [src/ide/mouse.c:48]
     |-- Scales m_x/m_y to virtual resolution
     |-- Handles keyboard-as-mouse (OPQA keys in paint mode)
     |-- Handles spacebar-as-click (magic value 0x8001)
     |-- Clamps to vga_width/vga_height bounds
     |-- Updates coord_x/coord_y (map coordinates under cursor)
     v
-poll_keyboard() [src/divkeybo.c:127]
+poll_keyboard() [src/ide/keyboard.c:127]
     |-- Updates mclock and reloj from SDL_GetTicks()
     |-- (The actual event pumping happens via read_mouse2)
 ```
@@ -185,7 +185,7 @@ OSDEP_Flip()
 
 ## 3. Window System
 
-### Window Structure: `struct twindow` in `src/global.h` (line 676)
+### Window Structure: `struct twindow` in `src/global.h`
 
 Each window has:
 - `type` -- Window type: 0=empty, 1=dialog, 2=menu, 3=palette, 4=timer,
@@ -205,7 +205,7 @@ Each window has:
 The front window is always `window[0]`, accessed via the macro `v`.
 When a window gains focus, it is moved to index 0 in the array via `move(0, n)`.
 
-### Window Rendering Primitives: `src/divwindo.c`
+### Window Rendering Primitives: `src/ide/window.c`
 
 All drawing operates on a window's `ptr` buffer (an 8-bit pixel array):
 
@@ -227,7 +227,7 @@ Dialogs are created by:
 4. The handler calls `_button()`, `_get()`, `_flag()` to add UI items
 5. `show_dialog()` runs `dialog_loop()` until `end_dialog=1`
 
-### UI Items: `struct t_item` in `src/global.h` (line 653)
+### UI Items: `struct t_item` in `src/global.h`
 
 Three types:
 - **Button** (`type=1`): Text label with position and centering mode.
@@ -245,7 +245,7 @@ index.
 
 ## 4. Menu System
 
-### Menu Creation: `create_menu()` in `src/divhandl.c`
+### Menu Creation: `create_menu()` in `src/ide/handler.c`
 
 Menus are built from consecutive entries in the `texts[]` array:
 
@@ -281,7 +281,7 @@ Highlights the item under the mouse cursor and executes actions on click.
 The main menu is created by `menu_principal0()`. Each top-level menu
 (Programs, Maps, Graphics, Fonts, Sounds, System, etc.) has its own trio of
 handler functions: `menu_X0()` (create), `menu_X1()` (paint), `menu_X2()`
-(click). These are all in `src/divhandl.c`.
+(click). These are all in `src/ide/handler.c`.
 
 ---
 
@@ -289,7 +289,7 @@ handler functions: `menu_X0()` (create), `menu_X1()` (paint), `menu_X2()`
 
 ### File Format: `system/lenguaje.div`
 
-The localization file is a simple text format parsed by `src/divlengu.c`:
+The localization file is a simple text format parsed by `src/ide/language.c`:
 
 ```
 34 "DIV Games Studio"
@@ -308,7 +308,7 @@ Rules:
 - Text indices auto-increment (consecutive quoted strings get sequential numbers)
 - The file may be encrypted (starts with `"Zk!"` magic, XOR cipher with key `"lave"`)
 
-### Loading: `initialize_texts()` in `src/divlengu.c` (line 29)
+### Loading: `initialize_texts()` in `src/ide/language.c` (line 29)
 
 1. Reads the entire file into memory
 2. Calls `analyze_texts()` which walks the buffer character by character
@@ -334,7 +334,7 @@ Examples:
 
 ### MAP Format (DIV's native bitmap image)
 
-Defined in `src/divforma.c`, starting at line 100.
+Defined in `src/formats/image.c`, starting at line 100.
 
 **Header** (1394+ bytes):
 
@@ -355,7 +355,7 @@ Detection: `es_MAP()` checks for `"map\x1a\x0d\x0a"` magic.
 
 ### PCX Format
 
-Defined in `src/divforma.c`, starting at line 176.
+Defined in `src/formats/image.c`, starting at line 176.
 
 Standard ZSoft PCX format. DIV supports:
 - 8-bit, 1-plane (256-color paletted)
@@ -367,7 +367,7 @@ and color_planes combinations.
 
 ### BMP Format
 
-Defined in `src/divforma.c`. Supports standard Windows BMP with:
+Defined in `src/formats/image.c`. Supports standard Windows BMP with:
 - 1, 4, 8, and 24 bits per pixel
 - BI_RGB (uncompressed) and BI_RLE8 (run-length encoded)
 
@@ -378,7 +378,7 @@ image which is quantized to the current 256-color palette.
 
 ### FPG Format (sprite collection / "Fichero de Paquetes Graficos")
 
-Defined in `src/fpgfile.c` and `src/fpgfile.hpp`.
+Defined in `src/formats/fpg.c` and `src/fpg.h`.
 
 **File structure:**
 
@@ -390,7 +390,7 @@ Defined in `src/fpgfile.c` and `src/fpgfile.hpp`.
 | +776 | 576 | Color rules |
 | +1352 | ... | Graphic entries (repeated) |
 
-**Per-graphic entry** (`HeadFPG` struct, `src/fpgfile.hpp` line 1):
+**Per-graphic entry** (`HeadFPG` struct, `src/fpg.h` line 1):
 
 | Offset | Size | Field |
 |--------|------|-------|
@@ -413,7 +413,7 @@ range) followed by color rules.
 
 ### FNT Format (bitmap font)
 
-Managed in `src/divfont.c`. DIV bitmap fonts store each character glyph as a
+Managed in `src/editor/font.c`. DIV bitmap fonts store each character glyph as a
 small indexed bitmap within an FPG-like container. The font file contains a
 header followed by per-character metrics and pixel data. Character codes map to
 glyph entries.
@@ -422,7 +422,7 @@ glyph entries.
 
 ## 7. Key Data Structures
 
-### `struct tmapa` (`src/global.h` line 710)
+### `struct tmapa` (`src/global.h`)
 
 Represents an open map/image in the editor:
 - `map` -- Pixel buffer (byte pointer)
@@ -433,7 +433,7 @@ Represents an open map/image in the editor:
 - `description[32]` -- Description text
 - `path`, `filename` -- File on disk
 
-### `struct tprg` (`src/global.h` line 724)
+### `struct tprg` (`src/global.h`)
 
 Represents an open program source file in the editor:
 - `buffer` -- Source text buffer
@@ -446,7 +446,7 @@ Represents an open program source file in the editor:
 - `l[1024+4]` -- Current line being edited
 - `font_an`, `font_al` -- Editor font dimensions
 
-### `SetupFile` struct (`src/global.h` line 267)
+### `SetupFile` struct (`src/global.h`)
 
 Saved/loaded from `system/setup.bin`. Contains:
 - Video mode settings

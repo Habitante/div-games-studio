@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "grabador.h"
+#include "recorder.h"
 #include "global.h"
 
 byte *frame_copy;

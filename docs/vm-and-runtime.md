@@ -63,7 +63,7 @@ stack pointer (`_SP` field). The stack grows upward (increasing `sp`).
 
 ## 2. Interpreter Loop
 
-### Entry: `interprete()` in `src/runtime/i.c` (line 713)
+### Entry: `interprete()` in `src/runtime/interpreter.c` (line 713)
 
 ```c
 void interprete(void) {
@@ -133,7 +133,7 @@ calls `core_exec()`.
 void core_exec() {
     do {
         switch ((byte)mem[ip++]) {
-            #include "debug/kernel.cpp"
+            #include "debug/kernel.inc"
         }
     } while (1);
 
@@ -143,10 +143,10 @@ void core_exec() {
 }
 ```
 
-The switch statement is a giant `#include` of `src/runtime/debug/kernel.cpp`,
+The switch statement is a giant `#include` of `src/runtime/debug/kernel.inc`,
 which contains all the `case` handlers. Each case corresponds to an EML opcode.
 
-### Key Opcode Implementations (from `kernel.cpp`)
+### Key Opcode Implementations (from `kernel.inc`)
 
 **Stack operations:**
 ```c
@@ -314,7 +314,7 @@ Processes communicate through:
 
 ## 4. Runtime Services
 
-### Built-in Functions: `src/runtime/f.c`
+### Built-in Functions: `src/runtime/functions.c`
 
 `function()` is called by the `lfun` opcode. It reads `mem[ip-1]` to get the
 function code, then dispatches to the implementation. Functions pop their
@@ -353,7 +353,7 @@ Key functions include:
 Timers are updated every frame in `frame_start()`. They count in centiseconds
 (1/100th of a second), derived from `SDL_GetTicks()`.
 
-### Sound System: `src/shared/run/divsound.c`
+### Sound System: `src/shared/run/sound.c`
 
 The runtime uses SDL2_mixer for audio:
 - Sound effects loaded as `Mix_Chunk*` via `Mix_LoadWAV_RW()`
@@ -362,7 +362,7 @@ The runtime uses SDL2_mixer for audio:
   for playback
 - 32 channels available (`channel(0)` through `channel(31)`)
 
-### Clock: `get_reloj()` in `src/runtime/f.c` (line 70)
+### Clock: `get_reloj()` in `src/runtime/functions.c` (line 70)
 
 ```c
 int get_reloj(void) {
@@ -420,7 +420,7 @@ do {
 This means entities are painted from highest Z to lowest Z (back to front).
 Higher `_Z` values appear behind lower ones.
 
-### Sprite Rendering: `paint_sprite()` in `src/runtime/s.c` (line 869)
+### Sprite Rendering: `paint_sprite()` in `src/runtime/render.c` (line 869)
 
 For each process with a visible graphic:
 
@@ -478,7 +478,7 @@ Mode 7-style floor/ceiling rendering (like SNES):
 - Uses 16.16 fixed-point math for the projection
 - Sprites are scaled based on their distance from the camera
 
-### Video Output: `src/shared/run/v.c`
+### Video Output: `src/shared/run/video.c`
 
 **Runtime rendering path:**
 

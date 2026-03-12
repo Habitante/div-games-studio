@@ -1,7 +1,7 @@
 
 
 #include "global.h"
-#include "fpgfile.hpp"
+#include "fpg.h"
 #include "div_string.h"
 
 void fpg_edit_code_dialog(void);

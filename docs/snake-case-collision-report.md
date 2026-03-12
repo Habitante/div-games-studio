@@ -13,38 +13,38 @@ Generated: 2026-03-11 | Phase 2C-1 | clang-format 20.1.8
 ## Collisions: Runtime wrapper vs. implementation
 
 All 18 collisions are between:
-- **Runtime API wrappers** in `runtime/f.c` (already snake_case: `load_song`, `stop_sound`, etc.)
+- **Runtime API wrappers** in `runtime/functions.c` (already snake_case: `load_song`, `stop_sound`, etc.)
 - **Implementation functions** in `shared/run/` (PascalCase: `LoadSong`, `StopSound`, etc.)
 
-| snake_case target | f.c wrapper | Implementation |
+| snake_case target | functions.c wrapper | Implementation |
 |---|---|---|
-| `change_channel` | `change_channel()` | `ChangeChannel()` in divsound.c |
-| `change_sound` | `change_sound()` | `ChangeSound()` in divsound.c |
-| `end_fli` | `end_fli()` | `EndFli()` in divfli.c |
-| `get_song_line` | `get_song_line()` | `GetSongLine()` in divsound.c, divpcm.c |
-| `get_song_pos` | `get_song_pos()` | `GetSongPos()` in divsound.c, divpcm.c |
-| `is_playing_song` | `is_playing_song()` | `IsPlayingSong()` in divsound.c |
-| `is_playing_sound` | `is_playing_sound()` | `IsPlayingSound()` in divsound.c |
-| `load_pal` | `load_pal()` | `LoadPal()` in divpalet.c |
-| `load_song` | `load_song()` | `LoadSong()` in divsound.c |
-| `reset_fli` | `reset_fli()` | `ResetFli()` in divfli.c |
-| `reset_sound` | `reset_sound()` | `ResetSound()` in divsound.c |
-| `save_map` | `save_map()` in divhandl.c | `save_MAP()` in divforma.c, f.c, v.c |
-| `set_song_pos` | `set_song_pos()` | `SetSongPos()` in divsound.c |
-| `sort` | `sort()` in f.c | `Sort()` in fpgfile.c |
-| `start_fli` | `start_fli()` | `StartFLI()` in divfli.c |
-| `stop_song` | `stop_song()` | `StopSong()` in divsound.c |
-| `stop_sound` | `stop_sound()` | `StopSound()` in divsound.c |
-| `unload_song` | `unload_song()` | `UnloadSong()` in divsound.c |
+| `change_channel` | `change_channel()` | `ChangeChannel()` in shared/run/sound.c |
+| `change_sound` | `change_sound()` | `ChangeSound()` in shared/run/sound.c |
+| `end_fli` | `end_fli()` | `EndFli()` in shared/run/fli.c |
+| `get_song_line` | `get_song_line()` | `GetSongLine()` in shared/run/sound.c, editor/pcm.c |
+| `get_song_pos` | `get_song_pos()` | `GetSongPos()` in shared/run/sound.c, editor/pcm.c |
+| `is_playing_song` | `is_playing_song()` | `IsPlayingSong()` in shared/run/sound.c |
+| `is_playing_sound` | `is_playing_sound()` | `IsPlayingSound()` in shared/run/sound.c |
+| `load_pal` | `load_pal()` | `LoadPal()` in editor/palette.c |
+| `load_song` | `load_song()` | `LoadSong()` in shared/run/sound.c |
+| `reset_fli` | `reset_fli()` | `ResetFli()` in shared/run/fli.c |
+| `reset_sound` | `reset_sound()` | `ResetSound()` in shared/run/sound.c |
+| `save_map` | `save_map()` in ide/handler.c | `save_MAP()` in formats/image.c, functions.c, shared/run/video.c |
+| `set_song_pos` | `set_song_pos()` | `SetSongPos()` in shared/run/sound.c |
+| `sort` | `sort()` in functions.c | `Sort()` in formats/fpg.c |
+| `start_fli` | `start_fli()` | `StartFLI()` in shared/run/fli.c |
+| `stop_song` | `stop_song()` | `StopSong()` in shared/run/sound.c |
+| `stop_sound` | `stop_sound()` | `StopSound()` in shared/run/sound.c |
+| `unload_song` | `unload_song()` | `UnloadSong()` in shared/run/sound.c |
 
 ### Recommended resolution
 
 Add a module prefix to implementation functions:
-- `LoadSong()` → `sound_load_song()` (in shared/run/divsound.c)
-- `StartFLI()` → `fli_start()` (in shared/run/divfli.c)
-- `LoadPal()` → `pal_load()` (in divpalet.c)
-- `Sort()` → `fpg_sort()` (in fpgfile.c)
-- `save_MAP()` → `format_save_map()` (in divforma.c)
+- `LoadSong()` → `sound_load_song()` (in shared/run/sound.c)
+- `StartFLI()` → `fli_start()` (in shared/run/fli.c)
+- `LoadPal()` → `pal_load()` (in editor/palette.c)
+- `Sort()` → `fpg_sort()` (in formats/fpg.c)
+- `save_MAP()` → `format_save_map()` (in formats/image.c)
 
 This makes the distinction clear: `load_song()` = runtime API, `sound_load_song()` = implementation.
 

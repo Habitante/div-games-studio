@@ -8,7 +8,7 @@
 #include <errno.h>
 
 void readmouse(void);
-#include "divmixer.hpp"
+#include "mixer.h"
 #include "divsound.h"
 
 #ifdef __EMSCRIPTEN__

@@ -86,30 +86,35 @@ README.md) as part of its deliverables.
       typedefs. `UPPER_CASE` for macros/enum constants. `OSDEP_*`/`SDL_*`/`Mix_*`
       preserved as-is.
 
-### 2C-2. Source reorganization
+### 2C-2. Source reorganization ✓
 
-Current layout is mostly flat (`src/` with 30+ files). Reorganize into logical
-modules without going overboard (no single-file folders).
-
-Proposed structure (to be discussed and refined):
+Flat `src/` directory reorganized into logical modules. All files renamed to
+drop the `div` prefix and use descriptive English names. Single-letter runtime
+files expanded (i.c → interpreter.c, etc.). `.hpp` files normalized to `.h`.
+13 dead files deleted (~370 lines). `kernel.cpp` renamed to `kernel.inc`
+(code fragment `#include`'d by interpreter.c, not a standalone compilation unit).
 
 ```
 src/
-  ide/          IDE core: div.c, divhandl.c, divmouse.c, divkeybo.c, divvideo.c,
-                diveffec.c, divbrow.c, divbasic.c, divmixer.c, divsound.c, divtimer.c
-  editor/       Editors: divedit.c, divpaint.c, divfpg.c, divfont.c, divcolor.c,
-                divbrush.c, divpcm.c, divforma.c
-  compiler/     Compiler: divc.c (eventually split), divpnum.c, ifs.c, newfuncs.c
-  runtime/      VM + runtime: i.c, f.c, s.c, divlengu.c, divmixer.c
-                (already partially organized)
-  shared/       Cross-cutting: osdep/, run/, lib/, div_string.h, global.h
-  runner/       Launcher: r.c
+  ide/          main.c, handler.c, desktop.c, window.c, mouse.c, keyboard.c,
+                video.c, graphics.c, effects.c, browser.c, help.c, setup.c,
+                gamma.c, language.c, installer.c, packer.c, trash.c, clock.c,
+                mixer_ui.c, mixer.c, sound.c, vesa.c, sprite.c, recorder.c
+  editor/       code.c, paint.c, brush.c, fpg.c, font.c, palette.c, pcm.c,
+                colorizer.c, charset.c
+  compiler/     compiler.c, calc.c, imgload.c
+  formats/      image.c, fpg.c
+  runtime/      interpreter.c, functions.c, render.c, language.c, mixer.c,
+                vesa.c, debug/debugger.c, debug/decompiler.c, debug/kernel.inc,
+                fli/flxplay.c
+  shared/       osdep/, run/(collision.c, video.c, pathfind.c, fli.c,
+                keyboard.c, sound.c, mouse.c, pcmtowav.c), lib/, unzip.c
+  runner/       runner.c
+  win/          osdepwin.c
+  (root)        global.h, div_string.h, div_stub.h, madewith.h, sysdac.h,
+                mixer.h, fpg.h, charset.h, sound.h, keyboard.h, recorder.h,
+                imgload.h, ide.h
 ```
-
-- [ ] Finalize folder structure (discuss with Daniel)
-- [ ] Move files, update `#include` paths and CMakeLists.txt
-- [ ] Rename files where names are misleading (identify candidates first)
-- [ ] Update README.md source tree and docs to reflect new layout
 
 ### 2C-3. Split monster files
 
@@ -117,9 +122,9 @@ Three files are too large to navigate or maintain effectively:
 
 | File | Lines | Proposed split |
 |------|-------|----------------|
-| `divc.c` | 7,824 | `divc_lexer.c` + `divc_parser.c` + `divc_codegen.c` |
-| `divpaint.c` | 4,970 | `divpaint.c` + `divpaint_tools.c` + `divpaint_select.c` |
-| `div.c` | 4,721 | `div.c` + `div_desktop.c` + `div_dialogs.c` |
+| `compiler/compiler.c` | ~11,500 | `compiler_lexer.c` + `compiler_parser.c` + `compiler_codegen.c` |
+| `editor/paint.c` | ~7,700 | `paint.c` + `paint_tools.c` + `paint_select.c` |
+| `ide/main.c` | ~5,500 | `main.c` + `main_desktop.c` + `main_dialogs.c` |
 
 Rules: extract functions, add forward declarations, update CMake. No behavioral
 changes. Static/file-scope globals may need to become shared or passed as parameters.
@@ -146,14 +151,16 @@ Spanish identifiers renamed. 8 parallel agents in 2 waves:
   divbrow, divhelp, ifs, runtime, divpcm, divpalet, divfpg, divfont,
   div, divwindo. Cross-file: `max_archivos`→`MAX_FILES` (8 files).
 
-### 2C-5. Documentation pass
+### 2C-5. Documentation pass ✓
 
-After reorganization, update all docs to match the new reality:
+Updated all docs to match the 2C-2 reorganization:
 
-- [ ] README.md — source tree, line counts, build instructions
-- [ ] `docs/architecture-overview.md` — file paths, module descriptions
-- [ ] `docs/compiler-pipeline.md` — paths if compiler files moved/split
-- [ ] `docs/vm-and-runtime.md` — paths if runtime files moved
+- [x] README.md — source tree updated with new module layout
+- [x] `docs/architecture-overview.md` — all file paths updated
+- [x] `docs/compiler-pipeline.md` — all file paths updated
+- [x] `docs/vm-and-runtime.md` — all file paths updated
+- [x] `docs/snake-case-collision-report.md` — all file paths updated
+- [x] MEMORY.md — directory layout, function locations, bug references updated
 
 ---
 

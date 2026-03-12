@@ -10,8 +10,6 @@ src/shared/run/topflc.h
 # Data headers (binary data as C arrays)
 src/madewith.h
 src/runtime/06x08.h
-src/runtime/text.h
 src/sysdac.h
 src/runtime/sysdac.h
-src/runtime/cdrom.h
 src/runtime/divfli.h

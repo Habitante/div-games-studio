@@ -1,8 +1,7 @@
 
 #include "global.h"
-#include "divsound.h"
-#include "divsb.h"
-#include "divmixer.hpp"
+#include "sound.h"
+#include "mixer.h"
 
 int frame_clock = 0;
 extern int safe;

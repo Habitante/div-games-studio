@@ -37,7 +37,7 @@ The IDE provides a full desktop environment (yes, inside the program) with:
 
 ## Codebase overview
 
-~87,000 lines of C across ~50 source files and ~40 headers. The code dates back to
+~87,000 lines of C across ~70 source files and ~30 headers. The code dates back to
 the mid-90s and carries hallmarks of that era: 8-bit palette rendering, `int`-sized
 pointer arithmetic, and lots of global state. It was originally built for 16/32-bit
 DOS with DJGPP and has been progressively adapted for modern platforms through an
@@ -48,41 +48,61 @@ code paths), and documented the architecture.
 
 ```
 src/
-  div.c              Main IDE entry point, desktop environment, menus
-  divc.c             DIV language compiler (lexer + parser + codegen)
-  divbasic.c         Expression evaluator / calculator
-  divedit.c          Code editor
-  divfont.c          Font editor
-  divfpg.c           FPG sprite archive editor
-  divpaint.c         Sprite/MAP drawing tools
-  divcolor.c         Palette editor
-  divmouse.c         Mouse input + SDL event loop (IDE)
-  divkeybo.c         Keyboard input + SDL event loop (IDE)
-  divmixer.c         Sound playback
-  divvideo.c         Video mode setup
-  diveffec.c         Screen transition effects
-  divhandl.c         Window/dialog handler
-  divbrush.c         Brush/texture thumbnail browser (paint editor)
   global.h           Master header — types, externs, the lot
   div_string.h       Safe string helpers (bounded copy/cat/printf)
 
-  runtime/
-    i.c              DIV2 bytecode interpreter (the VM)
-    s.c              Sprite rendering engine (8-bit blitter)
-    f.c              Runtime built-in functions
-    divmixer.c       Runtime sound
-    divlengu.c       Runtime language/text strings
-    debug/d.c        Debugger runtime
+  ide/               IDE shell (24 files)
+    main.c           Main entry point, desktop environment, menus
+    handler.c        Window/dialog handler and event dispatch
+    desktop.c        Desktop and window initialization
+    window.c         Window primitives (buttons, text, boxes)
+    mouse.c          Mouse input + SDL event handling
+    keyboard.c       Keyboard input
+    video.c          Video mode setup + fullscreen toggle
+    graphics.c       Graphics primitives (boxes, lines, text rendering)
+    browser.c        Thumbnail browser (MAP, PAL, FNT, IFS, PCM)
+    help.c           Hypertext help system
+    setup.c          Configuration dialog
+    ...              + mixer, sound, effects, language, installer, etc.
 
-  runner/
-    r.c              Launcher — starts the IDE, chains to debugger
+  editor/            All editors (9 files)
+    code.c           Code editor with syntax highlighting
+    paint.c          Sprite/MAP drawing tools
+    fpg.c            FPG sprite archive editor
+    font.c           Font editor
+    palette.c        Palette editor
+    pcm.c            PCM sound sample editor
+    charset.c        IFS character set editor
+    colorizer.c      Syntax colorizer
+    brush.c          Brush/texture thumbnails
 
-  shared/
+  compiler/          DIV language compiler (3 files)
+    compiler.c       Lexer + parser + code generation
+    calc.c           Expression calculator
+    imgload.c        Image loading stubs
+
+  formats/           File format I/O (2 files)
+    image.c          BMP, PCX, JPEG reading/writing
+    fpg.c            FPG file format reader/writer
+
+  runtime/           VM + runtime (10 files)
+    interpreter.c    DIV2 bytecode interpreter (the VM)
+    render.c         Sprite rendering engine (8-bit blitter)
+    functions.c      Runtime built-in functions
+    debug/
+      debugger.c     Integrated debugger
+      decompiler.c   Bytecode decompiler
+      kernel.inc     VM opcode dispatch (included by interpreter.c)
+
+  shared/            Platform abstraction + shared support
     osdep/
       osd_sdl2.c/.h  SDL2 OS-dependency layer (display, input, audio)
-    run/              Shared runtime support (keyboard, mouse, sound, FLI)
+    run/              collision.c, video.c, pathfind.c, sound.c, keyboard.c, etc.
     lib/sdlgfx/       Bundled SDL_gfx framerate limiter
     lib/zip/           Zip archive support
+
+  runner/
+    runner.c         Launcher — starts the IDE, chains to debugger
 
   win/
     osdepwin.c       Windows-specific helpers (fmemopen shim, etc.)

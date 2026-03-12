@@ -1,5 +1,5 @@
 #include "global.h"
-#include "fpgfile.hpp"
+#include "fpg.h"
 #include "div_string.h"
 
 int select_file(void);

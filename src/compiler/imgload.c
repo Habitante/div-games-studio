@@ -1,4 +1,4 @@
-#include "newfuncs.h"
+#include "imgload.h"
 
 
 SDL_Surface *DIV_IMG_Load(char *file) {

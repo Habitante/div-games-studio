@@ -120,11 +120,14 @@ SET(PLATFORM_LIBS m ${OS_LIBS})
 
 ADD_DEFINITIONS(-D_GNU_SOURCE)
 
-INCLUDE_DIRECTORIES(src/shared src/)
-SET(RUNNER_SOURCES "src/runner/r.c")
-FILE(GLOB DIV_SOURCES "src/*.c")
+INCLUDE_DIRECTORIES(src/shared src/ src/ide src/editor src/compiler src/formats)
+SET(RUNNER_SOURCES "src/runner/runner.c")
+FILE(GLOB IDE_SOURCES "src/ide/*.c")
+FILE(GLOB EDITOR_SOURCES "src/editor/*.c")
+FILE(GLOB COMPILER_SOURCES "src/compiler/*.c")
+FILE(GLOB FORMAT_SOURCES "src/formats/*.c")
 FILE(GLOB SDLGFX_SOURCES "src/shared/lib/sdlgfx/SDL_framerate.c")
-SET(DIV_SOURCES ${DIV_SOURCES} ${SDLGFX_SOURCES})
+SET(DIV_SOURCES ${IDE_SOURCES} ${EDITOR_SOURCES} ${COMPILER_SOURCES} ${FORMAT_SOURCES} ${SDLGFX_SOURCES})
 
 FILE(GLOB RUNTIME_SOURCES "src/runtime/*.c")
 FILE(GLOB DEBUG_SOURCES "src/runtime/debug/*.c")

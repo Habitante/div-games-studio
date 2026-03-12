@@ -5,9 +5,8 @@
 
 #include "global.h"
 #include "div_string.h"
-#include "divsound.h"
-#include "fpgfile.hpp"
-#include "divsb.h"
+#include "sound.h"
+#include "fpg.h"
 
 
 ///////////////////////////////////////////////////////////////////////////////

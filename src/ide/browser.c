@@ -5,8 +5,8 @@
 
 #include "global.h"
 #include "div_string.h"
-#include "divsound.h"
-#include "ifs.h"
+#include "sound.h"
+#include "charset.h"
 
 
 ///////////////////////////////////////////////////////////////////////////////

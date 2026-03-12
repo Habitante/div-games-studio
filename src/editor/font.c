@@ -8,7 +8,7 @@
 
 #include "global.h"
 #include "div_string.h"
-#include "ifs.h"
+#include "charset.h"
 
 void selcolor0(void);
 void GenFont0(void);

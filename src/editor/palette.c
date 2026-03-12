@@ -5,7 +5,7 @@
 
 #include "global.h"
 #include "div_string.h"
-#include "fpgfile.hpp"
+#include "fpg.h"
 
 // File-scope palette temps (formerly globals, used as implicit params between palette functions)
 static int r, g, b;

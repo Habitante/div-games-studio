@@ -11,7 +11,7 @@
 #include "div_string.h"
 
 #include "divsound.h"
-#include "divmixer.hpp"
+#include "mixer.h"
 #include <time.h>
 #include <sched.h>
 
@@ -849,7 +849,7 @@ int oo; // For internal kernel use
 void core_exec() {
   do {
     switch ((byte)mem[ip++]) {
-#include "debug/kernel.cpp"
+#include "debug/kernel.inc"
     }
   } while (1);
 
@@ -920,7 +920,7 @@ continue_process:
 void core_trace(void) {
   switch ((byte)mem[ip++]) {
 #define TRACE
-#include "debug/kernel.cpp"
+#include "debug/kernel.inc"
   }
 
   process_stoped = id;

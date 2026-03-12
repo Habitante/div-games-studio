@@ -1,6 +1,6 @@
 # DIV Games Studio - Compiler Pipeline
 
-The DIV compiler lives entirely in `src/divc.c` (~7,800 lines). It compiles
+The DIV compiler lives entirely in `src/compiler/compiler.c` (~7,800 lines). It compiles
 DIV source code into a bytecode format (EML -- "Ensamblador de la Maquina
 Logica", Logical Machine Assembler) that runs on the DIV virtual machine.
 
@@ -88,7 +88,7 @@ The lexer uses two main data structures:
 
 ### The `lower[256]` Table
 
-Defined in `src/div.c` (line 106). Maps every byte to its lowercase equivalent
+Defined in `src/ide/main.c` (line 106). Maps every byte to its lowercase equivalent
 for case-insensitive matching. Characters not in `lower` (mapping to 0) are
 treated as invalid identifier characters. This table determines the valid
 character set for identifiers:

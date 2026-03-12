@@ -1,6 +1,6 @@
 #include "global.h"
 #include "div_string.h"
-#include "fpgfile.hpp"
+#include "fpg.h"
 
 #include <time.h>
 #include <sys/stat.h>

@@ -1,9 +1,8 @@
 
 #include "global.h"
 #include "div_string.h"
-#include "divsound.h"
-#include "divmixer.hpp"
-#include "divsb.h"
+#include "sound.h"
+#include "mixer.h"
 
 #ifdef _WIN32
 #include <io.h>

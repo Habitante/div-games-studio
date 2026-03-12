@@ -2,7 +2,7 @@
 #include <string.h>
 
 #include "global.h"
-#include "ifs.h"
+#include "charset.h"
 
 //-----------------------------------------------------------------------------
 //  Tabla de conversión de chars Windows a chars MSDOS

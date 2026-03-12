@@ -41,7 +41,7 @@ void call(const void_return_type_t func); // void funcion(void); int n=(int)func
 
 #include <math.h>
 
-#include "divkeybo.h"
+#include "keyboard.h"
 #include "divfli.h"
 
 #ifdef ZLIB
@@ -146,10 +146,6 @@ void sp_size(int *x, int *y, int *xx, int *yy, int xg, int yg, int ang, int size
 void debug(void);
 extern int debug_active;
 #endif
-
-// Assembler (a.asm - replaced with a.cpp)
-
-void memcpyb(byte *di, byte *si, int n);
 
 ///////////////////////////////////////////////////////////////////////////////
 //      Functions exported by DIVLENGU (divlengu.cpp)
