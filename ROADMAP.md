@@ -81,7 +81,7 @@ README.md) as part of its deliverables.
 - [x] `.git-blame-ignore-revs` created so `git blame` skips the formatting commit.
 - [x] Snake_case collision analysis completed — 18 collisions found, all in the
       runtime-wrapper vs. implementation pattern. Full report in
-      [`docs/snake-case-collision-report.md`](docs/snake-case-collision-report.md).
+      [`docs/archive/snake-case-collision-report.md`](docs/archive/snake-case-collision-report.md).
 - [x] **Naming convention decided:** `snake_case` for functions/variables/structs/
       typedefs. `UPPER_CASE` for macros/enum constants. `OSDEP_*`/`SDL_*`/`Mix_*`
       preserved as-is.

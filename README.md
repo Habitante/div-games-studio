@@ -144,11 +144,10 @@ for anyone trying to understand this 1990s C codebase. Think of them as Rosetta 
 | [compiler-pipeline.md](docs/compiler-pipeline.md) | DIV language compiler: lexer → parser → codegen; 127-opcode EML instruction set |
 | [vm-and-runtime.md](docs/vm-and-runtime.md) | Stack-based VM interpreter; FRAME-based cooperative process scheduling; 8-bit rendering pipeline |
 | [sdl3-migration-report.md](docs/sdl3-migration-report.md) | Future SDL2→SDL3 migration plan: ~450 call sites, effort estimates |
-| [snake-case-collision-report.md](docs/snake-case-collision-report.md) | Naming convention collision analysis: 18 collisions, resolution plan |
 
-Older reports (glossary, video system audit, unsafe string audit) have been moved to
-`docs/archive/` — they were useful during early cleanup phases but are now largely
-superseded by the renamed codebase.
+Older reports (glossary, video system audit, unsafe string audit, snake-case collision
+report) have been moved to `docs/archive/` — they were useful during cleanup phases
+but are now largely superseded by the renamed and reorganized codebase.
 
 See [ROADMAP.md](ROADMAP.md) for the development plan and project vision.
 
