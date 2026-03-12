@@ -125,7 +125,7 @@ Large files that are hard to navigate or maintain effectively:
 | `compiler/compiler.c` | ~11,500 | `compiler_internal.h` + `compiler.c` + `compiler_parser.c` + `compiler_expression.c` | ✓ |
 | `editor/paint.c` | ~7,700 | `paint.c` + `paint_tools.c` + `paint_select.c` | ✓ |
 | `ide/main.c` | ~5,500 | `main_internal.h` (110) + `main.c` (2,742) + `main_desktop.c` (1,754) + `main_dialogs.c` (1,005) | ✓ |
-| `runtime/debug/debugger.c` | ~6,700 | By feature: init, variables, code window, process list, profiler + shared dialog/graphics | TODO |
+| `runtime/debug/debugger.c` | ~6,700 | `debugger_internal.h` (311) + `debugger.c` (1,093) + `debugger_ui.c` (2,167) + `debugger_inspect.c` (1,444) + `debugger_code.c` (881) + `debugger_proclist.c` (296) + `debugger_profile.c` (689) | ✓ |
 | `editor/code.c` | ~4,600 | By domain: edit primitives, rendering, file I/O, search/replace | TODO |
 | `ide/handler.c` | ~4,400 | By feature: menus, dialogs, map ops, map viewer, palette, fonts | TODO |
 
