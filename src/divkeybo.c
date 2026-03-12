@@ -49,8 +49,8 @@ extern int frame_clock;
 
 //extern float m_x=0.0,m_y;
 void poll_keyboard(void) {
-  mclock = SDL_GetTicks() / 100; //(int)clock()/20000;
-  frame_clock = SDL_GetTicks() / 100;  //(int)clock();
+  mclock = SDL_GetTicks() / 100;      //(int)clock()/20000;
+  frame_clock = SDL_GetTicks() / 100; //(int)clock();
 }
 
 //-----------------------------------------------------------------------------

@@ -837,7 +837,7 @@ void pal_load() {
         if (div_try)
           for (n = 0; n < 256; n++) {
             sample[((dac4[n * 3 + 0] & 0xFE) << 9) | ((dac4[n * 3 + 1] & 0xFE) << 4) |
-                    (dac4[n * 3 + 2] >> 1)] = 1;
+                   (dac4[n * 3 + 2] >> 1)] = 1;
           }
       }
     }

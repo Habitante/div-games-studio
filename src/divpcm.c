@@ -1017,7 +1017,7 @@ void EditSound0(void) {
   pos -= text_len(texts[508]) + 3;
   _button(508, pos, v.h - 34, 0);
 
-  _button(509, 7, v.h - 14, 0);        // Prueba
+  _button(509, 7, v.h - 14, 0);       // Prueba
   _button(512, v.w - 8, v.h - 14, 2); // Copiar en window
 
   pos = 193 + text_len(texts[555]) + 3; // 241;

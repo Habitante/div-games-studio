@@ -69,13 +69,13 @@ struct t_listboxbr file_list_br = {77, 27, files_buf, w_archivo, 4, 4, 51, 31};
 extern char dirs_buf[max_directorios * w_directorio];
 struct t_listbox dir_list_br = {3, 27, dirs_buf, w_directorio, 10, 65};
 
-#define MAX_DRIVES 26
-#define DRIVE_WIDTH    (4 + 1)
+#define MAX_DRIVES  26
+#define DRIVE_WIDTH (4 + 1)
 extern char drives_buf[MAX_DRIVES * DRIVE_WIDTH];
 struct t_listbox lunidadesbr = {3, 121, drives_buf, DRIVE_WIDTH, 4, 28};
 
 #define max_ext 26
-#define w_ext  (5 + 1)
+#define w_ext   (5 + 1)
 extern char ext[max_ext * w_ext];
 struct t_listbox lextbr = {40, 121, ext, w_ext, 4, 28};
 
@@ -869,8 +869,7 @@ void create_thumb_FNT(struct t_listboxbr *l) {
 
             for (y = 0; y < thumb[num].h; y += 2) {
               for (x = 0; x < thumb[num].w; x += 2) {
-                n = *(ghost + temp2[x + y * thumb[num].w] * 256 +
-                      temp2[x + 1 + y * thumb[num].w]);
+                n = *(ghost + temp2[x + y * thumb[num].w] * 256 + temp2[x + 1 + y * thumb[num].w]);
                 m = *(ghost + temp2[x + (y + 1) * thumb[num].w] * 256 +
                       temp2[x + 1 + (y + 1) * thumb[num].w]);
                 thumb[num].ptr[x / 2 + (y / 2) * (thumb[num].w / 2)] = *(ghost + n * 256 + m);
@@ -1765,7 +1764,8 @@ void browser2(void) {
             if (tipo[v_type].path[strlen(tipo[v_type].path) - 1] != '/')
               div_strcat(full, sizeof(full), "/");
             div_strcat(full, sizeof(full),
-                       files_buf + (file_list_br.zone - 10 + file_list_br.first_visible) * w_archivo);
+                       files_buf +
+                           (file_list_br.zone - 10 + file_list_br.first_visible) * w_archivo);
 
             Mix_HaltChannel(-1);
             if (smp != NULL)
@@ -1801,8 +1801,7 @@ void browser2(void) {
       if (tipo[v_type].path[strlen(tipo[v_type].path) - 1] != '/')
         div_strcat(tipo[v_type].path, sizeof(tipo[v_type].path), "/");
       div_strcat(tipo[v_type].path, sizeof(tipo[v_type].path),
-                 dirs_buf +
-                     (dir_list_br.zone - 10 + dir_list_br.first_visible) * w_directorio);
+                 dirs_buf + (dir_list_br.zone - 10 + dir_list_br.first_visible) * w_directorio);
       chdir(tipo[v_type].path);
       getcwd(tipo[v_type].path, PATH_MAX + 1);
       print_path_br();
@@ -1941,14 +1940,13 @@ void paint_listbox_br(struct t_listboxbr *l) {
 
   for (y = 0; y < l->lines; y++)
     for (x = 0; x < l->columns; x++) {
-      wbox(ptr, w, h, c1, l->x + (x * (l->w + 1)) + 1, l->y + (y * (l->h + 1)) + 1, l->w,
-           l->h - 8);
+      wbox(ptr, w, h, c1, l->x + (x * (l->w + 1)) + 1, l->y + (y * (l->h + 1)) + 1, l->w, l->h - 8);
       if (thumb[l->first_visible + y * l->columns + x].tagged)
         wbox(ptr, w, h, color_tag, l->x + (x * (l->w + 1)) + 1,
              l->y + (y * (l->h + 1)) + 1 + l->h - 8, l->w, 8);
       else
-        wbox(ptr, w, h, c01, l->x + (x * (l->w + 1)) + 1,
-             l->y + (y * (l->h + 1)) + 1 + l->h - 8, l->w, 8);
+        wbox(ptr, w, h, c01, l->x + (x * (l->w + 1)) + 1, l->y + (y * (l->h + 1)) + 1 + l->h - 8,
+             l->w, 8);
     }
 
   if (wmouse_in(l->x, l->y, (l->w + 1) * l->columns, (l->h + 1) * l->lines)) { // Calculate zone
@@ -1982,8 +1980,7 @@ void paint_slider_br(struct t_listboxbr *l) {
     h /= 2;
   }
 
-  wbox(ptr, w, h, c2, l->x + (l->w + 1) * l->columns + 1, l->y + 9, 7,
-       (l->h + 1) * l->lines - 17);
+  wbox(ptr, w, h, c2, l->x + (l->w + 1) * l->columns + 1, l->y + 9, 7, (l->h + 1) * l->lines - 17);
   if (l->slide > l->s0)
     wbox(ptr, w, h, c0, l->x + (l->w + 1) * l->columns + 1, l->slide - 1, 7, 1);
   if (l->slide < l->s1)

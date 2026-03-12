@@ -98,7 +98,7 @@ void Fonts1(void) {
 
   create_listbox(&lfontsizes);
 
-  wbox(v.ptr, w, h, c0, 2, 49, w - 4, 1);    // Upper horizontal line
+  wbox(v.ptr, w, h, c0, 2, 49, w - 4, 1);     // Upper horizontal line
   wbox(v.ptr, w, h, c0, 54, 49, 1, 92 - 20);  // Left vertical line
   wbox(v.ptr, w, h, c0, 114, 49, 1, 92 - 20); // Right vertical line
   wbox(v.ptr, w, h, c0, 18 + 67, 10, 1, 39);  // Upper-middle vertical line
@@ -551,7 +551,7 @@ void Fonts0(void) {
   _get(80, 4, v.h - (39), v.w - 16 - text_len(texts[113] + 1), (byte *)TestString, 21, 0, 0);
   _button(113, v.w - 8, v.h - 14 - 18, 2); //14
 
-  _button(120, 7, v.h - 14, 0);        //13
+  _button(120, 7, v.h - 14, 0);       //13
   _button(119, v.w - 8, v.h - 14, 2); //12
 
   _flag(112, 64, 112, &Mosaico1);
@@ -805,14 +805,16 @@ void Selcolor2(void) {
     }
     if (mouse_b) {
       if (sel_color_font != cColor) {
-        wbox(v.ptr, w, h, sel_color_font, (sel_color_font % 16) * 8 + 4, (sel_color_font / 16) * 8 + 12,
-             3, 3);
+        wbox(v.ptr, w, h, sel_color_font, (sel_color_font % 16) * 8 + 4,
+             (sel_color_font / 16) * 8 + 12, 3, 3);
         sel_color_font = cColor;
         if (dac[sel_color_font * 3] + dac[sel_color_font * 3 + 1] + dac[sel_color_font * 3 + 2] <
             (32 + 32 + 32))
-          wbox(v.ptr, w, h, c4, (sel_color_font % 16) * 8 + 4, (sel_color_font / 16) * 8 + 12, 3, 3);
+          wbox(v.ptr, w, h, c4, (sel_color_font % 16) * 8 + 4, (sel_color_font / 16) * 8 + 12, 3,
+               3);
         else
-          wbox(v.ptr, w, h, c0, (sel_color_font % 16) * 8 + 4, (sel_color_font / 16) * 8 + 12, 3, 3);
+          wbox(v.ptr, w, h, c0, (sel_color_font % 16) * 8 + 4, (sel_color_font / 16) * 8 + 12, 3,
+               3);
         v.redraw = 1;
       }
     }
@@ -1325,8 +1327,8 @@ void show_font1(void) {
 
   init = 0;
   for (x = 0; x < strlen(TestString2); x++) {
-    len =
-        show_char_buffer(TestString2[x], init, 0, (char *)temp, TamaX, (char *)&v.aux[RES_FOR_NAME]);
+    len = show_char_buffer(TestString2[x], init, 0, (char *)temp, TamaX,
+                           (char *)&v.aux[RES_FOR_NAME]);
     if (len <= 1)
       len = 0;
     init += len;
@@ -1627,7 +1629,8 @@ void create_text() {
 
   init = 0;
   for (x = 0; x < strlen(cCharsToPrint); x++)
-    if ((cnt = show_char_buffer(cCharsToPrint[x], init, 0, (char *)v.mapa->map, TamaX, font_aux)) != 1)
+    if ((cnt = show_char_buffer(cCharsToPrint[x], init, 0, (char *)v.mapa->map, TamaX, font_aux)) !=
+        1)
       init += cnt;
     else
       init += spacelen;
@@ -1878,7 +1881,7 @@ void Load_Font_session(FILE *file) {
   _get(80, 4, v.h - (39), v.w - 16 - text_len(texts[113] + 1), (byte *)TestString, 21, 0, 0);
   _button(113, v.w - 8, v.h - 14 - 18, 2); //14
 
-  _button(120, 7, v.h - 14, 0);        //13
+  _button(120, 7, v.h - 14, 0);       //13
   _button(119, v.w - 8, v.h - 14, 2); //12
 
   _flag(112, 64, 112, &Mosaico1);

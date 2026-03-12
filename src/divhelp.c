@@ -12,7 +12,7 @@ extern int primera_vez;
 int helpidx[4096];        // Per topic: {offset, length}
 int help_item;            // Which topic help is requested for
 int help_len;             // Length of help_buffer
-int help_w, help_h;     // Width and height of the help window
+int help_w, help_h;       // Width and height of the help window
 int help_l, help_lines;   // Current line, and total lines
 byte help_title[128];     // Topic title
 byte *help_buffer = NULL; // Buffer holding the help content
@@ -180,7 +180,7 @@ void help1(void) {
 
   wbox(ptr, w, h, c0, w - 10, 10, 9, h - 12); // Black slider background
 
-  wput(ptr, w, h, w - 9, 10, 39);      // Up
+  wput(ptr, w, h, w - 9, 10, 39);     // Up
   wput(ptr, w, h, w - 9, h - 17, 40); // Down
   wput(ptr, w, h, w - 9, h - 9, 34);  // Resize
   barra_vertical();
@@ -494,8 +494,7 @@ void help2(void) {
 
     if (!help_paint_active) {
       if (key(_ESC) && !key(_L_CTRL)) {
-        if (mouse_in(v.x + 2 * big2, v.y + 10 * big2, v.x + v.w - 2 * big2,
-                     v.y + v.h - 2 * big2)) {
+        if (mouse_in(v.x + 2 * big2, v.y + 10 * big2, v.x + v.w - 2 * big2, v.y + v.h - 2 * big2)) {
           close_window();
         } else
           window_closing = 2;
@@ -562,7 +561,7 @@ void resize_help(void) {
   int _mx = mouse_x, _my = mouse_y; // Initial mouse coordinates
   int my;                           // Snapped mouse coordinates at each moment
   int _al;                          // Original height in chars
-  int old_h;                       // Previous height
+  int old_h;                        // Previous height
   byte *new_block;
   int w = v.w / big2, h = v.h / big2;
 
@@ -975,8 +974,8 @@ void help_xref(int n, int linea) {
 int ejemplo = 0; // An example follows
 int imagen = 0;  // Image code
 int imagen_y;    // Current line of the image
-int image_h;   // Image height in chars
-int image_w;   // Image width in chars
+int image_h;     // Image height in chars
+int image_w;     // Image width in chars
 int tipo_imagen; // 0-left, 1-center, 2-right
 int restore_help_w = 0;
 

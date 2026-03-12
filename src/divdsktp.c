@@ -40,7 +40,7 @@ void calc0(void);
 extern int helpidx[4096];            // For each term {offset,length}
 extern int help_item;                // Which term help is requested for
 extern int help_len;                 // Length of help_buffer
-extern int help_w, help_h;         // Width and height of the help window
+extern int help_w, help_h;           // Width and height of the help window
 extern int help_l, help_lines;       // Current line, and total lines
 extern byte help_title[128];         // Title of the term
 extern byte *help_buffer, *h_buffer; // Buffer to hold help content, auxiliary
@@ -77,7 +77,8 @@ void download_desktop() {
   desktop = fopen("system/session.dtf", "wb");
   n = fwrite("dtf\x1a\x0d\x0a\x0", 8, 1, desktop);
   // Save the previous resolution
-  iWork = setup_file.vid_mode_height + setup_file.vid_mode_width * 10000 + (setup_file.vid_mode_big << 31);
+  iWork = setup_file.vid_mode_height + setup_file.vid_mode_width * 10000 +
+          (setup_file.vid_mode_big << 31);
   n = fwrite(&iWork, 1, 4, desktop);
   // Reserve space for the window count
   n = fwrite(&numvent, 1, 4, desktop);
@@ -212,8 +213,8 @@ int can_upload_desktop() {
   fread(cWork, 8, 1, desktop);
   // Check old resolution
   fread(&iWork, 1, 4, desktop);
-  if (iWork !=
-      setup_file.vid_mode_height + setup_file.vid_mode_width * 10000 + (setup_file.vid_mode_big << 31)) {
+  if (iWork != setup_file.vid_mode_height + setup_file.vid_mode_width * 10000 +
+                   (setup_file.vid_mode_big << 31)) {
     previous_mode = iWork;
     vid_mode_changed = 1;
   }

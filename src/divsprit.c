@@ -11,8 +11,7 @@ void sp_normal_mask(byte *p, int x, int y, int w, int h, int xg, int yg, int fla
 void sp_scan_clipped(byte *p, short n, short m, short o, byte *si, int w, int x0, int y0, int x1,
                      int y1, int flags);
 
-void sp_rotated(byte *si, int x, int y, int w, int h, int xg, int yg, int flags, float a,
-                float s);
+void sp_rotated(byte *si, int x, int y, int w, int h, int xg, int yg, int flags, float a, float s);
 
 void sp_scan(byte *p, short n, byte *si, int w, int x0, int y0, int x1, int y1, int flags);
 
@@ -217,13 +216,12 @@ void sp_normal_mask(byte *p, int x, int y, int w, int h, int xg, int yg, int fla
 
 byte *ptrmap;
 
-void sp_rotated(byte *si, int x, int y, int w, int h, int xg, int yg, int flags, float a,
-                float s) {
+void sp_rotated(byte *si, int x, int y, int w, int h, int xg, int yg, int flags, float a, float s) {
   float d0, d1, d2, d3;
   float a0, a1, a2, a3;
   int p[24];
   int scan_y, hmin, hmax; // Altura minima y maxima
-  int n, l0 = 0, l1; // Lado 0 y side 1 (indices p[])
+  int n, l0 = 0, l1;      // Lado 0 y side 1 (indices p[])
 
   int hmax0, hmax1;
   union {
@@ -405,12 +403,13 @@ void sp_rotated(byte *si, int x, int y, int w, int h, int xg, int yg, int flags,
       }
     }
 
-    if (scan_y < map_height && scan_y >= 0 && x0.w[1] < map_width && x1.w[1] >= 0 && x1.w[1] > x0.w[1]) {
+    if (scan_y < map_height && scan_y >= 0 && x0.w[1] < map_width && x1.w[1] >= 0 &&
+        x1.w[1] > x0.w[1]) {
       if (!mask_on) {
         if (x0.w[1] < 0)
           if (x1.w[1] >= map_width)
-            sp_scan_clipped(ptrmap, x1.w[1] - x0.w[1], map_width - 1, -x0.w[1], si, w, g0x.l,
-                            g0y.l, g1x.l, g1y.l, flags);
+            sp_scan_clipped(ptrmap, x1.w[1] - x0.w[1], map_width - 1, -x0.w[1], si, w, g0x.l, g0y.l,
+                            g1x.l, g1y.l, flags);
           else
             sp_scan_clipped(ptrmap, x1.w[1] - x0.w[1], x1.w[1], -x0.w[1], si, w, g0x.l, g0y.l,
                             g1x.l, g1y.l, flags);

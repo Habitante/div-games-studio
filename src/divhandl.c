@@ -1215,13 +1215,13 @@ void print_fontmap(void) {
 
   for (x = 1; x < map_width - 1; x++) {
     for (y = 1; y < map_height - 1; y++) {
-      if (MAP_PIXEL(x - 1, y - 1) == color && MAP_PIXEL(x - 1, y) == color && MAP_PIXEL(x, y - 1) == color &&
-          MAP_PIXEL(x, y) != color) {
+      if (MAP_PIXEL(x - 1, y - 1) == color && MAP_PIXEL(x - 1, y) == color &&
+          MAP_PIXEL(x, y - 1) == color && MAP_PIXEL(x, y) != color) {
         x0 = x;
         y0 = y;
       }
-      if (MAP_PIXEL(x, y) != color && MAP_PIXEL(x + 1, y + 1) == color && MAP_PIXEL(x + 1, y) == color &&
-          MAP_PIXEL(x, y + 1) == color) {
+      if (MAP_PIXEL(x, y) != color && MAP_PIXEL(x + 1, y + 1) == color &&
+          MAP_PIXEL(x + 1, y) == color && MAP_PIXEL(x, y + 1) == color) {
         if (x == x0 && y == y0) {
           *p++ = 0;
           *p++ = 0;
@@ -1949,8 +1949,9 @@ void map_view1(void) {
   if (w && h)
     for (y = 0, y2 = 0; y < h; y++, y2 += 2)
       for (x = 0, x2 = 0; x < w; x++, x2 += 2)
-        *(di + dst_stride * y + x) = *(ghost + *(ghost + *(word *)(si + src_stride * y2 + x2)) * 256 +
-                                 *(ghost + *(word *)(si + src_stride * (y2 + 1) + x2)));
+        *(di + dst_stride * y + x) =
+            *(ghost + *(ghost + *(word *)(si + src_stride * y2 + x2)) * 256 +
+              *(ghost + *(word *)(si + src_stride * (y2 + 1) + x2)));
   else {
     if (!w) {
       w++;
@@ -1987,7 +1988,7 @@ void read_mouse3(void) {}
 extern int back;
 
 #define max_texturas 1000
-#define w_textura   (3 + 1) // width for 000 - 999
+#define w_textura    (3 + 1) // width for 000 - 999
 
 #define BRUSH 4
 #define MAPBR 8
@@ -1999,20 +2000,20 @@ extern struct t_listboxbr texture_list_br;
 extern struct t_listboxbr thumbmap_list_br;
 
 extern struct _thumb_tex {
-  int w, h;         // Width and height of the thumbnail
+  int w, h;                    // Width and height of the thumbnail
   int real_width, real_height; // Width and height of the texture
-  char *ptr;          // ==NULL if the thumbnail has not started loading
-  int status;         // 0-Not a valid texture, 1-Loaded
+  char *ptr;                   // ==NULL if the thumbnail has not started loading
+  int status;                  // 0-Not a valid texture, 1-Loaded
   int FilePos;
   int Code;
   int is_square;
 } thumb_tex[max_texturas];
 
 extern struct _thumb_map {
-  int w, h;         // Width and height of the thumbnail
+  int w, h;                    // Width and height of the thumbnail
   int real_width, real_height; // Width and height of the texture
-  char *ptr;          // ==NULL if the thumbnail has not started loading
-  int status;         // 0-Not a valid texture, 1-Loaded
+  char *ptr;                   // ==NULL if the thumbnail has not started loading
+  int status;                  // 0-Not a valid texture, 1-Loaded
   int FilePos;
   int Code;
   int is_square;
@@ -2320,8 +2321,8 @@ void palette1(void) {
   }
   for (y = 0; y < 16; y++)
     for (x = 0; x < 16; x++)
-      wbox(v.ptr, w, h, x + y * 16, 2 + x * PIXELS_PER_COLOR, 10 + y * PIXELS_PER_COLOR, PIXELS_PER_COLOR - 1,
-           PIXELS_PER_COLOR - 1);
+      wbox(v.ptr, w, h, x + y * 16, 2 + x * PIXELS_PER_COLOR, 10 + y * PIXELS_PER_COLOR,
+           PIXELS_PER_COLOR - 1, PIXELS_PER_COLOR - 1);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2401,7 +2402,7 @@ void copyright0(void) {
   v.paint_handler = copyright1;
   v.click_handler = copyright2;
   if (CopyDesktop) {
-    _button(456, v.w - 11, v.h - 16, 2);   // Continue
+    _button(456, v.w - 11, v.h - 16, 2);    // Continue
     _button(457, 48 + 48 + 3, v.h - 16, 0); // New session
   } else {
     _button(457, v.w - 11, v.h - 16, 2); // New session
@@ -2757,13 +2758,13 @@ struct t_listbox file_list = {3, 49, files_buf, w_archivo, 12, 64};
 char dirs_buf[max_directorios * w_directorio];
 struct t_listbox dir_list = {80, 49, dirs_buf, w_directorio, 10, 64};
 
-#define MAX_DRIVES 26
-#define DRIVE_WIDTH    (4 + 1)
+#define MAX_DRIVES  26
+#define DRIVE_WIDTH (4 + 1)
 char drives_buf[MAX_DRIVES * DRIVE_WIDTH];
 struct t_listbox drive_list = {157, 49, drives_buf, DRIVE_WIDTH, 4, 28};
 
 #define MAX_EXTENSIONS 26
-#define EXT_WIDTH  (5 + 1)
+#define EXT_WIDTH      (5 + 1)
 char ext[MAX_EXTENSIONS * EXT_WIDTH];
 struct t_listbox ext_list = {157, 97, ext, EXT_WIDTH, 4, 28};
 
@@ -2905,8 +2906,8 @@ void update_listbox(struct t_listbox *l) {
 
   if (old_zona != l->zone)
     if (old_zona >= 10) { // Unhighlight zone
-      wwrite_in_box(ptr + (l->x + 2) * big2, w, l->w - 4, h, 0, l->y + 2 + (old_zona - 10) * 8,
-                    0, (byte *)l->list + l->item_width * (l->first_visible + old_zona - 10), c3);
+      wwrite_in_box(ptr + (l->x + 2) * big2, w, l->w - 4, h, 0, l->y + 2 + (old_zona - 10) * 8, 0,
+                    (byte *)l->list + l->item_width * (l->first_visible + old_zona - 10), c3);
       v.redraw = 1;
     }
 
@@ -3358,12 +3359,12 @@ void open_map(void) {
               memset(sample, 0, 32768);
               for (x = 0; x < 256; x++) {
                 sample[((pal[x * 3 + 0] & 0xFE) << 9) | ((pal[x * 3 + 1] & 0xFE) << 4) |
-                        (pal[x * 3 + 2] >> 1)] = 1;
+                       (pal[x * 3 + 2] >> 1)] = 1;
               }
             }
             for (x = 0; x < 256; x++) {
               sample[((dac4[x * 3 + 0] & 0xFE) << 9) | ((dac4[x * 3 + 1] & 0xFE) << 4) |
-                      (dac4[x * 3 + 2] >> 1)] = 1;
+                     (dac4[x * 3 + 2] >> 1)] = 1;
             }
           }
         }

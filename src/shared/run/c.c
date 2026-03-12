@@ -711,11 +711,9 @@ void put_collision(byte *buffer, int *ptr, int x, int y, int xg, int yg, int ang
       yg = h - 1 - yg;
     }
     y -= yg + iy;
-    if (x >= clipx0 && x + w <= clipx1 && y >= clipy0 &&
-        y + h <= clipy1) // Render unclipped sprite
+    if (x >= clipx0 && x + w <= clipx1 && y >= clipy0 && y + h <= clipy1) // Render unclipped sprite
       sp_normal(si, x, y, w, h, flags);
-    else if (x < clipx1 && y < clipy1 && x + w > clipx0 &&
-             y + h > clipy0) // Render clipped sprite
+    else if (x < clipx1 && y < clipy1 && x + w > clipx0 && y + h > clipy0) // Render clipped sprite
       sp_clipped(si, x, y, w, h, flags);
   }
 
@@ -734,7 +732,7 @@ void put_collision(byte *buffer, int *ptr, int x, int y, int xg, int yg, int ang
 
 void sp_rotated_p(byte *si, int w, int h, int flags) {
   int scan_y, hmin, hmax; // Minimum and maximum height
-  int n, l0 = 0, l1; // Side 0 and side 1 (p[] indices)
+  int n, l0 = 0, l1;      // Side 0 and side 1 (p[] indices)
 
   int hmax0, hmax1;
   union {
@@ -893,7 +891,8 @@ void sp_rotated_p(byte *si, int w, int h, int flags) {
       g1y.l = kk;
     }
 
-    if (scan_y < clipy1 && scan_y >= clipy0 && x0.w[1] < clipx1 && x1.w[1] >= clipx0 && x1.w[1] > x0.w[1])
+    if (scan_y < clipy1 && scan_y >= clipy0 && x0.w[1] < clipx1 && x1.w[1] >= clipx0 &&
+        x1.w[1] > x0.w[1])
       sp_scan(ptrcopia + x0.w[1], x1.w[1] - x0.w[1], si, w, g0x.l, g0y.l, g1x.l, g1y.l);
 
     if ((flags & 3) == 1 || (flags & 3) == 2) {
@@ -1249,7 +1248,7 @@ void test_scaled(byte *old_si, int x, int y, int w, int h, int xg, int yg, int s
 
 void test_rotated(byte *si, int w, int h, int flags) {
   int scan_y, hmin, hmax; // Minimum and maximum height
-  int n, l0 = 0, l1; // Side 0 and side 1 (p[] indices)
+  int n, l0 = 0, l1;      // Side 0 and side 1 (p[] indices)
 
   int hmax0, hmax1;
   union {
@@ -1408,7 +1407,8 @@ void test_rotated(byte *si, int w, int h, int flags) {
       g1y.l = kk;
     }
 
-    if (scan_y < clipy1 && scan_y >= clipy0 && x0.w[1] < clipx1 && x1.w[1] >= clipx0 && x1.w[1] > x0.w[1]) {
+    if (scan_y < clipy1 && scan_y >= clipy0 && x0.w[1] < clipx1 && x1.w[1] >= clipx0 &&
+        x1.w[1] > x0.w[1]) {
       if (x0.w[1] < clipx0) {
         if (x1.w[1] >= clipx1)
           test_scanc(ptrcopia + clipx0, x1.w[1] - x0.w[1], clipx1 - clipx0 - 1, clipx0 - x0.w[1],

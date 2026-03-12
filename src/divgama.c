@@ -13,7 +13,7 @@
 #define alto_ga  60
 #define gama_x   4
 #define gama_y   12
-#define gama_w  130
+#define gama_w   130
 
 //-----------------------------------------------------------------------------
 //  Estructura para guardar el estado de los colores de control de la gama

@@ -90,9 +90,9 @@ void call(const void_return_type_t func); // void funcion(void); int n=(int)func
 
 
 #define max_archivos    512 // ------------------------------- File listbox
-#define w_archivo      (255)
+#define w_archivo       (255)
 #define max_directorios 2048
-#define w_directorio   (255)
+#define w_directorio    (255)
 
 
 #define swap(a, b) \
@@ -272,9 +272,9 @@ typedef struct _setup_file {
 
   // Video mode
   int vid_mode;
-  int vid_mode_width; // Video mode width
-  int vid_mode_height;  // Video mode height
-  int vid_mode_big;   // "Big" video mode
+  int vid_mode_width;  // Video mode width
+  int vid_mode_height; // Video mode height
+  int vid_mode_big;    // "Big" video mode
 
   // Undo system
   int max_undo;
@@ -371,9 +371,9 @@ void wrectangle(byte *dest, int dest_width, int dest_height, byte c, int x, int 
 void wput(byte *dest, int dest_width, int dest_height, int x, int y, int n);
 void wput_in_box(byte *dest, int dest_pitch, int dest_width, int dest_height, int x, int y, int n);
 void blit_region(byte *dest, int dest_width, int dest_height, byte *p, int x, int y, int w, int h,
-              int salta);
+                 int salta);
 void blit_region_dark(byte *dest, int dest_width, int dest_height, byte *p, int x, int y, int w,
-                     int h, int salta);
+                      int h, int salta);
 void wwrite(byte *dest, int dest_width, int dest_height, int x, int y, int centro, byte *ptr,
             byte c);
 void wwrite_in_box(byte *dest, int dest_pitch, int dest_width, int dest_height, int x, int y,
@@ -682,9 +682,9 @@ GLOBAL_DATA int char_size;                             // font_width*font_height
 GLOBAL_DATA int current_mouse; // Mouse cursor graphic
 
 //GLOBAL_DATA
-struct tipo_undo {                    // Circular undo table
+struct tipo_undo {                  // Circular undo table
   int start, end, x, y, w, h, mode; // start refers to *(undo+start)
-  int code;                           // Map identifier for this undo entry
+  int code;                         // Map identifier for this undo entry
 }; // mode=-1 if entry unused
 
 GLOBAL_DATA struct tipo_undo *undo_table;
@@ -753,7 +753,7 @@ struct twindow {
   byte *name;     // Icon name
   byte *title;    // Title bar text
   void_return_type_t paint_handler, click_handler, close_handler;
-  int x, y, w, h;              // Window position and dimensions
+  int x, y, w, h;                // Window position and dimensions
   int _x, _y, _an, _al;          // Position saved when minimized
   byte *ptr;                     // Window buffer
   struct tmapa *mapa;            // Pointer to associated map struct
@@ -775,7 +775,7 @@ GLOBAL_DATA struct twindow window[max_windows];
 
 //GLOBAL_DATA
 struct tmapa {
-  char has_name;                               // New window will take the filename
+  char has_name;                              // New window will take the filename
   int code;                                   // Map identifier (for undo)
   int fpg_code;                               // Map code (for the FPG)
   char path[_MAX_PATH + 1];                   // Path of associated file
@@ -789,9 +789,9 @@ struct tmapa {
 };
 
 struct tprg {
-  int w, h;               // Width and height in characters of window
+  int w, h;                 // Width and height in characters of window
   int old_x, old_y;         // Coordinates before maximizing
-  int old_w, old_h;       // Width and height before maximizing
+  int old_w, old_h;         // Width and height before maximizing
   char path[_MAX_PATH + 1]; // Path of associated file
   char filename[255];       // Associated filename
   byte *buffer;             // Buffer with loaded file
@@ -814,7 +814,7 @@ struct t_listbox {
   char *list;        // List pointer
   int item_width;    // Characters per item
   int visible_items; // Visible item count
-  int w, h;        // Text zone width in pixels
+  int w, h;          // Text zone width in pixels
   int first_visible; // First visible index (from 0)
   int total_items;   // Total item count (0 n/a)
   int s0, s1, slide; // Slide bar start, end, current position
@@ -829,7 +829,7 @@ struct t_listboxbr {
   int item_width; // Characters per item
   int columns;    // Number of columns in browser listbox
   int lines;      // Number of lines
-  int w, h;     // Pixel size of each cell
+  int w, h;       // Pixel size of each cell
 
   int first_visible; // First visible index (from 0)
   int total_items;   // Total item count (0 n/a)
@@ -1103,8 +1103,8 @@ GLOBAL_DATA struct _gcolor *gradient_config;
 //-----------------------------------------------------------------------------
 
 typedef struct {
-  int w, h; // Width and height of the thumbnail
-  char *ptr;  // ==NULL if the thumbnail has not started loading
+  int w, h;  // Width and height of the thumbnail
+  char *ptr; // ==NULL if the thumbnail has not started loading
   SDL_Surface *surfaceptr;
   int status;   // -1-Not an image, 0-Loaded, +N-Number of bytes read
   int filesize; // File size in bytes

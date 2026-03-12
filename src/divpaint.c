@@ -72,8 +72,8 @@ struct {
 //      Constants
 //-----------------------------------------------------------------------------
 
-#define COLOR_RULER_X     96 // Color gradient start position on the edit screen
-#define max_int 65536
+#define COLOR_RULER_X 96 // Color gradient start position on the edit screen
+#define max_int       65536
 
 extern int quick_close;
 int determine_help(void);
@@ -97,7 +97,8 @@ int point_index = 0;
 
 int line_fx = 16; // Drawing mode for the line
 
-int pencil_tool_effect = 16, line_tool_effect = 16, box_tool_effect = 16, bezier_tool_effect = 16, polygon_tool_effect = 16;
+int pencil_tool_effect = 16, line_tool_effect = 16, box_tool_effect = 16, bezier_tool_effect = 16,
+    polygon_tool_effect = 16;
 int filled_tool_effect = 16, circle_tool_effect = 16, spray_tool_effect = 4, text_tool_effect = 16;
 
 int fill_seeds[128]; // Fill seed points (x,y), up to 64 different (-1,?) -> n/a
@@ -137,8 +138,8 @@ void remove_texture(void) {
 }
 
 byte get_color(int x, int y) {
-  return (*(texture_color + (x + texture_x) % texture_w +
-            ((y + texture_y) % texture_h) * texture_w));
+  return (
+      *(texture_color + (x + texture_x) % texture_w + ((y + texture_y) % texture_h) * texture_w));
 }
 
 //-----------------------------------------------------------------------------
@@ -3360,8 +3361,7 @@ void bezier(int x0, int y0, int x1, int y1, int _x0, int _y0, int _x1, int _y1, 
     }
   } while (n++ < 32);
 
-  if (save_undo(x - brush_w / 2, y - brush_h / 2, _x - x + 1 + brush_w,
-                _y - y + 1 + brush_h)) {
+  if (save_undo(x - brush_w / 2, y - brush_h / 2, _x - x + 1 + brush_w, _y - y + 1 + brush_h)) {
     if (inc0)
       line_pixel(p[0], p[1]);
     n = 1;
@@ -3402,8 +3402,8 @@ void line0(int x0, int y0, int x1, int y1, int inc0) {
   if (inc0 == -1)
     inc0 = 0;
   else
-    unded = (intptr_t)save_undo(x - brush_w / 2, y - brush_h / 2, dx + 1 + brush_w,
-                                dy + 1 + brush_h);
+    unded =
+        (intptr_t)save_undo(x - brush_w / 2, y - brush_h / 2, dx + 1 + brush_w, dy + 1 + brush_h);
 
   if (unded) {
     if (!dx && !dy)
@@ -3512,8 +3512,8 @@ void line(int x0, int y0, int x1, int y1, int inc0) {
   if (inc0 == -1)
     inc0 = 0;
   else
-    unded = (intptr_t)save_undo(x - brush_w / 2, y - brush_h / 2, dx + 1 + brush_w,
-                                dy + 1 + brush_h);
+    unded =
+        (intptr_t)save_undo(x - brush_w / 2, y - brush_h / 2, dx + 1 + brush_w, dy + 1 + brush_h);
 
   if (unded) {
     if (!dx && !dy)
@@ -4425,7 +4425,7 @@ void draw_box(int x0, int y0, int x1, int y1) {
 void draw_circle(int x0, int y0, int x1, int y1, int filled) {
   int p[2048];   // Points on the circumference
   double cx, rx; // Center and radius of the circumference
-  int w, h;    // Width and height
+  int w, h;      // Width and height
   double y, ymed, nsin;
   int n, xa, xb, ya, yb;
 
@@ -4575,8 +4575,8 @@ void edit_ruler(void) {
     mouse_b = 0;
   }
 
-  if ((mouse_b & 1) &&
-      mouse_in(toolbar_x + COLOR_RULER_X, toolbar_y, toolbar_x + COLOR_RULER_X + 127, toolbar_y + 18)) {
+  if ((mouse_b & 1) && mouse_in(toolbar_x + COLOR_RULER_X, toolbar_y,
+                                toolbar_x + COLOR_RULER_X + 127, toolbar_y + 18)) {
     if (editable(&n))
       gradients[gradient].colors[n] = color;
     else
@@ -5155,8 +5155,8 @@ int editable(int *n) {
   *n = (mouse_x - toolbar_x - COLOR_RULER_X) / r + 1;
 
   if (!gradients[gradient].fixed) {
-    if (mouse_y >= toolbar_y + 11 && mouse_y <= toolbar_y + 18 && mouse_x >= toolbar_x + COLOR_RULER_X &&
-        mouse_x < toolbar_x + COLOR_RULER_X + 128) {
+    if (mouse_y >= toolbar_y + 11 && mouse_y <= toolbar_y + 18 &&
+        mouse_x >= toolbar_x + COLOR_RULER_X && mouse_x < toolbar_x + COLOR_RULER_X + 128) {
       switch (gradients[gradient].type) {
       case 0:
         if (*n == 1)
@@ -5569,9 +5569,9 @@ void zoom_map2(void) {
     do {
       n = w;
       do {
-        *q++ = *(ghost + *p * 256 +
-                 texture_color[(x + texture_x) % texture_w +
-                               ((y + texture_y) % texture_h) * texture_w]);
+        *q++ = *(
+            ghost + *p * 256 +
+            texture_color[(x + texture_x) % texture_w + ((y + texture_y) % texture_h) * texture_w]);
         x++;
         p++;
       } while (--n);
@@ -5587,9 +5587,9 @@ void zoom_map2(void) {
     do {
       n = w;
       do {
-        c = *(ghost + *p * 256 +
-              texture_color[(x + texture_x) % texture_w +
-                            ((y + texture_y) % texture_h) * texture_w]);
+        c = *(
+            ghost + *p * 256 +
+            texture_color[(x + texture_x) % texture_w + ((y + texture_y) % texture_h) * texture_w]);
         c += c * 256;
         *(word *)q = c;
         *(word *)(q + vga_width) = c;
@@ -5609,9 +5609,9 @@ void zoom_map2(void) {
     do {
       n = w;
       do {
-        c = *(ghost + *p * 256 +
-              texture_color[(x + texture_x) % texture_w +
-                            ((y + texture_y) % texture_h) * texture_w]);
+        c = *(
+            ghost + *p * 256 +
+            texture_color[(x + texture_x) % texture_w + ((y + texture_y) % texture_h) * texture_w]);
         c += c * 256;
         c += c * 65536;
         *(int *)q = c;
@@ -5637,9 +5637,9 @@ void zoom_map2(void) {
     do {
       n = w;
       do {
-        c = *(ghost + *p * 256 +
-              texture_color[(x + texture_x) % texture_w +
-                            ((y + texture_y) % texture_h) * texture_w]);
+        c = *(
+            ghost + *p * 256 +
+            texture_color[(x + texture_x) % texture_w + ((y + texture_y) % texture_h) * texture_w]);
         c += c * 256;
         c += c * 65536;
         *(int *)q = c;
@@ -6379,7 +6379,7 @@ void paint_mask_window(byte *p, int c, int d) {
 //-----------------------------------------------------------------------------
 
 #define max_texturas 1000
-#define w_textura   (3 + 1) // 000 - 999
+#define w_textura    (3 + 1) // 000 - 999
 
 #define BRUSH 4
 #define MAPBR 8
@@ -6392,10 +6392,10 @@ extern byte brush_fpg_path[256];
 extern char m3d_fpgcodesbr[max_texturas * w_textura];
 extern struct t_listboxbr texture_list_br;
 extern struct _thumb_tex {
-  int w, h;         // Width and height of the thumbnail
+  int w, h;                    // Width and height of the thumbnail
   int real_width, real_height; // Width and height of the texture
-  char *ptr;          // ==NULL if the thumbnail has not started loading
-  int status;         // 0-Not a valid texture, 1-Loaded
+  char *ptr;                   // ==NULL if the thumbnail has not started loading
+  int status;                  // 0-Not a valid texture, 1-Loaded
   int FilePos;
   int Code;
   int is_square;
@@ -6409,11 +6409,11 @@ int m_maximo = 0;
 struct t_listboxbr thumbmap_list_br = {3 - 2, 11 - 2, NULL, 0, 4, 4, 32, 32};
 int browser_type = 0;
 
-struct _thumb_map {   // Brush map thumbnails
-  int w, h;         // Width and height of the thumbnail
+struct _thumb_map {            // Brush map thumbnails
+  int w, h;                    // Width and height of the thumbnail
   int real_width, real_height; // Width and height of the texture
-  char *ptr;          // ==NULL if the thumbnail has not started loading
-  int status;         // 0-Not a valid texture, 1-Loaded
+  char *ptr;                   // ==NULL if the thumbnail has not started loading
+  int status;                  // 0-Not a valid texture, 1-Loaded
   int FilePos;
   int Code;
   int is_square;
@@ -6552,14 +6552,15 @@ void select_color(int n) { // Icon number as parameter
   byte *temp;
   int man, mal;
 
-  if ((texture_type & 4) && ((key(_T) && hotkey) || (mouse_in(toolbar_x + 56 + n * 16, toolbar_y + 11,
-                                                         toolbar_x + 62 + n * 16, toolbar_y + 17) &&
-                                                (mouse_b & 1)))) {
+  if ((texture_type & 4) &&
+      ((key(_T) && hotkey) || (mouse_in(toolbar_x + 56 + n * 16, toolbar_y + 11,
+                                        toolbar_x + 62 + n * 16, toolbar_y + 17) &&
+                               (mouse_b & 1)))) {
     browser_type = BRUSH;
     show_dialog(mapper_browse_fpg0);
 
     num_tex = texture_list_br.first_visible + texture_list_br.zone - 10; // Position in browser
-    tex_cod = atoi(m3d_fpgcodesbr + num_tex * w_textura);       // Code at that position
+    tex_cod = atoi(m3d_fpgcodesbr + num_tex * w_textura);                // Code at that position
 
     if (thumb_tex[num_tex].Code == 0 || !v_finished)
       return;
@@ -6855,7 +6856,8 @@ void select_color(int n) { // Icon number as parameter
 
       if ((mouse_b & 1) && !mouse_in(a, b, a + c - 1, b + d - 1)) {
         if (mouse_in(toolbar_x, toolbar_y, toolbar_x + toolbar_width - 1, toolbar_y + 18)) {
-          if (mouse_in(toolbar_x + COLOR_RULER_X, toolbar_y, toolbar_x + COLOR_RULER_X + 127, toolbar_y + 18)) {
+          if (mouse_in(toolbar_x + COLOR_RULER_X, toolbar_y, toolbar_x + COLOR_RULER_X + 127,
+                       toolbar_y + 18)) {
             if (editable(&x))
               gradients[gradient].colors[x] = color;
             else {
@@ -6864,8 +6866,8 @@ void select_color(int n) { // Icon number as parameter
             }
             draw_ruler();
             needs_redraw = 1;
-          } else if (mouse_in(toolbar_x + COLOR_RULER_X - 8, toolbar_y, toolbar_x + COLOR_RULER_X - 1,
-                              toolbar_y + 18)) {
+          } else if (mouse_in(toolbar_x + COLOR_RULER_X - 8, toolbar_y,
+                              toolbar_x + COLOR_RULER_X - 1, toolbar_y + 18)) {
             if (texture_color != NULL) {
               remove_texture();
               if (color != 0) {
@@ -7606,8 +7608,8 @@ void flush_bars(int darkened) {
         flush_bar(toolbars[n].ptr, toolbars[n].w, toolbars[n].x, toolbars[n].y, toolbars[n].w,
                   toolbars[n].h);
       } else {
-        flush_bar_darkened(toolbars[n].ptr, toolbars[n].w, toolbars[n].x, toolbars[n].y, toolbars[n].w,
-                           toolbars[n].h);
+        flush_bar_darkened(toolbars[n].ptr, toolbars[n].w, toolbars[n].x, toolbars[n].y,
+                           toolbars[n].w, toolbars[n].h);
       }
     }
 }

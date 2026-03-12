@@ -209,7 +209,7 @@ void fpg_write_header(HeadFPG *MiHeadFPG, short *points, char *imagen, FILE *fpg
 }
 
 int fpg_add(FPG *Fpg, int COD, char *desc, char *filename, int Ancho, int Alto, int num_points,
-               char *points, char *Imagen, int delete_old, int get_info) {
+            char *points, char *Imagen, int delete_old, int get_info) {
   int LONG, OLDCOD = COD, First = 1, n;
   FILE *fpg;
 

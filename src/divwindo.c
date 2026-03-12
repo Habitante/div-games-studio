@@ -489,7 +489,7 @@ void bwput_in_box(byte *dest, int dest_pitch, int dest_width, int dest_height, i
 //-----------------------------------------------------------------------------
 
 void blit_region(byte *dest, int dest_width, int dest_height, byte *p, int x, int y, int w, int h,
-              int salta) {
+                 int salta) {
   byte *q;
   int salta_x, long_x, resto_x;
   int salta_y, long_y, resto_y;
@@ -533,7 +533,7 @@ void blit_region(byte *dest, int dest_width, int dest_height, byte *p, int x, in
 //-----------------------------------------------------------------------------
 
 void blit_region_dark(byte *dest, int dest_width, int dest_height, byte *p, int x, int y, int w,
-                     int h, int salta) {
+                      int h, int salta) {
   byte *q, *_ghost;
   int salta_x, long_x, resto_x;
   int salta_y, long_y, resto_y;
@@ -796,8 +796,8 @@ void wwrite_in_box(byte *dest, int dest_pitch, int dest_width, int dest_height, 
       }
 
       if (*ptr && x < 0) {
-        wtexc(dest, dest_pitch, dest_width, dest_height, font + car[*ptr].dir, x, y, car[*ptr].w,
-              h, c);
+        wtexc(dest, dest_pitch, dest_width, dest_height, font + car[*ptr].dir, x, y, car[*ptr].w, h,
+              c);
         x = x + car[*ptr].w;
         ptr++;
       }
@@ -809,16 +809,16 @@ void wwrite_in_box(byte *dest, int dest_pitch, int dest_width, int dest_height, 
       }
 
       if (*ptr && x < dest_width)
-        wtexc(dest, dest_pitch, dest_width, dest_height, font + car[*ptr].dir, x, y, car[*ptr].w,
-              h, c);
+        wtexc(dest, dest_pitch, dest_width, dest_height, font + car[*ptr].dir, x, y, car[*ptr].w, h,
+              c);
     } else {
       while (*ptr && x + car[*ptr].w <= 0) {
         x = x + car[*ptr].w;
         ptr++;
       }
       while (*ptr && x < dest_width) {
-        wtexc(dest, dest_pitch, dest_width, dest_height, font + car[*ptr].dir, x, y, car[*ptr].w,
-              h, c);
+        wtexc(dest, dest_pitch, dest_width, dest_height, font + car[*ptr].dir, x, y, car[*ptr].w, h,
+              c);
         x = x + car[*ptr].w;
         ptr++;
       }

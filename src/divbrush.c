@@ -81,7 +81,7 @@ int ceiling_height = 2048;
 int floor_height = 1024;
 
 #define max_texturas 1000
-#define w_textura   (3 + 1) // 000 - 999
+#define w_textura    (3 + 1) // 000 - 999
 char m3d_fpgcodesbr[max_texturas * w_textura];
 char texture_names[max_texturas * w_textura];
 char background_names[max_texturas * w_textura];
@@ -694,8 +694,7 @@ void M3D_paint_listboxbr(struct t_listboxbr *l) {
 
   for (y = 0; y < l->lines; y++)
     for (x = 0; x < l->columns; x++) {
-      wbox(ptr, w, h, c1, l->x + (x * (l->w + 1)) + 1, l->y + (y * (l->h + 1)) + 1, l->w,
-           l->h - 8);
+      wbox(ptr, w, h, c1, l->x + (x * (l->w + 1)) + 1, l->y + (y * (l->h + 1)) + 1, l->w, l->h - 8);
       wbox(ptr, w, h, c01, l->x + (x * (l->w + 1)) + 1, l->y + (y * (l->h + 1)) + 1 + l->h - 8,
            l->w, 8);
     }

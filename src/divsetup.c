@@ -356,15 +356,15 @@ void wallpaper_setup0(void) {
 }
 
 typedef struct _meminfo {
-  unsigned long largest_available_block;        // Largest block available
-  unsigned max_unlocked_pages;          // Maximum unlocked pages
-  unsigned largest_lockable_page;             // Largest lockable page
-  unsigned linear_address_space;       // Linear address space
-  unsigned free_pages_available;     // Number of free pages available
-  unsigned free_physical_pages;         // Number of free physical pages
-  unsigned total_physical_pages;                 // Total physical pages
-  unsigned free_linear_space; // Free linear address space
-  unsigned page_file_size;            // Page file size
+  unsigned long largest_available_block; // Largest block available
+  unsigned max_unlocked_pages;           // Maximum unlocked pages
+  unsigned largest_lockable_page;        // Largest lockable page
+  unsigned linear_address_space;         // Linear address space
+  unsigned free_pages_available;         // Number of free pages available
+  unsigned free_physical_pages;          // Number of free physical pages
+  unsigned total_physical_pages;         // Total physical pages
+  unsigned free_linear_space;            // Free linear address space
+  unsigned page_file_size;               // Page file size
   unsigned reserved[3];
 } meminfo;
 

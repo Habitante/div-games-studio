@@ -1228,8 +1228,7 @@ void start_scroll(void) {
       iscroll[snum].map2_x = *((word *)ptr2 + 32);
       iscroll[snum].map2_y = *((word *)ptr2 + 33);
     }
-    if ((iscroll[snum]._sscr2 = (byte *)malloc(iscroll[snum].w * (iscroll[snum].h + 1))) ==
-        NULL) {
+    if ((iscroll[snum]._sscr2 = (byte *)malloc(iscroll[snum].w * (iscroll[snum].h + 1))) == NULL) {
       free(iscroll[snum]._sscr1);
       free(iscroll[snum].fast);
       e(100);
@@ -2091,11 +2090,9 @@ void map_block_copy(void) {
       x = xd - x;
       y = yd - y;
 
-      if (x >= clipx0 && x + w <= clipx1 && y >= clipy0 &&
-          y + h <= clipy1) // Draw sprite unclipped
+      if (x >= clipx0 && x + w <= clipx1 && y >= clipy0 && y + h <= clipy1) // Draw sprite unclipped
         sp_normal(si, x, y, w, h, 0);
-      else if (x < clipx1 && y < clipy1 && x + w > clipx0 &&
-               y + h > clipy0) // Draw sprite clipped
+      else if (x < clipx1 && y < clipy1 && x + w > clipx0 && y + h > clipy0) // Draw sprite clipped
         sp_clipped(si, x, y, w, h, 0);
 
 no:
@@ -4568,16 +4565,16 @@ function 139 int ignore_error(0)                   // Ignore a runtime error (nu
 */
 
 typedef struct _meminfo {
-  unsigned largest_available_block;             // Largest available block
-  unsigned max_unlocked_pages;          // Max unlocked pages
-  unsigned largest_lockable_page;             // Largest lockable page
-  unsigned linear_address_space;       // Linear address space
-  unsigned free_pages_available;     // Number of free pages available
-  unsigned free_physical_pages;         // Number of free physical pages
-  unsigned total_physical_pages;                 // Total physical pages
-  unsigned free_linear_space; // Free linear address space
-  unsigned page_file_size;            // Page file size
-  unsigned reservado[3];                             // Reserved
+  unsigned largest_available_block; // Largest available block
+  unsigned max_unlocked_pages;      // Max unlocked pages
+  unsigned largest_lockable_page;   // Largest lockable page
+  unsigned linear_address_space;    // Linear address space
+  unsigned free_pages_available;    // Number of free pages available
+  unsigned free_physical_pages;     // Number of free physical pages
+  unsigned total_physical_pages;    // Total physical pages
+  unsigned free_linear_space;       // Free linear address space
+  unsigned page_file_size;          // Page file size
+  unsigned reservado[3];            // Reserved
 } meminfo;
 
 int mem_get_heap_free() {
@@ -5063,9 +5060,9 @@ enum tokens {
   p_neg
 };
 
-int token;        // From the enum above
-double token_number;   // When token==p_num
-char *expression; // Pointer to the ASCIIZ expression
+int token;           // From the enum above
+double token_number; // When token==p_num
+char *expression;    // Pointer to the ASCIIZ expression
 
 struct { // Holds the parsed expression
   int token;
@@ -5079,7 +5076,7 @@ double do_evaluate(void);
 void do_calculate(void) {
   double result;
   token = p_inicio;        // No token initially
-  num_expressions = 0;             // Initialize expression counter
+  num_expressions = 0;     // Initialize expression counter
   get_token();             // Get the first token
   expres0();               // Parse the expression
   if (token == p_ultimo) { // Expression parsed successfully

@@ -735,9 +735,9 @@ byte *ultima_linea, cero = 0;
 
 // Info for EXEC.LIN (position in mem and source of each statement)
 
-int start_addr, end_addr;    // Start and end addresses in mem[] of the statement
+int start_addr, end_addr;  // Start and end addresses in mem[] of the statement
 int start_line, start_col; // Position where the statement begins in source
-int end_line, end_col; // Position where the statement ends in source
+int end_line, end_col;     // Position where the statement ends in source
 
 void statement_start(void);  // Set start_addr, start_line, start_col
 void statement_end(void);    // Set end_addr, end_line, end_col
@@ -748,15 +748,15 @@ void record_statement(void); // Write the six variables to file
 // Object table --------------------------------- *iobj = first free object
 
 struct object {
-  byte type;               // Object type
-  byte used;              // Whether the object was used before being defined
-  byte *name;              // Pointer to name, for listing output
-  byte *ierror;            // Pointer to source code for determining column if needed
-  int line;                // Source line number, for error reporting
-  int param;               // Whether this object was declared in parameters
-  struct object *prev; // Previous object with the same name
-  struct object *scope;   // Block for this process (0-global/local N-private)
-  struct object *member;   // Which struct it belongs to (0-n/a)
+  byte type;             // Object type
+  byte used;             // Whether the object was used before being defined
+  byte *name;            // Pointer to name, for listing output
+  byte *ierror;          // Pointer to source code for determining column if needed
+  int line;              // Source line number, for error reporting
+  int param;             // Whether this object was declared in parameters
+  struct object *prev;   // Previous object with the same name
+  struct object *scope;  // Block for this process (0-global/local N-private)
+  struct object *member; // Which struct it belongs to (0-n/a)
   union {
     struct { // Constant
       int value;
@@ -767,17 +767,17 @@ struct object {
     } var_global;
     struct { // Global table
       int offset;
-      int total_len;          // total number of elements
+      int total_len;        // total number of elements
       int len1, len2, len3; // len2/3==-1 if n/a
     } table_global, ptr_int_global;
     struct { // Global byte
       int offset;
-      int total_len;          // total number of elements
+      int total_len;        // total number of elements
       int len1, len2, len3; // len2/3==-1 if n/a
     } byte_global, ptr_byte_global;
     struct { // Global word
       int offset;
-      int total_len;          // total number of elements
+      int total_len;        // total number of elements
       int len1, len2, len3; // len2/3==-1 if n/a
     } word_global, ptr_word_global;
     struct { // Global string
@@ -786,15 +786,15 @@ struct object {
     } string_global, ptr_string_global;
     struct { // Struct
       int offset;
-      int item_len;               // Number of fields
-      int total_items;             // Total number of records
+      int item_len;         // Number of fields
+      int total_items;      // Total number of records
       int dim1, dim2, dim3; // -1 if n/a
     } struct_global, struct_local;
     struct { // Struct pointer
       int offset;
-      struct object *ostruct;     // Pointer to struct
-      int total_items;             // Total number of records
-      int dim1, dim2, dim3; // -1 if n/a
+      struct object *ostruct; // Pointer to struct
+      int total_items;        // Total number of records
+      int dim1, dim2, dim3;   // -1 if n/a
     } ptr_struct_global, ptr_struct_local;
     struct { // Local variable
       int offset;
@@ -806,12 +806,12 @@ struct object {
     } table_local, ptr_int_local;
     struct { // Local byte
       int offset;
-      int total_len;          // total number of elements
+      int total_len;        // total number of elements
       int len1, len2, len3; // len2/3==-1 if n/a
     } byte_local, ptr_byte_local;
     struct { // Local word
       int offset;
-      int total_len;          // total number of elements
+      int total_len;        // total number of elements
       int len1, len2, len3; // len2/3==-1 if n/a
     } word_local, ptr_word_local;
     struct { // Local string
@@ -928,8 +928,8 @@ int local_var_len; // end of local variables including private ones
 //      Formatted listing variables
 //-----------------------------------------------------------------------------
 
-int comment_depth = 0;  // 0-Code, 1-Inside comment, 2-Nested, ...
-int emit_tokens = 0; // Whether to generate tokens in listing
+int comment_depth = 0; // 0-Code, 1-Inside comment, 2-Nested, ...
+int emit_tokens = 0;   // Whether to generate tokens in listing
 
 //-----------------------------------------------------------------------------
 //      Error information
@@ -1987,7 +1987,7 @@ lex_scan:
     while (*ptr != NULL && strcmp((char *)(ptr + 2), (char *)_ivnom + ptr8))
       ptr = (byte **)*ptr;
     if (!strcmp((char *)(ptr + 2), (char *)_ivnom + ptr8)) { // id found
-      name_index.b = _ivnom;                                      // remove it from vnom
+      name_index.b = _ivnom;                                 // remove it from vnom
       next_pieza = (intptr_t)*(ptr + 1);
       if (next_pieza < 256 && next_pieza >= 0) { // reserved word (token)
         if (next_pieza == p_rem) {
@@ -1999,8 +1999,8 @@ lex_scan:
         next_pieza = p_id;
       }
     } else {
-      name_index.b = _ivnom;  // remove it from vnom
-      next_pieza = p_id; // new id
+      name_index.b = _ivnom; // remove it from vnom
+      next_pieza = p_id;     // new id
     }
     break;
 
@@ -2146,7 +2146,7 @@ lex_scan:
     }
 
     if (!strcmp((char *)(ptr + 2), (char *)_ivnom + ptr8)) { // id found
-      name_index.b = _ivnom;                                      // remove it from vnom
+      name_index.b = _ivnom;                                 // remove it from vnom
       current_token = (intptr_t)*(ptr + 1);
       if (current_token < 256 && current_token >= 0) { // reserved word (t	oken)
 
@@ -2419,7 +2419,8 @@ struct object *analyze_pointer(int tipo, int offset) {
           }
           lexer();
         }
-        if (len1 != (*ob).ptr_int_local.len1 || len2 != (*ob).ptr_int_local.len2 || len3 != (*ob).ptr_int_local.len3)
+        if (len1 != (*ob).ptr_int_local.len1 || len2 != (*ob).ptr_int_local.len2 ||
+            len3 != (*ob).ptr_int_local.len3)
           c_error(4, 141);
         else if (current_token == p_asig)
           c_error(0, 54);
@@ -2556,7 +2557,7 @@ int analyze_pointer_struct(int tipo, int offset, struct object *estructura) {
   if ((*ob).ptr_struct_global.dim3 > -1)
     (*ob).ptr_struct_global.total_items *= (*ob).ptr_struct_global.dim3 + 1;
 
-  (*ob).type = tipo;               // tpsgl or tpslo
+  (*ob).type = tipo;                            // tpsgl or tpslo
   (*ob).ptr_struct_global.offset = offset;      // pointer offset
   (*ob).ptr_struct_global.ostruct = estructura; // original struct
 
@@ -2672,8 +2673,10 @@ puntero_a_struct:
         i = offstruct + len;
         dup = (*ob).struct_global.total_items + 1;
         if (dup > 1) {
-          test_buffer(&mem, &imem_max, i + (*ob).struct_global.item_len * (*ob).struct_global.total_items);
-          test_buffer(&frm, &ifrm_max, i + (*ob).struct_global.item_len * (*ob).struct_global.total_items);
+          test_buffer(&mem, &imem_max,
+                      i + (*ob).struct_global.item_len * (*ob).struct_global.total_items);
+          test_buffer(&frm, &ifrm_max,
+                      i + (*ob).struct_global.item_len * (*ob).struct_global.total_items);
           while (--dup) {
             if (i != offstruct + len) {
               memcpy(&mem[i], &mem[offstruct + len], (*ob).struct_global.item_len << 2);
@@ -2744,7 +2747,8 @@ puntero1:
           save_error(1);
           _itxt = itxt;
           lexer();
-          if (current_token != p_lit && !(current_token == p_id && (*o).type == tcons && (*o).cons.literal))
+          if (current_token != p_lit &&
+              !(current_token == p_id && (*o).type == tcons && (*o).cons.literal))
             c_error(3, 128);
           if (strlen((char *)&mem[token_value]) > (*ob).string_global.total_len + 1)
             c_error(4, 129);
@@ -3193,8 +3197,10 @@ puntero_a_struct:
         i = offstruct + len;
         dup = (*ob).struct_local.total_items + 1;
         if (dup > 1) {
-          test_buffer(&loc, &iloc_max, i + (*ob).struct_local.item_len * (*ob).struct_local.total_items);
-          test_buffer(&frm, &ifrm_max, i + (*ob).struct_local.item_len * (*ob).struct_local.total_items);
+          test_buffer(&loc, &iloc_max,
+                      i + (*ob).struct_local.item_len * (*ob).struct_local.total_items);
+          test_buffer(&frm, &ifrm_max,
+                      i + (*ob).struct_local.item_len * (*ob).struct_local.total_items);
           while (--dup) {
             memcpy(&loc[i], &loc[offstruct + len], (*ob).struct_local.item_len << 2);
             memcpy(&frm[i], &frm[offstruct + len], (*ob).struct_local.item_len << 2);
@@ -3263,7 +3269,8 @@ puntero1:
           save_error(1);
           _itxt = itxt;
           lexer();
-          if (current_token != p_lit && !(current_token == p_id && (*o).type == tcons && (*o).cons.literal))
+          if (current_token != p_lit &&
+              !(current_token == p_id && (*o).type == tcons && (*o).cons.literal))
             c_error(3, 128);
           if (strlen((char *)&mem[token_value]) > (*ob).string_local.total_len + 1)
             c_error(4, 129);
@@ -3714,8 +3721,10 @@ puntero_a_struct:
         i = offstruct + len;
         dup = (*ob).struct_local.total_items + 1;
         if (dup > 1) {
-          test_buffer(&mem, &imem_max, i + (*ob).struct_local.item_len * (*ob).struct_local.total_items);
-          test_buffer(&frm, &ifrm_max, i + (*ob).struct_local.item_len * (*ob).struct_local.total_items);
+          test_buffer(&mem, &imem_max,
+                      i + (*ob).struct_local.item_len * (*ob).struct_local.total_items);
+          test_buffer(&frm, &ifrm_max,
+                      i + (*ob).struct_local.item_len * (*ob).struct_local.total_items);
           while (--dup) {
             memcpy(&mem[i], &mem[offstruct + len], (*ob).struct_local.item_len << 2);
             memcpy(&frm[i], &frm[offstruct + len], (*ob).struct_local.item_len << 2);
@@ -3784,7 +3793,8 @@ puntero1:
           save_error(1);
           _itxt = itxt;
           lexer();
-          if (current_token != p_lit && !(current_token == p_id && (*o).type == tcons && (*o).cons.literal))
+          if (current_token != p_lit &&
+              !(current_token == p_id && (*o).type == tcons && (*o).cons.literal))
             c_error(3, 128);
           if (strlen((char *)&mem[token_value]) > (*ob).string_local.total_len + 1)
             c_error(4, 129);
@@ -4286,7 +4296,8 @@ void parser(void) {
   while (current_token == p_include) {
     statement_start();
     lexer();
-    if (current_token != p_lit && !(current_token == p_id && (*o).type == tcons && (*o).cons.literal))
+    if (current_token != p_lit &&
+        !(current_token == p_id && (*o).type == tcons && (*o).cons.literal))
       c_error(1, 62);
     old_source = source;
     nombre_include = (byte *)&mem[token_value];
@@ -4320,7 +4331,8 @@ void parser(void) {
       if (current_token != p_asig)
         c_error(3, 119);
       lexer();
-      if (current_token == p_lit || (current_token == p_id && (*o).type == tcons && (*o).cons.literal))
+      if (current_token == p_lit ||
+          (current_token == p_id && (*o).type == tcons && (*o).cons.literal))
         (*ob).cons.literal = 1;
       else
         (*ob).cons.literal = 0;
@@ -4347,8 +4359,9 @@ void parser(void) {
 
   if (current_token == p_global) {
     skip_semicolons();
-    while (current_token == p_id || current_token == p_int || current_token == p_pointer || current_token == p_struct ||
-           current_token == p_string || current_token == p_byte || current_token == p_word) {
+    while (current_token == p_id || current_token == p_int || current_token == p_pointer ||
+           current_token == p_struct || current_token == p_string || current_token == p_byte ||
+           current_token == p_word) {
       if (current_token == p_struct) { // Struct global
 
         lexer();
@@ -4440,8 +4453,10 @@ puntero_a_struct:
           imem = (*ob).struct_global.offset;
           dup = (*ob).struct_global.total_items + 1;
           if (dup > 1) {
-            test_buffer(&mem, &imem_max, imem + (*ob).struct_global.item_len * (*ob).struct_global.total_items);
-            test_buffer(&frm, &ifrm_max, imem + (*ob).struct_global.item_len * (*ob).struct_global.total_items);
+            test_buffer(&mem, &imem_max,
+                        imem + (*ob).struct_global.item_len * (*ob).struct_global.total_items);
+            test_buffer(&frm, &ifrm_max,
+                        imem + (*ob).struct_global.item_len * (*ob).struct_global.total_items);
             while (--dup) {
               if (imem != _imem) {
                 memcpy(&mem[imem], &mem[_imem], (*ob).struct_global.item_len << 2);
@@ -4516,11 +4531,13 @@ puntero1:
             save_error(1);
             _itxt = itxt;
             lexer();
-            if (current_token != p_lit && !(current_token == p_id && (*o).type == tcons && (*o).cons.literal))
+            if (current_token != p_lit &&
+                !(current_token == p_id && (*o).type == tcons && (*o).cons.literal))
               c_error(3, 128);
             if (strlen((char *)&mem[token_value]) > (*ob).string_global.total_len + 1)
               c_error(4, 129);
-            imem = _imem + 1 + ((*ob).string_global.total_len + 5) / 4; // e.g. c[32] -> c[0]..c[32],NUL
+            imem = _imem + 1 +
+                   ((*ob).string_global.total_len + 5) / 4; // e.g. c[32] -> c[0]..c[32],NUL
             test_buffer(&mem, &imem_max, imem);
             memmove((char *)&mem[_imem + 1], (char *)&mem[token_value],
                     strlen((char *)&mem[token_value]) + 1);
@@ -4872,8 +4889,9 @@ puntero4:
 
   if (current_token == p_local) {
     skip_semicolons();
-    while (current_token == p_id || current_token == p_int || current_token == p_pointer || current_token == p_struct ||
-           current_token == p_string || current_token == p_byte || current_token == p_word) {
+    while (current_token == p_id || current_token == p_int || current_token == p_pointer ||
+           current_token == p_struct || current_token == p_string || current_token == p_byte ||
+           current_token == p_word) {
       if (current_token == p_struct) {
         lexer();
 
@@ -4964,8 +4982,10 @@ puntero_a_struct_local:
           iloc = (*ob).struct_local.offset;
           dup = (*ob).struct_local.total_items + 1;
           if (dup > 1) {
-            test_buffer(&loc, &iloc_max, iloc + (*ob).struct_local.item_len * (*ob).struct_local.total_items);
-            test_buffer(&frm, &ifrm_max, imem + (*ob).struct_local.item_len * (*ob).struct_local.total_items);
+            test_buffer(&loc, &iloc_max,
+                        iloc + (*ob).struct_local.item_len * (*ob).struct_local.total_items);
+            test_buffer(&frm, &ifrm_max,
+                        imem + (*ob).struct_local.item_len * (*ob).struct_local.total_items);
             while (--dup) {
               memcpy(&loc[iloc], &loc[_imem], (*ob).struct_local.item_len << 2);
               memcpy(&frm[iloc], &frm[_imem], (*ob).struct_local.item_len << 2);
@@ -5037,13 +5057,16 @@ puntero5:
             save_error(1);
             _itxt = itxt;
             lexer();
-            if (current_token != p_lit && !(current_token == p_id && (*o).type == tcons && (*o).cons.literal))
+            if (current_token != p_lit &&
+                !(current_token == p_id && (*o).type == tcons && (*o).cons.literal))
               c_error(3, 128);
             if (strlen((char *)&mem[token_value]) > (*ob).string_local.total_len + 1)
               c_error(4, 129);
-            iloc = _imem + 1 + ((*ob).string_local.total_len + 5) / 4; // e.g. c[32] -> c[0]..c[32],NUL
+            iloc =
+                _imem + 1 + ((*ob).string_local.total_len + 5) / 4; // e.g. c[32] -> c[0]..c[32],NUL
             test_buffer(&loc, &iloc_max, iloc);
-            div_strcpy((char *)&loc[_imem + 1], (*ob).string_local.total_len + 1, (char *)&mem[token_value]);
+            div_strcpy((char *)&loc[_imem + 1], (*ob).string_local.total_len + 1,
+                       (char *)&mem[token_value]);
             itxt = _itxt; // Remove the string from the text segment
             lexer();
           } else {
@@ -5558,8 +5581,9 @@ void analyze_private(void) {
     g2(lpri, 0);
     _imem_old = imem - 1;
 
-    while (current_token == p_id || current_token == p_int || current_token == p_pointer || current_token == p_struct ||
-           current_token == p_string || current_token == p_byte || current_token == p_word) {
+    while (current_token == p_id || current_token == p_int || current_token == p_pointer ||
+           current_token == p_struct || current_token == p_string || current_token == p_byte ||
+           current_token == p_word) {
       if (current_token == p_struct) {
         lexer();
 
@@ -5654,8 +5678,10 @@ puntero_a_struct:
           imem = (*ob).struct_local.offset;
           dup = (*ob).struct_local.total_items + 1;
           if (dup > 1) {
-            test_buffer(&mem, &imem_max, imem + (*ob).struct_local.item_len * (*ob).struct_local.total_items);
-            test_buffer(&frm, &ifrm_max, imem + (*ob).struct_local.item_len * (*ob).struct_local.total_items);
+            test_buffer(&mem, &imem_max,
+                        imem + (*ob).struct_local.item_len * (*ob).struct_local.total_items);
+            test_buffer(&frm, &ifrm_max,
+                        imem + (*ob).struct_local.item_len * (*ob).struct_local.total_items);
             while (--dup) {
               if (imem != _imem) {
                 memcpy(&mem[imem], &mem[_imem], (*ob).struct_local.item_len << 2);
@@ -5768,11 +5794,13 @@ puntero1:
             save_error(1);
             _itxt = itxt;
             lexer();
-            if (current_token != p_lit && !(current_token == p_id && (*o).type == tcons && (*o).cons.literal))
+            if (current_token != p_lit &&
+                !(current_token == p_id && (*o).type == tcons && (*o).cons.literal))
               c_error(3, 128);
             if (strlen((char *)&mem[token_value]) > (*ob).string_local.total_len + 1)
               c_error(4, 129);
-            imem = _imem + 1 + ((*ob).string_local.total_len + 5) / 4; // e.g. c[32] -> c[0]..c[32],NUL
+            imem =
+                _imem + 1 + ((*ob).string_local.total_len + 5) / 4; // e.g. c[32] -> c[0]..c[32],NUL
             test_buffer(&mem, &imem_max, imem);
             memmove((char *)&mem[_imem + 1], (char *)&mem[token_value],
                     strlen((char *)&mem[token_value]) + 1);
@@ -6312,7 +6340,8 @@ void tglo_init2(int tipo) {
       if (current_token != p_abrir)
         c_error(3, 36);
 
-    } else if (current_token == p_lit || (current_token == p_id && (*o).type == tcons && (*o).cons.literal)) {
+    } else if (current_token == p_lit ||
+               (current_token == p_id && (*o).type == tcons && (*o).cons.literal)) {
       value = token_value;
       lexer();
       if (current_token == p_abrir || current_token == p_dup)
@@ -8104,7 +8133,8 @@ void factor(void) {
       break;
     case tpsgl:
     case tpslo:
-      (*_exp++).value = (*((*o).ptr_struct_global.ostruct)).struct_global.item_len * (*o).struct_global.total_items;
+      (*_exp++).value = (*((*o).ptr_struct_global.ostruct)).struct_global.item_len *
+                        (*o).struct_global.total_items;
       break;
     case ttglo:
     case ttloc:
@@ -10949,8 +10979,8 @@ int compilado = 0;
 void compile_pass1(void) {
   _show_items();
   wwrite(v.ptr, v.w / big2, v.h / big2, 3, 12, 0, texts[206], c3);
-  wwrite(v.ptr, v.w / big2, v.h / big2, 6 + text_len(texts[206]), 12, 0,
-         window[v_window + 1].title, c4);
+  wwrite(v.ptr, v.w / big2, v.h / big2, 6 + text_len(texts[206]), 12, 0, window[v_window + 1].title,
+         c4);
 }
 
 extern uint8_t cerror[128];
@@ -11367,7 +11397,7 @@ lex_scan:
     while (*ptr && strcmp((char *)(ptr + 2), (char *)(_ivnom + ptr8)))
       ptr = (byte **)*ptr;
     if (!strcmp((char *)(ptr + 2), (char *)_ivnom + ptr8)) { // id found
-      name_index.b = _ivnom;                                      // remove it from vnom
+      name_index.b = _ivnom;                                 // remove it from vnom
       current_token = (intptr_t)*(ptr + 1);
       if (current_token < 256 && current_token >= 0) { // reserved word (token)
         if (current_token == p_rem) {
@@ -11380,7 +11410,7 @@ lex_scan:
       }
     } else {
       name_index.b = _ivnom; // remove it from vnom
-      current_token = p_id;     // new id
+      current_token = p_id;  // new id
     }
     break;
 

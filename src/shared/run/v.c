@@ -509,8 +509,8 @@ int save_MAP(byte *mapa, int w, int h, FILE *f) {
   char gradients[576];
 
   fwrite("map\x1a\x0d\x0a\x00\x00", 8, 1, f); // +000 Header and version
-  fwrite(&w, 2, 1, f);                       // +008 Width
-  fwrite(&h, 2, 1, f);                       // +010 Height
+  fwrite(&w, 2, 1, f);                        // +008 Width
+  fwrite(&h, 2, 1, f);                        // +010 Height
   y = 1;
   fwrite(&y, 4, 1, f); // +012 Code
 

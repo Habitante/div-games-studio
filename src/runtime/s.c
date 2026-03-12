@@ -615,7 +615,7 @@ void process_scan_left(void) {
     // 2. Add the pixel on the left ...
 
     if (*(si - iscroll[snum].w + 1)) { // If incoming pixel is foreground
-      if (!fast[in].inc[0]) {           // If the segment begins with foreground
+      if (!fast[in].inc[0]) {          // If the segment begins with foreground
         fast[in].inc[1]++;
       } else { // If it begins with background
         fast[in].nt += 2;
@@ -1085,8 +1085,7 @@ void put_sprite(int file, int graph, int x, int y, int angle, int size, int flag
         yg = h - 1 - yg;
       }
       y -= yg;
-      if (x >= clipx0 && x + w <= clipx1 && y >= clipy0 &&
-          y + h <= clipy1) // Fully visible sprite
+      if (x >= clipx0 && x + w <= clipx1 && y >= clipy0 && y + h <= clipy1) // Fully visible sprite
         sp_normal(si, x, y, w, h, flags);
       else if (x < clipx1 && y < clipy1 && x + w > clipx0 && y + h > clipy0) // Clipped sprite
         sp_clipped(si, x, y, w, h, flags);
@@ -1210,8 +1209,7 @@ void paint_sprite(void) { // Render a sprite (if visible), using mem[ide+ ... ]
         yg = h - 1 - yg;
       }
       y -= yg;
-      if (x >= clipx0 && x + w <= clipx1 && y >= clipy0 &&
-          y + h <= clipy1) // Fully visible sprite
+      if (x >= clipx0 && x + w <= clipx1 && y >= clipy0 && y + h <= clipy1) // Fully visible sprite
         sp_normal(si, x, y, w, h, mem[ide + _Flags]);
       else if (x < clipx1 && y < clipy1 && x + w > clipx0 && y + h > clipy0) // Clipped sprite
         sp_clipped(si, x, y, w, h, mem[ide + _Flags]);
@@ -1625,7 +1623,7 @@ void sp_rotated(byte *si, int x, int y, int w, int h, int xg, int yg, int ang, i
   float a, s;
   int p[24];
   int scan_y, hmin, hmax; // Minimum and maximum height
-  int n, l0 = 0, l1; // Side 0 and side 1 (indices into p[])
+  int n, l0 = 0, l1;      // Side 0 and side 1 (indices into p[])
 
   int hmax0, hmax1;
   union {
@@ -1842,7 +1840,8 @@ void sp_rotated(byte *si, int x, int y, int w, int h, int xg, int yg, int ang, i
       g1y.l = kk;
     }
 
-    if (scan_y < clipy1 && scan_y >= clipy0 && x0.w[1] < clipx1 && x1.w[1] >= clipx0 && x1.w[1] > x0.w[1]) {
+    if (scan_y < clipy1 && scan_y >= clipy0 && x0.w[1] < clipx1 && x1.w[1] >= clipx0 &&
+        x1.w[1] > x0.w[1]) {
       if (x0.w[1] < clipx0) {
         if (x1.w[1] >= clipx1) {
           if (flags & 4)
@@ -2097,7 +2096,7 @@ void draw_filled_box(int x, int y, int w, int h) {
 void draw_circle(int relleno, int x0, int y0, int x1, int y1) {
   int p[2048];   // Points on the circumference
   double cx, rx; // Center and radius of the circle
-  int w, h;    // Width and height
+  int w, h;      // Width and height
   double y, ymed, nsin;
   int n, xa, xb, ya, yb;
 
@@ -2994,12 +2993,12 @@ void paint_sprites_m7(int n, int cx, int cy, float ang) { // Takes the camera po
       if (max >= 32) { // Don't render objects at the camera's own coordinates
 
         h = (m7 + n)->height - mem[ide + _Height];
-        altura = (h * (max - factor)) / (max);                // en pix/4
+        altura = (h * (max - factor)) / (max);               // en pix/4
         altura = im7[n].y + im7[n].h / 2 + (h - altura) / 4; // en pix
         altura += (m7 + n)->horizon - im7[n].h / 2;
 
         h += 1000;
-        porcen = (h * (max - factor)) / (max);                // en pix/4
+        porcen = (h * (max - factor)) / (max);               // en pix/4
         porcen = im7[n].y + im7[n].h / 2 + (h - porcen) / 4; // en pix
         porcen += (m7 + n)->horizon - im7[n].h / 2 - altura;
 
@@ -3074,7 +3073,7 @@ void paint_sprite_m7(int n, int ide, int x, int y, int size, int ang) {
 
   if ((ptr = g[mem[ide + _File]].grf[mem[ide + _Graph]]) != NULL) {
     w = ptr[13];
-    h = ptr[14];                        // Graphic width and height
+    h = ptr[14];                         // Graphic width and height
     si = (byte *)ptr + 64 + ptr[15] * 4; // Start of graphic data
 
     if (ptr[15] == 0 || *((word *)ptr + 32) == 65535) {

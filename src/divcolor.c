@@ -54,7 +54,7 @@ struct clex_ele {
 int cnum_nodos; // Number of nodes used in clex_simb
 
 int in_comment; // Whether inside a comment
-int numrem;   // Nesting level of /* and */
+int numrem;     // Nesting level of /* and */
 
 byte *cvnom = NULL; // Name vector (hash_chain:int, token (or iobj):int, asciiz)
 union {

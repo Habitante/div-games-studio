@@ -51,8 +51,8 @@ int exp_gamma;
 
 struct tp {   // Structure for explosion points
   int x, y;   // Point coordinates
-  int radius;  // Effective radius of the point
-  int force; // Central force of the point
+  int radius; // Effective radius of the point
+  int force;  // Central force of the point
   int xr, yr; // Coord. * 10000
   int ix, iy; // Increments
 };

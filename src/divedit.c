@@ -76,9 +76,9 @@ extern int fbuf; // Pointer to queue buffer end
 
 //-----------------------------------------------------------------------------
 
-extern int error_number;  // Error number
+extern int error_number; // Error number
 extern int error_line;   // Line error (note, can be num_lines + 1)
-extern int error_col; // Error column num
+extern int error_col;    // Error column num
 
 //-----------------------------------------------------------------------------
 //    TPRG Struct
@@ -123,16 +123,17 @@ char line_buffer[long_line + 4]; // Copy of the line being edited, for f_enter()
 
 int cursor_mode = 0; // Active cursor type (0-insert/1-overwrite)
 
-long block_state = 0; //0-n/a 1-pivot(block_start,block_col1) 2-complete(block_start,block_col1,block_end,block_col2)
+long block_state =
+    0; //0-n/a 1-pivot(block_start,block_col1) 2-complete(block_start,block_col1,block_end,block_col2)
 
 byte *block_start, *block_end; // Pointers to the start of the first and last lines
-int block_col1, block_col2;  // Start and end columns in those lines
+int block_col1, block_col2;    // Start and end columns in those lines
 
 struct tprg *kprg; // Prg that owns the block
 
 char *clipboard = NULL; // Pointer to clipboard (initially empty)
 int clipboard_len;      // Clipboard content length in bytes
-int clipboard_lines;   // Number of line breaks contained
+int clipboard_lines;    // Number of line breaks contained
 int clipboard_type = 0; // 0-character block, 1-line block
 
 int edit_block_mode = 0; // 1-Volatile block on current line, 2-multi-line
@@ -164,7 +165,7 @@ void color_lex(void);
 
 extern int color_token;    // Token read by color_lex()
 extern byte *color_source; // Pointer to source, for compiling the program
-extern int in_comment;  // Whether inside a comment
+extern int in_comment;     // Whether inside a comment
 
 char colin[1024]; // Buffer for line syntax coloring
 
@@ -192,11 +193,11 @@ void program1(void) {
   if (error_number != -1 && eprg == v.prg)
     error_cursor();
 
-  wput(ptr, w, h, w - 17, 10, 56);     // Maximize
-  wput(ptr, w, h, w - 9, 10, 39);      // Up
+  wput(ptr, w, h, w - 17, 10, 56);    // Maximize
+  wput(ptr, w, h, w - 9, 10, 39);     // Up
   wput(ptr, w, h, w - 9, h - 17, 40); // Down
   wput(ptr, w, h, w - 9, h - 9, 34);  // Resize
-  wput(ptr, w, h, 2, h - 9, 51);       // Left
+  wput(ptr, w, h, 2, h - 9, 51);      // Left
   wput(ptr, w, h, w - 17, h - 9, 52); // Right
 }
 
@@ -1274,7 +1275,8 @@ void f_mark(void) {
         block_start = v.prg->lptr;
         if ((block_col1 = v.prg->column) > strlen(v.prg->l))
           block_col1 = strlen(v.prg->l) + 1;
-      } else if (v.prg->lptr < block_start || (v.prg->lptr == block_start && v.prg->column < block_col1)) {
+      } else if (v.prg->lptr < block_start ||
+                 (v.prg->lptr == block_start && v.prg->column < block_col1)) {
         block_start = v.prg->lptr;
         block_col1 = v.prg->column;
       } else {
@@ -2208,7 +2210,8 @@ void _completo(void) {
   do {
     old_di = di;
     n = editor_font_height;
-    if (block_state == 0 || kprg != v.prg || si < block_start || si > block_end) { // Outside the block
+    if (block_state == 0 || kprg != v.prg || si < block_start ||
+        si > block_end) { // Outside the block
       if (si > v.prg->buffer + v.prg->file_len)
         while (n--) {
           memset(di, ce01, v.w - 12 * big2);
@@ -2412,7 +2415,8 @@ void _parcial(void) {
   si = v.prg->lptr;
 
   n = editor_font_height;
-  if (block_state == 0 || kprg != v.prg || si < block_start || si > block_end) { // Outside the block
+  if (block_state == 0 || kprg != v.prg || si < block_start ||
+      si > block_end) { // Outside the block
     while (n--) {
       memset(di, ce1, v.w - 12 * big2);
       di += v.w;
@@ -2578,7 +2582,7 @@ void resize(void) {
   int _mx = mouse_x, _my = mouse_y; // Initial mouse coordinates
   int mx, my;                       // Snapped mouse coordinates at each moment
   int _an, _al;                     // Original an/al (in chars)
-  int old_w, old_h;               // Previous an/al
+  int old_w, old_h;                 // Previous an/al
   byte *new_block;
   int w = v.w, h = v.h;
   if (big) {

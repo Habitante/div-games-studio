@@ -9,7 +9,7 @@ byte *lang_buffer;
 byte *lang_buffer_end;
 
 int text_count = 0; // Number of texts
-byte *p, *q;    // Punteros de lectura y escritura respectivamente.
+byte *p, *q;        // Punteros de lectura y escritura respectivamente.
 
 
 ///////////////////////////////////////////////////////////////////////////////

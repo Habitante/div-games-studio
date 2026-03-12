@@ -21,7 +21,8 @@ extern int _omx, _omy, omx, omy, oclock;
 extern int incremento;
 
 void map_to_fpg(struct tmapa *mapa);
-void get_map_graphic(struct tmapa *mapa, byte *imagen, int x, int y, int width, int height, int cod);
+void get_map_graphic(struct tmapa *mapa, byte *imagen, int x, int y, int width, int height,
+                     int cod);
 void fpg_to_map(FPG *MiFPG);
 void put_map_graphic(byte *imagen, byte *mapa, int num);
 void place_map(void);
@@ -133,9 +134,9 @@ void fpg_dialog2(void) {
         x = -1;
       }
     }
-    fpg_add(MiFPG, COD, (char *)desc, (char *)window[1].mapa->filename,
-               window[1].mapa->map_width, window[1].mapa->map_height, num_points,
-               (char *)window[1].mapa->points, (char *)window[1].mapa->map, 0, 1);
+    fpg_add(MiFPG, COD, (char *)desc, (char *)window[1].mapa->filename, window[1].mapa->map_width,
+            window[1].mapa->map_height, num_points, (char *)window[1].mapa->points,
+            (char *)window[1].mapa->map, 0, 1);
 
     for (n = 0; n < 1000; n++)
       MiFPG->thumb[n].tagged = 0;
@@ -162,8 +163,8 @@ void fpg_dialog2(void) {
 
     if (fpg_image) {
       fpg_add(MiFPG, MiFPG->MiHeadFPG.COD, (char *)MiFPG->MiHeadFPG.Descrip,
-                 (char *)MiFPG->MiHeadFPG.Filename, MiFPG->MiHeadFPG.Ancho, MiFPG->MiHeadFPG.Alto,
-                 MiFPG->MiHeadFPG.num_points, (char *)fpg_points, fpg_image, 1, 1);
+              (char *)MiFPG->MiHeadFPG.Filename, MiFPG->MiHeadFPG.Ancho, MiFPG->MiHeadFPG.Alto,
+              MiFPG->MiHeadFPG.num_points, (char *)fpg_points, fpg_image, 1, 1);
     }
 
     if (fpg_image)
@@ -496,13 +497,13 @@ void open_file(void) {
 
             for (x = 0; x < 256; x++) {
               sample[((pal[x * 3 + 0] & 0xFE) << 9) | ((pal[x * 3 + 1] & 0xFE) << 4) |
-                      (pal[x * 3 + 2] >> 1)] = 1;
+                     (pal[x * 3 + 2] >> 1)] = 1;
             }
           }
 
           for (x = 0; x < 256; x++) {
             sample[((dac4[x * 3 + 0] & 0xFE) << 9) | ((dac4[x * 3 + 1] & 0xFE) << 4) |
-                    (dac4[x * 3 + 2] >> 1)] = 1;
+                   (dac4[x * 3 + 2] >> 1)] = 1;
           }
         }
       }
@@ -850,7 +851,8 @@ void fpg_edit_code_dialog(void) {
         a += coefredy;
       }
 
-      if ((get_code_image_red = (char *)malloc((get_code_width_red * get_code_height_red) / 4)) != NULL) {
+      if ((get_code_image_red = (char *)malloc((get_code_width_red * get_code_height_red) / 4)) !=
+          NULL) {
         for (y = 0; y < get_code_height_red; y += 2) {
           for (x = 0; x < get_code_width_red; x += 2) {
             n = *(ghost + temp2[x + y * get_code_width_red] * 256 +
@@ -1253,15 +1255,14 @@ void FPG_paint_listbox_br(struct t_listboxbr *l) {
 
   for (y = 0; y < l->lines; y++)
     for (x = 0; x < l->columns; x++) {
-      wbox(ptr, w, h, c1, l->x + (x * (l->w + 1)) + 1, l->y + (y * (l->h + 1)) + 1, l->w,
-           l->h - 8);
+      wbox(ptr, w, h, c1, l->x + (x * (l->w + 1)) + 1, l->y + (y * (l->h + 1)) + 1, l->w, l->h - 8);
 
       if (MiFPG->thumb[l->first_visible + y * l->columns + x].tagged)
         wbox(ptr, w, h, color_tag, l->x + (x * (l->w + 1)) + 1,
              l->y + (y * (l->h + 1)) + 1 + l->h - 8, l->w, 8);
       else
-        wbox(ptr, w, h, c01, l->x + (x * (l->w + 1)) + 1,
-             l->y + (y * (l->h + 1)) + 1 + l->h - 8, l->w, 8);
+        wbox(ptr, w, h, c01, l->x + (x * (l->w + 1)) + 1, l->y + (y * (l->h + 1)) + 1 + l->h - 8,
+             l->w, 8);
     }
 
   if (wmouse_in(l->x, l->y, (l->w + 1) * l->columns, (l->h + 1) * l->lines)) { // Calculate zone
@@ -1298,8 +1299,7 @@ void FPG_paint_slider_br(struct t_listboxbr *l) {
     h /= 2;
   }
 
-  wbox(ptr, w, h, c2, l->x + (l->w + 1) * l->columns + 1, l->y + 9, 7,
-       (l->h + 1) * l->lines - 17);
+  wbox(ptr, w, h, c2, l->x + (l->w + 1) * l->columns + 1, l->y + 9, 7, (l->h + 1) * l->lines - 17);
 
   if (l->slide > l->s0)
     wbox(ptr, w, h, c0, l->x + (l->w + 1) * l->columns + 1, l->slide - 1, 7, 1);
@@ -1794,7 +1794,8 @@ void map_to_fpg(struct tmapa *mapa) {
   free(imagen);
 }
 
-void get_map_graphic(struct tmapa *mapa, byte *imagen, int x, int y, int width, int height, int cod) {
+void get_map_graphic(struct tmapa *mapa, byte *imagen, int x, int y, int width, int height,
+                     int cod) {
   FPG *MiFPG = (FPG *)v.aux;
   int pos, index = 0;
   int scan_x, scan_y;

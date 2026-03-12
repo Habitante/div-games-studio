@@ -8,7 +8,7 @@
 byte *lang_buffer;
 byte *lang_buffer_end;
 
-int text_count = 0;          // Número de texts
+int text_count = 0;      // Número de texts
 byte *p_lengu, *q_lengu; // Punteros de lectura y escritura respectivamente.
 
 

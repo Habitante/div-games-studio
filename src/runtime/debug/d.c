@@ -33,7 +33,7 @@ void wwrite(byte *dest, int dest_width, int dest_height, int x, int y, int centr
 void dread_mouse(void);
 void explode(int x, int y, int w, int h);
 void blit_region(byte *dest, int dest_width, int dest_height, byte *p, int x, int y, int w, int h,
-              int salta);
+                 int salta);
 
 void modal_loop(void);
 int mouse_in(int x, int y, int x2, int y2);
@@ -45,7 +45,7 @@ void implode(int x, int y, int w, int h);
 int collides_with(int a, int x, int y, int w, int h);
 
 void blit_region_dark(byte *dest, int dest_width, int dest_height, byte *p, int x, int y, int w,
-                     int h, int salta);
+                      int h, int salta);
 
 void wbox_in_box(byte *dest, int dest_pitch, int dest_width, int dest_height, byte c, int x, int y,
                  int w, int h);
@@ -1001,7 +1001,8 @@ void flush_window(int m) {
           if (window[n].foreground == 1)
             blit_region(screen_buffer, vga_width, vga_height, _ptr, __x, _y, _an, _al, salta_x);
           else
-            blit_region_dark(screen_buffer, vga_width, vga_height, _ptr, __x, _y, _an, _al, salta_x);
+            blit_region_dark(screen_buffer, vga_width, vga_height, _ptr, __x, _y, _an, _al,
+                             salta_x);
         }
       }
 
@@ -1013,7 +1014,7 @@ void flush_window(int m) {
 //-----------------------------------------------------------------------------
 
 void blit_region(byte *dest, int dest_width, int dest_height, byte *p, int x, int y, int w, int h,
-              int salta) {
+                 int salta) {
   byte *q;
   int salta_x, long_x, resto_x;
   int salta_y, long_y, resto_y;
@@ -1056,7 +1057,7 @@ void blit_region(byte *dest, int dest_width, int dest_height, byte *p, int x, in
 //-----------------------------------------------------------------------------
 
 void blit_region_dark(byte *dest, int dest_width, int dest_height, byte *p, int x, int y, int w,
-                     int h, int salta) {
+                      int h, int salta) {
   byte *q, *_ghost;
   int salta_x, long_x, resto_x;
   int salta_y, long_y, resto_y;
@@ -1628,8 +1629,8 @@ void wwrite_in_box(byte *dest, int dest_pitch, int dest_width, int dest_height, 
         ptr++;
       }
       if (*ptr && x < 0) {
-        wtexc(dest, dest_pitch, dest_width, dest_height, font + car[*ptr].dir, x, y, car[*ptr].w,
-              h, c);
+        wtexc(dest, dest_pitch, dest_width, dest_height, font + car[*ptr].dir, x, y, car[*ptr].w, h,
+              c);
         x = x + car[*ptr].w;
         ptr++;
       }
@@ -1639,16 +1640,16 @@ void wwrite_in_box(byte *dest, int dest_pitch, int dest_width, int dest_height, 
         ptr++;
       }
       if (*ptr && x < dest_width)
-        wtexc(dest, dest_pitch, dest_width, dest_height, font + car[*ptr].dir, x, y, car[*ptr].w,
-              h, c);
+        wtexc(dest, dest_pitch, dest_width, dest_height, font + car[*ptr].dir, x, y, car[*ptr].w, h,
+              c);
     } else {
       while (*ptr && x + car[*ptr].w <= 0) {
         x = x + car[*ptr].w;
         ptr++;
       }
       while (*ptr && x < dest_width) {
-        wtexc(dest, dest_pitch, dest_width, dest_height, font + car[*ptr].dir, x, y, car[*ptr].w,
-              h, c);
+        wtexc(dest, dest_pitch, dest_width, dest_height, font + car[*ptr].dir, x, y, car[*ptr].w, h,
+              c);
         x = x + car[*ptr].w;
         ptr++;
       }
@@ -1855,7 +1856,8 @@ void update_box(int x, int y, int w, int h) {
           if (window[n].foreground == 1)
             blit_region(screen_buffer, vga_width, vga_height, _ptr, __x, _y, _an, _al, salta_x);
           else
-            blit_region_dark(screen_buffer, vga_width, vga_height, _ptr, __x, _y, _an, _al, salta_x);
+            blit_region_dark(screen_buffer, vga_width, vga_height, _ptr, __x, _y, _an, _al,
+                             salta_x);
         }
       }
 
@@ -2011,16 +2013,16 @@ void _show_items2(void) {
 }
 
 void show_button(t_item *i) {
-  wwrite(v.ptr, v.w / big2, v.h / big2, i->button.x, i->button.y, i->button.center,
-         i->button.text, c3);
+  wwrite(v.ptr, v.w / big2, v.h / big2, i->button.x, i->button.y, i->button.center, i->button.text,
+         c3);
   if (&v.item[v.selected_item] == i)
     select_button(i, 1);
 }
 
 void show_get(t_item *i) {
   wbox(v.ptr, v.w / big2, v.h / big2, c1, i->get.x, i->get.y + 8, i->get.w, 9);
-  wwrite_in_box(v.ptr, v.w / big2, i->get.w - 1 + i->get.x, v.h / big2, i->get.x + 1,
-                i->get.y + 9, 0, i->get.buffer, c3);
+  wwrite_in_box(v.ptr, v.w / big2, i->get.w - 1 + i->get.x, v.h / big2, i->get.x + 1, i->get.y + 9,
+                0, i->get.buffer, c3);
   wwrite(v.ptr, v.w / big2, v.h / big2, i->get.x + 1, i->get.y, 0, i->get.text, c12);
   wwrite(v.ptr, v.w / big2, v.h / big2, i->get.x, i->get.y, 0, i->get.text, c3);
   if (&v.item[v.selected_item] == i) {
@@ -2064,8 +2066,7 @@ void select_get(t_item *i, int activo, int ocultar_error) {
       wbox(v.ptr, v.w / big2, v.h / big2, c1, i->get.x, i->get.y + 8, i->get.w, 9);
       wwrite_in_box(v.ptr, v.w / big2, i->get.w - 1 + i->get.x, v.h / big2, i->get.x + 1,
                     i->get.y + 9, 0, i->get.buffer, c3);
-      wrectangle(v.ptr, v.w / big2, v.h / big2, c2, i->get.x - 1, i->get.y + 7, i->get.w + 2,
-                 11);
+      wrectangle(v.ptr, v.w / big2, v.h / big2, c2, i->get.x - 1, i->get.y + 7, i->get.w + 2, 11);
     }
 
     for (n = 0; n < max_items; n++)
@@ -2503,15 +2504,15 @@ void get_input(int n) {
     } else
       scroll = 0;
 
-    wbox(v.ptr, v.w / big2, v.h / big2, c0, v.item[n].get.x, v.item[n].get.y + 8,
-         v.item[n].get.w, 9);
-    wwrite_in_box(v.ptr + (v.item[n].get.x + 1) * big2, v.w / big2, v.item[n].get.w - 2,
-                  v.h / big2, 0 - scroll, v.item[n].get.y + 9, 0, (byte *)cwork, c4);
+    wbox(v.ptr, v.w / big2, v.h / big2, c0, v.item[n].get.x, v.item[n].get.y + 8, v.item[n].get.w,
+         9);
+    wwrite_in_box(v.ptr + (v.item[n].get.x + 1) * big2, v.w / big2, v.item[n].get.w - 2, v.h / big2,
+                  0 - scroll, v.item[n].get.y + 9, 0, (byte *)cwork, c4);
 
     if (system_clock & 4) {
       x = l + 1;
-      wbox_in_box(v.ptr + (v.item[n].get.x + 1) * big2, v.w / big2, v.item[n].get.w - 2,
-                  v.h / big2, c3, x - scroll, v.item[n].get.y + 9, 2, 7);
+      wbox_in_box(v.ptr + (v.item[n].get.x + 1) * big2, v.w / big2, v.item[n].get.w - 2, v.h / big2,
+                  c3, x - scroll, v.item[n].get.y + 9, 2, 7);
     }
   }
   get_cursor = (system_clock & 4);
@@ -5651,19 +5652,17 @@ void paint_code(void) { // Paint the source code
       if (l == linea2) {
         c = *(p + columna2 + 1);
         *(p + columna2 + 1) = 0;
-        wwrite_in_box(ptr + 54 * big2, w, w - 59, h, x + 1, 148 - 16 - 32 + n * 8, 0,
-                      p + columna1, c0);
-        wwrite_in_box(ptr + 54 * big2, w, w - 59, h, x, 148 - 16 - 32 + n * 8, 0, p + columna1,
-                      c4);
+        wwrite_in_box(ptr + 54 * big2, w, w - 59, h, x + 1, 148 - 16 - 32 + n * 8, 0, p + columna1,
+                      c0);
+        wwrite_in_box(ptr + 54 * big2, w, w - 59, h, x, 148 - 16 - 32 + n * 8, 0, p + columna1, c4);
         x += text_len(p + columna1) + 1;
         *(p + columna2 + 1) = c;
-        wwrite_in_box(ptr + 54 * big2, w, w - 59, h, x, 148 - 16 - 32 + n * 8, 0,
-                      p + columna2 + 1, c3);
+        wwrite_in_box(ptr + 54 * big2, w, w - 59, h, x, 148 - 16 - 32 + n * 8, 0, p + columna2 + 1,
+                      c3);
       } else {
-        wwrite_in_box(ptr + 54 * big2, w, w - 59, h, x + 1, 148 - 16 - 32 + n * 8, 0,
-                      p + columna1, c0);
-        wwrite_in_box(ptr + 54 * big2, w, w - 59, h, x, 148 - 16 - 32 + n * 8, 0, p + columna1,
-                      c4);
+        wwrite_in_box(ptr + 54 * big2, w, w - 59, h, x + 1, 148 - 16 - 32 + n * 8, 0, p + columna1,
+                      c0);
+        wwrite_in_box(ptr + 54 * big2, w, w - 59, h, x, 148 - 16 - 32 + n * 8, 0, p + columna1, c4);
       }
     } else if (l == linea2) {
       c = *(p + columna2 + 1);
@@ -5676,13 +5675,11 @@ void paint_code(void) { // Paint the source code
       wwrite_in_box(ptr + 54 * big2, w, w - 59, h, x, 148 - 16 - 32 + n * 8, 0, p + columna2 + 1,
                     c3);
     } else if (l > linea1 && l < linea2) {
-      wwrite_in_box(ptr + 54 * big2, w, w - 59, h, x_inicio - 54 + 1, 148 - 16 - 32 + n * 8, 0,
-                    p, c0);
-      wwrite_in_box(ptr + 54 * big2, w, w - 59, h, x_inicio - 54, 148 - 16 - 32 + n * 8, 0, p,
-                    c4);
+      wwrite_in_box(ptr + 54 * big2, w, w - 59, h, x_inicio - 54 + 1, 148 - 16 - 32 + n * 8, 0, p,
+                    c0);
+      wwrite_in_box(ptr + 54 * big2, w, w - 59, h, x_inicio - 54, 148 - 16 - 32 + n * 8, 0, p, c4);
     } else {
-      wwrite_in_box(ptr + 54 * big2, w, w - 59, h, x_inicio - 54, 148 - 16 - 32 + n * 8, 0, p,
-                    c3);
+      wwrite_in_box(ptr + 54 * big2, w, w - 59, h, x_inicio - 54, 148 - 16 - 32 + n * 8, 0, p, c3);
     }
     p += strlen((char *)p) + 1;
   }
@@ -6217,8 +6214,7 @@ void paint_profile_list(void) {
         div_snprintf(cwork, sizeof(cwork), "0");
     }
 
-    wwrite(ptr, w, h, w - 10 - 130 + 32, lpy + 1 + (m - lp_ini) * lpal, 1, (byte *)cwork,
-           c_g_low0);
+    wwrite(ptr, w, h, w - 10 - 130 + 32, lpy + 1 + (m - lp_ini) * lpal, 1, (byte *)cwork, c_g_low0);
     wwrite(ptr, w, h, w - 11 - 130 + 32, lpy + 1 + (m - lp_ini) * lpal, 1, (byte *)cwork, c34);
 
     wbox(ptr, w, h, c_r_low0, w - 11 - 65, lpy + (m - lp_ini) * lpal, 64, lpal - 1); // Rendering
@@ -6235,8 +6231,7 @@ void paint_profile_list(void) {
         div_snprintf(cwork, sizeof(cwork), "0");
     }
 
-    wwrite(ptr, w, h, w - 10 - 65 + 32, lpy + 1 + (m - lp_ini) * lpal, 1, (byte *)cwork,
-           c_r_low0);
+    wwrite(ptr, w, h, w - 10 - 65 + 32, lpy + 1 + (m - lp_ini) * lpal, 1, (byte *)cwork, c_r_low0);
     wwrite(ptr, w, h, w - 11 - 65 + 32, lpy + 1 + (m - lp_ini) * lpal, 1, (byte *)cwork, c34);
 
     wwrite_in_box(ptr, w, w - 13 - 131, h, 5, lpy + 1 + (m - lp_ini) * lpal, 0,

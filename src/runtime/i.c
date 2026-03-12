@@ -1073,7 +1073,8 @@ void frame_start(void) {
   function_exec(255, get_ticks() - profile_clock);
 #endif
 
-  if (get_reloj() > (fractional_clock + clock_interval / 3)) { // Allow consuming up to one third of the next frame
+  if (get_reloj() > (fractional_clock +
+                     clock_interval / 3)) { // Allow consuming up to one third of the next frame
     if (blits_skipped < max_frame_skips) {
       blits_skipped++;
       skip_blit = 1;
@@ -1813,7 +1814,7 @@ int main(int argc, char *argv[]) {
   vga_width = 320;
   vga_height = 200;
   clock_interval = 1000.0 / 24.0; // 24 fps
-  max_frame_skips = 0;         // 0 skips
+  max_frame_skips = 0;            // 0 skips
 
 #ifdef __EMSCRIPTEN__
 

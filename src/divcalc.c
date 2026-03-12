@@ -64,7 +64,7 @@ enum tokens {
 };
 
 int token;               // Del tipo enumerado anterior
-double token_number;          // Cuando token==p_num
+double token_number;     // Cuando token==p_num
 static char *expression; // Puntero a la expresión asciiz
 
 struct { // Para contener la expression analizada
@@ -79,7 +79,7 @@ double do_evaluate(void);
 void do_calculate(void) {
   double result;
   token = p_inicio;        // No hay ningun token inicialmente
-  num_expressions = 0;             // Inicializa el contador de expresiones
+  num_expressions = 0;     // Inicializa el contador de expresiones
   get_token();             // Obtiene el primer token
   expres0();               // Se analiza la expression
   if (token == p_ultimo) { // Se analizó con éxito la expression

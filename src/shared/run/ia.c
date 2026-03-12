@@ -29,8 +29,8 @@ word *siguientes;  // Linked list of cells
 #define dis2(x) (*(distancias2 + (x)))
 #define sig(x)  (*(siguientes + (x)))
 
-byte *map;  // Pointer to the hardness map (bytes, 0 = free)
-int w, h; // Width and height of the map
+byte *map; // Pointer to the hardness map (bytes, 0 = free)
+int w, h;  // Width and height of the map
 
 #define m(x, y) (*(map + (x) + ((y) * w)))
 

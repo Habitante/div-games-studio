@@ -970,8 +970,7 @@ void mainloop(void) {
   if (dragging != 4) {
     if (n == 0)
       if (v.foreground == 1)
-        if (!mouse_in(v.x + 2 * big2, v.y + 10 * big2, v.x + v.w - 2 * big2,
-                      v.y + v.h - 2 * big2))
+        if (!mouse_in(v.x + 2 * big2, v.y + 10 * big2, v.x + v.w - 2 * big2, v.y + v.h - 2 * big2))
           n--;
 
     if (n != oldn && oldn == 0) {
@@ -2090,7 +2089,7 @@ void minimize_window(void) {
   v.h = 7 * big2;
 
   if (v.w != v._an || v.h != v._al) { // If this is the first minimize
-                                        // (or the name changed ...)
+                                      // (or the name changed ...)
     place_window(v.side * 2 + 0, &v.x, &v.y, v.w, v.h);
   } else {
     v.x = v._x;
@@ -2511,7 +2510,7 @@ void update_box(int x, int y, int w, int h) {
               blit_region(screen_buffer, vga_width, vga_height, _ptr, _x, _y, _an, _al, salta_x);
             else
               blit_region_dark(screen_buffer, vga_width, vga_height, _ptr, _x, _y, _an, _al,
-                              salta_x);
+                               salta_x);
           }
 
         } else {
@@ -2601,7 +2600,7 @@ void update_dialogs(int x, int y, int w, int h) {
               blit_region(screen_buffer, vga_width, vga_height, _ptr, _x, _y, _an, _al, salta_x);
             else
               blit_region_dark(screen_buffer, vga_width, vga_height, _ptr, _x, _y, _an, _al,
-                              salta_x);
+                               salta_x);
           }
         }
 }
@@ -2674,7 +2673,7 @@ void update_box2(int vent, int x, int y, int w, int h) {
               blit_region(screen_buffer, vga_width, vga_height, _ptr, _x, _y, _an, _al, salta_x);
             else
               blit_region_dark(screen_buffer, vga_width, vga_height, _ptr, _x, _y, _an, _al,
-                              salta_x);
+                               salta_x);
           }
 
         } else {
@@ -2915,7 +2914,7 @@ void flush_window(int m) {
               blit_region(screen_buffer, vga_width, vga_height, _ptr, _x, _y, _an, _al, salta_x);
             } else {
               blit_region_dark(screen_buffer, vga_width, vga_height, _ptr, _x, _y, _an, _al,
-                              salta_x);
+                               salta_x);
             }
           }
         } else {
@@ -4380,8 +4379,8 @@ void _show_items(void) {
 }
 
 void show_button(struct t_item *i) {
-  wwrite(v.ptr, v.w / big2, v.h / big2, i->button.x, i->button.y, i->button.center,
-         i->button.text, c3);
+  wwrite(v.ptr, v.w / big2, v.h / big2, i->button.x, i->button.y, i->button.center, i->button.text,
+         c3);
   if (&v.item[v.selected_item] == i)
     select_button(i, 1);
 }
@@ -4432,8 +4431,8 @@ void select_button(struct t_item *i, int activo) {
 
 void show_get(struct t_item *i) {
   wbox(v.ptr, v.w / big2, v.h / big2, c1, i->get.x, i->get.y + 8, i->get.w, 9);
-  wwrite_in_box(v.ptr, v.w / big2, i->get.w - 1 + i->get.x, v.h / big2, i->get.x + 1,
-                i->get.y + 9, 0, i->get.buffer, c3);
+  wwrite_in_box(v.ptr, v.w / big2, i->get.w - 1 + i->get.x, v.h / big2, i->get.x + 1, i->get.y + 9,
+                0, i->get.buffer, c3);
   wwrite(v.ptr, v.w / big2, v.h / big2, i->get.x + 1, i->get.y, 0, i->get.text, c12);
   wwrite(v.ptr, v.w / big2, v.h / big2, i->get.x, i->get.y, 0, i->get.text, c3);
   if (&v.item[v.selected_item] == i) {
@@ -4476,8 +4475,7 @@ void select_get(struct t_item *i, int activo, int ocultar_error) {
       wbox(v.ptr, v.w / big2, v.h / big2, c1, i->get.x, i->get.y + 8, i->get.w, 9);
       wwrite_in_box(v.ptr, v.w / big2, i->get.w - 1 + i->get.x, v.h / big2, i->get.x + 1,
                     i->get.y + 9, 0, i->get.buffer, c3);
-      wrectangle(v.ptr, v.w / big2, v.h / big2, c2, i->get.x - 1, i->get.y + 7, i->get.w + 2,
-                 11);
+      wrectangle(v.ptr, v.w / big2, v.h / big2, c2, i->get.x - 1, i->get.y + 7, i->get.w + 2, 11);
     }
 
     for (n = 0; n < max_items; n++)
@@ -4907,15 +4905,15 @@ void get_input(int n) {
     } else
       scroll = 0;
 
-    wbox(v.ptr, v.w / big2, v.h / big2, c0, v.item[n].get.x, v.item[n].get.y + 8,
-         v.item[n].get.w, 9);
-    wwrite_in_box(v.ptr + (v.item[n].get.x + 1) * big2, v.w / big2, v.item[n].get.w - 2,
-                  v.h / big2, 0 - scroll, v.item[n].get.y + 9, 0, (byte *)cwork, c4);
+    wbox(v.ptr, v.w / big2, v.h / big2, c0, v.item[n].get.x, v.item[n].get.y + 8, v.item[n].get.w,
+         9);
+    wwrite_in_box(v.ptr + (v.item[n].get.x + 1) * big2, v.w / big2, v.item[n].get.w - 2, v.h / big2,
+                  0 - scroll, v.item[n].get.y + 9, 0, (byte *)cwork, c4);
 
     if (*system_clock & 4) {
       x = l + 1;
-      wbox_in_box(v.ptr + (v.item[n].get.x + 1) * big2, v.w / big2, v.item[n].get.w - 2,
-                  v.h / big2, c3, x - scroll, v.item[n].get.y + 9, 2, 7);
+      wbox_in_box(v.ptr + (v.item[n].get.x + 1) * big2, v.w / big2, v.item[n].get.w - 2, v.h / big2,
+                  c3, x - scroll, v.item[n].get.y + 9, 2, 7);
     }
   }
   get_cursor = (*system_clock & 4);
@@ -4990,8 +4988,8 @@ void activate(void) {
   for (m = 1; m < max_windows; m++)
     if (window[m].type == v.type && window[m].state) {
       window[m].state = 0;
-      wgra(window[m].ptr, window[m].w / big2, window[m].h / big2, c1, 2, 2,
-           window[m].w / big2 - 20, 7);
+      wgra(window[m].ptr, window[m].w / big2, window[m].h / big2, c1, 2, 2, window[m].w / big2 - 20,
+           7);
       if (text_len(window[m].title) + 3 > window[m].w / big2 - 20) {
         wwrite_in_box(window[m].ptr, window[m].w / big2, window[m].w / big2 - 19,
                       window[m].h / big2, 4, 2, 0, window[m].title, c0);

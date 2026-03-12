@@ -547,7 +547,7 @@ GLOBAL FILE *tabfiles[32]; // Table of open handles (0 = free)
 
 GLOBAL int vga_width, vga_height; // Physical screen dimensions
 GLOBAL int vwidth, vheight;       // Screen window dimensions
-GLOBAL int vvga_w, vvga_h;      // Physical screen dimensions (legacy)
+GLOBAL int vvga_w, vvga_h;        // Physical screen dimensions (legacy)
 
 GLOBAL byte fsmode;
 
@@ -649,14 +649,14 @@ typedef struct _TABLAFNT {
 } TABLAFNT;
 
 typedef struct _fnt_info {
-  int width;     // Average font width
-  int spacing;   // Space character width in pixels
+  int width;          // Average font width
+  int spacing;        // Space character width in pixels
   int letter_spacing; // Inter-character spacing (in addition to glyph width)
-  int height;      // Maximum font height
-  int fonpal;    // CRC of its palette
-  int syspal;    // CRC of the palette it is adapted to
-  int len;       // FNT file length
-  char name[80]; // FNT file name
+  int height;         // Maximum font height
+  int fonpal;         // CRC of its palette
+  int syspal;         // CRC of the palette it is adapted to
+  int len;            // FNT file length
+  char name[80];      // FNT file name
 } fnt_info;
 
 #define max_fonts 32 // Maximum number of fonts at runtime
@@ -681,7 +681,7 @@ typedef struct _t_texto {
   int centro; // Alignment type: 0=left, 1=centered, ...
   int region; // Clipping region
   int x0, y0; // Region occupied by the text
-  int w, h; // For partial screen blits
+  int w, h;   // For partial screen blits
 } t_text;
 
 GLOBAL t_text texts[max_texts + 1];
@@ -806,7 +806,7 @@ GLOBAL int skip_blit, blits_skipped;
 // Collision detection buffer
 //////////////////////////////////////////////////////////////////////////////
 
-GLOBAL byte *buffer;             // Collision Buffer
+GLOBAL byte *buffer;           // Collision Buffer
 GLOBAL int buffer_w, buffer_h; // Width & Height of buffer
 
 //////////////////////////////////////////////////////////////////////////////
@@ -881,7 +881,7 @@ typedef struct _twindow {
   byte *title;    // Title bar text
   void_return_type_t paint_handler, click_handler, close_handler;
   int x, y, w, h; // Window position and dimensions
-  byte *ptr;        // Window buffer
+  byte *ptr;      // Window buffer
   int state;
   int redraw;             // Needs-redraw flag
   t_item item[max_items]; // Buttons, gets, switches, etc.
@@ -897,7 +897,7 @@ struct t_listbox {
   char *list;        // List pointer
   int item_width;    // Characters per item
   int visible_items; // Visible item count
-  int w, h;        // Text zone width in pixels
+  int w, h;          // Text zone width in pixels
   int first_visible; // First visible index (from 0)
   int total_items;   // Total item count (0 n/a)
   int s0, s1, slide; // Slide bar start, end, current position
