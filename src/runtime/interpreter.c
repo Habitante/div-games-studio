@@ -1677,6 +1677,10 @@ void exer(int e) {
   printf("exited %d\n", e);
 #endif
 
+#ifdef WIN32
+  closefiles();
+#endif
+
 #ifdef EMSCRIPTEN
   emscripten_cancel_main_loop();
 #endif

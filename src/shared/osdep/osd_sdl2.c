@@ -16,12 +16,14 @@ extern int vwidth;
 extern int vheight;
 
 void OSDEP_Init(void) {
-  SDL_Init(SDL_INIT_EVERYTHING);
-// on windows, get printf working.
+// on windows, get printf working before any SDL calls.
 #ifdef __WIN32
   freopen("CON", "w", stdout);
   freopen("CON", "w", stderr);
 #endif
+  if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
+    fprintf(stderr, "SDL_Init failed: %s\n", SDL_GetError());
+  }
 }
 
 void OSDEP_Quit(void) {
@@ -86,7 +88,10 @@ OSDEP_Surface *OSDEP_SetVideoMode(int width, int height, int bpp, char fs) {
     if (fs)
       flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
 
-    SDL_CreateWindowAndRenderer(width, height, flags, &OSDEP_window, &OSDEP_renderer);
+    if (SDL_CreateWindowAndRenderer(width, height, flags, &OSDEP_window, &OSDEP_renderer) < 0) {
+      SDL_Log("SDL_CreateWindowAndRenderer failed: %s", SDL_GetError());
+      return NULL;
+    }
     SDL_ShowCursor(SDL_DISABLE);
 
     if (windowtitle[0])
@@ -112,11 +117,23 @@ OSDEP_Surface *OSDEP_SetVideoMode(int width, int height, int bpp, char fs) {
   }
 
   OSDEP_buffer8 = SDL_CreateRGBSurface(0, width, height, 8, 0, 0, 0, 0);
+  if (OSDEP_buffer8 == NULL) {
+    SDL_Log("SDL_CreateRGBSurface (8-bit) failed: %s", SDL_GetError());
+    return NULL;
+  }
 
   OSDEP_buffer32 = SDL_CreateRGBSurface(0, width, height, 32, 0, 0, 0, 0);
+  if (OSDEP_buffer32 == NULL) {
+    SDL_Log("SDL_CreateRGBSurface (32-bit) failed: %s", SDL_GetError());
+    return NULL;
+  }
 
   OSDEP_texture = SDL_CreateTexture(OSDEP_renderer, SDL_PIXELFORMAT_ARGB8888,
                                     SDL_TEXTUREACCESS_STREAMING, width, height);
+  if (OSDEP_texture == NULL) {
+    SDL_Log("SDL_CreateTexture failed: %s", SDL_GetError());
+    return NULL;
+  }
 
   return OSDEP_buffer8;
 }

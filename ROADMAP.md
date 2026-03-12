@@ -154,18 +154,21 @@ astronautics.
   `fmt_load_map`; rejected in `fpg_read_image_header`, `fpg_remap_to_pal`,
   `fpg_delete`, `fpg_delete_many`
 
-### 3C — Runtime & SDL robustness (~1 session)
+### 3C — Runtime & SDL robustness ✓
 
-- [ ] **Check SDL init calls** — `SDL_CreateWindowAndRenderer()`,
-  `SDL_CreateTexture()`, `SDL_CreateRGBSurface()` in `osd_sdl2.c` return NULL
-  on failure but are never checked. Add checks with visible error messages
-- [ ] **Compiler `longjmp` cleanup** — `compiler.c` leaks `mem`, `loc`, `frm`
-  when `comp_exit()` fires via `longjmp`. Free allocated pointers in the error
-  recovery path
-- [ ] **Unchecked `fopen()` in Windows `fmemopen` shim** — `osdepwin.c`
-  crashes if temp directory is full or inaccessible
-- [ ] **Runtime `exit()` without cleanup** — `functions.c` calls `exit()`
-  directly. Should go through proper SDL/temp-file shutdown
+- [x] **Check SDL init calls** — `SDL_Init()`, `SDL_CreateWindowAndRenderer()`,
+  `SDL_CreateRGBSurface()`, `SDL_CreateTexture()` in `osd_sdl2.c` now checked
+  for failure with `SDL_Log` error messages; `OSDEP_SetVideoMode` returns NULL
+  on any failure
+- [x] **Compiler `longjmp` cleanup** — `comp()` now calls `free_resources()`
+  on the error path (when `setjmp` returns nonzero), freeing `mem`, `loc`,
+  `frm`, `vnom`, and closing open file handles
+- [x] **Unchecked `fopen()` in Windows `fmemopen` shim** — `_tempnam()` and
+  both `fopen()` calls now checked for NULL; `tmpcount` bounds-checked against
+  array size; returns NULL instead of crashing
+- [x] **Runtime `exit()` without cleanup** — `_exit_dos()` (functions.c) and
+  `exer()` (interpreter.c) now call `closefiles()` to clean up temp files
+  before exit. `atexit(OSDEP_Quit)` already handles SDL shutdown
 
 ---
 

@@ -228,6 +228,8 @@ static jmp_buf buf;
 void comp(void) {
   if (!setjmp(buf))
     compile();
+  else
+    free_resources();
 }
 
 void comp_exit(void) {

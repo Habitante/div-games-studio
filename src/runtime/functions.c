@@ -3410,6 +3410,10 @@ void _exit_dos(void) {
   _dos_setdrive((int)toupper(*divpath) - 'A' + 1, &divnum);
   chdir(divpath);
 
+#ifdef WIN32
+  { extern void closefiles(void); closefiles(); }
+#endif
+
   exit(stack[sp]);
 }
 

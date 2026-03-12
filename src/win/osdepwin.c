@@ -14,17 +14,28 @@ FILE *fmemopen(void *buf, size_t size, const char *opentype) {
   FILE *f;
 #ifdef WIN32
   char *tmp_fname = _tempnam("%TMP%", "fmemopen");
-  tmpnames[tmpcount] = tmp_fname;
-  tmpcount++;
-
-  printf("TEMP FILE CREATED: %s\n", tmp_fname);
+  if (tmp_fname == NULL) {
+    fprintf(stderr, "fmemopen: _tempnam failed\n");
+    return NULL;
+  }
+  if (tmpcount < 255) {
+    tmpnames[tmpcount] = tmp_fname;
+    tmpcount++;
+  }
 
   f = fopen(tmp_fname, "wb");
+  if (f == NULL) {
+    fprintf(stderr, "fmemopen: failed to create temp file: %s\n", tmp_fname);
+    free(tmp_fname);
+    return NULL;
+  }
   fwrite(buf, 1, size, f);
   fclose(f);
   f = fopen(tmp_fname, "rb");
 #else
   f = tmpfile();
+  if (f == NULL)
+    return NULL;
   fwrite(buf, 1, size, f);
   rewind(f);
 #endif
