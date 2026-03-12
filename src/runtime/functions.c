@@ -6191,7 +6191,7 @@ void function(void) {
   case 84:
     new_map();
     break;
-****
+
   case 85:
     _strcpy();
     break;

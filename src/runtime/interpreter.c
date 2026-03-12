@@ -338,11 +338,11 @@ void initialization(void) {
   setup = (struct _setup *)&mem[long_header + 14 + 10 * 10 + 10 * 7 + 8];
   // net = (struct _net *)&mem[long_header + 14 + 10 * 10 + 10 * 7 + 8 + 11];
   // m8 pointer removed (MODE8 deleted) - memory layout preserved for compatibility
-  dirinfo = (struct _dirinfo *)&mem[long_header + 14 + 10 * 10 + 10 * 7 + 8 + 11 + 9 + 10 * 4];
+  dirinfo = (struct _dirinfo *)&mem[long_header + 14 + 10 * 10 + 10 * 7 + 8 + 11 ];
   fileinfo =
-      (struct _fileinfo *)&mem[long_header + 14 + 10 * 10 + 10 * 7 + 8 + 11 + 9 + 10 * 4 + 1026];
+      (struct _fileinfo *)&mem[long_header + 14 + 10 * 10 + 10 * 7 + 8 + 11 + 1026];
   video_modes = (struct _video_modes
-                     *)&mem[long_header + 14 + 10 * 10 + 10 * 7 + 8 + 11 + 9 + 10 * 4 + 1026 + 146];
+                     *)&mem[long_header + 14 + 10 * 10 + 10 * 7 + 8 + 11 + 1026 + 146];
   iloc = mem[2];              // Start of local variables
   iloc_len = mem[6] + mem[5]; // Length of local (public and private)
   iloc_pub_len = mem[6];      // Length of local public variables

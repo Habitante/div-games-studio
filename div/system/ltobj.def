@@ -46,7 +46,6 @@ const g_y_center=3      // Y centro
 const c_screen=0        // Tipo de coordenada de pantalla
 const c_scroll=1        // Tipo de coordenada de scroll
 const c_m7=2            // Tipo de coordenada de m7
-const c_m8=3            // Tipo de coordenada de m8
 
 const partial_dump=0    // Volcado parcial (dump_type)
 const complete_dump=1   // Volcado completo (dump_type)
@@ -467,89 +466,89 @@ function 073 int load_pcx(0)                       // Carga un mapa (asignado a 
 function 075 int unload_pcx(0)                     // Descarga de memoria un mapa
 
 function 078 int set_color(0,0,0,0)                // Define un color de la paleta (color,r,g,b)
-function 082 int xadvance(0,0)                     // Avanza (angulo,distancia)
-function 083 int char(0)                           // Retorna el (primer) caracter contenido en la cadena (string)
+function 079 int xadvance(0,0)                     // Avanza (angulo,distancia)
+function 080 int char(0)                           // Retorna el (primer) caracter contenido en la cadena (string)
 
-function 084 int path_find(0,0,0,0,0,0,0,0)        // Busca el camino entre dos puntos (modo,file,code,tilesize,x,y,offset,sizeof)
-function 085 int path_line(0,0,0,0,0)              // Determina si puede ir en linea recta (file,code,tilesize,x,y)
-function 086 int path_free(0,0,0,0,0)              // Determina si un punto est� libre (file,code,tilesize,x,y)
-function 087 int new_map(0,0,0,0,0)                // Crea un nuevo mapa (ancho,alto,centro_x,centro_y,color)
+function 081 int path_find(0,0,0,0,0,0,0,0)        // Busca el camino entre dos puntos (modo,file,code,tilesize,x,y,offset,sizeof)
+function 082 int path_line(0,0,0,0,0)              // Determina si puede ir en linea recta (file,code,tilesize,x,y)
+function 083 int path_free(0,0,0,0,0)              // Determina si un punto est� libre (file,code,tilesize,x,y)
+function 084 int new_map(0,0,0,0,0)                // Crea un nuevo mapa (ancho,alto,centro_x,centro_y,color)
 
-function 101 string strcpy(0,0)                    // Funciones de cadenas, copia una a otra
-function 102 string strcat(0,0)                    // Funciones de cadenas, concatena dos cadenas
-function 103 int strlen(0)                         // Funciones de cadenas, devuelve la longitud
-function 104 int strcmp(0,0)                       // Funciones de cadenas, compara dos cadenas
-function 105 int strchr(0,0)                       // Funciones de cadenas, busca uno o varios caracteres (devuelve -1 o el �ndice)
-function 106 int strstr(0,0)                       // Funciones de cadenas, busca una cadena en otra (devuelve -1 o el �ndice)
-function 107 string strset(0,0)                    // Funciones de cadenas, rellena la cadena con el caracter dado
-function 108 string upper(0)                       // Funciones de cadenas, convierte a may�sculas (cadena o char)
-function 109 string lower(0)                       // Funciones de cadenas, convierte a min�sculas (cadena o char)
-function 110 string strdel(0,0,0)                  // Borra n caracteres del inicio y m del final (string,n,m) tambi�n admite negativos (a�ade espacios)
-function 111 int screen_copy(0,0,0,0,0,0,0)        // Pasa una region de pantalla a una region de un gr�fico (region,file,graf,x,y,an,al)
-function 112 int qsort(1,0)                        // Ordena una estructura (nombre_struct,campo,modo) (0-ascendente,1-descendente,2-desordenar)
+function 085 string strcpy(0,0)                    // Funciones de cadenas, copia una a otra
+function 086 string strcat(0,0)                    // Funciones de cadenas, concatena dos cadenas
+function 087 int strlen(0)                         // Funciones de cadenas, devuelve la longitud
+function 088 int strcmp(0,0)                       // Funciones de cadenas, compara dos cadenas
+function 089 int strchr(0,0)                       // Funciones de cadenas, busca uno o varios caracteres (devuelve -1 o el �ndice)
+function 090 int strstr(0,0)                       // Funciones de cadenas, busca una cadena en otra (devuelve -1 o el �ndice)
+function 091 string strset(0,0)                    // Funciones de cadenas, rellena la cadena con el caracter dado
+function 092 string upper(0)                       // Funciones de cadenas, convierte a may�sculas (cadena o char)
+function 093 string lower(0)                       // Funciones de cadenas, convierte a min�sculas (cadena o char)
+function 094 string strdel(0,0,0)                  // Borra n caracteres del inicio y m del final (string,n,m) tambi�n admite negativos (a�ade espacios)
+function 095 int screen_copy(0,0,0,0,0,0,0)        // Pasa una region de pantalla a una region de un gr�fico (region,file,graf,x,y,an,al)
+function 096 int qsort(1,0)                        // Ordena una estructura (nombre_struct,campo,modo) (0-ascendente,1-descendente,2-desordenar)
 
-function 113 int load_song(0,0)                    // Carga una cancion ("cancion.XXX",loop) Devuelve su codigo
-function 114 int unload_song(0)                    // Descarga una cancion, dando su codigo
-function 115 int song(0)                           // Toca una cancion (Solo puede estar tocandose una)
-function 116 int stop_song()                       // Detiene la cancion que este sonando
-function 117 int set_song_pos(0)                   // Pone la cancion en un pattern determinado
-function 118 int get_song_pos()                    // Devuelve el pattern que se esta tocando
-function 119 int get_song_line()                   // Devuelve la linea que se esta tocando
-function 120 int is_playing_sound(0)               // Dice si se est� tocando un sonido en un canal determinado
-function 121 int is_playing_song()                 // Dice si se est� tocando un modulo de musica (MOD, S3M, XM)
+function 097 int load_song(0,0)                    // Carga una cancion ("cancion.XXX",loop) Devuelve su codigo
+function 098 int unload_song(0)                    // Descarga una cancion, dando su codigo
+function 099 int song(0)                           // Toca una cancion (Solo puede estar tocandose una)
+function 100 int stop_song()                       // Detiene la cancion que este sonando
+function 101 int set_song_pos(0)                   // Pone la cancion en un pattern determinado
+function 102 int get_song_pos()                    // Devuelve el pattern que se esta tocando
+function 103 int get_song_line()                   // Devuelve la linea que se esta tocando
+function 104 int is_playing_sound(0)               // Dice si se est� tocando un sonido en un canal determinado
+function 105 int is_playing_song()                 // Dice si se est� tocando un modulo de musica (MOD, S3M, XM)
 
-function 122 int fopen(0,0)                        // Casi como en C (filename,"rwa+") (siempre modo binario)
-function 123 int fclose(0)                         // Casi como en C (handle) pero si handle es 0 hace un fcloseall
-function 124 int fread(0,0,0)                      // Casi como en C (&buffer,longitud(en ints),handle) pero con s�lo una longitud de ints
-function 125 int fwrite(0,0,0)                     // Inversa a fread (&buffer,longitud,handle)
-function 126 int fseek(0,0,0)                      // Id�ntica a C (handle,posicion,modo) (modo seek_set/cur/end)
-function 127 int ftell(0)                          // Id�ntica a C (handle)
-function 128 int filelength(0)                     // Longitud de un fichero abierto (handle)
-function 129 int flush()                           // Vacia buffers de escritura y devuelve n� de ficheros abiertos
-function 130 int get_dirinfo(0,0)                  // Lee un directorio ("dir\*.pr?",_hidden+_system+_subdir) en la estructura dirinfo(files,name[]) y devuelve "files" (n�mero)
-function 131 string get_fileinfo(0)                // Rellena la estructura fileinfo (fullpath (o cwd), drive, dir, name, ext, size, date, time, attrib) y devuelve puntero a "fullpath" o "cwd"
-function 132 int getdrive()                        // Devuelve la unidad actual (1-A, 2-B, ...)
-function 133 int setdrive(0)                       // Fija la unidad actual (idem)
-function 134 int chdir(0)                          // Cambia el directorio actual ("..")
-function 135 int mkdir(0)                          // Crea un directorio nuevo (a partir del cwd)
-function 136 int remove(0)                         // Borra archivos o directorios (se aceptan comodines) (auto rmdir)
+function 106 int fopen(0,0)                        // Casi como en C (filename,"rwa+") (siempre modo binario)
+function 107 int fclose(0)                         // Casi como en C (handle) pero si handle es 0 hace un fcloseall
+function 108 int fread(0,0,0)                      // Casi como en C (&buffer,longitud(en ints),handle) pero con s�lo una longitud de ints
+function 109 int fwrite(0,0,0)                     // Inversa a fread (&buffer,longitud,handle)
+function 110 int fseek(0,0,0)                      // Id�ntica a C (handle,posicion,modo) (modo seek_set/cur/end)
+function 111 int ftell(0)                          // Id�ntica a C (handle)
+function 112 int filelength(0)                     // Longitud de un fichero abierto (handle)
+function 113 int flush()                           // Vacia buffers de escritura y devuelve n� de ficheros abiertos
+function 114 int get_dirinfo(0,0)                  // Lee un directorio ("dir\*.pr?",_hidden+_system+_subdir) en la estructura dirinfo(files,name[]) y devuelve "files" (n�mero)
+function 115 string get_fileinfo(0)                // Rellena la estructura fileinfo (fullpath (o cwd), drive, dir, name, ext, size, date, time, attrib) y devuelve puntero a "fullpath" o "cwd"
+function 116 int getdrive()                        // Devuelve la unidad actual (1-A, 2-B, ...)
+function 117 int setdrive(0)                       // Fija la unidad actual (idem)
+function 118 int chdir(0)                          // Cambia el directorio actual ("..")
+function 119 int mkdir(0)                          // Crea un directorio nuevo (a partir del cwd)
+function 120 int remove(0)                         // Borra archivos o directorios (se aceptan comodines) (auto rmdir)
 
-function 137 int disk_free(0)                      // Espacio disponible en una unidad (en Kbs)
-function 138 int memory_free()                     // Memoria disponible (en Kbs)
-function 139 int ignore_error(0)                   // Ignorar un error de ejecuci�n (n�mero)
+function 121 int disk_free(0)                      // Espacio disponible en una unidad (en Kbs)
+function 122 int memory_free()                     // Memoria disponible (en Kbs)
+function 123 int ignore_error(0)                   // Ignorar un error de ejecuci�n (n�mero)
 
-function 140 int save_pcx(0,0,0)                   // Graba un mapa como pcx (file,graf,"archivo.pcx");
+function 124 int save_pcx(0,0,0)                   // Graba un mapa como pcx (file,graf,"archivo.pcx");
 
-function 141 int sin(0)                            // Devuelve el seno de un angulo dado en milesimas
-function 142 int cos(0)                            // Devuelve el coseno de un angulo dado en milesimas
-function 143 int tan(0)                            // Devuelve la tangente de un angulo dado en milesimas
-function 144 int asin(0)                           // Devuelve ...
-function 145 int acos(0)                           // Devuelve ...
-function 146 int atan(0)                           // Devuelve ...
-function 147 int atan2(0,0)                        // Devuelve ...
+function 125 int sin(0)                            // Devuelve el seno de un angulo dado en milesimas
+function 126 int cos(0)                            // Devuelve el coseno de un angulo dado en milesimas
+function 127 int tan(0)                            // Devuelve la tangente de un angulo dado en milesimas
+function 128 int asin(0)                           // Devuelve ...
+function 129 int acos(0)                           // Devuelve ...
+function 130 int atan(0)                           // Devuelve ...
+function 131 int atan2(0,0)                        // Devuelve ...
 
-function 148 int draw(0,0,0,0,0,0,0,0)             // Pinta una primitiva "tipo" y "color" dentro de unas coordenadas teniendo en cuenta "region" (tipo, color, porcentaje 0..15, region, x0, y0, x1, y1)
-function 149 int delete_draw(0)                    // Borra una primitiva (identificador)
-function 150 int move_draw(0,0,0,0,0,0,0)          // Modifica una primitiva (identificador, color, porcentaje 0..15, x0, y0, x1, y1)
+function 132 int draw(0,0,0,0,0,0,0,0)             // Pinta una primitiva "tipo" y "color" dentro de unas coordenadas teniendo en cuenta "region" (tipo, color, porcentaje 0..15, region, x0, y0, x1, y1)
+function 133 int delete_draw(0)                    // Borra una primitiva (identificador)
+function 134 int move_draw(0,0,0,0,0,0,0)          // Modifica una primitiva (identificador, color, porcentaje 0..15, x0, y0, x1, y1)
 
-function 151 int save_map(0,0,0)                   // Graba un mapa como map (file,graf,"archivo.map")
-function 152 int write_in_map(0,0,0)               // Pinta un texto en un mapa (font,texto,centrado) y devuelve map_id
+function 135 int save_map(0,0,0)                   // Graba un mapa como map (file,graf,"archivo.map")
+function 136 int write_in_map(0,0,0)               // Pinta un texto en un mapa (font,texto,centrado) y devuelve map_id
 
-function 153 int calculate(0)                      // Si error devuelve 0, si no el resultado
-function 154 int itoa(0)                           // (int) Devuelve la cadena
+function 137 int calculate(0)                      // Si error devuelve 0, si no el resultado
+function 138 int itoa(0)                           // (int) Devuelve la cadena
 
-function 155 int change_channel(0,0,0)             // Modifica un canal (id_canal,volumen,panning)
+function 139 int change_channel(0,0,0)             // Modifica un canal (id_canal,volumen,panning)
 
-function 156 int malloc(0)                         // Asigna memoria dinamica. Devuelve indice de mem.
-function 157 int free(0)                           // Libera memoria dinamica. Devuelve 0 � 1.
+function 140 int malloc(0)                         // Asigna memoria dinamica. Devuelve indice de mem.
+function 141 int free(0)                           // Libera memoria dinamica. Devuelve 0 � 1.
 
-function 158 int encode(0,0,0)                     // encode(offset, size, clave) Devuelve 0 � 1
-function 159 int encode_file(0,0)                  // encode_file("*.*", clave) Devuelve 0 � 1
-function 160 int decode_file(0,0)                  // decode_file("*.*", clave) Devuelve 0 � 1
+function 142 int encode(0,0,0)                     // encode(offset, size, clave) Devuelve 0 � 1
+function 143 int encode_file(0,0)                  // encode_file("*.*", clave) Devuelve 0 � 1
+function 144 int decode_file(0,0)                  // decode_file("*.*", clave) Devuelve 0 � 1
 
-function 161 int compress_file(0)                  // compress_file("*.*") Devuelve 0 � 1
-function 162 int uncompress_file(0)                // uncompress_file("*.*") Devuelve 0 � 1
+function 145 int compress_file(0)                  // compress_file("*.*") Devuelve 0 � 1
+function 146 int uncompress_file(0)                // uncompress_file("*.*") Devuelve 0 � 1
 
-function 163 int find_color(0,0,0)                 // Define un color de la paleta (r,g,b) de 0..63
-function 164 int load_screen(0)                    // Carga una imagen de fondo (filename)
-function 165 int force_pal(0)                      // Activa una paleta y adapta los archivos cargados despu�s (filename)
+function 147 int find_color(0,0,0)                 // Define un color de la paleta (r,g,b) de 0..63
+function 148 int load_screen(0)                    // Carga una imagen de fondo (filename)
+function 149 int force_pal(0)                      // Activa una paleta y adapta los archivos cargados despu�s (filename)
