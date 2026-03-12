@@ -23,13 +23,13 @@ void dialog_loop(void) {
   poll_keyboard();
 
   //-------------------------------------------------------------------------
-  // Find the window the mouse is over (n); n=max_windows if none
+  // Find the window the mouse is over (n); n=MAX_WINDOWS if none
   //-------------------------------------------------------------------------
 
   if (mouse_in(v.x, v.y, v.x + v.w - 1, v.y + v.h - 1))
     n = 0;
   else
-    n = max_windows;
+    n = MAX_WINDOWS;
 
   //-------------------------------------------------------------------------
   // If we were previously in a window we've now left,
@@ -62,7 +62,7 @@ void dialog_loop(void) {
       salir_del_dialogo = 0;
     }
 
-  oldn = max_windows;
+  oldn = MAX_WINDOWS;
 
   if (n < 0)
     n++;
@@ -71,7 +71,7 @@ void dialog_loop(void) {
   // Determine cursor shape
   //-------------------------------------------------------------------------
 
-  if (n == max_windows)
+  if (n == MAX_WINDOWS)
     mouse_graf = 1;
   else if (mouse_in(v.x + 2 * big2, v.y + 2 * big2, v.x + v.w - 2 * big2, v.y + 9 * big2))
     if (mouse_x <= v.x + v.w - 10 * big2)
@@ -227,7 +227,7 @@ void show_dialog(void_return_type_t init_handler) {
   int n, m, x, y, w, h;
   uint32_t colorkey = 0;
 
-  if (!window[max_windows - 1].type) {
+  if (!window[MAX_WINDOWS - 1].type) {
     _get_pos = get_pos;
 
     if (v.type) {
@@ -310,7 +310,7 @@ void show_dialog(void_return_type_t init_handler) {
           window[1].foreground = 0;
           flush_window(1);
         } else {
-          for (n = 1; n < max_windows; n++) {
+          for (n = 1; n < MAX_WINDOWS; n++) {
             if (window[n].type && window[n].foreground == 1) {
               hidden[n - 1] = 1;
               window[n].foreground = 0;
@@ -541,7 +541,7 @@ void select_get(struct t_item *i, int activo, int ocultar_error) {
   if (activo) {
     wrectangle(v.ptr, v.w / big2, v.h / big2, c12, i->get.x - 1, i->get.y + 7, i->get.w + 2, 11);
     if (i->state & 2) {
-      div_strcpy((char *)get, long_line, (char *)i->get.buffer);
+      div_strcpy((char *)get, LONG_LINE, (char *)i->get.buffer);
       get_pos = strlen(get);
     }
     i->state &= 1;
@@ -571,7 +571,7 @@ void select_get(struct t_item *i, int activo, int ocultar_error) {
       wrectangle(v.ptr, v.w / big2, v.h / big2, c2, i->get.x - 1, i->get.y + 7, i->get.w + 2, 11);
     }
 
-    for (n = 0; n < max_items; n++)
+    for (n = 0; n < MAX_ITEMS; n++)
       if (i == &v.item[n])
         v.active_item = n;
   }
@@ -612,7 +612,7 @@ void _process_items(void) {
           if (superget)
             div_strcpy((char *)v.item[v.selected_item].get.buffer,
                        v.item[v.selected_item].get.buffer_len + 1, "");
-          div_strcpy((char *)get, long_line, (char *)v.item[v.selected_item].get.buffer);
+          div_strcpy((char *)get, LONG_LINE, (char *)v.item[v.selected_item].get.buffer);
           get_pos = strlen(get);
           select_get(&v.item[v.selected_item], 0, 1);
           select_get(&v.item[v.selected_item], 1, 1);
@@ -828,7 +828,7 @@ void process_get(int n, int e) {
   v.item[n].state = e;
   if (!(old_e & 2) && (e & 2)) {
     _select_new_item(n);
-    div_strcpy((char *)get, long_line, (char *)v.item[n].get.buffer);
+    div_strcpy((char *)get, LONG_LINE, (char *)v.item[n].get.buffer);
     get_pos = strlen(get);
   }
 
@@ -902,7 +902,7 @@ void process_flag(int n, int e) {
 int text_len2(byte *ptr);
 
 void get_input(int n) {
-  char cwork[long_line];
+  char cwork[LONG_LINE];
   int x, l, scroll;
 
   if (!*get)
@@ -963,7 +963,7 @@ void get_input(int n) {
         cwork[get_pos] = ascii;
         cwork[get_pos + 1] = 0;
         div_strcat(cwork, sizeof(cwork), get + get_pos);
-        div_strcpy(get, long_line, cwork);
+        div_strcpy(get, LONG_LINE, cwork);
         get_pos++;
         v.redraw = 1;
       }

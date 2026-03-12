@@ -30,7 +30,7 @@ void initialize_texts(byte *filename) {
   FILE *f;
   int n;
 
-  memset(texts, 0, max_texts * 4);
+  memset(texts, 0, MAX_TEXTS * 4);
 
   if ((f = fopen((char *)filename, "rb")) != NULL) {
     fseek(f, 0, SEEK_END);
@@ -75,7 +75,7 @@ void analyze_number(void) {
     text_count = text_count * 10 + *p - '0';
     p++;
   } while (*p >= '0' && *p <= '9' && p < lang_buffer_end);
-  if (text_count >= max_texts)
+  if (text_count >= MAX_TEXTS)
     text_count = 0;
 }
 

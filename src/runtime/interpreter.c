@@ -1305,11 +1305,11 @@ void frame_end(void) {
 
       if (otheride) {
         if (otheride == 1) {
-          for (n = 0; n < max_texts; n++)
+          for (n = 0; n < MAX_TEXTS; n++)
             if (texts[n].font)
               break;
 
-          if (n < max_texts) {
+          if (n < MAX_TEXTS) {
             memb[nullstring[0] * 4] = 0; // The "floating" text is never shown
             memb[nullstring[1] * 4] = 0;
             memb[nullstring[2] * 4] = 0;
@@ -1369,7 +1369,7 @@ void frame_end(void) {
     } while (ide || mode7_id || scroll_id || otheride);
 
     if (demo)
-      paint_texts(max_texts);
+      paint_texts(MAX_TEXTS);
 
     if (post_process_buffer != NULL)
       post_process_buffer();
@@ -1429,7 +1429,7 @@ void frame_end(void) {
           if (mouse_x1 != -1)
             blit_partial(mouse_x0, mouse_y0, mouse_x1 - mouse_x0 + 1, mouse_y1 - mouse_y0 + 1);
 
-          for (n = 0; n < max_texts; n++)
+          for (n = 0; n < MAX_TEXTS; n++)
             if (texts[n].font && texts[n].w)
               blit_partial(texts[n].x0, texts[n].y0, texts[n].w, texts[n].h);
 
@@ -1453,7 +1453,7 @@ void frame_end(void) {
           }
           if (mouse_x1 != -1)
             blit_partial(mouse_x0, mouse_y0, mouse_x1 - mouse_x0 + 1, mouse_y1 - mouse_y0 + 1);
-          for (n = 0; n < max_texts + 1; n++)
+          for (n = 0; n < MAX_TEXTS + 1; n++)
             if (texts[n].font && texts[n].w)
               blit_partial(texts[n].x0, texts[n].y0, texts[n].w, texts[n].h);
         }

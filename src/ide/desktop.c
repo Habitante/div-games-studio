@@ -87,7 +87,7 @@ void download_desktop() {
   // Save ghost table
   n = fwrite(ghost, 65536, 1, desktop);
   // Check and save each used window one by one
-  for (x = max_windows - 1; x >= 0; x--) {
+  for (x = MAX_WINDOWS - 1; x >= 0; x--) {
     if (window[x].type != 0 && window[x].title) {
       numvent++;
       n = fwrite(&window[x], 1, sizeof(struct twindow), desktop);
@@ -490,7 +490,7 @@ int create_saved_window(void_return_type_t init_handler, int nx, int ny) {
 
   uint32_t colorkey = 0;
 
-  if (!window[max_windows - 1].type) {
+  if (!window[MAX_WINDOWS - 1].type) {
     addwindow();
 
     //---------------------------------------------------------------------------
@@ -551,7 +551,7 @@ int create_saved_window(void_return_type_t init_handler, int nx, int ny) {
     if (vid_mode_changed) {
       if (v.type >= 100 && window_aux.foreground != 2) {
         v.state = 1; // Activate it
-        for (m = 1; m < max_windows; m++)
+        for (m = 1; m < MAX_WINDOWS; m++)
           if (window[m].type == v.type && window[m].state) {
             window[m].state = 0;
             wgra(window[m].ptr, window[m].w / big2, window[m].h / big2, c1, 2, 2,
@@ -590,7 +590,7 @@ int create_saved_window(void_return_type_t init_handler, int nx, int ny) {
       if (!vid_mode_changed) {
         swap(v.w, window_aux.w);
         swap(v.h, window_aux.h);
-        for (n = 1; n < max_windows; n++) {
+        for (n = 1; n < MAX_WINDOWS; n++) {
           if (window[n].type && window[n].foreground == 1) {
             if (windows_collide(0, n)) {
               window[n].foreground = 0;
@@ -601,7 +601,7 @@ int create_saved_window(void_return_type_t init_handler, int nx, int ny) {
         swap(v.w, window_aux.w);
         swap(v.h, window_aux.h);
       } else {
-        for (n = 1; n < max_windows; n++) {
+        for (n = 1; n < MAX_WINDOWS; n++) {
           if (window[n].type && window[n].foreground == 1) {
             if (windows_collide(0, n)) {
               window[n].foreground = 0;

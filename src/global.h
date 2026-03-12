@@ -90,9 +90,9 @@ void call(const void_return_type_t func); // void funcion(void); int n=(int)func
 
 
 #define MAX_FILES       512 // ------------------------------- File listbox
-#define w_archivo       (255)
-#define max_directorios 2048
-#define w_directorio    (255)
+#define FILE_SIZE       (255)
+#define MAX_FOLDERS 2048
+#define FOLDER_SIZE    (255)
 
 
 #define swap(a, b) \
@@ -102,10 +102,10 @@ void call(const void_return_type_t func); // void funcion(void); int n=(int)func
     (a) ^= (b);    \
   }
 
-#define max_windows 96   // maximum No. of open windows
-#define max_texts   2048 // max No. allowed texts (lenguaje.div)
+#define MAX_WINDOWS 96   // maximum No. of open windows
+#define MAX_TEXTS   2048 // max No. allowed texts (lenguaje.div)
 
-#define long_line 1024 // Maximum line length in the editor
+#define LONG_LINE 1024 // Maximum line length in the editor
 
 #define RES_FOR_NAME _MAX_PATH
 
@@ -706,11 +706,11 @@ GLOBAL_DATA int selected_icon;  // (toolbar) -1 if none selected, 0-zoom, ...
 
 GLOBAL_DATA int full_redraw; // Whether the entire VGA screen copy has been modified
 
-GLOBAL_DATA byte *texts[max_texts]; // Output text strings, in translatable format
+GLOBAL_DATA byte *texts[MAX_TEXTS]; // Output text strings, in translatable format
 
 GLOBAL_DATA int wmouse_x, wmouse_y; // Mouse position within a window
 
-#define max_items 24 // Maximum number of items in a window
+#define MAX_ITEMS 24 // Maximum number of items in a window
 
 //GLOBAL_DATA
 struct t_item {
@@ -757,7 +757,7 @@ struct twindow {
   int state;                      // Button/item state
   int buttons;                    // Pressed buttons bitmask
   byte *aux;                      // Auxiliary pointer for miscellaneous data
-  struct t_item item[max_items];  // Buttons, gets, switches, etc.
+  struct t_item item[MAX_ITEMS];  // Buttons, gets, switches, etc.
   int items;                      // Number of defined items
   int active_item;                // Which item triggered an action
   int selected_item;              // Currently selected item (for keyboard)
@@ -765,7 +765,7 @@ struct twindow {
   int exploding;
 };
 
-GLOBAL_DATA struct twindow window[max_windows];
+GLOBAL_DATA struct twindow window[MAX_WINDOWS];
 #define v window[0]
 
 //GLOBAL_DATA
@@ -799,7 +799,7 @@ struct tprg {
   byte *vptr;               // Pointer to first visible line
   int first_line;           // First visible line on screen
   int first_column;         // Horizontal scroll offset
-  char l[long_line + 4];    // Buffer for edited line
+  char l[LONG_LINE + 4];    // Buffer for edited line
   int line_size;            // Original size of edited line
   int prev_line;            // Previous line (for partial redraw)
 };
@@ -883,9 +883,9 @@ GLOBAL_DATA char file_mask[512]; // File mask for directory listing
 GLOBAL_DATA char input[512];     // Dialog box for entering the filename
 
 
-GLOBAL_DATA int hidden[max_windows]; // Windows hidden when opening a dialog
+GLOBAL_DATA int hidden[MAX_WINDOWS]; // Windows hidden when opening a dialog
 
-GLOBAL_DATA struct tmapa *windows_to_create[max_windows];
+GLOBAL_DATA struct tmapa *windows_to_create[MAX_WINDOWS];
 GLOBAL_DATA int num_windows_to_create;
 
 GLOBAL_DATA int mouse_shift; // For big mode, adjusts coordinates within the toolbar

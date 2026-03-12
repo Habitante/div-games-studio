@@ -1684,14 +1684,14 @@ void __write(void) {
   x = 1;
   while (texts[x].font != NULL) {
     x++;
-    if (x == max_texts)
+    if (x == MAX_TEXTS)
       break;
     if (pila[sp - 1] == texts[x].alignment && pila[sp - 2] == texts[x].y &&
         pila[sp - 3] == texts[x].x)
       break;
   }
 
-  if (x < max_texts) {
+  if (x < MAX_TEXTS) {
     texts[x].type = 0;
     texts[x].ptr = pila[sp--];
     if (pila[sp] < 0 || pila[sp] > 8) {
@@ -1727,13 +1727,13 @@ void write_int(void) {
   x = 1;
   while (texts[x].font) {
     x++;
-    if (x == max_texts)
+    if (x == MAX_TEXTS)
       break;
     if (pila[sp - 1] == texts[x].alignment && pila[sp - 2] == texts[x].y &&
         pila[sp - 3] == texts[x].x)
       break;
   }
-  if (x < max_texts) {
+  if (x < MAX_TEXTS) {
     texts[x].type = 1;
     texts[x].ptr = pila[sp--];
     if (pila[sp] < 0 || pila[sp] > 8) {
@@ -1758,13 +1758,13 @@ void write_int(void) {
 
 void delete_text(void) {
   x = pila[sp];
-  if (x < max_texts && x > 0)
+  if (x < MAX_TEXTS && x > 0)
     texts[x].font = 0;
   else if (x == 0) {
     x = 1;
     do
       texts[x++].font = 0;
-    while (x < max_texts);
+    while (x < MAX_TEXTS);
   } else
     e(119);
 }
@@ -1775,7 +1775,7 @@ void delete_text(void) {
 
 void move_text(void) {
   x = pila[sp - 2];
-  if (x < max_texts && x > 0) {
+  if (x < MAX_TEXTS && x > 0) {
     texts[x].x = pila[sp - 1];
     texts[x].y = pila[sp];
   } else

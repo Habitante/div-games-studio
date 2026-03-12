@@ -657,7 +657,7 @@ GLOBAL fnt_info f_i[max_fonts];
 // Text rendering system
 //-----------------------------------------------------------------------------
 
-#define max_texts 256 // Maximum number of texts at runtime
+#define MAX_TEXTS 256 // Maximum number of texts at runtime
 
 typedef struct _t_text_display {
   int type;      // Text type: 0=normal, 1=&variable
@@ -670,7 +670,7 @@ typedef struct _t_text_display {
   int w, h;      // For partial screen blits
 } t_text;
 
-GLOBAL t_text texts[max_texts + 1];
+GLOBAL t_text texts[MAX_TEXTS + 1];
 
 //-----------------------------------------------------------------------------
 // Drawing primitives system
@@ -821,8 +821,8 @@ GLOBAL int buffer_w, buffer_h; // Width & Height of buffer
 //////////////////////////////////////////////////////////////////////////////
 
 #define v           window[0]
-#define max_items   24 // Maximum number of items in a window
-#define max_windows 8  // Maximum number of windows
+#define MAX_ITEMS   24 // Maximum number of items in a window
+#define MAX_WINDOWS 8  // Maximum number of windows
 
 GLOBAL int big, big2; // big(0,1), big2(1,2)
 GLOBAL int mouse_graf;
@@ -870,13 +870,13 @@ typedef struct _twindow {
   byte *ptr;      // Window buffer
   int state;
   int redraw;             // Needs-redraw flag
-  t_item item[max_items]; // Buttons, gets, switches, etc.
+  t_item item[MAX_ITEMS]; // Buttons, gets, switches, etc.
   int items;              // Number of defined items
   int active_item;        // When an item triggers an effect
   int selected_item;      // Currently selected item (for keyboard)
 } twindow;
 
-GLOBAL twindow window[max_windows];
+GLOBAL twindow window[MAX_WINDOWS];
 
 struct t_listbox {
   int x, y;          // Listbox position in window

@@ -63,7 +63,7 @@ extern int superget;
 //      Global variables
 ///////////////////////////////////////////////////////////////////////////////
 
-char get_buffer[long_line]; // Shared buffer (except for calculator)
+char get_buffer[LONG_LINE]; // Shared buffer (except for calculator)
 char *get;
 int get_cursor, get_pos; // Clock and cursor position in get fields
 
@@ -701,10 +701,10 @@ void init_environment() {
     upload_desktop();
 
   if (!first_run) {
-    for (n = 0; n < max_windows; n++)
+    for (n = 0; n < MAX_WINDOWS; n++)
       if (window[n].click_handler == menu_principal2)
         break;
-    if (n == max_windows)
+    if (n == MAX_WINDOWS)
       new_window(menu_principal0);
   }
 
@@ -855,7 +855,7 @@ extern int frame_clock; // clock
 ///////////////////////////////////////////////////////////////////////////////
 
 void mainloop(void) {
-  int n, m, oldn = max_windows;
+  int n, m, oldn = MAX_WINDOWS;
   int llamar;
   char cwork[256], *p;
 
@@ -866,24 +866,24 @@ void mainloop(void) {
   poll_keyboard();
 
   //-------------------------------------------------------------------------
-  // Find the window the mouse is over (n); n=max_windows if none
+  // Find the window the mouse is over (n); n=MAX_WINDOWS if none
   //-------------------------------------------------------------------------
 
   n = 0;
 
-  while (n < max_windows &&
+  while (n < MAX_WINDOWS &&
          !(window[n].type > 0 && mouse_in(window[n].x, window[n].y, window[n].x + window[n].w - 1,
                                           window[n].y + window[n].h - 1)))
     n++;
 
-  if (n < max_windows && dragging == 4 && window[n].order == drag_source)
+  if (n < MAX_WINDOWS && dragging == 4 && window[n].order == drag_source)
     dragging = 5;
 
   //-------------------------------------------------------------------------
   //  Drag onto the wallpaper
   //-------------------------------------------------------------------------
 
-  if (dragging == 4 && (n == max_windows || window[n].type == 2)) {
+  if (dragging == 4 && (n == MAX_WINDOWS || window[n].type == 2)) {
     dragging = 5;
     free_drag = 0;
     v_title = (char *)texts[57];
@@ -962,7 +962,7 @@ void mainloop(void) {
         }
       }
     }
-    oldn = max_windows;
+    oldn = MAX_WINDOWS;
 
     if (n < 0)
       n++;
@@ -972,7 +972,7 @@ void mainloop(void) {
   // Determine the shape of the cursor (mouse pointer)
   ///////////////////////////////////////////////////////////////////////////
 
-  if (n >= max_windows || n < 0) {
+  if (n >= MAX_WINDOWS || n < 0) {
     mouse_graf = 1;
   } else {
     switch (window[n].foreground) {
@@ -1004,7 +1004,7 @@ void mainloop(void) {
   // If we are on a window that is not the first ...
   //-------------------------------------------------------------------------
 
-  if (n != 0 && n < max_windows) {
+  if (n != 0 && n < MAX_WINDOWS) {
     // Bring window to position 0 if it's in the foreground or clicked
 
     if (window[n].foreground == 1 || (mouse_b & 1)) {
@@ -1013,7 +1013,7 @@ void mainloop(void) {
     }
 
     if (n == 0 && v.foreground != 1) { // Clicked icon or background window
-      for (m = 1; m < max_windows; m++) {
+      for (m = 1; m < MAX_WINDOWS; m++) {
         if (window[m].type && window[m].foreground == 1) {
           if (windows_collide(0, m)) {
             window[m].foreground = 0;
@@ -1049,7 +1049,7 @@ void mainloop(void) {
   //  Drop something onto a background window
   //-------------------------------------------------------------------------
 
-  if (n < max_windows && window[n].foreground == 0 && dragging == 4 && v.type >= 100 &&
+  if (n < MAX_WINDOWS && window[n].foreground == 0 && dragging == 4 && v.type >= 100 &&
       window[n].type != 2) {
     move(0, n);
     n = 0;
@@ -1068,7 +1068,7 @@ void mainloop(void) {
 
     call((void_return_type_t)v.click_handler);
 
-    for (m = 1; m < max_windows; m++)
+    for (m = 1; m < MAX_WINDOWS; m++)
       if (window[m].type && window[m].foreground == 1)
         if (windows_collide(0, m)) {
           window[m].foreground = 0;
@@ -1288,7 +1288,7 @@ void mainloop(void) {
 
 fin_bucle_entorno:
 
-  for (m = 0; m < max_windows; m++) {
+  for (m = 0; m < MAX_WINDOWS; m++) {
     if (m == 0 &&
         mouse_in(v.x + 2 * big2, v.y + 10 * big2, v.x + v.w - 2 * big2, v.y + v.h - 2 * big2) &&
         window[m].type != 107)
@@ -1341,11 +1341,11 @@ fin_bucle_entorno:
   //  Program menu hotkeys
   ///////////////////////////////////////////////////////////////////////////
 
-  for (m = 0; m < max_windows; m++)
+  for (m = 0; m < MAX_WINDOWS; m++)
     if (window[m].type == 102 && window[m].state && window[m].prg != NULL)
       break;
 
-  if (m < max_windows && beta_status == 4) { // If a PRG ...
+  if (m < MAX_WINDOWS && beta_status == 4) { // If a PRG ...
     n = 0;
     if (shift_status & 8)
       switch (scan_code) {
@@ -1420,7 +1420,7 @@ fin_bucle_entorno:
         move(0, m);
 
         if (v.foreground == 0) {
-          for (m = 1; m < max_windows; m++)
+          for (m = 1; m < MAX_WINDOWS; m++)
             if (window[m].type && window[m].foreground == 1)
               if (windows_collide(0, m)) {
                 window[m].foreground = 0;
@@ -1699,7 +1699,7 @@ fin_bucle_entorno:
  */
 void main_loop(void) {
   div_started = 1;
-  int n, m, oldn = max_windows;
+  int n, m, oldn = MAX_WINDOWS;
 
   int llamar;
 
@@ -1717,7 +1717,7 @@ void main_loop(void) {
 }
 
 // Dialog loop state (used by dialog_loop in main_dialogs.c)
-int n, m, oldn = max_windows;
+int n, m, oldn = MAX_WINDOWS;
 int dialogo_invocado;
 int salir_del_dialogo = 0;
 
@@ -1777,7 +1777,7 @@ void initialization(void) {
   undo = (byte *)malloc(undo_memory);
   undo_table = (struct undo_entry *)malloc(sizeof(struct undo_entry) * max_undos);
 
-  for (n = 0; n < max_windows; n++) {
+  for (n = 0; n < MAX_WINDOWS; n++) {
     window[n].type = 0;
     window[n].side = 0;
   }
@@ -2550,7 +2550,7 @@ void check_mouse(void) {}
 int determine_prg2(void) {
   int m, n = -1;
 
-  for (m = 0; m < max_windows; m++) {
+  for (m = 0; m < MAX_WINDOWS; m++) {
     if (window[m].type == 102 && window[m].state && window[m].prg != NULL) {
       n = m;
       break;
@@ -2562,7 +2562,7 @@ int determine_prg2(void) {
 int determine_calc(void) {
   int m, n = -1;
 
-  for (m = 0; m < max_windows; m++) {
+  for (m = 0; m < MAX_WINDOWS; m++) {
     if (window[m].click_handler == calc2 && window[m].state) {
       n = m;
       break;
@@ -2610,12 +2610,12 @@ void move(int a, int b) {
 }
 
 void divdelete(int a) {
-  memmove(&window[a].type, &window[a + 1].type, sizeof(struct twindow) * (max_windows - 1 - a));
-  window[max_windows - 1].type = 0;
+  memmove(&window[a].type, &window[a + 1].type, sizeof(struct twindow) * (MAX_WINDOWS - 1 - a));
+  window[MAX_WINDOWS - 1].type = 0;
 }
 
 void addwindow(void) {
-  memmove(&window[1].type, &v.type, sizeof(struct twindow) * (max_windows - 1));
+  memmove(&window[1].type, &v.type, sizeof(struct twindow) * (MAX_WINDOWS - 1));
 }
 
 void wup(int a) {

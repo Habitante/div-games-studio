@@ -8,8 +8,8 @@ void show_dialog(void_return_type_t init_handler) {
   int x, y, w, h;
   int vtipo;
 
-  if (!window[max_windows - 1].type) {
-    memmove(&window[1].type, &v.type, sizeof(twindow) * (max_windows - 1));
+  if (!window[MAX_WINDOWS - 1].type) {
+    memmove(&window[1].type, &v.type, sizeof(twindow) * (MAX_WINDOWS - 1));
 
     //---------------------------------------------------------------------------
     // The following values must be set by init_handler; defaults:
@@ -117,8 +117,8 @@ void show_dialog(void_return_type_t init_handler) {
       //---------------------------------------------------------------------------
 
     } else {
-      memmove(&v.type, &window[1].type, sizeof(twindow) * (max_windows - 1));
-      window[max_windows - 1].type = 0;
+      memmove(&v.type, &window[1].type, sizeof(twindow) * (MAX_WINDOWS - 1));
+      window[MAX_WINDOWS - 1].type = 0;
     }
   }
 }
@@ -153,7 +153,7 @@ void repaint_window(void) {
 //-----------------------------------------------------------------------------
 
 void modal_loop(void) {
-  int n, m, oldn = max_windows;
+  int n, m, oldn = MAX_WINDOWS;
   int dialogo_invocado;
   int salir_del_dialogo = 0;
 
@@ -165,13 +165,13 @@ void modal_loop(void) {
     dialogo_invocado = 0;
 
     //-------------------------------------------------------------------------
-    // Find the window the mouse is over (n); n=max_windows if none
+    // Find the window the mouse is over (n); n=MAX_WINDOWS if none
     //-------------------------------------------------------------------------
 
     if (mouse_in(v.x, v.y, v.x + v.w - 1, v.y + v.h - 1))
       n = 0;
     else
-      n = max_windows;
+      n = MAX_WINDOWS;
 
     //-------------------------------------------------------------------------
     // If we were previously in a window we've now left,
@@ -197,7 +197,7 @@ void modal_loop(void) {
         }
         salir_del_dialogo = 0;
       }
-    oldn = max_windows;
+    oldn = MAX_WINDOWS;
     if (n < 0)
       n++;
 
@@ -205,7 +205,7 @@ void modal_loop(void) {
     // Determine cursor shape
     //-------------------------------------------------------------------------
 
-    if (n == max_windows)
+    if (n == MAX_WINDOWS)
       mouse_graf = 1;
     else if (mouse_in(v.x + 2 * big2, v.y + 2 * big2, v.x + v.w - 2 * big2, v.y + 9 * big2))
       if (mouse_x <= v.x + v.w - 10 * big2)
@@ -358,7 +358,7 @@ void close_window(void) {
   y = v.y;
   w = v.w;
   h = v.h;
-  memmove(&v.type, &window[1].type, sizeof(twindow) * (max_windows - 1));
+  memmove(&v.type, &window[1].type, sizeof(twindow) * (MAX_WINDOWS - 1));
   update_box(x, y, w, h);
 
   if (v.type == 1) { // Dialog over dialog: only open the last one
@@ -1290,7 +1290,7 @@ void update_box(int x, int y, int w, int h) {
 
   restore_wallpaper(x, y, w, h);
 
-  for (n = max_windows - 1; n >= 0; n--)
+  for (n = MAX_WINDOWS - 1; n >= 0; n--)
     if (window[n].type)
       if (collides_with(n, x, y, w, h)) {
         _ptr = window[n].ptr;
@@ -1539,7 +1539,7 @@ void select_get(t_item *i, int activo, int ocultar_error) {
       wrectangle(v.ptr, v.w / big2, v.h / big2, c2, i->get.x - 1, i->get.y + 7, i->get.w + 2, 11);
     }
 
-    for (n = 0; n < max_items; n++)
+    for (n = 0; n < MAX_ITEMS; n++)
       if (i == &v.item[n])
         v.active_item = n;
   }

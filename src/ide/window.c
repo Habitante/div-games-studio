@@ -541,7 +541,7 @@ void blit_region_dark(byte *dest, int dest_width, int dest_height, byte *p, int 
 
   SDL_Rect trc;
 
-  for (vn = 0; vn < max_windows; vn++) {
+  for (vn = 0; vn < MAX_WINDOWS; vn++) {
     if (window[vn].ptr != NULL)
       if (window[vn].ptr == p) {
         break;

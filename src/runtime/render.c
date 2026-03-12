@@ -2655,7 +2655,7 @@ void paint_texts(int n) { // E: texts[]
 
   do
     if (texts[n].font) {
-      if (n == max_texts) {
+      if (n == MAX_TEXTS) {
         if (frame_clock & 64)
           break;
         else
@@ -2812,7 +2812,7 @@ void paint_texts(int n) { // E: texts[]
         }
       }
     }
-  while (++n < max_texts);
+  while (++n < MAX_TEXTS);
 }
 
 void text_normal(byte *p, int x, int y, byte w, int h) {

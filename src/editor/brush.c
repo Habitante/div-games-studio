@@ -423,7 +423,7 @@ void M3D_show_thumb(struct t_listboxbr *l, int num) {
   struct _thumb_tex thumb_tmp[max_texturas];
 
   if (browser_type == MAPBR)
-    memcpy(&thumb_tmp, &thumb_map, sizeof(struct _thumb_map) * max_windows);
+    memcpy(&thumb_tmp, &thumb_map, sizeof(struct _thumb_map) * MAX_WINDOWS);
   else
     memcpy(&thumb_tmp, &thumb_tex, sizeof(struct _thumb_tex) * max_texturas);
 

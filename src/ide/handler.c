@@ -485,7 +485,7 @@ void menu_edicion2(void) {
         }
         move(0, n);
         if (v.foreground == 0) {
-          for (m = 1; m < max_windows; m++)
+          for (m = 1; m < MAX_WINDOWS; m++)
             if (window[m].type && window[m].foreground == 1)
               if (windows_collide(0, m)) {
                 window[m].foreground = 0;
@@ -527,7 +527,7 @@ void menu_edicion2(void) {
         if (v_accept) {
           move(0, n);
           if (v.foreground == 0) {
-            for (m = 1; m < max_windows; m++)
+            for (m = 1; m < MAX_WINDOWS; m++)
               if (window[m].type && window[m].foreground == 1)
                 if (windows_collide(0, m)) {
                   window[m].foreground = 0;
@@ -552,7 +552,7 @@ void menu_edicion2(void) {
         }
         move(0, n);
         if (v.foreground == 0) {
-          for (m = 1; m < max_windows; m++)
+          for (m = 1; m < MAX_WINDOWS; m++)
             if (window[m].type && window[m].foreground == 1)
               if (windows_collide(0, m)) {
                 window[m].foreground = 0;
@@ -571,7 +571,7 @@ void menu_edicion2(void) {
         if (v_accept) {
           move(0, n);
           if (v.foreground == 0) {
-            for (m = 1; m < max_windows; m++)
+            for (m = 1; m < MAX_WINDOWS; m++)
               if (window[m].type && window[m].foreground == 1)
                 if (windows_collide(0, m)) {
                   window[m].foreground = 0;
@@ -715,7 +715,7 @@ void menu_mapas2(void) {
       v_text = (char *)texts[335];
       show_dialog(accept0);
       if (v_accept) {
-        for (n = 0; n < max_windows; n++)
+        for (n = 0; n < MAX_WINDOWS; n++)
           if (window[n].type == 100 && window[n].foreground != 2) {
             move(0, n);
             close_window();
@@ -780,7 +780,7 @@ casi_no_tiene_nombre:
         v.state = 0;
         move(0, n);
         if (v.foreground == 0) {
-          for (m = 1; m < max_windows; m++)
+          for (m = 1; m < MAX_WINDOWS; m++)
             if (window[m].type && window[m].foreground == 1)
               if (windows_collide(0, m)) {
                 window[m].foreground = 0;
@@ -869,7 +869,7 @@ int check_file(void) {
 int find_pcm_window(void) {
   int m, n = 0;
 
-  for (m = 1; m < max_windows; m++)
+  for (m = 1; m < MAX_WINDOWS; m++)
     if (window[m].type == 105 && window[m].state) {
       n = m;
       break;
@@ -880,7 +880,7 @@ int find_pcm_window(void) {
 int find_mod_window(void) {
   int m, n = 0;
 
-  for (m = 1; m < max_windows; m++)
+  for (m = 1; m < MAX_WINDOWS; m++)
     if (window[m].type == 107 && window[m].state) {
       n = m;
       break;
@@ -891,7 +891,7 @@ int find_mod_window(void) {
 int find_font_window(void) {
   int m, n = 0;
 
-  for (m = 1; m < max_windows; m++)
+  for (m = 1; m < MAX_WINDOWS; m++)
     if (window[m].type == 104 && window[m].state) {
       n = m;
       break;
@@ -902,7 +902,7 @@ int find_font_window(void) {
 int find_fpg_window(void) {
   int m, n = 0;
 
-  for (m = 1; m < max_windows; m++)
+  for (m = 1; m < MAX_WINDOWS; m++)
     if (window[m].type == 101 && window[m].state) {
       n = m;
       break;
@@ -915,7 +915,7 @@ int find_fpg_window(void) {
 int find_map_window(void) {
   int m, n = 0;
 
-  for (m = 1; m < max_windows; m++)
+  for (m = 1; m < MAX_WINDOWS; m++)
     if (window[m].type == 100 && window[m].state) {
       n = m;
       break;
@@ -926,7 +926,7 @@ int find_map_window(void) {
 int find_and_load_map(void) {
   int m, n = 0;
 
-  for (m = 1; m < max_windows; m++)
+  for (m = 1; m < MAX_WINDOWS; m++)
     if (window[m].type == 100 && window[m].state) {
       n = m;
       break;
@@ -946,7 +946,7 @@ int find_and_load_map(void) {
 int find_program_window(void) {
   int m, n = 0;
 
-  for (m = 1; m < max_windows; m++) {
+  for (m = 1; m < MAX_WINDOWS; m++) {
     if (window[m].type == 102 && window[m].state && window[m].prg != NULL) {
       n = m;
       break;
@@ -1289,7 +1289,7 @@ end_bucle:
   // Create the window and close the old if available
 
 
-  for (x = -1, y = 1; y < max_windows; y++)
+  for (x = -1, y = 1; y < MAX_WINDOWS; y++)
     if (window[y].type == 104 && !strcmp((char *)window[y].title, FontName))
       x = y;
 
@@ -1969,7 +1969,7 @@ int windows_collide(int, int);
 void calculate_foreground(void) {
   int n, m;
 
-  for (n = 0; n < max_windows; n++)
+  for (n = 0; n < MAX_WINDOWS; n++)
     if (window[n].type && window[n].foreground != 2) {
       window[n].foreground = 1;
       for (m = 0; m < n; m++)
@@ -2016,7 +2016,7 @@ extern struct _thumb_map {
   int FilePos;
   int Code;
   int is_square;
-} thumb_map[max_windows];
+} thumb_map[MAX_WINDOWS];
 
 void M3D_create_thumbs(struct t_listboxbr *l, int prog);
 int create_mapbr_thumbs(struct t_listboxbr *l);
@@ -2055,7 +2055,7 @@ void map_view2(void) {
       return;
     }
 
-    for (n = 1; n < max_windows; n++)
+    for (n = 1; n < MAX_WINDOWS; n++)
       if (window[n].type && window[n].foreground == 1) {
         hidden[n] = 1;
         window[n].foreground = 0;
@@ -2136,7 +2136,7 @@ void map_view2(void) {
     exploding_windows = 0;
     for (n = 0; n < max_texturas; n++)
       thumb_tex[n].ptr = NULL;
-    for (n = 0; n < max_windows; n++)
+    for (n = 0; n < MAX_WINDOWS; n++)
       thumb_map[n].ptr = NULL;
     div_strcpy(full, sizeof(full), file_types[1].path);
     if (full[strlen(full) - 1] != '/')
@@ -2260,7 +2260,7 @@ void map_view2(void) {
     v.mapa->zoom_y = zoom_y;
     v.mapa->zoom_cx = zoom_cx;
     v.mapa->zoom_cy = zoom_cy;
-    for (n = 1; n < max_windows; n++)
+    for (n = 1; n < MAX_WINDOWS; n++)
       if (hidden[n])
         window[n].foreground = 1;
     v.foreground = 1;
@@ -2751,11 +2751,11 @@ void palette_action3(void) {
 //      Lists for the file open window
 //-----------------------------------------------------------------------------
 
-char files_buf[MAX_FILES * w_archivo];
-struct t_listbox file_list = {3, 49, files_buf, w_archivo, 12, 64};
+char files_buf[MAX_FILES * FILE_SIZE];
+struct t_listbox file_list = {3, 49, files_buf, FILE_SIZE, 12, 64};
 
-char dirs_buf[max_directorios * w_directorio];
-struct t_listbox dir_list = {80, 49, dirs_buf, w_directorio, 10, 64};
+char dirs_buf[MAX_FOLDERS * FOLDER_SIZE];
+struct t_listbox dir_list = {80, 49, dirs_buf, FOLDER_SIZE, 10, 64};
 
 #define MAX_DRIVES  26
 #define DRIVE_WIDTH (4 + 1)

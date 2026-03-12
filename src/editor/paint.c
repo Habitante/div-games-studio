@@ -1962,7 +1962,7 @@ void draw_help(int n) {
       move(0, m);
       call(v.close_handler);
       if (v.click_handler == help2 && old_prg != NULL) {
-        for (m = 1; m < max_windows; m++) {
+        for (m = 1; m < MAX_WINDOWS; m++) {
           if (window[m].click_handler == program2) {
             if (window[m].prg == old_prg && window[m].foreground < 2) {
               window[m].state = 1;
@@ -2897,7 +2897,7 @@ struct _thumb_map {            // Brush map thumbnails
   int FilePos;
   int Code;
   int is_square;
-} thumb_map[max_windows];
+} thumb_map[MAX_WINDOWS];
 
 void mapper_browse_fpg0(void);
 
@@ -2910,7 +2910,7 @@ void free_paint_thumbs(void) {
       thumb_tex[n].ptr = NULL;
     }
   }
-  for (n = 0; n < max_windows; n++) {
+  for (n = 0; n < MAX_WINDOWS; n++) {
     if (thumb_map[n].ptr != NULL) {
       free(thumb_map[n].ptr);
       thumb_map[n].ptr = NULL;
@@ -2929,7 +2929,7 @@ int create_mapbr_thumbs(struct t_listboxbr *l) {
   fpg_thumb_pos = 0;
 
   n = m_maximo = 0;
-  for (con = 0; con < max_windows; con++) {
+  for (con = 0; con < MAX_WINDOWS; con++) {
     if (window[con].type == 100) {
       thumb_map[n].w = (int)window[con].mapa->map_width;
       thumb_map[n].h = (int)window[con].mapa->map_height;
@@ -3483,7 +3483,7 @@ void change_map(int forward) {
   copy(-1, 0);
 
   if (forward) {
-    for (n = 1; n < max_windows; n++) {
+    for (n = 1; n < MAX_WINDOWS; n++) {
       if (window[n].type == 100 && window[n].mapa->map_width == map_width &&
           window[n].mapa->map_height == map_height && window[n].foreground != 2) {
         copy(old, n);
@@ -3491,7 +3491,7 @@ void change_map(int forward) {
       }
     }
   } else {
-    for (n = max_windows - 1; n > 0; n--) {
+    for (n = MAX_WINDOWS - 1; n > 0; n--) {
       if (window[n].type == 100 && window[n].mapa->map_width == map_width &&
           window[n].mapa->map_height == map_height && window[n].foreground != 2) {
         copy(old, n);
@@ -3502,7 +3502,7 @@ void change_map(int forward) {
 
   copy(old, -1);
 
-  for (n = 0; n < max_windows; n++) {
+  for (n = 0; n < MAX_WINDOWS; n++) {
     if (thumb_map[n].ptr != NULL) {
       free(thumb_map[n].ptr);
       thumb_map[n].ptr = NULL;

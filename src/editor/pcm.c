@@ -790,7 +790,7 @@ void close_sound(char *snd_path) {
   pcminfo *mypcminfo;
   int m;
 
-  for (m = 0; m < max_windows; m++) {
+  for (m = 0; m < MAX_WINDOWS; m++) {
     if (window[m].type == 105) {
       mypcminfo = (pcminfo *)window[m].aux;
       if (!strcmp(snd_path, mypcminfo->pathname)) {

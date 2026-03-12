@@ -121,7 +121,7 @@ void init_debug(void) {
   FILE *f;
   int n;
 
-  for (n = 0; n < max_windows; n++)
+  for (n = 0; n < MAX_WINDOWS; n++)
     window[n].type = 0;
   if ((mouse_background = (byte *)malloc(2048)) == NULL)
     exer(1);

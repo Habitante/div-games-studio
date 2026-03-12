@@ -133,7 +133,7 @@ void fonts1(void) {
 void close_old_fnt(void) {
   int m;
 
-  for (m = 1; m < max_windows; m++)
+  for (m = 1; m < MAX_WINDOWS; m++)
     if (window[m].type == 104 && !strcmp(FontName, (char *)window[m].aux)) {
       move(0, m);
       close_window();

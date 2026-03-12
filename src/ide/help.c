@@ -668,7 +668,7 @@ int dtoi(int m) {
 int determine_help(void) {
   int m, n = -1;
 
-  for (m = 0; m < max_windows; m++) {
+  for (m = 0; m < MAX_WINDOWS; m++) {
     if (window[m].type == 102 && window[m].click_handler == help2) {
       n = m;
       break;
@@ -702,7 +702,7 @@ void help(int n) {
       maximize_window();
 
     if (m && v.foreground == 0) { // If it was in the background
-      for (m = 1; m < max_windows; m++)
+      for (m = 1; m < MAX_WINDOWS; m++)
         if (window[m].type && window[m].foreground == 1)
           if (windows_collide(0, m)) {
             window[m].foreground = 0;

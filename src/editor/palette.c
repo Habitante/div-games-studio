@@ -716,7 +716,7 @@ void calculate_gradient(int n) {
 
 int has_maps(void) {
   int m, n = -1;
-  for (m = 0; m < max_windows; m++)
+  for (m = 0; m < MAX_WINDOWS; m++)
     if (window[m].type == 100) {
       n = m;
       break;
@@ -950,7 +950,7 @@ void pal_refresh(int no_tocar_mapas, int guardar_original) {
 
   // ************** Free FPG thumbnails
 
-  for (m = 0; m < max_windows; m++)
+  for (m = 0; m < MAX_WINDOWS; m++)
     if (window[m].type == 101) {
       my_fpg = (FPG *)window[m].aux;
 
@@ -974,7 +974,7 @@ void pal_refresh(int no_tocar_mapas, int guardar_original) {
     xlat[x] = find_color_not0(pal[x * 3], pal[x * 3 + 1], pal[x * 3 + 2]);
 
   if (!no_tocar_mapas) {
-    for (n = 1; n < max_windows; n++) {
+    for (n = 1; n < MAX_WINDOWS; n++) {
       if (window[n].type == 100) {
         ptr = window[n].mapa->map;
         sum = window[n].mapa->map_width * window[n].mapa->map_height;
@@ -1000,7 +1000,7 @@ void pal_refresh(int no_tocar_mapas, int guardar_original) {
       }
     }
 
-  for (n = 0; n < max_windows; n++) {
+  for (n = 0; n < MAX_WINDOWS; n++) {
     if (window[n].type == 102 && !strcmp((char *)window[n].name, (char *)texts[83])) {
       Text1Col = xlat[Text1Col];
       Text2Col = xlat[Text2Col];
@@ -1063,12 +1063,12 @@ void pal_refresh(int no_tocar_mapas, int guardar_original) {
 
   create_title_bar();
 
-  for (n = 1; n < max_windows; n++) {
+  for (n = 1; n < MAX_WINDOWS; n++) {
     if (window[n].type == 104)
       pal_reload_font(n, (struct twindow *)&window[n].type);
   }
 
-  for (n = 0; n < max_windows; n++)
+  for (n = 0; n < MAX_WINDOWS; n++)
     if (window[n].type) {
       wup(n);
       ptr = v.ptr;
@@ -1153,7 +1153,7 @@ void pal_refresh(int no_tocar_mapas, int guardar_original) {
   if (guardar_original)
     memcpy(original_palette, dac, 768);
 
-  for (n = 1; n < max_windows; n++) {
+  for (n = 1; n < MAX_WINDOWS; n++) {
     if (window[n].type == 101) {
       if (remap_all_files(n))
         n--;

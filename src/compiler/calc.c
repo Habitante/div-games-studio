@@ -23,7 +23,7 @@ void calculator(void);
 //      Variables del módulo
 //-----------------------------------------------------------------------------
 
-extern char get_buffer[long_line];
+extern char get_buffer[LONG_LINE];
 extern char *get;
 
 struct _calc {

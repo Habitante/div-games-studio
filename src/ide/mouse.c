@@ -235,12 +235,12 @@ void read_mouse(void) {
 void libera_drag(void) {
   int n;
   dragging = 0;
-  for (n = 0; n < max_windows; n++) {
+  for (n = 0; n < MAX_WINDOWS; n++) {
     if (window[n].type && window[n].order == drag_source)
       break;
   }
 
-  if (n < max_windows && window[n].type == 101 && window[n].mapa != NULL) {
+  if (n < MAX_WINDOWS && window[n].type == 101 && window[n].mapa != NULL) {
     free(window[n].mapa->map);
     free(window[n].mapa);
     window[n].mapa = NULL;
@@ -536,7 +536,7 @@ void read_mouse2(void) {
     prepare_wallpaper();
 
     if (strcmp((char *)v.title, (char *)texts[35])) {
-      for (n = max_windows; n >= 0; n--) {
+      for (n = MAX_WINDOWS; n >= 0; n--) {
         if (window[n].type) {
           if (window[n].x + window[n].w > vga_width)
             window[n].x = vga_width - window[n].w;

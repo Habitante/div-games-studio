@@ -57,7 +57,7 @@ This function allocates all fundamental IDE resources:
 ### Window array initialization
 
 ```c
-struct twindow window[max_windows];  // max_windows = 96
+struct twindow window[MAX_WINDOWS];  // MAX_WINDOWS = 96
 #define v window[0]                  // v is always the frontmost window
 ```
 
@@ -77,8 +77,8 @@ void main_loop(void) {
 The actual work is in `mainloop()` (line 857), which runs once per iteration:
 
 1. **`poll_keyboard()`** -- Pumps the SDL event queue, updates `mclock` timestamp.
-2. **Window hit-test** -- Scans `window[0..max_windows-1]` to find which window
-   the mouse is over (variable `n`). `n=max_windows` means background.
+2. **Window hit-test** -- Scans `window[0..MAX_WINDOWS-1]` to find which window
+   the mouse is over (variable `n`). `n=MAX_WINDOWS` means background.
 3. **Drag-and-drop** -- Handles dragging sprites/maps between windows and the
    desktop (`dragging` state machine: 0=idle, 1=pending, 2=dragging, 3=done,
    4=dropping, 5=dropped).
@@ -198,7 +198,7 @@ Each window has:
 - `ptr` -- Byte buffer for the window's rendered content
 - `mapa` -- Pointer to a `struct tmapa` (for map editors)
 - `prg` -- Pointer to a `struct tprg` (for program editors)
-- `item[max_items]` -- Up to 24 UI items (buttons, text fields, checkboxes)
+- `item[MAX_ITEMS]` -- Up to 24 UI items (buttons, text fields, checkboxes)
 - `order` -- Z-order number
 - `redraw` -- Flag indicating the window needs redrawing
 

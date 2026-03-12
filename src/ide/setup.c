@@ -431,7 +431,7 @@ void mem_info1(void) {
   wwrite_in_box(v.ptr + 2, w, w - 4, h, (w - 4) / 2, 32, 1, (byte *)user2, c3);
 
   get_free_mem(&my_meminfo);
-  for (x = 0; x < max_windows; x++) {
+  for (x = 0; x < MAX_WINDOWS; x++) {
     if (window[x].type)
       nuvent++;
     if (window[x].type == 100) {
@@ -463,7 +463,7 @@ void mem_info1(void) {
   wwrite(v.ptr, w, h, w / 2 + 1, 52, 1, (byte *)cWork, c1);
   wwrite(v.ptr, w, h, w / 2, 52, 1, (byte *)cWork, c4);
 
-  DIV_SPRINTF(cWork, (char *)texts[198], nuvent * 100 / max_windows, '%');
+  DIV_SPRINTF(cWork, (char *)texts[198], nuvent * 100 / MAX_WINDOWS, '%');
   wwrite(v.ptr, w, h, w / 2 + 1, 60, 1, (byte *)cWork, c1);
   wwrite(v.ptr, w, h, w / 2, 60, 1, (byte *)cWork, c4);
 }
@@ -868,7 +868,7 @@ void config_setup_end(void) {
   struct twindow vp[24];
   int i;
 
-  for (i = 0, n = 0; n < max_windows; n++) {
+  for (i = 0, n = 0; n < MAX_WINDOWS; n++) {
     if (window[n].click_handler == (void_return_type_t)program2)
       i++;
   }
@@ -1011,19 +1011,19 @@ void config_setup_end(void) {
     exploding_windows = 0;
 
     if (old_editor_font != editor_font) {
-      for (n = 0; n < max_windows; n++)
+      for (n = 0; n < MAX_WINDOWS; n++)
         if (window[n].click_handler == (void_return_type_t)help2) {
           move(0, n);
           close_window();
           help_item++;
           break;
         }
-      if (n == max_windows)
+      if (n == MAX_WINDOWS)
         help_item = 0;
       i = 0;
       do {
         found = 0;
-        for (n = max_windows - 1; n >= 0; n--)
+        for (n = MAX_WINDOWS - 1; n >= 0; n--)
           if (window[n].click_handler == (void_return_type_t)program2) {
             memcpy(&vp[i].type, &window[n].type, sizeof(struct twindow));
             i++;
@@ -1038,7 +1038,7 @@ void config_setup_end(void) {
 
     create_title_bar();
 
-    for (n = 0; n < max_windows; n++)
+    for (n = 0; n < MAX_WINDOWS; n++)
       if (window[n].type) {
         xchg(0, n);
 

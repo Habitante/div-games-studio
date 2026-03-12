@@ -14,7 +14,7 @@
 
 /* --- Shared globals (defined in main.c) --- */
 
-extern char get_buffer[long_line];
+extern char get_buffer[LONG_LINE];
 extern char *get;
 extern int get_cursor, get_pos;
 

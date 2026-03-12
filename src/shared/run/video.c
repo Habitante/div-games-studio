@@ -273,13 +273,13 @@ void setup_video_mode(void) {
   m_y = (float)vga_height / 2.0;
 
   if (demo) {
-    texts[max_texts].type = 0;
-    texts[max_texts].alignment = 4;
-    texts[max_texts].y = vga_height / 2;
-    texts[max_texts].x = vga_width / 2;
-    texts[max_texts].font = (byte *)fonts[0];
+    texts[MAX_TEXTS].type = 0;
+    texts[MAX_TEXTS].alignment = 4;
+    texts[MAX_TEXTS].y = vga_height / 2;
+    texts[MAX_TEXTS].x = vga_width / 2;
+    texts[MAX_TEXTS].font = (byte *)fonts[0];
   } else
-    texts[max_texts].font = 0;
+    texts[MAX_TEXTS].font = 0;
 
 #ifndef DEBUG
   if (splashtime > 0)

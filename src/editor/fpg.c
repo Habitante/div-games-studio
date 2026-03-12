@@ -2046,7 +2046,7 @@ void close_fpg(char *fpg_path) {
   FPG *my_fpg;
   int m;
 
-  for (m = 0; m < max_windows; m++) {
+  for (m = 0; m < MAX_WINDOWS; m++) {
     my_fpg = (FPG *)window[m].aux;
     if (window[m].type == 101) {
       if (!strcmp(fpg_path, (char *)my_fpg->current_file)) {

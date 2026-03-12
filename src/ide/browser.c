@@ -62,12 +62,12 @@ Mix_Chunk *smp = NULL;
 };*/
 
 
-extern char files_buf[MAX_FILES * w_archivo];
+extern char files_buf[MAX_FILES * FILE_SIZE];
 //[?*MAX_FILES]
-struct t_listboxbr file_list_br = {77, 27, files_buf, w_archivo, 4, 4, 51, 31};
+struct t_listboxbr file_list_br = {77, 27, files_buf, FILE_SIZE, 4, 4, 51, 31};
 
-extern char dirs_buf[max_directorios * w_directorio];
-struct t_listbox dir_list_br = {3, 27, dirs_buf, w_directorio, 10, 65};
+extern char dirs_buf[MAX_FOLDERS * FOLDER_SIZE];
+struct t_listbox dir_list_br = {3, 27, dirs_buf, FOLDER_SIZE, 10, 65};
 
 #define MAX_DRIVES  26
 #define DRIVE_WIDTH (4 + 1)
@@ -1750,7 +1750,7 @@ void browser2(void) {
       browser1();
       v.redraw = 1;
       div_strcpy(full, sizeof(full),
-                 files_buf + (file_list_br.zone - 10 + file_list_br.first_visible) * w_archivo);
+                 files_buf + (file_list_br.zone - 10 + file_list_br.first_visible) * FILE_SIZE);
 
       // TODO: Handle CTRL and SHIFT modifier keys
       if (strcmp(input, full) || ((v_thumb == 7 || v_type == 16) && opc_pru)) {
@@ -1766,7 +1766,7 @@ void browser2(void) {
               div_strcat(full, sizeof(full), "/");
             div_strcat(full, sizeof(full),
                        files_buf +
-                           (file_list_br.zone - 10 + file_list_br.first_visible) * w_archivo);
+                           (file_list_br.zone - 10 + file_list_br.first_visible) * FILE_SIZE);
 
             Mix_HaltChannel(-1);
             if (smp != NULL)
@@ -1802,7 +1802,7 @@ void browser2(void) {
       if (file_types[v_type].path[strlen(file_types[v_type].path) - 1] != '/')
         div_strcat(file_types[v_type].path, sizeof(file_types[v_type].path), "/");
       div_strcat(file_types[v_type].path, sizeof(file_types[v_type].path),
-                 dirs_buf + (dir_list_br.zone - 10 + dir_list_br.first_visible) * w_directorio);
+                 dirs_buf + (dir_list_br.zone - 10 + dir_list_br.first_visible) * FOLDER_SIZE);
       chdir(file_types[v_type].path);
       getcwd(file_types[v_type].path, PATH_MAX + 1);
       print_path_br();
@@ -1897,23 +1897,23 @@ void open_dir_br(void) {
   n = 0;
   m = _dos_findfirst(file_mask, _A_NORMAL, &fileinfo);
   while (m == 0 && n < MAX_FILES) {
-    div_strcpy(files_buf + n++ * w_archivo, w_archivo, fileinfo.name);
+    div_strcpy(files_buf + n++ * FILE_SIZE, FILE_SIZE, fileinfo.name);
     m = _dos_findnext(&fileinfo);
   }
   file_list_br.total_items = n;
-  qsort(files_buf, file_list_br.total_items, (size_t)w_archivo,
+  qsort(files_buf, file_list_br.total_items, (size_t)FILE_SIZE,
         (int (*)(const void *, const void *))strcmp);
 
   n = 0;
   m = _dos_findfirst("*.*", _A_SUBDIR, &fileinfo);
-  while (m == 0 && n < max_directorios) {
+  while (m == 0 && n < MAX_FOLDERS) {
     if (strcmp(fileinfo.name, ".") && (fileinfo.attrib & 16)) {
-      div_strcpy(dirs_buf + n++ * w_directorio, w_directorio, fileinfo.name);
+      div_strcpy(dirs_buf + n++ * FOLDER_SIZE, FOLDER_SIZE, fileinfo.name);
     }
     m = _dos_findnext(&fileinfo);
   }
   dir_list_br.total_items = n;
-  qsort(dirs_buf, dir_list_br.total_items, w_directorio,
+  qsort(dirs_buf, dir_list_br.total_items, FOLDER_SIZE,
         (int (*)(const void *, const void *))strcmp);
 
   for (n = 0; n < MAX_FILES; n++) {

@@ -106,7 +106,7 @@ extern int error_col;    // Error column num
   int first_line;            // First line displayed on screen
   int first_column;          // Horizontal scroll offset on screen
 
-  char l[long_line+4];          // Buffer for the edited line
+  char l[LONG_LINE+4];          // Buffer for the edited line
   int line_size;                // Original size of the edited line
 
   int prev_line;              // Previous line (for partial blit_screen)
@@ -119,7 +119,7 @@ extern int error_col;    // Error column num
 
 // Window size is (an*editor_font_width+12*big2) x (al*editor_font_height+20*big2)
 
-char line_buffer[long_line + 4]; // Copy of the line being edited, for f_enter()
+char line_buffer[LONG_LINE + 4]; // Copy of the line being edited, for f_enter()
 
 int cursor_mode = 0; // Active cursor type (0-insert/1-overwrite)
 
@@ -496,10 +496,10 @@ void editor() {
   v.prg->prev_line = v.prg->line - v.prg->first_line;
 
   if (edited != v.prg) { // If we were editing a different one ...
-    for (n = 0; n < max_windows; n++)
+    for (n = 0; n < MAX_WINDOWS; n++)
       if (window[n].type == 102 && window[n].prg != NULL && window[n].prg == edited)
         break;
-    if (n < max_windows) {
+    if (n < MAX_WINDOWS) {
       wup(n);
       write_line();
       read_line();
@@ -1286,10 +1286,10 @@ void f_mark(void) {
           block_col2 = strlen(v.prg->l) + 1;
       }
     } else {
-      for (n = 0; n < max_windows; n++)
+      for (n = 0; n < MAX_WINDOWS; n++)
         if (window[n].type == 102 && window[n].prg == kprg && kprg != NULL)
           break;
-      if (n < max_windows) {
+      if (n < MAX_WINDOWS) {
         wup(n);
         f_unmark();
         v.redraw = 2;
@@ -1326,10 +1326,10 @@ void f_mark(void) {
 void f_unmark(void) {
   int n;
   if (block_state && kprg != v.prg) {
-    for (n = 0; n < max_windows; n++)
+    for (n = 0; n < MAX_WINDOWS; n++)
       if (window[n].type == 102 && window[n].prg == kprg && kprg != NULL)
         break;
-    if (n < max_windows) {
+    if (n < MAX_WINDOWS) {
       wup(n);
       f_unmark();
       v.redraw = 2;
@@ -1349,10 +1349,10 @@ void f_cut_block(int mode) {
   int n;
   t_p = 0; // Clipboard type -> chars by default
   if (block_state && kprg != v.prg) {
-    for (n = 0; n < max_windows; n++)
+    for (n = 0; n < MAX_WINDOWS; n++)
       if (window[n].type == 102 && window[n].prg == kprg && kprg != NULL)
         break;
-    if (n < max_windows) {
+    if (n < MAX_WINDOWS) {
       wup(n);
       f_cut(mode);
       v.redraw = 2;
@@ -1564,7 +1564,7 @@ void f_paste_block(void) {
 //-----------------------------------------------------------------------------
 
 void f_right(void) {
-  if (v.prg->column < long_line - 1)
+  if (v.prg->column < LONG_LINE - 1)
     v.prg->column++;
   if (v.prg->column - v.prg->first_column == v.prg->w) {
     v.prg->first_column++;
@@ -1682,7 +1682,7 @@ void f_delete_char(void) {
       }
       while (p < v.prg->buffer + v.prg->file_len && *p != cr) {
         n_chars++;
-        if (n < long_line - 1)
+        if (n < LONG_LINE - 1)
           v.prg->l[n++] = *p++;
       }
       v.prg->l[n] = 0;
@@ -1738,7 +1738,7 @@ void f_tab(void) {
       ascii = ' ';
       f_insert_char();
     }
-  } while (((v.prg->column - 1) % tab_size) != 0 && v.prg->column < long_line - 1);
+  } while (((v.prg->column - 1) % tab_size) != 0 && v.prg->column < LONG_LINE - 1);
   ascii = 0;
 }
 
@@ -1754,7 +1754,7 @@ void f_untab(void) {
 }
 
 void f_overwrite(void) {
-  if (v.prg->column < long_line) {
+  if (v.prg->column < LONG_LINE) {
     if (strlen(v.prg->l) < v.prg->column)
       f_insert_char();
     else {
@@ -1767,7 +1767,7 @@ void f_overwrite(void) {
 void f_insert_char(void) {
   int n;
 
-  if (v.prg->column < long_line) {
+  if (v.prg->column < LONG_LINE) {
     if (strlen(v.prg->l) < v.prg->column) {
       for (n = strlen(v.prg->l); n < v.prg->column - 1; n++)
         v.prg->l[n] = ' ';
@@ -1778,12 +1778,12 @@ void f_insert_char(void) {
         block_col1++;
       if (block_end == v.prg->lptr && block_col2 >= v.prg->column)
         block_col2++;
-      if (strlen(v.prg->l) < long_line - 1)
+      if (strlen(v.prg->l) < LONG_LINE - 1)
         v.prg->l[strlen(v.prg->l) + 1] = 0;
       for (n = strlen(v.prg->l); n >= v.prg->column; n--)
         v.prg->l[n] = v.prg->l[n - 1];
       v.prg->l[n] = ascii;
-      v.prg->l[long_line - 1] = 0;
+      v.prg->l[LONG_LINE - 1] = 0;
     }
     f_right();
   }
@@ -1817,7 +1817,7 @@ void f_enter(void) {
       line_buffer[t] = ' ';
       t++;
     }
-    memcpy(line_buffer + t, v.prg->l + n, long_line - n);
+    memcpy(line_buffer + t, v.prg->l + n, LONG_LINE - n);
     v.prg->l[n] = 0;
     remove_spaces();
     n = strlen(v.prg->l);
@@ -1839,7 +1839,7 @@ void f_enter(void) {
     advance_lptr();
     read_line();
 
-    memcpy(v.prg->l, line_buffer, long_line);
+    memcpy(v.prg->l, line_buffer, LONG_LINE);
 
     if (v.prg->line - v.prg->first_line == v.prg->h)
       advance_vptr();
@@ -2234,11 +2234,11 @@ void _completo(void) {
         col0 = 1;
       if (si == block_end) {
         if (block_col2 > linelen(block_end))
-          col1 = long_line;
+          col1 = LONG_LINE;
         else
           col1 = block_col2;
       } else
-        col1 = long_line;
+        col1 = LONG_LINE;
       x = v.prg->first_column;
       width = v.prg->w;
       while (width--) {
@@ -2433,11 +2433,11 @@ void _parcial(void) {
       col0 = 1;
     if (si == block_end) {
       if (block_col2 > linelen(block_end))
-        col1 = long_line;
+        col1 = LONG_LINE;
       else
         col1 = block_col2;
     } else
-      col1 = long_line;
+      col1 = LONG_LINE;
     x = v.prg->first_column;
     width = v.prg->w;
     while (width--) {
@@ -2517,7 +2517,7 @@ void scrollbars(void) {
   wbox(ptr, w, h, c2, 10, h - 9, w - 4 - 24, 7); // Horizontal slider
   min = 10;
   max = w - 21;
-  slider = min + (v.prg->first_column * (max - min)) / (long_line - v.prg->w);
+  slider = min + (v.prg->first_column * (max - min)) / (LONG_LINE - v.prg->w);
   wbox(ptr, w, h, c0, slider - 1, h - 9, 1, 7);
   wbox(ptr, w, h, c0, slider + 3, h - 9, 1, 7);
   wput(ptr, w, h, slider, h - 9, 55);
@@ -2543,7 +2543,7 @@ int get_slide_x(void) {
     w /= 2;
   min = 10;
   max = w - 21;
-  return (min + (v.prg->first_column * (max - min)) / (long_line - v.prg->w));
+  return (min + (v.prg->first_column * (max - min)) / (LONG_LINE - v.prg->w));
 }
 
 //-----------------------------------------------------------------------------
@@ -2855,11 +2855,11 @@ int in_block(void) {
         col0 = 1;
       if (v.prg->lptr == block_end) {
         if (block_col2 > linelen(block_end))
-          col1 = long_line;
+          col1 = LONG_LINE;
         else
           col1 = block_col2;
       } else
-        col1 = long_line;
+        col1 = LONG_LINE;
       if (v.prg->column >= col0 && v.prg->column <= col1)
         return (1);
       else
@@ -4420,7 +4420,7 @@ void process_list0(void) {
 void goto_error(void) {
   int m, n = 0;
 
-  for (m = 0; m < max_windows; m++) {
+  for (m = 0; m < MAX_WINDOWS; m++) {
     if (window[m].type == 102 && window[m].state && window[m].prg != NULL) {
       n = m;
       break;
@@ -4431,7 +4431,7 @@ void goto_error(void) {
     move(0, n); // If not window[0], bring to foreground
 
   if (v.foreground != 1) { // If not in foreground, bring it there
-    for (m = 1; m < max_windows; m++)
+    for (m = 1; m < MAX_WINDOWS; m++)
       if (window[m].type && window[m].foreground == 1)
         if (windows_collide(0, m)) {
           window[m].foreground = 0;

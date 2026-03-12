@@ -36,7 +36,7 @@ void on_window_moved(int x, int y, int w, int h) {
   v.type = n;
 
   if (v.type != 1) {
-    for (n = 1; n < max_windows; n++)
+    for (n = 1; n < MAX_WINDOWS; n++)
       if (window[n].type && window[n].foreground == 0)
 
         // If a dimmed window was previously covered ...
@@ -46,7 +46,7 @@ void on_window_moved(int x, int y, int w, int h) {
 
           // If it's covered by other windows (foreground or background) ...
 
-          for (m = 1; m < max_windows; m++)
+          for (m = 1; m < MAX_WINDOWS; m++)
             if (m != n && window[m].type &&
                 (window[m].foreground == 1 || (window[m].foreground != 1 && m < n)))
               if (windows_collide(n, m))
@@ -62,7 +62,7 @@ void on_window_moved(int x, int y, int w, int h) {
           }
         }
 
-    for (n = 1; n < max_windows; n++)
+    for (n = 1; n < MAX_WINDOWS; n++)
       if (window[n].type && window[n].foreground == 1)
         if (windows_collide(0, n)) {
           window[n].foreground = 0;
@@ -99,7 +99,7 @@ void maximize_window(void) {
   v.h = v._h_saved;
 
   m = 0;
-  for (n = 1; n < max_windows; n++)
+  for (n = 1; n < MAX_WINDOWS; n++)
     if (window[n].type && window[n].foreground == 1)
       if (windows_collide(0, n))
         m++;
@@ -154,7 +154,7 @@ void minimize_window(void) {
     v.x = v._x;
     v.y = v._y;
     m = 0;
-    for (n = 1; n < max_windows; n++)
+    for (n = 1; n < MAX_WINDOWS; n++)
       if (window[n].type && window[n].foreground == 2)
         if (windows_collide(0, n))
           m++;
@@ -212,7 +212,7 @@ void close_window(void) {
   }
 
   if (v.click_handler == help2 && old_prg != NULL) {
-    for (m = 1; m < max_windows; m++) {
+    for (m = 1; m < MAX_WINDOWS; m++) {
       if (window[m].click_handler == program2 || window[m].click_handler == calc2) {
         if ((window[m].prg == old_prg || window[m].aux == (byte *)old_prg) &&
             window[m].foreground < 2) {
@@ -240,7 +240,7 @@ void close_window(void) {
   }
 
   if (v.type >= 100 && v.state) { // Maps auto-deactivate on close
-    for (m = 1; m < max_windows; m++)
+    for (m = 1; m < MAX_WINDOWS; m++)
       if (window[m].type == v.type && window[m].foreground < 2) {
         window[m].state = 1;
         wgra(window[m].ptr, window[m].w / big2, window[m].h / big2, c_b_low, 2, 2,
@@ -280,17 +280,17 @@ void close_window(void) {
       v.foreground = 1;
       flush_window(0);
     } else if (draw_mode >= 100)
-      for (n = 0; n < max_windows; n++)
+      for (n = 0; n < MAX_WINDOWS; n++)
         if (hidden[n]) {
           window[n].foreground = 1;
           flush_window(n);
         }
   } else
-    for (n = 0; n < max_windows; n++)
+    for (n = 0; n < MAX_WINDOWS; n++)
       if (window[n].type && window[n].foreground == 0)
         if (collides_with(n, x, y, w, h)) {
           window[n].foreground = 1;
-          for (m = 0; m < max_windows; m++)
+          for (m = 0; m < MAX_WINDOWS; m++)
             if (m != n && window[m].type &&
                 (window[m].foreground == 1 || (window[m].foreground == 2 && m < n)))
               if (windows_collide(n, m))
@@ -533,7 +533,7 @@ void update_box(int x, int y, int w, int h) {
                   vga_height - 1 - y, 18, div_version, c2);
   }
 
-  for (n = max_windows - 1; n >= 0; n--)
+  for (n = MAX_WINDOWS - 1; n >= 0; n--)
     if (window[n].type)
       if (collides_with(n, x, y, w, h)) {
         if (window[n].foreground < 2) {
@@ -623,7 +623,7 @@ void update_dialogs(int x, int y, int w, int h) {
   if (w <= 0 || h <= 0)
     return;
 
-  for (n = max_windows - 1; n >= 0; n--)
+  for (n = MAX_WINDOWS - 1; n >= 0; n--)
     if (window[n].type == 1)
       if (collides_with(n, x, y, w, h))
         if (window[n].foreground < 2) {
@@ -998,7 +998,7 @@ void flush_window(int m) {
 
 void place_window(int flag, int *_x, int *_y, int w, int h) {
   int n, m, x, y, new_x, old_y = *_y;
-  int scanes, scan[max_windows];
+  int scanes, scan[MAX_WINDOWS];
 
   // First build scan[] with possible Y positions (0 + window bottom edges)
 
@@ -1011,7 +1011,7 @@ void place_window(int flag, int *_x, int *_y, int w, int h) {
   }
   scanes = 1;
 
-  for (n = 1; n < max_windows; n++)
+  for (n = 1; n < MAX_WINDOWS; n++)
     if (window[n].type) {
       if (flag & 1) {
         if ((y = window[n].y + window[n].h + 1) < vga_height) {
@@ -1022,7 +1022,7 @@ void place_window(int flag, int *_x, int *_y, int w, int h) {
           if (x == scanes)
             scan[scanes++] = y;
           else if (y != scan[x]) {
-            memmove(&scan[x + 1], &scan[x], 4 * (max_windows - x - 1));
+            memmove(&scan[x + 1], &scan[x], 4 * (MAX_WINDOWS - x - 1));
             scan[x] = y;
             scanes++;
           }
@@ -1036,7 +1036,7 @@ void place_window(int flag, int *_x, int *_y, int w, int h) {
           if (x == scanes)
             scan[scanes++] = y;
           else if (y != scan[x]) {
-            memmove(&scan[x + 1], &scan[x], 4 * (max_windows - x - 1));
+            memmove(&scan[x + 1], &scan[x], 4 * (MAX_WINDOWS - x - 1));
             scan[x] = y;
             scanes++;
           }
@@ -1052,7 +1052,7 @@ void place_window(int flag, int *_x, int *_y, int w, int h) {
       new_x = vga_width - w;
       do {
         x = new_x;
-        for (m = 1; m < max_windows; m++)
+        for (m = 1; m < MAX_WINDOWS; m++)
           if (window[m].type && collides_with(m, x - 1, y - 1, w + 2, h + 2))
             if (new_x >= window[m].x - w)
               new_x = window[m].x - w - 1;
@@ -1069,7 +1069,7 @@ void place_window(int flag, int *_x, int *_y, int w, int h) {
       new_x = 0;
       do {
         x = new_x;
-        for (m = 1; m < max_windows; m++)
+        for (m = 1; m < MAX_WINDOWS; m++)
           if (window[m].type && collides_with(m, x - 1, y - 1, w + 2, h + 2))
             if (window[m].x + window[m].w >= new_x)
               new_x = window[m].x + window[m].w + 1;
@@ -1121,7 +1121,7 @@ void find_best_position(int *_x, int *_y, int w, int h) {
 int calculate_collision(int x, int y, int w, int h) {
   int n, c, colision = 0;
 
-  for (n = 1; n < max_windows; n++) {
+  for (n = 1; n < MAX_WINDOWS; n++) {
     if (window[n].type) {
       if ((c = calculate_overlap(n, x, y, w, h))) {
         if (window[n].foreground)
@@ -1235,7 +1235,7 @@ void new_window(void_return_type_t init_handler) {
   amask = 0xff000000;
 #endif
 
-  if (!window[max_windows - 1].type) {
+  if (!window[MAX_WINDOWS - 1].type) {
     if (v.type) {
       wmouse_x = -1;
       wmouse_y = -1;
@@ -1314,7 +1314,7 @@ void new_window(void_return_type_t init_handler) {
 
     if (v.type >= 100) {
       v.state = 1; // Activate it
-      for (m = 1; m < max_windows; m++)
+      for (m = 1; m < MAX_WINDOWS; m++)
         if (window[m].type == v.type && window[m].state) {
           window[m].state = 0;
           wgra(window[m].ptr, window[m].w / big2, window[m].h / big2, c1, 2, 2,
@@ -1351,7 +1351,7 @@ void new_window(void_return_type_t init_handler) {
 
     n = 0;
     if (v.type == 2 || v.type == 3 || v.type == 4 || v.type == 5 || v.type == 8) {
-      for (m = 1; m < max_windows; m++)
+      for (m = 1; m < MAX_WINDOWS; m++)
         if (window[m].type == 2 || window[m].type == 3 || window[m].type == 4 ||
             window[m].type == 5 || window[m].type == 8)
           if (window[m].click_handler == v.click_handler)
@@ -1377,7 +1377,7 @@ void new_window(void_return_type_t init_handler) {
           window[1].foreground = 0;
           flush_window(1);
         } else
-          for (n = 1; n < max_windows; n++)
+          for (n = 1; n < MAX_WINDOWS; n++)
             if (window[n].type && window[n].foreground == 1) {
               hidden[n - 1] = 1;
               window[n].foreground = 0;
@@ -1387,7 +1387,7 @@ void new_window(void_return_type_t init_handler) {
       } else {
         vtipo = v.type;
         v.type = 0;
-        for (n = 1; n < max_windows; n++) {
+        for (n = 1; n < MAX_WINDOWS; n++) {
           if (window[n].type && window[n].foreground == 1) {
             if (windows_collide(0, n)) {
               if (n == 1) {
@@ -1493,7 +1493,7 @@ void new_window(void_return_type_t init_handler) {
         if (window[n].foreground == 0) {
           divdelete(0);
           move(0, n - 1);
-          for (m = 1; m < max_windows; m++)
+          for (m = 1; m < MAX_WINDOWS; m++)
             if (window[m].type && window[m].foreground == 1)
               if (windows_collide(0, m)) {
                 window[m].foreground = 0;
@@ -1683,7 +1683,7 @@ void deactivate(void) { // Minimize: deactivate
       wwrite(v.ptr, w, h, 2 + (w - 20) / 2, 3, 1, v.title, c0);
       wwrite(v.ptr, w, h, 2 + (w - 20) / 2, 2, 1, v.title, c2);
     }
-    for (m = 1; m < max_windows; m++)
+    for (m = 1; m < MAX_WINDOWS; m++)
       if (window[m].type == v.type && window[m].foreground < 2) {
         window[m].state = 1;
         wgra(window[m].ptr, window[m].w / big2, window[m].h / big2, c_b_low, 2, 2,
@@ -1727,7 +1727,7 @@ void activate(void) {
     wwrite(v.ptr, w, h, 3 + (w - 20) / 2, 2, 1, v.title, c1);
     wwrite(v.ptr, w, h, 2 + (w - 20) / 2, 2, 1, v.title, c4);
   }
-  for (m = 1; m < max_windows; m++)
+  for (m = 1; m < MAX_WINDOWS; m++)
     if (window[m].type == v.type && window[m].state) {
       window[m].state = 0;
       wgra(window[m].ptr, window[m].w / big2, window[m].h / big2, c1, 2, 2, window[m].w / big2 - 20,
