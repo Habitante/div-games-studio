@@ -124,7 +124,7 @@ int superget = 0;
 int line0;    // First line number in the debugger code window
 byte *pline0; // Pointer to the first line in the debugger code window
 
-int mem1, mem2;                         // Bounds of the current statement in the mem[] array
+int mem1, mem2;                       // Bounds of the current statement in the mem[] array
 int line1, columna1, line2, columna2; // Bounds of the current statement
 
 int line_sel; // Selected line number
@@ -207,7 +207,7 @@ int num_objects = 0; // Number of objects in the object table
 
 int num_predefined;
 
-int *used; // Marks which objects have been included in var[]
+int *used;  // Marks which objects have been included in var[]
 int *visor; // Display mode used for each object
 
 struct variables {

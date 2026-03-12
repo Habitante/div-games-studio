@@ -158,7 +158,7 @@ short escalar() {
   char *ptr = Buffer, *p;
 
   ancho2 = (float)width * ifs.size_x / ifs_size; // width real en relación
-                                                // al tamaño original
+                                                 // al tamaño original
   alto2 = (float)height * ifs.size_y / ifs_size;
 
   if (ifs.size_x == ifs_size && ifs.size_y == ifs_size) // no hace falta escalar

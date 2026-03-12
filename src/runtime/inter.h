@@ -162,7 +162,7 @@ void finalize_texts(void);
 // Constants
 ///////////////////////////////////////////////////////////////////////////////
 
-#define max_exp   512  // Maximum number of elements in an expression
+#define max_exp         512  // Maximum number of elements in an expression
 #define EVAL_STACK_SIZE 2048 // Execution stack length
 
 #define swap(a, b) \
@@ -499,7 +499,8 @@ void read_joy(void);
 //  Target machine memory
 //-----------------------------------------------------------------------------
 
-GLOBAL int pila[EVAL_STACK_SIZE + max_exp + 64]; // Expression evaluation (compilation and execution)
+GLOBAL int
+    pila[EVAL_STACK_SIZE + max_exp + 64]; // Expression evaluation (compilation and execution)
 
 GLOBAL int *mem, imem, iloc, iloc_pub_len, iloc_len;
 GLOBAL byte *memb;

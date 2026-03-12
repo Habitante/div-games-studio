@@ -3993,22 +3993,20 @@ int sort3(const void *a, const void *b) {
 }
 
 int sort4(const void *a, const void *b) {
-  return (
-      strcmp((char *)&mem[*((char *)a + offset_key)], (char *)&mem[*((char *)b + offset_key)]));
+  return (strcmp((char *)&mem[*((char *)a + offset_key)], (char *)&mem[*((char *)b + offset_key)]));
 }
 
 int sort5(const void *a, const void *b) {
-  return (-strcmp((char *)&mem[*((char *)a + offset_key)],
-                  (char *)&mem[*((char *)b + offset_key)]));
+  return (
+      -strcmp((char *)&mem[*((char *)a + offset_key)], (char *)&mem[*((char *)b + offset_key)]));
 }
 
 int unsort00(byte *a, byte *b) {
-  return ((int)(xlat_rnd[*(a + offset_key * 4)] ^ (xlat_rnd[*(a + 1 + offset_key * 4)] / 2) ^
-                (xlat_rnd[*(a + 2 + offset_key * 4)] / 4) ^
-                (xlat_rnd[*(a + 3 + offset_key * 4)] / 8)) -
-          (int)(xlat_rnd[*(b + offset_key * 4)] ^ (xlat_rnd[*(b + 1 + offset_key * 4)] / 2) ^
-                (xlat_rnd[*(b + 2 + offset_key * 4)] / 4) ^
-                (xlat_rnd[*(b + 3 + offset_key * 4)] / 8)));
+  return (
+      (int)(xlat_rnd[*(a + offset_key * 4)] ^ (xlat_rnd[*(a + 1 + offset_key * 4)] / 2) ^
+            (xlat_rnd[*(a + 2 + offset_key * 4)] / 4) ^ (xlat_rnd[*(a + 3 + offset_key * 4)] / 8)) -
+      (int)(xlat_rnd[*(b + offset_key * 4)] ^ (xlat_rnd[*(b + 1 + offset_key * 4)] / 2) ^
+            (xlat_rnd[*(b + 2 + offset_key * 4)] / 4) ^ (xlat_rnd[*(b + 3 + offset_key * 4)] / 8)));
 }
 
 
@@ -5008,8 +5006,8 @@ void write_in_map(void) {
       cx += f_i[font_index].spacing;
       ptr2++;
     } else {
-      texn2(ptr + 68, w, fonts[font_index] + fnt[*ptr2].offset, cx, fnt[*ptr2].incY, fnt[*ptr2].width,
-            fnt[*ptr2].height);
+      texn2(ptr + 68, w, fonts[font_index] + fnt[*ptr2].offset, cx, fnt[*ptr2].incY,
+            fnt[*ptr2].width, fnt[*ptr2].height);
       cx = cx + fnt[*ptr2].width;
       ptr2++;
     }

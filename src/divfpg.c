@@ -1001,8 +1001,8 @@ void delete_tagged() {
 
   wup(vent);
 
-  while (my_fpg->list_info.first_visible + (my_fpg->list_info.lines - 1) * my_fpg->list_info.columns +
-             1 >
+  while (my_fpg->list_info.first_visible +
+             (my_fpg->list_info.lines - 1) * my_fpg->list_info.columns + 1 >
          my_fpg->list_info.total_items) {
     my_fpg->list_info.first_visible -= my_fpg->list_info.columns;
   }

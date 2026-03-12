@@ -89,7 +89,7 @@ void call(const void_return_type_t func); // void funcion(void); int n=(int)func
 //unsigned int
 
 
-#define MAX_FILES    512 // ------------------------------- File listbox
+#define MAX_FILES       512 // ------------------------------- File listbox
 #define w_archivo       (255)
 #define max_directorios 2048
 #define w_directorio    (255)

@@ -800,7 +800,8 @@ void selcolor2(void) {
   if ((wmouse_y > 10) && (wmouse_y < 138) && (wmouse_x > 2) && (wmouse_x < 130)) {
     cur_color = ((wmouse_y - 10) / 8) * 16 + ((wmouse_x - 2) / 8);
     if (cur_color != font_old_color) {
-      wrectangle(v.ptr, w, h, c0, (font_old_color % 16) * 8 + 1, (font_old_color / 16) * 8 + 9, 9, 9);
+      wrectangle(v.ptr, w, h, c0, (font_old_color % 16) * 8 + 1, (font_old_color / 16) * 8 + 9, 9,
+                 9);
       wrectangle(v.ptr, w, h, c4, (cur_color % 16) * 8 + 1, (cur_color / 16) * 8 + 9, 9, 9);
       v.redraw = 1;
       font_old_color = cur_color;
@@ -1631,8 +1632,8 @@ void create_text() {
 
   init = 0;
   for (x = 0; x < strlen(cCharsToPrint); x++)
-    if ((cnt = show_char_buffer(cCharsToPrint[x], init, 0, (char *)v.mapa->map, text_width, font_aux)) !=
-        1)
+    if ((cnt = show_char_buffer(cCharsToPrint[x], init, 0, (char *)v.mapa->map, text_width,
+                                font_aux)) != 1)
       init += cnt;
     else
       init += spacelen;

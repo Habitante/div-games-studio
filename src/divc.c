@@ -266,10 +266,10 @@ void add_code(int dir, int param, int op);
 #define long_med_id 20  //Average identifier length (+4+4+1)
 #endif
 
-#define max_nodos   128  //Maximum number of lexer symbol nodes
-#define max_exp     512  //Maximum number of elements in an expression
-#define long_header 9    //Header length at program start
-#define EVAL_STACK_SIZE  2048 //Execution stack length
+#define max_nodos       128  //Maximum number of lexer symbol nodes
+#define max_exp         512  //Maximum number of elements in an expression
+#define long_header     9    //Header length at program start
+#define EVAL_STACK_SIZE 2048 //Execution stack length
 
 #define default_buffer    (16384 * 8)
 #define security_distance (4096 * 8)

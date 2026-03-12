@@ -960,7 +960,7 @@ typedef struct _SND {
 } SND;
 
 SND DesktopSND[100];
-int NumSND = 0; // Contador de sonidos pegados durante una edicion
+int NumSND = 0;    // Contador de sonidos pegados durante una edicion
 int snd_count = 1; // Contador de sonidos pegados durante toda la sesion
 //SAMPLE  sample;
 CLP sound_clipboard = {0, 0, NULL};
