@@ -118,13 +118,19 @@ src/
 
 ### 2C-3. Split monster files
 
-Three files are too large to navigate or maintain effectively:
+Large files that are hard to navigate or maintain effectively:
 
 | File | Lines | Split | Status |
 |------|-------|-------|--------|
-| `compiler/compiler.c` | ~11,500 | `compiler_internal.h` (737) + `compiler.c` (2,940) + `compiler_parser.c` (4,760) + `compiler_expression.c` (3,194) | ✓ |
-| `editor/paint.c` | ~7,700 | `paint.c` + `paint_tools.c` + `paint_select.c` | TODO |
-| `ide/main.c` | ~5,500 | `main.c` + `main_desktop.c` + `main_dialogs.c` | TODO |
+| `compiler/compiler.c` | ~11,500 | `compiler_internal.h` + `compiler.c` + `compiler_parser.c` + `compiler_expression.c` | ✓ |
+| `editor/paint.c` | ~7,700 | `paint.c` + `paint_tools.c` + `paint_select.c` | ✓ |
+| `ide/main.c` | ~5,500 | `main_internal.h` (110) + `main.c` (2,742) + `main_desktop.c` (1,754) + `main_dialogs.c` (1,005) | ✓ |
+| `runtime/debug/debugger.c` | ~6,700 | By feature: init, variables, code window, process list, profiler + shared dialog/graphics | TODO |
+| `editor/code.c` | ~4,600 | By domain: edit primitives, rendering, file I/O, search/replace | TODO |
+| `ide/handler.c` | ~4,400 | By feature: menus, dialogs, map ops, map viewer, palette, fonts | TODO |
+
+`runtime/functions.c` (~6,400 lines) reviewed and kept as-is — flat list of
+150+ independent VM API implementations, already well-sectioned with comments.
 
 **compiler.c split notes:** The actual split differed from the original proposal.
 The lexer (~500 lines) stayed in compiler.c rather than getting its own file.
