@@ -1,16 +1,22 @@
 # DIV Games Studio - Compiler Pipeline
 
-The DIV compiler lives entirely in `src/compiler/compiler.c` (~7,800 lines). It compiles
-DIV source code into a bytecode format (EML -- "Ensamblador de la Maquina
+The DIV compiler spans 4 files in `src/compiler/` (~11K lines total):
+
+- **`compiler_internal.h`** -- shared definitions (types, constants, EML opcodes, extern declarations)
+- **`compiler.c`** -- orchestration, lexer, symbol table loading, error handling, output
+- **`compiler_parser.c`** -- declarations, structs, statements
+- **`compiler_expression.c`** -- expressions, conditions, code generation, peephole optimizer
+
+It compiles DIV source code into a bytecode format (EML -- "Ensamblador de la Maquina
 Logica", Logical Machine Assembler) that runs on the DIV virtual machine.
 
 ---
 
 ## 1. Compilation Entry Point
 
-### `compile()` at line 997
+### `compile()` in `compiler.c`
 
-Called from `comp()` (line 689), which wraps it in a `setjmp`/`longjmp` for
+Called from `comp()` (also in `compiler.c`), which wraps it in a `setjmp`/`longjmp` for
 error recovery. The compilation pipeline:
 
 1. **Reset state** -- Clear object table, lexer tables, hash table, peephole buffer
@@ -57,7 +63,7 @@ error recovery. The compilation pipeline:
 
 ## 2. Lexer
 
-### Lexer Initialization: `analyze_ltlex()` at line 1353
+### Lexer Initialization: `analyze_ltlex()` in `compiler.c`
 
 The lexer is table-driven. Its tables are loaded from `system/ltlex.def`, a
 definition file that maps:
@@ -99,7 +105,7 @@ character set for identifiers:
 - Accented characters (Latin-1 range 0x80-0xFF, mapped to lowercase equivalents)
 - `#` and `$` are included as valid identifier characters
 
-### Tokenization: `lexer()` at line 1754
+### Tokenization: `lexer()` in `compiler.c`
 
 The main lexer function. Sets global `current_token` and `token_value`
 (numeric value for numbers/literals). Also tracks `source_line`, `ierror`,
@@ -159,7 +165,7 @@ String literals (delimited by `"`) are:
 
 ## 3. Symbol Table
 
-### Object Table: `obj[max_obj]` at line 843
+### Object Table: `obj[max_obj]` in `compiler.c` (struct defined in `compiler_internal.h`)
 
 ```c
 struct object {
@@ -214,7 +220,7 @@ When looking up an identifier:
 3. The lookup walks the chain, matching `scope` and `member` to find the
    correct scope
 
-### Predefined Objects: `preload_objects()` at line 1434
+### Predefined Objects: `preload_objects()` in `compiler.c`
 
 Loaded from `system/ltobj.def`. This file defines:
 - Built-in constants (e.g., `true`, `false`, `_max_process`, screen resolutions)
@@ -229,7 +235,7 @@ Loaded from `system/ltobj.def`. This file defines:
 
 ### Grammar Overview
 
-DIV uses a recursive descent parser. `parser()` (line 3172) handles the
+DIV uses a recursive descent parser. `parser()` (in `compiler_parser.c`) handles the
 top-level program structure:
 
 ```
@@ -266,7 +272,7 @@ Variables can be declared as:
 - Pointer: `INT POINTER p;`, `BYTE POINTER p;`
 - Struct: `STRUCT name[N] field1; field2; END`
 
-### Statement Parsing: `statement()` at line 4867
+### Statement Parsing: `statement()` in `compiler_parser.c`
 
 Handles all control flow constructs:
 
@@ -288,7 +294,7 @@ Handles all control flow constructs:
 
 Statements also include assignments (`expr;`) which are parsed via `expression()`.
 
-### Expression Parsing: `expression()` at line 5284
+### Expression Parsing: `expression()` in `compiler_expression.c`
 
 Expressions use a two-phase approach:
 
@@ -296,7 +302,7 @@ Expressions use a two-phase approach:
    expression into `tabexp[]`, an array of `exp_ele` elements in postfix
    (reverse Polish) notation.
 
-2. **Phase 2: Generate code** -- `generate_expression()` (line 5322) walks
+2. **Phase 2: Generate code** -- `generate_expression()` (in `compiler_expression.c`) walks
    `tabexp[]` and emits bytecode instructions.
 
 The expression parser is recursive descent with explicit precedence levels:

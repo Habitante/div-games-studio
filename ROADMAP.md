@@ -120,11 +120,17 @@ src/
 
 Three files are too large to navigate or maintain effectively:
 
-| File | Lines | Proposed split |
-|------|-------|----------------|
-| `compiler/compiler.c` | ~11,500 | `compiler_lexer.c` + `compiler_parser.c` + `compiler_codegen.c` |
-| `editor/paint.c` | ~7,700 | `paint.c` + `paint_tools.c` + `paint_select.c` |
-| `ide/main.c` | ~5,500 | `main.c` + `main_desktop.c` + `main_dialogs.c` |
+| File | Lines | Split | Status |
+|------|-------|-------|--------|
+| `compiler/compiler.c` | ~11,500 | `compiler_internal.h` (737) + `compiler.c` (2,940) + `compiler_parser.c` (4,760) + `compiler_expression.c` (3,194) | ✓ |
+| `editor/paint.c` | ~7,700 | `paint.c` + `paint_tools.c` + `paint_select.c` | TODO |
+| `ide/main.c` | ~5,500 | `main.c` + `main_desktop.c` + `main_dialogs.c` | TODO |
+
+**compiler.c split notes:** The actual split differed from the original proposal.
+The lexer (~500 lines) stayed in compiler.c rather than getting its own file.
+`statement()` went into the parser file (it parses control flow). The "codegen"
+file became `compiler_expression.c` since this is a single-pass compiler —
+expression parsing and code generation are interleaved.
 
 Rules: extract functions, add forward declarations, update CMake. No behavioral
 changes. Static/file-scope globals may need to become shared or passed as parameters.
