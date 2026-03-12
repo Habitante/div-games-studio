@@ -124,36 +124,27 @@ Three files are too large to navigate or maintain effectively:
 Rules: extract functions, add forward declarations, update CMake. No behavioral
 changes. Static/file-scope globals may need to become shared or passed as parameters.
 
-### 2C-4. Remaining identifier renames
+### 2C-4. Identifier renames ✓
 
-**2C-4a (done):** 76 PascalCase/Spanish functions renamed to snake_case with
-module prefixes across 25 files. All 18 snake_case collisions resolved.
-Modules: `sound_` (18), `fli_` (16), `fpg_` (12), `pal_` (10), `fmt_` (20).
+All identifiers in the codebase are now English snake_case. Completed in
+four sub-phases across multiple sessions:
 
-**2C-4b (done):** File-local variables, struct fields, and parameters renamed
-across 45 files (~9,160 lines). Three batches:
+**2C-4a:** 76 PascalCase/Spanish functions → snake_case (25 files).
+All 18 collisions resolved via module prefixes (`sound_`, `fli_`, `fpg_`,
+`pal_`, `fmt_`).
 
-- **Compiler (divc.c + d.c):** 68 rename mappings, ~4,560 replacements.
-  `struct objeto`→`object`, 23 union members decoded (`vglo`→`var_global`,
-  `pigl`→`ptr_int_global`, `sloc`→`struct_local`, etc.), `pieza`→`current_token`
-  (905 hits), `bloque_actual`→`current_scope`, `pila`→`eval_stack`, lex_ele
-  fields, error vars, 4 function renames.
-- **Editor (divedit.c + divcolor.c):** 27 renames, ~715 replacements.
-  `papelera`→`clipboard`, `kbloque`→`block_state`, `modo_cursor`→`cursor_mode`,
-  `cpieza`→`color_token`, `volcado_saltado`→`skip_full_blit`.
-- **Runtime + cross-file (44 files):** `reloj`→`frame_clock` (11 files),
-  `wvolcado`→`blit_region` (10 files), `ancho`→`width`/`alto`→`height` (19 files),
-  `an`→`w`/`al`→`h` (targeted regex to preserve English comments),
-  `espacio`→`spacing`, `espaciado`→`letter_spacing`, `nomitidos`→`num_skipped`,
-  `retra`→`retrace_pending`, `mouse_pintado`→`mouse_drawn`.
+**2C-4b:** File-local vars, struct fields, params → English (45 files,
+~9,160 lines). Compiler symbols, editor state, runtime globals, paint
+module, handler module all renamed.
 
-Still remaining — mostly deeper locals in large files:
-
-- [x] divc.c — compiler structs, state vars, union members ✓
-- [x] divedit.c — clipboard, selection, cursor state ✓
-- [x] runtime/i.c — timing, blit, rendering vars ✓
-- [x] divpaint.c — paint editor locals + cross-file struct fields ✓
-- [x] divhandl.c — dialog/window manager locals + cross-file functions ✓
+**2C-4c (2026-03-12):** Final cleanup — ~125 PascalCase functions + ~120
+Spanish identifiers renamed. 8 parallel agents in 2 waves:
+- Wave 1 (HIGH): divpcm functions/structs, divfont/ifs typedefs+fields,
+  fpgfile struct fields, global.h/inter.h globals (paleta→palette,
+  tipo→file_types, boton→draw_button, interprete→interpreter, etc.)
+- Wave 2 (LOW): all remaining locals across divc, divedit, divcolor,
+  divbrow, divhelp, ifs, runtime, divpcm, divpalet, divfpg, divfont,
+  div, divwindo. Cross-file: `max_archivos`→`MAX_FILES` (8 files).
 
 ### 2C-5. Documentation pass
 
