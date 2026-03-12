@@ -845,7 +845,7 @@ void Selcolor0(void) {
   _button(101, v.w - 8, v.h - 14, 2);
 }
 
-int TamaY = 0, TamaX = 0;
+int text_height = 0, text_width = 0;
 
 void Preview1() {
   int can = v.w, cal = v.h;
@@ -854,16 +854,16 @@ void Preview1() {
   int bancho, balto;
   char *MyBuffer, *BuffAux;
   _show_items();
-  BuffAux = MyBuffer = (char *)malloc(TamaX * TamaY);
+  BuffAux = MyBuffer = (char *)malloc(text_width * text_height);
   if (MyBuffer == NULL) {
     v_text = (char *)texts[45];
     show_dialog(err0);
     return;
   }
-  memset(MyBuffer, c2, TamaX * TamaY);
+  memset(MyBuffer, c2, text_width * text_height);
   init = 0;
   for (x = 0; x < strlen(test_string); x++) {
-    len = show_char(test_string[x], init, 0, MyBuffer, TamaX);
+    len = show_char(test_string[x], init, 0, MyBuffer, text_width);
     if (len <= 1)
       len = spacelen;
     init += len;
@@ -871,26 +871,26 @@ void Preview1() {
 
   ptr += 11 * big2 * can + 2 * big2;
 
-  if ((can - 4 * big2) >= TamaX) { // Narrower than window: center in window
-    bancho = TamaX;
-    ptr += ((can - 4 * big2) - TamaX) / 2 + 1;
+  if ((can - 4 * big2) >= text_width) { // Narrower than window: center in window
+    bancho = text_width;
+    ptr += ((can - 4 * big2) - text_width) / 2 + 1;
   } else { // Wider than window: center the buffer
     bancho = (can - 4 * big2);
-    BuffAux += (TamaX - (can - 4 * big2)) / 2;
+    BuffAux += (text_width - (can - 4 * big2)) / 2;
   }
 
-  if ((cal - 29 * big2) >= TamaY) { // Shorter than window: center in window
-    balto = TamaY;
-    ptr += (((cal - 29 * big2) - TamaY) / 2) * can;
+  if ((cal - 29 * big2) >= text_height) { // Shorter than window: center in window
+    balto = text_height;
+    ptr += (((cal - 29 * big2) - text_height) / 2) * can;
   } else { // Taller than window: center the buffer
     balto = (cal - 29 * big2);
-    BuffAux += ((TamaY - (cal - 29 * big2)) / 2) * TamaX;
+    BuffAux += ((text_height - (cal - 29 * big2)) / 2) * text_width;
   }
 
   for (y = 0; y < balto; y++)
     for (x = 0; x < bancho; x++)
-      if (*(BuffAux + y * TamaX + x))
-        *(ptr + y * can + x) = *(BuffAux + y * TamaX + x);
+      if (*(BuffAux + y * text_width + x))
+        *(ptr + y * can + x) = *(BuffAux + y * text_width + x);
 
   free(MyBuffer);
 }
@@ -904,8 +904,8 @@ void Preview2() {
 void Preview0() {
   int x, fan, _fal = 0, fal, cnt, TX, TY;
 
-  TamaX = 0;
-  TamaY = 0;
+  text_width = 0;
+  text_height = 0;
 
   spacelen = 0;
   cnt = 0;
@@ -927,20 +927,20 @@ void Preview0() {
     get_char_size(test_string[x], &fan, &fal);
     if (fan <= 1)
       fan = spacelen;
-    TamaX += fan;
-    if (TamaY < fal)
-      TamaY = fal;
+    text_width += fan;
+    if (text_height < fal)
+      text_height = fal;
   }
-  if (TamaY == 0)
-    TamaY = _fal;
+  if (text_height == 0)
+    text_height = _fal;
 
   v.type = 1; // Dialog
   if (big) {
-    TX = TamaX / 2;
-    TY = TamaY / 2;
+    TX = text_width / 2;
+    TY = text_height / 2;
   } else {
-    TX = TamaX;
-    TY = TamaY;
+    TX = text_width;
+    TY = text_height;
   }
   v.w = TX + 6;
   if (v.w < 60)
@@ -1094,17 +1094,17 @@ void Preview21() {
   int bancho, balto;
   char *MyBuffer, *BuffAux;
   _show_items();
-  BuffAux = MyBuffer = (char *)malloc(TamaX * TamaY);
+  BuffAux = MyBuffer = (char *)malloc(text_width * text_height);
   if (MyBuffer == NULL) {
     v_text = (char *)texts[45];
     show_dialog(err0);
     return;
   }
-  memset(MyBuffer, c2, TamaX * TamaY);
+  memset(MyBuffer, c2, text_width * text_height);
 
   init = 0;
   for (x = 0; x < strlen(test_string2); x++) {
-    len = show_char_buffer(test_string2[x], init, 0, MyBuffer, TamaX, font_aux);
+    len = show_char_buffer(test_string2[x], init, 0, MyBuffer, text_width, font_aux);
     if (len <= 1)
       len = 0;
     init += len;
@@ -1112,26 +1112,26 @@ void Preview21() {
 
   ptr += 11 * big2 * can + 2 * big2;
 
-  if ((can - 4 * big2) >= TamaX) { // Narrower than window: center in window
-    bancho = TamaX;
-    ptr += ((can - 4 * big2) - TamaX) / 2 + 1;
+  if ((can - 4 * big2) >= text_width) { // Narrower than window: center in window
+    bancho = text_width;
+    ptr += ((can - 4 * big2) - text_width) / 2 + 1;
   } else { // Wider than window: center the buffer
     bancho = (can - 4 * big2);
-    BuffAux += (TamaX - (can - 4 * big2)) / 2;
+    BuffAux += (text_width - (can - 4 * big2)) / 2;
   }
 
-  if ((cal - 29 * big2) >= TamaY) { // Shorter than window: center in window
-    balto = TamaY;
-    ptr += (((cal - 29 * big2) - TamaY) / 2) * can;
+  if ((cal - 29 * big2) >= text_height) { // Shorter than window: center in window
+    balto = text_height;
+    ptr += (((cal - 29 * big2) - text_height) / 2) * can;
   } else { // Taller than window: center the buffer
     balto = (cal - 29 * big2);
-    BuffAux += ((TamaY - (cal - 29 * big2)) / 2) * TamaX;
+    BuffAux += ((text_height - (cal - 29 * big2)) / 2) * text_width;
   }
 
   for (y = 0; y < balto; y++)
     for (x = 0; x < bancho; x++)
-      if (*(BuffAux + y * TamaX + x))
-        *(ptr + y * can + x) = *(BuffAux + y * TamaX + x);
+      if (*(BuffAux + y * text_width + x))
+        *(ptr + y * can + x) = *(BuffAux + y * text_width + x);
 
   free(MyBuffer);
 }
@@ -1146,8 +1146,8 @@ void Preview22() {
 void Preview20() {
   int x, fan, _fal = 0, fal, cnt, TX, TY;
 
-  TamaX = 0;
-  TamaY = 0;
+  text_width = 0;
+  text_height = 0;
 
   spacelen = 0;
   cnt = 0;
@@ -1169,22 +1169,22 @@ void Preview20() {
     get_char_size_buffer(test_string2[x], &fan, &fal, font_aux);
     if (fan <= 1)
       fan = 0;
-    TamaX += fan;
-    if (TamaY < fal)
-      TamaY = fal;
+    text_width += fan;
+    if (text_height < fal)
+      text_height = fal;
   }
-  if (TamaY == 0)
-    TamaY = _fal;
-  if (TamaX == 0)
-    TamaX = 1;
+  if (text_height == 0)
+    text_height = _fal;
+  if (text_width == 0)
+    text_width = 1;
   v.type = 1; // Dialog
 
   if (big) {
-    TX = TamaX / 2;
-    TY = TamaY / 2;
+    TX = text_width / 2;
+    TY = text_height / 2;
   } else {
-    TX = TamaX;
-    TY = TamaY;
+    TX = text_width;
+    TY = text_height;
   }
   v.w = TX + 6;
   if (v.w < 60)
@@ -1288,8 +1288,8 @@ void show_font1(void) {
   for (x = 0; x < strlen(test_string2); x++)
     char_table[test_string2[x]] = 1;
 
-  TamaX = 0;
-  TamaY = 0;
+  text_width = 0;
+  text_height = 0;
 
   spacelen = 0;
   cnt = 0;
@@ -1311,41 +1311,41 @@ void show_font1(void) {
     get_char_size_buffer(test_string2[x], &fan, &fal, (char *)&v.aux[RES_FOR_NAME]);
     if (fan <= 1)
       fan = 0;
-    TamaX += fan;
-    if (TamaY < fal)
-      TamaY = fal + 1;
+    text_width += fan;
+    if (text_height < fal)
+      text_height = fal + 1;
   }
-  if (TamaX == 0)
-    TamaX = 1;
-  if (TamaY == 0)
-    TamaY = _fal;
+  if (text_width == 0)
+    text_width = 1;
+  if (text_height == 0)
+    text_height = _fal;
 
   memcpy(char_table, saved_char_table, 256);
 
-  if ((temp = (byte *)malloc(TamaX * TamaY)) == NULL)
+  if ((temp = (byte *)malloc(text_width * text_height)) == NULL)
     return;
 
-  memset(temp, c1, TamaX * TamaY);
+  memset(temp, c1, text_width * text_height);
 
   init = 0;
   for (x = 0; x < strlen(test_string2); x++) {
-    len = show_char_buffer(test_string2[x], init, 0, (char *)temp, TamaX,
+    len = show_char_buffer(test_string2[x], init, 0, (char *)temp, text_width,
                            (char *)&v.aux[RES_FOR_NAME]);
     if (len <= 1)
       len = 0;
     init += len;
   }
 
-  if (TamaX > ancho_w * big2 || TamaY > alto_w * big2) {
+  if (text_width > ancho_w * big2 || text_height > alto_w * big2) {
     // Create the thumbnail reduction
-    coefredx = TamaX / ((float)ancho_w * (float)big2);
-    coefredy = TamaY / ((float)alto_w * (float)big2);
+    coefredx = text_width / ((float)ancho_w * (float)big2);
+    coefredy = text_height / ((float)alto_w * (float)big2);
     if (coefredx > coefredy)
       coefredy = coefredx;
     else
       coefredx = coefredy;
-    width = (float)TamaX / coefredx + 0.5;
-    height = (float)TamaY / coefredy + 0.5;
+    width = (float)text_width / coefredx + 0.5;
+    height = (float)text_height / coefredy + 0.5;
 
     width *= 2;
     height *= 2;
@@ -1361,7 +1361,7 @@ void show_font1(void) {
     for (y = 0; y < height; y++) {
       b = coefredx / 2.0;
       for (x = 0; x < width; x++) {
-        temp2[y * width + x] = temp[((memptrsize)a) * TamaX + (memptrsize)b];
+        temp2[y * width + x] = temp[((memptrsize)a) * text_width + (memptrsize)b];
         b += coefredx;
       }
       a += coefredy;
@@ -1379,8 +1379,8 @@ void show_font1(void) {
     }
     free(temp2);
   } else {
-    width = TamaX;
-    height = TamaY;
+    width = text_width;
+    height = text_height;
     pos = ((big2 * 2) + (big2 * 10) * v.w) + ((ancho_w * big2) - width) / 2 +
           (((alto_w * big2) - height) / 2) * v.w;
 
@@ -1586,7 +1586,7 @@ void get_text0(void) {
 }
 
 void create_text() {
-  int n, y, x, TamaX = 0, TamaY = 0, fan, _fal = 0, fal, init, cnt;
+  int n, y, x, text_width = 0, text_height = 0, fan, _fal = 0, fal, init, cnt;
 
   // 1 - Determine the space width
 
@@ -1606,23 +1606,23 @@ void create_text() {
   }
   spacelen = (spacelen / cnt) / 2;
 
-  // 2 - Calculate the text dimensions in TamaX x TamaY
+  // 2 - Calculate the text dimensions in text_width x text_height
 
   for (x = 0; x < strlen(cCharsToPrint); x++) {
     get_char_size_buffer(cCharsToPrint[x], &fan, &fal, font_aux);
     if (fan == 1)
       fan = spacelen;
-    TamaX += fan;
-    if (TamaY < fal)
-      TamaY = fal;
+    text_width += fan;
+    if (text_height < fal)
+      text_height = fal;
   }
-  if (TamaY == 0)
-    TamaY = _fal;
+  if (text_height == 0)
+    text_height = _fal;
 
   // 3 - Create a map of that size
 
-  map_width = TamaX;
-  map_height = TamaY;
+  map_width = text_width;
+  map_height = text_height;
 
   if (new_map(NULL))
     return;
@@ -1631,7 +1631,7 @@ void create_text() {
 
   init = 0;
   for (x = 0; x < strlen(cCharsToPrint); x++)
-    if ((cnt = show_char_buffer(cCharsToPrint[x], init, 0, (char *)v.mapa->map, TamaX, font_aux)) !=
+    if ((cnt = show_char_buffer(cCharsToPrint[x], init, 0, (char *)v.mapa->map, text_width, font_aux)) !=
         1)
       init += cnt;
     else

@@ -132,7 +132,7 @@ int mem_get_heap_free(void);
 
 ifs_table_entry tifs[256];
 FILE *fifs;
-void load_letter(uint8_t letra);
+void load_letter(uint8_t char_code);
 
 //-----------------------------------------------------------------------------
 //  Print the current directory or file path
@@ -208,7 +208,7 @@ void create_thumbs(void) {
 }
 
 void create_thumb_MAP(struct t_listboxbr *l) {
-  int tipomapa, estado = 0, n, m;
+  int map_type, state = 0, n, m;
   int man, mal;
   FILE *f;
   byte *temp, *temp2;
@@ -237,23 +237,23 @@ void create_thumb_MAP(struct t_listboxbr *l) {
     do {
       if (thumb[num].ptr == NULL && thumb[num].status > -1) {
         if (mouse_b == 0)
-          estado = 1;
+          state = 1;
         break;
       }
       if (thumb[num].ptr != NULL && thumb[num].status > 0) {
-        estado = 2;
+        state = 2;
         break;
       }
       if (++num == l->total_items)
         num = 0;
     } while (num != l->first_visible);
 
-    if (estado == 0) {
+    if (state == 0) {
       num = -1;
       return;
     }
 
-    if (estado == 1) { // Read a new thumbnail
+    if (state == 1) { // Read a new thumbnail
       char filename[255];
       div_strcpy(filename, sizeof(filename), l->list + (l->item_width * num));
       strupr(filename);
@@ -262,7 +262,7 @@ void create_thumb_MAP(struct t_listboxbr *l) {
           strcmp(strchr(filename, '.'), ".MAP") && strcmp(strchr(filename, '.'), ".PCX") &&
           strcmp(strchr(filename, '.'), ".BMP") && strcmp(strchr(filename, '.'), ".JPG") &&
           strcmp(strchr(filename, '.'), ".JPE")) {
-        estado = 0;
+        state = 0;
         thumb[num].status = -1;
 
       } else if ((f = fopen(l->list + (l->item_width * num), "rb")) != NULL) {
@@ -278,7 +278,7 @@ void create_thumb_MAP(struct t_listboxbr *l) {
             } else {
               free(thumb[num].ptr);
               thumb[num].ptr = NULL;
-              estado = 0;
+              state = 0;
               thumb[num].status = -1;
             }
           } else {
@@ -287,21 +287,21 @@ void create_thumb_MAP(struct t_listboxbr *l) {
             } else {
               free(thumb[num].ptr);
               thumb[num].ptr = NULL;
-              estado = 0;
+              state = 0;
               thumb[num].status = -1;
             }
           }
         } else {
-          estado = 0;
+          state = 0;
           thumb[num].status = -1;
         }
         fclose(f);
       } else {
-        estado = 0;
+        state = 0;
         thumb[num].status = -1;
       }
       return;
-    } else if (estado == 2 &&
+    } else if (state == 2 &&
                thumb[num].status != thumb[num].filesize) { // Continue reading a thumbnail
 
       if ((f = fopen(l->list + (l->item_width * num), "rb")) != NULL) {
@@ -312,7 +312,7 @@ void create_thumb_MAP(struct t_listboxbr *l) {
           } else {
             free(thumb[num].ptr);
             thumb[num].ptr = NULL;
-            estado = 0;
+            state = 0;
             thumb[num].status = -1;
           }
         } else {
@@ -322,13 +322,13 @@ void create_thumb_MAP(struct t_listboxbr *l) {
           } else {
             free(thumb[num].ptr);
             thumb[num].ptr = NULL;
-            estado = 0;
+            state = 0;
             thumb[num].status = -1;
           }
         }
         fclose(f);
       } else {
-        estado = 0;
+        state = 0;
         thumb[num].status = -1;
       }
       return;
@@ -336,32 +336,32 @@ void create_thumb_MAP(struct t_listboxbr *l) {
 
     // Now create the thumbnail if the file is fully loaded
 
-    if (estado == 2 && thumb[num].status == thumb[num].filesize &&
+    if (state == 2 && thumb[num].status == thumb[num].filesize &&
         abs(_omx - mouse_x) + abs(_omy - mouse_y) + mouse_b + ascii == 0) {
       thumb[num].status = 0;
 
       man = map_width;
       mal = map_height;
       if (fmt_is_map((byte *)thumb[num].ptr))
-        tipomapa = 1;
+        map_type = 1;
       else if (fmt_is_pcx((byte *)thumb[num].ptr))
-        tipomapa = 2;
+        map_type = 2;
       else if (fmt_is_bmp((byte *)thumb[num].ptr))
-        tipomapa = 3;
+        map_type = 3;
       else if (fmt_is_jpg((byte *)thumb[num].ptr, thumb[num].filesize))
-        tipomapa = 4;
+        map_type = 4;
       else
-        tipomapa = 0;
+        map_type = 0;
       swap(man, map_width);
       swap(mal, map_height);
 
-      if (tipomapa) {
+      if (map_type) {
         if ((temp = (byte *)malloc(man * mal + man)) != NULL) {
           memset(temp, 0, man * mal + man);
           swap(man, map_width);
           swap(mal, map_height);
           n = 1;
-          switch (tipomapa) {
+          switch (map_type) {
           case 1:
             fmt_load_map((byte *)thumb[num].ptr, temp, 0);
             break;
@@ -490,7 +490,7 @@ void create_thumb_MAP(struct t_listboxbr *l) {
 }
 
 void create_thumb_PAL(struct t_listboxbr *l) {
-  int estado = 0, n, tipo;
+  int state = 0, n, tipo;
   byte pal[768];
   byte xlat[256];
   int x, y;
@@ -508,14 +508,14 @@ void create_thumb_PAL(struct t_listboxbr *l) {
     num = l->first_visible;
     do {
       if (thumb[num].ptr == NULL && thumb[num].status > -1) {
-        estado = 1;
+        state = 1;
         break;
       }
       if (++num == l->total_items)
         num = 0;
     } while (num != l->first_visible);
 
-    if (estado == 0) {
+    if (state == 0) {
       num = -1;
       return;
     }
@@ -539,7 +539,7 @@ void create_thumb_PAL(struct t_listboxbr *l) {
     else if (!strcmp(strchr(filename, '.'), ".JPE"))
       tipo = 7;
     else {
-      estado = 0;
+      state = 0;
       thumb[num].status = -1;
       return;
     }
@@ -567,7 +567,7 @@ void create_thumb_PAL(struct t_listboxbr *l) {
       break;
     }
     if (!tipo) {
-      estado = 0;
+      state = 0;
       thumb[num].status = -1;
       return;
     }
@@ -582,7 +582,7 @@ void create_thumb_PAL(struct t_listboxbr *l) {
     thumb[num].w = 32 * big2;
     thumb[num].h = 16 * big2;
     if ((thumb[num].ptr = (char *)malloc((thumb[num].w * thumb[num].h))) == NULL) {
-      estado = 0;
+      state = 0;
       thumb[num].status = -1;
       return;
     }
@@ -617,13 +617,13 @@ void create_thumb_PAL(struct t_listboxbr *l) {
   }
 }
 
-extern int TamaY, TamaX;
+extern int text_height, text_width;
 extern int spacelen;
 extern char test_string2[21];
 extern char char_table[256];
 
 void create_thumb_FNT(struct t_listboxbr *l) {
-  int estado = 0, n, m, init, x, y, len;
+  int state = 0, n, m, init, x, y, len;
   int fan, _fal = 0, fal, cnt;
   byte *temp, *temp2;
   byte pal[768];
@@ -651,24 +651,24 @@ void create_thumb_FNT(struct t_listboxbr *l) {
     do {
       if (thumb[num].ptr == NULL && thumb[num].status > -1) {
         if (mouse_b == 0)
-          estado = 1;
+          state = 1;
         break;
       }
       if (thumb[num].ptr != NULL && thumb[num].status > 0) {
-        estado = 2;
+        state = 2;
         break;
       }
       if (++num == l->total_items)
         num = 0;
     } while (num != l->first_visible);
 
-    if (estado == 0) {
+    if (state == 0) {
       num = -1;
       return;
     }
 
     // read a new thumbnail
-    if (estado == 1) {
+    if (state == 1) {
       div_strcpy(filename, sizeof(filename), l->list + (l->item_width * num));
       strupr(filename);
       printf("%s %s\n", filename, l->list + (l->item_width * num));
@@ -676,12 +676,12 @@ void create_thumb_FNT(struct t_listboxbr *l) {
       if (!strcmp(strchr(filename, '.'), ".FNT"))
         ;
       else {
-        estado = 0;
+        state = 0;
         thumb[num].status = -1;
         return;
       }
       if ((f = fopen(l->list + (l->item_width * num), "rb")) == NULL) {
-        estado = 0;
+        state = 0;
         thumb[num].status = -1;
         return;
       }
@@ -692,7 +692,7 @@ void create_thumb_FNT(struct t_listboxbr *l) {
         incremento = FILE_CHUNK;
       if ((thumb[num].ptr = (char *)malloc(thumb[num].filesize)) == NULL) {
         fclose(f);
-        estado = 0;
+        state = 0;
         thumb[num].status = -1;
         return;
       }
@@ -703,7 +703,7 @@ void create_thumb_FNT(struct t_listboxbr *l) {
           free(thumb[num].ptr);
           thumb[num].ptr = NULL;
           fclose(f);
-          estado = 0;
+          state = 0;
           thumb[num].status = -1;
           return;
         }
@@ -713,7 +713,7 @@ void create_thumb_FNT(struct t_listboxbr *l) {
           free(thumb[num].ptr);
           thumb[num].ptr = NULL;
           fclose(f);
-          estado = 0;
+          state = 0;
           thumb[num].status = -1;
           return;
         }
@@ -723,9 +723,9 @@ void create_thumb_FNT(struct t_listboxbr *l) {
     }
 
     // Continue reading a thumbnail
-    else if (estado == 2 && thumb[num].status != thumb[num].filesize) {
+    else if (state == 2 && thumb[num].status != thumb[num].filesize) {
       if ((f = fopen(l->list + (l->item_width * num), "rb")) == NULL) {
-        estado = 0;
+        state = 0;
         thumb[num].status = -1;
       }
       fseek(f, thumb[num].status, SEEK_SET);
@@ -734,7 +734,7 @@ void create_thumb_FNT(struct t_listboxbr *l) {
           free(thumb[num].ptr);
           thumb[num].ptr = NULL;
           fclose(f);
-          estado = 0;
+          state = 0;
           thumb[num].status = -1;
           return;
         }
@@ -745,7 +745,7 @@ void create_thumb_FNT(struct t_listboxbr *l) {
           free(thumb[num].ptr);
           thumb[num].ptr = NULL;
           fclose(f);
-          estado = 0;
+          state = 0;
           thumb[num].status = -1;
           return;
         }
@@ -756,7 +756,7 @@ void create_thumb_FNT(struct t_listboxbr *l) {
     }
 
     // Now create the thumbnail if the file is fully loaded
-    if (estado == 2 && thumb[num].status == thumb[num].filesize &&
+    if (state == 2 && thumb[num].status == thumb[num].filesize &&
         abs(_omx - mouse_x) + abs(_omy - mouse_y) + mouse_b + ascii == 0) {
       thumb[num].status = 0;
 
@@ -770,8 +770,8 @@ void create_thumb_FNT(struct t_listboxbr *l) {
       for (x = 0; x < strlen(test_string2); x++)
         char_table[test_string2[x]] = 1;
 
-      TamaX = 0;
-      TamaY = 0;
+      text_width = 0;
+      text_height = 0;
 
       spacelen = 0;
       cnt = 0;
@@ -793,29 +793,29 @@ void create_thumb_FNT(struct t_listboxbr *l) {
         get_char_size_buffer(test_string2[x], &fan, &fal, thumb[num].ptr);
         if (fan <= 1)
           fan = 0;
-        TamaX += fan;
-        if (TamaY < fal)
-          TamaY = fal + 1;
+        text_width += fan;
+        if (text_height < fal)
+          text_height = fal + 1;
       }
-      if (TamaX == 0)
-        TamaX = 1;
-      if (TamaY == 0)
-        TamaY = _fal;
+      if (text_width == 0)
+        text_width = 1;
+      if (text_height == 0)
+        text_height = _fal;
 
       memcpy(char_table, saved_char_table, 256);
 
-      if ((temp = (byte *)malloc(TamaX * TamaY)) == NULL) {
+      if ((temp = (byte *)malloc(text_width * text_height)) == NULL) {
         free(thumb[num].ptr);
         thumb[num].ptr = NULL;
-        estado = 0;
+        state = 0;
         thumb[num].status = -1;
         return;
       }
-      memset(temp, 0, TamaX * TamaY);
+      memset(temp, 0, text_width * text_height);
 
       init = 0;
       for (x = 0; x < strlen(test_string2); x++) {
-        len = show_char_buffer(test_string2[x], init, 0, (char *)temp, TamaX, thumb[num].ptr);
+        len = show_char_buffer(test_string2[x], init, 0, (char *)temp, text_width, thumb[num].ptr);
         if (len <= 1)
           len = 0;
         init += len;
@@ -826,19 +826,19 @@ void create_thumb_FNT(struct t_listboxbr *l) {
       create_dac4();
       for (n = 1; n < 256; n++)
         xlat[n] = fast_find_color(pal[n * 3], pal[n * 3 + 1], pal[n * 3 + 2]);
-      for (n = TamaX * TamaY - 1; n >= 0; n--)
+      for (n = text_width * text_height - 1; n >= 0; n--)
         temp[n] = xlat[temp[n]];
 
-      if (TamaX > 101 * big2 || TamaY > 22 * big2) {
+      if (text_width > 101 * big2 || text_height > 22 * big2) {
         // Create the thumbnail
-        coefredx = TamaX / ((float)101 * 2 * (float)big2);
-        coefredy = TamaY / ((float)22 * 2 * (float)big2);
+        coefredx = text_width / ((float)101 * 2 * (float)big2);
+        coefredy = text_height / ((float)22 * 2 * (float)big2);
         if (coefredx > coefredy)
           coefredy = coefredx;
         else
           coefredx = coefredy;
-        thumb[num].w = (float)TamaX / coefredx + 0.5;
-        thumb[num].h = (float)TamaY / coefredy + 0.5;
+        thumb[num].w = (float)text_width / coefredx + 0.5;
+        thumb[num].h = (float)text_height / coefredy + 0.5;
         thumb[num].w &= -2;
         thumb[num].h &= -2;
         if (thumb[num].w < 2)
@@ -846,10 +846,10 @@ void create_thumb_FNT(struct t_listboxbr *l) {
         if (thumb[num].h < 2)
           thumb[num].h = 2;
 
-        if (coefredx * (float)(thumb[num].w - 1) >= (float)TamaX)
-          coefredx = (float)(TamaX - 1) / (float)(thumb[num].w - 1);
-        if (coefredy * (float)(thumb[num].h - 1) >= (float)TamaY)
-          coefredy = (float)(TamaY - 1) / (float)(thumb[num].h - 1);
+        if (coefredx * (float)(thumb[num].w - 1) >= (float)text_width)
+          coefredx = (float)(text_width - 1) / (float)(thumb[num].w - 1);
+        if (coefredy * (float)(thumb[num].h - 1) >= (float)text_height)
+          coefredy = (float)(text_height - 1) / (float)(thumb[num].h - 1);
 
         if ((temp2 = (byte *)malloc(thumb[num].w * thumb[num].h)) != NULL) {
           memset(temp2, 0, thumb[num].w * thumb[num].h);
@@ -858,7 +858,7 @@ void create_thumb_FNT(struct t_listboxbr *l) {
           for (y = 0; y < thumb[num].h; y++) {
             b = (float)0.0;
             for (x = 0; x < thumb[num].w; x++) {
-              temp2[y * thumb[num].w + x] = temp[((memptrsize)a) * TamaX + (memptrsize)b];
+              temp2[y * thumb[num].w + x] = temp[((memptrsize)a) * text_width + (memptrsize)b];
               b += coefredx;
             }
             a += coefredy;
@@ -888,8 +888,8 @@ void create_thumb_FNT(struct t_listboxbr *l) {
         free(temp);
       } else {
         thumb[num].ptr = (char *)temp;
-        thumb[num].w = TamaX;
-        thumb[num].h = TamaY;
+        thumb[num].w = text_width;
+        thumb[num].h = text_height;
       }
     }
   }
@@ -904,7 +904,7 @@ void create_thumb_FNT(struct t_listboxbr *l) {
 }
 
 void create_thumb_IFS(struct t_listboxbr *l) {
-  int estado = 0, n, pos, width, height, x, y, xini;
+  int state = 0, n, pos, width, height, x, y, xini;
   char *str;
   char filename[255];
 
@@ -914,14 +914,14 @@ void create_thumb_IFS(struct t_listboxbr *l) {
     num = l->first_visible;
     do {
       if (thumb[num].ptr == NULL && thumb[num].status > -1) {
-        estado = 1;
+        state = 1;
         break;
       }
       if (++num == l->total_items)
         num = 0;
     } while (num != l->first_visible);
 
-    if (estado == 0) {
+    if (state == 0) {
       num = -1;
       return;
     }
@@ -1011,7 +1011,7 @@ typedef struct _HeadDC {
 } HeadDC;
 
 void create_thumb_PCM(struct t_listboxbr *l) {
-  int estado = 0, x, y, y0, y1, p0, p1, n;
+  int state = 0, x, y, y0, y1, p0, p1, n;
   FILE *f;
   char *temp, *WAV;
   float step, position = 0;
@@ -1046,26 +1046,26 @@ void create_thumb_PCM(struct t_listboxbr *l) {
     do {
       if (thumb[num].ptr == NULL && thumb[num].status > -1) {
         if (mouse_b == 0)
-          estado = 1;
+          state = 1;
         break;
       }
       if (thumb[num].ptr != NULL && thumb[num].status > 0) {
-        estado = 2;
+        state = 2;
         break;
       }
       if (++num == l->total_items)
         num = 0;
     } while (num != l->first_visible);
 
-    if (estado == 0) {
+    if (state == 0) {
       num = -1;
       return;
     }
 
     // Start reading a new thumbnail
-    if (estado == 1) {
+    if (state == 1) {
       if ((f = fopen(l->list + (l->item_width * num), "rb")) == NULL) {
-        estado = 0;
+        state = 0;
         thumb[num].status = -1;
         return;
       }
@@ -1075,7 +1075,7 @@ void create_thumb_PCM(struct t_listboxbr *l) {
       fseek(f, 0, SEEK_SET);
       if (thumb[num].filesize > mem) {
         fclose(f);
-        estado = 0;
+        state = 0;
         thumb[num].status = -1;
         return;
       }
@@ -1088,7 +1088,7 @@ void create_thumb_PCM(struct t_listboxbr *l) {
         ;
       else {
         fclose(f);
-        estado = 0;
+        state = 0;
         thumb[num].status = -1;
         return;
       }
@@ -1096,7 +1096,7 @@ void create_thumb_PCM(struct t_listboxbr *l) {
         incremento = FILE_CHUNK;
       if ((thumb[num].ptr = (char *)malloc(thumb[num].filesize)) == NULL) {
         fclose(f);
-        estado = 0;
+        state = 0;
         thumb[num].status = -1;
         return;
       }
@@ -1107,7 +1107,7 @@ void create_thumb_PCM(struct t_listboxbr *l) {
           fclose(f);
           free(thumb[num].ptr);
           thumb[num].ptr = NULL;
-          estado = 0;
+          state = 0;
           thumb[num].status = -1;
           return;
         }
@@ -1117,7 +1117,7 @@ void create_thumb_PCM(struct t_listboxbr *l) {
           fclose(f);
           free(thumb[num].ptr);
           thumb[num].ptr = NULL;
-          estado = 0;
+          state = 0;
           thumb[num].status = -1;
           return;
         }
@@ -1127,9 +1127,9 @@ void create_thumb_PCM(struct t_listboxbr *l) {
     }
 
     // Continue reading a thumbnail
-    else if (estado == 2 && thumb[num].status != thumb[num].filesize) {
+    else if (state == 2 && thumb[num].status != thumb[num].filesize) {
       if ((f = fopen(l->list + (l->item_width * num), "rb")) == NULL) {
-        estado = 0;
+        state = 0;
         thumb[num].status = -1;
       }
       fseek(f, thumb[num].status, SEEK_SET);
@@ -1138,7 +1138,7 @@ void create_thumb_PCM(struct t_listboxbr *l) {
           fclose(f);
           free(thumb[num].ptr);
           thumb[num].ptr = NULL;
-          estado = 0;
+          state = 0;
           thumb[num].status = -1;
           return;
         }
@@ -1149,7 +1149,7 @@ void create_thumb_PCM(struct t_listboxbr *l) {
           fclose(f);
           free(thumb[num].ptr);
           thumb[num].ptr = NULL;
-          estado = 0;
+          state = 0;
           thumb[num].status = -1;
           return;
         }
@@ -1160,7 +1160,7 @@ void create_thumb_PCM(struct t_listboxbr *l) {
     }
 
     // Now create the thumbnail if the file is fully loaded
-    if (estado == 2 && thumb[num].status == thumb[num].filesize &&
+    if (state == 2 && thumb[num].status == thumb[num].filesize &&
         abs(_omx - mouse_x) + abs(_omy - mouse_y) + mouse_b + ascii == 0) {
       thumb[num].status = 0;
 
@@ -1324,14 +1324,14 @@ void create_thumb_PCM(struct t_listboxbr *l) {
   }
 }
 
-void load_letter(uint8_t letra) {
+void load_letter(uint8_t char_code) {
   long offset;
   short x, y, j, t;
   uint8_t rtbyte, error = 0;
   short pixels, despY;
 
   map_width = map_height = 0;
-  offset = tifs[letra].offset;
+  offset = tifs[char_code].offset;
   if (fseek(fifs, offset, SEEK_SET))
     error = 1;
   if (fread(&map_height, 2, 1, fifs) < 1)
@@ -1627,11 +1627,11 @@ void browser2(void) {
 #endif
 
   int need_refresh = 0;
-  int estado;
+  int state;
 
   create_thumbs();
 
-  estado = v.item[0].state;
+  state = v.item[0].state;
   _process_items();
 
   if (v.active_item == 3) {

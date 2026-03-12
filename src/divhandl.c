@@ -3291,7 +3291,7 @@ void open_map(void) {
   FILE *f;
   byte *ptr;
   int x, sum;
-  int n, tipomapa;
+  int n, map_type;
   byte *buffer;
   byte pal[768];
   byte palorg[768];
@@ -3436,17 +3436,17 @@ void open_map(void) {
           fseek(f, 0, SEEK_SET);
           if (fread(buffer, 1, n, f) == n) {
             if (fmt_is_map(buffer))
-              tipomapa = 1;
+              map_type = 1;
             else if (fmt_is_pcx(buffer))
-              tipomapa = 2;
+              map_type = 2;
             else if (fmt_is_bmp(buffer))
-              tipomapa = 3;
+              map_type = 3;
             else if (fmt_is_jpg(buffer, n))
-              tipomapa = 4;
+              map_type = 4;
             else
-              tipomapa = 0;
+              map_type = 0;
 
-            if (tipomapa) {
+            if (map_type) {
               if ((v_map = (struct tmapa *)malloc(sizeof(struct tmapa))) != NULL) {
                 memset(v_map, 0, sizeof(struct tmapa));
 
@@ -3457,7 +3457,7 @@ void open_map(void) {
                     v_map->points[x] = -1;
 
                   x = 1;
-                  switch (tipomapa) {
+                  switch (map_type) {
                   case 1:
                     fmt_load_map(buffer, v_map->map, 1);
                     break;
@@ -3564,7 +3564,7 @@ void open_map(void) {
 //-----------------------------------------------------------------------------
 
 void save_map(void) {
-  int e, tipomapa;
+  int e, map_type;
   int w = window[v_window].w, h = window[v_window].h;
   char filename[255];
   FILE *f;
@@ -3586,14 +3586,14 @@ void save_map(void) {
       strupr(filename);
 
       if (!strcmp(strchr(filename, '.'), ".PCX"))
-        tipomapa = 1;
+        map_type = 1;
       else if (!strcmp(strchr(filename, '.'), ".BMP"))
-        tipomapa = 2;
+        map_type = 2;
       else
 
-        tipomapa = 0;
+        map_type = 0;
 
-      switch (tipomapa) {
+      switch (map_type) {
       case 0:
         e = fmt_save_map(map, f);
         break;

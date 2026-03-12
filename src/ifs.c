@@ -24,30 +24,30 @@ char OEM2ANSI[256] = {
     245, 213, 181, 254, 222, 218, 219, 217, 253, 221, 175, 180, 173, 177, 95,  190, 182, 167, 247,
     184, 176, 168, 183, 185, 179, 178, 95,  32};
 
-fnt_header_t FNTheader = {"DIVFNT", 0x1A};
-ifs_header_t IFSheader;
-fnt_table_entry tablaFNT[256];
-ifs_table_entry tablaIFS[256];
+fnt_header_t fnt_hdr = {"DIVFNT", 0x1A};
+ifs_header_t ifs_hdr;
+fnt_table_entry fnt_table[256];
+ifs_table_entry ifs_table[256];
 IFS ifs;
 
 char *body_tex_buffer, *out_tex_buffer, *shadow_tex_buffer;
 
-char *ptrLetra, *ptrBody, *ptrOutline, *ptrShadow;
+char *char_ptr, *ptrBody, *ptrOutline, *ptrShadow;
 char *Buffer = NULL, *Buffer2 = NULL, *Buffer3 = NULL;
 char *outBuffer = NULL, *shadowBuffer = NULL;
-FILE *fichIFS = NULL, *fichFNT = NULL;
-short despY, Alto, Ancho, sizeIFS, incY;
-unsigned short anchoreal, altoreal, anchoBody, altoBody, anchoOutline, altoOutline;
+FILE *file_ifs = NULL, *file_fnt = NULL;
+short despY, Alto, Ancho, ifs_size, incY;
+unsigned short anchoreal, altoreal, anchoBody, altoBody, outline_width, altoOutline;
 
 
 void close_and_free_all() {
-  if (fichIFS != NULL) {
-    fclose(fichIFS);
-    fichIFS = NULL;
+  if (file_ifs != NULL) {
+    fclose(file_ifs);
+    file_ifs = NULL;
   }
-  if (fichFNT != NULL) {
-    fclose(fichFNT);
-    fichFNT = NULL;
+  if (file_fnt != NULL) {
+    fclose(file_fnt);
+    file_fnt = NULL;
   }
   if (Buffer)
     free(Buffer);
@@ -63,36 +63,36 @@ void close_and_free_all() {
 
 
 short initStruct() {
-  long posicion;
-  if ((fichIFS = fopen(ifs.ifsName, "rb")) == NULL)
+  long position;
+  if ((file_ifs = fopen(ifs.ifsName, "rb")) == NULL)
     return (IFS_OPEN_ERROR);
-  if (fread(&IFSheader, sizeof(IFSheader), 1, fichIFS) < 1)
+  if (fread(&ifs_hdr, sizeof(ifs_hdr), 1, file_ifs) < 1)
     return (IFS_FORMAT_ERROR);
-  if (strcmp((char *)IFSheader.id, "IFS"))
+  if (strcmp((char *)ifs_hdr.id, "IFS"))
     return (IFS_FORMAT_ERROR);
   if (ifs.size_x < 8 || ifs.size_x > 128 || ifs.size_y < 8 || ifs.size_y > 128)
     return (IFS_PARAM_ERROR);
 
   if (ifs.size_x == 8 && ifs.size_y == 8) {
-    posicion = IFSheader.offset8;
-    sizeIFS = 8;
+    position = ifs_hdr.offset8;
+    ifs_size = 8;
   } else if (ifs.size_x <= 10 && ifs.size_y <= 10) {
-    posicion = IFSheader.offset10;
-    sizeIFS = 10;
+    position = ifs_hdr.offset10;
+    ifs_size = 10;
   } else if (ifs.size_x <= 12 && ifs.size_y <= 12) {
-    posicion = IFSheader.offset12;
-    sizeIFS = 12;
+    position = ifs_hdr.offset12;
+    ifs_size = 12;
   } else if (ifs.size_x <= 14 && ifs.size_y <= 14) {
-    posicion = IFSheader.offset14;
-    sizeIFS = 14;
+    position = ifs_hdr.offset14;
+    ifs_size = 14;
   } else {
-    posicion = IFSheader.offset128;
-    sizeIFS = 128;
+    position = ifs_hdr.offset128;
+    ifs_size = 128;
   }
 
-  if (fseek(fichIFS, posicion, SEEK_SET))
+  if (fseek(file_ifs, position, SEEK_SET))
     return (IFS_FORMAT_ERROR);
-  if (fread(&tablaIFS, sizeof(tablaIFS), 1, fichIFS) < 1)
+  if (fread(&ifs_table, sizeof(ifs_table), 1, file_ifs) < 1)
     return (IFS_FORMAT_ERROR);
 
   if (ifs.brightness > 4)
@@ -108,16 +108,16 @@ short load_char(short letra) {
   char rtbyte, error = 0;
   short pixels;
 
-  offset = tablaIFS[letra].offset;
-  if (fseek(fichIFS, offset, SEEK_SET))
+  offset = ifs_table[letra].offset;
+  if (fseek(file_ifs, offset, SEEK_SET))
     error = 1;
-  if (fread(&Alto, 2, 1, fichIFS) < 1)
+  if (fread(&Alto, 2, 1, file_ifs) < 1)
     error = 1;
-  if (fread(&despY, 2, 1, fichIFS) < 1)
+  if (fread(&despY, 2, 1, file_ifs) < 1)
     error = 1;
-  if (fread(&Ancho, 2, 1, fichIFS) < 1)
+  if (fread(&Ancho, 2, 1, file_ifs) < 1)
     error = 1;
-  if (fread(&pixels, 2, 1, fichIFS) < 1)
+  if (fread(&pixels, 2, 1, file_ifs) < 1)
     error = 1;
   if (error)
     return (IFS_READ_ERROR);
@@ -134,7 +134,7 @@ short load_char(short letra) {
 
   for (y = 0; y < Alto - despY; y++)
     for (x = 0; x < Ancho; x++) {
-      if (fread(&rtbyte, 1, 1, fichIFS) < 1)
+      if (fread(&rtbyte, 1, 1, file_ifs) < 1)
         return (IFS_READ_ERROR);
       for (j = 0; j < 8; j++)
         if (rtbyte & (1 << j))
@@ -157,13 +157,13 @@ short escalar() {
   short cx = 0, cy = 0, flag = 0;
   char *ptr = Buffer, *p;
 
-  ancho2 = (float)width * ifs.size_x / sizeIFS; // width real en relación
+  ancho2 = (float)width * ifs.size_x / ifs_size; // width real en relación
                                                 // al tamaño original
-  alto2 = (float)height * ifs.size_y / sizeIFS;
+  alto2 = (float)height * ifs.size_y / ifs_size;
 
-  if (ifs.size_x == sizeIFS && ifs.size_y == sizeIFS) // no hace falta escalar
+  if (ifs.size_x == ifs_size && ifs.size_y == ifs_size) // no hace falta escalar
   {
-    ptrLetra = Buffer;
+    char_ptr = Buffer;
     return (0);
   }
 
@@ -222,7 +222,7 @@ short escalar() {
       cy++;
     }
     if (flag) {
-      ptrLetra = Buffer2;
+      char_ptr = Buffer2;
       return (0);
     }
     width = anchoreal;
@@ -290,7 +290,7 @@ short escalar() {
     cx = 0;
     cy++;
   }
-  ptrLetra = Buffer3;
+  char_ptr = Buffer3;
   return (0);
 }
 
@@ -479,7 +479,7 @@ short paint_outline() {
     }
   }
 
-  ptrLetra = outBuffer;
+  char_ptr = outBuffer;
   anchoreal += (ifs.outline * 2);
   altoreal += (ifs.outline * 2);
   free(tmpBuffer);
@@ -509,13 +509,13 @@ short paint_shadow() {
 
   ptr = ptrOutline;
   for (y = 0; y < altoOutline; y++) {
-    for (x = 0; x < anchoOutline; x++, ptr++, ptr2++)
+    for (x = 0; x < outline_width; x++, ptr++, ptr2++)
       if (*ptr)
         *ptr2 = ifs.shadow_tex_color;
     ptr2 += absSombraX;
   }
 
-  ptrLetra = shadowBuffer;
+  char_ptr = shadowBuffer;
   anchoreal += absSombraX;
   altoreal += absSombraY;
   return (0);
@@ -569,11 +569,11 @@ void texturarOutline() {
   short x, y, ix, iy;
   float factX, factY, fx, fy;
 
-  ptr = ptrOutline + incY * anchoOutline;
+  ptr = ptrOutline + incY * outline_width;
 
   if (ifs.outline_tex_w < 2 && ifs.outline_tex_h < 2) {
     for (y = 0; y < altoOutline - incY; y++)
-      for (x = 0; x < anchoOutline; x++, ptr++)
+      for (x = 0; x < outline_width; x++, ptr++)
         if (*ptr) {
           if (*ptr < 128)
             *ptr = ifs.shadows[ifs.outline_tex_color];
@@ -587,11 +587,11 @@ void texturarOutline() {
 
   if (ifs.outline_tex_mode == 1) // escalar textura
   {
-    factX = (float)ifs.outline_tex_w / anchoOutline;
+    factX = (float)ifs.outline_tex_w / outline_width;
     factY = (float)ifs.outline_tex_h / (altoOutline - incY);
 
     for (y = 0, fy = 0; y < altoOutline - incY; y++, fy += factY)
-      for (x = 0, fx = 0; x < anchoOutline; x++, fx += factX, ptr++)
+      for (x = 0, fx = 0; x < outline_width; x++, fx += factX, ptr++)
         if (*ptr) {
           color = out_tex_buffer[(int)fy * ifs.outline_tex_w + (int)fx];
           if (*ptr < 128)
@@ -605,7 +605,7 @@ void texturarOutline() {
   } else
     for (y = 0, iy = 0; y < altoOutline - incY; y++) // textura en tile
     {
-      for (x = 0, ix = 0; x < anchoOutline; x++, ptr++) {
+      for (x = 0, ix = 0; x < outline_width; x++, ptr++) {
         if (*ptr) {
           color = out_tex_buffer[iy * ifs.outline_tex_w + ix];
           if (*ptr < 128)
@@ -633,15 +633,15 @@ void texturarSombra() {
   if (ifs.shadow_tex_w < 2 && ifs.shadow_tex_h < 2)
     return;
 
-  ptr = ptrShadow + incY * (anchoOutline + absSombraX);
+  ptr = ptrShadow + incY * (outline_width + absSombraX);
 
   if (ifs.shadow_tex_mode == 1) // escalar textura
   {
-    factX = (float)ifs.shadow_tex_w / anchoOutline;
+    factX = (float)ifs.shadow_tex_w / outline_width;
     factY = (float)ifs.shadow_tex_h / (altoOutline - incY);
 
     for (y = 0, fy = 0; y < altoOutline - incY; y++, fy += factY) {
-      for (x = 0, fx = 0; x < anchoOutline; x++, fx += factX, ptr++)
+      for (x = 0, fx = 0; x < outline_width; x++, fx += factX, ptr++)
         if (*ptr)
           *ptr = shadow_tex_buffer[(int)fy * ifs.shadow_tex_w + (int)fx];
       ptr += absSombraX;
@@ -649,7 +649,7 @@ void texturarSombra() {
   } else
     for (y = 0, iy = 0; y < altoOutline - incY; y++) // textura en tile
     {
-      for (x = 0, ix = 0; x < anchoOutline; x++, ptr++) {
+      for (x = 0, ix = 0; x < outline_width; x++, ptr++) {
         if (*ptr)
           *ptr = shadow_tex_buffer[iy * ifs.shadow_tex_w + ix];
         if (++ix >= ifs.shadow_tex_w)
@@ -667,7 +667,7 @@ void unirOutlineConBody(void) { // Le añade el body al outline
   short x, y, n;
 
   ptr = ptrBody - anchoBody - 1;
-  ptr2 = ptrOutline + ifs.outline - 1 + (ifs.outline - 1) * anchoOutline;
+  ptr2 = ptrOutline + ifs.outline - 1 + (ifs.outline - 1) * outline_width;
   for (y = -1; y <= altoBody; y++) {
     for (x = -1; x <= anchoBody; x++, ptr++, ptr2++) {
       if (x >= 0 && y >= 0 && x < anchoBody && y < altoBody) {
@@ -752,7 +752,7 @@ void unirSombraConResto() {
     ptr2 += absSombraX;
 
   for (y = 0; y < altoOutline; y++) {
-    for (x = 0; x < anchoOutline; x++, ptr++, ptr2++)
+    for (x = 0; x < outline_width; x++, ptr++, ptr2++)
       if (*ptr)
         *ptr2 = *ptr;
     ptr2 += absSombraX;
@@ -775,24 +775,24 @@ int jorge_create_font(int GenCode) {
   }
 
 
-  if ((fichFNT = fopen(ifs.fntName, "wb")) == NULL) {
+  if ((file_fnt = fopen(ifs.fntName, "wb")) == NULL) {
     close_and_free_all();
     return (IFS_OPEN_ERROR);
   }
-  fwrite("fnt\x1a\x0d\x0a\x00\x00", 8, 1, fichFNT);
-  fwrite(dac, 768, 1, fichFNT);
-  fwrite(gradients, sizeof(gradients), 1, fichFNT);
-  fwrite(&GenCode, 1, 4, fichFNT);
+  fwrite("fnt\x1a\x0d\x0a\x00\x00", 8, 1, file_fnt);
+  fwrite(dac, 768, 1, file_fnt);
+  fwrite(gradients, sizeof(gradients), 1, file_fnt);
+  fwrite(&GenCode, 1, 4, file_fnt);
 
-  if (fwrite(tablaFNT, sizeof(tablaFNT), 1, fichFNT) < 1) {
+  if (fwrite(fnt_table, sizeof(fnt_table), 1, file_fnt) < 1) {
     error = 1;
   }
 
   for (x = 0, error = 0; x < 256 && !error; x++) {
     show_progress((char *)texts[217], x, 256);
 
-    tablaFNT[x].width = tablaFNT[x].height = 0;
-    tablaFNT[x].offset = 0;
+    fnt_table[x].width = fnt_table[x].height = 0;
+    fnt_table[x].offset = 0;
     if (ifs.table[x]) {
       anchoreal = 0;
       altoreal = 0;
@@ -808,14 +808,14 @@ int jorge_create_font(int GenCode) {
             close_and_free_all();
             return (ret);
           }
-          ptrOutline = ptrBody = ptrLetra;
-          anchoOutline = anchoBody = anchoreal;
+          ptrOutline = ptrBody = char_ptr;
+          outline_width = anchoBody = anchoreal;
           altoOutline = altoBody = altoreal;
 
           stop = 0;
           for (incY = 0; !stop && incY < altoreal; incY++)
             for (j = 0; !stop && j < anchoreal; j++)
-              if (ptrLetra[incY * anchoreal + j])
+              if (char_ptr[incY * anchoreal + j])
                 stop = 1;
           incY--;
           if (ifs.outline) {
@@ -824,8 +824,8 @@ int jorge_create_font(int GenCode) {
               close_and_free_all();
               return (ret);
             }
-            ptrOutline = ptrLetra;
-            anchoOutline = anchoreal;
+            ptrOutline = char_ptr;
+            outline_width = anchoreal;
             altoOutline = altoreal;
             texturarBody();
             texturarOutline();
@@ -845,17 +845,17 @@ int jorge_create_font(int GenCode) {
         }
 
         if (anchoreal <= 0 || incY >= altoreal) {
-          tablaFNT[x].width = 0;
-          tablaFNT[x].height = 0;
-          tablaFNT[x].incY = 0;
-          tablaFNT[x].offset = 0;
+          fnt_table[x].width = 0;
+          fnt_table[x].height = 0;
+          fnt_table[x].incY = 0;
+          fnt_table[x].offset = 0;
         } else {
-          tablaFNT[x].width = anchoreal;
-          tablaFNT[x].height = altoreal - incY;
-          tablaFNT[x].incY = incY;
-          tablaFNT[x].offset = ftell(fichFNT);
-          if (fwrite(ptrLetra + incY * anchoreal, tablaFNT[x].width * tablaFNT[x].height, 1,
-                     fichFNT) < 1)
+          fnt_table[x].width = anchoreal;
+          fnt_table[x].height = altoreal - incY;
+          fnt_table[x].incY = incY;
+          fnt_table[x].offset = ftell(file_fnt);
+          if (fwrite(char_ptr + incY * anchoreal, fnt_table[x].width * fnt_table[x].height, 1,
+                     file_fnt) < 1)
             error = 1;
         }
       }
@@ -868,8 +868,8 @@ int jorge_create_font(int GenCode) {
     return (IFS_WRITE_ERROR);
   }
 
-  fseek(fichFNT, 8 + 768 + sizeof(gradients) + 4, SEEK_SET);
-  fwrite(&tablaFNT, sizeof(tablaFNT), 1, fichFNT);
+  fseek(file_fnt, 8 + 768 + sizeof(gradients) + 4, SEEK_SET);
+  fwrite(&fnt_table, sizeof(fnt_table), 1, file_fnt);
 
   show_progress((char *)texts[217], 256, 256);
   close_and_free_all();
@@ -884,15 +884,15 @@ void get_char_size(int WhatChar, int *width, int *height) {
   if ((fichFnt = fopen("PREVIEW.FNT", "rb")) == NULL)
     return;
   fseek(fichFnt, 8 + 768 + sizeof(gradients) + 4, SEEK_SET);
-  if (fread(tablaFNT, sizeof(tablaFNT), 1, fichFnt) < 1) {
+  if (fread(fnt_table, sizeof(fnt_table), 1, fichFnt) < 1) {
     fclose(fichFnt);
     return;
   }
-  *height = tablaFNT[WhatChar].incY + tablaFNT[WhatChar].height;
+  *height = fnt_table[WhatChar].incY + fnt_table[WhatChar].height;
   if (WhatChar == 32)
-    *width = tablaFNT[WhatChar].width / 2;
+    *width = fnt_table[WhatChar].width / 2;
   else
-    *width = tablaFNT[WhatChar].width + 1;
+    *width = fnt_table[WhatChar].width + 1;
   fclose(fichFnt);
   return;
 }
@@ -900,9 +900,9 @@ void get_char_size_buffer(int WhatChar, int *width, int *height, char *buffer) {
   *width = 4;
   *height = 1;
 
-  memcpy(tablaFNT, buffer + 8 + 768 + sizeof(gradients) + 4, sizeof(tablaFNT));
-  *height = tablaFNT[WhatChar].incY + tablaFNT[WhatChar].height;
-  *width = tablaFNT[WhatChar].width + 1;
+  memcpy(fnt_table, buffer + 8 + 768 + sizeof(gradients) + 4, sizeof(fnt_table));
+  *height = fnt_table[WhatChar].incY + fnt_table[WhatChar].height;
+  *width = fnt_table[WhatChar].width + 1;
   return;
 }
 int show_char(int WhatChar, int cx, int cy, char *ptr, int w) {
@@ -912,83 +912,83 @@ int show_char(int WhatChar, int cx, int cy, char *ptr, int w) {
   if ((fichFnt = fopen("PREVIEW.FNT", "rb")) == NULL)
     return 4;
   fseek(fichFnt, 8 + 768 + sizeof(gradients) + 4, SEEK_SET);
-  if (fread(tablaFNT, sizeof(tablaFNT), 1, fichFnt) < 1) {
+  if (fread(fnt_table, sizeof(fnt_table), 1, fichFnt) < 1) {
     fclose(fichFnt);
     return 4;
   }
-  if (tablaFNT[WhatChar].width && tablaFNT[WhatChar].height) {
-    rawBuffer = (char *)malloc(tablaFNT[WhatChar].width * tablaFNT[WhatChar].height);
+  if (fnt_table[WhatChar].width && fnt_table[WhatChar].height) {
+    rawBuffer = (char *)malloc(fnt_table[WhatChar].width * fnt_table[WhatChar].height);
     if (rawBuffer == NULL) {
       fclose(fichFnt);
       if (WhatChar == 32)
-        return (tablaFNT[WhatChar].width / 2);
+        return (fnt_table[WhatChar].width / 2);
       else
-        return (tablaFNT[WhatChar].width + 1);
+        return (fnt_table[WhatChar].width + 1);
     }
-    if (fseek(fichFnt, tablaFNT[WhatChar].offset, SEEK_SET)) {
+    if (fseek(fichFnt, fnt_table[WhatChar].offset, SEEK_SET)) {
       free(rawBuffer);
       fclose(fichFnt);
       if (WhatChar == 32)
-        return (tablaFNT[WhatChar].width / 2);
+        return (fnt_table[WhatChar].width / 2);
       else
-        return (tablaFNT[WhatChar].width + 1);
+        return (fnt_table[WhatChar].width + 1);
     }
-    if (fread(rawBuffer, tablaFNT[WhatChar].width * tablaFNT[WhatChar].height, 1, fichFnt) < 1) {
+    if (fread(rawBuffer, fnt_table[WhatChar].width * fnt_table[WhatChar].height, 1, fichFnt) < 1) {
       free(rawBuffer);
       fclose(fichFnt);
       if (WhatChar == 32)
-        return (tablaFNT[WhatChar].width / 2);
+        return (fnt_table[WhatChar].width / 2);
       else
-        return (tablaFNT[WhatChar].width + 1);
+        return (fnt_table[WhatChar].width + 1);
     }
-    iy = tablaFNT[WhatChar].incY;
-    for (y = 0; y < tablaFNT[WhatChar].height; y++)
-      memcpy(ptr + ((cy + iy) * w + cx) + y * w, rawBuffer + y * tablaFNT[WhatChar].width,
-             tablaFNT[WhatChar].width);
+    iy = fnt_table[WhatChar].incY;
+    for (y = 0; y < fnt_table[WhatChar].height; y++)
+      memcpy(ptr + ((cy + iy) * w + cx) + y * w, rawBuffer + y * fnt_table[WhatChar].width,
+             fnt_table[WhatChar].width);
 
     fclose(fichFnt);
     free(rawBuffer);
     if (WhatChar == 32)
-      return (tablaFNT[WhatChar].width / 2);
+      return (fnt_table[WhatChar].width / 2);
     else
-      return (tablaFNT[WhatChar].width + 1);
+      return (fnt_table[WhatChar].width + 1);
   } else
     fclose(fichFnt);
   if (WhatChar == 32)
-    return (tablaFNT[WhatChar].width / 2);
+    return (fnt_table[WhatChar].width / 2);
   else
-    return (tablaFNT[WhatChar].width + 1);
+    return (fnt_table[WhatChar].width + 1);
 }
 
 int show_char_buffer(int WhatChar, int cx, int cy, char *ptr, int w, char *buffer) {
   int y, iy, x, c;
   char *rawBuffer;
-  memcpy(tablaFNT, buffer + 8 + 768 + sizeof(gradients) + 4, sizeof(tablaFNT));
-  if (tablaFNT[WhatChar].width && tablaFNT[WhatChar].height) {
-    rawBuffer = (char *)malloc(tablaFNT[WhatChar].width * tablaFNT[WhatChar].height);
+  memcpy(fnt_table, buffer + 8 + 768 + sizeof(gradients) + 4, sizeof(fnt_table));
+  if (fnt_table[WhatChar].width && fnt_table[WhatChar].height) {
+    rawBuffer = (char *)malloc(fnt_table[WhatChar].width * fnt_table[WhatChar].height);
     if (rawBuffer == NULL) {
       if (WhatChar == 32)
-        return (tablaFNT[WhatChar].width / 2);
+        return (fnt_table[WhatChar].width / 2);
       else
-        return (tablaFNT[WhatChar].width + 1);
+        return (fnt_table[WhatChar].width + 1);
     }
-    memcpy(rawBuffer, buffer + tablaFNT[WhatChar].offset,
-           tablaFNT[WhatChar].width && tablaFNT[WhatChar].height);
-    iy = tablaFNT[WhatChar].incY;
-    for (y = 0; y < tablaFNT[WhatChar].height; y++) {
-      for (x = 0; x < tablaFNT[WhatChar].width; x++) {
-        if ((c = rawBuffer[y * tablaFNT[WhatChar].width + x])) {
+    memcpy(rawBuffer, buffer + fnt_table[WhatChar].offset,
+           fnt_table[WhatChar].width && fnt_table[WhatChar].height);
+    iy = fnt_table[WhatChar].incY;
+    for (y = 0; y < fnt_table[WhatChar].height; y++) {
+      for (x = 0; x < fnt_table[WhatChar].width; x++) {
+        if ((c = rawBuffer[y * fnt_table[WhatChar].width + x])) {
           ptr[(cy + iy) * w + cx + x + y * w] = c;
         }
       }
     }
     free(rawBuffer);
     if (WhatChar == 32)
-      return (tablaFNT[WhatChar].width / 2);
+      return (fnt_table[WhatChar].width / 2);
     else
-      return (tablaFNT[WhatChar].width + 1);
+      return (fnt_table[WhatChar].width + 1);
   }
-  return (tablaFNT[WhatChar].width + 1);
+  return (fnt_table[WhatChar].width + 1);
 }
 
 void convert_fnt_to_pal(char *buffer) {
@@ -1008,14 +1008,14 @@ void convert_fnt_to_pal(char *buffer) {
   for (x = 1; x < 256; x++)
     xlat[x] = find_color_not0(DacFnt[x * 3], DacFnt[x * 3 + 1], DacFnt[x * 3 + 2]);
 
-  memcpy(tablaFNT, buffer + 8 + 768 + sizeof(gradients) + 4, sizeof(tablaFNT));
+  memcpy(fnt_table, buffer + 8 + 768 + sizeof(gradients) + 4, sizeof(fnt_table));
 
   for (x = 0; x < 256; x++) {
-    if (tablaFNT[x].width && tablaFNT[x].height)
-      for (a = 0; a < tablaFNT[x].height; a++)
-        for (b = 0; b < tablaFNT[x].width; b++) {
-          acum = *(buffer + tablaFNT[x].offset + a * tablaFNT[x].width + b);
-          *(buffer + tablaFNT[x].offset + a * tablaFNT[x].width + b) = xlat[acum];
+    if (fnt_table[x].width && fnt_table[x].height)
+      for (a = 0; a < fnt_table[x].height; a++)
+        for (b = 0; b < fnt_table[x].width; b++) {
+          acum = *(buffer + fnt_table[x].offset + a * fnt_table[x].width + b);
+          *(buffer + fnt_table[x].offset + a * fnt_table[x].width + b) = xlat[acum];
         }
   }
   memcpy(buffer + 8, dac, 768);

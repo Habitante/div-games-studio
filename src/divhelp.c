@@ -30,13 +30,13 @@ extern int help_paint_active;
 
 void read_line(void);
 void vuelca_help(void);
-void help_xref(int n, int linea);
+void help_xref(int n, int line);
 void Print_Help(void);
 void resize_help(void);
 int dtoi(int m);
 void arregla_linea(byte *end, int chars, int help_w);
 void put_chr(byte *ptr, int w, byte c, byte color);
-void put_image_line(int n, int linea, byte *di, int v_w);
+void put_image_line(int n, int line, byte *di, int v_w);
 
 
 //-----------------------------------------------------------------------------
@@ -906,7 +906,7 @@ void get_error(int n) {
 //      Navigate to another topic via cross-reference
 //-----------------------------------------------------------------------------
 
-void help_xref(int n, int linea) {
+void help_xref(int n, int line) {
   FILE *f;
   byte *p;
   int m_back;
@@ -948,8 +948,8 @@ void help_xref(int n, int linea) {
           div_strcpy((char *)help_title, sizeof(help_title), (char *)h_buffer);
           help_l = 0;
           tabula_help(p + 1, help_buffer, helpidx[n * 2 + 1] - (p + 1 - h_buffer));
-          if (linea != -1)
-            while (linea--) {
+          if (line != -1)
+            while (line--) {
               while (*help_line++)
                 ;
               help_l++;
@@ -1599,7 +1599,7 @@ void vuelca_help(void) {
 //      Render a single line of an image
 //-----------------------------------------------------------------------------
 
-void put_image_line(int n, int linea, byte *di, int v_w) {
+void put_image_line(int n, int line, byte *di, int v_w) {
   int w, h, _an, c;
   byte *si;
 
@@ -1607,10 +1607,10 @@ void put_image_line(int n, int linea, byte *di, int v_w) {
     return;
 
   _an = graf_help[n].ran;
-  h = graf_help[n].ral - linea * font_height;
+  h = graf_help[n].ral - line * font_height;
   if (h > font_height)
     h = font_height;
-  si = graf_help[n].ptr + linea * font_height * _an;
+  si = graf_help[n].ptr + line * font_height * _an;
 
   do {
     w = _an;
