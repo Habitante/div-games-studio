@@ -317,8 +317,14 @@ Processes communicate through:
 ### Built-in Functions: `src/runtime/functions.c`
 
 `function()` is called by the `lfun` opcode. It reads `mem[ip-1]` to get the
-function code, then dispatches to the implementation. Functions pop their
-arguments from `pila[]` and push results back.
+function code, then dispatches via a `switch` to the implementation. Functions
+pop their arguments from `pila[]` and push results back.
+
+> **Important:** The `case` numbers in this switch, the `fname[]` debug table,
+> and the `function NNN` lines in `div/system/ltobj.def` must all agree. The
+> compiler bakes the `ltobj.def` number into bytecode; the runtime dispatches
+> by that number. See the coupling warning in `docs/compiler-pipeline.md` for
+> the full list of invariants.
 
 Key functions include:
 

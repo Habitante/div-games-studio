@@ -229,6 +229,31 @@ Loaded from `system/ltobj.def`. This file defines:
 - Predefined structs (`mouse`, `scroll`, `m7`, `joy`, `setup`, etc.)
 - Built-in function signatures (parameter types and return types)
 
+> **Tight coupling warning -- `div/system/ltobj.def` is a contract between the
+> compiler and the runtime.** Three things must stay in sync when editing it:
+>
+> 1. **Function numbers** -- Each `function NNN` line in `ltobj.def` declares a
+>    dispatch code. The compiler stores this code in bytecode (`(*ob).func.code
+>    = cod`). The runtime's `function()` switch in `functions.c` must have a
+>    matching `case NNN:` for the same implementation. The `fname[]` debug
+>    table (also in `functions.c`) is indexed by the same numbers.
+>
+> 2. **Global struct layout** -- The order and size of `global struct` blocks
+>    in `ltobj.def` determines how the compiler lays out global memory. The
+>    runtime's `initialization()` in `interpreter.c` has hardcoded offsets
+>    (e.g., `long_header + 14 + 10*10 + ...`) that must match exactly. The
+>    `end_struct` macro in `inter.h` must equal the total size of all structs.
+>
+> 3. **Local variable layout** -- The `local` declarations and `local struct
+>    reserved` define per-process memory. The runtime accesses these via
+>    `#define` offsets in `inter.h` (`_X`, `_Y`, `_Graph`, etc.) that must
+>    match the declaration order in `ltobj.def`.
+>
+> A companion file, `system/ltlex.def`, defines the lexer tables (keywords and
+> symbol tokens). It is loaded by `analyze_ltlex()` and is less fragile since
+> its token codes map to the compiler's internal `p_*` enum, not to runtime
+> offsets.
+
 ---
 
 ## 4. Parser
