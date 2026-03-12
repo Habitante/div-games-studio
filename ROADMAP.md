@@ -100,8 +100,9 @@ src/
                 video.c, graphics.c, effects.c, browser.c, help.c, setup.c,
                 gamma.c, language.c, installer.c, packer.c, trash.c, clock.c,
                 mixer_ui.c, mixer.c, sound.c, vesa.c, sprite.c, recorder.c
-  editor/       code.c, paint.c, brush.c, fpg.c, font.c, palette.c, pcm.c,
-                colorizer.c, charset.c
+  editor/       editor.c, editor_edit.c, editor_render.c, editor_file.c,
+                editor_internal.h, paint.c, brush.c, fpg.c, font.c,
+                palette.c, pcm.c, colorizer.c, charset.c
   compiler/     compiler.c, calc.c, imgload.c
   formats/      image.c, fpg.c
   runtime/      interpreter.c, functions.c, render.c, language.c, mixer.c,
@@ -126,7 +127,7 @@ Large files that are hard to navigate or maintain effectively:
 | `editor/paint.c` | ~7,700 | `paint.c` + `paint_tools.c` + `paint_select.c` | ✓ |
 | `ide/main.c` | ~5,500 | `main_internal.h` (110) + `main.c` (2,742) + `main_desktop.c` (1,754) + `main_dialogs.c` (1,005) | ✓ |
 | `runtime/debug/debugger.c` | ~6,700 | `debugger_internal.h` (311) + `debugger.c` (1,093) + `debugger_ui.c` (2,167) + `debugger_inspect.c` (1,444) + `debugger_code.c` (881) + `debugger_proclist.c` (296) + `debugger_profile.c` (689) | ✓ |
-| `editor/code.c` | ~4,600 | By domain: edit primitives, rendering, file I/O, search/replace | TODO |
+| `editor/code.c` | ~4,600 | `editor_internal.h` (191) + `editor.c` (1,122) + `editor_edit.c` (916) + `editor_render.c` (1,170) + `editor_file.c` (1,264) | ✓ |
 | `ide/handler.c` | ~4,400 | By feature: menus, dialogs, map ops, map viewer, palette, fonts | TODO |
 
 `runtime/functions.c` (~6,400 lines) reviewed and kept as-is — flat list of

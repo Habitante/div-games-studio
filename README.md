@@ -65,8 +65,11 @@ src/
     setup.c          Configuration dialog
     ...              + mixer, sound, effects, language, installer, etc.
 
-  editor/            All editors (9 files)
-    code.c           Code editor with syntax highlighting
+  editor/            All editors (13 files)
+    editor.c         Code editor core (main loop, window handlers)
+    editor_edit.c    Code editor editing (blocks, cursor, navigation)
+    editor_render.c  Code editor rendering (painting, scrollbars, chars)
+    editor_file.c    Code editor file I/O, search/replace, dialogs
     paint.c          Sprite/MAP drawing tools
     fpg.c            FPG sprite archive editor
     font.c           Font editor
