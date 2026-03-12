@@ -94,7 +94,7 @@ The lexer uses two main data structures:
 
 ### The `lower[256]` Table
 
-Defined in `src/ide/main.c` (line 106). Maps every byte to its lowercase equivalent
+Defined in `src/ide/main.c` (line 74). Maps every byte to its lowercase equivalent
 for case-insensitive matching. Characters not in `lower` (mapping to 0) are
 treated as invalid identifier characters. This table determines the valid
 character set for identifiers:

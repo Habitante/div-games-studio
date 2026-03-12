@@ -8,7 +8,7 @@ and file format support.
 
 ## 1. IDE Main Loop and Event Dispatch
 
-### Entry Point: `main()` in `src/ide/main.c` (line 389)
+### Entry Point: `main()` in `src/ide/main.c` (line 346)
 
 The `main()` function performs the following startup sequence:
 
@@ -32,7 +32,7 @@ The `main()` function performs the following startup sequence:
 12. **Shutdown** -- Saves session, calls `finalization()`, `finalize_texts()`,
     returns `return_mode` (0=quit, 1=run program, 3=test failure).
 
-### Initialization: `initialization()` at line 3368
+### Initialization: `initialization()` in `src/ide/main.c` at line 1739
 
 This function allocates all fundamental IDE resources:
 
@@ -63,7 +63,7 @@ struct twindow window[MAX_WINDOWS];  // MAX_WINDOWS = 96
 
 All windows are initialized with `type=0` (empty/inactive).
 
-### Main Loop: `main_loop()` at line 1697
+### Main Loop: `main_loop()` in `src/ide/main.c` at line 1700
 
 ```c
 void main_loop(void) {
@@ -74,7 +74,7 @@ void main_loop(void) {
 }
 ```
 
-The actual work is in `mainloop()` (line 857), which runs once per iteration:
+The actual work is in `mainloop()` (same file, line 857), which runs once per iteration:
 
 1. **`poll_keyboard()`** -- Pumps the SDL event queue, updates `mclock` timestamp.
 2. **Window hit-test** -- Scans `window[0..MAX_WINDOWS-1]` to find which window
@@ -94,7 +94,7 @@ The actual work is in `mainloop()` (line 857), which runs once per iteration:
 8. **Keyboard shortcuts** -- F1-F12 hotkeys, Alt+X quit, Ctrl+C, menu shortcuts.
 9. **`flush_copy()`** -- Blits the virtual screen (`screen_buffer`) to the display.
 
-### Dialog Loop: `dialog_loop()` at line 1731
+### Dialog Loop: `dialog_loop()` in `src/ide/main_dialogs.c` at line 20
 
 Modal dialogs use a secondary event loop (`show_dialog()` calls
 `dialog_loop()` repeatedly until `end_dialog`). This
@@ -133,7 +133,7 @@ The `kbdFLAGS[128]` array maps DOS-style scan codes to key-down state. SDL
 keysyms are translated to DOS scan codes via the `OSDEP_key[2048]` lookup table
 (initialized in `OSDEP_keyInit()`).
 
-### Shutdown: `finalization()` at line 3682
+### Shutdown: `finalization()` in `src/ide/main.c` at line 2048
 
 Frees all buffers allocated in `initialization()`, restores video mode via
 `rvmode()`, calls `end_lexcolor()` and `kbd_reset()`.

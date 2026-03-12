@@ -58,134 +58,47 @@ Nine sprints (A through J) making the codebase readable:
   SetSongPos, browser cleanup, file dialog, keyboard mouse, numpad 5).
   All `__EMSCRIPTEN__` dead code removed from div.c.
 
+### Phase 2C — Codebase Modernization (2026-03-11/12)
+
+Made the codebase genuinely maintainable: consistently formatted, logically
+organized, properly named, and easy for any developer (or agent) to navigate.
+
+**2C-1. Coding standards:** `clang-format` applied to 82 files. Naming
+convention decided: `snake_case` everywhere, `UPPER_CASE` for macros/enums.
+18 collision cases resolved via module prefixes.
+
+**2C-2. Source reorganization:** Flat `src/` split into `ide/`, `editor/`,
+`compiler/`, `formats/`, `runtime/`, `shared/`, `runner/`. All files renamed
+to drop `div` prefix and use descriptive English names. Single-letter runtime
+files expanded (i.c → interpreter.c, etc.). 13 dead files deleted.
+
+**2C-3. Monster file splits:** 6 oversized files split into focused modules
+(~40K lines reorganized, no behavioral changes):
+
+| Original | Split into |
+|----------|-----------|
+| `compiler/compiler.c` (11.5K) | `compiler_internal.h` + `compiler.c` + `compiler_parser.c` + `compiler_expression.c` |
+| `editor/paint.c` (7.7K) | `paint.c` + `paint_tools.c` + `paint_select.c` + `paint_internal.h` |
+| `runtime/debug/debugger.c` (6.7K) | `debugger_internal.h` + `debugger.c` + `debugger_ui.c` + `debugger_inspect.c` + `debugger_code.c` + `debugger_proclist.c` + `debugger_profile.c` |
+| `ide/main.c` (5.5K) | `main_internal.h` + `main.c` + `main_desktop.c` + `main_dialogs.c` |
+| `editor/code.c` (4.6K) | `editor_internal.h` + `editor.c` + `editor_edit.c` + `editor_render.c` + `editor_file.c` |
+| `ide/handler.c` (4.4K) | `handler_internal.h` + `handler.c` + `handler_dialogs.c` + `handler_map.c` + `handler_fonts.c` |
+
+`runtime/functions.c` (6.4K) reviewed and kept as-is — flat list of 150+
+independent VM API implementations, already well-sectioned.
+
+**2C-4. Identifier renames:** All identifiers now English snake_case.
+~200 PascalCase functions, ~120 Spanish identifiers, struct fields, locals,
+and globals renamed across the entire codebase in three sub-phases.
+
+**2C-5. Documentation pass:** All docs (README, ROADMAP, architecture,
+compiler pipeline, VM/runtime, SDL3 migration report, glossary) updated to
+match the reorganized and renamed codebase.
+
 **Net result of all phases:** codebase reduced from ~130K to ~87K lines. Zero
-warnings. All identifiers in public/global scope translated to English. Architecture
-documented. Four targets build clean.
-
----
-
-## Current Phase — Codebase Modernization
-
-The codebase compiles and works, but it's still far from "nice code." The goal of
-this phase is to make it genuinely maintainable — well-organized, consistently
-formatted, properly named, and easy for any developer (or agent) to navigate.
-
-We are NOT in a rush. Each step should be done carefully, verified, and documented
-before moving on. Every sprint must update project docs (ROADMAP.md, MEMORY.md,
-README.md) as part of its deliverables.
-
-### 2C-1. Apply coding standards ✓
-
-- [x] Applied `clang-format` (v20.1.8) to 82 project source files. Third-party
-      and data headers excluded (listed in `.clang-format-ignore`).
-- [x] `.git-blame-ignore-revs` created so `git blame` skips the formatting commit.
-- [x] Snake_case collision analysis completed — 18 collisions found, all in the
-      runtime-wrapper vs. implementation pattern. Full report in
-      [`docs/archive/snake-case-collision-report.md`](docs/archive/snake-case-collision-report.md).
-- [x] **Naming convention decided:** `snake_case` for functions/variables/structs/
-      typedefs. `UPPER_CASE` for macros/enum constants. `OSDEP_*`/`SDL_*`/`Mix_*`
-      preserved as-is.
-
-### 2C-2. Source reorganization ✓
-
-Flat `src/` directory reorganized into logical modules. All files renamed to
-drop the `div` prefix and use descriptive English names. Single-letter runtime
-files expanded (i.c → interpreter.c, etc.). `.hpp` files normalized to `.h`.
-13 dead files deleted (~370 lines). `kernel.cpp` renamed to `kernel.inc`
-(code fragment `#include`'d by interpreter.c, not a standalone compilation unit).
-
-```
-src/
-  ide/          main.c, handler.c, handler_dialogs.c, handler_map.c,
-                handler_fonts.c, desktop.c, window.c, mouse.c, keyboard.c,
-                video.c, graphics.c, effects.c, browser.c, help.c, setup.c,
-                gamma.c, language.c, installer.c, packer.c, trash.c, clock.c,
-                mixer_ui.c, mixer.c, sound.c, vesa.c, sprite.c, recorder.c
-  editor/       editor.c, editor_edit.c, editor_render.c, editor_file.c,
-                editor_internal.h, paint.c, brush.c, fpg.c, font.c,
-                palette.c, pcm.c, colorizer.c, charset.c
-  compiler/     compiler.c, calc.c, imgload.c
-  formats/      image.c, fpg.c
-  runtime/      interpreter.c, functions.c, render.c, language.c, mixer.c,
-                vesa.c, debug/debugger.c, debug/decompiler.c, debug/kernel.inc,
-                fli/flxplay.c
-  shared/       osdep/, run/(collision.c, video.c, pathfind.c, fli.c,
-                keyboard.c, sound.c, mouse.c, pcmtowav.c), lib/, unzip.c
-  runner/       runner.c
-  win/          osdepwin.c
-  (root)        global.h, div_string.h, div_stub.h, madewith.h, sysdac.h,
-                mixer.h, fpg.h, charset.h, sound.h, keyboard.h, recorder.h,
-                imgload.h, ide.h
-```
-
-### 2C-3. Split monster files
-
-Large files that are hard to navigate or maintain effectively:
-
-| File | Lines | Split | Status |
-|------|-------|-------|--------|
-| `compiler/compiler.c` | ~11,500 | `compiler_internal.h` + `compiler.c` + `compiler_parser.c` + `compiler_expression.c` | ✓ |
-| `editor/paint.c` | ~7,700 | `paint.c` + `paint_tools.c` + `paint_select.c` | ✓ |
-| `ide/main.c` | ~5,500 | `main_internal.h` (110) + `main.c` (2,742) + `main_desktop.c` (1,754) + `main_dialogs.c` (1,005) | ✓ |
-| `runtime/debug/debugger.c` | ~6,700 | `debugger_internal.h` (311) + `debugger.c` (1,093) + `debugger_ui.c` (2,167) + `debugger_inspect.c` (1,444) + `debugger_code.c` (881) + `debugger_proclist.c` (296) + `debugger_profile.c` (689) | ✓ |
-| `editor/code.c` | ~4,600 | `editor_internal.h` (191) + `editor.c` (1,122) + `editor_edit.c` (916) + `editor_render.c` (1,170) + `editor_file.c` (1,264) | ✓ |
-| `ide/handler.c` | ~4,400 | `handler_internal.h` (89) + `handler.c` (1,501) + `handler_dialogs.c` (994) + `handler_map.c` (1,564) + `handler_fonts.c` (272) | ✓ |
-
-`runtime/functions.c` (~6,400 lines) reviewed and kept as-is — flat list of
-150+ independent VM API implementations, already well-sectioned with comments.
-
-**compiler.c split notes:** The actual split differed from the original proposal.
-The lexer (~500 lines) stayed in compiler.c rather than getting its own file.
-`statement()` went into the parser file (it parses control flow). The "codegen"
-file became `compiler_expression.c` since this is a single-pass compiler —
-expression parsing and code generation are interleaved.
-
-**handler.c split notes:** Split into menu infrastructure, dialogs, map operations,
-and font generation. All 9 Spanish menu function names were renamed to English:
-`menu_principal` -> `menu_main`, `menu_programas` -> `menu_programs`,
-`menu_edicion` -> `menu_edit`, `menu_paletas` -> `menu_palettes`,
-`menu_mapas` -> `menu_maps`, `menu_graficos` -> `menu_graphics`,
-`menu_fuentes` -> `menu_fonts`, `menu_sonidos` -> `menu_sounds`,
-`menu_sistema` -> `menu_system`. Renames propagated to `global.h`, `desktop.c`,
-and `main.c`.
-
-Rules: extract functions, add forward declarations, update CMake. No behavioral
-changes. Static/file-scope globals may need to become shared or passed as parameters.
-
-### 2C-4. Identifier renames ✓
-
-All identifiers in the codebase are now English snake_case. Completed in
-four sub-phases across multiple sessions:
-
-**2C-4a:** 76 PascalCase/Spanish functions → snake_case (25 files).
-All 18 collisions resolved via module prefixes (`sound_`, `fli_`, `fpg_`,
-`pal_`, `fmt_`).
-
-**2C-4b:** File-local vars, struct fields, params → English (45 files,
-~9,160 lines). Compiler symbols, editor state, runtime globals, paint
-module, handler module all renamed.
-
-**2C-4c (2026-03-12):** Final cleanup — ~125 PascalCase functions + ~120
-Spanish identifiers renamed. 8 parallel agents in 2 waves:
-- Wave 1 (HIGH): divpcm functions/structs, divfont/ifs typedefs+fields,
-  fpgfile struct fields, global.h/inter.h globals (paleta→palette,
-  tipo→file_types, boton→draw_button, interprete→interpreter, etc.)
-- Wave 2 (LOW): all remaining locals across divc, divedit, divcolor,
-  divbrow, divhelp, ifs, runtime, divpcm, divpalet, divfpg, divfont,
-  div, divwindo. Cross-file: `max_archivos`→`MAX_FILES` (8 files).
-
-### 2C-5. Documentation pass ✓
-
-Updated all docs to match the 2C-2 reorganization and 2C-4 identifier renames:
-
-- [x] README.md — source tree updated with new module layout
-- [x] `docs/architecture-overview.md` — file paths + identifier names updated
-- [x] `docs/compiler-pipeline.md` — file paths + identifier names updated
-- [x] `docs/vm-and-runtime.md` — file paths + identifier names updated
-- [x] `docs/sdl3-migration-report.md` — file paths + function/struct names updated
-- [x] `docs/snake-case-collision-report.md` — all file paths updated
-- [x] `docs/archive/glossary-spanish-english.md` — restructured with old→new name mapping
-- [x] MEMORY.md — directory layout, function locations, bug references updated
+warnings. All identifiers translated to English snake_case. Source organized
+into logical modules with focused files. Architecture documented. Four targets
+build clean.
 
 ---
 

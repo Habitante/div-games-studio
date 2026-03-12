@@ -51,12 +51,16 @@ src/
   global.h           Master header — types, externs, the lot
   div_string.h       Safe string helpers (bounded copy/cat/printf)
 
-  ide/               IDE shell (24 files)
-    main.c           Main entry point, desktop environment, menus
+  ide/               IDE shell (31 files)
+    main.c           Main entry point, startup, main loop
+    main_desktop.c   Desktop environment, initialization, finalization
+    main_dialogs.c   Modal dialog loop and helpers
+    main_internal.h  Shared declarations for main_* modules
     handler.c        Menu infrastructure + 9 top-level menus
     handler_dialogs.c Dialog boxes, listbox UI, file browser, progress bar
     handler_map.c    Map viewer, open/save/new map, resize, search
     handler_fonts.c  Font map generation
+    handler_internal.h Shared declarations for handler_* modules
     desktop.c        Desktop and window initialization
     window.c         Window primitives (buttons, text, boxes)
     mouse.c          Mouse input + SDL event handling
@@ -68,12 +72,16 @@ src/
     setup.c          Configuration dialog
     ...              + mixer, sound, effects, language, installer, etc.
 
-  editor/            All editors (13 files)
+  editor/            All editors (16 files)
     editor.c         Code editor core (main loop, window handlers)
     editor_edit.c    Code editor editing (blocks, cursor, navigation)
     editor_render.c  Code editor rendering (painting, scrollbars, chars)
     editor_file.c    Code editor file I/O, search/replace, dialogs
-    paint.c          Sprite/MAP drawing tools
+    editor_internal.h Shared declarations for editor_* modules
+    paint.c          Sprite/MAP drawing tools (main loop, UI)
+    paint_tools.c    Paint tool implementations (draw, fill, effects)
+    paint_select.c   Paint selection operations (cut, copy, paste, resize)
+    paint_internal.h Shared declarations for paint_* modules
     fpg.c            FPG sprite archive editor
     font.c           Font editor
     palette.c        Palette editor
@@ -82,8 +90,11 @@ src/
     colorizer.c      Syntax colorizer
     brush.c          Brush/texture thumbnails
 
-  compiler/          DIV language compiler (3 files)
-    compiler.c       Lexer + parser + code generation
+  compiler/          DIV language compiler (6 files)
+    compiler.c       Orchestration, lexer, symbol table, error handling
+    compiler_parser.c Top-level parsing, declarations, statements
+    compiler_expression.c Expression parsing, code generation, peephole optimizer
+    compiler_internal.h Shared definitions (types, constants, EML opcodes)
     calc.c           Expression calculator
     imgload.c        Image loading stubs
 
@@ -91,12 +102,18 @@ src/
     image.c          BMP, PCX, JPEG reading/writing
     fpg.c            FPG file format reader/writer
 
-  runtime/           VM + runtime (10 files)
+  runtime/           VM + runtime (17 files)
     interpreter.c    DIV2 bytecode interpreter (the VM)
     render.c         Sprite rendering engine (8-bit blitter)
     functions.c      Runtime built-in functions
     debug/
-      debugger.c     Integrated debugger
+      debugger.c     Debugger entry point, main loop
+      debugger_ui.c  Debugger UI rendering and input
+      debugger_inspect.c Variable inspection and memory display
+      debugger_code.c Code view, breakpoints, single-stepping
+      debugger_proclist.c Process list display
+      debugger_profile.c Performance profiler
+      debugger_internal.h Shared declarations for debugger_* modules
       decompiler.c   Bytecode decompiler
       kernel.inc     VM opcode dispatch (included by interpreter.c)
 

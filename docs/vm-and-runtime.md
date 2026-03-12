@@ -77,11 +77,11 @@ void interpreter(void) {
 
 The game runs until all processes are dead, or Ctrl+Esc / Alt+X is pressed.
 
-### Frame Loop: `mainloop()` at line 665
+### Frame Loop: `mainloop()` at line 702
 
 Each frame:
 
-1. **`frame_start()`** (line 922):
+1. **`frame_start()`** (line 960):
    - Polls keyboard/mouse events via `tecla()`
    - Pauses if app lost focus (`app_paused` flag)
    - Handles screensaver activation
@@ -100,7 +100,7 @@ Each frame:
    } while (ide);
    ```
 
-3. **`frame_end()`** (line 1133):
+3. **`frame_end()`** (line 1176):
    - Restores background
    - Sorts and paints all sprites by Z-order
    - Handles scrolling backgrounds and Mode 7
@@ -108,7 +108,7 @@ Each frame:
    - Updates palette fading
    - Blits to screen via `blit_screen()`
 
-### Process Execution: `exec_process()` at line 744
+### Process Execution: `exec_process()` at line 783
 
 Selects the highest-priority unexecuted process:
 
@@ -127,7 +127,7 @@ If a process has a partial frame (`_Frame >= 100`), it decrements by 100 and
 skips execution. Otherwise, it loads the process's saved IP and stack, then
 calls `core_exec()`.
 
-### Bytecode Execution: `core_exec()` at line 810
+### Bytecode Execution: `core_exec()` at line 849
 
 ```c
 void core_exec() {
@@ -239,7 +239,7 @@ case lret:
 ### Process Fields
 
 Each process has these fields at fixed offsets from its base address
-(defined in `src/runtime/inter.h`, lines 440-488):
+(defined in `src/runtime/inter.h`, lines 434-482):
 
 | Offset | Name | Description |
 |--------|------|-------------|
@@ -396,7 +396,7 @@ The rendering pipeline is entirely 8-bit paletted. Each frame:
 3. **Blit to display** -- The 8-bit `screen_buffer` is converted to 32-bit and
    presented via SDL2
 
-### Sprite Sorting and Painting: `frame_end()` at line 1133
+### Sprite Sorting and Painting: `frame_end()` at line 1176
 
 The rendering uses a priority-based selection loop (not a pre-sorted array):
 
@@ -426,7 +426,7 @@ do {
 This means entities are painted from highest Z to lowest Z (back to front).
 Higher `_Z` values appear behind lower ones.
 
-### Sprite Rendering: `paint_sprite()` in `src/runtime/render.c` (line 869)
+### Sprite Rendering: `paint_sprite()` in `src/runtime/render.c` (line 1115)
 
 For each process with a visible graphic:
 
@@ -444,7 +444,7 @@ For each process with a visible graphic:
      (4096-entry table for full rotation).
 6. Save the painted region in `mem[ide+_x0.._y1]` for partial screen updates.
 
-### Normal Sprite: `sp_normal()` at line 953
+### Normal Sprite: `sp_normal()` at line 1252
 
 ```c
 void sp_normal(byte * p, int x, int y, int an, int al, int flags) {
@@ -468,7 +468,7 @@ void sp_normal(byte * p, int x, int y, int an, int al, int flags) {
 Color 0 is always transparent. The `ghost` flag (bit 2 of `_Flags`) uses the
 256x256 ghost table to blend sprite pixels with background pixels.
 
-### Scroll System: `scroll_simple()` at line 194
+### Scroll System: `scroll_simple()` at line 208
 
 Implements hardware-style scrolling backgrounds:
 - `scroll[N]` struct has: camera process, speed, region, x/y offset
@@ -530,32 +530,32 @@ version but less critical with SDL2.
 These structs are defined in `src/runtime/inter.h` and accessible from DIV
 programs:
 
-### `mouse` struct (line 317)
+### `mouse` struct (line 322)
 ```
 x, y, z, file, graph, angle, size, flags, region, left, middle, right, cursor, speed
 ```
 
-### `scroll[10]` struct (line 323)
+### `scroll[10]` struct (line 328)
 ```
 z, camera, ratio, speed, region1, region2, x0, y0, x1, y1
 ```
 
-### `m7[10]` struct (Mode 7, line 329)
+### `m7[10]` struct (Mode 7, line 334)
 ```
 z, camera, height, distance, horizon, focus, color
 ```
 
-### `joy` struct (line 335)
+### `joy` struct (line 340)
 ```
 button1, button2, button3, button4, left, right, up, down
 ```
 
-### `setup` struct (line 342)
+### `setup` struct (line 347)
 ```
 card, port, irq, dma, dma2, master, sound_fx, cd_audio, mixer, mixrate, mixmode
 ```
 
-### Other predefined globals (line 404+)
+### Other predefined globals (line 398+)
 
 | Name | Description |
 |------|-------------|
