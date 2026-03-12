@@ -124,10 +124,10 @@ int fmt_load_dac_fpg(char *name);
 int fmt_load_dac_pal(char *name);
 
 extern int SongType;
-extern int SongCode;
+extern int song_code;
 extern int last_mod_clean;
-void FreeMOD(void);
-int IsWAV(char *FileName);
+void free_mod(void);
+int is_wav(char *FileName);
 int mem_get_heap_free(void);
 
 TABLAIFS tifs[256];
@@ -1082,7 +1082,7 @@ void create_thumb_PCM(struct t_listboxbr *l) {
       div_strcpy(filename, sizeof(filename), l->list + (l->item_width * num));
       strupr(filename);
 
-      if (IsWAV(l->list + (l->item_width * num)))
+      if (is_wav(l->list + (l->item_width * num)))
         ;
       else if (!strcmp(strchr(filename, '.'), ".PCM"))
         ;
@@ -1166,7 +1166,7 @@ void create_thumb_PCM(struct t_listboxbr *l) {
 
       // Start of conversion
 
-      if (IsWAV(l->list + (l->item_width * num))) {
+      if (is_wav(l->list + (l->item_width * num))) {
         WAV = thumb[num].ptr;
         length = thumb[num].filesize;
         pos = 0;
@@ -1463,8 +1463,8 @@ void browser0(void) {
   }
 
   if (v_thumb == 7 || v_type == 16) {
-    FreeMOD();
-    SongCode++;
+    free_mod();
+    song_code++;
     last_mod_clean = 0;
   }
 
@@ -1622,7 +1622,7 @@ void browser2(void) {
   byte *ptr;
 
 #ifdef MIXER
-  Mix_Chunk *SI = NULL;
+  Mix_Chunk *si = NULL;
 #endif
 
   int need_refresh = 0;
@@ -1882,7 +1882,7 @@ void browser3(void) {
     song_playing = 0;
   }
   if (v_type == 16)
-    FreeMOD();
+    free_mod();
 }
 
 //-----------------------------------------------------------------------------

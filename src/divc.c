@@ -2066,7 +2066,7 @@ lex_scan:
 //      Lexer (reads a new token from *source)
 //-----------------------------------------------------------------------------
 
-int IsWAV(char *FileName);
+int is_wav(char *FileName);
 int en_fopen = 0;
 
 /* Lexer: reads the next token from the source buffer.
@@ -2287,7 +2287,7 @@ lex_scan:
 
       fclose(f);
 
-      if (IsWAV(full))
+      if (is_wav(full))
         empaquetable = 1;
 
       // ???

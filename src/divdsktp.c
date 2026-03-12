@@ -13,9 +13,9 @@ void carga_Fonts0(void);
 void carga_help(int n, int helpal, int helpline, int x1, int x2);
 void help_xref(int n, int linea);
 void mixer0(void);
-void OpenDesktopSound(FILE *f);
-void SaveDesktopSound(pcminfo *mypcminfo, FILE *f);
-void OpenDesktopSong(void);
+void open_desktop_sound(FILE *f);
+void save_desktop_sound(pcminfo *mypcminfo, FILE *f);
+void open_desktop_song(void);
 
 int CDinit(void);
 int get_cd_error(void);
@@ -179,7 +179,7 @@ void download_desktop() {
         break;
       case 105: //pcm
         mypcminfo = (pcminfo *)window[x].aux;
-        SaveDesktopSound(mypcminfo, desktop);
+        save_desktop_sound(mypcminfo, desktop);
         break;
       // case 106 (map3d) removed (MODE8/3D map editor deleted)
       case 107: //mod
@@ -459,15 +459,15 @@ int upload_desktop() {
       }
       break;
     case 105: //pcm
-      OpenDesktopSound(desktop);
+      open_desktop_sound(desktop);
       break;
     // case 106 (map3d) removed (MODE8/3D map editor deleted)
     case 107: //mod
-      fread(SongName, 1, 14, desktop);
-      fread(SongPathName, 1, 256, desktop);
-      if ((f = fopen(SongPathName, "rb")) != NULL) {
+      fread(song_name, 1, 14, desktop);
+      fread(song_path_name, 1, 256, desktop);
+      if ((f = fopen(song_path_name, "rb")) != NULL) {
         fclose(f);
-        OpenDesktopSong();
+        open_desktop_song();
       }
       break;
     }

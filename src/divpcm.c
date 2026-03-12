@@ -14,18 +14,18 @@
 
 int FilePos = 0;
 
-void FreeMOD(void);
+void free_mod(void);
 int sound_get_song_pos(void);
 int sound_get_song_line(void);
 void mostrar_mod_meters(void);
 void open_sound(void);
 void open_sound_file(void);
-void OpenDesktopSound(FILE *f);
+void open_desktop_sound(FILE *f);
 void save_sound(pcminfo *mypcminfo, char *dst);
-void SaveDesktopSound(pcminfo *mypcminfo, FILE *f);
-void CloseSound(char *snd_path);
+void save_desktop_sound(pcminfo *mypcminfo, FILE *f);
+void close_sound(char *snd_path);
 void open_song(void);
-void OpenDesktopSong(void);
+void open_desktop_song(void);
 void sound_play_song(char *pathname);
 void EditSound0(void);
 void EditSound1(void);
@@ -35,31 +35,31 @@ void rec_sound0(void);
 void RecSound1(void);
 void RecSound2(void);
 void RecSound3(void);
-void ModifySound(int option);
-void ChangeSoundFreq(int freq);
-void RecordSound(void);
-void PollRecord(void);
-int JudasProgressRead(int handle, void *buffer, int size);
-void CopyNewSound(pcminfo *mypcminfo, int ini, int fin);
-void PasteNewSounds(void);
-byte *SaveSoundMem(pcminfo *mypcminfo);
-int IsWAV(char *FileName);
-int NewSample(pcminfo *mypcminfo); // 1-OK, 0-ERROR
-// Espacio (malloc+lock) en mypcminfo->SoundData para mypcminfo->SoundSize shorts
+void modify_sound(int option);
+void change_sound_freq(int freq);
+void record_sound(void);
+void poll_record(void);
+int judas_progress_read(int handle, void *buffer, int size);
+void copy_new_sound(pcminfo *mypcminfo, int ini, int fin);
+void paste_new_sounds(void);
+byte *save_sound_mem(pcminfo *mypcminfo);
+int is_wav(char *FileName);
+int new_sample(pcminfo *mypcminfo); // 1-OK, 0-ERROR
+// Allocate (malloc+lock) in mypcminfo->sound_data for mypcminfo->sound_size shorts
 void wline(char *ptr, int realan, int w, int h, int x0, int y0, int x1, int y1, char color);
 void linea_pixel(char *ptr, int w, int realan, int h, int x, int y, char color);
 
 void set_mixer(void);
 int find_pcm_window(void);
 
-char SoundName[255];
-char SoundPathName[256];
-char SongName[255];
-char SongPathName[256];
+char sound_name[255];
+char sound_path_name[256];
+char song_name[255];
+char song_path_name[256];
 byte *pcminfo_aux;
 byte *modinfo_aux;
 int SongType = 0;
-int SongCode = 10;
+int song_code = 10;
 int SongChannels = 0;
 int last_mod_clean = 1;
 int wav_handle;
@@ -96,8 +96,8 @@ void PCM1(void) {
   Ancho = v.w - 4 * big2;
   Alto = v.h - 12 * big2;
   ptr += (2 + (10 * v.w)) * big2 + (Alto / 2) * v.w;
-  buffer = mypcminfo->SoundData;
-  length = mypcminfo->SoundSize;
+  buffer = mypcminfo->sound_data;
+  length = mypcminfo->sound_size;
 
   if (length > 1) {
     if (length < 3 * Ancho) {
@@ -165,9 +165,9 @@ void PCM2(void) {
       }
       return;
     } else {
-      if (mypcminfo->SoundData) {
+      if (mypcminfo->sound_data) {
 #ifdef MIXER
-        Mix_PlayChannel(0, mypcminfo->SI, 0);
+        Mix_PlayChannel(0, mypcminfo->si, 0);
 #endif
       }
       while (mouse_b & 1)
@@ -179,13 +179,13 @@ void PCM2(void) {
 void PCM3(void) {
   pcminfo *mypcminfo = (pcminfo *)v.aux;
 
-  if (mypcminfo->SoundData) {
+  if (mypcminfo->sound_data) {
 #ifdef MIXER
-    Mix_FreeChunk(mypcminfo->SI);
-    mypcminfo->SI = NULL;
+    Mix_FreeChunk(mypcminfo->si);
+    mypcminfo->si = NULL;
 #endif
-    mypcminfo->SoundData = NULL;
-    mypcminfo->SoundSize = 0;
+    mypcminfo->sound_data = NULL;
+    mypcminfo->sound_size = 0;
   }
   free(v.aux);
 }
@@ -224,7 +224,7 @@ void MOD1(void) {
   wrectangle(v.ptr, w, h, c0, 1, 38, w - 2, 11);
   wrectangle(v.ptr, w, h, c0, 1, 38, 21, 11);
 
-  if (Mix_PlayingMusic() && mymodinfo->SongCode == SongCode) {
+  if (Mix_PlayingMusic() && mymodinfo->song_code == song_code) {
     if (ModButton && ModWindow == v.order)
       wput(v.ptr, w, h, 2, 39, -214);
     else
@@ -253,11 +253,11 @@ void MOD2(void) {
       ModWindow = v.order;
       need_refresh = 1;
 #ifdef MIXER
-      if (Mix_PlayingMusic() && mymodinfo->SongCode == SongCode) {
-        FreeMOD();
+      if (Mix_PlayingMusic() && mymodinfo->song_code == song_code) {
+        free_mod();
         Mix_FreeMusic(mymodinfo->music);
       } else {
-        FreeMOD();
+        free_mod();
         sound_play_song(mymodinfo->pathname);
       }
 #endif
@@ -274,8 +274,8 @@ void MOD2(void) {
 void MOD3(void) {
   modinfo *mymodinfo = (modinfo *)v.aux;
 #ifdef MIXER
-  if (mymodinfo->SongCode == SongCode) {
-    FreeMOD();
+  if (mymodinfo->song_code == song_code) {
+    free_mod();
     Mix_FreeMusic(mymodinfo->music);
   }
 #endif
@@ -297,13 +297,13 @@ void MOD0(void) {
   modinfo_aux = NULL;
   mymodinfo = (modinfo *)v.aux;
 
-  mymodinfo->SongCode = 0;
+  mymodinfo->song_code = 0;
 
   v.title = (byte *)mymodinfo->name;
   v.name = (byte *)mymodinfo->name;
 }
 
-void FreeMOD(void) {
+void free_mod(void) {
   Mix_HaltMusic();
   Mix_SetPostMix(NULL, NULL);
   SongType = 0;
@@ -325,7 +325,7 @@ void mostrar_mod_meters(void) {
   int ini = v.w * v.h - v.w * ((2 + 10) * big2 + 1) + 2 * big2;
   char cwork[10];
 
-  if (mymodinfo->SongCode == SongCode) {
+  if (mymodinfo->song_code == song_code) {
     if (Mix_PlayingMusic()) {
       wbox(v.ptr, w, h, c1, 2, 10, w - 4, h - 12 - 10);
       wbox(v.ptr, w, h, c2, 22, 39, w - 4 - 20, 9);
@@ -354,11 +354,11 @@ void mostrar_mod_meters(void) {
         }
       }
     } else {
-      SongCode++;
+      song_code++;
       last_mod_clean = 0;
     }
     v.redraw = 1;
-  } else if (mymodinfo->SongCode == SongCode - 1) {
+  } else if (mymodinfo->song_code == song_code - 1) {
     if (!last_mod_clean) {
       call(v.paint_handler);
       v.redraw = 1;
@@ -468,7 +468,7 @@ void open_sound(void) {
 
 #ifdef MIXER
 
-  Mix_Chunk *SI;
+  Mix_Chunk *si;
 
 #endif
 
@@ -504,8 +504,8 @@ void open_sound(void) {
       if (full[strlen(full) - 1] != '/')
         div_strcat(full, sizeof(full), "/");
       div_strcat(full, sizeof(full), input);
-      DIV_STRCPY(SoundName, input);
-      DIV_STRCPY(SoundPathName, full);
+      DIV_STRCPY(sound_name, input);
+      DIV_STRCPY(sound_path_name, full);
 
       if (!v_exists) {
         v_text = (char *)texts[43];
@@ -525,12 +525,12 @@ void open_sound(void) {
 
 #ifdef MIXER
 
-      SI = Mix_LoadWAV(SoundPathName);
+      si = Mix_LoadWAV(sound_path_name);
 
-      if (SI == NULL)
-        SI = DIVMIX_LoadPCM(SoundPathName);
+      if (si == NULL)
+        si = DIVMIX_LoadPCM(sound_path_name);
 
-      if (SI == NULL) {
+      if (si == NULL) {
         free(pcminfo_aux);
         v_text = (char *)texts[46];
         show_dialog(err0);
@@ -539,37 +539,37 @@ void open_sound(void) {
 
 #endif
 
-      memcpy(mypcminfo->name, SoundName, 14);
-      memcpy(mypcminfo->pathname, SoundPathName, 256);
-      mypcminfo->SoundFreq = 44100;
-      mypcminfo->SoundBits = 16;
+      memcpy(mypcminfo->name, sound_name, 14);
+      memcpy(mypcminfo->pathname, sound_path_name, 256);
+      mypcminfo->sound_freq = 44100;
+      mypcminfo->sound_bits = 16;
 #ifdef MIXER
-      mypcminfo->SoundSize = SI->alen / 2;
-      mypcminfo->SoundData = (short *)malloc(SI->alen);
-      if (mypcminfo->SoundData != NULL)
-        memcpy(mypcminfo->SoundData, SI->abuf, SI->alen);
+      mypcminfo->sound_size = si->alen / 2;
+      mypcminfo->sound_data = (short *)malloc(si->alen);
+      if (mypcminfo->sound_data != NULL)
+        memcpy(mypcminfo->sound_data, si->abuf, si->alen);
 
-      mypcminfo->SI = SI;
+      mypcminfo->si = si;
 #endif
       new_window(PCM0);
     }
   }
 }
 
-void open_sound_file(void) // Open the file SoundPathName
+void open_sound_file(void) // Open the file sound_path_name
 {
   fprintf(stdout, "TODO - divpcm.cpp open_sound_file\n");
 
   pcminfo *mypcminfo;
 #ifdef MIXER
-  Mix_Chunk *SI = NULL;
+  Mix_Chunk *si = NULL;
 #endif
-  debugprintf("SoundName %s\n", input);
+  debugprintf("sound_name %s\n", input);
   debugprintf("SOundPath %s\n", full);
 
 
-  DIV_STRCPY(SoundName, input);
-  DIV_STRCPY(SoundPathName, full);
+  DIV_STRCPY(sound_name, input);
+  DIV_STRCPY(sound_path_name, full);
 
   if ((pcminfo_aux = (byte *)malloc(sizeof(pcminfo))) == NULL) {
     v_text = (char *)texts[45];
@@ -580,14 +580,14 @@ void open_sound_file(void) // Open the file SoundPathName
 
 #ifdef MIXER
 
-  SI = Mix_LoadWAV(SoundPathName);
+  si = Mix_LoadWAV(sound_path_name);
 
-  if (SI == NULL)
-    SI = DIVMIX_LoadPCM(SoundPathName);
+  if (si == NULL)
+    si = DIVMIX_LoadPCM(sound_path_name);
 
-  if (SI == NULL) {
+  if (si == NULL) {
     //     free(pcminfo_aux);
-    //if(SI) free(SI);
+    //if(si) free(si);
     v_text = (char *)texts[46];
     show_dialog(err0);
     free(mypcminfo);
@@ -595,17 +595,17 @@ void open_sound_file(void) // Open the file SoundPathName
   }
 
 #endif
-  memcpy(mypcminfo->name, SoundName, 14);
-  memcpy(mypcminfo->pathname, SoundPathName, 256);
-  mypcminfo->SoundFreq = 44100;
-  mypcminfo->SoundBits = 16;
+  memcpy(mypcminfo->name, sound_name, 14);
+  memcpy(mypcminfo->pathname, sound_path_name, 256);
+  mypcminfo->sound_freq = 44100;
+  mypcminfo->sound_bits = 16;
 #ifdef MIXER
-  mypcminfo->SoundSize = SI->alen / 2;
-  mypcminfo->SoundData = (short *)malloc(SI->alen);
-  if (mypcminfo->SoundData != NULL)
-    memcpy(mypcminfo->SoundData, SI->abuf, SI->alen);
+  mypcminfo->sound_size = si->alen / 2;
+  mypcminfo->sound_data = (short *)malloc(si->alen);
+  if (mypcminfo->sound_data != NULL)
+    memcpy(mypcminfo->sound_data, si->abuf, si->alen);
 
-  mypcminfo->SI = SI;
+  mypcminfo->si = si;
 
 #endif
   new_window(PCM0);
@@ -614,7 +614,7 @@ int create_saved_window(void_return_type_t init_handler, int nx, int ny);
 //void create_saved_window(int init_handler,int nx,int ny);
 extern struct twindow window_aux;
 
-void OpenDesktopSound(FILE *f) {
+void open_desktop_sound(FILE *f) {
   pcminfo *mypcminfo;
 
   pcminfo_aux = (byte *)malloc(sizeof(pcminfo));
@@ -624,29 +624,29 @@ void OpenDesktopSound(FILE *f) {
 
   fread(mypcminfo->name, 1, 14, f);
   fread(mypcminfo->pathname, 1, 256, f);
-  fread(&mypcminfo->SoundFreq, 1, 4, f);
-  fread(&mypcminfo->SoundBits, 1, 4, f);
-  fread(&mypcminfo->SoundSize, 1, 4, f);
+  fread(&mypcminfo->sound_freq, 1, 4, f);
+  fread(&mypcminfo->sound_bits, 1, 4, f);
+  fread(&mypcminfo->sound_size, 1, 4, f);
 
-  if (!NewSample(mypcminfo)) {
+  if (!new_sample(mypcminfo)) {
     free(pcminfo_aux);
-    fseek(f, mypcminfo->SoundSize * 2, SEEK_CUR);
+    fseek(f, mypcminfo->sound_size * 2, SEEK_CUR);
     return;
   }
 
-  fread(mypcminfo->SoundData, 2, mypcminfo->SoundSize, f);
+  fread(mypcminfo->sound_data, 2, mypcminfo->sound_size, f);
 
 #ifdef MIXER
   {
-    byte *FileBuffer = SaveSoundMem(mypcminfo);
+    byte *FileBuffer = save_sound_mem(mypcminfo);
     if (FileBuffer != NULL) {
-      int wavSize = mypcminfo->SoundSize * 2 + 44;
+      int wavSize = mypcminfo->sound_size * 2 + 44;
       SDL_RWops *rw = SDL_RWFromMem(FileBuffer, wavSize);
-      mypcminfo->SI = Mix_LoadWAV_RW(rw, 1);
+      mypcminfo->si = Mix_LoadWAV_RW(rw, 1);
       free(FileBuffer);
     }
-    if (mypcminfo->SI == NULL) {
-      free(mypcminfo->SoundData);
+    if (mypcminfo->si == NULL) {
+      free(mypcminfo->sound_data);
       free(pcminfo_aux);
       return;
     }
@@ -662,7 +662,7 @@ void save_sound(pcminfo *mypcminfo, char *dst) {
   HeadDC MyHeadDC;
   int length;
   int con;
-  byte *byte_ptr = (byte *)mypcminfo->SoundData;
+  byte *byte_ptr = (byte *)mypcminfo->sound_data;
   float paso, pos;
   char drive[_MAX_DRIVE + 1];
   char dir[_MAX_DIR + 1];
@@ -671,7 +671,7 @@ void save_sound(pcminfo *mypcminfo, char *dst) {
 
   _splitpath(dst, (char *)drive, (char *)dir, (char *)fname, (char *)ext);
   strupr((char *)ext);
-  length = mypcminfo->SoundSize;
+  length = mypcminfo->sound_size;
 
   if ((dstfile = fopen(dst, "wb")) == NULL) {
     v_text = (char *)texts[43];
@@ -680,7 +680,7 @@ void save_sound(pcminfo *mypcminfo, char *dst) {
   }
 
   if (!strcmp(ext, ".WAV")) {
-    if (mypcminfo->SoundBits == 16)
+    if (mypcminfo->sound_bits == 16)
       length *= 2;
     fputc('R', dstfile);
     fputc('I', dstfile);
@@ -709,10 +709,10 @@ void save_sound(pcminfo *mypcminfo, char *dst) {
     MyHeadDC.dwUnknow = 16;
     MyHeadDC.wFormatTag = 1;
     MyHeadDC.wChannels = 1;
-    MyHeadDC.dwSamplePerSec = mypcminfo->SoundFreq;
-    MyHeadDC.dwAvgBytesPerSec = mypcminfo->SoundFreq * (mypcminfo->SoundBits / 8);
+    MyHeadDC.dwSamplePerSec = mypcminfo->sound_freq;
+    MyHeadDC.dwAvgBytesPerSec = mypcminfo->sound_freq * (mypcminfo->sound_bits / 8);
     MyHeadDC.wBlockAlign = 1;
-    MyHeadDC.wBits = mypcminfo->SoundBits;
+    MyHeadDC.wBits = mypcminfo->sound_bits;
 
     if (fwrite(&MyHeadDC, 1, sizeof(HeadDC), dstfile) != sizeof(HeadDC)) {
       fclose(dstfile);
@@ -734,7 +734,7 @@ void save_sound(pcminfo *mypcminfo, char *dst) {
       show_dialog(err0);
       return;
     }
-    if (mypcminfo->SoundBits == 8) {
+    if (mypcminfo->sound_bits == 8) {
       if ((byte_ptr = (byte *)malloc(length)) == NULL) {
         fclose(dstfile);
         delete_file(dst);
@@ -743,10 +743,10 @@ void save_sound(pcminfo *mypcminfo, char *dst) {
         return;
       }
       for (con = 0; con < length; con++)
-        byte_ptr[con] = mypcminfo->SoundData[con] / 0xFF + 0x80;
+        byte_ptr[con] = mypcminfo->sound_data[con] / 0xFF + 0x80;
     }
   } else {
-    paso = (float)mypcminfo->SoundFreq / (float)11025;
+    paso = (float)mypcminfo->sound_freq / (float)11025;
     pos = (float)length / paso;
     length = (int)(pos + 0.5);
     if ((byte_ptr = (byte *)malloc(length)) == NULL) {
@@ -758,14 +758,14 @@ void save_sound(pcminfo *mypcminfo, char *dst) {
     }
     pos = 0;
     for (con = 0; con < length; con++) {
-      byte_ptr[con] = mypcminfo->SoundData[(int)pos] / 0xFF + 0x80;
+      byte_ptr[con] = mypcminfo->sound_data[(int)pos] / 0xFF + 0x80;
       pos += paso;
     }
   }
 
   if (fwrite(byte_ptr, 1, length, dstfile) != length) {
     fclose(dstfile);
-    if (byte_ptr != (byte *)mypcminfo->SoundData)
+    if (byte_ptr != (byte *)mypcminfo->sound_data)
       free(byte_ptr);
     delete_file(dst);
     v_text = (char *)texts[47];
@@ -773,21 +773,21 @@ void save_sound(pcminfo *mypcminfo, char *dst) {
     return;
   }
 
-  if (byte_ptr != (byte *)mypcminfo->SoundData)
+  if (byte_ptr != (byte *)mypcminfo->sound_data)
     free(byte_ptr);
   fclose(dstfile);
 }
 
-void SaveDesktopSound(pcminfo *mypcminfo, FILE *f) {
+void save_desktop_sound(pcminfo *mypcminfo, FILE *f) {
   fwrite(mypcminfo->name, 1, 14, f);
   fwrite(mypcminfo->pathname, 1, 256, f);
-  fwrite(&mypcminfo->SoundFreq, 1, 4, f);
-  fwrite(&mypcminfo->SoundBits, 1, 4, f);
-  fwrite(&mypcminfo->SoundSize, 1, 4, f);
-  fwrite(mypcminfo->SoundData, 2, mypcminfo->SoundSize, f);
+  fwrite(&mypcminfo->sound_freq, 1, 4, f);
+  fwrite(&mypcminfo->sound_bits, 1, 4, f);
+  fwrite(&mypcminfo->sound_size, 1, 4, f);
+  fwrite(mypcminfo->sound_data, 2, mypcminfo->sound_size, f);
 }
 
-void CloseSound(char *snd_path) {
+void close_sound(char *snd_path) {
   pcminfo *mypcminfo;
   int m;
 
@@ -842,8 +842,8 @@ void open_song(void) {
       if (full[strlen(full) - 1] != '/')
         div_strcat(full, sizeof(full), "/");
       div_strcat(full, sizeof(full), input);
-      DIV_STRCPY(SongName, input);
-      DIV_STRCPY(SongPathName, full);
+      DIV_STRCPY(song_name, input);
+      DIV_STRCPY(song_path_name, full);
 
       if (!v_exists) {
         v_text = (char *)texts[43];
@@ -858,15 +858,15 @@ void open_song(void) {
       }
       mymodinfo = (modinfo *)modinfo_aux;
 
-      memcpy(mymodinfo->name, SongName, 14);
-      memcpy(mymodinfo->pathname, SongPathName, 256);
+      memcpy(mymodinfo->name, song_name, 14);
+      memcpy(mymodinfo->pathname, song_path_name, 256);
 
       new_window(MOD0);
     }
   }
 }
 
-void OpenDesktopSong(void) {
+void open_desktop_song(void) {
   modinfo *mymodinfo;
 
   if ((modinfo_aux = (byte *)malloc(sizeof(modinfo))) == NULL) {
@@ -876,8 +876,8 @@ void OpenDesktopSong(void) {
   }
   mymodinfo = (modinfo *)modinfo_aux;
 
-  memcpy(mymodinfo->name, SongName, 14);
-  memcpy(mymodinfo->pathname, SongPathName, 256);
+  memcpy(mymodinfo->name, song_name, 14);
+  memcpy(mymodinfo->pathname, song_path_name, 256);
 
   create_saved_window(MOD0, window_aux.x, window_aux.y);
 }
@@ -904,8 +904,8 @@ void sound_play_song(char *pathname) {
 #ifdef MIXER
   Mix_Music *music;
   modinfo *mymodinfo = (modinfo *)v.aux;
-  SongCode++;
-  mymodinfo->SongCode = SongCode;
+  song_code++;
+  mymodinfo->song_code = song_code;
   last_mod_clean = 0;
 
   printf("loadsong [%s]\n", pathname);
@@ -946,17 +946,17 @@ int window_width, window_height;
 int sel_1, sel_2;
 
 typedef struct _CLP {
-  int SoundFreq;
-  int SoundSize;
-  short *SoundData;
+  int sound_freq;
+  int sound_size;
+  short *sound_data;
 } CLP;
 
 typedef struct _SND {
   char name[14];
-  int SoundFreq;
-  int SoundBits;
-  int SoundSize;
-  short *SoundData;
+  int sound_freq;
+  int sound_bits;
+  int sound_size;
+  short *sound_data;
 } SND;
 
 SND DesktopSND[100];
@@ -986,10 +986,10 @@ void EditSound0(void) {
 
   for (NumSND = 0; NumSND < 100; NumSND++) {
     DesktopSND[NumSND].name[0] = 0;
-    DesktopSND[NumSND].SoundFreq = 0;
-    DesktopSND[NumSND].SoundBits = 0;
-    DesktopSND[NumSND].SoundSize = 0;
-    DesktopSND[NumSND].SoundData = NULL;
+    DesktopSND[NumSND].sound_freq = 0;
+    DesktopSND[NumSND].sound_bits = 0;
+    DesktopSND[NumSND].sound_size = 0;
+    DesktopSND[NumSND].sound_data = NULL;
   }
   NumSND = 0;
 
@@ -1058,9 +1058,9 @@ void EditSound1(void) {
   wrectangle(v.ptr, w, h, c0, 3, 11, 71, 30);
   wrectangle(v.ptr, w, h, c0, 3, 21, 71, 11);
   wwrite(v.ptr, w, h, 39, 13, 1, (byte *)mypcminfo->name, c3);
-  itoa(mypcminfo->SoundFreq, cwork, 10);
+  itoa(mypcminfo->sound_freq, cwork, 10);
   wwrite(v.ptr, w, h, 39, 23, 1, (byte *)cwork, c3);
-  div_snprintf(cwork, sizeof(cwork), "%02d bit", mypcminfo->SoundBits);
+  div_snprintf(cwork, sizeof(cwork), "%02d bit", mypcminfo->sound_bits);
   wwrite(v.ptr, w, h, 39, 33, 1, (byte *)cwork, c3);
 
   // Opciones de conversion
@@ -1095,8 +1095,8 @@ void EditSound1(void) {
   Alto = window_height;
   ptr += (4 + ((12 + PosY) * v.w)) * big2 + (Alto / 2) * v.w;
 #ifdef MIXER
-  buffer = (short *)mypcminfo->SI->abuf;
-  length = mypcminfo->SI->alen / 2;
+  buffer = (short *)mypcminfo->si->abuf;
+  length = mypcminfo->si->alen / 2;
 #endif
   if (length > 1) {
     if (length < 3 * Ancho) {
@@ -1150,7 +1150,7 @@ void EditSound2(void) {
   _process_items();
 
   if (v.active_item != -1) {
-    ModifySound(v.active_item);
+    modify_sound(v.active_item);
     need_refresh = 1;
   }
 
@@ -1298,23 +1298,23 @@ void RecSound2(void) {
 
 void RecSound3(void) {
   if (v_accept) {
-    RecordSound();
+    record_sound();
   }
 }
 
-void ModifySound(int option) {
-  printf("TODO - divpcm.cpp ModifySound\n");
+void modify_sound(int option) {
+  printf("TODO - divpcm.cpp modify_sound\n");
 #ifdef MIXER
   SDL_RWops *rw;
   pcminfo *mypcminfo = (pcminfo *)pcminfo_aux;
   pcminfo pcminfo_bak;
-  Mix_Chunk *SI = NULL;
+  Mix_Chunk *si = NULL;
   byte *FileBuffer;
   float inicio, final, tam_rel, fade;
   int pos, value, n;
   int ini, fin;
-  short *buffer = (short *)mypcminfo->SI->abuf;
-  short *short_ptr = Clipboard.SoundData;
+  short *buffer = (short *)mypcminfo->si->abuf;
+  short *short_ptr = Clipboard.sound_data;
   int length;
   float paso, pos_f;
 
@@ -1323,123 +1323,123 @@ void ModifySound(int option) {
   else
     inicio = sel_2, final = sel_1 + 1;
 
-  tam_rel = (float)mypcminfo->SoundSize / (float)window_width;
+  tam_rel = (float)mypcminfo->sound_size / (float)window_width;
 
   ini = (float)inicio * tam_rel;
   fin = (float) final * tam_rel;
   if (final == window_width)
-    fin = mypcminfo->SoundSize;
+    fin = mypcminfo->sound_size;
 
   Mix_HaltChannel(-1);
 
   switch (option) {
   case 5: // Copy
-    if (Clipboard.SoundData != NULL) {
-      free(Clipboard.SoundData);
-      Clipboard.SoundData = NULL;
+    if (Clipboard.sound_data != NULL) {
+      free(Clipboard.sound_data);
+      Clipboard.sound_data = NULL;
     }
-    if (mypcminfo->SoundData == NULL)
+    if (mypcminfo->sound_data == NULL)
       return;
-    Clipboard.SoundFreq = mypcminfo->SoundFreq;
-    Clipboard.SoundSize = fin - ini;
-    if (Clipboard.SoundSize <= 0)
+    Clipboard.sound_freq = mypcminfo->sound_freq;
+    Clipboard.sound_size = fin - ini;
+    if (Clipboard.sound_size <= 0)
       return;
-    Clipboard.SoundData = (short *)malloc(Clipboard.SoundSize * 2);
-    if (Clipboard.SoundData == NULL) {
+    Clipboard.sound_data = (short *)malloc(Clipboard.sound_size * 2);
+    if (Clipboard.sound_data == NULL) {
       v_text = (char *)texts[45];
       show_dialog(err0);
       return;
     }
-    memcpy(Clipboard.SoundData, buffer + ini, Clipboard.SoundSize * 2);
+    memcpy(Clipboard.sound_data, buffer + ini, Clipboard.sound_size * 2);
     return;
   case 6: // Cut
-    if (Clipboard.SoundData != NULL) {
-      free(Clipboard.SoundData);
-      Clipboard.SoundData = NULL;
+    if (Clipboard.sound_data != NULL) {
+      free(Clipboard.sound_data);
+      Clipboard.sound_data = NULL;
     }
-    if (mypcminfo->SoundData == NULL)
+    if (mypcminfo->sound_data == NULL)
       return;
-    Clipboard.SoundFreq = mypcminfo->SoundFreq;
-    Clipboard.SoundSize = fin - ini;
-    if (Clipboard.SoundSize <= 0)
+    Clipboard.sound_freq = mypcminfo->sound_freq;
+    Clipboard.sound_size = fin - ini;
+    if (Clipboard.sound_size <= 0)
       return;
-    Clipboard.SoundData = (short *)malloc(Clipboard.SoundSize * 2);
-    if (Clipboard.SoundData == NULL) {
+    Clipboard.sound_data = (short *)malloc(Clipboard.sound_size * 2);
+    if (Clipboard.sound_data == NULL) {
       v_text = (char *)texts[45];
       show_dialog(err0);
       return;
     }
-    memcpy(Clipboard.SoundData, buffer + ini, Clipboard.SoundSize * 2);
-    if (mypcminfo->SoundSize - Clipboard.SoundSize <= 0) {
-      if (mypcminfo->SoundData) {
-        mypcminfo->SoundData = NULL;
-        mypcminfo->SoundSize = 0;
+    memcpy(Clipboard.sound_data, buffer + ini, Clipboard.sound_size * 2);
+    if (mypcminfo->sound_size - Clipboard.sound_size <= 0) {
+      if (mypcminfo->sound_data) {
+        mypcminfo->sound_data = NULL;
+        mypcminfo->sound_size = 0;
       }
     } else {
-      if ((pcminfo_bak.SoundData =
-               (short *)malloc((mypcminfo->SoundSize - Clipboard.SoundSize) * 2)) == NULL) {
-        free(Clipboard.SoundData);
-        Clipboard.SoundData = NULL;
+      if ((pcminfo_bak.sound_data =
+               (short *)malloc((mypcminfo->sound_size - Clipboard.sound_size) * 2)) == NULL) {
+        free(Clipboard.sound_data);
+        Clipboard.sound_data = NULL;
         v_text = (char *)texts[45];
         show_dialog(err0);
         return;
       }
-      pcminfo_bak.SoundBits = mypcminfo->SoundBits;
-      pcminfo_bak.SoundFreq = mypcminfo->SoundFreq;
-      pcminfo_bak.SoundSize = mypcminfo->SoundSize - Clipboard.SoundSize;
+      pcminfo_bak.sound_bits = mypcminfo->sound_bits;
+      pcminfo_bak.sound_freq = mypcminfo->sound_freq;
+      pcminfo_bak.sound_size = mypcminfo->sound_size - Clipboard.sound_size;
 
-      memcpy(pcminfo_bak.SoundData, buffer, ini * 2);
-      memcpy(pcminfo_bak.SoundData + ini, buffer + fin, (mypcminfo->SoundSize - fin) * 2);
+      memcpy(pcminfo_bak.sound_data, buffer, ini * 2);
+      memcpy(pcminfo_bak.sound_data + ini, buffer + fin, (mypcminfo->sound_size - fin) * 2);
 
-      if ((FileBuffer = SaveSoundMem(&pcminfo_bak)) == NULL) {
-        free(pcminfo_bak.SoundData);
-        free(Clipboard.SoundData);
-        Clipboard.SoundData = NULL;
+      if ((FileBuffer = save_sound_mem(&pcminfo_bak)) == NULL) {
+        free(pcminfo_bak.sound_data);
+        free(Clipboard.sound_data);
+        Clipboard.sound_data = NULL;
         v_text = (char *)texts[45];
         show_dialog(err0);
         return;
       }
-      SI = Mix_QuickLoad_RAW(FileBuffer, FilePos);
-      pcminfo_bak.SI = SI;
+      si = Mix_QuickLoad_RAW(FileBuffer, FilePos);
+      pcminfo_bak.si = si;
 
-      if (SI == NULL) {
+      if (si == NULL) {
         if (FileBuffer)
           free(FileBuffer);
-        free(pcminfo_bak.SoundData);
-        free(Clipboard.SoundData);
-        Clipboard.SoundData = NULL;
+        free(pcminfo_bak.sound_data);
+        free(Clipboard.sound_data);
+        Clipboard.sound_data = NULL;
         v_text = (char *)texts[45];
         show_dialog(err0);
         return;
       }
 
-      if (mypcminfo->SoundData) {
-        mypcminfo->SoundData = NULL;
-        mypcminfo->SoundSize = 0;
+      if (mypcminfo->sound_data) {
+        mypcminfo->sound_data = NULL;
+        mypcminfo->sound_size = 0;
       }
 
-      mypcminfo->SoundSize = SI->alen / 2;
+      mypcminfo->sound_size = si->alen / 2;
 
-      mypcminfo->SoundData = (short *)malloc(SI->alen);
+      mypcminfo->sound_data = (short *)malloc(si->alen);
 
-      if (mypcminfo->SoundData != NULL)
-        memcpy(mypcminfo->SoundData, SI->abuf, SI->alen);
+      if (mypcminfo->sound_data != NULL)
+        memcpy(mypcminfo->sound_data, si->abuf, si->alen);
 
       mypcminfo->sample = NULL;
-      mypcminfo->SI = SI;
+      mypcminfo->si = si;
 
       free(FileBuffer);
-      free(pcminfo_bak.SoundData);
+      free(pcminfo_bak.sound_data);
     }
     return;
   case 7: // Paste
-    if (Clipboard.SoundData == NULL)
+    if (Clipboard.sound_data == NULL)
       return;
-    if (Clipboard.SoundSize <= 0)
+    if (Clipboard.sound_size <= 0)
       return;
-    length = Clipboard.SoundSize;
-    if (Clipboard.SoundFreq != mypcminfo->SoundFreq) {
-      paso = (float)Clipboard.SoundFreq / (float)mypcminfo->SoundFreq;
+    length = Clipboard.sound_size;
+    if (Clipboard.sound_freq != mypcminfo->sound_freq) {
+      paso = (float)Clipboard.sound_freq / (float)mypcminfo->sound_freq;
       pos_f = (float)length / paso;
       length = (int)(pos_f + 0.5);
       pos_f = 0;
@@ -1449,37 +1449,37 @@ void ModifySound(int option) {
         return;
       }
       for (pos = 0; pos < length; pos++) {
-        short_ptr[pos] = Clipboard.SoundData[(int)pos_f];
+        short_ptr[pos] = Clipboard.sound_data[(int)pos_f];
         pos_f += paso;
       }
     }
 
-    if ((pcminfo_bak.SoundData = (short *)malloc((mypcminfo->SoundSize + length) * 2)) == NULL) {
+    if ((pcminfo_bak.sound_data = (short *)malloc((mypcminfo->sound_size + length) * 2)) == NULL) {
       v_text = (char *)texts[45];
       show_dialog(err0);
       return;
     }
-    pcminfo_bak.SoundBits = mypcminfo->SoundBits;
-    pcminfo_bak.SoundFreq = mypcminfo->SoundFreq;
-    pcminfo_bak.SoundSize = mypcminfo->SoundSize + length;
+    pcminfo_bak.sound_bits = mypcminfo->sound_bits;
+    pcminfo_bak.sound_freq = mypcminfo->sound_freq;
+    pcminfo_bak.sound_size = mypcminfo->sound_size + length;
 
-    memcpy(pcminfo_bak.SoundData, buffer, ini * 2);
-    memcpy(pcminfo_bak.SoundData + ini, short_ptr, length * 2);
-    memcpy(pcminfo_bak.SoundData + ini + length, buffer + ini, (mypcminfo->SoundSize - ini) * 2);
-    if (Clipboard.SoundFreq != mypcminfo->SoundFreq)
+    memcpy(pcminfo_bak.sound_data, buffer, ini * 2);
+    memcpy(pcminfo_bak.sound_data + ini, short_ptr, length * 2);
+    memcpy(pcminfo_bak.sound_data + ini + length, buffer + ini, (mypcminfo->sound_size - ini) * 2);
+    if (Clipboard.sound_freq != mypcminfo->sound_freq)
       free(short_ptr);
 
-    if ((FileBuffer = SaveSoundMem(&pcminfo_bak)) == NULL) {
-      free(pcminfo_bak.SoundData);
+    if ((FileBuffer = save_sound_mem(&pcminfo_bak)) == NULL) {
+      free(pcminfo_bak.sound_data);
       v_text = (char *)texts[45];
       show_dialog(err0);
       return;
     }
-    free(pcminfo_bak.SoundData);
-    SI = Mix_QuickLoad_RAW(FileBuffer, FilePos);
-    pcminfo_bak.SI = SI;
+    free(pcminfo_bak.sound_data);
+    si = Mix_QuickLoad_RAW(FileBuffer, FilePos);
+    pcminfo_bak.si = si;
 
-    if (SI == NULL) {
+    if (si == NULL) {
       if (FileBuffer)
         free(FileBuffer);
       v_text = (char *)texts[45];
@@ -1487,46 +1487,46 @@ void ModifySound(int option) {
       return;
     }
 
-    if (mypcminfo->SoundData) {
-      mypcminfo->SoundData = NULL;
-      mypcminfo->SoundSize = 0;
+    if (mypcminfo->sound_data) {
+      mypcminfo->sound_data = NULL;
+      mypcminfo->sound_size = 0;
     }
 
-    mypcminfo->SoundSize = SI->alen / 2;
+    mypcminfo->sound_size = si->alen / 2;
 
-    mypcminfo->SoundData = (short *)malloc(SI->alen);
-    if (mypcminfo->SoundData != NULL)
-      memcpy(mypcminfo->SoundData, SI->abuf, SI->alen);
+    mypcminfo->sound_data = (short *)malloc(si->alen);
+    if (mypcminfo->sound_data != NULL)
+      memcpy(mypcminfo->sound_data, si->abuf, si->alen);
 
     mypcminfo->sample = NULL;
-    mypcminfo->SI = SI;
+    mypcminfo->si = si;
 
     free(FileBuffer);
     return;
   case 8: // Play
-    if (mypcminfo->SoundData == NULL)
+    if (mypcminfo->sound_data == NULL)
       return;
 
-    Mix_PlayChannel(-1, mypcminfo->SI, 0);
+    Mix_PlayChannel(-1, mypcminfo->si, 0);
 
     return;
   case 9: // Pega el sounds en el escritorio
-    CopyNewSound(mypcminfo, ini, fin);
+    copy_new_sound(mypcminfo, ini, fin);
     return;
   case 10: // Convertir a 8 bit
-    mypcminfo->SoundBits = 8;
+    mypcminfo->sound_bits = 8;
     return;
   case 11: // Convertir a 16 bit
-    mypcminfo->SoundBits = 16;
+    mypcminfo->sound_bits = 16;
     return;
   case 12: // Convertir a 11025 Hz
-    ChangeSoundFreq(11025);
+    change_sound_freq(11025);
     return;
   case 13: // Convertir a 22050 Hz
-    ChangeSoundFreq(22050);
+    change_sound_freq(22050);
     return;
   case 14: // Convertir a 44100 Hz
-    ChangeSoundFreq(44100);
+    change_sound_freq(44100);
     return;
   }
 
@@ -1584,20 +1584,20 @@ void ModifySound(int option) {
 #endif
 }
 
-void ChangeSoundFreq(int freq) {
+void change_sound_freq(int freq) {
   pcminfo *mypcminfo = (pcminfo *)pcminfo_aux;
   pcminfo pcminfo_bak;
   byte *FileBuffer;
   short *short_ptr;
   float paso, pos_f;
-  int length = mypcminfo->SoundSize;
+  int length = mypcminfo->sound_size;
   int pos;
 
-  if (mypcminfo->SoundData == NULL || mypcminfo->SoundFreq == freq)
+  if (mypcminfo->sound_data == NULL || mypcminfo->sound_freq == freq)
     return;
 
   // Resample from current frequency to target frequency (nearest-neighbor)
-  paso = (float)mypcminfo->SoundFreq / (float)freq;
+  paso = (float)mypcminfo->sound_freq / (float)freq;
   pos_f = (float)length / paso;
   length = (int)(pos_f + 0.5);
   pos_f = 0;
@@ -1607,16 +1607,16 @@ void ChangeSoundFreq(int freq) {
     return;
   }
   for (pos = 0; pos < length; pos++) {
-    short_ptr[pos] = mypcminfo->SoundData[(int)pos_f];
+    short_ptr[pos] = mypcminfo->sound_data[(int)pos_f];
     pos_f += paso;
   }
 
   // Build a WAV file in memory from the resampled data
-  pcminfo_bak.SoundFreq = freq;
-  pcminfo_bak.SoundSize = length;
-  pcminfo_bak.SoundData = short_ptr;
+  pcminfo_bak.sound_freq = freq;
+  pcminfo_bak.sound_size = length;
+  pcminfo_bak.sound_data = short_ptr;
 
-  if ((FileBuffer = SaveSoundMem(&pcminfo_bak)) == NULL) {
+  if ((FileBuffer = save_sound_mem(&pcminfo_bak)) == NULL) {
     free(short_ptr);
     v_text = (char *)texts[45];
     show_dialog(err0);
@@ -1627,9 +1627,9 @@ void ChangeSoundFreq(int freq) {
   {
     int wavSize = length * 2 + 44;
     SDL_RWops *rw = SDL_RWFromMem(FileBuffer, wavSize);
-    Mix_Chunk *newSI = Mix_LoadWAV_RW(rw, 1);
+    Mix_Chunk *new_si = Mix_LoadWAV_RW(rw, 1);
 
-    if (newSI == NULL) {
+    if (new_si == NULL) {
       free(FileBuffer);
       free(short_ptr);
       v_text = (char *)texts[45];
@@ -1638,20 +1638,20 @@ void ChangeSoundFreq(int freq) {
     }
 
     // Free old sound data
-    if (mypcminfo->SoundData) {
-      Mix_FreeChunk(mypcminfo->SI);
-      mypcminfo->SI = NULL;
-      mypcminfo->SoundData = NULL;
-      mypcminfo->SoundSize = 0;
+    if (mypcminfo->sound_data) {
+      Mix_FreeChunk(mypcminfo->si);
+      mypcminfo->si = NULL;
+      mypcminfo->sound_data = NULL;
+      mypcminfo->sound_size = 0;
     }
 
     // Store new resampled sound
-    mypcminfo->SoundFreq = freq;
-    mypcminfo->SoundSize = newSI->alen / 2;
-    mypcminfo->SoundData = (short *)malloc(newSI->alen);
-    if (mypcminfo->SoundData != NULL)
-      memcpy(mypcminfo->SoundData, newSI->abuf, newSI->alen);
-    mypcminfo->SI = newSI;
+    mypcminfo->sound_freq = freq;
+    mypcminfo->sound_size = new_si->alen / 2;
+    mypcminfo->sound_data = (short *)malloc(new_si->alen);
+    if (mypcminfo->sound_data != NULL)
+      memcpy(mypcminfo->sound_data, new_si->abuf, new_si->alen);
+    mypcminfo->si = new_si;
   }
 #endif
 
@@ -1660,8 +1660,8 @@ void ChangeSoundFreq(int freq) {
 }
 
 
-void RecordSound(void) {
-  printf("TODO - divpcm.cpp RecordSound\n");
+void record_sound(void) {
+  printf("TODO - divpcm.cpp record_sound\n");
 
   HeadDC MyHeadDC;
   FILE *f;
@@ -1747,11 +1747,11 @@ void RecordSound(void) {
     mix_set_input(MIX_IN_CD | MIX_NO_FILT);
   }
 
-  PollRecord();
+  poll_record();
 }
 
-void PollRecord(void) {
-  printf("TODO - divpcm.cpp PollRecord\n");
+void poll_record(void) {
+  printf("TODO - divpcm.cpp poll_record\n");
 
   FILE *f;
   int length;
@@ -1778,7 +1778,7 @@ void PollRecord(void) {
   fclose(f);
 }
 
-int JudasProgressRead(int handle, void *buffer, int size) {
+int judas_progress_read(int handle, void *buffer, int size) {
   int con, pasos, resto;
   byte *byte_ptr = (byte *)buffer;
 
@@ -1803,16 +1803,16 @@ int JudasProgressRead(int handle, void *buffer, int size) {
   return (1);
 }
 
-void CopyNewSound(pcminfo *mypcminfo, int ini, int fin) {
+void copy_new_sound(pcminfo *mypcminfo, int ini, int fin) {
   char aux[5];
-  short *SoundData;
-  int SoundBytes = (fin - ini) * 2;
+  short *sound_data;
+  int sound_bytes = (fin - ini) * 2;
 
   if (fin == -1)
-    fin = mypcminfo->SoundSize;
+    fin = mypcminfo->sound_size;
 
-  if (mypcminfo->SoundData == NULL || mypcminfo->SoundSize == 0 || ini > mypcminfo->SoundSize ||
-      fin > mypcminfo->SoundSize || ini >= fin)
+  if (mypcminfo->sound_data == NULL || mypcminfo->sound_size == 0 || ini > mypcminfo->sound_size ||
+      fin > mypcminfo->sound_size || ini >= fin)
     return;
 
   if (NumSND > 99) {
@@ -1821,26 +1821,26 @@ void CopyNewSound(pcminfo *mypcminfo, int ini, int fin) {
     return;
   }
 
-  if ((SoundData = (short *)malloc(SoundBytes)) == NULL) {
+  if ((sound_data = (short *)malloc(sound_bytes)) == NULL) {
     v_text = (char *)texts[45];
     show_dialog(err0);
     return;
   }
-  memcpy(SoundData, mypcminfo->SoundData + ini, SoundBytes);
+  memcpy(sound_data, mypcminfo->sound_data + ini, sound_bytes);
 
   div_strcpy(DesktopSND[NumSND].name, sizeof(DesktopSND[NumSND].name), (char *)texts[137]);
   div_strcat(DesktopSND[NumSND].name, sizeof(DesktopSND[NumSND].name), itoa((ConSND), aux, 10));
-  DesktopSND[NumSND].SoundFreq = mypcminfo->SoundFreq;
-  DesktopSND[NumSND].SoundBits = mypcminfo->SoundBits;
-  DesktopSND[NumSND].SoundSize = fin - ini;
-  DesktopSND[NumSND].SoundData = SoundData;
+  DesktopSND[NumSND].sound_freq = mypcminfo->sound_freq;
+  DesktopSND[NumSND].sound_bits = mypcminfo->sound_bits;
+  DesktopSND[NumSND].sound_size = fin - ini;
+  DesktopSND[NumSND].sound_data = sound_data;
   ConSND++;
   if (ConSND > 99)
     ConSND = 0;
   NumSND++;
 }
 
-void PasteNewSounds(void) {
+void paste_new_sounds(void) {
   pcminfo *mypcminfo;
   byte *FileBuffer;
   int con;
@@ -1854,12 +1854,12 @@ void PasteNewSounds(void) {
     memset(pcminfo_aux, 0, sizeof(pcminfo));
     mypcminfo = (pcminfo *)pcminfo_aux;
 
-    mypcminfo->SoundFreq = DesktopSND[con].SoundFreq;
-    mypcminfo->SoundSize = DesktopSND[con].SoundSize;
-    mypcminfo->SoundData = DesktopSND[con].SoundData;
+    mypcminfo->sound_freq = DesktopSND[con].sound_freq;
+    mypcminfo->sound_size = DesktopSND[con].sound_size;
+    mypcminfo->sound_data = DesktopSND[con].sound_data;
 
-    if ((FileBuffer = SaveSoundMem(mypcminfo)) == NULL) {
-      free(DesktopSND[con].SoundData);
+    if ((FileBuffer = save_sound_mem(mypcminfo)) == NULL) {
+      free(DesktopSND[con].sound_data);
       free(pcminfo_aux);
       v_text = (char *)texts[46];
       show_dialog(err0);
@@ -1868,13 +1868,13 @@ void PasteNewSounds(void) {
 
 #ifdef MIXER
     {
-      int wavSize = mypcminfo->SoundSize * 2 + 44;
+      int wavSize = mypcminfo->sound_size * 2 + 44;
       SDL_RWops *rw = SDL_RWFromMem(FileBuffer, wavSize);
-      Mix_Chunk *newSI = Mix_LoadWAV_RW(rw, 1);
+      Mix_Chunk *new_si = Mix_LoadWAV_RW(rw, 1);
 
-      if (newSI == NULL) {
+      if (new_si == NULL) {
         free(FileBuffer);
-        free(DesktopSND[con].SoundData);
+        free(DesktopSND[con].sound_data);
         free(pcminfo_aux);
         v_text = (char *)texts[46];
         show_dialog(err0);
@@ -1883,30 +1883,30 @@ void PasteNewSounds(void) {
 
       memcpy(mypcminfo->name, DesktopSND[con].name, 14);
       mypcminfo->pathname[0] = 0;
-      mypcminfo->SoundBits = DesktopSND[con].SoundBits;
-      mypcminfo->SoundSize = newSI->alen / 2;
-      mypcminfo->SoundData = (short *)malloc(newSI->alen);
-      if (mypcminfo->SoundData != NULL)
-        memcpy(mypcminfo->SoundData, newSI->abuf, newSI->alen);
-      mypcminfo->SI = newSI;
+      mypcminfo->sound_bits = DesktopSND[con].sound_bits;
+      mypcminfo->sound_size = new_si->alen / 2;
+      mypcminfo->sound_data = (short *)malloc(new_si->alen);
+      if (mypcminfo->sound_data != NULL)
+        memcpy(mypcminfo->sound_data, new_si->abuf, new_si->alen);
+      mypcminfo->si = new_si;
     }
 #endif
 
     free(FileBuffer);
-    free(DesktopSND[con].SoundData);
+    free(DesktopSND[con].sound_data);
 
     new_window(PCM0);
   }
 }
 
-byte *SaveSoundMem(pcminfo *mypcminfo) {
+byte *save_sound_mem(pcminfo *mypcminfo) {
   HeadDC MyHeadDC;
-  byte *byte_ptr = (byte *)mypcminfo->SoundData;
+  byte *byte_ptr = (byte *)mypcminfo->sound_data;
   byte *FileBuffer;
   int length;
 
   FilePos = 0;
-  length = mypcminfo->SoundSize * 2;
+  length = mypcminfo->sound_size * 2;
 
   if ((FileBuffer = (byte *)malloc(length + 44)) == NULL) {
     v_text = (char *)texts[45];
@@ -1948,8 +1948,8 @@ byte *SaveSoundMem(pcminfo *mypcminfo) {
   MyHeadDC.dwUnknow = 16;
   MyHeadDC.wFormatTag = 1;
   MyHeadDC.wChannels = 2;
-  MyHeadDC.dwSamplePerSec = mypcminfo->SoundFreq;
-  MyHeadDC.dwAvgBytesPerSec = mypcminfo->SoundFreq * (mypcminfo->SoundBits / 8);
+  MyHeadDC.dwSamplePerSec = mypcminfo->sound_freq;
+  MyHeadDC.dwAvgBytesPerSec = mypcminfo->sound_freq * (mypcminfo->sound_bits / 8);
   MyHeadDC.wBlockAlign = 1;
   MyHeadDC.wBits = 16;
 
@@ -1973,7 +1973,7 @@ byte *SaveSoundMem(pcminfo *mypcminfo) {
   return (FileBuffer);
 }
 
-int IsWAV(char *FileName) {
+int is_wav(char *FileName) {
   FILE *f;
   int ok = 1;
 
@@ -2003,12 +2003,12 @@ int IsWAV(char *FileName) {
   return (ok);
 }
 
-int NewSample(pcminfo *mypcminfo) {
-  mypcminfo->SoundData = (short *)malloc(mypcminfo->SoundSize * 2);
-  if (mypcminfo->SoundData == NULL)
+int new_sample(pcminfo *mypcminfo) {
+  mypcminfo->sound_data = (short *)malloc(mypcminfo->sound_size * 2);
+  if (mypcminfo->sound_data == NULL)
     return (0);
   mypcminfo->sample = NULL;
-  mypcminfo->SI = NULL;
+  mypcminfo->si = NULL;
   return (1);
 }
 

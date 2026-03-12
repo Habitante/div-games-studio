@@ -79,7 +79,7 @@ void about0(void);
 void map_save(void);
 
 void save_sound(pcminfo *mypcminfo, char *dst);
-void PasteNewSounds(void);
+void paste_new_sounds(void);
 
 void merge_palettes(void);
 int fmt_load_dac_map(char *name);
@@ -1559,7 +1559,7 @@ no_tiene_nombre_sonido:
         move(0, n);
         call((void_return_type_t)v.paint_handler);
         v.redraw = 1;
-        PasteNewSounds();
+        paste_new_sounds();
       }
       break;
 

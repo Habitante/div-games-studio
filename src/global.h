@@ -968,12 +968,12 @@ void paint_listbox(struct t_listbox *l);
 typedef struct _pcminfo {
   char name[255];
   char pathname[256];
-  int SoundFreq;
-  int SoundBits;
-  int SoundSize;
-  short *SoundData;
+  int sound_freq;
+  int sound_bits;
+  int sound_size;
+  short *sound_data;
 #ifdef MIXER
-  Mix_Chunk *SI;
+  Mix_Chunk *si;
 #endif
   //        SAMPLE *sample;
   char *sample;
@@ -982,7 +982,7 @@ typedef struct _pcminfo {
 typedef struct _modinfo {
   char name[255];
   char pathname[256];
-  int SongCode;
+  int song_code;
 #ifdef MIXER
   Mix_Music *music;
 #endif
@@ -995,10 +995,10 @@ void PCM2(void);
 void EditSound0(void);
 void EditSound1(void);
 void EditSound2(void);
-extern char SoundName[255];
-extern char SoundPathName[256];
-extern char SongName[255];
-extern char SongPathName[256];
+extern char sound_name[255];
+extern char sound_path_name[256];
+extern char song_name[255];
+extern char song_path_name[256];
 extern byte *pcminfo_aux;
 extern byte *modinfo_aux;
 
