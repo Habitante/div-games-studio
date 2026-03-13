@@ -47,6 +47,7 @@ void set_mouse(word x, word y) {
 void read_mouse(void) {
   int n = 0;
   int s, shift = 0;
+  static int mouse_captured = 0;
 
   prev_mouse_buttons = mouse_b;
   if (vwidth == 0 && vheight == 0) {
@@ -58,10 +59,35 @@ void read_mouse(void) {
   if (draw_mode < 100 && hotkey && !help_paint_active)
     poll_keyboard();
 
+  // In paint mode, capture the mouse so SDL keeps sending motion events
+  // even when the cursor leaves the window. This lets move_zoom() scroll
+  // the canvas when the user pushes the mouse past the window edge —
+  // the modern equivalent of the DOS behavior where the mouse had no
+  // window boundary. Capture is released when leaving paint mode.
+  {
+    int want_capture = (draw_mode < 100 && hotkey && !help_paint_active);
+    if (want_capture != mouse_captured) {
+      SDL_CaptureMouse(want_capture ? SDL_TRUE : SDL_FALSE);
+      mouse_captured = want_capture;
+    }
+  }
+
   // When mouse is outside the window, force out-of-bounds so no UI
   // element thinks it's being hovered (en_caja checks will all fail).
-  // Also update mouse_shift and coord so the paint cursor goes offscreen.
   if (!mouse_in_window) {
+    if (draw_mode < 100 && hotkey && !help_paint_active) {
+      // Paint mode with capture active: let out-of-bounds coordinates
+      // flow through so move_zoom() can use them for canvas scrolling.
+      // real_mouse_x/y get the raw (possibly negative / over-bounds) values;
+      // mouse_x/y are clamped to screen bounds by the clamp_mouse code below.
+      real_mouse_x = (int)m_x;
+      real_mouse_y = (int)m_y;
+      mouse_x = (int)m_x;
+      mouse_y = (int)m_y;
+      mouse_b = m_b;
+      shift = 1;
+      goto clamp_mouse;
+    }
     mouse_x = -1;
     mouse_y = -1;
     real_mouse_x = -1;
@@ -157,6 +183,7 @@ void read_mouse(void) {
     }
   }
 
+clamp_mouse:
   if (shift) {
     if (mouse_x < 0) {
       mouse_x = 0;

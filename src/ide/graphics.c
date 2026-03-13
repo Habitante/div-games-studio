@@ -263,7 +263,9 @@ void draw_edit_background(int x, int y, int w, int h) {
     wbox_in_box(screen_buffer + y * vga_width + x, vga_width, w, h, c0, zoom_win_x - 1 - x,
                 zoom_win_y - 1 - y, zoom_win_width + 2, 1);
   }
-  if (zoom_win_y + zoom_win_height < vga_height) {
+  // Only draw bottom/right borders when the bitmap genuinely fits (centered),
+  // not for the truncation remainder when the bitmap overflows the screen.
+  if (zoom_win_y + zoom_win_height < vga_height && (map_height << zoom) < vga_height) {
     wbox_in_box(screen_buffer + y * vga_width + x, vga_width, w, h, c2, zoom_win_x - 2 - x,
                 zoom_win_y + zoom_win_height + 1 - y, zoom_win_width + 4, 1);
     wbox_in_box(screen_buffer + y * vga_width + x, vga_width, w, h, c0, zoom_win_x - 1 - x,
@@ -276,7 +278,7 @@ void draw_edit_background(int x, int y, int w, int h) {
     wbox_in_box(screen_buffer + y * vga_width + x, vga_width, w, h, c0, zoom_win_x - 1 - x,
                 zoom_win_y - y, 1, zoom_win_height);
   }
-  if (zoom_win_x + zoom_win_width < vga_width) {
+  if (zoom_win_x + zoom_win_width < vga_width && (map_width << zoom) < vga_width) {
     wbox_in_box(screen_buffer + y * vga_width + x, vga_width, w, h, c2,
                 zoom_win_x + zoom_win_width + 1 - x, zoom_win_y - 1 - y, 1, zoom_win_height + 2);
     wbox_in_box(screen_buffer + y * vga_width + x, vga_width, w, h, c0,
@@ -383,14 +385,17 @@ void zoom_map(void) {
           big = 0;
           big2 = 1;
         }
-        if (zoom_win_y + zoom_win_height < vga_height) {
+        // Only draw border lines when the bitmap genuinely fits in the screen
+        // (the centered case). Don't draw them for the truncation remainder
+        // when the bitmap overflows — that strip gets filled with pixel data.
+        if (zoom_win_y + zoom_win_height < vga_height && (map_height << zoom) < vga_height) {
           wbox(screen_buffer, vga_width, vga_height, c2, zoom_win_x - 2,
                zoom_win_y + zoom_win_height + 1, zoom_win_width + 4, 1);
           wbox(screen_buffer, vga_width, vga_height, c0, zoom_win_x - 1,
                zoom_win_y + zoom_win_height, zoom_win_width + 2, 1);
           blit_partial(0, zoom_win_y + zoom_win_height, vga_width, 2);
         }
-        if (zoom_win_x + zoom_win_width < vga_width) {
+        if (zoom_win_x + zoom_win_width < vga_width && (map_width << zoom) < vga_width) {
           wbox(screen_buffer, vga_width, vga_height, c2, zoom_win_x - 2, zoom_win_y - 2,
                zoom_win_width + 4, 1);
           wbox(screen_buffer, vga_width, vga_height, c0, zoom_win_x - 1, zoom_win_y - 1,
@@ -513,6 +518,81 @@ void zoom_map(void) {
       q += vga_width * 8 - w * 8;
     } while (--m);
     break;
+  }
+
+  // Fill remainder strips when window size isn't a multiple of texel size.
+  // The main blit loop above renders w*h full texels, covering w<<zoom by
+  // h<<zoom screen pixels. If vga_width or vga_height aren't exact multiples
+  // of (1<<zoom), a thin strip at the right/bottom edge remains undrawn.
+  // We fill it with partial texels (the next source pixel, repeated to fill).
+  if (!zoom_region) {
+    int texel = 1 << zoom;
+    int drawn_w = w << zoom;
+    int drawn_h = h << zoom;
+    int rem_x = (zoom_win_x == 0 && (map_width << zoom) >= vga_width) ? vga_width - drawn_w : 0;
+    int rem_y = (zoom_win_y == 0 && (map_height << zoom) >= vga_height) ? vga_height - drawn_h : 0;
+
+    // Right edge: partial texel column
+    if (rem_x > 0) {
+      byte *rq = screen_buffer + drawn_w;
+      if (zoom_x + w < map_width) {
+        byte *rp = map + zoom_y * map_width + zoom_x + w;
+        int row;
+        for (row = 0; row < h; row++) {
+          int ty;
+          for (ty = 0; ty < texel; ty++) {
+            memset(rq, *rp, rem_x);
+            rq += vga_width;
+          }
+          rp += map_width;
+        }
+      } else {
+        int row;
+        for (row = 0; row < drawn_h; row++) {
+          memset(rq, c0, rem_x);
+          rq += vga_width;
+        }
+      }
+    }
+
+    // Bottom edge: partial texel row
+    if (rem_y > 0) {
+      byte *rq = screen_buffer + drawn_h * vga_width;
+      if (zoom_y + h < map_height) {
+        byte *rp = map + (zoom_y + h) * map_width + zoom_x;
+        int col;
+        for (col = 0; col < w; col++) {
+          byte *rq2 = rq + (col << zoom);
+          int ry;
+          for (ry = 0; ry < rem_y; ry++) {
+            memset(rq2, *rp, texel);
+            rq2 += vga_width;
+          }
+          rp++;
+        }
+      } else {
+        int ry;
+        for (ry = 0; ry < rem_y; ry++) {
+          memset(rq, c0, drawn_w);
+          rq += vga_width;
+        }
+      }
+
+      // Corner: remainder_x * remainder_y
+      if (rem_x > 0) {
+        byte *cq = screen_buffer + drawn_h * vga_width + drawn_w;
+        byte cc;
+        int ry;
+        if (zoom_x + w < map_width && zoom_y + h < map_height)
+          cc = *(map + (zoom_y + h) * map_width + zoom_x + w);
+        else
+          cc = c0;
+        for (ry = 0; ry < rem_y; ry++) {
+          memset(cq, cc, rem_x);
+          cq += vga_width;
+        }
+      }
+    }
   }
 
   if (!zoom_region)

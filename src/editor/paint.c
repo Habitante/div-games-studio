@@ -2164,6 +2164,94 @@ void zoom_map2(void) {
     } while (--m);
     break;
   }
+
+  // Fill remainder strips for partial texels (same logic as zoom_map()).
+  // zoom_map2() is the texture-preview variant (X key), so apply the
+  // ghost+texture blend to the extra edge pixels.
+  {
+    int texel = 1 << zoom;
+    int drawn_w = w << zoom;
+    int drawn_h = h << zoom;
+    int rem_x = (zoom_win_x == 0 && (map_width << zoom) >= vga_width) ? vga_width - drawn_w : 0;
+    int rem_y = (zoom_win_y == 0 && (map_height << zoom) >= vga_height) ? vga_height - drawn_h : 0;
+
+    // Right edge
+    if (rem_x > 0) {
+      byte *rq = screen_buffer + drawn_w;
+      if (zoom_x + w < map_width) {
+        byte *rp = map + zoom_y * map_width + zoom_x + w;
+        int src_x = zoom_x + w;
+        int src_y = zoom_y;
+        int row;
+        for (row = 0; row < h; row++) {
+          int ty;
+          byte pc = *(ghost + *rp * 256 +
+                      texture_color[(src_x + texture_x) % texture_w +
+                                    ((src_y + texture_y) % texture_h) * texture_w]);
+          for (ty = 0; ty < texel; ty++) {
+            memset(rq, pc, rem_x);
+            rq += vga_width;
+          }
+          rp += map_width;
+          src_y++;
+        }
+      } else {
+        int row;
+        for (row = 0; row < drawn_h; row++) {
+          memset(rq, c0, rem_x);
+          rq += vga_width;
+        }
+      }
+    }
+
+    // Bottom edge
+    if (rem_y > 0) {
+      byte *rq = screen_buffer + drawn_h * vga_width;
+      if (zoom_y + h < map_height) {
+        byte *rp = map + (zoom_y + h) * map_width + zoom_x;
+        int src_y = zoom_y + h;
+        int col;
+        for (col = 0; col < w; col++) {
+          byte *rq2 = rq + (col << zoom);
+          int src_x = zoom_x + col;
+          byte pc = *(ghost + *rp * 256 +
+                      texture_color[(src_x + texture_x) % texture_w +
+                                    ((src_y + texture_y) % texture_h) * texture_w]);
+          int ry;
+          for (ry = 0; ry < rem_y; ry++) {
+            memset(rq2, pc, texel);
+            rq2 += vga_width;
+          }
+          rp++;
+        }
+      } else {
+        int ry;
+        for (ry = 0; ry < rem_y; ry++) {
+          memset(rq, c0, drawn_w);
+          rq += vga_width;
+        }
+      }
+
+      // Corner
+      if (rem_x > 0) {
+        byte *cq = screen_buffer + drawn_h * vga_width + drawn_w;
+        byte cc = c0;
+        int ry;
+        if (zoom_x + w < map_width && zoom_y + h < map_height) {
+          int src_x = zoom_x + w;
+          int src_y = zoom_y + h;
+          byte raw = *(map + src_y * map_width + src_x);
+          cc = *(ghost + raw * 256 +
+                 texture_color[(src_x + texture_x) % texture_w +
+                               ((src_y + texture_y) % texture_h) * texture_w]);
+        }
+        for (ry = 0; ry < rem_y; ry++) {
+          memset(cq, cc, rem_x);
+          cq += vga_width;
+        }
+      }
+    }
+  }
 }
 
 
@@ -3789,22 +3877,30 @@ void select_zoom(void) {
       zoom_win_height = (vga_height >> zoom) << zoom;
     }
 
-    zoom_x = zoom_cx - (zoom_win_width / 2) / (1 << zoom);
-    if (zoom_x <= 0)
-      zoom_x = 0;
-    else if (zoom_x + zoom_win_width / (1 << zoom) > map_width) {
-      zoom_x = map_width - zoom_win_width / (1 << zoom);
-      if (zoom_x < 0)
-        zoom_x = 0;
-    }
+    // Use ceiling division for visible columns/rows to account for partial
+    // texels when window size isn't a multiple of the texel size (1<<zoom).
+    {
+      int texel = 1 << zoom;
+      int vis_w = (vga_width + texel - 1) >> zoom;
+      int vis_h = (vga_height + texel - 1) >> zoom;
 
-    zoom_y = zoom_cy - (zoom_win_height / 2) / (1 << zoom);
-    if (zoom_y < 0)
-      zoom_y = 0;
-    else if (zoom_y + zoom_win_height / (1 << zoom) > map_height) {
-      zoom_y = map_height - zoom_win_height / (1 << zoom);
+      zoom_x = zoom_cx - vis_w / 2;
+      if (zoom_x <= 0)
+        zoom_x = 0;
+      else if (zoom_x + vis_w > map_width) {
+        zoom_x = map_width - vis_w;
+        if (zoom_x < 0)
+          zoom_x = 0;
+      }
+
+      zoom_y = zoom_cy - vis_h / 2;
       if (zoom_y < 0)
         zoom_y = 0;
+      else if (zoom_y + vis_h > map_height) {
+        zoom_y = map_height - vis_h;
+        if (zoom_y < 0)
+          zoom_y = 0;
+      }
     }
 
     if (z && !mouse_shift) {
@@ -3852,8 +3948,17 @@ void move_zoom(void) {
   }
 
   if (zoom_move == c3) {
+    // Use ceiling division for visible columns/rows: accounts for partial
+    // texels when the window size isn't a multiple of the texel size (1<<zoom).
+    int texel = 1 << zoom;
+    int vis_w = (vga_width + texel - 1) >> zoom;
+    int vis_h = (vga_height + texel - 1) >> zoom;
+
     n = zoom_x;
-    if (zoom_win_x == 0 && zoom_win_width >= vga_width) {
+    // Check bitmap overflow using actual bitmap size, not truncated zoom_win_width.
+    // On DOS, screen sizes were always multiples of 8 so these were equivalent;
+    // with SDL2 free-resize they can differ, blocking scroll.
+    if (zoom_win_x == 0 && (map_width << zoom) >= vga_width) {
       if (real_mouse_x < 0) {
         zoom_x -= (-real_mouse_x) >> zoom;
         if (zoom_x < 0)
@@ -3862,14 +3967,16 @@ void move_zoom(void) {
           m |= 1;
       } else if (real_mouse_x >= vga_width) {
         zoom_x += (real_mouse_x - vga_width + 1) >> zoom;
-        if (zoom_x > map_width - vga_width / (1 << zoom))
-          zoom_x = map_width - vga_width / (1 << zoom);
+        if (zoom_x > map_width - vis_w)
+          zoom_x = map_width - vis_w;
+        if (zoom_x < 0)
+          zoom_x = 0;
         if (n != zoom_x)
           m |= 1;
       }
     }
     n = zoom_y;
-    if (zoom_win_y == 0 && zoom_win_height >= vga_height) {
+    if (zoom_win_y == 0 && (map_height << zoom) >= vga_height) {
       if (real_mouse_y < 0) {
         zoom_y -= (-real_mouse_y) >> zoom;
         if (zoom_y < 0)
@@ -3878,8 +3985,10 @@ void move_zoom(void) {
           m |= 2;
       } else if (real_mouse_y >= vga_height) {
         zoom_y += (real_mouse_y - vga_height + 1) >> zoom;
-        if (zoom_y > map_height - vga_height / (1 << zoom))
-          zoom_y = map_height - vga_height / (1 << zoom);
+        if (zoom_y > map_height - vis_h)
+          zoom_y = map_height - vis_h;
+        if (zoom_y < 0)
+          zoom_y = 0;
         if (n != zoom_y)
           m |= 2;
       }

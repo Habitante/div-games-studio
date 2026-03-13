@@ -277,22 +277,30 @@ void map_view2(void) {
       zoom_win_height = (vga_height >> zoom) << zoom;
     }
 
-    zoom_x = zoom_cx - (zoom_win_width / 2) / (1 << zoom);
-    if (zoom_x <= 0)
-      zoom_x = 0;
-    else if (zoom_x + zoom_win_width / (1 << zoom) > map_width) {
-      zoom_x = map_width - zoom_win_width / (1 << zoom);
-      if (zoom_x < 0)
-        zoom_x = 0;
-    }
+    // Use ceiling division for visible columns/rows to account for partial
+    // texels when window size isn't a multiple of the texel size (1<<zoom).
+    {
+      int texel = 1 << zoom;
+      int vis_w = (vga_width + texel - 1) >> zoom;
+      int vis_h = (vga_height + texel - 1) >> zoom;
 
-    zoom_y = zoom_cy - (zoom_win_height / 2) / (1 << zoom);
-    if (zoom_y < 0)
-      zoom_y = 0;
-    else if (zoom_y + zoom_win_height / (1 << zoom) > map_height) {
-      zoom_y = map_height - zoom_win_height / (1 << zoom);
+      zoom_x = zoom_cx - vis_w / 2;
+      if (zoom_x <= 0)
+        zoom_x = 0;
+      else if (zoom_x + vis_w > map_width) {
+        zoom_x = map_width - vis_w;
+        if (zoom_x < 0)
+          zoom_x = 0;
+      }
+
+      zoom_y = zoom_cy - vis_h / 2;
       if (zoom_y < 0)
         zoom_y = 0;
+      else if (zoom_y + vis_h > map_height) {
+        zoom_y = map_height - vis_h;
+        if (zoom_y < 0)
+          zoom_y = 0;
+      }
     }
 
     current_map_code = v.mapa->code;
