@@ -9,7 +9,7 @@ void col_analyze_ltlex(void);
 
 //-----------------------------------------------------------------------------
 
-#define MAX_OBJECTS     768 // Maximum compiler object count
+#define MAX_OBJECTS   768 // Maximum compiler object count
 #define ID_AVG_LENGTH 16  // Average identifier length (+4+4+1)
 
 #define MAX_NODES 128 // Maximum lexer symbol nodes

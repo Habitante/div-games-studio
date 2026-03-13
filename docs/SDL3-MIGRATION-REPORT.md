@@ -317,21 +317,21 @@ SDL3's `SDL_SetWindowSize()` now fires `SDL_EVENT_WINDOW_RESIZED`, which didn't 
 
 ### 4.1 SDL_CreateRGBSurface → SDL_CreateSurface
 
-**Site A — 8-bit paletted back-buffer** (osd_sdl2.c:134):
+**Site A — 8-bit paletted back-buffer** (`OSDEP_SetVideoMode()` in `osd_sdl2.c`, creates `OSDEP_buffer8`):
 ```c
 // SDL2:  SDL_CreateRGBSurface(0, width, height, 8, 0,0,0,0);
 // SDL3:  SDL_CreateSurface(width, height, SDL_PIXELFORMAT_INDEX8);
 ```
 **CRITICAL**: Must also call `SDL_CreateSurfacePalette(OSDEP_buffer8)` immediately after — SDL3 does NOT auto-create palettes on indexed surfaces. Missing this = black screen.
 
-**Site B — 32-bit blit target** (osd_sdl2.c:137):
+**Site B — 32-bit blit target** (`OSDEP_SetVideoMode()` in `osd_sdl2.c`, creates `OSDEP_buffer32`):
 ```c
 // SDL2:  SDL_CreateRGBSurface(0, width, height, 32, 0,0,0,0);
 // SDL3:  SDL_CreateSurface(width, height, SDL_PIXELFORMAT_RGBA32);
 ```
 `SDL_PIXELFORMAT_RGBA32` auto-selects correct byte order for the platform.
 
-**Site C — Surface clone** (ide/video.c:148):
+**Site C — Surface clone** (`copy_surface()` in `ide/video.c`):
 ```c
 // SDL2:  SDL_CreateRGBSurface(0, src->w, src->h, src->format->BitsPerPixel, masks...);
 // SDL3:  SDL_CreateSurface(src->w, src->h, src->format);  // format is now an enum directly
@@ -345,16 +345,16 @@ In SDL3: `surface->format` is `SDL_PixelFormat` (an enum value like `SDL_PIXELFO
 
 | SDL2 Expression | SDL3 Replacement | File |
 |----------------|-----------------|------|
-| `surface->format->palette` | `SDL_GetSurfacePalette(surface)` | osd_sdl2.c:172 |
-| `source->format->BitsPerPixel` | `SDL_GetPixelFormatDetails(source->format)->bits_per_pixel` | ide/video.c:149 |
-| `source->format->Rmask` etc. | Not needed — use `source->format` enum directly | ide/video.c:150-151 |
-| `vga->format->BitsPerPixel` | `SDL_GetPixelFormatDetails(vga->format)->bits_per_pixel` | ide/video.c:311 |
+| `surface->format->palette` | `SDL_GetSurfacePalette(surface)` | `OSDEP_SetPalette()` in `osd_sdl2.c` |
+| `source->format->BitsPerPixel` | `SDL_GetPixelFormatDetails(source->format)->bits_per_pixel` | `copy_surface()` in `ide/video.c` |
+| `source->format->Rmask` etc. | Not needed — use `source->format` enum directly | `copy_surface()` in `ide/video.c` |
+| `vga->format->BitsPerPixel` | `SDL_GetPixelFormatDetails(vga->format)->bits_per_pixel` | (search for `vga->format` usage) |
 
 `surface->pixels`, `->pitch`, `->w`, `->h` — **unchanged**, still directly accessible.
 
 ### 4.3 Palette management
 
-Current (osd_sdl2.c:172):
+Current (`OSDEP_SetPalette()` in `osd_sdl2.c`):
 ```c
 SDL_SetPaletteColors(surface->format->palette, colors, 0, 256);
 ```

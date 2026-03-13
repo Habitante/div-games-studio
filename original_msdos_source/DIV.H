@@ -46,27 +46,27 @@ typedef struct _process{
 }process;
 
 typedef struct __mouse{
-        int     x;      // Coordenada X del rat¢n
-        int     y;      // Coordenada Y del rat¢n
-        int     z;      // Prioridad de impresi¢n del gr fico
-        int     file;   // Fichero que contiene el gr fico
-        int     graph;  // Gr fico asignado al rat¢n
+        int     x;      // Coordenada X del ratï¿½n
+        int     y;      // Coordenada Y del ratï¿½n
+        int     z;      // Prioridad de impresiï¿½n del grï¿½fico
+        int     file;   // Fichero que contiene el grï¿½fico
+        int     graph;  // Grï¿½fico asignado al ratï¿½n
         int     angle;  // Angulo del puntero
-        int     size;   // Tama¤o en porcentaje
-        int     flags;  // Flags del rat¢n
+        int     size;   // Tamaï¿½o en porcentaje
+        int     flags;  // Flags del ratï¿½n
         int     region; // Region de corte
-        int     left;   // Bot¢n izquierdo del rat¢n
-        int     middle; // Bot¢n central del rat¢n
-        int     right;  // Bot¢n derecho del rat¢n
+        int     left;   // Botï¿½n izquierdo del ratï¿½n
+        int     middle; // Botï¿½n central del ratï¿½n
+        int     right;  // Botï¿½n derecho del ratï¿½n
 }_mouse;
 
 typedef struct __scroll{
-        int     z;              // Prioridad de impresi¢n
+        int     z;              // Prioridad de impresiï¿½n
         int     camera;         // Id del proceso al que sigue el scroll (p.def 0-n/a)
         int     ratio;          // Background speed ratio (p.def 200, la mitad del primero)
-        int     speed;          // Velocidad m xima del scroll (primer plano) (p.def 0-Sin l¡mite)
+        int     speed;          // Velocidad mï¿½xima del scroll (primer plano) (p.def 0-Sin lï¿½mite)
         int     region1;        // Region de bloqueo del scroll (p.def -1)
-        int     region2;        // Region exterior del scroll (sin velocidad m xima, p.def -1)
+        int     region2;        // Region exterior del scroll (sin velocidad mï¿½xima, p.def -1)
         int     x0;             // Coordenadas del primer plano de scroll
         int     y0;             // (esquina superior izquierda de la ventana)
         int     x1;             // Coordenadas del segundo plano
@@ -74,12 +74,12 @@ typedef struct __scroll{
 }_scroll;
 
 typedef struct __m7{
-        int     z;              // Prioridad de impresi¢n
-        int     camera;         // Id del proceso al que sigue la c mara
-        int     height;         // Altura de la c mara
-        int     distance;       // Distancia de la c mara al proceso seguido
+        int     z;              // Prioridad de impresiï¿½n
+        int     camera;         // Id del proceso al que sigue la cï¿½mara
+        int     height;         // Altura de la cï¿½mara
+        int     distance;       // Distancia de la cï¿½mara al proceso seguido
         int     horizon;        // Altura del horizonte
-        int     focus;          // Focal para la c mara (0..512)
+        int     focus;          // Focal para la cï¿½mara (0..512)
         int     color;          // Color para el exterior del modo-7
 }_m7;
 
@@ -89,7 +89,7 @@ typedef struct __joy{
         int     button3;
         int     button4;
         int     left;           // Movimientos del joystick o gamepad
-        int     right;          // Valores l¢gicos (0/1)
+        int     right;          // Valores lï¿½gicos (0/1)
         int     up;
         int     down;
 }_joy;

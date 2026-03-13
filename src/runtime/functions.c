@@ -3411,7 +3411,10 @@ void _exit_dos(void) {
   chdir(divpath);
 
 #ifdef WIN32
-  { extern void closefiles(void); closefiles(); }
+  {
+    extern void closefiles(void);
+    closefiles();
+  }
 #endif
 
   exit(stack[sp]);
@@ -3784,7 +3787,8 @@ void _strcpy(void) {
       return;
     }
   if ((unsigned)stack[sp] > 255)
-    memmove((char *)&mem[stack[sp - 1]], (char *)&mem[stack[sp]], strlen((char *)&mem[stack[sp]]) + 1);
+    memmove((char *)&mem[stack[sp - 1]], (char *)&mem[stack[sp]],
+            strlen((char *)&mem[stack[sp]]) + 1);
   else
     mem[stack[sp - 1]] = stack[sp];
   sp--;
@@ -6408,23 +6412,22 @@ char *fname[] = {
     "define_region", "xput", "put", "put_screen", "map_xput", "map_put", "put_pixel", "get_pixel",
     "map_put_pixel", "map_get_pixel", "get_point", "clear_screen", "save", "load", "set_mode",
     "load_pcm/wav", "unload_pcm/wav", "sound", "stop_sound", "change_sound", "set_fps", "start_fli",
-    "frame_fli", "end_fli", "reset_fli", "system", "refresh_scroll", "fget_dist", "fget_angle", 
-    "", "", "", // Removed CD Music functions
-    "start_mode7", "stop_mode7", "advance", "abs", "fade_on", "fade_off", "rand_seed",
-    "sqrt", "pow", "map_block_copy", "move_scroll", "near_angle", "let_me_alone", "exit",
-    "roll_palette", "get_real_point", "get_joy_button", "get_joy_position", "convert_palette",
-    "load_map/pcx", "reset_sound", "unload_map/pcx", "unload_fnt", "set_volume",
+    "frame_fli", "end_fli", "reset_fli", "system", "refresh_scroll", "fget_dist", "fget_angle", "",
+    "", "", // Removed CD Music functions
+    "start_mode7", "stop_mode7", "advance", "abs", "fade_on", "fade_off", "rand_seed", "sqrt",
+    "pow", "map_block_copy", "move_scroll", "near_angle", "let_me_alone", "exit", "roll_palette",
+    "get_real_point", "get_joy_button", "get_joy_position", "convert_palette", "load_map/pcx",
+    "reset_sound", "unload_map/pcx", "unload_fnt", "set_volume",
 
     // New functions added for DIV 2.0
 
-    "set_color", "x_advance", "char", "path_find",
-    "path_line", "path_free", "new_map", 
-    "strcpy", "strcat", "strlen", "strcmp", "strchr", "strstr", "strset", "strupr", "strlwr",
-    "strdel", "screen_copy", "sort", "load_song", "unload_song", "song", "stop_song",
-    "set_song_pos", "get_song_pos", "get_song_line", "is_playing_sound", "is_playing_song", "fopen",
-    "fclose", "fread", "fwrite", "fseek", "ftell", "filelength", "flush", "get_dirinfo",
-    "get_fileinfo", "getdrive", "setdrive", "chdir", "mkdir", "remove", "disk_free", "memory_free",
-    "ignore_error", "save_pcx", "sin", "cos", "tan", "asin", "acos", "atan", "atan2", "draw",
-    "delete_draw", "move_draw", "save_map", "write_in_map", "calculate", "itoa", "change_channel",
-    "malloc", "free", "encode", "encode_file", "decode_file", "compress_file", "uncompress_file",
+    "set_color", "x_advance", "char", "path_find", "path_line", "path_free", "new_map", "strcpy",
+    "strcat", "strlen", "strcmp", "strchr", "strstr", "strset", "strupr", "strlwr", "strdel",
+    "screen_copy", "sort", "load_song", "unload_song", "song", "stop_song", "set_song_pos",
+    "get_song_pos", "get_song_line", "is_playing_sound", "is_playing_song", "fopen", "fclose",
+    "fread", "fwrite", "fseek", "ftell", "filelength", "flush", "get_dirinfo", "get_fileinfo",
+    "getdrive", "setdrive", "chdir", "mkdir", "remove", "disk_free", "memory_free", "ignore_error",
+    "save_pcx", "sin", "cos", "tan", "asin", "acos", "atan", "atan2", "draw", "delete_draw",
+    "move_draw", "save_map", "write_in_map", "calculate", "itoa", "change_channel", "malloc",
+    "free", "encode", "encode_file", "decode_file", "compress_file", "uncompress_file",
     "find_color", "load_screen", "force_pal"};

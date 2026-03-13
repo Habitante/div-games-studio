@@ -803,16 +803,13 @@ void paint_code(void) { // Paint the source code
       if (l == line2) {
         c = *(p + col2 + 1);
         *(p + col2 + 1) = 0;
-        wwrite_in_box(ptr + 54 * big2, w, w - 59, h, x + 1, 148 - 16 - 32 + n * 8, 0, p + col1,
-                      c0);
+        wwrite_in_box(ptr + 54 * big2, w, w - 59, h, x + 1, 148 - 16 - 32 + n * 8, 0, p + col1, c0);
         wwrite_in_box(ptr + 54 * big2, w, w - 59, h, x, 148 - 16 - 32 + n * 8, 0, p + col1, c4);
         x += text_len(p + col1) + 1;
         *(p + col2 + 1) = c;
-        wwrite_in_box(ptr + 54 * big2, w, w - 59, h, x, 148 - 16 - 32 + n * 8, 0, p + col2 + 1,
-                      c3);
+        wwrite_in_box(ptr + 54 * big2, w, w - 59, h, x, 148 - 16 - 32 + n * 8, 0, p + col2 + 1, c3);
       } else {
-        wwrite_in_box(ptr + 54 * big2, w, w - 59, h, x + 1, 148 - 16 - 32 + n * 8, 0, p + col1,
-                      c0);
+        wwrite_in_box(ptr + 54 * big2, w, w - 59, h, x + 1, 148 - 16 - 32 + n * 8, 0, p + col1, c0);
         wwrite_in_box(ptr + 54 * big2, w, w - 59, h, x, 148 - 16 - 32 + n * 8, 0, p + col1, c4);
       }
     } else if (l == line2) {
@@ -823,8 +820,7 @@ void paint_code(void) { // Paint the source code
       wwrite_in_box(ptr + 54 * big2, w, w - 59, h, x, 148 - 16 - 32 + n * 8, 0, p, c4);
       x += text_len(p) + 1;
       *(p + col2 + 1) = c;
-      wwrite_in_box(ptr + 54 * big2, w, w - 59, h, x, 148 - 16 - 32 + n * 8, 0, p + col2 + 1,
-                    c3);
+      wwrite_in_box(ptr + 54 * big2, w, w - 59, h, x, 148 - 16 - 32 + n * 8, 0, p + col2 + 1, c3);
     } else if (l > line1 && l < line2) {
       wwrite_in_box(ptr + 54 * big2, w, w - 59, h, x_start - 54 + 1, 148 - 16 - 32 + n * 8, 0, p,
                     c0);

@@ -243,8 +243,8 @@ id = mem[id + _Caller];
 if (!(id & 1))
   goto next_process1;
 ip = mem[id + _IP];
-if (mem[stack[sp] + _FCount] > 0) {           // Si era una funcion, duerme al padre.
-  mem[stack[sp] + _Caller]++;                 // Caller dormido
+if (mem[stack[sp] + _FCount] > 0) {          // Si era una funcion, duerme al padre.
+  mem[stack[sp] + _Caller]++;                // Caller dormido
   bp = sp;                                   // Deja la stack aparcada en el lugar adecuado
   sp = mem[id + _Param] - mem[id + _NumPar]; // Y la prerara para retornar al anterior
   save_stack(id, sp, bp);
@@ -441,8 +441,8 @@ id = mem[id + _Caller];
 if (!(id & 1))
   goto next_process2;
 ip = mem[id + _IP];
-if (mem[stack[sp] + _FCount] > 0) {           // Si es una funcion, duerme al padre.
-  mem[stack[sp] + _Caller]++;                 // Caller dormido
+if (mem[stack[sp] + _FCount] > 0) {          // Si es una funcion, duerme al padre.
+  mem[stack[sp] + _Caller]++;                // Caller dormido
   bp = sp;                                   // Deja la stack aparcada en el lugar adecuado
   sp = mem[id + _Param] - mem[id + _NumPar]; // Y la prerara para retornar al anterior
   save_stack(id, sp, bp);
@@ -716,7 +716,8 @@ if ((unsigned)stack[sp] > 255)
   }
 #endif
 if ((unsigned)stack[sp] > 255)
-  memmove((char *)&mem[stack[sp - 1]], (char *)&mem[stack[sp]], strlen((char *)&mem[stack[sp]]) + 1);
+  memmove((char *)&mem[stack[sp - 1]], (char *)&mem[stack[sp]],
+          strlen((char *)&mem[stack[sp]]) + 1);
 else {
   ((char *)&mem[stack[sp - 1]])[0] = (char)stack[sp];
   ((char *)&mem[stack[sp - 1]])[1] = 0;
@@ -828,7 +829,7 @@ if (oo < 1028) {
       memb[nullstring[nstring] * 4] = 0;
     else
       memb[nullstring[nstring] * 4 + oo - stack[sp]] = 0;
-  } else if (stack[sp] < 0) {  // Añadir (?) caracteres (por homogeneidad)
+  } else if (stack[sp] < 0) {   // Añadir (?) caracteres (por homogeneidad)
     stack[sp] = oo - stack[sp]; // Nueva longitud
     if (stack[sp] > 1025)
       stack[sp] = 1025;
@@ -872,7 +873,7 @@ if (stack[sp] > 0) { // Quitar caracteres
     memb[stack[sp - 1] * 4] = 0;
   else
     memb[stack[sp - 1] * 4 + oo - stack[sp]] = 0;
-} else if (stack[sp] < 0) {  // Añadir (?) caracteres (por homogeneidad)
+} else if (stack[sp] < 0) {   // Añadir (?) caracteres (por homogeneidad)
   stack[sp] = oo - stack[sp]; // Nueva longitud
   for (; oo < stack[sp]; oo++) {
     memb[stack[sp - 1] * 4 + oo] = ' ';

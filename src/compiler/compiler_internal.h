@@ -32,21 +32,21 @@
 #define version "0c88b" // Compiler version
 
 #ifndef SHARE
-#define MAX_OBJECTS     8192 // Compiler object maximum limit
+#define MAX_OBJECTS   8192 // Compiler object maximum limit
 #define ID_AVG_LENGTH 16   // Average identifier length (+4+4+1)
 #else
-#define MAX_OBJECTS     700 // The shareware version has 626 ...
+#define MAX_OBJECTS   700 // The shareware version has 626 ...
 #define ID_AVG_LENGTH 20  // Average identifier length (+4+4+1)
 #endif
 
 #define MAX_NODES       128  // Maximum number of lexer symbol nodes
-#define MAX_EXP_SIZE         512  // Maximum number of elements in an expression
-#define HEADER_LENGTH     9    // Header length at program start
+#define MAX_EXP_SIZE    512  // Maximum number of elements in an expression
+#define HEADER_LENGTH   9    // Header length at program start
 #define EVAL_STACK_SIZE 2048 // Execution stack length
 
-#define DEFAULT_BUFFER    (16384 * 8)
-#define SAFETY_BUFFER (4096 * 8)
-#define BUFFER_INCREASE       (16384 * 8)
+#define DEFAULT_BUFFER  (16384 * 8)
+#define SAFETY_BUFFER   (4096 * 8)
+#define BUFFER_INCREASE (16384 * 8)
 
 #define cr  13 // Carriage return
 #define lf  10 // Line feed

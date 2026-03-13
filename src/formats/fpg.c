@@ -25,8 +25,7 @@ short get_code_p0y;
 #define alto_br  72
 
 void fpg_read_image_header(HeadFPG *MiHeadFPG, FILE *fpg) {
-  if (fread(&MiHeadFPG->code, 1, 4, fpg) != 4 ||
-      fread(&MiHeadFPG->length, 1, 4, fpg) != 4) {
+  if (fread(&MiHeadFPG->code, 1, 4, fpg) != 4 || fread(&MiHeadFPG->length, 1, 4, fpg) != 4) {
     fpg_image = NULL;
     fpg_points = NULL;
     return;
@@ -34,8 +33,7 @@ void fpg_read_image_header(HeadFPG *MiHeadFPG, FILE *fpg) {
   memset(MiHeadFPG->description, 0, 33);
   fread(MiHeadFPG->description, 1, 32, fpg);
   fread(MiHeadFPG->Filename, 1, 12, fpg);
-  if (fread(&MiHeadFPG->width, 1, 4, fpg) != 4 ||
-      fread(&MiHeadFPG->height, 1, 4, fpg) != 4 ||
+  if (fread(&MiHeadFPG->width, 1, 4, fpg) != 4 || fread(&MiHeadFPG->height, 1, 4, fpg) != 4 ||
       fread(&MiHeadFPG->num_points, 1, 4, fpg) != 4) {
     fpg_image = NULL;
     fpg_points = NULL;
@@ -215,14 +213,12 @@ void fpg_sort(FPG *Fpg) {
 }
 
 int fpg_read_header(HeadFPG *MiHeadFPG, FILE *fpg) {
-  if (fread(&MiHeadFPG->code, 1, 4, fpg) != 4 ||
-      fread(&MiHeadFPG->length, 1, 4, fpg) != 4)
+  if (fread(&MiHeadFPG->code, 1, 4, fpg) != 4 || fread(&MiHeadFPG->length, 1, 4, fpg) != 4)
     return 0;
   memset(MiHeadFPG->description, 0, 33);
   fread(MiHeadFPG->description, 1, 32, fpg);
   fread(MiHeadFPG->Filename, 1, 12, fpg);
-  if (fread(&MiHeadFPG->width, 1, 4, fpg) != 4 ||
-      fread(&MiHeadFPG->height, 1, 4, fpg) != 4 ||
+  if (fread(&MiHeadFPG->width, 1, 4, fpg) != 4 || fread(&MiHeadFPG->height, 1, 4, fpg) != 4 ||
       fread(&MiHeadFPG->num_points, 1, 4, fpg) != 4)
     return 0;
   return 1;

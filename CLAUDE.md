@@ -38,3 +38,6 @@ All 4 targets must build with **zero warnings**: d, div, divrun, divdbg.
 4. 32-bit only. No 64-bit assumptions.
 5. UTF-8 source. Use `\xNN` for high-byte literals.
 6. After every sprint: update MEMORY.md, ROADMAP.md, README.md, and docs as needed.
+7. No line-number references in docs. They break on any edit or reformat.
+   Use function names, variable names, or searchable identifiers instead
+   (e.g. `` `OSDEP_SetPalette()` in `osd_sdl2.c` `` not `osd_sdl2.c:172`).

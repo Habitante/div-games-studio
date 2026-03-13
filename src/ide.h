@@ -2,7 +2,7 @@
 #define __DIV_H_
 
 #define HEADER_LENGTH 36
-#define end_struct  HEADER_LENGTH + 12 + 10 * 10 + 10 * 7 + 8 + 8
+#define end_struct    HEADER_LENGTH + 12 + 10 * 10 + 10 * 7 + 8 + 8
 
 #ifndef NULL
 #define NULL 0

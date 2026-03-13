@@ -89,10 +89,10 @@ void call(const void_return_type_t func); // void funcion(void); int n=(int)func
 //unsigned int
 
 
-#define MAX_FILES       512 // ------------------------------- File listbox
-#define FILE_SIZE       (255)
+#define MAX_FILES   512 // ------------------------------- File listbox
+#define FILE_SIZE   (255)
 #define MAX_FOLDERS 2048
-#define FOLDER_SIZE    (255)
+#define FOLDER_SIZE (255)
 
 
 #define swap(a, b) \

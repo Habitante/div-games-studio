@@ -17,7 +17,7 @@
 //-----------------------------------------------------------------------------
 
 #define BUFFER_INCREASE 16384 // Edit buffer growth increment
-#define buffer_min  2048  // Minimum margin space
+#define buffer_min      2048  // Minimum margin space
 
 #define cr  13 // Carriage return
 #define lf  10 // newline / linefeed
@@ -28,14 +28,14 @@
 //-----------------------------------------------------------------------------
 
 #define p_end_of_file 0x00  // End of file <EOF>
-#define p_rem    0x7f  // Single-line comment
-#define p_id     0xfd  // Identifier
-#define p_num    0xfe  // Number
-#define p_spc    0x100 // Whitespace
-#define p_sym    0x101 // Symbol
-#define p_lit    0x102 // Quoted literal
-#define p_res    0x103 // Reserved keyword
-#define p_pre    0x104 // Predefined identifier
+#define p_rem         0x7f  // Single-line comment
+#define p_id          0xfd  // Identifier
+#define p_num         0xfe  // Number
+#define p_spc         0x100 // Whitespace
+#define p_sym         0x101 // Symbol
+#define p_lit         0x102 // Quoted literal
+#define p_res         0x103 // Reserved keyword
+#define p_pre         0x104 // Predefined identifier
 
 //-----------------------------------------------------------------------------
 //      Externs from other modules
@@ -85,8 +85,8 @@ extern int _cached_in_comment;
 extern char *_cached_color_source;
 extern char *c_oldline;
 extern int old_comment_state;
-extern struct tprg *edited;             // Currently edited program
-extern int t_p;                         // Clipboard type for cut operations
+extern struct tprg *edited; // Currently edited program
+extern int t_p;             // Clipboard type for cut operations
 
 //-----------------------------------------------------------------------------
 //      Functions in editor.c (core)

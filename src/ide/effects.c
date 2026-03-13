@@ -9,9 +9,9 @@
 //      Definitions
 //-----------------------------------------------------------------------------
 
-#define max_pun 64 // Maximum number of control points
+#define max_pun      64 // Maximum number of control points
 #define MAX_EXP_SIZE 8  // Maximum number of base explosions
-#define DEEP    4
+#define DEEP         4
 // #pragma on (check_stack)  /* Watcom-specific, not needed */
 
 #ifndef uchar

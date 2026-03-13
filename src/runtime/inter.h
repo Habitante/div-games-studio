@@ -158,7 +158,7 @@ void finalize_texts(void);
 // Constants
 ///////////////////////////////////////////////////////////////////////////////
 
-#define MAX_EXP_SIZE         512  // Maximum number of elements in an expression
+#define MAX_EXP_SIZE    512  // Maximum number of elements in an expression
 #define EVAL_STACK_SIZE 2048 // Execution stack length
 
 #define swap(a, b) \

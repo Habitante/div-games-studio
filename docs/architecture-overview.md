@@ -107,7 +107,7 @@ the close button. The dialog is always `window[0]`.
 SDL_PollEvent()
     |
     v
-read_mouse2() [src/ide/mouse.c:376]
+read_mouse2() [src/ide/mouse.c → read_mouse2()]
     |-- SDL_TEXTINPUT     --> ascii
     |-- SDL_MOUSEWHEEL    --> m_b bits 2,3
     |-- SDL_MOUSEMOTION   --> m_x, m_y
@@ -117,14 +117,14 @@ read_mouse2() [src/ide/mouse.c:376]
     |-- SDL_WINDOWEVENT   --> resize, focus, enter/leave, close
     |-- SDL_QUIT          --> exit_requested = 1
     v
-read_mouse() [src/ide/mouse.c:48]
+read_mouse() [src/ide/mouse.c → read_mouse()]
     |-- Scales m_x/m_y to virtual resolution
     |-- Handles keyboard-as-mouse (OPQA keys in paint mode)
     |-- Handles spacebar-as-click (magic value 0x8001)
     |-- Clamps to vga_width/vga_height bounds
     |-- Updates coord_x/coord_y (map coordinates under cursor)
     v
-poll_keyboard() [src/ide/keyboard.c:127]
+poll_keyboard() [src/ide/keyboard.c → poll_keyboard()]
     |-- Updates mclock from SDL_GetTicks()
     |-- (The actual event pumping happens via read_mouse2)
 ```
@@ -133,7 +133,7 @@ The `kbdFLAGS[128]` array maps DOS-style scan codes to key-down state. SDL
 keysyms are translated to DOS scan codes via the `OSDEP_key[2048]` lookup table
 (initialized in `OSDEP_keyInit()`).
 
-### Shutdown: `finalization()` in `src/ide/main.c` at line 2048
+### Shutdown: `finalization()` in `src/ide/main.c`
 
 Frees all buffers allocated in `initialization()`, restores video mode via
 `rvmode()`, calls `end_lexcolor()` and `kbd_reset()`.
