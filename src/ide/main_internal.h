@@ -31,6 +31,7 @@ extern int restore_button;
 extern int first_run;
 extern int partial_blits;
 extern int leer_mouse;
+extern int mouse_in_window;
 
 /* --- Title bar gradient tables (defined in main.c) --- */
 

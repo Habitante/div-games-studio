@@ -855,7 +855,8 @@ extern int frame_clock; // clock
 ///////////////////////////////////////////////////////////////////////////////
 
 void mainloop(void) {
-  int n, m, oldn = MAX_WINDOWS;
+  static int oldn = MAX_WINDOWS;
+  int n, m;
   int llamar;
   char cwork[256], *p;
 

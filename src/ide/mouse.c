@@ -432,13 +432,10 @@ void read_mouse2(void) {
       exit_requested = 1;
     }
     if (event.type == SDL_MOUSEMOTION) {
-      if (fsmode == 1) {
-        m_x += event.motion.xrel * (1 + (setup_file.mouse_ratio / 2));
-        m_y += event.motion.yrel * (1 + (setup_file.mouse_ratio / 2));
-      } else {
-        m_x = event.motion.x;
-        m_y = event.motion.y;
-      }
+      // SDL_RenderSetLogicalSize maps physical coords to logical coords
+      // in both windowed and fullscreen — always use absolute position.
+      m_x = event.motion.x;
+      m_y = event.motion.y;
     }
     /* If a button on the mouse is pressed. */
     if (event.type == SDL_MOUSEBUTTONDOWN) {

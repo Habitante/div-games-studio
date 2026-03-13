@@ -123,8 +123,11 @@ void print_event(const SDL_Event *event) {
     case SDL_WINDOWEVENT_RESIZED:
       SDL_Log("Window %d resized to %dx%d", event->window.windowID, event->window.data1,
               event->window.data2);
-      vwidth = event->window.data1;
-      vheight = event->window.data2;
+      // Ignore resize in fullscreen — SDL_RenderSetLogicalSize handles scaling
+      if (!OSDEP_IsFullScreen()) {
+        vwidth = event->window.data1;
+        vheight = event->window.data2;
+      }
       full_redraw = 1;
       break;
     case SDL_WINDOWEVENT_SIZE_CHANGED:
@@ -225,15 +228,10 @@ void poll_keyboard(void) {
     }
 
     if (event.type == SDL_MOUSEMOTION) {
+      // SDL_RenderSetLogicalSize maps physical coords to logical coords
+      // in both windowed and fullscreen — always use absolute position.
       mouse->x = event.motion.x;
       mouse->y = event.motion.y;
-
-      if (vga_width != vwidth || vga_height != vheight) {
-        mouse->x = (int)(event.motion.x * (float)((float)vga_width / (float)vwidth));
-        mouse->y = (int)(event.motion.y * (float)((float)vga_height / (float)vheight));
-        SDL_Log("Mouse: VX: %d VY: %d x: %d y: %d\n", mouse->x, mouse->y, event.motion.x,
-                event.motion.y);
-      }
     }
     /* If a button on the mouse is pressed. */
     if (event.type == SDL_MOUSEBUTTONDOWN) {

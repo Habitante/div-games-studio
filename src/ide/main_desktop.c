@@ -1194,6 +1194,10 @@ int collides_with(int a, int x, int y, int w, int h) {
 void flush_copy(void) {
   if (leer_mouse)
     read_mouse();
+  if (!mouse_in_window) {
+    blit_screen(screen_buffer);
+    return;
+  }
   if (draw_mode < 100) {
     save_mouse_bg(mouse_background, mouse_shift_x, mouse_shift_y, mouse_graf, 0);
     put(mouse_shift_x, mouse_shift_y, mouse_graf);
