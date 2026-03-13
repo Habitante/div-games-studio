@@ -49,6 +49,13 @@ void read_mouse(void) {
   int n = 0;
   int s, shift = 0;
   static int mouse_captured = 0;
+  // Track the m_x/m_y values we last programmed via set_mouse().
+  // Used instead of mouse_x/mouse_y for detecting real mouse movement,
+  // because test_mouse()/select_zoom() can modify mouse_x/mouse_y
+  // between frames (big-mode toolbar coordinate adjustment), which
+  // would otherwise trick read_mouse() into thinking the real mouse
+  // moved and permanently lock out keyboard navigation.
+  static int last_set_mx = 0, last_set_my = 0;
 
   prev_mouse_buttons = mouse_b;
   if (vwidth == 0 && vheight == 0) {
@@ -98,6 +105,8 @@ void read_mouse(void) {
     mouse_shift_y = -1;
     coord_x = -1;
     coord_y = -1;
+    last_set_mx = (int)m_x;
+    last_set_my = (int)m_y;
     return;
   }
 
@@ -132,7 +141,7 @@ void read_mouse(void) {
     }
   }
 
-  if (mouse_x != (int)m_x || mouse_y != (int)m_y || mouse_b != m_b) {
+  if ((int)m_x != last_set_mx || (int)m_y != last_set_my || mouse_b != m_b) {
     mouse_x = (int)m_x;
     mouse_y = (int)m_y;
     mouse_b = m_b;
@@ -286,6 +295,9 @@ clamp_mouse:
       break;
     }
   }
+
+  last_set_mx = (int)m_x;
+  last_set_my = (int)m_y;
 }
 
 void libera_drag(void) {
