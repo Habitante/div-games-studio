@@ -29,10 +29,6 @@ Andreas Schiffler -- aschiffler at ferzkopp dot net
 
 #include "SDL_framerate.h"
 
-#ifndef WIN32
-#include <sched.h>
-#include <unistd.h>
-#endif
 /*!
 \brief Internal wrapper to SDL_GetTicks that ensures a non-zero return value.
 
@@ -147,38 +143,6 @@ drawing too slow), the delay is zero and the delay interpolation is reset.
 
 \return The time that passed since the last call to the function in ms. May return 0.
 */
-#ifndef WIN32
-void delay(unsigned int milliseconds)
-{
-	if(milliseconds<1)
-		return;
-    //struct timespec spec;
-
-	/* clock() returns the number of clock ticks since the start of the program */
-	/* On PC this is 1000, on ubuntu Linux, this is 1000000 */
-    /* Code taken from Larry Bank's programmers corner website: http://www.bitbanksoftware.com/Programmers/code4.html */
-
-    unsigned int ticksPerMillisecond = 1000;//CLOCKS_PER_SEC/1000;
-    int counter = SDL_GetTicks() + (ticksPerMillisecond * milliseconds);
-    if(milliseconds >= 2)
-    {
-        //usleep((milliseconds - 1)*1000);
-        //spec.tv_nsec = (milliseconds-1)*1000*1000;
-        //spec.tv_sec = 0;
-        //nanosleep(&spec, (struct timespec *)NULL);
-        //sleep(milliseconds -1); /* Sleep through most of it then spin for the last millisecond. */
-		sched_yield();
-        usleep((milliseconds-1));
-    }
-
-    while(SDL_GetTicks() < counter)
-    {
-        sched_yield();
-    }
-}
-
-#endif
-
 Uint32 SDL_framerateDelay(FPSmanager * manager)
 {
 	Uint32 current_ticks;
@@ -215,15 +179,7 @@ Uint32 SDL_framerateDelay(FPSmanager * manager)
 
 	if (current_ticks <= target_ticks) {
 		the_delay = target_ticks - current_ticks;
-#ifdef WIN32
 		SDL_Delay(the_delay);
-#else
-//		delay(the_delay/1000);
-		sched_yield();
-//		printf("%d\n",the_delay);
-		if(the_delay>2)
-			usleep(the_delay-1);
-#endif
 	} else {
 		manager->framecount = 0;
 		manager->baseticks = _getTicks();
