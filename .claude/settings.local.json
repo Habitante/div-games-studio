@@ -44,7 +44,10 @@
       "Bash(rm -v convert_to_utf8.py fix_encoding.py scan_encoding.py AndroidAppSettings.cfg AndroidBuild.sh Makefile.droid Makefile.html Makefile.html2 .travis.yml bitbucket-pipelines.yml params.json index.html)",
       "Bash(rm -rv javascripts/ stylesheets/)",
       "Bash(mkdir -p /c/Src/div/reports/archive)",
-      "Bash(mv -v glossary-spanish-english.md video-system-audit.md unsafe-string-audit.md archive/)"
+      "Bash(mv -v glossary-spanish-english.md video-system-audit.md unsafe-string-audit.md archive/)",
+      "Read(//c/msys64/mingw32/lib/gcc/i686-w64-mingw32/15.2.0/**)",
+      "Bash(ldd /c/msys64/mingw32/lib/gcc/i686-w64-mingw32/15.2.0/cc1.exe)",
+      "Bash(/c/msys64/mingw32/bin/objdump.exe -p /c/msys64/mingw32/lib/gcc/i686-w64-mingw32/15.2.0/cc1.exe)"
     ]
   }
 }

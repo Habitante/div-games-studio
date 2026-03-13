@@ -6,6 +6,7 @@
 #include "global.h"
 
 extern int help_paint_active;
+extern SDL_Window *OSDEP_window;
 byte m_b;
 
 float m_x = 0.0, m_y = 0.0;
@@ -60,14 +61,15 @@ void read_mouse(void) {
     poll_keyboard();
 
   // In paint mode, capture the mouse so SDL keeps sending motion events
-  // even when the cursor leaves the window. This lets move_zoom() scroll
-  // the canvas when the user pushes the mouse past the window edge —
-  // the modern equivalent of the DOS behavior where the mouse had no
-  // window boundary. Capture is released when leaving paint mode.
+  // even when the cursor leaves the window (windowed mode scroll).
+  // In fullscreen, grab the window so the mouse can't escape to other
+  // monitors. Both are released when leaving paint mode.
   {
     int want_capture = (draw_mode < 100 && hotkey && !help_paint_active);
     if (want_capture != mouse_captured) {
       SDL_CaptureMouse(want_capture ? SDL_TRUE : SDL_FALSE);
+      if (OSDEP_IsFullScreen())
+        SDL_SetWindowGrab(OSDEP_window, want_capture ? SDL_TRUE : SDL_FALSE);
       mouse_captured = want_capture;
     }
   }
@@ -102,6 +104,33 @@ void read_mouse(void) {
   real_mouse_x = (int)m_x;
   real_mouse_y = (int)m_y;
 
+  // Fullscreen edge-scroll: the original DOS code used raw mouse deltas
+  // (INT 33h function 0Bh) accumulated into m_x/m_y in software, so the
+  // position could drift past screen bounds freely. In SDL2 fullscreen,
+  // the OS clamps the cursor at the screen edge and stops generating
+  // motion events. Instead, we detect the cursor sitting at the edge and
+  // push real_mouse_x/y past bounds so move_zoom() scrolls.
+  // Throttled to ~30 scrolls/sec (every 33ms) for comfortable speed.
+  if (OSDEP_IsFullScreen() && draw_mode < 100 && hotkey && !help_paint_active) {
+    static int last_edge_time = 0;
+    int at_edge = 0;
+    if (real_mouse_x <= 0 || real_mouse_x >= vga_width - 1)
+      at_edge = 1;
+    if (real_mouse_y <= 0 || real_mouse_y >= vga_height - 1)
+      at_edge = 1;
+    if (at_edge && mclock - last_edge_time >= 0) {
+      int texel = 1 << zoom;
+      last_edge_time = mclock;
+      if (real_mouse_x <= 0)
+        real_mouse_x = -texel;
+      else if (real_mouse_x >= vga_width - 1)
+        real_mouse_x = vga_width + texel;
+      if (real_mouse_y <= 0)
+        real_mouse_y = -texel;
+      else if (real_mouse_y >= vga_height - 1)
+        real_mouse_y = vga_height + texel;
+    }
+  }
 
   if (mouse_x != (int)m_x || mouse_y != (int)m_y || mouse_b != m_b) {
     mouse_x = (int)m_x;
