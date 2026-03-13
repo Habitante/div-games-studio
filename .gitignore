@@ -43,7 +43,6 @@ div/*.PRG
 
 # Legacy
 old/
-original_msdos_source/
 html/
 zipdiv
 WSTUB/
