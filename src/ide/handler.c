@@ -11,7 +11,7 @@
 byte aux_palette[768];
 int new_status;
 
-void _completo(void);
+void repaint_full(void);
 void text_cursor(void);
 void repaint_window(void);
 
@@ -310,7 +310,7 @@ void menu_programs2(void) {
 //      Edit Menu
 //-----------------------------------------------------------------------------
 
-void _completo(void);
+void repaint_full(void);
 void f_delete(void);
 void f_cut_block(memptrsize);
 void f_paste_block(void);
@@ -343,7 +343,7 @@ void menu_edit2(void) {
       if ((n = find_program_window())) {
         wup(n);
         f_delete();
-        _completo();
+        repaint_full();
         v.redraw = 2;
         wdown(n);
         flush_window(n);
@@ -354,7 +354,7 @@ void menu_edit2(void) {
       if ((n = find_program_window())) {
         wup(n);
         f_mark();
-        _completo();
+        repaint_full();
         v.redraw = 2;
         wdown(n);
         flush_window(n);
@@ -365,7 +365,7 @@ void menu_edit2(void) {
       if ((n = find_program_window())) {
         wup(n);
         f_unmark();
-        _completo();
+        repaint_full();
         v.redraw = 2;
         wdown(n);
         flush_window(n);
@@ -376,7 +376,7 @@ void menu_edit2(void) {
       if ((n = find_program_window())) {
         wup(n);
         f_cut_block(1);
-        _completo();
+        repaint_full();
         v.redraw = 2;
         wdown(n);
         flush_window(n);
@@ -387,7 +387,7 @@ void menu_edit2(void) {
       if ((n = find_program_window())) {
         wup(n);
         f_cut_block(0);
-        _completo();
+        repaint_full();
         v.redraw = 2;
         wdown(n);
         flush_window(n);
@@ -399,7 +399,7 @@ void menu_edit2(void) {
         wup(n);
         f_paste_block();
         f_unmark();
-        _completo();
+        repaint_full();
         v.redraw = 2;
         wdown(n);
         flush_window(n);
@@ -448,7 +448,7 @@ void menu_edit2(void) {
             advance_vptr();
           }
           v.redraw = 2;
-          _completo();
+          repaint_full();
           text_cursor();
         }
       }

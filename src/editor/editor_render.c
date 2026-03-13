@@ -59,7 +59,7 @@ void fill_color_line(void) { // Get the colors for the next line
 //      Full editor window rendering
 //-----------------------------------------------------------------------------
 
-void _completo(void) {
+void repaint_full(void) {
   int width, height;
   byte *di, *si, *old_di;
   byte *s, *_kini = NULL;
@@ -258,7 +258,7 @@ void _completo(void) {
 //      Partial rendering of an editor window (current line only)
 //-----------------------------------------------------------------------------
 
-void _parcial(void) {
+void repaint_partial(void) {
   int line, width;
   byte *di, *si, *old_di;
   byte *s, *_kini = NULL;
@@ -291,7 +291,7 @@ void _parcial(void) {
     c_oldline = (char *)v.prg->lptr;
     old_comment_state = numrem;
     v.redraw++;
-    _completo();
+    repaint_full();
     return;
   }
   c_oldline = (char *)v.prg->lptr;

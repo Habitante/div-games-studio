@@ -42,7 +42,7 @@ void f_mark(void) {
         wup(n);
         f_unmark();
         v.redraw = 2;
-        _completo();
+        repaint_full();
         wdown(n);
         flush_window(n);
       }
@@ -82,7 +82,7 @@ void f_unmark(void) {
       wup(n);
       f_unmark();
       v.redraw = 2;
-      _completo();
+      repaint_full();
       wdown(n);
       flush_window(n);
     }
@@ -103,7 +103,7 @@ void f_cut_block(int mode) {
       wup(n);
       f_cut(mode);
       v.redraw = 2;
-      _completo();
+      repaint_full();
       wdown(n);
       flush_window(n);
     }

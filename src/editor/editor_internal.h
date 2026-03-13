@@ -153,8 +153,8 @@ void remove_spaces(void);
 
 void color_lex(void);
 void fill_color_line(void);
-void _completo(void);
-void _parcial(void);
+void repaint_full(void);
+void repaint_partial(void);
 void scrollbars(void);
 int get_slide_y(void);
 int get_slide_x(void);

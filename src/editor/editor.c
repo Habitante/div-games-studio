@@ -60,7 +60,7 @@ void program1(void) {
     h /= 2;
   }
 
-  _completo();
+  repaint_full();
 
   if (error_number != -1 && eprg == v.prg)
     error_cursor();
@@ -354,7 +354,7 @@ void editor() {
 
   if (error_number != -1 && eprg == v.prg) {
     if ((scan_code <= 1 || scan_code == 59) && ascii == 0 && mouse_b == 0) {
-      _parcial();
+      repaint_partial();
       error_cursor2();
       v.redraw++;
       return;
@@ -1070,9 +1070,9 @@ void editor() {
       skip_full_blit = 0;
     }
     if (v.redraw)
-      _completo();
+      repaint_full();
     else
-      _parcial();
+      repaint_partial();
     text_cursor();
     v.redraw++;
   }

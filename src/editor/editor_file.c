@@ -408,7 +408,7 @@ void find_text(void) {
   }
 
   v.redraw = 2;
-  _completo();
+  repaint_full();
   text_cursor();
 }
 
@@ -518,7 +518,7 @@ void replace_text(void) {
         f_left();
       if (v_accept != 3) {
         v.redraw = 2;
-        _completo();
+        repaint_full();
         flush_window(0);
         show_dialog(replace0);
       }
@@ -547,7 +547,7 @@ void replace_text(void) {
     memcpy(v.prg, &mi_prg, sizeof(struct tprg));
   } // EOF
   v.redraw = 2;
-  _completo();
+  repaint_full();
   text_cursor();
   show_dialog(replacements0);
 }
@@ -1164,7 +1164,7 @@ void goto_error(void) {
   scan_code = 0;
 
   v.redraw = 2;
-  _completo();
+  repaint_full();
   text_cursor();
 }
 
