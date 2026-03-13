@@ -114,6 +114,7 @@ void print_event(const SDL_Event *event) {
       break;
     case SDL_WINDOWEVENT_EXPOSED:
       SDL_Log("Window %d exposed", event->window.windowID);
+      full_redraw = 1;
       break;
     case SDL_WINDOWEVENT_MOVED:
       SDL_Log("Window %d moved to %d,%d", event->window.windowID, event->window.data1,
@@ -124,6 +125,7 @@ void print_event(const SDL_Event *event) {
               event->window.data2);
       vwidth = event->window.data1;
       vheight = event->window.data2;
+      full_redraw = 1;
       break;
     case SDL_WINDOWEVENT_SIZE_CHANGED:
       SDL_Log("Window %d size changed to %dx%d", event->window.windowID, event->window.data1,
@@ -140,6 +142,7 @@ void print_event(const SDL_Event *event) {
       break;
     case SDL_WINDOWEVENT_FOCUS_GAINED:
     case SDL_WINDOWEVENT_RESTORED:
+      full_redraw = 1;
       app_paused = 0;
       Mix_Resume(-1);
       Mix_ResumeMusic();

@@ -164,7 +164,19 @@ void OSDEP_Flip(OSDEP_Surface *s) {
 }
 
 void OSDEP_UpdateRect(SDL_Surface *screen, Sint32 x, Sint32 y, Sint32 w, Sint32 h) {
-  OSDEP_Flip(screen);
+  SDL_Rect rect = {x, y, w, h};
+
+  /* Partial 8-bit to 32-bit palette conversion (only the dirty region) */
+  SDL_BlitSurface(OSDEP_buffer8, &rect, OSDEP_buffer32, &rect);
+
+  /* Upload only the dirty region to the GPU texture */
+  uint8_t *pixels = (uint8_t *)OSDEP_buffer32->pixels +
+                    y * OSDEP_buffer32->pitch + x * 4;
+  SDL_UpdateTexture(OSDEP_texture, &rect, pixels, OSDEP_buffer32->pitch);
+
+  /* Present the full window (GPU-cheap, just re-composites the texture) */
+  SDL_RenderCopy(OSDEP_renderer, OSDEP_texture, NULL, NULL);
+  SDL_RenderPresent(OSDEP_renderer);
 }
 
 /* Update the 256-color palette on the given 8-bit surface. Called whenever

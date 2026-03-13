@@ -19,12 +19,8 @@
 SDL_Surface *vga = NULL;
 
 void snapshot(byte *p);
-void blit_full_svga(byte *p);
-void blit_full_320x200(byte *p);
-void blit_full_modex(byte *p);
-void blit_partial_svga(byte *p);
-void blit_partial_320x200(byte *p);
-void blit_partial_modex(byte *p);
+void blit_sdl(byte *p);
+void blit_partial_sdl(byte *p);
 int save_PCX(byte *mapa, int w, int h, FILE *f);
 void create_ghost_vc(int m);
 void create_ghost_slow(void);
@@ -193,6 +189,7 @@ void set_dac(void) {
   if (!OSDEP_SetPalette(vga, colors, 0, 256)) {
     printf("Failed to set palette :(\n");
   }
+  full_redraw = 1; /* Palette change requires full 8->32 re-conversion */
 
   retrace_wait();
 }
@@ -218,9 +215,6 @@ void fade_wait(void) {
 //-----------------------------------------------------------------------------
 //      Set Video Mode (vga_width and vga_height are defined in shared.h)
 //-----------------------------------------------------------------------------
-
-int lineal_mode;
-int vesa_mode;
 
 extern float m_x, m_y;
 
@@ -266,8 +260,6 @@ void setup_video_mode(void) {
   printf("SET VIDEO MODE %p\n", (void *)vga);
 #endif
   OSDEP_SetCaption("DIVDX 3.01", "");
-
-  vesa_mode = 1;
 
   m_x = (float)vga_width / 2.0;
   m_y = (float)vga_height / 2.0;
@@ -327,6 +319,51 @@ void blit_sdl(byte *p) {
   OSDEP_Flip(vga);
 }
 
+/* Partial blit: copy only dirty scan[] segments to the SDL surface,
+ * then do a partial 8->32 conversion and texture upload via OSDEP_UpdateRect.
+ */
+void blit_partial_sdl(byte *p) {
+  int y = 0, n;
+  int x_min = vga_width, x_max = 0, y_min = vga_height, y_max = 0;
+  byte *q = (byte *)vga->pixels;
+
+  if (SDL_MUSTLOCK(vga))
+    SDL_LockSurface(vga);
+
+  while (y < vga_height) {
+    n = y * 4;
+    if (scan[n + 1]) {
+      memcpy(q + scan[n], p + scan[n], scan[n + 1]);
+      if (scan[n] < x_min)
+        x_min = scan[n];
+      if (scan[n] + scan[n + 1] > x_max)
+        x_max = scan[n] + scan[n + 1];
+      if (y < y_min)
+        y_min = y;
+      y_max = y + 1;
+    }
+    if (scan[n + 3]) {
+      memcpy(q + scan[n + 2], p + scan[n + 2], scan[n + 3]);
+      if (scan[n + 2] < x_min)
+        x_min = scan[n + 2];
+      if (scan[n + 2] + scan[n + 3] > x_max)
+        x_max = scan[n + 2] + scan[n + 3];
+      if (y < y_min)
+        y_min = y;
+      y_max = y + 1;
+    }
+    q += vga->pitch;
+    p += vga_width;
+    y++;
+  }
+
+  if (SDL_MUSTLOCK(vga))
+    SDL_UnlockSurface(vga);
+
+  if (x_max > x_min)
+    OSDEP_UpdateRect(vga, x_min, y_min, x_max - x_min, y_max - y_min);
+}
+
 long lasttick = 0;
 long newtick = 0;
 long nexttick = 0;
@@ -382,7 +419,11 @@ void blit_screen(byte *p) {
   if (fli_palette_update)
     retrace_wait();
 
-  blit_sdl(p);
+  if (full_redraw) {
+    blit_sdl(p);
+  } else {
+    blit_partial_sdl(p);
+  }
   if (fli_palette_update) {
     fli_palette_update = 0;
     set_dac2();
@@ -564,81 +605,12 @@ void restore(byte *q, byte *p) {
 }
 
 //-----------------------------------------------------------------------------
-//      Blit in 320x200 mode
-//-----------------------------------------------------------------------------
-
-void blit_partial_320x200(byte *p) {
-  int y = 0, n;
-  byte *q = (byte *)vga->pixels;
-
-#ifdef GRABADORA
-  record_screen(p);
-#endif
-
-  while (y < vga_height) {
-    n = y * 4;
-    if (scan[n + 1])
-      memcpy(q + scan[n], p + scan[n], scan[n + 1]);
-    if (scan[n + 3])
-      memcpy(q + scan[n + 2], p + scan[n + 2], scan[n + 3]);
-    q += vga_width;
-    p += vga_width;
-    y++;
-  }
-}
-
-void blit_full_320x200(byte *p) {
-#ifdef GRABADORA
-  record_screen(p);
-#endif
-  memcpy(vga, p, vga_width * vga_height);
-}
-
-//-----------------------------------------------------------------------------
-//      Blit in SVGA mode
-//-----------------------------------------------------------------------------
-
-void blit_partial_svga(byte *p) {}
-
-void blit_full_svga(byte *p) {}
-
-//-----------------------------------------------------------------------------
-//      Blit in Mode-X
-//-----------------------------------------------------------------------------
-
-void blit_partial_modex(byte *p) {}
-
-void blit_full_modex(byte *p) {}
-
-//-----------------------------------------------------------------------------
-//      Generic blit_screen subroutines
-//-----------------------------------------------------------------------------
-
-void vgacpy(byte *q, byte *p, int n) {
-  int m;
-
-  m = n >> 2;
-  while (m--) {
-    *(int *)q = *p + 256 * (*(p + 4) + 256 * (*(p + 8) + 256 * (*(p + 12))));
-    q += 4;
-    p += 16;
-  }
-
-  n &= 3;
-  while (n--) {
-    *q = *p;
-    q++;
-    p += 4;
-  }
-}
-
-//-----------------------------------------------------------------------------
 //      Mark a window region for subsequent blit_screen
 //-----------------------------------------------------------------------------
 
 void init_flush(void) {
 #ifndef DROID
-  memset(&scan[0], 0, MAX_YRES * sizeof(short));
+  memset(&scan[0], 0, MAX_YRES * 8);
 #endif
   full_redraw = 0;
 }
@@ -670,20 +642,6 @@ void blit_partial(int x, int y, int w, int h) {
       return;
     xmax = x + w - 1;
     ymax = y + h - 1;
-
-    if (!vesa_mode) {
-      switch (vga_width * 1000 + vga_height) {
-      case 320240:
-      case 320400:
-      case 360240:
-      case 360360:
-      case 376282: // Mode-X modes
-        x >>= 2;
-        xmax >>= 2;
-        w = xmax - x + 1;
-        break;
-      }
-    }
 
     while (y <= ymax) {
       n = y * 4;

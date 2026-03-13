@@ -310,6 +310,7 @@ void print_event(const SDL_Event *event) {
       break;
     case SDL_WINDOWEVENT_EXPOSED:
       SDL_Log("Window %d exposed", event->window.windowID);
+      full_redraw = 1;
       break;
     case SDL_WINDOWEVENT_MOVED:
       SDL_Log("Window %d moved to %d,%d", event->window.windowID, event->window.data1,
@@ -328,6 +329,7 @@ void print_event(const SDL_Event *event) {
         sound_end();
         soundstopped = 1;
       }
+      full_redraw = 1;
       break;
     case SDL_WINDOWEVENT_SIZE_CHANGED:
       SDL_Log("Window %d size changed to %dx%d", event->window.windowID, event->window.data1,
@@ -341,6 +343,7 @@ void print_event(const SDL_Event *event) {
       break;
     case SDL_WINDOWEVENT_RESTORED:
       SDL_Log("Window %d restored", event->window.windowID);
+      full_redraw = 1;
       break;
     case SDL_WINDOWEVENT_ENTER:
       mouse_in_window = 1;

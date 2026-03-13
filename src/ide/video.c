@@ -11,13 +11,8 @@
 #define CDEPTH 8
 
 void snapshot(byte *p);
-void blit_full_svga(byte *p);
-void blit_full_320x200(byte *p);
-void blit_full_modex(byte *p);
-void blit_partial_svga(byte *p);
-void blit_partial_320x200(byte *p);
-void blit_partial_modex(byte *p);
 void blit_sdl(byte *p);
+void blit_partial_sdl(byte *p);
 
 ///////////////////////////////////////////////////////////////////////////////
 //	Declarations and module-level data
@@ -86,16 +81,13 @@ void set_dac(byte *_dac) {
   if (!OSDEP_SetPalette(vga, colors, 0, 256)) {
     printf("Failed to set palette :(\n");
   }
+  full_redraw = 1; /* Palette change requires full 8->32 re-conversion */
   retrace_wait();
 }
 
 //-----------------------------------------------------------------------------
 //      Set Video Mode (vga_width y vga_height se definen en shared.h)
 //-----------------------------------------------------------------------------
-
-int lineal_mode;
-int vesa_mode;
-
 
 SDL_Surface *copy_surface(SDL_Surface *source) {
   SDL_Surface *target;
@@ -132,8 +124,6 @@ void setup_video_mode(void) {
   else
     vga = OSDEP_SetVideoMode(vga_width, vga_height, CDEPTH, 1);
 
-  vesa_mode = 1;
-
   set_dac(dac);
 }
 
@@ -153,58 +143,47 @@ void reset_video_mode(void) {
 //-----------------------------------------------------------------------------
 //      Dump buffer to vga (screen)
 //-----------------------------------------------------------------------------
-void vgacpy(byte *q, byte *p, int n);
 
-
-void volcadosdlp(byte *p) {
-  blit_sdl(p);
-  return;
-
+void blit_partial_sdl(byte *p) {
   int y = 0, n;
-  byte *oldp = (byte *)p;
-  uint32_t x1 = vga_width, y1 = vga_height, w1 = 1, h1 = 1;
-  SDL_Rect rc;
+  int x_min = vga_width, x_max = 0, y_min = vga_height, y_max = 0;
   byte *q = (byte *)vga->pixels;
-  uint32_t *q32 = (uint32_t *)vga->pixels;
-  SDL_LockSurface(vga);
+
+  if (SDL_MUSTLOCK(vga))
+    SDL_LockSurface(vga);
 
   while (y < vga_height) {
     n = y * 4;
     if (scan[n + 1]) {
       memcpy(q + scan[n], p + scan[n], scan[n + 1]);
-      if (scan[n] < x1)
-        x1 = scan[n];
-      if (y < y1)
-        y1 = y;
-      if (scan[n] + scan[n + 1] + 1 - x1 > w1)
-        w1 = scan[n] + scan[n + 1] + 1 - x1;
-
-      if (y + 1 - y1 > h1)
-        h1 = (y + 1 - y1);
+      if (scan[n] < x_min)
+        x_min = scan[n];
+      if (scan[n] + scan[n + 1] > x_max)
+        x_max = scan[n] + scan[n + 1];
+      if (y < y_min)
+        y_min = y;
+      y_max = y + 1;
     }
     if (scan[n + 3]) {
       memcpy(q + scan[n + 2], p + scan[n + 2], scan[n + 3]);
-      if (scan[n + 2] < x1)
-        x1 = scan[n + 2];
-      if (y < y1)
-        y1 = y;
-      if (scan[n + 2] + scan[n + 3] + 1 - x1 > w1)
-        w1 = scan[n + 2] + scan[n + 3] + 1 - x1;
-
-      if (y + 1 - y1 > h1)
-        h1 = (y + 1 - y1);
+      if (scan[n + 2] < x_min)
+        x_min = scan[n + 2];
+      if (scan[n + 2] + scan[n + 3] > x_max)
+        x_max = scan[n + 2] + scan[n + 3];
+      if (y < y_min)
+        y_min = y;
+      y_max = y + 1;
     }
-
     q += vga->pitch;
     p += vga_width;
     y++;
   }
-  SDL_UnlockSurface(vga);
-  printf("changed rect: %d %d %d %d     \r", x1, y1, w1, h1);
 
-  OSDEP_UpdateRect(vga, x1, y1, w1, h1);
+  if (SDL_MUSTLOCK(vga))
+    SDL_UnlockSurface(vga);
 
-  return;
+  if (x_max > x_min)
+    OSDEP_UpdateRect(vga, x_min, y_min, x_max - x_min, y_max - y_min);
 }
 
 void blit_sdl(byte *p) {
@@ -231,55 +210,10 @@ void blit_screen(byte *p) {
     snapshot(p);
 
 
-  if (full_redraw) {
-    if (vesa_mode)
-      blit_sdl(p);
-    else
-      switch (vga_width * 1000 + vga_height) {
-      case 320200:
-        blit_full_320x200(p);
-        break;
-      case 320240:
-        blit_full_modex(p);
-        break;
-      case 320400:
-        blit_full_modex(p);
-        break;
-      case 360240:
-        blit_full_modex(p);
-        break;
-      case 360360:
-        blit_full_modex(p);
-        break;
-      case 376282:
-        blit_full_modex(p);
-        break;
-      }
-  } else {
-    if (vesa_mode)
-      volcadosdlp(p);
-    else
-      switch (vga_width * 1000 + vga_height) {
-      case 320200:
-        blit_partial_320x200(p);
-        break;
-      case 320240:
-        blit_partial_modex(p);
-        break;
-      case 320400:
-        blit_partial_modex(p);
-        break;
-      case 360240:
-        blit_partial_modex(p);
-        break;
-      case 360360:
-        blit_partial_modex(p);
-        break;
-      case 376282:
-        blit_partial_modex(p);
-        break;
-      }
-  }
+  if (full_redraw)
+    blit_sdl(p);
+  else
+    blit_partial_sdl(p);
 
   {
     static uint32_t fs_cooldown = 0;
@@ -314,98 +248,7 @@ void snapshot(byte *p) {
 }
 
 //-----------------------------------------------------------------------------
-//      Dump mode 320x200
-//-----------------------------------------------------------------------------
-
-void blit_partial_320x200(byte *p) { // PARTIAL
-}
-
-void blit_full_320x200(byte *p) { // COMPLETE
-}
-
-//-----------------------------------------------------------------------------
-//      SVGA DUMP
-//-----------------------------------------------------------------------------
-
-void blit_partial_svga(byte *p) {
-  int y = 0, page, old_page = -1751, point, t1, t2, n;
-  char *q = (char *)vga->pixels;
-
-  if (lineal_mode) {
-    while (y < vga_height) {
-      n = y * 4;
-      if (scan[n + 1])
-        memcpy(q + scan[n], p + scan[n], scan[n + 1]);
-      if (scan[n + 3])
-        memcpy(q + scan[n + 2], p + scan[n + 2], scan[n + 3]);
-      q += vga_width;
-      p += vga_width;
-      y++;
-    }
-  } else
-    while (y < vga_height) {
-      n = y * 4;
-      if (scan[n + 1]) {
-        page = (y * vga_width + scan[n]) / 65536;
-        point = (y * vga_width + scan[n]) % 65536;
-        if (point + scan[n + 1] > 65536) {
-          t1 = 65536 - point;
-          t2 = scan[n + 1] - t1;
-          memcpy(vga + point, p + scan[n], t1);
-          memcpy(vga, p + scan[n] + t1, t2);
-        } else {
-          memcpy(vga + point, p + scan[n], scan[n + 1]);
-        }
-      }
-      if (scan[n + 3]) {
-        page = (y * vga_width + scan[n + 2]) / 65536;
-        point = (y * vga_width + scan[n + 2]) % 65536;
-        if (point + scan[n + 3] > 65536) {
-          t1 = 65536 - point;
-          t2 = scan[n + 3] - t1;
-          memcpy(vga + point, p + scan[n + 2], t1);
-          memcpy(vga, p + scan[n + 2] + t1, t2);
-        } else {
-          memcpy(vga + point, p + scan[n + 2], scan[n + 3]);
-        }
-      }
-      p += vga_width;
-      y++;
-    }
-}
-
-void blit_full_svga(byte *p) {
-  int cnt = vga_width * vga_height;
-  int tpv = 0, ActPge = 0;
-
-  if (lineal_mode)
-    memcpy(vga, p, cnt);
-  else
-    while (cnt > 0) {
-      tpv = cnt > 65536 ? 65536 : cnt;
-      memcpy(vga, p, tpv);
-      p += tpv;
-      cnt -= tpv;
-    }
-}
-
-//-----------------------------------------------------------------------------
-//      Volcado en un modo-x
-//-----------------------------------------------------------------------------
-
-void blit_partial_modex(byte *p) {}
-
-void blit_full_modex(byte *p) {}
-
-
-//-----------------------------------------------------------------------------
-//      Subrutinas de blit_screen genéricas
-//-----------------------------------------------------------------------------
-
-void vgacpy(byte *q, byte *p, int n) {}
-
-//-----------------------------------------------------------------------------
-//      Select a window for subsequent dump
+//      Mark a window region for subsequent blit_screen
 //-----------------------------------------------------------------------------
 
 void init_flush(void) {
@@ -440,20 +283,6 @@ void blit_partial(int x, int y, int w, int h) {
       return;
     xmax = x + w - 1;
     ymax = y + h - 1;
-
-    if (!vesa_mode) {
-      switch (vga_width * 1000 + vga_height) {
-      case 320240:
-      case 320400:
-      case 360240:
-      case 360360:
-      case 376282: // Modos X
-        x >>= 2;
-        xmax >>= 2;
-        w = xmax - x + 1;
-        break;
-      }
-    }
 
     while (y <= ymax) {
       n = y * 4;
