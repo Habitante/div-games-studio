@@ -14,7 +14,7 @@ architecture docs, code review, and discussion with Daniel Navarro.
 | # | Improvement | Status | Risk |
 |---|-------------|--------|------|
 | 1 | [Enums & constants](#1-enums--constants) | **DONE** (all 6 sprints) | Very low |
-| 2 | [Testing infrastructure](#2-testing-infrastructure) | Sprint 1 **DONE** | None |
+| 2 | [Testing infrastructure](#2-testing-infrastructure) | Sprints 1-2 **DONE** | None |
 | 3 | [File format hardening + modern imports](#3-file-format-hardening--modern-imports) | — | Low |
 | 4 | [Help translation quality pass](#4-help-translation-quality-pass) | — | Low |
 | 5 | [IDE graphics & fonts to FPG/FNT](#5-ide-graphics--fonts--self-hosted-resources) | — | Low |
