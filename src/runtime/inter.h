@@ -43,6 +43,7 @@ void call(const void_return_type_t func); // void funcion(void); int n=(int)func
 
 #include "keyboard.h"
 #include "divfli.h"
+#include "../div_enums.h"
 
 #ifdef ZLIB
 #include <zlib.h>

@@ -150,10 +150,10 @@ void read_mouse(void) {
 
     if (draw_mode < 100 && hotkey && !help_paint_active) {
       if (key(_SPC)) {
-        if (mouse_b != 0x8001) {
-          mouse_b = 0x8001;
+        if (mouse_b != MB_KEYBOARD_CLICK) {
+          mouse_b = MB_KEYBOARD_CLICK;
         }
-      } else if (mouse_b == 0x8001) {
+      } else if (mouse_b == MB_KEYBOARD_CLICK) {
         mouse_b = 0;
       }
     }
@@ -165,11 +165,11 @@ void read_mouse(void) {
 
   } else if (draw_mode < 100 && hotkey && !help_paint_active) { // Keys are only active in edit mode
 
-    if (!(shift_status & 4)) {
+    if (!(shift_status & MOD_CTRL)) {
       mouse_x = mouse_shift_x;
       mouse_y = mouse_shift_y;
 
-      if ((shift_status & 3) || key(_L_SHIFT) || key(_R_SHIFT))
+      if ((shift_status & MOD_SHIFT) || key(_L_SHIFT) || key(_R_SHIFT))
         s = 8;
       else
         s = 1;
@@ -206,10 +206,10 @@ void read_mouse(void) {
         shift = 1;
       }
       if (key(_SPC)) {
-        if (mouse_b != 0x8001) {
-          mouse_b = 0x8001;
+        if (mouse_b != MB_KEYBOARD_CLICK) {
+          mouse_b = MB_KEYBOARD_CLICK;
         }
-      } else if (mouse_b == 0x8001) {
+      } else if (mouse_b == MB_KEYBOARD_CLICK) {
         mouse_b = 0;
       }
       if (shift) {
@@ -255,7 +255,7 @@ clamp_mouse:
   if (free_drag) {
     switch (dragging) {
     case 0:
-      if ((mouse_b & 1) && !(prev_mouse_buttons & 1)) {
+      if ((mouse_b & MB_LEFT) && !(prev_mouse_buttons & MB_LEFT)) {
         dragging = 1;
         drag_x = mouse_x;
         drag_y = mouse_y;
@@ -267,15 +267,15 @@ clamp_mouse:
       break;
 
     case 2:
-      if (mouse_b & 1) {
+      if (mouse_b & MB_LEFT) {
         if (abs(mouse_x - drag_x) > 1 || abs(mouse_y - drag_y) > 1) {
           dragging = 3;
           wmouse_x = -1;
           wmouse_y = -1;
-          mouse_b &= ~1;
+          mouse_b &= ~MB_LEFT;
           call((void_return_type_t)v.click_handler);
           drag_source = v.order;
-          mouse_b |= 1;
+          mouse_b |= MB_LEFT;
           mouse_graf = drag_graphic;
         }
       } else {
@@ -284,7 +284,7 @@ clamp_mouse:
       break;
 
     case 3:
-      if (!(mouse_b & 1)) {
+      if (!(mouse_b & MB_LEFT)) {
         dragging = 4;
       }
       break;
@@ -341,16 +341,16 @@ void release_drag(void) {
 void checkmod(OSDEPMod mod) {
   if (mod != KMOD_NONE) {
     if (mod & KMOD_LCTRL || mod & KMOD_CTRL || mod & KMOD_RCTRL)
-      shift_status |= 4;
+      shift_status |= MOD_CTRL;
 
     if (mod & KMOD_RSHIFT)
-      shift_status |= 1;
+      shift_status |= MOD_RSHIFT;
 
     if (mod & KMOD_LSHIFT)
-      shift_status |= 2;
+      shift_status |= MOD_LSHIFT;
 
     if (mod & KMOD_LALT || mod & KMOD_ALT || mod & KMOD_RALT)
-      shift_status |= 8;
+      shift_status |= MOD_ALT;
 
     if (mod & KMOD_CAPS)
       shift_status |= 64;
@@ -442,8 +442,8 @@ void print_event(const SDL_Event *event) {
 void read_mouse2(void) {
   scan_code = 0;
   ascii = 0;
-  m_b &= ~4; // clear wheel-down (one-shot per frame)
-  m_b &= ~8; // clear wheel-up (one-shot per frame)
+  m_b &= ~MB_SCROLL_DOWN; // clear wheel-down (one-shot per frame)
+  m_b &= ~MB_SCROLL_UP; // clear wheel-up (one-shot per frame)
 
   SDL_Event event;
   int n = 0;
@@ -460,9 +460,9 @@ void read_mouse2(void) {
     }
     if (event.type == SDL_MOUSEWHEEL) {
       if (event.wheel.y > 0) {
-        m_b |= 8;
+        m_b |= MB_SCROLL_UP;
       } else {
-        m_b |= 4;
+        m_b |= MB_SCROLL_DOWN;
       }
     }
 
@@ -508,10 +508,10 @@ void read_mouse2(void) {
     /* If a button on the mouse is pressed. */
     if (event.type == SDL_MOUSEBUTTONDOWN) {
       if (event.button.button == SDL_BUTTON_LEFT) {
-        m_b |= 1;
+        m_b |= MB_LEFT;
       }
       if (event.button.button == SDL_BUTTON_RIGHT) {
-        m_b |= 2;
+        m_b |= MB_RIGHT;
       }
       //	printf("click\n");
       //				m_b = 1;
@@ -520,7 +520,7 @@ void read_mouse2(void) {
       checkmod((OSDEPMod)event.key.keysym.mod);
 
       if (event.key.keysym.sym == SDLK_LCTRL || event.key.keysym.sym == SDLK_RCTRL)
-        shift_status |= 4;
+        shift_status |= MOD_CTRL;
       else { // don't set scan code when lctrl pressed
         scan_code = OSDEP_key[event.key.keysym.sym < 2048 ? event.key.keysym.sym
                                                           : event.key.keysym.sym - 0x3FFFFD1A];
@@ -553,10 +553,10 @@ void read_mouse2(void) {
 
     if (event.type == SDL_MOUSEBUTTONUP) {
       if (event.button.button == SDL_BUTTON_LEFT)
-        m_b &= ~1;
+        m_b &= ~MB_LEFT;
 
       if (event.button.button == SDL_BUTTON_RIGHT)
-        m_b &= ~2;
+        m_b &= ~MB_RIGHT;
     }
   }
   if (soundstopped == 1) {

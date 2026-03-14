@@ -147,7 +147,7 @@ void fpg_dialog2(void) {
     free_drag = 1;
   }
 
-  if ((my_fpg->fpg_info) && (my_fpg->list_info.zone >= 10) && (mouse_b & 1)) {
+  if ((my_fpg->fpg_info) && (my_fpg->list_info.zone >= 10) && (mouse_b & MB_LEFT)) {
     mouse_b = 0;
     Elemento = my_fpg->desc_index[(my_fpg->list_info.zone - 10) + my_fpg->list_info.first_visible];
 
@@ -181,7 +181,7 @@ void fpg_dialog2(void) {
     return;
   }
 
-  if ((my_fpg->list_info.zone >= 10) && (mouse_b & 1 || prev_mouse_buttons & 1) &&
+  if ((my_fpg->list_info.zone >= 10) && (mouse_b & MB_LEFT || prev_mouse_buttons & MB_LEFT) &&
       (mouse_b != prev_mouse_buttons) && (dragging < 3)) {
     Elemento = (my_fpg->list_info.zone - 10) + my_fpg->list_info.first_visible;
 
@@ -1388,11 +1388,11 @@ void FPG_update_listbox_br(struct t_listboxbr *l) {
       v.redraw = 1;
     }
 
-  if ((mouse_b & 8 && wmouse_x != -1) ||
+  if ((mouse_b & MB_SCROLL_UP && wmouse_x != -1) ||
       (l->zone == 2 &&
-       ((mouse_b & 1) || (v_pause && !(mouse_b & 1) && (prev_mouse_buttons & 1))))) {
-    if (mouse_b & 8 || !v_pause || (v_pause && !(mouse_b & 1) && (prev_mouse_buttons & 1))) {
-      if ((prev_mouse_buttons & 1) && !v_pause) {
+       ((mouse_b & MB_LEFT) || (v_pause && !(mouse_b & MB_LEFT) && (prev_mouse_buttons & MB_LEFT))))) {
+    if (mouse_b & MB_SCROLL_UP || !v_pause || (v_pause && !(mouse_b & MB_LEFT) && (prev_mouse_buttons & MB_LEFT))) {
+      if ((prev_mouse_buttons & MB_LEFT) && !v_pause) {
         retrace_wait();
         retrace_wait();
       }
@@ -1414,11 +1414,11 @@ void FPG_update_listbox_br(struct t_listboxbr *l) {
     v.redraw = 1;
   }
 
-  if ((mouse_b & 4 && wmouse_x != -1) ||
+  if ((mouse_b & MB_SCROLL_DOWN && wmouse_x != -1) ||
       (l->zone == 3 &&
-       ((mouse_b & 1) || (v_pause && !(mouse_b & 1) && (prev_mouse_buttons & 1))))) {
-    if (mouse_b & 4 || !v_pause || (v_pause && !(mouse_b & 1) && (prev_mouse_buttons & 1))) {
-      if ((prev_mouse_buttons & 1) && !v_pause) {
+       ((mouse_b & MB_LEFT) || (v_pause && !(mouse_b & MB_LEFT) && (prev_mouse_buttons & MB_LEFT))))) {
+    if (mouse_b & MB_SCROLL_DOWN || !v_pause || (v_pause && !(mouse_b & MB_LEFT) && (prev_mouse_buttons & MB_LEFT))) {
+      if ((prev_mouse_buttons & MB_LEFT) && !v_pause) {
         retrace_wait();
         retrace_wait();
       }
@@ -1443,7 +1443,7 @@ void FPG_update_listbox_br(struct t_listboxbr *l) {
     v.redraw = 1;
   }
 
-  if (l->zone == 4 && (mouse_b & 1)) {
+  if (l->zone == 4 && (mouse_b & MB_LEFT)) {
     l->slide = wmouse_y - 1;
 
     if (l->slide < l->s0)

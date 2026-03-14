@@ -418,7 +418,7 @@ void fonts2(void) {
   }
 
   update_listbox(&lfontsizes);
-  if ((lfontsizes.zone >= 10) && (mouse_b & 1)) {
+  if ((lfontsizes.zone >= 10) && (mouse_b & MB_LEFT)) {
     font_width_gen = font_height_gen =
         fontTamanos[(lfontsizes.zone - 10) + lfontsizes.first_visible];
     DIV_SPRINTF(font_height_str, "%d", font_height_gen);
@@ -1396,7 +1396,7 @@ void show_font1(void) {
 }
 
 void show_font2(void) {
-  if (!(mouse_b & 1) && (prev_mouse_buttons & 1) && wmouse_x != -1) {
+  if (!(mouse_b & MB_LEFT) && (prev_mouse_buttons & MB_LEFT) && wmouse_x != -1) {
     prev_mouse_buttons = 0;
     font_aux = (char *)v.aux + RES_FOR_NAME;
     preview_2();

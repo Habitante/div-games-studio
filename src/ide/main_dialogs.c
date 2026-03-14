@@ -72,14 +72,14 @@ void dialog_loop(void) {
   //-------------------------------------------------------------------------
 
   if (n == MAX_WINDOWS)
-    mouse_graf = 1;
+    mouse_graf = CURSOR_ARROW;
   else if (mouse_in(v.x + 2 * big2, v.y + 2 * big2, v.x + v.w - 2 * big2, v.y + 9 * big2))
     if (mouse_x <= v.x + v.w - 10 * big2)
-      mouse_graf = 2;
+      mouse_graf = CURSOR_MOVE;
     else
-      mouse_graf = 5;
+      mouse_graf = CURSOR_CLOSE;
   else
-    mouse_graf = 1;
+    mouse_graf = CURSOR_ARROW;
 
   //-------------------------------------------------------------------------
   // If we are inside a window's content area ...
@@ -110,11 +110,11 @@ void dialog_loop(void) {
 
     } else { // If we are on the window's control toolbar ...
 
-      if (mouse_graf == 2 && (mouse_b & 1) && !(prev_mouse_buttons & 1))
+      if (mouse_graf == CURSOR_MOVE && (mouse_b & MB_LEFT) && !(prev_mouse_buttons & MB_LEFT))
         move_window();
 
-      if (mouse_graf == 5) {
-        if (mouse_b & 1) {
+      if (mouse_graf == CURSOR_CLOSE) {
+        if (mouse_b & MB_LEFT) {
           if (big)
             wput(v.ptr, v.w / 2, v.h / 2, v.w / 2 - 9, 2, -45);
           else
@@ -124,16 +124,16 @@ void dialog_loop(void) {
           flush_window(0);
           partial_blits = 0;
         }
-        if (!(mouse_b & 1) && (prev_mouse_buttons & 1)) {
+        if (!(mouse_b & MB_LEFT) && (prev_mouse_buttons & MB_LEFT)) {
           close_window();
           salir_del_dialogo = 1;
-        } else if (mouse_b & 1)
+        } else if (mouse_b & MB_LEFT)
           restore_button = 3;
       }
 
       oldn = -1;
     }
-  else if (draw_mode < 100 && (mouse_b & 1)) {
+  else if (draw_mode < 100 && (mouse_b & MB_LEFT)) {
     close_window();
     salir_del_dialogo = 1;
   }
@@ -169,7 +169,7 @@ void dialog_loop(void) {
   // Keyboard Control
   //-------------------------------------------------------------------------
 
-  if ((key(_ESC) && !key(_L_CTRL)) || (draw_mode < 100 && (mouse_b & 2))) {
+  if ((key(_ESC) && !key(_L_CTRL)) || (draw_mode < 100 && (mouse_b & MB_RIGHT))) {
     for (n = 0; n < v.items; n++)
       if (v.item[n].type == ITEM_TEXT && (v.item[n].state & 2))
         break;
@@ -360,7 +360,7 @@ void show_dialog(void_return_type_t init_handler) {
 
       do {
         read_mouse();
-      } while ((mouse_b & 1) || key(_ESC));
+      } while ((mouse_b & MB_LEFT) || key(_ESC));
 
       if (exploding_windows) {
         v.exploding = 1;
@@ -371,7 +371,7 @@ void show_dialog(void_return_type_t init_handler) {
       blit_partial(x, y, w, h);
       do {
         read_mouse();
-      } while (mouse_b & 1);
+      } while (mouse_b & MB_LEFT);
       modal_loop();
 
       get_pos = _get_pos;
@@ -745,7 +745,7 @@ int button_status(int n) {
   }
   if (wmouse_in(x - 3, y - 3, w + 6, h + 6))
     e = 1;
-  if (e && (mouse_b & 1))
+  if (e && (mouse_b & MB_LEFT))
     e = 2;
   if (v.selected_item == n && kbdFLAGS[28])
     e = 3;
@@ -799,8 +799,8 @@ int get_status(int n) {
     else
       x &= 2;
   }
-  if ((x & 1) && (mouse_b & 1)) {
-    if (!(prev_mouse_buttons & 1) && (x & 2))
+  if ((x & 1) && (mouse_b & MB_LEFT)) {
+    if (!(prev_mouse_buttons & MB_LEFT) && (x & 2))
       x |= 4;
     x |= 2;
   }
@@ -866,7 +866,7 @@ int flag_status(int n) {
   int x = 0;
   if (wmouse_in(v.item[n].flag.x, v.item[n].flag.y, text_len(v.item[n].flag.text) + 10, 8))
     x = 1;
-  if (x && (mouse_b & 1))
+  if (x && (mouse_b & MB_LEFT))
     x = 2;
   return (x);
 }
@@ -929,7 +929,7 @@ void get_input(int n) {
     _select_new_item(n + 1);
     return;
   default:
-    if (!(shift_status & 15) && ascii == 0) {
+    if (!(shift_status & (MOD_SHIFT | MOD_CTRL | MOD_ALT)) && ascii == 0) {
       l = v.redraw;
       v.redraw = 1;
       switch (scan_code) {

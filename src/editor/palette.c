@@ -1051,9 +1051,9 @@ void pal_refresh(int preserve_maps, int save_original) {
   }
 
   x = 0;
-  mouse_graf = 3;
+  mouse_graf = CURSOR_BUSY;
   flush_copy();
-  mouse_graf = 1;
+  mouse_graf = CURSOR_ARROW;
 
   init_ghost();
   create_ghost(0);
@@ -1233,7 +1233,7 @@ void sort_colors2(void) {
 
   _process_items();
 
-  if ((mouse_b & 1) && wmouse_in(2, 10, 132, 132)) {
+  if ((mouse_b & MB_LEFT) && wmouse_in(2, 10, 132, 132)) {
     if (wmouse_x < 2 + 66)
       ord = 0;
     else
@@ -1390,7 +1390,7 @@ void merge_palette(void) {
         return;
       }
 
-      mouse_graf = 3;
+      mouse_graf = CURSOR_BUSY;
       blit_screen(screen_buffer);
 
       merge_palettes();
@@ -1966,7 +1966,7 @@ void pal_interpolate2(void) {
   update_listbox(&l_green);
   v_pause = 1;
   if (action)
-    mouse_graf = 2;
+    mouse_graf = CURSOR_MOVE;
   if ((wmouse_y > 10) && (wmouse_y < 138) && (wmouse_x > 2) && (wmouse_x < 130)) {
     cur_color = ((wmouse_y - 10) / 8) * 16 + ((wmouse_x - 2) / 8);
     if (cur_color != old_color) {
@@ -2131,7 +2131,7 @@ void pal_interpolate2(void) {
     v.redraw = 1;
   }
 
-  if ((prev_mouse_buttons & 1) && !(mouse_b & 1)) {
+  if ((prev_mouse_buttons & MB_LEFT) && !(mouse_b & MB_LEFT)) {
     touched = 0;
     switch (l_red.zone) {
     case 2:

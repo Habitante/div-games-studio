@@ -5,6 +5,7 @@
 
 #include "inter.h"
 #include "osdep.h"
+#include "div_enums.h"
 
 
 #define JOY_DEADZONE 500
@@ -79,21 +80,21 @@ void checkmod(OSDEPMod mod) {
     return;
   }
   if (mod & KMOD_LCTRL)
-    shift_status |= 4;
+    shift_status |= MOD_CTRL;
   if (mod & KMOD_RCTRL)
-    shift_status |= 4;
+    shift_status |= MOD_CTRL;
   if (mod & KMOD_RSHIFT)
-    shift_status |= 1;
+    shift_status |= MOD_RSHIFT;
   if (mod & KMOD_LSHIFT)
-    shift_status |= 2;
+    shift_status |= MOD_LSHIFT;
   if (mod & KMOD_RALT)
-    shift_status |= 8;
+    shift_status |= MOD_ALT;
   if (mod & KMOD_LALT)
-    shift_status |= 8;
+    shift_status |= MOD_ALT;
   if (mod & KMOD_CTRL)
-    shift_status |= 4;
+    shift_status |= MOD_CTRL;
   if (mod & KMOD_ALT)
-    shift_status |= 8;
+    shift_status |= MOD_ALT;
 
   if (mod & KMOD_CAPS)
     shift_status |= 64;
@@ -188,22 +189,22 @@ void poll_keyboard(void) {
       switch (event.key.keysym.sym) {
         // handle special keys
       case SDLK_LSHIFT:
-        shift_status |= 2;
+        shift_status |= MOD_LSHIFT;
         break;
       case SDLK_RSHIFT:
-        shift_status |= 1;
+        shift_status |= MOD_RSHIFT;
         break;
       case SDLK_LCTRL:
-        shift_status |= 4;
+        shift_status |= MOD_CTRL;
         break;
       case SDLK_RCTRL:
-        shift_status |= 4;
+        shift_status |= MOD_CTRL;
         break;
       case SDLK_LALT:
-        shift_status |= 8;
+        shift_status |= MOD_ALT;
         break;
       case SDLK_RALT:
-        shift_status |= 8;
+        shift_status |= MOD_ALT;
         break;
       case SDLK_INSERT:
         shift_status |= 128;
@@ -238,19 +239,19 @@ void poll_keyboard(void) {
       if (event.button.button == SDL_BUTTON_LEFT) {
         mouse->left = 1;
 #ifdef DEBUG
-        mouse_b |= 1;
+        mouse_b |= MB_LEFT;
 #endif
       }
       if (event.button.button == SDL_BUTTON_RIGHT) {
         mouse->right = 1;
 #ifdef DEBUG
-        mouse_b |= 2;
+        mouse_b |= MB_RIGHT;
 #endif
       }
       if (event.button.button == SDL_BUTTON_MIDDLE) {
         mouse->middle = 1;
 #ifdef DEBUG
-        mouse_b |= 4;
+        mouse_b |= MB_SCROLL_DOWN;
 #endif
       }
     }
@@ -259,26 +260,26 @@ void poll_keyboard(void) {
       if (event.button.button == SDL_BUTTON_LEFT) {
         mouse->left = 0;
 #ifdef DEBUG
-        mouse_b ^= 1;
+        mouse_b ^= MB_LEFT;
 #endif
       }
 
       if (event.button.button == SDL_BUTTON_RIGHT) {
         mouse->right = 0;
 #ifdef DEBUG
-        mouse_b ^= 2;
+        mouse_b ^= MB_RIGHT;
 #endif
       }
 
       if (event.button.button == SDL_BUTTON_MIDDLE) {
         mouse->middle = 0;
 #ifdef DEBUG
-        mouse_b ^= 4;
+        mouse_b ^= MB_SCROLL_DOWN;
 #endif
       }
     }
 
-    if ((shift_status & 8) && scan_code == _x)
+    if ((shift_status & MOD_ALT) && scan_code == _x)
       alt_x = 1;
 
   } // end while

@@ -484,7 +484,7 @@ void profile2(void) {
     return;
   }
 
-  if (wmouse_in(3, lpy, w - 15, lpnum * lpal) && (mouse_b & 1)) {
+  if (wmouse_in(3, lpy, w - 15, lpnum * lpal) && (mouse_b & MB_LEFT)) {
     n = lp_ini + (wmouse_y - lpy) / lpal;
     if (n < lp_num) {
       if (lp_select != n) {
@@ -496,7 +496,7 @@ void profile2(void) {
   }
 
   if (wmouse_in(w - 12, lpy - 1, 9, 9)) {
-    if (mouse_b & 1) {
+    if (mouse_b & MB_LEFT) {
       if (lp_button == 0) {
         wput(ptr, w, h, w - 11, lpy, -41);
         lp_button = 1;
@@ -522,7 +522,7 @@ void profile2(void) {
 
   if (wmouse_in(w - 11, lpy + 8, 7, lpnum * lpal - 17)) {
     mouse_graf = 13;
-    if (lp_num > 1 && (mouse_b & 1)) {
+    if (lp_num > 1 && (mouse_b & MB_LEFT)) {
       x = (float)(wmouse_y - lpy - 8) / (float)(lpnum * lpal - 18);
       lp_select = x * (lp_num - 1);
       if (lp_select < lp_ini)
@@ -535,7 +535,7 @@ void profile2(void) {
   }
 
   if (wmouse_in(w - 12, lpy + lpnum * lpal - 9, 9, 9)) {
-    if (mouse_b & 1) {
+    if (mouse_b & MB_LEFT) {
       if (lp_button == 0) {
         wput(ptr, w, h, w - 11, lpy + lpnum * lpal - 8, -42);
         lp_button = 2;
@@ -560,7 +560,7 @@ void profile2(void) {
 
   // Functions listbox
 
-  if (wmouse_in(3, lp2y, w - lp2esp - 15, lp2num * lp2al) && (mouse_b & 1)) {
+  if (wmouse_in(3, lp2y, w - lp2esp - 15, lp2num * lp2al) && (mouse_b & MB_LEFT)) {
     n = lp2_ini + (wmouse_y - lp2y) / lp2al;
     if (n < lp2_num) {
       if (lp2_select != n) {
@@ -572,7 +572,7 @@ void profile2(void) {
   }
 
   if (wmouse_in(w - lp2esp - 12, lp2y - 1, 9, 9)) {
-    if (mouse_b & 1) {
+    if (mouse_b & MB_LEFT) {
       if (lp2_button == 0) {
         wput(ptr, w, h, w - lp2esp - 11, lp2y, -41);
         lp2_button = 1;
@@ -598,7 +598,7 @@ void profile2(void) {
 
   if (wmouse_in(w - lp2esp - 11, lp2y + 8, 7, lp2num * lp2al - 17)) {
     mouse_graf = 13;
-    if (lp2_num > 1 && (mouse_b & 1)) {
+    if (lp2_num > 1 && (mouse_b & MB_LEFT)) {
       x = (float)(wmouse_y - lp2y - 8) / (float)(lp2num * lp2al - 18);
       lp2_select = x * (lp2_num - 1);
       if (lp2_select < lp2_ini)
@@ -611,7 +611,7 @@ void profile2(void) {
   }
 
   if (wmouse_in(w - lp2esp - 12, lp2y + lp2num * lp2al - 9, 9, 9)) {
-    if (mouse_b & 1) {
+    if (mouse_b & MB_LEFT) {
       if (lp2_button == 0) {
         wput(ptr, w, h, w - lp2esp - 11, lp2y + lp2num * lp2al - 8, -42);
         lp2_button = 2;

@@ -665,21 +665,21 @@ void interpolation_mode(void) {
         select_zoom();
         test_mouse();
 
-        if (((mouse_b & 1) && selected_icon == 2)) {
+        if (((mouse_b & MB_LEFT) && selected_icon == 2)) {
           fill_inter(w, h);
           need_zoom = 1;
-        } else if ((mouse_b & 1) && selected_icon == 1) {
+        } else if ((mouse_b & MB_LEFT) && selected_icon == 1) {
           fill_inter(w, h);
           need_zoom = 1;
           do {
             read_mouse();
-          } while (mouse_b & 1);
+          } while (mouse_b & MB_LEFT);
         }
 
         blit_interpolated(w);
 
         blit_edit();
-      } while (!(mouse_b & 2) && !key(_ESC) && draw_mode < 100 &&
+      } while (!(mouse_b & MB_RIGHT) && !key(_ESC) && draw_mode < 100 &&
                !(mouse_b && mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18)));
 
       blit_interpolated(w);

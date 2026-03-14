@@ -6,6 +6,7 @@
 #include "inter.h"
 #include "madewith.h"
 #include "../../div_string.h"
+#include "div_enums.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 //	Declarations and module-level data
@@ -377,10 +378,10 @@ extern int alt_x;
 
 void blit_screen(byte *p) {
 #ifndef __EMSCRIPTEN__
-  if ((shift_status & 4) && (shift_status & 8) && key(_0)) {
+  if ((shift_status & MOD_CTRL) && (shift_status & MOD_ALT) && key(_0)) {
     recording = 1;
   }
-  if ((shift_status & 4) && (shift_status & 8) && key(_9)) {
+  if ((shift_status & MOD_CTRL) && (shift_status & MOD_ALT) && key(_9)) {
     recording = 0;
   }
 
@@ -400,7 +401,7 @@ void blit_screen(byte *p) {
   }
   // CTRL + ALT + P
 
-  if ((shift_status & 4) && (shift_status & 8) && key(_P)) {
+  if ((shift_status & MOD_CTRL) && (shift_status & MOD_ALT) && key(_P)) {
     snapshot(p);
     do {
       poll_keyboard();
@@ -409,7 +410,7 @@ void blit_screen(byte *p) {
 
   {
     static uint32_t fs_cooldown = 0;
-    if (shift_status & 8 && key(_ENTER) && SDL_GetTicks() - fs_cooldown > 500) {
+    if (shift_status & MOD_ALT && key(_ENTER) && SDL_GetTicks() - fs_cooldown > 500) {
       toggle_fullscreen(vga);
       fs_cooldown = SDL_GetTicks();
     }

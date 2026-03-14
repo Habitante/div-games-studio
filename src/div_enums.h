@@ -90,4 +90,38 @@ enum button_align {
 #define MENU_TEXT_MARGIN   7
 #define MENU_WIDTH_PAD     23
 
+// Mouse button bits (mouse_b)
+// Undefine Windows SDK clashes first
+#ifdef MB_RIGHT
+#undef MB_RIGHT
+#endif
+#define MB_LEFT           0x01
+#define MB_RIGHT          0x02
+#define MB_SCROLL_DOWN    0x04
+#define MB_SCROLL_UP      0x08
+#define MB_KEYBOARD_CLICK 0x8001
+
+// Keyboard modifier bits (shift_status)
+#ifdef MOD_SHIFT
+#undef MOD_SHIFT
+#endif
+#ifdef MOD_ALT
+#undef MOD_ALT
+#endif
+#define MOD_RSHIFT  0x01
+#define MOD_LSHIFT  0x02
+#define MOD_SHIFT   0x03  // Mask: either shift key
+#define MOD_CTRL    0x04
+#define MOD_ALT     0x08
+
+// Mouse cursor IDs (mouse_graf)
+#define CURSOR_ARROW      1
+#define CURSOR_MOVE       2
+#define CURSOR_BUSY       3
+#define CURSOR_MINIMIZE   4
+#define CURSOR_CLOSE      5
+#define CURSOR_RESIZE     6
+#define CURSOR_ACTIVATE   7
+#define CURSOR_ON_CANVAS  10
+
 #endif // DIV_ENUMS_H

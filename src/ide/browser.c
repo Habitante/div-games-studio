@@ -1702,10 +1702,10 @@ void browser2(void) {
     break;
   }
 
-  if ((mouse_b & 1) && !(prev_mouse_buttons & 1)) {
+  if ((mouse_b & MB_LEFT) && !(prev_mouse_buttons & MB_LEFT)) {
     if (file_list_br.zone >= 10) {
       if (v_type != 6 && !v_mode) {
-        if (shift_status & 3) // SHIFT
+        if (shift_status & MOD_SHIFT) // SHIFT
         {
           for (num = 0; num < file_list_br.total_items; num++)
             thumb[num].tagged = 0;
@@ -1719,7 +1719,7 @@ void browser2(void) {
             thumb[n].tagged = 1;
             num_taggeds++;
           }
-        } else if (shift_status & 4) // CTRL
+        } else if (shift_status & MOD_CTRL) // CTRL
         {
           selected = file_list_br.zone - 10 + file_list_br.first_visible;
           ini_tagged = selected;
@@ -1784,7 +1784,7 @@ void browser2(void) {
 
             } else {
               Mix_PlayChannel(0, smp, 0);
-              while (mouse_b & 1)
+              while (mouse_b & MB_LEFT)
                 read_mouse();
             }
           }
@@ -2063,8 +2063,8 @@ void update_listbox_br(struct t_listboxbr *l) {
       v.redraw = 1;
     }
 
-  if ((l->zone > 0 && mouse_b & 8) || (l->zone == 2 && (mouse_b & 1))) {
-    if (prev_mouse_buttons & 1) {
+  if ((l->zone > 0 && mouse_b & MB_SCROLL_UP) || (l->zone == 2 && (mouse_b & MB_LEFT))) {
+    if (prev_mouse_buttons & MB_LEFT) {
       retrace_wait();
       retrace_wait();
       retrace_wait();
@@ -2084,8 +2084,8 @@ void update_listbox_br(struct t_listboxbr *l) {
     v.redraw = 1;
   }
 
-  if ((l->zone > 0 && mouse_b & 4) || (l->zone == 3 && (mouse_b & 1))) {
-    if (prev_mouse_buttons & 1) {
+  if ((l->zone > 0 && mouse_b & MB_SCROLL_DOWN) || (l->zone == 3 && (mouse_b & MB_LEFT))) {
+    if (prev_mouse_buttons & MB_LEFT) {
       retrace_wait();
       retrace_wait();
       retrace_wait();
@@ -2106,7 +2106,7 @@ void update_listbox_br(struct t_listboxbr *l) {
     v.redraw = 1;
   }
 
-  if (l->zone == 4 && (mouse_b & 1)) {
+  if (l->zone == 4 && (mouse_b & MB_LEFT)) {
     l->slide = wmouse_y - 1;
     if (l->slide < l->s0)
       l->slide = l->s0;

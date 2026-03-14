@@ -246,7 +246,7 @@ void help2(void) {
       mouse_graf = 12;
     }
 
-    if (scan_code == 72 || (mouse_graf == 7 && (mouse_b & 1) && wmouse_x != -1)) {
+    if (scan_code == 72 || (mouse_graf == 7 && (mouse_b & MB_LEFT) && wmouse_x != -1)) {
       if (scan_code != 72) {
         if (!(v.buttons & 2)) {
           wput(v.ptr, w, h, w - 9, 10, -41);
@@ -270,8 +270,8 @@ void help2(void) {
       v.buttons ^= 2;
       v.redraw++;
     }
-    if (scan_code == 73 || (mouse_b & 8 && wmouse_x != -1)) {
-      for (n = 0; n < (mouse_b & 8 ? 3 : help_h); n++) {
+    if (scan_code == 73 || (mouse_b & MB_SCROLL_UP && wmouse_x != -1)) {
+      for (n = 0; n < (mouse_b & MB_SCROLL_UP ? 3 : help_h); n++) {
         if (help_line != help_buffer + 1) {
           help_line--;
           while (*(--help_line))
@@ -284,7 +284,7 @@ void help2(void) {
       v.redraw++;
     }
 
-    if (scan_code == 80 || (mouse_graf == 9 && (mouse_b & 1) && wmouse_x != -1)) {
+    if (scan_code == 80 || (mouse_graf == 9 && (mouse_b & MB_LEFT) && wmouse_x != -1)) {
       if (scan_code != 80) {
         if (!(v.buttons & 4)) {
           wput(v.ptr, w, h, w - 9, h - 17, -42);
@@ -307,8 +307,8 @@ void help2(void) {
       v.redraw++;
     }
 
-    if (scan_code == 81 || (mouse_b & 4 && wmouse_x != -1)) {
-      for (n = 0; n < (mouse_b & 4 ? 3 : help_h); n++) {
+    if (scan_code == 81 || (mouse_b & MB_SCROLL_DOWN && wmouse_x != -1)) {
+      for (n = 0; n < (mouse_b & MB_SCROLL_DOWN ? 3 : help_h); n++) {
         if (help_l + help_h < help_lines) {
           while (*(help_line++))
             ;
@@ -319,7 +319,7 @@ void help2(void) {
       v.redraw++;
     }
 
-    if (mouse_graf == 13 && (mouse_b & 1) && wmouse_x != -1) {
+    if (mouse_graf == 13 && (mouse_b & MB_LEFT) && wmouse_x != -1) {
       min = 18;
       max = h - 21;
       forced_helpslider = wmouse_y - 1;
@@ -359,7 +359,7 @@ void help2(void) {
       }
     }
 
-    if (mouse_graf == 12 && (mouse_b & 1))
+    if (mouse_graf == 12 && (mouse_b & MB_LEFT))
       resize_help();
 
     vertical_scrollbar();
@@ -417,8 +417,8 @@ void help2(void) {
         // We are over a cross-reference in the hypertext
 
         if (n != -1) {
-          mouse_graf = 2;
-          if ((mouse_b & 1) && !(prev_mouse_buttons & 1) && old_estado) {
+          mouse_graf = CURSOR_MOVE;
+          if ((mouse_b & MB_LEFT) && !(prev_mouse_buttons & MB_LEFT) && old_estado) {
             if (n == 9999) { // *** Extract an example ***
               if ((di = p = (byte *)malloc(16384)) != NULL) {
                 while (*si != 6)
@@ -465,7 +465,7 @@ void help2(void) {
       }
     }
 
-    if (((scan_code == 14 && !(shift_status & 3)) || v.active_item == 0) && a_back != i_back) {
+    if (((scan_code == 14 && !(shift_status & MOD_SHIFT)) || v.active_item == 0) && a_back != i_back) {
       a_back -= 2;
       if (a_back < 0)
         a_back = 62;
@@ -486,7 +486,7 @@ void help2(void) {
       }
     }
 
-    if (((scan_code == 14 && (shift_status & 3)) || v.active_item == 1) && a_back != f_back) {
+    if (((scan_code == 14 && (shift_status & MOD_SHIFT)) || v.active_item == 1) && a_back != f_back) {
       f2_back = f_back;
       help_xref(backto[a_back], backto[a_back + 1]);
       f_back = f2_back;
@@ -623,7 +623,7 @@ void resize_help(void) {
     blit_screen(screen_buffer);
     save_mouse_bg(mouse_background, _mx, my, mouse_graf, 1);
 
-  } while (mouse_b & 1);
+  } while (mouse_b & MB_LEFT);
 
   wput(v.ptr, w, h, w - 9, h - 9, -34);
   v.redraw = 2;

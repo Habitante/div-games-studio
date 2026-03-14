@@ -83,7 +83,7 @@ void edit_scr(void) {
     // ...
 
     blit_edit();
-  } while (!exit_requested && !(mouse_b & 2) && !key(_ESC) && draw_mode < 100 &&
+  } while (!exit_requested && !(mouse_b & MB_RIGHT) && !key(_ESC) && draw_mode < 100 &&
            !(mouse_b && mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18)));
 }
 
@@ -108,7 +108,7 @@ void edit_mode_0(void) {
     draw_help(1295);
     edit_ruler();
     select_color(2);
-    if (((mouse_b & 1) && !(prev_mouse_buttons & 1)) && mouse_graf >= 10) {
+    if (((mouse_b & MB_LEFT) && !(prev_mouse_buttons & MB_LEFT)) && mouse_graf >= CURSOR_ON_CANVAS) {
       if (!mask[*(map + coord_x + coord_y * map_width)]) {
         if (*(map + coord_x + coord_y * map_width) != color) {
           save_undo(coord_x, coord_y, 1, 1);
@@ -120,19 +120,19 @@ void edit_mode_0(void) {
       }
     }
 
-    if (((mouse_b & 1) && selected_icon == 1) ||
+    if (((mouse_b & MB_LEFT) && selected_icon == 1) ||
         (scan_code == 14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
       undo_back();
       do {
         read_mouse();
-      } while (mouse_b & 1);
+      } while (mouse_b & MB_LEFT);
     } else if (scan_code == 14 && (key(_L_SHIFT) || key(_R_SHIFT))) {
       undo_next();
       need_zoom = 1;
     }
 
     blit_edit();
-  } while (!exit_requested && !(mouse_b & 2) && !key(_ESC) && draw_mode < 100 &&
+  } while (!exit_requested && !(mouse_b & MB_RIGHT) && !key(_ESC) && draw_mode < 100 &&
            !(mouse_b && mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18)));
 }
 
@@ -163,7 +163,7 @@ void edit_mode_1(void) {
 
     a = -1; // Last action performed (this iteration) - undefined
 
-    if ((mouse_b & 1) && mouse_graf >= 10) {
+    if ((mouse_b & MB_LEFT) && mouse_graf >= CURSOR_ON_CANVAS) {
       if (key(_D))
         blur_enabled = 1;
 
@@ -184,12 +184,12 @@ void edit_mode_1(void) {
     if (a >= 0)
       _a = a; // Save the last action
 
-    if (((mouse_b & 1) && selected_icon == 1) ||
+    if (((mouse_b & MB_LEFT) && selected_icon == 1) ||
         (scan_code == 14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
       undo_back();
       do {
         read_mouse();
-      } while (mouse_b & 1);
+      } while (mouse_b & MB_LEFT);
     } else if (scan_code == 14 && (key(_L_SHIFT) || key(_R_SHIFT))) {
       undo_next();
       need_zoom = 1;
@@ -199,7 +199,7 @@ void edit_mode_1(void) {
     _y = coord_y;
     _b = mouse_b;
     blit_edit();
-  } while (!exit_requested && !(mouse_b & 2) && !key(_ESC) && draw_mode < 100 &&
+  } while (!exit_requested && !(mouse_b & MB_RIGHT) && !key(_ESC) && draw_mode < 100 &&
            !(mouse_b && mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18)));
 }
 
@@ -240,17 +240,17 @@ void edit_mode_2(void) {
     back = 0;
     switch (s) {
     case 0:
-      if ((mouse_b & 1) && mouse_graf >= 10) {
+      if ((mouse_b & MB_LEFT) && mouse_graf >= CURSOR_ON_CANVAS) {
         s = 1;
         x0 = coord_x;
         y0 = coord_y;
         do {
           read_mouse();
-        } while (mouse_b & 1);
+        } while (mouse_b & MB_LEFT);
       }
       break;
     case 1:
-      if (mouse_graf >= 10) {
+      if (mouse_graf >= CURSOR_ON_CANVAS) {
         line_fx = line_tool_effect;
         undo_error = 0;
         line(x0, y0, coord_x, coord_y, 1);
@@ -259,11 +259,11 @@ void edit_mode_2(void) {
         else {
           w = (x0 > coord_x) ? x0 - coord_x : coord_x - x0;
           h = (y0 > coord_y) ? y0 - coord_y : coord_y - y0;
-          if (mouse_b & 1) {
+          if (mouse_b & MB_LEFT) {
             s = 0;
             do {
               read_mouse();
-            } while (mouse_b & 1);
+            } while (mouse_b & MB_LEFT);
           } else if (mouse_b || key(_ESC)) {
             do {
               read_mouse();
@@ -279,12 +279,12 @@ void edit_mode_2(void) {
 
     blur_enabled = 0;
 
-    if (((mouse_b & 1) && selected_icon == 1) ||
+    if (((mouse_b & MB_LEFT) && selected_icon == 1) ||
         (scan_code == 14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
       undo_back();
       do {
         read_mouse();
-      } while (mouse_b & 1);
+      } while (mouse_b & MB_LEFT);
     } else if (scan_code == 14 && (key(_L_SHIFT) || key(_R_SHIFT))) {
       undo_next();
       need_zoom = 1;
@@ -304,7 +304,7 @@ void edit_mode_2(void) {
       need_zoom = 0;
     }
 
-  } while (!exit_requested && !(mouse_b & 2) && !(key(_ESC) && s != 1) && draw_mode < 100 &&
+  } while (!exit_requested && !(mouse_b & MB_RIGHT) && !(key(_ESC) && s != 1) && draw_mode < 100 &&
            !(mouse_b && mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18)));
 }
 
@@ -345,18 +345,18 @@ void edit_mode_3(void) {
     back = 0;
     switch (s) {
     case 0:
-      if ((mouse_b & 1) && mouse_graf >= 10) {
+      if ((mouse_b & MB_LEFT) && mouse_graf >= CURSOR_ON_CANVAS) {
         s = 1;
         x0 = coord_x;
         y0 = coord_y;
         do {
           read_mouse();
-        } while (mouse_b & 1);
+        } while (mouse_b & MB_LEFT);
       }
       break;
     case 1:
     case 2:
-      if (mouse_graf >= 10) {
+      if (mouse_graf >= CURSOR_ON_CANVAS) {
         line_fx = box_tool_effect;
         undo_error = 0;
         line(x0, y0, coord_x, coord_y, s & 1);
@@ -365,13 +365,13 @@ void edit_mode_3(void) {
         else {
           w = (x0 > coord_x) ? x0 - coord_x : coord_x - x0;
           h = (y0 > coord_y) ? y0 - coord_y : coord_y - y0;
-          if (mouse_b & 1) {
+          if (mouse_b & MB_LEFT) {
             s = 2;
             x0 = coord_x;
             y0 = coord_y;
             do {
               read_mouse();
-            } while (mouse_b & 1);
+            } while (mouse_b & MB_LEFT);
           } else if (mouse_b || key(_ESC)) {
             do {
               read_mouse();
@@ -387,12 +387,12 @@ void edit_mode_3(void) {
 
     blur_enabled = 0;
 
-    if (((mouse_b & 1) && selected_icon == 1) ||
+    if (((mouse_b & MB_LEFT) && selected_icon == 1) ||
         (scan_code == 14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
       undo_back();
       do {
         read_mouse();
-      } while (mouse_b & 1);
+      } while (mouse_b & MB_LEFT);
     } else if (scan_code == 14 && (key(_L_SHIFT) || key(_R_SHIFT))) {
       undo_next();
       need_zoom = 1;
@@ -412,7 +412,7 @@ void edit_mode_3(void) {
       need_zoom = 0;
     }
 
-  } while (!exit_requested && !(mouse_b & 2) && !(key(_ESC) && s != 1) && draw_mode < 100 &&
+  } while (!exit_requested && !(mouse_b & MB_RIGHT) && !(key(_ESC) && s != 1) && draw_mode < 100 &&
            !(mouse_b && mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18)));
 }
 
@@ -452,30 +452,30 @@ void edit_mode_4(void) {
     back = 0;
     switch (s) {
     case 0:
-      if ((mouse_b & 1) && mouse_graf >= 10) {
+      if ((mouse_b & MB_LEFT) && mouse_graf >= CURSOR_ON_CANVAS) {
         s = 1;
         x0 = coord_x;
         y0 = coord_y;
         do {
           read_mouse();
-        } while (mouse_b & 1);
+        } while (mouse_b & MB_LEFT);
       }
       break;
     case 1:
-      if (mouse_graf >= 10) {
+      if (mouse_graf >= CURSOR_ON_CANVAS) {
         line_fx = bezier_tool_effect;
         undo_error = 0;
         line(x0, y0, coord_x, coord_y, 1);
         if (undo_error)
           s = 0;
         else {
-          if (mouse_b & 1) {
+          if (mouse_b & MB_LEFT) {
             s = 2;
             x1 = coord_x;
             y1 = coord_y;
             do {
               read_mouse();
-            } while (mouse_b & 1);
+            } while (mouse_b & MB_LEFT);
           } else if (mouse_b || key(_ESC)) {
             do {
               read_mouse();
@@ -487,20 +487,20 @@ void edit_mode_4(void) {
       }
       break;
     case 2:
-      if (mouse_graf >= 10) {
+      if (mouse_graf >= CURSOR_ON_CANVAS) {
         line_fx = bezier_tool_effect;
         undo_error = 0;
         bezier(x0, y0, x1, y1, coord_x, coord_y, coord_x, coord_y, 1);
         if (undo_error)
           s = 0;
         else {
-          if (mouse_b & 1) {
+          if (mouse_b & MB_LEFT) {
             s = 3;
             _x0 = coord_x;
             _y0 = coord_y;
             do {
               read_mouse();
-            } while (mouse_b & 1);
+            } while (mouse_b & MB_LEFT);
           } else if (mouse_b || key(_ESC)) {
             do {
               read_mouse();
@@ -512,18 +512,18 @@ void edit_mode_4(void) {
       }
       break;
     case 3:
-      if (mouse_graf >= 10) {
+      if (mouse_graf >= CURSOR_ON_CANVAS) {
         line_fx = bezier_tool_effect;
         undo_error = 0;
         bezier(x0, y0, x1, y1, _x0, _y0, coord_x, coord_y, 1);
         if (undo_error)
           s = 0;
         else {
-          if (mouse_b & 1) {
+          if (mouse_b & MB_LEFT) {
             s = 0;
             do {
               read_mouse();
-            } while (mouse_b & 1);
+            } while (mouse_b & MB_LEFT);
           } else if (mouse_b || key(_ESC)) {
             do {
               read_mouse();
@@ -539,12 +539,12 @@ void edit_mode_4(void) {
 
     blur_enabled = 0;
 
-    if (((mouse_b & 1) && selected_icon == 1) ||
+    if (((mouse_b & MB_LEFT) && selected_icon == 1) ||
         (scan_code == 14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
       undo_back();
       do {
         read_mouse();
-      } while (mouse_b & 1);
+      } while (mouse_b & MB_LEFT);
     } else if (scan_code == 14 && (key(_L_SHIFT) || key(_R_SHIFT))) {
       undo_next();
       need_zoom = 1;
@@ -563,7 +563,7 @@ void edit_mode_4(void) {
       need_zoom = 0;
     }
 
-  } while (!exit_requested && !(mouse_b & 2) && !(key(_ESC) && s != 1) && draw_mode < 100 &&
+  } while (!exit_requested && !(mouse_b & MB_RIGHT) && !(key(_ESC) && s != 1) && draw_mode < 100 &&
            !(mouse_b && mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18)));
 }
 
@@ -605,24 +605,24 @@ void edit_mode_5(void) {
 
     switch (s) {
     case 0:
-      if ((mouse_b & 1) && mouse_graf >= 10) {
+      if ((mouse_b & MB_LEFT) && mouse_graf >= CURSOR_ON_CANVAS) {
         s = 1;
         x0 = coord_x;
         y0 = coord_y;
         do {
           read_mouse();
-        } while (mouse_b & 1);
+        } while (mouse_b & MB_LEFT);
       }
       break;
     case 1:
-      if (mouse_graf >= 10) {
+      if (mouse_graf >= CURSOR_ON_CANVAS) {
         line_fx = polygon_tool_effect;
         undo_error = 0;
         line(x0, y0, coord_x, coord_y, 1);
         if (undo_error)
           s = 0;
         else {
-          if (mouse_b & 1) {
+          if (mouse_b & MB_LEFT) {
             s = 2;
             x0 = x0 - coord_x;
             y0 = coord_y - y0;
@@ -634,7 +634,7 @@ void edit_mode_5(void) {
             y1 = coord_y;
             do {
               read_mouse();
-            } while (mouse_b & 1);
+            } while (mouse_b & MB_LEFT);
           } else if (mouse_b || key(_ESC)) {
             back = 1;
             do {
@@ -647,7 +647,7 @@ void edit_mode_5(void) {
       }
       break;
     case 2:
-      if (mouse_graf >= 10) {
+      if (mouse_graf >= CURSOR_ON_CANVAS) {
         y0 = sqrt(abs(coord_x - x1) * abs(coord_x - x1) + abs(coord_y - y1) * abs(coord_y - y1));
 
         if (key(0xd) || key(0x4e))
@@ -664,7 +664,7 @@ void edit_mode_5(void) {
         if (undo_error)
           s = 0;
         else {
-          if (mouse_b & 1) {
+          if (mouse_b & MB_LEFT) {
             x0 = bezier_x - coord_x;
             y0 = coord_y - bezier_y;
             if (!x0 && !y0)
@@ -675,7 +675,7 @@ void edit_mode_5(void) {
             y1 = coord_y;
             do {
               read_mouse();
-            } while (mouse_b & 1);
+            } while (mouse_b & MB_LEFT);
           } else if (mouse_b || key(_ESC)) {
             back = 1;
             do {
@@ -691,12 +691,12 @@ void edit_mode_5(void) {
 
     blur_enabled = 0;
 
-    if (((mouse_b & 1) && selected_icon == 1) ||
+    if (((mouse_b & MB_LEFT) && selected_icon == 1) ||
         (scan_code == 14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
       undo_back();
       do {
         read_mouse();
-      } while (mouse_b & 1);
+      } while (mouse_b & MB_LEFT);
     } else if (scan_code == 14 && (key(_L_SHIFT) || key(_R_SHIFT))) {
       undo_next();
       need_zoom = 1;
@@ -715,7 +715,7 @@ void edit_mode_5(void) {
       need_zoom = 0;
     }
 
-  } while (!exit_requested && !(mouse_b & 2) && !(key(_ESC) && s != 1) && draw_mode < 100 &&
+  } while (!exit_requested && !(mouse_b & MB_RIGHT) && !(key(_ESC) && s != 1) && draw_mode < 100 &&
            !(mouse_b && mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18)));
 }
 
@@ -754,17 +754,17 @@ void edit_mode_6(void) {
     back = 0;
     switch (s) {
     case 0:
-      if ((mouse_b & 1) && mouse_graf >= 10) {
+      if ((mouse_b & MB_LEFT) && mouse_graf >= CURSOR_ON_CANVAS) {
         s = 1;
         x0 = coord_x;
         y0 = coord_y;
         do {
           read_mouse();
-        } while (mouse_b & 1);
+        } while (mouse_b & MB_LEFT);
       }
       break;
     case 1:
-      if (mouse_graf >= 10) {
+      if (mouse_graf >= CURSOR_ON_CANVAS) {
         line_fx = filled_tool_effect;
         w = coord_x - x0;
         h = coord_y - y0;
@@ -790,11 +790,11 @@ void edit_mode_6(void) {
           if (undo_error)
             s = 0;
         }
-        if (mouse_b & 1) {
+        if (mouse_b & MB_LEFT) {
           s = 0;
           do {
             read_mouse();
-          } while (mouse_b & 1);
+          } while (mouse_b & MB_LEFT);
         } else if (mouse_b || key(_ESC)) {
           do {
             read_mouse();
@@ -807,12 +807,12 @@ void edit_mode_6(void) {
       break;
     }
 
-    if (((mouse_b & 1) && selected_icon == 1) ||
+    if (((mouse_b & MB_LEFT) && selected_icon == 1) ||
         (scan_code == 14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
       undo_back();
       do {
         read_mouse();
-      } while (mouse_b & 1);
+      } while (mouse_b & MB_LEFT);
     } else if (scan_code == 14 && (key(_L_SHIFT) || key(_R_SHIFT))) {
       undo_next();
       need_zoom = 1;
@@ -837,7 +837,7 @@ void edit_mode_6(void) {
       need_zoom = 0;
     }
 
-  } while (!exit_requested && !(mouse_b & 2) && !(key(_ESC) && s != 1) && draw_mode < 100 &&
+  } while (!exit_requested && !(mouse_b & MB_RIGHT) && !(key(_ESC) && s != 1) && draw_mode < 100 &&
            !(mouse_b && mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18)));
 }
 
@@ -876,17 +876,17 @@ void edit_mode_7(void) {
     back = 0;
     switch (s) {
     case 0:
-      if ((mouse_b & 1) && mouse_graf >= 10) {
+      if ((mouse_b & MB_LEFT) && mouse_graf >= CURSOR_ON_CANVAS) {
         s = 1;
         x0 = coord_x;
         y0 = coord_y;
         do {
           read_mouse();
-        } while (mouse_b & 1);
+        } while (mouse_b & MB_LEFT);
       }
       break;
     case 1:
-      if (mouse_graf >= 10) {
+      if (mouse_graf >= CURSOR_ON_CANVAS) {
         line_fx = circle_tool_effect;
         if (mode_circle < 2) {
           w = coord_x - x0;
@@ -939,11 +939,11 @@ void edit_mode_7(void) {
               s = 0;
           }
         }
-        if (mouse_b & 1) {
+        if (mouse_b & MB_LEFT) {
           s = 0;
           do {
             read_mouse();
-          } while (mouse_b & 1);
+          } while (mouse_b & MB_LEFT);
         } else if (mouse_b || key(_ESC)) {
           do {
             read_mouse();
@@ -956,12 +956,12 @@ void edit_mode_7(void) {
       break;
     }
 
-    if (((mouse_b & 1) && selected_icon == 1) ||
+    if (((mouse_b & MB_LEFT) && selected_icon == 1) ||
         (scan_code == 14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
       undo_back();
       do {
         read_mouse();
-      } while (mouse_b & 1);
+      } while (mouse_b & MB_LEFT);
     } else if (scan_code == 14 && (key(_L_SHIFT) || key(_R_SHIFT))) {
       undo_next();
       need_zoom = 1;
@@ -986,7 +986,7 @@ void edit_mode_7(void) {
       need_zoom = 0;
     }
 
-  } while (!exit_requested && !(mouse_b & 2) && !(key(_ESC) && s != 1) && draw_mode < 100 &&
+  } while (!exit_requested && !(mouse_b & MB_RIGHT) && !(key(_ESC) && s != 1) && draw_mode < 100 &&
            !(mouse_b && mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18)));
 }
 
@@ -1029,7 +1029,7 @@ void edit_mode_8(void) {
     if (key(_D))
       blur_enabled = 1;
 
-    if ((mouse_b & 1) && mouse_graf >= 10) {
+    if ((mouse_b & MB_LEFT) && mouse_graf >= CURSOR_ON_CANVAS) {
       if (clock_spray != -1) {
         if (u == undo_spray || abs(coord_x - ux) > undo_box || abs(coord_y - uy) > undo_box) {
           u = 0;
@@ -1080,12 +1080,12 @@ void edit_mode_8(void) {
 
     blur_enabled = 0;
 
-    if (((mouse_b & 1) && selected_icon == 1) ||
+    if (((mouse_b & MB_LEFT) && selected_icon == 1) ||
         (scan_code == 14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
       undo_back();
       do {
         read_mouse();
-      } while (mouse_b & 1);
+      } while (mouse_b & MB_LEFT);
     } else if (scan_code == 14 && (key(_L_SHIFT) || key(_R_SHIFT))) {
       undo_next();
       need_zoom = 1;
@@ -1097,7 +1097,7 @@ void edit_mode_8(void) {
       u = undo_spray;
 
     blit_edit();
-  } while (!exit_requested && !(mouse_b & 2) && !key(_ESC) && draw_mode < 100 &&
+  } while (!exit_requested && !(mouse_b & MB_RIGHT) && !key(_ESC) && draw_mode < 100 &&
            !(mouse_b && mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18)));
 }
 
@@ -1125,7 +1125,7 @@ void edit_mode_9(void) {
     select_fill(12);
     select_color(2);
 
-    if ((mouse_b & 1) && !(prev_mouse_buttons & 1) && mouse_graf >= 10) {
+    if ((mouse_b & MB_LEFT) && !(prev_mouse_buttons & MB_LEFT) && mouse_graf >= CURSOR_ON_CANVAS) {
       if (!mask[*(map + coord_y * map_width + coord_x)] &&
           (*(map + coord_y * map_width + coord_x) != color || mode_fill == 3 ||
            texture_color != NULL)) {
@@ -1133,12 +1133,12 @@ void edit_mode_9(void) {
       }
     }
 
-    if (((mouse_b & 1) && selected_icon == 1) ||
+    if (((mouse_b & MB_LEFT) && selected_icon == 1) ||
         (scan_code == 14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
       undo_back();
       do {
         read_mouse();
-      } while (mouse_b & 1);
+      } while (mouse_b & MB_LEFT);
     } else if (scan_code == 14 && (key(_L_SHIFT) || key(_R_SHIFT))) {
       undo_next();
       need_zoom = 1;
@@ -1146,7 +1146,7 @@ void edit_mode_9(void) {
 
     blit_edit();
 
-  } while (!exit_requested && !(mouse_b & 2) && !key(_ESC) && draw_mode < 100 &&
+  } while (!exit_requested && !(mouse_b & MB_RIGHT) && !key(_ESC) && draw_mode < 100 &&
            !(mouse_b && mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18)));
 }
 
@@ -1169,7 +1169,7 @@ void edit_mode_11(void) {
     select_zoom();
     test_mouse();
 
-    if (mouse_b & 1)
+    if (mouse_b & MB_LEFT)
       switch (selected_icon) {
       case 1:
         undo_back();
@@ -1178,13 +1178,13 @@ void edit_mode_11(void) {
         undo_back();
         do {
           read_mouse();
-        } while (mouse_b & 1);
+        } while (mouse_b & MB_LEFT);
         break;
       case 3:
         undo_next();
         do {
           read_mouse();
-        } while (mouse_b & 1);
+        } while (mouse_b & MB_LEFT);
         break;
       case 4:
         undo_next();
@@ -1198,7 +1198,7 @@ void edit_mode_11(void) {
     }
 
     blit_edit();
-  } while (!exit_requested && !(mouse_b & 2) && !key(_ESC) && draw_mode < 100 &&
+  } while (!exit_requested && !(mouse_b & MB_RIGHT) && !key(_ESC) && draw_mode < 100 &&
            !(mouse_b && mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18)));
 }
 
@@ -1293,7 +1293,7 @@ void edit_mode_12(void) {
     if (font == NULL) {
       // Write with the system font
 
-      if (mouse_graf >= 10 && (mouse_b & 1) && !key(_SPC)) {
+      if (mouse_graf >= CURSOR_ON_CANVAS && (mouse_b & MB_LEFT) && !key(_SPC)) {
         sel_x0 = coord_x - font_width / 2;
         sel_y0 = coord_y - font_height / 2;
         sel_x1 = sel_x0 + font_width - 1;
@@ -1302,12 +1302,12 @@ void edit_mode_12(void) {
         hotkey = 0;
         tx = sel_x0;
         ty = sel_y0;
-      } else if (((mouse_b & 2) || key(_ESC)) && sel_status) {
+      } else if (((mouse_b & MB_RIGHT) || key(_ESC)) && sel_status) {
         sel_status = 0;
         hotkey = 1;
         do {
           read_mouse();
-        } while ((mouse_b & 2) || key(_ESC));
+        } while ((mouse_b & MB_RIGHT) || key(_ESC));
       }
       if (sel_status == 1) {
         if (ascii == 13) {
@@ -1337,7 +1337,7 @@ void edit_mode_12(void) {
     } else {
       // Write with the selected font
 
-      if (mouse_graf >= 10 && (mouse_b & 1)) {
+      if (mouse_graf >= CURSOR_ON_CANVAS && (mouse_b & MB_LEFT)) {
         sel_x0 = coord_x - spacelen / 2;
         sel_y0 = coord_y - max_char_h / 2;
         sel_x1 = sel_x0 + spacelen - 1;
@@ -1347,12 +1347,12 @@ void edit_mode_12(void) {
         tx = sel_x0;
         ty = sel_y0;
         text_len = 0;
-      } else if (((mouse_b & 2) || key(_ESC)) && sel_status) {
+      } else if (((mouse_b & MB_RIGHT) || key(_ESC)) && sel_status) {
         sel_status = 0;
         hotkey = 1;
         do {
           read_mouse();
-        } while ((mouse_b & 2) || key(_ESC));
+        } while ((mouse_b & MB_RIGHT) || key(_ESC));
       }
       if (sel_status == 1) {
         if (ascii == 13) {
@@ -1397,7 +1397,7 @@ void edit_mode_12(void) {
 
     test_next();
 
-    if (((mouse_b & 1) && selected_icon == 1) ||
+    if (((mouse_b & MB_LEFT) && selected_icon == 1) ||
         ((scan_code == 14 && hotkey) && !key(_L_SHIFT) && !key(_R_SHIFT))) {
       if (sel_x0 != tx) {
         if (undo_back()) {
@@ -1414,14 +1414,14 @@ void edit_mode_12(void) {
       need_zoom = 1;
       do {
         read_mouse();
-      } while (mouse_b & 1);
+      } while (mouse_b & MB_LEFT);
     } else if ((scan_code == 14 && hotkey) && (key(_L_SHIFT) || key(_R_SHIFT))) {
       undo_next();
       need_zoom = 1;
     }
 
     blit_edit();
-  } while (!exit_requested && !(mouse_b & 2) && !(key(_ESC) && hotkey) && draw_mode < 100 &&
+  } while (!exit_requested && !(mouse_b & MB_RIGHT) && !(key(_ESC) && hotkey) && draw_mode < 100 &&
            !(mouse_b && mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18)));
 
   text_bar_active = 0;
@@ -1578,19 +1578,19 @@ void edit_mode_13(void) {
       break;
     }
 
-    if (mouse_b & 1)
+    if (mouse_b & MB_LEFT)
       switch (selected_icon) {
       case 1:
         point_index--;
         do {
           read_mouse();
-        } while (mouse_b & 1);
+        } while (mouse_b & MB_LEFT);
         break;
       case 3:
         point_index++;
         do {
           read_mouse();
-        } while (mouse_b & 1);
+        } while (mouse_b & MB_LEFT);
         break;
       }
 
@@ -1618,7 +1618,7 @@ void edit_mode_13(void) {
       v.mapa->points[point_index * 2 + 1] = -1;
     }
 
-    if (mouse_graf >= 10 && (mouse_b & 1)) {
+    if (mouse_graf >= CURSOR_ON_CANVAS && (mouse_b & MB_LEFT)) {
       if ((v.mapa->points[point_index * 2] == coord_x) &
           (v.mapa->points[point_index * 2 + 1] == coord_y)) {
         v.mapa->points[point_index * 2] = -1;
@@ -1629,7 +1629,7 @@ void edit_mode_13(void) {
       }
       do
         read_mouse();
-      while (mouse_b & 1);
+      while (mouse_b & MB_LEFT);
       sel_x0 = coord_x - 1;
       sel_x1 = coord_x + 1;
       sel_y0 = coord_y - 1;
@@ -1664,7 +1664,7 @@ void edit_mode_13(void) {
 
     blit_edit();
 
-  } while (!exit_requested && !(mouse_b & 2) && !key(_ESC) && draw_mode < 100 &&
+  } while (!exit_requested && !(mouse_b & MB_RIGHT) && !key(_ESC) && draw_mode < 100 &&
            !(mouse_b && mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18)));
 
   sel_status = 0;

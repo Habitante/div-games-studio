@@ -408,11 +408,11 @@ void palette_action2(void) {
 
   _process_items();
 
-  if ((mouse_b & 1) && wmouse_in(4, 12, 65, 65 + 10))
+  if ((mouse_b & MB_LEFT) && wmouse_in(4, 12, 65, 65 + 10))
     v.active_item = 2;
-  if ((mouse_b & 1) && wmouse_in(4 + 65, 12, 65, 65 + 10))
+  if ((mouse_b & MB_LEFT) && wmouse_in(4 + 65, 12, 65, 65 + 10))
     v.active_item = 3;
-  if ((mouse_b & 1) && wmouse_in(91, 12, 65, 65 + 10))
+  if ((mouse_b & MB_LEFT) && wmouse_in(91, 12, 65, 65 + 10))
     v.active_item = 4;
 
   switch (v.active_item) {
@@ -618,11 +618,11 @@ void update_listbox(struct t_listbox *l) {
       v.redraw = 1;
     }
 
-  if ((mouse_b & 8 && l->zone > 0) ||
+  if ((mouse_b & MB_SCROLL_UP && l->zone > 0) ||
       (l->zone == 2 &&
-       ((mouse_b & 1) || (v_pause && !(mouse_b & 1) && (prev_mouse_buttons & 1))))) {
-    if (!v_pause || (v_pause && !(mouse_b & 1) && (prev_mouse_buttons & 1))) {
-      if ((prev_mouse_buttons & 1) && !v_pause) {
+       ((mouse_b & MB_LEFT) || (v_pause && !(mouse_b & MB_LEFT) && (prev_mouse_buttons & MB_LEFT))))) {
+    if (!v_pause || (v_pause && !(mouse_b & MB_LEFT) && (prev_mouse_buttons & MB_LEFT))) {
+      if ((prev_mouse_buttons & MB_LEFT) && !v_pause) {
         retrace_wait();
         retrace_wait();
       }
@@ -641,11 +641,11 @@ void update_listbox(struct t_listbox *l) {
     v.redraw = 1;
   }
 
-  if ((mouse_b & 4 && l->zone > 0) ||
+  if ((mouse_b & MB_SCROLL_DOWN && l->zone > 0) ||
       (l->zone == 3 &&
-       ((mouse_b & 1) || (v_pause && !(mouse_b & 1) && (prev_mouse_buttons & 1))))) {
-    if (!v_pause || (v_pause && !(mouse_b & 1) && (prev_mouse_buttons & 1))) {
-      if ((prev_mouse_buttons & 1) && !v_pause) {
+       ((mouse_b & MB_LEFT) || (v_pause && !(mouse_b & MB_LEFT) && (prev_mouse_buttons & MB_LEFT))))) {
+    if (!v_pause || (v_pause && !(mouse_b & MB_LEFT) && (prev_mouse_buttons & MB_LEFT))) {
+      if ((prev_mouse_buttons & MB_LEFT) && !v_pause) {
         retrace_wait();
         retrace_wait();
       }
@@ -665,7 +665,7 @@ void update_listbox(struct t_listbox *l) {
     v.redraw = 1;
   }
 
-  if (l->zone == 4 && (mouse_b & 1)) {
+  if (l->zone == 4 && (mouse_b & MB_LEFT)) {
     l->slide = wmouse_y - 1;
     if (l->slide < l->s0)
       l->slide = l->s0;
@@ -917,7 +917,7 @@ void progress0() {
 
 int show_progress(char *title, int current, int total) {
   if (!progress_init) { // Initialize the progress window
-    mouse_graf = 3;
+    mouse_graf = CURSOR_BUSY;
     flush_copy();
     progress_init = 1;
     progress_current = current;
@@ -929,7 +929,7 @@ int show_progress(char *title, int current, int total) {
   } else {
     progress_current = current;
     if (progress_current >= progress_total) { // Finalize the progress window
-      mouse_graf = 1;
+      mouse_graf = CURSOR_ARROW;
       progress_init = 0;
       close_window();
       flush_copy();

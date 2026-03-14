@@ -107,7 +107,7 @@ void mixer2(void) {
     setup_file.vol_fx = 15 - lvol_fx.first_visible;
     Tocado = 1;
   }
-  if (!(mouse_b & 1) && (prev_mouse_buttons & 1) && (lvol_fx.zone == 2 || lvol_fx.zone == 3)) {
+  if (!(mouse_b & MB_LEFT) && (prev_mouse_buttons & MB_LEFT) && (lvol_fx.zone == 2 || lvol_fx.zone == 3)) {
     setup_file.vol_fx = 15 - lvol_fx.first_visible;
     Tocado = 1;
   }
@@ -115,7 +115,7 @@ void mixer2(void) {
     setup_file.vol_cd = 15 - lvol_cd.first_visible;
     Tocado = 1;
   }
-  if (!(mouse_b & 1) && (prev_mouse_buttons & 1) && (lvol_cd.zone == 2 || lvol_cd.zone == 3)) {
+  if (!(mouse_b & MB_LEFT) && (prev_mouse_buttons & MB_LEFT) && (lvol_cd.zone == 2 || lvol_cd.zone == 3)) {
     setup_file.vol_cd = 15 - lvol_cd.first_visible;
     Tocado = 1;
   }
@@ -123,12 +123,12 @@ void mixer2(void) {
     setup_file.vol_ma = 15 - lvol_ma.first_visible;
     Tocado = 1;
   }
-  if (!(mouse_b & 1) && (prev_mouse_buttons & 1) && (lvol_ma.zone == 2 || lvol_ma.zone == 3)) {
+  if (!(mouse_b & MB_LEFT) && (prev_mouse_buttons & MB_LEFT) && (lvol_ma.zone == 2 || lvol_ma.zone == 3)) {
     setup_file.vol_ma = 15 - lvol_ma.first_visible;
     Tocado = 1;
   }
 
-  if (!(mouse_b & 1) && (prev_mouse_buttons & 1)) {
+  if (!(mouse_b & MB_LEFT) && (prev_mouse_buttons & MB_LEFT)) {
     if (wmouse_in(MIX_BAR1 - 5, 57, 17, 17)) {
       setup_file.mut_fx = !setup_file.mut_fx;
       Tocado = 1;

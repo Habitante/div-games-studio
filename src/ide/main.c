@@ -234,7 +234,7 @@ void betatest1(void) {
 
 void betatest2(void) {
   _process_items();
-  if ((shift_status & 4) && (shift_status & 8) && key(_Z))
+  if ((shift_status & MOD_CTRL) && (shift_status & MOD_ALT) && key(_Z))
     beta_status = 4;
   if (v.active_item == 1)
     end_dialog = 1;
@@ -465,7 +465,7 @@ int main(int argc, char *argv[]) {
     init_compiler();
 
     compilado = 1;
-    mouse_graf = 3;
+    mouse_graf = CURSOR_BUSY;
     error_number = -1;
 
     if (argc < 3) {
@@ -574,7 +574,7 @@ int main(int argc, char *argv[]) {
 
   /////////////////////////////////////////////////////////////////////////////
 
-  mouse_graf = 3;
+  mouse_graf = CURSOR_BUSY;
   flush_copy();
 
   if (auto_save_session || return_mode != 0)
@@ -975,29 +975,29 @@ void main_loop_tick(void) {
   ///////////////////////////////////////////////////////////////////////////
 
   if (n >= MAX_WINDOWS || n < 0) {
-    mouse_graf = 1;
+    mouse_graf = CURSOR_ARROW;
   } else {
     switch (window[n].foreground) {
     case WF_BACKGROUND:
-      mouse_graf = 7;
+      mouse_graf = CURSOR_ACTIVATE;
       break;
     case WF_FOREGROUND:
       if (mouse_in(window[n].x + 2 * big2, window[n].y + 2 * big2,
                    window[n].x + window[n].w - 2 * big2, window[n].y + 9 * big2))
         if (mouse_x <= window[n].x + window[n].w - 18 * big2)
-          mouse_graf = 2;
+          mouse_graf = CURSOR_MOVE;
         else if (mouse_x <= window[n].x + window[n].w - 10 * big2)
-          mouse_graf = 4;
+          mouse_graf = CURSOR_MINIMIZE;
         else
-          mouse_graf = 5;
+          mouse_graf = CURSOR_CLOSE;
       else
-        mouse_graf = 1;
+        mouse_graf = CURSOR_ARROW;
       break;
     case WF_MINIMIZED:
       if (mouse_x >= window[n].x + 7 * big2)
-        mouse_graf = 2;
+        mouse_graf = CURSOR_MOVE;
       else
-        mouse_graf = 6;
+        mouse_graf = CURSOR_RESIZE;
       break;
     }
   }
@@ -1009,7 +1009,7 @@ void main_loop_tick(void) {
   if (n != 0 && n < MAX_WINDOWS) {
     // Bring window to position 0 if it's in the foreground or clicked
 
-    if (window[n].foreground == WF_FOREGROUND || (mouse_b & 1)) {
+    if (window[n].foreground == WF_FOREGROUND || (mouse_b & MB_LEFT)) {
       move(0, n);
       n = 0;
     }
@@ -1031,7 +1031,7 @@ void main_loop_tick(void) {
         flush_window(0);
         do {
           read_mouse();
-        } while (mouse_b & 1);
+        } while (mouse_b & MB_LEFT);
 
         prev_mouse_buttons = 0;
       }
@@ -1041,8 +1041,8 @@ void main_loop_tick(void) {
     // Activate an excludable window (type>=100) when interacted with
     //-------------------------------------------------------------------------
 
-  } else if (n == 0 && (mouse_b & 1) && v.type >= WIN_EDITOR_MIN && v.foreground != WF_MINIMIZED && !v.state &&
-             mouse_graf != 4 && mouse_graf != 5) {
+  } else if (n == 0 && (mouse_b & MB_LEFT) && v.type >= WIN_EDITOR_MIN && v.foreground != WF_MINIMIZED && !v.state &&
+             mouse_graf != CURSOR_MINIMIZE && mouse_graf != CURSOR_CLOSE) {
     activate();
     flush_window(0);
   }
@@ -1082,7 +1082,7 @@ void main_loop_tick(void) {
     v.redraw = 0;
     do {
       read_mouse();
-    } while (mouse_b & 1);
+    } while (mouse_b & MB_LEFT);
 
     goto fin_bucle_entorno; // end loop environment
   }
@@ -1105,7 +1105,7 @@ void main_loop_tick(void) {
 
         llamar = 0;
 
-        if ((mouse_b & 1) && !(prev_mouse_buttons & 1)) {
+        if ((mouse_b & MB_LEFT) && !(prev_mouse_buttons & MB_LEFT)) {
           if (*system_clock < double_click + 10 && *system_clock > double_click &&
               abs(double_click_x - mouse_x) < 8 && abs(double_click_y - mouse_y) < 8) {
             llamar = 1;
@@ -1152,7 +1152,7 @@ void main_loop_tick(void) {
              // Move a window
              //-----------------------------------------------------------------------
 
-      if (mouse_graf == 2 && (mouse_b & 1) && !(prev_mouse_buttons & 1)) {
+      if (mouse_graf == CURSOR_MOVE && (mouse_b & MB_LEFT) && !(prev_mouse_buttons & MB_LEFT)) {
         move_window();
       }
 
@@ -1160,8 +1160,8 @@ void main_loop_tick(void) {
       // Close the window
       //-----------------------------------------------------------------------
 
-      if (mouse_graf == 5) {
-        if (mouse_b & 1) {
+      if (mouse_graf == CURSOR_CLOSE) {
+        if (mouse_b & MB_LEFT) {
           if (big)
             wput(v.ptr, v.w / 2, v.h / 2, v.w / 2 - 9, 2, -45);
           else
@@ -1170,7 +1170,7 @@ void main_loop_tick(void) {
           flush_window(0);
         }
 
-        if (!(mouse_b & 1) && (prev_mouse_buttons & 1)) {
+        if (!(mouse_b & MB_LEFT) && (prev_mouse_buttons & MB_LEFT)) {
           if (v.click_handler == menu_main2) {
             if (big)
               wput(v.ptr, v.w / 2, v.h / 2, v.w / 2 - 9, 2, -45);
@@ -1187,7 +1187,7 @@ void main_loop_tick(void) {
 
             do {
               read_mouse();
-            } while (mouse_b & 1);
+            } while (mouse_b & MB_LEFT);
 
             v_title = (char *)texts[40];
             v_text = NULL;
@@ -1211,7 +1211,7 @@ void main_loop_tick(void) {
 
             do {
               read_mouse();
-            } while (mouse_b & 1);
+            } while (mouse_b & MB_LEFT);
 
             switch (v.type) {
             case WIN_MAP:
@@ -1234,7 +1234,7 @@ void main_loop_tick(void) {
               close_window();
           } else
             close_window();
-        } else if (mouse_b & 1)
+        } else if (mouse_b & MB_LEFT)
           restore_button = 3;
       }
 
@@ -1242,15 +1242,15 @@ void main_loop_tick(void) {
       // Minimize a window
       //-----------------------------------------------------------------------
 
-      if (mouse_graf == 4) {
-        if (mouse_b & 1) {
+      if (mouse_graf == CURSOR_MINIMIZE) {
+        if (mouse_b & MB_LEFT) {
           wput(v.ptr, v.w / big2, v.h / big2, v.w / big2 - 17, 2, -47);
           flush_window(0);
         }
 
-        if (!(mouse_b & 1) && (prev_mouse_buttons & 1)) {
+        if (!(mouse_b & MB_LEFT) && (prev_mouse_buttons & MB_LEFT)) {
           minimize_window();
-        } else if (mouse_b & 1)
+        } else if (mouse_b & MB_LEFT)
           restore_button = 1;
       }
 
@@ -1263,11 +1263,11 @@ void main_loop_tick(void) {
   //-------------------------------------------------------------------------
 
   if (n == 0 && v.foreground == WF_MINIMIZED) {
-    if (mouse_graf == 2) {
-      if ((mouse_b & 1) && !(prev_mouse_buttons & 1))
+    if (mouse_graf == CURSOR_MOVE) {
+      if ((mouse_b & MB_LEFT) && !(prev_mouse_buttons & MB_LEFT))
         move_window();
     } else {
-      if (mouse_b & 1) {
+      if (mouse_b & MB_LEFT) {
         if (big) {
           wput(screen_buffer, -vga_width, vga_height, v.x, v.y, -48);
           blit_partial(v.x, v.y, 14, 14);
@@ -1277,9 +1277,9 @@ void main_loop_tick(void) {
         }
       }
 
-      if (!(mouse_b & 1) && (prev_mouse_buttons & 1)) {
+      if (!(mouse_b & MB_LEFT) && (prev_mouse_buttons & MB_LEFT)) {
         maximize_window();
-      } else if (mouse_b & 1)
+      } else if (mouse_b & MB_LEFT)
         restore_button = 2;
     }
   }
@@ -1349,7 +1349,7 @@ fin_bucle_entorno:
 
   if (m < MAX_WINDOWS && beta_status == 4) { // If a PRG ...
     n = 0;
-    if (shift_status & 8)
+    if (shift_status & MOD_ALT)
       switch (scan_code) {
       case 33:
         n = 1;
@@ -1363,7 +1363,7 @@ fin_bucle_entorno:
         n = 3;
         break; // alt+r
       }
-    else if (shift_status & 4)
+    else if (shift_status & MOD_CTRL)
 
       switch (scan_code) {
       case 33:
@@ -1453,7 +1453,7 @@ fin_bucle_entorno:
         break;
 
       case 4:
-        mouse_graf = 3;
+        mouse_graf = CURSOR_BUSY;
         flush_copy();
         v_type = FT_PRG;
         save_prg_buffer(0);
@@ -1585,9 +1585,9 @@ fin_bucle_entorno:
         v_text = (char *)texts[43];
         show_dialog(err0);
       } else {
-        mouse_graf = 3;
+        mouse_graf = CURSOR_BUSY;
         flush_copy();
-        mouse_graf = 1;
+        mouse_graf = CURSOR_ARROW;
         open_program();
       }
     }
@@ -1651,7 +1651,7 @@ fin_bucle_entorno:
     }
   }
 
-  if ((shift_status & 8) && scan_code == 45) { // Alt-X Exit
+  if ((shift_status & MOD_ALT) && scan_code == 45) { // Alt-X Exit
     v_title = (char *)texts[40];
     v_text = NULL;
     show_dialog(accept0);
@@ -1713,7 +1713,7 @@ void main_loop(void) {
 
   do {
     read_mouse();
-  } while (mouse_b & 1);
+  } while (mouse_b & MB_LEFT);
 
   printf("env end\n");
 }
@@ -2019,7 +2019,7 @@ void initialization(void) {
   mouse_y = vga_height / 2;
   _mouse_x = mouse_x;
   _mouse_y = mouse_y;
-  mouse_graf = 1;
+  mouse_graf = CURSOR_ARROW;
   set_mouse(mouse_x, mouse_y); // set_mickeys(8);
 
   dragging = 0;

@@ -114,7 +114,7 @@ void maximize_window(void) {
 
   do {
     read_mouse();
-  } while (mouse_b & 1);
+  } while (mouse_b & MB_LEFT);
 
   on_window_moved(x, y, w, h);
 
@@ -170,7 +170,7 @@ void minimize_window(void) {
 
   do {
     read_mouse();
-  } while (mouse_b & 1);
+  } while (mouse_b & MB_LEFT);
 
   on_window_moved(x, y, w, h);
 }
@@ -324,7 +324,7 @@ void move_window(void) {
     return;
   }
 
-  mouse_graf = 2;
+  mouse_graf = CURSOR_MOVE;
   w = v.w;
   h = v.h;
   oldx = v.x;
@@ -359,7 +359,7 @@ void move_window(void) {
       update_box(x + w - 1, y, 1, h);
     }
 
-  } while (mouse_b & 1);
+  } while (mouse_b & MB_LEFT);
 
   big = b;
   if (x != oldx || y != oldy) {
@@ -413,7 +413,7 @@ void move_window_complete(void) {
   int ix, iy, oldx, oldy;
   int x, y, w, h;
 
-  mouse_graf = 2;
+  mouse_graf = CURSOR_MOVE;
   w = v.w;
   h = v.h;
   oldx = v.x;
@@ -434,7 +434,7 @@ void move_window_complete(void) {
     v.y = mouse_y - iy;
     on_window_moved(x, y, w, h);
     flush_copy();
-  } while (mouse_b & 1);
+  } while (mouse_b & MB_LEFT);
 
   if (window_move_pending) {
     window_move_pending = 0;
@@ -1474,7 +1474,7 @@ void new_window(void_return_type_t init_handler) {
       if (first_run != 1) {
         do {
           read_mouse();
-        } while ((mouse_b & 1) || key(_ESC));
+        } while ((mouse_b & MB_LEFT) || key(_ESC));
         if (exploding_windows) {
           v.exploding = 1;
           explode(x, y, w, h);

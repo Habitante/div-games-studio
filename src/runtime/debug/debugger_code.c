@@ -117,7 +117,7 @@ void debug2(void) {
   if (skip_flush)
     goto next_frame;
 
-  if (!(shift_status & 15) && ascii == 0) {
+  if (!(shift_status & (MOD_SHIFT | MOD_CTRL | MOD_ALT)) && ascii == 0) {
     if (scan_code == 80) {
       f_down();
       paint_code();
@@ -163,7 +163,7 @@ void debug2(void) {
       v.redraw = 1;
     }
 
-  } else if (shift_status & 15) { // (Shift || Control || Alt)
+  } else if (shift_status & (MOD_SHIFT | MOD_CTRL | MOD_ALT)) { // (Shift || Control || Alt)
 
     if (kbdFLAGS[80]) {
       kbdFLAGS[80] = 0;
@@ -203,7 +203,7 @@ void debug2(void) {
     }
   }
 
-  if (wmouse_in(3, 21, 128 - 9, 120 - 16 - 32) && (mouse_b & 1)) {
+  if (wmouse_in(3, 21, 128 - 9, 120 - 16 - 32) && (mouse_b & MB_LEFT)) {
     n = ids_ini + (wmouse_y - 21) / 8;
     if (n < iids) {
       ids_select = n;
@@ -213,7 +213,7 @@ void debug2(void) {
   }
 
   if (wmouse_in(122, 19, 9, 9)) {
-    if (mouse_b & 1) {
+    if (mouse_b & MB_LEFT) {
       if (button == 0) {
         wput(ptr, w, h, 123, 20, -41);
         button = 1;
@@ -238,7 +238,7 @@ void debug2(void) {
 
   if (wmouse_in(123, 28, 7, 105 - 16 - 32)) {
     mouse_graf = 13;
-    if (iids > 1 && (mouse_b & 1)) {
+    if (iids > 1 && (mouse_b & MB_LEFT)) {
       x = (float)(wmouse_y - 28) / (104.0 - 16.0 - 32.0);
       ids_select = x * (iids - 1);
       if (ids_select < ids_ini)
@@ -251,7 +251,7 @@ void debug2(void) {
   }
 
   if (wmouse_in(122, 133 - 16 - 32, 9, 9)) {
-    if (mouse_b & 1) {
+    if (mouse_b & MB_LEFT) {
       if (button == 0) {
         wput(ptr, w, h, 123, 134 - 16 - 32, -42);
         button = 2;
@@ -274,7 +274,7 @@ void debug2(void) {
     v.redraw = 1;
   }
 
-  if ((mouse_b & 1) && wmouse_in(48 + 5, 147 - 16 - 32, w - 52 - 5, 41 + 16 + 32)) {
+  if ((mouse_b & MB_LEFT) && wmouse_in(48 + 5, 147 - 16 - 32, w - 52 - 5, 41 + 16 + 32)) {
     line_sel = line0 + (wmouse_y - (147 - 16 - 32)) / 8;
     if (line_sel == line0 + 11)
       line_sel = line0 + 10;

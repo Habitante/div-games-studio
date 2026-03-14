@@ -149,7 +149,7 @@ int sound_window;
 void pcm2(void) {
   pcminfo *mypcminfo = (pcminfo *)v.aux;
 
-  if (mouse_b & 1) {
+  if (mouse_b & MB_LEFT) {
     if (!sound_active) {
       if (sound_error) {
         v_text = (char *)texts[549];
@@ -169,7 +169,7 @@ void pcm2(void) {
         Mix_PlayChannel(0, mypcminfo->si, 0);
 #endif
       }
-      while (mouse_b & 1)
+      while (mouse_b & MB_LEFT)
         read_mouse();
     }
   }
@@ -244,11 +244,11 @@ void mod_dialog2(void) {
 
   ModButton = 0;
   if (wmouse_in(2, 39, 19, 9)) {
-    if (mouse_b & 1) {
+    if (mouse_b & MB_LEFT) {
       ModButton = 1;
       ModWindow = v.order;
       need_refresh = 1;
-    } else if (prev_mouse_buttons & 1) {
+    } else if (prev_mouse_buttons & MB_LEFT) {
       ModWindow = v.order;
       need_refresh = 1;
 #ifdef MIXER
@@ -1154,14 +1154,14 @@ void edit_sound2(void) {
   }
 
   if (wmouse_in(4, 12 + PosY, w_v, h_v)) {
-    if (mouse_b & 1) {
-      if (!(prev_mouse_buttons & 1))
+    if (mouse_b & MB_LEFT) {
+      if (!(prev_mouse_buttons & MB_LEFT))
         sel_1 = mouse_x - v.x - (4 * big2), sel_2 = mouse_x - v.x - (4 * big2);
       else
         sel_2 = mouse_x - v.x - (4 * big2);
       need_refresh = 1;
     }
-    if (mouse_b & 2) {
+    if (mouse_b & MB_RIGHT) {
       sel_1 = 0, sel_2 = window_width - 1;
       need_refresh = 1;
     }

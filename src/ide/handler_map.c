@@ -227,7 +227,7 @@ void map_view2(void) {
     h /= 2;
   }
 
-  if ((mouse_b & 1)) {
+  if ((mouse_b & MB_LEFT)) {
     read_mouse3();
 
     num_windows_to_create = 0;
@@ -325,7 +325,7 @@ void map_view2(void) {
     } else
       do {
         read_mouse();
-      } while (mouse_b & 1);
+      } while (mouse_b & MB_LEFT);
 
     highlight_background = 0;
     current_mouse = 21 + paint_cursor * 4;
@@ -429,7 +429,7 @@ void map_view2(void) {
         read_mouse();
       } while (mouse_b || key(_ESC));
     } while (draw_mode >= 100);
-    mouse_graf = 1;
+    mouse_graf = CURSOR_ARROW;
 
     free(selection_mask);
     selection_mask = NULL;
@@ -538,7 +538,7 @@ void new_map2(void) {
   _process_items();
   update_listbox(&map_sizes_list);
 
-  if ((mouse_b & 1) && !(prev_mouse_buttons & 1)) {
+  if ((mouse_b & MB_LEFT) && !(prev_mouse_buttons & MB_LEFT)) {
     if (map_sizes_list.zone >= 10) {
       n = map_sizes_list.zone - 10 + map_sizes_list.first_visible;
       *strchr(&map_sizes[n * 9], 'x') = 0;

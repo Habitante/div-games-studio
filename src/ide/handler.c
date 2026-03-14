@@ -53,7 +53,7 @@ void menu_main1(void) {
  */
 void menu_main2(void) {
   update_menu(MENU_MAIN, 1, 0);
-  if ((prev_mouse_buttons & 1) && !(mouse_b & 1)) {
+  if ((prev_mouse_buttons & MB_LEFT) && !(mouse_b & MB_LEFT)) {
     switch (v.state) {
     case 1:
       new_window(menu_programs0);
@@ -119,7 +119,7 @@ void menu_programs2(void) {
   else
     update_menu(MENU_PROGRAMS, 3, 99);
 
-  if ((prev_mouse_buttons & 1) && !(mouse_b & 1)) {
+  if ((prev_mouse_buttons & MB_LEFT) && !(mouse_b & MB_LEFT)) {
     v_type = FT_PRG;
 
     switch (v.state) {
@@ -151,9 +151,9 @@ void menu_programs2(void) {
           v_text = (char *)texts[43];
           show_dialog(err0);
         } else {
-          mouse_graf = 3;
+          mouse_graf = CURSOR_BUSY;
           flush_copy();
-          mouse_graf = 1;
+          mouse_graf = CURSOR_ARROW;
           open_program();
         }
       }
@@ -176,9 +176,9 @@ void menu_programs2(void) {
       if ((n = find_program_window())) {
         flush_window(0);
         save_prg_buffer(n);
-        mouse_graf = 3;
+        mouse_graf = CURSOR_BUSY;
         flush_copy();
-        mouse_graf = 1;
+        mouse_graf = CURSOR_ARROW;
         wup(n);
         div_strcpy(file_types[v_type].path, sizeof(file_types[v_type].path), v.prg->path);
         div_strcpy(input, sizeof(input), v.prg->filename);
@@ -202,9 +202,9 @@ void menu_programs2(void) {
           } else
             v_accept = 1;
           if (v_accept) {
-            mouse_graf = 3;
+            mouse_graf = CURSOR_BUSY;
             flush_copy();
-            mouse_graf = 1;
+            mouse_graf = CURSOR_ARROW;
             wup(n);
             save_program();
             wdown(n);
@@ -240,9 +240,9 @@ void menu_programs2(void) {
     case 9:
       if ((n = find_program_window())) {
         save_prg_buffer(n);
-        mouse_graf = 3;
+        mouse_graf = CURSOR_BUSY;
         flush_copy();
-        mouse_graf = 1;
+        mouse_graf = CURSOR_ARROW;
         wup(n);
         div_strcpy(file_types[v_type].path, sizeof(file_types[v_type].path), v.prg->path);
         div_strcpy(input, sizeof(input), v.prg->filename);
@@ -335,7 +335,7 @@ void menu_edit2(void) {
   else
     update_menu(MENU_EDIT, 0, 99);
 
-  if ((prev_mouse_buttons & 1) && !(mouse_b & 1)) {
+  if ((prev_mouse_buttons & MB_LEFT) && !(mouse_b & MB_LEFT)) {
     v_type = FT_PRG;
 
     switch (v.state) {
@@ -550,7 +550,7 @@ void menu_palettes1(void) {
 
 void menu_palettes2(void) {
   update_menu(MENU_PALETTES, 1, 0);
-  if ((prev_mouse_buttons & 1) && !(mouse_b & 1)) {
+  if ((prev_mouse_buttons & MB_LEFT) && !(mouse_b & MB_LEFT)) {
     switch (v.state) {
     case 1:
       pal_load();
@@ -600,16 +600,16 @@ void menu_maps2(void) {
   else
     update_menu(MENU_MAPS, 3, 9);
 
-  if ((prev_mouse_buttons & 1) && !(mouse_b & 1)) {
+  if ((prev_mouse_buttons & MB_LEFT) && !(mouse_b & MB_LEFT)) {
     v_type = FT_MAP;
 
     switch (v.state) {
     case 1: // New map ...
       show_dialog(new_map0);
       if (v_finished) {
-        mouse_graf = 3;
+        mouse_graf = CURSOR_BUSY;
         flush_copy();
-        mouse_graf = 1;
+        mouse_graf = CURSOR_ARROW;
         new_map(NULL);
       }
       break;
@@ -623,9 +623,9 @@ void menu_maps2(void) {
           v_text = (char *)texts[43];
           show_dialog(err0);
         } else {
-          mouse_graf = 3;
+          mouse_graf = CURSOR_BUSY;
           flush_copy();
-          mouse_graf = 1;
+          mouse_graf = CURSOR_ARROW;
           open_map();
         }
       }
@@ -666,9 +666,9 @@ void menu_maps2(void) {
           div_strcpy(input2, sizeof(input2), (char *)window[n].title);
           goto casi_no_tiene_nombre;
         }
-        mouse_graf = 3;
+        mouse_graf = CURSOR_BUSY;
         flush_copy();
-        mouse_graf = 1;
+        mouse_graf = CURSOR_ARROW;
         div_strcpy(file_types[v_type].path, sizeof(file_types[v_type].path), window[n].mapa->path);
         div_strcpy(input, sizeof(input), window[n].mapa->filename);
         save_map();
@@ -690,9 +690,9 @@ casi_no_tiene_nombre:
           } else
             v_accept = 1;
           if (v_accept) {
-            mouse_graf = 3;
+            mouse_graf = CURSOR_BUSY;
             flush_copy();
-            mouse_graf = 1;
+            mouse_graf = CURSOR_ARROW;
             save_map();
           }
         }
@@ -923,7 +923,7 @@ void menu_graphics2(void) {
   else
     update_menu(MENU_GRAPHICS, 3, 9);
 
-  if ((prev_mouse_buttons & 1) && !(mouse_b & 1)) {
+  if ((prev_mouse_buttons & MB_LEFT) && !(mouse_b & MB_LEFT)) {
     v_type = FT_FPG;
 
     switch (v.state) {
@@ -976,9 +976,9 @@ void menu_graphics2(void) {
             v_accept = 1;
           }
           if (v_accept) {
-            mouse_graf = 3;
+            mouse_graf = CURSOR_BUSY;
             flush_copy();
-            mouse_graf = 1;
+            mouse_graf = CURSOR_ARROW;
             fpg_save(n);
           }
         }
@@ -1046,7 +1046,7 @@ void menu_fonts2(void) {
       update_menu(MENU_FONTS, 3, 6);
   }
 
-  if ((prev_mouse_buttons & 1) && !(mouse_b & 1)) {
+  if ((prev_mouse_buttons & MB_LEFT) && !(mouse_b & MB_LEFT)) {
     switch (v.state) {
     case 1:
       open_gen_font();
@@ -1118,7 +1118,7 @@ void menu_sounds2(void) {
   else
     update_menu(MENU_SOUNDS, 3, 6);
 
-  if ((prev_mouse_buttons & 1) && !(mouse_b & 1)) {
+  if ((prev_mouse_buttons & MB_LEFT) && !(mouse_b & MB_LEFT)) {
     switch (v.state) {
     case 1:
 
@@ -1164,9 +1164,9 @@ void menu_sounds2(void) {
       if ((n = find_pcm_window())) {
         if (strchr((const char *)window[n].title, ' ') != NULL)
           goto unnamed_sound;
-        mouse_graf = 3;
+        mouse_graf = CURSOR_BUSY;
         flush_copy();
-        mouse_graf = 1;
+        mouse_graf = CURSOR_ARROW;
         mypcminfo = (pcminfo *)window[n].aux;
         div_strcpy(full, sizeof(full), mypcminfo->pathname);
         div_strcpy(input, sizeof(input), mypcminfo->name);
@@ -1193,9 +1193,9 @@ unnamed_sound:
           } else
             v_accept = 1;
           if (v_accept) {
-            mouse_graf = 3;
+            mouse_graf = CURSOR_BUSY;
             flush_copy();
-            mouse_graf = 1;
+            mouse_graf = CURSOR_ARROW;
             mypcminfo = (pcminfo *)window[n].aux;
             div_strcpy(full, sizeof(full), file_types[v_type].path);
             if (full[strlen(full) - 1] != '/')
@@ -1296,7 +1296,7 @@ void calculator(void);
 
 void menu_system2(void) {
   update_menu(MENU_SYSTEM, 1, 0);
-  if ((prev_mouse_buttons & 1) && !(mouse_b & 1)) {
+  if ((prev_mouse_buttons & MB_LEFT) && !(mouse_b & MB_LEFT)) {
     switch (v.state) {
     case 1:
       show_clock();
@@ -1419,7 +1419,7 @@ void update_menu(int menu, int min, int max) {
     mouse_graf = 16;
   }
 
-  if (mouse_b & 1)
+  if (mouse_b & MB_LEFT)
     n = -n;
 
 

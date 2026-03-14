@@ -86,12 +86,12 @@ void program2(void) {
     v.redraw = 1;
 
   if (wmouse_x != -1 && v.state) {
-    if ((mouse_b & 1) && mouse_y >= v.y + 18 * big2 && mouse_x >= v.x + 2 * big2) {
+    if ((mouse_b & MB_LEFT) && mouse_y >= v.y + 18 * big2 && mouse_x >= v.x + 2 * big2) {
       n = v.prg->first_line + (mouse_y - (v.y + 18 * big2)) / editor_font_height;
       m = v.prg->first_column + (mouse_x - (v.x + 2 * big2)) / editor_font_width;
       if (n >= v.prg->first_line && n < v.prg->first_line + v.prg->h && m >= v.prg->first_column &&
           m < v.prg->first_column + v.prg->w) {
-        if (!(prev_mouse_buttons & 1)) {
+        if (!(prev_mouse_buttons & MB_LEFT)) {
           mouse_block = 1;
           mouse_block_x = m;
           mouse_block_y = n;
@@ -122,7 +122,7 @@ void program2(void) {
       }
       mouse_block = 0;
     }
-    if (mouse_b & 2) {
+    if (mouse_b & MB_RIGHT) {
       f_unmark();
       v.redraw++;
     }
@@ -148,7 +148,7 @@ void program2(void) {
     mouse_graf = 15;
   }
 
-  if (mouse_graf == 15 && (mouse_b & 1) && wmouse_x != -1) {
+  if (mouse_graf == 15 && (mouse_b & MB_LEFT) && wmouse_x != -1) {
     if (!(v.buttons & 1)) {
       wput(v.ptr, w, h, w - 17, 10, -57);
       v.buttons |= 1;
@@ -164,7 +164,7 @@ void program2(void) {
     }
   }
 
-  if (mouse_graf == 7 && (mouse_b & 1) && wmouse_x != -1) {
+  if (mouse_graf == 7 && (mouse_b & MB_LEFT) && wmouse_x != -1) {
     if (!(v.buttons & 2)) {
       wput(v.ptr, w, h, w - 9, 10, -41);
       v.buttons |= 2;
@@ -183,7 +183,7 @@ void program2(void) {
     v.redraw++;
   }
 
-  if (mouse_graf == 9 && (mouse_b & 1) && wmouse_x != -1) {
+  if (mouse_graf == 9 && (mouse_b & MB_LEFT) && wmouse_x != -1) {
     if (!(v.buttons & 4)) {
       wput(v.ptr, w, h, w - 9, h - 17, -42);
       v.buttons |= 4;
@@ -202,7 +202,7 @@ void program2(void) {
     v.redraw++;
   }
 
-  if (mouse_graf == 10 && (mouse_b & 1) && wmouse_x != -1) {
+  if (mouse_graf == 10 && (mouse_b & MB_LEFT) && wmouse_x != -1) {
     if (!(v.buttons & 8)) {
       wput(v.ptr, w, h, 2, h - 9, -53);
       v.buttons |= 8;
@@ -218,7 +218,7 @@ void program2(void) {
     v.redraw++;
   }
 
-  if (mouse_graf == 11 && (mouse_b & 1) && wmouse_x != -1) {
+  if (mouse_graf == 11 && (mouse_b & MB_LEFT) && wmouse_x != -1) {
     if (!(v.buttons & 16)) {
       wput(v.ptr, w, h, w - 17, h - 9, -54);
       v.buttons |= 16;
@@ -234,10 +234,10 @@ void program2(void) {
     v.redraw++;
   }
 
-  if (mouse_graf == 12 && (mouse_b & 1) && wmouse_x != -1)
+  if (mouse_graf == 12 && (mouse_b & MB_LEFT) && wmouse_x != -1)
     resize();
 
-  if (mouse_graf == 13 && (mouse_b & 1) && wmouse_x != -1) {
+  if (mouse_graf == 13 && (mouse_b & MB_LEFT) && wmouse_x != -1) {
     f_bop();
     f_home();
     min = 18;
@@ -273,7 +273,7 @@ void program2(void) {
     }
   }
 
-  if (mouse_graf == 14 && !(prev_mouse_buttons & 1) && (mouse_b & 1) && wmouse_x != -1) {
+  if (mouse_graf == 14 && !(prev_mouse_buttons & MB_LEFT) && (mouse_b & MB_LEFT) && wmouse_x != -1) {
     if (!(v.buttons & 64)) {
       if (wmouse_x > get_slide_x()) {
         f_right();
@@ -387,7 +387,7 @@ void editor() {
 
   if (edit_block_mode == 1) { // Single-line block edit
 
-    if ((shift_status & 3) && !(shift_status & 12))
+    if ((shift_status & MOD_SHIFT) && !(shift_status & (MOD_CTRL | MOD_ALT)))
       switch (scan_code) {
       case 0:
         break;
@@ -448,7 +448,7 @@ void editor() {
         f_unmark();
         break;
       }
-    else if ((shift_status & 4) && !(shift_status & 11)) {
+    else if ((shift_status & MOD_CTRL) && !(shift_status & (MOD_SHIFT | MOD_ALT))) {
       switch (scan_code) {
       case 0:
         break;
@@ -478,7 +478,7 @@ void editor() {
         scan_code = 0;
       }
 
-    } else if (!(shift_status & 15) && ascii == 0)
+    } else if (!(shift_status & (MOD_SHIFT | MOD_CTRL | MOD_ALT)) && ascii == 0)
       switch (scan_code) {
       case 0:
         break;
@@ -491,7 +491,7 @@ void editor() {
         f_unmark();
         break;
       }
-    else if ((shift_status & 3) && (shift_status & 4))
+    else if ((shift_status & MOD_SHIFT) && (shift_status & MOD_CTRL))
       switch (scan_code) {
       case 116: // ctrl+shift+right
         if (block_col2 == v.prg->column - 1) {
@@ -563,7 +563,7 @@ void editor() {
 
   if (edit_block_mode == 2) { // Multi-line block edit
 
-    if ((shift_status & 3) && !(shift_status & 12))
+    if ((shift_status & MOD_SHIFT) && !(shift_status & (MOD_CTRL | MOD_ALT)))
       switch (scan_code) {
       case 0:
         break;
@@ -668,7 +668,7 @@ void editor() {
         f_unmark();
         break;
       }
-    else if ((shift_status & 4) && !(shift_status & 11)) {
+    else if ((shift_status & MOD_CTRL) && !(shift_status & (MOD_SHIFT | MOD_ALT))) {
       switch (scan_code) {
       case 0:
         break;
@@ -701,7 +701,7 @@ void editor() {
         scan_code = 0;
       }
 
-    } else if (!(shift_status & 15) && ascii == 0)
+    } else if (!(shift_status & (MOD_SHIFT | MOD_CTRL | MOD_ALT)) && ascii == 0)
       switch (scan_code) {
       case 0:
         break;
@@ -714,7 +714,7 @@ void editor() {
         f_unmark();
         break;
       }
-    else if ((shift_status & 3) && (shift_status & 4))
+    else if ((shift_status & MOD_SHIFT) && (shift_status & MOD_CTRL))
       switch (scan_code) {
       case 116: // ctrl+shift+right
         if (block_end < v.prg->lptr) {
@@ -760,7 +760,7 @@ void editor() {
 
   if (edit_block_mode == 0) { // Only if there is no active edit block
 
-    if ((shift_status & 3) && !(shift_status & 12))
+    if ((shift_status & MOD_SHIFT) && !(shift_status & (MOD_CTRL | MOD_ALT)))
       switch (scan_code) {
       case 77: // shift+right
         f_unmark();
@@ -878,7 +878,7 @@ void editor() {
         f_end();
         break;
       }
-    else if ((shift_status & 3) && (shift_status & 4))
+    else if ((shift_status & MOD_SHIFT) && (shift_status & MOD_CTRL))
       switch (scan_code) {
       case 116: // ctrl+shift+right
         f_unmark();
@@ -926,7 +926,7 @@ void editor() {
           f_unmark();
         break;
       }
-    else if (!(shift_status & 15) && ascii == 0)
+    else if (!(shift_status & (MOD_SHIFT | MOD_CTRL | MOD_ALT)) && ascii == 0)
       switch (scan_code) {
       case 77:
         f_right();
@@ -959,7 +959,7 @@ void editor() {
         f_delete_char();
         break; // delete
       }
-    else if (!(shift_status & 15))
+    else if (!(shift_status & (MOD_SHIFT | MOD_CTRL | MOD_ALT)))
       switch (scan_code) {
       case 14:
         f_backspace();
@@ -968,7 +968,7 @@ void editor() {
         f_tab();
         break; // tab
       }
-    else if ((shift_status & 4) && !(shift_status & 11))
+    else if ((shift_status & MOD_CTRL) && !(shift_status & (MOD_SHIFT | MOD_ALT)))
       switch (scan_code) {
       case 14:
       case 21:
@@ -1009,7 +1009,7 @@ void editor() {
         f_unmark();
         break;
       }
-    else if ((shift_status & 8) && !(shift_status & 7))
+    else if ((shift_status & MOD_ALT) && !(shift_status & (MOD_SHIFT | MOD_CTRL)))
       switch (scan_code) {
       case 30:
         f_mark();
@@ -1036,17 +1036,17 @@ void editor() {
       }
   } // edit_block_mode==0
 
-  if (mouse_b & 4 && wmouse_x != -1) {
+  if (mouse_b & MB_SCROLL_DOWN&& wmouse_x != -1) {
     f_scroll(3);
   }
 
-  if (mouse_b & 8 && wmouse_x != -1) {
+  if (mouse_b & MB_SCROLL_UP&& wmouse_x != -1) {
     f_mscroll(3);
   }
 
   //-----------------------------------------------------------------------------
 
-  if (!(shift_status & (4 | 8)) && ascii) {
+  if (!(shift_status & (MOD_CTRL | MOD_ALT)) && ascii) {
     if (ascii == cr)
       f_enter();
     else if (ascii != 0x1b) {

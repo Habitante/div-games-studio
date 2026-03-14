@@ -580,8 +580,8 @@ void M3D_update_listboxbr(struct t_listboxbr *l) {
       }
   }
 
-  if (l->zone == 2 && (mouse_b & 1)) {
-    if (prev_mouse_buttons & 1) {
+  if (l->zone == 2 && (mouse_b & MB_LEFT)) {
+    if (prev_mouse_buttons & MB_LEFT) {
       retrace_wait();
       retrace_wait();
       retrace_wait();
@@ -601,8 +601,8 @@ void M3D_update_listboxbr(struct t_listboxbr *l) {
     v.redraw = 1;
   }
 
-  if (l->zone == 3 && (mouse_b & 1)) {
-    if (prev_mouse_buttons & 1) {
+  if (l->zone == 3 && (mouse_b & MB_LEFT)) {
+    if (prev_mouse_buttons & MB_LEFT) {
       retrace_wait();
       retrace_wait();
       retrace_wait();
@@ -623,7 +623,7 @@ void M3D_update_listboxbr(struct t_listboxbr *l) {
     v.redraw = 1;
   }
 
-  if (l->zone == 4 && (mouse_b & 1)) {
+  if (l->zone == 4 && (mouse_b & MB_LEFT)) {
     l->slide = wmouse_y - 1;
     if (l->slide < l->s0)
       l->slide = l->s0;
@@ -798,7 +798,7 @@ void mapper_browse_fpg2(void) {
 
   M3D_update_listboxbr(&texture_list_br);
 
-  if ((mouse_b & 1) && !(prev_mouse_buttons & 1)) {
+  if ((mouse_b & MB_LEFT) && !(prev_mouse_buttons & MB_LEFT)) {
     if (texture_list_br.zone >= 10) {
       // Paint mode only (draw_mode<100) - 3D map mode removed
       if (browser_type == BRUSH) {

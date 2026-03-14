@@ -74,13 +74,13 @@ void edit_mode_10(void) {
     edit_ruler();
     select_color(2);
 
-    if (((mouse_b & 1) && selected_icon == 1) ||
+    if (((mouse_b & MB_LEFT) && selected_icon == 1) ||
         (scan_code == 14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
       undo_back();
       need_zoom = 1;
       do {
         read_mouse();
-      } while (mouse_b & 1);
+      } while (mouse_b & MB_LEFT);
     } else if (scan_code == 14 && (key(_L_SHIFT) || key(_R_SHIFT))) {
       undo_next();
       need_zoom = 1;
@@ -95,10 +95,10 @@ void edit_mode_10(void) {
     case 2:
     case 3:
 
-      if ((mouse_b & 1) && selected_icon == 12) { // *** Move, Copy, ...
+      if ((mouse_b & MB_LEFT) && selected_icon == 12) { // *** Move, Copy, ...
         do {
           read_mouse();
-        } while (mouse_b & 1);
+        } while (mouse_b & MB_LEFT);
         sel_status = 0;
         box_to_sel_mask();
         move_selection(NULL, 0, 0);
@@ -112,10 +112,10 @@ void edit_mode_10(void) {
           read_mouse();
         } while (mouse_b || key(_ESC));
       }
-      if ((mouse_b & 1) && selected_icon == 13) { // *** Effects
+      if ((mouse_b & MB_LEFT) && selected_icon == 13) { // *** Effects
         do {
           read_mouse();
-        } while (mouse_b & 1);
+        } while (mouse_b & MB_LEFT);
         box_to_sel_mask();
         effects();
         if (draw_mode < 100) {
@@ -128,7 +128,7 @@ void edit_mode_10(void) {
           read_mouse();
         } while (mouse_b || key(_ESC));
       }
-      if (((mouse_b & 1) && selected_icon == 14) || key(_K)) { // *** Cut to window
+      if (((mouse_b & MB_LEFT) && selected_icon == 14) || key(_K)) { // *** Cut to window
         s = 0;
         sel_status = 0;
         block_bar(0);
@@ -143,7 +143,7 @@ void edit_mode_10(void) {
 
     test_previous();
 
-    if ((key(_L_CTRL) || key(_R_CTRL)) && (mouse_b & 1) && mouse_graf >= 10 && sel_status &&
+    if ((key(_L_CTRL) || key(_R_CTRL)) && (mouse_b & MB_LEFT) && mouse_graf >= CURSOR_ON_CANVAS && sel_status &&
         s >= 2) {
       if (mode_selection == 0 || mode_selection == 4 || (mode_selection == 3 && s < 2)) {
         x = coord_x - (sel_x1 - sel_x0) / 2;
@@ -258,7 +258,7 @@ void edit_mode_10(void) {
     analyze_bar(w, h);
 
     blit_edit();
-  } while (!exit_requested && !(mouse_b & 2) && !(key(_ESC) && s != 1 && s != 2) &&
+  } while (!exit_requested && !(mouse_b & MB_RIGHT) && !(key(_ESC) && s != 1 && s != 2) &&
            draw_mode < 100 &&
            !(mouse_b && mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18)));
 
@@ -698,22 +698,22 @@ void sel_mask_antialias(void) {
 int edit_mode_6_box(int s) {
   switch (s) {
   case 0:
-    if ((mouse_b & 1) && mouse_graf >= 10) {
+    if ((mouse_b & MB_LEFT) && mouse_graf >= CURSOR_ON_CANVAS) {
       s = 1;
       sel_x0 = coord_x;
       sel_y0 = coord_y;
       do {
         read_mouse();
-      } while (mouse_b & 1);
+      } while (mouse_b & MB_LEFT);
     }
     break;
 
   case 1:
-    if (mouse_graf >= 10) {
+    if (mouse_graf >= CURSOR_ON_CANVAS) {
       sel_x1 = coord_x;
       sel_y1 = coord_y;
       sel_status = 1;
-      if (mouse_b & 1) {
+      if (mouse_b & MB_LEFT) {
         if (sel_x0 > sel_x1)
           swap(sel_x0, sel_x1);
         if (sel_y0 > sel_y1)
@@ -733,7 +733,7 @@ int edit_mode_6_box(int s) {
 
   case 2:
     sel_status = 1;
-    if ((mouse_b & 1) && mouse_graf >= 10) {
+    if ((mouse_b & MB_LEFT) && mouse_graf >= CURSOR_ON_CANVAS) {
       if (coord_x >= (sel_x0 + sel_x1 * 3) / 4)
         sel_x1 = coord_x;
       else if (coord_x <= (sel_x0 * 3 + sel_x1) / 4)
@@ -742,7 +742,7 @@ int edit_mode_6_box(int s) {
         sel_y1 = coord_y;
       else if (coord_y <= (sel_y0 * 3 + sel_y1) / 4)
         sel_y0 = coord_y;
-    } else if ((mouse_b & 2) || key(_ESC)) {
+    } else if ((mouse_b & MB_RIGHT) || key(_ESC)) {
       s = 0;
       sel_status = 0;
       block_bar(0);
@@ -766,7 +766,7 @@ int edit_mode_6_box_auto(int s) {
   switch (s) {
   case 0:
   case 2:
-    if ((mouse_b & 1) && mouse_graf >= 10) {
+    if ((mouse_b & MB_LEFT) && mouse_graf >= CURSOR_ON_CANVAS) {
       if (*(map + coord_y * map_width + coord_x)) {
         if (s == 0 ||
             (coord_x < sel_x0 || coord_x > sel_x1 || coord_y < sel_y0 || coord_y > sel_y1)) {
@@ -906,9 +906,9 @@ int edit_mode_6_box_auto(int s) {
 
       do {
         read_mouse();
-      } while (mouse_b & 1);
+      } while (mouse_b & MB_LEFT);
 
-    } else if ((mouse_b & 2) || key(_ESC)) {
+    } else if ((mouse_b & MB_RIGHT) || key(_ESC)) {
       if (s == 2) {
         s = 0;
         sel_status = 0;
@@ -1129,7 +1129,7 @@ int edit_mode_6_lines(int s) {
 
   switch (s) {
   case 0:
-    if ((mouse_b & 1) && mouse_graf >= 10) {
+    if ((mouse_b & MB_LEFT) && mouse_graf >= CURSOR_ON_CANVAS) {
       s = 1;
       n_points = 1;
       polygon[0] = coord_x;
@@ -1145,7 +1145,7 @@ int edit_mode_6_lines(int s) {
 
   case 1:
     sel_status = 1;
-    if ((mouse_b & 1) && mouse_graf >= 10 && n_points < 1024 &&
+    if ((mouse_b & MB_LEFT) && mouse_graf >= CURSOR_ON_CANVAS && n_points < 1024 &&
         (polygon[n_points * 2 - 2] != coord_x || polygon[n_points * 2 - 1] != coord_y)) {
       polygon[n_points * 2] = coord_x;
       polygon[n_points * 2 + 1] = coord_y;
@@ -1172,7 +1172,7 @@ int edit_mode_6_lines(int s) {
         s = 2;
         block_bar(1);
       }
-    } else if ((mouse_b & 2) || key(_ESC)) {
+    } else if ((mouse_b & MB_RIGHT) || key(_ESC)) {
       if (n_points > 2) {
         polygon[n_points * 2] = polygon[0];
         polygon[n_points * 2 + 1] = polygon[1];
@@ -1197,7 +1197,7 @@ int edit_mode_6_lines(int s) {
 
   case 2:
     sel_status = 1;
-    if ((mouse_b & 2) || key(_ESC)) {
+    if ((mouse_b & MB_RIGHT) || key(_ESC)) {
       s = 0;
       sel_status = 0;
       block_bar(0);
@@ -1219,7 +1219,7 @@ int edit_mode_6_fill(int s) {
 
   switch (s) {
   case 0:
-    if ((mouse_b & 1) && mouse_graf >= 10) {
+    if ((mouse_b & MB_LEFT) && mouse_graf >= CURSOR_ON_CANVAS) {
       if (mode_selection == 1) {
         memset(fill_dac, 0, 256);
         fill_dac[*(map + coord_y * map_width + coord_x)] = 1;
@@ -1243,13 +1243,13 @@ int edit_mode_6_fill(int s) {
         s = 0;
       do {
         read_mouse();
-      } while (mouse_b & 1);
+      } while (mouse_b & MB_LEFT);
     }
     break;
 
   case 2:
     sel_status = 1;
-    if ((mouse_b & 1) && mouse_graf >= 10) {
+    if ((mouse_b & MB_LEFT) && mouse_graf >= CURSOR_ON_CANVAS) {
       if (mode_selection == 1)
         fill_dac[*(map + coord_y * map_width + coord_x)] = 1;
       n = 0;
@@ -1273,7 +1273,7 @@ int edit_mode_6_fill(int s) {
           } else
             fill_seeds[n] = -1;
         }
-    } else if ((mouse_b & 2) || key(_ESC)) {
+    } else if ((mouse_b & MB_RIGHT) || key(_ESC)) {
       s = 0;
       sel_status = 0;
       block_bar(0);
@@ -1295,7 +1295,7 @@ int edit_mode_6_boxes(int s) {
 
   switch (s) {
   case 0:
-    if ((mouse_b & 1) && mouse_graf >= 10) {
+    if ((mouse_b & MB_LEFT) && mouse_graf >= CURSOR_ON_CANVAS) {
       s = 1;
       sel_x0 = coord_x;
       sel_y0 = coord_y;
@@ -1306,16 +1306,16 @@ int edit_mode_6_boxes(int s) {
       sel_mask_y1 = 0;
       do {
         read_mouse();
-      } while (mouse_b & 1);
+      } while (mouse_b & MB_LEFT);
     }
     break;
 
   case 1:
-    if (mouse_graf >= 10) {
+    if (mouse_graf >= CURSOR_ON_CANVAS) {
       sel_x1 = coord_x;
       sel_y1 = coord_y;
       sel_status = 1;
-      if (mouse_b & 1) {
+      if (mouse_b & MB_LEFT) {
         if (sel_x0 > sel_x1)
           swap(sel_x0, sel_x1);
         if (sel_y0 > sel_y1)
@@ -1332,7 +1332,7 @@ int edit_mode_6_boxes(int s) {
         block_bar(1);
         do {
           read_mouse();
-        } while (mouse_b & 1);
+        } while (mouse_b & MB_LEFT);
       } else if (mouse_b || key(_ESC)) {
         s = 0;
         sel_status = 0;
@@ -1346,14 +1346,14 @@ int edit_mode_6_boxes(int s) {
 
   case 2:
     sel_status = 1;
-    if ((mouse_b & 1) && mouse_graf >= 10) {
+    if ((mouse_b & MB_LEFT) && mouse_graf >= CURSOR_ON_CANVAS) {
       s = 3;
       sel_x0 = coord_x;
       sel_y0 = coord_y;
       do {
         read_mouse();
-      } while (mouse_b & 1);
-    } else if ((mouse_b & 2) || key(_ESC)) {
+      } while (mouse_b & MB_LEFT);
+    } else if ((mouse_b & MB_RIGHT) || key(_ESC)) {
       s = 0;
       sel_status = 0;
       block_bar(0);
@@ -1365,12 +1365,12 @@ int edit_mode_6_boxes(int s) {
 
   case 3:
     sel_status = 1;
-    if (mouse_graf >= 10) {
+    if (mouse_graf >= CURSOR_ON_CANVAS) {
       sel_x1 = coord_x;
       sel_y1 = coord_y;
     } else
       sel_x1 = -1;
-    if ((mouse_b & 1) && mouse_graf >= 10) {
+    if ((mouse_b & MB_LEFT) && mouse_graf >= CURSOR_ON_CANVAS) {
       if (sel_x0 > sel_x1)
         swap(sel_x0, sel_x1);
       if (sel_y0 > sel_y1)
@@ -1390,8 +1390,8 @@ int edit_mode_6_boxes(int s) {
       sel_x1 = -1;
       do {
         read_mouse();
-      } while (mouse_b & 1);
-    } else if ((mouse_b & 2) || key(_ESC)) {
+      } while (mouse_b & MB_LEFT);
+    } else if ((mouse_b & MB_RIGHT) || key(_ESC)) {
       sel_x1 = -1;
       s = 2;
       do {
@@ -1457,52 +1457,52 @@ void move_selection(byte *sp, int w, int h) {
     test_mouse();
 
     if (s == 0) {
-      if (((mouse_b & 1) && selected_icon == 1) ||
+      if (((mouse_b & MB_LEFT) && selected_icon == 1) ||
           (scan_code == 14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
         undo_back();
         do {
           read_mouse();
-        } while (mouse_b & 1);
+        } while (mouse_b & MB_LEFT);
       } else if (scan_code == 14 && (key(_L_SHIFT) || key(_R_SHIFT))) {
         undo_next();
         need_zoom = 1;
       }
 
-      if ((mouse_b & 1) && selected_icon == 2) {
+      if ((mouse_b & MB_LEFT) && selected_icon == 2) {
         ghost ^= 1;
         bar[2] = 105 + ghost;
         draw_bar(0);
         put_bar_inv(10, 2, 139);
         do {
           read_mouse();
-        } while (mouse_b & 1);
+        } while (mouse_b & MB_LEFT);
       }
 
-      if ((mouse_b & 1) && selected_icon == 3) {
+      if ((mouse_b & MB_LEFT) && selected_icon == 3) {
         block ^= 1;
         bar[3] = 122 + block;
         draw_bar(0);
         put_bar_inv(10, 2, 139);
         do {
           read_mouse();
-        } while (mouse_b & 1);
+        } while (mouse_b & MB_LEFT);
       }
 
-      if ((mouse_b & 1) && selected_icon == 4) {
+      if ((mouse_b & MB_LEFT) && selected_icon == 4) {
         flip_horizontal(sp, w, h);
         do {
           read_mouse();
-        } while (mouse_b & 1);
+        } while (mouse_b & MB_LEFT);
       }
 
-      if ((mouse_b & 1) && selected_icon == 5) {
+      if ((mouse_b & MB_LEFT) && selected_icon == 5) {
         flip_vertical(sp, w, h);
         do {
           read_mouse();
-        } while (mouse_b & 1);
+        } while (mouse_b & MB_LEFT);
       }
 
-      if ((mouse_b & 1) && selected_icon == 6) {
+      if ((mouse_b & MB_LEFT) && selected_icon == 6) {
         s = 1;
         bar[1] = 0;
         bar[2] = 0;
@@ -1511,10 +1511,10 @@ void move_selection(byte *sp, int w, int h) {
         old_float = ang;
         do {
           read_mouse();
-        } while (mouse_b & 1);
+        } while (mouse_b & MB_LEFT);
       }
 
-      if ((mouse_b & 1) && selected_icon == 7) {
+      if ((mouse_b & MB_LEFT) && selected_icon == 7) {
         s = 3;
         bar[1] = 0;
         bar[2] = 0;
@@ -1523,15 +1523,15 @@ void move_selection(byte *sp, int w, int h) {
         old_float = size;
         do {
           read_mouse();
-        } while (mouse_b & 1);
+        } while (mouse_b & MB_LEFT);
       }
 
-      if ((mouse_b & 1) && selected_icon == 8) {
+      if ((mouse_b & MB_LEFT) && selected_icon == 8) {
         box_to_sel_mask();
         sel_mask_delete();
         do {
           read_mouse();
-        } while (mouse_b & 1);
+        } while (mouse_b & MB_LEFT);
       }
     }
 
@@ -1624,9 +1624,9 @@ void move_selection(byte *sp, int w, int h) {
         }
       }
       if (s == 2 || s == 4)
-        _mouse_graf = 1;
+        _mouse_graf = CURSOR_ARROW;
       else
-        _mouse_graf = 2;
+        _mouse_graf = CURSOR_MOVE;
     }
 
     zoom_map();
@@ -1636,10 +1636,10 @@ void move_selection(byte *sp, int w, int h) {
     blit_screen(screen_buffer);
     save_mouse_bg(mouse_background, mouse_shift_x, mouse_shift_y, _mouse_graf, 1);
 
-    if (mouse_graf >= 10)
+    if (mouse_graf >= CURSOR_ON_CANVAS)
       switch (s) {
       case 0:
-        if (mouse_b & 1)
+        if (mouse_b & MB_LEFT)
           do {
             read_mouse();
           } while (mouse_b);
@@ -1648,13 +1648,13 @@ void move_selection(byte *sp, int w, int h) {
         break;
       case 1:
         undo_back();
-        if (mouse_b & 1) {
+        if (mouse_b & MB_LEFT) {
           do {
             read_mouse();
           } while (mouse_b);
           s = 2;
         }
-        if (mouse_b & 2 || key(_ESC)) {
+        if (mouse_b & MB_RIGHT || key(_ESC)) {
           bar[1] = 121;
           bar[2] = 105 + ghost;
           draw_bar(0);
@@ -1669,7 +1669,7 @@ void move_selection(byte *sp, int w, int h) {
       case 2:
         undo_back();
         if (mouse_b || key(_ESC)) {
-          if (!(mouse_b & 1))
+          if (!(mouse_b & MB_LEFT))
             ang = old_float;
           bar[1] = 121;
           bar[2] = 105 + ghost;
@@ -1683,13 +1683,13 @@ void move_selection(byte *sp, int w, int h) {
         break;
       case 3:
         undo_back();
-        if (mouse_b & 1) {
+        if (mouse_b & MB_LEFT) {
           do {
             read_mouse();
           } while (mouse_b);
           s = 4;
         }
-        if (mouse_b & 2 || key(_ESC)) {
+        if (mouse_b & MB_RIGHT || key(_ESC)) {
           bar[1] = 121;
           bar[2] = 105 + ghost;
           draw_bar(0);
@@ -1704,7 +1704,7 @@ void move_selection(byte *sp, int w, int h) {
       case 4:
         undo_back();
         if (mouse_b || key(_ESC)) {
-          if (!(mouse_b & 1))
+          if (!(mouse_b & MB_LEFT))
             size = old_float;
           bar[1] = 121;
           bar[2] = 105 + ghost;
@@ -1734,7 +1734,7 @@ void move_selection(byte *sp, int w, int h) {
     } else
       tab_cycling = 0;
 
-  } while (!exit_requested && !(mouse_b & 2) && !(key(_ESC) && !s) && draw_mode < 100 &&
+  } while (!exit_requested && !(mouse_b & MB_RIGHT) && !(key(_ESC) && !s) && draw_mode < 100 &&
            !(mouse_b && mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18)));
 
   if (key(_ESC) ||
@@ -1773,63 +1773,63 @@ void effects(void) {
     select_zoom();
     test_mouse();
 
-    if (((mouse_b & 1) && selected_icon == 1) ||
+    if (((mouse_b & MB_LEFT) && selected_icon == 1) ||
         (scan_code == 14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
       undo_back();
       do {
         read_mouse();
-      } while (mouse_b & 1);
+      } while (mouse_b & MB_LEFT);
     } else if (scan_code == 14 && (key(_L_SHIFT) || key(_R_SHIFT))) {
       undo_next();
       need_zoom = 1;
     }
 
-    if ((mouse_b & 1) && selected_icon == 2) { // Remap to gradient
+    if ((mouse_b & MB_LEFT) && selected_icon == 2) { // Remap to gradient
       sel_mask_ruler();
       need_zoom = 1;
       do {
         read_mouse();
-      } while (mouse_b & 1);
+      } while (mouse_b & MB_LEFT);
     }
 
-    if ((mouse_b & 1) && selected_icon == 3) { // Invert
+    if ((mouse_b & MB_LEFT) && selected_icon == 3) { // Invert
       sel_mask_invert();
       need_zoom = 1;
       do {
         read_mouse();
-      } while (mouse_b & 1);
+      } while (mouse_b & MB_LEFT);
     }
 
-    if ((mouse_b & 1) && selected_icon == 4) { // Mask
+    if ((mouse_b & MB_LEFT) && selected_icon == 4) { // Mask
       sel_mask_mask();
       need_zoom = 1;
       do {
         read_mouse();
-      } while (mouse_b & 1);
+      } while (mouse_b & MB_LEFT);
     }
 
-    if ((mouse_b & 1) && selected_icon == 5) { // Lighten
+    if ((mouse_b & MB_LEFT) && selected_icon == 5) { // Lighten
       sel_mask_lighten(c4);
       need_zoom = 1;
       do {
         read_mouse();
-      } while (mouse_b & 1);
+      } while (mouse_b & MB_LEFT);
     }
 
-    if ((mouse_b & 1) && selected_icon == 6) { // Darken
+    if ((mouse_b & MB_LEFT) && selected_icon == 6) { // Darken
       sel_mask_lighten(c0);
       need_zoom = 1;
       do {
         read_mouse();
-      } while (mouse_b & 1);
+      } while (mouse_b & MB_LEFT);
     }
 
-    if ((mouse_b & 1) && selected_icon == 7) { // Anti-alias
+    if ((mouse_b & MB_LEFT) && selected_icon == 7) { // Anti-alias
       sel_mask_antialias();
       need_zoom = 1;
       do {
         read_mouse();
-      } while (mouse_b & 1);
+      } while (mouse_b & MB_LEFT);
     }
 
     need_zoom_x = map_width;
@@ -1839,7 +1839,7 @@ void effects(void) {
     test_next();
 
     blit_edit();
-  } while (!exit_requested && !(mouse_b & 2) && !key(_ESC) && draw_mode < 100 &&
+  } while (!exit_requested && !(mouse_b & MB_RIGHT) && !key(_ESC) && draw_mode < 100 &&
            !(mouse_b && mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18)));
 
   if (key(_ESC) ||

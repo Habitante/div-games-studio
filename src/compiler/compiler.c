@@ -2704,7 +2704,7 @@ void get_error(int n);
 void compile_pass2(void) {
   if (compilado == 0) {
     compilado = 1;
-    mouse_graf = 3;
+    mouse_graf = CURSOR_BUSY;
     error_number = -1;
     comp();
     if (error_number >= 0) {
@@ -2715,7 +2715,7 @@ void compile_pass2(void) {
       if (run_mode)
         end_dialog = 1;
     }
-    mouse_graf = 1;
+    mouse_graf = CURSOR_ARROW;
     v.redraw = 1;
   }
   _process_items();

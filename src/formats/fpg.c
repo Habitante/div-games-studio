@@ -543,7 +543,7 @@ int fpg_delete(FPG *fpg_file,
     free(fpg_file->thumb[n].ptr);
   memmove(&(fpg_file->thumb[n]), &(fpg_file->thumb[n + 1]), sizeof(t_thumb) * (999 - n));
 
-  mouse_graf = 3;
+  mouse_graf = CURSOR_BUSY;
   fseek(fpg, 0, SEEK_END);
   len = ftell(fpg);
   fseek(fpg, 0, SEEK_SET);
@@ -650,7 +650,7 @@ int fpg_delete_many(FPG *fpg_file, int taggeds, int *array_del) {
     return 0;
   }
 
-  mouse_graf = 3;
+  mouse_graf = CURSOR_BUSY;
   fseek(fpg, 0, SEEK_END);
   len = ftell(fpg);
   fseek(fpg, 0, SEEK_SET);

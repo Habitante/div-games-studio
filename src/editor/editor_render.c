@@ -579,7 +579,7 @@ void resize(void) {
     blit_screen(screen_buffer);
     save_mouse_bg(mouse_background, mx, my, mouse_graf, 1);
 
-  } while (mouse_b & 1);
+  } while (mouse_b & MB_LEFT);
 
   wput(v.ptr, w, h, w - 9, h - 9, -34);
   v.redraw = 2;

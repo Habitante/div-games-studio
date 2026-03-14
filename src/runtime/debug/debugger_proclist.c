@@ -186,14 +186,14 @@ void process_list2(void) {
     v.redraw = 1;
   }
 
-  if (wmouse_in(3, 21, 128 + 32 - 9, 120) && (mouse_b & 1)) {
+  if (wmouse_in(3, 21, 128 + 32 - 9, 120) && (mouse_b & MB_LEFT)) {
     n = lp_ini + (wmouse_y - 21) / 8;
     if (n < lp_num) {
       if (lp_select != n) {
         lp_select = n;
         paint_process_list();
         v.redraw = 1;
-      } else if (!(prev_mouse_buttons & 1)) {
+      } else if (!(prev_mouse_buttons & MB_LEFT)) {
         v_accept = 1;
         end_dialog = 1;
       }
@@ -201,7 +201,7 @@ void process_list2(void) {
   }
 
   if (wmouse_in(122 + 32, 19, 9, 9)) {
-    if (mouse_b & 1) {
+    if (mouse_b & MB_LEFT) {
       if (lp_button == 0) {
         wput(ptr, w, h, 123 + 32, 20, -41);
         lp_button = 1;
@@ -227,7 +227,7 @@ void process_list2(void) {
 
   if (wmouse_in(123 + 32, 28, 7, 105)) {
     mouse_graf = 13;
-    if (lp_num > 1 && (mouse_b & 1)) {
+    if (lp_num > 1 && (mouse_b & MB_LEFT)) {
       x = (float)(wmouse_y - 28) / 104.0;
       lp_select = x * (lp_num - 1);
       if (lp_select < lp_ini)
@@ -240,7 +240,7 @@ void process_list2(void) {
   }
 
   if (wmouse_in(122 + 32, 93 + 40, 9, 9)) {
-    if (mouse_b & 1) {
+    if (mouse_b & MB_LEFT) {
       if (lp_button == 0) {
         wput(ptr, w, h, 123 + 32, 94 + 40, -42);
         lp_button = 2;

@@ -291,7 +291,7 @@ void explode_dialog2(void) {
   old_type_a = type_a;
   old_type_b = type_b;
   old_type_c = type_c;
-  if (wmouse_in(w - 70, 18, 66, 11) && (mouse_b & 1)) {
+  if (wmouse_in(w - 70, 18, 66, 11) && (mouse_b & MB_LEFT)) {
     gradient_buf = exp_colores;
     gradient_config = exp_gama;
     show_dialog((void_return_type_t)gamma0);

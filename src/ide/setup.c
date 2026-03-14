@@ -84,7 +84,7 @@ void vid_setup2(void) {
     need_refresh = 1;
   }
 
-  if ((lvgasizes.zone >= 10) && (mouse_b & 1)) {
+  if ((lvgasizes.zone >= 10) && (mouse_b & MB_LEFT)) {
     stvga_w = modos[(lvgasizes.zone - 10) + lvgasizes.first_visible].width;
     stvga_h = modos[(lvgasizes.zone - 10) + lvgasizes.first_visible].height;
     need_refresh = 1;
@@ -299,7 +299,7 @@ void wallpaper_setup2(void) {
     break;
   }
 
-  if (wmouse_in(w - 38, 24 + 8, 34, 7) && (mouse_b & 1)) {
+  if (wmouse_in(w - 38, 24 + 8, 34, 7) && (mouse_b & MB_LEFT)) {
     gradient_buf = wallpaper_gradient;
     gradient_config = setup_file.gradient_config;
     show_dialog((void_return_type_t)gamma0);
@@ -698,13 +698,13 @@ void cfg_setup2(void) {
     zone = 17;
 
   if ((zone >= 1 && zone <= 12) || zone == 15)
-    mouse_graf = 2;
+    mouse_graf = CURSOR_MOVE;
   if (zone == 13)
     mouse_graf = 10;
   if (zone == 14)
     mouse_graf = 11;
 
-  if (zone == 13 && (mouse_b & 1) && wmouse_x != -1) {
+  if (zone == 13 && (mouse_b & MB_LEFT) && wmouse_x != -1) {
     if (!(v.buttons & 1)) {
       wput(v.ptr, w, h, 53 + 50, 56 + 30, -53);
       v.buttons ^= 1;
@@ -720,7 +720,7 @@ void cfg_setup2(void) {
     }
   }
 
-  if (zone == 14 && (mouse_b & 1) && wmouse_x != -1) {
+  if (zone == 14 && (mouse_b & MB_LEFT) && wmouse_x != -1) {
     if (!(v.buttons & 2)) {
       wput(v.ptr, w, h, 93 + 50, 56 + 30, -54);
       v.buttons ^= 2;
@@ -736,7 +736,7 @@ void cfg_setup2(void) {
     }
   }
 
-  if (zone == 16 && (mouse_b & 1) && wmouse_x != -1) {
+  if (zone == 16 && (mouse_b & MB_LEFT) && wmouse_x != -1) {
     if (!(v.buttons & 4)) {
       wput(v.ptr, w, h, 53 + 50, 56 + 30 + inc, -53);
       v.buttons ^= 4;
@@ -752,7 +752,7 @@ void cfg_setup2(void) {
     }
   }
 
-  if (zone == 17 && (mouse_b & 1) && wmouse_x != -1) {
+  if (zone == 17 && (mouse_b & MB_LEFT) && wmouse_x != -1) {
     if (!(v.buttons & 8)) {
       wput(v.ptr, w, h, 93 + 50, 56 + 30 + inc, -54);
       v.buttons ^= 8;
@@ -768,13 +768,13 @@ void cfg_setup2(void) {
     }
   }
 
-  if (!(mouse_b & 1) && (prev_mouse_buttons & 1) && zone == 15) {
+  if (!(mouse_b & MB_LEFT) && (prev_mouse_buttons & MB_LEFT) && zone == 15) {
     paint_cursor = (paint_cursor + 1) % 3;
     cfg_show_cursor();
     v.redraw = 1;
   }
 
-  if ((mouse_b & 1) && zone >= 1 && zone <= 12) {
+  if ((mouse_b & MB_LEFT) && zone >= 1 && zone <= 12) {
     sel_color_font = color_cfg[zone - 1];
     show_dialog((void_return_type_t)selcolor0);
     if (sel_color_ok) {

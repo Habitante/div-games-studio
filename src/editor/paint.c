@@ -101,11 +101,11 @@ void test_mouse_box(int a, int b, int c, int d) {
       mouse_y = b + (mouse_shift_y - b) / 2;
     }
     if (mouse_in(a + 2, b + 2, a + c - 10, b + 9))
-      mouse_graf = 2;
+      mouse_graf = CURSOR_MOVE;
     else if (mouse_in(a + c - 9, b + 2, a + c - 2, b + 9))
-      mouse_graf = 5;
+      mouse_graf = CURSOR_CLOSE;
     else
-      mouse_graf = 1;
+      mouse_graf = CURSOR_ARROW;
   } else if (mouse_in(toolbar_x, toolbar_y, toolbar_x + toolbar_width * big2 - 1,
                       toolbar_y + 19 * big2 - 1)) {
     if (big && !mouse_shift) {
@@ -114,13 +114,13 @@ void test_mouse_box(int a, int b, int c, int d) {
       mouse_y = toolbar_y + (mouse_shift_y - toolbar_y) / 2;
     }
     if (mouse_in(toolbar_x, toolbar_y, toolbar_x + 9, toolbar_y + 9))
-      mouse_graf = 2;
+      mouse_graf = CURSOR_MOVE;
     else if (mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18))
-      mouse_graf = 5;
+      mouse_graf = CURSOR_CLOSE;
     else
-      mouse_graf = 1;
+      mouse_graf = CURSOR_ARROW;
   } else
-    mouse_graf = 1;
+    mouse_graf = CURSOR_ARROW;
 }
 
 void test_mouse_box2(int a, int b, int c, int d) {
@@ -131,11 +131,11 @@ void test_mouse_box2(int a, int b, int c, int d) {
       mouse_y = b + (mouse_shift_y - b) / 2;
     }
     if (mouse_in(a, b + 2, a + c - 10, b + 9))
-      mouse_graf = 2;
+      mouse_graf = CURSOR_MOVE;
     else if (mouse_in(a + c - 9, b + 2, a + c - 2, b + 9))
-      mouse_graf = 5;
+      mouse_graf = CURSOR_CLOSE;
     else
-      mouse_graf = 1;
+      mouse_graf = CURSOR_ARROW;
   } else if (mouse_in(toolbar_x, toolbar_y, toolbar_x + toolbar_width * big2 - 1,
                       toolbar_y + 19 * big2 - 1)) {
     if (big && !mouse_shift) {
@@ -144,16 +144,16 @@ void test_mouse_box2(int a, int b, int c, int d) {
       mouse_y = toolbar_y + (mouse_shift_y - toolbar_y) / 2;
     }
     if (mouse_in(toolbar_x, toolbar_y, toolbar_x + 9, toolbar_y + 9))
-      mouse_graf = 2;
+      mouse_graf = CURSOR_MOVE;
     else if (mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18))
-      mouse_graf = 5;
+      mouse_graf = CURSOR_CLOSE;
     else
-      mouse_graf = 1;
+      mouse_graf = CURSOR_ARROW;
   } else if (mouse_in(zoom_win_x, zoom_win_y, zoom_win_x + zoom_win_width - 1,
                       zoom_win_y + zoom_win_height - 1))
     mouse_graf = current_mouse - zoom;
   else
-    mouse_graf = 1;
+    mouse_graf = CURSOR_ARROW;
 }
 
 void test_mouse(void) {
@@ -165,16 +165,16 @@ void test_mouse(void) {
       mouse_y = toolbar_y + (mouse_shift_y - toolbar_y) / 2;
     }
     if (mouse_in(toolbar_x, toolbar_y, toolbar_x + 9, toolbar_y + 9))
-      mouse_graf = 2;
+      mouse_graf = CURSOR_MOVE;
     else if (mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18))
-      mouse_graf = 5;
+      mouse_graf = CURSOR_CLOSE;
     else
-      mouse_graf = 1;
+      mouse_graf = CURSOR_ARROW;
   } else if (mouse_in(zoom_win_x, zoom_win_y, zoom_win_x + zoom_win_width - 1,
                       zoom_win_y + zoom_win_height - 1))
     mouse_graf = current_mouse - zoom;
   else
-    mouse_graf = 1;
+    mouse_graf = CURSOR_ARROW;
 }
 
 //-----------------------------------------------------------------------------
@@ -1495,14 +1495,14 @@ void edit_ruler(void) {
   read_mouse();
   select_zoom();
   test_mouse();
-  if ((key(_L_SHIFT) || key(_R_SHIFT)) && (mouse_b & 1) && mouse_graf >= 10) {
+  if ((key(_L_SHIFT) || key(_R_SHIFT)) && (mouse_b & MB_LEFT) && mouse_graf >= CURSOR_ON_CANVAS) {
     color = *(map + coord_y * map_width + coord_x);
     remove_texture();
     draw_ruler();
     mouse_b = 0;
   }
 
-  if ((mouse_b & 1) && mouse_in(toolbar_x + COLOR_RULER_X, toolbar_y,
+  if ((mouse_b & MB_LEFT) && mouse_in(toolbar_x + COLOR_RULER_X, toolbar_y,
                                 toolbar_x + COLOR_RULER_X + 127, toolbar_y + 18)) {
     if (editable(&n))
       gradients[gradient].colors[n] = color;
@@ -1512,10 +1512,10 @@ void edit_ruler(void) {
     draw_ruler();
   }
 
-  if ((mouse_b & 1) && selected_icon == 11) {
+  if ((mouse_b & MB_LEFT) && selected_icon == 11) {
     do {
       read_mouse();
-    } while (mouse_b & 1);
+    } while (mouse_b & MB_LEFT);
     eyedropper();
     draw_ruler();
     do {
@@ -1556,14 +1556,14 @@ void eyedropper(void) {
       select_zoom();
       test_mouse();
 
-      if ((mouse_b & 1) && mouse_graf >= 10) {
+      if ((mouse_b & MB_LEFT) && mouse_graf >= CURSOR_ON_CANVAS) {
         col = *(map + coord_x + coord_y * map_width);
         color = col;
-        mouse_b = 2;
+        mouse_b = MB_RIGHT;
         remove_texture();
       }
 
-      if (mouse_graf >= 10) {
+      if (mouse_graf >= CURSOR_ON_CANVAS) {
         col = *(map + coord_x + coord_y * map_width);
         _saved_buffer = screen_buffer;
         screen_buffer = toolbar;
@@ -1589,7 +1589,7 @@ void eyedropper(void) {
       }
 
       blit_edit();
-    } while (!exit_requested && !(mouse_b & 2) && !key(_ESC) && draw_mode < 100 &&
+    } while (!exit_requested && !(mouse_b & MB_RIGHT) && !key(_ESC) && draw_mode < 100 &&
              !(mouse_b && mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18)));
 
     if (key(_ESC) ||
@@ -2430,7 +2430,7 @@ void select_fx(int n, int *effect) {
   int ix, iy, wait = 0;
   byte *p;
 
-  if (mouse_in(icon_x, toolbar_y + 2, icon_x + 15, toolbar_y + 17) && (mouse_b & 1)) {
+  if (mouse_in(icon_x, toolbar_y + 2, icon_x + 15, toolbar_y + 17) && (mouse_b & MB_LEFT)) {
     c = 88 * big2;
     d = 27 * big2;
     if ((p = (byte *)malloc(c * d)) == NULL) {
@@ -2455,7 +2455,7 @@ void select_fx(int n, int *effect) {
     d /= big2;
     do {
       read_mouse();
-    } while (mouse_b & 1);
+    } while (mouse_b & MB_LEFT);
 
     do {
       read_mouse();
@@ -2472,16 +2472,16 @@ void select_fx(int n, int *effect) {
       wbox(p, c, d, c4, 12, 19, *effect * 4, 4);
 
       if (mouse_in(a + 2, b + 18, a + 9, b + 25)) {
-        mouse_graf = 4;
-        if (mouse_b & 1) {
+        mouse_graf = CURSOR_MINIMIZE;
+        if (mouse_b & MB_LEFT) {
           wput(p, c, d, 2, 18, -47);
           wait = 1;
           if (*effect > 1)
             (*effect)--;
         }
       } else if (mouse_in(a + 79, b + 18, a + 86, b + 25)) {
-        mouse_graf = 6;
-        if (mouse_b & 1) {
+        mouse_graf = CURSOR_RESIZE;
+        if (mouse_b & MB_LEFT) {
           wput(p, c, d, 79, 18, -48);
           wait = 1;
           if (*effect < 16)
@@ -2498,7 +2498,7 @@ void select_fx(int n, int *effect) {
         ix = 11 + iy * 4;
         wbox(p, c, d, c4, ix, 18, 1, 1);
         wbox(p, c, d, c4, ix, 23, 1, 1);
-        if (mouse_b & 1) {
+        if (mouse_b & MB_LEFT) {
           *effect = iy;
           wait = 2;
         }
@@ -2506,7 +2506,7 @@ void select_fx(int n, int *effect) {
         ix = mouse_shift_x - a;
         iy = mouse_shift_y - b;
         wrectangle(p, c, d, c4, 0, 0, c, d);
-        while (mouse_b & 1) {
+        while (mouse_b & MB_LEFT) {
           save_mouse_bg(mouse_background, mouse_shift_x, mouse_shift_y, mouse_graf, 0);
           put(mouse_shift_x, mouse_shift_y, mouse_graf);
           blit_screen(screen_buffer);
@@ -2540,13 +2540,13 @@ void select_fx(int n, int *effect) {
         wput(p, c, d, 79, 18, -38);
         do {
           read_mouse();
-        } while (mouse_b & 1);
+        } while (mouse_b & MB_LEFT);
       }
 
     } while ((!mouse_b || wait) && !key(_ESC));
 
     if (!mouse_in(toolbar_x, toolbar_y, toolbar_x + toolbar_width - 1, toolbar_y + 18) ||
-        !(mouse_b & 1) || mouse_in(icon_x, toolbar_y + 2, icon_x + 15, toolbar_y + 17)) {
+        !(mouse_b & MB_LEFT) || mouse_in(icon_x, toolbar_y + 2, icon_x + 15, toolbar_y + 17)) {
       wput(p, c, d, c - 9, 2, -45);
       blit_region(screen_buffer, vga_width, vga_height, p, a, b, c * big2, d * big2, 0);
       blit_partial(a, b, c * big2, d * big2);
@@ -2608,7 +2608,7 @@ int select_icon(int icon_x, int *icons) {
   int r = -1, ix, iy;
   byte *p;
 
-  if (mouse_in(icon_x, toolbar_y + 2, icon_x + 15, toolbar_y + 17) && (mouse_b & 1)) {
+  if (mouse_in(icon_x, toolbar_y + 2, icon_x + 15, toolbar_y + 17) && (mouse_b & MB_LEFT)) {
     num = *icons++;
     col = *icons++;
     fil = (num + col - 1) / col;
@@ -2636,7 +2636,7 @@ int select_icon(int icon_x, int *icons) {
     d /= big2;
     do {
       read_mouse();
-    } while (mouse_b & 1);
+    } while (mouse_b & MB_LEFT);
 
     do {
       read_mouse();
@@ -2663,7 +2663,7 @@ int select_icon(int icon_x, int *icons) {
         ix = mouse_shift_x - a;
         iy = mouse_shift_y - b;
         wrectangle(p, c, d, c4, 0, 0, c, d);
-        while (mouse_b & 1) {
+        while (mouse_b & MB_LEFT) {
           save_mouse_bg(mouse_background, mouse_shift_x, mouse_shift_y, mouse_graf, 0);
           put(mouse_shift_x, mouse_shift_y, mouse_graf);
           blit_screen(screen_buffer);
@@ -2689,13 +2689,13 @@ int select_icon(int icon_x, int *icons) {
 
     } while (!mouse_b && !key(_ESC));
 
-    if ((mouse_b & 1) && mouse_in(a + 2, b + 10, a + c - 2, b + d - 2)) {
+    if ((mouse_b & MB_LEFT) && mouse_in(a + 2, b + 10, a + c - 2, b + d - 2)) {
       r = ((mouse_y - b - 10) / 16) * col + (mouse_x - a - 2) / 16;
     } else
       r = -1;
 
     if (!mouse_in(toolbar_x, toolbar_y, toolbar_x + toolbar_width - 1, toolbar_y + 18) ||
-        !(mouse_b & 1) || mouse_in(icon_x, toolbar_y + 2, icon_x + 15, toolbar_y + 17)) {
+        !(mouse_b & MB_LEFT) || mouse_in(icon_x, toolbar_y + 2, icon_x + 15, toolbar_y + 17)) {
       wput(p, c, d, c - 9, 2, -45);
       blit_region(screen_buffer, vga_width, vga_height, p, a, b, c * big2, d * big2, 0);
       blit_partial(a, b, c * big2, d * big2);
@@ -2733,7 +2733,7 @@ void blit_mouse_a(void) {
   int moux, mouy;
   moux = zoom_win_x + ((mouse_x - zoom_win_x) & (-(1 << zoom)));
   mouy = zoom_win_y + ((mouse_y - zoom_win_y) & (-(1 << zoom)));
-  if (mouse_graf < 10) {
+  if (mouse_graf < CURSOR_ON_CANVAS) {
     flush_bars(0);
   } else {
     save_mouse_bg(mouse_background, moux, mouy, mouse_graf, 0);
@@ -2746,12 +2746,12 @@ void blit_mouse_b(void) {
   int moux, mouy;
   moux = zoom_win_x + ((mouse_x - zoom_win_x) & (-(1 << zoom)));
   mouy = zoom_win_y + ((mouse_y - zoom_win_y) & (-(1 << zoom)));
-  if (mouse_graf < 10) {
+  if (mouse_graf < CURSOR_ON_CANVAS) {
     save_mouse_bg(mouse_background, mouse_shift_x, mouse_shift_y, mouse_graf, 0);
     put(mouse_shift_x, mouse_shift_y, mouse_graf);
   }
   blit_screen(screen_buffer);
-  if (mouse_graf < 10)
+  if (mouse_graf < CURSOR_ON_CANVAS)
     save_mouse_bg(mouse_background, mouse_shift_x, mouse_shift_y, mouse_graf, 1);
   else
     save_mouse_bg(mouse_background, moux, mouy, mouse_graf, 1);
@@ -2769,7 +2769,7 @@ void select_mask(int n) {
 
   if ((key(_M) && hotkey) ||
       (mouse_in(toolbar_x + 48 + n * 16, toolbar_y + 2, toolbar_x + 55 + n * 16, toolbar_y + 17) &&
-       (mouse_b & 2))) {
+       (mouse_b & MB_RIGHT))) {
     c = (128 + 3) * big2;
     d = (128 + 11 + 8) * big2;
     a = toolbar_x;
@@ -2805,9 +2805,9 @@ void select_mask(int n) {
       if (mouse_in(a + 2, b + 2, a + c - 10, b + 9)) {
         ix = mouse_shift_x - a;
         iy = mouse_shift_y - b;
-        if (mouse_b & 1) {
+        if (mouse_b & MB_LEFT) {
           wrectangle(p, c, d, c4, 0, 0, c, d);
-          while (mouse_b & 1) {
+          while (mouse_b & MB_LEFT) {
             read_mouse();
             a = mouse_shift_x - ix;
             b = mouse_shift_y - iy;
@@ -2829,8 +2829,8 @@ void select_mask(int n) {
 
       if (mouse_in(a + 2, b + 10, a + 128 + 1, b + 128 + 9)) {
         col = (mouse_x - a - 2) / 8 + ((mouse_y - b - 10) / 8) * 16;
-        if (mouse_b & 1) {
-          if (col != oldcol || !(prev_mouse_buttons & 1))
+        if (mouse_b & MB_LEFT) {
+          if (col != oldcol || !(prev_mouse_buttons & MB_LEFT))
             mask[col] ^= 1;
           draw_ruler();
         }
@@ -2838,7 +2838,7 @@ void select_mask(int n) {
 
       // Invert / Clear
 
-      if ((mouse_b & 1) && mouse_in(a + 2, b + d - 9, a + c - 2, b + d - 2)) {
+      if ((mouse_b & MB_LEFT) && mouse_in(a + 2, b + d - 9, a + c - 2, b + d - 2)) {
         if (mouse_x < a + c / 2) {
           for (i = 0; i < 256; i++)
             mask[i] ^= 1;
@@ -2852,8 +2852,8 @@ void select_mask(int n) {
 
       // Pick a color from the screen
 
-      if ((mouse_b & 1) && !mouse_in(a, b, a + c - 1, b + d - 1)) {
-        if (mouse_graf >= 10) {
+      if ((mouse_b & MB_LEFT) && !mouse_in(a, b, a + c - 1, b + d - 1)) {
+        if (mouse_graf >= CURSOR_ON_CANVAS) {
           mask[*(map + coord_y * map_width + coord_x)] = 1;
           draw_ruler();
         } else
@@ -2874,11 +2874,11 @@ void select_mask(int n) {
       wrectangle(p, c, d, c0, x, y, 9, 9);
       blit_partial(a + x * big2, b + y * big2, 9 * big2, 9 * big2);
 
-    } while (!(mouse_b & 2) && !key(_ESC) && !done && !key(_M) && !exit_requested &&
-             !((mouse_b & 1) && mouse_in(a + c - 9, b + 2, a + c - 2, b + 9)));
+    } while (!(mouse_b & MB_RIGHT) && !key(_ESC) && !done && !key(_M) && !exit_requested &&
+             !((mouse_b & MB_LEFT) && mouse_in(a + c - 9, b + 2, a + c - 2, b + 9)));
 
     if (!mouse_in(toolbar_x, toolbar_y, toolbar_x + toolbar_width - 1, toolbar_y + 18) ||
-        !(mouse_b & 1) || key(_M) ||
+        !(mouse_b & MB_LEFT) || key(_M) ||
         mouse_in(toolbar_x + 48 + n * 16, toolbar_y + 2, toolbar_x + 57 + n * 16, toolbar_y + 17)) {
       blit_mouse_a();
       wput(p, c, d, c - 9, 2, -45);
@@ -3123,7 +3123,7 @@ void select_color(int n) { // Icon number as parameter
   if ((texture_type & 4) &&
       ((key(_T) && hotkey) || (mouse_in(toolbar_x + 56 + n * 16, toolbar_y + 11,
                                         toolbar_x + 62 + n * 16, toolbar_y + 17) &&
-                               (mouse_b & 1)))) {
+                               (mouse_b & MB_LEFT)))) {
     browser_type = BRUSH;
     show_dialog(mapper_browse_fpg0);
 
@@ -3176,7 +3176,7 @@ void select_color(int n) { // Icon number as parameter
   if ((texture_type & 8) &&
       ((key(_U) && hotkey) || (mouse_in(toolbar_x + 56 - 8 + n * 16, toolbar_y + 11,
                                         toolbar_x + 62 - 8 + n * 16, toolbar_y + 17) &&
-                               (mouse_b & 1)))) {
+                               (mouse_b & MB_LEFT)))) {
     browser_type = MAPBR;
     show_dialog(mapper_browse_fpg0);
     if (v_finished) {
@@ -3193,7 +3193,7 @@ void select_color(int n) { // Icon number as parameter
 
   if ((key(_C) && hotkey) ||
       (mouse_in(toolbar_x + 48 + n * 16, toolbar_y + 2, toolbar_x + 55 + n * 16, toolbar_y + 10) &&
-       (mouse_b & 1))) {
+       (mouse_b & MB_LEFT))) {
     c = (128 + 3 + 32 + 64 + 8) * big2;
     d = (128 + 3 + 18 + 8) * big2;
     a = toolbar_x;
@@ -3232,9 +3232,9 @@ void select_color(int n) { // Icon number as parameter
       if (mouse_in(a + 2, b + 2, a + c - 10, b + 9)) {
         ix = mouse_shift_x - a;
         iy = mouse_shift_y - b;
-        if (mouse_b & 1) {
+        if (mouse_b & MB_LEFT) {
           wrectangle(p, c, d, c4, 0, 0, c, d);
-          while (mouse_b & 1) {
+          while (mouse_b & MB_LEFT) {
             read_mouse();
             a = mouse_shift_x - ix;
             b = mouse_shift_y - iy;
@@ -3255,7 +3255,7 @@ void select_color(int n) { // Icon number as parameter
 
       if (mouse_in(a + 10, b + 10, a + 128 + 9, b + 128 + 9)) {
         col = (mouse_x - a - 10) / 8 + ((mouse_y - b - 10) / 8) * 16;
-        if (mouse_b & 1) {
+        if (mouse_b & MB_LEFT) {
           color = col;
           remove_texture();
           draw_ruler();
@@ -3265,13 +3265,13 @@ void select_color(int n) { // Icon number as parameter
       } else if (col != oldcol && needs_redraw != 1)
         needs_redraw = 2;
 
-      if ((mouse_b & 1) && mouse_in(a + 170, b + 10, a + 233, b + 128 + 9)) {
+      if ((mouse_b & MB_LEFT) && mouse_in(a + 170, b + 10, a + 233, b + 128 + 9)) {
         gradient = (mouse_y - b - 10) / 8;
         draw_ruler();
         needs_redraw = 1;
       }
 
-      if ((mouse_b & 1) && mouse_in(a + 138, b + 140, a + 138 + 95, b + 140 + 15)) {
+      if ((mouse_b & MB_LEFT) && mouse_in(a + 138, b + 140, a + 138 + 95, b + 140 + 15)) {
         if (mouse_y >= b + 132 + 16)
           x = 2;
         else if (mouse_x < a + 138 + 48)
@@ -3364,18 +3364,18 @@ void select_color(int n) { // Icon number as parameter
         needs_redraw = 1;
         do
           read_mouse();
-        while (mouse_b & 1);
+        while (mouse_b & MB_LEFT);
       } else if (!mouse_in(a + 138, b + 140, a + 138 + 95, b + 140 + 15))
         button = -1;
 
       if (editable_selection(&x, a + 10, b + 128 + 12))
-        mouse_graf = 2;
+        mouse_graf = CURSOR_MOVE;
       else if (!mouse_in(a, b, a + c - 1, b + d - 1) &&
                mouse_in(toolbar_x, toolbar_y, toolbar_x + toolbar_width - 1, toolbar_y + 18)) {
         if (mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18))
-          mouse_graf = 5;
+          mouse_graf = CURSOR_CLOSE;
         else if (mouse_in(toolbar_x, toolbar_y, toolbar_x + 9, toolbar_y + 9) || editable(&x))
-          mouse_graf = 2;
+          mouse_graf = CURSOR_MOVE;
       }
 
       // Blit: 0-Nothing (mouse), 1-Color info, 2-Entire window.
@@ -3411,7 +3411,7 @@ void select_color(int n) { // Icon number as parameter
       wrectangle(p, c, d, c0, x, y, 9, 9);
       blit_partial(a + x * big2, b + y * big2, 9 * big2, 9 * big2);
 
-      if ((mouse_b & 1) && mouse_in(a + 10, b + 132 + 8, a + 137, b + 147 + 8)) {
+      if ((mouse_b & MB_LEFT) && mouse_in(a + 10, b + 132 + 8, a + 137, b + 147 + 8)) {
         if (editable_selection(&x, a + 10, b + 132 + 8))
           gradients[gradient].colors[x] = color;
         else {
@@ -3422,7 +3422,7 @@ void select_color(int n) { // Icon number as parameter
         needs_redraw = 1;
       }
 
-      if ((mouse_b & 1) && !mouse_in(a, b, a + c - 1, b + d - 1)) {
+      if ((mouse_b & MB_LEFT) && !mouse_in(a, b, a + c - 1, b + d - 1)) {
         if (mouse_in(toolbar_x, toolbar_y, toolbar_x + toolbar_width - 1, toolbar_y + 18)) {
           if (mouse_in(toolbar_x + COLOR_RULER_X, toolbar_y, toolbar_x + COLOR_RULER_X + 127,
                        toolbar_y + 18)) {
@@ -3461,11 +3461,11 @@ void select_color(int n) { // Icon number as parameter
           done = 1;
       }
 
-    } while (!(mouse_b & 2) && !key(_ESC) && !done && !key(_C) && !exit_requested &&
-             !((mouse_b & 1) && mouse_in(a + c - 9, b + 2, a + c - 2, b + 9)));
+    } while (!(mouse_b & MB_RIGHT) && !key(_ESC) && !done && !key(_C) && !exit_requested &&
+             !((mouse_b & MB_LEFT) && mouse_in(a + c - 9, b + 2, a + c - 2, b + 9)));
 
     if (!mouse_in(toolbar_x, toolbar_y, toolbar_x + toolbar_width - 1, toolbar_y + 18) ||
-        !(mouse_b & 1) || key(_C) ||
+        !(mouse_b & MB_LEFT) || key(_C) ||
         mouse_in(toolbar_x + 48 + n * 16, toolbar_y + 2, toolbar_x + 57 + n * 16, toolbar_y + 17)) {
       blit_mouse_a();
       wput(p, c, d, c - 9, 2, -45);
@@ -3486,7 +3486,7 @@ void select_color(int n) { // Icon number as parameter
     free(p);
   } else if ((ascii == '0' && hotkey) || (mouse_in(toolbar_x + 56 + n * 16, toolbar_y + 2,
                                                    toolbar_x + 62 + n * 16, toolbar_y + 10) &&
-                                          (mouse_b & 1))) {
+                                          (mouse_b & MB_LEFT))) {
     if (texture_color != NULL) {
       remove_texture();
       if (color != 0) {
@@ -3518,7 +3518,7 @@ void select_color(int n) { // Icon number as parameter
     } else
       color_down();
     draw_ruler();
-  } else if ((shift_status & 4) && hotkey) {
+  } else if ((shift_status & MOD_CTRL) && hotkey) {
     if ((key(_RIGHT) && scan_code) || scan_code == _P)
       color_up();
     if ((key(_LEFT) && scan_code) || scan_code == _O)
@@ -3784,7 +3784,7 @@ void adjust_box(int *a, int *b, int *c, int *d) {
 void move_bar(void) {
   int barx, bary;
 
-  if ((mouse_b & 1) && mouse_in(toolbar_x, toolbar_y, toolbar_x + 9, toolbar_y + 9)) {
+  if ((mouse_b & MB_LEFT) && mouse_in(toolbar_x, toolbar_y, toolbar_x + 9, toolbar_y + 9)) {
     wrectangle(toolbar, vga_width / big2, vga_height, c4, 0, 0, toolbar_width, 19);
     barx = toolbar_x - mouse_shift_x;
     bary = toolbar_y - mouse_shift_y;
@@ -3797,7 +3797,7 @@ void move_bar(void) {
       flush_bars(0);
       put(mouse_x, mouse_y, 2);
       blit_screen(screen_buffer);
-    } while (mouse_b & 1);
+    } while (mouse_b & MB_LEFT);
     zoom_map();
 
     wrectangle(toolbar, vga_width / big2, vga_height, c2, 0, 0, toolbar_width, 19);
@@ -3825,14 +3825,14 @@ void select_zoom(void) {
       mouse_shift = 1;
   }
 
-  if (mouse_b & 8 && zoom > 0) {
+  if (mouse_b & MB_SCROLL_UP && zoom > 0) {
     zoom--;
     r = 0;
     if (!mouse_shift) {
       zoom_cx = coord_x;
       zoom_cy = coord_y;
     }
-  } else if (mouse_b & 4 && zoom < 3) {
+  } else if (mouse_b & MB_SCROLL_DOWN && zoom < 3) {
     zoom++;
     r = 0;
     if (!mouse_shift) {
@@ -3913,7 +3913,7 @@ void select_zoom(void) {
 
     do {
       read_mouse();
-    } while ((mouse_b & 1) || (key(_Z) && hotkey));
+    } while ((mouse_b & MB_LEFT) || (key(_Z) && hotkey));
 
     need_zoom = 1;
   }
@@ -3937,14 +3937,14 @@ void select_zoom(void) {
 void move_zoom(void) {
   int n, m = 0;
 
-  if ((mouse_b & 1) && mouse_in(toolbar_x + 26, toolbar_y + 2, toolbar_x + 47, toolbar_y + 17)) {
+  if ((mouse_b & MB_LEFT) && mouse_in(toolbar_x + 26, toolbar_y + 2, toolbar_x + 47, toolbar_y + 17)) {
     if (zoom_move == c3)
       zoom_move = c1;
     else
       zoom_move = c3;
     do {
       read_mouse();
-    } while (mouse_b & 1);
+    } while (mouse_b & MB_LEFT);
   }
 
   if (zoom_move == c3) {

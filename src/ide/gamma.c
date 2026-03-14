@@ -253,7 +253,7 @@ void gamma2(void) {
     break;
   }
 
-  if (!(mouse_b & 1) && (prev_mouse_buttons & 1)) {
+  if (!(mouse_b & MB_LEFT) && (prev_mouse_buttons & MB_LEFT)) {
     for (con = 0; con < 9; con++) {
       if (wmouse_in(button_coords[con].x, button_coords[con].y, 7, 7)) {
         gradient_config[con].selec = !gradient_config[con].selec;

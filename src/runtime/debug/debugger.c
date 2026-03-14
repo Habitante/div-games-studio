@@ -526,7 +526,7 @@ void runtime_error(int text_id) {
   dacout_b = 0;
   dacout_speed = 16;
 
-  mouse_graf = 1;
+  mouse_graf = CURSOR_ARROW;
   v_text = (char *)text[text_id];
   show_dialog(_err0);
   dacout_r = dr;
@@ -602,7 +602,7 @@ void deb(void) {
   dacout_b = 0;
   dacout_speed = 16;
 
-  mouse_graf = 1;
+  mouse_graf = CURSOR_ARROW;
   show_dialog(deb0);
 
   dacout_r = dr;
@@ -1079,7 +1079,7 @@ void debug(void) {
   memcpy(screen_buffer_debug, screen_buffer, vga_width * vga_height);
 
   new_palette = 0;
-  mouse_graf = 1;
+  mouse_graf = CURSOR_ARROW;
   show_dialog(debug0);
 
   dacout_r = dr;

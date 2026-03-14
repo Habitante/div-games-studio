@@ -101,7 +101,7 @@ void show_dialog(void_return_type_t init_handler) {
 
       do {
         dread_mouse();
-      } while ((mouse_b & 1) || key(_ESC));
+      } while ((mouse_b & MB_LEFT) || key(_ESC));
 
       explode(x, y, w, h);
 
@@ -109,7 +109,7 @@ void show_dialog(void_return_type_t init_handler) {
       blit_partial(x, y, w, h);
       do {
         dread_mouse();
-      } while (mouse_b & 1);
+      } while (mouse_b & MB_LEFT);
       modal_loop();
 
       //---------------------------------------------------------------------------
@@ -206,14 +206,14 @@ void modal_loop(void) {
     //-------------------------------------------------------------------------
 
     if (n == MAX_WINDOWS)
-      mouse_graf = 1;
+      mouse_graf = CURSOR_ARROW;
     else if (mouse_in(v.x + 2 * big2, v.y + 2 * big2, v.x + v.w - 2 * big2, v.y + 9 * big2))
       if (mouse_x <= v.x + v.w - 10 * big2)
-        mouse_graf = 2;
+        mouse_graf = CURSOR_MOVE;
       else
-        mouse_graf = 5;
+        mouse_graf = CURSOR_CLOSE;
     else
-      mouse_graf = 1;
+      mouse_graf = CURSOR_ARROW;
 
     //-------------------------------------------------------------------------
     // If we are inside a window's content area ...
@@ -238,10 +238,10 @@ void modal_loop(void) {
 
       } else { // If we are on the window's control bar ...
 
-        if (mouse_graf == 2 && (mouse_b & 1))
+        if (mouse_graf == CURSOR_MOVE && (mouse_b & MB_LEFT))
           move_window();
 
-        if (mouse_graf == 5 && (mouse_b & 1)) {
+        if (mouse_graf == CURSOR_CLOSE && (mouse_b & MB_LEFT)) {
           close_window();
           salir_del_dialogo = 1;
         }
@@ -302,7 +302,7 @@ void modal_loop(void) {
 
   do {
     dread_mouse();
-  } while ((mouse_b & 1) || key(_ESC));
+  } while ((mouse_b & MB_LEFT) || key(_ESC));
 }
 
 //----------------------------------------------------------------------------
@@ -368,7 +368,7 @@ void close_window(void) {
 
   do {
     dread_mouse();
-  } while ((mouse_b & 1) || key(_ESC));
+  } while ((mouse_b & MB_LEFT) || key(_ESC));
 
   implode(x, y, w, h);
 }
@@ -381,7 +381,7 @@ void move_window(void) {
   int ix, iy;
   int x, y, w, h;
 
-  mouse_graf = 2;
+  mouse_graf = CURSOR_MOVE;
   w = v.w;
   h = v.h;
   ix = mouse_x - v.x;
@@ -401,7 +401,7 @@ void move_window(void) {
     if (!skip_flush) {
       flush_copy();
     }
-  } while (mouse_b & 1);
+  } while (mouse_b & MB_LEFT);
 
   wrectangle(v.ptr, w / big2, h / big2, c2, 0, 0, w / big2, h / big2);
   v.redraw = 1;
@@ -1783,8 +1783,8 @@ int get_status(int n) {
     else
       x &= 2;
   }
-  if ((x & 1) && (mouse_b & 1)) {
-    if (!(prev_mouse_buttons & 1) && (x & 2))
+  if ((x & 1) && (mouse_b & MB_LEFT)) {
+    if (!(prev_mouse_buttons & MB_LEFT) && (x & 2))
       x |= 4;
     x |= 2;
   }
@@ -1848,7 +1848,7 @@ int flag_status(int n) {
   int x = 0;
   if (wmouse_in(v.item[n].flag.x, v.item[n].flag.y, text_len(v.item[n].flag.text) + 10, 8))
     x = 1;
-  if (x && (mouse_b & 1))
+  if (x && (mouse_b & MB_LEFT))
     x = 2;
   return (x);
 }
@@ -1913,7 +1913,7 @@ void get_input(int n) {
     _select_new_item(n + 1);
     return;
   default:
-    if (!(shift_status & 15) && ascii == 0) {
+    if (!(shift_status & (MOD_SHIFT | MOD_CTRL | MOD_ALT)) && ascii == 0) {
       l = v.redraw;
       v.redraw = 1;
       switch (scan_code) {
@@ -2033,7 +2033,7 @@ int button_status(int n) {
   }
   if (wmouse_in(x - 3, y - 3, w + 6, h + 6))
     e = 1;
-  if (e && (mouse_b & 1))
+  if (e && (mouse_b & MB_LEFT))
     e = 2;
   if (v.selected_item == n && kbdFLAGS[28])
     e = 3;

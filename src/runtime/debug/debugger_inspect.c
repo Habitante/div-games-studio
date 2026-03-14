@@ -290,7 +290,7 @@ void inspect2(void) {
     v.redraw = 1;
   }
 
-  if (wmouse_in(3, 21, 128 + 32 + 64 - 9, 80) && (mouse_b & 1)) {
+  if (wmouse_in(3, 21, 128 + 32 + 64 - 9, 80) && (mouse_b & MB_LEFT)) {
     n = var_ini + (wmouse_y - 21) / 8;
     if (n < num_var) {
       var_select = n;
@@ -300,7 +300,7 @@ void inspect2(void) {
   }
 
   if (wmouse_in(122 + 32 + 64, 19, 9, 9)) {
-    if (mouse_b & 1) {
+    if (mouse_b & MB_LEFT) {
       if (button == 0) {
         wput(ptr, w, h, 123 + 32 + 64, 20, -41);
         button = 1;
@@ -325,7 +325,7 @@ void inspect2(void) {
 
   if (wmouse_in(123 + 32 + 64, 28, 7, 65)) {
     mouse_graf = 13;
-    if (num_var > 1 && (mouse_b & 1)) {
+    if (num_var > 1 && (mouse_b & MB_LEFT)) {
       x = (float)(wmouse_y - 28) / 64.0;
       var_select = x * (num_var - 1);
       if (var_select < var_ini)
@@ -338,7 +338,7 @@ void inspect2(void) {
   }
 
   if (wmouse_in(122 + 32 + 64, 93, 9, 9)) {
-    if (mouse_b & 1) {
+    if (mouse_b & MB_LEFT) {
       if (button == 0) {
         wput(ptr, w, h, 123 + 32 + 64, 94, -42);
         button = 2;

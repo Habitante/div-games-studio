@@ -13,7 +13,7 @@ architecture docs, code review, and discussion with Daniel Navarro.
 
 | # | Improvement | Status | Risk |
 |---|-------------|--------|------|
-| 1 | [Enums & constants](#1-enums--constants) | Sprints 1-2 DONE, sprints 3-6 open | Very low |
+| 1 | [Enums & constants](#1-enums--constants) | Sprints 1-3 DONE, sprints 4-6 open | Very low |
 | 2 | [Testing infrastructure](#2-testing-infrastructure) | — | None |
 | 3 | [File format hardening + modern imports](#3-file-format-hardening--modern-imports) | — | Low |
 | 4 | [Help translation quality pass](#4-help-translation-quality-pass) | — | Low |
@@ -132,20 +132,31 @@ Defined in `div_enums.h` as `enum menu_base`.
 
 **Files:** `handler.c`.
 
-#### F. Mouse cursor IDs (`mouse_graf`)
+#### F. Mouse cursor IDs (`mouse_graf`) — DONE
 
-| Value | Meaning | Proposed name |
-|-------|---------|---------------|
+Defined in `div_enums.h` as `#define` constants. Window-chrome cursor IDs
+(1-7) replaced across all IDE, paint, and debugger files. The `>= 10`
+threshold for paint canvas replaced with `CURSOR_ON_CANVAS`.
+
+| Value | Meaning | Name |
+|-------|---------|------|
 | 1 | Normal arrow | `CURSOR_ARROW` |
 | 2 | Move/drag (title bar) | `CURSOR_MOVE` |
+| 3 | Busy/wait (during operations) | `CURSOR_BUSY` |
 | 4 | Minimize button hover | `CURSOR_MINIMIZE` |
 | 5 | Close button hover | `CURSOR_CLOSE` |
 | 6 | Resize grip | `CURSOR_RESIZE` |
 | 7 | Background window (click to activate) | `CURSOR_ACTIVATE` |
 | >= 10 | Paint cursor on canvas | `CURSOR_ON_CANVAS` (threshold) |
 
-**Files:** `main.c`, `mouse.c`, `paint.c`, `paint_tools.c`,
-`paint_select.c`, `handler_map.c`.
+Values 7-15 are also used as scrollbar/widget region IDs in the code
+editor, help viewer, browser, and debugger. These reuse cursor graphic
+indices but have widget-specific semantics and are left as bare numbers.
+
+**Files:** `main.c`, `main_desktop.c`, `main_dialogs.c`, `mouse.c`,
+`paint.c`, `paint_tools.c`, `paint_select.c`, `handler.c`,
+`handler_map.c`, `handler_dialogs.c`, `compiler.c`, `palette.c`,
+`fpg.c` (formats), `debugger.c`, `debugger_ui.c`.
 
 #### G. Paint editor draw modes (`draw_mode`)
 
@@ -204,29 +215,43 @@ The `draw_mode < 100` / `>= 100` checks become `draw_mode < TOOL_TRANSITION`.
 
 **Files:** `main.c`, `handler_map.c`.
 
-#### J. Mouse button bits (`mouse_b`)
+#### J. Mouse button bits (`mouse_b`) — DONE
 
-| Bit/Value | Meaning | Proposed name |
-|-----------|---------|---------------|
+Defined in `div_enums.h` as `#define` constants. Replaced across all 32
+files that use `mouse_b` bit patterns, including the local `m_b` variable
+in `mouse.c` and `prev_mouse_buttons` checks.
+
+| Bit/Value | Meaning | Name |
+|-----------|---------|------|
 | bit 0 (0x01) | Left button | `MB_LEFT` |
 | bit 1 (0x02) | Right button | `MB_RIGHT` |
 | bit 2 (0x04) | Scroll wheel down | `MB_SCROLL_DOWN` |
 | bit 3 (0x08) | Scroll wheel up | `MB_SCROLL_UP` |
 | 0x8001 | Spacebar pretending to be left-click | `MB_KEYBOARD_CLICK` |
 
-**Files:** `mouse.c`, `main.c`, `paint.c`, `paint_tools.c`,
-`paint_select.c`, `editor.c`, `handler_map.c`.
+`#undef MB_RIGHT` guards added for Windows SDK conflict.
 
-#### K. Shift/modifier status bits (`shift_status`)
+**Files:** All 32 files using `mouse_b` patterns.
 
-| Bit | Meaning | Proposed name |
-|-----|---------|---------------|
-| 0-1 | Shift key | `MOD_SHIFT` (mask 0x03) |
+#### K. Shift/modifier status bits (`shift_status`) — DONE
+
+Defined in `div_enums.h` as `#define` constants. Replaced across all 12
+files using `shift_status` bit patterns. Combined masks like `& 12`
+replaced with `(MOD_CTRL | MOD_ALT)` for readability.
+
+| Bit | Meaning | Name |
+|-----|---------|------|
+| 0 | Right shift | `MOD_RSHIFT` (0x01) |
+| 1 | Left shift | `MOD_LSHIFT` (0x02) |
+| 0-1 | Either shift key | `MOD_SHIFT` (mask 0x03) |
 | 2 | Ctrl key | `MOD_CTRL` (0x04) |
 | 3 | Alt key | `MOD_ALT` (0x08) |
 
-**Files:** `editor.c`, `editor_edit.c`, `mouse.c`, `main.c`,
-`paint_tools.c`.
+`#undef MOD_SHIFT` / `#undef MOD_ALT` guards added for Windows SDK conflicts.
+Capslock (0x40) and Numlock (0x20) bits left as bare numbers (only set
+in `mouse.c` and `keyboard.c`, not checked elsewhere).
+
+**Files:** All 12 files using `shift_status` patterns.
 
 #### L. Process status codes (`_Status`, runtime)
 
@@ -317,7 +342,7 @@ Each sprint is one self-contained commit.
 |--------|-----------|--------|
 | 1 — Core IDE enums | A. Window types, B. Foreground state, C. File types, D. Item types | DONE |
 | 2 — Menu and UI constants | E. Menu bases, P. Alignment modes, O. Menu metrics | DONE |
-| 3 — Input state enums | F. Cursor IDs, J. Mouse buttons, K. Modifiers | — |
+| 3 — Input state enums | F. Cursor IDs, J. Mouse buttons, K. Modifiers | DONE |
 | 4 — Editor state enums | G. Draw modes, H. Block state, I. Drag-and-drop | — |
 | 5 — Palette and format constants | O. Palette/ghost/cuad sizes, `MAX_FPG_GRAPHICS`, Q. Format offsets | — |
 | 6 — Runtime enums | L. Process status, M. Coordinate types, N. Sprite flags | — |
