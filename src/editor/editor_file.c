@@ -939,21 +939,21 @@ void process_list2(void) {
 
   _process_items();
 
-  if (scan_code == 80 && lp_select + 1 < lp_num) {
+  if (scan_code == _DOWN && lp_select + 1 < lp_num) {
     if (lp_ini + 15 == ++lp_select)
       lp_ini++;
     paint_process_list();
     flush_buffer();
     v.redraw = 1;
   }
-  if (scan_code == 72 && lp_select) {
+  if (scan_code == _UP && lp_select) {
     if (lp_ini == lp_select--)
       lp_ini--;
     paint_process_list();
     flush_buffer();
     v.redraw = 1;
   }
-  if (scan_code == 81) {
+  if (scan_code == _PGDN) {
     for (n = 0; n < 15; n++)
       if (lp_select + 1 < lp_num) {
         if (lp_ini + 15 == ++lp_select)
@@ -963,7 +963,7 @@ void process_list2(void) {
     flush_buffer();
     v.redraw = 1;
   }
-  if (scan_code == 73) {
+  if (scan_code == _PGUP) {
     for (n = 0; n < 15; n++)
       if (lp_select) {
         if (lp_ini == lp_select--)

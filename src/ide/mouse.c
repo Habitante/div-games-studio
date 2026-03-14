@@ -353,10 +353,10 @@ void checkmod(OSDEPMod mod) {
       shift_status |= MOD_ALT;
 
     if (mod & KMOD_CAPS)
-      shift_status |= 64;
+      shift_status |= MOD_CAPS;
 
     if (mod & KMOD_NUM)
-      shift_status |= 32;
+      shift_status |= MOD_NUM;
   }
 
   //	fprintf(stdout, "%d\n", shift_status);
@@ -528,14 +528,14 @@ void read_mouse2(void) {
       //		ascii = scan_code;
 
       // fix backspace in editor
-      if (scan_code == 14)
-        ascii = 8;
+      if (scan_code == _BACKSPACE)
+        ascii = ASCII_BACKSPACE;
       // fix return in editor
-      if (scan_code == '\x1c')
-        ascii = 13;
+      if (scan_code == _ENTER)
+        ascii = ASCII_ENTER;
 
-      if (scan_code == 15)
-        ascii = 9;
+      if (scan_code == _TAB)
+        ascii = ASCII_TAB;
       //				fprintf(stdout, "ascii: %d scancode: %d 0x%x\n", ascii, scan_code,scan_code);
       key(scan_code) = 1;
     }

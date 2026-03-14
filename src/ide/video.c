@@ -206,7 +206,7 @@ void blit_sdl(byte *p) {
 }
 
 void blit_screen(byte *p) {
-  if ((shift_status & 4) && (shift_status & 8) && scan_code == _P)
+  if ((shift_status & MOD_CTRL) && (shift_status & MOD_ALT) && scan_code == _P)
     snapshot(p);
 
 
@@ -217,7 +217,7 @@ void blit_screen(byte *p) {
 
   {
     static uint32_t fs_cooldown = 0;
-    if (shift_status & 8 && key(_ENTER) && SDL_GetTicks() - fs_cooldown > 500) {
+    if (shift_status & MOD_ALT && key(_ENTER) && SDL_GetTicks() - fs_cooldown > 500) {
       toggle_fullscreen(vga);
       fs_cooldown = SDL_GetTicks();
     }

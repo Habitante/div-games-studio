@@ -353,7 +353,7 @@ void editor() {
   int n;
 
   if (error_number != -1 && eprg == v.prg) {
-    if ((scan_code <= 1 || scan_code == 59) && ascii == 0 && mouse_b == 0) {
+    if ((scan_code <= 1 || scan_code == _F1) && ascii == 0 && mouse_b == 0) {
       repaint_partial();
       error_cursor2();
       v.redraw++;
@@ -391,7 +391,7 @@ void editor() {
       switch (scan_code) {
       case 0:
         break;
-      case 77:
+      case _RIGHT:
         if (block_col2 + 1 == v.prg->column)
           block_col2++;
         else if (block_col1 == v.prg->column)
@@ -400,7 +400,7 @@ void editor() {
           f_unmark();
         f_right();
         break;
-      case 75:
+      case _LEFT:
         if (v.prg->column > 1) {
           if (block_col2 == v.prg->column - 1)
             block_col2--;
@@ -411,18 +411,18 @@ void editor() {
           f_left();
         }
         break;
-      case 82:
+      case _INS:
         f_cut_block(2); // shift+insert
         f_paste_block();
         f_unmark();
         scan_code = 0;
         break;
-      case 83:
+      case _DEL:
         f_cut_block(1); // shift+delete
         edit_block_mode = 0;
         scan_code = 0;
         break;
-      case 71: // shift+home
+      case _HOME: // shift+home
         if (block_col1 == v.prg->column)
           block_col1 = 1;
         else {
@@ -433,7 +433,7 @@ void editor() {
           f_unmark();
         f_home();
         break;
-      case 79: // shift+end
+      case _END: // shift+end
         if (block_col2 + 1 == v.prg->column)
           block_col2 = linelen(v.prg->lptr);
         else {
@@ -452,16 +452,16 @@ void editor() {
       switch (scan_code) {
       case 0:
         break;
-      case 45:
+      case _X:
         f_cut_block(1); // ctrl+x
         edit_block_mode = 0;
         scan_code = 0;
         break;
-      case 46:
+      case _C:
         f_cut_block(0); // ctrl+c
         scan_code = 0;
         break;
-      case 47:
+      case _V:
         f_cut_block(2); // ctrl+v
         f_paste_block();
         f_unmark();
@@ -472,8 +472,8 @@ void editor() {
         break;
       }
 
-      if (kbdFLAGS[82]) { // ctrl+ins
-        kbdFLAGS[82] = 0;
+      if (key(_INS)) { // ctrl+ins
+        key(_INS) = 0;
         f_cut_block(0);
         scan_code = 0;
       }
@@ -482,7 +482,7 @@ void editor() {
       switch (scan_code) {
       case 0:
         break;
-      case 83:
+      case _DEL:
         f_cut_block(2); // delete
         scan_code = 0;
         edit_block_mode = 0;
@@ -493,7 +493,7 @@ void editor() {
       }
     else if ((shift_status & MOD_SHIFT) && (shift_status & MOD_CTRL))
       switch (scan_code) {
-      case 116: // ctrl+shift+right
+      case _CTRL_RIGHT: // ctrl+shift+right
         if (block_col2 == v.prg->column - 1) {
           f_word_right2();
           block_end = v.prg->lptr;
@@ -524,7 +524,7 @@ void editor() {
         scan_code = 0;
         v.redraw++;
         break;
-      case 115: // ctrl+shift+left
+      case _CTRL_LEFT: // ctrl+shift+left
         f_up();
         p = v.prg->lptr;
         f_down();
@@ -567,7 +567,7 @@ void editor() {
       switch (scan_code) {
       case 0:
         break;
-      case 80: // shift+down
+      case _DOWN: // shift+down
         if (block_end < v.prg->lptr) {
           block_end = v.prg->lptr;
           block_col2 = linelen(v.prg->lptr) + 1;
@@ -582,7 +582,7 @@ void editor() {
         v.redraw++;
         scan_code = 0;
         break;
-      case 81: // shift+page down
+      case _PGDN: // shift+page down
         if (block_end < v.prg->lptr) {
           f_page_down();
           f_up();
@@ -606,7 +606,7 @@ void editor() {
         v.redraw++;
         scan_code = 0;
         break;
-      case 73: // shift+page up
+      case _PGUP: // shift+page up
         if (block_start == v.prg->lptr) {
           f_page_up();
           block_start = v.prg->lptr;
@@ -629,7 +629,7 @@ void editor() {
         v.redraw++;
         scan_code = 0;
         break;
-      case 72: // shift+up
+      case _UP: // shift+up
         if (block_start == v.prg->lptr) {
           f_up();
           block_start = v.prg->lptr;
@@ -652,13 +652,13 @@ void editor() {
         v.redraw++;
         scan_code = 0;
         break;
-      case 82:
+      case _INS:
         f_cut_block(2); // shift+insert
         f_paste_block();
         f_unmark();
         scan_code = 0;
         break;
-      case 83:
+      case _DEL:
         f_cut_block(1); // shift+delete
         edit_block_mode = 0;
         clipboard_type = 1;
@@ -672,18 +672,18 @@ void editor() {
       switch (scan_code) {
       case 0:
         break;
-      case 45:
+      case _X:
         f_cut_block(1); // ctrl+x
         edit_block_mode = 0;
         clipboard_type = 1;
         scan_code = 0;
         break;
-      case 46:
+      case _C:
         f_cut_block(0); // ctrl+c
         clipboard_type = 1;
         scan_code = 0;
         break;
-      case 47:
+      case _V:
         f_cut_block(2); // ctrl+v
         f_paste_block();
         f_unmark();
@@ -694,8 +694,8 @@ void editor() {
         break;
       }
 
-      if (kbdFLAGS[82]) { // ctrl+ins
-        kbdFLAGS[82] = 0;
+      if (key(_INS)) { // ctrl+ins
+        key(_INS) = 0;
         f_cut_block(0);
         clipboard_type = 1;
         scan_code = 0;
@@ -705,7 +705,7 @@ void editor() {
       switch (scan_code) {
       case 0:
         break;
-      case 83:
+      case _DEL:
         f_cut_block(2); // delete
         scan_code = 0;
         edit_block_mode = 0;
@@ -716,7 +716,7 @@ void editor() {
       }
     else if ((shift_status & MOD_SHIFT) && (shift_status & MOD_CTRL))
       switch (scan_code) {
-      case 116: // ctrl+shift+right
+      case _CTRL_RIGHT: // ctrl+shift+right
         if (block_end < v.prg->lptr) {
           f_word_right2();
           f_up();
@@ -734,7 +734,7 @@ void editor() {
         scan_code = 0;
         break;
         break;
-      case 115: // ctrl+shift+left
+      case _CTRL_LEFT: // ctrl+shift+left
         if (block_start == v.prg->lptr) {
           f_word_left();
           block_start = v.prg->lptr;
@@ -762,7 +762,7 @@ void editor() {
 
     if ((shift_status & MOD_SHIFT) && !(shift_status & (MOD_CTRL | MOD_ALT)))
       switch (scan_code) {
-      case 77: // shift+right
+      case _RIGHT: // shift+right
         f_unmark();
         edit_block_mode = 1;
         block_state = 2;
@@ -773,7 +773,7 @@ void editor() {
         block_col2 = v.prg->column;
         f_right();
         break;
-      case 75: // shift+left
+      case _LEFT: // shift+left
         if (v.prg->column > 1) {
           f_unmark();
           edit_block_mode = 1;
@@ -786,7 +786,7 @@ void editor() {
           block_col2 = v.prg->column;
         }
         break;
-      case 80: // shift+down
+      case _DOWN: // shift+down
         f_unmark();
         edit_block_mode = 2;
         block_state = 2;
@@ -799,7 +799,7 @@ void editor() {
         if (v.prg->lptr == block_end)
           f_unmark();
         break;
-      case 81: // shift+page down
+      case _PGDN: // shift+page down
         f_unmark();
         edit_block_mode = 2;
         block_state = 2;
@@ -814,7 +814,7 @@ void editor() {
         if (block_start > block_end)
           f_unmark();
         break;
-      case 72: // shift+up
+      case _UP: // shift+up
         if (v.prg->line > 1) {
           f_unmark();
           edit_block_mode = 2;
@@ -827,7 +827,7 @@ void editor() {
           block_col2 = linelen(v.prg->lptr) + 1;
         }
         break;
-      case 73: // shift+page up
+      case _PGUP: // shift+page up
         edit_block_mode = 2;
         block_state = 2;
         kprg = v.prg;
@@ -841,17 +841,17 @@ void editor() {
         if (v.prg->lptr == block_end)
           f_unmark();
         break;
-      case 15:
+      case _TAB:
         f_untab();
         break; // shift+tab
-      case 82:
+      case _INS:
         f_paste_block(); // shift+insert
         f_unmark();
         break;
-      case 83:
+      case _DEL:
         f_cut_block(1);
         break; // shift+delete
-      case 71: // shift+home
+      case _HOME: // shift+home
         f_unmark();
         edit_block_mode = 1;
         block_state = 2;
@@ -864,7 +864,7 @@ void editor() {
           f_unmark();
         f_home();
         break;
-      case 79: // shift+end
+      case _END: // shift+end
         f_unmark();
         edit_block_mode = 1;
         block_state = 2;
@@ -880,7 +880,7 @@ void editor() {
       }
     else if ((shift_status & MOD_SHIFT) && (shift_status & MOD_CTRL))
       switch (scan_code) {
-      case 116: // ctrl+shift+right
+      case _CTRL_RIGHT: // ctrl+shift+right
         f_unmark();
         edit_block_mode = 1;
         block_state = 2;
@@ -903,7 +903,7 @@ void editor() {
         } else if (block_col1 > block_col2)
           f_unmark();
         break;
-      case 115: // ctrl+shift+left
+      case _CTRL_LEFT: // ctrl+shift+left
         f_unmark();
         edit_block_mode = 1;
         block_state = 2;
@@ -928,100 +928,100 @@ void editor() {
       }
     else if (!(shift_status & (MOD_SHIFT | MOD_CTRL | MOD_ALT)) && ascii == 0)
       switch (scan_code) {
-      case 77:
+      case _RIGHT:
         f_right();
         break; // cursor right
-      case 75:
+      case _LEFT:
         f_left();
         break; // cursor left
-      case 80:
+      case _DOWN:
         f_down();
         break; // cursor down
-      case 72:
+      case _UP:
         f_up();
         break; // cursor up
-      case 71:
+      case _HOME:
         f_home();
         break; // home
-      case 79:
+      case _END:
         f_end();
         break; // end
-      case 81:
+      case _PGDN:
         f_page_down();
         break; // page down
-      case 73:
+      case _PGUP:
         f_page_up();
         break; // page up
-      case 82:
+      case _INS:
         f_insert();
         break; // insert
-      case 83:
+      case _DEL:
         f_delete_char();
         break; // delete
       }
     else if (!(shift_status & (MOD_SHIFT | MOD_CTRL | MOD_ALT)))
       switch (scan_code) {
-      case 14:
+      case _BACKSPACE:
         f_backspace();
         break; // backspace
-      case 15:
+      case _TAB:
         f_tab();
         break; // tab
       }
     else if ((shift_status & MOD_CTRL) && !(shift_status & (MOD_SHIFT | MOD_ALT)))
       switch (scan_code) {
-      case 14:
-      case 21:
+      case _BACKSPACE:
+      case _Y:
         f_delete();
         break; // ctrl+backspace,ctrl+y
-      case 116:
-      case 77:
+      case _CTRL_RIGHT:
+      case _RIGHT:
         f_word_right();
         break; // ctrl+right
-      case 115:
-      case 75:
+      case _CTRL_LEFT:
+      case _LEFT:
         f_word_left();
         break; // ctrl+left
-      case 132:
-      case 73:
+      case _CTRL_PGUP:
+      case _PGUP:
         f_bof();
         break; // ctrl+page up
       case 118:
-      case 81:
+      case _PGDN:
         f_eof();
         break; // ctrl+page down
       case 119:
-      case 71:
+      case _HOME:
         f_bop();
         break; // ctrl+home
       case 117:
-      case 79:
+      case _END:
         f_eop();
         break; // ctrl+end
-      case 45:
+      case _X:
         f_cut_block(1);
         break; // ctrl+x
-      case 46:
+      case _C:
         f_cut_block(0);
         break; // ctrl+c
-      case 47:
+      case _V:
         f_paste_block(); // ctrl+v
         f_unmark();
         break;
       }
     else if ((shift_status & MOD_ALT) && !(shift_status & (MOD_SHIFT | MOD_CTRL)))
       switch (scan_code) {
-      case 30:
+      case _A:
         f_mark();
         break; // alt+a
-      case 22:
+      case _U:
         f_unmark();
         break; // alt+u
-      case 34: // alt+g=alt+d
-      case 32:
+      case _G: // alt+g=alt+d
+      case _D:
         f_cut_block(1);
         break; // alt+d
-      case 46:
+      case _C:
         if (block_state) { // alt+c
           f_cut_block(0);
           f_paste_block();

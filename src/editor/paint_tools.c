@@ -121,12 +121,12 @@ void edit_mode_0(void) {
     }
 
     if (((mouse_b & MB_LEFT) && selected_icon == 1) ||
-        (scan_code == 14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
+        (scan_code == _BACKSPACE && !key(_L_SHIFT) && !key(_R_SHIFT))) {
       undo_back();
       do {
         read_mouse();
       } while (mouse_b & MB_LEFT);
-    } else if (scan_code == 14 && (key(_L_SHIFT) || key(_R_SHIFT))) {
+    } else if (scan_code == _BACKSPACE && (key(_L_SHIFT) || key(_R_SHIFT))) {
       undo_next();
       need_zoom = 1;
     }
@@ -185,12 +185,12 @@ void edit_mode_1(void) {
       _a = a; // Save the last action
 
     if (((mouse_b & MB_LEFT) && selected_icon == 1) ||
-        (scan_code == 14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
+        (scan_code == _BACKSPACE && !key(_L_SHIFT) && !key(_R_SHIFT))) {
       undo_back();
       do {
         read_mouse();
       } while (mouse_b & MB_LEFT);
-    } else if (scan_code == 14 && (key(_L_SHIFT) || key(_R_SHIFT))) {
+    } else if (scan_code == _BACKSPACE && (key(_L_SHIFT) || key(_R_SHIFT))) {
       undo_next();
       need_zoom = 1;
     }
@@ -280,12 +280,12 @@ void edit_mode_2(void) {
     blur_enabled = 0;
 
     if (((mouse_b & MB_LEFT) && selected_icon == 1) ||
-        (scan_code == 14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
+        (scan_code == _BACKSPACE && !key(_L_SHIFT) && !key(_R_SHIFT))) {
       undo_back();
       do {
         read_mouse();
       } while (mouse_b & MB_LEFT);
-    } else if (scan_code == 14 && (key(_L_SHIFT) || key(_R_SHIFT))) {
+    } else if (scan_code == _BACKSPACE && (key(_L_SHIFT) || key(_R_SHIFT))) {
       undo_next();
       need_zoom = 1;
     }
@@ -388,12 +388,12 @@ void edit_mode_3(void) {
     blur_enabled = 0;
 
     if (((mouse_b & MB_LEFT) && selected_icon == 1) ||
-        (scan_code == 14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
+        (scan_code == _BACKSPACE && !key(_L_SHIFT) && !key(_R_SHIFT))) {
       undo_back();
       do {
         read_mouse();
       } while (mouse_b & MB_LEFT);
-    } else if (scan_code == 14 && (key(_L_SHIFT) || key(_R_SHIFT))) {
+    } else if (scan_code == _BACKSPACE && (key(_L_SHIFT) || key(_R_SHIFT))) {
       undo_next();
       need_zoom = 1;
     }
@@ -540,12 +540,12 @@ void edit_mode_4(void) {
     blur_enabled = 0;
 
     if (((mouse_b & MB_LEFT) && selected_icon == 1) ||
-        (scan_code == 14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
+        (scan_code == _BACKSPACE && !key(_L_SHIFT) && !key(_R_SHIFT))) {
       undo_back();
       do {
         read_mouse();
       } while (mouse_b & MB_LEFT);
-    } else if (scan_code == 14 && (key(_L_SHIFT) || key(_R_SHIFT))) {
+    } else if (scan_code == _BACKSPACE && (key(_L_SHIFT) || key(_R_SHIFT))) {
       undo_next();
       need_zoom = 1;
     }
@@ -650,9 +650,9 @@ void edit_mode_5(void) {
       if (mouse_graf >= CURSOR_ON_CANVAS) {
         y0 = sqrt(abs(coord_x - x1) * abs(coord_x - x1) + abs(coord_y - y1) * abs(coord_y - y1));
 
-        if (key(0xd) || key(0x4e))
+        if (key(_PLUS) || key(_C_PLUS))
           tension++;
-        if (key(0xc) || (key(0x4a) && tension))
+        if (key(_MINUS) || (key(_C_MINUS) && tension))
           tension--;
         y0 = tension;
 
@@ -692,12 +692,12 @@ void edit_mode_5(void) {
     blur_enabled = 0;
 
     if (((mouse_b & MB_LEFT) && selected_icon == 1) ||
-        (scan_code == 14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
+        (scan_code == _BACKSPACE && !key(_L_SHIFT) && !key(_R_SHIFT))) {
       undo_back();
       do {
         read_mouse();
       } while (mouse_b & MB_LEFT);
-    } else if (scan_code == 14 && (key(_L_SHIFT) || key(_R_SHIFT))) {
+    } else if (scan_code == _BACKSPACE && (key(_L_SHIFT) || key(_R_SHIFT))) {
       undo_next();
       need_zoom = 1;
     }
@@ -808,12 +808,12 @@ void edit_mode_6(void) {
     }
 
     if (((mouse_b & MB_LEFT) && selected_icon == 1) ||
-        (scan_code == 14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
+        (scan_code == _BACKSPACE && !key(_L_SHIFT) && !key(_R_SHIFT))) {
       undo_back();
       do {
         read_mouse();
       } while (mouse_b & MB_LEFT);
-    } else if (scan_code == 14 && (key(_L_SHIFT) || key(_R_SHIFT))) {
+    } else if (scan_code == _BACKSPACE && (key(_L_SHIFT) || key(_R_SHIFT))) {
       undo_next();
       need_zoom = 1;
     }
@@ -957,12 +957,12 @@ void edit_mode_7(void) {
     }
 
     if (((mouse_b & MB_LEFT) && selected_icon == 1) ||
-        (scan_code == 14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
+        (scan_code == _BACKSPACE && !key(_L_SHIFT) && !key(_R_SHIFT))) {
       undo_back();
       do {
         read_mouse();
       } while (mouse_b & MB_LEFT);
-    } else if (scan_code == 14 && (key(_L_SHIFT) || key(_R_SHIFT))) {
+    } else if (scan_code == _BACKSPACE && (key(_L_SHIFT) || key(_R_SHIFT))) {
       undo_next();
       need_zoom = 1;
     }
@@ -1081,12 +1081,12 @@ void edit_mode_8(void) {
     blur_enabled = 0;
 
     if (((mouse_b & MB_LEFT) && selected_icon == 1) ||
-        (scan_code == 14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
+        (scan_code == _BACKSPACE && !key(_L_SHIFT) && !key(_R_SHIFT))) {
       undo_back();
       do {
         read_mouse();
       } while (mouse_b & MB_LEFT);
-    } else if (scan_code == 14 && (key(_L_SHIFT) || key(_R_SHIFT))) {
+    } else if (scan_code == _BACKSPACE && (key(_L_SHIFT) || key(_R_SHIFT))) {
       undo_next();
       need_zoom = 1;
     }
@@ -1134,12 +1134,12 @@ void edit_mode_9(void) {
     }
 
     if (((mouse_b & MB_LEFT) && selected_icon == 1) ||
-        (scan_code == 14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
+        (scan_code == _BACKSPACE && !key(_L_SHIFT) && !key(_R_SHIFT))) {
       undo_back();
       do {
         read_mouse();
       } while (mouse_b & MB_LEFT);
-    } else if (scan_code == 14 && (key(_L_SHIFT) || key(_R_SHIFT))) {
+    } else if (scan_code == _BACKSPACE && (key(_L_SHIFT) || key(_R_SHIFT))) {
       undo_next();
       need_zoom = 1;
     }
@@ -1190,9 +1190,9 @@ void edit_mode_11(void) {
         undo_next();
         break;
       }
-    if (scan_code == 14 && !key(_L_SHIFT) && !key(_R_SHIFT))
+    if (scan_code == _BACKSPACE && !key(_L_SHIFT) && !key(_R_SHIFT))
       undo_back();
-    else if (scan_code == 14 && (key(_L_SHIFT) || key(_R_SHIFT))) {
+    else if (scan_code == _BACKSPACE && (key(_L_SHIFT) || key(_R_SHIFT))) {
       undo_next();
       need_zoom = 1;
     }
@@ -1310,13 +1310,13 @@ void edit_mode_12(void) {
         } while ((mouse_b & MB_RIGHT) || key(_ESC));
       }
       if (sel_status == 1) {
-        if (ascii == 13) {
+        if (ascii == ASCII_ENTER) {
           ty += font_height;
           sel_x0 = tx;
           sel_y0 = ty;
           sel_x1 = sel_x0 + font_width - 1;
           sel_y1 = sel_y0 + font_height - 1;
-        } else if (scan_code == 14) {
+        } else if (scan_code == _BACKSPACE) {
           if (sel_x0 != tx) {
             if (undo_back()) {
               test_previous();
@@ -1355,14 +1355,14 @@ void edit_mode_12(void) {
         } while ((mouse_b & MB_RIGHT) || key(_ESC));
       }
       if (sel_status == 1) {
-        if (ascii == 13) {
+        if (ascii == ASCII_ENTER) {
           ty += max_char_h;
           sel_x0 = tx;
           sel_y0 = ty;
           sel_x1 = sel_x0 + spacelen - 1;
           sel_y1 = sel_y0 + max_char_h - 1;
           text_len = 0;
-        } else if (scan_code == 14) {
+        } else if (scan_code == _BACKSPACE) {
           if (sel_x0 != tx) {
             if (undo_back()) {
               test_previous();
@@ -1398,7 +1398,7 @@ void edit_mode_12(void) {
     test_next();
 
     if (((mouse_b & MB_LEFT) && selected_icon == 1) ||
-        ((scan_code == 14 && hotkey) && !key(_L_SHIFT) && !key(_R_SHIFT))) {
+        ((scan_code == _BACKSPACE && hotkey) && !key(_L_SHIFT) && !key(_R_SHIFT))) {
       if (sel_x0 != tx) {
         if (undo_back()) {
           if (font == NULL) {
@@ -1415,7 +1415,7 @@ void edit_mode_12(void) {
       do {
         read_mouse();
       } while (mouse_b & MB_LEFT);
-    } else if ((scan_code == 14 && hotkey) && (key(_L_SHIFT) || key(_R_SHIFT))) {
+    } else if ((scan_code == _BACKSPACE && hotkey) && (key(_L_SHIFT) || key(_R_SHIFT))) {
       undo_next();
       need_zoom = 1;
     }
@@ -1556,19 +1556,19 @@ void edit_mode_13(void) {
     test_mouse();
 
     switch (scan_code) {
-    case 0x4A:
+    case _C_MINUS:
       point_index--;
       break; // -
-    case 0x4E:
+    case _C_PLUS:
       point_index++;
       break; // +
-    case 0x49:
+    case _PGUP:
       point_index -= 10;
       break; // PgUp
-    case 0x51:
+    case _PGDN:
       point_index += 10;
       break; // PgDn
-    case 0x47:
+    case _HOME:
       point_index = 0;
       break;   // Home
     case 0x4F: // End
@@ -1613,7 +1613,7 @@ void edit_mode_13(void) {
         test_sel();
       }
 
-    if (scan_code == 0x53) { // Delete
+    if (scan_code == _DEL) { // Delete
       v.mapa->points[point_index * 2] = -1;
       v.mapa->points[point_index * 2 + 1] = -1;
     }

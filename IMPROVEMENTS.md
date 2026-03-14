@@ -13,7 +13,7 @@ architecture docs, code review, and discussion with Daniel Navarro.
 
 | # | Improvement | Status | Risk |
 |---|-------------|--------|------|
-| 1 | [Enums & constants](#1-enums--constants) | Sprints 1-3 DONE, sprints 4-6 open | Very low |
+| 1 | [Enums & constants](#1-enums--constants) | Sprints 1-3b DONE, sprints 4-6 open | Very low |
 | 2 | [Testing infrastructure](#2-testing-infrastructure) | — | None |
 | 3 | [File format hardening + modern imports](#3-file-format-hardening--modern-imports) | — | Low |
 | 4 | [Help translation quality pass](#4-help-translation-quality-pass) | — | Low |
@@ -259,8 +259,9 @@ replaced with `(MOD_CTRL | MOD_ALT)` for readability.
 | 3 | Alt key | `MOD_ALT` (0x08) |
 
 `#undef MOD_SHIFT` / `#undef MOD_ALT` guards added for Windows SDK conflicts.
-Capslock (0x40) and Numlock (0x20) bits left as bare numbers (only set
-in `mouse.c` and `keyboard.c`, not checked elsewhere).
+Capslock, Numlock, and Scroll Lock constants (`MOD_CAPS`, `MOD_NUM`,
+`MOD_SCROLL`) added in sprint 3b and replaced in `mouse.c` and
+`keyboard.c`.
 
 **Files:** All 12 files using `shift_status` patterns.
 
@@ -345,6 +346,43 @@ and `wwrite()` across IDE, editor, compiler, and debugger modules.
 **Files:** `image.c`, `fpg.c`, `font.c`, `charset.c`, `browser.c`,
 `handler_fonts.c`, `desktop.c`.
 
+#### R. Keyboard scan code constants — DONE
+
+Keyboard scan codes were defined in `keyboard.h` (included via `global.h`
+and `inter.h`) but never used — all IDE/editor/debugger code used raw
+numeric values. Sprint 3b fixed two bugs in `keyboard.h` (`_PRNT_SCRN`
+and `_SCROLL_LOCK` had wrong values that collided with `_HOME` and
+`_F11`), added all missing key defines (letters, punctuation, numpad
+operators, Ctrl+key extended codes), synced the runtime copy, and
+replaced ~170 raw patterns across 18 files:
+
+- ~120 raw `scan_code ==` / `case N:` comparisons → named constants
+- 34 raw `kbdFLAGS[N]` accesses → `key(_CONSTANT)` macro
+- 4 raw `key(0xNN)` hex calls → `key(_CONSTANT)`
+- 2 raw `shift_status & 4`/`& 8` → `MOD_CTRL`/`MOD_ALT`
+- 5 raw lock-key modifier sets (`|= 64`/`32`/`128`) → `MOD_CAPS`/`MOD_NUM`/`MOD_SCROLL`
+
+Also added `#undef _X`/`_Y`/`_Z` guards in `inter.h` to resolve
+conflicts between keyboard scan code and process field offset defines.
+
+**Bug noted:** Ctrl+navigation extended scan codes (`_C_UP`, `_C_LEFT`,
+etc.) are defined but never mapped in the SDL2 OSDEP layer — `key(_C_UP)`
+always returns false. Canvas panning in `mouse.c` works because it also
+checks `key(_UP)` as fallback.
+
+**Files:** `editor.c`, `editor_file.c`, `paint_tools.c`, `paint_select.c`,
+`main.c`, `main_dialogs.c`, `help.c`, `mouse.c`, `video.c`,
+`debugger_code.c`, `debugger_ui.c`, `debugger_inspect.c`,
+`debugger_proclist.c`, `debugger_profile.c`, `keyboard.c` (runtime).
+
+#### S. ASCII character constants — DONE
+
+Defined in `div_enums.h`: `ASCII_BACKSPACE` (8), `ASCII_TAB` (9),
+`ASCII_ENTER` (13), `ASCII_ESC` (0x1b). Replaced ~20 raw `ascii ==`
+comparisons and `ascii =` assignments across IDE and debugger files.
+
+**Files:** `main_dialogs.c`, `debugger_ui.c`, `paint_tools.c`, `mouse.c`.
+
 ### Sprint plan
 
 Each sprint is one self-contained commit.
@@ -354,6 +392,7 @@ Each sprint is one self-contained commit.
 | 1 — Core IDE enums | A. Window types, B. Foreground state, C. File types, D. Item types | DONE |
 | 2 — Menu and UI constants | E. Menu bases, P. Alignment modes, O. Menu metrics | DONE |
 | 3 — Input state enums | F. Cursor IDs, J. Mouse buttons, K. Modifiers | DONE |
+| 3b — Scan codes & ASCII | R. Scan code constants, S. ASCII constants, K. Lock-key modifiers | DONE |
 | 4 — Editor state enums | G. Draw modes, H. Block state, I. Drag-and-drop | — |
 | 5 — Palette and format constants | O. Palette/ghost/cuad sizes, `MAX_FPG_GRAPHICS`, Q. Format offsets | — |
 | 6 — Runtime enums | L. Process status, M. Coordinate types, N. Sprite flags | — |

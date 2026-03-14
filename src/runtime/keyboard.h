@@ -1,82 +1,142 @@
+// ---------------------------------------------------------------------------
+// DIV Games Studio — Keyboard scan code constants
+//
+// Values match the OSDEP_key mapping (osd_sdl2.c) and the DIV user manual
+// predefined constants (Appendix C.6).
+//
+// Use with the key() macro:  if (key(_ESC)) ...
+// Or compare with scan_code: if (scan_code == _F1) ...
+// ---------------------------------------------------------------------------
 
-// System Keys
-#define _ESC       0x01
-#define _BACKSPACE 0x0E
-#define _TAB       0x0F
+#ifndef DIV_KEYBOARD_H
+#define DIV_KEYBOARD_H
 
-#define _ENTER   0x1C
-#define _L_CTRL  0x1D
-#define _R_CTRL  0x5A
-#define _L_SHIFT 0x2A
-#define _R_SHIFT 0x36
-#define _L_ALT   0x38
-#define _R_ALT   0x5C
+// --- System keys ---
+#define _ESC       1
+#define _BACKSPACE 14
+#define _TAB       15
+#define _ENTER     28
+#define _SPC       57
+#define _CAPS_LOCK 58
+#define _NUM_LOCK  69
+#define _PRNT_SCRN 55
+#define _SCROLL_LOCK 70
 
-#define _SPC         0x39
-#define _CAPS_LOCK   0x3A
-#define _NUM_LOCK    0x45
-#define _PRNT_SCRN   0x47
-#define _SCROLL_LOCK 0x57
+// Modifier keys (for key() checks; use shift_status & MOD_* for state)
+#define _L_CTRL    29
+#define _R_CTRL    90   // DOS synthetic; SDL2 maps both Ctrl keys to 29
+#define _L_SHIFT   42
+#define _R_SHIFT   54
+#define _L_ALT     56
+#define _R_ALT     92   // DOS synthetic; SDL2 maps both Alt keys to 56
 
-// Function Keys
-#define _F1  0x3b
-#define _F2  0x3c
-#define _F3  0x3d
-#define _F4  0x3e
-#define _F5  0x3f
-#define _F6  0x40
-#define _F7  0x41
-#define _F8  0x42
-#define _F9  0x43
-#define _F10 0x44
-#define _F11 0x57
-#define _F12 0x58
+// --- Function keys ---
+#define _F1  59
+#define _F2  60
+#define _F3  61
+#define _F4  62
+#define _F5  63
+#define _F6  64
+#define _F7  65
+#define _F8  66
+#define _F9  67
+#define _F10 68
+#define _F11 87
+#define _F12 88
 
-// Directional Control Keys
-#define _HOME   0x47
-#define _UP     0x48
-#define _PGUP   0x49
-#define _LEFT   0x4b
-#define _CENTER 0x4c
-#define _RIGHT  0x4d
-#define _END    0x4f
-#define _DOWN   0x50
-#define _PGDN   0x51
-#define _INS    0x52
-#define _DEL    0x53
+// --- Navigation keys ---
+#define _HOME   71
+#define _UP     72
+#define _PGUP   73
+#define _LEFT   75
+#define _CENTER 76   // Numpad 5
+#define _RIGHT  77
+#define _END    79
+#define _DOWN   80
+#define _PGDN   81
+#define _INS    82
+#define _DEL    83
 
-// Cluster Directional Control Keys
-#define _C_ENTER 0x59
-#define _C_HOME  0x5d
-#define _C_UP    0x5e
-#define _C_PGUP  0x5f
-#define _C_LEFT  0x60
-#define _C_RIGHT 0x61
-#define _C_END   0x62
-#define _C_DOWN  0x63
-#define _C_PGDN  0x64
-#define _C_INS   0x65
-#define _C_DEL   0x66
+// --- Numpad operator keys ---
+#define _C_BACKSLASH 53  // Numpad /
+#define _C_ASTERISK  55  // Numpad * (same scan code as Print Screen)
+#define _C_MINUS     74  // Numpad -
+#define _C_PLUS      78  // Numpad +
 
-// Alphanumerics
-#define _1 0x02
-#define _2 0x03
-#define _3 0x04
-#define _4 0x05
-#define _5 0x06
-#define _6 0x07
-#define _7 0x08
-#define _8 0x09
-#define _9 0x0A
-#define _0 0x0B
+// --- Ctrl+navigation extended scan codes (DOS-era) ---
+// In SDL2 these are dead — the base key fires with MOD_CTRL instead.
+// Named for the kbdFLAGS[] array and backward compatibility with DOS.
+#define _C_ENTER 89
+#define _C_HOME  93
+#define _C_UP    94
+#define _C_PGUP  95
+#define _C_LEFT  96
+#define _C_RIGHT 97
+#define _C_END   98
+#define _C_DOWN  99
+#define _C_PGDN  100
+#define _C_INS   101
+#define _C_DEL   102
 
-#define _Q 0x10
-#define _W 0x11
-#define _O 0x18
-#define _P 0x19
-#define _A 0x1e
-#define _S 0x1f
-#define _H 0x23
-#define _x 0x2d
-#define _C 0x2e
-#define _M 0x32
+// DOS BIOS extended Ctrl+key scan codes (INT 16h AH values).
+// Dead in SDL2 — the base key fires with MOD_CTRL set instead.
+// Named here so editor.c switch cases are readable.
+#define _CTRL_LEFT  115
+#define _CTRL_RIGHT 116
+#define _CTRL_PGDN  118
+#define _CTRL_PGUP  132
+
+// --- Number row ---
+#define _1 2
+#define _2 3
+#define _3 4
+#define _4 5
+#define _5 6
+#define _6 7
+#define _7 8
+#define _8 9
+#define _9 10
+#define _0 11
+
+// --- Letter keys ---
+#define _Q 16
+#define _W 17
+#define _E 18
+#define _R 19
+#define _T 20
+#define _Y 21
+#define _U 22
+#define _I 23
+#define _O 24
+#define _P 25
+#define _A 30
+#define _S 31
+#define _D 32
+#define _F 33
+#define _G 34
+#define _H 35
+#define _J 36
+#define _K 37
+#define _L 38
+#define _Z 44
+#define _X 45
+#define _C 46
+#define _V 47
+#define _B 48
+#define _N 49
+#define _M 50
+
+// --- Punctuation ---
+#define _WAVE       41  // ` ~ (backquote/tilde)
+#define _MINUS      12  // - _ key
+#define _PLUS       13  // = + key
+#define _L_BRACKET  26  // [ { key
+#define _R_BRACKET  27  // ] } key
+#define _SEMICOLON  39  // ; : key
+#define _APOSTROPHE 40  // ' " key
+#define _BACKSLASH  43  // \ | key
+#define _COMMA      51  // , < key
+#define _PERIOD     51  // . > key (same scan code on ES keyboard)
+#define _SLASH      51  // / ? key (same scan code on ES keyboard)
+
+#endif // DIV_KEYBOARD_H

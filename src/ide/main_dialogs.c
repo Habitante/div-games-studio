@@ -467,7 +467,7 @@ void _show_items(void) {
     }
     n++;
   }
-  kbdFLAGS[28] = 0;
+  key(_ENTER) = 0;
   show_items_called = 0;
 }
 
@@ -595,18 +595,18 @@ void _process_items(void) {
   if (v.selected_item != -1) {
     if (!v.state && v.type == WIN_CODE) {
       asc = ascii;
-      kesc = kbdFLAGS[28];
+      kesc = key(_ENTER);
       ascii = 0;
-      kbdFLAGS[28] = 0;
+      key(_ENTER) = 0;
     } else {
-      if (ascii == 9) {
+      if (ascii == ASCII_TAB) {
         ascii = 0;
         _select_new_item(v.selected_item + 1);
       }
-      if (ascii == 0x1b) { // && (v.item[v.selected_item].state&2)) {
+      if (ascii == ASCII_ESC) { // && (v.item[v.selected_item].state&2)) {
         if (v.item[v.selected_item].type == ITEM_TEXT) {
           asc = ascii;
-          kesc = kbdFLAGS[28];
+          kesc = key(_ENTER);
           est = v.item[v.selected_item].state;
           ascii = 0;
           if (superget)
@@ -618,7 +618,7 @@ void _process_items(void) {
           select_get(&v.item[v.selected_item], 1, 1);
           if (est == v.item[v.selected_item].state) {
             ascii = asc;
-            kbdFLAGS[28] = kesc;
+            key(_ENTER) = kesc;
           } else {
             v.redraw = 1;
             key(_ESC) = 0;
@@ -652,7 +652,7 @@ void _process_items(void) {
   if (v.selected_item != -1) {
     if (!v.state && v.type == WIN_CODE) {
       ascii = asc;
-      kbdFLAGS[28] = kesc;
+      key(_ENTER) = kesc;
     }
   }
 }
@@ -747,7 +747,7 @@ int button_status(int n) {
     e = 1;
   if (e && (mouse_b & MB_LEFT))
     e = 2;
-  if (v.selected_item == n && kbdFLAGS[28])
+  if (v.selected_item == n && key(_ENTER))
     e = 3;
   return (e);
 }
@@ -755,7 +755,7 @@ int button_status(int n) {
 void process_button(int n, int e) {
   if (v.item[n].state == 3 && e != 3) {
     v.active_item = n;
-    kbdFLAGS[28] = 0;
+    key(_ENTER) = 0;
     ascii = 0;
   }
   switch (e) {
@@ -804,11 +804,11 @@ int get_status(int n) {
       x |= 4;
     x |= 2;
   }
-  if ((ascii && (ascii != 0x1b) && v.selected_item == n)) { //||superget) {
+  if ((ascii && (ascii != ASCII_ESC) && v.selected_item == n)) { //||superget) {
     // MapperCreator2 digit filter removed (MODE8/3D map editor deleted)
     {
       if (!(x & 2)) {
-        if (ascii == 13)
+        if (ascii == ASCII_ENTER)
           ascii = 0;
         else
           x |= 4;
@@ -911,9 +911,9 @@ void get_input(int n) {
   switch (ascii) {
   case 1:
   case 0x1a:
-  case 0x1b:
+  case ASCII_ESC:
     break;
-  case 8:
+  case ASCII_BACKSPACE:
     if (get_pos) {
       memmove(&get[get_pos - 1], &get[get_pos], strlen(&get[get_pos]) + 1);
       get_pos--;
@@ -923,9 +923,9 @@ void get_input(int n) {
                  v.item[v.selected_item].get.buffer_len + 1, "");
     v.redraw = 1;
     break;
-  case 13:
+  case ASCII_ENTER:
     ascii = 0;
-    kbdFLAGS[28] = 0;
+    key(_ENTER) = 0;
     _select_new_item(n + 1);
     return;
   default:
@@ -933,19 +933,19 @@ void get_input(int n) {
       l = v.redraw;
       v.redraw = 1;
       switch (scan_code) {
-      case 77:
+      case _RIGHT:
         get_pos++;
         break; // cursor right
-      case 75:
+      case _LEFT:
         get_pos--;
         break; // cursor left
-      case 71:
+      case _HOME:
         get_pos = 0;
         break; // home
-      case 79:
+      case _END:
         get_pos = strlen(get);
         break; // end
-      case 83:
+      case _DEL:
         get[strlen(get) + 1] = 0;
         memmove(&get[get_pos], &get[get_pos + 1], strlen(&get[get_pos + 1]) + 1);
         if (!*get && superget)

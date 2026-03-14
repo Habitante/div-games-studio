@@ -75,13 +75,13 @@ void edit_mode_10(void) {
     select_color(2);
 
     if (((mouse_b & MB_LEFT) && selected_icon == 1) ||
-        (scan_code == 14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
+        (scan_code == _BACKSPACE && !key(_L_SHIFT) && !key(_R_SHIFT))) {
       undo_back();
       need_zoom = 1;
       do {
         read_mouse();
       } while (mouse_b & MB_LEFT);
-    } else if (scan_code == 14 && (key(_L_SHIFT) || key(_R_SHIFT))) {
+    } else if (scan_code == _BACKSPACE && (key(_L_SHIFT) || key(_R_SHIFT))) {
       undo_next();
       need_zoom = 1;
     }
@@ -1458,12 +1458,12 @@ void move_selection(byte *sp, int w, int h) {
 
     if (s == 0) {
       if (((mouse_b & MB_LEFT) && selected_icon == 1) ||
-          (scan_code == 14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
+          (scan_code == _BACKSPACE && !key(_L_SHIFT) && !key(_R_SHIFT))) {
         undo_back();
         do {
           read_mouse();
         } while (mouse_b & MB_LEFT);
-      } else if (scan_code == 14 && (key(_L_SHIFT) || key(_R_SHIFT))) {
+      } else if (scan_code == _BACKSPACE && (key(_L_SHIFT) || key(_R_SHIFT))) {
         undo_next();
         need_zoom = 1;
       }
@@ -1774,12 +1774,12 @@ void effects(void) {
     test_mouse();
 
     if (((mouse_b & MB_LEFT) && selected_icon == 1) ||
-        (scan_code == 14 && !key(_L_SHIFT) && !key(_R_SHIFT))) {
+        (scan_code == _BACKSPACE && !key(_L_SHIFT) && !key(_R_SHIFT))) {
       undo_back();
       do {
         read_mouse();
       } while (mouse_b & MB_LEFT);
-    } else if (scan_code == 14 && (key(_L_SHIFT) || key(_R_SHIFT))) {
+    } else if (scan_code == _BACKSPACE && (key(_L_SHIFT) || key(_R_SHIFT))) {
       undo_next();
       need_zoom = 1;
     }

@@ -1351,60 +1351,60 @@ fin_bucle_entorno:
     n = 0;
     if (shift_status & MOD_ALT)
       switch (scan_code) {
-      case 33:
+      case _F:
         n = 1;
         break; // alt+f
 
-      case 49:
+      case _N:
         n = 2;
         break; // alt+n
 
-      case 19:
+      case _R:
         n = 3;
         break; // alt+r
       }
     else if (shift_status & MOD_CTRL)
 
       switch (scan_code) {
-      case 33:
+      case _F:
         n = 1;
         break; // ctrl+f
 
-      case 38:
+      case _L:
         n = 2;
         break; // ctrl+l
 
-      case 19:
+      case _R:
         n = 3;
         break; // ctrl+r
 
-      case 44:
+      case _Z:
         n = 9;
         break; // ctrl+z
       }
     else
       switch (scan_code) {
-      case 60:
+      case _F2:
         n = 4;
         break; // f2
 
-      case 61:
+      case _F3:
         n = 2;
         break; // f3
 
-      case 63:
+      case _F5:
         n = 8;
         break; // f5
 
-      case 68:
+      case _F10:
         n = 6;
         break; // f10
       }
 
-    if (kbdFLAGS[87])
+    if (key(_F11))
       n = 5; // f11
 
-    if (kbdFLAGS[88])
+    if (key(_F12))
       n = 7; // f12
 
     if (n) { // If a hotkey was pressed ...
@@ -1574,7 +1574,7 @@ fin_bucle_entorno:
   // Other hotkeys
   //-------------------------------------------------------------------------
 
-  if (scan_code == 62) { // F4 Open PRG
+  if (scan_code == _F4) { // F4 Open PRG
     v_type = FT_PRG;
     v_mode = 0;
     v_text = (char *)texts[346];
@@ -1593,7 +1593,7 @@ fin_bucle_entorno:
     }
   }
 
-  if (scan_code == 59) { // F1 Help
+  if (scan_code == _F1) { // F1 Help
     determine_prg2();
 
     if (v_window != -1) {
@@ -1651,7 +1651,7 @@ fin_bucle_entorno:
     }
   }
 
-  if ((shift_status & MOD_ALT) && scan_code == 45) { // Alt-X Exit
+  if ((shift_status & MOD_ALT) && scan_code == _X) { // Alt-X Exit
     v_title = (char *)texts[40];
     v_text = NULL;
     show_dialog(accept0);

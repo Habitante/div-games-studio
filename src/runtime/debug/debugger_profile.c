@@ -634,7 +634,7 @@ void profile2(void) {
     v.redraw = 1;
   }
 
-  if (scan_code == 33 || kbdFLAGS[_F12])
+  if (scan_code == _F || kbdFLAGS[_F12])
     goto profiler_next_frame;
 
   switch (v.active_item) {

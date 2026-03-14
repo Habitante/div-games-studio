@@ -97,9 +97,9 @@ void checkmod(OSDEPMod mod) {
     shift_status |= MOD_ALT;
 
   if (mod & KMOD_CAPS)
-    shift_status |= 64;
+    shift_status |= MOD_CAPS;
   if (mod & KMOD_NUM)
-    shift_status |= 32;
+    shift_status |= MOD_NUM;
 }
 
 #include <SDL2/SDL_events.h>
@@ -207,7 +207,7 @@ void poll_keyboard(void) {
         shift_status |= MOD_ALT;
         break;
       case SDLK_INSERT:
-        shift_status |= 128;
+        shift_status |= MOD_SCROLL;
       }
 
       scan_code = OSDEP_key[event.key.keysym.sym < 2048 ? event.key.keysym.sym
@@ -279,7 +279,7 @@ void poll_keyboard(void) {
       }
     }
 
-    if ((shift_status & MOD_ALT) && scan_code == _x)
+    if ((shift_status & MOD_ALT) && scan_code == _X)
       alt_x = 1;
 
   } // end while

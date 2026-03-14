@@ -118,45 +118,45 @@ void debug2(void) {
     goto next_frame;
 
   if (!(shift_status & (MOD_SHIFT | MOD_CTRL | MOD_ALT)) && ascii == 0) {
-    if (scan_code == 80) {
+    if (scan_code == _DOWN) {
       f_down();
       paint_code();
       flush_buffer();
       v.redraw = 1;
     }
-    if (scan_code == 72) {
+    if (scan_code == _UP) {
       f_up();
       paint_code();
       flush_buffer();
       v.redraw = 1;
     }
-    if (scan_code == 81) {
+    if (scan_code == _PGDN) {
       for (n = 0; n < 11; n++)
         f_down();
       paint_code();
       flush_buffer();
       v.redraw = 1;
     }
-    if (scan_code == 73) {
+    if (scan_code == _PGUP) {
       for (n = 0; n < 11; n++)
         f_up();
       paint_code();
       flush_buffer();
       v.redraw = 1;
     }
-    if (scan_code == 71) {
+    if (scan_code == _HOME) {
       f_home();
       paint_code();
       flush_buffer();
       v.redraw = 1;
     }
-    if (scan_code == 77) {
+    if (scan_code == _RIGHT) {
       f_right();
       paint_code();
       flush_buffer();
       v.redraw = 1;
     }
-    if (scan_code == 75) {
+    if (scan_code == _LEFT) {
       f_left();
       paint_code();
       flush_buffer();
@@ -165,8 +165,8 @@ void debug2(void) {
 
   } else if (shift_status & (MOD_SHIFT | MOD_CTRL | MOD_ALT)) { // (Shift || Control || Alt)
 
-    if (kbdFLAGS[80]) {
-      kbdFLAGS[80] = 0;
+    if (key(_DOWN)) {
+      key(_DOWN) = 0;
       if (ids_select + 1 < iids) {
         if (ids_ini + 9 == ++ids_select)
           ids_ini++;
@@ -174,8 +174,8 @@ void debug2(void) {
         v.redraw = 1;
       }
     }
-    if (kbdFLAGS[72]) {
-      kbdFLAGS[72] = 0;
+    if (key(_UP)) {
+      key(_UP) = 0;
       if (ids_select) {
         if (ids_ini == ids_select--)
           ids_ini--;
@@ -183,7 +183,7 @@ void debug2(void) {
         v.redraw = 1;
       }
     }
-    if (scan_code == 81 || scan_code == 118) {
+    if (scan_code == _PGDN || scan_code == _CTRL_PGDN) {
       for (n = 0; n < 9; n++)
         if (ids_select + 1 < iids) {
           if (ids_ini + 9 == ++ids_select)
@@ -192,7 +192,7 @@ void debug2(void) {
       draw_proc_list();
       v.redraw = 1;
     }
-    if (scan_code == 73 || scan_code == 132) {
+    if (scan_code == _PGUP || scan_code == _CTRL_PGUP) {
       for (n = 0; n < 9; n++)
         if (ids_select) {
           if (ids_ini == ids_select--)
@@ -296,9 +296,9 @@ void debug2(void) {
     goto set_break;
   if (scan_code == _F10)
     goto step_proc;
-  if (scan_code == 32 || kbdFLAGS[_F11])
+  if (scan_code == _D || kbdFLAGS[_F11])
     goto profile_window;
-  if (scan_code == 33 || kbdFLAGS[_F12])
+  if (scan_code == _F || kbdFLAGS[_F12])
     goto next_frame;
 
   switch (v.active_item) {

@@ -255,21 +255,21 @@ void inspect2(void) {
   float x;
 
   _process_items();
-  if (scan_code == 80 && var_select + 1 < num_var) {
+  if (scan_code == _DOWN && var_select + 1 < num_var) {
     if (var_ini + 10 == ++var_select)
       var_ini++;
     paint_var_list();
     flush_buffer();
     v.redraw = 1;
   }
-  if (scan_code == 72 && var_select) {
+  if (scan_code == _UP && var_select) {
     if (var_ini == var_select--)
       var_ini--;
     paint_var_list();
     flush_buffer();
     v.redraw = 1;
   }
-  if (scan_code == 81) {
+  if (scan_code == _PGDN) {
     for (n = 0; n < 10; n++)
       if (var_select + 1 < num_var) {
         if (var_ini + 10 == ++var_select)
@@ -279,7 +279,7 @@ void inspect2(void) {
     flush_buffer();
     v.redraw = 1;
   }
-  if (scan_code == 73) {
+  if (scan_code == _PGUP) {
     for (n = 0; n < 10; n++)
       if (var_select) {
         if (var_ini == var_select--)
@@ -363,14 +363,14 @@ void inspect2(void) {
 
   if (num_var) {
     if (var[var_select].object > 0) {
-      if (scan_code == 75)
+      if (scan_code == _LEFT)
         goto dec_index;
-      if (scan_code == 77)
+      if (scan_code == _RIGHT)
         goto inc_index;
     }
   }
 
-  if (scan_code == 71) { // Home
+  if (scan_code == _HOME) { // Home
     if (var[var_select].object > 0)
       switch (o[var[var_select].object].type) {
       case tpigl:
@@ -411,7 +411,7 @@ void inspect2(void) {
       }
   }
 
-  if (scan_code == 79) { // End
+  if (scan_code == _END) { // End
     if (var[var_select].object > 0)
       switch (o[var[var_select].object].type) {
       case tpigl:

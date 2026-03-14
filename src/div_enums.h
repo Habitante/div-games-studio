@@ -113,6 +113,15 @@ enum button_align {
 #define MOD_SHIFT   0x03  // Mask: either shift key
 #define MOD_CTRL    0x04
 #define MOD_ALT     0x08
+#define MOD_NUM     0x20  // Num Lock
+#define MOD_CAPS    0x40  // Caps Lock
+#define MOD_SCROLL  0x80  // Scroll Lock (runtime only)
+
+// ASCII character constants (for ascii variable comparisons)
+#define ASCII_BACKSPACE 8
+#define ASCII_TAB       9
+#define ASCII_ENTER     13
+#define ASCII_ESC       0x1b
 
 // Mouse cursor IDs (mouse_graf)
 // Window-chrome cursors (1-7)

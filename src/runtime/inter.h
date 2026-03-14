@@ -466,6 +466,12 @@ void read_joy(void);
 #define _BigBro     23 //Older sibling id (0 if none)
 #define _Priority   24 //Process priority (positive or negative)
 #define _Ctype      25 //Coordinate type: screen, parallax, or mode 7
+// Process field offsets _X/_Y/_Z shadow the keyboard scan code constants
+// from keyboard.h (included above). The process fields take precedence
+// in the runtime — DIV programs use the OSDEP_key table for key() checks.
+#undef _X
+#undef _Y
+#undef _Z
 #define _X          26 //X coordinate (of the graphic's center of gravity)
 #define _Y          27 //Y coordinate (same)
 #define _Z          28 //Z coordinate (rendering priority)

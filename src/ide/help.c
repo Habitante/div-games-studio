@@ -213,7 +213,7 @@ void help2(void) {
       help_xref(1, 0);
 
     if (!help_paint_active) {
-      if (scan_code == 74) { // Previous help topic (-)
+      if (scan_code == _C_MINUS) { // Previous help topic (-)
         n = help_item;
         while (--n >= 0) {
           if (helpidx[n * 2] && helpidx[n * 2 + 1]) {
@@ -223,7 +223,7 @@ void help2(void) {
         }
         return;
       }
-      if (scan_code == 78) { // Next help topic (+)
+      if (scan_code == _C_PLUS) { // Next help topic (+)
         n = help_item;
         while (++n < 2048) {
           if (helpidx[n * 2] && helpidx[n * 2 + 1]) {
@@ -246,8 +246,8 @@ void help2(void) {
       mouse_graf = CURSOR_GRIP;
     }
 
-    if (scan_code == 72 || (mouse_graf == CURSOR_SCROLL_UP&& (mouse_b & MB_LEFT) && wmouse_x != -1)) {
-      if (scan_code != 72) {
+    if (scan_code == _UP || (mouse_graf == CURSOR_SCROLL_UP&& (mouse_b & MB_LEFT) && wmouse_x != -1)) {
+      if (scan_code != _UP) {
         if (!(v.buttons & 2)) {
           wput(v.ptr, w, h, w - 9, 10, -41);
           v.buttons |= 2;
@@ -270,7 +270,7 @@ void help2(void) {
       v.buttons ^= 2;
       v.redraw++;
     }
-    if (scan_code == 73 || (mouse_b & MB_SCROLL_UP && wmouse_x != -1)) {
+    if (scan_code == _PGUP || (mouse_b & MB_SCROLL_UP && wmouse_x != -1)) {
       for (n = 0; n < (mouse_b & MB_SCROLL_UP ? 3 : help_h); n++) {
         if (help_line != help_buffer + 1) {
           help_line--;
@@ -284,8 +284,8 @@ void help2(void) {
       v.redraw++;
     }
 
-    if (scan_code == 80 || (mouse_graf == CURSOR_SCROLL_DOWN&& (mouse_b & MB_LEFT) && wmouse_x != -1)) {
-      if (scan_code != 80) {
+    if (scan_code == _DOWN || (mouse_graf == CURSOR_SCROLL_DOWN&& (mouse_b & MB_LEFT) && wmouse_x != -1)) {
+      if (scan_code != _DOWN) {
         if (!(v.buttons & 4)) {
           wput(v.ptr, w, h, w - 9, h - 17, -42);
           v.buttons |= 4;
@@ -307,7 +307,7 @@ void help2(void) {
       v.redraw++;
     }
 
-    if (scan_code == 81 || (mouse_b & MB_SCROLL_DOWN && wmouse_x != -1)) {
+    if (scan_code == _PGDN || (mouse_b & MB_SCROLL_DOWN && wmouse_x != -1)) {
       for (n = 0; n < (mouse_b & MB_SCROLL_DOWN ? 3 : help_h); n++) {
         if (help_l + help_h < help_lines) {
           while (*(help_line++))
@@ -465,7 +465,7 @@ void help2(void) {
       }
     }
 
-    if (((scan_code == 14 && !(shift_status & MOD_SHIFT)) || v.active_item == 0) && a_back != i_back) {
+    if (((scan_code == _BACKSPACE && !(shift_status & MOD_SHIFT)) || v.active_item == 0) && a_back != i_back) {
       a_back -= 2;
       if (a_back < 0)
         a_back = 62;
@@ -486,7 +486,7 @@ void help2(void) {
       }
     }
 
-    if (((scan_code == 14 && (shift_status & MOD_SHIFT)) || v.active_item == 1) && a_back != f_back) {
+    if (((scan_code == _BACKSPACE && (shift_status & MOD_SHIFT)) || v.active_item == 1) && a_back != f_back) {
       f2_back = f_back;
       help_xref(backto[a_back], backto[a_back + 1]);
       f_back = f2_back;
