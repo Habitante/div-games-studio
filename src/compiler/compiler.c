@@ -413,6 +413,7 @@ void compile(void) {
   lex_case[' '] = (struct lex_ele *)l_spc;
   lex_case[tab] = (struct lex_ele *)l_spc;
   lex_case[cr] = (struct lex_ele *)l_cr;
+  lex_case[lf] = (struct lex_ele *)l_cr; // Accept Unix (LF) and Windows (CRLF) line endings
 
   objects_start = name_index.b;
 
@@ -857,7 +858,7 @@ void analyze_ltlex(void) {
       }
       break;
     case ';':
-      while (*buf != cr) {
+      while (*buf != cr && *buf != lf) {
         buf++;
       }
       break;
@@ -902,7 +903,7 @@ void analyze_ltlex(void) {
           (*e).character = *buf++;
         } else
           buf++;
-        while (*buf != ' ' && *buf != tab && *buf != cr) {
+        while (*buf != ' ' && *buf != tab && *buf != cr && *buf != lf) {
           if (lower[*buf])
             c_error(0, 4);
           if ((*e).next == 0) {
@@ -1311,7 +1312,12 @@ lex_scan:
       }
 
       source_line++;
-      if ((*++_source) == lf) {
+      if (*_source == lf) { // Bare \n (Unix)
+        _source++;
+        last_line = _source;
+        goto lex_scan;
+      }
+      if ((*++_source) == lf) { // \r\n (Windows)
         _source++;
         last_line = _source;
         goto lex_scan;
@@ -1320,7 +1326,11 @@ lex_scan:
       break;
 
     } else {
-      if ((*++_source) == lf) {
+      if (*_source == lf) { // Bare \n (Unix)
+        _source++;
+        goto lex_scan;
+      }
+      if ((*++_source) == lf) { // \r\n (Windows)
         _source++;
         goto lex_scan;
       }
@@ -1349,7 +1359,7 @@ lex_scan:
       next_pieza = (intptr_t)*(ptr + 1);
       if (next_pieza < 256 && next_pieza >= 0) { // reserved word (token)
         if (next_pieza == p_rem) {
-          while (*_source != cr)
+          while (*_source != cr && *_source != lf)
             _source++;
           goto lex_scan;
         }
@@ -1398,7 +1408,7 @@ lex_scan:
     _source = _ivnom;
 
     if (next_pieza == p_rem && !comment_depth) {
-      while (*_source != cr) {
+      while (*_source != cr && *_source != lf) {
         _source++;
       }
       goto lex_scan;
@@ -1473,13 +1483,18 @@ lex_scan:
     }
 
     source_line++;
-    if ((*++_source) == lf) {
+    if (*_source == lf) { // Bare \n (Unix)
+      _source++;
+      last_line = _source;
+      goto lex_scan;
+    }
+    if ((*++_source) == lf) { // \r\n (Windows)
       _source++;
       last_line = _source;
       goto lex_scan;
     }
     current_token = p_end_of_file;
-    break; // eof
+    break; // eof (bare \r used as source terminator)
 
   case l_id:
     if (comment_depth) {
@@ -1509,7 +1524,7 @@ lex_scan:
       if (current_token < 256 && current_token >= 0) { // reserved word (t	oken)
 
         if (current_token == p_rem) {
-          while (*_source != cr)
+          while (*_source != cr && *_source != lf)
             _source++;
           goto lex_scan;
         }
@@ -1702,7 +1717,7 @@ lex_scan:
     _source = _ivnom;
 
     if (current_token == p_rem && !comment_depth) {
-      while (*_source != cr)
+      while (*_source != cr && *_source != lf)
         _source++;
       goto lex_scan;
     }
@@ -2786,13 +2801,18 @@ lex_scan:
 
   case l_cr:
     source_line++;
-    if ((*++_source) == lf) {
+    if (*_source == lf) { // Bare \n (Unix)
+      _source++;
+      last_line = _source;
+      goto lex_scan;
+    }
+    if ((*++_source) == lf) { // \r\n (Windows)
       _source++;
       last_line = _source;
       goto lex_scan;
     }
     current_token = p_end_of_file;
-    break; // eof
+    break; // eof (bare \r used as source terminator)
 
   case l_id:
     if (comment_depth) {
@@ -2818,7 +2838,7 @@ lex_scan:
       current_token = (intptr_t)*(ptr + 1);
       if (current_token < 256 && current_token >= 0) { // reserved word (token)
         if (current_token == p_rem) {
-          while (*_source != cr)
+          while (*_source != cr && *_source != lf)
             _source++;
           goto lex_scan;
         }
@@ -2898,7 +2918,7 @@ lex_scan:
     _source = _ivnom;
 
     if (current_token == p_rem && !comment_depth) {
-      while (*_source != cr)
+      while (*_source != cr && *_source != lf)
         _source++;
       goto lex_scan;
     }

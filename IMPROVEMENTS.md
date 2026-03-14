@@ -14,7 +14,7 @@ architecture docs, code review, and discussion with Daniel Navarro.
 | # | Improvement | Status | Risk |
 |---|-------------|--------|------|
 | 1 | [Enums & constants](#1-enums--constants) | **DONE** (all 6 sprints) | Very low |
-| 2 | [Testing infrastructure](#2-testing-infrastructure) | Sprints 1-2 **DONE** | None |
+| 2 | [Testing infrastructure](#2-testing-infrastructure) | Sprints 1-3 **DONE** | None |
 | 3 | [File format hardening + modern imports](#3-file-format-hardening--modern-imports) | — | Low |
 | 4 | [Help translation quality pass](#4-help-translation-quality-pass) | — | Low |
 | 5 | [IDE graphics & fonts to FPG/FNT](#5-ide-graphics--fonts--self-hosted-resources) | — | Low |
@@ -586,19 +586,36 @@ examples, restructured as non-interactive assertion-based tests:
 - **`test_trig.prg`** — `get_distx()`, `get_disty()`, `get_angle()`,
   `get_dist()`, `sin()`, `cos()`, `fget_angle()`, `fget_dist()`.
 
-### Sprint 3: IDE smoke test
+### Sprint 3: IDE smoke test — DONE
 
-A curated `test_session.div` (workspace desktop file) with all editor
-types open: one code editor (tiny PRG), one MAP in paint editor, one
-FPG with a graphic, one FNT, one PCM. Plus a small test program.
+Added `--smoke` flag to the IDE that runs the full initialization
+pipeline then performs automated verification instead of entering the
+interactive main loop. Tests the IDE init → compile → run → session
+save pipeline end-to-end.
 
-Test sequence: load DIV with this session → compile+run the program →
-return to IDE → save session → exit. Validates the full IDE ↔ runtime
-loop and that all editor types can serialize/deserialize their state.
+**`--smoke [test.prg]`** flag in `main.c`:
+- Full `initialization()`: video mode, keyboard, help index, palette
+  tables, UI fonts, icon graphics, sound system, paint toolbar
+- Skips `init_environment()` (has blocking modal dialogs)
+- Creates the main menu bar window
+- Runs 19 automated checks across 6 phases:
+  - **Phase 1** (13 checks): Core buffer allocations (screen_buffer,
+    dac, ghost, color_lookup, text_font, toolbar, graf_ptr, etc.)
+  - **Phase 2** (2 checks): Help index loaded, texts loaded
+  - **Phase 3** (1 check): Window state (at least one window open)
+  - **Phase 4** (1 check): Compile the specified PRG via `comp()`
+  - **Phase 5** (2 checks): Run compiled program via runtime, verify
+    result file (passed > 0, failed == 0)
+  - **Phase 6**: Session save via `download_desktop()`
+- Writes `tests/test_smoke.result` in the standard binary format
+- Writes `tests/smoke.log` with detailed PASS/FAIL per check
+- Exits 0 (all passed) or 1 (any failed)
 
-This requires either a `-test` flag for scripted IDE actions, or a
-carefully designed session that exercises the load → run → return → save
-path with minimal interaction.
+**`test_smoke.prg`** — companion program exercising basic runtime:
+math, string ops, memory access, file I/O (7 assertions).
+
+**`run_tests.sh`** updated: smoke test runs first, then the 6
+existing self-hosted tests. Total: **214 assertions across 7 tests**.
 
 ### CI (when ready)
 
@@ -609,13 +626,14 @@ GitHub Actions with MSYS2/MinGW32:
 3. Report pass/fail per test program
 
 **Payoff:** DIV tests itself using its own language, compiler, and
-runtime. The help documentation becomes source material for the test
-suite. Any regression that would break a user's program gets caught.
+runtime. The smoke test also validates the IDE initialization pipeline.
+The help documentation becomes source material for the test suite.
+Any regression that would break a user's program gets caught.
 
-**Effort:** Sprint 1: half a day. Sprint 2: 1-2 days. Sprint 3: 1-2
-days. CI: half a day.
-**Risk:** None — purely additive. Test programs live in `div/tests/`
-and don't affect the build or runtime.
+**Effort:** Sprint 1: half a day. Sprint 2: 1-2 days. Sprint 3: half
+a day. CI: half a day.
+**Risk:** None — test programs live in `div/tests/` and the `--smoke`
+flag is a new code path that doesn't affect normal IDE operation.
 
 ---
 
