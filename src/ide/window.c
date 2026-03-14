@@ -197,7 +197,7 @@ void wgra(byte *dest, int dest_width, int dest_height, byte color, int x, int y,
 //      Highlight a box, like an icon under the cursor
 //-----------------------------------------------------------------------------
 
-void wresalta_box(byte *dest, int dest_width, int dest_height, int x, int y, int w, int h) {
+void w_highlight_box(byte *dest, int dest_width, int dest_height, int x, int y, int w, int h) {
   byte *p;
 
   if (big) {
@@ -489,7 +489,7 @@ void bwput_in_box(byte *dest, int dest_pitch, int dest_width, int dest_height, i
 //-----------------------------------------------------------------------------
 
 void blit_region(byte *dest, int dest_width, int dest_height, byte *p, int x, int y, int w, int h,
-                 int salta) {
+                 int skip) {
   byte *q;
   int salta_x, long_x, resto_x;
   int salta_y, long_y, resto_y;
@@ -502,10 +502,10 @@ void blit_region(byte *dest, int dest_width, int dest_height, byte *p, int x, in
   else
     salta_x = 0;
   if (x + w > dest_width)
-    resto_x = x + w - dest_width + salta;
+    resto_x = x + w - dest_width + skip;
   else
-    resto_x = salta;
-  long_x = w + salta - salta_x - resto_x;
+    resto_x = skip;
+  long_x = w + skip - salta_x - resto_x;
 
   if (y < 0)
     salta_y = -y;
@@ -533,7 +533,7 @@ void blit_region(byte *dest, int dest_width, int dest_height, byte *p, int x, in
 //-----------------------------------------------------------------------------
 
 void blit_region_dark(byte *dest, int dest_width, int dest_height, byte *p, int x, int y, int w,
-                      int h, int salta) {
+                      int h, int skip) {
   byte *q, *_ghost;
   int salta_x, long_x, resto_x;
   int salta_y, long_y, resto_y;
@@ -555,10 +555,10 @@ void blit_region_dark(byte *dest, int dest_width, int dest_height, byte *p, int 
   else
     salta_x = 0;
   if (x + w > dest_width)
-    resto_x = x + w - dest_width + salta;
+    resto_x = x + w - dest_width + skip;
   else
-    resto_x = salta;
-  long_x = w + salta - salta_x - resto_x;
+    resto_x = skip;
+  long_x = w + skip - salta_x - resto_x;
 
   if (y < 0)
     salta_y = -y;

@@ -493,12 +493,12 @@ void _err0(void) {
 
 extern int ignore_errors;
 
-void e(int text_id) {
+void runtime_error(int text_id) {
 #ifdef __EMSCRIPTEN__
   return;
 #endif
   int smouse_x, smouse_y;
-  int reloj_e = frame_clock, n;
+  int saved_clock = frame_clock, n;
   int ticks_e = ticks;
   int dr = dacout_r, dg = dacout_g, db = dacout_b;
 
@@ -532,7 +532,7 @@ void e(int text_id) {
   dacout_r = dr;
   dacout_g = dg;
   dacout_b = db;
-  frame_clock = reloj_e;
+  frame_clock = saved_clock;
   ticks = ticks_e;
   set_mouse(smouse_x, smouse_y);
 }
@@ -588,7 +588,7 @@ void deb0(void) {
 
 void deb(void) {
   int smouse_x, smouse_y;
-  int reloj_e = frame_clock;
+  int saved_clock = frame_clock;
   int ticks_e = ticks;
   int dr = dacout_r, dg = dacout_g, db = dacout_b;
 
@@ -608,7 +608,7 @@ void deb(void) {
   dacout_r = dr;
   dacout_g = dg;
   dacout_b = db;
-  frame_clock = reloj_e;
+  frame_clock = saved_clock;
   ticks = ticks_e;
   set_mouse(smouse_x, smouse_y);
 }
@@ -617,7 +617,7 @@ void deb(void) {
 //    Determine if all processes have been executed
 //----------------------------------------------------------------------------
 
-int procesos_ejecutados(void) {
+int processes_executed(void) {
   int max = 0x80000000, ide = 0;
   if (process_stoped)
     return (0);

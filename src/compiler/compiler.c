@@ -472,7 +472,7 @@ void compile(void) {
   source_line = 1;
 
   itxt = strings_start = imem;
-  psintactico(); // To obtain "strings_length"
+  parse_syntax(); // To obtain "strings_length"
   imem += strings_length;
 
   test_buffer(&mem, &imem_max, imem);
@@ -1277,7 +1277,7 @@ int next_pieza;
 int next_line;
 byte *next_source;
 
-byte *next_lexico(byte *_source, int comment_depth, int source_line) { // Never generates errors
+byte *next_token(byte *_source, int comment_depth, int source_line) { // Never generates errors
 
   byte **ptr, *_ivnom, h;
   struct lex_ele *e;
@@ -1407,7 +1407,7 @@ lex_scan:
     if (next_pieza == p_ini_rem) {
       comment_depth++;
       do {
-        _source = next_lexico(_source, comment_depth, source_line);
+        _source = next_token(_source, comment_depth, source_line);
         source_line = next_line;
       } while (next_pieza != p_end_rem);
       comment_depth--;
@@ -1582,9 +1582,9 @@ lex_scan:
     } while (*_ivnom++);
     _source++;
 
-    next_lexico(_source, 0, 0);
+    next_token(_source, 0, 0);
     while (next_pieza == p_lit) {
-      next_lexico(_source, 0, source_line);
+      next_token(_source, 0, source_line);
       source_line = next_line;
       _source = next_source;
       h = *_source;
@@ -1601,7 +1601,7 @@ lex_scan:
           *_ivnom = *_source;
       } while (*_ivnom++);
       _source++;
-      next_lexico(_source, 0, 0);
+      next_token(_source, 0, 0);
     }
 
     n = (strlen((char *)name_index.b) + ptr4) / 4;
@@ -2762,7 +2762,7 @@ void compile_program(void) {
 }
 
 
-void plexico(void) {
+void scan_token(void) {
   byte **ptr, *_ivnom, h, *_source = source;
   struct lex_ele *e;
 
@@ -2907,7 +2907,7 @@ lex_scan:
       comment_depth++;
       do {
         source = _source;
-        plexico();
+        scan_token();
         _source = source;
       } while (current_token != p_end_rem);
       comment_depth--;
@@ -2926,13 +2926,13 @@ lex_scan:
   ierror_end = _source - 1;
 }
 
-void psintactico(void) {
+void parse_syntax(void) {
   byte *_ivnom = name_index.b;
 
   strings_length = 0;
 
   do {
-    plexico();
+    scan_token();
   } while (current_token != p_end_of_file);
 
   name_index.b = _ivnom;

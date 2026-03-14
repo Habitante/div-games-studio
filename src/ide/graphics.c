@@ -192,7 +192,7 @@ void put_bw(int x, int y, int n) { // Puts a contrasting graphic (mouse edition 
 //      Swap two memory blocks ( without requiring a third party)
 ///////////////////////////////////////////////////////////////////////////////
 
-void memxchg(byte *d, byte *s, int n) {
+void mem_xchg(byte *d, byte *s, int n) {
   int m, x;
 
   if ((m = n / 4))
@@ -1771,7 +1771,7 @@ void copy_block(byte *d, byte *s, int w, int h) {
 
 void xchg_block(byte *d, byte *s, int w, int h) {
   do {
-    memxchg(d, s, w);
+    mem_xchg(d, s, w);
     d += w;
     s += map_width;
   } while (--h);

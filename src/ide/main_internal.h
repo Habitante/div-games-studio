@@ -48,8 +48,8 @@ extern int salir_del_dialogo;
 void copy(int a, int b);
 void xchg(int a, int b);
 void move(int a, int b);
-void divdelete(int a);
-void addwindow(void);
+void div_delete(int a);
+void add_window(void);
 void wup(int a);
 void wdown(int a);
 
@@ -93,9 +93,9 @@ void _get(int t, int x, int y, int w, byte *buffer, int buffer_len, int r0, int 
 void _flag(int t, int x, int y, int *value);
 void _show_items(void);
 void show_button(struct t_item *i);
-void select_button(struct t_item *i, int activo);
+void select_button(struct t_item *i, int active);
 void show_get(struct t_item *i);
-void select_get(struct t_item *i, int activo, int ocultar_error);
+void select_get(struct t_item *i, int active, int hide_error);
 void show_flag(struct t_item *i);
 void _process_items(void);
 void _select_new_item(int i);

@@ -84,7 +84,7 @@ void line_pixel(int x, int y);
 void circle_scanline_filled(int x, int y, int w);
 void circle_scanline(int x, int y, int w);
 void pixel(byte *p);
-void pixel_sin_mask(byte *p);
+void pixel_without_mask(byte *p);
 void select_fill(int n);
 void select_box(int n);
 int editable(int *n);

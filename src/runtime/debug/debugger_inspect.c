@@ -108,14 +108,14 @@ void create_variable_list(void) {
   } while (newest);
 }
 
-void exclude_members(int padre, int nivel, int index) {
+void exclude_members(int parent, int level, int index) {
   int m;
   m = o[member].miembro;
   while (m == o[member].miembro) {
     if (index == -1)
-      var[padre].object = -member;
+      var[parent].object = -member;
     else
-      var[padre].object = member;
+      var[parent].object = member;
     switch (o[member].type) {
     case tpigl:
     case tpwgl:
@@ -127,19 +127,19 @@ void exclude_members(int padre, int nivel, int index) {
     case tpblo:
     case tpclo:
     case tpslo:
-      var[padre].indice = -1;
+      var[parent].indice = -1;
       break;
     }
-    padre++;
+    parent++;
     if (o[member].type == tsglo || o[member].type == tsloc) {
       member++;
-      exclude_members(padre, nivel + 1, index);
+      exclude_members(parent, level + 1, index);
     } else
       member++;
   }
 }
 
-void include_members(int padre, int nivel, int index) {
+void include_members(int parent, int level, int index) {
   int m;
 
   m = o[member].miembro;
@@ -149,8 +149,8 @@ void include_members(int padre, int nivel, int index) {
       var[num_var].object = -member;
     else
       var[num_var].object = member;
-    var[num_var].tab = nivel;
-    var[num_var].miembro = padre;
+    var[num_var].tab = level;
+    var[num_var].miembro = parent;
     used[member] = 1;
 
     switch (o[member].type) {
@@ -174,7 +174,7 @@ void include_members(int padre, int nivel, int index) {
 
     if (o[member].type == tsglo || o[member].type == tsloc) {
       member++;
-      include_members(num_var, nivel + 1, index);
+      include_members(num_var, level + 1, index);
     } else
       member++;
   }
@@ -781,7 +781,7 @@ void inspect0(void) {
 
 // Functions to prevent page faults
 
-byte *capar_byte(byte *dir) {
+byte *clamp_byte(byte *dir) {
   uintptr_t offset;
   offset = ((uintptr_t)dir - (uintptr_t)mem) / 4;
   if (validate_address(offset))
@@ -790,7 +790,7 @@ byte *capar_byte(byte *dir) {
     return ((byte *)mem);
 }
 
-word *capar_word(word *dir) {
+word *clamp_word(word *dir) {
   uintptr_t offset;
   offset = ((uintptr_t)dir - (uintptr_t)mem) / 4;
   if (validate_address(offset))
@@ -1291,7 +1291,7 @@ byte *_get_offset_byte(int m) {
 }
 
 byte *get_offset_byte(int m) {
-  return (capar_byte(_get_offset_byte(m)));
+  return (clamp_byte(_get_offset_byte(m)));
 }
 
 word *_get_offset_word(int m) {
@@ -1330,7 +1330,7 @@ word *_get_offset_word(int m) {
 }
 
 word *get_offset_word(int m) {
-  return (capar_word(_get_offset_word(m)));
+  return (clamp_word(_get_offset_word(m)));
 }
 
 //-----------------------------------------------------------------------------

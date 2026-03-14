@@ -16,7 +16,7 @@ int file_pos = 0;
 void free_mod(void);
 int sound_get_song_pos(void);
 int sound_get_song_line(void);
-void mostrar_mod_meters(void);
+void show_mod_meters(void);
 void open_sound(void);
 void open_sound_file(void);
 void open_desktop_sound(FILE *f);
@@ -29,24 +29,24 @@ void sound_play_song(char *pathname);
 void edit_sound0(void);
 void edit_sound1(void);
 void edit_sound2(void);
-void EditSound3(void);
+void edit_sound3(void);
 void rec_sound0(void);
-void RecSound1(void);
-void RecSound2(void);
-void RecSound3(void);
+void rec_sound1(void);
+void rec_sound2(void);
+void rec_sound3(void);
 void modify_sound(int option);
 void change_sound_freq(int freq);
 void record_sound(void);
 void poll_record(void);
 int judas_progress_read(int handle, void *buffer, int size);
-void copy_new_sound(pcminfo *mypcminfo, int ini, int fin);
+void copy_new_sound(pcminfo *mypcminfo, int start, int end);
 void paste_new_sounds(void);
 byte *save_sound_mem(pcminfo *mypcminfo);
 int is_wav(char *filename);
 int new_sample(pcminfo *mypcminfo); // 1-OK, 0-ERROR
 // Allocate (malloc+lock) in mypcminfo->sound_data for mypcminfo->sound_size shorts
-void wline(char *ptr, int realan, int w, int h, int x0, int y0, int x1, int y1, char color);
-void linea_pixel(char *ptr, int w, int realan, int h, int x, int y, char color);
+void wline(char *ptr, int real_width, int w, int h, int x0, int y0, int x1, int y1, char color);
+void pixel_line(char *ptr, int w, int real_width, int h, int x, int y, char color);
 
 void set_mixer(void);
 int find_pcm_window(void);
@@ -175,7 +175,7 @@ void pcm2(void) {
   }
 }
 
-void PCM3(void) {
+void pcm_dialog3(void) {
   pcminfo *mypcminfo = (pcminfo *)v.aux;
 
   if (mypcminfo->sound_data) {
@@ -198,7 +198,7 @@ void pcm0(void) {
 
   v.paint_handler = pcm1;
   v.click_handler = pcm2;
-  v.close_handler = PCM3;
+  v.close_handler = pcm_dialog3;
 
   v.aux = pcminfo_aux;
   pcminfo_aux = NULL;
@@ -212,7 +212,7 @@ void pcm0(void) {
 //  Song (mod/s3m/xm) window
 //-----------------------------------------------------------------------------
 
-void MOD1(void) {
+void mod_dialog1(void) {
   modinfo *mymodinfo = (modinfo *)v.aux;
   int w = v.w / big2, h = v.h / big2;
 
@@ -236,7 +236,7 @@ void MOD1(void) {
   }
 }
 
-void MOD2(void) {
+void mod_dialog2(void) {
   modinfo *mymodinfo = (modinfo *)v.aux;
   int need_refresh = 0;
 
@@ -270,7 +270,7 @@ void MOD2(void) {
   }
 }
 
-void MOD3(void) {
+void mod_dialog3(void) {
   modinfo *mymodinfo = (modinfo *)v.aux;
 #ifdef MIXER
   if (mymodinfo->song_code == song_code) {
@@ -281,16 +281,16 @@ void MOD3(void) {
   free(v.aux);
 }
 
-void MOD0(void) {
+void mod_dialog0(void) {
   modinfo *mymodinfo;
 
   v.type = WIN_MUSIC;
   v.w = 68;
   v.h = 50;
 
-  v.paint_handler = MOD1;
-  v.click_handler = MOD2;
-  v.close_handler = MOD3;
+  v.paint_handler = mod_dialog1;
+  v.click_handler = mod_dialog2;
+  v.close_handler = mod_dialog3;
 
   v.aux = modinfo_aux;
   modinfo_aux = NULL;
@@ -317,11 +317,11 @@ int sound_get_song_line(void) {
   return songline;
 }
 
-void mostrar_mod_meters(void) {
+void show_mod_meters(void) {
   modinfo *mymodinfo = (modinfo *)v.aux;
   int w = v.w / big2, h = v.h / big2;
   int x, y, con, canal, ancho_barra;
-  int ini = v.w * v.h - v.w * ((2 + 10) * big2 + 1) + 2 * big2;
+  int start = v.w * v.h - v.w * ((2 + 10) * big2 + 1) + 2 * big2;
   char cwork[10];
 
   if (mymodinfo->song_code == song_code) {
@@ -347,9 +347,9 @@ void mostrar_mod_meters(void) {
 
         for (con = 0; con < y; con++) {
           if (canal & 1)
-            memset(v.ptr + ini + x - con * v.w, c_g_low, ancho_barra);
+            memset(v.ptr + start + x - con * v.w, c_g_low, ancho_barra);
           else
-            memset(v.ptr + ini + x - con * v.w, c_g, ancho_barra);
+            memset(v.ptr + start + x - con * v.w, c_g, ancho_barra);
         }
       }
     } else {
@@ -386,7 +386,7 @@ typedef struct _HeadDC {
 } HeadDC;
 
 #ifdef MIXER
-Mix_Chunk *DIVMIX_LoadPCM(char *path) {
+Mix_Chunk *divmix_load_pcm(char *path) {
   FILE *f;
   HeadDC dc_header;
   char *riff = "RIFF";
@@ -527,7 +527,7 @@ void open_sound(void) {
       si = Mix_LoadWAV(sound_path_name);
 
       if (si == NULL)
-        si = DIVMIX_LoadPCM(sound_path_name);
+        si = divmix_load_pcm(sound_path_name);
 
       if (si == NULL) {
         free(pcminfo_aux);
@@ -582,7 +582,7 @@ void open_sound_file(void) // Open the file sound_path_name
   si = Mix_LoadWAV(sound_path_name);
 
   if (si == NULL)
-    si = DIVMIX_LoadPCM(sound_path_name);
+    si = divmix_load_pcm(sound_path_name);
 
   if (si == NULL) {
     //     free(pcminfo_aux);
@@ -860,7 +860,7 @@ void open_song(void) {
       memcpy(mymodinfo->name, song_name, 14);
       memcpy(mymodinfo->pathname, song_path_name, 256);
 
-      new_window(MOD0);
+      new_window(mod_dialog0);
     }
   }
 }
@@ -878,12 +878,12 @@ void open_desktop_song(void) {
   memcpy(mymodinfo->name, song_name, 14);
   memcpy(mymodinfo->pathname, song_path_name, 256);
 
-  create_saved_window(MOD0, window_aux.x, window_aux.y);
+  create_saved_window(mod_dialog0, window_aux.x, window_aux.y);
 }
 
 int songposcount = 0;
 // make a passthru processor function that does nothing...
-void noEffect(void *udata, Uint8 *stream, int len) {
+void no_effect(void *udata, Uint8 *stream, int len) {
   songposcount++;
   if (songposcount == 32) {
     songpos++;
@@ -926,7 +926,7 @@ void sound_play_song(char *pathname) {
   songposcount = 0;
   songpos = 1;
   songline = 1;
-  Mix_SetPostMix(noEffect, NULL);
+  Mix_SetPostMix(no_effect, NULL);
   if (Mix_PlayMusic(music, 1) == -1) {
     debugprintf("Mix_PlayMusic: %s\n", Mix_GetError());
     // well, there's no music, but most games don't break without music...
@@ -976,7 +976,7 @@ void edit_sound0(void) {
 
   v.paint_handler = edit_sound1;
   v.click_handler = edit_sound2;
-  v.close_handler = EditSound3;
+  v.close_handler = edit_sound3;
 
   window_width = (v.w - 8) * big2;
   window_height = 64 * big2;
@@ -1173,7 +1173,7 @@ void edit_sound2(void) {
   }
 }
 
-void EditSound3(void) {
+void edit_sound3(void) {
   Mix_HaltChannel(-1);
 }
 
@@ -1188,9 +1188,9 @@ void rec_sound0(void) {
   v.w = 200;
   v.h = 68;
 
-  v.paint_handler = RecSound1;
-  v.click_handler = RecSound2;
-  v.close_handler = RecSound3;
+  v.paint_handler = rec_sound1;
+  v.click_handler = rec_sound2;
+  v.close_handler = rec_sound3;
 
   DIV_STRCPY(sound_file, file_types[7].path);
   if (sound_file[strlen(sound_file) - 1] != '/')
@@ -1211,8 +1211,8 @@ void rec_sound0(void) {
   v_accept = 0;
 }
 
-void RecSound1(void) {
-  printf("TODO - divpcm.cpp RecSound1\n");
+void rec_sound1(void) {
+  printf("TODO - divpcm.cpp rec_sound1\n");
 
   int w = v.w / big2, h = v.h / big2;
 
@@ -1242,7 +1242,7 @@ void RecSound1(void) {
   wwrite_in_box(v.ptr, w, w - 4, h, w / 2, 40, 1, texts[564], c3);
 }
 
-void RecSound2(void) {
+void rec_sound2(void) {
   int need_refresh = 0;
 
   _process_items();
@@ -1295,7 +1295,7 @@ void RecSound2(void) {
   }
 }
 
-void RecSound3(void) {
+void rec_sound3(void) {
   if (v_accept) {
     record_sound();
   }
@@ -1311,7 +1311,7 @@ void modify_sound(int option) {
   byte *file_buffer;
   float inicio, final, tam_rel, fade;
   int pos, value, n;
-  int ini, fin;
+  int start, end;
   short *buffer = (short *)mypcminfo->si->abuf;
   short *short_ptr = sound_clipboard.sound_data;
   int length;
@@ -1324,10 +1324,10 @@ void modify_sound(int option) {
 
   tam_rel = (float)mypcminfo->sound_size / (float)window_width;
 
-  ini = (float)inicio * tam_rel;
-  fin = (float) final * tam_rel;
+  start = (float)inicio * tam_rel;
+  end = (float) final * tam_rel;
   if (final == window_width)
-    fin = mypcminfo->sound_size;
+    end = mypcminfo->sound_size;
 
   Mix_HaltChannel(-1);
 
@@ -1340,7 +1340,7 @@ void modify_sound(int option) {
     if (mypcminfo->sound_data == NULL)
       return;
     sound_clipboard.sound_freq = mypcminfo->sound_freq;
-    sound_clipboard.sound_size = fin - ini;
+    sound_clipboard.sound_size = end - start;
     if (sound_clipboard.sound_size <= 0)
       return;
     sound_clipboard.sound_data = (short *)malloc(sound_clipboard.sound_size * 2);
@@ -1349,7 +1349,7 @@ void modify_sound(int option) {
       show_dialog(err0);
       return;
     }
-    memcpy(sound_clipboard.sound_data, buffer + ini, sound_clipboard.sound_size * 2);
+    memcpy(sound_clipboard.sound_data, buffer + start, sound_clipboard.sound_size * 2);
     return;
   case 6: // Cut
     if (sound_clipboard.sound_data != NULL) {
@@ -1359,7 +1359,7 @@ void modify_sound(int option) {
     if (mypcminfo->sound_data == NULL)
       return;
     sound_clipboard.sound_freq = mypcminfo->sound_freq;
-    sound_clipboard.sound_size = fin - ini;
+    sound_clipboard.sound_size = end - start;
     if (sound_clipboard.sound_size <= 0)
       return;
     sound_clipboard.sound_data = (short *)malloc(sound_clipboard.sound_size * 2);
@@ -1368,7 +1368,7 @@ void modify_sound(int option) {
       show_dialog(err0);
       return;
     }
-    memcpy(sound_clipboard.sound_data, buffer + ini, sound_clipboard.sound_size * 2);
+    memcpy(sound_clipboard.sound_data, buffer + start, sound_clipboard.sound_size * 2);
     if (mypcminfo->sound_size - sound_clipboard.sound_size <= 0) {
       if (mypcminfo->sound_data) {
         mypcminfo->sound_data = NULL;
@@ -1387,8 +1387,8 @@ void modify_sound(int option) {
       pcminfo_bak.sound_freq = mypcminfo->sound_freq;
       pcminfo_bak.sound_size = mypcminfo->sound_size - sound_clipboard.sound_size;
 
-      memcpy(pcminfo_bak.sound_data, buffer, ini * 2);
-      memcpy(pcminfo_bak.sound_data + ini, buffer + fin, (mypcminfo->sound_size - fin) * 2);
+      memcpy(pcminfo_bak.sound_data, buffer, start * 2);
+      memcpy(pcminfo_bak.sound_data + start, buffer + end, (mypcminfo->sound_size - end) * 2);
 
       if ((file_buffer = save_sound_mem(&pcminfo_bak)) == NULL) {
         free(pcminfo_bak.sound_data);
@@ -1462,9 +1462,9 @@ void modify_sound(int option) {
     pcminfo_bak.sound_freq = mypcminfo->sound_freq;
     pcminfo_bak.sound_size = mypcminfo->sound_size + length;
 
-    memcpy(pcminfo_bak.sound_data, buffer, ini * 2);
-    memcpy(pcminfo_bak.sound_data + ini, short_ptr, length * 2);
-    memcpy(pcminfo_bak.sound_data + ini + length, buffer + ini, (mypcminfo->sound_size - ini) * 2);
+    memcpy(pcminfo_bak.sound_data, buffer, start * 2);
+    memcpy(pcminfo_bak.sound_data + start, short_ptr, length * 2);
+    memcpy(pcminfo_bak.sound_data + start + length, buffer + start, (mypcminfo->sound_size - start) * 2);
     if (sound_clipboard.sound_freq != mypcminfo->sound_freq)
       free(short_ptr);
 
@@ -1510,7 +1510,7 @@ void modify_sound(int option) {
 
     return;
   case 9: // Pega el sounds en el escritorio
-    copy_new_sound(mypcminfo, ini, fin);
+    copy_new_sound(mypcminfo, start, end);
     return;
   case 10: // Convertir a 8 bit
     mypcminfo->sound_bits = 8;
@@ -1529,7 +1529,7 @@ void modify_sound(int option) {
     return;
   }
 
-  for (pos = ini; pos < fin; pos++) {
+  for (pos = start; pos < end; pos++) {
     value = buffer[pos];
     switch (option) {
     case 0: // Volume down
@@ -1563,11 +1563,11 @@ void modify_sound(int option) {
       }
       break;
     case 2: // Fade in
-      fade = (float)(pos - ini) / (float)(fin - ini);
+      fade = (float)(pos - start) / (float)(end - start);
       value = (float)value * fade;
       break;
     case 3: // Fade out
-      fade = (float)(pos - ini) / (float)(fin - ini);
+      fade = (float)(pos - start) / (float)(end - start);
       value = (float)value * (1.0 - fade);
       break;
     case 4: // Silence
@@ -1802,16 +1802,16 @@ int judas_progress_read(int handle, void *buffer, int size) {
   return (1);
 }
 
-void copy_new_sound(pcminfo *mypcminfo, int ini, int fin) {
+void copy_new_sound(pcminfo *mypcminfo, int start, int end) {
   char aux[5];
   short *sound_data;
-  int sound_bytes = (fin - ini) * 2;
+  int sound_bytes = (end - start) * 2;
 
-  if (fin == -1)
-    fin = mypcminfo->sound_size;
+  if (end == -1)
+    end = mypcminfo->sound_size;
 
-  if (mypcminfo->sound_data == NULL || mypcminfo->sound_size == 0 || ini > mypcminfo->sound_size ||
-      fin > mypcminfo->sound_size || ini >= fin)
+  if (mypcminfo->sound_data == NULL || mypcminfo->sound_size == 0 || start > mypcminfo->sound_size ||
+      end > mypcminfo->sound_size || start >= end)
     return;
 
   if (NumSND > 99) {
@@ -1825,13 +1825,13 @@ void copy_new_sound(pcminfo *mypcminfo, int ini, int fin) {
     show_dialog(err0);
     return;
   }
-  memcpy(sound_data, mypcminfo->sound_data + ini, sound_bytes);
+  memcpy(sound_data, mypcminfo->sound_data + start, sound_bytes);
 
   div_strcpy(DesktopSND[NumSND].name, sizeof(DesktopSND[NumSND].name), (char *)texts[137]);
   div_strcat(DesktopSND[NumSND].name, sizeof(DesktopSND[NumSND].name), itoa((snd_count), aux, 10));
   DesktopSND[NumSND].sound_freq = mypcminfo->sound_freq;
   DesktopSND[NumSND].sound_bits = mypcminfo->sound_bits;
-  DesktopSND[NumSND].sound_size = fin - ini;
+  DesktopSND[NumSND].sound_size = end - start;
   DesktopSND[NumSND].sound_data = sound_data;
   snd_count++;
   if (snd_count > 99)
@@ -2011,7 +2011,7 @@ int new_sample(pcminfo *mypcminfo) {
   return (1);
 }
 
-void wline(char *ptr, int realan, int w, int h, int x0, int y0, int x1, int y1, char color) {
+void wline(char *ptr, int real_width, int w, int h, int x0, int y0, int x1, int y1, char color) {
   int dx, dy, a, b, d, x, y;
 
   if (x0 > x1) {
@@ -2030,12 +2030,12 @@ void wline(char *ptr, int realan, int w, int h, int x0, int y0, int x1, int y1, 
   }
 
   if (!dx && !dy)
-    linea_pixel(ptr, w, realan, h, x0, y0, color);
+    pixel_line(ptr, w, real_width, h, x0, y0, color);
   else {
-    linea_pixel(ptr, w, realan, h, x0, y0, color);
+    pixel_line(ptr, w, real_width, h, x0, y0, color);
     if (dy <= dx) {
       if (x0 > x1) {
-        linea_pixel(ptr, w, realan, h, x1, y1, color);
+        pixel_line(ptr, w, real_width, h, x1, y1, color);
         x0--;
         swap(x0, x1);
         swap(y0, y1);
@@ -2055,7 +2055,7 @@ void wline(char *ptr, int realan, int w, int h, int x0, int y0, int x1, int y1, 
             x++;
             y++;
           }
-          linea_pixel(ptr, w, realan, h, x, y, color);
+          pixel_line(ptr, w, real_width, h, x, y, color);
         }
       else
         while (x < x1) {
@@ -2067,11 +2067,11 @@ void wline(char *ptr, int realan, int w, int h, int x0, int y0, int x1, int y1, 
             x++;
             y--;
           }
-          linea_pixel(ptr, w, realan, h, x, y, color);
+          pixel_line(ptr, w, real_width, h, x, y, color);
         }
     } else {
       if (y0 > y1) {
-        linea_pixel(ptr, w, realan, h, x1, y1, color);
+        pixel_line(ptr, w, real_width, h, x1, y1, color);
         y0--;
         swap(x0, x1);
         swap(y0, y1);
@@ -2091,7 +2091,7 @@ void wline(char *ptr, int realan, int w, int h, int x0, int y0, int x1, int y1, 
             y++;
             x++;
           }
-          linea_pixel(ptr, w, realan, h, x, y, color);
+          pixel_line(ptr, w, real_width, h, x, y, color);
         }
       else
         while (y < y1) {
@@ -2103,14 +2103,14 @@ void wline(char *ptr, int realan, int w, int h, int x0, int y0, int x1, int y1, 
             y++;
             x--;
           }
-          linea_pixel(ptr, w, realan, h, x, y, color);
+          pixel_line(ptr, w, real_width, h, x, y, color);
         }
     }
   }
 }
 
-void linea_pixel(char *ptr, int w, int realan, int h, int x, int y, char color) {
+void pixel_line(char *ptr, int w, int real_width, int h, int x, int y, char color) {
   if (x >= 0 && y >= 0 && x < w && y < h) {
-    ptr[x + y * realan] = color;
+    ptr[x + y * real_width] = color;
   }
 }

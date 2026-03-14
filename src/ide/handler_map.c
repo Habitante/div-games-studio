@@ -12,7 +12,7 @@ int fmt_load_dac_bmp(char *name);
 int fmt_load_dac_jpg(char *name);
 void create_palette(void);
 void palette_action0(void);
-void apply_resize(struct tmapa *MiMap, int map_w, int map_h);
+void apply_resize(struct tmapa *map_data, int map_w, int map_h);
 
 extern byte apply_palette[768];
 extern byte *sample;
@@ -1055,7 +1055,7 @@ void reduce_half() {
   char *temp_buffer;
   int n, p1, p2, p3, p4, map_w, map_h, c;
   float x, y;
-  struct tmapa *MiMap;
+  struct tmapa *map_data;
   float incx, incy;
   int fx, fy;
   char lut[190];
@@ -1063,13 +1063,13 @@ void reduce_half() {
   n = find_and_load_map();
   if (!n)
     return;
-  MiMap = window[n].mapa;
+  map_data = window[n].mapa;
 
-  if ((MiMap->map_width < 2) || (MiMap->map_height < 2))
+  if ((map_data->map_width < 2) || (map_data->map_height < 2))
     return;
 
-  map_w = MiMap->map_width;
-  map_h = MiMap->map_height;
+  map_w = map_data->map_width;
+  map_h = map_data->map_height;
 
   show_dialog(resize0);
   if (!v_accept)
@@ -1081,7 +1081,7 @@ void reduce_half() {
   }
 
   if (map_width > map_w || map_height > map_h) {
-    apply_resize(MiMap, map_w, map_h);
+    apply_resize(map_data, map_w, map_h);
     return;
   }
 
@@ -1129,21 +1129,21 @@ void reduce_half() {
     x = (float)0;
     for (fx = 0; fx < map_width; fx++) {
       if (fx == (map_width - 1)) {
-        p1 = MiMap->map[(memptrsize)y * map_w + (memptrsize)x - 1];
-        p2 = MiMap->map[(memptrsize)y * map_w + (memptrsize)x];
+        p1 = map_data->map[(memptrsize)y * map_w + (memptrsize)x - 1];
+        p2 = map_data->map[(memptrsize)y * map_w + (memptrsize)x];
       } else {
-        p1 = MiMap->map[(memptrsize)y * map_w + (memptrsize)x];
-        p2 = MiMap->map[(memptrsize)y * map_w + (memptrsize)x + 1];
+        p1 = map_data->map[(memptrsize)y * map_w + (memptrsize)x];
+        p2 = map_data->map[(memptrsize)y * map_w + (memptrsize)x + 1];
       }
 
       p1 = ghost[p1 + p2 * 256];
 
       if (fy == (map_height - 1)) {
-        p3 = MiMap->map[(memptrsize)y * map_w + (memptrsize)x - map_w - 1];
-        p4 = MiMap->map[(memptrsize)y * map_w + (memptrsize)x - map_w];
+        p3 = map_data->map[(memptrsize)y * map_w + (memptrsize)x - map_w - 1];
+        p4 = map_data->map[(memptrsize)y * map_w + (memptrsize)x - map_w];
       } else {
-        p3 = MiMap->map[(memptrsize)y * map_w + (memptrsize)x + map_w];
-        p4 = MiMap->map[(memptrsize)y * map_w + (memptrsize)x + map_w + 1];
+        p3 = map_data->map[(memptrsize)y * map_w + (memptrsize)x + map_w];
+        p4 = map_data->map[(memptrsize)y * map_w + (memptrsize)x + map_w + 1];
       }
 
       p3 = ghost[p3 + p4 * 256];
@@ -1339,7 +1339,7 @@ void map_search() {
 
 //-----------------------------------------------------------------------------
 
-void apply_resize(struct tmapa *MiMap, int map_w, int map_h) {
+void apply_resize(struct tmapa *map_data, int map_w, int map_h) {
   char *temp_buffer;
   char saved_dac[768];
   int n, p1, p2, p3, p4;
@@ -1470,7 +1470,7 @@ void apply_resize(struct tmapa *MiMap, int map_w, int map_h) {
       else
         pp1 += (ry - fy);
       pp1 = (2.0 - pp1) / 2.0;
-      p1 = MiMap->map[(memptrsize)ry * map_w + (memptrsize)rx];
+      p1 = map_data->map[(memptrsize)ry * map_w + (memptrsize)rx];
       r = dac[p1 * 3] * pp1;
       g = dac[p1 * 3 + 1] * pp1;
       b = dac[p1 * 3 + 2] * pp1;
@@ -1484,7 +1484,7 @@ void apply_resize(struct tmapa *MiMap, int map_w, int map_h) {
       else
         pp2 += (ry - fy);
       pp2 = (2.0 - pp2) / 2.0;
-      p2 = MiMap->map[(memptrsize)ry * map_w + (memptrsize)(rx + 1.0)];
+      p2 = map_data->map[(memptrsize)ry * map_w + (memptrsize)(rx + 1.0)];
       r += dac[p2 * 3] * pp2;
       g += dac[p2 * 3 + 1] * pp2;
       b += dac[p2 * 3 + 2] * pp2;
@@ -1498,7 +1498,7 @@ void apply_resize(struct tmapa *MiMap, int map_w, int map_h) {
       else
         pp3 += ((ry + 1.0) - fy);
       pp3 = (2.0 - pp3) / 2.0;
-      p3 = MiMap->map[(memptrsize)(ry + 1.0) * map_w + (memptrsize)rx];
+      p3 = map_data->map[(memptrsize)(ry + 1.0) * map_w + (memptrsize)rx];
       r += dac[p3 * 3] * pp3;
       g += dac[p3 * 3 + 1] * pp3;
       b += dac[p3 * 3 + 2] * pp3;
@@ -1512,7 +1512,7 @@ void apply_resize(struct tmapa *MiMap, int map_w, int map_h) {
       else
         pp4 += ((ry + 1.0) - fy);
       pp4 = (2.0 - pp4) / 2.0;
-      p4 = MiMap->map[(memptrsize)(ry + 1.0) * map_w + (memptrsize)(rx + 1.0)];
+      p4 = map_data->map[(memptrsize)(ry + 1.0) * map_w + (memptrsize)(rx + 1.0)];
       r += dac[p4 * 3] * pp4;
       g += dac[p4 * 3 + 1] * pp4;
       b += dac[p4 * 3 + 2] * pp4;

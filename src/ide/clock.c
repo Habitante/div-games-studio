@@ -6,16 +6,16 @@
 #include "global.h"
 #include "div_string.h"
 
-static int ORDig1 = -1, ORDig2 = -1, ORDig3 = -1, ORDig4 = -1;
+static int old_dig1 = -1, old_dig2 = -1, old_dig3 = -1, old_dig4 = -1;
 static char cTimeForIcon[18];
 static struct tm *timeinfo;
 static time_t dtime;
 
-static void Show_Time(void) {
+static void show_time(void) {
   byte *ptr = v.ptr;
   int w, h;
   char cBuff[3];
-  int Dig1, Dig2, Dig3, Dig4;
+  int dig1, dig2, dig3, dig4;
 
   if (v.foreground != WF_MINIMIZED || v.h > v._h_saved) {
     w = v.w;
@@ -35,32 +35,32 @@ static void Show_Time(void) {
               timeinfo->tm_sec % 2 ? ':' : '.', timeinfo->tm_min);
 
   div_snprintf(cBuff, sizeof(cBuff), "%02d", timeinfo->tm_hour);
-  Dig1 = (cBuff[0] == '0') ? 10 + 200 : (cBuff[0] - '0') + 200;
-  Dig2 = (cBuff[1] - '0') + 200;
+  dig1 = (cBuff[0] == '0') ? 10 + 200 : (cBuff[0] - '0') + 200;
+  dig2 = (cBuff[1] - '0') + 200;
 
   div_snprintf(cBuff, sizeof(cBuff), "%02d", timeinfo->tm_min);
-  Dig3 = (cBuff[0] - '0') + 200;
-  Dig4 = (cBuff[1] - '0') + 200;
+  dig3 = (cBuff[0] - '0') + 200;
+  dig4 = (cBuff[1] - '0') + 200;
 
-  if (ORDig1 != Dig1) {
-    wput(ptr, w, h, 8, 14, Dig1);
+  if (old_dig1 != dig1) {
+    wput(ptr, w, h, 8, 14, dig1);
     v.redraw = 1;
-    ORDig1 = Dig1;
+    old_dig1 = dig1;
   }
-  if (ORDig2 != Dig2) {
-    wput(ptr, w, h, 15, 14, Dig2);
+  if (old_dig2 != dig2) {
+    wput(ptr, w, h, 15, 14, dig2);
     v.redraw = 1;
-    ORDig2 = Dig2;
+    old_dig2 = dig2;
   }
-  if (ORDig3 != Dig3) {
-    wput(ptr, w, h, 26, 14, Dig3);
+  if (old_dig3 != dig3) {
+    wput(ptr, w, h, 26, 14, dig3);
     v.redraw = 1;
-    ORDig3 = Dig3;
+    old_dig3 = dig3;
   }
-  if (ORDig4 != Dig4) {
-    wput(ptr, w, h, 33, 14, Dig4);
+  if (old_dig4 != dig4) {
+    wput(ptr, w, h, 33, 14, dig4);
     v.redraw = 1;
-    ORDig4 = Dig4;
+    old_dig4 = dig4;
   }
 
   if (timeinfo->tm_sec % 2) {
@@ -81,18 +81,18 @@ void clock1(void) {
     h /= 2;
   }
   wput(ptr, w, h, 2, 10, 218);
-  ORDig1 = -1;
-  ORDig2 = -1;
-  ORDig3 = -1;
-  ORDig4 = -1;
-  Show_Time();
+  old_dig1 = -1;
+  old_dig2 = -1;
+  old_dig3 = -1;
+  old_dig4 = -1;
+  show_time();
 }
 
-void Clock2(void) {
-  Show_Time();
+void clock2(void) {
+  show_time();
 }
 
-void Clock3(void) {}
+void clock3(void) {}
 
 void clock0(void) {
   v.type = WIN_CLOCK;
@@ -105,12 +105,12 @@ void clock0(void) {
               timeinfo->tm_sec % 2 ? ';' : ' ', timeinfo->tm_min);
   v.name = (byte *)cTimeForIcon;
   v.paint_handler = clock1;
-  v.click_handler = Clock2;
-  v.close_handler = Clock3;
-  ORDig1 = -1;
-  ORDig2 = -1;
-  ORDig3 = -1;
-  ORDig4 = -1;
+  v.click_handler = clock2;
+  v.close_handler = clock3;
+  old_dig1 = -1;
+  old_dig2 = -1;
+  old_dig3 = -1;
+  old_dig4 = -1;
 }
 
 void show_clock(void) {

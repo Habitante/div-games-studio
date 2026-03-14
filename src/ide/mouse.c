@@ -13,7 +13,7 @@ float m_x = 0.0, m_y = 0.0;
 int mouse_in_window = 1;
 int joymx = 0, joymy = 0;
 void read_mouse2(void);
-void libera_drag(void);
+void release_drag(void);
 int collides_with(int a, int x, int y, int w, int h);
 void sound_init(void);
 void sound_end(void);
@@ -291,7 +291,7 @@ clamp_mouse:
 
     case 4:
     case 5:
-      libera_drag();
+      release_drag();
       break;
     }
   }
@@ -300,7 +300,7 @@ clamp_mouse:
   last_set_my = (int)m_y;
 }
 
-void libera_drag(void) {
+void release_drag(void) {
   int n;
   dragging = 0;
   for (n = 0; n < MAX_WINDOWS; n++) {

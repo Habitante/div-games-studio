@@ -488,7 +488,7 @@ trace_proc:
       break;
     }
     if (process_count) {
-      if (procesos_ejecutados()) {
+      if (processes_executed()) {
         frame_clock = debug_clock;
         ticks = ticks_debug;
         set_mouse(smouse_x, smouse_y);
@@ -571,7 +571,7 @@ step_proc:
       break;
     }
     if (process_count) {
-      if (procesos_ejecutados()) {
+      if (processes_executed()) {
         frame_clock = debug_clock;
         ticks = ticks_debug;
         set_mouse(smouse_x, smouse_y);
@@ -631,7 +631,7 @@ exec_proc:
       }
     }
     if (process_count) {
-      if (procesos_ejecutados()) {
+      if (processes_executed()) {
         frame_clock = debug_clock;
         ticks = ticks_debug;
         set_mouse(smouse_x, smouse_y);

@@ -7,7 +7,7 @@
 #include "div_string.h"
 #include <errno.h>
 
-void readmouse(void);
+void read_mouse(void);
 #include "mixer.h"
 #include "divsound.h"
 
@@ -34,7 +34,7 @@ void _compress_file(int encode, char *filename);
 extern int max_reloj;
 
 void _object_advance(int ide, int angle, int velocity);
-int joy_position(int eje);
+int joy_position(int axis);
 
 void _object_advance(int ide, int angle, int velocity) {
   mem[id + _X] += get_distx(mem[id + _Angle], stack[sp]);
@@ -65,12 +65,12 @@ extern int num_skipped;
 //  Fix for the /oneatx /fp5 bug in i.cpp
 //----------------------------------------------------------------------------
 
-static int n_reloj = 0, o_reloj = 0;
+static int new_ticks = 0, old_ticks = 0;
 
-int get_reloj(void) {
-  n_reloj = OSDEP_GetTicks();
-  frame_clock += (n_reloj - o_reloj);
-  o_reloj = n_reloj;
+int get_clock(void) {
+  new_ticks = OSDEP_GetTicks();
+  frame_clock += (new_ticks - old_ticks);
+  old_ticks = new_ticks;
 
   return frame_clock;
 }
@@ -123,7 +123,7 @@ void signal_tree(int p, int s) {
 
 void _key(void) {
   if (stack[sp] <= 0 || stack[sp] >= 128) {
-    e(101);
+    runtime_error(101);
     return;
   }
   stack[sp] = key(stack[sp]);
@@ -453,7 +453,7 @@ void load_pal(void) {
   int m, offs = 8;
 
   if (auto_adapt_palette) {
-    e(183);
+    runtime_error(183);
     stack[sp] = 0;
     return;
   }
@@ -464,12 +464,12 @@ void load_pal(void) {
       goto palfuera;
     if (m == -2) {
       stack[sp] = 0;
-      e(100);
+      runtime_error(100);
       return;
     }
     if (m <= 0) {
       stack[sp] = 0;
-      e(200);
+      runtime_error(200);
       return;
     }
     memcpy(pal, packptr, 1352);
@@ -478,7 +478,7 @@ void load_pal(void) {
 palfuera:
     if ((es = div_open_file((char *)&mem[stack[sp]])) == NULL) {
       stack[sp] = 0;
-      e(102);
+      runtime_error(102);
       return;
     } else {
       fread(pal, 1, 1352, es);
@@ -500,12 +500,12 @@ palfuera:
                 goto palfuera2;
               if (m == -2) {
                 stack[sp] = 0;
-                e(100);
+                runtime_error(100);
                 return;
               }
               if (m <= 0) {
                 stack[sp] = 0;
-                e(200);
+                runtime_error(200);
                 return;
               }
               memcpy(pal, packptr + m - 768, 768);
@@ -514,7 +514,7 @@ palfuera:
 palfuera2:
               if ((es = div_open_file((char *)&mem[stack[sp]])) == NULL) {
                 stack[sp] = 0;
-                e(102);
+                runtime_error(102);
                 return;
               } else {
                 fseek(es, -768, SEEK_END);
@@ -529,7 +529,7 @@ palfuera2:
 
           } else {
             stack[sp] = 0;
-            e(103);
+            runtime_error(103);
             return;
           }
 
@@ -664,13 +664,13 @@ int is_PCX(byte *buffer) {
 
 byte *pcxdac;
 
-void descomprime_PCX(byte *buffer, byte *mapa) {
+void decompress_pcx(byte *buffer, byte *mapa) {
   unsigned int con;
   unsigned int pixel = 0, pixel_line = 0;
   unsigned int last_byte, bytes_line;
   char ch, rep;
   pcx_header header;
-  byte *pDest;
+  byte *dest;
   int map_width, map_height;
 
   memcpy((byte *)&header, buffer, sizeof(pcx_header));
@@ -684,7 +684,7 @@ void descomprime_PCX(byte *buffer, byte *mapa) {
   last_byte = header.bytes_per_line * header.color_planes * map_height;
   bytes_line = header.bytes_per_line * header.color_planes;
 
-  pDest = mapa;
+  dest = mapa;
 
   do {
     ch = *buffer++;          // Copy one by default.
@@ -698,7 +698,7 @@ void descomprime_PCX(byte *buffer, byte *mapa) {
     if (pixel > last_byte) {
       rep -= pixel - last_byte;
       for (con = 0; con < rep; con++)
-        *pDest++ = ch;
+        *dest++ = ch;
       break;
     }
     if (pixel_line == bytes_line) {
@@ -706,7 +706,7 @@ void descomprime_PCX(byte *buffer, byte *mapa) {
       rep -= bytes_line - map_width;
     }
     for (con = 0; con < rep; con++)
-      *pDest++ = ch;
+      *dest++ = ch;
   } while (1);
 
   for (con = 0; con < 768; con++)
@@ -744,12 +744,12 @@ void load_map(void) {
       goto mapfuera;
     if (m == -2) {
       stack[sp] = 0;
-      e(100);
+      runtime_error(100);
       return;
     }
     if (m <= 0) {
       stack[sp] = 0;
-      e(200);
+      runtime_error(200);
       return;
     }
     ptr = packptr;
@@ -758,7 +758,7 @@ void load_map(void) {
 mapfuera:
     if ((es = div_open_file((char *)&mem[stack[sp]])) == NULL) {
       stack[sp] = 0;
-      e(143);
+      runtime_error(143);
       return;
     } else {
       fseek(es, 0, SEEK_END);
@@ -770,7 +770,7 @@ mapfuera:
       } else {
         fclose(es);
         stack[sp] = 0;
-        e(100);
+        runtime_error(100);
         return;
       }
     }
@@ -825,13 +825,13 @@ mapfuera:
     num_points = 0;
 
     if ((!width && !height) || width < 0 || height < 0) {
-      e(144);
+      runtime_error(144);
       free(ptr);
       return;
     }
 
     buffer = (byte *)malloc(1394 + width * height);
-    descomprime_PCX(ptr, &buffer[1394]);
+    decompress_pcx(ptr, &buffer[1394]);
 
     adapt_palette(buffer + 1394, width * height, pcxdac, NULL);
 
@@ -851,12 +851,12 @@ mapfuera:
     stack[sp] = next_map_code;
 
   } else {
-    e(144);
+    runtime_error(144);
     free(ptr);
     return;
   }
 
-  max_reloj += get_reloj() - old_clock;
+  max_reloj += get_clock() - old_clock;
 }
 
 //----------------------------------------------------------------------------
@@ -878,15 +878,15 @@ void new_map(void) {
   // Check width/height/color bounds ...
 
   if (width < 1 || height < 1 || width > 32768 || height > 32768) {
-    e(153);
+    runtime_error(153);
     return;
   }
   if (color < 0 || color > 255) {
-    e(154);
+    runtime_error(154);
     return;
   }
   if (cx < 0 || cy < 0 || cx >= width || cy >= height) {
-    e(155);
+    runtime_error(155);
     return;
   }
 
@@ -907,7 +907,7 @@ void new_map(void) {
     stack[sp] = next_map_code;
 
   } else
-    e(100);
+    runtime_error(100);
 }
 
 //----------------------------------------------------------------------------
@@ -933,13 +933,13 @@ void load_fpg(void) {
   }
   if (num == max_fpgs) {
     stack[sp] = 0;
-    e(104);
+    runtime_error(104);
     return;
   }
   if (num) {
     if ((lst = (int **)malloc(sizeof(int *) * 1000)) == NULL) {
       stack[sp] = 0;
-      e(100);
+      runtime_error(100);
       return;
     }
   } else
@@ -952,12 +952,12 @@ void load_fpg(void) {
       goto fpgfuera;
     if (m == -2) {
       stack[sp] = 0;
-      e(100);
+      runtime_error(100);
       return;
     }
     if (m <= 0) {
       stack[sp] = 0;
-      e(200);
+      runtime_error(200);
       return;
     }
     ptr = packptr;
@@ -971,7 +971,7 @@ fpgfuera:
 #endif
     if ((es = div_open_file((char *)&mem[stack[sp]])) == NULL) {
       stack[sp] = 0;
-      e(105);
+      runtime_error(105);
       return;
     } else {
       fseek(es, 0, SEEK_END);
@@ -999,14 +999,14 @@ fpgfuera:
       } else {
         fclose(es);
         stack[sp] = 0;
-        e(100);
+        runtime_error(100);
         return;
       }
     }
   }
 
   if (strcmp((char *)ptr, "fpg\x1a\x0d\x0a")) {
-    e(106);
+    runtime_error(106);
     free(ptr);
     return;
   }
@@ -1101,14 +1101,14 @@ fpgfuera:
   printf("fpg search ended, %p: ptr: %p\n", (void *)((byte *)g[num].fpg + file_len), (void *)ptr);
 #endif
   stack[sp] = num;
-  max_reloj += get_reloj() - old_clock;
+  max_reloj += get_clock() - old_clock;
 }
 
 //----------------------------------------------------------------------------
 //      Start_scroll(snum,file,graf1,graf2,region,flags)
 //----------------------------------------------------------------------------
 
-void set_scroll(int plano, int x, int y);
+void set_scroll(int plane, int x, int y);
 
 void start_scroll(void) {
   int file, graf1, graf2, reg, s;
@@ -1123,7 +1123,7 @@ void start_scroll(void) {
   stack[sp] = 0;
 
   if (snum < 0 || snum > 9) {
-    e(107);
+    runtime_error(107);
     return;
   }
 
@@ -1140,17 +1140,17 @@ void start_scroll(void) {
     iscroll[snum].w = region[reg].x1 - region[reg].x0;
     iscroll[snum].h = region[reg].y1 - region[reg].y0;
   } else {
-    e(108);
+    runtime_error(108);
     return;
   }
 
   if (iscroll[snum].w == 0 || iscroll[snum].h == 0) {
-    e(146);
+    runtime_error(146);
     return;
   }
 
   if (file < 0 || file > max_fpgs) {
-    e(109);
+    runtime_error(109);
     return;
   }
   if (file)
@@ -1158,21 +1158,21 @@ void start_scroll(void) {
   else
     max_grf = 2000;
   if (graf1 < 0 || graf1 >= max_grf) {
-    e(110);
+    runtime_error(110);
     return;
   }
   if (graf2 < 0 || graf2 >= max_grf) {
-    e(110);
+    runtime_error(110);
     return;
   }
   if (g[file].grf == NULL) {
-    e(111);
+    runtime_error(111);
     return;
   }
   ptr1 = g[file].grf[graf1];
   ptr2 = g[file].grf[graf2];
   if (ptr1 == NULL && ptr2 == NULL) {
-    e(112);
+    runtime_error(112);
     return;
   }
   if (ptr1 == NULL) {
@@ -1200,11 +1200,11 @@ void start_scroll(void) {
     iscroll[snum].map1_y = *((word *)ptr1 + 33);
   }
   if ((iscroll[snum]._sscr1 = (byte *)malloc(iscroll[snum].w * (iscroll[snum].h + 1))) == NULL) {
-    e(100);
+    runtime_error(100);
     return;
   }
   if ((iscroll[snum].fast = (tfast *)malloc(iscroll[snum].h * sizeof(tfast))) == NULL) {
-    e(100);
+    runtime_error(100);
     return;
   }
   iscroll[snum].sscr1 = iscroll[snum]._sscr1;
@@ -1231,7 +1231,7 @@ void start_scroll(void) {
     if ((iscroll[snum]._sscr2 = (byte *)malloc(iscroll[snum].w * (iscroll[snum].h + 1))) == NULL) {
       free(iscroll[snum]._sscr1);
       free(iscroll[snum].fast);
-      e(100);
+      runtime_error(100);
       return;
     }
     iscroll[snum].sscr2 = iscroll[snum]._sscr2;
@@ -1267,7 +1267,7 @@ void update_scroll(int);
 void _move_scroll(void) {
   snum = stack[sp];
   if (snum < 0 || snum > 9) {
-    e(107);
+    runtime_error(107);
     return;
   }
   if (iscroll[snum].on == 1)
@@ -1284,7 +1284,7 @@ void stop_scroll(void) {
   snum = stack[sp];
 
   if (snum < 0 || snum > 9) {
-    e(107);
+    runtime_error(107);
     return;
   }
 
@@ -1479,7 +1479,7 @@ void load_fnt(void) {
       break;
   if (ifonts == max_fonts) {
     stack[sp] = 0;
-    e(113);
+    runtime_error(113);
     return;
   }
 
@@ -1489,12 +1489,12 @@ void load_fnt(void) {
       goto fntfuera;
     if (m == -2) {
       stack[sp] = 0;
-      e(100);
+      runtime_error(100);
       return;
     }
     if (m <= 0) {
       stack[sp] = 0;
-      e(200);
+      runtime_error(200);
       return;
     }
     ptr = packptr;
@@ -1504,7 +1504,7 @@ void load_fnt(void) {
 fntfuera:
     if ((es = div_open_file((char *)&mem[stack[sp]])) == NULL) {
       stack[sp] = 0;
-      e(114);
+      runtime_error(114);
       return;
     } else {
       fseek(es, 0, SEEK_END);
@@ -1517,7 +1517,7 @@ fntfuera:
       } else {
         fclose(es);
         stack[sp] = 0;
-        e(118);
+        runtime_error(118);
         return;
       }
     }
@@ -1525,7 +1525,7 @@ fntfuera:
 
   if (strcmp((char *)ptr, "fnt\x1a\x0d\x0a")) {
     fonts[ifonts] = 0;
-    e(115);
+    runtime_error(115);
     free(ptr);
     return;
   }
@@ -1575,7 +1575,7 @@ fntfuera:
     f_i[ifonts].syspal = palcrc;
   }
 
-  max_reloj += get_reloj() - old_clock;
+  max_reloj += get_clock() - old_clock;
 }
 
 //----------------------------------------------------------------------------
@@ -1674,11 +1674,11 @@ void __write(void) {
   int f = stack[sp - 4];
 
   if (f < 0 || f >= max_fonts) {
-    e(116);
+    runtime_error(116);
     f = 0;
   }
   if (fonts[f] == 0) {
-    e(116);
+    runtime_error(116);
     f = 0;
   }
   x = 1;
@@ -1695,7 +1695,7 @@ void __write(void) {
     texts[x].type = 0;
     texts[x].ptr = stack[sp--];
     if (stack[sp] < 0 || stack[sp] > 8) {
-      e(117);
+      runtime_error(117);
       stack[sp] = 0;
     }
     texts[x].alignment = stack[sp--];
@@ -1706,7 +1706,7 @@ void __write(void) {
   } else {
     sp -= 4;
     stack[sp] = 0;
-    e(118);
+    runtime_error(118);
   }
 }
 
@@ -1717,11 +1717,11 @@ void __write(void) {
 void write_int(void) {
   int f = stack[sp - 4];
   if (f < 0 || f >= max_fonts) {
-    e(116);
+    runtime_error(116);
     f = 0;
   }
   if (fonts[f] == 0) {
-    e(116);
+    runtime_error(116);
     f = 0;
   }
   x = 1;
@@ -1737,7 +1737,7 @@ void write_int(void) {
     texts[x].type = 1;
     texts[x].ptr = stack[sp--];
     if (stack[sp] < 0 || stack[sp] > 8) {
-      e(117);
+      runtime_error(117);
       stack[sp] = 0;
     }
     texts[x].alignment = stack[sp--];
@@ -1748,7 +1748,7 @@ void write_int(void) {
   } else {
     sp -= 4;
     stack[sp] = 0;
-    e(118);
+    runtime_error(118);
   }
 }
 
@@ -1766,7 +1766,7 @@ void delete_text(void) {
       texts[x++].font = 0;
     while (x < MAX_TEXTS);
   } else
-    e(119);
+    runtime_error(119);
 }
 
 //----------------------------------------------------------------------------
@@ -1779,7 +1779,7 @@ void move_text(void) {
     texts[x].x = stack[sp - 1];
     texts[x].y = stack[sp];
   } else
-    e(119);
+    runtime_error(119);
   sp -= 2;
 }
 
@@ -1796,7 +1796,7 @@ void unload_fpg(void) {
       free(g[c].fpg);
       g[c].fpg = 0;
     } else
-      e(109);
+      runtime_error(109);
     if (g[c].grf != 0) {
       if (c) {
         free(g[c].grf);
@@ -1806,7 +1806,7 @@ void unload_fpg(void) {
       }
     }
   } else
-    e(109);
+    runtime_error(109);
 }
 
 //----------------------------------------------------------------------------
@@ -1887,7 +1887,7 @@ void define_region(void) {
   if (y + h > vga_height)
     h = vga_height - y;
   if (w < 0 || h < 0) {
-    e(120);
+    runtime_error(120);
     return;
   }
 
@@ -1899,7 +1899,7 @@ void define_region(void) {
     stack[sp] = 1;
   } else {
     stack[sp] = 0;
-    e(108);
+    runtime_error(108);
   }
 }
 
@@ -1955,7 +1955,7 @@ void map_xput(void) {
   file = stack[sp];
 
   if (file > max_fpgs || file < 0) {
-    e(109);
+    runtime_error(109);
     return;
   }
   if (file)
@@ -1963,11 +1963,11 @@ void map_xput(void) {
   else
     max_grf = 2000;
   if (graf1 <= 0 || graf1 >= max_grf) {
-    e(110);
+    runtime_error(110);
     return;
   }
   if (g[file].grf == NULL) {
-    e(111);
+    runtime_error(111);
     return;
   }
 
@@ -1975,7 +1975,7 @@ void map_xput(void) {
     put_sprite(file, graf2, x, y, angle, size, flags, -1, (byte *)ptr + 64 + ptr[15] * 4, ptr[13],
                ptr[14]);
   } else
-    e(121);
+    runtime_error(121);
 }
 
 //----------------------------------------------------------------------------
@@ -1993,7 +1993,7 @@ void map_put(void) {
   file = stack[sp];
 
   if (file > max_fpgs || file < 0) {
-    e(109);
+    runtime_error(109);
     return;
   }
   if (file)
@@ -2001,18 +2001,18 @@ void map_put(void) {
   else
     max_grf = 2000;
   if (graf1 <= 0 || graf1 >= max_grf) {
-    e(110);
+    runtime_error(110);
     return;
   }
   if (g[file].grf == NULL) {
-    e(111);
+    runtime_error(111);
     return;
   }
 
   if ((ptr = g[file].grf[graf1]) != NULL) {
     put_sprite(file, graf2, x, y, 0, 100, 0, -1, (byte *)ptr + 64 + ptr[15] * 4, ptr[13], ptr[14]);
   } else
-    e(121);
+    runtime_error(121);
 }
 
 //----------------------------------------------------------------------------
@@ -2037,7 +2037,7 @@ void map_block_copy(void) {
   file = stack[sp];
 
   if (file > max_fpgs || file < 0) {
-    e(109);
+    runtime_error(109);
     return;
   }
   if (file)
@@ -2045,15 +2045,15 @@ void map_block_copy(void) {
   else
     max_grf = 2000;
   if (grafd <= 0 || grafd >= max_grf) {
-    e(110);
+    runtime_error(110);
     return;
   }
   if (graf <= 0 || graf >= max_grf) {
-    e(110);
+    runtime_error(110);
     return;
   }
   if (g[file].grf == NULL) {
-    e(111);
+    runtime_error(111);
     return;
   }
 
@@ -2103,9 +2103,9 @@ no:
       vga_width = _saved_width;
       vga_height = _saved_height;
     } else
-      e(121);
+      runtime_error(121);
   } else
-    e(121);
+    runtime_error(121);
 }
 
 //----------------------------------------------------------------------------
@@ -2132,12 +2132,12 @@ void screen_copy(void) {
     w = region[reg].x1 - region[reg].x0;
     h = region[reg].y1 - region[reg].y0;
   } else {
-    e(108);
+    runtime_error(108);
     return;
   }
 
   if (file > max_fpgs || file < 0) {
-    e(109);
+    runtime_error(109);
     return;
   }
   if (file)
@@ -2145,16 +2145,16 @@ void screen_copy(void) {
   else
     max_grf = 2000;
   if (graf <= 0 || graf >= max_grf) {
-    e(110);
+    runtime_error(110);
     return;
   }
   if (g[file].grf == NULL) {
-    e(111);
+    runtime_error(111);
     return;
   }
 
   if ((ptr = g[file].grf[graf]) == NULL) {
-    e(121);
+    runtime_error(121);
     return;
   }
 
@@ -2218,7 +2218,7 @@ void put_screen(void) {
   file = stack[sp];
 
   if (file < 0 || file > max_fpgs) {
-    e(109);
+    runtime_error(109);
     return;
   }
   if (file)
@@ -2226,15 +2226,15 @@ void put_screen(void) {
   else
     max_grf = 2000;
   if (graf <= 0 || graf >= max_grf) {
-    e(110);
+    runtime_error(110);
     return;
   }
   if (g[file].grf == NULL) {
-    e(111);
+    runtime_error(111);
     return;
   }
   if ((ptr = g[file].grf[graf]) == NULL) {
-    e(121);
+    runtime_error(121);
     return;
   }
 
@@ -2296,7 +2296,7 @@ void map_put_pixel(void) {
   file = stack[sp];
 
   if (file < 0 || file > max_fpgs) {
-    e(109);
+    runtime_error(109);
     return;
   }
   if (file)
@@ -2304,15 +2304,15 @@ void map_put_pixel(void) {
   else
     max_grf = 2000;
   if (graf <= 0 || graf >= max_grf) {
-    e(110);
+    runtime_error(110);
     return;
   }
   if (g[file].grf == NULL) {
-    e(111);
+    runtime_error(111);
     return;
   }
   if ((ptr = g[file].grf[graf]) == NULL) {
-    e(121);
+    runtime_error(121);
     return;
   }
 
@@ -2337,7 +2337,7 @@ void map_get_pixel(void) {
   file = stack[sp];
 
   if (file < 0 || file > max_fpgs) {
-    e(109);
+    runtime_error(109);
     return;
   }
   if (file)
@@ -2345,15 +2345,15 @@ void map_get_pixel(void) {
   else
     max_grf = 2000;
   if (graf <= 0 || graf >= max_grf) {
-    e(110);
+    runtime_error(110);
     return;
   }
   if (g[file].grf == NULL) {
-    e(111);
+    runtime_error(111);
     return;
   }
   if ((ptr = g[file].grf[graf]) == NULL) {
-    e(121);
+    runtime_error(121);
     return;
   }
 
@@ -2381,7 +2381,7 @@ void get_point(void) {
   stack[sp] = 0;
 
   if (file < 0 || file > max_fpgs) {
-    e(109);
+    runtime_error(109);
     return;
   }
   if (file)
@@ -2389,15 +2389,15 @@ void get_point(void) {
   else
     max_grf = 2000;
   if (graf <= 0 || graf >= max_grf) {
-    e(110);
+    runtime_error(110);
     return;
   }
   if (g[file].grf == NULL) {
-    e(111);
+    runtime_error(111);
     return;
   }
   if ((ptr = g[file].grf[graf]) == NULL) {
-    e(121);
+    runtime_error(121);
     return;
   }
 
@@ -2473,13 +2473,13 @@ void save(void) {
 
   if (!validate_address(offset) || !validate_address(offset + lon)) {
     stack[sp] = 0;
-    e(122);
+    runtime_error(122);
     return;
   }
   es = open_save_file((byte *)&mem[stack[sp]]);
   if (es == NULL) {
     stack[sp] = 0;
-    e(123);
+    runtime_error(123);
     return;
   }
 
@@ -2488,9 +2488,9 @@ void save(void) {
   fclose(es);
 
   if (lon != llon) //*unit_size)
-    e(124);
+    runtime_error(124);
 
-  max_reloj += get_reloj() - old_clock;
+  max_reloj += get_clock() - old_clock;
 }
 
 void _save(void) {
@@ -2503,7 +2503,7 @@ void _save(void) {
   offset = stack[sp--];
   if (offset < HEADER_LENGTH || offset + lon > imem_max) {
     stack[sp] = 0;
-    e(122);
+    runtime_error(122);
     return;
   }
   es = open_save_file((byte *)&mem[stack[sp]]);
@@ -2512,13 +2512,13 @@ void _save(void) {
     // Save failure is silently ignored (file may be on read-only media)
     return;
   }
-  //  if (fwrite(&mem[offset],unit_size,lon,es)!=lon) e(124);
+  //  if (fwrite(&mem[offset],unit_size,lon,es)!=lon) runtime_error(124);
   llon = fwrite(&mem[offset], unit_size, lon, es);
   fclose(es);
 
   if (llon != lon)
-    e(124);
-  max_reloj += get_reloj() - old_clock;
+    runtime_error(124);
+  max_reloj += get_clock() - old_clock;
 }
 
 
@@ -2536,7 +2536,7 @@ void load(void) {
   offset = stack[sp--];
   if (!validate_address(offset)) {
     stack[sp] = 0;
-    e(125);
+    runtime_error(125);
     return;
   }
   //fprintf(stdout, "loading data from: %s\n",(byte*)&mem[stack[sp]]);
@@ -2549,17 +2549,17 @@ void load(void) {
     if (lon > 0) {
       if (!validate_address(offset + lon)) {
         stack[sp] = 0;
-        e(125);
+        runtime_error(125);
         return;
       }
       memcpy(&mem[offset], packptr, lon);
-      max_reloj += get_reloj() - old_clock;
+      max_reloj += get_clock() - old_clock;
       return;
     }
 
     stack[sp] = 0;
 #ifdef DEBUG
-    e(126);
+    runtime_error(126);
 #endif
     return;
   }
@@ -2572,17 +2572,17 @@ void load(void) {
   fseek(es, 0, SEEK_SET);
   if (!validate_address(offset + lon)) {
     stack[sp] = 0;
-    e(125);
+    runtime_error(125);
     return;
   }
   lon = lon / unit_size;
   fbytes = fread(&mem[offset], unit_size, lon, es);
   if (fbytes != lon) {
     //fprintf(stdout,"Bytes read: %d bytes wanted: %d len: %d unit_size: %d\n",fbytes, lon*unit_size, lon, unit_size);
-    e(127);
+    runtime_error(127);
   }
   fclose(es);
-  max_reloj += get_reloj() - old_clock;
+  max_reloj += get_clock() - old_clock;
 }
 
 //----------------------------------------------------------------------------
@@ -2710,12 +2710,12 @@ void load_pcm(void) {
       goto pcmfuera;
     if (m == -2) {
       stack[sp] = 0;
-      e(100);
+      runtime_error(100);
       return;
     }
     if (m <= 0) {
       stack[sp] = 0;
-      e(200);
+      runtime_error(200);
       return;
     }
     ptr = (char *)packptr;
@@ -2724,7 +2724,7 @@ void load_pcm(void) {
 pcmfuera:
     if ((es = div_open_file((char *)&mem[stack[sp]])) == NULL) {
       stack[sp] = -1;
-      e(128);
+      runtime_error(128);
       return;
     } else {
       fseek(es, 0, SEEK_END);
@@ -2736,7 +2736,7 @@ pcmfuera:
       } else {
         fclose(es);
         stack[sp] = 0;
-        e(100);
+        runtime_error(100);
         return;
       }
     }
@@ -2746,7 +2746,7 @@ pcmfuera:
 
   free(ptr);
 
-  max_reloj += get_reloj() - old_clock;
+  max_reloj += get_clock() - old_clock;
 }
 
 //----------------------------------------------------------------------------
@@ -2779,14 +2779,14 @@ void _sound(void) {
     stack[sp] = 0;
 #endif
   }
-  // if (stack[sp]==-1) e(129);
+  // if (stack[sp]==-1) runtime_error(129);
 }
 
 //----------------------------------------------------------------------------
 //      Stop_sound(channel_id)
 //----------------------------------------------------------------------------
 
-extern int MusicChannels;
+extern int music_channels;
 
 void stop_sound(void) {
 #ifdef MIXER
@@ -2852,12 +2852,12 @@ void load_song(void) {
       goto songfuera;
     if (m == -2) {
       stack[sp] = 0;
-      e(100);
+      runtime_error(100);
       return;
     }
     if (m <= 0) {
       stack[sp] = 0;
-      e(200);
+      runtime_error(200);
       return;
     }
     ptr = (char *)packptr;
@@ -2866,7 +2866,7 @@ void load_song(void) {
 songfuera:
     if ((es = div_open_file((char *)&mem[stack[sp]])) == NULL) {
       stack[sp] = -1;
-      e(167);
+      runtime_error(167);
       return;
     } else {
       fseek(es, 0, SEEK_END);
@@ -2878,7 +2878,7 @@ songfuera:
       } else {
         fclose(es);
         stack[sp] = 0;
-        e(100);
+        runtime_error(100);
         return;
       }
     }
@@ -2887,7 +2887,7 @@ songfuera:
 
   free(ptr);
 
-  max_reloj += get_reloj() - old_clock;
+  max_reloj += get_clock() - old_clock;
 }
 
 //----------------------------------------------------------------------------
@@ -2958,7 +2958,7 @@ void is_playing_song(void) {
 //----------------------------------------------------------------------------
 //      Set_fps(fps, max frame skips)
 //----------------------------------------------------------------------------
-void mainloop(void);
+void runtime_main_loop(void);
 
 void set_fps(void) {
   max_frame_skips = stack[sp--];
@@ -2986,12 +2986,12 @@ void start_fli(void) {
 #ifdef USE_FLI
   if ((es = div_open_file((char *)&mem[stack[sp]])) == NULL) {
     stack[sp] = 0;
-    e(147);
+    runtime_error(147);
   } else {
     fclose(es);
     stack[sp] = fli_start(full, (char *)back_buffer, vga_width, vga_height, x, y);
     if (stack[sp] == 0)
-      e(130);
+      runtime_error(130);
   }
 #endif
 
@@ -3052,7 +3052,7 @@ void _system(void) {
       setup_video_mode();
       set_dac();
       set_mouse(mouse->x, mouse->y);
-      readmouse();
+      read_mouse();
       full_redraw = 1;
     } else {
       system((char *)&mem[stack[sp]]);
@@ -3118,7 +3118,7 @@ void start_mode7(void) {
   stack[sp] = 0;
 
   if (n < 0 || n > 9) {
-    e(131);
+    runtime_error(131);
     return;
   }
   (m7 + n)->horizon = m;
@@ -3136,17 +3136,17 @@ void start_mode7(void) {
     im7[n].w = region[reg].x1 - region[reg].x0;
     im7[n].h = region[reg].y1 - region[reg].y0;
   } else {
-    e(108);
+    runtime_error(108);
     return;
   }
 
   if (im7[n].w == 0 || im7[n].h == 0) {
-    e(146);
+    runtime_error(146);
     return;
   }
 
   if (file < 0 || file > max_fpgs) {
-    e(109);
+    runtime_error(109);
     return;
   }
   if (file)
@@ -3154,21 +3154,21 @@ void start_mode7(void) {
   else
     max_grf = 2000;
   if (graf1 < 0 || graf1 >= max_grf) {
-    e(110);
+    runtime_error(110);
     return;
   }
   if (graf2 < 0 || graf2 >= max_grf) {
-    e(110);
+    runtime_error(110);
     return;
   }
   if (g[file].grf == NULL) {
-    e(111);
+    runtime_error(111);
     return;
   }
   ptr1 = g[file].grf[graf1];
   ptr2 = g[file].grf[graf2];
   if (ptr1 == NULL && ptr2 == NULL) {
-    e(132);
+    runtime_error(132);
     return;
   }
   if (ptr1 == NULL) {
@@ -3242,7 +3242,7 @@ void stop_mode7(void) {
   int n = stack[sp];
 
   if (n < 0 || n > 9) {
-    e(131);
+    runtime_error(131);
     return;
   }
   im7[n].on = 0;
@@ -3463,7 +3463,7 @@ void get_real_point(void) {
   n = stack[sp];
 
   if (mem[id + _File] > max_fpgs || mem[id + _File] < 0) {
-    e(109);
+    runtime_error(109);
     return;
   }
   if (mem[id + _File])
@@ -3471,15 +3471,15 @@ void get_real_point(void) {
   else
     max_grf = 2000;
   if (mem[id + _Graph] <= 0 || mem[id + _Graph] >= max_grf) {
-    e(110);
+    runtime_error(110);
     return;
   }
   if (g[mem[id + _File]].grf == NULL) {
-    e(111);
+    runtime_error(111);
     return;
   }
   if ((ptr = g[mem[id + _File]].grf[mem[id + _Graph]]) == NULL) {
-    e(121);
+    runtime_error(121);
     return;
   }
 
@@ -3557,7 +3557,7 @@ void get_real_point(void) {
     mem[dx] = px;
     mem[dy] = py;
   } else
-    e(133);
+    runtime_error(133);
 }
 
 //----------------------------------------------------------------------------
@@ -3586,15 +3586,15 @@ int ej[4] = {-1, -1, -1, -1};
 void get_joy_position(void) {
   if (stack[sp] < 0 || stack[sp] > 3) {
     stack[sp] = 0;
-    e(134);
+    runtime_error(134);
     return;
   }
 
   stack[sp] = joy_position(stack[sp]);
 }
 
-int joy_position(int eje) {
-  return OSDEP_JoystickGetAxis(divjoy, eje) / 100;
+int joy_position(int axis) {
+  return OSDEP_JoystickGetAxis(divjoy, axis) / 100;
 }
 
 //----------------------------------------------------------------------------
@@ -3662,11 +3662,11 @@ void convert_palette(void) {
   file = stack[sp];
 
   if (!validate_address(pal_ofs) || !validate_address(pal_ofs + 256)) {
-    e(136);
+    runtime_error(136);
     return;
   }
   if (file < 0 || file > max_fpgs) {
-    e(109);
+    runtime_error(109);
     return;
   }
   if (file)
@@ -3674,15 +3674,15 @@ void convert_palette(void) {
   else
     max_grf = 2000;
   if (graf <= 0 || graf >= max_grf) {
-    e(110);
+    runtime_error(110);
     return;
   }
   if (g[file].grf == NULL) {
-    e(111);
+    runtime_error(111);
     return;
   }
   if ((ptr = g[file].grf[graf]) == NULL) {
-    e(121);
+    runtime_error(121);
     return;
   }
 
@@ -3777,13 +3777,13 @@ void _strchar(void) { // char("0") -> 48
 void _strcpy(void) {
   if ((mem[stack[sp - 1] - 1] & 0xFFF00000) != 0xDAD00000) {
     sp--;
-    e(164);
+    runtime_error(164);
     return;
   }
   if ((unsigned)stack[sp] > 255)
     if ((mem[stack[sp - 1] - 1] & 0xFFFFF) + 1 < strlen((char *)&mem[stack[sp]])) {
       sp--;
-      e(140);
+      runtime_error(140);
       return;
     }
   if ((unsigned)stack[sp] > 255)
@@ -3798,7 +3798,7 @@ void _strcat(void) {
   int n;
   if ((mem[stack[sp - 1] - 1] & 0xFFF00000) != 0xDAD00000) {
     sp--;
-    e(164);
+    runtime_error(164);
     return;
   }
   if ((unsigned)stack[sp] > 255)
@@ -3807,7 +3807,7 @@ void _strcat(void) {
     n = 1;
   if ((mem[stack[sp - 1] - 1] & 0xFFFFF) + 1 < strlen((char *)&mem[stack[sp - 1]]) + n) {
     sp--;
-    e(140);
+    runtime_error(140);
     return;
   }
   if ((unsigned)stack[sp] > 255) {
@@ -3877,7 +3877,7 @@ void __strset(void) {
   int n;
   if ((mem[stack[sp - 1] - 1] & 0xFFF00000) != 0xDAD00000) {
     sp--;
-    e(164);
+    runtime_error(164);
     return;
   }
   n = (mem[stack[sp - 1] - 1] & 0xFFFFF) + 1;
@@ -3926,7 +3926,7 @@ void __strlwr(void) {
   }
 }
 
-void strdelbeg(char *s, int n) {
+void str_del_beg(char *s, int n) {
   int len = strlen(s);
   if (n > 0) {
     if (n >= len)
@@ -3939,7 +3939,7 @@ void strdelbeg(char *s, int n) {
   }
 }
 
-void strdelend(char *s, int n) {
+void str_del_end(char *s, int n) {
   int len = strlen(s);
   if (n > 0) {
     if (n >= len)
@@ -3959,21 +3959,21 @@ void _strdel(void) { // (string,n,m) delete <n> chars from start and <m> from en
   int n = stack[sp--];
 
   if ((mem[stack[sp] - 1] & 0xFFF00000) != 0xDAD00000) {
-    e(164);
+    runtime_error(164);
     return;
   }
 
   if ((mem[stack[sp] - 1] & 0xFFFFF) + 1 < strlen((char *)&mem[stack[sp]]) - n - m) {
-    e(140);
+    runtime_error(140);
     return;
   }
 
   if (n > m) { // Delete from start first
-    strdelbeg((char *)&mem[stack[sp]], n);
-    strdelend((char *)&mem[stack[sp]], m);
+    str_del_beg((char *)&mem[stack[sp]], n);
+    str_del_end((char *)&mem[stack[sp]], m);
   } else { // Delete from end first
-    strdelend((char *)&mem[stack[sp]], m);
-    strdelbeg((char *)&mem[stack[sp]], n);
+    str_del_end((char *)&mem[stack[sp]], m);
+    str_del_beg((char *)&mem[stack[sp]], n);
   }
 }
 
@@ -4022,7 +4022,7 @@ int unsort0(const void *a, const void *b) {
   return unsort00((byte *)a, (byte *)b);
 }
 
-int strcmpsort(const void *a, const void *b) {
+int strcmp_sort(const void *a, const void *b) {
   return strcmp((char *)a, (char *)b);
 }
 
@@ -4062,7 +4062,7 @@ void sort(void) {
         qsort(&mem[offset], numreg, size * 4, sort4);
       break;
     }
-  max_reloj += get_reloj() - old_clock;
+  max_reloj += get_clock() - old_clock;
 }
 
 //----------------------------------------------------------------------------
@@ -4082,8 +4082,8 @@ function 129 int flush()            // Flush write buffers and return number of 
 function 130 int get_dirinfo(0,0)   // Read a directory ("dir\*.pr?",_hidden+_system+_subdir) into the dirinfo(files,name[]) struct and return "files" (count)
 function 131 string get_fileinfo(0) // Fill the fileinfo struct (fullpath (or cwd), drive, dir, name, ext, size, date, time, attrib) and return pointer to "fullpath" or "cwd"
 
-function 132 int getdrive()         // Returns current drive (1-A, 2-B, ...)
-function 133 int setdrive(0)        // Set current drive (same)
+function 132 int getdrive()         // Returns current drive (1-A, 2-B, ...) [C: get_drive()]
+function 133 int setdrive(0)        // Set current drive (same) [C: set_drive()]
 function 134 int chdir(0)           // Change current directory ("..")
 function 135 int mkdir(0)           // Create a new directory (from cwd)
 function 136 int remove(0)          // Delete files or directories (wildcards accepted) (auto rmdir)
@@ -4112,7 +4112,7 @@ void _fopen(void) { // Search for the file, as it may have been included in the 
       break;
   if (n < strlen(modo)) {
     stack[sp] = 0;
-    e(166);
+    runtime_error(166);
   }
   div_strcat(modo, sizeof(modo), "b");
 
@@ -4162,7 +4162,7 @@ void _fopen(void) { // Search for the file, as it may have been included in the 
     if (x == 32) {
       fclose(f);
       stack[sp] = 0;
-      e(169);
+      runtime_error(169);
     } else {
       tabfiles[x] = f;
       stack[sp] = x * 2 + 1;
@@ -4170,7 +4170,7 @@ void _fopen(void) { // Search for the file, as it may have been included in the 
   } else {
     stack[sp] = 0;
     if (errno == EMFILE) {
-      e(169);
+      runtime_error(169);
     }
   }
 }
@@ -4190,7 +4190,7 @@ void _fclose(void) {
   } else {
     if (!(stack[sp] & 1) || stack[sp] < 1 || stack[sp] > 63) {
 #ifdef DEBUG
-      e(170);
+      runtime_error(170);
 #else
       stack[sp] = 0;
 #endif
@@ -4198,7 +4198,7 @@ void _fclose(void) {
     }
     n = stack[sp] / 2;
     if (tabfiles[n] == 0) {
-      e(170);
+      runtime_error(170);
       return;
     }
     stack[sp] = fclose((FILE *)(tabfiles[n]));
@@ -4226,29 +4226,29 @@ void _fread(void) {
   offset = stack[sp];
 
   if (!(handle & 1) || handle < 1 || handle > 63) {
-    e(170);
+    runtime_error(170);
     return;
   }
   if (tabfiles[handle / 2] == 0) {
-    e(170);
+    runtime_error(170);
     return;
   }
   f = (FILE *)tabfiles[handle / 2];
   if (!validate_address(offset) || !validate_address(offset + (lon * unit_size) / 4)) {
     stack[sp] = 0;
-    e(125);
+    runtime_error(125);
     return;
   }
   n = fread(&mem[offset], 1, unit_size * lon, f); // Bytes read
   if ((n + unit_size - 1) / unit_size < lon) {
     stack[sp] = 0;
-    e(127);
+    runtime_error(127);
   } else {
     if (n / unit_size < lon)
       memset(&memb[offset * 4 + n], 0, lon * unit_size - n);
     stack[sp] = 1;
   }
-  max_reloj += get_reloj() - old_clock;
+  max_reloj += get_clock() - old_clock;
 }
 
 //----------------------------------------------------------------------------
@@ -4267,25 +4267,25 @@ void _fwrite(void) {
   offset = stack[sp];
 
   if (!(handle & 1) || handle < 1 || handle > 63) {
-    e(170);
+    runtime_error(170);
     return;
   }
   if (tabfiles[handle / 2] == 0) {
-    e(170);
+    runtime_error(170);
     return;
   }
   f = (FILE *)tabfiles[handle / 2];
   if (!validate_address(offset) || !validate_address(offset + (lon * unit_size) / 4)) {
     stack[sp] = 0;
-    e(122);
+    runtime_error(122);
     return;
   }
   if (fwrite(&mem[offset], unit_size, lon, f) != lon) {
     stack[sp] = 0;
-    e(124);
+    runtime_error(124);
   } else
     stack[sp] = 1;
-  max_reloj += get_reloj() - old_clock;
+  max_reloj += get_clock() - old_clock;
 }
 
 //----------------------------------------------------------------------------
@@ -4304,11 +4304,11 @@ void _fseek(void) {
   handle = stack[sp];
 
   if (!(handle & 1) || handle < 1 || handle > 63) {
-    e(170);
+    runtime_error(170);
     return;
   }
   if (tabfiles[handle / 2] == 0) {
-    e(170);
+    runtime_error(170);
     return;
   }
   f = (FILE *)tabfiles[handle / 2];
@@ -4326,11 +4326,11 @@ void _ftell(void) {
     unit_size = 1;
 
   if (!(stack[sp] & 1) || stack[sp] < 1 || stack[sp] > 63) {
-    e(170);
+    runtime_error(170);
     return;
   }
   if (tabfiles[stack[sp] / 2] == 0) {
-    e(170);
+    runtime_error(170);
     return;
   }
   stack[sp] = (int)(ftell((FILE *)tabfiles[stack[sp] / 2]) + unit_size - 1) / unit_size;
@@ -4347,11 +4347,11 @@ void __filelength(void) {
     unit_size = 1;
 
   if (!(stack[sp] & 1) || stack[sp] < 1 || stack[sp] > 63) {
-    e(170);
+    runtime_error(170);
     return;
   }
   if (tabfiles[stack[sp] / 2] == 0) {
-    e(170);
+    runtime_error(170);
     return;
   }
 
@@ -4399,7 +4399,7 @@ void get_dirinfo(void) {
     x++;
   }
 
-  qsort(filenames, x, 16, strcmpsort);
+  qsort(filenames, x, 16, strcmp_sort);
 
   dirinfo->files = stack[sp] = x;
 }
@@ -4457,18 +4457,18 @@ void get_fileinfo(void) {
 }
 
 //----------------------------------------------------------------------------
-//      getdrive() returns drive number (1-A, 2-B, 3-C, ...)
+//      get_drive() returns drive number (1-A, 2-B, 3-C, ...)
 //----------------------------------------------------------------------------
 
-void getdrive(void) {
+void get_drive(void) {
   stack[++sp] = 0;
 }
 
 //----------------------------------------------------------------------------
-//      setdrive(drive)
+//      set_drive(drive)
 //----------------------------------------------------------------------------
 
-void setdrive(void) {
+void set_drive(void) {
   unsigned int total;
   _dos_setdrive(stack[sp], &total);
   stack[sp] = 0;
@@ -4590,7 +4590,7 @@ int mem_get_heap_free() {
   return 65535;
 }
 
-void get_free_mem(meminfo *Meminfo) {}
+void get_free_mem(meminfo *meminfo_ptr) {}
 
 //----------------------------------------------------------------------------
 //      disk_free(drive)
@@ -4623,7 +4623,7 @@ void ignore_error(void) {
   if (n >= num_skipped && num_skipped < 127) {
     skipped[num_skipped++] = stack[sp];
   } else if (num_skipped == 127)
-    e(168);
+    runtime_error(168);
   stack[sp] = 0;
 }
 
@@ -4647,7 +4647,7 @@ void _asin(void) {
   float seno = (float)stack[sp] / 1000.0;
   if (stack[sp] < -1000 || stack[sp] > 1000) {
     stack[sp] = 0;
-    e(171);
+    runtime_error(171);
     return;
   }
   stack[sp] = (int)((float)asin(seno) * radian);
@@ -4666,7 +4666,7 @@ void _acos(void) {
   float coseno = (float)stack[sp] / 1000.0;
   if (stack[sp] < -1000 || stack[sp] > 1000) {
     stack[sp] = 0;
-    e(171);
+    runtime_error(171);
     return;
   }
   stack[sp] = (int)((float)acos(coseno) * radian);
@@ -4727,7 +4727,7 @@ void draw(void) {
   if (x == max_drawings) {
     sp -= 7;
     stack[sp] = 0;
-    e(172);
+    runtime_error(172);
     return;
   }
 
@@ -4742,19 +4742,19 @@ void draw(void) {
 
   if (drawing[x].type < 1 || drawing[x].type > tipo_mayor) {
     drawing[x].type = 0;
-    e(173);
+    runtime_error(173);
   }
   if (drawing[x].color < 0 || drawing[x].color > 255) {
     drawing[x].type = 0;
-    e(154);
+    runtime_error(154);
   }
   if (drawing[x].opacity < 0 || drawing[x].opacity > 15) {
     drawing[x].type = 0;
-    e(174);
+    runtime_error(174);
   }
   if (drawing[x].region < 0 || drawing[x].region >= max_region) {
     drawing[x].type = 0;
-    e(108);
+    runtime_error(108);
   }
 
   if (drawing[x].type)
@@ -4778,14 +4778,14 @@ void delete_draw(void) {
   } else {
     if ((draw_id & 1) == 0 || draw_id < 1 || draw_id > max_drawings * 2 - 1) {
       stack[sp] = 0;
-      e(175);
+      runtime_error(175);
       return;
     }
     draw_id /= 2;
 
     if (drawing[draw_id].type == 0) {
       stack[sp] = 0;
-      e(175);
+      runtime_error(175);
       return;
     }
 
@@ -4805,14 +4805,14 @@ void move_draw(void) {
   if ((draw_id & 1) == 0 || draw_id < 1 || draw_id > max_drawings * 2 - 1) {
     sp -= 6;
     stack[sp] = 0;
-    e(175);
+    runtime_error(175);
     return;
   }
   draw_id /= 2;
 
   if (drawing[draw_id].type == 0) {
     stack[sp] = 0;
-    e(175);
+    runtime_error(175);
     return;
   }
 
@@ -4826,11 +4826,11 @@ void move_draw(void) {
 
   if (drawing[draw_id].color < 0 || drawing[draw_id].color > 255) {
     drawing[draw_id].type = 0;
-    e(154);
+    runtime_error(154);
   }
   if (drawing[draw_id].opacity < 0 || drawing[draw_id].opacity > 15) {
     drawing[draw_id].type = 0;
-    e(174);
+    runtime_error(174);
   }
 }
 
@@ -4856,7 +4856,7 @@ void save_mapcx(int tipo) {
   stack[sp] = 0;
 
   if (file > max_fpgs || file < 0) {
-    e(109);
+    runtime_error(109);
     return;
   }
   if (file)
@@ -4864,15 +4864,15 @@ void save_mapcx(int tipo) {
   else
     max_grf = 2000;
   if (graph <= 0 || graph >= max_grf) {
-    e(110);
+    runtime_error(110);
     return;
   }
   if (g[file].grf == NULL) {
-    e(111);
+    runtime_error(111);
     return;
   }
   if ((ptr = g[file].grf[graph]) == NULL) {
-    e(121);
+    runtime_error(121);
     return;
   }
 
@@ -4881,26 +4881,26 @@ void save_mapcx(int tipo) {
   buffer = (byte *)ptr + 64 + ptr[15] * 4;
 
   if ((f = open_save_file((byte *)cwork)) == NULL) {
-    e(123);
+    runtime_error(123);
     return;
   }
   if (tipo) {
     if (save_PCX(buffer, w, h, f)) {
       fclose(f);
-      e(100);
+      runtime_error(100);
       return;
     }
   } else {
     if (save_MAP(buffer, w, h, f)) {
       fclose(f);
-      e(100);
+      runtime_error(100);
       return;
     }
   }
   fclose(f);
   stack[sp] = 1;
 
-  max_reloj += get_reloj() - old_clock;
+  max_reloj += get_clock() - old_clock;
 }
 
 //----------------------------------------------------------------------------
@@ -4920,16 +4920,16 @@ void write_in_map(void) {
   font_index = stack[sp];
 
   if (font_index < 0 || font_index >= max_fonts) {
-    e(116);
+    runtime_error(116);
     return;
   }
   if (fonts[font_index] == 0) {
-    e(116);
+    runtime_error(116);
     return;
   }
 
   if (alignment < 0 || alignment > 8) {
-    e(117);
+    runtime_error(117);
     return;
   }
 
@@ -5005,7 +5005,7 @@ void write_in_map(void) {
     stack[sp] = next_map_code;
 
   } else
-    e(100);
+    runtime_error(100);
 
   cx = 0; // Draw the text (ptr2) into ptr+68 (an*al)
 
@@ -5468,13 +5468,13 @@ void _malloc(void) {
 
   if (con == 256) {
     stack[sp] = 0;
-    e(179);
+    runtime_error(179);
     return;
   }
 
   if (stack[sp] < 1) {
     stack[sp] = 0;
-    e(181);
+    runtime_error(181);
     return;
   }
 
@@ -5482,7 +5482,7 @@ void _malloc(void) {
 
   if (!divmalloc[con].ptr) {
     stack[sp] = 0;
-    e(100);
+    runtime_error(100);
     return;
   }
 
@@ -5512,7 +5512,7 @@ void _free(void) {
 
   if (con == 256 || stack[sp] == 0) {
     stack[sp] = 0;
-    e(180);
+    runtime_error(180);
     return;
   }
 
@@ -5543,7 +5543,7 @@ void encode(void) {
 
   if (!validate_address(offset) || !validate_address(offset + size)) {
     stack[sp] = 0;
-    e(182);
+    runtime_error(182);
     return;
   }
   stack[sp] = 1;
@@ -5596,7 +5596,7 @@ void encode_file(int encode) {
     rc = _dos_findnext(&ft);
   }
 
-  max_reloj += get_reloj() - old_clock;
+  max_reloj += get_clock() - old_clock;
 }
 
 void _encrypt(int encode, char *filename, char *key) {
@@ -5620,18 +5620,18 @@ void _encrypt(int encode, char *filename, char *key) {
         fclose(f);
         free(ptr);
         stack[sp] = 0;
-        e(127);
+        runtime_error(127);
         return;
       }
     } else {
       fclose(f);
       stack[sp] = 0;
-      e(100);
+      runtime_error(100);
       return;
     }
   } else {
     stack[sp] = 0;
-    e(105);
+    runtime_error(105);
     return;
   }
 
@@ -5660,7 +5660,7 @@ void _encrypt(int encode, char *filename, char *key) {
   if (rename(filename, full)) {
     stack[sp] = 0;
     free(ptr);
-    e(105);
+    runtime_error(105);
     return;
   }
 
@@ -5668,7 +5668,7 @@ void _encrypt(int encode, char *filename, char *key) {
     rename(full, filename);
     free(ptr);
     stack[sp] = 0;
-    e(105);
+    runtime_error(105);
     return;
   }
 
@@ -5679,7 +5679,7 @@ void _encrypt(int encode, char *filename, char *key) {
       rename(full, filename);
       free(ptr);
       stack[sp] = 0;
-      e(105);
+      runtime_error(105);
       return;
     }
   }
@@ -5690,7 +5690,7 @@ void _encrypt(int encode, char *filename, char *key) {
     rename(full, filename);
     free(ptr);
     stack[sp] = 0;
-    e(105);
+    runtime_error(105);
     return;
   }
 
@@ -5744,7 +5744,7 @@ void _compress(int encode) {
     rc = _dos_findnext(&ft);
   }
 
-  max_reloj += get_reloj() - old_clock;
+  max_reloj += get_clock() - old_clock;
 }
 
 void _compress_file(int encode, char *filename) {
@@ -5768,18 +5768,18 @@ void _compress_file(int encode, char *filename) {
         fclose(f);
         free(ptr);
         stack[sp] = 0;
-        e(127);
+        runtime_error(127);
         return;
       }
     } else {
       fclose(f);
       stack[sp] = 0;
-      e(100);
+      runtime_error(100);
       return;
     }
   } else {
     stack[sp] = 0;
-    e(105);
+    runtime_error(105);
     return;
   }
 
@@ -5790,7 +5790,7 @@ void _compress_file(int encode, char *filename) {
     if ((ptr_dest = (byte *)malloc(size2)) == NULL) {
       free(ptr);
       stack[sp] = 0;
-      e(100);
+      runtime_error(100);
       return;
     }
 #ifdef ZLIB
@@ -5802,7 +5802,7 @@ void _compress_file(int encode, char *filename) {
       free(ptr_dest);
       free(ptr);
       stack[sp] = 0;
-      e(100);
+      runtime_error(100);
       return;
     }
 
@@ -5821,7 +5821,7 @@ void _compress_file(int encode, char *filename) {
     if ((ptr_dest = (byte *)malloc(size2)) == NULL) {
       free(ptr);
       stack[sp] = 0;
-      e(100);
+      runtime_error(100);
       return;
     }
 #ifdef ZLIB
@@ -5833,7 +5833,7 @@ void _compress_file(int encode, char *filename) {
       free(ptr_dest);
       free(ptr);
       stack[sp] = 0;
-      e(100);
+      runtime_error(100);
       return;
     }
     size2 = *(int *)(ptr + 8);
@@ -5848,7 +5848,7 @@ void _compress_file(int encode, char *filename) {
   if (rename(filename, full)) {
     stack[sp] = 0;
     free(ptr_dest);
-    e(105);
+    runtime_error(105);
     return;
   }
 
@@ -5856,7 +5856,7 @@ void _compress_file(int encode, char *filename) {
     rename(full, filename);
     free(ptr_dest);
     stack[sp] = 0;
-    e(105);
+    runtime_error(105);
     return;
   }
 
@@ -5867,7 +5867,7 @@ void _compress_file(int encode, char *filename) {
       rename(full, filename);
       free(ptr_dest);
       stack[sp] = 0;
-      e(105);
+      runtime_error(105);
       return;
     }
     if (fwrite(&size, 1, 4, f) != 4) {
@@ -5876,7 +5876,7 @@ void _compress_file(int encode, char *filename) {
       rename(full, filename);
       free(ptr_dest);
       stack[sp] = 0;
-      e(105);
+      runtime_error(105);
       return;
     }
   }
@@ -5887,7 +5887,7 @@ void _compress_file(int encode, char *filename) {
     rename(full, filename);
     free(ptr_dest);
     stack[sp] = 0;
-    e(105);
+    runtime_error(105);
     return;
   }
 
@@ -5940,7 +5940,7 @@ void function(void) {
   int oticks = get_ticks();
 #endif
 
-  old_clock = get_reloj();
+  old_clock = get_clock();
 
   switch (v_function = (byte)mem[ip++]) {
   case 0:
@@ -6294,10 +6294,10 @@ void function(void) {
     get_fileinfo();
     break;
   case 116:
-    getdrive();
+    get_drive();
     break;
   case 117:
-    setdrive();
+    set_drive();
     break;
   case 118:
     div_chdir();

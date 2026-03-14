@@ -267,7 +267,7 @@ void close_window(void) {
   y = v.y;
   w = v.w;
   h = v.h;
-  divdelete(0);
+  div_delete(0);
   if (draw_mode < 100) {
     draw_edit_background(x, y, w, h);
     flush_bars(0);
@@ -1256,7 +1256,7 @@ void new_window(void_return_type_t init_handler) {
       }
     }
 
-    addwindow();
+    add_window();
 
     //---------------------------------------------------------------------------
     // The following values should define the init_handler, default values:
@@ -1490,12 +1490,12 @@ void new_window(void_return_type_t init_handler) {
 
     } else {
       if (n && window[n].foreground == WF_MINIMIZED) {
-        divdelete(0);
+        div_delete(0);
         move(0, n - 1);
         maximize_window();
       } else if (n) {
         if (window[n].foreground == WF_BACKGROUND) {
-          divdelete(0);
+          div_delete(0);
           move(0, n - 1);
           for (m = 1; m < MAX_WINDOWS; m++)
             if (window[m].type && window[m].foreground == WF_FOREGROUND)
@@ -1506,7 +1506,7 @@ void new_window(void_return_type_t init_handler) {
           v.foreground = WF_FOREGROUND;
           flush_window(0);
         } else { // When the requested menu is already in the foreground, highlight it
-          divdelete(0);
+          div_delete(0);
           move(0, n - 1);
           wrectangle(v.ptr, v.w / big2, v.h / big2, c4, 0, 0, v.w / big2, v.h / big2);
           init_flush();
@@ -1521,7 +1521,7 @@ void new_window(void_return_type_t init_handler) {
           retrace_wait();
         }
       } else {
-        divdelete(0);
+        div_delete(0);
       }
     }
   }

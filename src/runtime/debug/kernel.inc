@@ -65,7 +65,7 @@ if (stack[sp] == 0) {
   stack[--sp] = 0;
 #ifdef DEBUG
   v_function = -2;
-  e(145);
+  runtime_error(145);
   if (call_to_debug) {
     process_stoped = id;
     return;
@@ -81,7 +81,7 @@ if (stack[sp] == 0) {
   stack[--sp] = 0;
 #ifdef DEBUG
   v_function = -2;
-  e(145);
+  runtime_error(145);
   if (call_to_debug) {
     process_stoped = id;
     return;
@@ -111,7 +111,7 @@ case lrng:
 #ifdef DEBUG
 if (stack[sp] < 0 || stack[sp] > mem[ip]) {
   v_function = -2;
-  e(140);
+  runtime_error(140);
   if (call_to_debug) {
     ip++;
     process_stoped = id;
@@ -128,7 +128,7 @@ ip = mem[ip];
 #ifdef DEBUG
 if (frame_clock > max_reloj) {
   v_function = -2;
-  e(142);
+  runtime_error(142);
   max_reloj = max_process_time + frame_clock;
   if (call_to_debug) {
     process_stoped = id;
@@ -145,7 +145,7 @@ else
 #ifdef DEBUG
 if (frame_clock > max_reloj) {
   v_function = -2;
-  e(142);
+  runtime_error(142);
   max_reloj = max_process_time + frame_clock;
   if (call_to_debug) {
     process_stoped = id;
@@ -328,7 +328,7 @@ if (stack[sp] == 0) {
   stack[--sp] = 0;
 #ifdef DEBUG
   v_function = -2;
-  e(145);
+  runtime_error(145);
   if (call_to_debug) {
     process_stoped = id;
     return;
@@ -345,7 +345,7 @@ if (stack[sp] == 0) {
   stack[--sp] = 0;
 #ifdef DEBUG
   v_function = -2;
-  e(145);
+  runtime_error(145);
   if (call_to_debug) {
     process_stoped = id;
     return;
@@ -465,7 +465,7 @@ case lchk:
 #ifdef DEBUG
 if (stack[sp] < id_init || stack[sp] > id_max || stack[sp] != mem[stack[sp]]) {
   v_function = -2;
-  e(141);
+  runtime_error(141);
   if (call_to_debug) {
     process_stoped = id;
     return;
@@ -627,7 +627,7 @@ if (stack[sp] == 0) {
   stack[sp] = 0;
 #ifdef DEBUG
   v_function = -2;
-  e(145);
+  runtime_error(145);
   if (call_to_debug) {
     process_stoped = id;
     return;
@@ -645,7 +645,7 @@ if (stack[sp] == 0) {
   stack[sp] = 0;
 #ifdef DEBUG
   v_function = -2;
-  e(145);
+  runtime_error(145);
   if (call_to_debug) {
     process_stoped = id;
     return;
@@ -696,7 +696,7 @@ case lstrcpy:
 if ((mem[stack[sp - 1] - 1] & 0xFFF00000) != 0xDAD00000) {
   sp--;
   v_function = -2;
-  e(164);
+  runtime_error(164);
   if (call_to_debug) {
     process_stoped = id;
     return;
@@ -707,7 +707,7 @@ if ((unsigned)stack[sp] > 255)
   if ((mem[stack[sp - 1] - 1] & 0xFFFFF) + 1 < strlen((char *)&mem[stack[sp]])) {
     sp--;
     v_function = -2;
-    e(140);
+    runtime_error(140);
     if (call_to_debug) {
       process_stoped = id;
       return;
@@ -739,7 +739,7 @@ case lstrcat:
 if ((mem[stack[sp - 1] - 1] & 0xFFF00000) != 0xDAD00000) {
   sp--;
   v_function = -2;
-  e(164);
+  runtime_error(164);
   if (call_to_debug) {
     process_stoped = id;
     return;
@@ -753,7 +753,7 @@ else
 if ((mem[stack[sp - 1] - 1] & 0xFFFFF) + 1 < strlen((char *)&mem[stack[sp - 1]]) + oo) {
   sp--;
   v_function = -2;
-  e(140);
+  runtime_error(140);
   if (call_to_debug) {
     process_stoped = id;
     return;
@@ -787,7 +787,7 @@ else
 if (oo >= 1028) {
   sp--;
   v_function = -2;
-  e(140);
+  runtime_error(140);
   if (call_to_debug) {
     process_stoped = id;
     return;
@@ -850,7 +850,7 @@ oo = strlen((char *)&mem[stack[sp - 1]]);
 if ((mem[stack[sp - 1] - 1] & 0xFFF00000) != 0xDAD00000) {
   sp--;
   v_function = -2;
-  e(164);
+  runtime_error(164);
   if (call_to_debug) {
     process_stoped = id;
     return;
@@ -860,7 +860,7 @@ if ((mem[stack[sp - 1] - 1] & 0xFFF00000) != 0xDAD00000) {
 if ((mem[stack[sp - 1] - 1] & 0xFFFFF) + 1 < oo - stack[sp]) {
   sp--;
   v_function = -2;
-  e(140);
+  runtime_error(140);
   if (call_to_debug) {
     process_stoped = id;
     return;
@@ -1057,7 +1057,7 @@ if ((mem[stack[sp] - 1] & 0xFFF00000) != 0xDAD00000) {
   sp--;
   mem[id + _Param]++;
   v_function = -2;
-  e(164);
+  runtime_error(164);
   if (call_to_debug) {
     process_stoped = id;
     return;
@@ -1069,7 +1069,7 @@ if ((unsigned)stack[mem[id + _Param]] > 255) {
     sp--;
     mem[id + _Param]++;
     v_function = -2;
-    e(140);
+    runtime_error(140);
     if (call_to_debug) {
       process_stoped = id;
       return;
@@ -1132,7 +1132,7 @@ if (stack[sp] == 0) {
   stack[sp] = 0;
 #ifdef DEBUG
   v_function = -2;
-  e(145);
+  runtime_error(145);
   if (call_to_debug) {
     process_stoped = id;
     return;
@@ -1150,7 +1150,7 @@ if (stack[sp] == 0) {
   stack[sp] = 0;
 #ifdef DEBUG
   v_function = -2;
-  e(145);
+  runtime_error(145);
   if (call_to_debug) {
     process_stoped = id;
     return;
@@ -1198,7 +1198,7 @@ case lnul:
 #ifdef DEBUG
 if (!stack[sp]) {
   v_function = -2;
-  e(165);
+  runtime_error(165);
   if (call_to_debug) {
     process_stoped = id;
     return;

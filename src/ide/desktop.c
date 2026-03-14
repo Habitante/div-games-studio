@@ -8,10 +8,10 @@
 
 int create_saved_window(void_return_type_t init_handler, int nx, int ny);
 int load_new_map(int nx, int ny, char *name, byte *bitmap);
-void carga_programa0(void);
-void carga_Fonts0(void);
-void carga_help(int n, int helpal, int helpline, int x1, int x2);
-void help_xref(int n, int linea);
+void load_program0(void);
+void load_fonts0(void);
+void load_help(int n, int helpal, int helpline, int x1, int x2);
+void help_xref(int n, int line);
 void mixer0(void);
 void open_desktop_sound(FILE *f);
 void save_desktop_sound(pcminfo *mypcminfo, FILE *f);
@@ -54,8 +54,8 @@ void fonts1(void);
 void fonts2(void);
 void fonts3(void);
 
-void Load_Font_session(FILE *file);
-int Save_Font_session(FILE *file, int);
+void load_font_session(FILE *file);
+int save_font_session(FILE *file, int);
 FILE *desktop;
 
 char pathtmp[1024];
@@ -155,7 +155,7 @@ void download_desktop() {
           if (!strcmp((char *)window[x].name, (char *)texts[83])) {
             iWork = 1;
             n = fwrite(&iWork, 1, 4, desktop);
-            iWork = Save_Font_session(desktop, iWork);
+            iWork = save_font_session(desktop, iWork);
           } else if (!strcmp((char *)window[x].name, (char *)texts[413])) {
             iWork = 3;
             n = fwrite(&iWork, 1, 4, desktop);
@@ -386,7 +386,7 @@ int upload_desktop() {
           fread(&iWork, 1, 4, desktop);
           v_prg->vptr = v_prg->buffer + iWork;
 
-          create_saved_window(carga_programa0, window_aux.x, window_aux.y);
+          create_saved_window(load_program0, window_aux.x, window_aux.y);
 
           blit_region(screen_buffer, vga_width, vga_height, v.ptr, v.x, v.y, v.w, v.h, 0);
           if (!interpreting)
@@ -417,13 +417,13 @@ int upload_desktop() {
         break;
       } else {
         if (iWork == 1)
-          create_saved_window(carga_Fonts0, window_aux.x, window_aux.y);
+          create_saved_window(load_fonts0, window_aux.x, window_aux.y);
         else {
           if (iWork == 2) {
             fread(&iWork, 1, 4, desktop);
             fread(&iWork2, 1, 4, desktop);
             fread(&iWork3, 1, 4, desktop);
-            carga_help(iWork, iWork2, iWork3, window_aux.x, window_aux.y);
+            load_help(iWork, iWork2, iWork3, window_aux.x, window_aux.y);
           } else {
             if (iWork == 3) {
               readcalc = (struct _calc *)malloc(sizeof(struct _calc));
@@ -491,7 +491,7 @@ int create_saved_window(void_return_type_t init_handler, int nx, int ny) {
   uint32_t colorkey = 0;
 
   if (!window[MAX_WINDOWS - 1].type) {
-    addwindow();
+    add_window();
 
     //---------------------------------------------------------------------------
     // The following values must be set by init_handler, defaults:
@@ -696,7 +696,7 @@ int create_saved_window(void_return_type_t init_handler, int nx, int ny) {
       //---------------------------------------------------------------------------
 
     } else {
-      divdelete(0);
+      div_delete(0);
       return (1);
     }
 
@@ -747,7 +747,7 @@ int load_new_map(int nx, int ny, char *name, byte *bitmap) {
 
 void test_cursor(void);
 
-void carga_programa0(void) {
+void load_program0(void) {
   v.type = WIN_CODE;
 
   v.prg = v_prg;
@@ -793,14 +793,14 @@ void carga_programa0(void) {
 
 extern struct t_listbox lfontsizes;
 
-void carga_Fonts0(void) {
-  Load_Font_session(desktop);
+void load_fonts0(void) {
+  load_font_session(desktop);
 }
 
-void vuelca_help(void);
-void barra_vertical(void);
+void dump_help(void);
+void vertical_scrollbar(void);
 
-void carga_help(int n, int helpal, int helpline, int x1, int x2) {
+void load_help(int n, int helpal, int helpline, int x1, int x2) {
   FILE *f;
   byte *p;
   int m_back;
@@ -836,7 +836,7 @@ void carga_help(int n, int helpal, int helpline, int x1, int x2) {
           help_h = helpal;
 
           help_l = 0;
-          tabula_help(p + 1, help_buffer, helpidx[n * 2 + 1] - (p + 1 - h_buffer));
+          tabulate_help(p + 1, help_buffer, helpidx[n * 2 + 1] - (p + 1 - h_buffer));
           create_saved_window(help0, x1, x2);
 
           for (n = 0; n < helpline; n++) {
@@ -851,8 +851,8 @@ void carga_help(int n, int helpal, int helpline, int x1, int x2) {
             swap(v.w, v._w_saved);
             swap(v.h, v._h_saved);
           }
-          vuelca_help();
-          barra_vertical();
+          dump_help();
+          vertical_scrollbar();
           if (v.foreground == WF_MINIMIZED) {
             swap(v.w, v._w_saved);
             swap(v.h, v._h_saved);

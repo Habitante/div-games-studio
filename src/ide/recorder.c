@@ -8,107 +8,107 @@ FILE *grb_file;
 char CHUNK;
 int init_recorder = 0;
 
-int check_differences(byte *NewScreen) {
-  int x, Dif = 0;
+int check_differences(byte *new_screen) {
+  int x, dif = 0;
   for (x = 0; x < 64000; x++)
-    if ((frame_copy[x] ^= NewScreen[x]))
-      Dif = 1;
-  return (Dif);
+    if ((frame_copy[x] ^= new_screen[x]))
+      dif = 1;
+  return (dif);
 }
 
-char *compress_off(char *Buffer, int *LengtOff) {
-  int x, rep, LastOff, cnt = 0;
-  byte *cbuffer = (byte *)malloc(*LengtOff * 2);
+char *compress_off(char *buffer, int *length_off) {
+  int x, rep, last_off, cnt = 0;
+  byte *cbuffer = (byte *)malloc(*length_off * 2);
 
-  for (x = 0; x < *LengtOff; x++)
-    if (Buffer[x]) {
-      LastOff = x;
-      cbuffer[cnt++] = LastOff % 256;
-      cbuffer[cnt++] = LastOff / 256;
+  for (x = 0; x < *length_off; x++)
+    if (buffer[x]) {
+      last_off = x;
+      cbuffer[cnt++] = last_off % 256;
+      cbuffer[cnt++] = last_off / 256;
       rep = 0;
-      while (Buffer[x] || Buffer[x + 1] || Buffer[x + 2]) {
+      while (buffer[x] || buffer[x + 1] || buffer[x + 2]) {
         rep++;
         if (rep == 255)
           break;
         x++;
       }
       cbuffer[cnt++] = rep;
-      memcpy(&cbuffer[cnt], Buffer + LastOff, rep);
+      memcpy(&cbuffer[cnt], buffer + last_off, rep);
       cnt += rep;
     }
-  *LengtOff = cnt;
+  *length_off = cnt;
   return ((char *)cbuffer);
 }
 
-char *compress_rle(char *pVideoMem, int *LengtOff) {
-  char ActPixel;
+char *compress_rle(char *video_mem, int *length_off) {
+  char act_pixel;
   char cntPixel = 0;
   int ptr = 0, cptr = 0;
-  byte *cbuffer = (byte *)malloc(*LengtOff * 2);
+  byte *cbuffer = (byte *)malloc(*length_off * 2);
 
-  ActPixel = pVideoMem[ptr];
-  while (ptr < *LengtOff) {
-    while ((pVideoMem[ptr] == ActPixel) && (ptr < *LengtOff)) {
+  act_pixel = video_mem[ptr];
+  while (ptr < *length_off) {
+    while ((video_mem[ptr] == act_pixel) && (ptr < *length_off)) {
       cntPixel++;
       ptr++;
       if (cntPixel == 63)
         break;
     }
     if (cntPixel == 1) {
-      if (ActPixel > 63)
+      if (act_pixel > 63)
         cbuffer[cptr++] = 193;
-      cbuffer[cptr++] = ActPixel;
+      cbuffer[cptr++] = act_pixel;
     } else {
       cbuffer[cptr++] = 192 + cntPixel;
-      cbuffer[cptr++] = ActPixel;
+      cbuffer[cptr++] = act_pixel;
     }
-    ActPixel = pVideoMem[ptr];
+    act_pixel = video_mem[ptr];
     cntPixel = 0;
   }
-  *LengtOff = cptr;
+  *length_off = cptr;
   return ((char *)cbuffer);
 }
 
 void compress_and_save_frame() {
-  byte *BuffOff;
-  byte *BuffRLE;
-  int LengtOff = 64000, LengtRLE = 64000;
+  byte *buff_off;
+  byte *buff_rle;
+  int length_off = 64000, length_rle = 64000;
 
-  BuffOff = (byte *)compress_off((char *)frame_copy, &LengtOff);
-  BuffRLE = (byte *)compress_rle((char *)frame_copy, &LengtRLE);
+  buff_off = (byte *)compress_off((char *)frame_copy, &length_off);
+  buff_rle = (byte *)compress_rle((char *)frame_copy, &length_rle);
 
-  if (LengtOff < LengtRLE) {
+  if (length_off < length_rle) {
     CHUNK = INIT_FRAME;
     fwrite(&CHUNK, 1, 1, grb_file);
     CHUNK = CMP_OFF;
     fwrite(&CHUNK, 1, 1, grb_file);
-    fwrite(&LengtOff, 1, 4, grb_file);
-    _ffwrite(BuffOff, LengtOff, grb_file);
+    fwrite(&length_off, 1, 4, grb_file);
+    _ffwrite(buff_off, length_off, grb_file);
   } else {
     CHUNK = INIT_FRAME;
     fwrite(&CHUNK, 1, 1, grb_file);
     CHUNK = CMP_RLE;
     fwrite(&CHUNK, 1, 1, grb_file);
-    fwrite(&LengtRLE, 1, 4, grb_file);
-    _ffwrite(BuffRLE, LengtRLE, grb_file);
+    fwrite(&length_rle, 1, 4, grb_file);
+    _ffwrite(buff_rle, length_rle, grb_file);
   }
-  free(BuffOff);
-  free(BuffRLE);
+  free(buff_off);
+  free(buff_rle);
 }
 
-void record_screen(unsigned char *NewScreen) {
+void record_screen(unsigned char *new_screen) {
   if (!init_recorder) {
     init_recorder = 1;
     frame_copy = (byte *)malloc(64004);
     memset(frame_copy, 0, 64004);
     grb_file = fopen("GRABADOR.SSN", "wb");
     write_dac(dac);
-    memcpy(frame_copy, NewScreen, 64000);
+    memcpy(frame_copy, new_screen, 64000);
     compress_and_save_frame();
   } else {
-    if (check_differences(NewScreen))
+    if (check_differences(new_screen))
       compress_and_save_frame();
-    memcpy(frame_copy, NewScreen, 64000);
+    memcpy(frame_copy, new_screen, 64000);
   }
 }
 
@@ -132,10 +132,10 @@ void write_dac(byte *dac) {
       }
 }
 
-void write_mouse_key(char bMouseKey) {
+void write_mouse_key(char mouse_key) {
   if (init_recorder) {
     CHUNK = MOUSE_KEY;
     fwrite(&CHUNK, 1, 1, grb_file);
-    fwrite(&bMouseKey, 1, 1, grb_file);
+    fwrite(&mouse_key, 1, 1, grb_file);
   }
 }

@@ -699,7 +699,7 @@ void sp_scan_mask(byte *p, short n, byte *si, int w, int x0, int y0, int x1, int
 //      Invierte horizontalmente un gráfico
 //-----------------------------------------------------------------------------
 
-void invierte_hor(byte *p, int w, int h) {
+void flip_horizontal(byte *p, int w, int h) {
   int x, y;
   byte *q;
 
@@ -720,7 +720,7 @@ void invierte_hor(byte *p, int w, int h) {
 //      Invierte verticalmente un gráfico
 //-----------------------------------------------------------------------------
 
-void invierte_ver(byte *sp, int w, int h) {
+void flip_vertical(byte *sp, int w, int h) {
   int x, y;
   byte *q, *p;
 

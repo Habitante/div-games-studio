@@ -33,7 +33,7 @@ void set_mouse(int x, int y) {
 extern int mouse_x, mouse_y;
 #endif
 
-void readmouse(void) {
+void read_mouse(void) {
   int n = 0;
 
   poll_keyboard();

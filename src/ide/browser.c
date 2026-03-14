@@ -1614,7 +1614,7 @@ int ns, chn;
 
 // For loading PCM in the browser
 #ifdef MIXER
-Mix_Chunk *DIVMIX_LoadPCM(char *path);
+Mix_Chunk *divmix_load_pcm(char *path);
 #endif
 
 void browser2(void) {
@@ -1777,7 +1777,7 @@ void browser2(void) {
             smp = Mix_LoadWAV(full);
             if (smp == NULL) {
               // try loading PCM
-              smp = DIVMIX_LoadPCM(full);
+              smp = divmix_load_pcm(full);
             }
             if (smp == NULL) {
               debugprintf("failed to load %s\n", full);

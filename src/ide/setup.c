@@ -34,11 +34,11 @@ extern int sel_color_font;
 extern int sel_color_ok;
 void selcolor0(void);
 
-void gama0(void);
+void gamma0(void);
 
 void wallpaper_thumb(void);
 void prepare_wallpaper_temp(void);
-void rescalar(byte *si, int sian, int sial, byte *di, int dian, int dial);
+void rescale(byte *src, int src_w, int src_h, byte *dst, int dst_w, int dst_h);
 
 char vgasizes[32 * 16];
 
@@ -302,7 +302,7 @@ void wallpaper_setup2(void) {
   if (wmouse_in(w - 38, 24 + 8, 34, 7) && (mouse_b & 1)) {
     gradient_buf = wallpaper_gradient;
     gradient_config = setup_file.gradient_config;
-    show_dialog((void_return_type_t)gama0);
+    show_dialog((void_return_type_t)gamma0);
     if (v_accept)
       need_refresh = 1;
   }
@@ -376,18 +376,18 @@ int mem_get_heap_free() {
 #include <windows.h>
 #endif
 
-void get_free_mem(meminfo *Meminfo) {
+void get_free_mem(meminfo *meminfo_ptr) {
 #ifdef WIN32
   MEMORYSTATUSEX status;
   status.dwLength = sizeof(status);
   GlobalMemoryStatusEx(&status);
-  Meminfo->largest_available_block = status.ullAvailPhys;
+  meminfo_ptr->largest_available_block = status.ullAvailPhys;
   return;
 #else
   FILE *mem = fopen("/proc/meminfo", "r");
 
   if (mem == NULL) {
-    Meminfo->largest_available_block = -1;
+    meminfo_ptr->largest_available_block = -1;
     return;
   }
   char line[256];
@@ -395,7 +395,7 @@ void get_free_mem(meminfo *Meminfo) {
     int64_t ram;
     if (sscanf(line, "MemFree: %ds kB", &ram) == 1) {
       fclose(mem);
-      Meminfo->largest_available_block = ram * 1024;
+      meminfo_ptr->largest_available_block = ram * 1024;
       return;
     }
   }
@@ -403,7 +403,7 @@ void get_free_mem(meminfo *Meminfo) {
   // If we got here, then we couldn't find the proper line in the meminfo file:
   // do something appropriate like return an error code, throw an exception, etc.
   fclose(mem);
-  Meminfo->largest_available_block = -1;
+  meminfo_ptr->largest_available_block = -1;
   return;
 #endif
 }
@@ -496,7 +496,7 @@ char old_editor_font;
 int setup_switches[4];
 int old_paint_cursor;
 
-void Cfg_colors(void) {
+void cfg_colors(void) {
   int w = v.w / big2, h = v.h / big2;
   wbox(v.ptr, w, h, color_cfg[0], 13, 22, 7, 7);
   wbox(v.ptr, w, h, color_cfg[1], 53 + 25, 22, 7, 7);
@@ -572,7 +572,7 @@ void cfg_setup1(void) {
   wwrite(v.ptr, w, h, 5, 100 + 30, 0, texts[333], c1);
   wwrite(v.ptr, w, h, 4, 100 + 30, 0, texts[333], c3);
 
-  Cfg_colors();
+  cfg_colors();
   cfg_show_font();
   cfg_show_mouse();
   cfg_show_cursor();
@@ -779,7 +779,7 @@ void cfg_setup2(void) {
     show_dialog((void_return_type_t)selcolor0);
     if (sel_color_ok) {
       color_cfg[zone - 1] = sel_color_font;
-      Cfg_colors();
+      cfg_colors();
       v.redraw = 1;
     }
   }
@@ -1348,7 +1348,7 @@ void prepare_wallpaper_temp(void) {
 
     free(temp);
   } else {
-    rescalar(temp, w, h, p, vga_width, vga_height);
+    rescale(temp, w, h, p, vga_width, vga_height);
     free(temp);
     x_wallpaper_width = vga_width;
     x_wallpaper_height = vga_height;

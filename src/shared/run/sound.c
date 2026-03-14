@@ -5,15 +5,15 @@ sound_t sounds[128];
 song_t songs[128];
 tChannels channels[64];
 
-int SongType = 0;
-int MusicChannels = 0;
-int NextChannel = 0;
-int *NewSound;
-int ChannelCon = 0;
+int song_type = 0;
+int music_channels = 0;
+int next_channel = 0;
+int *new_sound;
+int channel_con = 0;
 
-int SongInst[128];
+int song_inst[128];
 
-int Freq_original[CHANNELS];
+int freq_original[CHANNELS];
 
 int sound_active = 1;
 void print_init_flags(int flags) {
@@ -74,13 +74,13 @@ void sound_init(void) {
   initted = 1;
 #endif
 
-  MusicChannels = 0;
+  music_channels = 0;
 }
 
 void sound_reset(void) {}
 
-int sound_load(char *ptr, long Len, int Loop) {
-  HeadDC MyHeadDC;
+int sound_load(char *ptr, long len, int loop_flag) {
+  HeadDC wav_header;
 
 #ifdef MIXER
   int channel;
@@ -94,7 +94,7 @@ int sound_load(char *ptr, long Len, int Loop) {
   char *data = "data";
   int con = 0;
   byte res = 0;
-  int32_t iLen = (int32_t)Len + 36;
+  int32_t ilen = (int32_t)len + 36;
 
   while (con < 128 && sounds[con].smp != 0)
     con++;
@@ -104,36 +104,36 @@ int sound_load(char *ptr, long Len, int Loop) {
 
   // check if wav or OGG
   if ((ptr[0] == 'R' && ptr[1] == 'I') || (ptr[0] == 'O' && ptr[1] == 'g')) {
-    rw = SDL_RWFromMem(ptr, Len);
+    rw = SDL_RWFromMem(ptr, len);
     sound = Mix_LoadWAV_RW(rw, 1);
   }
 
   // If sound cant be loaded, must be a pcm
   if (!sound) {
-    dst = (byte *)malloc((int)iLen + 50);
+    dst = (byte *)malloc((int)ilen + 50);
 
     if (dst == NULL)
       return (-1);
 
-    memset(dst, 0, (int)Len + 40);
+    memset(dst, 0, (int)len + 40);
 
-    MyHeadDC.dwUnknow = 16;
-    MyHeadDC.wFormatTag = 1;
-    MyHeadDC.wChannels = 1;
-    MyHeadDC.dwSamplePerSec = 11025;
-    MyHeadDC.dwAvgBytesPerSec = 11025;
-    MyHeadDC.wBlockAlign = 1;
-    MyHeadDC.wBits = 8;
+    wav_header.dwUnknow = 16;
+    wav_header.wFormatTag = 1;
+    wav_header.wChannels = 1;
+    wav_header.dwSamplePerSec = 11025;
+    wav_header.dwAvgBytesPerSec = 11025;
+    wav_header.wBlockAlign = 1;
+    wav_header.wBits = 8;
 
     memcpy(dst, riff, 4);
-    memcpy(dst + 4, &iLen, 4);
+    memcpy(dst + 4, &ilen, 4);
     memcpy(dst + 8, wavefmt, 8);
-    memcpy(dst + 16, &MyHeadDC, sizeof(HeadDC));
+    memcpy(dst + 16, &wav_header, sizeof(HeadDC));
     memcpy(dst + 16 + sizeof(HeadDC), data, 4);
-    memcpy(dst + 20 + sizeof(HeadDC), &Len, 4);
-    memcpy(dst + 24 + sizeof(HeadDC), ptr, Len);
+    memcpy(dst + 20 + sizeof(HeadDC), &len, 4);
+    memcpy(dst + 24 + sizeof(HeadDC), ptr, len);
 
-    rw = SDL_RWFromMem((void *)dst, (int)(Len + 24 + sizeof(HeadDC)));
+    rw = SDL_RWFromMem((void *)dst, (int)(len + 24 + sizeof(HeadDC)));
     sound = Mix_LoadWAV_RW(rw, 1);
 
     if (!sound) {
@@ -144,7 +144,7 @@ int sound_load(char *ptr, long Len, int Loop) {
   // all ok. save our data to free() later
   sounds[con].smp = 1;
   sounds[con].sound = sound;
-  sounds[con].loop = Loop;
+  sounds[con].loop = loop_flag;
 
   return con;
 #endif
@@ -152,24 +152,24 @@ int sound_load(char *ptr, long Len, int Loop) {
   return -1;
 }
 
-int sound_unload(int NumSonido) {
+int sound_unload(int sound_num) {
 #ifdef MIXER
-  if (sounds[NumSonido].sound) {
-    Mix_FreeChunk(sounds[NumSonido].sound);
-    sounds[NumSonido].smp = 0;
-    sounds[NumSonido].sound = NULL;
+  if (sounds[sound_num].sound) {
+    Mix_FreeChunk(sounds[sound_num].sound);
+    sounds[sound_num].smp = 0;
+    sounds[sound_num].sound = NULL;
   }
 #endif
   return (1);
 }
 #ifdef MIXER
 
-void doneEffect(int chan, void *data) {
+void done_effect(int chan, void *data) {
   return;
 }
 
 // make a passthru processor function that alters the stream size
-void freqEffect(int chan, void *stream, int len, void *udata) {
+void freq_effect(int chan, void *stream, int len, void *udata) {
   float x = 0;
   sound_t *s = &sounds[channels[chan].num];
   int pos = channels[chan].pos;
@@ -234,19 +234,19 @@ void freqEffect(int chan, void *stream, int len, void *udata) {
   }
 }
 #endif
-void channelDone(int channel) {
+void channel_done(int channel) {
   // Done!
 }
 
-int sound_play(int NumSonido, int Volumen, int Frec) // Vol y Frec (0..256)
+int sound_play(int sound_num, int volume, int frequency) // Vol y frequency (0..256)
 {
   int con = 0;
   int loop = -1;
 #ifdef MIXER
 
-  // always play as loop, let the freqEffect manage stop_sound when loop is zero
+  // always play as loop, let the freq_effect manage stop_sound when loop is zero
   // this permits slow playing sound to run for the correct length.
-  con = Mix_PlayChannel(-1, sounds[NumSonido].sound, loop);
+  con = Mix_PlayChannel(-1, sounds[sound_num].sound, loop);
 
 
   // if unable to play, return
@@ -256,75 +256,75 @@ int sound_play(int NumSonido, int Volumen, int Frec) // Vol y Frec (0..256)
   // Make sure all old callbacks are cleared
   Mix_UnregisterAllEffects(con);
 
-  channels[con].freq = Frec;
-  channels[con].vol = Volumen;
+  channels[con].freq = frequency;
+  channels[con].vol = volume;
   channels[con].pos = 0;
 
   // Setup our callback to change frequency
-  Mix_RegisterEffect(con, freqEffect, doneEffect, NULL);
-  Mix_ChannelFinished(channelDone);
+  Mix_RegisterEffect(con, freq_effect, done_effect, NULL);
+  Mix_ChannelFinished(channel_done);
 
-  Mix_Volume(con, Volumen / 2);
-  channels[con].num = NumSonido;
+  Mix_Volume(con, volume / 2);
+  channels[con].num = sound_num;
   channels[con].con = con;
 
-  Freq_original[con] = channels[con].freq;
+  freq_original[con] = channels[con].freq;
 
 #endif
   return (con);
 }
 
-int sound_stop(int NumChannel) {
-  if (NumChannel == -2)
-    NumChannel = -1;
+int sound_stop(int num_channel) {
+  if (num_channel == -2)
+    num_channel = -1;
 
 #ifdef MIXER
   int x = 99;
-  if (Mix_Playing(NumChannel)) {
-    Mix_HaltChannel(NumChannel);
+  if (Mix_Playing(num_channel)) {
+    Mix_HaltChannel(num_channel);
   }
-  while (x-- > 0 && Mix_Playing(NumChannel))
-    Mix_HaltChannel(NumChannel);
+  while (x-- > 0 && Mix_Playing(num_channel))
+    Mix_HaltChannel(num_channel);
 
 #endif // MIXER
   return (1);
 }
 
-int sound_change(int NumChannel, int Volumen, int Frec) {
+int sound_change(int num_channel, int volume, int frequency) {
 #ifdef MIXER
-  channels[NumChannel].freq = Frec;
-  Mix_Volume(NumChannel, Volumen / 2);
+  channels[num_channel].freq = frequency;
+  Mix_Volume(num_channel, volume / 2);
 #endif
 
   return (1);
 }
 
-int sound_change_channel(int NumChannel, int Volumen, int Panning) {
+int sound_change_channel(int num_channel, int volume, int panning) {
   // Set the volume
 #ifdef MIXER
-  Mix_Volume(NumChannel, Volumen / 2);
+  Mix_Volume(num_channel, volume / 2);
 
   // set the balance
-  Mix_SetPanning(NumChannel, 255 - Panning, Panning);
+  Mix_Setpanning(num_channel, 255 - panning, panning);
 #endif
   return (1);
 }
 
-int sound_is_playing(int NumChannel) {
+int sound_is_playing(int num_channel) {
 #ifdef MIXER
-  return Mix_Playing(NumChannel);
+  return Mix_Playing(num_channel);
 #endif
 
   return (1);
 }
 
 #ifdef DIV2
-int sound_load_song(char *ptr, int Len, int Loop) {
+int sound_load_song(char *ptr, int len, int loop_flag) {
 #ifdef MIXER
   int con = 0;
 
   // Check we can load the file
-  SDL_RWops *rw = SDL_RWFromMem(ptr, Len);
+  SDL_RWops *rw = SDL_RWFromMem(ptr, len);
 
   Mix_Music *music = Mix_LoadMUS_RW(rw, 0);
   if (!music)
@@ -338,13 +338,13 @@ int sound_load_song(char *ptr, int Len, int Loop) {
   if (con == 128)
     return (-1);
 
-  if ((songs[con].ptr = (char *)malloc(Len)) == NULL)
+  if ((songs[con].ptr = (char *)malloc(len)) == NULL)
     return (-1);
 
-  memcpy(songs[con].ptr, ptr, Len);
-  songs[con].loop = Loop;
+  memcpy(songs[con].ptr, ptr, len);
+  songs[con].loop = loop_flag;
 
-  rw = SDL_RWFromMem(songs[con].ptr, Len);
+  rw = SDL_RWFromMem(songs[con].ptr, len);
   music = Mix_LoadMUS_RW(rw, 0);
 
   songs[con].music = music;
@@ -355,15 +355,15 @@ int sound_load_song(char *ptr, int Len, int Loop) {
   return -1;
 }
 
-int sound_play_song(int NumSong) {
-  if (NumSong > 127 || !songs[NumSong].ptr)
+int sound_play_song(int num_song) {
+  if (num_song > 127 || !songs[num_song].ptr)
     return (-1);
 
   sound_stop_song();
 
 #ifdef MIXER
-  if (songs[NumSong].music) {
-    Mix_PlayMusic(songs[NumSong].music, songs[NumSong].loop ? -1 : 0);
+  if (songs[num_song].music) {
+    Mix_PlayMusic(songs[num_song].music, songs[num_song].loop ? -1 : 0);
   }
 #endif
 
@@ -375,27 +375,27 @@ void sound_stop_song(void) {
   Mix_HaltMusic();
 #endif
 
-  MusicChannels = 0;
+  music_channels = 0;
 }
 
-void sound_unload_song(int NumSong) {
-  if (NumSong > 127 || !songs[NumSong].ptr)
+void sound_unload_song(int num_song) {
+  if (num_song > 127 || !songs[num_song].ptr)
     return;
 #ifdef MIXER
-  Mix_FreeMusic(songs[NumSong].music);
-  free(songs[NumSong].ptr);
-  SDL_FreeRW(songs[NumSong].rw);
+  Mix_FreeMusic(songs[num_song].music);
+  free(songs[num_song].ptr);
+  SDL_FreeRW(songs[num_song].rw);
 
-  songs[NumSong].music = NULL;
-  songs[NumSong].rw = NULL;
+  songs[num_song].music = NULL;
+  songs[num_song].rw = NULL;
 #endif
-  songs[NumSong].ptr = NULL;
-  songs[NumSong].loop = 0;
+  songs[num_song].ptr = NULL;
+  songs[num_song].loop = 0;
 }
 
-void sound_set_song_pos(int SongPat) {
+void sound_set_song_pos(int song_pos) {
 #ifdef MIXER
-  Mix_SetMusicPosition((double)SongPat);
+  Mix_SetMusicPosition((double)song_pos);
 #endif
 }
 

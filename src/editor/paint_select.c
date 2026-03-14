@@ -1489,14 +1489,14 @@ void move_selection(byte *sp, int w, int h) {
       }
 
       if ((mouse_b & 1) && selected_icon == 4) {
-        invierte_hor(sp, w, h);
+        flip_horizontal(sp, w, h);
         do {
           read_mouse();
         } while (mouse_b & 1);
       }
 
       if ((mouse_b & 1) && selected_icon == 5) {
-        invierte_ver(sp, w, h);
+        flip_vertical(sp, w, h);
         do {
           read_mouse();
         } while (mouse_b & 1);
@@ -1596,7 +1596,7 @@ void move_selection(byte *sp, int w, int h) {
     if (mouse_in(toolbar_x + 48, toolbar_y + 2, toolbar_x + toolbar_width - 2, toolbar_y + 17)) {
       selected_icon = (mouse_x - toolbar_x - 48) / 16;
       if (bar[selected_icon] > 1) {
-        wresalta_box(toolbar, vga_width / big2, 19, 48 + selected_icon * 16, 2, 15, 15);
+        w_highlight_box(toolbar, vga_width / big2, 19, 48 + selected_icon * 16, 2, 15, 15);
       } else
         selected_icon = -1;
     } else

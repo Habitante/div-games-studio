@@ -1209,8 +1209,8 @@ void edit_mode_11(void) {
 // TODO: Known bug -- screen refresh fails when combining undo with backspace during text deletion
 
 int find_font_window(void);
-void get_char_size_buffer(int WhatChar, int *width, int *height, char *buffer);
-int show_char_buffer(int WhatChar, int cx, int cy, char *ptr, int w, char *buffer);
+void get_char_size_buffer(int what_char, int *width, int *height, char *buffer);
+int show_char_buffer(int what_char, int cx, int cy, char *ptr, int w, char *buffer);
 
 void edit_mode_12(void) {
   int spacelen, cnt, x, char_w, char_h, max_char_w, max_char_h;

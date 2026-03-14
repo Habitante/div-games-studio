@@ -73,11 +73,11 @@ typedef struct _IFS {
 
 extern char *body_tex_buffer, *out_tex_buffer, *shadow_tex_buffer;
 extern IFS ifs;
-int jorge_create_font(int GenCode);
-int show_char(int WhatChar, int cx, int cy, char *ptr, int w);
-int show_char_buffer(int WhatChar, int cx, int cy, char *ptr, int w, char *buffer);
-void get_char_size(int WhatChar, int *width, int *height);
-void get_char_size_buffer(int WhatChar, int *width, int *height, char *buffer);
+int create_font_charset(int gen_code);
+int show_char(int what_char, int cx, int cy, char *ptr, int w);
+int show_char_buffer(int what_char, int cx, int cy, char *ptr, int w, char *buffer);
+void get_char_size(int what_char, int *width, int *height);
+void get_char_size_buffer(int what_char, int *width, int *height, char *buffer);
 void convert_fnt_to_pal(char *Buffer);
-int show_progress(char *titulo, int current, int total);
+int show_progress(char *title, int current, int total);
 #endif

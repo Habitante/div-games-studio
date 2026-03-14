@@ -9,18 +9,18 @@
 //      Constantes del módulo
 //-----------------------------------------------------------------------------
 
-#define ancho_ga 138
-#define alto_ga  60
-#define gama_x   4
-#define gama_y   12
-#define gama_w   130
+#define GAMMA_WIDTH 138
+#define GAMMA_HEIGHT  60
+#define GAMMA_X   4
+#define GAMMA_Y   12
+#define GAMMA_W   130
 
 //-----------------------------------------------------------------------------
 //  Estructura para guardar el estado de los colores de control de la gama
 //-----------------------------------------------------------------------------
 
-byte mis_colores[128];
-struct _gcolor mi_gama[9];
+byte saved_colors[128];
+struct _gcolor saved_gamma[9];
 
 struct {
   int x;
@@ -31,10 +31,10 @@ struct {
 //  Prototipos
 //-----------------------------------------------------------------------------
 
-void gama0(void);
-void gama1(void);
-void gama2(void);
-void gama3(void);
+void gamma0(void);
+void gamma1(void);
+void gamma2(void);
+void gamma3(void);
 
 //-----------------------------------------------------------------------------
 //  Variables y funciones externas
@@ -168,18 +168,18 @@ void create_gradient_colors(struct _gcolor *gradient_config, byte *gradient_buf)
 //  Codigo principal del show_dialog de gamas
 //-----------------------------------------------------------------------------
 
-void gama0(void) {
+void gamma0(void) {
   int con;
 
   v.type = WIN_DIALOG;
 
   v.title = texts[420];
-  v.w = ancho_ga;
-  v.h = alto_ga;
+  v.w = GAMMA_WIDTH;
+  v.h = GAMMA_HEIGHT;
 
-  v.paint_handler = (void_return_type_t)gama1;
-  v.click_handler = (void_return_type_t)gama2;
-  v.close_handler = (void_return_type_t)gama3;
+  v.paint_handler = (void_return_type_t)gamma1;
+  v.click_handler = (void_return_type_t)gamma2;
+  v.close_handler = (void_return_type_t)gamma3;
 
   for (con = 0; con < 9; con++) {
     button_coords[con].y = 33;
@@ -198,8 +198,8 @@ void gama0(void) {
   // Aqui se inicializa el estado de la gama y los botones (r, g, b y selec)
 
   create_dac4();
-  memcpy(mis_colores, gradient_buf, 128);
-  memcpy(mi_gama, gradient_config, sizeof(mi_gama));
+  memcpy(saved_colors, gradient_buf, 128);
+  memcpy(saved_gamma, gradient_config, sizeof(saved_gamma));
 
   // Botones Aceptar/Cancelar
 
@@ -209,7 +209,7 @@ void gama0(void) {
   v_accept = 0;
 }
 
-void gama1(void) {
+void gamma1(void) {
   int w = v.w / big2, h = v.h / big2;
   int con;
 
@@ -232,13 +232,13 @@ void gama1(void) {
 
   // Mostrar gama
 
-  wrectangle(v.ptr, w, h, c0, gama_x, gama_y, gama_w, 4);
+  wrectangle(v.ptr, w, h, c0, GAMMA_X, GAMMA_Y, GAMMA_W, 4);
   for (con = 0; con < 128; con++) {
-    wbox(v.ptr, w, h, gradient_buf[con], gama_x + con + 1, gama_y + 1, 1, 2);
+    wbox(v.ptr, w, h, gradient_buf[con], GAMMA_X + con + 1, GAMMA_Y + 1, 1, 2);
   }
 }
 
-void gama2(void) {
+void gamma2(void) {
   int con;
 
   _process_items();
@@ -275,9 +275,9 @@ void gama2(void) {
   }
 }
 
-void gama3(void) {
+void gamma3(void) {
   if (!v_accept) {
-    memcpy(gradient_buf, mis_colores, 128);
-    memcpy(gradient_config, mi_gama, sizeof(mi_gama));
+    memcpy(gradient_buf, saved_colors, 128);
+    memcpy(gradient_config, saved_gamma, sizeof(saved_gamma));
   }
 }

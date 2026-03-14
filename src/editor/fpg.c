@@ -158,13 +158,13 @@ void fpg_dialog2(void) {
       return;
     }
     fseek(fpg, my_fpg->grf_offsets[Elemento], SEEK_SET);
-    fpg_read_image_header(&my_fpg->MiHeadFPG, fpg);
+    fpg_read_image_header(&my_fpg->header, fpg);
     fclose(fpg);
 
     if (fpg_image) {
-      fpg_add(my_fpg, my_fpg->MiHeadFPG.code, (char *)my_fpg->MiHeadFPG.description,
-              (char *)my_fpg->MiHeadFPG.Filename, my_fpg->MiHeadFPG.width, my_fpg->MiHeadFPG.height,
-              my_fpg->MiHeadFPG.num_points, (char *)fpg_points, fpg_image, 1, 1);
+      fpg_add(my_fpg, my_fpg->header.code, (char *)my_fpg->header.description,
+              (char *)my_fpg->header.filename, my_fpg->header.width, my_fpg->header.height,
+              my_fpg->header.num_points, (char *)fpg_points, fpg_image, 1, 1);
     }
 
     if (fpg_image)
@@ -204,10 +204,10 @@ void fpg_dialog2(void) {
       return;
     }
     fseek(fpg, my_fpg->grf_offsets[Elemento], SEEK_SET);
-    fpg_read_header(&my_fpg->MiHeadFPG, fpg);
+    fpg_read_header(&my_fpg->header, fpg);
 
-    map_width = my_fpg->MiHeadFPG.width;
-    map_height = my_fpg->MiHeadFPG.height;
+    map_width = my_fpg->header.width;
+    map_height = my_fpg->header.height;
 
     v.mapa = (struct tmapa *)malloc(sizeof(struct tmapa));
 
@@ -227,19 +227,19 @@ void fpg_dialog2(void) {
       return;
     }
 
-    v.mapa->map_width = my_fpg->MiHeadFPG.width;
-    v.mapa->map_height = my_fpg->MiHeadFPG.height;
+    v.mapa->map_width = my_fpg->header.width;
+    v.mapa->map_height = my_fpg->header.height;
 
     v.mapa->has_name = 2;
-    v.mapa->fpg_code = my_fpg->MiHeadFPG.code;
-    memcpy(v.mapa->description, my_fpg->MiHeadFPG.description, 32);
+    v.mapa->fpg_code = my_fpg->header.code;
+    memcpy(v.mapa->description, my_fpg->header.description, 32);
     memset(v.mapa->filename, 0, 13);
-    memcpy(v.mapa->filename, my_fpg->MiHeadFPG.Filename, 12);
+    memcpy(v.mapa->filename, my_fpg->header.filename, 12);
 
     for (x = 0; x < 512; x++)
       v.mapa->points[x] = -1;
-    if (my_fpg->MiHeadFPG.num_points)
-      fread(v.mapa->points, my_fpg->MiHeadFPG.num_points, 4, fpg);
+    if (my_fpg->header.num_points)
+      fread(v.mapa->points, my_fpg->header.num_points, 4, fpg);
     fread(v.mapa->map, map_width, map_height, fpg);
     fclose(fpg);
 
@@ -908,10 +908,10 @@ void show_tagged() {
 
       fseek(fpg, my_fpg->grf_offsets[Elemento], SEEK_SET);
 
-      fpg_read_header(&my_fpg->MiHeadFPG, fpg);
+      fpg_read_header(&my_fpg->header, fpg);
 
-      map_width = my_fpg->MiHeadFPG.width;
-      map_height = my_fpg->MiHeadFPG.height;
+      map_width = my_fpg->header.width;
+      map_height = my_fpg->header.height;
 
       if (new_map(NULL)) {
         // ERROR: Out of memory
@@ -920,16 +920,16 @@ void show_tagged() {
       }
 
       v.mapa->has_name = 1;
-      v.mapa->fpg_code = my_fpg->MiHeadFPG.code;
-      memcpy(v.mapa->description, my_fpg->MiHeadFPG.description, 32);
+      v.mapa->fpg_code = my_fpg->header.code;
+      memcpy(v.mapa->description, my_fpg->header.description, 32);
       memset(v.mapa->filename, 0, 13);
-      memcpy(v.mapa->filename, my_fpg->MiHeadFPG.Filename, 12);
+      memcpy(v.mapa->filename, my_fpg->header.filename, 12);
 
       for (x = 0; x < 512; x++)
         v.mapa->points[x] = -1;
 
-      if (my_fpg->MiHeadFPG.num_points)
-        fread(v.mapa->points, my_fpg->MiHeadFPG.num_points, 4, fpg);
+      if (my_fpg->header.num_points)
+        fread(v.mapa->points, my_fpg->header.num_points, 4, fpg);
 
       fread(v.mapa->map, map_width, map_height, fpg);
       fclose(fpg);
@@ -961,7 +961,7 @@ void show_tagged() {
     }
 }
 
-int fpg_delete_many(FPG *Fpg, int taggeds, int *array_del);
+int fpg_delete_many(FPG *fpg_file, int taggeds, int *array_del);
 
 void delete_tagged() {
   FPG *my_fpg;
@@ -1136,7 +1136,7 @@ void print_list(void) {
           fseek(g, my_fpg->grf_offsets[n], SEEK_SET);
           fread(&cab, 1, sizeof(cab), g);
           memset(cwork2, 0, 13);
-          memcpy(cwork2, cab.Filename, 12);
+          memcpy(cwork2, cab.filename, 12);
           div_snprintf(cwork, sizeof(cwork), "[%03d] %s (%s, %dx%d)", cab.code, cab.description,
                        cwork2, cab.width, cab.height);
           if (f_ar) {
@@ -1566,11 +1566,11 @@ void create_thumb_FPG(struct t_listboxbr *l) {
 
       if ((f = fopen((char *)my_fpg->current_file, "rb")) != NULL) {
         fseek(f, my_fpg->grf_offsets[my_fpg->desc_index[num]], SEEK_SET);
-        fpg_read_header(&(my_fpg->MiHeadFPG), f);
-        fseek(f, my_fpg->MiHeadFPG.num_points * 4, SEEK_CUR);
-        my_fpg->thumb[num].w = my_fpg->MiHeadFPG.width;
-        my_fpg->thumb[num].h = my_fpg->MiHeadFPG.height;
-        my_fpg->thumb[num].filesize = my_fpg->MiHeadFPG.width * my_fpg->MiHeadFPG.height;
+        fpg_read_header(&(my_fpg->header), f);
+        fseek(f, my_fpg->header.num_points * 4, SEEK_CUR);
+        my_fpg->thumb[num].w = my_fpg->header.width;
+        my_fpg->thumb[num].h = my_fpg->header.height;
+        my_fpg->thumb[num].filesize = my_fpg->header.width * my_fpg->header.height;
 
         if (my_fpg->thumb[num].filesize <= 2048)
           incremento = 2048;
@@ -1613,8 +1613,8 @@ void create_thumb_FPG(struct t_listboxbr *l) {
 
       if ((f = fopen((char *)my_fpg->current_file, "rb")) != NULL) {
         fseek(f, my_fpg->grf_offsets[my_fpg->desc_index[num]], SEEK_SET);
-        fpg_read_header(&(my_fpg->MiHeadFPG), f);
-        fseek(f, my_fpg->MiHeadFPG.num_points * 4, SEEK_CUR);
+        fpg_read_header(&(my_fpg->header), f);
+        fseek(f, my_fpg->header.num_points * 4, SEEK_CUR);
         fseek(f, my_fpg->thumb[num].status, SEEK_CUR);
 
         if (my_fpg->thumb[num].filesize - my_fpg->thumb[num].status > incremento) {
@@ -1861,7 +1861,7 @@ int lmapan, lmapal;
 void fpg_to_map(FPG *my_fpg) {
   int num;
   FILE *fpg;
-  HeadFPG MiHeadFPG;
+  HeadFPG header;
   byte *fpg_image;
   byte *fpg_map;
 
@@ -1879,11 +1879,11 @@ void fpg_to_map(FPG *my_fpg) {
     fseek(fpg, my_fpg->grf_offsets[my_fpg->desc_index[num]], SEEK_SET);
     fseek(fpg, 52, SEEK_CUR);
 
-    fread(&MiHeadFPG.width, 1, 4, fpg);
-    fread(&MiHeadFPG.height, 1, 4, fpg);
+    fread(&header.width, 1, 4, fpg);
+    fread(&header.height, 1, 4, fpg);
 
-    lgraf[num].w = MiHeadFPG.width + 2;
-    lgraf[num].h = MiHeadFPG.height + 2;
+    lgraf[num].w = header.width + 2;
+    lgraf[num].h = header.height + 2;
 
     if (lmapan < lgraf[num].w)
       lmapan = lgraf[num].w;
@@ -1913,10 +1913,10 @@ void fpg_to_map(FPG *my_fpg) {
     fseek(fpg, my_fpg->grf_offsets[my_fpg->desc_index[num]], SEEK_SET);
     fseek(fpg, 60, SEEK_CUR);
 
-    fread(&MiHeadFPG.num_points, 1, 4, fpg);
+    fread(&header.num_points, 1, 4, fpg);
 
-    if (MiHeadFPG.num_points != 0)
-      fseek(fpg, MiHeadFPG.num_points * 4, SEEK_CUR);
+    if (header.num_points != 0)
+      fseek(fpg, header.num_points * 4, SEEK_CUR);
 
     if ((fpg_image = (byte *)malloc((lgraf[num].w - 2) * (lgraf[num].h - 2))) == NULL) {
       fclose(fpg);

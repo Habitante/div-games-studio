@@ -11,7 +11,7 @@
 #include "charset.h"
 
 void selcolor0(void);
-void GenFont0(void);
+void gen_font0(void);
 int font_generated = 0;
 void get_text0(void);
 void create_test_text(char *s, char flags);
@@ -244,7 +244,7 @@ void fonts2(void) {
       break;
     }
     font_generated = 0;
-    show_dialog(GenFont0);
+    show_dialog(gen_font0);
     if (font_generated) {
       close_old_fnt();
       div_strcpy(Load_FontName, sizeof(Load_FontName), FontName);
@@ -664,7 +664,7 @@ int create_font(int gen_code) {
   body_tex_buffer = text03;
   shadow_tex_buffer = text02;
   out_tex_buffer = text01;
-  if (jorge_create_font(gen_code)) {
+  if (create_font_charset(gen_code)) {
     v_text = (char *)texts[45];
     show_dialog(err0);
     return 0;
@@ -1005,7 +1005,7 @@ void preview_2() {
 
 int gen_font_buttons[5] = {1, 1, 1, 1, 0};
 int GenFontLe = 0;
-void GenFont1(void) {
+void gen_font1(void) {
   int w = v.w / big2, h = v.h / big2;
   char cWork[4];
 
@@ -1042,7 +1042,7 @@ void GenFont1(void) {
   wrectangle(v.ptr, w, h, c0, 2, h - 20, w - 4, 1);
 }
 int GenFontRet = 0;
-void GenFont2(void) {
+void gen_font2(void) {
   _process_items();
   switch (v.active_item) {
   case 5:
@@ -1054,7 +1054,7 @@ void GenFont2(void) {
     break;
   }
 }
-void GenFont3(void) {
+void gen_font3(void) {
   int gen_code = 0;
   if (GenFontRet) {
     if (gen_font_buttons[0])
@@ -1070,14 +1070,14 @@ void GenFont3(void) {
     font_generated = create_font(gen_code);
   }
 }
-void GenFont0(void) {
+void gen_font0(void) {
   v.type = WIN_DIALOG; // Dialog
   v.w = 169 - 26;
   v.h = 103;
   v.title = texts[852];
-  v.paint_handler = GenFont1;
-  v.click_handler = GenFont2;
-  v.close_handler = GenFont3;
+  v.paint_handler = gen_font1;
+  v.click_handler = gen_font2;
+  v.close_handler = gen_font3;
 
   _flag(114, 82, 15, &gen_font_buttons[0]);
   _flag(115, 82, 29, &gen_font_buttons[1]);
@@ -1553,11 +1553,11 @@ void open_font(void) {
 /////////////////////////////////////////////////////////////////////////////
 void create_text();
 
-void GetText1(void) {
+void get_text1(void) {
   _show_items();
 }
 
-void GetText2(void) {
+void get_text2(void) {
   _process_items();
   switch (v.active_item) {
   case 1:
@@ -1577,8 +1577,8 @@ void get_text0(void) {
   v.title = texts[855] + 1;
   v.name = texts[855] + 1;
 
-  v.paint_handler = GetText1;
-  v.click_handler = GetText2;
+  v.paint_handler = get_text1;
+  v.click_handler = get_text2;
   DIV_STRCPY(cCharsToPrint, "");
   _get(161, 4, 12, v.w - 8, (byte *)cCharsToPrint, 128, 0, 0);
   _button(100, 7, v.h - 14, 0);
@@ -1670,7 +1670,7 @@ void create_text() {
   blit_region(screen_buffer, vga_width, vga_height, v.ptr, v.x, v.y, v.w, v.h, 0);
 }
 
-int Save_Font_session(FILE *file, int n) {
+int save_font_session(FILE *file, int n) {
   n += fwrite(test_string, 1, 21, file);
 
   n += fwrite(&text1_w, 1, 4, file);
@@ -1715,7 +1715,7 @@ int Save_Font_session(FILE *file, int n) {
 }
 
 
-void Load_Font_session(FILE *file) {
+void load_font_session(FILE *file) {
   int tal = 24, tan = 41;
   float px, py;
   int x, y;

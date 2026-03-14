@@ -13,7 +13,7 @@ static int r, g, b;
 void create_ghost_vc(int m);
 void create_ghost_slow(void);
 void merge_palettes(void);
-void rescalar(byte *si, int sian, int sial, byte *di, int dian, int dial);
+void rescale(byte *src, int src_w, int src_h, byte *dst, int dst_w, int dst_h);
 
 
 // Prototypes for palette loading functions from DIVFORMA.CPP
@@ -466,7 +466,7 @@ byte find_color_not0(byte r, byte g, byte b) {
 //      Palette sorting function
 //-----------------------------------------------------------------------------
 
-void ord_paleta0(void) {
+void sort_palette0(void) {
   int n;
   create_dac4();
   for (n = 0; n < 256; n++)
@@ -474,7 +474,7 @@ void ord_paleta0(void) {
                             original_palette[n * 3 + 2]);
 }
 
-void ord_paleta1(void) {
+void sort_palette1(void) {
   byte *pal, c;
   int n;
 
@@ -496,7 +496,7 @@ void ord_paleta1(void) {
 
   n = 1;
   do {
-    c = find_ord(pal);
+    c = find_order(pal);
     r = pal[c * 4];
     g = pal[c * 4 + 1];
     b = pal[c * 4 + 2];
@@ -507,7 +507,7 @@ void ord_paleta1(void) {
   free(pal);
 }
 
-void ord_paleta2(void) {
+void sort_palette2(void) {
   byte *pal, c;
   int n;
 
@@ -532,7 +532,7 @@ void ord_paleta2(void) {
 
   n = 1;
   do {
-    c = find_ord(pal);
+    c = find_order(pal);
     r = (int)2 * pal[c * 4] - _r;
     g = (int)2 * pal[c * 4 + 1] - _g;
     b = (int)2 * pal[c * 4 + 2] - _b;
@@ -546,7 +546,7 @@ void ord_paleta2(void) {
   free(pal);
 }
 
-void ord_paleta3(void) {
+void sort_palette3(void) {
   byte *pal, c;
   int n;
 
@@ -568,12 +568,12 @@ void ord_paleta3(void) {
 
   n = 1;
   do {
-    c = find_ord(pal);
+    c = find_order(pal);
     if (!(n & 15)) {
       r = 0;
       g = 0;
       b = 0;
-      c = find_ord(pal);
+      c = find_order(pal);
     }
     r = pal[c * 4];
     g = pal[c * 4 + 1];
@@ -585,7 +585,7 @@ void ord_paleta3(void) {
   free(pal);
 }
 
-byte find_ord(byte *dac) {
+byte find_order(byte *dac) {
   int dmin, dif, r2, g2, b2;
   byte *pal, *endpal, *color;
 
@@ -733,7 +733,7 @@ extern int num_taggeds;
 
 extern byte *sample;
 extern byte apply_palette[768];
-extern int num_colores;
+extern int num_colors;
 void create_palette(void);
 
 void pal_load() {
@@ -924,7 +924,7 @@ void create_title_bar(void);
 
 byte *t64 = NULL;
 
-void pal_refresh(int no_tocar_mapas, int guardar_original) {
+void pal_refresh(int preserve_maps, int save_original) {
   byte *ptr, *ptrend;
   int w, h, x, sum;
   int n, m;
@@ -973,7 +973,7 @@ void pal_refresh(int no_tocar_mapas, int guardar_original) {
   for (x = 1; x < 256; x++)
     xlat[x] = find_color_not0(pal[x * 3], pal[x * 3 + 1], pal[x * 3 + 2]);
 
-  if (!no_tocar_mapas) {
+  if (!preserve_maps) {
     for (n = 1; n < MAX_WINDOWS; n++) {
       if (window[n].type == WIN_MAP) {
         ptr = window[n].mapa->map;
@@ -1150,7 +1150,7 @@ void pal_refresh(int no_tocar_mapas, int guardar_original) {
   for (n = 0; n < 768; n++)
     dac4[n] = dac[n] * 4;
 
-  if (guardar_original)
+  if (save_original)
     memcpy(original_palette, dac, 768);
 
   for (n = 1; n < MAX_WINDOWS; n++) {
@@ -1174,9 +1174,9 @@ void pal_refresh(int no_tocar_mapas, int guardar_original) {
 //      Sort palette
 //-----------------------------------------------------------------------------
 
-int ordenacion = 0;
+int sort_mode = 0;
 
-void ordena1(void) {
+void sort_colors1(void) {
   int x, y;
   int w = v.w / big2, h = v.h / big2;
 
@@ -1187,47 +1187,47 @@ void ordena1(void) {
   wbox(v.ptr, w, h, c2, 2 + 66, 10, 1, 65 * 2 + 3);
   wbox(v.ptr, w, h, c2, 2, 10 + 66, 65 * 2 + 3, 1);
 
-  ord_paleta0();
+  sort_palette0();
   for (y = 0; y < 16; y++)
     for (x = 0; x < 16; x++)
       wbox(v.ptr, w, h, palette[x + y * 16], 4 + x * 4, 12 + y * 4, 3, 3);
 
-  ord_paleta1();
+  sort_palette1();
   for (y = 0; y < 16; y++)
     for (x = 0; x < 16; x++)
       wbox(v.ptr, w, h, palette[x + y * 16], 66 + 4 + x * 4, 12 + y * 4, 3, 3);
 
-  ord_paleta2();
+  sort_palette2();
   for (y = 0; y < 16; y++)
     for (x = 0; x < 16; x++)
       wbox(v.ptr, w, h, palette[x + y * 16], 4 + x * 4, 66 + 12 + y * 4, 3, 3);
 
-  ord_paleta3();
+  sort_palette3();
   for (y = 0; y < 16; y++)
     for (x = 0; x < 16; x++)
       wbox(v.ptr, w, h, palette[x + y * 16], 66 + 4 + x * 4, 66 + 12 + y * 4, 3, 3);
 
-  switch (ordenacion) {
+  switch (sort_mode) {
   case 0:
-    ord_paleta0();
+    sort_palette0();
     wrectangle(v.ptr, w, h, c4, 2, 10, 67, 67);
     break;
   case 1:
-    ord_paleta1();
+    sort_palette1();
     wrectangle(v.ptr, w, h, c4, 2 + 66, 10, 67, 67);
     break;
   case 2:
-    ord_paleta2();
+    sort_palette2();
     wrectangle(v.ptr, w, h, c4, 2, 10 + 66, 67, 67);
     break;
   case 3:
-    ord_paleta3();
+    sort_palette3();
     wrectangle(v.ptr, w, h, c4, 2 + 66, 10 + 66, 67, 67);
     break;
   }
 }
 
-void ordena2(void) {
+void sort_colors2(void) {
   int ord;
   int w = v.w / big2, h = v.h / big2;
 
@@ -1241,7 +1241,7 @@ void ordena2(void) {
     if (wmouse_y >= 10 + 66)
       ord += 2;
 
-    if (ord != ordenacion) {
+    if (ord != sort_mode) {
       v.redraw = 1;
       wrectangle(v.ptr, w, h, c2, 2, 10, 65 * 2 + 3, 65 * 2 + 3);
       wbox(v.ptr, w, h, c2, 2 + 66, 10, 1, 65 * 2 + 3);
@@ -1249,22 +1249,22 @@ void ordena2(void) {
       switch (ord) {
       case 0:
         wrectangle(v.ptr, w, h, c4, 2, 10, 67, 67);
-        ord_paleta0();
+        sort_palette0();
         break;
       case 1:
         wrectangle(v.ptr, w, h, c4, 2 + 66, 10, 67, 67);
-        ord_paleta1();
+        sort_palette1();
         break;
       case 2:
         wrectangle(v.ptr, w, h, c4, 2, 10 + 66, 67, 67);
-        ord_paleta2();
+        sort_palette2();
         break;
       case 3:
         wrectangle(v.ptr, w, h, c4, 2 + 66, 10 + 66, 67, 67);
-        ord_paleta3();
+        sort_palette3();
         break;
       }
-      ordenacion = ord;
+      sort_mode = ord;
     }
   }
 
@@ -1279,7 +1279,7 @@ void ordena2(void) {
   }
 }
 
-void ordena0(void) {
+void sort_colors0(void) {
   v.type = WIN_DIALOG; // Dialog
   v.state = 0;
   v.w = 65 * 2 + 7;
@@ -1289,15 +1289,15 @@ void ordena0(void) {
   _button(100, 7, v.h - 14, 0);
   _button(101, v.w - 8, v.h - 14, 2);
 
-  v.paint_handler = ordena1;
-  v.click_handler = ordena2;
+  v.paint_handler = sort_colors1;
+  v.click_handler = sort_colors2;
   v_accept = 0;
 }
 
 void sort_palette(void) {
   int n;
 
-  show_dialog(ordena0);
+  show_dialog(sort_colors0);
   if (v_accept) {
     for (n = 0; n < 256; n++) {
       dac4[n * 3] = dac[palette[n] * 3];
@@ -1314,7 +1314,7 @@ void sort_palette(void) {
 
 // byte palette[768]
 
-word find_ord2(byte *dac) {
+word find_order2(byte *dac) {
   int dmin, dif, r2, g2, b2;
   byte *pal, *endpal, *color;
 
@@ -1433,7 +1433,7 @@ void merge_palettes(void) {
   palette[0] = c0;
   n = 1;
   do {
-    c = find_ord2(pal);
+    c = find_order2(pal);
     r = pal[c * 4];
     g = pal[c * 4 + 1];
     b = pal[c * 4 + 2];
@@ -1524,16 +1524,16 @@ void merge_palettes(void) {
 
 byte *sample; // 32768
 byte apply_palette[768];
-int num_colores;
+int num_colors;
 extern int load_palette;
 
-word new_find_ord(byte *dac) {
+word new_find_order(byte *dac) {
   int dmin, dif, r2, g2, b2;
   byte *pal, *endpal, *color;
 
   color = dac;
   pal = dac;
-  endpal = dac + num_colores * 4;
+  endpal = dac + num_colors * 4;
   dmin = 65536;
   if (r < 0)
     r = 0;
@@ -1586,28 +1586,28 @@ void create_palette(void) {
   sample[0] = 1;                        // Black is always included
   sample[(31 * 32 + 31) * 32 + 31] = 1; // White is always included
 
-  for (num_colores = 0, n = 0, rr = 0; rr < 32; rr++)
+  for (num_colors = 0, n = 0, rr = 0; rr < 32; rr++)
     for (gg = 0; gg < 32; gg++)
       for (bb = 0; bb < 32; bb++, n++) {
         if (sample[n]) {
-          pal[num_colores * 4] = rr;
-          pal[num_colores * 4 + 1] = gg;
-          pal[num_colores * 4 + 2] = bb;
-          num_colores++;
+          pal[num_colors * 4] = rr;
+          pal[num_colors * 4 + 1] = gg;
+          pal[num_colors * 4 + 2] = bb;
+          num_colors++;
         }
       }
 
-  if ((palette = (word *)malloc(num_colores * 2 + 10)) == NULL) {
+  if ((palette = (word *)malloc(num_colors * 2 + 10)) == NULL) {
     free(pal);
     return;
   }
-  if ((dist = (int *)malloc(num_colores * 4 + 10)) == NULL) {
+  if ((dist = (int *)malloc(num_colors * 4 + 10)) == NULL) {
     free(palette);
     free(pal);
     return;
   }
 
-  // pal[num_colores] prepared with { R,G,B,0 }
+  // pal[num_colors] prepared with { R,G,B,0 }
 
   r = 0;
   g = 0;
@@ -1618,25 +1618,25 @@ void create_palette(void) {
   do {
     if (!load_palette)
       if ((n & 127) == 0)
-        show_progress((char *)texts[497], n * 2, num_colores * 4 - 256);
-    c = new_find_ord(pal);
+        show_progress((char *)texts[497], n * 2, num_colors * 4 - 256);
+    c = new_find_order(pal);
     r = pal[c * 4];
     g = pal[c * 4 + 1];
     b = pal[c * 4 + 2];
     pal[c * 4] += 128;
     palette[n] = c;
-  } while (++n < num_colores);
+  } while (++n < num_colors);
 
   // Restore pal
 
-  for (n = 0; n < num_colores; n++) {
+  for (n = 0; n < num_colors; n++) {
     if (pal[n * 4] >= 128)
       pal[n * 4] -= 128;
   }
 
-  // palette[num_colores] with colors sorted
+  // palette[num_colors] with colors sorted
 
-  for (n = 0; n < num_colores - 1; n++) {
+  for (n = 0; n < num_colors - 1; n++) {
     dist[n] = *(int *)(color_lookup + pal[palette[n] * 4] * 256 + pal[palette[n + 1] * 4] * 4);
     dist[n] +=
         *(int *)(color_lookup + pal[palette[n] * 4 + 1] * 256 + pal[palette[n + 1] * 4 + 1] * 4);
@@ -1646,11 +1646,11 @@ void create_palette(void) {
 
   // dist[] with distances between all consecutive colors
 
-  c = num_colores - 1;
+  c = num_colors - 1;
   while (c > 255) {
     if (!load_palette)
       if ((c & 127) == 0)
-        show_progress((char *)texts[497], num_colores * 2 + num_colores - c, num_colores * 4 - 256);
+        show_progress((char *)texts[497], num_colors * 2 + num_colors - c, num_colors * 4 - 256);
 
     min = 64 * 64 * 64;
     for (n = 0; n < c; n++) { // Find the minimum distance
@@ -1704,7 +1704,7 @@ void create_palette(void) {
         if (sample[n]) {
           if (!load_palette)
             if (((c++) & 127) == 0)
-              show_progress((char *)texts[497], num_colores * 3 - 256 + c, num_colores * 4 - 256);
+              show_progress((char *)texts[497], num_colors * 3 - 256 + c, num_colors * 4 - 256);
           sample[n] = find_color(rr, gg, bb);
         }
 
@@ -1715,7 +1715,7 @@ void create_palette(void) {
       apply_palette[n] = col * 2 + 1;
 
   if (!load_palette)
-    show_progress((char *)texts[497], num_colores * 4 - 256, num_colores * 4 - 256);
+    show_progress((char *)texts[497], num_colors * 4 - 256, num_colors * 4 - 256);
 }
 
 
@@ -1842,7 +1842,7 @@ void prepare_wallpaper(void) {
       wallpaper = NULL;
       return;
     }
-    rescalar(temp, tap_w, tap_h, p, vga_width, vga_height);
+    rescale(temp, tap_w, tap_h, p, vga_width, vga_height);
     free(temp);
     wallpaper_width = vga_width;
     wallpaper_height = vga_height;
@@ -1853,20 +1853,20 @@ void prepare_wallpaper(void) {
   memcpy(dac4, old_dac4, 768);
 }
 
-void rescalar(byte *si, int sian, int sial, byte *di, int dian, int dial) {
+void rescale(byte *src, int src_w, int src_h, byte *dst, int dst_w, int dst_h) {
   float xr, yr;
   float ix, iy;
   int x, y;
   byte *s, *d;
 
-  ix = (float)sian / (float)dian;
-  iy = (float)sial / (float)dial;
+  ix = (float)src_w / (float)dst_w;
+  iy = (float)src_h / (float)dst_h;
 
-  for (y = 0, yr = 0; y < dial; y++, yr += iy) {
-    s = si + (int)yr * sian;
-    d = di + y * dian;
-    for (x = 0, xr = 0; x < dian; x++, xr += ix) {
-      *di++ = *(s + (int)xr);
+  for (y = 0, yr = 0; y < dst_h; y++, yr += iy) {
+    s = src + (int)yr * src_w;
+    d = dst + y * dst_w;
+    for (x = 0, xr = 0; x < dst_w; x++, xr += ix) {
+      *dst++ = *(s + (int)xr);
     }
   }
 }

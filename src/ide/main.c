@@ -33,7 +33,7 @@ void maximize(void);
 void test0(void);
 void calc2(void);
 void load_thumbs(void);
-void mostrar_mod_meters(void);
+void show_mod_meters(void);
 // MapperCreator2 removed (MODE8/3D map editor deleted)
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -319,7 +319,7 @@ void betatest6(void) {
 int safe;
 
 
-void GetFree4kBlocks(void);
+void get_free_4k_blocks(void);
 
 #ifdef MIXER
 void print_init_flags(int flags) {
@@ -538,9 +538,9 @@ int main(int argc, char *argv[]) {
   }
 
   if (!interpreting) {
-    textcolor(BRIGHT, WHITE, RED);
+    text_color(BRIGHT, WHITE, RED);
     printf("%s", texts[1]);
-    textcolor(TXTRESET, WHITE, BLACK);
+    text_color(TXTRESET, WHITE, BLACK);
     printf("\n");
   }
 
@@ -1312,7 +1312,7 @@ fin_bucle_entorno:
         break;
 
       case WIN_MUSIC:
-        mostrar_mod_meters();
+        show_mod_meters();
         break;
 
       default:
@@ -2610,12 +2610,12 @@ void move(int a, int b) {
   }
 }
 
-void divdelete(int a) {
+void div_delete(int a) {
   memmove(&window[a].type, &window[a + 1].type, sizeof(struct twindow) * (MAX_WINDOWS - 1 - a));
   window[MAX_WINDOWS - 1].type = WIN_EMPTY;
 }
 
-void addwindow(void) {
+void add_window(void) {
   memmove(&window[1].type, &v.type, sizeof(struct twindow) * (MAX_WINDOWS - 1));
 }
 
@@ -2680,7 +2680,7 @@ void debug_info(char *msg) {}
 
 void debug_data(int val) {}
 
-void GetFree4kBlocks(void) {}
+void get_free_4k_blocks(void) {}
 
 //-----------------------------------------------------------------------------
 //  Check_oldpif - If it finds an invalid DIV 1 PIF -> delete it

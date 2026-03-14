@@ -255,10 +255,10 @@ int fmt_is_pcx(byte *buffer) {
 
 extern byte *sample;
 extern byte apply_palette[768];
-extern int num_colores;
+extern int num_colors;
 void create_palette(void);
 void browser2(void);
-byte *fmt_decode_rle(byte *buffer, unsigned int bytes_line, unsigned int last_byte, byte *pDest);
+byte *fmt_decode_rle(byte *buffer, unsigned int bytes_line, unsigned int last_byte, byte *dest);
 
 int load_palette = 0;
 
@@ -268,7 +268,7 @@ void fmt_load_pcx(byte *buffer, byte *mapa, int vent) {
   unsigned int last_byte, bytes_line;
   char ch, rep;
   pcx_header header;
-  byte *pSrc = NULL, *pDest, *pSrcLine, *AuxPtr;
+  byte *pSrc = NULL, *dest, *pSrcLine, *AuxPtr;
   int rgb_color, x, y;
   byte rgb_blue, rgb_green, rgb_red;
   byte color16;
@@ -296,25 +296,25 @@ void fmt_load_pcx(byte *buffer, byte *mapa, int vent) {
 
   // If it's a 24bpp image
   if (header.color_planes == 3) {
-    if ((pDest = (byte *)malloc((map_width + 1) * (map_height + 1) * 3)) == NULL) {
+    if ((dest = (byte *)malloc((map_width + 1) * (map_height + 1) * 3)) == NULL) {
       v_text = (char *)texts[45];
       show_dialog((void_return_type_t)err0);
       return;
     }
-    memset(pDest, 0, (map_width + 1) * (map_height + 1) * 3);
-    pSrc = pDest;
+    memset(dest, 0, (map_width + 1) * (map_height + 1) * 3);
+    pSrc = dest;
   }
   // If it's a 4bpp image
   else if (header.color_planes == 4) {
-    if ((pDest = (byte *)malloc(last_byte)) == NULL) {
+    if ((dest = (byte *)malloc(last_byte)) == NULL) {
       v_text = (char *)texts[45];
       show_dialog((void_return_type_t)err0);
       return;
     }
-    memset(pDest, 0, last_byte);
-    pSrc = pDest;
+    memset(dest, 0, last_byte);
+    pSrc = dest;
   } else
-    pDest = mapa;
+    dest = mapa;
 
   if (header.bits_per_pixel != 8 || header.color_planes != 1) // If not 8bpp
   {
@@ -329,11 +329,11 @@ void fmt_load_pcx(byte *buffer, byte *mapa, int vent) {
       if (pixel > last_byte) {
         rep -= pixel - last_byte;
         for (con = 0; con < rep; con++)
-          *pDest++ = ch;
+          *dest++ = ch;
         break;
       }
       for (con = 0; con < rep; con++)
-        *pDest++ = ch;
+        *dest++ = ch;
     } while (1);
   }
 
@@ -350,7 +350,7 @@ void fmt_load_pcx(byte *buffer, byte *mapa, int vent) {
       if (pixel > last_byte) {
         rep -= pixel - last_byte;
         for (con = 0; con < rep; con++)
-          *pDest++ = ch;
+          *dest++ = ch;
         break;
       }
       if (pixel_line == bytes_line) {
@@ -358,7 +358,7 @@ void fmt_load_pcx(byte *buffer, byte *mapa, int vent) {
         rep -= bytes_line - map_width;
       }
       for (con = 0; con < rep; con++)
-        *pDest++ = ch;
+        *dest++ = ch;
     } while (1);
 
     memcpy(dac4, buffer, 768);
@@ -366,7 +366,7 @@ void fmt_load_pcx(byte *buffer, byte *mapa, int vent) {
       dac4[con] /= 4;
   } else if (header.bits_per_pixel == 1 && header.color_planes == 4) {
     // Convert from 4 to 8 bpp
-    pDest = mapa;
+    dest = mapa;
     AuxPtr = pSrc;
     pSrcLine = pSrc;
     for (y = 0; y < map_height; y++) // For each line...
@@ -382,8 +382,8 @@ void fmt_load_pcx(byte *buffer, byte *mapa, int vent) {
           color16 |= (((*(pSrc + header.bytes_per_line) & (1 << con16)) >> con16) << 1);
           color16 |= (((*(pSrc + header.bytes_per_line * 2) & (1 << con16)) >> con16) << 2);
           color16 |= (((*(pSrc + header.bytes_per_line * 3) & (1 << con16)) >> con16) << 3);
-          *pDest = color16;
-          pDest++;
+          *dest = color16;
+          dest++;
           pixel--;
         }
         pSrc++;
@@ -415,7 +415,7 @@ void fmt_load_pcx(byte *buffer, byte *mapa, int vent) {
       }
 
       // Convert from 24 to 8 bpp
-      pDest = mapa;
+      dest = mapa;
       AuxPtr = pSrc;
       pSrcLine = pSrc;
       for (y = 0; y < map_height; y++) { // For each line...
@@ -424,8 +424,8 @@ void fmt_load_pcx(byte *buffer, byte *mapa, int vent) {
           rgb_red = *(pSrc);
           rgb_green = *(pSrc + header.bytes_per_line);
           rgb_blue = *(pSrc + header.bytes_per_line * 2);
-          *pDest = (rgb_red & 0xE0) | ((rgb_green & 0xE0) >> 3) | ((rgb_blue & 0xC0) >> 6);
-          pDest++;
+          *dest = (rgb_red & 0xE0) | ((rgb_green & 0xE0) >> 3) | ((rgb_blue & 0xC0) >> 6);
+          dest++;
           pSrc++;
         }
         pSrcLine += header.bytes_per_line * 3;
@@ -444,7 +444,7 @@ void fmt_load_pcx(byte *buffer, byte *mapa, int vent) {
       memset(sample, 0, 32768);
 
       // Convert from 24 to 8 bpp
-      pDest = mapa;
+      dest = mapa;
       AuxPtr = pSrc;
       pSrcLine = pSrc;
       for (y = 0; y < map_height; y++) { // For each line...
@@ -455,7 +455,7 @@ void fmt_load_pcx(byte *buffer, byte *mapa, int vent) {
           rgb_blue = *(pSrc + header.bytes_per_line * 2);
           sample[((rgb_red & 0xF8) << 7) | ((rgb_green & 0xF8) << 2) | ((rgb_blue & 0xF8) >> 3)] =
               1;
-          pDest++;
+          dest++;
           pSrc++;
         }
         pSrcLine += header.bytes_per_line * 3;
@@ -466,7 +466,7 @@ void fmt_load_pcx(byte *buffer, byte *mapa, int vent) {
       create_palette();
 
       // Convert from 24 to 8 bpp
-      pDest = mapa;
+      dest = mapa;
       AuxPtr = pSrc;
       pSrcLine = pSrc;
       for (y = 0; y < map_height; y++) { // For each line...
@@ -475,9 +475,9 @@ void fmt_load_pcx(byte *buffer, byte *mapa, int vent) {
           rgb_red = *(pSrc);
           rgb_green = *(pSrc + header.bytes_per_line);
           rgb_blue = *(pSrc + header.bytes_per_line * 2);
-          *pDest = sample[((rgb_red & 0xF8) << 7) | ((rgb_green & 0xF8) << 2) |
+          *dest = sample[((rgb_red & 0xF8) << 7) | ((rgb_green & 0xF8) << 2) |
                           ((rgb_blue & 0xF8) >> 3)];
-          pDest++;
+          dest++;
           pSrc++;
         }
         pSrcLine += header.bytes_per_line * 3;
@@ -571,7 +571,7 @@ int fmt_save_pcx(byte *mapa, FILE *f) {
 //  Optimized RLE decompression routine
 //-----------------------------------------------------------------------------
 
-byte *fmt_decode_rle(byte *buffer, unsigned int bytes_line, unsigned int last_byte, byte *pDest) {
+byte *fmt_decode_rle(byte *buffer, unsigned int bytes_line, unsigned int last_byte, byte *dest) {
   unsigned int con;
   unsigned int pixel = 0, pixel_line = 0;
   char ch, rep;
@@ -588,7 +588,7 @@ byte *fmt_decode_rle(byte *buffer, unsigned int bytes_line, unsigned int last_by
     if (pixel > last_byte) {
       rep -= pixel - last_byte;
       for (con = 0; con < rep; con++)
-        *pDest++ = ch;
+        *dest++ = ch;
       break;
     }
     if (pixel_line == bytes_line) {
@@ -597,7 +597,7 @@ byte *fmt_decode_rle(byte *buffer, unsigned int bytes_line, unsigned int last_by
         buffer++;
     }
     for (con = 0; con < rep; con++)
-      *pDest++ = ch;
+      *dest++ = ch;
   } while (1);
 
   return (buffer);
@@ -666,7 +666,7 @@ void fmt_load_bmp(byte *buffer, byte *mapa, int vent) {
   RGBQUAD Bmpdac[256];
   byte bEOL;     // 1 if end of line reached.
   byte bEOF = 0; // 1 if end of file reached.
-  byte *pSrc, *pSrcLine, *pDest;
+  byte *pSrc, *pSrcLine, *dest;
   byte *AuxPtr;
   int x, y, fixmap_w, rgb_color, num_colors;
   byte rgb_red, rgb_green, rgb_blue, RunLength, pixel;
@@ -706,16 +706,16 @@ void fmt_load_bmp(byte *buffer, byte *mapa, int vent) {
   if (map_width % 4)
     fixmap_w += 4 - (map_width % 4);
 
-  pDest = mapa;
+  dest = mapa;
 
-  memset(pDest, 0, map_width * map_height);
+  memset(dest, 0, map_width * map_height);
 
   // Decompress the BMP if needed
 
   if (InfoHeader.biBitCount == 8) {
     if (InfoHeader.biCompression == BI_RLE8) {
       for (y = 0; y < map_height && !bEOF; y++) { // For each line...
-        pDest = &mapa[map_width * map_height - map_width * (y + 1)];
+        dest = &mapa[map_width * map_height - map_width * (y + 1)];
         bEOL = 0;
         while (!bEOL) { // For each packet do
           RunLength = *pSrc;
@@ -736,8 +736,8 @@ void fmt_load_bmp(byte *buffer, byte *mapa, int vent) {
               bEOF = 1;
               break;
             default: // Absolute byte copy (3 to 255)
-              memcpy(pDest, pSrc, RunLength);
-              pDest += RunLength;
+              memcpy(dest, pSrc, RunLength);
+              dest += RunLength;
               pSrc += RunLength;
               if (RunLength & 1)
                 pSrc++; // Word alignment at end of literal packet.
@@ -745,9 +745,9 @@ void fmt_load_bmp(byte *buffer, byte *mapa, int vent) {
             }
           } else { // Encoded packet:
             // RunLength pixels, all with the same value
-            memset(pDest, *pSrc, RunLength);
+            memset(dest, *pSrc, RunLength);
             pSrc++;
-            pDest += RunLength;
+            dest += RunLength;
           }
         }
       }
@@ -770,7 +770,7 @@ void fmt_load_bmp(byte *buffer, byte *mapa, int vent) {
   } else if (InfoHeader.biBitCount == 4) {
     if (InfoHeader.biCompression == BI_RLE4) {
       for (y = 0; y < map_height && !bEOF; y++) { // For each line...
-        pDest = &mapa[map_width * map_height - map_width * (y + 1)];
+        dest = &mapa[map_width * map_height - map_width * (y + 1)];
         bEOL = 0;
         while (!bEOL) { // For each packet do
           RunLength = *pSrc;
@@ -793,12 +793,12 @@ void fmt_load_bmp(byte *buffer, byte *mapa, int vent) {
             default: // Absolute byte copy (3 to 255)
               for (x = 0; x < RunLength; x++) {
                 if (x & 1) {
-                  *pDest = (*pSrc & 0x0F);
-                  pDest++;
+                  *dest = (*pSrc & 0x0F);
+                  dest++;
                   pSrc++;
                 } else {
-                  *pDest = (*pSrc >> 4);
-                  pDest++;
+                  *dest = (*pSrc >> 4);
+                  dest++;
                 }
               }
               if (x & 1)
@@ -811,11 +811,11 @@ void fmt_load_bmp(byte *buffer, byte *mapa, int vent) {
             // RunLength pixels, all with the same value
             for (x = 0; x < RunLength; x++) {
               if (x & 1) {
-                *pDest = (*pSrc & 0x0F);
-                pDest++;
+                *dest = (*pSrc & 0x0F);
+                dest++;
               } else {
-                *pDest = (*pSrc >> 4);
-                pDest++;
+                *dest = (*pSrc >> 4);
+                dest++;
               }
             }
             pSrc++;
@@ -867,14 +867,14 @@ void fmt_load_bmp(byte *buffer, byte *mapa, int vent) {
       if (fixmap_w != map_width * 3)
         fixmap_w += 4;
       for (y = 0; y < map_height; y++) { // For each line...
-        pDest = &mapa[map_width * map_height - map_width * (y + 1)];
+        dest = &mapa[map_width * map_height - map_width * (y + 1)];
         pSrc = pSrcLine;
         for (x = 0; x < map_width; x++) { // For each pixel...
           rgb_red = ((RGBQUAD *)pSrc)->rgbRed;
           rgb_green = ((RGBQUAD *)pSrc)->rgbGreen;
           rgb_blue = ((RGBQUAD *)pSrc)->rgbBlue;
-          *pDest = (rgb_red & 0xE0) | ((rgb_green & 0xE0) >> 3) | ((rgb_blue & 0xC0) >> 6);
-          pDest++;
+          *dest = (rgb_red & 0xE0) | ((rgb_green & 0xE0) >> 3) | ((rgb_blue & 0xC0) >> 6);
+          dest++;
           pSrc += 3;
         }
         pSrcLine += fixmap_w;
@@ -917,15 +917,15 @@ void fmt_load_bmp(byte *buffer, byte *mapa, int vent) {
       if (fixmap_w != map_width * 3)
         fixmap_w += 4;
       for (y = 0; y < map_height; y++) { // For each line...
-        pDest = &mapa[map_width * map_height - map_width * (y + 1)];
+        dest = &mapa[map_width * map_height - map_width * (y + 1)];
         pSrc = pSrcLine;
         for (x = 0; x < map_width; x++) { // For each pixel...
           rgb_red = ((RGBQUAD *)pSrc)->rgbRed;
           rgb_green = ((RGBQUAD *)pSrc)->rgbGreen;
           rgb_blue = ((RGBQUAD *)pSrc)->rgbBlue;
-          *pDest = sample[((rgb_red & 0xF8) << 7) | ((rgb_green & 0xF8) << 2) |
+          *dest = sample[((rgb_red & 0xF8) << 7) | ((rgb_green & 0xF8) << 2) |
                           ((rgb_blue & 0xF8) >> 3)];
-          pDest++;
+          dest++;
           pSrc += 3;
         }
         pSrcLine += fixmap_w;

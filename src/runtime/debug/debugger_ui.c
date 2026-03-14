@@ -484,7 +484,7 @@ void flush_window(int m) {
 //-----------------------------------------------------------------------------
 
 void blit_region(byte *dest, int dest_width, int dest_height, byte *p, int x, int y, int w, int h,
-                 int salta) {
+                 int skip) {
   byte *q;
   int salta_x, long_x, resto_x;
   int salta_y, long_y, resto_y;
@@ -496,10 +496,10 @@ void blit_region(byte *dest, int dest_width, int dest_height, byte *p, int x, in
   else
     salta_x = 0;
   if (x + w > dest_width)
-    resto_x = x + w - dest_width + salta;
+    resto_x = x + w - dest_width + skip;
   else
-    resto_x = salta;
-  long_x = w + salta - salta_x - resto_x;
+    resto_x = skip;
+  long_x = w + skip - salta_x - resto_x;
 
   if (y < 0)
     salta_y = -y;
@@ -527,7 +527,7 @@ void blit_region(byte *dest, int dest_width, int dest_height, byte *p, int x, in
 //-----------------------------------------------------------------------------
 
 void blit_region_dark(byte *dest, int dest_width, int dest_height, byte *p, int x, int y, int w,
-                      int h, int salta) {
+                      int h, int skip) {
   byte *q, *_ghost;
   int salta_x, long_x, resto_x;
   int salta_y, long_y, resto_y;
@@ -545,10 +545,10 @@ void blit_region_dark(byte *dest, int dest_width, int dest_height, byte *p, int 
   else
     salta_x = 0;
   if (x + w > dest_width)
-    resto_x = x + w - dest_width + salta;
+    resto_x = x + w - dest_width + skip;
   else
-    resto_x = salta;
-  long_x = w + salta - salta_x - resto_x;
+    resto_x = skip;
+  long_x = w + skip - salta_x - resto_x;
 
   if (y < 0)
     salta_y = -y;
@@ -1502,9 +1502,9 @@ void show_get(t_item *i) {
   }
 }
 
-void select_get(t_item *i, int activo, int ocultar_error) {
+void select_get(t_item *i, int active, int hide_error) {
   int n;
-  if (activo) {
+  if (active) {
     wrectangle(v.ptr, v.w / big2, v.h / big2, c12, i->get.x - 1, i->get.y + 7, i->get.w + 2, 11);
     if (i->state & 2) {
       div_strcpy(get, sizeof(get), (char *)i->get.buffer);
@@ -1519,7 +1519,7 @@ void select_get(t_item *i, int activo, int ocultar_error) {
         else {
           if (atoi(get) >= i->get.r0 && atoi(get) <= i->get.r1)
             itoa(atoi(get), (char *)i->get.buffer, 10);
-          else if (!ocultar_error && !show_items_called) {
+          else if (!hide_error && !show_items_called) {
             div_snprintf(combo_error, sizeof(combo_error), "%s [%d..%d].", (char *)text[4],
                          i->get.r0, i->get.r1);
             text[3] = (byte *)combo_error;
@@ -1554,7 +1554,7 @@ void show_flag(t_item *i) {
   wwrite(v.ptr, v.w / big2, v.h / big2, i->flag.x + 8, i->flag.y, 0, i->flag.text, c3);
 }
 
-void select_button(t_item *i, int activo) {
+void select_button(t_item *i, int active) {
   int x = i->button.x, y = i->button.y;
   int w, h;
 
@@ -1598,13 +1598,13 @@ void select_button(t_item *i, int activo) {
     break;
   }
   if (v.ptr[(x - 4) * big2 - 1 + (y - 5) * big2 * v.w] == c12) {
-    if (activo) {
+    if (active) {
       wrectangle(v.ptr, v.w / big2, v.h / big2, c1, x - 4, y - 4, w + 8, h + 8);
     } else {
       wrectangle(v.ptr, v.w / big2, v.h / big2, c12, x - 4, y - 4, w + 8, h + 8);
     }
   } else {
-    if (activo) {
+    if (active) {
       wrectangle(v.ptr, v.w / big2, v.h / big2, c12, x - 4, y - 4, w + 8, h + 8);
     } else {
       wrectangle(v.ptr, v.w / big2, v.h / big2, c2, x - 4, y - 4, w + 8, h + 8);
@@ -2043,7 +2043,7 @@ int button_status(int n) {
 //----------------------------------------------------------------------------
 //      Read mouse adapted for the interpreter
 //----------------------------------------------------------------------------
-void readmouse(void);
+void read_mouse(void);
 
 void dread_mouse(void) {
   poll_keyboard();

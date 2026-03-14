@@ -17,7 +17,7 @@ extern char Load_FontPathName[256];
 extern char Load_FontName[14];
 
 void print_fontmap(void) {
-  char FontPathName[256], FontName[14] = "";
+  char font_path_name[256], font_name[14] = "";
   char *buffer, *di, color;
   int buffer_len, x, y, _x0, x0 = 1, y0 = 1, chars, *p;
   int gencode;
@@ -26,9 +26,9 @@ void print_fontmap(void) {
   v_mode = 1;
   v_type = FT_FNT;
 
-  div_strcpy(FontPathName, sizeof(FontPathName), file_types[v_type].path);
-  div_strcat(FontPathName, sizeof(FontPathName), "/");
-  div_strcat(FontPathName, sizeof(FontPathName), FontName);
+  div_strcpy(font_path_name, sizeof(font_path_name), file_types[v_type].path);
+  div_strcat(font_path_name, sizeof(font_path_name), "/");
+  div_strcat(font_path_name, sizeof(font_path_name), font_name);
 
   v_text = (char *)texts[264];
   show_dialog(browser0);
@@ -44,11 +44,11 @@ void print_fontmap(void) {
       return;
   }
 
-  div_strcpy(FontName, sizeof(FontName), input);
-  DIV_STRCPY(FontPathName, file_types[v_type].path);
-  if (!IS_PATH_SEP(FontPathName[strlen(FontPathName) - 1]))
-    div_strcat(FontPathName, sizeof(FontPathName), "/");
-  div_strcat(FontPathName, sizeof(FontPathName), input); // * FontPathName full path of the file
+  div_strcpy(font_name, sizeof(font_name), input);
+  DIV_STRCPY(font_path_name, file_types[v_type].path);
+  if (!IS_PATH_SEP(font_path_name[strlen(font_path_name) - 1]))
+    div_strcat(font_path_name, sizeof(font_path_name), "/");
+  div_strcat(font_path_name, sizeof(font_path_name), input); // * font_path_name full path of the file
 
   buffer_len = 1356 + 256 * 16 + map_width * map_height; // Allocate enough memory for the FNT
 
@@ -124,7 +124,7 @@ end_bucle:
 
   memcpy(buffer + 1352, &gencode, 4);
 
-  if ((f = fopen(FontPathName, "wb")) == NULL) {
+  if ((f = fopen(font_path_name, "wb")) == NULL) {
     v_text = (char *)texts[242];
     show_dialog(err0);
     free(buffer);
@@ -146,7 +146,7 @@ end_bucle:
 
 
   for (x = -1, y = 1; y < MAX_WINDOWS; y++)
-    if (window[y].type == WIN_FONT && !strcmp((char *)window[y].title, FontName))
+    if (window[y].type == WIN_FONT && !strcmp((char *)window[y].title, font_name))
       x = y;
 
   if (x >= 0) {
@@ -154,8 +154,8 @@ end_bucle:
     close_window();
   }
 
-  div_strcpy(Load_FontName, sizeof(Load_FontName), FontName);
-  div_strcpy(Load_FontPathName, sizeof(Load_FontPathName), FontPathName);
+  div_strcpy(Load_FontName, sizeof(Load_FontName), font_name);
+  div_strcpy(Load_FontPathName, sizeof(Load_FontPathName), font_path_name);
   new_window(show_font0);
 }
 

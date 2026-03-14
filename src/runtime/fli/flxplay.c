@@ -41,7 +41,7 @@ struct {
   int loop;
 } flc;
 
-void SDLInit(char *header)
+void sdl_init(char *header)
 { /* Initialize SDL
   */
   printf("SDL: Version %d.%d.%d.\n", SDL_MAJOR_VERSION, SDL_MINOR_VERSION, SDL_PATCHLEVEL);
@@ -63,7 +63,7 @@ void SDLInit(char *header)
 /* Set titlebar and iconbar name
 */
   SDL_WM_SetCaption(header, header);
-} /* SDLInit */
+} /* sdl_init */
 
 
 void fli_read_u16(uint16_t *tmp1, uint8_t *tmp2) {
@@ -349,7 +349,7 @@ void fli_decode_copy()
   }
 } /* fli_decode_copy */
 
-void BLACK()
+void black()
 { Uint8 *pDst;
   int Lines = flc.screen_h;
   pDst=flc.mainscreen->pixels;
@@ -357,7 +357,7 @@ void BLACK()
     memset(pDst, 0, flc.screen_w);
     pDst+=flc.mainscreen->pitch;
   }
-} /* BLACK */
+} /* black */
 
 
 void fli_do_one_frame()
@@ -389,7 +389,7 @@ void fli_do_one_frame()
         fli_decode_lc();
       break;
       case 13:
-        BLACK();
+        black();
       break;
       case 15:
         fli_decode_brun();
@@ -410,7 +410,7 @@ void fli_do_one_frame()
   SDL_UnlockSurface(flc.mainscreen);
 } /* fli_do_one_frame */
 
-void SDLWaitFrame(void)
+void sdl_wait_frame(void)
 { static Uint32 oldTick=0;
   Uint32 currentTick;
   Sint32 waitTicks;
@@ -421,7 +421,7 @@ void SDLWaitFrame(void)
   if(waitTicks>0) {
     SDL_Delay(waitTicks);
   }
-} /* SDLWaitFrame */
+} /* sdl_wait_frame */
 
 void fli_init_first_frame()
 { flc.FrameSize=16;
@@ -433,7 +433,7 @@ void fli_init_first_frame()
   fli_read_file(flc.FrameSize);
 } /* fli_init_first_frame */
 
-void FlcInit(char *filename)
+void flc_init(char *filename)
 { flc.pMembuf=NULL;
   flc.membufSize=0;
 
@@ -441,15 +441,15 @@ void FlcInit(char *filename)
     printf("Wrong header\n");
     exit(1);
   }
-  SDLInit(filename);
-} /* FlcInit */
+  sdl_init(filename);
+} /* flc_init */
 
-void FlcDeInit()
+void flc_deinit()
 { fclose(flc.file);
   free(flc.pMembuf);
-} /* FlcDeInit */
+} /* flc_deinit */
 
-void FlcMain()
+void flc_main()
 { int quit=0;
   SDL_Event event;
   fli_init_first_frame();
@@ -474,7 +474,7 @@ void FlcMain()
 
     if(flc.FrameCheck!=0x0f100) {
       fli_do_one_frame();
-      SDLWaitFrame();
+      sdl_wait_frame();
       /* TODO: Track which rectangles have really changed */
       SDL_UpdateRect(flc.mainscreen, 0, 0, 0, 0);
     }
@@ -491,14 +491,14 @@ void FlcMain()
       }
     }
   }
-} /* FlcMain */
+} /* flc_main */
 
-void FlxplayHelp()
+void flxplay_help()
 { printf("FLX player (%s) with SDL output (jasper@il.fontys.nl)\n", version);
   printf("View readme file for more information\n\n");
   printf("flxplay [-l] [filename]\n");
   exit(1);
-} /* FlxplayHelp */
+} /* flxplay_help */
 
 main(int argc, char **argv)
 { int c;
@@ -509,16 +509,16 @@ main(int argc, char **argv)
       printf("Looping mode\n");
       flc.loop = 1;
     } else {
-      FlxplayHelp();
+      flxplay_help();
     }
   }
   if(!argv[c]) {
-    FlxplayHelp();
+    flxplay_help();
   }
 
-  FlcInit(argv[c]);
-  FlcMain();
-  FlcDeInit();
+  flc_init(argv[c]);
+  flc_main();
+  flc_deinit();
   exit(0);
 } /* main */
 

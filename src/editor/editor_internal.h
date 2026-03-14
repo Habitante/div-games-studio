@@ -179,7 +179,7 @@ void put_char3(byte *ptr, int w, byte c, int block, byte color);
 void open_program(void);
 void program0_new(void);
 void save_program(void);
-void open_program_external(char *nombre, char *path);
+void open_program_external(char *name, char *path);
 void find_text0(void);
 void find_text(void);
 void replace_text0(void);

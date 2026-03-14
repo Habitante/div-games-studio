@@ -157,7 +157,7 @@ void rectangle(byte, int, int, int, int);
 void save_mouse_bg(byte *p, int x, int y, int n, int flag);
 void put(int, int, int);
 void put_bw(int, int, int);
-void memxchg(byte *, byte *, int);
+void mem_xchg(byte *, byte *, int);
 void draw_edit_background(int, int, int, int);
 void zoom_map(void);
 void fill_select(word, word);
@@ -206,8 +206,8 @@ void select_zoom(void);
 void sp_normal(byte *, int, int, int, int, int, int, int);
 void sp_rotated(byte *, int, int, int, int, int, int, int, float, float);
 void sp_size(int *, int *, int *, int *, int, int, float, float);
-void invierte_hor(byte *, int, int);
-void invierte_ver(byte *, int, int);
+void flip_horizontal(byte *, int, int);
+void flip_vertical(byte *, int, int);
 
 ///////////////////////////////////////////////////////////////////////////////
 //      Functions exported by DIVVIDEO (divvideo.c)
@@ -245,7 +245,7 @@ void create_dac4();
 byte find_color(byte, byte, byte);
 byte find_color_not0(byte r, byte g, byte b);
 byte fast_find_color(byte fr, byte fg, byte fb);
-byte find_ord(byte *);
+byte find_order(byte *);
 byte average_color(byte, byte);
 void make_nearest_gradient(void);
 void calculate_gradient(int);
@@ -370,16 +370,16 @@ void wallpaper_setup0(void);
 
 void wgra(byte *dest, int dest_width, int dest_height, byte c, int x, int y, int w, int h);
 void wbox(byte *dest, int dest_width, int dest_height, byte c, int x, int y, int w, int h);
-void wresalta_box(byte *dest, int dest_width, int dest_height, int x, int y, int w, int h);
+void w_highlight_box(byte *dest, int dest_width, int dest_height, int x, int y, int w, int h);
 void wbox_in_box(byte *dest, int dest_pitch, int dest_width, int dest_height, byte c, int x, int y,
                  int w, int h);
 void wrectangle(byte *dest, int dest_width, int dest_height, byte c, int x, int y, int w, int h);
 void wput(byte *dest, int dest_width, int dest_height, int x, int y, int n);
 void wput_in_box(byte *dest, int dest_pitch, int dest_width, int dest_height, int x, int y, int n);
 void blit_region(byte *dest, int dest_width, int dest_height, byte *p, int x, int y, int w, int h,
-                 int salta);
+                 int skip);
 void blit_region_dark(byte *dest, int dest_width, int dest_height, byte *p, int x, int y, int w,
-                      int h, int salta);
+                      int h, int skip);
 void wwrite(byte *dest, int dest_width, int dest_height, int x, int y, int alignment, byte *ptr,
             byte c);
 void wwrite_in_box(byte *dest, int dest_pitch, int dest_width, int dest_height, int x, int y,
@@ -389,7 +389,7 @@ int char_len(char);
 void draw_button(int n, int x, int y, int alignment, int color);
 int mouse_button_hit(int n, int x, int y, int alignment);
 
-void wline(char *ptr, int realan, int w, int h, int x0, int y0, int x1, int y1, char color);
+void wline(char *ptr, int real_width, int w, int h, int x0, int y0, int x1, int y1, char color);
 
 ///////////////////////////////////////////////////////////////////////////////
 //      Functions exported by DIVLENGU (divlengu.c)
@@ -1047,7 +1047,7 @@ void help0(void);
 void help1(void);
 void help2(void);
 void help3(void);
-void tabula_help(byte *si, byte *di, int lon);
+void tabulate_help(byte *si, byte *di, int lon);
 
 //-----------------------------------------------------------------------------
 //      Installation
@@ -1078,8 +1078,8 @@ extern int lp1[512], lp_select;
 void copy(int a, int b);
 void xchg(int a, int b);
 void move(int a, int b);
-void divdelete(int a);
-void addwindow(void);
+void div_delete(int a);
+void add_window(void);
 void wup(int a);
 void wdown(int a);
 

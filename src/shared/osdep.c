@@ -99,60 +99,60 @@ void call(const void_return_type_t func) {
 // Comment:    Note that the concept of an extension is not available in Linux,
 //             nevertheless it is considered
 
-void _splitpath(const char *Path, char *Drive, char *Directory, char *Filename, char *Extension) {
-  char *CopyOfPath = (char *)Path;
-  int Counter = 0;
-  int Last = 0;
-  int Rest = 0;
+void _splitpath(const char *path, char *drive, char *directory, char *fname, char *extension) {
+  char *copy_of_path = (char *)path;
+  int counter = 0;
+  int last = 0;
+  int rest = 0;
 
   // no drives available in linux .
   // extensions are not common in linux
   // but considered anyway
-  Drive = NULL;
+  drive = NULL;
 
-  while (*CopyOfPath != '\0') {
+  while (*copy_of_path != '\0') {
     // search for the last slash
-    while (*CopyOfPath != '/' && *CopyOfPath != '\0') {
-      CopyOfPath++;
-      Counter++;
+    while (*copy_of_path != '/' && *copy_of_path != '\0') {
+      copy_of_path++;
+      counter++;
     }
-    if (*CopyOfPath == '/') {
-      CopyOfPath++;
-      Counter++;
-      Last = Counter;
+    if (*copy_of_path == '/') {
+      copy_of_path++;
+      counter++;
+      last = counter;
     } else
-      Rest = Counter - Last;
+      rest = counter - last;
   }
   // directory is the first part of the path until the
   // last slash appears
-  strncpy(Directory, Path, Last);
+  strncpy(directory, path, last);
   // strncpy doesnt add a '\0'
-  Directory[Last] = '\0';
-  // Filename is the part behind the last slahs
-  div_strcpy(Filename, _MAX_FNAME + 1, CopyOfPath -= Rest);
+  directory[last] = '\0';
+  // fname is the part behind the last slahs
+  div_strcpy(fname, _MAX_FNAME + 1, copy_of_path -= rest);
   // get extension if there is any
-  char *ext = Extension;
-  while (*Filename != '\0') {
+  char *ext = extension;
+  while (*fname != '\0') {
     // the part behind the point is called extension in windows systems
     // at least that is what i thought apperantly the '.' is used as part
     // of the extension too .
-    if (*Filename == '.') {
-      *Filename = '\0';
-      *Filename++;
-      *Extension = '.';
-      *Extension++;
-      while (*Filename != '\0') {
-        *Extension = *Filename;
-        Extension++;
-        Filename++;
+    if (*fname == '.') {
+      *fname = '\0';
+      *fname++;
+      *extension = '.';
+      *extension++;
+      while (*fname != '\0') {
+        *extension = *fname;
+        extension++;
+        fname++;
       }
     }
-    if (*Filename != '\0') {
-      Filename++;
+    if (*fname != '\0') {
+      fname++;
     }
   }
-  *Extension = '\0';
-  Extension = ext;
+  *extension = '\0';
+  extension = ext;
 
   return;
 }
@@ -167,29 +167,29 @@ void _splitpath(const char *Path, char *Drive, char *Directory, char *Filename, 
 // Comment:    Note that the concept of an extension is not available in Linux,
 //             nevertheless it is considered
 
-void _makepath(char *Path, const char *Drive, const char *Directory, const char *File,
-               const char *Extension) {
-  while (*Drive != '\0' && Drive != NULL) {
-    *Path = *Drive;
-    Path++;
-    Drive++;
+void _makepath(char *path, const char *drive, const char *directory, const char *file,
+               const char *extension) {
+  while (*drive != '\0' && drive != NULL) {
+    *path = *drive;
+    path++;
+    drive++;
   }
-  while (*Directory != '\0' && Directory != NULL) {
-    *Path = *Directory;
-    Path++;
-    Directory++;
+  while (*directory != '\0' && directory != NULL) {
+    *path = *directory;
+    path++;
+    directory++;
   }
-  while (*File != '\0' && File != NULL) {
-    *Path = *File;
-    Path++;
-    File++;
+  while (*file != '\0' && file != NULL) {
+    *path = *file;
+    path++;
+    file++;
   }
-  while (*Extension != '\0' && Extension != NULL) {
-    *Path = *Extension;
-    Path++;
-    Extension++;
+  while (*extension != '\0' && extension != NULL) {
+    *path = *extension;
+    path++;
+    extension++;
   }
-  *Path = '\0';
+  *path = '\0';
   return;
 }
 
@@ -200,9 +200,9 @@ void _makepath(char *Path, const char *Drive, const char *Directory, const char 
 //             The actual process and not for a forked one which would be true
 //             for system("cd DIR");
 
-int _chdir(const char *Directory) {
-  if (Directory != NULL && strlen(Directory) > 0)
-    chdir(Directory);
+int _chdir(const char *directory) {
+  if (directory != NULL && strlen(directory) > 0)
+    chdir(directory);
 
   return 0;
 }
@@ -283,7 +283,7 @@ void __mkdir(char *dir) {
 }
 
 
-void textcolor(int attr, int fg, int bg) {
+void text_color(int attr, int fg, int bg) {
   char command[13];
 
   /* Command is the control command to the terminal */

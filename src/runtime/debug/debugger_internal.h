@@ -169,11 +169,11 @@ void init_big(void);
 void init_colors(void);
 
 void err0(void);
-void e(int text_id);
+void runtime_error(int text_id);
 void deb(void);
 void debug(void);
 
-int procesos_ejecutados(void);
+int processes_executed(void);
 void determine_ids(void);
 void draw_proc_list(void);
 void process_graph(int id, byte *q, int van, int w, int h);
@@ -192,9 +192,9 @@ void move_window(void);
 void flush_window(int m);
 
 void blit_region(byte *dest, int dest_width, int dest_height, byte *p, int x, int y, int w, int h,
-                 int salta);
+                 int skip);
 void blit_region_dark(byte *dest, int dest_width, int dest_height, byte *p, int x, int y, int w,
-                      int h, int salta);
+                      int h, int skip);
 void wbox(byte *dest, int dest_width, int dest_height, byte c, int x, int y, int w, int h);
 void wbox_in_box(byte *dest, int dest_pitch, int dest_width, int dest_height, byte c, int x, int y,
                  int w, int h);
@@ -230,8 +230,8 @@ void _show_items2(void);
 void show_button(t_item *i);
 void show_get(t_item *i);
 void show_flag(t_item *i);
-void select_button(t_item *i, int activo);
-void select_get(t_item *i, int activo, int ocultar_error);
+void select_button(t_item *i, int active);
+void select_get(t_item *i, int active, int hide_error);
 void _process_items(void);
 void _select_new_item(int i);
 void _reselect_item(void);
@@ -254,8 +254,8 @@ int wmouse_in(int x, int y, int w, int h);
 //-----------------------------------------------------------------------------
 
 void create_variable_list(void);
-void exclude_members(int padre, int nivel, int index);
-void include_members(int padre, int nivel, int index);
+void exclude_members(int parent, int level, int index);
+void include_members(int parent, int level, int index);
 void inspect0(void);
 void paint_var_list(void);
 void paint_segment2(void);

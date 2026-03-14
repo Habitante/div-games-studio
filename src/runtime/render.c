@@ -23,7 +23,7 @@ void line_pixel(int x, int y);
 //----------------------------------------------------------------------------
 // Prototypes
 //----------------------------------------------------------------------------
-void move_scroll(int plano, int x, int y);
+void move_scroll(int plane, int x, int y);
 void save_region(void);
 void sp_scan_clipped(byte *p, short n, short m, short o, byte *si, int w, int x0, int y0, int x1,
                      int y1);
@@ -33,7 +33,7 @@ void sp_scan(byte *p, short n, byte *si, int w, int x0, int y0, int x1, int y1);
 void sp_scan_ghost(byte *p, short n, byte *si, int w, int x0, int y0, int x1, int y1);
 void text_clipped(byte *p, int x, int y, byte w, int h);
 void text_normal(byte *p, int x, int y, byte w, int h);
-void paint_mode7(int n, int camara_x, int camara_y, int camara_z, int angle);
+void paint_mode7(int n, int camera_x, int camera_y, int camera_z, int angle);
 void paint_sprite_m7(int n, int ide, int x, int y, int size, int ang);
 
 //----------------------------------------------------------------------------
@@ -297,10 +297,10 @@ void scroll_parallax(void) {
 }
 
 //----------------------------------------------------------------------------
-//      Set_scroll(plano,x,y) - snum
+//      Set_scroll(plane,x,y) - snum
 //----------------------------------------------------------------------------
 
-void set_scroll(int plano, int x, int y) {
+void set_scroll(int plane, int x, int y) {
   int w, h, iscan;
   int _nx, nx, ny;
   byte *di, *si, *_si;
@@ -309,10 +309,10 @@ void set_scroll(int plano, int x, int y) {
   if (snum < 0 || snum > 9)
     return;
 
-  if (plano < 0 || plano >= iscroll[snum].on)
+  if (plane < 0 || plane >= iscroll[snum].on)
     return;
 
-  if (plano == 0) {
+  if (plane == 0) {
     di = iscroll[snum].sscr1 = iscroll[snum]._sscr1;
     iscroll[snum].block1 = iscroll[snum].h;
     if (!(iscroll[snum].map_flags & 1)) {
@@ -377,7 +377,7 @@ void set_scroll(int plano, int x, int y) {
   } else {
 */
 
-  if (iscroll[snum].on == 2 && plano == 0) {
+  if (iscroll[snum].on == 2 && plane == 0) {
     fast = iscroll[snum].fast;
     ny = h - y;
     _nx = w - x;
@@ -643,7 +643,7 @@ cont_loop:
 }
 
 //----------------------------------------------------------------------------
-//      Move_scroll(snum,plano,ix,iy)
+//      Move_scroll(snum,plane,ix,iy)
 //----------------------------------------------------------------------------
 
 byte *scroll_right(byte *_buf, byte *buf, int *block, byte *map, int w, int h, int x, int y);
@@ -654,16 +654,16 @@ byte *scroll_down(byte *_buf, byte *buf, int *block, byte *map, int w, int h, in
 
 byte *scroll_up(byte *_buf, byte *buf, int *block, byte *map, int w, int h, int x, int y);
 
-void move_scroll(int plano, int x, int y) {
+void move_scroll(int plane, int x, int y) {
   int ix, iy;
 
   if (snum < 0 || snum > 9)
     return;
 
-  if (plano < 0 || plano >= iscroll[snum].on)
+  if (plane < 0 || plane >= iscroll[snum].on)
     return;
 
-  if (plano == 0) {
+  if (plane == 0) {
     ix = iscroll[snum].map1_x;
     iy = iscroll[snum].map1_y;
     x += iscroll[snum].map1_x;
@@ -704,19 +704,19 @@ void move_scroll(int plano, int x, int y) {
 
   /////////////////////////////////////////////////////////////////////
   if (abs(ix) > iscroll[snum].w / 2 || abs(iy) > iscroll[snum].h / 2) {
-    if (plano == 0) {
+    if (plane == 0) {
       ix += iscroll[snum].map1_x;
       iy += iscroll[snum].map1_y;
     } else {
       ix += iscroll[snum].map2_x;
       iy += iscroll[snum].map2_y;
     }
-    set_scroll(plano, ix, iy);
+    set_scroll(plane, ix, iy);
     return;
   }
   /////////////////////////////////////////////////////////////////////
 
-  if (plano == 0) {
+  if (plane == 0) {
     iscroll[snum].map1_x = x;
     iscroll[snum].map1_y = y;
   } else {
@@ -729,7 +729,7 @@ void move_scroll(int plano, int x, int y) {
 
   if (ix > 0)
     do {
-      if (plano == 0) {
+      if (plane == 0) {
         iscroll[snum].sscr1 =
             scroll_right(iscroll[snum]._sscr1, iscroll[snum].sscr1, &iscroll[snum].block1,
                          iscroll[snum].map1, iscroll[snum].map1_w, iscroll[snum].map1_h, x++, y);
@@ -745,7 +745,7 @@ void move_scroll(int plano, int x, int y) {
 
   if (ix < 0)
     do {
-      if (plano == 0) {
+      if (plane == 0) {
         iscroll[snum].sscr1 =
             scroll_left(iscroll[snum]._sscr1, iscroll[snum].sscr1, &iscroll[snum].block1,
                         iscroll[snum].map1, iscroll[snum].map1_w, iscroll[snum].map1_h, x--, y);
@@ -761,7 +761,7 @@ void move_scroll(int plano, int x, int y) {
 
   if (iy > 0)
     do {
-      if (plano == 0) {
+      if (plane == 0) {
         iscroll[snum].sscr1 =
             scroll_down(iscroll[snum]._sscr1, iscroll[snum].sscr1, &iscroll[snum].block1,
                         iscroll[snum].map1, iscroll[snum].map1_w, iscroll[snum].map1_h, x, y++);
@@ -779,7 +779,7 @@ void move_scroll(int plano, int x, int y) {
 
   if (iy < 0)
     do {
-      if (plano == 0) {
+      if (plane == 0) {
         iscroll[snum].sscr1 =
             scroll_up(iscroll[snum]._sscr1, iscroll[snum].sscr1, &iscroll[snum].block1,
                       iscroll[snum].map1, iscroll[snum].map1_w, iscroll[snum].map1_h, x, y--);
@@ -795,7 +795,7 @@ void move_scroll(int plano, int x, int y) {
       }
     } while (++iy);
 
-  if (plano) {
+  if (plane) {
     (scroll + snum)->x1 = iscroll[snum].map2_x;
     (scroll + snum)->y1 = iscroll[snum].map2_y;
   } else {
@@ -1011,7 +1011,7 @@ void put_sprite(int file, int graph, int x, int y, int angle, int size, int flag
   int _saved_width = vga_width, _saved_height = vga_height;
 
   if (file > max_fpgs || file < 0) {
-    e(109);
+    runtime_error(109);
     return;
   }
   if (file)
@@ -1019,11 +1019,11 @@ void put_sprite(int file, int graph, int x, int y, int angle, int size, int flag
   else
     max_grf = 2000;
   if (graph <= 0 || graph >= max_grf) {
-    e(110);
+    runtime_error(110);
     return;
   }
   if (g[file].grf == NULL) {
-    e(111);
+    runtime_error(111);
     return;
   }
 
@@ -1100,7 +1100,7 @@ void put_sprite(int file, int graph, int x, int y, int angle, int size, int flag
     vga_height = _saved_height;
 
   } else
-    e(121);
+    runtime_error(121);
 }
 
 //----------------------------------------------------------------------------
@@ -3106,7 +3106,7 @@ int get_disty(int a, int d) {
 // Render the map in perspective (mode-7 floor)
 //----------------------------------------------------------------------------
 
-void paint_mode7(int n, int camara_x, int camara_y, int camara_z, int angle) {
+void paint_mode7(int n, int camera_x, int camera_y, int camera_z, int angle) {
   int y, u, du, vv, dv, pos_x, pos_y;
   int ancho_m, alto_m, ancho_e, alto_e;
   int proyeccion_y, sint, cost;
@@ -3123,12 +3123,12 @@ void paint_mode7(int n, int camara_x, int camara_y, int camara_z, int angle) {
   ancho_e = im7[n].ext_w - 1;
   alto_e = im7[n].ext_h - 1;
 
-  if (!camara_y)
+  if (!camera_y)
     return;
 
   for (y = 0; y < im7[n].h; y++, di += vga_width - im7[n].w) {
     divisor = (m7 + n)->horizon - y - 1;
-    if (camara_y > 0) {
+    if (camera_y > 0) {
       if (divisor >= 0) {
         di += im7[n].w;
         continue;
@@ -3139,15 +3139,15 @@ void paint_mode7(int n, int camara_x, int camara_y, int camara_z, int angle) {
         continue;
       }
     }
-    proyeccion_y = -camara_y / divisor;
+    proyeccion_y = -camera_y / divisor;
 
     sint = mul_24(seno[angle], proyeccion_y);
     cost = mul_24(coseno[angle], proyeccion_y);
 
-    u = camara_x + mul_16(distancia, cost) + mul_16(sint, -mediox_modo7_16);
+    u = camera_x + mul_16(distancia, cost) + mul_16(sint, -mediox_modo7_16);
     du = sint;
 
-    vv = camara_z + mul_16(distancia, sint) - mul_16(cost, -mediox_modo7_16);
+    vv = camera_z + mul_16(distancia, sint) - mul_16(cost, -mediox_modo7_16);
     dv = -cost;
     vv = -vv;
     dv = -dv;

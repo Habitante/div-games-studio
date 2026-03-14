@@ -243,7 +243,7 @@ void show_dialog(void_return_type_t init_handler) {
       }
     }
 
-    addwindow();
+    add_window();
 
     //---------------------------------------------------------------------------
     // The following values should define the init_handler, default values
@@ -381,7 +381,7 @@ void show_dialog(void_return_type_t init_handler) {
       //---------------------------------------------------------------------------
 
     } else {
-      divdelete(0);
+      div_delete(0);
     }
   }
 }
@@ -478,7 +478,7 @@ void show_button(struct t_item *i) {
     select_button(i, 1);
 }
 
-void select_button(struct t_item *i, int activo) {
+void select_button(struct t_item *i, int active) {
   int x = i->button.x, y = i->button.y;
   int w, h;
   w = text_len(i->button.text + 1);
@@ -515,7 +515,7 @@ void select_button(struct t_item *i, int activo) {
     y = y - h + 1;
     break;
   }
-  if (activo) {
+  if (active) {
     wrectangle(v.ptr, v.w / big2, v.h / big2, c12, x - 4, y - 4, w + 8, h + 8);
   } else {
     wrectangle(v.ptr, v.w / big2, v.h / big2, c2, x - 4, y - 4, w + 8, h + 8);
@@ -535,10 +535,10 @@ void show_get(struct t_item *i) {
   }
 }
 
-void select_get(struct t_item *i, int activo, int ocultar_error) {
+void select_get(struct t_item *i, int active, int hide_error) {
   char cWork[128];
   int n;
-  if (activo) {
+  if (active) {
     wrectangle(v.ptr, v.w / big2, v.h / big2, c12, i->get.x - 1, i->get.y + 7, i->get.w + 2, 11);
     if (i->state & 2) {
       div_strcpy((char *)get, LONG_LINE, (char *)i->get.buffer);
@@ -553,7 +553,7 @@ void select_get(struct t_item *i, int activo, int ocultar_error) {
         else {
           if (atoi(get) >= i->get.r0 && atoi(get) <= i->get.r1)
             itoa(atoi(get), (char *)i->get.buffer, 10);
-          else if (!ocultar_error && !show_items_called) {
+          else if (!hide_error && !show_items_called) {
             div_snprintf(cWork, sizeof(cWork), "%s [%d..%d].", texts[49], i->get.r0, i->get.r1);
             v_text = cWork;
             show_dialog(err0);

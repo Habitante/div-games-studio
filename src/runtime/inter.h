@@ -1060,7 +1060,7 @@ GLOBAL int demo;
 //      Runtime error messages
 //----------------------------------------------------------------------------
 
-void e(int text_id);
+void runtime_error(int text_id);
 
 GLOBAL int skipped[128];
 GLOBAL int num_skipped;

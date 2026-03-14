@@ -31,7 +31,7 @@ FILE *prg = NULL;
 byte locvar[STACK_SIZE];
 byte localvar;
 
-void getvarname(int i, char *name) {
+void get_var_name(int i, char *name) {
   char mousestruct[12][10] = {"x",    "y",     "z",      "file", "graph",  "angle",
                               "size", "flags", "region", "left", "middle", "right"};
 
@@ -92,7 +92,7 @@ void getvarname(int i, char *name) {
 }
 
 
-void printglobals(void) {
+void print_globals(void) {
   int i = 255; //mem[1];
   fprintf(prg, "GLOBAL // %u %u\n", i, mem[1] - 1);
   while (i <= mem[1] - 1) {
@@ -100,7 +100,7 @@ void printglobals(void) {
     i++;
   }
 }
-void printlocal(void) {
+void print_local(void) {
   int i = mem[2] + 35;
 
   fprintf(prg, "LOCAL\n");
@@ -605,7 +605,7 @@ void dump(int size) {
       fprintf(prg, "// lptr %s %d %d\n", cstack[sp - 1], dstack[sp - 1], i);
       // get var names
       localvar = locvar[sp - 1];
-      getvarname(dstack[sp - 1], name);
+      get_var_name(dstack[sp - 1], name);
       div_snprintf(cstack[sp - 1], sizeof(cstack[sp - 1]), "%s", name);
       div_strcpy(cmd, sizeof(cmd), cstack[sp - 1]);
       stp[sp - 1] = 1;
@@ -616,7 +616,7 @@ void dump(int size) {
     case laid:
       fprintf(sta, "%5u\taid", i);
       localvar = locvar[sp - 1];
-      getvarname(dstack[sp - 1], cstack[sp - 1]);
+      get_var_name(dstack[sp - 1], cstack[sp - 1]);
       fprintf(prg, "// %s %d %d %d\n", cstack[sp - 1], dstack[sp - 1], i, localvar);
 
       break;
@@ -991,7 +991,7 @@ void dump(int size) {
       if (args > 0) {
         args--;
         localvar = locvar[0];
-        getvarname(dstack[0], name);
+        get_var_name(dstack[0], name);
         fprintf(prg, "%s ", name);
         if (args == 0)
           fprintf(prg, ");\n\n");
@@ -1006,8 +1006,8 @@ void dump(int size) {
       if (mem[i + 2] == lfrm) {
         fprintf(prg, "PROGRAM myprg;\n");
         i += 2;
-        printglobals();
-        printlocal();
+        print_globals();
+        print_local();
       } else {
         fprintf(prg, "\n\nPROCESS proc%u(", mem[i + 1]);
       }
@@ -1046,7 +1046,7 @@ void dump(int size) {
     case lpti:
       fprintf(sta, "%5u\tpti", i);
       localvar = locvar[0];
-      getvarname(dstack[0], cmd);
+      get_var_name(dstack[0], cmd);
       div_strcat(cmd, sizeof(cmd), "++");
       break;
     case ldpt:
@@ -1056,14 +1056,14 @@ void dump(int size) {
     case lptd:
       fprintf(sta, "%5u\tptd", i);
       localvar = locvar[0];
-      getvarname(dstack[0], cmd);
+      get_var_name(dstack[0], cmd);
       div_strcat(cmd, sizeof(cmd), "++");
       break;
 
     case lada:
       fprintf(sta, "%5u\tada", i);
       localvar = locvar[sp - 2];
-      getvarname(dstack[sp - 2], cstack[sp - 2]);
+      get_var_name(dstack[sp - 2], cstack[sp - 2]);
       div_snprintf(cmd, sizeof(cmd), "%s+=%s", cstack[sp - 2], cstack[sp - 1]);
       fprintf(prg, "// %s %i\n", cmd, i);
       sp--;
@@ -1071,7 +1071,7 @@ void dump(int size) {
     case lsua:
       fprintf(sta, "%5u\tsua", i);
       localvar = locvar[sp - 2];
-      getvarname(dstack[sp - 2], name);
+      get_var_name(dstack[sp - 2], name);
       div_snprintf(cmd, sizeof(cmd), "%s-=%s", name, cstack[sp - 1]);
       break;
     case lmua:
@@ -1125,7 +1125,7 @@ void dump(int size) {
       fprintf(sta, "%5u\tchk", i);
       fprintf(prg, "// offset %d %s %d %s %s\n", mem[i + 2], cstack[sp - 1], dstack[sp - 1],
               condstack[con - 1], cmd);
-      getvarname(mem[i + 2], name);
+      get_var_name(mem[i + 2], name);
       div_strcat(cstack[sp - 1], sizeof(cstack[sp - 1]), ".");
       div_strcat(cstack[sp - 1], sizeof(cstack[sp - 1]), name);
       i += 2;

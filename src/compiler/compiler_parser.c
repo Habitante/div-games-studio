@@ -103,7 +103,7 @@ struct object *analyze_pointer(int tipo, int offset) {
 
 //-----------------------------------------------------------------------------
 
-int analyze_pointer_struct(int tipo, int offset, struct object *estructura) {
+int analyze_pointer_struct(int tipo, int offset, struct object *structure) {
   struct object *ob;
   int dim1, dim2, dim3;
 
@@ -186,7 +186,7 @@ int analyze_pointer_struct(int tipo, int offset, struct object *estructura) {
 
   (*ob).type = tipo;                            // tpsgl or tpslo
   (*ob).ptr_struct_global.offset = offset;      // pointer offset
-  (*ob).ptr_struct_global.ostruct = estructura; // original struct
+  (*ob).ptr_struct_global.ostruct = structure; // original struct
 
   return (1);
 }

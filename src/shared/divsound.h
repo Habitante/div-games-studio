@@ -38,7 +38,7 @@ typedef struct _sonido {
 typedef struct _cancion {
   char *ptr;
   int loop;
-  int SongType;
+  int song_type;
 #ifdef MIXER
   Mix_Music *music;
   SDL_RWops *rw;
@@ -47,23 +47,23 @@ typedef struct _cancion {
 
 extern sound_t sounds[128];
 extern song_t songs[128];
-extern int *NewSound;
-extern int ChannelCon;
+extern int *new_sound;
+extern int channel_con;
 
 void sound_init(void);
 void sound_reset(void);
-int sound_load(char *ptr, long Len, int Loop);
-int sound_unload(int NumSonido);
-int sound_play(int NumSonido, int Volumen, int Frec);
-int sound_stop(int NumChannel);
-int sound_change(int NumChannel, int Volumen, int Frec);
-int sound_change_channel(int NumChannel, int Volumen, int Panning);
-int sound_is_playing(int NumChannel);
-int sound_load_song(char *ptr, int Len, int Loop);
-int sound_play_song(int NumSong);
+int sound_load(char *ptr, long len, int loop_flag);
+int sound_unload(int sound_num);
+int sound_play(int sound_num, int volume, int frequency);
+int sound_stop(int num_channel);
+int sound_change(int num_channel, int volume, int frequency);
+int sound_change_channel(int num_channel, int volume, int panning);
+int sound_is_playing(int num_channel);
+int sound_load_song(char *ptr, int len, int loop_flag);
+int sound_play_song(int num_song);
 void sound_stop_song(void);
-void sound_unload_song(int NumSong);
-void sound_set_song_pos(int SongPat);
+void sound_unload_song(int num_song);
+void sound_set_song_pos(int song_pos);
 int sound_get_song_pos(void);
 int sound_get_song_line(void);
 int sound_is_playing_song(void);

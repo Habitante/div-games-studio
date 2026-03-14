@@ -911,7 +911,7 @@ void menu_graphics1(void) {
 }
 
 void menu_graphics2(void) {
-  FPG *Fpg;
+  FPG *fpg_file;
   int n;
 
   if (find_fpg_window() && find_map_window())
@@ -956,13 +956,13 @@ void menu_graphics2(void) {
         if (v_finished) {
           if (v_exists) {
             // Check that the file is not the same
-            Fpg = (FPG *)window[n].aux;
+            fpg_file = (FPG *)window[n].aux;
             div_strcpy(full, sizeof(full), file_types[FT_FPG].path);
             if (full[strlen(full) - 1] != '/')
               div_strcat(full, sizeof(full), "/");
             div_strcat(full, sizeof(full), input);
 
-            if (!strcmp(full, (char *)Fpg->current_file)) {
+            if (!strcmp(full, (char *)fpg_file->current_file)) {
               v_text = (char *)texts[418];
               show_dialog(err0);
               v_accept = 0;

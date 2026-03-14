@@ -38,7 +38,7 @@ void init_rnd(int, char *); // Initialize the random generator with an int and k
 byte rndb(void);            // Get a byte from the random generator
 int rnd(void);              // Get an int from the random generator
 
-void gama0(void);
+void gamma0(void);
 byte exp_colores[128];
 struct _gcolor exp_gama[9];
 
@@ -294,7 +294,7 @@ void explode_dialog2(void) {
   if (wmouse_in(w - 70, 18, 66, 11) && (mouse_b & 1)) {
     gradient_buf = exp_colores;
     gradient_config = exp_gama;
-    show_dialog((void_return_type_t)gama0);
+    show_dialog((void_return_type_t)gamma0);
     if (v_accept)
       need_refresh = 1;
   }

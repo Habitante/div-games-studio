@@ -2,7 +2,7 @@ typedef struct _HeadFPG {
   int code;
   int length;
   uint8_t description[32];
-  uint8_t Filename[12];
+  uint8_t filename[12];
   int width;
   int height;
   int num_points;
@@ -12,8 +12,8 @@ typedef struct _HeadFPG {
 
 typedef struct _FPG {
   FILE *fpg;
-  FILE *Oldfpg;
-  HeadFPG MiHeadFPG;
+  FILE *old_fpg;
+  HeadFPG header;
   uint8_t current_file[_MAX_PATH + 14];
   int nIndex;
   int last_used;
@@ -28,19 +28,19 @@ typedef struct _FPG {
   byte version;
 } FPG;
 
-void fpg_sort(FPG *Fpg);
-int fpg_read_header(HeadFPG *MiHeadFPG, FILE *fpg);
-void fpg_write_header(HeadFPG *MiHeadFPG, short *points, char *imagen, FILE *fpg);
-void fpg_create_listbox(FPG *Fpg);
+void fpg_sort(FPG *fpg_file);
+int fpg_read_header(HeadFPG *fpg_header, FILE *fpg);
+void fpg_write_header(HeadFPG *fpg_header, short *points, char *image, FILE *fpg);
+void fpg_create_listbox(FPG *fpg_file);
 
-void fpg_create(FPG *Fpg, char *Name);
-int fpg_open(FPG *Fpg, char *Name);
-int fpg_add(FPG *Fpg, int COD, char *desc, char *filename, int Ancho, int Alto, int num_points,
-            char *points, char *Imagen, int delete_old, int get_info);
-int fpg_delete(FPG *Fpg, int COD);
-void fpg_read_image_header(HeadFPG *MiHeadFPG, FILE *fpg);
-int remap_all_file(FPG *Fpg);
-int fpg_remap_to_pal(FPG *Fpg);
+void fpg_create(FPG *fpg_file, char *name);
+int fpg_open(FPG *fpg_file, char *name);
+int fpg_add(FPG *fpg_file, int cod, char *desc, char *filename, int width, int height, int num_points,
+            char *points, char *img_data, int delete_old, int get_info);
+int fpg_delete(FPG *fpg_file, int cod);
+void fpg_read_image_header(HeadFPG *fpg_header, FILE *fpg);
+int remap_all_file(FPG *fpg_file);
+int fpg_remap_to_pal(FPG *fpg_file);
 
 void FPG_create_thumbs(void);
 void FPG_show_thumb(struct t_listboxbr *l, int num);

@@ -5,8 +5,8 @@
 #include "inter.h"
 #include "../../div_string.h"
 
-static void Error_Reporter(char *msg);
-static void Palette_Update(TFUByte (*palette)[256][3]);
+static void error_reporter(char *msg);
+static void palette_update(TFUByte (*palette)[256][3]);
 
 TFAnimation *animation = NULL;
 char *c_buffer;
@@ -464,6 +464,6 @@ void fli_reset() {}
 
 int quit_warning;
 
-static void Error_Reporter(char *msg) {}
+static void error_reporter(char *msg) {}
 
-static void Palette_Update(TFUByte (*TFpalette)[256][3]) {}
+static void palette_update(TFUByte (*TFpalette)[256][3]) {}

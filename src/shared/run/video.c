@@ -220,7 +220,7 @@ extern float m_x, m_y;
 
 
 extern int oldticks;
-void madewith(void) {
+void made_with(void) {
   SDL_RWops *rwops = NULL;
   SDL_Surface *mwsurface, *image;
 
@@ -275,7 +275,7 @@ void setup_video_mode(void) {
 
 #ifndef DEBUG
   if (splashtime > 0)
-    madewith();
+    made_with();
 #endif
 }
 

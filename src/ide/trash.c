@@ -25,8 +25,8 @@ void bin1(void) {
 
 // Trash click handler (handles mouse-up event for drag)
 
-void Bin2(void) {
-  FPG *MiMemoFPG;
+void bin2(void) {
+  FPG *my_fpg;
   struct twindow my_window;
 
   if (dragging == 4) {
@@ -48,25 +48,25 @@ void Bin2(void) {
 
       if (v_accept) {
         my_window = v;
-        MiMemoFPG = (FPG *)window[1].aux;
-        fpg_delete(MiMemoFPG, window[1].mapa->fpg_code);
+        my_fpg = (FPG *)window[1].aux;
+        fpg_delete(my_fpg, window[1].mapa->fpg_code);
         v = window[1];
 
-        //if (MiMemoFPG->list_info.first_visible+MiMemoFPG->list_info.lines*MiMemoFPG->list_info.columns>MiMemoFPG->list_info.total_items
-        //    && MiMemoFPG->list_info.first_visible) MiMemoFPG->list_info.first_visible--;
+        //if (my_fpg->list_info.first_visible+my_fpg->list_info.lines*my_fpg->list_info.columns>my_fpg->list_info.total_items
+        //    && my_fpg->list_info.first_visible) my_fpg->list_info.first_visible--;
 
-        while (MiMemoFPG->list_info.first_visible +
-                   (MiMemoFPG->list_info.lines - 1) * MiMemoFPG->list_info.columns + 1 >
-               MiMemoFPG->list_info.total_items) {
-          MiMemoFPG->list_info.first_visible -= MiMemoFPG->list_info.columns;
+        while (my_fpg->list_info.first_visible +
+                   (my_fpg->list_info.lines - 1) * my_fpg->list_info.columns + 1 >
+               my_fpg->list_info.total_items) {
+          my_fpg->list_info.first_visible -= my_fpg->list_info.columns;
         }
 
-        if (MiMemoFPG->list_info.first_visible < 0)
-          MiMemoFPG->list_info.first_visible = 0;
+        if (my_fpg->list_info.first_visible < 0)
+          my_fpg->list_info.first_visible = 0;
 
-        // FPG_paint_listbox_br(&MiMemoFPG->list_info);
+        // FPG_paint_listbox_br(&my_fpg->list_info);
 
-        FPG_update_listbox_br(&MiMemoFPG->list_info);
+        FPG_update_listbox_br(&my_fpg->list_info);
 
         v.redraw = 1;
         v = my_window;
@@ -84,7 +84,7 @@ void bin0(void) {
   v.w = 27;
   v.h = 34;
   v.paint_handler = bin1;
-  v.click_handler = Bin2;
+  v.click_handler = bin2;
   v.title = (byte *)"";
   v.name = texts[350];
 }

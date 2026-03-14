@@ -29,12 +29,12 @@ struct tprg *old_prg;
 extern int help_paint_active;
 
 void read_line(void);
-void vuelca_help(void);
+void dump_help(void);
 void help_xref(int n, int line);
-void Print_Help(void);
+void print_help(void);
 void resize_help(void);
 int dtoi(int m);
-void arregla_linea(byte *end, int chars, int help_w);
+void fix_line(byte *end, int chars, int help_w);
 void put_chr(byte *ptr, int w, byte c, byte color);
 void put_image_line(int n, int line, byte *di, int v_w);
 
@@ -145,7 +145,7 @@ int get_helpslide_y(void) {
   return (18 + (help_l * (v.h / big2 - 21 - 18)) / (help_lines - help_h));
 }
 
-void barra_vertical(void) {
+void vertical_scrollbar(void) {
   byte *ptr = v.ptr;
   int min, max, slider;
   int w = v.w / big2, h = v.h / big2;
@@ -183,11 +183,11 @@ void help1(void) {
   wput(ptr, w, h, w - 9, 10, 39);     // Up
   wput(ptr, w, h, w - 9, h - 17, 40); // Down
   wput(ptr, w, h, w - 9, h - 9, 34);  // Resize
-  barra_vertical();
+  vertical_scrollbar();
 
   wbox(ptr, w, h, c0, 2, 10 + 15, w - 12, 1);
 
-  vuelca_help();
+  dump_help();
 }
 
 void help2(void) {
@@ -206,7 +206,7 @@ void help2(void) {
     if (v.active_item == 4 && help_item != 1032)
       help_xref(1032, 0);
     if (v.active_item == 5) {
-      Print_Help();
+      print_help();
       return;
     }
     if (v.active_item == 6 && help_item != 1)
@@ -264,7 +264,7 @@ void help2(void) {
         help_line++;
         help_l--;
       }
-      vuelca_help();
+      dump_help();
     } else if (v.buttons & 2) {
       wput(v.ptr, w, h, w - 9, 10, -39);
       v.buttons ^= 2;
@@ -280,7 +280,7 @@ void help2(void) {
           help_l--;
         }
       }
-      vuelca_help();
+      dump_help();
       v.redraw++;
     }
 
@@ -300,7 +300,7 @@ void help2(void) {
           ;
         help_l++;
       }
-      vuelca_help();
+      dump_help();
     } else if (v.buttons & 4) {
       wput(v.ptr, w, h, w - 9, h - 17, -40);
       v.buttons ^= 4;
@@ -315,7 +315,7 @@ void help2(void) {
           help_l++;
         }
       }
-      vuelca_help();
+      dump_help();
       v.redraw++;
     }
 
@@ -349,12 +349,12 @@ void help2(void) {
         }
       }
       v.buttons |= 128;
-      vuelca_help();
+      dump_help();
       v.redraw++;
     } else {
       if (v.buttons & 128) {
         v.buttons ^= 128;
-        vuelca_help();
+        dump_help();
         v.redraw++;
       }
     }
@@ -362,7 +362,7 @@ void help2(void) {
     if (mouse_graf == 12 && (mouse_b & 1))
       resize_help();
 
-    barra_vertical();
+    vertical_scrollbar();
 
     // Check if we are over a cross-reference
 
@@ -719,7 +719,7 @@ void help(int n) {
         help_line++;
         help_l--;
       }
-      vuelca_help();
+      dump_help();
     } else {
       help_xref(n, 0);
     }
@@ -767,7 +767,7 @@ void help(int n) {
           help_l = 0;
           if (first_run)
             help_h += 5;
-          tabula_help(p + 1, help_buffer, helpidx[n * 2 + 1] - (p + 1 - h_buffer));
+          tabulate_help(p + 1, help_buffer, helpidx[n * 2 + 1] - (p + 1 - h_buffer));
           new_window(help0);
         }
       }
@@ -858,7 +858,7 @@ void help_paint(memptrsize n) {
             help_w = 120;
           help_h = (vga_height / 2 - (12 + 16) * big2 - 1) / font_height;
           help_l = 0;
-          tabula_help(p + 1, help_buffer, helpidx[n * 2 + 1] - (p + 1 - h_buffer));
+          tabulate_help(p + 1, help_buffer, helpidx[n * 2 + 1] - (p + 1 - h_buffer));
           help_paint_active = 1;
           show_dialog(help_paint0);
           help_paint_active = 0;
@@ -947,7 +947,7 @@ void help_xref(int n, int line) {
           *p = 0;
           div_strcpy((char *)help_title, sizeof(help_title), (char *)h_buffer);
           help_l = 0;
-          tabula_help(p + 1, help_buffer, helpidx[n * 2 + 1] - (p + 1 - h_buffer));
+          tabulate_help(p + 1, help_buffer, helpidx[n * 2 + 1] - (p + 1 - h_buffer));
           if (line != -1)
             while (line--) {
               while (*help_line++)
@@ -979,7 +979,7 @@ int image_w;     // Image width in chars
 int tipo_imagen; // 0-left, 1-center, 2-right
 int restore_help_w = 0;
 
-byte *continua_imagen(byte *di) {
+byte *continue_image(byte *di) {
   int n = 0;
 
   if (restore_help_w) {
@@ -1014,7 +1014,7 @@ byte *continua_imagen(byte *di) {
   return (di);
 }
 
-void tabula_help(byte *si, byte *di, int lon) {
+void tabulate_help(byte *si, byte *di, int lon) {
   byte *old_di2, *end = si + lon, c, *di2, *ptr;
   int ultimo_cr = 1, ultimo_cr_real = 1, tex;
   int estado = 0, chars, chars2, nchars, help_an2;
@@ -1059,14 +1059,14 @@ ini_tabulador:
         ultimo_cr = 2;
         *di++ = 0;
         help_lines++;
-        di = continua_imagen(di);
+        di = continue_image(di);
         c = 0;
         chars = 0;
       } else {
         if (ultimo_cr == 1) {
           *di++ = 0;
           help_lines++;
-          di = continua_imagen(di);
+          di = continue_image(di);
           ultimo_cr = 2;
         }
         if (si >= end || *si == 13 || *si == 10)
@@ -1145,7 +1145,7 @@ ini_tabulador:
                 chars = 0;
               }
               do {
-                di = continua_imagen(di);
+                di = continue_image(di);
                 *di++ = 0;
                 help_lines++;
                 ultimo_cr = 1;
@@ -1178,7 +1178,7 @@ ini_tabulador:
                 chars = 0;
               }
               do {
-                di = continua_imagen(di);
+                di = continue_image(di);
                 *di++ = 0;
                 help_lines++;
                 ultimo_cr = 1;
@@ -1245,7 +1245,7 @@ ini_tabulador:
                     tipo_imagen = 1;
 
                   do {
-                    di = continua_imagen(di);
+                    di = continue_image(di);
                     if (tipo_imagen == 1) {
                       *di++ = 0;
                       help_lines++;
@@ -1280,7 +1280,7 @@ ini_tabulador:
                 chars = 0;
               }
               do {
-                di = continua_imagen(di);
+                di = continue_image(di);
                 *di++ = 0;
                 help_lines++;
                 ultimo_cr = 1;
@@ -1355,7 +1355,7 @@ ini_tabulador:
               memmove(di + 10, di + 1, nchars);
               *di++ = 0;
               help_lines++;
-              di = continua_imagen(di);
+              di = continue_image(di);
               di = old_di2 + 9;
             } else {
               if (restore_help_w) {
@@ -1372,7 +1372,7 @@ ini_tabulador:
               *di++ = 2;
               *di++ = 0;
               help_lines++;
-              di = continua_imagen(di);
+              di = continue_image(di);
               *di = 1;
               di = old_di2 + 11;
             } else {
@@ -1393,7 +1393,7 @@ ini_tabulador:
               *di++ = 2;
               *di++ = 0;
               help_lines++;
-              di = continua_imagen(di);
+              di = continue_image(di);
               *di++ = 3;
               *(int *)di = itod(-estado);
               di = old_di2 + 15;
@@ -1413,7 +1413,7 @@ ini_tabulador:
           }
 
           if (!ejemplo)
-            arregla_linea(di2, chars2, help_an2);
+            fix_line(di2, chars2, help_an2);
 
         } else {
           *di = c;
@@ -1427,16 +1427,16 @@ ini_tabulador:
 
         if (estado == 0) {
           *di++ = 0;
-          di = continua_imagen(di);
+          di = continue_image(di);
         } else if (estado == 1) {
           *di++ = 2;
           *di++ = 0;
-          di = continua_imagen(di);
+          di = continue_image(di);
           *di++ = 1;
         } else {
           *di++ = 2;
           *di++ = 0;
-          di = continua_imagen(di);
+          di = continue_image(di);
           *di++ = 3;
           *(int *)di = -estado;
           di += 4;
@@ -1461,7 +1461,7 @@ ini_tabulador:
 //      Justify a line (generate correct spacing)
 //-----------------------------------------------------------------------------
 
-void arregla_linea(byte *end, int chars, int help_w) {
+void fix_line(byte *end, int chars, int help_w) {
   byte *ini, *i, *_i;
   int espacios, error, chesp;
   float nuevo_esp, espacio_acum;
@@ -1526,7 +1526,7 @@ void arregla_linea(byte *end, int chars, int help_w) {
 //      Render the hypertext window
 //-----------------------------------------------------------------------------
 
-void vuelca_help(void) {
+void dump_help(void) {
   byte *si, *di, *old_di;
   int h, n, ch;
   byte color = c0, color2 = average_color(c0, c_b_low);
@@ -1651,7 +1651,7 @@ void put_chr(byte *ptr, int w, byte c, byte color) {
 
 #define ancho_ayuda 70
 
-void tabula_help2(byte *si, byte *di, int lon) {
+void tabulate_help2(byte *si, byte *di, int lon) {
   byte *old_di, *end = si + lon, c;
   int ultimo_cr = 1, ultimo_cr_real = 1, chars = 0, n;
 
@@ -1860,7 +1860,7 @@ extern int f_ar;
 
 void printlist0(void);
 
-void Print_Help(void) {
+void print_help(void) {
   byte *print_buffer, *p, *_help_end;
   int n;
   char cwork[512];
@@ -1909,7 +1909,7 @@ void Print_Help(void) {
           *p = 0;
 
           _help_end = help_end;
-          tabula_help2(p + 1, print_buffer, helpidx[help_item * 2 + 1] - (p + 1 - h_buffer));
+          tabulate_help2(p + 1, print_buffer, helpidx[help_item * 2 + 1] - (p + 1 - h_buffer));
 
           // Print the help page title
 

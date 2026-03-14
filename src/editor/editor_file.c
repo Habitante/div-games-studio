@@ -285,10 +285,10 @@ void save_program(void) {
 //      Determine if a string has been found
 //-----------------------------------------------------------------------------
 
-int string_found(char *p, char *q, int may_min, int completa) {
-  if (completa && lower[*(q - 1)])
+int string_found(char *p, char *q, int case_sensitive, int whole_word) {
+  if (whole_word && lower[*(q - 1)])
     return (0);
-  if (may_min) {
+  if (case_sensitive) {
     while (*p) {
       if (*p != *q)
         return (0);
@@ -308,7 +308,7 @@ int string_found(char *p, char *q, int may_min, int completa) {
       q++;
     }
   }
-  if (completa && lower[*q])
+  if (whole_word && lower[*q])
     return (0);
   else
     return (1);
@@ -320,7 +320,7 @@ int string_found(char *p, char *q, int may_min, int completa) {
 
 #define y_bt 50
 char search_text[32] = {0};
-int may_min = 0, completa = 0;
+int case_sensitive = 0, whole_word = 0;
 
 void find_text1(void);
 void find_text2(void);
@@ -338,8 +338,8 @@ void find_text0(void) {
   _get(161, 4, 11, v.w - 8, (byte *)search_text, 32, 0, 0);
   _button(100, 7, y_bt, 0);
   _button(101, v.w - 8, y_bt, 2);
-  _flag(163, 4, y_bt - 20, &completa);
-  _flag(164, 4, y_bt - 12, &may_min);
+  _flag(163, 4, y_bt - 20, &whole_word);
+  _flag(164, 4, y_bt - 12, &case_sensitive);
 
   v_accept = 0;
 }
@@ -386,7 +386,7 @@ void find_text(void) {
         f_home();
       }
     } else {
-      if (string_found(search_text, &v.prg->l[v.prg->column - 1], may_min, completa))
+      if (string_found(search_text, &v.prg->l[v.prg->column - 1], case_sensitive, whole_word))
         encontrado = 1;
       else
         f_right();
@@ -422,7 +422,7 @@ void replacements0(void);
 #define y_st 69
 char buscar2[32] = {0};
 char sustituir[32] = {0};
-int may_min2 = 0, completa2 = 0;
+int case_sensitive2 = 0, whole_word2 = 0;
 int num_cambios;
 
 void replace_text1(void);
@@ -444,8 +444,8 @@ void replace_text0(void) {
   _get(162, 4, 30, v.w - 8, (byte *)sustituir, 32, 0, 0);
   _button(100, 7, y_st, 0);
   _button(101, v.w - 8, y_st, 2);
-  _flag(163, 4, y_st - 20, &completa2);
-  _flag(164, 4, y_st - 12, &may_min2);
+  _flag(163, 4, y_st - 20, &whole_word2);
+  _flag(164, 4, y_st - 12, &case_sensitive2);
 
   v_accept = 0;
 }
@@ -496,7 +496,7 @@ void replace_text(void) {
           f_home();
         }
       } else {
-        if (string_found(buscar2, &v.prg->l[v.prg->column - 1], may_min2, completa2))
+        if (string_found(buscar2, &v.prg->l[v.prg->column - 1], case_sensitive2, whole_word2))
           encontrado = 1;
         else
           f_right();
@@ -556,7 +556,7 @@ void replace_text(void) {
 //      Replace or not?
 //-----------------------------------------------------------------------------
 
-void sustituir1(void) {
+void replace_dialog(void) {
   _show_items();
 }
 
@@ -591,7 +591,7 @@ void replace0(void) {
   v.title = texts[190];
   v.w = x4 + text_len(texts[101] + 1) + 7;
   v.h = 29;
-  v.paint_handler = sustituir1;
+  v.paint_handler = replace_dialog;
   v.click_handler = replace2;
   _button(102, 7, v.h - 14, 0);
   _button(103, x2, v.h - 14, 0);
@@ -628,7 +628,7 @@ void replacements0(void) {
   _button(100, v.w / 2, v.h - 14, 1);
 }
 
-void open_program_external(char *nombre, char *path) {
+void open_program_external(char *name, char *path) {
   char wpath[_MAX_PATH];
   struct tprg *pr;
   FILE *f;
@@ -636,9 +636,9 @@ void open_program_external(char *nombre, char *path) {
   byte *buffer, *p;
 
   div_strcpy(full, sizeof(full), path);
-  div_strcpy(input, sizeof(input), nombre);
+  div_strcpy(input, sizeof(input), name);
   div_strcpy(wpath, sizeof(wpath), path);
-  wpath[strlen(wpath) - strlen(nombre)] = 0;
+  wpath[strlen(wpath) - strlen(name)] = 0;
   if ((f = fopen(full, "rb")) != NULL) { // A file was selected
     fseek(f, 0, SEEK_END);
     n = ftell(f) + BUFFER_INCREASE;

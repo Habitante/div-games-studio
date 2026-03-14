@@ -130,7 +130,7 @@ extern struct _thumb_map {
 // Comparison functions for qsort
 //-----------------------------------------------------------------------------
 
-int strcmpsort(const void *a, const void *b) {
+int strcmp_sort(const void *a, const void *b) {
   return strcmp((char *)a, (char *)b);
 }
 
@@ -404,8 +404,8 @@ void M3D_create_thumbs(struct t_listboxbr *l, int prog) {
   }
 
   qsort(thumb_tex, l->total_items, sizeof(struct _thumb_tex), cmpcode);
-  qsort(texture_names, tex_count, w_textura, strcmpsort);
-  qsort(background_names, l->total_items, w_textura, strcmpsort);
+  qsort(texture_names, tex_count, w_textura, strcmp_sort);
+  qsort(background_names, l->total_items, w_textura, strcmp_sort);
 }
 
 //-----------------------------------------------------------------------------

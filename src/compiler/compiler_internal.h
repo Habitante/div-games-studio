@@ -679,8 +679,8 @@ void list_objects(void);
 void save_dbg(void);
 void save_exec_bin(void);
 
-void psintactico(void);
-void plexico(void);
+void parse_syntax(void);
+void scan_token(void);
 
 FILE *div_open_file(char *file);
 
@@ -689,7 +689,7 @@ FILE *div_open_file(char *file);
 //-----------------------------------------------------------------------------
 
 struct object *analyze_pointer(int tipo, int offset);
-int analyze_pointer_struct(int tipo, int offset, struct object *estructura);
+int analyze_pointer_struct(int tipo, int offset, struct object *structure);
 int analyze_struct(int offstruct);
 int analyze_struct_local(int offstruct);
 int analyze_struct_private(int offstruct);

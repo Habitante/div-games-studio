@@ -847,7 +847,7 @@ void pixel(byte *p) {
   }
 }
 
-void pixel_sin_mask(byte *p) {
+void pixel_without_mask(byte *p) {
   byte a, b, c, d;
   int n;
 
@@ -1136,7 +1136,7 @@ void line_pixel(int x, int y) { // Brush
           do {
             do {
               if ((line_fx = *p) && *q != color) {
-                pixel_sin_mask(q);
+                pixel_without_mask(q);
               }
               q++;
               p++;
@@ -1176,7 +1176,7 @@ void line_pixel(int x, int y) { // Brush
           do {
             do {
               if (*p && *q != color) {
-                pixel_sin_mask(q);
+                pixel_without_mask(q);
               }
               q++;
               p++;
@@ -1221,7 +1221,7 @@ void line_pixel(int x, int y) { // Brush
             do {
               color = get_color(x + xx, y + yy);
               if ((line_fx = *p) && *q != color) {
-                pixel_sin_mask(q);
+                pixel_without_mask(q);
               }
               q++;
               p++;
@@ -1264,7 +1264,7 @@ void line_pixel(int x, int y) { // Brush
             do {
               color = get_color(x + xx, y + yy);
               if (*p && *q != color) {
-                pixel_sin_mask(q);
+                pixel_without_mask(q);
               }
               q++;
               p++;
@@ -1986,7 +1986,7 @@ void draw_help(int n) {
         }
         old_prg = NULL;
       }
-      divdelete(0);
+      div_delete(0);
       zoom_background = 0;
       v.type = WIN_EMPTY;
       v.foreground = WF_BACKGROUND;
@@ -2303,7 +2303,7 @@ void blit_edit(void) {
   if (mouse_in(toolbar_x + 48, toolbar_y + 2, toolbar_x + toolbar_width - 2, toolbar_y + 17)) {
     selected_icon = (mouse_x - toolbar_x - 48) / 16;
     if (bar[selected_icon] > 1) {
-      wresalta_box(toolbar, vga_width / big2, 19, 48 + selected_icon * 16, 2, 15, 15);
+      w_highlight_box(toolbar, vga_width / big2, 19, 48 + selected_icon * 16, 2, 15, 15);
     } else
       selected_icon = -1;
   } else
@@ -2658,7 +2658,7 @@ int select_icon(int icon_x, int *icons) {
         r = ((mouse_y - b - 10) / 16) * col + (mouse_x - a - 2) / 16;
         ix = 2 + (r % col) * 16;
         iy = 10 + (r / col) * 16;
-        wresalta_box(p, c, d, ix, iy, 15, 15);
+        w_highlight_box(p, c, d, ix, iy, 15, 15);
       } else if (mouse_in(a + 2, b + 2, a + c - 10, b + 9)) {
         ix = mouse_shift_x - a;
         iy = mouse_shift_y - b;
@@ -4312,6 +4312,6 @@ void put_bar(int x, int y, int n) {
 void put_bar_inv(int x, int y, int n) {
   wput_in_box(toolbar, vga_width / big2, vga_width / big2, 19, x, y,
               -n); // TODO: Highlight inversion does not render correctly
-  wresalta_box(toolbar, vga_width / big2, 19, x, y, *((word *)graf[n]) / big2,
+  w_highlight_box(toolbar, vga_width / big2, 19, x, y, *((word *)graf[n]) / big2,
                *((word *)(graf[n] + 2)) / big2);
 }

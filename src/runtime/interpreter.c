@@ -28,14 +28,14 @@ void finalization(void);
 void kill_process(int id);
 void core_exec(void);
 void core_trace(void);
-int get_reloj(void);
+int get_clock(void);
 
 
 void deb(void);
 extern int ids_old;
 extern int skip_flush;
 
-void readmouse(void);
+void read_mouse(void);
 
 int trace_program = 0;
 #ifdef __EMSCRIPTEN__
@@ -72,7 +72,7 @@ int splashtime = 5000; // 5 seconds
 byte running = 0;
 #endif
 
-void madewith(void);
+void made_with(void);
 
 
 #ifdef LLPROC
@@ -298,7 +298,7 @@ int __far critical_error(unsigned deverr, unsigned errcode, unsigned far *devhdr
 // Main program
 ///////////////////////////////////////////////////////////////////////////////
 
-void GetFree4kBlocks(void);
+void get_free_4k_blocks(void);
 int DOSalloc4k(void);
 int DPMIalloc4k(void);
 
@@ -698,7 +698,7 @@ void update_stack(int id, int value) {
 // Interpret the generated code
 ///////////////////////////////////////////////////////////////////////////////
 
-void mainloop(void) {
+void runtime_main_loop(void) {
 #ifdef EMSCRIPTEN
   if (!(process_count && !(kbdFLAGS[_ESC] && kbdFLAGS[_L_CTRL]) && !alt_x)) {
     fprintf(stdout, "Program finished. Ending.\n");
@@ -756,10 +756,10 @@ void interpreter(void) {
 #endif
 
 #ifdef __EMSCRIPTEN__
-  emscripten_set_main_loop(mainloop, 0, 1);
+  emscripten_set_main_loop(runtime_main_loop, 0, 1);
 #else
   while (process_count && !(kbdFLAGS[_ESC] && kbdFLAGS[_L_CTRL]) && !alt_x) {
-    mainloop();
+    runtime_main_loop();
   }
   finalization();
 #endif
@@ -826,7 +826,7 @@ inline
 continue_process:
 #endif
 
-      max_reloj = get_reloj() + max_process_time;
+      max_reloj = get_clock() + max_process_time;
 
       core_exec();
 
@@ -903,7 +903,7 @@ void trace_process(void) {
 
 continue_process:
 
-      max_reloj = get_reloj() + max_process_time;
+      max_reloj = get_clock() + max_process_time;
 
       core_trace();
     }
@@ -976,7 +976,7 @@ void frame_start(void) {
   // Control screensaver
 
   if (ss_status && ss_frame != NULL) {
-    if (get_reloj() > ss_time_counter) {
+    if (get_clock() > ss_time_counter) {
       if (ss_init != NULL)
         ss_init();
 
@@ -992,7 +992,7 @@ void frame_start(void) {
         if (key_check != last_key_check)
           ss_exit = 1;
 
-        readmouse();
+        read_mouse();
 
         mou_check = mouse->x + mouse->y + mouse->left + mouse->right + mouse->middle;
 
@@ -1020,7 +1020,7 @@ void frame_start(void) {
 
       memcpy(screen_buffer, back_buffer, vga_width * vga_height);
       blit_partial(0, 0, vga_width, vga_height);
-      ss_time_counter = get_reloj() + ss_time;
+      ss_time_counter = get_clock() + ss_time;
     }
   }
 
@@ -1046,18 +1046,18 @@ void frame_start(void) {
     if (otimer[max] != timer(max)) {
       mtimer[max] = timer(max) * 10;
     }
-    mtimer[max] += (get_reloj() - last_clock);
+    mtimer[max] += (get_clock() - last_clock);
     timer(max) = mtimer[max] / 10;
     otimer[max] = timer(max);
   }
 
 
-  if (get_reloj() > last_clock) {
-    ffps = (ffps * 9.0f + 1000.0f / (float)(get_reloj() - last_clock)) / 10.0f;
+  if (get_clock() > last_clock) {
+    ffps = (ffps * 9.0f + 1000.0f / (float)(get_clock() - last_clock)) / 10.0f;
     fps = (int)(ffps + 0.5f);
   }
 
-  last_clock = get_reloj();
+  last_clock = get_clock();
 
 #ifdef DEBUG
   if (overall_clock) {
@@ -1072,20 +1072,20 @@ void frame_start(void) {
   function_exec(255, get_ticks() - profile_clock);
 #endif
 
-  if (get_reloj() > (fractional_clock +
+  if (get_clock() > (fractional_clock +
                      clock_interval / 3)) { // Allow consuming up to one third of the next frame
     if (blits_skipped < max_frame_skips) {
       blits_skipped++;
       skip_blit = 1;
       fractional_clock += clock_interval;
     } else {
-      fractional_clock = (float)get_reloj() + clock_interval;
+      fractional_clock = (float)get_clock() + clock_interval;
       blits_skipped = 0;
       skip_blit = 0;
     }
   } else {
     n = 0;
-    old_clock = get_reloj();
+    old_clock = get_clock();
 
 #ifndef EMSCRIPTEN
     if (old_clock < (int)fractional_clock) {
@@ -1095,12 +1095,12 @@ void frame_start(void) {
 #else
         sched_yield();
 #endif
-      } while (get_reloj() < (int)fractional_clock); // TO keep FPS
+      } while (get_clock() < (int)fractional_clock); // TO keep FPS
     }
 #else
     do {
       retrace_wait();
-    } while (get_reloj() < (int)fractional_clock);
+    } while (get_clock() < (int)fractional_clock);
 #endif
     blits_skipped = 0;
     skip_blit = 0;
@@ -1122,7 +1122,7 @@ void frame_start(void) {
 
   // Position mouse variables
 
-  readmouse();
+  read_mouse();
 
   // Read joystick(s)
 
@@ -1142,7 +1142,7 @@ void frame_start(void) {
 
     if (joy_check != last_joy_check) {
       last_joy_check = joy_check;
-      ss_time_counter = get_reloj() + ss_time;
+      ss_time_counter = get_clock() + ss_time;
     }
   }
 
@@ -1153,14 +1153,14 @@ void frame_start(void) {
 
   if (key_check != last_key_check) {
     last_key_check = key_check;
-    ss_time_counter = get_reloj() + ss_time;
+    ss_time_counter = get_clock() + ss_time;
   }
 
   mou_check = mouse->x + mouse->y + mouse->left + mouse->right + mouse->middle;
 
   if (mou_check != last_mou_check) {
     last_mou_check = mou_check;
-    ss_time_counter = get_reloj() + ss_time;
+    ss_time_counter = get_clock() + ss_time;
   }
 
 #ifdef DEBUG
@@ -1320,7 +1320,7 @@ void frame_end(void) {
           }
           texts_drawn = 1;
         } else if (otheride == 2) {
-          readmouse();
+          read_mouse();
           x1s = -1;
           v_function = -1; // No errors (don't show?)
           put_sprite(mouse->file, mouse->graph, mouse->x, mouse->y, mouse->angle, mouse->size,
@@ -1693,7 +1693,7 @@ void exer(int e) {
 
 #ifndef DEBUG
 
-void e(int text_id) {
+void runtime_error(int text_id) {
   int n = 0;
 
   if (v_function == -1)
@@ -2237,6 +2237,6 @@ void debug_data(int val) {
   }
 }
 
-void GetFree4kBlocks(void) {}
+void get_free_4k_blocks(void) {}
 
 //////////////////////////////////////////////////////////////////////////////
