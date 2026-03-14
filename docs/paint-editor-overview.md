@@ -76,9 +76,12 @@ do {
 2. **Real mouse branch** — fires when `m_x`/`m_y` differ from last
    known position (`last_set_mx`/`last_set_my`), or button changed.
    Copies SDL state into `mouse_x`/`mouse_y`/`mouse_b`.
-3. **Keyboard branch** (else-if, paint mode only) — restores position
-   from `mouse_shift_x`/`mouse_shift_y`, applies arrow/OPQA/shift
-   offsets, SPACE simulates left-click (`mouse_b = 0x8001`).
+3. **Keyboard branch** (else-if, paint mode only):
+   - **No Ctrl**: moves pixel cursor — restores position from
+     `mouse_shift_x`/`mouse_shift_y`, applies arrow/OPQA offsets
+     (Shift = 8x speed), SPACE simulates left-click.
+   - **Ctrl held**: pans canvas viewport — adjusts `zoom_x`/`zoom_y`
+     by 8 bitmap pixels per keypress (Ctrl+Shift = 32), cursor stays put.
 4. **Clamp** — `mouse_x`/`mouse_y` clamped to screen bounds.
    `real_mouse_x`/`real_mouse_y` keep pre-clamp values for edge-scroll.
 5. **Coordinate transform** — `coord_x`/`coord_y` computed from

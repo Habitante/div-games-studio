@@ -166,6 +166,7 @@ void read_mouse(void) {
   } else if (draw_mode < 100 && hotkey && !help_paint_active) { // Keys are only active in edit mode
 
     if (!(shift_status & MOD_CTRL)) {
+      // Arrows/OPQA: move pixel cursor
       mouse_x = mouse_shift_x;
       mouse_y = mouse_shift_y;
 
@@ -174,32 +175,28 @@ void read_mouse(void) {
       else
         s = 1;
 
-      if (key(_C_RIGHT) || key(_RIGHT) || key(_P)) {
-        kbdFLAGS[_C_RIGHT] = 0;
+      if (key(_RIGHT) || key(_P)) {
         kbdFLAGS[_RIGHT] = 0;
         kbdFLAGS[_P] = 0;
         mouse_x += (1 << zoom) * s;
         shift = 1;
       }
 
-      if (key(_C_LEFT) || key(_LEFT) || key(_O)) {
-        kbdFLAGS[_C_LEFT] = 0;
+      if (key(_LEFT) || key(_O)) {
         kbdFLAGS[_LEFT] = 0;
         kbdFLAGS[_O] = 0;
         mouse_x -= (1 << zoom) * s;
         shift = 1;
       }
 
-      if (key(_C_DOWN) || key(_DOWN) || key(_A)) {
-        kbdFLAGS[_C_DOWN] = 0;
+      if (key(_DOWN) || key(_A)) {
         kbdFLAGS[_DOWN] = 0;
         kbdFLAGS[_A] = 0;
         mouse_y += (1 << zoom) * s;
         shift = 1;
       }
 
-      if (key(_C_UP) || key(_UP) || key(_Q)) {
-        kbdFLAGS[_C_UP] = 0;
+      if (key(_UP) || key(_Q)) {
         kbdFLAGS[_UP] = 0;
         kbdFLAGS[_Q] = 0;
         mouse_y -= (1 << zoom) * s;
@@ -218,6 +215,58 @@ void read_mouse(void) {
         set_mouse(mouse_x, mouse_y);
       } else
         mouse_shift = 0;
+    } else {
+      // Ctrl+arrows/OPQA: pan canvas viewport (cursor stays put)
+      int step = ((shift_status & MOD_SHIFT) || key(_L_SHIFT) || key(_R_SHIFT)) ? 32 : 8;
+      int texel = 1 << zoom;
+      int vis_w = (vga_width + texel - 1) >> zoom;
+      int vis_h = (vga_height + texel - 1) >> zoom;
+      int panned = 0;
+
+      if (key(_RIGHT) || key(_P)) {
+        kbdFLAGS[_RIGHT] = 0;
+        kbdFLAGS[_C_RIGHT] = 0;
+        kbdFLAGS[_P] = 0;
+        zoom_x += step;
+        panned = 1;
+      }
+      if (key(_LEFT) || key(_O)) {
+        kbdFLAGS[_LEFT] = 0;
+        kbdFLAGS[_C_LEFT] = 0;
+        kbdFLAGS[_O] = 0;
+        zoom_x -= step;
+        panned = 1;
+      }
+      if (key(_DOWN) || key(_A)) {
+        kbdFLAGS[_DOWN] = 0;
+        kbdFLAGS[_C_DOWN] = 0;
+        kbdFLAGS[_A] = 0;
+        zoom_y += step;
+        panned = 1;
+      }
+      if (key(_UP) || key(_Q)) {
+        kbdFLAGS[_UP] = 0;
+        kbdFLAGS[_C_UP] = 0;
+        kbdFLAGS[_Q] = 0;
+        zoom_y -= step;
+        panned = 1;
+      }
+
+      if (panned) {
+        int max_x = map_width - vis_w;
+        int max_y = map_height - vis_h;
+        if (zoom_x < 0)
+          zoom_x = 0;
+        if (zoom_x > max_x)
+          zoom_x = max_x > 0 ? max_x : 0;
+        if (zoom_y < 0)
+          zoom_y = 0;
+        if (zoom_y > max_y)
+          zoom_y = max_y > 0 ? max_y : 0;
+        zoom_cx = zoom_x + (vga_width / 2) / texel;
+        zoom_cy = zoom_y + (vga_height / 2) / texel;
+        need_zoom = 1;
+      }
     }
   }
 
@@ -538,6 +587,13 @@ void read_mouse2(void) {
         ascii = ASCII_TAB;
       //				fprintf(stdout, "ascii: %d scancode: %d 0x%x\n", ascii, scan_code,scan_code);
       key(scan_code) = 1;
+
+      // Synthesize Ctrl+nav extended scan codes (DOS compat)
+      if (shift_status & MOD_CTRL) {
+        int cc = ctrl_nav_code(scan_code);
+        if (cc)
+          kbdFLAGS[cc] = 1;
+      }
     }
     if (event.type == SDL_KEYUP) {
       shift_status = 0;
@@ -546,8 +602,15 @@ void read_mouse2(void) {
       scan_code = OSDEP_key[event.key.keysym.sym < 2048 ? event.key.keysym.sym
                                                         : event.key.keysym.sym - 0x3FFFFD1A];
 
-      //scan_code = event.key.keysym.scancode;
       key(scan_code) = 0;
+
+      // Always clear Ctrl+nav variant when base key is released
+      {
+        int cc = ctrl_nav_code(scan_code);
+        if (cc)
+          kbdFLAGS[cc] = 0;
+      }
+
       scan_code = 0;
     }
 

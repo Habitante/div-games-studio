@@ -217,6 +217,13 @@ void poll_keyboard(void) {
       checkmod((OSDEPMod)event.key.keysym.mod);
 
       kbdFLAGS[scan_code] = 1;
+
+      // Synthesize Ctrl+nav extended scan codes (DOS compat)
+      if (shift_status & MOD_CTRL) {
+        int cc = ctrl_nav_code(scan_code);
+        if (cc)
+          kbdFLAGS[cc] = 1;
+      }
     }
 
 
@@ -224,8 +231,16 @@ void poll_keyboard(void) {
       shift_status = 0;
       checkmod((OSDEPMod)event.key.keysym.mod);
 
-      kbdFLAGS[OSDEP_key[event.key.keysym.sym < 2048 ? event.key.keysym.sym
-                                                     : event.key.keysym.sym - 0x3FFFFD1A]] = 0;
+      {
+        int sc = OSDEP_key[event.key.keysym.sym < 2048 ? event.key.keysym.sym
+                                                       : event.key.keysym.sym - 0x3FFFFD1A];
+        kbdFLAGS[sc] = 0;
+
+        // Always clear Ctrl+nav variant when base key is released
+        int cc = ctrl_nav_code(sc);
+        if (cc)
+          kbdFLAGS[cc] = 0;
+      }
     }
 
     if (event.type == SDL_MOUSEMOTION) {

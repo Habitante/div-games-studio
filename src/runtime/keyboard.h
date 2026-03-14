@@ -64,8 +64,8 @@
 #define _C_PLUS      78  // Numpad +
 
 // --- Ctrl+navigation extended scan codes (DOS-era) ---
-// In SDL2 these are dead — the base key fires with MOD_CTRL instead.
-// Named for the kbdFLAGS[] array and backward compatibility with DOS.
+// SDL2 event handlers synthesize these from base key + MOD_CTRL via
+// ctrl_nav_code() so that key(_C_UP) etc. work as in the original DOS port.
 #define _C_ENTER 89
 #define _C_HOME  93
 #define _C_UP    94
@@ -77,6 +77,25 @@
 #define _C_PGDN  100
 #define _C_INS   101
 #define _C_DEL   102
+
+// Map a base navigation scan code to its Ctrl+nav extended code, or 0.
+// Used by SDL2 event handlers to synthesize DOS-era extended scan codes.
+static inline int ctrl_nav_code(int sc) {
+  switch (sc) {
+  case _ENTER: return _C_ENTER;
+  case _HOME:  return _C_HOME;
+  case _UP:    return _C_UP;
+  case _PGUP:  return _C_PGUP;
+  case _LEFT:  return _C_LEFT;
+  case _RIGHT: return _C_RIGHT;
+  case _END:   return _C_END;
+  case _DOWN:  return _C_DOWN;
+  case _PGDN:  return _C_PGDN;
+  case _INS:   return _C_INS;
+  case _DEL:   return _C_DEL;
+  default:     return 0;
+  }
+}
 
 // DOS BIOS extended Ctrl+key scan codes (INT 16h AH values).
 // Dead in SDL2 — the base key fires with MOD_CTRL set instead.
