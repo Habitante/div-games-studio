@@ -973,7 +973,7 @@ int show_char_buffer(int WhatChar, int cx, int cy, char *ptr, int w, char *buffe
         return (fnt_table[WhatChar].width + 1);
     }
     memcpy(rawBuffer, buffer + fnt_table[WhatChar].offset,
-           fnt_table[WhatChar].width && fnt_table[WhatChar].height);
+           fnt_table[WhatChar].width * fnt_table[WhatChar].height);
     iy = fnt_table[WhatChar].incY;
     for (y = 0; y < fnt_table[WhatChar].height; y++) {
       for (x = 0; x < fnt_table[WhatChar].width; x++) {

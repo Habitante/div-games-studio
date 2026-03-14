@@ -145,22 +145,353 @@ fragile and hard to read:
 - Process field offsets (`_X=26`, `_Y=27`) as raw numbers in `inter.h`
 - File type indices (2=MAP, 3=PAL, 4=FPG...) used as bare integers
 
-**What to do:**
+### Complete inventory
 
-- **Define enums** for window types, draw modes, cursor IDs, file type
-  indices, menu base indices, item types, and process status codes.
-- **Define named constants** for palette size (`PALETTE_BYTES = 768`),
-  FPG limits (`MAX_FPG_GRAPHICS = 1000`), UI metrics, and any other
-  value that appears more than twice.
-- **Do this incrementally** — one category at a time, with project-wide
-  search-and-replace. Each category is a self-contained commit.
-- **Don't over-abstract** — some magic numbers are genuinely one-off
-  pixel tweaks. Focus on values that appear in multiple files or that
-  would confuse a newcomer.
+Below is every category of magic number identified from the architecture
+docs, the IDE guide, and the editor overviews. Each category lists the
+values, their meaning, which files use them, and the proposed enum or
+constant name. Categories are ordered by sprint (see sprint plan at the
+end).
 
-**Effort:** 1-2 days total, spread across small commits.
+#### A. Window types (`v.type`)
+
+Used in handler init functions, `find_*_window()` helpers, `desktop.c`
+session save/restore, and `activate()` logic.
+
+| Value | Meaning | Proposed name |
+|-------|---------|---------------|
+| 0 | Empty/inactive slot | `WIN_EMPTY` |
+| 1 | Modal dialog | `WIN_DIALOG` |
+| 2 | Dropdown menu | `WIN_MENU` |
+| 3 | Palette display | `WIN_PALETTE` |
+| 4 | Clock | `WIN_CLOCK` |
+| 5 | Trash/recycle bin | `WIN_TRASH` |
+| 7 | Progress bar | `WIN_PROGRESS` |
+| 8 | Mixer | `WIN_MIXER` |
+| 100 | Map/paint editor | `WIN_MAP` |
+| 101 | FPG graphics editor | `WIN_FPG` |
+| 102 | Code editor (PRG) | `WIN_CODE` |
+| 104 | Font editor | `WIN_FONT` |
+| 105 | PCM/sound editor | `WIN_SOUND` |
+| 107 | Music module player | `WIN_MUSIC` |
+
+Types >= 100 are "major editors" — they participate in activation/
+deactivation logic and support minimize/maximize. The threshold `100`
+should become `WIN_EDITOR_MIN`.
+
+**Files:** `handler.c`, `handler_map.c`, `handler_fonts.c`, `main.c`,
+`main_desktop.c`, `desktop.c`, `editor.c`, `font.c`, `paint.c`,
+`browser.c`, `window.c`.
+
+#### B. Window foreground state (`v.foreground`)
+
+| Value | Meaning | Proposed name |
+|-------|---------|---------------|
+| 0 | Background (dimmed) | `WF_BACKGROUND` |
+| 1 | Foreground (active) | `WF_FOREGROUND` |
+| 2 | Minimized (icon) | `WF_MINIMIZED` |
+
+**Files:** `main.c`, `main_desktop.c`, `desktop.c`, `window.c`.
+
+#### C. File type indices (`v_type`, `file_types[]`)
+
+Used by the file browser and throughout handler code to filter files
+and navigate to type-specific directories.
+
+| Index | File type | Proposed name |
+|-------|-----------|---------------|
+| 2 | MAP (images) | `FT_MAP` |
+| 3 | PAL (palettes) | `FT_PAL` |
+| 4 | FPG (graphic collections) | `FT_FPG` |
+| 5 | FNT (fonts) | `FT_FNT` |
+| 7 | Audio (WAV, PCM, OGG...) | `FT_AUDIO` |
+| 8 | PRG (programs) | `FT_PRG` |
+| 9 | Wallpaper images | `FT_WALLPAPER` |
+| 16 | Tracker modules (MOD, S3M...) | `FT_MODULE` |
+
+**Files:** `handler.c`, `handler_map.c`, `handler_fonts.c`,
+`handler_dialogs.c`, `browser.c`, `desktop.c`, `editor_file.c`,
+`main.c`.
+
+#### D. Dialog item types (`t_item.type`)
+
+| Value | Widget | Proposed name |
+|-------|--------|---------------|
+| 1 | Button | `ITEM_BUTTON` |
+| 2 | Text input field | `ITEM_TEXT` |
+| 3 | Checkbox/flag | `ITEM_CHECKBOX` |
+
+**Files:** `main_dialogs.c`, `window.c`.
+
+#### E. Menu text base indices
+
+Each menu's text block starts at a fixed index in the `texts[]` array.
+These appear as arguments to `create_menu()`, `paint_menu()`, and
+`update_menu()`.
+
+| Base | Menu | Proposed name |
+|------|------|---------------|
+| 750 | Main menu bar | `MENU_MAIN` |
+| 775 | Palettes | `MENU_PALETTES` |
+| 800 | Maps | `MENU_MAPS` |
+| 825 | Graphics (FPG) | `MENU_GRAPHICS` |
+| 850 | Fonts | `MENU_FONTS` |
+| 875 | System | `MENU_SYSTEM` |
+| 900 | Programs | `MENU_PROGRAMS` |
+| 925 | Sounds | `MENU_SOUNDS` |
+| 950 | Edit | `MENU_EDIT` |
+
+**Files:** `handler.c`, `handler_map.c`, `handler_fonts.c`.
+
+#### F. Mouse cursor IDs (`mouse_graf`)
+
+Set by `test_mouse()` / `test_mouse_box2()` in the paint editor and
+by the main loop's hit-test logic.
+
+| Value | Meaning | Proposed name |
+|-------|---------|---------------|
+| 1 | Normal arrow | `CURSOR_ARROW` |
+| 2 | Move/drag (title bar) | `CURSOR_MOVE` |
+| 4 | Minimize button hover | `CURSOR_MINIMIZE` |
+| 5 | Close button hover | `CURSOR_CLOSE` |
+| 6 | Resize grip | `CURSOR_RESIZE` |
+| 7 | Background window (click to activate) | `CURSOR_ACTIVATE` |
+| >= 10 | Paint cursor on canvas | `CURSOR_ON_CANVAS` (threshold) |
+
+**Files:** `main.c`, `mouse.c`, `paint.c`, `paint_tools.c`,
+`paint_select.c`, `handler_map.c`.
+
+#### G. Paint editor draw modes (`draw_mode`)
+
+The `draw_mode` variable serves double duty: values 0-13 identify the
+active tool, and values >= 100 signal tool transitions (the outer loop
+subtracts 100 and dispatches).
+
+| Value | Tool | Proposed name |
+|-------|------|---------------|
+| 0 | Pixels (point-and-click) | `TOOL_PIXELS` |
+| 1 | Pencil/freehand strokes | `TOOL_PENCIL` |
+| 2 | Lines | `TOOL_LINES` |
+| 3 | Continuous lines | `TOOL_POLYLINE` |
+| 4 | Bezier curves | `TOOL_BEZIER` |
+| 5 | Continuous bezier | `TOOL_POLYBEZIER` |
+| 6 | Rectangles | `TOOL_RECT` |
+| 7 | Circles/ellipses | `TOOL_CIRCLE` |
+| 8 | Spray | `TOOL_SPRAY` |
+| 9 | Fill/flood | `TOOL_FILL` |
+| 10 | Selection/cut | `TOOL_SELECT` |
+| 11 | Undo history | `TOOL_UNDO` |
+| 12 | Control points | `TOOL_CTRLPOINTS` |
+| 13 | Text | `TOOL_TEXT` |
+| 100 | Tool transition offset | `TOOL_TRANSITION` |
+
+The `draw_mode < 100` / `>= 100` checks become `draw_mode < TOOL_TRANSITION`.
+
+**Files:** `paint.c`, `paint_tools.c`, `paint_select.c`, `mouse.c`,
+`handler_map.c`.
+
+#### H. Block selection state (code editor)
+
+| Variable | Value | Meaning | Proposed name |
+|----------|-------|---------|---------------|
+| `block_state` | 0 | No block | `BLOCK_NONE` |
+| `block_state` | 1 | Pivot set | `BLOCK_PIVOT` |
+| `block_state` | 2 | Complete | `BLOCK_COMPLETE` |
+| `edit_block_mode` | 0 | No selection | `BMODE_NONE` |
+| `edit_block_mode` | 1 | Character block | `BMODE_CHAR` |
+| `edit_block_mode` | 2 | Line block | `BMODE_LINE` |
+| `clipboard_type` | 0 | Character data | `CLIP_CHAR` |
+| `clipboard_type` | 1 | Line data | `CLIP_LINE` |
+
+**Files:** `editor.c`, `editor_edit.c`, `editor_render.c`.
+
+#### I. Drag-and-drop state (`dragging`)
+
+| Value | Meaning | Proposed name |
+|-------|---------|---------------|
+| 0 | Idle | `DRAG_IDLE` |
+| 1 | Pending (mouse down) | `DRAG_PENDING` |
+| 2 | Dragging (in flight) | `DRAG_ACTIVE` |
+| 3 | Done (released) | `DRAG_DONE` |
+| 4 | Dropping (over target) | `DRAG_DROPPING` |
+| 5 | Dropped (completed) | `DRAG_DROPPED` |
+
+**Files:** `main.c`, `handler_map.c`.
+
+#### J. Mouse button bits (`mouse_b`)
+
+| Bit/Value | Meaning | Proposed name |
+|-----------|---------|---------------|
+| bit 0 (0x01) | Left button | `MB_LEFT` |
+| bit 1 (0x02) | Right button | `MB_RIGHT` |
+| bit 2 (0x04) | Scroll wheel down | `MB_SCROLL_DOWN` |
+| bit 3 (0x08) | Scroll wheel up | `MB_SCROLL_UP` |
+| 0x8001 | Spacebar pretending to be left-click | `MB_KEYBOARD_CLICK` |
+
+**Files:** `mouse.c`, `main.c`, `paint.c`, `paint_tools.c`,
+`paint_select.c`, `editor.c`, `handler_map.c`.
+
+#### K. Shift/modifier status bits (`shift_status`)
+
+| Bit | Meaning | Proposed name |
+|-----|---------|---------------|
+| 0-1 | Shift key | `MOD_SHIFT` (mask 0x03) |
+| 2 | Ctrl key | `MOD_CTRL` (0x04) |
+| 3 | Alt key | `MOD_ALT` (0x08) |
+
+**Files:** `editor.c`, `editor_edit.c`, `mouse.c`, `main.c`,
+`paint_tools.c`.
+
+#### L. Process status codes (`_Status`, runtime)
+
+| Value | Meaning | Proposed name |
+|-------|---------|---------------|
+| 0 | Dead (free slot) | `PROC_DEAD` |
+| 1 | Killed (pending removal) | `PROC_KILLED` |
+| 2 | Alive (running) | `PROC_ALIVE` |
+| 3 | Sleeping (waiting for function return) | `PROC_SLEEPING` |
+| 4 | Frozen (paused, still painted) | `PROC_FROZEN` |
+
+**Files:** `interpreter.c`, `functions.c`, `render.c`, `kernel.inc`.
+
+#### M. Coordinate types (`_Ctype`, runtime)
+
+| Value | Meaning | Proposed name |
+|-------|---------|---------------|
+| 0 | Screen coordinates | `CTYPE_SCREEN` |
+| 1 | Scroll-relative | `CTYPE_SCROLL` |
+| 2 | Mode 7-relative | `CTYPE_MODE7` |
+
+**Files:** `interpreter.c`, `render.c`, `functions.c`.
+
+#### N. Sprite flags (`_Flags`, runtime)
+
+| Bit | Meaning | Proposed name |
+|-----|---------|---------------|
+| 0 | Horizontal flip | `SPRITE_HFLIP` |
+| 1 | Vertical flip | `SPRITE_VFLIP` |
+| 2 | Ghost (transparency blend) | `SPRITE_GHOST` |
+
+**Files:** `render.c`.
+
+#### O. Repeated numeric constants
+
+These literal numbers appear across many files and should become
+`#define` or `enum` constants.
+
+| Value | Meaning | Proposed name | Approx. occurrences |
+|-------|---------|---------------|---------------------|
+| 768 | Palette data size (256 * 3 bytes) | `PALETTE_SIZE` | 50+ |
+| 256 | Palette entry count | `PALETTE_ENTRIES` | many |
+| 576 | Color rules/gradients block size | `GRADIENTS_SIZE` | ~10 |
+| 999 / 1000 | Max graphics per FPG | `MAX_FPG_GRAPHICS` | ~10 |
+| 1024 | Max line length in editor | `LONG_LINE` (already exists) | — |
+| 65536 | Ghost table size (256*256) | `GHOST_TABLE_SIZE` | ~5 |
+| 16384 | Squared-difference table size | `CUAD_TABLE_SIZE` | ~3 |
+| 9 | Pixels per menu item | `MENU_ITEM_HEIGHT` | ~5 |
+| 11 | Menu header height | `MENU_HEADER_HEIGHT` | ~3 |
+| 7 / 23 | Menu item text margin / width padding | `MENU_TEXT_MARGIN` / `MENU_WIDTH_PAD` | ~5 |
+
+**Files:** Too many to list individually — `image.c`, `fpg.c`, `font.c`,
+`charset.c`, `palette.c`, `handler.c`, `handler_map.c`, `handler_fonts.c`,
+`main.c`, `interpreter.c`, `render.c`, `desktop.c`, `browser.c`, etc.
+
+#### P. Button alignment modes (`_button` center parameter)
+
+| Value | Position | Proposed name |
+|-------|----------|---------------|
+| 0 | Top-left | `ALIGN_TL` |
+| 1 | Top-center | `ALIGN_TC` |
+| 2 | Top-right | `ALIGN_TR` |
+| 3 | Middle-left | `ALIGN_ML` |
+| 4 | Middle-center | `ALIGN_MC` |
+| 5 | Middle-right | `ALIGN_MR` |
+| 6 | Bottom-left | `ALIGN_BL` |
+| 7 | Bottom-center | `ALIGN_BC` |
+| 8 | Bottom-right | `ALIGN_BR` |
+
+**Files:** `main_dialogs.c`, `handler_dialogs.c`, `handler_map.c`,
+`handler_fonts.c`, every dialog init function.
+
+#### Q. File format magic offsets
+
+These are structural offsets within DIV's binary file formats (MAP, FPG,
+FNT, PAL). They appear in parsing/writing code and should be named so
+format changes are centralized.
+
+| Value | Context | Proposed name |
+|-------|---------|---------------|
+| 8 | Start of palette in MAP/FPG/FNT/PAL | `FMT_PALETTE_OFFSET` |
+| 48 | Start of palette in MAP (after header fields) | `MAP_PALETTE_OFFSET` |
+| 1352 | Start of gencode in FNT (8 + 768 + 576) | `FNT_GENCODE_OFFSET` |
+| 1356 | Start of char table in FNT (1352 + 4) | `FNT_TABLE_OFFSET` |
+| 1392 | Start of control points in MAP | `MAP_CTRLPTS_OFFSET` |
+
+**Files:** `image.c`, `fpg.c`, `font.c`, `charset.c`, `browser.c`,
+`handler_fonts.c`, `desktop.c`.
+
+### Sprint plan
+
+Each sprint is one self-contained commit. Sprints are ordered by impact
+(most-referenced first) and grouped so related constants land together.
+
+**Sprint 1 — Core IDE enums** (highest impact, touches most files):
+- Window types (A)
+- Window foreground state (B)
+- File type indices (C)
+- Dialog item types (D)
+
+All go in `global.h` as enums. Search-and-replace project-wide.
+
+**Sprint 2 — Menu and UI constants:**
+- Menu text base indices (E)
+- Button alignment modes (P)
+- Menu layout constants from (O): `MENU_ITEM_HEIGHT`,
+  `MENU_HEADER_HEIGHT`, `MENU_TEXT_MARGIN`, `MENU_WIDTH_PAD`
+
+**Sprint 3 — Input state enums:**
+- Mouse cursor IDs (F)
+- Mouse button bits (J)
+- Shift/modifier bits (K)
+- Spacebar-as-click constant (J, `MB_KEYBOARD_CLICK`)
+
+**Sprint 4 — Editor state enums:**
+- Paint draw modes (G)
+- Block selection state (H)
+- Drag-and-drop state (I)
+
+**Sprint 5 — Palette and format constants:**
+- `PALETTE_SIZE` (768), `PALETTE_ENTRIES` (256), `GRADIENTS_SIZE` (576)
+- `GHOST_TABLE_SIZE`, `CUAD_TABLE_SIZE`
+- `MAX_FPG_GRAPHICS`
+- File format offsets (Q)
+
+**Sprint 6 — Runtime enums** (compiler/runtime boundary):
+- Process status codes (L)
+- Coordinate types (M)
+- Sprite flags (N)
+
+This sprint touches `inter.h`, `interpreter.c`, `functions.c`,
+`render.c`, and `kernel.inc`. Requires building all four targets
+and verifying runtime behavior hasn't changed.
+
+### What NOT to enumerate
+
+- **`texts[]` string indices beyond the menu bases** — there are
+  hundreds of these, they're inherently tied to `lenguaje.div` line
+  numbers, and naming every error message would create more churn than
+  clarity. The menu bases are worth naming because they're structural;
+  individual string references within dialogs are fine as-is.
+- **One-off pixel tweaks** — a `+3` padding in a single dialog paint
+  function isn't worth a constant. Only extract values that appear in
+  3+ places or that would confuse a newcomer.
+- **Process field offsets** — `_X`, `_Y`, `_Graph`, etc. are already
+  `#define` constants in `inter.h`. They're used correctly throughout.
+  No work needed.
+
+**Effort:** 1-2 days total, spread across 6 small sprints.
 **Risk:** Very low — purely mechanical, no behavior change. Compiler
-catches any mistakes.
+catches any mistakes. Each sprint is independently committable.
 
 ---
 
