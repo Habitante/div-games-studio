@@ -36,7 +36,7 @@ struct t_listbox lvol_ma = {MIX_BAR3, 11, dummy_mixer_array, 1, 5, 1};
 //-----------------------------------------------------------------------------
 
 void mixer0(void) {
-  v.type = 8;
+  v.type = WIN_MIXER;
   v.title = texts[421];
   v.name = texts[421];
   v.w = 59;

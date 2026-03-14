@@ -1443,7 +1443,7 @@ void show_thumb(struct t_listboxbr *l, int num) {
 void browser0(void) {
   unsigned n, m, x;
 
-  v.type = 1; // Dialog
+  v.type = WIN_DIALOG; // Dialog
   v.title = (byte *)v_text;
   v_thumb = v_type;
 
@@ -1491,10 +1491,10 @@ void browser0(void) {
   lextbr.total_items = 0;
   n = 0; // Create the list of extensions
 
-  if (v_type == 2 && v_mode > 0)
-    v_type = 14;
-  if (v_type == 7 && v_mode > 0)
-    v_type = 11;
+  if (v_type == FT_MAP && v_mode > 0)
+    v_type = FT_MAP_SAVE;
+  if (v_type == FT_AUDIO && v_mode > 0)
+    v_type = FT_AUDIO_SAVE;
 
   while ((x = file_types[v_type].ext[n++])) {
     m = 0;

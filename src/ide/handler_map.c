@@ -39,7 +39,7 @@ void map_view0(void) {
   int x, y;
   int max;
 
-  v.type = 100; // Map (windows of which only one can be active)
+  v.type = WIN_MAP; // Map (windows of which only one can be active)
   v.mapa = v_map;
 
   if ((v.w = v.mapa->map_width) < 48 * big2)
@@ -161,12 +161,12 @@ void calculate_foreground(void) {
   int n, m;
 
   for (n = 0; n < MAX_WINDOWS; n++)
-    if (window[n].type && window[n].foreground != 2) {
-      window[n].foreground = 1;
+    if (window[n].type && window[n].foreground != WF_MINIMIZED) {
+      window[n].foreground = WF_FOREGROUND;
       for (m = 0; m < n; m++)
         if (window[m].type) {
           if (windows_collide(n, m))
-            window[n].foreground = 0;
+            window[n].foreground = WF_BACKGROUND;
         }
     }
 }
@@ -247,9 +247,9 @@ void map_view2(void) {
     }
 
     for (n = 1; n < MAX_WINDOWS; n++)
-      if (window[n].type && window[n].foreground == 1) {
+      if (window[n].type && window[n].foreground == WF_FOREGROUND) {
         hidden[n] = 1;
-        window[n].foreground = 0;
+        window[n].foreground = WF_BACKGROUND;
       } else
         hidden[n] = 0;
 
@@ -305,8 +305,8 @@ void map_view2(void) {
 
     current_map_code = v.mapa->code;
     zoom_background = 0;
-    v.type = 0;
-    v.foreground = 0;
+    v.type = WIN_EMPTY;
+    v.foreground = WF_BACKGROUND;
     v.state = 0;
 
     wgra(v.ptr, w, h, c1, 2, 2, w - 20, 7);
@@ -354,11 +354,11 @@ void map_view2(void) {
       texture_type |= BRUSH; // Thumbnail type BRUSH
     }
 
-    v.type = 100;
+    v.type = WIN_MAP;
     if (create_mapbr_thumbs(&thumbmap_list_br)) {
       texture_type |= MAPBR; // Thumbnail type MAPBR
     }
-    v.type = 0;
+    v.type = WIN_EMPTY;
 
     do {
       zoom_map();
@@ -461,10 +461,10 @@ void map_view2(void) {
     v.mapa->zoom_cy = zoom_cy;
     for (n = 1; n < MAX_WINDOWS; n++)
       if (hidden[n])
-        window[n].foreground = 1;
-    v.foreground = 1;
+        window[n].foreground = WF_FOREGROUND;
+    v.foreground = WF_FOREGROUND;
     v.state = 1;
-    v.type = 100;
+    v.type = WIN_MAP;
 
     calculate_foreground();
 
@@ -506,7 +506,7 @@ struct t_listbox map_sizes_list = {64, 19, map_sizes, 9, 5, 50};
 char width_str[8], height_str[8];
 
 void new_map0(void) {
-  v.type = 1;
+  v.type = WIN_DIALOG;
   v.title = texts[132];
   v.w = 126;
   v.h = 14 + DIALOG_Y_OFFSET;
@@ -1029,7 +1029,7 @@ void resize3() {
 }
 
 void resize0() {
-  v.type = 1; // Window type 1 = dialog
+  v.type = WIN_DIALOG; // Window type 1 = dialog
 
   v.title = texts[63];
   v.w = 126 + 50;
@@ -1230,7 +1230,7 @@ void map_search3() {
 }
 
 void map_search0() {
-  v.type = 1;
+  v.type = WIN_DIALOG;
   v.title = texts[400];
   v.w = 72 + 40;
   v.h = 49 + 18 + 9;

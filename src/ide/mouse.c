@@ -308,7 +308,7 @@ void libera_drag(void) {
       break;
   }
 
-  if (n < MAX_WINDOWS && window[n].type == 101 && window[n].mapa != NULL) {
+  if (n < MAX_WINDOWS && window[n].type == WIN_FPG && window[n].mapa != NULL) {
     free(window[n].mapa->map);
     free(window[n].mapa);
     window[n].mapa = NULL;

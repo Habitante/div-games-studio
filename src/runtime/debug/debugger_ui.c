@@ -15,8 +15,8 @@ void show_dialog(void_return_type_t init_handler) {
     // The following values must be set by init_handler; defaults:
     //---------------------------------------------------------------------------
 
-    v.type = 1;
-    v.foreground = 1;
+    v.type = WIN_DIALOG;
+    v.foreground = WF_FOREGROUND;
     v.title = (byte *)"?";
     v.paint_handler = dummy_handler;
     v.click_handler = dummy_handler;
@@ -58,10 +58,10 @@ void show_dialog(void_return_type_t init_handler) {
       //---------------------------------------------------------------------------
 
       vtipo = v.type;
-      v.type = 0;
+      v.type = WIN_EMPTY;
 
-      if (window[1].type == 1) { // Dialog over dialog
-        window[1].foreground = 0;
+      if (window[1].type == WIN_DIALOG) { // Dialog over dialog
+        window[1].foreground = WF_BACKGROUND;
         flush_window(1);
       }
 
@@ -118,7 +118,7 @@ void show_dialog(void_return_type_t init_handler) {
 
     } else {
       memmove(&v.type, &window[1].type, sizeof(twindow) * (MAX_WINDOWS - 1));
-      window[MAX_WINDOWS - 1].type = 0;
+      window[MAX_WINDOWS - 1].type = WIN_EMPTY;
     }
   }
 }
@@ -183,7 +183,7 @@ void modal_loop(void) {
         n--;
 
     if (n != oldn && oldn == 0)
-      if (v.foreground == 1) {
+      if (v.foreground == WF_FOREGROUND) {
         dialogo_invocado = 1;
         wmouse_x = -1;
         wmouse_y = -1;
@@ -279,7 +279,7 @@ void modal_loop(void) {
 
     if (key(_ESC) && !key(_L_CTRL)) {
       for (n = 0; n < v.items; n++)
-        if (v.item[n].type == 2 && (v.item[n].state & 2))
+        if (v.item[n].type == ITEM_TEXT && (v.item[n].state & 2))
           break;
       if (n == v.items) {
         close_window();
@@ -361,8 +361,8 @@ void close_window(void) {
   memmove(&v.type, &window[1].type, sizeof(twindow) * (MAX_WINDOWS - 1));
   update_box(x, y, w, h);
 
-  if (v.type == 1) { // Dialog over dialog: only open the last one
-    v.foreground = 1;
+  if (v.type == WIN_DIALOG) { // Dialog over dialog: only open the last one
+    v.foreground = WF_FOREGROUND;
     flush_window(0);
   }
 
@@ -394,9 +394,9 @@ void move_window(void) {
     y = v.y;
     v.x = mouse_x - ix;
     v.y = mouse_y - iy;
-    v.type = 0;
+    v.type = WIN_EMPTY;
     update_box(x, y, w, h);
-    v.type = 1;
+    v.type = WIN_DIALOG;
     flush_window(0);
     if (!skip_flush) {
       flush_copy();
@@ -468,7 +468,7 @@ void flush_window(int m) {
         }
 
         if (_an > 0 && _al > 0) {
-          if (window[n].foreground == 1)
+          if (window[n].foreground == WF_FOREGROUND)
             blit_region(screen_buffer, vga_width, vga_height, _ptr, __x, _y, _an, _al, salta_x);
           else
             blit_region_dark(screen_buffer, vga_width, vga_height, _ptr, __x, _y, _an, _al,
@@ -1195,7 +1195,7 @@ void explode(int x, int y, int w, int h) {
   int xx, yy, aan, aal;
   if (skip_flush)
     return;
-  v.type = 0;
+  v.type = WIN_EMPTY;
   big = 0;
   update_box(x, y, w, h);
   while (++n < 10) {
@@ -1245,7 +1245,7 @@ void extrude(int x, int y, int w, int h, int x2, int y2, int w2, int h2) {
   int xx, yy, aan, aal;
   if (skip_flush)
     return;
-  v.type = 0;
+  v.type = WIN_EMPTY;
   big = 0;
   update_box(x, y, w, h);
   do {
@@ -1323,7 +1323,7 @@ void update_box(int x, int y, int w, int h) {
         }
 
         if (_an > 0 && _al > 0) {
-          if (window[n].foreground == 1)
+          if (window[n].foreground == WF_FOREGROUND)
             blit_region(screen_buffer, vga_width, vga_height, _ptr, __x, _y, _an, _al, salta_x);
           else
             blit_region_dark(screen_buffer, vga_width, vga_height, _ptr, __x, _y, _an, _al,
@@ -1398,7 +1398,7 @@ void restore_wallpaper(int x, int y, int w, int h) {
 //-----------------------------------------------------------------------------
 
 void _button(byte *t, int x, int y, int c) {
-  v.item[v.items].type = 1;
+  v.item[v.items].type = ITEM_BUTTON;
   v.item[v.items].state = 0;
   v.item[v.items].button.text = t;
   v.item[v.items].button.x = x;
@@ -1410,7 +1410,7 @@ void _button(byte *t, int x, int y, int c) {
 }
 
 void _get(byte *t, int x, int y, int w, byte *buffer, int buffer_len, int r0, int r1) {
-  v.item[v.items].type = 2;
+  v.item[v.items].type = ITEM_TEXT;
   v.item[v.items].state = 0;
   v.item[v.items].get.text = t;
   v.item[v.items].get.x = x;
@@ -1426,7 +1426,7 @@ void _get(byte *t, int x, int y, int w, byte *buffer, int buffer_len, int r0, in
 }
 
 void _flag(byte *t, int x, int y, int *value) {
-  v.item[v.items].type = 3;
+  v.item[v.items].type = ITEM_CHECKBOX;
   v.item[v.items].state = 0;
   v.item[v.items].flag.text = t;
   v.item[v.items].flag.x = x;
@@ -1623,7 +1623,7 @@ void _process_items(void) {
   v.active_item = -1;
 
   if (v.selected_item != -1) {
-    if (!v.state && v.type == 102) {
+    if (!v.state && v.type == WIN_CODE) {
       asc = ascii;
       kesc = kbdFLAGS[28];
       ascii = 0;
@@ -1634,7 +1634,7 @@ void _process_items(void) {
         _select_new_item(v.selected_item + 1);
       }
       if (ascii == 0x1b) { // && (v.item[v.selected_item].state&2)) {
-        if (v.item[v.selected_item].type == 2) {
+        if (v.item[v.selected_item].type == ITEM_TEXT) {
           asc = ascii;
           kesc = kbdFLAGS[28];
           est = v.item[v.selected_item].state;
@@ -1680,7 +1680,7 @@ void _process_items(void) {
   }
 
   if (v.selected_item != -1) {
-    if (!v.state && v.type == 102) {
+    if (!v.state && v.type == WIN_CODE) {
       ascii = asc;
       kbdFLAGS[28] = kesc;
     }
@@ -1703,7 +1703,7 @@ void _select_new_item(int i) {
     i++;
     if (i >= v.items)
       i = 0;
-  } while (v.item[i].type >= 3 || v.item[i].type < 1);
+  } while (v.item[i].type >= ITEM_CHECKBOX || v.item[i].type < ITEM_BUTTON);
 
   switch (v.item[v.selected_item = i].type) {
   case 1:

@@ -107,6 +107,12 @@ void call(const void_return_type_t func); // void funcion(void); int n=(int)func
 
 #define LONG_LINE 1024 // Maximum line length in the editor
 
+//-----------------------------------------------------------------------------
+//      Enums for magic-number replacement (shared with debugger via div_enums.h)
+//-----------------------------------------------------------------------------
+
+#include "div_enums.h"
+
 #define RES_FOR_NAME _MAX_PATH
 
 ///////////////////////////////////////////////////////////////////////////////

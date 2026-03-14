@@ -17,7 +17,7 @@ static void Show_Time(void) {
   char cBuff[3];
   int Dig1, Dig2, Dig3, Dig4;
 
-  if (v.foreground != 2 || v.h > v._h_saved) {
+  if (v.foreground != WF_MINIMIZED || v.h > v._h_saved) {
     w = v.w;
     h = v.h;
   } else {
@@ -95,7 +95,7 @@ void Clock2(void) {
 void Clock3(void) {}
 
 void clock0(void) {
-  v.type = 4;
+  v.type = WIN_CLOCK;
   v.w = 47;
   v.h = 30;
   v.title = texts[151];

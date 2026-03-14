@@ -120,7 +120,7 @@ void menu_programs2(void) {
     update_menu(900, 3, 99);
 
   if ((prev_mouse_buttons & 1) && !(mouse_b & 1)) {
-    v_type = 8;
+    v_type = FT_PRG;
 
     switch (v.state) {
     case 1: // New ...
@@ -225,7 +225,7 @@ void menu_programs2(void) {
         source_len = window[n].prg->file_len;
         v_window = n;
         run_mode = 0;
-        div_strcpy(file_types[8].path, sizeof(file_types[8].path), window[n].prg->path);
+        div_strcpy(file_types[FT_PRG].path, sizeof(file_types[FT_PRG].path), window[n].prg->path);
         compile_program();
         if (error_number != -1) {
           goto_error();
@@ -255,7 +255,7 @@ void menu_programs2(void) {
           run_mode = 1;
         else
           run_mode = 3;
-        div_strcpy(file_types[8].path, sizeof(file_types[8].path), window[n].prg->path);
+        div_strcpy(file_types[FT_PRG].path, sizeof(file_types[FT_PRG].path), window[n].prg->path);
         compile_program();
         if (error_number != -1) {
           goto_error();
@@ -276,7 +276,7 @@ void menu_programs2(void) {
         v_window = n;
         run_mode = 2;
         delete_file("system/exec.ins");
-        div_strcpy(file_types[8].path, sizeof(file_types[8].path), window[n].prg->path);
+        div_strcpy(file_types[FT_PRG].path, sizeof(file_types[FT_PRG].path), window[n].prg->path);
         compile_program();
         if (error_number != -1) {
           goto_error();
@@ -336,7 +336,7 @@ void menu_edit2(void) {
     update_menu(950, 0, 99);
 
   if ((prev_mouse_buttons & 1) && !(mouse_b & 1)) {
-    v_type = 8;
+    v_type = FT_PRG;
 
     switch (v.state) {
     case 1: // Delete line
@@ -417,14 +417,14 @@ void menu_edit2(void) {
           v.redraw = 0;
         }
         move(0, n);
-        if (v.foreground == 0) {
+        if (v.foreground == WF_BACKGROUND) {
           for (m = 1; m < MAX_WINDOWS; m++)
-            if (window[m].type && window[m].foreground == 1)
+            if (window[m].type && window[m].foreground == WF_FOREGROUND)
               if (windows_collide(0, m)) {
-                window[m].foreground = 0;
+                window[m].foreground = WF_BACKGROUND;
                 flush_window(m);
               }
-          v.foreground = 1;
+          v.foreground = WF_FOREGROUND;
         }
         flush_window(0);
         write_line();
@@ -459,14 +459,14 @@ void menu_edit2(void) {
         show_dialog(find_text0);
         if (v_accept) {
           move(0, n);
-          if (v.foreground == 0) {
+          if (v.foreground == WF_BACKGROUND) {
             for (m = 1; m < MAX_WINDOWS; m++)
-              if (window[m].type && window[m].foreground == 1)
+              if (window[m].type && window[m].foreground == WF_FOREGROUND)
                 if (windows_collide(0, m)) {
-                  window[m].foreground = 0;
+                  window[m].foreground = WF_BACKGROUND;
                   flush_window(m);
                 }
-            v.foreground = 1;
+            v.foreground = WF_FOREGROUND;
           }
           find_text();
         }
@@ -484,14 +484,14 @@ void menu_edit2(void) {
           v.redraw = 0;
         }
         move(0, n);
-        if (v.foreground == 0) {
+        if (v.foreground == WF_BACKGROUND) {
           for (m = 1; m < MAX_WINDOWS; m++)
-            if (window[m].type && window[m].foreground == 1)
+            if (window[m].type && window[m].foreground == WF_FOREGROUND)
               if (windows_collide(0, m)) {
-                window[m].foreground = 0;
+                window[m].foreground = WF_BACKGROUND;
                 flush_window(m);
               }
-          v.foreground = 1;
+          v.foreground = WF_FOREGROUND;
           flush_window(0);
         }
         find_text();
@@ -503,14 +503,14 @@ void menu_edit2(void) {
         show_dialog(replace_text0);
         if (v_accept) {
           move(0, n);
-          if (v.foreground == 0) {
+          if (v.foreground == WF_BACKGROUND) {
             for (m = 1; m < MAX_WINDOWS; m++)
-              if (window[m].type && window[m].foreground == 1)
+              if (window[m].type && window[m].foreground == WF_FOREGROUND)
                 if (windows_collide(0, m)) {
-                  window[m].foreground = 0;
+                  window[m].foreground = WF_BACKGROUND;
                   flush_window(m);
                 }
-            v.foreground = 1;
+            v.foreground = WF_FOREGROUND;
           }
           replace_text();
         }
@@ -601,7 +601,7 @@ void menu_maps2(void) {
     update_menu(800, 3, 9);
 
   if ((prev_mouse_buttons & 1) && !(mouse_b & 1)) {
-    v_type = 2;
+    v_type = FT_MAP;
 
     switch (v.state) {
     case 1: // New map ...
@@ -649,7 +649,7 @@ void menu_maps2(void) {
       show_dialog(accept0);
       if (v_accept) {
         for (n = 0; n < MAX_WINDOWS; n++)
-          if (window[n].type == 100 && window[n].foreground != 2) {
+          if (window[n].type == WIN_MAP && window[n].foreground != WF_MINIMIZED) {
             move(0, n);
             close_window();
             n = -1;
@@ -712,14 +712,14 @@ casi_no_tiene_nombre:
         paint_menu(800);
         v.state = 0;
         move(0, n);
-        if (v.foreground == 0) {
+        if (v.foreground == WF_BACKGROUND) {
           for (m = 1; m < MAX_WINDOWS; m++)
-            if (window[m].type && window[m].foreground == 1)
+            if (window[m].type && window[m].foreground == WF_FOREGROUND)
               if (windows_collide(0, m)) {
-                window[m].foreground = 0;
+                window[m].foreground = WF_BACKGROUND;
                 flush_window(m);
               }
-          v.foreground = 1;
+          v.foreground = WF_FOREGROUND;
         }
         mouse_b = 1;
         call((void_return_type_t)v.click_handler);
@@ -761,7 +761,7 @@ int check_file(void) {
   FILE *f;
 
   v_mode = 0;
-  v_type = 4;
+  v_type = FT_FPG;
   v_text = (char *)texts[70];
   show_dialog(browser0);
 
@@ -807,7 +807,7 @@ int find_pcm_window(void) {
   int m, n = 0;
 
   for (m = 1; m < MAX_WINDOWS; m++)
-    if (window[m].type == 105 && window[m].state) {
+    if (window[m].type == WIN_SOUND && window[m].state) {
       n = m;
       break;
     }
@@ -818,7 +818,7 @@ int find_mod_window(void) {
   int m, n = 0;
 
   for (m = 1; m < MAX_WINDOWS; m++)
-    if (window[m].type == 107 && window[m].state) {
+    if (window[m].type == WIN_MUSIC && window[m].state) {
       n = m;
       break;
     }
@@ -829,7 +829,7 @@ int find_font_window(void) {
   int m, n = 0;
 
   for (m = 1; m < MAX_WINDOWS; m++)
-    if (window[m].type == 104 && window[m].state) {
+    if (window[m].type == WIN_FONT && window[m].state) {
       n = m;
       break;
     }
@@ -840,7 +840,7 @@ int find_fpg_window(void) {
   int m, n = 0;
 
   for (m = 1; m < MAX_WINDOWS; m++)
-    if (window[m].type == 101 && window[m].state) {
+    if (window[m].type == WIN_FPG && window[m].state) {
       n = m;
       break;
     }
@@ -853,7 +853,7 @@ int find_map_window(void) {
   int m, n = 0;
 
   for (m = 1; m < MAX_WINDOWS; m++)
-    if (window[m].type == 100 && window[m].state) {
+    if (window[m].type == WIN_MAP && window[m].state) {
       n = m;
       break;
     }
@@ -864,7 +864,7 @@ int find_and_load_map(void) {
   int m, n = 0;
 
   for (m = 1; m < MAX_WINDOWS; m++)
-    if (window[m].type == 100 && window[m].state) {
+    if (window[m].type == WIN_MAP && window[m].state) {
       n = m;
       break;
     }
@@ -884,7 +884,7 @@ int find_program_window(void) {
   int m, n = 0;
 
   for (m = 1; m < MAX_WINDOWS; m++) {
-    if (window[m].type == 102 && window[m].state && window[m].prg != NULL) {
+    if (window[m].type == WIN_CODE && window[m].state && window[m].prg != NULL) {
       n = m;
       break;
     }
@@ -924,7 +924,7 @@ void menu_graphics2(void) {
     update_menu(825, 3, 9);
 
   if ((prev_mouse_buttons & 1) && !(mouse_b & 1)) {
-    v_type = 4;
+    v_type = FT_FPG;
 
     switch (v.state) {
     case 1: // New file
@@ -957,7 +957,7 @@ void menu_graphics2(void) {
           if (v_exists) {
             // Check that the file is not the same
             Fpg = (FPG *)window[n].aux;
-            div_strcpy(full, sizeof(full), file_types[4].path);
+            div_strcpy(full, sizeof(full), file_types[FT_FPG].path);
             if (full[strlen(full) - 1] != '/')
               div_strcat(full, sizeof(full), "/");
             div_strcat(full, sizeof(full), input);
@@ -1181,7 +1181,7 @@ void menu_sounds2(void) {
     case 5:
 unnamed_sound:
       if ((n = find_pcm_window())) {
-        v_type = 7;
+        v_type = FT_AUDIO;
         v_mode = 1;
         v_text = (char *)texts[339];
         show_dialog(browser0);
@@ -1221,7 +1221,7 @@ unnamed_sound:
     case 6:
       if ((n = find_pcm_window())) {
         pcminfo_aux = window[n].aux;
-        v_type = 7;
+        v_type = FT_AUDIO;
         v_text = (char *)texts[349];
 
         //          judas_stopsample(0);
@@ -1346,7 +1346,7 @@ void menu_system2(void) {
 void create_menu(int menu) {
   int w;
 
-  v.type = 2; // Menu
+  v.type = WIN_MENU; // Menu
   v.name = texts[menu++];
   v.title = texts[menu];
   v.state = 0;

@@ -321,7 +321,7 @@ void explode_dialog3(void) {
 }
 
 void explode_dialog0(void) {
-  v.type = 1;
+  v.type = WIN_DIALOG;
 
   v.title = texts[300];
   v.w = 128;

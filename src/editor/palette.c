@@ -717,7 +717,7 @@ void calculate_gradient(int n) {
 int has_maps(void) {
   int m, n = -1;
   for (m = 0; m < MAX_WINDOWS; m++)
-    if (window[m].type == 100) {
+    if (window[m].type == WIN_MAP) {
       n = m;
       break;
     }
@@ -742,7 +742,7 @@ void pal_load() {
   FILE *f;
 
   v_mode = 0;
-  v_type = 3;
+  v_type = FT_PAL;
   v_text = (char *)texts[777];
   show_dialog(browser0);
   if (!v_finished)
@@ -882,7 +882,7 @@ void pal_save() {
 
 void pal_save_as() {
   v_mode = 1;
-  v_type = 10;
+  v_type = FT_PAL_SAVE;
   v_text = (char *)texts[778];
   show_dialog(browser0);
   if (v_finished) {
@@ -951,7 +951,7 @@ void pal_refresh(int no_tocar_mapas, int guardar_original) {
   // ************** Free FPG thumbnails
 
   for (m = 0; m < MAX_WINDOWS; m++)
-    if (window[m].type == 101) {
+    if (window[m].type == WIN_FPG) {
       my_fpg = (FPG *)window[m].aux;
 
       // Free FPG thumbnails
@@ -975,7 +975,7 @@ void pal_refresh(int no_tocar_mapas, int guardar_original) {
 
   if (!no_tocar_mapas) {
     for (n = 1; n < MAX_WINDOWS; n++) {
-      if (window[n].type == 100) {
+      if (window[n].type == WIN_MAP) {
         ptr = window[n].mapa->map;
         sum = window[n].mapa->map_width * window[n].mapa->map_height;
         x = 0;
@@ -1001,7 +1001,7 @@ void pal_refresh(int no_tocar_mapas, int guardar_original) {
     }
 
   for (n = 0; n < MAX_WINDOWS; n++) {
-    if (window[n].type == 102 && !strcmp((char *)window[n].name, (char *)texts[83])) {
+    if (window[n].type == WIN_CODE && !strcmp((char *)window[n].name, (char *)texts[83])) {
       Text1Col = xlat[Text1Col];
       Text2Col = xlat[Text2Col];
       Text3Col = xlat[Text3Col];
@@ -1064,7 +1064,7 @@ void pal_refresh(int no_tocar_mapas, int guardar_original) {
   create_title_bar();
 
   for (n = 1; n < MAX_WINDOWS; n++) {
-    if (window[n].type == 104)
+    if (window[n].type == WIN_FONT)
       pal_reload_font(n, (struct twindow *)&window[n].type);
   }
 
@@ -1072,7 +1072,7 @@ void pal_refresh(int no_tocar_mapas, int guardar_original) {
     if (window[n].type) {
       wup(n);
       ptr = v.ptr;
-      if (window[n].foreground == 2) {
+      if (window[n].foreground == WF_MINIMIZED) {
         swap(v.w, v._w_saved);
         swap(v.h, v._h_saved);
       }
@@ -1087,7 +1087,7 @@ void pal_refresh(int no_tocar_mapas, int guardar_original) {
       wput(ptr, w, h, w - 9, 2, 35);
       wput(ptr, w, h, w - 17, 2, 37);
 
-      if (v.type >= 100 && !v.state) {
+      if (v.type >= WIN_EDITOR_MIN && !v.state) {
         wgra(v.ptr, w, h, c1, 2, 2, w - 20, 7);
         if (text_len(v.title) + 3 > w - 20) {
           wwrite_in_box(v.ptr, w, w - 19, h, 4, 2, 0, v.title, c0);
@@ -1107,7 +1107,7 @@ void pal_refresh(int no_tocar_mapas, int guardar_original) {
         }
       }
       call((void_return_type_t)v.paint_handler);
-      if (v.foreground == 2) {
+      if (v.foreground == WF_MINIMIZED) {
         swap(v.w, v._w_saved);
         swap(v.h, v._h_saved);
       }
@@ -1154,7 +1154,7 @@ void pal_refresh(int no_tocar_mapas, int guardar_original) {
     memcpy(original_palette, dac, 768);
 
   for (n = 1; n < MAX_WINDOWS; n++) {
-    if (window[n].type == 101) {
+    if (window[n].type == WIN_FPG) {
       if (remap_all_files(n))
         n--;
     }
@@ -1280,7 +1280,7 @@ void ordena2(void) {
 }
 
 void ordena0(void) {
-  v.type = 1; // Dialog
+  v.type = WIN_DIALOG; // Dialog
   v.state = 0;
   v.w = 65 * 2 + 7;
   v.h = 65 * 2 + 31;
@@ -1361,7 +1361,7 @@ void merge_palette(void) {
   int div_try = 0;
 
   v_mode = 0;
-  v_type = 3;
+  v_type = FT_PAL;
   v_text = (char *)texts[781];
   show_dialog(browser0);
 
@@ -2273,7 +2273,7 @@ void pal_interpolate2(void) {
 }
 
 void pal_interpolate0(void) {
-  v.type = 1; // Dialog
+  v.type = WIN_DIALOG; // Dialog
   v.w = 220 - 46 - 7;
   v.h = 163 + 24 - 16;
   v.title = texts[138];

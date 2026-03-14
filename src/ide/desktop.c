@@ -88,12 +88,12 @@ void download_desktop() {
   n = fwrite(ghost, 65536, 1, desktop);
   // Check and save each used window one by one
   for (x = MAX_WINDOWS - 1; x >= 0; x--) {
-    if (window[x].type != 0 && window[x].title) {
+    if (window[x].type != WIN_EMPTY && window[x].title) {
       numvent++;
       n = fwrite(&window[x], 1, sizeof(struct twindow), desktop);
       switch (window[x].type) {
       //Window struct
-      case 2: //menu
+      case WIN_MENU: //menu
         iWork = -1;
         if (window[x].paint_handler == menu_main1)
           iWork = 0;
@@ -117,18 +117,18 @@ void download_desktop() {
         n = fwrite(&iWork, 1, 4, desktop);
 
         break;
-      case 3: //palet
+      case WIN_PALETTE: //palet
         break;
-      case 4: //timer
+      case WIN_CLOCK: //timer
         if (window[x].paint_handler == clock1)
           iWork = 1;
         n = fwrite(&iWork, 1, 4, desktop);
         break;
-      case 5: //recycle bin
+      case WIN_TRASH: //recycle bin
         break;
-      case 8: //mixer
+      case WIN_MIXER: //mixer
         break;
-      case 100: //map
+      case WIN_MAP: //map
         // tmapa struct
         man = window[x].mapa->map_width;
         mal = window[x].mapa->map_height;
@@ -136,11 +136,11 @@ void download_desktop() {
         // Graphic data
         n = fwrite((char *)window[x].mapa->map, man * mal, 1, desktop);
         break;
-      case 101: //fpg
+      case WIN_FPG: //fpg
         // FPG struct
         n = fwrite(window[x].aux, 1, sizeof(FPG), desktop);
         break;
-      case 102: //prg
+      case WIN_CODE: //prg
         if (window[x].prg != NULL) {
           iWork = 0;
           n = fwrite(&iWork, 1, 4, desktop);
@@ -172,17 +172,17 @@ void download_desktop() {
           }
         }
         break;
-      case 104: //fnt
+      case WIN_FONT: //fnt
         // Save to file
         n = fwrite(window[x].aux, 1, 14, desktop);
         n = fwrite(window[x].aux + 14, 1, _MAX_PATH - 14, desktop);
         break;
-      case 105: //pcm
+      case WIN_SOUND: //pcm
         mypcminfo = (pcminfo *)window[x].aux;
         save_desktop_sound(mypcminfo, desktop);
         break;
       // case 106 (map3d) removed (MODE8/3D map editor deleted)
-      case 107: //mod
+      case WIN_MUSIC: //mod
         mymodinfo = (modinfo *)window[x].aux;
         n = fwrite(mymodinfo->name, 1, 14, desktop);
         n = fwrite(mymodinfo->pathname, 1, 256, desktop);
@@ -253,7 +253,7 @@ int upload_desktop() {
     // Window struct data
     fread(&window_aux, 1, sizeof(struct twindow), desktop);
     switch (window_aux.type) {
-    case 2: //menu
+    case WIN_MENU: //menu
       fread(&iWork, 1, 4, desktop);
       switch (iWork) {
       case 0:
@@ -290,12 +290,12 @@ int upload_desktop() {
       if (!interpreting)
         update_box(0, 0, vga_width, vga_height);
       break;
-    case 3:
+    case WIN_PALETTE:
       create_saved_window(palette0, window_aux.x, window_aux.y);
       if (!interpreting)
         update_box(0, 0, vga_width, vga_height);
       break;
-    case 4: //timer
+    case WIN_CLOCK: //timer
       fread(&iWork, 1, 4, desktop);
       switch (iWork) {
       case 0:
@@ -308,17 +308,17 @@ int upload_desktop() {
       if (!interpreting)
         update_box(0, 0, vga_width, vga_height);
       break;
-    case 5: //recycle bin
+    case WIN_TRASH: //recycle bin
       create_saved_window(bin0, window_aux.x, window_aux.y);
       if (!interpreting)
         update_box(0, 0, vga_width, vga_height);
       break;
-    case 8: //mixer
+    case WIN_MIXER: //mixer
       create_saved_window(mixer0, window_aux.x, window_aux.y);
       if (!interpreting)
         update_box(0, 0, vga_width, vga_height);
       break;
-    case 100: //map
+    case WIN_MAP: //map
       // tmapa struct
       fread(&maux, 1, sizeof(struct tmapa), desktop);
       baux = (char *)malloc(maux.map_width * maux.map_height);
@@ -356,7 +356,7 @@ int upload_desktop() {
       if (!interpreting)
         update_box(0, 0, vga_width, vga_height);
       break;
-    case 101: //fpg
+    case WIN_FPG: //fpg
       // FPG struct
       fread(&faux, 1, sizeof(FPG), desktop);
       div_strcpy(input, sizeof(input), (char *)faux.fpg_name);
@@ -373,7 +373,7 @@ int upload_desktop() {
         }
       }
       break;
-    case 102: //prg
+    case WIN_CODE: //prg
       fread(&iWork, 1, 4, desktop);
       if (iWork == 0) {
         if ((v_prg = (struct tprg *)malloc(sizeof(struct tprg))) != NULL) {
@@ -442,7 +442,7 @@ int upload_desktop() {
         }
       }
       break;
-    case 104: //fnt
+    case WIN_FONT: //fnt
       // Load from file
       fread(Load_FontName, 1, 14, desktop);
       fread(Load_FontPathName, 1, _MAX_PATH - 14, desktop);
@@ -458,11 +458,11 @@ int upload_desktop() {
           update_box(0, 0, vga_width, vga_height);
       }
       break;
-    case 105: //pcm
+    case WIN_SOUND: //pcm
       open_desktop_sound(desktop);
       break;
     // case 106 (map3d) removed (MODE8/3D map editor deleted)
-    case 107: //mod
+    case WIN_MUSIC: //mod
       fread(song_name, 1, 14, desktop);
       fread(song_path_name, 1, 256, desktop);
       if ((f = fopen(song_path_name, "rb")) != NULL) {
@@ -498,8 +498,8 @@ int create_saved_window(void_return_type_t init_handler, int nx, int ny) {
     //---------------------------------------------------------------------------
 
     v.order = next_order++;
-    v.type = 0;
-    v.foreground = 1;
+    v.type = WIN_EMPTY;
+    v.foreground = WF_FOREGROUND;
     v.name = (byte *)"?";
     v.title = (byte *)"?";
     v.paint_handler = dummy_handler;
@@ -549,7 +549,7 @@ int create_saved_window(void_return_type_t init_handler, int nx, int ny) {
     //---------------------------------------------------------------------------
 
     if (vid_mode_changed) {
-      if (v.type >= 100 && window_aux.foreground != 2) {
+      if (v.type >= WIN_EDITOR_MIN && window_aux.foreground != WF_MINIMIZED) {
         v.state = 1; // Activate it
         for (m = 1; m < MAX_WINDOWS; m++)
           if (window[m].type == v.type && window[m].state) {
@@ -568,7 +568,7 @@ int create_saved_window(void_return_type_t init_handler, int nx, int ny) {
                      2 + (window[m].w / big2 - 20) / 2, 2, 1, window[m].title, c2);
             }
             vtipo = v.type;
-            v.type = 0;
+            v.type = WIN_EMPTY;
             flush_window(m);
             v.type = vtipo;
             break;
@@ -585,15 +585,15 @@ int create_saved_window(void_return_type_t init_handler, int nx, int ny) {
       // Send overlapping windows to background as needed
       //---------------------------------------------------------------------------
       vtipo = v.type;
-      v.type = 0;
+      v.type = WIN_EMPTY;
 
       if (!vid_mode_changed) {
         swap(v.w, window_aux.w);
         swap(v.h, window_aux.h);
         for (n = 1; n < MAX_WINDOWS; n++) {
-          if (window[n].type && window[n].foreground == 1) {
+          if (window[n].type && window[n].foreground == WF_FOREGROUND) {
             if (windows_collide(0, n)) {
-              window[n].foreground = 0;
+              window[n].foreground = WF_BACKGROUND;
               flush_window(n);
             }
           }
@@ -602,9 +602,9 @@ int create_saved_window(void_return_type_t init_handler, int nx, int ny) {
         swap(v.h, window_aux.h);
       } else {
         for (n = 1; n < MAX_WINDOWS; n++) {
-          if (window[n].type && window[n].foreground == 1) {
+          if (window[n].type && window[n].foreground == WF_FOREGROUND) {
             if (windows_collide(0, n)) {
-              window[n].foreground = 0;
+              window[n].foreground = WF_BACKGROUND;
               flush_window(n);
             }
           }
@@ -652,7 +652,7 @@ int create_saved_window(void_return_type_t init_handler, int nx, int ny) {
         v._h_saved = window_aux._h_saved;
       }
 
-      if (v.type >= 100 && v.state == 0) {
+      if (v.type >= WIN_EDITOR_MIN && v.state == 0) {
         wgra(v.ptr, w, h, c1, 2, 2, w - 20, 7);
         if (text_len(v.title) + 3 > w - 20) {
           wwrite_in_box(v.ptr, w, w - 19, h, 4, 2, 0, v.title, c0);
@@ -669,7 +669,7 @@ int create_saved_window(void_return_type_t init_handler, int nx, int ny) {
       }
 
       if (!interpreting && exploding_windows) {
-        if (v.foreground == 2) {
+        if (v.foreground == WF_MINIMIZED) {
           v.exploding = 1;
           explode(v.x, v.y, v.w, v.h);
           v.exploding = 0;
@@ -680,8 +680,8 @@ int create_saved_window(void_return_type_t init_handler, int nx, int ny) {
         }
       }
 
-      if (v.foreground != 2) {
-        if (v.foreground == 1)
+      if (v.foreground != WF_MINIMIZED) {
+        if (v.foreground == WF_FOREGROUND)
           blit_region(screen_buffer, vga_width, vga_height, ptr, x, y, w, h, 0);
         else
           blit_region_dark(screen_buffer, vga_width, vga_height, ptr, x, y, w, h, 0);
@@ -748,7 +748,7 @@ int load_new_map(int nx, int ny, char *name, byte *bitmap) {
 void test_cursor(void);
 
 void carga_programa0(void) {
-  v.type = 102;
+  v.type = WIN_CODE;
 
   v.prg = v_prg;
 
@@ -847,13 +847,13 @@ void carga_help(int n, int helpal, int helpline, int x1, int x2) {
             }
           }
 
-          if (v.foreground == 2) {
+          if (v.foreground == WF_MINIMIZED) {
             swap(v.w, v._w_saved);
             swap(v.h, v._h_saved);
           }
           vuelca_help();
           barra_vertical();
-          if (v.foreground == 2) {
+          if (v.foreground == WF_MINIMIZED) {
             swap(v.w, v._w_saved);
             swap(v.h, v._h_saved);
           }

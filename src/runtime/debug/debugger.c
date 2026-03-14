@@ -122,7 +122,7 @@ void init_debug(void) {
   int n;
 
   for (n = 0; n < MAX_WINDOWS; n++)
-    window[n].type = 0;
+    window[n].type = WIN_EMPTY;
   if ((mouse_background = (byte *)malloc(2048)) == NULL)
     exer(1);
   init_big();
@@ -401,7 +401,7 @@ void err2(void) {
 }
 
 void err0(void) {
-  v.type = 1;
+  v.type = WIN_DIALOG;
   v.title = text[1];
   v.w = text_len((byte *)v_text) + 8;
   v.h = 38;
@@ -471,7 +471,7 @@ void _err2(void) {
 }
 
 void _err0(void) {
-  v.type = 1;
+  v.type = WIN_DIALOG;
   v.title = text[1];
   v.w = text_len((byte *)v_text) + 8;
   if (v.w < 218 + 16)
@@ -575,7 +575,7 @@ void deb2(void) {
 }
 
 void deb0(void) {
-  v.type = 1;
+  v.type = WIN_DIALOG;
   v.title = text[15];
   v.w = 190;
   v.h = 38;

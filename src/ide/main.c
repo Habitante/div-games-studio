@@ -160,7 +160,7 @@ void demo3(void) {
 }
 
 void demo0(void) {
-  beta_status = v.type = 1;
+  beta_status = v.type = WIN_DIALOG;
   v.title = texts[392];
   v.w = 160;
   v.h = 76;
@@ -242,7 +242,7 @@ void betatest2(void) {
 void coder(byte *ptr, int len, char *clave);
 
 void betatest0(void) {
-  beta_status = v.type = 1;
+  beta_status = v.type = WIN_DIALOG;
   v.title = texts[399];
   v.w = 160;
   v.h = 38 + 16;
@@ -427,21 +427,21 @@ int main(int argc, char *argv[]) {
   file_types[2].ext = "*.* *.MAP *.PCX *.BMP *.JPG *.JPE *.PNG *.GIF *.TGA *.TIF"; // Maps browser
   file_types[3].ext =
       "*.* *.PAL *.FPG *.FNT *.MAP *.BMP *.PCX *.JPG *.PNG *.GIF *.TGA *.TIF"; // Palette Browser
-  file_types[4].ext = "*.FPG *.*";                                             // FPG FILES
-  file_types[5].ext = "*.FNT *.*";                                             // FNT FILES
-  file_types[6].ext = "*.IFS *.*";                                             // IFS Font templates
+  file_types[FT_FPG].ext = "*.FPG *.*";                                             // FPG FILES
+  file_types[FT_FNT].ext = "*.FNT *.*";                                             // FNT FILES
+  file_types[FT_IFS].ext = "*.IFS *.*";                                             // IFS Font templates
   file_types[7].ext = "*.* *.7 *.WAV *.PCM *.MP3 *.OGG *.FLAC";                // Audio files
   file_types[8].ext = "*.PRG *.*";                                             // Program files
 
-  file_types[9].ext = "*.* *.JPG *.PNG *.BMP *.TIF"; // wallpaper files
+  file_types[FT_WALLPAPER].ext = "*.* *.JPG *.PNG *.BMP *.TIF"; // wallpaper files
 
-  file_types[10].ext = "*.PAL";       // Save Palettes
-  file_types[11].ext = "*.WAV *.PCM"; // Save Audio
+  file_types[FT_PAL_SAVE].ext = "*.PAL";       // Save Palettes
+  file_types[FT_AUDIO_SAVE].ext = "*.WAV *.PCM"; // Save Audio
   file_types[12].ext = "*.PRJ";       // Save Project
 
   file_types[13].ext = "*.* *.13"; // unknown
 
-  file_types[14].ext = "*.MAP *.PCX *.BMP";          // Save image
+  file_types[FT_MAP_SAVE].ext = "*.MAP *.PCX *.BMP";          // Save image
   file_types[15].ext = "*.WLD *.*";                  // 3D Map files
   file_types[16].ext = "*.* *.MOD *.S3M *.XM *.MID"; // Tracker modules
 
@@ -771,7 +771,7 @@ void interr2(void) {
 }
 
 void interr0(void) {
-  v.type = 1;
+  v.type = WIN_DIALOG;
   v.title = texts[367];
   v.h = 38;
   switch (error_code) {
@@ -822,7 +822,7 @@ void intmsg2(void) {
 }
 
 void intmsg0(void) {
-  v.type = 1;
+  v.type = WIN_DIALOG;
   v.title = texts[375];
   v.w = text_len((byte *)v_text) + 8;
   if (v.w < 120)
@@ -884,7 +884,7 @@ void mainloop(void) {
   //  Drag onto the wallpaper
   //-------------------------------------------------------------------------
 
-  if (dragging == 4 && (n == MAX_WINDOWS || window[n].type == 2)) {
+  if (dragging == 4 && (n == MAX_WINDOWS || window[n].type == WIN_MENU)) {
     dragging = 5;
     free_drag = 0;
     v_title = (char *)texts[57];
@@ -892,7 +892,7 @@ void mainloop(void) {
     show_dialog(accept0);
 
     if (v_accept) {
-      if (v.type == 101)
+      if (v.type == WIN_FPG)
         must_create = 0;
 
       if (!new_map(NULL)) {
@@ -944,12 +944,12 @@ void mainloop(void) {
 
   if (dragging != 4) {
     if (n == 0)
-      if (v.foreground == 1)
+      if (v.foreground == WF_FOREGROUND)
         if (!mouse_in(v.x + 2 * big2, v.y + 10 * big2, v.x + v.w - 2 * big2, v.y + v.h - 2 * big2))
           n--;
 
     if (n != oldn && oldn == 0) {
-      if (v.foreground == 1) {
+      if (v.foreground == WF_FOREGROUND) {
         wmouse_x = -1;
         wmouse_y = -1;
         m = mouse_b;
@@ -977,10 +977,10 @@ void mainloop(void) {
     mouse_graf = 1;
   } else {
     switch (window[n].foreground) {
-    case 0:
+    case WF_BACKGROUND:
       mouse_graf = 7;
       break;
-    case 1:
+    case WF_FOREGROUND:
       if (mouse_in(window[n].x + 2 * big2, window[n].y + 2 * big2,
                    window[n].x + window[n].w - 2 * big2, window[n].y + 9 * big2))
         if (mouse_x <= window[n].x + window[n].w - 18 * big2)
@@ -992,7 +992,7 @@ void mainloop(void) {
       else
         mouse_graf = 1;
       break;
-    case 2:
+    case WF_MINIMIZED:
       if (mouse_x >= window[n].x + 7 * big2)
         mouse_graf = 2;
       else
@@ -1008,25 +1008,25 @@ void mainloop(void) {
   if (n != 0 && n < MAX_WINDOWS) {
     // Bring window to position 0 if it's in the foreground or clicked
 
-    if (window[n].foreground == 1 || (mouse_b & 1)) {
+    if (window[n].foreground == WF_FOREGROUND || (mouse_b & 1)) {
       move(0, n);
       n = 0;
     }
 
-    if (n == 0 && v.foreground != 1) { // Clicked icon or background window
+    if (n == 0 && v.foreground != WF_FOREGROUND) { // Clicked icon or background window
       for (m = 1; m < MAX_WINDOWS; m++) {
-        if (window[m].type && window[m].foreground == 1) {
+        if (window[m].type && window[m].foreground == WF_FOREGROUND) {
           if (windows_collide(0, m)) {
-            window[m].foreground = 0;
+            window[m].foreground = WF_BACKGROUND;
             flush_window(m);
           }
         }
       }
-      if (v.foreground == 0) { // If it was in the background
-        if (v.type >= 100 && !v.state)
+      if (v.foreground == WF_BACKGROUND) { // If it was in the background
+        if (v.type >= WIN_EDITOR_MIN && !v.state)
           activate(); // Activate a map
 
-        v.foreground = 1;
+        v.foreground = WF_FOREGROUND;
         flush_window(0);
         do {
           read_mouse();
@@ -1040,7 +1040,7 @@ void mainloop(void) {
     // Activate an excludable window (type>=100) when interacted with
     //-------------------------------------------------------------------------
 
-  } else if (n == 0 && (mouse_b & 1) && v.type >= 100 && v.foreground < 2 && !v.state &&
+  } else if (n == 0 && (mouse_b & 1) && v.type >= WIN_EDITOR_MIN && v.foreground != WF_MINIMIZED && !v.state &&
              mouse_graf != 4 && mouse_graf != 5) {
     activate();
     flush_window(0);
@@ -1050,12 +1050,12 @@ void mainloop(void) {
   //  Drop something onto a background window
   //-------------------------------------------------------------------------
 
-  if (n < MAX_WINDOWS && window[n].foreground == 0 && dragging == 4 && v.type >= 100 &&
-      window[n].type != 2) {
+  if (n < MAX_WINDOWS && window[n].foreground == WF_BACKGROUND && dragging == 4 && v.type >= WIN_EDITOR_MIN &&
+      window[n].type != WIN_MENU) {
     move(0, n);
     n = 0;
 
-    if (v.type == 100)
+    if (v.type == WIN_MAP)
       mouse_b |= 1;
 
     activate();
@@ -1070,13 +1070,13 @@ void mainloop(void) {
     call((void_return_type_t)v.click_handler);
 
     for (m = 1; m < MAX_WINDOWS; m++)
-      if (window[m].type && window[m].foreground == 1)
+      if (window[m].type && window[m].foreground == WF_FOREGROUND)
         if (windows_collide(0, m)) {
-          window[m].foreground = 0;
+          window[m].foreground = WF_BACKGROUND;
           flush_window(m);
         }
 
-    v.foreground = 1;
+    v.foreground = WF_FOREGROUND;
     flush_window(0);
     v.redraw = 0;
     do {
@@ -1090,11 +1090,11 @@ void mainloop(void) {
   // If we are within the contents of a window ...
   //-------------------------------------------------------------------------
 
-  if (n == 0 && v.foreground == 1) {
+  if (n == 0 && v.foreground == WF_FOREGROUND) {
     if (mouse_in(v.x + 2 * big2, v.y + 10 * big2, v.x + v.w - 2 * big2, v.y + v.h - 2 * big2)) {
       llamar = 1; // Call its click_handler
 
-      if (v.type == 100 && dragging != 4) {
+      if (v.type == WIN_MAP && dragging != 4) {
         if (dragging == 1) {
           drag_graphic = 8;
           dragging = 2;
@@ -1118,8 +1118,8 @@ void mainloop(void) {
 
       // tipo==106 (3D map window) check removed (MODE8/3D map editor deleted)
 
-      if (v.type >= 100 && dragging == 4) {
-        if (v.type == 100)
+      if (v.type >= WIN_EDITOR_MIN && dragging == 4) {
+        if (v.type == WIN_MAP)
           mouse_b |= 1;
         activate();
       }
@@ -1194,7 +1194,7 @@ void mainloop(void) {
 
             if (v_accept)
               exit_requested = 1;
-          } else if (v.type >= 100) {
+          } else if (v.type >= WIN_EDITOR_MIN) {
             if (big)
               wput(v.ptr, v.w / 2, v.h / 2, v.w / 2 - 9, 2, -45);
             else
@@ -1213,18 +1213,18 @@ void mainloop(void) {
             } while (mouse_b & 1);
 
             switch (v.type) {
-            case 100:
+            case WIN_MAP:
               v_title = (char *)texts[50];
               v_text = (char *)v.title;
               break;
 
-            case 102:
+            case WIN_CODE:
               v_title = (char *)texts[188];
               v_text = (char *)v.title;
               break;
             }
 
-            if (v.type == 100 || (v.type == 102 && v.prg != NULL))
+            if (v.type == WIN_MAP || (v.type == WIN_CODE && v.prg != NULL))
               show_dialog(accept0);
             else
               v_accept = 1;
@@ -1261,7 +1261,7 @@ void mainloop(void) {
   // We are over an icon
   //-------------------------------------------------------------------------
 
-  if (n == 0 && v.foreground == 2) {
+  if (n == 0 && v.foreground == WF_MINIMIZED) {
     if (mouse_graf == 2) {
       if ((mouse_b & 1) && !(prev_mouse_buttons & 1))
         move_window();
@@ -1292,12 +1292,12 @@ fin_bucle_entorno:
   for (m = 0; m < MAX_WINDOWS; m++) {
     if (m == 0 &&
         mouse_in(v.x + 2 * big2, v.y + 10 * big2, v.x + v.w - 2 * big2, v.y + v.h - 2 * big2) &&
-        window[m].type != 107)
+        window[m].type != WIN_MUSIC)
       continue;
 
-    if (window[m].type == 4 || (window[m].type == 101 && window[m].foreground != 2) ||
-        (window[m].type == 107 && window[m].foreground != 2) ||
-        (window[m].type == 102 && window[m].state && window[m].foreground != 2)) {
+    if (window[m].type == WIN_CLOCK || (window[m].type == WIN_FPG && window[m].foreground != WF_MINIMIZED) ||
+        (window[m].type == WIN_MUSIC && window[m].foreground != WF_MINIMIZED) ||
+        (window[m].type == WIN_CODE && window[m].state && window[m].foreground != WF_MINIMIZED)) {
       if (m) {
         wup(m);
       }
@@ -1307,11 +1307,11 @@ fin_bucle_entorno:
       wmouse_y = -1;
 
       switch (v.type) {
-      case 101:
+      case WIN_FPG:
         load_thumbs();
         break;
 
-      case 107:
+      case WIN_MUSIC:
         mostrar_mod_meters();
         break;
 
@@ -1343,7 +1343,7 @@ fin_bucle_entorno:
   ///////////////////////////////////////////////////////////////////////////
 
   for (m = 0; m < MAX_WINDOWS; m++)
-    if (window[m].type == 102 && window[m].state && window[m].prg != NULL)
+    if (window[m].type == WIN_CODE && window[m].state && window[m].prg != NULL)
       break;
 
   if (m < MAX_WINDOWS && beta_status == 4) { // If a PRG ...
@@ -1420,15 +1420,15 @@ fin_bucle_entorno:
 
         move(0, m);
 
-        if (v.foreground == 0) {
+        if (v.foreground == WF_BACKGROUND) {
           for (m = 1; m < MAX_WINDOWS; m++)
-            if (window[m].type && window[m].foreground == 1)
+            if (window[m].type && window[m].foreground == WF_FOREGROUND)
               if (windows_collide(0, m)) {
-                window[m].foreground = 0;
+                window[m].foreground = WF_BACKGROUND;
                 flush_window(m);
               }
 
-          v.foreground = 1;
+          v.foreground = WF_FOREGROUND;
         }
 
         flush_window(0);
@@ -1454,15 +1454,15 @@ fin_bucle_entorno:
       case 4:
         mouse_graf = 3;
         flush_copy();
-        v_type = 8;
+        v_type = FT_PRG;
         save_prg_buffer(0);
-        div_strcpy(file_types[8].path, sizeof(file_types[8].path), v.prg->path);
+        div_strcpy(file_types[FT_PRG].path, sizeof(file_types[FT_PRG].path), v.prg->path);
         div_strcpy(input, sizeof(input), v.prg->filename);
         save_program();
         break;
 
       case 5:
-        v_type = 8;
+        v_type = FT_PRG;
         save_prg_buffer(0);
         source_ptr = v.prg->buffer;
         source_len = v.prg->file_len;
@@ -1480,9 +1480,9 @@ fin_bucle_entorno:
 
       case 6:
       case 7:
-        v_type = 8;
+        v_type = FT_PRG;
         save_prg_buffer(0);
-        div_strcpy(file_types[8].path, sizeof(file_types[8].path), v.prg->path);
+        div_strcpy(file_types[FT_PRG].path, sizeof(file_types[FT_PRG].path), v.prg->path);
         div_strcpy(input, sizeof(input), v.prg->filename);
         save_program();
         source_ptr = v.prg->buffer;
@@ -1509,7 +1509,7 @@ fin_bucle_entorno:
         break;
 
       case 8:
-        v_type = 8;
+        v_type = FT_PRG;
         save_prg_buffer(0);
 
         show_dialog(process_list0);
@@ -1574,7 +1574,7 @@ fin_bucle_entorno:
   //-------------------------------------------------------------------------
 
   if (scan_code == 62) { // F4 Open PRG
-    v_type = 8;
+    v_type = FT_PRG;
     v_mode = 0;
     v_text = (char *)texts[346];
     show_dialog(browser0);
@@ -1779,7 +1779,7 @@ void initialization(void) {
   undo_table = (struct undo_entry *)malloc(sizeof(struct undo_entry) * max_undos);
 
   for (n = 0; n < MAX_WINDOWS; n++) {
-    window[n].type = 0;
+    window[n].type = WIN_EMPTY;
     window[n].side = 0;
   }
 
@@ -1989,7 +1989,7 @@ void initialization(void) {
   mode_circle = 0;
   mode_rect = 1;
   mode_selection = 0;
-  v.type = 0;
+  v.type = WIN_EMPTY;
   init_flush();
   next_code = 1;
   mouse_shift = 0;
@@ -2263,12 +2263,12 @@ void save_config() {
   div_strcpy(setup_file.dir_cwd, sizeof(setup_file.dir_cwd), file_types[0].path);
   div_strcpy(setup_file.dir_map, sizeof(setup_file.dir_map), file_types[2].path);
   div_strcpy(setup_file.dir_pal, sizeof(setup_file.dir_pal), file_types[3].path);
-  div_strcpy(setup_file.dir_fpg, sizeof(setup_file.dir_fpg), file_types[4].path);
-  div_strcpy(setup_file.dir_fnt, sizeof(setup_file.dir_fnt), file_types[5].path);
-  div_strcpy(setup_file.dir_ifs, sizeof(setup_file.dir_ifs), file_types[6].path);
+  div_strcpy(setup_file.dir_fpg, sizeof(setup_file.dir_fpg), file_types[FT_FPG].path);
+  div_strcpy(setup_file.dir_fnt, sizeof(setup_file.dir_fnt), file_types[FT_FNT].path);
+  div_strcpy(setup_file.dir_ifs, sizeof(setup_file.dir_ifs), file_types[FT_IFS].path);
   div_strcpy(setup_file.dir_pcm, sizeof(setup_file.dir_pcm), file_types[7].path);
   div_strcpy(setup_file.dir_prg, sizeof(setup_file.dir_prg), file_types[8].path);
-  div_strcpy(setup_file.dir_pcms, sizeof(setup_file.dir_pcms), file_types[11].path);
+  div_strcpy(setup_file.dir_pcms, sizeof(setup_file.dir_pcms), file_types[FT_AUDIO_SAVE].path);
   div_strcpy(setup_file.dir_prj, sizeof(setup_file.dir_prj), file_types[12].path);
   div_strcpy(setup_file.dir_wld, sizeof(setup_file.dir_wld), file_types[15].path);
   div_strcpy(setup_file.dir_mod, sizeof(setup_file.dir_mod), file_types[16].path);
@@ -2310,28 +2310,28 @@ void load_config() {
   div_strcat(cWork, sizeof(cWork), "/MAP");
   div_strcpy(setup_file.dir_map, sizeof(setup_file.dir_map), cWork);
   div_strcpy(file_types[2].path, sizeof(file_types[2].path), cWork);
-  div_strcpy(file_types[9].path, sizeof(file_types[9].path), cWork);
+  div_strcpy(file_types[FT_WALLPAPER].path, sizeof(file_types[FT_WALLPAPER].path), cWork);
 
   div_strcpy(cWork, sizeof(cWork), file_types[1].path);
   div_strcat(cWork, sizeof(cWork), "/PAL");
   div_strcpy(setup_file.dir_pal, sizeof(setup_file.dir_pal), cWork);
   div_strcpy(file_types[3].path, sizeof(file_types[3].path), cWork);
-  div_strcpy(file_types[10].path, sizeof(file_types[10].path), cWork);
+  div_strcpy(file_types[FT_PAL_SAVE].path, sizeof(file_types[FT_PAL_SAVE].path), cWork);
 
   div_strcpy(cWork, sizeof(cWork), file_types[1].path);
   div_strcat(cWork, sizeof(cWork), "/FPG");
   div_strcpy(setup_file.dir_fpg, sizeof(setup_file.dir_fpg), cWork);
-  div_strcpy(file_types[4].path, sizeof(file_types[4].path), cWork);
+  div_strcpy(file_types[FT_FPG].path, sizeof(file_types[FT_FPG].path), cWork);
 
   div_strcpy(cWork, sizeof(cWork), file_types[1].path);
   div_strcat(cWork, sizeof(cWork), "/FNT");
   div_strcpy(setup_file.dir_fnt, sizeof(setup_file.dir_fnt), cWork);
-  div_strcpy(file_types[5].path, sizeof(file_types[5].path), cWork);
+  div_strcpy(file_types[FT_FNT].path, sizeof(file_types[FT_FNT].path), cWork);
 
   div_strcpy(cWork, sizeof(cWork), file_types[1].path);
   div_strcat(cWork, sizeof(cWork), "/IFS");
   div_strcpy(setup_file.dir_ifs, sizeof(setup_file.dir_ifs), cWork);
-  div_strcpy(file_types[6].path, sizeof(file_types[6].path), cWork);
+  div_strcpy(file_types[FT_IFS].path, sizeof(file_types[FT_IFS].path), cWork);
 
   div_strcpy(cWork, sizeof(cWork), file_types[1].path);
   div_strcat(cWork, sizeof(cWork), "/PCM");
@@ -2346,7 +2346,7 @@ void load_config() {
   div_strcpy(cWork, sizeof(cWork), file_types[1].path);
   div_strcat(cWork, sizeof(cWork), "/PCM");
   div_strcpy(setup_file.dir_pcms, sizeof(setup_file.dir_pcms), cWork);
-  div_strcpy(file_types[11].path, sizeof(file_types[11].path), cWork);
+  div_strcpy(file_types[FT_AUDIO_SAVE].path, sizeof(file_types[FT_AUDIO_SAVE].path), cWork);
 
   div_strcpy(cWork, sizeof(cWork), file_types[1].path);
   div_strcat(cWork, sizeof(cWork), "/PRJ");
@@ -2484,19 +2484,19 @@ void load_config() {
     div_strcpy(file_types[3].path, sizeof(file_types[3].path), file_types[1].path);
 
   if (chdir(setup_file.dir_fpg) != -1)
-    div_strcpy(file_types[4].path, sizeof(file_types[4].path), setup_file.dir_fpg);
-  else if (chdir(file_types[4].path) == -1)
-    div_strcpy(file_types[4].path, sizeof(file_types[4].path), file_types[1].path);
+    div_strcpy(file_types[FT_FPG].path, sizeof(file_types[FT_FPG].path), setup_file.dir_fpg);
+  else if (chdir(file_types[FT_FPG].path) == -1)
+    div_strcpy(file_types[FT_FPG].path, sizeof(file_types[FT_FPG].path), file_types[1].path);
 
   if (chdir(setup_file.dir_fnt) != -1)
-    div_strcpy(file_types[5].path, sizeof(file_types[5].path), setup_file.dir_fnt);
-  else if (chdir(file_types[5].path) == -1)
-    div_strcpy(file_types[5].path, sizeof(file_types[5].path), file_types[1].path);
+    div_strcpy(file_types[FT_FNT].path, sizeof(file_types[FT_FNT].path), setup_file.dir_fnt);
+  else if (chdir(file_types[FT_FNT].path) == -1)
+    div_strcpy(file_types[FT_FNT].path, sizeof(file_types[FT_FNT].path), file_types[1].path);
 
   if (chdir(setup_file.dir_ifs) != -1)
-    div_strcpy(file_types[6].path, sizeof(file_types[6].path), setup_file.dir_ifs);
-  else if (chdir(file_types[6].path) == -1)
-    div_strcpy(file_types[6].path, sizeof(file_types[6].path), file_types[1].path);
+    div_strcpy(file_types[FT_IFS].path, sizeof(file_types[FT_IFS].path), setup_file.dir_ifs);
+  else if (chdir(file_types[FT_IFS].path) == -1)
+    div_strcpy(file_types[FT_IFS].path, sizeof(file_types[FT_IFS].path), file_types[1].path);
 
   if (chdir(setup_file.dir_pcm) != -1)
     div_strcpy(file_types[7].path, sizeof(file_types[7].path), setup_file.dir_pcm);
@@ -2508,13 +2508,13 @@ void load_config() {
   else if (chdir(file_types[8].path) == -1)
     div_strcpy(file_types[8].path, sizeof(file_types[8].path), file_types[1].path);
 
-  div_strcpy(file_types[9].path, sizeof(file_types[9].path), file_types[2].path);
-  div_strcpy(file_types[10].path, sizeof(file_types[10].path), file_types[3].path);
+  div_strcpy(file_types[FT_WALLPAPER].path, sizeof(file_types[FT_WALLPAPER].path), file_types[2].path);
+  div_strcpy(file_types[FT_PAL_SAVE].path, sizeof(file_types[FT_PAL_SAVE].path), file_types[3].path);
 
   if (chdir(setup_file.dir_pcms) != -1)
-    div_strcpy(file_types[11].path, sizeof(file_types[11].path), setup_file.dir_pcms);
-  else if (chdir(file_types[11].path) == -1)
-    div_strcpy(file_types[11].path, sizeof(file_types[11].path), file_types[1].path);
+    div_strcpy(file_types[FT_AUDIO_SAVE].path, sizeof(file_types[FT_AUDIO_SAVE].path), setup_file.dir_pcms);
+  else if (chdir(file_types[FT_AUDIO_SAVE].path) == -1)
+    div_strcpy(file_types[FT_AUDIO_SAVE].path, sizeof(file_types[FT_AUDIO_SAVE].path), file_types[1].path);
 
   if (chdir(setup_file.dir_prj) != -1)
     div_strcpy(file_types[12].path, sizeof(file_types[12].path), setup_file.dir_prj);
@@ -2552,7 +2552,7 @@ int determine_prg2(void) {
   int m, n = -1;
 
   for (m = 0; m < MAX_WINDOWS; m++) {
-    if (window[m].type == 102 && window[m].state && window[m].prg != NULL) {
+    if (window[m].type == WIN_CODE && window[m].state && window[m].prg != NULL) {
       n = m;
       break;
     }
@@ -2612,7 +2612,7 @@ void move(int a, int b) {
 
 void divdelete(int a) {
   memmove(&window[a].type, &window[a + 1].type, sizeof(struct twindow) * (MAX_WINDOWS - 1 - a));
-  window[MAX_WINDOWS - 1].type = 0;
+  window[MAX_WINDOWS - 1].type = WIN_EMPTY;
 }
 
 void addwindow(void) {
@@ -2624,7 +2624,7 @@ void wup(int a) {
     ivaux = 0;
   copy(-1, 0);
   copy(0, a);
-  window[a].type = 0;
+  window[a].type = WIN_EMPTY;
 }
 
 void wdown(int a) {

@@ -509,7 +509,7 @@ void calc3(void) {
 }
 
 void calc0(void) {
-  v.type = 102;
+  v.type = WIN_CODE;
   v.w = 120;
   v.h = 34;
   v.title = texts[413];

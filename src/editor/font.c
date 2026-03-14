@@ -134,7 +134,7 @@ void close_old_fnt(void) {
   int m;
 
   for (m = 1; m < MAX_WINDOWS; m++)
-    if (window[m].type == 104 && !strcmp(FontName, (char *)window[m].aux)) {
+    if (window[m].type == WIN_FONT && !strcmp(FontName, (char *)window[m].aux)) {
       move(0, m);
       close_window();
       break;
@@ -451,7 +451,7 @@ void fonts0(void) {
     tan *= 2;
     tal *= 2;
   }
-  v.type = 102;
+  v.type = WIN_CODE;
   v.w = 169;
   v.h = 179 - 17;
   v.paint_handler = fonts1;
@@ -508,28 +508,28 @@ void fonts0(void) {
   mosaic3 = 0;
 
   DIV_STRCPY(FontName, (char *)texts[90]);
-  DIV_STRCPY(FontPathName, file_types[5].path);
+  DIV_STRCPY(FontPathName, file_types[FT_FNT].path);
   DIV_STRCAT(FontPathName, "/");
   DIV_STRCAT(FontPathName, FontName);
 
   DIV_STRCPY(FaceName, "NORMAL.IFS");
-  DIV_STRCPY(FacePathName, file_types[6].path);
+  DIV_STRCPY(FacePathName, file_types[FT_IFS].path);
   DIV_STRCAT(FacePathName, "/");
   DIV_STRCAT(FacePathName, FaceName);
 
   if ((f = fopen(FacePathName, "rb")) != NULL)
     fclose(f);
   else {
-    div_strcpy(file_types[6].path, sizeof(file_types[6].path), file_types[1].path);
-    div_strcat(file_types[6].path, sizeof(file_types[6].path), "/IFS");
-    DIV_STRCPY(FacePathName, file_types[6].path);
+    div_strcpy(file_types[FT_IFS].path, sizeof(file_types[FT_IFS].path), file_types[1].path);
+    div_strcat(file_types[FT_IFS].path, sizeof(file_types[FT_IFS].path), "/IFS");
+    DIV_STRCPY(FacePathName, file_types[FT_IFS].path);
     DIV_STRCAT(FacePathName, "/NORMAL.IFS");
     if ((f = fopen(FacePathName, "rb")) != NULL)
       fclose(f);
     else {
       DIV_STRCPY(FaceName, "");
       DIV_STRCPY(FacePathName, "");
-      div_strcpy(file_types[6].path, sizeof(file_types[6].path), file_types[1].path);
+      div_strcpy(file_types[FT_IFS].path, sizeof(file_types[FT_IFS].path), file_types[1].path);
     }
   }
 
@@ -676,7 +676,7 @@ void get_font() {
   int w = v.w / big2, h = v.h / big2;
 
   v_mode = 1;
-  v_type = 5;
+  v_type = FT_FNT;
 
   DIV_STRCPY(FontPathName, file_types[v_type].path);
   DIV_STRCAT(FontPathName, "/");
@@ -716,7 +716,7 @@ void get_ifs() {
   FILE *f;
 
   v_mode = 0;
-  v_type = 6;
+  v_type = FT_IFS;
   v_text = (char *)texts[77];
   show_dialog(browser0);
   if (v_finished) {
@@ -835,7 +835,7 @@ void selcolor3(void) {
 }
 
 void selcolor0(void) {
-  v.type = 1; // Dialog
+  v.type = WIN_DIALOG; // Dialog
   v.w = 131;
   v.h = 157;
   v.title = texts[78];
@@ -935,7 +935,7 @@ void preview0() {
   if (text_height == 0)
     text_height = _fal;
 
-  v.type = 1; // Dialog
+  v.type = WIN_DIALOG; // Dialog
   if (big) {
     text_x = text_width / 2;
     text_y = text_height / 2;
@@ -1071,7 +1071,7 @@ void GenFont3(void) {
   }
 }
 void GenFont0(void) {
-  v.type = 1; // Dialog
+  v.type = WIN_DIALOG; // Dialog
   v.w = 169 - 26;
   v.h = 103;
   v.title = texts[852];
@@ -1178,7 +1178,7 @@ void preview20() {
     text_height = _fal;
   if (text_width == 0)
     text_width = 1;
-  v.type = 1; // Dialog
+  v.type = WIN_DIALOG; // Dialog
 
   if (big) {
     text_x = text_width / 2;
@@ -1410,7 +1410,7 @@ void show_font3(void) {
 void show_font0(void) {
   FILE *file;
   int length;
-  v.type = 104;
+  v.type = WIN_FONT;
   v.w = 105;
   v.h = 44;
 
@@ -1486,7 +1486,7 @@ void open_font(void) {
   int num;
 
   v_mode = 0;
-  v_type = 5;
+  v_type = FT_FNT;
 
   DIV_STRCPY(Load_FontPathName, file_types[v_type].path);
   DIV_STRCAT(Load_FontPathName, "/");
@@ -1571,7 +1571,7 @@ void GetText2(void) {
   }
 }
 void get_text0(void) {
-  v.type = 1;
+  v.type = WIN_DIALOG;
   v.w = 220 + 6;
   v.h = 64 - 14;
   v.title = texts[855] + 1;
@@ -1729,7 +1729,7 @@ void Load_Font_session(FILE *file) {
     tan *= 2;
     tal *= 2;
   }
-  v.type = 102;
+  v.type = WIN_CODE;
   v.w = 169;
   v.h = 179 - 17;
   v.paint_handler = fonts1;

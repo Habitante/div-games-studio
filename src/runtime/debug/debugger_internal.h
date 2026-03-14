@@ -14,6 +14,7 @@
 
 #include "../inter.h"
 #include "../../div_string.h"
+#include "../../div_enums.h"
 
 //-----------------------------------------------------------------------------
 //      Constants

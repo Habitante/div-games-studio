@@ -11,7 +11,7 @@
 #define PIXELS_PER_COLOR 4
 
 void palette0(void) {
-  v.type = 3; // Palette
+  v.type = WIN_PALETTE; // Palette
   v.w = 16 * PIXELS_PER_COLOR + 3;
   v.h = 16 * PIXELS_PER_COLOR + 11;
   v.title = texts[51];
@@ -80,7 +80,7 @@ void user_info3(void) {
 }
 
 void user_info0(void) {
-  v.type = 1;
+  v.type = WIN_DIALOG;
   v.title = texts[485];
   v.w = 160 + 86;
   v.h = 10 + 47 + 31;
@@ -102,7 +102,7 @@ void user_info0(void) {
 extern int new_session;
 
 void copyright0(void) {
-  v.type = 1;
+  v.type = WIN_DIALOG;
   v.title = texts[35];
   v.w = 232;
   v.h = 12 + 47 + 31;
@@ -162,7 +162,7 @@ void copyright2(void) {
 ///////////////////////////////////////////////////////////////////////////////
 
 void err0(void) {
-  v.type = 1;
+  v.type = WIN_DIALOG;
   v.title = texts[41];
   v.w = text_len((byte *)v_text) + 8;
   v.h = 38; // Note: error_window=malloc(640*38*2)
@@ -207,7 +207,7 @@ void errhlp2(void) {
 }
 
 void errhlp0(void) {
-  v.type = 1;
+  v.type = WIN_DIALOG;
   v.title = texts[41];
   v.w = text_len((byte *)v_text) + 8;
   v.h = 38; // Note: error_window=malloc(640*38*2)
@@ -255,7 +255,7 @@ void test2(void) {
 }
 
 void test0(void) {
-  v.type = 1;
+  v.type = WIN_DIALOG;
   v.title = texts[384];
   v_text = (char *)texts[383];
   v.w = text_len((byte *)v_text) + 9;
@@ -274,7 +274,7 @@ void test0(void) {
 //-----------------------------------------------------------------------------
 
 void accept0(void) {
-  v.type = 1;
+  v.type = WIN_DIALOG;
   v.w = text_len(texts[100]) + text_len(texts[101]) + 24;
   if (v_title != NULL) {
     v.title = (byte *)v_title;
@@ -325,7 +325,7 @@ int palette_option[3];
 byte work_palette[768];
 
 void palette_action0(void) {
-  v.type = 1;
+  v.type = WIN_DIALOG;
   v.w = 160;
   v.h = 59 + 77;
 
@@ -906,7 +906,7 @@ void progress2() {
   wwrite(ptr, w, h, 4 + (w - 8) / 2, (14 + (h - 16) / 2) - 2, 4, (byte *)cwork, c3);
 }
 void progress0() {
-  v.type = 7;
+  v.type = WIN_PROGRESS;
   v.w = 100;
   v.h = 28;
   v.paint_handler = progress1;
@@ -984,7 +984,7 @@ void about2(void) {
 }
 
 void about0(void) {
-  v.type = 1;
+  v.type = WIN_DIALOG;
   v.title = texts[885];
   v.w = 232;
   v.h = 188;

@@ -732,7 +732,7 @@ extern struct t_listboxbr thumbmap_list_br;
 #define BRUSH 4
 
 void mapper_browse_fpg0(void) {
-  v.type = 1;
+  v.type = WIN_DIALOG;
   v.w = 147 - 4;
   v.h = 147 - 4;
   if (texture_type > 3) {

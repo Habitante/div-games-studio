@@ -670,7 +670,7 @@ profiler_next_frame:
 }
 
 void profile0(void) {
-  v.type = 1;
+  v.type = WIN_DIALOG;
   v.title = text[86];
 
   v.w = 256;

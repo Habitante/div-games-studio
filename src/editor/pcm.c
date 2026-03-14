@@ -192,7 +192,7 @@ void PCM3(void) {
 void pcm0(void) {
   pcminfo *mypcminfo;
 
-  v.type = 105;
+  v.type = WIN_SOUND;
   v.w = 80;
   v.h = 50;
 
@@ -284,7 +284,7 @@ void MOD3(void) {
 void MOD0(void) {
   modinfo *mymodinfo;
 
-  v.type = 107;
+  v.type = WIN_MUSIC;
   v.w = 68;
   v.h = 50;
 
@@ -474,7 +474,7 @@ void open_sound(void) {
   int num;
 
   v_mode = 0;
-  v_type = 7;
+  v_type = FT_AUDIO;
   v_text = (char *)texts[341];
   show_dialog(browser0);
   if (!v_finished)
@@ -791,7 +791,7 @@ void close_sound(char *snd_path) {
   int m;
 
   for (m = 0; m < MAX_WINDOWS; m++) {
-    if (window[m].type == 105) {
+    if (window[m].type == WIN_SOUND) {
       mypcminfo = (pcminfo *)window[m].aux;
       if (!strcmp(snd_path, mypcminfo->pathname)) {
         move(0, m);
@@ -812,7 +812,7 @@ void open_song(void) {
   FILE *f;
 
   v_mode = 0;
-  v_type = 16;
+  v_type = FT_MODULE;
   v_text = (char *)texts[558];
   show_dialog(browser0);
   if (!v_finished)
@@ -968,7 +968,7 @@ int PosY = 31;
 void edit_sound0(void) {
   int pos;
 
-  v.type = 1;
+  v.type = WIN_DIALOG;
   v.title = texts[349];
   v.name = texts[349];
   v.w = 308;
@@ -1182,7 +1182,7 @@ void EditSound3(void) {
 //-----------------------------------------------------------------------------
 
 void rec_sound0(void) {
-  v.type = 1;
+  v.type = WIN_DIALOG;
   v.title = texts[560];
   v.name = texts[560];
   v.w = 200;
@@ -1265,7 +1265,7 @@ void RecSound2(void) {
     break;
   case 4: // Seleccion de filename
     v_mode = 1;
-    v_type = 7;
+    v_type = FT_AUDIO;
     v_text = (char *)texts[339];
     show_dialog(browser0);
 

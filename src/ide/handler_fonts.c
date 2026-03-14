@@ -24,7 +24,7 @@ void print_fontmap(void) {
   FILE *f;
 
   v_mode = 1;
-  v_type = 5;
+  v_type = FT_FNT;
 
   div_strcpy(FontPathName, sizeof(FontPathName), file_types[v_type].path);
   div_strcat(FontPathName, sizeof(FontPathName), "/");
@@ -146,7 +146,7 @@ end_bucle:
 
 
   for (x = -1, y = 1; y < MAX_WINDOWS; y++)
-    if (window[y].type == 104 && !strcmp((char *)window[y].title, FontName))
+    if (window[y].type == WIN_FONT && !strcmp((char *)window[y].title, FontName))
       x = y;
 
   if (x >= 0) {

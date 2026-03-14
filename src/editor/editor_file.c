@@ -326,7 +326,7 @@ void find_text1(void);
 void find_text2(void);
 
 void find_text0(void) {
-  v.type = 1;
+  v.type = WIN_DIALOG;
   v.title = texts[160];
   v.w = 126;
   v.h = 14 + y_bt;
@@ -429,7 +429,7 @@ void replace_text1(void);
 void replace_text2(void);
 
 void replace_text0(void) {
-  v.type = 1;
+  v.type = WIN_DIALOG;
 
   v.title = texts[165];
   v.w = 126;
@@ -587,7 +587,7 @@ void replace0(void) {
   x2 = 7 + text_len(texts[102] + 1) + 10;
   x3 = x2 + text_len(texts[103] + 1) + 10;
   x4 = x3 + text_len(texts[124] + 1) + 10;
-  v.type = 1;
+  v.type = WIN_DIALOG;
   v.title = texts[190];
   v.w = x4 + text_len(texts[101] + 1) + 7;
   v.h = 29;
@@ -617,7 +617,7 @@ void replacements2(void) {
 }
 
 void replacements0(void) {
-  v.type = 1;
+  v.type = WIN_DIALOG;
   v.title = texts[191];
   itoa(num_cambios, sus, 10);
   div_strcat(sus, sizeof(sus), (char *)texts[192]);
@@ -1069,7 +1069,7 @@ void process_list2(void) {
 }
 
 void process_list0(void) {
-  v.type = 1;
+  v.type = WIN_DIALOG;
   v.title = texts[380];
 
   v.w = 166 + 100;
@@ -1091,7 +1091,7 @@ void goto_error(void) {
   int m, n = 0;
 
   for (m = 0; m < MAX_WINDOWS; m++) {
-    if (window[m].type == 102 && window[m].state && window[m].prg != NULL) {
+    if (window[m].type == WIN_CODE && window[m].state && window[m].prg != NULL) {
       n = m;
       break;
     }
@@ -1100,11 +1100,11 @@ void goto_error(void) {
   if (n)
     move(0, n); // If not window[0], bring to foreground
 
-  if (v.foreground != 1) { // If not in foreground, bring it there
+  if (v.foreground != WF_FOREGROUND) { // If not in foreground, bring it there
     for (m = 1; m < MAX_WINDOWS; m++)
-      if (window[m].type && window[m].foreground == 1)
+      if (window[m].type && window[m].foreground == WF_FOREGROUND)
         if (windows_collide(0, m)) {
-          window[m].foreground = 0;
+          window[m].foreground = WF_BACKGROUND;
           flush_window(m);
         }
   }
@@ -1202,7 +1202,7 @@ void printprogram2(void) {
 }
 
 void printprogram0(void) {
-  v.type = 1;
+  v.type = WIN_DIALOG;
   v.w = 120;
   v.h = 38 + 10;
   v.title = texts[453];

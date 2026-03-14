@@ -281,7 +281,7 @@ void process_list2(void) {
 }
 
 void process_list0(void) {
-  v.type = 1;
+  v.type = WIN_DIALOG;
   v.title = text[75];
 
   v.w = 166;

@@ -672,7 +672,7 @@ void debug3(void) {
 }
 
 void debug0(void) {
-  v.type = 1;
+  v.type = WIN_DIALOG;
   v.title = text[64];
   v.w = 304;
   v.h = 146 + 46; // TODO: Keep in sync with change_mode dialog dimensions

@@ -727,7 +727,7 @@ char titulo[256];
 void inspect0(void) {
   int n, x = 50;
 
-  v.type = 1;
+  v.type = WIN_DIALOG;
   v.title = (byte *)titulo;
   div_strcpy(titulo, sizeof(titulo), (char *)text[41]);
 
@@ -1377,7 +1377,7 @@ void change2(void) {
 }
 
 void change0(void) {
-  v.type = 1;
+  v.type = WIN_DIALOG;
   v.title = text[56];
   v.w = 126;
   v.h = 14 + y_bt;
@@ -1428,7 +1428,7 @@ void changestring2(void) {
 }
 
 void changestring0(void) {
-  v.type = 1;
+  v.type = WIN_DIALOG;
   v.title = text[60];
   v.w = 226;
   v.h = 14 + y_bt;

@@ -1956,15 +1956,15 @@ void draw_help(int n) {
     // If there is a help window, remove it
 
     if ((m = determine_help()) > 0) {
-      v.foreground = 1;
+      v.foreground = WF_FOREGROUND;
       v.state = 1;
-      v.type = 100;
+      v.type = WIN_MAP;
       move(0, m);
       call(v.close_handler);
       if (v.click_handler == help2 && old_prg != NULL) {
         for (m = 1; m < MAX_WINDOWS; m++) {
           if (window[m].click_handler == program2) {
-            if (window[m].prg == old_prg && window[m].foreground < 2) {
+            if (window[m].prg == old_prg && window[m].foreground != WF_MINIMIZED) {
               window[m].state = 1;
               wgra(window[m].ptr, window[m].w / big2, window[m].h / big2, c_b_low, 2, 2,
                    window[m].w / big2 - 20, 7);
@@ -1988,8 +1988,8 @@ void draw_help(int n) {
       }
       divdelete(0);
       zoom_background = 0;
-      v.type = 0;
-      v.foreground = 0;
+      v.type = WIN_EMPTY;
+      v.foreground = WF_BACKGROUND;
       v.state = 0;
       highlight_background = 0;
       zoom_map();
@@ -3018,7 +3018,7 @@ int create_mapbr_thumbs(struct t_listboxbr *l) {
 
   n = m_maximo = 0;
   for (con = 0; con < MAX_WINDOWS; con++) {
-    if (window[con].type == 100) {
+    if (window[con].type == WIN_MAP) {
       thumb_map[n].w = (int)window[con].mapa->map_width;
       thumb_map[n].h = (int)window[con].mapa->map_height;
       thumb_map[n].ptr = (char *)window[con].mapa->map;
@@ -3566,22 +3566,22 @@ void change_map(int forward) {
   v.mapa->zoom_y = zoom_y;
   v.mapa->zoom_cx = zoom_cx;
   v.mapa->zoom_cy = zoom_cy;
-  v.type = 100;
+  v.type = WIN_MAP;
   call(v.paint_handler);
   copy(-1, 0);
 
   if (forward) {
     for (n = 1; n < MAX_WINDOWS; n++) {
-      if (window[n].type == 100 && window[n].mapa->map_width == map_width &&
-          window[n].mapa->map_height == map_height && window[n].foreground != 2) {
+      if (window[n].type == WIN_MAP && window[n].mapa->map_width == map_width &&
+          window[n].mapa->map_height == map_height && window[n].foreground != WF_MINIMIZED) {
         copy(old, n);
         old = n;
       }
     }
   } else {
     for (n = MAX_WINDOWS - 1; n > 0; n--) {
-      if (window[n].type == 100 && window[n].mapa->map_width == map_width &&
-          window[n].mapa->map_height == map_height && window[n].foreground != 2) {
+      if (window[n].type == WIN_MAP && window[n].mapa->map_width == map_width &&
+          window[n].mapa->map_height == map_height && window[n].foreground != WF_MINIMIZED) {
         copy(old, n);
         old = n;
       }
@@ -3600,7 +3600,7 @@ void change_map(int forward) {
 
   map = v.mapa->map;
   current_map_code = v.mapa->code;
-  v.type = 0;
+  v.type = WIN_EMPTY;
   zoom_background = 0;
   need_zoom = 1;
 }

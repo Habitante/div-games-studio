@@ -2728,7 +2728,7 @@ void compile_pass2(void) {
 }
 
 void compile_pass0(void) {
-  v.type = 1;
+  v.type = WIN_DIALOG;
   v.w = 300;
   v.h = 46;
   switch (run_mode) {

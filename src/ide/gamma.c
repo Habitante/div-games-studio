@@ -171,7 +171,7 @@ void create_gradient_colors(struct _gcolor *gradient_config, byte *gradient_buf)
 void gama0(void) {
   int con;
 
-  v.type = 1;
+  v.type = WIN_DIALOG;
 
   v.title = texts[420];
   v.w = ancho_ga;

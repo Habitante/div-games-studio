@@ -447,7 +447,7 @@ void fpg_save(int n) {
     show_dialog(err0);
     return;
   }
-  div_strcpy(full, sizeof(full), file_types[4].path);
+  div_strcpy(full, sizeof(full), file_types[FT_FPG].path);
   if (full[strlen(full) - 1] != '/')
     div_strcat(full, sizeof(full), "/");
   div_strcat(full, sizeof(full), input);

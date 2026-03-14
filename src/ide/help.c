@@ -519,7 +519,7 @@ void help3(void) {
 void help0(void) { // help_item indicates which topic help is requested for
   int x;
 
-  v.type = 102;
+  v.type = WIN_CODE;
 
   v.w = (4 + 8) * big2 + font_width * help_w;
   v.h = (12 + 16) * big2 + font_height * help_h;
@@ -669,7 +669,7 @@ int determine_help(void) {
   int m, n = -1;
 
   for (m = 0; m < MAX_WINDOWS; m++) {
-    if (window[m].type == 102 && window[m].click_handler == help2) {
+    if (window[m].type == WIN_CODE && window[m].click_handler == help2) {
       n = m;
       break;
     }
@@ -698,17 +698,17 @@ void help(int n) {
   if ((m = determine_help()) != -1) {
     if (m)
       move(0, m);
-    if (v.foreground == 2)
+    if (v.foreground == WF_MINIMIZED)
       maximize_window();
 
-    if (m && v.foreground == 0) { // If it was in the background
+    if (m && v.foreground == WF_BACKGROUND) { // If it was in the background
       for (m = 1; m < MAX_WINDOWS; m++)
-        if (window[m].type && window[m].foreground == 1)
+        if (window[m].type && window[m].foreground == WF_FOREGROUND)
           if (windows_collide(0, m)) {
-            window[m].foreground = 0;
+            window[m].foreground = WF_BACKGROUND;
             flush_window(m);
           }
-      v.foreground = 1;
+      v.foreground = WF_FOREGROUND;
     }
 
     if (help_item == n) {
@@ -783,7 +783,7 @@ void help(int n) {
 void help_paint0(void) { // help_item indicates which topic help is requested for
   int x;
 
-  v.type = 1;
+  v.type = WIN_DIALOG;
 
   v.w = (4 + 8) * big2 + font_width * help_w;
   v.h = (12 + 16) * big2 + font_height * help_h;

@@ -115,7 +115,7 @@ void install_setup1() {
   int x, y;
 
   if (segundo_font) {
-    v.item[4].type = 1;
+    v.item[4].type = ITEM_BUTTON;
   } else {
     v.item[4].type = -1;
     if (v.selected_item == 4) {
@@ -177,21 +177,21 @@ void install_setup2() {
     end_dialog = 1;
     break;
   case 2:
-    div_strcpy(cwork, sizeof(cwork), file_types[4].path);
-    div_strcpy(file_types[4].path, sizeof(file_types[4].path), file_types[1].path);
-    if (file_types[4].path[strlen(file_types[4].path) - 1] != '/')
-      div_strcat(file_types[4].path, sizeof(file_types[4].path), "/");
-    div_strcat(file_types[4].path, sizeof(file_types[4].path), "INSTALL");
+    div_strcpy(cwork, sizeof(cwork), file_types[FT_FPG].path);
+    div_strcpy(file_types[FT_FPG].path, sizeof(file_types[FT_FPG].path), file_types[1].path);
+    if (file_types[FT_FPG].path[strlen(file_types[FT_FPG].path) - 1] != '/')
+      div_strcat(file_types[FT_FPG].path, sizeof(file_types[FT_FPG].path), "/");
+    div_strcat(file_types[FT_FPG].path, sizeof(file_types[FT_FPG].path), "INSTALL");
     v_mode = 1;
-    v_type = 4;
+    v_type = FT_FPG;
     v_text = (char *)texts[524];
     show_dialog(browser0);
 
-    div_strcpy(full, sizeof(full), file_types[4].path);
+    div_strcpy(full, sizeof(full), file_types[FT_FPG].path);
     if (full[strlen(full) - 1] != '/')
       div_strcat(full, sizeof(full), "/");
     div_strcat(full, sizeof(full), input);
-    div_strcpy(file_types[4].path, sizeof(file_types[4].path), cwork);
+    div_strcpy(file_types[FT_FPG].path, sizeof(file_types[FT_FPG].path), cwork);
 
     if (v_finished)
       if (v_exists) {
@@ -217,21 +217,21 @@ void install_setup2() {
       }
     break;
   case 3:
-    div_strcpy(cwork, sizeof(cwork), file_types[5].path);
-    div_strcpy(file_types[5].path, sizeof(file_types[5].path), file_types[1].path);
-    if (file_types[5].path[strlen(file_types[5].path) - 1] != '/')
-      div_strcat(file_types[5].path, sizeof(file_types[5].path), "/");
-    div_strcat(file_types[5].path, sizeof(file_types[5].path), "INSTALL");
+    div_strcpy(cwork, sizeof(cwork), file_types[FT_FNT].path);
+    div_strcpy(file_types[FT_FNT].path, sizeof(file_types[FT_FNT].path), file_types[1].path);
+    if (file_types[FT_FNT].path[strlen(file_types[FT_FNT].path) - 1] != '/')
+      div_strcat(file_types[FT_FNT].path, sizeof(file_types[FT_FNT].path), "/");
+    div_strcat(file_types[FT_FNT].path, sizeof(file_types[FT_FNT].path), "INSTALL");
     v_mode = 1;
-    v_type = 5;
+    v_type = FT_FNT;
     v_text = (char *)texts[525];
     show_dialog(browser0);
 
-    div_strcpy(full, sizeof(full), file_types[5].path);
+    div_strcpy(full, sizeof(full), file_types[FT_FNT].path);
     if (full[strlen(full) - 1] != '/')
       div_strcat(full, sizeof(full), "/");
     div_strcat(full, sizeof(full), input);
-    div_strcpy(file_types[5].path, sizeof(file_types[5].path), cwork);
+    div_strcpy(file_types[FT_FNT].path, sizeof(file_types[FT_FNT].path), cwork);
 
     if (v_finished)
       if (v_exists) {
@@ -251,13 +251,13 @@ void install_setup2() {
       }
     break;
   case 4:
-    div_strcpy(cwork, sizeof(cwork), file_types[5].path);
-    div_strcpy(file_types[5].path, sizeof(file_types[5].path), file_types[1].path);
-    if (file_types[5].path[strlen(file_types[5].path) - 1] != '/')
-      div_strcat(file_types[5].path, sizeof(file_types[5].path), "/");
-    div_strcat(file_types[5].path, sizeof(file_types[5].path), "INSTALL");
+    div_strcpy(cwork, sizeof(cwork), file_types[FT_FNT].path);
+    div_strcpy(file_types[FT_FNT].path, sizeof(file_types[FT_FNT].path), file_types[1].path);
+    if (file_types[FT_FNT].path[strlen(file_types[FT_FNT].path) - 1] != '/')
+      div_strcat(file_types[FT_FNT].path, sizeof(file_types[FT_FNT].path), "/");
+    div_strcat(file_types[FT_FNT].path, sizeof(file_types[FT_FNT].path), "INSTALL");
     v_mode = 1;
-    v_type = 5;
+    v_type = FT_FNT;
     v_text = (char *)texts[525];
     show_dialog(browser0);
 
@@ -265,7 +265,7 @@ void install_setup2() {
     if (full[strlen(full) - 1] != '/')
       div_strcat(full, sizeof(full), "/");
     div_strcat(full, sizeof(full), input);
-    div_strcpy(file_types[5].path, sizeof(file_types[5].path), cwork);
+    div_strcpy(file_types[FT_FNT].path, sizeof(file_types[FT_FNT].path), cwork);
 
     if (v_finished)
       if (v_exists) {
@@ -326,7 +326,7 @@ void install_setup0() {
   int y;
 
   v_accept = 0;
-  v.type = 1;
+  v.type = WIN_DIALOG;
   v.w = 310;
   v.h = 125 + 16 + 19 + 20;
   v.title = texts[236];
@@ -607,7 +607,7 @@ void install_setupm2() {
 void install_setupm0() {
   int y;
 
-  v.type = 1;
+  v.type = WIN_DIALOG;
   v.w = 310;
   v.h = 12 + 9 + 19 * 4;
   v.title = texts[526];
@@ -658,7 +658,7 @@ void install_setupe2() {
 void install_setupe0() {
   int y;
 
-  v.type = 1;
+  v.type = WIN_DIALOG;
   v.w = 310;
   v.h = 12 + 9 + 99 + 8;
   v.title = texts[537];

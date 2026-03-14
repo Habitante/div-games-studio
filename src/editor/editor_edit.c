@@ -36,7 +36,7 @@ void f_mark(void) {
       }
     } else {
       for (n = 0; n < MAX_WINDOWS; n++)
-        if (window[n].type == 102 && window[n].prg == kprg && kprg != NULL)
+        if (window[n].type == WIN_CODE && window[n].prg == kprg && kprg != NULL)
           break;
       if (n < MAX_WINDOWS) {
         wup(n);
@@ -76,7 +76,7 @@ void f_unmark(void) {
   int n;
   if (block_state && kprg != v.prg) {
     for (n = 0; n < MAX_WINDOWS; n++)
-      if (window[n].type == 102 && window[n].prg == kprg && kprg != NULL)
+      if (window[n].type == WIN_CODE && window[n].prg == kprg && kprg != NULL)
         break;
     if (n < MAX_WINDOWS) {
       wup(n);
@@ -97,7 +97,7 @@ void f_cut_block(int mode) {
   t_p = 0; // Clipboard type -> chars by default
   if (block_state && kprg != v.prg) {
     for (n = 0; n < MAX_WINDOWS; n++)
-      if (window[n].type == 102 && window[n].prg == kprg && kprg != NULL)
+      if (window[n].type == WIN_CODE && window[n].prg == kprg && kprg != NULL)
         break;
     if (n < MAX_WINDOWS) {
       wup(n);

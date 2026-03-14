@@ -291,7 +291,7 @@ void fpg_dialog0_new(void) {
   FPG *my_fpg;
   int n;
 
-  v.type = 101; // Droppable
+  v.type = WIN_FPG; // Droppable
   v.w = 159;
   v.h = 72 + 5;
   v.paint_handler = fpg_dialog1;
@@ -323,7 +323,7 @@ void fpg_dialog0_new(void) {
 void fpg_dialog0_add(void) {
   FPG *my_fpg;
   int n;
-  v.type = 101; // Droppable
+  v.type = WIN_FPG; // Droppable
   v.w = 159;
   v.h = 72 + 5;
   v.paint_handler = fpg_dialog1;
@@ -352,7 +352,7 @@ void fpg_dialog0_add(void) {
 int new_file(void) {
   v_accept = 0;
   v_mode = 1;
-  v_type = 4;
+  v_type = FT_FPG;
   v_text = (char *)texts[69];
   show_dialog(browser0);
 
@@ -415,7 +415,7 @@ void open_file(void) {
   byte pal[768];
 
   v_mode = 0;
-  v_type = 4;
+  v_type = FT_FPG;
   v_text = (char *)texts[70];
   show_dialog(browser0);
   if (!v_finished)
@@ -641,7 +641,7 @@ void fpg_warning2(void) {
   }
 }
 void fpg_warning0(void) {
-  v.type = 1; // Dialog
+  v.type = WIN_DIALOG; // Dialog
   v.w = 200;
   v.h = 60;
   v.title = texts[171];
@@ -780,7 +780,7 @@ void get_code3(void) {
 }
 
 void get_code0(void) {
-  v.type = 1; // Dialog
+  v.type = WIN_DIALOG; // Dialog
   v.w = 180 + 25;
   v.h = 100 - 12;
   v.title = texts[68];
@@ -1053,7 +1053,7 @@ void printlist2(void) {
 }
 
 void printlist0(void) {
-  v.type = 1;
+  v.type = WIN_DIALOG;
   v.w = 120;
   v.h = 38 + 10;
   v.title = (byte *)v_title;
@@ -2048,7 +2048,7 @@ void close_fpg(char *fpg_path) {
 
   for (m = 0; m < MAX_WINDOWS; m++) {
     my_fpg = (FPG *)window[m].aux;
-    if (window[m].type == 101) {
+    if (window[m].type == WIN_FPG) {
       if (!strcmp(fpg_path, (char *)my_fpg->current_file)) {
         move(0, m);
         close_window();
@@ -2067,7 +2067,7 @@ int select_file(void) {
 
   v_accept = 0;
   v_mode = 0;
-  v_type = 4;
+  v_type = FT_FPG;
   v_text = (char *)texts[69];
   show_dialog(browser0);
 
@@ -2156,7 +2156,7 @@ void replace_fpg_2(void) {
 void replace_fpg_0(void) {
   int x2, x3;
 
-  v.type = 1;
+  v.type = WIN_DIALOG;
   v.w = text_len(texts[510]) + text_len(texts[511]) + text_len(texts[101]) + 16;
   x2 = 7 + text_len(texts[510] + 1) + 10;
   x3 = x2 + text_len(texts[511] + 1) + 10;

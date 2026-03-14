@@ -123,7 +123,7 @@ void vid_setup3(void) {
 void vid_setup0(void) {
   int n;
 
-  v.type = 1;
+  v.type = WIN_DIALOG;
 
   v.title = texts[881] + 1;
   v.w = 126 + 24 + 30;
@@ -174,7 +174,7 @@ void get_wallpaper() {
   FILE *f;
 
   v_mode = 1;
-  v_type = 9;
+  v_type = FT_WALLPAPER;
   v_text = (char *)texts[182];
   show_dialog((void_return_type_t)browser0);
 
@@ -330,7 +330,7 @@ void wallpaper_setup3(void) {
 void wallpaper_setup0(void) {
   int w, h;
 
-  v.type = 1;
+  v.type = WIN_DIALOG;
   v.title = texts[882];
   v.w = 138;
   v.h = 150;
@@ -434,7 +434,7 @@ void mem_info1(void) {
   for (x = 0; x < MAX_WINDOWS; x++) {
     if (window[x].type)
       nuvent++;
-    if (window[x].type == 100) {
+    if (window[x].type == WIN_MAP) {
       meminmaps += window[x].mapa->map_width * window[x].mapa->map_height;
     }
   }
@@ -475,7 +475,7 @@ void mem_info2(void) {
 }
 
 void mem_info0(void) {
-  v.type = 1;
+  v.type = WIN_DIALOG;
   v.title = texts[199];
   v.w = 168;
   v.h = 88;
@@ -810,7 +810,7 @@ void cfg_setup3(void) {
 }
 
 void config_setup0(void) {
-  v.type = 1;
+  v.type = WIN_DIALOG;
   v.title = texts[883];
   v.w = 192;
   v.h = 200;
@@ -1042,7 +1042,7 @@ void config_setup_end(void) {
       if (window[n].type) {
         xchg(0, n);
 
-        if (v.foreground == 2) {
+        if (v.foreground == WF_MINIMIZED) {
           swap(v.w, v._w_saved);
           swap(v.h, v._h_saved);
           swap(v.x, v._x);
@@ -1056,7 +1056,7 @@ void config_setup_end(void) {
         wput(ptr, w, h, w - 9, 2, 35);
         wput(ptr, w, h, w - 17, 2, 37);
 
-        if (v.type >= 100 && !v.state) {
+        if (v.type >= WIN_EDITOR_MIN && !v.state) {
           wgra(v.ptr, w, h, c1, 2, 2, w - 20, 7);
           if (text_len(v.title) + 3 > w - 20) {
             wwrite_in_box(v.ptr, w, w - 19, h, 4, 2, 0, v.title, c0);
@@ -1078,7 +1078,7 @@ void config_setup_end(void) {
 
         call((void_return_type_t)v.paint_handler);
 
-        if (v.foreground == 2) {
+        if (v.foreground == WF_MINIMIZED) {
           swap(v.w, v._w_saved);
           swap(v.h, v._h_saved);
           swap(v.x, v._x);
@@ -1109,7 +1109,7 @@ void config_setup_end(void) {
 }
 
 void resize_program(void) {
-  v.type = 102;
+  v.type = WIN_CODE;
   v.prg = v_prg;
   if (v.prg->w < 4 * big2)
     v.prg->w = 4 * big2;

@@ -306,7 +306,7 @@ void program3(void) {
 }
 
 void program0(void) {
-  v.type = 102;
+  v.type = WIN_CODE;
 
   v_prg->w = (vga_width / 2 - 1 - 12 * big2) / editor_font_width;
   v_prg->h = (vga_height / 2 - 32 * big2 - 1) / editor_font_height;
@@ -366,7 +366,7 @@ void editor() {
 
   if (edited != v.prg) { // If we were editing a different one ...
     for (n = 0; n < MAX_WINDOWS; n++)
-      if (window[n].type == 102 && window[n].prg != NULL && window[n].prg == edited)
+      if (window[n].type == WIN_CODE && window[n].prg != NULL && window[n].prg == edited)
         break;
     if (n < MAX_WINDOWS) {
       wup(n);

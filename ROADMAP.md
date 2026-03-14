@@ -172,6 +172,10 @@ astronautics.
 
 ---
 
+## CRITICAL NOTE: Before proceeding with any future feature additions, we've decided to tackle a number of general / codebase IMPROVEMENTS.md first. So that document contains the new roadmap post Phase 3 now!
+
+---
+
 ## Phase 4 — Minimum Viable Steam Product
 
 The features needed so a modern developer won't rage-quit in the first 10

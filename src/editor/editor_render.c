@@ -730,7 +730,7 @@ void repaint_window(void) {
   wrectangle(v.ptr, w, h, c2, 0, 0, w, h);
   wput(v.ptr, w, h, w - 9, 2, 35);
 
-  if (v.type == 1) { // Dialogs cannot be minimized
+  if (v.type == WIN_DIALOG) { // Dialogs cannot be minimized
     wgra(v.ptr, w, h, c_b_low, 2, 2, w - 12, 7);
     if (text_len(v.title) + 3 > w - 12) {
       wwrite_in_box(v.ptr, w, w - 11, h, 4, 2, 0, v.title, c1);

@@ -80,7 +80,7 @@ void Bin2(void) {
 // setup bin
 
 void bin0(void) {
-  v.type = 5;
+  v.type = WIN_TRASH;
   v.w = 27;
   v.h = 34;
   v.paint_handler = bin1;

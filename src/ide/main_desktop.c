@@ -26,7 +26,7 @@ void on_window_moved(int x, int y, int w, int h) {
   int n, m;
 
   n = v.type;
-  v.type = 0;
+  v.type = WIN_EMPTY;
   if (draw_mode < 100) {
     draw_edit_background(x, y, w, h);
     flush_bars(0);
@@ -35,26 +35,26 @@ void on_window_moved(int x, int y, int w, int h) {
     update_box(x, y, w, h);
   v.type = n;
 
-  if (v.type != 1) {
+  if (v.type != WIN_DIALOG) {
     for (n = 1; n < MAX_WINDOWS; n++)
-      if (window[n].type && window[n].foreground == 0)
+      if (window[n].type && window[n].foreground == WF_BACKGROUND)
 
         // If a dimmed window was previously covered ...
 
         if (collides_with(n, x, y, w, h)) {
-          window[n].foreground = 1;
+          window[n].foreground = WF_FOREGROUND;
 
           // If it's covered by other windows (foreground or background) ...
 
           for (m = 1; m < MAX_WINDOWS; m++)
             if (m != n && window[m].type &&
-                (window[m].foreground == 1 || (window[m].foreground != 1 && m < n)))
+                (window[m].foreground == WF_FOREGROUND || (window[m].foreground != WF_FOREGROUND && m < n)))
               if (windows_collide(n, m))
-                window[n].foreground = 0;
+                window[n].foreground = WF_BACKGROUND;
 
           // If we uncovered said window, bring it to the foreground
 
-          if (window[n].foreground == 1) {
+          if (window[n].foreground == WF_FOREGROUND) {
             if (n != 1) {
               move(1, n);
             }
@@ -63,9 +63,9 @@ void on_window_moved(int x, int y, int w, int h) {
         }
 
     for (n = 1; n < MAX_WINDOWS; n++)
-      if (window[n].type && window[n].foreground == 1)
+      if (window[n].type && window[n].foreground == WF_FOREGROUND)
         if (windows_collide(0, n)) {
-          window[n].foreground = 0;
+          window[n].foreground = WF_BACKGROUND;
           flush_window(n);
         }
   }
@@ -100,7 +100,7 @@ void maximize_window(void) {
 
   m = 0;
   for (n = 1; n < MAX_WINDOWS; n++)
-    if (window[n].type && window[n].foreground == 1)
+    if (window[n].type && window[n].foreground == WF_FOREGROUND)
       if (windows_collide(0, n))
         m++;
   if (m)
@@ -110,7 +110,7 @@ void maximize_window(void) {
   v._y = y;
   v._w_saved = w;
   v._h_saved = h;
-  v.foreground = 1;
+  v.foreground = WF_FOREGROUND;
 
   do {
     read_mouse();
@@ -118,7 +118,7 @@ void maximize_window(void) {
 
   on_window_moved(x, y, w, h);
 
-  if (v.type >= 100) {
+  if (v.type >= WIN_EDITOR_MIN) {
     activate();
     flush_window(0);
   }
@@ -136,7 +136,7 @@ void minimize_window(void) {
   if (first_run != 1)
     flush_copy();
   wput(v.ptr, v.w / big2, v.h / big2, v.w / big2 - 17, 2, -37);
-  if (v.type >= 100)
+  if (v.type >= WIN_EDITOR_MIN)
     deactivate();
 
   x = v.x;
@@ -155,7 +155,7 @@ void minimize_window(void) {
     v.y = v._y;
     m = 0;
     for (n = 1; n < MAX_WINDOWS; n++)
-      if (window[n].type && window[n].foreground == 2)
+      if (window[n].type && window[n].foreground == WF_MINIMIZED)
         if (windows_collide(0, n))
           m++;
     if (m)
@@ -166,7 +166,7 @@ void minimize_window(void) {
   v._y = y;
   v._w_saved = w;
   v._h_saved = h;
-  v.foreground = 2;
+  v.foreground = WF_MINIMIZED;
 
   do {
     read_mouse();
@@ -184,7 +184,7 @@ extern struct tprg *old_prg;
 void close_window(void) {
   int x = 0, y = 0, w = 0, h = 0, n = 0, m = 0;
 
-  if (v.type == 102 && window_closing == 1) {
+  if (v.type == WIN_CODE && window_closing == 1) {
     window_closing = 2;
     return;
   }
@@ -215,7 +215,7 @@ void close_window(void) {
     for (m = 1; m < MAX_WINDOWS; m++) {
       if (window[m].click_handler == program2 || window[m].click_handler == calc2) {
         if ((window[m].prg == old_prg || window[m].aux == (byte *)old_prg) &&
-            window[m].foreground < 2) {
+            window[m].foreground != WF_MINIMIZED) {
           window[m].state = 1;
           wgra(window[m].ptr, window[m].w / big2, window[m].h / big2, c_b_low, 2, 2,
                window[m].w / big2 - 20, 7);
@@ -239,9 +239,9 @@ void close_window(void) {
     old_prg = NULL;
   }
 
-  if (v.type >= 100 && v.state) { // Maps auto-deactivate on close
+  if (v.type >= WIN_EDITOR_MIN && v.state) { // Maps auto-deactivate on close
     for (m = 1; m < MAX_WINDOWS; m++)
-      if (window[m].type == v.type && window[m].foreground < 2) {
+      if (window[m].type == v.type && window[m].foreground != WF_MINIMIZED) {
         window[m].state = 1;
         wgra(window[m].ptr, window[m].w / big2, window[m].h / big2, c_b_low, 2, 2,
              window[m].w / big2 - 20, 7);
@@ -275,27 +275,27 @@ void close_window(void) {
   } else
     update_box(x, y, w, h);
 
-  if (n == 1 || n == 7) {             // Dialogs bring hidden[] windows to foreground on close
-    if (v.type == 1 || v.type == 7) { // Dialog over dialog: only show the last one
-      v.foreground = 1;
+  if (n == WIN_DIALOG || n == WIN_PROGRESS) {             // Dialogs bring hidden[] windows to foreground on close
+    if (v.type == WIN_DIALOG || v.type == WIN_PROGRESS) { // Dialog over dialog: only show the last one
+      v.foreground = WF_FOREGROUND;
       flush_window(0);
     } else if (draw_mode >= 100)
       for (n = 0; n < MAX_WINDOWS; n++)
         if (hidden[n]) {
-          window[n].foreground = 1;
+          window[n].foreground = WF_FOREGROUND;
           flush_window(n);
         }
   } else
     for (n = 0; n < MAX_WINDOWS; n++)
-      if (window[n].type && window[n].foreground == 0)
+      if (window[n].type && window[n].foreground == WF_BACKGROUND)
         if (collides_with(n, x, y, w, h)) {
-          window[n].foreground = 1;
+          window[n].foreground = WF_FOREGROUND;
           for (m = 0; m < MAX_WINDOWS; m++)
             if (m != n && window[m].type &&
-                (window[m].foreground == 1 || (window[m].foreground == 2 && m < n)))
+                (window[m].foreground == WF_FOREGROUND || (window[m].foreground == WF_MINIMIZED && m < n)))
               if (windows_collide(n, m))
-                window[n].foreground = 0;
-          if (window[n].foreground == 1) {
+                window[n].foreground = WF_BACKGROUND;
+          if (window[n].foreground == WF_FOREGROUND) {
             if (n != 0) {
               move(0, n);
             }
@@ -379,13 +379,13 @@ void move_window(void) {
   if (oldx == v.x && oldy == v.y) {
     if (*system_clock < double_click + 10 && *system_clock > double_click &&
         abs(double_click_x - mouse_x) < 8 && abs(double_click_y - mouse_y) < 8) {
-      if (v.foreground == 2)
+      if (v.foreground == WF_MINIMIZED)
         place_window(v.side * 2 + 0, &v.x, &v.y, v.w, v.h);
       else
         place_window(v.side * 2 + 1, &v.x, &v.y, v.w, v.h);
       if (v.x == oldx && v.y == oldy) {
         v.side ^= 1;
-        if (v.foreground == 2)
+        if (v.foreground == WF_MINIMIZED)
           place_window(v.side * 2 + 0, &v.x, &v.y, v.w, v.h);
         else
           place_window(v.side * 2 + 1, &v.x, &v.y, v.w, v.h);
@@ -405,7 +405,7 @@ void move_window(void) {
     }
   }
 
-  if (!x && v.foreground == 1)
+  if (!x && v.foreground == WF_FOREGROUND)
     flush_window(0);
 }
 
@@ -421,10 +421,10 @@ void move_window_complete(void) {
   ix = mouse_x - oldx;
   iy = mouse_y - oldy;
 
-  if (v.foreground == 1)
+  if (v.foreground == WF_FOREGROUND)
     wrectangle(v.ptr, w / big2, h / big2, c4, 0, 0, w / big2, h / big2);
 
-  if (v.foreground == 2)
+  if (v.foreground == WF_MINIMIZED)
     window_move_pending = 1;
 
   do {
@@ -441,7 +441,7 @@ void move_window_complete(void) {
     flush_window(0);
   }
 
-  if (v.foreground == 1)
+  if (v.foreground == WF_FOREGROUND)
     wrectangle(v.ptr, w / big2, h / big2, c2, 0, 0, w / big2, h / big2);
 
   //---------------------------------------------------------------------------
@@ -453,13 +453,13 @@ void move_window_complete(void) {
   if (oldx == v.x && oldy == v.y) {
     if (*system_clock < double_click + 10 && *system_clock > double_click &&
         abs(double_click_x - mouse_x) < 8 && abs(double_click_y - mouse_y) < 8) {
-      if (v.foreground == 2)
+      if (v.foreground == WF_MINIMIZED)
         place_window(v.side * 2 + 0, &v.x, &v.y, v.w, v.h);
       else
         place_window(v.side * 2 + 1, &v.x, &v.y, v.w, v.h);
       if (v.x == oldx && v.y == oldy) {
         v.side ^= 1;
-        if (v.foreground == 2)
+        if (v.foreground == WF_MINIMIZED)
           place_window(v.side * 2 + 0, &v.x, &v.y, v.w, v.h);
         else
           place_window(v.side * 2 + 1, &v.x, &v.y, v.w, v.h);
@@ -479,7 +479,7 @@ void move_window_complete(void) {
     }
   }
 
-  if (!x && v.foreground == 1)
+  if (!x && v.foreground == WF_FOREGROUND)
     flush_window(0);
 }
 
@@ -536,7 +536,7 @@ void update_box(int x, int y, int w, int h) {
   for (n = MAX_WINDOWS - 1; n >= 0; n--)
     if (window[n].type)
       if (collides_with(n, x, y, w, h)) {
-        if (window[n].foreground < 2) {
+        if (window[n].foreground != WF_MINIMIZED) {
           _ptr = window[n].ptr;
           salta_x = 0;
           salta_y = 0;
@@ -567,7 +567,7 @@ void update_box(int x, int y, int w, int h) {
           }
 
           if (_an > 0 && _al > 0) {
-            if (window[n].foreground == 1)
+            if (window[n].foreground == WF_FOREGROUND)
               blit_region(screen_buffer, vga_width, vga_height, _ptr, _x, _y, _an, _al, salta_x);
             else
               blit_region_dark(screen_buffer, vga_width, vga_height, _ptr, _x, _y, _an, _al,
@@ -624,9 +624,9 @@ void update_dialogs(int x, int y, int w, int h) {
     return;
 
   for (n = MAX_WINDOWS - 1; n >= 0; n--)
-    if (window[n].type == 1)
+    if (window[n].type == WIN_DIALOG)
       if (collides_with(n, x, y, w, h))
-        if (window[n].foreground < 2) {
+        if (window[n].foreground != WF_MINIMIZED) {
           _ptr = window[n].ptr;
           salta_x = 0;
           salta_y = 0;
@@ -657,7 +657,7 @@ void update_dialogs(int x, int y, int w, int h) {
           }
 
           if (_an > 0 && _al > 0) {
-            if (window[n].foreground == 1)
+            if (window[n].foreground == WF_FOREGROUND)
               blit_region(screen_buffer, vga_width, vga_height, _ptr, _x, _y, _an, _al, salta_x);
             else
               blit_region_dark(screen_buffer, vga_width, vga_height, _ptr, _x, _y, _an, _al,
@@ -676,7 +676,7 @@ void update_box2(int vent, int x, int y, int w, int h) {
   int _x, _y, _an, _al;
   int salta_x, salta_y;
 
-  if (window[vent].foreground == 2) {
+  if (window[vent].foreground == WF_MINIMIZED) {
     update_box(x, y, w, h);
     return;
   }
@@ -699,7 +699,7 @@ void update_box2(int vent, int x, int y, int w, int h) {
   for (n = vent; n >= 0; n--)
     if (window[n].type)
       if (collides_with(n, x, y, w, h)) {
-        if (window[n].foreground < 2) {
+        if (window[n].foreground != WF_MINIMIZED) {
           _ptr = window[n].ptr;
           salta_x = 0;
           salta_y = 0;
@@ -730,7 +730,7 @@ void update_box2(int vent, int x, int y, int w, int h) {
           }
 
           if (_an > 0 && _al > 0) {
-            if (window[n].foreground == 1)
+            if (window[n].foreground == WF_FOREGROUND)
               blit_region(screen_buffer, vga_width, vga_height, _ptr, _x, _y, _an, _al, salta_x);
             else
               blit_region_dark(screen_buffer, vga_width, vga_height, _ptr, _x, _y, _an, _al,
@@ -882,7 +882,7 @@ void flush_window(int m) {
     return;
 
   if (partial_blits) {
-    if (window[m].type == 102 && window[m].redraw == 1 && window[m].prg != NULL) {
+    if (window[m].type == WIN_CODE && window[m].redraw == 1 && window[m].prg != NULL) {
       window[m].redraw = 0;
       update_box2(m, window[m].x + 2 * big2, window[m].y + 10 * big2, window[m].w - 20, 7 * big2);
       update_box2(m, window[m].x + 2 * big2,
@@ -904,7 +904,7 @@ void flush_window(int m) {
   w = window[m].w;
   h = window[m].h;
 
-  if (window[m].foreground == 2) {
+  if (window[m].foreground == WF_MINIMIZED) {
     update_box(x, y, w, h);
     return;
   }
@@ -925,7 +925,7 @@ void flush_window(int m) {
   for (n = m; n >= 0; n--)
     if (window[n].type)
       if (collides_with(n, x, y, w, h)) {
-        if (window[n].foreground < 2) {
+        if (window[n].foreground != WF_MINIMIZED) {
           _ptr = window[n].ptr;
           if (_ptr == NULL)
             return;
@@ -959,7 +959,7 @@ void flush_window(int m) {
           }
 
           if (_an > 0 && _al > 0) {
-            if (window[n].foreground == 1) {
+            if (window[n].foreground == WF_FOREGROUND) {
               blit_region(screen_buffer, vga_width, vga_height, _ptr, _x, _y, _an, _al, salta_x);
             } else {
               blit_region_dark(screen_buffer, vga_width, vga_height, _ptr, _x, _y, _an, _al,
@@ -1263,8 +1263,8 @@ void new_window(void_return_type_t init_handler) {
     //---------------------------------------------------------------------------
 
     v.order = next_order++;
-    v.type = 0;
-    v.foreground = 1;
+    v.type = WIN_EMPTY;
+    v.foreground = WF_FOREGROUND;
     v.name = (byte *)"?";
     v.title = (byte *)"?";
     v.paint_handler = dummy_handler;
@@ -1303,7 +1303,7 @@ void new_window(void_return_type_t init_handler) {
 
     if (first_run == 2) { // The help window (first time)
       y = x = vga_width / 2 - w / 2;
-    } else if (v.type == 1 || v.type == 7) { // Dialogs are centered
+    } else if (v.type == WIN_DIALOG || v.type == WIN_PROGRESS) { // Dialogs are centered
       x = vga_width / 2 - w / 2;
       y = vga_height / 2 - h / 2;
     } else
@@ -1316,7 +1316,7 @@ void new_window(void_return_type_t init_handler) {
     // Check that if it's a map, no other map is already active
     //---------------------------------------------------------------------------
 
-    if (v.type >= 100) {
+    if (v.type >= WIN_EDITOR_MIN) {
       v.state = 1; // Activate it
       for (m = 1; m < MAX_WINDOWS; m++)
         if (window[m].type == v.type && window[m].state) {
@@ -1335,14 +1335,14 @@ void new_window(void_return_type_t init_handler) {
                    2 + (window[m].w / big2 - 20) / 2, 2, 1, window[m].title, c2);
           }
 
-          if (v.type == 102 && (window[m].prg != NULL || window[m].click_handler == calc2) &&
-              window[m].type == 102) { // Erase cursor
+          if (v.type == WIN_CODE && (window[m].prg != NULL || window[m].click_handler == calc2) &&
+              window[m].type == WIN_CODE) { // Erase cursor
             wup(m);
             call((void_return_type_t)v.paint_handler);
             wdown(m);
           }
           vtipo = v.type;
-          v.type = 0;
+          v.type = WIN_EMPTY;
           flush_window(m);
           v.type = vtipo;
           break;
@@ -1354,10 +1354,10 @@ void new_window(void_return_type_t init_handler) {
     //---------------------------------------------------------------------------
 
     n = 0;
-    if (v.type == 2 || v.type == 3 || v.type == 4 || v.type == 5 || v.type == 8) {
+    if (v.type == WIN_MENU || v.type == WIN_PALETTE || v.type == WIN_CLOCK || v.type == WIN_TRASH || v.type == WIN_MIXER) {
       for (m = 1; m < MAX_WINDOWS; m++)
-        if (window[m].type == 2 || window[m].type == 3 || window[m].type == 4 ||
-            window[m].type == 5 || window[m].type == 8)
+        if (window[m].type == WIN_MENU || window[m].type == WIN_PALETTE || window[m].type == WIN_CLOCK ||
+            window[m].type == WIN_TRASH || window[m].type == WIN_MIXER)
           if (window[m].click_handler == v.click_handler)
             n = m;
     }
@@ -1374,25 +1374,25 @@ void new_window(void_return_type_t init_handler) {
       // Send appropriate windows to the background
       //---------------------------------------------------------------------------
 
-      if (v.type == 1 || v.type == 7) { // Dialogs/progress bars hide all windows
+      if (v.type == WIN_DIALOG || v.type == WIN_PROGRESS) { // Dialogs/progress bars hide all windows
         vtipo = v.type;
-        v.type = 0;
-        if (window[1].type == 1 || window[1].type == 7) { // Dialog over dialog
-          window[1].foreground = 0;
+        v.type = WIN_EMPTY;
+        if (window[1].type == WIN_DIALOG || window[1].type == WIN_PROGRESS) { // Dialog over dialog
+          window[1].foreground = WF_BACKGROUND;
           flush_window(1);
         } else
           for (n = 1; n < MAX_WINDOWS; n++)
-            if (window[n].type && window[n].foreground == 1) {
+            if (window[n].type && window[n].foreground == WF_FOREGROUND) {
               hidden[n - 1] = 1;
-              window[n].foreground = 0;
+              window[n].foreground = WF_BACKGROUND;
               flush_window(n);
             } else
               hidden[n - 1] = 0;
       } else {
         vtipo = v.type;
-        v.type = 0;
+        v.type = WIN_EMPTY;
         for (n = 1; n < MAX_WINDOWS; n++) {
-          if (window[n].type && window[n].foreground == 1) {
+          if (window[n].type && window[n].foreground == WF_FOREGROUND) {
             if (windows_collide(0, n)) {
               if (n == 1) {
                 wup(1);
@@ -1405,12 +1405,12 @@ void new_window(void_return_type_t init_handler) {
                 call((void_return_type_t)v.click_handler);
                 mouse_b = m;
                 prev_mouse_buttons = om;
-                v.foreground = 0;
+                v.foreground = WF_BACKGROUND;
                 flush_window(0);
                 v.redraw = 0;
                 wdown(1);
               } else {
-                window[n].foreground = 0;
+                window[n].foreground = WF_BACKGROUND;
                 flush_window(n);
               }
             }
@@ -1434,7 +1434,7 @@ void new_window(void_return_type_t init_handler) {
       wrectangle(ptr, w, h, c2, 0, 0, w, h);
       wput(ptr, w, h, w - 9, 2, 35);
 
-      if (v.type == 1) { // Dialogs can't be minimized
+      if (v.type == WIN_DIALOG) { // Dialogs can't be minimized
         wgra(ptr, w, h, c_b_low, 2, 2, w - 12, 7);
         if (text_len(v.title) + 3 > w - 12) {
           wwrite_in_box(ptr, w, w - 11, h, 4, 2, 0, v.title, c1);
@@ -1443,7 +1443,7 @@ void new_window(void_return_type_t init_handler) {
           wwrite(ptr, w, h, 3 + (w - 12) / 2, 2, 1, v.title, c1);
           wwrite(ptr, w, h, 2 + (w - 12) / 2, 2, 1, v.title, c4);
         }
-      } else if (v.type == 7) { // Progress bar
+      } else if (v.type == WIN_PROGRESS) { // Progress bar
         wgra(ptr, w, h, c_b_low, 2, 2, w - 4, 7);
         if (text_len(v.title) + 3 > w - 4) {
           wwrite_in_box(ptr, w, w - 3, h, 4, 2, 0, v.title, c1);
@@ -1489,21 +1489,21 @@ void new_window(void_return_type_t init_handler) {
       //---------------------------------------------------------------------------
 
     } else {
-      if (n && window[n].foreground == 2) {
+      if (n && window[n].foreground == WF_MINIMIZED) {
         divdelete(0);
         move(0, n - 1);
         maximize_window();
       } else if (n) {
-        if (window[n].foreground == 0) {
+        if (window[n].foreground == WF_BACKGROUND) {
           divdelete(0);
           move(0, n - 1);
           for (m = 1; m < MAX_WINDOWS; m++)
-            if (window[m].type && window[m].foreground == 1)
+            if (window[m].type && window[m].foreground == WF_FOREGROUND)
               if (windows_collide(0, m)) {
-                window[m].foreground = 0;
+                window[m].foreground = WF_BACKGROUND;
                 flush_window(m);
               }
-          v.foreground = 1;
+          v.foreground = WF_FOREGROUND;
           flush_window(0);
         } else { // When the requested menu is already in the foreground, highlight it
           divdelete(0);
@@ -1536,7 +1536,7 @@ void init_flush(void);
 void explode(int x, int y, int w, int h) {
   int n = 0, tipo = v.type, b = big;
   int xx, yy, aan, aal;
-  v.type = 0;
+  v.type = WIN_EMPTY;
   big = 0;
   if (draw_mode < 100) {
     if (b)
@@ -1619,7 +1619,7 @@ void implode(int x, int y, int w, int h) {
 void extrude(int x, int y, int w, int h, int x2, int y2, int w2, int h2) {
   int n = 9, tipo = v.type, b = big;
   int xx, yy, aan, aal;
-  v.type = 0;
+  v.type = WIN_EMPTY;
   big = 0;
   if (draw_mode < 100) {
     if (b)
@@ -1688,7 +1688,7 @@ void deactivate(void) { // Minimize: deactivate
       wwrite(v.ptr, w, h, 2 + (w - 20) / 2, 2, 1, v.title, c2);
     }
     for (m = 1; m < MAX_WINDOWS; m++)
-      if (window[m].type == v.type && window[m].foreground < 2) {
+      if (window[m].type == v.type && window[m].foreground != WF_MINIMIZED) {
         window[m].state = 1;
         wgra(window[m].ptr, window[m].w / big2, window[m].h / big2, c_b_low, 2, 2,
              window[m].w / big2 - 20, 7);
@@ -1706,7 +1706,7 @@ void deactivate(void) { // Minimize: deactivate
         flush_window(m);
         break;
       }
-    if (v.type == 102)
+    if (v.type == WIN_CODE)
       call((void_return_type_t)v.paint_handler); // Erase cursor
   }
 }
@@ -1747,7 +1747,7 @@ void activate(void) {
         wwrite(window[m].ptr, window[m].w / big2, window[m].h / big2,
                2 + (window[m].w / big2 - 20) / 2, 2, 1, window[m].title, c2);
       }
-      if (v.type == 102 && window[m].type == 102) { // Erase cursor
+      if (v.type == WIN_CODE && window[m].type == WIN_CODE) { // Erase cursor
         wup(m);
         call((void_return_type_t)v.paint_handler);
         wdown(m);
