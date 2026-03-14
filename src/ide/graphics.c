@@ -679,7 +679,7 @@ void interpolation_mode(void) {
         blit_interpolated(w);
 
         blit_edit();
-      } while (!(mouse_b & MB_RIGHT) && !key(_ESC) && draw_mode < 100 &&
+      } while (!(mouse_b & MB_RIGHT) && !key(_ESC) && draw_mode < TOOL_TRANSITION &&
                !(mouse_b && mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18)));
 
       blit_interpolated(w);
@@ -703,7 +703,7 @@ void interpolation_mode(void) {
     show_dialog(err0);
   }
 
-  draw_mode += 100;
+  draw_mode += TOOL_TRANSITION;
 }
 
 //-----------------------------------------------------------------------------

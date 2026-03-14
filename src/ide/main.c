@@ -861,7 +861,7 @@ void main_loop_tick(void) {
   int llamar;
   char cwork[256], *p;
 
-  if (dragging == 3) {      // drag == 3?
+  if (dragging == DRAG_DONE) {      // drag == 3?
     goto fin_bucle_entorno; // end loop environment
   }
 
@@ -878,15 +878,15 @@ void main_loop_tick(void) {
                                           window[n].y + window[n].h - 1)))
     n++;
 
-  if (n < MAX_WINDOWS && dragging == 4 && window[n].order == drag_source)
-    dragging = 5;
+  if (n < MAX_WINDOWS && dragging == DRAG_DROPPING && window[n].order == drag_source)
+    dragging = DRAG_DROPPED;
 
   //-------------------------------------------------------------------------
   //  Drag onto the wallpaper
   //-------------------------------------------------------------------------
 
-  if (dragging == 4 && (n == MAX_WINDOWS || window[n].type == WIN_MENU)) {
-    dragging = 5;
+  if (dragging == DRAG_DROPPING && (n == MAX_WINDOWS || window[n].type == WIN_MENU)) {
+    dragging = DRAG_DROPPED;
     free_drag = 0;
     v_title = (char *)texts[57];
     v_text = NULL;
@@ -943,7 +943,7 @@ void main_loop_tick(void) {
   // repaint it (to clear any highlights)
   //-------------------------------------------------------------------------
 
-  if (dragging != 4) {
+  if (dragging != DRAG_DROPPING) {
     if (n == 0)
       if (v.foreground == WF_FOREGROUND)
         if (!mouse_in(v.x + 2 * big2, v.y + 10 * big2, v.x + v.w - 2 * big2, v.y + v.h - 2 * big2))
@@ -1051,7 +1051,7 @@ void main_loop_tick(void) {
   //  Drop something onto a background window
   //-------------------------------------------------------------------------
 
-  if (n < MAX_WINDOWS && window[n].foreground == WF_BACKGROUND && dragging == 4 && v.type >= WIN_EDITOR_MIN &&
+  if (n < MAX_WINDOWS && window[n].foreground == WF_BACKGROUND && dragging == DRAG_DROPPING && v.type >= WIN_EDITOR_MIN &&
       window[n].type != WIN_MENU) {
     move(0, n);
     n = 0;
@@ -1095,10 +1095,10 @@ void main_loop_tick(void) {
     if (mouse_in(v.x + 2 * big2, v.y + 10 * big2, v.x + v.w - 2 * big2, v.y + v.h - 2 * big2)) {
       llamar = 1; // Call its click_handler
 
-      if (v.type == WIN_MAP && dragging != 4) {
-        if (dragging == 1) {
+      if (v.type == WIN_MAP && dragging != DRAG_DROPPING) {
+        if (dragging == DRAG_PENDING) {
           drag_graphic = 8;
-          dragging = 2;
+          dragging = DRAG_ACTIVE;
           map_width = v.mapa->map_width;
           map_height = v.mapa->map_height;
         }
@@ -1119,7 +1119,7 @@ void main_loop_tick(void) {
 
       // tipo==106 (3D map window) check removed (MODE8/3D map editor deleted)
 
-      if (v.type >= WIN_EDITOR_MIN && dragging == 4) {
+      if (v.type >= WIN_EDITOR_MIN && dragging == DRAG_DROPPING) {
         if (v.type == WIN_MAP)
           mouse_b |= 1;
         activate();
@@ -1985,7 +1985,7 @@ void initialization(void) {
     undo_table[a].mode = -1;
   color = 0;
   default_gradients();
-  draw_mode = 101;
+  draw_mode = TOOL_TRANSITION + TOOL_PENCIL;
   mode_fill = 0;
   mode_circle = 0;
   mode_rect = 1;
@@ -2022,7 +2022,7 @@ void initialization(void) {
   mouse_graf = CURSOR_ARROW;
   set_mouse(mouse_x, mouse_y); // set_mickeys(8);
 
-  dragging = 0;
+  dragging = DRAG_IDLE;
 
   update_box(0, 0, vga_width, vga_height);
 

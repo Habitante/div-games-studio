@@ -102,7 +102,7 @@ void edit_mode_10(void) {
         sel_status = 0;
         box_to_sel_mask();
         move_selection(NULL, 0, 0);
-        if (draw_mode < 100) {
+        if (draw_mode < TOOL_TRANSITION) {
           block_bar(1);
           sel_status = 1;
         }
@@ -118,7 +118,7 @@ void edit_mode_10(void) {
         } while (mouse_b & MB_LEFT);
         box_to_sel_mask();
         effects();
-        if (draw_mode < 100) {
+        if (draw_mode < TOOL_TRANSITION) {
           block_bar(1);
           sel_status = 1;
         }
@@ -259,7 +259,7 @@ void edit_mode_10(void) {
 
     blit_edit();
   } while (!exit_requested && !(mouse_b & MB_RIGHT) && !(key(_ESC) && s != 1 && s != 2) &&
-           draw_mode < 100 &&
+           draw_mode < TOOL_TRANSITION &&
            !(mouse_b && mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18)));
 
   sel_status = 0;
@@ -1610,7 +1610,7 @@ void move_selection(byte *sp, int w, int h) {
           if (save_undo(_coord_x - xg, _coord_y - yg, w, h))
             sp_normal(sp, _coord_x, _coord_y, w, h, xg, yg, block * 2 + ghost);
           else
-            draw_mode = 110;
+            draw_mode = TOOL_TRANSITION + TOOL_SELECT;
         } else {
           bar_width = w;
           _al = h;
@@ -1620,7 +1620,7 @@ void move_selection(byte *sp, int w, int h) {
           if (save_undo(_x, _y, bar_width, _al))
             sp_rotated(sp, _coord_x, _coord_y, w, h, xg, yg, block * 2 + ghost, ang, size);
           else
-            draw_mode = 110;
+            draw_mode = TOOL_TRANSITION + TOOL_SELECT;
         }
       }
       if (s == 2 || s == 4)
@@ -1734,7 +1734,7 @@ void move_selection(byte *sp, int w, int h) {
     } else
       tab_cycling = 0;
 
-  } while (!exit_requested && !(mouse_b & MB_RIGHT) && !(key(_ESC) && !s) && draw_mode < 100 &&
+  } while (!exit_requested && !(mouse_b & MB_RIGHT) && !(key(_ESC) && !s) && draw_mode < TOOL_TRANSITION &&
            !(mouse_b && mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18)));
 
   if (key(_ESC) ||
@@ -1839,7 +1839,7 @@ void effects(void) {
     test_next();
 
     blit_edit();
-  } while (!exit_requested && !(mouse_b & MB_RIGHT) && !key(_ESC) && draw_mode < 100 &&
+  } while (!exit_requested && !(mouse_b & MB_RIGHT) && !key(_ESC) && draw_mode < TOOL_TRANSITION &&
            !(mouse_b && mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18)));
 
   if (key(_ESC) ||

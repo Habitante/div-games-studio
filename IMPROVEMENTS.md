@@ -13,7 +13,7 @@ architecture docs, code review, and discussion with Daniel Navarro.
 
 | # | Improvement | Status | Risk |
 |---|-------------|--------|------|
-| 1 | [Enums & constants](#1-enums--constants) | Sprints 1-3b DONE, sprints 4-6 open | Very low |
+| 1 | [Enums & constants](#1-enums--constants) | Sprints 1-4 DONE, sprints 5-6 open | Very low |
 | 2 | [Testing infrastructure](#2-testing-infrastructure) | — | None |
 | 3 | [File format hardening + modern imports](#3-file-format-hardening--modern-imports) | — | Low |
 | 4 | [Help translation quality pass](#4-help-translation-quality-pass) | — | Low |
@@ -169,14 +169,17 @@ code editor, help viewer, browser, debugger, and listbox widgets:
 `handler_map.c`, `handler_dialogs.c`, `compiler.c`, `palette.c`,
 `fpg.c` (formats), `debugger.c`, `debugger_ui.c`.
 
-#### G. Paint editor draw modes (`draw_mode`)
+#### G. Paint editor draw modes (`draw_mode`) — DONE
 
-The `draw_mode` variable serves double duty: values 0-13 identify the
-active tool, and values >= 100 signal tool transitions (the outer loop
-subtracts 100 and dispatches).
+Defined in `div_enums.h` as `enum draw_mode_id`. The `draw_mode`
+variable serves double duty: values 0-13 identify the active tool,
+and values >= 100 signal tool transitions (the outer loop subtracts
+100 and dispatches). All `draw_mode < 100` / `>= 100` checks replaced
+with `TOOL_TRANSITION`. F-key assignments, switch case labels, and
+the special `TOOL_PASTE` (90) value all replaced.
 
-| Value | Tool | Proposed name |
-|-------|------|---------------|
+| Value | Tool | Name |
+|-------|------|------|
 | 0 | Pixels (point-and-click) | `TOOL_PIXELS` |
 | 1 | Pencil/freehand strokes | `TOOL_PENCIL` |
 | 2 | Lines | `TOOL_LINES` |
@@ -191,17 +194,23 @@ subtracts 100 and dispatches).
 | 11 | Undo history | `TOOL_UNDO` |
 | 12 | Control points | `TOOL_CTRLPOINTS` |
 | 13 | Text | `TOOL_TEXT` |
+| 90 | Paste graphic (map editor) | `TOOL_PASTE` |
 | 100 | Tool transition offset | `TOOL_TRANSITION` |
 
-The `draw_mode < 100` / `>= 100` checks become `draw_mode < TOOL_TRANSITION`.
+**Files:** `paint.c`, `paint_tools.c`, `paint_select.c`, `brush.c`,
+`mouse.c`, `handler_map.c`, `main.c`, `main_desktop.c`,
+`main_dialogs.c`, `help.c`, `graphics.c`.
 
-**Files:** `paint.c`, `paint_tools.c`, `paint_select.c`, `mouse.c`,
-`handler_map.c`.
+#### H. Block selection state (code editor) — DONE
 
-#### H. Block selection state (code editor)
+Defined in `div_enums.h` as `enum block_state_id`, `enum block_mode_id`,
+and `enum clipboard_type_id`. All raw comparisons and assignments
+replaced. `block_state & 1` patterns replaced with
+`block_state == BLOCK_PIVOT` (semantically identical). Bare boolean
+checks (`if (block_state)`) left as-is.
 
-| Variable | Value | Meaning | Proposed name |
-|----------|-------|---------|---------------|
+| Variable | Value | Meaning | Name |
+|----------|-------|---------|------|
 | `block_state` | 0 | No block | `BLOCK_NONE` |
 | `block_state` | 1 | Pivot set | `BLOCK_PIVOT` |
 | `block_state` | 2 | Complete | `BLOCK_COMPLETE` |
@@ -211,12 +220,15 @@ The `draw_mode < 100` / `>= 100` checks become `draw_mode < TOOL_TRANSITION`.
 | `clipboard_type` | 0 | Character data | `CLIP_CHAR` |
 | `clipboard_type` | 1 | Line data | `CLIP_LINE` |
 
-**Files:** `editor.c`, `editor_edit.c`, `editor_render.c`.
+**Files:** `editor.c`, `editor_edit.c`, `editor_render.c`, `editor_file.c`.
 
-#### I. Drag-and-drop state (`dragging`)
+#### I. Drag-and-drop state (`dragging`) — DONE
 
-| Value | Meaning | Proposed name |
-|-------|---------|---------------|
+Defined in `div_enums.h` as `enum drag_state`. All raw comparisons,
+assignments, and switch case labels replaced across 8 files.
+
+| Value | Meaning | Name |
+|-------|---------|------|
 | 0 | Idle | `DRAG_IDLE` |
 | 1 | Pending (mouse down) | `DRAG_PENDING` |
 | 2 | Dragging (in flight) | `DRAG_ACTIVE` |
@@ -224,7 +236,8 @@ The `draw_mode < 100` / `>= 100` checks become `draw_mode < TOOL_TRANSITION`.
 | 4 | Dropping (over target) | `DRAG_DROPPING` |
 | 5 | Dropped (completed) | `DRAG_DROPPED` |
 
-**Files:** `main.c`, `handler_map.c`.
+**Files:** `mouse.c`, `main.c`, `handler_map.c`, `handler.c`,
+`editor.c`, `font.c`, `fpg.c`, `trash.c`.
 
 #### J. Mouse button bits (`mouse_b`) — DONE
 
@@ -365,10 +378,11 @@ replaced ~170 raw patterns across 18 files:
 Also added `#undef _X`/`_Y`/`_Z` guards in `inter.h` to resolve
 conflicts between keyboard scan code and process field offset defines.
 
-**Bug noted:** Ctrl+navigation extended scan codes (`_C_UP`, `_C_LEFT`,
-etc.) are defined but never mapped in the SDL2 OSDEP layer — `key(_C_UP)`
-always returns false. Canvas panning in `mouse.c` works because it also
-checks `key(_UP)` as fallback.
+**Bug fixed:** Ctrl+navigation extended scan codes (`_C_UP`, `_C_LEFT`,
+etc.) were never mapped in SDL2 — `key(_C_UP)` always returned false.
+Fixed: `read_mouse2()` and runtime `poll_keyboard()` now synthesize
+`_C_*` flags from base key + MOD_CTRL. Dead `key(_C_*)` checks removed
+from paint editor; Ctrl+arrows/OPQA now pans the canvas viewport.
 
 **Files:** `editor.c`, `editor_file.c`, `paint_tools.c`, `paint_select.c`,
 `main.c`, `main_dialogs.c`, `help.c`, `mouse.c`, `video.c`,
@@ -393,7 +407,7 @@ Each sprint is one self-contained commit.
 | 2 — Menu and UI constants | E. Menu bases, P. Alignment modes, O. Menu metrics | DONE |
 | 3 — Input state enums | F. Cursor IDs, J. Mouse buttons, K. Modifiers | DONE |
 | 3b — Scan codes & ASCII | R. Scan code constants, S. ASCII constants, K. Lock-key modifiers | DONE |
-| 4 — Editor state enums | G. Draw modes, H. Block state, I. Drag-and-drop | — |
+| 4 — Editor state enums | G. Draw modes, H. Block state, I. Drag-and-drop | DONE |
 | 5 — Palette and format constants | O. Palette/ghost/cuad sizes, `MAX_FPG_GRAPHICS`, Q. Format offsets | — |
 | 6 — Runtime enums | L. Process status, M. Coordinate types, N. Sprite flags | — |
 

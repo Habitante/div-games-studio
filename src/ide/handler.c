@@ -1404,7 +1404,7 @@ void update_menu(int menu, int min, int max) {
   byte *ptr = v.ptr, *p, *q;
   int w = v.w / big2, h = v.h / big2, n;
 
-  if (dragging == 4)
+  if (dragging == DRAG_DROPPING)
     return;
 
   menu++;

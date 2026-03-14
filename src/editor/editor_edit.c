@@ -17,10 +17,10 @@ void f_mark(void) {
 
   remove_spaces();
 
-  if (block_state == 2)
+  if (block_state == BLOCK_COMPLETE)
     if (kprg == v.prg) {
       if (in_block()) {
-        block_state = 1;
+        block_state = BLOCK_PIVOT;
         block_start = v.prg->lptr;
         if ((block_col1 = v.prg->column) > strlen(v.prg->l))
           block_col1 = strlen(v.prg->l) + 1;
@@ -46,11 +46,11 @@ void f_mark(void) {
         wdown(n);
         flush_window(n);
       }
-      block_state = 0;
+      block_state = BLOCK_NONE;
       f_mark();
     }
-  else if (block_state == 1) {
-    block_state = 2;
+  else if (block_state == BLOCK_PIVOT) {
+    block_state = BLOCK_COMPLETE;
     block_end = v.prg->lptr;
     if ((block_col2 = v.prg->column) > strlen(v.prg->l))
       block_col2 = strlen(v.prg->l) + 1;
@@ -62,8 +62,8 @@ void f_mark(void) {
       block_col1 = block_col2;
       block_col2 = n;
     }
-  } else if (block_state == 0) {
-    block_state = 1;
+  } else if (block_state == BLOCK_NONE) {
+    block_state = BLOCK_PIVOT;
     block_start = v.prg->lptr;
     kprg = v.prg;
     if ((block_col1 = v.prg->column) > strlen(v.prg->l))
@@ -87,8 +87,8 @@ void f_unmark(void) {
       flush_window(n);
     }
   }
-  block_state = 0;
-  edit_block_mode = 0;
+  block_state = BLOCK_NONE;
+  edit_block_mode = BMODE_NONE;
   v.redraw++;
 }
 
@@ -118,9 +118,9 @@ void f_cut(int mode) { // 0-Copy, 1-Cut, 2-Delete
   int n, num_lines, num_lineas2, num_lineas3;
   byte *k1, *k2;
 
-  if (block_state == 0)
+  if (block_state == BLOCK_NONE)
     return;
-  else if (block_state & 1)
+  else if (block_state == BLOCK_PIVOT)
     f_mark();
   write_line();
   if (block_col1 > linelen(block_start))
@@ -205,7 +205,7 @@ void f_cut(int mode) { // 0-Copy, 1-Cut, 2-Delete
 
     v.prg->num_lines -= num_lines;
 
-    block_state = 0;
+    block_state = BLOCK_NONE;
   }
 
   read_line();
@@ -231,7 +231,7 @@ void f_paste_block(void) {
   byte *ini, *p;
   int espacios, n, col = 0;
 
-  if (clipboard_type == 1) {
+  if (clipboard_type == CLIP_LINE) {
     col = v.prg->column;
     v.prg->column = 1;
   }
@@ -242,7 +242,7 @@ void f_paste_block(void) {
 
     check_memory(clipboard_len);
 
-    block_state = 2;
+    block_state = BLOCK_COMPLETE;
     kprg = v.prg;
     block_start = v.prg->lptr;
     block_col1 = v.prg->column; // Set block_start
@@ -338,7 +338,7 @@ void f_down(void) {
       v.redraw++;
     }
   }
-  if (block_state & 1)
+  if (block_state == BLOCK_PIVOT)
     v.redraw++;
 }
 
@@ -352,7 +352,7 @@ void f_up(void) {
       v.redraw++;
     }
   }
-  if (block_state & 1)
+  if (block_state == BLOCK_PIVOT)
     v.redraw++;
 }
 
@@ -449,7 +449,7 @@ void f_delete_char(void) {
         block_col2--;
       else if (block_col2 == v.prg->column) {
         if (block_start == v.prg->lptr && block_col1 == block_col2)
-          block_state = 0;
+          block_state = BLOCK_NONE;
         else if (block_col2 == 1) {
           retreat_lptr();
           block_end = v.prg->lptr;
@@ -600,7 +600,7 @@ void f_enter(void) {
 
 void f_delete(void) {
   if (block_start == v.prg->lptr && block_end == v.prg->lptr)
-    block_state = 0;
+    block_state = BLOCK_NONE;
   else if (block_start == v.prg->lptr)
     block_col1 = 1;
   else if (block_end == v.prg->lptr) {
@@ -712,7 +712,7 @@ void f_eop(void) {
     advance_lptr();
     read_line();
   }
-  if (block_state & 1)
+  if (block_state == BLOCK_PIVOT)
     v.redraw++;
 }
 
@@ -721,7 +721,7 @@ void f_bop(void) {
   v.prg->lptr = v.prg->vptr;
   v.prg->line = v.prg->first_line;
   read_line();
-  if (block_state & 1)
+  if (block_state == BLOCK_PIVOT)
     v.redraw++;
 }
 

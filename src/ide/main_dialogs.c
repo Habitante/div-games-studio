@@ -133,7 +133,7 @@ void dialog_loop(void) {
 
       oldn = -1;
     }
-  else if (draw_mode < 100 && (mouse_b & MB_LEFT)) {
+  else if (draw_mode < TOOL_TRANSITION && (mouse_b & MB_LEFT)) {
     close_window();
     salir_del_dialogo = 1;
   }
@@ -169,7 +169,7 @@ void dialog_loop(void) {
   // Keyboard Control
   //-------------------------------------------------------------------------
 
-  if ((key(_ESC) && !key(_L_CTRL)) || (draw_mode < 100 && (mouse_b & MB_RIGHT))) {
+  if ((key(_ESC) && !key(_L_CTRL)) || (draw_mode < TOOL_TRANSITION && (mouse_b & MB_RIGHT))) {
     for (n = 0; n < v.items; n++)
       if (v.item[n].type == ITEM_TEXT && (v.item[n].state & 2))
         break;
@@ -305,7 +305,7 @@ void show_dialog(void_return_type_t init_handler) {
       vtipo = v.type;
       v.type = WIN_EMPTY; // Megabug workaround
 
-      if (draw_mode >= 100) {
+      if (draw_mode >= TOOL_TRANSITION) {
         if (window[1].type == WIN_DIALOG || window[1].type == WIN_PROGRESS) { // Dialog over dialog
           window[1].foreground = WF_BACKGROUND;
           flush_window(1);

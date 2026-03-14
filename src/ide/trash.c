@@ -29,8 +29,8 @@ void bin2(void) {
   FPG *my_fpg;
   struct twindow my_window;
 
-  if (dragging == 4) {
-    dragging = 5;
+  if (dragging == DRAG_DROPPING) {
+    dragging = DRAG_DROPPED;
     free_drag = 0;
 
     switch (window[1].type) {

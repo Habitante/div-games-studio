@@ -100,7 +100,7 @@ void repaint_full(void) {
   if (block_state && kprg == v.prg) {
     if (block_col1 > linelen(block_start))
       block_col1 = linelen(block_start) + 1;
-    if (block_state & 1) {
+    if (block_state == BLOCK_PIVOT) {
       _kini = block_start;
       _kcol1 = block_col1;
       block_end = v.prg->lptr;
@@ -130,7 +130,7 @@ void repaint_full(void) {
   do {
     old_di = di;
     n = editor_font_height;
-    if (block_state == 0 || kprg != v.prg || si < block_start ||
+    if (block_state == BLOCK_NONE || kprg != v.prg || si < block_start ||
         si > block_end) { // Outside the block
       if (si > v.prg->buffer + v.prg->file_len)
         while (n--) {
@@ -243,7 +243,7 @@ void repaint_full(void) {
 
   } while (--height);
 
-  if ((block_state & 1) && kprg == v.prg) {
+  if ((block_state == BLOCK_PIVOT) && kprg == v.prg) {
     block_start = _kini;
     block_col1 = _kcol1;
   }
@@ -311,7 +311,7 @@ void repaint_partial(void) {
   if (block_state && kprg == v.prg) {
     if (block_col1 > linelen(block_start))
       block_col1 = linelen(block_start) + 1;
-    if (block_state & 1) {
+    if (block_state == BLOCK_PIVOT) {
       _kini = block_start;
       _kcol1 = block_col1;
       block_end = v.prg->lptr;
@@ -335,7 +335,7 @@ void repaint_partial(void) {
   si = v.prg->lptr;
 
   n = editor_font_height;
-  if (block_state == 0 || kprg != v.prg || si < block_start ||
+  if (block_state == BLOCK_NONE || kprg != v.prg || si < block_start ||
       si > block_end) { // Outside the block
     while (n--) {
       memset(di, ce1, v.w - 12 * big2);
@@ -395,7 +395,7 @@ void repaint_partial(void) {
     si++;
   }
 
-  if ((block_state & 1) && kprg == v.prg) {
+  if ((block_state == BLOCK_PIVOT) && kprg == v.prg) {
     block_start = _kini;
     block_col1 = _kcol1;
   }
@@ -763,7 +763,7 @@ int in_block(void) {
 
   if (kprg != v.prg)
     return (0);
-  if (block_state & 1)
+  if (block_state == BLOCK_PIVOT)
     return (1);
   else if (block_state && v.prg->lptr >= block_start && v.prg->lptr <= block_end)
     if (v.prg->lptr > block_start && v.prg->lptr < block_end)

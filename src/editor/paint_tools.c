@@ -83,7 +83,7 @@ void edit_scr(void) {
     // ...
 
     blit_edit();
-  } while (!exit_requested && !(mouse_b & MB_RIGHT) && !key(_ESC) && draw_mode < 100 &&
+  } while (!exit_requested && !(mouse_b & MB_RIGHT) && !key(_ESC) && draw_mode < TOOL_TRANSITION &&
            !(mouse_b && mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18)));
 }
 
@@ -132,7 +132,7 @@ void edit_mode_0(void) {
     }
 
     blit_edit();
-  } while (!exit_requested && !(mouse_b & MB_RIGHT) && !key(_ESC) && draw_mode < 100 &&
+  } while (!exit_requested && !(mouse_b & MB_RIGHT) && !key(_ESC) && draw_mode < TOOL_TRANSITION &&
            !(mouse_b && mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18)));
 }
 
@@ -199,7 +199,7 @@ void edit_mode_1(void) {
     _y = coord_y;
     _b = mouse_b;
     blit_edit();
-  } while (!exit_requested && !(mouse_b & MB_RIGHT) && !key(_ESC) && draw_mode < 100 &&
+  } while (!exit_requested && !(mouse_b & MB_RIGHT) && !key(_ESC) && draw_mode < TOOL_TRANSITION &&
            !(mouse_b && mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18)));
 }
 
@@ -304,7 +304,7 @@ void edit_mode_2(void) {
       need_zoom = 0;
     }
 
-  } while (!exit_requested && !(mouse_b & MB_RIGHT) && !(key(_ESC) && s != 1) && draw_mode < 100 &&
+  } while (!exit_requested && !(mouse_b & MB_RIGHT) && !(key(_ESC) && s != 1) && draw_mode < TOOL_TRANSITION &&
            !(mouse_b && mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18)));
 }
 
@@ -412,7 +412,7 @@ void edit_mode_3(void) {
       need_zoom = 0;
     }
 
-  } while (!exit_requested && !(mouse_b & MB_RIGHT) && !(key(_ESC) && s != 1) && draw_mode < 100 &&
+  } while (!exit_requested && !(mouse_b & MB_RIGHT) && !(key(_ESC) && s != 1) && draw_mode < TOOL_TRANSITION &&
            !(mouse_b && mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18)));
 }
 
@@ -563,7 +563,7 @@ void edit_mode_4(void) {
       need_zoom = 0;
     }
 
-  } while (!exit_requested && !(mouse_b & MB_RIGHT) && !(key(_ESC) && s != 1) && draw_mode < 100 &&
+  } while (!exit_requested && !(mouse_b & MB_RIGHT) && !(key(_ESC) && s != 1) && draw_mode < TOOL_TRANSITION &&
            !(mouse_b && mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18)));
 }
 
@@ -715,7 +715,7 @@ void edit_mode_5(void) {
       need_zoom = 0;
     }
 
-  } while (!exit_requested && !(mouse_b & MB_RIGHT) && !(key(_ESC) && s != 1) && draw_mode < 100 &&
+  } while (!exit_requested && !(mouse_b & MB_RIGHT) && !(key(_ESC) && s != 1) && draw_mode < TOOL_TRANSITION &&
            !(mouse_b && mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18)));
 }
 
@@ -837,7 +837,7 @@ void edit_mode_6(void) {
       need_zoom = 0;
     }
 
-  } while (!exit_requested && !(mouse_b & MB_RIGHT) && !(key(_ESC) && s != 1) && draw_mode < 100 &&
+  } while (!exit_requested && !(mouse_b & MB_RIGHT) && !(key(_ESC) && s != 1) && draw_mode < TOOL_TRANSITION &&
            !(mouse_b && mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18)));
 }
 
@@ -986,7 +986,7 @@ void edit_mode_7(void) {
       need_zoom = 0;
     }
 
-  } while (!exit_requested && !(mouse_b & MB_RIGHT) && !(key(_ESC) && s != 1) && draw_mode < 100 &&
+  } while (!exit_requested && !(mouse_b & MB_RIGHT) && !(key(_ESC) && s != 1) && draw_mode < TOOL_TRANSITION &&
            !(mouse_b && mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18)));
 }
 
@@ -1097,7 +1097,7 @@ void edit_mode_8(void) {
       u = undo_spray;
 
     blit_edit();
-  } while (!exit_requested && !(mouse_b & MB_RIGHT) && !key(_ESC) && draw_mode < 100 &&
+  } while (!exit_requested && !(mouse_b & MB_RIGHT) && !key(_ESC) && draw_mode < TOOL_TRANSITION &&
            !(mouse_b && mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18)));
 }
 
@@ -1146,7 +1146,7 @@ void edit_mode_9(void) {
 
     blit_edit();
 
-  } while (!exit_requested && !(mouse_b & MB_RIGHT) && !key(_ESC) && draw_mode < 100 &&
+  } while (!exit_requested && !(mouse_b & MB_RIGHT) && !key(_ESC) && draw_mode < TOOL_TRANSITION &&
            !(mouse_b && mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18)));
 }
 
@@ -1198,7 +1198,7 @@ void edit_mode_11(void) {
     }
 
     blit_edit();
-  } while (!exit_requested && !(mouse_b & MB_RIGHT) && !key(_ESC) && draw_mode < 100 &&
+  } while (!exit_requested && !(mouse_b & MB_RIGHT) && !key(_ESC) && draw_mode < TOOL_TRANSITION &&
            !(mouse_b && mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18)));
 }
 
@@ -1421,7 +1421,7 @@ void edit_mode_12(void) {
     }
 
     blit_edit();
-  } while (!exit_requested && !(mouse_b & MB_RIGHT) && !(key(_ESC) && hotkey) && draw_mode < 100 &&
+  } while (!exit_requested && !(mouse_b & MB_RIGHT) && !(key(_ESC) && hotkey) && draw_mode < TOOL_TRANSITION &&
            !(mouse_b && mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18)));
 
   text_bar_active = 0;
@@ -1664,7 +1664,7 @@ void edit_mode_13(void) {
 
     blit_edit();
 
-  } while (!exit_requested && !(mouse_b & MB_RIGHT) && !key(_ESC) && draw_mode < 100 &&
+  } while (!exit_requested && !(mouse_b & MB_RIGHT) && !key(_ESC) && draw_mode < TOOL_TRANSITION &&
            !(mouse_b && mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18)));
 
   sel_status = 0;

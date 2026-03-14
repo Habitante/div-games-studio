@@ -27,7 +27,7 @@ void on_window_moved(int x, int y, int w, int h) {
 
   n = v.type;
   v.type = WIN_EMPTY;
-  if (draw_mode < 100) {
+  if (draw_mode < TOOL_TRANSITION) {
     draw_edit_background(x, y, w, h);
     flush_bars(0);
     update_dialogs(x, y, w, h);
@@ -268,7 +268,7 @@ void close_window(void) {
   w = v.w;
   h = v.h;
   div_delete(0);
-  if (draw_mode < 100) {
+  if (draw_mode < TOOL_TRANSITION) {
     draw_edit_background(x, y, w, h);
     flush_bars(0);
     update_dialogs(x, y, w, h);
@@ -279,7 +279,7 @@ void close_window(void) {
     if (v.type == WIN_DIALOG || v.type == WIN_PROGRESS) { // Dialog over dialog: only show the last one
       v.foreground = WF_FOREGROUND;
       flush_window(0);
-    } else if (draw_mode >= 100)
+    } else if (draw_mode >= TOOL_TRANSITION)
       for (n = 0; n < MAX_WINDOWS; n++)
         if (hidden[n]) {
           window[n].foreground = WF_FOREGROUND;
@@ -345,7 +345,7 @@ void move_window(void) {
     blit_partial(x + w - 1, y, 1, h);
     flush_copy();
 
-    if (draw_mode < 100) {
+    if (draw_mode < TOOL_TRANSITION) {
       if (b)
         big = 1;
       draw_edit_background(x, y, w, h);
@@ -1198,7 +1198,7 @@ void flush_copy(void) {
     blit_screen(screen_buffer);
     return;
   }
-  if (draw_mode < 100) {
+  if (draw_mode < TOOL_TRANSITION) {
     save_mouse_bg(mouse_background, mouse_shift_x, mouse_shift_y, mouse_graf, 0);
     put(mouse_shift_x, mouse_shift_y, mouse_graf);
     blit_screen(screen_buffer);
@@ -1538,7 +1538,7 @@ void explode(int x, int y, int w, int h) {
   int xx, yy, aan, aal;
   v.type = WIN_EMPTY;
   big = 0;
-  if (draw_mode < 100) {
+  if (draw_mode < TOOL_TRANSITION) {
     if (b)
       big = 1;
     draw_edit_background(x, y, w, h);
@@ -1560,7 +1560,7 @@ void explode(int x, int y, int w, int h) {
     explode_num = n;
     retrace_wait();
     flush_copy();
-    if (draw_mode < 100) {
+    if (draw_mode < TOOL_TRANSITION) {
       if (b)
         big = 1;
       draw_edit_background(xx, yy, aan, aal);
@@ -1598,7 +1598,7 @@ void implode(int x, int y, int w, int h) {
     blit_partial(xx + aan - 1, yy, 1, aal);
     explode_num = n;
     flush_copy();
-    if (draw_mode < 100) {
+    if (draw_mode < TOOL_TRANSITION) {
       if (b)
         big = 1;
       draw_edit_background(xx, yy, aan, aal);
@@ -1621,7 +1621,7 @@ void extrude(int x, int y, int w, int h, int x2, int y2, int w2, int h2) {
   int xx, yy, aan, aal;
   v.type = WIN_EMPTY;
   big = 0;
-  if (draw_mode < 100) {
+  if (draw_mode < TOOL_TRANSITION) {
     if (b)
       big = 1;
     draw_edit_background(x, y, w, h);
@@ -1643,7 +1643,7 @@ void extrude(int x, int y, int w, int h, int x2, int y2, int w2, int h2) {
     if (first_run != 1)
       flush_copy();
 
-    if (draw_mode < 100) {
+    if (draw_mode < TOOL_TRANSITION) {
       if (b)
         big = 1;
       draw_edit_background(xx, yy, aan, aal);

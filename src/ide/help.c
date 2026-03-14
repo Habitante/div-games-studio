@@ -597,7 +597,7 @@ void resize_help(void) {
     if ((new_block = (byte *)realloc(v.ptr, v.w * v.h)) != NULL) {
       window_surface(v.w, v.h, 0);
 
-      if (draw_mode < 100) {
+      if (draw_mode < TOOL_TRANSITION) {
         draw_edit_background(v.x, v.y, v.w > w ? v.w : w, v.h > h ? v.h : h);
         flush_bars(1);
       }
@@ -607,7 +607,7 @@ void resize_help(void) {
       wput(v.ptr, v.w / big2, v.h / big2, v.w / big2 - 9, v.h / big2 - 9, -44);
       on_window_moved(v.x, v.y, w, h);
 
-      if (draw_mode >= 100) {
+      if (draw_mode >= TOOL_TRANSITION) {
         update_box(v.x, v.y, v.w > w ? v.w : w, v.h > h ? v.h : h);
       }
 

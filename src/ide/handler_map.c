@@ -318,10 +318,10 @@ void map_view2(void) {
       wwrite(v.ptr, w, h, 2 + (w - 20) / 2, 2, 1, v.title, c2);
     }
 
-    if (dragging == 4) {
+    if (dragging == DRAG_DROPPING) {
       mouse_b = 0;
       old_draw_mode = draw_mode;
-      draw_mode = 190;
+      draw_mode = TOOL_TRANSITION + TOOL_PASTE;
     } else
       do {
         read_mouse();
@@ -348,9 +348,9 @@ void map_view2(void) {
     if ((file_paint_fpg = fopen(full, "rb")) != NULL) // NOTE !!! Could provide message here
     {
       div_strcpy((char *)brush_fpg_path, sizeof(brush_fpg_path), full);
-      draw_mode -= 100;
+      draw_mode -= TOOL_TRANSITION;
       M3D_create_thumbs(&texture_list_br, 0);
-      draw_mode += 100;
+      draw_mode += TOOL_TRANSITION;
       texture_type |= BRUSH; // Thumbnail type BRUSH
     }
 
@@ -364,71 +364,71 @@ void map_view2(void) {
       zoom_map();
       need_zoom = 0;
       back = 0;
-      draw_mode -= 100;
+      draw_mode -= TOOL_TRANSITION;
       switch (draw_mode) {
-      case 0:
+      case TOOL_PIXELS:
         edit_mode_0();
         break; // Pixels
-      case 1:
+      case TOOL_PENCIL:
         edit_mode_1();
         break; // Strokes
-      case 2:
+      case TOOL_LINES:
         edit_mode_2();
         break; // Lines
-      case 3:
+      case TOOL_POLYLINE:
         edit_mode_3();
         break; // Lines cont.
-      case 4:
+      case TOOL_BEZIER:
         edit_mode_4();
         break; // Bezier
-      case 5:
+      case TOOL_POLYBEZIER:
         edit_mode_5();
         break; // Bezier cont.
-      case 6:
+      case TOOL_RECT:
         edit_mode_6();
         break; // Boxes
-      case 7:
+      case TOOL_CIRCLE:
         edit_mode_7();
         break; // Circles
-      case 8:
+      case TOOL_SPRAY:
         edit_mode_8();
         break; // Spray
-      case 9:
+      case TOOL_FILL:
         edit_mode_9();
         break; // Fill
-      case 10:
+      case TOOL_SELECT:
         edit_mode_10();
         break; // Cut
-      case 11:
+      case TOOL_UNDO:
         edit_mode_11();
         break; // Undo
-      case 12:
+      case TOOL_CTRLPOINTS:
         edit_mode_12();
         break; // Points
-      case 13:
+      case TOOL_TEXT:
         edit_mode_13();
         break; // Text
-      case 90: // Paste graphic
+      case TOOL_PASTE: // Paste graphic
         sp_w = window[1].mapa->map_width;
         sp_h = window[1].mapa->map_height;
         if ((sp = (byte *)malloc(sp_w * sp_h)) != NULL) {
           memcpy(sp, window[1].mapa->map, sp_w * sp_h);
           move_selection(sp, sp_w, sp_h);
         };
-        dragging = 5;
+        dragging = DRAG_DROPPED;
         break;
       default:
         edit_scr();
         break;
       }
-      if (draw_mode < 100) {
+      if (draw_mode < TOOL_TRANSITION) {
         put_bar(2, 10, 45);
       }
       blit_mouse();
       do {
         read_mouse();
       } while (mouse_b || key(_ESC));
-    } while (draw_mode >= 100);
+    } while (draw_mode >= TOOL_TRANSITION);
     mouse_graf = CURSOR_ARROW;
 
     free(selection_mask);
@@ -441,8 +441,8 @@ void map_view2(void) {
     texture_type = 0;
     browser_type = 0;
 
-    if (draw_mode < 90)
-      draw_mode += 100;
+    if (draw_mode < TOOL_PASTE)
+      draw_mode += TOOL_TRANSITION;
     else
       draw_mode = old_draw_mode;
 

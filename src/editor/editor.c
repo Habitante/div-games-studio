@@ -26,9 +26,9 @@ struct tprg *kprg; // Prg that owns the block
 char *clipboard = NULL; // Pointer to clipboard (initially empty)
 int clipboard_len;      // Clipboard content length in bytes
 int clipboard_lines;    // Number of line breaks contained
-int clipboard_type = 0; // 0-character block, 1-line block
+int clipboard_type = CLIP_CHAR; // 0-character block, 1-line block
 
-int edit_block_mode = 0; // 1-Volatile block on current line, 2-multi-line
+int edit_block_mode = BMODE_NONE; // 1-Volatile block on current line, 2-multi-line
 
 int skip_full_blit = 0; // For skipping full screen blits
 
@@ -82,7 +82,7 @@ void program2(void) {
     h /= 2;
   }
 
-  if (dragging == 4)
+  if (dragging == DRAG_DROPPING)
     v.redraw = 1;
 
   if (wmouse_x != -1 && v.state) {
@@ -297,7 +297,7 @@ void program2(void) {
 
 void program3(void) {
   if (block_state && kprg == v.prg)
-    block_state = 0;
+    block_state = BLOCK_NONE;
 
   free(v.prg->buffer);
   v.prg->buffer = NULL;
@@ -372,7 +372,7 @@ void editor() {
       wup(n);
       write_line();
       read_line();
-      if (block_state == 1)
+      if (block_state == BLOCK_PIVOT)
         f_mark();
       wdown(n);
     }
@@ -385,7 +385,7 @@ void editor() {
 
   //-----------------------------------------------------------------------------
 
-  if (edit_block_mode == 1) { // Single-line block edit
+  if (edit_block_mode == BMODE_CHAR) { // Single-line block edit
 
     if ((shift_status & MOD_SHIFT) && !(shift_status & (MOD_CTRL | MOD_ALT)))
       switch (scan_code) {
@@ -419,7 +419,7 @@ void editor() {
         break;
       case _DEL:
         f_cut_block(1); // shift+delete
-        edit_block_mode = 0;
+        edit_block_mode = BMODE_NONE;
         scan_code = 0;
         break;
       case _HOME: // shift+home
@@ -454,7 +454,7 @@ void editor() {
         break;
       case _X:
         f_cut_block(1); // ctrl+x
-        edit_block_mode = 0;
+        edit_block_mode = BMODE_NONE;
         scan_code = 0;
         break;
       case _C:
@@ -485,7 +485,7 @@ void editor() {
       case _DEL:
         f_cut_block(2); // delete
         scan_code = 0;
-        edit_block_mode = 0;
+        edit_block_mode = BMODE_NONE;
         break;
       default:
         f_unmark();
@@ -510,7 +510,7 @@ void editor() {
           }
         }
         if (block_end != block_start) {
-          edit_block_mode = 2;
+          edit_block_mode = BMODE_LINE;
           block_col1 = 1;
           n = v.prg->column;
           v.prg->column = 1;
@@ -544,7 +544,7 @@ void editor() {
           }
         }
         if (block_end != block_start) {
-          edit_block_mode = 2;
+          edit_block_mode = BMODE_LINE;
           block_col1 = 1;
           block_start = v.prg->lptr;
           block_end = p;
@@ -561,7 +561,7 @@ void editor() {
 
   //-----------------------------------------------------------------------------
 
-  if (edit_block_mode == 2) { // Multi-line block edit
+  if (edit_block_mode == BMODE_LINE) { // Multi-line block edit
 
     if ((shift_status & MOD_SHIFT) && !(shift_status & (MOD_CTRL | MOD_ALT)))
       switch (scan_code) {
@@ -660,8 +660,8 @@ void editor() {
         break;
       case _DEL:
         f_cut_block(1); // shift+delete
-        edit_block_mode = 0;
-        clipboard_type = 1;
+        edit_block_mode = BMODE_NONE;
+        clipboard_type = CLIP_LINE;
         scan_code = 0;
         break;
       default:
@@ -674,13 +674,13 @@ void editor() {
         break;
       case _X:
         f_cut_block(1); // ctrl+x
-        edit_block_mode = 0;
-        clipboard_type = 1;
+        edit_block_mode = BMODE_NONE;
+        clipboard_type = CLIP_LINE;
         scan_code = 0;
         break;
       case _C:
         f_cut_block(0); // ctrl+c
-        clipboard_type = 1;
+        clipboard_type = CLIP_LINE;
         scan_code = 0;
         break;
       case _V:
@@ -697,7 +697,7 @@ void editor() {
       if (key(_INS)) { // ctrl+ins
         key(_INS) = 0;
         f_cut_block(0);
-        clipboard_type = 1;
+        clipboard_type = CLIP_LINE;
         scan_code = 0;
       }
 
@@ -708,7 +708,7 @@ void editor() {
       case _DEL:
         f_cut_block(2); // delete
         scan_code = 0;
-        edit_block_mode = 0;
+        edit_block_mode = BMODE_NONE;
         break;
       default:
         f_unmark();
@@ -758,14 +758,14 @@ void editor() {
 
   //-----------------------------------------------------------------------------
 
-  if (edit_block_mode == 0) { // Only if there is no active edit block
+  if (edit_block_mode == BMODE_NONE) { // Only if there is no active edit block
 
     if ((shift_status & MOD_SHIFT) && !(shift_status & (MOD_CTRL | MOD_ALT)))
       switch (scan_code) {
       case _RIGHT: // shift+right
         f_unmark();
-        edit_block_mode = 1;
-        block_state = 2;
+        edit_block_mode = BMODE_CHAR;
+        block_state = BLOCK_COMPLETE;
         kprg = v.prg;
         block_start = v.prg->lptr;
         block_end = v.prg->lptr;
@@ -776,8 +776,8 @@ void editor() {
       case _LEFT: // shift+left
         if (v.prg->column > 1) {
           f_unmark();
-          edit_block_mode = 1;
-          block_state = 2;
+          edit_block_mode = BMODE_CHAR;
+          block_state = BLOCK_COMPLETE;
           kprg = v.prg;
           block_start = v.prg->lptr;
           block_end = v.prg->lptr;
@@ -788,8 +788,8 @@ void editor() {
         break;
       case _DOWN: // shift+down
         f_unmark();
-        edit_block_mode = 2;
-        block_state = 2;
+        edit_block_mode = BMODE_LINE;
+        block_state = BLOCK_COMPLETE;
         kprg = v.prg;
         block_start = v.prg->lptr;
         block_end = v.prg->lptr;
@@ -801,8 +801,8 @@ void editor() {
         break;
       case _PGDN: // shift+page down
         f_unmark();
-        edit_block_mode = 2;
-        block_state = 2;
+        edit_block_mode = BMODE_LINE;
+        block_state = BLOCK_COMPLETE;
         kprg = v.prg;
         block_start = v.prg->lptr;
         block_col1 = 1;
@@ -817,8 +817,8 @@ void editor() {
       case _UP: // shift+up
         if (v.prg->line > 1) {
           f_unmark();
-          edit_block_mode = 2;
-          block_state = 2;
+          edit_block_mode = BMODE_LINE;
+          block_state = BLOCK_COMPLETE;
           kprg = v.prg;
           f_up();
           block_start = v.prg->lptr;
@@ -828,8 +828,8 @@ void editor() {
         }
         break;
       case _PGUP: // shift+page up
-        edit_block_mode = 2;
-        block_state = 2;
+        edit_block_mode = BMODE_LINE;
+        block_state = BLOCK_COMPLETE;
         kprg = v.prg;
         f_up();
         block_end = v.prg->lptr;
@@ -853,8 +853,8 @@ void editor() {
         break; // shift+delete
       case _HOME: // shift+home
         f_unmark();
-        edit_block_mode = 1;
-        block_state = 2;
+        edit_block_mode = BMODE_CHAR;
+        block_state = BLOCK_COMPLETE;
         kprg = v.prg;
         block_start = v.prg->lptr;
         block_end = v.prg->lptr;
@@ -866,8 +866,8 @@ void editor() {
         break;
       case _END: // shift+end
         f_unmark();
-        edit_block_mode = 1;
-        block_state = 2;
+        edit_block_mode = BMODE_CHAR;
+        block_state = BLOCK_COMPLETE;
         kprg = v.prg;
         block_start = v.prg->lptr;
         block_end = v.prg->lptr;
@@ -882,8 +882,8 @@ void editor() {
       switch (scan_code) {
       case _CTRL_RIGHT: // ctrl+shift+right
         f_unmark();
-        edit_block_mode = 1;
-        block_state = 2;
+        edit_block_mode = BMODE_CHAR;
+        block_state = BLOCK_COMPLETE;
         kprg = v.prg;
         block_start = v.prg->lptr;
         block_col1 = v.prg->column;
@@ -891,7 +891,7 @@ void editor() {
         block_end = v.prg->lptr;
         block_col2 = v.prg->column - 1;
         if (block_end != block_start) {
-          edit_block_mode = 2;
+          edit_block_mode = BMODE_LINE;
           block_col1 = 1;
           n = v.prg->column;
           v.prg->column = 1;
@@ -905,8 +905,8 @@ void editor() {
         break;
       case _CTRL_LEFT: // ctrl+shift+left
         f_unmark();
-        edit_block_mode = 1;
-        block_state = 2;
+        edit_block_mode = BMODE_CHAR;
+        block_state = BLOCK_COMPLETE;
         kprg = v.prg;
         block_end = v.prg->lptr;
         block_col2 = v.prg->column - 1;
@@ -917,7 +917,7 @@ void editor() {
         block_start = v.prg->lptr;
         block_col1 = v.prg->column;
         if (block_end != block_start) {
-          edit_block_mode = 2;
+          edit_block_mode = BMODE_LINE;
           block_col1 = 1;
           block_start = v.prg->lptr;
           block_end = p;

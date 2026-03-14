@@ -102,8 +102,8 @@ void fpg_dialog2(void) {
     break;
   }
 
-  if ((dragging == 4)) { // Released
-    dragging = 5;
+  if ((dragging == DRAG_DROPPING)) { // Released
+    dragging = DRAG_DROPPED;
     free_drag = 0;
 
     if (window[1].mapa->fpg_code) {
@@ -175,14 +175,14 @@ void fpg_dialog2(void) {
     return;
   }
 
-  if (dragging == 1 && my_fpg->list_info.zone >= 10 && !my_fpg->fpg_info) {
+  if (dragging == DRAG_PENDING && my_fpg->list_info.zone >= 10 && !my_fpg->fpg_info) {
     drag_graphic = 8;
-    dragging = 2;
+    dragging = DRAG_ACTIVE;
     return;
   }
 
   if ((my_fpg->list_info.zone >= 10) && (mouse_b & MB_LEFT || prev_mouse_buttons & MB_LEFT) &&
-      (mouse_b != prev_mouse_buttons) && (dragging < 3)) {
+      (mouse_b != prev_mouse_buttons) && (dragging < DRAG_DONE)) {
     Elemento = (my_fpg->list_info.zone - 10) + my_fpg->list_info.first_visible;
 
     if (my_fpg->code_desc[Elemento][0] == 255) {
@@ -196,7 +196,7 @@ void fpg_dialog2(void) {
     v.redraw = 1;
   }
 
-  if ((dragging == 3) && (my_fpg->list_info.zone >= 10)) {
+  if ((dragging == DRAG_DONE) && (my_fpg->list_info.zone >= 10)) {
     Elemento = my_fpg->desc_index[(my_fpg->list_info.zone - 10) + my_fpg->list_info.first_visible];
 
     if ((fpg = fopen((char *)my_fpg->current_file, "rb")) == NULL) {
@@ -265,8 +265,8 @@ void fpg_dialog2(void) {
     v.mapa->zoom_y = y;
     v.redraw = 1;
     return;
-  } else if (dragging == 3)
-    dragging = 0;
+  } else if (dragging == DRAG_DONE)
+    dragging = DRAG_IDLE;
 
   v_pause = 1;
   FPG_update_listbox_br(&my_fpg->list_info);

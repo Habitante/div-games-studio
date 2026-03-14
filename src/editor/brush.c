@@ -205,7 +205,7 @@ void M3D_create_thumbs(struct t_listboxbr *l, int prog) {
   memcpy(FPG_pal, FPG_H.pal, 768);
   create_dac4();
 
-  if (draw_mode < 100) {
+  if (draw_mode < TOOL_TRANSITION) {
     for (n = 0; n < 256; n++) {
       switch ((FPG_pal[n * 3] + FPG_pal[n * 3 + 1] + FPG_pal[n * 3 + 2]) / 22) {
       case 1:
@@ -488,7 +488,7 @@ void M3D_show_thumb(struct t_listboxbr *l, int num) {
     }
 
     if (browser_type != MAPBR) {
-      if (draw_mode < 100 && num_tex == brush_index) {
+      if (draw_mode < TOOL_TRANSITION && num_tex == brush_index) {
         wbox(ptr, w, h, c_b_low, px, py + l->h - 8, l->w, 8);
       }
 
@@ -751,7 +751,7 @@ void mapper_browse_fpg0(void) {
   v.paint_handler = mapper_browse_fpg1;
   v.click_handler = mapper_browse_fpg2;
 
-  if (draw_mode < 100) {
+  if (draw_mode < TOOL_TRANSITION) {
     if (browser_type == MAPBR) {
       memcpy(&copia_br, &texture_list_br, sizeof(texture_list_br));
       memcpy(&texture_list_br, &thumbmap_list_br, sizeof(texture_list_br));

@@ -1589,7 +1589,7 @@ void eyedropper(void) {
       }
 
       blit_edit();
-    } while (!exit_requested && !(mouse_b & MB_RIGHT) && !key(_ESC) && draw_mode < 100 &&
+    } while (!exit_requested && !(mouse_b & MB_RIGHT) && !key(_ESC) && draw_mode < TOOL_TRANSITION &&
              !(mouse_b && mouse_in(toolbar_x, toolbar_y + 10, toolbar_x + 9, toolbar_y + 18)));
 
     if (key(_ESC) ||
@@ -1803,7 +1803,7 @@ void draw_ruler(void) {
 
   wbox(toolbar, vga_width / big2, 19, color, 80, 2, 7, 8); // Color box, triggers select_color()
 
-  if (texture_color == NULL || draw_mode == 0) {
+  if (texture_color == NULL || draw_mode == TOOL_PIXELS) {
     n = (memptrsize)c1 * 3;
     med = dac[n] + dac[n + 1] + dac[n + 2];
     n = color * 3;
@@ -2351,60 +2351,60 @@ void select_mode(void) {
 
   if (!key(_L_SHIFT) && !key(_R_SHIFT)) {
     if (key(_F2)) {
-      draw_mode = 101;
+      draw_mode = TOOL_TRANSITION + TOOL_PENCIL;
       return;
     }
     if (key(_F3)) {
-      draw_mode = 102;
+      draw_mode = TOOL_TRANSITION + TOOL_LINES;
       return;
     }
     if (key(_F4)) {
-      draw_mode = 103;
+      draw_mode = TOOL_TRANSITION + TOOL_POLYLINE;
       return;
     }
     if (key(_F5)) {
-      draw_mode = 104;
+      draw_mode = TOOL_TRANSITION + TOOL_BEZIER;
       return;
     }
     if (key(_F6)) {
-      draw_mode = 105;
+      draw_mode = TOOL_TRANSITION + TOOL_POLYBEZIER;
       return;
     }
     if (key(_F7)) {
-      draw_mode = 106;
+      draw_mode = TOOL_TRANSITION + TOOL_RECT;
       return;
     }
     if (key(_F8)) {
-      draw_mode = 107;
+      draw_mode = TOOL_TRANSITION + TOOL_CIRCLE;
       return;
     }
     if (key(_F9)) {
-      draw_mode = 108;
+      draw_mode = TOOL_TRANSITION + TOOL_SPRAY;
       return;
     }
     if (key(_F10)) {
-      draw_mode = 109;
+      draw_mode = TOOL_TRANSITION + TOOL_FILL;
       return;
     }
     if (key(_F11)) {
-      draw_mode = 110;
+      draw_mode = TOOL_TRANSITION + TOOL_SELECT;
       return;
     }
     if (key(_F12)) {
-      draw_mode = 111;
+      draw_mode = TOOL_TRANSITION + TOOL_UNDO;
       return;
     }
   } else {
     if (key(_F1)) {
-      draw_mode = 112;
+      draw_mode = TOOL_TRANSITION + TOOL_CTRLPOINTS;
       return;
     }
     if (key(_F2)) {
-      draw_mode = 113;
+      draw_mode = TOOL_TRANSITION + TOOL_TEXT;
       return;
     }
     if (key(_F3)) {
-      draw_mode = 100;
+      draw_mode = TOOL_TRANSITION + TOOL_PIXELS;
       return;
     }
   }
@@ -2417,7 +2417,7 @@ void select_mode(void) {
     icons_mode[12] = mode_selection + 167 - 4;
   r = select_icon(toolbar_x + 10, icons_mode);
   if (r >= 0)
-    draw_mode = r + 100;
+    draw_mode = r + TOOL_TRANSITION;
 }
 
 //-----------------------------------------------------------------------------
@@ -4027,50 +4027,50 @@ void draw_bar(int bar_width) {
     n++;
   }
   switch (draw_mode) {
-  case 0:
+  case TOOL_PIXELS:
     put_bar_inv(10, 2, 177);
     break;
-  case 1:
+  case TOOL_PENCIL:
     put_bar_inv(10, 2, 160);
     break;
-  case 2:
+  case TOOL_LINES:
     put_bar_inv(10, 2, 161);
     break;
-  case 3:
+  case TOOL_POLYLINE:
     put_bar_inv(10, 2, 178);
     break;
-  case 4:
+  case TOOL_BEZIER:
     put_bar_inv(10, 2, 162);
     break;
-  case 5:
+  case TOOL_POLYBEZIER:
     put_bar_inv(10, 2, 179);
     break;
-  case 6:
+  case TOOL_RECT:
     put_bar_inv(10, 2, 163);
     break;
-  case 7:
+  case TOOL_CIRCLE:
     put_bar_inv(10, 2, 164);
     break;
-  case 8:
+  case TOOL_SPRAY:
     put_bar_inv(10, 2, 180);
     break;
-  case 9:
+  case TOOL_FILL:
     put_bar_inv(10, 2, 165);
     break;
-  case 10:
+  case TOOL_SELECT:
     if (mode_selection < 4) {
       put_bar_inv(10, 2, 131 + mode_selection);
     } else {
       put_bar_inv(10, 2, mode_selection + 167 - 4);
     }
     break;
-  case 11:
+  case TOOL_UNDO:
     put_bar_inv(10, 2, 100);
     break;
-  case 12:
+  case TOOL_CTRLPOINTS:
     put_bar_inv(10, 2, 191);
     break;
-  case 13:
+  case TOOL_TEXT:
     put_bar_inv(10, 2, 190);
     break;
   }

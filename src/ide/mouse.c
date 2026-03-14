@@ -64,7 +64,7 @@ void read_mouse(void) {
   }
   read_mouse2();
 
-  if (draw_mode < 100 && hotkey && !help_paint_active)
+  if (draw_mode < TOOL_TRANSITION && hotkey && !help_paint_active)
     poll_keyboard();
 
   // In paint mode, capture the mouse so SDL keeps sending motion events
@@ -72,7 +72,7 @@ void read_mouse(void) {
   // In fullscreen, grab the window so the mouse can't escape to other
   // monitors. Both are released when leaving paint mode.
   {
-    int want_capture = (draw_mode < 100 && hotkey && !help_paint_active);
+    int want_capture = (draw_mode < TOOL_TRANSITION && hotkey && !help_paint_active);
     if (want_capture != mouse_captured) {
       SDL_CaptureMouse(want_capture ? SDL_TRUE : SDL_FALSE);
       if (OSDEP_IsFullScreen())
@@ -84,7 +84,7 @@ void read_mouse(void) {
   // When mouse is outside the window, force out-of-bounds so no UI
   // element thinks it's being hovered (en_caja checks will all fail).
   if (!mouse_in_window) {
-    if (draw_mode < 100 && hotkey && !help_paint_active) {
+    if (draw_mode < TOOL_TRANSITION && hotkey && !help_paint_active) {
       // Paint mode with capture active: let out-of-bounds coordinates
       // flow through so move_zoom() can use them for canvas scrolling.
       // real_mouse_x/y get the raw (possibly negative / over-bounds) values;
@@ -120,7 +120,7 @@ void read_mouse(void) {
   // motion events. Instead, we detect the cursor sitting at the edge and
   // push real_mouse_x/y past bounds so move_zoom() scrolls.
   // Throttled to ~30 scrolls/sec (every 33ms) for comfortable speed.
-  if (OSDEP_IsFullScreen() && draw_mode < 100 && hotkey && !help_paint_active) {
+  if (OSDEP_IsFullScreen() && draw_mode < TOOL_TRANSITION && hotkey && !help_paint_active) {
     static int last_edge_time = 0;
     int at_edge = 0;
     if (real_mouse_x <= 0 || real_mouse_x >= vga_width - 1)
@@ -148,7 +148,7 @@ void read_mouse(void) {
 
     shift = 1;
 
-    if (draw_mode < 100 && hotkey && !help_paint_active) {
+    if (draw_mode < TOOL_TRANSITION && hotkey && !help_paint_active) {
       if (key(_SPC)) {
         if (mouse_b != MB_KEYBOARD_CLICK) {
           mouse_b = MB_KEYBOARD_CLICK;
@@ -163,7 +163,7 @@ void read_mouse(void) {
     }
 
 
-  } else if (draw_mode < 100 && hotkey && !help_paint_active) { // Keys are only active in edit mode
+  } else if (draw_mode < TOOL_TRANSITION && hotkey && !help_paint_active) { // Keys are only active in edit mode
 
     if (!(shift_status & MOD_CTRL)) {
       // Arrows/OPQA: move pixel cursor
@@ -303,22 +303,22 @@ clamp_mouse:
 
   if (free_drag) {
     switch (dragging) {
-    case 0:
+    case DRAG_IDLE:
       if ((mouse_b & MB_LEFT) && !(prev_mouse_buttons & MB_LEFT)) {
-        dragging = 1;
+        dragging = DRAG_PENDING;
         drag_x = mouse_x;
         drag_y = mouse_y;
       }
       break;
 
-    case 1:
-      dragging = 0;
+    case DRAG_PENDING:
+      dragging = DRAG_IDLE;
       break;
 
-    case 2:
+    case DRAG_ACTIVE:
       if (mouse_b & MB_LEFT) {
         if (abs(mouse_x - drag_x) > 1 || abs(mouse_y - drag_y) > 1) {
-          dragging = 3;
+          dragging = DRAG_DONE;
           wmouse_x = -1;
           wmouse_y = -1;
           mouse_b &= ~MB_LEFT;
@@ -328,18 +328,18 @@ clamp_mouse:
           mouse_graf = drag_graphic;
         }
       } else {
-        dragging = 0;
+        dragging = DRAG_IDLE;
       }
       break;
 
-    case 3:
+    case DRAG_DONE:
       if (!(mouse_b & MB_LEFT)) {
-        dragging = 4;
+        dragging = DRAG_DROPPING;
       }
       break;
 
-    case 4:
-    case 5:
+    case DRAG_DROPPING:
+    case DRAG_DROPPED:
       release_drag();
       break;
     }
@@ -351,7 +351,7 @@ clamp_mouse:
 
 void release_drag(void) {
   int n;
-  dragging = 0;
+  dragging = DRAG_IDLE;
   for (n = 0; n < MAX_WINDOWS; n++) {
     if (window[n].type && window[n].order == drag_source)
       break;
@@ -374,7 +374,7 @@ void release_drag(void) {
       wdown(n);
     }
 
-    if (draw_mode >= 100) {
+    if (draw_mode >= TOOL_TRANSITION) {
       flush_window(n);
     }
     window[n].redraw = 0;

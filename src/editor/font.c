@@ -322,8 +322,8 @@ void fonts2(void) {
     }
   }
 
-  if (dragging == 4) {
-    dragging = 5;
+  if (dragging == DRAG_DROPPING) {
+    dragging = DRAG_DROPPED;
     free_drag = 0;
     if ((wmouse_y > 86) && (wmouse_y < 86 + 24)) {
       if ((wmouse_x > 64) && (wmouse_x < 64 + 41)) {

@@ -504,7 +504,7 @@ void replace_text(void) {
     }
 
     if (encontrado) {
-      block_state = 2;
+      block_state = BLOCK_COMPLETE;
       kprg = v.prg;
       block_start = v.prg->lptr;
       block_col1 = v.prg->column;
@@ -539,7 +539,7 @@ void replace_text(void) {
         f_right();
       } else if (v_accept == 4)
         encontrado = 0;
-      block_state = 0;
+      block_state = BLOCK_NONE;
     }
   } while (encontrado);
 

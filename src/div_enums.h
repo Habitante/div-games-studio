@@ -147,4 +147,54 @@ enum button_align {
 // Paint canvas threshold
 #define CURSOR_ON_CANVAS  10     // Values >= this mean cursor is on canvas
 
+// Paint editor draw modes (draw_mode)
+enum draw_mode_id {
+  TOOL_PIXELS     = 0,   // Point-and-click
+  TOOL_PENCIL     = 1,   // Freehand strokes
+  TOOL_LINES      = 2,   // Lines
+  TOOL_POLYLINE   = 3,   // Continuous lines
+  TOOL_BEZIER     = 4,   // Bezier curves
+  TOOL_POLYBEZIER = 5,   // Continuous bezier
+  TOOL_RECT       = 6,   // Rectangles
+  TOOL_CIRCLE     = 7,   // Circles/ellipses
+  TOOL_SPRAY      = 8,   // Spray
+  TOOL_FILL       = 9,   // Flood fill
+  TOOL_SELECT     = 10,  // Selection/cut
+  TOOL_UNDO       = 11,  // Undo history
+  TOOL_CTRLPOINTS = 12,  // Control points
+  TOOL_TEXT       = 13,  // Text
+  TOOL_PASTE      = 90,  // Paste graphic (map editor)
+  TOOL_TRANSITION = 100, // Tool transition offset (+100 = in menu overlay)
+};
+
+// Code editor block selection state (block_state)
+enum block_state_id {
+  BLOCK_NONE     = 0, // No block
+  BLOCK_PIVOT    = 1, // Pivot set (block_start, block_col1)
+  BLOCK_COMPLETE = 2, // Complete (block_start/end, block_col1/2)
+};
+
+// Code editor block mode (edit_block_mode)
+enum block_mode_id {
+  BMODE_NONE = 0, // No selection
+  BMODE_CHAR = 1, // Character block
+  BMODE_LINE = 2, // Line block
+};
+
+// Clipboard content type (clipboard_type)
+enum clipboard_type_id {
+  CLIP_CHAR = 0, // Character data
+  CLIP_LINE = 1, // Line data
+};
+
+// Drag-and-drop state (dragging)
+enum drag_state {
+  DRAG_IDLE     = 0, // Idle
+  DRAG_PENDING  = 1, // Pending (mouse down)
+  DRAG_ACTIVE   = 2, // Dragging (in flight)
+  DRAG_DONE     = 3, // Done (released)
+  DRAG_DROPPING = 4, // Dropping (over target)
+  DRAG_DROPPED  = 5, // Dropped (completed)
+};
+
 #endif // DIV_ENUMS_H
