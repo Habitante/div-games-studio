@@ -14,7 +14,7 @@ architecture docs, code review, and discussion with Daniel Navarro.
 | # | Improvement | Status | Risk |
 |---|-------------|--------|------|
 | 1 | [Enums & constants](#1-enums--constants) | **DONE** (all 6 sprints) | Very low |
-| 2 | [Testing infrastructure](#2-testing-infrastructure) | — | None |
+| 2 | [Testing infrastructure](#2-testing-infrastructure) | Sprint 1 **DONE** | None |
 | 3 | [File format hardening + modern imports](#3-file-format-hardening--modern-imports) | — | Low |
 | 4 | [Help translation quality pass](#4-help-translation-quality-pass) | — | Low |
 | 5 | [IDE graphics & fonts to FPG/FNT](#5-ide-graphics--fonts--self-hosted-resources) | — | Low |
@@ -492,38 +492,27 @@ catches any mistakes. Each sprint is independently committable.
 faith. The code is battle-tested but has no regression safety net.
 
 **Key insight:** DIV can test itself. The inline help (`help.div`)
-already contains hundreds of working example programs — one for nearly
-every built-in function — and the resources they need (`help.fpg`,
-`help.fnt`, `help.map`, `help.pcm`, etc.) already ship in `div/help/`.
-DIV programs can write results to files via `fopen`/`fwrite`, so a test
-program can run assertions and dump pass/fail counts without human
-interaction.
+contains **150 working example programs** — one for nearly every
+built-in function — and the resources they need (`help.fpg`, `help.fnt`,
+`help.map`, `help.pcm`, etc.) already ship in `div/help/`. The existing
+file I/O API (`fopen`/`fwrite`/`fclose`) can write binary results, and
+`exit("", 0)` cleanly terminates the runtime. No runtime changes needed.
+
+**Source material:** `div/HELP/help.div` contains a documented example
+for every built-in function. These examples are interactive (`LOOP` /
+`FRAME`), so test programs restructure them as non-interactive: run
+assertions, write results, call `exit("", 0)`.
 
 **What to do, in order of ROI:**
 
-### Self-hosted API test suite (highest ROI)
+### Sprint 1: First test + runner (prove the pipeline)
 
-Write DIV programs that systematically test the runtime API — inspired
-by (and harvested from) the help.div example programs, but restructured
-as non-interactive tests that run, assert, and exit:
+One test program, one runner script. Proves the full
+compile → run → report → verify pipeline works end-to-end.
 
-- **`test_math.prg`** — `rand()`, `abs()`, `sqrt()`, `pow()`,
-  `get_distx()`/`get_disty()`, `get_angle()`, `get_dist()`, etc.
-  Pure functions with known inputs/outputs, easy to validate.
-- **`test_strings.prg`** — string operations, `itoa()`, `atoi()`,
-  `strlen()`, `strcpy()`, `strcat()`, etc.
-- **`test_processes.prg`** — process creation, `signal()`, `get_id()`,
-  `collision()`, father/son/sibling relationships, priority scheduling.
-  Spawn processes, run a few frames, verify state.
-- **`test_files.prg`** — `fopen()`/`fread()`/`fwrite()`/`fclose()`,
-  `save()`/`load()`, `encode()`. Write data, read it back, compare.
-- **`test_graphics.prg`** — `load_fpg()`, `load_map()`, `load_pal()`,
-  `map_info()`, `graphic_info()`, using the help resources that already
-  ship with DIV.
-- **`test_scroll.prg`** — `start_scroll()`, `move_scroll()`, Mode 7.
-  Run a few frames, verify no crash.
-
-Each test program follows the same pattern:
+**`div/tests/test_math.prg`** — Tests pure math functions with known
+inputs/outputs: `abs()`, `pow()`, `sqrt()`, `rand()` range checking.
+No graphics, no processes — simplest possible first test.
 
 ```
 PROGRAM test_math;
@@ -531,9 +520,19 @@ GLOBAL
     passed = 0;
     failed = 0;
     handle;
+    result;
+    x;
 BEGIN
-    // --- rand() ---
-    FROM x = 0 TO 100;
+    // --- abs() ---
+    IF (abs(5) == 5) passed++; ELSE failed++; END
+    IF (abs(-5) == 5) passed++; ELSE failed++; END
+    IF (abs(0) == 0) passed++; ELSE failed++; END
+
+    // --- pow() ---
+    IF (pow(2, 10) == 1024) passed++; ELSE failed++; END
+
+    // --- rand() range ---
+    FROM x = 0 TO 99;
         result = rand(1, 10);
         IF (result < 1 OR result > 10)
             failed++;
@@ -542,71 +541,81 @@ BEGIN
         END
     END
 
-    // --- get_distx() at 0 degrees = full distance ---
-    IF (get_distx(0, 100) == 100) passed++; ELSE failed++; END
-
-    // ... more tests ...
-
-    // Dump results to file for the test runner
-    handle = fopen("test_math.result", "w");
-    fwrite(offset passed, 1, handle);
-    fwrite(offset failed, 1, handle);
+    // Write binary results (2 ints: passed, failed)
+    handle = fopen("tests/test_math.result", "w");
+    fwrite(OFFSET passed, 1, handle);
+    fwrite(OFFSET failed, 1, handle);
     fclose(handle);
 
-    // Exit after a few frames
-    FROM x = 0 TO 3; FRAME; END
+    exit("", 0);
 END
 ```
 
-The key challenge is that most DIV programs don't have an explicit exit
-condition (users Alt+X out of them). Test programs must use a counted
-frame loop and then fall off the `END` to terminate cleanly.
+**`div/tests/run_tests.sh`** — Shell script that:
 
-### Test runner script
+1. Cleans old `.result` files
+2. For each `test_*.prg`: compiles with `div -c`, runs with `divrun`,
+   reads the binary result file
+3. Reports: no result file = CRASH, failed > 0 = FAIL, failed == 0 = PASS
+4. Exits non-zero if any test failed
 
-A shell script that orchestrates the test suite:
+**Result format:** Each test writes a binary `.result` file containing
+two 32-bit little-endian ints (passed count, failed count). The runner
+reads them with `od`. Three outcome states:
 
-```bash
-cd div
-for prg in tests/test_*.prg; do
-    system/div-WINDOWS.exe -c "$prg"        # compile
-    system/divrun-WINDOWS.exe               # run (self-terminating)
-    # parse .result file for failures
-done
-```
+- No `.result` file → **CRASH** (runtime died before test completed)
+- `.result` exists, failed > 0 → **FAIL** (test ran, assertions failed)
+- `.result` exists, failed == 0 → **PASS**
 
-### Compiler golden tests
+### Sprint 2: Expand the API test suite
 
-- A set of `.PRG` files that compile to known-good bytecode.
-- A script compiles each and diffs the output `EXEC.EXE` against golden
-  files. Catches parser/codegen regressions instantly.
-- 10-15 programs covering: basic expressions, control flow, processes,
-  structs, arrays, strings, edge cases.
-- Also include programs that should *fail* to compile — verifying that
-  the compiler correctly rejects invalid syntax and produces the right
-  error messages.
+More test programs, same pattern. Harvested from the 150 `help.div`
+examples, restructured as non-interactive assertion-based tests:
 
-### File format round-trip tests
+- **`test_strings.prg`** — `strcpy()`, `strcat()`, `strlen()`,
+  `strcmp()`, `strchr()`, `strstr()`, `strset()`, `upper()`, `lower()`,
+  `strdel()`, `itoa()`.
+- **`test_files.prg`** — `fopen()`/`fwrite()`/`fread()`/`fclose()`/
+  `fseek()`/`ftell()`/`filelength()`. Write data, read back, compare.
+- **`test_processes.prg`** — Process creation, `signal()`, `get_id()`,
+  `collision()`, father/son/sibling, priority scheduling. Spawn
+  processes, run a few frames, verify state.
+- **`test_graphics.prg`** — `load_fpg()`, `load_map()`, `load_pal()`,
+  `map_info()`, `graphic_info()`, using `help/` resources that already
+  ship with DIV.
+- **`test_trig.prg`** — `get_distx()`, `get_disty()`, `get_angle()`,
+  `get_dist()`, `sin()`, `cos()`, `fget_angle()`, `fget_dist()`.
 
-- Create MAP/FPG/FNT in memory, write to disk, read back, compare.
-- Catches parser bugs and format hardening regressions.
-- Could be DIV programs (using `save()`/`load()`) or C-level tests.
+### Sprint 3: IDE smoke test
 
-### Build CI
+A curated `test_session.div` (workspace desktop file) with all editor
+types open: one code editor (tiny PRG), one MAP in paint editor, one
+FPG with a graphic, one FNT, one PCM. Plus a small test program.
 
-- Run all of the above on every push via GitHub Actions.
-- Even just "does it compile with zero warnings on all 4 targets" as a
-  baseline would catch regressions.
+Test sequence: load DIV with this session → compile+run the program →
+return to IDE → save session → exit. Validates the full IDE ↔ runtime
+loop and that all editor types can serialize/deserialize their state.
 
-**Payoff:** DIV tests itself using its own language, its own compiler,
-its own runtime, and its own help resources. The documentation becomes
-the source material for the test suite. Any regression in the compiler
-or runtime that would break a user's program gets caught automatically.
+This requires either a `-test` flag for scripted IDE actions, or a
+carefully designed session that exercises the load → run → return → save
+path with minimal interaction.
 
-**Effort:** 2-3 days for the self-hosted test suite, 1 day for compiler
-golden tests, half a day for CI setup.
-**Risk:** None — purely additive. Test programs live in a `tests/`
-directory and don't affect the build or runtime.
+### CI (when ready)
+
+GitHub Actions with MSYS2/MinGW32:
+
+1. Build all 4 targets with zero warnings (baseline)
+2. Run the self-hosted test suite via `run_tests.sh`
+3. Report pass/fail per test program
+
+**Payoff:** DIV tests itself using its own language, compiler, and
+runtime. The help documentation becomes source material for the test
+suite. Any regression that would break a user's program gets caught.
+
+**Effort:** Sprint 1: half a day. Sprint 2: 1-2 days. Sprint 3: 1-2
+days. CI: half a day.
+**Risk:** None — purely additive. Test programs live in `div/tests/`
+and don't affect the build or runtime.
 
 ---
 
