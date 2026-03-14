@@ -396,12 +396,12 @@ void initialization(void) {
   memcpy(&mem[id_init], &mem[iloc], iloc_pub_len << 2); // *** Init
   mem[id_init + _Id] = id_init;
   mem[id_init + _IdScan] = id_init;
-  mem[id_init + _Status] = 2;
+  mem[id_init + _Status] = PROC_ALIVE;
 
   memcpy(&mem[id_start], &mem[iloc], iloc_pub_len << 2); // *** Main
   mem[id_start + _Id] = id_start;
   mem[id_start + _IdScan] = id_start;
-  mem[id_start + _Status] = 2;
+  mem[id_start + _Status] = PROC_ALIVE;
   mem[id_start + _IP] = mem[1];
 
   mem[id_init + _Son] = id_start;
@@ -800,7 +800,7 @@ inline
   id = id_old;
 
   do {
-    if (mem[id + _Status] == 2 && !mem[id + _Executed] && mem[id + _Priority] > max) {
+    if (mem[id + _Status] == PROC_ALIVE && !mem[id + _Executed] && mem[id + _Priority] > max) {
       ide = id;
       max = mem[id + _Priority];
     }
@@ -878,7 +878,7 @@ void trace_process(void) {
 
   id = id_old;
   do {
-    if (mem[id + _Status] == 2 && !mem[id + _Executed] && mem[id + _Priority] > max) {
+    if (mem[id + _Status] == PROC_ALIVE && !mem[id + _Executed] && mem[id + _Priority] > max) {
       ide = id;
       max = mem[id + _Priority];
     }
@@ -1031,7 +1031,7 @@ void frame_start(void) {
   // Eliminate dead processes
 
   for (ide = id_start; ide <= id_end; ide += iloc_len)
-    if (mem[ide + _Status] == 1)
+    if (mem[ide + _Status] == PROC_KILLED)
       kill_process(ide);
 
 #ifdef DEBUG
@@ -1266,8 +1266,8 @@ void frame_end(void) {
       max = 0x80000000;
 
       for (id = id_start; id <= id_end; id += iloc_len) {
-        if ((mem[id + _Status] == 2 || mem[id + _Status] == 4) && mem[id + _Ctype] == 0 &&
-            !mem[id + _Executed] && mem[id + _Z] > max) {
+        if ((mem[id + _Status] == PROC_ALIVE || mem[id + _Status] == PROC_FROZEN) &&
+            mem[id + _Ctype] == CTYPE_SCREEN && !mem[id + _Executed] && mem[id + _Z] > max) {
           ide = id;
           max = mem[id + _Z];
         }
@@ -1483,15 +1483,15 @@ void kill_process(int id) {
   remove_process(id);
 #endif
 
-  mem[id + _Status] = 0;
+  mem[id + _Status] = PROC_DEAD;
   process_count--;
 
   if ((id2 = mem[id + _Father])) {
     if (mem[id2 + _Son] == id)
       mem[id2 + _Son] = mem[id + _BigBro];
-    if (mem[id + _FCount] > 0 && mem[id2 + _Status] == 3) {
+    if (mem[id + _FCount] > 0 && mem[id2 + _Status] == PROC_SLEEPING) {
       mem[id2 + _Executed] = 0;
-      mem[id2 + _Status] = 2;
+      mem[id2 + _Status] = PROC_ALIVE;
     }
   }
 
@@ -1517,7 +1517,7 @@ void kill_process(int id) {
     mem[id_init + _Son] = mem[id + _Son];
   }
 
-  while (mem[id_end + _Status] == 0 && id_end > id_start) {
+  while (mem[id_end + _Status] == PROC_DEAD && id_end > id_start) {
     id_end -= iloc_len;
   }
 }

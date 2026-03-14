@@ -623,7 +623,7 @@ int processes_executed(void) {
     return (0);
   id = id_old;
   do {
-    if (mem[id + _Status] == 2 && !mem[id + _Executed] && mem[id + _Priority] > max) {
+    if (mem[id + _Status] == PROC_ALIVE && !mem[id + _Executed] && mem[id + _Priority] > max) {
       ide = id;
       max = mem[id + _Priority];
     }
@@ -659,7 +659,7 @@ void determine_ids(void) {
     max = 0x80000000;
     id = id_old;
     do {
-      if (mem[id + _Status] == 2 && mem[id + _Executed] && !mem[id + _Painted] &&
+      if (mem[id + _Status] == PROC_ALIVE && mem[id + _Executed] && !mem[id + _Painted] &&
           mem[id + _Priority] > max) {
         ide = id;
         max = mem[id + _Priority];
@@ -693,7 +693,7 @@ void determine_ids(void) {
     max = 0x80000000;
     id = id_old;
     do {
-      if (mem[id + _Status] == 2 && !mem[id + _Executed] && !mem[id + _Painted] &&
+      if (mem[id + _Status] == PROC_ALIVE && !mem[id + _Executed] && !mem[id + _Painted] &&
           mem[id + _Priority] > max) {
         ide = id;
         max = mem[id + _Priority];
@@ -719,7 +719,7 @@ void determine_ids(void) {
     max = 0x80000000;
     id = id_old;
     do {
-      if (mem[id + _Status] != 0 && !mem[id + _Painted] && mem[id + _Priority] > max) {
+      if (mem[id + _Status] != PROC_DEAD && !mem[id + _Painted] && mem[id + _Priority] > max) {
         ide = id;
         max = mem[id + _Priority];
       }
@@ -767,19 +767,19 @@ void draw_proc_list(void) {
     div_strcat(msg, sizeof(msg), ")");
     wwrite_in_box(ptr, w, 90, h, 10, 21 + (m - ids_ini) * 8, 0, (byte *)msg, x);
     switch (mem[ids[m] + _Status]) {
-    case 0:
+    case PROC_DEAD:
       msg[0] = '-';
       break;
-    case 1:
+    case PROC_KILLED:
       msg[0] = 'K';
       break;
-    case 2:
+    case PROC_ALIVE:
       msg[0] = 'A';
       break;
-    case 3:
+    case PROC_SLEEPING:
       msg[0] = 'S';
       break;
-    case 4:
+    case PROC_FROZEN:
       msg[0] = 'F';
       break;
     default:
@@ -805,16 +805,16 @@ void draw_proc_list(void) {
   div_strcpy(msg, sizeof(msg), (char *)text[19]);
   itoa(ids[ids_select], msg + strlen(msg), 10);
   switch (mem[ids[ids_select] + _Status]) {
-  case 1:
+  case PROC_KILLED:
     div_strcat(msg, sizeof(msg), (char *)text[20]);
     break;
-  case 2:
+  case PROC_ALIVE:
     div_strcat(msg, sizeof(msg), (char *)text[21]);
     break;
-  case 3:
+  case PROC_SLEEPING:
     div_strcat(msg, sizeof(msg), (char *)text[22]);
     break;
-  case 4:
+  case PROC_FROZEN:
     div_strcat(msg, sizeof(msg), (char *)text[23]);
     break;
   default:
@@ -853,17 +853,14 @@ void draw_proc_list(void) {
   wwrite_in_box(ptr, w, w - 2, h, w - 40, 48 + 8, 1, (byte *)msg, c3);
 
   switch (mem[ids[ids_select] + _Ctype]) {
-  case 0:
+  case CTYPE_SCREEN:
     div_strcpy(msg, sizeof(msg), (char *)text[25]);
     break;
-  case 1:
+  case CTYPE_SCROLL:
     div_strcpy(msg, sizeof(msg), (char *)text[26]);
     break;
-  case 2:
+  case CTYPE_MODE7:
     div_strcpy(msg, sizeof(msg), (char *)text[27]);
-    break;
-  case 3:
-    div_strcpy(msg, sizeof(msg), (char *)text[28]);
     break;
   default:
     div_strcpy(msg, sizeof(msg), (char *)text[29]);
@@ -872,29 +869,29 @@ void draw_proc_list(void) {
   wwrite_in_box(ptr, w, w - 2, h, w - 39, 48 + 16, 1, (byte *)msg, c1);
   wwrite_in_box(ptr, w, w - 2, h, w - 40, 48 + 16, 1, (byte *)msg, c3);
 
-  switch (mem[ids[ids_select] + _Flags] & 7) {
+  switch (mem[ids[ids_select] + _Flags] & (SPRITE_HFLIP | SPRITE_VFLIP | SPRITE_GHOST)) {
   case 0:
     div_strcpy(msg, sizeof(msg), (char *)text[30]);
     break;
-  case 1:
+  case SPRITE_HFLIP:
     div_strcpy(msg, sizeof(msg), (char *)text[31]);
     break;
-  case 2:
+  case SPRITE_VFLIP:
     div_strcpy(msg, sizeof(msg), (char *)text[32]);
     break;
-  case 3:
+  case SPRITE_HFLIP | SPRITE_VFLIP:
     div_strcpy(msg, sizeof(msg), (char *)text[33]);
     break;
-  case 4:
+  case SPRITE_GHOST:
     div_strcpy(msg, sizeof(msg), (char *)text[34]);
     break;
-  case 5:
+  case SPRITE_GHOST | SPRITE_HFLIP:
     div_strcpy(msg, sizeof(msg), (char *)text[35]);
     break;
-  case 6:
+  case SPRITE_GHOST | SPRITE_VFLIP:
     div_strcpy(msg, sizeof(msg), (char *)text[36]);
     break;
-  case 7:
+  case SPRITE_GHOST | SPRITE_HFLIP | SPRITE_VFLIP:
     div_strcpy(msg, sizeof(msg), (char *)text[37]);
     break;
   }
@@ -926,7 +923,7 @@ void process_graph(int id, byte *q, int van, int w, int h) {
   if (file < 0 || file > max_fpgs)
     return;
 
-  if (mem[id + _Ctype] == 2 || mem[id + _Ctype] == 3)
+  if (mem[id + _Ctype] == CTYPE_MODE7)
     angle = 0;
   else if ((n = mem[id + _XGraph]) > 0) {
     m = mem[n];
@@ -936,14 +933,14 @@ void process_graph(int id, byte *q, int van, int w, int h) {
       angle -= 2 * pi;
     while (angle < 0)
       angle += 2 * pi;
-    mem[id + _Flags] &= 254;
+    mem[id + _Flags] &= ~SPRITE_HFLIP;
     graph = ((angle + (2 * pi) / (m * 2)) * m) / (2 * pi);
     angle = 0;
     if (graph >= m)
       graph = 0;
     if ((graph = mem[n + 1 + graph]) < 0) {
       graph = -graph;
-      mem[id + _Flags] |= 1;
+      mem[id + _Flags] |= SPRITE_HFLIP;
     }
   }
 
@@ -986,11 +983,11 @@ void process_graph(int id, byte *q, int van, int w, int h) {
     clipy1 = ptr[14];
     sp_size_scaled(&clipx0, &clipy0, &clipx1, &clipy1, xg, yg, mem[id + _Size], mem[id + _Flags]);
   } else {
-    if (mem[id + _Flags] & 1)
+    if (mem[id + _Flags] & SPRITE_HFLIP)
       clipx0 = x - (ptr[13] - 1 - xg);
     else
       clipx0 = x - xg;
-    if (mem[id + _Flags] & 2)
+    if (mem[id + _Flags] & SPRITE_VFLIP)
       clipy0 = y - (ptr[14] - 1 - yg);
     else
       clipy0 = y - yg;

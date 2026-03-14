@@ -186,7 +186,7 @@ if ((id_start + ((process_count - 2) * iloc_len)) == id_end)
 //if((processos-1)*iloc_len>id_end)
 
 
-while (mem[id + _Status] && id <= id_end)
+while (mem[id + _Status] != PROC_DEAD && id <= id_end)
   id += iloc_len;
 #ifdef LLPROC
 insert_process(id);
@@ -248,7 +248,7 @@ if (mem[stack[sp] + _FCount] > 0) {          // Si era una funcion, duerme al pa
   bp = sp;                                   // Deja la stack aparcada en el lugar adecuado
   sp = mem[id + _Param] - mem[id + _NumPar]; // Y la prerara para retornar al anterior
   save_stack(id, sp, bp);
-  mem[id + _Status] = 3;
+  mem[id + _Status] = PROC_SLEEPING;
   goto next_frm;
 } else {
 #ifdef DEBUG
@@ -403,7 +403,7 @@ case lclo:
 process_count++;
 id2 = id;
 id = id_start;
-while (mem[id + _Status] && id <= id_end)
+while (mem[id + _Status] != PROC_DEAD && id <= id_end)
   id += iloc_len;
 if (id > id_end) {
   if (id > imem_max - iloc_len)
@@ -446,7 +446,7 @@ if (mem[stack[sp] + _FCount] > 0) {          // Si es una funcion, duerme al pad
   bp = sp;                                   // Deja la stack aparcada en el lugar adecuado
   sp = mem[id + _Param] - mem[id + _NumPar]; // Y la prerara para retornar al anterior
   save_stack(id, sp, bp);
-  mem[id + _Status] = 3;
+  mem[id + _Status] = PROC_SLEEPING;
   goto next_frf;
 } else {
   mem[stack[sp] + _Caller] = 0;

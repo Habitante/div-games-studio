@@ -211,4 +211,25 @@ enum drag_state {
 #define FNT_TABLE_OFFSET   1356 // FNT_GENCODE_OFFSET + 4 (gencode field)
 #define MAP_CTRLPTS_OFFSET 1392 // Control points offset in MAP files
 
+// Process status codes (_Status)
+enum proc_status {
+  PROC_DEAD     = 0, // Free slot
+  PROC_KILLED   = 1, // Pending removal
+  PROC_ALIVE    = 2, // Running
+  PROC_SLEEPING = 3, // Waiting for function return
+  PROC_FROZEN   = 4, // Paused (still painted)
+};
+
+// Coordinate types (_Ctype)
+enum coord_type {
+  CTYPE_SCREEN = 0, // Screen coordinates
+  CTYPE_SCROLL = 1, // Scroll-relative
+  CTYPE_MODE7  = 2, // Mode 7-relative
+};
+
+// Sprite flags (_Flags) — bit field
+#define SPRITE_HFLIP 1 // Bit 0: horizontal flip
+#define SPRITE_VFLIP 2 // Bit 1: vertical flip
+#define SPRITE_GHOST 4 // Bit 2: ghost/transparency blend
+
 #endif // DIV_ENUMS_H

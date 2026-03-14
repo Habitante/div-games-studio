@@ -13,7 +13,7 @@ architecture docs, code review, and discussion with Daniel Navarro.
 
 | # | Improvement | Status | Risk |
 |---|-------------|--------|------|
-| 1 | [Enums & constants](#1-enums--constants) | Sprints 1-5 DONE, sprint 6 open | Very low |
+| 1 | [Enums & constants](#1-enums--constants) | **DONE** (all 6 sprints) | Very low |
 | 2 | [Testing infrastructure](#2-testing-infrastructure) | — | None |
 | 3 | [File format hardening + modern imports](#3-file-format-hardening--modern-imports) | — | Low |
 | 4 | [Help translation quality pass](#4-help-translation-quality-pass) | — | Low |
@@ -278,37 +278,58 @@ Capslock, Numlock, and Scroll Lock constants (`MOD_CAPS`, `MOD_NUM`,
 
 **Files:** All 12 files using `shift_status` patterns.
 
-#### L. Process status codes (`_Status`, runtime)
+#### L. Process status codes (`_Status`, runtime) — DONE
 
-| Value | Meaning | Proposed name |
-|-------|---------|---------------|
+Defined in `div_enums.h` as `enum proc_status`. Replaced ~30 occurrences
+across 6 files. Truthiness checks (`if (mem[...+ _Status])` meaning
+"not dead") left as-is. Signal function arithmetic (`stack[sp] + 1`,
+`stack[sp] - 99`) left as-is — these convert DIV signal constants to
+status codes at runtime.
+
+| Value | Meaning | Name |
+|-------|---------|------|
 | 0 | Dead (free slot) | `PROC_DEAD` |
 | 1 | Killed (pending removal) | `PROC_KILLED` |
 | 2 | Alive (running) | `PROC_ALIVE` |
 | 3 | Sleeping (waiting for function return) | `PROC_SLEEPING` |
 | 4 | Frozen (paused, still painted) | `PROC_FROZEN` |
 
-**Files:** `interpreter.c`, `functions.c`, `render.c`, `kernel.inc`.
+**Files:** `interpreter.c`, `functions.c`, `render.c`, `collision.c`,
+`debugger.c`, `kernel.inc`.
 
-#### M. Coordinate types (`_Ctype`, runtime)
+#### M. Coordinate types (`_Ctype`, runtime) — DONE
 
-| Value | Meaning | Proposed name |
-|-------|---------|---------------|
+Defined in `div_enums.h` as `enum coord_type`. Replaced ~20 occurrences
+across 5 files. Dead MODE8 code paths removed: `_object_advance()` stub
+deleted from `functions.c`, `_Ctype == 3` branches removed from
+`advance()`, `x_advance()`, and `debugger.c`. `_Old_Ctype` define
+removed from `inter.h` (was MODE8-only, never referenced).
+
+| Value | Meaning | Name |
+|-------|---------|------|
 | 0 | Screen coordinates | `CTYPE_SCREEN` |
 | 1 | Scroll-relative | `CTYPE_SCROLL` |
 | 2 | Mode 7-relative | `CTYPE_MODE7` |
 
-**Files:** `interpreter.c`, `render.c`, `functions.c`.
+**Files:** `interpreter.c`, `render.c`, `functions.c`, `collision.c`,
+`debugger.c`.
 
-#### N. Sprite flags (`_Flags`, runtime)
+#### N. Sprite flags (`_Flags`, runtime) — DONE
 
-| Bit | Meaning | Proposed name |
-|-----|---------|---------------|
+Defined in `div_enums.h` as `#define` constants. Replaced ~80 occurrences
+across 4 files. Process field patterns (`_Flags] &= 254` → `&= ~SPRITE_HFLIP`,
+`_Flags] |= 1` → `|= SPRITE_HFLIP`, `_Flags] & 1/2` → `& SPRITE_HFLIP/VFLIP`)
+and local `flags` parameter patterns (`flags & 1/2/4`, `flags & 3`,
+`flags & 7` switch statements) all replaced. Scroll `map_flags` bit
+patterns correctly left alone.
+
+| Bit | Meaning | Name |
+|-----|---------|------|
 | 0 | Horizontal flip | `SPRITE_HFLIP` |
 | 1 | Vertical flip | `SPRITE_VFLIP` |
 | 2 | Ghost (transparency blend) | `SPRITE_GHOST` |
 
-**Files:** `render.c`.
+**Files:** `render.c`, `collision.c`, `functions.c`, `debugger.c`.
 
 #### O. Repeated numeric constants — DONE
 
@@ -443,7 +464,7 @@ Each sprint is one self-contained commit.
 | 3b — Scan codes & ASCII | R. Scan code constants, S. ASCII constants, K. Lock-key modifiers | DONE |
 | 4 — Editor state enums | G. Draw modes, H. Block state, I. Drag-and-drop | DONE |
 | 5 — Palette and format constants | O. Palette/ghost/cuad sizes, `MAX_FPG_GRAPHICS`, Q. Format offsets | DONE |
-| 6 — Runtime enums | L. Process status, M. Coordinate types, N. Sprite flags | — |
+| 6 — Runtime enums | L. Process status, M. Coordinate types, N. Sprite flags | DONE |
 
 ### What NOT to enumerate
 

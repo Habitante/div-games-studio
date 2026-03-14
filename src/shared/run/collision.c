@@ -38,7 +38,7 @@ void out_region(void) {
   id = stack[sp];
   stack[sp] = 1; // Default: not in the region
 
-  if (mem[id + _Ctype] == 2) {
+  if (mem[id + _Ctype] == CTYPE_MODE7) {
     runtime_error(137);
     return;
   }
@@ -65,14 +65,14 @@ void out_region(void) {
       angle -= 2 * pi;
     while (angle < 0)
       angle += 2 * pi;
-    mem[id + _Flags] &= 254;
+    mem[id + _Flags] &= ~SPRITE_HFLIP;
     graph = ((angle + (2 * pi) / (m * 2)) * m) / (2 * pi);
     angle = 0;
     if (graph >= m)
       graph = 0;
     if ((graph = mem[n + 1 + graph]) < 0) {
       graph = -graph;
-      mem[id + _Flags] |= 1;
+      mem[id + _Flags] |= SPRITE_HFLIP;
     }
   }
 
@@ -120,11 +120,11 @@ void out_region(void) {
     w = w - x + 1;
     h = h - y + 1;
   } else {
-    if (mem[id + _Flags] & 1) {
+    if (mem[id + _Flags] & SPRITE_HFLIP) {
       xg = w - 1 - xg;
     }
     x -= xg;
-    if (mem[id + _Flags] & 2) {
+    if (mem[id + _Flags] & SPRITE_VFLIP) {
       yg = h - 1 - yg;
     }
     y -= yg;
@@ -132,7 +132,7 @@ void out_region(void) {
 
   // Already has region[reg].(x0..y1) and sprite(x,y,an,al)
 
-  if (mem[id + _Ctype] == 1) {
+  if (mem[id + _Ctype] == CTYPE_SCROLL) {
     for (n = 0; n < 10; n++)
       if (iscroll[n].on && (mem[id + _Cnumber] == 0 || (mem[id + _Cnumber] & (1 << n)))) {
         xg = x + iscroll[n].x - iscroll[n].map1_x; // Sprite position in the scroll
@@ -160,7 +160,7 @@ void out_region(void) {
         } // It is in the region
       }
 
-  } else if (mem[id + _Ctype] == 0) {
+  } else if (mem[id + _Ctype] == CTYPE_SCREEN) {
     if (x < region[reg].x1 && y < region[reg].y1 && x + w > region[reg].x0 &&
         y + h > region[reg].y0)
       stack[sp] = 0; // It is in the region
@@ -246,7 +246,7 @@ void collision(void) {
   block = stack[sp];
   stack[sp] = 0; // Default: no collision
 
-  if (mem[id + _Ctype] == 2) {
+  if (mem[id + _Ctype] == CTYPE_MODE7) {
     runtime_error(139);
     return;
   }
@@ -277,14 +277,14 @@ void collision(void) {
       angle -= 2 * pi;
     while (angle < 0)
       angle += 2 * pi;
-    mem[id + _Flags] &= 254;
+    mem[id + _Flags] &= ~SPRITE_HFLIP;
     graph = ((angle + (2 * pi) / (m * 2)) * m) / (2 * pi);
     angle = 0;
     if (graph >= m)
       graph = 0;
     if ((graph = mem[n + 1 + graph]) < 0) {
       graph = -graph;
-      mem[id + _Flags] |= 1;
+      mem[id + _Flags] |= SPRITE_HFLIP;
     }
   }
 
@@ -333,11 +333,11 @@ void collision(void) {
     clipy1 = ptr[14];
     sp_size_scaled(&clipx0, &clipy0, &clipx1, &clipy1, xg, yg, mem[id + _Size], mem[id + _Flags]);
   } else {
-    if (mem[id + _Flags] & 1)
+    if (mem[id + _Flags] & SPRITE_HFLIP)
       clipx0 = x - (ptr[13] - 1 - xg);
     else
       clipx0 = x - xg;
-    if (mem[id + _Flags] & 2)
+    if (mem[id + _Flags] & SPRITE_VFLIP)
       clipy0 = y - (ptr[14] - 1 - yg);
     else
       clipy0 = y - yg;
@@ -359,7 +359,7 @@ void collision(void) {
 
   // Already has sprite region clipx0..clipy1 (if on screen)
 
-  if (mem[id + _Ctype] == 1) {
+  if (mem[id + _Ctype] == CTYPE_SCROLL) {
     for (n = 0; n < 10; n++)
       if (iscroll[n].on && (mem[id + _Cnumber] == 0 || (mem[id + _Cnumber] & (1 << n)))) {
         xg = iscroll[n].x - iscroll[n].map1_x;
@@ -399,9 +399,10 @@ int check_collisions(int i, int block, int scroll) {
   }
 
   for (; i <= id_end; i += iloc_len) {
-    if (i != id && mem[i + _Bloque] == block && (mem[i + _Status] == 2 || mem[i + _Status] == 4) &&
-        mem[i + _Ctype] < 2) {
-      if (mem[i + _Ctype] == 1) { // If scroll sprite, determine which scroll (n)
+    if (i != id && mem[i + _Bloque] == block &&
+        (mem[i + _Status] == PROC_ALIVE || mem[i + _Status] == PROC_FROZEN) &&
+        mem[i + _Ctype] < CTYPE_MODE7) {
+      if (mem[i + _Ctype] == CTYPE_SCROLL) { // If scroll sprite, determine which scroll (n)
         if (scroll < 0) {         // Screen vs scroll collision - first active
           for (n = 0; n < 10; n++)
             if (iscroll[n].on && (mem[i + _Cnumber] == 0 || (mem[i + _Cnumber] & (1 << n))))
@@ -431,14 +432,14 @@ int check_collisions(int i, int block, int scroll) {
           angle -= 2 * pi;
         while (angle < 0)
           angle += 2 * pi;
-        mem[i + _Flags] &= 254;
+        mem[i + _Flags] &= ~SPRITE_HFLIP;
         graph = ((angle + (2 * pi) / (m * 2)) * m) / (2 * pi);
         angle = 0;
         if (graph >= m)
           graph = 0;
         if ((graph = mem[j + 1 + graph]) < 0) {
           graph = -graph;
-          mem[i + _Flags] |= 1;
+          mem[i + _Flags] |= SPRITE_HFLIP;
         }
       }
 
@@ -460,7 +461,7 @@ int check_collisions(int i, int block, int scroll) {
         y /= mem[i + _Resolution];
       }
 
-      if (mem[i + _Ctype] == 1) {
+      if (mem[i + _Ctype] == CTYPE_SCROLL) {
         x += iscroll[n].x - iscroll[n].map1_x;
         y += iscroll[n].y - iscroll[n].map1_y;
       }
@@ -514,12 +515,12 @@ int check_collisions(int i, int block, int scroll) {
       } else {
         w = ptr[13];
         h = ptr[14];
-        if (mem[i + _Flags] & 1)
+        if (mem[i + _Flags] & SPRITE_HFLIP)
           xxg = w - 1 - xg;
         else
           xxg = xg;
         xx = x - xxg;
-        if (mem[i + _Flags] & 2)
+        if (mem[i + _Flags] & SPRITE_VFLIP)
           yyg = h - 1 - yg;
         else
           yyg = yg;
@@ -584,7 +585,7 @@ void sp_size(int *x, int *y, int *xx, int *yy, int xg, int yg, int ang, int size
   else
     a3 = a + (float)atan2(-yg, xg);
 
-  if (flags & 1) {
+  if (flags & SPRITE_HFLIP) {
     p[0] = *x - (int)((float)cos(a0) * d0);
     p[2] = *x - (int)((float)cos(a1) * d1);
     p[4] = *x - (int)((float)cos(a2) * d2);
@@ -596,7 +597,7 @@ void sp_size(int *x, int *y, int *xx, int *yy, int xg, int yg, int ang, int size
     p[6] = *x + (int)((float)cos(a3) * d3);
   }
 
-  if (flags & 2) {
+  if (flags & SPRITE_VFLIP) {
     p[1] = *y - (int)(-(float)sin(a0) * d0);
     p[3] = *y - (int)(-(float)sin(a1) * d1);
     p[5] = *y - (int)(-(float)sin(a2) * d2);
@@ -637,11 +638,11 @@ void sp_size(int *x, int *y, int *xx, int *yy, int xg, int yg, int ang, int size
 void sp_size_scaled(int *x, int *y, int *xx, int *yy, int xg, int yg, int size, int flags) {
   int x0, y0, x1, y1; // Area occupied by the sprite on the framebuffer
 
-  if (flags & 1)
+  if (flags & SPRITE_HFLIP)
     x0 = *x - ((*xx - 1 - xg) * size) / 100;
   else
     x0 = *x - (xg * size) / 100;
-  if (flags & 2)
+  if (flags & SPRITE_VFLIP)
     y0 = *y - ((*yy - 1 - yg) * size) / 100;
   else
     y0 = *y - (yg * size) / 100;
@@ -703,11 +704,11 @@ void put_collision(byte *buffer, int *ptr, int x, int y, int xg, int yg, int ang
     y -= iy;
     sp_scaled(si, x, y, w, h, xg, yg, size, flags);
   } else {
-    if (flags & 1) {
+    if (flags & SPRITE_HFLIP) {
       xg = w - 1 - xg;
     }
     x -= xg + ix;
-    if (flags & 2) {
+    if (flags & SPRITE_VFLIP) {
       yg = h - 1 - yg;
     }
     y -= yg + iy;
@@ -879,7 +880,7 @@ void sp_rotated_p(byte *si, int w, int h, int flags) {
       }
     }
 
-    if ((flags & 3) == 1 || (flags & 3) == 2) {
+    if ((flags & (SPRITE_HFLIP | SPRITE_VFLIP)) == SPRITE_HFLIP || (flags & (SPRITE_HFLIP | SPRITE_VFLIP)) == SPRITE_VFLIP) {
       kk = x0.l;
       x0.l = x1.l;
       x1.l = kk;
@@ -895,7 +896,7 @@ void sp_rotated_p(byte *si, int w, int h, int flags) {
         x1.w[1] > x0.w[1])
       sp_scan(ptrcopia + x0.w[1], x1.w[1] - x0.w[1], si, w, g0x.l, g0y.l, g1x.l, g1y.l);
 
-    if ((flags & 3) == 1 || (flags & 3) == 2) {
+    if ((flags & (SPRITE_HFLIP | SPRITE_VFLIP)) == SPRITE_HFLIP || (flags & (SPRITE_HFLIP | SPRITE_VFLIP)) == SPRITE_VFLIP) {
       kk = x0.l;
       x0.l = x1.l;
       x1.l = kk;
@@ -960,11 +961,11 @@ void test_collision(byte *buffer, int *ptr, int x, int y, int xg, int yg, int an
     y -= iy;
     test_scaled(si, x, y, w, h, xg, yg, size, flags);
   } else {
-    if (flags & 1) {
+    if (flags & SPRITE_HFLIP) {
       xg = w - 1 - xg;
     }
     x -= xg + ix;
-    if (flags & 2) {
+    if (flags & SPRITE_VFLIP) {
       yg = h - 1 - yg;
     }
     y -= yg + iy;
@@ -991,7 +992,7 @@ void test_normal(byte *p, int x, int y, int w, int h, int flags) {
   byte *q = screen_buffer + y * vga_width + x;
   int width = w;
 
-  switch (flags & 3) {
+  switch (flags & (SPRITE_HFLIP | SPRITE_VFLIP)) {
   case 0: //--
     do {
       do {
@@ -1005,7 +1006,7 @@ void test_normal(byte *p, int x, int y, int w, int h, int flags) {
       q += vga_width - (w = width);
     } while (--h);
     break;
-  case 1: //h-
+  case SPRITE_HFLIP: //h-
     p += w - 1;
     do {
       do {
@@ -1020,7 +1021,7 @@ void test_normal(byte *p, int x, int y, int w, int h, int flags) {
       p += w * 2;
     } while (--h);
     break;
-  case 2: //-v
+  case SPRITE_VFLIP: //-v
     p += (h - 1) * w;
     do {
       do {
@@ -1035,7 +1036,7 @@ void test_normal(byte *p, int x, int y, int w, int h, int flags) {
       p -= w * 2;
     } while (--h);
     break;
-  case 3: //hv
+  case SPRITE_HFLIP | SPRITE_VFLIP: //hv
     p += h * w - 1;
     do {
       do {
@@ -1081,7 +1082,7 @@ void test_clipped(byte *p, int x, int y, int w, int h, int flags) {
     resto_y = 0;
   long_y = h - salta_y - resto_y;
 
-  switch (flags & 3) {
+  switch (flags & (SPRITE_HFLIP | SPRITE_VFLIP)) {
   case 0: //--
     p += w * salta_y + salta_x;
     q += vga_width * salta_y + salta_x;
@@ -1100,7 +1101,7 @@ void test_clipped(byte *p, int x, int y, int w, int h, int flags) {
       p += resto_x;
     } while (--long_y);
     break;
-  case 1: //h-
+  case SPRITE_HFLIP: //h-
     p += w * salta_y + w - 1 - salta_x;
     q += vga_width * salta_y + salta_x;
     resto_x += salta_x;
@@ -1118,7 +1119,7 @@ void test_clipped(byte *p, int x, int y, int w, int h, int flags) {
       p += w + long_x;
     } while (--long_y);
     break;
-  case 2: //-v
+  case SPRITE_VFLIP: //-v
     p += (h - 1) * w - w * salta_y + salta_x;
     q += vga_width * salta_y + salta_x;
     resto_x += salta_x;
@@ -1136,7 +1137,7 @@ void test_clipped(byte *p, int x, int y, int w, int h, int flags) {
       p += resto_x - w * 2;
     } while (--long_y);
     break;
-  case 3: //hv
+  case SPRITE_HFLIP | SPRITE_VFLIP: //hv
     p += h * w - 1 - w * salta_y - salta_x;
     q += vga_width * salta_y + salta_x;
     resto_x += salta_x;
@@ -1168,11 +1169,11 @@ void test_scaled(byte *old_si, int x, int y, int w, int h, int xg, int yg, int s
   int xr, ixr, yr, iyr, old_xr, old_w;
   byte *si, *di;
 
-  if (flags & 1)
+  if (flags & SPRITE_HFLIP)
     x0 = x - ((w - 1 - xg) * size) / 100;
   else
     x0 = x - (xg * size) / 100;
-  if (flags & 2)
+  if (flags & SPRITE_VFLIP)
     y0 = y - ((h - 1 - yg) * size) / 100;
   else
     y0 = y - (yg * size) / 100;
@@ -1210,12 +1211,12 @@ void test_scaled(byte *old_si, int x, int y, int w, int h, int xg, int yg, int s
     resto_y = 0;
   long_y = (h * size) / 100 - salta_y - resto_y;
 
-  if (flags & 1) {
+  if (flags & SPRITE_HFLIP) {
     xr = w * 256 - salta_x * ixr - 1;
     ixr = -ixr;
   } else
     xr = salta_x * ixr;
-  if (flags & 2) {
+  if (flags & SPRITE_VFLIP) {
     yr = h * 256 - salta_y * iyr - 1;
     iyr = -iyr;
   } else
@@ -1395,7 +1396,7 @@ void test_rotated(byte *si, int w, int h, int flags) {
       }
     }
 
-    if ((flags & 3) == 1 || (flags & 3) == 2) {
+    if ((flags & (SPRITE_HFLIP | SPRITE_VFLIP)) == SPRITE_HFLIP || (flags & (SPRITE_HFLIP | SPRITE_VFLIP)) == SPRITE_VFLIP) {
       kk = x0.l;
       x0.l = x1.l;
       x1.l = kk;
@@ -1423,7 +1424,7 @@ void test_rotated(byte *si, int w, int h, int flags) {
         test_scan(ptrcopia + x0.w[1], x1.w[1] - x0.w[1], si, w, g0x.l, g0y.l, g1x.l, g1y.l);
     }
 
-    if ((flags & 3) == 1 || (flags & 3) == 2) {
+    if ((flags & (SPRITE_HFLIP | SPRITE_VFLIP)) == SPRITE_HFLIP || (flags & (SPRITE_HFLIP | SPRITE_VFLIP)) == SPRITE_VFLIP) {
       kk = x0.l;
       x0.l = x1.l;
       x1.l = kk;

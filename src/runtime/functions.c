@@ -33,15 +33,7 @@ void _compress_file(int encode, char *filename);
 
 extern int max_reloj;
 
-void _object_advance(int ide, int angle, int velocity);
 int joy_position(int axis);
-
-void _object_advance(int ide, int angle, int velocity) {
-  mem[id + _X] += get_distx(mem[id + _Angle], stack[sp]);
-  mem[id + _Y] += get_disty(mem[id + _Angle], stack[sp]);
-}
-
-// MODE8 function stubs removed (MODE8 deleted)
 
 void path_find(void);
 void path_line(void);
@@ -1320,14 +1312,14 @@ void kill_invisible(void) {
   for (i = id_start; i <= id_end; i += iloc_len) {
     if (mem[i + _Status]) {
       n = 0;
-      if (mem[i + _Ctype] == 1) {
+      if (mem[i + _Ctype] == CTYPE_SCROLL) {
         for (n = 0; n < 10; n++) {
           if (iscroll[n].on && (!mem[i + _Cnumber] || (mem[i + _Cnumber] & (1 << n)))) {
             break;
           }
         }
       }
-      if (mem[i + _Ctype] == 2) {
+      if (mem[i + _Ctype] == CTYPE_MODE7) {
         for (n = 0; n < 10; n++) {
           if (im7[n].on && (!mem[i + _Cnumber] || (mem[i + _Cnumber] & (1 << n)))) {
             break;
@@ -1357,7 +1349,8 @@ void get_id(void) {
   } else
     i = mem[id + _IdScan];
   do {
-    if (i != id && mem[i + _Bloque] == bloque && (mem[i + _Status] == 2 || mem[i + _Status] == 4)) {
+    if (i != id && mem[i + _Bloque] == bloque &&
+        (mem[i + _Status] == PROC_ALIVE || mem[i + _Status] == PROC_FROZEN)) {
       mem[id + _IdScan] = i + iloc_len;
       stack[sp] = i;
       return;
@@ -3256,12 +3249,8 @@ void stop_mode7(void) {
 //----------------------------------------------------------------------------
 
 void advance(void) {
-  if (mem[id + _Ctype] == 3) {
-    _object_advance(id, mem[id + _Angle], stack[sp]);
-  } else {
-    mem[id + _X] += get_distx(mem[id + _Angle], stack[sp]);
-    mem[id + _Y] += get_disty(mem[id + _Angle], stack[sp]);
-  }
+  mem[id + _X] += get_distx(mem[id + _Angle], stack[sp]);
+  mem[id + _Y] += get_disty(mem[id + _Angle], stack[sp]);
   stack[sp] = 0;
 }
 
@@ -3272,12 +3261,8 @@ void advance(void) {
 void x_advance(void) {
   int distancia = stack[sp--];
 
-  if (mem[id + _Ctype] == 3) {
-    _object_advance(id, stack[sp], distancia);
-  } else {
-    mem[id + _X] += get_distx(stack[sp], distancia);
-    mem[id + _Y] += get_disty(stack[sp], distancia);
-  }
+  mem[id + _X] += get_distx(stack[sp], distancia);
+  mem[id + _Y] += get_disty(stack[sp], distancia);
   stack[sp] = 0;
 }
 
@@ -3381,7 +3366,7 @@ void let_me_alone(void) {
   int i;
   for (i = id_start; i <= id_end; i += iloc_len)
     if (i != id && mem[i + _Status])
-      mem[i + _Status] = 1;
+      mem[i + _Status] = PROC_KILLED;
   stack[++sp] = 0;
 }
 
@@ -3522,30 +3507,30 @@ void get_real_point(void) {
           ang = atan2(-py, px);
         ang += ((float)mem[id + _Angle]) / radian;
         dis = sqrt(px * px + py * py) * mem[id + _Size] / 100;
-        if (mem[id + _Flags] & 1)
+        if (mem[id + _Flags] & SPRITE_HFLIP)
           px = x - cos(ang) * dis;
         else
           px = x + cos(ang) * dis;
-        if (mem[id + _Flags] & 2)
+        if (mem[id + _Flags] & SPRITE_VFLIP)
           py = y + sin(ang) * dis;
         else
           py = y - sin(ang) * dis;
       }
     } else if (mem[id + _Size] != 100) {
-      if (mem[id + _Flags] & 1)
+      if (mem[id + _Flags] & SPRITE_HFLIP)
         px = x + (xg - px) * mem[id + _Size] / 100;
       else
         px = x + (px - xg) * mem[id + _Size] / 100;
-      if (mem[id + _Flags] & 2)
+      if (mem[id + _Flags] & SPRITE_VFLIP)
         py = y + (yg - py) * mem[id + _Size] / 100;
       else
         py = y + (py - yg) * mem[id + _Size] / 100;
     } else {
-      if (mem[id + _Flags] & 1)
+      if (mem[id + _Flags] & SPRITE_HFLIP)
         px = x + xg - px;
       else
         px += x - xg;
-      if (mem[id + _Flags] & 2)
+      if (mem[id + _Flags] & SPRITE_VFLIP)
         py = y + yg - py;
       else
         py += y - yg;

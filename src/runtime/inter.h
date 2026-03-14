@@ -436,7 +436,7 @@ void read_joy(void);
 #define _IdScan   1  //Scan index for iterating other processes (e.g. collisions)
 #define _Bloque   2  //Process type identifier (for collisions)
 #define _BlScan   3  //Last process type scanned in the last iteration
-#define _Status   4  //State (0 dead, 1 killed, 2 alive, 3 asleep, 4 frozen)
+#define _Status   4  //State (see enum proc_status in div_enums.h)
 #define _NumPar   5  //Number of process parameters
 #define _Param    6  //Pointer to parameters passed to the process (on stack)
 #define _IP       7  //Instruction pointer (next after previous frame)
@@ -444,13 +444,11 @@ void read_joy(void);
 #define _Executed 9  //Whether the process has already executed this frame
 #define _Painted  10 //Whether the process has already been painted
 
-// The following 2 variables are dual-purpose, depending on mode 7 or mode 8
+// Mode 7 distance fields (slots 11-12, dual-purpose — _Dist2 overlaps _Old_Ctype,
+// but _Old_Ctype was only used by MODE8 which has been deleted)
 
 #define _Dist1 11 //Distance 1, for mode 7
 #define _Dist2 12 //Distance 2, for mode 7
-
-// _M8_Object removed (MODE8 deleted)
-#define _Old_Ctype 12 //Previous _Ctype
 
 #define _Frame  13 //Frame progress of the process (frame(n))
 #define _x0     14 //Bounding box occupied by the sprite

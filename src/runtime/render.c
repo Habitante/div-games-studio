@@ -97,7 +97,8 @@ void paint_scroll_sprites(void) {
     ide = 0;
     max = 0x80000000;
     for (id = id_start; id <= id_end; id += iloc_len)
-      if ((mem[id + _Status] == 2 || mem[id + _Status] == 4) && mem[id + _Ctype] == 1 &&
+      if ((mem[id + _Status] == PROC_ALIVE || mem[id + _Status] == PROC_FROZEN) &&
+          mem[id + _Ctype] == CTYPE_SCROLL &&
           (mem[id + _Cnumber] == 0 || (mem[id + _Cnumber] & (1 << snum))) && !mem[id + _Painted] &&
           mem[id + _Z] > max) {
         ide = id;
@@ -1077,11 +1078,11 @@ void put_sprite(int file, int graph, int x, int y, int angle, int size, int flag
     } else if (size != 100) {
       sp_scaled(si, x, y, w, h, xg, yg, size, flags);
     } else {
-      if (flags & 1) {
+      if (flags & SPRITE_HFLIP) {
         xg = w - 1 - xg;
       }
       x -= xg;
-      if (flags & 2) {
+      if (flags & SPRITE_VFLIP) {
         yg = h - 1 - yg;
       }
       y -= yg;
@@ -1130,13 +1131,13 @@ void paint_sprite(void) { // Render a sprite (if visible), using mem[ide+ ... ]
       mem[ide + _Angle] -= 2 * pi;
     while (mem[ide + _Angle] < 0)
       mem[ide + _Angle] += 2 * pi;
-    mem[ide + _Flags] &= 254;
+    mem[ide + _Flags] &= ~SPRITE_HFLIP;
     mem[ide + _Graph] = ((mem[ide + _Angle] + (2 * pi) / (m * 2)) * m) / (2 * pi);
     if (mem[ide + _Graph] >= m)
       mem[ide + _Graph] = 0;
     if ((mem[ide + _Graph] = mem[n + 1 + mem[ide + _Graph]]) < 0) {
       mem[ide + _Graph] = -mem[ide + _Graph];
-      mem[ide + _Flags] |= 1;
+      mem[ide + _Flags] |= SPRITE_HFLIP;
     }
   }
   if (mem[ide + _File])
@@ -1150,7 +1151,7 @@ void paint_sprite(void) { // Render a sprite (if visible), using mem[ide+ ... ]
 
   x = mem[ide + _Region];
 
-  if (mem[ide + _Ctype] == 1 && iscroll[snum].on > 0) {
+  if (mem[ide + _Ctype] == CTYPE_SCROLL && iscroll[snum].on > 0) {
     clipx0 = iscroll[snum].x;
     clipx1 = iscroll[snum].x + iscroll[snum].w;
     clipy0 = iscroll[snum].y;
@@ -1175,7 +1176,7 @@ void paint_sprite(void) { // Render a sprite (if visible), using mem[ide+ ... ]
       y /= mem[ide + _Resolution];
     }
 
-    if (mem[ide + _Ctype] == 1) {
+    if (mem[ide + _Ctype] == CTYPE_SCROLL) {
       x += iscroll[snum].x - iscroll[snum].map1_x;
       y += iscroll[snum].y - iscroll[snum].map1_y;
     }
@@ -1201,11 +1202,11 @@ void paint_sprite(void) { // Render a sprite (if visible), using mem[ide+ ... ]
       sp_scaled(si, x, y, w, h, xg, yg, mem[ide + _Size], mem[ide + _Flags]);
       save_region();
     } else {
-      if (mem[ide + _Flags] & 1) {
+      if (mem[ide + _Flags] & SPRITE_HFLIP) {
         xg = w - 1 - xg;
       }
       x -= xg;
-      if (mem[ide + _Flags] & 2) {
+      if (mem[ide + _Flags] & SPRITE_VFLIP) {
         yg = h - 1 - yg;
       }
       y -= yg;
@@ -1223,7 +1224,7 @@ void paint_sprite(void) { // Render a sprite (if visible), using mem[ide+ ... ]
 }
 
 void save_region(void) {
-  if (mem[ide + _Ctype] == 0) {
+  if (mem[ide + _Ctype] == CTYPE_SCREEN) {
     if (clipx0 > x0s) {
       x0s = clipx0;
     }
@@ -1253,7 +1254,7 @@ void sp_normal(byte *p, int x, int y, int w, int h, int flags) {
   byte *q = screen_buffer + y * vga_width + x;
   int width = w;
 
-  switch (flags & 7) {
+  switch (flags & (SPRITE_HFLIP | SPRITE_VFLIP | SPRITE_GHOST)) {
   case 0: //--
     do {
       do {
@@ -1266,7 +1267,7 @@ void sp_normal(byte *p, int x, int y, int w, int h, int flags) {
       q += vga_width - (w = width);
     } while (--h);
     break;
-  case 1: //h-
+  case SPRITE_HFLIP: //h-
     p += w - 1;
     do {
       do {
@@ -1280,7 +1281,7 @@ void sp_normal(byte *p, int x, int y, int w, int h, int flags) {
       p += w * 2;
     } while (--h);
     break;
-  case 2: //-v
+  case SPRITE_VFLIP: //-v
     p += (h - 1) * w;
     do {
       do {
@@ -1294,7 +1295,7 @@ void sp_normal(byte *p, int x, int y, int w, int h, int flags) {
       p -= w * 2;
     } while (--h);
     break;
-  case 3: //hv
+  case SPRITE_HFLIP | SPRITE_VFLIP: //hv
     p += h * w - 1;
     do {
       do {
@@ -1307,7 +1308,7 @@ void sp_normal(byte *p, int x, int y, int w, int h, int flags) {
       q += vga_width - (w = width);
     } while (--h);
     break;
-  case 4: //-- Ghost
+  case SPRITE_GHOST: //-- Ghost
     do {
       do {
         *q = ghost[(*p << 8) + *q];
@@ -1317,7 +1318,7 @@ void sp_normal(byte *p, int x, int y, int w, int h, int flags) {
       q += vga_width - (w = width);
     } while (--h);
     break;
-  case 5: //h- Ghost
+  case SPRITE_GHOST | SPRITE_HFLIP: //h- Ghost
     p += w - 1;
     do {
       do {
@@ -1329,7 +1330,7 @@ void sp_normal(byte *p, int x, int y, int w, int h, int flags) {
       p += w * 2;
     } while (--h);
     break;
-  case 6: //-v Ghost
+  case SPRITE_GHOST | SPRITE_VFLIP: //-v Ghost
     p += (h - 1) * w;
     do {
       do {
@@ -1341,7 +1342,7 @@ void sp_normal(byte *p, int x, int y, int w, int h, int flags) {
       p -= w * 2;
     } while (--h);
     break;
-  case 7: //hv Ghost
+  case SPRITE_GHOST | SPRITE_HFLIP | SPRITE_VFLIP: //hv Ghost
     p += h * w - 1;
     do {
       do {
@@ -1384,7 +1385,7 @@ void sp_clipped(byte *p, int x, int y, int w, int h, int flags) {
     resto_y = 0;
   long_y = h - salta_y - resto_y;
 
-  switch (flags & 7) {
+  switch (flags & (SPRITE_HFLIP | SPRITE_VFLIP | SPRITE_GHOST)) {
   case 0: //--
     p += w * salta_y + salta_x;
     q += vga_width * salta_y + salta_x;
@@ -1402,7 +1403,7 @@ void sp_clipped(byte *p, int x, int y, int w, int h, int flags) {
       p += resto_x;
     } while (--long_y);
     break;
-  case 1: //h-
+  case SPRITE_HFLIP: //h-
     p += w * salta_y + w - 1 - salta_x;
     q += vga_width * salta_y + salta_x;
     resto_x += salta_x;
@@ -1419,7 +1420,7 @@ void sp_clipped(byte *p, int x, int y, int w, int h, int flags) {
       p += w + long_x;
     } while (--long_y);
     break;
-  case 2: //-v
+  case SPRITE_VFLIP: //-v
     p += (h - 1) * w - w * salta_y + salta_x;
     q += vga_width * salta_y + salta_x;
     resto_x += salta_x;
@@ -1436,7 +1437,7 @@ void sp_clipped(byte *p, int x, int y, int w, int h, int flags) {
       p += resto_x - w * 2;
     } while (--long_y);
     break;
-  case 3: //hv
+  case SPRITE_HFLIP | SPRITE_VFLIP: //hv
     p += h * w - 1 - w * salta_y - salta_x;
     q += vga_width * salta_y + salta_x;
     resto_x += salta_x;
@@ -1453,7 +1454,7 @@ void sp_clipped(byte *p, int x, int y, int w, int h, int flags) {
       p -= resto_x;
     } while (--long_y);
     break;
-  case 4: //-- Ghost
+  case SPRITE_GHOST: //-- Ghost
     p += w * salta_y + salta_x;
     q += vga_width * salta_y + salta_x;
     resto_x += salta_x;
@@ -1468,7 +1469,7 @@ void sp_clipped(byte *p, int x, int y, int w, int h, int flags) {
       p += resto_x;
     } while (--long_y);
     break;
-  case 5: //h- Ghost
+  case SPRITE_GHOST | SPRITE_HFLIP: //h- Ghost
     p += w * salta_y + w - 1 - salta_x;
     q += vga_width * salta_y + salta_x;
     resto_x += salta_x;
@@ -1483,7 +1484,7 @@ void sp_clipped(byte *p, int x, int y, int w, int h, int flags) {
       p += w + long_x;
     } while (--long_y);
     break;
-  case 6: //-v Ghost
+  case SPRITE_GHOST | SPRITE_VFLIP: //-v Ghost
     p += (h - 1) * w - w * salta_y + salta_x;
     q += vga_width * salta_y + salta_x;
     resto_x += salta_x;
@@ -1498,7 +1499,7 @@ void sp_clipped(byte *p, int x, int y, int w, int h, int flags) {
       p += resto_x - w * 2;
     } while (--long_y);
     break;
-  case 7: //hv Ghost
+  case SPRITE_GHOST | SPRITE_HFLIP | SPRITE_VFLIP: //hv Ghost
     p += h * w - 1 - w * salta_y - salta_x;
     q += vga_width * salta_y + salta_x;
     resto_x += salta_x;
@@ -1526,11 +1527,11 @@ void sp_scaled(byte *old_si, int x, int y, int w, int h, int xg, int yg, int siz
   int xr, ixr, yr, iyr, old_xr, old_w;
   byte *si, *di, c;
 
-  if (flags & 1)
+  if (flags & SPRITE_HFLIP)
     x0s = x - ((w - 1 - xg) * size) / 100;
   else
     x0s = x - (xg * size) / 100;
-  if (flags & 2)
+  if (flags & SPRITE_VFLIP)
     y0s = y - ((h - 1 - yg) * size) / 100;
   else
     y0s = y - (yg * size) / 100;
@@ -1568,12 +1569,12 @@ void sp_scaled(byte *old_si, int x, int y, int w, int h, int xg, int yg, int siz
     resto_y = 0;
   long_y = (h * size) / 100 - salta_y - resto_y;
 
-  if (flags & 1) {
+  if (flags & SPRITE_HFLIP) {
     xr = w * 256 - salta_x * ixr - 1;
     ixr = -ixr;
   } else
     xr = salta_x * ixr;
-  if (flags & 2) {
+  if (flags & SPRITE_VFLIP) {
     yr = h * 256 - salta_y * iyr - 1;
     iyr = -iyr;
   } else
@@ -1584,7 +1585,7 @@ void sp_scaled(byte *old_si, int x, int y, int w, int h, int xg, int yg, int siz
   di += vga_width * salta_y + salta_x;
   w = long_x;
 
-  if (flags & 4)
+  if (flags & SPRITE_GHOST)
     do {
       si = old_si + (yr >> 8) * old_w;
       do {
@@ -1662,7 +1663,7 @@ void sp_rotated(byte *si, int x, int y, int w, int h, int xg, int yg, int ang, i
   else
     a3 = a + (float)atan2(-yg, xg);
 
-  if (flags & 1) {
+  if (flags & SPRITE_HFLIP) {
     p[0] = x - (int)((float)cos(a0) * d0);
     p[2] = x - (int)((float)cos(a1) * d1);
     p[4] = x - (int)((float)cos(a2) * d2);
@@ -1674,7 +1675,7 @@ void sp_rotated(byte *si, int x, int y, int w, int h, int xg, int yg, int ang, i
     p[6] = x + (int)((float)cos(a3) * d3);
   }
 
-  if (flags & 2) {
+  if (flags & SPRITE_VFLIP) {
     p[1] = y - (int)(-(float)sin(a0) * d0);
     p[3] = y - (int)(-(float)sin(a1) * d1);
     p[5] = y - (int)(-(float)sin(a2) * d2);
@@ -1828,7 +1829,7 @@ void sp_rotated(byte *si, int x, int y, int w, int h, int xg, int yg, int ang, i
       }
     }
 
-    if ((flags & 3) == 1 || (flags & 3) == 2) {
+    if ((flags & (SPRITE_HFLIP | SPRITE_VFLIP)) == SPRITE_HFLIP || (flags & (SPRITE_HFLIP | SPRITE_VFLIP)) == SPRITE_VFLIP) {
       kk = x0.l;
       x0.l = x1.l;
       x1.l = kk;
@@ -1844,14 +1845,14 @@ void sp_rotated(byte *si, int x, int y, int w, int h, int xg, int yg, int ang, i
         x1.w[1] > x0.w[1]) {
       if (x0.w[1] < clipx0) {
         if (x1.w[1] >= clipx1) {
-          if (flags & 4)
+          if (flags & SPRITE_GHOST)
             sp_scan_clipped_ghost(ptrcopia + clipx0, x1.w[1] - x0.w[1], clipx1 - clipx0 - 1,
                                   clipx0 - x0.w[1], si, w, g0x.l, g0y.l, g1x.l, g1y.l);
           else
             sp_scan_clipped(ptrcopia + clipx0, x1.w[1] - x0.w[1], clipx1 - clipx0 - 1,
                             clipx0 - x0.w[1], si, w, g0x.l, g0y.l, g1x.l, g1y.l);
         } else {
-          if (flags & 4)
+          if (flags & SPRITE_GHOST)
             sp_scan_clipped_ghost(ptrcopia + clipx0, x1.w[1] - x0.w[1], x1.w[1] - clipx0,
                                   clipx0 - x0.w[1], si, w, g0x.l, g0y.l, g1x.l, g1y.l);
           else
@@ -1859,21 +1860,21 @@ void sp_rotated(byte *si, int x, int y, int w, int h, int xg, int yg, int ang, i
                             clipx0 - x0.w[1], si, w, g0x.l, g0y.l, g1x.l, g1y.l);
         }
       } else if (x1.w[1] >= clipx1) {
-        if (flags & 4)
+        if (flags & SPRITE_GHOST)
           sp_scan_clipped_ghost(ptrcopia + x0.w[1], x1.w[1] - x0.w[1], clipx1 - 1 - x0.w[1], 0, si,
                                 w, g0x.l, g0y.l, g1x.l, g1y.l);
         else
           sp_scan_clipped(ptrcopia + x0.w[1], x1.w[1] - x0.w[1], clipx1 - 1 - x0.w[1], 0, si, w,
                           g0x.l, g0y.l, g1x.l, g1y.l);
       } else {
-        if (flags & 4)
+        if (flags & SPRITE_GHOST)
           sp_scan_ghost(ptrcopia + x0.w[1], x1.w[1] - x0.w[1], si, w, g0x.l, g0y.l, g1x.l, g1y.l);
         else
           sp_scan(ptrcopia + x0.w[1], x1.w[1] - x0.w[1], si, w, g0x.l, g0y.l, g1x.l, g1y.l);
       }
     }
 
-    if ((flags & 3) == 1 || (flags & 3) == 2) {
+    if ((flags & (SPRITE_HFLIP | SPRITE_VFLIP)) == SPRITE_HFLIP || (flags & (SPRITE_HFLIP | SPRITE_VFLIP)) == SPRITE_VFLIP) {
       kk = x0.l;
       x0.l = x1.l;
       x1.l = kk;
@@ -2946,7 +2947,8 @@ void paint_sprites_m7(int n, int cx, int cy, float ang) { // Takes the camera po
   // Pre-calculate _Dist1 and _Dist2 for each mode-7 object
 
   for (id = id_start; id <= id_end; id += iloc_len) {
-    if ((mem[id + _Status] == 2 || mem[id + _Status] == 4) && mem[id + _Ctype] == 2 &&
+    if ((mem[id + _Status] == PROC_ALIVE || mem[id + _Status] == PROC_FROZEN) &&
+        mem[id + _Ctype] == CTYPE_MODE7 &&
         (mem[id + _Cnumber] == 0 || (mem[id + _Cnumber] & (1 << n)))) {
       if (mem[id + _Resolution] > 0) {
         dx = (mem[id + _X] * 16) / mem[id + _Resolution] - cx2;
@@ -2979,7 +2981,7 @@ void paint_sprites_m7(int n, int cx, int cy, float ang) { // Takes the camera po
     ide = 0;
     max = 0x80000000;
     for (id = id_start; id <= id_end; id += iloc_len) {
-      if (mem[id + _Ctype] == 2 && mem[id + _Dist1] && !mem[id + _Painted]) {
+      if (mem[id + _Ctype] == CTYPE_MODE7 && mem[id + _Dist1] && !mem[id + _Painted]) {
         if (mem[id + _Dist1] > max || (mem[id + _Dist1] == max && mem[id + _Z] > old_z)) {
           ide = id;
           max = mem[id + _Dist1];
@@ -3048,13 +3050,13 @@ void paint_sprite_m7(int n, int ide, int x, int y, int size, int ang) {
     if (m < 1 || m > 256)
       return;
     // ang is the viewing angle of the graphic (0..4096), m is the number of partitions
-    mem[ide + _Flags] &= 254;
+    mem[ide + _Flags] &= ~SPRITE_HFLIP;
     mem[ide + _Graph] = ((ang + 4096 / (m * 2)) * m) / 4096;
     if (mem[ide + _Graph] >= m)
       mem[ide + _Graph] = 0;
     if ((mem[ide + _Graph] = mem[p + 1 + mem[ide + _Graph]]) < 0) {
       mem[ide + _Graph] = -mem[ide + _Graph];
-      mem[ide + _Flags] |= 1;
+      mem[ide + _Flags] |= SPRITE_HFLIP;
     }
   }
   if (mem[ide + _File])
