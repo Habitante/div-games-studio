@@ -992,7 +992,7 @@ void preview_2() {
   DIV_STRCPY(saved_font_path, FontPathName);
   memcpy(saved_char_table, char_table, 256);
 
-  create_test_text(test_string2, v.aux[1352 + RES_FOR_NAME]);
+  create_test_text(test_string2, v.aux[FNT_GENCODE_OFFSET + RES_FOR_NAME]);
 
   memset(char_table, 0, 256);
   for (x = 0; x < strlen(test_string2); x++)
@@ -1268,22 +1268,22 @@ void show_font1(void) {
   wbox(v.ptr, w, h, c0, 2, 32, ancho_w, 1);
 
   DIV_STRCPY(cWork, "");
-  if (v.aux[1352 + RES_FOR_NAME] & NUM)
+  if (v.aux[FNT_GENCODE_OFFSET + RES_FOR_NAME] & NUM)
     DIV_STRCAT(cWork, (char *)texts[166]);
-  if (v.aux[1352 + RES_FOR_NAME] & MAY)
+  if (v.aux[FNT_GENCODE_OFFSET + RES_FOR_NAME] & MAY)
     DIV_STRCAT(cWork, (char *)texts[167]);
-  if (v.aux[1352 + RES_FOR_NAME] & MIN)
+  if (v.aux[FNT_GENCODE_OFFSET + RES_FOR_NAME] & MIN)
     DIV_STRCAT(cWork, (char *)texts[168]);
-  if (v.aux[1352 + RES_FOR_NAME] & SIM)
+  if (v.aux[FNT_GENCODE_OFFSET + RES_FOR_NAME] & SIM)
     DIV_STRCAT(cWork, (char *)texts[169]);
-  if (v.aux[1352 + RES_FOR_NAME] & EXT)
+  if (v.aux[FNT_GENCODE_OFFSET + RES_FOR_NAME] & EXT)
     DIV_STRCAT(cWork, (char *)texts[170]);
 
   wwrite(v.ptr, w, h, w / 2 + 2, 34, 1, (byte *)cWork, c4);
 
   memcpy(saved_char_table, char_table, 256);
 
-  create_test_text(test_string2, v.aux[1352 + RES_FOR_NAME]);
+  create_test_text(test_string2, v.aux[FNT_GENCODE_OFFSET + RES_FOR_NAME]);
 
   memset(char_table, 0, 256);
   for (x = 0; x < strlen(test_string2); x++)

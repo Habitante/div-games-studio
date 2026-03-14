@@ -160,7 +160,7 @@ void update_palette(void) {
       dac[n] = 63;
     }
     n++;
-  } while (n < 768);
+  } while (n < PALETTE_SIZE);
 
   dark_color = 0;
 
@@ -480,7 +480,7 @@ struct pcx_struct {
 };
 
 int save_PCX(byte *mapa, int w, int h, FILE *f) {
-  byte p[768];
+  byte p[PALETTE_SIZE];
   int x;
   byte *cbuffer;
   struct pcx_struct pcx;
@@ -538,9 +538,9 @@ int save_PCX(byte *mapa, int w, int h, FILE *f) {
   fwrite(&pcx.header, 1, sizeof(pcx_header), f);
   fwrite(cbuffer, 1, cptr, f);
   fwrite(&Paletilla, 1, 1, f);
-  for (x = 0; x < 768; x++)
+  for (x = 0; x < PALETTE_SIZE; x++)
     p[x] = palette[x] * 4;
-  fwrite(p, 1, 768, f);
+  fwrite(p, 1, PALETTE_SIZE, f);
   free(cbuffer);
   return (0);
 }
@@ -548,7 +548,7 @@ int save_PCX(byte *mapa, int w, int h, FILE *f) {
 int save_MAP(byte *mapa, int w, int h, FILE *f) {
   int y;
   char cwork[32] = "";
-  char gradients[576];
+  char gradients[GRADIENTS_SIZE];
 
   fwrite("map\x1a\x0d\x0a\x00\x00", 8, 1, f); // +000 Header and version
   fwrite(&w, 2, 1, f);                        // +008 Width
@@ -557,7 +557,7 @@ int save_MAP(byte *mapa, int w, int h, FILE *f) {
   fwrite(&y, 4, 1, f); // +012 Code
 
   fwrite(cwork, 32, 1, f);    // +016 Description
-  fwrite(palette, 768, 1, f); // +048 Palette
+  fwrite(palette, PALETTE_SIZE, 1, f); // +048 Palette
 
   for (y = 0; y < 16; y++) {
     gradients[y * 36] = 16;
@@ -742,7 +742,7 @@ void init_ghost(void) {
   int n, m;
   byte *d = palette;
 
-  for (n = 0; n < 768; n++)
+  for (n = 0; n < PALETTE_SIZE; n++)
     dac4[n] = palette[n] * 4;
 
   for (n = 0; n < 512; n++)
@@ -922,7 +922,7 @@ void create_ghost_slow(void) {
   byte *pal, *endpal, *color = NULL;
 
   pal = dac4;
-  endpal = dac4 + 768;
+  endpal = dac4 + PALETTE_SIZE;
   dmin = 65536;
   do {
     dif = *(int *)(color_lookup + rr + *pal);
@@ -945,7 +945,7 @@ void find_color(byte r, byte g, byte b) { // Find a color (excluding index 0)
   byte *pal, *endpal, *color = NULL;
 
   pal = palette + 3;
-  endpal = palette + 768;
+  endpal = palette + PALETTE_SIZE;
   dmin = 65536;
   do {
     if (((pal - palette) / 3) == last_c1)

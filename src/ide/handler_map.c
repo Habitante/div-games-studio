@@ -14,7 +14,7 @@ void create_palette(void);
 void palette_action0(void);
 void apply_resize(struct tmapa *map_data, int map_w, int map_h);
 
-extern byte apply_palette[768];
+extern byte apply_palette[PALETTE_SIZE];
 extern byte *sample;
 extern int num_taggeds;
 extern struct t_listboxbr file_list_br;
@@ -628,7 +628,7 @@ int new_map(byte *pre_buffer) {
 int has_maps(void);
 extern int load_palette;
 
-extern byte apply_palette[768];
+extern byte apply_palette[PALETTE_SIZE];
 extern byte *sample;
 
 void open_map(void) {
@@ -637,8 +637,8 @@ void open_map(void) {
   int x, sum;
   int n, map_type;
   byte *buffer;
-  byte pal[768];
-  byte palorg[768];
+  byte pal[PALETTE_SIZE];
+  byte palorg[PALETTE_SIZE];
   byte xlat[256];
   int num, div_try;
 
@@ -663,9 +663,9 @@ void open_map(void) {
 
   n = 0; // Number of distinct palettes
   sample = NULL;
-  memcpy(pal, dac, 768);
-  memcpy(palorg, original_palette, 768);
-  memset(original_palette, 0, 768);
+  memcpy(pal, dac, PALETTE_SIZE);
+  memcpy(palorg, original_palette, PALETTE_SIZE);
+  memset(original_palette, 0, PALETTE_SIZE);
 
   for (num = 0; num < file_list_br.total_items; num++) {
     if (thumb[num].tagged) {
@@ -688,13 +688,13 @@ void open_map(void) {
 
       if (div_try) {
         if (n++ == 0) {
-          memcpy(pal, dac4, 768);
+          memcpy(pal, dac4, PALETTE_SIZE);
         } else {
           x = 0;
           sum = 0;
           do {
             sum += abs((int)pal[x] - (int)dac4[x]);
-          } while (++x < 768);
+          } while (++x < PALETTE_SIZE);
           if (sum) {
             if (sample == NULL) {
               sample = (byte *)malloc(32768);
@@ -719,7 +719,7 @@ void open_map(void) {
   if (sample != NULL) {
     create_palette();
     free(sample);
-    memcpy(pal, apply_palette, 768);
+    memcpy(pal, apply_palette, PALETTE_SIZE);
   }
 
   // pal[] now contains the palette of the maps to load
@@ -728,16 +728,16 @@ void open_map(void) {
   sum = 0;
   do {
     sum += abs((int)pal[x] - (int)dac[x]);
-  } while (++x < 768);
-  memcpy(work_palette, pal, 768);
+  } while (++x < PALETTE_SIZE);
+  memcpy(work_palette, pal, PALETTE_SIZE);
 
   if (sum && n == 1) {
     x = 0;
     sum = 0;
     do {
       sum += abs((int)original_palette[x] - (int)dac[x]);
-    } while (++x < 768);
-    memcpy(work_palette, original_palette, 768);
+    } while (++x < PALETTE_SIZE);
+    memcpy(work_palette, original_palette, PALETTE_SIZE);
   }
 
   if (sum) {
@@ -745,24 +745,24 @@ void open_map(void) {
 
     switch (v_accept) {
     case 0: // Cancel (don't load)
-      memcpy(original_palette, palorg, 768);
+      memcpy(original_palette, palorg, PALETTE_SIZE);
       return;
     case 1: // Adapt maps to the system palette
       break;
     case 2: // Merge palettes
-      memcpy(dac4, pal, 768);
+      memcpy(dac4, pal, PALETTE_SIZE);
       merge_palettes();
       pal_refresh(0, 1);
       break;
     case 3: // Activate the new palette
       if (sample == NULL)
-        memcpy(pal, original_palette, 768);
-      memcpy(dac4, pal, 768);
+        memcpy(pal, original_palette, PALETTE_SIZE);
+      memcpy(dac4, pal, PALETTE_SIZE);
       pal_refresh(0, 1);
       break;
     }
   }
-  memcpy(original_palette, palorg, 768);
+  memcpy(original_palette, palorg, PALETTE_SIZE);
 
 
   for (num = 0; num < file_list_br.total_items; num++) {
@@ -835,10 +835,10 @@ void open_map(void) {
                   sum = 0;
                   do {
                     sum += abs((int)dac4[x] - (int)dac[x]);
-                  } while (++x < 768);
+                  } while (++x < PALETTE_SIZE);
 
                   if (sum) {
-                    memcpy(pal, dac4, 768);
+                    memcpy(pal, dac4, PALETTE_SIZE);
                     create_dac4();
                     for (x = 0; x < 256; x++)
                       xlat[x] = find_color(pal[x * 3], pal[x * 3 + 1], pal[x * 3 + 2]);
@@ -1341,7 +1341,7 @@ void map_search() {
 
 void apply_resize(struct tmapa *map_data, int map_w, int map_h) {
   char *temp_buffer;
-  char saved_dac[768];
+  char saved_dac[PALETTE_SIZE];
   int n, p1, p2, p3, p4;
   int x, y, z, t, x0, y0, ant, min, max;
   float incx, incy;
@@ -1394,8 +1394,8 @@ void apply_resize(struct tmapa *map_data, int map_w, int map_h) {
     if ((rgb_tab = fopen("RGB_TAB.TMP", "rb")) == NULL)
       regen = 1;
     else {
-      fread(saved_dac, 1, 768, rgb_tab);
-      for (x = 0; x < 768; x++)
+      fread(saved_dac, 1, PALETTE_SIZE, rgb_tab);
+      for (x = 0; x < PALETTE_SIZE; x++)
         regen += abs(dac[x] - saved_dac[x]);
     }
     if (regen) {
@@ -1421,7 +1421,7 @@ void apply_resize(struct tmapa *map_data, int map_w, int map_h) {
       if (rgb_tab)
         fclose(rgb_tab);
       rgb_tab = fopen("RGB_TAB.TMP", "wb");
-      fwrite(dac, 1, 768, rgb_tab);
+      fwrite(dac, 1, PALETTE_SIZE, rgb_tab);
       fwrite(rgb_table, 1, 32768, rgb_tab);
       fclose(rgb_tab);
     } else {

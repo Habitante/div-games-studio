@@ -50,7 +50,7 @@ void print_fontmap(void) {
     div_strcat(font_path_name, sizeof(font_path_name), "/");
   div_strcat(font_path_name, sizeof(font_path_name), input); // * font_path_name full path of the file
 
-  buffer_len = 1356 + 256 * 16 + map_width * map_height; // Allocate enough memory for the FNT
+  buffer_len = FNT_TABLE_OFFSET + 256 * 16 + map_width * map_height; // Allocate enough memory for the FNT
 
   if ((buffer = (char *)malloc(buffer_len)) == NULL) {
     v_text = (char *)texts[45];
@@ -59,14 +59,14 @@ void print_fontmap(void) {
   }
 
   memcpy(buffer, "fnt\x1a\x0d\x0a\x00", 8);
-  memcpy(buffer + 8, dac, 768);
+  memcpy(buffer + 8, dac, PALETTE_SIZE);
   memcpy(buffer + 776, gradients, sizeof(gradients));
-  memset(buffer + 1356, 0, 256 * 16);
+  memset(buffer + FNT_TABLE_OFFSET, 0, 256 * 16);
 
-  di = buffer + 1356 + 256 * 16;
+  di = buffer + FNT_TABLE_OFFSET + 256 * 16;
   color = *map;
   chars = 0;
-  p = (int *)(buffer + 1356);
+  p = (int *)(buffer + FNT_TABLE_OFFSET);
 
   for (x = 1; x < map_width - 1; x++) {
     for (y = 1; y < map_height - 1; y++) {
@@ -111,18 +111,18 @@ end_bucle:
   }
 
   gencode = 0;
-  if (*(int *)(buffer + 1356 + '0' * 16))
+  if (*(int *)(buffer + FNT_TABLE_OFFSET + '0' * 16))
     gencode |= 1;
-  if (*(int *)(buffer + 1356 + 'A' * 16))
+  if (*(int *)(buffer + FNT_TABLE_OFFSET + 'A' * 16))
     gencode |= 2;
-  if (*(int *)(buffer + 1356 + 'a' * 16))
+  if (*(int *)(buffer + FNT_TABLE_OFFSET + 'a' * 16))
     gencode |= 4;
-  if (*(int *)(buffer + 1356 + '?' * 16))
+  if (*(int *)(buffer + FNT_TABLE_OFFSET + '?' * 16))
     gencode |= 8;
-  if (*(int *)(buffer + 1356 + '\xa4' * 16))
+  if (*(int *)(buffer + FNT_TABLE_OFFSET + '\xa4' * 16))
     gencode |= 16;
 
-  memcpy(buffer + 1352, &gencode, 4);
+  memcpy(buffer + FNT_GENCODE_OFFSET, &gencode, 4);
 
   if ((f = fopen(font_path_name, "wb")) == NULL) {
     v_text = (char *)texts[242];
@@ -162,7 +162,7 @@ end_bucle:
 //-----------------------------------------------------------------------------
 
 void generate_fontmap(void) {
-  int *p = (int *)(font_aux + 1356), n, x;
+  int *p = (int *)(font_aux + FNT_TABLE_OFFSET), n, x;
   char col[256], *ptr, *FntEnd = NULL;
   int dist, mincolor, mindist, r, g, b;
 

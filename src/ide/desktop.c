@@ -83,9 +83,9 @@ void download_desktop() {
   // Reserve space for the window count
   n = fwrite(&numvent, 1, 4, desktop);
   // Save palette /4
-  n = fwrite(dac, 768, 1, desktop);
+  n = fwrite(dac, PALETTE_SIZE, 1, desktop);
   // Save ghost table
-  n = fwrite(ghost, 65536, 1, desktop);
+  n = fwrite(ghost, GHOST_TABLE_SIZE, 1, desktop);
   // Check and save each used window one by one
   for (x = MAX_WINDOWS - 1; x >= 0; x--) {
     if (window[x].type != WIN_EMPTY && window[x].title) {
@@ -221,9 +221,9 @@ int can_upload_desktop() {
   // Skip the window counter
   fread(cWork, 4, 1, desktop);
   // Read palette /4
-  fread(dac, 768, 1, desktop);
+  fread(dac, PALETTE_SIZE, 1, desktop);
   // Read ghost table
-  fread(ghost, 65536, 1, desktop);
+  fread(ghost, GHOST_TABLE_SIZE, 1, desktop);
   fclose(desktop);
   return (1);
 }
@@ -247,7 +247,7 @@ int upload_desktop() {
 
   fseek(desktop, 8 + 4, SEEK_SET);
   fread(&numvent, 1, 4, desktop);
-  fseek(desktop, 8 + 4 + 4 + 768 + 65536, SEEK_SET);
+  fseek(desktop, 8 + 4 + 4 + PALETTE_SIZE + GHOST_TABLE_SIZE, SEEK_SET);
   // Load each of the windows one by one
   for (x = 0; x < numvent; x++) {
     // Window struct data

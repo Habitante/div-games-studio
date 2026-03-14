@@ -198,7 +198,7 @@ TFStatus TFAnimation_SetPaletteFunction(TFAnimation *animation,
 *  animation structure is deleted.
 *
 *  Frame buffer size must be <width>*<height> bytes and palette buffer size
-*  must be 768 bytes.
+*  must be PALETTE_SIZE (768) bytes.
 **************************************************************************/
 
 TFStatus TFBuffers_Set(TFAnimation *animation, void *framebuffer,

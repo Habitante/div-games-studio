@@ -780,7 +780,7 @@ int create_font_charset(int gen_code) {
     return (IFS_OPEN_ERROR);
   }
   fwrite("fnt\x1a\x0d\x0a\x00\x00", 8, 1, file_fnt);
-  fwrite(dac, 768, 1, file_fnt);
+  fwrite(dac, PALETTE_SIZE, 1, file_fnt);
   fwrite(gradients, sizeof(gradients), 1, file_fnt);
   fwrite(&gen_code, 1, 4, file_fnt);
 
@@ -868,7 +868,7 @@ int create_font_charset(int gen_code) {
     return (IFS_WRITE_ERROR);
   }
 
-  fseek(file_fnt, 8 + 768 + sizeof(gradients) + 4, SEEK_SET);
+  fseek(file_fnt, 8 + PALETTE_SIZE + sizeof(gradients) + 4, SEEK_SET);
   fwrite(&fnt_table, sizeof(fnt_table), 1, file_fnt);
 
   show_progress((char *)texts[217], 256, 256);
@@ -883,7 +883,7 @@ void get_char_size(int what_char, int *width, int *height) {
 
   if ((fnt_file = fopen("PREVIEW.FNT", "rb")) == NULL)
     return;
-  fseek(fnt_file, 8 + 768 + sizeof(gradients) + 4, SEEK_SET);
+  fseek(fnt_file, 8 + PALETTE_SIZE + sizeof(gradients) + 4, SEEK_SET);
   if (fread(fnt_table, sizeof(fnt_table), 1, fnt_file) < 1) {
     fclose(fnt_file);
     return;
@@ -900,7 +900,7 @@ void get_char_size_buffer(int what_char, int *width, int *height, char *buffer) 
   *width = 4;
   *height = 1;
 
-  memcpy(fnt_table, buffer + 8 + 768 + sizeof(gradients) + 4, sizeof(fnt_table));
+  memcpy(fnt_table, buffer + 8 + PALETTE_SIZE + sizeof(gradients) + 4, sizeof(fnt_table));
   *height = fnt_table[what_char].incY + fnt_table[what_char].height;
   *width = fnt_table[what_char].width + 1;
   return;
@@ -911,7 +911,7 @@ int show_char(int what_char, int cx, int cy, char *ptr, int w) {
   char *raw_buffer;
   if ((fnt_file = fopen("PREVIEW.FNT", "rb")) == NULL)
     return 4;
-  fseek(fnt_file, 8 + 768 + sizeof(gradients) + 4, SEEK_SET);
+  fseek(fnt_file, 8 + PALETTE_SIZE + sizeof(gradients) + 4, SEEK_SET);
   if (fread(fnt_table, sizeof(fnt_table), 1, fnt_file) < 1) {
     fclose(fnt_file);
     return 4;
@@ -963,7 +963,7 @@ int show_char(int what_char, int cx, int cy, char *ptr, int w) {
 int show_char_buffer(int what_char, int cx, int cy, char *ptr, int w, char *buffer) {
   int y, iy, x, c;
   char *raw_buffer;
-  memcpy(fnt_table, buffer + 8 + 768 + sizeof(gradients) + 4, sizeof(fnt_table));
+  memcpy(fnt_table, buffer + 8 + PALETTE_SIZE + sizeof(gradients) + 4, sizeof(fnt_table));
   if (fnt_table[what_char].width && fnt_table[what_char].height) {
     raw_buffer = (char *)malloc(fnt_table[what_char].width * fnt_table[what_char].height);
     if (raw_buffer == NULL) {
@@ -992,12 +992,12 @@ int show_char_buffer(int what_char, int cx, int cy, char *ptr, int w, char *buff
 }
 
 void convert_fnt_to_pal(char *buffer) {
-  char fnt_dac[768];
+  char fnt_dac[PALETTE_SIZE];
   int acum = 0, x, a, b;
   byte xlat[256];
-  memcpy(fnt_dac, buffer + 8, 768);
+  memcpy(fnt_dac, buffer + 8, PALETTE_SIZE);
 
-  for (x = 0; x < 768; x++)
+  for (x = 0; x < PALETTE_SIZE; x++)
     if (dac[x] != fnt_dac[x])
       acum = 1;
   if (!acum)
@@ -1008,7 +1008,7 @@ void convert_fnt_to_pal(char *buffer) {
   for (x = 1; x < 256; x++)
     xlat[x] = find_color_not0(fnt_dac[x * 3], fnt_dac[x * 3 + 1], fnt_dac[x * 3 + 2]);
 
-  memcpy(fnt_table, buffer + 8 + 768 + sizeof(gradients) + 4, sizeof(fnt_table));
+  memcpy(fnt_table, buffer + 8 + PALETTE_SIZE + sizeof(gradients) + 4, sizeof(fnt_table));
 
   for (x = 0; x < 256; x++) {
     if (fnt_table[x].width && fnt_table[x].height)
@@ -1018,5 +1018,5 @@ void convert_fnt_to_pal(char *buffer) {
           *(buffer + fnt_table[x].offset + a * fnt_table[x].width + b) = xlat[acum];
         }
   }
-  memcpy(buffer + 8, dac, 768);
+  memcpy(buffer + 8, dac, PALETTE_SIZE);
 }

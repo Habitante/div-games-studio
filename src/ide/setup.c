@@ -1211,9 +1211,9 @@ void prepare_wallpaper_temp(void) {
   int x, y, lon, tap_w, tap_h, con_x = 0, con_y = 0, w, h, n;
   byte *p, *q;
   byte *temp;
-  byte pal[768];
-  byte old_dac[768];
-  byte old_dac4[768];
+  byte pal[PALETTE_SIZE];
+  byte old_dac[PALETTE_SIZE];
+  byte old_dac4[PALETTE_SIZE];
 
 
   // TODO: Support tiling/rescaling and loading a user-specified map file
@@ -1272,8 +1272,8 @@ void prepare_wallpaper_temp(void) {
   swap(map_width, tap_w);
   swap(map_height, tap_h);
 
-  memcpy(old_dac4, dac4, 768);
-  memcpy(old_dac, dac, 768);
+  memcpy(old_dac4, dac4, PALETTE_SIZE);
+  memcpy(old_dac, dac, PALETTE_SIZE);
 
   n = 1;
   switch (x) {
@@ -1302,7 +1302,7 @@ void prepare_wallpaper_temp(void) {
     return;
   }
 
-  memcpy(pal, dac4, 768);
+  memcpy(pal, dac4, PALETTE_SIZE);
   create_dac4();
 
   if (!wallpaper_gamma) {
@@ -1355,6 +1355,6 @@ void prepare_wallpaper_temp(void) {
     x_wallpaper_map = x_wallpaper = p;
   }
 
-  memcpy(dac, old_dac, 768);
-  memcpy(dac4, old_dac4, 768);
+  memcpy(dac, old_dac, PALETTE_SIZE);
+  memcpy(dac4, old_dac4, PALETTE_SIZE);
 }

@@ -19,7 +19,7 @@
 //      Module-shared variables (defined in handler.c)
 //-----------------------------------------------------------------------------
 
-extern byte aux_palette[768];
+extern byte aux_palette[PALETTE_SIZE];
 extern int new_status;
 
 //-----------------------------------------------------------------------------
@@ -63,7 +63,7 @@ extern struct t_listbox drive_list;
 extern struct t_listbox ext_list;
 
 // Shared dialog state
-extern byte work_palette[768];
+extern byte work_palette[PALETTE_SIZE];
 extern char user1[128];
 extern char user2[128];
 

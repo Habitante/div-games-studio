@@ -370,7 +370,7 @@ void initialization(void) {
     exer(1);
 #endif
 
-  if ((ghost_inicial = (byte *)malloc(65536 + 512)) == NULL)
+  if ((ghost_inicial = (byte *)malloc(GHOST_TABLE_SIZE + 512)) == NULL)
     exer(1);
 
   ghost = (byte *)((uintptr_t)(ghost_inicial + 512)); //&0xFFFFFF00);
@@ -416,10 +416,10 @@ void initialization(void) {
 
   memset(g, 0, sizeof(g));
 
-  if ((g[0].grf = (int **)malloc(sizeof(int *) * 2000)) == NULL)
+  if ((g[0].grf = (int **)malloc(sizeof(int *) * MAX_FPG_GRAPHICS * 2)) == NULL)
     exer(1);
-  memset(g[0].grf, 0, sizeof(int *) * 2000);
-  next_map_code = 1000;
+  memset(g[0].grf, 0, sizeof(int *) * MAX_FPG_GRAPHICS * 2);
+  next_map_code = MAX_FPG_GRAPHICS;
 
   memset(fonts, 0, sizeof(fonts));
   memset(texts, 0, sizeof(texts));
@@ -448,8 +448,8 @@ void initialization(void) {
   _mouse_x = mouse->x;
   _mouse_y = mouse->y;
 
-  memset(&palette[0], 0, 768);
-  memset(&dac[0], 0, 768);
+  memset(&palette[0], 0, PALETTE_SIZE);
+  memset(&dac[0], 0, PALETTE_SIZE);
   dacout_r = 0;
   dacout_g = 0;
   dacout_b = 0;
@@ -512,7 +512,7 @@ void initialization(void) {
 
   init_sin_cos(); // Sine and cosine tables for mode-7
 
-  memcpy(palette, system_dac, 768);
+  memcpy(palette, system_dac, PALETTE_SIZE);
   apply_palette();
 
   auto_adapt_palette = 0; // Until force_pal is called...
@@ -562,7 +562,7 @@ void initialization(void) {
 void create_color_lookup(void) {
   int a, b;
 
-  if ((color_lookup = (byte *)malloc(16384)) == NULL)
+  if ((color_lookup = (byte *)malloc(CUAD_TABLE_SIZE)) == NULL)
     exer(1);
 
   a = 0;
@@ -604,7 +604,7 @@ void system_font(void) {
     }
   }
 
-  n = 1356 + sizeof(fnt_table_entry) * 256 + 12288;
+  n = FNT_TABLE_OFFSET + sizeof(fnt_table_entry) * 256 + 12288;
 
   if ((fonts[0] = (byte *)malloc(n)) == NULL)
     exer(1);
@@ -612,12 +612,12 @@ void system_font(void) {
   memset(fonts[0], 0, n);
   memcpy(fonts[0] + n - 12288, sys06x08, 12288);
 
-  ptr = (int *)(fonts[0] + 1356);
+  ptr = (int *)(fonts[0] + FNT_TABLE_OFFSET);
   for (n = 0; n < 256; n++) {
     *ptr++ = 6;
     *ptr++ = 8;
     *ptr++ = 0;
-    *ptr++ = 1356 + sizeof(fnt_table_entry) * 256 + n * 48;
+    *ptr++ = FNT_TABLE_OFFSET + sizeof(fnt_table_entry) * 256 + n * 48;
   }
   last_c1 = 1;
 
@@ -1554,7 +1554,7 @@ void finalization(void) {
 #endif
 
   // free any new_map ptrs if any
-  for (newmapcount = 1000; newmapcount < 2000; newmapcount++) {
+  for (newmapcount = MAX_FPG_GRAPHICS; newmapcount < MAX_FPG_GRAPHICS * 2; newmapcount++) {
     if (g[0].grf[newmapcount] != 0) {
       free((byte *)(g[0].grf[newmapcount]) - 1330);
       g[0].grf[newmapcount] = 0;

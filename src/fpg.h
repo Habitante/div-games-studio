@@ -17,14 +17,14 @@ typedef struct _FPG {
   uint8_t current_file[_MAX_PATH + 14];
   int nIndex;
   int last_used;
-  int desc_index[1000];
-  uint8_t code_desc[1000][40];
-  int grf_offsets[1000];
+  int desc_index[MAX_FPG_GRAPHICS];
+  uint8_t code_desc[MAX_FPG_GRAPHICS][40];
+  int grf_offsets[MAX_FPG_GRAPHICS];
   byte fpg_name[13];
   struct t_listboxbr list_info;
   int fpg_info;
   int thumb_on;
-  t_thumb thumb[1000];
+  t_thumb thumb[MAX_FPG_GRAPHICS];
   byte version;
 } FPG;
 

@@ -43,7 +43,7 @@ byte _r, _g, _b, find_col; // Palette calculations
 
 int find_min; // Nearest color calculation
 
-byte palette[768];
+byte palette[PALETTE_SIZE];
 
 int num_points;
 
@@ -53,7 +53,7 @@ int num_points;
 
 void find_colors(void) {
   int x;
-  char pal[768];
+  char pal[PALETTE_SIZE];
   FILE *f;
 
   create_dac4();
@@ -89,11 +89,11 @@ void find_colors(void) {
   c_g_low = find_color(0, 32, 0);
   color_c0 = c0;
 
-  memset(pal, 0, 768);
+  memset(pal, 0, PALETTE_SIZE);
 
   if ((f = fopen("help/help.fig", "rb")) != NULL) {
     fseek(f, 8, SEEK_SET);
-    fread(pal, 1, 768, f);
+    fread(pal, 1, PALETTE_SIZE, f);
     fclose(f);
     help_xlat[0] = 0;
 
@@ -376,7 +376,7 @@ void create_ghost_slow(void) {
 
   color = dac4;
   pal = dac4;
-  endpal = dac4 + 768;
+  endpal = dac4 + PALETTE_SIZE;
   dmin = 65536;
   do {
     dif = *(int *)(color_lookup + r + *pal);
@@ -399,7 +399,7 @@ void create_ghost_slow(void) {
 
 void create_dac4(void) {
   int a;
-  for (a = 0; a < 768; a++)
+  for (a = 0; a < PALETTE_SIZE; a++)
     dac4[a] = dac[a] * 4;
 }
 
@@ -414,7 +414,7 @@ byte find_color(byte r, byte g, byte b) {
 
   color = dac4;
   pal = dac4;
-  endpal = dac4 + 768;
+  endpal = dac4 + PALETTE_SIZE;
   dmin = 65536;
   _r = (int)r * 256;
   _g = (int)g * 256;
@@ -441,7 +441,7 @@ byte find_color_not0(byte r, byte g, byte b) {
 
   color = dac4;
   pal = dac4 + 3;
-  endpal = dac4 + 768;
+  endpal = dac4 + PALETTE_SIZE;
   dmin = 65536;
   _r = (int)r * 256;
   _g = (int)g * 256;
@@ -732,7 +732,7 @@ extern t_thumb thumb[MAX_FILES];
 extern int num_taggeds;
 
 extern byte *sample;
-extern byte apply_palette[768];
+extern byte apply_palette[PALETTE_SIZE];
 extern int num_colors;
 void create_palette(void);
 
@@ -843,7 +843,7 @@ void pal_load() {
     }
 
     create_palette();
-    memcpy(&dac4[0], &apply_palette[0], 768);
+    memcpy(&dac4[0], &apply_palette[0], PALETTE_SIZE);
     free(sample);
 
     if (has_maps()) {
@@ -869,7 +869,7 @@ void pal_save() {
   if ((f = fopen(full, "wb")) != NULL) {
     div_strcpy(pal_name, sizeof(pal_name), full);
     fwrite("pal\x1a\x0d\x0a\x00\x00", 8, 1, f);
-    fwrite(dac, 768, 1, f);
+    fwrite(dac, PALETTE_SIZE, 1, f);
     for (x = 0; x < 16; x++)
       fwrite(&gradients[x], 1, 36, f);
     fclose(f);
@@ -929,8 +929,8 @@ void pal_refresh(int preserve_maps, int save_original) {
   int w, h, x, sum;
   int n, m;
   FPG *my_fpg;
-  byte pal[768];
-  byte xlat[768];
+  byte pal[PALETTE_SIZE];
+  byte xlat[PALETTE_SIZE];
   int tal = 24 * big2, tan = 41 * big2;
 
   // Check if the new palette is different
@@ -939,12 +939,12 @@ void pal_refresh(int preserve_maps, int save_original) {
   sum = 0;
   do {
     sum += abs((int)dac[x] - (int)dac4[x]);
-  } while (++x < 768);
+  } while (++x < PALETTE_SIZE);
   if (!sum) {
     x = 0;
     do
       dac4[x] = dac[x] * 4;
-    while (++x < 768);
+    while (++x < PALETTE_SIZE);
     return;
   }
 
@@ -963,8 +963,8 @@ void pal_refresh(int preserve_maps, int save_original) {
       }
     }
 
-  memcpy(pal, dac, 768);
-  memcpy(dac, dac4, 768);
+  memcpy(pal, dac, PALETTE_SIZE);
+  memcpy(dac, dac4, PALETTE_SIZE);
 
   // *** Remap existing graphics to the new palette
 
@@ -1115,7 +1115,7 @@ void pal_refresh(int preserve_maps, int save_original) {
     }
 
   for (n = 4; n < 64; n += 4) { // fade_off
-    for (x = 0; x < 768; x++) {
+    for (x = 0; x < PALETTE_SIZE; x++) {
       if (pal[x] > n) {
         dac4[x] = pal[x] - n;
       } else {
@@ -1139,7 +1139,7 @@ void pal_refresh(int preserve_maps, int save_original) {
   blit_screen(screen_buffer);
 
   for (n = 60; n >= 0; n -= 4) {
-    for (x = 0; x < 768; x++)
+    for (x = 0; x < PALETTE_SIZE; x++)
       if (dac[x] > n)
         dac4[x] = dac[x] - n;
       else
@@ -1147,11 +1147,11 @@ void pal_refresh(int preserve_maps, int save_original) {
     set_dac(dac4);
   }
 
-  for (n = 0; n < 768; n++)
+  for (n = 0; n < PALETTE_SIZE; n++)
     dac4[n] = dac[n] * 4;
 
   if (save_original)
-    memcpy(original_palette, dac, 768);
+    memcpy(original_palette, dac, PALETTE_SIZE);
 
   for (n = 1; n < MAX_WINDOWS; n++) {
     if (window[n].type == WIN_FPG) {
@@ -1312,7 +1312,7 @@ void sort_palette(void) {
 //      Merge two different palettes
 //-----------------------------------------------------------------------------
 
-// byte palette[768]
+// byte palette[PALETTE_SIZE]
 
 word find_order2(byte *dac) {
   int dmin, dif, r2, g2, b2;
@@ -1523,7 +1523,7 @@ void merge_palettes(void) {
 //-----------------------------------------------------------------------------
 
 byte *sample; // 32768
-byte apply_palette[768];
+byte apply_palette[PALETTE_SIZE];
 int num_colors;
 extern int load_palette;
 
@@ -1695,7 +1695,7 @@ void create_palette(void) {
   free(palette);
   free(pal);
 
-  for (n = 0; n < 768; n++)
+  for (n = 0; n < PALETTE_SIZE; n++)
     dac4[n] = apply_palette[n] * 4;
 
   for (n = 0, c = 0, rr = 0; rr < 32; rr++)
@@ -1710,7 +1710,7 @@ void create_palette(void) {
 
   create_dac4();
 
-  for (n = 0; n < 768; n++)
+  for (n = 0; n < PALETTE_SIZE; n++)
     if ((col = apply_palette[n]))
       apply_palette[n] = col * 2 + 1;
 
@@ -1733,9 +1733,9 @@ void prepare_wallpaper(void) {
   int x, lon, tap_w, tap_h;
   byte *p, *q;
   byte *temp, *temp2;
-  byte pal[768];
-  byte old_dac[768];
-  byte old_dac4[768];
+  byte pal[PALETTE_SIZE];
+  byte old_dac[PALETTE_SIZE];
+  byte old_dac4[PALETTE_SIZE];
   int n;
 
   if ((f = fopen(setup_file.desktop_image, "rb")) == NULL)
@@ -1787,8 +1787,8 @@ void prepare_wallpaper(void) {
   swap(map_width, tap_w);
   swap(map_height, tap_h);
 
-  memcpy(old_dac4, dac4, 768);
-  memcpy(old_dac, dac, 768);
+  memcpy(old_dac4, dac4, PALETTE_SIZE);
+  memcpy(old_dac, dac, PALETTE_SIZE);
 
   n = load_palette;
   load_palette = 1;
@@ -1811,7 +1811,7 @@ void prepare_wallpaper(void) {
   load_palette = n;
 
   free(temp2);
-  memcpy(pal, dac4, 768);
+  memcpy(pal, dac4, PALETTE_SIZE);
   create_dac4();
 
   if (!setup_file.desktop_gamma) { // If the file is displayed in color
@@ -1849,8 +1849,8 @@ void prepare_wallpaper(void) {
     wallpaper_map = wallpaper = p;
   }
 
-  memcpy(dac, old_dac, 768);
-  memcpy(dac4, old_dac4, 768);
+  memcpy(dac, old_dac, PALETTE_SIZE);
+  memcpy(dac4, old_dac4, PALETTE_SIZE);
 }
 
 void rescale(byte *src, int src_w, int src_h, byte *dst, int dst_w, int dst_h) {
@@ -2003,7 +2003,7 @@ void pal_interpolate2(void) {
       old_color = cur_color;
     }
     if ((mouse_b) && (cur_color != sel_color)) {
-      memcpy(palette, dac, 768);
+      memcpy(palette, dac, PALETTE_SIZE);
       switch (action) {
       case 1:
         //Gradient fill
@@ -2236,7 +2236,7 @@ void pal_interpolate2(void) {
     break;
   case 2:
     //Undo
-    memcpy(dac, palette, 768);
+    memcpy(dac, palette, PALETTE_SIZE);
 
     find_colors();
     refresh_dialog();
@@ -2295,28 +2295,28 @@ void pal_interpolate0(void) {
 
 void pal_edit() {
   int n;
-  byte dac_aux[768];
+  byte dac_aux[PALETTE_SIZE];
   return_value = 0;
-  memcpy(dac_aux, dac, 768);
-  memcpy(palette, dac, 768);
+  memcpy(dac_aux, dac, PALETTE_SIZE);
+  memcpy(palette, dac, PALETTE_SIZE);
   show_dialog(pal_interpolate0);
   if (!return_value) {
-    memcpy(dac, dac_aux, 768);
+    memcpy(dac, dac_aux, PALETTE_SIZE);
     find_colors();
     set_dac(dac);
   } else {
-    for (n = 0; n < 768; n++)
+    for (n = 0; n < PALETTE_SIZE; n++)
       if (dac_aux[n] != dac[n])
         break;
-    if (n < 768) {
+    if (n < PALETTE_SIZE) {
       if (has_maps()) {
         v_title = (char *)texts[53];
         v_text = (char *)texts[321];
         show_dialog(accept0);
       } else
         v_accept = 1;
-      memcpy(dac4, dac, 768);
-      memcpy(dac, dac_aux, 768);
+      memcpy(dac4, dac, PALETTE_SIZE);
+      memcpy(dac, dac_aux, PALETTE_SIZE);
       if (v_accept)
         pal_refresh(0, 1);
       else

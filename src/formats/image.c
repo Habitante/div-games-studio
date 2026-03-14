@@ -136,8 +136,8 @@ void fmt_load_map(byte *buffer, byte *mapa, int vent) {
     memcpy(map_description, buffer + 16, 32);
   }
 
-  memcpy(dac4, buffer + 48, 768);
-  memcpy(&num_points, buffer + 1392, 2);
+  memcpy(dac4, buffer + 48, PALETTE_SIZE);
+  memcpy(&num_points, buffer + MAP_CTRLPTS_OFFSET, 2);
 
   if (num_points < 0)
     num_points = 0;
@@ -167,7 +167,7 @@ int fmt_save_map(byte *mapa, FILE *f) {
   fwrite(&y, 4, 1, f); // +012 Code
 
   fwrite(window[v_window].mapa->description, 32, 1, f); // +016 Description
-  fwrite(dac, 768, 1, f);                               // +048 Palette
+  fwrite(dac, PALETTE_SIZE, 1, f);                               // +048 Palette
   fwrite(gradients, 1, sizeof(gradients), f);           // +816 Color gradients
 
   num_points = 0;
@@ -254,7 +254,7 @@ int fmt_is_pcx(byte *buffer) {
 }
 
 extern byte *sample;
-extern byte apply_palette[768];
+extern byte apply_palette[PALETTE_SIZE];
 extern int num_colors;
 void create_palette(void);
 void browser2(void);
@@ -361,8 +361,8 @@ void fmt_load_pcx(byte *buffer, byte *mapa, int vent) {
         *dest++ = ch;
     } while (1);
 
-    memcpy(dac4, buffer, 768);
-    for (con = 0; con < 768; con++)
+    memcpy(dac4, buffer, PALETTE_SIZE);
+    for (con = 0; con < PALETTE_SIZE; con++)
       dac4[con] /= 4;
   } else if (header.bits_per_pixel == 1 && header.color_planes == 4) {
     // Convert from 4 to 8 bpp
@@ -487,7 +487,7 @@ void fmt_load_pcx(byte *buffer, byte *mapa, int vent) {
       free(pSrc = AuxPtr);
       sample = old_sample;
 
-      memcpy(&dac4[0], &apply_palette[0], 768);
+      memcpy(&dac4[0], &apply_palette[0], PALETTE_SIZE);
     }
   }
   if (vent) {
@@ -499,7 +499,7 @@ void fmt_load_pcx(byte *buffer, byte *mapa, int vent) {
 }
 
 int fmt_save_pcx(byte *mapa, FILE *f) {
-  byte p[768];
+  byte p[PALETTE_SIZE];
   int x;
   byte *cbuffer;
   struct pcx_struct pcx;
@@ -560,9 +560,9 @@ int fmt_save_pcx(byte *mapa, FILE *f) {
   fwrite(&pcx.header, 1, sizeof(pcx_header), f);
   fwrite(cbuffer, 1, cptr, f);
   fwrite(&Paletilla, 1, 1, f);
-  for (x = 0; x < 768; x++)
+  for (x = 0; x < PALETTE_SIZE; x++)
     p[x] = dac[x] * 4;
-  fwrite(p, 1, 768, f);
+  fwrite(p, 1, PALETTE_SIZE, f);
   free(cbuffer);
   return (0);
 }
@@ -933,7 +933,7 @@ void fmt_load_bmp(byte *buffer, byte *mapa, int vent) {
 
       free(sample);
       sample = old_sample;
-      memcpy(&dac4[0], &apply_palette[0], 768);
+      memcpy(&dac4[0], &apply_palette[0], PALETTE_SIZE);
     }
   }
 
@@ -1159,7 +1159,7 @@ int fmt_load_dac_fnt(char *name) {
     fclose(file);
     return (0);
   }
-  fread(dac4, 768, 1, file);
+  fread(dac4, PALETTE_SIZE, 1, file);
   fclose(file);
 
   return (1);
@@ -1180,7 +1180,7 @@ int fmt_load_dac_fpg(char *name) {
     fclose(file);
     return (0);
   }
-  fread(dac4, 768, 1, file);
+  fread(dac4, PALETTE_SIZE, 1, file);
   fclose(file);
 
   return (1);
@@ -1198,16 +1198,16 @@ int fmt_load_dac_pal(char *name) {
   }
   fread(par, 1, 8, file);
   fseek(file, 0, SEEK_END);
-  if (strcmp(par, "pal\x1a\x0d\x0a\x00\x00") && (ftell(file) != 768)) {
+  if (strcmp(par, "pal\x1a\x0d\x0a\x00\x00") && (ftell(file) != PALETTE_SIZE)) {
     fclose(file);
     return (0);
   }
-  if (ftell(file) == 768) {
+  if (ftell(file) == PALETTE_SIZE) {
     fseek(file, 0, SEEK_SET);
-    fread(dac4, 768, 1, file);
+    fread(dac4, PALETTE_SIZE, 1, file);
   } else {
     fseek(file, 8, SEEK_SET);
-    fread(dac4, 768, 1, file);
+    fread(dac4, PALETTE_SIZE, 1, file);
   }
   fclose(file);
 
@@ -1260,7 +1260,7 @@ int fmt_load_dac_map(char *name) {
     swap(mal, map_height);
     fmt_load_map(buffer, temp, 0);
 
-    memcpy(original_palette, dac4, 768);
+    memcpy(original_palette, dac4, PALETTE_SIZE);
 
     fmt_strip_unused_colors(temp, map_width * map_height);
 
@@ -1271,7 +1271,7 @@ int fmt_load_dac_map(char *name) {
 
   } else {
     fseek(file, 48, SEEK_SET);
-    fread(dac4, 768, 1, file);
+    fread(dac4, PALETTE_SIZE, 1, file);
   }
 
   fclose(file);
@@ -1304,9 +1304,9 @@ int fmt_load_dac_pcx(char *name) {
 
   if (header.bits_per_pixel == 8 && header.color_planes == 1 && !load_palette) {
     fseek(file, 0, SEEK_END);
-    fseek(file, ftell(file) - 768, SEEK_SET);
-    fread(dac4, 768, 1, file);
-    for (x = 0; x < 768; x++)
+    fseek(file, ftell(file) - PALETTE_SIZE, SEEK_SET);
+    fread(dac4, PALETTE_SIZE, 1, file);
+    for (x = 0; x < PALETTE_SIZE; x++)
       dac4[x] = dac4[x] / 4;
   } else if (header.bits_per_pixel == 8 && (header.color_planes == 3 || header.color_planes == 1)) {
     man = header.xmax - header.xmin + 1;
@@ -1334,7 +1334,7 @@ int fmt_load_dac_pcx(char *name) {
     load_palette = 1;
     fmt_load_pcx(buffer, temp, 0);
 
-    memcpy(original_palette, dac4, 768);
+    memcpy(original_palette, dac4, PALETTE_SIZE);
 
     if (header.color_planes == 1)
       fmt_strip_unused_colors(temp, map_width * map_height);
@@ -1438,7 +1438,7 @@ int fmt_load_dac_bmp(char *name) {
     load_palette = 1;
     fmt_load_bmp(buffer, temp, 0);
 
-    memcpy(original_palette, dac4, 768);
+    memcpy(original_palette, dac4, PALETTE_SIZE);
 
     if (InfoHeader.biBitCount == 8)
       fmt_strip_unused_colors(temp, map_width * map_height);
@@ -1542,7 +1542,7 @@ int fmt_load_dac_jpg(char *name) {
     }
   }
 
-  memcpy(original_palette, dac4, 768);
+  memcpy(original_palette, dac4, PALETTE_SIZE);
 
   jpeg_finish_decompress(&cinfo);
   jpeg_destroy_decompress(&cinfo);

@@ -13,7 +13,7 @@ char description[33];
 extern char *fpg_image;
 extern short *fpg_points;
 
-extern char newdac[768];
+extern char newdac[PALETTE_SIZE];
 extern int new_dac_loaded;
 
 #define incremento_maximo 65536
@@ -117,14 +117,14 @@ void fpg_dialog2(void) {
         COD++;
       };
 
-      if (COD > 999)
+      if (COD >= MAX_FPG_GRAPHICS)
         COD = 1;
 
       while (my_fpg->grf_offsets[COD]) {
         COD++;
       };
 
-      if (COD > 999)
+      if (COD >= MAX_FPG_GRAPHICS)
         COD = 1;
     }
     num_points = 0;
@@ -138,7 +138,7 @@ void fpg_dialog2(void) {
             window[1].mapa->map_height, num_points, (char *)window[1].mapa->points,
             (char *)window[1].mapa->map, 0, 1);
 
-    for (n = 0; n < 1000; n++)
+    for (n = 0; n < MAX_FPG_GRAPHICS; n++)
       my_fpg->thumb[n].tagged = 0;
 
     call((void_return_type_t)v.paint_handler);
@@ -278,7 +278,7 @@ void fpg_dialog3(void) {
   int n;
 
   // Free FPG thumbnails
-  for (n = 0; n < 1000; n++) {
+  for (n = 0; n < MAX_FPG_GRAPHICS; n++) {
     if (my_fpg->thumb[n].ptr != NULL)
       free(my_fpg->thumb[n].ptr);
   }
@@ -301,7 +301,7 @@ void fpg_dialog0_new(void) {
   v.aux = v_aux;
   my_fpg = (FPG *)v.aux;
 
-  for (n = 0; n < 1000; n++) {
+  for (n = 0; n < MAX_FPG_GRAPHICS; n++) {
     my_fpg->thumb[n].ptr = NULL;
     my_fpg->thumb[n].status = 0;
     my_fpg->thumb[n].tagged = 0;
@@ -332,7 +332,7 @@ void fpg_dialog0_add(void) {
 
   v.aux = v_aux;
   my_fpg = (FPG *)v.aux;
-  for (n = 0; n < 1000; n++) {
+  for (n = 0; n < MAX_FPG_GRAPHICS; n++) {
     my_fpg->thumb[n].ptr = NULL;
     my_fpg->thumb[n].status = 0;
     my_fpg->thumb[n].tagged = 0;
@@ -399,9 +399,9 @@ extern int num_taggeds;
 void create_palette(void);
 void merge_palettes(void);
 void palette_action0(void);
-extern byte work_palette[768];
+extern byte work_palette[PALETTE_SIZE];
 
-extern byte apply_palette[768];
+extern byte apply_palette[PALETTE_SIZE];
 extern byte *sample;
 
 void open_file(void) {
@@ -412,7 +412,7 @@ void open_file(void) {
 
   int x, sum;
   int n;
-  byte pal[768];
+  byte pal[PALETTE_SIZE];
 
   v_mode = 0;
   v_type = FT_FPG;
@@ -446,7 +446,7 @@ void open_file(void) {
 
   n = 0; // Number of distinct palettes
   sample = NULL;
-  memcpy(pal, dac, 768);
+  memcpy(pal, dac, PALETTE_SIZE);
 
   for (num = 0; num < file_list_br.total_items; num++) {
     if (thumb[num].tagged) {
@@ -473,18 +473,18 @@ void open_file(void) {
         continue;
       }
 
-      fread(dac4, 768, 1, f);
+      fread(dac4, PALETTE_SIZE, 1, f);
       fclose(f);
 
       if (n++ == 0) {
-        memcpy(pal, dac4, 768);
+        memcpy(pal, dac4, PALETTE_SIZE);
       } else {
         x = 0;
         sum = 0;
 
         do {
           sum += abs((int)pal[x] - (int)dac4[x]);
-        } while (++x < 768);
+        } while (++x < PALETTE_SIZE);
 
         if (sum) {
           if (sample == NULL) {
@@ -513,7 +513,7 @@ void open_file(void) {
   if (sample != NULL) {
     create_palette();
     free(sample);
-    memcpy(pal, apply_palette, 768);
+    memcpy(pal, apply_palette, PALETTE_SIZE);
   }
 
   // Now pal[] holds the palette of the FPGs to load
@@ -522,10 +522,10 @@ void open_file(void) {
   sum = 0;
   do {
     sum += abs((int)pal[x] - (int)dac[x]);
-  } while (++x < 768);
+  } while (++x < PALETTE_SIZE);
 
   if (sum) {
-    memcpy(work_palette, pal, 768);
+    memcpy(work_palette, pal, PALETTE_SIZE);
     show_dialog(palette_action0); // Load palette?
 
     switch (v_accept) {
@@ -537,13 +537,13 @@ void open_file(void) {
       break;
 
     case 2: // Merge palettes
-      memcpy(dac4, pal, 768);
+      memcpy(dac4, pal, PALETTE_SIZE);
       merge_palettes();
       pal_refresh(0, 1);
       break;
 
     case 3: // Apply new palette
-      memcpy(dac4, pal, 768);
+      memcpy(dac4, pal, PALETTE_SIZE);
       pal_refresh(0, 1);
       break;
     }
@@ -653,26 +653,26 @@ void fpg_warning0(void) {
 }
 
 
-extern byte aux_pal[768];
+extern byte aux_pal[PALETTE_SIZE];
 
 int remap_all_files(int vent) {
   // Ask whether to remap the FPG palette or close it
 
   FPG *my_fpg = (FPG *)window[vent].aux;
-  byte p[768]; // to compare file palette with DAC
+  byte p[PALETTE_SIZE]; // to compare file palette with DAC
   FILE *f;
   int sum, x;
 
   if ((f = fopen((char *)my_fpg->current_file, "rb")) != NULL) {
     fseek(f, 8, SEEK_SET);
-    fread(p, 1, 768, f);
+    fread(p, 1, PALETTE_SIZE, f);
     fclose(f);
     x = 0;
     sum = 0;
 
     do {
       sum += abs((int)dac[x] - (int)p[x]);
-    } while (++x < 768);
+    } while (++x < PALETTE_SIZE);
 
     if (!sum)
       return (0);
@@ -791,7 +791,7 @@ void get_code0(void) {
   _button(100, 7, v.h - 14, ALIGN_TL);
   _button(101, v.w - 8, v.h - 14, ALIGN_TR);
 
-  _get(71, 4, 12, 30, (byte *)code_str, 5, 1, 999);
+  _get(71, 4, 12, 30, (byte *)code_str, 5, 1, MAX_FPG_GRAPHICS - 1);
   _get(439, 48, 12, 64, (byte *)file_str, 12, 0, 0);
   _get(72, 4, 52, v.w - 8, (byte *)description, 32, 0, 0);
 }
@@ -1091,7 +1091,7 @@ void print_list(void) {
   if (v_accept) {
     my_fpg = (FPG *)window[vent].aux;
 
-    for (n = 0; n < 1000; n++)
+    for (n = 0; n < MAX_FPG_GRAPHICS; n++)
       if (my_fpg->grf_offsets[n])
         num++;
 
@@ -1130,7 +1130,7 @@ void print_list(void) {
         return;
       }
 
-      for (n = 0; n < 1000; n++) {
+      for (n = 0; n < MAX_FPG_GRAPHICS; n++) {
         if (my_fpg->grf_offsets[n]) {
           show_progress((char *)texts[437], ++_num, num);
           fseek(g, my_fpg->grf_offsets[n], SEEK_SET);
@@ -1853,7 +1853,7 @@ void get_map_graphic(struct tmapa *mapa, byte *imagen, int x, int y, int width, 
 
 struct {
   int x, y, w, h;
-} lgraf[1000];
+} lgraf[MAX_FPG_GRAPHICS];
 
 int lnum = 0;
 int lmapan, lmapal;
@@ -1982,7 +1982,7 @@ void put_map_graphic(byte *imagen, byte *mapa, int num) {
 void place_map(void) { // Place graphic lnum
 
   int n, m, x, y, new_x;
-  int scans, scan[1000];
+  int scans, scan[MAX_FPG_GRAPHICS];
 
   lgraf[lnum].x = 0;
   lgraf[lnum].y = lmapal;
@@ -2002,7 +2002,7 @@ void place_map(void) { // Place graphic lnum
     if (x == scans)
       scan[scans++] = y;
     else if (y != scan[x]) {
-      memmove(&scan[x + 1], &scan[x], 4 * (1000 - x - 1));
+      memmove(&scan[x + 1], &scan[x], 4 * (MAX_FPG_GRAPHICS - x - 1));
       scan[x] = y;
       scans++;
     }

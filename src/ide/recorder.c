@@ -3,7 +3,7 @@
 #include "global.h"
 
 byte *frame_copy;
-byte dac_copy[768];
+byte dac_copy[PALETTE_SIZE];
 FILE *grb_file;
 char CHUNK;
 int init_recorder = 0;
@@ -122,12 +122,12 @@ void end_recorder() {
 void write_dac(byte *dac) {
   int x;
   if (init_recorder)
-    for (x = 0; x < 768; x++)
+    for (x = 0; x < PALETTE_SIZE; x++)
       if (dac_copy[x] != dac[x]) {
         CHUNK = SET_PALET;
         fwrite(&CHUNK, 1, 1, grb_file);
-        fwrite(dac, 768, 1, grb_file);
-        memcpy(dac_copy, dac, 768);
+        fwrite(dac, PALETTE_SIZE, 1, grb_file);
+        memcpy(dac_copy, dac, PALETTE_SIZE);
         return;
       }
 }

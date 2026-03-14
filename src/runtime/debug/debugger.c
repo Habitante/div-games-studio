@@ -319,11 +319,11 @@ void init_big(void) {
     exer(6);
   else {
     fseek(f, 0, SEEK_END);
-    n = ftell(f) - 1352;
+    n = ftell(f) - FNT_GENCODE_OFFSET;
     if (n > 0 && (graf_ptr = (byte *)malloc(n)) != NULL) {
       memset(graf, 0, sizeof(graf));
       ptr = graf_ptr;
-      fseek(f, 1352, SEEK_SET);
+      fseek(f, FNT_GENCODE_OFFSET, SEEK_SET);
       fread(graf_ptr, 1, n, f);
       fclose(f);
       while (graf_ptr < ptr + n && *((int *)graf_ptr) < 256) {
@@ -948,9 +948,9 @@ void process_graph(int id, byte *q, int van, int w, int h) {
   }
 
   if (file)
-    max_grf = 1000;
+    max_grf = MAX_FPG_GRAPHICS;
   else
-    max_grf = 2000;
+    max_grf = MAX_FPG_GRAPHICS * 2;
   if (graph <= 0 || graph >= max_grf)
     return;
   if (g[file].grf == NULL)

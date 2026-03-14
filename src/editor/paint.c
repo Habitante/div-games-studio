@@ -3114,7 +3114,7 @@ void select_color(int n) { // Icon number as parameter
   int done, needs_redraw;
   int _gradient, button;
   byte reg[33];
-  byte pal[768], xchg[256];
+  byte pal[PALETTE_SIZE], xchg[256];
   byte *p;
   int num_tex, tex_cod;
   byte *temp;
@@ -3157,8 +3157,8 @@ void select_color(int n) { // Icon number as parameter
         brush_h = mal;
 
         fseek(file_paint_fpg, 8, SEEK_SET);
-        memcpy(pal, dac, 768);
-        fread(pal, 1, 768, file_paint_fpg);
+        memcpy(pal, dac, PALETTE_SIZE);
+        fread(pal, 1, PALETTE_SIZE, file_paint_fpg);
 
         // Brush in {brush, man x mal, pal}
 

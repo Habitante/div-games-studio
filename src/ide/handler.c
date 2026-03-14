@@ -8,7 +8,7 @@
 //      Module variables
 //-----------------------------------------------------------------------------
 
-byte aux_palette[768];
+byte aux_palette[PALETTE_SIZE];
 int new_status;
 
 void repaint_full(void);

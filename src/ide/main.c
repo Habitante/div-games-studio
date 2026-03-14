@@ -1786,11 +1786,11 @@ void initialization(void) {
 
   mouse_background = (byte *)malloc(1024 * big2);
   screen_buffer = (byte *)malloc(vga_width * vga_height + 6) + 6;
-  dac = (byte *)malloc(768);
-  dac4 = (byte *)malloc(768);
-  color_lookup = (byte *)malloc(16384);
+  dac = (byte *)malloc(PALETTE_SIZE);
+  dac4 = (byte *)malloc(PALETTE_SIZE);
+  color_lookup = (byte *)malloc(CUAD_TABLE_SIZE);
 
-  ghost = (byte *)malloc(65536); // 256*256 combinations
+  ghost = (byte *)malloc(GHOST_TABLE_SIZE); // 256*256 combinations
 
   toolbar = (byte *)malloc(vga_width * 19 * big2);
   fill_dac = (byte *)malloc(256);
@@ -1888,12 +1888,12 @@ void initialization(void) {
   else {
     fseek(f, 0, SEEK_END);
 
-    n = ftell(f) - 1352;
+    n = ftell(f) - FNT_GENCODE_OFFSET;
 
     if (n > 0 && (graf_ptr = (byte *)malloc(n)) != NULL) {
       memset(graf, 0, sizeof(graf));
       ptr = graf_ptr;
-      fseek(f, 1352, SEEK_SET);
+      fseek(f, FNT_GENCODE_OFFSET, SEEK_SET);
       fread(graf_ptr, 1, n, f);
       fclose(f);
 
@@ -1933,7 +1933,7 @@ void initialization(void) {
       fseek(f, 0, SEEK_SET);
       fread(ptr2, 1, n, f);
       fclose(f);
-      ptr2 += 1352;
+      ptr2 += FNT_GENCODE_OFFSET;
 
       while (ptr2 < ptr + n && *((int *)ptr2) < 384) {
         graf_help[*(int *)ptr2].w = *(int *)(ptr2 + 52);
@@ -1959,7 +1959,7 @@ void initialization(void) {
     if (!interpreting) {
       cprintf("%s", (char *)texts[11]);
     } // *** Palette calculations ***
-    memcpy(dac, system_dac, 768);
+    memcpy(dac, system_dac, PALETTE_SIZE);
     init_ghost();
     create_ghost(1);
   }
@@ -1994,7 +1994,7 @@ void initialization(void) {
   init_flush();
   next_code = 1;
   mouse_shift = 0;
-  memcpy(original_palette, dac, 768);
+  memcpy(original_palette, dac, PALETTE_SIZE);
   drag_source = 0;
   free_drag = 1;
   memset(mask, 0, 256);

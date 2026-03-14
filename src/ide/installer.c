@@ -433,7 +433,7 @@ void create_install_image(char *file, int errores) {
   int *ptr;
   int file_len;
   int lst[1000];
-  byte pal[768];
+  byte pal[PALETTE_SIZE];
   byte xlat[256];
   char cwork[256];
 
@@ -460,9 +460,9 @@ void create_install_image(char *file, int errores) {
         return;
       }
 
-      memcpy(pal, fpg + 8, 768);
+      memcpy(pal, fpg + 8, PALETTE_SIZE);
 
-      p += 1352; // FPG Header len
+      p += FNT_GENCODE_OFFSET; // FPG Header len
 
       memset(lst, 0, 1000 * sizeof(int));
 

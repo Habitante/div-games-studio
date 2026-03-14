@@ -322,7 +322,7 @@ void palette_action1(void);
 void palette_action2(void);
 void palette_action3(void);
 int palette_option[3];
-byte work_palette[768];
+byte work_palette[PALETTE_SIZE];
 
 void palette_action0(void) {
   v.type = WIN_DIALOG;
@@ -355,7 +355,7 @@ void palette_action1(void) {
   int w = v.w / big2, h = v.h / big2;
   int xx = 91, x, y;
   byte c;
-  byte d4[768];
+  byte d4[PALETTE_SIZE];
 
   _show_items();
 
@@ -388,7 +388,7 @@ void palette_action1(void) {
     c = c3;
   wwrite(v.ptr, w, h, xx + 32, 14, 1, texts[577], c);
 
-  memcpy(d4, dac4, 768);
+  memcpy(d4, dac4, PALETTE_SIZE);
   create_dac4();
 
   for (y = 0; y < 16; y++) {
@@ -400,7 +400,7 @@ void palette_action1(void) {
     }
   }
 
-  memcpy(dac4, d4, 768);
+  memcpy(dac4, d4, PALETTE_SIZE);
 }
 
 void palette_action2(void) {

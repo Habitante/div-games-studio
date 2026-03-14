@@ -12,7 +12,7 @@ extern char description[33];
 char *fpg_image = NULL;
 short *fpg_points = NULL;
 
-char newdac[768];
+char newdac[PALETTE_SIZE];
 int new_dac_loaded = 0;
 
 int get_code_width;
@@ -77,7 +77,7 @@ void fpg_create(FPG *fpg_file, char *name) {
   FILE *fpg;
   if ((fpg = fopen(name, "wb")) == NULL)
     return;
-  for (x = 0; x < 1000; x++) {
+  for (x = 0; x < MAX_FPG_GRAPHICS; x++) {
     fpg_file->grf_offsets[x] = 0;
     fpg_file->desc_index[x] = 0;
   }
@@ -92,7 +92,7 @@ void fpg_create(FPG *fpg_file, char *name) {
 
   fwrite(&fpg_file->version, 1, 1, fpg);
 
-  fwrite(dac, 768, 1, fpg);
+  fwrite(dac, PALETTE_SIZE, 1, fpg);
 
   fwrite(gradients, sizeof(gradients), 1, fpg);
   fclose(fpg);
@@ -120,7 +120,7 @@ int fpg_open(FPG *fpg_file, char *name) {
   int x;
   FILE *fpg;
   HeadFPG kkhead;
-  char buffer[768];
+  char buffer[PALETTE_SIZE];
 
   if ((fpg = fopen(name, "rb")) == NULL) {
     return 0;
@@ -137,29 +137,29 @@ int fpg_open(FPG *fpg_file, char *name) {
 #ifdef DEBUG
   printf("FPG version: %d\n", fpg_file->version);
 #endif
-  for (x = 0; x < 1000; x++) {
+  for (x = 0; x < MAX_FPG_GRAPHICS; x++) {
     fpg_file->grf_offsets[x] = 0;
     fpg_file->desc_index[x] = 0;
   }
 
   fpg_file->nIndex = 0;
   div_strcpy((char *)fpg_file->current_file, sizeof(fpg_file->current_file), name);
-  if (fread(newdac, 768, 1, fpg) != 1) {
+  if (fread(newdac, PALETTE_SIZE, 1, fpg) != 1) {
     fclose(fpg);
     return 0;
   }
-  memcpy(dac4, newdac, 768);
+  memcpy(dac4, newdac, PALETTE_SIZE);
   new_dac_loaded = 1;
   fread((byte *)gradients, 1, sizeof(gradients), fpg);
 
   while (fpg_read_header(&kkhead, fpg)) {
-    if (kkhead.code < 0 || kkhead.code >= 1000) {
+    if (kkhead.code < 0 || kkhead.code >= MAX_FPG_GRAPHICS) {
       debugprintf("FPG: skipping graphic with out-of-range code %d\n", kkhead.code);
       fseek(fpg, kkhead.length - FPG_HEAD, SEEK_CUR);
       continue;
     }
-    if (fpg_file->nIndex >= 1000) {
-      debugprintf("FPG: too many graphics (>1000), stopping\n");
+    if (fpg_file->nIndex >= MAX_FPG_GRAPHICS) {
+      debugprintf("FPG: too many graphics (>=%d), stopping\n", MAX_FPG_GRAPHICS);
       break;
     }
     fpg_file->grf_offsets[kkhead.code] = ftell(fpg) - FPG_HEAD;
@@ -296,7 +296,7 @@ int fpg_add(FPG *fpg_file, int cod, char *desc, char *filename, int width, int h
     n++;
   }
 
-  memmove(&(fpg_file->thumb[n + 1]), &(fpg_file->thumb[n]), sizeof(t_thumb) * (999 - n));
+  memmove(&(fpg_file->thumb[n + 1]), &(fpg_file->thumb[n]), sizeof(t_thumb) * (MAX_FPG_GRAPHICS - 1 - n));
 
   fpg_file->thumb[n].ptr = NULL;
   fpg_file->thumb[n].status = 0;
@@ -352,7 +352,7 @@ int fpg_remap_to_pal(FPG *fpg_file) {
   char ActualPath[_MAX_PATH + 14];
   char *other_image;
   short *other_points = NULL;
-  byte tmp[768];
+  byte tmp[PALETTE_SIZE];
   int x;
   FILE *fpg;
   FILE *Oldfpg;
@@ -379,11 +379,11 @@ int fpg_remap_to_pal(FPG *fpg_file) {
   // Copy graphic header
   fread(tmp, 8, 1, fpg);
   fwrite(tmp, 8, 1, Oldfpg);
-  fread(tmp, 768, 1, fpg);
+  fread(tmp, PALETTE_SIZE, 1, fpg);
   create_dac4();
   for (x = 0; x < 256; x++)
     color_lut[x] = find_color(tmp[x * 3], tmp[x * 3 + 1], tmp[x * 3 + 2]);
-  fwrite(dac, 768, 1, Oldfpg);
+  fwrite(dac, PALETTE_SIZE, 1, Oldfpg);
   fread(CopiaReglas, 1, sizeof(CopiaReglas), fpg);
   fwrite(CopiaReglas, sizeof(CopiaReglas), 1, Oldfpg);
   while (fpg_read_header(&other_header, fpg)) {
@@ -507,7 +507,7 @@ int fpg_delete(FPG *fpg_file,
   char ActualPath[_MAX_PATH + 14];
   char *other_image;
   short *other_points = NULL;
-  byte tmp[768];
+  byte tmp[PALETTE_SIZE];
   int x, len, n;
   FILE *fpg;
   FILE *Oldfpg;
@@ -541,7 +541,7 @@ int fpg_delete(FPG *fpg_file,
 
   if (fpg_file->thumb[n].ptr != NULL)
     free(fpg_file->thumb[n].ptr);
-  memmove(&(fpg_file->thumb[n]), &(fpg_file->thumb[n + 1]), sizeof(t_thumb) * (999 - n));
+  memmove(&(fpg_file->thumb[n]), &(fpg_file->thumb[n + 1]), sizeof(t_thumb) * (MAX_FPG_GRAPHICS - 1 - n));
 
   mouse_graf = CURSOR_BUSY;
   fseek(fpg, 0, SEEK_END);
@@ -552,8 +552,8 @@ int fpg_delete(FPG *fpg_file,
   // Copy graphic header
   fread(tmp, 8, 1, fpg);
   fwrite(tmp, 8, 1, Oldfpg);
-  fread(tmp, 768, 1, fpg);
-  fwrite(tmp, 768, 1, Oldfpg);
+  fread(tmp, PALETTE_SIZE, 1, fpg);
+  fwrite(tmp, PALETTE_SIZE, 1, Oldfpg);
   fread(CopiaReglas, 1, sizeof(CopiaReglas), fpg);
   fwrite(CopiaReglas, sizeof(CopiaReglas), 1, Oldfpg);
 
@@ -629,7 +629,7 @@ int fpg_delete_many(FPG *fpg_file, int taggeds, int *array_del) {
   char ActualPath[_MAX_PATH + 14];
   char *other_image;
   short *other_points = NULL;
-  byte tmp[768];
+  byte tmp[PALETTE_SIZE];
   int x, y, len, n;
   FILE *fpg;
   FILE *Oldfpg;
@@ -658,8 +658,8 @@ int fpg_delete_many(FPG *fpg_file, int taggeds, int *array_del) {
 
   fread(tmp, 8, 1, fpg); // Copy graphic header
   fwrite(tmp, 8, 1, Oldfpg);
-  fread(tmp, 768, 1, fpg);
-  fwrite(tmp, 768, 1, Oldfpg);
+  fread(tmp, PALETTE_SIZE, 1, fpg);
+  fwrite(tmp, PALETTE_SIZE, 1, Oldfpg);
   fread(CopiaReglas, 1, sizeof(CopiaReglas), fpg);
   fwrite(CopiaReglas, sizeof(CopiaReglas), 1, Oldfpg);
 
@@ -719,9 +719,9 @@ int fpg_delete_many(FPG *fpg_file, int taggeds, int *array_del) {
 
       if (fpg_file->thumb[n].ptr != NULL)
         free(fpg_file->thumb[n].ptr);
-      memmove(&(fpg_file->thumb[n]), &(fpg_file->thumb[n + 1]), sizeof(t_thumb) * (999 - n));
+      memmove(&(fpg_file->thumb[n]), &(fpg_file->thumb[n + 1]), sizeof(t_thumb) * (MAX_FPG_GRAPHICS - 1 - n));
 
-      memmove(&(fpg_file->desc_index[n]), &(fpg_file->desc_index[n + 1]), sizeof(int) * (999 - n));
+      memmove(&(fpg_file->desc_index[n]), &(fpg_file->desc_index[n + 1]), sizeof(int) * (MAX_FPG_GRAPHICS - 1 - n));
     }
 
     // *************************

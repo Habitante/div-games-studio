@@ -449,7 +449,7 @@ void force_pal(void) {
 }
 
 void load_pal(void) {
-  byte pal[1352];
+  byte pal[FNT_GENCODE_OFFSET];
   int m, offs = 8;
 
   if (auto_adapt_palette) {
@@ -472,7 +472,7 @@ void load_pal(void) {
       runtime_error(200);
       return;
     }
-    memcpy(pal, packptr, 1352);
+    memcpy(pal, packptr, FNT_GENCODE_OFFSET);
     free(packptr);
   } else {
 palfuera:
@@ -481,7 +481,7 @@ palfuera:
       runtime_error(102);
       return;
     } else {
-      fread(pal, 1, 1352, es);
+      fread(pal, 1, FNT_GENCODE_OFFSET, es);
       fclose(es);
     }
   }
@@ -508,7 +508,7 @@ palfuera:
                 runtime_error(200);
                 return;
               }
-              memcpy(pal, packptr + m - 768, 768);
+              memcpy(pal, packptr + m - PALETTE_SIZE, PALETTE_SIZE);
               free(packptr);
             } else {
 palfuera2:
@@ -517,13 +517,13 @@ palfuera2:
                 runtime_error(102);
                 return;
               } else {
-                fseek(es, -768, SEEK_END);
-                fread(pal, 1, 768, es);
+                fseek(es, -PALETTE_SIZE, SEEK_END);
+                fread(pal, 1, PALETTE_SIZE, es);
                 fclose(es);
               }
             }
 
-            for (m = 0; m < 768; m++)
+            for (m = 0; m < PALETTE_SIZE; m++)
               pal[m] /= 4;
             offs = 0;
 
@@ -539,10 +539,10 @@ palfuera2:
     }
   }
 
-  for (m = 0; m < 768; m++)
+  for (m = 0; m < PALETTE_SIZE; m++)
     if (pal[m + offs] != palette[m])
       break;
-  if (m < 768) {
+  if (m < PALETTE_SIZE) {
     dr = dacout_r;
     dg = dacout_g;
     db = dacout_b;
@@ -551,7 +551,7 @@ palfuera2:
       fade_off();
       sp--;
     }
-    memcpy(palette, pal + offs, 768);
+    memcpy(palette, pal + offs, PALETTE_SIZE);
     apply_palette();
   }
 
@@ -568,12 +568,12 @@ void apply_palette(void) {
   }
 
   palcrc = 0;
-  for (n = 0; n < 768; n++) {
+  for (n = 0; n < PALETTE_SIZE; n++) {
     palcrc += (int)palette[n];
     palcrc <<= 1;
   }
 
-  memcpy(dac, palette, 768);
+  memcpy(dac, palette, PALETTE_SIZE);
   init_ghost();
   create_ghost();
 
@@ -581,7 +581,7 @@ void apply_palette(void) {
   c0 = find_col;
   find_color(63, 63, 63);
   c1 = find_col;
-  p = fonts[0] + 1356 + sizeof(fnt_table_entry) * 256;
+  p = fonts[0] + FNT_TABLE_OFFSET + sizeof(fnt_table_entry) * 256;
 
   for (n = 0; n < 12288; n++) {
     if (*p == last_c1) {
@@ -615,7 +615,7 @@ void apply_palette(void) {
 //----------------------------------------------------------------------------
 
 void unload_map(void) {
-  if (stack[sp] < 1000 || stack[sp] > 1999)
+  if (stack[sp] < MAX_FPG_GRAPHICS || stack[sp] > MAX_FPG_GRAPHICS * 2 - 1)
     return;
   if (g[0].grf[stack[sp]] != 0) {
     free((byte *)(g[0].grf[stack[sp]]) - 1330);
@@ -624,7 +624,7 @@ void unload_map(void) {
 }
 
 //----------------------------------------------------------------------------
-//      Load_map(file) - Returns the graphic code (1000..1999)
+//      Load_map(file) - Returns the graphic code (MAX_FPG_GRAPHICS..MAX_FPG_GRAPHICS*2-1)
 //----------------------------------------------------------------------------
 
 typedef struct _pcx_header {
@@ -709,15 +709,15 @@ void decompress_pcx(byte *buffer, byte *mapa) {
       *dest++ = ch;
   } while (1);
 
-  for (con = 0; con < 768; con++)
+  for (con = 0; con < PALETTE_SIZE; con++)
     buffer[con] /= 4;
   pcxdac = buffer;
 
   if (!palette_loaded) {
-    for (con = 0; con < 768; con++)
+    for (con = 0; con < PALETTE_SIZE; con++)
       if (buffer[con] != palette[con])
         break;
-    if (con < 768) {
+    if (con < PALETTE_SIZE) {
       dr = dacout_r;
       dg = dacout_g;
       db = dacout_b;
@@ -726,7 +726,7 @@ void decompress_pcx(byte *buffer, byte *mapa) {
         fade_off();
         sp--;
       }
-      memcpy(palette, buffer, 768);
+      memcpy(palette, buffer, PALETTE_SIZE);
       apply_palette();
     }
     palette_loaded = 1;
@@ -781,10 +781,10 @@ mapfuera:
       process_map((char *)ptr, file_len);
 
     if (!palette_loaded) {
-      for (m = 0; m < 768; m++)
+      for (m = 0; m < PALETTE_SIZE; m++)
         if (ptr[m + 48] != palette[m])
           break;
-      if (m < 768) {
+      if (m < PALETTE_SIZE) {
         dr = dacout_r;
         dg = dacout_g;
         db = dacout_b;
@@ -793,7 +793,7 @@ mapfuera:
           fade_off();
           sp--;
         }
-        memcpy(palette, ptr + 48, 768);
+        memcpy(palette, ptr + 48, PALETTE_SIZE);
         apply_palette();
       }
       palette_loaded = 1;
@@ -801,7 +801,7 @@ mapfuera:
 
     width = *(word *)(ptr + 8);
     height = *(word *)(ptr + 10);
-    num_points = *(word *)(ptr + 1392);
+    num_points = *(word *)(ptr + MAP_CTRLPTS_OFFSET);
 
     adapt_palette(ptr + 1394 + num_points * 4, width * height, ptr + 48, NULL);
 
@@ -812,8 +812,8 @@ mapfuera:
     *((int *)ptr + 15) = num_points;
 
     while (g[0].grf[next_map_code]) {
-      if (next_map_code++ == 1999)
-        next_map_code = 1000;
+      if (next_map_code++ == MAX_FPG_GRAPHICS * 2 - 1)
+        next_map_code = MAX_FPG_GRAPHICS;
     }
     g[0].grf[next_map_code] = (int *)ptr;
     stack[sp] = next_map_code;
@@ -844,8 +844,8 @@ mapfuera:
     *((int *)buffer + 15) = num_points;
 
     while (g[0].grf[next_map_code]) {
-      if (next_map_code++ == 1999)
-        next_map_code = 1000;
+      if (next_map_code++ == MAX_FPG_GRAPHICS * 2 - 1)
+        next_map_code = MAX_FPG_GRAPHICS;
     }
     g[0].grf[next_map_code] = (int *)buffer;
     stack[sp] = next_map_code;
@@ -900,8 +900,8 @@ void new_map(void) {
     memset(ptr + 4 + 64, color, width * height);
 
     while (g[0].grf[next_map_code]) {
-      if (next_map_code++ == 1999)
-        next_map_code = 1000;
+      if (next_map_code++ == MAX_FPG_GRAPHICS * 2 - 1)
+        next_map_code = MAX_FPG_GRAPHICS;
     }
     g[0].grf[next_map_code] = (int *)ptr;
     stack[sp] = next_map_code;
@@ -937,14 +937,14 @@ void load_fpg(void) {
     return;
   }
   if (num) {
-    if ((lst = (int **)malloc(sizeof(int *) * 1000)) == NULL) {
+    if ((lst = (int **)malloc(sizeof(int *) * MAX_FPG_GRAPHICS)) == NULL) {
       stack[sp] = 0;
       runtime_error(100);
       return;
     }
   } else
     lst = g[0].grf;
-  memset(lst, 0, sizeof(int *) * 1000);
+  memset(lst, 0, sizeof(int *) * MAX_FPG_GRAPHICS);
 
   if (npackfiles) {
     m = read_packfile((byte *)&mem[stack[sp]]);
@@ -978,7 +978,7 @@ fpgfuera:
       file_len = ftell(es);
 
 #ifdef __EMSCRIPTEN__
-      file_len = 1352;
+      file_len = FNT_GENCODE_OFFSET;
 #endif
       if ((ptr = (byte *)malloc(file_len + 8)) != NULL) {
         memset(ptr, 0, file_len + 8);
@@ -1014,10 +1014,10 @@ fpgfuera:
   if (process_fpg != NULL)
     process_fpg((char *)ptr, file_len);
   if (!palette_loaded) {
-    for (m = 0; m < 768; m++)
+    for (m = 0; m < PALETTE_SIZE; m++)
       if (ptr[m + 8] != palette[m])
         break;
-    if (m < 768) {
+    if (m < PALETTE_SIZE) {
       dr = dacout_r;
       dg = dacout_g;
       db = dacout_b;
@@ -1026,13 +1026,13 @@ fpgfuera:
         fade_off();
         sp--;
       }
-      memcpy(palette, ptr + 8, 768);
+      memcpy(palette, ptr + 8, PALETTE_SIZE);
       apply_palette();
     }
     palette_loaded = 1;
   }
 
-  for (m = 0, n = 0; n < 768; n++) {
+  for (m = 0, n = 0; n < PALETTE_SIZE; n++) {
     m += (int)ptr[n + 8];
     m <<= 1;
   }
@@ -1058,7 +1058,7 @@ fpgfuera:
   }
   fseek(es, 0, SEEK_END);
   file_len = ftell(es);
-  fseek(es, 1352, SEEK_SET);
+  fseek(es, FNT_GENCODE_OFFSET, SEEK_SET);
   int len_ = 1;
   int num_ = 1;
 
@@ -1078,11 +1078,11 @@ fpgfuera:
   }
   fclose(es);
 #else
-  ptr += 1352; // FPG header length
+  ptr += FNT_GENCODE_OFFSET; // FPG header length
   ptr2 = ptr;
   ptr3 = ptr;
 
-  while (ptr <= (ptr2 + file_len) && *(int *)ptr3 < 1000 && *(int *)ptr3 > 0) {
+  while (ptr <= (ptr2 + file_len) && *(int *)ptr3 < MAX_FPG_GRAPHICS && *(int *)ptr3 > 0) {
     int *ptr_4 = (int *)ptr3;
     int *ptr_8 = (int *)ptr3;
     int num = *ptr_4;
@@ -1154,9 +1154,9 @@ void start_scroll(void) {
     return;
   }
   if (file)
-    max_grf = 1000;
+    max_grf = MAX_FPG_GRAPHICS;
   else
-    max_grf = 2000;
+    max_grf = MAX_FPG_GRAPHICS * 2;
   if (graf1 < 0 || graf1 >= max_grf) {
     runtime_error(110);
     return;
@@ -1535,7 +1535,7 @@ fntfuera:
   w = 0;
   h = 0;
   nan = 0;
-  fnt = (fnt_table_entry *)((byte *)ptr + 1356);
+  fnt = (fnt_table_entry *)((byte *)ptr + FNT_TABLE_OFFSET);
   for (n = 0; n < 256; n++) {
     if (fnt[n].width) {
       w += fnt[n].width;
@@ -1549,7 +1549,7 @@ fntfuera:
 
   ptr += 8;
   m = 0;
-  for (n = 0; n < 768; n++) {
+  for (n = 0; n < PALETTE_SIZE; n++) {
     m += (int)ptr[n];
     m <<= 1;
   }
@@ -1570,8 +1570,8 @@ fntfuera:
   stack[sp] = ifonts;
 
   if (auto_adapt_palette) {
-    adapt_palette(fonts[ifonts] + 1356 + sizeof(fnt_table_entry) * 256,
-                  f_i[ifonts].len - 1356 - sizeof(fnt_table_entry) * 256, fonts[ifonts] + 8, NULL);
+    adapt_palette(fonts[ifonts] + FNT_TABLE_OFFSET + sizeof(fnt_table_entry) * 256,
+                  f_i[ifonts].len - FNT_TABLE_OFFSET - sizeof(fnt_table_entry) * 256, fonts[ifonts] + 8, NULL);
     f_i[ifonts].syspal = palcrc;
   }
 
@@ -1622,8 +1622,8 @@ fntfuera:
     }
 
     if (f_i[ifonts].fonpal != palcrc) {
-      adapt_palette(fonts[ifonts] + 1356 + sizeof(fnt_table_entry) * 256,
-                    f_i[ifonts].len - 1356 - sizeof(fnt_table_entry) * 256, fonts[ifonts] + 8,
+      adapt_palette(fonts[ifonts] + FNT_TABLE_OFFSET + sizeof(fnt_table_entry) * 256,
+                    f_i[ifonts].len - FNT_TABLE_OFFSET - sizeof(fnt_table_entry) * 256, fonts[ifonts] + 8,
                     NULL);
     }
 
@@ -1644,7 +1644,7 @@ void adapt_palette(byte *ptr, int len, byte *pal, byte *xlat) {
     if (xlat == NULL) {
       xlat = &_xlat[0];
 
-      for (m = 0, n = 0; n < 768; n++) {
+      for (m = 0, n = 0; n < PALETTE_SIZE; n++) {
         m += (int)pal[n];
         m <<= 1;
       }
@@ -1802,7 +1802,7 @@ void unload_fpg(void) {
         free(g[c].grf);
         g[c].grf = 0;
       } else {
-        memset(g[c].grf, 0, sizeof(int *) * 1000);
+        memset(g[c].grf, 0, sizeof(int *) * MAX_FPG_GRAPHICS);
       }
     }
   } else
@@ -1959,9 +1959,9 @@ void map_xput(void) {
     return;
   }
   if (file)
-    max_grf = 1000;
+    max_grf = MAX_FPG_GRAPHICS;
   else
-    max_grf = 2000;
+    max_grf = MAX_FPG_GRAPHICS * 2;
   if (graf1 <= 0 || graf1 >= max_grf) {
     runtime_error(110);
     return;
@@ -1997,9 +1997,9 @@ void map_put(void) {
     return;
   }
   if (file)
-    max_grf = 1000;
+    max_grf = MAX_FPG_GRAPHICS;
   else
-    max_grf = 2000;
+    max_grf = MAX_FPG_GRAPHICS * 2;
   if (graf1 <= 0 || graf1 >= max_grf) {
     runtime_error(110);
     return;
@@ -2041,9 +2041,9 @@ void map_block_copy(void) {
     return;
   }
   if (file)
-    max_grf = 1000;
+    max_grf = MAX_FPG_GRAPHICS;
   else
-    max_grf = 2000;
+    max_grf = MAX_FPG_GRAPHICS * 2;
   if (grafd <= 0 || grafd >= max_grf) {
     runtime_error(110);
     return;
@@ -2141,9 +2141,9 @@ void screen_copy(void) {
     return;
   }
   if (file)
-    max_grf = 1000;
+    max_grf = MAX_FPG_GRAPHICS;
   else
-    max_grf = 2000;
+    max_grf = MAX_FPG_GRAPHICS * 2;
   if (graf <= 0 || graf >= max_grf) {
     runtime_error(110);
     return;
@@ -2222,9 +2222,9 @@ void put_screen(void) {
     return;
   }
   if (file)
-    max_grf = 1000;
+    max_grf = MAX_FPG_GRAPHICS;
   else
-    max_grf = 2000;
+    max_grf = MAX_FPG_GRAPHICS * 2;
   if (graf <= 0 || graf >= max_grf) {
     runtime_error(110);
     return;
@@ -2300,9 +2300,9 @@ void map_put_pixel(void) {
     return;
   }
   if (file)
-    max_grf = 1000;
+    max_grf = MAX_FPG_GRAPHICS;
   else
-    max_grf = 2000;
+    max_grf = MAX_FPG_GRAPHICS * 2;
   if (graf <= 0 || graf >= max_grf) {
     runtime_error(110);
     return;
@@ -2341,9 +2341,9 @@ void map_get_pixel(void) {
     return;
   }
   if (file)
-    max_grf = 1000;
+    max_grf = MAX_FPG_GRAPHICS;
   else
-    max_grf = 2000;
+    max_grf = MAX_FPG_GRAPHICS * 2;
   if (graf <= 0 || graf >= max_grf) {
     runtime_error(110);
     return;
@@ -2385,9 +2385,9 @@ void get_point(void) {
     return;
   }
   if (file)
-    max_grf = 1000;
+    max_grf = MAX_FPG_GRAPHICS;
   else
-    max_grf = 2000;
+    max_grf = MAX_FPG_GRAPHICS * 2;
   if (graf <= 0 || graf >= max_grf) {
     runtime_error(110);
     return;
@@ -3150,9 +3150,9 @@ void start_mode7(void) {
     return;
   }
   if (file)
-    max_grf = 1000;
+    max_grf = MAX_FPG_GRAPHICS;
   else
-    max_grf = 2000;
+    max_grf = MAX_FPG_GRAPHICS * 2;
   if (graf1 < 0 || graf1 >= max_grf) {
     runtime_error(110);
     return;
@@ -3426,7 +3426,7 @@ void _exit_dos(void) {
 
 void roll_palette(void) {
   int c, n, i, x, color;
-  char pal[768];
+  char pal[PALETTE_SIZE];
 
   i = stack[sp--];
   n = abs(stack[sp--]);
@@ -3467,9 +3467,9 @@ void get_real_point(void) {
     return;
   }
   if (mem[id + _File])
-    max_grf = 1000;
+    max_grf = MAX_FPG_GRAPHICS;
   else
-    max_grf = 2000;
+    max_grf = MAX_FPG_GRAPHICS * 2;
   if (mem[id + _Graph] <= 0 || mem[id + _Graph] >= max_grf) {
     runtime_error(110);
     return;
@@ -3670,9 +3670,9 @@ void convert_palette(void) {
     return;
   }
   if (file)
-    max_grf = 1000;
+    max_grf = MAX_FPG_GRAPHICS;
   else
-    max_grf = 2000;
+    max_grf = MAX_FPG_GRAPHICS * 2;
   if (graf <= 0 || graf >= max_grf) {
     runtime_error(110);
     return;
@@ -4860,9 +4860,9 @@ void save_mapcx(int tipo) {
     return;
   }
   if (file)
-    max_grf = 1000;
+    max_grf = MAX_FPG_GRAPHICS;
   else
-    max_grf = 2000;
+    max_grf = MAX_FPG_GRAPHICS * 2;
   if (graph <= 0 || graph >= max_grf) {
     runtime_error(110);
     return;
@@ -4937,7 +4937,7 @@ void write_in_map(void) {
 
   ptr = (byte *)&mem[texts];
 
-  fnt = (fnt_table_entry *)((byte *)fonts[font_index] + 1356);
+  fnt = (fnt_table_entry *)((byte *)fonts[font_index] + FNT_TABLE_OFFSET);
   h = f_i[font_index].height;
 
   ptr2 = ptr;
@@ -4998,8 +4998,8 @@ void write_in_map(void) {
     memset(ptr + 4 + 64, 0, w * h);
 
     while (g[0].grf[next_map_code]) {
-      if (next_map_code++ == 1999)
-        next_map_code = 1000;
+      if (next_map_code++ == MAX_FPG_GRAPHICS * 2 - 1)
+        next_map_code = MAX_FPG_GRAPHICS;
     }
     g[0].grf[next_map_code] = (int *)ptr;
     stack[sp] = next_map_code;

@@ -13,7 +13,7 @@ architecture docs, code review, and discussion with Daniel Navarro.
 
 | # | Improvement | Status | Risk |
 |---|-------------|--------|------|
-| 1 | [Enums & constants](#1-enums--constants) | Sprints 1-4 DONE, sprints 5-6 open | Very low |
+| 1 | [Enums & constants](#1-enums--constants) | Sprints 1-5 DONE, sprint 6 open | Very low |
 | 2 | [Testing infrastructure](#2-testing-infrastructure) | — | None |
 | 3 | [File format hardening + modern imports](#3-file-format-hardening--modern-imports) | — | Low |
 | 4 | [Help translation quality pass](#4-help-translation-quality-pass) | — | Low |
@@ -310,20 +310,44 @@ Capslock, Numlock, and Scroll Lock constants (`MOD_CAPS`, `MOD_NUM`,
 
 **Files:** `render.c`.
 
-#### O. Repeated numeric constants
+#### O. Repeated numeric constants — DONE
+
+Defined in `div_enums.h` as `#define` constants. Replaced across all IDE,
+editor, format, runtime, and shared files.
 
 | Value | Meaning | Name | Status |
 |-------|---------|------|--------|
-| 768 | Palette data size (256 * 3 bytes) | `PALETTE_SIZE` | — |
-| 256 | Palette entry count | `PALETTE_ENTRIES` | — |
-| 576 | Color rules/gradients block size | `GRADIENTS_SIZE` | — |
-| 999 / 1000 | Max graphics per FPG | `MAX_FPG_GRAPHICS` | — |
+| 768 | Palette data size (256 * 3 bytes) | `PALETTE_SIZE` | DONE |
+| 256 | Palette entry count | `PALETTE_ENTRIES` | skipped (too ubiquitous, low value) |
+| 576 | Color rules/gradients block size | `GRADIENTS_SIZE` | DONE |
+| 999 / 1000 | Max graphics per FPG | `MAX_FPG_GRAPHICS` | DONE |
 | 1024 | Max line length in editor | `LONG_LINE` (already exists) | — |
-| 65536 | Ghost table size (256*256) | `GHOST_TABLE_SIZE` | — |
-| 16384 | Squared-difference table size | `CUAD_TABLE_SIZE` | — |
+| 65536 | Ghost table size (256*256) | `GHOST_TABLE_SIZE` | DONE |
+| 16384 | Squared-difference table size | `CUAD_TABLE_SIZE` | DONE |
 | 9 | Pixels per menu item | `MENU_ITEM_HEIGHT` | DONE |
 | 11 | Menu header height | `MENU_HEADER_HEIGHT` | DONE |
 | 7 / 23 | Menu item text margin / width padding | `MENU_TEXT_MARGIN` / `MENU_WIDTH_PAD` | DONE |
+
+`PALETTE_SIZE` replaced ~200 occurrences across ~30 files (array declarations,
+memcpy/fread/fwrite sizes, loop bounds, pointer arithmetic). Non-palette uses
+of 768 (32768 buffers, 1024x768 resolution) correctly skipped.
+
+`MAX_FPG_GRAPHICS` replaced ~60 occurrences across 10 files including struct
+array sizes in `fpg.h`, bounds checks, memmove shifts, runtime `max_grf`
+assignments (both `1000` for user FPGs and `2000` = `MAX_FPG_GRAPHICS * 2`
+for system FPG).
+
+`GHOST_TABLE_SIZE` replaced only where it's the 256x256 transparency table
+(malloc, fread/fwrite, fseek offsets) — NOT in fixed-point math or sentinel
+values. `CUAD_TABLE_SIZE` replaced only in `color_lookup` mallocs.
+
+**Files:** `global.h`, `ide.h`, `fpg.h`, `sysdac.h`, `handler_internal.h`,
+`main.c`, `desktop.c`, `handler.c`, `handler_dialogs.c`, `handler_map.c`,
+`handler_fonts.c`, `browser.c`, `recorder.c`, `setup.c`, `installer.c`,
+`graphics.c`, `palette.c`, `editor/fpg.c`, `paint.c`, `brush.c`, `charset.c`,
+`formats/image.c`, `formats/fpg.c`, `video.c`, `interpreter.c`, `functions.c`,
+`render.c`, `inter.h`, `runtime/sysdac.h`, `collision.c`, `pathfind.c`,
+`debugger.c`, `topflc.h`.
 
 #### P. Button alignment modes (`_button` center parameter) — DONE
 
@@ -346,18 +370,28 @@ and `wwrite()` across IDE, editor, compiler, and debugger modules.
 **Files:** `main_dialogs.c`, `handler_dialogs.c`, `handler_map.c`,
 `handler_fonts.c`, `window.c`, `debugger_ui.c`, and every dialog init function.
 
-#### Q. File format magic offsets
+#### Q. File format magic offsets — DONE
 
-| Value | Context | Proposed name |
-|-------|---------|---------------|
-| 8 | Start of palette in MAP/FPG/FNT/PAL | `FMT_PALETTE_OFFSET` |
-| 48 | Start of palette in MAP (after header fields) | `MAP_PALETTE_OFFSET` |
-| 1352 | Start of gencode in FNT (8 + 768 + 576) | `FNT_GENCODE_OFFSET` |
-| 1356 | Start of char table in FNT (1352 + 4) | `FNT_TABLE_OFFSET` |
-| 1392 | Start of control points in MAP | `MAP_CTRLPTS_OFFSET` |
+Defined in `div_enums.h` as `#define` constants. The large, unique offsets
+(1352, 1356, 1392) were replaced across all files. The small offsets (8, 48)
+were skipped — too generic to name beneficially.
 
-**Files:** `image.c`, `fpg.c`, `font.c`, `charset.c`, `browser.c`,
-`handler_fonts.c`, `desktop.c`.
+| Value | Context | Name | Status |
+|-------|---------|------|--------|
+| 8 | Start of palette in MAP/FPG/FNT/PAL | `FMT_PALETTE_OFFSET` | skipped (too generic) |
+| 48 | Start of palette in MAP (after header fields) | `MAP_PALETTE_OFFSET` | skipped (too generic) |
+| 1352 | Start of gencode in FNT (8 + 768 + 576) | `FNT_GENCODE_OFFSET` | DONE |
+| 1356 | Start of char table in FNT (1352 + 4) | `FNT_TABLE_OFFSET` | DONE |
+| 1392 | Start of control points in MAP | `MAP_CTRLPTS_OFFSET` | DONE |
+
+`FNT_GENCODE_OFFSET` replaced ~15 occurrences across 7 files (fseek, ftell
+calculations, buffer offsets, progress tracking). `FNT_TABLE_OFFSET` replaced
+~19 occurrences across 4 files (font table pointer casts, buffer allocation,
+memset, font rendering). `MAP_CTRLPTS_OFFSET` replaced in 2 files.
+
+**Files:** `main.c`, `handler_fonts.c`, `browser.c`, `font.c`, `brush.c`,
+`installer.c`, `charset.c`, `formats/image.c`, `functions.c`, `interpreter.c`,
+`render.c`, `debugger.c`.
 
 #### R. Keyboard scan code constants — DONE
 
@@ -408,7 +442,7 @@ Each sprint is one self-contained commit.
 | 3 — Input state enums | F. Cursor IDs, J. Mouse buttons, K. Modifiers | DONE |
 | 3b — Scan codes & ASCII | R. Scan code constants, S. ASCII constants, K. Lock-key modifiers | DONE |
 | 4 — Editor state enums | G. Draw modes, H. Block state, I. Drag-and-drop | DONE |
-| 5 — Palette and format constants | O. Palette/ghost/cuad sizes, `MAX_FPG_GRAPHICS`, Q. Format offsets | — |
+| 5 — Palette and format constants | O. Palette/ghost/cuad sizes, `MAX_FPG_GRAPHICS`, Q. Format offsets | DONE |
 | 6 — Runtime enums | L. Process status, M. Coordinate types, N. Sprite flags | — |
 
 ### What NOT to enumerate

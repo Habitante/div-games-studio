@@ -77,9 +77,9 @@ void out_region(void) {
   }
 
   if (file)
-    max_grf = 1000;
+    max_grf = MAX_FPG_GRAPHICS;
   else
-    max_grf = 2000;
+    max_grf = MAX_FPG_GRAPHICS * 2;
   if (graph <= 0 || graph >= max_grf) {
     runtime_error(110);
     return;
@@ -186,9 +186,9 @@ void graphic_info(void) {
     return;
   }
   if (file)
-    max_grf = 1000;
+    max_grf = MAX_FPG_GRAPHICS;
   else
-    max_grf = 2000;
+    max_grf = MAX_FPG_GRAPHICS * 2;
   if (graph <= 0 || graph >= max_grf) {
     runtime_error(110);
     return;
@@ -289,9 +289,9 @@ void collision(void) {
   }
 
   if (file)
-    max_grf = 1000;
+    max_grf = MAX_FPG_GRAPHICS;
   else
-    max_grf = 2000;
+    max_grf = MAX_FPG_GRAPHICS * 2;
   if (graph <= 0 || graph >= max_grf) {
     runtime_error(110);
     return;
@@ -443,9 +443,9 @@ int check_collisions(int i, int block, int scroll) {
       }
 
       if (file)
-        max_grf = 1000;
+        max_grf = MAX_FPG_GRAPHICS;
       else
-        max_grf = 2000;
+        max_grf = MAX_FPG_GRAPHICS * 2;
       if (graph <= 0 || graph >= max_grf)
         continue;
       if (g[file].grf == NULL)

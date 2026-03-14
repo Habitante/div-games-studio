@@ -102,9 +102,9 @@ void path_find(void) {
     return;
   }
   if (file)
-    max_grf = 1000;
+    max_grf = MAX_FPG_GRAPHICS;
   else
-    max_grf = 2000;
+    max_grf = MAX_FPG_GRAPHICS * 2;
   if (code <= 0 || code >= max_grf) {
     runtime_error(110);
     return;
@@ -942,9 +942,9 @@ void path_line(void) {
     return;
   }
   if (file)
-    max_grf = 1000;
+    max_grf = MAX_FPG_GRAPHICS;
   else
-    max_grf = 2000;
+    max_grf = MAX_FPG_GRAPHICS * 2;
   if (code <= 0 || code >= max_grf) {
     runtime_error(110);
     return;
@@ -1012,9 +1012,9 @@ void path_free(void) {
     return;
   }
   if (file)
-    max_grf = 1000;
+    max_grf = MAX_FPG_GRAPHICS;
   else
-    max_grf = 2000;
+    max_grf = MAX_FPG_GRAPHICS * 2;
   if (code <= 0 || code >= max_grf) {
     runtime_error(110);
     return;

@@ -1015,9 +1015,9 @@ void put_sprite(int file, int graph, int x, int y, int angle, int size, int flag
     return;
   }
   if (file)
-    max_grf = 1000;
+    max_grf = MAX_FPG_GRAPHICS;
   else
-    max_grf = 2000;
+    max_grf = MAX_FPG_GRAPHICS * 2;
   if (graph <= 0 || graph >= max_grf) {
     runtime_error(110);
     return;
@@ -1140,9 +1140,9 @@ void paint_sprite(void) { // Render a sprite (if visible), using mem[ide+ ... ]
     }
   }
   if (mem[ide + _File])
-    max_grf = 1000;
+    max_grf = MAX_FPG_GRAPHICS;
   else
-    max_grf = 2000;
+    max_grf = MAX_FPG_GRAPHICS * 2;
   if (mem[ide + _Graph] <= 0 || mem[ide + _Graph] >= max_grf)
     return;
   if (g[mem[ide + _File]].grf == NULL)
@@ -2620,7 +2620,7 @@ void text_out(char *ptr, int x, int y) {
     }
   }
 
-  fnt = (fnt_table_entry *)((byte *)fonts[0] + 1356);
+  fnt = (fnt_table_entry *)((byte *)fonts[0] + FNT_TABLE_OFFSET);
 
   h = f_i[0].height;
   while (*ptr && x + fnt[*ptr].width <= 0)
@@ -2691,7 +2691,7 @@ void paint_texts(int n) { // E: texts[]
 
       checkpal_font(font_index);
 
-      fnt = (fnt_table_entry *)((byte *)texts[n].font + 1356);
+      fnt = (fnt_table_entry *)((byte *)texts[n].font + FNT_TABLE_OFFSET);
 
       h = f_i[font_index].height;
 
@@ -3058,9 +3058,9 @@ void paint_sprite_m7(int n, int ide, int x, int y, int size, int ang) {
     }
   }
   if (mem[ide + _File])
-    max_grf = 1000;
+    max_grf = MAX_FPG_GRAPHICS;
   else
-    max_grf = 2000;
+    max_grf = MAX_FPG_GRAPHICS * 2;
   if (mem[ide + _Graph] <= 0 || mem[ide + _Graph] >= max_grf)
     return;
   if (g[mem[ide + _File]].grf == NULL)

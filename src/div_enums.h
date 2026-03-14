@@ -197,4 +197,18 @@ enum drag_state {
   DRAG_DROPPED  = 5, // Dropped (completed)
 };
 
+// Palette and color table sizes
+#define PALETTE_SIZE     768   // 256 colors × 3 bytes (RGB)
+#define GRADIENTS_SIZE   576   // 16 gradients × 36 bytes each
+#define GHOST_TABLE_SIZE 65536 // 256 × 256 transparency lookup
+#define CUAD_TABLE_SIZE  16384 // 128 × 128 squared-difference lookup
+
+// FPG limits
+#define MAX_FPG_GRAPHICS 1000 // Maximum graphics per FPG file
+
+// File format header offsets (MAP/FPG/FNT)
+#define FNT_GENCODE_OFFSET 1352 // 8 (magic) + 768 (palette) + 576 (gradients)
+#define FNT_TABLE_OFFSET   1356 // FNT_GENCODE_OFFSET + 4 (gencode field)
+#define MAP_CTRLPTS_OFFSET 1392 // Control points offset in MAP files
+
 #endif // DIV_ENUMS_H

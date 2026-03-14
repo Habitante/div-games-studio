@@ -904,7 +904,7 @@ GLOBAL_DATA int double_click, double_click_x, double_click_y; // For detecting d
 
 GLOBAL_DATA int dragging, drag_x, drag_y, drag_graphic;
 
-GLOBAL_DATA byte original_palette[768];
+GLOBAL_DATA byte original_palette[PALETTE_SIZE];
 
 GLOBAL_DATA int drag_source, free_drag;
 

@@ -21,8 +21,8 @@ typedef struct {
   char magic1[3];
   char magic2[4];
   char version;
-  byte pal[768];
-  byte gamas[576];
+  byte pal[PALETTE_SIZE];
+  byte gamas[GRADIENTS_SIZE];
 } FPG_header;
 
 typedef struct {
@@ -71,7 +71,7 @@ int tex_sop[11] = {2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048};
 int scroll_x, scroll_y;
 int flag_num = 0;
 
-byte FPG_pal[768];
+byte FPG_pal[PALETTE_SIZE];
 byte FPG_xlat[256];
 int fpg_thumb_pos;
 
@@ -191,7 +191,7 @@ void M3D_create_thumbs(struct t_listboxbr *l, int prog) {
     return;
   }
   fseek(FPG_F, 0, SEEK_END);
-  FPG_progress.pos = 1352;
+  FPG_progress.pos = FNT_GENCODE_OFFSET;
   FPG_progress.total = ftell(FPG_F) * 2;
   fseek(FPG_F, 0, SEEK_SET);
 
@@ -202,7 +202,7 @@ void M3D_create_thumbs(struct t_listboxbr *l, int prog) {
     return;
   }
 
-  memcpy(FPG_pal, FPG_H.pal, 768);
+  memcpy(FPG_pal, FPG_H.pal, PALETTE_SIZE);
   create_dac4();
 
   if (draw_mode < TOOL_TRANSITION) {

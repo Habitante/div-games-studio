@@ -554,15 +554,15 @@ GLOBAL byte *back_buffer; // Second copy, sprite background outside scroll
 GLOBAL byte *screen_buffer_debug; // Third copy, debug only (dialogs)
 #endif
 
-GLOBAL byte palette[768]; // Current program palette
+GLOBAL byte palette[PALETTE_SIZE]; // Current program palette
 
 GLOBAL int palcrc; // CRC of the current program palette
 
 GLOBAL int auto_adapt_palette; // Auto-adapt loaded files to the active palette
 
-GLOBAL byte dac[768]; // Active palette on screen
+GLOBAL byte dac[PALETTE_SIZE]; // Active palette on screen
 
-GLOBAL byte dac4[768]; // Palette multiplied by 4
+GLOBAL byte dac4[PALETTE_SIZE]; // Palette multiplied by 4
 
 GLOBAL int dacout_r, dacout_g, dacout_b, dacout_speed; // Fade: amount to subtract and speed
 
@@ -589,11 +589,11 @@ GLOBAL int num_error;
 
 typedef struct _t_g { // Structure for an FPG file
   int **fpg;          // File loaded in memory
-  int **grf;          // Pointers to graphics (g[n].grf[000..999])
+  int **grf;          // Pointers to graphics (g[n].grf[0..MAX_FPG_GRAPHICS-1])
 } t_g;
 
-// The first FPG can hold up to 2000 graphics; from 1000 onward they are
-// graphics loaded with load_map (codes 1000..1999)
+// The first FPG can hold up to MAX_FPG_GRAPHICS*2 graphics; from
+// MAX_FPG_GRAPHICS onward they are graphics loaded with load_map
 
 GLOBAL int next_map_code, max_grf;
 
@@ -810,7 +810,7 @@ GLOBAL int buffer_w, buffer_h; // Width & Height of buffer
 // char   768   dac (palette)
 // char 16*36   color gradients
 // --------------------- 1 ---------------------------
-// int      1   graphic code (000-999)
+// int      1   graphic code (0..MAX_FPG_GRAPHICS-1)
 // int      1   graphic length including header
 // char    32   graphic description
 // char    12   source file name it was created from

@@ -212,7 +212,7 @@ void create_thumb_MAP(struct t_listboxbr *l) {
   int man, mal;
   FILE *f;
   byte *temp, *temp2;
-  byte pal[768];
+  byte pal[PALETTE_SIZE];
   byte xlat[256];
 
   float coefredy, coefredx, a, b;
@@ -384,7 +384,7 @@ void create_thumb_MAP(struct t_listboxbr *l) {
             thumb[num].status = -1;
             return;
           }
-          memcpy(pal, dac4, 768);
+          memcpy(pal, dac4, PALETTE_SIZE);
           create_dac4();
           for (n = 0; n < 256; n++)
             xlat[n] = fast_find_color(pal[n * 3], pal[n * 3 + 1], pal[n * 3 + 2]);
@@ -491,7 +491,7 @@ void create_thumb_MAP(struct t_listboxbr *l) {
 
 void create_thumb_PAL(struct t_listboxbr *l) {
   int state = 0, n, tipo;
-  byte pal[768];
+  byte pal[PALETTE_SIZE];
   byte xlat[256];
   int x, y;
   char filename[255];
@@ -573,7 +573,7 @@ void create_thumb_PAL(struct t_listboxbr *l) {
     }
 
     // Copy palette to pal, restore dac4 and create xlat lookup from pal
-    memcpy(pal, dac4, 768);
+    memcpy(pal, dac4, PALETTE_SIZE);
     create_dac4();
     for (n = 0; n < 256; n++)
       xlat[n] = fast_find_color(pal[n * 3], pal[n * 3 + 1], pal[n * 3 + 2]);
@@ -626,7 +626,7 @@ void create_thumb_FNT(struct t_listboxbr *l) {
   int state = 0, n, m, init, x, y, len;
   int fan, _fal = 0, fal, cnt;
   byte *temp, *temp2;
-  byte pal[768];
+  byte pal[PALETTE_SIZE];
   byte xlat[256];
   char saved_char_table[256];
   float coefredy, coefredx, a, b;
@@ -760,11 +760,11 @@ void create_thumb_FNT(struct t_listboxbr *l) {
         abs(old_mouse_x - mouse_x) + abs(old_mouse_y - mouse_y) + mouse_b + ascii == 0) {
       thumb[num].status = 0;
 
-      memcpy(pal, &thumb[num].ptr[8], 768);
+      memcpy(pal, &thumb[num].ptr[8], PALETTE_SIZE);
 
       memcpy(saved_char_table, char_table, 256);
 
-      create_test_text(test_string2, thumb[num].ptr[1352]);
+      create_test_text(test_string2, thumb[num].ptr[FNT_GENCODE_OFFSET]);
 
       memset(char_table, 0, 256);
       for (x = 0; x < strlen(test_string2); x++)

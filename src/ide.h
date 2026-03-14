@@ -115,7 +115,7 @@ typedef struct __setup {
 
 typedef struct _FPGHEADER {
   char header[8];
-  char dac[768];
+  char dac[PALETTE_SIZE];
   char regdac[16 * 36];
 } FPGHEADER;
 
