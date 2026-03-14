@@ -305,7 +305,7 @@ int sound_change_channel(int num_channel, int volume, int panning) {
   Mix_Volume(num_channel, volume / 2);
 
   // set the balance
-  Mix_Setpanning(num_channel, 255 - panning, panning);
+  Mix_SetPanning(num_channel, 255 - panning, panning);
 #endif
   return (1);
 }

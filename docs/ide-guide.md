@@ -15,7 +15,7 @@ UI features.
 
 | File | Role |
 |------|------|
-| `ide/main.c` | Entry point, `main()`, `mainloop()`, `initialization()`, `finalization()` |
+| `ide/main.c` | Entry point, `main()`, `main_loop_tick()`, `initialization()`, `finalization()` |
 | `ide/main_internal.h` | Shared declarations across `main_*.c` modules |
 | `ide/main_desktop.c` | Window management, rendering, placement, animations |
 | `ide/main_dialogs.c` | Modal loop, `show_dialog()`, UI item system (buttons/text/checkboxes) |
@@ -195,7 +195,7 @@ void my_dialog2(void) {           // Click handler
 There are two ways to create a window:
 
 **`show_dialog(init_handler)`** — Creates a **modal** dialog:
-1. Calls `addwindow()` to find a free slot
+1. Calls `add_window()` to find a free slot
 2. Sets default values in `v`
 3. Calls `init_handler` to customize `v`
 4. Allocates `v.ptr` buffer (`w * h` bytes)
@@ -240,7 +240,7 @@ is `v.ptr` and width/height are the logical (divided by big2) dimensions:
 | `wwrite_in_box(ptr, w, clip_w, h, x, y, align, text, color)` | Draw text with horizontal clipping |
 | `wput(ptr, w, h, x, y, gfx_id)` | Draw a UI graphic/icon (from `graf[]`) |
 | `wgra(ptr, w, h, color, x, y, gw, gh)` | Draw a gradient bar (used for title bars) |
-| `wresalta_box(...)` | Toggle-highlight a rectangle |
+| `w_highlight_box(...)` | Toggle-highlight a rectangle |
 
 **Color constants** (`c0` through `c34`, `c_b_low`, `c_r_low`, etc.) are palette
 indices found by `find_colors()` at startup. They adapt to whatever palette is loaded.
@@ -544,7 +544,7 @@ expansion, directory navigation, extension appending, and file existence checks.
 
 ## The main event loop
 
-### Entry point: `mainloop()` in `main.c`
+### Entry point: `main_loop_tick()` in `main.c`
 
 Called repeatedly by `main_loop()` until `exit_requested` is set. Each iteration:
 
@@ -643,8 +643,8 @@ These functions in `main_desktop.c` handle window lifecycle and layout:
 
 | Function | What it does |
 |----------|--------------|
-| `addwindow()` | Find free slot in `window[]`, shift array to make room at position 0 |
-| `divdelete(n)` | Free window `n` — calls `close_handler`, frees `v.ptr`, clears slot |
+| `add_window()` | Find free slot in `window[]`, shift array to make room at position 0 |
+| `div_delete(n)` | Free window `n` — calls `close_handler`, frees `v.ptr`, clears slot |
 | `close_window()` | Close `window[0]` with optional implosion animation |
 | `move(a, b)` | Swap window positions (bring `b` to position `a`) |
 | `move_window()` | Interactive drag: follows mouse until button release, then `on_window_moved()` |
@@ -710,7 +710,7 @@ the standard handler pattern but has its own internal event loop.
 
 ### Code editor (type 102)
 
-- Init: `carga_programa0()` creates the window, loads the `.prg` file into
+- Init: `load_program0()` creates the window, loads the `.prg` file into
   `v.prg` (a `tprg` struct with source buffer, cursor state, etc.)
 - Click handler: `editor()` in `editor/editor.c` — a full editor loop that
   handles keyboard input, text manipulation, syntax coloring, and rendering

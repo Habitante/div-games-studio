@@ -27,7 +27,7 @@ error recovery. The compilation pipeline:
 5. **Allocate `mem[]`** -- Main output buffer (starts at 128KB, grows as needed)
 6. **Allocate `loc[]`** -- Local variable template buffer
 7. **Allocate `frm[]`** -- Frame/initialization data buffer
-8. **`psintactico()`** -- Pre-parse to determine string literal total length
+8. **`parse_syntax()`** -- Pre-parse to determine string literal total length
 9. **`parser()`** -- Full parse + code generation
 10. **Check unused objects** -- Error if any identifier was used but never defined
 11. **Fill header** -- `mem[0..8]` with program metadata

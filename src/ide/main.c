@@ -43,6 +43,7 @@ void show_mod_meters(void);
 void initialization(void);
 void init_environment(void);
 void main_loop(void);
+void main_loop_tick(void);
 void finalization(void);
 int determine_prg2(void);
 int determine_calc(void);
@@ -538,9 +539,9 @@ int main(int argc, char *argv[]) {
   }
 
   if (!interpreting) {
-    text_color(BRIGHT, WHITE, RED);
+    set_text_color(BRIGHT, WHITE, RED);
     printf("%s", texts[1]);
-    text_color(TXTRESET, WHITE, BLACK);
+    set_text_color(TXTRESET, WHITE, BLACK);
     printf("\n");
   }
 
@@ -854,7 +855,7 @@ extern int frame_clock; // clock
 //      Environment
 ///////////////////////////////////////////////////////////////////////////////
 
-void mainloop(void) {
+void main_loop_tick(void) {
   static int oldn = MAX_WINDOWS;
   int n, m;
   int llamar;
@@ -1695,7 +1696,7 @@ fin_bucle_entorno:
 }
 
 /* IDE main loop (desktop environment).
- * Repeatedly calls mainloop() to pump events, manage windows, and render
+ * Repeatedly calls main_loop_tick() to pump events, manage windows, and render
  * the desktop until exit_requested is set (quit requested).
  */
 void main_loop(void) {
@@ -1707,7 +1708,7 @@ void main_loop(void) {
   char cwork[256], *p;
 
   do {
-    mainloop();
+    main_loop_tick();
   } while (!exit_requested);
 
   do {

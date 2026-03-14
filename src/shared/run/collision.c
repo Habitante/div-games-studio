@@ -39,7 +39,7 @@ void out_region(void) {
   stack[sp] = 1; // Default: not in the region
 
   if (mem[id + _Ctype] == 2) {
-    e(137);
+    runtime_error(137);
     return;
   }
 
@@ -48,12 +48,12 @@ void out_region(void) {
   angle = mem[id + _Angle];
 
   if (reg < 0 || reg >= max_region) {
-    e(108);
+    runtime_error(108);
     return;
   } // Already has region[reg].(x0..y1)
 
   if (file < 0 || file > max_fpgs) {
-    e(109);
+    runtime_error(109);
     return;
   }
 
@@ -81,15 +81,15 @@ void out_region(void) {
   else
     max_grf = 2000;
   if (graph <= 0 || graph >= max_grf) {
-    e(110);
+    runtime_error(110);
     return;
   }
   if (g[file].grf == NULL) {
-    e(111);
+    runtime_error(111);
     return;
   }
   if ((ptr = g[file].grf[graph]) == NULL) {
-    e(121);
+    runtime_error(121);
     return;
   }
 
@@ -182,7 +182,7 @@ void graphic_info(void) {
   stack[sp] = 0;
 
   if (file < 0 || file > max_fpgs) {
-    e(109);
+    runtime_error(109);
     return;
   }
   if (file)
@@ -190,15 +190,15 @@ void graphic_info(void) {
   else
     max_grf = 2000;
   if (graph <= 0 || graph >= max_grf) {
-    e(110);
+    runtime_error(110);
     return;
   }
   if (g[file].grf == NULL) {
-    e(111);
+    runtime_error(111);
     return;
   }
   if ((ptr = g[file].grf[graph]) == NULL) {
-    e(121);
+    runtime_error(121);
     return;
   }
 
@@ -224,7 +224,7 @@ void graphic_info(void) {
     stack[sp] = yg;
     break; //g_y_center
   default:
-    e(138);
+    runtime_error(138);
   }
 }
 
@@ -247,7 +247,7 @@ void collision(void) {
   stack[sp] = 0; // Default: no collision
 
   if (mem[id + _Ctype] == 2) {
-    e(139);
+    runtime_error(139);
     return;
   }
 
@@ -265,7 +265,7 @@ void collision(void) {
   angle = mem[id + _Angle];
 
   if (file < 0 || file > max_fpgs) {
-    e(109);
+    runtime_error(109);
     return;
   }
 
@@ -293,15 +293,15 @@ void collision(void) {
   else
     max_grf = 2000;
   if (graph <= 0 || graph >= max_grf) {
-    e(110);
+    runtime_error(110);
     return;
   }
   if (g[file].grf == NULL) {
-    e(111);
+    runtime_error(111);
     return;
   }
   if ((ptr = g[file].grf[graph]) == NULL) {
-    e(121);
+    runtime_error(121);
     return;
   }
 
@@ -348,7 +348,7 @@ void collision(void) {
   buffer_w = clipx1 - clipx0 + 1;
   buffer_h = clipy1 - clipy0 + 1;
   if ((buffer = (byte *)malloc(buffer_w * buffer_h)) == NULL) {
-    e(100);
+    runtime_error(100);
     return;
   }
   memset(buffer, 0, buffer_w * buffer_h);

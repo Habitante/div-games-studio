@@ -107,7 +107,7 @@ Also `Mix_Init(flags)` in ide/main.c becomes `MIX_Init()` (no flags).
 This is 2,150 lines and the most audio-intensive file in the IDE.
 
 **Sound loading** (`open_sound`, `open_sound_file`, `open_desktop_sound`):
-- Current: `Mix_LoadWAV(path)` or wrap raw PCM in WAV header via `DIVMIX_LoadPCM` + `SDL_RWFromMem` + `Mix_LoadWAV_RW`
+- Current: `Mix_LoadWAV(path)` or wrap raw PCM in WAV header via `divmix_load_pcm` + `SDL_RWFromMem` + `Mix_LoadWAV_RW`
 - SDL3: `MIX_LoadAudio(mixer, path, true)` or `MIX_LoadRawAudio(mixer, data, len, &spec)` — **the WAV-wrapping hack is eliminated entirely**
 
 **Opaque `MIX_Audio` — no `abuf`/`alen` access:**
@@ -124,7 +124,7 @@ The editor currently reads/writes `SI->abuf` directly for waveform display and e
 
 **`change_sound_freq()`**: Resamples PCM, wraps in WAV, loads via `Mix_LoadWAV_RW`. Simplifies to `MIX_LoadRawAudio()`.
 
-**`Mix_SetPostMix` callback** (`noEffect` function, line 918): Used as a song-position counter — increments counters, doesn't look at audio data. Becomes `MIX_SetPostMixCallback(mixer, noEffectSDL3, NULL)`. Trivial.
+**`Mix_SetPostMix` callback** (`no_effect` function): Used as a song-position counter — increments counters, doesn't look at audio data. Becomes `MIX_SetPostMixCallback(mixer, no_effect_sdl3, NULL)`. Trivial.
 
 **Music playback** (`sound_play_song`): `Mix_LoadMUS` + `Mix_PlayMusic` → `MIX_LoadAudio` + `MIX_SetTrackAudio` + `MIX_PlayTrack`. Needs dedicated music track.
 
@@ -145,13 +145,13 @@ The editor currently reads/writes `SI->abuf` directly for waveform display and e
 **Sound playback** (`sound_play`) — **THE HARDEST PART:**
 ```c
 // Current SDL2 code:
-con = Mix_PlayChannel(-1, sounds[NumSonido].sound, loop);
+con = Mix_PlayChannel(-1, sounds[sound_num].sound, loop);
 Mix_UnregisterAllEffects(con);
-Mix_RegisterEffect(con, freqEffect, doneEffect, NULL);
-Mix_Volume(con, Volumen/2);
+Mix_RegisterEffect(con, freq_effect, done_effect, NULL);
+Mix_Volume(con, volume/2);
 ```
 
-The `freqEffect` callback (lines 402-465) is a **60-line hand-written sample-rate converter** registered as a channel effect. It reads from `s->sound->abuf` at a variable rate controlled by `channels[chan].freq` (ratio 0-1024, where 256 = normal speed). This implements variable-speed playback with looping.
+The `freq_effect` callback is a **60-line hand-written sample-rate converter** registered as a channel effect. It reads from `s->sound->abuf` at a variable rate controlled by `channels[chan].freq` (ratio 0-1024, where 256 = normal speed). This implements variable-speed playback with looping.
 
 **SDL3_mixer replaces this entirely with a single call:**
 ```c
@@ -185,7 +185,7 @@ MIX_PlayTrack(g_tracks[con], 0);
 | File | Call Sites | Difficulty | Key Change |
 |------|-----------|------------|-----------|
 | editor/pcm.c | ~40 | Moderate | sound_data as authority, MIX_LoadRawAudio |
-| shared/run/sound.c | ~35 | Significant | freqEffect deletion, track pool |
+| shared/run/sound.c | ~35 | Significant | freq_effect deletion, track pool |
 | ide/browser.c | 4 | Trivial | Preview playback |
 | ide/mixer.c | 2 | Trivial | Volume int→float |
 | ide/sound.c (IDE) | 4 | Trivial | Init/shutdown |
@@ -499,12 +499,12 @@ If/when we decide to proceed:
 - `mingw-w64-i686-SDL3_mixer` may not be packaged yet for 32-bit MSYS2
 - SDL3 ecosystem is still maturing; SDL2 is proven on Steam
 - Phase 1 (video system fix, warnings, landmines) and Phase 2 (cleanup) should come first
-- The audio system works — `freqEffect` is buggy but stable
+- The audio system works — `freq_effect` is buggy but stable
 - Our audio needs are simple (8-bit WAV at 11-44kHz + MOD music)
 
 **Reasons to migrate (eventually):**
-- `MIX_SetTrackFrequencyRatio()` deletes the buggiest audio code we have (60-line freqEffect callback)
-- `MIX_LoadRawAudio()` eliminates WAV-header-wrapping hacks (DIVMIX_LoadPCM, SaveSoundMem)
+- `MIX_SetTrackFrequencyRatio()` deletes the buggiest audio code we have (60-line `freq_effect` callback)
+- `MIX_LoadRawAudio()` eliminates WAV-header-wrapping hacks (`divmix_load_pcm`, `SaveSoundMem`)
 - Unified `MIX_Audio` type eliminates awkward Chunk/Music distinction
 - SDL3_mixer is the future — eventually SDL2_mixer stops getting updates
 - Several broken systems (video modes, fullscreen) need rewriting anyway — doing it once for SDL3 is better than doing it twice

@@ -69,12 +69,12 @@ All windows are initialized with `type=0` (empty/inactive).
 void main_loop(void) {
     div_started = 1;
     do {
-        mainloop();
+        main_loop_tick();
     } while (!exit_requested);
 }
 ```
 
-The actual work is in `mainloop()` (same file, line 857), which runs once per iteration:
+The actual work is in `main_loop_tick()` (same file), which runs once per iteration:
 
 1. **`poll_keyboard()`** -- Pumps the SDL event queue, updates `mclock` timestamp.
 2. **Window hit-test** -- Scans `window[0..MAX_WINDOWS-1]` to find which window

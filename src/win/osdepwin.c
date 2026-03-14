@@ -337,7 +337,7 @@ void __mkdir(char *dir) {
 }
 
 
-void text_color(int attr, int fg, int bg) {
+void set_text_color(int attr, int fg, int bg) {
   char command[40];
 
   /* Command is the control command to the terminal */

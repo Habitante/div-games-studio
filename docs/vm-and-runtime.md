@@ -69,7 +69,7 @@ stack pointer (`_SP` field). The stack grows upward (increasing `sp`).
 void interpreter(void) {
     initialization();
     while (process_count && !(kbdFLAGS[_ESC] && kbdFLAGS[_L_CTRL]) && !alt_x) {
-        mainloop();
+        runtime_main_loop();
     }
     finalization();
 }
@@ -77,7 +77,7 @@ void interpreter(void) {
 
 The game runs until all processes are dead, or Ctrl+Esc / Alt+X is pressed.
 
-### Frame Loop: `mainloop()` at line 702
+### Frame Loop: `runtime_main_loop()` in `interpreter.c`
 
 Each frame:
 
@@ -368,10 +368,10 @@ The runtime uses SDL2_mixer for audio:
   for playback
 - 32 channels available (`channel(0)` through `channel(31)`)
 
-### Clock: `get_reloj()` in `src/runtime/functions.c` (line 70)
+### Clock: `get_clock()` in `src/runtime/functions.c`
 
 ```c
-int get_reloj(void) {
+int get_clock(void) {
     n_reloj = OSDEP_GetTicks();
     frame_clock += (n_reloj - o_reloj);
     o_reloj = n_reloj;

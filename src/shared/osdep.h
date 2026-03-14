@@ -176,7 +176,7 @@ extern int _chdir(const char *Directory);
 #define WHITE   7
 
 
-void text_color(int attr, int fg, int bg);
+void set_text_color(int attr, int fg, int bg);
 
 #if __WORDSIZE == 64
 #define ptr8 16

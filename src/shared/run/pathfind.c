@@ -77,13 +77,13 @@ void path_find(void) {
   // Check offset and size bounds ...
 #ifdef DIV2
   if (!validate_address(offset) || !validate_address(offset + size)) {
-    e(122);
+    runtime_error(122);
     return;
   }
 #else
 
   if (offset < HEADER_LENGTH || offset + size > imem_max) {
-    e(e122);
+    runtime_error(122);
     return;
   }
 #endif
@@ -91,14 +91,14 @@ void path_find(void) {
   // Tile size bounds
 
   if (tile < 1 || tile > 256) {
-    e(151);
+    runtime_error(151);
     return;
   }
 
   // Check file and code bounds
 
   if (file > max_fpgs || file < 0) {
-    e(109);
+    runtime_error(109);
     return;
   }
   if (file)
@@ -106,15 +106,15 @@ void path_find(void) {
   else
     max_grf = 2000;
   if (code <= 0 || code >= max_grf) {
-    e(110);
+    runtime_error(110);
     return;
   }
   if (g[file].grf == NULL) {
-    e(111);
+    runtime_error(111);
     return;
   }
   if ((ptr = g[file].grf[code]) == NULL) {
-    e(121);
+    runtime_error(121);
     return;
   }
 
@@ -125,7 +125,7 @@ void path_find(void) {
   map = (byte *)ptr + 64 + ptr[15] * 4;
 
   if (w < 1 || h < 1 || w > max_map_size || h > max_map_size) {
-    e(152);
+    runtime_error(152);
     return;
   }
 
@@ -251,7 +251,7 @@ void path_find(void) {
 
   if (!find_status)
     if (init_find()) {
-      e(100);
+      runtime_error(100);
       return;
     }
 
@@ -931,14 +931,14 @@ void path_line(void) {
   stack[sp] = 0; // Default return value, until proven otherwise
 
   if (tile < 1 || tile > 256) {
-    e(151);
+    runtime_error(151);
     return;
   } // Tile size bounds
 
   // Check file and code bounds
 
   if (file > max_fpgs || file < 0) {
-    e(109);
+    runtime_error(109);
     return;
   }
   if (file)
@@ -946,15 +946,15 @@ void path_line(void) {
   else
     max_grf = 2000;
   if (code <= 0 || code >= max_grf) {
-    e(110);
+    runtime_error(110);
     return;
   }
   if (g[file].grf == NULL) {
-    e(111);
+    runtime_error(111);
     return;
   }
   if ((ptr = g[file].grf[code]) == NULL) {
-    e(121);
+    runtime_error(121);
     return;
   }
 
@@ -964,7 +964,7 @@ void path_line(void) {
   h = ptr[14];
   map = (byte *)ptr + 64 + ptr[15] * 4;
   if (w < 1 || h < 1 || w > max_map_size || h > max_map_size) {
-    e(152);
+    runtime_error(152);
     return;
   }
 
@@ -1001,14 +1001,14 @@ void path_free(void) {
   stack[sp] = 0; // Default return value, until proven otherwise
 
   if (tile < 1 || tile > 256) {
-    e(151);
+    runtime_error(151);
     return;
   } // Tile size bounds
 
   // Check file and code bounds
 
   if (file > max_fpgs || file < 0) {
-    e(109);
+    runtime_error(109);
     return;
   }
   if (file)
@@ -1016,15 +1016,15 @@ void path_free(void) {
   else
     max_grf = 2000;
   if (code <= 0 || code >= max_grf) {
-    e(110);
+    runtime_error(110);
     return;
   }
   if (g[file].grf == NULL) {
-    e(111);
+    runtime_error(111);
     return;
   }
   if ((ptr = (int *)g[file].grf[code]) == NULL) {
-    e(121);
+    runtime_error(121);
     return;
   }
 
@@ -1034,7 +1034,7 @@ void path_free(void) {
   h = ptr[14];
   map = (byte *)ptr + 64 + ptr[15] * 4;
   if (w < 1 || h < 1 || w > max_map_size || h > max_map_size) {
-    e(152);
+    runtime_error(152);
     return;
   }
   // Check coordinate bounds (if outside the map, return 0)

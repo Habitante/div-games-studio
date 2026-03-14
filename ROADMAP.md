@@ -226,7 +226,7 @@ analysis (~450 call sites). Pre-requisite: verify 32-bit SDL3 package
 availability.
 
 Biggest win: `MIX_SetTrackFrequencyRatio()` replaces the 60-line hand-written
-`freqEffect` sample-rate converter in `shared/run/sound.c` and eliminates the
+`freq_effect` sample-rate converter in `shared/run/sound.c` and eliminates the
 WAV-header-wrapping hacks in the PCM editor.
 
 ---
