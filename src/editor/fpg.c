@@ -648,8 +648,8 @@ void fpg_warning0(void) {
   v.paint_handler = fpg_warning1;
   v.click_handler = fpg_warning2;
 
-  _button(123, 7, v.h - 14, 0);
-  _button(119, v.w - 8, v.h - 14, 2);
+  _button(123, 7, v.h - 14, ALIGN_TL);
+  _button(119, v.w - 8, v.h - 14, ALIGN_TR);
 }
 
 
@@ -788,8 +788,8 @@ void get_code0(void) {
   v.click_handler = get_code2;
   v.close_handler = get_code3;
 
-  _button(100, 7, v.h - 14, 0);
-  _button(101, v.w - 8, v.h - 14, 2);
+  _button(100, 7, v.h - 14, ALIGN_TL);
+  _button(101, v.w - 8, v.h - 14, ALIGN_TR);
 
   _get(71, 4, 12, 30, (byte *)code_str, 5, 1, 999);
   _get(439, 48, 12, 64, (byte *)file_str, 12, 0, 0);
@@ -1059,8 +1059,8 @@ void printlist0(void) {
   v.title = (byte *)v_title;
   v.paint_handler = printlist1;
   v.click_handler = printlist2;
-  _button(100, 7, v.h - 14, 0);
-  _button(101, v.w - 8, v.h - 14, 2);
+  _button(100, 7, v.h - 14, ALIGN_TL);
+  _button(101, v.w - 8, v.h - 14, ALIGN_TR);
   _flag(448, 4, 12, &f_im);
   _flag(449, 4, 12 + 9, &f_ar);
   _get(414, 16 + text_len(texts[449]), 12, v.w - 20 - text_len(texts[449]), (byte *)v_text, 15, 0,
@@ -2177,9 +2177,9 @@ void replace_fpg_0(void) {
   v.paint_handler = replace_fpg_1;
   v.click_handler = replace_fpg_2;
 
-  _button(510, 7, v.h - 14, 0);  // Replace
-  _button(511, x2, v.h - 14, 0); // Add
-  _button(101, x3, v.h - 14, 0); // Cancel
+  _button(510, 7, v.h - 14, ALIGN_TL);  // Replace
+  _button(511, x2, v.h - 14, ALIGN_TL); // Add
+  _button(101, x3, v.h - 14, ALIGN_TL); // Cancel
 
   v_accept = 3;
 }

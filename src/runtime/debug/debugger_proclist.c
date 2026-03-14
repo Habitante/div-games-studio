@@ -289,8 +289,8 @@ void process_list0(void) {
   v.paint_handler = process_list1;
   v.click_handler = process_list2;
 
-  _button(text[7], 7, v.h - 14, 0);
-  _button(text[58], v.w - 8, v.h - 14, 2);
+  _button(text[7], 7, v.h - 14, ALIGN_TL);
+  _button(text[58], v.w - 8, v.h - 14, ALIGN_TR);
   _flag(text[76], v.w - text_len(text[76]) - 12, 11, &lp_sort);
   v_accept = 0;
 }

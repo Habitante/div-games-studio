@@ -172,10 +172,10 @@ void demo0(void) {
   v.close_handler = demo3;
 
   if (exe_cola[1] - 0xF31725AB > 31) {
-    _button(100, v.w / 2, v.h - 14, 1);
+    _button(100, v.w / 2, v.h - 14, ALIGN_TC);
   } else {
-    _button(100, v.w - 8, v.h - 14, 2);
-    _button(125, 7, v.h - 14, 0);
+    _button(100, v.w - 8, v.h - 14, ALIGN_TR);
+    _button(125, 7, v.h - 14, ALIGN_TL);
   }
 }
 
@@ -253,7 +253,7 @@ void betatest0(void) {
 
   v.paint_handler = betatest1;
   v.click_handler = betatest2;
-  _button(100, v.w / 2, v.h - 14, 1);
+  _button(100, v.w / 2, v.h - 14, ALIGN_TC);
 }
 
 // 1 - beta.nfo
@@ -800,7 +800,7 @@ void interr0(void) {
     v.w = 120;
   v.paint_handler = interr1;
   v.click_handler = interr2;
-  _button(100, v.w / 2, v.h - 14, 1);
+  _button(100, v.w / 2, v.h - 14, ALIGN_TC);
 }
 
 //-----------------------------------------------------------------------------
@@ -831,7 +831,7 @@ void intmsg0(void) {
   v.h = 38 + 8;
   v.paint_handler = intmsg1;
   v.click_handler = intmsg2;
-  _button(100, v.w / 2, v.h - 14, 1);
+  _button(100, v.w / 2, v.h - 14, ALIGN_TC);
 }
 
 //-----------------------------------------------------------------------------

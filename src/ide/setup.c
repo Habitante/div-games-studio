@@ -149,8 +149,8 @@ void vid_setup0(void) {
   lvgasizes.created = 0;
   lvgasizes.total_items = num_modes;
 
-  _button(100, 7, v.h - 14, 0);
-  _button(101, v.w - 8, v.h - 14, 2);
+  _button(100, 7, v.h - 14, ALIGN_TL);
+  _button(101, v.w - 8, v.h - 14, ALIGN_TR);
   _flag(175, 4, 22 + 14 + 16, &stnot_big);
   _flag(176, 4, 22 + 26 + 16, &stbig);
 
@@ -343,9 +343,9 @@ void wallpaper_setup0(void) {
   v.click_handler = (void_return_type_t)wallpaper_setup2;
   v.close_handler = (void_return_type_t)wallpaper_setup3;
 
-  _button(100, 7, v.h - 14, 0);
-  _button(101, v.w - 8, v.h - 14, 2);
-  _button(121, v.w - 12, 18, 0);
+  _button(100, 7, v.h - 14, ALIGN_TL);
+  _button(101, v.w - 8, v.h - 14, ALIGN_TR);
+  _button(121, v.w - 12, 18, ALIGN_TL);
 
   _flag(179, 4, 24 + 8, &wallpaper_tile);
   _flag(181, v.w - 49 - text_len(texts[181]), 24 + 8, &wallpaper_gamma);
@@ -482,7 +482,7 @@ void mem_info0(void) {
   v.paint_handler = (void_return_type_t)mem_info1;
   v.click_handler = (void_return_type_t)mem_info2;
 
-  _button(100, v.w / 2, v.h - 14, 1);
+  _button(100, v.w / 2, v.h - 14, ALIGN_TC);
 }
 
 //-----------------------------------------------------------------------------
@@ -818,8 +818,8 @@ void config_setup0(void) {
   v.click_handler = (void_return_type_t)cfg_setup2;
   v.close_handler = (void_return_type_t)cfg_setup3;
 
-  _button(100, 7, v.h - 14, 0);
-  _button(101, v.w - 8, v.h - 14, 2);
+  _button(100, 7, v.h - 14, ALIGN_TL);
+  _button(101, v.w - 8, v.h - 14, ALIGN_TR);
   itoa(undo_memory / 1024, undomem, 10);
   itoa(tab_size, tabul, 10);
   _get(411, 12, 76, 40, (byte *)tabul, 4, 1, 16);

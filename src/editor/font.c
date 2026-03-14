@@ -536,25 +536,25 @@ void fonts0(void) {
   DIV_SPRINTF(font_height_str, "%d", font_height_gen);
   DIV_SPRINTF(font_width_str, "%d", font_width_gen);
 
-  _button(121, 74, 16, 0);                                    //15
-  _button(121, 74, 35, 0);                                    //16
+  _button(121, 74, 16, ALIGN_TL);                              //15
+  _button(121, 74, 35, ALIGN_TL);                              //16
   _get(133, 88, 11, 19, (byte *)font_width_str, 4, 16, 128);  //1
   _get(134, 88, 30, 19, (byte *)font_height_str, 4, 16, 128); //2
 
-  _button(111, 7 + 60, 61, 0);  //4
-  _button(110, 37 + 60, 61, 0); //5
-  _button(111, 7 + 60, 75, 0);  //6 //129
-  _button(110, 37 + 60, 75, 0); //7
-  _button(111, 67 + 60, 61, 0); //8
-  _button(110, 97 + 60, 61, 0); //9
-  _button(111, 67 + 60, 75, 0); //10
-  _button(110, 97 + 60, 75, 0); //11
+  _button(111, 7 + 60, 61, ALIGN_TL);  //4
+  _button(110, 37 + 60, 61, ALIGN_TL); //5
+  _button(111, 7 + 60, 75, ALIGN_TL);  //6 //129
+  _button(110, 37 + 60, 75, ALIGN_TL); //7
+  _button(111, 67 + 60, 61, ALIGN_TL); //8
+  _button(110, 97 + 60, 61, ALIGN_TL); //9
+  _button(111, 67 + 60, 75, ALIGN_TL); //10
+  _button(110, 97 + 60, 75, ALIGN_TL); //11
 
   _get(80, 4, v.h - (39), v.w - 16 - text_len(texts[113] + 1), (byte *)test_string, 21, 0, 0);
-  _button(113, v.w - 8, v.h - 14 - 18, 2); //14
+  _button(113, v.w - 8, v.h - 14 - 18, ALIGN_TR); //14
 
-  _button(120, 7, v.h - 14, 0);       //13
-  _button(119, v.w - 8, v.h - 14, 2); //12
+  _button(120, 7, v.h - 14, ALIGN_TL);       //13
+  _button(119, v.w - 8, v.h - 14, ALIGN_TR); //12
 
   _flag(112, 64, 112, &mosaic1);
   _flag(112, 124, 112, &mosaic2);
@@ -842,8 +842,8 @@ void selcolor0(void) {
   v.paint_handler = selcolor1;
   v.click_handler = selcolor2;
   v.close_handler = selcolor3;
-  _button(100, 7, v.h - 14, 0);
-  _button(101, v.w - 8, v.h - 14, 2);
+  _button(100, 7, v.h - 14, ALIGN_TL);
+  _button(101, v.w - 8, v.h - 14, ALIGN_TR);
 }
 
 int text_height = 0, text_width = 0;
@@ -956,7 +956,7 @@ void preview0() {
   v.paint_handler = preview1;
   v.click_handler = preview2;
   v.title = texts[80];
-  _button(100, v.w / 2, v.h - 14, 1);
+  _button(100, v.w / 2, v.h - 14, ALIGN_TC);
 }
 
 void preview() {
@@ -1084,8 +1084,8 @@ void gen_font0(void) {
   _flag(116, 82, 43, &gen_font_buttons[2]);
   _flag(117, 82, 57, &gen_font_buttons[3]);
   _flag(118, 82, 71, &gen_font_buttons[4]);
-  _button(100, 7, v.h - 14, 0);
-  _button(101, v.w - 8, v.h - 14, 2);
+  _button(100, 7, v.h - 14, ALIGN_TL);
+  _button(101, v.w - 8, v.h - 14, ALIGN_TR);
   GenFontRet = 0;
 }
 void preview21() {
@@ -1200,7 +1200,7 @@ void preview20() {
   v.paint_handler = preview21;
   v.click_handler = preview22;
   v.title = texts[98];
-  _button(100, v.w / 2, v.h - 14, 1);
+  _button(100, v.w / 2, v.h - 14, ALIGN_TC);
 }
 /////////////////////////////////////////////////////////////////////////////
 
@@ -1581,8 +1581,8 @@ void get_text0(void) {
   v.click_handler = get_text2;
   DIV_STRCPY(cCharsToPrint, "");
   _get(161, 4, 12, v.w - 8, (byte *)cCharsToPrint, 128, 0, 0);
-  _button(100, 7, v.h - 14, 0);
-  _button(101, v.w - 8, v.h - 14, 2);
+  _button(100, 7, v.h - 14, ALIGN_TL);
+  _button(101, v.w - 8, v.h - 14, ALIGN_TR);
   v_accept = 0;
 }
 
@@ -1867,25 +1867,25 @@ void load_font_session(FILE *file) {
   DIV_SPRINTF(font_height_str, "%d", font_height_gen);
   DIV_SPRINTF(font_width_str, "%d", font_width_gen);
 
-  _button(121, 74, 16, 0);
-  _button(121, 74, 35, 0);
+  _button(121, 74, 16, ALIGN_TL);
+  _button(121, 74, 35, ALIGN_TL);
   _get(133, 88, 11, 19, (byte *)font_width_str, 4, 16, 128);
   _get(134, 88, 30, 19, (byte *)font_height_str, 4, 16, 128);
 
-  _button(111, 7 + 60, 61, 0);  //4
-  _button(110, 37 + 60, 61, 0); //5
-  _button(111, 7 + 60, 75, 0);  //6 //129
-  _button(110, 37 + 60, 75, 0); //7
-  _button(111, 67 + 60, 61, 0); //8
-  _button(110, 97 + 60, 61, 0); //9
-  _button(111, 67 + 60, 75, 0); //10
-  _button(110, 97 + 60, 75, 0); //11
+  _button(111, 7 + 60, 61, ALIGN_TL);  //4
+  _button(110, 37 + 60, 61, ALIGN_TL); //5
+  _button(111, 7 + 60, 75, ALIGN_TL);  //6 //129
+  _button(110, 37 + 60, 75, ALIGN_TL); //7
+  _button(111, 67 + 60, 61, ALIGN_TL); //8
+  _button(110, 97 + 60, 61, ALIGN_TL); //9
+  _button(111, 67 + 60, 75, ALIGN_TL); //10
+  _button(110, 97 + 60, 75, ALIGN_TL); //11
 
   _get(80, 4, v.h - (39), v.w - 16 - text_len(texts[113] + 1), (byte *)test_string, 21, 0, 0);
-  _button(113, v.w - 8, v.h - 14 - 18, 2); //14
+  _button(113, v.w - 8, v.h - 14 - 18, ALIGN_TR); //14
 
-  _button(120, 7, v.h - 14, 0);       //13
-  _button(119, v.w - 8, v.h - 14, 2); //12
+  _button(120, 7, v.h - 14, ALIGN_TL);       //13
+  _button(119, v.w - 8, v.h - 14, ALIGN_TR); //12
 
   _flag(112, 64, 112, &mosaic1);
   _flag(112, 124, 112, &mosaic2);

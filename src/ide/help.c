@@ -539,18 +539,18 @@ void help0(void) { // help_item indicates which topic help is requested for
   v.click_handler = help2;
   v.close_handler = help3;
 
-  _button(488, 6, 14, 0);
+  _button(488, 6, 14, ALIGN_TL);
   x = 6 + text_len(texts[488]) + 2;
-  _button(489, x, 14, 0);
+  _button(489, x, 14, ALIGN_TL);
   x += text_len(texts[489]) + 2 + 6;
-  _button(490, x, 14, 0);
+  _button(490, x, 14, ALIGN_TL);
   x += text_len(texts[490]) + 2;
-  _button(491, x, 14, 0);
+  _button(491, x, 14, ALIGN_TL);
   x += text_len(texts[491]) + 2;
-  _button(492, x, 14, 0);
+  _button(492, x, 14, ALIGN_TL);
   x += text_len(texts[492]) + 2 + 6;
-  _button(494, x, 14, 0);
-  _button(493, abs(v.w) / big2 - 15, 14, 2);
+  _button(494, x, 14, ALIGN_TL);
+  _button(493, abs(v.w) / big2 - 15, 14, ALIGN_TR);
 }
 
 //-----------------------------------------------------------------------------
@@ -805,18 +805,18 @@ void help_paint0(void) { // help_item indicates which topic help is requested fo
 
   v.state = 1;
 
-  _button(488, 6, 14, 0);
+  _button(488, 6, 14, ALIGN_TL);
   x = 6 + text_len(texts[488]) + 2;
-  _button(489, x, 14, 0);
+  _button(489, x, 14, ALIGN_TL);
   x += text_len(texts[489]) + 2 + 6;
-  _button(490, x, 14, 0);
+  _button(490, x, 14, ALIGN_TL);
   x += text_len(texts[490]) + 2;
-  _button(491, x, 14, 0);
+  _button(491, x, 14, ALIGN_TL);
   x += text_len(texts[491]) + 2;
-  _button(492, x, 14, 0);
+  _button(492, x, 14, ALIGN_TL);
   x += text_len(texts[492]) + 2 + 6;
-  _button(494, x, 14, 0);
-  _button(493, abs(v.w) / big2 - 15, 14, 2);
+  _button(494, x, 14, ALIGN_TL);
+  _button(493, abs(v.w) / big2 - 15, 14, ALIGN_TR);
 }
 
 void help_paint(memptrsize n) {

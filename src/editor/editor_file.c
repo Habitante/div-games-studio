@@ -336,8 +336,8 @@ void find_text0(void) {
   //  strcpy(search_text,"");
 
   _get(161, 4, 11, v.w - 8, (byte *)search_text, 32, 0, 0);
-  _button(100, 7, y_bt, 0);
-  _button(101, v.w - 8, y_bt, 2);
+  _button(100, 7, y_bt, ALIGN_TL);
+  _button(101, v.w - 8, y_bt, ALIGN_TR);
   _flag(163, 4, y_bt - 20, &whole_word);
   _flag(164, 4, y_bt - 12, &case_sensitive);
 
@@ -442,8 +442,8 @@ void replace_text0(void) {
 
   _get(161, 4, 11, v.w - 8, (byte *)buscar2, 32, 0, 0);
   _get(162, 4, 30, v.w - 8, (byte *)sustituir, 32, 0, 0);
-  _button(100, 7, y_st, 0);
-  _button(101, v.w - 8, y_st, 2);
+  _button(100, 7, y_st, ALIGN_TL);
+  _button(101, v.w - 8, y_st, ALIGN_TR);
   _flag(163, 4, y_st - 20, &whole_word2);
   _flag(164, 4, y_st - 12, &case_sensitive2);
 
@@ -593,10 +593,10 @@ void replace0(void) {
   v.h = 29;
   v.paint_handler = replace_dialog;
   v.click_handler = replace2;
-  _button(102, 7, v.h - 14, 0);
-  _button(103, x2, v.h - 14, 0);
-  _button(124, x3, v.h - 14, 0);
-  _button(101, x4, v.h - 14, 0);
+  _button(102, 7, v.h - 14, ALIGN_TL);
+  _button(103, x2, v.h - 14, ALIGN_TL);
+  _button(124, x3, v.h - 14, ALIGN_TL);
+  _button(101, x4, v.h - 14, ALIGN_TL);
   v_accept = 4;
 }
 
@@ -625,7 +625,7 @@ void replacements0(void) {
   v.h = 38;
   v.paint_handler = replacements1;
   v.click_handler = replacements2;
-  _button(100, v.w / 2, v.h - 14, 1);
+  _button(100, v.w / 2, v.h - 14, ALIGN_TC);
 }
 
 void open_program_external(char *name, char *path) {
@@ -1077,8 +1077,8 @@ void process_list0(void) {
   v.paint_handler = process_list1;
   v.click_handler = process_list2;
 
-  _button(100, 7, v.h - 14, 0);
-  _button(101, v.w - 8, v.h - 14, 2);
+  _button(100, 7, v.h - 14, ALIGN_TL);
+  _button(101, v.w - 8, v.h - 14, ALIGN_TR);
   _flag(337, v.w - text_len(texts[337]) - 12, 11, &lp_sort);
   v_accept = 0;
 }
@@ -1208,8 +1208,8 @@ void printprogram0(void) {
   v.title = texts[453];
   v.paint_handler = printprogram1;
   v.click_handler = printprogram2;
-  _button(100, 7, v.h - 14, 0);
-  _button(101, v.w - 8, v.h - 14, 2);
+  _button(100, 7, v.h - 14, ALIGN_TL);
+  _button(101, v.w - 8, v.h - 14, ALIGN_TR);
   _flag(454, 4, 12, &fp_co);
   _flag(455, 4, 12 + 9, &fp_bl);
   v_accept = 0;

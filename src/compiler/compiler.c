@@ -2747,8 +2747,8 @@ void compile_pass0(void) {
   }
   v.paint_handler = compile_pass1;
   v.click_handler = compile_pass2;
-  _button(100, 7, v.h - 14, 0);
-  _button(125, v.w - 8, v.h - 14, 2);
+  _button(100, 7, v.h - 14, ALIGN_TL);
+  _button(125, v.w - 8, v.h - 14, ALIGN_TR);
   compilado = 0;
   v_help = 0;
 }

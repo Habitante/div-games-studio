@@ -89,7 +89,7 @@ void user_info0(void) {
   v.click_handler = user_info2;
   v.close_handler = user_info3;
 
-  _button(100, v.w - 8, v.h - 14, 2);
+  _button(100, v.w - 8, v.h - 14, ALIGN_TR);
 
   _get(460, 4 + 86, 22, v.w - 8 - 86, (byte *)user1, 127, 0, 0);
   _get(461, 4 + 86, 22 + 19, v.w - 8 - 86, (byte *)user2, 127, 0, 0);
@@ -109,10 +109,10 @@ void copyright0(void) {
   v.paint_handler = copyright1;
   v.click_handler = copyright2;
   if (copy_desktop) {
-    _button(456, v.w - 11, v.h - 16, 2);    // Continue
-    _button(457, 48 + 48 + 3, v.h - 16, 0); // New session
+    _button(456, v.w - 11, v.h - 16, ALIGN_TR);    // Continue
+    _button(457, 48 + 48 + 3, v.h - 16, ALIGN_TL); // New session
   } else {
-    _button(457, v.w - 11, v.h - 16, 2); // New session
+    _button(457, v.w - 11, v.h - 16, ALIGN_TR); // New session
   }
 }
 
@@ -170,7 +170,7 @@ void err0(void) {
     v.w = 320;
   v.paint_handler = err1;
   v.click_handler = err2;
-  _button(100, v.w / 2, v.h - 14, 1);
+  _button(100, v.w / 2, v.h - 14, ALIGN_TC);
 }
 
 void err1(void) {
@@ -216,8 +216,8 @@ void errhlp0(void) {
   v.paint_handler = errhlp1;
   v.click_handler = errhlp2;
   v_accept = 0;
-  _button(100, 7, v.h - 14, 0);
-  _button(125, v.w - 8, v.h - 14, 2);
+  _button(100, 7, v.h - 14, ALIGN_TL);
+  _button(125, v.w - 8, v.h - 14, ALIGN_TR);
 }
 
 //-----------------------------------------------------------------------------
@@ -262,7 +262,7 @@ void test0(void) {
   v.h = 38;
   v.paint_handler = test1;
   v.click_handler = test2;
-  _button(100, v.w / 2, v.h - 14, 1);
+  _button(100, v.w / 2, v.h - 14, ALIGN_TC);
 
   exit_requested = 1;
   return_mode = 3;
@@ -289,8 +289,8 @@ void accept0(void) {
     v.h = 29;
   v.paint_handler = accept1;
   v.click_handler = accept2;
-  _button(100, 7, v.h - 14, 0);
-  _button(101, v.w - 8, v.h - 14, 2);
+  _button(100, 7, v.h - 14, ALIGN_TL);
+  _button(101, v.w - 8, v.h - 14, ALIGN_TR);
   v_accept = 0;
 }
 
@@ -339,8 +339,8 @@ void palette_action0(void) {
   palette_option[1] = 0;
   palette_option[2] = 0;
 
-  _button(100, 7, v.h - 14, 0);
-  _button(101, v.w - 8, v.h - 14, 2);
+  _button(100, 7, v.h - 14, ALIGN_TL);
+  _button(101, v.w - 8, v.h - 14, ALIGN_TR);
   _flag(569, 4, 12 + 77, &palette_option[0]);
   _flag(570, 4, 22 + 77, &palette_option[1]);
   _flag(571, 4, 32 + 77, &palette_option[2]);
@@ -990,5 +990,5 @@ void about0(void) {
   v.h = 188;
   v.paint_handler = about1;
   v.click_handler = about2;
-  _button(100, v.w / 2, v.h - 14, 1);
+  _button(100, v.w / 2, v.h - 14, ALIGN_TC);
 }

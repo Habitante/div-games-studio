@@ -678,9 +678,9 @@ void profile0(void) {
   v.paint_handler = profile1;
   v.click_handler = profile2;
 
-  _button(text[87], 7, v.h - 14, 0);
-  _button(text[88], 7 + 3 + text_len((byte *)"\15 Siguiente Frame "), v.h - 14, 0);
-  _button(text[89], v.w - 8, v.h - 14, 2);
+  _button(text[87], 7, v.h - 14, ALIGN_TL);
+  _button(text[88], 7 + 3 + text_len((byte *)"\15 Siguiente Frame "), v.h - 14, ALIGN_TL);
+  _button(text[89], v.w - 8, v.h - 14, ALIGN_TR);
   _flag(text[90],
         7 + 3 + text_len((byte *)"\15 Siguiente Frame ") + 3 + text_len((byte *)"\15 Comenzar "),
         v.h - 14, &absolut);

@@ -749,22 +749,22 @@ void inspect0(void) {
   v.click_handler = inspect2;
   v.close_handler = inspect3;
 
-  _button(text[42], 185 + 64, 72, 1);
+  _button(text[42], 185 + 64, 72, ALIGN_TC);
 
-  _button(text[43], 169 + 64, 92, 0);
-  _button(text[44], 190 + 64, 92, 0);
+  _button(text[43], 169 + 64, 92, ALIGN_TL);
+  _button(text[44], 190 + 64, 92, ALIGN_TL);
 
-  _button(text[45], x, v.h - 14, 0);
+  _button(text[45], x, v.h - 14, ALIGN_TL);
   x += text_len(text[45] + 1) + 8;
-  _button(text[46], x, v.h - 14, 0);
+  _button(text[46], x, v.h - 14, ALIGN_TL);
   x += text_len(text[46] + 1) + 8;
-  _button(text[47], x, v.h - 14, 0);
+  _button(text[47], x, v.h - 14, ALIGN_TL);
   x += text_len(text[47] + 1) + 8;
-  _button(text[48], x, v.h - 14, 0);
+  _button(text[48], x, v.h - 14, ALIGN_TL);
   x += text_len(text[48] + 1) + 8;
-  _button(text[49], x, v.h - 14, 0);
+  _button(text[49], x, v.h - 14, ALIGN_TL);
   x += text_len(text[49] + 1) + 8;
-  _button(text[50], x, v.h - 14, 0);
+  _button(text[50], x, v.h - 14, ALIGN_TL);
 
   _flag(text[51], 4, 11, &pre_defined);
   _flag(text[52], 32 + text_len(text[51]), 11, &user_defined);
@@ -1394,8 +1394,8 @@ void change0(void) {
 
   itoa(value, search_text, 10);
   _get((byte *)text[57], 4, 11, v.w - 8, (byte *)search_text, 32, 0, 0);
-  _button(text[7], 7, y_bt, 0);
-  _button(text[58], v.w - 8, y_bt, 2);
+  _button(text[7], 7, y_bt, ALIGN_TL);
+  _button(text[58], v.w - 8, y_bt, ALIGN_TR);
 }
 
 //-----------------------------------------------------------------------------
@@ -1439,6 +1439,6 @@ void changestring0(void) {
   else
     div_strcpy(enterstring, sizeof(enterstring), "");
   _get((byte *)text[61], 4, 11, v.w - 8, (byte *)enterstring, 256, 0, 0);
-  _button(text[7], 7, y_bt, 0);
-  _button(text[58], v.w - 8, y_bt, 2);
+  _button(text[7], 7, y_bt, ALIGN_TL);
+  _button(text[58], v.w - 8, y_bt, ALIGN_TR);
 }

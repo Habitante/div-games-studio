@@ -399,15 +399,15 @@ void install_setup0() {
 
   y = 64 + 19 * 3;
 
-  _button(100, 7, v.h - 14, 0);
-  _button(101, v.w - 8, v.h - 14, 2);
+  _button(100, 7, v.h - 14, ALIGN_TL);
+  _button(101, v.w - 8, v.h - 14, ALIGN_TR);
 
-  _button(121, 109, 38, 0);
-  _button(121, 109, 38 + 19, 0);
-  _button(121, 109, 38 + 48, 0);
+  _button(121, 109, 38, ALIGN_TL);
+  _button(121, 109, 38 + 19, ALIGN_TL);
+  _button(121, 109, 38 + 48, ALIGN_TL);
 
-  _button(527, 7, 48 + 19 * 3, 0);
-  _button(519, 113, 48 + 19 * 3, 2);
+  _button(527, 7, 48 + 19 * 3, ALIGN_TL);
+  _button(519, 113, 48 + 19 * 3, ALIGN_TR);
 
   _flag(539, 4, 32 + 39, &segundo_font);
 
@@ -615,14 +615,14 @@ void install_setupm0() {
   v.click_handler = install_setupm2;
 
   y = 12;
-  _button(100, v.w - 8, v.h - 14, 2);
+  _button(100, v.w - 8, v.h - 14, ALIGN_TR);
   _get(225, 4, y + 19 * 0, v.w - 8, (byte *)help_text1, 127, 0, 0);
   y += 11;
   _get(414, 4, y + 19 * 0, v.w - 8, (byte *)help_text2, 127, 0, 0);
   _get(520, 4, y + 19 * 1, (v.w - 16) / 2 - 16, (byte *)disk_text1, 127, 0, 0);
   _get(414, v.w / 2 - 8, y + 19 * 1, v.w / 2 + 4, (byte *)disk_text2, 127, 0, 0);
   _get(229, 4, y + 19 * 2, v.w - 8, (byte *)msg_exe, 127, 0, 0);
-  _button(538, 7, v.h - 14, 0);
+  _button(538, 7, v.h - 14, ALIGN_TL);
 }
 
 //-----------------------------------------------------------------------------
@@ -666,7 +666,7 @@ void install_setupe0() {
   v.click_handler = install_setupe2;
 
   y = 4;
-  _button(100, v.w - 8, v.h - 14, 2);
+  _button(100, v.w - 8, v.h - 14, ALIGN_TR);
   _get(414, 4, y + 11 * 0, v.w - 8, (byte *)install_err0, 127, 0, 0);
   _get(414, 4, y + 11 * 1, v.w - 8, (byte *)install_err1, 127, 0, 0);
   _get(414, 4, y + 11 * 2, v.w - 8, (byte *)install_err2, 127, 0, 0);
@@ -676,7 +676,7 @@ void install_setupe0() {
   _get(414, 4, y + 11 * 6, v.w - 8, (byte *)install_err6, 127, 0, 0);
   _get(414, 4, y + 11 * 7, v.w - 8, (byte *)install_err7, 127, 0, 0);
   _get(414, 4, y + 11 * 8, v.w - 8, (byte *)install_err8, 127, 0, 0);
-  _button(538, 7, v.h - 14, 0);
+  _button(538, 7, v.h - 14, ALIGN_TL);
 }
 
 

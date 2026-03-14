@@ -993,13 +993,13 @@ void edit_sound0(void) {
   NumSND = 0;
 
   pos = 7;
-  _button(501, pos, v.h - 34, 0);
+  _button(501, pos, v.h - 34, ALIGN_TL);
   pos += text_len(texts[501]) + 3;
-  _button(502, pos, v.h - 34, 0);
+  _button(502, pos, v.h - 34, ALIGN_TL);
   pos += text_len(texts[502]) + 3;
-  _button(503, pos, v.h - 34, 0);
+  _button(503, pos, v.h - 34, ALIGN_TL);
   pos += text_len(texts[503]) + 3;
-  _button(504, pos, v.h - 34, 0);
+  _button(504, pos, v.h - 34, ALIGN_TL);
 
   pos += text_len(texts[504]) + 3;
   pos += v.w - 1 - text_len(texts[506]);
@@ -1007,31 +1007,31 @@ void edit_sound0(void) {
   pos -= text_len(texts[508]) + 3;
   pos -= text_len(texts[505]) + 3;
   pos /= 2;
-  _button(505, pos, v.h - 34, 0);
+  _button(505, pos, v.h - 34, ALIGN_TL);
 
   pos = v.w - 1 - text_len(texts[506]);
-  _button(506, pos, v.h - 34, 0);
+  _button(506, pos, v.h - 34, ALIGN_TL);
   pos -= text_len(texts[507]) + 3;
-  _button(507, pos, v.h - 34, 0);
+  _button(507, pos, v.h - 34, ALIGN_TL);
   pos -= text_len(texts[508]) + 3;
-  _button(508, pos, v.h - 34, 0);
+  _button(508, pos, v.h - 34, ALIGN_TL);
 
-  _button(509, 7, v.h - 14, 0);       // Prueba
-  _button(512, v.w - 8, v.h - 14, 2); // Copiar en window
+  _button(509, 7, v.h - 14, ALIGN_TL);       // Prueba
+  _button(512, v.w - 8, v.h - 14, ALIGN_TR); // Copiar en window
 
   pos = 193 + text_len(texts[555]) + 3; // 241;
 
-  _button(553, pos, 15, 0);
+  _button(553, pos, 15, ALIGN_TL);
   pos += text_len(texts[553]) + 3;
-  _button(554, pos, 15, 0);
+  _button(554, pos, 15, ALIGN_TL);
 
   pos = 193;
 
-  _button(555, pos, 30, 0);
+  _button(555, pos, 30, ALIGN_TL);
   pos += text_len(texts[555]) + 3;
-  _button(556, pos, 30, 0);
+  _button(556, pos, 30, ALIGN_TL);
   pos += text_len(texts[556]) + 3;
-  _button(557, pos, 30, 0);
+  _button(557, pos, 30, ALIGN_TL);
   pos += text_len(texts[557]) + 3;
 
   v_finished = 0;
@@ -1198,15 +1198,15 @@ void rec_sound0(void) {
   DIV_STRCAT(sound_file, "SAMPLE.WAV");
 
   // Botones Aceptar/Cancelar
-  _button(100, 7, v.h - 14, 0);
-  _button(101, v.w - 8, v.h - 14, 2);
+  _button(100, 7, v.h - 14, ALIGN_TL);
+  _button(101, v.w - 8, v.h - 14, ALIGN_TR);
 
   // Flags MIC/CD
   _flag(561, 3, 20, &rec_device[0]);
   _flag(562, 3 + 11 + text_len(texts[561]), 20, &rec_device[1]);
 
   // Boton de seleccion de filename
-  _button(121, v.w - 12, 17, 0);
+  _button(121, v.w - 12, 17, ALIGN_TL);
 
   v_accept = 0;
 }

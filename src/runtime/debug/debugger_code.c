@@ -680,18 +680,18 @@ void debug0(void) {
   v.click_handler = debug2;
   v.close_handler = debug3;
 
-  _button(text[65], v.w - 8, 102 - 18, 2);
-  _button(text[66], 7 + 17, v.h - 14 - 15 * 4, 35 * 256 + 1);
-  _button(text[67], 7 + 17, v.h - 14 - 15 * 3, 35 * 256 + 1);
-  _button(text[68], 7 + 17, v.h - 14 - 15 * 2, 35 * 256 + 1);
-  _button(text[69], 7 + 17, v.h - 14 - 15 * 1, 35 * 256 + 1);
-  _button(text[70], 7 + 17, v.h - 14 - 15 * 0, 35 * 256 + 1);
-  _button(text[71], v.w - 40, 35, 1);
-  _button(text[72], 136, 102 - 18, 0);
+  _button(text[65], v.w - 8, 102 - 18, ALIGN_TR);
+  _button(text[66], 7 + 17, v.h - 14 - 15 * 4, 35 * 256 + ALIGN_TC);
+  _button(text[67], 7 + 17, v.h - 14 - 15 * 3, 35 * 256 + ALIGN_TC);
+  _button(text[68], 7 + 17, v.h - 14 - 15 * 2, 35 * 256 + ALIGN_TC);
+  _button(text[69], 7 + 17, v.h - 14 - 15 * 1, 35 * 256 + ALIGN_TC);
+  _button(text[70], 7 + 17, v.h - 14 - 15 * 0, 35 * 256 + ALIGN_TC);
+  _button(text[71], v.w - 40, 35, ALIGN_TC);
+  _button(text[72], 136, 102 - 18, ALIGN_TL);
   _button(text[73],
           (v.w - 8 - text_len((byte *)"\15Sgte. Frame") + 136 + text_len((byte *)"\15Perfiles")) /
               2,
-          102 - 18, 1);
+          102 - 18, ALIGN_TC);
 }
 
 //----------------------------------------------------------------------------

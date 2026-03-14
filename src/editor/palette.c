@@ -1286,8 +1286,8 @@ void sort_colors0(void) {
   v.h = 65 * 2 + 31;
   v.title = texts[140];
 
-  _button(100, 7, v.h - 14, 0);
-  _button(101, v.w - 8, v.h - 14, 2);
+  _button(100, 7, v.h - 14, ALIGN_TL);
+  _button(101, v.w - 8, v.h - 14, ALIGN_TR);
 
   v.paint_handler = sort_colors1;
   v.click_handler = sort_colors2;
@@ -2247,7 +2247,7 @@ void pal_interpolate2(void) {
     action = 0;
     call((void_return_type_t)v.paint_handler);
 
-    draw_button(4, w / 2, h - 13, 1, c0);
+    draw_button(4, w / 2, h - 13, ALIGN_TC, c0);
 
     //Refresh values and scrollbars
     wbox(v.ptr, w, h, c2, 130, 63 - 21, 25, 20);
@@ -2280,9 +2280,9 @@ void pal_interpolate0(void) {
   v.paint_handler = pal_interpolate1;
   v.click_handler = pal_interpolate2;
 
-  _button(100, 7, v.h - 14, 0);
-  _button(101, v.w - 8, v.h - 14, 2);
-  _button(104, v.w / 2, v.h - 14, 1);
+  _button(100, 7, v.h - 14, ALIGN_TL);
+  _button(101, v.w - 8, v.h - 14, ALIGN_TR);
+  _button(104, v.w / 2, v.h - 14, ALIGN_TC);
 
   _flag(105, 4, 143, &gradient_flag);
   _flag(106, v.w / 2 - (8 * big2 + text_len(texts[106])) / 2, 143, &swap_flag);

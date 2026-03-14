@@ -330,8 +330,8 @@ void explode_dialog0(void) {
   v.click_handler = (void_return_type_t)explode_dialog2;
   v.close_handler = (void_return_type_t)explode_dialog3;
 
-  _button(100, 7, v.h - 14, 0);
-  _button(101, v.w - 8, v.h - 14, 2);
+  _button(100, 7, v.h - 14, ALIGN_TL);
+  _button(101, v.w - 8, v.h - 14, ALIGN_TR);
   type_a = type_b = type_c = old_type_a = old_type_b = old_type_c = 0;
   if (exp_color0 == -1)
     exp_color0 = c4;

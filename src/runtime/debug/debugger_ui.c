@@ -980,33 +980,33 @@ void wwrite_in_box(byte *dest, int dest_pitch, int dest_width, int dest_height, 
   font = text_font + 1025;
 
   switch (alignment) {
-  case 0:
+  case ALIGN_TL:
     break;
-  case 1:
+  case ALIGN_TC:
     x = x - (w >> 1);
     break;
-  case 2:
+  case ALIGN_TR:
     x = x - w + 1;
     break;
-  case 3:
+  case ALIGN_ML:
     y = y - (h >> 1);
     break;
-  case 4:
+  case ALIGN_MC:
     x = x - (w >> 1);
     y = y - (h >> 1);
     break;
-  case 5:
+  case ALIGN_MR:
     x = x - w + 1;
     y = y - (h >> 1);
     break;
-  case 6:
+  case ALIGN_BL:
     y = y - h + 1;
     break;
-  case 7:
+  case ALIGN_BC:
     x = x - (w >> 1);
     y = y - h + 1;
     break;
-  case 8:
+  case ALIGN_BR:
     x = x - w + 1;
     y = y - h + 1;
     break;
@@ -1049,33 +1049,33 @@ void wwrite_in_box(byte *dest, int dest_pitch, int dest_width, int dest_height, 
     }
     font = text_font + 1025;
     switch (alignment) {
-    case 0:
+    case ALIGN_TL:
       break;
-    case 1:
+    case ALIGN_TC:
       x = x_org - (w >> 1);
       break;
-    case 2:
+    case ALIGN_TR:
       x = x_org - w + 1;
       break;
-    case 3:
+    case ALIGN_ML:
       y = y_org - (h >> 1);
       break;
-    case 4:
+    case ALIGN_MC:
       x = x_org - (w >> 1);
       y = y_org - (h >> 1);
       break;
-    case 5:
+    case ALIGN_MR:
       x = x_org - w + 1;
       y = y_org - (h >> 1);
       break;
-    case 6:
+    case ALIGN_BL:
       y = y_org - h + 1;
       break;
-    case 7:
+    case ALIGN_BC:
       x = x_org - (w >> 1);
       y = y_org - h + 1;
       break;
-    case 8:
+    case ALIGN_BR:
       x = x_org - w + 1;
       y = y_org - h + 1;
       break;
@@ -1566,33 +1566,33 @@ void select_button(t_item *i, int active) {
     h = 7;
   }
   switch ((i->button.center & 0xFF)) {
-  case 0:
+  case ALIGN_TL:
     break;
-  case 1:
+  case ALIGN_TC:
     x = x - (w >> 1);
     break;
-  case 2:
+  case ALIGN_TR:
     x = x - w + 1;
     break;
-  case 3:
+  case ALIGN_ML:
     y = y - (h >> 1);
     break;
-  case 4:
+  case ALIGN_MC:
     x = x - (w >> 1);
     y = y - (h >> 1);
     break;
-  case 5:
+  case ALIGN_MR:
     x = x - w + 1;
     y = y - (h >> 1);
     break;
-  case 6:
+  case ALIGN_BL:
     y = y - h + 1;
     break;
-  case 7:
+  case ALIGN_BC:
     x = x - (w >> 1);
     y = y - h + 1;
     break;
-  case 8:
+  case ALIGN_BR:
     x = x - w + 1;
     y = y - h + 1;
     break;
@@ -2000,33 +2000,33 @@ int button_status(int n) {
     h = 7;
   }
   switch ((v.item[n].button.center & 0xFF)) {
-  case 0:
+  case ALIGN_TL:
     break;
-  case 1:
+  case ALIGN_TC:
     x = x - (w >> 1);
     break;
-  case 2:
+  case ALIGN_TR:
     x = x - w + 1;
     break;
-  case 3:
+  case ALIGN_ML:
     y = y - (h >> 1);
     break;
-  case 4:
+  case ALIGN_MC:
     x = x - (w >> 1);
     y = y - (h >> 1);
     break;
-  case 5:
+  case ALIGN_MR:
     x = x - w + 1;
     y = y - (h >> 1);
     break;
-  case 6:
+  case ALIGN_BL:
     y = y - h + 1;
     break;
-  case 7:
+  case ALIGN_BC:
     x = x - (w >> 1);
     y = y - h + 1;
     break;
-  case 8:
+  case ALIGN_BR:
     x = x - w + 1;
     y = y - h + 1;
     break;

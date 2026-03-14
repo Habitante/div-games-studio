@@ -203,8 +203,8 @@ void gamma0(void) {
 
   // Botones Aceptar/Cancelar
 
-  _button(100, 7, v.h - 14, 0);
-  _button(101, v.w - 8, v.h - 14, 2);
+  _button(100, 7, v.h - 14, ALIGN_TL);
+  _button(101, v.w - 8, v.h - 14, ALIGN_TR);
 
   v_accept = 0;
 }

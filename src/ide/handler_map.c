@@ -520,8 +520,8 @@ void new_map0(void) {
   itoa(map_height, height_str, 10);
   _get(133, 4, 12, v.w - 72, (byte *)width_str, 8, 1, 32767);
   _get(134, 4, 34, v.w - 72, (byte *)height_str, 8, 1, 32767);
-  _button(100, 7, DIALOG_Y_OFFSET, 0);
-  _button(101, v.w - 8, DIALOG_Y_OFFSET, 2);
+  _button(100, 7, DIALOG_Y_OFFSET, ALIGN_TL);
+  _button(101, v.w - 8, DIALOG_Y_OFFSET, ALIGN_TR);
   v_finished = 0;
 }
 
@@ -1047,8 +1047,8 @@ void resize0() {
   grayscale = 0;
   _flag(95, 90, 19, &percentages);
   _flag(96, 90, 38, &grayscale);
-  _button(100, 7, v.h - 14, 0);
-  _button(101, v.w - 8, v.h - 14, 2);
+  _button(100, 7, v.h - 14, ALIGN_TL);
+  _button(101, v.w - 8, v.h - 14, ALIGN_TR);
 }
 
 void reduce_half() {
@@ -1249,8 +1249,8 @@ void map_search0() {
 
   _flag(403, 4, 49, &minimums);
 
-  _button(100, 7, v.h - 14, 0);
-  _button(101, v.w - 8, v.h - 14, 2);
+  _button(100, 7, v.h - 14, ALIGN_TL);
+  _button(101, v.w - 8, v.h - 14, ALIGN_TR);
 }
 
 #define max_map_size 254 // 128

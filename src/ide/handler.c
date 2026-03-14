@@ -37,14 +37,14 @@ void dummy_handler(void) {}
 //-----------------------------------------------------------------------------
 
 void menu_main0(void) {
-  create_menu(750);
+  create_menu(MENU_MAIN);
   v.paint_handler = menu_main1;
   v.click_handler = menu_main2;
   v.close_handler = menu_main3;
 }
 
 void menu_main1(void) {
-  paint_menu(750);
+  paint_menu(MENU_MAIN);
 }
 
 /* Click handler for the top menu bar.
@@ -52,7 +52,7 @@ void menu_main1(void) {
  * Maps, Graphics, Fonts, Sounds, System, Help) based on which item is hit.
  */
 void menu_main2(void) {
-  update_menu(750, 1, 0);
+  update_menu(MENU_MAIN, 1, 0);
   if ((prev_mouse_buttons & 1) && !(mouse_b & 1)) {
     switch (v.state) {
     case 1:
@@ -101,13 +101,13 @@ void menu_main3(void) {
 void print_program(void);
 
 void menu_programs0(void) {
-  create_menu(900);
+  create_menu(MENU_PROGRAMS);
   v.paint_handler = menu_programs1;
   v.click_handler = menu_programs2;
 }
 
 void menu_programs1(void) {
-  paint_menu(900);
+  paint_menu(MENU_PROGRAMS);
 }
 
 void menu_programs2(void) {
@@ -115,9 +115,9 @@ void menu_programs2(void) {
   int n;
 
   if (find_program_window())
-    update_menu(900, 1, 0);
+    update_menu(MENU_PROGRAMS, 1, 0);
   else
-    update_menu(900, 3, 99);
+    update_menu(MENU_PROGRAMS, 3, 99);
 
   if ((prev_mouse_buttons & 1) && !(mouse_b & 1)) {
     v_type = FT_PRG;
@@ -318,22 +318,22 @@ void f_mark(void);
 void f_unmark(void);
 
 void menu_edit0(void) {
-  create_menu(950);
+  create_menu(MENU_EDIT);
   v.paint_handler = menu_edit1;
   v.click_handler = menu_edit2;
 }
 
 void menu_edit1(void) {
-  paint_menu(950);
+  paint_menu(MENU_EDIT);
 }
 
 void menu_edit2(void) {
   int n, m;
 
   if (find_program_window())
-    update_menu(950, 1, 0);
+    update_menu(MENU_EDIT, 1, 0);
   else
-    update_menu(950, 0, 99);
+    update_menu(MENU_EDIT, 0, 99);
 
   if ((prev_mouse_buttons & 1) && !(mouse_b & 1)) {
     v_type = FT_PRG;
@@ -539,17 +539,17 @@ void save_prg_buffer(memptrsize n) { // Update the program, save the current lin
 //-----------------------------------------------------------------------------
 
 void menu_palettes0(void) {
-  create_menu(775);
+  create_menu(MENU_PALETTES);
   v.paint_handler = menu_palettes1;
   v.click_handler = menu_palettes2;
 }
 
 void menu_palettes1(void) {
-  paint_menu(775);
+  paint_menu(MENU_PALETTES);
 }
 
 void menu_palettes2(void) {
-  update_menu(775, 1, 0);
+  update_menu(MENU_PALETTES, 1, 0);
   if ((prev_mouse_buttons & 1) && !(mouse_b & 1)) {
     switch (v.state) {
     case 1:
@@ -583,22 +583,22 @@ extern char input2[32];
 void browser0(void);
 
 void menu_maps0(void) {
-  create_menu(800);
+  create_menu(MENU_MAPS);
   v.paint_handler = menu_maps1;
   v.click_handler = menu_maps2;
 }
 
 void menu_maps1(void) {
-  paint_menu(800);
+  paint_menu(MENU_MAPS);
 }
 
 void menu_maps2(void) {
   int n, m;
 
   if (find_map_window())
-    update_menu(800, 1, 0);
+    update_menu(MENU_MAPS, 1, 0);
   else
-    update_menu(800, 3, 9);
+    update_menu(MENU_MAPS, 3, 9);
 
   if ((prev_mouse_buttons & 1) && !(mouse_b & 1)) {
     v_type = FT_MAP;
@@ -709,7 +709,7 @@ casi_no_tiene_nombre:
 
     case 9: // Edit the map
       if ((n = find_and_load_map())) {
-        paint_menu(800);
+        paint_menu(MENU_MAPS);
         v.state = 0;
         move(0, n);
         if (v.foreground == WF_BACKGROUND) {
@@ -901,13 +901,13 @@ void fpg_to_map(FPG *MiFPG);
 void map_to_fpg(struct tmapa *mapa);
 
 void menu_graphics0(void) {
-  create_menu(825);
+  create_menu(MENU_GRAPHICS);
   v.paint_handler = menu_graphics1;
   v.click_handler = menu_graphics2;
 }
 
 void menu_graphics1(void) {
-  paint_menu(825);
+  paint_menu(MENU_GRAPHICS);
 }
 
 void menu_graphics2(void) {
@@ -915,13 +915,13 @@ void menu_graphics2(void) {
   int n;
 
   if (find_fpg_window() && find_map_window())
-    update_menu(825, 1, 0);
+    update_menu(MENU_GRAPHICS, 1, 0);
   else if (find_fpg_window())
-    update_menu(825, 9, 9);
+    update_menu(MENU_GRAPHICS, 9, 9);
   else if (find_map_window())
-    update_menu(825, 3, 8);
+    update_menu(MENU_GRAPHICS, 3, 8);
   else
-    update_menu(825, 3, 9);
+    update_menu(MENU_GRAPHICS, 3, 9);
 
   if ((prev_mouse_buttons & 1) && !(mouse_b & 1)) {
     v_type = FT_FPG;
@@ -1017,13 +1017,13 @@ void menu_graphics2(void) {
 //-----------------------------------------------------------------------------
 
 void menu_fonts0(void) {
-  create_menu(850);
+  create_menu(MENU_FONTS);
   v.paint_handler = menu_fonts1;
   v.click_handler = menu_fonts2;
 }
 
 void menu_fonts1(void) {
-  paint_menu(850);
+  paint_menu(MENU_FONTS);
 }
 
 extern char *font_aux;
@@ -1036,14 +1036,14 @@ void menu_fonts2(void) {
 
   if (find_font_window()) {
     if (find_map_window())
-      update_menu(850, 1, 0);
+      update_menu(MENU_FONTS, 1, 0);
     else
-      update_menu(850, 6, 6);
+      update_menu(MENU_FONTS, 6, 6);
   } else {
     if (find_map_window())
-      update_menu(850, 3, 5);
+      update_menu(MENU_FONTS, 3, 5);
     else
-      update_menu(850, 3, 6);
+      update_menu(MENU_FONTS, 3, 6);
   }
 
   if ((prev_mouse_buttons & 1) && !(mouse_b & 1)) {
@@ -1096,13 +1096,13 @@ void open_song(void);
 void open_sound_file(void);
 
 void menu_sounds0(void) {
-  create_menu(925);
+  create_menu(MENU_SOUNDS);
   v.paint_handler = menu_sounds1;
   v.click_handler = menu_sounds2;
 }
 
 void menu_sounds1(void) {
-  paint_menu(925);
+  paint_menu(MENU_SOUNDS);
 }
 
 void mixer0(void);
@@ -1114,9 +1114,9 @@ void menu_sounds2(void) {
   int n;
 
   if (find_pcm_window())
-    update_menu(925, 1, 0);
+    update_menu(MENU_SOUNDS, 1, 0);
   else
-    update_menu(925, 3, 6);
+    update_menu(MENU_SOUNDS, 3, 6);
 
   if ((prev_mouse_buttons & 1) && !(mouse_b & 1)) {
     switch (v.state) {
@@ -1280,13 +1280,13 @@ unnamed_sound:
 void mem_info0(void);
 
 void menu_system0(void) {
-  create_menu(875);
+  create_menu(MENU_SYSTEM);
   v.paint_handler = menu_system1;
   v.click_handler = menu_system2;
 }
 
 void menu_system1(void) {
-  paint_menu(875);
+  paint_menu(MENU_SYSTEM);
 }
 
 void config_setup0(void);
@@ -1295,7 +1295,7 @@ void shell(void);
 void calculator(void);
 
 void menu_system2(void) {
-  update_menu(875, 1, 0);
+  update_menu(MENU_SYSTEM, 1, 0);
   if ((prev_mouse_buttons & 1) && !(mouse_b & 1)) {
     switch (v.state) {
     case 1:
@@ -1351,12 +1351,12 @@ void create_menu(int menu) {
   v.title = texts[menu];
   v.state = 0;
 
-  v.w = text_len(texts[menu++]) + 23;
-  v.h = 11;
+  v.w = text_len(texts[menu++]) + MENU_WIDTH_PAD;
+  v.h = MENU_HEADER_HEIGHT;
 
   while ((char *)texts[menu]) {
-    v.h += 9;
-    w = text_len(texts[menu++]) + 7;
+    v.h += MENU_ITEM_HEIGHT;
+    w = text_len(texts[menu++]) + MENU_TEXT_MARGIN;
     if (v.w < w)
       v.w = w;
   }
@@ -1377,18 +1377,18 @@ void paint_menu(int menu) {
   while (texts[++menu]) {
     if (*(p = texts[menu]) == '-') {
       p++;
-      wbox(ptr, w, h, c0, 2, 9 + n * 9, w - 4, 1);
+      wbox(ptr, w, h, c0, 2, MENU_ITEM_HEIGHT + n * MENU_ITEM_HEIGHT, w - 4, 1);
     }
 
     if ((q = (byte *)strchr((const char *)p, '[')) != NULL) {
       *q = 0;
-      wwrite(ptr, w, h, 3, 11 + n * 9, 0, p, c3);
+      wwrite(ptr, w, h, 3, MENU_HEADER_HEIGHT + n * MENU_ITEM_HEIGHT, 0, p, c3);
       *q = '[';
-      wwrite(ptr, w, h, w - 4, 11 + n * 9, 2, q, c1);
-      wwrite(ptr, w, h, w - 5, 11 + n * 9, 2, q, c3);
+      wwrite(ptr, w, h, w - 4, MENU_HEADER_HEIGHT + n * MENU_ITEM_HEIGHT, 2, q, c1);
+      wwrite(ptr, w, h, w - 5, MENU_HEADER_HEIGHT + n * MENU_ITEM_HEIGHT, 2, q, c3);
       n++;
     } else
-      wwrite(ptr, w, h, 3, 11 + n++ * 9, 0, p, c3);
+      wwrite(ptr, w, h, 3, MENU_HEADER_HEIGHT + n++ * MENU_ITEM_HEIGHT, 0, p, c3);
   }
 }
 
@@ -1410,7 +1410,7 @@ void update_menu(int menu, int min, int max) {
   menu++;
 
   if (wmouse_y >= 0)
-    n = (wmouse_y - 10) / 9 + 1;
+    n = (wmouse_y - (MENU_HEADER_HEIGHT - 1)) / MENU_ITEM_HEIGHT + 1;
   else
     n = 0;
 
@@ -1425,39 +1425,39 @@ void update_menu(int menu, int min, int max) {
 
   if (n != v.state) {
     if (v.state) {
-      wbox(ptr, w, h, c2, 2, 1 + abs(v.state) * 9, w - 4, 8);
+      wbox(ptr, w, h, c2, 2, 1 + abs(v.state) * MENU_ITEM_HEIGHT, w - 4, 8);
       p = texts[menu + abs(v.state)];
       if (*p == '-')
         p++;
 
       if ((q = (byte *)strchr((const char *)p, '[')) != NULL) {
         *q = 0;
-        wwrite(ptr, w, h, 3, 2 + abs(v.state) * 9, 0, p, c3);
+        wwrite(ptr, w, h, 3, 2 + abs(v.state) * MENU_ITEM_HEIGHT, 0, p, c3);
         *q = '[';
-        wwrite(ptr, w, h, w - 4, 2 + abs(v.state) * 9, 2, q, c1);
-        wwrite(ptr, w, h, w - 5, 2 + abs(v.state) * 9, 2, q, c3);
+        wwrite(ptr, w, h, w - 4, 2 + abs(v.state) * MENU_ITEM_HEIGHT, 2, q, c1);
+        wwrite(ptr, w, h, w - 5, 2 + abs(v.state) * MENU_ITEM_HEIGHT, 2, q, c3);
       } else
-        wwrite(ptr, w, h, 3, 2 + abs(v.state) * 9, 0, p, c3);
+        wwrite(ptr, w, h, 3, 2 + abs(v.state) * MENU_ITEM_HEIGHT, 0, p, c3);
     }
 
     if (n) {
       if (n < 0) {
-        wbox(ptr, w, h, c12, 3, 2 - n * 9, w - 6, 6);
+        wbox(ptr, w, h, c12, 3, 2 - n * MENU_ITEM_HEIGHT, w - 6, 6);
 
-        wbox(ptr, w, h, c1, 2, 1 - n * 9, 1, 7);
-        wbox(ptr, w, h, c1, 2, 1 - n * 9, w - 5, 1);
-        wbox(ptr, w, h, c3, w - 3, 2 - n * 9, 1, 7);
-        wbox(ptr, w, h, c3, 3, 8 - n * 9, w - 5, 1);
+        wbox(ptr, w, h, c1, 2, 1 - n * MENU_ITEM_HEIGHT, 1, 7);
+        wbox(ptr, w, h, c1, 2, 1 - n * MENU_ITEM_HEIGHT, w - 5, 1);
+        wbox(ptr, w, h, c3, w - 3, 2 - n * MENU_ITEM_HEIGHT, 1, 7);
+        wbox(ptr, w, h, c3, 3, 8 - n * MENU_ITEM_HEIGHT, w - 5, 1);
 
         if (big) {
-          *(ptr + (2 * (8 - n * 9)) * v.w + 2 * (w - 3)) = c34;
-          *(ptr + (2 * (8 - n * 9) + 1) * v.w + 2 * (w - 3) + 1) = c34;
-          *(ptr + (2 * (1 - n * 9)) * v.w + 2 * (2)) = c01;
-          *(ptr + (2 * (1 - n * 9) + 1) * v.w + 2 * (2) + 1) = c01;
-          *(ptr + (2 * (1 - n * 9)) * v.w + 2 * (w - 3)) = c1;
-          *(ptr + (2 * (1 - n * 9) + 1) * v.w + 2 * (w - 3) + 1) = c3;
-          *(ptr + (2 * (8 - n * 9)) * v.w + 2 * (2)) = c1;
-          *(ptr + (2 * (8 - n * 9) + 1) * v.w + 2 * (2) + 1) = c3;
+          *(ptr + (2 * (8 - n * MENU_ITEM_HEIGHT)) * v.w + 2 * (w - 3)) = c34;
+          *(ptr + (2 * (8 - n * MENU_ITEM_HEIGHT) + 1) * v.w + 2 * (w - 3) + 1) = c34;
+          *(ptr + (2 * (1 - n * MENU_ITEM_HEIGHT)) * v.w + 2 * (2)) = c01;
+          *(ptr + (2 * (1 - n * MENU_ITEM_HEIGHT) + 1) * v.w + 2 * (2) + 1) = c01;
+          *(ptr + (2 * (1 - n * MENU_ITEM_HEIGHT)) * v.w + 2 * (w - 3)) = c1;
+          *(ptr + (2 * (1 - n * MENU_ITEM_HEIGHT) + 1) * v.w + 2 * (w - 3) + 1) = c3;
+          *(ptr + (2 * (8 - n * MENU_ITEM_HEIGHT)) * v.w + 2 * (2)) = c1;
+          *(ptr + (2 * (8 - n * MENU_ITEM_HEIGHT) + 1) * v.w + 2 * (2) + 1) = c3;
         }
 
         p = texts[menu - n];
@@ -1466,31 +1466,31 @@ void update_menu(int menu, int min, int max) {
 
         if ((q = (byte *)strchr((const char *)p, '[')) != NULL) {
           *q = 0;
-          wwrite(ptr, w, h, 4, 2 - n * 9, 0, p, c1);
-          wwrite(ptr, w, h, 3, 2 - n * 9, 0, p, c4);
+          wwrite(ptr, w, h, 4, 2 - n * MENU_ITEM_HEIGHT, 0, p, c1);
+          wwrite(ptr, w, h, 3, 2 - n * MENU_ITEM_HEIGHT, 0, p, c4);
           *q = '[';
-          wwrite(ptr, w, h, w - 4, 2 - n * 9, 2, q, c1);
-          wwrite(ptr, w, h, w - 5, 2 - n * 9, 2, q, c3);
+          wwrite(ptr, w, h, w - 4, 2 - n * MENU_ITEM_HEIGHT, 2, q, c1);
+          wwrite(ptr, w, h, w - 5, 2 - n * MENU_ITEM_HEIGHT, 2, q, c3);
         } else {
-          wwrite(ptr, w, h, 4, 2 - n * 9, 0, p, c1);
-          wwrite(ptr, w, h, 3, 2 - n * 9, 0, p, c4);
+          wwrite(ptr, w, h, 4, 2 - n * MENU_ITEM_HEIGHT, 0, p, c1);
+          wwrite(ptr, w, h, 3, 2 - n * MENU_ITEM_HEIGHT, 0, p, c4);
         }
       } else {
-        wbox(ptr, w, h, c2, 2, 1 + n * 9, w - 4, 8);
+        wbox(ptr, w, h, c2, 2, 1 + n * MENU_ITEM_HEIGHT, w - 4, 8);
         p = texts[menu + n];
         if (*p == '-')
           p++;
 
         if ((q = (byte *)strchr((const char *)p, '[')) != NULL) {
           *q = 0;
-          wwrite(ptr, w, h, 4, 2 + n * 9, 0, p, c1);
-          wwrite(ptr, w, h, 3, 2 + n * 9, 0, p, c4);
+          wwrite(ptr, w, h, 4, 2 + n * MENU_ITEM_HEIGHT, 0, p, c1);
+          wwrite(ptr, w, h, 3, 2 + n * MENU_ITEM_HEIGHT, 0, p, c4);
           *q = '[';
-          wwrite(ptr, w, h, w - 4, 2 + n * 9, 2, q, c1);
-          wwrite(ptr, w, h, w - 5, 2 + n * 9, 2, q, c3);
+          wwrite(ptr, w, h, w - 4, 2 + n * MENU_ITEM_HEIGHT, 2, q, c1);
+          wwrite(ptr, w, h, w - 5, 2 + n * MENU_ITEM_HEIGHT, 2, q, c3);
         } else {
-          wwrite(ptr, w, h, 4, 2 + n * 9, 0, p, c1);
-          wwrite(ptr, w, h, 3, 2 + n * 9, 0, p, c4);
+          wwrite(ptr, w, h, 4, 2 + n * MENU_ITEM_HEIGHT, 0, p, c1);
+          wwrite(ptr, w, h, 3, 2 + n * MENU_ITEM_HEIGHT, 0, p, c4);
         }
       }
     }

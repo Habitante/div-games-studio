@@ -407,7 +407,7 @@ void err0(void) {
   v.h = 38;
   v.paint_handler = err1;
   v.click_handler = err2;
-  _button(text[7], v.w / 2, v.h - 14, 1);
+  _button(text[7], v.w / 2, v.h - 14, ALIGN_TC);
 }
 
 //-----------------------------------------------------------------------------
@@ -481,10 +481,10 @@ void _err0(void) {
   v.click_handler = _err2;
 
   //  TODO: add the missing one and check that 218 is enough
-  _button(text[11], 7, v.h - 14, 0);
-  _button(text[12], 7 + text_len(text[11]) + 14, v.h - 14, 0);
-  _button(text[13], v.w - 8 - text_len(text[14]) - 14, v.h - 14, 2);
-  _button(text[14], v.w - 8, v.h - 14, 2);
+  _button(text[11], 7, v.h - 14, ALIGN_TL);
+  _button(text[12], 7 + text_len(text[11]) + 14, v.h - 14, ALIGN_TL);
+  _button(text[13], v.w - 8 - text_len(text[14]) - 14, v.h - 14, ALIGN_TR);
+  _button(text[14], v.w - 8, v.h - 14, ALIGN_TR);
 }
 
 //----------------------------------------------------------------------------
@@ -581,9 +581,9 @@ void deb0(void) {
   v.h = 38;
   v.paint_handler = deb1;
   v.click_handler = deb2;
-  _button(text[16], v.w / 2, v.h - 14, 1);
-  _button(text[17], v.w - 8, v.h - 14, 2);
-  _button(text[18], 7, v.h - 14, 0);
+  _button(text[16], v.w / 2, v.h - 14, ALIGN_TC);
+  _button(text[17], v.w - 8, v.h - 14, ALIGN_TR);
+  _button(text[18], 7, v.h - 14, ALIGN_TL);
 }
 
 void deb(void) {

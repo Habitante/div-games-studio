@@ -484,33 +484,33 @@ void select_button(struct t_item *i, int active) {
   w = text_len(i->button.text + 1);
   h = 7;
   switch (i->button.center) {
-  case 0:
+  case ALIGN_TL:
     break;
-  case 1:
+  case ALIGN_TC:
     x = x - (w >> 1);
     break;
-  case 2:
+  case ALIGN_TR:
     x = x - w + 1;
     break;
-  case 3:
+  case ALIGN_ML:
     y = y - (h >> 1);
     break;
-  case 4:
+  case ALIGN_MC:
     x = x - (w >> 1);
     y = y - (h >> 1);
     break;
-  case 5:
+  case ALIGN_MR:
     x = x - w + 1;
     y = y - (h >> 1);
     break;
-  case 6:
+  case ALIGN_BL:
     y = y - h + 1;
     break;
-  case 7:
+  case ALIGN_BC:
     x = x - (w >> 1);
     y = y - h + 1;
     break;
-  case 8:
+  case ALIGN_BR:
     x = x - w + 1;
     y = y - h + 1;
     break;
@@ -712,33 +712,33 @@ int button_status(int n) {
   w = text_len(v.item[n].button.text + 1);
   h = 7;
   switch (v.item[n].button.center) {
-  case 0:
+  case ALIGN_TL:
     break;
-  case 1:
+  case ALIGN_TC:
     x = x - (w >> 1);
     break;
-  case 2:
+  case ALIGN_TR:
     x = x - w + 1;
     break;
-  case 3:
+  case ALIGN_ML:
     y = y - (h >> 1);
     break;
-  case 4:
+  case ALIGN_MC:
     x = x - (w >> 1);
     y = y - (h >> 1);
     break;
-  case 5:
+  case ALIGN_MR:
     x = x - w + 1;
     y = y - (h >> 1);
     break;
-  case 6:
+  case ALIGN_BL:
     y = y - h + 1;
     break;
-  case 7:
+  case ALIGN_BC:
     x = x - (w >> 1);
     y = y - h + 1;
     break;
-  case 8:
+  case ALIGN_BR:
     x = x - w + 1;
     y = y - h + 1;
     break;

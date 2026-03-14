@@ -13,7 +13,7 @@ architecture docs, code review, and discussion with Daniel Navarro.
 
 | # | Improvement | Status | Risk |
 |---|-------------|--------|------|
-| 1 | [Enums & constants](#1-enums--constants) | Sprint 1 DONE, sprints 2-6 open | Very low |
+| 1 | [Enums & constants](#1-enums--constants) | Sprints 1-2 DONE, sprints 3-6 open | Very low |
 | 2 | [Testing infrastructure](#2-testing-infrastructure) | — | None |
 | 3 | [File format hardening + modern imports](#3-file-format-hardening--modern-imports) | — | Low |
 | 4 | [Help translation quality pass](#4-help-translation-quality-pass) | — | Low |
@@ -110,13 +110,13 @@ variant when `v_mode > 0`.
 | 2 | Text input field | `ITEM_TEXT` |
 | 3 | Checkbox/flag | `ITEM_CHECKBOX` |
 
-#### E. Menu text base indices
+#### E. Menu text base indices — DONE
 
 Each menu's text block starts at a fixed index in the `texts[]` array.
 These appear as arguments to `create_menu()`, `paint_menu()`, and
 `update_menu()`.
 
-| Base | Menu | Proposed name |
+| Base | Menu | Name |
 |------|------|---------------|
 | 750 | Main menu bar | `MENU_MAIN` |
 | 775 | Palettes | `MENU_PALETTES` |
@@ -128,7 +128,9 @@ These appear as arguments to `create_menu()`, `paint_menu()`, and
 | 925 | Sounds | `MENU_SOUNDS` |
 | 950 | Edit | `MENU_EDIT` |
 
-**Files:** `handler.c`, `handler_map.c`, `handler_fonts.c`.
+Defined in `div_enums.h` as `enum menu_base`.
+
+**Files:** `handler.c`.
 
 #### F. Mouse cursor IDs (`mouse_graf`)
 
@@ -260,22 +262,22 @@ The `draw_mode < 100` / `>= 100` checks become `draw_mode < TOOL_TRANSITION`.
 
 #### O. Repeated numeric constants
 
-| Value | Meaning | Proposed name | Approx. occurrences |
-|-------|---------|---------------|---------------------|
-| 768 | Palette data size (256 * 3 bytes) | `PALETTE_SIZE` | 50+ |
-| 256 | Palette entry count | `PALETTE_ENTRIES` | many |
-| 576 | Color rules/gradients block size | `GRADIENTS_SIZE` | ~10 |
-| 999 / 1000 | Max graphics per FPG | `MAX_FPG_GRAPHICS` | ~10 |
+| Value | Meaning | Name | Status |
+|-------|---------|------|--------|
+| 768 | Palette data size (256 * 3 bytes) | `PALETTE_SIZE` | — |
+| 256 | Palette entry count | `PALETTE_ENTRIES` | — |
+| 576 | Color rules/gradients block size | `GRADIENTS_SIZE` | — |
+| 999 / 1000 | Max graphics per FPG | `MAX_FPG_GRAPHICS` | — |
 | 1024 | Max line length in editor | `LONG_LINE` (already exists) | — |
-| 65536 | Ghost table size (256*256) | `GHOST_TABLE_SIZE` | ~5 |
-| 16384 | Squared-difference table size | `CUAD_TABLE_SIZE` | ~3 |
-| 9 | Pixels per menu item | `MENU_ITEM_HEIGHT` | ~5 |
-| 11 | Menu header height | `MENU_HEADER_HEIGHT` | ~3 |
-| 7 / 23 | Menu item text margin / width padding | `MENU_TEXT_MARGIN` / `MENU_WIDTH_PAD` | ~5 |
+| 65536 | Ghost table size (256*256) | `GHOST_TABLE_SIZE` | — |
+| 16384 | Squared-difference table size | `CUAD_TABLE_SIZE` | — |
+| 9 | Pixels per menu item | `MENU_ITEM_HEIGHT` | DONE |
+| 11 | Menu header height | `MENU_HEADER_HEIGHT` | DONE |
+| 7 / 23 | Menu item text margin / width padding | `MENU_TEXT_MARGIN` / `MENU_WIDTH_PAD` | DONE |
 
-#### P. Button alignment modes (`_button` center parameter)
+#### P. Button alignment modes (`_button` center parameter) — DONE
 
-| Value | Position | Proposed name |
+| Value | Position | Name |
 |-------|----------|---------------|
 | 0 | Top-left | `ALIGN_TL` |
 | 1 | Top-center | `ALIGN_TC` |
@@ -287,8 +289,12 @@ The `draw_mode < 100` / `>= 100` checks become `draw_mode < TOOL_TRANSITION`.
 | 7 | Bottom-center | `ALIGN_BC` |
 | 8 | Bottom-right | `ALIGN_BR` |
 
+Defined in `div_enums.h` as `enum button_align`. Used by `_button()`,
+`draw_button()`, `select_button()`, `button_status()`, `mouse_button_hit()`,
+and `wwrite()` across IDE, editor, compiler, and debugger modules.
+
 **Files:** `main_dialogs.c`, `handler_dialogs.c`, `handler_map.c`,
-`handler_fonts.c`, every dialog init function.
+`handler_fonts.c`, `window.c`, `debugger_ui.c`, and every dialog init function.
 
 #### Q. File format magic offsets
 
@@ -310,7 +316,7 @@ Each sprint is one self-contained commit.
 | Sprint | Categories | Status |
 |--------|-----------|--------|
 | 1 — Core IDE enums | A. Window types, B. Foreground state, C. File types, D. Item types | DONE |
-| 2 — Menu and UI constants | E. Menu bases, P. Alignment modes, O. Menu metrics | — |
+| 2 — Menu and UI constants | E. Menu bases, P. Alignment modes, O. Menu metrics | DONE |
 | 3 — Input state enums | F. Cursor IDs, J. Mouse buttons, K. Modifiers | — |
 | 4 — Editor state enums | G. Draw modes, H. Block state, I. Drag-and-drop | — |
 | 5 — Palette and format constants | O. Palette/ghost/cuad sizes, `MAX_FPG_GRAPHICS`, Q. Format offsets | — |

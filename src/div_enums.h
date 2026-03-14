@@ -58,4 +58,36 @@ enum item_type {
   ITEM_CHECKBOX = 3,
 };
 
+// Menu text base indices (texts[] offsets from lenguaje.div)
+enum menu_base {
+  MENU_MAIN     = 750,
+  MENU_PALETTES = 775,
+  MENU_MAPS     = 800,
+  MENU_GRAPHICS = 825,
+  MENU_FONTS    = 850,
+  MENU_SYSTEM   = 875,
+  MENU_PROGRAMS = 900,
+  MENU_SOUNDS   = 925,
+  MENU_EDIT     = 950,
+};
+
+// Button/text alignment modes (_button center parameter)
+enum button_align {
+  ALIGN_TL = 0, // Top-left
+  ALIGN_TC = 1, // Top-center
+  ALIGN_TR = 2, // Top-right
+  ALIGN_ML = 3, // Middle-left
+  ALIGN_MC = 4, // Middle-center
+  ALIGN_MR = 5, // Middle-right
+  ALIGN_BL = 6, // Bottom-left
+  ALIGN_BC = 7, // Bottom-center
+  ALIGN_BR = 8, // Bottom-right
+};
+
+// Menu layout metrics
+#define MENU_ITEM_HEIGHT   9
+#define MENU_HEADER_HEIGHT 11
+#define MENU_TEXT_MARGIN   7
+#define MENU_WIDTH_PAD     23
+
 #endif // DIV_ENUMS_H

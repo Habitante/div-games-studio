@@ -1523,8 +1523,8 @@ void browser0(void) {
   _get(126, 4, v.h - 21, v.w - (24 + text_len(texts[100]) + text_len(texts[101])), (byte *)input,
        512, 0, 0);
 
-  _button(100, v.w - 12 - text_len(texts[101]), v.h - 14, 2);
-  _button(101, v.w - 8, v.h - 14, 2);
+  _button(100, v.w - 12 - text_len(texts[101]), v.h - 14, ALIGN_TR);
+  _button(101, v.w - 8, v.h - 14, ALIGN_TR);
 
   if (v_thumb)
     _flag(419, v.w - 12 - text_len(texts[419]), 12, &opc_img[v_thumb]);
