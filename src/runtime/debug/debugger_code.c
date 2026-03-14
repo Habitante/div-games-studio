@@ -229,7 +229,7 @@ void debug2(void) {
       button = 0;
       v.redraw = 1;
     }
-    mouse_graf = 7;
+    mouse_graf = CURSOR_SCROLL_UP;
   } else if (button == 1) {
     wput(ptr, w, h, 123, 20, -39);
     button = 0;
@@ -237,7 +237,7 @@ void debug2(void) {
   }
 
   if (wmouse_in(123, 28, 7, 105 - 16 - 32)) {
-    mouse_graf = 13;
+    mouse_graf = CURSOR_SCROLL_TRACK;
     if (iids > 1 && (mouse_b & MB_LEFT)) {
       x = (float)(wmouse_y - 28) / (104.0 - 16.0 - 32.0);
       ids_select = x * (iids - 1);
@@ -267,7 +267,7 @@ void debug2(void) {
       button = 0;
       v.redraw = 1;
     }
-    mouse_graf = 9;
+    mouse_graf = CURSOR_SCROLL_DOWN;
   } else if (button == 2) {
     wput(ptr, w, h, 123, 134 - 16 - 32, -40);
     button = 0;

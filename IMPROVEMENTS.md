@@ -149,9 +149,20 @@ threshold for paint canvas replaced with `CURSOR_ON_CANVAS`.
 | 7 | Background window (click to activate) | `CURSOR_ACTIVATE` |
 | >= 10 | Paint cursor on canvas | `CURSOR_ON_CANVAS` (threshold) |
 
-Values 7-15 are also used as scrollbar/widget region IDs in the code
-editor, help viewer, browser, and debugger. These reuse cursor graphic
-indices but have widget-specific semantics and are left as bare numbers.
+Scrollbar/widget cursor IDs (7-16) also defined and replaced across
+code editor, help viewer, browser, debugger, and listbox widgets:
+
+| Value | Meaning | Name |
+|-------|---------|------|
+| 7 | Scrollbar up arrow | `CURSOR_SCROLL_UP` (= `CURSOR_ACTIVATE`) |
+| 9 | Scrollbar down arrow | `CURSOR_SCROLL_DOWN` |
+| 10 | Horizontal scroll left | `CURSOR_SCROLL_LEFT` |
+| 11 | Horizontal scroll right | `CURSOR_SCROLL_RIGHT` |
+| 12 | Corner resize grip | `CURSOR_GRIP` |
+| 13 | Scrollbar track/thumb | `CURSOR_SCROLL_TRACK` |
+| 14 | Horizontal scrollbar track | `CURSOR_HSCROLL_TRACK` |
+| 15 | Maximize button | `CURSOR_MAXIMIZE` |
+| 16 | Menu item highlight | `CURSOR_MENU_HOVER` |
 
 **Files:** `main.c`, `main_desktop.c`, `main_dialogs.c`, `mouse.c`,
 `paint.c`, `paint_tools.c`, `paint_select.c`, `handler.c`,

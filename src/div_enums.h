@@ -115,6 +115,7 @@ enum button_align {
 #define MOD_ALT     0x08
 
 // Mouse cursor IDs (mouse_graf)
+// Window-chrome cursors (1-7)
 #define CURSOR_ARROW      1
 #define CURSOR_MOVE       2
 #define CURSOR_BUSY       3
@@ -122,6 +123,19 @@ enum button_align {
 #define CURSOR_CLOSE      5
 #define CURSOR_RESIZE     6
 #define CURSOR_ACTIVATE   7
-#define CURSOR_ON_CANVAS  10
+// Scrollbar/widget cursors (7-16) — used by code editor, help viewer,
+// browser, debugger, and listbox widgets. Some overlap window-chrome
+// values (same cursor graphic, different context).
+#define CURSOR_SCROLL_UP     7   // Vertical scrollbar up arrow (= CURSOR_ACTIVATE)
+#define CURSOR_SCROLL_DOWN   9   // Vertical scrollbar down arrow
+#define CURSOR_SCROLL_LEFT  10   // Horizontal scrollbar left arrow
+#define CURSOR_SCROLL_RIGHT 11   // Horizontal scrollbar right arrow
+#define CURSOR_GRIP         12   // Corner resize grip
+#define CURSOR_SCROLL_TRACK 13   // Scrollbar track (drag to position)
+#define CURSOR_HSCROLL_TRACK 14  // Horizontal scrollbar track
+#define CURSOR_MAXIMIZE     15   // Maximize button
+#define CURSOR_MENU_HOVER   16   // Menu item highlight
+// Paint canvas threshold
+#define CURSOR_ON_CANVAS  10     // Values >= this mean cursor is on canvas
 
 #endif // DIV_ENUMS_H

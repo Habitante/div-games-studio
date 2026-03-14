@@ -130,25 +130,25 @@ void program2(void) {
 
   if (wmouse_in(w - 9, 10, 9, h - 20)) { // Vertical slider
     if (wmouse_y < 18)
-      mouse_graf = 7;
+      mouse_graf = CURSOR_SCROLL_UP;
     else if (wmouse_y >= h - 17)
-      mouse_graf = 9;
+      mouse_graf = CURSOR_SCROLL_DOWN;
     else
-      mouse_graf = 13;
+      mouse_graf = CURSOR_SCROLL_TRACK;
   } else if (wmouse_in(2, h - 9, w - 11, 9)) { // Horizontal slider
     if (wmouse_x < 10)
-      mouse_graf = 10;
+      mouse_graf = CURSOR_SCROLL_LEFT;
     else if (wmouse_x >= w - 17)
-      mouse_graf = 11;
+      mouse_graf = CURSOR_SCROLL_RIGHT;
     else
-      mouse_graf = 14;
+      mouse_graf = CURSOR_HSCROLL_TRACK;
   } else if (wmouse_in(w - 9, h - 9, 9, 9)) { // Resize
-    mouse_graf = 12;
+    mouse_graf = CURSOR_GRIP;
   } else if (wmouse_in(w - 17, 10, 9, 9)) { // Maximize
-    mouse_graf = 15;
+    mouse_graf = CURSOR_MAXIMIZE;
   }
 
-  if (mouse_graf == 15 && (mouse_b & MB_LEFT) && wmouse_x != -1) {
+  if (mouse_graf == CURSOR_MAXIMIZE&& (mouse_b & MB_LEFT) && wmouse_x != -1) {
     if (!(v.buttons & 1)) {
       wput(v.ptr, w, h, w - 17, 10, -57);
       v.buttons |= 1;
@@ -156,7 +156,7 @@ void program2(void) {
     }
   } else if (v.buttons & 1) {
     v.buttons ^= 1;
-    if (mouse_graf == 15 && wmouse_in(w - 17, 10, 9, 9)) {
+    if (mouse_graf == CURSOR_MAXIMIZE&& wmouse_in(w - 17, 10, 9, 9)) {
       maximize();
     } else {
       wput(v.ptr, w, h, w - 17, 10, 56);
@@ -164,7 +164,7 @@ void program2(void) {
     }
   }
 
-  if (mouse_graf == 7 && (mouse_b & MB_LEFT) && wmouse_x != -1) {
+  if (mouse_graf == CURSOR_SCROLL_UP&& (mouse_b & MB_LEFT) && wmouse_x != -1) {
     if (!(v.buttons & 2)) {
       wput(v.ptr, w, h, w - 9, 10, -41);
       v.buttons |= 2;
@@ -183,7 +183,7 @@ void program2(void) {
     v.redraw++;
   }
 
-  if (mouse_graf == 9 && (mouse_b & MB_LEFT) && wmouse_x != -1) {
+  if (mouse_graf == CURSOR_SCROLL_DOWN&& (mouse_b & MB_LEFT) && wmouse_x != -1) {
     if (!(v.buttons & 4)) {
       wput(v.ptr, w, h, w - 9, h - 17, -42);
       v.buttons |= 4;
@@ -202,7 +202,7 @@ void program2(void) {
     v.redraw++;
   }
 
-  if (mouse_graf == 10 && (mouse_b & MB_LEFT) && wmouse_x != -1) {
+  if (mouse_graf == CURSOR_SCROLL_LEFT&& (mouse_b & MB_LEFT) && wmouse_x != -1) {
     if (!(v.buttons & 8)) {
       wput(v.ptr, w, h, 2, h - 9, -53);
       v.buttons |= 8;
@@ -218,7 +218,7 @@ void program2(void) {
     v.redraw++;
   }
 
-  if (mouse_graf == 11 && (mouse_b & MB_LEFT) && wmouse_x != -1) {
+  if (mouse_graf == CURSOR_SCROLL_RIGHT&& (mouse_b & MB_LEFT) && wmouse_x != -1) {
     if (!(v.buttons & 16)) {
       wput(v.ptr, w, h, w - 17, h - 9, -54);
       v.buttons |= 16;
@@ -234,10 +234,10 @@ void program2(void) {
     v.redraw++;
   }
 
-  if (mouse_graf == 12 && (mouse_b & MB_LEFT) && wmouse_x != -1)
+  if (mouse_graf == CURSOR_GRIP&& (mouse_b & MB_LEFT) && wmouse_x != -1)
     resize();
 
-  if (mouse_graf == 13 && (mouse_b & MB_LEFT) && wmouse_x != -1) {
+  if (mouse_graf == CURSOR_SCROLL_TRACK&& (mouse_b & MB_LEFT) && wmouse_x != -1) {
     f_bop();
     f_home();
     min = 18;
@@ -273,7 +273,7 @@ void program2(void) {
     }
   }
 
-  if (mouse_graf == 14 && !(prev_mouse_buttons & MB_LEFT) && (mouse_b & MB_LEFT) && wmouse_x != -1) {
+  if (mouse_graf == CURSOR_HSCROLL_TRACK&& !(prev_mouse_buttons & MB_LEFT) && (mouse_b & MB_LEFT) && wmouse_x != -1) {
     if (!(v.buttons & 64)) {
       if (wmouse_x > get_slide_x()) {
         f_right();

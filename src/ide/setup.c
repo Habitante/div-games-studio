@@ -700,9 +700,9 @@ void cfg_setup2(void) {
   if ((zone >= 1 && zone <= 12) || zone == 15)
     mouse_graf = CURSOR_MOVE;
   if (zone == 13)
-    mouse_graf = 10;
+    mouse_graf = CURSOR_SCROLL_LEFT;
   if (zone == 14)
-    mouse_graf = 11;
+    mouse_graf = CURSOR_SCROLL_RIGHT;
 
   if (zone == 13 && (mouse_b & MB_LEFT) && wmouse_x != -1) {
     if (!(v.buttons & 1)) {

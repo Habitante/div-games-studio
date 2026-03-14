@@ -704,13 +704,13 @@ void update_listbox(struct t_listbox *l) {
 
   switch (l->zone) {
   case 2:
-    mouse_graf = 7;
+    mouse_graf = CURSOR_SCROLL_UP;
     break;
   case 3:
-    mouse_graf = 9;
+    mouse_graf = CURSOR_SCROLL_DOWN;
     break;
   case 4:
-    mouse_graf = 13;
+    mouse_graf = CURSOR_SCROLL_TRACK;
     break;
   }
 }

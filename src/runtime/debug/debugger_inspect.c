@@ -316,7 +316,7 @@ void inspect2(void) {
       button = 0;
       v.redraw = 1;
     }
-    mouse_graf = 7;
+    mouse_graf = CURSOR_SCROLL_UP;
   } else if (button == 1) {
     wput(ptr, w, h, 123 + 32 + 64, 20, -39);
     button = 0;
@@ -324,7 +324,7 @@ void inspect2(void) {
   }
 
   if (wmouse_in(123 + 32 + 64, 28, 7, 65)) {
-    mouse_graf = 13;
+    mouse_graf = CURSOR_SCROLL_TRACK;
     if (num_var > 1 && (mouse_b & MB_LEFT)) {
       x = (float)(wmouse_y - 28) / 64.0;
       var_select = x * (num_var - 1);
@@ -354,7 +354,7 @@ void inspect2(void) {
       button = 0;
       v.redraw = 1;
     }
-    mouse_graf = 9;
+    mouse_graf = CURSOR_SCROLL_DOWN;
   } else if (button == 2) {
     wput(ptr, w, h, 123 + 32 + 64, 94, -40);
     button = 0;

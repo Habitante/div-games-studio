@@ -1416,7 +1416,7 @@ void update_menu(int menu, int min, int max) {
 
   if (n >= min && n <= max) {
     n = 0;
-    mouse_graf = 16;
+    mouse_graf = CURSOR_MENU_HOVER;
   }
 
   if (mouse_b & MB_LEFT)

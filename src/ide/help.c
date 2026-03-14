@@ -237,16 +237,16 @@ void help2(void) {
 
     if (wmouse_in(w - 9, 10, 9, h - 20)) { // Vertical slider
       if (wmouse_y < 18)
-        mouse_graf = 7;
+        mouse_graf = CURSOR_SCROLL_UP;
       else if (wmouse_y >= h - 17)
-        mouse_graf = 9;
+        mouse_graf = CURSOR_SCROLL_DOWN;
       else
-        mouse_graf = 13;
+        mouse_graf = CURSOR_SCROLL_TRACK;
     } else if (wmouse_in(w - 9, h - 9, 9, 9)) { // Resize
-      mouse_graf = 12;
+      mouse_graf = CURSOR_GRIP;
     }
 
-    if (scan_code == 72 || (mouse_graf == 7 && (mouse_b & MB_LEFT) && wmouse_x != -1)) {
+    if (scan_code == 72 || (mouse_graf == CURSOR_SCROLL_UP&& (mouse_b & MB_LEFT) && wmouse_x != -1)) {
       if (scan_code != 72) {
         if (!(v.buttons & 2)) {
           wput(v.ptr, w, h, w - 9, 10, -41);
@@ -284,7 +284,7 @@ void help2(void) {
       v.redraw++;
     }
 
-    if (scan_code == 80 || (mouse_graf == 9 && (mouse_b & MB_LEFT) && wmouse_x != -1)) {
+    if (scan_code == 80 || (mouse_graf == CURSOR_SCROLL_DOWN&& (mouse_b & MB_LEFT) && wmouse_x != -1)) {
       if (scan_code != 80) {
         if (!(v.buttons & 4)) {
           wput(v.ptr, w, h, w - 9, h - 17, -42);
@@ -319,7 +319,7 @@ void help2(void) {
       v.redraw++;
     }
 
-    if (mouse_graf == 13 && (mouse_b & MB_LEFT) && wmouse_x != -1) {
+    if (mouse_graf == CURSOR_SCROLL_TRACK&& (mouse_b & MB_LEFT) && wmouse_x != -1) {
       min = 18;
       max = h - 21;
       forced_helpslider = wmouse_y - 1;
@@ -359,7 +359,7 @@ void help2(void) {
       }
     }
 
-    if (mouse_graf == 12 && (mouse_b & MB_LEFT))
+    if (mouse_graf == CURSOR_GRIP&& (mouse_b & MB_LEFT))
       resize_help();
 
     vertical_scrollbar();

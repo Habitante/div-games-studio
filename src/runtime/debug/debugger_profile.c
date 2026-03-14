@@ -512,7 +512,7 @@ void profile2(void) {
       lp_button = 0;
       v.redraw = 1;
     }
-    mouse_graf = 7;
+    mouse_graf = CURSOR_SCROLL_UP;
   } else if (lp_button == 1) {
     wput(ptr, w, h, w - 11, lpy, -39);
     lp_button = 0;
@@ -521,7 +521,7 @@ void profile2(void) {
 
 
   if (wmouse_in(w - 11, lpy + 8, 7, lpnum * lpal - 17)) {
-    mouse_graf = 13;
+    mouse_graf = CURSOR_SCROLL_TRACK;
     if (lp_num > 1 && (mouse_b & MB_LEFT)) {
       x = (float)(wmouse_y - lpy - 8) / (float)(lpnum * lpal - 18);
       lp_select = x * (lp_num - 1);
@@ -551,7 +551,7 @@ void profile2(void) {
       lp_button = 0;
       v.redraw = 1;
     }
-    mouse_graf = 9;
+    mouse_graf = CURSOR_SCROLL_DOWN;
   } else if (lp_button == 2) {
     wput(ptr, w, h, w - 11, lpy + lpnum * lpal - 8, -40);
     lp_button = 0;
@@ -588,7 +588,7 @@ void profile2(void) {
       lp2_button = 0;
       v.redraw = 1;
     }
-    mouse_graf = 7;
+    mouse_graf = CURSOR_SCROLL_UP;
   } else if (lp2_button == 1) {
     wput(ptr, w, h, w - lp2esp - 11, lp2y, -39);
     lp2_button = 0;
@@ -597,7 +597,7 @@ void profile2(void) {
 
 
   if (wmouse_in(w - lp2esp - 11, lp2y + 8, 7, lp2num * lp2al - 17)) {
-    mouse_graf = 13;
+    mouse_graf = CURSOR_SCROLL_TRACK;
     if (lp2_num > 1 && (mouse_b & MB_LEFT)) {
       x = (float)(wmouse_y - lp2y - 8) / (float)(lp2num * lp2al - 18);
       lp2_select = x * (lp2_num - 1);
@@ -627,7 +627,7 @@ void profile2(void) {
       lp2_button = 0;
       v.redraw = 1;
     }
-    mouse_graf = 9;
+    mouse_graf = CURSOR_SCROLL_DOWN;
   } else if (lp2_button == 2) {
     wput(ptr, w, h, w - lp2esp - 11, lp2y + lp2num * lp2al - 8, -40);
     lp2_button = 0;
