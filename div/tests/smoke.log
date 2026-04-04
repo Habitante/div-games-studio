@@ -1,0 +1,31 @@
+[smoke] IDE smoke test starting...
+[smoke] Phase 1: Core allocations
+[smoke] PASS: screen_buffer
+[smoke] PASS: dac (palette)
+[smoke] PASS: dac4 (palette 0-255)
+[smoke] PASS: ghost (blend table)
+[smoke] PASS: color_lookup
+[smoke] PASS: text_font
+[smoke] PASS: toolbar
+[smoke] PASS: fill_dac
+[smoke] PASS: error_window
+[smoke] PASS: undo buffer
+[smoke] PASS: undo_table
+[smoke] PASS: mouse_background
+[smoke] PASS: graf_ptr (icon graphics)
+[smoke] Phase 2: Help & texts
+[smoke] PASS: help index loaded
+[smoke] PASS: texts loaded
+[smoke] Phase 3: Window state
+[smoke] Windows open: 1
+[smoke] PASS: at least one window open
+[smoke] Phase 4: Compile 'tests/test_smoke.prg'
+[smoke] PASS: compilation succeeded
+[smoke] Phase 5: Run compiled program (cwd=C:\Src\div\div)
+[smoke] Command: system/divrun-WINDOWS system/EXEC.EXE
+[smoke] Runtime returned: 0
+[smoke] PASS: runtime exited cleanly
+[smoke] Test PRG: 7 passed, 0 failed
+[smoke] PASS: test PRG all assertions passed
+[smoke] Phase 6: Session save (in progress...)
+[smoke] Result: 19 passed, 0 failed
